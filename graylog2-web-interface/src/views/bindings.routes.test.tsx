@@ -22,6 +22,7 @@ jest.mock('util/AppConfig', () => ({
   gl2ServerUrl: () => 'localhost:9000/api/',
   gl2AppPathPrefix: jest.fn(() => '/gl2/'),
   isFeatureEnabled: () => false,
+  isCloud: jest.fn(() => false),
 }));
 
 describe('bindings.routes', () => {

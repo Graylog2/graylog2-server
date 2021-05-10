@@ -69,6 +69,7 @@ jest.mock('util/AppConfig', () => ({
   gl2AppPathPrefix: jest.fn(() => ''),
   gl2DevMode: jest.fn(() => false),
   isFeatureEnabled: jest.fn(() => true),
+  isCloud: jest.fn(() => false),
 }));
 
 jest.mock('stores/sessions/SessionStore', () => ({

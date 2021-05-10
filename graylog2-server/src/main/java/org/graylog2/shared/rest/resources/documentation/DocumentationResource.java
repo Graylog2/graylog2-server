@@ -26,6 +26,7 @@ import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.rest.RestTools;
 import org.graylog2.shared.plugins.DocumentationRestResourceClasses;
+import org.graylog2.shared.rest.HideOnCloud;
 import org.graylog2.shared.rest.documentation.generator.Generator;
 import org.graylog2.shared.rest.resources.RestResource;
 
@@ -48,6 +49,7 @@ import static org.graylog2.shared.initializers.JerseyService.PLUGIN_PREFIX;
 
 @Api(value = "Documentation", description = "Documentation of this API in JSON format.")
 @Path("/api-docs")
+@HideOnCloud
 public class DocumentationResource extends RestResource {
 
     private final Generator generator;

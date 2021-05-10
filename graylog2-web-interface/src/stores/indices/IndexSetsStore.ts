@@ -18,22 +18,72 @@ import Reflux from 'reflux';
 
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
-import * as URLUtils from 'util/URLUtils';
+import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import ActionsProvider from 'injection/ActionsProvider';
+
+export type IndexSet = {
+  id: string,
+  title: string,
+  description: string,
+  index_prefix: string,
+  shards: number,
+  replicas: number,
+  rotation_strategy_class: string,
+  rotation_strategy: {
+    type: string,
+    max_docs_per_index: number,
+  },
+  retention_strategy_class: string,
+  retention_strategy: {
+    type: string,
+    max_docs_per_index: number,
+    index_action: string,
+  },
+  creation_date: string,
+  index_analyzer: string,
+  index_optimization_max_num_segments: number,
+  index_optimization_disabled: boolean,
+  field_type_refresh_interval: number,
+  index_template_type: string,
+  writable: boolean,
+  default: boolean,
+};
+
+type IndexSetsResponseType = {
+  total: number,
+  index_sets: Array<IndexSet>,
+  stats: {
+    [key: string]: {
+      documents: number,
+      indices: number,
+      size: number,
+    },
+  },
+};
 
 const IndexSetsActions = ActionsProvider.getActions('IndexSets');
 
 const IndexSetsStore = Reflux.createStore({
   listenables: [IndexSetsActions],
+  indexSetsCount: undefined,
+  indexSets: undefined,
+  indexSetStats: undefined,
 
-  list(stats) {
-    const url = URLUtils.qualifyUrl(ApiRoutes.IndexSetsApiController.list(stats).url);
+  getInitialState() {
+    return {
+      indexSetsCount: this.indexSetsCount,
+      indexSets: this.indexSets,
+      indexSetStats: this.indexSetStats,
+    };
+  },
+  list(stats: boolean) {
+    const url = qualifyUrl(ApiRoutes.IndexSetsApiController.list(stats).url);
     const promise = fetch('GET', url);
 
     promise
       .then(
-        (response) => this.trigger({
+        (response: IndexSetsResponseType) => this.trigger({
           indexSetsCount: response.total,
           indexSets: response.index_sets,
           indexSetStats: response.stats,
@@ -47,13 +97,13 @@ const IndexSetsStore = Reflux.createStore({
     IndexSetsActions.list.promise(promise);
   },
 
-  listPaginated(skip, limit, stats) {
-    const url = URLUtils.qualifyUrl(ApiRoutes.IndexSetsApiController.listPaginated(skip, limit, stats).url);
+  listPaginated(skip: number, limit: number, stats: boolean) {
+    const url = qualifyUrl(ApiRoutes.IndexSetsApiController.listPaginated(skip, limit, stats).url);
     const promise = fetch('GET', url);
 
     promise
       .then(
-        (response) => this.trigger({
+        (response: IndexSetsResponseType) => this.trigger({
           indexSetsCount: response.total,
           indexSets: response.index_sets,
           indexSetStats: response.stats,
@@ -67,12 +117,12 @@ const IndexSetsStore = Reflux.createStore({
     IndexSetsActions.listPaginated.promise(promise);
   },
 
-  get(indexSetId) {
-    const url = URLUtils.qualifyUrl(ApiRoutes.IndexSetsApiController.get(indexSetId).url);
+  get(indexSetId: string) {
+    const url = qualifyUrl(ApiRoutes.IndexSetsApiController.get(indexSetId).url);
     const promise = fetch('GET', url);
 
     promise.then(
-      (response) => {
+      (response: IndexSet) => {
         this.trigger({ indexSet: response });
 
         return response;
@@ -85,12 +135,12 @@ const IndexSetsStore = Reflux.createStore({
     IndexSetsActions.get.promise(promise);
   },
 
-  update(indexSet) {
-    const url = URLUtils.qualifyUrl(ApiRoutes.IndexSetsApiController.get(indexSet.id).url);
+  update(indexSet: IndexSet) {
+    const url = qualifyUrl(ApiRoutes.IndexSetsApiController.get(indexSet.id).url);
     const promise = fetch('PUT', url, indexSet);
 
     promise.then(
-      (response) => {
+      (response: IndexSet) => {
         UserNotification.success(`Successfully updated index set '${indexSet.title}'`, 'Success');
         this.trigger({ indexSet: response });
 
@@ -104,12 +154,12 @@ const IndexSetsStore = Reflux.createStore({
     IndexSetsActions.update.promise(promise);
   },
 
-  create(indexSet) {
-    const url = URLUtils.qualifyUrl(ApiRoutes.IndexSetsApiController.create().url);
+  create(indexSet: IndexSet) {
+    const url = qualifyUrl(ApiRoutes.IndexSetsApiController.create().url);
     const promise = fetch('POST', url, indexSet);
 
     promise.then(
-      (response) => {
+      (response: IndexSet) => {
         UserNotification.success(`Successfully created index set '${indexSet.title}'`, 'Success');
         this.trigger({ indexSet: response });
 
@@ -123,8 +173,8 @@ const IndexSetsStore = Reflux.createStore({
     IndexSetsActions.create.promise(promise);
   },
 
-  delete(indexSet, deleteIndices) {
-    const url = URLUtils.qualifyUrl(ApiRoutes.IndexSetsApiController.delete(indexSet.id, deleteIndices).url);
+  delete(indexSet: IndexSet, deleteIndices: boolean) {
+    const url = qualifyUrl(ApiRoutes.IndexSetsApiController.delete(indexSet.id, deleteIndices).url);
     const promise = fetch('DELETE', url);
 
     promise.then(
@@ -139,8 +189,8 @@ const IndexSetsStore = Reflux.createStore({
     IndexSetsActions.delete.promise(promise);
   },
 
-  setDefault(indexSet) {
-    const url = URLUtils.qualifyUrl(ApiRoutes.IndexSetsApiController.setDefault(indexSet.id).url);
+  setDefault(indexSet: IndexSet) {
+    const url = qualifyUrl(ApiRoutes.IndexSetsApiController.setDefault(indexSet.id).url);
     const promise = fetch('PUT', url);
 
     promise.then(
@@ -156,7 +206,7 @@ const IndexSetsStore = Reflux.createStore({
   },
 
   stats() {
-    const url = URLUtils.qualifyUrl(ApiRoutes.IndexSetsApiController.stats().url);
+    const url = qualifyUrl(ApiRoutes.IndexSetsApiController.stats().url);
     const promise = fetch('GET', url);
 
     promise

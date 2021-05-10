@@ -162,6 +162,9 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "enabled_tls_protocols", converter = StringSetConverter.class)
     private Set<String> enabledTlsProtocols = DefaultTLSProtocolProvider.getDefaultSupportedTlsProtocols();
 
+    @Parameter(value = "is_cloud")
+    private boolean isCloud = false;
+
     @Parameter(value = "elasticsearch_mute_deprecation_warnings")
     private boolean muteDeprecationWarnings = false;
 
@@ -207,6 +210,10 @@ public class Configuration extends BaseConfiguration {
 
     public int getOutputBufferProcessorKeepAliveTime() {
         return outputBufferProcessorKeepAliveTime;
+    }
+
+    public boolean isCloud() {
+        return isCloud;
     }
 
     @Override

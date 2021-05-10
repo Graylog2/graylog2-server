@@ -17,25 +17,30 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import HideOnCloud from 'util/conditional/HideOnCloud';
 import { Col } from 'components/graylog';
 import { IndicesConfiguration } from 'components/indices';
+import type { IndexSet } from 'stores/indices/IndexSetsStore';
 
 import StyledIndexSetDetailsRow from './StyledIndexSetDetailsRow';
 
-const IndexSetDetails = ({ indexSet }) => {
+type Props = {
+  indexSet: IndexSet,
+};
+
+const IndexSetDetails = ({ indexSet }: Props) => {
   return (
     <StyledIndexSetDetailsRow>
       <Col lg={3}>
         <dl>
           <dt>Index prefix:</dt>
           <dd>{indexSet.index_prefix}</dd>
-
-          <dt>Shards:</dt>
-          <dd>{indexSet.shards}</dd>
-
-          <dt>Replicas:</dt>
-          <dd>{indexSet.replicas}</dd>
-
+          <HideOnCloud>
+            <dt>Shards:</dt>
+            <dd>{indexSet.shards}</dd>
+            <dt>Replicas:</dt>
+            <dd>{indexSet.replicas}</dd>
+          </HideOnCloud>
           <dt>Field type refresh interval:</dt>
           <dd>{indexSet.field_type_refresh_interval / 1000.0} seconds</dd>
         </dl>
@@ -48,8 +53,5 @@ const IndexSetDetails = ({ indexSet }) => {
   );
 };
 
-IndexSetDetails.propTypes = {
-  indexSet: PropTypes.object.isRequired,
-};
-
+IndexSetDetails.propTypes = { indexSet: PropTypes.object.isRequired };
 export default IndexSetDetails;

@@ -14,12 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
-import createReactClass from 'create-react-class';
-import Reflux from 'reflux';
+import PropTypes from 'prop-types';
 import numeral from 'numeral';
 
+import HideOnCloud from 'util/conditional/HideOnCloud';
 import { LinkContainer } from 'components/graylog/router';
 import { Alert, Row, Col, Panel, Button } from 'components/graylog';
 import { DocumentTitle, PageHeader, Spinner, Icon } from 'components/common';
@@ -30,53 +29,90 @@ import DocsHelper from 'util/DocsHelper';
 import CombinedProvider from 'injection/CombinedProvider';
 import Routes from 'routing/Routes';
 import withParams from 'routing/withParams';
+import connect from 'stores/connect';
+import type { IndexSet } from 'stores/indices/IndexSetsStore';
+import type { IndexerOverview } from 'stores/indexers/IndexerOverviewStore';
+import type { Indices } from 'stores/indices/IndicesStore';
 
 const { IndexSetsStore, IndexSetsActions } = CombinedProvider.get('IndexSets');
 const { IndicesStore, IndicesActions } = CombinedProvider.get('Indices');
 const { IndexerOverviewStore, IndexerOverviewActions } = CombinedProvider.get('IndexerOverview');
 
-const IndexSetPage = createReactClass({
-  displayName: 'IndexSetPage',
+const REFRESH_INTERVAL = 2000;
 
-  propTypes: {
-    params: PropTypes.object.isRequired,
+type Props = {
+  params: {
+    indexSetId?: string,
   },
+  indexSet?: IndexSet,
+  indexerOverview?: IndexerOverview,
+  indexerOverviewError?: string,
+  indexDetails: {
+    closedIndices?: Indices,
+    indices?: Indices,
+  },
+};
 
-  mixins: [
-    Reflux.connect(IndexSetsStore),
-    Reflux.connect(IndicesStore, 'indexDetails'),
-    Reflux.connect(IndexerOverviewStore),
-  ],
+type State = {
+  timerId?: NodeJS.Timeout,
+};
 
-  getInitialState() {
-    return {
-      indexSet: undefined,
+class IndexSetPage extends React.Component<Props, State> {
+  static propTypes = {
+    params: PropTypes.shape({
+      indexSetId: PropTypes.string,
+    }).isRequired,
+    indexSet: PropTypes.object,
+    indexerOverview: PropTypes.object,
+    indexerOverviewError: PropTypes.object,
+    indexDetails: PropTypes.object,
+  };
+
+  static defaultProps = {
+    indexerOverview: undefined,
+    indexerOverviewError: undefined,
+    indexSet: undefined,
+    indexDetails: {
+      indices: undefined,
+      closedIndices: undefined,
+    },
+  }
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      timerId: undefined,
     };
-  },
+  }
 
   componentDidMount() {
-    IndexSetsActions.get(this.props.params.indexSetId);
-    IndicesActions.list(this.props.params.indexSetId);
+    const { params: { indexSetId } } = this.props;
+    IndexSetsActions.get(indexSetId);
+    IndicesActions.list(indexSetId);
 
-    this.timerId = setInterval(() => {
+    const timerId = setInterval(() => {
       IndicesActions.multiple();
-      IndexerOverviewActions.list(this.props.params.indexSetId);
-    }, this.REFRESH_INTERVAL);
-  },
+      IndexerOverviewActions.list(indexSetId);
+    }, REFRESH_INTERVAL);
+    this.setState({ timerId: timerId });
+  }
 
   componentWillUnmount() {
-    if (this.timerId) {
-      clearInterval(this.timerId);
+    const { timerId } = this.state;
+
+    if (timerId) {
+      clearInterval(timerId);
     }
-  },
+  }
 
-  REFRESH_INTERVAL: 2000,
+  _totalIndexCount = () => {
+    const { indexerOverview: indices } = this.props;
 
-  _totalIndexCount() {
-    return Object.keys(this.state.indexerOverview.indices).length;
-  },
+    return indices ? Object.keys(indices).length : null;
+  };
 
-  _renderElasticsearchUnavailableInformation() {
+  _renderElasticsearchUnavailableInformation = () => {
     return (
       <Row className="content">
         <Col md={8} mdOffset={2}>
@@ -98,20 +134,22 @@ const IndexSetPage = createReactClass({
         </Col>
       </Row>
     );
-  },
+  };
 
-  _isLoading() {
-    return !this.state.indexSet;
-  },
+  _isLoading = () => {
+    const { indexSet } = this.props;
+
+    return !indexSet;
+  };
 
   render() {
     if (this._isLoading()) {
       return <Spinner />;
     }
 
-    const { indexSet } = this.state;
+    const { indexSet, indexerOverview, indexerOverviewError, params: { indexSetId }, indexDetails: { indices: indexDetailsIndices, closedIndices: indexDetailsClosedIndices } } = this.props;
 
-    const pageHeader = (
+    const pageHeader = indexSet && (
       <PageHeader title={`Index Set: ${indexSet.title}`}>
         <span>
           This is an overview of all indices (message stores) in this index set Graylog is currently taking in account
@@ -132,12 +170,12 @@ const IndexSetPage = createReactClass({
             <Button bsStyle="info">Edit Index Set</Button>
           </LinkContainer>
           &nbsp;
-          <IndicesMaintenanceDropdown indexSetId={this.props.params.indexSetId} indexSet={this.state.indexSet} />
+          <IndicesMaintenanceDropdown indexSetId={indexSetId} indexSet={indexSet} />
         </span>
       </PageHeader>
     );
 
-    if (this.state.indexerOverviewError) {
+    if (indexerOverviewError) {
       return (
         <span>
           {pageHeader}
@@ -149,26 +187,28 @@ const IndexSetPage = createReactClass({
     let indicesInfo;
     let indicesOverview;
 
-    if (this.state.indexerOverview && this.state.indexDetails.closedIndices) {
-      const deflectorInfo = this.state.indexerOverview.deflector;
+    if (indexerOverview && indexDetailsClosedIndices) {
+      const deflectorInfo = indexerOverview.deflector;
 
       indicesInfo = (
         <span>
           <Alert bsStyle="success" style={{ marginTop: '10' }}>
             <Icon name="th" /> &nbsp;{this._totalIndexCount()} indices with a total of{' '}
-            {numeral(this.state.indexerOverview.counts.events).format('0,0')} messages under management,
+            {numeral(indexerOverview.counts.events).format('0,0')} messages under management,
             current write-active index is <i>{deflectorInfo.current_target}</i>.
           </Alert>
-          <IndexerClusterHealthSummary health={this.state.indexerOverview.indexer_cluster.health} />
+          <HideOnCloud>
+            <IndexerClusterHealthSummary health={indexerOverview.indexer_cluster.health} />
+          </HideOnCloud>
         </span>
       );
 
       indicesOverview = (
-        <IndicesOverview indices={this.state.indexerOverview.indices}
-                         indexDetails={this.state.indexDetails.indices}
-                         indexSetId={this.props.params.indexSetId}
-                         closedIndices={this.state.indexDetails.closedIndices}
-                         deflector={this.state.indexerOverview.deflector} />
+        <IndicesOverview indices={indexerOverview.indices}
+                         indexDetails={indexDetailsIndices}
+                         indexSetId={indexSetId}
+                         closedIndices={indexDetailsClosedIndices}
+                         deflector={indexerOverview.deflector} />
       );
     } else {
       indicesInfo = <Spinner />;
@@ -176,7 +216,7 @@ const IndexSetPage = createReactClass({
     }
 
     return (
-      <DocumentTitle title={`Index Set - ${indexSet.title}`}>
+      <DocumentTitle title={`Index Set - ${indexSet ? indexSet.title : ''}`}>
         <div>
           {pageHeader}
 
@@ -196,7 +236,23 @@ const IndexSetPage = createReactClass({
         </div>
       </DocumentTitle>
     );
-  },
-});
+  }
+}
 
-export default withParams(IndexSetPage);
+export default connect(
+  withParams(IndexSetPage),
+  {
+    indexSets: IndexSetsStore,
+    indexerOverview: IndexerOverviewStore,
+    indices: IndicesStore,
+  },
+  ({ indexSets, indexerOverview, indices }) => ({
+    // @ts-ignore
+    indexSet: indexSets ? indexSets.indexSet : undefined,
+    // @ts-ignore
+    indexerOverview: indexerOverview && indexerOverview.indexerOverview,
+    // @ts-ignore
+    indexerOverviewError: indexerOverview && indexerOverview.indexerOverviewError,
+    indexDetails: indices,
+  }),
+);

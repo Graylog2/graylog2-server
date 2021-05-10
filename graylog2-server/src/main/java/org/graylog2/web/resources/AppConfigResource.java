@@ -79,6 +79,7 @@ public class AppConfigResource {
             "rootTimeZone", configuration.getRootTimeZone(),
             "serverUri", baseUri.resolve(HttpConfiguration.PATH_API),
             "appPathPrefix", baseUri.getPath(),
+            "isCloud", configuration.isCloud(),
             "pluginUISettings", buildPluginUISettings());
         return templateEngine.transform(template, model);
     }

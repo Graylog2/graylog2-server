@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
@@ -35,18 +36,25 @@ public class ClusterHealthCheckThread extends Periodical {
     private NotificationService notificationService;
     private final InputRegistry inputRegistry;
     private final NodeId nodeId;
+    private boolean isCloud;
 
     @Inject
     public ClusterHealthCheckThread(NotificationService notificationService,
                                     InputRegistry inputRegistry,
-                                    NodeId nodeId) {
+                                    NodeId nodeId,
+                                    @Named("is_cloud") boolean isCloud) {
         this.notificationService = notificationService;
         this.inputRegistry = inputRegistry;
         this.nodeId = nodeId;
+        this.isCloud = isCloud;
     }
 
     @Override
     public void doRun() {
+        if (isCloud) {
+            LOG.debug("Skipping run of ClusterHealthCheckThread, since contained checks are not applicable for Cloud.");
+            return;
+        }
         try {
             if (inputRegistry.runningCount() == 0) {
                 LOG.debug("No input running in cluster!");

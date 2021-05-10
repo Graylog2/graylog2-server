@@ -79,8 +79,8 @@ public class JournalResource extends RestResource {
             }
 
             return JournalSummaryResponse.createEnabled(throttleState.appendEventsPerSec,
-                                                        throttleState.readEventsPerSec,
-                                                        throttleState.uncommittedJournalEntries,
+                    throttleState.readEventsPerSec,
+                    throttleState.uncommittedJournalEntries,
                                                         Size.bytes(throttleState.journalSize),
                                                         Size.bytes(throttleState.journalSizeLimit),
                                                         kafkaJournal.numberOfSegments(),
