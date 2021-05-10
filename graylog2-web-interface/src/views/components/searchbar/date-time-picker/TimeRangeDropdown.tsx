@@ -48,7 +48,7 @@ const timeRangeTypes = {
 
 const allTimeRangeTypes = Object.keys(timeRangeTypes) as Array<TimeRangeType>;
 
-type Props = {
+export type TimeRangeDropdownProps = {
   currentTimeRange: SearchBarFormValues['timerange'] | NoTimeRangeOverride,
   noOverride?: boolean,
   position: 'bottom'|'right',
@@ -252,10 +252,12 @@ const TimeRangeDropdown = ({
   setCurrentTimeRange,
   validTypes = allTimeRangeTypes,
   position,
-}: Props) => {
+}: TimeRangeDropdownProps) => {
   const { limitDuration } = useContext(DateTimeContext);
   const [validatingKeyword, setValidatingKeyword] = useState(false);
   const [activeTab, setActiveTab] = useState('type' in currentTimeRange ? currentTimeRange.type : undefined);
+
+  const positionIsBottom = position === 'bottom';
 
   const handleNoOverride = () => {
     setCurrentTimeRange({});
@@ -287,10 +289,10 @@ const TimeRangeDropdown = ({
     <StyledPopover id="timerange-type"
                    data-testid="timerange-type"
                    placement={position}
-                   positionTop={position === 'bottom' ? 36 : -10}
-                   positionLeft={position === 'bottom' ? -15 : 45}
-                   arrowOffsetTop={position === 'bottom' ? undefined : 25}
-                   arrowOffsetLeft={position === 'bottom' ? 34 : -11}
+                   positionTop={positionIsBottom ? 36 : -10}
+                   positionLeft={positionIsBottom ? -15 : 45}
+                   arrowOffsetTop={positionIsBottom ? undefined : 25}
+                   arrowOffsetLeft={positionIsBottom ? 34 : -11}
                    title={title}>
       <Formik initialValues={{ nextTimeRange: onInitializingNextTimeRange(currentTimeRange) }}
               validate={({ nextTimeRange }) => dateTimeValidate(nextTimeRange, limitDuration)}
