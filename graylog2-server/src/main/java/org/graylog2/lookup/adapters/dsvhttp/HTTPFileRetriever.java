@@ -26,6 +26,9 @@ import org.joda.time.DateTimeZone;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -61,6 +64,14 @@ public class HTTPFileRetriever {
     }
 
     /**
+     * Request that a file be downloaded and stored to the provided location.  No "If-Modified-Since" header will be
+     * sent so the file will be fetched again, even if it hasn't been modified since the last fetch.
+     */
+    public boolean downloadFile(String url, Path toPath) throws IOException {
+        return downloadFile(url, toPath, false);
+    }
+
+    /**
      * Request file by sending an "If-Modified-Since" header so that the file won't be fetched if it hasn't been
      * modified since the last request.
      */
@@ -74,6 +85,25 @@ public class HTTPFileRetriever {
      */
     public Optional<byte[]> fetchFileBytesIfNotModified(String url) throws IOException {
         return fetchFileBytes(url, true);
+    }
+
+    /**
+     * Request that a file be downloaded and stored to the provided location. Will send the "If-Modified-Since" header
+     * so that the file won't be fetched if it hasn't been modified since the last request.  Returns TRUE if the file
+     * was downloaded, FALSE otherwise.
+     */
+    public boolean downloadFileIfNotModified(String url, Path toPath) throws IOException {
+        return downloadFile(url, toPath, true);
+    }
+
+    private boolean downloadFile(String url, Path toPath, boolean addIfModifiedSinceHeader) throws IOException {
+        try (Response response = doHttpGet(url, addIfModifiedSinceHeader)) {
+            if (null != response && null != response.body()) {
+                Files.copy(response.body().byteStream(), toPath, StandardCopyOption.REPLACE_EXISTING);
+                return true;
+            }
+            return false;
+        }
     }
 
     private Optional<byte[]> fetchFileBytes(String url, boolean addIfModifiedSinceHeader) throws IOException {

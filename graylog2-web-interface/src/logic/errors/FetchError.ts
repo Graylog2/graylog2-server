@@ -32,6 +32,8 @@ type Additional = {
 }
 
 export default class FetchError extends Error {
+  name: 'FetchError';
+
   responseMessage: string;
 
   additional: Additional;
@@ -40,18 +42,12 @@ export default class FetchError extends Error {
 
   constructor(message, additional) {
     super(message);
-    this.message = message ?? additional?.message ?? 'Undefined error.';
+    this.name = 'FetchError';
 
-    /* eslint-disable no-console */
-    try {
-      this.responseMessage = additional.body ? additional.body.message : undefined;
+    const details = additional?.body?.message ?? 'Not available';
+    this.message = `There was an error fetching a resource: ${message}. Additional information: ${details}`;
 
-      console.error(`There was an error fetching a resource: ${this.message}.`,
-        `Additional information: ${additional.body && additional.body.message ? additional.body.message : 'Not available'}`);
-    } catch (e) {
-      console.error(`There was an error fetching a resource: ${this.message}. No additional information available.`);
-    }
-    /* eslint-enable no-console */
+    this.responseMessage = additional?.body?.message ?? undefined;
 
     this.additional = additional;
     this.status = additional?.status; // Shortcut, as this is often used

@@ -19,7 +19,6 @@ import Immutable from 'immutable';
 import { render, screen } from 'wrappedTestingLibrary';
 import { MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
-
 import Search from 'views/logic/search/Search';
 import Widget from 'views/logic/widgets/Widget';
 import TimeLocalizeContext from 'contexts/TimeLocalizeContext';

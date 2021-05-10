@@ -16,6 +16,9 @@
  */
 package org.graylog.testing.completebackend;
 
+import java.net.URL;
+import java.util.List;
+
 /**
  * Controls the lifecycle of the {@link GraylogBackend} used in tests
  */
@@ -33,11 +36,11 @@ public enum Lifecycle {
      */
     METHOD {
         @Override
-        void afterEach(GraylogBackend backend) {
-            backend.fullReset();
+        void afterEach(GraylogBackend backend, List<URL> mongoDBFixtures) {
+            backend.fullReset(mongoDBFixtures);
         }
     };
 
-    void afterEach(GraylogBackend backend) {
+    void afterEach(GraylogBackend backend, List<URL> mongoDBFixtures) {
     }
 }

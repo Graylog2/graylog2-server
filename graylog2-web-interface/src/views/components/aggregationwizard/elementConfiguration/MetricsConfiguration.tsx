@@ -28,6 +28,7 @@ const MetricsConfiguration = () => {
 
   return (
     <FieldArray name="metrics"
+                validateOnChange={false}
                 render={({ remove }) => (
                   <>
                     <div>

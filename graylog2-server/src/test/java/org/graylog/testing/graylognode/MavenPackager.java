@@ -21,10 +21,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
+import java.nio.file.Path;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
@@ -32,9 +32,9 @@ import static org.graylog.testing.graylognode.ExecutableFileUtil.makeSureExecuta
 
 public class MavenPackager {
     private static final Logger LOG = LoggerFactory.getLogger(MavenPackager.class);
-    private static final String MVN_COMMAND = "mvn package -DskipTests -Dskip.web.build -Dforbiddenapis.skip=true -Dmaven.javadoc.skip=true";
+    private static final String MVN_COMMAND = "mvn package -DskipTests -Dskip.web.build -Dforbiddenapis.skip=true -Dmaven.javadoc.skip=true -Dassembly.skipAssembly=true";
 
-    static void packageJarIfNecessary(String projectDir) {
+    static void packageJarIfNecessary(Path projectDir) {
         if (isRunFromMaven()) {
             LOG.info("Running from Maven. Assuming jars are current.");
         } else {
@@ -49,7 +49,7 @@ public class MavenPackager {
         return System.getProperty("surefire.test.class.path") != null;
     }
 
-    static void packageJar(String pomDir) {
+    static void packageJar(Path pomDir) {
         Process p = startProcess(pomDir);
 
         Stopwatch sw = Stopwatch.createStarted();
@@ -70,9 +70,9 @@ public class MavenPackager {
         }
     }
 
-    private static Process startProcess(String pomDir) {
+    private static Process startProcess(Path pomDir) {
         try {
-            return new ProcessBuilder().command("sh", "-c", MVN_COMMAND).directory(new File(pomDir)).inheritIO().start();
+            return new ProcessBuilder().command("sh", "-c", MVN_COMMAND).directory(pomDir.toFile()).inheritIO().start();
         } catch (IOException e) {
             String msg = String.format(Locale.US, "Failed to start maven process with command [%s].", MVN_COMMAND);
             throw new RuntimeException(msg, e);

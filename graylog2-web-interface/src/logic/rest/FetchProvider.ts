@@ -133,7 +133,7 @@ export class Builder {
         return noContent ? null : resp.json();
       }
 
-      throw new FetchError(resp.statusText, resp);
+      throw resp;
     };
 
     this.errorHandler = (error) => onServerError(error);
@@ -152,7 +152,7 @@ export class Builder {
         return resp.text();
       }
 
-      throw new FetchError(resp.statusText, resp);
+      this.errorHandler(resp);
     };
 
     this.errorHandler = (error) => onServerError(error);
@@ -173,7 +173,7 @@ export class Builder {
         return resp.json();
       }
 
-      throw new FetchError(resp.statusText, resp);
+      throw resp;
     };
 
     this.errorHandler = (error) => onServerError(error, onUnauthorized);
@@ -203,7 +203,8 @@ export class Builder {
       method: this.method,
       headers,
       body: this.body ? this.body.body : undefined,
-    })).then(this.responseHandler, this.errorHandler);
+    })).then(this.responseHandler, this.errorHandler)
+      .catch(this.errorHandler);
   }
 }
 
