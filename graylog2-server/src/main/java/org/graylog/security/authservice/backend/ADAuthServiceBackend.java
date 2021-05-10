@@ -39,6 +39,7 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -263,15 +264,20 @@ public class ADAuthServiceBackend implements AuthServiceBackend {
                 .put("login_success", loginSuccess);
 
         if (user != null) {
-            userDetails.put("user_details", ImmutableMap.<String, String>builder()
-                    .put("dn", user.dn())
-                    .put("account_enabled", String.valueOf(user.accountIsEnabled()))
-                    .put(AD_OBJECT_GUID, user.base64UniqueId())
-                    .put(config.userNameAttribute(), user.username())
-                    .put(config.userFullNameAttribute(), user.fullName())
-                    .put("email", user.email())
-                    .build()
-            );
+            // Use regular HashMap to allow duplicates. Users might use the same attribute for name and full name.
+            // See: https://github.com/Graylog2/graylog2-server/issues/10069
+            final Map<String, String> attributes = new HashMap<>();
+
+            attributes.put("dn", user.dn());
+            attributes.put("account_enabled", String.valueOf(user.accountIsEnabled()));
+            // Use a special key for the unique ID attribute. If users use something like "uid" for the unique ID,
+            // it might be confusing to see a base64 encoded value instead of the plain text one.
+            attributes.put("unique_id (" + AD_OBJECT_GUID + ")", user.base64UniqueId());
+            attributes.put(config.userNameAttribute(), user.username());
+            attributes.put(config.userFullNameAttribute(), user.fullName());
+            attributes.put("email", user.email());
+
+            userDetails.put("user_details", ImmutableMap.copyOf(attributes));
         } else {
             userDetails.put("user_details", ImmutableMap.of());
         }

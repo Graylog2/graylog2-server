@@ -26,6 +26,8 @@ import style from './MapVisualization.css';
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import leafletStyles from '!style/useable!css!leaflet/dist/leaflet.css';
 
+import InteractiveContext from '../../contexts/InteractiveContext';
+
 const DEFAULT_VIEWPORT = {
   center: [0, 0],
   zoom: 1,
@@ -45,7 +47,6 @@ class MapVisualization extends React.Component {
     width: PropTypes.number.isRequired,
     url: PropTypes.string,
     attribution: PropTypes.string,
-    interactive: PropTypes.bool,
     onRenderComplete: PropTypes.func,
     onChange: PropTypes.func.isRequired,
     locked: PropTypes.bool, // Disables zoom and dragging
@@ -61,7 +62,6 @@ class MapVisualization extends React.Component {
     data: {},
     url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
     attribution: '&copy; <a href="http://osm.org/copyright" target="_blank">OpenStreetMap</a> contributors',
-    interactive: true,
     onRenderComplete: () => {},
     locked: false,
     viewport: DEFAULT_VIEWPORT,
@@ -145,7 +145,7 @@ class MapVisualization extends React.Component {
   }
 
   render() {
-    const { data, id, height, width, url, attribution, interactive, locked, viewport, onChange, markerRadiusSize, markerRadiusIncrementSize } = this.props;
+    const { data, id, height, width, url, attribution, locked, viewport, onChange, markerRadiusSize, markerRadiusIncrementSize } = this.props;
 
     const noOfKeys = data.length;
     const chromaScale = chroma.scale('Spectral');
@@ -163,25 +163,29 @@ class MapVisualization extends React.Component {
     });
 
     return (
-      <div className={locked ? style.mapLocked : ''} style={{ position: 'relative', zIndex: 0 }}>
-        {locked && <div className={style.overlay} style={{ height, width }} />}
-        <Map animate={interactive}
-             className={style.map}
-             fadeAnimation={interactive}
-             key={`visualization-${id}-${width}-${height}`}
-             id={`visualization-${id}`}
-             markerZoomAnimation={interactive}
-             onViewportChanged={onChange}
-             scrollWheelZoom
-             style={{ height, width }}
-             viewport={viewport}
-             whenReady={this._handleMapReady}
-             zoomAnimation={interactive}
-             ref={(c) => { this._map = c; }}>
-          <TileLayer url={url} maxZoom={19} attribution={attribution} onLoad={this._handleTilesReady} />
-          {markers}
-        </Map>
-      </div>
+      <InteractiveContext.Consumer>
+        {(interactive) => (
+          <div className={locked ? style.mapLocked : ''} style={{ position: 'relative', zIndex: 0 }}>
+            {locked && <div className={style.overlay} style={{ height, width }} />}
+            <Map animate={interactive}
+                 className={style.map}
+                 fadeAnimation={interactive}
+                 key={`visualization-${id}-${width}-${height}`}
+                 id={`visualization-${id}`}
+                 markerZoomAnimation={interactive}
+                 onViewportChanged={onChange}
+                 scrollWheelZoom
+                 style={{ height, width }}
+                 viewport={viewport}
+                 whenReady={this._handleMapReady}
+                 zoomAnimation={interactive}
+                 ref={(c) => { this._map = c; }}>
+              <TileLayer url={url} maxZoom={19} attribution={attribution} onLoad={this._handleTilesReady} />
+              {markers}
+            </Map>
+          </div>
+        )}
+      </InteractiveContext.Consumer>
     );
   }
 }
