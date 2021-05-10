@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useEffect, useState } from 'react';
 import { Field, useFormikContext } from 'formik';
 import styled, { css } from 'styled-components';
 import moment from 'moment';
@@ -96,9 +97,19 @@ const ConfiguredWrapper = styled.div`
   justify-self: end;
 `;
 
-const getValue = (fieldName, value: number, unsetRangeValue) => RELATIVE_RANGE_TYPES.map(({ type }) => {
+const getValue = (fieldName, value: number | '', unsetRangeValue, previousRangeType?: moment.unitOfTime.DurationConstructor) => RELATIVE_RANGE_TYPES.map(({ type }) => {
   const unsetRange = value === unsetRangeValue;
   const diff = moment.duration(value, 'seconds').as(type);
+  const valueInputIsEmpty = value === null;
+
+  if (valueInputIsEmpty) {
+    return {
+      rangeValue: value,
+      rangeType: previousRangeType ?? type,
+      unsetRange: false,
+      [fieldName]: value,
+    };
+  }
 
   if (diff - Math.floor(diff) === 0) {
     return {
@@ -133,100 +144,142 @@ type Props = {
   disableUnsetRange?: boolean
 }
 
-const RelativeRangeSelect = ({ disabled, fieldName, limitDuration, unsetRangeLabel, defaultRange, title, disableUnsetRange, unsetRangeValue }: Props) => {
+const useSyncInputsWithFormState = ({ rangeValue, rangeType, value, fieldName, unsetRangeValue, setInputValue }) => {
+  useEffect(() => {
+    if (rangeValue !== value) {
+      setInputValue(getValue(fieldName, value, unsetRangeValue, rangeType));
+    }
+  }, [rangeValue, rangeType, value, fieldName, unsetRangeValue, setInputValue]);
+};
+
+const RelativeRangeSelectInner = ({
+  value,
+  onChange,
+  name,
+  disabled,
+  unsetRangeLabel,
+  error,
+  defaultRange,
+  title,
+  disableUnsetRange,
+  unsetRangeValue,
+  fieldName,
+  limitDuration,
+}: Required<Props> & {
+  value: number | '',
+  onChange: (changeEvent: { target: { name: string, value: string } }) => void,
+  name: string,
+  error: string | undefined,
+}) => {
   const { initialValues } = useFormikContext<TimeRangeDropDownFormValues>();
   const availableRangeTypes = buildRangeTypes(limitDuration);
+  const [inputValue, setInputValue] = useState(getValue(fieldName, value, unsetRangeValue));
+
+  useSyncInputsWithFormState({
+    rangeValue: inputValue.rangeValue, rangeType: inputValue.rangeType, value, fieldName, unsetRangeValue, setInputValue,
+  });
+
+  const _onChange = (nextValue) => {
+    onChange({ target: { name, value: nextValue } });
+  };
+
+  const _onChangeTime = (event) => {
+    const inputIsEmpty = event.target.value === '';
+    const newTimeValue = inputIsEmpty ? null : moment.duration(event.target.value || 1, inputValue.rangeType).asSeconds();
+
+    _onChange(newTimeValue);
+  };
+
+  const _onChangeType = (type) => {
+    const newTimeValue = moment.duration(inputValue.rangeValue || 1, type).asSeconds();
+
+    _onChange(newTimeValue);
+  };
+
+  const _onUnsetRange = (event) => {
+    const hasInitialRelativeRange = isTypeRelative(initialValues.nextTimeRange);
+    const _defaultRange = (
+      hasInitialRelativeRange
+      && fieldName in initialValues.nextTimeRange
+      && initialValues.nextTimeRange[fieldName]
+    ) ? initialValues.nextTimeRange[fieldName] : defaultRange;
+
+    _onChange(event.target.checked ? unsetRangeValue : _defaultRange);
+  };
+
+  const _onSetPreset = (range) => {
+    const newFromValue = getValue(fieldName, range, unsetRangeValue);
+
+    _onChange(newFromValue[fieldName]);
+  };
 
   return (
-    <Field name={`nextTimeRange.${fieldName}`}>
-      {({ field: { value, onChange, name }, meta: { error } }) => {
-        const inputValue = getValue(fieldName, value, unsetRangeValue);
+    <RangeWrapper>
+      <RangeTitle>{title}</RangeTitle>
+      <RangeCheck htmlFor={`relative-unset-${fieldName}`} className={disableUnsetRange && 'shortened'}>
+        <input type="checkbox"
+               id={`relative-unset-${fieldName}`}
+               value="0"
+               className="mousetrap"
+               checked={inputValue.unsetRange}
+               onChange={_onUnsetRange}
+               disabled={disableUnsetRange} />{unsetRangeLabel}
+      </RangeCheck>
+      <InputWrap>
+        <Input id={`relative-timerange-${fieldName}-value`}
+               name={`relative-timerange-${fieldName}-value`}
+               disabled={disabled || inputValue.unsetRange}
+               type="number"
+               min="1"
+               value={inputValue.rangeValue === null ? '' : inputValue.rangeValue}
+               className="mousetrap"
+               title={`Set the ${fieldName} value`}
+               onChange={_onChangeTime}
+               bsStyle={error ? 'error' : null} />
+      </InputWrap>
+      <StyledSelect id={`relative-timerange-${fieldName}-length`}
+                    name={`relative-timerange-${fieldName}-length`}
+                    disabled={disabled || inputValue.unsetRange}
+                    value={inputValue.rangeType}
+                    options={availableRangeTypes}
+                    inputProps={{ className: 'mousetrap' }}
+                    placeholder="Select a range length"
+                    onChange={_onChangeType}
+                    clearable={false} />
 
-        const _onChange = (nextValue) => {
-          onChange({ target: { name, value: nextValue } });
-        };
+      <Ago />
 
-        const _onChangeTime = (event) => {
-          const newTimeValue = moment.duration(event.target.value || 1, inputValue.rangeType).asSeconds();
+      {error && (
+        <ErrorMessage>
+          {error}
+        </ErrorMessage>
+      )}
 
-          _onChange(newTimeValue);
-        };
-
-        const _onChangeType = (type) => {
-          const newTimeValue = moment.duration(inputValue.rangeValue, type).asSeconds();
-
-          _onChange(newTimeValue);
-        };
-
-        const _onUnsetRange = (event) => {
-          const hasInitialRelativeRange = isTypeRelative(initialValues.nextTimeRange);
-          const _defaultRange = (
-            hasInitialRelativeRange
-            && fieldName in initialValues.nextTimeRange
-            && initialValues.nextTimeRange[fieldName]
-          ) ? initialValues.nextTimeRange[fieldName] : defaultRange;
-
-          _onChange(event.target.checked ? unsetRangeValue : _defaultRange);
-        };
-
-        const _onSetPreset = (range) => {
-          const newFromValue = getValue(fieldName, range, unsetRangeValue);
-
-          _onChange(newFromValue[fieldName]);
-        };
-
-        return (
-          <RangeWrapper>
-            <RangeTitle>{title}</RangeTitle>
-            <RangeCheck htmlFor={`relative-unset-${fieldName}`} className={disableUnsetRange && 'shortened'}>
-              <input type="checkbox"
-                     id={`relative-unset-${fieldName}`}
-                     value="0"
-                     className="mousetrap"
-                     checked={inputValue.unsetRange}
-                     onChange={_onUnsetRange}
-                     disabled={disableUnsetRange} />{unsetRangeLabel}
-            </RangeCheck>
-            <InputWrap>
-              <Input id={`relative-timerange-${fieldName}-value`}
-                     name={`relative-timerange-${fieldName}-value`}
-                     disabled={disabled || inputValue.unsetRange}
-                     type="number"
-                     min="1"
-                     value={inputValue.rangeValue}
-                     className="mousetrap"
-                     title={`Set the ${fieldName} value`}
-                     onChange={_onChangeTime}
-                     bsStyle={error ? 'error' : null} />
-            </InputWrap>
-            <StyledSelect id={`relative-timerange-${fieldName}-length`}
-                          name={`relative-timerange-${fieldName}-length`}
-                          disabled={disabled || inputValue.unsetRange}
-                          value={inputValue.rangeType}
-                          options={availableRangeTypes}
-                          inputProps={{ className: 'mousetrap' }}
-                          placeholder="Select a range length"
-                          onChange={_onChangeType}
-                          clearable={false} />
-
-            <Ago />
-
-            {error && (
-              <ErrorMessage>
-                {error}
-              </ErrorMessage>
-            )}
-
-            <ConfiguredWrapper>
-              <ConfiguredRelativeTimeRangeSelector onChange={_onSetPreset} disabled={disabled} />
-            </ConfiguredWrapper>
-          </RangeWrapper>
-
-        );
-      }}
-    </Field>
+      <ConfiguredWrapper>
+        <ConfiguredRelativeTimeRangeSelector onChange={_onSetPreset} disabled={disabled} />
+      </ConfiguredWrapper>
+    </RangeWrapper>
   );
 };
+
+const RelativeRangeSelect = ({ disabled, fieldName, limitDuration, unsetRangeLabel, defaultRange, title, disableUnsetRange, unsetRangeValue }: Props) => (
+  <Field name={`nextTimeRange.${fieldName}`}>
+    {({ field: { value, onChange, name }, meta: { error } }) => (
+      <RelativeRangeSelectInner defaultRange={defaultRange}
+                                disabled={disabled}
+                                disableUnsetRange={disableUnsetRange}
+                                error={error}
+                                fieldName={fieldName}
+                                limitDuration={limitDuration}
+                                name={name}
+                                onChange={onChange}
+                                title={title}
+                                unsetRangeLabel={unsetRangeLabel}
+                                unsetRangeValue={unsetRangeValue}
+                                value={value} />
+    )}
+  </Field>
+);
 
 RelativeRangeSelect.defaultProps = {
   disabled: false,

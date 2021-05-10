@@ -209,6 +209,14 @@ export const dateTimeValidate = (nextTimeRange, limitDuration) => {
       }
     }
 
+    if (nextTimeRange.from === null) {
+      errors.nextTimeRange = { ...errors.nextTimeRange, from: 'Cannot be empty.' };
+    }
+
+    if (nextTimeRange.to === null) {
+      errors.nextTimeRange = { ...errors.nextTimeRange, to: 'Cannot be empty.' };
+    }
+
     if (nextTimeRange.from && nextTimeRange.from <= nextTimeRange.to) {
       errors.nextTimeRange = { ...errors.nextTimeRange, to: timeRangeError };
     }
