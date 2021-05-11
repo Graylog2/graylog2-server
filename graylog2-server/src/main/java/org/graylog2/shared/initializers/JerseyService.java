@@ -85,7 +85,6 @@ import java.security.InvalidKeyException;
 import java.security.KeyStore;
 import java.security.cert.CertificateException;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -234,16 +233,10 @@ public class JerseyService extends AbstractIdleService {
                 "", HttpConfiguration.PATH_API
         );
 
-        final Map<String, MediaType> mediaTypeMappings = new HashMap<>();
-        mediaTypeMappings.put("json", MediaType.APPLICATION_JSON_TYPE);
-        mediaTypeMappings.put("ndjson", MoreMediaTypes.APPLICATION_NDJSON_TYPE);
-        mediaTypeMappings.put("csv", MoreMediaTypes.TEXT_CSV_TYPE);
-        mediaTypeMappings.put("log", MoreMediaTypes.TEXT_PLAIN_TYPE);
-
         final ResourceConfig rc = new ResourceConfig()
                 .property(ServerProperties.BV_SEND_ERROR_IN_RESPONSE, true)
                 .property(ServerProperties.WADL_FEATURE_DISABLE, true)
-                .property(ServerProperties.MEDIA_TYPE_MAPPINGS, mediaTypeMappings)
+                .property(ServerProperties.MEDIA_TYPE_MAPPINGS, mediaTypeMappings())
                 .register(new PrefixAddingModelProcessor(packagePrefixes, graylogConfiguration))
                 .register(new AuditEventModelProcessor(pluginAuditEventTypes))
                 .registerClasses(
@@ -264,12 +257,7 @@ public class JerseyService extends AbstractIdleService {
                         XHRFilter.class,
                         NotAuthorizedResponseFilter.class,
                         WebAppNotFoundResponseFilter.class)
-                .register(new ContextResolver<ObjectMapper>() {
-                    @Override
-                    public ObjectMapper getContext(Class<?> type) {
-                        return objectMapper;
-                    }
-                })
+                .register((ContextResolver<ObjectMapper>) type -> objectMapper)
                 .register(new UserContextBinder())
                 .register(MultiPartFeature.class)
                 .registerClasses(systemRestResources)
@@ -290,6 +278,15 @@ public class JerseyService extends AbstractIdleService {
         }
 
         return rc;
+    }
+
+    private Map<String, MediaType> mediaTypeMappings() {
+        return ImmutableMap.of(
+            "json", MediaType.APPLICATION_JSON_TYPE,
+            "ndjson", MoreMediaTypes.APPLICATION_NDJSON_TYPE,
+            "csv", MoreMediaTypes.TEXT_CSV_TYPE,
+            "log", MoreMediaTypes.TEXT_PLAIN_TYPE
+        );
     }
 
     private HttpServer setUp(URI listenUri,
