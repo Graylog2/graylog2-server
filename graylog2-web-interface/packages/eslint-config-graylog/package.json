@@ -14,7 +14,7 @@
   "license": "SSPL-1.0",
   "dependencies": {
     "@babel/eslint-parser": "7.13.14",
-    "@typescript-eslint/parser": "4.22.0",
+    "@typescript-eslint/parser": "4.23.0",
     "@typescript-eslint/eslint-plugin": "4.22.0",
     "eslint": "7.25.0",
     "eslint-config-airbnb": "18.2.0",
