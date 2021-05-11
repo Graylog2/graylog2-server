@@ -1,15 +1,11 @@
 package org.graylog.plugins.views.search.rest;
 
-import com.google.common.eventbus.EventBus;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog.plugins.views.search.export.AuditContext;
-import org.graylog.plugins.views.search.export.AuditingMessagesExporter;
 import org.graylog.plugins.views.search.export.ExportJobFactory;
 import org.graylog.plugins.views.search.export.ExportJobService;
-import org.graylog.plugins.views.search.export.MessagesExporter;
 import org.graylog.plugins.views.search.export.MessagesRequest;
 import org.graylog.plugins.views.search.export.ResultFormat;
 import org.graylog2.shared.rest.resources.RestResource;
@@ -19,7 +15,6 @@ import javax.validation.Valid;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import java.util.function.Function;
 
 @Api(value = "Search/Messages", description = "Simple search returning (matching) messages only, as CSV.")
 @Path("/views/export")
@@ -27,16 +22,12 @@ import java.util.function.Function;
 public class ExportJobsResource extends RestResource {
     private final ExportJobService exportJobService;
     private final ExportJobFactory exportJobFactory;
-    Function<AuditContext, MessagesExporter> messagesExporterFactory;
 
     @Inject
     public ExportJobsResource(ExportJobService exportJobService,
-                              ExportJobFactory exportJobFactory,
-                              MessagesExporter exporter,
-                              @SuppressWarnings("UnstableApiUsage") EventBus eventBus) {
+                              ExportJobFactory exportJobFactory) {
         this.exportJobService = exportJobService;
         this.exportJobFactory = exportJobFactory;
-        this.messagesExporterFactory = context -> new AuditingMessagesExporter(context, eventBus, exporter);
     }
 
     @POST
