@@ -104,6 +104,13 @@ const loadUsersPaginated: $PropertyType<ActionsType, 'loadUsersPaginated'> = not
   }),
 });
 
+const loadActiveBackendType: $PropertyType<ActionsType, 'loadActiveBackendType'> = notifyingAction({
+  action: AuthenticationActions.loadActiveBackendType,
+  error: (error) => ({
+    message: `Loading active authentication service type failed with status: ${error}`,
+  }),
+});
+
 export default {
   create,
   update,
@@ -115,4 +122,5 @@ export default {
   setActiveBackend,
   loadBackendsPaginated,
   loadUsersPaginated,
+  loadActiveBackendType,
 };

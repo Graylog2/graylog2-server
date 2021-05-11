@@ -48,6 +48,7 @@ const ApiRoutes = {
     load: (serviceId) => ({ url: `/system/authentication/services/backends/${serviceId}` }),
     loadActive: () => ({ url: '/system/authentication/services/active-backend' }),
     loadUsersPaginated: (authBackendId) => ({ url: `/system/authentication/services/backends/${authBackendId}/users` }),
+    loadActiveBackendType: () => ({ url: '/system/authentication/services/backends/active-backend-type' }),
     servicesPaginated: () => ({ url: '/system/authentication/services/backends' }),
     testConnection: () => ({ url: '/system/authentication/services/test/backend/connection' }),
     testLogin: () => ({ url: '/system/authentication/services/test/backend/login' }),
