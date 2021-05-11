@@ -257,7 +257,13 @@ public class JerseyService extends AbstractIdleService {
                         XHRFilter.class,
                         NotAuthorizedResponseFilter.class,
                         WebAppNotFoundResponseFilter.class)
-                .register((ContextResolver<ObjectMapper>) type -> objectMapper)
+                // Replacing this with a lambda leads to missing subtypes - https://github.com/Graylog2/graylog2-server/pull/10617#discussion_r630236360
+                .register(new ContextResolver<ObjectMapper>() {
+                    @Override
+                    public ObjectMapper getContext(Class<?> type) {
+                        return objectMapper;
+                    }
+                })
                 .register(new UserContextBinder())
                 .register(MultiPartFeature.class)
                 .registerClasses(systemRestResources)
