@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 @AutoValue
 @JsonAutoDetect
@@ -20,7 +22,7 @@ public abstract class MessagesRequestExportJob implements ExportJob {
     public abstract MessagesRequest messagesRequest();
 
     static MessagesRequestExportJob fromMessagesRequest(String id, MessagesRequest messagesRequest) {
-        return new AutoValue_MessagesRequestExportJob(id, messagesRequest);
+        return new AutoValue_MessagesRequestExportJob(id, DateTime.now(DateTimeZone.UTC), messagesRequest);
     }
 
     @JsonCreator
@@ -28,6 +30,6 @@ public abstract class MessagesRequestExportJob implements ExportJob {
             @JsonProperty(FIELD_ID) String id,
             @JsonProperty(FIELD_MESSAGES_REQUEST) MessagesRequest messagesRequest
     ) {
-        return new AutoValue_MessagesRequestExportJob(id, messagesRequest);
+        return new AutoValue_MessagesRequestExportJob(id, DateTime.now(DateTimeZone.UTC), messagesRequest);
     }
 }

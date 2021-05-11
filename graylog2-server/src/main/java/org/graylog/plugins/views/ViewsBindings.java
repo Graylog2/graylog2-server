@@ -41,6 +41,7 @@ import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.export.ChunkDecorator;
 import org.graylog.plugins.views.search.export.DecoratingMessagesExporter;
 import org.graylog.plugins.views.search.export.ExportBackend;
+import org.graylog.plugins.views.search.export.ExportJobCleanupPeriodical;
 import org.graylog.plugins.views.search.export.LegacyChunkDecorator;
 import org.graylog.plugins.views.search.export.MessagesExporter;
 import org.graylog.plugins.views.search.export.SimpleMessageChunkCsvWriter;
@@ -168,6 +169,7 @@ public class ViewsBindings extends ViewsModule {
         registerVisualizationConfigSubtypes();
 
         addPeriodical(SearchesCleanUpJob.class);
+        addPeriodical(ExportJobCleanupPeriodical.class);
 
         addMigration(V20181220133700_AddViewsAdminRole.class);
         addMigration(V20190304102700_MigrateMessageListStructure.class);

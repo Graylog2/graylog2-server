@@ -4,6 +4,7 @@ import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.joda.time.DateTime;
+import org.mongojack.DBQuery;
 import org.mongojack.JacksonDBCollection;
 import org.mongojack.WriteResult;
 
@@ -33,5 +34,7 @@ public class ExportJobService {
         return save.getSavedId().toHexString();
     }
 
-    public void removeExpired(DateTime olderThan) {}
+    public void removeExpired(DateTime olderThan) {
+        db.remove(DBQuery.lessThan(ExportJob.FIELD_CREATED_AT, olderThan));
+    }
 }

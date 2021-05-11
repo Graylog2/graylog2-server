@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 import javax.validation.constraints.NotEmpty;
 
@@ -31,7 +33,7 @@ public abstract class SearchTypeExportJob implements ExportJob {
     public abstract ResultFormat resultFormat();
 
     static SearchTypeExportJob forSearchType(String id, String searchId, String searchTypeId, ResultFormat resultFormat) {
-        return new AutoValue_SearchTypeExportJob(id, searchId, searchTypeId, resultFormat);
+        return new AutoValue_SearchTypeExportJob(id, DateTime.now(DateTimeZone.UTC), searchId, searchTypeId, resultFormat);
     }
 
     @JsonCreator
@@ -42,6 +44,7 @@ public abstract class SearchTypeExportJob implements ExportJob {
             @JsonProperty(FIELD_RESULT_FORMAT) ResultFormat resultFormat
     ) {
         return new AutoValue_SearchTypeExportJob(id,
+                DateTime.now(DateTimeZone.UTC),
                 searchId,
                 searchTypeId,
                 resultFormat

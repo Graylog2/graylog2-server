@@ -2,6 +2,7 @@ package org.graylog.plugins.views.search.export;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import org.joda.time.DateTime;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = ExportJob.FIELD_TYPE)
 @JsonSubTypes({
@@ -12,5 +13,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 public interface ExportJob {
     String FIELD_TYPE = "type";
     String FIELD_ID = "_id";
+    String FIELD_CREATED_AT = "created_at";
     String id();
+    DateTime createdAt();
 }
