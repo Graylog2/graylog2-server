@@ -79,7 +79,6 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
     private static final String FIELD_USER_RECIPIENTS = "user_recipients";
 
     @JsonProperty(FIELD_SENDER)
-    @NotBlank
     public abstract String sender();
 
     @JsonProperty(FIELD_SUBJECT)
@@ -111,9 +110,6 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
     public ValidationResult validate() {
         final ValidationResult validation = new ValidationResult();
 
-        if (sender().isEmpty()) {
-            validation.addError(FIELD_SENDER, "Email Notification sender cannot be empty.");
-        }
         if (subject().isEmpty()) {
             validation.addError(FIELD_SUBJECT, "Email Notification subject cannot be empty.");
         }

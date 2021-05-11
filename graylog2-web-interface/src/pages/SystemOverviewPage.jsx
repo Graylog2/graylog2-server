@@ -23,6 +23,7 @@ import { SystemJobsComponent } from 'components/systemjobs';
 import { SystemMessagesComponent } from 'components/systemmessages';
 import { TimesList } from 'components/times';
 import { GraylogClusterOverview } from 'components/cluster';
+import HideOnCloud from 'util/conditional/HideOnCloud';
 
 class SystemOverviewPage extends React.Component {
   render() {
@@ -33,19 +34,23 @@ class SystemOverviewPage extends React.Component {
             <NotificationsList />
           </IfPermitted>
 
-          <IfPermitted permissions="systemjobs:read">
-            <SystemJobsComponent />
-          </IfPermitted>
+          <HideOnCloud>
+            <IfPermitted permissions="systemjobs:read">
+              <SystemJobsComponent />
+            </IfPermitted>
+          </HideOnCloud>
 
           <GraylogClusterOverview />
 
-          <IfPermitted permissions="indexercluster:read">
-            <IndexerClusterHealth />
-          </IfPermitted>
+          <HideOnCloud>
+            <IfPermitted permissions="indexercluster:read">
+              <IndexerClusterHealth />
+            </IfPermitted>
 
-          <IfPermitted permissions="indices:failures">
-            <IndexerFailuresComponent />
-          </IfPermitted>
+            <IfPermitted permissions="indices:failures">
+              <IndexerFailuresComponent />
+            </IfPermitted>
+          </HideOnCloud>
 
           <TimesList />
 

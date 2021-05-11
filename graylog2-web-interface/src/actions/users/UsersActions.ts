@@ -27,6 +27,8 @@ import UserOverview, { AccountStatus } from 'logic/users/UserOverview';
 export type UserCreate = {
   email: $PropertyType<UserJSON, 'email'>;
   full_name: $PropertyType<UserJSON, 'full_name'>;
+  first_name: $PropertyType<UserJSON, 'first_name'>;
+  last_name: $PropertyType<UserJSON, 'last_name'>;
   password: string;
   permissions: $PropertyType<UserJSON, 'permissions'>;
   roles: $PropertyType<UserJSON, 'roles'>;
@@ -40,9 +42,16 @@ export type UserUpdate = $Shape<UserCreate & {
 }>;
 
 export type Token = {
-  token_name: string;
+  id: string;
+  name: string;
   token: string;
   last_access: string;
+};
+
+export type TokenSummary = {
+  id: string,
+  name: string,
+  last_access: string,
 };
 
 export type ChangePasswordRequest = {
@@ -62,7 +71,7 @@ export type ActionsType = {
   delete: (userId: string, fullName: string) => Promise<void>;
   changePassword: (userId: string, request: ChangePasswordRequest) => Promise<void>;
   createToken: (userId: string, tokenName: string) => Promise<Token>;
-  loadTokens: (userId: string) => Promise<Token[]>;
+  loadTokens: (userId: string) => Promise<TokenSummary[]>;
   deleteToken: (userId: string, tokenId: string, tokenName: string) => Promise<void>;
   loadUsers: () => Promise<Immutable.List<User>>;
   loadUsersPaginated: (pagination: Pagination) => Promise<PaginatedUsers>;

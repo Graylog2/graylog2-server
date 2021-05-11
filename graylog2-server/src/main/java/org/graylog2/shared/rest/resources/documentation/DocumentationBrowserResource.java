@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Resources;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.rest.RestTools;
+import org.graylog2.shared.rest.HideOnCloud;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import javax.activation.MimetypesFileTypeMap;
@@ -43,6 +44,7 @@ import java.util.Map;
 import static java.util.Objects.requireNonNull;
 
 @Path("/api-browser")
+@HideOnCloud
 public class DocumentationBrowserResource extends RestResource {
     private final MimetypesFileTypeMap mimeTypes;
     private final HttpConfiguration httpConfiguration;

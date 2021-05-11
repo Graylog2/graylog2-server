@@ -261,6 +261,10 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
 
     @Override
     public User create() {
+        return userFactory.create(initialUserFields());
+    }
+
+    public static Map<String, Object> initialUserFields() {
         final Map<String, Object> fields = new HashMap<>();
 
         // We always want the authentication service fields in new user objects, event if they don't get set
@@ -270,8 +274,7 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
         fields.put(UserImpl.EXTERNAL_USER, false);
         // New accounts are enabled by default
         fields.put(UserImpl.ACCOUNT_STATUS, User.AccountStatus.ENABLED.toString().toLowerCase(Locale.US));
-
-        return userFactory.create(fields);
+        return fields;
     }
 
     @Override

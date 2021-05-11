@@ -30,6 +30,7 @@ jest.mock('util/AppConfig', () => ({
   gl2AppPathPrefix: jest.fn(() => ''),
   gl2ServerUrl: jest.fn(() => undefined),
   gl2DevMode: jest.fn(() => false),
+  isCloud: jest.fn(() => false),
 }));
 
 jest.mock('routing/withLocation', () => (x) => x);
