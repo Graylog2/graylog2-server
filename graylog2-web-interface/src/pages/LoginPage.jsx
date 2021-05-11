@@ -24,6 +24,7 @@ import LoginForm from 'components/login/LoginForm';
 import LoginBox from 'components/login/LoginBox';
 import authStyles from 'theme/styles/authStyles';
 import CombinedProvider from 'injection/CombinedProvider';
+import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 
 import LoadingPage from './LoadingPage';
 
@@ -36,6 +37,18 @@ const LoginPageStyles = createGlobalStyle`
 const LoginPage = () => {
   const [didValidateSession, setDidValidateSession] = useState(false);
   const [lastError, setLastError] = useState(undefined);
+  const [activeBackend, setActiveBackend] = useState();
+  const [isDetermined, setIsDetermined] = useState(false);
+
+  useEffect(() => {
+    if (!isDetermined) {
+      AuthenticationDomain.loadActiveBackendType()
+        .then((backend) => {
+          setIsDetermined(true);
+          setActiveBackend(backend);
+        });
+    }
+  }, [isDetermined]);
 
   useEffect(() => {
     const sessionPromise = SessionActions.validate().then((response) => {
@@ -68,10 +81,12 @@ const LoginPage = () => {
   };
 
   const renderLoginForm = () => {
-    const loginComponent = PluginStore.exports('loginProviderType');
+    const registeredLoginComponents = PluginStore.exports('loginProviderType');
 
-    if (loginComponent.length === 1) {
-      return React.createElement(loginComponent[0].formComponent, {
+    const loginComponent = registeredLoginComponents.find((c) => c.type === activeBackend);
+
+    if (loginComponent && loginComponent.formComponent) {
+      return React.createElement(loginComponent.formComponent, {
         onErrorChange: setLastError,
       });
     }
@@ -79,7 +94,7 @@ const LoginPage = () => {
     return <LoginForm onErrorChange={setLastError} />;
   };
 
-  if (!didValidateSession) {
+  if (!didValidateSession || !isDetermined) {
     return (
       <LoadingPage />
     );

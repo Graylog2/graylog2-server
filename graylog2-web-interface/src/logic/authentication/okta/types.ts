@@ -1,4 +1,5 @@
 export interface OktaBackendConfig {
+  type: 'okta';
   oktaBaseUrl: string;
   clientId: string;
   clientSecret: string;
@@ -7,6 +8,7 @@ export interface OktaBackendConfig {
 }
 
 export interface OktaBackendConfigJson {
+  type: 'okta';
   okta_base_url: string;
   client_id: string;
   client_secret: string;

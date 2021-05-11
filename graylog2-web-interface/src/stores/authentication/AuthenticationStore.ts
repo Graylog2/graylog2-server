@@ -21,7 +21,7 @@ import { $PropertyType } from 'utility-types/dist/utility-types';
 import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
 import type { Store } from 'stores/StoreTypes';
 import { qualifyUrl } from 'util/URLUtils';
-import fetch from 'logic/rest/FetchProvider';
+import fetch, { Builder } from 'logic/rest/FetchProvider';
 import { singletonStore } from 'views/logic/singleton';
 import AuthenticationActions from 'actions/authentication/AuthenticationActions';
 import PaginationURL from 'util/PaginationURL';
@@ -178,6 +178,22 @@ const AuthenticationStore: Store<{ authenticators: any }> = singletonStore(
         }));
 
       AuthenticationActions.loadUsersPaginated.promise(promise);
+
+      return promise;
+    },
+
+    loadActiveBackendType(): Promise<string | undefined> {
+      const url = qualifyUrl(ApiRoutes.AuthenticationController.loadActiveBackendType().url);
+
+      // no authentication required
+      const promise = new Builder('GET', url)
+        .build()
+        .then((response) => response.json())
+        .then((result: { backend: string | undefined }) => {
+          return result.backend;
+        });
+
+      AuthenticationActions.loadActiveBackendType.promise(promise);
 
       return promise;
     },
