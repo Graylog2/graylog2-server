@@ -4,6 +4,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.primitives.Ints;
 import org.graylog2.plugin.periodical.Periodical;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,8 +65,8 @@ public class ExportJobCleanupPeriodical extends Periodical {
 
     @Override
     public void doRun() {
-        final DateTime notOlderThan = DateTime.now().minus(DEFAULT_MAX_EXPORT_JOB_AGE);
-        LOG.debug("Removing export jobs created before " + notOlderThan.toString());
+        final DateTime notOlderThan = DateTime.now(DateTimeZone.UTC).minus(DEFAULT_MAX_EXPORT_JOB_AGE);
+        LOG.debug("Removing export jobs created before " + notOlderThan);
         exportJobService.removeExpired(notOlderThan);
     }
 }
