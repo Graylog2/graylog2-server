@@ -374,6 +374,10 @@ const ApiRoutes = {
     exportSearch: ((searchId) => { return { url: `/views/search/messages/${searchId}` }; }),
     exportSearchType: ((searchId, searchTypeId) => { return { url: `/views/search/messages/${searchId}/${searchTypeId}` }; }),
   },
+  ExportJobsController: {
+    exportSearch: ((searchId) => { return { url: `/views/export/${searchId}` }; }),
+    exportSearchType: ((searchId, searchTypeId) => { return { url: `/views/export/${searchId}/${searchTypeId}` }; }),
+  },
   MapDataController: {
     search: () => { return { url: '/search/mapdata' }; },
   },

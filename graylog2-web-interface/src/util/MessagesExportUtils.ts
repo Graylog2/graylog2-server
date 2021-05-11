@@ -14,8 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import download from 'downloadjs';
-
 import { fetchFile } from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
@@ -30,25 +28,42 @@ export type ExportPayload = {
   fields_in_order: string[] | undefined | null,
   execution_state?: SearchExecutionState,
   limit?: number,
+  filename?: string,
 };
 
-const downloadFile = (fileContent: string, filename: string = 'search-result', mimeType: string) => download(fileContent, filename, mimeType);
+const downloadFile = (exportJobId: string, filename: string) => {
+  const link = document.createElement('a');
+  link.download = filename;
+  link.href = qualifyUrl(`/views/search/messages/job/${exportJobId}/${filename}`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
 
 export const exportSearchMessages = (exportPayload: ExportPayload, searchId: string, mimeType: string, filename?: string) => {
-  const { url } = ApiRoutes.MessagesController.exportSearch(searchId);
+  const { url } = ApiRoutes.ExportJobsController.exportSearch(searchId);
 
-  return fetchFile('POST', qualifyUrl(url), exportPayload, mimeType)
-    .then((result: string) => downloadFile(result, filename, mimeType))
+  const exportPayloadWithFilename = {
+    ...exportPayload,
+    filename,
+  };
+
+  return fetchFile('POST', qualifyUrl(url), exportPayloadWithFilename, mimeType)
+    .then((result: string) => downloadFile(result, filename))
     .catch(() => {
       UserNotification.error('Export failed');
     });
 };
 
 export const exportSearchTypeMessages = (exportPayload: ExportPayload, searchId: string, searchTypeId: string, mimeType: string, filename?: string) => {
-  const { url } = ApiRoutes.MessagesController.exportSearchType(searchId, searchTypeId, filename);
+  const exportPayloadWithFilename = {
+    ...exportPayload,
+    filename,
+  };
+  const { url } = ApiRoutes.ExportJobsController.exportSearchType(searchId, searchTypeId, filename);
 
-  return fetchFile('POST', qualifyUrl(url), exportPayload, mimeType)
-    .then((result: string) => downloadFile(result, filename, mimeType))
+  return fetchFile('POST', qualifyUrl(url), exportPayloadWithFilename, mimeType)
+    .then((result: string) => downloadFile(result, filename))
     .catch(() => {
       UserNotification.error('Export for widget failed');
     });

@@ -44,6 +44,7 @@ import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.jersey.PrefixAddingModelProcessor;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.rest.MoreMediaTypes;
 import org.graylog2.rest.filter.WebAppNotFoundResponseFilter;
 import org.graylog2.shared.rest.CORSFilter;
 import org.graylog2.shared.rest.NodeIdResponseFilter;
@@ -72,6 +73,7 @@ import javax.inject.Named;
 import javax.net.ssl.SSLContext;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.container.DynamicFeature;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.ExceptionMapper;
 import java.io.IOException;
@@ -83,6 +85,7 @@ import java.security.InvalidKeyException;
 import java.security.KeyStore;
 import java.security.cert.CertificateException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -231,9 +234,16 @@ public class JerseyService extends AbstractIdleService {
                 "", HttpConfiguration.PATH_API
         );
 
+        final Map<String, MediaType> mediaTypeMappings = new HashMap<>();
+        mediaTypeMappings.put("json", MediaType.APPLICATION_JSON_TYPE);
+        mediaTypeMappings.put("ndjson", MoreMediaTypes.APPLICATION_NDJSON_TYPE);
+        mediaTypeMappings.put("csv", MoreMediaTypes.TEXT_CSV_TYPE);
+        mediaTypeMappings.put("log", MoreMediaTypes.TEXT_PLAIN_TYPE);
+
         final ResourceConfig rc = new ResourceConfig()
                 .property(ServerProperties.BV_SEND_ERROR_IN_RESPONSE, true)
                 .property(ServerProperties.WADL_FEATURE_DISABLE, true)
+                .property(ServerProperties.MEDIA_TYPE_MAPPINGS, mediaTypeMappings)
                 .register(new PrefixAddingModelProcessor(packagePrefixes, graylogConfiguration))
                 .register(new AuditEventModelProcessor(pluginAuditEventTypes))
                 .registerClasses(

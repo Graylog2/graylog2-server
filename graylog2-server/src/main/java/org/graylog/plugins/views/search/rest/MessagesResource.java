@@ -31,10 +31,15 @@ import org.graylog.plugins.views.search.export.AuditContext;
 import org.graylog.plugins.views.search.export.AuditingMessagesExporter;
 import org.graylog.plugins.views.search.export.ChunkedRunner;
 import org.graylog.plugins.views.search.export.CommandFactory;
+import org.graylog.plugins.views.search.export.ExportJob;
+import org.graylog.plugins.views.search.export.ExportJobService;
 import org.graylog.plugins.views.search.export.ExportMessagesCommand;
 import org.graylog.plugins.views.search.export.MessagesExporter;
 import org.graylog.plugins.views.search.export.MessagesRequest;
+import org.graylog.plugins.views.search.export.MessagesRequestExportJob;
 import org.graylog.plugins.views.search.export.ResultFormat;
+import org.graylog.plugins.views.search.export.SearchExportJob;
+import org.graylog.plugins.views.search.export.SearchTypeExportJob;
 import org.graylog.plugins.views.search.export.SimpleMessageChunk;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog2.audit.jersey.NoAuditEvent;
@@ -45,11 +50,14 @@ import org.graylog2.shared.security.RestPermissions;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
+import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Response;
+import java.io.UnsupportedEncodingException;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -65,6 +73,7 @@ public class MessagesResource extends RestResource implements PluginRestResource
     private final SearchExecutionGuard executionGuard;
     private final PermittedStreams permittedStreams;
     private final ObjectMapper objectMapper;
+    private final ExportJobService exportJobService;
 
     //allow mocking
     Function<Consumer<Consumer<SimpleMessageChunk>>, ChunkedOutput<SimpleMessageChunk>> asyncRunner = ChunkedRunner::runAsync;
@@ -78,12 +87,14 @@ public class MessagesResource extends RestResource implements PluginRestResource
             SearchExecutionGuard executionGuard,
             PermittedStreams permittedStreams,
             ObjectMapper objectMapper,
-            @SuppressWarnings("UnstableApiUsage") EventBus eventBus) {
+            @SuppressWarnings("UnstableApiUsage") EventBus eventBus,
+            ExportJobService exportJobService) {
         this.commandFactory = commandFactory;
         this.searchDomain = searchDomain;
         this.executionGuard = executionGuard;
         this.permittedStreams = permittedStreams;
         this.objectMapper = objectMapper;
+        this.exportJobService = exportJobService;
         this.messagesExporterFactory = context -> new AuditingMessagesExporter(context, eventBus, exporter);
     }
 
@@ -145,6 +156,43 @@ public class MessagesResource extends RestResource implements PluginRestResource
         ExportMessagesCommand command = commandFactory.buildWithMessageList(search, searchTypeId, format);
 
         return asyncRunner.apply(chunkConsumer -> exporter(searchId, searchTypeId).export(command, chunkConsumer));
+    }
+
+    @ApiOperation("Retrieve results for export job")
+    @GET
+    @Path("job/{exportJobId}/{filename:.*}")
+    public Response retrieveForExportJob(@ApiParam(value = "ID of an existing export job", name = "exportJobId")
+                                         @PathParam("exportJobId") String exportJobId) throws UnsupportedEncodingException {
+        final ExportJob exportJob = exportJobService.get(exportJobId)
+                .orElseThrow(() -> new NotFoundException("Unable to find export job with id <" + exportJobId + ">!"));
+
+        final ChunkedOutput<SimpleMessageChunk> output = outputFor(exportJob);
+
+        //final String encodedFilename = URLEncoder.encode(filename + "." + extension, StandardCharsets.UTF_8.toString());
+
+        return Response.ok()
+                .entity(output)
+                //.header("Content-Disposition", "attachment; filename=\"" + encodedFilename +"\"")
+                .build();
+    }
+
+    private ChunkedOutput<SimpleMessageChunk> outputFor(ExportJob exportJob) {
+        if (exportJob instanceof MessagesRequestExportJob) {
+            final MessagesRequest messagesRequest = ((MessagesRequestExportJob) exportJob).messagesRequest();
+            return this.retrieve(messagesRequest);
+        }
+
+        if (exportJob instanceof SearchExportJob) {
+            final ResultFormat resultFormat = ((SearchExportJob) exportJob).resultFormat();
+            return this.retrieveForSearch(((SearchExportJob) exportJob).searchId(), resultFormat);
+        }
+
+        if (exportJob instanceof SearchTypeExportJob) {
+            final ResultFormat resultFormat = ((SearchTypeExportJob) exportJob).resultFormat();
+            return this.retrieveForSearchType(((SearchTypeExportJob) exportJob).searchId(), ((SearchTypeExportJob) exportJob).searchTypeId(), resultFormat);
+        }
+
+        throw new IllegalStateException("Invalid type of export job: " + exportJob.getClass());
     }
 
     private MessagesExporter exporter() {

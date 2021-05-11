@@ -1360,18 +1360,7 @@
       "node_modules/react-query/es/react/setBatchUpdatesFn.js": 536,
       "node_modules/react-query/es/react/setLogger.js": 540,
       "node_modules/@emotion/stylis/dist/stylis.browser.esm.js": 99,
-      "node_modules/@emotion/unitless/dist/unitless.browser.esm.js": 116,
-      "node_modules/stylis/dist/stylis.mjs": 443,
-      "node_modules/@emotion/react/dist/emotion-element-4fbd89c5.browser.esm.js": 452,
-      "node_modules/@emotion/utils/dist/emotion-utils.browser.esm.js": 453,
-      "node_modules/@emotion/serialize/dist/emotion-serialize.browser.esm.js": 454,
-      "node_modules/@emotion/weak-memoize/dist/weak-memoize.browser.esm.js": 455,
-      "node_modules/@emotion/sheet/dist/emotion-sheet.browser.esm.js": 456,
-      "node_modules/@emotion/cache/dist/emotion-cache.browser.esm.js": 458,
-      "node_modules/@emotion/memoize/dist/emotion-memoize.browser.esm.js": 460,
-      "node_modules/@emotion/react/isolated-hoist-non-react-statics-do-not-use-this-in-your-code/dist/emotion-react-isolated-hoist-non-react-statics-do-not-use-this-in-your-code.browser.esm.js": 462,
-      "node_modules/@emotion/hash/dist/hash.browser.esm.js": 541,
-      "node_modules/@emotion/react/dist/emotion-react.browser.esm.js": 548
+      "node_modules/@emotion/unitless/dist/unitless.browser.esm.js": 116
     },
     "usedIds": {
       "0": 0,
