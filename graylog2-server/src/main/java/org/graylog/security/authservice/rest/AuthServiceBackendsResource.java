@@ -22,6 +22,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresGuest;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.security.SecurityAuditEventTypes;
 import org.graylog.security.authservice.AuthServiceBackendDTO;
@@ -101,6 +102,20 @@ public class AuthServiceBackendsResource extends RestResource {
         this.roleService = roleService;
         this.usageCheck = usageCheck;
         this.userSearchQueryParser = new SearchQueryParser(UserOverviewDTO.FIELD_FULL_NAME, SEARCH_FIELD_MAPPING);
+    }
+
+
+    @GET
+    @RequiresGuest
+    @Path("active-backend-type")
+    @ApiOperation("Returns type of currently active authentication service backend")
+    public Response getActiveType() {
+        String type = null;
+        final AuthServiceBackendDTO activeBackendConfig = globalAuthServiceConfig.getActiveBackendConfig().orElse(null);
+        if (activeBackendConfig != null) {
+            type = activeBackendConfig.config().type();
+        }
+        return toResponse(type);
     }
 
     @GET
