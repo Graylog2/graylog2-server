@@ -74,7 +74,7 @@ public class AuthzRolesResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(RestResource.class);
 
     protected static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
-            .put(AuthzRoleDTO.FIELD_ID, SearchQueryField.create("_id", SearchQueryField.Type.ID))
+            .put(AuthzRoleDTO.FIELD_ID, SearchQueryField.create("_id", SearchQueryField.Type.OBJECT_ID))
             .put(AuthzRoleDTO.FIELD_NAME, SearchQueryField.create(AuthzRoleDTO.FIELD_NAME))
             .put(AuthzRoleDTO.FIELD_DESCRIPTION, SearchQueryField.create(AuthzRoleDTO.FIELD_DESCRIPTION))
             .build();

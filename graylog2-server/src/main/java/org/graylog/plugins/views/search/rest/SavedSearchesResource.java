@@ -48,7 +48,7 @@ import static java.util.Locale.ENGLISH;
 @Path("/search/saved")
 public class SavedSearchesResource extends RestResource {
     private static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
-            .put("id", SearchQueryField.create("_id", SearchQueryField.Type.ID))
+            .put("id", SearchQueryField.create("_id", SearchQueryField.Type.OBJECT_ID))
             .put("title", SearchQueryField.create(ViewDTO.FIELD_TITLE))
             .build();
 

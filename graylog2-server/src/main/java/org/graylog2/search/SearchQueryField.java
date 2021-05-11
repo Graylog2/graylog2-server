@@ -18,7 +18,7 @@ package org.graylog2.search;
 
 public class SearchQueryField {
     public enum Type {
-        STRING, DATE, INT, LONG, ID;
+        STRING, DATE, INT, LONG, OBJECT_ID;
     }
 
     private final String dbField;

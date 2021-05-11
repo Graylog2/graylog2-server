@@ -86,7 +86,7 @@ import java.util.stream.Collectors;
 @RequiresAuthentication
 public class SidecarResource extends RestResource implements PluginRestResource {
     protected static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
-            .put("id", SearchQueryField.create("_id", SearchQueryField.Type.ID))
+            .put("id", SearchQueryField.create("_id", SearchQueryField.Type.OBJECT_ID))
             .put("node_id", SearchQueryField.create(Sidecar.FIELD_NODE_ID))
             .put("name", SearchQueryField.create(Sidecar.FIELD_NODE_NAME))
             .put("sidecar_version", SearchQueryField.create(Sidecar.FIELD_SIDECAR_VERSION))
