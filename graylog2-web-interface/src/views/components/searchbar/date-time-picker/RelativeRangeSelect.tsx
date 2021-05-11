@@ -21,10 +21,10 @@ import styled, { css } from 'styled-components';
 import moment from 'moment';
 
 import { RELATIVE_RANGE_TYPES } from 'views/Constants';
-import Input from 'components/bootstrap/Input';
 import { Select } from 'components/common';
 import { isTypeRelative } from 'views/typeGuards/timeRange';
 
+import RelativeRangeValueInput from './RelativeRangeValueInput';
 import type { TimeRangeDropDownFormValues } from './TimeRangeDropdown';
 import ConfiguredRelativeTimeRangeSelector from './ConfiguredRelativeTimeRangeSelector';
 
@@ -97,7 +97,7 @@ const ConfiguredWrapper = styled.div`
   justify-self: end;
 `;
 
-const getValue = (fieldName, value: number | '', unsetRangeValue, previousRangeType?: moment.unitOfTime.DurationConstructor) => RELATIVE_RANGE_TYPES.map(({ type }) => {
+const getValue = (fieldName, value: number | null, unsetRangeValue, previousRangeType?: moment.unitOfTime.DurationConstructor) => RELATIVE_RANGE_TYPES.map(({ type }) => {
   const unsetRange = value === unsetRangeValue;
   const diff = moment.duration(value, 'seconds').as(type);
   const valueInputIsEmpty = value === null;
@@ -166,8 +166,8 @@ const RelativeRangeSelectInner = ({
   fieldName,
   limitDuration,
 }: Required<Props> & {
-  value: number | '',
-  onChange: (changeEvent: { target: { name: string, value: string } }) => void,
+  value: number | null,
+  onChange: (changeEvent: { target: { name: string, value: number | null } }) => void,
   name: string,
   error: string | undefined,
 }) => {
@@ -179,16 +179,16 @@ const RelativeRangeSelectInner = ({
     rangeValue: inputValue.rangeValue, rangeType: inputValue.rangeType, value, fieldName, unsetRangeValue, setInputValue,
   });
 
-  const _onChange = (nextValue) => {
+  const _onChange = React.useCallback((nextValue) => {
     onChange({ target: { name, value: nextValue } });
-  };
+  }, [name, onChange]);
 
-  const _onChangeTime = (event) => {
+  const _onChangeTime = React.useCallback((event) => {
     const inputIsEmpty = event.target.value === '';
     const newTimeValue = inputIsEmpty ? null : moment.duration(event.target.value || 1, inputValue.rangeType).asSeconds();
 
     _onChange(newTimeValue);
-  };
+  }, [_onChange, inputValue.rangeType]);
 
   const _onChangeType = (type) => {
     const newTimeValue = moment.duration(inputValue.rangeValue || 1, type).asSeconds();
@@ -226,16 +226,12 @@ const RelativeRangeSelectInner = ({
                disabled={disableUnsetRange} />{unsetRangeLabel}
       </RangeCheck>
       <InputWrap>
-        <Input id={`relative-timerange-${fieldName}-value`}
-               name={`relative-timerange-${fieldName}-value`}
-               disabled={disabled || inputValue.unsetRange}
-               type="number"
-               min="1"
-               value={inputValue.rangeValue === null ? '' : inputValue.rangeValue}
-               className="mousetrap"
-               title={`Set the ${fieldName} value`}
-               onChange={_onChangeTime}
-               bsStyle={error ? 'error' : null} />
+        <RelativeRangeValueInput disabled={disabled}
+                                 error={error}
+                                 fieldName={fieldName}
+                                 onChange={_onChangeTime}
+                                 unsetRange={inputValue.unsetRange}
+                                 value={inputValue.rangeValue} />
       </InputWrap>
       <StyledSelect id={`relative-timerange-${fieldName}-length`}
                     name={`relative-timerange-${fieldName}-length`}
