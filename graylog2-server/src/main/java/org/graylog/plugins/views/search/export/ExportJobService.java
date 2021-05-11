@@ -16,16 +16,16 @@
  */
 package org.graylog.plugins.views.search.export;
 
+import com.mongodb.BasicDBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
-import org.joda.time.DateTime;
-import org.mongojack.DBQuery;
 import org.mongojack.JacksonDBCollection;
 import org.mongojack.WriteResult;
 
 import javax.inject.Inject;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 public class ExportJobService {
     protected final JacksonDBCollection<ExportJob, ObjectId> db;
@@ -38,6 +38,7 @@ public class ExportJobService {
                 ObjectId.class,
                 mapper.get());
 
+        db.createIndex(new BasicDBObject(ExportJob.FIELD_CREATED_AT, 1), new BasicDBObject("expireAfterSeconds", TimeUnit.HOURS.toSeconds(1L)));
     }
 
     public Optional<ExportJob> get(String id) {
@@ -48,9 +49,5 @@ public class ExportJobService {
         final WriteResult<ExportJob, ObjectId> save = db.insert(exportJob);
 
         return save.getSavedId().toHexString();
-    }
-
-    public void removeExpired(DateTime olderThan) {
-        db.remove(DBQuery.lessThan(ExportJob.FIELD_CREATED_AT, olderThan));
     }
 }
