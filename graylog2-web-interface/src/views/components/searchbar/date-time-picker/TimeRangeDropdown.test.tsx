@@ -16,15 +16,13 @@
  */
 import React from 'react';
 import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
-import { NoTimeRangeOverride } from 'src/views/logic/queries/Query';
 import { StoreMock as MockStore } from 'helpers/mocking';
 import { act } from 'react-dom/test-utils';
-import { SearchBarFormValues } from 'src/views/Constants';
 
 import ToolsStore from 'stores/tools/ToolsStore';
 
 import { DateTimeContext } from './DateTimeProvider';
-import OriginalTimeRangeDropDown from './TimeRangeDropdown';
+import OriginalTimeRangeDropDown, { TimeRangeDropdownProps } from './TimeRangeDropdown';
 
 const mockSearchClusterConfig = {
   query_time_range_limit: 'P3D',
@@ -88,16 +86,10 @@ const defaultProps = {
   noOverride: false,
   setCurrentTimeRange: jest.fn(),
   toggleDropdownShow: jest.fn(),
+  position: 'bottom',
 } as const;
 
-type Props = {
-  noOverride?: boolean,
-  currentTimeRange: SearchBarFormValues['timerange'] | NoTimeRangeOverride,
-  setCurrentTimeRange: (nextTimeRange: SearchBarFormValues['timerange'] | NoTimeRangeOverride) => void,
-  toggleDropdownShow: () => void,
-};
-
-const TimeRangeDropdown = (allProps: Props) => (
+const TimeRangeDropdown = (allProps: TimeRangeDropdownProps) => (
   <DateTimeContext.Provider value={{
     limitDuration: 259200,
   }}>

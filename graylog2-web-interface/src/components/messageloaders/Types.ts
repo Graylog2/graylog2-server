@@ -14,25 +14,31 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import pjson from '../../package.json';
 
-class Version {
-  constructor() {
-    this.full = pjson.version;
-    const splitVersion = this.full.split('.');
+export type Input = {
+  id: string,
+  title: string,
+  name: string,
+  type: string,
+  configuration: {
+    [type: string]: any,
+  },
+  input_profile_id: string,
+  version: number,
+  created_at: string,
+  content_pack?: boolean;
+};
 
-    this.major = splitVersion[0];
-    this.minor = splitVersion[1];
-  }
+export type Codec ={
+  type: string,
+  name: string,
+  requested_configuration: {
+    [key: string]: {
+      [key: string]: any,
+    },
+  },
+};
 
-  getMajorAndMinorVersion() {
-    return `${this.major}.${this.minor}`;
-  }
-
-  getFullVersion() {
-    return this.full;
-  }
-}
-
-const version = new Version();
-export default version;
+export type CodecTypes = {
+  [key: string]: Codec,
+};

@@ -122,10 +122,10 @@ public class UserImpl extends PersistedImpl implements User {
     }
 
     @AssistedInject
-    protected UserImpl(PasswordAlgorithmFactory passwordAlgorithmFactory,
-                       Permissions permissions,
-                       @Assisted final ObjectId id,
-                       @Assisted final Map<String, Object> fields) {
+    public UserImpl(PasswordAlgorithmFactory passwordAlgorithmFactory,
+                    Permissions permissions,
+                    @Assisted final ObjectId id,
+                    @Assisted final Map<String, Object> fields) {
         super(id, fields);
         this.passwordAlgorithmFactory = passwordAlgorithmFactory;
         this.permissions = permissions;
