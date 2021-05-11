@@ -22,6 +22,7 @@ import {
   DirectoryServiceBackendConfig, DirectoryServiceBackendConfigJson,
   WizardSubmitPayload,
 } from 'logic/authentication/directoryServices/types';
+import { OktaBackendConfig, OktaBackendConfigJson } from 'logic/authentication/okta/types';
 import Role from 'logic/roles/Role';
 import { WizardFormValues } from 'components/authentication/directoryServices/BackendWizard/BackendWizardContext';
 
@@ -37,8 +38,8 @@ interface AuthenticationService {
     authenticationBackend: AuthenticationBackend,
     roles: Immutable.List<Role>,
   }>;
-  configToJson: (config: {}) => DirectoryServiceBackendConfigJson;
-  configFromJson: (json: {}) => DirectoryServiceBackendConfig;
+  configToJson: (config: {}) => DirectoryServiceBackendConfigJson | OktaBackendConfigJson;
+  configFromJson: (json: {}) => DirectoryServiceBackendConfig | OktaBackendConfig;
 }
 
 interface GroupSyncSectionProps {
