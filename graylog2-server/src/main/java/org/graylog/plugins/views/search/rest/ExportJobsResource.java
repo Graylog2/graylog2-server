@@ -4,10 +4,12 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
 import org.graylog.plugins.views.search.export.ExportJobFactory;
 import org.graylog.plugins.views.search.export.ExportJobService;
 import org.graylog.plugins.views.search.export.MessagesRequest;
 import org.graylog.plugins.views.search.export.ResultFormat;
+import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import javax.inject.Inject;
@@ -30,7 +32,9 @@ public class ExportJobsResource extends RestResource {
         this.exportJobFactory = exportJobFactory;
     }
 
+    @ApiOperation(value = "Create job to export a defined set of messages")
     @POST
+    @AuditEvent(type = ViewsAuditEventTypes.EXPORT_JOB_CREATED)
     public String create(@ApiParam @Valid MessagesRequest rawrequest) {
         return exportJobService.save(exportJobFactory.fromMessagesRequest(rawrequest));
     }
@@ -38,6 +42,7 @@ public class ExportJobsResource extends RestResource {
     @ApiOperation(value = "Create job to export search result")
     @POST
     @Path("{searchId}")
+    @AuditEvent(type = ViewsAuditEventTypes.EXPORT_JOB_CREATED)
     public String createForSearch(
             @ApiParam(value = "ID of an existing Search", name = "searchId") @PathParam("searchId") String searchId,
             @ApiParam(value = "Optional overrides") @Valid ResultFormat formatFromClient) {
@@ -47,6 +52,7 @@ public class ExportJobsResource extends RestResource {
     @ApiOperation(value = "Create job to export search type")
     @POST
     @Path("{searchId}/{searchTypeId}")
+    @AuditEvent(type = ViewsAuditEventTypes.EXPORT_JOB_CREATED)
     public String createForSearchType(
             @ApiParam(value = "ID of an existing Search", name = "searchId") @PathParam("searchId") String searchId,
             @ApiParam(value = "ID of a Message Table contained in the Search", name = "searchTypeId") @PathParam("searchTypeId") String searchTypeId,
