@@ -58,7 +58,7 @@ const TimeRangeDropdown = (allProps: TimeRangeDropdownProps) => (
 );
 
 describe('TimeRangeDropdown relative time range', () => {
-  it('Display warning when emptying from range value input', async () => {
+  it('display warning when emptying from range value input', async () => {
     render(<TimeRangeDropdown {...defaultProps} />);
 
     const fromRangeValueInput = screen.getByTitle('Set the from value');
@@ -73,7 +73,7 @@ describe('TimeRangeDropdown relative time range', () => {
     expect(submitButton).toBeDisabled();
   });
 
-  it('Display warning when emptying to range value input', async () => {
+  it('display warning when emptying to range value input', async () => {
     const props = {
       ...defaultProps,
       currentTimeRange: {
