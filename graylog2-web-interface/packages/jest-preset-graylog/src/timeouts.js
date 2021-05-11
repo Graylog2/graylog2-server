@@ -14,9 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { configure } from '@testing-library/react';
-import { timeoutMultiplier, applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
+const parsedTimeoutMultiplier = Number.parseFloat(process.env.TIMEOUT_MULTIPLIER);
 
-if (timeoutMultiplier() !== 1.0) {
-  configure((existingConfig) => ({ ...existingConfig, asyncUtilTimeout: applyTimeoutMultiplier(existingConfig.asyncUtilTimeout) }));
-}
+export const timeoutMultiplier = () => (Number.isFinite(parsedTimeoutMultiplier) ? parsedTimeoutMultiplier : 1.0);
+
+export const applyTimeoutMultiplier = (x) => x * timeoutMultiplier();
