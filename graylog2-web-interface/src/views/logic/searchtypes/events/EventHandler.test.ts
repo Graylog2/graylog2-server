@@ -39,14 +39,10 @@ describe('EventHandler convert', () => {
   });
 
   it('should convert events to char data', () => {
-    const result = EventHandler.toChartData(groupByTimestamp([event]), WidgetFormattingSettings.builder().build(), 'UTC');
+    const result = EventHandler.toChartData(groupByTimestamp([event]), 'UTC');
 
     expect(result).toEqual({
       hovertemplate: '%{text}',
-      marker: {
-        color: '#d3d3d3',
-        size: 5,
-      },
       mode: 'markers',
       opacity: 0.5,
       name: 'Alerts',
@@ -58,14 +54,10 @@ describe('EventHandler convert', () => {
   });
 
   it('should convert events to char data and use new timezone', () => {
-    const result = EventHandler.toChartData(groupByTimestamp([event]), WidgetFormattingSettings.builder().build(), 'CET');
+    const result = EventHandler.toChartData(groupByTimestamp([event]), 'CET');
 
     expect(result).toEqual({
       hovertemplate: '%{text}',
-      marker: {
-        color: '#d3d3d3',
-        size: 5,
-      },
       mode: 'markers',
       opacity: 0.5,
       name: 'Alerts',
@@ -77,14 +69,10 @@ describe('EventHandler convert', () => {
   });
 
   it('should group duplicate events by timestamp and convert events to char data', () => {
-    const result = EventHandler.toChartData(groupByTimestamp([event, event, event]), WidgetFormattingSettings.builder().build(), 'UTC');
+    const result = EventHandler.toChartData(groupByTimestamp([event, event, event]), 'UTC');
 
     expect(result).toEqual({
       hovertemplate: '%{text}',
-      marker: {
-        color: '#d3d3d3',
-        size: 5,
-      },
       mode: 'markers',
       opacity: 0.5,
       name: 'Alerts',
@@ -96,16 +84,10 @@ describe('EventHandler convert', () => {
   });
 
   it('should keep the color set by the user', () => {
-    const result = EventHandler.toChartData(groupByTimestamp([event]), WidgetFormattingSettings.builder()
-      .chartColors({ Alerts: '#ffffff' })
-      .build(), 'UTC');
+    const result = EventHandler.toChartData(groupByTimestamp([event]), 'UTC');
 
     expect(result).toEqual({
       hovertemplate: '%{text}',
-      marker: {
-        color: '#ffffff',
-        size: 5,
-      },
       mode: 'markers',
       opacity: 0.5,
       name: 'Alerts',
@@ -117,7 +99,7 @@ describe('EventHandler convert', () => {
   });
 
   it('should convert events to shape data', () => {
-    const result = EventHandler.toShapeData([event.timestamp], undefined, 'UTC');
+    const result = EventHandler.toShapeData([event.timestamp], 'UTC');
 
     expect(result[0]).toEqual({
       layer: 'below',
@@ -128,14 +110,11 @@ describe('EventHandler convert', () => {
       x0: '2019-11-14T08:53:35.000+00:00',
       x1: '2019-11-14T08:53:35.000+00:00',
       opacity: 0.5,
-      line: {
-        color: '#d3d3d3',
-      },
     });
   });
 
   it('should convert events to shape data with new timezone', () => {
-    const result = EventHandler.toShapeData([event.timestamp], undefined, 'CET');
+    const result = EventHandler.toShapeData([event.timestamp], 'CET');
 
     expect(result[0]).toEqual({
       layer: 'below',
@@ -146,28 +125,6 @@ describe('EventHandler convert', () => {
       x0: '2019-11-14T09:53:35.000+01:00',
       x1: '2019-11-14T09:53:35.000+01:00',
       opacity: 0.5,
-      line: {
-        color: '#d3d3d3',
-      },
-    });
-  });
-
-  it('should convert events to shape data with custom color', () => {
-    const widgetFormattingSettings = WidgetFormattingSettings.create({ Alerts: '#ffffff' });
-    const result = EventHandler.toShapeData([event.timestamp], widgetFormattingSettings, 'UTC');
-
-    expect(result[0]).toEqual({
-      layer: 'below',
-      type: 'line',
-      yref: 'paper',
-      y0: 0,
-      y1: 1,
-      x0: '2019-11-14T08:53:35.000+00:00',
-      x1: '2019-11-14T08:53:35.000+00:00',
-      opacity: 0.5,
-      line: {
-        color: '#ffffff',
-      },
     });
   });
 });
