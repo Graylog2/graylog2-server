@@ -23,7 +23,7 @@ import { Overlay, RootCloseWrapper } from 'react-overlays';
 import { Popover } from 'components/graylog';
 import ColorPicker from 'components/common/ColorPicker';
 import Plot from 'views/components/visualizations/plotly/AsyncPlot';
-import { colors as defaultColors, defaultChartColors } from 'views/components/visualizations/Colors';
+import { colors as defaultColors } from 'views/components/visualizations/Colors';
 import ColorMapper from 'views/components/visualizations/ColorMapper';
 import { eventsDisplayName } from 'views/logic/searchtypes/events/EventHandler';
 

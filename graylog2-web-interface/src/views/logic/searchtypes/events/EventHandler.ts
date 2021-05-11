@@ -17,7 +17,6 @@
 import moment from 'moment-timezone';
 import { groupBy } from 'lodash';
 
-import WidgetFormattingSettings from 'views/logic/aggregationbuilder/WidgetFormattingSettings';
 import type { ChartDefinition } from 'views/components/visualizations/ChartData';
 import CombinedProvider from 'injection/CombinedProvider';
 
