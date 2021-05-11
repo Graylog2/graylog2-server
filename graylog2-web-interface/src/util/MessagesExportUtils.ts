@@ -28,13 +28,12 @@ export type ExportPayload = {
   fields_in_order: string[] | undefined | null,
   execution_state?: SearchExecutionState,
   limit?: number,
-  filename?: string,
 };
 
 const downloadFile = (exportJobId: string, filename: string) => {
   const link = document.createElement('a');
   link.download = filename;
-  link.href = qualifyUrl(`/views/search/messages/job/${exportJobId}/${filename}`);
+  link.href = qualifyUrl(ApiRoutes.MessagesController.jobResults(exportJobId, filename));
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
@@ -43,12 +42,7 @@ const downloadFile = (exportJobId: string, filename: string) => {
 export const exportSearchMessages = (exportPayload: ExportPayload, searchId: string, mimeType: string, filename?: string) => {
   const { url } = ApiRoutes.ExportJobsController.exportSearch(searchId);
 
-  const exportPayloadWithFilename = {
-    ...exportPayload,
-    filename,
-  };
-
-  return fetchFile('POST', qualifyUrl(url), exportPayloadWithFilename, mimeType)
+  return fetchFile('POST', qualifyUrl(url), exportPayload, mimeType)
     .then((result: string) => downloadFile(result, filename))
     .catch(() => {
       UserNotification.error('Export failed');
@@ -56,13 +50,9 @@ export const exportSearchMessages = (exportPayload: ExportPayload, searchId: str
 };
 
 export const exportSearchTypeMessages = (exportPayload: ExportPayload, searchId: string, searchTypeId: string, mimeType: string, filename?: string) => {
-  const exportPayloadWithFilename = {
-    ...exportPayload,
-    filename,
-  };
   const { url } = ApiRoutes.ExportJobsController.exportSearchType(searchId, searchTypeId, filename);
 
-  return fetchFile('POST', qualifyUrl(url), exportPayloadWithFilename, mimeType)
+  return fetchFile('POST', qualifyUrl(url), exportPayload, mimeType)
     .then((result: string) => downloadFile(result, filename))
     .catch(() => {
       UserNotification.error('Export for widget failed');

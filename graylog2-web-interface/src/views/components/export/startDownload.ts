@@ -57,7 +57,6 @@ const startDownload = (
     execution_state: executionState,
     fields_in_order: selectedFields.map((field) => field.field),
     limit,
-    filename,
     ...customSettings,
   };
   const searchType: SearchType | undefined | null = selectedWidget ? view.getSearchTypeByWidgetId(selectedWidget.id) : undefined;

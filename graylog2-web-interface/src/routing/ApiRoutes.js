@@ -16,6 +16,8 @@
  */
 import Qs from 'qs';
 
+import { qualifyUrl } from '../util/URLUtils';
+
 const ApiRoutes = {
   AlarmCallbacksApiController: {
     available: () => { return { url: '/alerts/callbacks/types' }; },
@@ -373,6 +375,7 @@ const ApiRoutes = {
     single: (index, messageId) => { return { url: `/messages/${index}/${messageId}` }; },
     exportSearch: ((searchId) => { return { url: `/views/search/messages/${searchId}` }; }),
     exportSearchType: ((searchId, searchTypeId) => { return { url: `/views/search/messages/${searchId}/${searchTypeId}` }; }),
+    jobResults: ((exportJobId, filename) => { return { url: `/views/search/messages/job/${exportJobId}/${filename}` }; }),
   },
   ExportJobsController: {
     exportSearch: ((searchId) => { return { url: `/views/export/${searchId}` }; }),
