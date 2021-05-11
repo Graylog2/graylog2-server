@@ -213,7 +213,7 @@ export const dateTimeValidate = (nextTimeRange, limitDuration) => {
       errors.nextTimeRange = { ...errors.nextTimeRange, from: 'Cannot be empty.' };
     }
 
-    if (nextTimeRange.to === null) {
+    if (nextTimeRange.from && nextTimeRange.to === null) {
       errors.nextTimeRange = { ...errors.nextTimeRange, to: 'Cannot be empty.' };
     }
 
