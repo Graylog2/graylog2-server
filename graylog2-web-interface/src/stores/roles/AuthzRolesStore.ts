@@ -59,13 +59,19 @@ const _responseToPaginatedUserList = ({ count, total, page, per_page, query, use
   },
 });
 
+const encodeApiUrl = (apiRoute: (...args: Array<string>) => { url: string }, uriParams: Array<string> = []): string => {
+  const encodedUriParams = uriParams.map((param) => encodeURIComponent(param));
+
+  return apiRoute(...encodedUriParams).url;
+};
+
 const AuthzRolesStore: Store<{}> = singletonStore(
   'AuthzRoles',
   () => Reflux.createStore({
     listenables: [AuthzRolesActions],
 
     load(roleId: $PropertyType<Role, 'id'>): Promise<Role> {
-      const url = qualifyUrl(ApiRoutes.AuthzRolesController.load(encodeURIComponent(roleId)).url);
+      const url = qualifyUrl(encodeApiUrl(ApiRoutes.AuthzRolesController.load, [roleId]));
       const promise = fetch('GET', url).then(Role.fromJSON);
 
       AuthzRolesActions.load.promise(promise);
@@ -74,7 +80,7 @@ const AuthzRolesStore: Store<{}> = singletonStore(
     },
 
     delete(roleId: string): Promise<void> {
-      const url = qualifyUrl(ApiRoutes.AuthzRolesController.delete(encodeURIComponent(roleId)).url);
+      const url = qualifyUrl(encodeApiUrl(ApiRoutes.AuthzRolesController.delete, [roleId]));
       const promise = fetch('DELETE', url);
 
       AuthzRolesActions.delete.promise(promise);
@@ -83,7 +89,7 @@ const AuthzRolesStore: Store<{}> = singletonStore(
     },
 
     addMembers(roleId: string, usernames: Immutable.Set<string>): Promise<Role> {
-      const { url } = ApiRoutes.AuthzRolesController.addMembers(roleId);
+      const url = encodeApiUrl(ApiRoutes.AuthzRolesController.addMembers, [roleId]);
       const promise = fetch('PUT', qualifyUrl(url), usernames.toArray());
 
       AuthzRolesActions.addMembers.promise(promise);
@@ -92,7 +98,7 @@ const AuthzRolesStore: Store<{}> = singletonStore(
     },
 
     removeMember(roleId: string, username: string): Promise<Role> {
-      const { url } = ApiRoutes.AuthzRolesController.removeMember(roleId, username);
+      const url = encodeApiUrl(ApiRoutes.AuthzRolesController.removeMember, [roleId, username]);
       const promise = fetch('DELETE', qualifyUrl(url));
 
       AuthzRolesActions.removeMember.promise(promise);
@@ -101,7 +107,8 @@ const AuthzRolesStore: Store<{}> = singletonStore(
     },
 
     loadUsersForRole(roleId: string, roleName: string, { page, perPage, query }: Pagination): Promise<PaginatedUsers> {
-      const url = PaginationURL(ApiRoutes.AuthzRolesController.loadUsersForRole(roleId).url, page, perPage, query);
+      const apiUrl = encodeApiUrl(ApiRoutes.AuthzRolesController.loadUsersForRole, [roleId]);
+      const url = PaginationURL(apiUrl, page, perPage, query);
 
       const promise = fetch('GET', qualifyUrl(url))
         .then(_responseToPaginatedUserList);
@@ -112,7 +119,8 @@ const AuthzRolesStore: Store<{}> = singletonStore(
     },
 
     loadRolesForUser(username: string, { page, perPage, query }: Pagination): Promise<PaginatedRoles> {
-      const url = PaginationURL(ApiRoutes.AuthzRolesController.loadRolesForUser(username).url, page, perPage, query);
+      const apiUrl = encodeApiUrl(ApiRoutes.AuthzRolesController.loadRolesForUser, [username]);
+      const url = PaginationURL(apiUrl, page, perPage, query);
 
       const promise = fetch('GET', qualifyUrl(url))
         .then(_responseToPaginatedList);
@@ -123,7 +131,8 @@ const AuthzRolesStore: Store<{}> = singletonStore(
     },
 
     loadRolesPaginated({ page, perPage, query }: Pagination): Promise<PaginatedRoles> {
-      const url = PaginationURL(ApiRoutes.AuthzRolesController.list().url, page, perPage, query);
+      const apiUrl = encodeApiUrl(ApiRoutes.AuthzRolesController.list);
+      const url = PaginationURL(apiUrl, page, perPage, query);
 
       const promise = fetch('GET', qualifyUrl(url))
         .then(_responseToPaginatedList);

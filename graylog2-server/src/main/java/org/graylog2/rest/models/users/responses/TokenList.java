@@ -29,10 +29,10 @@ import java.util.List;
 @WithBeanGetter
 public abstract class TokenList {
     @JsonProperty
-    public abstract List<Token> tokens();
+    public abstract List<TokenSummary> tokens();
 
     @JsonCreator
-    public static TokenList create(@JsonProperty("tokens") List<Token> tokens) {
+    public static TokenList create(@JsonProperty("tokens") List<TokenSummary> tokens) {
         return new AutoValue_TokenList(tokens);
     }
 }

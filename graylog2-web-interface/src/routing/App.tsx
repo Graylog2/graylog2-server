@@ -25,6 +25,7 @@ import CurrentUserContext from 'contexts/CurrentUserContext';
 import Navigation from 'components/navigation/Navigation';
 import ReportedErrorBoundary from 'components/errors/ReportedErrorBoundary';
 import RuntimeErrorBoundary from 'components/errors/RuntimeErrorBoundary';
+import DefaultQueryClientProvider from 'contexts/DefaultQueryClientProvider';
 
 import 'stylesheets/typeahead.less';
 
@@ -64,22 +65,24 @@ const App = ({ children }) => (
       }
 
       return (
-        <ScratchpadProvider loginName={currentUser.username}>
-          <AppLayout>
-            <Navigation />
-            <ScrollToHint id="scroll-to-hint">
-              <Icon name="arrow-up" />
-            </ScrollToHint>
-            <Scratchpad />
-            <ReportedErrorBoundary>
-              <RuntimeErrorBoundary>
-                <PageContent>
-                  {children}
-                </PageContent>
-              </RuntimeErrorBoundary>
-            </ReportedErrorBoundary>
-          </AppLayout>
-        </ScratchpadProvider>
+        <DefaultQueryClientProvider>
+          <ScratchpadProvider loginName={currentUser.username}>
+            <AppLayout>
+              <Navigation />
+              <ScrollToHint id="scroll-to-hint">
+                <Icon name="arrow-up" />
+              </ScrollToHint>
+              <Scratchpad />
+              <ReportedErrorBoundary>
+                <RuntimeErrorBoundary>
+                  <PageContent>
+                    {children}
+                  </PageContent>
+                </RuntimeErrorBoundary>
+              </ReportedErrorBoundary>
+            </AppLayout>
+          </ScratchpadProvider>
+        </DefaultQueryClientProvider>
       );
     }}
   </CurrentUserContext.Consumer>

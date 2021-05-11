@@ -22,6 +22,14 @@ import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import ActionsProvider from 'injection/ActionsProvider';
 
+export type IndexRange = {
+  index_name: string,
+  begin: string,
+  end: string,
+  calculated_at: string,
+  took_ms: number,
+};
+
 const IndexRangesActions = ActionsProvider.getActions('IndexRanges');
 
 const IndexRangesStore = Reflux.createStore({

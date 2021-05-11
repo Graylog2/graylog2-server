@@ -52,6 +52,7 @@
     "react": "16.13.1",
     "react-bootstrap": "0.33.1",
     "react-dom": "16.13.1",
+    "react-query": "3.13.10",
     "react-router": "5.2.0",
     "react-router-bootstrap": "0.25.0",
     "react-router-dom": "5.2.0",

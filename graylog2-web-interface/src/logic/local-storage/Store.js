@@ -14,15 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-const { localStorage } = window;
 
 const Store = {
-  set(key, value) {
-    localStorage.setItem(key, JSON.stringify(value));
+  set(key, value, storage = window.localStorage) {
+    storage.setItem(key, JSON.stringify(value));
   },
 
-  get(key) {
-    const value = localStorage.getItem(key);
+  get(key, storage = window.localStorage) {
+    const value = storage.getItem(key);
 
     if (value === undefined || value === null) {
       return undefined;
@@ -35,8 +34,20 @@ const Store = {
     }
   },
 
-  delete(key) {
-    localStorage.removeItem(key);
+  delete(key, storage = window.localStorage) {
+    storage.removeItem(key);
+  },
+
+  sessionSet(key, value) {
+    return Store.set(key, value, window.sessionStorage);
+  },
+
+  sessionGet(key) {
+    return Store.get(key, window.sessionStorage);
+  },
+
+  sessionDelete(key) {
+    return Store.delete(key, window.sessionStorage);
   },
 };
 

@@ -23,6 +23,7 @@ import { Button, Col, Row } from 'components/graylog';
 import { ReadOnlyFormGroup } from 'components/common';
 import User from 'logic/users/User';
 import SectionComponent from 'components/common/Section/SectionComponent';
+import AppConfig from 'util/AppConfig';
 
 import ProfileUpdateInfo from './ProfileUpdateInfo';
 
@@ -30,6 +31,7 @@ import FirstNameFormGroup from '../UserCreate/FirstNameFormGroup';
 import LastNameFormGroup from '../UserCreate/LastNameFormGroup';
 import EmailFormGroup from '../UserCreate/EmailFormGroup';
 
+const isCloud = AppConfig.isCloud();
 type Props = {
   user: User,
   onSubmit: (payload: {
@@ -54,6 +56,30 @@ const ProfileSection = ({
     email,
   } = user;
 
+  const _getUserNameGroup = () => {
+    if (isCloud) {
+      return <ReadOnlyFormGroup label="Email" value={email} />;
+    }
+
+    return (
+      <>
+        <ReadOnlyFormGroup label="Username" value={username} />
+      </>
+    );
+  };
+
+  const _getEmailGroup = () => {
+    if (isCloud) {
+      return null;
+    }
+
+    return (
+      <>
+        <EmailFormGroup />
+      </>
+    );
+  };
+
   const isOldUser = () => {
     return fullName && (!firstName && !lastName);
   };
@@ -65,11 +91,11 @@ const ProfileSection = ({
               initialValues={{ email, first_name: firstName, last_name: lastName }}>
         {({ isSubmitting, isValid }) => (
           <Form className="form form-horizontal">
-            <StyledReadOnlyFormGroup label="Username" value={username} />
             {isOldUser() && <StyledReadOnlyFormGroup label="Full Name" value={fullName} />}
             <FirstNameFormGroup />
             <LastNameFormGroup />
-            <EmailFormGroup />
+            {_getUserNameGroup()}
+            {_getEmailGroup()}
             <Row className="no-bm">
               <Col xs={12}>
                 <div className="pull-right">

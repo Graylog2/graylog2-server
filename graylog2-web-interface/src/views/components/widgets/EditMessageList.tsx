@@ -19,7 +19,6 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { $PropertyType } from 'utility-types';
 import { EditWidgetComponentProps } from 'views/types';
-
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import { Row, Col, Checkbox } from 'components/graylog';
 import FieldSelect from 'views/components/widgets/FieldSelect';

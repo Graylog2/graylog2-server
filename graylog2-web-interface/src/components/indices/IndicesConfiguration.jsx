@@ -20,8 +20,8 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { Row, Col } from 'components/graylog';
 import IndexMaintenanceStrategiesSummary from 'components/indices/IndexMaintenanceStrategiesSummary';
-import {} from 'components/indices/rotation'; // Load rotation plugin UI plugins from core.
-import {} from 'components/indices/retention'; // Load rotation plugin UI plugins from core.
+import 'components/indices/rotation'; // Load rotation plugin UI plugins from core.
+import 'components/indices/retention'; // Load rotation plugin UI plugins from core.
 import style from 'components/configurations/ConfigurationStyles.lazy.css';
 
 class IndicesConfiguration extends React.Component {
