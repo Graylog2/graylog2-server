@@ -27,7 +27,7 @@ type Props = {
   value: number | null
 }
 
-const RangeValueInput = React.memo(({ fieldName, unsetRange, value, onChange, disabled, error }: Props) => (
+const RelativeRangeValueInput = React.memo(({ fieldName, unsetRange, value, onChange, disabled, error }: Props) => (
   <Input id={`relative-timerange-${fieldName}-value`}
          name={`relative-timerange-${fieldName}-value`}
          disabled={disabled || unsetRange}
@@ -40,4 +40,4 @@ const RangeValueInput = React.memo(({ fieldName, unsetRange, value, onChange, di
          bsStyle={error ? 'error' : null} />
 ));
 
-export default RangeValueInput;
+export default RelativeRangeValueInput;
