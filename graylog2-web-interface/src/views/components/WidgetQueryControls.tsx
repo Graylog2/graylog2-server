@@ -53,6 +53,10 @@ const SecondRow = styled.div`
   }
 `;
 
+const WidgetTopRow = styled(TopRow)`
+  margin-top: 10px;
+`;
+
 type Props = {
   availableStreams: Array<any>,
   globalOverride: GlobalOverride | undefined | null,
@@ -90,13 +94,14 @@ const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
                      validateOnMount={false}>
         {({ dirty, isValid, isSubmitting, handleSubmit, values, setFieldValue }) => (
           <>
-            <TopRow>
+            <WidgetTopRow>
               <Col md={6}>
                 {!hasTimeRangeOverride && (
                   <TimeRangeInput disabled={hasTimeRangeOverride}
                                   onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
                                   value={values?.timerange}
-                                  hasErrorOnMount={!isValid} />
+                                  hasErrorOnMount={!isValid}
+                                  position="right" />
                 )}
                 {hasTimeRangeOverride && (
                   <TimeRangeOverrideInfo value={globalOverride?.timerange} onReset={_resetTimeRangeOverride} />
@@ -112,7 +117,7 @@ const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
                   )}
                 </Field>
               </Col>
-            </TopRow>
+            </WidgetTopRow>
 
             <SecondRow>
               <SearchButton disabled={isSubmitting || !isValid}
