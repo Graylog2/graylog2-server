@@ -16,8 +16,6 @@
  */
 import Qs from 'qs';
 
-import { qualifyUrl } from '../util/URLUtils';
-
 const ApiRoutes = {
   AlarmCallbacksApiController: {
     available: () => { return { url: '/alerts/callbacks/types' }; },
