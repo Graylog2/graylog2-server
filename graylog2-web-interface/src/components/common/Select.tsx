@@ -25,6 +25,8 @@ import { themePropTypes } from 'theme';
 
 import Icon from './Icon';
 
+export const CONTROL_CLASS = 'common-select-control';
+
 type Option = { [key: string]: any };
 
 const MultiValueRemove = (props) => (
@@ -50,6 +52,10 @@ const DropdownIndicator = (props) => {
     </div>
   );
 };
+
+const Control = (props) => (
+  <Components.Control {...props} className={CONTROL_CLASS} />
+);
 
 type CustomOptionProps = {
   data: any,
@@ -169,12 +175,14 @@ type OverriddenComponents = {
   DropdownIndicator: React.ComponentType<any>;
   MultiValueRemove: React.ComponentType<any>;
   IndicatorSeparator: React.ComponentType<any>;
+  Control: React.ComponentType<any>;
 };
 
 const _components: OverriddenComponents = {
   DropdownIndicator,
   MultiValueRemove,
   IndicatorSeparator,
+  Control,
 };
 
 const _styles = ({ size, theme }) => ({
