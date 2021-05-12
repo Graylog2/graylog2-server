@@ -86,16 +86,6 @@ describe('AggregationWizard/Core Visualizations', () => {
     await screen.findByText('World Map');
   });
 
-  it('heat map expects mandatory default value field', async () => {
-    render(<SimpleAggregationWizard />);
-
-    await selectEvent.select(await visualizationSelect(), 'Heatmap');
-
-    await expectSubmitButtonToBeDisabled();
-
-    await screen.findByText(/Default Value is required/);
-  });
-
   it('creates Area Chart config when all required fields are present', async () => {
     const onChange = jest.fn();
     const areaChartConfig = widgetConfig.toBuilder().series([Series.create('count')]).build();
@@ -170,8 +160,6 @@ describe('AggregationWizard/Core Visualizations', () => {
     render(<SimpleAggregationWizard onChange={onChange} config={heatMapConfig} />);
 
     await selectOption('Select visualization type', 'Heatmap');
-
-    await expectSubmitButtonToBeDisabled();
 
     const useSmallestAsDefault = await screen.findByRole('checkbox', { name: 'Use smallest as default' });
     userEvent.click(useSmallestAsDefault);
