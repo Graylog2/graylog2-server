@@ -41,6 +41,10 @@ const ConfigletRow = styled(Row)`
     margin-top: 10px;
     margin-bottom: 5px;
   }
+
+  > div {
+    margin-bottom: 30px;
+  }
 `;
 
 export default ConfigletRow;
