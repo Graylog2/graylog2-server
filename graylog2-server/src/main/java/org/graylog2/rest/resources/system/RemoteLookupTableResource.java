@@ -16,6 +16,7 @@
  */
 package org.graylog2.rest.resources.system;
 
+import org.graylog2.rest.resources.system.responses.LookupTableCachePurgingResponse;
 import retrofit2.Call;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
@@ -32,5 +33,5 @@ public interface RemoteLookupTableResource {
      * See {@link org.graylog2.rest.resources.system.lookup.LookupTableResource#performPurge(String, String)}
      */
     @POST("system/lookup/tables/{idOrName}/purge")
-    Call<Void> performPurge(@Path("idOrName") String idOrName, @Query("key") String key);
+    Call<LookupTableCachePurgingResponse> performPurge(@Path("idOrName") String idOrName, @Query("key") String key);
 }

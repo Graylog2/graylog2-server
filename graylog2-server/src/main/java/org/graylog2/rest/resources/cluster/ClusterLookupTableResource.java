@@ -25,6 +25,7 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodeService;
+import org.graylog2.rest.resources.system.responses.LookupTableCachePurgingResponse;
 import org.graylog2.rest.RemoteInterfaceProvider;
 import org.graylog2.rest.resources.system.RemoteLookupTableResource;
 import org.graylog2.shared.rest.resources.ProxiedResource;
@@ -41,7 +42,11 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ExecutorService;
+import java.util.stream.Collectors;
 
 /**
  * The primary objective of this API is to provide facilities for managing Lookup Tables on the cluster level.
@@ -63,7 +68,8 @@ public class ClusterLookupTableResource extends ProxiedResource {
 
     /**
      * Calls {@link org.graylog2.rest.resources.system.lookup.LookupTableResource#performPurge(String, String)}
-     * on all active nodes.
+     * on all active nodes. If it least one call fails, then 500 returned. Regardless of the operation outcome
+     * a map containing results per each node is always included in the response.
      */
     @POST
     @Timed
@@ -71,8 +77,26 @@ public class ClusterLookupTableResource extends ProxiedResource {
     @ApiOperation(value = "Purge Lookup Table Cache on the cluster-wide level")
     @NoAuditEvent("Cache purge only")
     @RequiresPermissions(RestPermissions.LOOKUP_TABLES_READ)
-    public void performPurge(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName,
-                             @ApiParam(name = "key") @QueryParam("key") String key) {
-        getForAllNodes(r -> r.performPurge(idOrName, key), createRemoteInterfaceProvider(RemoteLookupTableResource.class));
+    public Response performPurge(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName,
+                                 @ApiParam(name = "key") @QueryParam("key") String key) {
+
+        final Map<String, Optional<LookupTableCachePurgingResponse>> allNodeRes = getForAllNodes(r -> r.performPurge(idOrName, key),
+                createRemoteInterfaceProvider(RemoteLookupTableResource.class));
+
+        final boolean isSuccess = allNodeRes
+                .entrySet().stream()
+                .allMatch(e -> e.getValue().isPresent());
+
+        final Map<String, String> transformedRes = allNodeRes
+                .entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey,
+                        e -> e.getValue()
+                                .map(r -> r.result)
+                                .orElse("ERROR")));
+
+        return Response
+                .status(isSuccess ? Response.Status.OK : Response.Status.INTERNAL_SERVER_ERROR)
+                .entity(transformedRes)
+                .build();
     }
 }

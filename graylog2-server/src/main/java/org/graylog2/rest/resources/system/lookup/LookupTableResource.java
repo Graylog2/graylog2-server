@@ -46,6 +46,7 @@ import org.graylog2.lookup.db.DBCacheService;
 import org.graylog2.lookup.db.DBDataAdapterService;
 import org.graylog2.lookup.db.DBLookupTableService;
 import org.graylog2.lookup.dto.CacheDto;
+import org.graylog2.rest.resources.system.responses.LookupTableCachePurgingResponse;
 import org.graylog2.lookup.dto.DataAdapterDto;
 import org.graylog2.lookup.dto.LookupTableDto;
 import org.graylog2.plugin.lookup.LookupCache;
@@ -212,8 +213,8 @@ public class LookupTableResource extends RestResource {
     @ApiOperation(value = "Purge lookup table cache")
     @NoAuditEvent("Cache purge only")
     @RequiresPermissions(RestPermissions.LOOKUP_TABLES_READ)
-    public void performPurge(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName,
-                             @ApiParam(name = "key") @QueryParam("key") String key) {
+    public LookupTableCachePurgingResponse performPurge(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName,
+                                                        @ApiParam(name = "key") @QueryParam("key") String key) {
         final Optional<LookupTableDto> lookupTableDto = dbTableService.get(idOrName);
         if (!lookupTableDto.isPresent()) {
             throw new NotFoundException("Lookup table <" + idOrName + "> not found");
@@ -229,6 +230,8 @@ public class LookupTableResource extends RestResource {
         } else {
             throw new NotFoundException("Lookup table <" + idOrName + "> not found");
         }
+
+        return LookupTableCachePurgingResponse.success();
     }
 
     @GET
