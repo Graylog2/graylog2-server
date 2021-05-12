@@ -22,7 +22,7 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import { Alert, Button, ButtonToolbar, Col, ControlLabel, FormControl, FormGroup, HelpBlock, Row } from 'components/graylog';
 import { Select, Spinner } from 'components/common';
 import { Input } from 'components/bootstrap';
-import * as FormsUtils from 'util/FormsUtils';
+import { getValueFromInput } from 'util/FormsUtils';
 
 class EventNotificationForm extends React.Component {
   static propTypes = {
@@ -59,7 +59,7 @@ class EventNotificationForm extends React.Component {
     const { name } = event.target;
     const { onChange } = this.props;
 
-    onChange(name, FormsUtils.getValueFromInput(event.target));
+    onChange(name, getValueFromInput(event.target));
   };
 
   handleConfigChange = (nextConfig) => {
@@ -146,23 +146,28 @@ class EventNotificationForm extends React.Component {
 
             {notificationFormComponent}
 
-            <FormGroup>
-              <ControlLabel>Test Notification <small className="text-muted">(Optional)</small></ControlLabel>
-              <FormControl.Static>
-                <Button bsStyle="info" bsSize="small" disabled={testResult.isLoading} onClick={this.handleTestTrigger}>
-                  {testButtonText}
-                </Button>
-              </FormControl.Static>
-              {testResult.message && (
-                <Alert bsStyle={testResult.error ? 'danger' : 'success'}>
-                  <b>{testResult.error ? 'Error: ' : 'Success: '}</b>
-                  {testResult.message}
-                </Alert>
-              )}
-              <HelpBlock>
-                Execute this Notification with a test Alert.
-              </HelpBlock>
-            </FormGroup>
+            {notificationFormComponent && (
+              <FormGroup>
+                <ControlLabel>Test Notification <small className="text-muted">(Optional)</small></ControlLabel>
+                <FormControl.Static>
+                  <Button bsStyle="info"
+                          bsSize="small"
+                          disabled={testResult.isLoading}
+                          onClick={this.handleTestTrigger}>
+                    {testButtonText}
+                  </Button>
+                </FormControl.Static>
+                {testResult.message && (
+                  <Alert bsStyle={testResult.error ? 'danger' : 'success'}>
+                    <b>{testResult.error ? 'Error: ' : 'Success: '}</b>
+                    {testResult.message}
+                  </Alert>
+                )}
+                <HelpBlock>
+                  Execute this Notification with a test Alert.
+                </HelpBlock>
+              </FormGroup>
+            )}
 
             {!embedded && (
               <ButtonToolbar>

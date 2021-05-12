@@ -171,10 +171,12 @@ public class OutputBufferProcessor implements WorkHandler<MessageEvent> {
     private Future<?> processMessage(final Message msg, final MessageOutput output, final CountDownLatch doneSignal) {
         if (output == null) {
             LOG.error("Output was null!");
+            doneSignal.countDown();
             return Futures.immediateCancelledFuture();
         }
         if (!output.isRunning()) {
             LOG.debug("Skipping stopped output {}", output.getClass().getName());
+            doneSignal.countDown();
             return Futures.immediateCancelledFuture();
         }
 

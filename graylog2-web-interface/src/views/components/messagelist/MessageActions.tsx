@@ -88,7 +88,7 @@ const MessageActions = ({ index, id, fields, decorationStats, disabled, disableS
       {showChanges}
       <Button href={messageUrl}>Permalink</Button>
 
-      <ClipboardButton title="Copy ID" text={id} />
+      <ClipboardButton title="Copy ID" text={id} bsSize="small" />
       {surroundingSearchButton}
       {disableTestAgainstStream ? null : _getTestAgainstStreamButton(streams, index, id)}
     </ButtonGroup>

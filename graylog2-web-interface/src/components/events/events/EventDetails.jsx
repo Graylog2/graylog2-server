@@ -114,6 +114,10 @@ class EventDetails extends React.Component {
             {lodash.isEmpty(event.fields)
               ? <dd>No additional Fields added to this Event.</dd>
               : this.renderEventFields(event.fields)}
+            <dt>Group-By Fields</dt>
+            {lodash.isEmpty(event.group_by_fields)
+              ? <dd>No group-by fields on this Event.</dd>
+              : this.renderEventFields(event.group_by_fields)}
           </dl>
         </Col>
       </Row>

@@ -54,7 +54,7 @@ public abstract class RestResource {
     protected UserService userService;
 
     @Inject
-    private HttpConfiguration configuration;
+    protected HttpConfiguration configuration;
 
     @Context
     SecurityContext securityContext;

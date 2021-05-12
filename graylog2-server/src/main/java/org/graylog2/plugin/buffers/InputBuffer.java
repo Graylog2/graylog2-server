@@ -18,8 +18,6 @@ package org.graylog2.plugin.buffers;
 
 import org.graylog2.plugin.journal.RawMessage;
 
-public interface InputBuffer {
+public interface InputBuffer extends EventBuffer {
     void insert(RawMessage message);
-
-    long getUsage();
 }

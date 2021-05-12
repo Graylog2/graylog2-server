@@ -36,13 +36,14 @@ type Props = {
   onChange: (query: string) => Promise<string>,
   onExecute: (query: string) => void,
   placeholder?: string,
+  height?: number,
   theme: DefaultTheme,
   value: string,
 };
 
 const defaultCompleterFactory = (completers) => new SearchBarAutoCompletions(completers);
 
-const QueryInput = ({ disabled, onBlur, onChange, onExecute, placeholder, value, completers, completerFactory = defaultCompleterFactory, theme }: Props) => {
+const QueryInput = ({ disabled, onBlur, onChange, onExecute, placeholder, value, completers, completerFactory = defaultCompleterFactory, theme, height }: Props) => {
   const completer = useMemo(() => completerFactory(completers), [completerFactory, completers]);
   const _onExecute = useCallback((editor: Editor) => {
     if (editor.completer && editor.completer.popup) {
@@ -92,7 +93,8 @@ const QueryInput = ({ disabled, onBlur, onChange, onExecute, placeholder, value,
                              selectionStyle: 'line',
                            }}
                            fontSize={theme.fonts.size.large}
-                           placeholder={placeholder} />
+                           placeholder={placeholder}
+                           $height={height} />
         )}
       </UserPreferencesContext.Consumer>
     </div>
@@ -107,17 +109,19 @@ QueryInput.propTypes = {
   onChange: PropTypes.func.isRequired,
   onExecute: PropTypes.func.isRequired,
   placeholder: PropTypes.string,
+  height: PropTypes.number,
   theme: themePropTypes.isRequired,
   value: PropTypes.string,
 };
 
 QueryInput.defaultProps = {
-  disabled: false,
-  onBlur: () => {},
-  completers: [],
   completerFactory: defaultCompleterFactory,
-  value: '',
+  completers: [],
+  disabled: false,
+  height: undefined,
+  onBlur: () => {},
   placeholder: '',
+  value: '',
 };
 
 export default withPluginEntities(withTheme(QueryInput), { completers: 'views.completers' });

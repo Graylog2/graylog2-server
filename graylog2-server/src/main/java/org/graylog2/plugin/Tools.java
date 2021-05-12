@@ -361,6 +361,10 @@ public final class Tools {
         return new DateTime(DateTimeZone.UTC);
     }
 
+    public static DateTime now(DateTimeZone dateTimeZone) {
+        return new DateTime(dateTimeZone);
+    }
+
     /**
      * @return The current date with timezone UTC.
      * @deprecated Use {@link #nowUTC()} instead.

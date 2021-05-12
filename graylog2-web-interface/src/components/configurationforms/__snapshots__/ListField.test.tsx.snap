@@ -37,21 +37,27 @@ exports[`<ListField> should render an empty field 1`] = `
     </label>
     <span>
       <div
-        class="css-1pcexqc-container"
+        class=" css-2b097c-container"
       >
+        <span
+          aria-atomic="false"
+          aria-live="polite"
+          aria-relevant="additions text"
+          class="css-1f43avz-a11yText-A11yText"
+        />
         <div
-          class="css-ghr2vn-control"
+          class=" css-9w5mt0-control"
         >
           <div
-            class="css-1hio1c"
+            class=" css-d5r05u-ValueContainer"
           >
             <div
-              class="css-1fbh878-placeholder"
+              class=" css-cv6aql-placeholder"
             >
               Select list field
             </div>
             <div
-              class="css-dg7tyz"
+              class="css-200f6w-Input"
             >
               <div
                 class=""
@@ -76,7 +82,7 @@ exports[`<ListField> should render an empty field 1`] = `
             </div>
           </div>
           <div
-            class="css-1wy0on6"
+            class=" css-1hb7zxy-IndicatorsContainer"
           >
             <div
               aria-hidden="true"

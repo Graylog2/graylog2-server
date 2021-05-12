@@ -34,7 +34,7 @@ import ExportModal from 'views/components/export/ExportModal';
 import ViewTypeLabel from 'views/components/ViewTypeLabel';
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import CurrentUserContext from 'contexts/CurrentUserContext';
-import * as Permissions from 'views/Permissions';
+import * as ViewsPermissions from 'views/Permissions';
 import type { UserJSON } from 'logic/users/User';
 import ViewPropertiesModal from 'views/components/views/ViewPropertiesModal';
 import { loadAsDashboard, loadNewSearch } from 'views/logic/views/Actions';
@@ -58,7 +58,7 @@ type State = {
 
 const _isAllowedToEdit = (view: View, currentUser: UserJSON | undefined | null) => (
   view.owner === currentUser?.username
-  || isPermitted(currentUser?.permissions, [Permissions.View.Edit(view.id)])
+  || isPermitted(currentUser?.permissions, [ViewsPermissions.View.Edit(view.id)])
 );
 
 class SavedSearchControls extends React.Component<Props, State> {
@@ -256,7 +256,8 @@ class SavedSearchControls extends React.Component<Props, State> {
                     </Button>
                     {showList && (
                       <SavedSearchList deleteSavedSearch={this.deleteSavedSearch}
-                                       toggleModal={this.toggleListModal} />
+                                       toggleModal={this.toggleListModal}
+                                       activeSavedSearchId={view.id} />
                     )}
                     <ShareButton entityType="search"
                                  entityId={view.id}

@@ -22,6 +22,7 @@ import ActionsProvider from 'injection/ActionsProvider';
 import { createFromFetchError } from 'logic/errors/ReportedErrors';
 import Routes from 'routing/Routes';
 import history from 'util/History';
+import CancellablePromise from 'logic/rest/CancellablePromise';
 
 const reportServerSuccess = () => {
   const ServerAvailabilityActions = ActionsProvider.getActions('ServerAvailability');
@@ -132,7 +133,7 @@ export class Builder {
         return noContent ? null : resp.json();
       }
 
-      throw new FetchError(resp.statusText, resp);
+      throw resp;
     };
 
     this.errorHandler = (error) => onServerError(error);
@@ -151,7 +152,7 @@ export class Builder {
         return resp.text();
       }
 
-      throw new FetchError(resp.statusText, resp);
+      this.errorHandler(resp);
     };
 
     this.errorHandler = (error) => onServerError(error);
@@ -172,7 +173,7 @@ export class Builder {
         return resp.json();
       }
 
-      throw new FetchError(resp.statusText, resp);
+      throw resp;
     };
 
     this.errorHandler = (error) => onServerError(error, onUnauthorized);
@@ -198,11 +199,12 @@ export class Builder {
       headers.Accept = this.accept;
     }
 
-    return window.fetch(this.url, {
+    return CancellablePromise.of(window.fetch(this.url, {
       method: this.method,
       headers,
       body: this.body ? this.body.body : undefined,
-    }).then(this.responseHandler, this.errorHandler);
+    })).then(this.responseHandler, this.errorHandler)
+      .catch(this.errorHandler);
   }
 }
 
@@ -210,13 +212,13 @@ function queuePromiseIfNotLoggedin(promise) {
   const SessionStore = StoreProvider.getStore('Session');
 
   if (!SessionStore.isLoggedIn()) {
-    return () => new Promise((resolve, reject) => {
+    return () => CancellablePromise.of(new Promise((resolve, reject) => {
       const SessionActions = ActionsProvider.getActions('Session');
 
       SessionActions.login.completed.listen(() => {
         promise().then(resolve, reject);
       });
-    });
+    }));
   }
 
   return promise;
