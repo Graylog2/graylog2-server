@@ -28,6 +28,7 @@ import { CurrentViewStateStore } from 'views/stores/CurrentViewStateStore';
 import { Popover } from 'components/graylog';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import { colors as defaultColors } from 'views/components/visualizations/Colors';
+import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 
 const ColorHint = styled.div(({ color }) => `
   cursor: pointer;
@@ -94,6 +95,7 @@ const PlotLegend = ({ children, config, chartData, labelMapper = defaultLabelMap
   const labels: Array<string> = labelMapper(chartData);
   const { activeQuery } = useStore(CurrentViewStateStore);
   const { colors, setColor } = useContext(ChartColorContext);
+  const { focusedWidget } = useContext(WidgetFocusContext);
 
   const chunkCells = (cells, columnCount) => {
     const { length } = cells;
@@ -161,6 +163,10 @@ const PlotLegend = ({ children, config, chartData, labelMapper = defaultLabelMap
       </LegendCell>
     );
   });
+
+  if (tableCells.length <= 1 && (!focusedWidget || !focusedWidget.editing)) {
+    return <>{children}</>;
+  }
 
   const result = chunkCells(tableCells, 5).map((cells, index) => (
     // eslint-disable-next-line react/no-array-index-key
