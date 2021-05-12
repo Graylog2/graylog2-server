@@ -70,11 +70,6 @@ const StyledFormGroup = styled(BootstrapFormGroup)(({ theme, validationState }) 
       .form-control-feedback {
         color: ${text};
       }
-
-      .${COMMON_SELECT_CONTROL_CLASS} {
-        border-top-left-radius: 0;
-        border-bottom-left-radius: 0;
-      }
     }
   `;
 });
