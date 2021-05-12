@@ -16,71 +16,67 @@
  */
 import { css } from 'styled-components';
 
-const navTabsStyles = css(({ theme }) => {
-  const borderColor = theme.colors.variant.default;
+const navTabsStyles = css(({ theme }) => css`
+  .nav-tabs {
+    border-bottom-color: ${theme.colors.variant.default};
 
-  return css`
-    .nav-tabs {
-      border-bottom-color: ${borderColor};
+    > li {
+      > a {
+        transition: background-color 150ms ease-in-out;
+        color: ${theme.colors.global.textDefault};
+        border-color: ${theme.colors.variant.lighter.default} ${theme.colors.variant.lighter.default} ${theme.colors.variant.default};
 
-      > li {
-        > a {
-          transition: background-color 150ms ease-in-out;
+        &:hover {
+          background-color: ${theme.colors.variant.lightest.default};
           color: ${theme.colors.global.textDefault};
-          border-color: ${theme.colors.variant.lighter.default} ${theme.colors.variant.lighter.default} ${borderColor};
-
-          &:hover {
-            background-color: ${theme.colors.variant.lightest.default};
-            color: ${theme.colors.global.textDefault};
-          }
-        }
-
-        &.active > a {
-          &,
-          &:hover,
-          &:focus {
-            color: ${theme.colors.variant.darkest.default};
-            background-color: ${theme.colors.global.contentBackground};
-            border-color: ${borderColor};
-            border-bottom-color: transparent;
-          }
-        }
-
-        &.disabled > a {
-          &,
-          &:hover,
-          &:focus {
-            color: ${theme.colors.gray[60]};
-            background-color: ${theme.colors.gray[100]};
-            border-color: ${theme.colors.gray[100]} ${theme.colors.gray[100]} ${borderColor};
-            cursor: not-allowed;
-          }
         }
       }
-    }
 
-    &.nav-justified {
-      > .active > a {
+      &.active > a {
         &,
         &:hover,
         &:focus {
-          border-color: ${borderColor};
+          color: ${theme.colors.variant.darkest.default};
+          background-color: ${theme.colors.global.contentBackground};
+          border-color: ${theme.colors.variant.default};
+          border-bottom-color: transparent;
         }
       }
 
-      @media (min-width: ${theme.breakpoints.min.sm}) {
-        > li > a {
-          border-bottom-color: ${borderColor};
-        }
-
-        > .active > a,
-        > .active > a:hover,
-        > .active > a:focus {
-          border-bottom-color: ${theme.colors.gray[100]};
+      &.disabled > a {
+        &,
+        &:hover,
+        &:focus {
+          color: ${theme.colors.gray[60]};
+          background-color: ${theme.colors.gray[100]};
+          border-color: ${theme.colors.gray[100]} ${theme.colors.gray[100]} ${theme.colors.variant.default};
+          cursor: not-allowed;
         }
       }
     }
-  `;
-});
+  }
+
+  &.nav-justified {
+    > .active > a {
+      &,
+      &:hover,
+      &:focus {
+        border-color: ${theme.colors.variant.default};
+      }
+    }
+
+    @media (min-width: ${theme.breakpoints.min.sm}) {
+      > li > a {
+        border-bottom-color: ${theme.colors.variant.default};
+      }
+
+      > .active > a,
+      > .active > a:hover,
+      > .active > a:focus {
+        border-bottom-color: ${theme.colors.gray[100]};
+      }
+    }
+  }
+`);
 
 export default navTabsStyles;
