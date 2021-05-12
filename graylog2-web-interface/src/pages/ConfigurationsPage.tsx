@@ -27,10 +27,10 @@ import MessageProcessorsConfig from 'components/configurations/MessageProcessors
 import SidecarConfig from 'components/configurations/SidecarConfig';
 import EventsConfig from 'components/configurations/EventsConfig';
 import UrlWhiteListConfig from 'components/configurations/UrlWhiteListConfig';
-import {} from 'components/maps/configurations';
-import style from 'components/configurations/ConfigurationStyles.lazy.css';
+import 'components/maps/configurations';
 import { Store } from 'stores/StoreTypes';
 import usePluginEntities from 'views/logic/usePluginEntities';
+import ConfigletRow from 'pages/configurations/ConfigletRow';
 
 import ConfigletContainer from './configurations/ConfigletContainer';
 import PluginConfigRows from './configurations/PluginConfigRows';
@@ -66,12 +66,6 @@ const ConfigurationsPage = () => {
   const pluginSystemConfigs = usePluginEntities('systemConfigurations');
   const configuration = useStore(ConfigurationsStore as Store<Record<string, any>>, (state) => state?.configuration);
   const permissions = useStore(CurrentUserStore as Store<{ currentUser: { permissions: Array<string> } }>, (state) => state?.currentUser?.permissions);
-
-  useEffect(() => {
-    style.use();
-
-    return () => { style.unuse(); };
-  }, []);
 
   useEffect(() => {
     const promises = [
@@ -152,9 +146,9 @@ const ConfigurationsPage = () => {
           </span>
         </PageHeader>
 
-        <Row className="content">
+        <ConfigletRow className="content">
           {Output}
-        </Row>
+        </ConfigletRow>
 
         {pluginSystemConfigs.length > 0 && (
         <Row className="content">
