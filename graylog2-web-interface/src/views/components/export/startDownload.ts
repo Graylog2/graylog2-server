@@ -52,7 +52,6 @@ const startDownload = (
   limit: number | undefined | null,
   customSettings: ExportSettings,
 ) => {
-  const filename = getFilename(view, selectedWidget);
   const payload: ExportPayload = {
     execution_state: executionState,
     fields_in_order: selectedFields.map((field) => field.field),
@@ -60,6 +59,7 @@ const startDownload = (
     ...customSettings,
   };
   const searchType: SearchType | undefined | null = selectedWidget ? view.getSearchTypeByWidgetId(selectedWidget.id) : undefined;
+  const filename = getFilename(view, selectedWidget);
 
   return downloadFile(format, payload, view.search.queries, searchType, view.search.id, filename);
 };
