@@ -114,6 +114,7 @@ const adjustTabsVisibility = (maxWidth, lockedTab, setLockedTab) => {
 
   tabItems.forEach((tabItem) => {
     tabItem.classList.remove(CLASS_HIDDEN);
+    tabItem.setAttribute('aria-hidden', 'false');
 
     if (lockedTab) {
       const anchor = tabItem.querySelector('a');
@@ -133,6 +134,8 @@ const adjustTabsVisibility = (maxWidth, lockedTab, setLockedTab) => {
         hiddenItems.splice(idx, 1);
       } else {
         tabItem.classList.add(CLASS_HIDDEN);
+        tabItem.setAttribute('aria-hidden', 'true');
+
         hiddenItems.push(idx);
       }
     }
