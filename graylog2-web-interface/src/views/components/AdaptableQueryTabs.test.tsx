@@ -50,7 +50,7 @@ describe('AdaptableQueryTabs', () => {
 
   const finishInitialRender = async () => {
     await screen.findByRole('menuitem', {
-      name: /Tab 4/i,
+      name: 'Tab 4',
       hidden: true,
     });
   };
@@ -63,7 +63,7 @@ describe('AdaptableQueryTabs', () => {
     it('displays tabs in dropdown if they do not fit in container row', async () => {
       render(<AdaptableQueryTabs {...DEFAULT_PROPS} />);
       const mainTabs = [1, 2];
-      const dropdownTabs = [2, 3];
+      const dropdownTabs = [3, 4];
 
       await finishInitialRender();
 

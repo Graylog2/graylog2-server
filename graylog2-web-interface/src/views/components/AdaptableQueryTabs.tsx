@@ -143,9 +143,11 @@ const adjustTabsVisibility = (maxWidth, lockedTab, setLockedTab) => {
 
   moreItems.forEach((tabItem: HTMLElement, idx) => {
     tabItem.classList.remove(CLASS_HIDDEN);
+    tabItem.setAttribute('aria-hidden', 'false');
 
     if (!hiddenItems.includes(idx)) {
       tabItem.classList.add(CLASS_HIDDEN);
+      tabItem.setAttribute('aria-hidden', 'true');
     } else if (tabItem.classList.contains(CLASS_ACTIVE)) {
       const { tabId } = tabItem.querySelector('a').dataset;
 
@@ -243,6 +245,7 @@ const AdaptableQueryTabs = ({ maxWidth, queries, titles, selectedQueryId, onRemo
                    pullRight
                    active={openedMore}
                    open={openedMore}
+
                    onToggle={(isOpened) => setOpenedMore(isOpened)}>
         {currentTabs.menuItems}
       </NavDropdown>
