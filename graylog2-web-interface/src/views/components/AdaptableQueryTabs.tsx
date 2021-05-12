@@ -251,6 +251,7 @@ const AdaptableQueryTabs = ({ maxWidth, queries, titles, selectedQueryId, onRemo
 
       <NavItem key="new"
                eventKey="new"
+               title="Create New Tab"
                onClick={() => onSelect('new')}
                className="query-tabs-new">
         <Icon name="plus" />

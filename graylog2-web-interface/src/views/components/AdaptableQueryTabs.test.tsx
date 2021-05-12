@@ -181,10 +181,53 @@ describe('AdaptableQueryTabs', () => {
     render(<AdaptableQueryTabs {...DEFAULT_PROPS} selectedQueryId="query-id-2" />);
 
     const tab2 = screen.getByRole(mainTabRole, {
-      name: /Tab 2/i,
+      name: 'Tab 2',
     });
 
     expect(tab2).toBeVisible();
     expect(tab2.parentNode).toHaveClass('active');
+  });
+
+  it('selects main tab', async () => {
+    const onSelectStub = jest.fn((id: string) => Promise.resolve(id));
+    render(<AdaptableQueryTabs {...DEFAULT_PROPS} onSelect={onSelectStub} />);
+
+    const tab2 = await screen.findByRole(mainTabRole, {
+      name: 'Tab 2',
+    });
+    userEvent.click(tab2);
+
+    waitFor(() => expect(onSelectStub).toHaveBeenCalledTimes(1));
+
+    expect(onSelectStub).toHaveBeenCalledWith('query-id-2');
+  });
+
+  it('selects dropdown tab', async () => {
+    const onSelectStub = jest.fn((id: string) => Promise.resolve(id));
+    render(<AdaptableQueryTabs {...DEFAULT_PROPS} onSelect={onSelectStub} />);
+
+    await finishInitialRender();
+
+    const tab4 = screen.getByRole(dropdownTabRole, {
+      name: 'Tab 4',
+      hidden: true,
+    });
+    userEvent.click(tab4);
+
+    waitFor(() => expect(onSelectStub).toHaveBeenCalledTimes(1));
+
+    expect(onSelectStub).toHaveBeenCalledWith('query-id-4');
+  });
+
+  it('creates new tab', async () => {
+    const onSelectStub = jest.fn((id: string) => Promise.resolve(id));
+    render(<AdaptableQueryTabs {...DEFAULT_PROPS} onSelect={onSelectStub} />);
+
+    const createTabButton = await screen.findByTitle('Create New Tab');
+    userEvent.click(createTabButton);
+
+    waitFor(() => expect(onSelectStub).toHaveBeenCalledTimes(1));
+
+    expect(onSelectStub).toHaveBeenCalledWith('new');
   });
 });
