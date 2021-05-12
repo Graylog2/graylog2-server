@@ -185,7 +185,8 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
     private String createScript(List<BucketSpec> pivots) {
         return pivots.stream()
                 .map(BucketSpec::field)
-                .map(field -> field == null ? "'null field'" : "(doc.containsKey('" + field + "') ? doc['" + field + "'].value : 'unknown field')")
+//                .map(field -> field == null ? "'null field'" : "(doc.containsKey('" + field + "') ? doc['" + field + "'].value : 'unknown field')")
+                .map(field -> field == null ? "'null field'" : "(doc['" + field + "'].size() == 0 ? 'unknown field' : doc['" + field + "'].value)")
                 .collect(Collectors.joining(" + '" + TERMS_SEPARATOR + "' + "));
     }
 
