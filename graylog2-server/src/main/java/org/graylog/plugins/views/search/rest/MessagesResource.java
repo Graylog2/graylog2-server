@@ -56,7 +56,6 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.Response;
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
 import java.util.Objects;
@@ -161,19 +160,12 @@ public class MessagesResource extends RestResource implements PluginRestResource
     @ApiOperation("Retrieve results for export job")
     @GET
     @Path("job/{exportJobId}/{filename:.*}")
-    public Response retrieveForExportJob(@ApiParam(value = "ID of an existing export job", name = "exportJobId")
+    public ChunkedOutput<SimpleMessageChunk> retrieveForExportJob(@ApiParam(value = "ID of an existing export job", name = "exportJobId")
                                          @PathParam("exportJobId") String exportJobId) throws UnsupportedEncodingException {
         final ExportJob exportJob = exportJobService.get(exportJobId)
                 .orElseThrow(() -> new NotFoundException("Unable to find export job with id <" + exportJobId + ">!"));
 
-        final ChunkedOutput<SimpleMessageChunk> output = outputFor(exportJob);
-
-        //final String encodedFilename = URLEncoder.encode(filename + "." + extension, StandardCharsets.UTF_8.toString());
-
-        return Response.ok()
-                .entity(output)
-                //.header("Content-Disposition", "attachment; filename=\"" + encodedFilename +"\"")
-                .build();
+        return outputFor(exportJob);
     }
 
     private ChunkedOutput<SimpleMessageChunk> outputFor(ExportJob exportJob) {
@@ -183,13 +175,13 @@ public class MessagesResource extends RestResource implements PluginRestResource
         }
 
         if (exportJob instanceof SearchExportJob) {
-            final ResultFormat resultFormat = ((SearchExportJob) exportJob).resultFormat();
-            return this.retrieveForSearch(((SearchExportJob) exportJob).searchId(), resultFormat);
+            final SearchExportJob searchExportJob = (SearchExportJob) exportJob;
+            return this.retrieveForSearch(searchExportJob.searchId(), searchExportJob.resultFormat());
         }
 
         if (exportJob instanceof SearchTypeExportJob) {
-            final ResultFormat resultFormat = ((SearchTypeExportJob) exportJob).resultFormat();
-            return this.retrieveForSearchType(((SearchTypeExportJob) exportJob).searchId(), ((SearchTypeExportJob) exportJob).searchTypeId(), resultFormat);
+            final SearchTypeExportJob searchTypeExportJob = (SearchTypeExportJob)exportJob;
+            return this.retrieveForSearchType(searchTypeExportJob.searchId(), searchTypeExportJob.searchTypeId(), searchTypeExportJob.resultFormat());
         }
 
         throw new IllegalStateException("Invalid type of export job: " + exportJob.getClass());
