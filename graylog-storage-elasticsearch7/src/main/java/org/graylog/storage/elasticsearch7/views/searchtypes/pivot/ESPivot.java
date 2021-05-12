@@ -131,7 +131,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
             seriesAggregations.forEach(columnsAggregation::subAggregation);
             rowsAggregation.subAggregation(columnsAggregation);
         } else {
-            // only columns are defined, still add an aggregation
+            // only columns are defined. Still add an aggregation to the searchSourceBuilder, so we get 1 row
             final AggregationBuilder columnsAggregation = createAggregation(createAggregationName(queryContext, pivot, COLUMNS_POSTFIX), pivot.columnGroups(), bucketOrder);
 
             seriesAggregations.forEach(columnsAggregation::subAggregation);
@@ -185,7 +185,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
     private String createScript(List<BucketSpec> pivots) {
         return pivots.stream()
                 .map(BucketSpec::field)
-                .map(field -> "doc['" + field + "'].value")
+                .map(field -> field == null ? "" : "(doc.containsKey('" + field + "') ? doc['" + field + "'].value : '')")
                 .collect(Collectors.joining(" + '" + TERMS_SEPARATOR + "' + "));
     }
 
@@ -252,6 +252,9 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
                         .stream()
                         .map(bucket -> {
                             final ImmutableList<String> rowKeys = ImmutableList.copyOf(bucket.getKeyAsString().split(TERMS_SEPARATOR));
+                            if(pivot.rowGroups().size() != rowKeys.size()) {
+                                LOG.warn("Expected number of terms in row: {}, but was {}. The separator char might be part of the field values.", pivot.rowGroups().size(), rowKeys.size());
+                            }
                             final PivotResult.Row.Builder rowBuilder = PivotResult.Row.builder().key(rowKeys).source("leaf");
                             if (pivot.rollup()) {
                                 pivot.series().stream()
@@ -266,6 +269,9 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
                                     if (columnsResult != null) {
                                         columnsResult.getBuckets().forEach(columnBucket -> {
                                             final ImmutableList<String> columnKeys = ImmutableList.copyOf(columnBucket.getKeyAsString().split(TERMS_SEPARATOR));
+                                            if(pivot.columnGroups().size() != columnKeys.size()) {
+                                                LOG.warn("Expected number of terms in columns: {}, but was {}. The separator char might be part of the field values.", pivot.rowGroups().size(), rowKeys.size());
+                                            }
                                             pivot.series().stream()
                                                     .flatMap(seriesSpec -> createColumnValuesForSeries(pivot, queryResult, queryContext, columnBucket, seriesSpec, columnKeys))
                                                     .forEach(rowBuilder::addValue);
@@ -299,6 +305,9 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
 
                     columnsResult.getBuckets().forEach(columnBucket -> {
                         final ImmutableList<String> columnKeys = ImmutableList.copyOf(columnBucket.getKeyAsString().split(TERMS_SEPARATOR));
+                        if(pivot.columnGroups().size() != columnKeys.size()) {
+                            LOG.warn("Expected number of terms in columns: {}, but was {}. The separator char might be part of the field values.", pivot.columnGroups().size(), columnKeys.size());
+                        }
                         pivot.series().stream()
                                 .flatMap(seriesSpec -> createColumnValuesForSeries(pivot, queryResult, queryContext, columnBucket, seriesSpec, columnKeys))
                                 .forEach(rowBuilder::addValue);
