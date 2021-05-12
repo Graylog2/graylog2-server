@@ -25,9 +25,17 @@ const fieldTypesUrl = qualifyUrl('/views/fields');
 
 type FieldTypesResponse = Array<FieldTypeMappingJSON>;
 
+type FieldTypesRequest = {
+  streams?: Array<string>,
+  timerange?: TimeRange,
+};
+
 const _deserializeFieldTypes = (response: FieldTypesResponse) => response
   .map((fieldTypeMapping) => FieldTypeMapping.fromJSON(fieldTypeMapping));
-const fetchAllFieldTypes = (streams: Array<string>, timerange: TimeRange): Promise<Array<FieldTypeMapping>> => fetch('POST', fieldTypesUrl, { streams, timerange })
+
+const createFieldTypeRequest = (streams: Array<string>, timerange: TimeRange): FieldTypesRequest => ((streams && streams.length > 0) ? { streams, timerange } : { timerange });
+
+const fetchAllFieldTypes = (streams: Array<string>, timerange: TimeRange): Promise<Array<FieldTypeMapping>> => fetch('POST', fieldTypesUrl, createFieldTypeRequest(streams, timerange))
   .then(_deserializeFieldTypes);
 
 const useFieldTypes = (streams: Array<string> = [], timerange: TimeRange) => useQuery([streams, timerange], () => fetchAllFieldTypes(streams, timerange));
