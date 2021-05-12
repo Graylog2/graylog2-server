@@ -245,7 +245,6 @@ const AdaptableQueryTabs = ({ maxWidth, queries, titles, selectedQueryId, onRemo
                    pullRight
                    active={openedMore}
                    open={openedMore}
-
                    onToggle={(isOpened) => setOpenedMore(isOpened)}>
         {currentTabs.menuItems}
       </NavDropdown>
