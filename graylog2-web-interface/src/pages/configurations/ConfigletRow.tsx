@@ -30,7 +30,7 @@ const ConfigletRow = styled(Row)`
   }
 
   .deflist dd {
-    margin-left: 160px;
+    margin-left: 180px;
   }
 
   .top-margin {
