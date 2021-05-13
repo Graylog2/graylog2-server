@@ -48,6 +48,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -94,11 +95,11 @@ public class ClusterLookupTableResource extends ProxiedResource {
                     result.add(LookupTableCachePurgingNodeResponse.success(node.getNodeId()));
                 } else {
                     result.add(LookupTableCachePurgingNodeResponse.failure(node.getNodeId(),
-                            String.format("Failed with code %s, message: %s", response.code(), response.message())));
+                            String.format(Locale.ENGLISH, "Failed with code %s, message: %s", response.code(), response.message())));
                 }
             } catch (Exception e) {
                 result.add(LookupTableCachePurgingNodeResponse.failure(node.getNodeId(),
-                        String.format("Failed with exception: %s, message: %s", e.getClass().getName(), e.getMessage())));
+                        String.format(Locale.ENGLISH, "Failed with exception: %s, message: %s", e.getClass().getName(), e.getMessage())));
 
                 if (LOG.isDebugEnabled()) {
                     LOG.warn("Failed to purge lookup table cache on node {}, cause: {}", node.getNodeId(), e.getMessage(), e);
