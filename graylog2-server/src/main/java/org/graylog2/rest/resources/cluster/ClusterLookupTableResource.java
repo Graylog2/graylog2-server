@@ -72,8 +72,7 @@ public class ClusterLookupTableResource extends ProxiedResource {
 
     /**
      * Calls {@link org.graylog2.rest.resources.system.lookup.LookupTableResource#performPurge(String, String)}
-     * on all active nodes. If it least one call fails, then 500 returned. Regardless of the operation outcome
-     * a map containing results per each node is always included in the response.
+     * on all active nodes and returns results per node
      */
     @POST
     @Timed
