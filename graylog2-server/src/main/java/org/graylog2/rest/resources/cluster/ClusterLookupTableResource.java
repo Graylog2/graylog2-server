@@ -23,13 +23,17 @@ import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodeService;
-import org.graylog2.rest.resources.system.responses.LookupTableCachePurgingResponse;
 import org.graylog2.rest.RemoteInterfaceProvider;
 import org.graylog2.rest.resources.system.RemoteLookupTableResource;
+import org.graylog2.rest.resources.system.responses.LookupTableCachePurgingNodeResponse;
 import org.graylog2.shared.rest.resources.ProxiedResource;
 import org.graylog2.shared.security.RestPermissions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import retrofit2.Response;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -42,11 +46,9 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import java.util.Map;
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
-import java.util.stream.Collectors;
 
 /**
  * The primary objective of this API is to provide facilities for managing Lookup Tables on the cluster level.
@@ -57,6 +59,8 @@ import java.util.stream.Collectors;
 @Path("/cluster/system/lookup")
 @Produces(MediaType.APPLICATION_JSON)
 public class ClusterLookupTableResource extends ProxiedResource {
+
+    private static final Logger LOG = LoggerFactory.getLogger(ClusterLookupTableResource.class);
 
     @Inject
     public ClusterLookupTableResource(NodeService nodeService,
@@ -77,26 +81,34 @@ public class ClusterLookupTableResource extends ProxiedResource {
     @ApiOperation(value = "Purge Lookup Table Cache on the cluster-wide level")
     @NoAuditEvent("Cache purge only")
     @RequiresPermissions(RestPermissions.LOOKUP_TABLES_READ)
-    public Response performPurge(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName,
-                                 @ApiParam(name = "key") @QueryParam("key") String key) {
+    public List<LookupTableCachePurgingNodeResponse> performPurge(
+            @ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName,
+            @ApiParam(name = "key") @QueryParam("key") String key) {
 
-        final Map<String, Optional<LookupTableCachePurgingResponse>> allNodeRes = getForAllNodes(r -> r.performPurge(idOrName, key),
-                createRemoteInterfaceProvider(RemoteLookupTableResource.class));
+        final List<LookupTableCachePurgingNodeResponse> result = new ArrayList<>();
 
-        final boolean isSuccess = allNodeRes
-                .entrySet().stream()
-                .allMatch(e -> e.getValue().isPresent());
+        for (Node node : nodeService.allActive().values()) {
+            try {
+                final RemoteLookupTableResource lookupTableApi = remoteInterfaceProvider.get(node, this.authenticationToken, RemoteLookupTableResource.class);
+                final Response<Void> response = lookupTableApi.performPurge(idOrName, key).execute();
+                if (response.isSuccessful()) {
+                    result.add(LookupTableCachePurgingNodeResponse.success(node.getNodeId()));
+                } else {
+                    result.add(LookupTableCachePurgingNodeResponse.failure(node.getNodeId(),
+                            String.format("Failed with code %s, message: %s", response.code(), response.message())));
+                }
+            } catch (Exception e) {
+                result.add(LookupTableCachePurgingNodeResponse.failure(node.getNodeId(),
+                        String.format("Failed with exception: %s, message: %s", e.getClass().getName(), e.getMessage())));
 
-        final Map<String, String> transformedRes = allNodeRes
-                .entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey,
-                        e -> e.getValue()
-                                .map(r -> r.result)
-                                .orElse("ERROR")));
+                if (LOG.isDebugEnabled()) {
+                    LOG.warn("Failed to purge lookup table cache on node {}, cause: {}", node.getNodeId(), e.getMessage(), e);
+                } else {
+                    LOG.warn("Failed to purge lookup table cache on node {}, cause: {}", node.getNodeId(), e.getMessage());
+                }
+            }
+        }
 
-        return Response
-                .status(isSuccess ? Response.Status.OK : Response.Status.INTERNAL_SERVER_ERROR)
-                .entity(transformedRes)
-                .build();
+        return result;
     }
 }

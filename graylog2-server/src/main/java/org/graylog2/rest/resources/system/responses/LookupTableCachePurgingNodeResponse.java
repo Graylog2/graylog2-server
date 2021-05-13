@@ -19,15 +19,26 @@ package org.graylog2.rest.resources.system.responses;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class LookupTableCachePurgingResponse {
-    public final String result;
+public class LookupTableCachePurgingNodeResponse {
+    public final String nodeId;
+    public final boolean success;
+    public final String message;
 
     @JsonCreator
-    private LookupTableCachePurgingResponse(@JsonProperty("result") String result) {
-        this.result = result;
+    private LookupTableCachePurgingNodeResponse(
+            @JsonProperty("success") boolean success,
+            @JsonProperty("nodeId") String nodeId,
+            @JsonProperty("message") String message) {
+        this.success = success;
+        this.nodeId = nodeId;
+        this.message = message;
     }
 
-    public static LookupTableCachePurgingResponse success() {
-        return new LookupTableCachePurgingResponse("SUCCESS");
+    public static LookupTableCachePurgingNodeResponse success(String nodeId) {
+        return new LookupTableCachePurgingNodeResponse(true, nodeId, "Successfully purged the cache");
+    }
+
+    public static LookupTableCachePurgingNodeResponse failure(String nodeId, String message) {
+        return new LookupTableCachePurgingNodeResponse(false, nodeId, message);
     }
 }
