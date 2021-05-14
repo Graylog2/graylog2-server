@@ -63,6 +63,20 @@ type RequestHeaders = {
   'Content-Type'?: string,
 };
 
+const defaultResponseHandler = (resp: Response) => {
+  if (resp.ok) {
+    const { status } = resp;
+    const contentLength = Number.parseInt(resp.headers.get('Content-Length'), 10);
+    const noContent = status === 204 || contentLength === 0;
+
+    reportServerSuccess();
+
+    return noContent ? null : resp.json();
+  }
+
+  throw resp;
+};
+
 export class Builder {
   private options = {};
 
@@ -70,7 +84,7 @@ export class Builder {
 
   private readonly method: string;
 
-  private body: { body: any, mimeType: string };
+  private body: { body: any, mimeType?: string };
 
   private accept: string;
 
@@ -122,20 +136,19 @@ export class Builder {
     this.body = { body: maybeStringify(body), mimeType: 'application/json' };
     this.accept = 'application/json';
 
-    this.responseHandler = (resp: Response) => {
-      if (resp.ok) {
-        const { status } = resp;
-        const contentLength = Number.parseInt(resp.headers.get('Content-Length'), 10);
-        const noContent = status === 204 || contentLength === 0;
+    this.responseHandler = defaultResponseHandler;
 
-        reportServerSuccess();
+    this.errorHandler = (error) => onServerError(error);
 
-        return noContent ? null : resp.json();
-      }
+    return this;
+  }
 
-      throw resp;
-    };
+  formData(body, acceptedMimeType = 'application/json') {
+    this.body = { body };
 
+    this.accept = acceptedMimeType;
+
+    this.responseHandler = defaultResponseHandler;
     this.errorHandler = (error) => onServerError(error);
 
     return this;
@@ -152,7 +165,7 @@ export class Builder {
         return resp.text();
       }
 
-      this.errorHandler(resp);
+      throw resp;
     };
 
     this.errorHandler = (error) => onServerError(error);
@@ -191,8 +204,11 @@ export class Builder {
   }
 
   build() {
+    // eslint-disable-next-line no-nested-ternary
     const headers: RequestHeaders = this.body
-      ? { ...this.options, 'Content-Type': this.body.mimeType }
+      ? this.body.mimeType
+        ? { ...this.options, 'Content-Type': this.body.mimeType }
+        : this.options
       : this.options;
 
     if (this.accept) {
