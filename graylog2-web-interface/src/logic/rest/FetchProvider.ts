@@ -204,11 +204,8 @@ export class Builder {
   }
 
   build() {
-    // eslint-disable-next-line no-nested-ternary
-    const headers: RequestHeaders = this.body
-      ? this.body.mimeType
-        ? { ...this.options, 'Content-Type': this.body.mimeType }
-        : this.options
+    const headers: RequestHeaders = this.body && this.body.mimeType
+      ? { ...this.options, 'Content-Type': this.body.mimeType }
       : this.options;
 
     if (this.accept) {
