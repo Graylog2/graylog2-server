@@ -51,12 +51,13 @@ export interface Notification {
   hiddenTitle: boolean,
 }
 export type Notifications = Array<Notification>;
+type NotificationId = string;
 
-interface PublicNotificationsHooks {
+export interface PublicNotificationsHooks {
   usePublicNotifications: () => ({
     notifications: Notifications,
-    notificationStore: Set<any>,
-    onDismissPublicNotification: () => void,
+    dismissedNotifications: Set<NotificationId>,
+    onDismissPublicNotification: (NotificationId) => void,
   })
 }
 
