@@ -50,8 +50,8 @@ export interface Notification {
   variant: ColorVariants,
   hiddenTitle: boolean,
 }
-export type Notifications = { [string]: Notification };
 type NotificationId = string;
+export type Notifications = { [id: string]: Notification };
 
 export interface PublicNotificationsHooks {
   usePublicNotifications: () => ({
