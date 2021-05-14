@@ -18,6 +18,7 @@ import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 import PropTypes from 'prop-types';
 import { PluginStore } from 'graylog-web-plugin/plugin';
+import { PublicNotificationsHooks } from 'theme/types';
 
 import { Alert, Button } from 'components/graylog';
 import AppConfig from 'util/AppConfig';
@@ -25,7 +26,7 @@ import AppConfig from 'util/AppConfig';
 const customizationHook = PluginStore.exports('customization.publicNotifications');
 
 interface Props {
-  fromConfig?: boolean,
+  readFromConfig?: boolean,
 }
 
 const FlexWrap = styled.div`
@@ -45,27 +46,27 @@ const LongContent = styled.div(({ $visible }: {$visible: boolean}) => css`
   padding-top: 12px;
 `);
 
-const defaultNotifications = {
+const defaultNotifications: PublicNotificationsHooks = {
   usePublicNotifications: () => ({
     notifications: undefined,
-    notificationStore: undefined,
+    dismissedNotifications: undefined,
     onDismissPublicNotification: undefined,
   }),
 };
 
-const PublicNotifications = ({ fromConfig }: Props) => {
+const PublicNotifications = ({ readFromConfig }: Props) => {
   const { usePublicNotifications } = customizationHook[0]?.hooks || defaultNotifications;
   const [showReadMore, setShowReadMore] = useState<string>(undefined);
-  const { notifications, notificationStore, onDismissPublicNotification } = usePublicNotifications();
+  const { notifications, dismissedNotifications, onDismissPublicNotification } = usePublicNotifications();
 
-  if (!notifications && !notificationStore && !onDismissPublicNotification) {
+  if (!notifications && !dismissedNotifications && !onDismissPublicNotification) {
     return null;
   }
 
-  const allNotification = fromConfig ? AppConfig.publicNotifications() : notifications;
+  const allNotification = readFromConfig ? AppConfig.publicNotifications() : notifications;
 
   const publicNotifications = Object.keys(allNotification).map((notificationId) => {
-    if (notificationStore.has(notificationId)) {
+    if (dismissedNotifications.has(notificationId)) {
       return null;
     }
 
@@ -96,11 +97,11 @@ const PublicNotifications = ({ fromConfig }: Props) => {
 };
 
 PublicNotifications.propTypes = {
-  fromConfig: PropTypes.bool,
+  readFromConfig: PropTypes.bool,
 };
 
 PublicNotifications.defaultProps = {
-  fromConfig: false,
+  readFromConfig: false,
 };
 
 export default PublicNotifications;

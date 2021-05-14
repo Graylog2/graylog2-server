@@ -58,7 +58,7 @@ const LoginBox = ({ children }) => {
     <Wrapper className="container">
       <Row>
         <Col md={8} mdOffset={2}>
-          <PublicNotifications fromConfig />
+          <PublicNotifications readFromConfig />
         </Col>
       </Row>
       <Row>
