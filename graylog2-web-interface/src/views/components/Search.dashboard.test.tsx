@@ -77,6 +77,13 @@ jest.mock('views/components/DashboardSearchBar', () => () => <div>Mocked dashboa
 jest.mock('components/layout/Footer', () => mockComponent('Footer'));
 jest.mock('views/components/contexts/WidgetFocusProvider', () => jest.fn());
 
+jest.mock('views/stores/FieldTypesStore', () => ({
+  FieldTypesStore: MockStore(),
+  FieldTypesActions: {
+    refresh: jest.fn(),
+  },
+}));
+
 const mockWidgetEditing = () => {
   asMock(WidgetFocusProvider as React.FunctionComponent).mockImplementation(({ children }) => (
     <WidgetFocusContext.Provider value={{

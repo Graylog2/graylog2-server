@@ -20,8 +20,11 @@ import * as Immutable from 'immutable';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import type { RefluxActions, Store } from 'stores/StoreTypes';
-import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import FieldTypeMapping, { FieldTypeMappingJSON } from 'views/logic/fieldtypes/FieldTypeMapping';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
+import { CurrentQueryStore } from 'views/stores/CurrentQueryStore';
+import Query, { TimeRange } from 'views/logic/queries/Query';
+import { GlobalOverrideStore, GlobalOverrideStoreState } from 'views/stores/GlobalOverrideStore';
 
 import { QueryFiltersStore } from './QueryFiltersStore';
 
@@ -29,12 +32,14 @@ const fieldTypesUrl = qualifyUrl('/views/fields');
 
 type FieldTypesActionsType = RefluxActions<{
   all: () => Promise<void>,
+  refresh: () => Promise<void>,
 }>;
 
 export const FieldTypesActions: FieldTypesActionsType = singletonActions(
   'views.FieldTypes',
   () => Reflux.createActions({
     all: { asyncResult: true },
+    refresh: { asyncResult: true },
   }),
 );
 
@@ -45,6 +50,18 @@ export type FieldTypesStoreState = {
 };
 
 export type FieldTypesStoreType = Store<FieldTypesStoreState>;
+
+type FieldTypesResponse = Array<FieldTypeMappingJSON>;
+
+const _deserializeFieldTypes = (response: FieldTypesResponse) => response
+  .map((fieldTypeMapping) => FieldTypeMapping.fromJSON(fieldTypeMapping));
+const fetchAllFieldTypes = (timerange: TimeRange): Promise<Array<FieldTypeMapping>> => fetch('POST', fieldTypesUrl, { timerange })
+  .then(_deserializeFieldTypes);
+
+const streamIdsFromFilters = (filters: Immutable.Map<string, Immutable.Map<'filters', Immutable.List<Immutable.Map<string, string>>>>) => filters
+  .map((filter) => filter.get('filters', Immutable.List())
+    .filter((f) => f.get('type') === 'stream')
+    .map((f) => f.get('id')));
 
 export const FieldTypesStore: FieldTypesStoreType = singletonStore(
   'views.FieldTypes',
@@ -57,25 +74,53 @@ export const FieldTypesStore: FieldTypesStoreType = singletonStore(
     init() {
       this.all();
       this.listenTo(QueryFiltersStore, this.onQueryFiltersUpdate, this.onQueryFiltersUpdate);
+      this.listenTo(CurrentQueryStore, this.onCurrentQueryUpdate, this.onCurrentQueryUpdate);
+      this.listenTo(GlobalOverrideStore, this.onGlobalOverrideUpdate, this.onGlobalOverrideUpdate);
     },
 
     getInitialState() {
       return this._state();
     },
 
+    onCurrentQueryUpdate(query: Query) {
+      this._timerange = query?.timerange;
+      this.refresh();
+    },
+
     onQueryFiltersUpdate(newFilters) {
-      const streamIds = newFilters
-        .map((filter) => filter.get('filters', Immutable.List()).filter((f) => f.get('type') === 'stream').map((f) => f.get('id')));
-      const promises = streamIds
-        .map((filters, queryId) => (filters.size > 0
-          ? this.forStreams(filters.toArray())
-          : Promise.resolve(this._all))
-          .then((response) => ({
-            queryId,
-            response,
-          })))
+      this._streamIds = streamIdsFromFilters(newFilters);
+      this.refresh();
+    },
+
+    onGlobalOverrideUpdate(newGlobalOverride: GlobalOverrideStoreState) {
+      this._overrideTimerange = newGlobalOverride?.timerange;
+      this.refresh();
+    },
+
+    all(timerange: TimeRange) {
+      const promise = fetchAllFieldTypes(timerange)
+        .then((response) => {
+          this._all = Immutable.fromJS(response);
+          this._trigger();
+        });
+
+      FieldTypesActions.all.promise(promise);
+
+      return promise;
+    },
+
+    refresh() {
+      const timerange = this._overrideTimerange ?? this._timerange;
+      const allFields = fetchAllFieldTypes(timerange);
+      const promises = this._streamIds?.map((filters, queryId) => (filters.size > 0
+        ? this.forStreams(filters, timerange)
+        : allFields)
+        .then((response) => ({
+          queryId,
+          response,
+        })))
         .valueSeq()
-        .toJS();
+        .toArray();
 
       Promise.all(promises).then((results) => {
         const combinedResult = {};
@@ -89,27 +134,9 @@ export const FieldTypesStore: FieldTypesStoreType = singletonStore(
       });
     },
 
-    all() {
-      const promise = fetch('GET', fieldTypesUrl)
-        .then(this._deserializeFieldTypes)
-        .then((response) => {
-          this._all = Immutable.fromJS(response);
-          this._trigger();
-        });
-
-      FieldTypesActions.all.promise(promise);
-
-      return promise;
-    },
-
-    forStreams(streams) {
-      return fetch('POST', fieldTypesUrl, { streams: streams })
-        .then(this._deserializeFieldTypes);
-    },
-
-    _deserializeFieldTypes(response) {
-      return response
-        .map((fieldTypeMapping) => FieldTypeMapping.fromJSON(fieldTypeMapping));
+    forStreams(streams: Array<string>, timerange: TimeRange) {
+      return fetch('POST', fieldTypesUrl, { streams, timerange })
+        .then(_deserializeFieldTypes);
     },
 
     _state(): FieldTypesStoreState {

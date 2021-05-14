@@ -108,8 +108,8 @@ const FieldsOverview = ({ allFields, activeQueryFields, viewMetadata }: Props) =
           List fields of{' '}
           <FieldGroup selected={currentGroup === 'current'}
                       group="current"
-                      text="current streams"
-                      title="This shows fields which are (prospectively) included in the streams you have selected."
+                      text="current query"
+                      title="This shows fields which occur in your current query."
                       onSelect={setCurrentGroup} />
           {', '}
           <FieldGroup selected={currentGroup === 'all'}
