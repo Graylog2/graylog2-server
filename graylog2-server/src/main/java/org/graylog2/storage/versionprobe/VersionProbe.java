@@ -17,6 +17,7 @@
 package org.graylog2.storage.versionprobe;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.base.Strings;
 import okhttp3.Credentials;
 import okhttp3.OkHttpClient;
@@ -29,6 +30,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -39,11 +41,18 @@ public class VersionProbe {
     private static final Logger LOG = LoggerFactory.getLogger(VersionProbe.class);
     private final ObjectMapper objectMapper;
     private final OkHttpClient okHttpClient;
+    private final int connectionRetries;
+    private final Duration connectionRetryWait;
 
     @Inject
-    public VersionProbe(ObjectMapper objectMapper, OkHttpClient okHttpClient) {
+    public VersionProbe(ObjectMapper objectMapper,
+                        OkHttpClient okHttpClient,
+                        @Named("elasticsearch_connection_retries") int elasticsearchConnectionRetries,
+                        @Named("elasticsearch_connection_retry_wait") Duration elasticsearchConnectionRetryWait) {
         this.objectMapper = objectMapper;
         this.okHttpClient = okHttpClient;
+        this.connectionRetries = elasticsearchConnectionRetries;
+        this.connectionRetryWait = elasticsearchConnectionRetryWait;
     }
 
     public Optional<Version> probe(Collection<URI> hosts) {
@@ -107,14 +116,28 @@ public class VersionProbe {
     }
 
     private Optional<RootResponse> rootResponse(RootRoute rootRoute) {
-        try {
-            final Response<RootResponse> response = rootRoute.root().execute();
-            if (response.isSuccessful()) {
-                return Optional.ofNullable(response.body());
+        int i = 0;
+        // try at least once
+        do {
+            try {
+                try {
+                    final Response<RootResponse> response = rootRoute.root().execute();
+                    if (response.isSuccessful()) {
+                        return Optional.ofNullable(response.body());
+                    }
+                } catch (IOException e) {
+                    LOG.error("Unable to retrieve version from Elasticsearch node: ", e);
+                }
+                if (i < this.connectionRetries) {
+                    LOG.warn("Failed to connect to Elasticsearch. Retry {} from {}", i + 1, this.connectionRetries);
+                    Thread.sleep(this.connectionRetryWait.toMilliseconds());
+                }
+            } catch (InterruptedException ie) {
+                LOG.error("Unable to retrieve version from Elasticsearch node: ", ie);
             }
-        } catch (IOException e) {
-            LOG.error("Unable to retrieve version from Elasticsearch node: ", e);
-        }
+            i++;
+        } while (i <= this.connectionRetries);
+
         return Optional.empty();
     }
 }
