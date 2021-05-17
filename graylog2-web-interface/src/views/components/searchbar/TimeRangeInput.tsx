@@ -32,6 +32,7 @@ type Props = {
   hasErrorOnMount?: boolean,
   onChange: (nextTimeRange: TimeRange | NoTimeRangeOverride) => void,
   validTypes?: Array<TimeRangeType>,
+  position?: 'bottom'|'right',
 };
 
 const FlexContainer = styled.span`
@@ -40,7 +41,7 @@ const FlexContainer = styled.span`
   justify-content: space-between;
 `;
 
-const TimeRangeInput = ({ disabled, hasErrorOnMount, noOverride, value = {}, onChange, validTypes }: Props) => {
+const TimeRangeInput = ({ disabled, hasErrorOnMount, noOverride, value = {}, onChange, validTypes, position }: Props) => {
   const [show, setShow] = useState(false);
 
   if (validTypes && value && 'type' in value && !validTypes.includes(value?.type)) {
@@ -59,7 +60,8 @@ const TimeRangeInput = ({ disabled, hasErrorOnMount, noOverride, value = {}, onC
                            noOverride={noOverride}
                            setCurrentTimeRange={onChange}
                            toggleDropdownShow={toggleShow}
-                           validTypes={validTypes} />
+                           validTypes={validTypes}
+                           position={position} />
       </TimeRangeDropdownButton>
       <TimeRangeDisplay timerange={value} toggleDropdownShow={toggleShow} />
     </FlexContainer>
@@ -78,6 +80,7 @@ TimeRangeInput.defaultProps = {
   hasErrorOnMount: false,
   noOverride: false,
   validTypes: undefined,
+  position: 'bottom',
 };
 
 export default TimeRangeInput;

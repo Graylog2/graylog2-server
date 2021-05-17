@@ -21,7 +21,9 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
+import java.util.Optional;
 import java.util.Set;
 
 @AutoValue
@@ -29,14 +31,21 @@ import java.util.Set;
 @JsonDeserialize(builder = FieldTypesForStreamsRequest.Builder.class)
 public abstract class FieldTypesForStreamsRequest {
     private static final String FIELD_STREAMS = "streams";
+    private static final String FIELD_TIMERANGE = "timerange";
 
     @JsonProperty(FIELD_STREAMS)
-    public abstract Set<String> streams();
+    public abstract Optional<Set<String>> streams();
+
+    @JsonProperty(FIELD_TIMERANGE)
+    public abstract Optional<TimeRange> timerange();
 
     @AutoValue.Builder
     public abstract static class Builder {
         @JsonProperty(FIELD_STREAMS)
         public abstract Builder streams(Set<String> streams);
+
+        @JsonProperty(FIELD_TIMERANGE)
+        public abstract Builder timerange(TimeRange timerange);
 
         public abstract FieldTypesForStreamsRequest build();
 

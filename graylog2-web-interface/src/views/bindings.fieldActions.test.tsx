@@ -14,9 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import MockStore from 'helpers/mocking/StoreMock';
+
 import FieldType, { FieldTypes, Properties } from 'views/logic/fieldtypes/FieldType';
 
 import bindings from './bindings';
+
+jest.mock('views/stores/FieldTypesStore', () => ({
+  FieldTypesStore: MockStore(['getInitialState', () => ({ all: {}, queryFields: {} })]),
+}));
 
 describe('Views bindings field actions', () => {
   const { fieldActions } = bindings;
@@ -211,7 +217,7 @@ describe('Views bindings field actions', () => {
         .toEqual(false);
     });
 
-    it('should be enabled when field analisys is disabled', () => {
+    it('should be enabled when field analysis is disabled', () => {
       expect(isEnabled({
         ...defaultArguments,
         field: 'something',

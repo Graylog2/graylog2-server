@@ -16,54 +16,14 @@
  */
 import React from 'react';
 import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
-import { NoTimeRangeOverride } from 'src/views/logic/queries/Query';
 import { StoreMock as MockStore } from 'helpers/mocking';
 import { act } from 'react-dom/test-utils';
-import { SearchBarFormValues } from 'src/views/Constants';
+import mockSearchClusterConfig from 'fixtures/searchClusterConfig';
 
 import ToolsStore from 'stores/tools/ToolsStore';
 
 import { DateTimeContext } from './DateTimeProvider';
-import OriginalTimeRangeDropDown from './TimeRangeDropdown';
-
-const mockSearchClusterConfig = {
-  query_time_range_limit: 'P3D',
-  relative_timerange_options: {
-    PT10M: 'Search in the last 5 minutes',
-    PT15M: 'Search in the last 15 minutes',
-    PT30M: 'Search in the last 30 minutes',
-    PT1H: 'Search in the last 1 hour',
-    PT2H: 'Search in the last 2 hours',
-    PT8H: 'Search in the last 8 hours',
-    P1D: 'Search in the last 1 day',
-    P2D: 'Search in the last 2 days',
-    P5D: 'Search in the last 5 days',
-    P7D: 'Search in the last 7 days',
-    P14D: 'Search in the last 14 days',
-    P30D: 'Search in the last 30 days',
-    PT0S: 'Search in all messages',
-    P45D: '45 last days',
-  },
-  surrounding_timerange_options: {
-    PT1S: '1 second',
-    PT5S: '5 seconds',
-    PT10S: '10 seconds',
-    PT30S: '30 seconds',
-    PT1M: '1 minute',
-    PT5M: '5 minutes',
-    PT3M: '3 minutes',
-  },
-  surrounding_filter_fields: [
-    'file',
-    'source',
-    'gl2_source_input',
-    'source_file',
-  ],
-  analysis_disabled_fields: [
-    'full_message',
-    'message',
-  ],
-};
+import OriginalTimeRangeDropDown, { TimeRangeDropdownProps } from './TimeRangeDropdown';
 
 jest.mock('views/stores/SearchConfigStore', () => ({
   SearchConfigActions: {
@@ -88,16 +48,10 @@ const defaultProps = {
   noOverride: false,
   setCurrentTimeRange: jest.fn(),
   toggleDropdownShow: jest.fn(),
+  position: 'bottom',
 } as const;
 
-type Props = {
-  noOverride?: boolean,
-  currentTimeRange: SearchBarFormValues['timerange'] | NoTimeRangeOverride,
-  setCurrentTimeRange: (nextTimeRange: SearchBarFormValues['timerange'] | NoTimeRangeOverride) => void,
-  toggleDropdownShow: () => void,
-};
-
-const TimeRangeDropdown = (allProps: Props) => (
+const TimeRangeDropdown = (allProps: TimeRangeDropdownProps) => (
   <DateTimeContext.Provider value={{
     limitDuration: 259200,
   }}>

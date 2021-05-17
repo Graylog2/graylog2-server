@@ -48,18 +48,31 @@ const timeRangeTypes = {
 
 const allTimeRangeTypes = Object.keys(timeRangeTypes) as Array<TimeRangeType>;
 
-type Props = {
-  noOverride?: boolean,
+export type TimeRangeDropdownProps = {
   currentTimeRange: SearchBarFormValues['timerange'] | NoTimeRangeOverride,
+  noOverride?: boolean,
+  position: 'bottom'|'right',
   setCurrentTimeRange: (nextTimeRange: SearchBarFormValues['timerange'] | NoTimeRangeOverride) => void,
   toggleDropdownShow: () => void,
   validTypes?: Array<TimeRangeType>,
 };
 
+export type TimeRangeType = keyof typeof timeRangeTypes;
+
+type TimeRangeTabsArguments = {
+  activeTab: TimeRangeType,
+  limitDuration: number,
+  setValidatingKeyword: (status: boolean) => void,
+  tabs: Array<TimeRangeType>,
+}
+
 const StyledPopover = styled(Popover)(({ theme }) => css`
   min-width: 750px;
-  transform: translateX(-15px);
   background-color: ${theme.colors.variant.lightest.default};
+
+  .popover-title {
+    border: none;
+  }
 `);
 
 const StyledTabs = styled(Tabs)`
@@ -78,6 +91,10 @@ const PopoverTitle = styled.span`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  
+  > span {
+    font-weight: 600;
+  }
 `;
 
 const LimitLabel = styled.span(({ theme }) => css`
@@ -112,15 +129,6 @@ const DEFAULT_RANGES = {
   },
   disabled: undefined,
 };
-
-export type TimeRangeType = keyof typeof timeRangeTypes;
-
-type TimeRangeTabsArguments = {
-  activeTab: TimeRangeType,
-  limitDuration: number,
-  setValidatingKeyword: (status: boolean) => void,
-  tabs: Array<TimeRangeType>,
-}
 
 const timeRangeTypeTabs = ({ activeTab, limitDuration, setValidatingKeyword, tabs }: TimeRangeTabsArguments) => availableTimeRangeTypes
   .filter(({ type }) => tabs.includes(type))
@@ -201,6 +209,14 @@ export const dateTimeValidate = (nextTimeRange, limitDuration) => {
       }
     }
 
+    if (nextTimeRange.from === null) {
+      errors.nextTimeRange = { ...errors.nextTimeRange, from: 'Cannot be empty.' };
+    }
+
+    if (nextTimeRange.from && nextTimeRange.to === null) {
+      errors.nextTimeRange = { ...errors.nextTimeRange, to: 'Cannot be empty.' };
+    }
+
     if (nextTimeRange.from && nextTimeRange.from <= nextTimeRange.to) {
       errors.nextTimeRange = { ...errors.nextTimeRange, to: timeRangeError };
     }
@@ -237,10 +253,19 @@ const onSettingCurrentTimeRange = (nextTimeRange: TimeRangeDropDownFormValues['n
   return (nextTimeRange as SearchBarFormValues['timerange']);
 };
 
-const TimeRangeDropdown = ({ noOverride, toggleDropdownShow, currentTimeRange, setCurrentTimeRange, validTypes = allTimeRangeTypes }: Props) => {
+const TimeRangeDropdown = ({
+  noOverride,
+  toggleDropdownShow,
+  currentTimeRange,
+  setCurrentTimeRange,
+  validTypes = allTimeRangeTypes,
+  position,
+}: TimeRangeDropdownProps) => {
   const { limitDuration } = useContext(DateTimeContext);
   const [validatingKeyword, setValidatingKeyword] = useState(false);
   const [activeTab, setActiveTab] = useState('type' in currentTimeRange ? currentTimeRange.type : undefined);
+
+  const positionIsBottom = position === 'bottom';
 
   const handleNoOverride = () => {
     setCurrentTimeRange({});
@@ -271,10 +296,12 @@ const TimeRangeDropdown = ({ noOverride, toggleDropdownShow, currentTimeRange, s
   return (
     <StyledPopover id="timerange-type"
                    data-testid="timerange-type"
-                   placement="bottom"
-                   positionTop={36}
-                   title={title}
-                   arrowOffsetLeft={34}>
+                   placement={position}
+                   positionTop={positionIsBottom ? 36 : -10}
+                   positionLeft={positionIsBottom ? -15 : 45}
+                   arrowOffsetTop={positionIsBottom ? undefined : 25}
+                   arrowOffsetLeft={positionIsBottom ? 34 : -11}
+                   title={title}>
       <Formik initialValues={{ nextTimeRange: onInitializingNextTimeRange(currentTimeRange) }}
               validate={({ nextTimeRange }) => dateTimeValidate(nextTimeRange, limitDuration)}
               onSubmit={handleSubmit}

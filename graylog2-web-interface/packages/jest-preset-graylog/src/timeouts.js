@@ -14,22 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-module.exports = [
-  '@emotion/react',
-  'chroma-js',
-  'create-react-class',
-  'formik',
-  'jquery',
-  'leaflet',
-  'moment-timezone',
-  'moment',
-  'react-bootstrap',
-  'react-dom',
-  'react-query',
-  'react-router-bootstrap',
-  'react-router',
-  'react',
-  'reflux-core',
-  'reflux',
-  'styled-components',
-];
+const parsedTimeoutMultiplier = Number.parseFloat(process.env.TIMEOUT_MULTIPLIER);
+
+export const timeoutMultiplier = () => (Number.isFinite(parsedTimeoutMultiplier) ? parsedTimeoutMultiplier : 1.0);
+
+export const applyTimeoutMultiplier = (x) => x * timeoutMultiplier();
