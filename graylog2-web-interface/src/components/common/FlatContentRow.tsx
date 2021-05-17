@@ -18,7 +18,10 @@ import styled from 'styled-components';
 
 import { RowContentStyles } from 'components/graylog/Row';
 
-const RowFlat = styled.div`
+/*
+ * Component with the same styling like the bootstrap `Row` but with a smaller padding.
+ */
+const FlatContentRow = styled.div`
   ${RowContentStyles}
   padding: 9px;
   margin-left: -15px;
@@ -35,4 +38,4 @@ const RowFlat = styled.div`
   }
 `;
 
-export default RowFlat;
+export default FlatContentRow;
