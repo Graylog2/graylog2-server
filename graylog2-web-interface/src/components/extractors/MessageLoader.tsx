@@ -94,11 +94,12 @@ const MessageLoader = ({ hidden, hideText, onMessageLoaded, messageId: defaultMe
   }, [index, loadMessage, messageId]);
 
   const toggleMessageForm = useCallback(() => {
-    const newIsHidden = !isHidden;
-    setIsHidden(newIsHidden);
+    setIsHidden(!isHidden);
+  }, [isHidden]);
 
-    if (!newIsHidden) {
-      messageIdRef.current?.focus?.();
+  useEffect(() => {
+    if (!isHidden && messageIdRef.current) {
+      messageIdRef.current.focus();
     }
   }, [isHidden]);
 
