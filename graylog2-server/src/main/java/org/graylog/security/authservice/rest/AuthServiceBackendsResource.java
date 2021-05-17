@@ -107,7 +107,7 @@ public class AuthServiceBackendsResource extends RestResource {
 
     @GET
     @RequiresGuest
-    @Path("active-backend-type")
+    @Path("active-backend/type")
     @ApiOperation("Returns type of currently active authentication service backend")
     public Response getActiveType() {
         String type = null;
