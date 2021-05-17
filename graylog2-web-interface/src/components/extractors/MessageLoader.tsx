@@ -106,8 +106,7 @@ const MessageLoader = ({ hidden, hideText, onMessageLoaded, messageId: defaultMe
     <div className="message-loader">
       {hideText || (
         <p>
-          Wrong example? You can{' '}
-          <Button bsStyle="link" bsSize="sm" onClick={toggleMessageForm}>load another message</Button>.
+          Wrong example? <Button bsSize="sm" onClick={toggleMessageForm}>Load another message</Button>
         </p>
       )}
       {hidden || (
