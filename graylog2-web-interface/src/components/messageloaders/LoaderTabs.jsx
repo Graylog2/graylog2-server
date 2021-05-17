@@ -136,7 +136,8 @@ class LoaderTabs extends React.Component {
           <div style={{ marginTop: 5, marginBottom: 15 }}>
             Please provide the id and index of the message that you want to load in this form:
           </div>
-          <MessageLoader messageId={messageId} index={index}
+          <MessageLoader messageId={messageId}
+                         index={index}
                          onMessageLoaded={this.onMessageLoaded}
                          hidden={false}
                          hideText />
