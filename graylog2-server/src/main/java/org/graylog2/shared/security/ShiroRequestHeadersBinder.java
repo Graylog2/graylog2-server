@@ -35,7 +35,7 @@ import java.util.Optional;
 // Needs to run after RequestIdFilter
 @Priority(Priorities.AUTHENTICATION - 8)
 public class ShiroRequestHeadersBinder implements ContainerRequestFilter, ContainerResponseFilter {
-    private static final String REQUEST_HEADERS = "REQUEST_HEADERS";
+    public static final String REQUEST_HEADERS = "REQUEST_HEADERS";
 
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {

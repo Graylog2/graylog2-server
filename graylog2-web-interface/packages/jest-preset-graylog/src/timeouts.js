@@ -14,15 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-declare module '*.css' {
-  interface CSSClasses { [key: string]: any }
-  const classes: CSSClasses;
-  export default classes;
-}
+const parsedTimeoutMultiplier = Number.parseFloat(process.env.TIMEOUT_MULTIPLIER);
 
-declare module '*.jpg' {
-  export default string;
-}
-declare module '*.svg' {
-  export default string;
-}
+export const timeoutMultiplier = () => (Number.isFinite(parsedTimeoutMultiplier) ? parsedTimeoutMultiplier : 1.0);
+
+export const applyTimeoutMultiplier = (x) => x * timeoutMultiplier();

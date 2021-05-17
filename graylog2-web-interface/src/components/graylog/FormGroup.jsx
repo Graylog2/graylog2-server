@@ -21,6 +21,8 @@ import { FormGroup as BootstrapFormGroup } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
 import chroma from 'chroma-js';
 
+import { CONTROL_CLASS as COMMON_SELECT_CONTROL_CLASS } from 'components/common/Select.tsx';
+
 import FormControl from './FormControl';
 import { StyledAddon } from './InputGroup';
 
@@ -32,7 +34,7 @@ const StyledFormGroup = styled(BootstrapFormGroup)(({ theme, validationState }) 
   }
 
   const text = theme.colors.variant.dark[variant];
-  const border = theme.colors.variant.lighter[variant];
+  const border = theme.colors.variant.light[variant];
   const background = theme.colors.variant.lightest[variant];
 
   return css`
@@ -50,7 +52,7 @@ const StyledFormGroup = styled(BootstrapFormGroup)(({ theme, validationState }) 
         color: ${text};
       }
 
-      ${FormControl} {
+      ${FormControl}, .${COMMON_SELECT_CONTROL_CLASS} {
         border-color: ${border};
 
         &:focus {

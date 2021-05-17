@@ -73,7 +73,11 @@ interface PluginCloud {
     onCreate: (formData: { [name: string ]: string }) => { [name: string]: string };
   };
 }
-
+interface InputConfiguration {
+  type: string;
+  component: React.ComponentType<{}>;
+  embeddedComponent?: React.ComponentType<{}>;
+}
 declare module 'graylog-web-plugin/plugin' {
   interface PluginExports {
     navigation?: Array<PluginNavigation>;
@@ -83,6 +87,7 @@ declare module 'graylog-web-plugin/plugin' {
     pages?: PluginPages;
     pageFooter?: Array<PluginPageFooter>;
     cloud?: Array<PluginCloud>;
+    inputConfiguration?: Array<InputConfiguration>
   }
 
   interface PluginRegistration {

@@ -14,15 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-declare module '*.css' {
-  interface CSSClasses { [key: string]: any }
-  const classes: CSSClasses;
-  export default classes;
-}
+import { useStore } from 'stores/connect';
+import { CurrentQueryStore } from 'views/stores/CurrentQueryStore';
+import Query from 'views/logic/queries/Query';
 
-declare module '*.jpg' {
-  export default string;
-}
-declare module '*.svg' {
-  export default string;
-}
+const useCurrentQuery = (): Query => useStore(CurrentQueryStore);
+export default useCurrentQuery;

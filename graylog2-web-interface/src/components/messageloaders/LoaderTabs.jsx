@@ -50,11 +50,6 @@ class LoaderTabs extends React.Component {
 
   componentDidMount() {
     this.loadData();
-    const { messageId, index } = this.props;
-
-    if (messageId && index) {
-      this.messageLoader.submit(messageId, index);
-    }
   }
 
   onMessageLoaded = (message) => {
@@ -134,12 +129,15 @@ class LoaderTabs extends React.Component {
     }
 
     if (this._isTabVisible('messageId')) {
+      const { messageId, index } = this.props;
+
       messageLoaders.push(
         <Tab key="messageId" eventKey={this.TAB_KEYS.messageId} title="Message ID" style={{ marginBottom: 10 }}>
           <div style={{ marginTop: 5, marginBottom: 15 }}>
             Please provide the id and index of the message that you want to load in this form:
           </div>
-          <MessageLoader ref={(messageLoader) => { this.messageLoader = messageLoader; }}
+          <MessageLoader messageId={messageId}
+                         index={index}
                          onMessageLoaded={this.onMessageLoaded}
                          hidden={false}
                          hideText />

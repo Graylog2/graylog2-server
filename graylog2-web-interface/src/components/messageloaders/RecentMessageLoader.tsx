@@ -110,7 +110,7 @@ RecentMessageLoader.propTypes = {
 };
 
 RecentMessageLoader.defaultProps = {
-  inputs: {},
+  inputs: Immutable.Map(),
   selectedInputId: undefined,
 };
 

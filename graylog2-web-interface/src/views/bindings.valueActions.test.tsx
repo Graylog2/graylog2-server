@@ -14,9 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import MockStore from 'helpers/mocking/StoreMock';
+
 import FieldType, { FieldTypes, Properties } from 'views/logic/fieldtypes/FieldType';
 
 import bindings from './bindings';
+
+jest.mock('views/stores/FieldTypesStore', () => ({
+  FieldTypesStore: MockStore(['getInitialState', () => ({ all: {}, queryFields: {} })]),
+}));
 
 describe('Views bindings value actions', () => {
   const { valueActions } = bindings;
