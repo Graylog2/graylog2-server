@@ -19,13 +19,15 @@ import * as React from 'react';
 import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
 import {
   DirectoryServiceBackend,
-  DirectoryServiceBackendConfig, DirectoryServiceBackendConfigJson,
+  DirectoryServiceBackendConfig,
+  DirectoryServiceBackendConfigJson,
   WizardSubmitPayload,
 } from 'logic/authentication/directoryServices/types';
+import { OktaBackendConfig, OktaBackendConfigJson } from 'logic/authentication/okta/types';
 import Role from 'logic/roles/Role';
 import { WizardFormValues } from 'components/authentication/directoryServices/BackendWizard/BackendWizardContext';
 
-interface AuthenticationService {
+export interface DirectoryServiceAuthenticationService {
   name: string;
   displayName: string;
   createComponent: React.ComponentType<{}>;
@@ -39,6 +41,16 @@ interface AuthenticationService {
   }>;
   configToJson: (config: {}) => DirectoryServiceBackendConfigJson;
   configFromJson: (json: {}) => DirectoryServiceBackendConfig;
+}
+
+interface OktaAuthenticationService {
+  name: 'okta';
+  displayName: string;
+  createComponent: React.ComponentType;
+  editComponent: React.ComponentType;
+  configDetailsComponent: React.ComponentType;
+  configToJson: (config: {}) => OktaBackendConfigJson;
+  configFromJson: (json: {}) => OktaBackendConfig;
 }
 
 interface GroupSyncSectionProps {
@@ -95,7 +107,7 @@ interface AuthenticationPlugin {
 
 declare module 'graylog-web-plugin/plugin' {
   interface PluginExports {
-    'authentication.services'?: Array<AuthenticationService>;
+    'authentication.services'?: Array<DirectoryServiceAuthenticationService | OktaAuthenticationService>;
     'authentication.enterprise.directoryServices.groupSync'?: Array<DirectoryServicesGroupSync>;
     'authentication.enterprise'?: Array<AuthenticationPlugin>;
   }
