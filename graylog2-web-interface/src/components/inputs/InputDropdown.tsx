@@ -14,9 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
-import React from 'react';
+import * as React from 'react';
+import { useCallback, useMemo, useState } from 'react';
+import * as PropTypes from 'prop-types';
 import styled from 'styled-components';
+import * as Immutable from 'immutable';
 
 import { Button } from 'components/graylog';
 import { Input } from 'components/bootstrap';
@@ -28,88 +30,94 @@ const StyledInputDropdown = styled(Input)`
   margin-right: 10px;
 `;
 
-class InputDropdown extends React.Component {
-  static propTypes = {
-    inputs: PropTypes.object,
-    title: PropTypes.string,
-    preselectedInputId: PropTypes.string,
-    onLoadMessage: PropTypes.func,
-    disabled: PropTypes.bool,
-  };
+const PLACEHOLDER = 'placeholder';
 
-  PLACEHOLDER = 'placeholder';
+type InputType = {
+  id: string,
+  title: string,
+  type: string,
+};
 
-  _formatInput = (input) => {
-    return <option key={input.id} value={input.id}>{input.title} ({input.type})</option>;
-  };
+const _formatInput = ({ id, title, type }: InputType) => {
+  return <option key={id} value={id}>{title} ({type})</option>;
+};
 
-  _sortByTitle = (input1, input2) => {
-    return input1.title.localeCompare(input2.title);
-  };
+const _sortByTitle = (input1: Input, input2: InputType) => input1.title.localeCompare(input2.title);
 
-  _onLoadMessage = () => {
-    this.props.onLoadMessage(this.state.selectedInput);
-  };
+const StaticInput = ({ input: { type, title } }: { input: InputType }) => (
+  <StyledInputDropdown id={`${type}-select`} type="select" disabled>
+    <option>{`${title} (${type})`}</option>
+  </StyledInputDropdown>
+);
 
-  _formatStaticInput = (input) => {
+type Props = {
+  disabled?: boolean,
+  inputs: Immutable.Map<string, InputType>,
+  preselectedInputId?: string,
+  onLoadMessage: (inputId: string) => any,
+  title: string,
+};
+
+const InputDropdown = ({ disabled, inputs, onLoadMessage, preselectedInputId, title }: Props) => {
+  const [selectedInput, setSelectedInput] = useState(preselectedInputId || PLACEHOLDER);
+  const onSelectedInputChange = useCallback((event) => setSelectedInput(event.target.value), []);
+  const _onLoadMessage = useCallback(() => onLoadMessage(selectedInput), [onLoadMessage, selectedInput]);
+  const preselectedInput = useMemo(() => inputs?.get(preselectedInputId), [inputs, preselectedInputId]);
+
+  // When an input is pre-selected, show a static dropdown
+  if (preselectedInput) {
     return (
-      <StyledInputDropdown id={`${input.type}-select`} type="select" disabled>
-        <option>{`${input.title} (${input.type})`}</option>
-      </StyledInputDropdown>
+      <div>
+        <StaticInput input={preselectedInput} />
+
+        <Button bsStyle="info"
+                disabled={selectedInput === PLACEHOLDER}
+                onClick={_onLoadMessage}>
+          {title}
+        </Button>
+      </div>
     );
-  };
-
-  onSelectedInputChange = (event) => {
-    this.setState({ selectedInput: event.target.value });
-  };
-
-  state = {
-    selectedInput: this.props.preselectedInputId || this.PLACEHOLDER,
-  };
-
-  render() {
-    const { selectedInput } = this.state;
-
-    // When an input is pre-selected, show a static dropdown
-    if (this.props.inputs && this.props.preselectedInputId) {
-      return (
-        <div>
-          {this._formatStaticInput(this.props.inputs.get(this.props.preselectedInputId))}
-
-          <Button bsStyle="info"
-                  disabled={selectedInput === this.PLACEHOLDER}
-                  onClick={this._onLoadMessage}>
-            {this.props.title}
-          </Button>
-        </div>
-      );
-    }
-
-    if (this.props.inputs) {
-      const inputs = this.props.inputs.sort(this._sortByTitle).map(this._formatInput);
-
-      return (
-        <div>
-          <StyledInputDropdown id="placeholder-select"
-                               type="select"
-                               value={selectedInput}
-                               onChange={this.onSelectedInputChange}
-                               placeholder={this.PLACEHOLDER}>
-            <option value={this.PLACEHOLDER}>Select an input</option>
-            {inputs.toArray()}
-          </StyledInputDropdown>
-
-          <Button bsStyle="info"
-                  disabled={this.props.disabled || selectedInput === this.PLACEHOLDER}
-                  onClick={this._onLoadMessage}>
-            {this.props.title}
-          </Button>
-        </div>
-      );
-    }
-
-    return <Spinner />;
   }
-}
+
+  if (inputs) {
+    const inputOptions = inputs.sort(_sortByTitle).map(_formatInput);
+
+    return (
+      <div>
+        <StyledInputDropdown id="placeholder-select"
+                             type="select"
+                             value={selectedInput}
+                             onChange={onSelectedInputChange}
+                             placeholder={PLACEHOLDER}>
+          <option value={PLACEHOLDER}>Select an input</option>
+          {inputOptions.toArray()}
+        </StyledInputDropdown>
+
+        <Button bsStyle="info"
+                disabled={disabled || selectedInput === PLACEHOLDER}
+                onClick={_onLoadMessage}>
+          {title}
+        </Button>
+      </div>
+    );
+  }
+
+  return <Spinner />;
+};
+
+InputDropdown.propTypes = {
+  inputs: PropTypes.object,
+  title: PropTypes.string.isRequired,
+  preselectedInputId: PropTypes.string,
+  onLoadMessage: PropTypes.func,
+  disabled: PropTypes.bool,
+};
+
+InputDropdown.defaultProps = {
+  inputs: Immutable.Map(),
+  onLoadMessage: () => {},
+  preselectedInputId: undefined,
+  disabled: false,
+};
 
 export default InputDropdown;
