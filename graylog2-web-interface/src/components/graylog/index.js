@@ -41,6 +41,7 @@ import Panel from './Panel';
 import Popover from './Popover';
 import ProgressBar from './ProgressBar';
 import Row from './Row';
+import RowFlat from './RowFlat';
 import SplitButton from './SplitButton';
 import Table from './Table';
 import Tab from './Tab';
@@ -76,6 +77,7 @@ export {
   Popover,
   ProgressBar,
   Row,
+  RowFlat,
   SplitButton,
   Table,
   Tab,

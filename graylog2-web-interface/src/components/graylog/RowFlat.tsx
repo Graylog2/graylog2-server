@@ -18,7 +18,7 @@ import styled from 'styled-components';
 
 import { RowContentStyles } from 'components/graylog/Row';
 
-const SearchBarContainer = styled.div`
+const RowFlat = styled.div`
   ${RowContentStyles}
   padding: 9px;
   margin-left: -15px;
@@ -35,4 +35,4 @@ const SearchBarContainer = styled.div`
   }
 `;
 
-export default SearchBarContainer;
+export default RowFlat;

@@ -21,6 +21,7 @@ import { Field } from 'formik';
 import moment from 'moment';
 import styled, { css } from 'styled-components';
 
+import { RowFlat } from 'components/graylog';
 import connect from 'stores/connect';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
@@ -39,7 +40,6 @@ import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 
 import DashboardSearchForm from './DashboardSearchBarForm';
 import TimeRangeInput from './searchbar/TimeRangeInput';
-import SearchBarContainer from './SearchBarContainer';
 
 type Props = {
   config: SearchesConfig,
@@ -105,7 +105,7 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
     <WidgetFocusContext.Consumer>
       {({ focusedWidget: { editing } = { editing: false } }) => (
         <ScrollToHint value={queryString}>
-          <SearchBarContainer>
+          <RowFlat>
             <DashboardSearchForm initialValues={{ timerange, queryString }}
                                  limitDuration={limitDuration}
                                  onSubmit={submitForm}>
@@ -156,7 +156,7 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
                 </>
               )}
             </DashboardSearchForm>
-          </SearchBarContainer>
+          </RowFlat>
         </ScrollToHint>
       )}
     </WidgetFocusContext.Consumer>
