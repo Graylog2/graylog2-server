@@ -27,9 +27,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
-import java.io.IOException;
 import java.net.URI;
-import java.time.Duration;
+import com.github.joschi.jadconfig.util.Duration;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
@@ -79,7 +78,7 @@ public class ElasticsearchVersionProvider implements Provider<Version> {
                 }
                 if(i < this.connectionRetries) {
                     LOG.warn("Failed to connect to Elasticsearch. Retry {} from {}", i+1, this.connectionRetries);
-                    Thread.sleep(this.connectionRetryWait.toMillis());
+                    Thread.sleep(this.connectionRetryWait.toMilliseconds());
                 }
             } catch (InterruptedException iex) {
                 LOG.warn("Failed to connect to Elasticsearch. Retry {} from {}", i+1, this.connectionRetries);
