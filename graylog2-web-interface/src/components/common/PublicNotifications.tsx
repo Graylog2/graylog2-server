@@ -17,13 +17,11 @@
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 import PropTypes from 'prop-types';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 import { PublicNotificationsHooks } from 'theme/types';
 
+import usePluginEntities from 'views/logic/usePluginEntities';
 import { Alert, Button } from 'components/graylog';
 import AppConfig from 'util/AppConfig';
-
-const customizationHook = PluginStore.exports('customization.publicNotifications');
 
 interface Props {
   readFromConfig?: boolean,
@@ -69,6 +67,7 @@ const defaultNotifications: PublicNotificationsHooks = {
 };
 
 const PublicNotifications = ({ readFromConfig }: Props) => {
+  const customizationHook = usePluginEntities('customization.publicNotifications');
   const { usePublicNotifications } = customizationHook[0]?.hooks || defaultNotifications;
   const [showReadMore, setShowReadMore] = useState<string>(undefined);
   const { notifications, dismissedNotifications, onDismissPublicNotification } = usePublicNotifications();

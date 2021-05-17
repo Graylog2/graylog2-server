@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { render, screen } from 'wrappedTestingLibrary';
+import { fireEvent, render, screen } from 'wrappedTestingLibrary';
 import { Notifications } from 'theme/types';
 import { asMock } from 'helpers/mocking';
 
@@ -47,19 +47,34 @@ const mockedNotifications = {
     isDismissible: true,
   },
 } as Notifications;
+const mockedConfigNotifications = {
+  '607468afaaa2380afe0757f1': {
+    title: "A really long title that really shouldn't be this long but people sometimes are do it",
+    shortMessage: 'zxcvzxcv',
+    longMessage: 'zxcvzxcvzxcvzxcvzxcvzxcv',
+    atLogin: true,
+    variant: 'warning',
+    hiddenTitle: true,
+    isActive: true,
+    isGlobal: false,
+    isDismissible: false,
+  },
+} as Notifications;
 
 jest.mock('views/logic/usePluginEntities');
 
 jest.mock('util/AppConfig', () => ({
-  publicNotifications: jest.fn(() => mockedNotifications),
+  publicNotifications: jest.fn(() => mockedConfigNotifications),
 }));
+
+const onDismissPublicNotification = jest.fn();
 
 const mockedUsePublicNotifications = () => ({
   hooks: {
     usePublicNotifications: () => ({
       notifications: mockedNotifications,
-      dismissedNotifications: new Set([Object.keys(mockedNotifications)[1]]),
-      onDismissPublicNotification: jest.fn(() => {}),
+      dismissedNotifications: new Set(),
+      onDismissPublicNotification,
     }),
   },
 });
@@ -76,20 +91,35 @@ const beforeMock = () => {
   });
 };
 
-const renderSUT = () => {
-  beforeMock();
-
-  return render(<PublicNotifications />);
-};
-
 describe('PublicNotifications', () => {
   beforeEach(beforeMock);
 
-  it('should render an Alert', () => {
-    renderSUT();
+  it('should render notifications', () => {
+    render(<PublicNotifications />);
 
-    screen.debug();
+    const alerts = screen.getAllByRole('alert');
 
-    expect(true).toBeTruthy();
+    expect(alerts.length).toBe(2);
+  });
+
+  it('should dismiss notification', () => {
+    render(<PublicNotifications />);
+
+    const dismissedId = Object.keys(mockedNotifications)[1];
+    const dismissBtn = screen.getByRole('button', {
+      name: /close alert/i,
+    });
+
+    fireEvent.click(dismissBtn);
+
+    expect(onDismissPublicNotification).toHaveBeenCalledWith(dismissedId);
+  });
+
+  it('should render from AppConfig', () => {
+    render(<PublicNotifications readFromConfig />);
+
+    const alerts = screen.getAllByRole('alert');
+
+    expect(alerts.length).toBe(1);
   });
 });
