@@ -109,7 +109,7 @@ const MessageLoader = ({ hidden, hideText, onMessageLoaded, messageId: defaultMe
           Wrong example? <Button bsSize="sm" onClick={toggleMessageForm}>Load another message</Button>
         </p>
       )}
-      {hidden || (
+      {isHidden || (
         <LoadMessageForm loading={loading} loadMessage={_loadMessage}>
           <input ref={messageIdRef} type="text" className="form-control message-id-input" placeholder="Message ID" required value={messageId} onChange={onChangeMessageId} />
           <input type="text" className="form-control" placeholder="Index" required value={index} onChange={onChangeIndex} />
