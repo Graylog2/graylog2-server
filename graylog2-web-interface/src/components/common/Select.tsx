@@ -533,7 +533,7 @@ class Select extends React.Component<Props, State> {
                        isMulti={isMulti}
                        isDisabled={isDisabled}
                        isClearable={isClearable}
-                       getOptionLabel={(option) => option[displayKey]}
+                       getOptionLabel={(option) => option[displayKey] || option.label}
                        getOptionValue={(option) => option[valueKey]}
                        filterOption={customFilter}
                        components={mergedComponents}
