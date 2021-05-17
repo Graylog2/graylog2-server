@@ -46,6 +46,20 @@ const LongContent = styled.div(({ $visible }: {$visible: boolean}) => css`
   padding-top: 12px;
 `);
 
+const StyledAlert = styled(Alert)`
+  margin-bottom: 6px;
+  padding-right: 9px;
+  
+  &.alert-dismissable .close {
+    right: 12px;
+  }
+`;
+
+const Wrapper = styled.div`
+  width: 90%;
+  margin: 0 auto 15px;
+`;
+
 const defaultNotifications: PublicNotificationsHooks = {
   usePublicNotifications: () => ({
     notifications: undefined,
@@ -59,11 +73,11 @@ const PublicNotifications = ({ readFromConfig }: Props) => {
   const [showReadMore, setShowReadMore] = useState<string>(undefined);
   const { notifications, dismissedNotifications, onDismissPublicNotification } = usePublicNotifications();
 
-  if (!notifications && !dismissedNotifications && !onDismissPublicNotification) {
+  const allNotification = readFromConfig ? AppConfig.publicNotifications() : notifications;
+
+  if (!allNotification && !dismissedNotifications && !onDismissPublicNotification) {
     return null;
   }
-
-  const allNotification = readFromConfig ? AppConfig.publicNotifications() : notifications;
 
   const publicNotifications = Object.keys(allNotification).map((notificationId) => {
     if (dismissedNotifications.has(notificationId)) {
@@ -82,18 +96,18 @@ const PublicNotifications = ({ readFromConfig }: Props) => {
     };
 
     return (
-      <Alert bsStyle={variant} onDismiss={isDismissible ? _dismiss : undefined} key={title}>
+      <StyledAlert bsStyle={variant} onDismiss={isDismissible ? _dismiss : undefined} key={title}>
         {!hiddenTitle && (<h3>{title}</h3>)}
         <FlexWrap>
           <ShortContent>{shortMessage}</ShortContent>
           {longMessage && <Button bsStyle="link" onClick={toggleReadMore}>Read {showReadMore === notificationId ? 'Less' : 'More'}</Button>}
         </FlexWrap>
         {longMessage && <LongContent $visible={showReadMore === notificationId}>{longMessage}</LongContent>}
-      </Alert>
+      </StyledAlert>
     );
   });
 
-  return <>{publicNotifications}</>;
+  return <Wrapper>{publicNotifications}</Wrapper>;
 };
 
 PublicNotifications.propTypes = {
