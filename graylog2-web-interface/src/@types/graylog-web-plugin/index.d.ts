@@ -76,7 +76,7 @@ interface PluginCloud {
 interface InputConfiguration {
   type: string;
   component: React.ComponentType<{}>;
-  embeddedComponent: React.ComponentType<{}> | null;
+  embeddedComponent?: React.ComponentType<{}>;
 }
 declare module 'graylog-web-plugin/plugin' {
   interface PluginExports {
