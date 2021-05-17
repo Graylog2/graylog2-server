@@ -46,8 +46,8 @@ type Props = {
   hidden: boolean,
   hideText: string,
   onMessageLoaded: (data: any) => void,
-  messageId: undefined | string,
-  index: undefined | string,
+  messageId?: string,
+  index?: string,
 };
 
 const useMessageLoader = (defaultMessageId: string, defaultIndex: string, onMessageLoaded: (data: any) => void): [boolean, (messageId: string, index: string) => void] => {
@@ -124,11 +124,15 @@ MessageLoader.propTypes = {
   hidden: PropTypes.bool,
   hideText: PropTypes.bool,
   onMessageLoaded: PropTypes.func.isRequired,
+  messageId: PropTypes.string,
+  index: PropTypes.string,
 };
 
 MessageLoader.defaultProps = {
   hidden: true,
   hideText: false,
+  messageId: '',
+  index: '',
 };
 
 export default MessageLoader;
