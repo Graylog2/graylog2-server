@@ -20,7 +20,7 @@ import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 
 import { FormDataContext } from '../../context/FormData';
-import { AWS_AUTH_TYPES } from '../constants';
+import { toAWSRequest } from '../formDataAdapter';
 
 /* useFetch Custom Hook
 
@@ -81,37 +81,10 @@ const useFetch = (url, setHook = () => {}, method = 'GET', options = {}) => {
       if (isFetchable && !data) {
         setLoading(true);
 
-        const {
-          awsAuthenticationType,
-          awsCloudWatchAssumeARN,
-          awsCloudWatchAwsKey,
-          awsCloudWatchAwsSecret,
-          awsEndpointCloudWatch,
-          awsEndpointIAM,
-          awsEndpointDynamoDB,
-          awsEndpointKinesis,
-          key,
-          secret,
-        } = formData;
-
         if (method === 'GET') {
           fetcher = fetch(method, qualifiedURL);
         } else {
-          fetcher = fetch(method, qualifiedURL, {
-            ...awsAuthenticationType?.value === AWS_AUTH_TYPES.keysecret ? {
-              aws_access_key_id: awsCloudWatchAwsKey?.value,
-              aws_secret_access_key: awsCloudWatchAwsSecret?.value,
-            } : {
-              aws_access_key_id: key,
-              aws_secret_access_key: secret,
-            },
-            assume_role_arn: awsCloudWatchAssumeARN?.value,
-            cloudwatch_endpoint: awsEndpointCloudWatch?.value,
-            dynamodb_endpoint: awsEndpointDynamoDB?.value,
-            iam_endpoint: awsEndpointIAM?.value,
-            kinesis_endpoint: awsEndpointKinesis?.value,
-            ...options,
-          });
+          fetcher = fetch(method, qualifiedURL, toAWSRequest(formData, options));
         }
 
         fetcher.then((result) => {

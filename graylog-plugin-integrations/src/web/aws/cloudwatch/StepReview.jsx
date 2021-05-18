@@ -17,8 +17,8 @@
 import React, { useContext, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { Link } from 'components/graylog/router';
 
+import { Link } from 'components/graylog/router';
 import Routes from 'routing/Routes';
 import { Input } from 'components/bootstrap';
 import { Icon } from 'components/common';
@@ -37,7 +37,7 @@ Default.propTypes = {
   value: PropTypes.string.isRequired,
 };
 
-const StepReview = ({ onSubmit, onEditClick }) => {
+const StepReview = ({ onSubmit, onEditClick, externalInputSubmit }) => {
   const [formError, setFormError] = useState(null);
   const { formData } = useContext(FormDataContext);
   const { logData } = useContext(ApiContext);
@@ -91,6 +91,12 @@ const StepReview = ({ onSubmit, onEditClick }) => {
   }, [fetchSubmitStatus.error]);
 
   const handleSubmit = () => {
+    if (externalInputSubmit) {
+      onSubmit(formData);
+
+      return;
+    }
+
     setSubmitFetch(ApiRoutes.INTEGRATIONS.AWS.KINESIS.SAVE);
   };
 
@@ -216,6 +222,11 @@ const StepReview = ({ onSubmit, onEditClick }) => {
 StepReview.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   onEditClick: PropTypes.func.isRequired,
+  externalInputSubmit: PropTypes.bool,
+};
+
+StepReview.defaultProps = {
+  externalInputSubmit: false,
 };
 
 const Container = styled.div`

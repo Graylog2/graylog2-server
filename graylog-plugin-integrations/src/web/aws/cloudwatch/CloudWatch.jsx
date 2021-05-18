@@ -14,13 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
-import { withRouter } from 'react-router';
 
 import ConfirmLeaveDialog from 'components/common/ConfirmLeaveDialog';
 import Wizard from 'components/common/Wizard';
-import FormUtils from 'util/FormsUtils.js';
+import { getValueFromInput } from 'util/FormsUtils.js';
 import history from 'util/History';
 import Routes from 'routing/Routes';
 import StepAuthorize from 'aws/StepAuthorize';
@@ -34,7 +33,7 @@ import StepHealthCheck from './StepHealthCheck';
 import StepReview from './StepReview';
 import SidebarPermissions from './SidebarPermissions';
 
-const CloudWatch = ({ route }) => {
+const CloudWatch = ({ externalInputSubmit, onSubmit }) => {
   const {
     availableSteps,
     currentStep,
@@ -53,80 +52,90 @@ const CloudWatch = ({ route }) => {
     setCurrentStep(nextStep);
   };
 
-  const handleEditClick = (nextStep) => () => {
-    setCurrentStep(nextStep);
-  };
+  const wizardSteps = useMemo(() => {
+    const handleEditClick = (nextStep) => () => {
+      setCurrentStep(nextStep);
+    };
 
-  const handleFieldUpdate = ({ target }, fieldData) => {
-    const id = target.name || target.id;
+    const handleFieldUpdate = ({ target }, fieldData) => {
+      const id = target.name || target.id;
 
-    let value = FormUtils.getValueFromInput(target);
+      let value = getValueFromInput(target);
 
-    if (typeof value === 'string') {
-      value = value.trim();
-    }
+      if (typeof value === 'string') {
+        value = value.trim();
+      }
 
-    if (!dirty) {
-      setDirty(true);
-    }
+      if (!dirty) {
+        setDirty(true);
+      }
 
-    setFormData(id, { ...fieldData, value });
-  };
+      setFormData(id, { ...fieldData, value });
+    };
 
-  const handleSubmit = () => {
-    clearSidebar();
-    const nextStep = availableSteps.indexOf(currentStep) + 1;
+    const handleSubmit = (maybeFormData) => {
+      clearSidebar();
+      const nextStep = availableSteps.indexOf(currentStep) + 1;
 
-    if (availableSteps[nextStep]) {
-      const key = availableSteps[nextStep];
+      if (availableSteps[nextStep]) {
+        const key = availableSteps[nextStep];
 
-      setCurrentStep(key);
-      setEnabledStep(key);
-    } else {
-      setLastStep(true);
-      history.push(Routes.SYSTEM.INPUTS);
-    }
-  };
+        setCurrentStep(key);
+        setEnabledStep(key);
+      } else {
+        setLastStep(true);
 
-  const wizardSteps = [
-    {
-      key: 'authorize',
-      title: 'AWS Kinesis Authorize',
-      component: (<StepAuthorize onSubmit={handleSubmit}
+        if (externalInputSubmit) {
+          onSubmit(maybeFormData);
+        } else {
+          history.push(Routes.SYSTEM.INPUTS);
+        }
+      }
+    };
+
+    return [
+      {
+        key: 'authorize',
+        title: 'AWS Kinesis Authorize',
+        component: (<StepAuthorize onSubmit={handleSubmit}
+                                   onChange={handleFieldUpdate}
+                                   sidebarComponent={<SidebarPermissions />} />),
+        disabled: isDisabledStep('authorize'),
+      },
+      {
+        key: 'kinesis-setup',
+        title: 'AWS Kinesis Setup',
+        component: (<StepKinesis onSubmit={handleSubmit}
                                  onChange={handleFieldUpdate}
-                                 sidebarComponent={<SidebarPermissions />} />),
-      disabled: isDisabledStep('authorize'),
-    },
-    {
-      key: 'kinesis-setup',
-      title: 'AWS Kinesis Setup',
-      component: (<StepKinesis onSubmit={handleSubmit}
-                               onChange={handleFieldUpdate}
-                               hasStreams={availableStreams.length > 0} />),
-      disabled: isDisabledStep('kinesis-setup'),
-    },
-    {
-      key: 'health-check',
-      title: 'AWS CloudWatch Health Check',
-      component: (<StepHealthCheck onSubmit={handleSubmit} onChange={handleFieldUpdate} />),
-      disabled: isDisabledStep('health-check'),
-    },
-    {
-      key: 'review',
-      title: 'AWS Kinesis Review',
-      component: (<StepReview onSubmit={handleSubmit}
-                              onEditClick={handleEditClick} />),
-      disabled: isDisabledStep('review'),
-    },
-  ];
+                                 hasStreams={availableStreams.length > 0} />),
+        disabled: isDisabledStep('kinesis-setup'),
+      },
+      {
+        key: 'health-check',
+        title: 'AWS CloudWatch Health Check',
+        component: (<StepHealthCheck onSubmit={handleSubmit} onChange={handleFieldUpdate} />),
+        disabled: isDisabledStep('health-check'),
+      },
+      {
+        key: 'review',
+        title: 'AWS Kinesis Review',
+        component: (<StepReview onSubmit={handleSubmit}
+                                onEditClick={handleEditClick}
+                                externalInputSubmit={externalInputSubmit} />),
+        disabled: isDisabledStep('review'),
+      },
+    ];
+  }, [availableSteps, availableStreams.length, clearSidebar, currentStep, dirty, isDisabledStep, setCurrentStep, setEnabledStep, setFormData, externalInputSubmit, onSubmit]);
 
-  if (availableSteps.length === 0) {
-    setAvailableStep(wizardSteps.map((step) => step.key));
-  }
+  useEffect(() => {
+    if (availableSteps.length === 0) {
+      setAvailableStep(wizardSteps.map((step) => step.key));
+    }
+  }, [availableSteps, setAvailableStep, wizardSteps]);
 
   return (
     <>
-      {dirty && !lastStep && <ConfirmLeaveDialog route={route} question="Are you sure? Your new Input will not be created." />}
+      {dirty && !lastStep && <ConfirmLeaveDialog question="Are you sure? Your new Input will not be created." />}
       <Wizard steps={wizardSteps}
               activeStep={currentStep}
               onStepChange={handleStepChange}
@@ -140,7 +149,13 @@ const CloudWatch = ({ route }) => {
 };
 
 CloudWatch.propTypes = {
-  route: PropTypes.object.isRequired,
+  externalInputSubmit: PropTypes.bool,
+  onSubmit: PropTypes.func,
 };
 
-export default withRouter(CloudWatch);
+CloudWatch.defaultProps = {
+  externalInputSubmit: false,
+  onSubmit: undefined,
+};
+
+export default CloudWatch;

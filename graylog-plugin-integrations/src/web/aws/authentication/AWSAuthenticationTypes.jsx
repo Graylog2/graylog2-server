@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
@@ -25,6 +25,12 @@ import { AWS_AUTH_TYPES } from 'aws/common/constants';
 import KeySecret from './KeySecret';
 import Automatic from './Automatic';
 import ARN from './ARN';
+
+const AuthWrapper = styled.div(({ theme }) => css`
+  margin: 0 0 21px 9px;
+  padding: 3px 0 3px 21px;
+  border-left: 3px solid ${theme.colors.gray[80]};
+`);
 
 const AWSAuthenticationTypes = ({ onChange }) => {
   const { clearField, formData } = useContext(FormDataContext);
@@ -42,12 +48,6 @@ const AWSAuthenticationTypes = ({ onChange }) => {
   useEffect(() => {
     onChange({ target: { name: 'awsAuthenticationType', value: defaultAuthTypeValue } });
   }, []);
-
-  const AuthWrapper = useCallback(styled.div(({ theme }) => css`
-    margin: 0 0 21px 9px;
-    padding: 3px 0 3px 21px;
-    border-left: 3px solid ${theme.colors.gray[80]};
-  `), []);
 
   const isType = (type) => {
     return currentType === type;

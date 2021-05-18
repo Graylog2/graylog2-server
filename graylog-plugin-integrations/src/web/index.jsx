@@ -22,6 +22,7 @@ import Routes from 'aws/common/Routes';
 
 import AWSInputConfiguration from './aws/AWSInputConfiguration';
 import AWSCloudWatchApp from './aws/cloudwatch/CloudWatchApp';
+import EmbeddedCloudWatchApp from './aws/cloudwatch/EmbeddedCloudWatchApp';
 import PagerDutyNotificationDetails from './pager-duty/PagerDutyNotificationDetails';
 import PagerDutyNotificationForm from './pager-duty/PagerDutyNotificationForm';
 import PagerDutyNotificationSummary from './pager-duty/PagerDutyNotificationSummary';
@@ -42,6 +43,7 @@ const manifest = new PluginManifest(packageJson, {
     {
       type: 'org.graylog.integrations.aws.inputs.AWSInput',
       component: AWSInputConfiguration,
+      embeddedComponent: EmbeddedCloudWatchApp,
     },
   ],
   eventNotificationTypes: [
