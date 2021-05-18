@@ -172,13 +172,14 @@ class SimulationResults extends React.Component {
 
 SimulationResults.propTypes = {
   stream: PropTypes.object.isRequired,
-  originalMessage: PropTypes.object.isRequired,
+  originalMessage: PropTypes.object,
   simulationResults: PropTypes.object,
   isLoading: PropTypes.bool,
   error: PropTypes.object,
 };
 
 SimulationResults.defaultProps = {
+  originalMessage: undefined,
   simulationResults: undefined,
   isLoading: false,
   error: undefined,
