@@ -159,9 +159,9 @@ const Scratchpad = () => {
       textareaRef.current.focus();
     }
 
-    clipboard.curent = new ClipboardJS('[data-clipboard-button]', {});
+    clipboard.current = new ClipboardJS('[data-clipboard-button]', {});
 
-    clipboard.curent.on('success', () => {
+    clipboard.current.on('success', () => {
       setCopied(true);
 
       setTimeout(() => {
@@ -170,7 +170,7 @@ const Scratchpad = () => {
     });
 
     return () => {
-      clipboard.curent.destroy();
+      clipboard.current.destroy();
     };
   }, [isScratchpadVisible]);
 
