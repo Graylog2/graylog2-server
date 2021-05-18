@@ -84,7 +84,7 @@ const SavingMessage = styled.span(({ theme, visible }) => css`
 `);
 
 const Scratchpad = () => {
-  let clipboard;
+  const clipboard = useRef();
   const textareaRef = useRef();
   const confirmationModalRef = useRef();
   const { isScratchpadVisible, setScratchpadVisibility, localStorageItem } = useContext(ScratchpadContext);
@@ -159,9 +159,9 @@ const Scratchpad = () => {
       textareaRef.current.focus();
     }
 
-    clipboard = new ClipboardJS('[data-clipboard-button]', {});
+    clipboard.curent = new ClipboardJS('[data-clipboard-button]', {});
 
-    clipboard.on('success', () => {
+    clipboard.curent.on('success', () => {
       setCopied(true);
 
       setTimeout(() => {
@@ -170,7 +170,7 @@ const Scratchpad = () => {
     });
 
     return () => {
-      clipboard.destroy();
+      clipboard.curent.destroy();
     };
   }, [isScratchpadVisible]);
 
@@ -204,7 +204,7 @@ const Scratchpad = () => {
           <OverlayTrigger placement="right"
                           trigger={['hover', 'focus']}
                           overlay={(
-                            <Tooltip id="scratchpad-help">
+                            <Tooltip id="scratchpad-help" show>
                               You can use this space to store personal notes and other information while interacting with
                               Graylog, without leaving your browser window. For example, store timestamps, user IDs, or IP
                               addresses you need in various investigations.
