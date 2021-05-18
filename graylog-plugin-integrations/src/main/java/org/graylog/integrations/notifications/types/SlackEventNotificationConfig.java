@@ -33,7 +33,7 @@ import org.graylog2.plugin.rest.ValidationResult;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
-import java.util.regex.Matcher;
+import java.net.URI;
 import java.util.regex.Pattern;
 
 @AutoValue
@@ -43,18 +43,17 @@ public abstract class SlackEventNotificationConfig implements EventNotificationC
 
     public static final String TYPE_NAME = "slack-notification-v1";
 
-    private final String regex = "https:\\/\\/(hooks.slack.com\\/services\\/|.*\\.?discord(app)?.com\\/api\\/webhooks.*\\/slack)";
-    private final Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
-    private static final String HEX_COLOR = "#ff0500";
+    private static final Pattern SLACK_PATTERN = Pattern.compile("https:\\/\\/hooks.slack.com\\/services\\/");
+    private static final Pattern DISCORD_PATTERN = Pattern.compile("https:\\/\\/.*\\.?discord(app)?.com\\/api\\/webhooks.*\\/slack");
+    private static final String DEFAULT_HEX_COLOR = "#ff0500";
+    private static final String DEFAULT_CUSTOM_MESSAGE = "Graylog Slack Notification";
+    private static final long DEFAULT_BACKLOG_SIZE = 0;
 
-    private static final String CUSTOM_MESSAGE = "hello World";
-    private static final boolean FALSE = false;
-    private static final long BACKLOG_SIZE = 0;
-
-
-    static final String INVALID_BACKLOG_ERROR_MESSAGE = "Backlog size cannot be less than zero .";
-    static final String INVALID_CHANNEL_ERROR_MESSAGE = "Channel cannot be empty.";
-    static final String INVALID_WEBHOOK_ERROR_MESSAGE = "Please specify a valid webhook url";
+    static final String INVALID_BACKLOG_ERROR_MESSAGE = "Backlog size cannot be less than zero";
+    static final String INVALID_CHANNEL_ERROR_MESSAGE = "Channel cannot be empty";
+    static final String INVALID_WEBHOOK_ERROR_MESSAGE = "Specified Webhook URL is not a valid URL";
+    static final String INVALID_SLACK_URL_ERROR_MESSAGE = "Specified Webhook URL is not a valid Slack URL";
+    static final String INVALID_DISCORD_URL_ERROR_MESSAGE = "Specified Webhook URL is not a valid Discord URL";
     static final String WEB_HOOK_URL = "https://hooks.slack.com/services/xxx/xxxx/xxxxxxxxxxxxxxxxxxx";
     static final String CHANNEL = "#general";
 
@@ -69,10 +68,8 @@ public abstract class SlackEventNotificationConfig implements EventNotificationC
     static final String FIELD_ICON_EMOJI = "icon_emoji";
     static final String FIELD_BACKLOG_SIZE = "backlog_size";
 
-
     @JsonProperty(FIELD_BACKLOG_SIZE)
     public abstract long backlogSize();
-
 
     @JsonProperty(FIELD_COLOR)
     @NotBlank
@@ -107,7 +104,6 @@ public abstract class SlackEventNotificationConfig implements EventNotificationC
     @Nullable
     public abstract String iconEmoji();
 
-
     @Override
     @JsonIgnore
     public JobTriggerData toJobTriggerData(EventDto dto) {
@@ -122,7 +118,22 @@ public abstract class SlackEventNotificationConfig implements EventNotificationC
     @JsonIgnore
     public ValidationResult validate() {
         ValidationResult validation = new ValidationResult();
-        final Matcher matcher = pattern.matcher(webhookUrl());
+
+        URI webhookUri;
+        try {
+            webhookUri = new URI(webhookUrl());
+            if (webhookUri.getHost().toLowerCase().contains("slack")) {
+                if (!SLACK_PATTERN.matcher(webhookUrl()).find()) {
+                    validation.addError(FIELD_WEBHOOK_URL, INVALID_SLACK_URL_ERROR_MESSAGE);
+                }
+            } else if (webhookUri.getHost().toLowerCase().contains("discord")) {
+                if (!DISCORD_PATTERN.matcher(webhookUrl()).find()) {
+                    validation.addError(FIELD_WEBHOOK_URL, INVALID_DISCORD_URL_ERROR_MESSAGE);
+                }
+            }
+        } catch (Exception ex) {
+            validation.addError(FIELD_WEBHOOK_URL, INVALID_WEBHOOK_ERROR_MESSAGE);
+        }
 
         if (backlogSize() < 0) {
             validation.addError(FIELD_BACKLOG_SIZE, INVALID_BACKLOG_ERROR_MESSAGE);
@@ -132,11 +143,7 @@ public abstract class SlackEventNotificationConfig implements EventNotificationC
             validation.addError(FIELD_CHANNEL, INVALID_CHANNEL_ERROR_MESSAGE);
         }
 
-        if (matcher.find() == false) {
-            validation.addError(FIELD_WEBHOOK_URL, INVALID_WEBHOOK_ERROR_MESSAGE);
-        }
         return validation;
-
     }
 
     @AutoValue.Builder
@@ -146,13 +153,13 @@ public abstract class SlackEventNotificationConfig implements EventNotificationC
 
             return new AutoValue_SlackEventNotificationConfig.Builder()
                     .type(TYPE_NAME)
-                    .color(HEX_COLOR)
+                    .color(DEFAULT_HEX_COLOR)
                     .webhookUrl(WEB_HOOK_URL)
                     .channel(CHANNEL)
-                    .customMessage(CUSTOM_MESSAGE)
-                    .notifyChannel(FALSE)
-                    .backlogSize(BACKLOG_SIZE)
-                    .linkNames(FALSE);
+                    .customMessage(DEFAULT_CUSTOM_MESSAGE)
+                    .notifyChannel(false)
+                    .backlogSize(DEFAULT_BACKLOG_SIZE)
+                    .linkNames(false);
         }
 
         @JsonProperty(FIELD_COLOR)

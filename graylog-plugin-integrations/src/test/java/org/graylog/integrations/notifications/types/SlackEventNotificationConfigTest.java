@@ -28,12 +28,24 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 
 
 public class SlackEventNotificationConfigTest {
+
+    @Test
+    public void validate_succeeds_whenWebhookUrlIsValidUrl() {
+        SlackEventNotificationConfig slackEventNotificationConfig = SlackEventNotificationConfig.builder()
+                .webhookUrl("http://graylog.org")
+                .build();
+        ValidationResult result = slackEventNotificationConfig.validate();
+        Map errors = result.getErrors();
+        assertThat(errors).size().isEqualTo(0);
+    }
 
     @Test
     public void validate_succeeds_whenWebhookUrlIsValidSlackUrl() {
@@ -68,12 +80,40 @@ public class SlackEventNotificationConfigTest {
     @Test
     public void validate_failsAndReturnsAnError_whenWebhookUrlIsInvalid() {
         SlackEventNotificationConfig slackEventNotificationConfig = SlackEventNotificationConfig.builder()
-                .webhookUrl("A67888900000")
+                .webhookUrl("html:/?Thing.foo")
                 .build();
         ValidationResult result = slackEventNotificationConfig.validate();
         assertThat(result.failed()).isTrue();
         Map errors = result.getErrors();
-        assertThat(errors).size().isGreaterThan(0);
+        assertThat(errors).size().isEqualTo(1);
+        assertEquals(((List)errors.get(SlackEventNotificationConfig.FIELD_WEBHOOK_URL)).get(0),
+                SlackEventNotificationConfig.INVALID_WEBHOOK_ERROR_MESSAGE);
+    }
+
+    @Test
+    public void validate_failsAndReturnsAnError_whenWebhookUrlIsInvalidSlackUrl() {
+        SlackEventNotificationConfig slackEventNotificationConfig = SlackEventNotificationConfig.builder()
+                .webhookUrl("https://hooks.slack.com/api/foo")
+                .build();
+        ValidationResult result = slackEventNotificationConfig.validate();
+        assertThat(result.failed()).isTrue();
+        Map errors = result.getErrors();
+        assertThat(errors).size().isEqualTo(1);
+        assertEquals(((List)errors.get(SlackEventNotificationConfig.FIELD_WEBHOOK_URL)).get(0),
+                SlackEventNotificationConfig.INVALID_SLACK_URL_ERROR_MESSAGE);
+    }
+
+    @Test
+    public void validate_failsAndReturnsAnError_whenWebhookUrlIsInvalidDiscordUrl() {
+        SlackEventNotificationConfig slackEventNotificationConfig = SlackEventNotificationConfig.builder()
+                .webhookUrl("https://discord.com/api/webhooks/xxxx/xxXXXxxxxxxxxx")
+                .build();
+        ValidationResult result = slackEventNotificationConfig.validate();
+        assertThat(result.failed()).isTrue();
+        Map errors = result.getErrors();
+        assertThat(errors).size().isEqualTo(1);
+        assertEquals(((List)errors.get(SlackEventNotificationConfig.FIELD_WEBHOOK_URL)).get(0),
+                SlackEventNotificationConfig.INVALID_DISCORD_URL_ERROR_MESSAGE);
     }
 
     @Test
