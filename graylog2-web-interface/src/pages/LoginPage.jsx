@@ -16,15 +16,16 @@
  */
 import React, { useEffect, useState } from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
-import { createGlobalStyle } from 'styled-components';
+import styled, { createGlobalStyle } from 'styled-components';
 
 import { DocumentTitle, Icon } from 'components/common';
-import { Alert } from 'components/graylog';
+import { Alert, Button } from 'components/graylog';
 import LoginForm from 'components/login/LoginForm';
 import LoginBox from 'components/login/LoginBox';
 import authStyles from 'theme/styles/authStyles';
 import CombinedProvider from 'injection/CombinedProvider';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
+import AppConfig from 'util/AppConfig';
 
 import LoadingPage from './LoadingPage';
 
@@ -34,11 +35,23 @@ const LoginPageStyles = createGlobalStyle`
   ${authStyles}
 `;
 
+const StyledButton = styled(Button)`
+  margin-top: 1em;
+  display: inline-block;
+  cursor: pointer;
+`;
+
 const LoginPage = () => {
   const [didValidateSession, setDidValidateSession] = useState(false);
   const [lastError, setLastError] = useState(undefined);
   const [activeBackend, setActiveBackend] = useState();
   const [isDetermined, setIsDetermined] = useState(false);
+  const [useFallback, setUseFallback] = useState(false);
+
+  const isCloud = AppConfig.isCloud();
+  const registeredLoginComponents = PluginStore.exports('loginProviderType');
+  const loginComponent = registeredLoginComponents.find((c) => c.type === activeBackend);
+  const hasCustomLogin = loginComponent && loginComponent.formComponent;
 
   useEffect(() => {
     if (!isDetermined) {
@@ -81,11 +94,7 @@ const LoginPage = () => {
   };
 
   const renderLoginForm = () => {
-    const registeredLoginComponents = PluginStore.exports('loginProviderType');
-
-    const loginComponent = registeredLoginComponents.find((c) => c.type === activeBackend);
-
-    if (loginComponent && loginComponent.formComponent) {
+    if (!useFallback && hasCustomLogin) {
       return React.createElement(loginComponent.formComponent, {
         onErrorChange: setLastError,
       });
@@ -107,6 +116,11 @@ const LoginPage = () => {
         <LoginPageStyles />
         {formatLastError()}
         {renderLoginForm()}
+        {hasCustomLogin && !isCloud && (
+          <StyledButton as="a" onClick={() => setUseFallback(!useFallback)}>
+            {`Login with ${useFallback ? loginComponent.type.replace(/^\w/, (c) => c.toUpperCase()) : 'default method'}`}
+          </StyledButton>
+        )}
       </LoginBox>
     </DocumentTitle>
   );
