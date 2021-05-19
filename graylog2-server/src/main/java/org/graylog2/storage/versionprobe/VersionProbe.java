@@ -115,6 +115,12 @@ public class VersionProbe {
         }
     }
 
+    /**
+     * Try to connect to ES to extract the version info. If configured, retry multiple times with a delay if
+     * the inital connection is refused (e.g. ES starts up in a different container and is not ready yet)
+     * @param rootRoute
+     * @return
+     */
     private Optional<RootResponse> rootResponse(RootRoute rootRoute) {
         int i = 0;
         // try at least once
@@ -126,8 +132,10 @@ public class VersionProbe {
                         return Optional.ofNullable(response.body());
                     }
                 } catch (IOException e) {
+                    // catches "Connection Refused" etc.
                     LOG.error("Unable to retrieve version from Elasticsearch node: ", e);
                 }
+                // do not wait/show warning if this was the last try
                 if (i < this.connectionRetries) {
                     LOG.warn("Failed to connect to Elasticsearch. Retry {} from {}", i + 1, this.connectionRetries);
                     Thread.sleep(this.connectionRetryWait.toMilliseconds());
