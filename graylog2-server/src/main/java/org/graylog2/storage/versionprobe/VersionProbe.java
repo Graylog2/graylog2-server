@@ -18,6 +18,10 @@ package org.graylog2.storage.versionprobe;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
+import com.github.rholder.retry.RetryException;
+import com.github.rholder.retry.RetryerBuilder;
+import com.github.rholder.retry.StopStrategies;
+import com.github.rholder.retry.WaitStrategies;
 import com.google.common.base.Strings;
 import okhttp3.Credentials;
 import okhttp3.OkHttpClient;
@@ -36,6 +40,8 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.Collection;
 import java.util.Optional;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 
 public class VersionProbe {
     private static final Logger LOG = LoggerFactory.getLogger(VersionProbe.class);
@@ -115,37 +121,34 @@ public class VersionProbe {
         }
     }
 
-    /**
-     * Try to connect to ES to extract the version info. If configured, retry multiple times with a delay if
-     * the inital connection is refused (e.g. ES starts up in a different container and is not ready yet)
-     * @param rootRoute
-     * @return
-     */
-    private Optional<RootResponse> rootResponse(RootRoute rootRoute) {
-        int i = 0;
-        // try at least once
-        do {
-            try {
-                try {
-                    final Response<RootResponse> response = rootRoute.root().execute();
-                    if (response.isSuccessful()) {
-                        return Optional.ofNullable(response.body());
-                    }
-                } catch (IOException e) {
-                    // catches "Connection Refused" etc.
-                    LOG.error("Unable to retrieve version from Elasticsearch node: ", e);
-                }
-                // do not wait/show warning if this was the last try
-                if (i < this.connectionRetries) {
-                    LOG.warn("Failed to connect to Elasticsearch. Retry {} from {}", i + 1, this.connectionRetries);
-                    Thread.sleep(this.connectionRetryWait.toMilliseconds());
-                }
-            } catch (InterruptedException ie) {
-                LOG.error("Unable to retrieve version from Elasticsearch node: ", ie);
-            }
-            i++;
-        } while (i <= this.connectionRetries);
+    private Optional<RootResponse> rootResponse(final RootRoute rootRoute) {
+        return (connectionRetries > 0) ? this.multipleTries(rootRoute) : this.singleTry(rootRoute);
+    }
 
+    private Optional<RootResponse> singleTry(final RootRoute rootRoute) {
+        try {
+            final Response<RootResponse> response = rootRoute.root().execute();
+            if (response.isSuccessful()) {
+                return Optional.ofNullable(response.body());
+            }
+        } catch (IOException e) {
+            LOG.error("Unable to retrieve version from Elasticsearch node: ", e);
+        }
+        return Optional.empty();
+    }
+
+    private Optional<RootResponse> multipleTries(final RootRoute rootRoute) {
+        try {
+            return RetryerBuilder.<Optional<RootResponse>>newBuilder()
+                    .retryIfResult(input -> !input.isPresent())
+                    .retryIfExceptionOfType(IOException.class)
+                    .retryIfRuntimeException()
+                    .withWaitStrategy(WaitStrategies.fixedWait(connectionRetryWait.getQuantity(), connectionRetryWait.getUnit()))
+                    .withStopStrategy(StopStrategies.stopAfterAttempt(connectionRetries))
+                    .build().call(() -> this.singleTry(rootRoute));
+        } catch (ExecutionException | RetryException e) {
+            LOG.error("Unable to retrieve version from Elasticsearch node: ", e);
+        }
         return Optional.empty();
     }
 }
