@@ -15,20 +15,24 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useContext, useState, useEffect, useRef } from 'react';
-import styled, { css } from 'styled-components';
+import styled, { css, DefaultTheme } from 'styled-components';
 import chroma from 'chroma-js';
 import ClipboardJS from 'clipboard';
+import debounce from 'lodash/debounce';
 
 import { ScratchpadContext } from 'contexts/ScratchpadProvider';
-import { Alert, Button, MenuItem, SplitButton, OverlayTrigger, Tooltip } from 'components/graylog';
+import { Alert, Button, ButtonGroup, OverlayTrigger, Tooltip } from 'components/graylog';
 import { BootstrapModalConfirm } from 'components/bootstrap';
-/* NOTE: common components are cyclical dependencies, so they need to be directly imported */
 import InteractableModal from 'components/common/InteractableModal';
 import Icon from 'components/common/Icon';
 import Store from 'logic/local-storage/Store';
 
 const DEFAULT_SCRATCHDATA = '';
 const TEXTAREA_ID = 'scratchpad-text-content';
+const STATUS_CLEARED = 'Cleared.';
+const STATUS_COPIED = 'Copied!';
+const STATUS_AUTOSAVED = 'Auto saved.';
+const STATUS_DEFAULT = '';
 
 const ContentArea = styled.div`
   display: flex;
@@ -36,14 +40,14 @@ const ContentArea = styled.div`
   height: 100%;
 `;
 
-const Textarea = styled.textarea(({ copied, theme }) => css`
+const Textarea = styled.textarea(({ $copied, theme }: {$copied: boolean, theme:DefaultTheme}) => css`
   width: 100%;
   padding: 3px;
   resize: none;
   flex: 1;
   margin: 15px 0 7px;
-  border: 1px solid ${copied ? theme.colors.variant.success : theme.colors.variant.lighter.default};
-  box-shadow: inset 1px 1px 1px rgba(0, 0, 0, 0.075)${copied && `, 0 0 8px ${chroma(theme.colors.variant.success).alpha(0.4).css()}`};
+  border: 1px solid ${$copied ? theme.colors.variant.success : theme.colors.variant.lighter.default};
+  box-shadow: inset 1px 1px 1px rgba(0, 0, 0, 0.075)${$copied && `, 0 0 8px ${chroma(theme.colors.variant.success).alpha(0.4).css()}`};
   transition: border 150ms ease-in-out, box-shadow 150ms ease-in-out;
   font-family: ${theme.fonts.family.monospace};
   font-size: ${theme.fonts.size.body};
@@ -57,7 +61,7 @@ const Textarea = styled.textarea(({ copied, theme }) => css`
 const StyledAlert = styled(Alert)`
   && {
     padding: 6px 12px;
-    margin-bottom: 9px;
+    margin: 6px 0 0;
     display: flex;
     align-items: center;
   }
@@ -68,34 +72,34 @@ const AlertNote = styled.em`
   flex: 1;
 `;
 
-const Footer = styled.footer(({ theme }) => css`
+const Footer = styled.footer(({ theme }: { theme: DefaultTheme }) => css`
   display: flex;
   align-items: center;
   padding: 7px 0 9px;
   border-top: 1px solid ${theme.colors.gray[80]};
 `);
 
-const SavingMessage = styled.span(({ theme, visible }) => css`
+const StatusMessage = styled.span(({ theme, $visible }: { theme: DefaultTheme, $visible: boolean}) => css`
   flex: 1;
   color: ${theme.colors.variant.success};
   font-style: italic;
-  opacity: ${visible ? '1' : '0'};
+  opacity: ${$visible ? '1' : '0'};
   transition: opacity 150ms ease-in-out;
 `);
 
 const Scratchpad = () => {
-  const clipboard = useRef();
-  const textareaRef = useRef();
-  const confirmationModalRef = useRef();
+  const clipboard = useRef<typeof ClipboardJS>();
+  const textareaRef = useRef<HTMLTextAreaElement>();
+  const confirmationModalRef = useRef<typeof BootstrapModalConfirm>();
+  const statusTimeout = useRef<ReturnType<typeof setTimeout>>();
   const { isScratchpadVisible, setScratchpadVisibility, localStorageItem } = useContext(ScratchpadContext);
   const scratchpadStore = Store.get(localStorageItem) || {};
-  const [isSecurityWarningConfirmed, setSecurityWarningConfirmed] = useState(scratchpadStore.securityConfirmed || false);
-  const [scratchData, setScratchData] = useState(scratchpadStore.value || DEFAULT_SCRATCHDATA);
-  const [size, setSize] = useState(scratchpadStore.size || undefined);
-  const [copied, setCopied] = useState(false);
-  const [dirty, setDirty] = useState(false);
-  const [recentlySaved, setRecentlySaved] = useState(false);
-  const [position, setPosition] = useState(scratchpadStore.position || undefined);
+  const [isSecurityWarningConfirmed, setSecurityWarningConfirmed] = useState<boolean>(scratchpadStore.securityConfirmed || false);
+  const [scratchData, setScratchData] = useState<string>(scratchpadStore.value || DEFAULT_SCRATCHDATA);
+  const [size, setSize] = useState<{ width: string, height: string } | undefined>(scratchpadStore.size || undefined);
+  const [position, setPosition] = useState<{ x:number, y:number } | undefined>(scratchpadStore.position || undefined);
+  const [statusMessage, setStatusMessage] = useState<string>(STATUS_DEFAULT);
+  const [showStatusMessage, setShowStatusMessage] = useState<boolean>(false);
 
   const writeData = (newData) => {
     const currentStorage = Store.get(localStorageItem);
@@ -103,25 +107,29 @@ const Scratchpad = () => {
     Store.set(localStorageItem, { ...currentStorage, ...newData });
   };
 
-  const handleSaveMessage = () => {
-    if (dirty) {
-      setRecentlySaved(true);
-
-      setTimeout(() => {
-        setRecentlySaved(false);
-      }, 1500);
+  const resetStatusTimer = () => {
+    if (statusTimeout.current) {
+      clearTimeout(statusTimeout.current);
     }
 
-    setDirty(false);
+    statusTimeout.current = setTimeout(() => {
+      setShowStatusMessage(false);
+    }, 1000);
   };
 
-  const handleChange = () => {
+  const updateStatusMessage = (message) => {
+    setStatusMessage(message);
+    setShowStatusMessage(true);
+    resetStatusTimer();
+  };
+
+  const handleChange = debounce(() => {
     const { value } = textareaRef.current;
 
-    setDirty(true);
     setScratchData(value);
+    updateStatusMessage(STATUS_AUTOSAVED);
     writeData({ value });
-  };
+  }, 500);
 
   const handleDrag = (newPosition) => {
     setPosition(newPosition);
@@ -146,33 +154,31 @@ const Scratchpad = () => {
     setScratchData(DEFAULT_SCRATCHDATA);
     writeData({ value: DEFAULT_SCRATCHDATA });
     confirmationModalRef.current.close();
+    updateStatusMessage(STATUS_CLEARED);
   };
 
   const handleCancelClear = () => {
     confirmationModalRef.current.close();
   };
 
-  const CopyWithIcon = <><Icon name="copy" /> Copy</>;
-
   useEffect(() => {
-    if (textareaRef.current && isScratchpadVisible) {
-      textareaRef.current.focus();
-    }
-
     clipboard.current = new ClipboardJS('[data-clipboard-button]', {});
 
     clipboard.current.on('success', () => {
-      setCopied(true);
-
-      setTimeout(() => {
-        setCopied(false);
-      }, 1000);
+      updateStatusMessage(STATUS_COPIED);
     });
 
     return () => {
       clipboard.current.destroy();
     };
-  }, [isScratchpadVisible]);
+  });
+
+  useEffect(() => {
+    if (textareaRef.current && isScratchpadVisible) {
+      textareaRef.current.focus();
+      textareaRef.current.value = scratchData;
+    }
+  }, [scratchData, isScratchpadVisible]);
 
   if (!isScratchpadVisible) return null;
 
@@ -187,17 +193,17 @@ const Scratchpad = () => {
         {!isSecurityWarningConfirmed && (
           <StyledAlert bsStyle="warning" bsSize="sm">
             <Icon name="exclamation-triangle" size="lg" />
-            <AlertNote>We recommend you do <strong>not</strong> store any sensitive information, such as passwords, in this area.</AlertNote>
+            <AlertNote>We recommend you do <strong>not</strong> store any sensitive information, such as passwords, in
+              this area.
+            </AlertNote>
             <Button bsStyle="link" bsSize="sm" onClick={handleGotIt}>Got It!</Button>
           </StyledAlert>
         )}
 
         <Textarea ref={textareaRef}
                   onChange={handleChange}
-                  onBlur={handleSaveMessage}
-                  value={scratchData}
                   id={TEXTAREA_ID}
-                  copied={copied}
+                  $copied={statusMessage === STATUS_COPIED}
                   spellCheck={false} />
 
         <Footer>
@@ -215,15 +221,22 @@ const Scratchpad = () => {
             </Button>
           </OverlayTrigger>
 
-          <SavingMessage visible={recentlySaved}><Icon name="hdd" type="regular" /> Saved!</SavingMessage>
+          <StatusMessage $visible={showStatusMessage}>
+            <Icon name={statusMessage === STATUS_COPIED ? 'copy' : 'hdd'} type="regular" /> {statusMessage}
+          </StatusMessage>
 
-          <SplitButton title={CopyWithIcon}
-                       bsStyle="info"
-                       data-clipboard-button
-                       data-clipboard-target={`#${TEXTAREA_ID}`}
-                       id="scratchpad-actions">
-            <MenuItem onClick={openConfirmClear}><Icon name="trash-alt" /> Clear</MenuItem>
-          </SplitButton>
+          <ButtonGroup>
+            <Button data-clipboard-button
+                    data-clipboard-target={`#${TEXTAREA_ID}`}
+                    id="scratchpad-actions"
+                    title="Copy">
+              <Icon name="copy" />
+            </Button>
+            <Button onClick={openConfirmClear} title="Clear">
+              <Icon name="trash-alt" />
+            </Button>
+          </ButtonGroup>
+
         </Footer>
 
       </ContentArea>
