@@ -41,6 +41,8 @@ jest.mock('../searchbar/QueryInput', () => mockComponent('QueryInput'));
 jest.mock('./WidgetHeader', () => 'widget-header');
 jest.mock('./WidgetColorContext', () => ({ children }) => children);
 
+// jest.mock('views/components/contexts/WidgetEditApplyAllChangesProvider', () => ({ children }) => <WidgetEditApplyAllChangesContext.Provider></>);
+
 jest.mock('views/stores/WidgetStore', () => ({
   WidgetStore: MockStore(),
   WidgetActions: {
