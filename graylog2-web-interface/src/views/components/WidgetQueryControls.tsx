@@ -15,11 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useEffect, useContext, useRef } from 'react';
 import { Field } from 'formik';
 import moment from 'moment';
-import { useContext } from 'react';
 import styled from 'styled-components';
 
+import WidgetEditApplyAllChangesContext from 'views/components/contexts/WidgetEditApplyAllChangesContext';
 import { StreamsStore } from 'views/stores/StreamsStore';
 import connect, { useStore } from 'stores/connect';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
@@ -35,6 +36,7 @@ import GlobalOverride from 'views/logic/search/GlobalOverride';
 import WidgetContext from 'views/components/contexts/WidgetContext';
 import { GlobalOverrideStore, GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
 import { SearchActions } from 'views/stores/SearchStore';
+import PropagateValidationState from 'views/components/aggregationwizard/PropagateValidationState';
 
 import TimeRangeOverrideInfo from './searchbar/WidgetTimeRangeOverride';
 import TimeRangeInput from './searchbar/TimeRangeInput';
@@ -62,19 +64,43 @@ type Props = {
   globalOverride: GlobalOverride | undefined | null,
 };
 
-const _onSubmit = (values, widget: Widget) => {
-  const { timerange, streams, queryString } = values;
-  const newWidget = widget.toBuilder()
+export const updateWidgetSearchControls = (widget, { timerange, streams, queryString }) => {
+  return widget.toBuilder()
     .timerange(timerange)
     .query(createElasticsearchQueryString(queryString))
     .streams(streams)
     .build();
+};
+
+const _onSubmit = (values, widget: Widget) => {
+  const { timerange, streams, queryString } = values;
+  const newWidget = updateWidgetSearchControls(widget, { timerange, streams, queryString });
 
   return WidgetActions.update(widget.id, newWidget);
 };
 
 const _resetTimeRangeOverride = () => GlobalOverrideActions.resetTimeRange().then(SearchActions.refresh);
 const _resetQueryOverride = () => GlobalOverrideActions.resetQuery().then(SearchActions.refresh);
+
+const useBindApplySearchControlsChanges = (formRef) => {
+  const { bindApplySearchControlsChanges } = useContext(WidgetEditApplyAllChangesContext);
+
+  useEffect(() => {
+    const updateWidget = (newWidget: Widget) => {
+      if (formRef.current) {
+        const { dirty, values, isValid } = formRef.current;
+
+        if (dirty && isValid) {
+          return updateWidgetSearchControls(newWidget, values);
+        }
+      }
+
+      return newWidget;
+    };
+
+    bindApplySearchControlsChanges(updateWidget);
+  }, [formRef, bindApplySearchControlsChanges]);
+};
 
 const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
   const widget = useContext(WidgetContext);
@@ -85,15 +111,20 @@ const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
   const { query_string: queryString } = widget.query ?? createElasticsearchQueryString('');
   const hasTimeRangeOverride = globalOverride?.timerange !== undefined;
   const hasQueryOverride = globalOverride?.query !== undefined;
+  const formRef = useRef(null);
+
+  useBindApplySearchControlsChanges(formRef);
 
   return (
     <>
       <SearchBarForm initialValues={{ timerange, streams, queryString }}
                      limitDuration={limitDuration}
+                     formRef={formRef}
                      onSubmit={(values) => _onSubmit(values, widget)}
                      validateOnMount={false}>
         {({ dirty, isValid, isSubmitting, handleSubmit, values, setFieldValue }) => (
           <>
+            <PropagateValidationState formKey="widget-query-controls" />
             <WidgetTopRow>
               <Col md={6}>
                 {!hasTimeRangeOverride && (

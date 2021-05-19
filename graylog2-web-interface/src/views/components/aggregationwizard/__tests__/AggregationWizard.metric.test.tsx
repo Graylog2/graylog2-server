@@ -147,7 +147,7 @@ describe('AggregationWizard', () => {
       await selectEvent.select(fieldSelect, 'http_method');
     });
 
-    const applyButton = await screen.findByRole('button', { name: 'Apply Changes' });
+    const applyButton = await screen.findByRole('button', { name: 'Update Preview' });
     fireEvent.click(applyButton);
 
     const updatedSeriesConfig = SeriesConfig.empty().toBuilder().name('New name').build();
@@ -187,7 +187,7 @@ describe('AggregationWizard', () => {
     await selectEvent.openMenu(percentileInput);
     await selectEvent.select(percentileInput, '50');
 
-    const applyButton = await screen.findByRole('button', { name: 'Apply Changes' });
+    const applyButton = await screen.findByRole('button', { name: 'Update Preview' });
     fireEvent.click(applyButton);
 
     const updatedConfig = widgetConfig
@@ -225,7 +225,7 @@ describe('AggregationWizard', () => {
       await selectEvent.select(newFieldSelect, 'http_method');
     });
 
-    const applyButton = await screen.findByRole('button', { name: 'Apply Changes' });
+    const applyButton = await screen.findByRole('button', { name: 'Update Preview' });
     fireEvent.click(applyButton);
 
     const updatedConfig = config.toBuilder()
@@ -253,7 +253,7 @@ describe('AggregationWizard', () => {
     const removeMetricElementButton = screen.getByRole('button', { name: 'Remove Metric' });
     userEvent.click(removeMetricElementButton);
 
-    const applyButton = await screen.findByRole('button', { name: 'Apply Changes' });
+    const applyButton = await screen.findByRole('button', { name: 'Update Preview' });
     userEvent.click(applyButton);
 
     const updatedConfig = widgetConfig

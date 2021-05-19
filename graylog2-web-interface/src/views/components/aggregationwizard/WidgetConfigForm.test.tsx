@@ -15,24 +15,28 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState } from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 
 import WidgetConfigForm from 'views/components/aggregationwizard/WidgetConfigForm';
 
-import { ValidationStateContext } from '../widgets/EditWidgetFrame';
+import ValidationStateProvider from '../contexts/ValidationStateProvider';
+import ValidationStateContext from '../contexts/ValidationStateContext';
 
 describe('WidgetConfigForm', () => {
   const WidgetConfigFormWithValidationState = ({ validate }: { validate: () => ({ [key: string]: string })}) => {
-    const [hasErrors, setHasErrors] = useState(false);
-
     return (
-      <ValidationStateContext.Provider value={[hasErrors, setHasErrors]}>
-        <WidgetConfigForm initialValues={{}} onSubmit={() => {}} validate={validate}>
-          <span>Hello world!</span>
-        </WidgetConfigForm>
-        <span>{hasErrors ? 'Form has errors' : 'Form has no errors'}</span>
-      </ValidationStateContext.Provider>
+      <ValidationStateProvider>
+        <ValidationStateContext.Consumer>
+          {({ hasErrors }) => (
+            <>
+              <WidgetConfigForm initialValues={{}} onSubmit={() => {}} validate={validate}>
+                <span>Hello world!</span>
+              </WidgetConfigForm>
+              <span>{hasErrors ? 'Form has errors' : 'Form has no errors'}</span>
+            </>
+          )}
+        </ValidationStateContext.Consumer>
+      </ValidationStateProvider>
     );
   };
 

@@ -111,7 +111,7 @@ describe('AggregationWizard', () => {
     await selectEvent.openMenu(sortDirectionSelect);
     await selectEvent.select(sortDirectionSelect, 'Descending');
 
-    const applyButton = await screen.findByRole('button', { name: 'Apply Changes' });
+    const applyButton = await screen.findByRole('button', { name: 'Update Preview' });
     userEvent.click(applyButton);
 
     const updatedConfig = widgetConfig
@@ -144,7 +144,7 @@ describe('AggregationWizard', () => {
     await selectEvent.openMenu(newSortDirectionSelect);
     await selectEvent.select(newSortDirectionSelect, 'Descending');
 
-    const applyButton = await screen.findByRole('button', { name: 'Apply Changes' });
+    const applyButton = await screen.findByRole('button', { name: 'Update Preview' });
     userEvent.click(applyButton);
 
     const updatedConfig = widgetConfig
@@ -180,7 +180,7 @@ describe('AggregationWizard', () => {
     await selectEvent.openMenu(newSortDirectionSelect);
     await selectEvent.select(newSortDirectionSelect, 'Descending');
 
-    const applyButton = await screen.findByRole('button', { name: 'Apply Changes' });
+    const applyButton = await screen.findByRole('button', { name: 'Update Preview' });
     userEvent.click(applyButton);
 
     const updatedConfig = widgetConfig
@@ -202,7 +202,7 @@ describe('AggregationWizard', () => {
     await addSortElement();
 
     const newSortContainer = await screen.findByTestId('sort-element-0');
-    const applyButton = await screen.findByRole('button', { name: 'Apply Changes' });
+    const applyButton = await screen.findByRole('button', { name: 'Update Preview' });
     await waitFor(() => expect(within(newSortContainer).getByText('Field is required.')).toBeInTheDocument());
     await waitFor(() => expect(expect(applyButton).toBeDisabled()));
   });
@@ -213,7 +213,7 @@ describe('AggregationWizard', () => {
     await addSortElement();
 
     const newSortContainer = await screen.findByTestId('sort-element-0');
-    const applyButton = await screen.findByRole('button', { name: 'Apply Changes' });
+    const applyButton = await screen.findByRole('button', { name: 'Update Preview' });
     await waitFor(() => expect(within(newSortContainer).getByText('Direction is required.')).toBeInTheDocument());
     await waitFor(() => expect(expect(applyButton).toBeDisabled()));
   });
@@ -230,7 +230,7 @@ describe('AggregationWizard', () => {
     const removeSortElementButton = screen.getByRole('button', { name: 'Remove Sort' });
     userEvent.click(removeSortElementButton);
 
-    const applyButton = await screen.findByRole('button', { name: 'Apply Changes' });
+    const applyButton = await screen.findByRole('button', { name: 'Update Preview' });
     userEvent.click(applyButton);
 
     const updatedConfig = widgetConfig
@@ -266,7 +266,7 @@ describe('AggregationWizard', () => {
     fireEvent.keyDown(firstItem, { key: 'Space', keyCode: 32 });
     await screen.findByText(/You have dropped the item/i);
 
-    const applyButton = await screen.findByRole('button', { name: 'Apply Changes' });
+    const applyButton = await screen.findByRole('button', { name: 'Update Preview' });
     fireEvent.click(applyButton);
 
     const updatedConfig = config

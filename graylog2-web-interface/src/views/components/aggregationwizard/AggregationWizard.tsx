@@ -71,7 +71,7 @@ const onCreateElement = (
   }
 };
 
-const _onSubmit = (formValues: WidgetConfigFormValues, onConfigChange: (newConfig: AggregationWidgetConfig) => void, oldConfig = AggregationWidgetConfig.builder().build()) => {
+export const updateWidgetAggregationElements = (formValues: WidgetConfigFormValues, oldConfig = AggregationWidgetConfig.builder().build()) => {
   const toConfigByKey = Object.fromEntries(aggregationElements.map(({ key, toConfig }) => [key, toConfig]));
 
   const newConfig = Object.keys(formValues).map((key) => {
@@ -84,7 +84,13 @@ const _onSubmit = (formValues: WidgetConfigFormValues, onConfigChange: (newConfi
     return toConfig;
   }).reduce((prevConfig, toConfig) => toConfig(formValues, prevConfig), oldConfig.toBuilder());
 
-  onConfigChange(newConfig.build());
+  return newConfig.build();
+};
+
+const _onSubmit = (formValues: WidgetConfigFormValues, onConfigChange: (newConfig: AggregationWidgetConfig) => void, oldConfig: AggregationWidgetConfig) => {
+  const newConfig = updateWidgetAggregationElements(formValues, oldConfig);
+
+  return onConfigChange(newConfig);
 };
 
 const validateForm = (formValues: WidgetConfigFormValues) => {

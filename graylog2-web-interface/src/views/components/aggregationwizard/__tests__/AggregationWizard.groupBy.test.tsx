@@ -94,7 +94,7 @@ describe('AggregationWizard', () => {
       await selectEvent.select(fieldSelection, 'took_ms');
     });
 
-    const applyButton = await screen.findByRole('button', { name: 'Apply Changes' });
+    const applyButton = await screen.findByRole('button', { name: 'Update Preview' });
     fireEvent.click(applyButton);
 
     const pivot = Pivot.create('took_ms', 'values', { limit: 15 });
@@ -150,7 +150,7 @@ describe('AggregationWizard', () => {
       await selectEvent.select(fieldSelections[1], 'took_ms');
     });
 
-    const applyButton = await screen.findByRole('button', { name: 'Apply Changes' });
+    const applyButton = await screen.findByRole('button', { name: 'Update Preview' });
     fireEvent.click(applyButton);
 
     const pivot0 = Pivot.create('timestamp', 'time', { interval: { type: 'auto', scaling: 1 } });
@@ -211,7 +211,7 @@ describe('AggregationWizard', () => {
       await selectEvent.select(fieldSelection, 'took_ms');
     });
 
-    const applyButton = await screen.findByRole('button', { name: 'Apply Changes' });
+    const applyButton = await screen.findByRole('button', { name: 'Update Preview' });
     fireEvent.click(applyButton);
 
     const updatedConfig = widgetConfig
@@ -245,7 +245,7 @@ describe('AggregationWizard', () => {
     fireEvent.keyDown(firstItem, { key: 'Space', keyCode: 32 });
     await screen.findByText(/You have dropped the item/i);
 
-    const applyButton = await screen.findByRole('button', { name: 'Apply Changes' });
+    const applyButton = await screen.findByRole('button', { name: 'Update Preview' });
     fireEvent.click(applyButton);
 
     const updatedConfig = widgetConfig

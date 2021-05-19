@@ -15,13 +15,19 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useRef, useEffect, useContext } from 'react';
 import { Form, Formik, FormikProps } from 'formik';
 import { ConfigurationField } from 'views/types';
 import styled from 'styled-components';
 
+import WidgetEditApplyAllChangesContext from 'views/components/contexts/WidgetEditApplyAllChangesContext';
 import PropagateValidationState from 'views/components/aggregationwizard/PropagateValidationState';
 import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 import { AutoTimeConfig, TimeUnitConfig } from 'views/logic/aggregationbuilder/Pivot';
+import WidgetConfig from 'views/logic/widgets/WidgetConfig';
+import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+
+import { updateWidgetAggregationElements } from './AggregationWizard';
 
 const StyledForm = styled(Form)`
   display: flex;
@@ -106,19 +112,45 @@ type Props = {
   initialValues: WidgetConfigFormValues,
   onSubmit: (formValues: WidgetConfigFormValues) => void,
   validate: (formValues: WidgetConfigFormValues) => { [key: string]: string },
+  config: AggregationWidgetConfig,
 }
 
-const WidgetConfigForm = ({ children, onSubmit, initialValues, validate }: Props) => {
+const useBindApplyElementConfigurationChanges = (formRef, config) => {
+  const { bindApplyElementConfigurationChanges } = useContext(WidgetEditApplyAllChangesContext);
+
+  useEffect(() => {
+    const updateWidgetConfig = (newWidgetConfig: WidgetConfig) => {
+      if (formRef.current) {
+        const { dirty, values, isValid } = formRef.current;
+
+        if (dirty && isValid) {
+          return updateWidgetAggregationElements(values, config);
+        }
+      }
+
+      return newWidgetConfig;
+    };
+
+    bindApplyElementConfigurationChanges(updateWidgetConfig);
+  }, [formRef, bindApplyElementConfigurationChanges, config]);
+};
+
+const WidgetConfigForm = ({ children, onSubmit, initialValues, validate, config }: Props) => {
+  const formRef = useRef(null);
+
+  useBindApplyElementConfigurationChanges(formRef, config);
+
   return (
     <Formik<WidgetConfigFormValues> initialValues={initialValues}
                                     validate={validate}
                                     enableReinitialize
+                                    innerRef={formRef}
                                     validateOnChange
                                     validateOnMount
                                     onSubmit={onSubmit}>
       {(...args) => (
         <StyledForm className="form form-horizontal">
-          <PropagateValidationState />
+          <PropagateValidationState formKey="widget-config" />
           {typeof children === 'function' ? children(...args) : children}
         </StyledForm>
       )}
