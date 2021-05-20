@@ -1,6 +1,6 @@
-import { qualifyUrl, qualifyUrlWithSessionCredentials } from 'util/URLUtils';
 import { asMock } from 'helpers/mocking';
 
+import { qualifyUrl, qualifyUrlWithSessionCredentials } from 'util/URLUtils';
 import AppConfig from 'util/AppConfig';
 
 jest.mock('util/AppConfig');
@@ -27,6 +27,14 @@ describe('qualifyUrl', () => {
 
     expect(qualifyUrl('/foo')).toEqual('http://something.graylog.cloud/api/foo');
   });
+
+  it('is idempotent', () => {
+    asMock(AppConfig.gl2ServerUrl).mockReturnValue('http://something.graylog.cloud/api');
+
+    const qualifiedUrl = qualifyUrl('/foo');
+
+    expect(qualifyUrl(qualifiedUrl)).toEqual('http://something.graylog.cloud/api/foo');
+  });
 });
 
 describe('qualifyUrlWithSessionCredentials', () => {
@@ -37,5 +45,12 @@ describe('qualifyUrlWithSessionCredentials', () => {
 
     expect(qualifyUrlWithSessionCredentials('/something/else/23', 'deadbeef'))
       .toEqual('https://deadbeef:session@something.foo:2342/api/something/else/23');
+  });
+
+  it('adds session credentials to url that was already qualified', () => {
+    asMock(AppConfig.gl2ServerUrl).mockReturnValue('http://something.graylog.cloud/api');
+
+    expect(qualifyUrlWithSessionCredentials(qualifyUrl('/foo'), 'deadbeef'))
+      .toEqual('http://deadbeef:session@something.graylog.cloud/api/foo');
   });
 });

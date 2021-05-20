@@ -37,6 +37,12 @@ const qualifyRelativeURLWithCurrentHostname = (url: string): string => {
 const URLUtils = {
   parser: new UAParser(),
   qualifyUrl(url: string) {
+    const parsedUrl = new URI(url);
+
+    if (parsedUrl.is('absolute')) {
+      return url;
+    }
+
     const absoluteServerUrl = qualifyRelativeURLWithCurrentHostname(AppConfig.gl2ServerUrl());
 
     return new URI(absoluteServerUrl + url).normalizePathname().toString();
