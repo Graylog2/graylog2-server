@@ -42,24 +42,39 @@ const WidgetEditApplyAllChangesProvider = ({ children, widget }: Props) => {
   }, []);
 
   const applyAllWidgetChanges = useCallback(() => {
-    setIsSubmitting(true);
     let newWidget = widget;
+    let hasChanges = false;
 
     if (applySearchControlsChanges.current) {
-      newWidget = applySearchControlsChanges.current(newWidget);
+      const updatedWidget = applySearchControlsChanges.current(newWidget);
+
+      if (updatedWidget) {
+        newWidget = updatedWidget;
+        hasChanges = hasChanges || true;
+      }
     }
 
     if (applyElementConfigurationChanges.current) {
-      const newConfig = applyElementConfigurationChanges.current(newWidget.config);
-      newWidget = newWidget.toBuilder().config(newConfig).build();
+      const updatedWidgetConfig = applyElementConfigurationChanges.current(newWidget.config);
+
+      if (updatedWidgetConfig) {
+        newWidget = newWidget.toBuilder().config(updatedWidgetConfig).build();
+        hasChanges = hasChanges || true;
+      }
     }
 
-    return WidgetActions.update(widget.id, newWidget)
-      .catch((error) => {
-        UserNotification.error(`Applying widget changes failed with status: ${error}`);
+    if (hasChanges) {
+      setIsSubmitting(true);
 
-        return error;
-      }).finally(() => setIsSubmitting(false));
+      return WidgetActions.update(widget.id, newWidget)
+        .catch((error) => {
+          UserNotification.error(`Applying widget changes failed with status: ${error}`);
+
+          return error;
+        }).finally(() => setIsSubmitting(false));
+    }
+
+    return Promise.resolve();
   }, [widget]);
 
   const contextValue = {

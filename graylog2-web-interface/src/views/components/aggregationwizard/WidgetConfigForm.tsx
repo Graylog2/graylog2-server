@@ -24,7 +24,6 @@ import WidgetEditApplyAllChangesContext from 'views/components/contexts/WidgetEd
 import PropagateValidationState from 'views/components/aggregationwizard/PropagateValidationState';
 import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 import { AutoTimeConfig, TimeUnitConfig } from 'views/logic/aggregationbuilder/Pivot';
-import WidgetConfig from 'views/logic/widgets/WidgetConfig';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 
 import { updateWidgetAggregationElements } from './AggregationWizard';
@@ -119,7 +118,7 @@ const useBindApplyElementConfigurationChanges = (formRef, config) => {
   const { bindApplyElementConfigurationChanges } = useContext(WidgetEditApplyAllChangesContext);
 
   useEffect(() => {
-    const updateWidgetConfig = (newWidgetConfig: WidgetConfig) => {
+    bindApplyElementConfigurationChanges(() => {
       if (formRef.current) {
         const { dirty, values, isValid } = formRef.current;
 
@@ -128,10 +127,8 @@ const useBindApplyElementConfigurationChanges = (formRef, config) => {
         }
       }
 
-      return newWidgetConfig;
-    };
-
-    bindApplyElementConfigurationChanges(updateWidgetConfig);
+      return undefined;
+    });
   }, [formRef, bindApplyElementConfigurationChanges, config]);
 };
 

@@ -86,7 +86,7 @@ const useBindApplySearchControlsChanges = (formRef) => {
   const { bindApplySearchControlsChanges } = useContext(WidgetEditApplyAllChangesContext);
 
   useEffect(() => {
-    const updateWidget = (newWidget: Widget) => {
+    bindApplySearchControlsChanges((newWidget: Widget) => {
       if (formRef.current) {
         const { dirty, values, isValid } = formRef.current;
 
@@ -95,10 +95,8 @@ const useBindApplySearchControlsChanges = (formRef) => {
         }
       }
 
-      return newWidget;
-    };
-
-    bindApplySearchControlsChanges(updateWidget);
+      return undefined;
+    });
   }, [formRef, bindApplySearchControlsChanges]);
 };
 

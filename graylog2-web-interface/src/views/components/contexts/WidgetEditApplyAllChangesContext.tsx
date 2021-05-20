@@ -15,25 +15,24 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import * as Immutable from 'immutable';
 import type Widget from 'src/views/logic/widgets/Widget';
 import type WidgetConfig from 'src/views/logic/widgets/WidgetConfig';
 import type { Widgets } from 'src/views/stores/WidgetStore';
 
 import { singleton } from 'views/logic/singleton';
 
-type ApplySearchControlsChanges = (widget: Widget) => Widget;
-type ApplyElementConfigurationChanges = (widgetConfig: WidgetConfig) => WidgetConfig;
+type ApplySearchControlsChanges = (widget: Widget) => Widget | undefined;
+type ApplyElementConfigurationChanges = (widgetConfig: WidgetConfig) => WidgetConfig | undefined;
 
 type WidgetEditApplyAllChangesContextValue = {
-  applyAllWidgetChanges: () => Promise<Widgets>,
+  applyAllWidgetChanges: () => Promise<Widgets | void>,
   bindApplyElementConfigurationChanges: (updateFn: ApplyElementConfigurationChanges) => void,
   bindApplySearchControlsChanges: (updateFn: ApplySearchControlsChanges) => void,
   isSubmitting: boolean,
 }
 
 const WidgetEditApplyAllChangesContext = React.createContext<WidgetEditApplyAllChangesContextValue>({
-  applyAllWidgetChanges: () => Promise.resolve(Immutable.OrderedMap()),
+  applyAllWidgetChanges: () => Promise.resolve(),
   bindApplyElementConfigurationChanges: () => {},
   bindApplySearchControlsChanges: () => {},
   isSubmitting: false,
