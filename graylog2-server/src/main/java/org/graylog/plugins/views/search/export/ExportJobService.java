@@ -42,6 +42,9 @@ public class ExportJobService {
     }
 
     public Optional<ExportJob> get(String id) {
+        if (!ObjectId.isValid(id)) {
+            return Optional.empty();
+        }
         return Optional.ofNullable(db.findOneById(new ObjectId(id)));
     }
 
