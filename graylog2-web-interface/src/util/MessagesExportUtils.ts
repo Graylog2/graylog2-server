@@ -15,11 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { fetchFile } from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
+import { qualifyUrl, qualifyUrlWithSessionCredentials } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import ApiRoutes from 'routing/ApiRoutes';
 import { QueryString, TimeRange } from 'views/logic/queries/Query';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
+import StoreProvider from 'injection/StoreProvider';
 
 export type ExportPayload = {
   timerange?: TimeRange | undefined | null,
@@ -31,9 +32,10 @@ export type ExportPayload = {
 };
 
 const downloadFile = (exportJobId: string, filename: string) => {
+  const SessionStore = StoreProvider.getStore('Session');
   const link = document.createElement('a');
   link.download = filename;
-  link.href = qualifyUrl(ApiRoutes.MessagesController.jobResults(exportJobId, filename).url);
+  link.href = qualifyUrlWithSessionCredentials(ApiRoutes.MessagesController.jobResults(exportJobId, filename).url, SessionStore.getSessionId());
   link.click();
 };
 
