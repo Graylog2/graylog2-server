@@ -145,7 +145,7 @@ public class AuthServiceBackendsResource extends RestResource {
     @Path("{backendId}")
     @ApiOperation("Returns the authentication service backend for the given ID")
     @Operation(summary = "Returns the authentication service backend for the given ID", responses = {
-            @ApiResponse(responseCode = "200", content = @Content(
+            @ApiResponse(responseCode = "200", description = "The authentication service backend", content = @Content(
                     schema = @Schema(implementation = AuthServiceBackendDTO.class)
             ))
     })

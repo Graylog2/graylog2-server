@@ -19,10 +19,12 @@ package org.graylog.plugins.views.search;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import javax.annotation.Nullable;
 import java.util.Map;
@@ -42,6 +44,7 @@ import java.util.Objects;
         property = Parameter.TYPE_FIELD,
         visible = true,
         defaultImpl = ValueParameter.class)
+@Schema
 public interface Parameter {
     String TYPE_FIELD = "type";
 
@@ -109,6 +112,7 @@ public interface Parameter {
             property = Binding.TYPE_FIELD,
             visible = true,
             defaultImpl = Binding.Fallback.class)
+    @Schema
     interface Binding {
         String TYPE_FIELD = "type";
 

@@ -22,11 +22,13 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Strings;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 
 @AutoValue
 @JsonTypeName(ElasticsearchQueryString.NAME)
 @JsonDeserialize(builder = AutoValue_ElasticsearchQueryString.Builder.class)
+@Schema(allOf = BackendQuery.class)
 public abstract class ElasticsearchQueryString implements BackendQuery {
 
     public static final String NAME = "elasticsearch";

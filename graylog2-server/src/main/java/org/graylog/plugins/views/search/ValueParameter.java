@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Parameters describe variable inputs to queries.
@@ -35,6 +36,7 @@ import com.google.auto.value.AutoValue;
 @AutoValue
 @JsonTypeName(ValueParameter.TYPE_NAME)
 @JsonDeserialize(builder = ValueParameter.Builder.class)
+@Schema(allOf = Parameter.class)
 public abstract class ValueParameter implements Parameter {
     public static final String TYPE_NAME = "value-parameter-v1";
 

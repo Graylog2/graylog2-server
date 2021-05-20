@@ -25,6 +25,13 @@ import com.google.common.util.concurrent.Uninterruptibles;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.models.media.Encoding;
 import one.util.streamex.StreamEx;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
@@ -212,10 +219,17 @@ public class SearchResource extends RestResource implements PluginRestResource {
 
     @POST
     @ApiOperation(value = "Execute a new synchronous search", notes = "Executes a new search and waits for its result")
+    @Operation(operationId = "Run a synchronous search", description = "Executes a new search and waits for its result")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200",
+                    description = "A finished search job",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = SearchJob.class))
+            ),
+            @ApiResponse(responseCode = "500", description = "An error occurred while executing the search request, including timing out waiting for the response")
+    })
     @Path("sync")
     @NoAuditEvent("Creating audit event manually in method body.")
-    public Response executeSyncJob(@ApiParam Search search,
-                                   @ApiParam(name = "timeout", defaultValue = "60000")
+    public Response executeSyncJob(@RequestBody(required = true, description = "search request", content = @Content(mediaType = MediaType.APPLICATION_JSON)) Search search,
                                    @QueryParam("timeout") @DefaultValue("60000") long timeout) {
         final String username = username();
 

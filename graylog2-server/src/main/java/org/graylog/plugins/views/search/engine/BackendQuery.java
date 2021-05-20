@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.Objects;
 
@@ -30,6 +31,7 @@ import java.util.Objects;
         visible = true,
         defaultImpl = BackendQuery.Fallback.class)
 @JsonAutoDetect
+@Schema
 public interface BackendQuery {
     String TYPE_FIELD = "type";
 

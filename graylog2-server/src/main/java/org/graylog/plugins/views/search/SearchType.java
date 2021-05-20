@@ -20,11 +20,15 @@ import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import org.graylog.plugins.views.search.engine.BackendQuery;
+import org.graylog.plugins.views.search.searchtypes.MessageList;
+import org.graylog.plugins.views.search.searchtypes.events.EventList;
+import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
 import org.graylog2.contentpacks.ContentPackable;
 import org.graylog2.contentpacks.EntityDescriptorIds;
@@ -53,6 +57,11 @@ import java.util.stream.Collectors;
         property = SearchType.TYPE_FIELD,
         visible = true,
         defaultImpl = SearchType.Fallback.class)
+@JsonSubTypes({
+        @JsonSubTypes.Type(name = EventList.NAME, value = EventList.class),
+        @JsonSubTypes.Type(name = MessageList.NAME, value = MessageList.class),
+        @JsonSubTypes.Type(name = Pivot.NAME, value = Pivot.class)
+})
 @JsonAutoDetect
 public interface SearchType extends ContentPackable<SearchTypeEntity>, Exportable {
     String TYPE_FIELD = "type";
