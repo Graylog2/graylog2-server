@@ -170,6 +170,10 @@ const Scratchpad = () => {
 
     return () => {
       clipboard.current.destroy();
+
+      if (statusTimeout.current) {
+        clearTimeout(statusTimeout.current);
+      }
     };
   });
 
