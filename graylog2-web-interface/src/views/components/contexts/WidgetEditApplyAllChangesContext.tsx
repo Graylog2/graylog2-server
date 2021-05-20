@@ -15,10 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type Widget from 'src/views/logic/widgets/Widget';
-import type WidgetConfig from 'src/views/logic/widgets/WidgetConfig';
-import type { Widgets } from 'src/views/stores/WidgetStore';
 
+import type Widget from 'views/logic/widgets/Widget';
+import type WidgetConfig from 'views/logic/widgets/WidgetConfig';
+import type { Widgets } from 'views/stores/WidgetStore';
 import { singleton } from 'views/logic/singleton';
 
 type ApplySearchControlsChanges = (widget: Widget) => Widget | undefined;
