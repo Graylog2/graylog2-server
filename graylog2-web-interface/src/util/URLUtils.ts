@@ -25,6 +25,8 @@ const ACCEPTED_PROTOCOLS = ['http:', 'https:'];
 const URLUtils = {
   parser: new UAParser(),
   qualifyUrl(url) {
+    const serverUrl = new URI(AppConfig.gl2ServerUrl());
+    if (serverUrl.)
     return new URI(AppConfig.gl2ServerUrl() + url).normalizePathname().toString();
   },
   appPrefixed(url) {
