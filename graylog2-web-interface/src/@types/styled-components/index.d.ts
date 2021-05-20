@@ -22,6 +22,7 @@ declare module 'styled-components' {
   import type { Colors } from 'src/theme/colors';
   import type { Fonts } from 'src/theme/fonts';
   import type { Utils } from 'src/theme/utils';
+  import type { Margins } from 'src/theme/margins';
   import type { ThemeMode } from 'src/theme/constants';
   // eslint-disable-next-line import/order
   import type { Breakpoints } from 'src/theme/breakpoints';
@@ -31,6 +32,7 @@ declare module 'styled-components' {
     colors: Colors,
     fonts: Fonts,
     utils: Utils,
+    margins: Margins,
     mode: ThemeMode,
     changeMode: (string) => void,
     components: { [component: string]: any }

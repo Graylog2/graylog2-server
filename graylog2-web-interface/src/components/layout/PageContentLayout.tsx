@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import WithGlobalAppNotifications from 'components/notifications/WithGlobalAppNotifications';
 import { Grid } from 'components/graylog';
@@ -27,16 +27,20 @@ type Props = {
   className?: string
 };
 
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  overflow: auto;
-  height: 100%;
-  width: 100%;
+const Container = styled.div(({ theme }) => {
+  const padding = theme.margins.pageContent;
 
-  /* Bottom gap is defined by the footer */
-  padding: 9px 9px 0 9px;
-`;
+  return css`
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+    height: 100%;
+    width: 100%;
+
+    /* Bottom gap is defined by the footer */
+    padding: ${padding}px ${padding}px 0 ${padding}px;
+  `;
+});
 
 const StyledGrid = styled(Grid)`
   width: 100%;

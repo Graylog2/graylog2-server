@@ -14,22 +14,26 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// eslint-disable-next-line no-restricted-imports
-import { Row as BootstrapRow } from 'react-bootstrap';
-import styled, { css } from 'styled-components';
+import PropTypes from 'prop-types';
 
-export const RowContentStyles = css(({ theme }) => css`
-  background-color: ${theme.colors.global.contentBackground};
-  border: 1px solid ${theme.colors.variant.lighter.default};
-  margin-bottom: ${theme.margins.row}px;
-  border-radius: 4px;
-`);
+export type Margins = {
+  root: number,
+  row: number,
+  pageContent: number,
+};
 
-const Row = styled(BootstrapRow)`
-  &.content {
-    ${RowContentStyles}
-  }
-`;
+export const marginsPropTypes = PropTypes.shape({
+  root: PropTypes.number,
+  row: PropTypes.number,
+  pageContent: PropTypes.number,
+});
 
-/** @component */
-export default Row;
+const ROOT_MARGIN = 3;
+
+const margins: Margins = {
+  root: ROOT_MARGIN,
+  pageContent: ROOT_MARGIN * 3,
+  row: ROOT_MARGIN * 2,
+};
+
+export default margins;

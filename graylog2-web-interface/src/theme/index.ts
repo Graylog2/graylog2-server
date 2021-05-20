@@ -19,12 +19,14 @@ import PropTypes from 'prop-types';
 import breakpoints, { breakpointPropTypes } from './breakpoints';
 import colors, { colorsPropTypes } from './colors';
 import fonts, { fontsPropTypes } from './fonts';
+import margins, { marginsPropTypes } from './margins';
 import utils, { utilsPropTypes } from './utils';
 
 const themePropTypes = PropTypes.shape({
   breakpoints: breakpointPropTypes,
   colors: colorsPropTypes,
   fonts: fontsPropTypes,
+  margins: marginsPropTypes,
   utils: utilsPropTypes,
 });
 
@@ -32,6 +34,7 @@ export {
   breakpoints,
   colors,
   fonts,
-  utils,
+  margins,
   themePropTypes,
+  utils,
 };

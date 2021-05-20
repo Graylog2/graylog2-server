@@ -20,7 +20,7 @@ import { ThemeProvider } from 'styled-components';
 import { Router } from 'react-router-dom';
 
 import history from 'util/History';
-import { breakpoints, colors, fonts, utils } from 'theme';
+import { breakpoints, colors, fonts, utils, margins } from 'theme';
 import { THEME_MODE_LIGHT } from 'theme/constants';
 import buttonStyles from 'components/graylog/styles/buttonStyles';
 import aceEditorStyles from 'components/graylog/styles/aceEditorStyles';
@@ -37,6 +37,7 @@ const WrappingContainer = ({ children }) => {
     mode: THEME_MODE_LIGHT,
     changeMode: () => {},
     breakpoints,
+    margins,
     colors: themeColors,
     fonts,
     components: {
