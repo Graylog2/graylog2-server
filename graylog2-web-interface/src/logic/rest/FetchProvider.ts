@@ -32,9 +32,14 @@ const reportServerSuccess = () => {
 
 const defaultOnUnauthorizedError = (error) => ErrorsActions.report(createFromFetchError(error));
 
-const onServerError = (error, onUnauthorized = defaultOnUnauthorizedError) => {
+const emptyToUndefined = (s: string | undefined) => (s && s !== '' ? s : undefined);
+
+const onServerError = async (error: Response | undefined, onUnauthorized = defaultOnUnauthorizedError) => {
+  console.log(error);
+  const contentType = error.headers?.get('Content-Type');
+  const response = await (contentType?.startsWith('application/json') ? error.json().then((body) => body?.message) : error.text());
   const SessionStore = StoreProvider.getStore('Session');
-  const fetchError = new FetchError(error.statusText, error);
+  const fetchError = new FetchError(error.statusText, error.status, emptyToUndefined(response));
 
   if (SessionStore.isLoggedIn() && error.status === 401) {
     const SessionActions = ActionsProvider.getActions('Session');
