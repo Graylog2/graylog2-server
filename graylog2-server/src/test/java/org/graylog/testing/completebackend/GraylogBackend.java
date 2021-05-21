@@ -35,6 +35,7 @@ import java.util.concurrent.Future;
 public class GraylogBackend {
 
     private static final Logger LOG = LoggerFactory.getLogger(GraylogBackend.class);
+    private final Network network;
     private final ElasticsearchInstance es;
     private final MongoDBInstance mongodb;
     private final NodeInstance node;
@@ -83,7 +84,7 @@ public class GraylogBackend {
                     extraPorts,
                     pluginJars, mavenProjectDir);
 
-            return new GraylogBackend(esInstance, mongoDB, node);
+            return new GraylogBackend(network, esInstance, mongoDB, node);
         } catch (InterruptedException | ExecutionException e) {
             LOG.error("Container creation aborted", e);
             throw new RuntimeException(e);
@@ -92,7 +93,8 @@ public class GraylogBackend {
         }
     }
 
-    private GraylogBackend(ElasticsearchInstance es, MongoDBInstance mongodb, NodeInstance node) {
+    private GraylogBackend(Network network, ElasticsearchInstance es, MongoDBInstance mongodb, NodeInstance node) {
+        this.network = network;
         this.es = es;
         this.mongodb = mongodb;
         this.node = node;
@@ -128,5 +130,9 @@ public class GraylogBackend {
 
     public int mappedPortFor(int originalPort) {
         return node.mappedPortFor(originalPort);
+    }
+
+    public Network network() {
+        return this.network;
     }
 }
