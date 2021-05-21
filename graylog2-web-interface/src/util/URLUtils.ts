@@ -22,15 +22,35 @@ import AppConfig from 'util/AppConfig';
 
 const ACCEPTED_PROTOCOLS = ['http:', 'https:'];
 
+const qualifyRelativeURLWithCurrentHostname = (url: string): string => {
+  const uri = new URI(url);
+
+  if (!uri.hostname() || !uri.scheme()) {
+    const currentLocation = new URI(window.location);
+
+    return uri.absoluteTo(currentLocation).toString();
+  }
+
+  return url;
+};
+
 const URLUtils = {
   parser: new UAParser(),
-  qualifyUrl(url) {
-    return new URI(AppConfig.gl2ServerUrl() + url).normalizePathname().toString();
+  qualifyUrl(url: string) {
+    const parsedUrl = new URI(url);
+
+    if (parsedUrl.is('absolute')) {
+      return url;
+    }
+
+    const absoluteServerUrl = qualifyRelativeURLWithCurrentHostname(AppConfig.gl2ServerUrl() ?? '');
+
+    return new URI(absoluteServerUrl + url).normalizePathname().toString();
   },
-  appPrefixed(url) {
+  appPrefixed(url: string) {
     return URLUtils.concatURLPath(AppConfig.gl2AppPathPrefix(), url);
   },
-  getParsedSearch(location) {
+  getParsedSearch(location: Location) {
     let search = {};
     let query = location.search;
 
@@ -43,7 +63,7 @@ const URLUtils = {
 
     return search;
   },
-  getParsedHash(location) {
+  getParsedHash(location: Location) {
     let result = {};
     let { hash } = location;
 
@@ -56,13 +76,13 @@ const URLUtils = {
 
     return result;
   },
-  replaceHashParam(name, newValue) {
+  replaceHashParam(name: string, newValue: string) {
     const origHash = this.getParsedHash(window.location);
 
     origHash[name] = newValue;
     window.location.replace(`#${Qs.stringify(origHash)}`);
   },
-  concatURLPath(...allArgs) {
+  concatURLPath(...allArgs: string[]) {
     const args = Array(allArgs.length);
 
     // eslint-disable-next-line no-plusplus
@@ -74,12 +94,12 @@ const URLUtils = {
 
     return joinedPath.replace(/[/]+/g, '/');
   },
-  areCredentialsInURLSupported() {
+  areCredentialsInURLSupported(): boolean {
     const browser = URLUtils.parser.getBrowser();
 
     return browser.name !== 'IE' && browser.name !== 'Edge';
   },
-  isValidURL(str) {
+  isValidURL(str: string) {
     let isValid = true;
 
     try {
@@ -92,12 +112,26 @@ const URLUtils = {
     return isValid;
   },
 
-  hasAcceptedProtocol(string, acceptedProtocols = ACCEPTED_PROTOCOLS) {
+  hasAcceptedProtocol(string: string, acceptedProtocols = ACCEPTED_PROTOCOLS) {
     const url = new URL(string);
 
     return acceptedProtocols.includes(url.protocol);
   },
 };
+
+export const qualifyUrlWithSessionCredentials = (url: string, sessionId: string) => {
+  let result = new URI(URLUtils.qualifyUrl(url));
+
+  if (URLUtils.areCredentialsInURLSupported()) {
+    const trimmedSessionId = sessionId !== undefined ? sessionId : '';
+
+    result = result.username(trimmedSessionId)
+      .password('session');
+  }
+
+  return result.toString();
+};
+
 export default URLUtils;
 
 export const {

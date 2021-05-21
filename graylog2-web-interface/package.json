@@ -130,6 +130,7 @@
     "@types/plotly.js": "1.54.8",
     "@types/react-beautiful-dnd": "^13.0.0",
     "@types/react-plotly.js": "^2.2.4",
+    "@types/urijs": "^1.19.15",
     "assets-webpack-plugin": "^5.1.2",
     "babel-loader": "^8.2.2",
     "babel-plugin-add-module-exports": "^1.0.2",
