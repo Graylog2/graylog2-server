@@ -31,10 +31,31 @@ const reportServerSuccess = () => {
 };
 
 const defaultOnUnauthorizedError = (error) => ErrorsActions.report(createFromFetchError(error));
+const createErrorResponse = async (response: Response) =>{
+  if (typeof response !== "undefined" && response.status >= 400) {
+    const serverResponseBody = await response.clone().json();
+    const serverResponseText = await response.clone().text();
+    const error = {
+      res: {
+        body: serverResponseBody,
+        status: response.status,
+        statusText: response.statusText,
+        text: serverResponseText,
+      },
+      body: serverResponseBody,
+      status: response.status,
+      statusText: response.statusText,
+    }
 
-const onServerError = (error, onUnauthorized = defaultOnUnauthorizedError) => {
+    return error;
+  }
+  return response;
+}
+const onServerError =  async (error, onUnauthorized = defaultOnUnauthorizedError) => {
+
+  const errorResponse = await createErrorResponse(error);
   const SessionStore = StoreProvider.getStore('Session');
-  const fetchError = new FetchError(error.statusText, error);
+  const fetchError = new FetchError(error.statusText, errorResponse);
 
   if (SessionStore.isLoggedIn() && error.status === 401) {
     const SessionActions = ActionsProvider.getActions('Session');
@@ -73,7 +94,6 @@ const defaultResponseHandler = (resp: Response) => {
 
     return noContent ? null : resp.json();
   }
-
   throw resp;
 };
 
