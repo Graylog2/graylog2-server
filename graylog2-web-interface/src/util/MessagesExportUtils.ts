@@ -36,7 +36,9 @@ const downloadFile = (exportJobId: string, filename: string) => {
   const link = document.createElement('a');
   link.download = filename;
   link.href = qualifyUrlWithSessionCredentials(ApiRoutes.MessagesController.jobResults(exportJobId, filename).url, SessionStore.getSessionId());
+  document.body.appendChild(link);
   link.click();
+  document.body.removeChild(link);
 };
 
 export const exportSearchMessages = (exportPayload: ExportPayload, searchId: string, mimeType: string, filename?: string) => {
