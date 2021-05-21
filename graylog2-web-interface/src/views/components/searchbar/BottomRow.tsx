@@ -16,10 +16,12 @@
  */
 import styled from 'styled-components';
 
-import { Row } from 'components/graylog';
+const BottomRow = styled.div(({ theme }) => `
+  display: flex;
 
-const TopRow = styled(Row)`
-  margin-bottom: 10px;
-`;
+  @media (max-width: ${theme.breakpoints.max.sm}) {
+    flex-direction: column;
+  }
+`);
 
-export default TopRow;
+export default BottomRow;

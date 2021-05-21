@@ -73,7 +73,7 @@ describe('SearchBar', () => {
     const streamsFilter = screen.getByTestId('streams-filter');
     const liveUpdate = screen.getByLabelText('Refresh Search Controls');
     const searchButton = screen.getByTitle('Perform search');
-    const metaButtons = screen.getByLabelText('Search Meta Buttons');
+    const metaButtons = screen.getByText('Saved Search Controls');
 
     expect(timeRangeButton).not.toBeNull();
     expect(timeRangeDisplay).not.toBeNull();
