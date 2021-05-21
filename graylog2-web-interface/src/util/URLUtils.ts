@@ -43,7 +43,7 @@ const URLUtils = {
       return url;
     }
 
-    const absoluteServerUrl = qualifyRelativeURLWithCurrentHostname(AppConfig.gl2ServerUrl());
+    const absoluteServerUrl = qualifyRelativeURLWithCurrentHostname(AppConfig.gl2ServerUrl() ?? '');
 
     return new URI(absoluteServerUrl + url).normalizePathname().toString();
   },
