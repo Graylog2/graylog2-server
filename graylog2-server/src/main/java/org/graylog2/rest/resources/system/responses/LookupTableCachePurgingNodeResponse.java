@@ -27,7 +27,7 @@ public class LookupTableCachePurgingNodeResponse {
     @JsonCreator
     private LookupTableCachePurgingNodeResponse(
             @JsonProperty("success") boolean success,
-            @JsonProperty("nodeId") String nodeId,
+            @JsonProperty("node_id") String nodeId,
             @JsonProperty("message") String message) {
         this.success = success;
         this.nodeId = nodeId;
