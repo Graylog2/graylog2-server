@@ -26,6 +26,7 @@ import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.Permission;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
+import org.apache.shiro.authz.permission.WildcardPermissionResolver;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.graylog.grn.GRN;
@@ -67,6 +68,7 @@ public class MongoDbAuthorizationRealm extends AuthorizingRealm {
         setCachingEnabled(true);
         setCacheManager(mongoDbAuthorizationCacheManager);
         serverEventBus.register(this);
+        setPermissionResolver(new WildcardPermissionResolver(true));
     }
 
     @Override

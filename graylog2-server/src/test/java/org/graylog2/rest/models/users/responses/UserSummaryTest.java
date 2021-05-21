@@ -19,9 +19,9 @@ package org.graylog2.rest.models.users.responses;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
-import org.apache.shiro.authz.permission.WildcardPermission;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNTypes;
+import org.graylog.security.permissions.CaseSensitiveWildcardPermission;
 import org.graylog.security.permissions.GRNPermission;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -42,7 +42,7 @@ class UserSummaryTest {
             "Hans",
             "Dampf",
             "Hans Dampf",
-            ImmutableList.of(new WildcardPermission("dashboard:create:123")),
+            ImmutableList.of(new CaseSensitiveWildcardPermission("dashboard:create:123")),
             ImmutableList.of(GRNPermission.create(RestPermissions.ENTITY_OWN, grnRegistry.newGRN(GRNTypes.STREAM, "1234"))),
             null,
             null,

@@ -20,7 +20,7 @@ import com.google.common.collect.ImmutableMap;
 import org.apache.shiro.authz.Permission;
 import org.apache.shiro.authz.permission.AllPermission;
 import org.apache.shiro.authz.permission.RolePermissionResolver;
-import org.apache.shiro.authz.permission.WildcardPermission;
+import org.graylog.security.permissions.CaseSensitiveWildcardPermission;
 import org.graylog2.shared.users.Role;
 import org.graylog2.users.RoleService;
 import org.slf4j.Logger;
@@ -67,7 +67,7 @@ public class InMemoryRolePermissionResolver implements RolePermissionResolver {
             if (p.equals("*")) {
                 return new AllPermission();
             } else {
-                return new WildcardPermission(p);
+                return new CaseSensitiveWildcardPermission(p);
             }
         }).collect(Collectors.toList());
     }

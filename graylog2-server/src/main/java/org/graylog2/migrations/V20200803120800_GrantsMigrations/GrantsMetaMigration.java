@@ -22,12 +22,12 @@ import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-import org.apache.shiro.authz.permission.WildcardPermission;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNType;
 import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.security.Capability;
 import org.graylog.security.DBGrantService;
+import org.graylog.security.permissions.CaseSensitiveWildcardPermission;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.migrations.Migration;
 import org.graylog2.plugin.cluster.ClusterConfigService;
@@ -127,7 +127,7 @@ public class GrantsMetaMigration extends Migration {
     }
 
     // only needed to access protected getParts() method from WildcardPermission
-    public static class MigrationWildcardPermission extends WildcardPermission {
+    public static class MigrationWildcardPermission extends CaseSensitiveWildcardPermission {
         public MigrationWildcardPermission(String wildcardString) {
             super(wildcardString);
         }
