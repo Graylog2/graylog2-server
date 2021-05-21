@@ -168,6 +168,9 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "elasticsearch_mute_deprecation_warnings")
     private boolean muteDeprecationWarnings = false;
 
+    @Parameter(value = "forwarder_enabled")
+    private boolean forwarderEnabled = false;
+
     public boolean isMuteDeprecationWarnings() {
         return muteDeprecationWarnings;
     }
@@ -337,6 +340,23 @@ public class Configuration extends BaseConfiguration {
 
     public Set<String> getEnabledTlsProtocols() {
         return enabledTlsProtocols;
+    }
+
+    /**
+     * The property is supposed to be migrated into the according plugin configuration
+     * as soon as required facilities for injection of plugin config beans into
+     * plugin beans are in place.
+     *
+     * Currently it's only possible for {@link org.graylog2.Configuration}.
+     * See {@link org.graylog2.plugin.Plugin}
+     *
+     * NB(!!!):
+     * Even though it's exposed as public API, it MUST NOT be used in the code.
+     * It's expected to be DELETED soon!
+     */
+    @Deprecated
+    public boolean isForwarderEnabled() {
+        return forwarderEnabled;
     }
 
     @ValidatorMethod

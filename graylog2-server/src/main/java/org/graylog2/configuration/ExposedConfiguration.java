@@ -88,6 +88,9 @@ public abstract class ExposedConfiguration {
     @JsonProperty("gc_warning_threshold")
     public abstract String gcWarningThreshold();
 
+    @JsonProperty("forwarder_enabled")
+    public abstract boolean forwarderEnabled();
+
     public static ExposedConfiguration create(Configuration configuration) {
         return create(
                 configuration.getInputbufferProcessors(),
@@ -107,7 +110,8 @@ public abstract class ExposedConfiguration {
                 configuration.getStreamProcessingMaxFaults(),
                 configuration.getOutputModuleTimeout(),
                 configuration.getStaleMasterTimeout(),
-                configuration.getGcWarningThreshold().toString());
+                configuration.getGcWarningThreshold().toString(),
+                configuration.isForwarderEnabled());
     }
 
     @JsonCreator
@@ -129,7 +133,8 @@ public abstract class ExposedConfiguration {
             @JsonProperty("stream_processing_max_faults") int streamProcessingMaxFaults,
             @JsonProperty("output_module_timeout") long outputModuleTimeout,
             @JsonProperty("stale_master_timeout") int staleMasterTimeout,
-            @JsonProperty("gc_warning_threshold") String gcWarningThreshold) {
+            @JsonProperty("gc_warning_threshold") String gcWarningThreshold,
+            @JsonProperty("forwarder_enabled") boolean forwarderEnabled) {
         return new AutoValue_ExposedConfiguration(
                 inputBufferProcessors,
                 processBufferProcessors,
@@ -148,7 +153,8 @@ public abstract class ExposedConfiguration {
                 streamProcessingMaxFaults,
                 outputModuleTimeout,
                 staleMasterTimeout,
-                gcWarningThreshold);
+                gcWarningThreshold,
+                forwarderEnabled);
     }
 
 }
