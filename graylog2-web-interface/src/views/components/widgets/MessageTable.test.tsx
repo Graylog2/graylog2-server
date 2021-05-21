@@ -18,6 +18,7 @@ import * as React from 'react';
 import { mount } from 'wrappedEnzyme';
 import * as Immutable from 'immutable';
 import suppressConsole from 'helpers/suppressConsole';
+import { MockStore } from 'helpers/mocking';
 
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldType from 'views/logic/fieldtypes/FieldType';
@@ -27,6 +28,10 @@ import MessageTable from './MessageTable';
 
 import InteractiveContext from '../contexts/InteractiveContext';
 import HighlightMessageContext from '../contexts/HighlightMessageContext';
+
+jest.mock('stores/configurations/ConfigurationsStore', () => ({
+  ConfigurationsStore: MockStore(),
+}));
 
 const messages = [
   {

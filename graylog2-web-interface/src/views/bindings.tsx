@@ -83,8 +83,8 @@ import HeatmapVisualizationConfiguration from 'views/components/aggregationbuild
 import HeatmapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/HeatmapVisualizationConfig';
 import visualizationBindings from 'views/components/visualizations/bindings';
 import AggregationWizard from 'views/components/aggregationwizard/AggregationWizard';
-
 import { filterCloudValueActions } from 'util/conditional/filterValueActions';
+
 import type { ActionHandlerArguments } from './components/actions/ActionHandler';
 import NumberVisualizationConfig from './logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
 import BarVisualizationConfiguration from './components/aggregationbuilder/BarVisualizationConfiguration';
