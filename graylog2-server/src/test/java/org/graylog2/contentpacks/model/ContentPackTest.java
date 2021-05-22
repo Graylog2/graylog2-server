@@ -50,6 +50,7 @@ import java.util.Collections;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 
 public class ContentPackTest {
 
@@ -145,7 +146,7 @@ public class ContentPackTest {
         String expectedJSON = String.join("", Files.readAllLines(path)).replace("\n", "").replace("\r", "");
 
         final String jsonTxt = objectMapper.writeValueAsString(contentPack);
-        assertThat(jsonTxt).isEqualTo(expectedJSON);
+        assertThatJson(jsonTxt).isEqualTo(expectedJSON);
 
         final ContentPack readContentPack = objectMapper.readValue(jsonTxt, ContentPack.class);
         assertThat(readContentPack.id()).isEqualTo(contentPack.id());
