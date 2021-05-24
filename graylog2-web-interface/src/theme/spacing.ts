@@ -17,9 +17,8 @@
 import PropTypes from 'prop-types';
 
 export type Spacing = {
-  base: string,
-  none: string,
-  px: string,
+  0: string,
+  1: string,
   xxs: string,
   xs: string,
   sm: string,
@@ -30,9 +29,8 @@ export type Spacing = {
 };
 
 export const spacingPropTypes = PropTypes.shape({
-  base: PropTypes.string,
-  none: PropTypes.string,
-  px: PropTypes.string,
+  0: PropTypes.string,
+  1: PropTypes.string,
   xxs: PropTypes.string,
   xs: PropTypes.string,
   sm: PropTypes.string,
@@ -44,17 +42,21 @@ export const spacingPropTypes = PropTypes.shape({
 
 const base = '1rem';
 
+let count;
+const fibSequence = [0, 1];
+const sizes = ['xxs', 'xs', 'sm', 'md', 'lg', 'xl', 'xxl'];
+
+for (count = 2; count <= 8; count += 1) {
+  fibSequence[count] = fibSequence[count - 2] + fibSequence[count - 1];
+}
+
 const spacing = {
-  base,
-  none: '0',
-  px: '1px',
-  xxs: `calc(0.25 * ${base})`,
-  xs: `calc(0.5 * ${base})`,
-  sm: `calc(0.75 * ${base})`,
-  md: `calc(1.25 * ${base})`,
-  lg: `calc(2 * ${base})`,
-  xl: `calc(3.25 * ${base})`,
-  xxl: `calc(5.25 * ${base})`,
+  0: '0',
+  1: '1px',
 } as Spacing;
+
+sizes.forEach((size, index) => {
+  spacing[size] = `calc(${0.25 * fibSequence[index + 2]} * ${base})`;
+});
 
 export default spacing;
