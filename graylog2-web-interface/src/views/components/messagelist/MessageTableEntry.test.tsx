@@ -17,8 +17,13 @@
 import * as React from 'react';
 import { mount } from 'wrappedEnzyme';
 import * as Immutable from 'immutable';
+import MockStore from 'helpers/mocking/StoreMock';
 
 import MessageTableEntry from './MessageTableEntry';
+
+jest.mock('stores/configurations/ConfigurationsStore', () => ({
+  ConfigurationsStore: MockStore(),
+}));
 
 describe('MessageTableEntry', () => {
   it('renders message for unknown selected fields', () => {

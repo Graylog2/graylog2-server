@@ -46,6 +46,11 @@ jest.mock('views/stores/ViewMetadataStore', () => ({
   ),
 }));
 
+jest.mock('react-sizeme', () => ({
+  // eslint-disable-next-line react/prop-types
+  SizeMe: ({ children }) => <div>{children({ size: { width: 1024 } })}</div>,
+}));
+
 const mockedQueryIds = Immutable.List(['query-id-1', 'query-id-2']);
 
 jest.mock('views/stores/QueryIdsStore', () => ({
@@ -71,6 +76,13 @@ jest.mock('views/components/SearchResult', () => () => <div>Mocked search result
 jest.mock('views/components/DashboardSearchBar', () => () => <div>Mocked dashboard search bar</div>);
 jest.mock('components/layout/Footer', () => mockComponent('Footer'));
 jest.mock('views/components/contexts/WidgetFocusProvider', () => jest.fn());
+
+jest.mock('views/stores/FieldTypesStore', () => ({
+  FieldTypesStore: MockStore(),
+  FieldTypesActions: {
+    refresh: jest.fn(),
+  },
+}));
 
 const mockWidgetEditing = () => {
   asMock(WidgetFocusProvider as React.FunctionComponent).mockImplementation(({ children }) => (
@@ -132,9 +144,9 @@ describe('Dashboard Search', () => {
   it('should list tabs for dashboard pages', async () => {
     render(<SimpleSearch />);
 
-    await waitFor(() => expect(screen.getByText('First dashboard page')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByRole('button', { name: 'First dashboard page' })).toBeInTheDocument());
 
-    expect(screen.getByText('Second dashboard page')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Second dashboard page' })).toBeInTheDocument();
   });
 
   it('should not list tabs for pages when focusing a widget', async () => {

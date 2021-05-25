@@ -14,12 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import styled from 'styled-components';
+import { useStore } from 'stores/connect';
+import { CurrentQueryStore } from 'views/stores/CurrentQueryStore';
+import Query from 'views/logic/queries/Query';
 
-import { Row } from 'components/graylog';
-
-const TopRow = styled(Row)`
-  margin-bottom: 10px;
-`;
-
-export default TopRow;
+const useCurrentQuery = (): Query => useStore(CurrentQueryStore);
+export default useCurrentQuery;
