@@ -35,6 +35,6 @@ public abstract class AdapterSharedStoresUpdated {
 
     @JsonCreator
     public static AdapterSharedStoresUpdated create(@JsonProperty("ids") Set<String> ids) {
-        return new AutoValue_Adapter_SharedStoresUpdated(ids);
+        return new AutoValue_AdapterSharedStoresUpdated(ids);
     }
 }
