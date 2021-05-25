@@ -16,35 +16,18 @@
  */
 import PropTypes from 'prop-types';
 
-export type Spacing = {
-  0: string,
-  1: string,
-  xxs: string,
-  xs: string,
-  sm: string,
-  md: string,
-  lg: string,
-  xl: string,
-  xxl: string,
-};
+const SIZES = ['0', '1', 'xxs', 'xs', 'sm', 'md', 'lg', 'xl', 'xxl'] as const;
+const BASE = '1rem';
 
-export const spacingPropTypes = PropTypes.shape({
-  0: PropTypes.string,
-  1: PropTypes.string,
-  xxs: PropTypes.string,
-  xs: PropTypes.string,
-  sm: PropTypes.string,
-  md: PropTypes.string,
-  lg: PropTypes.string,
-  xl: PropTypes.string,
-  xxl: PropTypes.string,
-});
+type Sizes = typeof SIZES[number]
+export type Spacing = Record<Sizes, string>;
 
-const base = '1rem';
+const props = SIZES.reduce((acc, key) => ({ ...acc, [key]: PropTypes.string }), {});
+
+export const spacingPropTypes = PropTypes.shape(props);
 
 let count;
 const fibSequence = [0, 1];
-const sizes = ['xxs', 'xs', 'sm', 'md', 'lg', 'xl', 'xxl'];
 
 for (count = 2; count <= 8; count += 1) {
   fibSequence[count] = fibSequence[count - 2] + fibSequence[count - 1];
@@ -55,8 +38,8 @@ const spacing = {
   1: '1px',
 } as Spacing;
 
-sizes.forEach((size, index) => {
-  spacing[size] = `calc(${0.25 * fibSequence[index + 2]} * ${base})`;
+SIZES.forEach((size, index) => {
+  spacing[size] = `calc(${0.25 * fibSequence[index + 2]} * ${BASE})`;
 });
 
 export default spacing;
