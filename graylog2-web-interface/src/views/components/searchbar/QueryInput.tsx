@@ -29,21 +29,34 @@ import SearchBarAutoCompletions from './SearchBarAutocompletions';
 import type { Completer } from './SearchBarAutocompletions';
 
 type Props = {
+  className?: string
   completerFactory: (completers: Array<Completer>) => AutoCompleter,
   completers: Array<Completer>,
   disabled?: boolean,
+  height?: number,
   onBlur?: (query: string) => void,
   onChange: (query: string) => Promise<string>,
   onExecute: (query: string) => void,
   placeholder?: string,
-  height?: number,
   theme: DefaultTheme,
   value: string,
 };
 
 const defaultCompleterFactory = (completers) => new SearchBarAutoCompletions(completers);
 
-const QueryInput = ({ disabled, onBlur, onChange, onExecute, placeholder, value, completers, completerFactory = defaultCompleterFactory, theme, height }: Props) => {
+const QueryInput = ({
+  className,
+  completerFactory = defaultCompleterFactory,
+  completers,
+  disabled,
+  height,
+  onBlur,
+  onChange,
+  onExecute,
+  placeholder,
+  theme,
+  value,
+}: Props) => {
   const completer = useMemo(() => completerFactory(completers), [completerFactory, completers]);
   const _onExecute = useCallback((editor: Editor) => {
     if (editor.completer && editor.completer.popup) {
@@ -69,7 +82,7 @@ const QueryInput = ({ disabled, onBlur, onChange, onExecute, placeholder, value,
   }, [completer, _onExecute]);
 
   return (
-    <div className="query" style={{ display: 'flex' }} data-testid="query-input">
+    <div className={`query ${className}`} style={{ display: 'flex' }} data-testid="query-input">
       <UserPreferencesContext.Consumer>
         {({ enableSmartSearch = true }) => (
           <StyledAceEditor mode="lucene"
@@ -102,19 +115,21 @@ const QueryInput = ({ disabled, onBlur, onChange, onExecute, placeholder, value,
 };
 
 QueryInput.propTypes = {
+  className: PropTypes.string,
   completerFactory: PropTypes.func,
   completers: PropTypes.array,
   disabled: PropTypes.bool,
+  height: PropTypes.number,
   onBlur: PropTypes.func,
   onChange: PropTypes.func.isRequired,
   onExecute: PropTypes.func.isRequired,
   placeholder: PropTypes.string,
-  height: PropTypes.number,
   theme: themePropTypes.isRequired,
   value: PropTypes.string,
 };
 
 QueryInput.defaultProps = {
+  className: '',
   completerFactory: defaultCompleterFactory,
   completers: [],
   disabled: false,

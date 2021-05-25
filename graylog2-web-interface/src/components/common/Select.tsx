@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import lodash from 'lodash';
 import PropTypes from 'prop-types';
+import { isEqual, find } from 'lodash';
 import { DefaultTheme, withTheme } from 'styled-components';
 import ReactSelect, { components as Components, createFilter } from 'react-select';
 import CreatableSelect from 'react-select/creatable';
@@ -24,6 +24,8 @@ import CreatableSelect from 'react-select/creatable';
 import { themePropTypes } from 'theme';
 
 import Icon from './Icon';
+
+export const CONTROL_CLASS = 'common-select-control';
 
 type Option = { [key: string]: any };
 
@@ -50,6 +52,10 @@ const DropdownIndicator = (props) => {
     </div>
   );
 };
+
+const Control = (props) => (
+  <Components.Control {...props} className={CONTROL_CLASS} />
+);
 
 type CustomOptionProps = {
   data: any,
@@ -169,12 +175,14 @@ type OverriddenComponents = {
   DropdownIndicator: React.ComponentType<any>;
   MultiValueRemove: React.ComponentType<any>;
   IndicatorSeparator: React.ComponentType<any>;
+  Control: React.ComponentType<any>;
 };
 
 const _components: OverriddenComponents = {
   DropdownIndicator,
   MultiValueRemove,
   IndicatorSeparator,
+  Control,
 };
 
 const _styles = ({ size, theme }) => ({
@@ -364,7 +372,7 @@ class Select extends React.Component<Props, State> {
       this.setState({ value: nextProps.value });
     }
 
-    if (inputProps !== nextProps.inputProps
+    if (!isEqual(inputProps, nextProps.inputProps)
       || optionRenderer !== nextProps.optionRenderer
       || valueRenderer !== nextProps.valueRenderer) {
       this.setState({ customComponents: this.getCustomComponents(inputProps, optionRenderer, valueRenderer) });
@@ -431,7 +439,7 @@ class Select extends React.Component<Props, State> {
         [valueKey]: v,
         [displayKey]: v,
       };
-      const option = lodash.find(options, predicate);
+      const option = find(options, predicate);
 
       return option || predicate;
     });
@@ -525,7 +533,7 @@ class Select extends React.Component<Props, State> {
                        isMulti={isMulti}
                        isDisabled={isDisabled}
                        isClearable={isClearable}
-                       getOptionLabel={(option) => option[displayKey]}
+                       getOptionLabel={(option) => option[displayKey] || option.label}
                        getOptionValue={(option) => option[valueKey]}
                        filterOption={customFilter}
                        components={mergedComponents}

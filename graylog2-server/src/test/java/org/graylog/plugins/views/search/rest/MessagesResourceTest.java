@@ -24,6 +24,7 @@ import org.graylog.plugins.views.search.SearchExecutionGuard;
 import org.graylog.plugins.views.search.errors.PermissionException;
 import org.graylog.plugins.views.search.export.AuditContext;
 import org.graylog.plugins.views.search.export.CommandFactory;
+import org.graylog.plugins.views.search.export.ExportJobService;
 import org.graylog.plugins.views.search.export.ExportMessagesCommand;
 import org.graylog.plugins.views.search.export.MessagesExporter;
 import org.graylog.plugins.views.search.export.MessagesRequest;
@@ -83,7 +84,7 @@ public class MessagesResourceTest {
 
     class MessagesTestResource extends MessagesResource {
         public MessagesTestResource(MessagesExporter exporter, CommandFactory commandFactory, SearchDomain searchDomain, SearchExecutionGuard executionGuard, PermittedStreams permittedStreams, ObjectMapper objectMapper, EventBus eventBus) {
-            super(exporter, commandFactory, searchDomain, executionGuard, permittedStreams, objectMapper, eventBus);
+            super(exporter, commandFactory, searchDomain, executionGuard, permittedStreams, objectMapper, eventBus, mock(ExportJobService.class));
         }
 
         @Nullable

@@ -18,6 +18,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import * as ImmutablePropTypes from 'react-immutable-proptypes';
+import { List } from 'immutable';
 
 import connect from 'stores/connect';
 import { TitlesActions } from 'views/stores/TitlesStore';
@@ -28,6 +29,7 @@ import { QueryIdsStore } from 'views/stores/QueryIdsStore';
 import { QueryTitlesStore } from 'views/stores/QueryTitlesStore';
 import { ViewMetaData, ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import { ViewStatesActions } from 'views/stores/ViewStatesStore';
+import { QueryId } from 'views/logic/queries/Query';
 
 import QueryTabs from './QueryTabs';
 
@@ -56,15 +58,13 @@ const onCloseTab = (queryId, currentQuery, queries) => {
 };
 
 type Props = {
-  children?: React.ReactElement,
-  queries: string[],
+  queries: List<QueryId>,
   queryTitles: Immutable.Map<string, string>,
   viewMetadata: ViewMetaData,
 };
 
-const QueryBar = ({ children, queries, queryTitles, viewMetadata }: Props) => {
+const QueryBar = ({ queries, queryTitles, viewMetadata }: Props) => {
   const { activeQuery } = viewMetadata;
-  const childrenWithQueryId = React.Children.map(children, (child) => React.cloneElement(child, { queryId: activeQuery }));
   const selectQueryAndExecute = (queryId) => onSelectQuery(queryId);
 
   return (
@@ -73,14 +73,11 @@ const QueryBar = ({ children, queries, queryTitles, viewMetadata }: Props) => {
                titles={queryTitles}
                onSelect={selectQueryAndExecute}
                onTitleChange={onTitleChange}
-               onRemove={(queryId) => onCloseTab(queryId, activeQuery, queries)}>
-      {childrenWithQueryId}
-    </QueryTabs>
+               onRemove={(queryId) => onCloseTab(queryId, activeQuery, queries)} />
   );
 };
 
 QueryBar.propTypes = {
-  children: PropTypes.element,
   queries: ImmutablePropTypes.listOf(PropTypes.string).isRequired,
   queryTitles: ImmutablePropTypes.mapOf(PropTypes.string, PropTypes.string).isRequired,
   viewMetadata: PropTypes.exact({
@@ -90,10 +87,6 @@ QueryBar.propTypes = {
     summary: PropTypes.string,
     activeQuery: PropTypes.string.isRequired,
   }).isRequired,
-};
-
-QueryBar.defaultProps = {
-  children: null,
 };
 
 export default connect(QueryBar, { queries: QueryIdsStore, queryTitles: QueryTitlesStore, viewMetadata: ViewMetadataStore });

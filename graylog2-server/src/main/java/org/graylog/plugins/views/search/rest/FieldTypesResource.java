@@ -16,12 +16,12 @@
  */
 package org.graylog.plugins.views.search.rest;
 
-import com.google.common.collect.ImmutableSet;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
+import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.rest.exceptions.MissingStreamPermissionException;
 import org.graylog2.shared.rest.resources.RestResource;
@@ -57,7 +57,7 @@ public class FieldTypesResource extends RestResource implements PluginRestResour
     @GET
     @ApiOperation(value = "Retrieve the list of all fields present in the system")
     public Set<MappedFieldTypeDTO> allFieldTypes() {
-        return mappedFieldTypesService.fieldTypesByStreamIds(permittedStreams.load(this::allowedToReadStream));
+        return mappedFieldTypesService.fieldTypesByStreamIds(permittedStreams.load(this::allowedToReadStream), RelativeRange.allTime());
     }
 
     private boolean allowedToReadStream(String streamId) {
@@ -68,9 +68,10 @@ public class FieldTypesResource extends RestResource implements PluginRestResour
     @ApiOperation(value = "Retrieve the field list of a given set of streams")
     @NoAuditEvent("This is not changing any data")
     public Set<MappedFieldTypeDTO> byStreams(FieldTypesForStreamsRequest request) {
-        checkStreamPermission(request.streams());
+        final Set<String> streams = request.streams().orElse(permittedStreams.load(this::allowedToReadStream));
+        checkStreamPermission(streams);
 
-        return mappedFieldTypesService.fieldTypesByStreamIds(request.streams());
+        return mappedFieldTypesService.fieldTypesByStreamIds(streams, request.timerange().orElse(RelativeRange.allTime()));
     }
 
     private void checkStreamPermission(Set<String> streamIds) {

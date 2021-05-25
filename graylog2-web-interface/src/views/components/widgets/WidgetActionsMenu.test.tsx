@@ -37,6 +37,7 @@ import ViewState from 'views/logic/views/ViewState';
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import { loadDashboard } from 'views/logic/views/Actions';
 import { TitlesMap } from 'views/stores/TitleTypes';
+import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 
 import WidgetActionsMenu from './WidgetActionsMenu';
 
@@ -114,23 +115,25 @@ describe('<Widget />', () => {
     focusedWidget,
     ...props
   }: DummyWidgetProps) => (
-    <WidgetFocusContext.Provider value={{
-      setWidgetFocusing,
-      setWidgetEditing,
-      unsetWidgetFocusing,
-      unsetWidgetEditing,
-      focusedWidget,
-    }}>
-      <WidgetContext.Provider value={propsWidget}>
-        <WidgetActionsMenu isFocused={false}
-                           toggleEdit={() => {}}
-                           title="Widget Title"
-                           view={viewStoreState}
-                           position={new WidgetPosition(1, 1, 1, 1)}
-                           onPositionsChange={() => {}}
-                           {...props} />
-      </WidgetContext.Provider>
-    </WidgetFocusContext.Provider>
+    <FieldTypesContext.Provider value={{ all: Immutable.List(), queryFields: Immutable.Map() }}>
+      <WidgetFocusContext.Provider value={{
+        setWidgetFocusing,
+        setWidgetEditing,
+        unsetWidgetFocusing,
+        unsetWidgetEditing,
+        focusedWidget,
+      }}>
+        <WidgetContext.Provider value={propsWidget}>
+          <WidgetActionsMenu isFocused={false}
+                             toggleEdit={() => {}}
+                             title="Widget Title"
+                             view={viewStoreState}
+                             position={new WidgetPosition(1, 1, 1, 1)}
+                             onPositionsChange={() => {}}
+                             {...props} />
+        </WidgetContext.Provider>
+      </WidgetFocusContext.Provider>
+    </FieldTypesContext.Provider>
   );
 
   it('is updating widget focus context on focus', () => {
