@@ -94,7 +94,7 @@ const RolesSection = ({ user, onSubmit }: Props) => {
     <SectionComponent title="Roles" showLoading={loading}>
       <h3>Assign Roles</h3>
       <Container>
-        <RolesSelector onSubmit={_onAssignRole} assignedRolesIds={user.roles} identifier={(role) => role.name} />
+        <RolesSelector onSubmit={_onAssignRole} assignedRolesIds={user.roles} identifier={(role) => role.name} multi />
       </Container>
 
       <ErrorAlert onClose={setErrors}>
