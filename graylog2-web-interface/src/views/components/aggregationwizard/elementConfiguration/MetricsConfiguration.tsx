@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useCallback } from 'react';
 import { useFormikContext, FieldArray } from 'formik';
 
 import ElementConfigurationContainer from './ElementConfigurationContainer';
@@ -24,19 +25,23 @@ import MetricElement from '../aggregationElements/MetricElement';
 import { WidgetConfigFormValues } from '../WidgetConfigForm';
 
 const MetricsConfiguration = () => {
-  const { values: { metrics } } = useFormikContext<WidgetConfigFormValues>();
+  const { values: { metrics }, setValues, values } = useFormikContext<WidgetConfigFormValues>();
+
+  const removeMetric = useCallback((index) => () => {
+    setValues(MetricElement.onRemove(index, values));
+  }, [setValues, values]);
 
   return (
     <FieldArray name="metrics"
                 validateOnChange={false}
-                render={({ remove }) => (
+                render={() => (
                   <>
                     <div>
                       {metrics.map((metric, index) => {
                         return (
-                        // eslint-disable-next-line react/no-array-index-key
+                          // eslint-disable-next-line react/no-array-index-key
                           <ElementConfigurationContainer key={`metrics-${index}`}
-                                                         onRemove={() => remove(index)}
+                                                         onRemove={removeMetric(index)}
                                                          elementTitle={MetricElement.title}>
                             <Metric index={index} />
                           </ElementConfigurationContainer>
