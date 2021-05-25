@@ -23,7 +23,7 @@ import buttonStyles from 'components/graylog/styles/buttonStyles';
 import aceEditorStyles from 'components/graylog/styles/aceEditorStyles';
 import usePluginEntities from 'views/logic/usePluginEntities';
 
-import { breakpoints, colors, fonts, utils, margins } from './index';
+import { breakpoints, colors, fonts, utils, spacings } from './index';
 import RegeneratableThemeContext from './RegeneratableThemeContext';
 import { Colors } from './colors';
 import { THEME_MODES, ThemeMode } from './constants';
@@ -52,7 +52,7 @@ function buildTheme(currentThemeColors, changeMode, mode): DefaultTheme {
   return {
     mode,
     changeMode,
-    margins,
+    spacings,
     breakpoints,
     colors: currentThemeColors,
     fonts,

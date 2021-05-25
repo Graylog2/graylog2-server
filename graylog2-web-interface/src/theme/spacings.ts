@@ -16,13 +16,13 @@
  */
 import PropTypes from 'prop-types';
 
-export type Margins = {
+export type Spacings = {
   root: number,
   row: number,
   pageContent: number,
 };
 
-export const marginsPropTypes = PropTypes.shape({
+export const spacingsPropTypes = PropTypes.shape({
   root: PropTypes.number,
   row: PropTypes.number,
   pageContent: PropTypes.number,
@@ -30,10 +30,10 @@ export const marginsPropTypes = PropTypes.shape({
 
 const ROOT_MARGIN = 3;
 
-const margins: Margins = {
+const spacings: Spacings = {
   root: ROOT_MARGIN,
   pageContent: ROOT_MARGIN * 3,
   row: ROOT_MARGIN * 2,
 };
 
-export default margins;
+export default spacings;

@@ -28,7 +28,7 @@ type Props = {
 };
 
 const Container = styled.div(({ theme }) => {
-  const padding = theme.margins.pageContent;
+  const padding = theme.spacings.pageContent;
 
   return css`
     display: flex;
