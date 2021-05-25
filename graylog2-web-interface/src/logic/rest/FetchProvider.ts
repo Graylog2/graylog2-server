@@ -35,7 +35,6 @@ const defaultOnUnauthorizedError = (error) => ErrorsActions.report(createFromFet
 const emptyToUndefined = (s: any) => (s && s !== '' ? s : undefined);
 
 const onServerError = async (error: Response | undefined, onUnauthorized = defaultOnUnauthorizedError) => {
-  console.log(error);
   const contentType = error.headers?.get('Content-Type');
   const response = await (contentType?.startsWith('application/json') ? error.json().then((body) => body) : error.text());
   const SessionStore = StoreProvider.getStore('Session');
