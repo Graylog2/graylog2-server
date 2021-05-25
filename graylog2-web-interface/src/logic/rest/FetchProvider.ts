@@ -32,12 +32,12 @@ const reportServerSuccess = () => {
 
 const defaultOnUnauthorizedError = (error) => ErrorsActions.report(createFromFetchError(error));
 
-const emptyToUndefined = (s: string | undefined) => (s && s !== '' ? s : undefined);
+const emptyToUndefined = (s: any) => (s && s !== '' ? s : undefined);
 
 const onServerError = async (error: Response | undefined, onUnauthorized = defaultOnUnauthorizedError) => {
   console.log(error);
   const contentType = error.headers?.get('Content-Type');
-  const response = await (contentType?.startsWith('application/json') ? error.json().then((body) => body?.message) : error.text());
+  const response = await (contentType?.startsWith('application/json') ? error.json().then((body) => body) : error.text());
   const SessionStore = StoreProvider.getStore('Session');
   const fetchError = new FetchError(error.statusText, error.status, emptyToUndefined(response));
 
@@ -52,7 +52,7 @@ const onServerError = async (error: Response | undefined, onUnauthorized = defau
     onUnauthorized(fetchError);
   }
 
-  if (error.originalError && !error.originalError.status) {
+  if (error && !error.status) {
     const ServerAvailabilityActions = ActionsProvider.getActions('ServerAvailability');
 
     ServerAvailabilityActions.reportError(fetchError);
