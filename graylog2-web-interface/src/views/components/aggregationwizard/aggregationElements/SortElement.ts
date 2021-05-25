@@ -108,6 +108,10 @@ const SortElement: AggregationElement = {
   }),
   toConfig: (formValues: WidgetConfigFormValues, configBuilder: AggregationWidgetConfigBuilder) => configBuilder
     .sort(formValues.sort.map((sort) => new SortConfig(formValueTypeToConfigType(sort.type), sort.field, Direction.fromString(sort.direction)))),
+  onRemove: ((index, formValues) => ({
+    ...formValues,
+    sort: formValues.sort.filter((value, i) => index !== i),
+  })),
   validate: validateSorts,
 };
 
