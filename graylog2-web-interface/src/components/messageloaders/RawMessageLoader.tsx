@@ -124,19 +124,21 @@ const RawMessageLoader = ({ onMessageLoaded, inputIdSelector, codecTypes, inputs
       return [{ value: 'none', label: 'Loading inputs...', disabled: true }];
     }
 
-    const inputIds = Object.keys(inputs);
-
-    if (inputIds.length === 0) {
+    if (inputs.size === 0) {
       return [{ value: 'none', label: 'No inputs available' }];
     }
 
-    return inputIds
-      .map((id) => {
-        const label = `${id} / ${inputs.get(id).title} / ${inputs.get(id).name}`;
+    const formattedInputs = [];
 
-        return { value: inputId, label: label };
-      })
-      .sort((inputA, inputB) => inputA.label.toLowerCase().localeCompare(inputB.label.toLowerCase()));
+    inputs
+      .sort((inputA, inputB) => inputA.title.toLowerCase().localeCompare(inputB.title.toLowerCase()))
+      .forEach((input, id) => {
+        const label = `${id} / ${input.title} / ${input.name}`;
+
+        formattedInputs.push({ value: id, label: label });
+      });
+
+    return formattedInputs;
   };
 
   const _onCodecSelect = (selectedCodec: string) => {

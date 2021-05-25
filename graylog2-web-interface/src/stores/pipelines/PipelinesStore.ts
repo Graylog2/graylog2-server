@@ -172,10 +172,8 @@ const PipelinesStore = Reflux.createStore({
       },
       (error) => {
         // a Bad Request indicates a parse error, set all the returned errors in the editor
-        const response = error.additional.res;
-
-        if (response.status === 400) {
-          callback(response.body);
+        if (error.status === 400) {
+          callback(error.additional.body);
         }
       },
     );
