@@ -24,6 +24,14 @@ jest.mock('views/stores/FieldTypesStore', () => ({
   FieldTypesStore: MockStore(['getInitialState', () => ({ all: {}, queryFields: {} })]),
 }));
 
+jest.mock('stores/configurations/ConfigurationsStore', () => ({
+  ConfigurationsStore: MockStore(),
+}));
+
+jest.mock('stores/decorators/DecoratorsStore', () => ({
+  DecoratorsStore: MockStore(),
+}));
+
 describe('Views bindings value actions', () => {
   const { valueActions } = bindings;
   const defaultArguments = {

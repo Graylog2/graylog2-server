@@ -57,11 +57,11 @@ const _updateQueryParams = (
     }
 
     if (newQueryParams.focusing) {
-      baseUri = baseUri.setSearch('focusing', true);
+      baseUri = baseUri.setSearch('focusing', String(true));
     }
 
     if (newQueryParams.editing) {
-      baseUri = baseUri.setSearch('editing', true);
+      baseUri = baseUri.setSearch('editing', String(true));
     }
   }
 
