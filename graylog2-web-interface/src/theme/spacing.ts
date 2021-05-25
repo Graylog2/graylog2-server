@@ -21,7 +21,7 @@ import { ROOT_FONT_SIZE } from './constants';
 const SIZES = ['0', '1', 'xxs', 'xs', 'sm', 'md', 'lg', 'xl', 'xxl'] as const;
 
 type Sizes = typeof SIZES[number]
-export type Spacing = Record<Sizes, string> & { px: Record<Sizes, string> };
+export type Spacing = Record<Sizes, string> & { px: Record<Sizes, number> };
 
 const props = SIZES.reduce((acc, key) => ({ ...acc, [key]: PropTypes.string }), {});
 
@@ -45,7 +45,7 @@ SIZES.forEach((size, index) => {
     const value = 0.075 * fibSequence[index + 2];
 
     spacing[size] = `calc(${value} * 1rem)`;
-    spacing.px[size] = (value * ROOT_FONT_SIZE).toFixed(0);
+    spacing.px[size] = Math.round(value * ROOT_FONT_SIZE);
   }
 });
 
