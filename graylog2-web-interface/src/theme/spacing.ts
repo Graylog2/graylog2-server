@@ -16,11 +16,12 @@
  */
 import PropTypes from 'prop-types';
 
+import { ROOT_FONT_SIZE } from './constants';
+
 const SIZES = ['0', '1', 'xxs', 'xs', 'sm', 'md', 'lg', 'xl', 'xxl'] as const;
-const BASE = '1rem';
 
 type Sizes = typeof SIZES[number]
-export type Spacing = Record<Sizes, string>;
+export type Spacing = Record<Sizes, string> & { px: Record<Sizes, string> };
 
 const props = SIZES.reduce((acc, key) => ({ ...acc, [key]: PropTypes.string }), {});
 
@@ -29,17 +30,23 @@ export const spacingPropTypes = PropTypes.shape(props);
 let count;
 const fibSequence = [0, 1];
 
-for (count = 2; count <= 8; count += 1) {
+for (count = 2; count <= 10; count += 1) {
   fibSequence[count] = fibSequence[count - 2] + fibSequence[count - 1];
 }
 
 const spacing = {
-  0: '0',
-  1: '1px',
+  px: {},
 } as Spacing;
 
 SIZES.forEach((size, index) => {
-  spacing[size] = `calc(${0.25 * fibSequence[index + 2]} * ${BASE})`;
+  if (size === '0') spacing[size] = '0';
+  else if (size === '1') spacing[size] = '1px';
+  else {
+    const value = 0.075 * fibSequence[index + 2];
+
+    spacing[size] = `calc(${value} * 1rem)`;
+    spacing.px[size] = (value * ROOT_FONT_SIZE).toFixed(0);
+  }
 });
 
 export default spacing;

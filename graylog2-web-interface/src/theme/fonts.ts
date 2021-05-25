@@ -16,6 +16,8 @@
  */
 import PropTypes from 'prop-types';
 
+import { ROOT_FONT_SIZE } from './constants';
+
 import 'opensans-npm-webfont/open_sans.css';
 import 'opensans-npm-webfont/open_sans_italic.css';
 import 'opensans-npm-webfont/open_sans_bold.css';
@@ -70,7 +72,7 @@ const family = {
 
 /* Scaled 1.125 Major Second - https://type-scale.com/ */
 const size = {
-  root: '87.5%', /* 14px */
+  root: `${ROOT_FONT_SIZE}px`,
   body: '1rem',
   huge: '2.027rem',
   large: '1.125rem',
