@@ -89,7 +89,7 @@ class NotificationsForm extends React.Component {
       );
     }
 
-    if (!isPermitted(currentUser.permissions, 'eventnotifications:read')) {
+    if (notifications.length < 1) {
       return (
         <Row>
           <Col md={6} lg={5}>
