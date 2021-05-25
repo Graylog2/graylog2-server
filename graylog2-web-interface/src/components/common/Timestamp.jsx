@@ -99,11 +99,11 @@ class Timestamp extends React.Component {
   };
 
   render() {
-    const { render: Component, dateTime } = this.props;
+    const { render: Component, dateTime, ...rest } = this.props;
 
     return (
       <time key={`time-${dateTime}`} dateTime={dateTime} title={dateTime}>
-        <Component value={this._formatDateTime()} />
+        <Component value={this._formatDateTime()} {...rest} />
       </time>
     );
   }
