@@ -68,6 +68,7 @@ public class MongoDbAuthorizationRealm extends AuthorizingRealm {
         setCachingEnabled(true);
         setCacheManager(mongoDbAuthorizationCacheManager);
         serverEventBus.register(this);
+        // Use case sensitive permission resolver
         setPermissionResolver(new WildcardPermissionResolver(true));
     }
 
