@@ -14,34 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
+import React from 'react';
 import styled, { css } from 'styled-components';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import Version from 'util/Version';
-import connect from 'stores/connect';
-import StoreProvider from 'injection/StoreProvider';
-import { Store } from 'stores/StoreTypes';
-
-const SystemStore = StoreProvider.getStore('System');
-
-type SystemStoreState = {
-  system: {
-    version?: string,
-    hostname?: string,
-  };
-};
-
-type Props = {
-  system?: {
-    version?: string,
-    hostname?: string,
-  },
-};
-
-type Jvm = {
-  info: string;
-};
+import StandardFooter from './StandardFooter';
 
 const StyledFooter = styled.footer(({ theme }) => css`
   text-align: center;
@@ -58,51 +35,26 @@ const StyledFooter = styled.footer(({ theme }) => css`
   }
 `);
 
-const Footer = ({ system }: Props) => {
-  const [jvm, setJvm] = useState<Jvm | undefined>();
+const Footer = () => {
+  const customFooter = PluginStore.exports('pageFooter');
 
-  useEffect(() => {
-    let mounted = true;
+  if (customFooter.length === 1) {
+    const CustomFooter = customFooter[0].component;
 
-    SystemStore.jvm().then((jvmInfo) => {
-      if (mounted) {
-        setJvm(jvmInfo);
-      }
-    });
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
-  if (!(system && jvm)) {
     return (
       <StyledFooter>
-        Graylog {Version.getFullVersion()}
+        <CustomFooter />
       </StyledFooter>
     );
   }
 
   return (
     <StyledFooter>
-      Graylog {system.version} on {system.hostname} ({jvm.info})
+      <StandardFooter />
     </StyledFooter>
   );
 };
 
-Footer.propTypes = {
-  system: PropTypes.shape({
-    version: PropTypes.string,
-    hostname: PropTypes.string,
-  }),
-};
+Footer.propTypes = {};
 
-Footer.defaultProps = {
-  system: undefined,
-};
-
-export default connect(
-  Footer,
-  { system: SystemStore as Store<SystemStoreState> },
-  ({ system: { system } = { system: undefined } }) => ({ system }),
-);
+export default Footer;

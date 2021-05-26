@@ -83,6 +83,7 @@ import HeatmapVisualizationConfiguration from 'views/components/aggregationbuild
 import HeatmapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/HeatmapVisualizationConfig';
 import visualizationBindings from 'views/components/visualizations/bindings';
 import AggregationWizard from 'views/components/aggregationwizard/AggregationWizard';
+import { filterCloudValueActions } from 'util/conditional/filterValueActions';
 
 import type { ActionHandlerArguments } from './components/actions/ActionHandler';
 import NumberVisualizationConfig from './logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
@@ -259,7 +260,7 @@ const exports: PluginExports = {
       resetFocus: false,
     },
   ],
-  valueActions: [
+  valueActions: filterCloudValueActions([
     {
       type: 'exclude',
       title: 'Exclude from results',
@@ -295,7 +296,7 @@ const exports: PluginExports = {
       isEnabled: HighlightValueHandler.isEnabled,
       resetFocus: false,
     },
-  ],
+  ], ['create-extractor']),
   visualizationTypes: visualizationBindings,
   visualizationConfigTypes: [
     {

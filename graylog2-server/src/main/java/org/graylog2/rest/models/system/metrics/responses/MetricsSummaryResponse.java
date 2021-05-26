@@ -22,7 +22,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 
-import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 @AutoValue
 @WithBeanGetter
@@ -31,14 +32,14 @@ public abstract class MetricsSummaryResponse {
     @JsonProperty
     public abstract int total();
     @JsonProperty
-    public abstract Collection metrics();
+    public abstract List<Map<String, Object>> metrics();
 
     @JsonCreator
-    public static MetricsSummaryResponse create(@JsonProperty("total") int total, @JsonProperty("metrics") Collection metrics) {
+    public static MetricsSummaryResponse create(@JsonProperty("total") int total, @JsonProperty("metrics") List<Map<String, Object>> metrics) {
         return new AutoValue_MetricsSummaryResponse(total, metrics);
     }
 
-    public static MetricsSummaryResponse create(Collection metrics) {
+    public static MetricsSummaryResponse create(List<Map<String, Object>> metrics) {
         return new AutoValue_MetricsSummaryResponse(metrics.size(), metrics);
     }
 }

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useCallback } from 'react';
 import { FieldArray, useFormikContext } from 'formik';
 
 import { SortableList } from 'components/common';
@@ -26,12 +27,15 @@ import { WidgetConfigFormValues } from 'views/components/aggregationwizard/Widge
 import SortElement from '../aggregationElements/SortElement';
 
 const SortConfiguration = () => {
-  const { values: { sort }, setFieldValue } = useFormikContext<WidgetConfigFormValues>();
+  const { values: { sort }, setFieldValue, setValues, values } = useFormikContext<WidgetConfigFormValues>();
+  const removeSort = useCallback((index) => () => {
+    setValues(SortElement.onRemove(index, values));
+  }, [setValues, values]);
 
   return (
     <FieldArray name="sort"
                 validateOnChange={false}
-                render={({ remove }) => (
+                render={() => (
                   <SortableList items={sort}
                                 onMoveItem={(newSort) => setFieldValue('sort', newSort)}
                                 customListItemRender={({ item, index, dragHandleProps, draggableProps, className, ref }) => (
@@ -40,7 +44,7 @@ const SortConfiguration = () => {
                                                                  draggableProps={draggableProps}
                                                                  className={className}
                                                                  testIdPrefix={`sort-${index}`}
-                                                                 onRemove={() => remove(index)}
+                                                                 onRemove={removeSort(index)}
                                                                  elementTitle={SortElement.title}
                                                                  ref={ref}>
                                     <Sort index={index} />

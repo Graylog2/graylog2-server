@@ -30,7 +30,6 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Optional;
-import java.util.OptionalInt;
 
 import static org.graylog.plugins.views.search.export.ExportMessagesCommand.DEFAULT_FIELDS;
 import static org.graylog.plugins.views.search.export.LinkedHashSetUtil.linkedHashSetOf;
@@ -49,11 +48,13 @@ public abstract class ResultFormat {
     public abstract Optional<AbsoluteRange> timerange();
 
     @JsonProperty
-    @Positive
-    public abstract OptionalInt limit();
+    public abstract Optional<Integer> limit();
 
     @JsonProperty
     public abstract Map<String, Object> executionState();
+
+    @JsonProperty
+    public abstract Optional<String> filename();
 
     public static ResultFormat.Builder builder() {
         return ResultFormat.Builder.create();
@@ -73,13 +74,16 @@ public abstract class ResultFormat {
         }
 
         @JsonProperty
-        public abstract Builder limit(Integer limit);
+        public abstract Builder limit(@Positive @Nullable Integer limit);
 
         @JsonProperty
         public abstract Builder executionState(Map<String, Object> executionState);
 
         @JsonProperty
         public abstract Builder timerange(@Nullable AbsoluteRange timeRange);
+
+        @JsonProperty
+        public abstract Builder filename(@Nullable String filename);
 
         public abstract ResultFormat build();
 

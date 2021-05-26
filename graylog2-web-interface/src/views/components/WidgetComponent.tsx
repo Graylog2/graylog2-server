@@ -28,6 +28,7 @@ import ExportSettingsContextProvider from 'views/components/ExportSettingsContex
 import { WidgetDataMap, WidgetErrorsMap } from './widgets/WidgetPropTypes';
 import Widget from './widgets/Widget';
 import DrilldownContextProvider from './contexts/DrilldownContextProvider';
+import WidgetFieldTypesContextProvider from './contexts/WidgetFieldTypesContextProvider';
 
 type Props = {
   data: WidgetDataMap,
@@ -63,18 +64,20 @@ const WidgetComponent = ({
       <WidgetContext.Provider value={widget}>
         <AdditionalContext.Provider value={{ widget }}>
           <ExportSettingsContextProvider>
-            <Widget data={widgetData}
-                    editing={editing}
-                    errors={widgetErrors}
-                    fields={fields}
-                    height={height}
-                    id={widget.id}
-                    onPositionsChange={onPositionsChange}
-                    onSizeChange={onWidgetSizeChange}
-                    position={position}
-                    title={title}
-                    widget={widget}
-                    width={width} />
+            <WidgetFieldTypesContextProvider>
+              <Widget data={widgetData}
+                      editing={editing}
+                      errors={widgetErrors}
+                      fields={fields}
+                      height={height}
+                      id={widget.id}
+                      onPositionsChange={onPositionsChange}
+                      onSizeChange={onWidgetSizeChange}
+                      position={position}
+                      title={title}
+                      widget={widget}
+                      width={width} />
+            </WidgetFieldTypesContextProvider>
           </ExportSettingsContextProvider>
         </AdditionalContext.Provider>
       </WidgetContext.Provider>

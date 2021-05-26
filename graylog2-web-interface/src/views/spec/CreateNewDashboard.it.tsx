@@ -18,6 +18,7 @@ import * as React from 'react';
 import { render, fireEvent } from 'wrappedTestingLibrary';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 import { StoreMock as MockStore } from 'helpers/mocking';
+import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 
 import history from 'util/History';
 import Routes from 'routing/Routes';
@@ -69,6 +70,7 @@ jest.mock('util/AppConfig', () => ({
   gl2AppPathPrefix: jest.fn(() => ''),
   gl2DevMode: jest.fn(() => false),
   isFeatureEnabled: jest.fn(() => true),
+  isCloud: jest.fn(() => false),
 }));
 
 jest.mock('stores/sessions/SessionStore', () => ({
@@ -80,14 +82,15 @@ jest.mock('views/components/searchbar/QueryInput', () => () => <span>Query Edito
 
 jest.unmock('logic/rest/FetchProvider');
 
-describe('Create a new dashboard', () => {
-  beforeAll(() => {
-    PluginStore.register(new PluginManifest({}, viewsBindings));
-  });
+const viewsPlugin = new PluginManifest({}, viewsBindings);
 
-  beforeEach(() => {
-    jest.setTimeout(30000);
-  });
+const finderTimeout = applyTimeoutMultiplier(15000);
+const testTimeout = applyTimeoutMultiplier(30000);
+
+describe('Create a new dashboard', () => {
+  beforeAll(() => PluginStore.register(viewsPlugin));
+
+  afterAll(() => PluginStore.unregister(viewsPlugin));
 
   const SimpleAppRouter = () => (
     <CurrentUserProvider>
@@ -101,17 +104,17 @@ describe('Create a new dashboard', () => {
     const { findByText, findAllByText } = render(<SimpleAppRouter />);
     history.push(Routes.DASHBOARDS);
 
-    const buttons = await findAllByText('Create new dashboard', {}, { timeout: 15000 });
+    const buttons = await findAllByText('Create new dashboard', {}, { timeout: finderTimeout });
 
     fireEvent.click(buttons[0]);
-    await findByText(/This dashboard has no widgets yet/, {}, { timeout: 15000 });
-  });
+    await findByText(/This dashboard has no widgets yet/, {}, { timeout: finderTimeout });
+  }, testTimeout);
 
   it('by going to the new dashboards endpoint', async () => {
     const { findByText } = render(<SimpleAppRouter />);
 
     history.push(Routes.pluginRoute('DASHBOARDS_NEW'));
 
-    await findByText(/This dashboard has no widgets yet/, {}, { timeout: 15000 });
-  });
+    await findByText(/This dashboard has no widgets yet/, {}, { timeout: finderTimeout });
+  }, testTimeout);
 });

@@ -23,6 +23,8 @@ import javax.annotation.Priority;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.container.ContainerResponseContext;
+import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.core.MultivaluedMap;
 import java.io.IOException;
 import java.util.Optional;
@@ -31,8 +33,8 @@ import java.util.Optional;
  * This filter makes the request headers accessible within Shiro's {@link ThreadContext}.
  */
 // Needs to run after RequestIdFilter
-@Priority(Priorities.AUTHORIZATION - 10)
-public class ShiroRequestHeadersBinder implements ContainerRequestFilter {
+@Priority(Priorities.AUTHENTICATION - 8)
+public class ShiroRequestHeadersBinder implements ContainerRequestFilter, ContainerResponseFilter {
     public static final String REQUEST_HEADERS = "REQUEST_HEADERS";
 
     @Override
@@ -52,5 +54,11 @@ public class ShiroRequestHeadersBinder implements ContainerRequestFilter {
             }
         }
         return Optional.empty();
+    }
+
+    @Override
+    public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
+        // Ensure removal of request headers to avoid leaking them for the next request
+        ThreadContext.remove(REQUEST_HEADERS);
     }
 }

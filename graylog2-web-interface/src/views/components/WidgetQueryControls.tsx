@@ -27,11 +27,10 @@ import Widget from 'views/logic/widgets/Widget';
 import { WidgetActions } from 'views/stores/WidgetStore';
 import { DEFAULT_TIMERANGE } from 'views/Constants';
 import { SearchConfigStore } from 'views/stores/SearchConfigStore';
-import { Col } from 'components/graylog';
+import { Row, Col } from 'components/graylog';
 import { Icon } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
-import TopRow from 'views/components/searchbar/TopRow';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
 import WidgetContext from 'views/components/contexts/WidgetContext';
 import { GlobalOverrideStore, GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
@@ -51,6 +50,11 @@ const SecondRow = styled.div`
   .query {
     flex: 1;
   }
+`;
+
+const WidgetTopRow = styled(Row)`
+  margin-top: 10px;
+  margin-bottom: 10px;
 `;
 
 type Props = {
@@ -90,13 +94,14 @@ const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
                      validateOnMount={false}>
         {({ dirty, isValid, isSubmitting, handleSubmit, values, setFieldValue }) => (
           <>
-            <TopRow>
+            <WidgetTopRow>
               <Col md={6}>
                 {!hasTimeRangeOverride && (
                   <TimeRangeInput disabled={hasTimeRangeOverride}
                                   onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
                                   value={values?.timerange}
-                                  hasErrorOnMount={!isValid} />
+                                  hasErrorOnMount={!isValid}
+                                  position="right" />
                 )}
                 {hasTimeRangeOverride && (
                   <TimeRangeOverrideInfo value={globalOverride?.timerange} onReset={_resetTimeRangeOverride} />
@@ -112,7 +117,7 @@ const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
                   )}
                 </Field>
               </Col>
-            </TopRow>
+            </WidgetTopRow>
 
             <SecondRow>
               <SearchButton disabled={isSubmitting || !isValid}

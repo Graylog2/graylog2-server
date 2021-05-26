@@ -108,7 +108,7 @@ public class CommandFactory {
         requestBuilder.fieldsInOrder(resultFormat.fieldsInOrder());
 
         if (resultFormat.limit().isPresent()) {
-            requestBuilder.limit(resultFormat.limit().getAsInt());
+            requestBuilder.limit(resultFormat.limit().orElseThrow(() -> new IllegalStateException("No value present!")));
         }
 
         return requestBuilder;

@@ -230,6 +230,7 @@ if (TARGET === 'start') {
         DEVELOPMENT: true,
         // Keep old env to avoid breaking developer setups
         GRAYLOG_API_URL: JSON.stringify(process.env.GRAYLOG_API_URL || process.env.GRAYLOG_HTTP_PUBLISH_URI),
+        IS_CLOUD: process.env.IS_CLOUD,
       }),
       new CopyWebpackPlugin({ patterns: [{ from: 'config.js' }] }),
       new webpack.HotModuleReplacementPlugin(),

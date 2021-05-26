@@ -46,6 +46,8 @@ jest.mock('react-sizeme', () => ({
   SizeMe: ({ children }) => <div>{children({ size: { width: 200 } })}</div>,
 }));
 
+jest.mock('views/components/contexts/WidgetFieldTypesContextProvider', () => ({ children }) => children);
+
 describe('<WidgetGrid />', () => {
   it('should render with minimal props', () => {
     const wrapper = mount((
