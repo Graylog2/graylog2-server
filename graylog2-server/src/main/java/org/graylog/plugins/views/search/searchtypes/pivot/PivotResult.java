@@ -25,7 +25,9 @@ import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @AutoValue
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
@@ -87,7 +89,7 @@ public abstract class PivotResult implements SearchType.Result {
     public static abstract class Row {
 
         @JsonProperty
-        public abstract ImmutableList<String> key();
+        public abstract List<String> key();
 
         @JsonProperty
         public abstract ImmutableList<Value> values();
@@ -101,7 +103,7 @@ public abstract class PivotResult implements SearchType.Result {
 
         @AutoValue.Builder
         public abstract static class Builder {
-            public abstract Builder key(ImmutableList<String> key);
+            public abstract Builder key(List<String> key);
 
             abstract ImmutableList.Builder<Value> valuesBuilder();
             //public abstract Builder values(ImmutableList<Value> values);
@@ -124,7 +126,7 @@ public abstract class PivotResult implements SearchType.Result {
     public static abstract class Value {
 
         @JsonProperty
-        public abstract ImmutableList<String> key();
+        public abstract List<String> key();
 
         @JsonProperty
         @Nullable
@@ -137,7 +139,11 @@ public abstract class PivotResult implements SearchType.Result {
         public abstract String source();
 
         public static Value create(Collection<String> key, @Nullable Object value, boolean rollup, String source) {
-            return new AutoValue_PivotResult_Value(ImmutableList.copyOf(key), value, rollup, source);
+            return new AutoValue_PivotResult_Value(copy(key), value, rollup, source);
+        }
+
+        private static List<String> copy(Collection<String> key) {
+            return Collections.unmodifiableList(key.stream().collect(Collectors.toList()));
         }
     }
 }

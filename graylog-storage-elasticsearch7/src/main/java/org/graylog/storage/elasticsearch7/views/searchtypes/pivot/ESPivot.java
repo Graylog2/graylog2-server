@@ -59,6 +59,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.ArrayDeque;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.IdentityHashMap;
@@ -75,6 +76,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
     private final Map<String, ESPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>> seriesHandlers;
     private static final TimeRange ALL_MESSAGES_TIMERANGE = allMessagesTimeRange();
     private static final String TERMS_SEPARATOR = "\u2E31";
+    private static final String UNKNOWN_FIELD = "\u200B";
 
     private static final String ROWS_POSTFIX = "-rows";
     private static final String COLUMNS_POSTFIX = "-columns";
@@ -185,8 +187,8 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
     private String createScript(List<BucketSpec> pivots) {
         return pivots.stream()
                 .map(BucketSpec::field)
-//                .map(field -> field == null ? "'null field'" : "(doc.containsKey('" + field + "') ? doc['" + field + "'].value : 'unknown field')")
-                .map(field -> field == null ? "'null field'" : "(doc['" + field + "'].size() == 0 ? 'unknown field' : doc['" + field + "'].value)")
+// containsKey seems to be buggy .map(field -> "(doc.containsKey('" + field + "') ? doc['" + field + "'].value : 'unknown field')")
+                .map(field -> "(doc['" + field + "'].size() == 0 ? '" + UNKNOWN_FIELD + "' : doc['" + field + "'].value)")
                 .collect(Collectors.joining(" + '" + TERMS_SEPARATOR + "' + "));
     }
 
@@ -225,6 +227,14 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         );
     }
 
+    private static List<String> copy(Collection<String> key) {
+        return Collections.unmodifiableList(key.stream().collect(Collectors.toList()));
+    }
+
+    private static List<String> replaceUnknownFields(String key[]) {
+        return copy(Arrays.stream(key).map(k -> UNKNOWN_FIELD.equals(k) ? null : k).collect(Collectors.toList()));
+    }
+
     @Override
     public SearchType.Result doExtractResult(SearchJob job, Query query, Pivot pivot, SearchResponse queryResult, Aggregations aggregations, ESGeneratedQueryContext queryContext) {
         final AbsoluteRange effectiveTimerange = extractEffectiveTimeRange(queryResult, query, pivot);
@@ -252,7 +262,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
                 final List<PivotResult.Row> rows = rowsResult.getBuckets()
                         .stream()
                         .map(bucket -> {
-                            final ImmutableList<String> rowKeys = ImmutableList.copyOf(bucket.getKeyAsString().split(TERMS_SEPARATOR));
+                            final List<String> rowKeys = replaceUnknownFields(bucket.getKeyAsString().split(TERMS_SEPARATOR));
                             if(pivot.rowGroups().size() != rowKeys.size()) {
                                 LOG.warn("Expected number of terms in row: {}, but was {}. The separator char might be part of the field values.", pivot.rowGroups().size(), rowKeys.size());
                             }
@@ -269,7 +279,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
                                     final MultiBucketsAggregation columnsResult = bucket.getAggregations().get(columnsAggName);
                                     if (columnsResult != null) {
                                         columnsResult.getBuckets().forEach(columnBucket -> {
-                                            final ImmutableList<String> columnKeys = ImmutableList.copyOf(columnBucket.getKeyAsString().split(TERMS_SEPARATOR));
+                                            final List<String> columnKeys = replaceUnknownFields(columnBucket.getKeyAsString().split(TERMS_SEPARATOR));
                                             if(pivot.columnGroups().size() != columnKeys.size()) {
                                                 LOG.warn("Expected number of terms in columns: {}, but was {}. The separator char might be part of the field values.", pivot.rowGroups().size(), rowKeys.size());
                                             }
@@ -305,7 +315,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
                         processSeries(rowBuilder, queryResult, queryContext, pivot, new ArrayDeque<>(), createInitialResult(queryResult), true, "row-leaf");
 
                     columnsResult.getBuckets().forEach(columnBucket -> {
-                        final ImmutableList<String> columnKeys = ImmutableList.copyOf(columnBucket.getKeyAsString().split(TERMS_SEPARATOR));
+                        final List<String> columnKeys = replaceUnknownFields(columnBucket.getKeyAsString().split(TERMS_SEPARATOR));
                         if(pivot.columnGroups().size() != columnKeys.size()) {
                             LOG.warn("Expected number of terms in columns: {}, but was {}. The separator char might be part of the field values.", pivot.columnGroups().size(), columnKeys.size());
                         }

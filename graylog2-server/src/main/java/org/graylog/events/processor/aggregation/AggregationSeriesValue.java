@@ -19,7 +19,6 @@ package org.graylog.events.processor.aggregation;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableList;
 
 import java.util.List;
 
@@ -28,7 +27,7 @@ import java.util.List;
 public abstract class AggregationSeriesValue {
     public abstract AggregationSeries series();
 
-    public abstract ImmutableList<String> key();
+    public abstract List<String> key();
 
     public abstract double value();
 

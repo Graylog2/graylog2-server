@@ -278,7 +278,7 @@ public class PivotAggregationSearch implements AggregationSearch {
             // We always wrap aggregations in date range buckets so we can run aggregations for multiple ranges at once.
             // The timestamp value of the date range bucket will be part of the result.
             final String timeKey = row.key().get(0);
-            final ImmutableList<String> groupKey;
+            final List<String> groupKey;
 
             if (row.key().size() > 1) {
                 // The date range bucket value must not be exposed to consumers as part of the key so they
