@@ -23,7 +23,7 @@ declare module 'styled-components' {
   import type { Fonts } from 'src/theme/fonts';
   import type { Utils } from 'src/theme/utils';
   import type { ThemeMode } from 'src/theme/constants';
-  import type { Spacing } from 'src/theme/spacing';
+  import type { Spacings } from 'src/theme/spacings';
   // eslint-disable-next-line import/order
   import type { Breakpoints } from 'src/theme/breakpoints';
 
@@ -33,7 +33,7 @@ declare module 'styled-components' {
     fonts: Fonts,
     utils: Utils,
     mode: ThemeMode,
-    spacing: Spacing,
+    spacings: Spacings,
     changeMode: (string) => void,
     components: { [component: string]: any }
   }

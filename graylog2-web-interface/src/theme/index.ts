@@ -20,14 +20,14 @@ import breakpoints, { breakpointPropTypes } from './breakpoints';
 import colors, { colorsPropTypes } from './colors';
 import fonts, { fontsPropTypes } from './fonts';
 import utils, { utilsPropTypes } from './utils';
-import spacing, { spacingPropTypes } from './spacing';
+import spacings, { spacingsPropTypes } from './spacings';
 
 const themePropTypes = PropTypes.shape({
   breakpoints: breakpointPropTypes,
   colors: colorsPropTypes,
   fonts: fontsPropTypes,
   utils: utilsPropTypes,
-  spacing: spacingPropTypes,
+  spacings: spacingsPropTypes,
 });
 
 export {
@@ -36,5 +36,5 @@ export {
   fonts,
   utils,
   themePropTypes,
-  spacing,
+  spacings,
 };
