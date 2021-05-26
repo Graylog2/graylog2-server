@@ -18,12 +18,15 @@ import PropTypes from 'prop-types';
 
 import { ROOT_FONT_SIZE } from './constants';
 
+const SPACE = 0.08; // magic number we use for our calculations
 const SIZES = ['0', '1', 'xxs', 'xs', 'sm', 'md', 'lg', 'xl', 'xxl'] as const;
 
 type Sizes = typeof SIZES[number]
 export type Spacing = Record<Sizes, string> & { px: Record<Sizes, number> };
 
-const props = SIZES.reduce((acc, key) => ({ ...acc, [key]: PropTypes.string }), {});
+const props = SIZES.reduce((acc, key) => ({ ...acc, [key]: PropTypes.string }), {
+  px: PropTypes.shape(SIZES.reduce((acc, key) => ({ ...acc, [key]: PropTypes.number }), {})),
+});
 
 export const spacingPropTypes = PropTypes.shape(props);
 
@@ -42,9 +45,9 @@ SIZES.forEach((size, index) => {
   if (size === '0') spacing[size] = '0';
   else if (size === '1') spacing[size] = '1px';
   else {
-    const value = 0.075 * fibSequence[index + 2];
+    const value = SPACE * fibSequence[index + 2];
 
-    spacing[size] = `calc(${value} * 1rem)`;
+    spacing[size] = `${value}rem`;
     spacing.px[size] = Math.round(value * ROOT_FONT_SIZE);
   }
 });

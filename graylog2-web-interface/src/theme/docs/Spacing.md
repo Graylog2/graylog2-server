@@ -6,8 +6,6 @@ import styled, { useTheme  } from 'styled-components';
 
 const { spacing } = useTheme();
 
-console.log({spacing})
-
 const Colors = () => (
   <>
     {Object.keys(spacing).map((space) => space !== 'px' && (
