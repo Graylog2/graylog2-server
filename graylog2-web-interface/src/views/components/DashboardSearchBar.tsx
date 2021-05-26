@@ -25,7 +25,7 @@ import connect from 'stores/connect';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
 import RefreshControls from 'views/components/searchbar/RefreshControls';
-import { Icon, Spinner } from 'components/common';
+import { FlatContentRow, Icon, Spinner } from 'components/common';
 import ScrollToHint from 'views/components/common/ScrollToHint';
 import SearchButton from 'views/components/searchbar/SearchButton';
 import QueryInput from 'views/components/searchbar/AsyncQueryInput';
@@ -39,7 +39,6 @@ import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 
 import DashboardSearchForm from './DashboardSearchBarForm';
 import TimeRangeInput from './searchbar/TimeRangeInput';
-import SearchBarContainer from './SearchBarContainer';
 
 type Props = {
   config: SearchesConfig,
@@ -105,7 +104,7 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
     <WidgetFocusContext.Consumer>
       {({ focusedWidget: { editing } = { editing: false } }) => (
         <ScrollToHint value={queryString}>
-          <SearchBarContainer>
+          <FlatContentRow>
             <DashboardSearchForm initialValues={{ timerange, queryString }}
                                  limitDuration={limitDuration}
                                  onSubmit={submitForm}>
@@ -156,7 +155,7 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
                 </>
               )}
             </DashboardSearchForm>
-          </SearchBarContainer>
+          </FlatContentRow>
         </ScrollToHint>
       )}
     </WidgetFocusContext.Consumer>
