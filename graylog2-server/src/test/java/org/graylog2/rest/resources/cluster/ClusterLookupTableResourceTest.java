@@ -25,7 +25,7 @@ import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.rest.RemoteInterfaceProvider;
 import org.graylog2.rest.resources.system.RemoteLookupTableResource;
-import org.graylog2.rest.resources.system.responses.LookupTableCachePurgingNodeResponse;
+import org.graylog2.shared.rest.resources.ProxiedResource;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,7 +38,6 @@ import javax.ws.rs.core.HttpHeaders;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
 
@@ -80,8 +79,8 @@ public class ClusterLookupTableResourceTest {
         when(httpHeaders.getRequestHeader("Authorization"))
                 .thenReturn(Collections.singletonList("TEST_TOKEN"));
 
-        when(node1.getNodeId()).thenReturn("node_1");
-        when(node2.getNodeId()).thenReturn("node_2");
+        when(nodeService.byNodeId("node_1")).thenReturn(node1);
+        when(nodeService.byNodeId("node_2")).thenReturn(node2);
 
         when(remoteInterfaceProvider.get(node1, "TEST_TOKEN", RemoteLookupTableResource.class))
                 .thenReturn(remoteLookupTableResource1);
@@ -98,33 +97,34 @@ public class ClusterLookupTableResourceTest {
     }
 
     @Test
-    public void performPurge_whenAllCallsSucceedThen200WithPerNodeDetailsReturned() throws Exception {
+    public void performPurge_whenAllCallsSucceedThenResponseWithPerNodeDetailsReturned() throws Exception {
         // given
         when(nodeService.allActive()).thenReturn(nodeMap());
         mock204Response("testName", "testKey", remoteLookupTableResource1);
         mock204Response("testName", "testKey", remoteLookupTableResource2);
 
         // when
-        final List<LookupTableCachePurgingNodeResponse> res = underTest.performPurge("testName", "testKey");
+        final Map<String, ProxiedResource.CallResult<Void>> res = underTest.performPurge("testName", "testKey");
 
         // then
         verify(remoteLookupTableResource1).performPurge("testName", "testKey");
         verify(remoteLookupTableResource2).performPurge("testName", "testKey");
 
-        assertThat(findNodeRes(res, "node_1")).satisfies(nodeRes -> {
-            assertThat(nodeRes.success).isTrue();
-            assertThat(nodeRes.message).isEqualTo("Successfully purged the cache");
+        assertThat(res.get("node_1")).satisfies(nodeRes -> {
+            assertThat(nodeRes.isSuccess()).isTrue();
+            assertThat(nodeRes.serverErrorMessage()).isNull();
+            assertThat(nodeRes.response().code()).isEqualTo(204);
+            assertThat(nodeRes.response().entity()).isEmpty();
+            assertThat(nodeRes.response().errorText()).isNull();
         });
-        assertThat(findNodeRes(res, "node_2")).satisfies(nodeRes -> {
-            assertThat(nodeRes.success).isTrue();
-            assertThat(nodeRes.message).isEqualTo("Successfully purged the cache");
-        });
-    }
 
-    private LookupTableCachePurgingNodeResponse findNodeRes(List<LookupTableCachePurgingNodeResponse> res, String nodeId) {
-        return res.stream()
-                .filter(r -> nodeId.equals(r.nodeId))
-                .findFirst().get();
+        assertThat(res.get("node_2")).satisfies(nodeRes -> {
+            assertThat(nodeRes.isSuccess()).isTrue();
+            assertThat(nodeRes.serverErrorMessage()).isNull();
+            assertThat(nodeRes.response().code()).isEqualTo(204);
+            assertThat(nodeRes.response().entity()).isEmpty();
+            assertThat(nodeRes.response().errorText()).isNull();
+        });
     }
 
     @Test
@@ -135,24 +135,31 @@ public class ClusterLookupTableResourceTest {
         mock404Response("testName", "testKey", remoteLookupTableResource2);
 
         // when
-        final List<LookupTableCachePurgingNodeResponse> res = underTest.performPurge("testName", "testKey");
+        final Map<String, ProxiedResource.CallResult<Void>> res = underTest.performPurge("testName", "testKey");
 
         // then
         verify(remoteLookupTableResource1).performPurge("testName", "testKey");
         verify(remoteLookupTableResource2).performPurge("testName", "testKey");
 
-        assertThat(findNodeRes(res, "node_1")).satisfies(nodeRes -> {
-            assertThat(nodeRes.success).isTrue();
-            assertThat(nodeRes.message).isEqualTo("Successfully purged the cache");
+        assertThat(res.get("node_1")).satisfies(nodeRes -> {
+            assertThat(nodeRes.isSuccess()).isTrue();
+            assertThat(nodeRes.serverErrorMessage()).isNull();
+            assertThat(nodeRes.response().code()).isEqualTo(204);
+            assertThat(nodeRes.response().entity()).isEmpty();
+            assertThat(nodeRes.response().errorText()).isNull();
+
         });
-        assertThat(findNodeRes(res, "node_2")).satisfies(nodeRes -> {
-            assertThat(nodeRes.success).isFalse();
-            assertThat(nodeRes.message).isEqualTo("Failed with code 404, message: Not Found");
+        assertThat(res.get("node_2")).satisfies(nodeRes -> {
+            assertThat(nodeRes.isSuccess()).isTrue();
+            assertThat(nodeRes.serverErrorMessage()).isNull();
+            assertThat(nodeRes.response().code()).isEqualTo(404);
+            assertThat(nodeRes.response().entity()).isEmpty();
+            assertThat(nodeRes.response().errorText()).isEqualTo("Resource Not Found");
         });
     }
 
     @Test
-    public void performPurge_whenOneCallFailsWithExceptionThenResponseWithPerNodeDetailsReturned() throws Exception {
+    public void performPurge_whenOneCallFailsWithServerErrorThenResponseWithPerNodeDetailsReturned() throws Exception {
         // given
         when(nodeService.allActive()).thenReturn(nodeMap());
         mock204Response("testName", "testKey", remoteLookupTableResource1);
@@ -160,19 +167,25 @@ public class ClusterLookupTableResourceTest {
                 .thenThrow(new RuntimeException("Some exception"));
 
         // when
-        final List<LookupTableCachePurgingNodeResponse> res = underTest.performPurge("testName", "testKey");
+        final Map<String, ProxiedResource.CallResult<Void>> res = underTest.performPurge("testName", "testKey");
 
         // then
         verify(remoteLookupTableResource1).performPurge("testName", "testKey");
         verify(remoteLookupTableResource2).performPurge("testName", "testKey");
 
-        assertThat(findNodeRes(res, "node_1")).satisfies(nodeRes -> {
-            assertThat(nodeRes.success).isTrue();
-            assertThat(nodeRes.message).isEqualTo("Successfully purged the cache");
+        assertThat(res.get("node_1")).satisfies(nodeRes -> {
+            assertThat(nodeRes.isSuccess()).isTrue();
+            assertThat(nodeRes.serverErrorMessage()).isNull();
+            assertThat(nodeRes.response().code()).isEqualTo(204);
+            assertThat(nodeRes.response().entity()).isEmpty();
+            assertThat(nodeRes.response().errorText()).isNull();
+
         });
-        assertThat(findNodeRes(res, "node_2")).satisfies(nodeRes -> {
-            assertThat(nodeRes.success).isFalse();
-            assertThat(nodeRes.message).isEqualTo("Failed with exception: java.lang.RuntimeException, message: Some exception");
+
+        assertThat(res.get("node_2")).satisfies(nodeRes -> {
+            assertThat(nodeRes.isSuccess()).isFalse();
+            assertThat(nodeRes.serverErrorMessage()).isEqualTo("Some exception");
+            assertThat(nodeRes.response()).isNull();
         });
     }
 
@@ -183,7 +196,13 @@ public class ClusterLookupTableResourceTest {
         when(remoteLookupTableResource.performPurge(tableName, key))
                 .thenReturn(call);
 
-        when(call.execute()).thenReturn(Response.success(null));
+        when(call.execute()).thenReturn(Response.success(null,
+                new okhttp3.Response.Builder() //
+                        .code(204)
+                        .message("No-Content")
+                        .protocol(Protocol.HTTP_1_1)
+                        .request(new Request.Builder().url("http://localhost/").build())
+                        .build()));
     }
 
     private void mock404Response(String tableName, String key,
@@ -194,7 +213,7 @@ public class ClusterLookupTableResourceTest {
                 .thenReturn(call);
 
         when(call.execute()).thenReturn(Response.error(
-                ResponseBody.create(null, ""),
+                ResponseBody.create(null, "Resource Not Found"),
                 new okhttp3.Response.Builder() //
                         .code(404)
                         .message("Not Found")

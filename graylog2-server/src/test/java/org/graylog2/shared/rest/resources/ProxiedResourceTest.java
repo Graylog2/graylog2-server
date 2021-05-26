@@ -16,7 +16,7 @@
  */
 package org.graylog2.shared.rest.resources;
 
-import org.graylog2.shared.rest.resources.ProxiedResource.MasterResponse;
+import org.graylog2.shared.rest.resources.ProxiedResource.NodeResponse;
 import org.junit.Test;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -26,7 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ProxiedResourceTest {
     @Test
     public void masterResponse() {
-        final MasterResponse<String> response1 = MasterResponse.create(true, 200, "hello world", null);
+        final ProxiedResource.NodeResponse<String> response1 = NodeResponse.create(true, 200, "hello world", null);
 
         assertThat(response1.isSuccess()).isTrue();
         assertThat(response1.code()).isEqualTo(200);
@@ -34,7 +34,7 @@ public class ProxiedResourceTest {
         assertThat(response1.error()).isNotPresent();
         assertThat(response1.body()).isEqualTo("hello world");
 
-        final MasterResponse<String> response2 = MasterResponse.create(false, 400, null, "error".getBytes(UTF_8));
+        final NodeResponse<String> response2 = NodeResponse.create(false, 400, null, "error".getBytes(UTF_8));
 
         assertThat(response2.isSuccess()).isFalse();
         assertThat(response2.code()).isEqualTo(400);
