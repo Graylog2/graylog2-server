@@ -122,18 +122,19 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
                         .setConnectTimeout(Math.toIntExact(connectTimeout.toMilliseconds()))
                         .setSocketTimeout(Math.toIntExact(socketTimeout.toMilliseconds()))
                         .setExpectContinueEnabled(useExpectContinue)
-                        .setAuthenticationEnabled(true))
-                .setHttpClientConfigCallback(httpClientBuilder -> {
-                    httpClientBuilder
+                        .setAuthenticationEnabled(true)
+                )
+                .setHttpClientConfigCallback(httpClientConfig -> {
+                    httpClientConfig
                         .setMaxConnTotal(maxTotalConnections)
                         .setMaxConnPerRoute(maxTotalConnectionsPerRoute)
                         .setDefaultCredentialsProvider(credentialsProvider);
 
                     if(muteElasticsearchDeprecationWarnings) {
-                        httpClientBuilder.addInterceptorFirst(new ElasticsearchFilterDeprecationWarningsInterceptor());
+                        httpClientConfig.addInterceptorFirst(new ElasticsearchFilterDeprecationWarningsInterceptor());
                     }
 
-                    return httpClientBuilder;
+                    return httpClientConfig;
                 });
 
         return new RestHighLevelClient(restClientBuilder);
