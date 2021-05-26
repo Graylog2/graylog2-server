@@ -59,6 +59,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.ArrayDeque;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.IdentityHashMap;
@@ -75,6 +76,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
     private final Map<String, ESPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>> seriesHandlers;
     private static final TimeRange ALL_MESSAGES_TIMERANGE = allMessagesTimeRange();
     private static final String TERMS_SEPARATOR = "\u2E31";
+    private static final String UNKNOWN_FIELD = "\u200B";
 
     private static final String ROWS_POSTFIX = "-rows";
     private static final String COLUMNS_POSTFIX = "-columns";
@@ -95,8 +97,14 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         this.seriesHandlers = seriesHandlers;
     }
 
+    private String createAggregationName(final ESGeneratedQueryContext queryContext, final Pivot pivot, final String postfix) {
+        final String aggregationName = queryContext.nextName();
+        queryContext.contextMap().put(pivot.id() + postfix, aggregationName);
+        return aggregationName;
+    }
+
     @Override
-    public void doGenerateQueryPart(SearchJob job, Query query, Pivot pivot, ESGeneratedQueryContext queryContext) {
+    public void doGenerateQueryPart(final SearchJob job, final Query query, final Pivot pivot, final ESGeneratedQueryContext queryContext) {
         LOG.debug("Generating aggregation for {}", pivot);
         final SearchSourceBuilder searchSourceBuilder = queryContext.searchSourceBuilder(pivot);
 
@@ -104,36 +112,32 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         final AggTypes aggTypes = new AggTypes();
         contextMap.put(pivot.id(), aggTypes);
 
-        final List<AggregationBuilder> seriesAggregations = seriesStream(pivot, queryContext, "global rollup")
-                .collect(Collectors.toList());
+        final List<AggregationBuilder> seriesAggregations = seriesStream(pivot, queryContext, "global rollup").collect(Collectors.toList());
 
-        // add global rollup series if those were requested
-        if (pivot.rollup()) {
-            seriesAggregations.forEach(searchSourceBuilder::aggregation);
-        }
-
-        final String rowsAggregationName = queryContext.nextName();
-        contextMap.put(pivot.id() + ROWS_POSTFIX, rowsAggregationName);
+        // add rollup series if those were requested
+        if (pivot.rollup()) seriesAggregations.forEach(searchSourceBuilder::aggregation);
 
         final List<Order> bucketOrder = orderListForPivot(pivot, queryContext);
-        final AggregationBuilder rowsAggregation = createAggregation(rowsAggregationName, pivot.rowGroups(), bucketOrder);
 
-        if (pivot.rollup()) {
-            seriesAggregations.forEach(rowsAggregation::subAggregation);
-        }
+        // if rows are defined, begin nesting from the rows
+        if(!pivot.rowGroups().isEmpty()) {
+            final AggregationBuilder rowsAggregation = createAggregation(createAggregationName(queryContext, pivot, ROWS_POSTFIX), pivot.rowGroups(), bucketOrder);
 
-        // If the rowGroups does not have at least one field, the script stays empty ("") which leads to an error in ES
-        if(pivotHasFields(pivot.rowGroups()))
+            // add rollup series if those were requested
+            if (pivot.rollup()) seriesAggregations.forEach(rowsAggregation::subAggregation);
+
             searchSourceBuilder.aggregation(rowsAggregation);
 
-        if (!pivot.columnGroups().isEmpty()) {
-            final String columnsAggregationName = queryContext.nextName();
-            contextMap.put(pivot.id() + COLUMNS_POSTFIX, columnsAggregationName);
-            final AggregationBuilder columnsAggregation = createAggregation(columnsAggregationName, pivot.columnGroups(), bucketOrder);
+            final AggregationBuilder columnsAggregation = createAggregation(createAggregationName(queryContext, pivot, COLUMNS_POSTFIX), pivot.columnGroups(), bucketOrder);
 
             seriesAggregations.forEach(columnsAggregation::subAggregation);
-
             rowsAggregation.subAggregation(columnsAggregation);
+        } else {
+            // only columns are defined. Still add an aggregation to the searchSourceBuilder, so we get 1 row
+            final AggregationBuilder columnsAggregation = createAggregation(createAggregationName(queryContext, pivot, COLUMNS_POSTFIX), pivot.columnGroups(), bucketOrder);
+
+            seriesAggregations.forEach(columnsAggregation::subAggregation);
+            searchSourceBuilder.aggregation(columnsAggregation);
         }
 
         final MinAggregationBuilder startTimestamp = AggregationBuilders.min("timestamp-min").field("timestamp");
@@ -146,7 +150,8 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
     private String createScript(List<BucketSpec> pivots) {
         return pivots.stream()
                 .map(BucketSpec::field)
-                .map(field -> "doc['" + field + "'].value")
+//                .map(field -> field == null ? "'null field'" : "(doc.containsKey('" + field + "') ? doc['" + field + "'].value : 'unknown field')")
+                .map(field -> "(doc['" + field + "'].size() == 0 ? '" + UNKNOWN_FIELD + "' : doc['" + field + "'].value)")
                 .collect(Collectors.joining(" + '" + TERMS_SEPARATOR + "' + "));
     }
 
@@ -199,6 +204,14 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         );
     }
 
+    private static List<String> copy(Collection<String> key) {
+        return Collections.unmodifiableList(key.stream().collect(Collectors.toList()));
+    }
+
+    private static List<String> replaceUnknownFields(String key[]) {
+        return copy(Arrays.stream(key).map(k -> UNKNOWN_FIELD.equals(k) ? null : k).collect(Collectors.toList()));
+    }
+
     @Override
     public SearchType.Result doExtractResult(SearchJob job, Query query, Pivot pivot, SearchResult queryResult, MetricAggregation aggregations, ESGeneratedQueryContext queryContext) {
         final AbsoluteRange effectiveTimerange = extractEffectiveTimeRange(queryResult, query, pivot);
@@ -206,7 +219,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         final PivotResult.Builder resultBuilder = PivotResult.builder()
                 .id(pivot.id())
                 .effectiveTimerange(effectiveTimerange)
-                .total(extractDocumentCount(queryResult, pivot, queryContext));
+                .total(extractDocumentCount(queryResult));
 
         // pivot results are a table where cells can contain multiple "values" and not only scalars:
         // each combination of row and column groups can contain all series (if rollup is true)
@@ -226,9 +239,11 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
                 final List<PivotResult.Row> rows = rowsResult.getBuckets()
                         .stream()
                         .map(bucket -> {
-                            final ImmutableList<String> rowKeys = ImmutableList.copyOf(bucket.getKeyAsString().split(TERMS_SEPARATOR));
-                            final PivotResult.Row.Builder rowBuilder = PivotResult.Row.builder().key(rowKeys)
-                                    .source("leaf");
+                            final List<String> rowKeys = replaceUnknownFields(bucket.getKeyAsString().split(TERMS_SEPARATOR));
+                            if(pivot.rowGroups().size() != rowKeys.size()) {
+                                LOG.warn("Expected number of terms in row: {}, but was {}. The separator char might be part of the field values.", pivot.rowGroups().size(), rowKeys.size());
+                            }
+                            final PivotResult.Row.Builder rowBuilder = PivotResult.Row.builder().key(rowKeys).source("leaf");
                             if (pivot.rollup()) {
                                 pivot.series().stream()
                                         .flatMap(seriesSpec -> createRowValuesForSeries(pivot, queryResult, queryContext, bucket, seriesSpec))
@@ -241,7 +256,10 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
                                     final TermsAggregation columnsResult = bucket.getTermsAggregation(columnsAggName);
                                     if (columnsResult != null) {
                                         columnsResult.getBuckets().forEach(columnBucket -> {
-                                            final ImmutableList<String> columnKeys = ImmutableList.copyOf(columnBucket.getKeyAsString().split(TERMS_SEPARATOR));
+                                            final List<String> columnKeys = replaceUnknownFields(columnBucket.getKeyAsString().split(TERMS_SEPARATOR));
+                                            if(pivot.columnGroups().size() != columnKeys.size()) {
+                                                LOG.warn("Expected number of terms in columns: {}, but was {}. The separator char might be part of the field values.", pivot.rowGroups().size(), rowKeys.size());
+                                            }
                                             pivot.series().stream()
                                                     .flatMap(seriesSpec -> createColumnValuesForSeries(pivot, queryResult, queryContext, columnBucket, seriesSpec, columnKeys))
                                                     .forEach(rowBuilder::addValue);
@@ -262,9 +280,36 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
                 LOG.warn("Expected aggregation '{}' not found in aggregations.", rowsAggName);
             }
         } else {
-            LOG.warn("Expected row-key '{}' not found in queryContext", rowKey);
+            // in the case that only columns were defined
+            final String columnsKey = pivot.id() + COLUMNS_POSTFIX;
+            if(queryContext.contextMap().containsKey(columnsKey)) {
+                final String colsAggName = queryContext.contextMap().get(columnsKey).toString();
+                final TermsAggregation columnsResult = queryResult.getAggregations().getTermsAggregation(colsAggName);
+                if (columnsResult != null) {
+                    final PivotResult.Row.Builder rowBuilder = PivotResult.Row.builder().key(ImmutableList.<String>builder().build()).source("leaf");
+
+//                    if(pivot.rollup())
+//                        processSeries(rowBuilder, queryResult, queryContext, pivot, new ArrayDeque<>(), createInitialResult(queryResult), true, "row-leaf");
+
+                    columnsResult.getBuckets().forEach(columnBucket -> {
+                        final List<String> columnKeys = replaceUnknownFields(columnBucket.getKeyAsString().split(TERMS_SEPARATOR));
+                        if(pivot.columnGroups().size() != columnKeys.size()) {
+                            LOG.warn("Expected number of terms in columns: {}, but was {}. The separator char might be part of the field values.", pivot.columnGroups().size(), columnKeys.size());
+                        }
+                        pivot.series().stream()
+                                .flatMap(seriesSpec -> createColumnValuesForSeries(pivot, queryResult, queryContext, columnBucket, seriesSpec, columnKeys))
+                                .forEach(rowBuilder::addValue);
+                    });
+
+                    resultBuilder.addRow(rowBuilder.build());
+                } else {
+                    LOG.warn("Expected aggregation '{}' not found in aggregations.", colsAggName);
+                }
+            }
         }
-        return pivot.name().map(resultBuilder::name).orElse(resultBuilder).build();
+
+        final PivotResult pvr = pivot.name().map(resultBuilder::name).orElse(resultBuilder).build();
+        return pvr;
     }
 
     private Stream<PivotResult.Value> createRowValuesForSeries(Pivot pivot, SearchResult queryResult, ESGeneratedQueryContext queryContext, Bucket bucket, SeriesSpec seriesSpec) {
@@ -314,10 +359,9 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
                 .collect(Collectors.toList());
     }
 
-    private long extractDocumentCount(SearchResult queryResult, Pivot pivot, ESGeneratedQueryContext queryContext) {
+    private long extractDocumentCount(SearchResult queryResult) {
         return queryResult.getTotal();
     }
-
 
     /*
         results from elasticsearch are nested so we need to recurse into the aggregation tree, but our result is a table, thus we need
