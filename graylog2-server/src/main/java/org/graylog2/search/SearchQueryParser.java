@@ -24,6 +24,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSet;
 import org.apache.commons.lang3.tuple.Pair;
+import org.bson.types.ObjectId;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -259,6 +260,8 @@ public class SearchQueryParser {
                 return new FieldValue(Integer.parseInt(pair.getLeft()), pair.getRight(), negate);
             case LONG:
                 return new FieldValue(Long.parseLong(pair.getLeft()), pair.getRight(), negate);
+            case OBJECT_ID:
+                return new FieldValue(new ObjectId(pair.getLeft()), pair.getRight(), negate);
             default:
                 throw new IllegalArgumentException("Unhandled field type: " + fieldType.toString());
         }

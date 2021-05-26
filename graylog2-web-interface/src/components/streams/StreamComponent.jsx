@@ -21,6 +21,7 @@ import { Alert } from 'components/graylog';
 import { Icon, IfPermitted, PaginatedList, SearchForm } from 'components/common';
 import StoreProvider from 'injection/StoreProvider';
 import Spinner from 'components/common/Spinner';
+import QueryHelper from 'components/common/QueryHelper';
 
 import StreamList from './StreamList';
 import CreateStreamButton from './CreateStreamButton';
@@ -160,7 +161,10 @@ class StreamComponent extends React.Component {
         <PaginatedList onChange={this._onPageChange}
                        totalItems={pagination.total}>
           <div style={{ marginBottom: 15 }}>
-            <SearchForm onSearch={this._onSearch} onReset={this._onReset} useLoadingState />
+            <SearchForm onSearch={this._onSearch}
+                        onReset={this._onReset}
+                        queryHelpComponent={<QueryHelper entityName="stream" />}
+                        useLoadingState />
           </div>
           <div>{streamListComp}</div>
         </PaginatedList>
