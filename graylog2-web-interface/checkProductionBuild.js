@@ -92,6 +92,9 @@ function bootstrapApi(prefix = '/api/') {
 
   const sessionHandler = (req, res) => res.json({ session_id: null, username: null, is_valid: false });
   api.get(`${prefix}system/sessions`, sessionHandler);
+  const authtypeHandler = (req, res) => res.json({ backend: 'okta' });
+  api.get(`${prefix}system/authentication/services/backends/active-backend/type`, authtypeHandler);
+
   const server = api.listen();
   const { port } = server.address();
 
