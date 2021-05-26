@@ -89,8 +89,8 @@ module.exports = {
           content: 'src/theme/docs/Utilities.md',
         },
         {
-          name: 'Spacing',
-          content: 'src/theme/docs/Spacing.md',
+          name: 'Spacings',
+          content: 'src/theme/docs/Spacings.md',
         },
       ],
     },

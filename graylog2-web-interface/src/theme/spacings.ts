@@ -42,9 +42,13 @@ const spacings = {
 } as Spacings;
 
 SIZES.forEach((size, index) => {
-  if (size === '0') spacings[size] = '0';
-  else if (size === '1') spacings[size] = '1px';
-  else {
+  if (size === '0') {
+    spacings[size] = '0px';
+    spacings.px[size] = 0;
+  } else if (size === '1') {
+    spacings[size] = '1px';
+    spacings.px[size] = 1;
+  } else {
     const value = SPACE * fibSequence[index + 2];
 
     spacings[size] = `${value}rem`;
