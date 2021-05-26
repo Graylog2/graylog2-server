@@ -91,7 +91,7 @@ const defaultLabelMapper = (data: Array<{ name: string }>) => data.map(({ name }
 
 const PlotLegend = ({ children, config, chartData, labelMapper = defaultLabelMapper }: Props) => {
   const [colorPickerConfig, setColorPickerConfig] = useState<ColorPickerConfig | undefined>();
-  const { columnPivots } = config;
+  const { columnPivots, series } = config;
   const labels: Array<string> = labelMapper(chartData);
   const { activeQuery } = useStore(CurrentViewStateStore);
   const { colors, setColor } = useContext(ChartColorContext);
@@ -145,6 +145,10 @@ const PlotLegend = ({ children, config, chartData, labelMapper = defaultLabelMap
     setColorPickerConfig(undefined);
   }, [setColor]);
 
+  if ((!focusedWidget || !focusedWidget.editing) && series.length <= 1 && columnPivots.length <= 0) {
+    return <>{children}</>;
+  }
+
   const tableCells = labels.sort(stringLenSort).map((value) => {
     let val: React.ReactNode = value;
 
@@ -163,10 +167,6 @@ const PlotLegend = ({ children, config, chartData, labelMapper = defaultLabelMap
       </LegendCell>
     );
   });
-
-  if (tableCells.length <= 1 && (!focusedWidget || !focusedWidget.editing)) {
-    return <>{children}</>;
-  }
 
   const result = chunkCells(tableCells, 5).map((cells, index) => (
     // eslint-disable-next-line react/no-array-index-key

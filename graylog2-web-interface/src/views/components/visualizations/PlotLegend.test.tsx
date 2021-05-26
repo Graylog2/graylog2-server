@@ -23,6 +23,7 @@ import ColorMapper from 'views/components/visualizations/ColorMapper';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
+import Series from 'views/logic/aggregationbuilder/Series';
 
 import ChartColorContext from './ChartColorContext';
 
@@ -48,7 +49,7 @@ const columnPivots = [Pivot.create('field1', 'unknown')];
 const config = AggregationWidgetConfig.builder().columnPivots(columnPivots).build();
 
 // eslint-disable-next-line react/require-default-props
-const SUT = ({ chartDataProp = chartData }: { chartDataProp?: Array<{ name: string }>}) => (
+const SUT = ({ chartDataProp = chartData, plotConfig = config }: { chartDataProp?: Array<{ name: string, }>, plotConfig?: AggregationWidgetConfig }) => (
   <WidgetFocusContext.Provider value={{
     focusedWidget: undefined,
     setWidgetFocusing: jest.fn(),
@@ -57,7 +58,7 @@ const SUT = ({ chartDataProp = chartData }: { chartDataProp?: Array<{ name: stri
     setWidgetEditing: jest.fn(),
   }}>
     <ChartColorContext.Provider value={{ colors, setColor }}>
-      <PlotLegend config={config} chartData={chartDataProp}>
+      <PlotLegend config={plotConfig} chartData={chartDataProp}>
         <div>Plot</div>
       </PlotLegend>
     </ChartColorContext.Provider>
@@ -108,7 +109,8 @@ describe('PlotLegend', () => {
   });
 
   it('should hide with a single values', async () => {
-    render(<SUT chartDataProp={[{ name: 'name1' }]} />);
+    const plotConfig = AggregationWidgetConfig.builder().series([Series.forFunction('count')]).build();
+    render(<SUT chartDataProp={[{ name: 'name1' }]} plotConfig={plotConfig} />);
 
     expect(screen.queryByText('name1')).not.toBeInTheDocument();
   });
