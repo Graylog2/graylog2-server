@@ -40,7 +40,6 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.Collection;
 import java.util.Optional;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 
 public class VersionProbe {
@@ -61,7 +60,11 @@ public class VersionProbe {
         this.connectionRetryWait = elasticsearchConnectionRetryWait;
     }
 
-    public Optional<Version> probe(Collection<URI> hosts) {
+    public Optional<Version> probe(final Collection<URI> hosts) {
+        return (connectionRetries > 0) ? this.probeRetries(hosts) : this.probeSingle(hosts);
+    }
+
+    public Optional<Version> probeSingle(final Collection<URI> hosts) {
         return hosts
                 .stream()
                 .map(this::probe)
@@ -70,7 +73,22 @@ public class VersionProbe {
                 .orElse(Optional.empty());
     }
 
-    public Optional<Version> probe(URI host) {
+    private Optional<Version> probeRetries(final Collection<URI> hosts) {
+        try {
+            return RetryerBuilder.<Optional<Version>>newBuilder()
+                    .retryIfResult(input -> !input.isPresent())
+                    .retryIfExceptionOfType(IOException.class)
+                    .retryIfRuntimeException()
+                    .withWaitStrategy(WaitStrategies.fixedWait(connectionRetryWait.getQuantity(), connectionRetryWait.getUnit()))
+                    .withStopStrategy(StopStrategies.stopAfterAttempt(connectionRetries))
+                    .build().call(() -> this.probeSingle(hosts));
+        } catch (ExecutionException | RetryException e) {
+            LOG.error("Unable to retrieve version from Elasticsearch node: ", e);
+        }
+        return Optional.empty();
+    }
+
+    private Optional<Version> probe(URI host) {
         final Retrofit retrofit;
         try {
             retrofit = new Retrofit.Builder()
@@ -122,31 +140,12 @@ public class VersionProbe {
     }
 
     private Optional<RootResponse> rootResponse(final RootRoute rootRoute) {
-        return (connectionRetries > 0) ? this.multipleTries(rootRoute) : this.singleTry(rootRoute);
-    }
-
-    private Optional<RootResponse> singleTry(final RootRoute rootRoute) {
         try {
             final Response<RootResponse> response = rootRoute.root().execute();
             if (response.isSuccessful()) {
                 return Optional.ofNullable(response.body());
             }
         } catch (IOException e) {
-            LOG.error("Unable to retrieve version from Elasticsearch node: ", e);
-        }
-        return Optional.empty();
-    }
-
-    private Optional<RootResponse> multipleTries(final RootRoute rootRoute) {
-        try {
-            return RetryerBuilder.<Optional<RootResponse>>newBuilder()
-                    .retryIfResult(input -> !input.isPresent())
-                    .retryIfExceptionOfType(IOException.class)
-                    .retryIfRuntimeException()
-                    .withWaitStrategy(WaitStrategies.fixedWait(connectionRetryWait.getQuantity(), connectionRetryWait.getUnit()))
-                    .withStopStrategy(StopStrategies.stopAfterAttempt(connectionRetries))
-                    .build().call(() -> this.singleTry(rootRoute));
-        } catch (ExecutionException | RetryException e) {
             LOG.error("Unable to retrieve version from Elasticsearch node: ", e);
         }
         return Optional.empty();
