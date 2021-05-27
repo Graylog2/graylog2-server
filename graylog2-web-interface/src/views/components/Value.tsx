@@ -41,7 +41,7 @@ const defaultRenderer: ValueRenderer = ({ value }: ValueRendererProps) => value;
 
 const Value = ({ children, field, value, queryId, render = defaultRenderer, type = FieldType.Unknown }: Props) => {
   const RenderComponent: ValueRenderer = render || ((props: ValueRendererProps) => props.value);
-  const Component = (v) => <RenderComponent field={field} value={v.value} type={type} />;
+  const Component = ({ value: componentValue }) => <RenderComponent field={field} value={componentValue} />;
   const element = <TypeSpecificValue field={field} value={value} type={type} render={Component} />;
 
   return (
