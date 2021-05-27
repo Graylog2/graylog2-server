@@ -16,19 +16,13 @@
  */
 import { isString } from 'lodash';
 
-type Body = {
-  message?: string;
-  type?: string;
-  streams?: string[];
-}
-
 type Res = {
   text?: string;
 }
 
 type Additional = {
   status: number;
-  body?: Body;
+  body?: any;
   res?: Res;
 }
 
@@ -41,7 +35,7 @@ export default class FetchError extends Error {
 
   status: Additional['status'];
 
-  constructor(message: string, status: number,  additional) {
+  constructor(message: string, status: number, additional: any) {
     super(message);
     this.name = 'FetchError';
 
@@ -50,7 +44,7 @@ export default class FetchError extends Error {
 
     this.responseMessage = additional?.message ?? undefined;
 
-    this.additional = {body: additional, status, res: {text: JSON.stringify(additional)}};
+    this.additional = { body: additional, status, res: { text: isString(additional) && additional } };
     this.status = status; // Shortcut, as this is often used
   }
 }
