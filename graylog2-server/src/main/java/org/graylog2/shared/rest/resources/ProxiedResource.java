@@ -193,9 +193,9 @@ public abstract class ProxiedResource extends RestResource {
      * This is used to forward an API request to the master node. It is useful in situations where an API call can
      * only be executed on the master node.
      * <p>
-     * The returned {@link NodeResponse} object is constructed from the remote response's status code and body.
+     * The returned {@link MasterResponse} object is constructed from the remote response's status code and body.
      */
-    protected <RemoteInterfaceType, RemoteCallResponseType> NodeResponse<RemoteCallResponseType> requestOnMaster(
+    protected <RemoteInterfaceType, RemoteCallResponseType> MasterResponse<RemoteCallResponseType> requestOnMaster(
             Function<RemoteInterfaceType, Call<RemoteCallResponseType>> remoteInterfaceFunction,
             Function<String, Optional<RemoteInterfaceType>> remoteInterfaceProvider
     ) throws IOException {
@@ -207,7 +207,7 @@ public abstract class ProxiedResource extends RestResource {
         return doNodeApiCall(masterNode.getNodeId(), remoteInterfaceProvider, remoteInterfaceFunction, Function.identity());
     }
 
-    private  <RemoteInterfaceType, RemoteCallResponseType, FinalResponseType> NodeResponse<FinalResponseType> doNodeApiCall(
+    private  <RemoteInterfaceType, RemoteCallResponseType, FinalResponseType> MasterResponse<FinalResponseType> doNodeApiCall(
             String nodeId,
             Function<String, Optional<RemoteInterfaceType>> remoteInterfaceProvider,
             Function<RemoteInterfaceType, Call<RemoteCallResponseType>> remoteInterfaceFunction,
@@ -221,7 +221,7 @@ public abstract class ProxiedResource extends RestResource {
 
         final byte[] errorBody = response.errorBody() == null ? null : response.errorBody().bytes();
 
-        return NodeResponse.create(response.isSuccessful(), response.code(), transformer.apply(response.body()), errorBody);
+        return MasterResponse.create(response.isSuccessful(), response.code(), transformer.apply(response.body()), errorBody);
     }
 
     /**
@@ -240,9 +240,9 @@ public abstract class ProxiedResource extends RestResource {
 
         @JsonProperty("response")
         @Nullable
-        public abstract NodeResponse<ResponseType> response();
+        public abstract MasterResponse<ResponseType> response();
 
-        public static <ResponseType> CallResult<ResponseType> success(@Nonnull NodeResponse<ResponseType> response) {
+        public static <ResponseType> CallResult<ResponseType> success(@Nonnull MasterResponse<ResponseType> response) {
             return new AutoValue_ProxiedResource_CallResult<>(true, null, response);
         }
 
@@ -251,8 +251,12 @@ public abstract class ProxiedResource extends RestResource {
         }
     }
 
+    /**
+     * The name of the class is preserved for the sake of backward compatibility
+     * with existing plugins.
+     */
     @AutoValue
-    public static abstract class NodeResponse<ResponseType> {
+    public static abstract class MasterResponse<ResponseType> {
         /**
          * Indicates whether the request has been successful or not.
          * @return {@code true} for a successful request, {@code false} otherwise
@@ -302,11 +306,11 @@ public abstract class ProxiedResource extends RestResource {
                     .orElse(null);
         }
 
-        public static <ResponseType> NodeResponse<ResponseType> create(boolean isSuccess,
-                                                                       int code,
-                                                                       @Nullable ResponseType entity,
-                                                                       @Nullable byte[] error) {
-            return new AutoValue_ProxiedResource_NodeResponse<>(isSuccess, code, Optional.ofNullable(entity), Optional.ofNullable(error));
+        public static <ResponseType> MasterResponse<ResponseType> create(boolean isSuccess,
+                                                                         int code,
+                                                                         @Nullable ResponseType entity,
+                                                                         @Nullable byte[] error) {
+            return new AutoValue_ProxiedResource_MasterResponse<>(isSuccess, code, Optional.ofNullable(entity), Optional.ofNullable(error));
         }
     }
 }
