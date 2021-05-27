@@ -18,7 +18,9 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { Responsive, WidthProvider } from 'react-grid-layout';
 import { isEqual } from 'lodash';
-import styled, { css } from 'styled-components';
+import styled, { css, withTheme } from 'styled-components';
+
+import { themePropTypes } from 'theme';
 
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
@@ -186,6 +188,7 @@ class ReactGridContainer extends React.Component {
      */
     measureBeforeMount: PropTypes.bool,
     width: PropTypes.number,
+    theme: themePropTypes.isRequired,
   };
 
   static defaultProps = {
@@ -258,8 +261,9 @@ class ReactGridContainer extends React.Component {
   };
 
   render() {
-    const { children, width, locked, isResizable, rowHeight, columns, animate, useDragHandle, measureBeforeMount, className } = this.props;
+    const { children, width, locked, isResizable, rowHeight, columns, animate, useDragHandle, measureBeforeMount, className, theme } = this.props;
     const { layout } = this.state;
+    const cellMargin = theme.spacings.px.xs;
 
     // We need to use a className and draggableHandle to avoid re-rendering all graphs on lock/unlock. See:
     // https://github.com/STRML/react-grid-layout/issues/371
@@ -271,7 +275,7 @@ class ReactGridContainer extends React.Component {
                                      cols={columns}
                                      rowHeight={rowHeight}
                                      containerPadding={[0, 0]}
-                                     margin={[6, 6]}
+                                     margin={[cellMargin, cellMargin]}
                                      isResizable={isResizable}
                                      measureBeforeMount={measureBeforeMount}
         // Do not allow dragging from elements inside a `.actions` css class. This is
@@ -287,4 +291,4 @@ class ReactGridContainer extends React.Component {
   }
 }
 
-export default ReactGridContainer;
+export default withTheme(ReactGridContainer);
