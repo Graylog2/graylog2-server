@@ -36,7 +36,7 @@ const emptyToUndefined = (s: any) => (s && s !== '' ? s : undefined);
 
 const onServerError = async (error: Response | undefined, onUnauthorized = defaultOnUnauthorizedError) => {
   const contentType = error.headers?.get('Content-Type');
-  const response = await (contentType?.startsWith('application/json') ? error.json().then((body) => body) : error.text());
+  const response = await (contentType?.startsWith('application/json') ? error.json().then((body) => body) : error?.text?.());
   const SessionStore = StoreProvider.getStore('Session');
   const fetchError = new FetchError(error.statusText, error.status, emptyToUndefined(response));
 

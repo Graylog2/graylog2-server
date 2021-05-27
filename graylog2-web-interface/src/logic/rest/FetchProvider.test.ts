@@ -41,6 +41,7 @@ jest.mock('injection/ActionsProvider', () => ({
     },
     ServerAvailability: {
       reportSuccess: jest.fn(),
+      reportError: jest.fn(),
     },
   }[key]),
 }));
@@ -164,8 +165,9 @@ describe('FetchProvider', () => {
   });
 
   it('handles error properly when endpoint is not reachable', async () => {
-    const result = await fetch('POST', 'http://localhost:12223/');
+    const error = await fetch('POST', 'http://localhost:12223/').catch((e) => e);
 
-    console.log(result);
+    expect(error.status).toEqual(undefined);
+    expect(error.message).toEqual('There was an error fetching a resource: undefined. Additional information: Not available');
   });
 });
