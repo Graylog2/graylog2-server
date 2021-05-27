@@ -108,7 +108,7 @@ class StreamComponent extends React.Component {
 
   _onReset = () => {
     const { pagination } = this.state;
-    const newPagination = Object.assign(pagination, { query: '' });
+    const newPagination = { ...pagination, query: '', page: 1 };
 
     this.setState({ pagination: newPagination }, this.loadData);
   };
