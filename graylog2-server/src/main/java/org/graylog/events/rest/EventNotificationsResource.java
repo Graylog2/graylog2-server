@@ -74,7 +74,7 @@ import static org.graylog2.shared.security.RestPermissions.USERS_LIST;
 @RequiresAuthentication
 public class EventNotificationsResource extends RestResource implements PluginRestResource {
     private static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
-            .put("id", SearchQueryField.create(NotificationDto.FIELD_ID))
+            .put("id", SearchQueryField.create("_id", SearchQueryField.Type.OBJECT_ID))
             .put("title", SearchQueryField.create(NotificationDto.FIELD_TITLE))
             .put("description", SearchQueryField.create(NotificationDto.FIELD_DESCRIPTION))
             .build();

@@ -24,7 +24,7 @@ import moment from 'moment';
 import connect from 'stores/connect';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
-import { Spinner, Icon } from 'components/common';
+import { Spinner, Icon, FlatContentRow } from 'components/common';
 import { Row, Col } from 'components/graylog';
 import BottomRow from 'views/components/searchbar/BottomRow';
 import ViewActionsWrapper from 'views/components/searchbar/ViewActionsWrapper';
@@ -46,7 +46,6 @@ import type { SearchesConfig } from 'components/search/SearchConfig';
 import type { SearchBarFormValues } from 'views/Constants';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 
-import SearchBarContainer from './SearchBarContainer';
 import SearchBarForm from './searchbar/SearchBarForm';
 
 type Props = {
@@ -124,7 +123,7 @@ const SearchBar = ({
     <WidgetFocusContext.Consumer>
       {({ focusedWidget: { editing } = { editing: false } }) => (
         <ScrollToHint value={query.query_string}>
-          <SearchBarContainer>
+          <FlatContentRow>
             <SearchBarForm initialValues={{ timerange, streams, queryString }}
                            limitDuration={limitDuration}
                            onSubmit={_onSubmit}>
@@ -191,7 +190,7 @@ const SearchBar = ({
                 </>
               )}
             </SearchBarForm>
-          </SearchBarContainer>
+          </FlatContentRow>
         </ScrollToHint>
       )}
     </WidgetFocusContext.Consumer>
