@@ -194,10 +194,10 @@ const InteractableModal = ({
     return () => {
       window.removeEventListener('resize', handleBrowserResize);
     };
-  }, [dragPosition]);
+  }, [dragPosition, handleBrowserResize]);
 
   return (
-    <InteractableModalWrapper className={wrapperClassName}>
+    <InteractableModalWrapper className={wrapperClassName} role="dialog">
       <StyledRnd default={{ ...position, ...size }}
                  minHeight={minHeight}
                  minWidth={minWidth}
@@ -213,7 +213,7 @@ const InteractableModal = ({
         <Header ref={dragHandleRef}>
           <Title><DragBars name="bars" />{title}</Title>
 
-          <CloseButton bsStyle="link" onClick={onClose} bsSize="small">
+          <CloseButton bsStyle="link" onClick={onClose} bsSize="small" title="Close">
             <Icon name="times" size="lg" />
           </CloseButton>
         </Header>

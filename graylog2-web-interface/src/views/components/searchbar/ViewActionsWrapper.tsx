@@ -14,21 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import { render } from 'wrappedTestingLibrary';
+import styled from 'styled-components';
 
-import { ScratchpadProvider } from 'contexts/ScratchpadProvider';
+const ViewActionsWrapper = styled.div(({ theme }) => `
+  margin-left: 18px;
 
-import Scratchpad from './Scratchpad';
-
-describe('<Scratchpad />', () => {
-  it('properly renders', () => {
-    const { firstChild } = render(
-      <ScratchpadProvider loginName="scooby-doo">
-        <Scratchpad />
-      </ScratchpadProvider>,
-    );
-
-    expect(firstChild).toMatchSnapshot();
-  });
-});
+  @media (max-width: ${theme.breakpoints.max.sm}) {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 10px;
+  }
+`);
+export default ViewActionsWrapper;

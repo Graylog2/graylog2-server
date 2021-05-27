@@ -121,19 +121,19 @@ public class LookupTableResource extends RestResource {
             CacheDto.FIELD_NAME
     );
     private static final ImmutableMap<String, SearchQueryField> LUT_SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
-            .put("id", SearchQueryField.create(LookupTableDto.FIELD_ID))
+            .put("id", SearchQueryField.create("_id", SearchQueryField.Type.OBJECT_ID))
             .put("title", SearchQueryField.create(LookupTableDto.FIELD_TITLE))
             .put("description", SearchQueryField.create(LookupTableDto.FIELD_DESCRIPTION))
             .put("name", SearchQueryField.create(LookupTableDto.FIELD_NAME))
             .build();
     private static final ImmutableMap<String, SearchQueryField> ADAPTER_SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
-            .put("id", SearchQueryField.create(DataAdapterDto.FIELD_ID))
+            .put("id", SearchQueryField.create("_id", SearchQueryField.Type.OBJECT_ID))
             .put("title", SearchQueryField.create(DataAdapterDto.FIELD_TITLE))
             .put("description", SearchQueryField.create(DataAdapterDto.FIELD_DESCRIPTION))
             .put("name", SearchQueryField.create(DataAdapterDto.FIELD_NAME))
             .build();
     private static final ImmutableMap<String, SearchQueryField> CACHE_SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
-            .put("id", SearchQueryField.create(CacheDto.FIELD_ID))
+            .put("id", SearchQueryField.create("_id", SearchQueryField.Type.OBJECT_ID))
             .put("title", SearchQueryField.create(CacheDto.FIELD_TITLE))
             .put("description", SearchQueryField.create(CacheDto.FIELD_DESCRIPTION))
             .put("name", SearchQueryField.create(CacheDto.FIELD_NAME))
