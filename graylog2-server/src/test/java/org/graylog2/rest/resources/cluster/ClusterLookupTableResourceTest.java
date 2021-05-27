@@ -111,7 +111,7 @@ public class ClusterLookupTableResourceTest {
         verify(remoteLookupTableResource2).performPurge("testName", "testKey");
 
         assertThat(res.get("node_1")).satisfies(nodeRes -> {
-            assertThat(nodeRes.isSuccess()).isTrue();
+            assertThat(nodeRes.isCallExecuted()).isTrue();
             assertThat(nodeRes.serverErrorMessage()).isNull();
             assertThat(nodeRes.response().code()).isEqualTo(204);
             assertThat(nodeRes.response().entity()).isEmpty();
@@ -119,7 +119,7 @@ public class ClusterLookupTableResourceTest {
         });
 
         assertThat(res.get("node_2")).satisfies(nodeRes -> {
-            assertThat(nodeRes.isSuccess()).isTrue();
+            assertThat(nodeRes.isCallExecuted()).isTrue();
             assertThat(nodeRes.serverErrorMessage()).isNull();
             assertThat(nodeRes.response().code()).isEqualTo(204);
             assertThat(nodeRes.response().entity()).isEmpty();
@@ -142,7 +142,7 @@ public class ClusterLookupTableResourceTest {
         verify(remoteLookupTableResource2).performPurge("testName", "testKey");
 
         assertThat(res.get("node_1")).satisfies(nodeRes -> {
-            assertThat(nodeRes.isSuccess()).isTrue();
+            assertThat(nodeRes.isCallExecuted()).isTrue();
             assertThat(nodeRes.serverErrorMessage()).isNull();
             assertThat(nodeRes.response().code()).isEqualTo(204);
             assertThat(nodeRes.response().entity()).isEmpty();
@@ -150,7 +150,7 @@ public class ClusterLookupTableResourceTest {
 
         });
         assertThat(res.get("node_2")).satisfies(nodeRes -> {
-            assertThat(nodeRes.isSuccess()).isTrue();
+            assertThat(nodeRes.isCallExecuted()).isTrue();
             assertThat(nodeRes.serverErrorMessage()).isNull();
             assertThat(nodeRes.response().code()).isEqualTo(404);
             assertThat(nodeRes.response().entity()).isEmpty();
@@ -174,7 +174,7 @@ public class ClusterLookupTableResourceTest {
         verify(remoteLookupTableResource2).performPurge("testName", "testKey");
 
         assertThat(res.get("node_1")).satisfies(nodeRes -> {
-            assertThat(nodeRes.isSuccess()).isTrue();
+            assertThat(nodeRes.isCallExecuted()).isTrue();
             assertThat(nodeRes.serverErrorMessage()).isNull();
             assertThat(nodeRes.response().code()).isEqualTo(204);
             assertThat(nodeRes.response().entity()).isEmpty();
@@ -183,7 +183,7 @@ public class ClusterLookupTableResourceTest {
         });
 
         assertThat(res.get("node_2")).satisfies(nodeRes -> {
-            assertThat(nodeRes.isSuccess()).isFalse();
+            assertThat(nodeRes.isCallExecuted()).isFalse();
             assertThat(nodeRes.serverErrorMessage()).isEqualTo("Some exception");
             assertThat(nodeRes.response()).isNull();
         });

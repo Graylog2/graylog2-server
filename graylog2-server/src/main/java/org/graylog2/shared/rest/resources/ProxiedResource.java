@@ -204,10 +204,12 @@ public abstract class ProxiedResource extends RestResource {
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("No active master node found"));
 
-        return doNodeApiCall(masterNode.getNodeId(), remoteInterfaceProvider, remoteInterfaceFunction, Function.identity());
+        return MasterResponse.create(
+                doNodeApiCall(masterNode.getNodeId(), remoteInterfaceProvider, remoteInterfaceFunction, Function.identity())
+        );
     }
 
-    private  <RemoteInterfaceType, RemoteCallResponseType, FinalResponseType> MasterResponse<FinalResponseType> doNodeApiCall(
+    private  <RemoteInterfaceType, RemoteCallResponseType, FinalResponseType> NodeResponse<FinalResponseType> doNodeApiCall(
             String nodeId,
             Function<String, Optional<RemoteInterfaceType>> remoteInterfaceProvider,
             Function<RemoteInterfaceType, Call<RemoteCallResponseType>> remoteInterfaceFunction,
@@ -221,7 +223,7 @@ public abstract class ProxiedResource extends RestResource {
 
         final byte[] errorBody = response.errorBody() == null ? null : response.errorBody().bytes();
 
-        return MasterResponse.create(response.isSuccessful(), response.code(), transformer.apply(response.body()), errorBody);
+        return NodeResponse.create(response.isSuccessful(), response.code(), transformer.apply(response.body()), errorBody);
     }
 
     /**
@@ -231,8 +233,8 @@ public abstract class ProxiedResource extends RestResource {
     @AutoValue
     public static abstract class CallResult<ResponseType> {
 
-        @JsonProperty("success")
-        public abstract boolean isSuccess();
+        @JsonProperty("call_executed")
+        public abstract boolean isCallExecuted();
 
         @JsonProperty("server_error_message")
         @Nullable
@@ -240,9 +242,9 @@ public abstract class ProxiedResource extends RestResource {
 
         @JsonProperty("response")
         @Nullable
-        public abstract MasterResponse<ResponseType> response();
+        public abstract NodeResponse<ResponseType> response();
 
-        public static <ResponseType> CallResult<ResponseType> success(@Nonnull MasterResponse<ResponseType> response) {
+        public static <ResponseType> CallResult<ResponseType> success(@Nonnull NodeResponse<ResponseType> response) {
             return new AutoValue_ProxiedResource_CallResult<>(true, null, response);
         }
 
@@ -251,12 +253,9 @@ public abstract class ProxiedResource extends RestResource {
         }
     }
 
-    /**
-     * The name of the class is preserved for the sake of backward compatibility
-     * with existing plugins.
-     */
+
     @AutoValue
-    public static abstract class MasterResponse<ResponseType> {
+    public static abstract class NodeResponse<ResponseType> {
         /**
          * Indicates whether the request has been successful or not.
          * @return {@code true} for a successful request, {@code false} otherwise
@@ -306,11 +305,37 @@ public abstract class ProxiedResource extends RestResource {
                     .orElse(null);
         }
 
-        public static <ResponseType> MasterResponse<ResponseType> create(boolean isSuccess,
+        public static <ResponseType> NodeResponse<ResponseType> create(boolean isSuccess,
                                                                          int code,
                                                                          @Nullable ResponseType entity,
                                                                          @Nullable byte[] error) {
-            return new AutoValue_ProxiedResource_MasterResponse<>(isSuccess, code, Optional.ofNullable(entity), Optional.ofNullable(error));
+            return new AutoValue_ProxiedResource_NodeResponse<>(isSuccess, code, Optional.ofNullable(entity), Optional.ofNullable(error));
+        }
+    }
+
+    /**
+     * TODO: To replace by {@link NodeResponse}.
+     * Mind backward compatibility with existing plugins.
+     */
+    @Deprecated
+    @AutoValue
+    public static abstract class MasterResponse<ResponseType> {
+
+        public abstract boolean isSuccess();
+
+        public abstract int code();
+
+        public abstract Optional<ResponseType> entity();
+
+        public abstract Optional<byte[]> error();
+
+        public Object body() {
+            return entity().isPresent() ? entity().get() : error().orElse(null);
+        }
+
+        public static <ResponseType> MasterResponse<ResponseType> create(NodeResponse<ResponseType> nodeResponse) {
+            return new AutoValue_ProxiedResource_MasterResponse<>(
+                    nodeResponse.isSuccess(), nodeResponse.code(), nodeResponse.entity(), nodeResponse.error());
         }
     }
 }

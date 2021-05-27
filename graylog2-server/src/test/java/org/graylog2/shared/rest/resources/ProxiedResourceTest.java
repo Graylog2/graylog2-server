@@ -26,7 +26,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ProxiedResourceTest {
     @Test
     public void masterResponse() {
-        final MasterResponse<String> response1 = MasterResponse.create(true, 200, "hello world", null);
+        final MasterResponse<String> response1 = MasterResponse.create(
+                ProxiedResource.NodeResponse.create(true, 200, "hello world", null));
 
         assertThat(response1.isSuccess()).isTrue();
         assertThat(response1.code()).isEqualTo(200);
@@ -34,7 +35,8 @@ public class ProxiedResourceTest {
         assertThat(response1.error()).isNotPresent();
         assertThat(response1.body()).isEqualTo("hello world");
 
-        final MasterResponse<String> response2 = ProxiedResource.MasterResponse.create(false, 400, null, "error".getBytes(UTF_8));
+        final MasterResponse<String> response2 = ProxiedResource.MasterResponse.create(
+                ProxiedResource.NodeResponse.create(false, 400, null, "error".getBytes(UTF_8)));
 
         assertThat(response2.isSuccess()).isFalse();
         assertThat(response2.code()).isEqualTo(400);
