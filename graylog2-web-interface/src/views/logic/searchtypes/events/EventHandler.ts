@@ -32,6 +32,8 @@ export type Event = {
 
 export type Events = Array<Event>;
 
+export const EVENT_COLOR = '#d3d3d3';
+
 type GroupedEvents = { [key: string]: Events };
 
 type Shape = {

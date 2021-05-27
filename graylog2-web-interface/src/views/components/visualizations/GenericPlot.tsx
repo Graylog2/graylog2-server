@@ -25,7 +25,7 @@ import ColorPicker from 'components/common/ColorPicker';
 import Plot from 'views/components/visualizations/plotly/AsyncPlot';
 import { colors as defaultColors } from 'views/components/visualizations/Colors';
 import ColorMapper from 'views/components/visualizations/ColorMapper';
-import { eventsDisplayName } from 'views/logic/searchtypes/events/EventHandler';
+import { EVENT_COLOR, eventsDisplayName } from 'views/logic/searchtypes/events/EventHandler';
 
 import ChartColorContext from './ChartColorContext';
 import styles from './GenericPlot.lazy.css';
@@ -215,7 +215,7 @@ class GenericPlot extends React.Component<GenericPlotProps, State> {
         {({ colors, setColor }) => {
           plotLayout.shapes = plotLayout.shapes.map((shape) => ({
             ...shape,
-            line: { color: colors.get(eventsDisplayName) },
+            line: { color: colors.get(eventsDisplayName, EVENT_COLOR) },
           }));
 
           const newChartData = chartData.map((chart) => {
@@ -227,7 +227,7 @@ class GenericPlot extends React.Component<GenericPlotProps, State> {
               }
 
               if (chart?.name === eventsDisplayName) {
-                const eventColor = colors.get(eventsDisplayName);
+                const eventColor = colors.get(eventsDisplayName, EVENT_COLOR);
 
                 conf.marker = { color: eventColor, size: 5 };
               }

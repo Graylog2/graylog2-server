@@ -38,13 +38,20 @@ class ColorMapper {
     return defaultChartColors[this._currentDefaultColor];
   }
 
-  get(name) {
+  get(name, defaultColor?) {
     const color = this._value.get(name);
 
     if (color) {
       this._incrementColor();
 
       return color;
+    }
+
+    if (defaultColor) {
+      this._incrementColor();
+      this._value = this._value.set(name, defaultColor);
+
+      return defaultColor;
     }
 
     const newColor = this._nextFreeColor();

@@ -28,6 +28,7 @@ import { CurrentViewStateStore } from 'views/stores/CurrentViewStateStore';
 import { Popover } from 'components/graylog';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import { colors as defaultColors } from 'views/components/visualizations/Colors';
+import { EVENT_COLOR, eventsDisplayName } from 'views/logic/searchtypes/events/EventHandler';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 
 const ColorHint = styled.div(({ color }) => `
@@ -150,6 +151,7 @@ const PlotLegend = ({ children, config, chartData, labelMapper = defaultLabelMap
   }
 
   const tableCells = labels.sort(stringLenSort).map((value) => {
+    const defaultColor = value === eventsDisplayName ? EVENT_COLOR : undefined;
     let val: React.ReactNode = value;
 
     if (columnPivots.length === 1) {
@@ -159,7 +161,7 @@ const PlotLegend = ({ children, config, chartData, labelMapper = defaultLabelMap
     return (
       <LegendCell key={value}>
         <LegendEntry>
-          <ColorHint aria-label="Color Hint" onClick={_onOpenColorPicker(value)} color={colors.get(value)} />
+          <ColorHint aria-label="Color Hint" onClick={_onOpenColorPicker(value)} color={colors.get(value, defaultColor)} />
           <ValueContainer>
             {val}
           </ValueContainer>
