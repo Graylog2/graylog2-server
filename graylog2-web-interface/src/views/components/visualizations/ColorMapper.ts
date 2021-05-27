@@ -17,6 +17,7 @@
 import { Map } from 'immutable';
 
 import { defaultChartColors } from 'views/components/visualizations/Colors';
+import { eventsDisplayName } from 'views/logic/searchtypes/events/EventHandler';
 
 class ColorMapper {
   private _value: Map<string, string>;
@@ -42,13 +43,18 @@ class ColorMapper {
     const color = this._value.get(name);
 
     if (color) {
-      this._incrementColor();
+      if (name !== eventsDisplayName) {
+        this._incrementColor();
+      }
 
       return color;
     }
 
     if (defaultColor) {
-      this._incrementColor();
+      if (name !== eventsDisplayName) {
+        this._incrementColor();
+      }
+
       this._value = this._value.set(name, defaultColor);
 
       return defaultColor;
