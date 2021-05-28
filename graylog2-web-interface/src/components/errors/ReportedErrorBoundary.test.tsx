@@ -53,7 +53,7 @@ describe('ReportedErrorBoundary', () => {
     const response = { status: 404, body: { message: 'The request error message' } };
 
     suppressConsole(() => {
-      ErrorsActions.report(createNotFoundError(new FetchError('The request error message', response)));
+      ErrorsActions.report(createNotFoundError(new FetchError('The request error message', response.status, response)));
     });
 
     await waitFor(() => expect(queryByText('Hello World!')).toBeNull());
@@ -67,7 +67,7 @@ describe('ReportedErrorBoundary', () => {
     const response = { status: 404, body: { message: 'The error message' } };
 
     suppressConsole(() => {
-      ErrorsActions.report({ ...createNotFoundError(new FetchError('The error message', response)), type: 'UnkownReportedError' });
+      ErrorsActions.report({ ...createNotFoundError(new FetchError('The error message', response.status, response)), type: 'UnkownReportedError' });
     });
 
     await waitFor(() => expect(queryByText('Hello World!')).toBeNull());
@@ -81,7 +81,7 @@ describe('ReportedErrorBoundary', () => {
     const response = { status: 403, body: { message: 'The request error message' } };
 
     suppressConsole(() => {
-      ErrorsActions.report(createUnauthorizedError(new FetchError('The request error message', response)));
+      ErrorsActions.report(createUnauthorizedError(new FetchError('The request error message', response.status, response)));
     });
 
     await findByText('Missing Permissions');
@@ -97,7 +97,7 @@ describe('ReportedErrorBoundary', () => {
     expect(getByText('Hello World!')).not.toBeNull();
 
     suppressConsole(() => {
-      ErrorsActions.report(createUnauthorizedError(new FetchError('The request error message', response)));
+      ErrorsActions.report(createUnauthorizedError(new FetchError('The request error message', response.status, response)));
     });
 
     await waitFor(() => expect(getByText('Missing Permissions')).not.toBeNull());
