@@ -78,7 +78,7 @@ const QueryBar = ({ queries, queryTitles, viewMetadata }: Props) => {
 };
 
 QueryBar.propTypes = {
-  queries: ImmutablePropTypes.listOf(PropTypes.string).isRequired,
+  queries: ImmutablePropTypes.orderedSetOf(PropTypes.string).isRequired,
   queryTitles: ImmutablePropTypes.mapOf(PropTypes.string, PropTypes.string).isRequired,
   viewMetadata: PropTypes.exact({
     id: PropTypes.string,

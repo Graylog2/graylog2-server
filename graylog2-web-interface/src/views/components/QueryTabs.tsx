@@ -44,7 +44,7 @@ const StyledRow = styled(Row)`
   margin-bottom: 0;
 `;
 
-const QueryTabs = ({ onRemove, onSelect, onTitleChange, queries, selectedQueryId, titles }:QueryTabsProps) => {
+const QueryTabs = ({ onRemove, onSelect, onTitleChange, queries, selectedQueryId, titles }: QueryTabsProps) => {
   const queryTitleEditModal = useRef<QueryTitleEditModal | undefined | null>();
 
   return (
@@ -79,7 +79,7 @@ QueryTabs.propTypes = {
   onRemove: PropTypes.func.isRequired,
   onSelect: PropTypes.func.isRequired,
   onTitleChange: PropTypes.func.isRequired,
-  queries: ImmutablePropTypes.listOf(PropTypes.string).isRequired,
+  queries: ImmutablePropTypes.orderedSetOf(PropTypes.string).isRequired,
   selectedQueryId: PropTypes.string.isRequired,
   titles: PropTypes.object.isRequired,
 };

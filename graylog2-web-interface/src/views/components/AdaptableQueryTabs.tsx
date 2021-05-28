@@ -264,7 +264,7 @@ const AdaptableQueryTabs = ({ maxWidth, queries, titles, selectedQueryId, onRemo
 
 AdaptableQueryTabs.propTypes = {
   maxWidth: PropTypes.number.isRequired,
-  queries: ImmutablePropTypes.listOf(PropTypes.string).isRequired,
+  queries: ImmutablePropTypes.orderedSetOf(PropTypes.string).isRequired,
   titles: PropTypes.object.isRequired,
   selectedQueryId: PropTypes.string.isRequired,
   onRemove: PropTypes.func.isRequired,

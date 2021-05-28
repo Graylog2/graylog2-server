@@ -33,7 +33,7 @@ export const QueryIdsStore = singletonStore(
       return this._state();
     },
     onViewsStoreUpdate(view) {
-      const newState = view?.view?.state?.keySeq().toList();
+      const newState = view?.view?.search?.queries?.map((q) => q.id);
 
       if (!isEqual(this.state, newState)) {
         this.state = newState;
