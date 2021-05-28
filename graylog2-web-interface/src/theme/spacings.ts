@@ -18,8 +18,9 @@ import PropTypes from 'prop-types';
 
 import { ROOT_FONT_SIZE } from './constants';
 
-const SPACE = 0.08; // magic number we use for our calculations
+const SPACE = 0.08; // ratio we use for our calculations
 const SIZES = ['0', '1', 'xxs', 'xs', 'sm', 'md', 'lg', 'xl', 'xxl'] as const;
+const FIBONACCI = [0, 1, 3, 5, 8, 13, 21, 34, 55, 89, 144]; // skipped [1, 2]
 
 type Sizes = typeof SIZES[number]
 export type Spacings = Record<Sizes, string> & { px: Record<Sizes, number> };
@@ -29,13 +30,6 @@ const props = SIZES.reduce((acc, key) => ({ ...acc, [key]: PropTypes.string }), 
 });
 
 export const spacingsPropTypes = PropTypes.shape(props);
-
-let count;
-const fibSequence = [0, 1];
-
-for (count = 2; count <= 10; count += 1) {
-  fibSequence[count] = fibSequence[count - 2] + fibSequence[count - 1];
-}
 
 const spacings = {
   px: {},
@@ -49,9 +43,9 @@ SIZES.forEach((size, index) => {
     spacings[size] = '1px';
     spacings.px[size] = 1;
   } else {
-    const value = SPACE * fibSequence[index + 2];
+    const value = SPACE * FIBONACCI[index];
 
-    spacings[size] = `${value}rem`;
+    spacings[size] = `${value.toFixed(2)}rem`;
     spacings.px[size] = Math.round(value * ROOT_FONT_SIZE);
   }
 });
