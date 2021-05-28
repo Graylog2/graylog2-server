@@ -21,7 +21,6 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import styled from 'styled-components';
 import { $PropertyType } from 'utility-types';
 import { EditWidgetComponentProps } from 'views/types';
-import VisualizationConfig from 'src/views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 
 import { Col, Row } from 'components/graylog';
 import { defaultCompare } from 'views/logic/DefaultCompare';
