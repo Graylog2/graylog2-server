@@ -16,12 +16,49 @@
  */
 import type { VisualizationType } from 'views/types';
 
+import Viewport from 'views/logic/aggregationbuilder/visualizations/Viewport';
+import WorldMapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/WorldMapVisualizationConfig';
 import WorldMapVisualization from 'views/components/visualizations/worldmap/WorldMapVisualization';
+
+type WorldMapVisualizationConfigFormValues = {
+  zoom: number,
+  centerX: number,
+  centerY: number,
+};
 
 const worldMap: VisualizationType = {
   type: WorldMapVisualization.type,
   displayName: 'World Map',
   component: WorldMapVisualization,
+  config: {
+    createConfig: () => ({ zoom: 1, centerX: 1, centerY: 1 }),
+    fromConfig: (config: WorldMapVisualizationConfig) => ({
+      zoom: config.viewport?.zoom,
+      centerX: config.viewport?.center[0],
+      centerY: config.viewport?.center[1],
+    }),
+    toConfig: (formValues: WorldMapVisualizationConfigFormValues) => WorldMapVisualizationConfig.create(Viewport.create([formValues.centerX, formValues.centerY], formValues.zoom)),
+    fields: [
+      {
+        name: 'zoom',
+        title: 'Zoom',
+        type: 'numeric',
+        required: true,
+      },
+      {
+        name: 'centerX',
+        title: 'Latitude',
+        type: 'numeric',
+        required: true,
+      },
+      {
+        name: 'centerY',
+        title: 'Longitude',
+        type: 'numeric',
+        required: true,
+      },
+    ],
+  },
 };
 
 export default worldMap;

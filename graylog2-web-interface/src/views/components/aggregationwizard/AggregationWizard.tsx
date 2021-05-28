@@ -23,6 +23,7 @@ import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationW
 import WidgetConfigForm, { WidgetConfigFormValues } from './WidgetConfigForm';
 import ElementsConfiguration from './ElementsConfiguration';
 import aggregationElements from './aggregationElements';
+import Visualization from './Visualization';
 
 const aggregationElementsByKey = Object.fromEntries(aggregationElements.map((element) => ([element.key, element])));
 
@@ -40,11 +41,6 @@ const Controls = styled.div`
   flex: 1.2;
   padding-right: 15px;
   overflow-y: auto;
-`;
-
-const Visualization = styled.div`
-  height: 100%;
-  flex: 3;
 `;
 
 const Section = styled.div`
@@ -103,27 +99,23 @@ const AggregationWizard = ({ onChange, config, children }: EditWidgetComponentPr
   const initialFormValues = _initialFormValues(config);
 
   return (
-    <>
-      <Controls>
-        <WidgetConfigForm onSubmit={(formValues: WidgetConfigFormValues) => _onSubmit(formValues, onChange)}
-                          initialValues={initialFormValues}
-                          validate={validateForm}>
-          {() => (
-            <>
-              <Section data-testid="configure-elements-section">
-                <ElementsConfiguration aggregationElementsByKey={aggregationElementsByKey}
-                                       config={config}
-                                       onCreate={onCreateElement}
-                                       onConfigChange={onChange} />
-              </Section>
-            </>
-          )}
-        </WidgetConfigForm>
-      </Controls>
-      <Visualization>
-        {children}
-      </Visualization>
-    </>
+    <WidgetConfigForm onSubmit={(formValues: WidgetConfigFormValues) => _onSubmit(formValues, onChange)}
+                      initialValues={initialFormValues}
+                      validate={validateForm}>
+      <>
+        <Controls>
+          <Section data-testid="configure-elements-section">
+            <ElementsConfiguration aggregationElementsByKey={aggregationElementsByKey}
+                                   config={config}
+                                   onCreate={onCreateElement}
+                                   onConfigChange={onChange} />
+          </Section>
+        </Controls>
+        <Visualization>
+          {children}
+        </Visualization>
+      </>
+    </WidgetConfigForm>
   );
 };
 

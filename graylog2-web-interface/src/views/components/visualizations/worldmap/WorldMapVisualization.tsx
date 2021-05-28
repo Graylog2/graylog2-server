@@ -19,8 +19,6 @@ import PropTypes from 'prop-types';
 import { flow, fromPairs, get, zip, isEmpty } from 'lodash';
 
 import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
-import WorldMapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/WorldMapVisualizationConfig';
-import Viewport from 'views/logic/aggregationbuilder/visualizations/Viewport';
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import type Pivot from 'views/logic/aggregationbuilder/Pivot';
@@ -82,15 +80,12 @@ const WorldMapVisualization = makeVisualization(({ config, data, editing, onChan
   const viewport = get(config, 'visualizationConfig.viewport');
 
   const _onChange = (newViewport) => {
-    const visualizationConfig = (config.visualizationConfig
-      // FIXME: Ugly hack to get the builder type consistent
-      ? config.visualizationConfig.toBuilder() as unknown as ReturnType<typeof WorldMapVisualizationConfig['builder']>
-      : WorldMapVisualizationConfig.builder())
-      .viewport(Viewport.create(newViewport.center, newViewport.zoom))
-      .build();
-
     if (editing) {
-      onChange(visualizationConfig);
+      onChange({
+        zoom: newViewport.zoom,
+        centerX: newViewport.center[0],
+        centerY: newViewport.center[1],
+      });
     }
   };
 
