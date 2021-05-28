@@ -95,7 +95,7 @@ const validateForm = (formValues: WidgetConfigFormValues) => {
   return elementValidationResults.reduce((prev, cur) => ({ ...prev, ...cur }), {});
 };
 
-const AggregationWizard = ({ onChange, config, children }: EditWidgetComponentProps<AggregationWidgetConfig>) => {
+const AggregationWizard = ({ onChange, config, children }: EditWidgetComponentProps<AggregationWidgetConfig> & { children: React.ReactElement }) => {
   const initialFormValues = _initialFormValues(config);
 
   return (

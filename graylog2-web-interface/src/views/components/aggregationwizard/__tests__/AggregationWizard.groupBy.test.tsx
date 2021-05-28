@@ -63,7 +63,7 @@ describe('AggregationWizard', () => {
                          fields={Immutable.List([])}
                          onChange={() => {}}
                          {...props}>
-        The Visualization
+        <>The Visualization</>
       </AggregationWizard>,
     </FieldTypesContext.Provider>,
   );

@@ -37,7 +37,7 @@ const Visualization = ({ children }: Props) => {
     setFieldValue('visualization', { ...values.visualization, config: { ...values.visualization.config, ...newVisualizationConfig } });
   }, [values.visualization, setFieldValue]);
 
-  const childrenWithCallback = useMemo(() => React.Children.map(children, (child: React.ReactElement) => React.cloneElement(child, {
+  const childrenWithCallback = useMemo(() => React.Children.map(children, (child) => React.cloneElement(child, {
     onVisualizationConfigChange: onVisualizationConfigChange,
   })), [children, onVisualizationConfigChange]);
 

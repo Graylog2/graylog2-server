@@ -40,7 +40,7 @@ import {
 import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 
 interface EditWidgetComponentProps<Config extends WidgetConfig = WidgetConfig> {
-  children: React.ReactElement,
+  children: React.ReactNode,
   config: Config,
   editing: boolean;
   id: string;
