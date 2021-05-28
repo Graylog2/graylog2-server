@@ -50,12 +50,15 @@ const TimeRangeInput = ({ disabled, hasErrorOnMount, noOverride, value = {}, onC
   }
 
   const toggleShow = () => setShow(!show);
+  const hideTimeRangeDropDown = () => show && toggleShow();
 
   return (
     <FlexContainer className={className}>
       <TimeRangeDropdownButton disabled={disabled}
                                show={show}
                                toggleShow={toggleShow}
+                               onPresetSelectOpen={hideTimeRangeDropDown}
+                               setCurrentTimeRange={onChange}
                                hasErrorOnMount={hasErrorOnMount}>
         <TimeRangeDropdown currentTimeRange={value}
                            noOverride={noOverride}

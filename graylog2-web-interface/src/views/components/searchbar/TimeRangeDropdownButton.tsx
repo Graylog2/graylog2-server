@@ -18,22 +18,45 @@ import * as React from 'react';
 import { useRef } from 'react';
 import { Overlay } from 'react-overlays';
 import styled from 'styled-components';
+import { TimeRange } from 'src/views/logic/queries/Query';
 
+import { ButtonGroup } from 'components/graylog';
+import { NoTimeRangeOverride } from 'views/logic/queries/Query';
+
+import RelativeRangePresetSelect from './RelativeRangePresetSelect';
 import TimeRangeButton from './TimeRangeButton';
 
 type Props = {
   children: React.ReactNode,
   disabled?: boolean,
   hasErrorOnMount?: boolean,
+  onPresetSelectOpen: () => void,
+  setCurrentTimeRange: (nextTimeRange: TimeRange | NoTimeRangeOverride) => void,
   show?: boolean,
   toggleShow: () => void,
 };
+
+const StyledRelativeRangePresetSelect = styled(RelativeRangePresetSelect)`
+  padding: 6px;
+`;
 
 const RelativePosition = styled.div`
   position: relative;
 `;
 
-const TimeRangeDropdownButton = ({ children, disabled, hasErrorOnMount, show, toggleShow }: Props) => {
+const StyledButtonGroup = styled(ButtonGroup)`
+  display: flex;
+`;
+
+const TimeRangeDropdownButton = ({
+  children,
+  disabled,
+  hasErrorOnMount,
+  onPresetSelectOpen,
+  setCurrentTimeRange,
+  show,
+  toggleShow,
+}: Props) => {
   const containerRef = useRef();
 
   const _onClick = (e) => {
@@ -41,11 +64,32 @@ const TimeRangeDropdownButton = ({ children, disabled, hasErrorOnMount, show, to
     toggleShow();
   };
 
+  const selectRelativeTimeRangePreset = (from) => {
+    setCurrentTimeRange({
+      type: 'relative',
+      from,
+    });
+  };
+
+  const _onPresetSelectToggle = (open: boolean) => {
+    if (open) {
+      onPresetSelectOpen();
+    }
+  };
+
   return (
     <RelativePosition ref={containerRef}>
-      <TimeRangeButton hasError={hasErrorOnMount}
-                       disabled={disabled}
-                       onClick={_onClick} />
+      <StyledButtonGroup>
+        <TimeRangeButton hasError={hasErrorOnMount}
+                         disabled={disabled}
+                         onClick={_onClick} />
+        <StyledRelativeRangePresetSelect disabled={disabled}
+                                         displayTitle={false}
+                                         onChange={selectRelativeTimeRangePreset}
+                                         onToggle={_onPresetSelectToggle}
+                                         header="From (Until Now)"
+                                         bsSize={null} />
+      </StyledButtonGroup>
       <Overlay show={show}
                trigger="click"
                placement="bottom"
