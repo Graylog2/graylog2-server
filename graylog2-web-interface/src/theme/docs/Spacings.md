@@ -6,7 +6,7 @@ import styled, { useTheme } from 'styled-components';
 
 const { spacings } = useTheme();
 
-const Colors = () => (
+const SpacingExample = () => (
   <>
     {Object.keys(spacings).map((space) => space !== 'px' && (
       <div key={space} style={{display:'flex',alignItems: 'center', marginBottom: 12}}>
@@ -17,5 +17,5 @@ const Colors = () => (
   </>
 );
 
-<Colors />
+<SpacingExample />
 ```
