@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { createGlobalStyle } from 'styled-components';
+import { createGlobalStyle, css } from 'styled-components';
 
 import GraylogThemeProvider from '../src/theme/GraylogThemeProvider';
 
@@ -23,11 +23,11 @@ type Props = {
   children: React.Component,
 }
 
-const StyleGuideStyles = createGlobalStyle`
+const StyleGuideStyles = createGlobalStyle(({ theme }) => css`
   html {
-    font-size: 14px;
+    font-size: ${theme.fonts.size.root};
   }
-`;
+`);
 
 const StyleGuideWrapper = ({ children }: Props) => (
   <GraylogThemeProvider initialThemeModeOverride="teint">
