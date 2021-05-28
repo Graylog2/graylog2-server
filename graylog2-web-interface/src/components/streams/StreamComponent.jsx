@@ -102,14 +102,14 @@ class StreamComponent extends React.Component {
 
   _onSearch = (query, resetLoadingCallback) => {
     const { pagination } = this.state;
-    const newPagination = Object.assign(pagination, { query: query });
+    const newPagination = { ...pagination, query: query, page: 1 };
 
     this.setState({ pagination: newPagination }, () => this.loadData(resetLoadingCallback));
   };
 
   _onReset = () => {
     const { pagination } = this.state;
-    const newPagination = Object.assign(pagination, { query: '' });
+    const newPagination = { ...pagination, query: '', page: 1 };
 
     this.setState({ pagination: newPagination }, this.loadData);
   };
@@ -159,6 +159,7 @@ class StreamComponent extends React.Component {
     return (
       <div>
         <PaginatedList onChange={this._onPageChange}
+                       activePage={pagination.page}
                        totalItems={pagination.total}>
           <div style={{ marginBottom: 15 }}>
             <SearchForm onSearch={this._onSearch}

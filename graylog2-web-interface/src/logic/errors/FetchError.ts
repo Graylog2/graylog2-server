@@ -14,12 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-
-type Body = {
-  message: string;
-  type: string;
-  streams?: string[];
-}
+import { isString } from 'lodash';
 
 type Res = {
   text?: string;
@@ -27,7 +22,7 @@ type Res = {
 
 type Additional = {
   status: number;
-  body?: Body;
+  body?: any;
   res?: Res;
 }
 
@@ -40,16 +35,16 @@ export default class FetchError extends Error {
 
   status: Additional['status'];
 
-  constructor(message, additional) {
+  constructor(message: string, status: number, additional: any) {
     super(message);
     this.name = 'FetchError';
 
-    const details = additional?.body?.message ?? 'Not available';
+    const details = isString(additional) ? additional : (additional?.message ?? 'Not available');
     this.message = `There was an error fetching a resource: ${message}. Additional information: ${details}`;
 
-    this.responseMessage = additional?.body?.message ?? undefined;
+    this.responseMessage = additional?.message ?? undefined;
 
-    this.additional = additional;
-    this.status = additional?.status; // Shortcut, as this is often used
+    this.additional = { body: additional, status, res: { text: isString(additional) && additional } };
+    this.status = status; // Shortcut, as this is often used
   }
 }

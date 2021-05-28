@@ -202,6 +202,11 @@ public class LookupTableResource extends RestResource {
         return lookupTableService.newBuilder().lookupTable(name).build().lookup(key);
     }
 
+    /**
+     * NOTE: Must NOT be called directly by clients. Consider calling
+     * {@link org.graylog2.rest.resources.cluster.ClusterLookupTableResource#performPurge(String, String)}
+     * instead!
+     */
     @POST
     @Path("tables/{idOrName}/purge")
     @ApiOperation(value = "Purge lookup table cache")

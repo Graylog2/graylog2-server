@@ -70,6 +70,8 @@ class Timestamp extends React.Component {
      *  - ISO_8601: `YYYY-MM-DDTHH:mm:ss.SSSZ`
      */
     format: PropTypes.string,
+    /** Provides field prop for the render function.  */
+    field: PropTypes.string,
     /** Specifies if the component should display relative time or not. */
     relative: PropTypes.bool,
     /**
@@ -85,10 +87,11 @@ class Timestamp extends React.Component {
   };
 
   static defaultProps = {
+    field: undefined,
     format: DateTime.Formats.TIMESTAMP,
     relative: false,
-    tz: undefined,
     render: ({ value }) => value,
+    tz: undefined,
   };
 
   _formatDateTime = () => {
@@ -99,11 +102,11 @@ class Timestamp extends React.Component {
   };
 
   render() {
-    const { render: Component, dateTime } = this.props;
+    const { render: Component, dateTime, field } = this.props;
 
     return (
       <time key={`time-${dateTime}`} dateTime={dateTime} title={dateTime}>
-        <Component value={this._formatDateTime()} />
+        <Component value={this._formatDateTime()} field={field} />
       </time>
     );
   }

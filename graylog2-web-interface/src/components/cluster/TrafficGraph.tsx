@@ -37,7 +37,7 @@ const TrafficGraph = ({ width, traffic }: Props) => {
   const dailyTraffic = ndx.dimension((d) => moment(d.ts).format('YYYY-MM-DD'));
 
   const dailySums = dailyTraffic.group().reduceSum((d) => d.bytes);
-  const t = _.mapKeys(dailySums.all(), (entry) => moment.utc(entry.key, 'YYYY-MM-DD').unix() * 1000);
+  const t = _.mapKeys(dailySums.all(), (entry) => moment.utc(entry.key, 'YYYY-MM-DD').toISOString());
   const unixTraffic = _.mapValues(t, (val) => val.value);
   const chartData = [{
     type: 'bar',

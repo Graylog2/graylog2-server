@@ -41,6 +41,7 @@ jest.mock('injection/ActionsProvider', () => ({
     },
     ServerAvailability: {
       reportSuccess: jest.fn(),
+      reportError: jest.fn(),
     },
   }[key]),
 }));
@@ -98,6 +99,8 @@ const setUpServer = () => {
     res.send(req.fields).end();
   });
 
+  app.post('/errorWithMessage', (req, res) => res.status(500).send({ message: 'The dungeon collapses. You die!' }));
+
   return app.listen(PORT, () => {});
 };
 
@@ -153,5 +156,18 @@ describe('FetchProvider', () => {
     const result = await builder.build();
 
     expect(result).toEqual({ foo: 'bar' });
+  });
+
+  it('extracts the error message from a failed request', async () => {
+    await expect(fetch('POST', `${baseUrl}/errorWithMessage`))
+      .rejects
+      .toThrowError('There was an error fetching a resource: Internal Server Error. Additional information: The dungeon collapses. You die!');
+  });
+
+  it('handles error properly when endpoint is not reachable', async () => {
+    const error = await fetch('POST', 'http://localhost:12223/').catch((e) => e);
+
+    expect(error.status).toEqual(undefined);
+    expect(error.message).toEqual('There was an error fetching a resource: undefined. Additional information: Not available');
   });
 });
