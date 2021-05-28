@@ -18,7 +18,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import * as ImmutablePropTypes from 'react-immutable-proptypes';
-import { List } from 'immutable';
+import { OrderedSet } from 'immutable';
 
 import connect from 'stores/connect';
 import { TitlesActions } from 'views/stores/TitlesStore';
@@ -58,7 +58,7 @@ const onCloseTab = (queryId, currentQuery, queries) => {
 };
 
 type Props = {
-  queries: List<QueryId>,
+  queries: OrderedSet<QueryId>,
   queryTitles: Immutable.Map<string, string>,
   viewMetadata: ViewMetaData,
 };

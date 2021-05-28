@@ -21,7 +21,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { SizeMe } from 'react-sizeme';
 import ImmutablePropTypes from 'react-immutable-proptypes';
-import { List } from 'immutable';
+import { OrderedSet } from 'immutable';
 
 import { Col, Row } from 'components/graylog';
 import Query, { QueryId } from 'views/logic/queries/Query';
@@ -35,7 +35,7 @@ export interface QueryTabsProps {
   onRemove: (queryId: string) => Promise<void> | Promise<ViewState>,
   onSelect: (queryId: string) => Promise<Query> | Promise<string>,
   onTitleChange: (queryId: string, newTitle: string) => Promise<TitlesMap>,
-  queries: List<QueryId>,
+  queries: OrderedSet<QueryId>,
   selectedQueryId: string,
   titles: Immutable.Map<string, string>,
 }

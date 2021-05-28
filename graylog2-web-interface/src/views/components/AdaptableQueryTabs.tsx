@@ -162,7 +162,7 @@ const adjustTabsVisibility = (maxWidth, lockedTab, setLockedTab) => {
   }
 };
 
-const AdaptableQueryTabs = ({ maxWidth, queries, titles, selectedQueryId, onRemove, onSelect, queryTitleEditModal, onTitleChange }:Props) => {
+const AdaptableQueryTabs = ({ maxWidth, queries, titles, selectedQueryId, onRemove, onSelect, queryTitleEditModal, onTitleChange }: Props) => {
   const [openedMore, setOpenedMore] = useState<boolean>(false);
   const [lockedTab, setLockedTab] = useState<QueryId>();
 

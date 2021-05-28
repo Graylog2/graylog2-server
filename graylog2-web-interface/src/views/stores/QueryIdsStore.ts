@@ -16,15 +16,16 @@
  */
 import Reflux from 'reflux';
 import { isEqual } from 'lodash';
+import { OrderedSet } from 'immutable';
 
 import { singletonStore } from 'views/logic/singleton';
 
-import { ViewStore } from './ViewStore';
+import { ViewStore, ViewStoreState } from './ViewStore';
 
 // eslint-disable-next-line import/prefer-default-export
 export const QueryIdsStore = singletonStore(
   'views.QueryIds',
-  () => Reflux.createStore({
+  () => Reflux.createStore<OrderedSet<string>>({
     state: {},
     init() {
       this.listenTo(ViewStore, this.onViewsStoreUpdate, this.onViewsStoreUpdate);
@@ -32,8 +33,8 @@ export const QueryIdsStore = singletonStore(
     getInitialState() {
       return this._state();
     },
-    onViewsStoreUpdate(view) {
-      const newState = view?.view?.search?.queries?.map((q) => q.id);
+    onViewsStoreUpdate(view: ViewStoreState) {
+      const newState = view?.view?.search?.queries?.map((q) => q.id).toOrderedSet();
 
       if (!isEqual(this.state, newState)) {
         this.state = newState;
