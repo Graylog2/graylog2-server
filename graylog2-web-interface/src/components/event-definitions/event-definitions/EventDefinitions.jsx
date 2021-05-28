@@ -27,6 +27,7 @@ import {
   PaginatedList,
   SearchForm,
 } from 'components/common';
+import QueryHelper from 'components/common/QueryHelper';
 
 import styles from './EventDefinitions.css';
 import EventDefinitionEntry from './EventDefinitionEntry';
@@ -92,6 +93,7 @@ class EventDefinitions extends React.Component {
                       searchButtonLabel="Find"
                       placeholder="Find Event Definitions"
                       wrapperClass={styles.inline}
+                      queryHelpComponent={<QueryHelper entityName="event definition" />}
                       queryWidth={200}
                       topMargin={0}
                       useLoadingState>

@@ -18,6 +18,7 @@ import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import asMock from 'helpers/mocking/AsMock';
 import suppressConsole from 'helpers/suppressConsole';
+import MockStore from 'helpers/mocking/StoreMock';
 
 import ConfigurationsPage from 'pages/ConfigurationsPage';
 import usePluginEntities from 'views/logic/usePluginEntities';
@@ -27,6 +28,12 @@ jest.mock('views/logic/usePluginEntities');
 jest.mock('components/configurations/SearchesConfig', () => () => <span>Search Configuration</span>);
 jest.mock('components/configurations/MessageProcessorsConfig', () => () => <span>Message Processors Configuration</span>);
 jest.mock('components/configurations/SidecarConfig');
+
+jest.mock('stores/decorators/DecoratorsStore', () => ({
+  DecoratorsStore: MockStore(),
+}));
+
+jest.mock('stores/configurations/ConfigurationsStore', () => MockStore(['getInitialState', () => ({})]));
 
 const ComponentThrowingError = () => {
   throw Error('Boom!');

@@ -16,6 +16,7 @@
  */
 package org.graylog2.contentpacks.model;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.auto.value.AutoValue;
@@ -24,6 +25,7 @@ import org.apache.commons.lang.StringUtils;
 
 
 @AutoValue
+@JsonAutoDetect
 public abstract class ModelId {
     @JsonValue
     public abstract String id();

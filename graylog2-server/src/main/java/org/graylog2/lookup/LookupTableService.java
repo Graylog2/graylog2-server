@@ -27,6 +27,7 @@ import org.graylog2.lookup.db.DBLookupTableService;
 import org.graylog2.lookup.dto.CacheDto;
 import org.graylog2.lookup.dto.DataAdapterDto;
 import org.graylog2.lookup.dto.LookupTableDto;
+import org.graylog2.lookup.events.AdapterSharedStoresUpdated;
 import org.graylog2.lookup.events.CachesDeleted;
 import org.graylog2.lookup.events.CachesUpdated;
 import org.graylog2.lookup.events.DataAdaptersDeleted;
@@ -247,6 +248,18 @@ public class LookupTableService extends AbstractIdleService {
             // stop old caches
             existingCaches.build().forEach(AbstractIdleService::stopAsync);
         }, 0, TimeUnit.SECONDS);
+    }
+
+    @Subscribe
+    public void handleAdapterSharedStoreUpdate(AdapterSharedStoresUpdated updated) {
+        // When one node updates the data store shared by other data adapter instances in
+        // a cluster, then we need to purge the caches that depend on that data adapter on each node
+        scheduler.schedule(() -> updated.ids().stream().forEach( dataAdapterId -> {
+            liveTables.values().stream()
+                    .filter(table -> table.dataAdapter().id().equals(dataAdapterId))
+                    .map(LookupTable::cache)
+                    .forEach(LookupCache::purge);
+                }), 0, TimeUnit.SECONDS);
     }
 
     @Subscribe
