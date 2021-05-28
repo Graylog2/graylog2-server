@@ -23,10 +23,12 @@ import { Button } from 'components/graylog';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import UrlWhiteListForm from 'components/configurations/UrlWhiteListForm';
 import CombinedProvider from 'injection/CombinedProvider';
-import type { WhiteListConfig } from 'stores/configurations/ConfigurationsStore';
+import type { ConfigurationsStoreState, WhiteListConfig } from 'stores/configurations/ConfigurationsStore';
 // Explicit import to fix eslint import/no-cycle
 import IfPermitted from 'components/common/IfPermitted';
 import { isPermitted } from 'util/PermissionsMixin';
+import { Store } from 'stores/StoreTypes';
+import { CurrentUserStoreState } from 'stores/users/CurrentUserStore';
 
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 const { ConfigurationsActions, ConfigurationsStore } = CombinedProvider.get('Configurations');
@@ -192,10 +194,13 @@ class URLWhiteListFormModal extends React.Component<Props, State> {
   }
 }
 
-export default connect(URLWhiteListFormModal, { configurations: ConfigurationsStore, currentUser: CurrentUserStore }, ({ configurations, currentUser, ...otherProps }) => ({
-  /* eslint-disable-next-line @typescript-eslint/ban-ts-comment */
-  // @ts-ignore TODO: ConfigurationsStore returns unknown
-  ...configurations,
-  ...currentUser,
-  ...otherProps,
-}));
+export default connect(URLWhiteListFormModal,
+  {
+    configurations: ConfigurationsStore as Store<ConfigurationsStoreState>,
+    currentUser: CurrentUserStore as Store<CurrentUserStoreState>,
+  },
+  ({ configurations, currentUser, ...otherProps }) => ({
+    ...configurations,
+    ...currentUser,
+    ...otherProps,
+  }));
