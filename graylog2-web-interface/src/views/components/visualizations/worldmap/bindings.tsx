@@ -31,7 +31,7 @@ const worldMap: VisualizationType = {
   displayName: 'World Map',
   component: WorldMapVisualization,
   config: {
-    createConfig: () => ({ zoom: 1, centerX: 1, centerY: 1 }),
+    createConfig: () => ({ zoom: 1, centerX: 0, centerY: 1 }),
     fromConfig: (config: WorldMapVisualizationConfig) => ({
       zoom: config.viewport?.zoom,
       centerX: config.viewport?.center[0],
@@ -50,15 +50,22 @@ const worldMap: VisualizationType = {
         title: 'Latitude',
         type: 'numeric',
         required: true,
+        componentProps: {
+          step: 'any',
+        },
       },
       {
         name: 'centerY',
         title: 'Longitude',
         type: 'numeric',
         required: true,
+        componentProps: {
+          step: 'any',
+        },
       },
     ],
   },
+
 };
 
 export default worldMap;

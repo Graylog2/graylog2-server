@@ -88,7 +88,7 @@ const VisualizationConfigurationOptions = ({ name: namePrefix, fields = [] }: Pr
       return (
         <Field key={`${namePrefix}.${field.name}`} name={`${namePrefix}.${field.name}`}>
           {({ field: { name, value, onChange }, meta: { error } }) => (
-            <Component key={`${namePrefix}.${field.name}`} name={name} value={value} onChange={onChange} error={error} field={field} title={title} />
+            <Component key={`${namePrefix}.${field.name}`} name={name} value={value} onChange={onChange} error={error} field={field} title={title} {...field.componentProps} />
           )}
         </Field>
       );
