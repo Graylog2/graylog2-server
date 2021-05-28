@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableSet;
 import org.apache.http.HttpHeaders;
 import org.glassfish.jersey.internal.util.collection.MultivaluedStringMap;
 import org.graylog.plugins.views.search.export.ExportFormat;
+import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.rest.MoreMediaTypes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,7 +47,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class MessageExportFormatFilterTest {
-    private static final String VALID_PATH = "/views/search/messages";
+    private static final String VALID_PATH = HttpConfiguration.PATH_API + "views/search/messages";
     private static final ExportFormat disabledJsonExportFormat = new ExportFormat() {
         @Override
         public MediaType mimeType() {
