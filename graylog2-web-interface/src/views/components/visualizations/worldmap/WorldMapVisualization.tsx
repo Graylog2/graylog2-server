@@ -18,6 +18,7 @@ import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 import { flow, fromPairs, get, zip, isEmpty } from 'lodash';
 
+import type Viewport from 'views/logic/aggregationbuilder/visualizations/Viewport';
 import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
@@ -79,7 +80,7 @@ const WorldMapVisualization = makeVisualization(({ config, data, editing, onChan
 
   const viewport = get(config, 'visualizationConfig.viewport');
 
-  const _onChange = (newViewport) => {
+  const _onChange = (newViewport: Viewport) => {
     if (editing) {
       onChange({
         zoom: newViewport.zoom,

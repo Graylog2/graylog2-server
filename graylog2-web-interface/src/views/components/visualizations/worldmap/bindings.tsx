@@ -20,7 +20,7 @@ import Viewport from 'views/logic/aggregationbuilder/visualizations/Viewport';
 import WorldMapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/WorldMapVisualizationConfig';
 import WorldMapVisualization from 'views/components/visualizations/worldmap/WorldMapVisualization';
 
-type WorldMapVisualizationConfigFormValues = {
+export type WorldMapVisualizationConfigFormValues = {
   zoom: number,
   centerX: number,
   centerY: number,
