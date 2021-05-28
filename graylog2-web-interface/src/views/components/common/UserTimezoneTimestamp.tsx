@@ -21,11 +21,22 @@ import CurrentUserContext from 'contexts/CurrentUserContext';
 import Timestamp from 'components/common/Timestamp';
 import DateTime from 'logic/datetimes/DateTime';
 
-const UserTimezoneTimestamp = ({ ...rest }) => {
+type Props = {
+  dateTime: string,
+  render?: React.ComponentType<{ value: string, field: string }>,
+  field?: string
+}
+
+const UserTimezoneTimestamp = ({ ...rest }: Props) => {
   const currentUser = useContext(CurrentUserContext);
   const timezone = currentUser?.timezone ?? AppConfig.rootTimeZone();
 
   return <Timestamp tz={timezone} format={DateTime.Formats.TIMESTAMP_TZ} {...rest} />;
+};
+
+UserTimezoneTimestamp.defaultProps = {
+  render: undefined,
+  field: undefined,
 };
 
 export default UserTimezoneTimestamp;
