@@ -46,49 +46,45 @@ public class VersionProbe {
     private static final Logger LOG = LoggerFactory.getLogger(VersionProbe.class);
     private final ObjectMapper objectMapper;
     private final OkHttpClient okHttpClient;
-    private final int connectionRetries;
-    private final Duration connectionRetryWait;
+    private final int connectionAttempts;
+    private final Duration delayBetweenAttempts;
 
     @Inject
     public VersionProbe(ObjectMapper objectMapper,
                         OkHttpClient okHttpClient,
-                        @Named("elasticsearch_connection_retries") int elasticsearchConnectionRetries,
-                        @Named("elasticsearch_connection_retry_wait") Duration elasticsearchConnectionRetryWait) {
+                        @Named("elasticsearch_version_probe_attempts") int elasticsearchVersionProbeAttempts,
+                        @Named("elasticsearch_version_probe_delay") Duration elasticsearchVersionProbeDelay) {
         this.objectMapper = objectMapper;
         this.okHttpClient = okHttpClient;
-        this.connectionRetries = elasticsearchConnectionRetries;
-        this.connectionRetryWait = elasticsearchConnectionRetryWait;
+        this.connectionAttempts = elasticsearchVersionProbeAttempts;
+        this.delayBetweenAttempts = elasticsearchVersionProbeDelay;
     }
 
     public Optional<Version> probe(final Collection<URI> hosts) {
-        return (connectionRetries > 0) ? this.probeRetries(hosts) : this.probeSingle(hosts);
-    }
-
-    public Optional<Version> probeSingle(final Collection<URI> hosts) {
-        return hosts
-                .stream()
-                .map(this::probe)
-                .filter(Optional::isPresent)
-                .findFirst()
-                .orElse(Optional.empty());
-    }
-
-    private Optional<Version> probeRetries(final Collection<URI> hosts) {
         try {
             return RetryerBuilder.<Optional<Version>>newBuilder()
                     .retryIfResult(input -> !input.isPresent())
                     .retryIfExceptionOfType(IOException.class)
                     .retryIfRuntimeException()
-                    .withWaitStrategy(WaitStrategies.fixedWait(connectionRetryWait.getQuantity(), connectionRetryWait.getUnit()))
-                    .withStopStrategy(StopStrategies.stopAfterAttempt(connectionRetries))
-                    .build().call(() -> this.probeSingle(hosts));
+                    .withWaitStrategy(WaitStrategies.fixedWait(delayBetweenAttempts.getQuantity(), delayBetweenAttempts.getUnit()))
+                    .withStopStrategy((connectionAttempts == 0) ? StopStrategies.neverStop() : StopStrategies.stopAfterAttempt(connectionAttempts))
+                    .build().call(() -> this.probeAllHosts(hosts));
         } catch (ExecutionException | RetryException e) {
             LOG.error("Unable to retrieve version from Elasticsearch node: ", e);
         }
         return Optional.empty();
     }
 
-    private Optional<Version> probe(URI host) {
+    private Optional<Version> probeAllHosts(final Collection<URI> hosts) {
+        return hosts
+                .stream()
+                .map(this::probeSingleHost)
+                .filter(Optional::isPresent)
+                .findFirst()
+                .orElse(Optional.empty());
+    }
+
+    private Optional<Version> probeSingleHost(URI host) {
         final Retrofit retrofit;
         try {
             retrofit = new Retrofit.Builder()
