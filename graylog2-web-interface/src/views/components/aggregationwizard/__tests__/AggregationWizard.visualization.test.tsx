@@ -36,6 +36,7 @@ const SimpleAggregationWizard = (props) => (
 );
 
 const dataTableVisualization = makeVisualization(() => <span>This is the chart.</span>, 'table');
+const mapVisualization = makeVisualization(() => <span>This is the map.</span>, 'map');
 
 interface ExtraConfigSettings {
   mode: 'onemode' | 'anothermode' | 'thirdmode',
@@ -56,6 +57,15 @@ const visualizationPlugin: PluginRegistration = {
       type: 'table',
       component: dataTableVisualization,
       displayName: 'Data Table',
+    }, {
+      type: 'map',
+      displayName: 'World Map',
+      component: mapVisualization,
+      config: {
+        fromConfig,
+        toConfig,
+        fields: [],
+      },
     }, {
       type: 'visualizationWithConfig',
       displayName: 'Extra Config Required',
@@ -165,6 +175,36 @@ describe('AggregationWizard/Visualizations', () => {
         color: 'green',
         factor: 10,
         mode: 'anothermode',
+      },
+    })));
+  });
+
+  it('should update visualization config when changing config inside visualization', async () => {
+    const worldMapConfig = widgetConfig.toBuilder().visualization('map').build();
+    const onChange = jest.fn();
+
+    const WorldMap = ({ onVisualizationConfigChange }: { onVisualizationConfigChange?: (newViewport: { zoom: number, centerX: number, centerY: number }) => void }) => (
+      <button type="button" onClick={() => onVisualizationConfigChange({ zoom: 2, centerX: 40, centerY: 50 })}>Change Viewport</button>
+    );
+    WorldMap.defaultProps = { onVisualizationConfigChange: undefined };
+
+    render(
+      <SimpleAggregationWizard onChange={onChange} config={worldMapConfig}>
+        <WorldMap />
+      </SimpleAggregationWizard>,
+    );
+
+    const updateViewportButton = await screen.findByRole('button', { name: 'Change Viewport' });
+    userEvent.click(updateViewportButton);
+    const submitButton = await screen.findByRole('button', { name: 'Apply Changes' });
+    userEvent.click(submitButton);
+
+    await waitFor(() => expect(onChange).toHaveBeenCalledWith(expect.objectContaining({
+      visualization: 'map',
+      visualizationConfig: {
+        zoom: 2,
+        centerX: 40,
+        centerY: 50,
       },
     })));
   });
