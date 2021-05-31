@@ -18,10 +18,9 @@ import * as React from 'react';
 import { useRef } from 'react';
 import { Overlay } from 'react-overlays';
 import styled from 'styled-components';
-import { TimeRange } from 'src/views/logic/queries/Query';
 
+import { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import { ButtonGroup } from 'components/graylog';
-import { NoTimeRangeOverride } from 'views/logic/queries/Query';
 
 import RangePresetDropdown from './RangePresetDropdown';
 import TimeRangeButton from './TimeRangeButton';
