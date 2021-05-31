@@ -22,15 +22,16 @@ import { FieldComponentProps } from 'views/components/aggregationwizard/elementC
 
 type Props = FieldComponentProps & {
   type: 'numeric',
-  step?: string
 };
 
 const createEvent = (name: string, value: number) => ({ target: { name, value } }) as React.ChangeEvent<any>;
 
-const InputField = ({ type, onChange, value, error, name, title, field, step }: Props) => {
+const InputField = ({ type, onChange, value, error, name, title, field }: Props) => {
   const _onChange = useCallback((e: React.ChangeEvent<any>) => (type === 'numeric'
     ? onChange(createEvent(e.target.name, Number.parseFloat(e.target.value)))
     : onChange(e)), [onChange, type]);
+
+  const step = 'step' in field ? field.step : undefined;
 
   return (
     <Input id={`${name}-input`}
@@ -46,10 +47,6 @@ const InputField = ({ type, onChange, value, error, name, title, field, step }: 
            labelClassName="col-sm-3"
            wrapperClassName="col-sm-9" />
   );
-};
-
-InputField.defaultProps = {
-  step: undefined,
 };
 
 export default InputField;

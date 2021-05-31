@@ -114,9 +114,7 @@ type BooleanField = BaseField & {
 
 type NumericField = BaseRequiredField & {
   type: 'numeric',
-  componentProps?: {
-    step: string,
-  }
+  step?: string,
 };
 
 type ConfigurationField = SelectField | BooleanField | NumericField;

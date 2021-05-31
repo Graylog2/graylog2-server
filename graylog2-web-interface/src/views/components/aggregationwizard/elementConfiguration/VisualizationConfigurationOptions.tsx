@@ -84,12 +84,11 @@ const VisualizationConfigurationOptions = ({ name: namePrefix, fields = [] }: Pr
       const Component = componentForType(field.type);
 
       const title = titleForField(field);
-      const componentProps = ('componentProps' in field ? field.componentProps : {});
 
       return (
         <Field key={`${namePrefix}.${field.name}`} name={`${namePrefix}.${field.name}`}>
           {({ field: { name, value, onChange }, meta: { error } }) => (
-            <Component key={`${namePrefix}.${field.name}`} name={name} value={value} onChange={onChange} error={error} field={field} title={title} {...componentProps} />
+            <Component key={`${namePrefix}.${field.name}`} name={name} value={value} onChange={onChange} error={error} field={field} title={title} />
           )}
         </Field>
       );

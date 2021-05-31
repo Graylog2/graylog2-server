@@ -62,18 +62,14 @@ const worldMap: VisualizationType = {
         title: 'Latitude',
         type: 'numeric',
         required: true,
-        componentProps: {
-          step: 'any',
-        },
+        step: 'any',
       },
       {
         name: 'centerY',
         title: 'Longitude',
         type: 'numeric',
         required: true,
-        componentProps: {
-          step: 'any',
-        },
+        step: 'any',
       },
     ],
   },
