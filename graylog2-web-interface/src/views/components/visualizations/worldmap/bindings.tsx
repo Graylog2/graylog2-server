@@ -28,8 +28,8 @@ export type WorldMapVisualizationConfigFormValues = {
 
 const DEFAULT_FORM_VALUES = {
   zoom: 1,
-  centerX: -0.3515602939922709,
-  centerY: 0.703125,
+  centerX: 0,
+  centerY: 0,
 };
 
 const worldMap: VisualizationType = {
