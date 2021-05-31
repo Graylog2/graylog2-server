@@ -33,9 +33,9 @@ const worldMap: VisualizationType = {
   config: {
     createConfig: () => ({ zoom: 1, centerX: 0, centerY: 1 }),
     fromConfig: (config: WorldMapVisualizationConfig) => ({
-      zoom: config.viewport?.zoom,
-      centerX: config.viewport?.center[0],
-      centerY: config.viewport?.center[1],
+      zoom: config?.viewport.zoom,
+      centerX: config?.viewport.center[0],
+      centerY: config?.viewport.center[1],
     }),
     toConfig: (formValues: WorldMapVisualizationConfigFormValues) => WorldMapVisualizationConfig.create(Viewport.create([formValues.centerX, formValues.centerY], formValues.zoom)),
     fields: [
