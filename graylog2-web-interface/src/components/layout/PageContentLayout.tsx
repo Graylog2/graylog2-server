@@ -27,7 +27,7 @@ type Props = {
   className?: string
 };
 
-const Container = styled.div`
+const Container = styled.div(({ theme }) => `
   display: flex;
   flex-direction: column;
   overflow: auto;
@@ -35,8 +35,8 @@ const Container = styled.div`
   width: 100%;
 
   /* Bottom gap is defined by the footer */
-  padding: 9px 9px 0 9px;
-`;
+  padding: ${theme.spacings.sm} ${theme.spacings.sm} 0 ${theme.spacings.sm};
+`);
 
 const StyledGrid = styled(Grid)`
   width: 100%;

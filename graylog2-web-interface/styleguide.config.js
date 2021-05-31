@@ -88,6 +88,10 @@ module.exports = {
           name: 'Color Utilities',
           content: 'src/theme/docs/Utilities.md',
         },
+        {
+          name: 'Spacings',
+          content: 'src/theme/docs/Spacings.md',
+        },
       ],
     },
   ],
