@@ -66,6 +66,7 @@ import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.aggregations.b
 import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.sort.FieldSortBuilder;
 import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.sort.SortBuilders;
+import org.graylog.storage.elasticsearch6.indices.GetSingleAlias;
 import org.graylog.storage.elasticsearch6.jest.JestUtils;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.IndexMapping;
@@ -91,6 +92,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -179,25 +181,20 @@ public class IndicesAdapterES6 implements IndicesAdapter {
         // TODO: This is basically getting all indices and later we filter out the alias we want to check for.
         //       This can be done in a more efficient way by either using the /_cat/aliases/<alias-name> API or
         //       the regular /_alias/<alias-name> API.
-        final GetAliases request = new GetAliases.Builder().build();
-        final JestResult jestResult = JestUtils.execute(jestClient, request, () -> "Couldn't collect indices for alias " + alias);
+        final GetSingleAlias request = new GetSingleAlias.Builder()
+                .alias(alias)
+                .build();
+        try {
+            final JestResult jestResult = JestUtils.execute(jestClient, request, () -> "Couldn't collect indices for alias " + alias);
 
-        // The ES return value of this has an awkward format: The first key of the hash is the target index. Thanks.
-        final ImmutableSet.Builder<String> indicesBuilder = ImmutableSet.builder();
-        final Iterator<Map.Entry<String, JsonNode>> it = jestResult.getJsonObject().fields();
-        while (it.hasNext()) {
-            Map.Entry<String, JsonNode> entry = it.next();
-            final String indexName = entry.getKey();
-            Optional.of(entry.getValue())
-                    .map(json -> json.path("aliases"))
-                    .map(JsonNode::fields)
-                    .map(ImmutableList::copyOf)
-                    .filter(aliases -> !aliases.isEmpty())
-                    .filter(aliases -> aliases.stream().anyMatch(aliasEntry -> aliasEntry.getKey().equals(alias)))
-                    .ifPresent(x -> indicesBuilder.add(indexName));
+            // The ES return value of this has an awkward format: The first key of the hash is the target index. Thanks.
+            return ImmutableSet.copyOf(jestResult.getJsonObject().fieldNames());
+        } catch (ElasticsearchException e) {
+            if (e.getMessage().startsWith("Couldn't collect indices for alias ")) {
+                return Collections.emptySet();
+            }
+            throw e;
         }
-
-        return indicesBuilder.build();
     }
 
     @Override
