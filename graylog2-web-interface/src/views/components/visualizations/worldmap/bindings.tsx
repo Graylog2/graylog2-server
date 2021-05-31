@@ -26,17 +26,29 @@ export type WorldMapVisualizationConfigFormValues = {
   centerY: number,
 };
 
+const DEFAULT_FORM_VALUES = {
+  zoom: 1,
+  centerX: -0.3515602939922709,
+  centerY: 0.703125,
+};
+
 const worldMap: VisualizationType = {
   type: WorldMapVisualization.type,
   displayName: 'World Map',
   component: WorldMapVisualization,
   config: {
-    createConfig: () => ({ zoom: 1, centerX: 0, centerY: 1 }),
-    fromConfig: (config: WorldMapVisualizationConfig) => ({
-      zoom: config?.viewport.zoom,
-      centerX: config?.viewport.center[0],
-      centerY: config?.viewport.center[1],
-    }),
+    createConfig: () => DEFAULT_FORM_VALUES,
+    fromConfig: (config: WorldMapVisualizationConfig) => {
+      if (!config) {
+        return DEFAULT_FORM_VALUES;
+      }
+
+      return {
+        zoom: config.viewport.zoom,
+        centerX: config.viewport.center[0],
+        centerY: config.viewport.center[1],
+      };
+    },
     toConfig: (formValues: WorldMapVisualizationConfigFormValues) => WorldMapVisualizationConfig.create(Viewport.create([formValues.centerX, formValues.centerY], formValues.zoom)),
     fields: [
       {
