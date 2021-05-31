@@ -133,7 +133,7 @@ const SearchBar = ({
                   <TopRow>
                     <Col md={5}>
                       <TimeRangeInput disabled={disableSearch}
-                                      onChange={(nextTimeRange) => { console.log(nextTimeRange); setFieldValue('timerange', nextTimeRange); }}
+                                      onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
                                       value={values?.timerange}
                                       hasErrorOnMount={!isValid} />
                     </Col>
