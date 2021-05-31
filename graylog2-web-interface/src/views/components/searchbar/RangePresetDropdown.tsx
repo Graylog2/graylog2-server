@@ -41,7 +41,7 @@ const AdminMenuItem = styled(MenuItem)(({ theme }) => css`
   font-size: ${theme.fonts.size.small};
 `);
 
-const RelativeRangePresetSelect = ({ disabled, onChange, onToggle, className, displayTitle, bsSize, header }: Props) => {
+const RangePresetDropdown = ({ disabled, onChange, onToggle, className, displayTitle, bsSize, header }: Props) => {
   const { config } = useSearchConfiguration();
   const availableOptions = config?.relative_timerange_options;
   const timeRangeLimit = moment.duration(config?.query_time_range_limit);
@@ -98,7 +98,7 @@ const RelativeRangePresetSelect = ({ disabled, onChange, onToggle, className, di
   );
 };
 
-RelativeRangePresetSelect.propTypes = {
+RangePresetDropdown.propTypes = {
   bsSize: PropTypes.string,
   className: PropTypes.string,
   disabled: PropTypes.bool,
@@ -108,7 +108,7 @@ RelativeRangePresetSelect.propTypes = {
   onToggle: PropTypes.func,
 };
 
-RelativeRangePresetSelect.defaultProps = {
+RangePresetDropdown.defaultProps = {
   bsSize: 'small',
   className: undefined,
   disabled: false,
@@ -118,4 +118,4 @@ RelativeRangePresetSelect.defaultProps = {
   displayTitle: true,
 };
 
-export default RelativeRangePresetSelect;
+export default RangePresetDropdown;

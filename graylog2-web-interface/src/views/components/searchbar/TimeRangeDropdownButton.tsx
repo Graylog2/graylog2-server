@@ -23,7 +23,7 @@ import { TimeRange } from 'src/views/logic/queries/Query';
 import { ButtonGroup } from 'components/graylog';
 import { NoTimeRangeOverride } from 'views/logic/queries/Query';
 
-import RelativeRangePresetSelect from './RelativeRangePresetSelect';
+import RangePresetDropdown from './RangePresetDropdown';
 import TimeRangeButton from './TimeRangeButton';
 
 type Props = {
@@ -36,7 +36,7 @@ type Props = {
   toggleShow: () => void,
 };
 
-const StyledRelativeRangePresetSelect = styled(RelativeRangePresetSelect)`
+const StyledRangePresetDropdown = styled(RangePresetDropdown)`
   padding: 6px;
 `;
 
@@ -83,12 +83,12 @@ const TimeRangeDropdownButton = ({
         <TimeRangeButton hasError={hasErrorOnMount}
                          disabled={disabled}
                          onClick={_onClick} />
-        <StyledRelativeRangePresetSelect disabled={disabled}
-                                         displayTitle={false}
-                                         onChange={selectRelativeTimeRangePreset}
-                                         onToggle={_onPresetSelectToggle}
-                                         header="From (Until Now)"
-                                         bsSize={null} />
+        <StyledRangePresetDropdown disabled={disabled}
+                                   displayTitle={false}
+                                   onChange={selectRelativeTimeRangePreset}
+                                   onToggle={_onPresetSelectToggle}
+                                   header="From (Until Now)"
+                                   bsSize={null} />
       </StyledButtonGroup>
       <Overlay show={show}
                trigger="click"
