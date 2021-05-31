@@ -43,6 +43,13 @@ jest.mock('views/stores/SearchStore', () => ({
   },
 }));
 
+jest.mock('views/stores/SearchConfigStore', () => ({
+  SearchConfigStore: MockStore(['getInitialState', () => ({})]),
+  SearchConfigActions: {
+    refresh: jest.fn(() => Promise.resolve()),
+  },
+}));
+
 jest.mock('views/components/searchbar/AsyncQueryInput', () => () => null);
 
 const config = {
