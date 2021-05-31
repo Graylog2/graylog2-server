@@ -17,6 +17,7 @@
 import React, { useEffect, useState } from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import styled, { createGlobalStyle } from 'styled-components';
+import { useQuery } from 'react-query';
 
 import { DocumentTitle, Icon } from 'components/common';
 import { Alert, Button } from 'components/graylog';
@@ -44,24 +45,14 @@ const StyledButton = styled(Button)`
 const LoginPage = () => {
   const [didValidateSession, setDidValidateSession] = useState(false);
   const [lastError, setLastError] = useState(undefined);
-  const [activeBackend, setActiveBackend] = useState();
-  const [isDetermined, setIsDetermined] = useState(false);
   const [useFallback, setUseFallback] = useState(false);
+
+  const { data: activeBackend, isSuccess: isBackendDetermined } = useQuery('activeBackendType', AuthenticationDomain.loadActiveBackendType);
 
   const isCloud = AppConfig.isCloud();
   const registeredLoginComponents = PluginStore.exports('loginProviderType');
   const loginComponent = registeredLoginComponents.find((c) => c.type === activeBackend);
   const hasCustomLogin = loginComponent && loginComponent.formComponent;
-
-  useEffect(() => {
-    if (!isDetermined) {
-      AuthenticationDomain.loadActiveBackendType()
-        .then((backend) => {
-          setIsDetermined(true);
-          setActiveBackend(backend);
-        });
-    }
-  }, [isDetermined]);
 
   useEffect(() => {
     const sessionPromise = SessionActions.validate().then((response) => {
@@ -103,7 +94,7 @@ const LoginPage = () => {
     return <LoginForm onErrorChange={setLastError} />;
   };
 
-  if (!didValidateSession || !isDetermined) {
+  if (!didValidateSession || !isBackendDetermined) {
     return (
       <LoadingPage />
     );
