@@ -17,8 +17,9 @@
 import * as React from 'react';
 import { render, fireEvent } from 'wrappedTestingLibrary';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
-import { StoreMock as MockStore } from 'helpers/mocking';
+import { asMock, StoreMock as MockStore } from 'helpers/mocking';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
+import * as Immutable from 'immutable';
 
 import history from 'util/History';
 import Routes from 'routing/Routes';
@@ -26,6 +27,9 @@ import AppRouter from 'routing/AppRouter';
 import CurrentUserProvider from 'contexts/CurrentUserProvider';
 import viewsBindings from 'views/bindings';
 import StreamsContext from 'contexts/StreamsContext';
+import SearchMetadata from 'views/logic/search/SearchMetadata';
+import Parameter from 'views/logic/parameters/Parameter';
+import { SearchMetadataActions, SearchMetadataStore } from 'views/stores/SearchMetadataStore';
 
 jest.mock('views/stores/DashboardsStore', () => ({
   DashboardsActions: {
@@ -56,6 +60,13 @@ jest.mock('stores/users/CurrentUserStore', () => MockStore(
     },
   })],
 ));
+
+jest.mock('views/stores/SearchMetadataStore', () => ({
+  SearchMetadataActions: {
+    parseSearch: jest.fn(),
+  },
+  SearchMetadataStore: MockStore(),
+}));
 
 declare global {
   namespace NodeJS {
@@ -89,6 +100,12 @@ const testTimeout = applyTimeoutMultiplier(30000);
 
 describe('Create a new dashboard', () => {
   beforeAll(() => PluginStore.register(viewsPlugin));
+
+  beforeEach(() => {
+    const searchMetadata = SearchMetadata.empty();
+    asMock(SearchMetadataStore.getInitialState).mockReturnValue(searchMetadata);
+    asMock(SearchMetadataActions.parseSearch).mockReturnValue(Promise.resolve(searchMetadata));
+  });
 
   afterAll(() => PluginStore.unregister(viewsPlugin));
 
