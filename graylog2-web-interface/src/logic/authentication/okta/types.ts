@@ -25,6 +25,7 @@ export interface OktaBackendConfig {
   clientSecret: string;
   tokenVerifierConnectTimeout: string;
   callbackUrl: string;
+  apiToken: string;
 }
 
 export interface OktaBackendConfigJson {
@@ -34,6 +35,7 @@ export interface OktaBackendConfigJson {
   client_secret: string;
   token_verifier_connect_timeout: string;
   callback_url: string;
+  api_token: string;
 }
 
 export interface OktaBackend {
