@@ -63,6 +63,7 @@ const Metric = ({ index }: Props) => {
                     value={value}
                     aria-label="Select a function"
                     size="small"
+                    menuPortalTarget={document.body}
                     onChange={(newValue) => {
                       onChange({ target: { name, value: newValue } });
                     }} />
@@ -95,6 +96,7 @@ const Metric = ({ index }: Props) => {
                       value={value}
                       aria-label="Select percentile"
                       size="small"
+                      menuPortalTarget={document.body}
                       onChange={(newValue) => onChange({ target: { name, value: newValue } })} />
             </Input>
           )}
