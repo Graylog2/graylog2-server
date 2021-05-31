@@ -178,9 +178,6 @@ public class IndicesAdapterES6 implements IndicesAdapter {
 
     @Override
     public Set<String> resolveAlias(String alias) {
-        // TODO: This is basically getting all indices and later we filter out the alias we want to check for.
-        //       This can be done in a more efficient way by either using the /_cat/aliases/<alias-name> API or
-        //       the regular /_alias/<alias-name> API.
         final GetSingleAlias request = new GetSingleAlias.Builder()
                 .alias(alias)
                 .build();
