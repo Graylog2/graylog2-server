@@ -21,6 +21,7 @@ import loadAsync from 'routing/loadAsync';
 import ServerUnavailablePage from 'pages/ServerUnavailablePage';
 import StoreProvider from 'injection/StoreProvider';
 import connect from 'stores/connect';
+import LoginQueryClientProvider from 'contexts/LoginQueryClientProvider';
 
 import 'bootstrap/less/bootstrap.less';
 import 'toastr/toastr.less';
@@ -47,7 +48,11 @@ const AppFacade = ({ currentUser, server, sessionId }) => {
   }
 
   if (!sessionId) {
-    return <LoginPage />;
+    return (
+      <LoginQueryClientProvider>
+        <LoginPage />
+      </LoginQueryClientProvider>
+    );
   }
 
   if (!currentUser) {
