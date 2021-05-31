@@ -30,6 +30,11 @@ const options = {
   },
 };
 
+/*
+ * Use a separate client provider from the default one to be able to clear cached data once the user
+ * logs out. Login page is also created by another component than the regular app.
+ */
+
 const LoginQueryClientProvider = ({ children }: Props) => {
   const queryClient = useMemo(() => new QueryClient(options), []);
 
