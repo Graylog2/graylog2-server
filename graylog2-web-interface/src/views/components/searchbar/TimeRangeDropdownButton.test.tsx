@@ -17,6 +17,7 @@
 import { fireEvent, render, screen } from 'wrappedTestingLibrary';
 import * as React from 'react';
 import MockStore from 'helpers/mocking/StoreMock';
+import mockSearchClusterConfig from 'fixtures/searchClusterConfig';
 
 import TimeRangeDropdownButton from './TimeRangeDropdownButton';
 
@@ -24,16 +25,15 @@ jest.mock('stores/configurations/ConfigurationsStore', () => ({
   ConfigurationsStore: MockStore(),
 }));
 
-// jest.mock('views/stores/SearchConfigStore', () => ({
-//   SearchConfigActions: {
-//     refresh: jest.fn(() => Promise.resolve()),
-//   },
-//   SearchConfigStore: {
-//     listen: () => jest.fn(),
-//     searchesClusterConfig: mockSearchClusterConfig,
-//     getInitialState: () => mockSearchClusterConfig,
-//   },
-// }));
+jest.mock('views/stores/SearchConfigStore', () => ({
+  SearchConfigActions: {
+    refresh: jest.fn(() => Promise.resolve()),
+  },
+  SearchConfigStore: {
+    listen: () => jest.fn(),
+    getInitialState: () => ({ searchesClusterConfig: mockSearchClusterConfig }),
+  },
+}));
 
 describe('TimeRangeDropdownButton', () => {
   it('button can be clicked and Popover appears', async () => {
@@ -47,20 +47,18 @@ describe('TimeRangeDropdownButton', () => {
     expect(toggleShow).toHaveBeenCalled();
   });
 
-  // it('changes time range when selecting relative time range preset', async () => {
-  //   const setCurrentTimeRange = jest.fn();
-  //   render(<TimeRangeDropdownButton toggleShow={() => {}} onPresetSelectOpen={() => {}} setCurrentTimeRange={setCurrentTimeRange}><></></TimeRangeDropdownButton>);
+  it('changes time range when selecting relative time range preset', async () => {
+    const setCurrentTimeRange = jest.fn();
+    render(<TimeRangeDropdownButton toggleShow={() => {}} onPresetSelectOpen={() => {}} setCurrentTimeRange={setCurrentTimeRange}><></></TimeRangeDropdownButton>);
 
-  //   const timeRangeButton = screen.getByLabelText('Open time range preset select');
-  //   fireEvent.click(timeRangeButton);
-  //   const rangePresetOption = await screen.findByLabelText('30 minutes');
-  //   fireEvent.click(rangePresetOption);
+    const timeRangeButton = screen.getByLabelText('Open time range preset select');
+    fireEvent.click(timeRangeButton);
+    const rangePresetOption = await screen.findByText('30 minutes');
+    fireEvent.click(rangePresetOption);
 
-  //   screen.debug();
-
-  //   expect(setCurrentTimeRange).toHaveBeenCalledWith({
-  //     type: 'relative',
-  //     form: 1800,
-  //   });
-  // });
+    expect(setCurrentTimeRange).toHaveBeenCalledWith({
+      type: 'relative',
+      from: 1800,
+    });
+  });
 });
