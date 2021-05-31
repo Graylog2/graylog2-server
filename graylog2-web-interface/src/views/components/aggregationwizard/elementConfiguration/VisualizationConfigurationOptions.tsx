@@ -23,15 +23,13 @@ import BooleanField from 'views/components/aggregationwizard/elementConfiguratio
 import { VisualizationConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
 import { HoverForHelp } from 'components/common';
 
-import InputField from './configurationFields/InputField';
+import NumericField from './configurationFields/NumericField';
 import SelectField from './configurationFields/SelectField';
 
 type Props = {
   name: string,
   fields: Array<ConfigurationField>,
 };
-
-const NumericField = (props) => <InputField type="number" {...props} />;
 
 const TitleLabelWithHelp = styled.div`
   display: flex;
