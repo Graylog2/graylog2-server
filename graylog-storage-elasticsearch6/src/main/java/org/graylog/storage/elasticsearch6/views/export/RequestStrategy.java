@@ -18,7 +18,7 @@ package org.graylog.storage.elasticsearch6.views.export;
 
 import io.searchbox.core.Search;
 import io.searchbox.core.SearchResult;
-import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.plugins.views.search.export.ExportMessagesCommand;
 
 import java.util.List;
@@ -33,7 +33,7 @@ public interface RequestStrategy {
      * Allows implementers to specify options on SearchSourceBuilder that cannot be specified on Search.Builder.
      *
      * @see #nextChunk(Search.Builder, ExportMessagesCommand)
-     * @see org.graylog.shaded.elasticsearch5.org.elasticsearch.search.builder.SearchSourceBuilder#searchAfter(Object[])
+     * @see org.graylog.shaded.elasticsearch6.org.elasticsearch.search.builder.SearchSourceBuilder#searchAfter(Object[])
      */
     default SearchSourceBuilder configure(SearchSourceBuilder ssb) {
         return ssb;

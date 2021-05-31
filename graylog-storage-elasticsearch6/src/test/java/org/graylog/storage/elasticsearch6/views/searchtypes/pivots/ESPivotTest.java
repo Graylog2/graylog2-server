@@ -26,9 +26,9 @@ import io.searchbox.core.search.aggregation.MaxAggregation;
 import io.searchbox.core.search.aggregation.MetricAggregation;
 import io.searchbox.core.search.aggregation.MinAggregation;
 import org.assertj.core.api.AbstractCharSequenceAssert;
-import org.graylog.shaded.elasticsearch5.org.elasticsearch.index.query.QueryBuilders;
-import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.aggregations.AggregationBuilders;
-import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.graylog.shaded.elasticsearch6.org.elasticsearch.index.query.QueryBuilders;
+import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
@@ -43,7 +43,6 @@ import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
-import org.graylog.plugins.views.search.searchtypes.pivot.buckets.AutoInterval;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Time;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
@@ -175,7 +174,7 @@ public class ESPivotTest {
         when(queryContext.nextName()).thenReturn("values-agg", "time-agg");
 
         final Values values = Values.builder().field("action").limit(10).build();
-        final Time time = Time.builder().field("timestamp").interval(AutoInterval.create()).build();
+        final Time time = Time.builder().field("timestamp").buckets(Time.DEFAULT_BUCKET_SIZE).build();
         when(pivot.columnGroups()).thenReturn(ImmutableList.of(values, time));
 
         this.esPivot.doGenerateQueryPart(job, query, pivot, queryContext);
@@ -204,7 +203,7 @@ public class ESPivotTest {
         when(queryContext.searchSourceBuilder(pivot)).thenReturn(searchSourceBuilder);
         when(queryContext.nextName()).thenReturn("time-agg", "values-agg");
 
-        final Time time = Time.builder().field("timestamp").interval(AutoInterval.create()).build();
+        final Time time = Time.builder().field("timestamp").buckets(Time.DEFAULT_BUCKET_SIZE).build();
         final Values values = Values.builder().field("action").limit(10).build();
         when(pivot.rowGroups()).thenReturn(ImmutableList.of(time, values));
 
@@ -234,7 +233,7 @@ public class ESPivotTest {
         when(queryContext.searchSourceBuilder(pivot)).thenReturn(searchSourceBuilder);
         when(queryContext.nextName()).thenReturn("time-agg", "values-agg");
 
-        final Time time = Time.builder().field("timestamp").interval(AutoInterval.create()).build();
+        final Time time = Time.builder().field("timestamp").buckets(Time.DEFAULT_BUCKET_SIZE).build();
         final Values values = Values.builder().field("action").limit(10).build();
         when(pivot.rowGroups()).thenReturn(Collections.singletonList(time));
         when(pivot.columnGroups()).thenReturn(Collections.singletonList(values));
@@ -274,7 +273,7 @@ public class ESPivotTest {
         when(queryContext.searchSourceBuilder(pivot)).thenReturn(searchSourceBuilder);
         when(queryContext.nextName()).thenReturn("rowPivot1", "rowPivot2", "columnPivot1", "columnPivot2");
 
-        final BucketSpec rowPivot1 = Time.builder().field("timestamp").interval(AutoInterval.create()).build();
+        final BucketSpec rowPivot1 = Time.builder().field("timestamp").buckets(Time.DEFAULT_BUCKET_SIZE).build();
         final BucketSpec rowPivot2 = Values.builder().field("http_method").limit(10).build();
         final BucketSpec columnPivot1 = Values.builder().field("controller").limit(10).build();
         final BucketSpec columnPivot2 = Values.builder().field("action").limit(10).build();

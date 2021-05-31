@@ -71,7 +71,7 @@ public class ESTimeHandlerTest {
     @Before
     public void setUp() throws Exception {
         this.esTimeHandler = new ESTimeHandler();
-        when(time.interval()).thenReturn(interval);
+        when(time.buckets()).thenReturn(Time.DEFAULT_BUCKET_SIZE);
         when(time.field()).thenReturn("foobar");
         final ESPivot.AggTypes aggTypes = mock(ESPivot.AggTypes.class);
         when(queryContext.contextMap().get(any())).thenReturn(aggTypes);

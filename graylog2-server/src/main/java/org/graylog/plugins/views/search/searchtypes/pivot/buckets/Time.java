@@ -30,6 +30,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.TypedBuilder;
 @JsonDeserialize(builder = Time.Builder.class)
 public abstract class Time implements BucketSpec {
     public static final String NAME = "time";
+    public static final int DEFAULT_BUCKET_SIZE = 30;
 
     @Override
     public abstract String type();
@@ -38,7 +39,7 @@ public abstract class Time implements BucketSpec {
     public abstract String field();
 
     @JsonProperty
-    public abstract Interval interval();
+    public abstract int buckets();
 
     public static Time.Builder builder() {
         return new AutoValue_Time.Builder()
@@ -58,7 +59,7 @@ public abstract class Time implements BucketSpec {
         public abstract Builder field(String field);
 
         @JsonProperty
-        public abstract Builder interval(Interval interval);
+        public abstract Builder buckets(int buckets);
     }
 
 }

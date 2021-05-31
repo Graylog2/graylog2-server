@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.searchbox.core.Search;
 import io.searchbox.core.SearchResult;
 import io.searchbox.params.Parameters;
-import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.storage.elasticsearch6.testing.ElasticsearchInstanceES6;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog.testing.elasticsearch.ElasticsearchInstance;
@@ -37,7 +37,7 @@ import java.io.IOException;
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.graylog.shaded.elasticsearch5.org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
+import static org.graylog.shaded.elasticsearch6.org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 import static org.graylog.storage.elasticsearch6.testing.TestUtils.jestClient;
 
 public class ScrollResultES6IT extends ElasticsearchBaseTest {

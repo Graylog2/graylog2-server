@@ -66,7 +66,6 @@ import org.graylog.plugins.views.search.searchtypes.events.EventList;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotSort;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSort;
-import org.graylog.plugins.views.search.searchtypes.pivot.buckets.AutoInterval;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Time;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.TimeUnitInterval;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
@@ -156,7 +155,6 @@ public class ViewsBindings extends ViewsModule {
 
         registerJacksonSubtype(TimeUnitInterval.class);
         registerJacksonSubtype(TimeUnitIntervalDTO.class);
-        registerJacksonSubtype(AutoInterval.class);
         registerJacksonSubtype(AutoIntervalDTO.class);
 
         bind(SearchJobService.class).to(InMemorySearchJobService.class).in(Scopes.SINGLETON);

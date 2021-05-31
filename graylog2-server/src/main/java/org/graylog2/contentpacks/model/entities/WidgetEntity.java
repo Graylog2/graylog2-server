@@ -28,7 +28,6 @@ import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotSort;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
-import org.graylog.plugins.views.search.searchtypes.pivot.buckets.AutoInterval;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Time;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
@@ -215,7 +214,7 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
             if (rowPivot.type().matches("time")) {
                 return Time.builder()
                         .field(rowPivot.field())
-                        .interval(AutoInterval.create()).build();
+                        .buckets(Time.DEFAULT_BUCKET_SIZE).build();
             } else {
                 return Values.builder()
                         .field(rowPivot.field())
