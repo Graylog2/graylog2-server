@@ -17,6 +17,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import PublicNotifications from 'components/common/PublicNotifications';
+
 import GlobalAppNotifications from './GlobalAppNotifications';
 
 type Props = {
@@ -26,6 +28,7 @@ type Props = {
 const WithGlobalNotifications = ({ children }: Props) => (
   <>
     <GlobalAppNotifications />
+    <PublicNotifications />
     {children}
   </>
 );

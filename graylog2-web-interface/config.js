@@ -20,6 +20,7 @@ window.appConfig = {
   rootTimeZone: 'UTC',
   pluginUISettings: {
     'org.graylog.plugins.customization.theme': {},
+    'org.graylog.plugins.customization.notifications': {},
   },
   isCloud: false,
 };

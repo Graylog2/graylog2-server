@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { ThemeMode } from 'theme/constants';
-import { Colors, ThemeColorModes } from 'theme/colors';
+import { Colors, ColorVariants, ThemeColorModes } from 'theme/colors';
 
 interface CustomizationHooks {
   useThemeCustomizer: () => ({
@@ -39,8 +39,35 @@ interface CustomizationType {
   actions?: CustomizationActions;
 }
 
+export interface Notification {
+  title: string,
+  shortMessage: string,
+  longMessage: string,
+  isActive: boolean,
+  isDismissible: boolean,
+  atLogin: boolean,
+  isGlobal: boolean,
+  variant: ColorVariants,
+  hiddenTitle: boolean,
+}
+type NotificationId = string;
+export type Notifications = { [id: string]: Notification };
+
+export interface PublicNotificationsHooks {
+  usePublicNotifications: () => ({
+    notifications: Notifications,
+    dismissedNotifications: Set<NotificationId>,
+    onDismissPublicNotification: (NotificationId) => void,
+  })
+}
+
+interface PublicNotificationsType {
+  hooks?: PublicNotificationsHooks;
+}
+
 declare module 'graylog-web-plugin/plugin' {
   interface PluginExports {
     'customization.theme.customizer'?: Array<CustomizationType>;
+    'customization.publicNotifications'?: Array<PublicNotificationsType>;
   }
 }
