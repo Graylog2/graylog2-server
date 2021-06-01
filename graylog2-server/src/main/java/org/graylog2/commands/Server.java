@@ -28,6 +28,8 @@ import org.graylog.events.EventsModule;
 import org.graylog.freeenterprise.FreeEnterpriseConfiguration;
 import org.graylog.freeenterprise.FreeEnterpriseModule;
 import org.graylog.grn.GRNTypesModule;
+import org.graylog.metrics.prometheus.PrometheusExporterConfiguration;
+import org.graylog.metrics.prometheus.PrometheusMetricsModule;
 import org.graylog.plugins.cef.CEFInputModule;
 import org.graylog.plugins.map.MapWidgetModule;
 import org.graylog.plugins.netflow.NetFlowPluginModule;
@@ -116,6 +118,7 @@ public class Server extends ServerBootstrap {
     private final ProcessingStatusConfig processingStatusConfig = new ProcessingStatusConfig();
     private final JobSchedulerConfiguration jobSchedulerConfiguration = new JobSchedulerConfiguration();
     private final FreeEnterpriseConfiguration freeEnterpriseConfiguration = new FreeEnterpriseConfiguration();
+    private final PrometheusExporterConfiguration prometheusExporterConfiguration = new PrometheusExporterConfiguration();
 
     public Server() {
         super("server", configuration);
@@ -164,7 +167,8 @@ public class Server extends ServerBootstrap {
                 new EventsModule(),
                 new FreeEnterpriseModule(),
                 new GRNTypesModule(),
-                new SecurityModule()
+                new SecurityModule(),
+                new PrometheusMetricsModule()
         );
 
         return modules.build();
@@ -185,7 +189,8 @@ public class Server extends ServerBootstrap {
                 viewsConfiguration,
                 processingStatusConfig,
                 jobSchedulerConfiguration,
-                freeEnterpriseConfiguration);
+                freeEnterpriseConfiguration,
+                prometheusExporterConfiguration);
     }
 
     @Override

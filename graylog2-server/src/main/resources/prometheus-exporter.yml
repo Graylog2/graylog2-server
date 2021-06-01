@@ -1,0 +1,1344 @@
+---
+# This is the built-in core mapping for the prometheus exporter.
+# WARNING: Changes to the "metric_name" values are an API change!
+metric_mappings:
+  - metric_name: "log_appenders"
+    match_pattern: "org.apache.logging.log4j.core.Appender.*"
+    wildcard_extract_labels:
+      - "status"
+
+  - metric_name: "license_status"
+    match_pattern: "org.graylog.enterprise.license.status.*"
+    wildcard_extract_labels:
+      - "status"
+
+  - metric_name: "stream_incoming_messages"
+    match_pattern: "org.graylog2.plugin.streams.Stream.*.incomingMessages"
+    wildcard_extract_labels:
+      - "stream"
+
+  - metric_name: "stream_rules_execution_time"
+    match_pattern: "org.graylog2.plugin.streams.Stream.*.StreamRule.*.executionTime"
+    wildcard_extract_labels:
+      - "stream"
+      - "stream_rule"
+
+  - metric_name: "enterprise_forwarder_journal_written_bytes"
+    match_pattern: "org.graylog.enterprise.integrations.outputs.forwarder.buffer.ForwarderJournallingMessageHandler.*.writtenBytes"
+    wildcard_extract_labels:
+      - "forwarder"
+
+  - metric_name: "enterprise_forwarder_journal_last_flush_time"
+    match_pattern: "org.graylog.enterprise.integrations.outputs.forwarder.journal.ForwarderJournal.*.lastFlushTime"
+    wildcard_extract_labels:
+      - "forwarder"
+
+  - metric_name: "enterprise_forwarder_journal_log_end_offset"
+    match_pattern: "org.graylog.enterprise.integrations.outputs.forwarder.journal.ForwarderJournal.*.logEndOffset"
+    wildcard_extract_labels:
+      - "forwarder"
+
+  - metric_name: "enterprise_forwarder_journal_number_segments"
+    match_pattern: "org.graylog.enterprise.integrations.outputs.forwarder.journal.ForwarderJournal.*.numberOfSegments"
+    wildcard_extract_labels:
+      - "forwarder"
+
+  - metric_name: "enterprise_forwarder_journal_oldest_segment"
+    match_pattern: "org.graylog.enterprise.integrations.outputs.forwarder.journal.ForwarderJournal.*.oldest_segment"
+    wildcard_extract_labels:
+      - "forwarder"
+
+  - metric_name: "enterprise_forwarder_journal_read_messages"
+    match_pattern: "org.graylog.enterprise.integrations.outputs.forwarder.journal.ForwarderJournal.*.readMessages"
+    wildcard_extract_labels:
+      - "forwarder"
+
+  - metric_name: "enterprise_forwarder_journal_read_time"
+    match_pattern: "org.graylog.enterprise.integrations.outputs.forwarder.journal.ForwarderJournal.*.readTime"
+    wildcard_extract_labels:
+      - "forwarder"
+
+  - metric_name: "enterprise_forwarder_journal_recovery_point"
+    match_pattern: "org.graylog.enterprise.integrations.outputs.forwarder.journal.ForwarderJournal.*.recoveryPoint"
+    wildcard_extract_labels:
+      - "forwarder"
+
+  - metric_name: "enterprise_forwarder_journal_size"
+    match_pattern: "org.graylog.enterprise.integrations.outputs.forwarder.journal.ForwarderJournal.*.size"
+    wildcard_extract_labels:
+      - "forwarder"
+
+  - metric_name: "enterprise_forwarder_journal_uncommitted_messages"
+    match_pattern: "org.graylog.enterprise.integrations.outputs.forwarder.journal.ForwarderJournal.*.uncommittedMessages"
+    wildcard_extract_labels:
+      - "forwarder"
+
+  - metric_name: "enterprise_forwarder_journal_unflushed_messages"
+    match_pattern: "org.graylog.enterprise.integrations.outputs.forwarder.journal.ForwarderJournal.*.unflushedMessages"
+    wildcard_extract_labels:
+      - "forwarder"
+
+  - metric_name: "enterprise_forwarder_journal_write_discarded_messages"
+    match_pattern: "org.graylog.enterprise.integrations.outputs.forwarder.journal.ForwarderJournal.*.writeDiscardedMessages"
+    wildcard_extract_labels:
+      - "forwarder"
+
+  - metric_name: "enterprise_forwarder_journal_write_time"
+    match_pattern: "org.graylog.enterprise.integrations.outputs.forwarder.journal.ForwarderJournal.*.writeTime"
+    wildcard_extract_labels:
+      - "forwarder"
+
+  - metric_name: "enterprise_forwarder_journal_written_messages"
+    match_pattern: "org.graylog.enterprise.integrations.outputs.forwarder.journal.ForwarderJournal.*.writtenMessages"
+    wildcard_extract_labels:
+      - "forwarder"
+
+  - metric_name: "legacy_alarm_callback_failed_other"
+    match_pattern: "org.graylog.events.legacy.LegacyAlarmCallbackEventNotification.*.executions.failed_other"
+    wildcard_extract_labels:
+      - "alarm_callback"
+
+  - metric_name: "legacy_alarm_callback_failed_permanently"
+    match_pattern: "org.graylog.events.legacy.LegacyAlarmCallbackEventNotification.*.executions.failed_permanently"
+    wildcard_extract_labels:
+      - "alarm_callback"
+
+  - metric_name: "legacy_alarm_callback_failed_temporarily"
+    match_pattern: "org.graylog.events.legacy.LegacyAlarmCallbackEventNotification.*.executions.failed_temporarily"
+    wildcard_extract_labels:
+      - "alarm_callback"
+
+  - metric_name: "legacy_alarm_callback_in_grace_period"
+    match_pattern: "org.graylog.events.legacy.LegacyAlarmCallbackEventNotification.*.executions.in_grace_period"
+    wildcard_extract_labels:
+      - "alarm_callback"
+
+  - metric_name: "legacy_alarm_callback_successful"
+    match_pattern: "org.graylog.events.legacy.LegacyAlarmCallbackEventNotification.*.executions.successful"
+    wildcard_extract_labels:
+      - "alarm_callback"
+
+  - metric_name: "legacy_alarm_callback_total"
+    match_pattern: "org.graylog.events.legacy.LegacyAlarmCallbackEventNotification.*.executions.total"
+    wildcard_extract_labels:
+      - "alarm_callback"
+
+  - metric_name: "event_processor_events_created"
+    match_pattern: "org.graylog.events.processor.aggregation.AggregationEventProcessor.*.events_created"
+    wildcard_extract_labels:
+      - "processor_id"
+    additional_labels:
+      type: "aggregation"
+
+  - metric_name: "event_processor_events_created"
+    match_pattern: "org.graylog.plugins.events.processor.correlation.CorrelationEventProcessor.*.events_created"
+    wildcard_extract_labels:
+      - "processor_id"
+    additional_labels:
+      type: "correlation"
+
+  - metric_name: "event_processor_event_execution_count"
+    match_pattern: "org.graylog.events.processor.aggregation.AggregationEventProcessor.*.execution_count"
+    wildcard_extract_labels:
+      - "processor_id"
+    additional_labels:
+      type: "aggregation"
+
+  - metric_name: "event_processor_event_execution_count"
+    match_pattern: "org.graylog.plugins.events.processor.correlation.CorrelationEventProcessor.*.execution_count"
+    wildcard_extract_labels:
+      - "processor_id"
+    additional_labels:
+      type: "correlation"
+
+  - metric_name: "event_processor_event_execution_exception"
+    match_pattern: "org.graylog.events.processor.aggregation.AggregationEventProcessor.*.execution_exception"
+    wildcard_extract_labels:
+      - "processor_id"
+    additional_labels:
+      type: "aggregation"
+
+  - metric_name: "event_processor_event_execution_exception"
+    match_pattern: "org.graylog.plugins.events.processor.correlation.CorrelationEventProcessor.*.execution_exception"
+    wildcard_extract_labels:
+      - "processor_id"
+    additional_labels:
+      type: "correlation"
+
+  - metric_name: "event_processor_event_execution_successful"
+    match_pattern: "org.graylog.events.processor.aggregation.AggregationEventProcessor.*.execution_successful"
+    wildcard_extract_labels:
+      - "processor_id"
+    additional_labels:
+      type: "aggregation"
+
+  - metric_name: "event_processor_event_execution_successful"
+    match_pattern: "org.graylog.plugins.events.processor.correlation.CorrelationEventProcessor.*.execution_successful"
+    wildcard_extract_labels:
+      - "processor_id"
+    additional_labels:
+      type: "correlation"
+
+  - metric_name: "event_processor_event_execution_time"
+    match_pattern: "org.graylog.events.processor.aggregation.AggregationEventProcessor.*.execution_time"
+    wildcard_extract_labels:
+      - "processor_id"
+    additional_labels:
+      type: "aggregation"
+
+  - metric_name: "event_processor_event_execution_time"
+    match_pattern: "org.graylog.plugins.events.processor.correlation.CorrelationEventProcessor.*.execution_time"
+    wildcard_extract_labels:
+      - "processor_id"
+    additional_labels:
+      type: "correlation"
+
+  - metric_name: "input_empty_messages"
+    match_pattern: "org.graylog2.inputs.gelf.http.GELFHttpInput.*.emptyMessages"
+    wildcard_extract_labels:
+      - "input"
+
+  - metric_name: "input_incoming_messages"
+    match_pattern: "org.graylog2.inputs.gelf.http.GELFHttpInput.*.incomingMessages"
+    wildcard_extract_labels:
+      - "input"
+
+  - metric_name: "input_open_connections"
+    match_pattern: "org.graylog2.inputs.gelf.http.GELFHttpInput.*.open_connections"
+    wildcard_extract_labels:
+      - "input"
+
+  - metric_name: "input_raw_size"
+    match_pattern: "org.graylog2.inputs.gelf.http.GELFHttpInput.*.rawSize"
+    wildcard_extract_labels:
+      - "input"
+
+  - metric_name: "input_read_bytes_one_sec"
+    match_pattern: "org.graylog2.inputs.gelf.http.GELFHttpInput.*.read_bytes_1sec"
+    wildcard_extract_labels:
+      - "input"
+
+  - metric_name: "input_read_bytes_total"
+    match_pattern: "org.graylog2.inputs.gelf.http.GELFHttpInput.*.read_bytes_total"
+    wildcard_extract_labels:
+      - "input"
+
+  - metric_name: "input_total_connections"
+    match_pattern: "org.graylog2.inputs.gelf.http.GELFHttpInput.*.total_connections"
+    wildcard_extract_labels:
+      - "input"
+
+  - metric_name: "input_written_bytes_one_sec"
+    match_pattern: "org.graylog2.inputs.gelf.http.GELFHttpInput.*.written_bytes_1sec"
+    wildcard_extract_labels:
+      - "input"
+
+  - metric_name: "input_written_bytes_total"
+    match_pattern: "org.graylog2.inputs.gelf.http.GELFHttpInput.*.written_bytes_total"
+    wildcard_extract_labels:
+      - "input"
+
+  - metric_name: "pipeline"
+    match_pattern: "org.graylog.plugins.pipelineprocessor.ast.Pipeline.*.*"
+    wildcard_extract_labels:
+      - "pipeline"
+      - "type"
+
+  - metric_name: "pipeline_rule"
+    match_pattern: "org.graylog.plugins.pipelineprocessor.ast.Rule.*.*"
+    wildcard_extract_labels:
+      - "rule"
+      - "type"
+
+  - metric_name: "pipeline_rule_stage"
+    match_pattern: "org.graylog.plugins.pipelineprocessor.ast.Rule.*.*.*"
+    wildcard_extract_labels:
+      - "rule"
+      - "stage"
+      - "type"
+
+  - metric_name: "pipeline_stage_number"
+    match_pattern: "org.graylog.plugins.pipelineprocessor.ast.Pipeline.*.*.*.*"
+    wildcard_extract_labels:
+      - "pipeline"
+      - "stage"
+      - "stage_number"
+      - "type"
+
+  - metric_name: "pipeline_rule_stage_number"
+    match_pattern: "org.graylog.plugins.pipelineprocessor.ast.Rule.*.*.*.*"
+    wildcard_extract_labels:
+      - "rule"
+      - "stage"
+      - "stage_number"
+      - "type"
+
+  - metric_name: "accounting_bytes_destination"
+    match_pattern: "org.graylog.rulemetrics.*"
+    wildcard_extract_labels:
+      - "destination"
+
+  - metric_name: "output_buffer_thread_factory"
+    match_pattern: "org.graylog2.buffers.OutputBuffer.thread_factory.*"
+    wildcard_extract_labels:
+      - "status"
+
+  - metric_name: "extractor_condition_hits"
+    match_pattern: "org.graylog2.inputs.extractors.CopyInputExtractor.copy_input.*.conditionHits"
+    wildcard_extract_labels:
+      - "extractor_id"
+    additional_labels:
+      type: "copy_input"
+
+  - metric_name: "extractor_condition_hits"
+    match_pattern: "org.graylog2.inputs.extractors.GrokExtractor.grok.*.conditionHits"
+    wildcard_extract_labels:
+      - "extractor_id"
+    additional_labels:
+      type: "grok"
+
+  - metric_name: "extractor_condition_hits"
+    match_pattern: "org.graylog2.inputs.extractors.RegexExtractor.regex.*.conditionHits"
+    wildcard_extract_labels:
+      - "extractor_id"
+    additional_labels:
+      type: "regex"
+
+  - metric_name: "extractor_condition_hits"
+    match_pattern: "org.graylog2.inputs.extractors.RegexReplaceExtractor.regex_replace.*.conditionHits"
+    wildcard_extract_labels:
+      - "extractor_id"
+    additional_labels:
+      type: "regex_replace"
+
+  - metric_name: "extractor_condition_hits"
+    match_pattern: "org.graylog2.inputs.extractors.SplitAndIndexExtractor.split_and_index.*.conditionHits"
+    wildcard_extract_labels:
+      - "extractor_id"
+    additional_labels:
+      type: "split_index"
+
+  - metric_name: "extractor_condition_hits"
+    match_pattern: "org.graylog2.inputs.extractors.SubstringExtractor.substring.*.conditionHits"
+    wildcard_extract_labels:
+      - "extractor_id"
+    additional_labels:
+      type: "substring"
+
+  - metric_name: "extractor_condition_hits"
+    match_pattern: "org.graylog2.inputs.extractors.JsonExtractor.json.*.conditionHits"
+    wildcard_extract_labels:
+      - "extractor_id"
+    additional_labels:
+      type: "json"
+
+  - metric_name: "extractor_condition_misses"
+    match_pattern: "org.graylog2.inputs.extractors.CopyInputExtractor.copy_input.*.conditionMisses"
+    wildcard_extract_labels:
+      - "extractor_id"
+    additional_labels:
+      type: "copy_input"
+
+  - metric_name: "extractor_condition_misses"
+    match_pattern: "org.graylog2.inputs.extractors.GrokExtractor.grok.*.conditionMisses"
+    wildcard_extract_labels:
+      - "extractor_id"
+    additional_labels:
+      type: "grok"
+
+  - metric_name: "extractor_condition_misses"
+    match_pattern: "org.graylog2.inputs.extractors.RegexExtractor.regex.*.conditionMisses"
+    wildcard_extract_labels:
+      - "extractor_id"
+    additional_labels:
+      type: "regex"
+
+  - metric_name: "extractor_condition_misses"
+    match_pattern: "org.graylog2.inputs.extractors.RegexReplaceExtractor.regex_replace.*.conditionMisses"
+    wildcard_extract_labels:
+      - "extractor_id"
+    additional_labels:
+      type: "regex_replace"
+
+  - metric_name: "extractor_condition_misses"
+    match_pattern: "org.graylog2.inputs.extractors.SplitAndIndexExtractor.split_and_index.*.conditionMisses"
+    wildcard_extract_labels:
+      - "extractor_id"
+    additional_labels:
+      type: "split_index"
+
+  - metric_name: "extractor_condition_misses"
+    match_pattern: "org.graylog2.inputs.extractors.SubstringExtractor.substring.*.conditionMisses"
+    wildcard_extract_labels:
+      - "extractor_id"
+    additional_labels:
+      type: "substring"
+
+  - metric_name: "extractor_condition_misses"
+    match_pattern: "org.graylog2.inputs.extractors.JsonExtractor.json.*.conditionMisses"
+    wildcard_extract_labels:
+      - "extractor_id"
+    additional_labels:
+      type: "json"
+
+  - metric_name: "extractor_condition_time"
+    match_pattern: "org.graylog2.inputs.extractors.CopyInputExtractor.copy_input.*.conditionTime"
+    wildcard_extract_labels:
+      - "extractor_id"
+    additional_labels:
+      type: "copy_input"
+
+  - metric_name: "extractor_condition_time"
+    match_pattern: "org.graylog2.inputs.extractors.GrokExtractor.grok.*.conditionTime"
+    wildcard_extract_labels:
+      - "extractor_id"
+    additional_labels:
+      type: "grok"
+
+  - metric_name: "extractor_condition_time"
+    match_pattern: "org.graylog2.inputs.extractors.RegexExtractor.regex.*.conditionTime"
+    wildcard_extract_labels:
+      - "extractor_id"
+    additional_labels:
+      type: "regex"
+
+  - metric_name: "extractor_condition_time"
+    match_pattern: "org.graylog2.inputs.extractors.RegexReplaceExtractor.regex_replace.*.conditionTime"
+    wildcard_extract_labels:
+      - "extractor_id"
+    additional_labels:
+      type: "regex_replace"
+
+  - metric_name: "extractor_condition_time"
+    match_pattern: "org.graylog2.inputs.extractors.SplitAndIndexExtractor.split_and_index.*.conditionTime"
+    wildcard_extract_labels:
+      - "extractor_id"
+    additional_labels:
+      type: "split_index"
+
+  - metric_name: "extractor_condition_time"
+    match_pattern: "org.graylog2.inputs.extractors.SubstringExtractor.substring.split_and_index.*.conditionTime"
+    wildcard_extract_labels:
+      - "extractor_id"
+    additional_labels:
+      type: "substring"
+
+  - metric_name: "extractor_condition_time"
+    match_pattern: "org.graylog2.inputs.extractors.JsonExtractor.json.*.conditionTime"
+    wildcard_extract_labels:
+      - "extractor_id"
+    additional_labels:
+      type: "json"
+
+  - metric_name: "extractor_execution_time"
+    match_pattern: "org.graylog2.inputs.extractors.CopyInputExtractor.copy_input.*.executionTime"
+    wildcard_extract_labels:
+      - "extractor_id"
+    additional_labels:
+      type: "copy_input"
+
+  - metric_name: "extractor_execution_time"
+    match_pattern: "org.graylog2.inputs.extractors.GrokExtractor.grok.*.executionTime"
+    wildcard_extract_labels:
+      - "extractor_id"
+    additional_labels:
+      type: "grok"
+
+  - metric_name: "extractor_execution_time"
+    match_pattern: "org.graylog2.inputs.extractors.RegexExtractor.regex.*.executionTime"
+    wildcard_extract_labels:
+      - "extractor_id"
+    additional_labels:
+      type: "regex"
+
+  - metric_name: "extractor_execution_time"
+    match_pattern: "org.graylog2.inputs.extractors.RegexReplaceExtractor.regex_replace.*.executionTime"
+    wildcard_extract_labels:
+      - "extractor_id"
+    additional_labels:
+      type: "regex_replace"
+
+  - metric_name: "extractor_execution_time"
+    match_pattern: "org.graylog2.inputs.extractors.SplitAndIndexExtractor.split_and_index.*.executionTime"
+    wildcard_extract_labels:
+      - "extractor_id"
+    additional_labels:
+      type: "split_index"
+
+  - metric_name: "extractor_execution_time"
+    match_pattern: "org.graylog2.inputs.extractors.SubstringExtractor.substring.*.executionTime"
+    wildcard_extract_labels:
+      - "extractor_id"
+    additional_labels:
+      type: "substring"
+
+  - metric_name: "extractor_execution_time"
+    match_pattern: "org.graylog2.inputs.extractors.JsonExtractor.json.*.executionTime"
+    wildcard_extract_labels:
+      - "extractor_id"
+    additional_labels:
+      type: "json"
+
+  - metric_name: "extractor_complete_execution_time"
+    match_pattern: "org.graylog2.inputs.extractors.CopyInputExtractor.copy_input.*.completeExecutionTime"
+    wildcard_extract_labels:
+      - "extractor_id"
+    additional_labels:
+      type: "copy_input"
+
+  - metric_name: "extractor_complete_execution_time"
+    match_pattern: "org.graylog2.inputs.extractors.GrokExtractor.grok.*.completeExecutionTime"
+    wildcard_extract_labels:
+      - "extractor_id"
+    additional_labels:
+      type: "grok"
+
+  - metric_name: "extractor_complete_execution_time"
+    match_pattern: "org.graylog2.inputs.extractors.RegexExtractor.regex.*.completeExecutionTime"
+    wildcard_extract_labels:
+      - "extractor_id"
+    additional_labels:
+      type: "regex"
+
+  - metric_name: "extractor_complete_execution_time"
+    match_pattern: "org.graylog2.inputs.extractors.RegexReplaceExtractor.regex_replace.*.completeExecutionTime"
+    wildcard_extract_labels:
+      - "extractor_id"
+    additional_labels:
+      type: "regex_replace"
+
+  - metric_name: "extractor_complete_execution_time"
+    match_pattern: "org.graylog2.inputs.extractors.SplitAndIndexExtractor.split_and_index.*.completeExecutionTime"
+    wildcard_extract_labels:
+      - "extractor_id"
+    additional_labels:
+      type: "split_index"
+
+  - metric_name: "extractor_complete_execution_time"
+    match_pattern: "org.graylog2.inputs.extractors.SubstringExtractor.substring.*.completeExecutionTime"
+    wildcard_extract_labels:
+      - "extractor_id"
+    additional_labels:
+      type: "substring"
+
+  - metric_name: "extractor_complete_execution_time"
+    match_pattern: "org.graylog2.inputs.extractors.JsonExtractor.json.*.completeExecutionTime"
+    wildcard_extract_labels:
+      - "extractor_id"
+    additional_labels:
+      type: "json"
+
+  - metric_name: "extractor_converter_execution_time"
+    match_pattern: "org.graylog2.inputs.extractors.CopyInputExtractor.copy_input.*.converterExecutionTime"
+    wildcard_extract_labels:
+      - "extractor_id"
+    additional_labels:
+      type: "copy_input"
+
+  - metric_name: "extractor_converter_execution_time"
+    match_pattern: "org.graylog2.inputs.extractors.GrokExtractor.grok.*.converterExecutionTime"
+    wildcard_extract_labels:
+      - "extractor_id"
+    additional_labels:
+      type: "grok"
+
+  - metric_name: "extractor_converter_execution_time"
+    match_pattern: "org.graylog2.inputs.extractors.RegexExtractor.regex.*.converterExecutionTime"
+    wildcard_extract_labels:
+      - "extractor_id"
+    additional_labels:
+      type: "regex"
+
+  - metric_name: "extractor_converter_execution_time"
+    match_pattern: "org.graylog2.inputs.extractors.RegexReplaceExtractor.regex_replace.*.converterExecutionTime"
+    wildcard_extract_labels:
+      - "extractor_id"
+    additional_labels:
+      type: "regex_replace"
+
+  - metric_name: "extractor_converter_execution_time"
+    match_pattern: "org.graylog2.inputs.extractors.SplitAndIndexExtractor.split_and_index.*.converterExecutionTime"
+    wildcard_extract_labels:
+      - "extractor_id"
+    additional_labels:
+      type: "split_index"
+
+  - metric_name: "extractor_converter_execution_time"
+    match_pattern: "org.graylog2.inputs.extractors.SubstringExtractor.substring.*.converterExecutionTime"
+    wildcard_extract_labels:
+      - "extractor_id"
+    additional_labels:
+      type: "substring"
+
+  - metric_name: "extractor_converter_execution_time"
+    match_pattern: "org.graylog2.inputs.extractors.JsonExtractor.json.*.converterExecutionTime"
+    wildcard_extract_labels:
+      - "extractor_id"
+    additional_labels:
+      type: "json"
+
+  - metric_name: "lookup_table_refresh"
+    match_pattern: "org.graylog2.lookup.adapters.*.refresh"
+    wildcard_extract_labels:
+      - "lookup_table"
+
+  - metric_name: "lookup_table_requests"
+    match_pattern: "org.graylog2.lookup.adapters.*.requests"
+    wildcard_extract_labels:
+      - "lookup_table"
+
+  - metric_name: "lookup_cache_hits"
+    match_pattern: "org.graylog2.lookup.caches.*.hits"
+    wildcard_extract_labels:
+      - "cache"
+
+  - metric_name: "lookup_cache_misses"
+    match_pattern: "org.graylog2.lookup.caches.*.misses"
+    wildcard_extract_labels:
+      - "cache"
+
+  - metric_name: "lookup_cache_requests"
+    match_pattern: "org.graylog2.lookup.caches.*.requests"
+    wildcard_extract_labels:
+      - "cache"
+
+  - metric_name: "lookup_cache_entries"
+    match_pattern: "org.graylog2.lookup.caches.*.entries"
+    wildcard_extract_labels:
+      - "cache"
+
+  - metric_name: "lookup_cache_lookup_time"
+    match_pattern: "org.graylog2.lookup.caches.*.lookupTime"
+    wildcard_extract_labels:
+      - "cache"
+
+  - metric_name: "lookup_adapter_refresh"
+    match_pattern: "org.graylog2.lookup.adapters.*.refresh"
+    wildcard_extract_labels:
+      - "adapter"
+
+  - metric_name: "pipeline_rule_cef_parse_time"
+    match_pattern: "org.graylog.plugins.cef.pipelines.rules.CEFParserFunction.parseTime"
+
+  - metric_name: "collector_etag_cache_hits"
+    match_pattern: "org.graylog.plugins.collector.configurations.CollectorConfigurationService.etag-cache.hits"
+
+  - metric_name: "collector_etag_cache_misses"
+    match_pattern: "org.graylog.plugins.collector.configurations.CollectorConfigurationService.etag-cache.misses"
+
+  - metric_name: "collector_cache_hit_rate"
+    match_pattern: "org.graylog.plugins.collector.configurations.CollectorConfigurationService.etag-cache.hit-rate"
+
+  - metric_name: "collector_cache_miss_rate"
+    match_pattern: "org.graylog.plugins.collector.configurations.CollectorConfigurationService.etag-cache.miss-rate"
+
+  - metric_name: "collector_cache_evictions"
+    match_pattern: "org.graylog.plugins.collector.configurations.CollectorConfigurationService.etag-cache.evictions"
+
+  - metric_name: "collector_cache_load_exceptions"
+    match_pattern: "org.graylog.plugins.collector.configurations.CollectorConfigurationService.etag-cache.load-exceptions"
+
+  - metric_name: "collector_cache_load_successes"
+    match_pattern: "org.graylog.plugins.collector.configurations.CollectorConfigurationService.etag-cache.load-successes"
+
+  - metric_name: "collector_cache_requests"
+    match_pattern: "org.graylog.plugins.collector.configurations.CollectorConfigurationService.etag-cache.requests"
+
+  - metric_name: "collector_cache_total_load_time_ns"
+    match_pattern: "org.graylog.plugins.collector.configurations.CollectorConfigurationService.etag-cache.total-load-time-ns"
+
+  - metric_name: "geoip_legacy_resolve_time"
+    match_pattern: "org.graylog.plugins.map.geoip.GeoIpResolverEngine.resolveTime"
+
+  - metric_name: "pipeline_interpreter_execution_time"
+    match_pattern: "org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.executionTime"
+
+  - metric_name: "pipeline_interpreter_cache_evictions"
+    match_pattern: "org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.stage-cache.evictions"
+
+  - metric_name: "pipeline_interpreter_cache_hit_rate"
+    match_pattern: "org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.stage-cache.hit-rate"
+
+  - metric_name: "pipeline_interpreter_cache_hits"
+    match_pattern: "org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.stage-cache.hits"
+
+  - metric_name: "pipeline_interpreter_cache_load_exceptions"
+    match_pattern: "org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.stage-cache.load-exceptions"
+
+  - metric_name: "pipeline_interpreter_cache_load_successes"
+    match_pattern: "org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.stage-cache.load-successes"
+
+  - metric_name: "pipeline_interpreter_cache_miss_rate"
+    match_pattern: "org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.stage-cache.miss-rate"
+
+  - metric_name: "pipeline_interpreter_cache_misses"
+    match_pattern: "org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.stage-cache.misses"
+
+  - metric_name: "pipeline_interpreter_cache_requests"
+    match_pattern: "org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.stage-cache.requests"
+
+  - metric_name: "pipeline_interpreter_cache_total_load_time_ns"
+    match_pattern: "org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.stage-cache.total-load-time-ns"
+
+  - metric_name: "sidecar_configuration_cache_evictions"
+    match_pattern: "org.graylog.plugins.sidecar.services.ConfigurationService.etag-cache.evictions"
+
+  - metric_name: "sidecar_configuration_cache_hit_rate"
+    match_pattern: "org.graylog.plugins.sidecar.services.ConfigurationService.etag-cache.hit-rate"
+
+  - metric_name: "sidecar_configuration_cache_his"
+    match_pattern: "org.graylog.plugins.sidecar.services.ConfigurationService.etag-cache.hits"
+
+  - metric_name: "sidecar_configuration_cache_load_exceptions"
+    match_pattern: "org.graylog.plugins.sidecar.services.ConfigurationService.etag-cache.load-exceptions"
+
+  - metric_name: "sidecar_configuration_cache_load_successes"
+    match_pattern: "org.graylog.plugins.sidecar.services.ConfigurationService.etag-cache.load-successes"
+
+  - metric_name: "sidecar_configuration_cache_miss_rate"
+    match_pattern: "org.graylog.plugins.sidecar.services.ConfigurationService.etag-cache.miss-rate"
+
+  - metric_name: "sidecar_configuration_cache_misses"
+    match_pattern: "org.graylog.plugins.sidecar.services.ConfigurationService.etag-cache.misses"
+
+  - metric_name: "sidecar_configuration_cache_requests"
+    match_pattern: "org.graylog.plugins.sidecar.services.ConfigurationService.etag-cache.requests"
+
+  - metric_name: "sidecar_configuration_cache_total_load_time_ns"
+    match_pattern: "org.graylog.plugins.sidecar.services.ConfigurationService.etag-cache.total-load-time-ns"
+
+  - metric_name: "threat_intel_otx_http_request_errors"
+    match_pattern: "org.graylog.plugins.threatintel.adapters.otx.OTXDataAdapter.httpRequestErrors"
+
+  - metric_name: "threat_intel_otx_http_request_time"
+    match_pattern: "org.graylog.plugins.threatintel.adapters.otx.OTXDataAdapter.httpRequestTime"
+
+  - metric_name: "threat_intel_private_net_lookup_time"
+    match_pattern: "org.graylog.plugins.threatintel.functions.misc.PrivateNetLookupFunction.lookupTime"
+
+  - metric_name: "threat_intel_whois_request_time"
+    match_pattern: "org.graylog.plugins.threatintel.whois.ip.WhoisIpLookup.whoisRequestTime"
+
+  - metric_name: "event_bus_job_scheduler_system_posts"
+    match_pattern: "org.graylog.scheduler.eventbus.JobSchedulerEventBus.system.posts"
+
+  - metric_name: "event_bus_job_scheduler_system_registrations"
+    match_pattern: "org.graylog.scheduler.eventbus.JobSchedulerEventBus.system.registrations"
+
+  - metric_name: "job_scheduler_executions_failed"
+    match_pattern: "org.graylog.scheduler.JobExecutionEngine.executions.failed"
+
+  - metric_name: "job_scheduler_executions_successful"
+    match_pattern: "org.graylog.scheduler.JobExecutionEngine.executions.successful"
+
+  - metric_name: "job_scheduler_executions_time"
+    match_pattern: "org.graylog.scheduler.JobExecutionEngine.executions.time"
+
+  - metric_name: "job_worker_free_slots"
+    match_pattern: "org.graylog.scheduler.worker.JobWorkerPool.free_slots"
+
+  - metric_name: "job_worker_system_created"
+    match_pattern: "org.graylog.scheduler.worker.JobWorkerPool.system.created"
+
+  - metric_name: "job_worker_system_running"
+    match_pattern: "org.graylog.scheduler.worker.JobWorkerPool.system.running"
+
+  - metric_name: "job_worker_system_terminated"
+    match_pattern: "org.graylog.scheduler.worker.JobWorkerPool.system.terminated"
+
+  - metric_name: "job_worker_total_slots"
+    match_pattern: "org.graylog.scheduler.worker.JobWorkerPool.total_slots"
+
+  - metric_name: "job_worker_waiting_for_slots"
+    match_pattern: "org.graylog.scheduler.worker.JobWorkerPool.waiting_for_slots"
+
+  - metric_name: "buffer_size"
+    match_pattern: "org.graylog2.buffers.input.size"
+    additional_labels:
+      type: "input"
+
+  - metric_name: "buffer_size"
+    match_pattern: "org.graylog2.buffers.output.size"
+    additional_labels:
+      type: "output"
+
+  - metric_name: "buffer_size"
+    match_pattern: "org.graylog2.buffers.process.size"
+    additional_labels:
+      type: "process"
+
+  - metric_name: "buffer_usage"
+    match_pattern: "org.graylog2.buffers.input.usage"
+    additional_labels:
+      type: "input"
+
+  - metric_name: "buffer_usage"
+    match_pattern: "org.graylog2.buffers.output.usage"
+    additional_labels:
+      type: "output"
+
+  - metric_name: "buffer_usage"
+    match_pattern: "org.graylog2.buffers.process.usage"
+    additional_labels:
+      type: "process"
+
+  - metric_name: "buffer_incoming_messages"
+    match_pattern: "org.graylog2.shared.buffers.InputBufferImpl.incomingMessages"
+    additional_labels:
+      type: "input"
+
+  - metric_name: "buffer_incoming_messages"
+    match_pattern: "org.graylog2.buffers.OutputBuffer.incomingMessages"
+    additional_labels:
+      type: "output"
+
+  - metric_name: "buffer_incoming_messages"
+    match_pattern: "org.graylog2.shared.buffers.ProcessBuffer.incomingMessages"
+    additional_labels:
+      type: "process"
+
+  - metric_name: "buffer_process_time"
+    match_pattern: "org.graylog2.buffers.processors.OutputBufferProcessor.processTime"
+    additional_labels:
+      type: "output"
+
+  - metric_name: "buffer_process_time"
+    match_pattern: "org.graylog2.shared.buffers.processors.ProcessBufferProcessor.processTime"
+    additional_labels:
+      type: "process"
+
+  - metric_name: "output_buffer_incoming_thread_factory"
+    match_pattern: "org.graylog2.buffers.OutputBuffer.thread-factory.created"
+    additional_labels:
+      type: "created"
+
+  - metric_name: "output_buffer_incoming_thread_factory"
+    match_pattern: "org.graylog2.buffers.OutputBuffer.thread-factory.running"
+    additional_labels:
+      type: "running"
+
+  - metric_name: "output_buffer_incoming_thread_factory"
+    match_pattern: "org.graylog2.buffers.OutputBuffer.thread-factory.terminated"
+    additional_labels:
+      type: "terminated"
+
+  - metric_name: "output_buffer_executor_service_completed"
+    match_pattern: "org.graylog2.buffers.processors.OutputBufferProcessor.executor-service.completed"
+
+  - metric_name: "output_buffer_executor_service_duration"
+    match_pattern: "org.graylog2.buffers.processors.OutputBufferProcessor.executor-service.duration"
+
+  - metric_name: "output_buffer_executor_service_idle"
+    match_pattern: "org.graylog2.buffers.processors.OutputBufferProcessor.executor-service.idle"
+
+  - metric_name: "output_buffer_executor_service_running"
+    match_pattern: "org.graylog2.buffers.processors.OutputBufferProcessor.executor-service.running"
+
+  - metric_name: "output_buffer_executor_service_submitted"
+    match_pattern: "org.graylog2.buffers.processors.OutputBufferProcessor.executor-service.submitted"
+
+  - metric_name: "buffer_processor_incoming_messages"
+    match_pattern: "org.graylog2.buffers.processors.OutputBufferProcessor.incomingMessages"
+    additional_labels:
+      type: "output"
+
+  - metric_name: "buffer_processor_incoming_messages"
+    match_pattern: "org.graylog2.shared.buffers.processors.ProcessBufferProcessor.incomingMessages"
+    additional_labels:
+      type: "process"
+
+  - metric_name: "process_buffer_filtered_messages"
+    match_pattern: "org.graylog2.shared.buffers.processors.ProcessBufferProcessor.filteredOutMessages"
+
+  - metric_name: "process_buffer_outgoing_messages"
+    match_pattern: "org.graylog2.shared.buffers.processors.ProcessBufferProcessor.outgoingMessages"
+
+  - metric_name: "process_buffer_decode_time"
+    match_pattern: "org.graylog2.shared.buffers.ProcessBuffer.decodeTime"
+
+  - metric_name: "process_buffer_parse_time"
+    match_pattern: "org.graylog2.shared.buffers.ProcessBuffer.parseTime"
+
+  - metric_name: "filter_execution_time"
+    match_pattern: "org.graylog2.filters.ExtractorFilter.executionTime"
+    additional_labels:
+      type: "extractor"
+
+  - metric_name: "filter_execution_time"
+    match_pattern: "org.graylog2.filters.StaticFieldFilter.executionTime"
+    additional_labels:
+      type: "static_field"
+
+  - metric_name: "filter_execution_time"
+    match_pattern: "org.graylog2.filters.StreamMatcherFilter.executionTime"
+    additional_labels:
+      type: "stream_matcher"
+
+  - metric_name: "indexer_field_type_poller_time"
+    match_pattern: "org.graylog2.indexer.fieldtypes.IndexFieldTypePoller.indexPollTime"
+
+  - metric_name: "indexer_message_invalid_timestamps"
+    match_pattern: "org.graylog2.indexer.messages.Messages.invalid-timestamps"
+
+  - metric_name: "indexer_search_elasticsearch_ranges"
+    match_pattern: "org.graylog2.indexer.searches.Searches.elasticsearch.ranges"
+
+  - metric_name: "indexer_search_elasticsearch_requests"
+    match_pattern: "org.graylog2.indexer.searches.Searches.elasticsearch.requests"
+
+  - metric_name: "indexer_search_elasticsearch_searches"
+    match_pattern: "org.graylog2.indexer.searches.Searches.elasticsearch.total-searches"
+
+  - metric_name: "output_executor_service_completed"
+    match_pattern: "org.graylog2.initializers.OutputSetupService.executor-service.completed"
+
+  - metric_name: "output_executor_service_duration"
+    match_pattern: "org.graylog2.initializers.OutputSetupService.executor-service.duration"
+
+  - metric_name: "output_executor_service_idle"
+    match_pattern: "org.graylog2.initializers.OutputSetupService.executor-service.idle"
+
+  - metric_name: "output_executor_service_running"
+    match_pattern: "org.graylog2.initializers.OutputSetupService.executor-service.running"
+
+  - metric_name: "output_executor_service_submitted"
+    match_pattern: "org.graylog2.initializers.OutputSetupService.executor-service.submitted"
+
+  - metric_name: "gelf_chunk_aggregator_complete-messages"
+    match_pattern: "org.graylog2.inputs.codecs.GelfChunkAggregator.complete-messages"
+
+  - metric_name: "gelf_chunk_aggregator_duplicate-chunks"
+    match_pattern: "org.graylog2.inputs.codecs.GelfChunkAggregator.duplicate-chunks"
+
+  - metric_name: "gelf_chunk_aggregator_expired-chunks"
+    match_pattern: "org.graylog2.inputs.codecs.GelfChunkAggregator.expired-chunks"
+
+  - metric_name: "gelf_chunk_aggregator_expired-messages"
+    match_pattern: "org.graylog2.inputs.codecs.GelfChunkAggregator.expired-messages"
+
+  - metric_name: "gelf_chunk_aggregator_total-chunks"
+    match_pattern: "org.graylog2.inputs.codecs.GelfChunkAggregator.total-chunks"
+
+  - metric_name: "gelf_chunk_aggregator_waiting-messages"
+    match_pattern: "org.graylog2.inputs.codecs.GelfChunkAggregator.waiting-messages"
+
+  - metric_name: "journal_append.1_sec_rate"
+    match_pattern: "org.graylog2.journal.append.1-sec-rate"
+
+  - metric_name: "journal_entries_uncommitted"
+    match_pattern: "org.graylog2.journal.entries-uncommitted"
+
+  - metric_name: "journal_oldest_segment"
+    match_pattern: "org.graylog2.journal.oldest-segment"
+
+  - metric_name: "journal_read.1_sec_rate"
+    match_pattern: "org.graylog2.journal.read.1-sec-rate"
+
+  - metric_name: "journal_segments"
+    match_pattern: "org.graylog2.journal.segments"
+
+  - metric_name: "journal_size"
+    match_pattern: "org.graylog2.journal.size"
+
+  - metric_name: "journal_size-limit"
+    match_pattern: "org.graylog2.journal.size-limit"
+
+  - metric_name: "journal_utilization-ratio"
+    match_pattern: "org.graylog2.journal.utilization-ratio"
+
+  - metric_name: "json_path_http_request_errors"
+    match_pattern: "org.graylog2.lookup.adapters.HTTPJSONPathDataAdapter.httpRequestErrors"
+
+  - metric_name: "json_path_http_request_time"
+    match_pattern: "org.graylog2.lookup.adapters.HTTPJSONPathDataAdapter.httpRequestTime"
+
+  - metric_name: "json_path_http_url_errors"
+    match_pattern: "org.graylog2.lookup.adapters.HTTPJSONPathDataAdapter.httpURLErrors"
+
+  - metric_name: "blocking_elasticsearch_output_batch_size"
+    match_pattern: "org.graylog2.outputs.BlockingBatchedESOutput.batchSize"
+
+  - metric_name: "blocking_elasticsearch_output_buffer_flushes"
+    match_pattern: "org.graylog2.outputs.BlockingBatchedESOutput.bufferFlushes"
+
+  - metric_name: "blocking_elasticsearch_output_buffer_flushes_requested"
+    match_pattern: "org.graylog2.outputs.BlockingBatchedESOutput.bufferFlushesRequested"
+
+  - metric_name: "blocking_elasticsearch_output_buffer_flush_failures"
+    match_pattern: "org.graylog2.outputs.BlockingBatchedESOutput.bufferFlushFailures"
+
+  - metric_name: "blocking_elasticsearch_output_process_time"
+    match_pattern: "org.graylog2.outputs.BlockingBatchedESOutput.processTime"
+
+  - metric_name: "elasticsearch_output_failures"
+    match_pattern: "org.graylog2.outputs.ElasticSearchOutput.failures"
+
+  - metric_name: "elasticsearch_output_process_time"
+    match_pattern: "org.graylog2.outputs.ElasticSearchOutput.processTime"
+
+  - metric_name: "elasticsearch_output_writes"
+    match_pattern: "org.graylog2.outputs.ElasticSearchOutput.writes"
+
+  - metric_name: "elasticsearch_output_queue_size"
+    match_pattern: "org.graylog2.periodical.IndexFailuresPeriodical.queueSize"
+
+  - metric_name: "mongodb_auth_cache_manager_evictions"
+    match_pattern: "org.graylog2.security.MongoDbAuthorizationCacheManager.cache.evictions"
+
+  - metric_name: "mongodb_auth_cache_manager_hit_rate"
+    match_pattern: "org.graylog2.security.MongoDbAuthorizationCacheManager.cache.hit-rate"
+
+  - metric_name: "mongodb_auth_cache_manager_hits"
+    match_pattern: "org.graylog2.security.MongoDbAuthorizationCacheManager.cache.hits"
+
+  - metric_name: "mongodb_auth_cache_manager_load_exceptions"
+    match_pattern: "org.graylog2.security.MongoDbAuthorizationCacheManager.cache.load-exceptions"
+
+  - metric_name: "mongodb_auth_cache_manager_load_successes"
+    match_pattern: "org.graylog2.security.MongoDbAuthorizationCacheManager.cache.load-successes"
+
+  - metric_name: "mongodb_auth_cache_manager_miss_rate"
+    match_pattern: "org.graylog2.security.MongoDbAuthorizationCacheManager.cache.miss-rate"
+
+  - metric_name: "mongodb_auth_cache_manager_misses"
+    match_pattern: "org.graylog2.security.MongoDbAuthorizationCacheManager.cache.misses"
+
+  - metric_name: "mongodb_auth_cache_manager_requests"
+    match_pattern: "org.graylog2.security.MongoDbAuthorizationCacheManager.cache.requests"
+
+  - metric_name: "mongodb_auth_cache_manager_total_load_time_ns"
+    match_pattern: "org.graylog2.security.MongoDbAuthorizationCacheManager.cache.total-load-time-ns"
+
+  - metric_name: "event_bus_provider_executor_service_completed"
+    match_pattern: "org.graylog2.shared.bindings.providers.EventBusProvider.executor-service.completed"
+
+  - metric_name: "event_bus_provider_executor_service_duration"
+    match_pattern: "org.graylog2.shared.bindings.providers.EventBusProvider.executor-service.duration"
+
+  - metric_name: "event_bus_provider_executor_service_idle"
+    match_pattern: "org.graylog2.shared.bindings.providers.EventBusProvider.executor-service.idle"
+
+  - metric_name: "event_bus_provider_executor_service_running"
+    match_pattern: "org.graylog2.shared.bindings.providers.EventBusProvider.executor-service.running"
+
+  - metric_name: "event_bus_provider_executor_service_submitted"
+    match_pattern: "org.graylog2.shared.bindings.providers.EventBusProvider.executor-service.submitted"
+
+  - metric_name: "input-buffer-thread-factory"
+    match_pattern: "org.graylog2.shared.buffers.InputBufferImpl.thread-factory.created"
+    additional_labels:
+      type: "created"
+
+  - metric_name: "input-buffer-thread-factory"
+    match_pattern: "org.graylog2.shared.buffers.InputBufferImpl.thread-factory.running"
+    additional_labels:
+      type: "running"
+
+  - metric_name: "input-buffer-thread-factory"
+    match_pattern: "org.graylog2.shared.buffers.InputBufferImpl.thread-factory.terminated"
+    additional_labels:
+      type: "terminated"
+
+  - metric_name: "journal_message_handler_written_bytes"
+    match_pattern: "org.graylog2.shared.buffers.JournallingMessageHandler.written_bytes"
+
+  - metric_name: "process_buffer_thread_factory"
+    match_pattern: "org.graylog2.shared.buffers.ProcessBuffer.thread-factory.created"
+    additional_labels:
+      type: "created"
+
+  - metric_name: "process_buffer_thread_factory"
+    match_pattern: "org.graylog2.shared.buffers.ProcessBuffer.thread-factory.running"
+    additional_labels:
+      type: "running"
+
+  - metric_name: "process_buffer_thread_factory"
+    match_pattern: "org.graylog2.shared.buffers.ProcessBuffer.thread-factory.terminated"
+    additional_labels:
+      type: "terminated"
+
+  - metric_name: "buffer_raw_message_encoder_handler_incoming_messages"
+    match_pattern: "org.graylog2.shared.buffers.RawMessageEncoderHandler.incomingMessages"
+
+  - metric_name: "jersey_http_worker_executor_thread"
+    match_pattern: "org.graylog2.shared.initializers.JerseyService.http-worker-executor.completed"
+    additional_labels:
+      type: "completed"
+
+  - metric_name: "jersey_http_worker_executor_thread"
+    match_pattern: "org.graylog2.shared.initializers.JerseyService.http-worker-executor.running"
+    additional_labels:
+      type: "running"
+
+  - metric_name: "jersey_http_worker_executor_thread"
+    match_pattern: "org.graylog2.shared.initializers.JerseyService.http-worker-executor.submitted"
+    additional_labels:
+      type: "submitted"
+
+  - metric_name: "jersey_http_worker_executor_thread"
+    match_pattern: "org.graylog2.shared.initializers.JerseyService.http-worker-executor.idle"
+    additional_labels:
+      type: "idle"
+
+  - metric_name: "jersey_http_worker_duration"
+    match_pattern: "org.graylog2.shared.initializers.JerseyService.http-worker-executor.duration"
+
+  - metric_name: "input_launcher_executor_thread"
+    match_pattern: "org.graylog2.shared.inputs.InputLauncher.executor-service.completed"
+    additional_labels:
+      type: "completed"
+
+  - metric_name: "input_launcher_executor_thread"
+    match_pattern: "org.graylog2.shared.inputs.InputLauncher.executor-service.idle"
+    additional_labels:
+      type: "idle"
+
+  - metric_name: "input_launcher_executor_thread"
+    match_pattern: "org.graylog2.shared.inputs.InputLauncher.executor-service.running"
+    additional_labels:
+      type: "running"
+
+  - metric_name: "input_launcher_executor_thread"
+    match_pattern: "org.graylog2.shared.inputs.InputLauncher.executor-service.submitted"
+    additional_labels:
+      type: "submitted"
+
+  - metric_name: "input_launcher_executor_thread_duration"
+    match_pattern: "org.graylog2.shared.inputs.InputLauncher.executor-service.duration"
+
+  - metric_name: "journal_reader_read_blocked"
+    match_pattern: "org.graylog2.shared.journal.JournalReader.readBlocked"
+
+  - metric_name: "journal_reader_read_messages"
+    match_pattern: "org.graylog2.shared.journal.JournalReader.readMessages"
+
+  - metric_name: "journal_reader_requested_read_count"
+    match_pattern: "org.graylog2.shared.journal.JournalReader.requestedReadCount"
+
+  - metric_name: "kafka_journal_last_flush_time"
+    match_pattern: "org.graylog2.shared.journal.KafkaJournal.lastFlushTime"
+
+  - metric_name: "kafka_journal_log_end_offset"
+    match_pattern: "org.graylog2.shared.journal.KafkaJournal.logEndOffset"
+
+  - metric_name: "kafka_journal_number_of_segments"
+    match_pattern: "org.graylog2.shared.journal.KafkaJournal.numberOfSegments"
+
+  - metric_name: "kafka_journal_read_messages"
+    match_pattern: "org.graylog2.shared.journal.KafkaJournal.readMessages"
+
+  - metric_name: "kafka_journal_read_time"
+    match_pattern: "org.graylog2.shared.journal.KafkaJournal.readTime"
+
+  - metric_name: "kafka_journal_recovery_point"
+    match_pattern: "org.graylog2.shared.journal.KafkaJournal.recoveryPoint"
+
+  - metric_name: "kafka_journal_size"
+    match_pattern: "org.graylog2.shared.journal.KafkaJournal.size"
+
+  - metric_name: "kafka_journal_uncommitted_messages"
+    match_pattern: "org.graylog2.shared.journal.KafkaJournal.uncommittedMessages"
+
+  - metric_name: "kafka_journal_unflushed_messages"
+    match_pattern: "org.graylog2.shared.journal.KafkaJournal.unflushedMessages"
+
+  - metric_name: "kafka_journal_write_discarded_messages"
+    match_pattern: "org.graylog2.shared.journal.KafkaJournal.writeDiscardedMessages"
+
+  - metric_name: "kafka_journal_write_time"
+    match_pattern: "org.graylog2.shared.journal.KafkaJournal.writeTime"
+
+  - metric_name: "kafka_journal_written_messages"
+    match_pattern: "org.graylog2.shared.journal.KafkaJournal.writtenMessages"
+
+  - metric_name: "system_job_manager_executor_thread"
+    match_pattern: "org.graylog2.system.jobs.SystemJobManager.executor-service.completed"
+    additional_labels:
+      type: "completed"
+
+  - metric_name: "system_job_manager_executor_thread"
+    match_pattern: "org.graylog2.system.jobs.SystemJobManager.executor-service.running"
+    additional_labels:
+      type: "running"
+
+  - metric_name: "system_job_manager_executor_thread"
+    match_pattern: "org.graylog2.system.jobs.SystemJobManager.executor-service.submitted"
+    additional_labels:
+      type: "submitted"
+
+  - metric_name: "system_job_manager_executor_duration"
+    match_pattern: "org.graylog2.system.jobs.SystemJobManager.executor-service.duration"
+
+  - metric_name: "system_job_manager_executor_scheduled_once"
+    match_pattern: "org.graylog2.system.jobs.SystemJobManager.executor-service.scheduled.once"
+
+  - metric_name: "system_job_manager_executor_scheduled_overrun"
+    match_pattern: "org.graylog2.system.jobs.SystemJobManager.executor-service.scheduled.overrun"
+
+  - metric_name: "system_job_manager_executor_scheduled_percent-of-period"
+    match_pattern: "org.graylog2.system.jobs.SystemJobManager.executor-service.scheduled.percent-of-period"
+
+  - metric_name: "system_job_manager_executor_scheduled_repetitively"
+    match_pattern: "org.graylog2.system.jobs.SystemJobManager.executor-service.scheduled.repetitively"
+
+  - metric_name: "input_throughput"
+    match_pattern: "org.graylog2.throughput.input"
+
+  - metric_name: "output_throughput"
+    match_pattern: "org.graylog2.throughput.output"
+
+  - metric_name: "traffic_decoded"
+    match_pattern: "org.graylog2.traffic.decoded"
+
+  - metric_name: "traffic_input"
+    match_pattern: "org.graylog2.traffic.input"
+
+  - metric_name: "traffic_output"
+    match_pattern: "org.graylog2.traffic.output"
+
+  - metric_name: "traffic_system_output_traffic"
+    match_pattern: "org.graylog2.traffic.system-output-traffic"
+
+  - metric_name: "forwarder_grpc_method_invocations"
+    match_pattern: "org.graylog.plugins.cloud.forwarder.grpc.ServerMetricsInterceptor.method.org.graylog.cloud.forwarder.*.invocations"
+    wildcard_extract_labels:
+      - "method"
+
+  - metric_name: "forwarder_grpc_method_executionTime"
+    match_pattern: "org.graylog.plugins.cloud.forwarder.grpc.ServerMetricsInterceptor.method.org.graylog.cloud.forwarder.*.executionTime"
+    wildcard_extract_labels:
+      - "method"
+
+  - metric_name: "auth_actions"
+    match_pattern: "org.graylog.plugins.cloud.auth.*.success"
+    wildcard_extract_labels:
+      - "action"
+    additional_labels:
+      success: "true"
+
+  - metric_name: "auth_actions"
+    match_pattern: "org.graylog.plugins.cloud.auth.*.failure.http.*"
+    wildcard_extract_labels:
+      - "action"
+      - "http_code"
+    additional_labels:
+      success: "false"
+      type: "http"
+
+  - metric_name: "auth_actions"
+    match_pattern: "org.graylog.plugins.cloud.auth.*.failure.okta.*"
+    wildcard_extract_labels:
+      - "action"
+      - "okta_error_code"
+    additional_labels:
+      success: "false"
+      type: "okta"
+
+  - metric_name: "auth_actions"
+    match_pattern: "org.graylog.plugins.cloud.auth.*.failure.gl.*"
+    wildcard_extract_labels:
+      - "action"
+      - "graylog_error_code"
+    additional_labels:
+      success: "false"
+      type: "graylog"
+
+  - metric_name: "input-buffer-thread-factory"
+    match_pattern: "org.graylog.cloud.forwarder.input.JournalWritingInputBuffer.thread-factory.created"
+    additional_labels:
+      type: "created"
+
+  - metric_name: "input-buffer-thread-factory"
+    match_pattern: "org.graylog.cloud.forwarder.input.JournalWritingInputBuffer.thread-factory.running"
+    additional_labels:
+      type: "running"
+
+  - metric_name: "input-buffer-thread-factory"
+    match_pattern: "org.graylog.cloud.forwarder.input.JournalWritingInputBuffer.thread-factory.terminated"
+    additional_labels:
+      type: "terminated"
+
+  - metric_name: "process_buffer_thread_factory"
+    match_pattern: "org.graylog.cloud.forwarder.processing.ForwarderProcessBuffer.thread-factory.created"
+    additional_labels:
+      type: "created"
+
+  - metric_name: "process_buffer_thread_factory"
+    match_pattern: "org.graylog.cloud.forwarder.processing.ForwarderProcessBuffer.thread-factory.running"
+    additional_labels:
+      type: "running"
+
+  - metric_name: "process_buffer_thread_factory"
+    match_pattern: "org.graylog.cloud.forwarder.processing.ForwarderProcessBuffer.thread-factory.terminated"
+    additional_labels:
+      type: "terminated"
+
+  - metric_name: "buffer_incoming_messages"
+    match_pattern: "org.graylog.cloud.forwarder.input.JournalWritingInputBuffer.incomingMessages"
+    additional_labels:
+      type: "input"
+
+  - metric_name: "buffer_incoming_messages"
+    match_pattern: "org.graylog.cloud.forwarder.processing.ForwarderProcessBuffer.incomingMessages"
+    additional_labels:
+      type: "process"
+
+  - metric_name: "process_buffer_decode_time"
+    match_pattern: "org.graylog.cloud.forwarder.processing.ForwarderProcessBuffer.decodeTime"
+
+  - metric_name: "process_buffer_parse_time"
+    match_pattern: "org.graylog.cloud.forwarder.processing.ForwarderProcessBuffer.parseTime"
+
+  - metric_name: "buffer_processor_incoming_messages"
+    match_pattern: "org.graylog.cloud.forwarder.processing.ForwarderProcessBufferProcessor.incomingMessages"
+
+  - metric_name: "buffer_processor_outgoing_messages"
+    match_pattern: "org.graylog.cloud.forwarder.processing.ForwarderProcessBufferProcessor.outgoingMessages"
+
+  - metric_name: "buffer_processor_process_time"
+    match_pattern: "org.graylog.cloud.forwarder.processing.ForwarderProcessBufferProcessor.processTime"
+
+  - metric_name: "journal_reader_read_blocked"
+    match_pattern: "org.graylog.cloud.forwarder.processing.ForwarderJournalReader.readBlocked"
+
+  - metric_name: "journal_reader_read_messages"
+    match_pattern: "org.graylog.cloud.forwarder.processing.ForwarderJournalReader.readMessages"
+
+  - metric_name: "journal_reader_requested_read_count"
+    match_pattern: "org.graylog.cloud.forwarder.processing.ForwarderJournalReader.requestedReadCount"
+
+  - metric_name: "batch_sender_sending_threads"
+    match_pattern: "org.graylog.cloud.forwarder.grpc.messaging.BatchSender.sendingThreads.max"
+    additional_labels:
+      type: "max"
+
+  - metric_name: "batch_sender_sending_threads"
+    match_pattern: "org.graylog.cloud.forwarder.grpc.messaging.BatchSender.sendingThreads.busy"
+    additional_labels:
+      type: "busy"
+
+  - metric_name: "batch_sender_batch_size"
+    match_pattern: "org.graylog.cloud.forwarder.grpc.messaging.BatchSender.batchSize.bytes"
+    additional_labels:
+      unit: "bytes"
+
+  - metric_name: "batch_sender_batch_size"
+    match_pattern: "org.graylog.cloud.forwarder.grpc.messaging.BatchSender.batchSize.messages"
+    additional_labels:
+      unit: "messages"
+
+  - metric_name: "batch_sender_batches_sent"
+    match_pattern: "org.graylog.cloud.forwarder.grpc.messaging.BatchSender.batchesSent"
+
+  - metric_name: "batch_sender_message_serialization_time"
+    match_pattern: "org.graylog.cloud.forwarder.grpc.messaging.BatchSender.messageSerializationTime"
+
+  - metric_name: "grpc_method_invocations"
+    match_pattern: "org.graylog.cloud.forwarder.grpc.ClientMetricsInterceptor.method.org.graylog.cloud.forwarder.*.invocations"
+    wildcard_extract_labels:
+      - "method"
+
+  - metric_name: "grpc_method_executionTime"
+    match_pattern: "org.graylog.cloud.forwarder.grpc.ClientMetricsInterceptor.method.org.graylog.cloud.forwarder.*.executionTime"
+    wildcard_extract_labels:
+      - "method"
