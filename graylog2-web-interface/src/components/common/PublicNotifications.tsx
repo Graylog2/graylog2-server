@@ -104,9 +104,13 @@ const PublicNotifications = ({ readFromConfig }: Props) => {
         {longMessage && <LongContent $visible={showReadMore === notificationId}>{longMessage}</LongContent>}
       </StyledAlert>
     );
-  });
+  }).filter((a) => a);
 
-  return <Wrapper>{publicNotifications}</Wrapper>;
+  if (publicNotifications.length) {
+    return <Wrapper>{publicNotifications}</Wrapper>;
+  }
+
+  return null;
 };
 
 PublicNotifications.propTypes = {
