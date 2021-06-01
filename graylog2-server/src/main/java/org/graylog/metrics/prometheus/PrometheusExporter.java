@@ -68,7 +68,7 @@ public class PrometheusExporter extends AbstractIdleService {
             return;
         }
 
-        this.mappingFilesHandler = mappingFilesHandlerFactory.create(Resources.getResource("prometheus-exporter-dev.yml"), coreMappingPath, customMappingPath);
+        this.mappingFilesHandler = mappingFilesHandlerFactory.create(Resources.getResource("prometheus-exporter.yml"), coreMappingPath, customMappingPath);
 
         httpServer.replaceCollector(createCollector(mappingFilesHandler.getMapperConfigs()));
         httpServer.start();
