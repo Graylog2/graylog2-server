@@ -23,10 +23,11 @@ import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import type { Events } from 'views/logic/searchtypes/events/EventHandler';
 import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
-import type VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 
 import EmptyAggregationContent from './EmptyAggregationContent';
 import FullSizeContainer from './FullSizeContainer';
+
+import type { VisualizationConfigFormValues } from '../aggregationwizard/WidgetConfigForm';
 
 const defaultVisualizationType = 'table';
 
@@ -86,7 +87,7 @@ const getResult = (value: RowResult | EventResult): Rows | Events => {
   return value.rows;
 };
 
-type OnVisualizationConfigChange = (newConfig: VisualizationConfig) => void;
+type OnVisualizationConfigChange = (newConfig: VisualizationConfigFormValues) => void;
 
 type AggregationBuilderProps = WidgetComponentProps<AggregationWidgetConfig> & {
   onVisualizationConfigChange: OnVisualizationConfigChange,

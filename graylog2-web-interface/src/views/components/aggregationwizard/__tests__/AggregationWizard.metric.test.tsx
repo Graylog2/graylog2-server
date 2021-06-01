@@ -70,7 +70,7 @@ describe('AggregationWizard', () => {
                          type="AGGREGATION"
                          fields={Immutable.List([])}
                          {...props}>
-        The Visualization
+        <>The Visualization</>
       </AggregationWizard>
     </FieldTypesContext.Provider>,
   );
