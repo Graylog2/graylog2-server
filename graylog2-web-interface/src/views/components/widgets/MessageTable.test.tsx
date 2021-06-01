@@ -77,13 +77,16 @@ describe('MessageTable', () => {
   });
 
   it('renders a table entry for messages, even if fields are `undefined`', () => {
+    let wrapper;
+
     // Suppressing console to disable props warning because of `fields` being `undefined`.
     suppressConsole(() => {
-      const wrapper = mount(<SimpleMessageTable fields={undefined} />);
-      const messageTableEntry = wrapper.find('MessageTableEntry');
-
-      expect(messageTableEntry).not.toBeEmptyRender();
+      wrapper = mount(<SimpleMessageTable fields={undefined} />);
     });
+
+    const messageTableEntry = wrapper.find('MessageTableEntry');
+
+    expect(messageTableEntry).not.toBeEmptyRender();
   });
 
   it('renders config fields in table head with correct order', () => {

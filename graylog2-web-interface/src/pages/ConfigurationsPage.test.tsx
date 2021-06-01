@@ -49,12 +49,12 @@ describe('ConfigurationsPage', () => {
 
     asMock(SidecarConfig).mockImplementation(ComponentThrowingError);
 
-    await suppressConsole(async () => {
+    suppressConsole(async () => {
       render(<ConfigurationsPage />);
-
-      await screen.findByText('Message Processors Configuration');
-      await screen.findByText('Boom!');
     });
+
+    await screen.findByText('Message Processors Configuration');
+    await screen.findByText('Boom!');
   });
 
   it('wraps plugin configuration elements with error boundary', async () => {
