@@ -14,11 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+package org.graylog.security.permissions;
 
-export type ValueRendererProps = {
-  field: string,
-  value: any,
-};
+import org.apache.shiro.authz.permission.WildcardPermission;
 
-export type ValueRenderer = React.ComponentType<ValueRendererProps>;
+public class CaseSensitiveWildcardPermission extends WildcardPermission {
+    public CaseSensitiveWildcardPermission(String wildcardString) {
+        super(wildcardString, true);
+    }
+}

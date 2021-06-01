@@ -21,7 +21,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { SizeMe } from 'react-sizeme';
 import ImmutablePropTypes from 'react-immutable-proptypes';
-import { List } from 'immutable';
+import { OrderedSet } from 'immutable';
 
 import { Col, Row } from 'components/graylog';
 import Query, { QueryId } from 'views/logic/queries/Query';
@@ -35,7 +35,7 @@ export interface QueryTabsProps {
   onRemove: (queryId: string) => Promise<void> | Promise<ViewState>,
   onSelect: (queryId: string) => Promise<Query> | Promise<string>,
   onTitleChange: (queryId: string, newTitle: string) => Promise<TitlesMap>,
-  queries: List<QueryId>,
+  queries: OrderedSet<QueryId>,
   selectedQueryId: string,
   titles: Immutable.Map<string, string>,
 }
@@ -44,7 +44,7 @@ const StyledRow = styled(Row)`
   margin-bottom: 0;
 `;
 
-const QueryTabs = ({ onRemove, onSelect, onTitleChange, queries, selectedQueryId, titles }:QueryTabsProps) => {
+const QueryTabs = ({ onRemove, onSelect, onTitleChange, queries, selectedQueryId, titles }: QueryTabsProps) => {
   const queryTitleEditModal = useRef<QueryTitleEditModal | undefined | null>();
 
   return (
@@ -79,7 +79,7 @@ QueryTabs.propTypes = {
   onRemove: PropTypes.func.isRequired,
   onSelect: PropTypes.func.isRequired,
   onTitleChange: PropTypes.func.isRequired,
-  queries: ImmutablePropTypes.listOf(PropTypes.string).isRequired,
+  queries: ImmutablePropTypes.orderedSetOf(PropTypes.string).isRequired,
   selectedQueryId: PropTypes.string.isRequired,
   titles: PropTypes.object.isRequired,
 };

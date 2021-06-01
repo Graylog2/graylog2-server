@@ -35,7 +35,7 @@ Object.defineProperties(window.HTMLElement.prototype, {
 
 const DEFAULT_PROPS = {
   maxWidth: 500,
-  queries: Immutable.List(['query-id-1', 'query-id-2', 'query-id-3', 'query-id-4']),
+  queries: Immutable.OrderedSet(['query-id-1', 'query-id-2', 'query-id-3', 'query-id-4']),
   titles: Immutable.Map<string, string>([['query-id-1', 'Tab 1'], ['query-id-2', 'Tab 2'], ['query-id-3', 'Tab 3'], ['query-id-4', 'Tab 4']]),
   selectedQueryId: 'query-id-1',
   onRemove: () => Promise.resolve(),
@@ -163,7 +163,7 @@ describe('AdaptableQueryTabs', () => {
 
       await finishInitialRender();
 
-      const newQueries = DEFAULT_PROPS.queries.push('query-id-5');
+      const newQueries = DEFAULT_PROPS.queries.add('query-id-5');
       rerender(<AdaptableQueryTabs {...DEFAULT_PROPS} queries={newQueries} />);
 
       await screen.findByRole(dropdownTabRole, {
