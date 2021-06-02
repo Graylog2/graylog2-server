@@ -16,7 +16,7 @@
  */
 import React from 'react';
 import * as Immutable from 'immutable';
-import { render, within, screen, waitFor, fireEvent } from 'wrappedTestingLibrary';
+import { render, within, screen, waitFor, fireEvent, act } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
 import userEvent from '@testing-library/user-event';
 import { PluginRegistration, PluginStore } from 'graylog-web-plugin/plugin';
@@ -56,6 +56,30 @@ const plugin: PluginRegistration = { exports: { visualizationTypes: [dataTable] 
 const addSortElement = async () => {
   await userEvent.click(await screen.findByRole('button', { name: 'Add' }));
   await userEvent.click(await screen.findByRole('menuitem', { name: 'Sort' }));
+};
+
+const findWidgetConfigFormSubmitButton = async () => {
+  const button = await screen.findByRole('button', { name: 'Update Preview' });
+
+  return button;
+};
+
+const submitWidgetConfigForm = async () => {
+  const applyButton = await findWidgetConfigFormSubmitButton();
+  fireEvent.click(applyButton);
+};
+
+const sortByTookMsDesc = async (sortElementContainerId) => {
+  const httpMethodSortContainer = await screen.findByTestId(sortElementContainerId);
+  const sortFieldSelect = within(httpMethodSortContainer).getByLabelText('Select field for sorting');
+  const sortDirectionSelect = within(httpMethodSortContainer).getByLabelText('Select direction for sorting');
+
+  await act(async () => {
+    await selectEvent.openMenu(sortFieldSelect);
+    await selectEvent.select(sortFieldSelect, 'took_ms');
+    await selectEvent.openMenu(sortDirectionSelect);
+    await selectEvent.select(sortDirectionSelect, 'Descending');
+  });
 };
 
 describe('AggregationWizard', () => {
@@ -100,19 +124,8 @@ describe('AggregationWizard', () => {
 
     renderSUT({ config, onChange: onChangeMock });
 
-    const httpMethodSortContainer = await screen.findByTestId('sort-element-0');
-
-    const sortFieldSelect = within(httpMethodSortContainer).getByLabelText('Select field for sorting');
-    const sortDirectionSelect = within(httpMethodSortContainer).getByLabelText('Select direction for sorting');
-
-    await selectEvent.openMenu(sortFieldSelect);
-    await selectEvent.select(sortFieldSelect, 'took_ms');
-
-    await selectEvent.openMenu(sortDirectionSelect);
-    await selectEvent.select(sortDirectionSelect, 'Descending');
-
-    const applyButton = await screen.findByRole('button', { name: 'Update Preview' });
-    userEvent.click(applyButton);
+    await sortByTookMsDesc('sort-element-0');
+    await submitWidgetConfigForm();
 
     const updatedConfig = widgetConfig
       .toBuilder()
@@ -134,18 +147,8 @@ describe('AggregationWizard', () => {
     renderSUT({ config, onChange: onChangeMock });
 
     await addSortElement();
-
-    const newSortContainer = await screen.findByTestId('sort-element-0');
-    const newSortFieldSelect = within(newSortContainer).getByLabelText('Select field for sorting');
-    const newSortDirectionSelect = within(newSortContainer).getByLabelText('Select direction for sorting');
-
-    await selectEvent.openMenu(newSortFieldSelect);
-    await selectEvent.select(newSortFieldSelect, 'took_ms');
-    await selectEvent.openMenu(newSortDirectionSelect);
-    await selectEvent.select(newSortDirectionSelect, 'Descending');
-
-    const applyButton = await screen.findByRole('button', { name: 'Update Preview' });
-    userEvent.click(applyButton);
+    await sortByTookMsDesc('sort-element-0');
+    await submitWidgetConfigForm();
 
     const updatedConfig = widgetConfig
       .toBuilder()
@@ -171,17 +174,8 @@ describe('AggregationWizard', () => {
     const addSortButton = await screen.findByRole('button', { name: 'Add a Sort' });
     userEvent.click(addSortButton);
 
-    const newSortContainer = await screen.findByTestId('sort-element-1');
-    const newSortFieldSelect = within(newSortContainer).getByLabelText('Select field for sorting');
-    const newSortDirectionSelect = within(newSortContainer).getByLabelText('Select direction for sorting');
-
-    await selectEvent.openMenu(newSortFieldSelect);
-    await selectEvent.select(newSortFieldSelect, 'took_ms');
-    await selectEvent.openMenu(newSortDirectionSelect);
-    await selectEvent.select(newSortDirectionSelect, 'Descending');
-
-    const applyButton = await screen.findByRole('button', { name: 'Update Preview' });
-    userEvent.click(applyButton);
+    await sortByTookMsDesc('sort-element-1');
+    await submitWidgetConfigForm();
 
     const updatedConfig = widgetConfig
       .toBuilder()
@@ -202,7 +196,7 @@ describe('AggregationWizard', () => {
     await addSortElement();
 
     const newSortContainer = await screen.findByTestId('sort-element-0');
-    const applyButton = await screen.findByRole('button', { name: 'Update Preview' });
+    const applyButton = await findWidgetConfigFormSubmitButton();
     await waitFor(() => expect(within(newSortContainer).getByText('Field is required.')).toBeInTheDocument());
     await waitFor(() => expect(expect(applyButton).toBeDisabled()));
   });
@@ -213,7 +207,7 @@ describe('AggregationWizard', () => {
     await addSortElement();
 
     const newSortContainer = await screen.findByTestId('sort-element-0');
-    const applyButton = await screen.findByRole('button', { name: 'Update Preview' });
+    const applyButton = await findWidgetConfigFormSubmitButton();
     await waitFor(() => expect(within(newSortContainer).getByText('Direction is required.')).toBeInTheDocument());
     await waitFor(() => expect(expect(applyButton).toBeDisabled()));
   });
@@ -230,8 +224,7 @@ describe('AggregationWizard', () => {
     const removeSortElementButton = screen.getByRole('button', { name: 'Remove Sort' });
     userEvent.click(removeSortElementButton);
 
-    const applyButton = await screen.findByRole('button', { name: 'Update Preview' });
-    userEvent.click(applyButton);
+    await submitWidgetConfigForm();
 
     const updatedConfig = widgetConfig
       .toBuilder()
@@ -266,8 +259,7 @@ describe('AggregationWizard', () => {
     fireEvent.keyDown(firstItem, { key: 'Space', keyCode: 32 });
     await screen.findByText(/You have dropped the item/i);
 
-    const applyButton = await screen.findByRole('button', { name: 'Update Preview' });
-    fireEvent.click(applyButton);
+    await submitWidgetConfigForm();
 
     const updatedConfig = config
       .toBuilder()
