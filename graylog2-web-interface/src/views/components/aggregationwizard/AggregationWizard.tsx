@@ -71,7 +71,7 @@ const onCreateElement = (
   }
 };
 
-const _onSubmit = (formValues: WidgetConfigFormValues, onConfigChange: (newConfig: AggregationWidgetConfig) => void, oldConfig = AggregationWidgetConfig.builder()) => {
+const _onSubmit = (formValues: WidgetConfigFormValues, onConfigChange: (newConfig: AggregationWidgetConfig) => void, oldConfig = AggregationWidgetConfig.builder().build()) => {
   const toConfigByKey = Object.fromEntries(aggregationElements.map(({ key, toConfig }) => [key, toConfig]));
 
   const newConfig = Object.keys(formValues).map((key) => {
