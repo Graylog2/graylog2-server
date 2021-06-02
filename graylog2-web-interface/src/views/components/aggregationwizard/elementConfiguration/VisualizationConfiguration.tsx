@@ -99,7 +99,7 @@ const VisualizationConfiguration = () => {
       </Field>
       {isTimelineChart && supportsEventAnnotations && (
         <Field name="visualization.eventAnnotation">
-          {({ field: { name, value, onChange }, meta: { error } }) => (
+          {({ field: { name, value = false }, meta: { error } }) => (
             <Input id={`${name}-input`}
                    label="Show Event annotations"
                    error={error}
@@ -107,8 +107,8 @@ const VisualizationConfiguration = () => {
                    wrapperClassName="col-sm-1">
               <EventAnnotationCheckbox id={`${name}-input`}
                                        name={name}
-                                       onChange={onChange}
-                                       checked={value === true}
+                                       onChange={() => setFieldValue(name, !value)}
+                                       checked={value}
                                        className="pull-right" />
             </Input>
           )}
