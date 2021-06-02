@@ -58,7 +58,7 @@ describe('TimeRangeDropdownButton', () => {
 
     expect(setCurrentTimeRange).toHaveBeenCalledWith({
       type: 'relative',
-      from: 1800,
+      range: 1800,
     });
   });
 });
