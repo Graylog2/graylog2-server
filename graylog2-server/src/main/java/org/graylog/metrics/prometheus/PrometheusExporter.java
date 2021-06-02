@@ -25,7 +25,6 @@ import io.prometheus.client.Collector;
 import io.prometheus.client.dropwizard.DropwizardExports;
 import io.prometheus.client.dropwizard.samplebuilder.CustomMappingSampleBuilder;
 import io.prometheus.client.dropwizard.samplebuilder.MapperConfig;
-import io.prometheus.client.dropwizard.samplebuilder.SampleBuilder;
 import org.graylog.metrics.prometheus.mapping.PrometheusMappingFilesHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,8 +38,6 @@ import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 @Singleton
 public class PrometheusExporter extends AbstractIdleService {
@@ -120,31 +117,10 @@ public class PrometheusExporter extends AbstractIdleService {
     }
 
     private Collector createCollector(List<MapperConfig> mapperConfigs) {
-        final List<Pattern> prometheusMetricPatterns = mapperConfigs.stream()
-                .map(mc -> globToRegex(mc.getMatch()))
-                .collect(Collectors.toList());
-        final SampleBuilder sampleBuilder = new CustomMappingSampleBuilder(mapperConfigs);
         return new DropwizardExports(
                 metricRegistry,
-                (name, metric) -> prometheusMetricPatterns.stream().anyMatch(pattern -> pattern.matcher(name).matches()),
-                sampleBuilder
+                new PrometheusMetricFilter(mapperConfigs),
+                new CustomMappingSampleBuilder(mapperConfigs)
         );
-    }
-
-    /**
-     * Converts the given glob pattern (see {@link MapperConfig}) to a regexp {@link Pattern}.
-     *
-     * @param glob the glob pattern
-     * @return regexp pattern
-     */
-    private Pattern globToRegex(String glob) {
-        final String[] parts = glob.split(Pattern.quote("*"), -1);
-        final StringBuilder escapedPattern = new StringBuilder(Pattern.quote(parts[0]));
-
-        for (int i = 1; i < parts.length; i++) {
-            escapedPattern.append("([^.]*)").append(Pattern.quote(parts[i]));
-        }
-
-        return Pattern.compile("^" + escapedPattern + "$");
     }
 }
