@@ -89,6 +89,7 @@ const VisualizationConfiguration = () => {
                     name={name}
                     value={value}
                     menuPortalTarget={document.body}
+                    menuPlacement="auto"
                     onChange={(newValue) => {
                       if (newValue !== value) {
                         setNewVisualizationType(newValue);
