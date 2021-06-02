@@ -52,12 +52,8 @@ describe('PivotSelect', () => {
     expect(wrapper).not.toBeEmptyRender();
   });
 
-  it('renders properly with `undefined` fields', () => {
-    let wrapper;
-
-    suppressConsole(() => {
-      wrapper = mount(<PivotSelect onChange={() => {}} value={[]} options={[]} />);
-    });
+  it('renders properly with `undefined` fields', async () => {
+    const wrapper = await suppressConsole(() => mount(<PivotSelect onChange={() => {}} value={[]} options={[]} />));
 
     expect(wrapper).not.toBeEmptyRender();
   });
