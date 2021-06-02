@@ -38,7 +38,7 @@ describe('ReportedErrorBoundary', () => {
   it('displays runtime error page when react error got reported', async () => {
     const { getByText, queryByText } = render(<ReportedErrorBoundary>Hello World!</ReportedErrorBoundary>);
 
-    suppressConsole(() => {
+    await suppressConsole(() => {
       ErrorsActions.report(createReactError(new Error('The error message'), { componentStack: 'The component stack' }));
     });
 
@@ -52,7 +52,7 @@ describe('ReportedErrorBoundary', () => {
     const { getByText, queryByText } = render(<ReportedErrorBoundary>Hello World!</ReportedErrorBoundary>);
     const response = { status: 404, body: { message: 'The request error message' } };
 
-    suppressConsole(() => {
+    await suppressConsole(() => {
       ErrorsActions.report(createNotFoundError(new FetchError('The request error message', response.status, response)));
     });
 
@@ -66,7 +66,7 @@ describe('ReportedErrorBoundary', () => {
     const { getByText, queryByText } = render(<ReportedErrorBoundary>Hello World!</ReportedErrorBoundary>);
     const response = { status: 404, body: { message: 'The error message' } };
 
-    suppressConsole(() => {
+    await suppressConsole(() => {
       ErrorsActions.report({ ...createNotFoundError(new FetchError('The error message', response.status, response)), type: 'UnkownReportedError' });
     });
 
@@ -80,7 +80,7 @@ describe('ReportedErrorBoundary', () => {
     const { findByText, queryByText } = render(<ReportedErrorBoundary>Hello World!</ReportedErrorBoundary>);
     const response = { status: 403, body: { message: 'The request error message' } };
 
-    suppressConsole(() => {
+    await suppressConsole(() => {
       ErrorsActions.report(createUnauthorizedError(new FetchError('The request error message', response.status, response)));
     });
 
@@ -96,7 +96,7 @@ describe('ReportedErrorBoundary', () => {
 
     expect(getByText('Hello World!')).not.toBeNull();
 
-    suppressConsole(() => {
+    await suppressConsole(() => {
       ErrorsActions.report(createUnauthorizedError(new FetchError('The request error message', response.status, response)));
     });
 

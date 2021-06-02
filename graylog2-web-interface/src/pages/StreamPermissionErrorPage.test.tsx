@@ -26,10 +26,10 @@ import StreamPermissionErrorPage from './StreamPermissionErrorPage';
 jest.mock('components/layout/Footer', () => mockComponent('Footer'));
 
 describe('StreamPermissionErrorPage', () => {
-  it('displays fetch error', () => {
+  it('displays fetch error', async () => {
     const response = { status: 403, body: { message: 'The request error message', streams: ['stream-1-id', 'stream-2-id'], type: 'MissingStreamPermission' } };
 
-    suppressConsole(async () => {
+    await suppressConsole(() => {
       render(<StreamPermissionErrorPage error={new FetchError('The request error message', response.status, response)} missingStreamIds={['stream-1-id', 'stream-2-id']} />);
     });
 

@@ -69,8 +69,8 @@ describe('AggregationControls', () => {
     expect(getByTestId('dummy-component')).toHaveTextContent('The spice must flow.');
   });
 
-  it('should render with `undefined` fields', () => {
-    suppressConsole(() => {
+  it('should render with `undefined` fields', async () => {
+    await suppressConsole(() => {
       render((
         <SimpleAggregationControls config={config}
                                    fields={undefined}

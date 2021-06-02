@@ -44,7 +44,7 @@ describe('WidgetOverrideElements', () => {
   });
 
   it('propagates thrown errors', async () => {
-    suppressConsole(async () => {
+    await suppressConsole(() => {
       const throwElement = () => {
         throw new Error('The dungeon collapses, you die!');
       };

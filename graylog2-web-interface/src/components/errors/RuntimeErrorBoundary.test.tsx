@@ -48,8 +48,8 @@ describe('RuntimeErrorBoundary', () => {
     expect(getByText('Hello World!')).not.toBe(null);
   });
 
-  it('calls display error action after catching', () => {
-    suppressConsole(() => {
+  it('calls display error action after catching', async () => {
+    await suppressConsole(() => {
       render(
         <RuntimeErrorBoundary>
           <ErroneusComponent />

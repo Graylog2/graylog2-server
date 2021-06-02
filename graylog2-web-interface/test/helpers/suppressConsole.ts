@@ -23,14 +23,17 @@
  *
  * @param {function} fn - the function which should be called after disabling `console.error` and before restoring it.
  */
-const suppressConsole = (fn: () => void) => {
+const suppressConsole = <T extends () => any>(fn: T): Promise<ReturnType<T>> => {
   /* eslint-disable no-console */
   const originalConsoleError = console.error;
   console.error = () => {};
 
-  fn();
+  return Promise.resolve(fn()).then((result) => {
+    console.error = originalConsoleError;
 
-  console.error = originalConsoleError;
+    return result;
+  });
+
   /* eslint-enable no-console */
 };
 

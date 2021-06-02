@@ -76,13 +76,9 @@ describe('MessageTable', () => {
     expect(td.text()).toContain('frank.txt');
   });
 
-  it('renders a table entry for messages, even if fields are `undefined`', () => {
-    let wrapper;
-
+  it('renders a table entry for messages, even if fields are `undefined`', async () => {
     // Suppressing console to disable props warning because of `fields` being `undefined`.
-    suppressConsole(() => {
-      wrapper = mount(<SimpleMessageTable fields={undefined} />);
-    });
+    const wrapper = await suppressConsole(() => mount(<SimpleMessageTable fields={undefined} />));
 
     const messageTableEntry = wrapper.find('MessageTableEntry');
 

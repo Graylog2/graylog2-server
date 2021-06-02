@@ -44,8 +44,8 @@ describe('RouterErrorBoundary', () => {
     expect(getByText('Hello World!')).not.toBeNull();
   });
 
-  it('displays error after catching', () => {
-    suppressConsole(() => {
+  it('displays error after catching', async () => {
+    await suppressConsole(() => {
       render(
         <RouterErrorBoundary>
           <ErroneusComponent />

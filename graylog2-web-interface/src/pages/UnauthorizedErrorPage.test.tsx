@@ -26,10 +26,10 @@ import UnauthorizedErrorPage from './UnauthorizedErrorPage';
 jest.mock('components/layout/Footer', () => mockComponent('Footer'));
 
 describe('UnauthorizedErrorPage', () => {
-  it('displays fetch error', () => {
+  it('displays fetch error', async () => {
     const response = { status: 403, body: { message: 'The request error message' } };
 
-    suppressConsole(async () => {
+    await suppressConsole(() => {
       render(<UnauthorizedErrorPage error={new FetchError('The request error message', response.status, response)} />);
     });
 
