@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import java.net.URL;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
@@ -44,6 +45,7 @@ import java.util.stream.Collectors;
 @Singleton
 public class PrometheusExporter extends AbstractIdleService {
     private static final Logger LOG = LoggerFactory.getLogger(PrometheusExporter.class);
+    private static final String CORE_MAPPING_RESOURCE = "prometheus-exporter.yml";
 
     private final boolean enabled;
     private final Path coreMappingPath;
@@ -84,7 +86,8 @@ public class PrometheusExporter extends AbstractIdleService {
             return;
         }
 
-        this.mappingFilesHandler = mappingFilesHandlerFactory.create(Resources.getResource("prometheus-exporter.yml"), coreMappingPath, customMappingPath);
+        final URL coreResource = Resources.getResource(CORE_MAPPING_RESOURCE);
+        this.mappingFilesHandler = mappingFilesHandlerFactory.create(coreResource, coreMappingPath, customMappingPath);
 
         httpServer.replaceCollector(createCollector(mappingFilesHandler.getMapperConfigs()));
         httpServer.start();
