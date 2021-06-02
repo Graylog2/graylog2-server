@@ -45,17 +45,17 @@ public class ReplaceableCollectorRegistry extends CollectorRegistry {
 
     @Override
     public void register(Collector m) {
-        throw new UnsupportedOperationException("The dynamic prometheus collector registry doesn't support register()");
+        throw new UnsupportedOperationException("The dynamic Prometheus collector registry doesn't support register()");
     }
 
     @Override
     public void unregister(Collector m) {
-        throw new UnsupportedOperationException("The dynamic prometheus collector registry doesn't support unregister()");
+        throw new UnsupportedOperationException("The dynamic Prometheus collector registry doesn't support unregister()");
     }
 
     @Override
     public void clear() {
-        throw new UnsupportedOperationException("The dynamic prometheus collector registry doesn't support clear()");
+        throw new UnsupportedOperationException("The dynamic Prometheus collector registry doesn't support clear()");
     }
 
     @Override

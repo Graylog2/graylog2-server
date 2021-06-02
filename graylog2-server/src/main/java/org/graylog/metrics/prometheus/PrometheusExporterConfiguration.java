@@ -40,7 +40,7 @@ public class PrometheusExporterConfiguration {
     // TODO: Grab a default port from https://github.com/prometheus/prometheus/wiki/Default-port-allocations once
     //       we have working code and link to the repository or the documentation.
     //       Check if we really want this or if we consider this a private reporter and should choose a default port
-    //       outside of the "official" prometheus exporter range.
+    //       outside of the "official" Prometheus exporter range.
     private static int DEFAULT_BIND_ADDRESS_PORT = 9832;
 
     @Parameter(value = ENABLED, required = true)

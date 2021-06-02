@@ -1,5 +1,5 @@
 ---
-# This is the built-in core mapping for the prometheus exporter.
+# This is the built-in core mapping for the Prometheus exporter.
 # WARNING: Changes to the "metric_name" values are an API change!
 metric_mappings:
   - metric_name: "log_appenders"

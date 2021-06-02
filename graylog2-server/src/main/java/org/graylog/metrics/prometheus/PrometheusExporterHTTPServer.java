@@ -70,9 +70,9 @@ public class PrometheusExporterHTTPServer {
 
             this.server = new HTTPServer(httpServer, replaceableRegistry, true);
             isRunning.set(true);
-            LOG.info("Exporting prometheus metrics on <{}> via HTTP", bindAddress);
+            LOG.info("Exporting Prometheus metrics on <{}> via HTTP", bindAddress);
         } catch (IOException e) {
-            LOG.error("Couldn't start prometheus HTTP exporter", e);
+            LOG.error("Couldn't start Prometheus HTTP exporter", e);
         }
     }
 
