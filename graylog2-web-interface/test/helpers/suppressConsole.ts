@@ -28,10 +28,8 @@ const suppressConsole = <T>(fn: () => T): Promise<T> => {
   const originalConsoleError = console.error;
   console.error = () => {};
 
-  return Promise.resolve(fn()).then((result) => {
+  return Promise.resolve(fn()).then((result) => result).finally(() => {
     console.error = originalConsoleError;
-
-    return result;
   });
 
   /* eslint-enable no-console */
