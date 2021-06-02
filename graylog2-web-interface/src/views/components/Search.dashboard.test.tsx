@@ -51,7 +51,7 @@ jest.mock('react-sizeme', () => ({
   SizeMe: ({ children }) => <div>{children({ size: { width: 1024 } })}</div>,
 }));
 
-const mockedQueryIds = Immutable.List(['query-id-1', 'query-id-2']);
+const mockedQueryIds = Immutable.OrderedSet(['query-id-1', 'query-id-2']);
 
 jest.mock('views/stores/QueryIdsStore', () => ({
   QueryIdsStore: {

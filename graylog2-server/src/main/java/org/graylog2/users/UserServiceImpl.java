@@ -33,6 +33,7 @@ import org.bson.types.ObjectId;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.security.PermissionAndRoleResolver;
+import org.graylog.security.permissions.CaseSensitiveWildcardPermission;
 import org.graylog.security.permissions.GRNPermission;
 import org.graylog2.Configuration;
 import org.graylog2.database.MongoConnection;
@@ -382,9 +383,9 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
     public List<Permission> getPermissionsForUser(User user) {
         final GRN principal = grnRegistry.ofUser(user);
         final ImmutableSet.Builder<Permission> permSet = ImmutableSet.<Permission>builder()
-                .addAll(user.getPermissions().stream().map(WildcardPermission::new).collect(Collectors.toSet()))
+                .addAll(user.getPermissions().stream().map(CaseSensitiveWildcardPermission::new).collect(Collectors.toSet()))
                 .addAll(permissionAndRoleResolver.resolvePermissionsForPrincipal(principal))
-                .addAll(getUserPermissionsFromRoles(user).stream().map(WildcardPermission::new).collect(Collectors.toSet()));
+                .addAll(getUserPermissionsFromRoles(user).stream().map(CaseSensitiveWildcardPermission::new).collect(Collectors.toSet()));
 
         return permSet.build().asList();
     }

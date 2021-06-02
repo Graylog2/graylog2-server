@@ -63,6 +63,9 @@ jest.mock('moment', () => {
 jest.mock('views/components/searchbar/QueryInput', () => ({ value = '' }: { value: string }) => <span>{value}</span>);
 
 jest.mock('views/stores/SearchConfigStore', () => ({
+  SearchConfigActions: {
+    refresh: jest.fn(() => Promise.resolve()),
+  },
   SearchConfigStore: MockStore(['getInitialState', () => ({
     searchesClusterConfig: {
       relative_timerange_options: { P1D: 'Search in last day', PT0S: 'Search in all messages' },

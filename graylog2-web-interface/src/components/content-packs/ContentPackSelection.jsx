@@ -142,9 +142,17 @@ class ContentPackSelection extends React.Component {
 
   _updateSelectionGroup = (type) => {
     const { selectedEntities, entities, onStateChange } = this.props;
+    const { isFiltered, filteredEntities } = this.state;
+
     const newSelection = cloneDeep(selectedEntities);
 
-    if (this._isGroupSelected(type)) {
+    if (isFiltered) {
+      if (newSelection[type]) {
+        newSelection[type] = [...newSelection[type], ...filteredEntities[type]];
+      } else {
+        newSelection[type] = filteredEntities[type];
+      }
+    } else if (this._isGroupSelected(type)) {
       newSelection[type] = [];
     } else {
       newSelection[type] = entities[type];

@@ -124,15 +124,18 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
                         .setExpectContinueEnabled(useExpectContinue)
                         .setAuthenticationEnabled(true)
                 )
-                .setHttpClientConfigCallback(httpClientConfig -> httpClientConfig
+                .setHttpClientConfigCallback(httpClientConfig -> {
+                    httpClientConfig
                         .setMaxConnTotal(maxTotalConnections)
                         .setMaxConnPerRoute(maxTotalConnectionsPerRoute)
-                        .setDefaultCredentialsProvider(credentialsProvider)
-                );
+                        .setDefaultCredentialsProvider(credentialsProvider);
 
-        if(muteElasticsearchDeprecationWarnings) {
-            restClientBuilder.setHttpClientConfigCallback(httpClientBuilder -> httpClientBuilder.addInterceptorFirst(new ElasticsearchFilterDeprecationWarningsInterceptor()));
-        }
+                    if(muteElasticsearchDeprecationWarnings) {
+                        httpClientConfig.addInterceptorFirst(new ElasticsearchFilterDeprecationWarningsInterceptor());
+                    }
+
+                    return httpClientConfig;
+                });
 
         return new RestHighLevelClient(restClientBuilder);
     }

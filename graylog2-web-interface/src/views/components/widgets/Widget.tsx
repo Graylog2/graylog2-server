@@ -37,18 +37,17 @@ import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import type VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 import TimerangeInfo from 'views/components/widgets/TimerangeInfo';
 import IfDashboard from 'views/components/dashboard/IfDashboard';
+import { WidgetErrorsList } from 'views/components/widgets/WidgetPropTypes';
 
 import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';
 import EditWidgetFrame from './EditWidgetFrame';
 import LoadingWidget from './LoadingWidget';
 import ErrorWidget from './ErrorWidget';
-import { WidgetErrorsList } from './WidgetPropTypes';
 import WidgetColorContext from './WidgetColorContext';
 import WidgetErrorBoundary from './WidgetErrorBoundary';
 import WidgetActionsMenu from './WidgetActionsMenu';
 
-import CustomPropTypes from '../CustomPropTypes';
 import InteractiveContext from '../contexts/InteractiveContext';
 
 type Props = {
@@ -114,9 +113,7 @@ class Widget extends React.Component<Props, State> {
     id: PropTypes.string.isRequired,
     onPositionsChange: PropTypes.func.isRequired,
     onSizeChange: PropTypes.func.isRequired,
-    position: PropTypes.instanceOf(WidgetPosition).isRequired,
     title: PropTypes.string.isRequired,
-    view: CustomPropTypes.CurrentView.isRequired,
     widget: PropTypes.instanceOf(WidgetModel).isRequired,
     width: PropTypes.number,
   };
@@ -247,14 +244,14 @@ class Widget extends React.Component<Props, State> {
                             loading={loading}
                             onRename={(newTitle) => TitlesActions.set('widget', id, newTitle)}
                             editing={editing}>
-                {!editing && (
+                {!editing ? (
                   <WidgetActionsMenu isFocused={isFocused}
                                      toggleEdit={this._onToggleEdit}
                                      title={title}
                                      view={view}
                                      position={position}
                                      onPositionsChange={onPositionsChange} />
-                )}
+                ) : null}
               </WidgetHeader>
             )}
           </InteractiveContext.Consumer>

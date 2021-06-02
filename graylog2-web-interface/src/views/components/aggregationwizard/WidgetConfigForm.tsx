@@ -17,10 +17,16 @@
 import * as React from 'react';
 import { Form, Formik, FormikProps } from 'formik';
 import { ConfigurationField } from 'views/types';
+import styled from 'styled-components';
 
 import PropagateValidationState from 'views/components/aggregationwizard/PropagateValidationState';
 import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 import { AutoTimeConfig, TimeUnitConfig } from 'views/logic/aggregationbuilder/Pivot';
+
+const StyledForm = styled(Form)`
+  display: flex;
+  width: 100%;
+`;
 
 export type MetricFormValues = {
   function: string,
@@ -111,10 +117,10 @@ const WidgetConfigForm = ({ children, onSubmit, initialValues, validate }: Props
                                     validateOnMount
                                     onSubmit={onSubmit}>
       {(...args) => (
-        <Form className="form form-horizontal">
+        <StyledForm className="form form-horizontal">
           <PropagateValidationState />
           {typeof children === 'function' ? children(...args) : children}
-        </Form>
+        </StyledForm>
       )}
     </Formik>
   );

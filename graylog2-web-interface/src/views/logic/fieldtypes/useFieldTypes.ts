@@ -33,7 +33,19 @@ type FieldTypesRequest = {
 const _deserializeFieldTypes = (response: FieldTypesResponse) => response
   .map((fieldTypeMapping) => FieldTypeMapping.fromJSON(fieldTypeMapping));
 
-const createFieldTypeRequest = (streams: Array<string>, timerange: TimeRange): FieldTypesRequest => ((streams && streams.length > 0) ? { streams, timerange } : { timerange });
+const createFieldTypeRequest = (streams: Array<string>, timerange: TimeRange): FieldTypesRequest => {
+  let request: FieldTypesRequest = {};
+
+  if (streams && streams.length > 0) {
+    request = { streams };
+  }
+
+  if (timerange) {
+    request = { ...request, timerange };
+  }
+
+  return request;
+};
 
 const fetchAllFieldTypes = (streams: Array<string>, timerange: TimeRange): Promise<Array<FieldTypeMapping>> => fetch('POST', fieldTypesUrl, createFieldTypeRequest(streams, timerange))
   .then(_deserializeFieldTypes);

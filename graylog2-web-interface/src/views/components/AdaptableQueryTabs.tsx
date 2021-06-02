@@ -162,7 +162,7 @@ const adjustTabsVisibility = (maxWidth, lockedTab, setLockedTab) => {
   }
 };
 
-const AdaptableQueryTabs = ({ maxWidth, queries, titles, selectedQueryId, onRemove, onSelect, queryTitleEditModal, onTitleChange }:Props) => {
+const AdaptableQueryTabs = ({ maxWidth, queries, titles, selectedQueryId, onRemove, onSelect, queryTitleEditModal, onTitleChange }: Props) => {
   const [openedMore, setOpenedMore] = useState<boolean>(false);
   const [lockedTab, setLockedTab] = useState<QueryId>();
 
@@ -264,7 +264,7 @@ const AdaptableQueryTabs = ({ maxWidth, queries, titles, selectedQueryId, onRemo
 
 AdaptableQueryTabs.propTypes = {
   maxWidth: PropTypes.number.isRequired,
-  queries: ImmutablePropTypes.listOf(PropTypes.string).isRequired,
+  queries: ImmutablePropTypes.orderedSetOf(PropTypes.string).isRequired,
   titles: PropTypes.object.isRequired,
   selectedQueryId: PropTypes.string.isRequired,
   onRemove: PropTypes.func.isRequired,

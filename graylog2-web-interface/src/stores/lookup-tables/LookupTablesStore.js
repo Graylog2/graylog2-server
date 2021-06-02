@@ -202,7 +202,7 @@ const LookupTablesStore = Reflux.createStore({
   },
 
   purgeKey(table, key) {
-    const promise = fetch('POST', this._url(`tables/${table.id}/purge?key=${encodeURIComponent(key)}`));
+    const promise = fetch('POST', this._urlClusterWise(`tables/${table.id}/purge?key=${encodeURIComponent(key)}`));
 
     promise.then(() => {
       UserNotification.success(`Purging cache key "${key}" for lookup table "${table.name}"`, 'Success!');
@@ -214,7 +214,7 @@ const LookupTablesStore = Reflux.createStore({
   },
 
   purgeAll(table) {
-    const promise = fetch('POST', this._url(`tables/${table.id}/purge`));
+    const promise = fetch('POST', this._urlClusterWise(`tables/${table.id}/purge`));
 
     promise.then(() => {
       UserNotification.success(`Purging cache for lookup table "${table.name}"`, 'Success!');
@@ -269,6 +269,10 @@ const LookupTablesStore = Reflux.createStore({
 
   _url(path) {
     return qualifyUrl(`/system/lookup/${path}`);
+  },
+
+  _urlClusterWise(path) {
+    return qualifyUrl(`/cluster/system/lookup/${path}`);
   },
 });
 

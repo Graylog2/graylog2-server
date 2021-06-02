@@ -30,7 +30,7 @@ describe('StreamPermissionErrorPage', () => {
     const response = { status: 403, body: { message: 'The request error message', streams: ['stream-1-id', 'stream-2-id'], type: 'MissingStreamPermission' } };
 
     suppressConsole(async () => {
-      const { getByText } = render(<StreamPermissionErrorPage error={new FetchError('The request error message', response)} />);
+      const { getByText } = render(<StreamPermissionErrorPage error={new FetchError('The request error message', response.status, response)} />);
 
       expect(getByText('Missing Stream Permissions')).not.toBeNull();
       expect(getByText('You need permissions for streams with the id: stream-1-id, stream-2-id.')).not.toBeNull();

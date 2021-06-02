@@ -22,6 +22,8 @@ import PlotLegend from 'views/components/visualizations/PlotLegend';
 import ColorMapper from 'views/components/visualizations/ColorMapper';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
+import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
+import Series from 'views/logic/aggregationbuilder/Series';
 
 import ChartColorContext from './ChartColorContext';
 
@@ -47,12 +49,20 @@ const columnPivots = [Pivot.create('field1', 'unknown')];
 const config = AggregationWidgetConfig.builder().columnPivots(columnPivots).build();
 
 // eslint-disable-next-line react/require-default-props
-const SUT = ({ chartDataProp = chartData }: { chartDataProp?: Array<{ name: string }>}) => (
-  <ChartColorContext.Provider value={{ colors, setColor }}>
-    <PlotLegend config={config} chartData={chartDataProp}>
-      <div>Plot</div>
-    </PlotLegend>
-  </ChartColorContext.Provider>
+const SUT = ({ chartDataProp = chartData, plotConfig = config }: { chartDataProp?: Array<{ name: string, }>, plotConfig?: AggregationWidgetConfig }) => (
+  <WidgetFocusContext.Provider value={{
+    focusedWidget: undefined,
+    setWidgetFocusing: jest.fn(),
+    unsetWidgetFocusing: jest.fn(),
+    unsetWidgetEditing: jest.fn(),
+    setWidgetEditing: jest.fn(),
+  }}>
+    <ChartColorContext.Provider value={{ colors, setColor }}>
+      <PlotLegend config={plotConfig} chartData={chartDataProp}>
+        <div>Plot</div>
+      </PlotLegend>
+    </ChartColorContext.Provider>
+  </WidgetFocusContext.Provider>
 );
 
 describe('PlotLegend', () => {
@@ -73,7 +83,7 @@ describe('PlotLegend', () => {
     const colorHints = await screen.findAllByLabelText('Color Hint');
     fireEvent.click(colorHints[0]);
 
-    await screen.getByText('Configuration for name1');
+    screen.getByText('Configuration for name1');
     const color = screen.getByTitle('#b71c1c');
     fireEvent.click(color);
 
@@ -96,5 +106,12 @@ describe('PlotLegend', () => {
     render(<SUT chartDataProp={charDataProp} />);
     await screen.findByText('name1');
     await screen.findByText('name11');
+  });
+
+  it('should hide with a single values', async () => {
+    const plotConfig = AggregationWidgetConfig.builder().series([Series.forFunction('count')]).build();
+    render(<SUT chartDataProp={[{ name: 'name1' }]} plotConfig={plotConfig} />);
+
+    expect(screen.queryByText('name1')).not.toBeInTheDocument();
   });
 });

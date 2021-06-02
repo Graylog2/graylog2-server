@@ -16,6 +16,7 @@
  */
 import { readFileSync } from 'fs';
 
+import * as Immutable from 'immutable';
 import { dirname } from 'path';
 
 import Search from 'views/logic/search/Search';
@@ -45,20 +46,34 @@ jest.mock('../SearchType', () => jest.fn(() => ({
   defaults: {},
 })));
 
+const searchView = () => {
+  const viewFixture = View.fromJSON(readFixture('./UpdateSearchForWidgets.View.fixture.json'));
+  const searchFixture = Search.fromJSON(readFixture('./UpdateSearchForWidgets.Search.fixture.json'));
+
+  return viewFixture.toBuilder()
+    .search(searchFixture)
+    .build();
+};
+
 describe('UpdateSearchForWidgets', () => {
   beforeEach(() => {
     Parameter.registerSubtype(ValueParameter.type, ValueParameter);
   });
 
   it('should generate a new search for the view', () => {
-    const viewFixture = View.fromJSON(readFixture('./UpdateSearchForWidgets.View.fixture.json'));
-    const searchFixture = Search.fromJSON(readFixture('./UpdateSearchForWidgets.Search.fixture.json'));
-    const searchView = viewFixture.toBuilder()
-      .search(searchFixture)
-      .build();
-
-    const newView = UpdateSearchForWidgets(searchView);
+    const newView = UpdateSearchForWidgets(searchView());
 
     expect(newView).toMatchSnapshot();
+  });
+
+  it('should keep order of query tabs', () => {
+    const newView = UpdateSearchForWidgets(searchView());
+    const queryIds = newView.search.queries.map((q) => q.id);
+
+    expect(queryIds).toEqual(Immutable.OrderedSet([
+      'f678e6c5-43b1-4200-b5c3-d33eae164dea',
+      '770a516d-3bfd-4a91-89c8-c21cb192fdf1',
+      '85782551-ec81-42ed-b9f7-020a8de93653',
+    ]));
   });
 });

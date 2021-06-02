@@ -21,7 +21,7 @@ import com.google.common.collect.ImmutableMap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.Permission;
 import org.apache.shiro.authz.permission.AllPermission;
-import org.apache.shiro.authz.permission.WildcardPermission;
+import org.graylog.security.permissions.CaseSensitiveWildcardPermission;
 import org.graylog2.plugin.database.validators.ValidationResult;
 import org.graylog2.security.PasswordAlgorithmFactory;
 import org.graylog2.shared.security.Permissions;
@@ -155,10 +155,10 @@ public class UserImplTest {
                 UserImpl.PERMISSIONS, customPermissions);
         user = new UserImpl(passwordAlgorithmFactory, permissions, fields);
 
-        final Set<Permission> userSelfEditPermissions = permissions.userSelfEditPermissions("foobar").stream().map(WildcardPermission::new).collect(Collectors.toSet());
+        final Set<Permission> userSelfEditPermissions = permissions.userSelfEditPermissions("foobar").stream().map(CaseSensitiveWildcardPermission::new).collect(Collectors.toSet());
         assertThat(user.getObjectPermissions())
                 .containsAll(userSelfEditPermissions)
-                .contains(new WildcardPermission("subject:action"))
+                .contains(new CaseSensitiveWildcardPermission("subject:action"))
                 .extracting("class").containsOnlyOnce(AllPermission.class);
     }
 }

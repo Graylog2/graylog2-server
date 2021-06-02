@@ -38,6 +38,7 @@ const AppLayout = styled.div`
 const PageContent = styled.div`
   height: 100%;
   overflow: auto;
+  flex: 1;
 `;
 
 const ScrollToHint = styled.div(({ theme }) => css`

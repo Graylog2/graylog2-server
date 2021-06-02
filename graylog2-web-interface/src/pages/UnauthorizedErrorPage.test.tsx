@@ -29,7 +29,7 @@ describe('UnauthorizedErrorPage', () => {
   it('displays fetch error', () => {
     suppressConsole(async () => {
       const response = { status: 403, body: { message: 'The request error message' } };
-      const { getByText } = render(<UnauthorizedErrorPage error={new FetchError('The request error message', response)} />);
+      const { getByText } = render(<UnauthorizedErrorPage error={new FetchError('The request error message', response.status, response)} />);
 
       expect(getByText('Missing Permissions')).not.toBeNull();
       expect(getByText(/The request error message/)).not.toBeNull();
