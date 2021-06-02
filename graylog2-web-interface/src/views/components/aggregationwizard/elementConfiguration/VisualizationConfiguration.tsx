@@ -108,7 +108,7 @@ const VisualizationConfiguration = () => {
               <EventAnnotationCheckbox id={`${name}-input`}
                                        name={name}
                                        onChange={onChange}
-                                       checked={value}
+                                       checked={value === true}
                                        className="pull-right" />
             </Input>
           )}
