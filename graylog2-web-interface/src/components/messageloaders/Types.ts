@@ -20,7 +20,7 @@ export type Input = {
   title: string,
   name: string,
   type: string,
-  configuration: {
+  attributes: {
     [type: string]: any,
   },
   input_profile_id: string,
