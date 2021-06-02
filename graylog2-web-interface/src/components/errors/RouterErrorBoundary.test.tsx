@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { render } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
 import suppressConsole from 'helpers/suppressConsole';
 import mockComponent from 'helpers/mocking/MockComponent';
 
@@ -44,15 +44,15 @@ describe('RouterErrorBoundary', () => {
     expect(getByText('Hello World!')).not.toBeNull();
   });
 
-  it('displays error after catching', () => {
-    suppressConsole(() => {
-      const { getByText } = render(
+  it('displays error after catching', async () => {
+    await suppressConsole(() => {
+      render(
         <RouterErrorBoundary>
           <ErroneusComponent />
         </RouterErrorBoundary>,
       );
-
-      expect(getByText('Oh no, a banana peel fell on the party gorilla\'s head!')).not.toBeNull();
     });
+
+    expect(screen.getByText('Oh no, a banana peel fell on the party gorilla\'s head!')).not.toBeNull();
   });
 });
