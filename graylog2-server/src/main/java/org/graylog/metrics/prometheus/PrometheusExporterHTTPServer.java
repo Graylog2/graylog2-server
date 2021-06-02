@@ -16,6 +16,7 @@
  */
 package org.graylog.metrics.prometheus;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.net.HostAndPort;
 import com.google.inject.assistedinject.Assisted;
 import com.sun.net.httpserver.HttpServer;
@@ -28,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -81,5 +83,10 @@ public class PrometheusExporterHTTPServer {
             isRunning.set(false);
             server.stop();
         }
+    }
+
+    @VisibleForTesting
+    Optional<Integer> getPort() {
+        return Optional.ofNullable(server).map(HTTPServer::getPort);
     }
 }
