@@ -52,12 +52,10 @@ describe('PivotSelect', () => {
     expect(wrapper).not.toBeEmptyRender();
   });
 
-  it('renders properly with `undefined` fields', () => {
-    suppressConsole(() => {
-      const wrapper = mount(<PivotSelect onChange={() => {}} value={[]} options={[]} />);
+  it('renders properly with `undefined` fields', async () => {
+    const wrapper = await suppressConsole(() => mount(<PivotSelect onChange={() => {}} value={[]} options={[]} />));
 
-      expect(wrapper).not.toBeEmptyRender();
-    });
+    expect(wrapper).not.toBeEmptyRender();
   });
 
   describe('upon pivot list change, field types are passed for new pivot generation', () => {

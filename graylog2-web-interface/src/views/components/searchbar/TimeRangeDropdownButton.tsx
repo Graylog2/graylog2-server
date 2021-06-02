@@ -66,7 +66,7 @@ const TimeRangeDropdownButton = ({
   const selectRelativeTimeRangePreset = (from) => {
     setCurrentTimeRange({
       type: 'relative',
-      from,
+      range: from,
     });
   };
 
