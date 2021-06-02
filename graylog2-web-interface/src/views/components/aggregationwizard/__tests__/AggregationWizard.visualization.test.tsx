@@ -196,7 +196,7 @@ describe('AggregationWizard/Visualizations', () => {
 
     const updateViewportButton = await screen.findByRole('button', { name: 'Change Viewport' });
     userEvent.click(updateViewportButton);
-    const submitButton = await screen.findByRole('button', { name: 'Apply Changes' });
+    const submitButton = await screen.findByRole('button', { name: 'Update Preview' });
     userEvent.click(submitButton);
 
     await waitFor(() => expect(onChange).toHaveBeenCalledWith(expect.objectContaining({
