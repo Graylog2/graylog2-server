@@ -118,7 +118,7 @@ public class PrometheusExporter extends AbstractIdleService {
 
     private Collector createCollector(List<MapperConfig> mapperConfigs) {
         final List<Pattern> prometheusMetricPatterns = mapperConfigs.stream()
-                .map(mc -> Pattern.compile(mc.getMatch()))
+                .map(mc -> globToRegex(mc.getMatch()))
                 .collect(Collectors.toList());
         final SampleBuilder sampleBuilder = new CustomMappingSampleBuilder(mapperConfigs);
         return new DropwizardExports(
@@ -126,5 +126,22 @@ public class PrometheusExporter extends AbstractIdleService {
                 (name, metric) -> prometheusMetricPatterns.stream().anyMatch(pattern -> pattern.matcher(name).matches()),
                 sampleBuilder
         );
+    }
+
+    /**
+     * Converts the given glob pattern (see {@link MapperConfig}) to a regexp {@link Pattern}.
+     *
+     * @param glob the glob pattern
+     * @return regexp pattern
+     */
+    private Pattern globToRegex(String glob) {
+        final String[] parts = glob.split(Pattern.quote("*"), -1);
+        final StringBuilder escapedPattern = new StringBuilder(Pattern.quote(parts[0]));
+
+        for (int i = 1; i < parts.length; i++) {
+            escapedPattern.append("([^.]*)").append(Pattern.quote(parts[i]));
+        }
+
+        return Pattern.compile("^" + escapedPattern + "$");
     }
 }
