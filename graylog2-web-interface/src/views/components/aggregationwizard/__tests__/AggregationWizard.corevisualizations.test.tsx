@@ -149,6 +149,27 @@ describe('AggregationWizard/Core Visualizations', () => {
     })));
   });
 
+  it('allows enabling event annotations for visualizations supporting it', async () => {
+    const onChange = jest.fn();
+    const timelineConfig = widgetConfig.toBuilder()
+      .rowPivots([Pivot.create('timestamp', 'time', { interval: { type: 'auto', scaling: 1 } })])
+      .series([Series.create('count')])
+      .build();
+
+    render(<SimpleAggregationWizard onChange={onChange} config={timelineConfig} />);
+
+    await selectOption('Select visualization type', 'Line Chart');
+
+    userEvent.click(await screen.findByRole('checkbox', { name: /show event annotations/i }));
+
+    userEvent.click(await submitButton());
+
+    await waitFor(() => expect(onChange).toHaveBeenCalledWith(expect.objectContaining({
+      visualization: 'line',
+      eventAnnotation: true,
+    })));
+  });
+
   it('creates Heatmap config when all required fields are present', async () => {
     const onChange = jest.fn();
     const heatMapConfig = widgetConfig.toBuilder()
