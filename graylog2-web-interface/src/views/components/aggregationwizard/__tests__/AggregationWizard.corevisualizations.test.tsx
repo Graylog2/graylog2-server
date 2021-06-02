@@ -41,6 +41,9 @@ const fieldTypes: FieldTypes = {
   all: Immutable.List([]),
   queryFields: Immutable.Map(),
 };
+
+const selectEventConfig = { container: document.body };
+
 const SimpleAggregationWizard = (props) => (
   <FieldTypesContext.Provider value={fieldTypes}>
     <AggregationWizard config={widgetConfig} editing id="widget-id" type="AGGREGATION" fields={Immutable.List([])} onChange={() => {}} {...props} />
@@ -62,7 +65,7 @@ const visualizationSelect = async () => screen.findByLabelText('Select visualiza
 const selectOption = async (ariaLabel: string, option: string) => {
   const select = await screen.findByLabelText(ariaLabel);
   await selectEvent.openMenu(select);
-  await selectEvent.select(select, option);
+  await selectEvent.select(select, option, selectEventConfig);
 };
 
 describe('AggregationWizard/Core Visualizations', () => {

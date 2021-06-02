@@ -51,6 +51,8 @@ const widgetConfig = AggregationWidgetConfig
   .rowPivots([pivot0, pivot1])
   .build();
 
+const selectEventConfig = { container: document.body };
+
 const plugin: PluginRegistration = { exports: { visualizationTypes: [dataTable] } };
 
 const addSortElement = async () => {
@@ -76,9 +78,9 @@ const sortByTookMsDesc = async (sortElementContainerId) => {
 
   await act(async () => {
     await selectEvent.openMenu(sortFieldSelect);
-    await selectEvent.select(sortFieldSelect, 'took_ms');
+    await selectEvent.select(sortFieldSelect, 'took_ms', selectEventConfig);
     await selectEvent.openMenu(sortDirectionSelect);
-    await selectEvent.select(sortDirectionSelect, 'Descending');
+    await selectEvent.select(sortDirectionSelect, 'Descending', selectEventConfig);
   });
 };
 

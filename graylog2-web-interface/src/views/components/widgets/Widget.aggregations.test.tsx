@@ -79,6 +79,8 @@ jest.mock('views/stores/StreamsStore', () => ({
 
 const viewsPlugin = new PluginManifest({}, viewsBindings);
 
+const selectEventConfig = { container: document.body };
+
 describe('Aggregation Widget', () => {
   beforeAll(() => {
     PluginStore.register(viewsPlugin);
@@ -171,14 +173,14 @@ describe('Aggregation Widget', () => {
 
       const metricFieldSelect = screen.getByLabelText('Select a function');
       await selectEvent.openMenu(metricFieldSelect);
-      await selectEvent.select(metricFieldSelect, 'Count');
+      await selectEvent.select(metricFieldSelect, 'Count', selectEventConfig);
 
       await findWidgetConfigSubmitButton();
 
       // Change widget search controls
       const streamsSelect = await screen.findByLabelText('Select streams the search should include. Searches in all streams if empty.');
       await selectEvent.openMenu(streamsSelect);
-      await selectEvent.select(streamsSelect, 'Stream 1');
+      await selectEvent.select(streamsSelect, 'Stream 1', selectEventConfig);
 
       await screen.findByRole('button', {
         name: /perform search \(changes were made after last search execution\)/i,
@@ -216,7 +218,7 @@ describe('Aggregation Widget', () => {
 
       const metricFieldSelect = screen.getByLabelText('Select a function');
       await selectEvent.openMenu(metricFieldSelect);
-      await selectEvent.select(metricFieldSelect, 'Count');
+      await selectEvent.select(metricFieldSelect, 'Count', selectEventConfig);
 
       await findWidgetConfigSubmitButton();
 
