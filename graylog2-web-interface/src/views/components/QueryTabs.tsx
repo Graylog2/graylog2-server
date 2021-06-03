@@ -41,7 +41,7 @@ export interface QueryTabsProps {
 }
 
 const StyledRow = styled(Row)`
-  margin-bottom: 0;
+  margin-bottom: 1px;
 `;
 
 const QueryTabs = ({ onRemove, onSelect, onTitleChange, queries, selectedQueryId, titles }: QueryTabsProps) => {
