@@ -58,7 +58,7 @@ public class PrometheusExporterConfiguration {
     @Parameter(value = MAPPING_FILE_REFRESH_INTERVAL, validators = {PositiveDurationValidator.class})
     private Duration mappingFileRefreshInterval = Duration.seconds(60);
 
-    private static class CustomHostAndPortConverter extends HostAndPortConverter {
+    public static class CustomHostAndPortConverter extends HostAndPortConverter {
         @Override
         public HostAndPort convertFrom(String value) {
             return super.convertFrom(value)
