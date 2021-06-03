@@ -70,7 +70,9 @@ const GridContainer = styled.div<{ interactive: boolean }>(({ interactive }) => 
     > *:nth-child(2) {
       flex-grow: 1;
     }
-  ` : '';
+  ` : css`
+    flex: 1
+  `;
 });
 
 const SearchArea = styled(PageContentLayout)(() => {
