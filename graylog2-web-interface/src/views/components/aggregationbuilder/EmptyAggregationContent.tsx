@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useContext, useEffect } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { Button } from 'components/graylog';
 import RenderCompletionCallback from 'views/components/widgets/RenderCompletionCallback';
@@ -35,9 +35,9 @@ const Container = styled.div`
   height: inherit;
 `;
 
-const SpacedHeading = styled.h2`
-  margin-bottom: 20px;
-`;
+const SpacedHeading = styled.h2(({ theme }) => css`
+  margin-bottom: ${theme.spacings.sm};
+`);
 
 const EmptyAggregationContent = ({ toggleEdit, editing = false }: Props) => {
   const onRenderComplete = useContext(RenderCompletionCallback);
