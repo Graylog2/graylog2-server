@@ -23,7 +23,6 @@ export interface OktaBackendConfig {
   oktaBaseUrl: string;
   clientId: string;
   clientSecret: string;
-  apiToken: string;
   tokenVerifierConnectTimeout: string;
   callbackUrl: string;
 }
@@ -33,7 +32,6 @@ export interface OktaBackendConfigJson {
   okta_base_url: string;
   client_id: string;
   client_secret: string;
-  api_token: string;
   token_verifier_connect_timeout: string;
   callback_url: string;
 }
@@ -43,8 +41,7 @@ export interface OktaBackend {
   defaultRoles: $PropertyType<AuthenticationBackend, 'defaultRoles'>;
   title: $PropertyType<AuthenticationBackend, 'title'>;
   description: $PropertyType<AuthenticationBackend, 'description'>;
-  config: Omit<OktaBackendConfig, 'clientSecret' | 'apiToken'> & {
-    apiToken: { is_set: boolean };
+  config: Omit<OktaBackendConfig, 'clientSecret'> & {
     clientSecret: { is_set: boolean };
   };
 }
