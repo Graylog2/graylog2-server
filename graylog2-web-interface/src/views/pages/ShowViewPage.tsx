@@ -28,7 +28,6 @@ import type { Location } from 'routing/withLocation';
 import SearchPage from './SearchPage';
 
 type Props = {
-  className?: string
   location: Location,
   params: {
     viewId?: string,
@@ -36,7 +35,7 @@ type Props = {
   viewLoader?: ViewLoaderFn,
 };
 
-const ShowViewPage = ({ params: { viewId }, location: { query }, viewLoader, className }: Props) => {
+const ShowViewPage = ({ params: { viewId }, location: { query }, viewLoader }: Props) => {
   if (!viewId) {
     throw new Error('No view id specified!');
   }
@@ -51,7 +50,7 @@ const ShowViewPage = ({ params: { viewId }, location: { query }, viewLoader, cla
     return <Spinner />;
   }
 
-  return <SearchPage className={className} />;
+  return <SearchPage />;
 };
 
 ShowViewPage.propTypes = {
@@ -62,7 +61,6 @@ ShowViewPage.propTypes = {
 };
 
 ShowViewPage.defaultProps = {
-  className: undefined,
   viewLoader: ViewLoader,
 };
 

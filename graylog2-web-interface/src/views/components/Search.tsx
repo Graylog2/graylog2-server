@@ -70,7 +70,9 @@ const GridContainer = styled.div<{ interactive: boolean }>(({ interactive }) => 
     > *:nth-child(2) {
       flex-grow: 1;
     }
-  ` : '';
+  ` : css`
+    flex: 1
+  `;
 });
 
 const SearchArea = styled(PageContentLayout)(() => {
@@ -103,7 +105,6 @@ const ConnectedSidebar = connect(
 );
 
 type Props = {
-  className?: string,
   location: Location,
 };
 
@@ -140,7 +141,7 @@ const ViewAdditionalContextProvider = connect(
 
 ViewAdditionalContextProvider.displayName = 'ViewAdditionalContextProvider';
 
-const Search = ({ location, className }: Props) => {
+const Search = ({ location }: Props) => {
   const { pathname, search } = location;
   const query = `${pathname}${search}`;
   const searchRefreshHooks = usePluginEntities('views.hooks.searchRefresh');
@@ -190,7 +191,7 @@ const Search = ({ location, className }: Props) => {
                   <DefaultFieldTypesProvider>
                     <ViewAdditionalContextProvider>
                       <HighlightingRulesProvider>
-                        <GridContainer id="main-row" interactive={interactive} className={className}>
+                        <GridContainer id="main-row" interactive={interactive}>
                           <IfInteractive>
                             <ConnectedSidebar>
                               <FieldsOverview />
@@ -231,9 +232,5 @@ const Search = ({ location, className }: Props) => {
 };
 
 Search.propTypes = {};
-
-Search.defaultProps = {
-  className: undefined,
-};
 
 export default withLocation(Search);

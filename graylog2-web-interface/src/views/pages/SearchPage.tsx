@@ -23,23 +23,21 @@ import { loadNewView as defaultLoadNewView, loadView as defaultLoadView } from '
 import IfUserHasAccessToAnyStream from 'views/components/IfUserHasAccessToAnyStream';
 
 type Props = {
-  className?: string,
   loadNewView?: () => unknown,
   loadView?: (string) => unknown,
 };
 
-const SearchPage = ({ loadNewView = defaultLoadNewView, loadView = defaultLoadView, className }: Props) => (
+const SearchPage = ({ loadNewView = defaultLoadNewView, loadView = defaultLoadView }: Props) => (
   <NewViewLoaderContext.Provider value={loadNewView}>
     <ViewLoaderContext.Provider value={loadView}>
       <IfUserHasAccessToAnyStream>
-        <Search className={className} />
+        <Search />
       </IfUserHasAccessToAnyStream>
     </ViewLoaderContext.Provider>
   </NewViewLoaderContext.Provider>
 );
 
 SearchPage.defaultProps = {
-  className: undefined,
   loadNewView: defaultLoadNewView,
   loadView: defaultLoadView,
 };
