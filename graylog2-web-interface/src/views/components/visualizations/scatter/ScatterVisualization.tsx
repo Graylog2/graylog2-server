@@ -27,12 +27,14 @@ import XYPlot from '../XYPlot';
 
 const seriesGenerator = (type, name, labels, values) => ({ type, name, x: labels, y: values, mode: 'markers' });
 
+const setChartColor = (chart, colors) => ({ marker: { color: colors.get(chart.name) } });
+
 const ScatterVisualization = makeVisualization(({ config, data, effectiveTimerange, height }: VisualizationComponentProps) => {
   const chartDataResult = chartData(config, data.chart || Object.values(data)[0], 'scatter', seriesGenerator);
   const layout: { shapes?: Shapes } = {};
 
   if (config.eventAnnotation && data.events) {
-    const { eventChartData, shapes } = EventHandler.toVisualizationData(data.events, config.formattingSettings);
+    const { eventChartData, shapes } = EventHandler.toVisualizationData(data.events);
 
     chartDataResult.push(eventChartData);
     layout.shapes = shapes;
@@ -41,6 +43,7 @@ const ScatterVisualization = makeVisualization(({ config, data, effectiveTimeran
   return (
     <XYPlot config={config}
             chartData={chartDataResult}
+            setChartColor={setChartColor}
             plotLayout={layout}
             height={height}
             effectiveTimerange={effectiveTimerange} />

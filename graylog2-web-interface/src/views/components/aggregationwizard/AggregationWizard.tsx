@@ -71,7 +71,7 @@ const onCreateElement = (
   }
 };
 
-const _onSubmit = (formValues: WidgetConfigFormValues, onConfigChange: (newConfig: AggregationWidgetConfig) => void) => {
+const _onSubmit = (formValues: WidgetConfigFormValues, onConfigChange: (newConfig: AggregationWidgetConfig) => void, oldConfig = AggregationWidgetConfig.builder().build()) => {
   const toConfigByKey = Object.fromEntries(aggregationElements.map(({ key, toConfig }) => [key, toConfig]));
 
   const newConfig = Object.keys(formValues).map((key) => {
@@ -82,7 +82,7 @@ const _onSubmit = (formValues: WidgetConfigFormValues, onConfigChange: (newConfi
     }
 
     return toConfig;
-  }).reduce((prevConfig, toConfig) => toConfig(formValues, prevConfig), AggregationWidgetConfig.builder());
+  }).reduce((prevConfig, toConfig) => toConfig(formValues, prevConfig), oldConfig.toBuilder());
 
   onConfigChange(newConfig.build());
 };
@@ -99,7 +99,7 @@ const AggregationWizard = ({ onChange, config, children }: EditWidgetComponentPr
   const initialFormValues = _initialFormValues(config);
 
   return (
-    <WidgetConfigForm onSubmit={(formValues: WidgetConfigFormValues) => _onSubmit(formValues, onChange)}
+    <WidgetConfigForm onSubmit={(formValues: WidgetConfigFormValues) => _onSubmit(formValues, onChange, config)}
                       initialValues={initialFormValues}
                       validate={validateForm}>
       <>
