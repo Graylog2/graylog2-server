@@ -276,7 +276,8 @@ class ReactGridContainer extends React.Component {
                                      rowHeight={rowHeight}
                                      containerPadding={[0, 0]}
                                      margin={[cellMargin, cellMargin]}
-                                     isResizable={isResizable}
+                                     isResizable={!locked && isResizable}
+                                     isDraggable={!locked}
                                      measureBeforeMount={measureBeforeMount}
         // Do not allow dragging from elements inside a `.actions` css class. This is
         // meant to avoid calling `onDragStop` callbacks when clicking on an action button.
