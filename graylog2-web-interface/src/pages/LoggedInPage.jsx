@@ -18,16 +18,18 @@ import React from 'react';
 
 import AppRouter from 'routing/AppRouter';
 import ThemeAndUserProvider from 'contexts/ThemeAndUserProvider';
-
-import StreamsProvider from '../contexts/StreamsProvider';
+import StreamsProvider from 'contexts/StreamsProvider';
+import DefaultQueryClientProvider from 'contexts/DefaultQueryClientProvider';
 
 const LoggedInPage = () => {
   return (
-    <ThemeAndUserProvider>
-      <StreamsProvider>
-        <AppRouter />
-      </StreamsProvider>
-    </ThemeAndUserProvider>
+    <DefaultQueryClientProvider>
+      <ThemeAndUserProvider>
+        <StreamsProvider>
+          <AppRouter />
+        </StreamsProvider>
+      </ThemeAndUserProvider>
+    </DefaultQueryClientProvider>
   );
 };
 
