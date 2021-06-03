@@ -35,6 +35,10 @@ const Container = styled.div`
   height: inherit;
 `;
 
+const SpacedHeading = styled.h2`
+  margin-bottom: 20px;
+`;
+
 const EmptyAggregationContent = ({ toggleEdit, editing = false }: Props) => {
   const onRenderComplete = useContext(RenderCompletionCallback);
 
@@ -57,7 +61,7 @@ const EmptyAggregationContent = ({ toggleEdit, editing = false }: Props) => {
   return (
     <Container>
       <div>
-        <h2>Empty Aggregation</h2>
+        <SpacedHeading>Empty Aggregation</SpacedHeading>
 
         {text}
       </div>
