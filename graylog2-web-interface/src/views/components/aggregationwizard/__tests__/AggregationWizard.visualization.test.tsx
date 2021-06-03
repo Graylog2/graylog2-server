@@ -105,8 +105,10 @@ const visualizationPlugin: PluginRegistration = {
   },
 };
 
+const findWidgetConfigSubmitButton = () => screen.findByRole('button', { name: 'Update Preview' });
+
 const expectSubmitButtonToBeDisabled = async () => {
-  const submitButton = await screen.findByRole('button', { name: 'Update Preview' });
+  const submitButton = await findWidgetConfigSubmitButton();
 
   expect(submitButton).toBeDisabled();
 };
@@ -138,7 +140,7 @@ describe('AggregationWizard/Visualizations', () => {
     await selectEvent.openMenu(visualizationSelect);
     await selectEvent.select(visualizationSelect, 'Without Config');
 
-    userEvent.click(await screen.findByRole('button', { name: 'Update Preview' }));
+    userEvent.click(await findWidgetConfigSubmitButton());
 
     await waitFor(() => expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ visualization: 'withoutConfig', visualizationConfig: undefined })));
   });
@@ -155,7 +157,7 @@ describe('AggregationWizard/Visualizations', () => {
 
     fireEvent.change(factorInput, { target: { value: '10' } });
 
-    expect(await screen.findByRole('button', { name: 'Update Preview' })).not.toBeDisabled();
+    expect(await findWidgetConfigSubmitButton()).not.toBeDisabled();
 
     await selectOption('Select Mode', 'anothermode');
 
@@ -163,7 +165,7 @@ describe('AggregationWizard/Visualizations', () => {
 
     await selectOption('Select Favorite Color', 'Yellow');
 
-    const submitButton = await screen.findByRole('button', { name: 'Update Preview' });
+    const submitButton = await findWidgetConfigSubmitButton();
 
     expect(submitButton).not.toBeDisabled();
 
@@ -196,7 +198,7 @@ describe('AggregationWizard/Visualizations', () => {
 
     const updateViewportButton = await screen.findByRole('button', { name: 'Change Viewport' });
     userEvent.click(updateViewportButton);
-    const submitButton = await screen.findByRole('button', { name: 'Update Preview' });
+    const submitButton = await findWidgetConfigSubmitButton();
     userEvent.click(submitButton);
 
     await waitFor(() => expect(onChange).toHaveBeenCalledWith(expect.objectContaining({

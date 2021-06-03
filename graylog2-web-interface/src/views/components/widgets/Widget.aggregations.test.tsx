@@ -146,6 +146,8 @@ describe('Aggregation Widget', () => {
     </ViewTypeContext.Provider>
   );
 
+  const findWidgetConfigSubmitButton = () => screen.findByRole('button', { name: 'Update Preview' });
+
   describe('on a dashboard', () => {
     it('should update not submitted widget search controls and aggregation elements changes when clicking on "Apply Changes"', async () => {
       const newSeries = Series.create('count').toBuilder().config(SeriesConfig.empty().toBuilder().name('Metric name').build()).build();
@@ -171,7 +173,7 @@ describe('Aggregation Widget', () => {
       await selectEvent.openMenu(metricFieldSelect);
       await selectEvent.select(metricFieldSelect, 'Count');
 
-      await screen.findByRole('button', { name: 'Update Preview' });
+      await findWidgetConfigSubmitButton();
 
       // Change widget search controls
       const streamsSelect = await screen.findByLabelText('Select streams the search should include. Searches in all streams if empty.');
@@ -216,7 +218,7 @@ describe('Aggregation Widget', () => {
       await selectEvent.openMenu(metricFieldSelect);
       await selectEvent.select(metricFieldSelect, 'Count');
 
-      await screen.findByRole('button', { name: 'Update Preview' });
+      await findWidgetConfigSubmitButton();
 
       // Submit all changes
       const saveButton = screen.getByText('Apply Changes');
