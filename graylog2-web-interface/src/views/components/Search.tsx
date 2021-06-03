@@ -103,6 +103,7 @@ const ConnectedSidebar = connect(
 );
 
 type Props = {
+  className?: string,
   location: Location,
 };
 
@@ -139,7 +140,7 @@ const ViewAdditionalContextProvider = connect(
 
 ViewAdditionalContextProvider.displayName = 'ViewAdditionalContextProvider';
 
-const Search = ({ location }: Props) => {
+const Search = ({ location, className }: Props) => {
   const { pathname, search } = location;
   const query = `${pathname}${search}`;
   const searchRefreshHooks = usePluginEntities('views.hooks.searchRefresh');
@@ -189,7 +190,7 @@ const Search = ({ location }: Props) => {
                   <DefaultFieldTypesProvider>
                     <ViewAdditionalContextProvider>
                       <HighlightingRulesProvider>
-                        <GridContainer id="main-row" interactive={interactive}>
+                        <GridContainer id="main-row" interactive={interactive} className={className}>
                           <IfInteractive>
                             <ConnectedSidebar>
                               <FieldsOverview />
@@ -230,5 +231,9 @@ const Search = ({ location }: Props) => {
 };
 
 Search.propTypes = {};
+
+Search.defaultProps = {
+  className: undefined,
+};
 
 export default withLocation(Search);

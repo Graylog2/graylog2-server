@@ -51,7 +51,14 @@ const castQueryWithDefaults = ({ tabs, interval, refresh }: UntypedBigDisplayMod
 });
 
 const BodyPositioningWrapper = styled.div`
+  height: 100%;
+  display: flex;
+  flex-direction: column;
   padding: 10px;
+`;
+
+const FullHeightShowViewPage = styled(ShowViewPage)`
+  flex: 1;
 `;
 
 const ShowDashboardInBigDisplayMode = ({ location, view: { view, activeQuery } = {} }: Props) => {
@@ -72,7 +79,7 @@ const ShowDashboardInBigDisplayMode = ({ location, view: { view, activeQuery } =
       <BodyPositioningWrapper>
         {view && activeQuery ? <CycleQueryTab interval={configuration.interval} view={view} activeQuery={activeQuery} tabs={configuration.tabs} /> : null}
         <BigDisplayModeHeader />
-        <ShowViewPage />
+        <FullHeightShowViewPage />
       </BodyPositioningWrapper>
     </InteractiveContext.Provider>
   );
