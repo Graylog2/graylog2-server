@@ -73,7 +73,10 @@ public class PrometheusMappingFilesHandler {
 
             if (fileInfoRef.get() == null) {
                 LOG.debug("Getting initial file info for file <{}>", file);
-                fileInfoRef.set(FileInfo.forPath(file));
+                final FileInfo newFileInfo = FileInfo.forPath(file);
+                fileInfoRef.set(newFileInfo);
+                // The file didn't exist before so we want to trigger a change
+                return Optional.of(new FileInfo.Change(newFileInfo));
             }
 
             final FileInfo.Change change = fileInfoRef.get().checkForChange();
