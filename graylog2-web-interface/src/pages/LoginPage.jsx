@@ -42,8 +42,16 @@ const StyledButton = styled(Button)`
   cursor: pointer;
 `;
 
-const useActiveBackend = () => {
-  const { data, isSuccess } = useQuery('activeBackendType', AuthenticationDomain.loadActiveBackendType);
+const useActiveBackend = (isCloud) => {
+  const cloudBackendLoader = () => {
+    if (isCloud) {
+      return Promise.resolve('oidc-v1');
+    }
+
+    return AuthenticationDomain.loadActiveBackendType();
+  };
+
+  const { data, isSuccess } = useQuery('activeBackendType', cloudBackendLoader);
 
   return [data, isSuccess];
 };
@@ -53,9 +61,9 @@ const LoginPage = () => {
   const [lastError, setLastError] = useState(undefined);
   const [useFallback, setUseFallback] = useState(false);
 
-  const [activeBackend, isBackendDetermined] = useActiveBackend();
-
   const isCloud = AppConfig.isCloud();
+  const [activeBackend, isBackendDetermined] = useActiveBackend(isCloud);
+
   const registeredLoginComponents = PluginStore.exports('loginProviderType');
   const loginComponent = registeredLoginComponents.find((c) => c.type === activeBackend);
   const hasCustomLogin = loginComponent && loginComponent.formComponent;
