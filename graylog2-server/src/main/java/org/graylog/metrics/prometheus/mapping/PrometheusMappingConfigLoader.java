@@ -22,8 +22,8 @@ import io.prometheus.client.dropwizard.samplebuilder.MapperConfig;
 import org.graylog2.plugin.system.NodeId;
 
 import javax.inject.Inject;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -40,8 +40,8 @@ public class PrometheusMappingConfigLoader {
     }
 
 
-    public Set<MapperConfig> load(byte[] bytes) throws IOException {
-        final PrometheusMappingConfig config = YAML_MAPPER.readValue(new ByteArrayInputStream(bytes), PrometheusMappingConfig.class);
+    public Set<MapperConfig> load(InputStream inputStream) throws IOException {
+        final PrometheusMappingConfig config = YAML_MAPPER.readValue(inputStream, PrometheusMappingConfig.class);
 
         return config.metricMappings().stream()
                 .map(this::mapMetric)

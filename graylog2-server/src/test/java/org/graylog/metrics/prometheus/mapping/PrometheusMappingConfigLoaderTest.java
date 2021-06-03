@@ -28,6 +28,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.io.ByteArrayInputStream;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Map;
@@ -72,7 +73,7 @@ class PrometheusMappingConfigLoaderTest {
                 )
         ));
 
-        assertThat(configLoader.load(objectMapper.writeValueAsBytes(config))).containsExactlyInAnyOrder(
+        assertThat(configLoader.load(new ByteArrayInputStream(objectMapper.writeValueAsBytes(config)))).containsExactlyInAnyOrder(
                 new MapperConfig(
                         "foo.*.bar",
                         "gl_test1",

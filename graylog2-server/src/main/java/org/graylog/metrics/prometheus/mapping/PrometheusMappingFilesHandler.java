@@ -26,9 +26,11 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -112,14 +114,15 @@ public class PrometheusMappingFilesHandler {
         if (Files.exists(coreMappingFile)) {
             LOG.debug("Loading core metric mappings from file <{}>", coreMappingFile);
             try {
-                mapperConfigs.addAll(mapperConfigLoader.load(Files.readAllBytes(coreMappingFile)));
+                final InputStream inputStream = Files.newInputStream(coreMappingFile, StandardOpenOption.READ);
+                mapperConfigs.addAll(mapperConfigLoader.load(inputStream));
             } catch (IOException e) {
                 LOG.error("Couldn't load mapping from file <{}>", coreMappingFile, e);
             }
         } else {
             LOG.debug("Loading core metric mappings from resource <{}>", coreResource);
             try {
-                mapperConfigs.addAll(mapperConfigLoader.load(Resources.toByteArray(coreResource)));
+                mapperConfigs.addAll(mapperConfigLoader.load(Resources.getResource(coreResource.getPath()).openStream()));
             } catch (IOException e) {
                 LOG.error("Couldn't load mapping from resource <{}>", coreResource, e);
             }
@@ -133,7 +136,8 @@ public class PrometheusMappingFilesHandler {
                         .map(MapperConfig::getName)
                         .collect(Collectors.toSet());
 
-                final Set<MapperConfig> customConfigs = mapperConfigLoader.load(Files.readAllBytes(customMappingFile))
+                final InputStream inputStream = Files.newInputStream(customMappingFile, StandardOpenOption.READ);
+                final Set<MapperConfig> customConfigs = mapperConfigLoader.load(inputStream)
                         .stream()
                         .filter(config -> {
                             if (coreMetricNames.contains(config.getName())) {
