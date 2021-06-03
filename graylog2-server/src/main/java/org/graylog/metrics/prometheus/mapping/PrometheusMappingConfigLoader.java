@@ -52,7 +52,6 @@ public class PrometheusMappingConfigLoader {
         final Map<String, String> labels = new HashMap<>();
 
         // Add nodeId to every metric.
-        // TODO: Can Prometheus do this with some global label?
         labels.put("node", nodeId.toString());
         labels.putAll(mapping.additionalLabels());
 

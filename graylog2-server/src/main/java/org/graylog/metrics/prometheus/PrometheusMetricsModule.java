@@ -22,8 +22,6 @@ import org.graylog2.plugin.PluginModule;
 public class PrometheusMetricsModule extends PluginModule {
     @Override
     protected void configure() {
-        //addSystemRestResource();
-
         install(new FactoryModuleBuilder().build(PrometheusExporterHTTPServer.Factory.class));
 
         addInitializer(PrometheusExporter.class);

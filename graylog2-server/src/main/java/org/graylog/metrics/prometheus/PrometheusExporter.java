@@ -70,7 +70,7 @@ public class PrometheusExporter extends AbstractIdleService {
     @Override
     protected void startUp() throws Exception {
         if (!enabled) {
-            LOG.info("Exporter disabled - skipping");
+            LOG.debug("Exporter disabled");
             return;
         }
 
