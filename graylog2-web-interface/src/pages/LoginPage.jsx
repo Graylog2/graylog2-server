@@ -16,14 +16,17 @@
  */
 import React, { useEffect, useState } from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
-import { createGlobalStyle } from 'styled-components';
+import styled, { createGlobalStyle } from 'styled-components';
+import { useQuery } from 'react-query';
 
 import { DocumentTitle, Icon } from 'components/common';
-import { Alert } from 'components/graylog';
+import { Alert, Button } from 'components/graylog';
 import LoginForm from 'components/login/LoginForm';
 import LoginBox from 'components/login/LoginBox';
 import authStyles from 'theme/styles/authStyles';
 import CombinedProvider from 'injection/CombinedProvider';
+import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
+import AppConfig from 'util/AppConfig';
 
 import LoadingPage from './LoadingPage';
 
@@ -33,9 +36,37 @@ const LoginPageStyles = createGlobalStyle`
   ${authStyles}
 `;
 
+const StyledButton = styled(Button)`
+  margin-top: 1em;
+  display: inline-block;
+  cursor: pointer;
+`;
+
+const useActiveBackend = (isCloud) => {
+  const cloudBackendLoader = () => {
+    if (isCloud) {
+      return Promise.resolve('oidc-v1');
+    }
+
+    return AuthenticationDomain.loadActiveBackendType();
+  };
+
+  const { data, isSuccess } = useQuery('activeBackendType', cloudBackendLoader);
+
+  return [data, isSuccess];
+};
+
 const LoginPage = () => {
   const [didValidateSession, setDidValidateSession] = useState(false);
   const [lastError, setLastError] = useState(undefined);
+  const [useFallback, setUseFallback] = useState(false);
+
+  const isCloud = AppConfig.isCloud();
+  const [activeBackend, isBackendDetermined] = useActiveBackend(isCloud);
+
+  const registeredLoginComponents = PluginStore.exports('loginProviderType');
+  const loginComponent = registeredLoginComponents.find((c) => c.type === activeBackend);
+  const hasCustomLogin = loginComponent && loginComponent.formComponent;
 
   useEffect(() => {
     const sessionPromise = SessionActions.validate().then((response) => {
@@ -68,10 +99,8 @@ const LoginPage = () => {
   };
 
   const renderLoginForm = () => {
-    const loginComponent = PluginStore.exports('loginProviderType');
-
-    if (loginComponent.length === 1) {
-      return React.createElement(loginComponent[0].formComponent, {
+    if (!useFallback && hasCustomLogin) {
+      return React.createElement(loginComponent.formComponent, {
         onErrorChange: setLastError,
       });
     }
@@ -79,7 +108,7 @@ const LoginPage = () => {
     return <LoginForm onErrorChange={setLastError} />;
   };
 
-  if (!didValidateSession) {
+  if (!didValidateSession || !isBackendDetermined) {
     return (
       <LoadingPage />
     );
@@ -92,6 +121,11 @@ const LoginPage = () => {
         <LoginPageStyles />
         {formatLastError()}
         {renderLoginForm()}
+        {hasCustomLogin && !isCloud && (
+          <StyledButton as="a" onClick={() => setUseFallback(!useFallback)}>
+            {`Login with ${useFallback ? loginComponent.type.replace(/^\w/, (c) => c.toUpperCase()) : 'default method'}`}
+          </StyledButton>
+        )}
       </LoginBox>
     </DocumentTitle>
   );
