@@ -18,16 +18,17 @@ package org.graylog.metrics.prometheus.mapping;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.io.Resources;
-import com.google.inject.assistedinject.Assisted;
 import io.prometheus.client.dropwizard.samplebuilder.MapperConfig;
+import org.graylog.metrics.prometheus.PrometheusExporterConfiguration;
 import org.graylog2.plugin.utilities.FileInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -40,16 +41,12 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 public class PrometheusMappingFilesHandler {
-    public interface Factory {
-        PrometheusMappingFilesHandler create(URL coreResource,
-                                             @Assisted("coreMappingFile") Path coreMappingFile,
-                                             @Assisted("customMappingFile") Path customMappingFile);
-    }
-
     private static final Logger LOG = LoggerFactory.getLogger(PrometheusMappingFilesHandler.class);
+    private static final String CORE_MAPPING_RESOURCE = "prometheus-exporter.yml";
 
-    private final URL coreResource;
+    @Nullable
     private final Path coreMappingFile;
+    @Nullable
     private final Path customMappingFile;
     private final PrometheusMappingConfigLoader mapperConfigLoader;
 
@@ -57,18 +54,16 @@ public class PrometheusMappingFilesHandler {
     private final AtomicReference<FileInfo> customMappingFileInfoRef = new AtomicReference<>(null);
 
     @Inject
-    public PrometheusMappingFilesHandler(@Assisted URL coreResource,
-                                         @Assisted("coreMappingFile") Path coreMappingFile,
-                                         @Assisted("customMappingFile") Path customMappingFile,
+    public PrometheusMappingFilesHandler(@Named(PrometheusExporterConfiguration.MAPPING_FILE_PATH_CORE) @Nullable Path coreMappingPath,
+                                         @Named(PrometheusExporterConfiguration.MAPPING_FILE_PATH_CUSTOM) @Nullable Path customMappingPath,
                                          PrometheusMappingConfigLoader mapperConfigLoader) {
-        this.coreResource = coreResource;
-        this.coreMappingFile = coreMappingFile.toAbsolutePath();
-        this.customMappingFile = customMappingFile.toAbsolutePath();
+        this.coreMappingFile = coreMappingPath != null ? coreMappingPath.toAbsolutePath() : null;
+        this.customMappingFile = customMappingPath != null ? customMappingPath.toAbsolutePath() : null;
         this.mapperConfigLoader = mapperConfigLoader;
     }
 
-    private Optional<FileInfo.Change> detectChange(Path file, AtomicReference<FileInfo> fileInfoRef) {
-        if (Files.exists(file)) {
+    private Optional<FileInfo.Change> detectChange(@Nullable Path file, AtomicReference<FileInfo> fileInfoRef) {
+        if (file != null && Files.exists(file)) {
             LOG.debug("Detecting changes for file <{}>", file);
 
             if (fileInfoRef.get() == null) {
@@ -95,7 +90,8 @@ public class PrometheusMappingFilesHandler {
     }
 
     public boolean filesHaveChanged() {
-        if (!Files.exists(coreMappingFile) && !Files.exists(customMappingFile)) {
+        if ((coreMappingFile == null || !Files.exists(coreMappingFile)) &&
+                (customMappingFile == null || !Files.exists(customMappingFile))) {
             return false;
         }
 
@@ -114,7 +110,7 @@ public class PrometheusMappingFilesHandler {
         final Set<MapperConfig> mapperConfigs = new HashSet<>();
 
         // If an external core mapping file exists it takes precedence over the included mapping resource
-        if (Files.exists(coreMappingFile)) {
+        if (coreMappingFile != null && Files.exists(coreMappingFile)) {
             LOG.debug("Loading core metric mappings from file <{}>", coreMappingFile);
             try {
                 final InputStream inputStream = Files.newInputStream(coreMappingFile, StandardOpenOption.READ);
@@ -123,16 +119,16 @@ public class PrometheusMappingFilesHandler {
                 LOG.error("Couldn't load mapping from file <{}>", coreMappingFile, e);
             }
         } else {
-            LOG.debug("Loading core metric mappings from resource <{}>", coreResource);
+            LOG.debug("Loading core metric mappings from resource <{}>", CORE_MAPPING_RESOURCE);
             try {
-                mapperConfigs.addAll(mapperConfigLoader.load(Resources.getResource(coreResource.getPath()).openStream()));
+                mapperConfigs.addAll(mapperConfigLoader.load(Resources.getResource(CORE_MAPPING_RESOURCE).openStream()));
             } catch (IOException e) {
-                LOG.error("Couldn't load mapping from resource <{}>", coreResource, e);
+                LOG.error("Couldn't load mapping from resource <{}>", CORE_MAPPING_RESOURCE, e);
             }
         }
 
         // Load custom mappings if they exist. Custom mappings cannot override core mappings!
-        if (Files.exists(customMappingFile)) {
+        if (customMappingFile != null && Files.exists(customMappingFile)) {
             LOG.debug("Loading custom metric mappings from file <{}>", customMappingFile);
             try {
                 final Set<String> coreMetricNames = mapperConfigs.stream()

@@ -18,7 +18,6 @@ package org.graylog.metrics.prometheus;
 
 import com.codahale.metrics.MetricRegistry;
 import com.github.joschi.jadconfig.util.Duration;
-import com.google.common.io.Resources;
 import com.google.common.net.HostAndPort;
 import com.google.common.util.concurrent.AbstractIdleService;
 import io.prometheus.client.Collector;
@@ -31,9 +30,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
-import java.net.URL;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -42,14 +40,11 @@ import java.util.concurrent.TimeUnit;
 @Singleton
 public class PrometheusExporter extends AbstractIdleService {
     private static final Logger LOG = LoggerFactory.getLogger(PrometheusExporter.class);
-    private static final String CORE_MAPPING_RESOURCE = "prometheus-exporter.yml";
 
     private final boolean enabled;
-    private final Path coreMappingPath;
-    private final Path customMappingPath;
     private final ScheduledExecutorService scheduler;
     private final MetricRegistry metricRegistry;
-    private final PrometheusMappingFilesHandler.Factory mappingFilesHandlerFactory;
+    private final Provider<PrometheusMappingFilesHandler> mappingFilesHandlerProvider;
     private final PrometheusExporterHTTPServer httpServer;
     private final long refreshIntervalMs;
 
@@ -59,19 +54,15 @@ public class PrometheusExporter extends AbstractIdleService {
     @Inject
     public PrometheusExporter(@Named(PrometheusExporterConfiguration.ENABLED) boolean enabled,
                               @Named(PrometheusExporterConfiguration.BIND_ADDRESS) HostAndPort bindAddress,
-                              @Named(PrometheusExporterConfiguration.MAPPING_FILE_PATH_CORE) Path coreMappingPath,
-                              @Named(PrometheusExporterConfiguration.MAPPING_FILE_PATH_CUSTOM) Path customMappingPath,
                               @Named(PrometheusExporterConfiguration.MAPPING_FILE_REFRESH_INTERVAL) Duration mappingFileRefreshInterval,
                               @Named("daemonScheduler") ScheduledExecutorService scheduler,
                               MetricRegistry metricRegistry,
-                              PrometheusMappingFilesHandler.Factory mappingFilesHandlerFactory,
+                              Provider<PrometheusMappingFilesHandler> mappingFilesHandlerProvider,
                               PrometheusExporterHTTPServer.Factory httpServerFactory) {
         this.enabled = enabled;
-        this.coreMappingPath = coreMappingPath;
-        this.customMappingPath = customMappingPath;
         this.scheduler = scheduler;
         this.metricRegistry = metricRegistry;
-        this.mappingFilesHandlerFactory = mappingFilesHandlerFactory;
+        this.mappingFilesHandlerProvider = mappingFilesHandlerProvider;
         this.httpServer = httpServerFactory.create(bindAddress);
         this.refreshIntervalMs = mappingFileRefreshInterval.toMilliseconds();
     }
@@ -83,8 +74,7 @@ public class PrometheusExporter extends AbstractIdleService {
             return;
         }
 
-        final URL coreResource = Resources.getResource(CORE_MAPPING_RESOURCE);
-        this.mappingFilesHandler = mappingFilesHandlerFactory.create(coreResource, coreMappingPath, customMappingPath);
+        this.mappingFilesHandler = mappingFilesHandlerProvider.get();
 
         httpServer.replaceCollector(createCollector(mappingFilesHandler.getMapperConfigs()));
         httpServer.start();

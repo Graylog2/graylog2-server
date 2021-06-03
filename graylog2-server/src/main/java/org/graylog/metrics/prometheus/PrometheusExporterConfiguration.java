@@ -24,7 +24,6 @@ import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
 import com.google.common.net.HostAndPort;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 @SuppressWarnings({"FieldMayBeFinal", "unused"})
 public class PrometheusExporterConfiguration {
@@ -50,10 +49,10 @@ public class PrometheusExporterConfiguration {
     private HostAndPort bindAddress = HostAndPort.fromParts(DEFAULT_BIND_ADDRESS_HOST, DEFAULT_BIND_ADDRESS_PORT);
 
     @Parameter(value = MAPPING_FILE_PATH_CORE, validators = {FilePathReadableValidator.class})
-    private Path mappingFilePathCore = Paths.get("prometheus-exporter-mapping-core.yml");
+    private Path mappingFilePathCore;
 
     @Parameter(value = MAPPING_FILE_PATH_CUSTOM, validators = {FilePathReadableValidator.class})
-    private Path mappingFilePathCustom = Paths.get("prometheus-exporter-mapping-custom.yml");
+    private Path mappingFilePathCustom;
 
     @Parameter(value = MAPPING_FILE_REFRESH_INTERVAL, validators = {PositiveDurationValidator.class})
     private Duration mappingFileRefreshInterval = Duration.seconds(60);
