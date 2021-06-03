@@ -107,6 +107,7 @@ const AggregationWizard = ({ onChange, config, children }: EditWidgetComponentPr
   return (
     <WidgetConfigForm onSubmit={(formValues: WidgetConfigFormValues) => _onSubmit(formValues, onChange, config)}
                       initialValues={initialFormValues}
+                      config={config}
                       validate={validateForm}>
       <>
         <Controls>
