@@ -26,7 +26,7 @@ import { ButtonGroup } from 'components/graylog';
 import RangePresetDropdown from './RangePresetDropdown';
 import TimeRangeButton from './TimeRangeButton';
 
-export type Props = {
+type Props = {
   children: React.ReactNode,
   disabled?: boolean,
   hasErrorOnMount?: boolean,

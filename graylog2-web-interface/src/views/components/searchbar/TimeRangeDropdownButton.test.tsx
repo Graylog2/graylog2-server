@@ -21,7 +21,6 @@ import MockStore from 'helpers/mocking/StoreMock';
 import mockSearchClusterConfig from 'fixtures/searchClusterConfig';
 
 import TimeRangeDropdownButton from './TimeRangeDropdownButton';
-import type { Props as TimeRangeDropdownButtonProps } from './TimeRangeDropdownButton';
 
 jest.mock('stores/configurations/ConfigurationsStore', () => ({
   ConfigurationsStore: MockStore(),
@@ -38,7 +37,7 @@ jest.mock('views/stores/SearchConfigStore', () => ({
 }));
 
 describe('TimeRangeDropdownButton', () => {
-  type SUTProps = Partial<TimeRangeDropdownButtonProps> & {
+  type SUTProps = Partial<React.ComponentProps<typeof TimeRangeDropdownButton>> & {
     onSubmit?: () => void
   }
 
