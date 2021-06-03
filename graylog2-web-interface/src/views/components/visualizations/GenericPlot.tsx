@@ -25,6 +25,7 @@ import ColorPicker from 'components/common/ColorPicker';
 import Plot from 'views/components/visualizations/plotly/AsyncPlot';
 import { colors as defaultColors } from 'views/components/visualizations/Colors';
 import ColorMapper from 'views/components/visualizations/ColorMapper';
+import { EVENT_COLOR, eventsDisplayName } from 'views/logic/searchtypes/events/EventHandler';
 
 import ChartColorContext from './ChartColorContext';
 import styles from './GenericPlot.lazy.css';
@@ -41,6 +42,7 @@ type LegendConfig = {
 type ChartMarker = {
   colors?: Array<string>,
   color?: string,
+  size?: number,
 };
 
 export type ChartConfig = {
@@ -150,6 +152,7 @@ class GenericPlot extends React.Component<GenericPlotProps, State> {
   render() {
     const { chartData, layout, setChartColor, theme } = this.props;
     const defaultLayout = {
+      shapes: [],
       autosize: true,
       showlegend: true,
       margin: {
@@ -210,12 +213,23 @@ class GenericPlot extends React.Component<GenericPlotProps, State> {
     return (
       <ChartColorContext.Consumer>
         {({ colors, setColor }) => {
+          plotLayout.shapes = plotLayout.shapes.map((shape) => ({
+            ...shape,
+            line: { color: colors.get(eventsDisplayName, EVENT_COLOR) },
+          }));
+
           const newChartData = chartData.map((chart) => {
             if (setChartColor && colors) {
               const conf = setChartColor(chart, colors);
 
               if (chart.type === 'pie') {
                 conf.outsidetextfont = { color: theme.colors.global.textDefault };
+              }
+
+              if (chart?.name === eventsDisplayName) {
+                const eventColor = colors.get(eventsDisplayName, EVENT_COLOR);
+
+                conf.marker = { color: eventColor, size: 5 };
               }
 
               if (conf.line || conf.marker) {

@@ -17,6 +17,11 @@
 package org.graylog2.storage.versionprobe;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.joschi.jadconfig.util.Duration;
+import com.github.rholder.retry.RetryException;
+import com.github.rholder.retry.RetryerBuilder;
+import com.github.rholder.retry.StopStrategies;
+import com.github.rholder.retry.WaitStrategies;
 import com.google.common.base.Strings;
 import okhttp3.Credentials;
 import okhttp3.OkHttpClient;
@@ -29,33 +34,57 @@ import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.Collection;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 
 public class VersionProbe {
     private static final Logger LOG = LoggerFactory.getLogger(VersionProbe.class);
     private final ObjectMapper objectMapper;
     private final OkHttpClient okHttpClient;
+    private final int connectionAttempts;
+    private final Duration delayBetweenAttempts;
 
     @Inject
-    public VersionProbe(ObjectMapper objectMapper, OkHttpClient okHttpClient) {
+    public VersionProbe(ObjectMapper objectMapper,
+                        OkHttpClient okHttpClient,
+                        @Named("elasticsearch_version_probe_attempts") int elasticsearchVersionProbeAttempts,
+                        @Named("elasticsearch_version_probe_delay") Duration elasticsearchVersionProbeDelay) {
         this.objectMapper = objectMapper;
         this.okHttpClient = okHttpClient;
+        this.connectionAttempts = elasticsearchVersionProbeAttempts;
+        this.delayBetweenAttempts = elasticsearchVersionProbeDelay;
     }
 
-    public Optional<Version> probe(Collection<URI> hosts) {
+    public Optional<Version> probe(final Collection<URI> hosts) {
+        try {
+            return RetryerBuilder.<Optional<Version>>newBuilder()
+                    .retryIfResult(input -> !input.isPresent())
+                    .retryIfExceptionOfType(IOException.class)
+                    .retryIfRuntimeException()
+                    .withWaitStrategy(WaitStrategies.fixedWait(delayBetweenAttempts.getQuantity(), delayBetweenAttempts.getUnit()))
+                    .withStopStrategy((connectionAttempts == 0) ? StopStrategies.neverStop() : StopStrategies.stopAfterAttempt(connectionAttempts))
+                    .build().call(() -> this.probeAllHosts(hosts));
+        } catch (ExecutionException | RetryException e) {
+            LOG.error("Unable to retrieve version from Elasticsearch node: ", e);
+        }
+        return Optional.empty();
+    }
+
+    private Optional<Version> probeAllHosts(final Collection<URI> hosts) {
         return hosts
                 .stream()
-                .map(this::probe)
+                .map(this::probeSingleHost)
                 .filter(Optional::isPresent)
                 .findFirst()
                 .orElse(Optional.empty());
     }
 
-    public Optional<Version> probe(URI host) {
+    private Optional<Version> probeSingleHost(URI host) {
         final Retrofit retrofit;
         try {
             retrofit = new Retrofit.Builder()
@@ -106,7 +135,7 @@ public class VersionProbe {
         }
     }
 
-    private Optional<RootResponse> rootResponse(RootRoute rootRoute) {
+    private Optional<RootResponse> rootResponse(final RootRoute rootRoute) {
         try {
             final Response<RootResponse> response = rootRoute.root().execute();
             if (response.isSuccessful()) {

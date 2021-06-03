@@ -15,30 +15,22 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-export type Input = {
-  id: string,
-  title: string,
-  name: string,
-  type: string,
-  attributes: {
-    [type: string]: any,
+/* eslint-disable import/prefer-default-export */
+export const configuration = {
+  'org.graylog2.messageprocessors.MessageProcessorsConfig': {
+    processor_order: [
+      {
+        name: 'AWS Instance Name Lookup',
+        class_name: 'aws.classname',
+      },
+    ],
+    disabled_processors: [],
   },
-  input_profile_id: string,
-  version: number,
-  created_at: string,
-  content_pack?: boolean;
-};
-
-export type Codec ={
-  type: string,
-  name: string,
-  requested_configuration: {
-    [key: string]: {
-      [key: string]: any,
-    },
+  'org.graylog.plugins.sidecar.system.SidecarConfiguration': {
+    sidecar_configuration_override: false,
+    sidecar_expiration_threshold: 'P14D',
+    sidecar_inactive_threshold: 'PT1M',
+    sidecar_send_status: true,
+    sidecar_update_interval: 'PT30S',
   },
-};
-
-export type CodecTypes = {
-  [key: string]: Codec,
 };

@@ -41,6 +41,13 @@ jest.mock('stores/streams/StreamsStore', () => MockStore(
   'availableStreams',
 ));
 
+jest.mock('views/stores/SearchConfigStore', () => ({
+  SearchConfigStore: MockStore(['getInitialState', () => ({})]),
+  SearchConfigActions: {
+    refresh: jest.fn(() => Promise.resolve()),
+  },
+}));
+
 jest.mock('views/components/searchbar/QueryInput', () => 'query-input');
 jest.mock('views/components/searchbar/saved-search/SavedSearchControls', () => jest.fn(() => <div>Saved Search Controls</div>));
 

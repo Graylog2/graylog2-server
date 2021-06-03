@@ -16,18 +16,49 @@
  */
 import { fireEvent, render, screen } from 'wrappedTestingLibrary';
 import * as React from 'react';
+import MockStore from 'helpers/mocking/StoreMock';
+import mockSearchClusterConfig from 'fixtures/searchClusterConfig';
 
 import TimeRangeDropdownButton from './TimeRangeDropdownButton';
+
+jest.mock('stores/configurations/ConfigurationsStore', () => ({
+  ConfigurationsStore: MockStore(),
+}));
+
+jest.mock('views/stores/SearchConfigStore', () => ({
+  SearchConfigActions: {
+    refresh: jest.fn(() => Promise.resolve()),
+  },
+  SearchConfigStore: {
+    listen: () => jest.fn(),
+    getInitialState: () => ({ searchesClusterConfig: mockSearchClusterConfig }),
+  },
+}));
 
 describe('TimeRangeDropdownButton', () => {
   it('button can be clicked and Popover appears', async () => {
     const toggleShow = jest.fn();
-    render(<TimeRangeDropdownButton toggleShow={toggleShow}><></></TimeRangeDropdownButton>);
+    render(<TimeRangeDropdownButton toggleShow={toggleShow} onPresetSelectOpen={() => {}} setCurrentTimeRange={() => {}}><></></TimeRangeDropdownButton>);
 
     const timeRangeButton = screen.getByLabelText('Open Time Range Selector');
 
     fireEvent.click(timeRangeButton);
 
     expect(toggleShow).toHaveBeenCalled();
+  });
+
+  it('changes time range when selecting relative time range preset', async () => {
+    const setCurrentTimeRange = jest.fn();
+    render(<TimeRangeDropdownButton toggleShow={() => {}} onPresetSelectOpen={() => {}} setCurrentTimeRange={setCurrentTimeRange}><></></TimeRangeDropdownButton>);
+
+    const timeRangeButton = screen.getByLabelText('Open time range preset select');
+    fireEvent.click(timeRangeButton);
+    const rangePresetOption = await screen.findByText('30 minutes');
+    fireEvent.click(rangePresetOption);
+
+    expect(setCurrentTimeRange).toHaveBeenCalledWith({
+      type: 'relative',
+      range: 1800,
+    });
   });
 });

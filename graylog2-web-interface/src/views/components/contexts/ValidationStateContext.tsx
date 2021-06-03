@@ -14,31 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import * as React from 'react';
 
-export type Input = {
-  id: string,
-  title: string,
-  name: string,
-  type: string,
-  attributes: {
-    [type: string]: any,
-  },
-  input_profile_id: string,
-  version: number,
-  created_at: string,
-  content_pack?: boolean;
+import { singleton } from 'views/logic/singleton';
+
+export type ValidationState = {
+  hasErrors: boolean,
+  setHasErrors: (formKey: boolean, hasErrors: boolean) => void,
 };
 
-export type Codec ={
-  type: string,
-  name: string,
-  requested_configuration: {
-    [key: string]: {
-      [key: string]: any,
-    },
-  },
-};
+const ValidationStateContext = React.createContext<ValidationState>({
+  hasErrors: false,
+  setHasErrors: () => {},
+});
 
-export type CodecTypes = {
-  [key: string]: Codec,
-};
+export default singleton('contexts.ValidationStateContext', () => ValidationStateContext);

@@ -15,9 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useCallback } from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
-import { useCallback } from 'react';
 import { Form, Formik } from 'formik';
 import { isFunction } from 'lodash';
 import type { FormikProps } from 'formik';
@@ -34,6 +34,7 @@ type Props = {
   limitDuration: number,
   onSubmit: (Values) => void | Promise<any>,
   validateOnMount?: boolean,
+  formRef?: React.Ref<FormikProps<SearchBarFormValues>>,
 }
 
 const StyledForm = styled(Form)`
@@ -42,7 +43,7 @@ const StyledForm = styled(Form)`
 
 const _isFunction = (children: Props['children']): children is (props: FormikProps<SearchBarFormValues>) => React.ReactElement => isFunction(children);
 
-const SearchBarForm = ({ initialValues, limitDuration, onSubmit, children, validateOnMount }: Props) => {
+const SearchBarForm = ({ initialValues, limitDuration, onSubmit, children, validateOnMount, formRef }: Props) => {
   const _onSubmit = useCallback(({ timerange, streams, queryString }) => {
     const newTimeRange = onSubmittingTimerange(timerange);
 
@@ -64,6 +65,7 @@ const SearchBarForm = ({ initialValues, limitDuration, onSubmit, children, valid
     <Formik initialValues={_initialValues}
             enableReinitialize
             onSubmit={_onSubmit}
+            innerRef={formRef}
             validate={({ timerange: nextTimeRange }) => dateTimeValidate(nextTimeRange, limitDuration)}
             validateOnMount={validateOnMount}>
       {(...args) => (
@@ -78,7 +80,7 @@ const SearchBarForm = ({ initialValues, limitDuration, onSubmit, children, valid
 };
 
 SearchBarForm.propTypes = {
-  initialValues: PropTypes.shape({
+  initialValues: PropTypes.exact({
     timerange: PropTypes.object.isRequired,
     queryString: PropTypes.string.isRequired,
     streams: PropTypes.arrayOf(PropTypes.string).isRequired,
@@ -90,6 +92,7 @@ SearchBarForm.propTypes = {
 
 SearchBarForm.defaultProps = {
   validateOnMount: true,
+  formRef: undefined,
 };
 
 export default SearchBarForm;

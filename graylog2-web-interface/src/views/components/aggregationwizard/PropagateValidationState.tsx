@@ -17,13 +17,13 @@
 import { useContext, useEffect } from 'react';
 import { useFormikContext } from 'formik';
 
-import { ValidationStateContext } from '../widgets/EditWidgetFrame';
+import ValidationStateContext from '../contexts/ValidationStateContext';
 
-const PropagateValidationState = () => {
+const PropagateValidationState = ({ formKey }) => {
   const { isValid } = useFormikContext();
-  const [, setHasErrors] = useContext(ValidationStateContext);
+  const { setHasErrors } = useContext(ValidationStateContext);
 
-  useEffect(() => setHasErrors(!isValid), [isValid, setHasErrors]);
+  useEffect(() => setHasErrors(formKey, !isValid), [formKey, isValid, setHasErrors]);
 
   return null;
 };
