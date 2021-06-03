@@ -33,6 +33,7 @@ type Props = {
   setCurrentTimeRange: (nextTimeRange: TimeRange | NoTimeRangeOverride) => void,
   show?: boolean,
   toggleShow: () => void,
+  showPresetDropdown?: boolean,
 };
 
 const StyledRangePresetDropdown = styled(RangePresetDropdown)`
@@ -54,6 +55,7 @@ const TimeRangeDropdownButton = ({
   onPresetSelectOpen,
   setCurrentTimeRange,
   show,
+  showPresetDropdown = true,
   toggleShow,
 }: Props) => {
   const containerRef = useRef();
@@ -76,18 +78,24 @@ const TimeRangeDropdownButton = ({
     }
   };
 
+  const dropdown = showPresetDropdown
+    ? (
+      <StyledRangePresetDropdown disabled={disabled}
+                                 displayTitle={false}
+                                 onChange={selectRelativeTimeRangePreset}
+                                 onToggle={_onPresetSelectToggle}
+                                 header="From (Until Now)"
+                                 bsSize={null} />
+    )
+    : null;
+
   return (
     <RelativePosition ref={containerRef}>
       <StyledButtonGroup>
         <TimeRangeButton hasError={hasErrorOnMount}
                          disabled={disabled}
                          onClick={_onClick} />
-        <StyledRangePresetDropdown disabled={disabled}
-                                   displayTitle={false}
-                                   onChange={selectRelativeTimeRangePreset}
-                                   onToggle={_onPresetSelectToggle}
-                                   header="From (Until Now)"
-                                   bsSize={null} />
+        {dropdown}
       </StyledButtonGroup>
       <Overlay show={show}
                trigger="click"
@@ -104,6 +112,7 @@ TimeRangeDropdownButton.defaultProps = {
   hasErrorOnMount: false,
   disabled: false,
   show: false,
+  showPresetDropdown: true,
 };
 
 export default TimeRangeDropdownButton;
