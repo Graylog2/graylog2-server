@@ -31,7 +31,7 @@ public class PrometheusExporterConfiguration {
     private static final String PREFIX = "prometheus_exporter_";
 
     public static final String ENABLED = PREFIX + "enabled";
-    public static final String BIND_ADDRESS = "bind_address";
+    public static final String BIND_ADDRESS = PREFIX + "bind_address";
     public static final String MAPPING_FILE_PATH_CORE = PREFIX + "mapping_file_path_core";
     public static final String MAPPING_FILE_PATH_CUSTOM = PREFIX + "mapping_file_path_custom";
     public static final String MAPPING_FILE_REFRESH_INTERVAL = PREFIX + "mapping_file_refresh_interval";
