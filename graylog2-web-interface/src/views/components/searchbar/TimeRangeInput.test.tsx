@@ -105,4 +105,22 @@ describe('TimeRangeInput', () => {
     expect(screen.queryByRole('tab', { name: 'Keyword' })).not.toBeInTheDocument();
     expect(screen.queryByRole('tab', { name: 'Absolute' })).not.toBeInTheDocument();
   });
+
+  it('shows a dropdown button allowing to quick-select presets', async () => {
+    render(<TimeRangeInput onChange={() => {}} value={defaultTimeRange} validTypes={['relative']} />);
+
+    const dropdown = await screen.findByRole('button', { name: /open time range preset select/i });
+
+    fireEvent.click(dropdown);
+
+    await screen.findByRole('heading', { name: 'From (Until Now)' });
+  });
+
+  it('allows hiding the dropdown button for quick-selecting presets', async () => {
+    render(<TimeRangeInput onChange={() => {}} value={defaultTimeRange} validTypes={['relative']} showPresetDropdown={false} />);
+
+    await screen.findByText(/5 minutes ago/);
+
+    expect(screen.queryByRole('button', { name: /open time range preset select/i })).not.toBeInTheDocument();
+  });
 });
