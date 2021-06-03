@@ -18,6 +18,7 @@ import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 
 import WidgetConfigForm from 'views/components/aggregationwizard/WidgetConfigForm';
+import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 
 import ValidationStateProvider from '../contexts/ValidationStateProvider';
 import ValidationStateContext from '../contexts/ValidationStateContext';
@@ -29,7 +30,7 @@ describe('WidgetConfigForm', () => {
         <ValidationStateContext.Consumer>
           {({ hasErrors }) => (
             <>
-              <WidgetConfigForm initialValues={{}} onSubmit={() => {}} validate={validate}>
+              <WidgetConfigForm initialValues={{}} onSubmit={() => {}} validate={validate} config={AggregationWidgetConfig.builder().build()}>
                 <span>Hello world!</span>
               </WidgetConfigForm>
               <span>{hasErrors ? 'Form has errors' : 'Form has no errors'}</span>
