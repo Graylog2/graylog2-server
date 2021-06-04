@@ -18,6 +18,7 @@ import * as React from 'react';
 import { useRef } from 'react';
 import { Overlay } from 'react-overlays';
 import styled from 'styled-components';
+import { useFormikContext } from 'formik';
 
 import { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import { ButtonGroup } from 'components/graylog';
@@ -58,6 +59,7 @@ const TimeRangeDropdownButton = ({
   showPresetDropdown = true,
   toggleShow,
 }: Props) => {
+  const { submitForm } = useFormikContext();
   const containerRef = useRef();
 
   const _onClick = (e) => {
@@ -70,6 +72,8 @@ const TimeRangeDropdownButton = ({
       type: 'relative',
       range: from,
     });
+
+    submitForm();
   };
 
   const _onPresetSelectToggle = (open: boolean) => {

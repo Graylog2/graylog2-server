@@ -14,7 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { fireEvent, render, screen } from 'wrappedTestingLibrary';
+import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
+import { Formik } from 'formik';
 import * as React from 'react';
 import MockStore from 'helpers/mocking/StoreMock';
 import mockSearchClusterConfig from 'fixtures/searchClusterConfig';
@@ -36,9 +37,19 @@ jest.mock('views/stores/SearchConfigStore', () => ({
 }));
 
 describe('TimeRangeDropdownButton', () => {
+  type SUTProps = Partial<React.ComponentProps<typeof TimeRangeDropdownButton>> & {
+    onSubmit?: () => void
+  }
+
+  const SUTTimeRangeDropDownButton = ({ onSubmit = () => {}, ...props }: SUTProps) => (
+    <Formik initialValues={{ selectedFields: [] }} onSubmit={onSubmit}>
+      <TimeRangeDropdownButton toggleShow={() => {}} onPresetSelectOpen={() => {}} setCurrentTimeRange={() => {}} {...props}><></></TimeRangeDropdownButton>
+    </Formik>
+  );
+
   it('button can be clicked and Popover appears', async () => {
     const toggleShow = jest.fn();
-    render(<TimeRangeDropdownButton toggleShow={toggleShow} onPresetSelectOpen={() => {}} setCurrentTimeRange={() => {}}><></></TimeRangeDropdownButton>);
+    render(<SUTTimeRangeDropDownButton toggleShow={toggleShow}><></></SUTTimeRangeDropDownButton>);
 
     const timeRangeButton = screen.getByLabelText('Open Time Range Selector');
 
@@ -47,9 +58,10 @@ describe('TimeRangeDropdownButton', () => {
     expect(toggleShow).toHaveBeenCalled();
   });
 
-  it('changes time range when selecting relative time range preset', async () => {
+  it('changes time range and submits form when selecting relative time range preset', async () => {
     const setCurrentTimeRange = jest.fn();
-    render(<TimeRangeDropdownButton toggleShow={() => {}} onPresetSelectOpen={() => {}} setCurrentTimeRange={setCurrentTimeRange}><></></TimeRangeDropdownButton>);
+    const onSubmit = jest.fn();
+    render(<SUTTimeRangeDropDownButton setCurrentTimeRange={setCurrentTimeRange} onSubmit={onSubmit}><></></SUTTimeRangeDropDownButton>);
 
     const timeRangeButton = screen.getByLabelText('Open time range preset select');
     fireEvent.click(timeRangeButton);
@@ -60,5 +72,7 @@ describe('TimeRangeDropdownButton', () => {
       type: 'relative',
       range: 1800,
     });
+
+    waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1));
   });
 });
