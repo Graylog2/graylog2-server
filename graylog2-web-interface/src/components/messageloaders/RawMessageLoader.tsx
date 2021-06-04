@@ -36,7 +36,7 @@ const { MessagesActions } = CombinedProvider.get('Messages');
 const { CodecTypesActions, CodecTypesStore } = CombinedProvider.get('CodecTypes');
 const { InputsActions, InputsStore } = CombinedProvider.get('Inputs');
 const isCloud = AppConfig.isCloud();
-const ForwarderInputDropdown = isCloud ? PluginStore.exports('cloud')[0].messageLoaders.ForwarderInputDropdown : null;
+const ForwarderInputDropdown = isCloud ? PluginStore.exports('forwarder')[0].messageLoaders.ForwarderInputDropdown : null;
 const DEFAULT_REMOTE_ADDRESS = '127.0.0.1';
 
 type OptionsType = {

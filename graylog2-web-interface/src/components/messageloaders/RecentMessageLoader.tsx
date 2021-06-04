@@ -30,7 +30,7 @@ import type { Input } from './Types';
 
 const UniversalSearchStore = StoreProvider.getStore('UniversalSearch');
 const isCloud = AppConfig.isCloud();
-const ForwarderInputDropdown = isCloud ? PluginStore.exports('cloud')[0].messageLoaders.ForwarderInputDropdown : null;
+const ForwarderInputDropdown = isCloud ? PluginStore.exports('forwarder')[0].messageLoaders.ForwarderInputDropdown : null;
 
 type Props = {
   inputs: Immutable.Map<string, Input>,
