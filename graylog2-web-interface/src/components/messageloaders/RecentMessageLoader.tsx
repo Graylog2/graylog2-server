@@ -18,6 +18,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import * as Immutable from 'immutable';
+import styled from 'styled-components';
 
 import { Row, Col } from 'components/graylog';
 import AppConfig from 'util/AppConfig';
@@ -30,7 +31,33 @@ import type { Input } from './Types';
 
 const UniversalSearchStore = StoreProvider.getStore('UniversalSearch');
 const isCloud = AppConfig.isCloud();
-const ForwarderInputDropdown = isCloud ? PluginStore.exports('forwarder')[0].messageLoaders.ForwarderInputDropdown : null;
+const { ForwarderInputDropdown } = PluginStore.exports('forwarder')?.[0]?.messageLoaders;
+
+const StyledContainer = styled.div`
+  margin-top: 5px;
+`;
+
+type ServerInputSelectProps = {
+  inputs: Immutable.Map<string, Input>,
+  onChange: (inputId: string) => void,
+  selectedInputId: string | undefined,
+  isLoading: boolean,
+};
+
+const ServerInputSelect = ({ selectedInputId, inputs, onChange, isLoading }: ServerInputSelectProps) => {
+  return (
+    <fieldset>
+      {selectedInputId
+        ? 'Click on "Load Message" to load the most recent message received by this input within the last hour.'
+        : 'Select an Input from the list below and click "Load Message" to load the most recent message received by this input within the last hour.'}
+      <InputDropdown inputs={inputs}
+                     preselectedInputId={selectedInputId}
+                     onLoadMessage={onChange}
+                     title={isLoading ? 'Loading message...' : 'Load Message'}
+                     disabled={isLoading} />
+    </fieldset>
+  );
+};
 
 type Props = {
   inputs: Immutable.Map<string, Input>,
@@ -65,21 +92,14 @@ const RecentMessageLoader = ({ inputs, onMessageLoaded, selectedInputId }: Props
     promise.finally(() => setLoading(false));
   };
 
-  let helpMessage;
-
-  if (selectedInputId) {
-    helpMessage = 'Click on "Load Message" to load the most recent message received by this input within the last hour.';
-  } else {
-    helpMessage = 'Select an Input from the list below and click "Load Message" to load the most recent message received by this input within the last hour.';
-  }
-
   return (
-    <div style={{ marginTop: 5 }}>
+    <StyledContainer>
       {(ForwarderInputDropdown)
         ? (
           <Row>
             <Col md={8}>
-              <p className="description">Select an Input profile from the list below then select an then select an Input and click
+              <p className="description">Select an Input profile from the list below then select an then select an Input
+                and click
                 on &quot;Load message&quot; to load most recent message received by this input within the last hour.
               </p>
               <ForwarderInputDropdown onLoadMessage={onClick}
@@ -89,17 +109,9 @@ const RecentMessageLoader = ({ inputs, onMessageLoaded, selectedInputId }: Props
             </Col>
           </Row>
         ) : (
-          <fieldset>
-            {helpMessage}
-            <InputDropdown inputs={inputs}
-                           preselectedInputId={selectedInputId}
-                           onLoadMessage={onClick}
-                           title={loading ? 'Loading message...' : 'Load Message'}
-                           disabled={loading} />
-          </fieldset>
+          <ServerInputSelect selectedInputId={selectedInputId} inputs={inputs} onChange={onClick} isLoading={loading} />
         )}
-    </div>
-
+    </StyledContainer>
   );
 };
 
