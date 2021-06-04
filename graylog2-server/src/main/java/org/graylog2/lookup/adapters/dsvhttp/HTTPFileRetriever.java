@@ -146,6 +146,7 @@ public class HTTPFileRetriever {
 
             return response;
         } else {
+            response.close();
             if (response.code() != 304) {
                 throw new IOException("Request failed: " + response.message());
             }
