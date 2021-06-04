@@ -28,6 +28,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.ResponseBody;
 import org.graylog2.plugin.Version;
+import org.graylog2.shared.utilities.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import retrofit2.Converter;
@@ -159,7 +160,10 @@ public class VersionProbe {
                 errorLogger.accept(response.errorBody());
             }
         } catch (IOException e) {
-            LOG.error("Unable to retrieve version from Elasticsearch node: ", e);
+            final String error = ExceptionUtils.formatMessageCause(e);
+            final String rootCause = ExceptionUtils.formatMessageCause(ExceptionUtils.getRootCause(e));
+            LOG.error("Unable to retrieve version from Elasticsearch node: {} - {}", error, rootCause);
+            LOG.debug("Complete exception for version probe error: ", e);
         }
         return Optional.empty();
     }
