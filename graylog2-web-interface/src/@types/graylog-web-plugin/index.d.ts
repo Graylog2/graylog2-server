@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import FetchError from 'logic/errors/FetchError';
+import { NodeInfo } from 'stores/nodes/NodesStore';
 
 interface PluginRoute {
   path: string;
@@ -45,7 +46,7 @@ interface PluginPageFooter {
   component: React.ComponentType;
 }
 
-interface PluginCloud {
+interface PluginForwarder {
   ForwarderReceivedBy: React.ComponentType<{
     inputId: string;
     forwarderNodeId: string;
@@ -60,6 +61,9 @@ interface PluginCloud {
       onLoadMessage: (selectedInput: string) => void;
     }>;
   };
+}
+
+interface PluginCloud {
   oktaUserForm: {
     fields: {
       username: React.ComponentType<{}> | null;
@@ -87,6 +91,7 @@ declare module 'graylog-web-plugin/plugin' {
     pages?: PluginPages;
     pageFooter?: Array<PluginPageFooter>;
     cloud?: Array<PluginCloud>;
+    forwarder?: Array<PluginForwarder>;
     inputConfiguration?: Array<InputConfiguration>
   }
 
