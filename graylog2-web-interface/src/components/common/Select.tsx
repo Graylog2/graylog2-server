@@ -128,6 +128,11 @@ const menu = (base) => ({
   zIndex: 5,
 });
 
+const menuPortal = (base) => ({
+  ...base,
+  zIndex: 'auto',
+});
+
 const singleValueAndPlaceholder = ({ theme }) => (base) => ({
   ...base,
   lineHeight: '28px',
@@ -192,6 +197,7 @@ const _styles = ({ size, theme }) => ({
   multiValueLabel: multiValueLabel({ theme }),
   multiValueRemove: multiValueRemove({ theme }),
   menu,
+  menuPortal,
   singleValue: singleValueAndPlaceholder({ theme }),
   placeholder: placeholder({ theme }),
   control: controlFocus({ size, theme }),
@@ -218,6 +224,7 @@ type Props = {
   inputProps?: { [key: string]: any },
   matchProp?: 'any' | 'label' | 'value',
   multi?: boolean,
+  menuPortalTarget?: HTMLElement,
   name?: string,
   onBlur?: (event: React.FocusEvent<HTMLInputElement>) => void,
   onChange: (string) => void,
@@ -515,6 +522,7 @@ class Select extends React.Component<Props, State> {
       optionRenderer, // Do not pass down prop
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       valueRenderer, // Do not pass down prop
+      menuPortalTarget,
       ...rest
     } = this.props;
 
@@ -537,6 +545,7 @@ class Select extends React.Component<Props, State> {
                        getOptionValue={(option) => option[valueKey]}
                        filterOption={customFilter}
                        components={mergedComponents}
+                       menuPortalTarget={menuPortalTarget}
                        isOptionDisabled={(option) => !!option.disabled}
                        /* eslint-disable-next-line @typescript-eslint/ban-ts-comment */
                        // @ts-ignore TODO: Fix props assignment for _styles

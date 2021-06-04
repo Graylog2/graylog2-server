@@ -53,6 +53,8 @@ jest.mock('views/stores/AggregationFunctionsStore', () => ({
   listen: jest.fn(),
 }));
 
+const selectEventConfig = { container: document.body };
+
 const plugin: PluginRegistration = { exports: { visualizationTypes: [dataTable] } };
 
 const addElement = async (key: 'Grouping' | 'Metric' | 'Sort') => {
@@ -71,9 +73,9 @@ const selectMetric = async (functionName, fieldName, elementIndex = 0) => {
 
   await act(async () => {
     await selectEvent.openMenu(newFunctionSelect);
-    await selectEvent.select(newFunctionSelect, functionName);
+    await selectEvent.select(newFunctionSelect, functionName, selectEventConfig);
     await selectEvent.openMenu(newFieldSelect);
-    await selectEvent.select(newFieldSelect, fieldName);
+    await selectEvent.select(newFieldSelect, fieldName, selectEventConfig);
   });
 };
 
@@ -111,7 +113,7 @@ describe('AggregationWizard', () => {
 
     const functionSelect = await screen.findByLabelText('Select a function');
     await selectEvent.openMenu(functionSelect);
-    await selectEvent.select(functionSelect, 'Minimum');
+    await selectEvent.select(functionSelect, 'Minimum', selectEventConfig);
 
     await waitFor(() => expect(screen.getByText('Field is required for function min.')).toBeInTheDocument());
   });
@@ -182,7 +184,7 @@ describe('AggregationWizard', () => {
     expect(screen.getByText('Percentile is required.')).toBeInTheDocument();
 
     await selectEvent.openMenu(percentileInput);
-    await selectEvent.select(percentileInput, '50');
+    await selectEvent.select(percentileInput, '50', selectEventConfig);
 
     await submitWidgetConfigForm();
 

@@ -105,6 +105,7 @@ const visualizationPlugin: PluginRegistration = {
   },
 };
 
+const selectEventConfig = { container: document.body };
 const findWidgetConfigSubmitButton = () => screen.findByRole('button', { name: 'Update Preview' });
 
 const expectSubmitButtonToBeDisabled = async () => {
@@ -116,7 +117,7 @@ const expectSubmitButtonToBeDisabled = async () => {
 const selectOption = async (ariaLabel: string, option: string) => {
   const select = await screen.findByLabelText(ariaLabel);
   await selectEvent.openMenu(select);
-  await selectEvent.select(select, option);
+  await selectEvent.select(select, option, selectEventConfig);
 };
 
 describe('AggregationWizard/Visualizations', () => {
@@ -138,7 +139,7 @@ describe('AggregationWizard/Visualizations', () => {
     const visualizationSelect = await screen.findByLabelText('Select visualization type');
 
     await selectEvent.openMenu(visualizationSelect);
-    await selectEvent.select(visualizationSelect, 'Without Config');
+    await selectEvent.select(visualizationSelect, 'Without Config', selectEventConfig);
 
     userEvent.click(await findWidgetConfigSubmitButton());
 
