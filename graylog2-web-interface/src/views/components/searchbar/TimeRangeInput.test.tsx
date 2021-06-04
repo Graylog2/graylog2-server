@@ -114,7 +114,7 @@ describe('TimeRangeInput', () => {
   });
 
   it('shows a dropdown button allowing to quick-select presets', async () => {
-    render(<TimeRangeInput onChange={() => {}} value={defaultTimeRange} validTypes={['relative']} />);
+    render(<SUTTimeRangeInput onChange={() => {}} value={defaultTimeRange} validTypes={['relative']} />);
 
     const dropdown = await screen.findByRole('button', { name: /open time range preset select/i });
 
@@ -124,7 +124,7 @@ describe('TimeRangeInput', () => {
   });
 
   it('allows hiding the dropdown button for quick-selecting presets', async () => {
-    render(<TimeRangeInput onChange={() => {}} value={defaultTimeRange} validTypes={['relative']} showPresetDropdown={false} />);
+    render(<SUTTimeRangeInput onChange={() => {}} value={defaultTimeRange} validTypes={['relative']} showPresetDropdown={false} />);
 
     await screen.findByText(/5 minutes ago/);
 
