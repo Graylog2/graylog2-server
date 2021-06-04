@@ -31,11 +31,16 @@ import type { Input } from './Types';
 
 const UniversalSearchStore = StoreProvider.getStore('UniversalSearch');
 const isCloud = AppConfig.isCloud();
-const { ForwarderInputDropdown } = PluginStore.exports('forwarder')?.[0]?.messageLoaders;
 
 const StyledContainer = styled.div`
   margin-top: 5px;
 `;
+
+const useForwarderMessageLoaders = () => {
+  const messageLoaders = PluginStore.exports('forwarder')?.[0]?.messageLoaders;
+
+  return messageLoaders || { ForwarderInputDropdown: undefined };
+};
 
 type ServerInputSelectProps = {
   inputs: Immutable.Map<string, Input>,
@@ -66,6 +71,8 @@ type ForwaderInputSelectProps = {
 };
 
 const ForwarderInputSelect = ({ selectedInputId, onChange, isLoading }: ForwaderInputSelectProps) => {
+  const { ForwarderInputDropdown } = useForwarderMessageLoaders();
+
   return (
     <Row>
       <Col md={8}>
@@ -90,6 +97,7 @@ type Props = {
 
 const RecentMessageLoader = ({ inputs, onMessageLoaded, selectedInputId }: Props) => {
   const [loading, setLoading] = useState<boolean>(false);
+  const { ForwarderInputDropdown } = useForwarderMessageLoaders();
 
   const onClick = (inputId: string) => {
     const input = inputs && inputs.get(inputId);
