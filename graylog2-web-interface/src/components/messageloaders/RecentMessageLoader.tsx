@@ -59,6 +59,29 @@ const ServerInputSelect = ({ selectedInputId, inputs, onChange, isLoading }: Ser
   );
 };
 
+type ForwaderInputSelectProps = {
+  onChange: (inputId: string) => void,
+  selectedInputId: string | undefined,
+  isLoading: boolean,
+};
+
+const ForwarderInputSelect = ({ selectedInputId, onChange, isLoading }: ForwaderInputSelectProps) => {
+  return (
+    <Row>
+      <Col md={8}>
+        <p className="description">
+          Select an Input profile from the list below then select an then select an Input and click
+          on &quot;Load message&quot; to load most recent message received by this input within the last hour.
+        </p>
+        <ForwarderInputDropdown onLoadMessage={onChange}
+                                title={isLoading ? 'Loading message...' : 'Load Message'}
+                                preselectedInputId={selectedInputId}
+                                loadButtonDisabled={isLoading} />
+      </Col>
+    </Row>
+  );
+};
+
 type Props = {
   inputs: Immutable.Map<string, Input>,
   onMessageLoaded: (message?: Message) => void,
@@ -94,20 +117,9 @@ const RecentMessageLoader = ({ inputs, onMessageLoaded, selectedInputId }: Props
 
   return (
     <StyledContainer>
-      {(ForwarderInputDropdown)
+      {ForwarderInputDropdown
         ? (
-          <Row>
-            <Col md={8}>
-              <p className="description">Select an Input profile from the list below then select an then select an Input
-                and click
-                on &quot;Load message&quot; to load most recent message received by this input within the last hour.
-              </p>
-              <ForwarderInputDropdown onLoadMessage={onClick}
-                                      title={loading ? 'Loading message...' : 'Load Message'}
-                                      preselectedInputId={selectedInputId}
-                                      loadButtonDisabled={loading} />
-            </Col>
-          </Row>
+          <ForwarderInputSelect selectedInputId={selectedInputId} onChange={onClick} isLoading={loading} />
         ) : (
           <ServerInputSelect selectedInputId={selectedInputId} inputs={inputs} onChange={onClick} isLoading={loading} />
         )}
