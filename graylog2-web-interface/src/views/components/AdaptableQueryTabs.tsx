@@ -51,7 +51,6 @@ const StyledQueryNav = styled(Nav)(({ theme }) => css`
     display: flex;
     white-space: nowrap;
     position: relative;
-    margin-bottom: -1px;
     padding-left: ${NAV_PADDING}px;
 
     > li {

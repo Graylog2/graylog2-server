@@ -18,7 +18,6 @@ import * as React from 'react';
 import { useRef } from 'react';
 import * as Immutable from 'immutable';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
 import { SizeMe } from 'react-sizeme';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import { OrderedSet } from 'immutable';
@@ -40,15 +39,11 @@ export interface QueryTabsProps {
   titles: Immutable.Map<string, string>,
 }
 
-const StyledRow = styled(Row)`
-  margin-bottom: 0;
-`;
-
 const QueryTabs = ({ onRemove, onSelect, onTitleChange, queries, selectedQueryId, titles }: QueryTabsProps) => {
   const queryTitleEditModal = useRef<QueryTitleEditModal | undefined | null>();
 
   return (
-    <StyledRow>
+    <Row>
       <Col>
         <SizeMe>
           {({ size }) => (size.width ? (
@@ -71,7 +66,7 @@ const QueryTabs = ({ onRemove, onSelect, onTitleChange, queries, selectedQueryId
         <QueryTitleEditModal onTitleChange={(newTitle: string) => onTitleChange(selectedQueryId, newTitle)}
                              ref={queryTitleEditModal} />
       </Col>
-    </StyledRow>
+    </Row>
   );
 };
 
