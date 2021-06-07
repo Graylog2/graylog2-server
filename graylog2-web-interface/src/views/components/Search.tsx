@@ -61,6 +61,7 @@ import usePluginEntities from 'views/logic/usePluginEntities';
 import WidgetFocusProvider from 'views/components/contexts/WidgetFocusProvider';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
+import { RefluxActions } from 'stores/StoreTypes';
 
 const GridContainer = styled.div<{ interactive: boolean }>(({ interactive }) => {
   return interactive ? css`
@@ -146,6 +147,29 @@ const ViewAdditionalContextProvider = connect(
 
 ViewAdditionalContextProvider.displayName = 'ViewAdditionalContextProvider';
 
+const useRefreshSearchOn = (actions: Array<RefluxActions<any>>, refresh: () => Promise<any>) => {
+  useEffect(() => {
+    let storeListenersUnsubscribes = Immutable.List<() => void>();
+
+    refresh().finally(() => {
+      storeListenersUnsubscribes = storeListenersUnsubscribes
+        .push(SearchActions.refresh.listen(refresh))
+        .push(ViewActions.search.completed.listen(refresh));
+    });
+
+    // Returning cleanup function used when unmounting
+    return () => { storeListenersUnsubscribes.forEach((unsubscribeFunc) => unsubscribeFunc()); };
+  }, [refresh]);
+};
+
+const useBindSearchParamsFromQuery = (query: { [key: string]: unknown }) => {
+  useEffect(() => {
+    const { view } = ViewStore.getInitialState();
+
+    bindSearchParamsFromQuery({ view, query, retry: () => Promise.resolve() });
+  }, [query]);
+};
+
 const Search = ({ location }: Props) => {
   const { pathname, search } = location;
   const query = `${pathname}${search}`;
@@ -156,30 +180,16 @@ const Search = ({ location }: Props) => {
     [searchRefreshHooks],
   );
 
-  useEffect(() => {
-    const { view } = ViewStore.getInitialState();
+  useBindSearchParamsFromQuery(location.query);
+  useSyncWithQueryParameters(query);
 
-    bindSearchParamsFromQuery({ view, query: location.query, retry: () => Promise.resolve() });
-  }, [location.query]);
+  useRefreshSearchOn([SearchActions.refresh, ViewActions.search], refreshIfNotUndeclared);
 
   useEffect(() => {
     SearchConfigActions.refresh();
 
     StreamsActions.refresh();
-
-    let storeListenersUnsubscribes = Immutable.List<() => void>();
-
-    refreshIfNotUndeclared().finally(() => {
-      storeListenersUnsubscribes = storeListenersUnsubscribes
-        .push(SearchActions.refresh.listen(refreshIfNotUndeclared))
-        .push(ViewActions.search.completed.listen(refreshIfNotUndeclared));
-    });
-
-    // Returning cleanup function used when unmounting
-    return () => { storeListenersUnsubscribes.forEach((unsubscribeFunc) => unsubscribeFunc()); };
-  }, [refreshIfNotUndeclared]);
-
-  useSyncWithQueryParameters(query);
+  }, []);
 
   return (
     <WidgetFocusProvider>
