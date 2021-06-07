@@ -17,15 +17,14 @@
 
 import React from 'react';
 import { screen, render } from 'wrappedTestingLibrary';
-import { Map } from 'immutable';
 import asMock from 'helpers/mocking/AsMock';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import userEvent from '@testing-library/user-event';
 
 import AppConfig from 'util/AppConfig';
+import { inputs } from 'components/messageloaders/RecentMessageLoader.fixtures';
 
 import RecentMessageLoader from './RecentMessageLoader';
-import type { Input } from './Types';
 
 jest.mock('util/AppConfig', () => ({
   isCloud: jest.fn(() => false),
@@ -37,8 +36,6 @@ jest.mock('graylog-web-plugin/plugin', () => ({
   },
 }));
 
-const inputs = Map<string, Input>({});
-
 describe('<RecentMessageLoader>', () => {
   it('shows server input select when no forwarder plugin is installed', () => {
     asMock(PluginStore.exports).mockReturnValue([]);
@@ -48,6 +45,17 @@ describe('<RecentMessageLoader>', () => {
     expect(screen.getByText(/select an input from the list below/i)).toBeInTheDocument();
     expect(screen.getByRole('combobox', { name: /server input select/i })).toBeInTheDocument();
     expect(screen.getByDisplayValue(/select an input/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /load message/i })).toBeInTheDocument();
+  });
+
+  it('selects input when preselected input id is given', () => {
+    asMock(PluginStore.exports).mockReturnValue([]);
+
+    render(<RecentMessageLoader onMessageLoaded={jest.fn()} inputs={inputs} selectedInputId="5c26a37b3885e50480aa12a2" />);
+
+    expect(screen.getByText(/click on "load message" to load/i)).toBeInTheDocument();
+    expect(screen.getByRole('combobox')).toBeDisabled();
+    expect(screen.getByDisplayValue(/syslog udp/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /load message/i })).toBeInTheDocument();
   });
 
@@ -69,11 +77,11 @@ describe('<RecentMessageLoader>', () => {
 
       expect(screen.getByRole('combobox', { name: /input type select/i })).toBeInTheDocument();
 
-      const inputTypeDropdown = screen.getByDisplayValue(/select an input type/i);
+      const inputTypeSelect = screen.getByDisplayValue(/select an input type/i);
 
-      expect(inputTypeDropdown).toBeInTheDocument();
+      expect(inputTypeSelect).toBeInTheDocument();
 
-      userEvent.selectOptions(inputTypeDropdown, ['server']);
+      userEvent.selectOptions(inputTypeSelect, ['server']);
 
       expect(screen.getByText(/select an input from the list below/i)).toBeInTheDocument();
       expect(screen.getByRole('combobox', { name: /server input select/i })).toBeInTheDocument();
@@ -82,11 +90,39 @@ describe('<RecentMessageLoader>', () => {
       expect(screen.queryByText(/select an input profile from the list/i)).not.toBeInTheDocument();
       expect(screen.queryByText(/forwarder inputs/i)).not.toBeInTheDocument();
 
-      userEvent.selectOptions(inputTypeDropdown, ['forwarder']);
+      userEvent.selectOptions(inputTypeSelect, ['forwarder']);
 
       expect(screen.getByText(/select an input profile from the list/i)).toBeInTheDocument();
       expect(screen.getByText(/forwarder inputs/i)).toBeInTheDocument();
       expect(screen.queryByRole('combobox', { name: /server input select/i })).not.toBeInTheDocument();
+    });
+
+    it('preselects server input type when selectedInputId is in inputs', () => {
+      render(<RecentMessageLoader onMessageLoaded={jest.fn()} inputs={inputs} selectedInputId="5c26a37b3885e50480aa12a2" />);
+
+      const inputTypeSelect = screen.getByDisplayValue(/server input/i);
+
+      expect(inputTypeSelect).toBeInTheDocument();
+      expect(inputTypeSelect).toBeDisabled();
+      expect(screen.getByText(/click on "load message" to load/i)).toBeInTheDocument();
+
+      const inputSelect = screen.getByDisplayValue(/syslog udp/i);
+
+      expect(inputSelect).toBeInTheDocument();
+      expect(inputSelect).toBeDisabled();
+      expect(screen.getByRole('button', { name: /load message/i })).toBeInTheDocument();
+    });
+
+    it('preselects forwarder input type when selectedInputId is not in inputs', () => {
+      render(<RecentMessageLoader onMessageLoaded={jest.fn()} inputs={inputs} selectedInputId="5c26a37b3885e50480aa12a4" />);
+
+      const inputTypeSelect = screen.getByDisplayValue(/forwarder input/i);
+
+      expect(inputTypeSelect).toBeInTheDocument();
+      expect(inputTypeSelect).toBeDisabled();
+      expect(screen.getByText(/click on "load message" to load/i)).toBeInTheDocument();
+
+      expect(screen.getByText(/forwarder inputs/i)).toBeInTheDocument();
     });
 
     it('shows only forwarder input select on cloud', () => {

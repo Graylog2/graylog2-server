@@ -110,7 +110,18 @@ type Props = {
 const RecentMessageLoader = ({ inputs, onMessageLoaded, selectedInputId }: Props) => {
   const [loading, setLoading] = useState<boolean>(false);
   const { ForwarderInputDropdown } = useForwarderMessageLoaders();
-  const [selectedInputType, setSelectedInputType] = useState<'forwarder' | 'server'>(ForwarderInputDropdown ? undefined : 'server');
+
+  const [selectedInputType, setSelectedInputType] = useState<'forwarder' | 'server'>(() => {
+    if (selectedInputId) {
+      return inputs?.get(selectedInputId) ? 'server' : 'forwarder';
+    }
+
+    if (ForwarderInputDropdown) {
+      return undefined;
+    }
+
+    return 'server';
+  });
   const isCloud = AppConfig.isCloud();
 
   const onClick = (inputId: string) => {
@@ -160,6 +171,7 @@ const RecentMessageLoader = ({ inputs, onMessageLoaded, selectedInputId }: Props
                             aria-label="input type select"
                             type="select"
                             value={selectedInputType ?? 'placeholder'}
+                            disabled={!!selectedInputId}
                             onChange={(e) => setSelectedInputType(e.target.value)}>
                 <option value="placeholder" disabled>Select an Input type</option>
                 <option value="server">Server Input</option>

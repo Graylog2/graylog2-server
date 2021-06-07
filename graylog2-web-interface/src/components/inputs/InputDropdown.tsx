@@ -49,7 +49,7 @@ const _formatInput = ({ id, title, type }: InputType) => {
   return <option key={id} value={id}>{title} ({type})</option>;
 };
 
-const _sortByTitle = (input1: Input, input2: InputType) => input1.title.localeCompare(input2.title);
+const _sortByTitle = (input1: InputType, input2: InputType) => input1.title.localeCompare(input2.title);
 
 const StaticInput = ({ input: { type, title } }: { input: InputType }) => (
   <StyledInputDropdown id={`${type}-select`} type="select" disabled>
