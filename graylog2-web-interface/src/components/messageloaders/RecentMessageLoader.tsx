@@ -109,16 +109,18 @@ type Props = {
 
 const RecentMessageLoader = ({ inputs, onMessageLoaded, selectedInputId }: Props) => {
   const [loading, setLoading] = useState<boolean>(false);
-  const [selectedInputType, setSelectedInputType] = useState<'forwarder' | 'server'>(undefined);
   const { ForwarderInputDropdown } = useForwarderMessageLoaders();
+  const [selectedInputType, setSelectedInputType] = useState<'forwarder' | 'server'>(ForwarderInputDropdown ? undefined : 'server');
   const isCloud = AppConfig.isCloud();
 
   const onClick = (inputId: string) => {
     const input = inputs && inputs.get(inputId);
 
-    if (!isCloud && !input) {
+    if (selectedInputType === 'server' && !input) {
       UserNotification.error(`Invalid input selected: ${inputId}`,
         `Could not load message from invalid Input ${inputId}`);
+
+      return;
     }
 
     setLoading(true);
