@@ -36,11 +36,9 @@ public class PrometheusExporterConfiguration {
     public static final String MAPPING_FILE_REFRESH_INTERVAL = PREFIX + "mapping_file_refresh_interval";
 
     private static String DEFAULT_BIND_ADDRESS_HOST = "127.0.0.1";
-    // TODO: Grab a default port from https://github.com/prometheus/prometheus/wiki/Default-port-allocations once
-    //       we have working code and link to the repository or the documentation.
-    //       Check if we really want this or if we consider this a private reporter and should choose a default port
-    //       outside of the "official" Prometheus exporter range.
-    private static int DEFAULT_BIND_ADDRESS_PORT = 9832;
+    // The default port has been added to the Prometheus default port allocation wiki page:
+    // https://github.com/prometheus/prometheus/wiki/Default-port-allocations
+    private static int DEFAULT_BIND_ADDRESS_PORT = 9833;
 
     @Parameter(value = ENABLED, required = true)
     private boolean enabled = false;
