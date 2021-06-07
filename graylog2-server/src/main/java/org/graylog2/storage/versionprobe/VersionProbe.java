@@ -26,9 +26,12 @@ import com.google.common.base.Strings;
 import okhttp3.Credentials;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.ResponseBody;
 import org.graylog2.plugin.Version;
+import org.graylog2.shared.utilities.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import retrofit2.Converter;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
@@ -36,11 +39,13 @@ import retrofit2.converter.jackson.JacksonConverterFactory;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Consumer;
 
 public class VersionProbe {
     private static final Logger LOG = LoggerFactory.getLogger(VersionProbe.class);
@@ -99,7 +104,18 @@ public class VersionProbe {
 
         final RootRoute root = retrofit.create(RootRoute.class);
 
-        return rootResponse(root)
+        final Converter<ResponseBody, ErrorResponse> errorResponseConverter = retrofit.responseBodyConverter(ErrorResponse.class, new Annotation[0]);
+        final Consumer<ResponseBody> errorLogger = (responseBody) -> {
+            try {
+                final ErrorResponse errorResponse = errorResponseConverter.convert(responseBody);
+                LOG.error("Unable to retrieve version from Elasticsearch node {}:{}: {}", host.getHost(), host.getPort(), errorResponse);
+            } catch (IOException e) {
+                LOG.error("Unable to retrieve version from Elasticsearch node {}:{}: unknown error - an exception occurred while deserializing error response: {}", host.getHost(), host.getPort(), e);
+            }
+        };
+
+
+        return rootResponse(root, errorLogger)
                 .map(RootResponse::version)
                 .map(VersionResponse::number)
                 .flatMap(this::parseVersion);
@@ -135,14 +151,19 @@ public class VersionProbe {
         }
     }
 
-    private Optional<RootResponse> rootResponse(final RootRoute rootRoute) {
+    private Optional<RootResponse> rootResponse(final RootRoute rootRoute, Consumer<ResponseBody> errorLogger) {
         try {
             final Response<RootResponse> response = rootRoute.root().execute();
             if (response.isSuccessful()) {
                 return Optional.ofNullable(response.body());
+            } else {
+                errorLogger.accept(response.errorBody());
             }
         } catch (IOException e) {
-            LOG.error("Unable to retrieve version from Elasticsearch node: ", e);
+            final String error = ExceptionUtils.formatMessageCause(e);
+            final String rootCause = ExceptionUtils.formatMessageCause(ExceptionUtils.getRootCause(e));
+            LOG.error("Unable to retrieve version from Elasticsearch node: {} - {}", error, rootCause);
+            LOG.debug("Complete exception for version probe error: ", e);
         }
         return Optional.empty();
     }
