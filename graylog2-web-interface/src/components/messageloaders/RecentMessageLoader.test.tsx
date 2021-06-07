@@ -20,6 +20,7 @@ import { screen, render } from 'wrappedTestingLibrary';
 import { Map } from 'immutable';
 import asMock from 'helpers/mocking/AsMock';
 import { PluginStore } from 'graylog-web-plugin/plugin';
+import userEvent from '@testing-library/user-event';
 
 import AppConfig from 'util/AppConfig';
 
@@ -39,30 +40,66 @@ jest.mock('graylog-web-plugin/plugin', () => ({
 const inputs = Map<string, Input>({});
 
 describe('<RecentMessageLoader>', () => {
-  it('shows server input select when no forwarder plugin is present', () => {
+  it('shows server input select when no forwarder plugin is installed', () => {
     asMock(PluginStore.exports).mockReturnValue([]);
 
     render(<RecentMessageLoader onMessageLoaded={jest.fn()} inputs={inputs} />);
 
     expect(screen.getByText(/select an input from the list below/i)).toBeInTheDocument();
-    expect(screen.getByRole('combobox')).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: /server input select/i })).toBeInTheDocument();
+    expect(screen.getByDisplayValue(/select an input/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /load message/i })).toBeInTheDocument();
   });
 
-  it('shows forwarder input select on cloud', () => {
-    asMock(PluginStore.exports).mockImplementation((type) => ({
-      forwarder: [{
-        messageLoaders: {
-          ForwarderInputDropdown: () => <>Forwarder Inputs</>,
-        },
-      }],
-    }[type]));
+  describe('with forwarder plugin installed', () => {
+    beforeEach(() => {
+      asMock(PluginStore.exports).mockImplementation((type) => ({
+        forwarder: [{
+          messageLoaders: {
+            ForwarderInputDropdown: () => <>Forwarder Inputs</>,
+          },
+        }],
+      }[type]));
+    });
 
-    asMock(AppConfig.isCloud).mockImplementation(() => true);
+    it('allows user to select between server and forwarder input on premise', () => {
+      asMock(AppConfig.isCloud).mockImplementation(() => false);
 
-    render(<RecentMessageLoader onMessageLoaded={jest.fn()} inputs={inputs} />);
+      render(<RecentMessageLoader onMessageLoaded={jest.fn()} inputs={inputs} />);
 
-    expect(screen.getByText(/select an input profile from the list/i)).toBeInTheDocument();
-    expect(screen.getByText(/forwarder inputs/i)).toBeInTheDocument();
+      expect(screen.getByRole('combobox', { name: /input type select/i })).toBeInTheDocument();
+
+      const inputTypeDropdown = screen.getByDisplayValue(/select an input type/i);
+
+      expect(inputTypeDropdown).toBeInTheDocument();
+
+      userEvent.selectOptions(inputTypeDropdown, ['server']);
+
+      expect(screen.getByText(/select an input from the list below/i)).toBeInTheDocument();
+      expect(screen.getByRole('combobox', { name: /server input select/i })).toBeInTheDocument();
+      expect(screen.getByDisplayValue(/select an input/i)).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /load message/i })).toBeInTheDocument();
+      expect(screen.queryByText(/select an input profile from the list/i)).not.toBeInTheDocument();
+      expect(screen.queryByText(/forwarder inputs/i)).not.toBeInTheDocument();
+
+      userEvent.selectOptions(inputTypeDropdown, ['forwarder']);
+
+      expect(screen.getByText(/select an input profile from the list/i)).toBeInTheDocument();
+      expect(screen.getByText(/forwarder inputs/i)).toBeInTheDocument();
+      expect(screen.queryByRole('combobox', { name: /server input select/i })).not.toBeInTheDocument();
+    });
+
+    it('shows only forwarder input select on cloud', () => {
+      asMock(AppConfig.isCloud).mockImplementation(() => true);
+
+      render(<RecentMessageLoader onMessageLoaded={jest.fn()} inputs={inputs} />);
+
+      expect(screen.getByText(/select an input profile from the list/i)).toBeInTheDocument();
+      expect(screen.getByText(/forwarder inputs/i)).toBeInTheDocument();
+
+      expect(screen.queryByRole('combobox', { name: /server input select/i })).not.toBeInTheDocument();
+      expect(screen.queryByDisplayValue(/select an input/i)).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /load message/i })).not.toBeInTheDocument();
+    });
   });
 });

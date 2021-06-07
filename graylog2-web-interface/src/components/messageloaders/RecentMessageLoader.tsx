@@ -26,14 +26,22 @@ import InputDropdown from 'components/inputs/InputDropdown';
 import UserNotification from 'util/UserNotification';
 import StoreProvider from 'injection/StoreProvider';
 import type { Message } from 'views/components/messagelist/Types';
+import { Input } from 'components/bootstrap';
 
-import type { Input } from './Types';
+import type { Input as InputType } from './Types';
 
 const UniversalSearchStore = StoreProvider.getStore('UniversalSearch');
-const isCloud = AppConfig.isCloud();
 
-const StyledContainer = styled.div`
+const LoaderContainer = styled.div`
   margin-top: 5px;
+`;
+
+const Description = styled.p`
+  margin-bottom: 0.5em;
+`;
+
+const StyledSelect = styled(Input)`
+  width: 200px;
 `;
 
 const useForwarderMessageLoaders = () => {
@@ -43,7 +51,7 @@ const useForwarderMessageLoaders = () => {
 };
 
 type ServerInputSelectProps = {
-  inputs: Immutable.Map<string, Input>,
+  inputs: Immutable.Map<string, InputType>,
   onChange: (inputId: string) => void,
   selectedInputId: string | undefined,
   isLoading: boolean,
@@ -52,9 +60,11 @@ type ServerInputSelectProps = {
 const ServerInputSelect = ({ selectedInputId, inputs, onChange, isLoading }: ServerInputSelectProps) => {
   return (
     <fieldset>
-      {selectedInputId
-        ? 'Click on "Load Message" to load the most recent message received by this input within the last hour.'
-        : 'Select an Input from the list below and click "Load Message" to load the most recent message received by this input within the last hour.'}
+      <Description>
+        {selectedInputId
+          ? 'Click on "Load Message" to load the most recent message received by this input within the last hour.'
+          : 'Select an Input from the list below and click "Load Message" to load the most recent message received by this input within the last hour.'}
+      </Description>
       <InputDropdown inputs={inputs}
                      preselectedInputId={selectedInputId}
                      onLoadMessage={onChange}
@@ -74,30 +84,34 @@ const ForwarderInputSelect = ({ selectedInputId, onChange, isLoading }: Forwader
   const { ForwarderInputDropdown } = useForwarderMessageLoaders();
 
   return (
-    <Row>
-      <Col md={8}>
-        <p className="description">
-          Select an Input profile from the list below then select an then select an Input and click
-          on &quot;Load message&quot; to load most recent message received by this input within the last hour.
-        </p>
-        <ForwarderInputDropdown onLoadMessage={onChange}
-                                title={isLoading ? 'Loading message...' : 'Load Message'}
-                                preselectedInputId={selectedInputId}
-                                loadButtonDisabled={isLoading} />
-      </Col>
-    </Row>
+    <fieldset>
+      <Description>
+        Select an Input profile from the list below then select an then select an Input and click
+        on &quot;Load message&quot; to load most recent message received by this input within the last hour.
+      </Description>
+      <Row>
+        <Col md={8}>
+          <ForwarderInputDropdown onLoadMessage={onChange}
+                                  title={isLoading ? 'Loading message...' : 'Load Message'}
+                                  preselectedInputId={selectedInputId}
+                                  loadButtonDisabled={isLoading} />
+        </Col>
+      </Row>
+    </fieldset>
   );
 };
 
 type Props = {
-  inputs: Immutable.Map<string, Input>,
+  inputs: Immutable.Map<string, InputType>,
   onMessageLoaded: (message?: Message) => void,
   selectedInputId?: string,
 };
 
 const RecentMessageLoader = ({ inputs, onMessageLoaded, selectedInputId }: Props) => {
   const [loading, setLoading] = useState<boolean>(false);
+  const [selectedInputType, setSelectedInputType] = useState<'forwarder' | 'server'>(undefined);
   const { ForwarderInputDropdown } = useForwarderMessageLoaders();
+  const isCloud = AppConfig.isCloud();
 
   const onClick = (inputId: string) => {
     const input = inputs && inputs.get(inputId);
@@ -123,15 +137,48 @@ const RecentMessageLoader = ({ inputs, onMessageLoaded, selectedInputId }: Props
     promise.finally(() => setLoading(false));
   };
 
+  if (isCloud) {
+    return (
+      <LoaderContainer>
+        <ForwarderInputSelect selectedInputId={selectedInputId} onChange={onClick} isLoading={loading} />
+      </LoaderContainer>
+    );
+  }
+
   return (
-    <StyledContainer>
+    <LoaderContainer>
       {ForwarderInputDropdown
         ? (
-          <ForwarderInputSelect selectedInputId={selectedInputId} onChange={onClick} isLoading={loading} />
+          <>
+            <fieldset>
+              <Description>
+                Select the Input type you want to load the message from.
+              </Description>
+              <StyledSelect id="inputTypeSelect"
+                            aria-label="input type select"
+                            type="select"
+                            value={selectedInputType ?? 'placeholder'}
+                            onChange={(e) => setSelectedInputType(e.target.value)}>
+                <option value="placeholder" disabled>Select an Input type</option>
+                <option value="server">Server Input</option>
+                <option value="forwarder">Forwarder Input</option>
+              </StyledSelect>
+            </fieldset>
+
+            {selectedInputType === 'server' && (
+              <ServerInputSelect selectedInputId={selectedInputId}
+                                 inputs={inputs}
+                                 onChange={onClick}
+                                 isLoading={loading} />
+            )}
+            {selectedInputType === 'forwarder' && (
+              <ForwarderInputSelect selectedInputId={selectedInputId} onChange={onClick} isLoading={loading} />
+            )}
+          </>
         ) : (
           <ServerInputSelect selectedInputId={selectedInputId} inputs={inputs} onChange={onClick} isLoading={loading} />
         )}
-    </StyledContainer>
+    </LoaderContainer>
   );
 };
 
