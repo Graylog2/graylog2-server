@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useEffect, useContext } from 'react';
+import { useCallback, useEffect, useContext, useState } from 'react';
 import * as Immutable from 'immutable';
 import styled, { css } from 'styled-components';
 
@@ -60,6 +60,7 @@ import SearchPageLayoutProvider from 'views/components/contexts/SearchPageLayout
 import usePluginEntities from 'views/logic/usePluginEntities';
 import WidgetFocusProvider from 'views/components/contexts/WidgetFocusProvider';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
+import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 
 const GridContainer = styled.div<{ interactive: boolean }>(({ interactive }) => {
   return interactive ? css`
@@ -108,7 +109,7 @@ type Props = {
   location: Location,
 };
 
-const _searchRefreshConditionChain = (searchRefreshHooks, state: SearchRefreshConditionArguments) => {
+const _searchRefreshConditionChain = (searchRefreshHooks: Array<SearchRefreshCondition>, state: SearchRefreshConditionArguments) => {
   if (!searchRefreshHooks || searchRefreshHooks.length === 0) {
     return true;
   }
@@ -116,15 +117,19 @@ const _searchRefreshConditionChain = (searchRefreshHooks, state: SearchRefreshCo
   return searchRefreshHooks.every((condition: SearchRefreshCondition) => condition(state));
 };
 
-const _refreshIfNotUndeclared = (searchRefreshHooks, executionState) => {
+const _refreshIfNotUndeclared = (searchRefreshHooks: Array<SearchRefreshCondition>, executionState: SearchExecutionState, setHasErrors: (hasErrors: boolean) => void) => {
   const { view } = ViewStore.getInitialState();
 
   return SearchMetadataActions.parseSearch(view.search).then((searchMetadata) => {
     if (_searchRefreshConditionChain(searchRefreshHooks, { view, searchMetadata, executionState })) {
       FieldTypesActions.refresh();
 
+      setHasErrors(false);
+
       return SearchActions.execute(executionState);
     }
+
+    setHasErrors(true);
 
     return Promise.reject(searchMetadata);
   });
@@ -145,8 +150,9 @@ const Search = ({ location }: Props) => {
   const { pathname, search } = location;
   const query = `${pathname}${search}`;
   const searchRefreshHooks = usePluginEntities('views.hooks.searchRefresh');
+  const [hasErrors, setHasErrors] = useState(false);
   const refreshIfNotUndeclared = useCallback(
-    () => _refreshIfNotUndeclared(searchRefreshHooks, SearchExecutionStateStore.getInitialState()),
+    () => _refreshIfNotUndeclared(searchRefreshHooks, SearchExecutionStateStore.getInitialState(), setHasErrors),
     [searchRefreshHooks],
   );
 
@@ -213,9 +219,11 @@ const Search = ({ location }: Props) => {
                                 {!focusingWidget && <QueryBar />}
                               </IfDashboard>
                             </IfInteractive>
+                            {!hasErrors && (
                             <HighlightMessageInQuery>
                               <SearchResult />
                             </HighlightMessageInQuery>
+                            )}
                           </SearchArea>
                         </GridContainer>
                       </HighlightingRulesProvider>
@@ -230,7 +238,5 @@ const Search = ({ location }: Props) => {
     </WidgetFocusProvider>
   );
 };
-
-Search.propTypes = {};
 
 export default withLocation(Search);
