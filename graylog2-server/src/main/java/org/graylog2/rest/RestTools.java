@@ -122,8 +122,7 @@ public class RestTools {
 
     public static URI buildRelativeExternalUri(@NotNull MultivaluedMap<String, String> httpHeaders, @NotNull URI defaultUri) {
         final URI externalUri = RestTools.buildExternalUri(httpHeaders, defaultUri);
-        final String path = externalUri.getPath() + (externalUri.getPath().endsWith("/") ? "" : "/");
-        return URI.create(path);
+        return URI.create(externalUri.getPath());
     }
 
     public static String getPathFromResource(Resource resource) {
