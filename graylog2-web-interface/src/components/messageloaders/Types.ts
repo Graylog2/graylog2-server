@@ -23,10 +23,12 @@ export type Input = {
   attributes: {
     [type: string]: any,
   },
-  input_profile_id: string,
-  version: number,
   created_at: string,
-  content_pack?: boolean;
+  creator_user_id: string,
+  content_pack?: boolean,
+  global: boolean,
+  static_fields: { [field: string]: any },
+  node?: string,
 };
 
 export type Codec ={
