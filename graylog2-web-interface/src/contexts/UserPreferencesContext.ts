@@ -15,17 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { TThemeMode } from '@graylog/sawmill/types';
 
-import { DEFAULT_THEME_MODE, PREFERENCES_THEME_MODE, ThemeMode } from 'theme/constants';
-
-import { singleton } from '../views/logic/singleton';
+import { DEFAULT_THEME_MODE, PREFERENCES_THEME_MODE } from 'theme/constants';
+import { singleton } from 'views/logic/singleton';
 
 export type UserPreferences = {
   enableSmartSearch: boolean,
   updateUnfocussed: boolean,
   searchSidebarIsPinned?: boolean,
   dashboardSidebarIsPinned?: boolean,
-  [PREFERENCES_THEME_MODE]: ThemeMode,
+  [PREFERENCES_THEME_MODE]: TThemeMode,
 };
 
 export const defaultUserPreferences = {

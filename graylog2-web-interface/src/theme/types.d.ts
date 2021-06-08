@@ -14,9 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { TColors, TColorVariants, TThemeColorModes } from '@graylog/sawmill';
-
-import { ThemeMode } from 'theme/constants';
+import type { TColors, TColorVariants, TThemeColorModes, TThemeMode } from '@graylog/sawmill/types';
 
 interface CustomizationHooks {
   useThemeCustomizer: () => ({
@@ -24,7 +22,7 @@ interface CustomizationHooks {
     customThemeColors: {},
     isDefaultColors: boolean,
     isSaved: boolean,
-    onChangeTheme: ({ mode, key, type, hex }: {mode:ThemeMode, key:string, type:string, hex:string}) => void,
+    onChangeTheme: ({ mode, key, type, hex }: {mode:TThemeMode, key:string, type:string, hex:string}) => void,
     onResetTheme: () => Promise,
     onRevertTheme: () => Promise,
     onSaveTheme: () => Promise,
@@ -32,7 +30,7 @@ interface CustomizationHooks {
 }
 
 interface CustomizationActions {
-  generateCustomThemeColors: ({ graylogColors, mode, initialLoad }: {graylogColors: TColors, mode: ThemeMode, initialLoad: boolean}) => Promise,
+  generateCustomThemeColors: ({ graylogColors, mode, initialLoad }: {graylogColors: TColors, mode: TThemeMode, initialLoad: boolean}) => Promise,
 }
 
 interface CustomizationType {

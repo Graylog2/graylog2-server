@@ -22,7 +22,7 @@ declare module 'styled-components' {
   import type { Utils } from 'src/theme/utils';
   import type { ThemeMode } from 'src/theme/constants';
   // eslint-disable-next-line import/order
-  import type { TBreakpoints, TColors, TFonts, TSpacings } from '@graylog/sawmill';
+  import type { TBreakpoints, TColors, TFonts, TSpacings } from '@graylog/sawmill/types';
 
   export interface DefaultTheme {
     breakpoints: TBreakpoints,

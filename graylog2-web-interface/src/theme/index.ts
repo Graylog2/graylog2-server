@@ -16,17 +16,15 @@
  */
 import PropTypes from 'prop-types';
 import {
-  breakpoints, colors, fonts, spacings,
-  PropTypeBreakpoints, PropTypeColors, PropTypeFonts, PropTypeSpacings,
+  breakpoints, colors, fonts, spacings, utils,
+  PropTypeBreakpoints, PropTypeColors, PropTypeFonts, PropTypeSpacings, PropTypeUtils,
 } from '@graylog/sawmill';
-
-import utils, { utilsPropTypes } from './utils';
 
 const themePropTypes = PropTypes.shape({
   breakpoints: PropTypeBreakpoints,
   colors: PropTypeColors,
   fonts: PropTypeFonts,
-  utils: utilsPropTypes,
+  utils: PropTypeUtils,
   spacings: PropTypeSpacings,
 });
 

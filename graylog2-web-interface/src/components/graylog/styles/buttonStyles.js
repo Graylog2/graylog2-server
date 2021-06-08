@@ -28,7 +28,7 @@ const buttonStyles = ({ colors, utils }) => {
     warning: colors.variant.warning,
   };
 
-  const mixColor = (originalColor) => chroma.mix(originalColor, colors.global.textDefault, 0.15);
+  const mixColor = (originalColor, adjustColor = colors.global.textDefault, ratio = 0.15) => chroma.mix(originalColor, adjustColor, ratio).hex();
 
   return Object.keys(variants).map((variant) => {
     const variantColor = variants[variant];
@@ -37,15 +37,15 @@ const buttonStyles = ({ colors, utils }) => {
     const buttonAdjustColor = chroma(variantColor).luminance() > 0.5 ? colors.global.textDefault : colors.global.textAlt;
 
     const defaultBackground = variantColor;
-    const defaultBorder = isLink ? variants.link : chroma.mix(variantColor, buttonAdjustColor, 0.05);
+    const defaultBorder = isLink ? variants.link : mixColor(variantColor, buttonAdjustColor, 0.05);
     const defaultColor = isLink ? colors.global.link : utils.contrastingColor(defaultBackground);
 
-    const activeBackground = isLink ? variants.link : chroma.mix(variantColor, buttonAdjustColor, 0.10);
-    const activeBorder = isLink ? variants.link : chroma.mix(variantColor, buttonAdjustColor, 0.15);
+    const activeBackground = isLink ? variants.link : mixColor(variantColor, buttonAdjustColor, 0.10);
+    const activeBorder = isLink ? variants.link : mixColor(variantColor, buttonAdjustColor, 0.15);
     const activeColor = isLink ? colors.global.linkHover : utils.contrastingColor(activeBackground);
 
-    const disabledBackground = isLink ? variants.link : chroma.mix(variantColor, buttonAdjustColor, 0.20);
-    const disabledBorder = isLink ? variants.link : chroma.mix(variantColor, buttonAdjustColor, 0.15);
+    const disabledBackground = isLink ? variants.link : mixColor(variantColor, buttonAdjustColor, 0.20);
+    const disabledBorder = isLink ? variants.link : mixColor(variantColor, buttonAdjustColor, 0.15);
     const disabledColor = isLink ? colors.global.link : utils.contrastingColor(disabledBackground, 'AA');
 
     const hoverBackground = isLink ? 'transparent' : mixColor(defaultBackground);
