@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import * as Immutable from 'immutable';
@@ -102,7 +102,7 @@ const ForwarderInputSelect = ({ selectedInputId, onChange, isLoading }: Forwader
 };
 
 type Props = {
-  inputs: Immutable.Map<string, InputType>,
+  inputs?: Immutable.Map<string, InputType>,
   onMessageLoaded: (message?: Message) => void,
   selectedInputId?: string,
 };
@@ -111,18 +111,14 @@ const RecentMessageLoader = ({ inputs, onMessageLoaded, selectedInputId }: Props
   const [loading, setLoading] = useState<boolean>(false);
   const { ForwarderInputDropdown } = useForwarderMessageLoaders();
 
-  const [selectedInputType, setSelectedInputType] = useState<'forwarder' | 'server'>(() => {
-    if (selectedInputId) {
-      return inputs?.get(selectedInputId) ? 'server' : 'forwarder';
-    }
-
-    if (ForwarderInputDropdown) {
-      return undefined;
-    }
-
-    return 'server';
-  });
+  const [selectedInputType, setSelectedInputType] = useState<'forwarder' | 'server'>(ForwarderInputDropdown ? undefined : 'server');
   const isCloud = AppConfig.isCloud();
+
+  useEffect(() => {
+    if (selectedInputId && inputs) {
+      setSelectedInputType(inputs?.get(selectedInputId) ? 'server' : 'forwarder');
+    }
+  }, [inputs, selectedInputId]);
 
   const onClick = (inputId: string) => {
     const input = inputs && inputs.get(inputId);
@@ -203,7 +199,7 @@ RecentMessageLoader.propTypes = {
 };
 
 RecentMessageLoader.defaultProps = {
-  inputs: Immutable.Map(),
+  inputs: undefined,
   selectedInputId: undefined,
 };
 
