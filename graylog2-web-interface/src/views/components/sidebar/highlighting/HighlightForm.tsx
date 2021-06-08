@@ -73,6 +73,8 @@ type GradientColorObject = {
 };
 
 const colorToObject = (color: HighlightingColor | undefined): StaticColorObject | GradientColorObject => {
+  const defaultColorType = 'static';
+
   if (color?.type === 'static') {
     const { type, color: staticColor } = color as StaticColor;
 
@@ -93,7 +95,10 @@ const colorToObject = (color: HighlightingColor | undefined): StaticColorObject 
     };
   }
 
-  return undefined;
+  return {
+    type: defaultColorType,
+    color: undefined,
+  };
 };
 
 const colorFromObject = (color: StaticColorObject | GradientColorObject) => {
