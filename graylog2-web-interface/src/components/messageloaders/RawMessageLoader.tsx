@@ -228,6 +228,7 @@ const RawMessageLoader = ({ onMessageLoaded, inputIdSelector, codecTypes, inputs
                  label={<span>Message input <small>(optional)</small></span>}
                  help="Select the message input ID that should be assigned to the parsed message.">
             <Select id="input"
+                    aria-label="Message input"
                     placeholder="Select input"
                     options={_formatInputSelectOptions()}
                     matchProp="label"
@@ -280,6 +281,7 @@ const RawMessageLoader = ({ onMessageLoaded, inputIdSelector, codecTypes, inputs
                    help="Select the codec that should be used to decode the message."
                    required>
               <Select id="codec"
+                      aria-label="Message codec"
                       placeholder="Select codec"
                       options={_formatSelectOptions()}
                       matchProp="label"
