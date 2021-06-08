@@ -858,11 +858,19 @@ Object.defineProperties(Request.prototype, {
 
   url: {
     get: function() {
-      if (!this.scheme) { return null; }
-      return sprintf("%s://%s:%s%s",
-          this.scheme, this.host, this.port,
-          (this.proxy ? "/" : this.path) +
-          (this.query ? ("?" + this.query) : ""));
+      let result = '';
+      if (this.scheme) {
+        result += this.scheme + "://";
+      }
+
+      if (this.host) {
+        result += this.host;
+      }
+
+      if (this.port) {
+        result += ':' + this.port;
+      }
+      return result + (this.proxy ? "/" : this.path) + (this.query ? ("?" + this.query) : "");
     },
     set: function(_url) {
       _url = parseUri(_url);
@@ -895,13 +903,6 @@ Object.defineProperties(Request.prototype, {
 
   port: {
     get: function() {
-      if (!this._port) {
-        switch(this.scheme) {
-          case "https": return this._port = 443;
-          case "http":
-          default: return this._port = 80;
-        }
-      }
       return this._port;
     },
     set: function(value) { this._port = value; return this; },

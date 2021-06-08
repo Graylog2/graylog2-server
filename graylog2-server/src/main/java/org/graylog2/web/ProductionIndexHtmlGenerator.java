@@ -26,6 +26,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.core.MultivaluedMap;
 import java.io.IOException;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
@@ -72,11 +73,12 @@ public class ProductionIndexHtmlGenerator implements IndexHtmlGenerator {
 
     @Override
     public String get(MultivaluedMap<String, String> headers) {
+        final URI relativePath = RestTools.buildRelativeExternalUri(headers, httpConfiguration.getHttpExternalUri());
         final Map<String, Object> model = ImmutableMap.<String, Object>builder()
                 .put("title", "Graylog Web Interface")
                 .put("cssFiles", cssFiles)
                 .put("jsFiles", sortedJsFiles)
-                .put("appPrefix", RestTools.buildExternalUri(headers, httpConfiguration.getHttpExternalUri()))
+                .put("appPrefix", relativePath)
                 .build();
         return templateEngine.transform(template, model);
     }
