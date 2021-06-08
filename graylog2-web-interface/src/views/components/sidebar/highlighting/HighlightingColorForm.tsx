@@ -219,34 +219,32 @@ const HighlightingColorForm = ({ field }: Props) => {
 
   return (
     <Field name="color.type" validate={(value) => validateColoringType(value, isNumeric)}>
-      {({ field: { name, value }, meta }) => {
-        return (
-          <>
-            <Input id={`${name}-coloring`}
-                   label="Coloring"
-                   error={meta?.error}>
-              <Container>
-                <Input checked={value === 'static'}
-                       formGroupClassName=""
-                       id={name}
-                       label="Static Color"
-                       onChange={onChangeType}
-                       type="radio"
-                       value="static" />
-                <Input checked={value === 'gradient'}
-                       formGroupClassName=""
-                       id={name}
-                       disabled={!isNumeric}
-                       label="Gradient"
-                       onChange={onChangeType}
-                       type="radio"
-                       value="gradient" />
-              </Container>
-            </Input>
-            {value && <ColorForm type={value} />}
-          </>
-        );
-      }}
+      {({ field: { name, value }, meta }) => (
+        <>
+          <Input id={`${name}-coloring`}
+                 label="Coloring"
+                 error={meta?.error}>
+            <Container>
+              <Input checked={value === 'static'}
+                     formGroupClassName=""
+                     id={name}
+                     label="Static Color"
+                     onChange={onChangeType}
+                     type="radio"
+                     value="static" />
+              <Input checked={value === 'gradient'}
+                     formGroupClassName=""
+                     id={name}
+                     disabled={!isNumeric}
+                     label="Gradient"
+                     onChange={onChangeType}
+                     type="radio"
+                     value="gradient" />
+            </Container>
+          </Input>
+          {value && <ColorForm type={value} />}
+        </>
+      )}
     </Field>
   );
 };
