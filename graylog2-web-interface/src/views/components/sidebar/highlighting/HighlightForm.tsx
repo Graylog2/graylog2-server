@@ -31,7 +31,8 @@ import HighlightingRule, {
   ConditionLabelMap,
   StringConditionLabelMap,
 } from 'views/logic/views/formatting/highlighting/HighlightingRule';
-import HighlightingColorForm from 'views/components/sidebar/highlighting/HighlightingColorForm';
+import HighlightingColorForm, { createNewColor } from 'views/components/sidebar/highlighting/HighlightingColorForm';
+import type { StaticColorObject, GradientColorObject } from 'views/components/sidebar/highlighting/HighlightingColorForm';
 import { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import Series, { isFunction } from 'views/logic/aggregationbuilder/Series';
 import inferTypeForSeries from 'views/logic/fieldtypes/InferTypeForSeries';
@@ -60,18 +61,6 @@ const fieldTypeFor = (fields: FieldTypeMappingsList, selectedField: string) => (
   ? inferTypeForSeries(Series.forFunction(selectedField), fields)
   : fields.find((field) => field.name === selectedField));
 
-type StaticColorObject = {
-  type: 'static',
-  color: string,
-};
-
-type GradientColorObject = {
-  type: 'gradient',
-  gradient: string,
-  upper: number,
-  lower: number,
-};
-
 const colorToObject = (color: HighlightingColor | undefined): StaticColorObject | GradientColorObject => {
   const defaultColorType = 'static';
 
@@ -95,10 +84,7 @@ const colorToObject = (color: HighlightingColor | undefined): StaticColorObject 
     };
   }
 
-  return {
-    type: defaultColorType,
-    color: undefined,
-  };
+  return createNewColor(defaultColorType);
 };
 
 const colorFromObject = (color: StaticColorObject | GradientColorObject) => {
@@ -140,6 +126,7 @@ const HighlightForm = ({ onClose, rule }: Props) => {
 
   return (
     <Formik onSubmit={onSubmit}
+            validateOnMount
             initialValues={{
               field: rule?.field,
               value: rule?.value,

@@ -37,6 +37,20 @@ type ColorPickerProps = {
   type: string,
 };
 
+export type StaticColorObject = {
+  type: 'static',
+  color: string,
+};
+
+export type GradientColorObject = {
+  type: 'gradient',
+  gradient: string,
+  upper: number,
+  lower: number,
+};
+
+export type ColorType = StaticColorObject['type'] | GradientColorObject['type'];
+
 const StaticColorPicker = () => (
   <Field name="color.color">
     {({ field: { name, value, onChange }, meta }) => (
@@ -157,13 +171,11 @@ const Container = styled.div`
   margin-left: 10px;
 `;
 
-const _typeIsRequired = () => {};
-
 const randomColor = () => DEFAULT_CUSTOM_HIGHLIGHT_RANGE[
   Math.floor(Math.random() * DEFAULT_CUSTOM_HIGHLIGHT_RANGE.length)
 ];
 
-const createNewColor = (newType: string) => {
+export const createNewColor = (newType: ColorType): StaticColorObject | GradientColorObject => {
   if (newType === 'static') {
     return {
       type: 'static',
@@ -184,8 +196,6 @@ const createNewColor = (newType: string) => {
 };
 
 export const validateColoringType = (value, fieldIsNumeric) => {
-  console.log('validateColoringType', value, fieldIsNumeric);
-
   if (!value || value === '') {
     return 'Coloring is required';
   }
@@ -199,13 +209,12 @@ export const validateColoringType = (value, fieldIsNumeric) => {
 
 const HighlightingColorForm = ({ field }: Props) => {
   const isNumeric = field?.type?.isNumeric() ?? false;
-  const isDisabled = field === undefined;
 
   const { setFieldValue } = useFormikContext();
 
   const onChangeType = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const { target: { value: newType } } = e;
-    setFieldValue('color', createNewColor(newType));
+    setFieldValue('color', createNewColor(newType as ColorType));
   }, [setFieldValue]);
 
   return (
@@ -220,7 +229,6 @@ const HighlightingColorForm = ({ field }: Props) => {
                 <Input checked={value === 'static'}
                        formGroupClassName=""
                        id={name}
-                       disabled={isDisabled}
                        label="Static Color"
                        onChange={onChangeType}
                        type="radio"
@@ -228,7 +236,7 @@ const HighlightingColorForm = ({ field }: Props) => {
                 <Input checked={value === 'gradient'}
                        formGroupClassName=""
                        id={name}
-                       disabled={isDisabled || !isNumeric}
+                       disabled={!isNumeric}
                        label="Gradient"
                        onChange={onChangeType}
                        type="radio"
