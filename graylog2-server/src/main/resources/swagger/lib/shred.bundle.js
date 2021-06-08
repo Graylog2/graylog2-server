@@ -903,13 +903,6 @@ Object.defineProperties(Request.prototype, {
 
   port: {
     get: function() {
-      /*if (!this._port) {
-        switch(this.scheme) {
-          case "https": return this._port = 443;
-          case "http":
-          default: return this._port = 80;
-        }
-      }*/
       return this._port;
     },
     set: function(value) { this._port = value; return this; },
