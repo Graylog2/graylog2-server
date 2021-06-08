@@ -178,7 +178,7 @@ const HighlightForm = ({ onClose, rule }: Props) => {
                            type="text"
                            error={meta?.error}
                            onChange={onChange}
-                           value={value}
+                           value={value ?? ''}
                            label="Value" />
                   )}
                 </Field>
