@@ -99,6 +99,7 @@ const ForwarderInputSelect = ({ onInputSelect }: Pick<InputSelectProps, 'onInput
 
 const InputSelect = ({ inputs, selectedInputId, onInputSelect, show }: InputSelectProps) => {
   const { ForwarderInputDropdown } = useForwarderMessageLoaders();
+  const [selectedInputType, setSelectedInputType] = useState<'server' | 'forwarder' | undefined>();
 
   if (!show) {
     return null;
@@ -108,7 +109,31 @@ const InputSelect = ({ inputs, selectedInputId, onInputSelect, show }: InputSele
     return <ForwarderInputSelect onInputSelect={onInputSelect} />;
   }
 
-  return <ServerInputSelect inputs={inputs} selectedInputId={selectedInputId} onInputSelect={onInputSelect} />;
+  return ForwarderInputDropdown ? (
+    <>
+      <Input id="inputTypeSelect"
+             aria-label="input type select"
+             type="select"
+             label="Select an Input type"
+             help="Select the Input type you want to load the message from."
+             value={selectedInputType ?? 'placeholder'}
+             disabled={!!selectedInputId}
+             onChange={(e) => setSelectedInputType(e.target.value)}>
+        <option value="placeholder" disabled>Select an Input type</option>
+        <option value="server">Server Input</option>
+        <option value="forwarder">Forwarder Input</option>
+      </Input>
+
+      {selectedInputType === 'server' && (
+        <ServerInputSelect inputs={inputs} selectedInputId={selectedInputId} onInputSelect={onInputSelect} />
+      )}
+      {selectedInputType === 'forwarder' && (
+        <ForwarderInputSelect onInputSelect={onInputSelect} />
+      )}
+    </>
+  ) : (
+    <ServerInputSelect inputs={inputs} selectedInputId={selectedInputId} onInputSelect={onInputSelect} />
+  );
 };
 
 type OptionsType = {
