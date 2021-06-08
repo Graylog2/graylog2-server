@@ -183,6 +183,20 @@ const createNewColor = (newType: string) => {
   throw new Error(`Invalid color type: ${newType}`);
 };
 
+export const validateColoringType = (value, fieldIsNumeric) => {
+  console.log('validateColoringType', value, fieldIsNumeric);
+
+  if (!value || value === '') {
+    return 'Coloring is required';
+  }
+
+  if (!fieldIsNumeric && value === 'gradient') {
+    return 'A gradient can only be defined for numeric fields.';
+  }
+
+  return undefined;
+};
+
 const HighlightingColorForm = ({ field }: Props) => {
   const isNumeric = field?.type?.isNumeric() ?? false;
   const isDisabled = field === undefined;
@@ -195,34 +209,36 @@ const HighlightingColorForm = ({ field }: Props) => {
   }, [setFieldValue]);
 
   return (
-    <Field name="color.type" validate={_typeIsRequired}>
-      {({ field: { name, value } }, meta) => (
-        <>
-          <Input id={`${name}-coloring`}
-                 label="Coloring"
-                 error={meta?.error}>
-            <Container>
-              <Input checked={value === 'static'}
-                     formGroupClassName=""
-                     id={name}
-                     disabled={isDisabled}
-                     label="Static Color"
-                     onChange={onChangeType}
-                     type="radio"
-                     value="static" />
-              <Input checked={value === 'gradient'}
-                     formGroupClassName=""
-                     id={name}
-                     disabled={isDisabled || !isNumeric}
-                     label="Gradient"
-                     onChange={onChangeType}
-                     type="radio"
-                     value="gradient" />
-            </Container>
-          </Input>
-          {value && <ColorForm type={value} />}
-        </>
-      )}
+    <Field name="color.type" validate={(value) => validateColoringType(value, isNumeric)}>
+      {({ field: { name, value }, meta }) => {
+        return (
+          <>
+            <Input id={`${name}-coloring`}
+                   label="Coloring"
+                   error={meta?.error}>
+              <Container>
+                <Input checked={value === 'static'}
+                       formGroupClassName=""
+                       id={name}
+                       disabled={isDisabled}
+                       label="Static Color"
+                       onChange={onChangeType}
+                       type="radio"
+                       value="static" />
+                <Input checked={value === 'gradient'}
+                       formGroupClassName=""
+                       id={name}
+                       disabled={isDisabled || !isNumeric}
+                       label="Gradient"
+                       onChange={onChangeType}
+                       type="radio"
+                       value="gradient" />
+              </Container>
+            </Input>
+            {value && <ColorForm type={value} />}
+          </>
+        );
+      }}
     </Field>
   );
 };
