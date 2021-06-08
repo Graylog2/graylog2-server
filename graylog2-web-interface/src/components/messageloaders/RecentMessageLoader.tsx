@@ -16,7 +16,6 @@
  */
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 import * as Immutable from 'immutable';
 import styled from 'styled-components';
 
@@ -27,6 +26,7 @@ import UserNotification from 'util/UserNotification';
 import StoreProvider from 'injection/StoreProvider';
 import type { Message } from 'views/components/messagelist/Types';
 import { Input } from 'components/bootstrap';
+import useForwarderMessageLoaders from 'components/messageloaders/useForwarderMessageLoaders';
 
 import type { Input as InputType } from './Types';
 
@@ -43,12 +43,6 @@ const Description = styled.p`
 const StyledSelect = styled(Input)`
   width: 200px;
 `;
-
-const useForwarderMessageLoaders = () => {
-  const messageLoaders = PluginStore.exports('forwarder')?.[0]?.messageLoaders;
-
-  return messageLoaders || { ForwarderInputDropdown: undefined };
-};
 
 type ServerInputSelectProps = {
   inputs: Immutable.Map<string, InputType>,
