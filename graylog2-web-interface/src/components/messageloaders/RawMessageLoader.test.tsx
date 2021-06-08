@@ -18,7 +18,10 @@
 import React from 'react';
 import { screen, render } from 'wrappedTestingLibrary';
 import { StoreMock as MockStore, CombinedProviderMock as MockCombinedProvider } from 'helpers/mocking';
+import asMock from 'helpers/mocking/AsMock';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import AppConfig from 'util/AppConfig';
 import { inputs } from 'components/messageloaders/MessageLoaders.fixtures';
 
 import RawMessageLoader from './RawMessageLoader';
@@ -52,6 +55,28 @@ describe('<RawMessageLoader.test>', () => {
     expect(screen.getByRole('textbox', { name: /raw message/i })).toBeInTheDocument();
     expect(screen.getByRole('textbox', { name: /source ip address \(optional\)/i })).toBeInTheDocument();
     expect(screen.getByLabelText(/message input/i)).toBeInTheDocument();
+    expect(screen.getByText(/select input/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/message codec/i)).toBeInTheDocument();
+  });
+
+  describe('with forwarder plugin installed', () => {
+    beforeEach(() => {
+      asMock(PluginStore.exports).mockImplementation((type) => ({
+        forwarder: [{
+          messageLoaders: {
+            ForwarderInputDropdown: () => <>Forwarder Inputs</>,
+          },
+        }],
+      }[type]));
+    });
+
+    it('shows only forwarder input select on cloud', () => {
+      asMock(AppConfig.isCloud).mockImplementation(() => true);
+
+      render(<RawMessageLoader inputs={inputs} onMessageLoaded={jest.fn()} codecTypes={{}} inputIdSelector />);
+
+      expect(screen.getByText(/input selection \(optional\)/i)).toBeInTheDocument();
+      expect(screen.getByText(/forwarder inputs/i)).toBeInTheDocument();
+    });
   });
 });

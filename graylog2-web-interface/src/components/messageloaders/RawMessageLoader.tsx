@@ -18,6 +18,7 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
+import { Subtract } from 'utility-types';
 
 import { getValueFromInput } from 'util/FormsUtils';
 import { Col, Row, Button } from 'components/graylog';
@@ -28,6 +29,7 @@ import CombinedProvider from 'injection/CombinedProvider';
 import connect from 'stores/connect';
 import type { Message } from 'views/components/messagelist/Types';
 import useForwarderMessageLoaders from 'components/messageloaders/useForwarderMessageLoaders';
+import AppConfig from 'util/AppConfig';
 
 import type { Input as InputType, CodecTypes } from './Types';
 
@@ -36,20 +38,14 @@ const { CodecTypesActions, CodecTypesStore } = CombinedProvider.get('CodecTypes'
 const { InputsActions, InputsStore } = CombinedProvider.get('Inputs');
 const DEFAULT_REMOTE_ADDRESS = '127.0.0.1';
 
-type InputIdSelectorProps = {
+type InputSelectProps = {
   inputs: Immutable.Map<string, InputType>,
   selectedInputId: string | undefined,
   onInputSelect: (selectedInputId: string) => void,
   show: boolean,
 };
 
-const InputIdSelector = ({ inputs, selectedInputId, onInputSelect, show }: InputIdSelectorProps) => {
-  const { ForwarderInputDropdown } = useForwarderMessageLoaders();
-
-  if (!show) {
-    return null;
-  }
-
+const ServerInputSelect = ({ inputs, selectedInputId, onInputSelect }: Subtract<InputSelectProps, {show}>) => {
   const _formatInputSelectOptions = () => {
     if (!inputs) {
       return [{ value: 'none', label: 'Loading inputs...', disabled: true }];
@@ -72,17 +68,6 @@ const InputIdSelector = ({ inputs, selectedInputId, onInputSelect, show }: Input
     return formattedInputs;
   };
 
-  if (ForwarderInputDropdown) {
-    return (
-      <fieldset>
-        <legend>Input selection (optional)</legend>
-        <ForwarderInputDropdown onLoadMessage={onInputSelect}
-                                autoLoadMessage />
-        <p className="description">Select an Input profile from the list below then select an then select an Input.</p>
-      </fieldset>
-    );
-  }
-
   return (
     <Input id="input"
            name="input"
@@ -97,6 +82,33 @@ const InputIdSelector = ({ inputs, selectedInputId, onInputSelect, show }: Input
               value={selectedInputId} />
     </Input>
   );
+};
+
+const ForwarderInputSelect = ({ onInputSelect }: Pick<InputSelectProps, 'onInputSelect'>) => {
+  const { ForwarderInputDropdown } = useForwarderMessageLoaders();
+
+  return (
+    <fieldset>
+      <legend>Input selection (optional)</legend>
+      <ForwarderInputDropdown onLoadMessage={onInputSelect}
+                              autoLoadMessage />
+      <p className="description">Select an Input profile from the list below then select an then select an Input.</p>
+    </fieldset>
+  );
+};
+
+const InputSelect = ({ inputs, selectedInputId, onInputSelect, show }: InputSelectProps) => {
+  const { ForwarderInputDropdown } = useForwarderMessageLoaders();
+
+  if (!show) {
+    return null;
+  }
+
+  if (AppConfig.isCloud()) {
+    return <ForwarderInputSelect onInputSelect={onInputSelect} />;
+  }
+
+  return <ServerInputSelect inputs={inputs} selectedInputId={selectedInputId} onInputSelect={onInputSelect} />;
 };
 
 type OptionsType = {
@@ -281,10 +293,10 @@ const RawMessageLoader = ({ onMessageLoaded, inputIdSelector, codecTypes, inputs
                    value={remoteAddress}
                    onChange={_onRemoteAddressChange} />
           </fieldset>
-          <InputIdSelector inputs={inputs}
-                           selectedInputId={inputId}
-                           onInputSelect={_onInputSelect}
-                           show={inputIdSelector} />
+          <InputSelect inputs={inputs}
+                       selectedInputId={inputId}
+                       onInputSelect={_onInputSelect}
+                       show={inputIdSelector} />
           <fieldset>
             <legend>Codec configuration</legend>
             <Input id="codec"
