@@ -69,11 +69,12 @@ const ServerInputSelect = ({ inputs, selectedInputId, onInputSelect }: Subtract<
   };
 
   return (
-    <Input id="input"
-           name="input"
-           label={<span>Message input <small>(optional)</small></span>}
+    <Input id="inputSelect"
+           name="inputSelect"
+           label={<>Message input <small>(optional)</small></>}
            help="Select the message input ID that should be assigned to the parsed message.">
-      <Select id="input"
+      <Select inputId="inputSelect"
+              name="inputSelect"
               aria-label="Message input"
               placeholder="Select input"
               options={_formatInputSelectOptions()}
@@ -88,12 +89,12 @@ const ForwarderInputSelect = ({ onInputSelect }: Pick<InputSelectProps, 'onInput
   const { ForwarderInputDropdown } = useForwarderMessageLoaders();
 
   return (
-    <fieldset>
-      <legend>Input selection (optional)</legend>
+    <>
       <ForwarderInputDropdown onLoadMessage={onInputSelect}
+                              label="Forwarder Input selection (optional)"
                               autoLoadMessage />
       <p className="description">Select an Input profile from the list below then select an then select an Input.</p>
-    </fieldset>
+    </>
   );
 };
 
@@ -110,14 +111,13 @@ const InputSelect = ({ inputs, selectedInputId, onInputSelect, show }: InputSele
   }
 
   return ForwarderInputDropdown ? (
-    <>
+    <fieldset>
+      <legend>Input selection (optional)</legend>
       <Input id="inputTypeSelect"
-             aria-label="input type select"
              type="select"
-             label="Select an Input type"
+             label="Select an Input type (optional)"
              help="Select the Input type you want to load the message from."
              value={selectedInputType ?? 'placeholder'}
-             disabled={!!selectedInputId}
              onChange={(e) => setSelectedInputType(e.target.value)}>
         <option value="placeholder" disabled>Select an Input type</option>
         <option value="server">Server Input</option>
@@ -130,7 +130,7 @@ const InputSelect = ({ inputs, selectedInputId, onInputSelect, show }: InputSele
       {selectedInputType === 'forwarder' && (
         <ForwarderInputSelect onInputSelect={onInputSelect} />
       )}
-    </>
+    </fieldset>
   ) : (
     <ServerInputSelect inputs={inputs} selectedInputId={selectedInputId} onInputSelect={onInputSelect} />
   );

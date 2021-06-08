@@ -20,6 +20,7 @@ import { screen, render } from 'wrappedTestingLibrary';
 import { StoreMock as MockStore, CombinedProviderMock as MockCombinedProvider } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
 import { PluginStore } from 'graylog-web-plugin/plugin';
+import userEvent from '@testing-library/user-event';
 
 import AppConfig from 'util/AppConfig';
 import { inputs } from 'components/messageloaders/MessageLoaders.fixtures';
@@ -70,12 +71,33 @@ describe('<RawMessageLoader.test>', () => {
       }[type]));
     });
 
+    it('allows user to select between server and forwarder input on premise', () => {
+      asMock(AppConfig.isCloud).mockImplementation(() => false);
+
+      render(<RawMessageLoader inputs={inputs} onMessageLoaded={jest.fn()} codecTypes={{}} inputIdSelector />);
+
+      const inputTypeSelect = screen.getByRole('combobox', { name: /select an input type \(optional\)/i });
+
+      expect(inputTypeSelect).toBeInTheDocument();
+
+      userEvent.selectOptions(inputTypeSelect, ['server']);
+
+      expect(screen.getByLabelText(/message input \(optional\)/i)).toBeInTheDocument();
+      expect(screen.getByText(/select input/i)).toBeInTheDocument();
+      expect(screen.queryByText(/forwarder inputs/i)).not.toBeInTheDocument();
+
+      userEvent.selectOptions(inputTypeSelect, ['forwarder']);
+
+      expect(screen.getByText(/forwarder inputs/i)).toBeInTheDocument();
+      expect(screen.queryByLabelText(/message input \(optional\)/i)).not.toBeInTheDocument();
+      expect(screen.queryByText(/select input/i)).not.toBeInTheDocument();
+    });
+
     it('shows only forwarder input select on cloud', () => {
       asMock(AppConfig.isCloud).mockImplementation(() => true);
 
       render(<RawMessageLoader inputs={inputs} onMessageLoaded={jest.fn()} codecTypes={{}} inputIdSelector />);
 
-      expect(screen.getByText(/input selection \(optional\)/i)).toBeInTheDocument();
       expect(screen.getByText(/forwarder inputs/i)).toBeInTheDocument();
     });
   });

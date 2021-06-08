@@ -57,6 +57,7 @@ interface PluginForwarder {
       autoLoadMessage?: boolean;
       preselectedInputId?: string;
       title?: string;
+      label?: string;
       loadButtonDisabled?: boolean;
       onLoadMessage: (selectedInput: string) => void;
     }>;
