@@ -25,6 +25,7 @@ import StreamLink from 'components/streams/StreamLink';
 import MessageFields from 'components/search/MessageFields';
 import MessageDetailsTitle from 'components/search/MessageDetailsTitle';
 import Routes from 'routing/Routes';
+import AppConfig from 'util/AppConfig';
 
 class MessageDetail extends React.Component {
   static propTypes = {
@@ -57,14 +58,18 @@ class MessageDetail extends React.Component {
     if (node) {
       const nodeURL = Routes.node(nodeId);
 
-      nodeInformation = (
-        <a href={nodeURL}>
+      const nodeContent = (
+        <>
           <Icon name="code-branch" />
           &nbsp;
           <span style={{ wordBreak: 'break-word' }}>{node.short_node_id}</span>&nbsp;/&nbsp;
           <span style={{ wordBreak: 'break-word' }}>{node.hostname}</span>
-        </a>
+        </>
       );
+
+      nodeInformation = AppConfig.isCloud()
+        ? nodeContent
+        : <a href={nodeURL}>{nodeContent}</a>;
     } else {
       nodeInformation = <span style={{ wordBreak: 'break-word' }}>stopped node</span>;
     }
@@ -85,7 +90,7 @@ class MessageDetail extends React.Component {
       <ButtonGroup className="pull-right" bsSize="small">
         <Button href={messageUrl}>Permalink</Button>
 
-        <ClipboardButton title="Copy ID" text={message.id} />
+        <ClipboardButton title="Copy ID" bsSize="small" text={message.id} />
       </ButtonGroup>
     );
   };

@@ -46,7 +46,7 @@ exports[`<ListField> should render an empty field 1`] = `
           class="css-1f43avz-a11yText-A11yText"
         />
         <div
-          class=" css-9w5mt0-control"
+          class="common-select-control css-9w5mt0-control"
         >
           <div
             class=" css-d5r05u-ValueContainer"

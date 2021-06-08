@@ -58,7 +58,7 @@ const AreaVisualization = makeVisualization(({ config, data, effectiveTimerange,
   const layout: { shapes?: Shapes } = {};
 
   if (config.eventAnnotation && data.events) {
-    const { eventChartData, shapes } = EventHandler.toVisualizationData(data.events, config.formattingSettings);
+    const { eventChartData, shapes } = EventHandler.toVisualizationData(data.events);
 
     chartDataResult.push(eventChartData);
     layout.shapes = shapes;

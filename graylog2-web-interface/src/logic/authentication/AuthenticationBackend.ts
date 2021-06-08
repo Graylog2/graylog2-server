@@ -16,6 +16,7 @@
  */
 import * as Immutable from 'immutable';
 import { $PropertyType } from 'utility-types';
+import { DirectoryServiceAuthenticationService } from 'components/authentication/types';
 
 import { getAuthServicePlugin } from 'util/AuthenticationService';
 import { DirectoryServiceBackendConfig } from 'logic/authentication/directoryServices/types';
@@ -44,7 +45,7 @@ const configFromJson = (config: $PropertyType<AuthenticationBackendJSON, 'config
   const authService = getAuthServicePlugin((config as TypedConfig).type, true);
 
   if (authService && typeof authService.configFromJson === 'function') {
-    return authService.configFromJson(config);
+    return (authService as DirectoryServiceAuthenticationService).configFromJson(config);
   }
 
   return config;

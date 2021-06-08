@@ -88,6 +88,8 @@ const Sort = React.memo(({ index }: Props) => {
                       placeholder="Specify field/metric to be sorted on"
                       aria-label="Select field for sorting"
                       size="small"
+                      menuPortalTarget={document.body}
+                      menuPlacement="auto"
                       onChange={(newValue: Option['value']) => {
                         const option = options[newValue];
                         setFieldValue(`sort.${index}.type`, option.type);
@@ -111,6 +113,8 @@ const Sort = React.memo(({ index }: Props) => {
                     aria-label="Select direction for sorting"
                     value={value}
                     size="small"
+                    menuPortalTarget={document.body}
+                    menuPlacement="auto"
                     onChange={(newValue) => {
                       onChange({ target: { name, value: newValue } });
                     }} />

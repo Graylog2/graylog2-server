@@ -18,6 +18,7 @@ package org.graylog2.plugin.inputs.transports;
 
 import com.codahale.metrics.Gauge;
 import com.google.common.base.Strings;
+import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableMap;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.ByteBufAllocator;
@@ -33,6 +34,7 @@ import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.channel.socket.ServerSocketChannelConfig;
 import io.netty.handler.ssl.ClientAuth;
+import io.netty.handler.ssl.OpenSsl;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.SslHandler;
 import io.netty.handler.ssl.SslProvider;
@@ -80,10 +82,13 @@ import java.security.cert.X509Certificate;
 import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.Locale;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkState;
 
@@ -105,6 +110,8 @@ public abstract class AbstractTcpTransport extends NettyTransport {
             TLS_CLIENT_AUTH_DISABLED, TLS_CLIENT_AUTH_DISABLED,
             TLS_CLIENT_AUTH_OPTIONAL, TLS_CLIENT_AUTH_OPTIONAL,
             TLS_CLIENT_AUTH_REQUIRED, TLS_CLIENT_AUTH_REQUIRED);
+
+    private static final Supplier<Set<String>> secureDefaultCiphers = Suppliers.memoize(AbstractTcpTransport::getSecureCipherSuites);
 
     private final ConnectionCounter connectionCounter;
     private final AtomicInteger connections;
@@ -345,11 +352,21 @@ public abstract class AbstractTcpTransport extends NettyTransport {
                 if (!graylogConfiguration.getEnabledTlsProtocols().isEmpty()) {
                     sslContext.protocols(graylogConfiguration.getEnabledTlsProtocols());
                 }
+                if (tlsProvider.equals(SslProvider.OPENSSL)) {
+                    // Netty tcnative does not adhere jdk.tls.disabledAlgorithms: https://github.com/netty/netty-tcnative/issues/530
+                    // We need to build our own cipher list
+                    sslContext.ciphers(secureDefaultCiphers.get());
+                }
 
                 // TODO: Use byte buffer allocator of channel
                 return sslContext.build().newEngine(ByteBufAllocator.DEFAULT);
             }
         };
+    }
+
+    private static Set<String> getSecureCipherSuites() {
+        final Set<String> openSslCipherSuites = OpenSsl.availableOpenSslCipherSuites();
+        return openSslCipherSuites.stream().filter(s -> !(s.contains("CBC") || s.contains("AES128-SHA") || s.contains("AES256-SHA") )).collect(Collectors.toSet());
     }
 
     @ConfigClass

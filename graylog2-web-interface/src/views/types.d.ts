@@ -112,8 +112,9 @@ type BooleanField = BaseField & {
   type: 'boolean',
 };
 
-type NumericField = BaseRequiredField & {
+export type NumericField = BaseRequiredField & {
   type: 'numeric',
+  step?: string,
 };
 
 type ConfigurationField = SelectField | BooleanField | NumericField;

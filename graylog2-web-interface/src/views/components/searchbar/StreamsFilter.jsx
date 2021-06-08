@@ -29,6 +29,7 @@ const StreamsFilter = ({ disabled, value, streams, onChange }) => {
     <div style={{ position: 'relative' }} data-testid="streams-filter" title={placeholder}>
       <Select placeholder={placeholder}
               disabled={disabled}
+              inputProps={{ 'aria-label': placeholder }}
               displayKey="key"
               inputId="streams-filter"
               onChange={(selected) => onChange(selected === '' ? [] : selected.split(','))}

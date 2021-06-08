@@ -36,7 +36,7 @@ const JobWrap = styled.div`
 
 class SystemJob extends React.Component {
   static propTypes = {
-    job: PropTypes.arrayOf(PropTypes.shape({
+    job: PropTypes.shape({
       info: PropTypes.string,
       id: PropTypes.string,
       percent_complete: PropTypes.number,
@@ -44,7 +44,7 @@ class SystemJob extends React.Component {
       name: PropTypes.string,
       node_id: PropTypes.string,
       started_at: PropTypes.string,
-    })).isRequired,
+    }).isRequired,
   }
 
   _onCancel = (job) => {

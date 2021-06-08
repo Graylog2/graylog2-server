@@ -17,84 +17,80 @@
 import React from 'react';
 import * as Immutable from 'immutable';
 import { render, waitFor, fireEvent, screen } from 'wrappedTestingLibrary';
-import { Map } from 'immutable';
 import mockComponent from 'helpers/mocking/MockComponent';
 import mockAction from 'helpers/mocking/MockAction';
+import { PluginRegistration, PluginStore } from 'graylog-web-plugin/plugin';
+import MockStore from 'helpers/mocking/StoreMock';
+import { createSearch } from 'fixtures/searches';
 
 import WidgetModel from 'views/logic/widgets/Widget';
 import { WidgetActions, Widgets } from 'views/stores/WidgetStore';
 import { TitlesActions, TitleTypes } from 'views/stores/TitlesStore';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
-import View from 'views/logic/views/View';
 import { ViewStore } from 'views/stores/ViewStore';
 import type { ViewStoreState } from 'views/stores/ViewStore';
-import Search from 'views/logic/search/Search';
-import Query from 'views/logic/queries/Query';
-import ViewState from 'views/logic/views/ViewState';
 import { TitlesMap } from 'views/stores/TitleTypes';
 
-import Widget, { Result } from './Widget';
+import Widget from './Widget';
+import type { Props as WidgetComponentProps } from './Widget';
 
 import WidgetContext from '../contexts/WidgetContext';
 import WidgetFocusContext, { WidgetFocusContextType } from '../contexts/WidgetFocusContext';
 
-jest.mock('views/components/search/IfSearch', () => jest.fn(({ children }) => children));
+jest.mock('../searchbar/QueryInput', () => mockComponent('QueryInput'));
+jest.mock('./WidgetHeader', () => 'widget-header');
+jest.mock('./WidgetColorContext', () => ({ children }) => children);
 
-jest.mock('views/stores/ViewManagementStore', () => ({
-  ViewManagementActions: {
-    update: mockAction(jest.fn()),
-    get: mockAction(jest.fn()),
+jest.mock('views/stores/WidgetStore', () => ({
+  WidgetStore: MockStore(),
+  WidgetActions: {
+    update: mockAction(),
   },
 }));
 
-jest.mock('../searchbar/QueryInput', () => mockComponent('QueryInput'));
-jest.mock('./WidgetHeader', () => 'widget-header');
-
-jest.mock('graylog-web-plugin/plugin', () => ({
-  PluginStore: {
-    exports: (key) => (key !== 'enterpriseWidgets' ? [] : [
+const pluginManifest: PluginRegistration = {
+  exports: {
+    enterpriseWidgets: [
       {
         type: 'dummy',
         displayName: 'Some Dummy Visualization',
-        visualizationComponent: 'dummy-visualization',
+        visualizationComponent: () => <>dummy-visualization</>,
         // eslint-disable-next-line react/prop-types
         editComponent: ({ onChange }) => {
           // eslint-disable-next-line react/button-has-type
           return <button type="button" onClick={() => onChange({ foo: 23 })}>Click me</button>;
         },
+        needsControlledHeight: () => true,
+        searchTypes: () => [],
       },
       {
         type: 'default',
         visualizationComponent: () => <span>Unknown widget</span>,
         editComponent: () => <span>Unknown widget in edit mode</span>,
+        needsControlledHeight: () => true,
+        searchTypes: () => [],
       },
-    ]),
+    ],
   },
-}));
-
-jest.mock('views/stores/WidgetStore');
-jest.mock('views/stores/TitlesStore');
-jest.mock('./WidgetColorContext', () => ({ children }) => children);
+};
 
 describe('<Widget />', () => {
+  beforeAll(() => {
+    PluginStore.register(pluginManifest);
+  });
+
+  afterAll(() => {
+    PluginStore.unregister(pluginManifest);
+  });
+
   const widget = WidgetModel.builder().newId()
     .type('dummy')
-    .config({})
+    .config({ queryId: 'query-id-1' })
     .build();
 
-  const viewState = ViewState.builder().build();
-  const query = Query.builder().id('query-id').build();
-  const searchSearch = Search.builder().queries([query]).id('search-1').build();
-  const search = View.builder()
-    .search(searchSearch)
-    .type(View.Type.Dashboard)
-    .state(Map({ 'query-id': viewState }))
-    .id('search-1')
-    .title('search 1')
-    .build();
   const viewStoreState: ViewStoreState = {
-    activeQuery: 'query-id',
-    view: search,
+    activeQuery: 'query-id-1',
+    view: createSearch(),
     isNew: false,
     dirty: false,
   };
@@ -108,17 +104,12 @@ describe('<Widget />', () => {
     jest.resetModules();
   });
 
-  type DummyWidgetProps = {
-    widget?: WidgetModel,
-    errors?: Array<{ description: string }>,
-    data?: { [key: string]: Result },
+  type DummyWidgetProps = Partial<WidgetComponentProps> & {
     focusedWidget?: WidgetFocusContextType['focusedWidget'],
     setWidgetFocusing?: WidgetFocusContextType['setWidgetFocusing'],
     setWidgetEditing?: WidgetFocusContextType['setWidgetEditing'],
     unsetWidgetFocusing?: WidgetFocusContextType['unsetWidgetFocusing'],
     unsetWidgetEditing?: WidgetFocusContextType['unsetWidgetEditing'],
-    title?: string,
-    editing?: boolean,
   }
 
   const DummyWidget = ({
@@ -184,7 +175,7 @@ describe('<Widget />', () => {
     render(<DummyWidget data={{}} />);
 
     expect(screen.queryAllByTestId('loading-widget')).toHaveLength(0);
-    expect(screen.queryAllByTitle('Widget Title')).toHaveLength(2);
+    expect(screen.queryAllByTitle('Widget Title')).toHaveLength(1);
   });
 
   it('renders placeholder if widget type is unknown', async () => {
@@ -273,11 +264,13 @@ describe('<Widget />', () => {
     expect(mockUnsetWidgetEditing).toHaveBeenCalledTimes(1);
   });
 
-  it('updates focus mode, on widget edit save', () => {
+  it('updates focus mode, on widget edit save', async () => {
     const mockUnsetWidgetEditing = jest.fn();
     render(<DummyWidget editing unsetWidgetEditing={mockUnsetWidgetEditing} />);
-    const saveButton = screen.getByText('Save');
+    const saveButton = screen.getByText('Apply Changes');
     fireEvent.click(saveButton);
+
+    await waitFor(() => expect(saveButton).not.toBeDisabled());
 
     expect(mockUnsetWidgetEditing).toHaveBeenCalledTimes(1);
   });
@@ -317,7 +310,7 @@ describe('<Widget />', () => {
     expect(WidgetActions.update).toHaveBeenCalledWith('widgetId', widgetWithConfig);
   });
 
-  it('does not restore original state of widget config when clicking "Finish Editing"', () => {
+  it('does not restore original state of widget config when clicking "Apply Changes"', async () => {
     const widgetWithConfig = WidgetModel.builder()
       .id('widgetId')
       .type('dummy')
@@ -333,9 +326,11 @@ describe('<Widget />', () => {
 
     expect(WidgetActions.updateConfig).toHaveBeenCalledWith('widgetId', { foo: 23 });
 
-    const saveButton = screen.getByText('Save');
+    const saveButton = screen.getByText('Apply Changes');
 
     fireEvent.click(saveButton);
+
+    await waitFor(() => expect(saveButton).not.toBeDisabled());
 
     expect(WidgetActions.update).not.toHaveBeenCalledWith('widgetId', { config: { foo: 42 }, id: 'widgetId', type: 'dummy' });
   });

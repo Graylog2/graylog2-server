@@ -16,14 +16,26 @@
  */
 import * as React from 'react';
 import { fireEvent, render, screen, waitFor, within } from 'wrappedTestingLibrary';
+import MockStore from 'helpers/mocking/StoreMock';
+import { Formik } from 'formik';
 
 import TimeRangeInput from 'views/components/searchbar/TimeRangeInput';
+
+jest.mock('stores/configurations/ConfigurationsStore', () => ({
+  ConfigurationsStore: MockStore(),
+}));
 
 describe('TimeRangeInput', () => {
   const defaultTimeRange = { type: 'relative', range: 300 };
 
+  const SUTTimeRangeInput = (props) => (
+    <Formik initialValues={{ selectedFields: [] }} onSubmit={() => {}}>
+      <TimeRangeInput value={defaultTimeRange} onChange={() => {}} {...props} />
+    </Formik>
+  );
+
   it('opens date picker dropdown when clicking button', async () => {
-    render(<TimeRangeInput value={defaultTimeRange} onChange={() => {}} />);
+    render(<SUTTimeRangeInput />);
 
     const button = await screen.findByRole('button', {
       name: /open time range selector/i,
@@ -36,7 +48,7 @@ describe('TimeRangeInput', () => {
   });
 
   it('displays relative time range of 5 minutes', async () => {
-    render(<TimeRangeInput value={defaultTimeRange} onChange={() => {}} />);
+    render(<SUTTimeRangeInput />);
 
     const from = await screen.findByTestId('from');
     await within(from).findByText(/5 minutes ago/i);
@@ -46,7 +58,7 @@ describe('TimeRangeInput', () => {
   });
 
   it('opens date picker dropdown when clicking summary', async () => {
-    render(<TimeRangeInput value={defaultTimeRange} onChange={() => {}} />);
+    render(<SUTTimeRangeInput />);
 
     fireEvent.click(await screen.findByText(/5 minutes ago/));
 
@@ -55,7 +67,7 @@ describe('TimeRangeInput', () => {
 
   it('calls callback when changing time range', async () => {
     const onChange = jest.fn();
-    render(<TimeRangeInput value={defaultTimeRange} onChange={onChange} />);
+    render(<SUTTimeRangeInput value={defaultTimeRange} onChange={onChange} />);
 
     fireEvent.click(await screen.findByText(/5 minutes ago/));
 
@@ -75,13 +87,13 @@ describe('TimeRangeInput', () => {
   });
 
   it('shows "No Override" if no time range is provided', async () => {
-    render(<TimeRangeInput value={{}} onChange={() => {}} />);
+    render(<SUTTimeRangeInput value={{}} onChange={() => {}} />);
 
     await screen.findByText('No Override');
   });
 
   it('shows all tabs if no `validTypes` prop is passed', async () => {
-    render(<TimeRangeInput onChange={() => {}} value={defaultTimeRange} />);
+    render(<SUTTimeRangeInput onChange={() => {}} value={defaultTimeRange} />);
 
     fireEvent.click(await screen.findByText(/5 minutes ago/));
 
@@ -91,7 +103,7 @@ describe('TimeRangeInput', () => {
   });
 
   it('shows only valid tabs if `validTypes` prop is passed', async () => {
-    render(<TimeRangeInput onChange={() => {}} value={defaultTimeRange} validTypes={['relative']} />);
+    render(<SUTTimeRangeInput onChange={() => {}} value={defaultTimeRange} validTypes={['relative']} />);
 
     fireEvent.click(await screen.findByText(/5 minutes ago/));
 
@@ -99,5 +111,23 @@ describe('TimeRangeInput', () => {
 
     expect(screen.queryByRole('tab', { name: 'Keyword' })).not.toBeInTheDocument();
     expect(screen.queryByRole('tab', { name: 'Absolute' })).not.toBeInTheDocument();
+  });
+
+  it('shows a dropdown button allowing to quick-select presets', async () => {
+    render(<SUTTimeRangeInput onChange={() => {}} value={defaultTimeRange} validTypes={['relative']} />);
+
+    const dropdown = await screen.findByRole('button', { name: /open time range preset select/i });
+
+    fireEvent.click(dropdown);
+
+    await screen.findByRole('heading', { name: 'From (Until Now)' });
+  });
+
+  it('allows hiding the dropdown button for quick-selecting presets', async () => {
+    render(<SUTTimeRangeInput onChange={() => {}} value={defaultTimeRange} validTypes={['relative']} showPresetDropdown={false} />);
+
+    await screen.findByText(/5 minutes ago/);
+
+    expect(screen.queryByRole('button', { name: /open time range preset select/i })).not.toBeInTheDocument();
   });
 });

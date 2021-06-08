@@ -57,11 +57,11 @@ const _updateQueryParams = (
     }
 
     if (newQueryParams.focusing) {
-      baseUri = baseUri.setSearch('focusing', true);
+      baseUri = baseUri.setSearch('focusing', String(true));
     }
 
     if (newQueryParams.editing) {
-      baseUri = baseUri.setSearch('editing', true);
+      baseUri = baseUri.setSearch('editing', String(true));
     }
   }
 
@@ -85,7 +85,7 @@ const useSyncStateWithQueryParams = ({ focusedWidget, focusUriParams, setFocused
       const filter = nextFocusedWidget?.id ? [nextFocusedWidget.id] : null;
       SearchActions.setWidgetsToSearch(filter);
 
-      if (filter === null) {
+      if (focusedWidget?.editing && filter === null) {
         SearchActions.executeWithCurrentState();
       }
     }

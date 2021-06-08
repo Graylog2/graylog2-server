@@ -101,7 +101,7 @@ public class MongoIndexSetTest {
 
     @Before
     public void setUp() {
-        mongoIndexSet = new MongoIndexSet(config, indices, nodeId, indexRangeService, auditEventSender, systemJobManager, jobFactory, activityWriter);
+        mongoIndexSet = createIndexSet(config);
     }
 
     @Test
@@ -192,7 +192,7 @@ public class MongoIndexSetTest {
                 "graylog_4_restored_archive", Collections.emptySet());
 
         when(indices.getIndexNamesAndAliases(anyString())).thenReturn(indexNameAliases);
-        final MongoIndexSet mongoIndexSet = new MongoIndexSet(config, indices, nodeId, indexRangeService, auditEventSender, systemJobManager, jobFactory, activityWriter);
+        final MongoIndexSet mongoIndexSet = createIndexSet(config);
 
         final int number = mongoIndexSet.getNewestIndexNumber();
         assertEquals(3, number);
@@ -208,7 +208,7 @@ public class MongoIndexSetTest {
                 "graylog_5", Collections.singleton("graylog_deflector"));
 
         when(indices.getIndexNamesAndAliases(anyString())).thenReturn(indexNameAliases);
-        final MongoIndexSet mongoIndexSet = new MongoIndexSet(config, indices, nodeId, indexRangeService, auditEventSender, systemJobManager, jobFactory, activityWriter);
+        final MongoIndexSet mongoIndexSet = createIndexSet(config);
 
 
         final String[] allGraylogIndexNames = mongoIndexSet.getManagedIndices();
@@ -226,7 +226,7 @@ public class MongoIndexSetTest {
 
         when(indices.getIndexNamesAndAliases(anyString())).thenReturn(indexNameAliases);
 
-        final MongoIndexSet mongoIndexSet = new MongoIndexSet(config, indices, nodeId, indexRangeService, auditEventSender, systemJobManager, jobFactory, activityWriter);
+        final MongoIndexSet mongoIndexSet = createIndexSet(config);
         final Map<String, Set<String>> deflectorIndices = mongoIndexSet.getAllIndexAliases();
 
         assertThat(deflectorIndices).containsOnlyKeys("graylog_1", "graylog_2", "graylog_3", "graylog_5");
@@ -234,7 +234,7 @@ public class MongoIndexSetTest {
 
     @Test
     public void testCleanupAliases() throws Exception {
-        final MongoIndexSet mongoIndexSet = new MongoIndexSet(config, indices, nodeId, indexRangeService, auditEventSender, systemJobManager, jobFactory, activityWriter);
+        final MongoIndexSet mongoIndexSet = createIndexSet(config);
         mongoIndexSet.cleanupAliases(ImmutableSet.of("graylog_2", "graylog_3", "foobar"));
         verify(indices).removeAliases("graylog_deflector", ImmutableSet.of("graylog_2", "foobar"));
     }
@@ -249,7 +249,7 @@ public class MongoIndexSetTest {
         expectedException.expect(RuntimeException.class);
         expectedException.expectMessage("Could not create new target index <graylog_0>.");
 
-        final MongoIndexSet mongoIndexSet = new MongoIndexSet(config, indices, nodeId, indexRangeService, auditEventSender, systemJobManager, jobFactory, activityWriter);
+        final MongoIndexSet mongoIndexSet = createIndexSet(config);
         mongoIndexSet.cycle();
     }
 
@@ -263,7 +263,7 @@ public class MongoIndexSetTest {
         when(indices.create(newIndexName, mongoIndexSet)).thenReturn(true);
         when(indices.waitForRecovery(newIndexName)).thenReturn(HealthStatus.Green);
 
-        final MongoIndexSet mongoIndexSet = new MongoIndexSet(config, indices, nodeId, indexRangeService, auditEventSender, systemJobManager, jobFactory, activityWriter);
+        final MongoIndexSet mongoIndexSet = createIndexSet(config);
         mongoIndexSet.cycle();
 
         verify(indexRangeService, times(1)).createUnknownRange(newIndexName);
@@ -283,7 +283,7 @@ public class MongoIndexSetTest {
         final SetIndexReadOnlyAndCalculateRangeJob rangeJob = mock(SetIndexReadOnlyAndCalculateRangeJob.class);
         when(jobFactory.create(oldIndexName)).thenReturn(rangeJob);
 
-        final MongoIndexSet mongoIndexSet = new MongoIndexSet(config, indices, nodeId, indexRangeService, auditEventSender, systemJobManager, jobFactory, activityWriter);
+        final MongoIndexSet mongoIndexSet = createIndexSet(config);
         mongoIndexSet.cycle();
 
         verify(jobFactory, times(1)).create(oldIndexName);
@@ -302,7 +302,7 @@ public class MongoIndexSetTest {
         when(indices.create(newIndexName, mongoIndexSet)).thenReturn(true);
         when(indices.waitForRecovery(newIndexName)).thenReturn(HealthStatus.Green);
 
-        final MongoIndexSet mongoIndexSet = new MongoIndexSet(config, indices, nodeId, indexRangeService, auditEventSender, systemJobManager, jobFactory, activityWriter);
+        final MongoIndexSet mongoIndexSet = createIndexSet(config);
         mongoIndexSet.cycle();
 
         verify(indices, times(1)).cycleAlias(deflector, newIndexName, oldIndexName);
@@ -317,7 +317,7 @@ public class MongoIndexSetTest {
         when(indices.create(indexName, mongoIndexSet)).thenReturn(true);
         when(indices.waitForRecovery(indexName)).thenReturn(HealthStatus.Green);
 
-        final MongoIndexSet mongoIndexSet = new MongoIndexSet(config, indices, nodeId, indexRangeService, auditEventSender, systemJobManager, jobFactory, activityWriter);
+        final MongoIndexSet mongoIndexSet = createIndexSet(config);
         mongoIndexSet.cycle();
 
         verify(indices, times(1)).cycleAlias("graylog_deflector", indexName);
@@ -328,8 +328,29 @@ public class MongoIndexSetTest {
         final IndexSetConfig configWithPlus = config.toBuilder().indexPrefix("some+index").build();
         final String indexName = configWithPlus.indexPrefix() + "_0";
 
-        final MongoIndexSet mongoIndexSet = new MongoIndexSet(configWithPlus, indices, nodeId, indexRangeService, auditEventSender, systemJobManager, jobFactory, activityWriter);
+        final MongoIndexSet mongoIndexSet = createIndexSet(configWithPlus);
 
         assertThat(mongoIndexSet.isManagedIndex(indexName)).isTrue();
+    }
+
+    @Test
+    public void identifiesRestoredArchivesAsBeingManaged() {
+        final IndexSetConfig restoredArchives = config.toBuilder()
+                .title("Restored Archives")
+                .description("Indices which have been restored from an archive.")
+                .indexPrefix("restored-archive")
+                // Use a special match pattern and wildcard to match restored indices like `restored-archive-graylog_33`
+                .indexMatchPattern("restored-archive\\S*")
+                .indexWildcard("restored-archive*")
+                .build();
+        final String indexName = restoredArchives.indexPrefix() + "-graylog_33";
+
+        final MongoIndexSet mongoIndexSet = createIndexSet(restoredArchives);
+
+        assertThat(mongoIndexSet.isManagedIndex(indexName)).isTrue();
+    }
+
+    private MongoIndexSet createIndexSet(IndexSetConfig indexSetConfig) {
+        return new MongoIndexSet(indexSetConfig, indices, nodeId, indexRangeService, auditEventSender, systemJobManager, jobFactory, activityWriter);
     }
 }

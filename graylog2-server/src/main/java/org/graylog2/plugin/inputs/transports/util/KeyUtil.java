@@ -25,6 +25,7 @@ import com.google.common.io.ByteStreams;
 import io.netty.handler.ssl.PemPrivateKey;
 import io.netty.handler.ssl.PemX509Certificate;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
+import org.bouncycastle.openssl.PEMKeyPair;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.PKCS8Generator;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
@@ -265,6 +266,8 @@ public class KeyUtil {
             privateKey = converter.getPrivateKey(info);
         } else if (object instanceof PrivateKeyInfo) {
             privateKey = converter.getPrivateKey((PrivateKeyInfo) object);
+        } else if (object instanceof PEMKeyPair) {
+            privateKey = converter.getPrivateKey(((PEMKeyPair) object).getPrivateKeyInfo());
         } else {
             throw new PKCSException("Encountered unexpected object type: " + object.getClass().getName());
         }

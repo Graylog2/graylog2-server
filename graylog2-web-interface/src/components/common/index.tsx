@@ -40,6 +40,7 @@ export { default as ExpandableList } from './ExpandableList';
 export { default as ExpandableListItem } from './ExpandableListItem';
 export { default as ExternalLink } from './ExternalLink';
 export { default as ExternalLinkButton } from './ExternalLinkButton';
+export { default as FlatContentRow } from './FlatContentRow';
 export { default as FormikFormGroup } from './FormikFormGroup';
 export { default as FormikInput } from './FormikInput';
 export { default as HasOwnership } from './HasOwnership';
@@ -69,6 +70,7 @@ export { default as PaginatedItemOverview } from './PaginatedItemOverview/Pagina
 export { default as Pluralize } from './Pluralize';
 export { default as ReactGridContainer } from './ReactGridContainer';
 export { default as ReadOnlyFormGroup } from './ReadOnlyFormGroup';
+export { default as QueryHelper } from './QueryHelper';
 export { default as Scratchpad } from './Scratchpad';
 export { default as ScrollButton } from './ScrollButton';
 export { default as SearchForm } from './SearchForm';

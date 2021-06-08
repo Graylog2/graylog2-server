@@ -15,18 +15,21 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext, useState } from 'react';
-import PropTypes from 'prop-types';
+import { useContext } from 'react';
 import styled from 'styled-components';
 
 import Spinner from 'components/common/Spinner';
 import WidgetContext from 'views/components/contexts/WidgetContext';
 import QueryEditModeContext from 'views/components/contexts/QueryEditModeContext';
 import SaveOrCancelButtons from 'views/components/widgets/SaveOrCancelButtons';
+import WidgetEditApplyAllChangesProvider from 'views/components/contexts/WidgetEditApplyAllChangesProvider';
 
 import WidgetQueryControls from '../WidgetQueryControls';
 import IfDashboard from '../dashboard/IfDashboard';
 import WidgetOverrideElements from '../WidgetOverrideElements';
+import WidgetEditApplyAllChangesContext from '../contexts/WidgetEditApplyAllChangesContext';
+import ValidationStateProvider from '../contexts/ValidationStateProvider';
+import ValidationStateContext from '../contexts/ValidationStateContext';
 
 const Container = styled.div`
   display: flex;
@@ -42,7 +45,7 @@ const QueryControls = styled.div`
 
 const Visualization = styled.div`
   display: flex;
-  flex 1;
+  flex: 1;
   overflow: hidden;
 `;
 
@@ -52,43 +55,44 @@ type Props = {
   onFinish: () => void,
 };
 
-type ValidationState = [boolean, (hasErrors: boolean) => void];
-export const ValidationStateContext = React.createContext<ValidationState>([false, () => {}]);
-
 const EditWidgetFrame = ({ children, onCancel, onFinish }: Props) => {
   const widget = useContext(WidgetContext);
-
-  const [hasErrors, setHasErrors] = useState(false);
 
   if (!widget) {
     return <Spinner text="Loading widget ..." />;
   }
 
   return (
-    <ValidationStateContext.Provider value={[hasErrors, setHasErrors]}>
-      <Container>
-        <IfDashboard>
-          <QueryControls>
-            <QueryEditModeContext.Provider value="widget">
-              <WidgetQueryControls />
-            </QueryEditModeContext.Provider>
-          </QueryControls>
-        </IfDashboard>
-        <Visualization role="presentation">
-          <WidgetOverrideElements>
-            {children}
-          </WidgetOverrideElements>
-        </Visualization>
-        <div>
-          <SaveOrCancelButtons onFinish={onFinish} onCancel={onCancel} disableSave={hasErrors} />
-        </div>
-      </Container>
-    </ValidationStateContext.Provider>
+    <WidgetEditApplyAllChangesProvider widget={widget}>
+      <ValidationStateProvider>
+        <Container>
+          <IfDashboard>
+            <QueryControls>
+              <QueryEditModeContext.Provider value="widget">
+                <WidgetQueryControls />
+              </QueryEditModeContext.Provider>
+            </QueryControls>
+          </IfDashboard>
+          <Visualization role="presentation">
+            <WidgetOverrideElements>
+              {children}
+            </WidgetOverrideElements>
+          </Visualization>
+          <div>
+            <WidgetEditApplyAllChangesContext.Consumer>
+              {({ isSubmitting }) => (
+                <ValidationStateContext.Consumer>
+                  {({ hasErrors }) => (
+                    <SaveOrCancelButtons onFinish={onFinish} onCancel={onCancel} disableSave={hasErrors || isSubmitting} />
+                  )}
+                </ValidationStateContext.Consumer>
+              )}
+            </WidgetEditApplyAllChangesContext.Consumer>
+          </div>
+        </Container>
+      </ValidationStateProvider>
+    </WidgetEditApplyAllChangesProvider>
   );
-};
-
-EditWidgetFrame.propTypes = {
-  children: PropTypes.node.isRequired,
 };
 
 export default EditWidgetFrame;

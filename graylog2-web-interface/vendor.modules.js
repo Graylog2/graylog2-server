@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 module.exports = [
+  '@emotion/react',
   'chroma-js',
   'create-react-class',
   'formik',
@@ -24,6 +25,7 @@ module.exports = [
   'moment',
   'react-bootstrap',
   'react-dom',
+  'react-query',
   'react-router-bootstrap',
   'react-router',
   'react',

@@ -19,9 +19,9 @@ import { useMemo } from 'react';
 import { chunk } from 'lodash';
 import { SystemConfiguration } from 'views/types';
 
-import { Row } from 'components/graylog';
 import ConfigletContainer from 'pages/configurations/ConfigletContainer';
 import CombinedProvider from 'injection/CombinedProvider';
+import ConfigletRow from 'pages/configurations/ConfigletRow';
 
 const { ConfigurationsActions } = CombinedProvider.get('Configurations');
 
@@ -50,10 +50,10 @@ const PluginConfigRows = ({ configuration, systemConfigs }: PluginConfigRowsProp
   const configRows = chunk(pluginConfigs, 2)
     .map((configChunk, idx) => (
       // eslint-disable-next-line react/no-array-index-key
-      <Row key={`plugin-config-row-${idx}`}>
+      <ConfigletRow key={`plugin-config-row-${idx}`}>
         {configChunk[0]}
         {configChunk[1]}
-      </Row>
+      </ConfigletRow>
     ));
 
   return <>{configRows}</>;

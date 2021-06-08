@@ -28,6 +28,8 @@ import { CurrentViewStateStore } from 'views/stores/CurrentViewStateStore';
 import { Popover } from 'components/graylog';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import { colors as defaultColors } from 'views/components/visualizations/Colors';
+import { EVENT_COLOR, eventsDisplayName } from 'views/logic/searchtypes/events/EventHandler';
+import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 
 const ColorHint = styled.div(({ color }) => `
   cursor: pointer;
@@ -90,10 +92,11 @@ const defaultLabelMapper = (data: Array<{ name: string }>) => data.map(({ name }
 
 const PlotLegend = ({ children, config, chartData, labelMapper = defaultLabelMapper }: Props) => {
   const [colorPickerConfig, setColorPickerConfig] = useState<ColorPickerConfig | undefined>();
-  const { columnPivots } = config;
+  const { columnPivots, series } = config;
   const labels: Array<string> = labelMapper(chartData);
   const { activeQuery } = useStore(CurrentViewStateStore);
   const { colors, setColor } = useContext(ChartColorContext);
+  const { focusedWidget } = useContext(WidgetFocusContext);
 
   const chunkCells = (cells, columnCount) => {
     const { length } = cells;
@@ -143,7 +146,12 @@ const PlotLegend = ({ children, config, chartData, labelMapper = defaultLabelMap
     setColorPickerConfig(undefined);
   }, [setColor]);
 
+  if ((!focusedWidget || !focusedWidget.editing) && series.length <= 1 && columnPivots.length <= 0) {
+    return <>{children}</>;
+  }
+
   const tableCells = labels.sort(stringLenSort).map((value) => {
+    const defaultColor = value === eventsDisplayName ? EVENT_COLOR : undefined;
     let val: React.ReactNode = value;
 
     if (columnPivots.length === 1) {
@@ -153,7 +161,7 @@ const PlotLegend = ({ children, config, chartData, labelMapper = defaultLabelMap
     return (
       <LegendCell key={value}>
         <LegendEntry>
-          <ColorHint aria-label="Color Hint" onClick={_onOpenColorPicker(value)} color={colors.get(value)} />
+          <ColorHint aria-label="Color Hint" onClick={_onOpenColorPicker(value)} color={colors.get(value, defaultColor)} />
           <ValueContainer>
             {val}
           </ValueContainer>

@@ -3,4 +3,5 @@ window.appConfig = {
   gl2AppPathPrefix: '${appPathPrefix}',
   rootTimeZone: '${rootTimeZone}',
   pluginUISettings: ${pluginUISettings},
+  isCloud: ${isCloud},
 };

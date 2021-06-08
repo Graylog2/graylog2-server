@@ -90,6 +90,7 @@
         <amqp-client.version>5.8.0</amqp-client.version>
         <antlr.version>4.8-1</antlr.version>
         <apache-directory-version>1.0.3</apache-directory-version>
+        <apache-httpclient.version>4.5.13</apache-httpclient.version>
         <auto-value.version>1.7.4</auto-value.version>
         <auto-value-javabean.version>2.5.2</auto-value-javabean.version>
         <bouncycastle.version>1.64</bouncycastle.version>
@@ -142,6 +143,7 @@
         <opencsv.version>2.3</opencsv.version>
         <os-platform-finder.version>1.2.3</os-platform-finder.version>
         <pkts.version>3.0.5</pkts.version>
+        <prometheus-client.version>0.11.0</prometheus-client.version>
         <protobuf.version>3.11.4</protobuf.version>
         <reflections.version>0.9.12</reflections.version>
         <retrofit.version>2.9.0</retrofit.version>

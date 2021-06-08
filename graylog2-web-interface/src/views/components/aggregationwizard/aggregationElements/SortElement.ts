@@ -52,6 +52,13 @@ const validateSorts = (values: WidgetConfigFormValues) => {
       sortError.direction = 'Direction is required.';
     }
 
+    const timeRowExists = !!values.groupBy?.groupings.find((g) => g.direction === 'row' && g.field.type === 'time');
+    const nonDataTableVisExists = values.visualization && values.visualization.type !== 'table';
+
+    if (timeRowExists && nonDataTableVisExists) {
+      sortError.field = 'Sort on non data table with time based row grouping does not work.';
+    }
+
     return sortError;
   });
 
@@ -101,6 +108,10 @@ const SortElement: AggregationElement = {
   }),
   toConfig: (formValues: WidgetConfigFormValues, configBuilder: AggregationWidgetConfigBuilder) => configBuilder
     .sort(formValues.sort.map((sort) => new SortConfig(formValueTypeToConfigType(sort.type), sort.field, Direction.fromString(sort.direction)))),
+  onRemove: ((index, formValues) => ({
+    ...formValues,
+    sort: formValues.sort.filter((value, i) => index !== i),
+  })),
   validate: validateSorts,
 };
 

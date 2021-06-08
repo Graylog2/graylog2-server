@@ -41,13 +41,16 @@ const fieldTypes: FieldTypes = {
   all: Immutable.List([]),
   queryFields: Immutable.Map(),
 };
+
+const selectEventConfig = { container: document.body };
+
 const SimpleAggregationWizard = (props) => (
   <FieldTypesContext.Provider value={fieldTypes}>
     <AggregationWizard config={widgetConfig} editing id="widget-id" type="AGGREGATION" fields={Immutable.List([])} onChange={() => {}} {...props} />
   </FieldTypesContext.Provider>
 );
 
-const submitButton = async () => screen.findByText('Apply Changes');
+const submitButton = async () => screen.findByText('Update Preview');
 
 const expectSubmitButtonToBeDisabled = async () => {
   expect(await submitButton()).toBeDisabled();
@@ -62,7 +65,7 @@ const visualizationSelect = async () => screen.findByLabelText('Select visualiza
 const selectOption = async (ariaLabel: string, option: string) => {
   const select = await screen.findByLabelText(ariaLabel);
   await selectEvent.openMenu(select);
-  await selectEvent.select(select, option);
+  await selectEvent.select(select, option, selectEventConfig);
 };
 
 describe('AggregationWizard/Core Visualizations', () => {
@@ -84,16 +87,6 @@ describe('AggregationWizard/Core Visualizations', () => {
     await screen.findByText('Scatter Plot');
     await screen.findByText('Single Number');
     await screen.findByText('World Map');
-  });
-
-  it('heat map expects mandatory default value field', async () => {
-    render(<SimpleAggregationWizard />);
-
-    await selectEvent.select(await visualizationSelect(), 'Heatmap');
-
-    await expectSubmitButtonToBeDisabled();
-
-    await screen.findByText(/Default Value is required/);
   });
 
   it('creates Area Chart config when all required fields are present', async () => {
@@ -159,6 +152,27 @@ describe('AggregationWizard/Core Visualizations', () => {
     })));
   });
 
+  it('allows enabling event annotations for visualizations supporting it', async () => {
+    const onChange = jest.fn();
+    const timelineConfig = widgetConfig.toBuilder()
+      .rowPivots([Pivot.create('timestamp', 'time', { interval: { type: 'auto', scaling: 1 } })])
+      .series([Series.create('count')])
+      .build();
+
+    render(<SimpleAggregationWizard onChange={onChange} config={timelineConfig} />);
+
+    await selectOption('Select visualization type', 'Line Chart');
+
+    userEvent.click(await screen.findByRole('checkbox', { name: /show event annotations/i }));
+
+    userEvent.click(await submitButton());
+
+    await waitFor(() => expect(onChange).toHaveBeenCalledWith(expect.objectContaining({
+      visualization: 'line',
+      eventAnnotation: true,
+    })));
+  });
+
   it('creates Heatmap config when all required fields are present', async () => {
     const onChange = jest.fn();
     const heatMapConfig = widgetConfig.toBuilder()
@@ -170,8 +184,6 @@ describe('AggregationWizard/Core Visualizations', () => {
     render(<SimpleAggregationWizard onChange={onChange} config={heatMapConfig} />);
 
     await selectOption('Select visualization type', 'Heatmap');
-
-    await expectSubmitButtonToBeDisabled();
 
     const useSmallestAsDefault = await screen.findByRole('checkbox', { name: 'Use smallest as default' });
     userEvent.click(useSmallestAsDefault);

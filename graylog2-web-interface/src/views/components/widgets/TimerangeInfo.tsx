@@ -17,7 +17,6 @@
 import * as React from 'react';
 import { useContext } from 'react';
 import styled, { css } from 'styled-components';
-
 import { TextOverflowEllipsis } from 'components/common';
 import Widget from 'views/logic/widgets/Widget';
 import timerangeToString from 'views/logic/queries/TimeRangeToString';
@@ -40,6 +39,9 @@ const Wrapper = styled.div(({ theme }) => css`
   width: max-content;
 `);
 
+const getEffectiveWidgetTimerange = (result, activeQuery, searchTypeId) => result?.results[activeQuery]
+  .searchTypes[searchTypeId]?.effective_timerange;
+
 const TimerangeInfo = ({ className, widget, activeQuery, widgetId }: Props) => {
   const { localizeTime } = useContext(TimeLocalizeContext);
   const { result, widgetMapping } = useStore(SearchStore);
@@ -50,10 +52,10 @@ const TimerangeInfo = ({ className, widget, activeQuery, widgetId }: Props) => {
 
   const configuredTimerange = timerangeToString(widget.timerange || DEFAULT_TIMERANGE, localizeTime);
 
-  const searchTypeId = widgetId ? widgetMapping.get(widgetId).first() : undefined;
-  const effectiveTimerange = activeQuery && searchTypeId ? result?.results[activeQuery]
-    .searchTypes[searchTypeId].effective_timerange : {};
-  const effectiveTimerangeString = timerangeToString(effectiveTimerange, localizeTime);
+  const searchTypeId = widgetId ? widgetMapping.get(widgetId)?.first() : undefined;
+
+  const effectiveTimerange = (activeQuery && searchTypeId) ? getEffectiveWidgetTimerange(result, activeQuery, searchTypeId) : undefined;
+  const effectiveTimerangeString = effectiveTimerange ? timerangeToString(effectiveTimerange, localizeTime) : 'Effective widget time range is currently not available.';
 
   return (
     <Wrapper className={className}>

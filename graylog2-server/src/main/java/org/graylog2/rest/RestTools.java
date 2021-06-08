@@ -120,6 +120,11 @@ public class RestTools {
         return uri;
     }
 
+    public static URI buildRelativeExternalUri(@NotNull MultivaluedMap<String, String> httpHeaders, @NotNull URI defaultUri) {
+        final URI externalUri = RestTools.buildExternalUri(httpHeaders, defaultUri);
+        return URI.create(externalUri.getPath());
+    }
+
     public static String getPathFromResource(Resource resource) {
         String path = resource.getPath();
         Resource parent = resource.getParent();

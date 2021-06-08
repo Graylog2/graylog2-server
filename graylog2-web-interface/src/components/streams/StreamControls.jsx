@@ -24,6 +24,7 @@ import { DropdownButton, MenuItem } from 'components/graylog';
 import { IfPermitted } from 'components/common';
 import PermissionsMixin from 'util/PermissionsMixin';
 import StoreProvider from 'injection/StoreProvider';
+import HideOnCloud from 'util/conditional/HideOnCloud';
 
 import StreamForm from './StreamForm';
 
@@ -102,11 +103,13 @@ const StreamControls = createReactClass({
               Clone this stream
             </MenuItem>
           </IfPermitted>
-          <IfPermitted permissions="stream_outputs:read">
-            <MenuItem key={`manageOutputs-${stream.id}`} href={Routes.stream_outputs(stream.id)}>
-              Manage Outputs
-            </MenuItem>
-          </IfPermitted>
+          <HideOnCloud>
+            <IfPermitted permissions="stream_outputs:read">
+              <MenuItem key={`manageOutputs-${stream.id}`} href={Routes.stream_outputs(stream.id)}>
+                Manage Outputs
+              </MenuItem>
+            </IfPermitted>
+          </HideOnCloud>
           <MenuItem key={`setAsStartpage-${stream.id}`} onSelect={this._setStartpage} disabled={user.read_only}>
             Set as startpage
           </MenuItem>

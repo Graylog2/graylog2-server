@@ -80,23 +80,27 @@ const StyledListGroupItem = styled(BootstrapListGroupItem)(({ theme }) => css`
   background-color: ${theme.colors.global.contentBackground};
   border: 0;
 
+  padding: 10px 10px 5px 10px;
+
   .list-group-item-heading {
-    font-weight: bold;
+    font-size: ${theme.fonts.size.h5};
+  }
+
+  .list-group-item-text {
+    margin-bottom: 5px;
   }
 
   a&,
   button& {
-    color: ${theme.colors.global.link};
+    color: ${theme.colors.global.textDefault};
 
     .list-group-item-heading {
       color: ${theme.colors.variant.darkest.default};
-      font-weight: bold;
     }
 
     &:hover:not(.disabled),
     &:focus:not(.disabled) {
       background-color: ${theme.colors.variant.lightest.default};
-      color: ${theme.colors.global.linkHover};
 
       &.active {
         color: ${theme.colors.variant.darkest.default};
@@ -118,7 +122,6 @@ const StyledListGroupItem = styled(BootstrapListGroupItem)(({ theme }) => css`
 
     .list-group-item-heading {
       color: inherit;
-      font-weight: bold;
     }
 
     .list-group-item-text {
@@ -138,7 +141,6 @@ const StyledListGroupItem = styled(BootstrapListGroupItem)(({ theme }) => css`
     .list-group-item-heading > small,
     .list-group-item-heading > .small {
       color: inherit;
-      font-weight: bold;
     }
 
     .list-group-item-text {

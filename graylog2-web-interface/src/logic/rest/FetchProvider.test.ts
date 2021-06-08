@@ -16,20 +16,44 @@
  */
 import express from 'express';
 import nodeFetch from 'node-fetch';
+import formidableMiddleware from 'express-formidable';
+import FormData from 'form-data';
 
-import fetch, { fetchFile } from './FetchProvider';
+import fetch, { Builder, fetchFile } from './FetchProvider';
 
 jest.unmock('./FetchProvider');
 
-jest.mock('stores/sessions/SessionStore', () => ({
-  isLoggedIn: jest.fn(() => true),
-  getSessionId: jest.fn(() => 'foobar'),
+jest.mock('injection/StoreProvider', () => ({
+  getStore: (key) => ({
+    Session: {
+      isLoggedIn: jest.fn(() => true),
+      getSessionId: jest.fn(() => 'foobar'),
+    },
+  }[key]),
+}));
+
+const mockLogout = jest.fn();
+
+jest.mock('injection/ActionsProvider', () => ({
+  getActions: (key) => ({
+    Session: {
+      logout: mockLogout,
+    },
+    ServerAvailability: {
+      reportSuccess: jest.fn(),
+      reportError: jest.fn(),
+    },
+  }[key]),
 }));
 
 const PORT = 0;
 
 const setUpServer = () => {
   const app = express();
+
+  app.use(formidableMiddleware());
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  app.use((err, req, res, next) => console.error(err));
 
   app.get('/test1', (req, res) => {
     res.send({ text: 'test' });
@@ -59,6 +83,24 @@ const setUpServer = () => {
     }
   });
 
+  app.get('/simulatesSessionExpiration', (req, res) => {
+    res.status(401).end();
+  });
+
+  app.put('/uploadFile', (req, res) => {
+    const contentType = req.header('Content-Type');
+
+    if (contentType === 'application/json') {
+      res.status(400).send('Invalid Content-Type set for form data!').end();
+
+      return;
+    }
+
+    res.send(req.fields).end();
+  });
+
+  app.post('/errorWithMessage', (req, res) => res.status(500).send({ message: 'The dungeon collapses. You die!' }));
+
   return app.listen(PORT, () => {});
 };
 
@@ -87,7 +129,7 @@ describe('FetchProvider', () => {
     ['POST without content', 'POST', 'test4', null],
     ['DELETE without content and status 204', 'DELETE', 'test5', null],
   ])('should receive a %s', async (text, method, url, expectedResponse) => {
-    return fetch(method, `${baseUrl}/${url}`, undefined).then((response) => {
+    return fetch(method, `${baseUrl}/${url}`).then((response) => {
       expect(response).toStrictEqual(expectedResponse);
     });
   });
@@ -96,5 +138,36 @@ describe('FetchProvider', () => {
     const result = await fetchFile('POST', `${baseUrl}/failIfWrongAcceptHeader`, {}, 'text/csv');
 
     expect(result).toEqual('foo,bar,baz');
+  });
+
+  it('removes local session if 401 is returned', async () => {
+    const error = await fetch('GET', `${baseUrl}/simulatesSessionExpiration`).catch((e) => e);
+
+    expect(error.name).toEqual('FetchError');
+    expect(error.message).toEqual('There was an error fetching a resource: Unauthorized. Additional information: Not available');
+
+    expect(mockLogout).toHaveBeenCalledWith('foobar');
+  });
+
+  it('supports uploading form data without content type', async () => {
+    const form = new FormData();
+    form.append('foo', 'bar');
+    const builder = new Builder('PUT', `${baseUrl}/uploadFile`).formData(form);
+    const result = await builder.build();
+
+    expect(result).toEqual({ foo: 'bar' });
+  });
+
+  it('extracts the error message from a failed request', async () => {
+    await expect(fetch('POST', `${baseUrl}/errorWithMessage`))
+      .rejects
+      .toThrowError('There was an error fetching a resource: Internal Server Error. Additional information: The dungeon collapses. You die!');
+  });
+
+  it('handles error properly when endpoint is not reachable', async () => {
+    const error = await fetch('POST', 'http://localhost:12223/').catch((e) => e);
+
+    expect(error.status).toEqual(undefined);
+    expect(error.message).toEqual('There was an error fetching a resource: undefined. Additional information: Not available');
   });
 });

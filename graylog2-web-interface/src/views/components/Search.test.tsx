@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { mount } from 'wrappedEnzyme';
+import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
 import { StoreMock as MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
 import mockComponent from 'helpers/mocking/MockComponent';
@@ -34,9 +34,10 @@ import View from 'views/logic/views/View';
 import SearchMetadata from 'views/logic/search/SearchMetadata';
 import CurrentViewTypeProvider from 'views/components/views/CurrentViewTypeProvider';
 import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
+import { SearchExecutionResult } from 'views/actions/SearchActions';
+import WindowLeaveMessage from 'views/components/common/WindowLeaveMessage';
 
 import Search from './Search';
-import DashboardSearchBar from './DashboardSearchBar';
 
 import { useSyncWithQueryParameters } from '../hooks/SyncWithQueryParameters';
 
@@ -101,14 +102,19 @@ jest.mock('views/stores/SearchConfigStore', () => ({
 jest.mock('views/components/QueryBar', () => mockComponent('QueryBar'));
 jest.mock('views/components/SearchResult', () => mockComponent('SearchResult'));
 jest.mock('views/stores/StreamsStore');
-jest.mock('views/components/common/WindowLeaveMessage', () => mockComponent('WindowLeaveMessage'));
+jest.mock('views/components/common/WindowLeaveMessage', () => jest.fn(mockComponent('WindowLeaveMessage')));
 jest.mock('views/components/WithSearchStatus', () => (x) => x);
 jest.mock('views/components/SearchBar', () => mockComponent('SearchBar'));
-jest.mock('views/components/DashboardSearchBar', () => mockComponent('DashboardSearchBar'));
+
+jest.mock('views/components/DashboardSearchBar', () => ({ onExecute }: { onExecute: (view: View) => Promise<void> }) => (
+  <button type="button" onClick={() => onExecute({ search: {} } as View)}>Execute Query</button>
+));
+
 jest.mock('views/stores/SearchMetadataStore');
 jest.mock('views/components/views/CurrentViewTypeProvider', () => jest.fn());
 jest.mock('views/hooks/SyncWithQueryParameters');
 jest.mock('routing/withLocation', () => (Component) => (props) => <Component location={{ query: {}, pathname: '', search: '' }} {...props} />);
+jest.mock('views/components/contexts/WidgetFieldTypesContextProvider', () => ({ children }) => children);
 
 const mockPromise = <T, >(res: T): Promise<T> => {
   const promise = Promise.resolve(res);
@@ -123,8 +129,7 @@ describe('Search', () => {
   beforeEach(() => {
     WidgetStore.listen = jest.fn(() => jest.fn());
     QueryFiltersStore.listen = jest.fn(() => jest.fn());
-    // @ts-ignore
-    SearchActions.execute = jest.fn(() => mockPromise());
+    SearchActions.execute = mockAction(jest.fn(async () => ({} as SearchExecutionResult)));
     StreamsActions.refresh = mockAction(jest.fn());
     SearchConfigActions.refresh = mockAction(jest.fn());
     SearchExecutionStateStore.listen = jest.fn(() => jest.fn());
@@ -138,6 +143,7 @@ describe('Search', () => {
     }));
 
     FieldTypesActions.all = mockAction(jest.fn(async () => {}));
+    FieldTypesActions.refresh = mockAction(jest.fn(async () => {}));
     SearchMetadataActions.parseSearch = mockAction(jest.fn(() => mockPromise(SearchMetadata.empty())));
     SearchMetadataStore.listen = jest.fn(() => jest.fn());
     SearchActions.refresh = mockAction(jest.fn(() => Promise.resolve()));
@@ -150,145 +156,146 @@ describe('Search', () => {
             {...props} />
   );
 
-  it('register a WindowLeaveMessage', () => {
-    const wrapper = mount(<SimpleSearch />);
+  const newSearchCallback = async () => {
+    await waitFor(() => expect(ViewActions.search.completed.listen).toHaveBeenCalled());
 
-    expect(wrapper.find('WindowLeaveMessage')).toHaveLength(1);
+    return asMock(ViewActions.search.completed.listen).mock.calls[0][0];
+  };
+
+  it('register a WindowLeaveMessage', async () => {
+    render(<SimpleSearch />);
+
+    await waitFor(() => expect(WindowLeaveMessage).toHaveBeenCalled());
   });
 
-  it('executes search upon mount', () => {
-    mount(<SimpleSearch />);
+  it('executes search upon mount', async () => {
+    render(<SimpleSearch />);
 
-    expect(SearchActions.execute).toHaveBeenCalled();
+    await waitFor(() => expect(SearchActions.execute).toHaveBeenCalled());
   });
 
-  it('refreshes search config upon mount', () => {
-    mount(<SimpleSearch />);
+  it('refreshes search config upon mount', async () => {
+    render(<SimpleSearch />);
 
-    expect(SearchConfigActions.refresh).toHaveBeenCalled();
+    await waitFor(() => expect(SearchConfigActions.refresh).toHaveBeenCalled());
   });
 
-  it('does not register to QueryFiltersStore upon mount', () => {
-    mount(<SimpleSearch />);
+  it('does not register to QueryFiltersStore upon mount', async () => {
+    render(<SimpleSearch />);
 
-    expect(QueryFiltersStore.listen).not.toHaveBeenCalled();
+    await waitFor(() => expect(QueryFiltersStore.listen).not.toHaveBeenCalled());
   });
 
   it('does not unregister from Query Filter store upon unmount', () => {
     const unsubscribe = jest.fn();
 
     QueryFiltersStore.listen = jest.fn(() => unsubscribe);
-    const wrapper = mount(<SimpleSearch />);
+    const { unmount } = render(<SimpleSearch />);
 
-    wrapper.unmount();
+    unmount();
 
     expect(unsubscribe).not.toHaveBeenCalled();
   });
 
-  it('registers to SearchActions.refresh upon mount', () => {
-    mount(<SimpleSearch />);
+  it('registers to SearchActions.refresh upon mount', async () => {
+    render(<SimpleSearch />);
 
-    expect(SearchActions.refresh.listen).toHaveBeenCalled();
+    await waitFor(() => expect(SearchActions.refresh.listen).toHaveBeenCalled());
   });
 
-  it('registers to ViewActions.search.completed upon mount', () => {
-    mount(<SimpleSearch />);
+  it('registers to ViewActions.search.completed upon mount', async () => {
+    render(<SimpleSearch />);
 
-    expect(ViewActions.search.completed.listen).toHaveBeenCalled();
+    await waitFor(() => expect(ViewActions.search.completed.listen).toHaveBeenCalled());
   });
 
-  it('registers to ViewActions.search.completed even if search refresh condition fails', () => {
-    mount(<SimpleSearch searchRefreshHools={[() => false]} />);
+  it('registers to ViewActions.search.completed even if search refresh condition fails', async () => {
+    render(<SimpleSearch searchRefreshHools={[() => false]} />);
 
-    expect(ViewActions.search.completed.listen).toHaveBeenCalled();
+    await waitFor(() => expect(ViewActions.search.completed.listen).toHaveBeenCalled());
   });
 
-  it('unregisters from ViewActions.search.completed upon unmount', () => {
+  it('unregisters from ViewActions.search.completed upon unmount', async () => {
     const unsubscribe = jest.fn();
 
     ViewActions.search.completed.listen = jest.fn(() => unsubscribe);
-    const wrapper = mount(<SimpleSearch />);
+    const { unmount } = render(<SimpleSearch />);
+
+    await waitFor(() => expect(ViewActions.search.completed.listen).toHaveBeenCalled());
 
     expect(unsubscribe).not.toHaveBeenCalled();
 
-    wrapper.unmount();
+    unmount();
 
-    expect(unsubscribe).toHaveBeenCalled();
+    await waitFor(() => expect(unsubscribe).toHaveBeenCalled());
   });
 
-  it('refreshes Streams upon mount', () => {
-    mount(<SimpleSearch />);
+  it('refreshes Streams upon mount', async () => {
+    render(<SimpleSearch />);
 
-    expect(StreamsActions.refresh).toHaveBeenCalled();
+    await waitFor(() => expect(StreamsActions.refresh).toHaveBeenCalled());
   });
 
   it('synchronizes URL upon mount', async () => {
-    mount(<SimpleSearch />);
+    render(<SimpleSearch />);
 
-    expect(useSyncWithQueryParameters).toHaveBeenCalled();
+    await waitFor(() => expect(useSyncWithQueryParameters).toHaveBeenCalled());
   });
 
-  it('updating search in view triggers search execution', () => {
-    mount(<SimpleSearch />);
+  it('updating search in view triggers search execution', async () => {
+    render(<SimpleSearch />);
 
-    const cb = asMock(ViewActions.search.completed.listen).mock.calls[0][0];
+    const cb = await newSearchCallback();
 
     asMock(SearchActions.execute).mockClear();
 
     expect(SearchActions.execute).not.toHaveBeenCalled();
 
-    return cb({ search: {} } as View)
-      .then(() => {
-        expect(SearchActions.execute).toHaveBeenCalled();
-      });
+    cb({ search: {} } as View);
+
+    await waitFor(() => expect(SearchActions.execute).toHaveBeenCalled());
   });
 
-  it('refreshes field types store upon mount', () => {
-    expect(FieldTypesActions.all).not.toHaveBeenCalled();
+  it('refreshes field types store upon mount', async () => {
+    expect(FieldTypesActions.refresh).not.toHaveBeenCalled();
 
-    mount(<SimpleSearch />);
+    render(<SimpleSearch />);
 
-    expect(FieldTypesActions.all).toHaveBeenCalled();
+    await waitFor(() => expect(FieldTypesActions.refresh).toHaveBeenCalled());
   });
 
-  it('refreshes field types upon every search execution', () => {
-    mount(<SimpleSearch />);
+  it('refreshes field types upon every search execution', async () => {
+    render(<SimpleSearch />);
 
-    asMock(FieldTypesActions.all).mockClear();
-    const cb = asMock(ViewActions.search.completed.listen).mock.calls[0][0];
+    asMock(FieldTypesActions.refresh).mockClear();
 
-    return cb({ search: {} } as View)
-      .then(() => {
-        expect(FieldTypesActions.all).toHaveBeenCalled();
-      });
+    const cb = await newSearchCallback();
+    cb({ search: {} } as View);
+
+    await waitFor(() => expect(FieldTypesActions.refresh).toHaveBeenCalled());
   });
 
-  it('refreshing after query change parses search metadata first', () => {
-    const wrapper = mount(<SimpleSearch />);
+  it('refreshing after query change parses search metadata first', async () => {
+    render(<SimpleSearch />);
 
-    const searchBar = wrapper.find(DashboardSearchBar);
-    const cb = searchBar.at(0).props().onExecute as (view?: View) => Promise<void>;
+    const executeQuery = await screen.findByRole('button', { name: 'Execute Query' });
 
-    const view = { search: {} };
+    fireEvent.click(executeQuery);
 
-    const promise = cb(view as View);
+    await waitFor(() => expect(SearchMetadataActions.parseSearch).toHaveBeenCalled());
 
-    return promise.then(() => {
-      expect(SearchMetadataActions.parseSearch).toHaveBeenCalled();
-      expect(SearchActions.execute).toHaveBeenCalled();
-    });
+    expect(SearchActions.execute).toHaveBeenCalled();
   });
 
-  it('changing current query in view does not trigger search execution', () => {
-    mount(<SimpleSearch />);
+  it('changing current query in view does not trigger search execution', async () => {
+    render(<SimpleSearch />);
 
     asMock(SearchActions.execute).mockClear();
 
     expect(SearchActions.execute).not.toHaveBeenCalled();
 
-    return ViewActions.selectQuery('someQuery')
-      .then(() => {
-        expect(SearchActions.execute).not.toHaveBeenCalled();
-      });
+    await ViewActions.selectQuery('someQuery');
+
+    expect(SearchActions.execute).not.toHaveBeenCalled();
   });
 });

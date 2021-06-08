@@ -18,7 +18,6 @@ import * as React from 'react';
 import { useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 
-import DateTime from 'logic/datetimes/DateTime';
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import StoreProvider from 'injection/StoreProvider';
 import { isTypeKeyword, isTypeRelativeWithStartOnly, isTypeRelativeWithEnd } from 'views/typeGuards/timeRange';
@@ -26,7 +25,7 @@ import { readableRange } from 'views/logic/queries/TimeRangeToString';
 
 type Props = {
   timerange: TimeRange | NoTimeRangeOverride | null | undefined,
-  toggleDropdownShow: () => void,
+  toggleDropdownShow?: () => void,
 };
 
 export const EMPTY_RANGE = '----/--/-- --:--:--.---';
@@ -54,7 +53,6 @@ const TimeRangeWrapper = styled.p(({ theme }) => css`
     font-size: ${theme.fonts.size.body};
   }
 `);
-
 
 const dateOutput = (timerange: TimeRange) => {
   let from = EMPTY_RANGE;
@@ -126,6 +124,10 @@ const TimeRangeDisplay = ({ timerange, toggleDropdownShow }: Props) => {
         )}
     </TimeRangeWrapper>
   );
+};
+
+TimeRangeDisplay.defaultProps = {
+  toggleDropdownShow: undefined,
 };
 
 export default TimeRangeDisplay;

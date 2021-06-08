@@ -23,6 +23,7 @@ import { asMock } from 'helpers/mocking';
 import { WidgetStore } from 'views/stores/WidgetStore';
 import WidgetFocusProvider from 'views/components/contexts/WidgetFocusProvider';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
+import SearchActions from 'views/actions/SearchActions';
 
 const mockHistoryReplace = jest.fn();
 
@@ -54,15 +55,13 @@ describe('WidgetFocusProvider', () => {
     });
   });
 
-  const renderSUT = (consume) => {
-    render(
-      <WidgetFocusProvider>
-        <WidgetFocusContext.Consumer>
-          {consume}
-        </WidgetFocusContext.Consumer>
-      </WidgetFocusProvider>,
-    );
-  };
+  const renderSUT = (consume) => render(
+    <WidgetFocusProvider>
+      <WidgetFocusContext.Consumer>
+        {consume}
+      </WidgetFocusContext.Consumer>
+    </WidgetFocusProvider>,
+  );
 
   it('should update url on widget focus', () => {
     let contextValue;
@@ -176,5 +175,18 @@ describe('WidgetFocusProvider', () => {
     expect(contextValue.focusedWidget).toBe(undefined);
 
     expect(mockHistoryReplace).toBeCalledWith('');
+  });
+
+  it('should not trigger search execution when not leaving widget editing', async () => {
+    useLocation.mockReturnValue({
+      pathname: '',
+      search: '',
+    });
+
+    const consume = jest.fn();
+
+    renderSUT(consume);
+
+    expect(SearchActions.executeWithCurrentState).not.toHaveBeenCalled();
   });
 });

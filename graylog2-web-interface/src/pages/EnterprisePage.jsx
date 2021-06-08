@@ -28,6 +28,7 @@ import DocumentationLink from 'components/support/DocumentationLink';
 import EnterpriseFreeLicenseForm from 'components/enterprise/EnterpriseFreeLicenseForm';
 import PluginList from 'components/enterprise/PluginList';
 import CombinedProvider from 'injection/CombinedProvider';
+import HideOnCloud from 'util/conditional/HideOnCloud';
 
 const { EnterpriseActions, EnterpriseStore } = CombinedProvider.get('Enterprise');
 
@@ -125,47 +126,49 @@ const EnterprisePage = createReactClass({
           <GraylogClusterOverview layout="compact">
             <PluginList />
           </GraylogClusterOverview>
-          <IfPermitted permissions="freelicenses:create">
-            <Row className="content">
-              <Col md={6}>
-                <GraylogEnterpriseHeader>Graylog Enterprise</GraylogEnterpriseHeader>
-                <BiggerFontSize>
-                  <p><strong>Extend Graylog’s Open Source capabilities with a free trial of Graylog Enterprise for 30 days.</strong></p>
-                  <p>
-                    Graylog Enterprise introduces productivity and compliance features designed to help organizations
-                    reduce risk while encouraging collaboration across a large number of users.
-                  </p>
+          <HideOnCloud>
+            <IfPermitted permissions="freelicenses:create">
+              <Row className="content">
+                <Col md={6}>
+                  <GraylogEnterpriseHeader>Graylog Enterprise</GraylogEnterpriseHeader>
+                  <BiggerFontSize>
+                    <p><strong>Extend Graylog’s Open Source capabilities with a free trial of Graylog Enterprise for 30 days.</strong></p>
+                    <p>
+                      Graylog Enterprise introduces productivity and compliance features designed to help organizations
+                      reduce risk while encouraging collaboration across a large number of users.
+                    </p>
 
-                  <p>Graylog Enterprise includes:</p>
+                    <p>Graylog Enterprise includes:</p>
 
-                  <EnterpriseFeatureList>
-                    <li>Automated <DocumentationLink page="archiving.html" text={<strong>archiving</strong>} /> and retention</li>
-                    <li><DocumentationLink page="auditlog.html" text={<strong>Audit logs</strong>} /> of Graylog user activity</li>
-                    <li>
-                      Alerts with <DocumentationLink page="alerts.html#filter-with-dynamic-lists-enterprise-feature" text={<strong>dynamic lists</strong>} />
-                      and <DocumentationLink page="alerts.html" text={<strong>correlation engine</strong>} /> for events
-                      to minimize the number of alerts that you need to create and maintain
-                    </li>
-                    <li>
-                      Customizable <DocumentationLink page="reporting.html" text={<strong>scheduled reporting</strong>} /> using dashboard widgets for sharing analysis outside Graylog
-                    </li>
-                    <li><DocumentationLink page="searching/parameters.html"
-                                           text={<strong>Parameterized search templates</strong>} /> enable you to
-                      combine and reuse queries
-                    </li>
-                    <li><DocumentationLink page="integrations/forwarder.html"
-                                           text={<strong>Data forwarder</strong>} /> to easily combine data from
-                      multiple Graylog instances
-                    </li>
-                    <li>And more...</li>
-                  </EnterpriseFeatureList>
-                </BiggerFontSize>
-              </Col>
-              <Col md={6}>
-                {this.renderLicenseFormContent(licenseStatus)}
-              </Col>
-            </Row>
-          </IfPermitted>
+                    <EnterpriseFeatureList>
+                      <li>Automated <DocumentationLink page="archiving.html" text={<strong>archiving</strong>} /> and retention</li>
+                      <li><DocumentationLink page="auditlog.html" text={<strong>Audit logs</strong>} /> of Graylog user activity</li>
+                      <li>
+                        Alerts with <DocumentationLink page="alerts.html#filter-with-dynamic-lists-enterprise-feature" text={<strong>dynamic lists</strong>} />
+                        {' '}and <DocumentationLink page="alerts.html" text={<strong>correlation engine</strong>} /> for events
+                        to minimize the number of alerts that you need to create and maintain
+                      </li>
+                      <li>
+                        Customizable <DocumentationLink page="reporting.html" text={<strong>scheduled reporting</strong>} /> using dashboard widgets for sharing analysis outside Graylog
+                      </li>
+                      <li><DocumentationLink page="searching/parameters.html"
+                                             text={<strong>Parameterized search templates</strong>} /> enable you to
+                        combine and reuse queries
+                      </li>
+                      <li><DocumentationLink page="integrations/forwarder.html"
+                                             text={<strong>Data forwarder</strong>} /> to easily combine data from
+                        multiple Graylog instances
+                      </li>
+                      <li>And more...</li>
+                    </EnterpriseFeatureList>
+                  </BiggerFontSize>
+                </Col>
+                <Col md={6}>
+                  {this.renderLicenseFormContent(licenseStatus)}
+                </Col>
+              </Row>
+            </IfPermitted>
+          </HideOnCloud>
         </div>
       </DocumentTitle>
     );

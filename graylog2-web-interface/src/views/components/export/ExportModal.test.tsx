@@ -41,6 +41,7 @@ import {
   viewWithoutWidget,
 } from 'views/components/export/Fixtures';
 import { createWidget } from 'views/logic/WidgetTestHelpers';
+import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 
 import ExportModal, { Props as ExportModalProps } from './ExportModal';
 
@@ -95,9 +96,11 @@ describe('ExportModal', () => {
   } & Optional<ExportModalProps>;
 
   const SimpleExportModal = ({ viewType = View.Type.Search, ...props }: SimpleExportModalProps) => (
-    <ViewTypeContext.Provider value={viewType}>
-      <ExportModal view={viewWithoutWidget(viewType)} {...props as ExportModalProps} />
-    </ViewTypeContext.Provider>
+    <FieldTypesContext.Provider value={{ all: Immutable.List(), queryFields: Immutable.Map() }}>
+      <ViewTypeContext.Provider value={viewType}>
+        <ExportModal view={viewWithoutWidget(viewType)} {...props as ExportModalProps} />
+      </ViewTypeContext.Provider>
+    </FieldTypesContext.Provider>
   );
 
   SimpleExportModal.defaultProps = {

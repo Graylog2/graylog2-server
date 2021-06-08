@@ -22,6 +22,7 @@ import ActionsProvider from 'injection/ActionsProvider';
 import { createFromFetchError } from 'logic/errors/ReportedErrors';
 import Routes from 'routing/Routes';
 import history from 'util/History';
+import CancellablePromise from 'logic/rest/CancellablePromise';
 
 const reportServerSuccess = () => {
   const ServerAvailabilityActions = ActionsProvider.getActions('ServerAvailability');
@@ -31,9 +32,13 @@ const reportServerSuccess = () => {
 
 const defaultOnUnauthorizedError = (error) => ErrorsActions.report(createFromFetchError(error));
 
-const onServerError = (error, onUnauthorized = defaultOnUnauthorizedError) => {
+const emptyToUndefined = (s: any) => (s && s !== '' ? s : undefined);
+
+const onServerError = async (error: Response | undefined, onUnauthorized = defaultOnUnauthorizedError) => {
+  const contentType = error.headers?.get('Content-Type');
+  const response = await (contentType?.startsWith('application/json') ? error.json().then((body) => body) : error?.text?.());
   const SessionStore = StoreProvider.getStore('Session');
-  const fetchError = new FetchError(error.statusText, error);
+  const fetchError = new FetchError(error.statusText, error.status, emptyToUndefined(response));
 
   if (SessionStore.isLoggedIn() && error.status === 401) {
     const SessionActions = ActionsProvider.getActions('Session');
@@ -46,7 +51,7 @@ const onServerError = (error, onUnauthorized = defaultOnUnauthorizedError) => {
     onUnauthorized(fetchError);
   }
 
-  if (error.originalError && !error.originalError.status) {
+  if (error && !error.status) {
     const ServerAvailabilityActions = ActionsProvider.getActions('ServerAvailability');
 
     ServerAvailabilityActions.reportError(fetchError);
@@ -62,6 +67,20 @@ type RequestHeaders = {
   'Content-Type'?: string,
 };
 
+const defaultResponseHandler = (resp: Response) => {
+  if (resp.ok) {
+    const { status } = resp;
+    const contentLength = Number.parseInt(resp.headers.get('Content-Length'), 10);
+    const noContent = status === 204 || contentLength === 0;
+
+    reportServerSuccess();
+
+    return noContent ? null : resp.json();
+  }
+
+  throw resp;
+};
+
 export class Builder {
   private options = {};
 
@@ -69,7 +88,7 @@ export class Builder {
 
   private readonly method: string;
 
-  private body: { body: any, mimeType: string };
+  private body: { body: any, mimeType?: string };
 
   private accept: string;
 
@@ -121,20 +140,19 @@ export class Builder {
     this.body = { body: maybeStringify(body), mimeType: 'application/json' };
     this.accept = 'application/json';
 
-    this.responseHandler = (resp: Response) => {
-      if (resp.ok) {
-        const { status } = resp;
-        const contentLength = Number.parseInt(resp.headers.get('Content-Length'), 10);
-        const noContent = status === 204 || contentLength === 0;
+    this.responseHandler = defaultResponseHandler;
 
-        reportServerSuccess();
+    this.errorHandler = (error) => onServerError(error);
 
-        return noContent ? null : resp.json();
-      }
+    return this;
+  }
 
-      throw new FetchError(resp.statusText, resp);
-    };
+  formData(body, acceptedMimeType = 'application/json') {
+    this.body = { body };
 
+    this.accept = acceptedMimeType;
+
+    this.responseHandler = defaultResponseHandler;
     this.errorHandler = (error) => onServerError(error);
 
     return this;
@@ -151,7 +169,7 @@ export class Builder {
         return resp.text();
       }
 
-      throw new FetchError(resp.statusText, resp);
+      throw resp;
     };
 
     this.errorHandler = (error) => onServerError(error);
@@ -172,7 +190,7 @@ export class Builder {
         return resp.json();
       }
 
-      throw new FetchError(resp.statusText, resp);
+      throw resp;
     };
 
     this.errorHandler = (error) => onServerError(error, onUnauthorized);
@@ -190,7 +208,7 @@ export class Builder {
   }
 
   build() {
-    const headers: RequestHeaders = this.body
+    const headers: RequestHeaders = this.body && this.body.mimeType
       ? { ...this.options, 'Content-Type': this.body.mimeType }
       : this.options;
 
@@ -198,11 +216,12 @@ export class Builder {
       headers.Accept = this.accept;
     }
 
-    return window.fetch(this.url, {
+    return CancellablePromise.of(window.fetch(this.url, {
       method: this.method,
       headers,
       body: this.body ? this.body.body : undefined,
-    }).then(this.responseHandler, this.errorHandler);
+    })).then(this.responseHandler, this.errorHandler)
+      .catch(this.errorHandler);
   }
 }
 
@@ -210,13 +229,13 @@ function queuePromiseIfNotLoggedin(promise) {
   const SessionStore = StoreProvider.getStore('Session');
 
   if (!SessionStore.isLoggedIn()) {
-    return () => new Promise((resolve, reject) => {
+    return () => CancellablePromise.of(new Promise((resolve, reject) => {
       const SessionActions = ActionsProvider.getActions('Session');
 
       SessionActions.login.completed.listen(() => {
         promise().then(resolve, reject);
       });
-    });
+    }));
   }
 
   return promise;

@@ -154,6 +154,7 @@ public class HttpPollTransport extends ThrottleableTransport {
             if (isThrottled()) {
                 // this transport won't block, but we can simply skip this iteration
                 LOG.debug("Not polling HTTP resource {} because we are throttled.", url);
+                return;
             }
 
             final Request.Builder requestBuilder = new Request.Builder().get()
@@ -162,7 +163,8 @@ public class HttpPollTransport extends ThrottleableTransport {
 
             try (final Response r = httpClient.newCall(requestBuilder.build()).execute()) {
                 if (!r.isSuccessful()) {
-                    throw new RuntimeException("Expected successful HTTP status code [2xx], got " + r.code());
+                    LOG.error("Expected successful HTTP status code [2xx], got " + r.code());
+                    return;
                 }
 
                 input.processRawMessage(new RawMessage(r.body().bytes(), remoteAddress));

@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 
@@ -24,10 +24,13 @@ import WidgetClass from 'views/logic/widgets/Widget';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import TFieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import ExportSettingsContextProvider from 'views/components/ExportSettingsContextProvider';
+import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
+import View from 'views/logic/views/View';
 
 import { WidgetDataMap, WidgetErrorsMap } from './widgets/WidgetPropTypes';
 import Widget from './widgets/Widget';
 import DrilldownContextProvider from './contexts/DrilldownContextProvider';
+import WidgetFieldTypesContextProvider from './contexts/WidgetFieldTypesContextProvider';
 
 type Props = {
   data: WidgetDataMap,
@@ -57,24 +60,29 @@ const WidgetComponent = ({
   const dataKey = widget.data || widget.id;
   const widgetData = data[dataKey];
   const widgetErrors = errors[widget.id] || [];
+  const viewType = useContext(ViewTypeContext);
+
+  const WidgetFieldTypesIfDashboard = viewType === View.Type.Dashboard ? WidgetFieldTypesContextProvider : React.Fragment;
 
   return (
     <DrilldownContextProvider widget={widget}>
       <WidgetContext.Provider value={widget}>
         <AdditionalContext.Provider value={{ widget }}>
           <ExportSettingsContextProvider>
-            <Widget data={widgetData}
-                    editing={editing}
-                    errors={widgetErrors}
-                    fields={fields}
-                    height={height}
-                    id={widget.id}
-                    onPositionsChange={onPositionsChange}
-                    onSizeChange={onWidgetSizeChange}
-                    position={position}
-                    title={title}
-                    widget={widget}
-                    width={width} />
+            <WidgetFieldTypesIfDashboard>
+              <Widget data={widgetData}
+                      editing={editing}
+                      errors={widgetErrors}
+                      fields={fields}
+                      height={height}
+                      id={widget.id}
+                      onPositionsChange={onPositionsChange}
+                      onSizeChange={onWidgetSizeChange}
+                      position={position}
+                      title={title}
+                      widget={widget}
+                      width={width} />
+            </WidgetFieldTypesIfDashboard>
           </ExportSettingsContextProvider>
         </AdditionalContext.Provider>
       </WidgetContext.Provider>

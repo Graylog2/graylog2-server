@@ -26,8 +26,6 @@ import { resultHistogram, allMessagesTable } from '../Widgets';
 import WidgetPosition from '../widgets/WidgetPosition';
 import Widget from '../widgets/Widget';
 
-const { DecoratorsActions } = CombinedProvider.get('Decorators');
-
 type Result = {
   titles: { widget: { [key: string]: string } },
   widgets: Array<Widget>,
@@ -39,6 +37,7 @@ type DefaultWidgets = Record<ViewType, ViewCreator>;
 
 const _defaultWidgets: DefaultWidgets = {
   [View.Type.Search]: async (streamId: string | undefined | null) => {
+    const { DecoratorsActions } = CombinedProvider.get('Decorators');
     const decorators = await DecoratorsActions.list();
     const streamDecorators = decorators ? decorators.filter((decorator) => decorator.stream === streamId) : [];
     const histogram = resultHistogram();

@@ -19,6 +19,7 @@ import { useEffect, useState } from 'react';
 import { useFormikContext } from 'formik';
 import styled, { css } from 'styled-components';
 
+import { Spinner } from 'components/common';
 import { ButtonToolbar } from 'components/graylog';
 import Button from 'components/graylog/Button';
 import AggregationElementSelect from 'views/components/aggregationwizard/AggregationElementSelect';
@@ -121,9 +122,9 @@ const ElementsConfigurationActions = () => {
           </SelectContainer>
 
           {dirty && (
-          <Button bsStyle="primary" className="pull-right" type="submit" disabled={!isValid || isSubmitting}>
-            {isSubmitting ? 'Applying Changes' : 'Apply Changes'}
-          </Button>
+            <Button bsStyle="success" className="pull-right" type="submit" disabled={!isValid || isSubmitting}>
+              {isSubmitting ? <Spinner text="Updating Preview" delay={0} /> : 'Update Preview'}
+            </Button>
           )}
         </ButtonToolbar>
       </ConfigActions>

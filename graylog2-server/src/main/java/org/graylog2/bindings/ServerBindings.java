@@ -111,7 +111,7 @@ public class ServerBindings extends Graylog2Module {
         install(new AuthorizationOnlyRealmModule());
         bindSearchResponseDecorators();
         install(new GrokModule());
-        install(new LookupModule());
+        install(new LookupModule(configuration));
         install(new FieldTypesModule());
 
         // Just to create the binders so they are present in the injector. Prevents a server startup error when no

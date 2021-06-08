@@ -20,6 +20,7 @@ import { act, fireEvent, render, screen, waitFor, within } from 'wrappedTestingL
 import selectEvent from 'react-select-event';
 import userEvent from '@testing-library/user-event';
 import { PluginRegistration, PluginStore } from 'graylog-web-plugin/plugin';
+import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import DataTable from 'views/components/datatable/DataTable';
@@ -31,7 +32,7 @@ import dataTable from 'views/components/datatable/bindings';
 
 import AggregationWizard from '../AggregationWizard';
 
-const extendedTimeout = (Number(process.env.TIMEOUT_MULTIPLIER) || 1) * 15000;
+const extendedTimeout = applyTimeoutMultiplier(15000);
 
 const widgetConfig = AggregationWidgetConfig
   .builder()
@@ -47,9 +48,25 @@ const fieldTypes = { all: fields, queryFields: Immutable.Map({ queryId: fields }
 
 const plugin: PluginRegistration = { exports: { visualizationTypes: [dataTable] } };
 
+const selectEventConfig = { container: document.body };
+
 const addElement = async (key: 'Grouping' | 'Metric' | 'Sort') => {
   await userEvent.click(await screen.findByRole('button', { name: 'Add' }));
   await userEvent.click(await screen.findByRole('menuitem', { name: key }));
+};
+
+const selectField = async (fieldName) => {
+  const fieldSelection = await screen.findByLabelText('Field');
+
+  await act(async () => {
+    await selectEvent.openMenu(fieldSelection);
+    await selectEvent.select(fieldSelection, fieldName, selectEventConfig);
+  });
+};
+
+const submitWidgetConfigForm = async () => {
+  const applyButton = await screen.findByRole('button', { name: 'Update Preview' });
+  fireEvent.click(applyButton);
 };
 
 describe('AggregationWizard', () => {
@@ -62,7 +79,7 @@ describe('AggregationWizard', () => {
                          fields={Immutable.List([])}
                          onChange={() => {}}
                          {...props}>
-        The Visualization
+        <>The Visualization</>
       </AggregationWizard>,
     </FieldTypesContext.Provider>,
   );
@@ -74,8 +91,7 @@ describe('AggregationWizard', () => {
   it('should require group by function when adding a group by element', async () => {
     renderSUT();
 
-    await userEvent.click(await screen.findByRole('button', { name: 'Add' }));
-    await userEvent.click(await screen.findByRole('menuitem', { name: 'Grouping' }));
+    await addElement('Grouping');
 
     await waitFor(() => expect(screen.getByText('Field is required.')).toBeInTheDocument());
   });
@@ -85,16 +101,8 @@ describe('AggregationWizard', () => {
     renderSUT({ onChange });
 
     await addElement('Grouping');
-
-    const fieldSelection = await screen.findByLabelText('Field');
-
-    await act(async () => {
-      await selectEvent.openMenu(fieldSelection);
-      await selectEvent.select(fieldSelection, 'took_ms');
-    });
-
-    const applyButton = await screen.findByRole('button', { name: 'Apply Changes' });
-    fireEvent.click(applyButton);
+    await selectField('took_ms');
+    await submitWidgetConfigForm();
 
     const pivot = Pivot.create('took_ms', 'values', { limit: 15 });
     const updatedConfig = widgetConfig
@@ -111,13 +119,7 @@ describe('AggregationWizard', () => {
     renderSUT();
 
     await addElement('Grouping');
-
-    const fieldSelection = await screen.findByLabelText('Field');
-
-    await act(async () => {
-      await selectEvent.openMenu(fieldSelection);
-      await selectEvent.select(fieldSelection, 'timestamp');
-    });
+    await selectField('timestamp');
 
     const autoCheckbox = await screen.findByRole('checkbox', { name: 'Auto' });
     await screen.findByRole('slider', { name: /interval/i });
@@ -132,25 +134,17 @@ describe('AggregationWizard', () => {
     renderSUT({ onChange });
 
     await addElement('Grouping');
-
-    const fieldSelection = await screen.findByLabelText('Field');
-
-    await act(async () => {
-      await selectEvent.openMenu(fieldSelection);
-      await selectEvent.select(fieldSelection, 'timestamp');
-    });
-
+    await selectField('timestamp');
     await addElement('Grouping');
 
     const fieldSelections = await screen.findAllByLabelText('Field');
 
     await act(async () => {
       await selectEvent.openMenu(fieldSelections[1]);
-      await selectEvent.select(fieldSelections[1], 'took_ms');
+      await selectEvent.select(fieldSelections[1], 'took_ms', selectEventConfig);
     });
 
-    const applyButton = await screen.findByRole('button', { name: 'Apply Changes' });
-    fireEvent.click(applyButton);
+    await submitWidgetConfigForm();
 
     const pivot0 = Pivot.create('timestamp', 'time', { interval: { type: 'auto', scaling: 1 } });
     const pivot1 = Pivot.create('took_ms', 'values', { limit: 15 });
@@ -202,16 +196,8 @@ describe('AggregationWizard', () => {
     renderSUT({ onChange, config });
 
     await screen.findByText('timestamp');
-
-    const fieldSelection = await screen.findByLabelText('Field');
-
-    await act(async () => {
-      await selectEvent.openMenu(fieldSelection);
-      await selectEvent.select(fieldSelection, 'took_ms');
-    });
-
-    const applyButton = await screen.findByRole('button', { name: 'Apply Changes' });
-    fireEvent.click(applyButton);
+    await selectField('took_ms');
+    await submitWidgetConfigForm();
 
     const updatedConfig = widgetConfig
       .toBuilder()
@@ -244,8 +230,7 @@ describe('AggregationWizard', () => {
     fireEvent.keyDown(firstItem, { key: 'Space', keyCode: 32 });
     await screen.findByText(/You have dropped the item/i);
 
-    const applyButton = await screen.findByRole('button', { name: 'Apply Changes' });
-    fireEvent.click(applyButton);
+    await submitWidgetConfigForm();
 
     const updatedConfig = widgetConfig
       .toBuilder()

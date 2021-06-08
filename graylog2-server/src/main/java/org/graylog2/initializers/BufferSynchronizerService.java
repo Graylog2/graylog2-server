@@ -28,12 +28,16 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.EnumSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 import static com.codahale.metrics.MetricRegistry.name;
+import static org.graylog2.buffers.Buffers.Type.INPUT;
+import static org.graylog2.buffers.Buffers.Type.OUTPUT;
+import static org.graylog2.buffers.Buffers.Type.PROCESS;
 
 @Singleton
 public class BufferSynchronizerService extends AbstractIdleService {
@@ -62,21 +66,20 @@ public class BufferSynchronizerService extends AbstractIdleService {
     @Override
     protected void shutDown() throws Exception {
         LOG.debug("Stopping BufferSynchronizerService");
+        final ExecutorService executorService = executorService(metricRegistry);
+
+        EnumSet<Buffers.Type> buffersToDrain = EnumSet.of(INPUT);
         if (cluster.isConnected() && cluster.isDeflectorHealthy()) {
-            final ExecutorService executorService = executorService(metricRegistry);
-
-            executorService.submit(new Runnable() {
-                @Override
-                public void run() {
-                    bufferSynchronizer.waitForEmptyBuffers(configuration.getShutdownTimeout(), TimeUnit.MILLISECONDS);
-                }
-            });
-
-            executorService.shutdown();
-            executorService.awaitTermination(configuration.getShutdownTimeout(), TimeUnit.MILLISECONDS);
+            buffersToDrain.add(PROCESS);
+            buffersToDrain.add(OUTPUT);
         } else {
-            LOG.warn("Elasticsearch is unavailable. Not waiting to clear buffers and caches, as we have no healthy cluster.");
+            LOG.warn("Elasticsearch is unavailable. Not waiting to clear process and output buffers and caches, as we" +
+                    " have no healthy cluster.");
         }
+        executorService.submit(() -> bufferSynchronizer.waitForEmptyBuffers(buffersToDrain,
+                configuration.getShutdownTimeout(), TimeUnit.MILLISECONDS));
+        executorService.shutdown();
+        executorService.awaitTermination(configuration.getShutdownTimeout(), TimeUnit.MILLISECONDS);
         LOG.debug("Stopped BufferSynchronizerService");
     }
 

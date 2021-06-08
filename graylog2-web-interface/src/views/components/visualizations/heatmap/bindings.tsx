@@ -103,7 +103,7 @@ const heatmap: VisualizationType<HeatmapVisualizationConfig, HeatMapVisualizatio
       type: 'numeric',
       title: 'Default Value',
       isShown: (values: HeatMapVisualizationConfigFormValues) => !values?.useSmallestAsDefault,
-      required: true,
+      required: false,
     }],
   },
   validate,

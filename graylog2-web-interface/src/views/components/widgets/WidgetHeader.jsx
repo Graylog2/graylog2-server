@@ -41,7 +41,6 @@ const WidgetDragHandle = styled(Icon)`
 
 const WidgetActionDropdown = styled.span`
   position: relative;
-  z-index: 1;
 `;
 
 const WidgetHeader = ({ children, onRename, hideDragHandle, title, loading }) => (

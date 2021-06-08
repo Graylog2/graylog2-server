@@ -47,7 +47,7 @@ const MoveWidgetToTabModal = ({ view, onCancel, onSubmit, widgetId }: Props) => 
   const [selectedTab, setSelectedTab] = useState(null);
   const [keepCopy, setKeepCopy] = useState(false);
   const { id: activeQuery } = useStore(CurrentQueryStore);
-  const queryIds = useStore(QueryIdsStore) as Immutable.List<string>;
+  const queryIds = useStore(QueryIdsStore);
   const onKeepCopy = useCallback((e) => setKeepCopy(e.target.checked), [setKeepCopy]);
   const submit = useCallback(() => onSubmit(widgetId, selectedTab, keepCopy), [widgetId, selectedTab, keepCopy]);
 

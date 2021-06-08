@@ -24,8 +24,6 @@ type LineVisualizationConfigFormValues = {
   interpolation: 'linear' | 'step-after' | 'spline';
 };
 
-const DEFAULT_INTERPOLATION = 'linear';
-
 const validate = hasAtLeastOneMetric('Line chart');
 
 const lineChart: VisualizationType<LineVisualizationConfig, LineVisualizationConfigFormValues> = {
@@ -33,8 +31,8 @@ const lineChart: VisualizationType<LineVisualizationConfig, LineVisualizationCon
   displayName: 'Line Chart',
   component: LineVisualization,
   config: {
-    createConfig: () => ({ interpolation: DEFAULT_INTERPOLATION }),
-    fromConfig: (config: LineVisualizationConfig | undefined) => ({ interpolation: config?.interpolation }),
+    createConfig: () => ({ interpolation: LineVisualizationConfig.DEFAULT_INTERPOLATION }),
+    fromConfig: (config: LineVisualizationConfig | undefined) => ({ interpolation: config?.interpolation ?? LineVisualizationConfig.DEFAULT_INTERPOLATION }),
     toConfig: (formValues: LineVisualizationConfigFormValues) => LineVisualizationConfig.create(formValues.interpolation),
     fields: [{
       name: 'interpolation',

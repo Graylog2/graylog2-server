@@ -353,6 +353,15 @@ public abstract class PluginModule extends Graylog2Module {
     }
 
     /**
+     * @return A boolean indicating if the plugin is being loaded on Graylog Cloud. The graylog.cloud system property is
+     * set in the startup sequence of the Graylog Cloud Plugin.
+     */
+    protected boolean isCloud() {
+        // TODO: check if we can get rid of this method, now that we have the ability to inject core config into plugins
+        return Boolean.parseBoolean(System.getProperty("graylog.cloud"));
+    }
+
+    /**
      * Bind a message queue implementation. If any of the given classes implements the {@link Service} interface, it
      * will also be registered with the {@link #serviceBinder()}.
      *

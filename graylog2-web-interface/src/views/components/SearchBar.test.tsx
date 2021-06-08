@@ -41,6 +41,13 @@ jest.mock('stores/streams/StreamsStore', () => MockStore(
   'availableStreams',
 ));
 
+jest.mock('views/stores/SearchConfigStore', () => ({
+  SearchConfigStore: MockStore(['getInitialState', () => ({})]),
+  SearchConfigActions: {
+    refresh: jest.fn(() => Promise.resolve()),
+  },
+}));
+
 jest.mock('views/components/searchbar/QueryInput', () => 'query-input');
 jest.mock('views/components/searchbar/saved-search/SavedSearchControls', () => jest.fn(() => <div>Saved Search Controls</div>));
 
@@ -73,7 +80,7 @@ describe('SearchBar', () => {
     const streamsFilter = screen.getByTestId('streams-filter');
     const liveUpdate = screen.getByLabelText('Refresh Search Controls');
     const searchButton = screen.getByTitle('Perform search');
-    const metaButtons = screen.getByLabelText('Search Meta Buttons');
+    const metaButtons = screen.getByText('Saved Search Controls');
 
     expect(timeRangeButton).not.toBeNull();
     expect(timeRangeDisplay).not.toBeNull();

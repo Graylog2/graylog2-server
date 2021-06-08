@@ -33,6 +33,7 @@ import org.bson.types.ObjectId;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.security.PermissionAndRoleResolver;
+import org.graylog.security.permissions.CaseSensitiveWildcardPermission;
 import org.graylog.security.permissions.GRNPermission;
 import org.graylog2.Configuration;
 import org.graylog2.database.MongoConnection;
@@ -261,6 +262,10 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
 
     @Override
     public User create() {
+        return userFactory.create(initialUserFields());
+    }
+
+    public static Map<String, Object> initialUserFields() {
         final Map<String, Object> fields = new HashMap<>();
 
         // We always want the authentication service fields in new user objects, event if they don't get set
@@ -270,8 +275,7 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
         fields.put(UserImpl.EXTERNAL_USER, false);
         // New accounts are enabled by default
         fields.put(UserImpl.ACCOUNT_STATUS, User.AccountStatus.ENABLED.toString().toLowerCase(Locale.US));
-
-        return userFactory.create(fields);
+        return fields;
     }
 
     @Override
@@ -379,9 +383,9 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
     public List<Permission> getPermissionsForUser(User user) {
         final GRN principal = grnRegistry.ofUser(user);
         final ImmutableSet.Builder<Permission> permSet = ImmutableSet.<Permission>builder()
-                .addAll(user.getPermissions().stream().map(WildcardPermission::new).collect(Collectors.toSet()))
+                .addAll(user.getPermissions().stream().map(CaseSensitiveWildcardPermission::new).collect(Collectors.toSet()))
                 .addAll(permissionAndRoleResolver.resolvePermissionsForPrincipal(principal))
-                .addAll(getUserPermissionsFromRoles(user).stream().map(WildcardPermission::new).collect(Collectors.toSet()));
+                .addAll(getUserPermissionsFromRoles(user).stream().map(CaseSensitiveWildcardPermission::new).collect(Collectors.toSet()));
 
         return permSet.build().asList();
     }

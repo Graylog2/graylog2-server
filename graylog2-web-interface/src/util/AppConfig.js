@@ -47,8 +47,22 @@ const AppConfig = {
     return this.appConfig().rootTimeZone;
   },
 
+  isCloud() {
+    if (typeof IS_CLOUD !== 'undefined') {
+      // The IS_CLOUD variable will be set by webpack via the DefinePlugin.
+      // eslint-disable-next-line no-undef
+      return IS_CLOUD;
+    }
+
+    return this.appConfig().isCloud;
+  },
+
   customThemeColors() {
     return this.appConfig()?.pluginUISettings?.['org.graylog.plugins.customization.theme'] ?? {};
+  },
+
+  publicNotifications() {
+    return this.appConfig()?.pluginUISettings?.['org.graylog.plugins.customization.notifications'] ?? {};
   },
 
   appConfig() {

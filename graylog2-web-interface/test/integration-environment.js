@@ -63,6 +63,7 @@ class IntegrationEnvironment extends JSDomEnvironment {
     }));
 
     api.get(`${prefix}views/fields`, (req, res) => res.json([]));
+    api.post(`${prefix}views/fields`, (req, res) => res.json([]));
     api.get(`${prefix}views/functions`, (req, res) => res.json([]));
 
     api.post(`${prefix}views/search`, (req, res) => {

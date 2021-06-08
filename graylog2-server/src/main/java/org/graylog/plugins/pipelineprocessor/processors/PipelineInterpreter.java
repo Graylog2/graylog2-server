@@ -300,13 +300,22 @@ public class PipelineInterpreter implements MessageProcessor {
         boolean anyRulesMatched = stageRules.isEmpty(); // If there are no rules, we can simply continue to the next stage
         boolean allRulesMatched = true;
         for (Rule rule : stageRules) {
-            final boolean ruleCondition = evaluateRuleCondition(rule, message, msgId, pipeline, context, rulesToRun, interpreterListener);
-            anyRulesMatched |= ruleCondition;
-            allRulesMatched &= ruleCondition;
+            try {
+                final boolean ruleCondition = evaluateRuleCondition(rule, message, msgId, pipeline, context, rulesToRun, interpreterListener);
+                anyRulesMatched |= ruleCondition;
+                allRulesMatched &= ruleCondition;
+            } catch(Exception e) {
+                log.warn("Error evaluating condition for rule <{}/{}> with message: {} (Error: {})",
+                        rule.name(), rule.id(), message, e.getMessage());
+                throw e;
+            }
         }
 
         for (Rule rule : rulesToRun) {
             if (!executeRuleActions(rule, message, msgId, pipeline, context, interpreterListener)) {
+                final EvaluationContext.EvalError lastError = Iterables.getLast(context.evaluationErrors());
+                log.warn("Error evaluating action for rule <{}/{}> with message: {} (Error: {})",
+                        rule.name(), rule.id(), message, lastError);
                 // if any of the rules raise an error, skip the rest of the rules
                 break;
             }

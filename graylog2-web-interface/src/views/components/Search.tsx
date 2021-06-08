@@ -70,7 +70,9 @@ const GridContainer = styled.div<{ interactive: boolean }>(({ interactive }) => 
     > *:nth-child(2) {
       flex-grow: 1;
     }
-  ` : '';
+  ` : css`
+    flex: 1
+  `;
 });
 
 const SearchArea = styled(PageContentLayout)(() => {
@@ -119,7 +121,7 @@ const _refreshIfNotUndeclared = (searchRefreshHooks, executionState) => {
 
   return SearchMetadataActions.parseSearch(view.search).then((searchMetadata) => {
     if (_searchRefreshConditionChain(searchRefreshHooks, { view, searchMetadata, executionState })) {
-      FieldTypesActions.all();
+      FieldTypesActions.refresh();
 
       return SearchActions.execute(executionState);
     }

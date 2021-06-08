@@ -21,7 +21,8 @@ import lodash from 'lodash';
 import { ControlLabel, FormGroup, HelpBlock } from 'components/graylog';
 import { MultiSelect, SourceCodeEditor } from 'components/common';
 import { Input } from 'components/bootstrap';
-import * as FormsUtils from 'util/FormsUtils';
+import { getValueFromInput } from 'util/FormsUtils';
+import HideOnCloud from 'util/conditional/HideOnCloud';
 
 // TODO: Default body template should come from the server
 const DEFAULT_BODY_TEMPLATE = `--- [Event Definition] ---------------------------
@@ -109,7 +110,7 @@ class EmailNotificationForm extends React.Component {
   handleChange = (event) => {
     const { name } = event.target;
 
-    this.propagateChange(name, FormsUtils.getValueFromInput(event.target));
+    this.propagateChange(name, getValueFromInput(event.target));
   };
 
   handleBodyTemplateChange = (nextValue) => {
@@ -133,15 +134,6 @@ class EmailNotificationForm extends React.Component {
 
     return (
       <>
-        <Input id="notification-sender"
-               name="sender"
-               label="Sender"
-               type="text"
-               bsStyle={validation.errors.sender ? 'error' : null}
-               help={lodash.get(validation, 'errors.sender[0]', 'The email address that should be used as the notification sender.')}
-               value={config.sender || ''}
-               onChange={this.handleChange}
-               required />
         <Input id="notification-subject"
                name="subject"
                label="Subject"
@@ -151,6 +143,17 @@ class EmailNotificationForm extends React.Component {
                value={config.subject || ''}
                onChange={this.handleChange}
                required />
+        <HideOnCloud>
+          <Input id="notification-sender"
+                 name="sender"
+                 label={<ControlLabel>Sender <small className="text-muted">(Optional)</small></ControlLabel>}
+                 type="text"
+                 bsStyle={validation.errors.sender ? 'error' : null}
+                 help={lodash.get(validation, 'errors.sender[0]',
+                   'The email address that should be used as the notification sender. Leave it empty to use the default sender address.')}
+                 value={config.sender || ''}
+                 onChange={this.handleChange} />
+        </HideOnCloud>
         <FormGroup controlId="notification-user-recipients"
                    validationState={validation.errors.recipients ? 'error' : null}>
           <ControlLabel>User recipient(s) <small className="text-muted">(Optional)</small></ControlLabel>
