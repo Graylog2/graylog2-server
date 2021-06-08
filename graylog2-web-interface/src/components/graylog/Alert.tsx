@@ -19,15 +19,14 @@ import * as React from 'react';
 import styled, { css, DefaultTheme } from 'styled-components';
 // eslint-disable-next-line no-restricted-imports
 import { Alert as BootstrapAlert } from 'react-bootstrap';
-
-import { ColorVariants } from 'theme/colors';
+import type { TColorVariants } from '@graylog/sawmill';
 
 interface AlertProps {
-  $bsStyle: ColorVariants,
+  $bsStyle: TColorVariants,
   theme: DefaultTheme
 }
 
-const StyledAlert = styled(BootstrapAlert).attrs(({ bsStyle }: { bsStyle: ColorVariants }) => ({
+const StyledAlert = styled(BootstrapAlert).attrs(({ bsStyle }: { bsStyle: TColorVariants }) => ({
   bsStyle: null,
   $bsStyle: bsStyle || 'default',
 }))(({ $bsStyle, theme }: AlertProps) => {
@@ -64,7 +63,7 @@ const StyledAlert = styled(BootstrapAlert).attrs(({ bsStyle }: { bsStyle: ColorV
   `;
 });
 
-const Alert = ({ bsStyle, ...rest }: {bsStyle: ColorVariants}) => {
+const Alert = ({ bsStyle, ...rest }: {bsStyle: TColorVariants}) => {
   return <StyledAlert bsStyle={bsStyle} {...rest} />;
 };
 

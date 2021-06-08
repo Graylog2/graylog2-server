@@ -18,6 +18,7 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { ThemeProvider, DefaultTheme } from 'styled-components';
+import type { TColors } from '@graylog/sawmill';
 
 import buttonStyles from 'components/graylog/styles/buttonStyles';
 import aceEditorStyles from 'components/graylog/styles/aceEditorStyles';
@@ -25,12 +26,11 @@ import usePluginEntities from 'views/logic/usePluginEntities';
 
 import { breakpoints, colors, fonts, utils, spacings } from './index';
 import RegeneratableThemeContext from './RegeneratableThemeContext';
-import { Colors } from './colors';
 import { THEME_MODES, ThemeMode } from './constants';
 import useCurrentThemeMode from './UseCurrentThemeMode';
 
 interface generateCustomThemeColorsType {
-  graylogColors: Colors,
+  graylogColors: TColors,
   mode: ThemeMode,
   initialLoad: boolean,
 }
@@ -39,7 +39,7 @@ interface generateThemeType {
   changeMode: (ThemeMode) => void,
   mode: ThemeMode,
   initialLoad?: boolean,
-  generateCustomThemeColors: ({ graylogColors, mode, initialLoad }: generateCustomThemeColorsType) => Promise<Colors> | undefined,
+  generateCustomThemeColors: ({ graylogColors, mode, initialLoad }: generateCustomThemeColorsType) => Promise<TColors> | undefined,
 }
 
 function buildTheme(currentThemeColors, changeMode, mode): DefaultTheme {

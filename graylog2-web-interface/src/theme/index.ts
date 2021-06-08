@@ -15,19 +15,19 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import PropTypes from 'prop-types';
+import {
+  breakpoints, colors, fonts, spacings,
+  PropTypeBreakpoints, PropTypeColors, PropTypeFonts, PropTypeSpacings,
+} from '@graylog/sawmill';
 
-import breakpoints, { breakpointPropTypes } from './breakpoints';
-import colors, { colorsPropTypes } from './colors';
-import fonts, { fontsPropTypes } from './fonts';
 import utils, { utilsPropTypes } from './utils';
-import spacings, { spacingsPropTypes } from './spacings';
 
 const themePropTypes = PropTypes.shape({
-  breakpoints: breakpointPropTypes,
-  colors: colorsPropTypes,
-  fonts: fontsPropTypes,
+  breakpoints: PropTypeBreakpoints,
+  colors: PropTypeColors,
+  fonts: PropTypeFonts,
   utils: utilsPropTypes,
-  spacings: spacingsPropTypes,
+  spacings: PropTypeSpacings,
 });
 
 export {

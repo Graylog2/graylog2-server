@@ -14,12 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import type { TColors, TColorVariants, TThemeColorModes } from '@graylog/sawmill';
+
 import { ThemeMode } from 'theme/constants';
-import { Colors, ColorVariants, ThemeColorModes } from 'theme/colors';
 
 interface CustomizationHooks {
   useThemeCustomizer: () => ({
-    currentColors: ThemeColorModes,
+    currentColors: TThemeColorModes,
     customThemeColors: {},
     isDefaultColors: boolean,
     isSaved: boolean,
@@ -31,7 +32,7 @@ interface CustomizationHooks {
 }
 
 interface CustomizationActions {
-  generateCustomThemeColors: ({ graylogColors, mode, initialLoad }: {graylogColors: Colors, mode: ThemeMode, initialLoad: boolean}) => Promise,
+  generateCustomThemeColors: ({ graylogColors, mode, initialLoad }: {graylogColors: TColors, mode: ThemeMode, initialLoad: boolean}) => Promise,
 }
 
 interface CustomizationType {
@@ -47,7 +48,7 @@ export interface Notification {
   isDismissible: boolean,
   atLogin: boolean,
   isGlobal: boolean,
-  variant: ColorVariants,
+  variant: TColorVariants,
   hiddenTitle: boolean,
 }
 type NotificationId = string;

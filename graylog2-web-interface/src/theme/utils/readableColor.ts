@@ -15,12 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import chroma from 'chroma-js';
-
-import type { Colors } from 'theme/colors';
+import type { TColors } from '@graylog/sawmill';
 
 export type ReadableColor = (hex: string, darkColor?: string, lightColor?: string) => string;
 
-const readableColor = (colors: Colors) => (
+const readableColor = (colors: TColors) => (
   hex: string,
   darkColor: string = colors.global.textDefault,
   lightColor: string = colors.global.textAlt,

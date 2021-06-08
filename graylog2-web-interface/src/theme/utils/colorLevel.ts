@@ -15,12 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import chroma from 'chroma-js';
-
-import type { Colors } from 'theme/colors';
+import type { TColors } from '@graylog/sawmill';
 
 export type ColorLevel = (colorHex: string, level?: number) => string;
 
-const colorLevel = (colors: Colors) => (colorHex: string, level: number = 0): string => {
+const colorLevel = (colors: TColors) => (colorHex: string, level: number = 0): string => {
   /**
    * Recreating `color-level` from Bootstrap's SCSS functions
    * https://github.com/twbs/bootstrap/blob/08ba61e276a6393e8e2b97d56d2feb70a24fe22c/scss/_functions.scss#L97
