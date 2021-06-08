@@ -186,7 +186,7 @@ const HighlightForm = ({ onClose, rule }: Props) => {
               </Modal.Body>
               <Modal.Footer>
                 <Button type="button" onClick={onClose}>Cancel</Button>
-                <Button type="submit" disabled={!isValid}>Save</Button>
+                <Button type="submit" disabled={!isValid} bsStyle="primary">Save</Button>
               </Modal.Footer>
             </Form>
           </BootstrapModalWrapper>
