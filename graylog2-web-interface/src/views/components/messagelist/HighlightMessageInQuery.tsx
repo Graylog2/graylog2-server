@@ -16,28 +16,23 @@
  */
 import * as React from 'react';
 
-import withLocation from 'routing/withLocation';
-import type { Location } from 'routing/withLocation';
+import useQuery from 'routing/useQuery';
 
 import HighlightMessageContext from '../contexts/HighlightMessageContext';
 
 type Props = {
   children: React.ReactElement,
-  location: Location,
 };
 
-const emptyLocation = { query: undefined, pathname: undefined, search: undefined };
+const HighlightMessageInQuery = ({ children }: Props) => {
+  const query = useQuery();
+  const { highlightMessage } = query ?? {};
 
-const HighlightMessageInQuery = ({ children, location: { query = {} } = emptyLocation }: Props) => {
-  const { highlightMessage } = query;
-
-  return (
-    <HighlightMessageContext.Provider value={String(highlightMessage)}>
+  return highlightMessage ? (
+    <HighlightMessageContext.Provider value={highlightMessage.toString()}>
       {children}
     </HighlightMessageContext.Provider>
-  );
+  ) : children;
 };
 
-HighlightMessageInQuery.propTypes = {};
-
-export default withLocation(HighlightMessageInQuery);
+export default HighlightMessageInQuery;
