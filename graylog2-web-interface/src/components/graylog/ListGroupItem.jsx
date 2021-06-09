@@ -21,6 +21,8 @@ import PropTypes from 'prop-types';
 import { ListGroupItem as BootstrapListGroupItem } from 'react-bootstrap';
 
 const RefContainer = styled.div(({ theme }) => `
+  display: inline-block;
+  width: 100%;
   border: 1px solid ${theme.colors.variant.lighter.default};
   margin-bottom: -1px;
 

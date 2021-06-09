@@ -35,10 +35,6 @@ type Props = {
   activeSavedSearchId: string,
 };
 
-const StyledListGroup = styled(ListGroup)`
-  clear: both;
-`;
-
 const NoSavedSearches = styled(Alert)`
   clear: right;
   display: flex;
@@ -145,7 +141,7 @@ const SavedSearchList = ({ toggleModal, deleteSavedSearch, activeSavedSearchId }
               </NoSavedSearches>
             )}
             {savedSearches?.length > 0 && (
-              <StyledListGroup>
+              <ListGroup>
                 {savedSearches.map((savedSearch) => (
                   <ViewLoaderContext.Consumer key={savedSearch.id}>
                     {(loaderFunc) => (
@@ -163,7 +159,7 @@ const SavedSearchList = ({ toggleModal, deleteSavedSearch, activeSavedSearchId }
                     )}
                   </ViewLoaderContext.Consumer>
                 ))}
-              </StyledListGroup>
+              </ListGroup>
             )}
           </ListContainer>
         </PaginatedList>
