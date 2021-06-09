@@ -18,9 +18,11 @@ package org.graylog2.lookup;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Maps;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.AbstractIdleService;
+import com.google.common.util.concurrent.Service;
 import org.graylog2.lookup.db.DBCacheService;
 import org.graylog2.lookup.db.DBDataAdapterService;
 import org.graylog2.lookup.db.DBLookupTableService;
@@ -37,7 +39,6 @@ import org.graylog2.lookup.events.LookupTablesUpdated;
 import org.graylog2.plugin.lookup.LookupCache;
 import org.graylog2.plugin.lookup.LookupDataAdapter;
 import org.graylog2.plugin.lookup.LookupResult;
-import org.graylog2.utilities.LatchUpdaterListener;
 import org.graylog2.utilities.LoggingServiceListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,6 +61,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static com.google.common.util.concurrent.Uninterruptibles.awaitUninterruptibly;
@@ -168,6 +170,92 @@ public class LookupTableService extends AbstractIdleService {
         adapterRefreshService.stopAsync();
     }
 
+    private class DataAdapterListener extends Service.Listener {
+        private final DataAdapterDto dto;
+        private final LookupDataAdapter adapter;
+        private final CountDownLatch latch;
+        private final Consumer<LookupDataAdapter> replacedAdapterConsumer;
+
+        public DataAdapterListener(DataAdapterDto dto, LookupDataAdapter adapter, CountDownLatch latch) {
+            this(dto, adapter, latch, replacedAdapter -> {});
+        }
+
+        public DataAdapterListener(DataAdapterDto dto,
+                                   LookupDataAdapter adapter,
+                                   CountDownLatch latch,
+                                   Consumer<LookupDataAdapter> replacedAdapterConsumer) {
+            this.dto = dto;
+            this.adapter = adapter;
+            this.latch = latch;
+            this.replacedAdapterConsumer = replacedAdapterConsumer;
+        }
+
+        @Override
+        public void running() {
+            try {
+                idToAdapter.put(dto.id(), adapter);
+                final LookupDataAdapter existing = liveAdapters.put(dto.name(), adapter);
+                if (existing != null) {
+                    replacedAdapterConsumer.accept(existing);
+                }
+            } finally {
+                latch.countDown();
+            }
+        }
+
+        @Override
+        public void failed(State from, Throwable failure) {
+            try {
+                LOG.warn("Unable to start data adapter {}: {}", dto.name(), getRootCauseMessage(failure));
+            } finally {
+                latch.countDown();
+            }
+        }
+    }
+
+    private class CacheListener extends Service.Listener {
+        private final CacheDto cacheDto;
+        private final LookupCache lookupCache;
+        private final CountDownLatch latch;
+        private final Consumer<LookupCache> replacedCacheConsumer;
+
+        public CacheListener(CacheDto cacheDto, LookupCache lookupCache, CountDownLatch latch) {
+            this(cacheDto, lookupCache, latch, replacedCache -> {});
+        }
+
+        public CacheListener(CacheDto cacheDto,
+                             LookupCache lookupCache,
+                             CountDownLatch latch,
+                             Consumer<LookupCache> replacedCacheConsumer) {
+            this.cacheDto = cacheDto;
+            this.lookupCache = lookupCache;
+            this.latch = latch;
+            this.replacedCacheConsumer = replacedCacheConsumer;
+        }
+
+        @Override
+        public void running() {
+            try {
+                idToCache.put(cacheDto.id(), lookupCache);
+                final LookupCache existing = liveCaches.put(cacheDto.name(), lookupCache);
+                if (existing != null) {
+                    replacedCacheConsumer.accept(existing);
+                }
+            } finally {
+                latch.countDown();
+            }
+        }
+
+        @Override
+        public void failed(State from, Throwable failure) {
+            try {
+                LOG.warn("Unable to start cache {}: {}", cacheDto.name(), getRootCauseMessage(failure));
+            } finally {
+                latch.countDown();
+            }
+        }
+    }
+
     @Subscribe
     public void handleAdapterUpdate(DataAdaptersUpdated updated) {
         scheduler.schedule(() -> {
@@ -182,15 +270,12 @@ public class LookupTableService extends AbstractIdleService {
             final ImmutableSet.Builder<LookupDataAdapter> existingAdapters = ImmutableSet.builder();
 
             // create new adapter and lookup table instances
-            final Set<LookupDataAdapter> newAdapters = dbAdapters.findByIds(updated.ids()).stream()
-                    .map(dto -> createAdapter(dto, existingAdapters))
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toSet());
+            final Map<DataAdapterDto, LookupDataAdapter> newAdapters = createAdapters(dbAdapters.findByIds(updated.ids()));
 
             final CountDownLatch runningLatch = new CountDownLatch(newAdapters.size());
 
-            newAdapters.forEach(adapter -> {
-                adapter.addListener(new LatchUpdaterListener(runningLatch), scheduler);
+            newAdapters.forEach((dto, adapter) -> {
+                adapter.addListener(new DataAdapterListener(dto, adapter, runningLatch, existingAdapters::add), scheduler);
                 adapter.startAsync();
             });
             // wait until everything is either running or failed before starting the
@@ -229,15 +314,11 @@ public class LookupTableService extends AbstractIdleService {
             final ImmutableSet.Builder<LookupCache> existingCaches = ImmutableSet.builder();
 
             // create new cache and lookup table instances
-            final Set<LookupCache> newCaches = dbCaches.findByIds(updated.ids()).stream()
-                    .map(dto -> createCache(dto, existingCaches))
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toSet());
-
+            final Map<CacheDto, LookupCache> newCaches = createCaches(dbCaches.findByIds(updated.ids()));
             final CountDownLatch runningLatch = new CountDownLatch(newCaches.size());
 
-            newCaches.forEach(cache -> {
-                cache.addListener(new LatchUpdaterListener(runningLatch), scheduler);
+            newCaches.forEach((cacheDto, cache) -> {
+                cache.addListener(new CacheListener(cacheDto, cache, runningLatch, existingCaches::add), scheduler);
                 cache.startAsync();
             });
             // wait until everything is either running or failed before starting the
@@ -254,12 +335,12 @@ public class LookupTableService extends AbstractIdleService {
     public void handleAdapterSharedStoreUpdate(AdapterSharedStoresUpdated updated) {
         // When one node updates the data store shared by other data adapter instances in
         // a cluster, then we need to purge the caches that depend on that data adapter on each node
-        scheduler.schedule(() -> updated.ids().stream().forEach( dataAdapterId -> {
+        scheduler.schedule(() -> updated.ids().stream().forEach(dataAdapterId -> {
             liveTables.values().stream()
                     .filter(table -> table.dataAdapter().id().equals(dataAdapterId))
                     .map(LookupTable::cache)
                     .forEach(LookupCache::purge);
-                }), 0, TimeUnit.SECONDS);
+        }), 0, TimeUnit.SECONDS);
     }
 
     @Subscribe
@@ -287,20 +368,24 @@ public class LookupTableService extends AbstractIdleService {
     }
 
     private CountDownLatch createAndStartAdapters() {
-        final Set<LookupDataAdapter> adapters = dbAdapters.findAll().stream()
-                .map(dto -> createAdapter(dto, null))
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
+        final Map<DataAdapterDto, LookupDataAdapter> adapters = createAdapters(dbAdapters.findAll());
         final CountDownLatch latch = new CountDownLatch(toIntExact(adapters.size()));
 
-        adapters.forEach(adapter -> {
-            adapter.addListener(new LatchUpdaterListener(latch), scheduler);
+        adapters.forEach((dto, adapter) -> {
+            adapter.addListener(new DataAdapterListener(dto, adapter, latch), scheduler);
             adapter.startAsync();
         });
         return latch;
     }
 
-    private LookupDataAdapter createAdapter(DataAdapterDto dto, ImmutableSet.Builder<LookupDataAdapter> existingAdapters) {
+    private Map<DataAdapterDto, LookupDataAdapter> createAdapters(Collection<DataAdapterDto> adapterDtos) {
+        return adapterDtos.stream()
+                .map(dto -> Maps.immutableEntry(dto, createAdapter(dto)))
+                .filter(entry -> Objects.nonNull(entry.getValue()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
+    private LookupDataAdapter createAdapter(DataAdapterDto dto) {
         try {
             final LookupDataAdapter.Factory2 factory2 = adapterFactories2.get(dto.config().type());
             final LookupDataAdapter.Factory factory = adapterFactories.get(dto.config().type());
@@ -320,21 +405,6 @@ public class LookupTableService extends AbstractIdleService {
                             String.format(Locale.ENGLISH, "%s/%s [@%s]", dto.name(), dto.id(), objectId(adapter)),
                             LOG),
                     scheduler);
-            adapter.addListener(new Listener() {
-                @Override
-                public void running() {
-                    idToAdapter.put(dto.id(), adapter);
-                    final LookupDataAdapter existing = liveAdapters.put(dto.name(), adapter);
-                    if (existing != null && existingAdapters != null) {
-                        existingAdapters.add(existing);
-                    }
-                }
-
-                @Override
-                public void failed(State from, Throwable failure) {
-                    LOG.warn("Unable to start data adapter {}: {}", dto.name(), getRootCauseMessage(failure));
-                }
-            }, scheduler);
             // Each adapter needs to be added to the refresh scheduler
             adapter.addListener(adapterRefreshService.newServiceListener(adapter), scheduler);
             return adapter;
@@ -345,22 +415,26 @@ public class LookupTableService extends AbstractIdleService {
     }
 
     private CountDownLatch createAndStartCaches() {
-        final Set<LookupCache> caches = dbCaches.findAll().stream()
-                .map(dto -> createCache(dto, null))
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
+        final Map<CacheDto, LookupCache> caches = createCaches(dbCaches.findAll());
         final CountDownLatch latch = new CountDownLatch(toIntExact(caches.size()));
 
-        caches.forEach(lookupCache -> {
-            lookupCache.addListener(new LatchUpdaterListener(latch), scheduler);
+        caches.forEach((cacheDto, lookupCache) -> {
+            lookupCache.addListener(new CacheListener(cacheDto, lookupCache, latch), scheduler);
             lookupCache.startAsync();
         });
         return latch;
     }
 
-    private LookupCache createCache(CacheDto dto, @Nullable ImmutableSet.Builder<LookupCache> existingCaches) {
+    private Map<CacheDto, LookupCache> createCaches(Collection<CacheDto> cacheDtos) {
+        return cacheDtos.stream()
+                .map(dto -> Maps.immutableEntry(dto, createCache(dto)))
+                .filter(entry -> Objects.nonNull(entry.getValue()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
+    private LookupCache createCache(CacheDto dto) {
         try {
-            final LookupCache.Factory factory = cacheFactories.get(dto.config().type());
+            final LookupCache.Factory<? extends LookupCache> factory = cacheFactories.get(dto.config().type());
             if (factory == null) {
                 LOG.warn("Unable to load cache {} of type {}, missing a factory. Is a required plugin missing?", dto.name(), dto.config().type());
                 // TODO system notification
@@ -372,21 +446,6 @@ public class LookupTableService extends AbstractIdleService {
                             String.format(Locale.ENGLISH, "%s/%s [@%s]", dto.name(), dto.id(), objectId(cache)),
                             LOG),
                     scheduler);
-            cache.addListener(new Listener() {
-                @Override
-                public void running() {
-                    idToCache.put(dto.id(), cache);
-                    final LookupCache existing = liveCaches.put(dto.name(), cache);
-                    if (existing != null && existingCaches != null) {
-                        existingCaches.add(existing);
-                    }
-                }
-
-                @Override
-                public void failed(State from, Throwable failure) {
-                    LOG.warn("Unable to start cache {}: {}", dto.name(), getRootCauseMessage(failure));
-                }
-            }, scheduler);
             return cache;
         } catch (Exception e) {
             LOG.error("Couldn't create cache <{}/{}>", dto.name(), dto.id(), e);
