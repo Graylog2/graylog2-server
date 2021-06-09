@@ -214,21 +214,21 @@ public class LookupTableService extends AbstractIdleService {
     }
 
     private class CacheListener extends Service.Listener {
-        private final CacheDto cacheDto;
-        private final LookupCache lookupCache;
+        private final CacheDto dto;
+        private final LookupCache cache;
         private final CountDownLatch latch;
         private final Consumer<LookupCache> replacedCacheConsumer;
 
-        public CacheListener(CacheDto cacheDto, LookupCache lookupCache, CountDownLatch latch) {
-            this(cacheDto, lookupCache, latch, replacedCache -> {});
+        public CacheListener(CacheDto dto, LookupCache cache, CountDownLatch latch) {
+            this(dto, cache, latch, replacedCache -> {});
         }
 
-        public CacheListener(CacheDto cacheDto,
-                             LookupCache lookupCache,
+        public CacheListener(CacheDto dto,
+                             LookupCache cache,
                              CountDownLatch latch,
                              Consumer<LookupCache> replacedCacheConsumer) {
-            this.cacheDto = cacheDto;
-            this.lookupCache = lookupCache;
+            this.dto = dto;
+            this.cache = cache;
             this.latch = latch;
             this.replacedCacheConsumer = replacedCacheConsumer;
         }
@@ -236,8 +236,8 @@ public class LookupTableService extends AbstractIdleService {
         @Override
         public void running() {
             try {
-                idToCache.put(cacheDto.id(), lookupCache);
-                final LookupCache existing = liveCaches.put(cacheDto.name(), lookupCache);
+                idToCache.put(dto.id(), cache);
+                final LookupCache existing = liveCaches.put(dto.name(), cache);
                 if (existing != null) {
                     replacedCacheConsumer.accept(existing);
                 }
@@ -249,7 +249,7 @@ public class LookupTableService extends AbstractIdleService {
         @Override
         public void failed(State from, Throwable failure) {
             try {
-                LOG.warn("Unable to start cache {}: {}", cacheDto.name(), getRootCauseMessage(failure));
+                LOG.warn("Unable to start cache {}: {}", dto.name(), getRootCauseMessage(failure));
             } finally {
                 latch.countDown();
             }
