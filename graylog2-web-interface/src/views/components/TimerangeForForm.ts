@@ -22,7 +22,20 @@ import type { TimeRange } from 'views/logic/queries/Query';
 import type { SearchBarFormValues } from 'views/Constants';
 import { isTypeRelativeWithStartOnly, isTypeRelativeWithEnd } from 'views/typeGuards/timeRange';
 
+import { TimeRangeDropDownFormValues } from './searchbar/date-time-picker/TimeRangeDropdown';
+
 const formatDatetime = (datetime) => datetime.toString(DateTime.Formats.TIMESTAMP);
+
+export const onSettingSearchBarFormTimeRange = (nextTimeRange: TimeRangeDropDownFormValues['nextTimeRange']) => {
+  if (isTypeRelativeWithEnd(nextTimeRange) && nextTimeRange.from === RELATIVE_ALL_TIME) {
+    return {
+      type: nextTimeRange.type,
+      range: nextTimeRange.from,
+    };
+  }
+
+  return (nextTimeRange as SearchBarFormValues['timerange']);
+};
 
 export const onSubmittingTimerange = (timerange: TimeRange): TimeRange => {
   const { type } = timerange;

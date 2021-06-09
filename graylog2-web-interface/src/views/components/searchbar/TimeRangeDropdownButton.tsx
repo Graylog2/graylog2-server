@@ -26,6 +26,8 @@ import { ButtonGroup } from 'components/graylog';
 import RangePresetDropdown from './RangePresetDropdown';
 import TimeRangeButton from './TimeRangeButton';
 
+import { onSettingSearchBarFormTimeRange } from '../TimerangeForForm';
+
 type Props = {
   children: React.ReactNode,
   disabled?: boolean,
@@ -68,10 +70,11 @@ const TimeRangeDropdownButton = ({
   };
 
   const selectRelativeTimeRangePreset = (from) => {
-    setCurrentTimeRange({
+    const nextTimeRange = {
       type: 'relative',
-      range: from,
-    });
+      from,
+    };
+    setCurrentTimeRange(onSettingSearchBarFormTimeRange(nextTimeRange));
 
     submitForm();
   };

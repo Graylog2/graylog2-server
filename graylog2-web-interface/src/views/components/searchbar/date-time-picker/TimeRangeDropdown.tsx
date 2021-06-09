@@ -22,12 +22,12 @@ import moment from 'moment';
 
 import { Button, Col, Tabs, Tab, Row, Popover } from 'components/graylog';
 import { Icon, KeyCapture } from 'components/common';
-import { availableTimeRangeTypes, RELATIVE_ALL_TIME } from 'views/Constants';
-import { migrateTimeRangeToNewType } from 'views/components/TimerangeForForm';
+import { availableTimeRangeTypes } from 'views/Constants';
+import { migrateTimeRangeToNewType, onSettingSearchBarFormTimeRange } from 'views/components/TimerangeForForm';
 import DateTime from 'logic/datetimes/DateTime';
 import type { RelativeTimeRangeWithEnd, AbsoluteTimeRange, KeywordTimeRange, NoTimeRangeOverride, TimeRange } from 'views/logic/queries/Query';
 import type { SearchBarFormValues } from 'views/Constants';
-import { isTypeRelativeWithEnd, isTypeRelativeWithStartOnly } from 'views/typeGuards/timeRange';
+import { isTypeRelativeWithStartOnly } from 'views/typeGuards/timeRange';
 
 import TabAbsoluteTimeRange from './TabAbsoluteTimeRange';
 import TabKeywordTimeRange from './TabKeywordTimeRange';
@@ -242,17 +242,6 @@ const onInitializingNextTimeRange = (currentTimeRange: SearchBarFormValues['time
   return currentTimeRange;
 };
 
-const onSettingCurrentTimeRange = (nextTimeRange: TimeRangeDropDownFormValues['nextTimeRange']) => {
-  if (isTypeRelativeWithEnd(nextTimeRange) && nextTimeRange.from === RELATIVE_ALL_TIME) {
-    return {
-      type: nextTimeRange.type,
-      range: nextTimeRange.from,
-    };
-  }
-
-  return (nextTimeRange as SearchBarFormValues['timerange']);
-};
-
 const TimeRangeDropdown = ({
   noOverride,
   toggleDropdownShow,
@@ -277,7 +266,7 @@ const TimeRangeDropdown = ({
   }, [toggleDropdownShow]);
 
   const handleSubmit = ({ nextTimeRange }) => {
-    setCurrentTimeRange(onSettingCurrentTimeRange(nextTimeRange));
+    setCurrentTimeRange(onSettingSearchBarFormTimeRange(nextTimeRange));
     toggleDropdownShow();
   };
 
