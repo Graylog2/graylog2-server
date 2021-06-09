@@ -229,11 +229,9 @@ const Search = ({ location }: Props) => {
                                 {!focusingWidget && <QueryBar />}
                               </IfDashboard>
                             </IfInteractive>
-                            {!hasErrors && (
                             <HighlightMessageInQuery>
-                              <SearchResult />
+                              <SearchResult hasErrors={hasErrors} />
                             </HighlightMessageInQuery>
-                            )}
                           </SearchArea>
                         </GridContainer>
                       </HighlightingRulesProvider>

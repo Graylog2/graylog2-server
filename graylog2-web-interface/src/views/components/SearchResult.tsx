@@ -53,7 +53,11 @@ const SearchLoadingIndicator = connect(
 
 const QueryWithWidgets = connect(Query, { widgets: WidgetStore });
 
-const SearchResult = React.memo(() => {
+type Props = {
+  hasErrors: boolean,
+};
+
+const SearchResult = React.memo(({ hasErrors }: Props) => {
   const fieldTypes = useContext(FieldTypesContext);
   const { focusedWidget } = useContext(WidgetFocusContext);
   const searches = useStore(SearchStore, ({ result, widgetMapping }) => ({ result, widgetMapping }));
@@ -80,7 +84,7 @@ const SearchResult = React.memo(() => {
                       results={currentResults}
                       positions={positions}
                       widgetMapping={widgetMapping} />
-  ) : <Spinner />;
+  ) : hasErrors ? null : <Spinner />;
 
   return (
     <StyledRow $hasFocusedWidget={hasFocusedWidget}>
