@@ -86,4 +86,7 @@ public class ElasticsearchClientConfiguration {
 
     @Parameter(value = "elasticsearch_use_expect_continue")
     boolean useExpectContinue = true;
+
+    @Parameter(value = "elasticsearch_mute_deprecation_warnings")
+    private boolean muteDeprecationWarnings = false;
 }

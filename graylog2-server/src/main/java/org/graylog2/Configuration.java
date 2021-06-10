@@ -165,17 +165,6 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "is_cloud")
     private boolean isCloud = false;
 
-    @Parameter(value = "elasticsearch_mute_deprecation_warnings")
-    private boolean muteDeprecationWarnings = false;
-
-    public boolean isMuteDeprecationWarnings() {
-        return muteDeprecationWarnings;
-    }
-
-    public void setMuteDeprecationWarnings(boolean muteDeprecationWarnings) {
-        this.muteDeprecationWarnings = muteDeprecationWarnings;
-    }
-
     public boolean isMaster() {
         return isMaster;
     }
