@@ -23,11 +23,12 @@ import moment from 'moment';
 import { Button, Col, Tabs, Tab, Row, Popover } from 'components/graylog';
 import { Icon, KeyCapture } from 'components/common';
 import { availableTimeRangeTypes } from 'views/Constants';
-import { migrateTimeRangeToNewType, onSettingSearchBarFormTimeRange } from 'views/components/TimerangeForForm';
+import { migrateTimeRangeToNewType } from 'views/components/TimerangeForForm';
 import DateTime from 'logic/datetimes/DateTime';
 import type { RelativeTimeRangeWithEnd, AbsoluteTimeRange, KeywordTimeRange, NoTimeRangeOverride, TimeRange } from 'views/logic/queries/Query';
 import type { SearchBarFormValues } from 'views/Constants';
 import { isTypeRelativeWithStartOnly } from 'views/typeGuards/timeRange';
+import { normalizeIfAllMessagesRange } from 'views/logic/queries/NormalizeTimeRange';
 
 import TabAbsoluteTimeRange from './TabAbsoluteTimeRange';
 import TabKeywordTimeRange from './TabKeywordTimeRange';
@@ -266,7 +267,7 @@ const TimeRangeDropdown = ({
   }, [toggleDropdownShow]);
 
   const handleSubmit = ({ nextTimeRange }) => {
-    setCurrentTimeRange(onSettingSearchBarFormTimeRange(nextTimeRange));
+    setCurrentTimeRange(normalizeIfAllMessagesRange(nextTimeRange));
     toggleDropdownShow();
   };
 

@@ -24,6 +24,8 @@ import {
   RelativeTimeRange,
 } from 'views/logic/queries/Query';
 
+import { RELATIVE_ALL_TIME } from '../Constants';
+
 export const isTypeRelative = (timeRange: TimeRange | NoTimeRangeOverride): timeRange is RelativeTimeRange => {
   return 'type' in timeRange && timeRange.type === 'relative';
 };
@@ -38,4 +40,8 @@ export const isTypeRelativeWithEnd = (timeRange: TimeRange | NoTimeRangeOverride
 
 export const isTypeKeyword = (timeRange: TimeRange | NoTimeRangeOverride): timeRange is KeywordTimeRange => {
   return 'type' in timeRange && timeRange.type === 'keyword';
+};
+
+export const isAllMessagesRange = (timeRange: TimeRange) => {
+  return (isTypeRelativeWithEnd(timeRange) && timeRange.from === RELATIVE_ALL_TIME && !timeRange.to) || (isTypeRelativeWithStartOnly(timeRange) && timeRange.range === RELATIVE_ALL_TIME);
 };

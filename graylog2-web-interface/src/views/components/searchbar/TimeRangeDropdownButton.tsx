@@ -20,13 +20,12 @@ import { Overlay } from 'react-overlays';
 import styled from 'styled-components';
 import { useFormikContext } from 'formik';
 
-import { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
+import { TimeRange, NoTimeRangeOverride, RelativeTimeRangeWithEnd } from 'views/logic/queries/Query';
 import { ButtonGroup } from 'components/graylog';
+import { normalizeIfAllMessagesRange } from 'views/logic/queries/NormalizeTimeRange';
 
 import RangePresetDropdown from './RangePresetDropdown';
 import TimeRangeButton from './TimeRangeButton';
-
-import { onSettingSearchBarFormTimeRange } from '../TimerangeForForm';
 
 type Props = {
   children: React.ReactNode,
@@ -70,11 +69,11 @@ const TimeRangeDropdownButton = ({
   };
 
   const selectRelativeTimeRangePreset = (from) => {
-    const nextTimeRange = {
+    const nextTimeRange: RelativeTimeRangeWithEnd = {
       type: 'relative',
       from,
     };
-    setCurrentTimeRange(onSettingSearchBarFormTimeRange(nextTimeRange));
+    setCurrentTimeRange(normalizeIfAllMessagesRange(nextTimeRange));
 
     submitForm();
   };
