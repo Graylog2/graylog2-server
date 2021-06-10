@@ -16,7 +16,7 @@
  */
 
 const searchClusterConfig = {
-  query_time_range_limit: 'P3D',
+  query_time_range_limit: 'PT0S',
   relative_timerange_options: {
     PT10M: 'Search in the last 5 minutes',
     PT15M: 'Search in the last 15 minutes',
