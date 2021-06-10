@@ -14,33 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
-export type Input = {
-  id: string,
-  title: string,
-  name: string,
-  type: string,
-  attributes: {
-    [type: string]: any,
-  },
-  created_at: string,
-  creator_user_id: string,
-  content_pack?: boolean,
-  global: boolean,
-  static_fields: { [field: string]: any },
-  node?: string,
+const useForwarderMessageLoaders = () => {
+  const messageLoaders = PluginStore.exports('forwarder')?.[0]?.messageLoaders;
+
+  return messageLoaders || { ForwarderInputDropdown: undefined };
 };
 
-export type Codec ={
-  type: string,
-  name: string,
-  requested_configuration: {
-    [key: string]: {
-      [key: string]: any,
-    },
-  },
-};
-
-export type CodecTypes = {
-  [key: string]: Codec,
-};
+export default useForwarderMessageLoaders;
