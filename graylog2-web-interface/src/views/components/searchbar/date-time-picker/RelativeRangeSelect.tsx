@@ -26,7 +26,9 @@ import { isTypeRelative } from 'views/typeGuards/timeRange';
 
 import RelativeRangeValueInput from './RelativeRangeValueInput';
 import type { TimeRangeDropDownFormValues } from './TimeRangeDropdown';
-import ConfiguredRelativeTimeRangeSelector from './ConfiguredRelativeTimeRangeSelector';
+
+import TimerangeSelector from '../TimerangeSelector';
+import RangePresetDropdown from '../RangePresetDropdown';
 
 const RangeWrapper = styled.div`
   flex: 4;
@@ -252,7 +254,10 @@ const RelativeRangeSelectInner = ({
       )}
 
       <ConfiguredWrapper>
-        <ConfiguredRelativeTimeRangeSelector onChange={_onSetPreset} disabled={disabled} />
+        <TimerangeSelector className="relative">
+          <RangePresetDropdown disabled={disabled}
+                               onChange={_onSetPreset} />
+        </TimerangeSelector>
       </ConfiguredWrapper>
     </RangeWrapper>
   );

@@ -19,11 +19,12 @@ import { isEqual } from 'lodash';
 
 import type { Store } from 'stores/StoreTypes';
 import { singletonStore } from 'views/logic/singleton';
+import { QueryId } from 'views/logic/queries/Query';
 
 import { ViewStore } from './ViewStore';
 
 export type ViewMetaData = {
-  activeQuery: string,
+  activeQuery: QueryId,
   description: string,
   id: string,
   summary: string,

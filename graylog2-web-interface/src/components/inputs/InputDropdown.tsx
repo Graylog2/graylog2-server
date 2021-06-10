@@ -24,10 +24,17 @@ import { Button } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import Spinner from 'components/common/Spinner';
 
+const LoaderContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+
+  .form-group {
+    margin: 0 15px 0 0;
+  }
+`;
+
 const StyledInputDropdown = styled(Input)`
-  float: left;
-  width: 400px;
-  margin-right: 10px;
+  min-width: 400px;
 `;
 
 const PLACEHOLDER = 'placeholder';
@@ -42,7 +49,7 @@ const _formatInput = ({ id, title, type }: InputType) => {
   return <option key={id} value={id}>{title} ({type})</option>;
 };
 
-const _sortByTitle = (input1: Input, input2: InputType) => input1.title.localeCompare(input2.title);
+const _sortByTitle = (input1: InputType, input2: InputType) => input1.title.localeCompare(input2.title);
 
 const StaticInput = ({ input: { type, title } }: { input: InputType }) => (
   <StyledInputDropdown id={`${type}-select`} type="select" disabled>
@@ -67,7 +74,7 @@ const InputDropdown = ({ disabled, inputs, onLoadMessage, preselectedInputId, ti
   // When an input is pre-selected, show a static dropdown
   if (preselectedInput) {
     return (
-      <div>
+      <LoaderContainer>
         <StaticInput input={preselectedInput} />
 
         <Button bsStyle="info"
@@ -75,7 +82,7 @@ const InputDropdown = ({ disabled, inputs, onLoadMessage, preselectedInputId, ti
                 onClick={_onLoadMessage}>
           {title}
         </Button>
-      </div>
+      </LoaderContainer>
     );
   }
 
@@ -83,13 +90,14 @@ const InputDropdown = ({ disabled, inputs, onLoadMessage, preselectedInputId, ti
     const inputOptions = inputs.sort(_sortByTitle).map(_formatInput);
 
     return (
-      <div>
+      <LoaderContainer>
         <StyledInputDropdown id="placeholder-select"
                              type="select"
+                             aria-label="server input select"
                              value={selectedInput}
                              onChange={onSelectedInputChange}
                              placeholder={PLACEHOLDER}>
-          <option value={PLACEHOLDER}>Select an input</option>
+          <option value={PLACEHOLDER}>Select an Input</option>
           {inputOptions.toArray()}
         </StyledInputDropdown>
 
@@ -98,7 +106,7 @@ const InputDropdown = ({ disabled, inputs, onLoadMessage, preselectedInputId, ti
                 onClick={_onLoadMessage}>
           {title}
         </Button>
-      </div>
+      </LoaderContainer>
     );
   }
 

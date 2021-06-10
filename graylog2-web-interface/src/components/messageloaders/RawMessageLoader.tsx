@@ -17,8 +17,8 @@
 
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 import * as Immutable from 'immutable';
+import { Subtract } from 'utility-types';
 
 import { getValueFromInput } from 'util/FormsUtils';
 import { Col, Row, Button } from 'components/graylog';
@@ -26,18 +26,115 @@ import { Input } from 'components/bootstrap';
 import { Select } from 'components/common';
 import { BooleanField, DropdownField, NumberField, TextField } from 'components/configurationforms';
 import CombinedProvider from 'injection/CombinedProvider';
-import AppConfig from 'util/AppConfig';
 import connect from 'stores/connect';
 import type { Message } from 'views/components/messagelist/Types';
+import useForwarderMessageLoaders from 'components/messageloaders/useForwarderMessageLoaders';
+import AppConfig from 'util/AppConfig';
 
 import type { Input as InputType, CodecTypes } from './Types';
 
 const { MessagesActions } = CombinedProvider.get('Messages');
 const { CodecTypesActions, CodecTypesStore } = CombinedProvider.get('CodecTypes');
 const { InputsActions, InputsStore } = CombinedProvider.get('Inputs');
-const isCloud = AppConfig.isCloud();
-const ForwarderInputDropdown = isCloud ? PluginStore.exports('cloud')[0].messageLoaders.ForwarderInputDropdown : null;
 const DEFAULT_REMOTE_ADDRESS = '127.0.0.1';
+
+type InputSelectProps = {
+  inputs: Immutable.Map<string, InputType>,
+  selectedInputId: string | undefined,
+  onInputSelect: (selectedInputId: string) => void,
+  show: boolean,
+};
+
+const ServerInputSelect = ({ inputs, selectedInputId, onInputSelect }: Subtract<InputSelectProps, {show}>) => {
+  const _formatInputSelectOptions = () => {
+    if (!inputs) {
+      return [{ value: 'none', label: 'Loading inputs...', disabled: true }];
+    }
+
+    if (inputs.size === 0) {
+      return [{ value: 'none', label: 'No inputs available' }];
+    }
+
+    const formattedInputs = [];
+
+    inputs
+      .sort((inputA, inputB) => inputA.title.toLowerCase().localeCompare(inputB.title.toLowerCase()))
+      .forEach((input, id) => {
+        const label = `${id} / ${input.title} / ${input.name}`;
+
+        formattedInputs.push({ value: id, label: label });
+      });
+
+    return formattedInputs;
+  };
+
+  return (
+    <Input id="inputSelect"
+           name="inputSelect"
+           label={<>Message input <small>(optional)</small></>}
+           help="Select the message input ID that should be assigned to the parsed message.">
+      <Select inputId="inputSelect"
+              name="inputSelect"
+              aria-label="Message input"
+              placeholder="Select input"
+              options={_formatInputSelectOptions()}
+              matchProp="label"
+              onChange={onInputSelect}
+              value={selectedInputId} />
+    </Input>
+  );
+};
+
+const ForwarderInputSelect = ({ onInputSelect }: Pick<InputSelectProps, 'onInputSelect'>) => {
+  const { ForwarderInputDropdown } = useForwarderMessageLoaders();
+
+  return (
+    <>
+      <ForwarderInputDropdown onLoadMessage={onInputSelect}
+                              label="Forwarder Input selection (optional)"
+                              autoLoadMessage />
+      <p className="description">Select an Input profile from the list below then select an then select an Input.</p>
+    </>
+  );
+};
+
+const InputSelect = ({ inputs, selectedInputId, onInputSelect, show }: InputSelectProps) => {
+  const { ForwarderInputDropdown } = useForwarderMessageLoaders();
+  const [selectedInputType, setSelectedInputType] = useState<'server' | 'forwarder' | undefined>();
+
+  if (!show) {
+    return null;
+  }
+
+  if (AppConfig.isCloud()) {
+    return <ForwarderInputSelect onInputSelect={onInputSelect} />;
+  }
+
+  return ForwarderInputDropdown ? (
+    <fieldset>
+      <legend>Input selection (optional)</legend>
+      <Input id="inputTypeSelect"
+             type="select"
+             label="Select an Input type (optional)"
+             help="Select the Input type you want to load the message from."
+             value={selectedInputType ?? 'placeholder'}
+             onChange={(e) => setSelectedInputType(e.target.value)}>
+        <option value="placeholder" disabled>Select an Input type</option>
+        <option value="server">Server Input</option>
+        <option value="forwarder">Forwarder Input</option>
+      </Input>
+
+      {selectedInputType === 'server' && (
+        <ServerInputSelect inputs={inputs} selectedInputId={selectedInputId} onInputSelect={onInputSelect} />
+      )}
+      {selectedInputType === 'forwarder' && (
+        <ForwarderInputSelect onInputSelect={onInputSelect} />
+      )}
+    </fieldset>
+  ) : (
+    <ServerInputSelect inputs={inputs} selectedInputId={selectedInputId} onInputSelect={onInputSelect} />
+  );
+};
 
 type OptionsType = {
   message: string,
@@ -119,28 +216,6 @@ const RawMessageLoader = ({ onMessageLoaded, inputIdSelector, codecTypes, inputs
       .sort((codecA, codecB) => codecA.label.toLowerCase().localeCompare(codecB.label.toLowerCase()));
   };
 
-  const _formatInputSelectOptions = () => {
-    if (!inputs) {
-      return [{ value: 'none', label: 'Loading inputs...', disabled: true }];
-    }
-
-    if (inputs.size === 0) {
-      return [{ value: 'none', label: 'No inputs available' }];
-    }
-
-    const formattedInputs = [];
-
-    inputs
-      .sort((inputA, inputB) => inputA.title.toLowerCase().localeCompare(inputB.title.toLowerCase()))
-      .forEach((input, id) => {
-        const label = `${id} / ${input.title} / ${input.name}`;
-
-        formattedInputs.push({ value: id, label: label });
-      });
-
-    return formattedInputs;
-  };
-
   const _onCodecSelect = (selectedCodec: string) => {
     setCodec(selectedCodec);
     setCodecConfiguration({});
@@ -212,34 +287,6 @@ const RawMessageLoader = ({ onMessageLoaded, inputIdSelector, codecTypes, inputs
 
   const _isSubmitDisabled = !message || !codec || loading;
 
-  const _getInputIdSelector = () => {
-    if (inputIdSelector) {
-      return (ForwarderInputDropdown)
-        ? (
-          <fieldset>
-            <legend>Input selection (optional)</legend>
-            <ForwarderInputDropdown onLoadMessage={_onInputSelect}
-                                    autoLoadMessage />
-            <p className="description">Select an Input profile from the list below then select an then select an Input.</p>
-          </fieldset>
-        ) : (
-          <Input id="input"
-                 name="input"
-                 label={<span>Message input <small>(optional)</small></span>}
-                 help="Select the message input ID that should be assigned to the parsed message.">
-            <Select id="input"
-                    placeholder="Select input"
-                    options={_formatInputSelectOptions()}
-                    matchProp="label"
-                    onChange={_onInputSelect}
-                    value={inputId} />
-          </Input>
-        );
-    }
-
-    return null;
-  };
-
   let codecConfigurationOptions;
 
   if (codecTypes && codec) {
@@ -271,7 +318,10 @@ const RawMessageLoader = ({ onMessageLoaded, inputIdSelector, codecTypes, inputs
                    value={remoteAddress}
                    onChange={_onRemoteAddressChange} />
           </fieldset>
-          {_getInputIdSelector()}
+          <InputSelect inputs={inputs}
+                       selectedInputId={inputId}
+                       onInputSelect={_onInputSelect}
+                       show={inputIdSelector} />
           <fieldset>
             <legend>Codec configuration</legend>
             <Input id="codec"
@@ -280,6 +330,7 @@ const RawMessageLoader = ({ onMessageLoaded, inputIdSelector, codecTypes, inputs
                    help="Select the codec that should be used to decode the message."
                    required>
               <Select id="codec"
+                      aria-label="Message codec"
                       placeholder="Select codec"
                       options={_formatSelectOptions()}
                       matchProp="label"
