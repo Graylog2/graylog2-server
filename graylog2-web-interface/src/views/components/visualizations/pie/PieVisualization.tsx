@@ -85,7 +85,7 @@ const PieVisualization = makeVisualization(({ config, data }: VisualizationCompo
   const transformedData = chartData(config, data.chart || Object.values(data)[0], 'pie', _generateSeries);
 
   return (
-    <PlotLegend config={config} chartData={transformedData} labelMapper={labelMapper} neverHide>
+    <PlotLegend config={config} chartData={transformedData} labelMapper={labelMapper} isPieChart>
       <GenericPlot chartData={transformedData}
                    layout={{ showlegend: false }}
                    getChartColor={getChartColor}
