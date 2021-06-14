@@ -18,6 +18,7 @@ package org.graylog2.security.encryption;
 
 import org.graylog2.security.AESTools;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -48,7 +49,11 @@ public class EncryptedValueService {
                 .build();
     }
 
+    @Nullable
     public String decrypt(EncryptedValue encryptedValue) {
+        if (!encryptedValue.isSet()) {
+            return null;
+        }
         return AESTools.decrypt(encryptedValue.value(), encryptionKey, encryptedValue.salt());
     }
 }
