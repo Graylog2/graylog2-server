@@ -78,7 +78,7 @@ describe('PlotLegend', () => {
     await screen.findAllByLabelText('Color Hint');
   });
 
-  it('should set a color when clicking on the color hing', async () => {
+  it('should set a color when clicking on the color hint', async () => {
     render(<SUT />);
     const colorHints = await screen.findAllByLabelText('Color Hint');
     fireEvent.click(colorHints[0]);
@@ -113,5 +113,15 @@ describe('PlotLegend', () => {
     render(<SUT chartDataProp={[{ name: 'name1' }]} plotConfig={plotConfig} />);
 
     expect(screen.queryByText('name1')).not.toBeInTheDocument();
+  });
+
+  it('should not add value action menu for series', async () => {
+    const plotConfig = config.toBuilder().series([Series.forFunction('count')]).build();
+    render(<SUT chartDataProp={[{ name: 'name1' }, { name: 'count' }]} plotConfig={plotConfig} />);
+
+    const value = await screen.findByText('count');
+    fireEvent.click(value);
+
+    expect(screen.queryByText('Actions')).not.toBeInTheDocument();
   });
 });
