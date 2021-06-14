@@ -46,7 +46,7 @@ const chartData = [
   { name: 'name3' },
 ];
 const columnPivots = [Pivot.create('field1', 'unknown')];
-const config = AggregationWidgetConfig.builder().columnPivots(columnPivots).build();
+const config = AggregationWidgetConfig.builder().series([Series.forFunction('count')]).columnPivots(columnPivots).build();
 
 // eslint-disable-next-line react/require-default-props
 const SUT = ({ chartDataProp = chartData, plotConfig = config }: { chartDataProp?: Array<{ name: string, }>, plotConfig?: AggregationWidgetConfig }) => (
@@ -116,8 +116,7 @@ describe('PlotLegend', () => {
   });
 
   it('should not add value action menu for series', async () => {
-    const plotConfig = config.toBuilder().series([Series.forFunction('count')]).build();
-    render(<SUT chartDataProp={[{ name: 'name1' }, { name: 'count' }]} plotConfig={plotConfig} />);
+    render(<SUT chartDataProp={[{ name: 'name1' }, { name: 'count' }]} />);
 
     const value = await screen.findByText('count');
     fireEvent.click(value);
