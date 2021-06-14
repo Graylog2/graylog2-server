@@ -37,7 +37,7 @@ const onTitleChange = (queryId, newTitle) => TitlesActions.set('tab', 'title', n
 
 const onSelectQuery = (queryId) => (queryId === 'new' ? NewQueryActionHandler() : ViewActions.selectQuery(queryId));
 
-const onCloseTab = (queryId, currentQuery, queries) => {
+const onCloseTab = (queryId: string, currentQuery: string, queries: Immutable.OrderedSet<string>) => {
   if (queries.size === 1) {
     return Promise.resolve();
   }
@@ -45,9 +45,11 @@ const onCloseTab = (queryId, currentQuery, queries) => {
   let promise;
 
   if (queryId === currentQuery) {
-    const currentQueryIdIndex = queries.indexOf(queryId);
+    const indexedQueryIds = queries.toIndexedSeq();
+    const currentQueryIdIndex = indexedQueryIds.indexOf(queryId);
     const newQueryIdIndex = Math.min(0, currentQueryIdIndex - 1);
-    const newQuery = queries.remove(queryId).get(newQueryIdIndex);
+    const newQuery = indexedQueryIds.filter((currentQueryId) => (currentQueryId !== queryId))
+      .get(newQueryIdIndex);
 
     promise = ViewActions.selectQuery(newQuery);
   } else {
