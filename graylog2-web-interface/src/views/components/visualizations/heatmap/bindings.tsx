@@ -65,8 +65,12 @@ const heatmap: VisualizationType<HeatmapVisualizationConfig, HeatMapVisualizatio
     fromConfig: ({ autoScale, colorScale, reverseScale, defaultValue, useSmallestAsDefault, zMax, zMin }: HeatmapVisualizationConfig) => ({
       autoScale, colorScale, reverseScale, defaultValue, useSmallestAsDefault, zMax, zMin,
     }),
-    toConfig: ({ autoScale = false, colorScale, reverseScale = false, useSmallestAsDefault, zMax, zMin, defaultValue }: HeatMapVisualizationConfigFormValues) => HeatmapVisualizationConfig
-      .create(colorScale, reverseScale, autoScale, zMin, zMax, useSmallestAsDefault, defaultValue),
+    toConfig: ({ autoScale = false, colorScale, reverseScale = false, useSmallestAsDefault, zMax, zMin, defaultValue }: HeatMapVisualizationConfigFormValues) => {
+      const [finalZMin, finalZMax] = autoScale ? [undefined, undefined] : [zMin, zMax];
+
+      return HeatmapVisualizationConfig
+        .create(colorScale, reverseScale, autoScale, finalZMin, finalZMax, useSmallestAsDefault, defaultValue);
+    },
     createConfig: () => ({ colorScale: 'Viridis', autoScale: true }),
     fields: [{
       name: 'colorScale',
