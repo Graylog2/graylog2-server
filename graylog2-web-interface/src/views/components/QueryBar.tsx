@@ -14,7 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
+import { useCallback } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import * as ImmutablePropTypes from 'react-immutable-proptypes';
@@ -67,15 +68,15 @@ type Props = {
 
 const QueryBar = ({ queries, queryTitles, viewMetadata }: Props) => {
   const { activeQuery } = viewMetadata;
-  const selectQueryAndExecute = (queryId) => onSelectQuery(queryId);
+  const onRemove = useCallback((queryId) => onCloseTab(queryId, activeQuery, queries), [activeQuery, queries]);
 
   return (
     <QueryTabs queries={queries}
                selectedQueryId={activeQuery}
                titles={queryTitles}
-               onSelect={selectQueryAndExecute}
+               onSelect={onSelectQuery}
                onTitleChange={onTitleChange}
-               onRemove={(queryId) => onCloseTab(queryId, activeQuery, queries)} />
+               onRemove={onRemove} />
   );
 };
 
