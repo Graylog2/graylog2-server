@@ -49,6 +49,16 @@ describe('QueryBar', () => {
     await screen.findByRole('button', { name: 'Third Query' });
   });
 
+  it('allows changing tab', async () => {
+    render(<QueryBar queries={queries} queryTitles={queryTitles} viewMetadata={viewMetadata} />);
+
+    const nextTab = await screen.findByRole('button', { name: 'Third Query' });
+
+    fireEvent.click(nextTab);
+
+    await waitFor(() => expect(ViewActions.selectQuery).toHaveBeenCalledWith('baz'));
+  });
+
   it('allows closing current tab', async () => {
     render(<QueryBar queries={queries} queryTitles={queryTitles} viewMetadata={viewMetadata} />);
 
@@ -63,5 +73,6 @@ describe('QueryBar', () => {
     fireEvent.click(closeButton);
 
     await waitFor(() => expect(ViewActions.selectQuery).toHaveBeenCalledWith('foo'));
+    await waitFor(() => expect(ViewActions.search).toHaveBeenCalled());
   });
 });
