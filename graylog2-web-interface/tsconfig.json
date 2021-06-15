@@ -17,6 +17,7 @@
     "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
+    "noUncheckedIndexedAccess": true,
 
     "forceConsistentCasingInFileNames": true,
     "module": "esnext",
