@@ -30,6 +30,7 @@ import FieldType from 'views/logic/fieldtypes/FieldType';
 import { colors as defaultColors } from 'views/components/visualizations/Colors';
 import { EVENT_COLOR, eventsDisplayName } from 'views/logic/searchtypes/events/EventHandler';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
+import Series from 'views/logic/aggregationbuilder/Series';
 
 const ColorHint = styled.div(({ color }) => `
   cursor: pointer;
@@ -89,6 +90,8 @@ type ColorPickerConfig = {
 };
 
 const defaultLabelMapper = (data: Array<{ name: string }>) => data.map(({ name }) => name);
+
+const isLabelAFunction = (label: string, series: Series) => series.function === label || series.config.name === label;
 
 const PlotLegend = ({ children, config, chartData, labelMapper = defaultLabelMapper }: Props) => {
   const [colorPickerConfig, setColorPickerConfig] = useState<ColorPickerConfig | undefined>();
@@ -154,7 +157,7 @@ const PlotLegend = ({ children, config, chartData, labelMapper = defaultLabelMap
     const defaultColor = value === eventsDisplayName ? EVENT_COLOR : undefined;
     let val: React.ReactNode = value;
 
-    if (columnPivots.length === 1) {
+    if (columnPivots.length === 1 && series.length === 1 && !isLabelAFunction(value, series[0])) {
       val = (<Value type={FieldType.Unknown} value={value} field={columnPivots[0].field} queryId={activeQuery}>{value}</Value>);
     }
 
