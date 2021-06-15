@@ -31,6 +31,7 @@ import { colors as defaultColors } from 'views/components/visualizations/Colors'
 import { EVENT_COLOR, eventsDisplayName } from 'views/logic/searchtypes/events/EventHandler';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import Series from 'views/logic/aggregationbuilder/Series';
+import Pivot from 'views/logic/aggregationbuilder/Pivot';
 
 const ColorHint = styled.div(({ color }) => `
   cursor: pointer;
@@ -82,7 +83,7 @@ type Props = {
   config: AggregationWidgetConfig,
   chartData: any,
   labelMapper?: (data: Array<any>) => Array<string> | undefined | null,
-  isPieChart?: boolean,
+  neverHide?: boolean,
 };
 
 type ColorPickerConfig = {
@@ -90,11 +91,23 @@ type ColorPickerConfig = {
   target: EventTarget,
 };
 
-const defaultLabelMapper = (data: Array<{ name: string }>) => data.map(({ name }) => name);
-
 const isLabelAFunction = (label: string, series: Series) => series.function === label || series.config.name === label;
 
-const PlotLegend = ({ children, config, chartData, labelMapper = defaultLabelMapper, isPieChart }: Props) => {
+const legendField = (columnPivots: Array<Pivot>, rowPivots: Array<Pivot>, neverHide: boolean, series: Array<Series>, value: string) => {
+  if (columnPivots.length === 1 && series.length === 1 && !isLabelAFunction(value, series[0])) {
+    return columnPivots[0].field;
+  }
+
+  if (!neverHide && rowPivots.length === 1) {
+    return rowPivots[0].field;
+  }
+
+  return null;
+};
+
+const defaultLabelMapper = (data: Array<{ name: string }>) => data.map(({ name }) => name);
+
+const PlotLegend = ({ children, config, chartData, labelMapper = defaultLabelMapper, neverHide }: Props) => {
   const [colorPickerConfig, setColorPickerConfig] = useState<ColorPickerConfig | undefined>();
   const { rowPivots, columnPivots, series } = config;
   const labels: Array<string> = labelMapper(chartData);
@@ -150,19 +163,14 @@ const PlotLegend = ({ children, config, chartData, labelMapper = defaultLabelMap
     setColorPickerConfig(undefined);
   }, [setColor]);
 
-  if (!isPieChart && (!focusedWidget || !focusedWidget.editing) && series.length <= 1 && columnPivots.length <= 0) {
+  if (!neverHide && (!focusedWidget || !focusedWidget.editing) && series.length <= 1 && columnPivots.length <= 0) {
     return <>{children}</>;
   }
 
   const tableCells = labels.sort(stringLenSort).map((value) => {
     const defaultColor = value === eventsDisplayName ? EVENT_COLOR : undefined;
-    let val: React.ReactNode = value;
-
-    if (columnPivots.length === 1 && series.length === 1 && !isLabelAFunction(value, series[0])) {
-      val = (<Value type={FieldType.Unknown} value={value} field={columnPivots[0].field} queryId={activeQuery}>{value}</Value>);
-    } else if (isPieChart && rowPivots.length === 1) {
-      val = (<Value type={FieldType.Unknown} value={value} field={rowPivots[0].field} queryId={activeQuery}>{value}</Value>);
-    }
+    const field = legendField(columnPivots, rowPivots, !neverHide, series, value);
+    const val = field !== null ? <Value type={FieldType.Unknown} value={value} field={field} queryId={activeQuery}>{value}</Value> : value;
 
     return (
       <LegendCell key={value}>
@@ -210,7 +218,7 @@ const PlotLegend = ({ children, config, chartData, labelMapper = defaultLabelMap
 
 PlotLegend.defaultProps = {
   labelMapper: defaultLabelMapper,
-  isPieChart: false,
+  neverHide: false,
 };
 
 export default PlotLegend;
