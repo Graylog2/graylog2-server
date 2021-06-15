@@ -43,14 +43,14 @@ export interface OktaTeamSyncConfig {
   synchronizeGroups?: boolean
 }
 export interface OktaTeamSyncConfigJson {
-  id?: string,
+  id: string,
   auth_service_backend_id: string,
   selection_type: string,
   selection: Array<string>,
   default_roles: Array<string>,
   config: {
     type: string,
-    okta_api_token: (string | { keep_value: true } | { delete_value: true } | { set_value: string | undefined }) | undefined,
+    okta_api_token: string,
   },
 }
 
