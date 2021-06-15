@@ -172,6 +172,30 @@ describe('AggregationWizard', () => {
     await screen.findByText('timestamp');
   });
 
+  it('should remove all groupings', async () => {
+    const pivot = Pivot.create('took_ms', 'values', { limit: 15 });
+    const config = widgetConfig
+      .toBuilder()
+      .rowPivots([pivot])
+      .build();
+    const onChangeMock = jest.fn();
+    renderSUT({ config, onChange: onChangeMock });
+
+    const removeGroupingElementButton = screen.getByRole('button', { name: 'Remove Grouping' });
+    userEvent.click(removeGroupingElementButton);
+
+    await submitWidgetConfigForm();
+
+    const updatedConfig = widgetConfig
+      .toBuilder()
+      .rowPivots([])
+      .build();
+
+    await waitFor(() => expect(onChangeMock).toHaveBeenCalledTimes(1));
+
+    expect(onChangeMock).toHaveBeenCalledWith(updatedConfig);
+  });
+
   it('should display group by section even if config has no pivots', () => {
     const config = widgetConfig
       .toBuilder()
