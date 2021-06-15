@@ -15,32 +15,19 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-export type Input = {
-  id: string,
-  title: string,
-  name: string,
-  type: string,
-  attributes: {
-    [type: string]: any,
-  },
-  created_at: string,
-  creator_user_id: string,
-  content_pack?: boolean,
-  global: boolean,
-  static_fields: { [field: string]: any },
-  node?: string,
-};
+import isAllMessagesRange from 'views/logic/queries/IsAllMessagesRange';
+import { RELATIVE_ALL_TIME } from 'views/Constants';
 
-export type Codec ={
-  type: string,
-  name: string,
-  requested_configuration: {
-    [key: string]: {
-      [key: string]: any,
-    },
-  },
-};
+import { TimeRange } from './Query';
 
-export type CodecTypes = {
-  [key: string]: Codec,
+/* eslint-disable import/prefer-default-export */
+export const normalizeIfAllMessagesRange = (timeRange: TimeRange) => {
+  if (isAllMessagesRange(timeRange)) {
+    return {
+      type: timeRange.type,
+      range: RELATIVE_ALL_TIME,
+    };
+  }
+
+  return timeRange;
 };

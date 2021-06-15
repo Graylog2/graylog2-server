@@ -15,32 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-export type Input = {
-  id: string,
-  title: string,
-  name: string,
-  type: string,
-  attributes: {
-    [type: string]: any,
-  },
-  created_at: string,
-  creator_user_id: string,
-  content_pack?: boolean,
-  global: boolean,
-  static_fields: { [field: string]: any },
-  node?: string,
+import { RELATIVE_ALL_TIME } from 'views/Constants';
+import { isTypeRelativeWithEnd, isTypeRelativeWithStartOnly } from 'views/typeGuards/timeRange';
+import { TimeRange } from 'views/logic/queries/Query';
+
+const isAllMessagesRange = (timeRange: TimeRange) => {
+  return (isTypeRelativeWithEnd(timeRange) && timeRange.from === RELATIVE_ALL_TIME && !timeRange.to) || (isTypeRelativeWithStartOnly(timeRange) && timeRange.range === RELATIVE_ALL_TIME);
 };
 
-export type Codec ={
-  type: string,
-  name: string,
-  requested_configuration: {
-    [key: string]: {
-      [key: string]: any,
-    },
-  },
-};
-
-export type CodecTypes = {
-  [key: string]: Codec,
-};
+export default isAllMessagesRange;

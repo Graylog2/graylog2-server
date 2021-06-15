@@ -43,7 +43,7 @@ const WidgetContainer = ({ children, className, isFocused, style, ...rest }: Pro
       ...containerStyle,
       height: '100%',
       width: '100%',
-      zIndex: 1,
+      zIndex: 2,
       top: 0,
       left: 0,
     };

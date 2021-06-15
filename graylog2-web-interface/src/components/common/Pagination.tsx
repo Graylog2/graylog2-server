@@ -64,6 +64,7 @@ const StyledBootstrapPagination = styled(BootstrapPagination)(({ theme }: { them
           color: ${theme.utils.contrastingColor(theme.colors.variant.lightest.info)};
           background-color: ${theme.colors.variant.lightest.info};
           border-color: ${theme.colors.variant.lighter.info};
+          z-index: 1;
         }
       }
 
