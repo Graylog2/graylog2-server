@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { $PropertyType } from 'utility-types/dist/utility-types';
+import * as Immutable from 'immutable';
 
 import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
 
@@ -34,6 +35,23 @@ export interface OktaBackendConfigJson {
   client_secret: string;
   token_verifier_connect_timeout: string;
   callback_url: string;
+}
+export interface OktaTeamSyncConfig {
+  teamSelectionType?: 'all' | 'include' | 'exclude',
+  teamSelection?: Immutable.Set<string>,
+  oktaApiToken?: { is_set: boolean };
+  synchronizeGroups?: boolean
+}
+export interface OktaTeamSyncConfigJson {
+  id: string,
+  auth_service_backend_id: string,
+  selection_type: string,
+  selection: Array<string>,
+  default_roles: Array<string>,
+  config: {
+    type: string,
+    okta_api_token: string,
+  },
 }
 
 export interface OktaBackend {
