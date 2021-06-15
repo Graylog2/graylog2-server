@@ -49,7 +49,7 @@ jest.mock('views/actions/SearchActions');
 
 describe('WidgetFocusProvider', () => {
   beforeEach(() => {
-    useLocation.mockReturnValue({
+    asMock(useLocation).mockReturnValue({
       pathname: '',
       search: '',
     });
@@ -77,7 +77,7 @@ describe('WidgetFocusProvider', () => {
   });
 
   it('should update url on widget focus close', () => {
-    useLocation.mockReturnValueOnce({
+    asMock(useLocation).mockReturnValueOnce({
       pathname: '',
       search: '?focusedId=widget-id&focusing=true',
     });
@@ -94,7 +94,7 @@ describe('WidgetFocusProvider', () => {
   });
 
   it('should set widget focus based on url', () => {
-    useLocation.mockReturnValue({
+    asMock(useLocation).mockReturnValue({
       pathname: '',
       search: '?focusedId=widget-id&focusing=true',
     });
@@ -121,7 +121,7 @@ describe('WidgetFocusProvider', () => {
   });
 
   it('should update url on widget edit close', () => {
-    useLocation.mockReturnValue({
+    asMock(useLocation).mockReturnValue({
       pathname: '',
       search: '?focusedId=widget-id&editing=true',
     });
@@ -139,7 +139,7 @@ describe('WidgetFocusProvider', () => {
   });
 
   it('should set widget edit and focused based on url', () => {
-    useLocation.mockReturnValue({
+    asMock(useLocation).mockReturnValue({
       pathname: '',
       search: '?focusedId=widget-id&editing=true',
     });
@@ -154,7 +154,7 @@ describe('WidgetFocusProvider', () => {
   });
 
   it('should not remove focus query param on widget edit', () => {
-    useLocation.mockReturnValue({
+    asMock(useLocation).mockReturnValue({
       pathname: '',
       search: '?focusedId=widget-id&focusing=true',
     });
@@ -177,7 +177,7 @@ describe('WidgetFocusProvider', () => {
   it('should not set focused widget from url and cleanup url if the widget does not exist', () => {
     asMock(WidgetStore.getInitialState).mockReturnValue(Map());
 
-    useLocation.mockReturnValue({
+    asMock(useLocation).mockReturnValue({
       pathname: '',
       search: '?focusedId=not-existing-widget-id',
     });
@@ -194,7 +194,7 @@ describe('WidgetFocusProvider', () => {
   });
 
   it('should not trigger search execution when no focus mode was requested', async () => {
-    useLocation.mockReturnValue({
+    asMock(useLocation).mockReturnValue({
       pathname: '',
       search: '',
     });
