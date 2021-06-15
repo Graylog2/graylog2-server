@@ -214,7 +214,7 @@ describe('AggregationWizard', () => {
     await waitFor(() => expect(expect(applyButton).toBeDisabled()));
   });
 
-  it('should remove sort', async () => {
+  it('should remove all sorts', async () => {
     const onChangeMock = jest.fn();
     const config = widgetConfig
       .toBuilder()
