@@ -36,8 +36,6 @@ type Props = {
 class UrlWhiteListConfig extends React.Component<Props, State> {
   private configModal: BootstrapModalForm | undefined | null;
 
-  private inputs = {};
-
   static propTypes = {
     config: PropTypes.object.isRequired,
     updateConfig: PropTypes.func.isRequired,

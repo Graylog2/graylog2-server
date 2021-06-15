@@ -24,7 +24,6 @@ import { Field, Formik, Form } from 'formik';
 import connect from 'stores/connect';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
-import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import View from 'views/logic/views/View';
 import Widget from 'views/logic/widgets/Widget';
 import { Icon, Spinner } from 'components/common';
