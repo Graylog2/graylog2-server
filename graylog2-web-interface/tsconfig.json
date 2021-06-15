@@ -13,6 +13,7 @@
     "allowSyntheticDefaultImports": true,
 
     "strict": false,
+    "strictBindCallApply": true,
     "noImplicitThis": true,
 
     "forceConsistentCasingInFileNames": true,
