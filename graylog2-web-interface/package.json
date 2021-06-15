@@ -132,6 +132,7 @@
     "@types/react-bootstrap": "^0.32.25",
     "@types/react-plotly.js": "^2.2.4",
     "@types/react-router-dom": "^5.1.7",
+    "@types/ua-parser-js": "^0.7.36",
     "@types/urijs": "^1.19.15",
     "assets-webpack-plugin": "^5.1.2",
     "babel-loader": "^8.2.2",
