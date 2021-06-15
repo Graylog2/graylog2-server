@@ -125,6 +125,7 @@
     "@types/express": "^4.17.11",
     "@types/express-formidable": "^1.0.4",
     "@types/lodash": "^4.14.165",
+    "@types/md5": "^2.3.0",
     "@types/moment-duration-format": "^2.2.2",
     "@types/numeral": "^2.0.1",
     "@types/plotly.js": "1.54.8",
