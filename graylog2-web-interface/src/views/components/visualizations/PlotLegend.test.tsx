@@ -49,7 +49,7 @@ const columnPivots = [Pivot.create('field1', 'unknown')];
 const config = AggregationWidgetConfig.builder().series([Series.forFunction('count')]).columnPivots(columnPivots).build();
 
 // eslint-disable-next-line react/require-default-props
-const SUT = ({ chartDataProp = chartData, plotConfig = config }: { chartDataProp?: Array<{ name: string, }>, plotConfig?: AggregationWidgetConfig }) => (
+const SUT = ({ chartDataProp = chartData, plotConfig = config, neverHide = false }: { chartDataProp?: Array<{ name: string, }>, plotConfig?: AggregationWidgetConfig, neverHide?: boolean }) => (
   <WidgetFocusContext.Provider value={{
     focusedWidget: undefined,
     setWidgetFocusing: jest.fn(),
@@ -58,7 +58,7 @@ const SUT = ({ chartDataProp = chartData, plotConfig = config }: { chartDataProp
     setWidgetEditing: jest.fn(),
   }}>
     <ChartColorContext.Provider value={{ colors, setColor }}>
-      <PlotLegend config={plotConfig} chartData={chartDataProp}>
+      <PlotLegend config={plotConfig} chartData={chartDataProp} neverHide={neverHide}>
         <div>Plot</div>
       </PlotLegend>
     </ChartColorContext.Provider>
@@ -108,7 +108,7 @@ describe('PlotLegend', () => {
     await screen.findByText('name11');
   });
 
-  it('should hide with a single values', async () => {
+  it('should hide with a single value', async () => {
     const plotConfig = AggregationWidgetConfig.builder().series([Series.forFunction('count')]).build();
     render(<SUT chartDataProp={[{ name: 'name1' }]} plotConfig={plotConfig} />);
 
@@ -122,5 +122,12 @@ describe('PlotLegend', () => {
     fireEvent.click(value);
 
     expect(screen.queryByText('Actions')).not.toBeInTheDocument();
+  });
+
+  it('should not hide with a single value if configured', async () => {
+    const plotConfig = AggregationWidgetConfig.builder().series([Series.forFunction('count')]).build();
+    render(<SUT chartDataProp={[{ name: 'name1' }]} plotConfig={plotConfig} neverHide />);
+
+    screen.findByText('name1');
   });
 });
