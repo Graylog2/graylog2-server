@@ -112,7 +112,7 @@ class DecoratorSummary extends React.Component {
     const { decorator } = this.props;
 
     return (
-      <DropdownButton id={`decorator-${decorator.id}-actions`} bsStyle="default" bsSize="xsmall" title="Actions" pullRight>
+      <DropdownButton id={`decorator-${decorator.id}-actions`} bsStyle="default" bsSize="xsmall" title="Actions">
         <MenuItem onSelect={this._handleEditClick}>Edit</MenuItem>
         <MenuItem divider />
         <MenuItem onSelect={this._handleDeleteClick}>Delete</MenuItem>
