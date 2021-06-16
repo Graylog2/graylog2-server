@@ -25,6 +25,10 @@ import {
   AlwaysEqual,
   NeverEqual,
   NonValueClass,
+  numericVisualizationWithTrend,
+  numericVisualizationWithoutTrend,
+  barChartWithGrouping,
+  barChartWithStacking,
 } from 'stores/__tests__/EqualityCheck.fixtures';
 
 import isEqualForSearch from './isEqualForSearch';
@@ -79,5 +83,7 @@ describe('isEqualForSearch', () => {
     ${objectWithMap()}       | ${objectWithMap()}       | ${true}   | ${'objects containing immutable maps'}
     ${arrayOfMaps()}         | ${arrayOfMaps()}         | ${true}   | ${'arrays containing immutable maps'}
     ${mixedMapsAndObjects()} | ${mixedMapsAndObjects()} | ${true}   | ${'nested immutable maps and objects'}
+    ${numericVisualizationWithTrend()} | ${numericVisualizationWithoutTrend()} | ${false} | ${'numeric visualization with/without trend'}
+    ${barChartWithGrouping()} | ${barChartWithStacking()} | ${true} | ${'bar charts with different modes'}
   `('compares $description and returns $result', verifyIsEqualForSearch);
 });
