@@ -65,7 +65,9 @@ describe('WidgetFocusProvider', () => {
 
   it('should update url on widget focus', () => {
     let contextValue;
-    const consume = (value) => { contextValue = value; };
+    const consume = (value) => {
+      contextValue = value;
+    };
 
     renderSUT(consume);
 
@@ -81,7 +83,9 @@ describe('WidgetFocusProvider', () => {
     });
 
     let contextValue;
-    const consume = (value) => { contextValue = value; };
+    const consume = (value) => {
+      contextValue = value;
+    };
     renderSUT(consume);
 
     contextValue.unsetWidgetFocusing();
@@ -96,15 +100,19 @@ describe('WidgetFocusProvider', () => {
     });
 
     let contextValue;
-    const consume = (value) => { contextValue = value; };
+    const consume = (value) => {
+      contextValue = value;
+    };
     renderSUT(consume);
 
-    expect(contextValue.focusedWidget).toEqual({ id: 'widget-id', focusing: true, editing: false });
+    expect(contextValue.focusedWidget).toEqual({id: 'widget-id', focusing: true, editing: false});
   });
 
   it('should update url on widget edit', () => {
     let contextValue;
-    const consume = (value) => { contextValue = value; };
+    const consume = (value) => {
+      contextValue = value;
+    };
     renderSUT(consume);
 
     contextValue.setWidgetEditing('widget-id');
@@ -119,7 +127,9 @@ describe('WidgetFocusProvider', () => {
     });
 
     let contextValue;
-    const consume = (value) => { contextValue = value; };
+    const consume = (value) => {
+      contextValue = value;
+    };
 
     renderSUT(consume);
 
@@ -135,10 +145,12 @@ describe('WidgetFocusProvider', () => {
     });
 
     let contextValue;
-    const consume = (value) => { contextValue = value; };
+    const consume = (value) => {
+      contextValue = value;
+    };
     renderSUT(consume);
 
-    expect(contextValue.focusedWidget).toEqual({ id: 'widget-id', editing: true, focusing: true });
+    expect(contextValue.focusedWidget).toEqual({id: 'widget-id', editing: true, focusing: true});
   });
 
   it('should not remove focus query param on widget edit', () => {
@@ -148,7 +160,9 @@ describe('WidgetFocusProvider', () => {
     });
 
     let contextValue;
-    const consume = (value) => { contextValue = value; };
+    const consume = (value) => {
+      contextValue = value;
+    };
     renderSUT(consume);
 
     contextValue.setWidgetEditing('widget-id');
@@ -169,7 +183,9 @@ describe('WidgetFocusProvider', () => {
     });
 
     let contextValue;
-    const consume = (value) => { contextValue = value; };
+    const consume = (value) => {
+      contextValue = value;
+    };
     renderSUT(consume);
 
     expect(contextValue.focusedWidget).toBe(undefined);
@@ -177,7 +193,7 @@ describe('WidgetFocusProvider', () => {
     expect(mockHistoryReplace).toBeCalledWith('');
   });
 
-  it('should not trigger search execution when not leaving widget editing', async () => {
+  it('should not trigger search execution when no focus mode was requested', async () => {
     useLocation.mockReturnValue({
       pathname: '',
       search: '',
