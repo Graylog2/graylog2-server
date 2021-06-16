@@ -103,22 +103,13 @@ const Trend = React.forwardRef<HTMLSpanElement, Props>(({ current, previous, tre
   const backgroundTrend = _trendDirection(difference, trendPreference);
   const trendIcon = _trendIcon(difference);
 
-  const trendStrings = [];
-
-  if (Number.isFinite(difference)) {
-    trendStrings.push(numeral(difference).format('+0,0[.]0[000]'));
-  }
-
-  if (Number.isFinite(differencePercent)) {
-    trendStrings.push(numeral(differencePercent).format('+0[.]0[0]%'));
-  }
-
-  const trend = trendStrings.join(' / ');
+  const absoluteDifference = Number.isFinite(difference) ? numeral(difference).format('+0,0[.]0[000]') : '--';
+  const relativeDifference = Number.isFinite(differencePercent) ? numeral(differencePercent).format('+0[.]0[0]%') : '--';
 
   return (
     <Background trend={backgroundTrend} data-testid="trend-background">
       <TextContainer trend={backgroundTrend} ref={ref}>
-        <StyledIcon name={trendIcon} trend={backgroundTrend} data-testid="trend-icon" /> <span data-testid="trend-value">{trend}</span>
+        <StyledIcon name={trendIcon} trend={backgroundTrend} data-testid="trend-icon" /> <span data-testid="trend-value" title={`Previous value: ${previous}`}>{absoluteDifference} / {relativeDifference}</span>
       </TextContainer>
     </Background>
   );

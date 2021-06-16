@@ -77,7 +77,7 @@ describe('Trend', () => {
   it('shows adequate results if previous value is NaN', async () => {
     renderTrend({ current: 23, previous: NaN });
 
-    expect(await findTrend()).toEqual('');
+    expect(await findTrend()).toEqual('-- / --');
   });
 
   it('shows adequate results if current value is 0', async () => {
@@ -89,7 +89,7 @@ describe('Trend', () => {
   it('shows adequate results if current value is NaN', async () => {
     renderTrend({ current: NaN, previous: 42 });
 
-    expect(await findTrend()).toEqual('');
+    expect(await findTrend()).toEqual('-- / --');
   });
 
   describe('renders background according to values and trend preference', () => {
