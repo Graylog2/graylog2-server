@@ -23,7 +23,7 @@ import {
   DirectoryServiceBackendConfigJson,
   WizardSubmitPayload,
 } from 'logic/authentication/directoryServices/types';
-import { OktaBackendConfig, OktaBackendConfigJson } from 'logic/authentication/okta/types';
+import { OktaBackend, OktaBackendConfig, OktaBackendConfigJson } from 'logic/authentication/okta/types';
 import Role from 'logic/roles/Role';
 import { WizardFormValues } from 'components/authentication/directoryServices/BackendWizard/BackendWizardContext';
 
@@ -32,12 +32,12 @@ export interface DirectoryServiceAuthenticationService {
   displayName: string;
   createComponent: React.ComponentType<{}>;
   editComponent: React.ComponentType<{
-    authenticationBackend: DirectoryServiceBackend,
+    authenticationBackend: (typeof DirectoryServiceBackend | typeof OktaBackendConfig),
     initialStepKey: string | null | undefined
   }>;
   configDetailsComponent: React.ComponentType<{
-    authenticationBackend: AuthenticationBackend,
-    roles: Immutable.List<Role>,
+    authenticationBackend:(typeof AuthenticationBackend | typeof OktaBackend),
+    roles?: Immutable.List<Role>,
   }>;
   configToJson: (config: {}) => DirectoryServiceBackendConfigJson;
   configFromJson: (json: {}) => DirectoryServiceBackendConfig;

@@ -20,13 +20,14 @@ import { DirectoryServiceAuthenticationService } from 'components/authentication
 
 import { getAuthServicePlugin } from 'util/AuthenticationService';
 import { DirectoryServiceBackendConfig } from 'logic/authentication/directoryServices/types';
+import { OktaBackendConfig } from 'logic/authentication/okta/types';
 
 type InternalState = {
   id: string,
   title: string,
   description: string,
   defaultRoles: Immutable.List<string>,
-  config: DirectoryServiceBackendConfig,
+  config: DirectoryServiceBackendConfig | OktaBackendConfig,
 };
 
 type TypedConfig = {
@@ -38,7 +39,7 @@ export type AuthenticationBackendJSON = {
   title: string,
   description: string,
   default_roles: Array<string>,
-  config: DirectoryServiceBackendConfig,
+  config: DirectoryServiceBackendConfig | OktaBackendConfig,
 };
 
 const configFromJson = (config: $PropertyType<AuthenticationBackendJSON, 'config'>) => {
