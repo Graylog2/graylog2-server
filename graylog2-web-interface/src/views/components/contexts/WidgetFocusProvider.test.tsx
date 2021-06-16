@@ -177,7 +177,7 @@ describe('WidgetFocusProvider', () => {
     expect(mockHistoryReplace).toBeCalledWith('');
   });
 
-  it('should not trigger search execution when not leaving widget editing', async () => {
+  it('should trigger search execution when not leaving widget focus mode', async () => {
     useLocation.mockReturnValue({
       pathname: '',
       search: '',
@@ -187,6 +187,6 @@ describe('WidgetFocusProvider', () => {
 
     renderSUT(consume);
 
-    expect(SearchActions.executeWithCurrentState).not.toHaveBeenCalled();
+    expect(SearchActions.executeWithCurrentState).toHaveBeenCalledTimes(1);
   });
 });
