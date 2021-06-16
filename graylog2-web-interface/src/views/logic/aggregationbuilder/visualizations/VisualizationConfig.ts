@@ -39,6 +39,11 @@ export default class VisualizationConfig {
     throw new Error('Must not be called on abstract class!');
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars,class-methods-use-this
+  equalsForSearch(other: any) {
+    return true;
+  }
+
   static __registrations: { [key: string]: DeserializesVisualizationConfig } = {};
 
   static registerSubtype(type: string, implementingClass: DeserializesVisualizationConfig) {
