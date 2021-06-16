@@ -231,7 +231,7 @@ describe('AggregationWizard', () => {
     expect(onChangeMock).toHaveBeenCalledWith(updatedConfig);
   });
 
-  it('should remove metric', async () => {
+  it('should remove all metrics', async () => {
     const onChangeMock = jest.fn();
     const config = widgetConfig
       .toBuilder()

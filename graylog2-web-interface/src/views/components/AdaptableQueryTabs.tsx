@@ -186,6 +186,7 @@ const AdaptableQueryTabs = ({ maxWidth, queries, titles, selectedQueryId, onRemo
                     id={id}
                     onClose={() => onRemove(id)}
                     openEditModal={openTitleEditModal}
+                    allowsClosing={queries.size > 1}
                     title={title} />
       );
 

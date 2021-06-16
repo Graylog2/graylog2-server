@@ -20,9 +20,9 @@ import React from 'react';
 import { DropdownButton, MenuItem } from 'components/graylog';
 import { ConfigurationForm, ConfigurationWell } from 'components/configurationforms';
 
-// eslint-disable-next-line import/no-webpack-loader-syntax
 import InlineForm from './InlineForm';
 
+// eslint-disable-next-line import/no-webpack-loader-syntax
 import DecoratorStyles from '!style!css!./decoratorStyles.css';
 
 class DecoratorSummary extends React.Component {
@@ -112,7 +112,7 @@ class DecoratorSummary extends React.Component {
     const { decorator } = this.props;
 
     return (
-      <DropdownButton id={`decorator-${decorator.id}-actions`} bsStyle="default" bsSize="xsmall" title="Actions" pullRight>
+      <DropdownButton id={`decorator-${decorator.id}-actions`} bsStyle="default" bsSize="xsmall" title="Actions">
         <MenuItem onSelect={this._handleEditClick}>Edit</MenuItem>
         <MenuItem divider />
         <MenuItem onSelect={this._handleDeleteClick}>Delete</MenuItem>
