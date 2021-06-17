@@ -1,5 +1,6 @@
 version: 2
 updates:
+# default branch: enabling all dependency updates
 - package-ecosystem: maven
   directory: "/"
   schedule:
@@ -59,4 +60,61 @@ updates:
   open-pull-requests-limit: 10
   labels:
   - dependencies
+  rebase-strategy: "disabled"
+  
+# stable branch, enabling only security updates by setting PR limit to 0 (security updates will still go through)
+- package-ecosystem: maven
+  directory: "/"
+  target-branch: "4.0"
+  schedule:
+    interval: daily
+    time: "02:00"
+    timezone: "Europe/Berlin"
+  open-pull-requests-limit: 0
+  labels:
+  - security
+  rebase-strategy: "disabled"
+- package-ecosystem: npm
+  directory: "/graylog2-web-interface/packages/graylog-web-plugin"
+  target-branch: "4.0"
+  schedule:
+    interval: daily
+    time: "02:00"
+    timezone: "Europe/Berlin"
+  open-pull-requests-limit: 0
+  labels:
+  - security
+  rebase-strategy: "disabled"
+- package-ecosystem: npm
+  directory: "/graylog2-web-interface"
+  target-branch: "4.0"
+  schedule:
+    interval: daily
+    time: "02:00"
+    timezone: "Europe/Berlin"
+  open-pull-requests-limit: 0
+  labels:
+  - security
+  rebase-strategy: "disabled"
+- package-ecosystem: npm
+  directory: "/graylog2-web-interface/packages/eslint-config-graylog"
+  target-branch: "4.0"
+  schedule:
+    interval: daily
+    time: "02:00"
+    timezone: "Europe/Berlin"
+  open-pull-requests-limit: 0
+  labels:
+  - security
+  rebase-strategy: "disabled"
+- package-ecosystem: npm
+  directory: "/graylog2-web-interface/packages/jest-preset-graylog"
+  target-branch: "4.0"
+  schedule:
+    interval: daily
+    time: "02:00"
+    timezone: "Europe/Berlin"
+  open-pull-requests-limit: 0
+  labels:
+  - security
   rebase-strategy: "disabled"
