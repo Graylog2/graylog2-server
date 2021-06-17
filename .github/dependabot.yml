@@ -9,6 +9,7 @@ updates:
   open-pull-requests-limit: 10
   labels:
   - dependencies
+  rebase-strategy: "disabled"
 - package-ecosystem: npm
   directory: "/graylog2-web-interface/packages/graylog-web-plugin"
   schedule:
@@ -23,6 +24,7 @@ updates:
     versions:
     - ">= 1.a"
     - "< 2"
+  rebase-strategy: "disabled"
 - package-ecosystem: npm
   directory: "/graylog2-web-interface"
   schedule:
@@ -37,6 +39,7 @@ updates:
     versions:
     - ">= 4.a"
     - "< 5"
+  rebase-strategy: "disabled"
 - package-ecosystem: npm
   directory: "/graylog2-web-interface/packages/eslint-config-graylog"
   schedule:
@@ -46,6 +49,7 @@ updates:
   open-pull-requests-limit: 10
   labels:
   - dependencies
+  rebase-strategy: "disabled"
 - package-ecosystem: npm
   directory: "/graylog2-web-interface/packages/jest-preset-graylog"
   schedule:
@@ -55,3 +59,4 @@ updates:
   open-pull-requests-limit: 10
   labels:
   - dependencies
+  rebase-strategy: "disabled"
