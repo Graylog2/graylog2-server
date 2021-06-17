@@ -37,14 +37,14 @@ const FormikWrap = ({ timerange }:Props) => (
 );
 
 describe('TimeRangeLivePreview', () => {
-  it('renders relative timerange', () => {
+  it('renders relative timerange', async () => {
     const timerange: RelativeTimeRange = { type: 'relative', from: 300 };
     render(<FormikWrap timerange={timerange} />);
 
-    expect(screen.getByText(/5 minutes ago/i)).not.toBeNull();
+    expect(await screen.findByText(/5 minutes ago/i)).not.toBeNull();
   });
 
-  it('renders absolute timerange', () => {
+  it('renders absolute timerange', async () => {
     const timerange: AbsoluteTimeRange = {
       type: 'absolute',
       from: '1955-11-05 06:15:00.000',
@@ -52,15 +52,15 @@ describe('TimeRangeLivePreview', () => {
     };
     render(<FormikWrap timerange={timerange} />);
 
-    expect(screen.getByText(/1955-11-05 06:15:00.000/i)).not.toBeNull();
+    expect(await screen.findByText(/1955-11-05 06:15:00.000/i)).not.toBeNull();
     expect(screen.getByText(/1985-10-25 08:18:00.000/i)).not.toBeNull();
   });
 
-  it('renders keyword timerange', () => {
+  it('renders keyword timerange', async () => {
     const timerange: KeywordTimeRange = { type: 'keyword', keyword: 'Last ten minutes', from: '2020-10-27 15:20:56', to: '2020-10-27 15:30:56' };
     render(<FormikWrap timerange={timerange} />);
 
-    expect(screen.getByText(/2020-10-27 15:20:56/i)).not.toBeNull();
+    expect(await screen.findByText(/2020-10-27 15:20:56/i)).not.toBeNull();
     expect(screen.getByText(/2020-10-27 15:30:56/i)).not.toBeNull();
   });
 });

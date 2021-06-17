@@ -47,34 +47,36 @@ const renderSUT = (allProps = defaultProps, initialFormValues = initialValues) =
   </Formik>,
 );
 
+const fromRangeValue = () => screen.findByRole('spinbutton', { name: /set the from value/i });
+const toRangeValue = () => screen.findByRole('spinbutton', { name: /set the to value/i });
+
 describe('TabRelativeTimeRange', () => {
-  it('renders initial from value', () => {
+  it('renders initial from value', async () => {
     renderSUT();
 
-    const spinbutton = screen.getByRole('spinbutton', { name: /set the from value/i });
+    const spinbutton = await screen.findByRole('spinbutton', { name: /set the from value/i });
 
     expect(spinbutton).toBeInTheDocument();
     expect(spinbutton).toHaveValue(1);
   });
 
-  it('sets "now" as default for to value', () => {
+  it('sets "now" as default for to value', async () => {
     renderSUT();
 
-    const allTimeCheckbox = screen.getByRole('checkbox', { name: /Now/i });
-    const toRangeValue = screen.getByRole('spinbutton', { name: /set the to value/i });
+    const allTimeCheckbox = await screen.findByRole('checkbox', { name: /Now/i });
 
     expect(allTimeCheckbox).toBeEnabled();
-    expect(toRangeValue).toBeDisabled();
+    expect(await toRangeValue()).toBeDisabled();
   });
 
-  it('renders initial time range type', () => {
+  it('renders initial time range type', async () => {
     renderSUT();
 
-    expect(screen.getByText(/Hours/i)).toBeInTheDocument();
+    expect(await screen.findByText(/Hours/i)).toBeInTheDocument();
     expect((screen.getByRole('spinbutton', { name: /Set the from value/i }) as HTMLInputElement).value).toBe('1');
   });
 
-  it('renders initial time range with from and to value', () => {
+  it('renders initial time range with from and to value', async () => {
     const initialFormValues = {
       ...initialValues,
       nextTimeRange: {
@@ -85,40 +87,38 @@ describe('TabRelativeTimeRange', () => {
     };
     renderSUT(undefined, initialFormValues);
 
-    expect((screen.getByRole('spinbutton', { name: /Set the from value/i }) as HTMLInputElement).value).toBe('5');
+    expect((await screen.findByRole('spinbutton', { name: /Set the from value/i }) as HTMLInputElement).value).toBe('5');
     expect((screen.getByRole('spinbutton', { name: /Set the to value/i }) as HTMLInputElement).value).toBe('4');
   });
 
-  it('Clicking All Time disables input', () => {
+  it('Clicking All Time disables input', async () => {
     renderSUT();
 
-    const allTimeCheckbox = screen.getByRole('checkbox', { name: /All Time/i });
-    const fromRangeValue = screen.getByRole('spinbutton', { name: /set the from value/i });
+    const allTimeCheckbox = await screen.findByRole('checkbox', { name: /All Time/i });
 
-    expect(fromRangeValue).not.toBeDisabled();
+    expect(await fromRangeValue()).not.toBeDisabled();
 
     fireEvent.click(allTimeCheckbox);
 
-    expect(fromRangeValue).toBeDisabled();
+    expect(await fromRangeValue()).toBeDisabled();
   });
 
-  it('Clicking Now enables to input', () => {
+  it('Clicking Now enables to input', async () => {
     renderSUT();
 
-    const nowCheckbox = screen.getByRole('checkbox', { name: /Now/i });
-    const toRangeValue = screen.getByRole('spinbutton', { name: /set the to value/i });
+    const nowCheckbox = await screen.findByRole('checkbox', { name: /Now/i });
 
-    expect(toRangeValue).toBeDisabled();
+    expect(await toRangeValue()).toBeDisabled();
 
     fireEvent.click(nowCheckbox);
 
-    expect(toRangeValue).not.toBeDisabled();
+    expect(await toRangeValue()).not.toBeDisabled();
   });
 
-  it('All Time checkbox is disabled', () => {
+  it('All Time checkbox is disabled', async () => {
     renderSUT({ ...defaultProps, limitDuration: 10 });
 
-    const allTimeCheckbox = screen.getByRole('checkbox', { name: /All Time/i });
+    const allTimeCheckbox = await screen.findByRole('checkbox', { name: /All Time/i });
 
     expect(allTimeCheckbox).toBeDisabled();
   });
