@@ -13,6 +13,18 @@ Upgrading to Graylog 4.1.x
 Breaking Changes
 ================
 
+For the following legacy-API endpoints, some of the underlying search-methods have been tagged as ``@deprecated``.
++-----------------------------------------------+-----------------------------+
+| Endpoint                                      | Description                 |
++===============================================+=============================+
+| ``/search/universal/absolute*``               | Legacy API endpoint         |
+| ``/search/universal/keyword*``                | Legacy API endpoint         |
+| ``/search/universal/relative*``               | Legacy API endpoint         |
++-----------------------------------------------+-----------------------------+
+
+The reason is, that internally the ``NO_LIMIT`` has been changed to ``-1`` instead of ``0``, so we had to introduce a
+fix to keep the legacy-API consistent for users.
+
 
 Changes to the Elasticsearch Support
 ------------------------------------
