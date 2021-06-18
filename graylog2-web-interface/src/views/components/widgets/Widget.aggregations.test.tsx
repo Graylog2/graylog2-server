@@ -196,43 +196,44 @@ describe('Aggregation Widget', () => {
 
       expect(WidgetActions.update).toHaveBeenCalledWith(expect.any(String), updatedWidget);
     }, testTimeout);
+
+    it('should apply not submitted widget time range changes in correct format when clicking on "Apply Changes"', async () => {
+      const updatedWidget = dataTableWidget
+        .toBuilder()
+        .timerange({
+          from: '2019-12-31T23:55:00.000Z',
+          to: '2020-01-01T00:00:00.000Z',
+          type: 'absolute',
+        })
+        .build();
+
+      render(<AggregationWidget editing viewType={View.Type.Dashboard} />);
+
+      // Change widget time range
+      const timeRangeDropdownButton = screen.getByLabelText('Open Time Range Selector');
+      userEvent.click(timeRangeDropdownButton);
+
+      const absoluteTabButton = await screen.findByRole('tab', { name: /absolute/i });
+      userEvent.click(absoluteTabButton);
+
+      const timeRangeLivePreview = screen.getByTestId('time-range-live-preview');
+      await within(timeRangeLivePreview).findByText(/2020-01-01 00:55:00\.000/i);
+
+      const applyTimeRangeChangesButton = screen.getByRole('button', { name: 'Apply' });
+      userEvent.click(applyTimeRangeChangesButton);
+
+      const timeRangeDisplay = screen.getByLabelText('Search Time Range, Opens Time Range Selector On Click');
+      await within(timeRangeDisplay).findByText('2020-01-01 00:55:00.000');
+
+      // Submit all changes
+      const saveButton = screen.getByText('Apply Changes');
+      fireEvent.click(saveButton);
+
+      await waitFor(() => expect(WidgetActions.update).toHaveBeenCalledTimes(1));
+
+      expect(WidgetActions.update).toHaveBeenCalledWith(expect.any(String), updatedWidget);
+    }, testTimeout);
   });
-
-  it('should apply not submitted widget time range changes in correct format when clicking on "Apply Changes"', async () => {
-    const updatedWidget = dataTableWidget
-      .toBuilder()
-      .timerange({
-        from: '2019-12-31T23:55:00.000Z',
-        to: '2020-01-01T00:00:00.000Z',
-        type: 'absolute',
-      })
-      .build();
-
-    render(<AggregationWidget editing viewType={View.Type.Dashboard} />);
-
-    // Change widget time range
-    const timeRangeDropdownButton = screen.getByLabelText('Open Time Range Selector');
-    userEvent.click(timeRangeDropdownButton);
-
-    const absoluteTabButton = await screen.findByRole('tab', { name: /absolute/i });
-    userEvent.click(absoluteTabButton);
-
-    await screen.findByText(/2020-01-01 00:55:00.000/i);
-
-    const applyTimeRangeChangesButton = screen.getByRole('button', { name: 'Apply' });
-    userEvent.click(applyTimeRangeChangesButton);
-
-    const timeRangeDisplay = screen.getByLabelText('Search Time Range, Opens Time Range Selector On Click');
-    await within(timeRangeDisplay).findByText('2020-01-01 00:55:00.000');
-
-    // Submit all changes
-    const saveButton = screen.getByText('Apply Changes');
-    fireEvent.click(saveButton);
-
-    await waitFor(() => expect(WidgetActions.update).toHaveBeenCalledTimes(1));
-
-    expect(WidgetActions.update).toHaveBeenCalledWith(expect.any(String), updatedWidget);
-  }, testTimeout);
 
   describe('on a search', () => {
     it('should apply not submitted aggregation elements changes when clicking on "Apply Changes"', async () => {
