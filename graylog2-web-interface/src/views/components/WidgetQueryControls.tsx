@@ -43,7 +43,7 @@ import TimeRangeInput from './searchbar/TimeRangeInput';
 import StreamsFilter from './searchbar/StreamsFilter';
 import SearchButton from './searchbar/SearchButton';
 import QueryInput from './searchbar/AsyncQueryInput';
-import SearchBarForm from './searchbar/SearchBarForm';
+import SearchBarForm, { normalizeSearchBarFormValues } from './searchbar/SearchBarForm';
 import WidgetQueryOverride from './WidgetQueryOverride';
 
 const SecondRow = styled.div`
@@ -91,7 +91,9 @@ const useBindApplySearchControlsChanges = (formRef) => {
         const { dirty, values, isValid } = formRef.current;
 
         if (dirty && isValid) {
-          return updateWidgetSearchControls(newWidget, values);
+          const normalizedFormValues = normalizeSearchBarFormValues(values);
+
+          return updateWidgetSearchControls(newWidget, normalizedFormValues);
         }
       }
 
