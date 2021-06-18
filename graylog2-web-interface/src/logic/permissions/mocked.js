@@ -68,7 +68,7 @@ const searchPaginatedEntitySharesResponse = (page: number, perPage: number, quer
 const availableEntityTypes = {
   stream: 'Stream',
   dashboard: 'Dashboard',
-  saved_search: 'Saved Search',
+  search: 'Saved Search',
   event_definition: 'Event Definition',
 };
 
