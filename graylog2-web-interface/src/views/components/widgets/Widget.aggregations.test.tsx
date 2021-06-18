@@ -113,17 +113,15 @@ describe('Aggregation Widget', () => {
     dirty: false,
   };
 
-  const originalDateNow = Date.now;
-
   beforeEach(() => {
-    Date.now = jest.fn(() => mockedUnixTime);
+    jest.useFakeTimers('modern').setSystemTime(mockedUnixTime);
     ViewStore.getInitialState = jest.fn(() => viewStoreState);
   });
 
   afterEach(() => {
     jest.clearAllMocks();
     jest.resetModules();
-    Date.now = originalDateNow;
+    jest.useRealTimers();
   });
 
   type AggregationWidgetProps = Partial<WidgetComponentProps> & {
