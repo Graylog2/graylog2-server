@@ -64,6 +64,9 @@ public class MessagesAdapterES7 implements MessagesAdapter {
     static final String UNAVAILABLE_SHARDS_EXCEPTION = "unavailable_shards_exception";
     static final String PRIMARY_SHARD_NOT_ACTIVE_REASON = "primary shard is not active";
 
+    static final String ILLEGAL_ARGUMENT_EXCEPTION = "illegal_argument_exception";
+    static final String NO_WRITE_INDEX_DEFINED_FOR_ALIAS = "no write index is defined for alias";
+
     private final ElasticsearchClient client;
     private final Meter invalidTimestampMeter;
     private final ChunkedBulkIndexer chunkedBulkIndexer;
@@ -230,6 +233,9 @@ public class MessagesAdapterES7 implements MessagesAdapter {
                     return Messages.IndexingError.ErrorType.IndexBlocked;
             case UNAVAILABLE_SHARDS_EXCEPTION:
                 if (exception.reason().contains(PRIMARY_SHARD_NOT_ACTIVE_REASON))
+                    return Messages.IndexingError.ErrorType.IndexBlocked;
+            case ILLEGAL_ARGUMENT_EXCEPTION:
+                if (exception.reason().contains(NO_WRITE_INDEX_DEFINED_FOR_ALIAS))
                     return Messages.IndexingError.ErrorType.IndexBlocked;
             default: return Messages.IndexingError.ErrorType.Unknown;
         }
