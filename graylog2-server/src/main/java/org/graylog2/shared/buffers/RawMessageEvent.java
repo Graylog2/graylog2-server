@@ -96,4 +96,11 @@ public class RawMessageEvent {
         final ByteBuffer wrap = ByteBuffer.wrap(messageIdBytes);
         return new UUID(wrap.asLongBuffer().get(0), wrap.asLongBuffer().get(1));
     }
+
+    public void clear() {
+        this.rawMessage = null;
+        this.encodedRawMessage = null;
+        this.messageIdBytes = null;
+        this.messageTimestamp = null;
+    }
 }
