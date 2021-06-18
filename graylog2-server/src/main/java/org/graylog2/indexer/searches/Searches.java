@@ -103,6 +103,7 @@ public class Searches {
         return result;
     }
 
+    @Deprecated
     public ScrollResult scroll(String query, TimeRange range, int limit, int offset, List<String> fields, String filter, int batchSize) {
         final Set<String> affectedIndices = determineAffectedIndices(range, filter);
         final Set<String> indexWildcards = indexSetRegistry.getForIndices(affectedIndices).stream()
@@ -120,7 +121,8 @@ public class Searches {
                 .sorting(sorting)
                 .indices(indexWildcards);
 
-        scrollCommandBuilder = limit != ScrollCommand.NO_LIMIT ? scrollCommandBuilder.limit(limit) : scrollCommandBuilder;
+        // limit > 0 instead of ScrollCommand.NO_LIMIT is a fix for #9817, the caller of this method are only in the legacy-API
+        scrollCommandBuilder = limit > 0 ? scrollCommandBuilder.limit(limit) : scrollCommandBuilder;
         scrollCommandBuilder = batchSize != ScrollCommand.NO_BATCHSIZE ? scrollCommandBuilder.batchSize(batchSize) : scrollCommandBuilder;
 
         final ScrollResult result = searchesAdapter.scroll(scrollCommandBuilder.build());
