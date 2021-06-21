@@ -52,14 +52,6 @@ const mockedUnixTime = 1577836800000; // 2020-01-01 00:00:00.000
 jest.mock('./WidgetHeader', () => 'widget-header');
 jest.mock('./WidgetColorContext', () => ({ children }) => children);
 
-jest.mock('moment-timezone', () => {
-  const momentMock = jest.requireActual('moment-timezone');
-  momentMock.tz.setDefault('UTC');
-  momentMock.tz.guess = () => 'UTC';
-
-  return momentMock;
-});
-
 jest.mock('views/stores/FieldTypesStore', () => ({
   FieldTypesStore: MockStore(['getInitialState', () => ({ all: {}, queryFields: {} })]),
 }));
@@ -207,6 +199,7 @@ describe('Aggregation Widget', () => {
     }, testTimeout);
 
     it('should apply not submitted widget time range changes in correct format when clicking on "Apply Changes"', async () => {
+      // Displayed times are based on time zone defined in moment-timezone mock.
       const updatedWidget = dataTableWidget
         .toBuilder()
         .timerange({
@@ -226,13 +219,13 @@ describe('Aggregation Widget', () => {
       userEvent.click(absoluteTabButton);
 
       const timeRangeLivePreview = screen.getByTestId('time-range-live-preview');
-      await within(timeRangeLivePreview).findByText(/2020-01-01 00:00:00\.000/i);
+      await within(timeRangeLivePreview).findByText('2019-12-31 18:00:00.000');
 
       const applyTimeRangeChangesButton = screen.getByRole('button', { name: 'Apply' });
       userEvent.click(applyTimeRangeChangesButton);
 
       const timeRangeDisplay = screen.getByLabelText('Search Time Range, Opens Time Range Selector On Click');
-      await within(timeRangeDisplay).findByText('2020-01-01 00:00:00.000');
+      await within(timeRangeDisplay).findByText('2019-12-31 18:00:00.000');
 
       // Submit all changes
       const saveButton = screen.getByText('Apply Changes');
