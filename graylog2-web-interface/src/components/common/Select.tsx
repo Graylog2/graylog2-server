@@ -358,7 +358,7 @@ class Select extends React.Component<Props, State> {
     value: undefined,
     valueKey: 'value',
     valueRenderer: undefined,
-    menuPlacement: 'bottom',
+    menuPlacement: 'auto',
     maxMenuHeight: 300,
   };
 
