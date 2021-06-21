@@ -60,8 +60,6 @@ jest.mock('stores/users/UsersStore', () => ({
   },
 }));
 
-jest.useFakeTimers();
-
 describe('UsersSection', () => {
   afterEach(() => {
     jest.clearAllMocks();
