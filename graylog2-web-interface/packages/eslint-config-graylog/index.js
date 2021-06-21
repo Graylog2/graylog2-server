@@ -153,8 +153,9 @@ module.exports = {
       },
     },
     polyfills: [
-      'Promise',
       'fetch',
+      'IntersectionObserver',
+      'Promise',
     ],
   },
 };
