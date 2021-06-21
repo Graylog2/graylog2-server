@@ -62,7 +62,7 @@ describe('NewDashboardPage', () => {
 
     act(() => { jest.advanceTimersByTime(200); });
 
-    expect(getByText('Loading...')).not.toBeNull();
+    expect(await findByText('Loading...')).not.toBeNull();
 
     await findByText('Extended search page');
   });

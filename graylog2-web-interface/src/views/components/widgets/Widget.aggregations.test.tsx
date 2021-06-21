@@ -174,7 +174,7 @@ describe('Aggregation Widget', () => {
       const nameInput = await screen.findByLabelText(/Name/);
       userEvent.type(nameInput, 'Metric name');
 
-      const metricFieldSelect = screen.getByLabelText('Select a function');
+      const metricFieldSelect = await screen.findByLabelText('Select a function');
       await selectEvent.openMenu(metricFieldSelect);
       await selectEvent.select(metricFieldSelect, 'Count', selectEventConfig);
 
@@ -212,19 +212,19 @@ describe('Aggregation Widget', () => {
       render(<AggregationWidget editing viewType={View.Type.Dashboard} />);
 
       // Change widget time range
-      const timeRangeDropdownButton = screen.getByLabelText('Open Time Range Selector');
+      const timeRangeDropdownButton = await screen.findByLabelText('Open Time Range Selector');
       userEvent.click(timeRangeDropdownButton);
 
       const absoluteTabButton = await screen.findByRole('tab', { name: /absolute/i });
       userEvent.click(absoluteTabButton);
 
-      const timeRangeLivePreview = screen.getByTestId('time-range-live-preview');
+      const timeRangeLivePreview = await screen.findByTestId('time-range-live-preview');
       await within(timeRangeLivePreview).findByText('2019-12-31 18:00:00.000');
 
-      const applyTimeRangeChangesButton = screen.getByRole('button', { name: 'Apply' });
+      const applyTimeRangeChangesButton = await screen.findByRole('button', { name: 'Apply' });
       userEvent.click(applyTimeRangeChangesButton);
 
-      const timeRangeDisplay = screen.getByLabelText('Search Time Range, Opens Time Range Selector On Click');
+      const timeRangeDisplay = await screen.findByLabelText('Search Time Range, Opens Time Range Selector On Click');
       await within(timeRangeDisplay).findByText('2019-12-31 18:00:00.000');
 
       // Submit all changes

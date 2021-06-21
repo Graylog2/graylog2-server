@@ -67,10 +67,8 @@ describe('UsersSection', () => {
 
   it('should assigning a user', async () => {
     render(<UsersSection role={exampleRole} />);
-    await act(() => mockLoadUsersPromise.then());
-    await act(() => mockLoadUsersForRolePromise.then());
 
-    const assignUserButton = screen.getByRole('button', { name: 'Assign User' });
+    const assignUserButton = await screen.findByRole('button', { name: 'Assign User' });
     const usersSelector = screen.getByLabelText('Search for users');
     await selectEvent.select(usersSelector, bob.username);
 
@@ -83,10 +81,8 @@ describe('UsersSection', () => {
 
   it('should filter assigned users', async () => {
     render(<UsersSection role={exampleRole} />);
-    await act(() => mockLoadUsersForRolePromise.then());
-    await act(() => mockLoadUsersPromise.then());
 
-    const filterInput = screen.getByPlaceholderText('Enter query to filter');
+    const filterInput = await screen.findByPlaceholderText('Enter query to filter');
     const filterSubmitButton = screen.getByRole('button', { name: 'Filter' });
 
     fireEvent.change(filterInput, { target: { value: 'name of an assigned user' } });
@@ -99,8 +95,6 @@ describe('UsersSection', () => {
 
   it('should unassign a user', async () => {
     render(<UsersSection role={exampleRole} />);
-    await act(() => mockLoadUsersForRolePromise.then());
-    await act(() => mockLoadUsersPromise.then());
 
     const assignUserButton = await screen.findByRole('button', { name: `Remove ${alice.username}` });
     fireEvent.click(assignUserButton);

@@ -59,18 +59,6 @@ const TimeRangeDropdown = (allProps: TimeRangeDropdownProps) => (
 
 );
 
-const asyncRender = async (element) => {
-  let wrapper;
-
-  await act(async () => { wrapper = render(element); });
-
-  if (!wrapper) {
-    throw new Error('Render returned `null`.');
-  }
-
-  return wrapper;
-};
-
 describe('TimeRangeDropdown', () => {
   beforeEach(() => {
     ToolsStore.testNaturalDate = jest.fn(() => Promise.resolve({
@@ -79,10 +67,10 @@ describe('TimeRangeDropdown', () => {
     }));
   });
 
-  it('renders initial time range value', () => {
+  it('renders initial time range value', async () => {
     render(<TimeRangeDropdown {...defaultProps} />);
 
-    const title = screen.getByText(/search time range/i);
+    const title = await screen.findByText(/search time range/i);
 
     expect(title).toBeInTheDocument();
   });
@@ -101,17 +89,17 @@ describe('TimeRangeDropdown', () => {
     }));
   });
 
-  it('Limit duration is shown when setup', () => {
+  it('Limit duration is shown when setup', async () => {
     render(<TimeRangeDropdown {...defaultProps} />);
-    const limitDuration = screen.getByText(/admin has limited searching to 3 days ago/i);
 
+    const limitDuration = await screen.findByText(/admin has limited searching to 3 days ago/i);
     expect(limitDuration).toBeInTheDocument();
   });
 
   it('Render Tabs', async () => {
-    await asyncRender(<TimeRangeDropdown {...defaultProps} />);
+    render(<TimeRangeDropdown {...defaultProps} />);
 
-    const relativeTabButton = screen.getByRole('tab', { name: /relative/i });
+    const relativeTabButton = await screen.findByRole('tab', { name: /relative/i });
     const absoluteTabButton = screen.getByRole('tab', { name: /absolute/i });
     const keywordTabButton = screen.getByRole('tab', { name: /keyword/i });
 
@@ -121,9 +109,9 @@ describe('TimeRangeDropdown', () => {
   });
 
   it('Absolute tab has Accordion', async () => {
-    await asyncRender(<TimeRangeDropdown {...defaultProps} currentTimeRange={{ type: 'absolute', from: '1955-05-11 06:15:00', to: '1985-10-25 08:18:00' }} />);
+    render(<TimeRangeDropdown {...defaultProps} currentTimeRange={{ type: 'absolute', from: '1955-05-11 06:15:00', to: '1985-10-25 08:18:00' }} />);
 
-    const calendarButton = screen.getByRole('button', { name: /calendar/i });
+    const calendarButton = await screen.findByRole('button', { name: /calendar/i });
     const timestampButton = screen.getByRole('button', { name: /timestamp/i });
 
     expect(calendarButton).toBeInTheDocument();
@@ -131,15 +119,15 @@ describe('TimeRangeDropdown', () => {
 
     fireEvent.click(timestampButton);
 
-    const timestampContent = screen.getByText(/Date should be formatted as/i);
+    const timestampContent = await screen.findByText(/Date should be formatted as/i);
 
     expect(timestampContent).toBeInTheDocument();
   });
 
   it('Renders No Override Tab for Dashboard', async () => {
-    await asyncRender(<TimeRangeDropdown {...defaultProps} currentTimeRange={{}} noOverride />);
+    render(<TimeRangeDropdown {...defaultProps} currentTimeRange={{}} noOverride />);
 
-    const noOverrideContent = screen.getByText(/No Date\/Time Override chosen./i);
+    const noOverrideContent = await screen.findByText(/No Date\/Time Override chosen./i);
     const noOverrideButton = screen.getByRole('button', { name: /no override/i });
 
     expect(noOverrideButton).toBeInTheDocument();
