@@ -84,7 +84,7 @@ type Props = {
 
 const Navigation = ({ location }: Props) => {
   const currentUser = useContext(CurrentUserContext);
-  const { permissions, full_name: fullName, read_only: readOnly, id: userId } = currentUser || {};
+  const { permissions, fullName, readOnly, id: userId } = currentUser || {};
 
   const pluginExports = PluginStore.exports('navigation');
 

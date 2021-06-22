@@ -23,7 +23,7 @@ import AppConfig from 'util/AppConfig';
 import UsersDomain from 'domainActions/users/UsersDomain';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import { Button, Row, Col } from 'components/graylog';
-import User, { UserJSON } from 'logic/users/User';
+import User from 'logic/users/User';
 import { isPermitted } from 'util/PermissionsMixin';
 import SectionComponent from 'components/common/Section/SectionComponent';
 import { FormikFormGroup } from 'components/common';
@@ -61,7 +61,7 @@ const _onSubmit = (formData, userId) => {
 };
 
 const PasswordSection = ({ user: { id } }: Props) => {
-  const currentUser: UserJSON = useContext(CurrentUserContext);
+  const currentUser = useContext(CurrentUserContext);
   let requiresOldPassword = true;
 
   if (isPermitted(currentUser?.permissions, 'users:passwordchange:*')) {
