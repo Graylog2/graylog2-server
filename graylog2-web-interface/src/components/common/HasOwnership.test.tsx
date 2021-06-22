@@ -15,19 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import * as Immutable from 'immutable';
 import { render } from 'wrappedTestingLibrary';
-import { viewsManager } from 'fixtures/users';
-
+import { alice as currentUser } from 'fixtures/users';
+import User from 'logic/users/User';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import { createGRN } from 'logic/permissions/GRN';
 
 import HasOwnership from './HasOwnership';
 
 type Props = {
-  currentUser: {
-    grn_permissions: string[],
-    permissions: string[],
-  },
+  currentUser: User,
   id: string,
   type: string,
   hideChildren?: boolean,
@@ -41,8 +39,8 @@ describe('HasOwnership', () => {
       : <span>enabled</span>;
   };
 
-  const SimpleHasOwnership = ({ currentUser, ...props }: Props) => (
-    <CurrentUserContext.Provider value={{ ...viewsManager, ...currentUser }}>
+  const SimpleHasOwnership = ({ currentUser: user = currentUser, ...props }: Props) => (
+    <CurrentUserContext.Provider value={user}>
       <HasOwnership {...props}>
         {({ disabled }) => (
           <DisabledComponent disabled={disabled} />
@@ -50,6 +48,10 @@ describe('HasOwnership', () => {
       </HasOwnership>
     </CurrentUserContext.Provider>
   );
+
+  SimpleHasOwnership.defaultProps = {
+    hideChildren: false,
+  };
 
   const type = 'stream';
   const id = '000000000001';
@@ -62,7 +64,10 @@ describe('HasOwnership', () => {
   const otherGrnPermission = `entity:own:${otherGrn}`;
 
   it('should render children enabled if user has ownership', () => {
-    const user = { grn_permissions: [grnPermission], permissions: [] };
+    const user = currentUser.toBuilder()
+      .grnPermissions(Immutable.List([grnPermission]))
+      .permissions(Immutable.List())
+      .build();
     const { getByText: queryByText } = render(
       <SimpleHasOwnership currentUser={user} id={id} type={type} />,
     );
@@ -71,7 +76,10 @@ describe('HasOwnership', () => {
   });
 
   it('should render children disabled if user has empty ownership and is not admin', () => {
-    const user = { grn_permissions: [], permissions: [] };
+    const user = currentUser.toBuilder()
+      .grnPermissions(Immutable.List(Immutable.List()))
+      .permissions(Immutable.List())
+      .build();
     const { queryByText } = render(
       <SimpleHasOwnership currentUser={user} id={id} type={type} />,
     );
@@ -80,7 +88,10 @@ describe('HasOwnership', () => {
   });
 
   it('should render children disabled if user has wrong ownership and is not admin', () => {
-    const user = { grn_permissions: [otherGrnPermission], permissions: [] };
+    const user = currentUser.toBuilder()
+      .grnPermissions(Immutable.List([otherGrnPermission]))
+      .permissions(Immutable.List())
+      .build();
     const { queryByText } = render(
       <SimpleHasOwnership currentUser={user} id={id} type={type} />,
     );
@@ -89,7 +100,10 @@ describe('HasOwnership', () => {
   });
 
   it('should render children disabled if user has wrong ownership and is reader', () => {
-    const user = { grn_permissions: [otherGrnPermission], permissions: [`streams:read:${id}`] };
+    const user = currentUser.toBuilder()
+      .grnPermissions(Immutable.List([otherGrnPermission]))
+      .permissions(Immutable.List([`streams:read:${id}`]))
+      .build();
     const { queryByText } = render(
       <SimpleHasOwnership currentUser={user} id={id} type={type} />,
     );
@@ -98,7 +112,10 @@ describe('HasOwnership', () => {
   });
 
   it('should render children disabled if user has no ownership and is reader', () => {
-    const user = { grn_permissions: [], permissions: [`streams:read:${id}`] };
+    const user = currentUser.toBuilder()
+      .grnPermissions(Immutable.List([]))
+      .permissions(Immutable.List([`streams:read:${id}`]))
+      .build();
     const { queryByText } = render(
       <SimpleHasOwnership currentUser={user} id={id} type={type} />,
     );
@@ -107,7 +124,10 @@ describe('HasOwnership', () => {
   });
 
   it('should render children enabled if user has empty ownership and is admin', () => {
-    const user = { grn_permissions: [], permissions: ['*'] };
+    const user = currentUser.toBuilder()
+      .grnPermissions(Immutable.List([]))
+      .permissions(Immutable.List(['*']))
+      .build();
     const { queryByText } = render(
       <SimpleHasOwnership currentUser={user} id={id} type={type} />,
     );
@@ -116,7 +136,10 @@ describe('HasOwnership', () => {
   });
 
   it('should render children enabled if user has wrong ownership and is admin', () => {
-    const user = { grn_permissions: [otherGrnPermission], permissions: ['*'] };
+    const user = currentUser.toBuilder()
+      .grnPermissions(Immutable.List([otherGrnPermission]))
+      .permissions(Immutable.List(['*']))
+      .build();
     const { queryByText } = render(
       <SimpleHasOwnership currentUser={user} id={id} type={type} />,
     );
@@ -125,7 +148,10 @@ describe('HasOwnership', () => {
   });
 
   it('should hide children when configured', () => {
-    const user = { grn_permissions: [otherGrnPermission], permissions: [] };
+    const user = currentUser.toBuilder()
+      .grnPermissions(Immutable.List([otherGrnPermission]))
+      .permissions(Immutable.List([]))
+      .build();
     const { queryByText } = render(
       <SimpleHasOwnership currentUser={user} id={id} type={type} hideChildren />,
     );

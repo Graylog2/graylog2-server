@@ -14,10 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { fireEvent, render, screen } from 'wrappedTestingLibrary';
 import * as React from 'react';
+import * as Immutable from 'immutable';
+import { fireEvent, render, screen } from 'wrappedTestingLibrary';
 import MockStore from 'helpers/mocking/StoreMock';
-import { viewsManager } from 'fixtures/users';
+import { alice } from 'fixtures/users';
 import mockSearchClusterConfig from 'fixtures/searchClusterConfig';
 
 import CurrentUserContext from 'contexts/CurrentUserContext';
@@ -41,10 +42,7 @@ jest.mock('views/stores/SearchConfigStore', () => ({
 describe('RangePresetDropdown', () => {
   type SUTProps = Partial<React.ComponentProps<typeof RangePresetDropdown>>;
 
-  const currentUser = {
-    ...viewsManager,
-    permissions: ['*'],
-  };
+  const currentUser = alice.toBuilder().permissions(Immutable.List(['*'])).build();
 
   const SUTRangePresetDropdown = (props: SUTProps) => (
     <CurrentUserContext.Provider value={currentUser}>

@@ -14,9 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
+import * as Immutable from 'immutable';
 import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
-import { viewsManager, admin } from 'fixtures/users';
+import { adminUser, alice as currentUser } from 'fixtures/users';
 import mockAction from 'helpers/mocking/MockAction';
 import userEvent from '@testing-library/user-event';
 
@@ -27,7 +28,7 @@ import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import NewViewLoaderContext, { NewViewLoaderContextType } from 'views/logic/NewViewLoaderContext';
 import * as Permissions from 'views/Permissions';
 import CurrentUserContext from 'contexts/CurrentUserContext';
-import type { UserJSON } from 'logic/users/User';
+import User from 'logic/users/User';
 import type { ViewStoreState } from 'views/stores/ViewStore';
 
 import SavedSearchControls from './SavedSearchControls';
@@ -52,13 +53,13 @@ describe('SavedSearchControls', () => {
   type SimpleSavedSearchControlsProps = {
     loadNewView?: NewViewLoaderContextType,
     onLoadView?: ViewLoaderContextType,
-    currentUser?: UserJSON,
+    currentUser?: User,
     viewStoreState?: ViewStoreState,
   };
 
-  const SimpleSavedSearchControls = ({ loadNewView = () => Promise.resolve(), onLoadView, currentUser, ...props }: SimpleSavedSearchControlsProps) => (
+  const SimpleSavedSearchControls = ({ loadNewView = () => Promise.resolve(), onLoadView, currentUser: user, ...props }: SimpleSavedSearchControlsProps) => (
     <ViewLoaderContext.Provider value={onLoadView}>
-      <CurrentUserContext.Provider value={currentUser}>
+      <CurrentUserContext.Provider value={user}>
         <NewViewLoaderContext.Provider value={loadNewView}>
           <SavedSearchControls {...props} />
         </NewViewLoaderContext.Provider>
@@ -71,7 +72,7 @@ describe('SavedSearchControls', () => {
   SimpleSavedSearchControls.defaultProps = {
     loadNewView: () => Promise.resolve(),
     onLoadView: () => Promise.resolve(),
-    currentUser: viewsManager,
+    currentUser,
     viewStoreState: createViewStoreState(),
   };
 
@@ -109,12 +110,10 @@ describe('SavedSearchControls', () => {
       });
 
       it('which should be disabled if current user is neither owner nor permitted to edit search', async () => {
-        const notOwningUser = {
-          ...viewsManager,
-          username: 'notOwningUser',
-          permissions: [],
-          grn_permissions: [],
-        };
+        const notOwningUser = currentUser.toBuilder()
+          .grnPermissions(Immutable.List())
+          .permissions(Immutable.List())
+          .build();
         render(<SimpleSavedSearchControls currentUser={notOwningUser} viewStoreState={createViewStoreState(false, 'some-id')} />);
 
         const shareButton = await findShareButton();
@@ -123,12 +122,10 @@ describe('SavedSearchControls', () => {
       });
 
       it('which should be enabled if current user is owner of search', async () => {
-        const owningUser = {
-          ...viewsManager,
-          username: 'owningUser',
-          permissions: [],
-          grn_permissions: ['entity:own:grn::::search:user-id-1'],
-        };
+        const owningUser = currentUser.toBuilder()
+          .grnPermissions(Immutable.List([`entity:own:grn::::search:${currentUser.id}`]))
+          .permissions(Immutable.List())
+          .build();
 
         render(<SimpleSavedSearchControls currentUser={owningUser} viewStoreState={createViewStoreState(false, owningUser.id)} />);
 
@@ -138,12 +135,10 @@ describe('SavedSearchControls', () => {
       });
 
       it('which should be enabled if current user is permitted to edit search', async () => {
-        const owningUser = {
-          ...viewsManager,
-          username: 'powerfulUser',
-          permissions: [Permissions.View.Edit(viewsManager.id)],
-          grn_permissions: ['entity:own:grn::::search:user-id-1'],
-        };
+        const owningUser = currentUser.toBuilder()
+          .grnPermissions(Immutable.List([`entity:own:grn::::search:${currentUser.id}`]))
+          .permissions(Immutable.List([Permissions.View.Edit(currentUser.id)]))
+          .build();
 
         render(<SimpleSavedSearchControls currentUser={owningUser} viewStoreState={createViewStoreState(false, owningUser.id)} />);
 
@@ -153,7 +148,7 @@ describe('SavedSearchControls', () => {
       });
 
       it('which should be enabled if current user is admin', async () => {
-        render(<SimpleSavedSearchControls currentUser={admin} viewStoreState={createViewStoreState(false, admin.id)} />);
+        render(<SimpleSavedSearchControls currentUser={adminUser} viewStoreState={createViewStoreState(false, adminUser.id)} />);
 
         const shareSearch = await findShareButton();
 

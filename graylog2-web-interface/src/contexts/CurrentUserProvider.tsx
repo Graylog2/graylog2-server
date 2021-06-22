@@ -28,7 +28,7 @@ const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 
 const CurrentUserProvider = ({ children }) => {
   const currentUserJSON = useStore(CurrentUserStore, (state) => get(state, 'currentUser'));
-  const currentUser = User.fromJSON(currentUserJSON);
+  const currentUser = currentUserJSON ? User.fromJSON(currentUserJSON) : undefined;
 
   return currentUser
     ? (
