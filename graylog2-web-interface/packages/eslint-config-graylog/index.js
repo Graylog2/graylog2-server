@@ -53,6 +53,7 @@ module.exports = {
       rules: {
         'jest/expect-expect': ['error', { assertFunctionNames: ['expect*', '(screen.)?find(All)?By*'] }],
         'testing-library/no-debug': 'warn',
+        'testing-library/prefer-screen-queries': 'off',
       },
     },
   ],
