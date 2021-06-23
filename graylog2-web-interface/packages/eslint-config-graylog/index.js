@@ -49,7 +49,6 @@ module.exports = {
       extends: [
         'plugin:jest/recommended',
         'plugin:testing-library/react',
-        'plugin:testing-library/recommended',
       ],
       rules: {
         'jest/expect-expect': ['error', { assertFunctionNames: ['expect*', '(screen.)?find(All)?By*'] }],
