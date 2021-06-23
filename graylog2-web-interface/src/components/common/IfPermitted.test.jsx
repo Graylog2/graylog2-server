@@ -16,9 +16,9 @@
  */
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { mount, shallow } from 'wrappedEnzyme';
+import PropTypes from 'prop-types';
+import { render, screen } from 'wrappedTestingLibrary';
 import { alice } from 'fixtures/users';
-import mockComponent from 'helpers/mocking/MockComponent';
 
 import CurrentUserContext from 'contexts/CurrentUserContext';
 
@@ -28,33 +28,32 @@ jest.mock('stores/connect', () => (x) => x);
 jest.mock('injection/StoreProvider', () => ({ getStore: () => {} }));
 
 describe('IfPermitted', () => {
-  let element;
-
-  // We can't use prop types here, they are not compatible with mount and require in this case
-  // eslint-disable-next-line react/prop-types
-  const SimpleIfPermitted = ({ children, currentUser, ...props }) => (
+  const defaultChildren = <p>Something!</p>;
+  const SimpleIfPermitted = ({ children = defaultChildren, currentUser, ...props }) => (
     <CurrentUserContext.Provider value={currentUser}>
       <IfPermitted {...props}>{children}</IfPermitted>
     </CurrentUserContext.Provider>
   );
 
-  beforeEach(() => {
-    element = <p>Something!</p>;
-  });
+  SimpleIfPermitted.propTypes = {
+    children: PropTypes.node,
+    currentUser: PropTypes.object,
+  };
+
+  SimpleIfPermitted.defaultProps = {
+    children: undefined,
+    currentUser: undefined,
+  };
 
   describe('renders nothing if', () => {
-    let wrapper;
-
-    afterEach(() => {
-      expect(wrapper.find('IfPermitted')).toBeEmptyRender();
-    });
+    const expectToNotRenderChildren = () => {
+      expect(screen.queryByText('Something!')).not.toBeInTheDocument();
+    };
 
     it('no user is present', () => {
-      wrapper = mount((
-        <SimpleIfPermitted permissions={['somepermission']}>
-          {element}
-        </SimpleIfPermitted>
-      ));
+      render(<SimpleIfPermitted permissions={['somepermission']} />);
+
+      expectToNotRenderChildren();
     });
 
     it('user does not have permissions', () => {
@@ -62,21 +61,17 @@ describe('IfPermitted', () => {
         .permissions(undefined)
         .build();
 
-      wrapper = mount((
-        <SimpleIfPermitted permissions={['somepermission']} currentUser={currentUser}>
-          {element}
-        </SimpleIfPermitted>
-      ));
+      render(<SimpleIfPermitted permissions={['somepermission']} currentUser={currentUser} />);
+
+      expectToNotRenderChildren();
     });
 
     it('user has empty permissions', () => {
       const currentUser = alice.toBuilder().permissions(Immutable.List()).build();
 
-      wrapper = mount((
-        <SimpleIfPermitted permissions={['somepermission']} currentUser={currentUser}>
-          {element}
-        </SimpleIfPermitted>
-      ));
+      render(<SimpleIfPermitted permissions={['somepermission']} currentUser={currentUser} />);
+
+      expectToNotRenderChildren();
     });
 
     it('user has different permissions', () => {
@@ -84,11 +79,9 @@ describe('IfPermitted', () => {
         .permissions(Immutable.List(['someotherpermission']))
         .build();
 
-      wrapper = mount((
-        <SimpleIfPermitted permissions={['somepermission']} currentUser={currentUser}>
-          {element}
-        </SimpleIfPermitted>
-      ));
+      render(<SimpleIfPermitted permissions={['somepermission']} currentUser={currentUser} />);
+
+      expectToNotRenderChildren();
     });
 
     it('user is missing one permission', () => {
@@ -96,11 +89,9 @@ describe('IfPermitted', () => {
         .permissions(Immutable.List(['someotherpermission']))
         .build();
 
-      wrapper = mount((
-        <SimpleIfPermitted permissions={['somepermission', 'someotherpermission']} currentUser={currentUser}>
-          {element}
-        </SimpleIfPermitted>
-      ));
+      render(<SimpleIfPermitted permissions={['somepermission', 'someotherpermission']} currentUser={currentUser} />);
+
+      expectToNotRenderChildren();
     });
 
     it('user is missing permission for specific id', () => {
@@ -108,11 +99,9 @@ describe('IfPermitted', () => {
         .permissions(Immutable.List(['entity:action:otherid']))
         .build();
 
-      wrapper = mount((
-        <SimpleIfPermitted permissions={['entity:action:id']} currentUser={currentUser}>
-          {element}
-        </SimpleIfPermitted>
-      ));
+      render(<SimpleIfPermitted permissions={['entity:action:id']} currentUser={currentUser} />);
+
+      expectToNotRenderChildren();
     });
 
     it('user has permission for different action', () => {
@@ -120,11 +109,9 @@ describe('IfPermitted', () => {
         .permissions(Immutable.List(['entity:otheraction']))
         .build();
 
-      wrapper = mount((
-        <SimpleIfPermitted permissions={['entity:action']} currentUser={currentUser}>
-          {element}
-        </SimpleIfPermitted>
-      ));
+      render(<SimpleIfPermitted permissions={['entity:action']} currentUser={currentUser} />);
+
+      expectToNotRenderChildren();
     });
 
     it('user has permission for id only', () => {
@@ -132,47 +119,37 @@ describe('IfPermitted', () => {
         .permissions(Immutable.List(['entity:action:id']))
         .build();
 
-      wrapper = mount((
-        <SimpleIfPermitted permissions={['entity:action']} currentUser={currentUser}>
-          {element}
-        </SimpleIfPermitted>
-      ));
+      render(<SimpleIfPermitted permissions={['entity:action']} currentUser={currentUser} />);
+
+      expectToNotRenderChildren();
     });
   });
 
   describe('renders children if', () => {
-    let wrapper;
-
-    afterEach(() => {
-      expect(wrapper).toIncludeText('Something!');
-    });
+    const expectToRenderChildren = () => {
+      expect(screen.getByText('Something!')).toBeInTheDocument();
+    };
 
     it('empty permissions were passed', () => {
       const currentUser = alice.toBuilder()
         .permissions(Immutable.List([]))
         .build();
 
-      wrapper = mount((
-        <SimpleIfPermitted permissions={[]} currentUser={currentUser}>
-          {element}
-        </SimpleIfPermitted>
-      ));
+      render(<SimpleIfPermitted permissions={[]} currentUser={currentUser} />);
+
+      expectToRenderChildren();
     });
 
     it('empty permissions were passed and no user is present', () => {
-      wrapper = mount((
-        <SimpleIfPermitted permissions={[]}>
-          {element}
-        </SimpleIfPermitted>
-      ));
+      render(<SimpleIfPermitted permissions={[]} />);
+
+      expectToRenderChildren();
     });
 
     it('undefined permissions were passed and no user is present', () => {
-      wrapper = mount((
-        <SimpleIfPermitted permissions={[]}>
-          {element}
-        </SimpleIfPermitted>
-      ));
+      render(<SimpleIfPermitted permissions={[]} />);
+
+      expectToRenderChildren();
     });
 
     it('user has exact required permissions', () => {
@@ -180,11 +157,9 @@ describe('IfPermitted', () => {
         .permissions(Immutable.List(['something']))
         .build();
 
-      wrapper = mount((
-        <SimpleIfPermitted permissions={['something']} currentUser={currentUser}>
-          {element}
-        </SimpleIfPermitted>
-      ));
+      render(<SimpleIfPermitted permissions={['something']} currentUser={currentUser} />);
+
+      expectToRenderChildren();
     });
 
     it('user has any exact required permission', () => {
@@ -192,11 +167,9 @@ describe('IfPermitted', () => {
         .permissions(Immutable.List(['something']))
         .build();
 
-      wrapper = mount((
-        <SimpleIfPermitted permissions={['something', 'someother']} currentUser={currentUser} anyPermissions>
-          {element}
-        </SimpleIfPermitted>
-      ));
+      render(<SimpleIfPermitted permissions={['something', 'someother']} currentUser={currentUser} anyPermissions />);
+
+      expectToRenderChildren();
     });
 
     it('user has exact required permission for action with entity id', () => {
@@ -204,11 +177,9 @@ describe('IfPermitted', () => {
         .permissions(Immutable.List(['entity:action:id']))
         .build();
 
-      wrapper = mount((
-        <SimpleIfPermitted permissions={['entity:action:id']} currentUser={currentUser}>
-          {element}
-        </SimpleIfPermitted>
-      ));
+      render(<SimpleIfPermitted permissions={['entity:action:id']} currentUser={currentUser} />);
+
+      expectToRenderChildren();
     });
 
     it('user has wildcard permission', () => {
@@ -216,11 +187,9 @@ describe('IfPermitted', () => {
         .permissions(Immutable.List(['*']))
         .build();
 
-      wrapper = mount((
-        <SimpleIfPermitted permissions={['something']} currentUser={currentUser}>
-          {element}
-        </SimpleIfPermitted>
-      ));
+      render(<SimpleIfPermitted permissions={['something']} currentUser={currentUser} />);
+
+      expectToRenderChildren();
     });
 
     it('user has wildcard permission for action', () => {
@@ -228,11 +197,9 @@ describe('IfPermitted', () => {
         .permissions(Immutable.List(['entity:action']))
         .build();
 
-      wrapper = mount((
-        <SimpleIfPermitted permissions={['entity:action:id']} currentUser={currentUser}>
-          {element}
-        </SimpleIfPermitted>
-      ));
+      render(<SimpleIfPermitted permissions={['entity:action:id']} currentUser={currentUser} />);
+
+      expectToRenderChildren();
     });
 
     it('user has wildcard permission for id', () => {
@@ -240,11 +207,9 @@ describe('IfPermitted', () => {
         .permissions(Immutable.List(['entity:action:*']))
         .build();
 
-      wrapper = mount((
-        <SimpleIfPermitted permissions={['entity:action:id']} currentUser={currentUser}>
-          {element}
-        </SimpleIfPermitted>
-      ));
+      render(<SimpleIfPermitted permissions={['entity:action:id']} currentUser={currentUser} />);
+
+      expectToRenderChildren();
     });
 
     it('user has wildcard permission for entity', () => {
@@ -252,11 +217,9 @@ describe('IfPermitted', () => {
         .permissions(Immutable.List(['entity:*']))
         .build();
 
-      wrapper = mount((
-        <SimpleIfPermitted permissions={['entity:action']} currentUser={currentUser}>
-          {element}
-        </SimpleIfPermitted>
-      ));
+      render(<SimpleIfPermitted permissions={['entity:action']} currentUser={currentUser} />);
+
+      expectToRenderChildren();
     });
 
     it('user has wildcard permission for entity when permission for id is required', () => {
@@ -264,43 +227,39 @@ describe('IfPermitted', () => {
         .permissions(Immutable.List(['entity:*']))
         .build();
 
-      wrapper = mount((
-        <SimpleIfPermitted permissions={['entity:action:id']} currentUser={currentUser}>
-          {element}
-        </SimpleIfPermitted>
-      ));
+      render(<SimpleIfPermitted permissions={['entity:action:id']} currentUser={currentUser} />);
+
+      expectToRenderChildren();
     });
   });
 
   it('passes props to children', () => {
-    const Foo = mockComponent('Foo');
-    const Bar = mockComponent('Bar');
-    const wrapper = shallow((
+    const Foo = jest.fn(() => <p>Something else!</p>);
+    const Bar = jest.fn(() => <p>Something else!</p>);
+
+    render((
       <IfPermitted permissions={[]} something={42} otherProp={{ foo: 'bar!' }}>
         <Foo />
         <Bar />
       </IfPermitted>
     ));
 
-    expect(wrapper.find(Foo)).toHaveProp('something', 42);
-    expect(wrapper.find(Foo)).toHaveProp('otherProp', { foo: 'bar!' });
-    expect(wrapper.find(Bar)).toHaveProp('something', 42);
-    expect(wrapper.find(Bar)).toHaveProp('otherProp', { foo: 'bar!' });
+    expect(Foo).toHaveBeenLastCalledWith({ something: 42, otherProp: { foo: 'bar!' } }, {});
+    expect(Bar).toHaveBeenLastCalledWith({ something: 42, otherProp: { foo: 'bar!' } }, {});
   });
 
   it('does not pass property to children if already present', () => {
-    const Foo = mockComponent('Foo');
-    const Bar = mockComponent('Bar');
-    const wrapper = shallow((
+    const Foo = jest.fn(() => <p>Something else!</p>);
+    const Bar = jest.fn(() => <p>Something else!</p>);
+
+    render(
       <IfPermitted permissions={[]} something={42} otherProp={{ foo: 'bar!' }}>
         <Foo something={23} />
         <Bar otherProp={{ hello: 'world!' }} />
-      </IfPermitted>
-    ));
+      </IfPermitted>,
+    );
 
-    expect(wrapper.find(Foo)).toHaveProp('something', 23);
-    expect(wrapper.find(Foo)).toHaveProp('otherProp', { foo: 'bar!' });
-    expect(wrapper.find(Bar)).toHaveProp('something', 42);
-    expect(wrapper.find(Bar)).toHaveProp('otherProp', { hello: 'world!' });
+    expect(Foo).toHaveBeenLastCalledWith({ something: 23, otherProp: { foo: 'bar!' } }, {});
+    expect(Bar).toHaveBeenLastCalledWith({ something: 42, otherProp: { hello: 'world!' } }, {});
   });
 });
