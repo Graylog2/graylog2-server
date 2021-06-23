@@ -16,10 +16,10 @@
  */
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import PropTypes from 'prop-types';
 import { render, screen } from 'wrappedTestingLibrary';
 import { alice } from 'fixtures/users';
 
+import User from 'logic/users/User';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 
 import IfPermitted from './IfPermitted';
@@ -28,22 +28,16 @@ jest.mock('stores/connect', () => (x) => x);
 jest.mock('injection/StoreProvider', () => ({ getStore: () => {} }));
 
 describe('IfPermitted', () => {
+  type SUTProps = Partial<React.ComponentProps<typeof IfPermitted>> & {
+    currentUser?: User,
+  }
+
   const defaultChildren = <p>Something!</p>;
-  const SimpleIfPermitted = ({ children = defaultChildren, currentUser, ...props }) => (
+  const SimpleIfPermitted = ({ children = defaultChildren, currentUser, permissions, ...rest }: SUTProps) => (
     <CurrentUserContext.Provider value={currentUser}>
-      <IfPermitted {...props}>{children}</IfPermitted>
+      <IfPermitted permissions={permissions} {...rest}>{children}</IfPermitted>
     </CurrentUserContext.Provider>
   );
-
-  SimpleIfPermitted.propTypes = {
-    children: PropTypes.node,
-    currentUser: PropTypes.object,
-  };
-
-  SimpleIfPermitted.defaultProps = {
-    children: undefined,
-    currentUser: undefined,
-  };
 
   describe('renders nothing if', () => {
     const expectToNotRenderChildren = () => {
@@ -234,10 +228,11 @@ describe('IfPermitted', () => {
   });
 
   it('passes props to children', () => {
-    const Foo = jest.fn(() => <p>Something else!</p>);
-    const Bar = jest.fn(() => <p>Something else!</p>);
+    const Foo = jest.fn(() => <p>Something else!</p>) as React.ElementType;
+    const Bar = jest.fn(() => <p>Something else!</p>) as React.ElementType;
 
     render((
+      // @ts-ignore
       <IfPermitted permissions={[]} something={42} otherProp={{ foo: 'bar!' }}>
         <Foo />
         <Bar />
@@ -249,10 +244,11 @@ describe('IfPermitted', () => {
   });
 
   it('does not pass property to children if already present', () => {
-    const Foo = jest.fn(() => <p>Something else!</p>);
-    const Bar = jest.fn(() => <p>Something else!</p>);
+    const Foo = jest.fn(() => <p>Something else!</p>) as React.ElementType;
+    const Bar = jest.fn(() => <p>Something else!</p>) as React.ElementType;
 
     render(
+      // @ts-ignore
       <IfPermitted permissions={[]} something={42} otherProp={{ foo: 'bar!' }}>
         <Foo something={23} />
         <Bar otherProp={{ hello: 'world!' }} />
