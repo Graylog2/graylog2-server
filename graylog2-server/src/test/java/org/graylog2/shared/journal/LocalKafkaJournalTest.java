@@ -503,7 +503,7 @@ public class LocalKafkaJournalTest {
     @Test
     public void truncatedSegment() throws Exception {
         final Size segmentSize = Size.kilobytes(1L);
-        final KafkaJournal journal = new KafkaJournal(journalDirectory.toPath(),
+        final LocalKafkaJournal journal = new LocalKafkaJournal(journalDirectory.toPath(),
                 scheduler,
                 segmentSize,
                 Duration.standardHours(1),
@@ -548,7 +548,7 @@ public class LocalKafkaJournalTest {
     @Test
     @Ignore
     public void readNext() throws Exception {
-        final KafkaJournal journal = new KafkaJournal(journalDirectory.toPath(),
+        final LocalKafkaJournal journal = new LocalKafkaJournal(journalDirectory.toPath(),
                 scheduler, Size.kilobytes(1L),
                 Duration.standardHours(1),
                 Size.kilobytes(10L),
