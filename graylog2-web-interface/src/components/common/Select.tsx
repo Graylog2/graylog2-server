@@ -18,6 +18,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import { isEqual, find } from 'lodash';
 import { DefaultTheme, withTheme } from 'styled-components';
+import type { Theme as SelectTheme } from 'react-select';
 import ReactSelect, { components as Components, createFilter } from 'react-select';
 import CreatableSelect from 'react-select/creatable';
 
@@ -29,7 +30,7 @@ export const CONTROL_CLASS = 'common-select-control';
 
 type Option = { [key: string]: any };
 
-const MultiValueRemove = (props) => (
+const MultiValueRemove = (props: React.ComponentProps<typeof Components.MultiValueRemove>) => (
   <Components.MultiValueRemove {...props} />
 );
 
@@ -53,33 +54,32 @@ const DropdownIndicator = (props) => {
   );
 };
 
-const Control = (props) => (
+const Control = (props: React.ComponentProps<typeof Components.Control>) => (
   <Components.Control {...props} className={CONTROL_CLASS} />
 );
 
-type CustomOptionProps = {
-  data: any,
-};
 /* eslint-disable react/prop-types */
 const CustomOption = (optionRenderer: (Option) => React.ReactElement) => (
-  (props: CustomOptionProps): React.ReactElement => {
-    const { data, ...rest } = props;
+  (props: React.ComponentProps<typeof Components.Option>): React.ReactElement => {
+    const { data } = props;
 
     return (
-      <Components.Option {...rest}>
+      <Components.Option {...props}>
         {optionRenderer(data)}
       </Components.Option>
     );
   }
 );
 
-const CustomSingleValue = (valueRenderer: (option: Option) => React.ReactElement) => (
-  ({ data, ...rest }) => <Components.SingleValue {...rest}>{valueRenderer(data)}</Components.SingleValue>
-);
+const CustomSingleValue = (valueRenderer: (option: Option) => React.ReactElement) => (props: React.ComponentProps<typeof Components.SingleValue>) => {
+  const { data } = props;
+
+  return <Components.SingleValue {...props}>{valueRenderer(data)}</Components.SingleValue>;
+};
 /* eslint-enable react/prop-types */
 
 const CustomInput = (inputProps: { [key: string]: any }) => (
-  (props) => <Components.Input {...props} {...inputProps} />
+  (props: React.ComponentProps<typeof Components.Input>) => <Components.Input {...props} {...inputProps} />
 );
 
 const dropdownIndicator = (base, state) => ({
@@ -227,7 +227,7 @@ type Props = {
   menuPortalTarget?: HTMLElement,
   name?: string,
   onBlur?: (event: React.FocusEvent<HTMLInputElement>) => void,
-  onChange: (string) => void,
+  onChange: (option: string) => void,
   onReactSelectChange?: (option: Option | Option[]) => void,
   optionRenderer?: (option: Option) => React.ReactElement,
   options: Array<Option>,
@@ -452,7 +452,7 @@ class Select extends React.Component<Props, State> {
     });
   };
 
-  _selectTheme = (defaultTheme: {[key: string]: any}) => {
+  _selectTheme = (defaultTheme: SelectTheme) => {
     const { theme } = this.props;
 
     return {
@@ -496,9 +496,10 @@ class Select extends React.Component<Props, State> {
       options,
       valueKey,
       onReactSelectChange,
+      size,
+      theme,
     } = this.props;
     const { customComponents, value } = this.state;
-    const SelectComponent = allowCreate ? CreatableSelect : ReactSelect;
 
     let formattedValue = value;
 
@@ -535,24 +536,28 @@ class Select extends React.Component<Props, State> {
       ...customComponents,
     };
 
-    return (
-      <SelectComponent {...rest}
-                       onChange={onReactSelectChange || this._onChange}
-                       isMulti={isMulti}
-                       isDisabled={isDisabled}
-                       isClearable={isClearable}
-                       getOptionLabel={(option) => option[displayKey] || option.label}
-                       getOptionValue={(option) => option[valueKey]}
-                       filterOption={customFilter}
-                       components={mergedComponents}
-                       menuPortalTarget={menuPortalTarget}
-                       isOptionDisabled={(option) => !!option.disabled}
-                       /* eslint-disable-next-line @typescript-eslint/ban-ts-comment */
-                       // @ts-ignore TODO: Fix props assignment for _styles
-                       styles={_styles(this.props)}
-                       theme={this._selectTheme}
-                       value={formattedValue} />
-    );
+    const selectProps: React.ComponentProps<typeof ReactSelect> | React.ComponentProps<typeof CreatableSelect> = {
+      ...rest,
+      onChange: onReactSelectChange || this._onChange,
+      isMulti,
+      isDisabled,
+      isClearable,
+      getOptionLabel: (option) => option[displayKey] || option.label,
+      getOptionValue: (option) => option[valueKey],
+      filterOption: customFilter,
+      components: mergedComponents,
+      menuPortalTarget: menuPortalTarget,
+      isOptionDisabled: (option) => !!option.disabled,
+      styles: _styles({ size, theme }),
+      theme: this._selectTheme,
+      value: formattedValue,
+    };
+
+    if (allowCreate) {
+      return <CreatableSelect {...selectProps} />;
+    }
+
+    return <ReactSelect {...selectProps} />;
   }
 }
 
