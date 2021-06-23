@@ -20,7 +20,6 @@ import asMock from 'helpers/mocking/AsMock';
 import { alice } from 'fixtures/users';
 import { CombinedProviderMock as MockCombinedProvider, StoreMock as MockStore } from 'helpers/mocking';
 
-import User from 'logic/users/User';
 import CombinedProvider from 'injection/CombinedProvider';
 
 import CurrentUserContext from './CurrentUserContext';
