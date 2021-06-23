@@ -15,8 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import * as Immutable from 'immutable';
 import { mount, shallow } from 'wrappedEnzyme';
-import { viewsManager } from 'fixtures/users';
+import { alice } from 'fixtures/users';
 import mockComponent from 'helpers/mocking/MockComponent';
 
 import CurrentUserContext from 'contexts/CurrentUserContext';
@@ -32,7 +33,7 @@ describe('IfPermitted', () => {
   // We can't use prop types here, they are not compatible with mount and require in this case
   // eslint-disable-next-line react/prop-types
   const SimpleIfPermitted = ({ children, currentUser, ...props }) => (
-    <CurrentUserContext.Provider value={{ ...viewsManager, ...currentUser }}>
+    <CurrentUserContext.Provider value={currentUser}>
       <IfPermitted {...props}>{children}</IfPermitted>
     </CurrentUserContext.Provider>
   );
@@ -57,64 +58,82 @@ describe('IfPermitted', () => {
     });
 
     it('user does not have permissions', () => {
+      const currentUser = alice.toBuilder()
+        .permissions(undefined)
+        .build();
+
       wrapper = mount((
-        <SimpleIfPermitted permissions={['somepermission']} currentUser={{}}>
+        <SimpleIfPermitted permissions={['somepermission']} currentUser={currentUser}>
           {element}
         </SimpleIfPermitted>
       ));
     });
 
     it('user has empty permissions', () => {
-      wrapper = mount((
-        <SimpleIfPermitted permissions={['somepermission']} currentUser={{ permissions: [] }}>
-          {element}
-        </SimpleIfPermitted>
-      ));
-    });
+      const currentUser = alice.toBuilder().permissions(Immutable.List()).build();
 
-    it('user has undefined permissions', () => {
       wrapper = mount((
-        <SimpleIfPermitted permissions={['somepermission']} currentUser={{ permissions: undefined }}>
+        <SimpleIfPermitted permissions={['somepermission']} currentUser={currentUser}>
           {element}
         </SimpleIfPermitted>
       ));
     });
 
     it('user has different permissions', () => {
+      const currentUser = alice.toBuilder()
+        .permissions(Immutable.List(['someotherpermission']))
+        .build();
+
       wrapper = mount((
-        <SimpleIfPermitted permissions={['somepermission']} currentUser={{ permissions: ['someotherpermission'] }}>
+        <SimpleIfPermitted permissions={['somepermission']} currentUser={currentUser}>
           {element}
         </SimpleIfPermitted>
       ));
     });
 
     it('user is missing one permission', () => {
+      const currentUser = alice.toBuilder()
+        .permissions(Immutable.List(['someotherpermission']))
+        .build();
+
       wrapper = mount((
-        <SimpleIfPermitted permissions={['somepermission', 'someotherpermission']} currentUser={{ permissions: ['someotherpermission'] }}>
+        <SimpleIfPermitted permissions={['somepermission', 'someotherpermission']} currentUser={currentUser}>
           {element}
         </SimpleIfPermitted>
       ));
     });
 
     it('user is missing permission for specific id', () => {
+      const currentUser = alice.toBuilder()
+        .permissions(Immutable.List(['entity:action:otherid']))
+        .build();
+
       wrapper = mount((
-        <SimpleIfPermitted permissions={['entity:action:id']} currentUser={{ permissions: ['entity:action:otherid'] }}>
+        <SimpleIfPermitted permissions={['entity:action:id']} currentUser={currentUser}>
           {element}
         </SimpleIfPermitted>
       ));
     });
 
     it('user has permission for different action', () => {
+      const currentUser = alice.toBuilder()
+        .permissions(Immutable.List(['entity:otheraction']))
+        .build();
+
       wrapper = mount((
-        <SimpleIfPermitted permissions={['entity:action']} currentUser={{ permissions: ['entity:otheraction'] }}>
+        <SimpleIfPermitted permissions={['entity:action']} currentUser={currentUser}>
           {element}
         </SimpleIfPermitted>
       ));
     });
 
     it('user has permission for id only', () => {
+      const currentUser = alice.toBuilder()
+        .permissions(Immutable.List(['entity:action:id']))
+        .build();
+
       wrapper = mount((
-        <SimpleIfPermitted permissions={['entity:action']} currentUser={{ permissions: ['entity:action:id'] }}>
+        <SimpleIfPermitted permissions={['entity:action']} currentUser={currentUser}>
           {element}
         </SimpleIfPermitted>
       ));
@@ -129,8 +148,12 @@ describe('IfPermitted', () => {
     });
 
     it('empty permissions were passed', () => {
+      const currentUser = alice.toBuilder()
+        .permissions(Immutable.List([]))
+        .build();
+
       wrapper = mount((
-        <SimpleIfPermitted permissions={[]} currentUser={{ permissions: [] }}>
+        <SimpleIfPermitted permissions={[]} currentUser={currentUser}>
           {element}
         </SimpleIfPermitted>
       ));
@@ -153,64 +176,96 @@ describe('IfPermitted', () => {
     });
 
     it('user has exact required permissions', () => {
+      const currentUser = alice.toBuilder()
+        .permissions(Immutable.List(['something']))
+        .build();
+
       wrapper = mount((
-        <SimpleIfPermitted permissions={['something']} currentUser={{ permissions: ['something'] }}>
+        <SimpleIfPermitted permissions={['something']} currentUser={currentUser}>
           {element}
         </SimpleIfPermitted>
       ));
     });
 
     it('user has any exact required permission', () => {
+      const currentUser = alice.toBuilder()
+        .permissions(Immutable.List(['something']))
+        .build();
+
       wrapper = mount((
-        <SimpleIfPermitted permissions={['something', 'someother']} currentUser={{ permissions: ['something'] }} anyPermissions>
+        <SimpleIfPermitted permissions={['something', 'someother']} currentUser={currentUser} anyPermissions>
           {element}
         </SimpleIfPermitted>
       ));
     });
 
     it('user has exact required permission for action with entity id', () => {
+      const currentUser = alice.toBuilder()
+        .permissions(Immutable.List(['entity:action:id']))
+        .build();
+
       wrapper = mount((
-        <SimpleIfPermitted permissions={['entity:action:id']} currentUser={{ permissions: ['entity:action:id'] }}>
+        <SimpleIfPermitted permissions={['entity:action:id']} currentUser={currentUser}>
           {element}
         </SimpleIfPermitted>
       ));
     });
 
     it('user has wildcard permission', () => {
+      const currentUser = alice.toBuilder()
+        .permissions(Immutable.List(['*']))
+        .build();
+
       wrapper = mount((
-        <SimpleIfPermitted permissions={['something']} currentUser={{ permissions: ['*'] }}>
+        <SimpleIfPermitted permissions={['something']} currentUser={currentUser}>
           {element}
         </SimpleIfPermitted>
       ));
     });
 
     it('user has wildcard permission for action', () => {
+      const currentUser = alice.toBuilder()
+        .permissions(Immutable.List(['entity:action']))
+        .build();
+
       wrapper = mount((
-        <SimpleIfPermitted permissions={['entity:action:id']} currentUser={{ permissions: ['entity:action'] }}>
+        <SimpleIfPermitted permissions={['entity:action:id']} currentUser={currentUser}>
           {element}
         </SimpleIfPermitted>
       ));
     });
 
     it('user has wildcard permission for id', () => {
+      const currentUser = alice.toBuilder()
+        .permissions(Immutable.List(['entity:action:*']))
+        .build();
+
       wrapper = mount((
-        <SimpleIfPermitted permissions={['entity:action:id']} currentUser={{ permissions: ['entity:action:*'] }}>
+        <SimpleIfPermitted permissions={['entity:action:id']} currentUser={currentUser}>
           {element}
         </SimpleIfPermitted>
       ));
     });
 
     it('user has wildcard permission for entity', () => {
+      const currentUser = alice.toBuilder()
+        .permissions(Immutable.List(['entity:*']))
+        .build();
+
       wrapper = mount((
-        <SimpleIfPermitted permissions={['entity:action']} currentUser={{ permissions: ['entity:*'] }}>
+        <SimpleIfPermitted permissions={['entity:action']} currentUser={currentUser}>
           {element}
         </SimpleIfPermitted>
       ));
     });
 
     it('user has wildcard permission for entity when permission for id is required', () => {
+      const currentUser = alice.toBuilder()
+        .permissions(Immutable.List(['entity:*']))
+        .build();
+
       wrapper = mount((
-        <SimpleIfPermitted permissions={['entity:action:id']} currentUser={{ permissions: ['entity:*'] }}>
+        <SimpleIfPermitted permissions={['entity:action:id']} currentUser={currentUser}>
           {element}
         </SimpleIfPermitted>
       ));
