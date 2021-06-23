@@ -197,7 +197,7 @@ describe('AdaptableQueryTabs', () => {
     });
     userEvent.click(tab2);
 
-    waitFor(() => expect(onSelectStub).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(onSelectStub).toHaveBeenCalledTimes(1));
 
     expect(onSelectStub).toHaveBeenCalledWith('query-id-2');
   });
@@ -214,7 +214,7 @@ describe('AdaptableQueryTabs', () => {
     });
     userEvent.click(tab4);
 
-    waitFor(() => expect(onSelectStub).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(onSelectStub).toHaveBeenCalledTimes(1));
 
     expect(onSelectStub).toHaveBeenCalledWith('query-id-4');
   });
@@ -226,7 +226,7 @@ describe('AdaptableQueryTabs', () => {
     const createTabButton = await screen.findByTitle('Create New Tab');
     userEvent.click(createTabButton);
 
-    waitFor(() => expect(onSelectStub).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(onSelectStub).toHaveBeenCalledTimes(1));
 
     expect(onSelectStub).toHaveBeenCalledWith('new');
   });

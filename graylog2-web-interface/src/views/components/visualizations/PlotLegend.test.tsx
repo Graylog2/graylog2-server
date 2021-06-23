@@ -87,9 +87,7 @@ describe('PlotLegend', () => {
     const color = screen.getByTitle('#b71c1c');
     fireEvent.click(color);
 
-    waitFor(() => {
-      expect(setColor).toBeCalledWith('name1', '#b71c1c');
-    });
+    await waitFor(() => expect(setColor).toBeCalledWith('name1', '#b71c1c'));
   });
 
   it('should open the value context menu', async () => {
@@ -128,6 +126,6 @@ describe('PlotLegend', () => {
     const plotConfig = AggregationWidgetConfig.builder().series([Series.forFunction('count')]).build();
     render(<SUT chartDataProp={[{ name: 'name1' }]} plotConfig={plotConfig} neverHide />);
 
-    screen.findByText('name1');
+    await screen.findByText('name1');
   });
 });
