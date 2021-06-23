@@ -17,6 +17,7 @@
 package org.graylog2.lookup.adapters;
 
 import com.google.inject.Inject;
+import org.graylog2.lookup.AllowedAuxiliaryPathChecker;
 import org.graylog2.system.urlwhitelist.UrlWhitelistService;
 
 /**
@@ -24,13 +25,20 @@ import org.graylog2.system.urlwhitelist.UrlWhitelistService;
  */
 public class LookupDataAdapterValidationContext {
     private final UrlWhitelistService urlWhitelistService;
+    private final AllowedAuxiliaryPathChecker pathChecker;
 
     @Inject
-    public LookupDataAdapterValidationContext(UrlWhitelistService urlWhitelistService) {
+    public LookupDataAdapterValidationContext(UrlWhitelistService urlWhitelistService,
+                                              AllowedAuxiliaryPathChecker pathChecker) {
         this.urlWhitelistService = urlWhitelistService;
+        this.pathChecker = pathChecker;
     }
 
     public UrlWhitelistService getUrlWhitelistService() {
         return urlWhitelistService;
+    }
+
+    public AllowedAuxiliaryPathChecker getPathChecker() {
+        return pathChecker;
     }
 }

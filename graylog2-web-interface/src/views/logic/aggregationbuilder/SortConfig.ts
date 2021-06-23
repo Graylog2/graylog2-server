@@ -28,20 +28,22 @@ export type SortConfigJson = {
   direction: DirectionJson,
 };
 
+type SortConfigType = 'pivot' | 'series';
+
 type InternalState = {
-  type: string,
+  type: SortConfigType,
   field: string,
   direction: Direction,
 };
 
 export default class SortConfig {
-  static PIVOT_TYPE = 'pivot';
+  static PIVOT_TYPE = 'pivot' as const;
 
-  static SERIES_TYPE = 'series';
+  static SERIES_TYPE = 'series' as const;
 
   private readonly _value: InternalState;
 
-  constructor(type: string, field: string, direction: Direction) {
+  constructor(type: SortConfigType, field: string, direction: Direction) {
     this._value = { type, field, direction };
   }
 
@@ -102,7 +104,7 @@ export default class SortConfig {
       .build();
   }
 
-  // eslint-disable-next-line no-use-before-define
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
   toBuilder(): Builder {
     const { type, field, direction } = this._value;
 

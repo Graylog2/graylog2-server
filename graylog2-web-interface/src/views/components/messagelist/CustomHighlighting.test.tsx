@@ -21,6 +21,7 @@ import HighlightingRulesContext from 'views/components/contexts/HighlightingRule
 import HighlightingRule from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import DecoratorContext from 'views/components/messagelist/decoration/DecoratorContext';
 import FieldType from 'views/logic/fieldtypes/FieldType';
+import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
 
 import CustomHighlighting from './CustomHighlighting';
 
@@ -68,7 +69,7 @@ describe('CustomHighlighting', () => {
     const rule = HighlightingRule.builder()
       .field('bar')
       .value(String(value))
-      .color('#bc98fd')
+      .color(StaticColor.create('#bc98fd'))
       .build();
     const { findByText } = render(<CustomHighlightingWithContext highlightingRules={[rule]} />);
 
@@ -81,7 +82,7 @@ describe('CustomHighlighting', () => {
     const rule = HighlightingRule.builder()
       .field(field)
       .value(String(value))
-      .color('#bc98fd')
+      .color(StaticColor.create('#bc98fd'))
       .build();
     const { findByText } = render(<CustomHighlightingWithContext highlightingRules={[rule]} />);
 
@@ -94,7 +95,7 @@ describe('CustomHighlighting', () => {
     const rule = HighlightingRule.builder()
       .field(field)
       .value('2')
-      .color('#bc98fd')
+      .color(StaticColor.create('#bc98fd'))
       .build();
     const { findByText } = render(<CustomHighlightingWithContext highlightingRules={[rule]} />);
 
@@ -107,7 +108,7 @@ describe('CustomHighlighting', () => {
     const rule = HighlightingRule.builder()
       .field(field)
       .value('23')
-      .color('#bc98fd')
+      .color(StaticColor.create('#bc98fd'))
       .build();
     const { findByText } = render(<CustomHighlightingWithContext highlightingRules={[rule]} />);
 

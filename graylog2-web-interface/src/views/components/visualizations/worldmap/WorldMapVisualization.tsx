@@ -18,10 +18,9 @@ import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 import { flow, fromPairs, get, zip, isEmpty } from 'lodash';
 
+import type Viewport from 'views/logic/aggregationbuilder/visualizations/Viewport';
 import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
-import WorldMapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/WorldMapVisualizationConfig';
-import Viewport from 'views/logic/aggregationbuilder/visualizations/Viewport';
-import type { VisualizationComponent, VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
+import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import type Pivot from 'views/logic/aggregationbuilder/Pivot';
 import { makeVisualization } from 'views/components/aggregationbuilder/AggregationBuilder';
@@ -53,14 +52,14 @@ const _formatSeriesForMap = (rowPivots: Array<Pivot>) => {
       .map((key, idx) => ({ [rowPivots[idx].field]: key }))
       .reduce(_mergeObject, {}));
     const newX = x.map(_lastKey);
-    // eslint-disable-next-line no-unused-vars
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const values = fromPairs(zip(newX, y).filter(([_, v]) => (v !== undefined)));
 
     return { keys, name, values };
   });
 };
 
-const WorldMapVisualization: VisualizationComponent = makeVisualization(({ config, data, editing, onChange, width, ...rest }: VisualizationComponentProps) => {
+const WorldMapVisualization = makeVisualization(({ config, data, editing, onChange, width, ...rest }: VisualizationComponentProps) => {
   const { rowPivots } = config;
   const onRenderComplete = useContext(RenderCompletionCallback);
   const hasMetric = !isEmpty(config.series);
@@ -81,16 +80,13 @@ const WorldMapVisualization: VisualizationComponent = makeVisualization(({ confi
 
   const viewport = get(config, 'visualizationConfig.viewport');
 
-  const _onChange = (newViewport) => {
-    const visualizationConfig = (config.visualizationConfig
-      // FIXME: Ugly hack to get the builder type consistent
-      ? config.visualizationConfig.toBuilder() as unknown as ReturnType<typeof WorldMapVisualizationConfig['builder']>
-      : WorldMapVisualizationConfig.builder())
-      .viewport(Viewport.create(newViewport.center, newViewport.zoom))
-      .build();
-
+  const _onChange = (newViewport: Viewport) => {
     if (editing) {
-      onChange(visualizationConfig);
+      onChange({
+        zoom: newViewport.zoom,
+        centerX: newViewport.center[0],
+        centerY: newViewport.center[1],
+      });
     }
   };
 

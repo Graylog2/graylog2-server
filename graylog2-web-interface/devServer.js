@@ -28,6 +28,7 @@ const webpackConfig = require('./webpack.bundled');
 
 const DEFAULT_HOST = '127.0.0.1';
 const DEFAULT_PORT = 8080;
+const DEFAULT_API_URL = 'http://127.0.0.1:9000';
 
 const app = express();
 const vendorConfig = webpackConfig[0];
@@ -37,8 +38,16 @@ const appConfig = webpackConfig[1];
 const vendorCompiler = webpack(vendorConfig);
 const appCompiler = webpack(appConfig);
 
+const { argv } = yargs;
+const host = argv.host || DEFAULT_HOST;
+const port = argv.port || DEFAULT_PORT;
+const apiUrl = argv.apiUrl || process.env.GRAYLOG_API_URL || DEFAULT_API_URL;
+
 // Proxy all "/api" requests to the server backend API.
-app.use('/api', proxy('localhost:9000', {
+// eslint-disable-next-line no-console
+console.log(`Graylog web interface forwarding /api requests to ${apiUrl}`);
+
+app.use('/api', proxy(apiUrl, {
   proxyReqPathResolver(req) {
     // The proxy middleware removes the prefix from the path but we need it
     // to make sure we hit the "/api" resources on the server.
@@ -64,10 +73,6 @@ app.use(webpackDevMiddleware(appCompiler, {
 app.use(webpackHotMiddleware(appCompiler));
 
 const server = http.createServer(app);
-
-const { argv } = yargs;
-const host = argv.host || DEFAULT_HOST;
-const port = argv.port || DEFAULT_PORT;
 
 server
   .listen(port, host, () => {

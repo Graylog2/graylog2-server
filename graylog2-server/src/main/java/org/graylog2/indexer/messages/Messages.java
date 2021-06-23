@@ -31,12 +31,14 @@ import com.google.common.collect.Sets;
 import org.graylog2.indexer.IndexFailure;
 import org.graylog2.indexer.IndexFailureImpl;
 import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.InvalidWriteTargetException;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.plugin.Message;
 import org.graylog2.system.processing.ProcessingStatusRecorder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.IOException;
@@ -53,6 +55,11 @@ import java.util.stream.Collectors;
 
 @Singleton
 public class Messages {
+    public interface IndexingListener {
+        void onRetry(long attemptNumber);
+        void onSuccess(long delaySinceFirstAttempt);
+    }
+
     private static final Logger LOG = LoggerFactory.getLogger(Messages.class);
 
     private static final Duration MAX_WAIT_TIME = Duration.seconds(30L);
@@ -69,20 +76,21 @@ public class Messages {
     static final WaitStrategy exponentialWaitMilliseconds = WaitStrategies.exponentialWait(MAX_WAIT_TIME.getQuantity(), MAX_WAIT_TIME.getUnit());
 
     @SuppressWarnings("UnstableApiUsage")
-    private static final Retryer<List<IndexingError>> BULK_REQUEST_RETRYER = RetryerBuilder.<List<IndexingError>>newBuilder()
-            .retryIfException(t -> t instanceof IOException)
-            .withWaitStrategy(WaitStrategies.exponentialWait(MAX_WAIT_TIME.getQuantity(), MAX_WAIT_TIME.getUnit()))
-            .withRetryListener(new RetryListener() {
-                @Override
-                public <V> void onRetry(Attempt<V> attempt) {
-                    if (attempt.hasException()) {
-                        LOG.error("Caught exception during bulk indexing: {}, retrying (attempt #{}).", attempt.getExceptionCause(), attempt.getAttemptNumber());
-                    } else if (attempt.getAttemptNumber() > 1) {
-                        LOG.info("Bulk indexing finally successful (attempt #{}).", attempt.getAttemptNumber());
+    private RetryerBuilder<List<IndexingError>> createBulkRequestRetryerBuilder() {
+        return RetryerBuilder.<List<IndexingError>>newBuilder()
+                .retryIfException(t -> t instanceof IOException || t instanceof InvalidWriteTargetException)
+                .withWaitStrategy(WaitStrategies.exponentialWait(MAX_WAIT_TIME.getQuantity(), MAX_WAIT_TIME.getUnit()))
+                .withRetryListener(new RetryListener() {
+                    @Override
+                    public <V> void onRetry(Attempt<V> attempt) {
+                        if (attempt.hasException()) {
+                            LOG.error("Caught exception during bulk indexing: {}, retrying (attempt #{}).", attempt.getExceptionCause(), attempt.getAttemptNumber());
+                        } else if (attempt.getAttemptNumber() > 1) {
+                            LOG.info("Bulk indexing finally successful (attempt #{}).", attempt.getAttemptNumber());
+                        }
                     }
-                }
-            })
-            .build();
+                });
+    }
 
     private final LinkedBlockingQueue<List<IndexFailure>> indexFailureQueue;
     private final MessagesAdapter messagesAdapter;
@@ -110,10 +118,18 @@ public class Messages {
     }
 
     public List<String> bulkIndex(final List<Map.Entry<IndexSet, Message>> messageList) {
-        return bulkIndex(messageList, false);
+        return bulkIndex(messageList, false, null);
+    }
+
+    public List<String> bulkIndex(final List<Map.Entry<IndexSet, Message>> messageList, IndexingListener indexingListener) {
+        return bulkIndex(messageList, false, indexingListener);
     }
 
     public List<String> bulkIndex(final List<Map.Entry<IndexSet, Message>> messageList, boolean isSystemTraffic) {
+        return bulkIndex(messageList, isSystemTraffic, null);
+    }
+
+    public List<String> bulkIndex(final List<Map.Entry<IndexSet, Message>> messageList, boolean isSystemTraffic, IndexingListener indexingListener) {
         if (messageList.isEmpty()) {
             return Collections.emptyList();
         }
@@ -122,13 +138,17 @@ public class Messages {
                 .map(entry -> IndexingRequest.create(entry.getKey(), entry.getValue()))
                 .collect(Collectors.toList());
 
-        return bulkIndexRequests(indexingRequestList, isSystemTraffic);
+        return bulkIndexRequests(indexingRequestList, isSystemTraffic, indexingListener);
     }
 
     public List<String> bulkIndexRequests(List<IndexingRequest> indexingRequestList, boolean isSystemTraffic) {
-        final List<IndexingError> indexingErrors = runBulkRequest(indexingRequestList, indexingRequestList.size());
+        return bulkIndexRequests(indexingRequestList, isSystemTraffic, null);
+    }
 
-        final Set<IndexingError> remainingErrors = retryOnlyIndexBlockItemsForever(indexingRequestList, indexingErrors);
+    public List<String> bulkIndexRequests(List<IndexingRequest> indexingRequestList, boolean isSystemTraffic, IndexingListener indexingListener) {
+        final List<IndexingError> indexingErrors = runBulkRequest(indexingRequestList, indexingRequestList.size(), indexingListener);
+
+        final Set<IndexingError> remainingErrors = retryOnlyIndexBlockItemsForever(indexingRequestList, indexingErrors, indexingListener);
 
         final Set<String> failedIds = remainingErrors.stream()
                 .map(indexingError -> indexingError.message().getId())
@@ -143,7 +163,7 @@ public class Messages {
         return propagateFailure(remainingErrors);
     }
 
-    private Set<IndexingError> retryOnlyIndexBlockItemsForever(List<IndexingRequest> messages, List<IndexingError> allFailedItems) {
+    private Set<IndexingError> retryOnlyIndexBlockItemsForever(List<IndexingRequest> messages, List<IndexingError> allFailedItems, IndexingListener indexingListener) {
         Set<IndexingError> indexBlocks = indexBlocksFrom(allFailedItems);
         final Set<IndexingError> otherFailures = new HashSet<>(Sets.difference(new HashSet<>(allFailedItems), indexBlocks));
         List<IndexingRequest> blockedMessages = messagesForResultItems(messages, indexBlocks);
@@ -157,7 +177,7 @@ public class Messages {
         while (!indexBlocks.isEmpty()) {
             waitBeforeRetrying(attempt++);
 
-            final List<Messages.IndexingError> failedItems = runBulkRequest(blockedMessages, messages.size());
+            final List<Messages.IndexingError> failedItems = runBulkRequest(blockedMessages, messages.size(), indexingListener);
 
             indexBlocks = indexBlocksFrom(failedItems);
             blockedMessages = messagesForResultItems(blockedMessages, indexBlocks);
@@ -196,9 +216,14 @@ public class Messages {
         }
     }
 
-    private List<IndexingError> runBulkRequest(List<IndexingRequest> indexingRequestList, int count) {
+    @SuppressWarnings("UnstableApiUsage")
+    private List<IndexingError> runBulkRequest(List<IndexingRequest> indexingRequestList, int count, @Nullable IndexingListener indexingListener) {
+        final Retryer<List<IndexingError>> bulkRequestRetryer = indexingListener == null
+                ? createBulkRequestRetryerBuilder().build()
+                : createBulkRequestRetryerBuilder().withRetryListener(retryListenerFor(indexingListener)).build();
+
         try {
-            return BULK_REQUEST_RETRYER.call(() -> messagesAdapter.bulkIndex(indexingRequestList));
+            return bulkRequestRetryer.call(() -> messagesAdapter.bulkIndex(indexingRequestList));
         } catch (ExecutionException | RetryException e) {
             if (e instanceof RetryException) {
                 LOG.error("Could not bulk index {} messages. Giving up after {} attempts.", count, ((RetryException) e).getNumberOfFailedAttempts());
@@ -207,6 +232,20 @@ public class Messages {
             }
             throw new RuntimeException(e);
         }
+    }
+
+    @SuppressWarnings("UnstableApiUsage")
+    private RetryListener retryListenerFor(IndexingListener indexingListener) {
+        return new RetryListener() {
+            @Override
+            public <V> void onRetry(Attempt<V> attempt) {
+                if (attempt.hasException()) {
+                    indexingListener.onRetry(attempt.getAttemptNumber());
+                } else {
+                    indexingListener.onSuccess(attempt.getDelaySinceFirstAttempt());
+                }
+            }
+        };
     }
 
     private void accountTotalMessageSizes(List<IndexingRequest> requests, boolean isSystemTraffic) {

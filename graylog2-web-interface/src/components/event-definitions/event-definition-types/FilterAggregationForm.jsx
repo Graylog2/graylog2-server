@@ -19,7 +19,7 @@ import PropTypes from 'prop-types';
 import lodash from 'lodash';
 
 import { Col, ControlLabel, FormGroup, Radio, Row } from 'components/graylog';
-import FormsUtils from 'util/FormsUtils';
+import * as FormsUtils from 'util/FormsUtils';
 
 import FilterForm from './FilterForm';
 import FilterPreviewContainer from './FilterPreviewContainer';

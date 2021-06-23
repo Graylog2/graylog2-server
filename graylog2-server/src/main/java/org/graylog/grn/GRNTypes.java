@@ -25,6 +25,7 @@ public class GRNTypes {
     public static final GRNType EVENT_DEFINITION = GRNType.create("event_definition", "eventdefinitions:");
     public static final GRNType EVENT_NOTIFICATION = GRNType.create("notification", "eventnotifications:");
     public static final GRNType GRANT = GRNType.create("grant", "grants:");
+    public static final GRNType OUTPUT = GRNType.create("output", "outputs:");
     public static final GRNType ROLE = GRNType.create("role", "roles:");
     public static final GRNType SEARCH = GRNType.create("search", "view:");
     public static final GRNType STREAM = GRNType.create("stream", "streams:");
@@ -40,6 +41,7 @@ public class GRNTypes {
             .add(EVENT_DEFINITION)
             .add(EVENT_NOTIFICATION)
             .add(GRANT)
+            .add(OUTPUT)
             .add(ROLE)
             .add(SEARCH)
             .add(STREAM)

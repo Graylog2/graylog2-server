@@ -113,7 +113,8 @@ class BootstrapModalConfirm extends React.Component {
                              showModal={showModal}
                              onOpen={onModalOpen}
                              onClose={onModalClose}
-                             onHide={this.onCancel}>
+                             onHide={this.onCancel}
+                             role="alertdialog">
         <Modal.Header closeButton>
           <Modal.Title>{title}</Modal.Title>
         </Modal.Header>

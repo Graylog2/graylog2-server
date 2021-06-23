@@ -14,10 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
+import { useCallback } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import * as ImmutablePropTypes from 'react-immutable-proptypes';
+import { OrderedSet } from 'immutable';
 
 import connect from 'stores/connect';
 import { TitlesActions } from 'views/stores/TitlesStore';
@@ -28,6 +30,7 @@ import { QueryIdsStore } from 'views/stores/QueryIdsStore';
 import { QueryTitlesStore } from 'views/stores/QueryTitlesStore';
 import { ViewMetaData, ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import { ViewStatesActions } from 'views/stores/ViewStatesStore';
+import { QueryId } from 'views/logic/queries/Query';
 
 import QueryTabs from './QueryTabs';
 
@@ -35,7 +38,7 @@ const onTitleChange = (queryId, newTitle) => TitlesActions.set('tab', 'title', n
 
 const onSelectQuery = (queryId) => (queryId === 'new' ? NewQueryActionHandler() : ViewActions.selectQuery(queryId));
 
-const onCloseTab = (queryId, currentQuery, queries) => {
+const onCloseTab = (queryId: string, currentQuery: string, queries: Immutable.OrderedSet<string>) => {
   if (queries.size === 1) {
     return Promise.resolve();
   }
@@ -43,9 +46,11 @@ const onCloseTab = (queryId, currentQuery, queries) => {
   let promise;
 
   if (queryId === currentQuery) {
-    const currentQueryIdIndex = queries.indexOf(queryId);
+    const indexedQueryIds = queries.toIndexedSeq();
+    const currentQueryIdIndex = indexedQueryIds.indexOf(queryId);
     const newQueryIdIndex = Math.min(0, currentQueryIdIndex - 1);
-    const newQuery = queries.remove(queryId).get(newQueryIdIndex);
+    const newQuery = indexedQueryIds.filter((currentQueryId) => (currentQueryId !== queryId))
+      .get(newQueryIdIndex);
 
     promise = ViewActions.selectQuery(newQuery);
   } else {
@@ -56,32 +61,27 @@ const onCloseTab = (queryId, currentQuery, queries) => {
 };
 
 type Props = {
-  children?: React.ReactElement,
-  queries: string[],
+  queries: OrderedSet<QueryId>,
   queryTitles: Immutable.Map<string, string>,
   viewMetadata: ViewMetaData,
 };
 
-const QueryBar = ({ children, queries, queryTitles, viewMetadata }: Props) => {
+const QueryBar = ({ queries, queryTitles, viewMetadata }: Props) => {
   const { activeQuery } = viewMetadata;
-  const childrenWithQueryId = React.Children.map(children, (child) => React.cloneElement(child, { queryId: activeQuery }));
-  const selectQueryAndExecute = (queryId) => onSelectQuery(queryId);
+  const onRemove = useCallback((queryId) => onCloseTab(queryId, activeQuery, queries), [activeQuery, queries]);
 
   return (
     <QueryTabs queries={queries}
                selectedQueryId={activeQuery}
                titles={queryTitles}
-               onSelect={selectQueryAndExecute}
+               onSelect={onSelectQuery}
                onTitleChange={onTitleChange}
-               onRemove={(queryId) => onCloseTab(queryId, activeQuery, queries)}>
-      {childrenWithQueryId}
-    </QueryTabs>
+               onRemove={onRemove} />
   );
 };
 
 QueryBar.propTypes = {
-  children: PropTypes.element,
-  queries: ImmutablePropTypes.listOf(PropTypes.string).isRequired,
+  queries: ImmutablePropTypes.orderedSetOf(PropTypes.string).isRequired,
   queryTitles: ImmutablePropTypes.mapOf(PropTypes.string, PropTypes.string).isRequired,
   viewMetadata: PropTypes.exact({
     id: PropTypes.string,
@@ -90,10 +90,6 @@ QueryBar.propTypes = {
     summary: PropTypes.string,
     activeQuery: PropTypes.string.isRequired,
   }).isRequired,
-};
-
-QueryBar.defaultProps = {
-  children: null,
 };
 
 export default connect(QueryBar, { queries: QueryIdsStore, queryTitles: QueryTitlesStore, viewMetadata: ViewMetadataStore });

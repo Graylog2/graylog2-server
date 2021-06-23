@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableMap;
 import org.glassfish.jersey.server.model.ModelProcessor;
 import org.glassfish.jersey.server.model.Resource;
 import org.glassfish.jersey.server.model.ResourceModel;
+import org.graylog2.shared.rest.HideOnCloud;
 
 import javax.ws.rs.core.Configuration;
 import javax.ws.rs.ext.Provider;
@@ -29,9 +30,11 @@ import java.util.Optional;
 @Provider
 public class PrefixAddingModelProcessor implements ModelProcessor {
     private final Map<String, String> packagePrefixes;
+    private final org.graylog2.Configuration configuration;
 
-    public PrefixAddingModelProcessor(Map<String, String> packagePrefixes) {
+    public PrefixAddingModelProcessor(Map<String, String> packagePrefixes, org.graylog2.Configuration configuration) {
         this.packagePrefixes = ImmutableMap.copyOf(packagePrefixes);
+        this.configuration = configuration;
     }
 
     @Override
@@ -39,7 +42,11 @@ public class PrefixAddingModelProcessor implements ModelProcessor {
         // Create new resource model.
         final ResourceModel.Builder resourceModelBuilder = new ResourceModel.Builder(false);
         for (final Resource resource : model.getResources()) {
-            for (Class handlerClass : resource.getHandlerClasses()) {
+            for (Class<?> handlerClass : resource.getHandlerClasses()) {
+                final HideOnCloud hideOnCloud = handlerClass.getAnnotation(HideOnCloud.class);
+                if (hideOnCloud != null && configuration.isCloud()) {
+                    break;
+                }
                 final String packageName = handlerClass.getPackage().getName();
 
                 final Optional<String> packagePrefix = packagePrefixes.entrySet().stream()

@@ -21,6 +21,7 @@ import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.errors.MissingCapabilitiesException;
 import org.graylog.plugins.views.search.filter.OrFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
+import org.graylog.plugins.views.search.searchtypes.events.EventList;
 import org.graylog.plugins.views.search.views.PluginMetadataSummary;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
@@ -29,7 +30,6 @@ import org.graylog2.shared.rest.exceptions.MissingStreamPermissionException;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.ws.rs.ForbiddenException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -115,6 +115,13 @@ public class SearchExecutionGuardTest {
         final Query query = Query.builder()
                 .id("")
                 .timerange(mock(TimeRange.class))
+                .searchTypes(
+                        ImmutableSet.of(
+                                EventList.builder()
+                                        .id("event-list")
+                                        .streams(ImmutableSet.copyOf(streamIds))
+                                        .build())
+                )
                 .query(new BackendQuery.Fallback())
                 .filter(OrFilter.or(filters))
                 .build();

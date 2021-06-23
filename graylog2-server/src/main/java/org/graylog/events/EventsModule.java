@@ -49,6 +49,10 @@ import org.graylog.events.processor.aggregation.AggregationSearch;
 import org.graylog.events.processor.aggregation.PivotAggregationSearch;
 import org.graylog.events.processor.storage.EventStorageHandlerEngine;
 import org.graylog.events.processor.storage.PersistToStreamsStorageHandler;
+import org.graylog.events.rest.AvailableEntityTypesResource;
+import org.graylog.events.rest.EventDefinitionsResource;
+import org.graylog.events.rest.EventNotificationsResource;
+import org.graylog.events.rest.EventsResource;
 import org.graylog.scheduler.JobExecutionEngine;
 import org.graylog.scheduler.JobTriggerUpdates;
 import org.graylog.scheduler.schedule.IntervalJobSchedule;
@@ -81,8 +85,10 @@ public class EventsModule extends PluginModule {
         install(new FactoryModuleBuilder().build(JobWorkerPool.Factory.class));
         install(new FactoryModuleBuilder().build(JobTriggerUpdates.Factory.class));
 
-        // Add all rest resources in this package
-        registerRestControllerPackage(getClass().getPackage().getName());
+        addSystemRestResource(AvailableEntityTypesResource.class);
+        addSystemRestResource(EventDefinitionsResource.class);
+        addSystemRestResource(EventNotificationsResource.class);
+        addSystemRestResource(EventsResource.class);
 
         addPeriodical(EventNotificationStatusCleanUp.class);
 

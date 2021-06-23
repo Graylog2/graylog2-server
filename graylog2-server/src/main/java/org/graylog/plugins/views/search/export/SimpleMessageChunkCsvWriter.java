@@ -40,21 +40,13 @@ import static java.util.stream.Collectors.toList;
 
 @Provider
 @Produces(MoreMediaTypes.TEXT_CSV)
-public class SimpleMessageChunkCsvWriter implements MessageBodyWriter<SimpleMessageChunk> {
+public class SimpleMessageChunkCsvWriter extends SimpleMessageChunkWriter {
 
     private static final Logger LOG = LoggerFactory.getLogger(MessageBodyWriter.class);
 
     @Override
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         return typesMatch(type, genericType) && MoreMediaTypes.TEXT_CSV_TYPE.isCompatible(mediaType);
-    }
-
-    private boolean typesMatch(Class<?> type, Type genericType) {
-        return SimpleMessageChunk.class.equals(type) || isAutoValueType(type, genericType);
-    }
-
-    private boolean isAutoValueType(Class<?> type, Type genericType) {
-        return AutoValue_SimpleMessageChunk.class.equals(type) && SimpleMessageChunk.class.equals(genericType);
     }
 
     @Override

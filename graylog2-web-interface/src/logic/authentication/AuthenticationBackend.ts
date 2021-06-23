@@ -16,16 +16,18 @@
  */
 import * as Immutable from 'immutable';
 import { $PropertyType } from 'utility-types';
+import { DirectoryServiceAuthenticationService } from 'components/authentication/types';
 
 import { getAuthServicePlugin } from 'util/AuthenticationService';
 import { DirectoryServiceBackendConfig } from 'logic/authentication/directoryServices/types';
+import { OktaBackendConfig } from 'logic/authentication/okta/types';
 
 type InternalState = {
   id: string,
   title: string,
   description: string,
   defaultRoles: Immutable.List<string>,
-  config: DirectoryServiceBackendConfig,
+  config: DirectoryServiceBackendConfig | OktaBackendConfig,
 };
 
 type TypedConfig = {
@@ -37,14 +39,14 @@ export type AuthenticationBackendJSON = {
   title: string,
   description: string,
   default_roles: Array<string>,
-  config: unknown,
+  config: DirectoryServiceBackendConfig | OktaBackendConfig,
 };
 
 const configFromJson = (config: $PropertyType<AuthenticationBackendJSON, 'config'>) => {
   const authService = getAuthServicePlugin((config as TypedConfig).type, true);
 
   if (authService && typeof authService.configFromJson === 'function') {
-    return authService.configFromJson(config);
+    return (authService as DirectoryServiceAuthenticationService).configFromJson(config);
   }
 
   return config;

@@ -17,6 +17,7 @@
 package org.graylog2.periodical;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableList;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.cluster.health.AbsoluteValueWatermarkSettings;
 import org.graylog2.indexer.cluster.health.ClusterAllocationDiskSettings;
@@ -31,7 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -121,12 +122,10 @@ public class IndexerClusterCheckerThread extends Periodical {
                     }
                     if (currentNodeNotificationType != null) {
                         String nodeIdentifier = firstNonNull(nodeDiskUsageStats.host(), nodeDiskUsageStats.ip());
-                        if (notificationTypePerNodeIdentifier.containsKey(currentNodeNotificationType)) {
-                            List<String> nodesIdentifier = notificationTypePerNodeIdentifier.get(currentNodeNotificationType);
-                            nodesIdentifier.add(nodeIdentifier);
-                        } else {
-                            notificationTypePerNodeIdentifier.put(currentNodeNotificationType, Arrays.asList(nodeIdentifier));
-                        }
+                        notificationTypePerNodeIdentifier.merge(currentNodeNotificationType, Collections.singletonList(nodeIdentifier), (prev, cur) -> ImmutableList.<String>builder()
+                                .addAll(prev)
+                                .addAll(cur)
+                                .build());
                     }
                 }
 

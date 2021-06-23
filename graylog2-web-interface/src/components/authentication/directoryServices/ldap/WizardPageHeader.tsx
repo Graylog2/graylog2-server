@@ -20,13 +20,14 @@ import AuthenticationOverviewLinks from 'components/authentication/Authenticatio
 import DocsHelper from 'util/DocsHelper';
 import StringUtils from 'util/StringUtils';
 import { DirectoryServiceBackend } from 'logic/authentication/directoryServices/types';
+import { OktaBackend } from 'logic/authentication/okta/types';
 import { PageHeader } from 'components/common';
 import useActiveBackend from 'components/authentication/useActiveBackend';
 import BackendActionLinks from 'components/authentication/BackendActionLinks';
 import DocumentationLink from 'components/support/DocumentationLink';
 
 type Props = {
-  authenticationBackend?: DirectoryServiceBackend,
+  authenticationBackend?: DirectoryServiceBackend | OktaBackend,
 };
 
 const _pageTitle = (authBackend) => {

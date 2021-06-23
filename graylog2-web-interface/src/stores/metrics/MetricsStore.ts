@@ -16,7 +16,7 @@
  */
 import Reflux from 'reflux';
 
-import URLUtils from 'util/URLUtils';
+import * as URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch, { fetchPeriodically } from 'logic/rest/FetchProvider';
 import TimeHelper from 'util/TimeHelper';

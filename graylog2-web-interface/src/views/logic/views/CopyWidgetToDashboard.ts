@@ -19,17 +19,50 @@ import { List, Map } from 'immutable';
 import Widget from 'views/logic/widgets/Widget';
 import View from 'views/logic/views/View';
 import Query from 'views/logic/queries/Query';
+import GenerateNextPosition from 'views/logic/views/GenerateNextPosition';
+import WidgetPosition from 'views/logic/widgets/WidgetPosition';
+import TitleTypes from 'views/stores/TitleTypes';
 
-import FindWidgetAndQueryIdInView from './FindWidgetAndQueryIdInView';
 import UpdateSearchForWidgets from './UpdateSearchForWidgets';
+import FindWidgetAndQueryIdInView from './FindWidgetAndQueryIdInView';
 
 type QueryId = string;
 
-const _addWidgetToDashboard = (widget: Widget, dashboard: View): View => {
+const _newPositionsMap = (oldPosition, widgetPositions, widget, widgets) => {
+  const widgetPositionsMap = oldPosition ? {
+    ...widgetPositions,
+    [widget.id]: oldPosition.toBuilder().row(0).col(0).build(),
+  } : widgetPositions;
+
+  return GenerateNextPosition(Map(widgetPositionsMap), widgets.toArray());
+};
+
+const _newTitlesMap = (titlesMap, widget, title) => {
+  if (!title) {
+    return titlesMap;
+  }
+
+  const widgetTitles = titlesMap.get(TitleTypes.Widget, Map());
+  const newWidgetTitles = widgetTitles.set(widget.id, title);
+
+  return titlesMap.set(TitleTypes.Widget, newWidgetTitles);
+};
+
+const _addWidgetToDashboard = (widget: Widget, dashboard: View, oldPosition: WidgetPosition, title: string | undefined | null): View => {
   const dashboardQueryId = dashboard.state.keySeq().first();
   const viewState = dashboard.state.get(dashboardQueryId);
+  const widgets = viewState.widgets.push(widget);
+
+  const { widgetPositions } = viewState;
+  const newWidgetPositions = _newPositionsMap(oldPosition, widgetPositions, widget, widgets);
+
+  const titlesMap = viewState.titles;
+  const newTitlesMap = _newTitlesMap(titlesMap, widget, title);
+
   const newViewState = viewState.toBuilder()
-    .widgets(viewState.widgets.push(widget))
+    .widgets(widgets)
+    .titles(newTitlesMap)
+    .widgetPositions(newWidgetPositions)
     .build();
 
   return dashboard.toBuilder()
@@ -48,6 +81,9 @@ const CopyWidgetToDashboard = (widgetId: string, search: View, dashboard: View):
   if (match) {
     const [widget, queryId] = match;
     const { timerange, query, filter = Map() } = queryMap.get(queryId);
+    const { widgetPositions } = search.state.get(queryId);
+    const oldPositions = widgetPositions[widgetId];
+    const title = search.state.get(queryId).titles.get(TitleTypes.Widget).get(widgetId);
 
     const streams = (filter ? filter.get('filters', List.of()) : List.of())
       .filter((value) => Map.isMap(value) && value.get('type') === 'stream')
@@ -56,12 +92,13 @@ const CopyWidgetToDashboard = (widgetId: string, search: View, dashboard: View):
       .toArray();
 
     const dashboardWidget = widget.toBuilder()
+      .newId()
       .timerange(timerange)
       .query(query)
       .streams(streams)
       .build();
 
-    return UpdateSearchForWidgets(_addWidgetToDashboard(dashboardWidget, dashboard));
+    return UpdateSearchForWidgets(_addWidgetToDashboard(dashboardWidget, dashboard, oldPositions, title));
   }
 
   return undefined;

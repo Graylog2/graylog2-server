@@ -14,14 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { Popover as BootstrapPopover } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
 
-import ThemeAndUserProvider from 'contexts/ThemeAndUserProvider';
-
-const StyledPopover = styled(BootstrapPopover)(({ theme }) => {
+const Popover = styled(BootstrapPopover)(({ theme }) => {
   const borderColor = theme.colors.variant.light.default;
   const arrowColor = theme.colors.variant.lightest.default;
   const backgroundColor = theme.colors.global.contentBackground;
@@ -42,7 +39,7 @@ const StyledPopover = styled(BootstrapPopover)(({ theme }) => {
         border-top-color: ${borderColor};
 
         &::after {
-          border-top-color: ${backgroundColor};
+          border-top-color: ${arrowColor};
         }
       }
     }
@@ -52,7 +49,7 @@ const StyledPopover = styled(BootstrapPopover)(({ theme }) => {
         border-right-color: ${borderColor};
 
         &::after {
-          border-right-color: ${backgroundColor};
+          border-right-color: ${arrowColor};
           z-index: 1;
         }
       }
@@ -73,20 +70,12 @@ const StyledPopover = styled(BootstrapPopover)(({ theme }) => {
         border-left-color: ${borderColor};
 
         &::after {
-          border-left-color: ${backgroundColor};
+          border-left-color: ${arrowColor};
         }
       }
     }
   `;
 });
-
-const Popover = (props) => {
-  return (
-    <ThemeAndUserProvider>
-      <StyledPopover {...props} />
-    </ThemeAndUserProvider>
-  );
-};
 
 /** @component */
 export default Popover;

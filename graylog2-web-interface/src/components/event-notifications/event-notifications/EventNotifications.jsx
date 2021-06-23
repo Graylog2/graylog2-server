@@ -31,6 +31,7 @@ import {
   SearchForm,
   Spinner,
   Icon,
+  QueryHelper,
 } from 'components/common';
 import Routes from 'routing/Routes';
 
@@ -172,6 +173,7 @@ class EventNotifications extends React.Component {
                         searchButtonLabel="Find"
                         placeholder="Find Notifications"
                         wrapperClass={styles.inline}
+                        queryHelpComponent={<QueryHelper entityName="notification" />}
                         queryWidth={200}
                         topMargin={0}
                         useLoadingState>

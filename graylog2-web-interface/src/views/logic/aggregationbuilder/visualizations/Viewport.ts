@@ -47,7 +47,7 @@ export default class Viewport {
   toBuilder() {
     const { center, zoom } = this._value;
 
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder(Immutable.Map({ center, zoom }));
   }
 

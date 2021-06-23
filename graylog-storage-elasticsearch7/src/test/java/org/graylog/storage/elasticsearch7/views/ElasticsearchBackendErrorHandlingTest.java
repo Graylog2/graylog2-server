@@ -27,7 +27,6 @@ import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
-import org.graylog.plugins.views.search.elasticsearch.QueryStringParser;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.MultiSearchResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -79,7 +78,6 @@ public class ElasticsearchBackendErrorHandlingTest {
                 ImmutableMap.of(
                         "dummy", () -> mock(DummyHandler.class)
                 ),
-                new QueryStringParser(),
                 client,
                 indexLookup,
                 new QueryStringDecorators(Collections.emptySet()),

@@ -17,6 +17,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import Immutable from 'immutable';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { Link } from 'components/graylog/router';
 import { Col, Label, Row } from 'components/graylog';
@@ -60,9 +61,13 @@ class MessageDetail extends React.Component {
     streams: {},
   };
 
-  state = {
-    showOriginal: false,
-  };
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      showOriginal: false,
+    };
+  }
 
   _inputName = (inputId) => {
     const { inputs } = this.props;
@@ -78,6 +83,14 @@ class MessageDetail extends React.Component {
   _formatReceivedBy = (sourceNodeId, sourceInputId) => {
     if (!sourceNodeId) {
       return null;
+    }
+
+    const forwarderPlugin = PluginStore.exports('forwarder');
+    const ForwarderReceivedBy = forwarderPlugin?.[0]?.ForwarderReceivedBy;
+    const isLocalNode = forwarderPlugin?.[0]?.isLocalNode;
+
+    if (isLocalNode && !isLocalNode(sourceNodeId)) {
+      return <ForwarderReceivedBy inputId={sourceInputId} forwarderNodeId={sourceNodeId} />;
     }
 
     return (

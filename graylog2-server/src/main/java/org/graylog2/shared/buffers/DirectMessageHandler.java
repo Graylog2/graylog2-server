@@ -42,7 +42,7 @@ class DirectMessageHandler implements WorkHandler<RawMessageEvent> {
             processingStatusRecorder.updateIngestReceiveTime(rawMessage.getTimestamp());
         }
         // clear out for gc and to avoid promoting the raw message event to a tenured gen
-        event.setRawMessage(null);
+        event.clear();
     }
 
 

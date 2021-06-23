@@ -58,13 +58,8 @@ type Props = {
   onDelete: (EventDefinition) => void,
 };
 
-const getConditionPlugin = (type) => {
-  if (type === undefined) {
-    return {};
-  }
-
-  return PluginStore.exports('eventDefinitionTypes').find((edt) => edt.type === type) || {};
-};
+const getConditionPlugin = (type: string) => PluginStore.exports('eventDefinitionTypes')
+  .find((edt) => edt.type === type);
 
 const renderDescription = (definition, context) => {
   return <EventDefinitionDescription definition={definition} context={context} />;
@@ -107,7 +102,7 @@ const EventDefinitionEntry = ({
   );
 
   const plugin = getConditionPlugin(eventDefinition.config.type);
-  let titleSuffix = plugin.displayName || eventDefinition.config.type;
+  let titleSuffix = <>{plugin?.displayName ?? eventDefinition.config.type}</>;
 
   if (!isScheduled) {
     titleSuffix = (<span>{titleSuffix} <Label bsStyle="warning">disabled</Label></span>);

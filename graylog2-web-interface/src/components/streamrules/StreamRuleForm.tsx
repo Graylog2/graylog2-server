@@ -26,7 +26,7 @@ import CombinedProvider from 'injection/CombinedProvider';
 import connect from 'stores/connect';
 import DocsHelper from 'util/DocsHelper';
 import Version from 'util/Version';
-import FormsUtils from 'util/FormsUtils';
+import * as FormsUtils from 'util/FormsUtils';
 import { Store } from 'stores/StoreTypes';
 
 const { InputsStore, InputsActions } = CombinedProvider.get('Inputs');
@@ -147,14 +147,15 @@ class StreamRuleForm extends React.Component<Props, State> {
 
   handleChange = (event) => {
     const { streamRule } = this.state;
+    const updatedStreamRule = { ...streamRule };
 
-    streamRule[event.target.name] = FormsUtils.getValueFromInput(event.target);
+    updatedStreamRule[event.target.name] = FormsUtils.getValueFromInput(event.target);
 
-    if (event.target.name === 'type' && String(streamRule.type) === String(this.MATCH_INPUT)) {
-      streamRule.value = String(this.PLACEHOLDER_INPUT);
+    if (event.target.name === 'type' && String(updatedStreamRule.type) === String(this.MATCH_INPUT)) {
+      updatedStreamRule.value = String(this.PLACEHOLDER_INPUT);
     }
 
-    this.setState({ streamRule });
+    this.setState({ streamRule: updatedStreamRule });
   };
 
   _formatInputOptions = (input) => (

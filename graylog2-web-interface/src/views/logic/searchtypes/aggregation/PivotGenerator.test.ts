@@ -23,7 +23,7 @@ describe('PivotGenerator', () => {
   it('generates time pivot for date fields', () => {
     const result = PivotGenerator('foo', new FieldType('date', [], []));
 
-    expect(result).toEqual(new Pivot('foo', 'time', { interval: { type: 'auto' } }));
+    expect(result).toEqual(new Pivot('foo', 'time', { interval: { type: 'auto', scaling: 1.0 } }));
   });
 
   it('generates values pivot for other fields', () => {

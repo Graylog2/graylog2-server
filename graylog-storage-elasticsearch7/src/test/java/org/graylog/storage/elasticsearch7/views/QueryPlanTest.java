@@ -28,6 +28,7 @@ import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringParser;
 import org.graylog.plugins.views.search.engine.QueryEngine;
+import org.graylog.plugins.views.search.engine.QueryParser;
 import org.graylog.plugins.views.search.engine.QueryPlan;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.storage.elasticsearch7.views.searchtypes.ESMessageList;
@@ -57,13 +58,12 @@ public class QueryPlanTest {
         final FieldTypesLookup fieldTypesLookup = mock(FieldTypesLookup.class);
         final QueryStringParser queryStringParser = new QueryStringParser();
         ElasticsearchBackend backend = new ElasticsearchBackend(handlers,
-                queryStringParser,
                 null,
                 mock(IndexLookup.class),
                 new QueryStringDecorators.Fake(),
                 (elasticsearchBackend, ssb, job, query, results) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, results, fieldTypesLookup),
                 false);
-        queryEngine = new QueryEngine(backend, Collections.emptySet());
+        queryEngine = new QueryEngine(backend, Collections.emptySet(), new QueryParser(queryStringParser));
     }
 
     private static String randomUUID() {

@@ -30,6 +30,7 @@ import com.google.common.collect.Multimap;
 import com.google.common.primitives.Ints;
 import com.google.inject.assistedinject.Assisted;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog2.lookup.AllowedAuxiliaryPathChecker;
 import org.graylog2.plugin.lookup.LookupCachePurge;
 import org.graylog2.plugin.lookup.LookupDataAdapter;
 import org.graylog2.plugin.lookup.LookupDataAdapterConfiguration;
@@ -62,7 +63,18 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
 
     public static final String NAME = "csvfile";
 
+    /**
+     * If the AllowedAuxiliaryPathChecker is enabled (one or more paths provided to the allowed_auxiliary_paths server
+     * configuration property), then this error path will also be triggered for cases where the file does not exist.
+     * This is unavoidable, since the AllowedAuxiliaryPathChecker tries to resolve symbolic links and relative paths,
+     * which cannot be done if the file does not exist. Therefore this error message also indicates the possibility
+     * that the file does not exist.
+     */
+    public static final String ALLOWED_PATH_ERROR =
+            "The specified CSV file either does not exist or is not in an allowed path.";
+
     private final Config config;
+    private final AllowedAuxiliaryPathChecker pathChecker;
     private final AtomicReference<Map<String, String>> lookupRef = new AtomicReference<>(ImmutableMap.of());
 
     private FileInfo fileInfo = FileInfo.empty();
@@ -71,9 +83,11 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
     public CSVFileDataAdapter(@Assisted("id") String id,
                               @Assisted("name") String name,
                               @Assisted LookupDataAdapterConfiguration config,
-                              MetricRegistry metricRegistry) {
+                              MetricRegistry metricRegistry,
+                              AllowedAuxiliaryPathChecker pathChecker) {
         super(id, name, config, metricRegistry);
         this.config = (Config) config;
+        this.pathChecker = pathChecker;
     }
 
     @Override
@@ -81,6 +95,9 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
         LOG.debug("Starting CSV data adapter for file: {}", config.path());
         if (isNullOrEmpty(config.path())) {
             throw new IllegalStateException("File path needs to be set");
+        }
+        if (!pathChecker.fileIsInAllowedPath(Paths.get(config.path()))) {
+            throw new IllegalStateException(ALLOWED_PATH_ERROR);
         }
         if (config.checkInterval() < 1) {
             throw new IllegalStateException("Check interval setting cannot be smaller than 1");
@@ -98,6 +115,12 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
 
     @Override
     protected void doRefresh(LookupCachePurge cachePurge) throws Exception {
+        if (!pathChecker.fileIsInAllowedPath(Paths.get(config.path()))) {
+            LOG.error(ALLOWED_PATH_ERROR);
+            setError(new IllegalStateException(ALLOWED_PATH_ERROR));
+            return;
+        }
+
         try {
             final FileInfo.Change fileChanged = fileInfo.checkForChange();
             if (!fileChanged.isChanged() && !getError().isPresent()) {
@@ -283,10 +306,18 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
         }
 
         @Override
-        public Optional<Multimap<String, String>> validate() {
+        public Optional<Multimap<String, String>> validate(LookupDataAdapterValidationContext context) {
             final ArrayListMultimap<String, String> errors = ArrayListMultimap.create();
 
             final Path path = Paths.get(path());
+            if (!context.getPathChecker().fileIsInAllowedPath(path)) {
+                errors.put("path", ALLOWED_PATH_ERROR);
+
+                // Intentionally return here, because in the Cloud context, we should not perform the following checks
+                // to report to the user whether or not a file exists.
+                return Optional.of(errors);
+            }
+
             if (!Files.exists(path)) {
                 errors.put("path", "The file does not exist.");
             } else if (!Files.isReadable(path)) {

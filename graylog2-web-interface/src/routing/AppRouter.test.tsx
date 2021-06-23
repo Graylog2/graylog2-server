@@ -28,6 +28,7 @@ import history from 'util/History';
 import AppRouter from './AppRouter';
 
 jest.mock('components/throughput/GlobalThroughput', () => mockComponent('GlobalThroughput'));
+jest.mock('components/layout/Footer', () => mockComponent('Footer'));
 
 jest.mock('injection/CombinedProvider', () => {
   return new MockCombinedProvider({
@@ -40,7 +41,6 @@ jest.mock('components/errors/RouterErrorBoundary', () => mockComponent('RouterEr
 
 jest.mock('pages/StartPage', () => () => <>This is the start page</>);
 jest.mock('views/logic/usePluginEntities');
-jest.mock('components/layout/Footer', () => mockComponent('Footer'));
 
 describe('AppRouter', () => {
   beforeEach(() => {
@@ -60,7 +60,7 @@ describe('AppRouter', () => {
   });
 
   it('renders null-parent component plugin routes without application chrome', async () => {
-    asMock(usePluginEntities).mockReturnValue([{ parentComponent: null, component: () => <span>Hey there!</span> }]);
+    asMock(usePluginEntities).mockReturnValue([{ parentComponent: null, component: () => <span>Hey there!</span>, path: '/' }]);
 
     const { findByText, queryByTitle } = render(<AppRouterWithContext />);
 

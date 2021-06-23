@@ -15,17 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { PluginStore } from 'graylog-web-plugin/plugin';
+import { PluginExports, PluginStore } from 'graylog-web-plugin/plugin';
 import { Optional } from 'utility-types';
 
-function withPluginEntities<Props extends {}, Entities extends {}>(
+function withPluginEntities<Props extends {}, Entities extends Record<string, keyof PluginExports>>(
   Component: React.ComponentType<Props>,
   entityMapping: Entities,
   // @ts-ignore
 ): React.ComponentType<Optional<Props, keyof Entities>> {
   const entities = Object.entries(entityMapping)
     .map(([targetKey, entityKey]) => [targetKey, PluginStore.exports(entityKey)])
-    .reduce((prev, [key, value]) => ({ ...prev, [key]: value }), {});
+    .reduce((prev, [key, value]: [string, ReturnType<PluginStore['exports']>]) => ({ ...prev, [key]: value }), {});
 
   return (props: Props) => <Component {...entities} {...props} />;
 }

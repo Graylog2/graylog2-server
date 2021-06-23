@@ -88,7 +88,7 @@ public class ElasticsearchConfiguration {
     @Parameter(value = "index_optimization_max_num_segments", validator = PositiveIntegerValidator.class)
     private int indexOptimizationMaxNumSegments = 1;
 
-    @Parameter(value = "elasticsearch_index_optimization_timeout", validator = PositiveDurationValidator.class)
+    @Parameter(value = "elasticsearch_index_optimization_timeout", validator = DurationCastedToIntegerValidator.class)
     private Duration indexOptimizationTimeout = Duration.hours(1L);
 
     @Parameter(value = "elasticsearch_index_optimization_jobs", validator = PositiveIntegerValidator.class)

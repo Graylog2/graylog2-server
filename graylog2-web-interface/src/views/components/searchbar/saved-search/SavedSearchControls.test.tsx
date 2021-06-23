@@ -15,9 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { mount } from 'wrappedEnzyme';
+import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
 import { viewsManager, admin } from 'fixtures/users';
 import mockAction from 'helpers/mocking/MockAction';
+import userEvent from '@testing-library/user-event';
 
 import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
@@ -30,6 +31,8 @@ import type { UserJSON } from 'logic/users/User';
 import type { ViewStoreState } from 'views/stores/ViewStore';
 
 import SavedSearchControls from './SavedSearchControls';
+
+jest.mock('views/stores/FieldTypesStore', () => ({}));
 
 describe('SavedSearchControls', () => {
   const createViewStoreState = (dirty = true, id = undefined) => ({
@@ -63,6 +66,8 @@ describe('SavedSearchControls', () => {
     </ViewLoaderContext.Provider>
   );
 
+  const findShareButton = () => screen.findByRole('button', { name: 'Share' });
+
   SimpleSavedSearchControls.defaultProps = {
     loadNewView: () => Promise.resolve(),
     onLoadView: () => Promise.resolve(),
@@ -71,70 +76,68 @@ describe('SavedSearchControls', () => {
   };
 
   describe('Button handling', () => {
-    it('should clear a view', (done) => {
-      const loadNewView = jest.fn(() => {
-        done();
+    it('should clear a view', async () => {
+      const loadNewView = jest.fn(() => Promise.resolve());
 
-        return Promise.resolve();
-      });
-      const wrapper = mount(<SimpleSavedSearchControls loadNewView={loadNewView} />);
+      render(<SimpleSavedSearchControls loadNewView={loadNewView} />);
 
-      wrapper.find('a[data-testid="reset-search"]').simulate('click');
+      const resetSearch = await screen.findByTestId('reset-search');
+
+      fireEvent.click(resetSearch);
+
+      expect(loadNewView).toHaveBeenCalledTimes(1);
     });
 
-    it('should loadView after create', (done) => {
+    it('should loadView after create', async () => {
       ViewManagementActions.create = mockAction(jest.fn((view) => Promise.resolve(view)));
-      const onLoadView = jest.fn((view) => {
-        return new Promise(() => view);
-      });
-      const wrapper = mount(<SimpleSavedSearchControls onLoadView={onLoadView} viewStoreState={createViewStoreState(false)} />);
+      const onLoadView = jest.fn((view) => new Promise(() => view));
 
-      wrapper.find('button[title="Save search"]').simulate('click');
-      wrapper.find('input[value="title"]').simulate('change', { target: { value: 'Test' } });
-      wrapper.find('button[children="Create new"]').simulate('click');
+      render(<SimpleSavedSearchControls onLoadView={onLoadView} viewStoreState={createViewStoreState(false)} />);
 
-      setImmediate(() => {
-        expect(onLoadView).toHaveBeenCalledTimes(1);
+      fireEvent.click(await screen.findByTitle('Save search'));
+      userEvent.type(await screen.findByPlaceholderText('Enter title'), 'Test');
+      fireEvent.click(await screen.findByText('Create new'));
 
-        done();
-      });
+      await waitFor(() => expect(onLoadView).toHaveBeenCalledTimes(1));
     });
 
     describe('has "Share" option', () => {
-      it('includes the option to share the current search', () => {
-        const wrapper = mount(<SimpleSavedSearchControls viewStoreState={createViewStoreState(false, 'some-id')} />);
+      it('includes the option to share the current search', async () => {
+        render(<SimpleSavedSearchControls viewStoreState={createViewStoreState(false, 'some-id')} />);
 
-        expect(wrapper.find('button[title="Share"]')).toExist();
+        await findShareButton();
       });
 
-      it('which should be disabled if current user is neither owner nor permitted to edit search', () => {
+      it('which should be disabled if current user is neither owner nor permitted to edit search', async () => {
         const notOwningUser = {
           ...viewsManager,
           username: 'notOwningUser',
           permissions: [],
           grn_permissions: [],
         };
-        const wrapper = mount(<SimpleSavedSearchControls currentUser={notOwningUser} viewStoreState={createViewStoreState(false, 'some-id')} />);
+        render(<SimpleSavedSearchControls currentUser={notOwningUser} viewStoreState={createViewStoreState(false, 'some-id')} />);
 
-        const shareSearch = wrapper.find('button[title="Share"]');
+        const shareButton = await findShareButton();
 
-        expect(shareSearch).toBeDisabled();
+        expect(shareButton).toBeDisabled();
       });
 
-      it('which should be enabled if current user is owner of search', () => {
+      it('which should be enabled if current user is owner of search', async () => {
         const owningUser = {
           ...viewsManager,
           username: 'owningUser',
           permissions: [],
           grn_permissions: ['entity:own:grn::::search:user-id-1'],
         };
-        const wrapper = mount(<SimpleSavedSearchControls currentUser={owningUser} viewStoreState={createViewStoreState(false, owningUser.id)} />);
-        const shareSearch = wrapper.find('button[title="Share"]');
 
-        expect(shareSearch).not.toBeDisabled();
+        render(<SimpleSavedSearchControls currentUser={owningUser} viewStoreState={createViewStoreState(false, owningUser.id)} />);
+
+        const shareButton = await findShareButton();
+
+        expect(shareButton).not.toBeDisabled();
       });
 
-      it('which should be enabled if current user is permitted to edit search', () => {
+      it('which should be enabled if current user is permitted to edit search', async () => {
         const owningUser = {
           ...viewsManager,
           username: 'powerfulUser',
@@ -142,25 +145,25 @@ describe('SavedSearchControls', () => {
           grn_permissions: ['entity:own:grn::::search:user-id-1'],
         };
 
-        const wrapper = mount(<SimpleSavedSearchControls currentUser={owningUser} viewStoreState={createViewStoreState(false, owningUser.id)} />);
+        render(<SimpleSavedSearchControls currentUser={owningUser} viewStoreState={createViewStoreState(false, owningUser.id)} />);
 
-        const shareSearch = wrapper.find('button[title="Share"]');
+        const shareButton = await findShareButton();
+
+        expect(shareButton).not.toBeDisabled();
+      });
+
+      it('which should be enabled if current user is admin', async () => {
+        render(<SimpleSavedSearchControls currentUser={admin} viewStoreState={createViewStoreState(false, admin.id)} />);
+
+        const shareSearch = await findShareButton();
 
         expect(shareSearch).not.toBeDisabled();
       });
 
-      it('which should be enabled if current user is admin', () => {
-        const wrapper = mount(<SimpleSavedSearchControls currentUser={admin} viewStoreState={createViewStoreState(false, admin.id)} />);
+      it('which should be hidden if search is unsaved', async () => {
+        render(<SimpleSavedSearchControls />);
 
-        const shareSearch = wrapper.find('button[title="Share"]');
-
-        expect(shareSearch).not.toBeDisabled();
-      });
-
-      it('which should be hidden if search is unsaved', () => {
-        const wrapper = mount(<SimpleSavedSearchControls />);
-
-        const shareSearch = wrapper.find('button[title="Share"]');
+        const shareSearch = await findShareButton();
 
         expect(shareSearch).toMatchSnapshot();
       });
@@ -168,15 +171,13 @@ describe('SavedSearchControls', () => {
   });
 
   describe('render the SavedSearchControls', () => {
-    it('should render not dirty with unsaved view', () => {
-      const wrapper = mount(<SimpleSavedSearchControls viewStoreState={createViewStoreState(false)} />);
+    it('should render not dirty with unsaved view', async () => {
+      render(<SimpleSavedSearchControls viewStoreState={createViewStoreState(false)} />);
 
-      const saveButton = wrapper.find('button[title="Save search"]');
-
-      expect(saveButton).toExist();
+      await screen.findByRole('button', { name: 'Save search' });
     });
 
-    it('should render not dirty', () => {
+    it('should render not dirty', async () => {
       const viewStoreState = {
         activeQuery: '',
         view: View.builder()
@@ -189,13 +190,12 @@ describe('SavedSearchControls', () => {
         dirty: false,
         isNew: true,
       };
-      const wrapper = mount(<SimpleSavedSearchControls viewStoreState={viewStoreState} />);
-      const saveButton = wrapper.find('button[title="Saved search"]');
+      render(<SimpleSavedSearchControls viewStoreState={viewStoreState} />);
 
-      expect(saveButton).toExist();
+      await screen.findByRole('button', { name: 'Saved search' });
     });
 
-    it('should render dirty', () => {
+    it('should render dirty', async () => {
       const view = View.builder()
         .title('title')
         .type(View.Type.Search)
@@ -209,10 +209,9 @@ describe('SavedSearchControls', () => {
         dirty: true,
         isNew: false,
       };
-      const wrapper = mount(<SimpleSavedSearchControls viewStoreState={viewStoreState} />);
-      const saveButton = wrapper.find('button[title="Unsaved changes"]');
+      render(<SimpleSavedSearchControls viewStoreState={viewStoreState} />);
 
-      expect(saveButton).toExist();
+      await screen.findByRole('button', { name: 'Unsaved changes' });
     });
   });
 });

@@ -19,7 +19,7 @@ import URI from 'urijs';
 import lodash from 'lodash';
 import Bluebird from 'bluebird';
 
-import URLUtils from 'util/URLUtils';
+import * as URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 import CombinedProvider from 'injection/CombinedProvider';

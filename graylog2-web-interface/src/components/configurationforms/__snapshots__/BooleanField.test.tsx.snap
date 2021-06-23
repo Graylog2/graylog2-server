@@ -1,0 +1,96 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<BooleanField> should render a checked field 1`] = `
+.c0 {
+  display: block;
+  margin-top: 5px;
+  margin-bottom: 10px;
+  color: #838383;
+}
+
+.c1 {
+  color: inherit;
+}
+
+<div>
+  <div
+    class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 form-group"
+  >
+    <span>
+      <div
+        class="checkbox"
+      >
+        <label
+          title=""
+        >
+          <input
+            checked=""
+            label="boolean field"
+            name="configuration[example_boolean_field]"
+            placeholder=""
+            type="checkbox"
+            value=""
+          />
+          boolean field
+        </label>
+      </div>
+      <span
+        class="c0 help-block"
+      >
+        <span
+          class="c1"
+        >
+          my boolean description
+        </span>
+      </span>
+    </span>
+  </div>
+</div>
+`;
+
+exports[`<BooleanField> should render an unchecked field by default 1`] = `
+.c0 {
+  display: block;
+  margin-top: 5px;
+  margin-bottom: 10px;
+  color: #838383;
+}
+
+.c1 {
+  color: inherit;
+}
+
+<div>
+  <div
+    class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 form-group"
+  >
+    <span>
+      <div
+        class="checkbox"
+      >
+        <label
+          title=""
+        >
+          <input
+            label="boolean field"
+            name="configuration[example_boolean_field]"
+            placeholder=""
+            type="checkbox"
+            value=""
+          />
+          boolean field
+        </label>
+      </div>
+      <span
+        class="c0 help-block"
+      >
+        <span
+          class="c1"
+        >
+          my boolean description
+        </span>
+      </span>
+    </span>
+  </div>
+</div>
+`;

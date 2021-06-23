@@ -20,7 +20,7 @@ import * as PropTypes from 'prop-types';
 import { LinkContainer } from 'components/graylog/router';
 import type { PluginMetadata, Requirements } from 'views/logic/views/View';
 import { Col, Row, Button } from 'components/graylog';
-import URLUtils from 'util/URLUtils';
+import * as URLUtils from 'util/URLUtils';
 import fixup from 'views/pages/StyleFixups.css';
 import View from 'views/logic/views/View';
 import { viewsPath } from 'views/Constants';

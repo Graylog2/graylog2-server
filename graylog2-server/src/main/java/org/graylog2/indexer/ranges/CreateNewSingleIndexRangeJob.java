@@ -60,6 +60,10 @@ public class CreateNewSingleIndexRangeJob extends RebuildIndexRangesJob {
 
     @Override
     public void execute() {
+        if (!indices.exists(indexName)) {
+            LOG.debug("Not running job for deleted index <{}>", indexName);
+            return;
+        }
         if (indices.isClosed(indexName)) {
             LOG.debug("Not running job for closed index <{}>", indexName);
             return;

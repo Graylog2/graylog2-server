@@ -41,7 +41,7 @@ export default class AreaVisualizationConfig extends VisualizationConfig {
   }
 
   toBuilder() {
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder(Immutable.Map(this._value));
   }
 

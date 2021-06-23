@@ -17,8 +17,7 @@
 import * as Immutable from 'immutable';
 import { $PropertyType } from 'utility-types';
 
-import type { Color } from 'views/logic/views/formatting/highlighting/HighlightingRule';
-
+type Color = string;
 type ChartColors = { [key: string]: Color };
 
 type InternalState = {

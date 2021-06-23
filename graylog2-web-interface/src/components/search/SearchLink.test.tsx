@@ -44,11 +44,11 @@ describe('SearchLink', () => {
 
   it('includes the time range', () => {
     const result = SearchLink.builder()
-      .timerange({ type: 'relative', range: 300 })
+      .timerange({ type: 'relative', from: 300 })
       .build()
       .toURL();
 
-    expect(result).toEqual(`${urlPrefix}?rangetype=relative&relative=300`);
+    expect(result).toEqual(`${urlPrefix}?rangetype=relative&from=300`);
   });
 
   it('includes the streams', () => {

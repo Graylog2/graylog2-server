@@ -25,9 +25,7 @@ import NumberUtils from 'util/NumberUtils';
 import SimulationChanges from './SimulationChanges';
 import SimulationPreview from './SimulationPreview';
 import SimulationTrace from './SimulationTrace';
-
-// eslint-disable-next-line import/no-webpack-loader-syntax
-import style from '!style/useable!css!./SimulationResults.css';
+import style from './SimulationResults.lazy.css';
 
 const VIEW_OPTIONS = {
   SIMULATION_PREVIEW: 1,
@@ -162,7 +160,7 @@ class SimulationResults extends React.Component {
           <p>
             {isLoading
               ? 'Simulating message processing, please wait a moment.'
-              : `These are the results of processing the loaded message. Processing took ${NumberUtils.formatNumber(simulationResults.took_microseconds)} µs.`}
+              : `These are the results of processing the loaded message. Processing took ${NumberUtils.formatNumber(simulationResults?.took_microseconds)} µs.`}
           </p>
           {errorMessage}
           {this._getViewComponent(streams)}
@@ -174,13 +172,14 @@ class SimulationResults extends React.Component {
 
 SimulationResults.propTypes = {
   stream: PropTypes.object.isRequired,
-  originalMessage: PropTypes.object.isRequired,
+  originalMessage: PropTypes.object,
   simulationResults: PropTypes.object,
   isLoading: PropTypes.bool,
   error: PropTypes.object,
 };
 
 SimulationResults.defaultProps = {
+  originalMessage: undefined,
   simulationResults: undefined,
   isLoading: false,
   error: undefined,

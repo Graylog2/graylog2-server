@@ -43,6 +43,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.Create
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.DeleteAliasRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.PutIndexTemplateRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.cluster.metadata.AliasMetadata;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.unit.TimeValue;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.reindex.BulkByScrollResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.reindex.ReindexRequest;
@@ -86,6 +87,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
+import static org.graylog.storage.elasticsearch7.ElasticsearchClient.withTimeout;
 
 public class IndicesAdapterES7 implements IndicesAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(IndicesAdapterES7.class);
@@ -244,7 +246,11 @@ public class IndicesAdapterES7 implements IndicesAdapter {
     @Override
     public long numberOfMessages(String index) {
         final JsonNode result = statsApi.indexStats(index);
-        return result.path("primaries").path("docs").path("count").asLong();
+        final JsonNode count = result.path("_all").path("primaries").path("docs").path("count");
+        if (count.isMissingNode()) {
+            throw new RuntimeException("Unable to extract count from response.");
+        }
+        return count.asLong();
     }
 
     private GetSettingsResponse settingsFor(String indexOrAlias) {
@@ -391,7 +397,7 @@ public class IndicesAdapterES7 implements IndicesAdapter {
                 .maxNumSegments(maxNumSegments)
                 .flush(true);
 
-        client.execute((c, requestOptions) -> c.indices().forcemerge(request, requestOptions));
+        client.execute((c, requestOptions) -> c.indices().forcemerge(request, withTimeout(requestOptions, timeout)));
     }
 
     @Override
@@ -442,7 +448,12 @@ public class IndicesAdapterES7 implements IndicesAdapter {
 
     @Override
     public HealthStatus waitForRecovery(String index) {
-        final ClusterHealthRequest clusterHealthRequest = new ClusterHealthRequest(index);
+        return waitForRecovery(index, 30);
+    }
+
+    @Override
+    public HealthStatus waitForRecovery(String index, int timeout) {
+        final ClusterHealthRequest clusterHealthRequest = new ClusterHealthRequest(index).timeout(TimeValue.timeValueSeconds(timeout));
         clusterHealthRequest.waitForGreenStatus();
 
         final ClusterHealthResponse result = client.execute((c, requestOptions) -> c.cluster().health(clusterHealthRequest, requestOptions));

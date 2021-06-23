@@ -281,99 +281,39 @@ exports[`SavedSearchControls Button handling has "Share" option which should be 
   color: rgb(88,73,5);
 }
 
+.c2 {
+  display: inline-block;
+}
+
 .c1 {
+  display: inline-block;
+}
+
+.c3 {
   margin-left: 8px;
 }
 
 <button
-  className="c0 btn btn-default"
-  disabled={true}
-  onClick={[Function]}
+  class="c0 btn btn-default"
+  disabled=""
   title="Share"
   type="button"
 >
-  <Icon
-    name="user-plus"
-    type="solid"
+  <svg
+    class="svg-inline--fa fa-user-plus"
+  />
+   Share 
+  <div
+    class="c1"
   >
-    <FontAwesomeIcon
-      icon={
-        Object {
-          "iconName": "user-plus",
-          "prefix": "fas",
-        }
-      }
+    <span
+      class="c2 c3 "
+      role="button"
     >
       <svg
-        className="svg-inline--fa fa-user-plus"
+        class="svg-inline--fa fa-question-circle"
       />
-    </FontAwesomeIcon>
-  </Icon>
-   Share 
-  <SharingDisabledPopover
-    description="Only saved searches can be shared."
-    type="search"
-  >
-    <SharingDisabledPopover__StyledHoverForHelp
-      pullRight={false}
-      title="Sharing not possible"
-    >
-      <HoverForHelp
-        className="c1"
-        id="help-popover"
-        pullRight={false}
-        title="Sharing not possible"
-      >
-        <OverlayTrigger
-          defaultOverlayShown={false}
-          overlay={
-            <Popover
-              id="help-popover"
-              title="Sharing not possible"
-            >
-              Only saved searches can be shared.
-            </Popover>
-          }
-          placement="bottom"
-          trigger={
-            Array [
-              "hover",
-              "focus",
-            ]
-          }
-        >
-          <Icon
-            className="c1 "
-            name="question-circle"
-            onBlur={[Function]}
-            onClick={null}
-            onFocus={[Function]}
-            onMouseOut={[Function]}
-            onMouseOver={[Function]}
-            type="solid"
-          >
-            <FontAwesomeIcon
-              className="c1 "
-              icon={
-                Object {
-                  "iconName": "question-circle",
-                  "prefix": "fas",
-                }
-              }
-              onBlur={[Function]}
-              onClick={null}
-              onFocus={[Function]}
-              onMouseOut={[Function]}
-              onMouseOver={[Function]}
-            >
-              <svg
-                className="svg-inline--fa fa-question-circle"
-              />
-            </FontAwesomeIcon>
-          </Icon>
-        </OverlayTrigger>
-      </HoverForHelp>
-    </SharingDisabledPopover__StyledHoverForHelp>
-  </SharingDisabledPopover>
+    </span>
+  </div>
 </button>
 `;

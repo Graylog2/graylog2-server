@@ -36,7 +36,7 @@ class MockFetchError {
 }
 
 const MockFetchProvider = Object.assign(
-  jest.fn(() => Promise.resolve(mockResponse)),
+  () => Promise.resolve(mockResponse),
   {
     FetchError: MockFetchError,
     Builder: MockBuilder,

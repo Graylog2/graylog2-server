@@ -26,7 +26,7 @@ import ActionsProvider from 'injection/ActionsProvider';
 const GettingStartedActions = ActionsProvider.getActions('GettingStarted');
 
 const Container = styled.div`
-  height: calc(100vh - 130px);
+  height: 100%;
   display: grid;
   display: -ms-grid;
   grid-template-rows: max-content 1fr;

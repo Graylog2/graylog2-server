@@ -37,10 +37,12 @@ public class BuiltinCapabilities {
                         "Viewer",
                         ImmutableSet.of(
                                 RestPermissions.STREAMS_READ,
+                                RestPermissions.STREAM_OUTPUTS_READ,
                                 RestPermissions.DASHBOARDS_READ,
                                 ViewsRestPermissions.VIEW_READ,
                                 RestPermissions.EVENT_DEFINITIONS_READ,
-                                RestPermissions.EVENT_NOTIFICATIONS_READ
+                                RestPermissions.EVENT_NOTIFICATIONS_READ,
+                                RestPermissions.OUTPUTS_READ
                         )
                 ))
                 .put(Capability.MANAGE, CapabilityDescriptor.create(
@@ -50,6 +52,8 @@ public class BuiltinCapabilities {
                                 RestPermissions.STREAMS_READ,
                                 RestPermissions.STREAMS_EDIT,
                                 RestPermissions.STREAMS_CHANGESTATE,
+                                RestPermissions.STREAM_OUTPUTS_READ,
+                                RestPermissions.STREAM_OUTPUTS_CREATE,
                                 RestPermissions.DASHBOARDS_READ,
                                 RestPermissions.DASHBOARDS_EDIT,
                                 ViewsRestPermissions.VIEW_READ,
@@ -57,7 +61,9 @@ public class BuiltinCapabilities {
                                 RestPermissions.EVENT_DEFINITIONS_READ,
                                 RestPermissions.EVENT_DEFINITIONS_EDIT,
                                 RestPermissions.EVENT_NOTIFICATIONS_READ,
-                                RestPermissions.EVENT_NOTIFICATIONS_EDIT
+                                RestPermissions.EVENT_NOTIFICATIONS_EDIT,
+                                RestPermissions.OUTPUTS_READ,
+                                RestPermissions.OUTPUTS_EDIT
                         )
                 ))
                 .put(Capability.OWN, CapabilityDescriptor.create(
@@ -68,6 +74,9 @@ public class BuiltinCapabilities {
                                 RestPermissions.STREAMS_READ,
                                 RestPermissions.STREAMS_EDIT,
                                 RestPermissions.STREAMS_CHANGESTATE,
+                                RestPermissions.STREAM_OUTPUTS_READ,
+                                RestPermissions.STREAM_OUTPUTS_CREATE,
+                                RestPermissions.STREAM_OUTPUTS_DELETE,
                                 RestPermissions.DASHBOARDS_READ,
                                 RestPermissions.DASHBOARDS_EDIT,
                                 ViewsRestPermissions.VIEW_READ,
@@ -78,7 +87,10 @@ public class BuiltinCapabilities {
                                 RestPermissions.EVENT_DEFINITIONS_DELETE,
                                 RestPermissions.EVENT_NOTIFICATIONS_READ,
                                 RestPermissions.EVENT_NOTIFICATIONS_EDIT,
-                                RestPermissions.EVENT_NOTIFICATIONS_DELETE
+                                RestPermissions.EVENT_NOTIFICATIONS_DELETE,
+                                RestPermissions.OUTPUTS_READ,
+                                RestPermissions.OUTPUTS_EDIT,
+                                RestPermissions.OUTPUTS_TERMINATE
                         )
                 ))
                 .build();

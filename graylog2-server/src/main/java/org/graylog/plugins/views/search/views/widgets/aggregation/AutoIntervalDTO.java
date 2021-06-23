@@ -36,6 +36,10 @@ public abstract class AutoIntervalDTO implements IntervalDTO {
     public abstract String type();
 
     @JsonProperty(FIELD_SCALING)
+    public double scalingWithDefault() {
+        return scaling().orElse(1.0);
+    }
+
     public abstract Optional<Double> scaling();
 
     @AutoValue.Builder

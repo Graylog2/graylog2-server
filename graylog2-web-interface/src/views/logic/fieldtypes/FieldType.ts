@@ -16,15 +16,15 @@
  */
 import * as Immutable from 'immutable';
 
-export type Property = 'compound' | 'enumerable' | 'full-text-search' | 'numeric' | 'decorated';
-
-export const Properties: { [key: string]: Property } = {
+export const Properties = {
   Compound: 'compound',
   Enumerable: 'enumerable',
   FullTextSearch: 'full-text-search',
   Numeric: 'numeric',
   Decorated: 'decorated',
-};
+} as const;
+
+export type Property = typeof Properties[keyof typeof Properties];
 
 export type FieldTypeJSON = {
   type: string,
@@ -50,7 +50,7 @@ class FieldType {
     return this.value.get('type');
   }
 
-  get properties(): Immutable.Set<string> {
+  get properties(): Immutable.Set<Property> {
     return this.value.get('properties');
   }
 
@@ -60,6 +60,10 @@ class FieldType {
 
   isNumeric(): boolean {
     return this.properties.has(Properties.Numeric);
+  }
+
+  isEnumerable(): boolean {
+    return this.properties.has(Properties.Enumerable);
   }
 
   isCompound(): boolean {

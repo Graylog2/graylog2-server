@@ -159,7 +159,7 @@ export default class EntityShareState {
     return _sortAndOrderGrantees<SelectedGrantee>(granteesWithCapabilities, this._value.activeShares);
   }
 
-  // eslint-disable-next-line no-use-before-define
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
   toBuilder(): Builder {
     const {
       entity,
@@ -171,7 +171,7 @@ export default class EntityShareState {
       validationResults,
     } = this._value;
 
-    // eslint-disable-next-line no-use-before-define,@typescript-eslint/no-use-before-define
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder(Immutable.Map({
       entity,
       availableGrantees,
@@ -235,7 +235,7 @@ export default class EntityShareState {
   }
 
   static builder(): Builder {
-    // eslint-disable-next-line no-use-before-define,@typescript-eslint/no-use-before-define
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder();
   }
 }

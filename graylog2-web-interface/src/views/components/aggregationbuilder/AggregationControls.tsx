@@ -20,11 +20,11 @@ import * as Immutable from 'immutable';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import styled from 'styled-components';
 import { $PropertyType } from 'utility-types';
+import { EditWidgetComponentProps } from 'views/types';
 
 import { Col, Row } from 'components/graylog';
 import { defaultCompare } from 'views/logic/DefaultCompare';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
-import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import CustomPropTypes from 'views/components/CustomPropTypes';
 import SortDirectionSelect from 'views/components/widgets/SortDirectionSelect';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
@@ -39,12 +39,9 @@ import DescriptionBox from './DescriptionBox';
 import SeriesFunctionsSuggester from './SeriesFunctionsSuggester';
 import EventListConfiguration from './EventListConfiguration';
 
-type Props = {
-  children: React.ReactNode,
-  config: AggregationWidgetConfig,
-  fields: Immutable.List<FieldTypeMapping>,
-  onChange: (AggregationWidgetConfig) => void,
-};
+import worldMap, { WorldMapVisualizationConfigFormValues } from '../visualizations/worldmap/bindings';
+
+type Props = EditWidgetComponentProps<AggregationWidgetConfig>;
 
 type State = {
   config: AggregationWidgetConfig,
@@ -58,6 +55,7 @@ const Container = styled.div`
   grid-template-columns: 1fr;
   -ms-grid-columns: 1fr;
   height: 100%;
+  width: 100%;
 `;
 
 const TopRow = styled(Row)`
@@ -133,8 +131,13 @@ export default class AggregationControls extends React.Component<Props, State> {
     this._setAndPropagate((state) => ({ config: state.config.toBuilder().visualization(visualization).visualizationConfig(undefined).build() }));
   };
 
-  _onVisualizationConfigChange = (visualizationConfig: $PropertyType<$PropertyType<Props, 'config'>, 'visualizationConfig'>) => {
-    this._setAndPropagate((state) => ({ config: state.config.toBuilder().visualizationConfig(visualizationConfig).build() }));
+  _onVisualizationConfigChange = (visualizationConfigFormValues: WorldMapVisualizationConfigFormValues) => {
+    const { config } = this.props;
+
+    if (config.visualization === 'map') {
+      const newConfig = worldMap.config.toConfig(visualizationConfigFormValues);
+      this._setAndPropagate((state) => ({ config: state.config.toBuilder().visualizationConfig(newConfig).build() }));
+    }
   };
 
   _setAndPropagate = (fn: (State) => State) => this.setState(fn, this._propagateState);

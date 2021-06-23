@@ -39,11 +39,9 @@ const PopoverHelp = () => {
   );
 
   return (
-    <div className={DecoratorStyles.helpLinkContainer}>
-      <OverlayTrigger trigger="click" rootClose placement="right" overlay={popoverHelp}>
-        <Button bsStyle="link" className={DecoratorStyles.helpLink}>What are message decorators?</Button>
-      </OverlayTrigger>
-    </div>
+    <OverlayTrigger trigger="click" rootClose placement="right" overlay={popoverHelp}>
+      <Button bsStyle="link" className={DecoratorStyles.helpLink}>What are message decorators?</Button>
+    </OverlayTrigger>
   );
 };
 

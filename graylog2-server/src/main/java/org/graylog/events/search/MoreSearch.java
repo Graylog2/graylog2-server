@@ -181,6 +181,29 @@ public class MoreSearch {
         return esQueryDecorators.decorate(queryString, searchJob, dummyQuery, ImmutableSet.of());
     }
 
+
+    /**
+     * Helper to perform basic Lucene escaping of query string values
+     * @param searchString search string which may contain unescaped reserved characters
+     * @return String where those characters that Lucene expects to be escaped are escaped by a
+     * preceding <code>\</code>
+     */
+    public static String luceneEscape(String searchString) {
+        StringBuilder result = new StringBuilder();
+        if (searchString != null) {
+            for (char c : searchString.toCharArray()) {
+                // These characters are part of the query syntax and must be escaped
+                if (c == '\\' || c == '+' || c == '-' || c == '!' || c == '(' || c == ')' || c == ':'
+                        || c == '^' || c == '[' || c == ']' || c == '\"' || c == '{' || c == '}' || c == '~'
+                        || c == '*' || c == '?' || c == '|' || c == '&' || c == '/') {
+                    result.append('\\');
+                }
+                result.append(c);
+            }
+        }
+        return result.toString();
+    }
+
     /**
      * Callback that receives message batches from {@link #scrollQuery(String, Set, Set, TimeRange, int, ScrollCallback)}.
      */

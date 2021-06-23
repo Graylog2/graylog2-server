@@ -31,19 +31,24 @@ public class ValidationResult {
     private final Multimap<String, String> context = ArrayListMultimap.create();
 
 
-    public void addError(String fieldName, String error) {
+    public ValidationResult addError(String fieldName, String error) {
         errors.put(fieldName, error);
+        return this;
     }
-    public void addContext(String fieldName, Iterable<String> values) {
+    public ValidationResult addContext(String fieldName, Iterable<String> values) {
         context.putAll(fieldName, values);
+        return this;
     }
 
-    public void addAll(Multimap<String, String> extraErrors) {
+    public ValidationResult addAll(Multimap<String, String> extraErrors) {
         errors.putAll(extraErrors);
+        return this;
     }
 
-    public void addAll(ValidationResult validationResult) {
+    public ValidationResult addAll(ValidationResult validationResult) {
         errors.putAll(validationResult.errors);
+        context.putAll(validationResult.context);
+        return this;
     }
 
     @JsonProperty("failed")

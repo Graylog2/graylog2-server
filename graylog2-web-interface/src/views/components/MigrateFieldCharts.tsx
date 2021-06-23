@@ -26,7 +26,7 @@ import Store from 'logic/local-storage/Store';
 import { widgetDefinition } from 'views/logic/Widgets';
 import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
-import Pivot from 'views/logic/aggregationbuilder/Pivot';
+import Pivot, { PivotConfigType } from 'views/logic/aggregationbuilder/Pivot';
 import Series from 'views/logic/aggregationbuilder/Series';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import LineVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/LineVisualizationConfig';
@@ -34,6 +34,7 @@ import AreaVisualizationConfig from 'views/logic/aggregationbuilder/visualizatio
 import type { InterpolationMode } from 'views/logic/aggregationbuilder/visualizations/Interpolation';
 import { Alert, Button, Row, Col } from 'components/graylog';
 import Spinner from 'components/common/Spinner';
+import { TIMESTAMP_FIELD } from 'views/Constants';
 
 // localStorage keys
 const FIELD_CHARTS_KEY = 'pinned-field-charts';
@@ -138,7 +139,7 @@ const _updateExistingWidgetPos = (existingPositions, rowOffset) => {
 
 const _migrateWidgets = (legacyCharts) => {
   return new Promise((resolve) => {
-    const { defaultHeight } = widgetDefinition('AGGREGATION');
+    const { defaultHeight } = widgetDefinition(AggregationWidget.type);
     const currentView = CurrentViewStateStore.getInitialState();
     const newWidgetPositions = {};
 
@@ -149,8 +150,8 @@ const _migrateWidgets = (legacyCharts) => {
       const series = new Series(mapSeries(chart.valuetype, field));
       // Because all field charts show the results for the defined timerange,
       // the new row pivot always contains the timestamp field.
-      const rowPivotConfig = { interval: { type: 'timeunit', ...mapTime(chart.interval) } };
-      const rowPivot = new Pivot('timestamp', 'time', rowPivotConfig);
+      const rowPivotConfig = { interval: { type: 'timeunit', ...mapTime(chart.interval) } } as PivotConfigType;
+      const rowPivot = new Pivot(TIMESTAMP_FIELD, 'time', rowPivotConfig);
       const visualization = mapVisualization(chart.renderer);
       const visualizationConfig = createVisualizationConfig(chart.interpolation, visualization);
       // create widget with migrated data

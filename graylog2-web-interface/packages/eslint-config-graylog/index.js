@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 module.exports = {
-  parser: 'babel-eslint',
+  parser: '@babel/eslint-parser',
   env: {
     browser: true,
     jest: true,
@@ -37,10 +37,30 @@ module.exports = {
         '@typescript-eslint/no-shadow': ['error'],
       },
     },
+    {
+      files: ['*.js', '*.jsx'],
+    },
+    {
+      files: ['*.test.js', '*.test.jsx', '*.test.ts', '*.test.tsx'],
+      plugins: [
+        'jest',
+        'testing-library',
+      ],
+      extends: [
+        'plugin:jest/recommended',
+        'plugin:testing-library/react',
+        'plugin:testing-library/recommended',
+      ],
+      rules: {
+        'jest/expect-expect': ['error', { assertFunctionNames: ['expect*', '(screen.)?find(All)?By*'] }],
+        'testing-library/no-debug': 'warn',
+      },
+    },
   ],
   extends: [
     'eslint:recommended',
     'airbnb',
+    'plugin:compat/recommended',
     'plugin:import/errors',
     'plugin:import/warnings',
     'plugin:import/react',
@@ -75,6 +95,9 @@ module.exports = {
       }, {
         name: 'create-react-class',
         message: 'Please use an ES6 or functional component instead.',
+      }, {
+        name: 'jest-each',
+        message: 'Please use `it.each` instead.',
       }],
     }],
     'no-underscore-dangle': 'off',
@@ -129,5 +152,9 @@ module.exports = {
         config: './webpack.config.js',
       },
     },
+    polyfills: [
+      'Promise',
+      'fetch',
+    ],
   },
 };

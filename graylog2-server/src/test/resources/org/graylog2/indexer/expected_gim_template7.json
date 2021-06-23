@@ -66,18 +66,18 @@
       },
       "timestamp": {
         "type": "date",
-        "format": "yyyy-MM-dd HH:mm:ss.SSS"
+        "format": "uuuu-MM-dd HH:mm:ss.SSS"
       },
       "gl2_accounted_message_size": {
         "type": "long"
       },
       "gl2_receive_timestamp": {
         "type": "date",
-        "format": "yyyy-MM-dd HH:mm:ss.SSS"
+        "format": "uuuu-MM-dd HH:mm:ss.SSS"
       },
       "gl2_processing_timestamp": {
         "type": "date",
-        "format": "yyyy-MM-dd HH:mm:ss.SSS"
+        "format": "uuuu-MM-dd HH:mm:ss.SSS"
       },
       "source": {
         "type": "text",
@@ -541,7 +541,7 @@
       },
       "event_created": {
         "type": "date",
-        "format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||basic_date_time||basic_date_time_no_millis||epoch_second||date_time_no_millis||date_hour_minute_second_fraction||epoch_millis"
+        "format": "uuuu-MM-dd HH:mm:ss||uuuu-MM-dd||basic_date_time||basic_date_time_no_millis||epoch_second||date_time_no_millis||date_hour_minute_second_fraction||epoch_millis"
       },
       "event_source": {
         "type": "keyword"
@@ -554,7 +554,7 @@
       },
       "event_start": {
         "type": "date",
-        "format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||basic_date_time||basic_date_time_no_millis||epoch_second||date_time_no_millis||date_hour_minute_second_fraction||epoch_millis"
+        "format": "uuuu-MM-dd HH:mm:ss||uuuu-MM-dd||basic_date_time||basic_date_time_no_millis||epoch_second||date_time_no_millis||date_hour_minute_second_fraction||epoch_millis"
       },
       "event_code": {
         "type": "keyword"
@@ -593,7 +593,7 @@
       },
       "event_received_time": {
         "type": "date",
-        "format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||basic_date_time||basic_date_time_no_millis||epoch_second||date_time_no_millis||date_hour_minute_second_fraction||epoch_millis"
+        "format": "uuuu-MM-dd HH:mm:ss||uuuu-MM-dd||basic_date_time||basic_date_time_no_millis||epoch_second||date_time_no_millis||date_hour_minute_second_fraction||epoch_millis"
       },
       "event_repeat_count": {
         "type": "long"
@@ -615,7 +615,7 @@
       },
       "file_created_date": {
         "type": "date",
-        "format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||basic_date_time||basic_date_time_no_millis||epoch_second||date_time_no_millis||date_hour_minute_second_fraction||epoch_millis"
+        "format": "uuuu-MM-dd HH:mm:ss||uuuu-MM-dd||basic_date_time||basic_date_time_no_millis||epoch_second||date_time_no_millis||date_hour_minute_second_fraction||epoch_millis"
       },
       "file_name": {
         "type": "keyword"

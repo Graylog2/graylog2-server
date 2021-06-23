@@ -19,7 +19,7 @@ import lodash from 'lodash';
 
 import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
-import URLUtils from 'util/URLUtils';
+import * as URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 
 type StreamRule = {

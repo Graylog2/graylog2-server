@@ -19,7 +19,6 @@ package org.graylog2.indexer;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.indexer.indexset.IndexSetConfig;
-import org.graylog2.plugin.Tools;
 
 import java.util.Map;
 
@@ -49,6 +48,16 @@ public abstract class EventsIndexMapping implements IndexMappingTemplate {
                         .add(map()
                                 .put("fields", map()
                                         .put("path_match", "fields.*")
+                                        .put("mapping", map()
+                                                .put("type", "keyword")
+                                                .put("doc_values", true)
+                                                .put("index", true)
+                                                .build())
+                                        .build())
+                                .build())
+                        .add(map()
+                                .put("group_by_fields", map()
+                                        .put("path_match", "group_by_fields.*")
                                         .put("mapping", map()
                                                 .put("type", "keyword")
                                                 .put("doc_values", true)
@@ -121,25 +130,25 @@ public abstract class EventsIndexMapping implements IndexMappingTemplate {
                         .put("type", "date")
                         // Use the same format we use for the "message" mapping to make sure we
                         // can use the search.
-                        .put("format", Tools.ES_DATE_FORMAT)
+                        .put("format", dateFormat())
                         .build())
                 .put("timestamp_processing", map()
                         .put("type", "date")
                         // Use the same format we use for the "message" mapping to make sure we
                         // can use the search.
-                        .put("format", Tools.ES_DATE_FORMAT)
+                        .put("format", dateFormat())
                         .build())
                 .put("timerange_start", map()
                         .put("type", "date")
                         // Use the same format we use for the "message" mapping to make sure we
                         // can use the search.
-                        .put("format", Tools.ES_DATE_FORMAT)
+                        .put("format", dateFormat())
                         .build())
                 .put("timerange_end", map()
                         .put("type", "date")
                         // Use the same format we use for the "message" mapping to make sure we
                         // can use the search.
-                        .put("format", Tools.ES_DATE_FORMAT)
+                        .put("format", dateFormat())
                         .build())
                 .put("streams", map()
                         .put("type", "keyword")
@@ -173,6 +182,10 @@ public abstract class EventsIndexMapping implements IndexMappingTemplate {
                         .put("type", "boolean")
                         .build())
                 .put("fields", map()
+                        .put("type", "object")
+                        .put("dynamic", true)
+                        .build())
+                .put("group_by_fields", map()
                         .put("type", "object")
                         .put("dynamic", true)
                         .build())
@@ -211,5 +224,9 @@ public abstract class EventsIndexMapping implements IndexMappingTemplate {
 
     protected ImmutableList.Builder<Object> list() {
         return ImmutableList.builder();
+    }
+
+    protected String dateFormat() {
+        return Constants.ES_DATE_FORMAT;
     }
 }

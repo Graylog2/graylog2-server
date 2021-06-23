@@ -51,7 +51,9 @@ const castQueryWithDefaults = ({ tabs, interval, refresh }: UntypedBigDisplayMod
 });
 
 const BodyPositioningWrapper = styled.div`
-  margin-top: -45px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
   padding: 10px;
 `;
 

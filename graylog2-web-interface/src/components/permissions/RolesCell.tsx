@@ -18,11 +18,13 @@ import * as React from 'react';
 import styled from 'styled-components';
 import * as Immutable from 'immutable';
 
+import { Label } from 'components/graylog';
+
 const Td = styled.td`
   max-width: 300px;
 `;
 
-const Role = styled.span`
+const Role = styled(Label)`
   margin-right: 5px;
   margin-bottom: 5px;
   display: inline-block;
@@ -36,7 +38,7 @@ type Props = {
 const RolesCell = ({ roles }: Props) => (
   <Td>
     {roles.map((role) => (
-      <Role key={role} className={`label label-${role === 'Admin' ? 'info' : 'default'}`}>
+      <Role key={role} bsStyle={role === 'Admin' ? 'info' : 'default'}>
         {role}
       </Role>
     ))}

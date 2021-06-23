@@ -19,7 +19,6 @@ import PropTypes from 'prop-types';
 
 import useViewLoader from 'views/logic/views/UseViewLoader';
 import Spinner from 'components/common/Spinner';
-import View from 'views/logic/views/View';
 import type { ViewLoaderFn } from 'views/logic/views/ViewLoader';
 import ViewLoader from 'views/logic/views/ViewLoader';
 import withLocation from 'routing/withLocation';

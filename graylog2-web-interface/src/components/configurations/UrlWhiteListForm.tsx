@@ -71,7 +71,7 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
     let isValid = true;
 
     try {
-      // eslint-disable-next-line no-unused-vars
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const test = new URL(str);
     } catch (e) {
       isValid = false;

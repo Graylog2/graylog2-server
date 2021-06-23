@@ -16,11 +16,11 @@
  */
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import styled, { css } from 'styled-components';
+import styled, { css, DefaultTheme } from 'styled-components';
 
 import Icon from 'components/common/Icon';
 
-const Wrapper = styled.button(({ theme }) => css`
+const Wrapper = styled.button(({ theme, disabled }: {theme: DefaultTheme, disabled: boolean}) => css`
   display: inline-flex;
   justify-content: center;
   align-items: center;
@@ -29,15 +29,15 @@ const Wrapper = styled.button(({ theme }) => css`
   border: 0;
   background-color: transparent;
   cursor: pointer;
-  color: ${theme.colors.gray[70]};
+  color: ${disabled ? theme.colors.gray[90] : theme.colors.gray[60]};
   font-size: ${theme.fonts.size.large};
 
   :hover {
-    background-color: ${theme.colors.gray[90]};
+    background-color: ${theme.colors.gray[80]};
   }
 
   :active {
-    background-color: ${theme.colors.gray[80]};
+    background-color: ${theme.colors.gray[70]};
   }
 `);
 
@@ -47,6 +47,7 @@ type Props = {
   onClick?: () => void,
   className?: string,
   name: string,
+  disabled?: boolean,
 };
 
 const handleClick = (onClick) => {
@@ -55,8 +56,8 @@ const handleClick = (onClick) => {
   }
 };
 
-const IconButton = ({ title, onClick, focusable, className, ...rest }: Props) => (
-  <Wrapper tabIndex={focusable ? 0 : -1} title={title} onClick={() => handleClick(onClick)} className={className} type="button">
+const IconButton = ({ title, onClick, focusable, className, disabled, ...rest }: Props) => (
+  <Wrapper tabIndex={focusable ? 0 : -1} title={title} onClick={() => handleClick(onClick)} className={className} type="button" disabled={disabled}>
     <Icon {...rest} />
   </Wrapper>
 );
@@ -74,6 +75,7 @@ IconButton.defaultProps = {
   onClick: undefined,
   title: undefined,
   name: undefined,
+  disabled: false,
 };
 
 export default IconButton;

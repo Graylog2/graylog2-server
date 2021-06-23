@@ -18,7 +18,7 @@ import Reflux from 'reflux';
 
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
-import URLUtils from 'util/URLUtils';
+import * as URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import CombinedProvider from 'injection/CombinedProvider';
 

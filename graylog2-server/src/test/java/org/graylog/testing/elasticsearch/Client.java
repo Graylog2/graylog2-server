@@ -42,6 +42,8 @@ public interface Client {
 
     void addAliasMapping(String indexName, String alias);
 
+    void removeAliasMapping(String indexName, String alias);
+
     boolean templateExists(String templateName);
 
     void putTemplate(String templateName, Map<String, Object> source);

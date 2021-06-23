@@ -28,7 +28,7 @@ export type Drilldown = {
 const defaultValue: Drilldown = {
   query: createElasticsearchQueryString(''),
   streams: [],
-  timerange: { type: 'relative', range: 300 },
+  timerange: { type: 'relative', from: 300 },
 };
 
 const DrilldownContext = React.createContext<Drilldown>(defaultValue);

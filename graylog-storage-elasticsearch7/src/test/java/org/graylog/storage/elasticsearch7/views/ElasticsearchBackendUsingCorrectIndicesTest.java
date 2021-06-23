@@ -26,7 +26,6 @@ import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
-import org.graylog.plugins.views.search.elasticsearch.QueryStringParser;
 import org.graylog.plugins.views.search.filter.AndFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
@@ -68,7 +67,6 @@ public class ElasticsearchBackendUsingCorrectIndicesTest {
     private static Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> handlers = ImmutableMap.of(
             MessageList.NAME, () -> new ESMessageList(new QueryStringDecorators.Fake())
     );
-    private static final QueryStringParser queryStringParser = new QueryStringParser();
 
     @Rule
     public MockitoRule rule = MockitoJUnit.rule();
@@ -96,7 +94,6 @@ public class ElasticsearchBackendUsingCorrectIndicesTest {
 
         final FieldTypesLookup fieldTypesLookup = mock(FieldTypesLookup.class);
         this.backend = new ElasticsearchBackend(handlers,
-                queryStringParser,
                 client,
                 indexLookup,
                 new QueryStringDecorators.Fake(),

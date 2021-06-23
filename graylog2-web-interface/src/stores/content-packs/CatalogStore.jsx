@@ -17,7 +17,7 @@
 import Reflux from 'reflux';
 import lodash from 'lodash';
 
-import URLUtils from 'util/URLUtils';
+import * as URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import ActionsProvider from 'injection/ActionsProvider';

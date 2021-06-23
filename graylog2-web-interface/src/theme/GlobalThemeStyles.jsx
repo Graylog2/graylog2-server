@@ -29,9 +29,11 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     background-color: ${theme.colors.global.background};
     color: ${theme.colors.global.textDefault};
     font-family: ${theme.fonts.family.body};
-    overflow-x: hidden;
-    margin-top: 50px;
-    min-height: calc(100vh - 50px);
+    height: 100vh;
+  }
+
+  #app-root {
+    height: 100%;
   }
 
   ul {
@@ -88,7 +90,8 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     color: ${theme.colors.global.link};
   }
 
-  a:hover {
+  a:hover,
+  a:focus {
     color: ${theme.colors.global.linkHover};
   }
 
@@ -169,21 +172,12 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     margin-top: 10px;
   }
 
-  .row {
-    margin-bottom: 15px;
-  }
-
   .no-bm {
     margin-bottom: 0;
   }
 
   .has-bm {
     margin-bottom: 10px;
-  }
-
-  .alert {
-    margin-bottom: 0;
-    margin-top: 5px;
   }
 
   .modal form {

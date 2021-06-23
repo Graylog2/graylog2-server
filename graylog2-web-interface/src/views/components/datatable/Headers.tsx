@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import { flatten, get, isEqual, last } from 'lodash';
+import styled, { css } from 'styled-components';
 
 import Field from 'views/components/Field';
 import FieldType from 'views/logic/fieldtypes/FieldType';
@@ -27,11 +28,19 @@ import fieldTypeFor from 'views/logic/fieldtypes/FieldTypeFor';
 
 import styles from './DataTable.css';
 
-const _headerField = (activeQuery: string, fields, field: string, prefix: (string | number) = '', span: number = 1, title: string = field) => (
-  <th key={`${prefix}${field}`} colSpan={span} className={styles.leftAligned}>
-    <Field name={field} queryId={activeQuery} type={fieldTypeFor(field, fields)}>{title}</Field>
-  </th>
-);
+const StyledTh = styled.th(({ isNumeric }: { isNumeric: boolean }) => css`
+  ${isNumeric ? 'text-align: right' : ''}
+`);
+
+const _headerField = (activeQuery: string, fields, field: string, prefix: (string | number) = '', span: number = 1, title: string = field) => {
+  const type = fieldTypeFor(field, fields);
+
+  return (
+    <StyledTh isNumeric={type.isNumeric()} key={`${prefix}${field}`} colSpan={span} className={styles.leftAligned}>
+      <Field name={field} queryId={activeQuery} type={type}>{title}</Field>
+    </StyledTh>
+  );
+};
 
 const _headerFieldForValue = (activeQuery: string, field, value, span = 1, prefix = '') => (
   <th key={`${prefix}${field}-${value}`} colSpan={span} className={styles.leftAligned}>
@@ -39,6 +48,7 @@ const _headerFieldForValue = (activeQuery: string, field, value, span = 1, prefi
   </th>
 );
 
+// eslint-disable-next-line jsx-a11y/control-has-associated-label
 const _spacer = (idx, span = 1) => <th colSpan={span} key={`spacer-${idx}`} className={styles.leftAligned} />;
 
 const columnPivotFieldsHeaders = (activeQuery: string, columnPivots: string[], actualColumnPivotValues: any[], series: Series[], offset = 1) => {

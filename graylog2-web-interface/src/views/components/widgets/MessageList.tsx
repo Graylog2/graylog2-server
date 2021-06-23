@@ -30,6 +30,7 @@ import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import type { TimeRange } from 'views/logic/queries/Query';
 import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import type { ViewStoreState } from 'views/stores/ViewStore';
+import type { SearchTypeOptions } from 'views/logic/search/GlobalOverride';
 import { PaginatedList } from 'components/common';
 import MessageTable from 'views/components/widgets/MessageTable';
 import ErrorWidget from 'views/components/widgets/ErrorWidget';
@@ -41,21 +42,10 @@ import RenderCompletionCallback from './RenderCompletionCallback';
 const { InputsActions } = CombinedProvider.get('Inputs');
 
 const Wrapper = styled.div`
-  display: grid;
-  display: -ms-grid;
-  -ms-grid-row: 2;
-  -ms-grid-column: 1;
-  grid-template-rows: 1fr auto;
-  -ms-grid-rows: 1fr auto;
-  -ms-grid-columns: 1fr;
+  display: flex;
+  flex-direction: column;
   height: 100%;
-
-  .pagination-wrapper {
-    grid-row: 2;
-    -ms-grid-row: 2;
-    grid-column: 1;
-    -ms-grid-column: 1;
-  }
+  overflow: hidden;
 
   .pagination {
     margin-bottom: 0;
@@ -117,7 +107,15 @@ class MessageList extends React.Component<Props, State> {
     // execute search with new offset
     const { pageSize, searchTypes, data: { id: searchTypeId }, setLoadingState } = this.props;
     const { effectiveTimerange } = searchTypes[searchTypeId];
-    const searchTypePayload = { [searchTypeId]: { limit: pageSize, offset: pageSize * (pageNo - 1) } };
+    const searchTypePayload: SearchTypeOptions<{
+      limit: number,
+      offset: number,
+    }> = {
+      [searchTypeId]: {
+        limit: pageSize,
+        offset: pageSize * (pageNo - 1),
+      },
+    };
 
     RefreshActions.disable();
     setLoadingState(true);

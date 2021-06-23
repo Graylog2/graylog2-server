@@ -29,7 +29,7 @@ const PageErrorOverview = ({ errors }) => {
   const description = <p>We had trouble fetching some data required to build this page, so here is a picture instead.</p>;
 
   return (
-    <ErrorPage title="Error getting data" description={description}>
+    <ErrorPage title="Error getting data" description={description} displayPageLayout={false}>
       <ul>
         {formattedErrors}
         <li>Check your Graylog logs for more information.</li>

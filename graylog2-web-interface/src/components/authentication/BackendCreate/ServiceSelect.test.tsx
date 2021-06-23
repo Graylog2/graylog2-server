@@ -27,7 +27,7 @@ import ServiceSelect from './ServiceSelect';
 jest.mock('util/History');
 
 describe('ServiceSelect', () => {
-  it('should redirect correctly after selecting LDAP ', async () => {
+  it('should redirect correctly after selecting LDAP', async () => {
     const { getByLabelText, getByRole } = render(<ServiceSelect />);
 
     const serviceSelect = getByLabelText('Select a service');
@@ -41,7 +41,7 @@ describe('ServiceSelect', () => {
     await waitFor(() => expect(history.push).toHaveBeenCalledWith(Routes.SYSTEM.AUTHENTICATION.BACKENDS.createBackend('ldap')));
   });
 
-  it('should redirect correctly after selecting active directory ', async () => {
+  it('should redirect correctly after selecting active directory', async () => {
     const { getByLabelText, getByRole } = render(<ServiceSelect />);
 
     const serviceSelect = getByLabelText('Select a service');

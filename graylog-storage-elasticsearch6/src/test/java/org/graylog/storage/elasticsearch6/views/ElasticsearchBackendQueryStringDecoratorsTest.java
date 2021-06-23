@@ -28,7 +28,6 @@ import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
-import org.graylog.plugins.views.search.elasticsearch.QueryStringParser;
 import org.graylog.plugins.views.search.engine.QueryStringDecorator;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
@@ -56,7 +55,6 @@ class ElasticsearchBackendQueryStringDecoratorsTest {
         final FieldTypesLookup fieldTypesLookup = mock(FieldTypesLookup.class);
         this.backend = new ElasticsearchBackend(
                 Collections.emptyMap(),
-                new QueryStringParser(),
                 mock(JestClient.class),
                 mock(IndexLookup.class),
                 new QueryStringDecorators(decorators),

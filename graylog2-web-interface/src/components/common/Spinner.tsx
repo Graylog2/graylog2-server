@@ -16,12 +16,17 @@
  */
 import * as React from 'react';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
 
 import Icon from './Icon';
 import Delayed from './Delayed';
 
+const StyledIcon = styled(Icon)`
+  margin-right: 6px;
+`;
+
 type Props = {
-  delay: number,
+  delay?: number,
   name?: string,
   text?: string,
 };
@@ -31,7 +36,7 @@ type Props = {
  */
 const Spinner = ({ name, text, delay, ...rest }: Props) => (
   <Delayed delay={delay}>
-    <Icon {...rest} name={name} spin /> {text}
+    <StyledIcon {...rest} name={name} spin />{text}
   </Delayed>
 );
 

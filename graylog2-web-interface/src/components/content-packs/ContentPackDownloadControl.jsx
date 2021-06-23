@@ -16,13 +16,13 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
-import URI from 'urijs';
+import { qualifyUrlWithSessionCredentials } from 'util/URLUtils';
 
 import ApiRoutes from 'routing/ApiRoutes';
 import { Modal, Button } from 'components/graylog';
 import { Icon } from 'components/common';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
-import URLUtils from 'util/URLUtils';
+import * as URLUtils from 'util/URLUtils';
 import StoreProvider from 'injection/StoreProvider';
 
 const SessionStore = StoreProvider.getStore('Session');
@@ -42,17 +42,7 @@ class ContentPackDownloadControl extends React.Component {
   _getDownloadUrl() {
     const { contentPackId, revision } = this.props;
 
-    const url = new URI(URLUtils.qualifyUrl(
-      ApiRoutes.ContentPacksController.downloadRev(contentPackId, revision).url,
-    ));
-
-    if (URLUtils.areCredentialsInURLSupported()) {
-      url
-        .username(SessionStore.getSessionId())
-        .password('session');
-    }
-
-    return url.toString();
+    return qualifyUrlWithSessionCredentials(ApiRoutes.ContentPacksController.downloadRev(contentPackId, revision).url, SessionStore.getSessionId());
   }
 
   _closeModal() {

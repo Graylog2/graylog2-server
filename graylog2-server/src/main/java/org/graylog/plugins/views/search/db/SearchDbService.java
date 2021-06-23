@@ -21,9 +21,11 @@ import com.mongodb.BasicDBObject;
 import org.bson.types.ObjectId;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchRequirements;
+import org.graylog.plugins.views.search.SearchSummary;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedList;
+import org.joda.time.Instant;
 import org.mongojack.DBCursor;
 import org.mongojack.DBQuery;
 import org.mongojack.DBSort;
@@ -47,6 +49,7 @@ import java.util.stream.Stream;
  */
 public class SearchDbService {
     protected final JacksonDBCollection<Search, ObjectId> db;
+    protected final JacksonDBCollection<SearchSummary, ObjectId> summarydb;
     private final SearchRequirements.Factory searchRequirementsFactory;
 
     @Inject
@@ -59,6 +62,10 @@ public class SearchDbService {
                 ObjectId.class,
                 mapper.get());
         db.createIndex(new BasicDBObject("created_at", 1), new BasicDBObject("unique", false));
+        summarydb = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection("searches"),
+                SearchSummary.class,
+                ObjectId.class,
+                mapper.get());
     }
 
     public Optional<Search> get(String id) {
@@ -116,5 +123,16 @@ public class SearchDbService {
     private Search requirementsForSearch(Search search) {
         return searchRequirementsFactory.create(search)
                 .rebuildRequirements(Search::requires, (s, newRequirements) -> s.toBuilder().requires(newRequirements).build());
+    }
+
+    Stream<SearchSummary> findSummaries() {
+        return Streams.stream((Iterable<SearchSummary>) summarydb.find());
+    }
+
+    public Set<String> getExpiredSearches(final Set<String> neverDeleteIds, final Instant mustNotBeOlderThan) {
+        return this.findSummaries()
+                .filter(search -> !neverDeleteIds.contains(search.id()) && search.createdAt().isBefore(mustNotBeOlderThan))
+                .map(search -> search.id())
+                .collect(Collectors.toSet());
     }
 }

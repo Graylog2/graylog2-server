@@ -29,7 +29,7 @@ import org.graylog2.plugin.ThrottleState;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.shared.buffers.ProcessBuffer;
 import org.graylog2.shared.journal.Journal;
-import org.graylog2.shared.journal.KafkaJournal;
+import org.graylog2.shared.journal.LocalKafkaJournal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +53,7 @@ import static org.graylog2.shared.metrics.MetricUtils.safelyRegister;
  */
 public class ThrottleStateUpdaterThread extends Periodical {
     private static final Logger log = LoggerFactory.getLogger(ThrottleStateUpdaterThread.class);
-    private final KafkaJournal journal;
+    private final LocalKafkaJournal journal;
     private final ProcessBuffer processBuffer;
     private final EventBus eventBus;
     private final Size retentionSize;
@@ -80,18 +80,18 @@ public class ThrottleStateUpdaterThread extends Periodical {
         this.notificationService = notificationService;
         this.serverStatus = serverStatus;
         // leave this.journal null, we'll say "don't start" in that case, see startOnThisNode() below.
-        if (journal instanceof KafkaJournal) {
-            this.journal = (KafkaJournal) journal;
+        if (journal instanceof LocalKafkaJournal) {
+            this.journal = (LocalKafkaJournal) journal;
         } else {
             this.journal = null;
         }
         throttleState = new ThrottleState();
 
         safelyRegister(metricRegistry,
-                       GlobalMetricNames.JOURNAL_APPEND_RATE,
-                       new Gauge<Long>() {
-                           @Override
-                           public Long getValue() {
+                GlobalMetricNames.JOURNAL_APPEND_RATE,
+                new Gauge<Long>() {
+                    @Override
+                    public Long getValue() {
                                return throttleState.appendEventsPerSec;
                            }
                        });
@@ -221,7 +221,7 @@ public class ThrottleStateUpdaterThread extends Periodical {
 
         throttleState.processBufferCapacity = processBuffer.getRemainingCapacity();
 
-        if (committedOffset == KafkaJournal.DEFAULT_COMMITTED_OFFSET) {
+        if (committedOffset == LocalKafkaJournal.DEFAULT_COMMITTED_OFFSET) {
             // nothing committed at all, the entire log is uncommitted, or completely empty.
             throttleState.uncommittedJournalEntries = journal.size() == 0 ? 0 : logEndOffset - logStartOffset;
         } else {
@@ -231,14 +231,14 @@ public class ThrottleStateUpdaterThread extends Periodical {
 
         // the journal needs this to provide information to rest clients
         journal.setThrottleState(throttleState);
-        
+
         // publish to interested parties
         eventBus.post(throttleState);
 
         // Abusing the current thread to send notifications from KafkaJournal in the graylog2-shared module
         final double journalUtilizationPercentage = throttleState.journalSizeLimit > 0 ? (throttleState.journalSize * 100) / throttleState.journalSizeLimit : 0.0;
 
-        if (journalUtilizationPercentage > KafkaJournal.NOTIFY_ON_UTILIZATION_PERCENTAGE) {
+        if (journalUtilizationPercentage > LocalKafkaJournal.NOTIFY_ON_UTILIZATION_PERCENTAGE) {
             Notification notification = notificationService.buildNow()
                     .addNode(serverStatus.getNodeId().toString())
                     .addType(Notification.Type.JOURNAL_UTILIZATION_TOO_HIGH)

@@ -15,50 +15,103 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { ThemeProvider, DefaultTheme } from 'styled-components';
 
-import { breakpoints, colors, fonts, utils } from 'theme';
 import buttonStyles from 'components/graylog/styles/buttonStyles';
 import aceEditorStyles from 'components/graylog/styles/aceEditorStyles';
+import usePluginEntities from 'views/logic/usePluginEntities';
 
+import { breakpoints, colors, fonts, utils, spacings } from './index';
+import RegeneratableThemeContext from './RegeneratableThemeContext';
+import { Colors } from './colors';
+import { THEME_MODES, ThemeMode } from './constants';
 import useCurrentThemeMode from './UseCurrentThemeMode';
 
-const GraylogThemeProvider = ({ children }) => {
-  const [mode, changeMode] = useCurrentThemeMode();
-  const themeColors = colors[mode];
+interface generateCustomThemeColorsType {
+  graylogColors: Colors,
+  mode: ThemeMode,
+  initialLoad: boolean,
+}
 
-  const theme = useCallback((): DefaultTheme => {
-    const formattedUtils = {
-      ...utils,
-      colorLevel: utils.colorLevel(themeColors),
-      readableColor: utils.readableColor(themeColors),
-    };
+interface generateThemeType {
+  changeMode: (ThemeMode) => void,
+  mode: ThemeMode,
+  initialLoad?: boolean,
+  generateCustomThemeColors: ({ graylogColors, mode, initialLoad }: generateCustomThemeColorsType) => Promise<Colors> | undefined,
+}
 
-    return {
+function buildTheme(currentThemeColors, changeMode, mode): DefaultTheme {
+  const formattedUtils = {
+    ...utils,
+    colorLevel: utils.colorLevel(currentThemeColors),
+    readableColor: utils.readableColor(currentThemeColors),
+  };
+
+  return {
+    mode,
+    changeMode,
+    breakpoints,
+    colors: currentThemeColors,
+    fonts,
+    spacings,
+    components: {
+      button: buttonStyles({ colors: currentThemeColors, utils: formattedUtils }),
+      aceEditor: aceEditorStyles({ colors: currentThemeColors }),
+    },
+    utils: formattedUtils,
+  };
+}
+
+const _generateTheme = ({ changeMode, mode, generateCustomThemeColors, initialLoad = false }: generateThemeType) => {
+  if (generateCustomThemeColors) {
+    return generateCustomThemeColors({
+      graylogColors: colors[mode],
       mode,
-      changeMode,
-      breakpoints,
-      colors: themeColors,
-      fonts,
-      components: {
-        button: buttonStyles({ colors: themeColors, utils: formattedUtils }),
-        aceEditor: aceEditorStyles({ colors: themeColors }),
-      },
-      utils: formattedUtils,
-    };
-  }, [mode, themeColors, changeMode]);
+      initialLoad,
+    }).then((currentThemeColors) => {
+      return buildTheme(currentThemeColors, changeMode, mode);
+    });
+  }
 
-  return (
-    <ThemeProvider theme={theme}>
-      {children}
-    </ThemeProvider>
-  );
+  return Promise.resolve(colors[mode]).then((currentThemeColors) => {
+    return buildTheme(currentThemeColors, changeMode, mode);
+  });
+};
+
+const GraylogThemeProvider = ({ children, initialThemeModeOverride }) => {
+  const [mode, changeMode] = useCurrentThemeMode(initialThemeModeOverride);
+
+  const themeCustomizer = usePluginEntities('customization.theme.customizer');
+  const generateCustomThemeColors = themeCustomizer?.[0]?.actions?.generateCustomThemeColors;
+
+  const [theme, setTheme] = useState<DefaultTheme>();
+
+  useEffect(() => {
+    _generateTheme({ changeMode, mode, generateCustomThemeColors, initialLoad: true }).then(setTheme);
+  }, [changeMode, generateCustomThemeColors, mode, setTheme]);
+
+  const regenerateTheme = () => {
+    _generateTheme({ changeMode, mode, generateCustomThemeColors, initialLoad: false }).then(setTheme);
+  };
+
+  return theme ? (
+    <RegeneratableThemeContext.Provider value={{ regenerateTheme }}>
+      <ThemeProvider theme={theme}>
+        {children}
+      </ThemeProvider>
+    </RegeneratableThemeContext.Provider>
+  ) : null;
 };
 
 GraylogThemeProvider.propTypes = {
-  children: PropTypes.any.isRequired,
+  children: PropTypes.node.isRequired,
+  initialThemeModeOverride: PropTypes.oneOf(THEME_MODES),
+};
+
+GraylogThemeProvider.defaultProps = {
+  initialThemeModeOverride: undefined,
 };
 
 export default GraylogThemeProvider;

@@ -16,8 +16,27 @@
  */
 import React, { forwardRef } from 'react';
 import styled, { css } from 'styled-components';
+import PropTypes from 'prop-types';
 // eslint-disable-next-line no-restricted-imports
 import { ListGroupItem as BootstrapListGroupItem } from 'react-bootstrap';
+
+const RefContainer = styled.div(({ theme }) => `
+  display: inline-block;
+  width: 100%;
+  border: 1px solid ${theme.colors.variant.lighter.default};
+  margin-bottom: -1px;
+
+  &:first-child {
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+  }
+
+  &:last-child {
+    margin-bottom: 0;
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+  }
+`);
 
 const variantStyles = css(({ bsStyle, theme }) => {
   if (!bsStyle) {
@@ -61,25 +80,29 @@ const variantStyles = css(({ bsStyle, theme }) => {
 
 const StyledListGroupItem = styled(BootstrapListGroupItem)(({ theme }) => css`
   background-color: ${theme.colors.global.contentBackground};
-  border-color: ${theme.colors.variant.lighter.default};
+  border: 0;
+
+  padding: 10px 10px 5px 10px;
 
   .list-group-item-heading {
-    font-weight: bold;
+    font-size: ${theme.fonts.size.h5};
+  }
+
+  .list-group-item-text {
+    margin-bottom: 5px;
   }
 
   a&,
   button& {
-    color: ${theme.colors.global.link};
+    color: ${theme.colors.global.textDefault};
 
     .list-group-item-heading {
       color: ${theme.colors.variant.darkest.default};
-      font-weight: bold;
     }
 
     &:hover:not(.disabled),
     &:focus:not(.disabled) {
       background-color: ${theme.colors.variant.lightest.default};
-      color: ${theme.colors.global.linkHover};
 
       &.active {
         color: ${theme.colors.variant.darkest.default};
@@ -101,7 +124,6 @@ const StyledListGroupItem = styled(BootstrapListGroupItem)(({ theme }) => css`
 
     .list-group-item-heading {
       color: inherit;
-      font-weight: bold;
     }
 
     .list-group-item-text {
@@ -121,7 +143,6 @@ const StyledListGroupItem = styled(BootstrapListGroupItem)(({ theme }) => css`
     .list-group-item-heading > small,
     .list-group-item-heading > .small {
       color: inherit;
-      font-weight: bold;
     }
 
     .list-group-item-text {
@@ -132,8 +153,18 @@ const StyledListGroupItem = styled(BootstrapListGroupItem)(({ theme }) => css`
   ${variantStyles}
 `);
 
-const ListGroupItem = forwardRef((props, ref) => {
-  return <StyledListGroupItem {...props} ref={ref} />;
-});
+const ListGroupItem = forwardRef(({ containerProps, ...rest }, ref) => (
+  <RefContainer ref={ref} {...containerProps}>
+    <StyledListGroupItem {...rest} />
+  </RefContainer>
+));
+
+ListGroupItem.propTypes = {
+  containerProps: PropTypes.object,
+};
+
+ListGroupItem.defaultProps = {
+  containerProps: {},
+};
 
 export default ListGroupItem;

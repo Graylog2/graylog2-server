@@ -48,17 +48,20 @@ public class ViewService extends PaginatedDbService<ViewDTO> {
     private final ClusterConfigService clusterConfigService;
     private final ViewRequirements.Factory viewRequirementsFactory;
     private final EntityOwnershipService entityOwnerShipService;
+    private final ViewSummaryService viewSummaryService;
 
     @Inject
     protected ViewService(MongoConnection mongoConnection,
                           MongoJackObjectMapperProvider mapper,
                           ClusterConfigService clusterConfigService,
                           ViewRequirements.Factory viewRequirementsFactory,
-                          EntityOwnershipService entityOwnerShipService) {
+                          EntityOwnershipService entityOwnerShipService,
+                          ViewSummaryService viewSummaryService) {
         super(mongoConnection, mapper, ViewDTO.class, COLLECTION_NAME);
         this.clusterConfigService = clusterConfigService;
         this.viewRequirementsFactory = viewRequirementsFactory;
         this.entityOwnerShipService = entityOwnerShipService;
+        this.viewSummaryService = viewSummaryService;
     }
 
     private PaginatedList<ViewDTO> searchPaginated(DBQuery.Query query,
@@ -103,6 +106,16 @@ public class ViewService extends PaginatedDbService<ViewDTO> {
                 page,
                 perPage
         );
+    }
+
+    public PaginatedList<ViewSummaryDTO> searchSummariesPaginatedByType(final ViewDTO.Type type,
+                                                                        final SearchQuery query,
+                                                                        final Predicate<ViewSummaryDTO> filter,
+                                                                        final String order,
+                                                                        final String sortField,
+                                                                        final int page,
+                                                                        final int perPage) {
+        return viewSummaryService.searchPaginatedByType(type, query, filter, order, sortField, page, perPage);
     }
 
     public void saveDefault(ViewDTO dto) {

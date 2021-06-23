@@ -43,4 +43,9 @@ public class IndexMapping7 extends IndexMapping {
                 "mappings", mappings
         );
     }
+
+    @Override
+    protected String dateFormat() {
+        return ConstantsES7.ES_DATE_FORMAT;
+    }
 }

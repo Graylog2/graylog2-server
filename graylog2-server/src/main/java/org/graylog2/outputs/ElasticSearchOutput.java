@@ -19,8 +19,6 @@ package org.graylog2.outputs;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
-import com.google.inject.assistedinject.Assisted;
-import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.plugin.Message;
@@ -29,6 +27,7 @@ import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.journal.Journal;
+import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +36,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
@@ -57,22 +55,16 @@ public class ElasticSearchOutput implements MessageOutput {
     private final Messages messages;
     private final Journal journal;
     private final AtomicBoolean isRunning = new AtomicBoolean(false);
-
-    @AssistedInject
-    public ElasticSearchOutput(MetricRegistry metricRegistry,
-                               Messages messages,
-                               Journal journal,
-                               @Assisted Stream stream,
-                               @Assisted Configuration configuration) {
-        this(metricRegistry, messages, journal);
-    }
+    private final MessageQueueAcknowledger acknowledger;
 
     @Inject
     public ElasticSearchOutput(MetricRegistry metricRegistry,
                                Messages messages,
-                               Journal journal) {
+                               Journal journal,
+                               MessageQueueAcknowledger acknowledger) {
         this.messages = messages;
         this.journal = journal;
+        this.acknowledger = acknowledger;
         // Only constructing metrics here. write() get's another Core reference. (because this technically is a plugin)
         this.writes = metricRegistry.meter(WRITES_METRICNAME);
         this.failures = metricRegistry.meter(FAILURES_METRICNAME);
@@ -113,12 +105,7 @@ public class ElasticSearchOutput implements MessageOutput {
         failures.mark(failedMessageIds.size());
 
         // This does not exclude failedMessageIds, because we don't know if ES is ever gonna accept these messages.
-        final Optional<Long> offset = messageList.stream()
-            .map(Map.Entry::getValue)
-            .map(Message::getJournalOffset)
-            .max(Long::compare);
-
-        offset.ifPresent(journal::markJournalOffsetCommitted);
+        acknowledger.acknowledge(messageList.stream().map(Map.Entry::getValue).collect(Collectors.toList()));
     }
 
     @Override

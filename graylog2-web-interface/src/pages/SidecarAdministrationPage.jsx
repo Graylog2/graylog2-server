@@ -36,7 +36,7 @@ const SidecarAdministrationPage = ({ location: { query: { node_id: nodeId } } })
 
         <span>
           Read more about collectors and how to set them up in the
-          {' '}<DocumentationLink page={DocsHelper.PAGES.COLLECTOR} text="Graylog documentation" />.
+          {' '}<DocumentationLink page={DocsHelper.PAGES.COLLECTOR_SIDECAR} text="Graylog documentation" />.
         </span>
 
         <ButtonToolbar>

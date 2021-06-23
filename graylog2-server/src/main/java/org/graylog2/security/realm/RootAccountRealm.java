@@ -23,6 +23,7 @@ import org.apache.shiro.authc.SimpleAccount;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.authz.Permission;
 import org.apache.shiro.authz.permission.AllPermission;
+import org.apache.shiro.authz.permission.WildcardPermissionResolver;
 import org.apache.shiro.realm.SimpleAccountRealm;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.util.CollectionUtils;
@@ -43,6 +44,8 @@ public class RootAccountRealm extends SimpleAccountRealm {
         setCachingEnabled(false);
         setCredentialsMatcher(new HashedCredentialsMatcher("SHA-256"));
         setName("root-account-realm");
+        // Use case sensitive permission resolver
+        setPermissionResolver(new WildcardPermissionResolver(true));
 
         addRootAccount(rootUsername, rootPasswordSha2);
     }

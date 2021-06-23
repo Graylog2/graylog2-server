@@ -39,7 +39,7 @@ jest.mock('views/stores/GlobalOverrideStore', () => ({
 }));
 
 describe('DrilldownContextProvider', () => {
-  // eslint-disable-next-line no-unused-vars
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const Consumer = ({ streams, timerange, query }) => null;
 
   const TestComponent = () => {
@@ -102,7 +102,7 @@ describe('DrilldownContextProvider', () => {
       const wrapper = renderSUT(View.Type.Search);
 
       expectDrilldown([],
-        { type: 'relative', range: 300 },
+        { type: 'relative', from: 300 },
         { type: 'elasticsearch', query_string: '' },
         wrapper);
     });

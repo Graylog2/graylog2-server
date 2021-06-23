@@ -15,11 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { asElement, render, fireEvent, waitFor } from 'wrappedTestingLibrary';
+import { render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
 import MockStore from 'helpers/mocking/StoreMock';
 
 import { WidgetActions } from 'views/stores/WidgetStore';
+import { SearchActions } from 'views/stores/SearchStore';
 import Widget from 'views/logic/widgets/Widget';
 
 import EditWidgetFrame from './EditWidgetFrame';
@@ -33,7 +34,16 @@ jest.mock('views/stores/WidgetStore', () => ({
   },
 }));
 
+jest.mock('views/stores/SearchStore', () => ({
+  SearchActions: {
+    refresh: jest.fn(),
+  },
+}));
+
 jest.mock('views/stores/SearchConfigStore', () => ({
+  SearchConfigActions: {
+    refresh: jest.fn(() => Promise.resolve()),
+  },
   SearchConfigStore: MockStore(['getInitialState', () => ({
     searchesClusterConfig: {
       relative_timerange_options: { P1D: 'Search in last day', PT0S: 'Search in all messages' },
@@ -67,7 +77,7 @@ describe('EditWidgetFrame', () => {
     const renderSUT = () => render((
       <ViewTypeContext.Provider value="DASHBOARD">
         <WidgetContext.Provider value={widget}>
-          <EditWidgetFrame>
+          <EditWidgetFrame onCancel={() => {}} onFinish={() => {}}>
             <>Hello World!</>
             <>These are some buttons!</>
           </EditWidgetFrame>
@@ -75,45 +85,13 @@ describe('EditWidgetFrame', () => {
       </ViewTypeContext.Provider>
     ));
 
-    it('changes the widget\'s timerange when time range input is used', async () => {
-      const { getByDisplayValue, getByText, getByTitle } = renderSUT();
-      const timeRangeSelect = getByDisplayValue('Search in last day');
-
-      expect(timeRangeSelect).not.toBeNull();
-
-      const optionForAllMessages = asElement(getByText('Search in all messages'), HTMLOptionElement);
-
-      fireEvent.change(timeRangeSelect, { target: { value: optionForAllMessages.value } });
-
-      const searchButton = getByTitle(/Perform search/);
+    it('performs search when clicking on search button', async () => {
+      renderSUT();
+      const searchButton = screen.getByTitle(/Perform search/);
 
       fireEvent.click(searchButton);
 
-      await waitFor(() => expect(WidgetActions.update).toHaveBeenCalledWith('deadbeef', expect.objectContaining({
-        timerange: { type: 'relative', range: 0 },
-      })));
-    });
-
-    it('changes the widget\'s timerange type when switching to absolute time range', async () => {
-      const { getByText, getByTitle } = renderSUT();
-      const absoluteTimeRangeSelect = getByText('Absolute');
-
-      expect(absoluteTimeRangeSelect).not.toBeNull();
-
-      fireEvent.click(absoluteTimeRangeSelect);
-
-      const searchButton = getByTitle(/Perform search/);
-
-      fireEvent.click(searchButton);
-
-      await waitFor(() => expect(WidgetActions.update)
-        .toHaveBeenLastCalledWith('deadbeef', expect.objectContaining({
-          timerange: {
-            type: 'absolute',
-            from: '2019-10-10T12:21:31.146Z',
-            to: '2019-10-10T12:26:31.146Z',
-          },
-        })));
+      await waitFor(() => expect(SearchActions.refresh).toHaveBeenCalledTimes(1));
     });
 
     it('changes the widget\'s streams when using stream filter', async () => {

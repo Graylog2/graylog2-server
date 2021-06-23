@@ -51,8 +51,8 @@ export type ElasticsearchQueryString = {
 
 export const createElasticsearchQueryString = (query = ''): ElasticsearchQueryString => ({ type: 'elasticsearch', query_string: query });
 
-const _streamFilters = (selectedStreams: Array<string>): Array<Immutable.Map<string, string>> => {
-  return selectedStreams.map((stream) => Immutable.Map({ type: 'stream', id: stream }));
+const _streamFilters = (selectedStreams: Array<string>) => {
+  return Immutable.List(selectedStreams.map((stream) => Immutable.Map({ type: 'stream', id: stream })));
 };
 
 export const filtersForQuery = (streams: Array<string> | null | undefined): FilterType | null | undefined => {
@@ -88,10 +88,18 @@ export type QueryString = ElasticsearchQueryString;
 
 export type TimeRangeTypes = 'relative' | 'absolute' | 'keyword';
 
-export type RelativeTimeRange = {
+export type RelativeTimeRangeStartOnly = {
   type: 'relative',
   range: number,
-};
+}
+
+export type RelativeTimeRangeWithEnd = {
+  type: 'relative',
+  from: number,
+  to?: number
+}
+
+export type RelativeTimeRange = RelativeTimeRangeStartOnly | RelativeTimeRangeWithEnd
 
 export type AbsoluteTimeRange = {
   type: 'absolute',
@@ -102,9 +110,13 @@ export type AbsoluteTimeRange = {
 export type KeywordTimeRange = {
   type: 'keyword',
   keyword: string,
+  from?: string,
+  to?: string,
 };
 
 export type TimeRange = RelativeTimeRange | AbsoluteTimeRange | KeywordTimeRange;
+
+export type NoTimeRangeOverride = {};
 
 export default class Query {
   private _value: InternalState;
@@ -133,10 +145,10 @@ export default class Query {
     return this._value.searchTypes;
   }
 
-  // eslint-disable-next-line no-use-before-define
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
   toBuilder(): Builder {
     const { id, query, timerange, filter, searchTypes } = this._value;
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     const builder = Query.builder()
       .id(id)
       .query(query)
@@ -178,7 +190,7 @@ export default class Query {
     };
   }
 
-  // eslint-disable-next-line no-use-before-define
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
   static builder(): Builder {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder()

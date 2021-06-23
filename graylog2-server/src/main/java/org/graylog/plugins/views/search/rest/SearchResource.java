@@ -127,7 +127,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
     public Response createSearch(@ApiParam Search search) {
         final String username = username();
         final boolean isAdmin = getCurrentUser() != null && (getCurrentUser().isLocalAdmin() || isPermitted("*"));
-        final Optional<Search> previous = searchDbService.get(search.id());
+        final Optional<Search> previous = Optional.ofNullable(search.id()).flatMap(searchDbService::get);
         if (!isAdmin && !previous.map(existingSearch -> isOwnerOfSearch(existingSearch, username)).orElse(true)) {
             throw new ForbiddenException("Unable to update search with id <" + search.id() + ">, already exists and user is not permitted to overwrite it.");
         }

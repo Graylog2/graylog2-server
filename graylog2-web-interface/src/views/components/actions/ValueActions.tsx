@@ -44,14 +44,14 @@ type Props = {
 
 const ValueActions = ({ children, element, field, menuContainer, queryId, type, value }: Props) => {
   const actionContext = useContext(ActionContext);
-  const { setFocusedWidget } = useContext(WidgetFocusContext);
+  const { unsetWidgetFocusing } = useContext(WidgetFocusContext);
   const [open, setOpen] = useState(false);
   const [overflowingComponents, setOverflowingComponents] = useState({});
 
   const _onMenuToggle = () => setOpen(!open);
   const overflowingComponentsValues: Array<React.ReactNode> = Object.values(overflowingComponents);
   const handlerArgs = { queryId, field, type, value, contexts: actionContext };
-  const valueActions: Array<ActionDefinition> = PluginStore.exports('valueActions')
+  const valueActions = PluginStore.exports('valueActions')
     .filter((action: ActionDefinition) => {
       const { isHidden = () => false } = action;
 
@@ -68,7 +68,7 @@ const ValueActions = ({ children, element, field, menuContainer, queryId, type, 
         const { resetFocus } = action;
 
         if (resetFocus) {
-          setFocusedWidget(undefined);
+          unsetWidgetFocusing();
         }
 
         _onMenuToggle();

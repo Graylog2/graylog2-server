@@ -15,61 +15,81 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
-import { useField } from 'formik';
+import styled from 'styled-components';
 
-import type { SearchesConfig } from 'components/search/SearchConfig';
-import AbsoluteTimeRangeSelector from 'views/components/searchbar/AbsoluteTimeRangeSelector';
-import KeywordTimeRangeSelector from 'views/components/searchbar/KeywordTimeRangeSelector';
-import RelativeTimeRangeSelector from 'views/components/searchbar/RelativeTimeRangeSelector';
-import type { TimeRangeTypes } from 'views/logic/queries/Query';
+import { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 
-import DisabledTimeRangeSelector from './DisabledTimeRangeSelector';
+import TimeRangeDropdownButton from './TimeRangeDropdownButton';
+import TimeRangeDropdown, { TimeRangeType } from './date-time-picker/TimeRangeDropdown';
+import TimeRangeDisplay from './TimeRangeDisplay';
 
 type Props = {
-  disabled: boolean,
-  config: SearchesConfig,
+  className?: string,
+  disabled?: boolean,
+  hasErrorOnMount?: boolean,
+  noOverride?: boolean,
+  onChange: (nextTimeRange: TimeRange | NoTimeRangeOverride) => void,
+  position?: 'bottom'|'right',
+  showPresetDropdown?: boolean,
+  validTypes?: Array<TimeRangeType>,
+  value: TimeRange | NoTimeRangeOverride,
 };
 
-const timerangeStrategies = {
-  absolute: {
-    component: AbsoluteTimeRangeSelector,
-  },
-  relative: {
-    component: RelativeTimeRangeSelector,
-  },
-  keyword: {
-    component: KeywordTimeRangeSelector,
-  },
-};
+const FlexContainer = styled.span`
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+`;
 
-type TimeRangeInputProps = {
-  disabled: boolean;
-  config: SearchesConfig;
-};
+const TimeRangeInput = ({ disabled, hasErrorOnMount, noOverride, value = {}, onChange, validTypes, position, className, showPresetDropdown = true }: Props) => {
+  const [show, setShow] = useState(false);
 
-const timerangeStrategy = (type: TimeRangeTypes | undefined | null): { component: React.ComponentType<Partial<TimeRangeInputProps>> } => {
-  if (!type) {
-    return { component: DisabledTimeRangeSelector };
+  if (validTypes && value && 'type' in value && !validTypes.includes(value?.type)) {
+    throw new Error(`Value is of type ${value.type}, but only these types are valid: ${validTypes}`);
   }
 
-  return timerangeStrategies[type] || { component: DisabledTimeRangeSelector };
+  const toggleShow = () => setShow(!show);
+  const hideTimeRangeDropDown = () => show && toggleShow();
+
+  return (
+    <FlexContainer className={className}>
+      <TimeRangeDropdownButton disabled={disabled}
+                               show={show}
+                               toggleShow={toggleShow}
+                               onPresetSelectOpen={hideTimeRangeDropDown}
+                               setCurrentTimeRange={onChange}
+                               showPresetDropdown={showPresetDropdown}
+                               hasErrorOnMount={hasErrorOnMount}>
+        <TimeRangeDropdown currentTimeRange={value}
+                           noOverride={noOverride}
+                           setCurrentTimeRange={onChange}
+                           toggleDropdownShow={toggleShow}
+                           validTypes={validTypes}
+                           position={position} />
+      </TimeRangeDropdownButton>
+      <TimeRangeDisplay timerange={value} toggleDropdownShow={toggleShow} />
+    </FlexContainer>
+  );
 };
 
-export default function TimeRangeInput({ disabled, config }: Props) {
-  const [{ value }] = useField('timerange.type');
-  const { component: Component } = timerangeStrategy(value);
-
-  return <Component disabled={disabled} config={config} />;
-}
-
 TimeRangeInput.propTypes = {
-  config: PropTypes.shape({
-    relative_timerange_options: PropTypes.objectOf(PropTypes.string).isRequired,
-  }).isRequired,
+  className: PropTypes.string,
   disabled: PropTypes.bool,
+  hasErrorOnMount: PropTypes.bool,
+  noOverride: PropTypes.bool,
+  validTypes: PropTypes.arrayOf(PropTypes.string),
 };
 
 TimeRangeInput.defaultProps = {
+  className: undefined,
   disabled: false,
+  hasErrorOnMount: false,
+  noOverride: false,
+  validTypes: undefined,
+  position: 'bottom',
+  showPresetDropdown: true,
 };
+
+export default TimeRangeInput;

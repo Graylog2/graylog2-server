@@ -22,7 +22,7 @@ import styled from 'styled-components';
 import { Button, Panel, ControlLabel, FormGroup, HelpBlock } from 'components/graylog';
 import { BootstrapModalForm, Input } from 'components/bootstrap';
 import { Select } from 'components/common';
-import FormsUtils from 'util/FormsUtils';
+import * as FormsUtils from 'util/FormsUtils';
 import { naturalSortIgnoreCase } from 'util/SortUtils';
 
 const StyledPanel = styled(Panel)`

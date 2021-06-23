@@ -43,7 +43,7 @@ type WidgetActionsType = RefluxActions<{
   updateWidgets: (widgets: Immutable.Map<string, Widget>) => Promise<Widgets>,
 }>;
 
-type WidgetStoreState = Immutable.Map<string, Widget>;
+export type WidgetStoreState = Immutable.Map<string, Widget>;
 
 export const WidgetActions: WidgetActionsType = singletonActions(
   'views.Widget',

@@ -14,8 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import each from 'jest-each';
-
 import inferTypeForSeries from './InferTypeForSeries';
 import FieldTypeMapping from './FieldTypeMapping';
 import FieldType, { FieldTypes } from './FieldType';
@@ -23,21 +21,22 @@ import FieldType, { FieldTypes } from './FieldType';
 import Series from '../aggregationbuilder/Series';
 
 describe('InferTypeForSeries', () => {
-  each`
-    func              | expectedType
-    ${'card'}         | ${FieldTypes.LONG()}
-    ${'count'}        | ${FieldTypes.LONG()}
-    ${'stddev'}       | ${FieldTypes.FLOAT()}
-    ${'sum'}          | ${FieldTypes.FLOAT()}
-    ${'sumofsquares'} | ${FieldTypes.FLOAT()}
-  `.test('returns expected type for constant type function "$func(field)"', ({ func, expectedType }) => {
-    const functionName = `${func}(foo)`;
+  it.each`
+    func              | expectedType          | field
+    ${'card'}         | ${FieldTypes.LONG()}  | ${'foo'}
+    ${'count'}        | ${FieldTypes.LONG()}  | ${'foo'} 
+    ${'stddev'}       | ${FieldTypes.FLOAT()} | ${'foo'} 
+    ${'sum'}          | ${FieldTypes.FLOAT()} | ${'foo'} 
+    ${'sum'}          | ${FieldTypes.FLOAT()} | ${'foo-bar'} 
+    ${'sumofsquares'} | ${FieldTypes.FLOAT()} | ${'foo'} 
+  `('returns expected type for constant type function "$func($field)"', ({ func, expectedType, field }) => {
+    const functionName = `${func}(${field})`;
 
     expect(inferTypeForSeries(Series.forFunction(functionName), []))
       .toEqual(FieldTypeMapping.create(functionName, expectedType));
   });
 
-  each`
+  it.each`
     func     | fieldType
     ${'avg'} | ${FieldTypes.DATE()}
     ${'min'} | ${FieldTypes.DATE()}
@@ -45,7 +44,7 @@ describe('InferTypeForSeries', () => {
     ${'avg'} | ${FieldTypes.LONG()}
     ${'min'} | ${FieldTypes.LONG()}
     ${'max'} | ${FieldTypes.LONG()}
-  `.test('returns type of field for "$func(field)"', ({ func, fieldType }) => {
+  `('returns type of field for "$func(field)"', ({ func, fieldType }) => {
     const fieldName = 'bar';
     const types = [FieldTypeMapping.create(fieldName, fieldType)];
 

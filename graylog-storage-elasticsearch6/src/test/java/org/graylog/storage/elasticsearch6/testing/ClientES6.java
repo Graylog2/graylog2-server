@@ -39,6 +39,7 @@ import io.searchbox.indices.IndicesExists;
 import io.searchbox.indices.Refresh;
 import io.searchbox.indices.aliases.AddAliasMapping;
 import io.searchbox.indices.aliases.ModifyAliases;
+import io.searchbox.indices.aliases.RemoveAliasMapping;
 import io.searchbox.indices.mapping.GetMapping;
 import io.searchbox.indices.template.DeleteTemplate;
 import io.searchbox.indices.template.GetTemplate;
@@ -118,6 +119,14 @@ public class ClientES6 implements Client {
         final ModifyAliases addAliasRequest = new ModifyAliases.Builder(addAliasMapping).build();
 
         executeWithExpectedSuccess(addAliasRequest, "failed to add alias " + alias + " for index " + indexName);
+    }
+
+    @Override
+    public void removeAliasMapping(String indexName, String alias) {
+        final RemoveAliasMapping removeAliasMapping = new RemoveAliasMapping.Builder(indexName, alias).build();
+        final ModifyAliases addAliasRequest = new ModifyAliases.Builder(removeAliasMapping).build();
+
+        executeWithExpectedSuccess(addAliasRequest, "failed to remove alias " + alias + " for index " + indexName);
     }
 
     private JsonNode getMapping(String... indices) {

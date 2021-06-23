@@ -19,7 +19,7 @@ import PropTypes from 'prop-types';
 import styled, { createGlobalStyle, css } from 'styled-components';
 
 import NotFoundBackgroundImage from 'assets/not-found-bg.jpg';
-import AppContentGrid from 'components/layout/AppContentGrid';
+import PageContentLayout from 'components/layout/PageContentLayout';
 import DocumentTitle from 'components/common/DocumentTitle';
 import ErrorJumbotron from 'components/errors/ErrorJumbotron';
 
@@ -49,6 +49,7 @@ const ErrorMessage = styled.div(({ theme }) => css`
 type Props = {
   backgroundImage?: string,
   children?: React.ReactNode,
+  displayPageLayout: boolean,
   description: React.ReactNode,
   title: string,
 };
@@ -57,11 +58,13 @@ const ErrorPageStyles = createGlobalStyle`
     ${generateStyles()}
   `;
 
-const ErrorPage = ({ children, title, description, backgroundImage }: Props) => (
-  <AppContentGrid>
-    <ErrorPageStyles backgroundImage={backgroundImage} />
-    <div className="container-fluid">
-      <DocumentTitle title={title}>
+const ErrorPage = ({ children, title, description, backgroundImage, displayPageLayout }: Props) => {
+  const PageLayoutComponent = displayPageLayout ? PageContentLayout : React.Fragment;
+
+  return (
+    <DocumentTitle title={title}>
+      <PageLayoutComponent>
+        <ErrorPageStyles backgroundImage={backgroundImage} />
         <ErrorJumbotron title={title}>
           {description}
           {children && (
@@ -70,20 +73,22 @@ const ErrorPage = ({ children, title, description, backgroundImage }: Props) => 
           </ErrorMessage>
           )}
         </ErrorJumbotron>
-      </DocumentTitle>
-    </div>
-  </AppContentGrid>
-);
+      </PageLayoutComponent>
+    </DocumentTitle>
+  );
+};
 
 ErrorPage.propTypes = {
   children: PropTypes.node,
   description: PropTypes.node.isRequired,
+  displayPageLayout: PropTypes.bool,
   title: PropTypes.string.isRequired,
   backgroundImage: PropTypes.string,
 };
 
 ErrorPage.defaultProps = {
   children: undefined,
+  displayPageLayout: true,
   backgroundImage: NotFoundBackgroundImage,
 };
 

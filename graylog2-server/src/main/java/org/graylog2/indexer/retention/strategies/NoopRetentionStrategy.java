@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.util.List;
 import java.util.Optional;
 
 public class NoopRetentionStrategy extends AbstractIndexCountBasedRetentionStrategy {
@@ -40,7 +41,7 @@ public class NoopRetentionStrategy extends AbstractIndexCountBasedRetentionStrat
     }
 
     @Override
-    protected void retain(String indexName, IndexSet indexSet) {
+    protected void retain(List<String> indexNames, IndexSet indexSet) {
         LOG.info("Not running any index retention. This is the no-op index rotation strategy.");
     }
 

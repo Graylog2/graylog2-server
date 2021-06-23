@@ -48,6 +48,7 @@ const ApiRoutes = {
     load: (serviceId) => ({ url: `/system/authentication/services/backends/${serviceId}` }),
     loadActive: () => ({ url: '/system/authentication/services/active-backend' }),
     loadUsersPaginated: (authBackendId) => ({ url: `/system/authentication/services/backends/${authBackendId}/users` }),
+    loadActiveBackendType: () => ({ url: '/system/authentication/services/backends/active-backend/type' }),
     servicesPaginated: () => ({ url: '/system/authentication/services/backends' }),
     testConnection: () => ({ url: '/system/authentication/services/test/backend/connection' }),
     testLogin: () => ({ url: '/system/authentication/services/test/backend/login' }),
@@ -373,6 +374,11 @@ const ApiRoutes = {
     single: (index, messageId) => { return { url: `/messages/${index}/${messageId}` }; },
     exportSearch: ((searchId) => { return { url: `/views/search/messages/${searchId}` }; }),
     exportSearchType: ((searchId, searchTypeId) => { return { url: `/views/search/messages/${searchId}/${searchTypeId}` }; }),
+    jobResults: ((exportJobId, filename) => { return { url: `/views/search/messages/job/${exportJobId}/${filename}` }; }),
+  },
+  ExportJobsController: {
+    exportSearch: ((searchId) => { return { url: `/views/export/${searchId}` }; }),
+    exportSearchType: ((searchId, searchTypeId) => { return { url: `/views/export/${searchId}/${searchTypeId}` }; }),
   },
   MapDataController: {
     search: () => { return { url: '/search/mapdata' }; },

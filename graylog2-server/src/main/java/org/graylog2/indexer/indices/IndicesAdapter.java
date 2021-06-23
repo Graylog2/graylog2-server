@@ -90,6 +90,7 @@ public interface IndicesAdapter {
     IndexRangeStats indexRangeStatsOfIndex(String index);
 
     HealthStatus waitForRecovery(String index);
+    HealthStatus waitForRecovery(String index, int timeout);
 
     boolean isOpen(String index);
 

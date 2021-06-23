@@ -31,4 +31,9 @@ public class EventsIndexMapping7 extends EventsIndexMapping {
                         .build())
                 .build();
     }
+
+    @Override
+    protected String dateFormat() {
+        return ConstantsES7.ES_DATE_FORMAT;
+    }
 }

@@ -18,8 +18,8 @@ package org.graylog.security;
 
 import com.google.common.collect.ImmutableSet;
 import org.apache.shiro.authz.Permission;
-import org.apache.shiro.authz.permission.WildcardPermission;
 import org.graylog.grn.GRN;
+import org.graylog.security.permissions.CaseSensitiveWildcardPermission;
 import org.graylog.security.permissions.GRNPermission;
 import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
@@ -86,7 +86,7 @@ public class DefaultPermissionAndRoleResolver implements PermissionAndRoleResolv
                             if (permission.equals(RestPermissions.ENTITY_OWN)) {
                                 permissionsBuilder.add(GRNPermission.create(permission, target));
                             } else {
-                                permissionsBuilder.add(new WildcardPermission(permission + ":" + target.entity()));
+                                permissionsBuilder.add(new CaseSensitiveWildcardPermission(permission + ":" + target.entity()));
                             }
                         }
                     }

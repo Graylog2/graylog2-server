@@ -31,7 +31,7 @@ import {
   MenuItem,
 } from 'components/graylog';
 import { InputWrapper } from 'components/bootstrap';
-import FormsUtils from 'util/FormsUtils';
+import * as FormsUtils from 'util/FormsUtils';
 
 const unitValues = [
   'NANOSECONDS',

@@ -25,16 +25,21 @@ const Wrapper = styled.div`
 
 type Props = {
   children: string,
+  titleOverride?: string,
 };
 
 /**
  * Component that signals text overflow to users by using an ellipsis.
  * The parent component needs a concrete width.
  */
-const TextOverflowEllipsis = ({ children }: Props) => (
-  <Wrapper title={children}>
+const TextOverflowEllipsis = ({ children, titleOverride }: Props) => (
+  <Wrapper title={titleOverride || children}>
     {children}
   </Wrapper>
 );
+
+TextOverflowEllipsis.defaultProps = {
+  titleOverride: undefined,
+};
 
 export default TextOverflowEllipsis;

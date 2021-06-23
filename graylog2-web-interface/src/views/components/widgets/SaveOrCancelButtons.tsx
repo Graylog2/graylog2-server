@@ -15,32 +15,41 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback } from 'react';
-import { useFormikContext } from 'formik';
+import styled from 'styled-components';
+import { useContext } from 'react';
 
-import { Button } from 'components/graylog';
+import WidgetEditApplyAllChangesContext from 'views/components/contexts/WidgetEditApplyAllChangesContext';
+import { Spinner } from 'components/common';
+import { Button, ButtonToolbar } from 'components/graylog';
+
+const StyledButtonToolbar = styled(ButtonToolbar)`
+  margin-top: 6px;
+`;
 
 type Props = {
   onCancel: () => void,
-  onFinish: (...args: any[]) => void,
+  onFinish: () => void,
+  disableSave?: boolean,
 };
 
-const SaveOrCancelButtons = ({ onFinish, onCancel }: Props) => {
-  const { handleSubmit, dirty } = useFormikContext();
-  const _onFinish = useCallback((...args) => {
-    if (handleSubmit && dirty) {
-      handleSubmit();
-    }
-
-    return onFinish(...args);
-  }, [onFinish, handleSubmit, dirty]);
+const SaveOrCancelButtons = ({ onFinish, onCancel, disableSave = false }: Props) => {
+  const { applyAllWidgetChanges, isSubmitting } = useContext(WidgetEditApplyAllChangesContext);
+  const _onFinish = () => applyAllWidgetChanges().then(() => {
+    onFinish();
+  });
 
   return (
-    <>
-      <Button onClick={_onFinish} bsStyle="primary">Save</Button>
+    <StyledButtonToolbar className="pull-right">
+      <Button onClick={_onFinish} bsStyle="primary" disabled={disableSave}>
+        {isSubmitting ? <Spinner text="Applying Changes" delay={0} /> : 'Apply Changes'}
+      </Button>
       <Button onClick={onCancel}>Cancel</Button>
-    </>
+    </StyledButtonToolbar>
   );
+};
+
+SaveOrCancelButtons.defaultProps = {
+  disableSave: false,
 };
 
 export default SaveOrCancelButtons;

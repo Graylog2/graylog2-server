@@ -15,7 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 module.exports = {
-  presets: [['@babel/env', { modules: false }], '@babel/react', '@babel/typescript'],
+  presets: [
+    ['@babel/env', {
+      modules: false,
+      useBuiltIns: 'entry',
+      corejs: '3.9',
+    }],
+    '@babel/react',
+    '@babel/typescript',
+  ],
   plugins: [
     '@babel/plugin-syntax-dynamic-import',
     '@babel/plugin-proposal-class-properties',

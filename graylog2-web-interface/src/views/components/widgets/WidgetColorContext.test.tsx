@@ -62,7 +62,8 @@ describe('WidgetColorContext', () => {
   it('extracts coloring rules for current widget', () => {
     const { colors } = container.props();
 
-    expect(colors).toEqual({ localhost: '#171EFE', 'sum(bytes)': '#affe42' });
+    expect(colors.get('localhost')).toEqual('#171EFE');
+    expect(colors.get('sum(bytes)')).toEqual('#affe42');
   });
 
   it('supplies setter for color of current widget', () => {

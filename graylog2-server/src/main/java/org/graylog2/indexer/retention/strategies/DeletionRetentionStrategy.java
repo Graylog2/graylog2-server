@@ -30,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -68,17 +69,19 @@ public class DeletionRetentionStrategy extends AbstractIndexCountBasedRetentionS
     }
 
     @Override
-    public void retain(String indexName, IndexSet indexSet) {
-        final Stopwatch sw = Stopwatch.createStarted();
+    public void retain(List<String> indexNames, IndexSet indexSet) {
+        indexNames.forEach(indexName -> {
+                    final Stopwatch sw = Stopwatch.createStarted();
 
-        indices.delete(indexName);
-        auditEventSender.success(AuditActor.system(nodeId), ES_INDEX_RETENTION_DELETE, ImmutableMap.of(
-                "index_name", indexName,
-                "retention_strategy", this.getClass().getCanonicalName()
-        ));
+                    indices.delete(indexName);
+                    auditEventSender.success(AuditActor.system(nodeId), ES_INDEX_RETENTION_DELETE, ImmutableMap.of(
+                            "index_name", indexName,
+                            "retention_strategy", this.getClass().getCanonicalName()
+                    ));
 
-        LOG.info("Finished index retention strategy [delete] for index <{}> in {}ms.", indexName,
-                sw.stop().elapsed(TimeUnit.MILLISECONDS));
+                    LOG.info("Finished index retention strategy [delete] for index <{}> in {}ms.", indexName,
+                            sw.stop().elapsed(TimeUnit.MILLISECONDS));
+                });
     }
 
     @Override

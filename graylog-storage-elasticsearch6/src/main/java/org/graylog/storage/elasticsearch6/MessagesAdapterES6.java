@@ -173,7 +173,12 @@ public class MessagesAdapterES6 implements MessagesAdapter {
                 throw new ChunkedBulkIndexer.EntityTooLargeException(indexedSuccessfully, indexingErrorsFrom(failedItems, messageList));
             }
 
-            // TODO should we check result.isSucceeded()?
+            // Checking `result.isSucceeded()` is always `false` if at least one item fails. Instead, we are checking the response code to
+            // to determine if the result failed in general.
+
+            if (result.getResponseCode() >= 400) {
+                throw JestUtils.specificException(() -> "Error during bulk indexing: ", result.getJsonObject().get("error"));
+            }
 
             indexedSuccessfully += chunk.size();
 

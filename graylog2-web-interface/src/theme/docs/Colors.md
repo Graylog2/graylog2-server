@@ -4,17 +4,18 @@ _Click any color block below to copy the color path._
 
 ```jsx noeditor
 import React, { useEffect } from 'react';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import chroma from 'chroma-js';
 
-import { colors } from 'theme';
 import ColorSwatch, { Swatch } from './Colors';
 
-const ModeTitle = styled.h3`
+const { colors } = useTheme();
+
+const CategoryTitle = styled.h3`
   margin: 0 0 6px;
 `;
 
-const Section = styled.h4`
+const SubcategoryName = styled.h4`
   margin: 0 0 6px;
 `;
 
@@ -25,8 +26,8 @@ const Swatches = styled.div`
 `;
 
 const StyledColorSwatch = styled(ColorSwatch)`
-  flex-basis: ${(props) => props.section === 'global' ? '100px' : '1px'};
-  max-width: ${(props) => props.section === 'global' ? '200px' : 'auto'};
+  flex-basis: ${(props) => props.categoryName === 'global' ? '100px' : '1px'};
+  max-width: ${(props) => props.categoryName === 'global' ? '200px' : 'auto'};
 
   ${Swatch} {
     margin-right: 6px;
@@ -42,63 +43,56 @@ const getValues = (data = {}, callback = () => {}) => {
   return Object.keys(data).map((key) => callback(key));
 }
 
-const SectionWrap = (mode, section) => {
-  return (
-    <>
-      <Swatches>
-        {getValues(mode, (name) => {
-          if (typeof mode[name] === 'string' && chroma.valid(mode[name])) {
-            const copyTextName = section === 'gray' ? `${section}[${name}]` : `${section}.${name}`;
+const CategoryWrap = (categoryName, categoryColors) => (
+  <>
+    <Swatches>
+      {getValues(categoryColors, (name) => {
+        if (typeof categoryColors[name] === 'string' && chroma.valid(categoryColors[name])) {
+          const copyTextName = categoryName === 'gray' ? `${categoryName}[${name}]` : `${categoryName}.${name}`;
 
-            return (
-              <StyledColorSwatch name={name}
-                                 section={section}
-                                 color={mode[name]}
-                                 copyText={`theme.colors.${copyTextName}`} />
-            )
-          }
-        })}
-      </Swatches>
-
-      <div>
-        {getValues(mode, (name) =>
-          typeof mode[name] === 'object' && (
-            <>
-              <Section>{section} &mdash; {name}</Section>
-
-              <Swatches>
-                {getValues(mode[name], (subname) => (
-                  <StyledColorSwatch name={subname}
-                                     section={section}
-                                     color={mode[name][subname]}
-                                     copyText={`theme.colors.${section}.${name}.${subname}`} />
-                ))}
-              </Swatches>
-            </>
+          return (
+            <StyledColorSwatch name={name}
+                               section={categoryName}
+                               color={categoryColors[name]}
+                               copyText={`theme.colors.${copyTextName}`}
+                               key={`${categoryName}-${name}`} />
           )
-        )}
-      </div>
-    </>
-  );
-};
+        }
+      })}
+    </Swatches>
 
-const Colors = () => {
-  return (
-    <>
-      {getValues(colors, (themeMode) => (
-<>
-        <ModeTitle key={`title-${themeMode}`}>{themeMode}</ModeTitle>
-        {getValues(colors[themeMode], (section) => (
-          <>
-            <Section key={`section-${section}`}>{section}</Section>
-            {SectionWrap(colors[themeMode][section], section)}
-          </>
-        ))}
-</>
-      ))}
-    </>
-  );
-};
+    <div>
+      {getValues(categoryColors, (name) =>
+        typeof categoryColors[name] === 'object' && (
+          <div key={`${categoryName}-${name}`}>
+            <SubcategoryName>{categoryName} &mdash; {name}</SubcategoryName>
+
+            <Swatches>
+              {getValues(categoryColors[name], (subname) => (
+                <StyledColorSwatch name={subname}
+                                   categoryName={categoryName}
+                                   color={categoryColors[name][subname]}
+                                   copyText={`theme.colors.${categoryName}.${name}.${subname}`}
+                                   key={`${categoryName}-${name}-${categoryColors[name][subname]}`} />
+              ))}
+            </Swatches>
+          </div>
+        )
+      )}
+    </div>
+  </>
+);
+
+const Colors = () => (
+  <>
+    {getValues(colors, (categoryName) => (
+      <div key={categoryName}>
+          <CategoryTitle key={`title-${categoryName}`}>{categoryName}</CategoryTitle>
+          {CategoryWrap(categoryName, colors[categoryName])}
+      </div>
+    ))}
+  </>
+);
 
 <Colors />
 ```

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 
@@ -23,7 +24,7 @@ import { defaultCompare } from 'views/logic/DefaultCompare';
 import Direction from 'views/logic/aggregationbuilder/Direction';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
-import Select from 'views/components/Select';
+import Select from 'components/common/Select';
 
 type Props = {
   fields: Immutable.List<FieldTypeMapping>,
@@ -36,26 +37,21 @@ type Option = {
   value: number,
 };
 
-const findOptionByLabel = (options: Immutable.List<Option>, label: string) => options.find((option) => option.label === label);
+const findOptionByLabel = (options: Array<Option>, label: string) => options.find((option) => option.label === label);
 
-const findOptionByValue = (options: Immutable.List<Option>, value: number) => options.find((option) => option.value === value);
+const findOptionByValue = (options: Array<Option>, value: number) => options.find((option) => option.value === value);
 
-const currentValue = (sort: Array<SortConfig>, options: Immutable.List<Option>) => sort && sort.length > 0 && findOptionByLabel(options, sort[0].field);
+const currentValue = (sort: Array<SortConfig>, options: Array<Option>) => sort && sort.length > 0 && findOptionByLabel(options, sort[0].field)?.value;
 
-const sortedOptions = (fields: Immutable.List<FieldTypeMapping>) => {
+const sortedOptions = (fields: Immutable.List<FieldTypeMapping>): Array<Option> => {
   return fields.sort(
     (field1, field2) => defaultCompare(field1.name, field2.name),
   ).map(
     (field, idx) => ({ label: field.name, value: idx }),
-  ).toList();
+  ).toArray();
 };
 
-const onOptionChange = (options: Immutable.List<Option>, onChange, newValue, reason) => {
-  if (reason.action === 'clear') {
-    return onChange([]);
-  }
-
-  const { value } = newValue;
+const onOptionChange = (options: Array<Option>, onChange, value) => {
   const option = findOptionByValue(options, value);
 
   if (!option) {
@@ -68,13 +64,14 @@ const onOptionChange = (options: Immutable.List<Option>, onChange, newValue, rea
 };
 
 const FieldSortSelect = ({ fields, onChange, sort }: Props) => {
-  const options = sortedOptions(fields);
+  const options = useMemo(() => sortedOptions(fields), [fields]);
 
   return (
     <Select placeholder="None: click to add fields"
-            onChange={(newValue, reason) => onOptionChange(options, onChange, newValue, reason)}
-            options={options.toJS()}
-            isClearable
+            onChange={(newValue) => onOptionChange(options, onChange, newValue)}
+            options={options}
+            clearable={false}
+            aria-label="Select field for sorting"
             value={currentValue(sort, options)} />
   );
 };

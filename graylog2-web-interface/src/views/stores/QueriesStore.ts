@@ -126,9 +126,9 @@ export const QueriesStore: QueriesStoreType = singletonStore(
     rangeParams(queryId: QueryId, key: string, value: string | number) {
       const oldQuery = this.queries.get(queryId);
       const oldTimerange = oldQuery.timerange;
-      const newTimerange = { ...oldTimerange, [key]: value };
+      const newTimeRange = { ...oldTimerange, [key]: value };
 
-      const promise: Promise<QueriesList> = QueriesActions.timerange(queryId, newTimerange);
+      const promise: Promise<QueriesList> = QueriesActions.timerange(queryId, newTimeRange);
 
       QueriesActions.rangeParams.promise(promise);
 
@@ -146,27 +146,27 @@ export const QueriesStore: QueriesStoreType = singletonStore(
           return;
         }
 
-        let newTimerange: TimeRange;
+        let newTimeRange: TimeRange;
 
         // eslint-disable-next-line default-case
         switch (type) {
           case 'absolute':
-            newTimerange = {
+            newTimeRange = {
               type,
-              from: moment().subtract(oldTimerange.range, 'seconds').toISOString(),
-              to: moment().toISOString(),
+              from: moment().subtract(oldTimerange.from ?? oldTimerange.range, 'seconds').toISOString(),
+              to: moment().subtract(oldTimerange.to, 'seconds').toISOString(),
             };
 
             break;
           case 'relative':
-            newTimerange = {
+            newTimeRange = {
               type,
-              range: 300,
+              from: 300,
             };
 
             break;
           case 'keyword':
-            newTimerange = {
+            newTimeRange = {
               type,
               keyword: 'Last five Minutes',
             };
@@ -175,7 +175,7 @@ export const QueriesStore: QueriesStoreType = singletonStore(
           default: throw new Error(`Invalid time range type: ${type}`);
         }
 
-        resolve(QueriesActions.timerange(queryId, newTimerange));
+        resolve(QueriesActions.timerange(queryId, newTimeRange));
       }) as Promise<QueriesList>;
 
       QueriesActions.rangeType.promise(promise);

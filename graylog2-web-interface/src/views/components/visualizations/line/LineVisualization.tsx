@@ -18,7 +18,7 @@ import React, { useCallback } from 'react';
 import PropTypes from 'prop-types';
 
 import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
-import type { VisualizationComponent, VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
+import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import LineVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/LineVisualizationConfig';
 import toPlotly from 'views/logic/aggregationbuilder/visualizations/Interpolation';
 import EventHandler, { Shapes } from 'views/logic/searchtypes/events/EventHandler';
@@ -40,9 +40,9 @@ const getChartColor = (fullData, name) => {
   return undefined;
 };
 
-const setChartColor = (chart, colors) => ({ line: { color: colors[chart.name] } });
+const setChartColor = (chart, colors) => ({ line: { color: colors.get(chart.name) } });
 
-const LineVisualization: VisualizationComponent = makeVisualization(({ config, data, effectiveTimerange, height }: VisualizationComponentProps) => {
+const LineVisualization = makeVisualization(({ config, data, effectiveTimerange, height }: VisualizationComponentProps) => {
   const visualizationConfig = (config.visualizationConfig || LineVisualizationConfig.empty()) as LineVisualizationConfig;
   const { interpolation = 'linear' } = visualizationConfig;
   const chartGenerator = useCallback((type, name, labels, values): ChartDefinition => ({
@@ -57,7 +57,7 @@ const LineVisualization: VisualizationComponent = makeVisualization(({ config, d
   const layout: { shapes?: Shapes } = {};
 
   if (config.eventAnnotation && data.events) {
-    const { eventChartData, shapes } = EventHandler.toVisualizationData(data.events, config.formattingSettings);
+    const { eventChartData, shapes } = EventHandler.toVisualizationData(data.events);
 
     chartDataResult.push(eventChartData);
     layout.shapes = shapes;

@@ -46,7 +46,7 @@ describe('Delayed', () => {
 
     expect(queryByText('Hello World!')).toBeNull();
 
-    act(() => jest.advanceTimersByTime(200));
+    act(() => { jest.advanceTimersByTime(200); });
 
     expect(getByText('Hello World!')).not.toBeNull();
   });

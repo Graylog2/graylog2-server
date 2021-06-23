@@ -43,7 +43,7 @@ export default class FormattingSettings {
   toBuilder() {
     const { highlighting } = this._value;
 
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder(Immutable.Map({ highlighting }));
   }
 
@@ -52,7 +52,7 @@ export default class FormattingSettings {
   }
 
   static empty() {
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder().build();
   }
 

@@ -27,6 +27,7 @@ import { singletonActions } from 'views/logic/singleton';
 import type { RefluxActions } from 'stores/StoreTypes';
 import type { TimeRange } from 'views/logic/queries/Query';
 import type { WidgetMapping } from 'views/logic/views/types';
+import type { SearchTypeOptions } from 'views/logic/search/GlobalOverride';
 
 export type CreateSearchResponse = {
   search: Search,
@@ -39,17 +40,20 @@ export type SearchExecutionResult = {
   widgetMapping: WidgetMapping,
 };
 
+export type WidgetsToSearch = string[];
+
 type SearchActionsType = RefluxActions<{
   create: (search: Search) => Promise<CreateSearchResponse>,
   execute: (state: SearchExecutionState) => Promise<SearchExecutionResult>,
   reexecuteSearchTypes: (
-    searchTypes: {[searchTypeId: string]: { limit: number, offset: number }},
+    searchTypes: SearchTypeOptions,
     effectiveTimeRange?: TimeRange,
   ) => Promise<SearchExecutionResult>,
   executeWithCurrentState: () => Promise<SearchExecutionResult>,
   refresh: () => Promise<void>,
   get: (searchId: SearchId) => Promise<SearchJson>,
   parameters: (parameters: (Array<Parameter> | Immutable.List<Parameter>)) => Promise<View>,
+  setWidgetsToSearch: (filter: WidgetsToSearch) => Promise<void>,
 }>;
 
 const SearchActions: SearchActionsType = singletonActions(
@@ -75,6 +79,9 @@ const SearchActions: SearchActionsType = singletonActions(
     },
     refresh: {
       asyncResult: true,
+    },
+    setWidgetsToSearch: {
+      asyncResult: false,
     },
   }),
 );

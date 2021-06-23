@@ -20,6 +20,7 @@ import asMock from 'helpers/mocking/AsMock';
 
 import HighlightingRule from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import { HighlightingRulesStore } from 'views/stores/HighlightingRulesStore';
+import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
 
 import HighlightingRulesContext from './HighlightingRulesContext';
 import HighlightingRulesProvider from './HighlightingRulesProvider';
@@ -56,7 +57,7 @@ describe('HighlightingRulesProvider', () => {
     const rule = HighlightingRule.builder()
       .field('field-name')
       .value(String(42))
-      .color('#bc98fd')
+      .color(StaticColor.create('#bc98fd'))
       .build();
 
     asMock(HighlightingRulesStore.getInitialState).mockReturnValue([rule]);

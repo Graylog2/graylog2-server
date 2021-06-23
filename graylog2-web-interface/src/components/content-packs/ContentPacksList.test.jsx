@@ -18,7 +18,7 @@ import React from 'react';
 import { mount, shallow } from 'wrappedEnzyme';
 
 import 'helpers/mocking/react-dom_mock';
-import URLUtils from 'util/URLUtils';
+import * as URLUtils from 'util/URLUtils';
 import ContentPacksList from 'components/content-packs/ContentPacksList';
 
 describe('<ContentPacksList />', () => {

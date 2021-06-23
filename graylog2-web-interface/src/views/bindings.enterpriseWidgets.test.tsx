@@ -14,6 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import MockStore from 'helpers/mocking/StoreMock';
+
 import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Widget from 'views/logic/widgets/Widget';
@@ -21,15 +23,27 @@ import DataTable from 'views/components/datatable/DataTable';
 
 import bindings from './bindings';
 
+jest.mock('views/stores/FieldTypesStore', () => ({
+  FieldTypesStore: MockStore(['getInitialState', () => ({ all: {}, queryFields: {} })]),
+}));
+
+jest.mock('stores/configurations/ConfigurationsStore', () => ({
+  ConfigurationsStore: MockStore(),
+}));
+
+jest.mock('stores/decorators/DecoratorsStore', () => ({
+  DecoratorsStore: MockStore(),
+}));
+
 describe('Views bindings enterprise widgets', () => {
   const { enterpriseWidgets } = bindings;
-  type WidgetCondig = {
+  type WidgetConfig = {
     needsControlledHeight: (widget?: Widget) => boolean,
   };
   const findWidgetConfig = (type) => enterpriseWidgets.find((widgetConfig) => widgetConfig.type === type);
 
   describe('Aggregations', () => {
-    const aggregationConfig: WidgetCondig = findWidgetConfig('AGGREGATION');
+    const aggregationConfig: WidgetConfig = findWidgetConfig('AGGREGATION');
 
     it('is present', () => {
       expect(aggregationConfig).toBeDefined();

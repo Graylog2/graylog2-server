@@ -117,6 +117,18 @@ public class ClientES7 implements Client {
     }
 
     @Override
+    public void removeAliasMapping(String indexName, String alias) {
+        final IndicesAliasesRequest indicesAliasesRequest = new IndicesAliasesRequest();
+        final AliasActions aliasAction = new AliasActions(AliasActions.Type.REMOVE)
+                .index(indexName)
+                .alias(alias);
+        indicesAliasesRequest.addAliasAction(aliasAction);
+
+        client.execute((c, requestOptions) -> c.indices().updateAliases(indicesAliasesRequest, requestOptions),
+                "failed to remove alias " + alias + " for index " + indexName);
+    }
+
+    @Override
     public String fieldType(String testIndexName, String field) {
         return getMapping(testIndexName).get(field);
     }

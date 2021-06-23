@@ -42,6 +42,8 @@ public abstract class UserOverviewDTO {
     private static final String FIELD_AUTH_SERVICE_UID = "auth_service_uid";
     public static final String FIELD_USERNAME = "username";
     public static final String FIELD_EMAIL = "email";
+    public static final String FIELD_FIRST_NAME = "first_name";
+    public static final String FIELD_LAST_NAME = "last_name";
     public static final String FIELD_FULL_NAME = "full_name";
     private static final String FIELD_EXTERNAL_USER = "external_user";
     private static final String FIELD_ROLES = "roles";
@@ -69,8 +71,14 @@ public abstract class UserOverviewDTO {
     @JsonProperty(FIELD_EMAIL)
     public abstract String email();
 
+    @JsonProperty(FIELD_FIRST_NAME)
+    public abstract Optional<String> firstName();
+
+    @JsonProperty(FIELD_LAST_NAME)
+    public abstract Optional<String> lastName();
+
     @JsonProperty(FIELD_FULL_NAME)
-    public abstract String fullName();
+    public abstract Optional<String> fullName();
 
     @Nullable
     @JsonProperty(FIELD_EXTERNAL_USER)
@@ -133,8 +141,14 @@ public abstract class UserOverviewDTO {
         @JsonProperty(FIELD_EMAIL)
         public abstract Builder email(String email);
 
+        @JsonProperty(FIELD_FIRST_NAME)
+        public abstract Builder firstName(@Nullable String firstName);
+
+        @JsonProperty(FIELD_LAST_NAME)
+        public abstract Builder lastName(@Nullable String lastName);
+
         @JsonProperty(FIELD_FULL_NAME)
-        public abstract Builder fullName(String fullName);
+        public abstract Builder fullName(@Nullable String fullName);
 
         @JsonProperty(FIELD_EXTERNAL_USER)
         public abstract Builder externalUser(@Nullable Boolean externalUser);

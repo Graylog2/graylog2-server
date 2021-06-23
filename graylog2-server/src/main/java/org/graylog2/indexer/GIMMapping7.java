@@ -43,4 +43,14 @@ public class GIMMapping7 extends GIMMapping {
                 "mappings", mappings
         );
     }
+
+    @Override
+    protected String dateFormats() {
+        return "uuuu-MM-dd HH:mm:ss||uuuu-MM-dd";
+    }
+
+    @Override
+    protected String dateFormat() {
+        return ConstantsES7.ES_DATE_FORMAT;
+    }
 }

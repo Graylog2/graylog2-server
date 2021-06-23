@@ -19,7 +19,7 @@ import Reflux from 'reflux';
 import fetch from 'logic/rest/FetchProvider';
 import MessageFormatter from 'logic/message/MessageFormatter';
 import ApiRoutes from 'routing/ApiRoutes';
-import URLUtils from 'util/URLUtils';
+import * as URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import StringUtils from 'util/StringUtils';
 import ActionsProvider from 'injection/ActionsProvider';

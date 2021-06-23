@@ -57,7 +57,7 @@ describe('<FieldsOverview />', () => {
     expect(wrapper.find('span.field-element').at(0).text()).toBe('date');
     expect(wrapper.find('span.field-element').at(1).text()).toBe('http_method');
 
-    wrapper.find('a[children="current streams"]').simulate('click');
+    wrapper.find('a[children="current query"]').simulate('click');
 
     expect(wrapper.find('span.field-element').length).toBe(1);
     expect(wrapper.find('span.field-element').text()).toBe('http_method');

@@ -18,7 +18,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 
 import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
-import type { VisualizationComponent, VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
+import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import EventHandler, { Shapes } from 'views/logic/searchtypes/events/EventHandler';
 import { DateType } from 'views/logic/aggregationbuilder/Pivot';
 import { makeVisualization } from 'views/components/aggregationbuilder/AggregationBuilder';
@@ -48,7 +48,7 @@ const getChartColor = (fullData, name) => {
   return undefined;
 };
 
-const setChartColor = (chart, colors) => ({ marker: { color: colors[chart.name] } });
+const setChartColor = (chart, colors) => ({ marker: { color: colors.get(chart.name) } });
 
 const defineSingleDateBarWidth = (chartDataResult, config, timeRangeFrom: string, timeRangeTo: string) => {
   const barWidth = 0.03; // width in percentage, relative to chart width
@@ -79,7 +79,7 @@ type Layout = {
   barmode?: string;
 };
 
-const BarVisualization: VisualizationComponent = makeVisualization(({ config, data, effectiveTimerange, height }: VisualizationComponentProps) => {
+const BarVisualization = makeVisualization(({ config, data, effectiveTimerange, height }: VisualizationComponentProps) => {
   const visualizationConfig = config.visualizationConfig as BarVisualizationConfig;
   const layout: Layout = {};
 
@@ -95,7 +95,7 @@ const BarVisualization: VisualizationComponent = makeVisualization(({ config, da
   const chartDataResult = chartData(config, rows, 'bar', _seriesGenerator);
 
   if (config.eventAnnotation && data.events) {
-    const { eventChartData, shapes } = EventHandler.toVisualizationData(data.events, config.formattingSettings);
+    const { eventChartData, shapes } = EventHandler.toVisualizationData(data.events);
 
     chartDataResult.push(eventChartData);
     layout.shapes = shapes;

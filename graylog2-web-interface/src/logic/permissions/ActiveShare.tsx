@@ -44,11 +44,11 @@ export default class Grantee {
     return this._value.capability;
   }
 
-  // eslint-disable-next-line no-use-before-define
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
   toBuilder(): Builder {
     const { grant, grantee, capability } = this._value;
 
-    // eslint-disable-next-line no-use-before-define, @typescript-eslint/no-use-before-define
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder(Immutable.Map({ grant, grantee, capability }));
   }
 
@@ -70,7 +70,7 @@ export default class Grantee {
   }
 
   static builder(): Builder {
-    // eslint-disable-next-line no-use-before-define, @typescript-eslint/no-use-before-define
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder();
   }
 }

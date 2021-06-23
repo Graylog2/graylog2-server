@@ -58,13 +58,9 @@ const StreamList = createReactClass({
     );
   },
 
-  _sortByTitle(stream1, stream2) {
-    return stream1.title.localeCompare(stream2.title);
-  },
-
   render() {
     if (this.props.streams.length > 0) {
-      const streamList = this.props.streams.sort(this._sortByTitle).map(this._formatStream);
+      const streamList = this.props.streams.map(this._formatStream);
 
       return (
         <StreamsList>

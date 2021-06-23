@@ -72,7 +72,7 @@ class DecoratorList extends React.Component<Props> {
     }
 
     return (
-      <SortableList items={decorators} onMoveItem={this._onReorderWrapper} disableDragging={disableDragging} />
+      <SortableList items={decorators} onMoveItem={this._onReorderWrapper} disableDragging={disableDragging} displayOverlayInPortal />
     );
   }
 }

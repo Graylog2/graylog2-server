@@ -20,6 +20,7 @@ import { act } from 'react-dom/test-utils';
 import { simpleFields, simpleQueryFields } from 'fixtures/fields';
 import { render } from 'wrappedTestingLibrary';
 import asMock from 'helpers/mocking/AsMock';
+import MockStore from 'helpers/mocking/StoreMock';
 
 import { SearchLoadingStateStore } from 'views/stores/SearchLoadingStateStore';
 import SearchResult from 'views/components/SearchResult';
@@ -57,6 +58,10 @@ jest.mock('views/stores/SearchLoadingStateStore', () => ({
   },
 }));
 
+jest.mock('stores/configurations/ConfigurationsStore', () => ({
+  ConfigurationsStore: MockStore(),
+}));
+
 describe('SearchResult', () => {
   beforeAll(() => {
     jest.useFakeTimers();
@@ -91,7 +96,7 @@ describe('SearchResult', () => {
     expect(getByText('Loading...')).not.toBeNull();
   });
 
-  it('should display loading indicator, when search is loading ', () => {
+  it('should display loading indicator, when search is loading', () => {
     asMock(SearchLoadingStateStore.getInitialState).mockImplementation(() => ({ isLoading: true }));
     const { getByText } = render(<SimpleSearchResult />);
 

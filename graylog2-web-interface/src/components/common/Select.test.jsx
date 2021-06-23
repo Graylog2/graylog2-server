@@ -15,12 +15,56 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import { mount } from 'wrappedEnzyme';
 import SelectComponent, { components as Components } from 'react-select';
+import selectEvent from 'react-select-event';
 
 import Select from './Select';
 
+const createOption = (x) => ({ label: x, value: x });
+
 describe('Select', () => {
+  const SimpleSelect = (props) => <Select inputProps={{ 'aria-label': 'Select value' }} {...props} />;
+
+  it('calls `onChange` upon selecting option', async () => {
+    const options = ['foo', 'bar'].map(createOption);
+
+    const onChange = jest.fn();
+
+    render((
+      <SimpleSelect options={options}
+                    onChange={onChange} />
+    ));
+
+    const select = screen.getByLabelText('Select value');
+
+    await selectEvent.openMenu(select);
+
+    await selectEvent.select(select, 'foo');
+
+    await waitFor(() => expect(onChange).toHaveBeenCalledWith('foo'));
+  });
+
+  it('works with non-string options', async () => {
+    const options = [23, 42].map(createOption);
+
+    const onChange = jest.fn();
+
+    render((
+      <SimpleSelect options={options}
+                    onChange={onChange} />
+    ));
+
+    const select = screen.getByLabelText('Select value');
+
+    await selectEvent.openMenu(select);
+
+    await selectEvent.select(select, '42');
+
+    await waitFor(() => expect(onChange).toHaveBeenCalledWith(42));
+  });
+
   describe('Upgrade to react-select v2', () => {
     const options = [{ label: 'label', value: 'value' }];
     const onChange = () => { };

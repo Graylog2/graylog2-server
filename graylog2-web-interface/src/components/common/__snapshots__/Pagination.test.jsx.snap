@@ -32,6 +32,7 @@ exports[`<Pagination /> should display Pagination 1`] = `
   color: rgb(76,77,78);
   background-color: #eff2f8;
   border-color: #bdc8e4;
+  z-index: 1;
 }
 
 .c0.pagination > li.disabled > a,

@@ -15,14 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { asElement, fireEvent, render, waitFor } from 'wrappedTestingLibrary';
-import { act } from 'react-dom/test-utils';
+import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
 import { StoreMock as MockStore } from 'helpers/mocking';
 import mockAction from 'helpers/mocking/MockAction';
 
-import { QueriesActions } from 'views/stores/QueriesStore';
+import { SearchActions } from 'views/stores/SearchStore';
 // eslint-disable-next-line import/no-named-default
 import { default as MockQuery } from 'views/logic/queries/Query';
+import WidgetFocusContext, {
+  WidgetEditingState, WidgetFocusingState,
+} from 'views/components/contexts/WidgetFocusContext';
 
 import SearchBar from './SearchBar';
 
@@ -39,12 +41,19 @@ jest.mock('stores/streams/StreamsStore', () => MockStore(
   'availableStreams',
 ));
 
+jest.mock('views/stores/SearchConfigStore', () => ({
+  SearchConfigStore: MockStore(['getInitialState', () => ({})]),
+  SearchConfigActions: {
+    refresh: jest.fn(() => Promise.resolve()),
+  },
+}));
+
 jest.mock('views/components/searchbar/QueryInput', () => 'query-input');
-jest.mock('views/components/searchbar/saved-search/SavedSearchControls', () => 'saved-search-controls');
+jest.mock('views/components/searchbar/saved-search/SavedSearchControls', () => jest.fn(() => <div>Saved Search Controls</div>));
 
 jest.mock('views/stores/CurrentQueryStore', () => ({
   CurrentQueryStore: MockStore(['getInitialState', () => MockQuery.builder()
-    .timerange({ type: 'relative', range: 300 })
+    .timerange({ type: 'relative', from: 300 })
     .query({ type: 'elasticsearch', query_string: '*' })
     .id('34efae1e-e78e-48ab-ab3f-e83c8611a683')
     .build()]),
@@ -60,54 +69,88 @@ describe('SearchBar', () => {
   };
 
   beforeEach(() => {
-    QueriesActions.update = mockAction(jest.fn());
+    SearchActions.refresh = mockAction(jest.fn());
   });
 
   it('should render the SearchBar', () => {
-    const { getByText } = render(<SearchBar config={config} />);
+    render(<SearchBar config={config} />);
 
-    expect(getByText('Search in last day')).not.toBeNull();
-    expect(getByText('Search in all messages')).not.toBeNull();
+    const timeRangeButton = screen.getByLabelText('Open Time Range Selector');
+    const timeRangeDisplay = screen.getByLabelText('Search Time Range, Opens Time Range Selector On Click');
+    const streamsFilter = screen.getByTestId('streams-filter');
+    const liveUpdate = screen.getByLabelText('Refresh Search Controls');
+    const searchButton = screen.getByTitle('Perform search');
+    const metaButtons = screen.getByText('Saved Search Controls');
+
+    expect(timeRangeButton).not.toBeNull();
+    expect(timeRangeDisplay).not.toBeNull();
+    expect(streamsFilter).not.toBeNull();
+    expect(liveUpdate).not.toBeNull();
+    expect(searchButton).not.toBeNull();
+    expect(metaButtons).not.toBeNull();
   });
 
   it('should update query when search is performed', async () => {
-    const { getByTitle } = render(<SearchBar config={config} />);
+    render(<SearchBar config={config} />);
 
-    const searchButton = getByTitle('Perform search');
+    const searchButton = screen.getByTitle('Perform search');
 
     fireEvent.click(searchButton);
 
-    const queryId = '34efae1e-e78e-48ab-ab3f-e83c8611a683';
-
-    await waitFor(() => expect(QueriesActions.update).toHaveBeenCalledWith(queryId, expect.objectContaining({ id: queryId })));
+    await waitFor(() => expect(SearchActions.refresh).toHaveBeenCalledTimes(1));
   });
 
-  it('changing the time range type does not execute a new search', async () => {
-    const onSubmit = jest.fn(() => Promise.resolve());
-    const { getByText } = render(<SearchBar config={config} onSubmit={onSubmit} />);
-    const absoluteTimeRange = getByText('Absolute');
+  it('date exceeding limitDuration should render with error Icon & search button disabled', async () => {
+    render(<SearchBar config={{ ...config, query_time_range_limit: 'PT1M' }} />);
 
-    fireEvent.click(absoluteTimeRange);
+    const timeRangeButton = screen.getByLabelText('Open Time Range Selector');
+    const searchButton = screen.getByTitle('Perform search');
 
-    await waitFor(() => expect(onSubmit).not.toHaveBeenCalled());
+    await waitFor(() => {
+      expect(searchButton).toHaveAttribute('disabled');
+      expect(timeRangeButton.firstChild).toHaveClass('fa-exclamation-triangle');
+    });
   });
 
-  const selectOption = (option) => {
-    const { parentNode, value } = asElement(option, HTMLOptionElement);
-    const input = asElement(parentNode, HTMLSelectElement);
-    const { name } = input;
+  it('should hide the save load controls if editing the widget', () => {
+    const focusedWidget: WidgetEditingState = { id: 'foo', editing: true, focusing: true };
+    const widgetFocusContext = {
+      focusedWidget,
+      setWidgetFocusing: () => {},
+      setWidgetEditing: () => {},
+      unsetWidgetFocusing: () => {},
+      unsetWidgetEditing: () => {},
+    };
 
-    fireEvent.change(input, { target: { name, value: String(value) } });
-  };
+    render(
+      <WidgetFocusContext.Provider value={widgetFocusContext}>
+        <SearchBar config={config} />
+      </WidgetFocusContext.Provider>,
+    );
 
-  it('changing the relative time range value does not execute a new search', async () => {
-    const onSubmit = jest.fn();
-    const { getByText } = render(<SearchBar config={config} onSubmit={onSubmit} />);
+    const saveBtn = screen.queryByText('Saved Search Controls');
 
-    const lastDay = getByText('Search in last day');
+    expect(saveBtn).toBeNull();
+  });
 
-    await act(async () => selectOption(lastDay));
+  it('should show the save load controls if the widget is not edited', async () => {
+    const focusedWidget: WidgetFocusingState = { id: 'foo', editing: false, focusing: true };
+    const widgetFocusContext = {
+      focusedWidget,
+      setWidgetFocusing: () => {},
+      setWidgetEditing: () => {},
+      unsetWidgetFocusing: () => {},
+      unsetWidgetEditing: () => {},
+    };
 
-    expect(onSubmit).not.toHaveBeenCalled();
+    render(
+      <WidgetFocusContext.Provider value={widgetFocusContext}>
+        <SearchBar config={config} />
+      </WidgetFocusContext.Provider>,
+    );
+
+    const saveBtn = await screen.findByText('Saved Search Controls');
+
+    expect(saveBtn).not.toBeNull();
   });
 });

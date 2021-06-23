@@ -17,5 +17,5 @@
 package org.graylog.plugins.map.config;
 
 public enum DatabaseType {
-    MAXMIND_ASN, MAXMIND_CITY, MAXMIND_COUNTRY
+    MAXMIND_ASN, MAXMIND_CITY, MAXMIND_COUNTRY, IPINFO_STANDARD_LOCATION, IPINFO_ASN
 }

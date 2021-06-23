@@ -16,32 +16,21 @@
  */
 package org.graylog.storage.elasticsearch6.views;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import com.google.common.graph.Traverser;
 import com.google.inject.name.Named;
 import io.searchbox.client.JestClient;
 import io.searchbox.core.MultiSearch;
 import io.searchbox.core.MultiSearchResult;
 import io.searchbox.core.Search;
-import org.graylog.shaded.elasticsearch5.org.elasticsearch.index.query.BoolQueryBuilder;
-import org.graylog.shaded.elasticsearch5.org.elasticsearch.index.query.QueryBuilder;
-import org.graylog.shaded.elasticsearch5.org.elasticsearch.index.query.QueryBuilders;
-import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.GlobalOverride;
-import org.graylog.plugins.views.search.Parameter;
 import org.graylog.plugins.views.search.Query;
-import org.graylog.plugins.views.search.QueryMetadata;
 import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
-import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
-import org.graylog.plugins.views.search.elasticsearch.QueryStringParser;
-import org.graylog.storage.elasticsearch6.views.searchtypes.ESSearchTypeHandler;
+import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.engine.QueryBackend;
 import org.graylog.plugins.views.search.errors.SearchTypeError;
 import org.graylog.plugins.views.search.errors.SearchTypeErrorParser;
@@ -49,10 +38,15 @@ import org.graylog.plugins.views.search.filter.AndFilter;
 import org.graylog.plugins.views.search.filter.OrFilter;
 import org.graylog.plugins.views.search.filter.QueryStringFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
-import org.graylog2.indexer.ElasticsearchException;
+import org.graylog.shaded.elasticsearch5.org.elasticsearch.index.query.BoolQueryBuilder;
+import org.graylog.shaded.elasticsearch5.org.elasticsearch.index.query.QueryBuilder;
+import org.graylog.shaded.elasticsearch5.org.elasticsearch.index.query.QueryBuilders;
+import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.storage.elasticsearch6.TimeRangeQueryFactory;
-import org.graylog2.indexer.IndexMapping;
 import org.graylog.storage.elasticsearch6.jest.JestUtils;
+import org.graylog.storage.elasticsearch6.views.searchtypes.ESSearchTypeHandler;
+import org.graylog2.indexer.ElasticsearchException;
+import org.graylog2.indexer.IndexMapping;
 import org.graylog2.plugin.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,17 +63,13 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
-import static com.google.common.base.MoreObjects.firstNonNull;
-import static com.google.common.base.Preconditions.checkArgument;
 import static org.graylog.storage.elasticsearch6.jest.JestUtils.checkForFailedShards;
 
 public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContext> {
     private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchBackend.class);
 
     private final Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> elasticsearchSearchTypeHandlers;
-    private final QueryStringParser queryStringParser;
     private final JestClient jestClient;
     private final IndexLookup indexLookup;
     private final QueryStringDecorators queryStringDecorators;
@@ -88,14 +78,12 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
 
     @Inject
     public ElasticsearchBackend(Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> elasticsearchSearchTypeHandlers,
-                                QueryStringParser queryStringParser,
                                 JestClient jestClient,
                                 IndexLookup indexLookup,
                                 QueryStringDecorators queryStringDecorators,
                                 ESGeneratedQueryContext.Factory queryContextFactory,
                                 @Named("allow_leading_wildcard_searches") boolean allowLeadingWildcard) {
         this.elasticsearchSearchTypeHandlers = elasticsearchSearchTypeHandlers;
-        this.queryStringParser = queryStringParser;
         this.jestClient = jestClient;
         this.indexLookup = indexLookup;
 
@@ -283,46 +271,5 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                 .searchTypes(resultsMap)
                 .errors(new HashSet<>(queryContext.errors()))
                 .build();
-    }
-
-    private Set<String> queryStringsFromFilter(Filter entry) {
-        if (entry != null) {
-            final Traverser<Filter> filterTraverser = Traverser.forTree(filter -> firstNonNull(filter.filters(), Collections.emptySet()));
-            return StreamSupport.stream(filterTraverser.breadthFirst(entry).spliterator(), false)
-                    .filter(filter -> filter instanceof QueryStringFilter)
-                    .map(queryStringFilter -> ((QueryStringFilter) queryStringFilter).query())
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toSet());
-        }
-        return Collections.emptySet();
-    }
-
-    @Override
-    public QueryMetadata parse(ImmutableSet<Parameter> declaredParameters, Query query) {
-        checkArgument(query.query() instanceof ElasticsearchQueryString);
-        final String mainQueryString = ((ElasticsearchQueryString) query.query()).queryString();
-        final java.util.stream.Stream<String> queryStringStreams = java.util.stream.Stream.concat(
-                java.util.stream.Stream.of(mainQueryString),
-                query.searchTypes().stream().flatMap(this::queryStringsFromSearchType)
-        );
-
-        final QueryMetadata metadataForParameters = queryStringStreams
-                .map(queryStringParser::parse)
-                .reduce(QueryMetadata.builder().build(), (meta1, meta2) -> QueryMetadata.builder().usedParameterNames(
-                        Sets.union(meta1.usedParameterNames(), meta2.usedParameterNames())
-                ).build());
-
-
-        return metadataForParameters;
-    }
-
-    private java.util.stream.Stream<String> queryStringsFromSearchType(SearchType searchType) {
-        return java.util.stream.Stream.concat(
-                searchType.query().filter(query -> query instanceof ElasticsearchQueryString)
-                        .map(query -> ((ElasticsearchQueryString) query).queryString())
-                        .map(java.util.stream.Stream::of)
-                        .orElse(java.util.stream.Stream.empty()),
-                queryStringsFromFilter(searchType.filter()).stream()
-        );
     }
 }

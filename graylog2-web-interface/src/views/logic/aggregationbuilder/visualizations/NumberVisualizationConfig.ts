@@ -75,6 +75,10 @@ export default class NumberVisualizationConfig extends VisualizationConfig {
     };
   }
 
+  equalsForSearch(other: any) {
+    return other && 'trend' in other && other.trend === this.trend;
+  }
+
   static fromJSON(type: string, value: NumberVisualizationConfigJSON) {
     const { trend, trend_preference: trendPreference } = value;
 

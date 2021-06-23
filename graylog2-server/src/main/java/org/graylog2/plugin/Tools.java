@@ -70,10 +70,11 @@ public final class Tools {
     private static final byte[] EMPTY_BYTE_ARRAY_4 = {0,0,0,0};
     private static final byte[] EMPTY_BYTE_ARRAY_16 = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
-    public static final String ES_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
-    public static final String ES_DATE_FORMAT_NO_MS = "yyyy-MM-dd HH:mm:ss";
+    private static final String ES_DATE_FORMAT_JODA = "yyyy-MM-dd HH:mm:ss.SSS";
+    private static final String ES_DATE_FORMAT_NO_MS = "yyyy-MM-dd HH:mm:ss";
 
-    public static final DateTimeFormatter ES_DATE_FORMAT_FORMATTER = DateTimeFormat.forPattern(Tools.ES_DATE_FORMAT).withZoneUTC();
+    public static final DateTimeFormatter ES_DATE_FORMAT_FORMATTER = DateTimeFormat.forPattern(Tools.ES_DATE_FORMAT_JODA).withZoneUTC();
+    public static final DateTimeFormatter ES_DATE_FORMAT_NO_MS_FORMATTER = DateTimeFormat.forPattern(Tools.ES_DATE_FORMAT_NO_MS).withZoneUTC();
     public static final DateTimeFormatter ISO_DATE_FORMAT_FORMATTER = ISODateTimeFormat.dateTime().withZoneUTC();
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
@@ -358,6 +359,10 @@ public final class Tools {
 
     public static DateTime nowUTC() {
         return new DateTime(DateTimeZone.UTC);
+    }
+
+    public static DateTime now(DateTimeZone dateTimeZone) {
+        return new DateTime(dateTimeZone);
     }
 
     /**

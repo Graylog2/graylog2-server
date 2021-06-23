@@ -22,7 +22,7 @@ import { Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/graylog
 import { Select } from 'components/common';
 import { Input } from 'components/bootstrap';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
-import FormsUtils from 'util/FormsUtils';
+import * as FormsUtils from 'util/FormsUtils';
 
 import commonStyles from '../common/commonStyles.css';
 

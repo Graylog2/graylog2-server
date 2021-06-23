@@ -45,7 +45,7 @@ jest.mock('views/stores/ViewStore', () => ({
 
 jest.mock('util/History');
 
-const lastFiveMinutes: RelativeTimeRange = { type: 'relative', range: 300 };
+const lastFiveMinutes: RelativeTimeRange = { type: 'relative', from: 300 };
 const createSearch = (timerange: TimeRange = lastFiveMinutes, streams: Array<string> = [], queryString = 'foo:42') => Search.builder()
   .queries([
     Query.builder()
@@ -99,6 +99,33 @@ describe('SyncWithQueryParameters', () => {
       expect(history.push).toHaveBeenCalledWith('/search?somevalue=23&somethingelse=foo&q=foo%3A42&rangetype=relative&relative=600');
     });
 
+    it('if time range is relative with from and to', () => {
+      const viewWithRelativeTimerange = createView(createSearch({
+        type: 'relative',
+        from: 300,
+        to: 240,
+      }));
+
+      asMock(ViewStore.getInitialState).mockReturnValueOnce({ view: viewWithRelativeTimerange } as ViewStoreState);
+
+      syncWithQueryParameters('/search');
+
+      expect(history.push).toHaveBeenCalledWith('/search?q=foo%3A42&rangetype=relative&from=300&to=240');
+    });
+
+    it('if time range is relative with from only', () => {
+      const viewWithRelativeTimerange = createView(createSearch({
+        type: 'relative',
+        from: 300,
+      }));
+
+      asMock(ViewStore.getInitialState).mockReturnValueOnce({ view: viewWithRelativeTimerange } as ViewStoreState);
+
+      syncWithQueryParameters('/search');
+
+      expect(history.push).toHaveBeenCalledWith('/search?q=foo%3A42&rangetype=relative&from=300');
+    });
+
     it('if time range is absolute', () => {
       const viewWithAbsoluteTimerange = createView(createSearch({
         type: 'absolute',
@@ -144,7 +171,7 @@ describe('SyncWithQueryParameters', () => {
       syncWithQueryParameters('/search');
 
       expect(history.push)
-        .toHaveBeenCalledWith('/search?q=foo%3A42&rangetype=relative&relative=300&streams=stream1%2Cstream2');
+        .toHaveBeenCalledWith('/search?q=foo%3A42&rangetype=relative&from=300&streams=stream1%2Cstream2');
     });
 
     it('removes list of streams to query if they become empty', () => {
@@ -152,10 +179,10 @@ describe('SyncWithQueryParameters', () => {
 
       asMock(ViewStore.getInitialState).mockReturnValueOnce({ view: viewWithStreams } as ViewStoreState);
 
-      syncWithQueryParameters('/search?q=foo%3A42&rangetype=relative&relative=300&streams=stream1%2Cstream2');
+      syncWithQueryParameters('/search?q=foo%3A42&rangetype=relative&from=300&streams=stream1%2Cstream2');
 
       expect(history.push)
-        .toHaveBeenCalledWith('/search?q=foo%3A42&rangetype=relative&relative=300');
+        .toHaveBeenCalledWith('/search?q=foo%3A42&rangetype=relative&from=300');
     });
   });
 

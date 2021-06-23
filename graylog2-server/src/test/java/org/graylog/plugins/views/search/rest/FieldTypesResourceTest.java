@@ -20,6 +20,8 @@ import com.google.common.collect.ImmutableSet;
 import org.apache.shiro.subject.Subject;
 import org.graylog2.indexer.fieldtypes.FieldTypes;
 import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
+import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.shared.rest.exceptions.MissingStreamPermissionException;
 import org.graylog2.shared.security.RestPermissions;
 import org.junit.Before;
@@ -62,6 +64,9 @@ public class FieldTypesResourceTest {
     @Captor
     private ArgumentCaptor<Set<String>> streamIdCaptor;
 
+    @Captor
+    private ArgumentCaptor<TimeRange> timeRangeArgumentCaptor;
+
     class FieldTypesTestResource extends FieldTypesResource {
         FieldTypesTestResource(MappedFieldTypesService mappedFieldTypesService, PermittedStreams permittedStreams) {
             super(mappedFieldTypesService, permittedStreams);
@@ -100,11 +105,28 @@ public class FieldTypesResourceTest {
         when(permittedStreams.load(any())).thenReturn(ImmutableSet.of("2323", "4242"));
         final Set<MappedFieldTypeDTO> fieldTypes = Collections.singleton(MappedFieldTypeDTO.create("foobar",
                 FieldTypes.Type.createType("long", ImmutableSet.of("numeric", "enumerable"))));
-        when(mappedFieldTypesService.fieldTypesByStreamIds(eq(ImmutableSet.of("2323", "4242")))).thenReturn(fieldTypes);
+        when(mappedFieldTypesService.fieldTypesByStreamIds(eq(ImmutableSet.of("2323", "4242")), eq(RelativeRange.allTime()))).thenReturn(fieldTypes);
 
         final Set<MappedFieldTypeDTO> result = this.fieldTypesResource.allFieldTypes();
 
         assertThat(result).isEqualTo(fieldTypes);
+    }
+
+    @Test
+    public void passesRequestedTimeRangeToMappedFieldTypesService() throws Exception {
+        when(currentSubject.isPermitted(eq(RestPermissions.STREAMS_READ + ":2323"))).thenReturn(true);
+        when(currentSubject.isPermitted(eq(RestPermissions.STREAMS_READ + ":4242"))).thenReturn(true);
+
+        final FieldTypesForStreamsRequest request = FieldTypesForStreamsRequest.Builder.builder()
+                .streams(ImmutableSet.of("2323", "4242"))
+                .timerange(RelativeRange.create(300))
+                .build();
+
+        this.fieldTypesResource.byStreams(request);
+
+        verify(this.mappedFieldTypesService, times(1)).fieldTypesByStreamIds(streamIdCaptor.capture(), timeRangeArgumentCaptor.capture());
+
+        assertThat(timeRangeArgumentCaptor.getValue()).isEqualTo(RelativeRange.create(300));
     }
 
     @Test
@@ -129,15 +151,16 @@ public class FieldTypesResourceTest {
         when(currentSubject.isPermitted(eq(RestPermissions.STREAMS_READ + ":4242"))).thenReturn(true);
         final Set<MappedFieldTypeDTO> fieldTypes = Collections.singleton(MappedFieldTypeDTO.create("foobar",
                 FieldTypes.Type.createType("long", ImmutableSet.of("numeric", "enumerable"))));
-        when(mappedFieldTypesService.fieldTypesByStreamIds(eq(ImmutableSet.of("2323", "4242")))).thenReturn(fieldTypes);
+        when(mappedFieldTypesService.fieldTypesByStreamIds(eq(ImmutableSet.of("2323", "4242")), eq(RelativeRange.allTime()))).thenReturn(fieldTypes);
 
         final Set<MappedFieldTypeDTO> result = this.fieldTypesResource.byStreams(FieldTypesForStreamsRequest.Builder.builder()
                 .streams(ImmutableSet.of("2323", "4242"))
                 .build());
 
-        verify(mappedFieldTypesService, times(1)).fieldTypesByStreamIds(streamIdCaptor.capture());
+        verify(mappedFieldTypesService, times(1)).fieldTypesByStreamIds(streamIdCaptor.capture(), timeRangeArgumentCaptor.capture());
 
         assertThat(streamIdCaptor.getValue()).containsExactlyInAnyOrder("2323", "4242");
+        assertThat(timeRangeArgumentCaptor.getValue()).isEqualTo(RelativeRange.allTime());
         assertThat(result).isEqualTo(fieldTypes);
     }
 

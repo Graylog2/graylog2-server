@@ -27,6 +27,7 @@ import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.IndexSetRegistry;
+import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.events.IndicesClosedEvent;
 import org.graylog2.indexer.indices.events.IndicesDeletedEvent;
@@ -48,6 +49,7 @@ import java.util.Set;
 import java.util.SortedSet;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -121,6 +123,8 @@ public class MongoIndexRangeServiceTest {
     @Test
     @MongoDBFixtures("MongoIndexRangeServiceTest-LegacyIndexRanges.json")
     public void findIgnoresLegacyIndexRanges() throws Exception {
+        when(indices.waitForRecovery("graylog_1")).thenReturn(HealthStatus.Green);
+
         final DateTime begin = new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC);
         final DateTime end = new DateTime(2015, 2, 1, 0, 0, DateTimeZone.UTC);
         final SortedSet<IndexRange> indexRanges = indexRangeService.find(begin, end);
@@ -158,6 +162,7 @@ public class MongoIndexRangeServiceTest {
         final String index = "graylog";
         final DateTime min = new DateTime(2015, 1, 1, 1, 0, DateTimeZone.UTC);
         final DateTime max = new DateTime(2015, 1, 1, 5, 0, DateTimeZone.UTC);
+        when(indices.waitForRecovery(index)).thenReturn(HealthStatus.Green);
         when(indices.indexRangeStatsOfIndex(index)).thenReturn(IndexRangeStats.create(min, max));
 
         final IndexRange indexRange = indexRangeService.calculateRange(index);
@@ -181,6 +186,7 @@ public class MongoIndexRangeServiceTest {
     public void testCalculateRangeWithEmptyIndex() throws Exception {
         final String index = "graylog";
         when(indices.indexRangeStatsOfIndex(index)).thenReturn(IndexRangeStats.EMPTY);
+        when(indices.waitForRecovery(index)).thenReturn(HealthStatus.Green);
 
         final IndexRange range = indexRangeService.calculateRange(index);
 
@@ -190,10 +196,13 @@ public class MongoIndexRangeServiceTest {
         assertThat(range.end()).isEqualTo(new DateTime(0L, DateTimeZone.UTC));
     }
 
-    @Test(expected = ElasticsearchException.class)
+    @Test
     public void testCalculateRangeWithNonExistingIndex() throws Exception {
-        when(indices.indexRangeStatsOfIndex("does-not-exist")).thenThrow(new ElasticsearchException("does-not-exist"));
-        indexRangeService.calculateRange("does-not-exist");
+        when(indices.waitForRecovery("does-not-exist")).thenReturn(HealthStatus.Red);
+
+        assertThatThrownBy(() -> indexRangeService.calculateRange("does-not-exist"))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Unable to calculate range for index <does-not-exist>, index is unhealthy: Red");
     }
 
     @Test
@@ -276,6 +285,7 @@ public class MongoIndexRangeServiceTest {
         final DateTime end = new DateTime(2016, 1, 15, 0, 0, DateTimeZone.UTC);
         when(indices.indexRangeStatsOfIndex("graylog_3")).thenReturn(IndexRangeStats.create(begin, end));
         when(indexSetRegistry.isManagedIndex("graylog_3")).thenReturn(true);
+        when(indices.waitForRecovery("graylog_3")).thenReturn(HealthStatus.Green);
 
         localEventBus.post(IndicesReopenedEvent.create(Collections.singleton("graylog_3")));
 

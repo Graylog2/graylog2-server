@@ -20,7 +20,7 @@ import { useStore } from 'stores/connect';
 import CombinedProvider from 'injection/CombinedProvider';
 import Store from 'logic/local-storage/Store';
 
-import { PREFERENCES_THEME_MODE, DEFAULT_THEME_MODE } from './constants';
+import { PREFERENCES_THEME_MODE, DEFAULT_THEME_MODE, ThemeMode } from './constants';
 
 import UserPreferencesContext from '../contexts/UserPreferencesContext';
 import usePrefersColorScheme from '../hooks/usePrefersColorScheme';
@@ -35,7 +35,17 @@ type CurrentUser = {
   };
 };
 
-const useCurrentThemeMode = (): [string, (newThemeMode: string) => void] => {
+const _getInitialThemeMode = (userPreferences, browserThemePreference, initialThemeModeOverride) => {
+  if (initialThemeModeOverride) {
+    return initialThemeModeOverride;
+  }
+
+  const userThemePreference = userPreferences[PREFERENCES_THEME_MODE] ?? Store.get(PREFERENCES_THEME_MODE);
+
+  return userThemePreference ?? browserThemePreference ?? DEFAULT_THEME_MODE;
+};
+
+const useCurrentThemeMode = (initialThemeModeOverride: ThemeMode): [ThemeMode, (newThemeMode: ThemeMode) => void] => {
   const browserThemePreference = usePrefersColorScheme();
 
   const { userIsReadOnly, username } = useStore(CurrentUserStore, (userStore) => ({
@@ -44,11 +54,10 @@ const useCurrentThemeMode = (): [string, (newThemeMode: string) => void] => {
   }));
 
   const userPreferences = useContext(UserPreferencesContext);
-  const userThemePreference = userPreferences[PREFERENCES_THEME_MODE] ?? Store.get(PREFERENCES_THEME_MODE);
-  const initialThemeMode = userThemePreference ?? browserThemePreference ?? DEFAULT_THEME_MODE;
-  const [currentThemeMode, setCurrentThemeMode] = useState<string>(initialThemeMode);
+  const initialThemeMode = _getInitialThemeMode(userPreferences, browserThemePreference, initialThemeModeOverride);
+  const [currentThemeMode, setCurrentThemeMode] = useState<ThemeMode>(initialThemeMode);
 
-  const changeCurrentThemeMode = useCallback((newThemeMode: string) => {
+  const changeCurrentThemeMode = useCallback((newThemeMode: ThemeMode) => {
     setCurrentThemeMode(newThemeMode);
     Store.set(PREFERENCES_THEME_MODE, newThemeMode);
 

@@ -20,9 +20,34 @@ import styled from 'styled-components';
 
 import menuItemStyles from './styles/menuItem';
 
+class ModifiedBootstrapNavDropdown extends BootstrapNavDropdown {
+  // eslint-disable-next-line class-methods-use-this
+  isActive({ props }, activeKey, activeHref) {
+    // NOTE: had to override library as it doesn't respect setting `active={false}`
+    if (props.active === false) {
+      return false;
+    }
+
+    if (
+      props.active
+      || (activeKey != null && props.eventKey === activeKey)
+      || (activeHref && props.href === activeHref)
+    ) {
+      return true;
+    }
+
+    return props.active;
+  }
+}
+
 const NavDropdown = styled(BootstrapNavDropdown)`
+  ${menuItemStyles}
+`;
+
+const ModifiedNavDropdown = styled(ModifiedBootstrapNavDropdown)`
   ${menuItemStyles}
 `;
 
 /** @component */
 export default NavDropdown;
+export { ModifiedNavDropdown };

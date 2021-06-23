@@ -81,7 +81,7 @@ export default class Role {
       readOnly,
     } = this._value;
 
-    // eslint-disable-next-line no-use-before-define, @typescript-eslint/no-use-before-define
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder(Immutable.Map({
       id,
       name,
@@ -144,7 +144,7 @@ export default class Role {
   }
 
   static builder(): Builder {
-    // eslint-disable-next-line no-use-before-define, @typescript-eslint/no-use-before-define
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder();
   }
 }

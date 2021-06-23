@@ -60,7 +60,7 @@ public class V20180323150000_AddSidecarUser extends Migration {
         helpers.ensureUser(
                 sidecarUser,
                 UUID.randomUUID().toString(),
-                "Sidecar System User (built-in)",
+                "Sidecar", "System User (built-in)",
                 "sidecar@graylog.local",
                 Sets.newHashSet(
                         roleId,

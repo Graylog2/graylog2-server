@@ -21,6 +21,7 @@ import mockComponent from 'helpers/mocking/MockComponent';
 import { viewsManager } from 'fixtures/users';
 import asMock from 'helpers/mocking/AsMock';
 import { $PropertyType } from 'utility-types';
+import { StoreMock as MockStore } from 'helpers/mocking';
 
 import type { UserJSON } from 'logic/users/User';
 import CurrentUserContext from 'contexts/CurrentUserContext';
@@ -32,8 +33,20 @@ import { QueriesActions } from 'views/stores/QueriesStore';
 import { SearchActions } from 'views/stores/SearchStore';
 import CurrentUserStore from 'stores/users/CurrentUserStore';
 
+jest.mock('views/stores/CurrentViewStateStore', () => ({
+  CurrentViewStateStore: MockStore(
+    ['getInitialState', () => {
+      return {
+        activeQuery: 'active-query-id',
+      };
+    },
+    ],
+  ),
+}));
+
 jest.mock('stores/users/CurrentUserStore', () => ({
   get: jest.fn(),
+  listen: jest.fn(),
 }));
 
 jest.mock('views/stores/SearchStore', () => ({
@@ -44,17 +57,16 @@ jest.mock('views/stores/SearchStore', () => ({
   },
 }));
 
-jest.mock('stores/connect', () => (x) => x);
 jest.mock('../GenericPlot', () => mockComponent('GenericPlot'));
 jest.mock('views/stores/QueriesStore');
 
 describe('XYPlot', () => {
   const currentQuery = Query.fromJSON({ id: 'dummyquery', query: {}, timerange: {}, search_types: {} });
-  const timestampPivot = new Pivot('timestamp', 'time', {});
+  const timestampPivot = new Pivot('timestamp', 'time', { interval: { type: 'auto', scaling: 1.0 } });
   const config = AggregationWidgetConfig.builder().rowPivots([timestampPivot]).build();
   const getChartColor = () => undefined;
   const setChartColor = () => ({});
-  const chartData = [{ y: [23, 42] }];
+  const chartData = [{ y: [23, 42], name: 'count()' }];
   type SimpleXYPlotProps = {
     currentUser?: UserJSON,
     config?: $PropertyType<XYPlotProps, 'chartData'>,
@@ -105,6 +117,7 @@ describe('XYPlot', () => {
     expect(genericPlot).toHaveProp('layout', {
       yaxis: { fixedrange: true, rangemode: 'tozero', tickformat: ',g' },
       xaxis: { fixedrange: true },
+      showlegend: false,
     });
 
     expect(genericPlot).toHaveProp('chartData', chartData);

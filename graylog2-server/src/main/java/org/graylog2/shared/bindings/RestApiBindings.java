@@ -18,10 +18,13 @@ package org.graylog2.shared.bindings;
 
 import com.google.inject.multibindings.Multibinder;
 import org.graylog2.plugin.inject.Graylog2Module;
+import org.graylog2.rest.resources.RestResourcesModule;
+import org.graylog2.shared.rest.resources.RestResourcesSharedModule;
 import org.graylog2.shared.security.ShiroSecurityBinding;
 import org.graylog2.web.DevelopmentIndexHtmlGenerator;
 import org.graylog2.web.IndexHtmlGenerator;
 import org.graylog2.web.ProductionIndexHtmlGenerator;
+import org.graylog2.web.resources.WebResourcesModule;
 
 import javax.ws.rs.container.DynamicFeature;
 
@@ -44,6 +47,11 @@ public class RestApiBindings extends Graylog2Module {
         } else {
             bind(IndexHtmlGenerator.class).to(DevelopmentIndexHtmlGenerator.class).asEagerSingleton();
         }
+
+        // Install all resource modules
+        install(new WebResourcesModule());
+        install(new RestResourcesModule());
+        install(new RestResourcesSharedModule());
     }
 
     private void bindDynamicFeatures() {

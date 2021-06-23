@@ -22,7 +22,7 @@ import moment from 'moment';
 import { ControlLabel, FormControl, FormGroup, HelpBlock, InputGroup } from 'components/graylog';
 import { TimeUnitInput } from 'components/common';
 import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
-import FormsUtils from 'util/FormsUtils';
+import * as FormsUtils from 'util/FormsUtils';
 
 import commonStyles from '../common/commonStyles.css';
 

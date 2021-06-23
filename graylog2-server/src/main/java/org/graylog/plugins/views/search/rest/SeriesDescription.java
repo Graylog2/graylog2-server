@@ -26,7 +26,10 @@ public abstract class SeriesDescription {
     @JsonProperty
     public abstract String type();
 
-    public static SeriesDescription create(String type) {
-        return new AutoValue_SeriesDescription(type);
+    @JsonProperty
+    public abstract String description();
+
+    public static SeriesDescription create(String type, String description) {
+        return new AutoValue_SeriesDescription(type, description);
     }
 }

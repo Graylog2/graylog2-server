@@ -23,6 +23,7 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import withLocation from 'routing/withLocation';
 import { LinkContainer } from 'components/graylog/router';
 import { appPrefixed } from 'util/URLUtils';
+import AppConfig from 'util/AppConfig';
 import { IfPermitted } from 'components/common';
 import { isPermitted } from 'util/PermissionsMixin';
 import { Navbar, Nav, NavItem, NavDropdown } from 'components/graylog';
@@ -142,9 +143,13 @@ const Navigation = ({ location }: Props) => {
         <NotificationBadge />
 
         <Nav navbar pullRight className="header-meta-nav">
-          <LinkContainer to={Routes.SYSTEM.NODES.LIST}>
-            <GlobalThroughput />
-          </LinkContainer>
+          {AppConfig.isCloud() ? (
+            <GlobalThroughput disabled />
+          ) : (
+            <LinkContainer to={Routes.SYSTEM.NODES.LIST}>
+              <GlobalThroughput />
+            </LinkContainer>
+          )}
 
           <InactiveNavItem className="dev-badge-wrap">
             <DevelopmentHeaderBadge />

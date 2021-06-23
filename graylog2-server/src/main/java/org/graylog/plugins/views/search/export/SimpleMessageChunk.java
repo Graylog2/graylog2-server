@@ -24,6 +24,11 @@ import static org.graylog.plugins.views.search.export.LinkedHashSetUtil.linkedHa
 
 @AutoValue
 public abstract class SimpleMessageChunk {
+    public enum ChunkOrder {
+        FIRST,
+        INTERMEDIATE,
+        LAST;
+    }
     public static SimpleMessageChunk from(LinkedHashSet<String> fieldsInOrder, LinkedHashSet<SimpleMessage> messages) {
         return builder().fieldsInOrder(fieldsInOrder).messages(messages).build();
     }
@@ -36,14 +41,22 @@ public abstract class SimpleMessageChunk {
 
     public abstract LinkedHashSet<SimpleMessage> messages();
 
-    public abstract boolean isFirstChunk();
+    public boolean isFirstChunk() {
+        return chunkOrder().equals(ChunkOrder.FIRST);
+    }
+
+    public boolean isLastChunk() {
+        return chunkOrder().equals(ChunkOrder.LAST);
+    }
+
+    public abstract ChunkOrder chunkOrder();
 
     public int size() {
         return messages().size();
     }
 
     public static Builder builder() {
-        return Builder.create().isFirstChunk(false);
+        return Builder.create().chunkOrder(ChunkOrder.INTERMEDIATE);
     }
 
     public abstract Builder toBuilder();
@@ -64,7 +77,7 @@ public abstract class SimpleMessageChunk {
 
         public abstract Builder messages(LinkedHashSet<SimpleMessage> messages);
 
-        public abstract Builder isFirstChunk(boolean isFirstChunk);
+        public abstract Builder chunkOrder(ChunkOrder chunkOrder);
 
         public static Builder create() {
             return new AutoValue_SimpleMessageChunk.Builder();

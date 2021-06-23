@@ -19,13 +19,13 @@ import uuid from 'uuid/v4';
 
 import type { QueryId } from 'views/logic/queries/Query';
 import type { WidgetId } from 'views/logic/views/types';
-import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import type { TitlesMap } from 'views/stores/TitleTypes';
+import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 
 import View from './View';
 import FindWidgetAndQueryIdInView from './FindWidgetAndQueryIdInView';
 import UpdateSearchForWidgets from './UpdateSearchForWidgets';
-import AddNewWidgetsToPositions from './AddNewWidgetsToPositions';
+import GenerateNextPosition from './GenerateNextPosition';
 
 import Widget from '../widgets/Widget';
 
@@ -73,13 +73,16 @@ const _setWidgetTitle = (titlesMap: TitlesMap, widgetID: WidgetId, newTitle: str
   return titlesMap.set('widget', newWidgetTitleMap);
 };
 
-const _addWidgetToTab = (widget: Widget, targetQueryId: QueryId, dashboard: View, newWidgetPosition: WidgetPosition, widgetTitle: string | undefined | null): View => {
+const _addWidgetToTab = (widget: Widget, targetQueryId: QueryId, dashboard: View, widgetTitle: string | undefined | null, oldPosition: WidgetPosition): View => {
   const viewState = dashboard.state.get(targetQueryId);
   const newWidget = widget.toBuilder().id(uuid()).build();
   const newWidgets = viewState.widgets.push(newWidget);
-  const overridePositions = Immutable.Map({ [newWidget.id]: newWidgetPosition });
   const { widgetPositions } = viewState;
-  const newWidgetPositions = AddNewWidgetsToPositions(Immutable.Map(widgetPositions), newWidgets.toArray(), overridePositions);
+  const widgetPositionsMap = oldPosition ? {
+    ...widgetPositions,
+    [newWidget.id]: oldPosition.toBuilder().row(0).col(0).build(),
+  } : widgetPositions;
+  const newWidgetPositions = GenerateNextPosition(Immutable.Map(widgetPositionsMap), newWidgets.toArray());
   const newTitleMap = _setWidgetTitle(viewState.titles, newWidget.id, widgetTitle);
   const newViewState = viewState.toBuilder()
     .widgets(newWidgets)
@@ -90,10 +93,6 @@ const _addWidgetToTab = (widget: Widget, targetQueryId: QueryId, dashboard: View
   return dashboard.toBuilder()
     .state(dashboard.state.set(targetQueryId, newViewState))
     .build();
-};
-
-const _getWidgetPosition = (widgetId: WidgetId, queryId: QueryId, view: View): WidgetPosition => {
-  return view.state.get(queryId).widgetPositions[widgetId];
 };
 
 const _getWidgetTitle = (widgetId: WidgetId, queryId: QueryId, view: View): string | undefined | null => {
@@ -110,13 +109,13 @@ const MoveWidgetToTab = (widgetId: WidgetId, targetQueryId: QueryId, dashboard: 
   if (match) {
     const [widget, queryId] = match;
     const widgetTitle = _getWidgetTitle(widgetId, queryId, dashboard);
-    const newWidgetPosition = _getWidgetPosition(widgetId, queryId, dashboard).toBuilder()
-      .col(1)
-      .row(1)
-      .build();
-    const tempDashboard = copy ? dashboard : _removeWidgetFromTab(widgetId, queryId, dashboard);
+    const { widgetPositions } = dashboard.state.get(queryId);
+    const oldPosition = widgetPositions[widgetId];
 
-    return UpdateSearchForWidgets(_addWidgetToTab(widget, targetQueryId, tempDashboard, newWidgetPosition, widgetTitle));
+    const tempDashboard = copy ? dashboard : _removeWidgetFromTab(widgetId, queryId, dashboard);
+    const newWidget = copy ? widget.toBuilder().newId().build() : widget;
+
+    return UpdateSearchForWidgets(_addWidgetToTab(newWidget, targetQueryId, tempDashboard, widgetTitle, oldPosition));
   }
 
   return undefined;

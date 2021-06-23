@@ -20,8 +20,6 @@ import PropTypes from 'prop-types';
 import { Tooltip as BootstrapTooltip } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
 
-import ThemeAndUserProvider from 'contexts/ThemeAndUserProvider';
-
 const arrowSize = 10;
 const StyledTooltip = styled(BootstrapTooltip)(({ theme }) => css`
   &.in {
@@ -81,19 +79,17 @@ const StyledTooltip = styled(BootstrapTooltip)(({ theme }) => css`
   }
 `);
 
-const Tooltip = ({ children, className, id, placement, positionTop, positionLeft, arrowOffsetTop, arrowOffsetLeft }) => {
+const Tooltip = ({ children, className, id, placement, positionTop, positionLeft, arrowOffsetTop, arrowOffsetLeft, show }) => {
   return (
-    <ThemeAndUserProvider>
-      <StyledTooltip className={className}
-                     id={id}
-                     placement={placement}
-                     positionTop={positionTop}
-                     positionLeft={positionLeft}
-                     arrowOffsetTop={arrowOffsetTop}
-                     arrowOffsetLeft={arrowOffsetLeft}>
-        {children}
-      </StyledTooltip>
-    </ThemeAndUserProvider>
+    <StyledTooltip className={`${className} ${show ? 'in' : ''}`}
+                   id={id}
+                   placement={placement}
+                   positionTop={positionTop}
+                   positionLeft={positionLeft}
+                   arrowOffsetTop={arrowOffsetTop}
+                   arrowOffsetLeft={arrowOffsetLeft}>
+      {children}
+    </StyledTooltip>
   );
 };
 
@@ -129,6 +125,7 @@ Tooltip.propTypes = {
    * The "left" position value for the Tooltip arrow.
    */
   arrowOffsetLeft: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  show: PropTypes.bool,
 };
 
 Tooltip.defaultProps = {
@@ -138,6 +135,7 @@ Tooltip.defaultProps = {
   positionLeft: undefined,
   arrowOffsetTop: undefined,
   arrowOffsetLeft: undefined,
+  show: false,
 };
 
 /** @component */

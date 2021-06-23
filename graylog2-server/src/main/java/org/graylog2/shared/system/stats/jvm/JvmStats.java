@@ -63,7 +63,12 @@ public abstract class JvmStats {
         final String specVersion = runtimeMXBean.getSpecVersion();
 
         final List<String> inputArguments = runtimeMXBean.getInputArguments();
-        final String bootClassPath = runtimeMXBean.getBootClassPath();
+        String bootClassPath;
+        try {
+            bootClassPath = runtimeMXBean.getBootClassPath();
+        } catch (UnsupportedOperationException e) {
+            bootClassPath = "<unsupported>";
+        }
         final String classPath = runtimeMXBean.getClassPath();
 
         // TODO Remove some sensitive values or don't output at all?

@@ -21,6 +21,7 @@ import naturalSort from 'javascript-natural-sort';
 
 import withLocation from 'routing/withLocation';
 import { NavDropdown } from 'components/graylog';
+import HideOnCloud from 'util/conditional/HideOnCloud';
 import IfPermitted from 'components/common/IfPermitted';
 import Routes from 'routing/Routes';
 import { appPrefixed } from 'util/URLUtils';
@@ -115,28 +116,36 @@ const SystemMenu = ({ location }) => {
       <IfPermitted permissions={['clusterconfigentry:read']}>
         <NavigationLink path={Routes.SYSTEM.CONFIGURATIONS} description="Configurations" />
       </IfPermitted>
-      <NavigationLink path={Routes.SYSTEM.NODES.LIST} description="Nodes" />
-      <IfPermitted permissions={['inputs:read']}>
-        <NavigationLink path={Routes.SYSTEM.INPUTS} description="Inputs" />
-      </IfPermitted>
-      <IfPermitted permissions={['outputs:read']}>
-        <NavigationLink path={Routes.SYSTEM.OUTPUTS} description="Outputs" />
-      </IfPermitted>
+      <HideOnCloud>
+        <NavigationLink path={Routes.SYSTEM.NODES.LIST} description="Nodes" />
+      </HideOnCloud>
+      <HideOnCloud>
+        <IfPermitted permissions={['inputs:read']}>
+          <NavigationLink path={Routes.SYSTEM.INPUTS} description="Inputs" />
+        </IfPermitted>
+        <IfPermitted permissions={['outputs:read']}>
+          <NavigationLink path={Routes.SYSTEM.OUTPUTS} description="Outputs" />
+        </IfPermitted>
+      </HideOnCloud>
       <IfPermitted permissions={['indices:read']}>
         <NavigationLink path={Routes.SYSTEM.INDICES.LIST} description="Indices" />
       </IfPermitted>
-      <IfPermitted permissions={['loggers:read']}>
-        <NavigationLink path={Routes.SYSTEM.LOGGING} description="Logging" />
-      </IfPermitted>
+      <HideOnCloud>
+        <IfPermitted permissions={['loggers:read']}>
+          <NavigationLink path={Routes.SYSTEM.LOGGING} description="Logging" />
+        </IfPermitted>
+      </HideOnCloud>
       <IfPermitted permissions={['users:list']} anyPermissions>
         <NavigationLink path={Routes.SYSTEM.USERS.OVERVIEW} description="Users and Teams" />
       </IfPermitted>
       <IfPermitted permissions={['roles:read']} anyPermissions>
         <NavigationLink path={Routes.SYSTEM.AUTHZROLES.OVERVIEW} description="Roles" />
       </IfPermitted>
-      <IfPermitted permissions={['authentication:edit']} anyPermissions>
-        <NavigationLink path={Routes.SYSTEM.AUTHENTICATION.BACKENDS.ACTIVE} description="Authentication" />
-      </IfPermitted>
+      <HideOnCloud>
+        <IfPermitted permissions={['authentication:edit']} anyPermissions>
+          <NavigationLink path={Routes.SYSTEM.AUTHENTICATION.BACKENDS.ACTIVE} description="Authentication" />
+        </IfPermitted>
+      </HideOnCloud>
       <IfPermitted permissions={['dashboards:create', 'inputs:create', 'streams:create']}>
         <NavigationLink path={Routes.SYSTEM.CONTENTPACKS.LIST} description="Content Packs" />
       </IfPermitted>
@@ -149,9 +158,11 @@ const SystemMenu = ({ location }) => {
       <IfPermitted permissions={['inputs:create']}>
         <NavigationLink path={Routes.SYSTEM.PIPELINES.OVERVIEW} description="Pipelines" />
       </IfPermitted>
-      <IfPermitted permissions={['sidecars:read']}>
-        <NavigationLink path={Routes.SYSTEM.SIDECARS.OVERVIEW} description="Sidecars" />
-      </IfPermitted>
+      <HideOnCloud>
+        <IfPermitted permissions={['sidecars:read']}>
+          <NavigationLink path={Routes.SYSTEM.SIDECARS.OVERVIEW} description="Sidecars" />
+        </IfPermitted>
+      </HideOnCloud>
       {pluginSystemNavigations}
     </NavDropdown>
   );

@@ -19,7 +19,7 @@ import Reflux from 'reflux';
 import fetch from 'logic/rest/FetchProvider';
 import ActionsProvider from 'injection/ActionsProvider';
 import UserNotification from 'util/UserNotification';
-import URLUtils from 'util/URLUtils';
+import * as URLUtils from 'util/URLUtils';
 
 const GettingStartedActions = ActionsProvider.getActions('GettingStarted');
 

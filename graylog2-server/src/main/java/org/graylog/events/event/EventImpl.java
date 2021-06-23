@@ -57,6 +57,7 @@ public class EventImpl implements Event {
     private long priority;
     private boolean alert;
     private Map<String, FieldValue> fields = new HashMap<>();
+    private Map<String, FieldValue> groupByFields = new HashMap<>();
 
     EventImpl(String eventId,
               DateTime eventTimestamp,
@@ -263,8 +264,23 @@ public class EventImpl implements Event {
     }
 
     @Override
+    public Map<String, String> getGroupByFields() {
+        return this.groupByFields.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().value()));
+    }
+
+    @Override
+    public void setGroupByFields(Map<String, String> fields) {
+        this.groupByFields = fields.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> FieldValue.string(entry.getValue())));
+    }
+
+    @Override
     public EventDto toDto() {
         final Map<String, String> fields = this.fields.entrySet()
+                .stream()
+                .filter(entry -> !entry.getValue().isError())
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().value()));
+
+        final Map<String, String> groupByFields = this.groupByFields.entrySet()
                 .stream()
                 .filter(entry -> !entry.getValue().isError())
                 .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().value()));
@@ -287,6 +303,7 @@ public class EventImpl implements Event {
                 .priority(getPriority())
                 .alert(getAlert())
                 .fields(ImmutableMap.copyOf(fields))
+                .groupByFields(ImmutableMap.copyOf(groupByFields))
                 .build();
     }
 
@@ -333,12 +350,15 @@ public class EventImpl implements Event {
                 Objects.equals(message, event.message) &&
                 Objects.equals(source, event.source) &&
                 Objects.equals(keyTuple, event.keyTuple) &&
-                Objects.equals(fields, event.fields);
+                Objects.equals(fields, event.fields) &&
+                Objects.equals(groupByFields, event.groupByFields);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(eventId, eventDefinitionType, eventDefinitionId, originContext, eventTimestamp, processingTimestamp, timerangeStart, timerangeEnd, streams, sourceStreams, message, source, keyTuple, priority, alert, fields);
+        return Objects.hash(eventId, eventDefinitionType, eventDefinitionId, originContext, eventTimestamp,
+                processingTimestamp, timerangeStart, timerangeEnd, streams, sourceStreams, message, source,
+                keyTuple, priority, alert, fields, groupByFields);
     }
 
     @Override
@@ -360,6 +380,7 @@ public class EventImpl implements Event {
                 .add("priority", priority)
                 .add("alert", alert)
                 .add("fields", fields)
+                .add("groupByFields", groupByFields)
                 .toString();
     }
 

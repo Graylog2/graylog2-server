@@ -151,6 +151,10 @@ public class Indices {
         return indices.stream().findFirst();
     }
 
+    public Set<String> aliasTargets(String alias) {
+        return indicesAdapter.resolveAlias(alias);
+    }
+
     public void ensureIndexTemplate(IndexSet indexSet) {
         final IndexSetConfig indexSetConfig = indexSet.getConfig();
         final String templateName = indexSetConfig.indexTemplateName();
@@ -253,9 +257,9 @@ public class Indices {
     }
 
     public boolean isReopened(String indexName) {
-        final Optional<String> aliasTarget = aliasTarget(indexName + REOPENED_ALIAS_SUFFIX);
+        final Set<String> aliasTarget = aliasTargets(indexName + REOPENED_ALIAS_SUFFIX);
 
-        return aliasTarget.map(target -> target.equals(indexName)).orElse(false);
+        return !aliasTarget.isEmpty();
     }
 
     public Map<String, Boolean> areReopened(Collection<String> indices) {
@@ -326,9 +330,20 @@ public class Indices {
         indicesAdapter.optimizeIndex(index, maxNumSegments, timeout);
     }
 
+    HealthStatus waitForRecovery(String index, int timeout) {
+        LOG.debug("Waiting until index health status of index {} is healthy", index);
+        return indicesAdapter.waitForRecovery(index, timeout);
+    }
+
     public HealthStatus waitForRecovery(String index) {
         LOG.debug("Waiting until index health status of index {} is healthy", index);
         return indicesAdapter.waitForRecovery(index);
+    }
+
+    public static <E extends Exception> void checkIfHealthy(HealthStatus healthStatus, Function<HealthStatus, E> errorMessageSupplier) throws E {
+        if (healthStatus.equals(HealthStatus.Red)) {
+            throw errorMessageSupplier.apply(healthStatus);
+        }
     }
 
     public Optional<DateTime> indexCreationDate(String index) {

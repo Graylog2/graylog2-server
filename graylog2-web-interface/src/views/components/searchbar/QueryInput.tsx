@@ -29,9 +29,11 @@ import SearchBarAutoCompletions from './SearchBarAutocompletions';
 import type { Completer } from './SearchBarAutocompletions';
 
 type Props = {
+  className?: string
   completerFactory: (completers: Array<Completer>) => AutoCompleter,
   completers: Array<Completer>,
   disabled?: boolean,
+  height?: number,
   onBlur?: (query: string) => void,
   onChange: (query: string) => Promise<string>,
   onExecute: (query: string) => void,
@@ -42,7 +44,19 @@ type Props = {
 
 const defaultCompleterFactory = (completers) => new SearchBarAutoCompletions(completers);
 
-const QueryInput = ({ disabled, onBlur, onChange, onExecute, placeholder, value, completers, completerFactory = defaultCompleterFactory, theme }: Props) => {
+const QueryInput = ({
+  className,
+  completerFactory = defaultCompleterFactory,
+  completers,
+  disabled,
+  height,
+  onBlur,
+  onChange,
+  onExecute,
+  placeholder,
+  theme,
+  value,
+}: Props) => {
   const completer = useMemo(() => completerFactory(completers), [completerFactory, completers]);
   const _onExecute = useCallback((editor: Editor) => {
     if (editor.completer && editor.completer.popup) {
@@ -50,7 +64,7 @@ const QueryInput = ({ disabled, onBlur, onChange, onExecute, placeholder, value,
     }
 
     onExecute(value);
-  }, [onExecute]);
+  }, [onExecute, value]);
 
   const editorRef = useCallback((node) => {
     const editor = node && node.editor;
@@ -68,7 +82,7 @@ const QueryInput = ({ disabled, onBlur, onChange, onExecute, placeholder, value,
   }, [completer, _onExecute]);
 
   return (
-    <div className="query" style={{ display: 'flex' }} data-testid="query-input">
+    <div className={`query ${className}`} style={{ display: 'flex' }} data-testid="query-input">
       <UserPreferencesContext.Consumer>
         {({ enableSmartSearch = true }) => (
           <StyledAceEditor mode="lucene"
@@ -92,7 +106,8 @@ const QueryInput = ({ disabled, onBlur, onChange, onExecute, placeholder, value,
                              selectionStyle: 'line',
                            }}
                            fontSize={theme.fonts.size.large}
-                           placeholder={placeholder} />
+                           placeholder={placeholder}
+                           $height={height} />
         )}
       </UserPreferencesContext.Consumer>
     </div>
@@ -100,9 +115,11 @@ const QueryInput = ({ disabled, onBlur, onChange, onExecute, placeholder, value,
 };
 
 QueryInput.propTypes = {
+  className: PropTypes.string,
   completerFactory: PropTypes.func,
   completers: PropTypes.array,
   disabled: PropTypes.bool,
+  height: PropTypes.number,
   onBlur: PropTypes.func,
   onChange: PropTypes.func.isRequired,
   onExecute: PropTypes.func.isRequired,
@@ -112,14 +129,14 @@ QueryInput.propTypes = {
 };
 
 QueryInput.defaultProps = {
-  disabled: false,
-  onBlur: () => {},
-  completers: [],
+  className: '',
   completerFactory: defaultCompleterFactory,
-  value: '',
+  completers: [],
+  disabled: false,
+  height: undefined,
+  onBlur: () => {},
   placeholder: '',
+  value: '',
 };
 
-const mapping = { completers: 'views.completers' };
-
-export default withPluginEntities(withTheme(QueryInput), mapping);
+export default withPluginEntities(withTheme(QueryInput), { completers: 'views.completers' });

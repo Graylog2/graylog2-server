@@ -16,7 +16,7 @@
  */
 import Reflux from 'reflux';
 
-import URLUtils from 'util/URLUtils';
+import * as URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 import StoreProvider from 'injection/StoreProvider';

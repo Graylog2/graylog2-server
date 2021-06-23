@@ -38,6 +38,7 @@ type Props = {
   minLength?: number,
   maxLength?: number,
   required?: boolean,
+  bsSize?: 'large' | 'small' | 'xsmall',
   validate?: (any) => string | undefined,
 };
 
@@ -54,6 +55,7 @@ const FormikFormGroup = ({ labelClassName, wrapperClassName, label, name, onChan
 
 FormikFormGroup.defaultProps = {
   autoComplete: undefined,
+  bsSize: undefined,
   buttonAfter: undefined,
   disabled: false,
   onChange: undefined,

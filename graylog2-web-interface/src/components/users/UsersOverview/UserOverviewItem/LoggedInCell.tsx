@@ -33,26 +33,31 @@ type Props = {
 const Td = styled.td`
   width: 35px;
   text-align: right;
+  position: relative;
 `;
 
-const LoggedInCell = ({ lastActivity, sessionActive, clientAddress }: Props) => (
-  <Td>
-    <OverlayTrigger trigger={['hover', 'focus']}
-                    placement="right"
-                    overlay={(
-                      <Popover id="session-badge-details" title={sessionActive ? 'Logged in' : ''}>
-                        {sessionActive ? (
-                          <>
-                            <div>Last activity: {lastActivity ? <Timestamp dateTime={lastActivity} relative /> : '-'}</div>
-                            <div>Client address: {clientAddress ?? '-'}</div>
-                          </>
-                        ) : 'Not logged in'}
-                      </Popover>
-                    )}
-                    rootClose>
-      <LoggedInIcon active={sessionActive} />
-    </OverlayTrigger>
-  </Td>
-);
+const LoggedInCell = ({ lastActivity, sessionActive, clientAddress }: Props) => {
+  return (
+    <Td>
+      <OverlayTrigger trigger={['hover', 'focus']}
+                      placement="right"
+                      overlay={(
+                        <Popover id="session-badge-details" title={sessionActive ? 'Logged in' : ''}>
+                          {sessionActive ? (
+                            <>
+                              <div>Last activity: {lastActivity
+                                ? <Timestamp dateTime={lastActivity} relative /> : '-'}
+                              </div>
+                              <div>Client address: {clientAddress ?? '-'}</div>
+                            </>
+                          ) : 'Not logged in'}
+                        </Popover>
+                      )}
+                      rootClose>
+        <LoggedInIcon active={sessionActive} />
+      </OverlayTrigger>
+    </Td>
+  );
+};
 
 export default LoggedInCell;
