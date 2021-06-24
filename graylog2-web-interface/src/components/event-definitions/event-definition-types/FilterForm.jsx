@@ -66,9 +66,7 @@ class FilterForm extends React.Component {
   );
 
   _parseQuery = lodash.debounce((queryString) => {
-    const { currentUser } = this.props;
-
-    if (!isPermitted(currentUser.permissions, LOOKUP_PERMISSIONS)) {
+    if (!this._userCanViewLookupTables) {
       return;
     }
 
@@ -124,9 +122,7 @@ class FilterForm extends React.Component {
   }
 
   componentDidMount() {
-    const { currentUser } = this.props;
-
-    if (!isPermitted(currentUser.permissions, LOOKUP_PERMISSIONS)) {
+    if (!this._userCanViewLookupTables) {
       return;
     }
 
@@ -139,6 +135,12 @@ class FilterForm extends React.Component {
 
     config[key] = value;
     onChange('config', config);
+  };
+
+  _userCanViewLookupTables = () => {
+    const { currentUser } = this.props;
+
+    return !isPermitted(currentUser.permissions, LOOKUP_PERMISSIONS);
   };
 
   _syncParamsWithQuery = (paramsInQuery) => {
@@ -225,6 +227,14 @@ class FilterForm extends React.Component {
 
       return onChange('config', newConfig);
     };
+
+    if (!this._userCanViewLookupTables) {
+      return (
+        <Alert bsStyle="info">
+          Only Admins are able to declare Query Parameters from Lookup Tables.
+        </Alert>
+      );
+    }
 
     const parameterButtons = queryParameters.map((queryParam) => {
       return (
