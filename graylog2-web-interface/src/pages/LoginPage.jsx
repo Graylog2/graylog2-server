@@ -15,9 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import styled, { createGlobalStyle } from 'styled-components';
 import { useQuery } from 'react-query';
+import { ErrorBoundary } from 'react-error-boundary';
 
 import { DocumentTitle, Icon } from 'components/common';
 import { Alert, Button } from 'components/graylog';
@@ -42,6 +44,10 @@ const StyledButton = styled(Button)`
   cursor: pointer;
 `;
 
+const StyledPre = styled.pre`
+  white-space: pre-line;
+`;
+
 const useActiveBackend = (isCloud) => {
   const cloudBackendLoader = () => {
     if (isCloud) {
@@ -56,10 +62,39 @@ const useActiveBackend = (isCloud) => {
   return [data, isSuccess];
 };
 
+const ErrorFallback = ({ error, resetErrorBoundary }) => {
+  const isCloud = AppConfig.isCloud();
+
+  return (
+    <Alert bsStyle="danger">
+      {isCloud ? (
+        <p>Error loading login screen, please contact your Graylog account manager.</p>
+      ) : (
+        <>
+          <p>
+            Error using active authentication service login. Please check its configuration or contact your
+            Graylog account manager. Error details:
+          </p>
+          <StyledPre>{error.message}</StyledPre>
+          <Button bsStyle="danger" onClick={resetErrorBoundary}>Login with default method</Button>
+        </>
+      )}
+    </Alert>
+  );
+};
+
+ErrorFallback.propTypes = {
+  error: PropTypes.shape({
+    message: PropTypes.string.isRequired,
+  }).isRequired,
+  resetErrorBoundary: PropTypes.func.isRequired,
+};
+
 const LoginPage = () => {
   const [didValidateSession, setDidValidateSession] = useState(false);
   const [lastError, setLastError] = useState(undefined);
   const [useFallback, setUseFallback] = useState(false);
+  const [enableExternalBackend, setEnableExternalBackend] = useState(true);
 
   const isCloud = AppConfig.isCloud();
   const [activeBackend, isBackendDetermined] = useActiveBackend(isCloud);
@@ -79,6 +114,10 @@ const LoginPage = () => {
       sessionPromise.cancel();
     };
   }, []);
+
+  useEffect(() => {
+    setLastError(undefined);
+  }, [useFallback]);
 
   const resetLastError = () => {
     setLastError(undefined);
@@ -100,9 +139,15 @@ const LoginPage = () => {
 
   const renderLoginForm = () => {
     if (!useFallback && hasCustomLogin) {
-      return React.createElement(loginComponent.formComponent, {
-        onErrorChange: setLastError,
-      });
+      const { formComponent: PluginLoginForm } = loginComponent;
+
+      return (
+        <ErrorBoundary FallbackComponent={ErrorFallback}
+                       onError={() => setEnableExternalBackend(false)}
+                       onReset={() => setUseFallback(true)}>
+          <PluginLoginForm onErrorChange={setLastError} />
+        </ErrorBoundary>
+      );
     }
 
     return <LoginForm onErrorChange={setLastError} />;
@@ -121,7 +166,7 @@ const LoginPage = () => {
         <LoginPageStyles />
         {formatLastError()}
         {renderLoginForm()}
-        {hasCustomLogin && !isCloud && (
+        {hasCustomLogin && enableExternalBackend && !isCloud && (
           <StyledButton as="a" onClick={() => setUseFallback(!useFallback)}>
             {`Login with ${useFallback ? loginComponent.type.replace(/^\w/, (c) => c.toUpperCase()) : 'default method'}`}
           </StyledButton>
