@@ -30,7 +30,6 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
-import org.graylog.plugins.pipelineprocessor.codegen.PipelineClassloader;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.LongConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.StringConversion;
 import org.graylog.plugins.pipelineprocessor.functions.dates.Now;
@@ -84,8 +83,6 @@ import static org.junit.Assert.fail;
 
 public class PipelineRuleParserTest extends BaseParserTest {
 
-    protected static PipelineClassloader classLoader;
-
     @BeforeClass
     public static void registerFunctions() {
         final Map<String, Function<?>> functions = commonFunctions();
@@ -128,7 +125,7 @@ public class PipelineRuleParserTest extends BaseParserTest {
     }
 
     private Rule parseRuleWithOptionalCodegen() {
-        return parser.parseRule(ruleForTest(), false, classLoader);
+        return parser.parseRule(ruleForTest(), false);
     }
 
     @Test
@@ -144,9 +141,9 @@ public class PipelineRuleParserTest extends BaseParserTest {
             fail("should throw error: undeclared variable x");
         } catch (ParseException e) {
             assertEquals(2,
-                         e.getErrors().size()); // undeclared var and incompatible type, but we only care about the undeclared one here
+                    e.getErrors().size()); // undeclared var and incompatible type, but we only care about the undeclared one here
             assertTrue("Should find error UndeclaredVariable",
-                       e.getErrors().stream().anyMatch(error -> error instanceof UndeclaredVariable));
+                    e.getErrors().stream().anyMatch(error -> error instanceof UndeclaredVariable));
         }
     }
 
@@ -162,7 +159,7 @@ public class PipelineRuleParserTest extends BaseParserTest {
             fail("should throw error: undeclared function 'unknown'");
         } catch (ParseException e) {
             assertTrue("Should find error UndeclaredFunction",
-                       e.getErrors().stream().anyMatch(input -> input instanceof UndeclaredFunction));
+                    e.getErrors().stream().anyMatch(input -> input instanceof UndeclaredFunction));
         }
     }
 
@@ -197,7 +194,7 @@ public class PipelineRuleParserTest extends BaseParserTest {
         } catch (ParseException e) {
             assertEquals(2, e.getErrors().size());
             assertTrue("Should only find IncompatibleArgumentType errors",
-                       e.getErrors().stream().allMatch(input -> input instanceof IncompatibleArgumentType));
+                    e.getErrors().stream().allMatch(input -> input instanceof IncompatibleArgumentType));
         }
     }
 
@@ -301,7 +298,7 @@ public class PipelineRuleParserTest extends BaseParserTest {
         assertEquals(false, stage2.matchAll());
         assertEquals(2, stage2.stage());
         assertArrayEquals(new Object[]{"parse_cisco_time", "extract_src_dest", "normalize_src_dest", "lookup_ips", "resolve_ips"},
-                          stage2.ruleReferences().toArray());
+                stage2.ruleReferences().toArray());
     }
 
     @Test
@@ -666,7 +663,7 @@ public class PipelineRuleParserTest extends BaseParserTest {
     public static class SortFunction extends AbstractFunction<Collection> {
 
         private final ParameterDescriptor<Collection, Collection> collection = ParameterDescriptor.type("collection",
-                                                                                                        Collection.class).build();
+                Collection.class).build();
 
         @Override
         public Collection evaluate(FunctionArgs args, EvaluationContext context) {
