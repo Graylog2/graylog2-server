@@ -113,9 +113,17 @@ public class ContentPackPersistenceService {
         return Optional.ofNullable(dbCollection.findOne(query));
     }
 
-    public Optional<ContentPack> findByIdAndRevisionFilteringInvalidStreamReferences(final ModelId id, final int revision) {
-        return this.findByIdAndRevision(id, revision).map(cp -> {
-            ContentPackV1 cpv1 = (ContentPackV1) cp;
+    public Optional<ContentPack> insert(final ContentPack pack) {
+        if (findByIdAndRevision(pack.id(), pack.revision()).isPresent()) {
+            LOG.debug("Content pack already found: id: {} revision: {}. Did not insert!", pack.id(), pack.revision());
+            return Optional.empty();
+        }
+        final WriteResult<ContentPack, ObjectId> writeResult = dbCollection.insert(pack);
+        return Optional.of(writeResult.getSavedObject());
+    }
+
+    public Optional<ContentPack> filterMissingResourcesAndInsert(final ContentPack pack) {
+            ContentPackV1 cpv1 = (ContentPackV1) pack;
 
             final Set<String> allStreams = streamService.loadAll().stream().map(stream -> stream.getTitle()).collect(Collectors.toSet());
             final Map<String, String> streamsInContentPack = new HashMap<>();
@@ -151,17 +159,7 @@ public class ContentPackPersistenceService {
                         }
                     });
 
-            return cp;
-        });
-    }
-
-    public Optional<ContentPack> insert(final ContentPack pack) {
-        if (findByIdAndRevision(pack.id(), pack.revision()).isPresent()) {
-            LOG.debug("Content pack already found: id: {} revision: {}. Did not insert!", pack.id(), pack.revision());
-            return Optional.empty();
-        }
-        final WriteResult<ContentPack, ObjectId> writeResult = dbCollection.insert(pack);
-        return Optional.of(writeResult.getSavedObject());
+        return this.insert(cpv1);
     }
 
     public int deleteById(ModelId id) {
