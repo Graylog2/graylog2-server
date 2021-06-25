@@ -35,7 +35,6 @@ import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.Stage;
 import org.graylog.plugins.pipelineprocessor.ast.statements.Statement;
-import org.graylog.plugins.pipelineprocessor.codegen.GeneratedRule;
 import org.graylog.plugins.pipelineprocessor.db.RuleMetricsConfigDto;
 import org.graylog.plugins.pipelineprocessor.processors.listeners.InterpreterListener;
 import org.graylog.plugins.pipelineprocessor.processors.listeners.NoopInterpreterListener;
@@ -263,8 +262,9 @@ public class PipelineInterpreter implements MessageProcessor {
         // pipeline execution ordering is not guaranteed
         while (stages.hasNext()) {
             final List<Stage> stageSet = stages.next();
-            for (final Stage stage : stageSet)
+            for (final Stage stage : stageSet) {
                 evaluateStage(stage, message, msgId, result, pipelinesToSkip, interpreterListener);
+            }
         }
 
         // 7. return the processed messages
@@ -304,7 +304,7 @@ public class PipelineInterpreter implements MessageProcessor {
                 final boolean ruleCondition = evaluateRuleCondition(rule, message, msgId, pipeline, context, rulesToRun, interpreterListener);
                 anyRulesMatched |= ruleCondition;
                 allRulesMatched &= ruleCondition;
-            } catch(Exception e) {
+            } catch (Exception e) {
                 log.warn("Error evaluating condition for rule <{}/{}> with message: {} (Error: {})",
                         rule.name(), rule.id(), message, e.getMessage());
                 throw e;
@@ -358,27 +358,10 @@ public class PipelineInterpreter implements MessageProcessor {
         interpreterListener.executeRule(rule, pipeline);
         try {
             log.debug("[{}] rule `{}` matched running actions", msgId, rule.name());
-            final GeneratedRule generatedRule = rule.generatedRule();
-            if (generatedRule != null) {
-                try {
-                    generatedRule.then(context);
-                    return true;
-                } catch (Exception ignored) {
-                    final EvaluationContext.EvalError lastError = Iterables.getLast(context.evaluationErrors());
-                    appendProcessingError(rule, message, lastError.toString());
-                    log.debug("Encountered evaluation error, skipping rest of the rule: {}", lastError);
-                    rule.markFailure();
+            for (Statement statement : rule.then()) {
+                if (!evaluateStatement(message, interpreterListener, pipeline, context, rule, statement)) {
+                    // statement raised an error, skip the rest of the rule
                     return false;
-                }
-            } else {
-                if (ConfigurationStateUpdater.isAllowCodeGeneration()) {
-                    throw new IllegalStateException("Should have generated code and not interpreted the tree");
-                }
-                for (Statement statement : rule.then()) {
-                    if (!evaluateStatement(message, interpreterListener, pipeline, context, rule, statement)) {
-                        // statement raised an error, skip the rest of the rule
-                        return false;
-                    }
                 }
             }
             return true;
@@ -412,8 +395,7 @@ public class PipelineInterpreter implements MessageProcessor {
                                           EvaluationContext context,
                                           List<Rule> rulesToRun, InterpreterListener interpreterListener) {
         interpreterListener.evaluateRule(rule, pipeline);
-        final GeneratedRule generatedRule = rule.generatedRule();
-        boolean matched = generatedRule != null ? generatedRule.when(context) : rule.when().evaluateBool(context);
+        boolean matched = rule.when().evaluateBool(context);
         if (matched) {
             rule.markMatch();
 
@@ -484,7 +466,7 @@ public class PipelineInterpreter implements MessageProcessor {
                     .recordStats()
                     .build(new CacheLoader<Set<Pipeline>, StageIterator.Configuration>() {
                         @Override
-                        public StageIterator.Configuration load(@Nonnull Set<Pipeline> pipelines) throws Exception {
+                        public StageIterator.Configuration load(@Nonnull Set<Pipeline> pipelines) {
                             return new StageIterator.Configuration(pipelines);
                         }
                     });
