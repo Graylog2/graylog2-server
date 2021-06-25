@@ -14,15 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-
-import MetricElement from './MetricElement';
-import VisualizationElement from './VisualizationElement';
-import SortElement from './SortElement';
-import GroupByElement from './GroupByElement';
+import GroupingElement from './grouping';
+import MetricElement from './metric';
+import SortElement from './sort';
+import VisualizationElement from './visualization';
 
 export default [
-  VisualizationElement,
+  GroupingElement,
   MetricElement,
   SortElement,
-  GroupByElement,
+  VisualizationElement,
 ];

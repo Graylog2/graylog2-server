@@ -24,13 +24,13 @@ import { Checkbox } from 'components/graylog';
 import Select from 'components/common/Select';
 import usePluginEntities from 'views/logic/usePluginEntities';
 import { defaultCompare } from 'views/logic/DefaultCompare';
-import VisualizationConfigurationOptions from 'views/components/aggregationwizard/elementConfiguration/VisualizationConfigurationOptions';
 import { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
 import { TIMESTAMP_FIELD } from 'views/Constants';
 
-import ElementConfigurationContainer from './ElementConfigurationContainer';
+import VisualizationConfigurationOptions from './VisualizationConfigurationOptions';
+import VisualizationElement from './VisualizationElement';
 
-import VisualizationElement from '../aggregationElements/VisualizationElement';
+import ElementConfigurationContainer from '../ElementConfigurationContainer';
 
 const EventAnnotationCheckbox = styled(Checkbox)`
   input[type="checkbox"] {

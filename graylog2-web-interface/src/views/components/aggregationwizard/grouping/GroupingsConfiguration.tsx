@@ -22,10 +22,10 @@ import styled from 'styled-components';
 import { HoverForHelp, SortableList } from 'components/common';
 import { Checkbox } from 'components/graylog';
 
-import ElementConfigurationContainer from './ElementConfigurationContainer';
-import GroupBy from './GroupBy';
+import GroupingConfiguration from './GroupingConfiguration';
+import GroupingElement from './GroupingElement';
 
-import GroupByElement from '../aggregationElements/GroupByElement';
+import ElementConfigurationContainer from '../ElementConfigurationContainer';
 import { WidgetConfigFormValues } from '../WidgetConfigForm';
 
 const RollupColumnsCheckbox = styled(Checkbox)`
@@ -47,7 +47,7 @@ const GroupByConfiguration = () => {
   const { values: { groupBy }, values, setValues, setFieldValue } = useFormikContext<WidgetConfigFormValues>();
   const disableColumnRollup = !groupBy?.groupings?.find(({ direction }) => direction === 'column');
   const removeGrouping = useCallback((index) => () => {
-    setValues(GroupByElement.onRemove(index, values));
+    setValues(GroupingElement.onRemove(index, values));
   }, [setValues, values]);
 
   const isEmpty = !groupBy?.groupings;
@@ -82,9 +82,9 @@ const GroupByConfiguration = () => {
                                                                    className={className}
                                                                    testIdPrefix={`grouping-${index}`}
                                                                    onRemove={removeGrouping(index)}
-                                                                   elementTitle={GroupByElement.title}
+                                                                   elementTitle={GroupingElement.title}
                                                                    ref={ref}>
-                                      <GroupBy index={index} />
+                                      <GroupingConfiguration index={index} />
                                     </ElementConfigurationContainer>
                                   )} />
                   )} />

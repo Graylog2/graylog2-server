@@ -18,10 +18,10 @@ import * as React from 'react';
 import { useCallback } from 'react';
 import { useFormikContext, FieldArray } from 'formik';
 
-import ElementConfigurationContainer from './ElementConfigurationContainer';
-import Metric from './Metric';
+import MetricConfiguration from './MetricConfiguration';
+import MetricElement from './MetricElement';
 
-import MetricElement from '../aggregationElements/MetricElement';
+import ElementConfigurationContainer from '../ElementConfigurationContainer';
 import { WidgetConfigFormValues } from '../WidgetConfigForm';
 
 const MetricsConfiguration = () => {
@@ -36,18 +36,16 @@ const MetricsConfiguration = () => {
                 validateOnChange={false}
                 render={() => (
                   <>
-                    <div>
-                      {metrics.map((metric, index) => {
-                        return (
-                          // eslint-disable-next-line react/no-array-index-key
-                          <ElementConfigurationContainer key={`metrics-${index}`}
-                                                         onRemove={removeMetric(index)}
-                                                         elementTitle={MetricElement.title}>
-                            <Metric index={index} />
-                          </ElementConfigurationContainer>
-                        );
-                      })}
-                    </div>
+                    {metrics.map((metric, index) => {
+                      return (
+                      // eslint-disable-next-line react/no-array-index-key
+                        <ElementConfigurationContainer key={`metrics-${index}`}
+                                                       onRemove={removeMetric(index)}
+                                                       elementTitle={MetricElement.title}>
+                          <MetricConfiguration index={index} />
+                        </ElementConfigurationContainer>
+                      );
+                    })}
                   </>
                 )} />
   );

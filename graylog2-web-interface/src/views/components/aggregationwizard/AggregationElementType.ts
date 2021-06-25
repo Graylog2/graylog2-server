@@ -16,7 +16,7 @@
  */
 import AggregationWidgetConfig, { AggregationWidgetConfigBuilder } from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 
-import type { WidgetConfigFormValues, WidgetConfigValidationErrors } from '../WidgetConfigForm';
+import type { WidgetConfigFormValues, WidgetConfigValidationErrors } from './WidgetConfigForm';
 
 export type AggregationElement = {
   sectionTitle?: string,

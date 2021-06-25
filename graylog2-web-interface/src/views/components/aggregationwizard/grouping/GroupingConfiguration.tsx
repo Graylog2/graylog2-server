@@ -21,9 +21,9 @@ import { useFormikContext } from 'formik';
 import { FormikFormGroup } from 'components/common';
 import { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
 
-import Direction from './GroupBy/Direction';
-import FieldComponent from './GroupBy/FieldComponent';
-import Time from './GroupBy/Time';
+import Direction from './configuration/Direction';
+import FieldComponent from './configuration/FieldComponent';
+import Time from './configuration/Time';
 
 const Wrapper = styled.div``;
 
@@ -31,7 +31,7 @@ type Props = {
   index: number,
 }
 
-const GroupBy = React.memo(({ index }: Props) => {
+const GroupingConfiguration = React.memo(({ index }: Props) => {
   const { values: { groupBy } } = useFormikContext<WidgetConfigFormValues>();
   const fieldType = groupBy.groupings[index].field.type;
 
@@ -50,4 +50,4 @@ const GroupBy = React.memo(({ index }: Props) => {
   );
 });
 
-export default GroupBy;
+export default GroupingConfiguration;

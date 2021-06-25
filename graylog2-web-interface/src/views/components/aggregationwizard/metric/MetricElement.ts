@@ -18,9 +18,9 @@ import AggregationWidgetConfig, { AggregationWidgetConfigBuilder } from 'views/l
 import Series, { parseSeries } from 'views/logic/aggregationbuilder/Series';
 import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';
 
-import type { AggregationElement } from './AggregationElementType';
+import MetricsConfiguration from './MetricsConfiguration';
 
-import MetricsConfiguration from '../elementConfiguration/MetricsConfiguration';
+import type { AggregationElement } from '../AggregationElementType';
 import { WidgetConfigFormValues, MetricFormValues } from '../WidgetConfigForm';
 
 type MetricError = {

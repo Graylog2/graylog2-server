@@ -19,11 +19,12 @@ import { Field, useFormikContext } from 'formik';
 
 import Select from 'components/common/Select';
 import { Input } from 'components/bootstrap';
+
 import {
   GroupByFormValues,
   MetricFormValues,
   WidgetConfigFormValues,
-} from 'views/components/aggregationwizard/WidgetConfigForm';
+} from '../WidgetConfigForm';
 
 type Props = {
   index: number,

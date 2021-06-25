@@ -22,8 +22,8 @@ import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationW
 
 import WidgetConfigForm, { WidgetConfigFormValues } from './WidgetConfigForm';
 import ElementsConfiguration from './ElementsConfiguration';
-import aggregationElements from './aggregationElements';
-import Visualization from './Visualization';
+import aggregationElements from './aggregationElementDefinitions';
+import VisualizationContainer from './VisualizationContainer';
 
 const aggregationElementsByKey = Object.fromEntries(aggregationElements.map((element) => ([element.key, element])));
 
@@ -118,9 +118,9 @@ const AggregationWizard = ({ onChange, config, children }: EditWidgetComponentPr
                                    onConfigChange={onChange} />
           </Section>
         </Controls>
-        <Visualization>
+        <VisualizationContainer>
           {children}
-        </Visualization>
+        </VisualizationContainer>
       </>
     </WidgetConfigForm>
   );

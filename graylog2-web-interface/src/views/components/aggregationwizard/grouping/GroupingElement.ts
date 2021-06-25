@@ -20,8 +20,9 @@ import uuid from 'uuid/v4';
 import AggregationWidgetConfig, { AggregationWidgetConfigBuilder } from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Pivot, { TimeConfigType, ValuesConfigType } from 'views/logic/aggregationbuilder/Pivot';
 
-import type { AggregationElement } from './AggregationElementType';
+import GroupingsConfiguration from './GroupingsConfiguration';
 
+import type { AggregationElement } from '../AggregationElementType';
 import type {
   BaseGrouping,
   DateGrouping,
@@ -30,7 +31,6 @@ import type {
   ValuesGrouping,
   WidgetConfigFormValues,
 } from '../WidgetConfigForm';
-import GroupByConfiguration from '../elementConfiguration/GroupByConfiguration';
 
 type GroupByError = {
   field?: string,
@@ -227,7 +227,7 @@ const GroupByElement: AggregationElement = {
     };
   },
   toConfig: (formValues: WidgetConfigFormValues, configBuilder: AggregationWidgetConfigBuilder) => groupByToConfig(formValues.groupBy, configBuilder),
-  component: GroupByConfiguration,
+  component: GroupingsConfiguration,
   validate: validateGroupBy,
 };
 

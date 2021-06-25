@@ -16,11 +16,11 @@
  */
 import { GroupByFormValues, WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
 
-import GroupByElement from './GroupByElement';
+import GroupingElement from './GroupingElement';
 
 describe('GroupByElement', () => {
   describe('Validation', () => {
-    const { validate } = GroupByElement;
+    const { validate } = GroupingElement;
     const values = { groupBy: { columnRollup: true, groupings: [] } } as WidgetConfigFormValues;
 
     describe('Values', () => {
@@ -109,7 +109,7 @@ describe('GroupByElement', () => {
   });
 
   describe('remove grouping', () => {
-    const { onRemove } = GroupByElement;
+    const { onRemove } = GroupingElement;
     const values = { groupBy: { columnRollup: true, groupings: [] } } as WidgetConfigFormValues;
 
     it('should remove form values from a grouping', () => {

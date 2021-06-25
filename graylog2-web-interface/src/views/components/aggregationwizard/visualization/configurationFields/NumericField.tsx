@@ -19,7 +19,8 @@ import { useCallback } from 'react';
 import type { NumericField as NumericFieldType } from 'views/types';
 
 import { Input } from 'components/bootstrap';
-import { FieldComponentProps } from 'views/components/aggregationwizard/elementConfiguration/VisualizationConfigurationOptions';
+
+import { FieldComponentProps } from '../VisualizationConfigurationOptions';
 
 type Props = FieldComponentProps & {
   field: NumericFieldType,
