@@ -172,20 +172,21 @@ const WidgetActionsMenu = ({
         )}
         {!isFocused && (
           <>
-            <IconButton name="expand-arrows-alt"
-                        title="Focus this widget"
-                        onClick={() => setWidgetFocusing(widget.id)} />
             <WidgetHorizontalStretch widgetId={widget.id}
                                      widgetType={widget.type}
                                      onStretch={onPositionsChange}
                                      position={position} />
+            <IconButton name="expand-arrows-alt"
+                        title="Focus this widget"
+                        onClick={() => setWidgetFocusing(widget.id)} />
           </>
         )}
 
+        <IconButton name="edit"
+                    title="Edit"
+                    onClick={toggleEdit} />
+
         <WidgetActionDropdown>
-          <MenuItem onSelect={toggleEdit}>
-            Edit
-          </MenuItem>
           <MenuItem onSelect={onDuplicate}>
             Duplicate
           </MenuItem>
