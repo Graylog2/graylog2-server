@@ -15,8 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import * as Immutable from 'immutable';
 import { render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
-import { viewsManager as currentUser } from 'fixtures/users';
+import { alice } from 'fixtures/users';
 import { simpleEventDefinition } from 'fixtures/eventDefinition';
 
 import CurrentUserContext from 'contexts/CurrentUserContext';
@@ -31,15 +32,22 @@ const exampleEventDefinition = {
 jest.mock('components/permissions/EntityShareModal', () => () => <div>EntityShareModal content</div>);
 
 describe('EventDefinitionEntry', () => {
-  const renderSUT = (grn_permissions = [], permissions = []) => (
-    <CurrentUserContext.Provider value={{ ...currentUser, grn_permissions, permissions }}>
-      <EventDefinitionEntry onDelete={() => {}}
-                            onDisable={() => {}}
-                            onEnable={() => {}}
-                            context={{ scheduler: {} }}
-                            eventDefinition={exampleEventDefinition} />
-    </CurrentUserContext.Provider>
-  );
+  const renderSUT = (grnPermissions = [], permissions = []) => {
+    const currentUser = alice.toBuilder()
+      .grnPermissions(Immutable.List(grnPermissions))
+      .permissions(Immutable.List(permissions))
+      .build();
+
+    return (
+      <CurrentUserContext.Provider value={currentUser}>
+        <EventDefinitionEntry onDelete={() => {}}
+                              onDisable={() => {}}
+                              onEnable={() => {}}
+                              context={{ scheduler: {} }}
+                              eventDefinition={exampleEventDefinition} />
+      </CurrentUserContext.Provider>
+    );
+  };
 
   it('allows sharing for owners', async () => {
     const grnPermissions = ['entity:own:grn::::event_definition:event-definition-id'];

@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useContext } from 'react';
-import PropTypes from 'prop-types';
 import naturalSort from 'javascript-natural-sort';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
@@ -84,7 +83,7 @@ type Props = {
 
 const Navigation = ({ location }: Props) => {
   const currentUser = useContext(CurrentUserContext);
-  const { permissions, full_name: fullName, read_only: readOnly, id: userId } = currentUser || {};
+  const { permissions, fullName, readOnly, id: userId } = currentUser || {};
 
   const pluginExports = PluginStore.exports('navigation');
 

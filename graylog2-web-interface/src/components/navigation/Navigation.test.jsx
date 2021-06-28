@@ -15,10 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import * as Immutable from 'immutable';
 import { mount } from 'wrappedEnzyme';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import mockComponent from 'helpers/mocking/MockComponent';
-import { viewsManager } from 'fixtures/users';
+import { alice as currentUser } from 'fixtures/users';
 
 import Routes from 'routing/Routes';
 import AppConfig from 'util/AppConfig';
@@ -41,7 +42,6 @@ jest.mock('util/AppConfig', () => ({
 
 jest.mock('routing/withLocation', () => (x) => x);
 
-const currentUser = viewsManager;
 const findLink = (wrapper, title) => wrapper.find(`NavigationLink[description="${title}"]`);
 
 jest.mock('./DevelopmentHeaderBadge', () => () => <span />);
@@ -51,11 +51,15 @@ describe('Navigation', () => {
 
   // We can't use prop types here, they are not compatible with mount and require in this case
   // eslint-disable-next-line react/prop-types
-  const SimpleNavigation = ({ component: Component, permissions, ...props }) => (
-    <CurrentUserContext.Provider value={{ ...currentUser, permissions }}>
-      <Component {...props} />
-    </CurrentUserContext.Provider>
-  );
+  const SimpleNavigation = ({ component: Component, permissions, ...props }) => {
+    const user = currentUser.toBuilder().permissions(Immutable.List(permissions)).build();
+
+    return (
+      <CurrentUserContext.Provider value={user}>
+        <Component {...props} />
+      </CurrentUserContext.Provider>
+    );
+  };
 
   SimpleNavigation.defaultProps = {
     location: { pathname: '/' },
@@ -86,7 +90,7 @@ describe('Navigation', () => {
       const usermenu = wrapper.find('UserMenu');
 
       expect(usermenu).toHaveProp('userId', currentUser.id);
-      expect(usermenu).toHaveProp('fullName', currentUser.full_name);
+      expect(usermenu).toHaveProp('fullName', currentUser.fullName);
     });
 
     it('contains help menu', () => {

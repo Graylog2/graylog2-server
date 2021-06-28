@@ -16,10 +16,10 @@
  */
 import React from 'react';
 import * as mockImmutable from 'immutable';
-import { render, fireEvent } from 'wrappedTestingLibrary';
-import { viewsManager } from 'fixtures/users';
+import { render, fireEvent, waitFor } from 'wrappedTestingLibrary';
+import { alice } from 'fixtures/users';
 
-import type { UserJSON } from 'logic/users/User';
+import User from 'logic/users/User';
 import Search from 'views/logic/search/Search';
 import View from 'views/logic/views/View';
 import CurrentUserContext from 'contexts/CurrentUserContext';
@@ -80,14 +80,19 @@ jest.mock('stores/permissions/EntityShareStore', () => ({
 }));
 
 describe('ViewActionsMenu', () => {
-  const SimpleViewActionMenu = ({ currentUser, ...props }: {currentUser?: UserJSON}) => (
-    <CurrentUserContext.Provider value={currentUser}>
+  const currentUser = alice.toBuilder()
+    .grnPermissions(mockImmutable.List(['entity:own:grn::::dashboard:view-id']))
+    .permissions(mockImmutable.List(['dashboards:edit:view-id', 'view:edit:view-id']))
+    .build();
+
+  const SimpleViewActionMenu = ({ currentUser: user, ...props }: {currentUser?: User}) => (
+    <CurrentUserContext.Provider value={user}>
       <ViewActionsMenu {...props} />
     </CurrentUserContext.Provider>
   );
 
   SimpleViewActionMenu.defaultProps = {
-    currentUser: viewsManager,
+    currentUser,
   };
 
   it('should open modal to save new dashboard', () => {
@@ -99,13 +104,13 @@ describe('ViewActionsMenu', () => {
     expect(getByText('Save new dashboard')).not.toBeNull();
   });
 
-  it('should open edit dashboard meta information modal', () => {
+  it('should open edit dashboard meta information modal', async () => {
     const { getByText } = render(<SimpleViewActionMenu />);
-    const editMenuItem = getByText(/Edit/i);
+    const editMenuItem = getByText(/Edit metadata/i);
 
     fireEvent.click(editMenuItem);
 
-    expect(getByText('Editing dashboard')).not.toBeNull();
+    await waitFor(() => expect(getByText(/Editing dashboard/)).toBeInTheDocument());
   });
 
   it('should dashboard share modal', () => {

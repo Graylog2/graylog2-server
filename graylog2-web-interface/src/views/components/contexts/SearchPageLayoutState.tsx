@@ -52,7 +52,7 @@ const _getPinningPreferenceKey = (viewType: ViewType | undefined): PinningPrefer
 const _userSidebarPinningPref = (currentUser, userPreferences, viewType) => {
   const sidebarPinningPrefKey = _getPinningPreferenceKey(viewType);
 
-  if (currentUser?.read_only) {
+  if (currentUser?.readOnly) {
     return Store.get(sidebarPinningPrefKey);
   }
 
@@ -62,7 +62,7 @@ const _userSidebarPinningPref = (currentUser, userPreferences, viewType) => {
 const _updateUserSidebarPinningPref = (currentUser, userPreferences, viewType, newIsPinned) => {
   const sidebarPinningPrefKey: string = _getPinningPreferenceKey(viewType);
 
-  if (currentUser?.read_only) {
+  if (currentUser?.readOnly) {
     Store.set(sidebarPinningPrefKey, newIsPinned);
   } else {
     const newUserPreferences = {

@@ -25,7 +25,6 @@ import UsersDomain from 'domainActions/users/UsersDomain';
 import Routes from 'routing/Routes';
 import { Button, OverlayTrigger, Tooltip, DropdownButton, MenuItem } from 'components/graylog';
 import { IfPermitted } from 'components/common';
-import { UserJSON } from 'logic/users/User';
 
 type Props = {
   user: UserOverview,
@@ -68,7 +67,7 @@ const ReadOnlyActions = ({ user }: { user: UserOverview }) => {
 };
 
 const EditActions = ({ user, user: { username, id, fullName, accountStatus, external, readOnly } }: { user: UserOverview }) => {
-  const currentUser = useContext<UserJSON>(CurrentUserContext);
+  const currentUser = useContext(CurrentUserContext);
 
   const _toggleStatus = () => {
     if (accountStatus === 'enabled') {

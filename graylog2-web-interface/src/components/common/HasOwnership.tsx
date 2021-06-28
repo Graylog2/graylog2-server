@@ -20,7 +20,6 @@ import PropTypes from 'prop-types';
 
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import { createGRN } from 'logic/permissions/GRN';
-import { UserJSON } from 'logic/users/User';
 
 type ChildFun = ({ disabled: boolean }) => React.ReactElement;
 
@@ -32,13 +31,13 @@ type Props = {
 };
 
 const HasOwnership = ({ children, id, type, hideChildren }: Props) => {
-  const currentUser = useContext<UserJSON>(CurrentUserContext);
+  const currentUser = useContext(CurrentUserContext);
   const entity = createGRN(type, id);
   const ownership = `entity:own:${entity}`;
   const adminPermission = '*';
 
   if (currentUser) {
-    const { grn_permissions: grnPermissions = [], permissions } = currentUser;
+    const { grnPermissions = [], permissions } = currentUser;
     const isAdmin = permissions.includes(adminPermission);
 
     if (grnPermissions.includes(ownership) || isAdmin) {
