@@ -34,8 +34,8 @@ const StyledListGroupItem = styled(ListGroupItem)(({ theme }) => css`
 `);
 
 const HeaderWrapper = styled.div`
-  margin: 10px 0;
-  min-height: 20px;
+  padding: 10px 0;
+  min-height: 40px;
 `;
 
 const ControlledTableListHeader = createReactClass({
