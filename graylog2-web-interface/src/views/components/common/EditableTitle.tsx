@@ -23,7 +23,6 @@ import styles from './EditableTitle.css';
 const StyledStaticSpan = styled.span(({ theme }) => css`
   border: 1px solid ${theme.colors.global.contentBackground};
   font-size: ${theme.fonts.size.large};
-  display: inline-block;
 `);
 
 const StyledInput = styled.input(({ theme }) => css`
