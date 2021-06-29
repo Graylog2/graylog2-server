@@ -82,7 +82,7 @@ import LookupTableParameter from 'views/logic/parameters/LookupTableParameter';
 import HeatmapVisualizationConfiguration from 'views/components/aggregationbuilder/HeatmapVisualizationConfiguration';
 import HeatmapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/HeatmapVisualizationConfig';
 import visualizationBindings from 'views/components/visualizations/bindings';
-import AggregationWizard from 'views/components/aggregationwizard/AggregationWizard';
+import { AggregationWizard } from 'views/components/aggregationwizard';
 import { filterCloudValueActions } from 'util/conditional/filterValueActions';
 
 import type { ActionHandlerArguments } from './components/actions/ActionHandler';
