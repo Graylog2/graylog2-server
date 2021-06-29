@@ -18,9 +18,10 @@ import * as React from 'react';
 import { Field, useFormikContext } from 'formik';
 import { useContext } from 'react';
 
-import FieldSelect from 'views/components/aggregationwizard/elementConfiguration/FieldSelect';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
+
+import FieldSelect from '../../FieldSelect';
 
 type Props = {
   index: number,

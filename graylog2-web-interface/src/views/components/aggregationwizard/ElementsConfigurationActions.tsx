@@ -23,8 +23,8 @@ import { Spinner } from 'components/common';
 import { ButtonToolbar } from 'components/graylog';
 import Button from 'components/graylog/Button';
 import AggregationElementSelect from 'views/components/aggregationwizard/AggregationElementSelect';
-import aggregationElements from 'views/components/aggregationwizard/aggregationElements';
 
+import aggregationElements from './aggregationElementDefinitions';
 import type { WidgetConfigFormValues } from './WidgetConfigForm';
 
 const aggregationElementsByKey = Object.fromEntries(aggregationElements.map((element) => ([element.key, element])));

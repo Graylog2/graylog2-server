@@ -30,7 +30,7 @@ type Props = {
   children: React.ReactElement
 }
 
-const Visualization = ({ children }: Props) => {
+const VisualizationContainer = ({ children }: Props) => {
   const { setFieldValue, values } = useFormikContext<WidgetConfigFormValues>();
 
   const onVisualizationConfigChange = useCallback((newVisualizationConfig) => {
@@ -48,4 +48,4 @@ const Visualization = ({ children }: Props) => {
   );
 };
 
-export default Visualization;
+export default VisualizationContainer;

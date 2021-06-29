@@ -21,9 +21,9 @@ import { VisualizationType } from 'views/types';
 import AggregationWidgetConfig, { AggregationWidgetConfigBuilder } from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 
-import type { AggregationElement } from './AggregationElementType';
+import VisualizationConfiguration from './VisualizationConfiguration';
 
-import VisualizationConfiguration from '../elementConfiguration/VisualizationConfiguration';
+import type { AggregationElement } from '../AggregationElementType';
 import { VisualizationConfigFormValues, WidgetConfigFormValues } from '../WidgetConfigForm';
 
 const findVisualizationType = (visualizationType: string) => {

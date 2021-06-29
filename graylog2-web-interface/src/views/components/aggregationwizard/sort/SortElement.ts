@@ -20,9 +20,9 @@ import AggregationWidgetConfig, { AggregationWidgetConfigBuilder } from 'views/l
 import Direction from 'views/logic/aggregationbuilder/Direction';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 
-import type { AggregationElement } from './AggregationElementType';
+import SortsConfiguration from './SortsConfiguration';
 
-import SortConfiguration from '../elementConfiguration/SortConfiguration';
+import type { AggregationElement } from '../AggregationElementType';
 import { WidgetConfigFormValues } from '../WidgetConfigForm';
 
 type SortError = {
@@ -98,7 +98,7 @@ const SortElement: AggregationElement = {
       addRandomId({}),
     ],
   }),
-  component: SortConfiguration,
+  component: SortsConfiguration,
   fromConfig: (config: AggregationWidgetConfig) => ({
     sort: config.sort.map((s) => addRandomId({
       type: configTypeToFormValueType(s.type),

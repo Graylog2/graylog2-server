@@ -18,9 +18,10 @@ import * as React from 'react';
 import { Field } from 'formik';
 import styled from 'styled-components';
 
-import { FieldComponentProps } from 'views/components/aggregationwizard/elementConfiguration/VisualizationConfigurationOptions';
 import { Input } from 'components/bootstrap';
 import { HelpBlock } from 'components/graylog';
+
+import { FieldComponentProps } from '../VisualizationConfigurationOptions';
 
 const StyledField = styled(Field)`
   &&[type="checkbox"] {

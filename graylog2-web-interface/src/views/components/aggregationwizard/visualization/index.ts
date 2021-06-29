@@ -14,11 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { WidgetConfigFormValues } from 'views/components/aggregationwizard';
+import VisualizationElement from './VisualizationElement';
 
-export const areAtLeastNMetricsConfigured = (formValues: WidgetConfigFormValues, minimumMetrics: number) => formValues.metrics?.length >= minimumMetrics;
-export const areAtLeastNGroupingsConfigured = (formValues: WidgetConfigFormValues, minimumGroupings: number) => formValues.groupBy?.groupings?.length >= minimumGroupings;
-
-export const hasAtLeastOneMetric = (name: string) => (formValues: WidgetConfigFormValues) => (!areAtLeastNMetricsConfigured(formValues, 1)
-  ? { type: `${name} requires at least one metric` }
-  : {});
+export default VisualizationElement;

@@ -36,7 +36,7 @@ import {
   VisualizationConfigFormValues,
   VisualizationFormValues,
   WidgetConfigFormValues,
-} from 'views/components/aggregationwizard/WidgetConfigForm';
+} from 'views/components/aggregationwizard';
 import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 
 interface EditWidgetComponentProps<Config extends WidgetConfig = WidgetConfig> {

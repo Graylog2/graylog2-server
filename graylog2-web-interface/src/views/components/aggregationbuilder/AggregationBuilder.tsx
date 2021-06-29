@@ -27,7 +27,7 @@ import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 import EmptyAggregationContent from './EmptyAggregationContent';
 import FullSizeContainer from './FullSizeContainer';
 
-import type { VisualizationConfigFormValues } from '../aggregationwizard/WidgetConfigForm';
+import type { VisualizationConfigFormValues } from 'views/components/aggregationwizard';
 
 const defaultVisualizationType = 'table';
 

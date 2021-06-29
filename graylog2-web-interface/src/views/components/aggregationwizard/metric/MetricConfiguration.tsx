@@ -25,7 +25,7 @@ import AggregationFunctionsStore from 'views/stores/AggregationFunctionsStore';
 import { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
 import { InputOptionalInfo as Opt, FormikInput } from 'components/common';
 
-import FieldSelect from './FieldSelect';
+import FieldSelect from '../FieldSelect';
 
 type Props = {
   index: number,

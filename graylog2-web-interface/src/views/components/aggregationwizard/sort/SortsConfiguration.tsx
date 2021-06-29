@@ -19,14 +19,14 @@ import { useCallback } from 'react';
 import { FieldArray, useFormikContext } from 'formik';
 
 import { SortableList } from 'components/common';
-import Sort from 'views/components/aggregationwizard/elementConfiguration/Sort';
-import ElementConfigurationContainer
-  from 'views/components/aggregationwizard/elementConfiguration/ElementConfigurationContainer';
 import { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
 
-import SortElement from '../aggregationElements/SortElement';
+import SortConfiguration from './SortConfiguration';
+import SortElement from './SortElement';
 
-const SortConfiguration = () => {
+import ElementConfigurationContainer from '../ElementConfigurationContainer';
+
+const SortsConfiguration = () => {
   const { values: { sort }, setFieldValue, setValues, values } = useFormikContext<WidgetConfigFormValues>();
   const removeSort = useCallback((index) => () => {
     setValues(SortElement.onRemove(index, values));
@@ -47,11 +47,11 @@ const SortConfiguration = () => {
                                                                  onRemove={removeSort(index)}
                                                                  elementTitle={SortElement.title}
                                                                  ref={ref}>
-                                    <Sort index={index} />
+                                    <SortConfiguration index={index} />
                                   </ElementConfigurationContainer>
                                 )} />
                 )} />
   );
 };
 
-export default SortConfiguration;
+export default SortsConfiguration;

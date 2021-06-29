@@ -21,9 +21,9 @@ import styled from 'styled-components';
 
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 
-import ElementConfigurationSection from './elementConfiguration/ElementConfigurationSection';
+import ElementConfigurationSection from './ElementConfigurationSection';
 import ElementsConfigurationActions from './ElementsConfigurationActions';
-import type { AggregationElement } from './aggregationElements/AggregationElementType';
+import type { AggregationElement } from './AggregationElementType';
 import type { WidgetConfigFormValues } from './WidgetConfigForm';
 
 const Container = styled.div`

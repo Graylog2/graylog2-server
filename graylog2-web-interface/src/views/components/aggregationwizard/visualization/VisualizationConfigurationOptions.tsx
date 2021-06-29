@@ -19,10 +19,10 @@ import { Field, getIn, useFormikContext } from 'formik';
 import { ConfigurationField } from 'views/types';
 import styled from 'styled-components';
 
-import BooleanField from 'views/components/aggregationwizard/elementConfiguration/configurationFields/BooleanField';
 import { VisualizationConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
 import { HoverForHelp } from 'components/common';
 
+import BooleanField from './configurationFields/BooleanField';
 import NumericField from './configurationFields/NumericField';
 import SelectField from './configurationFields/SelectField';
 
