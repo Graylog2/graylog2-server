@@ -23,33 +23,33 @@ require._core = {
 require.resolve = (function () {
     return function (x, cwd) {
         if (!cwd) cwd = '/';
-        
+
         if (require._core[x]) return x;
         var path = require.modules.path();
         var y = cwd || '.';
-        
+
         if (x.match(/^(?:\.\.?\/|\/)/)) {
             var m = loadAsFileSync(path.resolve(y, x))
                 || loadAsDirectorySync(path.resolve(y, x));
             if (m) return m;
         }
-        
+
         var n = loadNodeModulesSync(x, y);
         if (n) return n;
-        
+
         throw new Error("Cannot find module '" + x + "'");
-        
+
         function loadAsFileSync (x) {
             if (require.modules[x]) {
                 return x;
             }
-            
+
             for (var i = 0; i < require.extensions.length; i++) {
                 var ext = require.extensions[i];
                 if (require.modules[x + ext]) return x + ext;
             }
         }
-        
+
         function loadAsDirectorySync (x) {
             x = x.replace(/\/+$/, '');
             var pkgfile = x + '/package.json';
@@ -69,10 +69,10 @@ require.resolve = (function () {
                     if (m) return m;
                 }
             }
-            
+
             return loadAsFileSync(x + '/index');
         }
-        
+
         function loadNodeModulesSync (x, start) {
             var dirs = nodeModulesPathsSync(start);
             for (var i = 0; i < dirs.length; i++) {
@@ -82,23 +82,23 @@ require.resolve = (function () {
                 var n = loadAsDirectorySync(dir + '/' + x);
                 if (n) return n;
             }
-            
+
             var m = loadAsFileSync(x);
             if (m) return m;
         }
-        
+
         function nodeModulesPathsSync (start) {
             var parts;
             if (start === '/') parts = [ '' ];
             else parts = path.normalize(start).split('/');
-            
+
             var dirs = [];
             for (var i = parts.length - 1; i >= 0; i--) {
                 if (parts[i] === 'node_modules') continue;
                 var dir = parts.slice(0, i + 1).join('/') + '/node_modules';
                 dirs.push(dir);
             }
-            
+
             return dirs;
         }
     };
@@ -114,13 +114,13 @@ require.alias = function (from, to) {
         res = require.resolve(from, '/');
     }
     var basedir = path.dirname(res);
-    
+
     var keys = (Object.keys || function (obj) {
         var res = [];
         for (var key in obj) res.push(key)
         return res;
     })(require.modules);
-    
+
     for (var i = 0; i < keys.length; i++) {
         var key = keys[i];
         if (key.slice(0, basedir.length + 1) === basedir + '/') {
@@ -138,7 +138,7 @@ require.define = function (filename, fn) {
         ? ''
         : require.modules.path().dirname(filename)
     ;
-    
+
     var require_ = function (file) {
         return require(file, dirname)
     };
@@ -148,7 +148,7 @@ require.define = function (filename, fn) {
     require_.modules = require.modules;
     require_.define = require.define;
     var module_ = { exports : {} };
-    
+
     require.modules[filename] = function () {
         require.modules[filename]._cached = module_.exports;
         fn.call(
@@ -171,7 +171,7 @@ if (!process.nextTick) process.nextTick = (function () {
     var canPost = typeof window !== 'undefined'
         && window.postMessage && window.addEventListener
     ;
-    
+
     if (canPost) {
         window.addEventListener('message', function (ev) {
             if (ev.source === window && ev.data === 'browserify-tick') {
@@ -183,7 +183,7 @@ if (!process.nextTick) process.nextTick = (function () {
             }
         }, true);
     }
-    
+
     return function (fn) {
         if (canPost) {
             queue.push(fn);
@@ -293,7 +293,7 @@ path = normalizeArray(filter(path.split('/'), function(p) {
   if (path && trailingSlash) {
     path += '/';
   }
-  
+
   return (isAbsolute ? '/' : '') + path;
 };
 
@@ -344,7 +344,7 @@ require.define("/shred.js", function (require, module, exports, __dirname, __fil
     // Shred is an HTTP client library intended to simplify the use of Node's
 // built-in HTTP library. In particular, we wanted to make it easier to interact
 // with HTTP-based APIs.
-// 
+//
 // See the [examples](./examples.html) for more details.
 
 // Ax is a nice logging library we wrote. You can use any logger, providing it
@@ -366,7 +366,7 @@ var Shred = function(options) {
 };
 
 // Most of the real work is done in the request and reponse classes.
- 
+
 Shred.Request = require("./shred/request");
 Shred.Response = require("./shred/response");
 
@@ -437,7 +437,7 @@ var format = function(level,message) {
 
 var noOp = function(message) { return this; }
 var makeLogger = function(level,fn) {
-  return function(message) { 
+  return function(message) {
     this.stream.write(this.format(level, message)+"\n");
     return this;
   }
@@ -549,7 +549,7 @@ require.define("/node_modules/cookiejar/cookiejar.js", function (require, module
       return this;
     }
     else {
-        return new CookieAccessInfo(domain,path,secure,script)    
+        return new CookieAccessInfo(domain,path,secure,script)
     }
 }
 
@@ -608,7 +608,7 @@ Cookie.prototype.parse = function parse(str) {
       , value=pair[2];
       this.name = key;
       this.value = value;
-    
+
       for(var i=1;i<parts.length;i++) {
         pair=parts[i].match(/([^=]+)(?:=((?:.|\n)*))?/)
         , key=pair[1].trim().toLowerCase()
@@ -637,7 +637,7 @@ Cookie.prototype.parse = function parse(str) {
           break
         }
       }
-    
+
       return this;
   }
     return new Cookie().parse(str)
@@ -678,7 +678,7 @@ Cookie.prototype.collidesWith = function collidesWith(access_info) {
 exports.CookieJar=CookieJar=function CookieJar() {
   if(this instanceof CookieJar) {
       var cookies = {} //name: [Cookie]
-    
+
       this.setCookie = function setCookie(cookie) {
         cookie = Cookie(cookie);
         //Delete the cookie if the set is past the current time
@@ -742,7 +742,7 @@ exports.CookieJar=CookieJar=function CookieJar() {
             matches.toValueString=function() {return matches.map(function(c){return c.toValueString();}).join(';');}
         return matches;
       }
-    
+
       return this;
   }
     return new CookieJar()
@@ -1121,7 +1121,7 @@ var processOptions = function(request,options) {
       request.setHeader("cookie", cookieString);
     }
   }
-  
+
   // The content entity can be set either using the `body` or `content` attributes.
   if (options.body||options.content) {
     request.content = options.body||options.content;
@@ -1149,7 +1149,7 @@ var createRequest = function(request) {
     // Node's HTTP/S modules will ignore this, but we are using the
     // browserify-http module in the browser for both HTTP and HTTPS, and this
     // is how you differentiate the two.
-    scheme: request.scheme,
+    scheme: request.scheme || window.location.protocol.replace(':', ''),
     // Use a provided agent.  'Undefined' is the default, which uses a global
     // agent.
     agent: request.agent
@@ -1739,14 +1739,14 @@ try {
 // `Request` object handles this, getting the raw response object and passing it
 // in here, along with the request. The callback allows us to stream the response
 // and then use the callback to let the request know when it's ready.
-var Response = function(raw, request, callback) { 
+var Response = function(raw, request, callback) {
   var response = this;
   this._raw = raw;
 
   // The `._setHeaders` method is "private"; you can't otherwise set headers on
   // the response.
   this._setHeaders.call(this,raw.headers);
-  
+
   // store any cookies
   if (request.cookieJar && this.getHeader('set-cookie')) {
     var cookieStrings = this.getHeader('set-cookie');
@@ -1809,7 +1809,7 @@ var Response = function(raw, request, callback) {
     }
 
     var setBodyAndFinish = function (body) {
-      response._body = new Content({ 
+      response._body = new Content({
         body: body,
         type: response.getHeader("Content-Type")
       });
@@ -1829,7 +1829,7 @@ var Response = function(raw, request, callback) {
     else{
        if (response.request.encoding){
             body = Iconv.fromEncoding(body,response.request.encoding);
-        }        
+        }
       setBodyAndFinish(body);
     }
   });
@@ -1862,8 +1862,8 @@ Response.prototype = {
 
 // `Response` object properties, all of which are read-only:
 Object.defineProperties(Response.prototype, {
-  
-// - **status**. The HTTP status code for the response. 
+
+// - **status**. The HTTP status code for the response.
   status: {
     get: function() { return this._raw.statusCode; },
     enumerable: true
@@ -1921,7 +1921,7 @@ module.exports = Response;
 });
 
 require.define("/shred/content.js", function (require, module, exports, __dirname, __filename) {
-    
+
 // The purpose of the `Content` object is to abstract away the data conversions
 // to and from raw content entities as strings. For example, you want to be able
 // to pass in a Javascript object and have it be automatically converted into a
@@ -1951,7 +1951,7 @@ Content.prototype = {
 
 // `Content` objects have the following attributes:
 Object.defineProperties(Content.prototype,{
-  
+
 // - **type**. Typically accessed as `content.type`, reflects the `content-type`
 //   header associated with the request or response. If not passed as an options
 //   to the constructor or set explicitly, it will infer the type the `data`
@@ -2065,7 +2065,7 @@ Content.processors = {};
 // - **stringify**. The function used to convert a Javascript data type into a
 //   raw content entity.
 Content.registerProcessor = function(types,processor) {
-  
+
 // You can pass an array of types that will trigger this processor, or just one.
 // We determine the array via duck-typing here.
   if (types.forEach) {
@@ -2120,7 +2120,7 @@ require.define("/shred/mixins/headers.js", function (require, module, exports, _
 // overload the index operator in Javascript, using a hash to represent the
 // headers means it's possible to have two conflicting values for a single
 // header.
-// 
+//
 // The solution to this is to provide explicit methods to set or get headers.
 // This also has the benefit of allowing us to introduce additional variations,
 // including snake case, which we automatically convert to what Matthew King has
@@ -2134,7 +2134,7 @@ require.define("/shred/mixins/headers.js", function (require, module, exports, _
 var corsetCase = function(string) {
   return string.toLowerCase()
       //.replace("_","-")
-      .replace(/(^|-)(\w)/g, 
+      .replace(/(^|-)(\w)/g,
           function(s) { return s.toUpperCase(); });
 };
 
@@ -2158,7 +2158,7 @@ var getHeader = function(object,name) {
 };
 
 // The "real" `getHeader` function: get one or more headers, or all of them
-// if you don't ask for any specifics. 
+// if you don't ask for any specifics.
 var getHeaders = function(object,names) {
   var keys = (names && names.length>0) ? names : Object.keys($H(object));
   var hash = keys.reduce(function(hash,key) {
@@ -2186,7 +2186,7 @@ var setHeaders = function(object,hash) {
 // Here's where we actually bind the functionality to an object. These mixins work by
 // exposing mixin functions. Each function mixes in a specific batch of features.
 module.exports = {
-  
+
   // Add getters.
   getters: function(constructor) {
     constructor.prototype.getHeader = function(name) { return getHeader(this,name); };
@@ -2226,10 +2226,10 @@ var iconv = module.exports = {
     fromEncoding: function(buf, encoding) {
         return iconv.getCodec(encoding).fromEncoding(buf);
     },
-    
+
     defaultCharUnicode: '�',
     defaultCharSingleByte: '?',
-    
+
     // Get correct codec for given encoding.
     getCodec: function(encoding) {
         var enc = encoding || "utf8";
@@ -2248,7 +2248,7 @@ var iconv = module.exports = {
                 // Options for other encoding.
                 codecOptions = codec;
                 enc = codec.type;
-            } 
+            }
             else if (type === "Function")
                 // Codec itself.
                 return codec(codecOptions);
@@ -2256,7 +2256,7 @@ var iconv = module.exports = {
                 throw new Error("Encoding not recognized: '" + encoding + "' (searched as: '"+enc+"')");
         }
     },
-    
+
     // Define basic encodings
     encodings: {
         internal: function(options) {
@@ -2274,20 +2274,20 @@ var iconv = module.exports = {
         binary: "internal",
         ascii: "internal",
         base64: "internal",
-        
+
         // Codepage single-byte encodings.
         singlebyte: function(options) {
             // Prepare chars if needed
             if (!options.chars || (options.chars.length !== 128 && options.chars.length !== 256))
                 throw new Error("Encoding '"+options.type+"' has incorrect 'chars' (must be of len 128 or 256)");
-            
+
             if (options.chars.length === 128)
                 options.chars = asciiString + options.chars;
-            
+
             if (!options.charsBuf) {
                 options.charsBuf = new Buffer(options.chars, 'ucs2');
             }
-            
+
             if (!options.revCharsBuf) {
                 options.revCharsBuf = new Buffer(65536);
                 var defChar = iconv.defaultCharSingleByte.charCodeAt(0);
@@ -2296,21 +2296,21 @@ var iconv = module.exports = {
                 for (var i = 0; i < options.chars.length; i++)
                     options.revCharsBuf[options.chars.charCodeAt(i)] = i;
             }
-            
+
             return {
                 toEncoding: function(str) {
                     str = ensureString(str);
-                    
+
                     var buf = new Buffer(str.length);
                     var revCharsBuf = options.revCharsBuf;
                     for (var i = 0; i < str.length; i++)
                         buf[i] = revCharsBuf[str.charCodeAt(i)];
-                    
+
                     return buf;
                 },
                 fromEncoding: function(buf) {
                     buf = ensureBuffer(buf);
-                    
+
                     // Strings are immutable in JS -> we use ucs2 buffer to speed up computations.
                     var charsBuf = options.charsBuf;
                     var newBuf = new Buffer(buf.length*2);
@@ -2337,7 +2337,7 @@ var iconv = module.exports = {
                     revCharsTable[table[key]] = parseInt(key);
                 }
             }
-            
+
             return {
                 toEncoding: function(str) {
                     str = ensureString(str);
@@ -2347,7 +2347,7 @@ var iconv = module.exports = {
                         if (str.charCodeAt(i) >> 7)
                             bufLen++;
 
-                    var newBuf = new Buffer(bufLen), gbkcode, unicode, 
+                    var newBuf = new Buffer(bufLen), gbkcode, unicode,
                         defaultChar = revCharsTable[iconv.defaultCharUnicode.charCodeAt(0)];
 
                     for (var i = 0, j = 0; i < strLen; i++) {
@@ -2372,7 +2372,7 @@ var iconv = module.exports = {
                     }
                     var newBuf = new Buffer(strLen*2), unicode, gbkcode,
                         defaultChar = iconv.defaultCharUnicode.charCodeAt(0);
-                    
+
                     for (var i = 0, j = 0; i < bufLen; i++, j+=2) {
                         gbkcode = buf[i];
                         if (gbkcode & 0x80) {
@@ -2439,7 +2439,7 @@ http.request = function (params, cb) {
     if (!params) params = {};
     if (!params.host) params.host = window.location.host.split(':')[0];
     if (!params.port) params.port = window.location.port;
-    
+
     var req = new Request(new xhrHttp, params);
     if (cb) req.on('response', cb);
     return req;
@@ -2554,15 +2554,15 @@ var Request = module.exports = function (xhr, params) {
     var self = this;
     self.xhr = xhr;
     self.body = '';
-    
+
     var uri = params.host + ':' + params.port + (params.path || '/');
-    
+
     xhr.open(
         params.method || 'GET',
         (params.scheme || 'http') + '://' + uri,
         true
     );
-    
+
     if (params.headers) {
         Object.keys(params.headers).forEach(function (key) {
             if (!isSafeHeader(key)) return;
@@ -2575,12 +2575,12 @@ var Request = module.exports = function (xhr, params) {
             else xhr.setRequestHeader(key, value)
         });
     }
-    
+
     var res = new Response(xhr);
     res.on('ready', function () {
         self.emit('response', res);
     });
-    
+
     xhr.onreadystatechange = function () {
         res.handle(xhr);
     };
@@ -2633,11 +2633,11 @@ function parseHeaders (xhr) {
     for (var i = 0; i < lines.length; i++) {
         var line = lines[i];
         if (line === '') continue;
-        
+
         var m = line.match(/^([^:]+):\s*(.*)/);
         if (m) {
             var key = m[1].toLowerCase(), value = m[2];
-            
+
             if (headers[key] !== undefined) {
                 if ((Array.isArray && Array.isArray(headers[key]))
                 || headers[key] instanceof Array) {
@@ -2681,7 +2681,7 @@ Response.prototype.handle = function () {
         catch (err) {
             capable.status2 = false;
         }
-        
+
         if (capable.status2) {
             this.emit('ready');
         }
@@ -2695,7 +2695,7 @@ Response.prototype.handle = function () {
             }
         }
         catch (err) {}
-        
+
         try {
             this.write();
         }
@@ -2709,7 +2709,7 @@ Response.prototype.handle = function () {
             this.emit('ready');
         }
         this.write();
-        
+
         if (xhr.error) {
             this.emit('error', xhr.responseText);
         }
