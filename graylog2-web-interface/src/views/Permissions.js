@@ -14,10 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+
+// eslint-disable-next-line import/prefer-default-export
 export const View = {
-  Use: 'view:use',
   Edit: (id) => `view:edit:${id}`,
-};
-export const ExtendedSearch = {
-  Use: 'extendedsearch:use',
 };
