@@ -27,7 +27,7 @@ import java.util.Set;
 
 public abstract class DefaultTLSProtocolProvider {
     // Defaults to TLS protocols that are currently considered secure
-    public static final Set<String> DEFAULT_TLS_PROTOCOLS = ImmutableSet.of("TLSv1.2", "TLSv1.3");
+    private static final Set<String> DEFAULT_TLS_PROTOCOLS = ImmutableSet.of("TLSv1.2", "TLSv1.3");
 
     private static final Logger LOG = LoggerFactory.getLogger(DefaultTLSProtocolProvider.class);
     private static Set<String> defaultSupportedTlsProtocols = null;
