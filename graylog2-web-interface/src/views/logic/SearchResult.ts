@@ -14,14 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { fromJS } from 'immutable';
+import { List, fromJS, Map } from 'immutable';
 import { mapValues, get, compact } from 'lodash';
 
 import QueryResult from './QueryResult';
 import SearchError from './SearchError';
 import ResultWindowLimitError from './ResultWindowLimitError';
+import { QueryId } from 'views/logic/queries/Query';
+import { SearchTypeId } from 'views/logic/SearchType';
 
 class SearchResult {
+  private readonly _results: Map<QueryId, QueryResult>;
+  private readonly _errors: List<SearchError>;
+
   constructor(result) {
     this._result = fromJS(result);
 
@@ -48,7 +53,7 @@ class SearchResult {
     return this._errors.toJS();
   }
 
-  forId(queryId) {
+  forId(queryId: QueryId) {
     return this._results.get(queryId);
   }
 
@@ -64,7 +69,7 @@ class SearchResult {
     return new SearchResult(updatedResult);
   }
 
-  getSearchTypesFromResponse(searchTypeIds) {
+  getSearchTypesFromResponse(searchTypeIds: Array<SearchTypeId>) {
     const searchTypes = searchTypeIds.map((searchTypeId) => {
       const relatedQuery = this._getQueryBySearchTypeId(searchTypeId);
 
@@ -74,15 +79,15 @@ class SearchResult {
     return SearchResult._filterFailedSearchTypes(searchTypes);
   }
 
-  _getQueryBySearchTypeId(searchTypeId) {
+  _getQueryBySearchTypeId(searchTypeId: SearchTypeId) {
     return Object.values(this.result.results).find((query) => SearchResult._getSearchTypeFromQuery(query, searchTypeId));
   }
 
-  static _getSearchTypeFromQuery(query, searchTypeId) {
+  private static _getSearchTypeFromQuery(query, searchTypeId: SearchTypeId) {
     return (query && query.search_types) ? query.search_types[searchTypeId] : undefined;
   }
 
-  static _filterFailedSearchTypes(searchTypes) {
+  private static _filterFailedSearchTypes(searchTypes) {
     return compact(searchTypes);
   }
 }

@@ -14,8 +14,30 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+
+import { QueryId } from 'views/logic/queries/Query';
+import { SearchTypeId } from 'views/logic/SearchType';
+
+export type SearchErrorResponse = {
+  query_id: QueryId,
+  search_type_id: SearchTypeId,
+  type: string,
+  backtrace: string,
+  description: string,
+};
+
+export type SearchErrorState = {
+  backtrace: string,
+  description: string,
+  query_id: QueryId,
+  search_type_id: SearchTypeId,
+  type: string,
+};
+
 export default class SearchError {
-  constructor(error) {
+  protected _state: SearchErrorState;
+
+  constructor(error: SearchErrorResponse) {
     const { backtrace, description, query_id, search_type_id, type } = error;
 
     this._state = {

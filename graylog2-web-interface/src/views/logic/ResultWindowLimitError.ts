@@ -14,10 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import SearchError from './SearchError';
+import SearchError, { SearchErrorResponse, SearchErrorState } from './SearchError';
+import { QueryId } from 'views/logic/queries/Query';
+import { SearchTypeId } from 'views/logic/SearchType';
+import SearchResult from 'views/logic/SearchResult';
+
+type ResultWindowLimitErrorState = SearchErrorState & {};
+
+type ResultWindowLimitErrorResponse = SearchErrorResponse & {
+  result_window_limit: number,
+};
 
 export default class ResultWindowLimitError extends SearchError {
-  constructor(error, result) {
+  private readonly _state: ResultWindowLimitErrorState;
+
+  constructor(error: ResultWindowLimitErrorResponse, result: SearchResult) {
     super(error);
     const { result_window_limit: resultWindowLimit } = error;
 
@@ -28,7 +39,7 @@ export default class ResultWindowLimitError extends SearchError {
     };
   }
 
-  static _extendDescription(result, description, queryId, searchTypeId, resultWindowLimit) {
+  static _extendDescription(result: SearchResult, description: string, queryId: QueryId, searchTypeId: SearchTypeId, resultWindowLimit: number) {
     const pageSize = ResultWindowLimitError._getPageSizeFromResult(result, queryId, searchTypeId);
     const validPages = Math.floor(resultWindowLimit / pageSize);
     const validPagesMessage = `Elasticsearch limits the search result to ${resultWindowLimit} messages. With a page size of ${pageSize} messages, you can use the first ${validPages} pages.`;
@@ -36,7 +47,7 @@ export default class ResultWindowLimitError extends SearchError {
     return `${validPagesMessage} ${description}`;
   }
 
-  static _getPageSizeFromResult(result, queryId, searchTypeId) {
+  static _getPageSizeFromResult(result: SearchResult, queryId: QueryId, searchTypeId: SearchTypeId) {
     const searchTypes = result.results[queryId].query.search_types;
     const searchType = searchTypes.find(({ id }) => id === searchTypeId);
 

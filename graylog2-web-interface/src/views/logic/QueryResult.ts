@@ -18,7 +18,7 @@ import { mapValues } from 'lodash';
 
 import searchTypeDefinition from 'views/logic/SearchType';
 
-import SearchError from './SearchError';
+import SearchError, { SearchErrorResponse } from './SearchError';
 import { TimeRange } from 'views/logic/queries/Query';
 
 type SearchTypeResult = {
@@ -70,7 +70,7 @@ type QueryResultResponse = {
     effective_timerange: TimeRange,
   },
   query: any,
-  errors: Array<string>,
+  errors: Array<SearchErrorResponse>,
   search_types: {
     [id: string]: { type: string },
   },
