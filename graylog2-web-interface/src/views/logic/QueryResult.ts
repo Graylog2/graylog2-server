@@ -19,14 +19,28 @@ import { mapValues } from 'lodash';
 import searchTypeDefinition from 'views/logic/SearchType';
 
 import SearchError from './SearchError';
+import { TimeRange } from 'views/logic/queries/Query';
 
-const _findMessages = (results) => {
-  return Object.keys(results.searchTypes)
-    .map((id) => results.searchTypes[id])
-    .find((searchType) => searchType.type.toLocaleLowerCase() === 'messages');
+type SearchTypeResult = {
+  type: string,
 };
 
-const _searchTypePlugin = (type) => {
+type Results = {
+  searchTypes: { [id: string]: SearchTypeResult | MessageResult },
+};
+
+type MessageResult = {
+  type: 'messages',
+  total: number,
+};
+
+const _findMessages = (results: Results): (MessageResult | undefined) => {
+  return Object.keys(results.searchTypes)
+    .map((id) => results.searchTypes[id])
+    .find((searchType) => searchType.type.toLocaleLowerCase() === 'messages') as MessageResult;
+};
+
+const _searchTypePlugin = (type: string) => {
   const typeDefinition = searchTypeDefinition(type);
 
   return typeDefinition && typeDefinition.handler ? searchTypeDefinition(type).handler
@@ -40,8 +54,32 @@ const _searchTypePlugin = (type) => {
     };
 };
 
+type State = {
+  query: any,
+  errors: Array<SearchError>,
+  duration: number,
+  timestamp: string,
+  effectiveTimerange: TimeRange,
+  searchTypes: { [id: string]: SearchTypeResult | MessageResult },
+};
+
+type QueryResultResponse = {
+  execution_stats: {
+    duration: number,
+    timestamp: string,
+    effective_timerange: TimeRange,
+  },
+  query: any,
+  errors: Array<string>,
+  search_types: {
+    [id: string]: { type: string },
+  },
+};
+
 export default class QueryResult {
-  constructor(queryResult) {
+  _state: State;
+
+  constructor(queryResult: QueryResultResponse) {
     const { duration, timestamp, effective_timerange } = queryResult.execution_stats;
 
     this._state = {
