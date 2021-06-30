@@ -22,9 +22,10 @@ import isEqualForSearch from 'views/stores/isEqualForSearch';
 import AggregationWidgetConfig from './AggregationWidgetConfig';
 
 import Widget from '../widgets/Widget';
+import { QueryString, TimeRange } from 'views/logic/queries/Query';
 
 export default class AggregationWidget extends Widget {
-  constructor(id, config, filter, timerange, query, streams) {
+  constructor(id: string, config: AggregationWidgetConfig, filter?: string, timerange?: TimeRange, query?: QueryString, streams: Array<string> = []) {
     super(id, AggregationWidget.type, config, filter, timerange, query, streams);
   }
 
@@ -50,7 +51,7 @@ export default class AggregationWidget extends Widget {
     return new Builder();
   }
 
-  equals(other) {
+  equals(other: any) {
     if (other instanceof AggregationWidget) {
       return ['id', 'config', 'filter', 'timerange', 'query', 'streams'].every((key) => isDeepEqual(this[key], other[key]));
     }
@@ -58,7 +59,7 @@ export default class AggregationWidget extends Widget {
     return false;
   }
 
-  equalsForSearch(other) {
+  equalsForSearch(other: any) {
     if (other instanceof AggregationWidget) {
       return ['id', 'config', 'filter', 'timerange', 'query', 'streams'].every((key) => isEqualForSearch(this[key], other[key]));
     }
