@@ -38,16 +38,20 @@ public abstract class DefaultTLSProtocolProvider {
         }
 
         final Set<String> tlsProtocols = Sets.newHashSet(DEFAULT_TLS_PROTOCOLS);
+        final Set<String> supportedProtocols = getSupportedTlsProtocols();
+        if (tlsProtocols.retainAll(supportedProtocols)) {
+            LOG.warn("JRE doesn't support all default TLS protocols. Changing <{}> to <{}>", DEFAULT_TLS_PROTOCOLS, tlsProtocols);
+        }
+        defaultSupportedTlsProtocols = tlsProtocols;
+        return defaultSupportedTlsProtocols;
+    }
+
+    public synchronized static Set<String> getSupportedTlsProtocols() {
         try {
-            final Set<String> supportedProtocols = ImmutableSet.copyOf(SSLContext.getDefault().createSSLEngine().getSupportedProtocols());
-            if (tlsProtocols.retainAll(supportedProtocols)) {
-                LOG.warn("JRE doesn't support all default TLS protocols. Changing <{}> to <{}>", DEFAULT_TLS_PROTOCOLS, tlsProtocols);
-            }
-            defaultSupportedTlsProtocols = tlsProtocols;
+            return ImmutableSet.copyOf(SSLContext.getDefault().createSSLEngine().getSupportedProtocols());
         } catch (NoSuchAlgorithmException e) {
             LOG.error("Failed to detect supported TLS protocols. Keeping default <{}>", DEFAULT_TLS_PROTOCOLS, e);
-            defaultSupportedTlsProtocols = DEFAULT_TLS_PROTOCOLS;
+            return DEFAULT_TLS_PROTOCOLS;
         }
-        return defaultSupportedTlsProtocols;
     }
 }

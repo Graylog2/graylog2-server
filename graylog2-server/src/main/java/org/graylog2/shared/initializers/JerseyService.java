@@ -41,6 +41,7 @@ import org.graylog2.Configuration;
 import org.graylog2.audit.PluginAuditEventTypes;
 import org.graylog2.audit.jersey.AuditEventModelProcessor;
 import org.graylog2.configuration.HttpConfiguration;
+import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.jersey.PrefixAddingModelProcessor;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.rest.PluginRestResource;
@@ -115,6 +116,7 @@ public class JerseyService extends AbstractIdleService {
     private final ObjectMapper objectMapper;
     private final MetricRegistry metricRegistry;
     private final ErrorPageGenerator errorPageGenerator;
+    private final TLSProtocolsConfiguration tlsConfiguration;
 
     private HttpServer apiHttpServer = null;
 
@@ -129,7 +131,8 @@ public class JerseyService extends AbstractIdleService {
                          Set<PluginAuditEventTypes> pluginAuditEventTypes,
                          ObjectMapper objectMapper,
                          MetricRegistry metricRegistry,
-                         ErrorPageGenerator errorPageGenerator) {
+                         ErrorPageGenerator errorPageGenerator,
+                         TLSProtocolsConfiguration tlsConfiguration) {
         this.configuration = requireNonNull(configuration, "configuration");
         this.graylogConfiguration = graylogConfiguration;
         this.dynamicFeatures = requireNonNull(dynamicFeatures, "dynamicFeatures");
@@ -142,6 +145,7 @@ public class JerseyService extends AbstractIdleService {
         this.objectMapper = requireNonNull(objectMapper, "objectMapper");
         this.metricRegistry = requireNonNull(metricRegistry, "metricRegistry");
         this.errorPageGenerator = requireNonNull(errorPageGenerator, "errorPageGenerator");
+        this.tlsConfiguration = requireNonNull(tlsConfiguration);
     }
 
     @Override
@@ -354,9 +358,7 @@ public class JerseyService extends AbstractIdleService {
 
         final SSLContext sslContext = sslContextConfigurator.createSSLContext(true);
         final SSLEngineConfigurator sslEngineConfigurator = new SSLEngineConfigurator(sslContext, false, false, false);
-        if (!graylogConfiguration.getEnabledTlsProtocols().isEmpty()) {
-            sslEngineConfigurator.setEnabledProtocols(graylogConfiguration.getEnabledTlsProtocols().toArray(new String[0]));
-        }
+        sslEngineConfigurator.setEnabledProtocols(tlsConfiguration.getEnabledTlsProtocols().toArray(new String[0]));
         return sslEngineConfigurator;
     }
 

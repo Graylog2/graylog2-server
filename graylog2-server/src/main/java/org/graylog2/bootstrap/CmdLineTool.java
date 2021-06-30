@@ -49,7 +49,7 @@ import io.netty.util.internal.logging.Slf4JLoggerFactory;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.DocsHelper;
 import org.graylog2.plugin.Plugin;
@@ -73,7 +73,6 @@ import org.slf4j.LoggerFactory;
 import java.lang.management.ManagementFactory;
 import java.nio.file.AccessDeniedException;
 import java.nio.file.Path;
-import java.security.Security;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -88,10 +87,6 @@ public abstract class CmdLineTool implements CliCommand {
     static {
         // Set up JDK Logging adapter, https://logging.apache.org/log4j/2.x/log4j-jul/index.html
         System.setProperty("java.util.logging.manager", "org.apache.logging.log4j.jul.LogManager");
-
-        // This needs to run before the first SSLContext is instantiated,
-        // because it sets up the default SSLAlgorithmConstraints
-        applySecuritySettings();
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(CmdLineTool.class);
@@ -172,26 +167,7 @@ public abstract class CmdLineTool implements CliCommand {
     /**
      * Things that have to run before the {@link #startCommand()} method is being called.
      */
-    protected void beforeStart() {}
-
-    private static void applySecuritySettings() {
-        // Disable insecure TLS parameters and algorithms by default.
-        // Prevent attacks like LOGJAM, LUCKY13, et al.
-        setSystemPropertyIfEmpty("jdk.tls.ephemeralDHKeySize", "2048");
-        setSystemPropertyIfEmpty("jdk.tls.rejectClientInitiatedRenegotiation", "true");
-
-        // Weirdly this is not a System property
-        Security.setProperty("jdk.tls.disabledAlgorithms", "CBC,3DES");
-
-        // Explicitly register Bouncy Castle as security provider.
-        // This allows us to use more key formats than with JCE
-        Security.addProvider(new BouncyCastleProvider());
-    }
-
-    private static void setSystemPropertyIfEmpty(String key, String value) {
-        if (System.getProperty(key) == null) {
-            System.setProperty(key, value);
-        }
+    protected void beforeStart(TLSProtocolsConfiguration configuration) {
     }
 
     @Override
@@ -204,6 +180,9 @@ public abstract class CmdLineTool implements CliCommand {
 
         installConfigRepositories();
         installCommandConfig();
+
+        beforeStart(parseAndGetTLSConfiguration());
+
         processConfiguration(jadConfig);
 
         coreConfigInjector = setupCoreConfigInjector();
@@ -222,7 +201,6 @@ public abstract class CmdLineTool implements CliCommand {
             System.exit(1);
         }
 
-        beforeStart();
 
         final List<String> arguments = ManagementFactory.getRuntimeMXBean().getInputArguments();
         LOG.info("Running with JVM arguments: {}", Joiner.on(' ').join(arguments));
@@ -247,6 +225,18 @@ public abstract class CmdLineTool implements CliCommand {
         reporter.start();
 
         startCommand();
+    }
+
+    // Parse only the TLSConfiguration bean
+    // to avoid triggering anything that might initialize the default SSLContext
+    private TLSProtocolsConfiguration parseAndGetTLSConfiguration() {
+        final JadConfig jadConfig = new JadConfig();
+        jadConfig.setRepositories(getConfigRepositories(configFile));
+        final TLSProtocolsConfiguration tlsConfiguration = new TLSProtocolsConfiguration();
+        jadConfig.addConfigurationBean(tlsConfiguration);
+        processConfiguration(jadConfig);
+
+        return tlsConfiguration;
     }
 
     private void installCommandConfig() {

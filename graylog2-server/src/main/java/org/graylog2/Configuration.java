@@ -29,7 +29,6 @@ import com.github.joschi.jadconfig.validators.PositiveLongValidator;
 import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
 import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.security.realm.RootAccountRealm;
-import org.graylog2.shared.security.tls.DefaultTLSProtocolProvider;
 import org.graylog2.utilities.IPSubnetConverter;
 import org.graylog2.utilities.IpSubnet;
 import org.joda.time.DateTimeZone;
@@ -158,9 +157,6 @@ public class Configuration extends BaseConfiguration {
 
     @Parameter(value = "deactivated_builtin_authentication_providers", converter = StringSetConverter.class)
     private Set<String> deactivatedBuiltinAuthenticationProviders = Collections.emptySet();
-
-    @Parameter(value = "enabled_tls_protocols", converter = StringSetConverter.class)
-    private Set<String> enabledTlsProtocols = DefaultTLSProtocolProvider.getDefaultSupportedTlsProtocols();
 
     @Parameter(value = "is_cloud")
     private boolean isCloud = false;
@@ -322,10 +318,6 @@ public class Configuration extends BaseConfiguration {
 
     public Set<String> getDeactivatedBuiltinAuthenticationProviders() {
         return deactivatedBuiltinAuthenticationProviders;
-    }
-
-    public Set<String> getEnabledTlsProtocols() {
-        return enabledTlsProtocols;
     }
 
     @ValidatorMethod

@@ -42,6 +42,7 @@ import io.netty.handler.ssl.util.SelfSignedCertificate;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.pkcs.PKCSException;
+import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.inputs.transports.NettyTransportConfiguration;
 import org.graylog2.inputs.transports.netty.ByteBufMessageAggregationHandler;
 import org.graylog2.inputs.transports.netty.ChannelRegistrationHandler;
@@ -120,7 +121,7 @@ public abstract class AbstractTcpTransport extends NettyTransport {
     protected final Configuration configuration;
     protected final EventLoopGroup parentEventLoopGroup;
     private final NettyTransportConfiguration nettyTransportConfiguration;
-    private final org.graylog2.Configuration graylogConfiguration;
+    private final TLSProtocolsConfiguration tlsConfiguration;
     private final AtomicReference<Channel> channelReference;
 
     private final boolean tlsEnable;
@@ -142,12 +143,12 @@ public abstract class AbstractTcpTransport extends NettyTransport {
             EventLoopGroup parentEventLoopGroup,
             EventLoopGroupFactory eventLoopGroupFactory,
             NettyTransportConfiguration nettyTransportConfiguration,
-            org.graylog2.Configuration graylogConfiguration) {
+            TLSProtocolsConfiguration tlsConfiguration) {
         super(configuration, eventLoopGroupFactory, throughputCounter, localRegistry);
         this.configuration = configuration;
         this.parentEventLoopGroup = parentEventLoopGroup;
         this.nettyTransportConfiguration = nettyTransportConfiguration;
-        this.graylogConfiguration = graylogConfiguration;
+        this.tlsConfiguration = tlsConfiguration;
         this.channelReference = new AtomicReference<>();
         this.childChannels = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 
@@ -349,8 +350,8 @@ public abstract class AbstractTcpTransport extends NettyTransport {
                         .sslProvider(tlsProvider)
                         .clientAuth(clientAuth)
                         .trustManager(clientAuthCerts);
-                if (!graylogConfiguration.getEnabledTlsProtocols().isEmpty()) {
-                    sslContext.protocols(graylogConfiguration.getEnabledTlsProtocols());
+                if (!tlsConfiguration.getEnabledTlsProtocols().isEmpty()) {
+                    sslContext.protocols(tlsConfiguration.getEnabledTlsProtocols());
                 }
                 if (tlsProvider.equals(SslProvider.OPENSSL)) {
                     // Netty tcnative does not adhere jdk.tls.disabledAlgorithms: https://github.com/netty/netty-tcnative/issues/530
