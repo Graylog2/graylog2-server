@@ -21,6 +21,7 @@ import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
 import UserNotification from 'util/UserNotification';
 import ActionsProvider from 'injection/ActionsProvider';
+import { SearchesConfig } from 'components/search/SearchConfig';
 
 const ConfigurationActions = ActionsProvider.getActions('Configuration');
 
@@ -37,7 +38,13 @@ export type WhiteListConfig = {
   disabled: boolean,
 };
 
-const ConfigurationsStore = Reflux.createStore({
+export type ConfigurationsStoreState = {
+  configuration: Record<string, any>,
+  searchesClusterConfig: SearchesConfig,
+  eventsClusterConfig: {},
+};
+
+const ConfigurationsStore = Reflux.createStore<ConfigurationsStoreState>({
   listenables: [ConfigurationActions],
 
   configuration: {},

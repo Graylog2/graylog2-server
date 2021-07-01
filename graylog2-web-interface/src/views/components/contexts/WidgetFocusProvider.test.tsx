@@ -28,7 +28,7 @@ import SearchActions from 'views/actions/SearchActions';
 const mockHistoryReplace = jest.fn();
 
 jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
+  ...jest.requireActual<{}>('react-router-dom'),
   useHistory: () => ({
     replace: mockHistoryReplace,
   }),

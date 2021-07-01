@@ -20,12 +20,17 @@ import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
 import CombinedProvider from 'injection/CombinedProvider';
+import User from 'logic/users/User';
 
 const { SessionStore, SessionActions } = CombinedProvider.get('Session');
 const { StartpageStore } = CombinedProvider.get('Startpage');
 const { PreferencesActions } = CombinedProvider.get('Preferences');
 
-const CurrentUserStore = Reflux.createStore({
+export type CurrentUserStoreState = {
+  currentUser: User,
+};
+
+const CurrentUserStore = Reflux.createStore<CurrentUserStoreState>({
   listenables: [SessionActions],
   currentUser: undefined,
 
