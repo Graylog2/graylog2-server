@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback } from 'react';
+import { useCallback, useContext } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import * as ImmutablePropTypes from 'react-immutable-proptypes';
@@ -31,6 +31,7 @@ import { QueryTitlesStore } from 'views/stores/QueryTitlesStore';
 import { ViewMetaData, ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import { ViewStatesActions } from 'views/stores/ViewStatesStore';
 import { QueryId } from 'views/logic/queries/Query';
+import DashboardPageContext from 'views/components/contexts/DashboardPageContext';
 
 import QueryTabs from './QueryTabs';
 
@@ -68,13 +69,21 @@ type Props = {
 
 const QueryBar = ({ queries, queryTitles, viewMetadata }: Props) => {
   const { activeQuery } = viewMetadata;
+  const { setDashboardPage } = useContext(DashboardPageContext);
+
+  const onSelectPage = useCallback((pageId) => {
+    setDashboardPage(pageId);
+
+    return onSelectQuery(pageId);
+  }, [setDashboardPage]);
+
   const onRemove = useCallback((queryId) => onCloseTab(queryId, activeQuery, queries), [activeQuery, queries]);
 
   return (
     <QueryTabs queries={queries}
                selectedQueryId={activeQuery}
                titles={queryTitles}
-               onSelect={onSelectQuery}
+               onSelect={onSelectPage}
                onTitleChange={onTitleChange}
                onRemove={onRemove} />
   );
