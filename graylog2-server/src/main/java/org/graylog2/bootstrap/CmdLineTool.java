@@ -184,7 +184,7 @@ public abstract class CmdLineTool implements CliCommand {
         // Only restrict ciphers if insecure TLS protocols are explicitly enabled.
         // c.f. https://github.com/Graylog2/graylog2-server/issues/10944
         final Set<String> tlsProtocols = configuration.getConfiguredTlsProtocols();
-        if (tlsProtocols == null || !(tlsProtocols.isEmpty() || tlsProtocols.contains("TLSv1") || tlsProtocols.contains("TLSv1.1") || tlsProtocols.contains("TLSv1.0"))) {
+        if (tlsProtocols == null || !(tlsProtocols.isEmpty() || tlsProtocols.contains("TLSv1") || tlsProtocols.contains("TLSv1.1"))) {
             // Weirdly this is not a System property
             Security.setProperty("jdk.tls.disabledAlgorithms", "CBC,3DES");
         }
