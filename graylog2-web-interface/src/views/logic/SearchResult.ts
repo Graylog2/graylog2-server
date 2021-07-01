@@ -15,25 +15,33 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { List, fromJS, Map } from 'immutable';
-import { mapValues, get, compact } from 'lodash';
+import { mapValues, compact } from 'lodash';
 
-import QueryResult from './QueryResult';
-import SearchError from './SearchError';
-import ResultWindowLimitError from './ResultWindowLimitError';
 import { QueryId } from 'views/logic/queries/Query';
 import { SearchTypeId } from 'views/logic/SearchType';
+import { SearchJobResult } from 'views/stores/SearchStore';
+
+import QueryResult from './QueryResult';
+import SearchError, { SearchErrorResponse } from './SearchError';
+import ResultWindowLimitError, {
+  isResultWindowLimitErrorResponse,
+  ResultWindowLimitErrorResponse,
+} from './ResultWindowLimitError';
 
 class SearchResult {
+  private readonly _result: Map<string, any>;
+
   private readonly _results: Map<QueryId, QueryResult>;
+
   private readonly _errors: List<SearchError>;
 
-  constructor(result) {
+  constructor(result: SearchJobResult) {
     this._result = fromJS(result);
 
     this._results = fromJS(mapValues(result.results, (queryResult) => new QueryResult(queryResult)));
 
-    this._errors = fromJS(get(result, 'errors', []).map((error) => {
-      if (error.type === 'result_window_limit') {
+    this._errors = fromJS(result?.errors ?? [].map((error: SearchErrorResponse | ResultWindowLimitErrorResponse) => {
+      if (isResultWindowLimitErrorResponse(error)) {
         return new ResultWindowLimitError(error, this);
       }
 
@@ -41,15 +49,15 @@ class SearchResult {
     }));
   }
 
-  get result() {
+  get result(): SearchJobResult {
     return this._result.toJS();
   }
 
-  get results() {
+  get results(): Record<QueryId, QueryResult> {
     return this._results.toJS();
   }
 
-  get errors() {
+  get errors(): Array<SearchError> {
     return this._errors.toJS();
   }
 
@@ -60,7 +68,7 @@ class SearchResult {
   updateSearchTypes(searchTypeResults) {
     const updatedResult = this.result;
 
-    searchTypeResults.forEach((searchTypeResult) => {
+    searchTypeResults.forEach((searchTypeResult: { id: string; }) => {
       const searchQuery = this._getQueryBySearchTypeId(searchTypeResult.id);
 
       updatedResult.results[searchQuery.query.id].search_types[searchTypeResult.id] = searchTypeResult;

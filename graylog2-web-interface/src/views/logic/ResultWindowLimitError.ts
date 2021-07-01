@@ -14,19 +14,25 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import SearchError, { SearchErrorResponse, SearchErrorState } from './SearchError';
 import { QueryId } from 'views/logic/queries/Query';
 import { SearchTypeId } from 'views/logic/SearchType';
 import SearchResult from 'views/logic/SearchResult';
 
+import SearchError, { SearchErrorResponse, SearchErrorState } from './SearchError';
+
 type ResultWindowLimitErrorState = SearchErrorState & {};
 
-type ResultWindowLimitErrorResponse = SearchErrorResponse & {
+export type ResultWindowLimitErrorResponse = SearchErrorResponse & {
+  type: 'result_window_limit',
   result_window_limit: number,
 };
 
+export const isResultWindowLimitErrorResponse = (error: SearchErrorResponse): error is ResultWindowLimitErrorResponse => (error?.type === 'result_window_limit');
+
 export default class ResultWindowLimitError extends SearchError {
-  private readonly _state: ResultWindowLimitErrorState;
+  protected readonly _state: ResultWindowLimitErrorState;
+
+  private readonly _resultWindowLimit: number;
 
   constructor(error: ResultWindowLimitErrorResponse, result: SearchResult) {
     super(error);
@@ -35,8 +41,9 @@ export default class ResultWindowLimitError extends SearchError {
     this._state = {
       ...this._state,
       description: ResultWindowLimitError._extendDescription(result, this.description, this.queryId, this.searchTypeId, resultWindowLimit),
-      result_window_limit: resultWindowLimit,
     };
+
+    this._resultWindowLimit = resultWindowLimit;
   }
 
   static _extendDescription(result: SearchResult, description: string, queryId: QueryId, searchTypeId: SearchTypeId, resultWindowLimit: number) {
@@ -54,5 +61,5 @@ export default class ResultWindowLimitError extends SearchError {
     return searchType.limit;
   }
 
-  get resultWindowLimit() { return this._state.result_window_limit; }
+  get resultWindowLimit() { return this._resultWindowLimit; }
 }

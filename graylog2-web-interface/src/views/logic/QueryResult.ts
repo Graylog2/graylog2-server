@@ -17,12 +17,13 @@
 import { mapValues } from 'lodash';
 
 import searchTypeDefinition from 'views/logic/SearchType';
-
-import SearchError, { SearchErrorResponse } from './SearchError';
 import { TimeRange } from 'views/logic/queries/Query';
 
-type SearchTypeResult = {
+import SearchError, { SearchErrorResponse } from './SearchError';
+
+export type SearchTypeResult = {
   type: string,
+  effective_timerange: TimeRange,
 };
 
 type Results = {
