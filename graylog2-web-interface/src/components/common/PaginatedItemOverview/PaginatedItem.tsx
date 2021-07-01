@@ -59,7 +59,7 @@ const PaginatedItem = ({ item: { name, description }, onDeleteItem, item }: Prop
     <Container>
       <Header>{name}</Header>
       <Description>{description}</Description>
-      { deleteButton }
+      {deleteButton}
     </Container>
   );
 };

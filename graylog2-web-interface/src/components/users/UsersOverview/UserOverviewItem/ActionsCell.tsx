@@ -104,13 +104,13 @@ const EditActions = ({ user, user: { username, id, fullName, accountStatus, exte
       <DropdownButton bsSize="xs" title="More actions" pullRight id={`delete-user-${id}`}>
         <EditTokensAction user={user} wrapperComponent={MenuItem} />
         <IfPermitted permissions={[`users:edit:${username}`]}>
-          { showEnableDisable && (
+          {showEnableDisable && (
             <MenuItem id={`set-status-user-${id}`}
                       onClick={_toggleStatus}
                       title={`Set new account status for ${fullName}`}>
               {accountStatus === 'enabled' ? 'Disable' : 'Enable'}
             </MenuItem>
-          ) }
+          )}
           <MenuItem id={`delete-user-${id}`}
                     bsStyle="primary"
                     bsSize="xs"

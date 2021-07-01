@@ -102,13 +102,13 @@ const StreamRule = ({ matchData, permissions, stream, streamRule, streamRuleType
     <ListGroupItem bsStyle={listGroupStyle}>
       {actionItems}
       <HumanReadableStreamRule streamRule={streamRule} streamRuleTypes={streamRuleTypes} inputs={inputs} />
-      { showStreamRuleForm && (
+      {showStreamRuleForm && (
         <StreamRuleForm streamRule={streamRule}
                         onClose={() => setShowStreamRuleForm(false)}
                         streamRuleTypes={streamRuleTypes}
                         title="Edit Stream Rule"
                         onSubmit={_onSubmit} />
-      ) }
+      )}
       {description}
     </ListGroupItem>
   );

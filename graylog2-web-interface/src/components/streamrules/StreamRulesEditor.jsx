@@ -180,12 +180,12 @@ class StreamRulesEditor extends React.Component {
                       onClick={this._onAddStreamRule}>
                 Add stream rule
               </Button>
-              { showStreamRuleForm && (
+              {showStreamRuleForm && (
                 <StreamRuleForm title="New Stream Rule"
                                 onClose={() => this.setState({ showStreamRuleForm: false })}
                                 streamRuleTypes={streamRuleTypes}
                                 onSubmit={this._onStreamRuleFormSubmit} />
-              ) }
+              )}
             </div>
 
             <h2>2. Manage stream rules</h2>
