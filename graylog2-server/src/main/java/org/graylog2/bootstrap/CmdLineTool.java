@@ -211,6 +211,7 @@ public abstract class CmdLineTool implements CliCommand {
         installConfigRepositories();
         installCommandConfig();
 
+        beforeStart();
         beforeStart(parseAndGetTLSConfiguration());
 
         processConfiguration(jadConfig);
