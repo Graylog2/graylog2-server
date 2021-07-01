@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { readFileSync } from 'fs';
-
 import { dirname } from 'path';
 
 import Search from 'views/logic/search/Search';
