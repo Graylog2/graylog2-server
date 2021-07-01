@@ -2050,7 +2050,7 @@
     remark "^13.0.0"
     unist-util-find-all-after "^3.0.2"
 
-"@testing-library/dom@8.0.0", "@testing-library/dom@^8.0.0":
+"@testing-library/dom@8.0.0":
   version "8.0.0"
   resolved "https://registry.yarnpkg.com/@testing-library/dom/-/dom-8.0.0.tgz#2bb994393c566aae021db86dd263ba06e8b71b38"
   integrity sha512-Ym375MTOpfszlagRnTMO+FOfTt6gRrWiDOWmEnWLu9OvwCPOWtK6i5pBHmZ07wUJiQ7wWz0t8+ZBK2wFo2tlew==
@@ -2088,6 +2088,20 @@
     dom-accessibility-api "^0.5.4"
     lz-string "^1.4.4"
     pretty-format "^26.6.2"
+
+"@testing-library/dom@^8.0.0":
+  version "8.1.0"
+  resolved "https://registry.yarnpkg.com/@testing-library/dom/-/dom-8.1.0.tgz#f8358b1883844ea569ba76b7e94582168df5370d"
+  integrity sha512-kmW9alndr19qd6DABzQ978zKQ+J65gU2Rzkl8hriIetPnwpesRaK4//jEQyYh8fEALmGhomD/LBQqt+o+DL95Q==
+  dependencies:
+    "@babel/code-frame" "^7.10.4"
+    "@babel/runtime" "^7.12.5"
+    "@types/aria-query" "^4.2.0"
+    aria-query "^4.2.2"
+    chalk "^4.1.0"
+    dom-accessibility-api "^0.5.6"
+    lz-string "^1.4.4"
+    pretty-format "^27.0.2"
 
 "@testing-library/jest-dom@5.14.1":
   version "5.14.1"
@@ -8589,11 +8603,11 @@ graceful-fs@^4.2.4:
     "@babel/preset-env" "7.13.10"
     "@babel/preset-typescript" "7.13.0"
     create-react-class "15.7.0"
-    eslint-config-graylog "file:packages/eslint-config-graylog"
+    eslint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.2.0-SNAPSHOT-b6dca862-15df-4cd1-a773-4426e5515423-1625151601644/node_modules/eslint-config-graylog"
     formik "2.2.6"
     html-webpack-plugin "^4.2.0"
     javascript-natural-sort "0.7.1"
-    jest-preset-graylog "file:packages/jest-preset-graylog"
+    jest-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.2.0-SNAPSHOT-b6dca862-15df-4cd1-a773-4426e5515423-1625151601644/node_modules/jest-preset-graylog"
     jquery "3.5.1"
     moment "2.29.1"
     moment-timezone "0.5.31"
@@ -8607,8 +8621,8 @@ graceful-fs@^4.2.4:
     react-router-dom "5.2.0"
     reflux "0.2.13"
     styled-components "5.2.3"
-    stylelint-config-graylog "file:packages/stylelint-config-graylog"
-    typescript "4.2.3"
+    stylelint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.2.0-SNAPSHOT-b6dca862-15df-4cd1-a773-4426e5515423-1625151601644/node_modules/stylelint-config-graylog"
+    typescript "4.3.2"
     webpack "4.44.2"
     webpack-cleanup-plugin "0.5.1"
     webpack-cli "3.3.12"
@@ -17178,6 +17192,11 @@ uuid@^3.2.1, uuid@^3.3.2, uuid@^3.3.3, uuid@^3.4.0:
   version "3.4.0"
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.4.0.tgz#b23e4358afa8a202fe7a100af1f5f883f02007ee"
   integrity sha512-HjSDRw6gZE5JMggctHBcjVak08+KEVhSIiDzFnT9S9aegmp85S/bReBVTb4QTFaRNptJ9kuYaNhnbNEOkbKb/A==
+
+uuid@^8.3.2:
+  version "8.3.2"
+  resolved "https://registry.yarnpkg.com/uuid/-/uuid-8.3.2.tgz#80d5b5ced271bb9af6c445f21a1a04c606cefbe2"
+  integrity sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==
 
 v8-compile-cache@^2.0.3, v8-compile-cache@^2.1.1:
   version "2.1.1"
