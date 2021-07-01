@@ -20,6 +20,7 @@ import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.converters.StringSetConverter;
 import org.graylog2.shared.security.tls.DefaultTLSProtocolProvider;
 
+import javax.annotation.Nullable;
 import java.util.Set;
 
 /**
@@ -34,6 +35,21 @@ public class TLSProtocolsConfiguration {
     @Parameter(value = "enabled_tls_protocols", converter = StringSetConverter.class)
     private Set<String> enabledTlsProtocols = null;
 
+    public TLSProtocolsConfiguration() {
+    }
+
+    /**
+     * Used to transfer this setting from {@link org.graylog2.Configuration}
+     */
+    public TLSProtocolsConfiguration(Set<String> enabledTlsProtocols) {
+        this.enabledTlsProtocols = enabledTlsProtocols;
+    }
+
+    /**
+     * Used to access the plain configuration value.
+     * In most cases you'd want to use {@link TLSProtocolsConfiguration#getEnabledTlsProtocols()}
+     */
+    @Nullable
     public Set<String> getConfiguredTlsProtocols() {
         return enabledTlsProtocols;
     }
@@ -46,11 +62,15 @@ public class TLSProtocolsConfiguration {
      * If it's not configured (null and the default) return a secure set of supported TLS protocols.
      */
     public Set<String> getEnabledTlsProtocols() {
-        if (enabledTlsProtocols != null) {
-            if (enabledTlsProtocols.isEmpty()) {
+        return getEnabledTlsProtocols(enabledTlsProtocols);
+    }
+
+    public static Set<String> getEnabledTlsProtocols(Set<String> configuredTlsProtocols) {
+        if (configuredTlsProtocols != null) {
+            if (configuredTlsProtocols.isEmpty()) {
                 return DefaultTLSProtocolProvider.getSupportedTlsProtocols();
             }
-            return enabledTlsProtocols;
+            return configuredTlsProtocols;
         }
         return DefaultTLSProtocolProvider.getDefaultSupportedTlsProtocols();
     }

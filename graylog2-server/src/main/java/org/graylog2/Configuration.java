@@ -158,6 +158,10 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "deactivated_builtin_authentication_providers", converter = StringSetConverter.class)
     private Set<String> deactivatedBuiltinAuthenticationProviders = Collections.emptySet();
 
+    // This is needed for backwards compatibility. The setting in TLSProtocolsConfiguration should be used instead.
+    @Parameter(value = "enabled_tls_protocols", converter = StringSetConverter.class)
+    public Set<String> enabledTlsProtocols = null;
+
     @Parameter(value = "is_cloud")
     private boolean isCloud = false;
 

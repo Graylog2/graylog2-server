@@ -121,7 +121,7 @@ public abstract class AbstractTcpTransport extends NettyTransport {
     protected final Configuration configuration;
     protected final EventLoopGroup parentEventLoopGroup;
     private final NettyTransportConfiguration nettyTransportConfiguration;
-    private final TLSProtocolsConfiguration tlsConfiguration;
+    private final Set<String> enabledTLSProtocols;
     private final AtomicReference<Channel> channelReference;
 
     private final boolean tlsEnable;
@@ -136,6 +136,19 @@ public abstract class AbstractTcpTransport extends NettyTransport {
     protected EventLoopGroup childEventLoopGroup;
     private ServerBootstrap bootstrap;
 
+    @Deprecated
+    public AbstractTcpTransport(
+            Configuration configuration,
+            ThroughputCounter throughputCounter,
+            LocalMetricRegistry localRegistry,
+            EventLoopGroup parentEventLoopGroup,
+            EventLoopGroupFactory eventLoopGroupFactory,
+            NettyTransportConfiguration nettyTransportConfiguration,
+            org.graylog2.Configuration graylogConfiguration) {
+            this(configuration, throughputCounter, localRegistry, parentEventLoopGroup, eventLoopGroupFactory,
+                    nettyTransportConfiguration, new TLSProtocolsConfiguration(graylogConfiguration.enabledTlsProtocols));
+    }
+
     public AbstractTcpTransport(
             Configuration configuration,
             ThroughputCounter throughputCounter,
@@ -148,7 +161,7 @@ public abstract class AbstractTcpTransport extends NettyTransport {
         this.configuration = configuration;
         this.parentEventLoopGroup = parentEventLoopGroup;
         this.nettyTransportConfiguration = nettyTransportConfiguration;
-        this.tlsConfiguration = tlsConfiguration;
+        this.enabledTLSProtocols = tlsConfiguration.getEnabledTlsProtocols();
         this.channelReference = new AtomicReference<>();
         this.childChannels = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 
@@ -350,9 +363,7 @@ public abstract class AbstractTcpTransport extends NettyTransport {
                         .sslProvider(tlsProvider)
                         .clientAuth(clientAuth)
                         .trustManager(clientAuthCerts);
-                if (!tlsConfiguration.getEnabledTlsProtocols().isEmpty()) {
-                    sslContext.protocols(tlsConfiguration.getEnabledTlsProtocols());
-                }
+                sslContext.protocols(enabledTLSProtocols);
                 if (tlsProvider.equals(SslProvider.OPENSSL)) {
                     // Netty tcnative does not adhere jdk.tls.disabledAlgorithms: https://github.com/netty/netty-tcnative/issues/530
                     // We need to build our own cipher list
