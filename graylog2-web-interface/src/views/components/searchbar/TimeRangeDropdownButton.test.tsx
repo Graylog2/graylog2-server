@@ -77,7 +77,7 @@ describe('TimeRangeDropdownButton', () => {
       from: 1800,
     });
 
-    waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1));
   });
 
   it('updates time range with range attribute when selecting "all messages" relative time range preset', async () => {
@@ -92,6 +92,6 @@ describe('TimeRangeDropdownButton', () => {
       range: 0,
     });
 
-    waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1));
   });
 });
