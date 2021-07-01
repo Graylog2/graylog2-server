@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { render, act, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
+import { render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
 import { alertsManager as exampleRole } from 'fixtures/roles';
 import { alice, bob, charlie } from 'fixtures/userOverviews';

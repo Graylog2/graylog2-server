@@ -17,7 +17,6 @@
 import React from 'react';
 import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
 import { StoreMock as MockStore } from 'helpers/mocking';
-import { act } from 'react-dom/test-utils';
 import mockSearchClusterConfig from 'fixtures/searchClusterConfig';
 
 import ToolsStore from 'stores/tools/ToolsStore';
@@ -93,6 +92,7 @@ describe('TimeRangeDropdown', () => {
     render(<TimeRangeDropdown {...defaultProps} />);
 
     const limitDuration = await screen.findByText(/admin has limited searching to 3 days ago/i);
+
     expect(limitDuration).toBeInTheDocument();
   });
 
