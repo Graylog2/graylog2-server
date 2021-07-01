@@ -105,6 +105,7 @@ module.exports = {
     'object-shorthand': ['error', 'methods'],
     'react/forbid-prop-types': 'off',
     'react/jsx-closing-bracket-location': ['warn', 'after-props'],
+    'react/jsx-curly-spacing': ['warn', { when: 'never', children: true }],
     'react/jsx-filename-extension': [1, { extensions: ['.jsx', '.tsx'] }],
     'react/jsx-first-prop-new-line': ['warn', 'never'],
     'react/jsx-indent-props': ['error', 'first'],
