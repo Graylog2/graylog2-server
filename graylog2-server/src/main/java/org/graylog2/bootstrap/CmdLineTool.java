@@ -49,6 +49,7 @@ import io.netty.util.internal.logging.Slf4JLoggerFactory;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.DocsHelper;
@@ -73,6 +74,7 @@ import org.slf4j.LoggerFactory;
 import java.lang.management.ManagementFactory;
 import java.nio.file.AccessDeniedException;
 import java.nio.file.Path;
+import java.security.Security;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -167,7 +169,35 @@ public abstract class CmdLineTool implements CliCommand {
     /**
      * Things that have to run before the {@link #startCommand()} method is being called.
      */
+    protected void beforeStart() {
+    }
+
     protected void beforeStart(TLSProtocolsConfiguration configuration) {
+    }
+
+    protected static void applySecuritySettings(TLSProtocolsConfiguration configuration) {
+        // Disable insecure TLS parameters and algorithms by default.
+        // Prevent attacks like LOGJAM, LUCKY13, et al.
+        setSystemPropertyIfEmpty("jdk.tls.ephemeralDHKeySize", "2048");
+        setSystemPropertyIfEmpty("jdk.tls.rejectClientInitiatedRenegotiation", "true");
+
+        // Only restrict ciphers if insecure TLS protocols are explicitly enabled.
+        // c.f. https://github.com/Graylog2/graylog2-server/issues/10944
+        final Set<String> tlsProtocols = configuration.getConfiguredTlsProtocols();
+        if (tlsProtocols == null || !(tlsProtocols.isEmpty() || tlsProtocols.contains("TLSv1") || tlsProtocols.contains("TLSv1.1") || tlsProtocols.contains("TLSv1.0"))) {
+            // Weirdly this is not a System property
+            Security.setProperty("jdk.tls.disabledAlgorithms", "CBC,3DES");
+        }
+
+        // Explicitly register Bouncy Castle as security provider.
+        // This allows us to use more key formats than with JCE
+        Security.addProvider(new BouncyCastleProvider());
+    }
+
+    private static void setSystemPropertyIfEmpty(String key, String value) {
+        if (System.getProperty(key) == null) {
+            System.setProperty(key, value);
+        }
     }
 
     @Override
