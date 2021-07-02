@@ -18,14 +18,15 @@ import { flatten } from 'lodash';
 
 import AggregationFunctionsStore from 'views/stores/AggregationFunctionsStore';
 import Series from 'views/logic/aggregationbuilder/Series';
+import type { Option, Suggester } from 'views/components/aggregationbuilder/SeriesSelect';
 
 import { parameterNeededForType } from './SeriesParameterOptions';
 
-const _makeIncompleteFunction = (fun) => ({ label: `${fun}(...)`, value: fun, incomplete: true, parameterNeeded: parameterNeededForType(fun) });
+const _makeIncompleteFunction = (fun: string) => ({ label: `${fun}(...)`, value: fun, incomplete: true, parameterNeeded: parameterNeededForType(fun) });
 
-const _wrapOption = (series) => ({ label: series.effectiveName, value: series });
+const _wrapOption = (series: Series) => ({ label: series.effectiveName, value: series });
 
-const _defaultFunctions = (functions) => {
+const _defaultFunctions = (functions: Functions): Array<Option> => {
   const funcOptions = Object.keys(functions).map(_makeIncompleteFunction);
 
   return [].concat(
@@ -34,7 +35,7 @@ const _defaultFunctions = (functions) => {
   );
 };
 
-const combineFunctionsWithFields = (functions, fields, parameter) => flatten(fields.map((name) => functions.map((f) => {
+const combineFunctionsWithFields = (functions: Array<string>, fields: Array<string>, parameter?: string | number) => flatten(fields.map((name) => functions.map((f) => {
   if (parameter) {
     return `${f}(${name},${parameter})`;
   }
@@ -42,16 +43,21 @@ const combineFunctionsWithFields = (functions, fields, parameter) => flatten(fie
   return `${f}(${name})`;
 })));
 
-export default class SeriesFunctionsSuggester {
-  constructor(fields) {
+type Functions = ReturnType<typeof AggregationFunctionsStore.getInitialState>;
+
+export default class SeriesFunctionsSuggester implements Suggester {
+  private readonly fields: Array<string>;
+
+  private defaultFunctions: Array<Option>;
+
+  constructor(fields: Array<string> = []) {
     this.fields = fields;
     this._updateFunctions(AggregationFunctionsStore.getInitialState());
     AggregationFunctionsStore.listen(this._updateFunctions);
   }
 
-  _updateFunctions = (functions) => {
+  _updateFunctions = (functions: Functions) => {
     if (functions) {
-      this.functions = functions;
       this.defaultFunctions = _defaultFunctions(functions);
     }
   };
@@ -60,5 +66,7 @@ export default class SeriesFunctionsSuggester {
     return this.defaultFunctions;
   }
 
-  for = (func, parameter) => combineFunctionsWithFields([func], this.fields, parameter).map(Series.forFunction).map(_wrapOption);
+  for = (func: string, parameter?: string | number) => combineFunctionsWithFields([func], this.fields, parameter)
+    .map(Series.forFunction)
+    .map(_wrapOption);
 }
