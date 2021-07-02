@@ -20,7 +20,7 @@ import { dirname } from 'path';
 import expandRows from './ExpandRows';
 
 const cwd = dirname(__filename);
-const readFixture = (filename) => JSON.parse(readFileSync(`${cwd}/${filename}`));
+const readFixture = (filename) => JSON.parse(readFileSync(`${cwd}/${filename}`).toString('utf8'));
 
 describe('ExpandRows', () => {
   it('normalizes empty array', () => {

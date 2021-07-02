@@ -14,7 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-export default (rows, rowFieldNames) => {
+
+type RowEntry = Row | string | number;
+
+type Row = { [key: string]: RowEntry };
+type Rows = Array<Row>;
+
+export default (rows: Rows, rowFieldNames: Array<string>) => {
   const duplicateKeys = {};
 
   return rows.map((item) => {

@@ -14,9 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
 import PropTypes from 'prop-types';
-import styled, { css } from 'styled-components';
+import styled, { css, DefaultTheme } from 'styled-components';
 import chroma from 'chroma-js';
 
 import { Table } from 'components/graylog';
@@ -25,7 +25,7 @@ const MessagesContainer = styled.div`
   width: 100%;
 `;
 
-const StyledTable = styled(Table)(({ theme }) => css`
+const StyledTable = styled(Table)(({ theme }: { theme: DefaultTheme }) => css`
   position: relative;
   font-size: ${theme.fonts.size.small};
   margin: 0;
@@ -146,7 +146,11 @@ const StyledTable = styled(Table)(({ theme }) => css`
   }
 `);
 
-const MessagesTable = ({ children }) => {
+type Props = {
+  children: React.ReactNode,
+};
+
+const MessagesTable = ({ children }: Props) => {
   return (
     <MessagesContainer>
       <StyledTable condensed>

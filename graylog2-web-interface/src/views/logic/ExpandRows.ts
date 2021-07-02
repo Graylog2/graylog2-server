@@ -16,14 +16,21 @@
  */
 import { flatten, setWith } from 'lodash';
 
-const expandRows = (fieldNames, columnFieldNames, rows) => {
+import { ColLeaf, Leaf, NonLeaf, RowInner, RowLeaf } from 'views/logic/searchtypes/pivot/PivotHandler';
+
+type ResultEntry = Result | string | number;
+
+type Result = { [key: string]: ResultEntry };
+type Results = Array<Result>;
+
+const expandRows = (fieldNames: Array<string>, columnFieldNames: Array<string>, rows: Array<Leaf | NonLeaf>): Results => {
   if (!rows) {
     return [];
   }
 
   const expanded = [];
 
-  rows.forEach((row) => {
+  rows.forEach((row: Leaf | NonLeaf) => {
     const { values } = row;
     const result = {};
 
@@ -31,7 +38,7 @@ const expandRows = (fieldNames, columnFieldNames, rows) => {
       result[fieldNames[idx]] = key;
     });
 
-    values.forEach(({ key, value }) => {
+    (values as Array<ColLeaf | RowLeaf | RowInner>).forEach(({ key, value }) => {
       const translatedKeys = flatten(key.map((k, idx) => (idx < key.length - 1 && columnFieldNames[idx] ? [columnFieldNames[idx], k] : k)));
 
       setWith(result, translatedKeys, value, Object);
