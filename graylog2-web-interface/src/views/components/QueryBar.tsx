@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useContext } from 'react';
+import { useCallback, useContext, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import * as ImmutablePropTypes from 'react-immutable-proptypes';
@@ -69,7 +69,13 @@ type Props = {
 
 const QueryBar = ({ queries, queryTitles, viewMetadata }: Props) => {
   const { activeQuery } = viewMetadata;
-  const { setDashboardPage } = useContext(DashboardPageContext);
+  const { setDashboardPage, dashboardPage } = useContext(DashboardPageContext);
+
+  useEffect(() => {
+    if (dashboardPage && activeQuery !== dashboardPage) {
+      ViewActions.selectQuery(dashboardPage);
+    }
+  }, [activeQuery, dashboardPage]);
 
   const onSelectPage = useCallback((pageId) => {
     setDashboardPage(pageId);

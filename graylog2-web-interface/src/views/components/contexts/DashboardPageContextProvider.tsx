@@ -43,7 +43,7 @@ const useSyncStateWithQueryParams = ({ dashboardPage, uriParams, setDashboardPag
     const nextPage = uriParams.page;
 
     if (nextPage !== dashboardPage) {
-      setDashboardPage(dashboardPage);
+      setDashboardPage(nextPage);
     }
   }, [uriParams.page, dashboardPage, setDashboardPage]);
 };
