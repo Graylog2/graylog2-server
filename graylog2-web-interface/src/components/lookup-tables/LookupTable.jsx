@@ -136,7 +136,7 @@ class LookupTable extends React.Component {
               <Button type="submit" bsStyle="success">Look up</Button>
             </fieldset>
           </form>
-          { this.state.lookupResult && (
+          {this.state.lookupResult && (
             <div>
               <h4>Lookup result</h4>
               <pre>{JSON.stringify(this.state.lookupResult, null, 2)}</pre>

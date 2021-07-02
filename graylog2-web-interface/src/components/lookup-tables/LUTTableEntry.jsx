@@ -54,18 +54,18 @@ class LUTTableEntry extends React.Component {
       <tbody>
         <tr>
           <td>
-            {this.props.errors.table && (<ErrorPopover placement="right" errorText={this.props.errors.table} title="Lookup Table problem" />) }
+            {this.props.errors.table && (<ErrorPopover placement="right" errorText={this.props.errors.table} title="Lookup Table problem" />)}
             <Link to={Routes.SYSTEM.LOOKUPTABLES.show(this.props.table.name)}>{this.props.table.title}</Link>
             <ContentPackMarker contentPack={this.props.table.content_pack} marginLeft={5} />
           </td>
           <td>{this.props.table.description}</td>
           <td>{this.props.table.name}</td>
           <td>
-            {this.props.errors.cache && (<ErrorPopover placement="bottom" errorText={this.props.errors.cache} title="Cache problem" />) }
+            {this.props.errors.cache && (<ErrorPopover placement="bottom" errorText={this.props.errors.cache} title="Cache problem" />)}
             <Link to={Routes.SYSTEM.LOOKUPTABLES.CACHES.show(this.props.cache.name)}>{this.props.cache.title}</Link>
           </td>
           <td>
-            {this.props.errors.dataAdapter && (<ErrorPopover placement="bottom" errorText={this.props.errors.dataAdapter} title="Data adapter problem" />) }
+            {this.props.errors.dataAdapter && (<ErrorPopover placement="bottom" errorText={this.props.errors.dataAdapter} title="Data adapter problem" />)}
             <Link to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.show(this.props.dataAdapter.name)}>{this.props.dataAdapter.title}</Link>
           </td>
           <td>

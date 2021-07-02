@@ -42,7 +42,7 @@ const HasOwnership = ({ children, id, type, hideChildren }: Props) => {
 
     if (grnPermissions.includes(ownership) || isAdmin) {
       if (!hideChildren && typeof children === 'function') {
-        return <>{ children({ disabled: false }) } </>;
+        return <>{children({ disabled: false })} </>;
       }
 
       return <>children</>;
@@ -50,7 +50,7 @@ const HasOwnership = ({ children, id, type, hideChildren }: Props) => {
   }
 
   if (!hideChildren && typeof children === 'function') {
-    return <>{ children({ disabled: true }) } </>;
+    return <>{children({ disabled: true })} </>;
   }
 
   return null;

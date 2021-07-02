@@ -356,7 +356,7 @@ class ContentPackSelection extends React.Component {
         </Row>
         <Row>
           <Col smOffset={1} sm={8} lg={8}>
-            {errors.selection && <Panel bsStyle="danger">{errors.selection}</Panel> }
+            {errors.selection && <Panel bsStyle="danger">{errors.selection}</Panel>}
             <ExpandableList>
               {entitiesComponent}
             </ExpandableList>

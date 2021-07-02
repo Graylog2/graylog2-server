@@ -274,13 +274,13 @@ class Stream extends React.Component {
                           permissions={permissions}
                           isDefaultStream={isDefaultStream} />
         </div>
-        { showStreamRuleForm && (
+        {showStreamRuleForm && (
           <StreamRuleForm onClose={this._closeStreamRuleForm}
                           title="New Stream Rule"
                           onSubmit={this._onSaveStreamRule}
                           streamRuleTypes={streamRuleTypes} />
-        ) }
-        { showEntityShareModal && (
+        )}
+        {showEntityShareModal && (
           <EntityShareModal entityId={stream.id}
                             entityType="stream"
                             entityTitle={stream.title}

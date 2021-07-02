@@ -197,8 +197,8 @@ class ContentPackParameterList extends React.Component {
       <div>
         <h2>Parameters list</h2>
         <br />
-        { !readOnly && this._parameterModal() }
-        { !readOnly && (<span><br /><br /></span>) }
+        {!readOnly && this._parameterModal()}
+        {!readOnly && (<span><br /><br /></span>)}
         <SearchForm onSearch={this._filterParameters}
                     onReset={() => { this._filterParameters(''); }}
                     searchButtonLabel="Filter" />

@@ -22,5 +22,5 @@ export type {
   VisualizationConfigDefinition,
   VisualizationConfigFormValues,
   VisualizationFormValues,
-  WidgetConfigFormValues } from './WidgetConfigForm';
-
+  WidgetConfigFormValues,
+} from './WidgetConfigForm';

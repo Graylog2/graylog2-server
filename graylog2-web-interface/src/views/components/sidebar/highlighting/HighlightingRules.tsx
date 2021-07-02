@@ -40,7 +40,7 @@ const HighlightingRules = () => {
         If a term or a value has more than one rule, the last matching rule is used.
       </SectionInfo>
       <SectionSubheadline>Active highlights <IconButton className="pull-right" name="plus" onClick={() => setShowForm(!showForm)} /> </SectionSubheadline>
-      { showForm && <HighlightForm onClose={() => setShowForm(false)} />}
+      {showForm && <HighlightForm onClose={() => setShowForm(false)} />}
       <HighlightingRuleGrid>
         <ColorPreview color={DEFAULT_HIGHLIGHT_COLOR} />
         <RuleContainer>Search terms</RuleContainer>

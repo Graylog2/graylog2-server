@@ -65,6 +65,7 @@ describe('WidgetFocusProvider', () => {
 
   it('should update url on widget focus', () => {
     let contextValue;
+
     const consume = (value) => {
       contextValue = value;
     };
@@ -83,9 +84,11 @@ describe('WidgetFocusProvider', () => {
     });
 
     let contextValue;
+
     const consume = (value) => {
       contextValue = value;
     };
+
     renderSUT(consume);
 
     contextValue.unsetWidgetFocusing();
@@ -100,19 +103,23 @@ describe('WidgetFocusProvider', () => {
     });
 
     let contextValue;
+
     const consume = (value) => {
       contextValue = value;
     };
+
     renderSUT(consume);
 
-    expect(contextValue.focusedWidget).toEqual({id: 'widget-id', focusing: true, editing: false});
+    expect(contextValue.focusedWidget).toEqual({ id: 'widget-id', focusing: true, editing: false });
   });
 
   it('should update url on widget edit', () => {
     let contextValue;
+
     const consume = (value) => {
       contextValue = value;
     };
+
     renderSUT(consume);
 
     contextValue.setWidgetEditing('widget-id');
@@ -127,6 +134,7 @@ describe('WidgetFocusProvider', () => {
     });
 
     let contextValue;
+
     const consume = (value) => {
       contextValue = value;
     };
@@ -145,12 +153,14 @@ describe('WidgetFocusProvider', () => {
     });
 
     let contextValue;
+
     const consume = (value) => {
       contextValue = value;
     };
+
     renderSUT(consume);
 
-    expect(contextValue.focusedWidget).toEqual({id: 'widget-id', editing: true, focusing: true});
+    expect(contextValue.focusedWidget).toEqual({ id: 'widget-id', editing: true, focusing: true });
   });
 
   it('should not remove focus query param on widget edit', () => {
@@ -160,9 +170,11 @@ describe('WidgetFocusProvider', () => {
     });
 
     let contextValue;
+
     const consume = (value) => {
       contextValue = value;
     };
+
     renderSUT(consume);
 
     contextValue.setWidgetEditing('widget-id');
@@ -183,9 +195,11 @@ describe('WidgetFocusProvider', () => {
     });
 
     let contextValue;
+
     const consume = (value) => {
       contextValue = value;
     };
+
     renderSUT(consume);
 
     expect(contextValue.focusedWidget).toBe(undefined);
