@@ -19,11 +19,17 @@ import Immutable from 'immutable';
 import { isEqual } from 'lodash';
 
 import { singletonActions, singletonStore } from 'views/logic/singleton';
-import { filtersForQuery } from 'views/logic/queries/Query';
+import { filtersForQuery, QueryId } from 'views/logic/queries/Query';
+import { RefluxActions } from 'stores/StoreTypes';
+import { QueriesList } from 'views/actions/QueriesActions';
 
 import { QueriesActions, QueriesStore } from './QueriesStore';
 
-export const QueryFiltersActions = singletonActions(
+type QueryFiltersActionsType = RefluxActions<{
+  streams: (queryId: QueryId, streams: Array<string>) => Promise<QueriesList>,
+}>;
+
+export const QueryFiltersActions = singletonActions<QueryFiltersActionsType>(
   'views.QueryFilters',
   () => Reflux.createActions({
     streams: { asyncResult: true },
@@ -43,7 +49,7 @@ export const QueryFiltersStore = singletonStore(
     getInitialState() {
       return this._state();
     },
-    onQueriesStoreChange(newQueries) {
+    onQueriesStoreChange(newQueries: QueriesList) {
       const newFilters = newQueries.map((q) => q.filter);
       const oldFilters = this.queries.map((q) => q.filter);
 
@@ -54,7 +60,7 @@ export const QueryFiltersStore = singletonStore(
       }
     },
 
-    streams(queryId, streams) {
+    streams(queryId: QueryId, streams: Array<string>) {
       const streamFilter = filtersForQuery(streams);
       const newQuery = this.queries.get(queryId).toBuilder().filter(streamFilter).build();
       const promise = QueriesActions.update(queryId, newQuery);
