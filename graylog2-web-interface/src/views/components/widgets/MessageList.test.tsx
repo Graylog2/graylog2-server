@@ -124,6 +124,7 @@ describe('MessageList', () => {
 
   beforeEach(() => {
     // eslint-disable-next-line import/namespace
+    // @ts-ignore
     messageList.MessageTableEntry = MessageTableEntry;
   });
 
