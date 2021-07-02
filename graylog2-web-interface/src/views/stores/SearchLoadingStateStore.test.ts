@@ -42,8 +42,9 @@ describe('SearchLoadingStateStore', () => {
   });
 
   it('registers to SearchStore for search executions', () => {
-    // eslint-disable-next-line no-unused-vars
     const { SearchLoadingStateStore } = loadSUT();
+
+    expect(SearchLoadingStateStore).not.toBeNull();
 
     expect(SearchActions.execute.listen).toHaveBeenCalledTimes(1);
     expect(SearchActions.execute.completed.listen).toHaveBeenCalledTimes(1);
@@ -86,3 +87,5 @@ describe('SearchLoadingStateStore', () => {
     executeCompletedCallback();
   });
 });
+
+export {};
