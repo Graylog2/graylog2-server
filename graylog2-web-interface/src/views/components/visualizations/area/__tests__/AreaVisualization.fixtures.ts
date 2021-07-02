@@ -14,7 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-export const simpleChartData = {
+import { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
+
+export const simpleChartData: { [key: string]: Rows } = {
   chart: [
     {
       key: [
@@ -165,4 +167,4 @@ export const effectiveTimerange = {
   type: 'absolute',
   from: '2019-11-28T15:21:00.486Z',
   to: '2019-11-28T15:25:57.000Z',
-};
+} as const;
