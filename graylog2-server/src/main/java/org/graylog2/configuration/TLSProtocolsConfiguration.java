@@ -62,16 +62,12 @@ public class TLSProtocolsConfiguration {
      * If it's not configured (null and the default) return a secure set of supported TLS protocols.
      */
     public Set<String> getEnabledTlsProtocols() {
-        return getEnabledTlsProtocols(enabledTlsProtocols);
-    }
-
-    public static Set<String> getEnabledTlsProtocols(Set<String> configuredTlsProtocols) {
-        if (configuredTlsProtocols != null) {
-            if (configuredTlsProtocols.isEmpty()) {
-                return DefaultTLSProtocolProvider.getSupportedTlsProtocols();
+        if (enabledTlsProtocols != null) {
+            if (enabledTlsProtocols.isEmpty()) {
+                return DefaultTLSProtocolProvider.getAllSupportedTlsProtocols();
             }
-            return configuredTlsProtocols;
+            return enabledTlsProtocols;
         }
-        return DefaultTLSProtocolProvider.getDefaultSupportedTlsProtocols();
+        return DefaultTLSProtocolProvider.getSecureTLSProtocols();
     }
 }

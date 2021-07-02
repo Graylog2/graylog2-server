@@ -146,7 +146,7 @@ public abstract class AbstractTcpTransport extends NettyTransport {
             NettyTransportConfiguration nettyTransportConfiguration,
             org.graylog2.Configuration graylogConfiguration) {
             this(configuration, throughputCounter, localRegistry, parentEventLoopGroup, eventLoopGroupFactory,
-                    nettyTransportConfiguration, new TLSProtocolsConfiguration(graylogConfiguration.enabledTlsProtocols));
+                    nettyTransportConfiguration, new TLSProtocolsConfiguration(graylogConfiguration.getEnabledTlsProtocols()));
     }
 
     public AbstractTcpTransport(
