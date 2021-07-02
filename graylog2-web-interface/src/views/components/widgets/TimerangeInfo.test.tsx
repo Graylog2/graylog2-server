@@ -37,7 +37,7 @@ jest.mock('views/stores/GlobalOverrideStore', () => ({
   ),
 }));
 
-const mockSearchStoreState = (storeState: Partial<SearchStoreState> = {}): SearchStoreState => ({
+const mockSearchStoreState = (storeState: {} = {}): {} => ({
   result: {
     results: {
       'active-query-id': {
@@ -145,7 +145,7 @@ describe('TimerangeInfo', () => {
           },
         },
       },
-    }));
+    }) as SearchStoreState);
 
     render(<SUT widget={relativeWidget} activeQuery="active-query-id" widgetId="widget-id" />);
 
@@ -155,7 +155,7 @@ describe('TimerangeInfo', () => {
   it('should not throw error and display default time range when widget id does not exist in search widget mapping', () => {
     asMock(SearchStore.getInitialState).mockReturnValueOnce(mockSearchStoreState({
       widgetMapping: Immutable.Map(),
-    }));
+    }) as SearchStoreState);
 
     render(<SUT widget={widget} activeQuery="active-query-id" widgetId="widget-id" />);
 
