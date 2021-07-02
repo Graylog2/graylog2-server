@@ -34,6 +34,7 @@ import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.inject.Binder;
@@ -46,6 +47,7 @@ import com.google.inject.name.Names;
 import com.google.inject.spi.Message;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import io.netty.util.internal.logging.Slf4JLoggerFactory;
+import joptsimple.internal.Strings;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
@@ -82,6 +84,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.google.common.base.Strings.nullToEmpty;
 
@@ -176,17 +180,32 @@ public abstract class CmdLineTool implements CliCommand {
     }
 
     protected static void applySecuritySettings(TLSProtocolsConfiguration configuration) {
-        // Disable insecure TLS parameters and algorithms by default.
+        // Disable insecure TLS parameters and ciphers by default.
         // Prevent attacks like LOGJAM, LUCKY13, et al.
         setSystemPropertyIfEmpty("jdk.tls.ephemeralDHKeySize", "2048");
         setSystemPropertyIfEmpty("jdk.tls.rejectClientInitiatedRenegotiation", "true");
 
+        final Set<String> tlsProtocols = configuration.getConfiguredTlsProtocols();
+        final List<String> disabledAlgorithms = Stream.of(Security.getProperty("jdk.tls.disabledAlgorithms").split(",")).map(String::trim).collect(Collectors.toList());
+
         // Only restrict ciphers if insecure TLS protocols are explicitly enabled.
         // c.f. https://github.com/Graylog2/graylog2-server/issues/10944
-        final Set<String> tlsProtocols = configuration.getConfiguredTlsProtocols();
         if (tlsProtocols == null || !(tlsProtocols.isEmpty() || tlsProtocols.contains("TLSv1") || tlsProtocols.contains("TLSv1.1"))) {
-            // Weirdly this is not a System property
-            Security.setProperty("jdk.tls.disabledAlgorithms", "CBC,3DES");
+            disabledAlgorithms.addAll(ImmutableSet.of("CBC", "3DES"));
+            Security.setProperty("jdk.tls.disabledAlgorithms", Strings.join(disabledAlgorithms, ", "));
+        } else {
+            // Remove explicitly enabled legacy TLS protocols from the disabledAlgorithms filter
+            Set<String> reEnabledTLSProtocols;
+            if (tlsProtocols.isEmpty()) {
+                reEnabledTLSProtocols = ImmutableSet.of("TLSv1", "TLSv1.1");
+            } else {
+                reEnabledTLSProtocols = tlsProtocols;
+            }
+            final List<String> updatedProperties = disabledAlgorithms.stream()
+                    .filter(p -> !reEnabledTLSProtocols.contains(p))
+                    .collect(Collectors.toList());
+
+            Security.setProperty("jdk.tls.disabledAlgorithms", Strings.join(updatedProperties, ", "));
         }
 
         // Explicitly register Bouncy Castle as security provider.

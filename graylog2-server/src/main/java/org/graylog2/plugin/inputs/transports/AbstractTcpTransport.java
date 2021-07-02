@@ -365,9 +365,11 @@ public abstract class AbstractTcpTransport extends NettyTransport {
                         .trustManager(clientAuthCerts);
                 sslContext.protocols(enabledTLSProtocols);
                 if (tlsProvider.equals(SslProvider.OPENSSL)) {
-                    // Netty tcnative does not adhere jdk.tls.disabledAlgorithms: https://github.com/netty/netty-tcnative/issues/530
-                    // We need to build our own cipher list
-                    sslContext.ciphers(secureDefaultCiphers.get());
+                    if (!enabledTLSProtocols.contains("TLSv1") && !enabledTLSProtocols.contains("TLSv1.1")) {
+                        // Netty tcnative does not adhere jdk.tls.disabledAlgorithms: https://github.com/netty/netty-tcnative/issues/530
+                        // We need to build our own cipher list
+                        sslContext.ciphers(secureDefaultCiphers.get());
+                    }
                 }
 
                 // TODO: Use byte buffer allocator of channel
