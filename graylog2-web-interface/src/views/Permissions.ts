@@ -17,5 +17,5 @@
 
 // eslint-disable-next-line import/prefer-default-export
 export const View = {
-  Edit: (id) => `view:edit:${id}`,
-};
+  Edit: (id: string) => `view:edit:${id}`,
+} as const;
