@@ -20,6 +20,7 @@ import Pie from 'plotly.js/lib/pie';
 import Heatmap from 'plotly.js/lib/heatmap';
 import Scatter from 'plotly.js/lib/scatter';
 
+// @ts-ignore
 Plotly.register([
   Bar,
   Pie,
