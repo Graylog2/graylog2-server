@@ -19,7 +19,7 @@ import Immutable from 'immutable';
 import { isEqual } from 'lodash';
 
 import { singletonActions, singletonStore } from 'views/logic/singleton';
-import { filtersForQuery, QueryId } from 'views/logic/queries/Query';
+import Query, { filtersForQuery, FilterType, QueryId } from 'views/logic/queries/Query';
 import { RefluxActions } from 'stores/StoreTypes';
 import { QueriesList } from 'views/actions/QueriesActions';
 
@@ -36,9 +36,11 @@ export const QueryFiltersActions = singletonActions<QueryFiltersActionsType>(
   }),
 );
 
+type QueryFiltersStoreState = Immutable.OrderedMap<QueryId, FilterType>;
+
 export const QueryFiltersStore = singletonStore(
   'views.QueryFilters',
-  () => Reflux.createStore({
+  () => Reflux.createStore<QueryFiltersStoreState>({
     listenables: [QueryFiltersActions],
     queries: Immutable.Map(),
 
@@ -70,8 +72,8 @@ export const QueryFiltersStore = singletonStore(
       return promise;
     },
 
-    _state() {
-      return this.queries.map((q) => q.filter ?? Immutable.Map());
+    _state(): QueryFiltersStoreState {
+      return this.queries.map((q: Query) => q.filter ?? Immutable.Map());
     },
     _trigger() {
       this.trigger(this._state());
