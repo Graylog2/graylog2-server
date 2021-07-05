@@ -41,17 +41,17 @@ const _updateQueryParams = (
   return baseUri.toString();
 };
 
-const useSyncStateWithQueryParams = ({ dashboardPage, uriParams, setDashboardPage, pageIds }) => {
+const useSyncStateWithQueryParams = ({ dashboardPage, uriParams, setDashboardPage, states }) => {
   useEffect(() => {
     const nextPage = uriParams.page;
 
-    if (!pageIds.includes(nextPage)) {
+    if (!states.has(nextPage)) {
       setDashboardPage(undefined);
     } else if (nextPage !== dashboardPage) {
       setDashboardPage(nextPage);
       ViewActions.selectQuery(nextPage);
     }
-  }, [uriParams.page, dashboardPage, setDashboardPage, pageIds]);
+  }, [uriParams.page, dashboardPage, setDashboardPage, states]);
 };
 
 const useCleanupQueryParams = ({ uriParams, query, history }) => {
@@ -66,7 +66,6 @@ const useCleanupQueryParams = ({ uriParams, query, history }) => {
 
 const DashboardPageContextProvider = ({ children }: { children: React.ReactNode }): React.ReactElement => {
   const states = useStore(ViewStatesStore);
-  const pageIds = states.keySeq();
   const { search, pathname } = useLocation();
   const query = pathname + search;
   const history = useHistory();
@@ -76,7 +75,7 @@ const DashboardPageContextProvider = ({ children }: { children: React.ReactNode 
     page: params.page,
   }), [params]);
 
-  useSyncStateWithQueryParams({ dashboardPage, uriParams, setDashboardPage, pageIds });
+  useSyncStateWithQueryParams({ dashboardPage, uriParams, setDashboardPage, states });
   useCleanupQueryParams({ uriParams, query, history });
 
   const updatePageParams = useCallback((newPage: string | undefined) => {
