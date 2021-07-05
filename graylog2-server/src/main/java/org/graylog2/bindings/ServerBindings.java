@@ -22,7 +22,6 @@ import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.Multibinder;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.glassfish.grizzly.http.server.ErrorPageGenerator;
-import org.graylog.plugins.views.search.views.ViewCleanupListener;
 import org.graylog2.Configuration;
 import org.graylog2.alerts.AlertSender;
 import org.graylog2.alerts.EmailRecipients;
@@ -194,7 +193,6 @@ public class ServerBindings extends Graylog2Module {
         bind(LocalDebugEventListener.class).asEagerSingleton();
         bind(ClusterDebugEventListener.class).asEagerSingleton();
         bind(StartPageCleanupListener.class).asEagerSingleton();
-        bind(ViewCleanupListener.class).asEagerSingleton();
     }
 
     private void bindSearchResponseDecorators() {
