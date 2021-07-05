@@ -15,21 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext, useState } from 'react';
 import PropTypes from 'prop-types';
-import { PluginStore } from 'graylog-web-plugin/plugin';
+import { useContext } from 'react';
 
-import { MenuItem } from 'components/graylog';
 import FieldType from 'views/logic/fieldtypes/FieldType';
-import { ActionContext } from 'views/logic/ActionContext';
 import type { QueryId } from 'views/logic/queries/Query';
-import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
+import Action from 'views/components/actions/Action';
+import { ActionContext } from 'views/logic/ActionContext';
 
-import { createHandlerFor } from './ActionHandler';
-import type { ActionDefinition } from './ActionHandler';
-
-import OverlayDropdown from '../OverlayDropdown';
-import style from '../Value.css';
 import CustomPropTypes from '../CustomPropTypes';
 
 type Props = {
@@ -44,68 +37,13 @@ type Props = {
 
 const ValueActions = ({ children, element, field, menuContainer, queryId, type, value }: Props) => {
   const actionContext = useContext(ActionContext);
-  const { unsetWidgetFocusing } = useContext(WidgetFocusContext);
-  const [open, setOpen] = useState(false);
-  const [overflowingComponents, setOverflowingComponents] = useState({});
-
-  const _onMenuToggle = () => setOpen(!open);
-  const overflowingComponentsValues: Array<React.ReactNode> = Object.values(overflowingComponents);
   const handlerArgs = { queryId, field, type, value, contexts: actionContext };
-  const valueActions = PluginStore.exports('valueActions')
-    .filter((action: ActionDefinition) => {
-      const { isHidden = () => false } = action;
-
-      return !isHidden(handlerArgs);
-    })
-    .map((action: ActionDefinition) => {
-      const setActionComponents = (fn) => {
-        setOverflowingComponents(fn(overflowingComponents));
-      };
-
-      const handler = createHandlerFor(action, setActionComponents);
-
-      const onSelect = () => {
-        const { resetFocus } = action;
-
-        if (resetFocus) {
-          unsetWidgetFocusing();
-        }
-
-        _onMenuToggle();
-        handler(handlerArgs);
-      };
-
-      const { isEnabled = () => true } = action;
-      const actionDisabled = !isEnabled(handlerArgs);
-
-      return (
-        <MenuItem key={`value-action-${field}-${action.type}`}
-                  disabled={actionDisabled}
-                  eventKey={{ field, value }}
-                  onSelect={onSelect}>{action.title}
-        </MenuItem>
-      );
-    });
+  const elementWithStatus = (() => element) as React.ComponentType<{ active: boolean }>;
 
   return (
-    <>
-      <OverlayDropdown show={open}
-                       toggle={element}
-                       placement="right"
-                       onToggle={_onMenuToggle}
-                       menuContainer={menuContainer}>
-        <li className={style.bottomSpacer}>
-          <span className={style.dropdownheader}>
-            {children}
-          </span>
-        </li>
-
-        <MenuItem divider />
-        <MenuItem header>Actions</MenuItem>
-        {valueActions}
-      </OverlayDropdown>
-      {overflowingComponentsValues}
-    </>
+    <Action element={elementWithStatus} handlerArgs={handlerArgs} menuContainer={menuContainer} type="value">
+      {children}
+    </Action>
   );
 };
 

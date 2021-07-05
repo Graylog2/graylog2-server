@@ -16,25 +16,27 @@
  */
 import Reflux from 'reflux';
 import Immutable from 'immutable';
-import { get, isEqual } from 'lodash';
+import { isEqual } from 'lodash';
 
 import { singletonStore } from 'views/logic/singleton';
 
-import { ViewStore } from './ViewStore';
+import { ViewStore, ViewStoreState } from './ViewStore';
+
+type QueryTitlesStoreState = Immutable.Map<string, string>;
 
 // eslint-disable-next-line import/prefer-default-export
 export const QueryTitlesStore = singletonStore(
   'views.QueryTitles',
-  () => Reflux.createStore({
+  () => Reflux.createStore<QueryTitlesStoreState>({
     init() {
       this.listenTo(ViewStore, this.onViewStoreUpdate, this.onViewStoreUpdate);
     },
     getInitialState() {
       return this._state();
     },
-    onViewStoreUpdate({ view }) {
-      const viewState = get(view, 'state', Immutable.Map());
-      const newState = viewState.map((state) => state.titles.getIn(['tab', 'title'])).filter((v) => v !== undefined);
+    onViewStoreUpdate({ view }: ViewStoreState) {
+      const viewState = view?.state ?? Immutable.Map();
+      const newState = viewState.map((state) => state.titles.getIn(['tab', 'title']) as string).filter((v) => v !== undefined).toMap();
 
       if (!isEqual(this.state, newState)) {
         this.state = newState;
