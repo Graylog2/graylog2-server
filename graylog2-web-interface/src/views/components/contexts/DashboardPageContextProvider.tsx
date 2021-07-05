@@ -21,6 +21,9 @@ import URI from 'urijs';
 
 import useQuery from 'routing/useQuery';
 import DashboardPageContext from 'views/components/contexts/DashboardPageContext';
+import { ViewActions } from 'views/stores/ViewStore';
+import { ViewStatesStore } from 'views/stores/ViewStatesStore';
+import { useStore } from 'stores/connect';
 
 const _clearURI = (query) => new URI(query)
   .removeSearch('page');
@@ -31,21 +34,24 @@ const _updateQueryParams = (
 ) => {
   let baseUri = _clearURI(query);
 
-  if (newPage) {
+  if (newPage && newPage !== 'new') {
     baseUri = baseUri.setSearch('page', newPage);
   }
 
   return baseUri.toString();
 };
 
-const useSyncStateWithQueryParams = ({ dashboardPage, uriParams, setDashboardPage }) => {
+const useSyncStateWithQueryParams = ({ dashboardPage, uriParams, setDashboardPage, pageIds }) => {
   useEffect(() => {
     const nextPage = uriParams.page;
 
-    if (nextPage !== dashboardPage) {
+    if (!pageIds.includes(nextPage)) {
+      setDashboardPage(undefined);
+    } else if (nextPage !== dashboardPage) {
       setDashboardPage(nextPage);
+      ViewActions.selectQuery(nextPage);
     }
-  }, [uriParams.page, dashboardPage, setDashboardPage]);
+  }, [uriParams.page, dashboardPage, setDashboardPage, pageIds]);
 };
 
 const useCleanupQueryParams = ({ uriParams, query, history }) => {
@@ -59,6 +65,8 @@ const useCleanupQueryParams = ({ uriParams, query, history }) => {
 };
 
 const DashboardPageContextProvider = ({ children }: { children: React.ReactNode }): React.ReactElement => {
+  const states = useStore(ViewStatesStore);
+  const pageIds = states.keySeq();
   const { search, pathname } = useLocation();
   const query = pathname + search;
   const history = useHistory();
@@ -68,7 +76,7 @@ const DashboardPageContextProvider = ({ children }: { children: React.ReactNode 
     page: params.page,
   }), [params]);
 
-  useSyncStateWithQueryParams({ dashboardPage, uriParams, setDashboardPage });
+  useSyncStateWithQueryParams({ dashboardPage, uriParams, setDashboardPage, pageIds });
   useCleanupQueryParams({ uriParams, query, history });
 
   const updatePageParams = useCallback((newPage: string | undefined) => {

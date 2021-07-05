@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useContext, useEffect } from 'react';
+import { useCallback, useContext } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import * as ImmutablePropTypes from 'react-immutable-proptypes';
@@ -39,12 +39,10 @@ const onTitleChange = (queryId, newTitle) => TitlesActions.set('tab', 'title', n
 
 const onSelectQuery = (queryId) => (queryId === 'new' ? NewQueryActionHandler() : ViewActions.selectQuery(queryId));
 
-const onCloseTab = (queryId: string, currentQuery: string, queries: Immutable.OrderedSet<string>) => {
+const onCloseTab = (queryId: string, currentQuery: string, queries: Immutable.OrderedSet<string>, setDashboardPage: (page: string | undefined) => void) => {
   if (queries.size === 1) {
     return Promise.resolve();
   }
-
-  let promise;
 
   if (queryId === currentQuery) {
     const indexedQueryIds = queries.toIndexedSeq();
@@ -53,12 +51,10 @@ const onCloseTab = (queryId: string, currentQuery: string, queries: Immutable.Or
     const newQuery = indexedQueryIds.filter((currentQueryId) => (currentQueryId !== queryId))
       .get(newQueryIdIndex);
 
-    promise = ViewActions.selectQuery(newQuery);
-  } else {
-    promise = Promise.resolve();
+    setDashboardPage(newQuery);
   }
 
-  return promise.then(() => QueriesActions.remove(queryId)).then(() => ViewStatesActions.remove(queryId));
+  return QueriesActions.remove(queryId).then(() => ViewStatesActions.remove(queryId));
 };
 
 type Props = {
@@ -69,13 +65,7 @@ type Props = {
 
 const QueryBar = ({ queries, queryTitles, viewMetadata }: Props) => {
   const { activeQuery } = viewMetadata;
-  const { setDashboardPage, dashboardPage } = useContext(DashboardPageContext);
-
-  useEffect(() => {
-    if (dashboardPage && activeQuery !== dashboardPage) {
-      ViewActions.selectQuery(dashboardPage);
-    }
-  }, [activeQuery, dashboardPage]);
+  const { setDashboardPage } = useContext(DashboardPageContext);
 
   const onSelectPage = useCallback((pageId) => {
     setDashboardPage(pageId);
@@ -83,7 +73,7 @@ const QueryBar = ({ queries, queryTitles, viewMetadata }: Props) => {
     return onSelectQuery(pageId);
   }, [setDashboardPage]);
 
-  const onRemove = useCallback((queryId) => onCloseTab(queryId, activeQuery, queries), [activeQuery, queries]);
+  const onRemove = useCallback((queryId) => onCloseTab(queryId, activeQuery, queries, setDashboardPage), [activeQuery, queries, setDashboardPage]);
 
   return (
     <QueryTabs queries={queries}

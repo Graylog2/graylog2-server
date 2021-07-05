@@ -27,6 +27,7 @@ import { WidgetStore } from 'views/stores/WidgetStore';
 import { SearchActions } from 'views/stores/SearchStore';
 
 import WidgetFocusContext, { FocusContextState } from './WidgetFocusContext';
+import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 
 type WidgetFocusRequest = {
   id: string,
@@ -94,7 +95,7 @@ const useSyncStateWithQueryParams = ({ focusedWidget, focusUriParams, setFocused
 
 const useCleanupQueryParams = ({ focusUriParams, widgets, query, history }) => {
   useEffect(() => {
-    if ((focusUriParams?.id && !widgets.has(focusUriParams.id)) || (focusUriParams?.id === undefined)) {
+    if ((focusUriParams?.id && !widgets.has(focusUriParams.id) && focusUriParams.isPageShown) || (focusUriParams?.id === undefined)) {
       const baseURI = _clearURI(query);
 
       history.replace(baseURI.toString());
@@ -108,12 +109,14 @@ const WidgetFocusProvider = ({ children }: { children: React.ReactNode }): React
   const history = useHistory();
   const [focusedWidget, setFocusedWidget] = useState<FocusContextState | undefined>();
   const widgets = useStore(WidgetStore);
+  const { activeQuery } = useStore(ViewMetadataStore);
   const params = useQuery();
   const focusUriParams = useMemo(() => ({
     editing: params.editing === 'true',
     focusing: params.focusing === 'true',
     id: params.focusedId,
-  }), [params.editing, params.focusing, params.focusedId]);
+    isPageShown: !params.page || params.page === activeQuery,
+  }), [params.editing, params.focusing, params.focusedId, params.page, activeQuery]);
 
   useSyncStateWithQueryParams({ focusedWidget, setFocusedWidget, widgets, focusUriParams });
 

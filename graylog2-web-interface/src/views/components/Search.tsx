@@ -62,7 +62,6 @@ import WidgetFocusProvider from 'views/components/contexts/WidgetFocusProvider';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import { RefluxActions } from 'stores/StoreTypes';
-import DashboardPageContextProvider from 'views/components/contexts/DashboardPageContextProvider';
 
 const GridContainer = styled.div<{ interactive: boolean }>(({ interactive }) => {
   return interactive ? css`
@@ -193,7 +192,6 @@ const Search = ({ location }: Props) => {
   }, []);
 
   return (
-    <DashboardPageContextProvider>
     <WidgetFocusProvider>
       <WidgetFocusContext.Consumer>
         {({ focusedWidget: { focusing: focusingWidget, editing: editingWidget } = { focusing: false, editing: false } }) => (
@@ -246,7 +244,6 @@ const Search = ({ location }: Props) => {
         )}
       </WidgetFocusContext.Consumer>
     </WidgetFocusProvider>
-    </DashboardPageContextProvider>
   );
 };
 
