@@ -208,7 +208,7 @@ public class ContentPackResource extends RestResource {
             @ApiParam(name = "Request body", value = "Content pack", required = true)
             @NotNull @Valid final ContentPack contentPack) {
         checkPermission(RestPermissions.CONTENT_PACK_CREATE);
-        final ContentPack pack = contentPackPersistenceService.filterMissingResourcesAndInsert(contentPack)
+        final ContentPack pack = contentPackPersistenceService.insert(contentPack)
                 .orElseThrow(() -> new BadRequestException("Content pack " + contentPack.id() + " with this revision " + contentPack.revision() + " already found!"));
 
         final URI packUri = getUriBuilderToSelf().path(ContentPackResource.class)
