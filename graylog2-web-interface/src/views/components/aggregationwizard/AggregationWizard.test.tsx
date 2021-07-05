@@ -61,10 +61,10 @@ describe('AggregationWizard', () => {
 
   afterAll(() => PluginStore.unregister(plugin));
 
-  it('should render visualization passed as children', () => {
+  it('should render visualization passed as children', async () => {
     renderSUT();
 
-    expect(screen.getByText('The Visualization')).toBeInTheDocument();
+    expect(await screen.findByText('The Visualization')).toBeInTheDocument();
   });
 
   it('should list available aggregation elements in element select', async () => {

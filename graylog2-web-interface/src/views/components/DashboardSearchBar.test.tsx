@@ -63,24 +63,19 @@ const config = {
 describe('DashboardSearchBar', () => {
   const onExecute = jest.fn();
 
-  it('should render the DashboardSearchBar', () => {
+  it('should render the DashboardSearchBar', async () => {
     render(<DashboardSearchBar onExecute={onExecute} config={config} />);
 
-    const timeRangeButton = screen.getByLabelText('Open Time Range Selector');
-    const timeRangeDisplay = screen.getByLabelText('Search Time Range, Opens Time Range Selector On Click');
-    const liveUpdate = screen.getByLabelText('Refresh Search Controls');
-    const searchButton = screen.getByTitle('Perform search');
-
-    expect(timeRangeButton).not.toBeNull();
-    expect(timeRangeDisplay).not.toBeNull();
-    expect(liveUpdate).not.toBeNull();
-    expect(searchButton).not.toBeNull();
+    await screen.findByLabelText('Open Time Range Selector');
+    await screen.findByLabelText('Search Time Range, Opens Time Range Selector On Click');
+    await screen.findByLabelText('Refresh Search Controls');
+    await screen.findByTitle('Perform search');
   });
 
-  it('defaults to no override being selected', () => {
+  it('defaults to no override being selected', async () => {
     render(<DashboardSearchBar onExecute={onExecute} config={config} />);
 
-    expect(screen.getByText('No Override')).toBeVisible();
+    await screen.findByText('No Override');
   });
 
   it('should refresh search when button is clicked', async () => {
@@ -112,7 +107,7 @@ describe('DashboardSearchBar', () => {
     await waitFor(() => expect(GlobalOverrideActions.set).toHaveBeenCalledWith({ type: 'relative', from: 300 }, ''));
   });
 
-  it('should hide the save and load controls if a widget is being edited', () => {
+  it('should hide the save and load controls if a widget is being edited', async () => {
     const focusedWidget: WidgetEditingState = { id: 'foo', editing: true, focusing: true };
     const widgetFocusContext = {
       focusedWidget,
@@ -127,6 +122,8 @@ describe('DashboardSearchBar', () => {
         <DashboardSearchBar onExecute={onExecute} config={config} />
       </WidgetFocusContext.Provider>,
     );
+
+    await screen.findByText('Not updating');
 
     const saveBtn = screen.queryByText('View Actions');
 
@@ -149,8 +146,6 @@ describe('DashboardSearchBar', () => {
       </WidgetFocusContext.Provider>,
     );
 
-    const saveBtn = await screen.findByText('View Actions');
-
-    expect(saveBtn).not.toBeNull();
+    await screen.findByText('View Actions');
   });
 });

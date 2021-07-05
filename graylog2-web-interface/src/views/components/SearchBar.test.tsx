@@ -72,10 +72,10 @@ describe('SearchBar', () => {
     SearchActions.refresh = mockAction(jest.fn());
   });
 
-  it('should render the SearchBar', () => {
+  it('should render the SearchBar', async () => {
     render(<SearchBar config={config} />);
 
-    const timeRangeButton = screen.getByLabelText('Open Time Range Selector');
+    const timeRangeButton = await screen.findByLabelText('Open Time Range Selector');
     const timeRangeDisplay = screen.getByLabelText('Search Time Range, Opens Time Range Selector On Click');
     const streamsFilter = screen.getByTestId('streams-filter');
     const liveUpdate = screen.getByLabelText('Refresh Search Controls');
@@ -93,7 +93,7 @@ describe('SearchBar', () => {
   it('should update query when search is performed', async () => {
     render(<SearchBar config={config} />);
 
-    const searchButton = screen.getByTitle('Perform search');
+    const searchButton = await screen.findByTitle('Perform search');
 
     fireEvent.click(searchButton);
 
@@ -112,7 +112,7 @@ describe('SearchBar', () => {
     });
   });
 
-  it('should hide the save load controls if editing the widget', () => {
+  it('should hide the save load controls if editing the widget', async () => {
     const focusedWidget: WidgetEditingState = { id: 'foo', editing: true, focusing: true };
     const widgetFocusContext = {
       focusedWidget,
@@ -128,6 +128,7 @@ describe('SearchBar', () => {
       </WidgetFocusContext.Provider>,
     );
 
+    await screen.findByTitle('Perform search');
     const saveBtn = screen.queryByText('Saved Search Controls');
 
     expect(saveBtn).toBeNull();
