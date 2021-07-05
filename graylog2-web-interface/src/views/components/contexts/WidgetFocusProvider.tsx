@@ -25,9 +25,9 @@ import { useStore } from 'stores/connect';
 import useQuery from 'routing/useQuery';
 import { WidgetStore } from 'views/stores/WidgetStore';
 import { SearchActions } from 'views/stores/SearchStore';
+import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 
 import WidgetFocusContext, { FocusContextState } from './WidgetFocusContext';
-import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 
 type WidgetFocusRequest = {
   id: string,
