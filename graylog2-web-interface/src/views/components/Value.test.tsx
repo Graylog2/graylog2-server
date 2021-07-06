@@ -172,7 +172,7 @@ describe('Value', () => {
   });
 
   const verifyReplacementOfEmptyValues = ({ value }) => {
-    const wrapper = mount(<Value field="foo" queryId="someQueryId" value={value} />);
+    const wrapper = mount(<Value type={FieldType.Unknown} field="foo" queryId="someQueryId" value={value} />);
     const valueActions = wrapper.find('ValueActions');
 
     expect(valueActions).toIncludeText('foo = <Empty Value>');
