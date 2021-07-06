@@ -23,7 +23,7 @@ export default {
       _.forEach(result.messages, (msg) => {
         _.forOwn(msg.message, (value, field) => {
           // add occurrences
-          map.mergeWith((oldVal, newVal) => oldVal + newVal, Immutable.Map([[field, 1]]));
+          map.mergeWith((oldVal: number, newVal: number) => oldVal + newVal, Immutable.Map([[field, 1]]));
         });
       });
     });
