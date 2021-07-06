@@ -38,12 +38,21 @@ const oppositePlacement = {
   right: 'left',
 };
 
-const FilterProps = ({ children, style }) => React.Children.map(children,
-  (child) => React.cloneElement(child, { style: { ...style, ...child.props.style } }));
+type _FilterProps = {
+  children: React.ReactElement,
+  // eslint-disable-next-line react/require-default-props
+  style?: {}
+};
+
+const FilterProps = ({ children, style }: _FilterProps) => (
+  <>{React.Children.map(children,
+    (child) => React.cloneElement(child, { style: { ...style, ...child.props.style } }))}
+  </>
+);
 
 const OverlayDropdown = ({ children, menuContainer, onToggle, placement, show, toggle }) => {
   const [currentPlacement, setCurrentPlacement] = useState(placement);
-  const toggleTarget = React.createRef();
+  const toggleTarget = React.createRef<HTMLSpanElement>();
 
   const handleOverlayEntering = (dropdownElem) => {
     const dropdownOffsetLeft = dropdownElem.offsetLeft;
