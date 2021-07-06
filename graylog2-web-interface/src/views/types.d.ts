@@ -49,9 +49,13 @@ interface EditWidgetComponentProps<Config extends WidgetConfig = WidgetConfig> {
   onChange: (newConfig: Config) => void,
 }
 
-interface WidgetComponentProps<Config extends WidgetConfig = WidgetConfig> {
+interface WidgetResults {
+ [key: string]: Result,
+}
+
+interface WidgetComponentProps<Config extends WidgetConfig = WidgetConfig, Result = WidgetResults> {
   config: Config;
-  data: { [key: string]: Result };
+  data: Result;
   editing: boolean;
   fields: Immutable.List<FieldTypeMapping>;
   filter: string;

@@ -31,8 +31,9 @@ import { RefreshActions } from 'views/stores/RefreshStore';
 import * as messageList from 'views/components/messagelist';
 import InputsStore from 'stores/inputs/InputsStore';
 import { SearchExecutionResult } from 'views/actions/SearchActions';
+import { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 
-import MessageList from './MessageList';
+import MessageList, { MessageListResult } from './MessageList';
 import RenderCompletionCallback, { TRenderCompletionCallback } from './RenderCompletionCallback';
 
 import InputsActions from '../../../actions/inputs/InputsActions';
@@ -105,7 +106,7 @@ jest.mock('views/stores/RefreshStore', () => ({
 jest.mock('views/components/messagelist');
 
 describe('MessageList', () => {
-  const data = {
+  const data: MessageListResult = {
     id: 'search-type-id',
     type: 'messages',
     messages: [
@@ -132,16 +133,34 @@ describe('MessageList', () => {
     jest.clearAllMocks();
   });
 
+  const SimpleMessageList = (props: {
+    config: MessagesWidgetConfig,
+    data: MessageListResult,
+    fields: FieldTypeMappingsList,
+    setLoadingState: () => void,
+  }) => (
+    <MessageList title="Message List"
+                 editing={false}
+                 height={480}
+                 width={640}
+                 filter=""
+                 type="messages"
+                 id="message-list"
+                 queryId="deadbeef"
+                 toggleEdit={() => {}}
+                 {...props} />
+  );
+
   it('should render with and without fields', () => {
     const fields = [new FieldTypeMapping('file_name', new FieldType('string', ['full-text-search'], []))];
 
     SelectedFieldsStore.getInitialState = jest.fn(() => Immutable.Set([TIMESTAMP_FIELD, 'file_name']));
     const config = MessagesWidgetConfig.builder().fields([TIMESTAMP_FIELD, 'file_name']).build();
     const wrapper1 = mount(
-      <MessageList data={data}
-                   config={config}
-                   fields={Immutable.List(fields)}
-                   setLoadingState={() => {}} />,
+      <SimpleMessageList data={data}
+                         config={config}
+                         fields={Immutable.List(fields)}
+                         setLoadingState={() => {}} />,
     );
 
     expect(wrapper1.find('span[role="presentation"]').length).toBe(2);
@@ -150,10 +169,10 @@ describe('MessageList', () => {
 
     SelectedFieldsStore.getInitialState = jest.fn(() => Immutable.Set([]));
     const wrapper2 = mount(
-      <MessageList data={data}
-                   config={emptyConfig}
-                   fields={Immutable.List(fields)}
-                   setLoadingState={() => {}} />,
+      <SimpleMessageList data={data}
+                         config={emptyConfig}
+                         fields={Immutable.List(fields)}
+                         setLoadingState={() => {}} />,
     );
 
     expect(wrapper2.find('span[role="presentation"]').length).toBe(0);
@@ -163,10 +182,10 @@ describe('MessageList', () => {
     const fields = [new FieldTypeMapping('file_name', new FieldType('string', ['full-text-search'], []))];
     const config = MessagesWidgetConfig.builder().fields(['file_name']).build();
     const wrapper = mount(
-      <MessageList data={data}
-                   fields={Immutable.List(fields)}
-                   config={config}
-                   setLoadingState={() => {}} />,
+      <SimpleMessageList data={data}
+                         fields={Immutable.List(fields)}
+                         config={config}
+                         setLoadingState={() => {}} />,
     );
     const messageTableEntry = wrapper.find('MessageTableEntry');
     const td = messageTableEntry.find('td').at(0);
@@ -178,19 +197,19 @@ describe('MessageList', () => {
     InputsStore.getInitialState = jest.fn(() => ({ inputs: undefined }));
     const config = MessagesWidgetConfig.builder().fields([]).build();
 
-    mount(<MessageList data={data}
-                       fields={Immutable.List([])}
-                       config={config}
-                       setLoadingState={() => {}} />);
+    mount(<SimpleMessageList data={data}
+                             fields={Immutable.List([])}
+                             config={config}
+                             setLoadingState={() => {}} />);
   });
 
   it('refreshs Inputs list upon mount', () => {
     const config = MessagesWidgetConfig.builder().fields([]).build();
     const Component = () => (
-      <MessageList data={data}
-                   fields={Immutable.List([])}
-                   config={config}
-                   setLoadingState={() => {}} />
+      <SimpleMessageList data={data}
+                         fields={Immutable.List([])}
+                         config={config}
+                         setLoadingState={() => {}} />
     );
 
     mount(<Component />);
@@ -202,10 +221,10 @@ describe('MessageList', () => {
     const searchTypePayload = { [data.id]: { limit: Messages.DEFAULT_LIMIT, offset: Messages.DEFAULT_LIMIT } };
     const config = MessagesWidgetConfig.builder().fields([]).build();
     const secondPageSize = 10;
-    const wrapper = mount(<MessageList data={{ ...data, total: Messages.DEFAULT_LIMIT + secondPageSize }}
-                                       fields={Immutable.List([])}
-                                       config={config}
-                                       setLoadingState={() => {}} />);
+    const wrapper = mount(<SimpleMessageList data={{ ...data, total: Messages.DEFAULT_LIMIT + secondPageSize }}
+                                             fields={Immutable.List([])}
+                                             config={config}
+                                             setLoadingState={() => {}} />);
 
     wrapper.find('[aria-label="Next"]').simulate('click');
 
@@ -215,10 +234,10 @@ describe('MessageList', () => {
   it('disables refresh actions, when using pagination', () => {
     const config = MessagesWidgetConfig.builder().fields([]).build();
     const secondPageSize = 10;
-    const wrapper = mount(<MessageList data={{ ...data, total: Messages.DEFAULT_LIMIT + secondPageSize }}
-                                       fields={Immutable.List([])}
-                                       config={config}
-                                       setLoadingState={() => {}} />);
+    const wrapper = mount(<SimpleMessageList data={{ ...data, total: Messages.DEFAULT_LIMIT + secondPageSize }}
+                                             fields={Immutable.List([])}
+                                             config={config}
+                                             setLoadingState={() => {}} />);
 
     wrapper.find('[aria-label="Next"]').simulate('click');
 
@@ -232,10 +251,10 @@ describe('MessageList', () => {
 
     const config = MessagesWidgetConfig.builder().fields([]).build();
     const secondPageSize = 10;
-    const wrapper = mount(<MessageList data={{ ...data, total: Messages.DEFAULT_LIMIT + secondPageSize }}
-                                       fields={Immutable.List([])}
-                                       config={config}
-                                       setLoadingState={() => {}} />);
+    const wrapper = mount(<SimpleMessageList data={{ ...data, total: Messages.DEFAULT_LIMIT + secondPageSize }}
+                                             fields={Immutable.List([])}
+                                             config={config}
+                                             setLoadingState={() => {}} />);
 
     await wrapper.find('[aria-label="Next"]').simulate('click');
     wrapper.update();
@@ -246,10 +265,10 @@ describe('MessageList', () => {
   it('calls render completion callback after first render', () => {
     const config = MessagesWidgetConfig.builder().fields([]).build();
     const Component = () => (
-      <MessageList data={data}
-                   fields={Immutable.List([])}
-                   config={config}
-                   setLoadingState={() => {}} />
+      <SimpleMessageList data={data}
+                         fields={Immutable.List([])}
+                         config={config}
+                         setLoadingState={() => {}} />
     );
 
     return new Promise<void>((resolve) => {
