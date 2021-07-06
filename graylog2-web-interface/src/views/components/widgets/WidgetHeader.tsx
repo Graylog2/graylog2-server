@@ -43,7 +43,15 @@ const WidgetActionDropdown = styled.span`
   position: relative;
 `;
 
-const WidgetHeader = ({ children, onRename, hideDragHandle, title, loading }) => (
+type Props = {
+  children: React.ReactNode,
+  onRename: (newTitle: string) => unknown,
+  hideDragHandle: boolean,
+  title: string,
+  loading: boolean,
+};
+
+const WidgetHeader = ({ children, onRename, hideDragHandle, title, loading }: Props) => (
   <Container>
     {hideDragHandle || <WidgetDragHandle name="bars" className="widget-drag-handle" />}
     <EditableTitle key={title} disabled={!onRename} value={title} onChange={onRename} />

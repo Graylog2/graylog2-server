@@ -242,8 +242,7 @@ class Widget extends React.Component<Props, State> {
               <WidgetHeader title={title}
                             hideDragHandle={!interactive || isFocused}
                             loading={loading}
-                            onRename={(newTitle) => TitlesActions.set('widget', id, newTitle)}
-                            editing={editing}>
+                            onRename={(newTitle) => TitlesActions.set('widget', id, newTitle)}>
                 {!editing ? (
                   <WidgetActionsMenu isFocused={isFocused}
                                      toggleEdit={this._onToggleEdit}
