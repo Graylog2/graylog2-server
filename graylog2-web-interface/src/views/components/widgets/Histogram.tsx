@@ -25,8 +25,8 @@ const _formatTimestamp = (epoch) => {
   return moment.unix(epoch).format('YYYY-MM-DD HH:mm:ss');
 };
 
-const _generateSeries = (results) => {
-  const data = new Immutable.OrderedMap(results);
+const _generateSeries = (results): Plotly.Data[] => {
+  const data = Immutable.OrderedMap<string, number>(results);
 
   return [{
     type: 'bar',
@@ -40,7 +40,6 @@ export default function Histogram({ data }) {
   return (
     <Plot data={_generateSeries(data.results)}
           style={{ position: 'absolute' }}
-          fit
           layout={{
             margin: {
               t: 10,
