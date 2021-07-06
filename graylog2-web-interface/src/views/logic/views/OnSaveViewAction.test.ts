@@ -51,9 +51,9 @@ describe('OnSaveViewAction', () => {
 
     return onSaveView(view, router).then(() => {
       expect(ViewActions.update).toHaveBeenCalledTimes(1);
-      expect(ViewActions.update.mock.calls[0][0]).toEqual(view);
+      expect(ViewActions.update).toHaveBeenCalledWith(view);
       expect(ViewManagementActions.update).toHaveBeenCalledTimes(1);
-      expect(ViewManagementActions.update.mock.calls[0][0]).toEqual(mockBaseView);
+      expect(ViewManagementActions.update).toHaveBeenCalledWith(mockBaseView);
     });
   });
 
