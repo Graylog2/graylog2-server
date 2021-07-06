@@ -22,7 +22,6 @@ import chroma from 'chroma-js';
 import { flatten } from 'lodash';
 import leafletStyles from 'leaflet/dist/leaflet.css';
 
-import { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import Viewport from 'views/logic/aggregationbuilder/visualizations/Viewport';
 
 import style from './MapVisualization.css';
@@ -34,7 +33,7 @@ const DEFAULT_VIEWPORT = {
   zoom: 1,
 };
 
-type MapVisualizationProps = Omit<VisualizationComponentProps, 'config'> & {
+type MapVisualizationProps = {
   attribution?: string,
   onRenderComplete?: () => void,
   markerRadiusSize?: number,
@@ -43,6 +42,9 @@ type MapVisualizationProps = Omit<VisualizationComponentProps, 'config'> & {
   url?: string,
   locked?: boolean,
   viewport?: Viewport,
+  height: number,
+  width: number,
+  onChange: (newViewport: Viewport) => void,
   data: Array<{ keys: any, name: any, values: { [key: string]: number } }>
 };
 
