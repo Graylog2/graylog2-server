@@ -74,7 +74,7 @@ describe('SearchResult', () => {
   const initialFieldTypes = { all: simpleFields(), queryFields: simpleQueryFields('aQueryId') };
   const SimpleSearchResult = ({ fieldTypes }) => (
     <FieldTypesContext.Provider value={fieldTypes}>
-      <SearchResult />
+      <SearchResult hasErrors={false} />
     </FieldTypesContext.Provider>
   );
 
@@ -88,10 +88,10 @@ describe('SearchResult', () => {
 
   it('should show spinner with undefined fields', () => {
     const { getByText } = render(
-      <SearchResult />,
+      <SearchResult hasErrors={false} />,
     );
 
-    act(() => jest.advanceTimersByTime(200));
+    act(() => { jest.advanceTimersByTime(200); });
 
     expect(getByText('Loading...')).not.toBeNull();
   });
@@ -100,7 +100,7 @@ describe('SearchResult', () => {
     asMock(SearchLoadingStateStore.getInitialState).mockImplementation(() => ({ isLoading: true }));
     const { getByText } = render(<SimpleSearchResult />);
 
-    act(() => jest.advanceTimersByTime(500));
+    act(() => { jest.advanceTimersByTime(500); });
 
     expect(getByText('Updating search results...')).not.toBeNull();
   });
