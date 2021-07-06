@@ -109,7 +109,7 @@ public class RestPermissions implements PluginPermissions {
     public static final String METRICS_READ = "metrics:read";
     public static final String METRICS_READALL = "metrics:readall";
     public static final String METRICS_READHISTORY = "metrics:readhistory";
-    public static final String NODE_SHUTDOWN = "node:shutdown";
+    @Deprecated public static final String NODE_SHUTDOWN = "node:shutdown";
     public static final String NOTIFICATIONS_DELETE = "notifications:delete";
     public static final String NOTIFICATIONS_READ = "notifications:read";
     public static final String OUTPUTS_CREATE = "outputs:create";
