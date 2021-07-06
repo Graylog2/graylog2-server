@@ -35,6 +35,7 @@ import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.rest.models.PaginatedResponse;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
@@ -74,6 +75,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
     private static final Logger log = LoggerFactory.getLogger(PipelineResource.class);
 
     private static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
+            .put(PipelineDao.FIELD_ID, SearchQueryField.create("_id", SearchQueryField.Type.OBJECT_ID))
             .put(PipelineDao.FIELD_TITLE, SearchQueryField.create(PipelineDao.FIELD_TITLE))
             .put(PipelineDao.FIELD_DESCRIPTION, SearchQueryField.create(PipelineDao.FIELD_DESCRIPTION))
             .build();
@@ -161,10 +163,10 @@ public class PipelineResource extends RestResource implements PluginRestResource
     }
 
     @GET
-    @Path("/page")
+    @Path("/paginated")
     @ApiOperation(value = "Get a paginated list of pipelines")
     @Produces(MediaType.APPLICATION_JSON)
-    public PipelinePageList getPage(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+    public PaginatedResponse<PipelineSource> getPage(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
                                      @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
                                      @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
                                      @ApiParam(name = "sort",
@@ -192,9 +194,8 @@ public class PipelineResource extends RestResource implements PluginRestResource
                 .collect(Collectors.toList());
         final PaginatedList<PipelineSource> pipelines = new PaginatedList<>(pipelineList,
                 result.pagination().total(), result.pagination().page(), result.pagination().perPage());
-        return PipelinePageList.create(query, result.pagination(), total, sort, order, pipelines);
+        return PaginatedResponse.create("pipelines", pipelines);
     }
-
 
     @ApiOperation(value = "Get a processing pipeline", notes = "It can take up to a second until the change is applied")
     @Path("/{id}")
