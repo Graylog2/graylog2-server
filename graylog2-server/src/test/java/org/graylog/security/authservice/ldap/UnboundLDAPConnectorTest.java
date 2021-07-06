@@ -34,6 +34,7 @@ import org.apache.directory.server.core.partition.impl.avl.AvlPartition;
 import org.apache.directory.server.ldap.LdapServer;
 import org.graylog.testing.ldap.LDAPTestUtils;
 import org.graylog2.ApacheDirectoryTestServiceFactory;
+import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.security.TrustManagerProvider;
 import org.graylog2.security.encryption.EncryptedValue;
 import org.graylog2.security.encryption.EncryptedValueService;
@@ -108,7 +109,7 @@ public class UnboundLDAPConnectorTest extends AbstractLdapTestUnit {
                 .serverList(ImmutableList.of(unreachableServer, ldapServer))
                 .build();
 
-        connector = new UnboundLDAPConnector(10000, ENABLED_TLS_PROTOCOLS, mock(TrustManagerProvider.class), encryptedValueService);
+        connector = new UnboundLDAPConnector(10000, new TLSProtocolsConfiguration(), mock(TrustManagerProvider.class), encryptedValueService);
         connection = connector.connect(connectorConfig);
     }
 
