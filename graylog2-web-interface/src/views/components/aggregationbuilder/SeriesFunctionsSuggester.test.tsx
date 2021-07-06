@@ -14,24 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-const AggregationFunctionsStore = {
+
+import { asMock } from 'helpers/mocking';
+
+import SeriesFunctionsSuggester from 'views/components/aggregationbuilder/SeriesFunctionsSuggester';
+import AggregationFunctionsStore from 'views/stores/AggregationFunctionsStore';
+
+jest.mock('views/stores/AggregationFunctionsStore', () => ({
   getInitialState: jest.fn(() => ({ avg: undefined, min: undefined, max: undefined })),
   listen: jest.fn(),
-};
+}));
 
 describe('SeriesFunctionsSuggester', () => {
-  let SeriesFunctionsSuggester;
-
-  beforeEach(() => {
-    jest.doMock('views/stores/AggregationFunctionsStore', () => AggregationFunctionsStore);
-
-    // eslint-disable-next-line global-require
-    SeriesFunctionsSuggester = require('./SeriesFunctionsSuggester').default;
-  });
-
   afterEach(() => {
     jest.clearAllMocks();
-    jest.resetModules();
   });
 
   it('returns default functions', () => {
@@ -60,7 +56,7 @@ describe('SeriesFunctionsSuggester', () => {
     expect(suggester.defaults).toHaveLength(4);
     expect(suggester.defaults).toMatchSnapshot('default functions before update');
 
-    const callback = AggregationFunctionsStore.listen.mock.calls[0][0];
+    const callback = asMock(AggregationFunctionsStore.listen).mock.calls[0][0];
 
     const newFunctions = { card: undefined, stddev: undefined };
 
