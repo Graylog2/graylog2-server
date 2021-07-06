@@ -44,6 +44,7 @@ export type WizardFormValues = {
   userSearchBase?: string,
   userSearchPattern?: string,
   verifyCertificates?: boolean,
+  oktaApiToken?: string,
 };
 
 export type AuthBackendMeta = {

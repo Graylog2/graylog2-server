@@ -25,41 +25,71 @@ const renderTrend = ({
   trendPreference = 'NEUTRAL',
 }: Partial<React.ComponentProps<typeof Trend>> = {}) => render(<Trend current={current} previous={previous} trendPreference={trendPreference} />);
 
+const findTrend = async () => {
+  const trend = await screen.findByTestId('trend-value');
+
+  return trend.innerHTML;
+};
+
 describe('Trend', () => {
   it('shows absolute delta', async () => {
     renderTrend({ previous: 23 });
 
-    await screen.findByText(/\+19/);
+    expect(await findTrend()).toMatch(/\+19/);
   });
 
   it('shows relative delta as percentage', async () => {
     renderTrend({ previous: 23 });
 
-    await screen.findByText(/\+82.61%/);
+    expect(await findTrend()).toMatch(/\+82.61%/);
   });
 
   it('shows absolute delta if values are equal', async () => {
     renderTrend();
 
-    await screen.findByText(/\+0/);
+    expect(await findTrend()).toMatch(/\+0/);
   });
 
   it('shows relative delta as percentage if values are equal', async () => {
     renderTrend();
 
-    await screen.findByText(/\+0%/);
+    expect(await findTrend()).toMatch(/\+0%/);
   });
 
   it('shows negative absolute delta', async () => {
     renderTrend({ current: 23 });
 
-    await screen.findByText(/-19/);
+    expect(await findTrend()).toMatch(/-19/);
   });
 
   it('shows negative relative delta as percentage', async () => {
     renderTrend({ current: 23 });
 
-    await screen.findByText(/-45.24%/);
+    expect(await findTrend()).toMatch(/-45.24%/);
+  });
+
+  it('shows adequate results if previous value is 0', async () => {
+    renderTrend({ current: 23, previous: 0 });
+
+    expect(await findTrend()).toMatch(/\+23/);
+  });
+
+  it('shows adequate results if previous value is NaN', async () => {
+    renderTrend({ current: 23, previous: NaN });
+
+    expect(await findTrend()).toEqual('-- / --');
+  });
+
+  it('shows adequate results if current value is 0', async () => {
+    renderTrend({ current: 0, previous: 42 });
+
+    expect(await findTrend()).toMatch(/-42 \/ -100%/);
+  });
+
+  it('shows adequate results if current value is NaN', async () => {
+    renderTrend({ current: NaN, previous: 42 });
+
+    expect(await findTrend()).toEqual('-- / --');
   });
 
   describe('renders background according to values and trend preference', () => {

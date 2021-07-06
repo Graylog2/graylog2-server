@@ -85,7 +85,7 @@ const useSyncStateWithQueryParams = ({ focusedWidget, focusUriParams, setFocused
       const filter = nextFocusedWidget?.id ? [nextFocusedWidget.id] : null;
       SearchActions.setWidgetsToSearch(filter);
 
-      if (focusedWidget?.editing && filter === null) {
+      if (focusedWidget?.focusing && filter === null) {
         SearchActions.executeWithCurrentState();
       }
     }

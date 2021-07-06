@@ -86,17 +86,30 @@ const _trendIcon = (delta: number) => (delta === 0
     ? 'arrow-circle-up'
     : 'arrow-circle-down');
 
+const diff = (current: number | undefined, previous: number | undefined): [number, number] => {
+  if (typeof current === 'number' && typeof previous === 'number') {
+    const difference = current - previous;
+    const differencePercent = difference / previous;
+
+    return [difference, differencePercent];
+  }
+
+  return [NaN, NaN];
+};
+
 const Trend = React.forwardRef<HTMLSpanElement, Props>(({ current, previous, trendPreference }: Props, ref) => {
-  const difference = previous ? current - previous : NaN;
-  const differencePercent = previous ? difference / previous : NaN;
+  const [difference, differencePercent] = diff(current, previous);
 
   const backgroundTrend = _trendDirection(difference, trendPreference);
   const trendIcon = _trendIcon(difference);
 
+  const absoluteDifference = Number.isFinite(difference) ? numeral(difference).format('+0,0[.]0[000]') : '--';
+  const relativeDifference = Number.isFinite(differencePercent) ? numeral(differencePercent).format('+0[.]0[0]%') : '--';
+
   return (
     <Background trend={backgroundTrend} data-testid="trend-background">
       <TextContainer trend={backgroundTrend} ref={ref}>
-        <StyledIcon name={trendIcon} trend={backgroundTrend} data-testid="trend-icon" /> {numeral(difference).format('+0,0[.]0[000]')} / {numeral(differencePercent).format('+0[.]0[0]%')}
+        <StyledIcon name={trendIcon} trend={backgroundTrend} data-testid="trend-icon" /> <span data-testid="trend-value" title={`Previous value: ${previous}`}>{absoluteDifference} / {relativeDifference}</span>
       </TextContainer>
     </Background>
   );

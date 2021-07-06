@@ -115,7 +115,7 @@ class DataAdapter extends React.Component {
               <Button type="submit" bsStyle="success">Look up</Button>
             </fieldset>
           </form>
-          { lookupResult && (
+          {lookupResult && (
             <div>
               <h4>Lookup result</h4>
               <pre>{JSON.stringify(lookupResult, null, 2)}</pre>

@@ -225,7 +225,7 @@ class NotificationsFactory {
           description: (
             <span>
               The most recent stable Graylog version is <em>{notification.details.current_version}</em>.
-              Get it from <a href="https://www.graylog.org/" target="_blank">https://www.graylog.org/</a>.
+              Get it from <a href="https://www.graylog.org/" target="_blank" rel="noreferrer">https://www.graylog.org/</a>.
             </span>
           ),
         };
@@ -275,7 +275,7 @@ class NotificationsFactory {
               There are Elasticsearch nodes in the cluster running out of disk space, their disk usage is above the low watermark.{' '}
               For this reason Elasticsearch will not allocate new shards to the affected nodes.{' '}
               The affected nodes are: [{notification.details.nodes}]{' '}
-              Check <a href="https://www.elastic.co/guide/en/elasticsearch/reference/master/disk-allocator.html" target="_blank">https://www.elastic.co/guide/en/elasticsearch/reference/master/disk-allocator.html</a>{' '}
+              Check <a href="https://www.elastic.co/guide/en/elasticsearch/reference/master/disk-allocator.html" target="_blank" rel="noreferrer">https://www.elastic.co/guide/en/elasticsearch/reference/master/disk-allocator.html</a>{' '}
               for more details.
             </span>
           ),
@@ -288,7 +288,7 @@ class NotificationsFactory {
               There are Elasticsearch nodes in the cluster with almost no free disk, their disk usage is above the high watermark.{' '}
               For this reason Elasticsearch will attempt to relocate shards away from the affected nodes.{' '}
               The affected nodes are: [{notification.details.nodes}]{' '}
-              Check <a href="https://www.elastic.co/guide/en/elasticsearch/reference/master/disk-allocator.html" target="_blank">https://www.elastic.co/guide/en/elasticsearch/reference/master/disk-allocator.html</a>{' '}
+              Check <a href="https://www.elastic.co/guide/en/elasticsearch/reference/master/disk-allocator.html" target="_blank" rel="noreferrer">https://www.elastic.co/guide/en/elasticsearch/reference/master/disk-allocator.html</a>{' '}
               for more details.
             </span>
           ),
@@ -301,7 +301,7 @@ class NotificationsFactory {
               There are Elasticsearch nodes in the cluster without free disk, their disk usage is above the flood stage watermark.{' '}
               For this reason Elasticsearch enforces a read-only index block on all indexes having any of their shards in any of the{' '}
               affected nodes. The affected nodes are: [{notification.details.nodes}]{' '}
-              Check <a href="https://www.elastic.co/guide/en/elasticsearch/reference/master/disk-allocator.html" target="_blank">https://www.elastic.co/guide/en/elasticsearch/reference/master/disk-allocator.html</a>{' '}
+              Check <a href="https://www.elastic.co/guide/en/elasticsearch/reference/master/disk-allocator.html" target="_blank" rel="noreferrer">https://www.elastic.co/guide/en/elasticsearch/reference/master/disk-allocator.html</a>{' '}
               for more details.
             </span>
           ),

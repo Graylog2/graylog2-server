@@ -904,22 +904,22 @@ metric_mappings:
   - metric_name: "output_executor_service_submitted"
     match_pattern: "org.graylog2.initializers.OutputSetupService.executor-service.submitted"
 
-  - metric_name: "gelf_chunk_aggregator_complete-messages"
+  - metric_name: "gelf_chunk_aggregator_complete_messages"
     match_pattern: "org.graylog2.inputs.codecs.GelfChunkAggregator.complete-messages"
 
-  - metric_name: "gelf_chunk_aggregator_duplicate-chunks"
+  - metric_name: "gelf_chunk_aggregator_duplicate_chunks"
     match_pattern: "org.graylog2.inputs.codecs.GelfChunkAggregator.duplicate-chunks"
 
-  - metric_name: "gelf_chunk_aggregator_expired-chunks"
+  - metric_name: "gelf_chunk_aggregator_expired_chunks"
     match_pattern: "org.graylog2.inputs.codecs.GelfChunkAggregator.expired-chunks"
 
-  - metric_name: "gelf_chunk_aggregator_expired-messages"
+  - metric_name: "gelf_chunk_aggregator_expired_messages"
     match_pattern: "org.graylog2.inputs.codecs.GelfChunkAggregator.expired-messages"
 
-  - metric_name: "gelf_chunk_aggregator_total-chunks"
+  - metric_name: "gelf_chunk_aggregator_total_chunks"
     match_pattern: "org.graylog2.inputs.codecs.GelfChunkAggregator.total-chunks"
 
-  - metric_name: "gelf_chunk_aggregator_waiting-messages"
+  - metric_name: "gelf_chunk_aggregator_waiting_messages"
     match_pattern: "org.graylog2.inputs.codecs.GelfChunkAggregator.waiting-messages"
 
   - metric_name: "journal_append.1_sec_rate"
@@ -940,10 +940,10 @@ metric_mappings:
   - metric_name: "journal_size"
     match_pattern: "org.graylog2.journal.size"
 
-  - metric_name: "journal_size-limit"
+  - metric_name: "journal_size_limit"
     match_pattern: "org.graylog2.journal.size-limit"
 
-  - metric_name: "journal_utilization-ratio"
+  - metric_name: "journal_utilization_ratio"
     match_pattern: "org.graylog2.journal.utilization-ratio"
 
   - metric_name: "json_path_http_request_errors"
@@ -1024,17 +1024,17 @@ metric_mappings:
   - metric_name: "event_bus_provider_executor_service_submitted"
     match_pattern: "org.graylog2.shared.bindings.providers.EventBusProvider.executor-service.submitted"
 
-  - metric_name: "input-buffer-thread-factory"
+  - metric_name: "input_buffer_thread_factory"
     match_pattern: "org.graylog2.shared.buffers.InputBufferImpl.thread-factory.created"
     additional_labels:
       type: "created"
 
-  - metric_name: "input-buffer-thread-factory"
+  - metric_name: "input_buffer_thread_factory"
     match_pattern: "org.graylog2.shared.buffers.InputBufferImpl.thread-factory.running"
     additional_labels:
       type: "running"
 
-  - metric_name: "input-buffer-thread-factory"
+  - metric_name: "input_buffer_thread_factory"
     match_pattern: "org.graylog2.shared.buffers.InputBufferImpl.thread-factory.terminated"
     additional_labels:
       type: "terminated"
@@ -1175,7 +1175,7 @@ metric_mappings:
   - metric_name: "system_job_manager_executor_scheduled_overrun"
     match_pattern: "org.graylog2.system.jobs.SystemJobManager.executor-service.scheduled.overrun"
 
-  - metric_name: "system_job_manager_executor_scheduled_percent-of-period"
+  - metric_name: "system_job_manager_executor_scheduled_percent_of_period"
     match_pattern: "org.graylog2.system.jobs.SystemJobManager.executor-service.scheduled.percent-of-period"
 
   - metric_name: "system_job_manager_executor_scheduled_repetitively"
@@ -1200,12 +1200,12 @@ metric_mappings:
     match_pattern: "org.graylog2.traffic.system-output-traffic"
 
   - metric_name: "forwarder_grpc_method_invocations"
-    match_pattern: "org.graylog.plugins.cloud.forwarder.grpc.ServerMetricsInterceptor.method.org.graylog.cloud.forwarder.*.invocations"
+    match_pattern: "org.graylog.plugins.forwarder.grpc.ServerMetricsInterceptor.method.org.graylog.cloud.forwarder.*.invocations"
     wildcard_extract_labels:
       - "method"
 
   - metric_name: "forwarder_grpc_method_executionTime"
-    match_pattern: "org.graylog.plugins.cloud.forwarder.grpc.ServerMetricsInterceptor.method.org.graylog.cloud.forwarder.*.executionTime"
+    match_pattern: "org.graylog.plugins.forwarder.grpc.ServerMetricsInterceptor.method.org.graylog.cloud.forwarder.*.executionTime"
     wildcard_extract_labels:
       - "method"
 
@@ -1242,103 +1242,3 @@ metric_mappings:
     additional_labels:
       success: "false"
       type: "graylog"
-
-  - metric_name: "input-buffer-thread-factory"
-    match_pattern: "org.graylog.cloud.forwarder.input.JournalWritingInputBuffer.thread-factory.created"
-    additional_labels:
-      type: "created"
-
-  - metric_name: "input-buffer-thread-factory"
-    match_pattern: "org.graylog.cloud.forwarder.input.JournalWritingInputBuffer.thread-factory.running"
-    additional_labels:
-      type: "running"
-
-  - metric_name: "input-buffer-thread-factory"
-    match_pattern: "org.graylog.cloud.forwarder.input.JournalWritingInputBuffer.thread-factory.terminated"
-    additional_labels:
-      type: "terminated"
-
-  - metric_name: "process_buffer_thread_factory"
-    match_pattern: "org.graylog.cloud.forwarder.processing.ForwarderProcessBuffer.thread-factory.created"
-    additional_labels:
-      type: "created"
-
-  - metric_name: "process_buffer_thread_factory"
-    match_pattern: "org.graylog.cloud.forwarder.processing.ForwarderProcessBuffer.thread-factory.running"
-    additional_labels:
-      type: "running"
-
-  - metric_name: "process_buffer_thread_factory"
-    match_pattern: "org.graylog.cloud.forwarder.processing.ForwarderProcessBuffer.thread-factory.terminated"
-    additional_labels:
-      type: "terminated"
-
-  - metric_name: "buffer_incoming_messages"
-    match_pattern: "org.graylog.cloud.forwarder.input.JournalWritingInputBuffer.incomingMessages"
-    additional_labels:
-      type: "input"
-
-  - metric_name: "buffer_incoming_messages"
-    match_pattern: "org.graylog.cloud.forwarder.processing.ForwarderProcessBuffer.incomingMessages"
-    additional_labels:
-      type: "process"
-
-  - metric_name: "process_buffer_decode_time"
-    match_pattern: "org.graylog.cloud.forwarder.processing.ForwarderProcessBuffer.decodeTime"
-
-  - metric_name: "process_buffer_parse_time"
-    match_pattern: "org.graylog.cloud.forwarder.processing.ForwarderProcessBuffer.parseTime"
-
-  - metric_name: "buffer_processor_incoming_messages"
-    match_pattern: "org.graylog.cloud.forwarder.processing.ForwarderProcessBufferProcessor.incomingMessages"
-
-  - metric_name: "buffer_processor_outgoing_messages"
-    match_pattern: "org.graylog.cloud.forwarder.processing.ForwarderProcessBufferProcessor.outgoingMessages"
-
-  - metric_name: "buffer_processor_process_time"
-    match_pattern: "org.graylog.cloud.forwarder.processing.ForwarderProcessBufferProcessor.processTime"
-
-  - metric_name: "journal_reader_read_blocked"
-    match_pattern: "org.graylog.cloud.forwarder.processing.ForwarderJournalReader.readBlocked"
-
-  - metric_name: "journal_reader_read_messages"
-    match_pattern: "org.graylog.cloud.forwarder.processing.ForwarderJournalReader.readMessages"
-
-  - metric_name: "journal_reader_requested_read_count"
-    match_pattern: "org.graylog.cloud.forwarder.processing.ForwarderJournalReader.requestedReadCount"
-
-  - metric_name: "batch_sender_sending_threads"
-    match_pattern: "org.graylog.cloud.forwarder.grpc.messaging.BatchSender.sendingThreads.max"
-    additional_labels:
-      type: "max"
-
-  - metric_name: "batch_sender_sending_threads"
-    match_pattern: "org.graylog.cloud.forwarder.grpc.messaging.BatchSender.sendingThreads.busy"
-    additional_labels:
-      type: "busy"
-
-  - metric_name: "batch_sender_batch_size"
-    match_pattern: "org.graylog.cloud.forwarder.grpc.messaging.BatchSender.batchSize.bytes"
-    additional_labels:
-      unit: "bytes"
-
-  - metric_name: "batch_sender_batch_size"
-    match_pattern: "org.graylog.cloud.forwarder.grpc.messaging.BatchSender.batchSize.messages"
-    additional_labels:
-      unit: "messages"
-
-  - metric_name: "batch_sender_batches_sent"
-    match_pattern: "org.graylog.cloud.forwarder.grpc.messaging.BatchSender.batchesSent"
-
-  - metric_name: "batch_sender_message_serialization_time"
-    match_pattern: "org.graylog.cloud.forwarder.grpc.messaging.BatchSender.messageSerializationTime"
-
-  - metric_name: "grpc_method_invocations"
-    match_pattern: "org.graylog.cloud.forwarder.grpc.ClientMetricsInterceptor.method.org.graylog.cloud.forwarder.*.invocations"
-    wildcard_extract_labels:
-      - "method"
-
-  - metric_name: "grpc_method_executionTime"
-    match_pattern: "org.graylog.cloud.forwarder.grpc.ClientMetricsInterceptor.method.org.graylog.cloud.forwarder.*.executionTime"
-    wildcard_extract_labels:
-      - "method"

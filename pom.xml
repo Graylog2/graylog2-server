@@ -30,7 +30,7 @@
 
     <groupId>org.graylog</groupId>
     <artifactId>graylog-parent</artifactId>
-    <version>4.1.0-SNAPSHOT</version>
+    <version>4.2.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Graylog Parent POM</name>
@@ -93,7 +93,7 @@
         <apache-httpclient.version>4.5.13</apache-httpclient.version>
         <auto-value.version>1.7.4</auto-value.version>
         <auto-value-javabean.version>2.5.2</auto-value-javabean.version>
-        <bouncycastle.version>1.64</bouncycastle.version>
+        <bouncycastle.version>1.69</bouncycastle.version>
         <caffeine.version>2.8.1</caffeine.version>
         <cef-parser.version>0.0.1.10</cef-parser.version>
         <commons-codec.version>1.14</commons-codec.version>
@@ -115,7 +115,6 @@
         <jackson.version>2.9.10.20200411</jackson.version>
         <jadconfig.version>0.13.0</jadconfig.version>
         <java-semver.version>0.9.0</java-semver.version>
-        <javapoet.version>1.12.1</javapoet.version>
         <javax.annotation-api.version>1.3.2</javax.annotation-api.version>
         <javax.el-api.version>3.0.0</javax.el-api.version>
         <javax.inject.version>1</javax.inject.version>

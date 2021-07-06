@@ -36,6 +36,13 @@ jest.mock('views/stores/SearchConfigStore', () => ({
   },
 }));
 
+const selectRangePreset = async (optionLabel: string) => {
+  const timeRangeButton = screen.getByLabelText('Open time range preset select');
+  fireEvent.click(timeRangeButton);
+  const rangePresetOption = await screen.findByText(optionLabel);
+  fireEvent.click(rangePresetOption);
+};
+
 describe('TimeRangeDropdownButton', () => {
   type SUTProps = Partial<React.ComponentProps<typeof TimeRangeDropdownButton>> & {
     onSubmit?: () => void
@@ -63,16 +70,28 @@ describe('TimeRangeDropdownButton', () => {
     const onSubmit = jest.fn();
     render(<SUTTimeRangeDropDownButton setCurrentTimeRange={setCurrentTimeRange} onSubmit={onSubmit}><></></SUTTimeRangeDropDownButton>);
 
-    const timeRangeButton = screen.getByLabelText('Open time range preset select');
-    fireEvent.click(timeRangeButton);
-    const rangePresetOption = await screen.findByText('30 minutes');
-    fireEvent.click(rangePresetOption);
+    await selectRangePreset('30 minutes');
 
     expect(setCurrentTimeRange).toHaveBeenCalledWith({
       type: 'relative',
-      range: 1800,
+      from: 1800,
     });
 
-    waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1));
+  });
+
+  it('updates time range with range attribute when selecting "all messages" relative time range preset', async () => {
+    const setCurrentTimeRange = jest.fn();
+    const onSubmit = jest.fn();
+    render(<SUTTimeRangeDropDownButton setCurrentTimeRange={setCurrentTimeRange} onSubmit={onSubmit}><></></SUTTimeRangeDropDownButton>);
+
+    await selectRangePreset('all messages');
+
+    expect(setCurrentTimeRange).toHaveBeenCalledWith({
+      type: 'relative',
+      range: 0,
+    });
+
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1));
   });
 });

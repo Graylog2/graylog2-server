@@ -15,8 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import * as Immutable from 'immutable';
+import { alice } from 'fixtures/users';
 import { mount } from 'wrappedEnzyme';
-import { admin } from 'fixtures/users';
 
 import CurrentUserContext from 'contexts/CurrentUserContext';
 
@@ -47,11 +48,17 @@ describe('SystemMenu', () => {
     AppConfig.gl2AppPathPrefix = jest.fn(() => '');
   });
 
-  const SimpleSystemMenu = ({ permissions, component: Component, location }: { permissions?: Array<string>, component: any, location?: { pathname: string }}) => (
-    <CurrentUserContext.Provider value={{ ...admin, permissions: permissions ?? [] }}>
-      <Component location={location} />
-    </CurrentUserContext.Provider>
-  );
+  const SimpleSystemMenu = ({ permissions, component: Component, location }: { permissions?: Array<string>, component: any, location?: { pathname: string }}) => {
+    const currentUser = alice.toBuilder()
+      .permissions(Immutable.List(permissions ?? []))
+      .build();
+
+    return (
+      <CurrentUserContext.Provider value={currentUser}>
+        <Component location={location} />
+      </CurrentUserContext.Provider>
+    );
+  };
 
   SimpleSystemMenu.defaultProps = {
     permissions: [],

@@ -21,7 +21,6 @@ import { PluginExports } from 'graylog-web-plugin/plugin';
 import Routes from 'routing/Routes';
 import App from 'routing/App';
 import AppConfig from 'util/AppConfig';
-import * as Permissions from 'views/Permissions';
 import { MessageListHandler } from 'views/logic/searchtypes/messages';
 import { MessageList } from 'views/components/widgets';
 import AddToTableActionHandler from 'views/logic/fieldactions/AddToTableActionHandler';
@@ -82,7 +81,7 @@ import LookupTableParameter from 'views/logic/parameters/LookupTableParameter';
 import HeatmapVisualizationConfiguration from 'views/components/aggregationbuilder/HeatmapVisualizationConfiguration';
 import HeatmapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/HeatmapVisualizationConfig';
 import visualizationBindings from 'views/components/visualizations/bindings';
-import AggregationWizard from 'views/components/aggregationwizard/AggregationWizard';
+import { AggregationWizard } from 'views/components/aggregationwizard';
 import { filterCloudValueActions } from 'util/conditional/filterValueActions';
 
 import type { ActionHandlerArguments } from './components/actions/ActionHandler';
@@ -128,9 +127,9 @@ const exports: PluginExports = {
     { path: showSearchPath, component: ShowViewPage, parentComponent: App },
     { path: `${Routes.unqualified.stream_search(':streamId')}/new`, component: NewSearchRedirectPage, parentComponent: null },
     { path: Routes.unqualified.stream_search(':streamId'), component: StreamSearchPage, parentComponent: App },
-    { path: extendedSearchPath, component: NewSearchPage, permissions: Permissions.ExtendedSearch.Use, parentComponent: App },
+    { path: extendedSearchPath, component: NewSearchPage, parentComponent: App },
 
-    { path: viewsPath, component: ViewManagementPage, permissions: Permissions.View.Use },
+    { path: viewsPath, component: ViewManagementPage },
     { path: showViewsPath, component: ShowViewPage, parentComponent: App },
   ],
   enterpriseWidgets: [

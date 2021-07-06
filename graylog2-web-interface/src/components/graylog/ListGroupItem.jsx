@@ -20,7 +20,8 @@ import PropTypes from 'prop-types';
 // eslint-disable-next-line no-restricted-imports
 import { ListGroupItem as BootstrapListGroupItem } from 'react-bootstrap';
 
-const RefContainer = styled.div(({ theme }) => `
+const RefContainer = styled.span(({ theme }) => `
+  display: block;
   border: 1px solid ${theme.colors.variant.lighter.default};
   margin-bottom: -1px;
 

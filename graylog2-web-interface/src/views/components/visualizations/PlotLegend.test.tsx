@@ -46,10 +46,10 @@ const chartData = [
   { name: 'name3' },
 ];
 const columnPivots = [Pivot.create('field1', 'unknown')];
-const config = AggregationWidgetConfig.builder().columnPivots(columnPivots).build();
+const config = AggregationWidgetConfig.builder().series([Series.forFunction('count')]).columnPivots(columnPivots).build();
 
 // eslint-disable-next-line react/require-default-props
-const SUT = ({ chartDataProp = chartData, plotConfig = config }: { chartDataProp?: Array<{ name: string, }>, plotConfig?: AggregationWidgetConfig }) => (
+const SUT = ({ chartDataProp = chartData, plotConfig = config, neverHide = false }: { chartDataProp?: Array<{ name: string, }>, plotConfig?: AggregationWidgetConfig, neverHide?: boolean }) => (
   <WidgetFocusContext.Provider value={{
     focusedWidget: undefined,
     setWidgetFocusing: jest.fn(),
@@ -58,7 +58,7 @@ const SUT = ({ chartDataProp = chartData, plotConfig = config }: { chartDataProp
     setWidgetEditing: jest.fn(),
   }}>
     <ChartColorContext.Provider value={{ colors, setColor }}>
-      <PlotLegend config={plotConfig} chartData={chartDataProp}>
+      <PlotLegend config={plotConfig} chartData={chartDataProp} neverHide={neverHide}>
         <div>Plot</div>
       </PlotLegend>
     </ChartColorContext.Provider>
@@ -78,7 +78,7 @@ describe('PlotLegend', () => {
     await screen.findAllByLabelText('Color Hint');
   });
 
-  it('should set a color when clicking on the color hing', async () => {
+  it('should set a color when clicking on the color hint', async () => {
     render(<SUT />);
     const colorHints = await screen.findAllByLabelText('Color Hint');
     fireEvent.click(colorHints[0]);
@@ -87,9 +87,7 @@ describe('PlotLegend', () => {
     const color = screen.getByTitle('#b71c1c');
     fireEvent.click(color);
 
-    waitFor(() => {
-      expect(setColor).toBeCalledWith('name1', '#b71c1c');
-    });
+    await waitFor(() => expect(setColor).toBeCalledWith('name1', '#b71c1c'));
   });
 
   it('should open the value context menu', async () => {
@@ -108,10 +106,26 @@ describe('PlotLegend', () => {
     await screen.findByText('name11');
   });
 
-  it('should hide with a single values', async () => {
+  it('should hide with a single value', async () => {
     const plotConfig = AggregationWidgetConfig.builder().series([Series.forFunction('count')]).build();
     render(<SUT chartDataProp={[{ name: 'name1' }]} plotConfig={plotConfig} />);
 
     expect(screen.queryByText('name1')).not.toBeInTheDocument();
+  });
+
+  it('should not add value action menu for series', async () => {
+    render(<SUT chartDataProp={[{ name: 'name1' }, { name: 'count' }]} />);
+
+    const value = await screen.findByText('count');
+    fireEvent.click(value);
+
+    expect(screen.queryByText('Actions')).not.toBeInTheDocument();
+  });
+
+  it('should not hide with a single value if configured', async () => {
+    const plotConfig = AggregationWidgetConfig.builder().series([Series.forFunction('count')]).build();
+    render(<SUT chartDataProp={[{ name: 'name1' }]} plotConfig={plotConfig} neverHide />);
+
+    await screen.findByText('name1');
   });
 });

@@ -93,7 +93,7 @@ const ViewList = ({ pagination, handleSearch, handleViewDelete, views }) => {
 
   return (
     <>
-      { viewToShare && (
+      {viewToShare && (
         <EntityShareModal entityId={viewToShare.id}
                           entityType="dashboard"
                           description={`Search for a User or Team to add as collaborator on this ${ViewTypeLabel({ type: viewToShare.type })}.`}

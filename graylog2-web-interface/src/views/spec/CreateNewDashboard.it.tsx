@@ -19,7 +19,6 @@ import { render, fireEvent } from 'wrappedTestingLibrary';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 import { asMock, StoreMock as MockStore } from 'helpers/mocking';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
-import * as Immutable from 'immutable';
 
 import history from 'util/History';
 import Routes from 'routing/Routes';
@@ -28,7 +27,6 @@ import CurrentUserProvider from 'contexts/CurrentUserProvider';
 import viewsBindings from 'views/bindings';
 import StreamsContext from 'contexts/StreamsContext';
 import SearchMetadata from 'views/logic/search/SearchMetadata';
-import Parameter from 'views/logic/parameters/Parameter';
 import { SearchMetadataActions, SearchMetadataStore } from 'views/stores/SearchMetadataStore';
 
 jest.mock('views/stores/DashboardsStore', () => ({

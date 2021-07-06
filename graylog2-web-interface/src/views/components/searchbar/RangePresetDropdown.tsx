@@ -78,6 +78,12 @@ const RangePresetDropdown = ({ disabled, onChange, onToggle, className, displayT
     options = (<MenuItem eventKey="300" disabled>Loading...</MenuItem>);
   }
 
+  const _onChange = (range) => {
+    if (range !== null && range !== undefined) {
+      onChange(parseInt(range, 10));
+    }
+  };
+
   return (
     <DropdownButton title={title}
                     id="relative-timerange-selector"
@@ -85,7 +91,7 @@ const RangePresetDropdown = ({ disabled, onChange, onToggle, className, displayT
                     bsSize={bsSize}
                     className={className}
                     onToggle={onToggle}
-                    onSelect={onChange}>
+                    onSelect={_onChange}>
       {header && (
         <MenuItem header>{header}</MenuItem>
       )}

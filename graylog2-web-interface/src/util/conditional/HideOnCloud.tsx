@@ -18,13 +18,18 @@ import * as React from 'react';
 
 import AppConfig from '../AppConfig';
 
-// eslint-disable-next-line react/prop-types
-const HideOnCloud: React.FunctionComponent = ({ children }) => {
+const HideOnCloud = ({ children, ...rest }) => {
   if (AppConfig.isCloud()) {
     return <></>;
   }
 
-  return <>{children}</>;
+  return React.Children.map(children, (child) => {
+    if (React.isValidElement(child)) {
+      return React.cloneElement(child, rest);
+    }
+
+    return child;
+  });
 };
 
 export default HideOnCloud;

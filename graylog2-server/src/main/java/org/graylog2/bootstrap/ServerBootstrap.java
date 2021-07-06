@@ -24,6 +24,7 @@ import com.google.inject.Module;
 import com.google.inject.ProvisionException;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
+import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
@@ -84,13 +85,17 @@ public abstract class ServerBootstrap extends CmdLineTool {
     }
 
     @Override
-    protected void beforeStart() {
-        super.beforeStart();
+    protected void beforeStart(TLSProtocolsConfiguration configuration) {
+        super.beforeStart(configuration);
 
         // Do not use a PID file if the user requested not to
         if (!isNoPidFile()) {
             savePidFile(getPidFile());
         }
+        // This needs to run before the first SSLContext is instantiated,
+        // because it sets up the default SSLAlgorithmConstraints
+        applySecuritySettings(configuration);
+
         // Set these early in the startup because netty's NativeLibraryUtil uses a static initializer
         setNettyNativeDefaults();
     }

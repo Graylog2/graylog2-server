@@ -130,7 +130,7 @@ const TimeRangeLivePreview = ({ timerange }: Props) => {
   }, [isValid, timerange]);
 
   return (
-    <PreviewWrapper>
+    <PreviewWrapper data-testid="time-range-live-preview">
       <FromWrapper>
         <Title>From</Title>
         <Date title={`Dates Formatted as [${DateTime.Formats.TIMESTAMP}]`}>{from}</Date>

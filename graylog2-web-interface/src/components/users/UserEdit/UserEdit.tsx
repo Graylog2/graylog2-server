@@ -65,22 +65,22 @@ const UserEdit = ({ user }: Props) => {
     <SectionGrid>
       <IfPermitted permissions={`users:edit:${user.username}`}>
         <div>
-          { user.external && (
+          {user.external && (
             <SectionComponent title="External User">
               <Alert bsStyle="warning">
                 This user was synced from an external server, therefore neither
                 the profile nor the password can be changed. Please contact your administrator for more information.
               </Alert>
             </SectionComponent>
-          ) }
-          { !user.external && (
+          )}
+          {!user.external && (
           <ProfileSection user={user}
                           onSubmit={(data) => _updateUser(data, currentUser, user.id, user.fullName)} />
-          ) }
+          )}
           <SettingsSection user={user}
                            onSubmit={(data) => _updateUser(data, currentUser, user.id, user.fullName)} />
           <IfPermitted permissions={`users:passwordchange:${user.username}`}>
-            { !user.external && <PasswordSection user={user} /> }
+            {!user.external && <PasswordSection user={user} />}
           </IfPermitted>
           <PreferencesSection user={user} />
         </div>

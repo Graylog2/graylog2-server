@@ -19,7 +19,7 @@ import * as Immutable from 'immutable';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import { paginatedShares } from 'fixtures/sharedEntities';
 import { reader as assignedRole } from 'fixtures/roles';
-import { admin as currentUser } from 'fixtures/users';
+import { alice } from 'fixtures/users';
 
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import User from 'logic/users/User';
@@ -56,8 +56,9 @@ const user = User
   .build();
 
 describe('<UserDetails />', () => {
+  const currentUser = alice.toBuilder().permissions(Immutable.List(['*'])).build();
   const SutComponent = (props) => (
-    <CurrentUserContext.Provider value={{ ...currentUser, permissions: ['*'] }}>
+    <CurrentUserContext.Provider value={currentUser}>
       <UserDetails {...props} />
     </CurrentUserContext.Provider>
   );

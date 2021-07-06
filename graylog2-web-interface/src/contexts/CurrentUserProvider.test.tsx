@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { render } from 'wrappedTestingLibrary';
 import asMock from 'helpers/mocking/AsMock';
-import { viewsManager } from 'fixtures/users';
+import { alice } from 'fixtures/users';
 import { CombinedProviderMock as MockCombinedProvider, StoreMock as MockStore } from 'helpers/mocking';
 
 import CombinedProvider from 'injection/CombinedProvider';
@@ -51,10 +51,10 @@ describe('CurrentUserProvider', () => {
   });
 
   it('provides current user', () => {
-    asMock(CurrentUserStore.getInitialState).mockReturnValue({ currentUser: viewsManager });
+    asMock(CurrentUserStore.getInitialState).mockReturnValue({ currentUser: alice.toJSON() });
 
     const consume = renderSUT();
 
-    expect(consume).toHaveBeenCalledWith(viewsManager);
+    expect(consume).toHaveBeenCalledWith(alice);
   });
 });

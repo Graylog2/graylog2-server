@@ -16,8 +16,8 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
-import { qualifyUrlWithSessionCredentials } from 'util/URLUtils';
 
+import { qualifyUrlWithSessionCredentials } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import { Modal, Button } from 'components/graylog';
 import { Icon } from 'components/common';

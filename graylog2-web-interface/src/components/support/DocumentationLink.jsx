@@ -28,7 +28,7 @@ class DocumentationLink extends React.Component {
 
   render() {
     return (
-      <a href={DocsHelper.toString(this.props.page)} title={this.props.title} target="_blank">
+      <a href={DocsHelper.toString(this.props.page)} title={this.props.title} target="_blank" rel="noreferrer">
         {this.props.text}
       </a>
     );

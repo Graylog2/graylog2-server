@@ -31,6 +31,7 @@ const TitleWrap = styled.span<{ active: boolean }>(({ active }) => css`
 
 type Props = {
   active: boolean,
+  allowsClosing?: boolean,
   id: QueryId,
   onClose: () => Promise<void> | Promise<ViewState>,
   openEditModal: (string) => void,
@@ -44,9 +45,14 @@ type State = {
 
 class QueryTitle extends React.Component<Props, State> {
   static propTypes = {
+    allowsClosing: PropTypes.bool,
     onClose: PropTypes.func.isRequired,
     title: PropTypes.string.isRequired,
     openEditModal: PropTypes.func.isRequired,
+  };
+
+  static defaultProps = {
+    allowsClosing: true,
   };
 
   constructor(props: Props) {
@@ -75,7 +81,7 @@ class QueryTitle extends React.Component<Props, State> {
 
   render() {
     const { editing, title } = this.state;
-    const { active, id, openEditModal } = this.props;
+    const { active, allowsClosing, id, openEditModal } = this.props;
     const isActive = !editing && active;
 
     return (
@@ -89,7 +95,7 @@ class QueryTitle extends React.Component<Props, State> {
             <MenuItem onSelect={() => this._onDuplicate(id)}>Duplicate</MenuItem>
             <MenuItem onSelect={() => openEditModal(title)}>Edit Title</MenuItem>
             <MenuItem divider />
-            <MenuItem onSelect={this._onClose}>Close</MenuItem>
+            <MenuItem onSelect={this._onClose} disabled={!allowsClosing}>Close</MenuItem>
           </QueryActionDropdown>
         )}
       </>

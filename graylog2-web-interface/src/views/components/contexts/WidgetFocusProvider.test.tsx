@@ -28,7 +28,7 @@ import SearchActions from 'views/actions/SearchActions';
 const mockHistoryReplace = jest.fn();
 
 jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
+  ...jest.requireActual<{}>('react-router-dom'),
   useHistory: () => ({
     replace: mockHistoryReplace,
   }),
@@ -49,7 +49,7 @@ jest.mock('views/actions/SearchActions');
 
 describe('WidgetFocusProvider', () => {
   beforeEach(() => {
-    useLocation.mockReturnValue({
+    asMock(useLocation).mockReturnValue({
       pathname: '',
       search: '',
     });
@@ -65,7 +65,10 @@ describe('WidgetFocusProvider', () => {
 
   it('should update url on widget focus', () => {
     let contextValue;
-    const consume = (value) => { contextValue = value; };
+
+    const consume = (value) => {
+      contextValue = value;
+    };
 
     renderSUT(consume);
 
@@ -75,13 +78,17 @@ describe('WidgetFocusProvider', () => {
   });
 
   it('should update url on widget focus close', () => {
-    useLocation.mockReturnValueOnce({
+    asMock(useLocation).mockReturnValueOnce({
       pathname: '',
       search: '?focusedId=widget-id&focusing=true',
     });
 
     let contextValue;
-    const consume = (value) => { contextValue = value; };
+
+    const consume = (value) => {
+      contextValue = value;
+    };
+
     renderSUT(consume);
 
     contextValue.unsetWidgetFocusing();
@@ -90,13 +97,17 @@ describe('WidgetFocusProvider', () => {
   });
 
   it('should set widget focus based on url', () => {
-    useLocation.mockReturnValue({
+    asMock(useLocation).mockReturnValue({
       pathname: '',
       search: '?focusedId=widget-id&focusing=true',
     });
 
     let contextValue;
-    const consume = (value) => { contextValue = value; };
+
+    const consume = (value) => {
+      contextValue = value;
+    };
+
     renderSUT(consume);
 
     expect(contextValue.focusedWidget).toEqual({ id: 'widget-id', focusing: true, editing: false });
@@ -104,7 +115,11 @@ describe('WidgetFocusProvider', () => {
 
   it('should update url on widget edit', () => {
     let contextValue;
-    const consume = (value) => { contextValue = value; };
+
+    const consume = (value) => {
+      contextValue = value;
+    };
+
     renderSUT(consume);
 
     contextValue.setWidgetEditing('widget-id');
@@ -113,13 +128,16 @@ describe('WidgetFocusProvider', () => {
   });
 
   it('should update url on widget edit close', () => {
-    useLocation.mockReturnValue({
+    asMock(useLocation).mockReturnValue({
       pathname: '',
       search: '?focusedId=widget-id&editing=true',
     });
 
     let contextValue;
-    const consume = (value) => { contextValue = value; };
+
+    const consume = (value) => {
+      contextValue = value;
+    };
 
     renderSUT(consume);
 
@@ -129,26 +147,34 @@ describe('WidgetFocusProvider', () => {
   });
 
   it('should set widget edit and focused based on url', () => {
-    useLocation.mockReturnValue({
+    asMock(useLocation).mockReturnValue({
       pathname: '',
       search: '?focusedId=widget-id&editing=true',
     });
 
     let contextValue;
-    const consume = (value) => { contextValue = value; };
+
+    const consume = (value) => {
+      contextValue = value;
+    };
+
     renderSUT(consume);
 
     expect(contextValue.focusedWidget).toEqual({ id: 'widget-id', editing: true, focusing: true });
   });
 
   it('should not remove focus query param on widget edit', () => {
-    useLocation.mockReturnValue({
+    asMock(useLocation).mockReturnValue({
       pathname: '',
       search: '?focusedId=widget-id&focusing=true',
     });
 
     let contextValue;
-    const consume = (value) => { contextValue = value; };
+
+    const consume = (value) => {
+      contextValue = value;
+    };
+
     renderSUT(consume);
 
     contextValue.setWidgetEditing('widget-id');
@@ -163,13 +189,17 @@ describe('WidgetFocusProvider', () => {
   it('should not set focused widget from url and cleanup url if the widget does not exist', () => {
     asMock(WidgetStore.getInitialState).mockReturnValue(Map());
 
-    useLocation.mockReturnValue({
+    asMock(useLocation).mockReturnValue({
       pathname: '',
       search: '?focusedId=not-existing-widget-id',
     });
 
     let contextValue;
-    const consume = (value) => { contextValue = value; };
+
+    const consume = (value) => {
+      contextValue = value;
+    };
+
     renderSUT(consume);
 
     expect(contextValue.focusedWidget).toBe(undefined);
@@ -177,8 +207,8 @@ describe('WidgetFocusProvider', () => {
     expect(mockHistoryReplace).toBeCalledWith('');
   });
 
-  it('should not trigger search execution when not leaving widget editing', async () => {
-    useLocation.mockReturnValue({
+  it('should not trigger search execution when no focus mode was requested', async () => {
+    asMock(useLocation).mockReturnValue({
       pathname: '',
       search: '',
     });

@@ -15,9 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { readFileSync } from 'fs';
+import { dirname } from 'path';
 
 import * as Immutable from 'immutable';
-import { dirname } from 'path';
 
 import MoveWidgetToTab from './MoveWidgetToTab';
 import View from './View';

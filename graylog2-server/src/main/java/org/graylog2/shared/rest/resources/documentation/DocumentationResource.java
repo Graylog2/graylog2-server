@@ -109,7 +109,7 @@ public class DocumentationResource extends RestResource {
         URI baseUri;
         if (route.startsWith("global")) {
             route = route.replace("global", "");
-            baseUri = RestTools.buildExternalUri(httpHeaders.getRequestHeaders(), httpConfiguration.getHttpExternalUri()).resolve(HttpConfiguration.PATH_API);
+            baseUri = RestTools.buildRelativeExternalUri(httpHeaders.getRequestHeaders(), httpConfiguration.getHttpExternalUri()).resolve(HttpConfiguration.PATH_API);
         } else {
             baseUri = httpConfiguration.getHttpPublishUri().resolve(HttpConfiguration.PATH_API);
         }

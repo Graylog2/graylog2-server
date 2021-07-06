@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useEffect, useContext } from 'react';
+import { useCallback, useEffect, useContext, useState } from 'react';
 import * as Immutable from 'immutable';
 import styled, { css } from 'styled-components';
 
@@ -60,6 +60,8 @@ import SearchPageLayoutProvider from 'views/components/contexts/SearchPageLayout
 import usePluginEntities from 'views/logic/usePluginEntities';
 import WidgetFocusProvider from 'views/components/contexts/WidgetFocusProvider';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
+import SearchExecutionState from 'views/logic/search/SearchExecutionState';
+import { RefluxActions } from 'stores/StoreTypes';
 
 const GridContainer = styled.div<{ interactive: boolean }>(({ interactive }) => {
   return interactive ? css`
@@ -108,7 +110,7 @@ type Props = {
   location: Location,
 };
 
-const _searchRefreshConditionChain = (searchRefreshHooks, state: SearchRefreshConditionArguments) => {
+const _searchRefreshConditionChain = (searchRefreshHooks: Array<SearchRefreshCondition>, state: SearchRefreshConditionArguments) => {
   if (!searchRefreshHooks || searchRefreshHooks.length === 0) {
     return true;
   }
@@ -116,15 +118,19 @@ const _searchRefreshConditionChain = (searchRefreshHooks, state: SearchRefreshCo
   return searchRefreshHooks.every((condition: SearchRefreshCondition) => condition(state));
 };
 
-const _refreshIfNotUndeclared = (searchRefreshHooks, executionState) => {
+const _refreshIfNotUndeclared = (searchRefreshHooks: Array<SearchRefreshCondition>, executionState: SearchExecutionState, setHasErrors: (hasErrors: boolean) => void) => {
   const { view } = ViewStore.getInitialState();
 
   return SearchMetadataActions.parseSearch(view.search).then((searchMetadata) => {
     if (_searchRefreshConditionChain(searchRefreshHooks, { view, searchMetadata, executionState })) {
       FieldTypesActions.refresh();
 
+      setHasErrors(false);
+
       return SearchActions.execute(executionState);
     }
+
+    setHasErrors(true);
 
     return Promise.reject(searchMetadata);
   });
@@ -141,39 +147,49 @@ const ViewAdditionalContextProvider = connect(
 
 ViewAdditionalContextProvider.displayName = 'ViewAdditionalContextProvider';
 
+const useRefreshSearchOn = (actions: Array<RefluxActions<any>>, refresh: () => Promise<any>) => {
+  useEffect(() => {
+    let storeListenersUnsubscribes = Immutable.List<() => void>();
+
+    refresh().finally(() => {
+      storeListenersUnsubscribes = storeListenersUnsubscribes
+        .push(SearchActions.refresh.listen(refresh))
+        .push(ViewActions.search.completed.listen(refresh));
+    });
+
+    // Returning cleanup function used when unmounting
+    return () => { storeListenersUnsubscribes.forEach((unsubscribeFunc) => unsubscribeFunc()); };
+  }, [refresh]);
+};
+
+const useBindSearchParamsFromQuery = (query: { [key: string]: unknown }) => {
+  useEffect(() => {
+    const { view } = ViewStore.getInitialState();
+
+    bindSearchParamsFromQuery({ view, query, retry: () => Promise.resolve() });
+  }, [query]);
+};
+
 const Search = ({ location }: Props) => {
   const { pathname, search } = location;
   const query = `${pathname}${search}`;
   const searchRefreshHooks = usePluginEntities('views.hooks.searchRefresh');
+  const [hasErrors, setHasErrors] = useState(false);
   const refreshIfNotUndeclared = useCallback(
-    () => _refreshIfNotUndeclared(searchRefreshHooks, SearchExecutionStateStore.getInitialState()),
+    () => _refreshIfNotUndeclared(searchRefreshHooks, SearchExecutionStateStore.getInitialState(), setHasErrors),
     [searchRefreshHooks],
   );
 
-  useEffect(() => {
-    const { view } = ViewStore.getInitialState();
+  useBindSearchParamsFromQuery(location.query);
+  useSyncWithQueryParameters(query);
 
-    bindSearchParamsFromQuery({ view, query: location.query, retry: () => Promise.resolve() });
-  }, [location.query]);
+  useRefreshSearchOn([SearchActions.refresh, ViewActions.search], refreshIfNotUndeclared);
 
   useEffect(() => {
     SearchConfigActions.refresh();
 
     StreamsActions.refresh();
-
-    let storeListenersUnsubscribes = Immutable.List<() => void>();
-
-    refreshIfNotUndeclared().finally(() => {
-      storeListenersUnsubscribes = storeListenersUnsubscribes
-        .push(SearchActions.refresh.listen(refreshIfNotUndeclared))
-        .push(ViewActions.search.completed.listen(refreshIfNotUndeclared));
-    });
-
-    // Returning cleanup function used when unmounting
-    return () => { storeListenersUnsubscribes.forEach((unsubscribeFunc) => unsubscribeFunc()); };
-  }, [refreshIfNotUndeclared]);
-
-  useSyncWithQueryParameters(query);
+  }, []);
 
   return (
     <WidgetFocusProvider>
@@ -214,7 +230,7 @@ const Search = ({ location }: Props) => {
                               </IfDashboard>
                             </IfInteractive>
                             <HighlightMessageInQuery>
-                              <SearchResult />
+                              <SearchResult hasErrors={hasErrors} />
                             </HighlightMessageInQuery>
                           </SearchArea>
                         </GridContainer>
@@ -230,7 +246,5 @@ const Search = ({ location }: Props) => {
     </WidgetFocusProvider>
   );
 };
-
-Search.propTypes = {};
 
 export default withLocation(Search);

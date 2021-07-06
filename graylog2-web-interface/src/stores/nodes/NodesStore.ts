@@ -24,7 +24,7 @@ import CombinedProvider from 'injection/CombinedProvider';
 const { NodesActions } = CombinedProvider.get('Nodes');
 const { SessionStore } = CombinedProvider.get('Session');
 
-type NodeInfo = {
+export type NodeInfo = {
   cluster_id: string,
   hostname: string,
   is_master: boolean,

@@ -26,6 +26,7 @@ module.exports = {
     require.resolve('./lib/setup-files/mock-FetchProvider.js'),
     require.resolve('./lib/setup-files/mock-Version.js'),
     require.resolve('./lib/setup-files/mock-IntersectionObserver.js'),
+    require.resolve('./lib/setup-files/mock-moment-timezone.js'),
     require.resolve('./lib/setup-files/console-warnings-fail-tests.js'),
     'jest-canvas-mock',
   ],
@@ -50,6 +51,7 @@ module.exports = {
     '\\.(css|less)$': 'identity-obj-proxy',
     '\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$': require.resolve('./lib/mocking/fileMock.js'),
   },
+  testEnvironment: 'jsdom',
   testPathIgnorePatterns: [
     '.fixtures.[jt]s$',
   ],

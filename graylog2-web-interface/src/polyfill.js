@@ -14,6 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+
+// When adding a polyfill it is probably necessary to extend the polyfill list in the eslint-config-graylog package.
+// Otherwise ESLint does not know about the polyfill and throws a warning because of the compat/compat rule.
+
 import 'core-js';
 import 'regenerator-runtime/runtime';
 
