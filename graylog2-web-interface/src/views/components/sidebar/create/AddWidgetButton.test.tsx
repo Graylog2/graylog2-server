@@ -16,7 +16,7 @@
  */
 import React from 'react';
 import { mount } from 'wrappedEnzyme';
-import { PluginStore } from 'graylog-web-plugin/plugin';
+import { PluginExports, PluginStore } from 'graylog-web-plugin/plugin';
 
 import AddWidgetButton from './AddWidgetButton';
 
@@ -28,7 +28,7 @@ const MockCreateParameterDialog = () => {
   return <span>42</span>;
 };
 
-const bindings = {
+const bindings: PluginExports = {
   creators: [
     {
       type: 'preset',
@@ -73,18 +73,18 @@ describe('AddWidgetButton', () => {
   const onClick = jest.fn();
 
   it('contains menu items for all widget types', () => {
-    const wrapper = mount(<AddWidgetButton onClick={onClick} toggleAutoClose={onClick} />);
+    const wrapper = mount(<AddWidgetButton onClick={onClick} />);
 
     ['Aggregation', 'Message Count', 'Message Table', 'Parameter']
       .forEach((title) => expect(wrapper.find(`button[children="${title}"]`)).toExist());
   });
 
   it('clicking on option to add aggregation calls AggregateActionHandler', () => {
-    const wrapper = mount(<AddWidgetButton onClick={onClick} toggleAutoClose={onClick} />);
+    const wrapper = mount(<AddWidgetButton onClick={onClick} />);
 
     const addAggregation = wrapper.find('button[children="Aggregation"]');
 
-    expect(addAggregation).toExist(0);
+    expect(addAggregation).toExist();
 
     addAggregation.simulate('click');
 
@@ -92,11 +92,11 @@ describe('AddWidgetButton', () => {
   });
 
   it('clicking on option to add message count calls AddMessageCountActionHandler', () => {
-    const wrapper = mount(<AddWidgetButton onClick={onClick} toggleAutoClose={onClick} />);
+    const wrapper = mount(<AddWidgetButton onClick={onClick} />);
 
     const addMessageCount = wrapper.find('button[children="Message Count"]');
 
-    expect(addMessageCount).toExist(0);
+    expect(addMessageCount).toExist();
 
     addMessageCount.simulate('click');
 
@@ -104,11 +104,11 @@ describe('AddWidgetButton', () => {
   });
 
   it('clicking on option to add message table calls AddMessageTableActionHandler', () => {
-    const wrapper = mount(<AddWidgetButton onClick={onClick} toggleAutoClose={onClick} />);
+    const wrapper = mount(<AddWidgetButton onClick={onClick} />);
 
     const addMessageTable = wrapper.find('button[children="Message Table"]');
 
-    expect(addMessageTable).toExist(0);
+    expect(addMessageTable).toExist();
 
     addMessageTable.simulate('click');
 
@@ -116,11 +116,11 @@ describe('AddWidgetButton', () => {
   });
 
   it('clicking on option to add a parameter renders MockCreateParameterDialog', () => {
-    const wrapper = mount(<AddWidgetButton onClick={onClick} toggleAutoClose={onClick} />);
+    const wrapper = mount(<AddWidgetButton onClick={onClick} />);
 
     const addMessageTable = wrapper.find('button[children="Parameter"]');
 
-    expect(addMessageTable).toExist(0);
+    expect(addMessageTable).toExist();
 
     addMessageTable.simulate('click');
 
@@ -130,11 +130,11 @@ describe('AddWidgetButton', () => {
   });
 
   it('calling onClose from creator component removes it', () => {
-    const wrapper = mount(<AddWidgetButton onClick={onClick} toggleAutoClose={onClick} />);
+    const wrapper = mount(<AddWidgetButton onClick={onClick} />);
 
     const addMessageTable = wrapper.find('button[children="Parameter"]');
 
-    expect(addMessageTable).toExist(0);
+    expect(addMessageTable).toExist();
 
     addMessageTable.simulate('click');
 
@@ -144,7 +144,7 @@ describe('AddWidgetButton', () => {
 
     expect(mockCreateParameterDialog).toExist();
 
-    const { onClose } = mockCreateParameterDialog.props();
+    const { onClose } = mockCreateParameterDialog.props() as { onClose: () => void };
 
     onClose();
 
