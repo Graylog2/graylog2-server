@@ -19,6 +19,7 @@ import PropTypes from 'prop-types';
 
 import { widgetDefinition } from 'views/logic/Widgets';
 import { IconButton } from 'components/common';
+import { Position } from 'views/components/widgets/WidgetPropTypes';
 
 type Position = {
   col: number,
@@ -38,7 +39,7 @@ class WidgetHorizontalStretch extends React.Component<Props> {
   static propTypes = {
     widgetId: PropTypes.string.isRequired,
     widgetType: PropTypes.string.isRequired,
-    position: PropTypes.object.isRequired,
+    position: PropTypes.shape(Position).isRequired,
     onStretch: PropTypes.func.isRequired,
   };
 

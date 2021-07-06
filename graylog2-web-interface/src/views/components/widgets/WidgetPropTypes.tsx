@@ -43,7 +43,7 @@ export const WidgetData = PropTypes.oneOfType([
 
 export const WidgetDataMap = PropTypes.objectOf(WidgetData);
 
-export const WidgetError = PropTypes.shape({
+export const WidgetError = PropTypes.exact({
   description: PropTypes.string,
 });
 export const WidgetErrorsList = PropTypes.arrayOf(WidgetError);
