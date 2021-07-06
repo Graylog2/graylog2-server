@@ -16,12 +16,12 @@
  */
 import * as React from 'react';
 import { mount } from 'wrappedEnzyme';
-import PropTypes from 'prop-types';
 import { StoreMock as MockStore } from 'helpers/mocking';
 
 import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 import View from 'views/logic/views/View';
 import QueryResult from 'views/logic/QueryResult';
+import { ViewMetaData } from 'views/stores/ViewMetadataStore';
 
 import Sidebar from './Sidebar';
 
@@ -45,7 +45,7 @@ describe('<Sidebar />', () => {
     summary: 'query summary',
     title: 'Query Title',
   };
-  const effectiveTimerange = { type: 'absolute', from: '2018-08-28T14:34:26.192Z', to: '2018-08-28T14:39:26.192Z' };
+  const effectiveTimerange = { type: 'absolute', from: '2018-08-28T14:34:26.192Z', to: '2018-08-28T14:39:26.192Z' } as const;
   const duration = 64;
   const timestamp = '2018-08-28T14:39:26.127Z';
   const query = {
@@ -57,35 +57,15 @@ describe('<Sidebar />', () => {
   };
   const errors = [];
   const executionStats = { effective_timerange: effectiveTimerange, duration, timestamp };
-  const queryResult = new QueryResult({ execution_stats: executionStats, query, errors });
+  const searchTypes = {};
+  const queryResult = new QueryResult({ execution_stats: executionStats, query, errors, search_types: searchTypes });
 
-  class TestComponent extends React.Component {
-    static propTypes = {
-      maximumHeight: PropTypes.number,
-    };
-
-    static defaultProps = {
-      maximumHeight: undefined,
-    };
-
-    getContainerHeight() {
-      const { maximumHeight } = this.props;
-
-      return maximumHeight;
-    }
-
-    render() {
-      expect(this.props).toHaveProperty('maximumHeight');
-
-      return <div id="martian">Marc Watney</div>;
-    }
-  }
+  const TestComponent = () => <div id="martian">Marc Watney</div>;
 
   it('should render and open when clicking on header', () => {
     const wrapper = mount(
       <Sidebar viewMetadata={viewMetaData}
                viewIsNew={false}
-               toggleOpen={jest.fn}
                queryId={query.id}
                results={queryResult}>
         <TestComponent />
@@ -101,7 +81,6 @@ describe('<Sidebar />', () => {
     const wrapper = mount(
       <Sidebar viewMetadata={viewMetaData}
                viewIsNew={false}
-               toggleOpen={jest.fn}
                queryId={query.id}
                results={queryResult}>
         <TestComponent />
@@ -113,17 +92,16 @@ describe('<Sidebar />', () => {
     expect(wrapper.find('SearchResultOverview').text()).toBe('Query executed in 64ms at 2018-08-28 09:39:26.');
   });
 
-  it('should render with a specific default title in the context of a new search', () => {
-    const emptyViewMetaData = {
-      activeQuery: '34efae1e-e78e-48ab-ab3f-e83c8611a683',
-      id: '5b34f4c44880a54df9616380',
-    };
+  const emptyViewMetaData = {
+    activeQuery: '34efae1e-e78e-48ab-ab3f-e83c8611a683',
+    id: '5b34f4c44880a54df9616380',
+  } as ViewMetaData;
 
+  it('should render with a specific default title in the context of a new search', () => {
     const wrapper = mount(
       <ViewTypeContext.Provider value={View.Type.Search}>
         <Sidebar viewMetadata={emptyViewMetaData}
                  viewIsNew={false}
-                 toggleOpen={jest.fn}
                  queryId={query.id}
                  results={queryResult}>
           <TestComponent />
@@ -137,16 +115,10 @@ describe('<Sidebar />', () => {
   });
 
   it('should render with a specific default title in the context of a new dashboard', () => {
-    const emptyViewMetaData = {
-      activeQuery: '34efae1e-e78e-48ab-ab3f-e83c8611a683',
-      id: '5b34f4c44880a54df9616380',
-    };
-
     const wrapper = mount(
       <ViewTypeContext.Provider value={View.Type.Dashboard}>
         <Sidebar viewMetadata={emptyViewMetaData}
                  viewIsNew={false}
-                 toggleOpen={jest.fn}
                  queryId={query.id}
                  results={queryResult}>
           <TestComponent />
@@ -160,16 +132,10 @@ describe('<Sidebar />', () => {
   });
 
   it('should render with a specific title for unsaved dashboards', () => {
-    const emptyViewMetaData = {
-      activeQuery: '34efae1e-e78e-48ab-ab3f-e83c8611a683',
-      id: '5b34f4c44880a54df9616380',
-    };
-
     const wrapper = mount(
       <ViewTypeContext.Provider value={View.Type.Dashboard}>
         <Sidebar viewMetadata={emptyViewMetaData}
                  viewIsNew
-                 toggleOpen={jest.fn}
                  queryId={query.id}
                  results={queryResult}>
           <TestComponent />
@@ -183,16 +149,10 @@ describe('<Sidebar />', () => {
   });
 
   it('should render with a specific title for unsaved searches', () => {
-    const emptyViewMetaData = {
-      activeQuery: '34efae1e-e78e-48ab-ab3f-e83c8611a683',
-      id: '5b34f4c44880a54df9616380',
-    };
-
     const wrapper = mount(
       <ViewTypeContext.Provider value={View.Type.Search}>
         <Sidebar viewMetadata={emptyViewMetaData}
                  viewIsNew
-                 toggleOpen={jest.fn}
                  queryId={query.id}
                  results={queryResult}>
           <TestComponent />
@@ -210,7 +170,6 @@ describe('<Sidebar />', () => {
       <ViewTypeContext.Provider value={View.Type.Dashboard}>
         <Sidebar viewMetadata={viewMetaData}
                  viewIsNew={false}
-                 toggleOpen={jest.fn}
                  queryId={query.id}
                  results={queryResult}>
           <TestComponent />
@@ -230,7 +189,6 @@ describe('<Sidebar />', () => {
       <ViewTypeContext.Provider value={View.Type.Dashboard}>
         <Sidebar viewMetadata={{ ...viewMetaData, description: undefined, summary: undefined }}
                  viewIsNew={false}
-                 toggleOpen={jest.fn}
                  queryId={query.id}
                  results={queryResult}>
           <TestComponent />
@@ -250,7 +208,6 @@ describe('<Sidebar />', () => {
       <ViewTypeContext.Provider value={View.Type.Search}>
         <Sidebar viewMetadata={{ ...viewMetaData, description: undefined, summary: undefined }}
                  viewIsNew={false}
-                 toggleOpen={jest.fn}
                  queryId={query.id}
                  results={queryResult}>
           <TestComponent />
@@ -270,7 +227,6 @@ describe('<Sidebar />', () => {
       <ViewTypeContext.Provider value={View.Type.Search}>
         <Sidebar viewMetadata={viewMetaData}
                  viewIsNew={false}
-                 toggleOpen={jest.fn}
                  queryId={query.id}
                  results={queryResult}>
           <TestComponent />
@@ -289,7 +245,6 @@ describe('<Sidebar />', () => {
     const wrapper = mount(
       <Sidebar viewMetadata={{ ...viewMetaData, id: undefined }}
                viewIsNew={false}
-               toggleOpen={jest.fn}
                queryId={query.id}
                results={queryResult}>
         <TestComponent />
@@ -309,7 +264,6 @@ describe('<Sidebar />', () => {
     const wrapper = mount(
       <Sidebar viewMetadata={viewMetaData}
                viewIsNew={false}
-               toggleOpen={jest.fn}
                queryId={query.id}
                results={queryResult}>
         <TestComponent />
@@ -327,7 +281,6 @@ describe('<Sidebar />', () => {
     const wrapper = mount(
       <Sidebar viewMetadata={viewMetaData}
                viewIsNew={false}
-               toggleOpen={jest.fn}
                queryId={query.id}
                results={queryResult}>
         <TestComponent />
@@ -345,7 +298,6 @@ describe('<Sidebar />', () => {
     const wrapper = mount(
       <Sidebar viewMetadata={viewMetaData}
                viewIsNew={false}
-               toggleOpen={jest.fn}
                queryId={query.id}
                results={queryResult}>
         <TestComponent />
@@ -365,7 +317,6 @@ describe('<Sidebar />', () => {
     const wrapper = mount(
       <Sidebar viewMetadata={viewMetaData}
                viewIsNew={false}
-               toggleOpen={jest.fn}
                queryId={query.id}
                results={queryResult}>
         <TestComponent />
