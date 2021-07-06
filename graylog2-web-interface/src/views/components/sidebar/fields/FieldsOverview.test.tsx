@@ -36,7 +36,7 @@ describe('<FieldsOverview />', () => {
   const fieldTypesStoreState = { all: simpleFields(), queryFields: simpleQueryFields('aQueryId') };
   const SimpleFieldsOverview = () => (
     <FieldTypesContext.Provider value={fieldTypesStoreState}>
-      <FieldsOverview listHeight={1000} />
+      <FieldsOverview />
     </FieldTypesContext.Provider>
   );
 
