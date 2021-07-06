@@ -54,7 +54,7 @@ import java.util.stream.Collectors;
         visible = true,
         defaultImpl = SearchType.Fallback.class)
 @JsonAutoDetect
-public interface SearchType extends ContentPackable<SearchTypeEntity> {
+public interface SearchType extends ContentPackable<SearchTypeEntity>, Exportable {
     String TYPE_FIELD = "type";
 
     @JsonProperty(TYPE_FIELD)

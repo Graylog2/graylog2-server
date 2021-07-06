@@ -34,6 +34,11 @@ export default class MessagesWidget extends Widget {
 
   static defaultTitle = 'Untitled Message Table';
 
+  // eslint-disable-next-line class-methods-use-this
+  get isExportable() {
+    return true;
+  }
+
   static fromJSON(value: WidgetState) {
     const { id, config, filter, timerange, query, streams } = value;
 

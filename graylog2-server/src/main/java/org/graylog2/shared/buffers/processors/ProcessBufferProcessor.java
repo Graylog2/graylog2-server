@@ -115,13 +115,25 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
         currentMessage = msg;
         incomingMessages.mark();
 
-        LOG.debug("Starting to process message <{}>.", msg.getId());
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Starting to process message <{}>.", msg.getId());
+        }
 
         try (final Timer.Context ignored = processTime.time()) {
             handleMessage(msg);
-            LOG.debug("Finished processing message <{}>. Writing to output buffer.", msg.getId());
+            if (LOG.isTraceEnabled()) {
+                LOG.trace("Finished processing message <{}>. Writing to output buffer.", msg.getId());
+            }
         } catch (Exception e) {
-            LOG.warn("Unable to process message <{}>: {}", msg.getId(), e);
+            if (LOG.isDebugEnabled()) {
+                // Log warning including the stacktrace
+                LOG.warn("Unable to process message <{}>:", msg.getId(), e);
+                // Log full message content to aid debugging
+                LOG.debug("Failed message <{}>: {}", msg.getId(), msg.toDumpString());
+            } else {
+                // Only logs a single line warning without stacktrace
+                LOG.warn("Unable to process message <{}>: {}", msg.getId(), e);
+            }
         } finally {
             currentMessage = null;
             outgoingMessages.mark();

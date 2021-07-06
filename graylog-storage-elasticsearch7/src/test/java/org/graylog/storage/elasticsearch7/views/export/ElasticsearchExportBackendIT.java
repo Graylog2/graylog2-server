@@ -201,16 +201,16 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
     }
 
     @Test
-    public void sortsByTimestampDescending() {
+    public void sortsByTimestampAscending() {
         importFixture("messages.json");
 
         ExportMessagesCommand command = commandBuilderWithAllStreams().build();
 
         runWithExpectedResult(command, "timestamp,source,message",
-                "graylog_0, 2015-01-01T04:00:00.000Z, source-2, Ho",
-                "graylog_0, 2015-01-01T03:00:00.000Z, source-1, Hi",
+                "graylog_0, 2015-01-01T01:00:00.000Z, source-1, Ha",
                 "graylog_1, 2015-01-01T02:00:00.000Z, source-2, He",
-                "graylog_0, 2015-01-01T01:00:00.000Z, source-1, Ha");
+                "graylog_0, 2015-01-01T03:00:00.000Z, source-1, Hi",
+                "graylog_0, 2015-01-01T04:00:00.000Z, source-2, Ho");
     }
 
     private Set<String> actualFieldNamesFrom(SimpleMessageChunk chunk) {

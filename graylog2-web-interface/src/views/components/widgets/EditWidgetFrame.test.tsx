@@ -20,6 +20,7 @@ import selectEvent from 'react-select-event';
 import MockStore from 'helpers/mocking/StoreMock';
 
 import { WidgetActions } from 'views/stores/WidgetStore';
+import { SearchActions } from 'views/stores/SearchStore';
 import Widget from 'views/logic/widgets/Widget';
 
 import EditWidgetFrame from './EditWidgetFrame';
@@ -33,7 +34,16 @@ jest.mock('views/stores/WidgetStore', () => ({
   },
 }));
 
+jest.mock('views/stores/SearchStore', () => ({
+  SearchActions: {
+    refresh: jest.fn(),
+  },
+}));
+
 jest.mock('views/stores/SearchConfigStore', () => ({
+  SearchConfigActions: {
+    refresh: jest.fn(() => Promise.resolve()),
+  },
   SearchConfigStore: MockStore(['getInitialState', () => ({
     searchesClusterConfig: {
       relative_timerange_options: { P1D: 'Search in last day', PT0S: 'Search in all messages' },
@@ -67,7 +77,7 @@ describe('EditWidgetFrame', () => {
     const renderSUT = () => render((
       <ViewTypeContext.Provider value="DASHBOARD">
         <WidgetContext.Provider value={widget}>
-          <EditWidgetFrame>
+          <EditWidgetFrame onCancel={() => {}} onFinish={() => {}}>
             <>Hello World!</>
             <>These are some buttons!</>
           </EditWidgetFrame>
@@ -75,15 +85,13 @@ describe('EditWidgetFrame', () => {
       </ViewTypeContext.Provider>
     ));
 
-    it('parses timerange when time range input is used', async () => {
+    it('performs search when clicking on search button', async () => {
       renderSUT();
       const searchButton = screen.getByTitle(/Perform search/);
 
       fireEvent.click(searchButton);
 
-      await waitFor(() => expect(WidgetActions.update).toHaveBeenCalledWith('deadbeef', expect.objectContaining({
-        timerange: { from: 300, type: 'relative' },
-      })));
+      await waitFor(() => expect(SearchActions.refresh).toHaveBeenCalledTimes(1));
     });
 
     it('changes the widget\'s streams when using stream filter', async () => {

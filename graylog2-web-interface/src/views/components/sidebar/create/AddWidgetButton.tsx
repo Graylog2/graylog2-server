@@ -73,7 +73,7 @@ type ComponentCreator = {
   type: CreatorType,
 };
 
-type Creator = ComponentCreator | FunctionalCreator;
+export type Creator = ComponentCreator | FunctionalCreator;
 
 const isCreatorFunc = (creator: Creator): creator is FunctionalCreator => ('func' in creator);
 
@@ -144,7 +144,7 @@ class AddWidgetButton extends React.Component<Props, State> {
 
   render() {
     const { overflowingComponents } = this.state;
-    const creators: Array<Creator> = PluginStore.exports('creators');
+    const creators = PluginStore.exports('creators');
     const presets = this._createGroup(creators, 'preset');
     const generic = this._createGroup(creators, 'generic');
     const components: Array<React.ReactNode> = Object.values(overflowingComponents);

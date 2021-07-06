@@ -157,7 +157,7 @@ export const ViewStore: ViewStoreType = singletonStore(
       /* Select selected query (activeQuery) or first query in view (for now).
          Selected query might become a property on the view later. */
       const queries = view.state.keySeq().toList();
-      const firstQueryId = queries.first();
+      const firstQueryId = view?.search?.queries?.first()?.id ?? queries.first();
       const selectedQuery = this.activeQuery && queries.find((id) => (id === this.activeQuery)) ? this.activeQuery : firstQueryId;
 
       this.selectQuery(selectedQuery);

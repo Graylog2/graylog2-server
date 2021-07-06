@@ -19,6 +19,7 @@ package org.graylog.plugins.beats;
 import com.google.inject.assistedinject.Assisted;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.EventLoopGroup;
+import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.inputs.transports.NettyTransportConfiguration;
 import org.graylog2.inputs.transports.netty.EventLoopGroupFactory;
 import org.graylog2.plugin.LocalMetricRegistry;
@@ -44,8 +45,8 @@ public class BeatsTransport extends AbstractTcpTransport {
                           NettyTransportConfiguration nettyTransportConfiguration,
                           ThroughputCounter throughputCounter,
                           LocalMetricRegistry localRegistry,
-                          org.graylog2.Configuration graylogConfiguration) {
-        super(configuration, throughputCounter, localRegistry, eventLoopGroup, eventLoopGroupFactory, nettyTransportConfiguration, graylogConfiguration);
+                          TLSProtocolsConfiguration tlsConfiguration) {
+        super(configuration, throughputCounter, localRegistry, eventLoopGroup, eventLoopGroupFactory, nettyTransportConfiguration, tlsConfiguration);
     }
 
     @Override

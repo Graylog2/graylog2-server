@@ -22,17 +22,14 @@ import chroma from 'chroma-js';
 import { Table } from 'components/graylog';
 
 const MessagesContainer = styled.div`
-  padding-right: 13px;
   width: 100%;
 `;
 
 const StyledTable = styled(Table)(({ theme }) => css`
   position: relative;
   font-size: ${theme.fonts.size.small};
-  margin-top: 15px;
-  margin-bottom: 60px;
+  margin: 0;
   border-collapse: collapse;
-  padding-left: 13px;
   width: 100%;
   word-break: break-all;
 
@@ -43,7 +40,6 @@ const StyledTable = styled(Table)(({ theme }) => css`
   td,
   th {
     position: relative;
-    left: 13px;
   }
 
   > thead th {

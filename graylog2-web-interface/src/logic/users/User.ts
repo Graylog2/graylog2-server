@@ -31,6 +31,8 @@ export type UserJSON = {
   email: string;
   external: boolean;
   full_name: string;
+  first_name: string;
+  last_name: string;
   id: string;
   last_activity: string | null | undefined;
   permissions: string[];
@@ -50,7 +52,10 @@ type InternalState = {
   id: string;
   username: string;
   fullName: string;
+  firstName: string;
+  lastName: string;
   email: string;
+  grnPermissions: Immutable.List<string>;
   permissions: Immutable.List<string>;
   timezone: string | null | undefined;
   preferences: PreferencesMap;
@@ -68,11 +73,33 @@ type InternalState = {
 export default class User {
   _value: InternalState;
 
-  constructor(id: $PropertyType<InternalState, 'id'>, username: $PropertyType<InternalState, 'username'>, fullName: $PropertyType<InternalState, 'fullName'>, email: $PropertyType<InternalState, 'email'>, permissions: $PropertyType<InternalState, 'permissions'>, timezone: $PropertyType<InternalState, 'timezone'>, preferences: $PropertyType<InternalState, 'preferences'>, roles: $PropertyType<InternalState, 'roles'>, readOnly: $PropertyType<InternalState, 'readOnly'>, external: $PropertyType<InternalState, 'external'>, sessionTimeoutMs: $PropertyType<InternalState, 'sessionTimeoutMs'>, startpage: $PropertyType<InternalState, 'startpage'>, sessionActive: $PropertyType<InternalState, 'sessionActive'>, clientAddress: $PropertyType<InternalState, 'clientAddress'>, lastActivity: $PropertyType<InternalState, 'lastActivity'>, accountStatus: $PropertyType<InternalState, 'accountStatus'>) {
+  constructor(
+    id: $PropertyType<InternalState, 'id'>,
+    username: $PropertyType<InternalState, 'username'>,
+    fullName: $PropertyType<InternalState, 'fullName'>,
+    firstName: $PropertyType<InternalState, 'firstName'>,
+    lastName: $PropertyType<InternalState, 'lastName'>,
+    email: $PropertyType<InternalState, 'email'>,
+    permissions: $PropertyType<InternalState, 'permissions'>,
+    timezone: $PropertyType<InternalState, 'timezone'>,
+    preferences: $PropertyType<InternalState, 'preferences'>,
+    roles: $PropertyType<InternalState, 'roles'>,
+    readOnly: $PropertyType<InternalState, 'readOnly'>,
+    external: $PropertyType<InternalState, 'external'>,
+    sessionTimeoutMs: $PropertyType<InternalState, 'sessionTimeoutMs'>,
+    startpage: $PropertyType<InternalState, 'startpage'>,
+    sessionActive: $PropertyType<InternalState, 'sessionActive'>,
+    clientAddress: $PropertyType<InternalState, 'clientAddress'>,
+    lastActivity: $PropertyType<InternalState, 'lastActivity'>,
+    accountStatus: $PropertyType<InternalState, 'accountStatus'>,
+    grnPermissions: $PropertyType<InternalState, 'grnPermissions'>,
+  ) {
     this._value = {
       id,
       username,
       fullName,
+      firstName,
+      lastName,
       email,
       permissions,
       timezone,
@@ -86,6 +113,7 @@ export default class User {
       clientAddress,
       lastActivity,
       accountStatus,
+      grnPermissions,
     };
   }
 
@@ -101,8 +129,20 @@ export default class User {
     return this._value.fullName;
   }
 
+  get firstName() {
+    return this._value.firstName;
+  }
+
+  get lastName() {
+    return this._value.lastName;
+  }
+
   get email() {
     return this._value.email;
+  }
+
+  get grnPermissions() {
+    return this._value.grnPermissions;
   }
 
   get permissions() {
@@ -198,8 +238,11 @@ export default class User {
       id,
       username,
       fullName,
+      firstName,
+      lastName,
       email,
       permissions,
+      grnPermissions,
       timezone,
       preferences,
       roles,
@@ -218,9 +261,12 @@ export default class User {
       id,
       username,
       fullName,
+      firstName,
+      lastName,
       email,
       permissions,
       timezone,
+      grnPermissions,
       preferences,
       roles,
       readOnly,
@@ -234,8 +280,48 @@ export default class User {
     }));
   }
 
-  static create(id: $PropertyType<InternalState, 'id'>, username: $PropertyType<InternalState, 'username'>, fullName: $PropertyType<InternalState, 'fullName'>, email: $PropertyType<InternalState, 'email'>, permissions: $PropertyType<InternalState, 'permissions'>, timezone: $PropertyType<InternalState, 'timezone'>, preferences: $PropertyType<InternalState, 'preferences'>, roles: $PropertyType<InternalState, 'roles'>, readOnly: $PropertyType<InternalState, 'readOnly'>, external: $PropertyType<InternalState, 'external'>, sessionTimeoutMs: $PropertyType<InternalState, 'sessionTimeoutMs'>, startpage: $PropertyType<InternalState, 'startpage'>, sessionActive: $PropertyType<InternalState, 'sessionActive'>, clientAddress: $PropertyType<InternalState, 'clientAddress'>, lastActivity: $PropertyType<InternalState, 'lastActivity'>, accountStatus: $PropertyType<InternalState, 'accountStatus'>) {
-    return new User(id, username, fullName, email, permissions, timezone, preferences, roles, readOnly, external, sessionTimeoutMs, startpage, sessionActive, clientAddress, lastActivity, accountStatus);
+  static create(
+    id: $PropertyType<InternalState, 'id'>,
+    username: $PropertyType<InternalState, 'username'>,
+    fullName: $PropertyType<InternalState, 'fullName'>,
+    firstName: $PropertyType<InternalState, 'firstName'>,
+    lastName: $PropertyType<InternalState, 'lastName'>,
+    email: $PropertyType<InternalState, 'email'>,
+    permissions: $PropertyType<InternalState, 'permissions'>,
+    timezone: $PropertyType<InternalState, 'timezone'>,
+    preferences: $PropertyType<InternalState, 'preferences'>,
+    roles: $PropertyType<InternalState, 'roles'>,
+    readOnly: $PropertyType<InternalState, 'readOnly'>,
+    external: $PropertyType<InternalState, 'external'>,
+    sessionTimeoutMs: $PropertyType<InternalState, 'sessionTimeoutMs'>,
+    startpage: $PropertyType<InternalState, 'startpage'>,
+    sessionActive: $PropertyType<InternalState, 'sessionActive'>,
+    clientAddress: $PropertyType<InternalState, 'clientAddress'>,
+    lastActivity: $PropertyType<InternalState, 'lastActivity'>,
+    accountStatus: $PropertyType<InternalState, 'accountStatus'>,
+    grnPermissions: $PropertyType<InternalState, 'grnPermissions'>,
+  ) {
+    return new User(
+      id,
+      username,
+      fullName,
+      firstName,
+      lastName,
+      email,
+      permissions,
+      timezone,
+      preferences,
+      roles,
+      readOnly,
+      external,
+      sessionTimeoutMs,
+      startpage,
+      sessionActive,
+      clientAddress,
+      lastActivity,
+      accountStatus,
+      grnPermissions,
+    );
   }
 
   static empty() {
@@ -248,7 +334,10 @@ export default class User {
       id,
       username,
       fullName,
+      firstName,
+      lastName,
       email,
+      grnPermissions,
       permissions,
       timezone,
       preferences,
@@ -267,7 +356,10 @@ export default class User {
       id,
       username,
       full_name: fullName,
+      first_name: firstName,
+      last_name: lastName,
       email,
+      grn_permissions: grnPermissions ? grnPermissions.toJS() : [],
       permissions: permissions ? permissions.toArray() : [],
       timezone,
       preferences,
@@ -288,7 +380,10 @@ export default class User {
       id,
       username,
       full_name,
+      first_name,
+      last_name,
       email,
+      grn_permissions,
       permissions,
       timezone,
       preferences,
@@ -303,7 +398,27 @@ export default class User {
       account_status,
     } = value;
 
-    return User.create(id, username, full_name, email, Immutable.List(permissions), timezone, preferences, Immutable.Set(roles), read_only, external, session_timeout_ms, startpage, session_active, client_address, last_activity, account_status);
+    return User.create(
+      id,
+      username,
+      full_name,
+      first_name,
+      last_name,
+      email,
+      Immutable.List(permissions),
+      timezone,
+      preferences,
+      Immutable.Set(roles),
+      read_only,
+      external,
+      session_timeout_ms,
+      startpage,
+      session_active,
+      client_address,
+      last_activity,
+      account_status,
+      Immutable.List(grn_permissions),
+    );
   }
 
   // eslint-disable-next-line @typescript-eslint/no-use-before-define
@@ -334,8 +449,20 @@ class Builder {
     return new Builder(this.value.set('fullName', value));
   }
 
+  firstName(value: $PropertyType<InternalState, 'firstName'>) {
+    return new Builder(this.value.set('firstName', value));
+  }
+
+  lastName(value: $PropertyType<InternalState, 'lastName'>) {
+    return new Builder(this.value.set('lastName', value));
+  }
+
   email(value: $PropertyType<InternalState, 'email'>) {
     return new Builder(this.value.set('email', value));
+  }
+
+  grnPermissions(value: $PropertyType<InternalState, 'grnPermissions'>) {
+    return new Builder(this.value.set('grnPermissions', value));
   }
 
   permissions(value: $PropertyType<InternalState, 'permissions'>) {
@@ -391,6 +518,8 @@ class Builder {
       id,
       username,
       fullName,
+      firstName,
+      lastName,
       email,
       permissions,
       timezone,
@@ -404,8 +533,29 @@ class Builder {
       clientAddress,
       lastActivity,
       accountStatus,
+      grnPermissions,
     } = this.value.toObject();
 
-    return new User(id, username, fullName, email, permissions, timezone, preferences, roles, readOnly, external, sessionTimeoutMs, startpage, sessionActive, clientAddress, lastActivity, accountStatus);
+    return new User(
+      id,
+      username,
+      fullName,
+      firstName,
+      lastName,
+      email,
+      permissions,
+      timezone,
+      preferences,
+      roles,
+      readOnly,
+      external,
+      sessionTimeoutMs,
+      startpage,
+      sessionActive,
+      clientAddress,
+      lastActivity,
+      accountStatus,
+      grnPermissions,
+    );
   }
 }

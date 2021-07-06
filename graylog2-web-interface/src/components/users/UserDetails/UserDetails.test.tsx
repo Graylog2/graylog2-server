@@ -19,7 +19,7 @@ import * as Immutable from 'immutable';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import { paginatedShares } from 'fixtures/sharedEntities';
 import { reader as assignedRole } from 'fixtures/roles';
-import { admin as currentUser } from 'fixtures/users';
+import { alice } from 'fixtures/users';
 
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import User from 'logic/users/User';
@@ -45,6 +45,8 @@ jest.mock('stores/permissions/EntityShareStore', () => ({
 const user = User
   .builder()
   .fullName('The full name')
+  .firstName('The first name')
+  .lastName('The last name')
   .username('The username')
   .email('theemail@example.org')
   .clientAddress('127.0.0.1')
@@ -54,8 +56,9 @@ const user = User
   .build();
 
 describe('<UserDetails />', () => {
+  const currentUser = alice.toBuilder().permissions(Immutable.List(['*'])).build();
   const SutComponent = (props) => (
-    <CurrentUserContext.Provider value={{ ...currentUser, permissions: ['*'] }}>
+    <CurrentUserContext.Provider value={currentUser}>
       <UserDetails {...props} />
     </CurrentUserContext.Provider>
   );
@@ -69,7 +72,8 @@ describe('<UserDetails />', () => {
 
     await screen.findByText(user.username);
 
-    expect(screen.getByText(user.fullName)).toBeInTheDocument();
+    expect(screen.getByText(user.firstName)).toBeInTheDocument();
+    expect(screen.getByText(user.lastName)).toBeInTheDocument();
     expect(screen.getByText(user.email)).toBeInTheDocument();
     expect(screen.getByText(user.clientAddress)).toBeInTheDocument();
 

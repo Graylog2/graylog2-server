@@ -15,21 +15,42 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
-import { StoreMock as MockStore } from 'helpers/mocking';
+import { act, render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
+import MockStore from 'helpers/mocking/StoreMock';
 
 import { GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
+import { SearchActions } from 'views/stores/SearchStore';
+import WidgetFocusContext, {
+  WidgetEditingState,
+  WidgetFocusingState,
+} from 'views/components/contexts/WidgetFocusContext';
 
 import DashboardSearchBar from './DashboardSearchBar';
 
 jest.mock('views/components/ViewActionsMenu', () => () => <span>View Actions</span>);
 
 jest.mock('views/stores/GlobalOverrideStore', () => ({
-  GlobalOverrideActions: {
-    set: jest.fn(() => Promise.resolve()),
-  },
   GlobalOverrideStore: MockStore(),
+  GlobalOverrideActions: {
+    set: jest.fn().mockResolvedValue({}),
+  },
 }));
+
+jest.mock('views/stores/SearchStore', () => ({
+  SearchActions: {
+    refresh: jest.fn(),
+  },
+}));
+
+jest.mock('views/stores/SearchConfigStore', () => ({
+  SearchConfigStore: MockStore(['getInitialState', () => ({})]),
+  SearchConfigActions: {
+    refresh: jest.fn(() => Promise.resolve()),
+  },
+}));
+
+jest.mock('views/components/searchbar/AsyncQueryInput', () => () => null);
 
 const config = {
   analysis_disabled_fields: ['full_message', 'message'],
@@ -40,41 +61,91 @@ const config = {
 };
 
 describe('DashboardSearchBar', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
   const onExecute = jest.fn();
 
-  it('should render the DashboardSearchBar', () => {
+  it('should render the DashboardSearchBar', async () => {
     render(<DashboardSearchBar onExecute={onExecute} config={config} />);
 
-    const timeRangeButton = screen.getByLabelText('Open Time Range Selector');
-    const timeRangeDisplay = screen.getByLabelText('Search Time Range, Opens Time Range Selector On Click');
-    const liveUpdate = screen.getByLabelText('Refresh Search Controls');
-    const searchButton = screen.getByTitle('Perform search');
-
-    expect(timeRangeButton).not.toBeNull();
-    expect(timeRangeDisplay).not.toBeNull();
-    expect(liveUpdate).not.toBeNull();
-    expect(searchButton).not.toBeNull();
+    await screen.findByLabelText('Open Time Range Selector');
+    await screen.findByLabelText('Search Time Range, Opens Time Range Selector On Click');
+    await screen.findByLabelText('Refresh Search Controls');
+    await screen.findByTitle('Perform search');
   });
 
-  it('defaults to no override being selected', () => {
+  it('defaults to no override being selected', async () => {
     render(<DashboardSearchBar onExecute={onExecute} config={config} />);
 
-    expect(screen.getByText('No Override')).toBeVisible();
+    await screen.findByText('No Override');
   });
 
-  it('should call onExecute and set global override when search is performed', async () => {
+  it('should refresh search when button is clicked', async () => {
     render(<DashboardSearchBar onExecute={onExecute} config={config} />);
 
     const searchButton = screen.getByTitle('Perform search');
 
     fireEvent.click(searchButton);
 
-    await waitFor(() => expect(onExecute).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(SearchActions.refresh).toHaveBeenCalledTimes(1));
+  });
 
-    expect(GlobalOverrideActions.set).toHaveBeenCalledWith(undefined, '');
+  it('should call onExecute and set global override when search is performed', async () => {
+    render(<DashboardSearchBar onExecute={onExecute} config={config} />);
+
+    const timeRangeInput = await screen.findByText(/no override/i);
+
+    act(() => {
+      userEvent.click(timeRangeInput);
+    });
+
+    userEvent.click(await screen.findByRole('tab', { name: 'Relative' }));
+    userEvent.click(await screen.findByRole('button', { name: 'Apply' }));
+
+    const searchButton = await screen.findByTitle('Perform search (changes were made after last search execution)');
+
+    fireEvent.click(searchButton);
+
+    await waitFor(() => expect(GlobalOverrideActions.set).toHaveBeenCalledWith({ type: 'relative', from: 300 }, ''));
+  });
+
+  it('should hide the save and load controls if a widget is being edited', async () => {
+    const focusedWidget: WidgetEditingState = { id: 'foo', editing: true, focusing: true };
+    const widgetFocusContext = {
+      focusedWidget,
+      setWidgetFocusing: () => {},
+      setWidgetEditing: () => {},
+      unsetWidgetFocusing: () => {},
+      unsetWidgetEditing: () => {},
+    };
+
+    render(
+      <WidgetFocusContext.Provider value={widgetFocusContext}>
+        <DashboardSearchBar onExecute={onExecute} config={config} />
+      </WidgetFocusContext.Provider>,
+    );
+
+    await screen.findByText('Not updating');
+
+    const saveBtn = screen.queryByText('View Actions');
+
+    expect(saveBtn).toBeNull();
+  });
+
+  it('should show the save and load controls if a widget is not being edited', async () => {
+    const focusedWidget: WidgetFocusingState = { id: 'foo', editing: false, focusing: true };
+    const widgetFocusContext = {
+      focusedWidget,
+      setWidgetFocusing: () => {},
+      setWidgetEditing: () => {},
+      unsetWidgetFocusing: () => {},
+      unsetWidgetEditing: () => {},
+    };
+
+    render(
+      <WidgetFocusContext.Provider value={widgetFocusContext}>
+        <DashboardSearchBar onExecute={onExecute} config={config} />
+      </WidgetFocusContext.Provider>,
+    );
+
+    await screen.findByText('View Actions');
   });
 });

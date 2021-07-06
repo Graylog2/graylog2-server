@@ -20,6 +20,7 @@ import styled, { css } from 'styled-components';
 
 import { Button } from 'components/graylog';
 import { Icon } from 'components/common';
+import { SearchActions } from 'views/stores/SearchStore';
 
 const StyledButton = styled(Button)`
   margin-right: 7px;
@@ -46,20 +47,27 @@ type Props = {
   dirty: boolean,
 };
 
-const SearchButton = ({ disabled, glyph, dirty }: Props) => {
-  const ButtonComponent = dirty ? DirtyButton : StyledButton;
-  const title = dirty ? 'Perform search (changes were made after last search execution)' : 'Perform search';
+const DirtySearchButton = ({ disabled, glyph }: { disabled: boolean, glyph: string }) => (
+  <DirtyButton type="submit"
+               bsStyle="success"
+               disabled={disabled}
+               title="Perform search (changes were made after last search execution)"
+               className="pull-left">
+    <Icon name={glyph} />
+  </DirtyButton>
+);
 
-  return (
-    <ButtonComponent type="submit"
-                     bsStyle="success"
-                     disabled={disabled}
-                     title={title}
-                     className="pull-left">
-      <Icon name={glyph} />
-    </ButtonComponent>
-  );
-};
+const CleanSearchButton = ({ disabled, glyph }: { disabled: boolean, glyph: string }) => (
+  <StyledButton bsStyle="success"
+                onClick={() => SearchActions.refresh()}
+                disabled={disabled}
+                title="Perform search"
+                className="pull-left">
+    <Icon name={glyph} />
+  </StyledButton>
+);
+
+const SearchButton = ({ dirty, ...rest }: Props) => (dirty ? <DirtySearchButton {...rest} /> : <CleanSearchButton {...rest} />);
 
 SearchButton.defaultProps = {
   disabled: false,

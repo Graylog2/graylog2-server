@@ -51,7 +51,7 @@ const SidecarStatus = createReactClass({
         <dt>Operating System</dt>
         <dd>{lodash.defaultTo(details.operating_system, 'Not available')}</dd>
         <dt>CPU Idle</dt>
-        <dd>{lodash.isNumber(metrics.cpu_idle) ? `${metrics.cpu_idle}%` : 'Not available' }</dd>
+        <dd>{lodash.isNumber(metrics.cpu_idle) ? `${metrics.cpu_idle}%` : 'Not available'}</dd>
         <dt>Load</dt>
         <dd>{lodash.defaultTo(metrics.load_1, 'Not available')}</dd>
         <dt>Volumes &gt; 75% full</dt>

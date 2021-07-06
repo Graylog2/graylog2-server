@@ -49,6 +49,8 @@ public class ViewsAuditEventTypes implements PluginAuditEventTypes {
     public static final String MESSAGES_EXPORT_REQUESTED = MESSAGES_EXPORT + "_requested";
     public static final String MESSAGES_EXPORT_SUCCEEDED = MESSAGES_EXPORT + "_succeeded";
 
+    public static final String EXPORT_JOB = "export_job";
+    public static final String EXPORT_JOB_CREATED = PREFIX + EXPORT_JOB + ":created";
 
     private static final ImmutableSet<String> EVENT_TYPES = ImmutableSet.<String>builder()
             .add(VIEW_CREATE)
@@ -67,6 +69,8 @@ public class ViewsAuditEventTypes implements PluginAuditEventTypes {
 
             .add(MESSAGES_EXPORT_REQUESTED)
             .add(MESSAGES_EXPORT_SUCCEEDED)
+
+            .add(EXPORT_JOB_CREATED)
 
             .build();
 

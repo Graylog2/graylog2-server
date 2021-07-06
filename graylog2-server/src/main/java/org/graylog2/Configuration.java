@@ -29,7 +29,6 @@ import com.github.joschi.jadconfig.validators.PositiveLongValidator;
 import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
 import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.security.realm.RootAccountRealm;
-import org.graylog2.shared.security.tls.DefaultTLSProtocolProvider;
 import org.graylog2.utilities.IPSubnetConverter;
 import org.graylog2.utilities.IpSubnet;
 import org.joda.time.DateTimeZone;
@@ -159,8 +158,12 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "deactivated_builtin_authentication_providers", converter = StringSetConverter.class)
     private Set<String> deactivatedBuiltinAuthenticationProviders = Collections.emptySet();
 
+    // This is needed for backwards compatibility. The setting in TLSProtocolsConfiguration should be used instead.
     @Parameter(value = "enabled_tls_protocols", converter = StringSetConverter.class)
-    private Set<String> enabledTlsProtocols = DefaultTLSProtocolProvider.getDefaultSupportedTlsProtocols();
+    private Set<String> enabledTlsProtocols = null;
+
+    @Parameter(value = "is_cloud")
+    private boolean isCloud = false;
 
     public boolean isMaster() {
         return isMaster;
@@ -196,6 +199,10 @@ public class Configuration extends BaseConfiguration {
 
     public int getOutputBufferProcessorKeepAliveTime() {
         return outputBufferProcessorKeepAliveTime;
+    }
+
+    public boolean isCloud() {
+        return isCloud;
     }
 
     @Override
@@ -317,6 +324,10 @@ public class Configuration extends BaseConfiguration {
         return deactivatedBuiltinAuthenticationProviders;
     }
 
+    /**
+     * This is needed for backwards compatibility. The setting in TLSProtocolsConfiguration should be used instead.
+     */
+    @Deprecated
     public Set<String> getEnabledTlsProtocols() {
         return enabledTlsProtocols;
     }

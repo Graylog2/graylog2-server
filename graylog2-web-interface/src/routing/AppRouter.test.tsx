@@ -19,7 +19,7 @@ import { render } from 'wrappedTestingLibrary';
 import mockComponent from 'helpers/mocking/MockComponent';
 import { CombinedProviderMock as MockCombinedProvider, StoreMock as MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
-import { admin } from 'fixtures/users';
+import { adminUser as currentUser } from 'fixtures/users';
 
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import usePluginEntities from 'views/logic/usePluginEntities';
@@ -48,7 +48,7 @@ describe('AppRouter', () => {
   });
 
   const AppRouterWithContext = () => (
-    <CurrentUserContext.Provider value={admin}>
+    <CurrentUserContext.Provider value={currentUser}>
       <AppRouter />
     </CurrentUserContext.Provider>
   );
@@ -60,7 +60,7 @@ describe('AppRouter', () => {
   });
 
   it('renders null-parent component plugin routes without application chrome', async () => {
-    asMock(usePluginEntities).mockReturnValue([{ parentComponent: null, component: () => <span>Hey there!</span> }]);
+    asMock(usePluginEntities).mockReturnValue([{ parentComponent: null, component: () => <span>Hey there!</span>, path: '/' }]);
 
     const { findByText, queryByTitle } = render(<AppRouterWithContext />);
 

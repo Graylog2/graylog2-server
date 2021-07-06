@@ -24,6 +24,7 @@ import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewService;
+import org.graylog.plugins.views.search.views.ViewSummaryDTO;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.rest.models.PaginatedResponse;
 import org.graylog2.search.SearchQuery;
@@ -49,8 +50,9 @@ import static java.util.Locale.ENGLISH;
 @Path("/dashboards")
 public class DashboardsResource extends RestResource {
     private static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
-            .put("id", SearchQueryField.create(ViewDTO.FIELD_ID))
+            .put("id", SearchQueryField.create("_id", SearchQueryField.Type.OBJECT_ID))
             .put("title", SearchQueryField.create(ViewDTO.FIELD_TITLE))
+            .put("description", SearchQueryField.create(ViewDTO.FIELD_DESCRIPTION))
             .put("summary", SearchQueryField.create(ViewDTO.FIELD_DESCRIPTION))
             .build();
     private final ViewService dbService;
@@ -65,14 +67,14 @@ public class DashboardsResource extends RestResource {
     @GET
     @ApiOperation("Get a list of all dashboards")
     @Timed
-    public PaginatedResponse<ViewDTO> views(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
-                                            @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
-                                            @ApiParam(name = "sort",
+    public PaginatedResponse<ViewSummaryDTO> views(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+                                                   @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+                                                   @ApiParam(name = "sort",
                                                       value = "The field to sort the result on",
                                                       required = true,
                                                       allowableValues = "id,title,created_at") @DefaultValue(ViewDTO.FIELD_TITLE) @QueryParam("sort") String sortField,
-                                            @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc") @DefaultValue("asc") @QueryParam("order") String order,
-                                            @ApiParam(name = "query") @QueryParam("query") String query) {
+                                                   @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc") @DefaultValue("asc") @QueryParam("order") String order,
+                                                   @ApiParam(name = "query") @QueryParam("query") String query) {
 
         if (!ViewDTO.SORT_FIELDS.contains(sortField.toLowerCase(ENGLISH))) {
             sortField = ViewDTO.FIELD_TITLE;
@@ -80,7 +82,7 @@ public class DashboardsResource extends RestResource {
 
         try {
             final SearchQuery searchQuery = searchQueryParser.parse(query);
-            final PaginatedList<ViewDTO> result = dbService.searchPaginatedByType(
+            final PaginatedList<ViewSummaryDTO> result = dbService.searchSummariesPaginatedByType(
                     ViewDTO.Type.DASHBOARD,
                     searchQuery,
                     view -> isPermitted(ViewsRestPermissions.VIEW_READ, view.id())

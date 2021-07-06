@@ -17,6 +17,7 @@
 import React from 'react';
 import $ from 'jquery';
 
+import { Button } from 'components/graylog';
 import { ConfigurationForm } from 'components/configurationforms';
 
 class CreateOutputDropdown extends React.Component {
@@ -40,7 +41,7 @@ class CreateOutputDropdown extends React.Component {
             {outputTypes}
           </select>
                     &nbsp;
-          <button className="btn btn-success" disabled={this.state.typeName === this.PLACEHOLDER} onClick={this._openModal}>Launch new output</button>
+          <Button bsStyle="success" disabled={this.state.typeName === this.PLACEHOLDER} onClick={this._openModal}>Launch new output</Button>
         </div>
 
         <ConfigurationForm ref={(configurationForm) => { this.configurationForm = configurationForm; }}

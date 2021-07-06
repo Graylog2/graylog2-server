@@ -42,6 +42,6 @@ describe('RuntimeErrorPage', () => {
 
     fireEvent.click(showMoreButton);
 
-    waitFor(() => expect(getByText('The component stack')).not.toBeNull());
+    await waitFor(() => expect(getByText(/The component stack/)).not.toBeNull());
   });
 });

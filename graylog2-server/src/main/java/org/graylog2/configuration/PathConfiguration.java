@@ -17,11 +17,17 @@
 package org.graylog2.configuration;
 
 import com.github.joschi.jadconfig.Parameter;
+import org.graylog2.configuration.converters.SortedPathSetConverter;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.Set;
+import java.util.SortedSet;
 
-public abstract class PathConfiguration {
+public class PathConfiguration {
+    public static final String ALLOWED_AUXILIARY_PATHS = "allowed_auxiliary_paths";
+
     protected static final Path DEFAULT_BIN_DIR = Paths.get("bin");
     protected static final Path DEFAULT_DATA_DIR = Paths.get("data");
     protected static final Path DEFAULT_PLUGIN_DIR = Paths.get("plugin");
@@ -34,6 +40,19 @@ public abstract class PathConfiguration {
 
     @Parameter(value = "plugin_dir", required = true)
     private Path pluginDir = DEFAULT_PLUGIN_DIR;
+
+    /**
+     * Optional allowed paths for Graylog data files.
+     *
+     * If provided, certain operations in Graylog will only be permitted if the data file(s) are located in the
+     * specified paths. All subdirectories of indicated paths are allowed by default.
+     *
+     * This provides an additional layer of security, and allows administrators to control where in the file system
+     * Graylog users can select files from. It protects against the potential inspection of arbitrary files in the
+     * file system from the Graylog user interface.
+     */
+    @Parameter(value = ALLOWED_AUXILIARY_PATHS, converter = SortedPathSetConverter.class)
+    private SortedSet<Path> allowedAuxiliaryPaths = Collections.emptySortedSet();
 
     public Path getBinDir() {
         return binDir;
@@ -50,4 +69,7 @@ public abstract class PathConfiguration {
         return pluginDir;
     }
 
+    public Set<Path> getAllowedAuxiliaryPaths() {
+        return allowedAuxiliaryPaths;
+    }
 }

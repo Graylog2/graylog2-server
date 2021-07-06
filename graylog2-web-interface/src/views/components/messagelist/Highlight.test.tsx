@@ -112,13 +112,12 @@ describe('Highlight', () => {
     const message = messageFor({
       foo: [{ start: 3, length: 256 }],
     });
-    const { debug, findByText } = render(
+    const { findByText } = render(
       <AdditionalContext.Provider value={{ message }}>
         <Highlight field="foo" value="foobar" />
       </AdditionalContext.Provider>,
     );
 
-    debug();
     const elem = await findByText(hasBrokenUpText('foobar'));
 
     expect(elem).toMatchSnapshot();

@@ -18,6 +18,7 @@ import * as React from 'react';
 import { mount } from 'wrappedEnzyme';
 import * as Immutable from 'immutable';
 import suppressConsole from 'helpers/suppressConsole';
+import { MockStore } from 'helpers/mocking';
 
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldType from 'views/logic/fieldtypes/FieldType';
@@ -27,6 +28,10 @@ import MessageTable from './MessageTable';
 
 import InteractiveContext from '../contexts/InteractiveContext';
 import HighlightMessageContext from '../contexts/HighlightMessageContext';
+
+jest.mock('stores/configurations/ConfigurationsStore', () => ({
+  ConfigurationsStore: MockStore(),
+}));
 
 const messages = [
   {
@@ -71,14 +76,13 @@ describe('MessageTable', () => {
     expect(td.text()).toContain('frank.txt');
   });
 
-  it('renders a table entry for messages, even if fields are `undefined`', () => {
+  it('renders a table entry for messages, even if fields are `undefined`', async () => {
     // Suppressing console to disable props warning because of `fields` being `undefined`.
-    suppressConsole(() => {
-      const wrapper = mount(<SimpleMessageTable fields={undefined} />);
-      const messageTableEntry = wrapper.find('MessageTableEntry');
+    const wrapper = await suppressConsole(() => mount(<SimpleMessageTable fields={undefined} />));
 
-      expect(messageTableEntry).not.toBeEmptyRender();
-    });
+    const messageTableEntry = wrapper.find('MessageTableEntry');
+
+    expect(messageTableEntry).not.toBeEmptyRender();
   });
 
   it('renders config fields in table head with correct order', () => {

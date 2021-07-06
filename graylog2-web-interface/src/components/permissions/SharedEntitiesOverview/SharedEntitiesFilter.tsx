@@ -82,7 +82,7 @@ const SharedEntitiesFilter = ({ onSearch, onFilter }: Props) => (
         <StyledSelect inputId="capability-select"
                       onChange={(capability) => onFilter('capability', capability)}
                       options={capabilityOptions}
-                      placeholder="Filter capabilies" />
+                      placeholder="Filter capabilities" />
       </SelectWrapper>
     </Filters>
   </>

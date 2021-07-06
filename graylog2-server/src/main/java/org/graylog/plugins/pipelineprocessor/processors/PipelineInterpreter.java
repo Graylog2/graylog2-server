@@ -35,7 +35,6 @@ import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.Stage;
 import org.graylog.plugins.pipelineprocessor.ast.statements.Statement;
-import org.graylog.plugins.pipelineprocessor.codegen.GeneratedRule;
 import org.graylog.plugins.pipelineprocessor.db.RuleMetricsConfigDto;
 import org.graylog.plugins.pipelineprocessor.processors.listeners.InterpreterListener;
 import org.graylog.plugins.pipelineprocessor.processors.listeners.NoopInterpreterListener;
@@ -47,7 +46,7 @@ import org.graylog2.plugin.Messages;
 import org.graylog2.plugin.messageprocessors.MessageProcessor;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
-import org.graylog2.shared.journal.Journal;
+import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.graylog2.shared.metrics.MetricUtils;
 import org.graylog2.shared.utilities.ExceptionUtils;
 import org.jooq.lambda.tuple.Tuple2;
@@ -71,18 +70,18 @@ import static org.jooq.lambda.tuple.Tuple.tuple;
 public class PipelineInterpreter implements MessageProcessor {
     private static final Logger log = LoggerFactory.getLogger(PipelineInterpreter.class);
 
-    private final Journal journal;
+    private final MessageQueueAcknowledger messageQueueAcknowledger;
     private final Meter filteredOutMessages;
     private final Timer executionTime;
     private final MetricRegistry metricRegistry;
     private final ConfigurationStateUpdater stateUpdater;
 
     @Inject
-    public PipelineInterpreter(Journal journal,
+    public PipelineInterpreter(MessageQueueAcknowledger messageQueueAcknowledger,
                                MetricRegistry metricRegistry,
                                ConfigurationStateUpdater stateUpdater) {
 
-        this.journal = journal;
+        this.messageQueueAcknowledger = messageQueueAcknowledger;
         this.filteredOutMessages = metricRegistry.meter(name(ProcessBufferProcessor.class, "filteredOutMessages"));
         this.executionTime = metricRegistry.timer(name(PipelineInterpreter.class, "executionTime"));
         this.metricRegistry = metricRegistry;
@@ -175,7 +174,7 @@ public class PipelineInterpreter implements MessageProcessor {
         if (message.getFilterOut()) {
             log.debug("[{}] marked message to be discarded. Dropping message.", message.getId());
             filteredOutMessages.mark();
-            journal.markJournalOffsetCommitted(message.getJournalOffset());
+            messageQueueAcknowledger.acknowledge(message);
         }
     }
 
@@ -263,8 +262,9 @@ public class PipelineInterpreter implements MessageProcessor {
         // pipeline execution ordering is not guaranteed
         while (stages.hasNext()) {
             final List<Stage> stageSet = stages.next();
-            for (final Stage stage : stageSet)
+            for (final Stage stage : stageSet) {
                 evaluateStage(stage, message, msgId, result, pipelinesToSkip, interpreterListener);
+            }
         }
 
         // 7. return the processed messages
@@ -300,13 +300,22 @@ public class PipelineInterpreter implements MessageProcessor {
         boolean anyRulesMatched = stageRules.isEmpty(); // If there are no rules, we can simply continue to the next stage
         boolean allRulesMatched = true;
         for (Rule rule : stageRules) {
-            final boolean ruleCondition = evaluateRuleCondition(rule, message, msgId, pipeline, context, rulesToRun, interpreterListener);
-            anyRulesMatched |= ruleCondition;
-            allRulesMatched &= ruleCondition;
+            try {
+                final boolean ruleCondition = evaluateRuleCondition(rule, message, msgId, pipeline, context, rulesToRun, interpreterListener);
+                anyRulesMatched |= ruleCondition;
+                allRulesMatched &= ruleCondition;
+            } catch (Exception e) {
+                log.warn("Error evaluating condition for rule <{}/{}> with message: {} (Error: {})",
+                        rule.name(), rule.id(), message, e.getMessage());
+                throw e;
+            }
         }
 
         for (Rule rule : rulesToRun) {
             if (!executeRuleActions(rule, message, msgId, pipeline, context, interpreterListener)) {
+                final EvaluationContext.EvalError lastError = Iterables.getLast(context.evaluationErrors());
+                log.warn("Error evaluating action for rule <{}/{}> with message: {} (Error: {})",
+                        rule.name(), rule.id(), message, lastError);
                 // if any of the rules raise an error, skip the rest of the rules
                 break;
             }
@@ -349,27 +358,10 @@ public class PipelineInterpreter implements MessageProcessor {
         interpreterListener.executeRule(rule, pipeline);
         try {
             log.debug("[{}] rule `{}` matched running actions", msgId, rule.name());
-            final GeneratedRule generatedRule = rule.generatedRule();
-            if (generatedRule != null) {
-                try {
-                    generatedRule.then(context);
-                    return true;
-                } catch (Exception ignored) {
-                    final EvaluationContext.EvalError lastError = Iterables.getLast(context.evaluationErrors());
-                    appendProcessingError(rule, message, lastError.toString());
-                    log.debug("Encountered evaluation error, skipping rest of the rule: {}", lastError);
-                    rule.markFailure();
+            for (Statement statement : rule.then()) {
+                if (!evaluateStatement(message, interpreterListener, pipeline, context, rule, statement)) {
+                    // statement raised an error, skip the rest of the rule
                     return false;
-                }
-            } else {
-                if (ConfigurationStateUpdater.isAllowCodeGeneration()) {
-                    throw new IllegalStateException("Should have generated code and not interpreted the tree");
-                }
-                for (Statement statement : rule.then()) {
-                    if (!evaluateStatement(message, interpreterListener, pipeline, context, rule, statement)) {
-                        // statement raised an error, skip the rest of the rule
-                        return false;
-                    }
                 }
             }
             return true;
@@ -403,8 +395,7 @@ public class PipelineInterpreter implements MessageProcessor {
                                           EvaluationContext context,
                                           List<Rule> rulesToRun, InterpreterListener interpreterListener) {
         interpreterListener.evaluateRule(rule, pipeline);
-        final GeneratedRule generatedRule = rule.generatedRule();
-        boolean matched = generatedRule != null ? generatedRule.when(context) : rule.when().evaluateBool(context);
+        boolean matched = rule.when().evaluateBool(context);
         if (matched) {
             rule.markMatch();
 
@@ -475,7 +466,7 @@ public class PipelineInterpreter implements MessageProcessor {
                     .recordStats()
                     .build(new CacheLoader<Set<Pipeline>, StageIterator.Configuration>() {
                         @Override
-                        public StageIterator.Configuration load(@Nonnull Set<Pipeline> pipelines) throws Exception {
+                        public StageIterator.Configuration load(@Nonnull Set<Pipeline> pipelines) {
                             return new StageIterator.Configuration(pipelines);
                         }
                     });

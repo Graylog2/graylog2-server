@@ -17,7 +17,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import jQuery from 'jquery';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import ObjectID from 'bson-objectid';
 
 import { ConfigurationForm } from 'components/configurationforms';
@@ -27,20 +27,21 @@ import { Select } from 'components/common';
 import InlineForm from './InlineForm';
 import PopoverHelp from './PopoverHelp';
 
+// eslint-disable-next-line import/no-webpack-loader-syntax
 import DecoratorStyles from '!style!css!./decoratorStyles.css';
 
-const ConfigurationFormContainer = styled.div`
+const ConfigurationFormContainer = styled.div(({ theme }) => css`
   margin-bottom: 10px;
   margin-top: 10px;
   margin-left: 5px;
   display: inline-block;
   border-style: solid;
-  border-color: lightgray;
+  border-color: ${theme.colors.gray[80]};
   border-radius: 5px;
   border-width: 1px;
   padding: 10px;
-  background: white;
-`;
+  background: ${theme.colors.background};
+`);
 
 class AddDecoratorButton extends React.Component {
   static propTypes = {

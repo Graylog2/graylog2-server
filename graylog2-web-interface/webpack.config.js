@@ -97,7 +97,7 @@ const webpackConfig = {
   entry: {
     app: APP_PATH,
     builtins: [path.resolve(APP_PATH, 'injection', 'builtins.js')],
-    polyfill: ['@babel/polyfill'],
+    polyfill: [path.resolve(APP_PATH, 'polyfill.js')],
   },
   output: {
     path: BUILD_PATH,
@@ -228,7 +228,9 @@ if (TARGET === 'start') {
     plugins: [
       new webpack.DefinePlugin({
         DEVELOPMENT: true,
-        GRAYLOG_HTTP_PUBLISH_URI: JSON.stringify(process.env.GRAYLOG_HTTP_PUBLISH_URI),
+        // Keep old env to avoid breaking developer setups
+        GRAYLOG_API_URL: JSON.stringify(process.env.GRAYLOG_API_URL || process.env.GRAYLOG_HTTP_PUBLISH_URI),
+        IS_CLOUD: process.env.IS_CLOUD,
       }),
       new CopyWebpackPlugin({ patterns: [{ from: 'config.js' }] }),
       new webpack.HotModuleReplacementPlugin(),

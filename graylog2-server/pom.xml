@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.graylog</groupId>
         <artifactId>graylog-project-parent</artifactId>
-        <version>4.1.0-SNAPSHOT</version>
+        <version>4.2.0-SNAPSHOT</version>
         <relativePath>../graylog-project-parent</relativePath>
     </parent>
 
@@ -166,6 +166,12 @@
             <artifactId>jackson-module-jsonSchema</artifactId>
         </dependency>
         <dependency>
+	    <!-- Workaround for https://github.com/FasterXML/jackson-bom/pull/38 -->
+            <groupId>com.fasterxml.jackson.module</groupId>
+            <artifactId>jackson-module-scala_2.13</artifactId>
+            <version>2.9.10</version>
+        </dependency>
+        <dependency>
             <groupId>com.fasterxml.jackson.jaxrs</groupId>
             <artifactId>jackson-jaxrs-json-provider</artifactId>
         </dependency>
@@ -201,6 +207,19 @@
         <dependency>
             <groupId>io.dropwizard.metrics</groupId>
             <artifactId>metrics-json</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.prometheus</groupId>
+            <artifactId>simpleclient_dropwizard</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.prometheus</groupId>
+            <artifactId>simpleclient_hotspot</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.prometheus</groupId>
+            <artifactId>simpleclient_httpserver</artifactId>
         </dependency>
 
         <dependency>
@@ -242,6 +261,10 @@
         <dependency>
             <groupId>org.glassfish.jersey.media</groupId>
             <artifactId>jersey-media-json-jackson</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-multipart</artifactId>
         </dependency>
         <dependency>
             <groupId>org.glassfish.jersey.containers</groupId>
@@ -504,8 +527,12 @@
             <artifactId>amqp-client</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.graylog.shaded</groupId>
+            <artifactId>kafka09_2.11</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.apache.kafka</groupId>
-            <artifactId>kafka_2.11</artifactId>
+            <artifactId>kafka_2.13</artifactId>
         </dependency>
         <dependency>
             <groupId>org.graylog2</groupId>
@@ -547,10 +574,6 @@
         <dependency>
             <groupId>org.jooq</groupId>
             <artifactId>jool-java-8</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.squareup</groupId>
-            <artifactId>javapoet</artifactId>
         </dependency>
         <dependency>
             <groupId>org.freemarker</groupId>
@@ -659,6 +682,10 @@
             <version>1.5.0</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -726,13 +753,6 @@
                     <shadedArtifactAttached>true</shadedArtifactAttached>
                     <minimizeJar>false</minimizeJar>
                     <filters>
-                        <!-- http://foxglovesecurity.com/2015/11/06/what-do-weblogic-websphere-jboss-jenkins-opennms-and-your-application-have-in-common-this-vulnerability/ -->
-                        <filter>
-                            <artifact>commons-collections:commons-collections</artifact>
-                            <excludes>
-                                <exclude>org/apache/commons/collections/functors/InvokerTransformer.class</exclude>
-                            </excludes>
-                        </filter>
                         <!-- Bouncycastle's JARs are signed. When building a shaded JAR, either remove the signatures, or
                              add dependency to the main JAR's manifest. Otherwise running the application will fail. -->
                         <filter>
@@ -966,6 +986,16 @@
                                 <phase>test</phase>
                                 <configuration>
                                     <arguments>test</arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>yarn test:integration</id>
+                                <goals>
+                                    <goal>yarn</goal>
+                                </goals>
+                                <phase>test</phase>
+                                <configuration>
+                                    <arguments>test:integration</arguments>
                                 </configuration>
                             </execution>
                             <execution>

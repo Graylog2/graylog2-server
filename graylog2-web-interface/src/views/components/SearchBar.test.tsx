@@ -19,9 +19,12 @@ import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
 import { StoreMock as MockStore } from 'helpers/mocking';
 import mockAction from 'helpers/mocking/MockAction';
 
-import { QueriesActions } from 'views/stores/QueriesStore';
+import { SearchActions } from 'views/stores/SearchStore';
 // eslint-disable-next-line import/no-named-default
 import { default as MockQuery } from 'views/logic/queries/Query';
+import WidgetFocusContext, {
+  WidgetEditingState, WidgetFocusingState,
+} from 'views/components/contexts/WidgetFocusContext';
 
 import SearchBar from './SearchBar';
 
@@ -38,8 +41,15 @@ jest.mock('stores/streams/StreamsStore', () => MockStore(
   'availableStreams',
 ));
 
+jest.mock('views/stores/SearchConfigStore', () => ({
+  SearchConfigStore: MockStore(['getInitialState', () => ({})]),
+  SearchConfigActions: {
+    refresh: jest.fn(() => Promise.resolve()),
+  },
+}));
+
 jest.mock('views/components/searchbar/QueryInput', () => 'query-input');
-jest.mock('views/components/searchbar/saved-search/SavedSearchControls', () => 'saved-search-controls');
+jest.mock('views/components/searchbar/saved-search/SavedSearchControls', () => jest.fn(() => <div>Saved Search Controls</div>));
 
 jest.mock('views/stores/CurrentQueryStore', () => ({
   CurrentQueryStore: MockStore(['getInitialState', () => MockQuery.builder()
@@ -59,18 +69,18 @@ describe('SearchBar', () => {
   };
 
   beforeEach(() => {
-    QueriesActions.update = mockAction(jest.fn());
+    SearchActions.refresh = mockAction(jest.fn());
   });
 
-  it('should render the SearchBar', () => {
+  it('should render the SearchBar', async () => {
     render(<SearchBar config={config} />);
 
-    const timeRangeButton = screen.getByLabelText('Open Time Range Selector');
+    const timeRangeButton = await screen.findByLabelText('Open Time Range Selector');
     const timeRangeDisplay = screen.getByLabelText('Search Time Range, Opens Time Range Selector On Click');
     const streamsFilter = screen.getByTestId('streams-filter');
     const liveUpdate = screen.getByLabelText('Refresh Search Controls');
     const searchButton = screen.getByTitle('Perform search');
-    const metaButtons = screen.getByLabelText('Search Meta Buttons');
+    const metaButtons = screen.getByText('Saved Search Controls');
 
     expect(timeRangeButton).not.toBeNull();
     expect(timeRangeDisplay).not.toBeNull();
@@ -83,13 +93,11 @@ describe('SearchBar', () => {
   it('should update query when search is performed', async () => {
     render(<SearchBar config={config} />);
 
-    const searchButton = screen.getByTitle('Perform search');
+    const searchButton = await screen.findByTitle('Perform search');
 
     fireEvent.click(searchButton);
 
-    const queryId = '34efae1e-e78e-48ab-ab3f-e83c8611a683';
-
-    await waitFor(() => expect(QueriesActions.update).toHaveBeenCalledWith(queryId, expect.objectContaining({ id: queryId })));
+    await waitFor(() => expect(SearchActions.refresh).toHaveBeenCalledTimes(1));
   });
 
   it('date exceeding limitDuration should render with error Icon & search button disabled', async () => {
@@ -102,5 +110,48 @@ describe('SearchBar', () => {
       expect(searchButton).toHaveAttribute('disabled');
       expect(timeRangeButton.firstChild).toHaveClass('fa-exclamation-triangle');
     });
+  });
+
+  it('should hide the save load controls if editing the widget', async () => {
+    const focusedWidget: WidgetEditingState = { id: 'foo', editing: true, focusing: true };
+    const widgetFocusContext = {
+      focusedWidget,
+      setWidgetFocusing: () => {},
+      setWidgetEditing: () => {},
+      unsetWidgetFocusing: () => {},
+      unsetWidgetEditing: () => {},
+    };
+
+    render(
+      <WidgetFocusContext.Provider value={widgetFocusContext}>
+        <SearchBar config={config} />
+      </WidgetFocusContext.Provider>,
+    );
+
+    await screen.findByTitle('Perform search');
+    const saveBtn = screen.queryByText('Saved Search Controls');
+
+    expect(saveBtn).toBeNull();
+  });
+
+  it('should show the save load controls if the widget is not edited', async () => {
+    const focusedWidget: WidgetFocusingState = { id: 'foo', editing: false, focusing: true };
+    const widgetFocusContext = {
+      focusedWidget,
+      setWidgetFocusing: () => {},
+      setWidgetEditing: () => {},
+      unsetWidgetFocusing: () => {},
+      unsetWidgetEditing: () => {},
+    };
+
+    render(
+      <WidgetFocusContext.Provider value={widgetFocusContext}>
+        <SearchBar config={config} />
+      </WidgetFocusContext.Provider>,
+    );
+
+    const saveBtn = await screen.findByText('Saved Search Controls');
+
+    expect(saveBtn).not.toBeNull();
   });
 });

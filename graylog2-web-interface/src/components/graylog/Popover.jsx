@@ -39,7 +39,7 @@ const Popover = styled(BootstrapPopover)(({ theme }) => {
         border-top-color: ${borderColor};
 
         &::after {
-          border-top-color: ${backgroundColor};
+          border-top-color: ${arrowColor};
         }
       }
     }
@@ -49,7 +49,7 @@ const Popover = styled(BootstrapPopover)(({ theme }) => {
         border-right-color: ${borderColor};
 
         &::after {
-          border-right-color: ${backgroundColor};
+          border-right-color: ${arrowColor};
           z-index: 1;
         }
       }
@@ -70,7 +70,7 @@ const Popover = styled(BootstrapPopover)(({ theme }) => {
         border-left-color: ${borderColor};
 
         &::after {
-          border-left-color: ${backgroundColor};
+          border-left-color: ${arrowColor};
         }
       }
     }

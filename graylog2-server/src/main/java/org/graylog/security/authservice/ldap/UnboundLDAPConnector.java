@@ -39,6 +39,7 @@ import com.unboundid.ldap.sdk.extensions.StartTLSExtendedRequest;
 import com.unboundid.util.Base64;
 import com.unboundid.util.LDAPTestUtils;
 import com.unboundid.util.ssl.SSLUtil;
+import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.security.TrustAllX509TrustManager;
 import org.graylog2.security.TrustManagerProvider;
 import org.graylog2.security.encryption.EncryptedValue;
@@ -74,18 +75,18 @@ public class UnboundLDAPConnector {
     private static final String OBJECT_CLASS_ATTRIBUTE = "objectClass";
 
     private final int connectionTimeout;
-    private final Set<String> enabledTlsProtocols;
+    private final TLSProtocolsConfiguration tlsConfiguration;
     private final TrustManagerProvider trustManagerProvider;
     private final EncryptedValueService encryptedValueService;
     private final int requestTimeoutSeconds;
 
     @Inject
     public UnboundLDAPConnector(@Named("ldap_connection_timeout") int connectionTimeout,
-                                @Named("enabled_tls_protocols") Set<String> enabledTlsProtocols,
+                                TLSProtocolsConfiguration tlsConfiguration,
                                 TrustManagerProvider trustManagerProvider,
                                 EncryptedValueService encryptedValueService) {
         this.connectionTimeout = connectionTimeout; // TODO: Make configurable per backend
-        this.enabledTlsProtocols = enabledTlsProtocols;
+        this.tlsConfiguration = tlsConfiguration;
         this.trustManagerProvider = trustManagerProvider;
         this.encryptedValueService = encryptedValueService;
         this.requestTimeoutSeconds = 60; // TODO: Make configurable per backend
@@ -107,7 +108,7 @@ public class UnboundLDAPConnector {
         StartTLSExtendedRequest startTLSRequest = null;
         SocketFactory socketFactory = null;
         if (ldapConfig.transportSecurity() != LDAPTransportSecurity.NONE) {
-            SSLUtil.setEnabledSSLProtocols(enabledTlsProtocols);
+            SSLUtil.setEnabledSSLProtocols(tlsConfiguration.getEnabledTlsProtocols());
 
             final SSLUtil sslUtil;
             if (ldapConfig.verifyCertificates()) {
@@ -260,10 +261,6 @@ public class UnboundLDAPConnector {
             // No need to add the objectClass attribute to the attribute map, we already make it available
             // in LDAPEntry#objectClasses
             if (OBJECT_CLASS_ATTRIBUTE.equalsIgnoreCase(attribute.getBaseName())) {
-                continue;
-            }
-            // We already set the unique ID above
-            if (uniqueIdAttribute.equalsIgnoreCase(attribute.getBaseName())) {
                 continue;
             }
 

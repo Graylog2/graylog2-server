@@ -59,6 +59,10 @@ public class OptimizeIndexJob extends SystemJob {
 
     @Override
     public void execute() {
+        if (!indices.exists(index)) {
+            LOG.debug("Not running job for deleted index <{}>", index);
+            return;
+        }
         if (indices.isClosed(index)) {
             LOG.debug("Not running job for closed index <{}>", index);
             return;

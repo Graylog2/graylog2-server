@@ -30,8 +30,4 @@ const HeaderElements = ({ headerElements = [] }: Props) => (
   </>
 );
 
-const mapping = {
-  headerElements: 'views.elements.header',
-};
-
-export default withPluginEntities(HeaderElements, mapping);
+export default withPluginEntities(HeaderElements, { headerElements: 'views.elements.header' });

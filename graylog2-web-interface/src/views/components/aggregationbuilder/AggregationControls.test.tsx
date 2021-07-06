@@ -17,7 +17,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { mount } from 'wrappedEnzyme';
-import { render } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import asMock from 'helpers/mocking/AsMock';
 import suppressConsole from 'helpers/suppressConsole';
@@ -45,6 +45,10 @@ jest.mock('graylog-web-plugin/plugin', () => ({
 
 class DummyVisualizationConfig extends VisualizationConfig {}
 
+const SimpleAggregationControls = (props) => (
+  <AggregationControls editing={false} id="foo" type="aggregation" {...props} />
+);
+
 describe('AggregationControls', () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars, react/prop-types
   const DummyComponent = () => <div data-testid="dummy-component">The spice must flow.</div>;
@@ -55,39 +59,39 @@ describe('AggregationControls', () => {
 
   it('should render its children', () => {
     const { getByTestId } = render((
-      <AggregationControls config={config}
-                           fields={Immutable.List([])}
-                           onChange={() => {}}>
+      <SimpleAggregationControls config={config}
+                                 fields={Immutable.List([])}
+                                 onChange={() => {}}>
         {children}
-      </AggregationControls>
+      </SimpleAggregationControls>
     ));
 
     expect(getByTestId('dummy-component')).toHaveTextContent('The spice must flow.');
   });
 
-  it('should render with `undefined` fields', () => {
-    suppressConsole(() => {
-      const { getByTestId } = render((
-        <AggregationControls config={config}
-                             fields={undefined}
-                             onChange={() => {}}>
+  it('should render with `undefined` fields', async () => {
+    await suppressConsole(() => {
+      render((
+        <SimpleAggregationControls config={config}
+                                   fields={undefined}
+                                   onChange={() => {}}>
           {children}
-        </AggregationControls>
+        </SimpleAggregationControls>
       ));
-
-      expect(getByTestId('dummy-component')).toHaveTextContent('The spice must flow.');
     });
+
+    expect(screen.getByTestId('dummy-component')).toHaveTextContent('The spice must flow.');
   });
 
   // NOTE: Why is this testing `HoverForHelp` component?
 
   it('should have all description boxes', () => {
     const wrapper = mount((
-      <AggregationControls config={config}
-                           fields={Immutable.List([])}
-                           onChange={() => {}}>
+      <SimpleAggregationControls config={config}
+                                 fields={Immutable.List([])}
+                                 onChange={() => {}}>
         {children}
-      </AggregationControls>
+      </SimpleAggregationControls>
     ));
 
     expect(wrapper.find('div.description').at(0).text()).toContain('Visualization Type');
@@ -102,11 +106,11 @@ describe('AggregationControls', () => {
 
   it('should open additional options for column pivots', () => {
     const wrapper = mount((
-      <AggregationControls config={config}
-                           fields={Immutable.List([])}
-                           onChange={() => {}}>
+      <SimpleAggregationControls config={config}
+                                 fields={Immutable.List([])}
+                                 onChange={() => {}}>
         {children}
-      </AggregationControls>
+      </SimpleAggregationControls>
     ));
 
     expect(wrapper.find('h3.popover-title')).toHaveLength(0);
@@ -121,11 +125,11 @@ describe('AggregationControls', () => {
 
   it('passes onVisualizationConfigChange to children', () => {
     const wrapper = mount((
-      <AggregationControls config={config}
-                           fields={Immutable.List([])}
-                           onChange={() => {}}>
+      <SimpleAggregationControls config={config}
+                                 fields={Immutable.List([])}
+                                 onChange={() => {}}>
         {children}
-      </AggregationControls>
+      </SimpleAggregationControls>
     ));
 
     expect(wrapper.find('DummyComponent')).toHaveProp('onVisualizationConfigChange');
@@ -150,11 +154,11 @@ describe('AggregationControls', () => {
       .visualizationConfig(new DummyVisualizationConfig())
       .build();
     const wrapper = mount((
-      <AggregationControls config={configWithVisualizationConfig}
-                           fields={Immutable.List([])}
-                           onChange={() => {}}>
+      <SimpleAggregationControls config={configWithVisualizationConfig}
+                                 fields={Immutable.List([])}
+                                 onChange={() => {}}>
         {children}
-      </AggregationControls>
+      </SimpleAggregationControls>
     ));
 
     expect(wrapper).toIncludeText('This is a custom visualization config');

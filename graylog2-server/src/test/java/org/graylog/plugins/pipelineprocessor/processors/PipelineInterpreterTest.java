@@ -25,8 +25,6 @@ import com.google.common.eventbus.EventBus;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
-import org.graylog.plugins.pipelineprocessor.codegen.CodeGenerator;
-import org.graylog.plugins.pipelineprocessor.codegen.compiler.JavaCompiler;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
@@ -52,7 +50,7 @@ import org.graylog2.plugin.Messages;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.SuppressForbidden;
-import org.graylog2.shared.journal.Journal;
+import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.junit.Test;
 
 import java.util.Collections;
@@ -257,7 +255,7 @@ public class PipelineInterpreterTest {
         when(pipelineStreamConnectionsService.loadAll()).thenReturn(Collections.singleton(pipelineConnections));
 
         final FunctionRegistry functionRegistry = new FunctionRegistry(functions);
-        final PipelineRuleParser parser = new PipelineRuleParser(functionRegistry, new CodeGenerator(JavaCompiler::new));
+        final PipelineRuleParser parser = new PipelineRuleParser(functionRegistry);
 
         final ConfigurationStateUpdater stateUpdater = new ConfigurationStateUpdater(ruleService,
                 pipelineService,
@@ -265,13 +263,12 @@ public class PipelineInterpreterTest {
                 parser,
                 ruleMetricsConfigService,
                 new MetricRegistry(),
-                functionRegistry,
                 Executors.newScheduledThreadPool(1),
                 mock(EventBus.class),
-                (currentPipelines, streamPipelineConnections, ruleMetricsConfig) -> new PipelineInterpreter.State(currentPipelines, streamPipelineConnections, ruleMetricsConfig, new MetricRegistry(), 1, true),
-                false);
+                (currentPipelines, streamPipelineConnections, ruleMetricsConfig) -> new PipelineInterpreter.State(currentPipelines, streamPipelineConnections, ruleMetricsConfig, new MetricRegistry(), 1, true)
+        );
         return new PipelineInterpreter(
-                mock(Journal.class),
+                mock(MessageQueueAcknowledger.class),
                 new MetricRegistry(),
                 stateUpdater
         );
@@ -313,7 +310,7 @@ public class PipelineInterpreterTest {
                 Collections.singleton("cde")));
 
         final FunctionRegistry functionRegistry = new FunctionRegistry(Collections.emptyMap());
-        final PipelineRuleParser parser = new PipelineRuleParser(functionRegistry, new CodeGenerator(JavaCompiler::new));
+        final PipelineRuleParser parser = new PipelineRuleParser(functionRegistry);
 
         final MetricRegistry metricRegistry = new MetricRegistry();
         final ConfigurationStateUpdater stateUpdater = new ConfigurationStateUpdater(ruleService,
@@ -322,13 +319,12 @@ public class PipelineInterpreterTest {
                 parser,
                 ruleMetricsConfigService,
                 metricRegistry,
-                functionRegistry,
                 Executors.newScheduledThreadPool(1),
                 mock(EventBus.class),
-                (currentPipelines, streamPipelineConnections, ruleMetricsConfig) -> new PipelineInterpreter.State(currentPipelines, streamPipelineConnections, ruleMetricsConfig, new MetricRegistry(), 1, true),
-                false);
+                (currentPipelines, streamPipelineConnections, ruleMetricsConfig) -> new PipelineInterpreter.State(currentPipelines, streamPipelineConnections, ruleMetricsConfig, new MetricRegistry(), 1, true)
+        );
         final PipelineInterpreter interpreter = new PipelineInterpreter(
-                mock(Journal.class),
+                mock(MessageQueueAcknowledger.class),
                 metricRegistry,
                 stateUpdater
         );

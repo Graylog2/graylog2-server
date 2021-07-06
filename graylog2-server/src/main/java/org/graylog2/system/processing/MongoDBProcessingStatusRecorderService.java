@@ -25,7 +25,7 @@ import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.AbstractIdleService;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.lifecycles.Lifecycle;
-import org.graylog2.shared.journal.KafkaJournal;
+import org.graylog2.shared.journal.LocalKafkaJournal;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,9 +47,12 @@ public class MongoDBProcessingStatusRecorderService extends AbstractIdleService 
     private static final Logger LOG = LoggerFactory.getLogger(MongoDBProcessingStatusRecorderService.class);
 
     private static final DateTime DEFAULT_RECEIVE_TIME = new DateTime(0L, UTC);
-    private static final String READ_MESSAGES_METRIC = name(KafkaJournal.class.getName(), KafkaJournal.METER_READ_MESSAGES);
-    private static final String WRITTEN_MESSAGES_METRIC = name(KafkaJournal.class.getName(), KafkaJournal.METER_WRITTEN_MESSAGES);
-    private static final String UNCOMMITTED_MESSAGES_METRIC = name(KafkaJournal.class.getName(), KafkaJournal.GAUGE_UNCOMMITTED_MESSAGES);
+    private static final String READ_MESSAGES_METRIC = name(LocalKafkaJournal.class.getName(),
+            LocalKafkaJournal.METER_READ_MESSAGES);
+    private static final String WRITTEN_MESSAGES_METRIC = name(LocalKafkaJournal.class.getName(),
+            LocalKafkaJournal.METER_WRITTEN_MESSAGES);
+    private static final String UNCOMMITTED_MESSAGES_METRIC = name(LocalKafkaJournal.class.getName(),
+            LocalKafkaJournal.GAUGE_UNCOMMITTED_MESSAGES);
 
     private final AtomicReference<DateTime> ingestReceiveTime = new AtomicReference<>(DEFAULT_RECEIVE_TIME);
     private final AtomicReference<DateTime> postProcessingReceiveTime = new AtomicReference<>(DEFAULT_RECEIVE_TIME);

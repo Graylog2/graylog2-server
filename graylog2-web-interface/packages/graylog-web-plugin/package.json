@@ -1,6 +1,6 @@
 {
   "name": "graylog-web-plugin",
-  "version": "4.1.0-SNAPSHOT",
+  "version": "4.2.0-SNAPSHOT",
   "description": "Helper code for streamlining Graylog web interface plugin development",
   "main": "index.js",
   "scripts": {
@@ -37,8 +37,8 @@
     "extends": "graylog"
   },
   "dependencies": {
-    "@babel/preset-env": "7.12.17",
-    "@babel/preset-typescript": "7.12.17",
+    "@babel/preset-env": "7.13.10",
+    "@babel/preset-typescript": "7.13.0",
     "create-react-class": "15.7.0",
     "eslint-config-graylog": "file:../eslint-config-graylog",
     "formik": "2.2.6",
@@ -52,20 +52,22 @@
     "react": "16.13.1",
     "react-bootstrap": "0.33.1",
     "react-dom": "16.13.1",
+    "react-query": "3.13.10",
     "react-router": "5.2.0",
     "react-router-bootstrap": "0.25.0",
     "react-router-dom": "5.2.0",
     "reflux": "0.2.13",
-    "styled-components": "5.1.1",
-    "typescript": "^4.0.5",
+    "styled-components": "5.2.3",
+    "stylelint-config-graylog": "file:../stylelint-config-graylog",
+    "typescript": "4.3.2",
     "webpack": "4.44.2",
     "webpack-cleanup-plugin": "0.5.1",
     "webpack-cli": "3.3.12",
     "webpack-merge": "4.2.2"
   },
   "devDependencies": {
-    "@babel/cli": "7.12.17",
-    "@babel/core": "7.12.17",
+    "@babel/cli": "7.13.10",
+    "@babel/core": "7.13.10",
     "babel-plugin-add-module-exports": "^1.0.2"
   }
 }

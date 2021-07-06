@@ -164,6 +164,21 @@ public class Version implements Comparable<Version> {
     }
 
     /**
+     * Try to read the version from the {@literal graylog-plugin.properties} file included in a plugin
+     * and {@literal git.properties} ({@code git.commit.id} property) from the classpath..
+     *
+     * @param pluginClass     Class where the class loader should be obtained from.
+     * @param path            Path of the properties file on the classpath which contains the version information.
+     * @param propertyName    The name of the property to read as project version ("major.minor.patch-preReleaseVersion").
+     * @param gitPath         Path of the properties file on the classpath which contains the SCM information.
+     * @param gitPropertyName The name of the property to read as git commit SHA.
+     * @param defaultVersion  The {@link Version} to return if reading the information from the properties files failed.
+     */
+    public static Version fromPluginProperties(Class<?> pluginClass, String path, String propertyName, String gitPath, String gitPropertyName, Version defaultVersion) {
+        return fromClasspathProperties(pluginClass, path, propertyName, gitPath, gitPropertyName, defaultVersion);
+    }
+
+    /**
      * Try to read the version from {@literal version.properties} ({@code project.version} property)
      * and {@literal git.properties} ({@code git.commit.id} property) from the classpath.
      *

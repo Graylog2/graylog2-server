@@ -6,7 +6,8 @@
       "titles": {
         "widget": {
           "9f194c3a-3db8-4d9a-8b93-8f356477d976": "Message Count",
-          "6a8eebc7-53f3-447e-8f81-f997d42a376a": "All Messages"
+          "6a8eebc7-53f3-447e-8f81-f997d42a376a": "All Messages",
+          "4d73ccaa-aabf-451a-b36e-309f55798e04": "Widget Title"
         }
       },
       "widgets": [

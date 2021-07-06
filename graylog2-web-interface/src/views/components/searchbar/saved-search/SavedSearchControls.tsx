@@ -30,12 +30,12 @@ import type { ViewStoreState } from 'views/stores/ViewStore';
 import onSaveView from 'views/logic/views/OnSaveViewAction';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
-import CSVExportModal from 'views/components/searchbar/csvexport/CSVExportModal';
+import ExportModal from 'views/components/export/ExportModal';
 import ViewTypeLabel from 'views/components/ViewTypeLabel';
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import CurrentUserContext from 'contexts/CurrentUserContext';
-import * as Permissions from 'views/Permissions';
-import type { UserJSON } from 'logic/users/User';
+import * as ViewsPermissions from 'views/Permissions';
+import User from 'logic/users/User';
 import ViewPropertiesModal from 'views/components/views/ViewPropertiesModal';
 import { loadAsDashboard, loadNewSearch } from 'views/logic/views/Actions';
 
@@ -43,30 +43,30 @@ import SavedSearchForm from './SavedSearchForm';
 import SavedSearchList from './SavedSearchList';
 
 type Props = {
-  viewStoreState: ViewStoreState,
   theme: DefaultTheme,
+  viewStoreState: ViewStoreState,
 };
 
 type State = {
   showForm: boolean,
   showList: boolean,
-  showCSVExport: boolean,
+  showExport: boolean,
   showShareSearch: boolean,
   showMetadataEdit: boolean,
   newTitle: string,
 };
 
-const _isAllowedToEdit = (view: View, currentUser: UserJSON | undefined | null) => (
+const _isAllowedToEdit = (view: View, currentUser: User | undefined | null) => (
   view.owner === currentUser?.username
-  || isPermitted(currentUser?.permissions, [Permissions.View.Edit(view.id)])
+  || isPermitted(currentUser?.permissions, [ViewsPermissions.View.Edit(view.id)])
 );
 
 class SavedSearchControls extends React.Component<Props, State> {
   static propTypes = {
-    viewStoreState: PropTypes.object.isRequired,
     theme: PropTypes.shape({
       colors: PropTypes.object,
     }).isRequired,
+    viewStoreState: PropTypes.object.isRequired,
   };
 
   static contextType = ViewLoaderContext;
@@ -83,7 +83,7 @@ class SavedSearchControls extends React.Component<Props, State> {
 
     this.state = {
       showMetadataEdit: false,
-      showCSVExport: false,
+      showExport: false,
       showShareSearch: false,
       showForm: false,
       showList: false,
@@ -103,10 +103,10 @@ class SavedSearchControls extends React.Component<Props, State> {
     this.setState({ showList: !showList });
   };
 
-  toggleCSVExport = () => {
-    const { showCSVExport } = this.state;
+  toggleExport = () => {
+    const { showExport } = this.state;
 
-    this.setState({ showCSVExport: !showCSVExport });
+    this.setState({ showExport: !showExport });
   };
 
   toggleMetadataEdit = () => {
@@ -205,7 +205,7 @@ class SavedSearchControls extends React.Component<Props, State> {
   };
 
   render() {
-    const { showForm, showList, newTitle, showCSVExport, showShareSearch, showMetadataEdit } = this.state;
+    const { showForm, showList, newTitle, showExport, showShareSearch, showMetadataEdit } = this.state;
     const { viewStoreState: { view, dirty }, theme } = this.props;
 
     const loaded = (view && view.id);
@@ -233,66 +233,63 @@ class SavedSearchControls extends React.Component<Props, State> {
           return (
             <NewViewLoaderContext.Consumer>
               {(loadNewView) => (
-                <div className="pull-right">
-                  <ButtonGroup>
-                    <>
-                      <Button title={title} ref={this.formTarget} onClick={this.toggleFormModal}>
-                        <Icon style={{ color: savedSearchColor }} name="star" type={loaded ? 'solid' : 'regular'} /> Save
-                      </Button>
-                      {showForm && (
-                      <SavedSearchForm onChangeTitle={this.onChangeTitle}
-                                       target={this.formTarget.current}
-                                       saveSearch={this.saveSearch}
-                                       saveAsSearch={this.saveAsSearch}
-                                       disableCreateNew={newTitle === view.title}
-                                       isCreateNew={!view.id || !isAllowedToEdit}
-                                       toggleModal={this.toggleFormModal}
-                                       value={newTitle} />
-                      )}
-                    </>
-                    <Button title="Load a previously saved search"
-                            onClick={this.toggleListModal}>
-                      <Icon name="folder" type="regular" /> Load
-                    </Button>
-                    {showList && (
-                      <SavedSearchList deleteSavedSearch={this.deleteSavedSearch}
-                                       toggleModal={this.toggleListModal} />
-                    )}
-                    <ShareButton entityType="search"
-                                 entityId={view.id}
-                                 onClick={this.toggleShareSearch}
-                                 bsStyle="default"
-                                 disabledInfo={!view.id && 'Only saved searches can be shared.'} />
-                    <DropdownButton title={<Icon name="ellipsis-h" />} id="search-actions-dropdown" pullRight noCaret>
-                      <MenuItem onSelect={this.toggleMetadataEdit} disabled={!isAllowedToEdit}>
-                        <Icon name="edit" /> Edit metadata
-                      </MenuItem>
-                      <MenuItem onSelect={this._loadAsDashboard}><Icon name="tachometer-alt" /> Export to dashboard</MenuItem>
-                      <MenuItem onSelect={this.toggleCSVExport}><Icon name="cloud-download-alt" /> Export to CSV</MenuItem>
-                      <MenuItem disabled={disableReset} onSelect={() => loadNewView()} data-testid="reset-search">
-                        <Icon name="eraser" /> Reset search
-                      </MenuItem>
-                      <MenuItem divider />
-                    </DropdownButton>
-                    {showCSVExport && (
-                      <CSVExportModal view={view} closeModal={this.toggleCSVExport} />
-                    )}
-                    {showMetadataEdit && (
-                      <ViewPropertiesModal show
-                                           view={view}
-                                           title="Editing saved search"
-                                           onClose={this.toggleMetadataEdit}
-                                           onSave={onSaveView} />
-                    )}
-                    {showShareSearch && (
-                      <EntityShareModal entityId={view.id}
-                                        entityType="search"
-                                        entityTitle={view.title}
-                                        description={`Search for a User or Team to add as collaborator on this ${viewTypeLabel}.`}
-                                        onClose={this.toggleShareSearch} />
-                    )}
-                  </ButtonGroup>
-                </div>
+                <ButtonGroup aria-label="Search Meta Buttons">
+                  <Button title={title} ref={this.formTarget} onClick={this.toggleFormModal}>
+                    <Icon style={{ color: savedSearchColor }} name="star" type={loaded ? 'solid' : 'regular'} /> Save
+                  </Button>
+                  {showForm && (
+                    <SavedSearchForm onChangeTitle={this.onChangeTitle}
+                                     target={this.formTarget.current}
+                                     saveSearch={this.saveSearch}
+                                     saveAsSearch={this.saveAsSearch}
+                                     disableCreateNew={newTitle === view.title}
+                                     isCreateNew={!view.id || !isAllowedToEdit}
+                                     toggleModal={this.toggleFormModal}
+                                     value={newTitle} />
+                  )}
+                  <Button title="Load a previously saved search"
+                          onClick={this.toggleListModal}>
+                    <Icon name="folder" type="regular" /> Load
+                  </Button>
+                  {showList && (
+                    <SavedSearchList deleteSavedSearch={this.deleteSavedSearch}
+                                     toggleModal={this.toggleListModal}
+                                     activeSavedSearchId={view.id} />
+                  )}
+                  <ShareButton entityType="search"
+                               entityId={view.id}
+                               onClick={this.toggleShareSearch}
+                               bsStyle="default"
+                               disabledInfo={!view.id && 'Only saved searches can be shared.'} />
+                  <DropdownButton title={<Icon name="ellipsis-h" />} id="search-actions-dropdown" pullRight noCaret>
+                    <MenuItem onSelect={this.toggleMetadataEdit} disabled={!isAllowedToEdit}>
+                      <Icon name="edit" /> Edit metadata
+                    </MenuItem>
+                    <MenuItem onSelect={this._loadAsDashboard}><Icon name="tachometer-alt" /> Export to dashboard</MenuItem>
+                    <MenuItem onSelect={this.toggleExport}><Icon name="cloud-download-alt" /> Export</MenuItem>
+                    <MenuItem disabled={disableReset} onSelect={() => loadNewView()} data-testid="reset-search">
+                      <Icon name="eraser" /> Reset search
+                    </MenuItem>
+                    <MenuItem divider />
+                  </DropdownButton>
+                  {showExport && (
+                    <ExportModal view={view} closeModal={this.toggleExport} />
+                  )}
+                  {showMetadataEdit && (
+                    <ViewPropertiesModal show
+                                         view={view}
+                                         title="Editing saved search"
+                                         onClose={this.toggleMetadataEdit}
+                                         onSave={onSaveView} />
+                  )}
+                  {showShareSearch && (
+                    <EntityShareModal entityId={view.id}
+                                      entityType="search"
+                                      entityTitle={view.title}
+                                      description={`Search for a User or Team to add as collaborator on this ${viewTypeLabel}.`}
+                                      onClose={this.toggleShareSearch} />
+                  )}
+                </ButtonGroup>
               )}
             </NewViewLoaderContext.Consumer>
           );

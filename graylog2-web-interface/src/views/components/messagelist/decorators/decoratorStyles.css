@@ -28,10 +28,6 @@
     font-size: 1rem; /* theme.fonts.size.body */
 }
 
-:local(.helpLinkContainer) {
-    height: 20px;
-}
-
 :local(.decoratorListContainer) {
     display: inline-block;
     overflow: visible;

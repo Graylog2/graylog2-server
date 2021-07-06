@@ -15,14 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import lodash from 'lodash';
 import PropTypes from 'prop-types';
+import { isEqual, find } from 'lodash';
 import { DefaultTheme, withTheme } from 'styled-components';
-import ReactSelect, { components as Components, Creatable, createFilter } from 'react-select';
+import ReactSelect, { components as Components, createFilter } from 'react-select';
+import CreatableSelect from 'react-select/creatable';
 
 import { themePropTypes } from 'theme';
 
 import Icon from './Icon';
+
+export const CONTROL_CLASS = 'common-select-control';
 
 type Option = { [key: string]: any };
 
@@ -49,6 +52,10 @@ const DropdownIndicator = (props) => {
     </div>
   );
 };
+
+const Control = (props) => (
+  <Components.Control {...props} className={CONTROL_CLASS} />
+);
 
 type CustomOptionProps = {
   data: any,
@@ -121,6 +128,11 @@ const menu = (base) => ({
   zIndex: 5,
 });
 
+const menuPortal = (base) => ({
+  ...base,
+  zIndex: 'auto',
+});
+
 const singleValueAndPlaceholder = ({ theme }) => (base) => ({
   ...base,
   lineHeight: '28px',
@@ -131,6 +143,7 @@ const singleValueAndPlaceholder = ({ theme }) => (base) => ({
 
 const placeholder = ({ theme }) => (base) => ({
   ...base,
+  color: theme.colors.input.placeholder,
   lineHeight: '28px',
   fontFamily: theme.fonts.family.body,
   fontSize: theme.fonts.size.body,
@@ -160,19 +173,21 @@ const controlFocus = ({ size, theme }) => (base, { isFocused }) => {
 
 const valueContainer = ({ size }) => (base) => ({
   ...base,
-  padding: size === 'small' ? '0 12px' : '2px 12px',
+  padding: size === 'small' ? '0 8px' : '2px 12px',
 });
 
 type OverriddenComponents = {
   DropdownIndicator: React.ComponentType<any>;
   MultiValueRemove: React.ComponentType<any>;
   IndicatorSeparator: React.ComponentType<any>;
+  Control: React.ComponentType<any>;
 };
 
 const _components: OverriddenComponents = {
   DropdownIndicator,
   MultiValueRemove,
   IndicatorSeparator,
+  Control,
 };
 
 const _styles = ({ size, theme }) => ({
@@ -182,6 +197,7 @@ const _styles = ({ size, theme }) => ({
   multiValueLabel: multiValueLabel({ theme }),
   multiValueRemove: multiValueRemove({ theme }),
   menu,
+  menuPortal,
   singleValue: singleValueAndPlaceholder({ theme }),
   placeholder: placeholder({ theme }),
   control: controlFocus({ size, theme }),
@@ -190,6 +206,7 @@ const _styles = ({ size, theme }) => ({
 
 type ComponentsProp = {
   MultiValueLabel?: React.ComponentType<any>,
+  SelectContainer?: React.ComponentType<any>,
 };
 
 type Props = {
@@ -207,6 +224,7 @@ type Props = {
   inputProps?: { [key: string]: any },
   matchProp?: 'any' | 'label' | 'value',
   multi?: boolean,
+  menuPortalTarget?: HTMLElement,
   name?: string,
   onBlur?: (event: React.FocusEvent<HTMLInputElement>) => void,
   onChange: (string) => void,
@@ -214,6 +232,7 @@ type Props = {
   optionRenderer?: (option: Option) => React.ReactElement,
   options: Array<Option>,
   placeholder: string,
+  ref?: React.Ref<React.ComponentType>,
   size?: 'normal' | 'small',
   theme: DefaultTheme,
   value?: Object | Array<Object> | null | undefined,
@@ -293,6 +312,7 @@ class Select extends React.Component<Props, State> {
      */
     value: PropTypes.oneOfType([
       PropTypes.string,
+      PropTypes.number,
       PropTypes.object,
       PropTypes.arrayOf(PropTypes.object),
     ]),
@@ -338,7 +358,7 @@ class Select extends React.Component<Props, State> {
     value: undefined,
     valueKey: 'value',
     valueRenderer: undefined,
-    menuPlacement: 'bottom',
+    menuPlacement: 'auto',
     maxMenuHeight: 300,
   };
 
@@ -359,7 +379,7 @@ class Select extends React.Component<Props, State> {
       this.setState({ value: nextProps.value });
     }
 
-    if (inputProps !== nextProps.inputProps
+    if (!isEqual(inputProps, nextProps.inputProps)
       || optionRenderer !== nextProps.optionRenderer
       || valueRenderer !== nextProps.valueRenderer) {
       this.setState({ customComponents: this.getCustomComponents(inputProps, optionRenderer, valueRenderer) });
@@ -426,7 +446,7 @@ class Select extends React.Component<Props, State> {
         [valueKey]: v,
         [displayKey]: v,
       };
-      const option = lodash.find(options, predicate);
+      const option = find(options, predicate);
 
       return option || predicate;
     });
@@ -478,7 +498,7 @@ class Select extends React.Component<Props, State> {
       onReactSelectChange,
     } = this.props;
     const { customComponents, value } = this.state;
-    const SelectComponent = allowCreate ? Creatable : ReactSelect;
+    const SelectComponent = allowCreate ? CreatableSelect : ReactSelect;
 
     let formattedValue = value;
 
@@ -502,6 +522,7 @@ class Select extends React.Component<Props, State> {
       optionRenderer, // Do not pass down prop
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       valueRenderer, // Do not pass down prop
+      menuPortalTarget,
       ...rest
     } = this.props;
 
@@ -520,10 +541,11 @@ class Select extends React.Component<Props, State> {
                        isMulti={isMulti}
                        isDisabled={isDisabled}
                        isClearable={isClearable}
-                       getOptionLabel={(option) => option[displayKey]}
+                       getOptionLabel={(option) => option[displayKey] || option.label}
                        getOptionValue={(option) => option[valueKey]}
                        filterOption={customFilter}
                        components={mergedComponents}
+                       menuPortalTarget={menuPortalTarget}
                        isOptionDisabled={(option) => !!option.disabled}
                        /* eslint-disable-next-line @typescript-eslint/ban-ts-comment */
                        // @ts-ignore TODO: Fix props assignment for _styles

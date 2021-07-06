@@ -24,10 +24,6 @@ import { MenuItem, ButtonGroup, DropdownButton, Button } from 'components/graylo
 import { Icon, Pluralize } from 'components/common';
 import { RefreshActions, RefreshStore } from 'views/stores/RefreshStore';
 
-const ControlsContainer = styled.div`
-  max-width: 100%;
-`;
-
 const FlexibleButtonGroup = styled(ButtonGroup)`
   display: flex;
 
@@ -113,17 +109,15 @@ class RefreshControls extends React.Component<Props> {
     const buttonLabel = this._buttonLabel(refreshConfig.enabled, naturalInterval);
 
     return (
-      <ControlsContainer className="pull-right" aria-label="Refresh Search Controls">
-        <FlexibleButtonGroup>
-          <Button onClick={this._toggleEnable}>
-            {refreshConfig.enabled ? <Icon name="pause" /> : <Icon name="play" />}
-          </Button>
+      <FlexibleButtonGroup aria-label="Refresh Search Controls">
+        <Button onClick={this._toggleEnable}>
+          {refreshConfig.enabled ? <Icon name="pause" /> : <Icon name="play" />}
+        </Button>
 
-          <DropdownButton title={buttonLabel} id="refresh-options-dropdown">
-            {intervalOptions}
-          </DropdownButton>
-        </FlexibleButtonGroup>
-      </ControlsContainer>
+        <DropdownButton title={buttonLabel} id="refresh-options-dropdown">
+          {intervalOptions}
+        </DropdownButton>
+      </FlexibleButtonGroup>
     );
   }
 }

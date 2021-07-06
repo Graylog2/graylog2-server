@@ -16,10 +16,11 @@
  */
 import React from 'react';
 import { get } from 'lodash';
+import { PluginExports } from 'graylog-web-plugin/plugin';
 
 import Routes from 'routing/Routes';
 import App from 'routing/App';
-import * as Permissions from 'views/Permissions';
+import AppConfig from 'util/AppConfig';
 import { MessageListHandler } from 'views/logic/searchtypes/messages';
 import { MessageList } from 'views/components/widgets';
 import AddToTableActionHandler from 'views/logic/fieldactions/AddToTableActionHandler';
@@ -31,8 +32,6 @@ import AggregationBuilder from 'views/components/aggregationbuilder/AggregationB
 import BarVisualization from 'views/components/visualizations/bar/BarVisualization';
 import LineVisualization from 'views/components/visualizations/line/LineVisualization';
 import NumberVisualization from 'views/components/visualizations/number/NumberVisualization';
-import PieVisualization from 'views/components/visualizations/pie/PieVisualization';
-import ScatterVisualization from 'views/components/visualizations/scatter/ScatterVisualization';
 import WorldMapVisualization from 'views/components/visualizations/worldmap/WorldMapVisualization';
 import HeatmapVisualization from 'views/components/visualizations/heatmap/HeatmapVisualization';
 import MigrateFieldCharts from 'views/components/MigrateFieldCharts';
@@ -81,6 +80,9 @@ import ShowDashboardInBigDisplayMode from 'views/pages/ShowDashboardInBigDisplay
 import LookupTableParameter from 'views/logic/parameters/LookupTableParameter';
 import HeatmapVisualizationConfiguration from 'views/components/aggregationbuilder/HeatmapVisualizationConfiguration';
 import HeatmapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/HeatmapVisualizationConfig';
+import visualizationBindings from 'views/components/visualizations/bindings';
+import { AggregationWizard } from 'views/components/aggregationwizard';
+import { filterCloudValueActions } from 'util/conditional/filterValueActions';
 
 import type { ActionHandlerArguments } from './components/actions/ActionHandler';
 import NumberVisualizationConfig from './logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
@@ -111,7 +113,7 @@ Parameter.registerSubtype(LookupTableParameter.type, LookupTableParameter);
 
 const isAnalysisDisabled = (field: string, analysisDisabledFields: string[] = []) => analysisDisabledFields.includes(field);
 
-export default {
+const exports: PluginExports = {
   pages: {
     search: { component: NewSearchPage },
   },
@@ -125,9 +127,9 @@ export default {
     { path: showSearchPath, component: ShowViewPage, parentComponent: App },
     { path: `${Routes.unqualified.stream_search(':streamId')}/new`, component: NewSearchRedirectPage, parentComponent: null },
     { path: Routes.unqualified.stream_search(':streamId'), component: StreamSearchPage, parentComponent: App },
-    { path: extendedSearchPath, component: NewSearchPage, permissions: Permissions.ExtendedSearch.Use, parentComponent: App },
+    { path: extendedSearchPath, component: NewSearchPage, parentComponent: App },
 
-    { path: viewsPath, component: ViewManagementPage, permissions: Permissions.View.Use },
+    { path: viewsPath, component: ViewManagementPage },
     { path: showViewsPath, component: ShowViewPage, parentComponent: App },
   ],
   enterpriseWidgets: [
@@ -135,6 +137,7 @@ export default {
       type: 'MESSAGES',
       displayName: 'Message List',
       defaultHeight: 5,
+      reportStyle: () => ({ width: 800 }),
       defaultWidth: 6,
       visualizationComponent: MessageList,
       editComponent: EditMessageList,
@@ -148,8 +151,11 @@ export default {
       displayName: 'Results',
       defaultHeight: 4,
       defaultWidth: 4,
+      reportStyle: () => ({ width: 600 }),
       visualizationComponent: AggregationBuilder,
-      editComponent: AggregationControls,
+      editComponent: AppConfig.isFeatureEnabled('legacy-aggregation-wizard')
+        ? AggregationControls
+        : AggregationWizard,
       needsControlledHeight: (widget: Widget) => {
         const widgetVisualization = get(widget, 'config.visualization');
         const flexibleHeightWidgets = [
@@ -253,7 +259,7 @@ export default {
       resetFocus: false,
     },
   ],
-  valueActions: [
+  valueActions: filterCloudValueActions([
     {
       type: 'exclude',
       title: 'Exclude from results',
@@ -289,54 +295,8 @@ export default {
       isEnabled: HighlightValueHandler.isEnabled,
       resetFocus: false,
     },
-  ],
-  visualizationTypes: [
-    {
-      type: AreaVisualization.type,
-      displayName: 'Area Chart',
-      component: AreaVisualization,
-    },
-    {
-      type: BarVisualization.type,
-      displayName: 'Bar Chart',
-      component: BarVisualization,
-    },
-    {
-      type: LineVisualization.type,
-      displayName: 'Line Chart',
-      component: LineVisualization,
-    },
-    {
-      type: WorldMapVisualization.type,
-      displayName: 'World Map',
-      component: WorldMapVisualization,
-    },
-    {
-      type: PieVisualization.type,
-      displayName: 'Pie Chart',
-      component: PieVisualization,
-    },
-    {
-      type: DataTable.type,
-      displayName: 'Data Table',
-      component: DataTable,
-    },
-    {
-      type: NumberVisualization.type,
-      displayName: 'Single Number',
-      component: NumberVisualization,
-    },
-    {
-      type: ScatterVisualization.type,
-      displayName: 'Scatter Plot',
-      component: ScatterVisualization,
-    },
-    {
-      type: HeatmapVisualization.type,
-      displayName: 'Heatmap',
-      component: HeatmapVisualization,
-    },
-  ],
+  ], ['create-extractor']),
+  visualizationTypes: visualizationBindings,
   visualizationConfigTypes: [
     {
       type: AreaVisualization.type,
@@ -387,4 +347,14 @@ export default {
   'views.elements.header': [
     () => <IfSearch><MigrateFieldCharts /></IfSearch>,
   ],
+  'views.export.formats': [
+    {
+      type: 'csv',
+      displayName: () => 'Comma-Separated Values (CSV)',
+      mimeType: 'text/csv',
+      fileExtension: 'csv',
+    },
+  ],
 };
+
+export default exports;

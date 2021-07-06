@@ -19,11 +19,9 @@ package org.graylog2.bootstrap;
 import com.github.rvesse.airline.Cli;
 import com.github.rvesse.airline.builder.CliBuilder;
 import com.google.common.collect.ImmutableSet;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.graylog2.bootstrap.commands.CliCommandHelp;
 import org.graylog2.bootstrap.commands.ShowVersion;
 
-import java.security.Security;
 import java.util.ServiceLoader;
 
 public class Main {
@@ -44,9 +42,6 @@ public class Main {
         final Cli<CliCommand> cli = builder.build();
         final Runnable command = cli.parse(args);
 
-        // Explicitly register Bouncy Castle as security provider.
-        // This allows us to use more key formats than with JCE
-        Security.addProvider(new BouncyCastleProvider());
         command.run();
     }
 }

@@ -20,11 +20,10 @@ import com.github.joschi.jadconfig.util.Duration;
 import com.github.zafarkhaja.semver.Version;
 import com.google.common.collect.ImmutableList;
 import io.searchbox.client.JestClient;
-import org.graylog.testing.PropertyLoader;
+import org.graylog.storage.elasticsearch6.jest.JestClientProvider;
 import org.graylog.testing.elasticsearch.Client;
 import org.graylog.testing.elasticsearch.ElasticsearchInstance;
 import org.graylog.testing.elasticsearch.FixtureImporter;
-import org.graylog.storage.elasticsearch6.jest.JestClientProvider;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,8 +34,7 @@ import java.net.URI;
 
 public class ElasticsearchInstanceES6 extends ElasticsearchInstance {
     private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchInstance.class);
-    private static final String DEFAULT_VERSION = "6.8.4";
-    private static final String PROPERTIES_RESOURCE_NAME = "elasticsearch.properties";
+    private static final String ES_VERSION = "6.8.4";
 
     private final Client client;
     private final JestClient jestClient;
@@ -68,11 +66,7 @@ public class ElasticsearchInstanceES6 extends ElasticsearchInstance {
     }
 
     public static ElasticsearchInstance create(Network network) {
-        String version = PropertyLoader
-                .loadProperties(PROPERTIES_RESOURCE_NAME)
-                .getProperty("version", DEFAULT_VERSION);
-
-        return create(version, network);
+        return create(ES_VERSION, network);
     }
 
     public static ElasticsearchInstance create(String versionString, Network network) {

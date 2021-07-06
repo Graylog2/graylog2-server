@@ -119,7 +119,7 @@ const HighlightingRule = ({ rule }: Props) => {
           <IconButton title="Remove this Highlighting Rule" name="trash-alt" onClick={() => onDelete(rule)} />
         </ButtonContainer>
       </HighlightingRuleGrid>
-      { showForm && <HighlightForm onClose={() => setShowForm(false)} rule={rule} />}
+      {showForm && <HighlightForm onClose={() => setShowForm(false)} rule={rule} />}
     </>
   );
 };

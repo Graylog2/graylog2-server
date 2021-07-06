@@ -60,8 +60,12 @@ public class MessagesAdapterES7 implements MessagesAdapter {
     static final String INDEX_BLOCK_ERROR = "cluster_block_exception";
     static final String MAPPER_PARSING_EXCEPTION = "mapper_parsing_exception";
     static final String INDEX_BLOCK_REASON = "blocked by: [TOO_MANY_REQUESTS/12/index read-only / allow delete (api)";
+    static final String FLOOD_STAGE_WATERMARK = "blocked by: [TOO_MANY_REQUESTS/12/disk usage exceeded flood-stage watermark";
     static final String UNAVAILABLE_SHARDS_EXCEPTION = "unavailable_shards_exception";
     static final String PRIMARY_SHARD_NOT_ACTIVE_REASON = "primary shard is not active";
+
+    static final String ILLEGAL_ARGUMENT_EXCEPTION = "illegal_argument_exception";
+    static final String NO_WRITE_INDEX_DEFINED_FOR_ALIAS = "no write index is defined for alias";
 
     private final ElasticsearchClient client;
     private final Meter invalidTimestampMeter;
@@ -224,8 +228,15 @@ public class MessagesAdapterES7 implements MessagesAdapter {
         final ParsedElasticsearchException exception = ParsedElasticsearchException.from(item.getFailureMessage());
         switch (exception.type()) {
             case MAPPER_PARSING_EXCEPTION: return Messages.IndexingError.ErrorType.MappingError;
-            case INDEX_BLOCK_ERROR: if (exception.reason().contains(INDEX_BLOCK_REASON)) return Messages.IndexingError.ErrorType.IndexBlocked;
-            case UNAVAILABLE_SHARDS_EXCEPTION: if (exception.reason().contains(PRIMARY_SHARD_NOT_ACTIVE_REASON)) return Messages.IndexingError.ErrorType.IndexBlocked;
+            case INDEX_BLOCK_ERROR:
+                if (exception.reason().contains(INDEX_BLOCK_REASON) || exception.reason().contains(FLOOD_STAGE_WATERMARK))
+                    return Messages.IndexingError.ErrorType.IndexBlocked;
+            case UNAVAILABLE_SHARDS_EXCEPTION:
+                if (exception.reason().contains(PRIMARY_SHARD_NOT_ACTIVE_REASON))
+                    return Messages.IndexingError.ErrorType.IndexBlocked;
+            case ILLEGAL_ARGUMENT_EXCEPTION:
+                if (exception.reason().contains(NO_WRITE_INDEX_DEFINED_FOR_ALIAS))
+                    return Messages.IndexingError.ErrorType.IndexBlocked;
             default: return Messages.IndexingError.ErrorType.Unknown;
         }
     }

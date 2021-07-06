@@ -17,18 +17,16 @@
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import asMock from 'helpers/mocking/AsMock';
+import { alice as currentUser } from 'fixtures/users';
 
 import AppConfig from 'util/AppConfig';
 import CurrentUserContext from 'contexts/CurrentUserContext';
-import { UserJSON } from 'logic/users/User';
 
 import UserTimezoneTimestamp from './UserTimezoneTimestamp';
 
 jest.mock('util/AppConfig');
 
-const createCurrentUserWithTz = (tz: string): UserJSON => ({
-  timezone: tz,
-} as UserJSON);
+const createCurrentUserWithTz = (tz: string) => currentUser.toBuilder().timezone(tz).build();
 
 describe('UserTimezoneTimestamp', () => {
   const WithTimezone = ({ children, tz }: { children: React.ReactNode, tz: string }) => (

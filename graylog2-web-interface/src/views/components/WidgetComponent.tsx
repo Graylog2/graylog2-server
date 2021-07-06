@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 
@@ -23,56 +23,67 @@ import WidgetContext from 'views/components/contexts/WidgetContext';
 import WidgetClass from 'views/logic/widgets/Widget';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import TFieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import ExportSettingsContextProvider from 'views/components/ExportSettingsContextProvider';
+import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
+import View from 'views/logic/views/View';
 
 import { WidgetDataMap, WidgetErrorsMap } from './widgets/WidgetPropTypes';
 import Widget from './widgets/Widget';
 import DrilldownContextProvider from './contexts/DrilldownContextProvider';
+import WidgetFieldTypesContextProvider from './contexts/WidgetFieldTypesContextProvider';
 
 type Props = {
-  widget: WidgetClass & { data: string };
-  widgetId: string,
   data: WidgetDataMap,
+  editing: boolean,
   errors: WidgetErrorsMap,
-  widgetDimension: { height: number | null | undefined, width: number | null | undefined },
-  title: string,
-  position: WidgetPosition,
-  onPositionsChange: (position?: WidgetPosition) => void,
   fields: Immutable.List<TFieldTypeMapping>,
+  onPositionsChange: (position?: WidgetPosition) => void,
   onWidgetSizeChange: (widgetId?: string, dimensions?: { height: number, width: number }) => void,
+  position: WidgetPosition,
+  title: string,
+  widget: WidgetClass & { data: string };
+  widgetDimension: { height: number | null | undefined, width: number | null | undefined },
 };
 
 const WidgetComponent = ({
-  widget,
-  widgetId,
   data,
+  editing,
   errors,
-  widgetDimension: { height, width },
-  position,
-  onPositionsChange = () => undefined,
-  title,
   fields,
+  onPositionsChange = () => undefined,
   onWidgetSizeChange = () => {},
+  position,
+  title,
+  widget,
+  widgetDimension: { height, width },
 }: Props) => {
   const dataKey = widget.data || widget.id;
   const widgetData = data[dataKey];
   const widgetErrors = errors[widget.id] || [];
+  const viewType = useContext(ViewTypeContext);
+
+  const WidgetFieldTypesIfDashboard = viewType === View.Type.Dashboard ? WidgetFieldTypesContextProvider : React.Fragment;
 
   return (
     <DrilldownContextProvider widget={widget}>
       <WidgetContext.Provider value={widget}>
         <AdditionalContext.Provider value={{ widget }}>
-          <Widget key={widgetId}
-                  id={widgetId}
-                  widget={widget}
-                  data={widgetData}
-                  errors={widgetErrors}
-                  height={height}
-                  position={position}
-                  width={width}
-                  fields={fields}
-                  onPositionsChange={onPositionsChange}
-                  onSizeChange={onWidgetSizeChange}
-                  title={title} />
+          <ExportSettingsContextProvider>
+            <WidgetFieldTypesIfDashboard>
+              <Widget data={widgetData}
+                      editing={editing}
+                      errors={widgetErrors}
+                      fields={fields}
+                      height={height}
+                      id={widget.id}
+                      onPositionsChange={onPositionsChange}
+                      onSizeChange={onWidgetSizeChange}
+                      position={position}
+                      title={title}
+                      widget={widget}
+                      width={width} />
+            </WidgetFieldTypesIfDashboard>
+          </ExportSettingsContextProvider>
         </AdditionalContext.Provider>
       </WidgetContext.Provider>
     </DrilldownContextProvider>
@@ -80,16 +91,16 @@ const WidgetComponent = ({
 };
 
 WidgetComponent.propTypes = {
-  widget: PropTypes.object.isRequired,
-  widgetId: PropTypes.string.isRequired,
   data: PropTypes.object.isRequired,
+  editing: PropTypes.bool.isRequired,
   errors: PropTypes.object.isRequired,
-  widgetDimension: PropTypes.object.isRequired,
-  title: PropTypes.string.isRequired,
-  position: PropTypes.object.isRequired,
-  onPositionsChange: PropTypes.func,
   fields: PropTypes.object.isRequired,
+  onPositionsChange: PropTypes.func,
   onWidgetSizeChange: PropTypes.func,
+  position: PropTypes.object.isRequired,
+  title: PropTypes.string.isRequired,
+  widget: PropTypes.object.isRequired,
+  widgetDimension: PropTypes.object.isRequired,
 };
 
 WidgetComponent.defaultProps = {

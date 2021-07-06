@@ -16,87 +16,207 @@
  */
 import * as React from 'react';
 import { Map } from 'immutable';
-import { useContext } from 'react';
-import { render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
+import { render } from 'wrappedTestingLibrary';
 import { useLocation } from 'react-router-dom';
 import { asMock } from 'helpers/mocking';
 
 import { WidgetStore } from 'views/stores/WidgetStore';
 import WidgetFocusProvider from 'views/components/contexts/WidgetFocusProvider';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
-import Widget from 'views/logic/widgets/Widget';
+import SearchActions from 'views/actions/SearchActions';
 
 const mockHistoryReplace = jest.fn();
 
 jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
+  ...jest.requireActual<{}>('react-router-dom'),
   useHistory: () => ({
     replace: mockHistoryReplace,
   }),
   useLocation: jest.fn(() => ({
     pathname: '',
-    search: '?focused=clack',
+    search: '',
   })),
 }));
 
 jest.mock('views/stores/WidgetStore', () => ({
   WidgetStore: {
-    getInitialState: jest.fn(() => ({ has: jest.fn(() => true) })),
+    getInitialState: jest.fn(() => ({ has: jest.fn((widgetId) => widgetId === 'widget-id') })),
     listen: jest.fn(),
   },
 }));
 
-describe('WidgetFocusProvider', () => {
-  const renderSUT = () => {
-    const Consumer = () => {
-      const { setFocusedWidget, focusedWidget } = useContext(WidgetFocusContext);
+jest.mock('views/actions/SearchActions');
 
-      return (
-        <>
-          <button type="button" onClick={() => setFocusedWidget('click')}>Click</button>
-          <div>{focusedWidget || 'No focus widget set'}</div>
-        </>
-      );
+describe('WidgetFocusProvider', () => {
+  beforeEach(() => {
+    asMock(useLocation).mockReturnValue({
+      pathname: '',
+      search: '',
+    });
+  });
+
+  const renderSUT = (consume) => render(
+    <WidgetFocusProvider>
+      <WidgetFocusContext.Consumer>
+        {consume}
+      </WidgetFocusContext.Consumer>
+    </WidgetFocusProvider>,
+  );
+
+  it('should update url on widget focus', () => {
+    let contextValue;
+
+    const consume = (value) => {
+      contextValue = value;
     };
 
-    render(
-      <WidgetFocusProvider>
-        <Consumer />
-      </WidgetFocusProvider>,
-    );
-  };
+    renderSUT(consume);
 
-  it('should update url', async () => {
-    renderSUT();
-    const button = await screen.getByText('Click');
-    fireEvent.click(button);
+    contextValue.setWidgetFocusing('widget-id');
 
-    await waitFor(() => {
-      expect(mockHistoryReplace).toBeCalledWith('?focused=click');
-    });
+    expect(mockHistoryReplace).toBeCalledWith('?focusedId=widget-id&focusing=true');
   });
 
-  it('should set focused widget from url', async () => {
-    asMock(WidgetStore.getInitialState).mockReturnValue(Map({ clack: Widget.builder().build() }));
-
-    useLocation.mockReturnValue({
+  it('should update url on widget focus close', () => {
+    asMock(useLocation).mockReturnValueOnce({
       pathname: '',
-      search: 'focused=clack',
+      search: '?focusedId=widget-id&focusing=true',
     });
 
-    renderSUT();
-    await screen.findByText('clack');
+    let contextValue;
+
+    const consume = (value) => {
+      contextValue = value;
+    };
+
+    renderSUT(consume);
+
+    contextValue.unsetWidgetFocusing();
+
+    expect(mockHistoryReplace).toBeCalledWith('');
   });
 
-  it('should not set focused widget from url if the widget does not exist', async () => {
+  it('should set widget focus based on url', () => {
+    asMock(useLocation).mockReturnValue({
+      pathname: '',
+      search: '?focusedId=widget-id&focusing=true',
+    });
+
+    let contextValue;
+
+    const consume = (value) => {
+      contextValue = value;
+    };
+
+    renderSUT(consume);
+
+    expect(contextValue.focusedWidget).toEqual({ id: 'widget-id', focusing: true, editing: false });
+  });
+
+  it('should update url on widget edit', () => {
+    let contextValue;
+
+    const consume = (value) => {
+      contextValue = value;
+    };
+
+    renderSUT(consume);
+
+    contextValue.setWidgetEditing('widget-id');
+
+    expect(mockHistoryReplace).toBeCalledWith('?focusedId=widget-id&editing=true');
+  });
+
+  it('should update url on widget edit close', () => {
+    asMock(useLocation).mockReturnValue({
+      pathname: '',
+      search: '?focusedId=widget-id&editing=true',
+    });
+
+    let contextValue;
+
+    const consume = (value) => {
+      contextValue = value;
+    };
+
+    renderSUT(consume);
+
+    contextValue.unsetWidgetEditing();
+
+    expect(mockHistoryReplace).toBeCalledWith('');
+  });
+
+  it('should set widget edit and focused based on url', () => {
+    asMock(useLocation).mockReturnValue({
+      pathname: '',
+      search: '?focusedId=widget-id&editing=true',
+    });
+
+    let contextValue;
+
+    const consume = (value) => {
+      contextValue = value;
+    };
+
+    renderSUT(consume);
+
+    expect(contextValue.focusedWidget).toEqual({ id: 'widget-id', editing: true, focusing: true });
+  });
+
+  it('should not remove focus query param on widget edit', () => {
+    asMock(useLocation).mockReturnValue({
+      pathname: '',
+      search: '?focusedId=widget-id&focusing=true',
+    });
+
+    let contextValue;
+
+    const consume = (value) => {
+      contextValue = value;
+    };
+
+    renderSUT(consume);
+
+    contextValue.setWidgetEditing('widget-id');
+
+    expect(mockHistoryReplace).toBeCalledWith('?focusedId=widget-id&focusing=true&editing=true');
+
+    contextValue.unsetWidgetEditing();
+
+    expect(mockHistoryReplace).toBeCalledWith('?focusedId=widget-id&focusing=true');
+  });
+
+  it('should not set focused widget from url and cleanup url if the widget does not exist', () => {
     asMock(WidgetStore.getInitialState).mockReturnValue(Map());
 
-    useLocation.mockReturnValue({
+    asMock(useLocation).mockReturnValue({
       pathname: '',
-      search: 'focused=clack',
+      search: '?focusedId=not-existing-widget-id',
     });
 
-    renderSUT();
-    await screen.findByText('No focus widget set');
+    let contextValue;
+
+    const consume = (value) => {
+      contextValue = value;
+    };
+
+    renderSUT(consume);
+
+    expect(contextValue.focusedWidget).toBe(undefined);
+
+    expect(mockHistoryReplace).toBeCalledWith('');
+  });
+
+  it('should not trigger search execution when no focus mode was requested', async () => {
+    asMock(useLocation).mockReturnValue({
+      pathname: '',
+      search: '',
+    });
+
+    const consume = jest.fn();
+
+    renderSUT(consume);
+
+    expect(SearchActions.executeWithCurrentState).not.toHaveBeenCalled();
   });
 });

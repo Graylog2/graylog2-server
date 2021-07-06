@@ -24,12 +24,13 @@ import moment from 'moment';
 import connect from 'stores/connect';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
-import { Spinner, Icon } from 'components/common';
-import { Col, Row } from 'components/graylog';
-import TopRow from 'views/components/searchbar/TopRow';
+import { Spinner, Icon, FlatContentRow } from 'components/common';
+import { Row, Col } from 'components/graylog';
+import BottomRow from 'views/components/searchbar/BottomRow';
+import ViewActionsWrapper from 'views/components/searchbar/ViewActionsWrapper';
 import SearchButton from 'views/components/searchbar/SearchButton';
 import SavedSearchControls from 'views/components/searchbar/saved-search/SavedSearchControls';
-import TimeRangeTypeSelector from 'views/components/searchbar/TimeRangeTypeSelector';
+import TimeRangeInput from 'views/components/searchbar/TimeRangeInput';
 import QueryInput from 'views/components/searchbar/AsyncQueryInput';
 import StreamsFilter from 'views/components/searchbar/StreamsFilter';
 import RefreshControls from 'views/components/searchbar/RefreshControls';
@@ -43,6 +44,7 @@ import Query, { createElasticsearchQueryString, filtersForQuery, filtersToStream
 import type { FilterType, QueryId } from 'views/logic/queries/Query';
 import type { SearchesConfig } from 'components/search/SearchConfig';
 import type { SearchBarFormValues } from 'views/Constants';
+import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 
 import SearchBarForm from './searchbar/SearchBarForm';
 
@@ -55,6 +57,10 @@ type Props = {
   queryFilters: Immutable.Map<QueryId, FilterType>,
 };
 
+const TopRow = styled(Row)`
+  margin-bottom: 10px;
+`;
+
 const FlexCol = styled(Col)`
   display: flex;
   align-items: stretch;
@@ -65,8 +71,17 @@ const StreamWrap = styled.div`
   flex: 1;
   
   > div {
-    margin-right: 24px;
+    margin-right: 18px;
   }
+`;
+
+const SearchButtonAndQuery = styled.div`
+  flex: 1;
+  display: flex;
+`;
+
+const StyledQueryInput = styled(QueryInput)`
+  flex: 1;
 `;
 
 const defaultOnSubmit = ({ timerange, streams, queryString }, currentQuery: Query) => {
@@ -105,74 +120,80 @@ const SearchBar = ({
   const _onSubmit = (values) => onSubmit(values, currentQuery);
 
   return (
-    <ScrollToHint value={query.query_string}>
-      <Row className="content">
-        <Col md={12}>
-          <SearchBarForm initialValues={{ timerange, streams, queryString }}
-                         limitDuration={limitDuration}
-                         onSubmit={_onSubmit}>
-            {({ dirty, isSubmitting, isValid, handleSubmit, values, setFieldValue }) => (
-              <>
-                <TopRow>
-                  <FlexCol md={5}>
-                    <TimeRangeTypeSelector disabled={disableSearch}
-                                           setCurrentTimeRange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
-                                           currentTimeRange={values?.timerange}
-                                           hasErrorOnMount={!isValid} />
-                  </FlexCol>
+    <WidgetFocusContext.Consumer>
+      {({ focusedWidget: { editing } = { editing: false } }) => (
+        <ScrollToHint value={query.query_string}>
+          <FlatContentRow>
+            <SearchBarForm initialValues={{ timerange, streams, queryString }}
+                           limitDuration={limitDuration}
+                           onSubmit={_onSubmit}>
+              {({ dirty, isSubmitting, isValid, handleSubmit, values, setFieldValue }) => (
+                <>
+                  <TopRow>
+                    <Col md={5}>
+                      <TimeRangeInput disabled={disableSearch}
+                                      onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
+                                      value={values?.timerange}
+                                      hasErrorOnMount={!isValid} />
+                    </Col>
 
-                  <Col mdHidden lgHidden>
-                    <HorizontalSpacer />
-                  </Col>
+                    <Col mdHidden lgHidden>
+                      <HorizontalSpacer />
+                    </Col>
 
-                  <FlexCol md={7}>
-                    <StreamWrap>
-                      <Field name="streams">
+                    <FlexCol md={7}>
+                      <StreamWrap>
+                        <Field name="streams">
+                          {({ field: { name, value, onChange } }) => (
+                            <StreamsFilter value={value}
+                                           streams={availableStreams}
+                                           onChange={(newStreams) => onChange({ target: { value: newStreams, name } })} />
+                          )}
+                        </Field>
+                      </StreamWrap>
+
+                      <RefreshControls />
+                    </FlexCol>
+                  </TopRow>
+
+                  <BottomRow>
+                    <SearchButtonAndQuery>
+                      <SearchButton disabled={disableSearch || isSubmitting || !isValid}
+                                    dirty={dirty} />
+
+                      <Field name="queryString">
                         {({ field: { name, value, onChange } }) => (
-                          <StreamsFilter value={value}
-                                         streams={availableStreams}
-                                         onChange={(newStreams) => onChange({ target: { value: newStreams, name } })} />
+                          <StyledQueryInput value={value}
+                                            placeholder={'Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'}
+                                            onChange={(newQuery) => {
+                                              onChange({ target: { value: newQuery, name } });
+
+                                              return Promise.resolve(newQuery);
+                                            }}
+                                            onExecute={handleSubmit as () => void} />
                         )}
                       </Field>
-                    </StreamWrap>
 
-                    <RefreshControls />
-                  </FlexCol>
-                </TopRow>
+                      <div className="search-help">
+                        <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
+                                           title="Search query syntax documentation"
+                                           text={<Icon name="lightbulb" />} />
+                      </div>
+                    </SearchButtonAndQuery>
 
-                <Row className="no-bm">
-                  <Col md={9} xs={8}>
-                    <div className="pull-right search-help">
-                      <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
-                                         title="Search query syntax documentation"
-                                         text={<Icon name="lightbulb" />} />
-                    </div>
-                    <SearchButton disabled={disableSearch || isSubmitting || !isValid}
-                                  dirty={dirty} />
-
-                    <Field name="queryString">
-                      {({ field: { name, value, onChange } }) => (
-                        <QueryInput value={value}
-                                    placeholder={'Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'}
-                                    onChange={(newQuery) => {
-                                      onChange({ target: { value: newQuery, name } });
-
-                                      return Promise.resolve(newQuery);
-                                    }}
-                                    onExecute={handleSubmit as () => void} />
-                      )}
-                    </Field>
-                  </Col>
-                  <Col md={3} xs={4} className="pull-right" aria-label="Search Meta Buttons">
-                    <SavedSearchControls />
-                  </Col>
-                </Row>
-              </>
-            )}
-          </SearchBarForm>
-        </Col>
-      </Row>
-    </ScrollToHint>
+                    {!editing && (
+                      <ViewActionsWrapper>
+                        <SavedSearchControls />
+                      </ViewActionsWrapper>
+                    )}
+                  </BottomRow>
+                </>
+              )}
+            </SearchBarForm>
+          </FlatContentRow>
+        </ScrollToHint>
+      )}
+    </WidgetFocusContext.Consumer>
   );
 };
 

@@ -26,7 +26,7 @@ import javax.ws.rs.container.ContainerRequestFilter;
 import java.io.IOException;
 
 // Needs to run before ShiroAuthorizationFilter
-@Priority(Priorities.AUTHORIZATION - 20)
+@Priority(Priorities.AUTHENTICATION - 9)
 public class RequestIdFilter implements ContainerRequestFilter {
     public final static String X_REQUEST_ID = "X-Request-Id";
 

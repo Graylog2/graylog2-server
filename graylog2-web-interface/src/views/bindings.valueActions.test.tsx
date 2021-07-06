@@ -14,16 +14,26 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import MockStore from 'helpers/mocking/StoreMock';
+
 import FieldType, { FieldTypes, Properties } from 'views/logic/fieldtypes/FieldType';
 
 import bindings from './bindings';
-import type { ActionHandlerCondition } from './components/actions/ActionHandler';
+
+jest.mock('views/stores/FieldTypesStore', () => ({
+  FieldTypesStore: MockStore(['getInitialState', () => ({ all: {}, queryFields: {} })]),
+}));
+
+jest.mock('stores/configurations/ConfigurationsStore', () => ({
+  ConfigurationsStore: MockStore(),
+}));
+
+jest.mock('stores/decorators/DecoratorsStore', () => ({
+  DecoratorsStore: MockStore(),
+}));
 
 describe('Views bindings value actions', () => {
   const { valueActions } = bindings;
-  type ValueAction = {
-    isEnabled: ActionHandlerCondition,
-  };
   const defaultArguments = {
     queryId: 'query1',
     contexts: {
@@ -34,7 +44,7 @@ describe('Views bindings value actions', () => {
   const findAction = (type) => valueActions.find((binding) => binding.type === type);
 
   describe('CreateExtractor', () => {
-    const action: ValueAction = findAction('create-extractor');
+    const action = findAction('create-extractor');
     const { isEnabled } = action;
 
     it('is present', () => {

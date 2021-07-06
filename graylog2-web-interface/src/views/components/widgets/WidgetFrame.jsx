@@ -21,12 +21,9 @@ import styled, { css } from 'styled-components';
 const WidgetWrap = styled.div(({ theme }) => css`
   height: inherit;
   margin: 0;
-  padding: 20px;
-  display: grid;
-  display: -ms-grid;
-  grid-template-rows: auto minmax(10px, 1fr);
-  -ms-grid-rows: auto minmax(10px, 1fr);
-  -ms-grid-columns: 1fr;
+  padding: 7px 9px 6px 9px;
+  display: flex;
+  flex-direction: column;
 
   .widget-top {
     position: relative;

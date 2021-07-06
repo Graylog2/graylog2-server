@@ -39,7 +39,7 @@ const SystemOutputsPage = createReactClass({
             </span>
 
             <span>
-              You can find output plugins in <a href="https://marketplace.graylog.org/" target="_blank">the Graylog Marketplace</a>.
+              You can find output plugins in <a href="https://marketplace.graylog.org/" target="_blank" rel="noreferrer">the Graylog Marketplace</a>.
             </span>
           </PageHeader>
 

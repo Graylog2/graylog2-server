@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useEffect, useContext } from 'react';
+import { useCallback, useEffect, useContext, useState } from 'react';
 import * as Immutable from 'immutable';
 import styled, { css } from 'styled-components';
 
@@ -60,6 +60,8 @@ import SearchPageLayoutProvider from 'views/components/contexts/SearchPageLayout
 import usePluginEntities from 'views/logic/usePluginEntities';
 import WidgetFocusProvider from 'views/components/contexts/WidgetFocusProvider';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
+import SearchExecutionState from 'views/logic/search/SearchExecutionState';
+import { RefluxActions } from 'stores/StoreTypes';
 
 const GridContainer = styled.div<{ interactive: boolean }>(({ interactive }) => {
   return interactive ? css`
@@ -70,14 +72,16 @@ const GridContainer = styled.div<{ interactive: boolean }>(({ interactive }) => 
     > *:nth-child(2) {
       flex-grow: 1;
     }
-  ` : '';
+  ` : css`
+    flex: 1
+  `;
 });
 
 const SearchArea = styled(PageContentLayout)(() => {
   const { focusedWidget } = useContext(WidgetFocusContext);
 
   return css`
-    ${focusedWidget && css`
+    ${focusedWidget?.id && css`
       .page-content-grid {
         display: flex;
         flex-direction: column;
@@ -85,7 +89,7 @@ const SearchArea = styled(PageContentLayout)(() => {
         width: 100%;
 
         /* overflow auto is required to display the message table widget height correctly */
-        overflow: ${focusedWidget ? 'auto' : 'visible'};
+        overflow: ${focusedWidget?.id ? 'auto' : 'visible'};
       }
     `}
   `;
@@ -106,7 +110,7 @@ type Props = {
   location: Location,
 };
 
-const _searchRefreshConditionChain = (searchRefreshHooks, state: SearchRefreshConditionArguments) => {
+const _searchRefreshConditionChain = (searchRefreshHooks: Array<SearchRefreshCondition>, state: SearchRefreshConditionArguments) => {
   if (!searchRefreshHooks || searchRefreshHooks.length === 0) {
     return true;
   }
@@ -114,15 +118,19 @@ const _searchRefreshConditionChain = (searchRefreshHooks, state: SearchRefreshCo
   return searchRefreshHooks.every((condition: SearchRefreshCondition) => condition(state));
 };
 
-const _refreshIfNotUndeclared = (searchRefreshHooks, executionState) => {
+const _refreshIfNotUndeclared = (searchRefreshHooks: Array<SearchRefreshCondition>, executionState: SearchExecutionState, setHasErrors: (hasErrors: boolean) => void) => {
   const { view } = ViewStore.getInitialState();
 
   return SearchMetadataActions.parseSearch(view.search).then((searchMetadata) => {
     if (_searchRefreshConditionChain(searchRefreshHooks, { view, searchMetadata, executionState })) {
-      FieldTypesActions.all();
+      FieldTypesActions.refresh();
+
+      setHasErrors(false);
 
       return SearchActions.execute(executionState);
     }
+
+    setHasErrors(true);
 
     return Promise.reject(searchMetadata);
   });
@@ -139,92 +147,104 @@ const ViewAdditionalContextProvider = connect(
 
 ViewAdditionalContextProvider.displayName = 'ViewAdditionalContextProvider';
 
-const Search = ({ location }: Props) => {
-  const { pathname, search } = location;
-  const query = `${pathname}${search}`;
-  const searchRefreshHooks: Array<SearchRefreshCondition> = usePluginEntities('views.hooks.searchRefresh');
-  const refreshIfNotUndeclared = useCallback(
-    () => _refreshIfNotUndeclared(searchRefreshHooks, SearchExecutionStateStore.getInitialState()),
-    [searchRefreshHooks],
-  );
+const useRefreshSearchOn = (actions: Array<RefluxActions<any>>, refresh: () => Promise<any>) => {
+  useEffect(() => {
+    let storeListenersUnsubscribes = Immutable.List<() => void>();
 
+    refresh().finally(() => {
+      storeListenersUnsubscribes = storeListenersUnsubscribes
+        .push(SearchActions.refresh.listen(refresh))
+        .push(ViewActions.search.completed.listen(refresh));
+    });
+
+    // Returning cleanup function used when unmounting
+    return () => { storeListenersUnsubscribes.forEach((unsubscribeFunc) => unsubscribeFunc()); };
+  }, [refresh]);
+};
+
+const useBindSearchParamsFromQuery = (query: { [key: string]: unknown }) => {
   useEffect(() => {
     const { view } = ViewStore.getInitialState();
 
-    bindSearchParamsFromQuery({ view, query: location.query, retry: () => Promise.resolve() });
-  }, [location.query]);
+    bindSearchParamsFromQuery({ view, query, retry: () => Promise.resolve() });
+  }, [query]);
+};
+
+const Search = ({ location }: Props) => {
+  const { pathname, search } = location;
+  const query = `${pathname}${search}`;
+  const searchRefreshHooks = usePluginEntities('views.hooks.searchRefresh');
+  const [hasErrors, setHasErrors] = useState(false);
+  const refreshIfNotUndeclared = useCallback(
+    () => _refreshIfNotUndeclared(searchRefreshHooks, SearchExecutionStateStore.getInitialState(), setHasErrors),
+    [searchRefreshHooks],
+  );
+
+  useBindSearchParamsFromQuery(location.query);
+  useSyncWithQueryParameters(query);
+
+  useRefreshSearchOn([SearchActions.refresh, ViewActions.search], refreshIfNotUndeclared);
 
   useEffect(() => {
     SearchConfigActions.refresh();
 
     StreamsActions.refresh();
-
-    let storeListenersUnsubscribes = Immutable.List<() => void>();
-
-    refreshIfNotUndeclared().finally(() => {
-      storeListenersUnsubscribes = storeListenersUnsubscribes
-        .push(SearchActions.refresh.listen(refreshIfNotUndeclared))
-        .push(ViewActions.search.completed.listen(refreshIfNotUndeclared));
-    });
-
-    // Returning cleanup function used when unmounting
-    return () => { storeListenersUnsubscribes.forEach((unsubscribeFunc) => unsubscribeFunc()); };
-  }, [refreshIfNotUndeclared]);
-
-  useSyncWithQueryParameters(query);
+  }, []);
 
   return (
     <WidgetFocusProvider>
-      <CurrentViewTypeProvider>
-        <IfInteractive>
-          <IfDashboard>
-            <WindowLeaveMessage />
-          </IfDashboard>
-        </IfInteractive>
-        <InteractiveContext.Consumer>
-          {(interactive) => (
-            <SearchPageLayoutProvider>
-              <DefaultFieldTypesProvider>
-                <ViewAdditionalContextProvider>
-                  <HighlightingRulesProvider>
-                    <GridContainer id="main-row" interactive={interactive}>
-                      <IfInteractive>
-                        <ConnectedSidebar>
-                          <FieldsOverview />
-                        </ConnectedSidebar>
-                      </IfInteractive>
-                      <SearchArea>
-                        <IfInteractive>
-                          <HeaderElements />
-                          <IfDashboard>
-                            <DashboardSearchBarWithStatus onExecute={refreshIfNotUndeclared} />
-                          </IfDashboard>
-                          <IfSearch>
-                            <SearchBarWithStatus onExecute={refreshIfNotUndeclared} />
-                          </IfSearch>
+      <WidgetFocusContext.Consumer>
+        {({ focusedWidget: { focusing: focusingWidget, editing: editingWidget } = { focusing: false, editing: false } }) => (
+          <CurrentViewTypeProvider>
+            <IfInteractive>
+              <IfDashboard>
+                <WindowLeaveMessage />
+              </IfDashboard>
+            </IfInteractive>
+            <InteractiveContext.Consumer>
+              {(interactive) => (
+                <SearchPageLayoutProvider>
+                  <DefaultFieldTypesProvider>
+                    <ViewAdditionalContextProvider>
+                      <HighlightingRulesProvider>
+                        <GridContainer id="main-row" interactive={interactive}>
+                          <IfInteractive>
+                            <ConnectedSidebar>
+                              <FieldsOverview />
+                            </ConnectedSidebar>
+                          </IfInteractive>
+                          <SearchArea>
+                            <IfInteractive>
+                              <HeaderElements />
+                              <IfDashboard>
+                                {!editingWidget && <DashboardSearchBarWithStatus onExecute={refreshIfNotUndeclared} />}
+                              </IfDashboard>
+                              <IfSearch>
+                                <SearchBarWithStatus onExecute={refreshIfNotUndeclared} />
+                              </IfSearch>
 
-                          <QueryBarElements />
+                              <QueryBarElements />
 
-                          <IfDashboard>
-                            <QueryBar />
-                          </IfDashboard>
-                        </IfInteractive>
-                        <HighlightMessageInQuery>
-                          <SearchResult />
-                        </HighlightMessageInQuery>
-                      </SearchArea>
-                    </GridContainer>
-                  </HighlightingRulesProvider>
-                </ViewAdditionalContextProvider>
-              </DefaultFieldTypesProvider>
-            </SearchPageLayoutProvider>
-          )}
-        </InteractiveContext.Consumer>
-      </CurrentViewTypeProvider>
+                              <IfDashboard>
+                                {!focusingWidget && <QueryBar />}
+                              </IfDashboard>
+                            </IfInteractive>
+                            <HighlightMessageInQuery>
+                              <SearchResult hasErrors={hasErrors} />
+                            </HighlightMessageInQuery>
+                          </SearchArea>
+                        </GridContainer>
+                      </HighlightingRulesProvider>
+                    </ViewAdditionalContextProvider>
+                  </DefaultFieldTypesProvider>
+                </SearchPageLayoutProvider>
+              )}
+            </InteractiveContext.Consumer>
+          </CurrentViewTypeProvider>
+        )}
+      </WidgetFocusContext.Consumer>
     </WidgetFocusProvider>
   );
 };
-
-Search.propTypes = {};
 
 export default withLocation(Search);

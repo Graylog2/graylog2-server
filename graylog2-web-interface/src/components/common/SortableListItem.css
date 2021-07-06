@@ -1,9 +1,0 @@
-:local(.listGroupItem) {
-    display: inline-block;
-    width: 100%;
-}
-
-:local(.itemHandle) {
-    float: left;
-    margin-right: 10px;
-}

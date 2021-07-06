@@ -186,7 +186,7 @@ export default class AggregationWidgetConfig extends WidgetConfig {
 
   equalsForSearch(other: any) {
     if (other instanceof AggregationWidgetConfig) {
-      return ['rowPivots', 'columnPivots', 'series', 'sort', 'rollup', 'eventAnnotation']
+      return ['rowPivots', 'columnPivots', 'series', 'sort', 'rollup', 'eventAnnotation', 'visualizationConfig']
         .every((key) => isEqualForSearch(this[key], other[key]));
     }
 
@@ -297,3 +297,5 @@ class Builder {
     );
   }
 }
+
+export type AggregationWidgetConfigBuilder = InstanceType<typeof Builder>;

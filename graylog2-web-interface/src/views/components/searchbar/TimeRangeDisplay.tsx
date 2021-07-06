@@ -18,14 +18,14 @@ import * as React from 'react';
 import { useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 
-import DateTime from 'logic/datetimes/DateTime';
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import StoreProvider from 'injection/StoreProvider';
 import { isTypeKeyword, isTypeRelativeWithStartOnly, isTypeRelativeWithEnd } from 'views/typeGuards/timeRange';
+import { readableRange } from 'views/logic/queries/TimeRangeToString';
 
 type Props = {
   timerange: TimeRange | NoTimeRangeOverride | null | undefined,
-  toggleDropdownShow: () => void,
+  toggleDropdownShow?: () => void,
 };
 
 export const EMPTY_RANGE = '----/--/-- --:--:--.---';
@@ -53,12 +53,6 @@ const TimeRangeWrapper = styled.p(({ theme }) => css`
     font-size: ${theme.fonts.size.body};
   }
 `);
-
-const readableRange = (timerange: TimeRange, fieldName: 'range' | 'from' | 'to', placeholder = 'All Time') => {
-  return !timerange[fieldName] ? placeholder : DateTime.now()
-    .subtract(timerange[fieldName] * 1000)
-    .fromNow();
-};
 
 const dateOutput = (timerange: TimeRange) => {
   let from = EMPTY_RANGE;
@@ -124,12 +118,16 @@ const TimeRangeDisplay = ({ timerange, toggleDropdownShow }: Props) => {
         ? <span><code>No Override</code></span>
         : (
           <>
-            <span><strong>From</strong>: <code>{from}</code></span>
-            <span><strong>Until</strong>: <code>{until}</code></span>
+            <span data-testid="from"><strong>From</strong>: <code>{from}</code></span>
+            <span data-testid="to"><strong>Until</strong>: <code>{until}</code></span>
           </>
         )}
     </TimeRangeWrapper>
   );
+};
+
+TimeRangeDisplay.defaultProps = {
+  toggleDropdownShow: undefined,
 };
 
 export default TimeRangeDisplay;

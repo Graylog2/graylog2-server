@@ -134,7 +134,7 @@ class CommandFactoryTest {
         ExportMessagesCommand command = buildFrom(s, resultFormat);
 
         assertThat(command.fieldsInOrder()).isEqualTo(resultFormat.fieldsInOrder());
-        assertThat(command.limit()).isEqualTo(resultFormat.limit());
+        assertThat(command.limit().orElseThrow(IllegalStateException::new)).isEqualTo(resultFormat.limit().orElseThrow(IllegalStateException::new));
     }
 
     @Test

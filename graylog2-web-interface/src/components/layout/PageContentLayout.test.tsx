@@ -44,7 +44,7 @@ describe('PageContentLayout', () => {
       globalNotifications: [
         {
           key: 'org.graylog.plugins.globalNotification.licenseWarning',
-          component: () => 'Your license is expiring.',
+          component: () => <>Your license is expiring.</>,
         },
       ],
     }));

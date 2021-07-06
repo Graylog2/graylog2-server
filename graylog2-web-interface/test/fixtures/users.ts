@@ -18,51 +18,16 @@ import * as Immutable from 'immutable';
 import { readerPermissions } from 'fixtures/permissions';
 
 import User from 'logic/users/User';
-import type { UserJSON } from 'logic/users/User';
-
-export const viewsManager: UserJSON = {
-  email: '',
-  external: false,
-  full_name: 'Betty Holberton',
-  id: 'user-id-1',
-  last_activity: '2020-01-01T10:40:05.376+0000',
-  permissions: ['dashboards:edit:view-id', 'view:edit:view-id'],
-  grn_permissions: ['entity:own:grn::::dashboard:view-id', 'entity:own:grn::::view:view-id', 'entity:own:grn::::search:some-id'],
-  preferences: { updateUnfocussed: false, enableSmartSearch: true, themeMode: 'teint' },
-  read_only: true,
-  roles: ['Views Manager'],
-  session_active: true,
-  session_timeout_ms: 28800000,
-  timezone: 'UTC',
-  username: 'betty',
-  client_address: '127.0.0.1',
-  account_status: 'enabled',
-};
-
-export const admin: UserJSON = {
-  client_address: '127.0.0.1',
-  email: '',
-  external: false,
-  full_name: 'Alonzo Church',
-  id: 'user-id-2',
-  last_activity: '2020-01-01T10:40:05.376+0000',
-  permissions: ['*'],
-  preferences: { updateUnfocussed: false, enableSmartSearch: true, themeMode: 'teint' },
-  read_only: true,
-  roles: ['Admin'],
-  session_active: false,
-  session_timeout_ms: 28800000,
-  timezone: 'UTC',
-  username: 'alonzo',
-  account_status: 'enabled',
-};
 
 export const alice = User.builder()
   .id('alice-id')
   .username('alice')
   .fullName('Alice Schwarzer')
+  .firstName('Alice')
+  .lastName('Schwarzer')
   .email('alice@example.org')
   .permissions(Immutable.List(readerPermissions('alice')))
+  .grnPermissions(Immutable.List())
   .preferences({ updateUnfocussed: false, enableSmartSearch: true, themeMode: 'noir' })
   .roles(Immutable.Set(['Reader']))
   .readOnly(false)
@@ -77,8 +42,11 @@ export const bob = User.builder()
   .id('bob-id')
   .username('bob')
   .fullName('Bob Bobson')
+  .firstName('Bob')
+  .lastName('Bobson')
   .email('bob@example.org')
   .permissions(Immutable.List(readerPermissions('bob')))
+  .grnPermissions(Immutable.List())
   .preferences({ updateUnfocussed: false, enableSmartSearch: true, themeMode: 'teint' })
   .roles(Immutable.Set(['Reader']))
   .readOnly(false)
@@ -93,8 +61,11 @@ export const adminUser = User.builder()
   .id('admin-id')
   .username('admin')
   .fullName('Administrator')
+  .firstName('Administrator')
+  .lastName('')
   .email('admin@example.org')
   .permissions(Immutable.List(['*']))
+  .grnPermissions(Immutable.List())
   .roles(Immutable.Set(['Admin', 'Reader']))
   .readOnly(false)
   .external(true)

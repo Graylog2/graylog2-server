@@ -123,7 +123,7 @@ const MessageTableEntry = ({
   return (
     <tbody className={classes}>
       <tr className="fields-row" onClick={_toggleDetail}>
-        { selectedFields.toArray().map((selectedFieldName, idx) => {
+        {selectedFields.toArray().map((selectedFieldName, idx) => {
           const type = fieldType(selectedFieldName, message, fields);
 
           return (
@@ -139,7 +139,7 @@ const MessageTableEntry = ({
               )}
             </td>
           );
-        }) }
+        })}
       </tr>
 
       {showMessageRow

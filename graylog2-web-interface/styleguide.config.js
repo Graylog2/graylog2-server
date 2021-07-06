@@ -80,17 +80,24 @@ module.exports = {
           name: 'Fonts',
           content: 'src/theme/docs/Fonts.md',
         },
-        // TODO: add src/theme/docs/Colors.md color swatches
+        {
+          name: 'Colors',
+          content: 'src/theme/docs/Colors.md',
+        },
         {
           name: 'Color Utilities',
           content: 'src/theme/docs/Utilities.md',
+        },
+        {
+          name: 'Spacings',
+          content: 'src/theme/docs/Spacings.md',
         },
       ],
     },
   ],
   usageMode: 'collapse',
   styleguideComponents: {
-    Wrapper: path.join(__dirname, 'src/theme/GraylogThemeProvider'),
+    Wrapper: path.join(__dirname, 'docs/StyleGuideWrapper'),
   },
   styleguideDir: 'docs/styleguide',
   title: 'Graylog UI documentation',

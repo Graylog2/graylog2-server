@@ -21,6 +21,7 @@ import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNTypes;
 import org.graylog.plugins.views.search.views.ViewRequirements;
 import org.graylog.plugins.views.search.views.ViewService;
+import org.graylog.plugins.views.search.views.ViewSummaryService;
 import org.graylog.security.Capability;
 import org.graylog.security.DBGrantService;
 import org.graylog.security.entities.EntityOwnershipService;
@@ -63,13 +64,14 @@ class ViewOwnershipToGrantsMigrationTest {
                MongoJackObjectMapperProvider objectMapperProvider,
                GRNRegistry grnRegistry,
                @Mock ClusterConfigService clusterConfigService,
-               @Mock UserService userService) {
+               @Mock UserService userService,
+               @Mock ViewSummaryService viewSummaryService) {
 
         this.userService = userService;
         this.grantService = new DBGrantService(mongodb.mongoConnection(), objectMapperProvider, grnRegistry);
 
         final EntityOwnershipService entityOwnershipService = new EntityOwnershipService(grantService, grnRegistry);
-        final TestViewService viewService = new TestViewService(mongodb.mongoConnection(), objectMapperProvider, clusterConfigService, entityOwnershipService);
+        final TestViewService viewService = new TestViewService(mongodb.mongoConnection(), objectMapperProvider, clusterConfigService, entityOwnershipService, viewSummaryService);
 
         this.migration = new ViewOwnerShipToGrantsMigration(userService, grantService, "admin", viewService, grnRegistry);
     }
@@ -131,8 +133,9 @@ class ViewOwnershipToGrantsMigrationTest {
         public TestViewService(MongoConnection mongoConnection,
                                MongoJackObjectMapperProvider mapper,
                                ClusterConfigService clusterConfigService,
-                               EntityOwnershipService entityOwnerShipService) {
-            super(mongoConnection, mapper, clusterConfigService, view -> new ViewRequirements(Collections.emptySet(), view), entityOwnerShipService);
+                               EntityOwnershipService entityOwnerShipService,
+                               ViewSummaryService viewSummaryService) {
+            super(mongoConnection, mapper, clusterConfigService, view -> new ViewRequirements(Collections.emptySet(), view), entityOwnerShipService, viewSummaryService);
         }
     }
 }

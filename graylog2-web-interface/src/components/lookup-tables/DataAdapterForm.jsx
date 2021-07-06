@@ -22,7 +22,7 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import { Col, Row, Button } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import ObjectUtils from 'util/ObjectUtils';
-import * as FormsUtils from 'util/FormsUtils';
+import { getValueFromInput } from 'util/FormsUtils';
 import CombinedProvider from 'injection/CombinedProvider';
 import { TimeUnitInput } from 'components/common';
 
@@ -108,6 +108,7 @@ class DataAdapterForm extends React.Component {
       // when creating always initially auto-generate the adapter name,
       // this will be false if the user changed the adapter name manually
       generateAdapterName: create,
+      isFormDisabled: false,
       dataAdapter: {
         id: adapter.id,
         title: adapter.title,
@@ -128,6 +129,10 @@ class DataAdapterForm extends React.Component {
     }
   };
 
+  _setIsFormDisabled = (isDisabled) => {
+    this.setState({ isFormDisabled: isDisabled });
+  };
+
   _validate = (adapter) => {
     const { validate } = this.props;
 
@@ -143,7 +148,7 @@ class DataAdapterForm extends React.Component {
     const { dataAdapter: dataAdapterState } = this.state;
     const dataAdapter = ObjectUtils.clone(dataAdapterState);
 
-    dataAdapter[event.target.name] = FormsUtils.getValueFromInput(event.target);
+    dataAdapter[event.target.name] = getValueFromInput(event.target);
     let { generateAdapterName } = this.state;
 
     if (generateAdapterName && event.target.name === 'title') {
@@ -164,7 +169,7 @@ class DataAdapterForm extends React.Component {
     const { dataAdapter: dataAdapterState } = this.state;
     const dataAdapter = ObjectUtils.clone(dataAdapterState);
 
-    dataAdapter.config[event.target.name] = FormsUtils.getValueFromInput(event.target);
+    dataAdapter.config[event.target.name] = getValueFromInput(event.target);
     this._validate(dataAdapter);
     this.setState({ dataAdapter: dataAdapter });
   };
@@ -257,7 +262,7 @@ class DataAdapterForm extends React.Component {
   };
 
   render() {
-    const { dataAdapter } = this.state;
+    const { dataAdapter, isFormDisabled } = this.state;
     const { create, type, title } = this.props;
     const adapterPlugins = PluginStore.exports('lookupTableAdapters');
 
@@ -277,6 +282,7 @@ class DataAdapterForm extends React.Component {
         updateConfig: this._updateConfig,
         validationMessage: this._validationMessage,
         validationState: this._validationState,
+        setDisableFormSubmission: this._setIsFormDisabled,
       });
 
       if (p.documentationComponent) {
@@ -357,7 +363,7 @@ class DataAdapterForm extends React.Component {
               <fieldset>
                 <Row>
                   <Col mdOffset={3} md={9}>
-                    <Button type="submit" bsStyle="success">{create ? 'Create Adapter'
+                    <Button type="submit" bsStyle="success" disabled={isFormDisabled}>{create ? 'Create Adapter'
                       : 'Update Adapter'}
                     </Button>
                   </Col>

@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 // eslint-disable-next-line no-restricted-imports
@@ -168,13 +168,18 @@ const Panel = ({
   onToggle,
   ...props
 }) => {
-  const [isExpanded, setIsExpanded] = useState(defaultExpanded);
+  const [isExpanded, setIsExpanded] = useState(null);
+  const didRender = useRef(false);
 
   useEffect(() => {
-    setIsExpanded((defaultExpanded && expanded)
-      || (!defaultExpanded && expanded)
-      || (defaultExpanded && isExpanded === expanded));
-  }, [defaultExpanded, expanded, isExpanded]);
+    setIsExpanded((prevIsExpanded) => ((defaultExpanded && expanded)
+        || (!defaultExpanded && expanded)
+        || (defaultExpanded && prevIsExpanded === expanded)));
+  }, [expanded, defaultExpanded]);
+
+  useEffect(() => {
+    didRender.current = true;
+  }, []);
 
   const handleToggle = (nextIsExpanded) => {
     setIsExpanded(nextIsExpanded);
@@ -185,7 +190,9 @@ const Panel = ({
 
   if (header || footer || title || collapsible || hasDeprecatedChildren) {
     /** NOTE: Deprecated & should be removed in 4.0 */
-    deprecationNotice('You have used a deprecated `Panel` prop, please check the documentation to use the latest `Panel`.');
+    if (!didRender.current) {
+      deprecationNotice('You have used a deprecated `Panel` prop, please check the documentation to use the latest `Panel`.');
+    }
 
     return (
       /* NOTE: this exists as a deprecated render for older Panel instances */
@@ -229,7 +236,7 @@ Panel.propTypes = {
    */
   defaultExpanded: PropTypes.bool,
   /**
-   * Controls the collapsed/expanded state ofthe Panel. Requires
+   * Controls the collapsed/expanded state of the Panel. Requires
    * a `Panel.Collapse` or `<Panel.Body collapsible>` child component
    * in order to actually animate out or in.
    *

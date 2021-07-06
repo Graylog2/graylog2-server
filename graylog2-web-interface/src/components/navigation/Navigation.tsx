@@ -16,13 +16,13 @@
  */
 import * as React from 'react';
 import { useContext } from 'react';
-import PropTypes from 'prop-types';
 import naturalSort from 'javascript-natural-sort';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import withLocation from 'routing/withLocation';
 import { LinkContainer } from 'components/graylog/router';
 import { appPrefixed } from 'util/URLUtils';
+import AppConfig from 'util/AppConfig';
 import { IfPermitted } from 'components/common';
 import { isPermitted } from 'util/PermissionsMixin';
 import { Navbar, Nav, NavItem, NavDropdown } from 'components/graylog';
@@ -83,7 +83,7 @@ type Props = {
 
 const Navigation = ({ location }: Props) => {
   const currentUser = useContext(CurrentUserContext);
-  const { permissions, full_name: fullName, read_only: readOnly, id: userId } = currentUser || {};
+  const { permissions, fullName, readOnly, id: userId } = currentUser || {};
 
   const pluginExports = PluginStore.exports('navigation');
 
@@ -142,9 +142,13 @@ const Navigation = ({ location }: Props) => {
         <NotificationBadge />
 
         <Nav navbar pullRight className="header-meta-nav">
-          <LinkContainer to={Routes.SYSTEM.NODES.LIST}>
-            <GlobalThroughput />
-          </LinkContainer>
+          {AppConfig.isCloud() ? (
+            <GlobalThroughput disabled />
+          ) : (
+            <LinkContainer to={Routes.SYSTEM.NODES.LIST}>
+              <GlobalThroughput />
+            </LinkContainer>
+          )}
 
           <InactiveNavItem className="dev-badge-wrap">
             <DevelopmentHeaderBadge />

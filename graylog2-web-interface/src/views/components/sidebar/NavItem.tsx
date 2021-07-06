@@ -104,8 +104,7 @@ const Container = styled.div<ContainerProps>(({ theme, isSelected, showTitleOnHo
   :active {
     background: ${theme.colors.variant.lighter.default};
   }
-  
-  /* stylelint-disable indentation, selector-max-empty-lines */
+  /* stylelint-disable selector-max-empty-lines, indentation */
   ${(isSelected && !sidebarIsPinned) && css`
     ::before,
     ::after {
@@ -127,7 +126,7 @@ const Container = styled.div<ContainerProps>(({ theme, isSelected, showTitleOnHo
       bottom: calc(50% - 12px);
     }
   `}
-  /* stylelint-enable indentation, selector-max-empty-lines */
+  /* stylelint-enable selector-max-empty-lines, indentation */
 
   ${IconWrap} {
     overflow: hidden;

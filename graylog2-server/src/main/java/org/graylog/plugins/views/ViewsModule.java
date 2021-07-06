@@ -75,9 +75,9 @@ public abstract class ViewsModule extends VersionAwareModule {
         return MapBinder.newMapBinder(binder(), String.class, SeriesDescription.class);
     }
 
-    protected void registerPivotAggregationFunction(String name, Class<? extends SeriesSpec> seriesSpecClass) {
+    protected void registerPivotAggregationFunction(String name, String description, Class<? extends SeriesSpec> seriesSpecClass) {
         registerJacksonSubtype(seriesSpecClass);
-        seriesSpecBinder().addBinding(name).toInstance(SeriesDescription.create(name));
+        seriesSpecBinder().addBinding(name).toInstance(SeriesDescription.create(name, description));
     }
 
     protected MapBinder<String, QueryBackend<? extends GeneratedQueryContext>> queryBackendBinder(Version version) {

@@ -58,13 +58,8 @@ type Props = {
   onDelete: (EventDefinition) => void,
 };
 
-const getConditionPlugin = (type) => {
-  if (type === undefined) {
-    return {};
-  }
-
-  return PluginStore.exports('eventDefinitionTypes').find((edt) => edt.type === type) || {};
-};
+const getConditionPlugin = (type: string) => PluginStore.exports('eventDefinitionTypes')
+  .find((edt) => edt.type === type);
 
 const renderDescription = (definition, context) => {
   return <EventDefinitionDescription definition={definition} context={context} />;
@@ -107,7 +102,7 @@ const EventDefinitionEntry = ({
   );
 
   const plugin = getConditionPlugin(eventDefinition.config.type);
-  let titleSuffix = plugin.displayName || eventDefinition.config.type;
+  let titleSuffix = <>{plugin?.displayName ?? eventDefinition.config.type}</>;
 
   if (!isScheduled) {
     titleSuffix = (<span>{titleSuffix} <Label bsStyle="warning">disabled</Label></span>);
@@ -123,7 +118,7 @@ const EventDefinitionEntry = ({
                       description={renderDescription(eventDefinition, context)}
                       noItemsText="Could not find any items with the given filter."
                       actions={actions} />
-      { showEntityShareModal && (
+      {showEntityShareModal && (
         <EntityShareModal entityId={eventDefinition.id}
                           entityType="event_definition"
                           entityTypeTitle="event definition"

@@ -15,21 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext, useState, useCallback } from 'react';
+import { useContext } from 'react';
 import styled, { css } from 'styled-components';
 
-import { MenuItem } from 'components/graylog';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import { ActionContext } from 'views/logic/ActionContext';
 import type { QueryId } from 'views/logic/queries/Query';
-import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
-import usePluginEntities from 'views/logic/usePluginEntities';
-
-import type { ActionDefinition } from './ActionHandler';
-import { createHandlerFor } from './ActionHandler';
-
-import OverlayDropdown from '../OverlayDropdown';
-import style from '../Field.css';
+import Action from 'views/components/actions/Action';
 
 type Props = {
   children: React.ReactNode,
@@ -55,68 +47,13 @@ const FieldElement = styled.span.attrs({
 
 const FieldActions = ({ children, disabled, element, menuContainer, name, type, queryId }: Props) => {
   const actionContext = useContext(ActionContext);
-  const { setFocusedWidget } = useContext(WidgetFocusContext);
-  const allFieldActions = usePluginEntities('fieldActions');
-
-  const [open, setOpen] = useState(false);
-  const [overflowingComponents, setOverflowingComponents] = useState({});
-
-  const _onMenuToggle = useCallback(() => setOpen(!open), [open]);
-
-  const wrappedElement = <FieldElement active={open} disabled={disabled}>{element}</FieldElement>;
+  const wrappedElement = ({ active }: { active: boolean }) => <FieldElement active={active} disabled={disabled}>{element}</FieldElement>;
   const handlerArgs = { queryId, field: name, type, contexts: actionContext };
-  const fieldActions = allFieldActions
-    .filter((action: ActionDefinition) => {
-      const { isHidden = () => false } = action;
-
-      return !isHidden(handlerArgs);
-    })
-    .map((action: ActionDefinition) => {
-      const setActionComponents = (fn) => {
-        setOverflowingComponents(fn(overflowingComponents));
-      };
-
-      const handler = createHandlerFor(action, setActionComponents);
-
-      const onSelect = () => {
-        const { resetFocus = false } = action;
-
-        if (resetFocus) {
-          setFocusedWidget(undefined);
-        }
-
-        _onMenuToggle();
-        handler(handlerArgs);
-      };
-
-      const { isEnabled = () => true } = action;
-      const actionDisabled = !isEnabled(handlerArgs);
-
-      return (
-        <MenuItem key={`${name}-action-${action.type}`}
-                  disabled={actionDisabled}
-                  eventKey={{ action: action.type, field: name }}
-                  onSelect={onSelect}>{action.title}
-        </MenuItem>
-      );
-    });
 
   return (
-    <OverlayDropdown show={open}
-                     toggle={wrappedElement}
-                     placement="right"
-                     onToggle={_onMenuToggle}
-                     menuContainer={menuContainer}>
-      <div style={{ marginBottom: '10px' }}>
-        <span className={`field-name ${style.dropdownheader}`}>
-          {children}
-        </span>
-      </div>
-
-      <MenuItem divider />
-      <MenuItem header>Actions</MenuItem>
-      {fieldActions}
-    </OverlayDropdown>
+    <Action element={wrappedElement} handlerArgs={handlerArgs} menuContainer={menuContainer} type="field">
+      {children}
+    </Action>
   );
 };
 

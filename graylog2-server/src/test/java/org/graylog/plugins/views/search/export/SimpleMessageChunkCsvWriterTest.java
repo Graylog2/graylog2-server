@@ -107,7 +107,7 @@ class SimpleMessageChunkCsvWriterTest {
     void writesHeaderForFirstChunk() {
         SimpleMessageChunk chunk = simpleMessageChunk("timestamp, source, message",
                 new Object[]{"2015-01-01 01:00:00.000", "source-1", "some text"});
-        SimpleMessageChunk firstChunk = chunk.toBuilder().isFirstChunk(true).build();
+        SimpleMessageChunk firstChunk = chunk.toBuilder().chunkOrder(SimpleMessageChunk.ChunkOrder.FIRST).build();
 
         String result = write(firstChunk);
 

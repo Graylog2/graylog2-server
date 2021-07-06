@@ -22,7 +22,6 @@ import { mount } from 'wrappedEnzyme';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Viewport from 'views/logic/aggregationbuilder/visualizations/Viewport';
 import Series from 'views/logic/aggregationbuilder/Series';
-import WorldMapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/WorldMapVisualizationConfig';
 import RenderCompletionCallback from 'views/components/widgets/RenderCompletionCallback';
 import { AbsoluteTimeRange } from 'views/logic/queries/Query';
 import { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
@@ -85,7 +84,11 @@ describe('WorldMapVisualization', () => {
 
     _onChange(viewport);
 
-    expect(onChange).toHaveBeenCalledWith(WorldMapVisualizationConfig.create(viewport));
+    expect(onChange).toHaveBeenCalledWith({
+      zoom: 0,
+      centerX: 0,
+      centerY: 0,
+    });
   });
 
   it('calls render completion callback after first render', () => {

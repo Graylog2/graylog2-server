@@ -24,6 +24,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Network;
 
+import java.net.URL;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -157,6 +159,12 @@ public class MongoDBInstance extends ExternalResource implements AutoCloseable {
             service.close();
         } catch (Exception e) {
             LOG.error("Error closing service", e);
+        }
+    }
+
+    public void importFixtures(List<URL> fixtureResources) {
+        if (! fixtureResources.isEmpty()) {
+            new MongoDBFixtureImporter(fixtureResources).importResources(service.mongoDatabase());
         }
     }
 }

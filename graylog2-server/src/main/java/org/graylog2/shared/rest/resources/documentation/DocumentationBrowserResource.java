@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Resources;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.rest.RestTools;
+import org.graylog2.shared.rest.HideOnCloud;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import javax.activation.MimetypesFileTypeMap;
@@ -36,6 +37,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
@@ -43,6 +45,7 @@ import java.util.Map;
 import static java.util.Objects.requireNonNull;
 
 @Path("/api-browser")
+@HideOnCloud
 public class DocumentationBrowserResource extends RestResource {
     private final MimetypesFileTypeMap mimeTypes;
     private final HttpConfiguration httpConfiguration;
@@ -87,8 +90,10 @@ public class DocumentationBrowserResource extends RestResource {
     public String allIndex(@Context HttpHeaders httpHeaders) throws IOException {
         final URL templateUrl = this.getClass().getResource("/swagger/index.html.template");
         final String template = Resources.toString(templateUrl, StandardCharsets.UTF_8);
+        final URI relativePath = RestTools.buildRelativeExternalUri(httpHeaders.getRequestHeaders(), httpConfiguration.getHttpExternalUri());
+
         final Map<String, Object> model = ImmutableMap.of(
-                "baseUri", RestTools.buildExternalUri(httpHeaders.getRequestHeaders(), httpConfiguration.getHttpExternalUri()).resolve(HttpConfiguration.PATH_API).toString(),
+                "baseUri", relativePath.resolve(HttpConfiguration.PATH_API).toString(),
                 "globalModePath", "global/index.html",
                 "globalUriMarker", "/global",
                 "showWarning", "true");

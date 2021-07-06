@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback, useState } from 'react';
-import PropTypes from 'prop-types';
 import { cloneDeep } from 'lodash';
 
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
@@ -33,6 +32,7 @@ type Props = {
   streams: Array<Stream>,
   decorators: Array<Decorator>,
   types: { [key: string]: any },
+  // eslint-disable-next-line react/require-default-props
   show?: boolean,
   onCancel: () => void,
   onSave: (newDecorators: Array<Decorator>) => unknown,
@@ -72,10 +72,15 @@ const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCa
 
   const nextOrder = currentDecorators.reduce((currentMax, decorator) => Math.max(currentMax, decorator.order), 0) + 1;
 
+  const _onCancel = useCallback(() => {
+    setModifiedDecorators(decorators);
+    onCancel();
+  }, [decorators, onCancel]);
+
   return (
     <BootstrapModalWrapper ref={modalRef}
                            showModal={show}
-                           onHide={onCancel}>
+                           onHide={_onCancel}>
       <Modal.Header closeButton>
         <Modal.Title>Update Default Decorators Configuration</Modal.Title>
       </Modal.Header>
@@ -93,7 +98,7 @@ const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCa
         <DecoratorList decorators={decoratorItems} onReorder={onReorder} />
       </Modal.Body>
       <Modal.Footer>
-        <Button type="button" onClick={onCancel}>Cancel</Button>
+        <Button type="button" onClick={_onCancel}>Cancel</Button>
         <Button bsStyle="primary" onClick={onSubmit}>Save</Button>
       </Modal.Footer>
     </BootstrapModalWrapper>

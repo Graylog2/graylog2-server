@@ -19,8 +19,7 @@ import { flatten } from 'lodash';
 import ObjectID from 'bson-objectid';
 
 import Widget from 'views/logic/widgets/Widget';
-import MessagesWidget from 'views/logic/widgets/MessagesWidget';
-import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
+import defaultTitle from 'views/components/defaultTitle';
 
 import ViewState from './ViewState';
 import type { WidgetMapping } from './types';
@@ -173,9 +172,9 @@ export default class View {
 
   getWidgetTitleByWidget(widget: Widget) {
     const widgetTitles = this.state.flatMap((state) => state.titles.get('widget'));
-    const defaultTitle = widget.type === MessagesWidget.type ? MessagesWidget.defaultTitle : AggregationWidget.defaultTitle;
+    const _defaultTitle = defaultTitle(widget);
 
-    return widgetTitles.get(widget.id) || defaultTitle;
+    return widgetTitles.get(widget.id) || _defaultTitle;
   }
 
   toBuilder(): Builder {

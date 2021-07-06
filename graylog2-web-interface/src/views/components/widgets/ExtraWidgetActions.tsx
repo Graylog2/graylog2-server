@@ -22,8 +22,6 @@ import usePluginEntities from 'views/logic/usePluginEntities';
 import { MenuItem } from 'components/graylog';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 
-import { WidgetActionType } from './Types';
-
 type Props = {
   onSelect: (eventKey: string, e: MouseEvent) => void,
   widget: Widget,
@@ -31,16 +29,16 @@ type Props = {
 
 const ExtraWidgetActions = ({ onSelect, widget }: Props) => {
   const widgetFocusContext = useContext(WidgetFocusContext);
-  const pluginWidgetActions = usePluginEntities<WidgetActionType>('views.widgets.actions');
+  const pluginWidgetActions = usePluginEntities('views.widgets.actions');
   const extraWidgetActions = useMemo(() => pluginWidgetActions
     .filter(({ isHidden = () => false }) => !isHidden(widget))
-    .map(({ title, action, type }) => {
+    .map(({ title, action, type, disabled = () => false }) => {
       const _onSelect = (eventKey: string, e: MouseEvent) => {
         action(widget, { widgetFocusContext });
         onSelect(eventKey, e);
       };
 
-      return (<MenuItem key={`${type}-${widget.id}`} onSelect={_onSelect}>{title(widget)}</MenuItem>);
+      return (<MenuItem key={`${type}-${widget.id}`} disabled={disabled()} onSelect={_onSelect}>{title(widget)}</MenuItem>);
     }), [onSelect, pluginWidgetActions, widget, widgetFocusContext]);
 
   return extraWidgetActions.length > 0

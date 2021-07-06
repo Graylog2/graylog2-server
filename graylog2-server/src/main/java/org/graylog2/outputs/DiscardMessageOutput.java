@@ -22,10 +22,9 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.Configuration;
-import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.streams.Stream;
-import org.graylog2.shared.journal.Journal;
+import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -35,20 +34,20 @@ import static com.codahale.metrics.MetricRegistry.name;
 
 public class DiscardMessageOutput implements MessageOutput {
     private final AtomicBoolean isRunning = new AtomicBoolean(false);
-    private final Journal journal;
+    private final MessageQueueAcknowledger messageQueueAcknowledger;
     private final Meter messagesDiscarded;
 
     @AssistedInject
-    public DiscardMessageOutput(final Journal journal,
+    public DiscardMessageOutput(final MessageQueueAcknowledger messageQueueAcknowledger,
                                 final MetricRegistry metricRegistry,
                                 @Assisted Stream stream,
                                 @Assisted Configuration configuration) {
-        this(journal, metricRegistry);
+        this(messageQueueAcknowledger, metricRegistry);
     }
 
     @Inject
-    public DiscardMessageOutput(final Journal journal, final MetricRegistry metricRegistry) {
-        this.journal = journal;
+    public DiscardMessageOutput(final MessageQueueAcknowledger messageQueueAcknowledger, final MetricRegistry metricRegistry) {
+        this.messageQueueAcknowledger = messageQueueAcknowledger;
         this.messagesDiscarded = metricRegistry.meter(name(this.getClass(), "messagesDiscarded"));
         isRunning.set(true);
     }
@@ -65,19 +64,13 @@ public class DiscardMessageOutput implements MessageOutput {
 
     @Override
     public void write(Message message) throws Exception {
-        journal.markJournalOffsetCommitted(message.getJournalOffset());
+        messageQueueAcknowledger.acknowledge(message);
         messagesDiscarded.mark();
     }
 
     @Override
     public void write(List<Message> messages) throws Exception {
-        long maxOffset = Long.MIN_VALUE;
-
-        for (final Message message : messages) {
-            maxOffset = Math.max(message.getJournalOffset(), maxOffset);
-        }
-
-        journal.markJournalOffsetCommitted(maxOffset);
+        messageQueueAcknowledger.acknowledge(messages);
         messagesDiscarded.mark(messages.size());
     }
 

@@ -17,45 +17,79 @@
 package org.graylog2.storage.versionprobe;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.joschi.jadconfig.util.Duration;
+import com.github.rholder.retry.RetryException;
+import com.github.rholder.retry.RetryerBuilder;
+import com.github.rholder.retry.StopStrategies;
+import com.github.rholder.retry.WaitStrategies;
 import com.google.common.base.Strings;
 import okhttp3.Credentials;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.ResponseBody;
 import org.graylog2.plugin.Version;
+import org.graylog2.shared.utilities.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import retrofit2.Converter;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.Collection;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.function.Consumer;
 
 public class VersionProbe {
     private static final Logger LOG = LoggerFactory.getLogger(VersionProbe.class);
     private final ObjectMapper objectMapper;
     private final OkHttpClient okHttpClient;
+    private final int connectionAttempts;
+    private final Duration delayBetweenAttempts;
 
     @Inject
-    public VersionProbe(ObjectMapper objectMapper, OkHttpClient okHttpClient) {
+    public VersionProbe(ObjectMapper objectMapper,
+                        OkHttpClient okHttpClient,
+                        @Named("elasticsearch_version_probe_attempts") int elasticsearchVersionProbeAttempts,
+                        @Named("elasticsearch_version_probe_delay") Duration elasticsearchVersionProbeDelay) {
         this.objectMapper = objectMapper;
         this.okHttpClient = okHttpClient;
+        this.connectionAttempts = elasticsearchVersionProbeAttempts;
+        this.delayBetweenAttempts = elasticsearchVersionProbeDelay;
     }
 
-    public Optional<Version> probe(Collection<URI> hosts) {
+    public Optional<Version> probe(final Collection<URI> hosts) {
+        try {
+            return RetryerBuilder.<Optional<Version>>newBuilder()
+                    .retryIfResult(input -> !input.isPresent())
+                    .retryIfExceptionOfType(IOException.class)
+                    .retryIfRuntimeException()
+                    .withWaitStrategy(WaitStrategies.fixedWait(delayBetweenAttempts.getQuantity(), delayBetweenAttempts.getUnit()))
+                    .withStopStrategy((connectionAttempts == 0) ? StopStrategies.neverStop() : StopStrategies.stopAfterAttempt(connectionAttempts))
+                    .build().call(() -> this.probeAllHosts(hosts));
+        } catch (ExecutionException | RetryException e) {
+            LOG.error("Unable to retrieve version from Elasticsearch node: ", e);
+        }
+        return Optional.empty();
+    }
+
+    private Optional<Version> probeAllHosts(final Collection<URI> hosts) {
         return hosts
                 .stream()
-                .map(this::probe)
+                .map(this::probeSingleHost)
                 .filter(Optional::isPresent)
                 .findFirst()
                 .orElse(Optional.empty());
     }
 
-    public Optional<Version> probe(URI host) {
+    private Optional<Version> probeSingleHost(URI host) {
         final Retrofit retrofit;
         try {
             retrofit = new Retrofit.Builder()
@@ -70,7 +104,18 @@ public class VersionProbe {
 
         final RootRoute root = retrofit.create(RootRoute.class);
 
-        return rootResponse(root)
+        final Converter<ResponseBody, ErrorResponse> errorResponseConverter = retrofit.responseBodyConverter(ErrorResponse.class, new Annotation[0]);
+        final Consumer<ResponseBody> errorLogger = (responseBody) -> {
+            try {
+                final ErrorResponse errorResponse = errorResponseConverter.convert(responseBody);
+                LOG.error("Unable to retrieve version from Elasticsearch node {}:{}: {}", host.getHost(), host.getPort(), errorResponse);
+            } catch (IOException e) {
+                LOG.error("Unable to retrieve version from Elasticsearch node {}:{}: unknown error - an exception occurred while deserializing error response: {}", host.getHost(), host.getPort(), e);
+            }
+        };
+
+
+        return rootResponse(root, errorLogger)
                 .map(RootResponse::version)
                 .map(VersionResponse::number)
                 .flatMap(this::parseVersion);
@@ -106,14 +151,19 @@ public class VersionProbe {
         }
     }
 
-    private Optional<RootResponse> rootResponse(RootRoute rootRoute) {
+    private Optional<RootResponse> rootResponse(final RootRoute rootRoute, Consumer<ResponseBody> errorLogger) {
         try {
             final Response<RootResponse> response = rootRoute.root().execute();
             if (response.isSuccessful()) {
                 return Optional.ofNullable(response.body());
+            } else {
+                errorLogger.accept(response.errorBody());
             }
         } catch (IOException e) {
-            LOG.error("Unable to retrieve version from Elasticsearch node: ", e);
+            final String error = ExceptionUtils.formatMessageCause(e);
+            final String rootCause = ExceptionUtils.formatMessageCause(ExceptionUtils.getRootCause(e));
+            LOG.error("Unable to retrieve version from Elasticsearch node: {} - {}", error, rootCause);
+            LOG.debug("Complete exception for version probe error: ", e);
         }
         return Optional.empty();
     }

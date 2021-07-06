@@ -31,7 +31,8 @@ import HighlightingRule, {
   ConditionLabelMap,
   StringConditionLabelMap,
 } from 'views/logic/views/formatting/highlighting/HighlightingRule';
-import HighlightingColorForm from 'views/components/sidebar/highlighting/HighlightingColorForm';
+import HighlightingColorForm, { createNewColor } from 'views/components/sidebar/highlighting/HighlightingColorForm';
+import type { StaticColorObject, GradientColorObject } from 'views/components/sidebar/highlighting/HighlightingColorForm';
 import { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import Series, { isFunction } from 'views/logic/aggregationbuilder/Series';
 import inferTypeForSeries from 'views/logic/fieldtypes/InferTypeForSeries';
@@ -60,19 +61,9 @@ const fieldTypeFor = (fields: FieldTypeMappingsList, selectedField: string) => (
   ? inferTypeForSeries(Series.forFunction(selectedField), fields)
   : fields.find((field) => field.name === selectedField));
 
-type StaticColorObject = {
-  type: 'static',
-  color: string,
-};
-
-type GradientColorObject = {
-  type: 'gradient',
-  gradient: string,
-  upper: number,
-  lower: number,
-};
-
 const colorToObject = (color: HighlightingColor | undefined): StaticColorObject | GradientColorObject => {
+  const defaultColorType = 'static';
+
   if (color?.type === 'static') {
     const { type, color: staticColor } = color as StaticColor;
 
@@ -93,7 +84,7 @@ const colorToObject = (color: HighlightingColor | undefined): StaticColorObject 
     };
   }
 
-  return undefined;
+  return createNewColor(defaultColorType);
 };
 
 const colorFromObject = (color: StaticColorObject | GradientColorObject) => {
@@ -135,6 +126,7 @@ const HighlightForm = ({ onClose, rule }: Props) => {
 
   return (
     <Formik onSubmit={onSubmit}
+            validateOnMount
             initialValues={{
               field: rule?.field,
               value: rule?.value,
@@ -186,7 +178,7 @@ const HighlightForm = ({ onClose, rule }: Props) => {
                            type="text"
                            error={meta?.error}
                            onChange={onChange}
-                           value={value}
+                           value={value ?? ''}
                            label="Value" />
                   )}
                 </Field>
@@ -194,7 +186,7 @@ const HighlightForm = ({ onClose, rule }: Props) => {
               </Modal.Body>
               <Modal.Footer>
                 <Button type="button" onClick={onClose}>Cancel</Button>
-                <Button type="submit" disabled={!isValid}>Save</Button>
+                <Button type="submit" disabled={!isValid} bsStyle="primary">Save</Button>
               </Modal.Footer>
             </Form>
           </BootstrapModalWrapper>

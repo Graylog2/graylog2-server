@@ -22,12 +22,13 @@ import moment from 'moment';
 
 import { Button, Col, Tabs, Tab, Row, Popover } from 'components/graylog';
 import { Icon, KeyCapture } from 'components/common';
-import { availableTimeRangeTypes, RELATIVE_ALL_TIME } from 'views/Constants';
+import { availableTimeRangeTypes } from 'views/Constants';
 import { migrateTimeRangeToNewType } from 'views/components/TimerangeForForm';
 import DateTime from 'logic/datetimes/DateTime';
 import type { RelativeTimeRangeWithEnd, AbsoluteTimeRange, KeywordTimeRange, NoTimeRangeOverride, TimeRange } from 'views/logic/queries/Query';
 import type { SearchBarFormValues } from 'views/Constants';
-import { isTypeRelativeWithEnd, isTypeRelativeWithStartOnly } from 'views/typeGuards/timeRange';
+import { isTypeRelativeWithStartOnly } from 'views/typeGuards/timeRange';
+import { normalizeIfAllMessagesRange } from 'views/logic/queries/NormalizeTimeRange';
 
 import TabAbsoluteTimeRange from './TabAbsoluteTimeRange';
 import TabKeywordTimeRange from './TabKeywordTimeRange';
@@ -46,18 +47,32 @@ const timeRangeTypes = {
   keyword: TabKeywordTimeRange,
 };
 
-type Props = {
-  noOverride?: boolean,
+const allTimeRangeTypes = Object.keys(timeRangeTypes) as Array<TimeRangeType>;
+
+export type TimeRangeDropdownProps = {
   currentTimeRange: SearchBarFormValues['timerange'] | NoTimeRangeOverride,
+  noOverride?: boolean,
+  position: 'bottom'|'right',
   setCurrentTimeRange: (nextTimeRange: SearchBarFormValues['timerange'] | NoTimeRangeOverride) => void,
   toggleDropdownShow: () => void,
+  validTypes?: Array<TimeRangeType>,
 };
 
+export type TimeRangeType = keyof typeof timeRangeTypes;
+
+type TimeRangeTabsArguments = {
+  activeTab: TimeRangeType,
+  limitDuration: number,
+  setValidatingKeyword: (status: boolean) => void,
+  tabs: Array<TimeRangeType>,
+}
+
 const StyledPopover = styled(Popover)(({ theme }) => css`
-  min-width: 100%;
-  
-  @media (min-width: ${theme.breakpoints.min.md}) {
-    min-width: 750px;
+  min-width: 750px;
+  background-color: ${theme.colors.variant.lightest.default};
+
+  .popover-title {
+    border: none;
   }
 `);
 
@@ -77,6 +92,10 @@ const PopoverTitle = styled.span`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  
+  > span {
+    font-weight: 600;
+  }
 `;
 
 const LimitLabel = styled.span(({ theme }) => css`
@@ -112,21 +131,23 @@ const DEFAULT_RANGES = {
   disabled: undefined,
 };
 
-const timeRangeTypeTabs = ({ activeTab, limitDuration, setValidatingKeyword }) => availableTimeRangeTypes.map(({ type, name }) => {
-  const TimeRangeTypeTabs = timeRangeTypes[type];
+const timeRangeTypeTabs = ({ activeTab, limitDuration, setValidatingKeyword, tabs }: TimeRangeTabsArguments) => availableTimeRangeTypes
+  .filter(({ type }) => tabs.includes(type))
+  .map(({ type, name }) => {
+    const TimeRangeTypeTab = timeRangeTypes[type];
 
-  return (
-    <Tab title={name}
-         key={`time-range-type-selector-${type}`}
-         eventKey={type}>
-      {type === activeTab && (
-        <TimeRangeTypeTabs disabled={false}
-                           limitDuration={limitDuration}
-                           setValidatingKeyword={type === 'keyword' ? setValidatingKeyword : undefined} />
-      )}
-    </Tab>
-  );
-});
+    return (
+      <Tab title={name}
+           key={`time-range-type-selector-${type}`}
+           eventKey={type}>
+        {type === activeTab && (
+        <TimeRangeTypeTab disabled={false}
+                          limitDuration={limitDuration}
+                          setValidatingKeyword={type === 'keyword' ? setValidatingKeyword : undefined} />
+        )}
+      </Tab>
+    );
+  });
 
 const exceedsDuration = (timerange, limitDuration) => {
   if (limitDuration === 0) {
@@ -189,6 +210,14 @@ export const dateTimeValidate = (nextTimeRange, limitDuration) => {
       }
     }
 
+    if (nextTimeRange.from === null) {
+      errors.nextTimeRange = { ...errors.nextTimeRange, from: 'Cannot be empty.' };
+    }
+
+    if (nextTimeRange.from && nextTimeRange.to === null) {
+      errors.nextTimeRange = { ...errors.nextTimeRange, to: 'Cannot be empty.' };
+    }
+
     if (nextTimeRange.from && nextTimeRange.from <= nextTimeRange.to) {
       errors.nextTimeRange = { ...errors.nextTimeRange, to: timeRangeError };
     }
@@ -214,21 +243,19 @@ const onInitializingNextTimeRange = (currentTimeRange: SearchBarFormValues['time
   return currentTimeRange;
 };
 
-const onSettingCurrentTimeRange = (nextTimeRange: TimeRangeDropDownFormValues['nextTimeRange']) => {
-  if (isTypeRelativeWithEnd(nextTimeRange) && nextTimeRange.from === RELATIVE_ALL_TIME) {
-    return {
-      type: nextTimeRange.type,
-      range: nextTimeRange.from,
-    };
-  }
-
-  return (nextTimeRange as SearchBarFormValues['timerange']);
-};
-
-const TimeRangeDropdown = ({ noOverride, toggleDropdownShow, currentTimeRange, setCurrentTimeRange }: Props) => {
+const TimeRangeDropdown = ({
+  noOverride,
+  toggleDropdownShow,
+  currentTimeRange,
+  setCurrentTimeRange,
+  validTypes = allTimeRangeTypes,
+  position,
+}: TimeRangeDropdownProps) => {
   const { limitDuration } = useContext(DateTimeContext);
   const [validatingKeyword, setValidatingKeyword] = useState(false);
   const [activeTab, setActiveTab] = useState('type' in currentTimeRange ? currentTimeRange.type : undefined);
+
+  const positionIsBottom = position === 'bottom';
 
   const handleNoOverride = () => {
     setCurrentTimeRange({});
@@ -240,7 +267,7 @@ const TimeRangeDropdown = ({ noOverride, toggleDropdownShow, currentTimeRange, s
   }, [toggleDropdownShow]);
 
   const handleSubmit = ({ nextTimeRange }) => {
-    setCurrentTimeRange(onSettingCurrentTimeRange(nextTimeRange));
+    setCurrentTimeRange(normalizeIfAllMessagesRange(nextTimeRange));
     toggleDropdownShow();
   };
 
@@ -259,10 +286,12 @@ const TimeRangeDropdown = ({ noOverride, toggleDropdownShow, currentTimeRange, s
   return (
     <StyledPopover id="timerange-type"
                    data-testid="timerange-type"
-                   placement="bottom"
-                   positionTop={36}
-                   title={title}
-                   arrowOffsetLeft={34}>
+                   placement={position}
+                   positionTop={positionIsBottom ? 36 : -10}
+                   positionLeft={positionIsBottom ? -15 : 45}
+                   arrowOffsetTop={positionIsBottom ? undefined : 25}
+                   arrowOffsetLeft={positionIsBottom ? 34 : -11}
+                   title={title}>
       <Formik initialValues={{ nextTimeRange: onInitializingNextTimeRange(currentTimeRange) }}
               validate={({ nextTimeRange }) => dateTimeValidate(nextTimeRange, limitDuration)}
               onSubmit={handleSubmit}
@@ -294,6 +323,7 @@ const TimeRangeDropdown = ({ noOverride, toggleDropdownShow, currentTimeRange, s
                         activeTab,
                         limitDuration,
                         setValidatingKeyword,
+                        tabs: validTypes,
                       })}
 
                       {!activeTab && (<TabDisabledTimeRange />)}
@@ -327,6 +357,7 @@ const TimeRangeDropdown = ({ noOverride, toggleDropdownShow, currentTimeRange, s
 
 TimeRangeDropdown.defaultProps = {
   noOverride: false,
+  validTypes: allTimeRangeTypes,
 };
 
 export default TimeRangeDropdown;

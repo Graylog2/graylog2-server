@@ -18,7 +18,9 @@ package org.graylog2.indexer.fieldtypes;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
+import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.rest.MappedFieldTypeDTO;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.streams.StreamService;
 
 import javax.inject.Inject;
@@ -34,22 +36,31 @@ public class MappedFieldTypesService {
     private final StreamService streamService;
     private final IndexFieldTypesService indexFieldTypesService;
     private final FieldTypeMapper fieldTypeMapper;
+    private final IndexLookup indexLookup;
 
     private static final FieldTypes.Type UNKNOWN_TYPE = createType("unknown", of());
     private static final String PROP_COMPOUND_TYPE = "compound";
 
     @Inject
-    public MappedFieldTypesService(StreamService streamService, IndexFieldTypesService indexFieldTypesService, FieldTypeMapper fieldTypeMapper) {
+    public MappedFieldTypesService(StreamService streamService,
+                                   IndexFieldTypesService indexFieldTypesService,
+                                   FieldTypeMapper fieldTypeMapper,
+                                   IndexLookup indexLookup) {
         this.streamService = streamService;
         this.indexFieldTypesService = indexFieldTypesService;
         this.fieldTypeMapper = fieldTypeMapper;
+        this.indexLookup = indexLookup;
     }
 
-    public Set<MappedFieldTypeDTO> fieldTypesByStreamIds(Collection<String> streamIds) {
+    public Set<MappedFieldTypeDTO> fieldTypesByStreamIds(Collection<String> streamIds, TimeRange timeRange) {
         final Set<String> indexSets = streamService.indexSetIdsByIds(streamIds);
 
-        final java.util.stream.Stream<MappedFieldTypeDTO> types = this.indexFieldTypesService.findForIndexSets(indexSets).stream()
-                .flatMap(indexSet -> indexSet.fields().stream())
+        final Set<String> indexNames = this.indexLookup.indexNamesForStreamsInTimeRange(ImmutableSet.copyOf(streamIds), timeRange);
+
+        final java.util.stream.Stream<MappedFieldTypeDTO> types = this.indexFieldTypesService.findForIndexSets(indexSets)
+                .stream()
+                .filter(fieldTypes -> indexNames.contains(fieldTypes.indexName()))
+                .flatMap(fieldTypes -> fieldTypes.fields().stream())
                 .map(this::mapPhysicalFieldType);
         return mergeCompoundFieldTypes(types);
     }

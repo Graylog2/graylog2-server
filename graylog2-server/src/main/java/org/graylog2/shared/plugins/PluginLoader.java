@@ -21,6 +21,7 @@ import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Iterables;
+import com.google.inject.Injector;
 import org.graylog2.plugin.Plugin;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.PluginModule;
@@ -51,10 +52,12 @@ public class PluginLoader {
 
     private final File pluginDir;
     private final ChainingClassLoader classLoader;
+    private final Injector coreConfigInjector;
 
-    public PluginLoader(File pluginDir, ChainingClassLoader classLoader) {
+    public PluginLoader(File pluginDir, ChainingClassLoader classLoader, Injector coreConfigInjector) {
         this.pluginDir = requireNonNull(pluginDir);
         this.classLoader = requireNonNull(classLoader);
+        this.coreConfigInjector = coreConfigInjector;
     }
 
     public Set<Plugin> loadPlugins() {
@@ -194,9 +197,10 @@ public class PluginLoader {
         }
     }
 
-    private static class PluginAdapterFunction implements Function<Plugin, Plugin> {
+    private class PluginAdapterFunction implements Function<Plugin, Plugin> {
         @Override
         public Plugin apply(Plugin input) {
+            coreConfigInjector.injectMembers(input);
             return new PluginAdapter(input);
         }
     }

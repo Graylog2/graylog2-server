@@ -18,7 +18,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import { ProgressBar } from 'components/graylog';
+import { Button, ProgressBar } from 'components/graylog';
 import { LinkToNode, Timestamp, Icon } from 'components/common';
 import ActionsProvider from 'injection/ActionsProvider';
 
@@ -31,12 +31,12 @@ const StyledProgressBar = styled(ProgressBar)`
 
 const JobWrap = styled.div`
   line-height: 1.5;
-  margin-bottom: 5;
+  margin-bottom: 5px;
 `;
 
 class SystemJob extends React.Component {
   static propTypes = {
-    job: PropTypes.arrayOf(PropTypes.shape({
+    job: PropTypes.shape({
       info: PropTypes.string,
       id: PropTypes.string,
       percent_complete: PropTypes.number,
@@ -44,7 +44,7 @@ class SystemJob extends React.Component {
       name: PropTypes.string,
       node_id: PropTypes.string,
       started_at: PropTypes.string,
-    })).isRequired,
+    }).isRequired,
   }
 
   _onCancel = (job) => {
@@ -64,7 +64,7 @@ class SystemJob extends React.Component {
       ? <StyledProgressBar bars={[{ value: job.percent_complete, bsStyle: 'info', animated: true }]} />
       : <span className="label label-success finished">Finished!</span>;
     const cancel = job.is_cancelable
-      ? (<button type="button" className="btn btn-primary btn-xs pull-right" onClick={this._onCancel(job)}>Cancel Job</button>) : null;
+      ? (<Button type="button" bsSize="xs" bsStyle="primary" className="pull-right" onClick={this._onCancel(job)}>Cancel Job</Button>) : null;
 
     return (
       <div>

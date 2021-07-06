@@ -17,8 +17,8 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import * as Immutable from 'immutable';
 import { $PropertyType } from 'utility-types';
+import { EditWidgetComponentProps } from 'views/types';
 
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import { Row, Col, Checkbox } from 'components/graylog';
@@ -28,9 +28,14 @@ import FieldSortSelect from 'views/components/widgets/FieldSortSelect';
 import SortDirectionSelect from 'views/components/widgets/SortDirectionSelect';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
-import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import DescriptionBox from 'views/components/aggregationbuilder/DescriptionBox';
 import DecoratorSidebar from 'views/components/messagelist/decorators/DecoratorSidebar';
+
+const FullHeightRow = styled(Row)`
+  height: 100%;
+  padding-bottom: 15px;
+  flex: 1;
+`;
 
 const FullHeightCol = styled(Col)`
   height: 100%;
@@ -63,14 +68,7 @@ const _onSortDirectionChange = (direction: SortConfig['direction'], config, onCh
   return onChange(newConfig);
 };
 
-type Props = {
-  children: React.ReactNode,
-  config: MessagesWidgetConfig,
-  fields: Immutable.List<FieldTypeMapping>,
-  onChange: (MessagesWidgetConfig) => void,
-};
-
-const EditMessageList = ({ children, config, fields, onChange }: Props) => {
+const EditMessageList = ({ children, config, fields, onChange }: EditWidgetComponentProps<MessagesWidgetConfig>) => {
   const { sort } = config;
   const [sortDirection] = (sort || []).map((s) => s.direction);
   const selectedFieldsForSelect = config.fields.map((fieldName) => ({ field: fieldName }));
@@ -78,7 +76,7 @@ const EditMessageList = ({ children, config, fields, onChange }: Props) => {
   const onDecoratorsChange = (newDecorators) => onChange(config.toBuilder().decorators(newDecorators).build());
 
   return (
-    <Row style={{ height: '100%', paddingBottom: '15px' }}>
+    <FullHeightRow>
       <FullHeightCol md={3}>
         <DescriptionBox description="Fields">
           <FieldSelect fields={fields}
@@ -106,7 +104,7 @@ const EditMessageList = ({ children, config, fields, onChange }: Props) => {
       <FullHeightCol md={9}>
         {children}
       </FullHeightCol>
-    </Row>
+    </FullHeightRow>
   );
 };
 

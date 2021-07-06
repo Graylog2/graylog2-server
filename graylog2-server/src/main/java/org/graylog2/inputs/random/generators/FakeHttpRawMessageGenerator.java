@@ -37,6 +37,7 @@ import static org.graylog2.inputs.random.generators.FakeHttpRawMessageGenerator.
 public class FakeHttpRawMessageGenerator {
     private static final Random RANDOM = new Random();
     private static final int MAX_WEIGHT = 50;
+    private long msgSequenceNumber;
 
     private static final ImmutableList<Resource> GET_RESOURCES = ImmutableList.of(
             new Resource("/login", "LoginController", "login", 10),
@@ -58,6 +59,7 @@ public class FakeHttpRawMessageGenerator {
 
     public FakeHttpRawMessageGenerator(String source) {
         this.source = requireNonNull(source);
+        msgSequenceNumber = 1;
     }
 
     public static int rateDeviation(int val, int maxDeviation, Random rand) {
@@ -85,6 +87,7 @@ public class FakeHttpRawMessageGenerator {
         final int methodProb = RANDOM.nextInt(100);
         final int successProb = RANDOM.nextInt(100);
 
+        generatorState.msgSequenceNr = msgSequenceNumber++;
         generatorState.source = source;
         generatorState.isSuccessful = successProb < 98;
         generatorState.isTimeout = RANDOM.nextInt(5) == 1;
@@ -162,6 +165,7 @@ public class FakeHttpRawMessageGenerator {
 
     private static Message createMessage(GeneratorState state, int httpCode, Resource resource, int tookMs, DateTime ingestTime) {
         final Message msg = new Message(shortMessage(ingestTime, state.method, state.resource, httpCode, tookMs), state.source, Tools.nowUTC());
+        msg.addField("sequence_nr", state.msgSequenceNr);
         msg.addFields(ingestTimeFields(ingestTime));
         msg.addFields(resourceFields(resource));
         msg.addField("ticks", System.nanoTime());
@@ -319,6 +323,7 @@ public class FakeHttpRawMessageGenerator {
     }
 
     public static class GeneratorState {
+        public long msgSequenceNr;
         public String source;
         public boolean isSuccessful;
         public Method method;

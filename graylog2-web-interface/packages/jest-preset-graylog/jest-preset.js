@@ -14,8 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-
-const TIMEOUT_MULTIPLIER = Number.parseFloat(process.env.TIMEOUT_MULTIPLIER);
+const { applyTimeoutMultiplier } = require('./lib/timeouts');
 
 module.exports = {
   rootDir: '../../',
@@ -26,7 +25,10 @@ module.exports = {
     'jest-localstorage-mock',
     require.resolve('./lib/setup-files/mock-FetchProvider.js'),
     require.resolve('./lib/setup-files/mock-Version.js'),
+    require.resolve('./lib/setup-files/mock-IntersectionObserver.js'),
+    require.resolve('./lib/setup-files/mock-moment-timezone.js'),
     require.resolve('./lib/setup-files/console-warnings-fail-tests.js'),
+    'jest-canvas-mock',
   ],
   setupFilesAfterEnv: [
     'jest-enzyme',
@@ -49,8 +51,10 @@ module.exports = {
     '\\.(css|less)$': 'identity-obj-proxy',
     '\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$': require.resolve('./lib/mocking/fileMock.js'),
   },
+  testEnvironment: 'jsdom',
   testPathIgnorePatterns: [
     '.fixtures.[jt]s$',
   ],
-  testTimeout: (Number.isFinite(TIMEOUT_MULTIPLIER) ? TIMEOUT_MULTIPLIER : 1.0) * 5000,
+  testTimeout: applyTimeoutMultiplier(5000),
+  reporters: ['default', 'jest-junit'],
 };

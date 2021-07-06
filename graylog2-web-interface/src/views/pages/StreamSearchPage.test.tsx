@@ -91,13 +91,14 @@ describe('StreamSearchPage', () => {
   afterEach(() => {
     jest.clearAllMocks();
     jest.resetModules();
+    jest.useRealTimers();
   });
 
   it('shows loading spinner before rendering page', async () => {
-    const { findByText, getByText } = render(<SimpleStreamSearchPage />);
-    act(() => jest.advanceTimersByTime(200));
+    const { findByText } = render(<SimpleStreamSearchPage />);
+    act(() => { jest.advanceTimersByTime(200); });
 
-    expect(getByText('Loading...')).not.toBeNull();
+    expect(await findByText('Loading...')).toBeInTheDocument();
 
     await findByText('Extended search page');
   });

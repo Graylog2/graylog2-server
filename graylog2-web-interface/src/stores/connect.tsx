@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { isFunction } from 'lodash';
 import { Optional } from 'utility-types';
 
@@ -40,19 +40,19 @@ export function useStore<U>(store: StoreType<U>): U;
 export function useStore<U, M extends (props: U) => any>(store: StoreType<U>, propsMapper: M): ReturnType<M>;
 
 export function useStore(store, propsMapper = id) {
-  const [storeState, setStoreState] = useState(() => propsMapper(store.getInitialState()));
+  const [storeState, setStoreState] = useState(() => store.getInitialState());
   const storeStateRef = useRef(storeState);
 
+  const mappedStoreState = useMemo(() => propsMapper(storeState), [propsMapper, storeState]);
+
   useEffect(() => store.listen((newState) => {
-    const mappedProps = propsMapper(newState);
-
-    if (!isDeepEqual(mappedProps, storeStateRef.current)) {
-      setStoreState(mappedProps);
-      storeStateRef.current = mappedProps;
+    if (!isDeepEqual(newState, storeStateRef.current)) {
+      setStoreState(newState);
+      storeStateRef.current = newState;
     }
-  }), [propsMapper, store]);
+  }), [store]);
 
-  return storeState;
+  return mappedStoreState;
 }
 
 /**

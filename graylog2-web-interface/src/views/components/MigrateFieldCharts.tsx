@@ -26,7 +26,7 @@ import Store from 'logic/local-storage/Store';
 import { widgetDefinition } from 'views/logic/Widgets';
 import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
-import Pivot from 'views/logic/aggregationbuilder/Pivot';
+import Pivot, { PivotConfigType } from 'views/logic/aggregationbuilder/Pivot';
 import Series from 'views/logic/aggregationbuilder/Series';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import LineVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/LineVisualizationConfig';
@@ -150,7 +150,7 @@ const _migrateWidgets = (legacyCharts) => {
       const series = new Series(mapSeries(chart.valuetype, field));
       // Because all field charts show the results for the defined timerange,
       // the new row pivot always contains the timestamp field.
-      const rowPivotConfig = { interval: { type: 'timeunit', ...mapTime(chart.interval) } };
+      const rowPivotConfig = { interval: { type: 'timeunit', ...mapTime(chart.interval) } } as PivotConfigType;
       const rowPivot = new Pivot(TIMESTAMP_FIELD, 'time', rowPivotConfig);
       const visualization = mapVisualization(chart.renderer);
       const visualizationConfig = createVisualizationConfig(chart.interpolation, visualization);

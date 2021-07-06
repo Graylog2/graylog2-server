@@ -106,7 +106,7 @@ const UsersStore: Store<undefined> = singletonStore('Users', () => Reflux.create
   },
 
   deleteToken(userId: string, tokenId: string): Promise<string[]> {
-    const url = qualifyUrl(ApiRoutes.UsersApiController.delete_token(encodeURIComponent(userId), encodeURIComponent(tokenId)).url, {});
+    const url = qualifyUrl(ApiRoutes.UsersApiController.delete_token(encodeURIComponent(userId), encodeURIComponent(tokenId)).url);
     const promise = fetch('DELETE', url);
     UsersActions.deleteToken.promise(promise);
 

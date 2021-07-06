@@ -33,8 +33,12 @@ class IndexerClusterHealthSummary extends React.Component {
     health: PropTypes.object.isRequired,
   };
 
+  _formatHealthStatus = ({ status }) => {
+    return status.toLowerCase();
+  };
+
   _alertClassForHealth = (health) => {
-    switch (health.status) {
+    switch (this._formatHealthStatus(health)) {
       case 'green': return 'success';
       case 'yellow': return 'warning';
       case 'red': return 'danger';
@@ -43,9 +47,9 @@ class IndexerClusterHealthSummary extends React.Component {
   };
 
   _formatTextForHealth = (health) => {
-    const text = `Elasticsearch cluster is ${health.status}.`;
+    const text = `Elasticsearch cluster is ${this._formatHealthStatus(health)}.`;
 
-    switch (health.status) {
+    switch (this._formatHealthStatus(health)) {
       case 'green': return text;
       case 'yellow':
       case 'red': return <strong>{text}</strong>;
@@ -54,7 +58,7 @@ class IndexerClusterHealthSummary extends React.Component {
   };
 
   _iconNameForHealth = (health) => {
-    switch (health.status) {
+    switch (this._formatHealthStatus(health)) {
       case 'green': return 'check-circle';
       case 'yellow': return 'exclamation-triangle';
       case 'red': return 'ambulance';

@@ -54,14 +54,15 @@ describe('NewDashboardPage', () => {
 
   afterEach(() => {
     jest.clearAllMocks();
+    jest.useRealTimers();
   });
 
   it('shows loading spinner before rendering page', async () => {
-    const { findByText, getByText } = render(<SimpleNewDashboardPage />);
+    const { findByText } = render(<SimpleNewDashboardPage />);
 
-    act(() => jest.advanceTimersByTime(200));
+    act(() => { jest.advanceTimersByTime(200); });
 
-    expect(getByText('Loading...')).not.toBeNull();
+    expect(await findByText('Loading...')).not.toBeNull();
 
     await findByText('Extended search page');
   });

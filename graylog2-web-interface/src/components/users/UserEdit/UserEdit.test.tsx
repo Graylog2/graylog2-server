@@ -22,11 +22,6 @@ import CurrentUserContext from 'contexts/CurrentUserContext';
 
 import UserEdit from './UserEdit';
 
-const exampleUser = adminUser.toBuilder()
-  .readOnly(false)
-  .external(false)
-  .build();
-
 jest.mock('./ProfileSection', () => () => <div>ProfileSection</div>);
 jest.mock('./SettingsSection', () => () => <div>SettingsSection</div>);
 jest.mock('./PasswordSection', () => () => <div>PasswordSection</div>);
@@ -39,8 +34,12 @@ describe('<UserEdit />', () => {
     jest.clearAllMocks();
   });
 
+  const currentUser = adminUser.toBuilder()
+    .readOnly(false)
+    .external(false)
+    .build();
   const SimpleUserEdit = (props) => (
-    <CurrentUserContext.Provider value={{ ...exampleUser.toJSON() }}>
+    <CurrentUserContext.Provider value={currentUser}>
       <UserEdit {...props} />
     </CurrentUserContext.Provider>
   );
@@ -56,7 +55,7 @@ describe('<UserEdit />', () => {
   });
 
   it('should not allow editing a readOnly user', () => {
-    const readOnlyUser = exampleUser.toBuilder()
+    const readOnlyUser = currentUser.toBuilder()
       .readOnly(true)
       .fullName('Full name')
       .build();
@@ -67,7 +66,7 @@ describe('<UserEdit />', () => {
   });
 
   it('should display profile, settings and password section', () => {
-    render(<SimpleUserEdit user={exampleUser} />);
+    render(<SimpleUserEdit user={currentUser} />);
 
     expect(screen.getByText('ProfileSection')).toBeInTheDocument();
     expect(screen.getByText('SettingsSection')).toBeInTheDocument();

@@ -47,6 +47,7 @@ import org.graylog2.rest.models.users.requests.Startpage;
 import org.graylog2.rest.models.users.requests.UpdateUserPreferences;
 import org.graylog2.rest.models.users.responses.Token;
 import org.graylog2.rest.models.users.responses.TokenList;
+import org.graylog2.rest.models.users.responses.TokenSummary;
 import org.graylog2.rest.models.users.responses.UserList;
 import org.graylog2.rest.models.users.responses.UserSummary;
 import org.graylog2.search.SearchQuery;
@@ -60,7 +61,7 @@ import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.Role;
 import org.graylog2.shared.users.Roles;
-import org.graylog2.shared.users.UserService;
+import org.graylog2.shared.users.UserManagementService;
 import org.graylog2.users.PaginatedUserService;
 import org.graylog2.users.RoleService;
 import org.graylog2.users.UserOverviewDTO;
@@ -122,7 +123,7 @@ import static org.graylog2.shared.security.RestPermissions.USERS_TOKENREMOVE;
 public class UsersResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(RestResource.class);
 
-    private final UserService userService;
+    private final UserManagementService userManagementService;
     private final PaginatedUserService paginatedUserService;
     private final AccessTokenService accessTokenService;
     private final RoleService roleService;
@@ -130,18 +131,19 @@ public class UsersResource extends RestResource {
     private final SearchQueryParser searchQueryParser;
 
     protected static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
+            .put(UserOverviewDTO.FIELD_ID, SearchQueryField.create("_id", SearchQueryField.Type.OBJECT_ID))
             .put(UserOverviewDTO.FIELD_USERNAME, SearchQueryField.create(UserOverviewDTO.FIELD_USERNAME))
             .put(UserOverviewDTO.FIELD_FULL_NAME, SearchQueryField.create(UserOverviewDTO.FIELD_FULL_NAME))
             .put(UserOverviewDTO.FIELD_EMAIL, SearchQueryField.create(UserOverviewDTO.FIELD_EMAIL))
             .build();
 
     @Inject
-    public UsersResource(UserService userService,
+    public UsersResource(UserManagementService userManagementService,
                          PaginatedUserService paginatedUserService,
                          AccessTokenService accessTokenService,
                          RoleService roleService,
                          MongoDBSessionService sessionService) {
-        this.userService = userService;
+        this.userManagementService = userManagementService;
         this.accessTokenService = accessTokenService;
         this.roleService = roleService;
         this.sessionService = sessionService;
@@ -166,7 +168,7 @@ public class UsersResource extends RestResource {
             throw new ForbiddenException("Not allowed to view user " + username);
         }
 
-        final User user = userService.load(username);
+        final User user = userManagementService.load(username);
         if (user == null) {
             throw new NotFoundException("Couldn't find user " + username);
         }
@@ -207,11 +209,11 @@ public class UsersResource extends RestResource {
     @RequiresPermissions(RestPermissions.USERS_LIST)
     @ApiOperation(value = "List all users", notes = "The permissions assigned to the users are always included.")
     public UserList listUsers() {
-        final List<User> users = userService.loadAll();
+        final List<User> users = userManagementService.loadAll();
         final AllUserSessions sessions = AllUserSessions.create(sessionService);
 
         final List<UserSummary> resultUsers = Lists.newArrayListWithCapacity(users.size() + 1);
-        userService.getRootUser().ifPresent(adminUser ->
+        userManagementService.getRootUser().ifPresent(adminUser ->
                 resultUsers.add(toUserResponse(adminUser, sessions))
         );
 
@@ -288,17 +290,17 @@ public class UsersResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.USER_CREATE)
     public Response create(@ApiParam(name = "JSON body", value = "Must contain username, full_name, email, password and a list of permissions.", required = true)
                            @Valid @NotNull CreateUserRequest cr) throws ValidationException {
-        if (userService.load(cr.username()) != null) {
+        if (userManagementService.load(cr.username()) != null) {
             final String msg = "Cannot create user " + cr.username() + ". Username is already taken.";
             LOG.error(msg);
             throw new BadRequestException(msg);
         }
 
         // Create user.
-        User user = userService.create();
+        User user = userManagementService.create();
         user.setName(cr.username());
         user.setPassword(cr.password());
-        user.setFullName(cr.fullName());
+        user.setFirstLastFullNames(cr.firstName(), cr.lastName());
         user.setEmail(cr.email());
         user.setPermissions(cr.permissions());
         setUserRoles(cr.roles(), user);
@@ -317,7 +319,7 @@ public class UsersResource extends RestResource {
             user.setStartpage(startpage.type(), startpage.id());
         }
 
-        final String id = userService.save(user);
+        final String id = userManagementService.create(user);
         LOG.debug("Saved user {} with id {}", user.getName(), id);
 
         final URI userUri = getUriBuilderToSelf().path(UsersResource.class)
@@ -375,8 +377,8 @@ public class UsersResource extends RestResource {
             if (cr.email() != null) {
                 user.setEmail(cr.email());
             }
-            if (cr.fullName() != null) {
-                user.setFullName(cr.fullName());
+            if (cr.firstName() != null && cr.lastName() != null) {
+                user.setFirstLastFullNames(cr.firstName(), cr.lastName());
             }
         }
         final boolean permitted = isPermitted(USERS_PERMISSIONSEDIT, user.getName());
@@ -415,7 +417,7 @@ public class UsersResource extends RestResource {
                 user.setSessionTimeoutMs(sessionTimeoutMs);
             }
         }
-        userService.save(user);
+        userManagementService.update(user);
     }
 
     @DELETE
@@ -426,7 +428,7 @@ public class UsersResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.USER_DELETE)
     public void deleteUser(@ApiParam(name = "username", value = "The name of the user to delete.", required = true)
                            @PathParam("username") String username) {
-        if (userService.delete(username) == 0) {
+        if (userManagementService.delete(username) == 0) {
             throw new NotFoundException("Couldn't find user " + username);
         }
     }
@@ -439,7 +441,7 @@ public class UsersResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.USER_DELETE)
     public void deleteUserById(@ApiParam(name = "userId", value = "The id of the user to delete.", required = true)
                                @PathParam("userId") String userId) {
-        if (userService.deleteById(userId) == 0) {
+        if (userManagementService.deleteById(userId) == 0) {
             throw new NotFoundException("Couldn't find user " + userId);
         }
     }
@@ -456,13 +458,13 @@ public class UsersResource extends RestResource {
                                 @PathParam("username") String username,
                                 @ApiParam(name = "JSON body", value = "The list of permissions to assign to the user.", required = true)
                                 @Valid @NotNull PermissionEditRequest permissionRequest) throws ValidationException {
-        final User user = userService.load(username);
+        final User user = userManagementService.load(username);
         if (user == null) {
             throw new NotFoundException("Couldn't find user " + username);
         }
 
         user.setPermissions(getEffectiveUserPermissions(user, permissionRequest.permissions()));
-        userService.save(user);
+        userManagementService.save(user);
     }
 
     @PUT
@@ -476,7 +478,7 @@ public class UsersResource extends RestResource {
                                 @PathParam("username") String username,
                                 @ApiParam(name = "JSON body", value = "The map of preferences to assign to the user.", required = true)
                                         UpdateUserPreferences preferencesRequest) throws ValidationException {
-        final User user = userService.load(username);
+        final User user = userManagementService.load(username);
         checkPermission(RestPermissions.USERS_EDIT, username);
 
         if (user == null) {
@@ -484,7 +486,7 @@ public class UsersResource extends RestResource {
         }
 
         user.setPreferences(preferencesRequest.preferences());
-        userService.save(user);
+        userManagementService.save(user);
     }
 
     @DELETE
@@ -497,12 +499,12 @@ public class UsersResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.USER_PERMISSIONS_DELETE)
     public void deletePermissions(@ApiParam(name = "username", value = "The name of the user to modify.", required = true)
                                   @PathParam("username") String username) throws ValidationException {
-        final User user = userService.load(username);
+        final User user = userManagementService.load(username);
         if (user == null) {
             throw new NotFoundException("Couldn't find user " + username);
         }
         user.setPermissions(Collections.emptyList());
-        userService.save(user);
+        userManagementService.save(user);
     }
 
     @PUT
@@ -548,7 +550,7 @@ public class UsersResource extends RestResource {
 
         boolean changeAllowed = false;
         if (checkOldPassword) {
-            if (user.isUserPassword(cr.oldPassword())) {
+            if (userManagementService.isUserPassword(user, cr.oldPassword())) {
                 changeAllowed = true;
             }
         } else {
@@ -556,8 +558,11 @@ public class UsersResource extends RestResource {
         }
 
         if (changeAllowed) {
-            user.setPassword(cr.password());
-            userService.save(user);
+            if (checkOldPassword) {
+                userManagementService.changePassword(user, cr.oldPassword(), cr.password());
+            } else {
+                userManagementService.changePassword(user, cr.password());
+            }
         } else {
             throw new BadRequestException("Old password is missing or incorrect.");
         }
@@ -589,8 +594,7 @@ public class UsersResource extends RestResource {
             return Response.notModified().build();
         }
 
-        user.setAccountStatus(newStatus);
-        userService.save(user);
+        userManagementService.setUserStatus(user, newStatus);
         return Response.ok().build();
     }
 
@@ -606,9 +610,9 @@ public class UsersResource extends RestResource {
             throw new ForbiddenException("Not allowed to list tokens for user " + username);
         }
 
-        final ImmutableList.Builder<Token> tokenList = ImmutableList.builder();
+        final ImmutableList.Builder<TokenSummary> tokenList = ImmutableList.builder();
         for (AccessToken token : accessTokenService.loadAll(user.getName())) {
-            tokenList.add(Token.create(token.getId(), token.getName(), token.getToken(), token.getLastAccess()));
+            tokenList.add(TokenSummary.create(token.getId(), token.getName(), token.getLastAccess()));
         }
 
         return TokenList.create(tokenList.build());
@@ -660,7 +664,7 @@ public class UsersResource extends RestResource {
     }
 
     private User loadUserById(String userId) {
-        final User user = userService.loadById(userId);
+        final User user = userManagementService.loadById(userId);
         if (user == null) {
             throw new NotFoundException("Couldn't find user with ID <" + userId + ">");
         }
@@ -676,7 +680,7 @@ public class UsersResource extends RestResource {
         Set<String> roleNames = Collections.emptySet();
 
         if (!roleIds.isEmpty()) {
-            roleNames = userService.getRoleNames(user);
+            roleNames = userManagementService.getRoleNames(user);
 
             if (roleNames.isEmpty()) {
                 LOG.error("Unable to load role names for role IDs {} for user {}", roleIds, user);
@@ -696,8 +700,8 @@ public class UsersResource extends RestResource {
         List<WildcardPermission> wildcardPermissions;
         List<GRNPermission> grnPermissions;
         if (includePermissions) {
-            wildcardPermissions = userService.getWildcardPermissionsForUser(user);
-            grnPermissions = userService.getGRNPermissionsForUser(user);
+            wildcardPermissions = userManagementService.getWildcardPermissionsForUser(user);
+            grnPermissions = userManagementService.getGRNPermissionsForUser(user);
         } else {
             wildcardPermissions = ImmutableList.of();
             grnPermissions = ImmutableList.of();
@@ -707,6 +711,8 @@ public class UsersResource extends RestResource {
                 user.getId(),
                 user.getName(),
                 user.getEmail(),
+                user.getFirstName().orElse(null),
+                user.getLastName().orElse(null),
                 user.getFullName(),
                 wildcardPermissions,
                 grnPermissions,
@@ -727,7 +733,7 @@ public class UsersResource extends RestResource {
     // Filter the permissions granted by roles from the permissions list
     private List<String> getEffectiveUserPermissions(final User user, final List<String> permissions) {
         final List<String> effectivePermissions = Lists.newArrayList(permissions);
-        effectivePermissions.removeAll(userService.getUserPermissionsFromRoles(user));
+        effectivePermissions.removeAll(userManagementService.getUserPermissionsFromRoles(user));
         return effectivePermissions;
     }
 
@@ -739,12 +745,12 @@ public class UsersResource extends RestResource {
     }
 
     private UserOverviewDTO getAdminUserDTO(AllUserSessions sessions) {
-        final Optional<User> optionalAdmin = userService.getRootUser();
+        final Optional<User> optionalAdmin = userManagementService.getRootUser();
         if (!optionalAdmin.isPresent()) {
             return null;
         }
         final User admin = optionalAdmin.get();
-        final Set<String> adminRoles = userService.getRoleNames(admin);
+        final Set<String> adminRoles = userManagementService.getRoleNames(admin);
         final Optional<MongoDbSession> lastSession = sessions.forUser(admin);
         return UserOverviewDTO.builder()
                 .username(admin.getName())

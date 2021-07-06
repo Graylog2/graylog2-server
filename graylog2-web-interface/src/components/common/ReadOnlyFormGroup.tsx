@@ -24,6 +24,7 @@ type Props = {
   label: React.ReactElement | string,
   value: unknown,
   help?: string,
+  className?: string,
 };
 
 const ValueCol = styled(Col)`
@@ -59,8 +60,8 @@ const readableValue = (value: Props['value']) => {
 };
 
 /** Displays the provided label and value with the same layout like the FormikFormGroup */
-const ReadOnlyFormGroup = ({ label, value, help }: Props) => (
-  <Row>
+const ReadOnlyFormGroup = ({ label, value, help, className }: Props) => (
+  <Row className={className}>
     <LabelCol sm={3}>
       {label}
     </LabelCol>
@@ -73,6 +74,7 @@ const ReadOnlyFormGroup = ({ label, value, help }: Props) => (
 
 ReadOnlyFormGroup.defaultProps = {
   help: undefined,
+  className: undefined,
 };
 
 export default ReadOnlyFormGroup;
