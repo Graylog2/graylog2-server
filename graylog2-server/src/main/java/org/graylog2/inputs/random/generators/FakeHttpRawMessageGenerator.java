@@ -171,7 +171,11 @@ public class FakeHttpRawMessageGenerator {
         msg.addField("ticks", System.nanoTime());
         msg.addField("http_method", state.method.name());
         msg.addField("http_response_code", httpCode);
-        msg.addField("user_id", state.userId);
+        if (state.msgSequenceNr % 50 == 0) {
+            msg.addField("user_id", "B0RK B0RK");
+        } else {
+            msg.addField("user_id", state.userId);
+        }
         msg.addField("took_ms", tookMs);
 
         return msg;

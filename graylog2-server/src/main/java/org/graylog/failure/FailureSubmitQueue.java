@@ -16,13 +16,15 @@
  */
 package org.graylog.failure;
 
+import javax.inject.Singleton;
 import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
 
-public interface FailureHandler {
+@Singleton
+public class FailureSubmitQueue {
+    private final LinkedBlockingQueue<List<FailureObject>> failureQueue = new LinkedBlockingQueue<>(1000);
 
-    void handle(List<FailureObject> failures);
-
-    boolean supports(FailureObject failure);
-
-    boolean isEnabled();
+    public LinkedBlockingQueue<List<FailureObject>> getFailureQueue() {
+        return failureQueue;
+    }
 }

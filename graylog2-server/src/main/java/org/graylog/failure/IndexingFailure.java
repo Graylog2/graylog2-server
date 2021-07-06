@@ -18,7 +18,7 @@ package org.graylog.failure;
 
 import org.graylog2.indexer.IndexFailure;
 
-public class IndexingFailure implements Failure{
+public class IndexingFailure implements Failure {
 
     private final IndexFailure internalFailure;
 

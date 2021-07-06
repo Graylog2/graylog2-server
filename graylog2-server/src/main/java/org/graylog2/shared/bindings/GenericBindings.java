@@ -18,6 +18,7 @@ package org.graylog2.shared.bindings;
 
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.eventbus.EventBus;
+import com.google.common.util.concurrent.Service;
 import com.google.common.util.concurrent.ServiceManager;
 import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
@@ -27,6 +28,7 @@ import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
 import okhttp3.OkHttpClient;
 import org.graylog.failure.FailureHandler;
+import org.graylog.failure.FailureService;
 import org.graylog.failure.PersistInMongoFailureHandler;
 import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.LocalMetricRegistry;
@@ -85,5 +87,12 @@ public class GenericBindings extends AbstractModule {
                 .to(PersistInMongoFailureHandler.class).asEagerSingleton();
 
         Multibinder.newSetBinder(binder(), FailureHandler.class);
+        serviceBinder().addBinding().to(FailureService.class).in(Scopes.SINGLETON);
     }
+
+    // TODO inherit from Graylog2Module instead?
+    protected Multibinder<Service> serviceBinder() {
+        return Multibinder.newSetBinder(binder(), Service.class);
+    }
+
 }

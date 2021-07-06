@@ -17,6 +17,7 @@
 package org.graylog.failure;
 
 import com.google.common.collect.Lists;
+import com.google.common.util.concurrent.AbstractExecutionThreadService;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -30,17 +31,21 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Singleton
-public class FailureService {
+public class FailureService extends AbstractExecutionThreadService {
 
     private final ExecutorService executor;
+    private FailureSubmitQueue failureQueue;
     private final List<FailureHandler> fallbackFailureHandlerAsList;
     private final Set<FailureHandler> failureHandlers;
+    private Thread executionThread;
 
     @Inject
     public FailureService(
+            FailureSubmitQueue failureQueue,
             @Named("fallbackFailureHandler") FailureHandler fallbackFailureHandler,
             Set<FailureHandler> failureHandlers
     ) {
+        this.failureQueue = failureQueue;
         this.fallbackFailureHandlerAsList = Lists.newArrayList(fallbackFailureHandler);
         this.failureHandlers = failureHandlers;
         // TODO: the executor uses 'offer' instead of 'add' => will cause lost messages if the queue is full
@@ -49,21 +54,55 @@ public class FailureService {
                 new LinkedBlockingQueue<>(1000));
     }
 
-    public void submit(Failure failure) {
-        executor.submit(() -> handle(failure));
+    private void submit(List<FailureObject> failures) {
+        executor.submit(() -> handle(failures));
     }
 
-    private void handle(Failure failure) {
-        suitableHandlers(failure)
-                .forEach(handler -> handler.handle(failure));
+    private void handle(List<FailureObject> failures) {
+        enabledHandlers()
+                .forEach(handler -> handler.handle(failures));
     }
 
-    private List<FailureHandler> suitableHandlers(Failure failure) {
+    private List<FailureHandler> enabledHandlers() {
+        final List<FailureHandler> suitableHandlers = failureHandlers.stream()
+                .filter(FailureHandler::isEnabled)
+                .collect(Collectors.toList());
+        return suitableHandlers.isEmpty() ? fallbackFailureHandlerAsList : suitableHandlers;
+    }
+
+    private List<FailureHandler> suitableHandlers(FailureObject failure) {
         final List<FailureHandler> suitableHandlers = failureHandlers.stream()
                 .filter(FailureHandler::isEnabled)
                 .filter(h -> h.supports(failure))
                 .collect(Collectors.toList());
 
         return suitableHandlers.isEmpty() ? fallbackFailureHandlerAsList : suitableHandlers;
+    }
+
+    @Override
+    protected void startUp() throws Exception {
+        super.startUp();
+        executionThread = Thread.currentThread();
+    }
+
+    @Override
+    protected void shutDown() throws Exception {
+        super.shutDown();
+    }
+
+    @Override
+    protected void triggerShutdown() {
+        executionThread.interrupt();
+    }
+
+    @Override
+    protected void run() throws Exception {
+        while (isRunning()) {
+            try {
+                final List<FailureObject> failureObjects = failureQueue.getFailureQueue().take();
+                submit(failureObjects);
+            } catch (InterruptedException ignored) {
+            }
+        }
     }
 }

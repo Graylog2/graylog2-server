@@ -16,8 +16,10 @@
  */
 package org.graylog2.indexer.messages;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
-import org.graylog.failure.FailureService;
+import de.huxhorn.sulky.ulid.ULID;
+import org.graylog.failure.FailureSubmitQueue;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.plugin.Message;
 import org.graylog2.system.processing.ProcessingStatusRecorder;
@@ -54,13 +56,13 @@ public class MessagesTest {
     private TrafficAccounting trafficAccounting;
 
     @Mock
-    private FailureService failureService;
+    private FailureSubmitQueue failureSubmitQueue;
 
     private Messages messages;
 
     @Before
     public void setUp() throws Exception {
-        this.messages = new Messages(trafficAccounting, messagesAdapter, mock(ProcessingStatusRecorder.class), failureService);
+        this.messages = new Messages(trafficAccounting, messagesAdapter, mock(ProcessingStatusRecorder.class), failureSubmitQueue, new ObjectMapper(), new ULID());
     }
 
     @Test

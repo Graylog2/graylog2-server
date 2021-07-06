@@ -14,15 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.failure;
+package org.graylog2.indexer;
 
-import java.util.List;
-
-public interface FailureHandler {
-
-    void handle(List<FailureObject> failures);
-
-    boolean supports(FailureObject failure);
-
-    boolean isEnabled();
+public class FailureIndexMapping6 extends FailureIndexMapping {
+    protected String dateFormat() {
+        return Constants.ES_DATE_FORMAT;
+    }
 }

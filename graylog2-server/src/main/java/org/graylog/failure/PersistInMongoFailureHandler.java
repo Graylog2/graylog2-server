@@ -19,6 +19,7 @@ package org.graylog.failure;
 import org.graylog2.indexer.IndexFailureService;
 
 import javax.inject.Inject;
+import java.util.List;
 
 public class PersistInMongoFailureHandler implements FailureHandler {
 
@@ -31,13 +32,13 @@ public class PersistInMongoFailureHandler implements FailureHandler {
 
 
     @Override
-    public void handle(Failure failure) {
-        indexFailureService.saveWithoutValidation(((IndexingFailure) failure).getInternalFailure());
+    public void handle(List<FailureObject> failures) {
+        failures.stream().map(FailureObject::toIndexFailure).forEach(indexFailureService::saveWithoutValidation);
     }
 
     @Override
-    public boolean supports(Failure failure) {
-        return failure instanceof IndexingFailure;
+    public boolean supports(FailureObject failure) {
+        return failure instanceof FailureObject;
     }
 
     @Override
