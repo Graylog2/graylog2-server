@@ -14,31 +14,39 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import FieldType from 'views/logic/fieldtypes/FieldType';
+
 import AddToTableActionHandler from './AddToTableActionHandler';
 
 import AggregationWidget from '../aggregationbuilder/AggregationWidget';
 import MessagesWidget from '../widgets/MessagesWidget';
 import MessagesWidgetConfig from '../widgets/MessagesWidgetConfig';
 
+const actionArgs = {
+  field: 'foo',
+  queryId: 'deadbeef',
+  type: FieldType.create('string'),
+} as const;
+
 describe('AddToTableActionHandler.condition', () => {
-  it('enables action if field is presented in message table', () => {
+  it('disables action if field is not present in message table', () => {
     const widget = MessagesWidget.builder()
       .config(MessagesWidgetConfig.builder().fields(['foo']).build())
       .build();
     const contexts = { widget };
 
-    const result = AddToTableActionHandler.isEnabled({ contexts, field: 'foo' });
+    const result = AddToTableActionHandler.isEnabled({ ...actionArgs, contexts });
 
     expect(result).toEqual(false);
   });
 
-  it('enables action if field is presented in message table', () => {
+  it('enables action if field is present in message table', () => {
     const widget = MessagesWidget.builder()
       .config(MessagesWidgetConfig.builder().build())
       .build();
     const contexts = { widget };
 
-    const result = AddToTableActionHandler.isEnabled({ contexts, field: 'foo' });
+    const result = AddToTableActionHandler.isEnabled({ ...actionArgs, contexts });
 
     expect(result).toEqual(true);
   });
@@ -47,7 +55,7 @@ describe('AddToTableActionHandler.condition', () => {
     const widget = AggregationWidget.builder().build();
     const contexts = { widget };
 
-    const result = AddToTableActionHandler.isEnabled({ contexts, field: 'foo' });
+    const result = AddToTableActionHandler.isEnabled({ ...actionArgs, contexts });
 
     expect(result).toEqual(false);
   });
