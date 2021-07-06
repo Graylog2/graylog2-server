@@ -26,7 +26,7 @@ import WidgetGrid from './WidgetGrid';
 
 jest.mock('./widgets/Widget', () => () => 'widget');
 // eslint-disable-next-line react/prop-types
-jest.mock('components/common/ReactGridContainer', () => ({ children }) => <react-grid-container-mock>{children}</react-grid-container-mock>);
+jest.mock('components/common/ReactGridContainer', () => ({ children }) => <span>{children}</span>);
 
 jest.mock('graylog-web-plugin/plugin', () => ({
   PluginStore: {
