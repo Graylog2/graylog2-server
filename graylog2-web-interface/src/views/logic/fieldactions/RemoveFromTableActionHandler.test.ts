@@ -14,11 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import FieldType from 'views/logic/fieldtypes/FieldType';
+
 import RemoveFromTableActionHandler from './RemoveFromTableActionHandler';
 
 import AggregationWidget from '../aggregationbuilder/AggregationWidget';
 import MessagesWidget from '../widgets/MessagesWidget';
 import MessagesWidgetConfig from '../widgets/MessagesWidgetConfig';
+
+const actionArgs = {
+  field: 'foo',
+  queryId: 'deadbeef',
+  type: FieldType.create('string'),
+} as const;
 
 describe('RemoveFromTableActionHandler.condition', () => {
   it('enables action if field is presented in message table', () => {
@@ -27,7 +35,7 @@ describe('RemoveFromTableActionHandler.condition', () => {
       .build();
     const contexts = { widget };
 
-    const result = RemoveFromTableActionHandler.isEnabled({ contexts, field: 'foo' });
+    const result = RemoveFromTableActionHandler.isEnabled({ ...actionArgs, contexts });
 
     expect(result).toEqual(true);
   });
@@ -38,7 +46,7 @@ describe('RemoveFromTableActionHandler.condition', () => {
       .build();
     const contexts = { widget };
 
-    const result = RemoveFromTableActionHandler.isEnabled({ contexts, field: 'foo' });
+    const result = RemoveFromTableActionHandler.isEnabled({ ...actionArgs, contexts });
 
     expect(result).toEqual(false);
   });
@@ -47,7 +55,7 @@ describe('RemoveFromTableActionHandler.condition', () => {
     const widget = AggregationWidget.builder().build();
     const contexts = { widget };
 
-    const result = RemoveFromTableActionHandler.isEnabled({ contexts, field: 'foo' });
+    const result = RemoveFromTableActionHandler.isEnabled({ ...actionArgs, contexts });
 
     expect(result).toEqual(false);
   });
