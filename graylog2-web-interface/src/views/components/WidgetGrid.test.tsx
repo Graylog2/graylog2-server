@@ -51,8 +51,7 @@ jest.mock('views/components/contexts/WidgetFieldTypesContextProvider', () => ({ 
 describe('<WidgetGrid />', () => {
   it('should render with minimal props', () => {
     const wrapper = mount((
-      <WidgetGrid allFields={Immutable.List()}
-                  data={{}}
+      <WidgetGrid data={{}}
                   errors={{}}
                   onPositionsChange={() => {}}
                   titles={Immutable.Map()}
@@ -83,7 +82,6 @@ describe('<WidgetGrid />', () => {
                   positions={positions}
                   data={data}
                   titles={titles}
-                  allFields={Immutable.List()}
                   fields={Immutable.List()}
                   onPositionsChange={() => {}} />
     ));
@@ -110,7 +108,6 @@ describe('<WidgetGrid />', () => {
                   positions={positions}
                   data={data}
                   titles={titles}
-                  allFields={Immutable.List()}
                   fields={Immutable.List()}
                   onPositionsChange={() => {}} />
     ));

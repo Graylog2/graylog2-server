@@ -61,7 +61,6 @@ const _onWidgetSizeChange = (widgetDimensions, setWidgetDimensions) => (widgetId
 };
 
 const _renderWidgets = ({
-  allFields,
   data,
   errors,
   fields,
@@ -100,8 +99,7 @@ const _renderWidgets = ({
 
     returnedWidgets.widgets.push(
       <WidgetContainer isFocused={isFocused} key={widget.id}>
-        <WidgetComponent allFields={allFields}
-                         data={data}
+        <WidgetComponent data={data}
                          editing={editing}
                          errors={errors}
                          fields={fields}
@@ -127,14 +125,12 @@ const WidgetGrid = ({
   widgets: propsWidgets,
   positions: propsPositions,
   fields,
-  allFields,
   titles,
 }) => {
   const { focusedWidget } = useContext(WidgetFocusContext);
   const [widgetDimensions, setWidgetDimensions] = useState({});
 
   const { widgets, positions } = useMemo(() => _renderWidgets({
-    allFields,
     data,
     errors,
     fields,
@@ -146,7 +142,6 @@ const WidgetGrid = ({
     widgetDimensions,
     focusedWidget,
   }), [
-    allFields,
     data,
     errors,
     fields,
@@ -196,7 +191,6 @@ const WidgetGrid = ({
 };
 
 WidgetGrid.propTypes = {
-  allFields: CustomPropTypes.FieldListType.isRequired,
   data: WidgetDataMap.isRequired,
   errors: WidgetErrorsMap.isRequired,
   fields: CustomPropTypes.FieldListType.isRequired,
