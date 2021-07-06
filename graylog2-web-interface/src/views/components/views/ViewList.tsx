@@ -21,6 +21,7 @@ import { ButtonToolbar, DropdownButton, MenuItem } from 'components/graylog';
 import { IfPermitted, PaginatedList, SearchForm, Spinner, EntityList, ShareButton } from 'components/common';
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import QueryHelper from 'components/common/QueryHelper';
+import ViewClass from 'views/logic/views/View';
 
 import View from './View';
 
@@ -59,7 +60,7 @@ const reducer = (state, action) => {
 
 const ViewList = ({ pagination, handleSearch, handleViewDelete, views }) => {
   const [{ query, page, perPage }, dispatch] = useReducer(reducer, { query: '', page: 1, perPage: 10 });
-  const [viewToShare, setViewToShare] = useState();
+  const [viewToShare, setViewToShare] = useState<ViewClass>();
 
   const execSearch = useCallback(() => handleSearch(query, page, perPage), [handleSearch, page, perPage, query]);
 
