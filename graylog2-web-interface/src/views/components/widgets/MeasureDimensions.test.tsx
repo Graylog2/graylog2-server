@@ -20,9 +20,13 @@ import { mount } from 'wrappedEnzyme';
 
 import MeasureDimensions from './MeasureDimensions';
 
+type ChildProps = {
+  containerHeight: number,
+};
+
 describe('<MeasureDimensions />', () => {
   it('should pass the height of the container to its children', () => {
-    class ChildComp extends React.Component {
+    class ChildComp extends React.Component<ChildProps> {
       static propTypes = {
         containerHeight: PropTypes.number,
       };
