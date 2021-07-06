@@ -39,6 +39,7 @@ public class IndexMappingFactory {
             case MESSAGES: return indexMappingFor(elasticsearchVersion);
             case EVENTS: return eventsIndexMappingFor(elasticsearchVersion);
             case GIM_V1: return gimMappingFor(elasticsearchVersion);
+            case FAILURES: return failureIndexMappingFor(elasticsearchVersion);
             default: throw new IllegalStateException("Invalid index template type: " + templateType);
         }
     }
@@ -70,6 +71,16 @@ public class IndexMappingFactory {
             return new EventsIndexMapping6();
         } else if (elasticsearchVersion.satisfies("^7.0.0")) {
             return new EventsIndexMapping7();
+        } else {
+            throw new ElasticsearchException("Unsupported Elasticsearch version: " + elasticsearchVersion);
+        }
+    }
+
+    public static IndexMappingTemplate failureIndexMappingFor(Version elasticsearchVersion) {
+        if (elasticsearchVersion.satisfies("^5.0.0 | ^6.0.0")) {
+            return new FailureIndexMapping6();
+        } else if (elasticsearchVersion.satisfies("^7.0.0")) {
+            return new FailureIndexMapping7();
         } else {
             throw new ElasticsearchException("Unsupported Elasticsearch version: " + elasticsearchVersion);
         }

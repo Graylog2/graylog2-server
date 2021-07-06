@@ -41,6 +41,10 @@ public interface Stream extends Persisted {
      */
     String DEFAULT_SYSTEM_EVENTS_STREAM_ID = "000000000000000000000003";
     /**
+     * The ID of the stream for message failures.
+     */
+    public String FAILURES_STREAM_ID = "000000000000000000000004";
+    /**
      * Contains all default event streams. (e.g. events and system events)
      */
     ImmutableSet<String> DEFAULT_EVENT_STREAM_IDS = ImmutableSet.of(DEFAULT_EVENTS_STREAM_ID, DEFAULT_SYSTEM_EVENTS_STREAM_ID);

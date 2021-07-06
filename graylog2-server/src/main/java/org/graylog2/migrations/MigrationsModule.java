@@ -51,6 +51,7 @@ public class MigrationsModule extends PluginModule {
         addMigration(V20200722110800_AddBuiltinRoles.class);
         addMigration(GrantsMetaMigration.class);
         addMigration(V20201103145400_LegacyAuthServiceMigration.class);
+        addMigration(V20210705181600_AddFailureIndexSetsMigration.class);
 
         // Make sure there is always a binder for migration modules
         Multibinder.newSetBinder(binder(), V20201103145400_LegacyAuthServiceMigration.MigrationModule.class);

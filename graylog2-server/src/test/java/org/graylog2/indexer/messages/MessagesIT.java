@@ -17,13 +17,15 @@
 package org.graylog2.indexer.messages;
 
 import com.codahale.metrics.MetricRegistry;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import de.huxhorn.sulky.ulid.ULID;
 import joptsimple.internal.Strings;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
-import org.graylog2.indexer.IndexFailure;
+import org.graylog2.indexer.FailureObject;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.TestIndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
@@ -92,7 +94,7 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         client().createIndex(INDEX_NAME);
         client().waitForGreenStatus(INDEX_NAME);
         final MetricRegistry metricRegistry = new MetricRegistry();
-        messages = new Messages(mock(TrafficAccounting.class), createMessagesAdapter(metricRegistry), mock(ProcessingStatusRecorder.class));
+        messages = new Messages(mock(TrafficAccounting.class), createMessagesAdapter(metricRegistry), mock(ProcessingStatusRecorder.class), new ObjectMapper(), new ULID());
     }
 
     @After
@@ -181,7 +183,7 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
 
         assertThat(failedItems).hasSize(1);
 
-        final List<IndexFailure> failures = this.messages.getIndexFailureQueue().poll(1L, TimeUnit.SECONDS);
+        final List<FailureObject> failures = this.messages.getIndexFailureQueue().poll(1L, TimeUnit.SECONDS);
 
         assertThat(failures).hasSize(1);
     }

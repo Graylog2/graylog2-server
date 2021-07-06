@@ -16,7 +16,9 @@
  */
 package org.graylog2.indexer.messages;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
+import de.huxhorn.sulky.ulid.ULID;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.plugin.Message;
 import org.graylog2.system.processing.ProcessingStatusRecorder;
@@ -50,7 +52,7 @@ class MessagesBulkIndexRetryingTest {
 
     @BeforeEach
     void setUp() {
-        this.messages = new Messages(trafficAccounting, messagesAdapter, processingStatusRecorder);
+        this.messages = new Messages(trafficAccounting, messagesAdapter, processingStatusRecorder, new ObjectMapper(), new ULID());
     }
 
     @Test

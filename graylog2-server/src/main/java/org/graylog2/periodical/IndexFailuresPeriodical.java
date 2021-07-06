@@ -18,6 +18,8 @@ package org.graylog2.periodical;
 
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.MetricRegistry;
+import org.graylog2.indexer.FailureIndexer;
+import org.graylog2.indexer.FailureObject;
 import org.graylog2.indexer.IndexFailureService;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.plugin.ServerStatus;
@@ -27,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.util.List;
 
 public class IndexFailuresPeriodical extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(IndexFailuresPeriodical.class);
@@ -35,16 +38,19 @@ public class IndexFailuresPeriodical extends Periodical {
     private final Messages messages;
     private final ServerStatus serverStatus;
     private final MetricRegistry metricRegistry;
+    private FailureIndexer failureIndexer;
 
     @Inject
     public IndexFailuresPeriodical(IndexFailureService indexFailureService,
                                    Messages messages,
                                    ServerStatus serverStatus,
-                                   MetricRegistry metricRegistry) {
+                                   MetricRegistry metricRegistry,
+                                   FailureIndexer failureIndexer) {
         this.indexFailureService = indexFailureService;
         this.messages = messages;
         this.serverStatus = serverStatus;
         this.metricRegistry = metricRegistry;
+        this.failureIndexer = failureIndexer;
     }
 
     @Override
@@ -61,9 +67,13 @@ public class IndexFailuresPeriodical extends Periodical {
     public void doRun() {
         while (serverStatus.getLifecycle() != Lifecycle.HALTING) {
             try {
-                messages.getIndexFailureQueue()
-                        .take()
-                        .forEach(indexFailureService::saveWithoutValidation);
+//                messages.getIndexFailureQueue()
+//                        .take()
+//                        .forEach(indexFailureService::saveWithoutValidation);
+                final List<FailureObject> failureObjects = messages.getIndexFailureQueue()
+                        .take();
+
+                       failureIndexer.write(failureObjects);
             } catch (Exception e) {
                 LOG.error("Could not persist index failure.", e);
             }

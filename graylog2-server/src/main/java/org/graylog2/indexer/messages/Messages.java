@@ -16,6 +16,8 @@
  */
 package org.graylog2.indexer.messages;
 
+import com.codahale.metrics.Meter;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
 import com.github.rholder.retry.Attempt;
 import com.github.rholder.retry.RetryException;
@@ -28,6 +30,8 @@ import com.google.auto.value.AutoValue;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
+import de.huxhorn.sulky.ulid.ULID;
+import org.graylog2.indexer.FailureObject;
 import org.graylog2.indexer.IndexFailure;
 import org.graylog2.indexer.IndexFailureImpl;
 import org.graylog2.indexer.IndexSet;
@@ -52,6 +56,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import static org.graylog2.plugin.Message.FIELD_GL2_MESSAGE_ID;
 
 @Singleton
 public class Messages {
@@ -92,18 +98,25 @@ public class Messages {
                 });
     }
 
-    private final LinkedBlockingQueue<List<IndexFailure>> indexFailureQueue;
+    private final LinkedBlockingQueue<List<FailureObject>> indexFailureQueue;
     private final MessagesAdapter messagesAdapter;
     private final ProcessingStatusRecorder processingStatusRecorder;
     private final TrafficAccounting trafficAccounting;
+    private final ObjectMapper objectMapper;
+    private ULID ulid;
 
     @Inject
     public Messages(TrafficAccounting trafficAccounting,
                     MessagesAdapter messagesAdapter,
-                    ProcessingStatusRecorder processingStatusRecorder) {
+                    ProcessingStatusRecorder processingStatusRecorder,
+                    // TODO user ObjectMapperProvider?
+                    ObjectMapper objectMapper,
+                    ULID ulid) {
         this.trafficAccounting = trafficAccounting;
         this.messagesAdapter = messagesAdapter;
         this.processingStatusRecorder = processingStatusRecorder;
+        this.objectMapper = objectMapper;
+        this.ulid = ulid;
 
         // TODO: Magic number
         this.indexFailureQueue = new LinkedBlockingQueue<>(1000);
@@ -274,8 +287,8 @@ public class Messages {
             return Collections.emptyList();
         }
 
-        final List<IndexFailure> indexFailures = indexingErrors.stream()
-                .map(IndexingError::toIndexFailure)
+        final List<FailureObject> indexFailures = indexingErrors.stream()
+                .map((ie) -> ie.toFailureObject(objectMapper, ulid))
                 .collect(Collectors.toList());
 
         try {
@@ -286,11 +299,11 @@ public class Messages {
         }
 
         return indexFailures.stream()
-                .map(IndexFailure::letterId)
+                .map(FailureObject::getId)
                 .collect(Collectors.toList());
     }
 
-    public LinkedBlockingQueue<List<IndexFailure>> getIndexFailureQueue() {
+    public LinkedBlockingQueue<List<FailureObject>> getIndexFailureQueue() {
         return indexFailureQueue;
     }
 
@@ -322,9 +335,24 @@ public class Messages {
                     .put("type", this.errorType().toString())
                     .put("message", this.errorMessage())
                     .put("timestamp", message.getTimestamp())
+                    .put("full_message", message)
                     .build();
 
             return new IndexFailureImpl(doc);
+        }
+
+        public FailureObject toFailureObject(ObjectMapper objectMapper, ULID ulid) {
+            final Indexable message = this.message();
+            final Map<String, Object> doc = ImmutableMap.<String, Object>builder()
+                    .put(FIELD_GL2_MESSAGE_ID, ulid.nextULID()) // TODO copy ulid from message? or at least make it searchable with another field for tracing
+                    .put("timestamp", message.getTimestamp())
+                    .put("failure_type", "INDEXING")
+                    .put("error_string", this.errorMessage())
+                    .put("message", this.errorMessage()) // Find a good message to display.
+                    .put("source", "source-of-failing-message") // TODO get real source from message
+                    .put("failed_message", message.toElasticSearchObject(objectMapper, new Meter()))
+                    .build();
+            return new FailureObject(doc);
         }
     }
 }

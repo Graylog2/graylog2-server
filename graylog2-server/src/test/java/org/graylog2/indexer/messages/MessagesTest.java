@@ -16,7 +16,9 @@
  */
 package org.graylog2.indexer.messages;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
+import de.huxhorn.sulky.ulid.ULID;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.plugin.Message;
 import org.graylog2.system.processing.ProcessingStatusRecorder;
@@ -56,7 +58,7 @@ public class MessagesTest {
 
     @Before
     public void setUp() throws Exception {
-        this.messages = new Messages(trafficAccounting, messagesAdapter, mock(ProcessingStatusRecorder.class));
+        this.messages = new Messages(trafficAccounting, messagesAdapter, mock(ProcessingStatusRecorder.class), new ObjectMapper(), new ULID());
     }
 
     @Test

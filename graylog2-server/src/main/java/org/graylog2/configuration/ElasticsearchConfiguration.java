@@ -29,6 +29,7 @@ import java.util.Locale;
 public class ElasticsearchConfiguration {
     public static final String DEFAULT_EVENTS_INDEX_PREFIX = "default_events_index_prefix";
     public static final String DEFAULT_SYSTEM_EVENTS_INDEX_PREFIX = "default_system_events_index_prefix";
+    public static final String DEFAULT_FAILURES_INDEX_PREFIX = "default_failures_index_prefix";
 
     @Parameter(value = "elasticsearch_disable_version_check")
     private boolean disableVersionCheck = false;
@@ -102,6 +103,9 @@ public class ElasticsearchConfiguration {
 
     @Parameter(value = DEFAULT_SYSTEM_EVENTS_INDEX_PREFIX, validators = StringNotBlankValidator.class)
     private String defaultSystemEventsIndexPrefix = "gl-system-events";
+
+    @Parameter(value = DEFAULT_FAILURES_INDEX_PREFIX, validators = StringNotBlankValidator.class)
+    private String defaultFailuresIndexPrefix = "gl-failures";
 
     public boolean isDisableVersionCheck() {
         return disableVersionCheck;
@@ -194,5 +198,9 @@ public class ElasticsearchConfiguration {
 
     public String getDefaultSystemEventsIndexPrefix() {
         return defaultSystemEventsIndexPrefix;
+    }
+
+    public String getGetDefaultFailuresIndexPrefix() {
+        return defaultFailuresIndexPrefix;
     }
 }
