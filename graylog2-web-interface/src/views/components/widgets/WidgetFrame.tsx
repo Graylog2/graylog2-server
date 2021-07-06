@@ -123,7 +123,16 @@ const WidgetWrap = styled.div(({ theme }) => css`
   }
 `);
 
-export default class extends React.Component {
+type Dimensions = {
+  height: number,
+  width: number,
+}
+
+type Props = {
+  onSizeChange: (widgetId: string, dimensions: Dimensions) => void,
+  widgetId: string,
+};
+export default class extends React.Component<Props, Dimensions> {
   WIDGET_HEADER_HEIGHT = 25;
 
   WIDGET_FOOTER_HEIGHT = 40;
@@ -133,6 +142,8 @@ export default class extends React.Component {
     children: PropTypes.node.isRequired,
     onSizeChange: PropTypes.func.isRequired,
   };
+
+  private _widgetNode: HTMLElement;
 
   constructor(props) {
     super(props);
@@ -166,8 +177,9 @@ export default class extends React.Component {
     const { height, width } = this._calculateWidgetSize();
 
     if (height !== currentHeight || width !== currentWidth) {
-      this.setState({ height: height, width: width });
-      onSizeChange(widgetId, { height: height, width: width });
+      const dimensions = { height, width };
+      this.setState(dimensions);
+      onSizeChange(widgetId, dimensions);
     }
   }
 
