@@ -17,6 +17,7 @@
 package org.graylog.plugins.beats;
 
 import io.netty.channel.nio.NioEventLoopGroup;
+import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.inputs.transports.NettyTransportConfiguration;
 import org.graylog2.inputs.transports.netty.EventLoopGroupFactory;
 import org.graylog2.plugin.LocalMetricRegistry;
@@ -41,7 +42,7 @@ public class BeatsTransportTest {
     private NioEventLoopGroup eventLoopGroup;
 
     @Mock
-    private org.graylog2.Configuration graylogConfiguration;
+    private TLSProtocolsConfiguration tlsConfiguration;
 
     @Before
     public void setUp() {
@@ -64,7 +65,7 @@ public class BeatsTransportTest {
                 nettyTransportConfiguration,
                 new ThroughputCounter(eventLoopGroup),
                 new LocalMetricRegistry(),
-                graylogConfiguration
+                tlsConfiguration
         );
 
         final MessageInput input = mock(MessageInput.class);
