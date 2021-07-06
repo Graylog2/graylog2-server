@@ -20,7 +20,21 @@ import PropTypes from 'prop-types';
 import { widgetDefinition } from 'views/logic/Widgets';
 import { IconButton } from 'components/common';
 
-class WidgetHorizontalStretch extends React.Component {
+type Position = {
+  col: number,
+  row: number,
+  height: number,
+  width: number,
+};
+
+type Props = {
+  onStretch: (args: { id: string } & Position) => void,
+  position: Position,
+  widgetId: string,
+  widgetType: string,
+}
+
+class WidgetHorizontalStretch extends React.Component<Props> {
   static propTypes = {
     widgetId: PropTypes.string.isRequired,
     widgetType: PropTypes.string.isRequired,
