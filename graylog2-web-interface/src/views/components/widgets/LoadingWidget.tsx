@@ -14,23 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import { mount } from 'wrappedEnzyme';
+import * as React from 'react';
 
-import ErrorWidget from './ErrorWidget';
+import { Icon } from 'components/common';
 
-describe('<ErrorWidget />', () => {
-  it('should display a list item for every provided error', () => {
-    const errors = [
-      { description: 'The first error' },
-      { description: 'The second error' },
-    ];
+import styles from './MessageWidgets.css';
 
-    const wrapper = mount(<ErrorWidget errors={errors} />);
-    const firstListItem = wrapper.find('li').at(0);
-    const secondListItem = wrapper.find('li').at(1);
+const LoadingWidget = () => (
+  <div className={styles.spinnerContainer}>
+    <Icon data-testid="loading-widget" name="sync" size="3x" className="spinner" />
+  </div>
+);
 
-    expect(firstListItem.text()).toContain(errors[0].description);
-    expect(secondListItem.text()).toContain(errors[1].description);
-  });
-});
+LoadingWidget.propTypes = {};
+
+export default LoadingWidget;

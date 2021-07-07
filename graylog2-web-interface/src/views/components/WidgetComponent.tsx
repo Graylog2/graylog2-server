@@ -27,15 +27,15 @@ import ExportSettingsContextProvider from 'views/components/ExportSettingsContex
 import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 import View from 'views/logic/views/View';
 
-import { WidgetDataMap, WidgetErrorsMap } from './widgets/WidgetPropTypes';
+import { Position, WidgetDataMap, WidgetErrorsMap } from './widgets/WidgetPropTypes';
 import Widget from './widgets/Widget';
 import DrilldownContextProvider from './contexts/DrilldownContextProvider';
 import WidgetFieldTypesContextProvider from './contexts/WidgetFieldTypesContextProvider';
 
 type Props = {
-  data: WidgetDataMap,
+  data: {},
   editing: boolean,
-  errors: WidgetErrorsMap,
+  errors: { [widgetId: string]: Array<{ description: string }> },
   fields: Immutable.List<TFieldTypeMapping>,
   onPositionsChange: (position?: WidgetPosition) => void,
   onWidgetSizeChange: (widgetId?: string, dimensions?: { height: number, width: number }) => void,
@@ -91,13 +91,13 @@ const WidgetComponent = ({
 };
 
 WidgetComponent.propTypes = {
-  data: PropTypes.object.isRequired,
+  data: WidgetDataMap.isRequired,
   editing: PropTypes.bool.isRequired,
-  errors: PropTypes.object.isRequired,
+  errors: WidgetErrorsMap.isRequired,
   fields: PropTypes.object.isRequired,
   onPositionsChange: PropTypes.func,
   onWidgetSizeChange: PropTypes.func,
-  position: PropTypes.object.isRequired,
+  position: PropTypes.shape(Position).isRequired,
   title: PropTypes.string.isRequired,
   widget: PropTypes.object.isRequired,
   widgetDimension: PropTypes.object.isRequired,

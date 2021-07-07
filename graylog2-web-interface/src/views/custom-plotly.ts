@@ -14,23 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import { mount } from 'wrappedEnzyme';
+import Plotly from 'plotly.js/lib/core';
+import Bar from 'plotly.js/lib/bar';
+import Pie from 'plotly.js/lib/pie';
+import Heatmap from 'plotly.js/lib/heatmap';
+import Scatter from 'plotly.js/lib/scatter';
 
-import ErrorWidget from './ErrorWidget';
+// @ts-ignore
+Plotly.register([
+  Bar,
+  Pie,
+  Scatter,
+  Heatmap,
+]);
 
-describe('<ErrorWidget />', () => {
-  it('should display a list item for every provided error', () => {
-    const errors = [
-      { description: 'The first error' },
-      { description: 'The second error' },
-    ];
-
-    const wrapper = mount(<ErrorWidget errors={errors} />);
-    const firstListItem = wrapper.find('li').at(0);
-    const secondListItem = wrapper.find('li').at(1);
-
-    expect(firstListItem.text()).toContain(errors[0].description);
-    expect(secondListItem.text()).toContain(errors[1].description);
-  });
-});
+export default Plotly;

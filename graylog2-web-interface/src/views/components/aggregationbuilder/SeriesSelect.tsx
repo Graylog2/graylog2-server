@@ -28,7 +28,7 @@ import SeriesFunctionsSuggester from './SeriesFunctionsSuggester';
 
 import CustomPropTypes from '../CustomPropTypes';
 
-type Option = {
+export type Option = {
   label: string,
   value: Series,
   parameter?: string | number,
@@ -50,17 +50,19 @@ const newSeriesConfigChange = (values, series, newSeries, onChange) => {
 
 const _wrapOption = (series) => ({ label: series.effectiveName, value: series });
 
+export interface Suggester {
+  defaults: Array<IsOption>,
+  for: (func: string | number, parameter: string | number | undefined | null) => Array<Option>,
+}
+
 type Props = {
   onChange: (newSeries: Array<Series>) => boolean,
   series: Array<Series>,
-  suggester: ((string) => Array<Option>) & {
-    defaults: Array<Option | IncompleteOption | ParameterNeededOption | BackToFunctions>,
-    for: (func: string | number, parameter: string | number | undefined | null) => Array<Option>,
-  },
+  suggester: Suggester,
 };
 
 type State = {
-  options: Array<Option | IncompleteOption | ParameterNeededOption | BackToFunctions>,
+  options: Array<IsOption>,
 };
 
 const isParameterNeeded = (option: IsOption): option is ParameterNeededOption => option && 'parameterNeeded' in option && option.parameterNeeded === true;

@@ -19,7 +19,6 @@ import * as Immutable from 'immutable';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import connect from 'stores/connect';
 import { widgetDefinition } from 'views/logic/Widgets';
 import { WidgetActions } from 'views/stores/WidgetStore';
@@ -30,7 +29,6 @@ import { RefreshActions } from 'views/stores/RefreshStore';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import WidgetModel from 'views/logic/widgets/Widget';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
-import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
@@ -78,16 +76,6 @@ export type Result = {
 };
 
 export type OnVisualizationConfigChange = (newConfig: VisualizationConfig) => void;
-
-export type WidgetProps = {
-  config: AggregationWidgetConfig,
-  data: { [key: string]: Result },
-  editing?: boolean,
-  toggleEdit: () => void,
-  fields: FieldTypeMappingsList,
-  onVisualizationConfigChange: OnVisualizationConfigChange,
-  type: string,
-};
 
 const _visualizationForType = (type) => {
   return widgetDefinition(type).visualizationComponent;
@@ -242,8 +230,7 @@ class Widget extends React.Component<Props, State> {
               <WidgetHeader title={title}
                             hideDragHandle={!interactive || isFocused}
                             loading={loading}
-                            onRename={(newTitle) => TitlesActions.set('widget', id, newTitle)}
-                            editing={editing}>
+                            onRename={(newTitle) => TitlesActions.set('widget', id, newTitle)}>
                 {!editing ? (
                   <WidgetActionsMenu isFocused={isFocused}
                                      toggleEdit={this._onToggleEdit}

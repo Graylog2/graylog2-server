@@ -25,7 +25,7 @@ import Widget from 'views/logic/widgets/Widget';
 import TimeLocalizeContext from 'contexts/TimeLocalizeContext';
 import { GlobalOverrideStore, GlobalOverrideStoreState } from 'views/stores/GlobalOverrideStore';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
-import { SearchStore } from 'views/stores/SearchStore';
+import { SearchStore, SearchStoreState } from 'views/stores/SearchStore';
 
 import TimerangeInfo from './TimerangeInfo';
 
@@ -37,12 +37,13 @@ jest.mock('views/stores/GlobalOverrideStore', () => ({
   ),
 }));
 
-const mockSearchStoreState = (storeState = {}) => ({
+const mockSearchStoreState = (storeState: {} = {}): {} => ({
   result: {
     results: {
       'active-query-id': {
         searchTypes: {
           'search-type-id': {
+            type: 'pivot',
             effective_timerange: {
               type: 'absolute', from: '2021-03-27T14:32:31.894Z', to: '2021-04-26T14:32:48.000Z',
             },
@@ -144,7 +145,7 @@ describe('TimerangeInfo', () => {
           },
         },
       },
-    }));
+    }) as SearchStoreState);
 
     render(<SUT widget={relativeWidget} activeQuery="active-query-id" widgetId="widget-id" />);
 
@@ -154,7 +155,7 @@ describe('TimerangeInfo', () => {
   it('should not throw error and display default time range when widget id does not exist in search widget mapping', () => {
     asMock(SearchStore.getInitialState).mockReturnValueOnce(mockSearchStoreState({
       widgetMapping: Immutable.Map(),
-    }));
+    }) as SearchStoreState);
 
     render(<SUT widget={widget} activeQuery="active-query-id" widgetId="widget-id" />);
 

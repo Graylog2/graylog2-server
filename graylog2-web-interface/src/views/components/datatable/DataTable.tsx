@@ -25,7 +25,7 @@ import { defaultCompare } from 'views/logic/DefaultCompare';
 import { ViewStore } from 'views/stores/ViewStore';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
-import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
+import type { Leaf, Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import { Events } from 'views/logic/searchtypes/events/EventHandler';
 
 import DataTableEntry from './DataTableEntry';
@@ -103,7 +103,7 @@ const DataTable = ({ config, currentView, data, fields }: Props) => {
   const effectiveFields = Immutable.OrderedSet(rowFieldNames.map((field) => ({ field, source: field })))
     .merge(seriesToMerge.map((s) => ({ field: s.effectiveName, source: s.function })));
 
-  const expandedRows = expandRows(rowFieldNames.slice(), columnFieldNames.slice(), rows.filter((r) => r.source === 'leaf'));
+  const expandedRows = expandRows(rowFieldNames.slice(), columnFieldNames.slice(), rows.filter((r) => r.source === 'leaf') as Array<Leaf>);
 
   const actualColumnPivotFields = _extractColumnPivotValues(rows);
 
