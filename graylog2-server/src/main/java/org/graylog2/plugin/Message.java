@@ -32,9 +32,11 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.net.InetAddresses;
 import org.graylog.failure.FailureCause;
+import org.graylog.failure.ProcessingFailureCause;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.messages.Indexable;
 import org.graylog2.plugin.streams.Stream;
+import org.graylog2.shared.utilities.ExceptionUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,7 +52,6 @@ import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.time.temporal.Temporal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -368,6 +369,7 @@ public class Message implements Messages, Indexable {
         return getFieldAs(String.class, FIELD_ID);
     }
 
+    @Override
     public String getMessageId() {
         return getFieldAs(String.class, FIELD_GL2_MESSAGE_ID);
     }
@@ -429,32 +431,66 @@ public class Message implements Messages, Indexable {
         }
 
         final Object timestampValue = getField(FIELD_TIMESTAMP);
-        DateTime dateTime;
-        if (timestampValue instanceof Date) {
-            dateTime = new DateTime(timestampValue);
-        } else if (timestampValue instanceof DateTime) {
-            dateTime = (DateTime) timestampValue;
-        } else if (timestampValue instanceof String) {
-            // if the timestamp value is a string, we try to parse it in the correct format.
-            // we fall back to "now", this avoids losing messages which happen to have the wrong timestamp format
-            try {
-                dateTime = ES_DATE_FORMAT_FORMATTER.parseDateTime((String) timestampValue);
-            } catch (IllegalArgumentException e) {
-                LOG.trace("Invalid format for field timestamp '{}' in message {}, forcing to current time.", timestampValue, getId());
-                invalidTimestampMeter.mark();
-                dateTime = Tools.nowUTC();
-            }
-        } else {
-            // don't allow any other types for timestamp, force to "now"
-            LOG.trace("Invalid type for field timestamp '{}' in message {}, forcing to current time.", timestampValue.getClass().getSimpleName(), getId());
-            invalidTimestampMeter.mark();
-            dateTime = Tools.nowUTC();
-        }
+        DateTime dateTime = convertToDateTime(timestampValue);
         if (dateTime != null) {
             obj.put(FIELD_TIMESTAMP, buildElasticSearchTimeFormat(dateTime.withZone(UTC)));
         }
 
         return obj;
+    }
+
+    private DateTime convertToDateTime(Object value) {
+        if (value instanceof DateTime) {
+            return (DateTime) value;
+        }
+
+        DateTime dateTime;
+        if (value instanceof Date) {
+            dateTime = new DateTime(value);
+        } else if (value instanceof ZonedDateTime) {
+            dateTime = new DateTime(Date.from(((ZonedDateTime) value).toInstant()));
+        } else if (value instanceof OffsetDateTime) {
+            dateTime = new DateTime(Date.from(((OffsetDateTime) value).toInstant()));
+        } else if (value instanceof LocalDateTime) {
+            final LocalDateTime localDateTime = (LocalDateTime) value;
+            final ZoneId defaultZoneId = ZoneId.systemDefault();
+            final ZoneOffset offset = defaultZoneId.getRules().getOffset(localDateTime);
+            dateTime = new DateTime(Date.from(localDateTime.toInstant(offset)));
+        } else if (value instanceof LocalDate) {
+            final LocalDate localDate = (LocalDate) value;
+            final LocalDateTime localDateTime = localDate.atStartOfDay();
+            final ZoneId defaultZoneId = ZoneId.systemDefault();
+            final ZoneOffset offset = defaultZoneId.getRules().getOffset(localDateTime);
+            dateTime = new DateTime(Date.from(localDateTime.toInstant(offset)));
+        } else if (value instanceof Instant) {
+            dateTime = new DateTime(Date.from((Instant) value));
+        } else if (value instanceof String) {
+            // if the timestamp value is a string, we try to parse it in the correct format.
+            // we fall back to "now", this avoids losing messages which happen to have the wrong timestamp format
+            try {
+                dateTime = ES_DATE_FORMAT_FORMATTER.parseDateTime((String) value);
+            } catch (IllegalArgumentException e) {
+                final String error = "Invalid format for field timestamp '" + value + "' in message " + getId() + ", forcing to current time.";
+                LOG.trace(error, e);
+                // TODO invalidTimestampMeter.mark();
+                addProcessingError(new ProcessingError(ProcessingFailureCause.InvalidTimestampException, error, ExceptionUtils.getRootCauseMessage(e)));
+                dateTime = Tools.nowUTC();
+            }
+        } else if (value == null) {
+            final String error = "null value for field timestamp in message " + getId() + ", forcing to current time.";
+            LOG.trace(error);
+            // TODO invalidTimestampMeter.mark();
+            addProcessingError(new ProcessingError(ProcessingFailureCause.InvalidTimestampException, error, ""));
+            dateTime = Tools.nowUTC();
+        } else {
+            // don't allow any other types for timestamp, force to "now"
+            final String error = "Invalid type for field timestamp '" + value.getClass().getSimpleName() + "' in message " + getId() + ", forcing to current time.";
+            LOG.trace(error);
+            addProcessingError(new ProcessingError(ProcessingFailureCause.InvalidTimestampException, error, ""));
+            //TODO invalidTimestampMeter.mark();
+            dateTime = Tools.nowUTC();
+        }
+        return dateTime;
     }
 
     // estimate the byte/char length for a field and its value
@@ -530,39 +566,10 @@ public class Message implements Messages, Indexable {
         }
 
         final boolean isTimestamp = FIELD_TIMESTAMP.equals(trimmedKey);
-        if (isTimestamp && value instanceof Date) {
-            final DateTime timestamp = new DateTime(value);
-            final Object previousValue = fields.put(FIELD_TIMESTAMP, timestamp);
-            updateSize(trimmedKey, timestamp, previousValue);
-        } else if (isTimestamp && value instanceof Temporal) {
-            final Date date;
-            if (value instanceof ZonedDateTime) {
-                date = Date.from(((ZonedDateTime) value).toInstant());
-            } else if (value instanceof OffsetDateTime) {
-                date = Date.from(((OffsetDateTime) value).toInstant());
-            } else if (value instanceof LocalDateTime) {
-                final LocalDateTime localDateTime = (LocalDateTime) value;
-                final ZoneId defaultZoneId = ZoneId.systemDefault();
-                final ZoneOffset offset = defaultZoneId.getRules().getOffset(localDateTime);
-                date = Date.from(localDateTime.toInstant(offset));
-            } else if (value instanceof LocalDate) {
-                final LocalDate localDate = (LocalDate) value;
-                final LocalDateTime localDateTime = localDate.atStartOfDay();
-                final ZoneId defaultZoneId = ZoneId.systemDefault();
-                final ZoneOffset offset = defaultZoneId.getRules().getOffset(localDateTime);
-                date = Date.from(localDateTime.toInstant(offset));
-            } else if (value instanceof Instant) {
-                date = Date.from((Instant) value);
-            } else {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Unsupported temporal type {}. Using current date and time in message {}.", value.getClass(), getId());
-                }
-                date = new Date();
-            }
-
-            final DateTime timestamp = new DateTime(date);
-            final Object previousValue = fields.put(FIELD_TIMESTAMP, timestamp);
-            updateSize(trimmedKey, timestamp, previousValue);
+        if (isTimestamp) {
+            final DateTime timeStamp = convertToDateTime(value);
+            final Object previousValue = fields.put(FIELD_TIMESTAMP, timeStamp);
+            updateSize(trimmedKey, timeStamp, previousValue);
         } else if (value instanceof String) {
             final String str = ((String) value).trim();
 
@@ -1019,8 +1026,12 @@ public class Message implements Messages, Indexable {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             final ProcessingError that = (ProcessingError) o;
             return Objects.equal(cause, that.cause) && Objects.equal(message, that.message) && Objects.equal(details, that.details);
         }
