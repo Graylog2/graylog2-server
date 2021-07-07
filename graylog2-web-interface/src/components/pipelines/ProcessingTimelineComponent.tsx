@@ -17,10 +17,11 @@
 import React, { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 import naturalSort from 'javascript-natural-sort';
+import Immutable from 'immutable';
 
 import { LinkContainer, Link } from 'components/graylog/router';
-import { Alert, Button } from 'components/graylog';
-import { DataTable, Spinner, PaginatedList } from 'components/common';
+import { Button } from 'components/graylog';
+import { DataTable, Spinner, PaginatedList, SearchForm } from 'components/common';
 import { MetricContainer, CounterRate } from 'components/metrics';
 import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';
@@ -34,11 +35,19 @@ import PipelineConnectionsList from './PipelineConnectionsList';
 const { PipelinesActions } = CombinedProvider.get('Pipelines');
 const { PipelineConnectionsStore, PipelineConnectionsActions } = CombinedProvider.get('PipelineConnections');
 
-const StyledAlert = styled(Alert)`
+const StyledPaginatedList = styled(PaginatedList)`
+  .pagination {
+    margin: 0;
+  }
+`;
+
+const LoadingSpinner = styled(Spinner)(({ theme }) => css`
+  margin-left: 10px;
+  font-size: ${theme.fonts.size.h3};
+`);
+
+const Header = styled.div`
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 9px;
 `;
 
 const PipelineStage = styled.div<{ $idle?: boolean }>(({ $idle, theme }) => css`
@@ -66,6 +75,13 @@ const StreamListTD = styled.td`
   word-wrap: break-word;
 `;
 
+const PipelineFilter = ({ onSearch }: { onSearch: (query: string) => void }) => (
+  <SearchForm onSearch={onSearch}
+              wrapperClass="has-bm"
+              onReset={() => onSearch('')}
+              topMargin={0} />
+);
+
 const _formatConnectedStreams = (streams) => {
   return streams.map((s) => s.title).join(', ');
 };
@@ -85,7 +101,7 @@ const ProcessingTimelineComponent = () => {
   const [paginatedPipelines, setPaginatedPipelines] = useState<PaginatedPipelines|undefined>();
   const [loading, setLoading] = useState(false);
   const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
-  const { list: pipelines, pagination: { total = 0 } = {} } = paginatedPipelines || {};
+  const { list: pipelines = Immutable.List(), pagination: { total = 0 } = {} } = paginatedPipelines || {};
   const { page, query, perPage } = pagination;
 
   useEffect(() => {
@@ -99,6 +115,13 @@ const ProcessingTimelineComponent = () => {
   if (isLoading) {
     return <Spinner />;
   }
+
+  const searchFilter = (
+    <Header>
+      <PipelineFilter onSearch={(newQuery) => setPagination({ ...pagination, query: newQuery, page: DEFAULT_PAGINATION.page })} />
+      {loading && <LoadingSpinner text="" delay={0} />}
+    </Header>
+  );
 
   const _headerCellFormatter = (header) => {
     let className;
@@ -114,7 +137,7 @@ const ProcessingTimelineComponent = () => {
     const stageNumbers = stages.map((stage) => stage.stage);
 
     return pipelines
-      .map((p) => p.stages.map(({ stage }) => stage))
+      .map(({ stages: pStages }) => pStages.map(({ stage }) => stage))
       .reduce((usedStagesAcc: number[], pipelineStages: number[]) => {
         // Concat stages in a single array removing duplicates
         return Array.from(new Set([...usedStagesAcc, ...pipelineStages]));
@@ -134,20 +157,24 @@ const ProcessingTimelineComponent = () => {
       // TODO: Replace with ConfirmDialog components
       // eslint-disable-next-line no-alert
       if (window.confirm(`Do you really want to delete pipeline "${pipeline.title}"? This action cannot be undone.`)) {
-        PipelinesActions.delete(pipeline.id);
+        PipelinesActions.delete(pipeline.id).then(() => {
+          setPagination({ page: DEFAULT_PAGINATION.page, perPage, query });
+        });
       }
     };
   };
 
   const _pipelineFormatter = (pipeline) => {
+    const { id, title, description, stages: pStages } = pipeline;
+
     return (
-      <tr key={pipeline.id}>
+      <tr key={id}>
         <PipelineNameTD>
-          <Link to={Routes.SYSTEM.PIPELINES.PIPELINE(pipeline.id)} title={pipeline.title}>{pipeline.title}</Link>
+          <Link to={Routes.SYSTEM.PIPELINES.PIPELINE(id)} title={title}>{title}</Link>
           <br />
-          {pipeline.description}
+          {description}
           <br />
-          <MetricContainer name={`org.graylog.plugins.pipelineprocessor.ast.Pipeline.${pipeline.id}.executed`}>
+          <MetricContainer name={`org.graylog.plugins.pipelineprocessor.ast.Pipeline.${id}.executed`}>
             <CounterRate prefix="Throughput:" suffix="msg/s" />
           </MetricContainer>
         </PipelineNameTD>
@@ -158,11 +185,11 @@ const ProcessingTimelineComponent = () => {
                                    streamsFormatter={_formatConnectedStreams}
                                    noConnectionsMessage={<em>Not connected</em>} />
         </StreamListTD>
-        <td>{_formatStages(pipeline, pipeline.stages)}</td>
+        <td>{_formatStages(pipeline, pStages)}</td>
         <td>
           <Button bsStyle="primary" bsSize="xsmall" onClick={_deletePipeline(pipeline)}>Delete</Button>
           &nbsp;
-          <LinkContainer to={Routes.SYSTEM.PIPELINES.PIPELINE(pipeline.id)}>
+          <LinkContainer to={Routes.SYSTEM.PIPELINES.PIPELINE(id)}>
             <Button bsStyle="info" bsSize="xsmall">Edit</Button>
           </LinkContainer>
         </td>
@@ -170,42 +197,23 @@ const ProcessingTimelineComponent = () => {
     );
   };
 
-  const addNewPipelineButton = (
-    <div className="pull-right">
-      <LinkContainer to={Routes.SYSTEM.PIPELINES.PIPELINE('new')}>
-        <Button bsStyle="success">Add new pipeline</Button>
-      </LinkContainer>
-    </div>
-  );
-
-  if (pipelines.size === 0) {
-    return (
-      <div>
-        <StyledAlert>
-          <span>There are no pipelines configured in your system. Create one to start processing your messages.</span>
-          {addNewPipelineButton}
-        </StyledAlert>
-      </div>
-    );
-  }
-
   const headers = ['Pipeline', 'Connected to Streams', 'Processing Timeline', 'Actions'];
 
   return (
     <div>
-      {addNewPipelineButton}
-      <PaginatedList onChange={(newPage, newPerPage) => setPagination({ ...pagination, page: newPage, perPage: newPerPage })}
-                     totalItems={total}>
+      <StyledPaginatedList onChange={(newPage, newPerPage) => setPagination({ ...pagination, page: newPage, perPage: newPerPage })}
+                           activePage={page}
+                           totalItems={total}>
         <DataTable id="processing-timeline"
                    className="table-hover"
                    headers={headers}
                    headerCellFormatter={_headerCellFormatter}
-                   sortByKey="title"
-                   rows={pipelines}
-                   dataRowFormatter={_pipelineFormatter}
-                   filterLabel="Filter pipelines"
-                   filterKeys={['title']} />
-      </PaginatedList>
+                   rows={pipelines.toJS()}
+                   customFilter={searchFilter}
+                   filterKeys={[]}
+                   filterLabel="Filter Pipelines"
+                   dataRowFormatter={_pipelineFormatter} />
+      </StyledPaginatedList>
     </div>
   );
 };

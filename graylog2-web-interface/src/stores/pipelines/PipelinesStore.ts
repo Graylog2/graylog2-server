@@ -181,13 +181,17 @@ const PipelinesStore = Reflux.createStore({
 
     const url = qualifyUrl(ApiRoutes.PipelinesController.delete(pipelineId).url);
 
-    return fetch('DELETE', url).then(() => {
+    const promise = fetch('DELETE', url).then(() => {
       const updatedPipelines = this.pipelines || [];
 
       this.pipelines = updatedPipelines.filter((el) => el.id !== pipelineId);
       this.trigger({ pipelines: this.pipelines });
       UserNotification.success(`Pipeline "${pipelineId}" deleted successfully`);
     }, failCallback);
+
+    PipelinesActions.delete.promise(promise);
+
+    return promise;
   },
   parse(pipelineSource, callback) {
     const url = qualifyUrl(ApiRoutes.PipelinesController.parse().url);
