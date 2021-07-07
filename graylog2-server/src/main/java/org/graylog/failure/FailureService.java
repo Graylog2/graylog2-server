@@ -44,6 +44,7 @@ public class FailureService {
 
     private List<FailureHandler> suitableHandlers(Failure failure) {
         final List<FailureHandler> suitableHandlers = failureHandlers.stream()
+                .filter(FailureHandler::isEnabled)
                 .filter(h -> h.supports(failure))
                 .collect(Collectors.toList());
 

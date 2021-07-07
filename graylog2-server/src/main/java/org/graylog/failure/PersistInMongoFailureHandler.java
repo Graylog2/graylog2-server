@@ -23,4 +23,9 @@ public class PersistInMongoFailureHandler implements FailureHandler {
     public boolean supports(Failure failure) {
         return failure instanceof IndexingFailure;
     }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
 }
