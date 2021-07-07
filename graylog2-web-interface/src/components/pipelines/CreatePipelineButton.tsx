@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Graylog, Inc.
+ * Copyright (C) 2020 Graylog, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the Server Side Public License, version 1,
