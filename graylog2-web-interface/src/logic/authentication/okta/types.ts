@@ -30,7 +30,7 @@ export interface OktaBackendConfig {
 
 export interface OktaBackendConfigJson {
   type: 'okta';
-  okta_base_url: string;
+  base_url: string;
   client_id: string;
   client_secret: string;
   token_verifier_connect_timeout: string;

@@ -55,6 +55,8 @@ public abstract class UserDetails {
 
     public abstract Set<String> defaultRoles();
 
+    public abstract Set<String> initialGraylogRoles(); // only used in Cloud
+
     public UserDetails withDatabaseId(String id) {
         checkArgument(!isNullOrEmpty(id), "id cannot be null or empty");
 
@@ -102,6 +104,8 @@ public abstract class UserDetails {
         public abstract Builder isExternal(boolean isExternal);
 
         public abstract Builder defaultRoles(Set<String> defaultRoles);
+
+        public abstract Builder initialGraylogRoles(Set<String> initialGraylogRoles);
 
         abstract UserDetails autoBuild();
 
