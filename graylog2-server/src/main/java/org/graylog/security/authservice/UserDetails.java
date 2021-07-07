@@ -19,7 +19,6 @@ package org.graylog.security.authservice;
 import com.google.auto.value.AutoValue;
 
 import javax.annotation.Nullable;
-import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 

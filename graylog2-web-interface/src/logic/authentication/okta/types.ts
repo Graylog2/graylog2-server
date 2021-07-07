@@ -36,7 +36,6 @@ export interface OktaBackendConfigJson {
   token_verifier_connect_timeout: string;
   callback_url: string;
 }
-
 export interface OktaTeamSyncConfig {
   teamSelectionType?: 'all' | 'include' | 'exclude',
   teamSelection?: Immutable.Set<string>,
