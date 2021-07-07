@@ -20,6 +20,7 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.EventLoopGroup;
+import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.inputs.syslog.tcp.SyslogTCPFramingRouterHandler;
 import org.graylog2.inputs.transports.netty.EventLoopGroupFactory;
 import org.graylog2.plugin.LocalMetricRegistry;
@@ -41,14 +42,14 @@ public class SyslogTcpTransport extends TcpTransport {
                               NettyTransportConfiguration nettyTransportConfiguration,
                               ThroughputCounter throughputCounter,
                               LocalMetricRegistry localRegistry,
-                              org.graylog2.Configuration graylogConfiguration) {
+                              TLSProtocolsConfiguration tlsConfiguration) {
         super(configuration,
                 eventLoopGroup,
                 eventLoopGroupFactory,
                 nettyTransportConfiguration,
                 throughputCounter,
                 localRegistry,
-                graylogConfiguration);
+                tlsConfiguration);
     }
 
     @Override
