@@ -88,7 +88,7 @@ const PipelinesStore = Reflux.createStore({
     }, listFailCallback);
   },
 
-  paginatedList({
+  listPaginated({
     page,
     perPage,
     query,
@@ -106,7 +106,7 @@ const PipelinesStore = Reflux.createStore({
       },
     }), listFailCallback);
 
-    PipelinesActions.paginatedList.promise(promise);
+    PipelinesActions.listPaginated.promise(promise);
 
     return promise;
   },

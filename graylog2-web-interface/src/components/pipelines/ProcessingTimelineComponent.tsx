@@ -20,16 +20,18 @@ import naturalSort from 'javascript-natural-sort';
 
 import { LinkContainer, Link } from 'components/graylog/router';
 import { Alert, Button } from 'components/graylog';
-import { DataTable, Spinner } from 'components/common';
+import { DataTable, Spinner, PaginatedList } from 'components/common';
 import { MetricContainer, CounterRate } from 'components/metrics';
 import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';
 import { useStore } from 'stores/connect';
 import StreamsStore, { Stream } from 'stores/streams/StreamsStore';
+import { PaginatedPipelines } from 'stores/pipelines/PipelinesStore';
+import { DEFAULT_PAGINATION } from 'stores/PaginationTypes';
 
 import PipelineConnectionsList from './PipelineConnectionsList';
 
-const { PipelinesStore, PipelinesActions } = CombinedProvider.get('Pipelines');
+const { PipelinesActions } = CombinedProvider.get('Pipelines');
 const { PipelineConnectionsStore, PipelineConnectionsActions } = CombinedProvider.get('PipelineConnections');
 
 const StyledAlert = styled(Alert)`
@@ -68,16 +70,29 @@ const _formatConnectedStreams = (streams) => {
   return streams.map((s) => s.title).join(', ');
 };
 
+const _loadPipelines = (pagination, setLoading, setPaginatedPipelines) => {
+  setLoading(true);
+
+  PipelinesActions.listPaginated(pagination).then((paginatedPipelines) => {
+    setPaginatedPipelines(paginatedPipelines);
+    setLoading(false);
+  });
+};
+
 const ProcessingTimelineComponent = () => {
-  const { pipelines } = useStore(PipelinesStore);
   const { connections } = useStore(PipelineConnectionsStore);
   const [streams, setStreams] = useState<Stream[] | undefined>();
+  const [paginatedPipelines, setPaginatedPipelines] = useState<PaginatedPipelines|undefined>();
+  const [loading, setLoading] = useState(false);
+  const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
+  const { list: pipelines, pagination: { total = 0 } = {} } = paginatedPipelines || {};
+  const { page, query, perPage } = pagination;
 
   useEffect(() => {
-    PipelinesActions.list();
+    _loadPipelines(pagination, setLoading, setPaginatedPipelines);
     PipelineConnectionsActions.list();
     StreamsStore.listStreams().then(setStreams);
-  }, []);
+  }, [pagination]);
 
   const isLoading = !pipelines || !streams || !connections;
 
@@ -163,7 +178,7 @@ const ProcessingTimelineComponent = () => {
     </div>
   );
 
-  if (pipelines.length === 0) {
+  if (pipelines.size === 0) {
     return (
       <div>
         <StyledAlert>
@@ -179,15 +194,18 @@ const ProcessingTimelineComponent = () => {
   return (
     <div>
       {addNewPipelineButton}
-      <DataTable id="processing-timeline"
-                 className="table-hover"
-                 headers={headers}
-                 headerCellFormatter={_headerCellFormatter}
-                 sortByKey="title"
-                 rows={pipelines}
-                 dataRowFormatter={_pipelineFormatter}
-                 filterLabel="Filter pipelines"
-                 filterKeys={['title']} />
+      <PaginatedList onChange={(newPage, newPerPage) => setPagination({ ...pagination, page: newPage, perPage: newPerPage })}
+                     totalItems={total}>
+        <DataTable id="processing-timeline"
+                   className="table-hover"
+                   headers={headers}
+                   headerCellFormatter={_headerCellFormatter}
+                   sortByKey="title"
+                   rows={pipelines}
+                   dataRowFormatter={_pipelineFormatter}
+                   filterLabel="Filter pipelines"
+                   filterKeys={['title']} />
+      </PaginatedList>
     </div>
   );
 };
