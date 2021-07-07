@@ -15,24 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { mapValues } from 'lodash';
+import { MessageResult, SearchTypeResults } from 'views/types';
 
 import searchTypeDefinition from 'views/logic/SearchType';
 import { TimeRange } from 'views/logic/queries/Query';
 
 import SearchError, { SearchErrorResponse } from './SearchError';
 
-export type SearchTypeResult = {
-  type: string,
-  effective_timerange: TimeRange,
-};
-
 type Results = {
-  searchTypes: { [id: string]: SearchTypeResult | MessageResult },
-};
-
-type MessageResult = {
-  type: 'messages',
-  total: number,
+  searchTypes: SearchTypeResults,
 };
 
 const _findMessages = (results: Results): (MessageResult | undefined) => {
@@ -61,7 +52,7 @@ type State = {
   duration: number,
   timestamp: string,
   effectiveTimerange: TimeRange,
-  searchTypes: { [id: string]: SearchTypeResult | MessageResult },
+  searchTypes: SearchTypeResults,
 };
 
 type QueryResultResponse = {
