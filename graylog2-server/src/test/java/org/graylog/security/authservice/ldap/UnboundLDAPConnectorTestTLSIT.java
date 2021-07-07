@@ -22,10 +22,10 @@ import com.unboundid.ldap.sdk.LDAPException;
 import org.assertj.core.api.Assertions;
 import org.graylog.testing.ldap.LDAPTestUtils;
 import org.graylog.testing.ldap.OpenLDAPContainer;
+import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.security.DefaultX509TrustManager;
 import org.graylog2.security.TrustManagerProvider;
 import org.graylog2.security.encryption.EncryptedValueService;
-import org.graylog2.shared.security.tls.DefaultTLSProtocolProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.junit.jupiter.Container;
@@ -69,7 +69,7 @@ public class UnboundLDAPConnectorTestTLSIT {
 
         mockTrustManagerWithSystemKeystore();
 
-        this.ldapConnector = new UnboundLDAPConnector(DEFAULT_TIMEOUT, DefaultTLSProtocolProvider.getDefaultSupportedTlsProtocols(), trustManagerProvider, encryptedValueService);
+        this.ldapConnector = new UnboundLDAPConnector(DEFAULT_TIMEOUT, new TLSProtocolsConfiguration(), trustManagerProvider, encryptedValueService);
     }
 
     @Test
