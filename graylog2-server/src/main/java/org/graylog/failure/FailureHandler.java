@@ -1,4 +1,4 @@
-package org.graylog2.failure;
+package org.graylog.failure;
 
 public interface FailureHandler {
 

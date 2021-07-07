@@ -1,4 +1,4 @@
-package org.graylog2.failure;
+package org.graylog.failure;
 
 import com.google.common.collect.Lists;
 
@@ -34,10 +34,10 @@ public class FailureService {
     }
 
     public void submit(Failure failure) {
-        executor.submit(() -> handleInternal(failure));
+        executor.submit(() -> handle(failure));
     }
 
-    private void handleInternal(Failure failure) {
+    private void handle(Failure failure) {
         suitableHandlers(failure)
                 .forEach(handler -> handler.handle(failure));
     }

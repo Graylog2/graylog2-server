@@ -17,7 +17,7 @@
 package org.graylog2.indexer.messages;
 
 import com.google.common.collect.ImmutableList;
-import org.graylog2.failure.FailureService;
+import org.graylog.failure.FailureService;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.plugin.Message;
 import org.graylog2.system.processing.ProcessingStatusRecorder;
