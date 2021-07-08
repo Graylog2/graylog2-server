@@ -296,7 +296,6 @@ class MessageTable extends React.Component<Props, State> {
                                        expanded={expandedMessages.contains(messageKey)}
                                        toggleDetail={this._toggleMessageDetail}
                                        highlightMessage={highlightMessageId}
-                                       highlight
                                        expandAllRenderAsync={false} />
                   )}
                 </HighlightMessageContext.Consumer>
