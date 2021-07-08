@@ -17,6 +17,7 @@
 import React from 'react';
 import { get } from 'lodash';
 import { PluginExports } from 'graylog-web-plugin/plugin';
+import { WidgetComponentProps } from 'views/types';
 
 import Routes from 'routing/Routes';
 import App from 'routing/App';
@@ -139,7 +140,8 @@ const exports: PluginExports = {
       defaultHeight: 5,
       reportStyle: () => ({ width: 800 }),
       defaultWidth: 6,
-      visualizationComponent: MessageList,
+      // TODO: Subtyping needs to be taked into account
+      visualizationComponent: MessageList as unknown as React.ComponentType<WidgetComponentProps>,
       editComponent: EditMessageList,
       needsControlledHeight: () => false,
       searchResultTransformer: (data: Array<unknown>) => data[0],

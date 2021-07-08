@@ -31,7 +31,7 @@ import Widget from '../widgets/Widget';
 
 jest.mock('views/stores/WidgetStore', () => ({
   WidgetActions: {
-    create: jest.fn((widget) => Promise.resolve(widget)),
+    create: jest.fn((widget: Widget) => Promise.resolve(widget)),
   },
 }));
 
@@ -148,7 +148,7 @@ describe('ShowDocumentsHandler', () => {
       }).then(() => {
         expect(WidgetActions.create).toHaveBeenCalled();
 
-        const { filter, query, streams, timerange }: AggregationWidget = asMock(WidgetActions.create).mock.calls[0][0];
+        const { filter, query, streams, timerange } = asMock(WidgetActions.create).mock.calls[0][0];
 
         expect(filter).toEqual('author: "Vanth"');
         expect(query).toEqual(createElasticsearchQueryString('foo:42 AND hello:world AND bar:42'));

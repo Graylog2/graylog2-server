@@ -22,7 +22,6 @@ import { WidgetActions } from 'views/stores/WidgetStore';
 import AggregateActionHandler from './AggregateActionHandler';
 
 import FieldType from '../fieldtypes/FieldType';
-import AggregationWidget from '../aggregationbuilder/AggregationWidget';
 import Pivot from '../aggregationbuilder/Pivot';
 import Widget from '../widgets/Widget';
 import { createElasticsearchQueryString } from '../queries/Query';
@@ -41,7 +40,7 @@ describe('AggregateActionHandler', () => {
 
     expect(WidgetActions.create).toHaveBeenCalled();
 
-    const widget: AggregationWidget = asMock(WidgetActions.create).mock.calls[0][0];
+    const widget = asMock(WidgetActions.create).mock.calls[0][0];
     const { config } = widget;
 
     expect(config.rowPivots[0]).toEqual(new Pivot('foo', 'values', { limit: 15 }));
@@ -56,7 +55,7 @@ describe('AggregateActionHandler', () => {
 
     expect(WidgetActions.create).toHaveBeenCalled();
 
-    const widget: AggregationWidget = asMock(WidgetActions.create).mock.calls[0][0];
+    const widget = asMock(WidgetActions.create).mock.calls[0][0];
 
     expect(widget.filter).toEqual(filter);
   });
@@ -79,7 +78,7 @@ describe('AggregateActionHandler', () => {
 
     expect(WidgetActions.create).toHaveBeenCalled();
 
-    const { filter, query, streams, timerange }: AggregationWidget = asMock(WidgetActions.create).mock.calls[0][0];
+    const { filter, query, streams, timerange } = asMock(WidgetActions.create).mock.calls[0][0];
 
     expect(filter).toEqual('author: "Vanth"');
     expect(query).toEqual(createElasticsearchQueryString('foo:42'));

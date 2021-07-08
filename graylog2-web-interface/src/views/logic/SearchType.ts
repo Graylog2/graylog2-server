@@ -14,23 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import { mount } from 'wrappedEnzyme';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import ErrorWidget from './ErrorWidget';
+const searchTypesKey = 'searchTypes';
 
-describe('<ErrorWidget />', () => {
-  it('should display a list item for every provided error', () => {
-    const errors = [
-      { description: 'The first error' },
-      { description: 'The second error' },
-    ];
+export type SearchTypeId = string;
 
-    const wrapper = mount(<ErrorWidget errors={errors} />);
-    const firstListItem = wrapper.find('li').at(0);
-    const secondListItem = wrapper.find('li').at(1);
-
-    expect(firstListItem.text()).toContain(errors[0].description);
-    expect(secondListItem.text()).toContain(errors[1].description);
-  });
-});
+export default function searchTypeDefinition(type: string) {
+  return PluginStore.exports(searchTypesKey)
+    .find((s) => s.type.toLocaleUpperCase() === type.toLocaleUpperCase());
+}
