@@ -25,6 +25,8 @@ import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.name.Names;
 import okhttp3.OkHttpClient;
+import org.graylog.failure.FailureHandler;
+import org.graylog.failure.PersistInMongoFailureHandler;
 import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.buffers.InputBuffer;
@@ -77,5 +79,8 @@ public class GenericBindings extends AbstractModule {
         bind(MimetypesFileTypeMap.class).toInstance(new MimetypesFileTypeMap());
 
         bind(ExecutorService.class).annotatedWith(Names.named("proxiedRequestsExecutorService")).toProvider(ProxiedRequestsExecutorService.class).asEagerSingleton();
+
+        bind(FailureHandler.class).annotatedWith(Names.named("fallbackFailureHandler"))
+                .to(PersistInMongoFailureHandler.class).asEagerSingleton();
     }
 }

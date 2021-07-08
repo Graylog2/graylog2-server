@@ -22,8 +22,9 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import joptsimple.internal.Strings;
+import org.graylog.failure.IndexingFailure;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
-import org.graylog2.indexer.IndexFailure;
+import org.graylog.failure.FailureService;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.TestIndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
@@ -58,7 +59,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 public abstract class MessagesIT extends ElasticsearchBaseTest {
     private static final String INDEX_NAME = "messages_it_deflector";
@@ -86,13 +89,16 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
 
     protected abstract MessagesAdapter createMessagesAdapter(MetricRegistry metricRegistry);
 
+    private FailureService failureService = mock(FailureService.class);
+
     @Before
     public void setUp() throws Exception {
         client().deleteIndices(INDEX_NAME);
         client().createIndex(INDEX_NAME);
         client().waitForGreenStatus(INDEX_NAME);
         final MetricRegistry metricRegistry = new MetricRegistry();
-        messages = new Messages(mock(TrafficAccounting.class), createMessagesAdapter(metricRegistry), mock(ProcessingStatusRecorder.class));
+        messages = new Messages(mock(TrafficAccounting.class), createMessagesAdapter(metricRegistry), mock(ProcessingStatusRecorder.class),
+                failureService);
     }
 
     @After
@@ -181,9 +187,7 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
 
         assertThat(failedItems).hasSize(1);
 
-        final List<IndexFailure> failures = this.messages.getIndexFailureQueue().poll(1L, TimeUnit.SECONDS);
-
-        assertThat(failures).hasSize(1);
+        verify(failureService).submit(any(IndexingFailure.class));
     }
 
     @Test

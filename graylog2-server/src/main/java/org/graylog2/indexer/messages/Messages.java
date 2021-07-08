@@ -28,6 +28,8 @@ import com.google.auto.value.AutoValue;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
+import org.graylog.failure.FailureService;
+import org.graylog.failure.IndexingFailure;
 import org.graylog2.indexer.IndexFailure;
 import org.graylog2.indexer.IndexFailureImpl;
 import org.graylog2.indexer.IndexSet;
@@ -49,8 +51,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Singleton
@@ -92,7 +92,7 @@ public class Messages {
                 });
     }
 
-    private final LinkedBlockingQueue<List<IndexFailure>> indexFailureQueue;
+    private final FailureService failureService;
     private final MessagesAdapter messagesAdapter;
     private final ProcessingStatusRecorder processingStatusRecorder;
     private final TrafficAccounting trafficAccounting;
@@ -100,13 +100,13 @@ public class Messages {
     @Inject
     public Messages(TrafficAccounting trafficAccounting,
                     MessagesAdapter messagesAdapter,
-                    ProcessingStatusRecorder processingStatusRecorder) {
+                    ProcessingStatusRecorder processingStatusRecorder,
+                    FailureService failureService
+                    ) {
         this.trafficAccounting = trafficAccounting;
         this.messagesAdapter = messagesAdapter;
         this.processingStatusRecorder = processingStatusRecorder;
-
-        // TODO: Magic number
-        this.indexFailureQueue = new LinkedBlockingQueue<>(1000);
+        this.failureService = failureService;
     }
 
     public ResultMessage get(String messageId, String index) throws DocumentNotFoundException, IOException {
@@ -278,20 +278,13 @@ public class Messages {
                 .map(IndexingError::toIndexFailure)
                 .collect(Collectors.toList());
 
-        try {
-            // TODO: Magic number
-            indexFailureQueue.offer(indexFailures, 25, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException e) {
-            LOG.warn("Couldn't save index failures.", e);
+        for(IndexFailure ie : indexFailures) {
+            failureService.submit(new IndexingFailure(ie));
         }
 
         return indexFailures.stream()
                 .map(IndexFailure::letterId)
                 .collect(Collectors.toList());
-    }
-
-    public LinkedBlockingQueue<List<IndexFailure>> getIndexFailureQueue() {
-        return indexFailureQueue;
     }
 
     @AutoValue
