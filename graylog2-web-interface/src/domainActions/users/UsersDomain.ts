@@ -14,14 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { $PropertyType } from 'utility-types';
-
-import { ActionsType } from 'actions/users/UsersActions';
 import { UsersActions } from 'stores/users/UsersStore';
 
 import notifyingAction from '../notifyingAction';
 
-const create: $PropertyType<ActionsType, 'create'> = notifyingAction({
+const create = notifyingAction({
   action: UsersActions.create,
   success: (user) => ({
     message: `User "${user?.first_name} ${user?.last_name}" was created successfully`,
@@ -31,7 +28,7 @@ const create: $PropertyType<ActionsType, 'create'> = notifyingAction({
   }),
 });
 
-const load: $PropertyType<ActionsType, 'load'> = notifyingAction({
+const load = notifyingAction({
   action: UsersActions.load,
   error: (error, userId) => ({
     message: `Loading user with id "${userId}" failed with status: ${error}`,
@@ -39,7 +36,7 @@ const load: $PropertyType<ActionsType, 'load'> = notifyingAction({
   notFoundRedirect: true,
 });
 
-const loadByUsername: $PropertyType<ActionsType, 'loadByUsername'> = notifyingAction({
+const loadByUsername = notifyingAction({
   action: UsersActions.loadByUsername,
   error: (error, username) => ({
     message: `Loading user with username "${username}" failed with status: ${error}`,
@@ -47,7 +44,7 @@ const loadByUsername: $PropertyType<ActionsType, 'loadByUsername'> = notifyingAc
   notFoundRedirect: true,
 });
 
-const update: $PropertyType<ActionsType, 'update'> = notifyingAction({
+const update = notifyingAction({
   action: UsersActions.update,
   success: (userId, payload, fullName) => ({
     message: `User "${fullName}" was updated successfully`,
@@ -57,7 +54,7 @@ const update: $PropertyType<ActionsType, 'update'> = notifyingAction({
   }),
 });
 
-const deleteAction: $PropertyType<ActionsType, 'delete'> = notifyingAction({
+const deleteAction = notifyingAction({
   action: UsersActions.delete,
   success: (userId, fullName) => ({
     message: `User "${fullName}" was deleted successfully`,
@@ -67,7 +64,7 @@ const deleteAction: $PropertyType<ActionsType, 'delete'> = notifyingAction({
   }),
 });
 
-const changePassword: $PropertyType<ActionsType, 'changePassword'> = notifyingAction({
+const changePassword = notifyingAction({
   action: UsersActions.changePassword,
   success: () => ({
     message: 'Password was changed successfully ',
@@ -77,7 +74,7 @@ const changePassword: $PropertyType<ActionsType, 'changePassword'> = notifyingAc
   }),
 });
 
-const createToken: $PropertyType<ActionsType, 'createToken'> = notifyingAction({
+const createToken = notifyingAction({
   action: UsersActions.createToken,
   success: (userId, tokenName) => ({
     message: `Token "${tokenName}" created successfully`,
@@ -87,14 +84,14 @@ const createToken: $PropertyType<ActionsType, 'createToken'> = notifyingAction({
   }),
 });
 
-const loadTokens: $PropertyType<ActionsType, 'loadTokens'> = notifyingAction({
+const loadTokens = notifyingAction({
   action: UsersActions.loadTokens,
   error: (error, userId) => ({
     message: `Loading tokens for user with id "${userId}" failed with status: ${error}`,
   }),
 });
 
-const deleteToken: $PropertyType<ActionsType, 'deleteToken'> = notifyingAction({
+const deleteToken = notifyingAction({
   action: UsersActions.deleteToken,
   success: (userId, tokenId, tokenName) => ({
     message: `Token "${tokenName}" deleted successfully`,
@@ -104,21 +101,21 @@ const deleteToken: $PropertyType<ActionsType, 'deleteToken'> = notifyingAction({
   }),
 });
 
-const loadUsers: $PropertyType<ActionsType, 'loadUsers'> = notifyingAction({
+const loadUsers = notifyingAction({
   action: UsersActions.loadUsers,
   error: (error) => ({
     message: `Loading users failed with status: ${error}`,
   }),
 });
 
-const loadUsersPaginated: $PropertyType<ActionsType, 'loadUsersPaginated'> = notifyingAction({
+const loadUsersPaginated = notifyingAction({
   action: UsersActions.loadUsersPaginated,
   error: (error) => ({
     message: `Loading users failed with status: ${error}`,
   }),
 });
 
-const setStatus: $PropertyType<ActionsType, 'setStatus'> = notifyingAction({
+const setStatus = notifyingAction({
   action: UsersActions.setStatus,
   success: (userId, accountStatus) => ({
     message: `User "${userId}" was set to ${accountStatus}`,
