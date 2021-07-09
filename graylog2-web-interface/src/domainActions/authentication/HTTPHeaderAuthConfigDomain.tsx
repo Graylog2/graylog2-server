@@ -14,21 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { $PropertyType } from 'utility-types';
-
-import type { ActionsType } from 'actions/authentication/HTTPHeaderAuthConfigActions';
 import { HTTPHeaderAuthConfigActions } from 'stores/authentication/HTTPHeaderAuthConfigStore';
 
 import notifyingAction from '../notifyingAction';
 
-const load: $PropertyType<ActionsType, 'load'> = notifyingAction({
+const load = notifyingAction({
   action: HTTPHeaderAuthConfigActions.load,
   error: (error) => ({
     message: `Loading HTTP header authentication config failed with status: ${error}`,
   }),
 });
 
-const update: $PropertyType<ActionsType, 'update'> = notifyingAction({
+const update = notifyingAction({
   action: HTTPHeaderAuthConfigActions.update,
   success: () => ({
     message: 'Successfully updated HTTP header authentication config',

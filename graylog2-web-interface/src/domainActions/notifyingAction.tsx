@@ -17,7 +17,6 @@
 import UserNotification from 'util/UserNotification';
 import { createNotFoundError } from 'logic/errors/ReportedErrors';
 import ErrorsActions from 'actions/errors/ErrorsActions';
-import type { ListenableAction } from 'stores/StoreTypes';
 
 type Notification = {
   title?: string,
@@ -40,20 +39,22 @@ const _displayErrorNotification = <T, Args extends Array<T>>(errorNotification: 
   UserNotification.error(message, title || 'Error');
 };
 
-type Props<Args extends any[], ActionResult extends Promise<any>> = {
-  action: ListenableAction<(...args: Args) => ActionResult>,
-  success?: (...Args) => Notification,
-  error: (error: string, ...Args) => Notification,
+type Props<F extends (...args: Array<any>) => any> = {
+  action: F,
+  success?: (...args: Parameters<F>) => Notification,
+  error: (error: string, ...args: Parameters<F>) => Notification,
   notFoundRedirect?: boolean,
 };
 
-const notifyingAction = <T, Args extends Array<T>, Result, ActionResult extends Promise<Result>>({
+type PromiseResult<P extends Promise<any>> = P extends Promise<infer R> ? R : never;
+
+const notifyingAction = <F extends (...args: Array<any>) => Promise<any>>({
   action,
   success: successNotification,
   error: errorNotification,
   notFoundRedirect,
-}: Props<Args, ActionResult>): (...Args) => Promise<Result> => {
-  return (...args: Args): Promise<Result> => action(...args).then((result) => {
+}: Props<F>) => {
+  return (...args: Parameters<typeof action>) => action(...args).then((result: PromiseResult<ReturnType<F>>) => {
     if (successNotification) _displaySuccessNotification(successNotification, ...args);
 
     return result;

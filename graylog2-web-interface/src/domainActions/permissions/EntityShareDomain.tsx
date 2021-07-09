@@ -14,21 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { $PropertyType } from 'utility-types';
-
-import type { ActionsType } from 'actions/permissions/EntityShareActions';
 import { EntityShareActions } from 'stores/permissions/EntityShareStore';
 
 import notifyingAction from '../notifyingAction';
 
-const prepare: $PropertyType<ActionsType, 'prepare'> = notifyingAction({
+const prepare = notifyingAction({
   action: EntityShareActions.prepare,
   error: (error, entityName, entityType) => ({
     message: `Preparing shares for ${entityType} "${entityName}" failed with status: ${error}`,
   }),
 });
 
-const update: $PropertyType<ActionsType, 'update'> = notifyingAction({
+const update = notifyingAction({
   action: EntityShareActions.update,
   error: (error, entityName, entityType) => ({
     message: `Updating shares for ${entityType} "${entityName}" failed with status: ${error}`,
@@ -38,7 +35,7 @@ const update: $PropertyType<ActionsType, 'update'> = notifyingAction({
   }),
 });
 
-const loadUserSharesPaginated: $PropertyType<ActionsType, 'loadUserSharesPaginated'> = notifyingAction({
+const loadUserSharesPaginated = notifyingAction({
   action: EntityShareActions.loadUserSharesPaginated,
   error: (error, userId) => ({
     message: `Loading entities which got shared for user with id "${userId}" failed with status: ${error}`,
