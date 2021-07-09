@@ -34,18 +34,18 @@ public class NodeContainerConfig {
     public final boolean enableDebugging;
     public final boolean skipPackaging;
 
-    public static NodeContainerConfig create(Network network, String mongoDbUri, String elasticsearchUri, String elasticsearchVersion, int[] extraPorts) {
-        return new NodeContainerConfig(network, mongoDbUri, elasticsearchUri, elasticsearchVersion, extraPorts);
+    public static NodeContainerConfig create(Network network, String mongoDbUri, String elasticsearchUri, String elasticsearchVersion, int[] extraPorts, boolean skipPackaging) {
+        return new NodeContainerConfig(network, mongoDbUri, elasticsearchUri, elasticsearchVersion, extraPorts, skipPackaging);
     }
 
-    public NodeContainerConfig(Network network, String mongoDbUri, String elasticsearchUri, String elasticsearchVersion, int[] extraPorts) {
+    public NodeContainerConfig(Network network, String mongoDbUri, String elasticsearchUri, String elasticsearchVersion, int[] extraPorts, boolean skipPackaging) {
         this.network = network;
         this.mongoDbUri = mongoDbUri;
         this.elasticsearchUri = elasticsearchUri;
         this.elasticsearchVersion = elasticsearchVersion;
         this.extraPorts = extraPorts == null ? new int[0] : extraPorts;
         this.enableDebugging = flagFromEnvVar("GRAYLOG_IT_DEBUG_SERVER");
-        this.skipPackaging = flagFromEnvVar("GRAYLOG_IT_SKIP_PACKAGING");
+        this.skipPackaging = flagFromEnvVar("GRAYLOG_IT_SKIP_PACKAGING") || skipPackaging;
     }
 
     private static boolean flagFromEnvVar(String flagName) {

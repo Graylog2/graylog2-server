@@ -25,16 +25,16 @@ import java.util.stream.Collectors;
 import static io.restassured.http.ContentType.JSON;
 
 public class MultipleESVersionsTestExecutor {
+    private boolean skipPackaging = false;
+
     public void execute(ExecutionRequest request, TestDescriptor descriptor) {
         if (descriptor instanceof EngineDescriptor)
             executeContainer(request, descriptor);
         if (descriptor instanceof MultipleESVersionsTestClassDescriptor)
             executeMethods(((MultipleESVersionsTestClassDescriptor)descriptor).getEsVersion(), request, (MultipleESVersionsTestClassDescriptor)descriptor);
-//        if (descriptor instanceof MultipleESVersionsTestMethodDescriptor)
-//            executeMethod(request, (MultipleESVersionsTestMethodDescriptor) descriptor);
     }
 
-    private GraylogBackend constructBackendFrom(String version, Class testClass) {
+    private GraylogBackend constructBackendFrom(String version, Class testClass, boolean skipPackaging) {
         MultipleESVersionsTest annotation = AnnotationSupport
                 .findAnnotation(testClass, MultipleESVersionsTest.class)
                 .orElseThrow(IllegalArgumentException::new);
@@ -54,7 +54,7 @@ public class MultipleESVersionsTestExecutor {
         final List<Path> pluginJars = instantiateFactory(annotation.pluginJarsProvider()).getJars();
         final Path mavenProjectDir = instantiateFactory(annotation.mavenProjectDirProvider()).getProjectDir();
         return GraylogBackend.createStarted(annotation.extraPorts(), Optional.of(version), esInstanceFactory, pluginJars, mavenProjectDir,
-                mongoDBFixtures);
+                mongoDBFixtures, skipPackaging);
     }
 
     private <T> T instantiateFactory(Class<? extends T> providerClass) {
@@ -84,7 +84,11 @@ public class MultipleESVersionsTestExecutor {
         try {
             ESVersionTest testInstance = (ESVersionTest)ReflectionUtils.newInstance(containerDescriptor.getTestClass());
 
-            GraylogBackend backend = constructBackendFrom(esVersion, containerDescriptor.getTestClass());
+            GraylogBackend backend = constructBackendFrom(esVersion, containerDescriptor.getTestClass(), this.skipPackaging);
+
+            // skip packaging after first time
+            this.skipPackaging = true;
+
             RequestSpecification specification = requestSpec(backend);
 
             testInstance.setEsVersion(backend, specification);
@@ -92,6 +96,9 @@ public class MultipleESVersionsTestExecutor {
             for (TestDescriptor descriptor : containerDescriptor.getChildren()) {
                 executeMethod(testInstance, request, (MultipleESVersionsTestMethodDescriptor)descriptor);
             }
+
+            backend.close();
+
             executionResult = TestExecutionResult.successful();
         } catch (Throwable throwable) {
             String message = String.format( //

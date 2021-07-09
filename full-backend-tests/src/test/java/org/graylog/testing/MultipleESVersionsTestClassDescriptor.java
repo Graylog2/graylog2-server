@@ -15,7 +15,7 @@ class MultipleESVersionsTestClassDescriptor extends AbstractTestDescriptor {
 
     public MultipleESVersionsTestClassDescriptor(Class<?> testClass, TestDescriptor parent, String esVersion) {
         super( //
-                parent.getUniqueId().append("class", testClass.getName()), //
+                parent.getUniqueId().append("class", testClass.getName() + "_" + esVersion), //
                 determineDisplayName(testClass) + " " + esVersion, //
                 ClassSource.from(testClass) //
         );

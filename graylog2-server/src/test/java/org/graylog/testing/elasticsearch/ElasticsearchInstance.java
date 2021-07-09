@@ -91,6 +91,10 @@ public abstract class ElasticsearchInstance extends ExternalResource {
         client().cleanUp();
     }
 
+    public void close() {
+        container.close();
+    }
+
     public static String internalUri() {
         return String.format(Locale.US, "http://%s:%d", NETWORK_ALIAS, ES_PORT);
     }

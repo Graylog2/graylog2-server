@@ -75,6 +75,12 @@ public class MongoDBInstance extends ExternalResource implements AutoCloseable {
         return mongoDb;
     }
 
+    public static MongoDBInstance createStartedWithUniqueName(Network network, Lifecycle lifecycle, String name) {
+        MongoDBInstance mongoDb = new MongoDBInstance(DEFAULT_INSTANCE_NAME + "_" + name, lifecycle, MongoDBContainer.DEFAULT_VERSION, network);
+        mongoDb.start();
+        return mongoDb;
+    }
+
     private MongoDBInstance(String instanceName, Lifecycle lifecycle, String version, Network network) {
         this.lifecycle = lifecycle;
 
