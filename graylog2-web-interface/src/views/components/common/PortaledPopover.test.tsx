@@ -19,7 +19,7 @@ import { mount } from 'wrappedEnzyme';
 
 import PortaledPopover from './PortaledPopover';
 
-const PopoverComponent = () => 'popover-component';
+const PopoverComponent = () => <>popover-component</>;
 
 describe('PortaledPopover', () => {
   let appRootContainer;
