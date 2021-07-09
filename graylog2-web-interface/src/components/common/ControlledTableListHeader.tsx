@@ -15,8 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-// eslint-disable-next-line no-restricted-imports
-import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
@@ -38,29 +36,22 @@ const HeaderWrapper = styled.div`
   min-height: 40px;
 `;
 
-const ControlledTableListHeader = createReactClass({
-  propTypes: {
-    children: PropTypes.node,
-  },
-
-  getDefaultProps() {
-    return {
-      children: '',
-    };
-  },
-
-  // We wrap string children to ensure they are displayed properly in the header
-  wrapStringChildren(text) {
+const ControlledTableListHeader = ({ children }) => {
+  const wrapStringChildren = (text) => {
     return <HeaderWrapper>{text}</HeaderWrapper>;
-  },
+  };
 
-  render() {
-    const { children } = this.props;
+  const header = typeof children === 'string' ? wrapStringChildren(children) : children;
 
-    const header = typeof children === 'string' ? this.wrapStringChildren(children) : children;
+  return <StyledListGroupItem>{header}</StyledListGroupItem>;
+};
 
-    return <StyledListGroupItem>{header}</StyledListGroupItem>;
-  },
-});
+ControlledTableListHeader.propTypes = {
+  children: PropTypes.node,
+};
+
+ControlledTableListHeader.defaultProps = {
+  children: '',
+};
 
 export default ControlledTableListHeader;
