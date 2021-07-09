@@ -29,6 +29,17 @@ const StyledPopover = styled(Popover)`
   }
 `;
 
+type Props = {
+  id: string,
+  placement: 'top' | 'right' | 'bottom' | 'left',
+  title: string,
+  triggerNode: React.ReactElement,
+  triggerAction: 'click' | 'hover' | 'focus',
+  color: string,
+  colors?: Array<Array<string>>,
+  onChange: (color: string, event: React.ChangeEvent<HTMLInputElement>, handleToggle: () => void) => void,
+};
+
 /**
  * Component that renders a `ColorPicker` component inside a react bootstrap
  * popover. This is meant to use in forms and UIs with limited space, as the color
@@ -38,7 +49,7 @@ const StyledPopover = styled(Popover)`
  * is left for that component. Please look at `ColorPicker`'s documentation for more
  * information.
  */
-const ColorPickerPopover = ({ id, placement, title, triggerNode, triggerAction, onChange, ...rest }) => {
+const ColorPickerPopover = ({ id, placement, title, triggerNode, triggerAction, onChange, ...rest }: Props) => {
   const [show, setShow] = useState(false);
   const toggleTarget = useRef();
 
