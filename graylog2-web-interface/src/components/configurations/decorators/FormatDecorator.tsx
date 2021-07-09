@@ -25,14 +25,14 @@ const formatDecorator = (
   decoratorTypes: { [key: string]: DecoratorType },
   updateFn?: (newDecorators: Array<Decorator>) => unknown,
 ) => {
-  const typeDefinition = decoratorTypes[decorator.type] || { requested_configuration: {}, name: `Unknown type: ${decorator.type}` };
+  const typeDefinition = decoratorTypes[decorator.type] || { requested_configuration: {}, name: `Unknown type: ${decorator.type}` } as DecoratorType;
 
   const onUpdate = updateFn
-    ? (id, updatedDecorator) => updateFn(decorators.map((curDecorator) => (curDecorator.id === id ? updatedDecorator : curDecorator)))
+    ? (id: string, updatedDecorator: Decorator) => updateFn(decorators.map((curDecorator) => (curDecorator.id === id ? updatedDecorator : curDecorator)))
     : () => {};
 
   const onDelete = updateFn
-    ? (deletedDecoratorId) => updateFn(decorators.filter(({ id }) => (id !== deletedDecoratorId)))
+    ? (deletedDecoratorId: string) => updateFn(decorators.filter(({ id }) => (id !== deletedDecoratorId)))
     : () => {};
 
   const { id, order } = decorator;

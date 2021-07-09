@@ -28,7 +28,7 @@ import WidgetConfig from './WidgetConfig';
 export type Decorator = {
   id: string,
   type: string,
-  config: any,
+  config?: any,
   stream: string | undefined | null,
   order: number,
 };
