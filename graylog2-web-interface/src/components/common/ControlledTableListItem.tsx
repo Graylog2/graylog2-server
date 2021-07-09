@@ -15,23 +15,20 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 
 import { ListGroupItem } from 'components/graylog';
 
-const ControlledTableListItem = createReactClass({
-  propTypes: {
-    children: PropTypes.node.isRequired,
-  },
+const ControlledTableListItem = ({ children }: { children: React.ReactNode }) => {
+  return (
+    <ListGroupItem>
+      {children}
+    </ListGroupItem>
+  );
+};
 
-  render() {
-    return (
-      <ListGroupItem>
-        {this.props.children}
-      </ListGroupItem>
-    );
-  },
-});
+ControlledTableListItem.propTypes = {
+  children: PropTypes.node.isRequired,
+};
 
 export default ControlledTableListItem;

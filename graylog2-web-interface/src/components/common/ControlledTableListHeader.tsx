@@ -36,7 +36,7 @@ const HeaderWrapper = styled.div`
   min-height: 40px;
 `;
 
-const ControlledTableListHeader = ({ children }) => {
+const ControlledTableListHeader = ({ children }: { children: React.ReactNode | string }) => {
   const wrapStringChildren = (text) => {
     return <HeaderWrapper>{text}</HeaderWrapper>;
   };
