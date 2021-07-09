@@ -17,7 +17,7 @@ exports[`ShowMessagePage renders for generic event 1`] = `
     >
       <span>
         {
-  "fields": {},
+  "fields": [],
   "streams": {},
   "allStreams": [],
   "disableSurroundingSearch": true,
@@ -106,7 +106,7 @@ exports[`ShowMessagePage renders for generic message 1`] = `
     >
       <span>
         {
-  "fields": {},
+  "fields": [],
   "streams": {},
   "allStreams": [],
   "disableSurroundingSearch": true,
