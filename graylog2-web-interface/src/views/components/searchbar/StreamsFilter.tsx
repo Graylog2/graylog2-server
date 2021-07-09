@@ -20,7 +20,13 @@ import PropTypes from 'prop-types';
 import Select from 'components/common/Select';
 import { defaultCompare } from 'views/logic/DefaultCompare';
 
-const StreamsFilter = ({ disabled, value, streams, onChange }) => {
+type Props = {
+  disabled: boolean,
+  value: Array<string>,
+  streams: Array<{ key: string, value: string }>,
+  onChange: (newStreamIds: Array<string>) => void,
+};
+const StreamsFilter = ({ disabled, value, streams, onChange }: Props) => {
   const selectedStreams = value.join(',');
   const placeholder = 'Select streams the search should include. Searches in all streams if empty.';
   const options = streams.sort(({ key: key1 }, { key: key2 }) => defaultCompare(key1, key2));
