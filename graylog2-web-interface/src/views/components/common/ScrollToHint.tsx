@@ -14,34 +14,34 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
+import { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 
 import UIUtils from 'util/UIUtils';
 
-export default class ScrollToHint extends React.Component {
-  static propTypes = {
-    children: PropTypes.node.isRequired,
-    value: PropTypes.any.isRequired,
-  };
+type Props = {
+  children: React.ReactNode,
+  value: any,
+};
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    if (!this.element) {
-      return;
-    }
+const ScrollToHint = ({ children, value }: Props) => {
+  const spanRef = useRef();
 
-    if (this.props.value !== nextProps.value) {
-      UIUtils.scrollToHint(this.element);
-    }
-  }
+  useEffect(() => {
+    UIUtils.scrollToHint(spanRef.current);
+  }, [value]);
 
-  render() {
-    const { children } = this.props;
+  return (
+    <span ref={spanRef}>
+      {children}
+    </span>
+  );
+};
 
-    return (
-      <span ref={(element) => { this.element = element; }}>
-        {children}
-      </span>
-    );
-  }
-}
+ScrollToHint.propTypes = {
+  children: PropTypes.node.isRequired,
+  value: PropTypes.any.isRequired,
+};
+
+export default ScrollToHint;
