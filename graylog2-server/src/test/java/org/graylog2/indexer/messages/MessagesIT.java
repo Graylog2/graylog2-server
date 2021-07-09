@@ -24,6 +24,7 @@ import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import de.huxhorn.sulky.ulid.ULID;
 import joptsimple.internal.Strings;
+import org.graylog.failure.FailureBatch;
 import org.graylog.failure.FailureSubmitQueue;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog2.indexer.IndexSet;
@@ -188,7 +189,7 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
 
         assertThat(failedItems).hasSize(1);
 
-        verify(failureSubmitQueue.getFailureQueue()).put(any(List.class));
+        verify(failureSubmitQueue.get()).put(any(FailureBatch.class));
     }
 
     @Test

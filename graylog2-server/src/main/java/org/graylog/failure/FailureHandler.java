@@ -16,13 +16,11 @@
  */
 package org.graylog.failure;
 
-import java.util.List;
-
 public interface FailureHandler {
 
-    void handle(List<FailureObject> failures);
+    void handle(FailureBatch failureBatch);
 
-    boolean supports(FailureObject failure);
+    boolean supports(FailureBatch failureBatch);
 
     boolean isEnabled();
 }

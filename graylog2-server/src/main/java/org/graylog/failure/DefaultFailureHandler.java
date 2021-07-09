@@ -16,29 +16,36 @@
  */
 package org.graylog.failure;
 
+import com.google.common.collect.ImmutableMap;
+import org.graylog2.indexer.IndexFailureImpl;
 import org.graylog2.indexer.IndexFailureService;
 
 import javax.inject.Inject;
-import java.util.List;
 
-public class PersistInMongoFailureHandler implements FailureHandler {
+public class DefaultFailureHandler implements FailureHandler {
 
     private final IndexFailureService indexFailureService;
 
     @Inject
-    public PersistInMongoFailureHandler(IndexFailureService indexFailureService) {
+    public DefaultFailureHandler(IndexFailureService indexFailureService) {
         this.indexFailureService = indexFailureService;
     }
 
-
     @Override
-    public void handle(List<FailureObject> failures) {
-        failures.stream().map(FailureObject::toIndexFailure).forEach(indexFailureService::saveWithoutValidation);
+    public void handle(FailureBatch failureBatch) {
+        failureBatch.getFailures().forEach(failure ->
+                indexFailureService.saveWithoutValidation(new IndexFailureImpl(ImmutableMap.<String, Object>builder()
+                    .put("letter_id", failure.messageId())
+                    .put("index", failure.targetIndex())
+                    .put("type", failure.failureType())
+                    .put("message", failure.errorMessage())
+                    .put("timestamp", failure.timestamp())
+                    .build())));
     }
 
     @Override
-    public boolean supports(FailureObject failure) {
-        return failure instanceof FailureObject;
+    public boolean supports(FailureBatch failureBatch) {
+        return failureBatch.getFailureClass().equals(IndexingFailure.class);
     }
 
     @Override

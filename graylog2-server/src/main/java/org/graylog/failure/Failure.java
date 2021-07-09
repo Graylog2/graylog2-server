@@ -16,6 +16,26 @@
  */
 package org.graylog.failure;
 
+
+import org.joda.time.DateTime;
+
+import javax.annotation.Nullable;
+
 public interface Failure {
-    String type();
+
+    String failureType();
+
+    String messageId();
+
+    //TODO: examine the type of this "getter"
+    String messageJson();
+
+    @Nullable
+    String targetIndex();
+
+    String errorType();
+
+    String errorMessage();
+
+    DateTime timestamp();
 }

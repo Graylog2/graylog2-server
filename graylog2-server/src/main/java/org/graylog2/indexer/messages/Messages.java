@@ -17,6 +17,7 @@
 package org.graylog2.indexer.messages;
 
 import com.codahale.metrics.Meter;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
 import com.github.rholder.retry.Attempt;
@@ -28,13 +29,12 @@ import com.github.rholder.retry.WaitStrategies;
 import com.github.rholder.retry.WaitStrategy;
 import com.google.auto.value.AutoValue;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 import de.huxhorn.sulky.ulid.ULID;
-import org.graylog.failure.FailureObject;
+import org.graylog.failure.Failure;
+import org.graylog.failure.FailureBatch;
 import org.graylog.failure.FailureSubmitQueue;
-import org.graylog2.indexer.IndexFailure;
-import org.graylog2.indexer.IndexFailureImpl;
+import org.graylog.failure.IndexingFailure;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.InvalidWriteTargetException;
 import org.graylog2.indexer.results.ResultMessage;
@@ -55,8 +55,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
-
-import static org.graylog2.plugin.Message.FIELD_GL2_MESSAGE_ID;
 
 @Singleton
 public class Messages {
@@ -285,20 +283,20 @@ public class Messages {
             return Collections.emptyList();
         }
 
-        final List<FailureObject> indexFailures = indexingErrors.stream()
-                .map((ie) -> ie.toFailureObject(objectMapper, ulid))
+        final List<Failure> indexingFailures = indexingErrors.stream()
+                .map((ie) -> ie.toFailure(objectMapper))
                 .collect(Collectors.toList());
 
         try {
             // TODO handle shutdown
-            failureSubmitQueue.getFailureQueue().put(indexFailures);
+            failureSubmitQueue.get().put(new FailureBatch(indexingFailures, IndexingFailure.class));
         } catch (InterruptedException e) {
             LOG.warn("Interrupted in failureSubmitQueue", e);
             // TODO
         }
 
-        return indexFailures.stream()
-                .map(FailureObject::getLetterId)
+        return indexingFailures.stream()
+                .map(Failure::messageId)
                 .collect(Collectors.toList());
     }
 
@@ -322,36 +320,21 @@ public class Messages {
             return create(message, index, ErrorType.Unknown, "");
         }
 
-        public IndexFailure toIndexFailure() {
-            final Indexable message = this.message();
-            final Map<String, Object> doc = ImmutableMap.<String, Object>builder()
-                    .put("letter_id", message.getId())
-                    .put("index", this.index())
-                    .put("type", this.errorType().toString())
-                    .put("message", this.errorMessage())
-                    .put("timestamp", message.getTimestamp())
-                    .build();
-
-            return new IndexFailureImpl(doc);
-        }
-
-        public FailureObject toFailureObject(ObjectMapper objectMapper, ULID ulid) {
-            final Indexable message = this.message();
-            final Map<String, Object> doc = ImmutableMap.<String, Object>builder()
-                    // IndexFailure fields
-                    .put("letter_id", message.getId())
-                    .put("index", this.index())
-                    .put("type", this.errorType().toString())
-                    .put("message", this.errorMessage()) // Find a good message to display.
-                    .put("timestamp", message.getTimestamp())
-                    // ESFailureObject fields
-                    .put(FIELD_GL2_MESSAGE_ID, ulid.nextULID()) // TODO copy ulid from message? or at least make it searchable with another field for tracing
-                    .put("failure_type", "INDEXING")
-                    .put("error_string", this.errorMessage())
-                    .put("source", "source-of-failing-message") // TODO get real source from message
-                    .put("failed_message", message.toElasticSearchObject(objectMapper, new Meter()))
-                    .build();
-            return new FailureObject(doc);
+        public Failure toFailure(ObjectMapper objectMapper) {
+            final Indexable message = message();
+            try {
+                final String messageJson = objectMapper.writeValueAsString(message.toElasticSearchObject(objectMapper, new Meter()));
+                return new IndexingFailure(
+                        message.getId(),
+                        index(),
+                        errorType().toString(),
+                        errorMessage(),
+                        message.getTimestamp(),
+                        messageJson
+                );
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 }

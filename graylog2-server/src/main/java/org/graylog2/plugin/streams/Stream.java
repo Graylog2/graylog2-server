@@ -43,7 +43,7 @@ public interface Stream extends Persisted {
     /**
      * The ID of the stream for message failures.
      */
-    public String FAILURES_STREAM_ID = "000000000000000000000004";
+    String FAILURES_STREAM_ID = "000000000000000000000004";
     /**
      * Contains all default event streams. (e.g. events and system events)
      */

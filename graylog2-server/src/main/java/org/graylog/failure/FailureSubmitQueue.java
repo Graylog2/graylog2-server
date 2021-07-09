@@ -17,14 +17,15 @@
 package org.graylog.failure;
 
 import javax.inject.Singleton;
-import java.util.List;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 @Singleton
 public class FailureSubmitQueue {
-    private final LinkedBlockingQueue<List<FailureObject>> failureQueue = new LinkedBlockingQueue<>(1000);
 
-    public LinkedBlockingQueue<List<FailureObject>> getFailureQueue() {
-        return failureQueue;
+    private final BlockingQueue<FailureBatch> queue = new LinkedBlockingQueue<>(1000);
+
+    public BlockingQueue<FailureBatch> get() {
+        return queue;
     }
 }

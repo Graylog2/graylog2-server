@@ -18,65 +18,35 @@ package org.graylog.failure;
 
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.AbstractExecutionThreadService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Singleton
-public class FailureService extends AbstractExecutionThreadService {
+public class FailureHandlerService extends AbstractExecutionThreadService {
 
-    private final ExecutorService executor;
-    private FailureSubmitQueue failureQueue;
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     private final List<FailureHandler> fallbackFailureHandlerAsList;
     private final Set<FailureHandler> failureHandlers;
+    private final FailureSubmitQueue failureSubmitQueue;
     private Thread executionThread;
 
     @Inject
-    public FailureService(
-            FailureSubmitQueue failureQueue,
+    public FailureHandlerService(
             @Named("fallbackFailureHandler") FailureHandler fallbackFailureHandler,
-            Set<FailureHandler> failureHandlers
+            Set<FailureHandler> failureHandlers,
+            FailureSubmitQueue failureSubmitQueue
     ) {
-        this.failureQueue = failureQueue;
         this.fallbackFailureHandlerAsList = Lists.newArrayList(fallbackFailureHandler);
         this.failureHandlers = failureHandlers;
-        // TODO: the executor uses 'offer' instead of 'add' => will cause lost messages if the queue is full
-        this.executor = new ThreadPoolExecutor(1, 1,
-                0L, TimeUnit.MILLISECONDS,
-                new LinkedBlockingQueue<>(1000));
-    }
-
-    private void submit(List<FailureObject> failures) {
-        executor.submit(() -> handle(failures));
-    }
-
-    private void handle(List<FailureObject> failures) {
-        enabledHandlers()
-                .forEach(handler -> handler.handle(failures));
-    }
-
-    private List<FailureHandler> enabledHandlers() {
-        final List<FailureHandler> suitableHandlers = failureHandlers.stream()
-                .filter(FailureHandler::isEnabled)
-                .collect(Collectors.toList());
-        return suitableHandlers.isEmpty() ? fallbackFailureHandlerAsList : suitableHandlers;
-    }
-
-    private List<FailureHandler> suitableHandlers(FailureObject failure) {
-        final List<FailureHandler> suitableHandlers = failureHandlers.stream()
-                .filter(FailureHandler::isEnabled)
-                .filter(h -> h.supports(failure))
-                .collect(Collectors.toList());
-
-        return suitableHandlers.isEmpty() ? fallbackFailureHandlerAsList : suitableHandlers;
+        this.failureSubmitQueue = failureSubmitQueue;
     }
 
     @Override
@@ -99,10 +69,25 @@ public class FailureService extends AbstractExecutionThreadService {
     protected void run() throws Exception {
         while (isRunning()) {
             try {
-                final List<FailureObject> failureObjects = failureQueue.getFailureQueue().take();
-                submit(failureObjects);
+                handle(failureSubmitQueue.get().take());
             } catch (InterruptedException ignored) {
+            } catch (Exception e) {
+                logger.error("Error occurred while handling a failure!", e);
             }
         }
+    }
+
+    private void handle(FailureBatch failureBatch) {
+        suitableHandlers(failureBatch)
+                .forEach(handler -> handler.handle(failureBatch));
+    }
+
+    private List<FailureHandler> suitableHandlers(FailureBatch failureBatch) {
+        final List<FailureHandler> suitableHandlers = failureHandlers.stream()
+                .filter(FailureHandler::isEnabled)
+                .filter(h -> h.supports(failureBatch))
+                .collect(Collectors.toList());
+
+        return suitableHandlers.isEmpty() ? fallbackFailureHandlerAsList : suitableHandlers;
     }
 }
