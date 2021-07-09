@@ -14,7 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
+import { createRef } from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
@@ -22,7 +23,7 @@ import { Checkbox } from 'components/graylog';
 
 import Icon from './Icon';
 
-const ItemWrap = styled.li(({ padded }) => css`
+const ItemWrap = styled.li(({ padded }: { padded: boolean }) => css`
   padding: ${padded ? '10px 5px' : ''};
 `);
 
@@ -95,10 +96,31 @@ const ExpandableContent = styled.div(({ theme }) => css`
   padding-left: 5px;
 `);
 
+type Props = {
+  checked: boolean,
+  indetermined: boolean,
+  selectable: boolean,
+  expandable: boolean,
+  expanded: boolean,
+  stayExpanded: boolean,
+  header: React.ReactElement | string,
+  subheader?: string | React.ReactElement,
+  children: React.ReactElement | Array<React.ReactElement>,
+  padded: boolean,
+  readOnly?: boolean,
+  onChange?: (e: React.MouseEvent<Checkbox>) => void,
+};
+
+type State = {
+  expanded: boolean,
+};
+
 /**
  * The ExpandableListItem is needed to render a ExpandableList.
  */
-class ExpandableListItem extends React.Component {
+class ExpandableListItem extends React.Component<Props, State> {
+  private _checkbox = createRef<Checkbox>();
+
   static propTypes = {
     /** Is the Item checked */
     checked: PropTypes.bool,
@@ -128,6 +150,10 @@ class ExpandableListItem extends React.Component {
     ]),
     /** Leave space before and after list item */
     padded: PropTypes.bool,
+    /** Mark checkbox as read only */
+    readOnly: PropTypes.bool,
+    /** onChange handler for the checkbox */
+    onChange: PropTypes.func,
   };
 
   static defaultProps = {
@@ -140,12 +166,12 @@ class ExpandableListItem extends React.Component {
     subheader: undefined,
     stayExpanded: false,
     padded: true,
+    readOnly: false,
+    onChange: () => undefined,
   };
 
   constructor(props) {
     super(props);
-
-    this._checkbox = undefined;
 
     this.state = {
       expanded: props.expanded,
@@ -156,7 +182,7 @@ class ExpandableListItem extends React.Component {
     const { indetermined } = this.props;
 
     if (indetermined && this._checkbox) {
-      this._checkbox.indeterminate = indetermined;
+      this._checkbox.current.indeterminate = indetermined;
     }
   }
 
@@ -168,7 +194,7 @@ class ExpandableListItem extends React.Component {
     }
 
     if (this._checkbox) {
-      this._checkbox.indeterminate = indetermined;
+      this._checkbox.current.indeterminate = indetermined;
     }
   }
 
@@ -184,6 +210,7 @@ class ExpandableListItem extends React.Component {
   };
 
   _filterInputProps = (props) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { expanded, indetermined, stayExpanded, padded, ...inputProps } = props;
 
     return inputProps;
@@ -191,7 +218,7 @@ class ExpandableListItem extends React.Component {
 
   _clickOnHeader = () => {
     if (this._checkbox) {
-      this._checkbox.click();
+      this._checkbox.current.click();
     }
   };
 
@@ -205,7 +232,7 @@ class ExpandableListItem extends React.Component {
     return (
       <ItemWrap padded={padded}>
         <Container>
-          {selectable && <Checkbox inputRef={(c) => { this._checkbox = c; }} inline checked={checked} {...inputProps} />}
+          {selectable && <Checkbox inputRef={this._checkbox} inline checked={checked} {...inputProps} />}
           {expandable
           && (
             <Toggle>
