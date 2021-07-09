@@ -26,6 +26,8 @@ import { Col, Row } from 'components/graylog';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
 import MessageDetail from 'views/components/messagelist/MessageDetail';
 import withParams from 'routing/withParams';
+import { Stream } from 'views/stores/StreamsStore';
+import { Input } from 'components/messageloaders/Types';
 
 const NodesActions = ActionsProvider.getActions('Nodes');
 const InputsActions = ActionsProvider.getActions('Inputs');
@@ -45,9 +47,9 @@ const ShowMessagePage = ({ params: { index, messageId } }: Props) => {
   }
 
   const [message, setMessage] = useState();
-  const [inputs, setInputs] = useState(Immutable.Map);
-  const [streams, setStreams] = useState<Immutable.Map<string, unknown>>();
-  const [allStreams, setAllStreams] = useState<Immutable.List<unknown>>();
+  const [inputs, setInputs] = useState<Immutable.Map<string, Input>>(Immutable.Map());
+  const [streams, setStreams] = useState<Immutable.Map<string, Stream>>();
+  const [allStreams, setAllStreams] = useState<Immutable.List<Stream>>();
 
   useEffect(() => { NodesActions.list(); }, []);
 
@@ -89,7 +91,7 @@ const ShowMessagePage = ({ params: { index, messageId } }: Props) => {
         <Row className="content">
           <Col md={12}>
             <InteractiveContext.Provider value={false}>
-              <MessageDetail fields={Immutable.Map()}
+              <MessageDetail fields={Immutable.List()}
                              streams={streams}
                              allStreams={allStreams}
                              disableSurroundingSearch

@@ -28,7 +28,6 @@ type Props = {
   index: string,
   id: string,
   fields: {
-    timestamp: string,
     [key: string]: unknown,
   },
   decorationStats: any,
@@ -76,7 +75,7 @@ const MessageActions = ({ index, id, fields, decorationStats, disabled, disableS
 
   const surroundingSearchButton = disableSurroundingSearch || (
     <SurroundingSearchButton id={id}
-                             timestamp={timestamp}
+                             timestamp={timestamp as string}
                              searchConfig={searchConfig}
                              messageFields={remainingFields} />
   );
