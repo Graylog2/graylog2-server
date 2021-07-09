@@ -49,11 +49,20 @@ const StyledListItem = styled.li(({ theme }) => css`
   }
 `);
 
+type Props = {
+  title: string | React.ReactNode,
+  titleSuffix: string | React.ReactNode,
+  description: string | React.ReactNode,
+  actions: React.ReactNode | Array<React.ReactNode>,
+  createdFromContentPack: boolean,
+  contentRow: React.ReactNode,
+}
+
 /**
  * Component that let you render an entity item using a similar look and feel as other entities in Graylog.
  * This component is meant to use alongside `EntityList`. Look there for an example of how to use this component.
  */
-const EntityListItem = ({ actions, contentRow, createdFromContentPack, description, title, titleSuffix }) => {
+const EntityListItem = ({ actions, contentRow, createdFromContentPack, description, title, titleSuffix }: Props) => {
   const wrappedTitleSuffix = titleSuffix ? <small>{titleSuffix}</small> : null;
   const actionsContainer = (
     <div className="item-actions text-right">
