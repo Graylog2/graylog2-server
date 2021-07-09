@@ -23,6 +23,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
+import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
 import okhttp3.OkHttpClient;
 import org.graylog.failure.FailureHandler;
@@ -82,5 +83,7 @@ public class GenericBindings extends AbstractModule {
 
         bind(FailureHandler.class).annotatedWith(Names.named("fallbackFailureHandler"))
                 .to(PersistInMongoFailureHandler.class).asEagerSingleton();
+
+        Multibinder.newSetBinder(binder(), FailureHandler.class);
     }
 }
