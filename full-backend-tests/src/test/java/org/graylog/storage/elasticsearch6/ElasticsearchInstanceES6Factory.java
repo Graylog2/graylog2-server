@@ -16,6 +16,7 @@
  */
 package org.graylog.storage.elasticsearch6;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.graylog.storage.elasticsearch6.testing.ElasticsearchInstanceES6;
 import org.graylog.testing.completebackend.ElasticsearchInstanceFactory;
 import org.graylog.testing.elasticsearch.ElasticsearchInstance;
@@ -25,6 +26,11 @@ public class ElasticsearchInstanceES6Factory implements ElasticsearchInstanceFac
     @Override
     public ElasticsearchInstance create(Network network) {
         return ElasticsearchInstanceES6.create(network);
+    }
+
+    @Override
+    public ElasticsearchInstance create(String version, Network network) {
+        throw new NotImplementedException("Create by version not implemented with this factory.");
     }
 
     @Override
