@@ -604,6 +604,9 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
      * @return A list of entries
      */
     public List<JournalReadEntry> readNext(long startOffset, long requestedMaximumCount) {
+        // Capture the log end offset early for the failure handling below. The end offset will change during the
+        // runtime of the retry loop because new messages are written to the journal. If we would use the changing
+        // end offset in the error handling while loop, we would skip valid messages.
         final long logEndOffset = getLogEndOffset();
 
         List<JournalReadEntry> messages = read(startOffset, requestedMaximumCount);
