@@ -48,7 +48,7 @@ class MessagesBulkIndexRetryingTest {
     private final TrafficAccounting trafficAccounting = mock(TrafficAccounting.class);
     private final MessagesAdapter messagesAdapter = mock(MessagesAdapter.class);
     private final ProcessingStatusRecorder processingStatusRecorder = mock(ProcessingStatusRecorder.class);
-    private final FailureSubmitQueue failureSubmitQueue = mock(FailureSubmitQueue.class);
+    private final FailureSubmitQueue failureSubmitQueue = new FailureSubmitQueue();
 
     private Messages messages;
 

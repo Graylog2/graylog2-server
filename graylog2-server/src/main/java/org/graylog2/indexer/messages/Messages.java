@@ -290,6 +290,7 @@ public class Messages {
                 .collect(Collectors.toList());
 
         try {
+            // TODO handle shutdown
             failureSubmitQueue.getFailureQueue().put(indexFailures);
         } catch (InterruptedException e) {
             LOG.warn("Interrupted in failureSubmitQueue", e);
@@ -297,7 +298,7 @@ public class Messages {
         }
 
         return indexFailures.stream()
-                .map(FailureObject::getId)
+                .map(FailureObject::getLetterId)
                 .collect(Collectors.toList());
     }
 

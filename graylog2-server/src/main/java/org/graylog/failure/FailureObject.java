@@ -39,6 +39,10 @@ public class FailureObject {
         return getFieldAs(String.class, "id");
     }
 
+    public String getLetterId() {
+        return getFieldAs(String.class, "letter_id");
+    }
+
     public ESFailureObject toESFailureObject() {
         return new ESFailureObject(fields);
     }
