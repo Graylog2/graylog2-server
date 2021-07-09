@@ -45,7 +45,12 @@ const StyledRow = styled(Row)(({ theme }) => css`
   }
 `);
 
-const ContentHeadRow = ({ children, className, ...props }) => {
+type Props = {
+  children: React.ReactChild | Array<React.ReactChild>,
+  className: string,
+};
+
+const ContentHeadRow = ({ children, className, ...props }: Props) => {
   return (
     <StyledRow className={classNames('content-head', className)} {...props}>
       {children}
