@@ -22,8 +22,8 @@ import ObjectID from 'bson-objectid';
 
 import { ConfigurationForm } from 'components/configurationforms';
 import { Select } from 'components/common';
+import type { DecoratorType, Decorator } from 'views/components/messagelist/decorators/Types';
 
-// eslint-disable-next-line import/no-webpack-loader-syntax
 import InlineForm from './InlineForm';
 import PopoverHelp from './PopoverHelp';
 
@@ -40,10 +40,29 @@ const ConfigurationFormContainer = styled.div(({ theme }) => css`
   border-radius: 5px;
   border-width: 1px;
   padding: 10px;
-  background: ${theme.colors.background};
+  background: ${theme.colors.global.background};
 `);
 
-class AddDecoratorButton extends React.Component {
+type Props = {
+  disabled?: boolean,
+  decoratorTypes: { [key: string]: DecoratorType },
+  nextOrder: number,
+  stream?: string,
+  onCreate: (newDecorator: Decorator) => void,
+  showHelp?: boolean,
+};
+
+type State = {
+  typeDefinition?: DecoratorType,
+  typeName?: string,
+};
+
+type SubmittedDecorator = {
+  type: string,
+  configuration: Decorator['config'],
+};
+
+class AddDecoratorButton extends React.Component<Props, State> {
   static propTypes = {
     decoratorTypes: PropTypes.object.isRequired,
     nextOrder: PropTypes.number.isRequired,
@@ -59,22 +78,26 @@ class AddDecoratorButton extends React.Component {
     stream: null,
   };
 
-  constructor(props) {
+  private readonly PLACEHOLDER: string = 'Please select decorator';
+
+  private configurationForm: any;
+
+  constructor(props: Props) {
     super(props);
     this.state = {};
   }
 
-  _formatDecoratorType = (typeDefinition, typeName) => {
+  _formatDecoratorType = (typeDefinition: DecoratorType, typeName: string) => {
     return { value: typeName, label: typeDefinition.name };
   };
 
   _handleCancel = () => this.setState({ typeName: undefined, typeDefinition: undefined });
 
-  _handleSubmit = (data) => {
+  _handleSubmit = (data: SubmittedDecorator) => {
     const { stream, nextOrder, onCreate } = this.props;
 
     const request = {
-      id: ObjectID().toString(),
+      id: new ObjectID().toString(),
       stream,
       type: data.type,
       config: data.configuration,
@@ -95,7 +118,7 @@ class AddDecoratorButton extends React.Component {
     if (decoratorTypes[decoratorType]) {
       this.setState({ typeDefinition: decoratorTypes[decoratorType] });
     } else {
-      this.setState({ typeDefinition: {} });
+      this.setState({ typeDefinition: {} as DecoratorType });
     }
   };
 
@@ -122,8 +145,7 @@ class AddDecoratorButton extends React.Component {
       <>
         <div className={`${DecoratorStyles.decoratorBox} ${DecoratorStyles.addDecoratorButtonContainer}`}>
           <div className={DecoratorStyles.addDecoratorSelect}>
-            <Select ref={(select) => { this.select = select; }}
-                    placeholder="Select decorator"
+            <Select placeholder="Select decorator"
                     onChange={this._onTypeChange}
                     options={decoratorTypeOptions}
                     matchProp="label"
