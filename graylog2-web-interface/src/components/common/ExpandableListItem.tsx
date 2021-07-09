@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { createRef } from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
@@ -119,7 +118,7 @@ type State = {
  * The ExpandableListItem is needed to render a ExpandableList.
  */
 class ExpandableListItem extends React.Component<Props, State> {
-  private _checkbox = createRef<Checkbox>();
+  private _checkbox: Checkbox | undefined;
 
   static propTypes = {
     /** Is the Item checked */
@@ -182,7 +181,7 @@ class ExpandableListItem extends React.Component<Props, State> {
     const { indetermined } = this.props;
 
     if (indetermined && this._checkbox) {
-      this._checkbox.current.indeterminate = indetermined;
+      this._checkbox.indeterminate = indetermined;
     }
   }
 
@@ -194,7 +193,7 @@ class ExpandableListItem extends React.Component<Props, State> {
     }
 
     if (this._checkbox) {
-      this._checkbox.current.indeterminate = indetermined;
+      this._checkbox.indeterminate = indetermined;
     }
   }
 
@@ -218,7 +217,7 @@ class ExpandableListItem extends React.Component<Props, State> {
 
   _clickOnHeader = () => {
     if (this._checkbox) {
-      this._checkbox.current.click();
+      this._checkbox.click();
     }
   };
 
@@ -232,7 +231,7 @@ class ExpandableListItem extends React.Component<Props, State> {
     return (
       <ItemWrap padded={padded}>
         <Container>
-          {selectable && <Checkbox inputRef={this._checkbox} inline checked={checked} {...inputProps} />}
+          {selectable && <Checkbox inputRef={(ref) => { this._checkbox = ref; }} inline checked={checked} {...inputProps} />}
           {expandable
           && (
             <Toggle>
