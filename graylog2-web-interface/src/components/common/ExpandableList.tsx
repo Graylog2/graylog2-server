@@ -20,7 +20,7 @@ import PropTypes from 'prop-types';
 import style from './ExpandableList.css';
 
 type Props = {
-  children?: React.ReactNode | Array<React.ReactNode>,
+  children?: React.ReactNode,
 };
 
 /**

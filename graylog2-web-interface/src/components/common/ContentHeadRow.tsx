@@ -46,7 +46,7 @@ const StyledRow = styled(Row)(({ theme }) => css`
 `);
 
 type Props = {
-  children: React.ReactChild | Array<React.ReactChild>,
+  children: React.ReactNode,
   className: string,
 };
 

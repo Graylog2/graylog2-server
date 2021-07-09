@@ -29,8 +29,8 @@ const StyledList = styled.ul`
 
 type Props = {
   bsNoItemsStyle: 'info' | 'success' | 'warning',
-  noItemsText: string | React.ReactElement,
-  items: Array<React.ReactElement>,
+  noItemsText: string | React.ReactNode,
+  items: Array<React.ReactNode>,
 }
 
 /**

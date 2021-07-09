@@ -19,8 +19,8 @@ import { useEffect } from 'react';
 import PropTypes from 'prop-types';
 
 type Props = {
-  title: string | React.ReactElement,
-  children: React.ReactElement | Array<React.ReactElement>,
+  title: React.ReactNode,
+  children: React.ReactNode,
 }
 
 /**
