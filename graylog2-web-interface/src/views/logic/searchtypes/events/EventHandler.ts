@@ -92,7 +92,7 @@ export default {
     const values = this.transformGroupedEvents(events);
     const xValues: Array<string> = values.map((v) => formatTimestamp(v[0], tz));
     const textValues: Array<string> = values.map((e) => {
-      if (Object.prototype.hasOwnProperty.call(e[1], 'message')) {
+      if (typeof e[1] !== 'number' && 'message' in e[1]) {
         return e[1].message;
       }
 

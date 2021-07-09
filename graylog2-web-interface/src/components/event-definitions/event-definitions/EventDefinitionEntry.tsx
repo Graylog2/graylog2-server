@@ -118,7 +118,7 @@ const EventDefinitionEntry = ({
                       description={renderDescription(eventDefinition, context)}
                       noItemsText="Could not find any items with the given filter."
                       actions={actions} />
-      { showEntityShareModal && (
+      {showEntityShareModal && (
         <EntityShareModal entityId={eventDefinition.id}
                           entityType="event_definition"
                           entityTypeTitle="event definition"

@@ -55,6 +55,7 @@ type InternalState = {
   firstName: string;
   lastName: string;
   email: string;
+  grnPermissions: Immutable.List<string>;
   permissions: Immutable.List<string>;
   timezone: string | null | undefined;
   preferences: PreferencesMap;
@@ -91,6 +92,7 @@ export default class User {
     clientAddress: $PropertyType<InternalState, 'clientAddress'>,
     lastActivity: $PropertyType<InternalState, 'lastActivity'>,
     accountStatus: $PropertyType<InternalState, 'accountStatus'>,
+    grnPermissions: $PropertyType<InternalState, 'grnPermissions'>,
   ) {
     this._value = {
       id,
@@ -111,6 +113,7 @@ export default class User {
       clientAddress,
       lastActivity,
       accountStatus,
+      grnPermissions,
     };
   }
 
@@ -136,6 +139,10 @@ export default class User {
 
   get email() {
     return this._value.email;
+  }
+
+  get grnPermissions() {
+    return this._value.grnPermissions;
   }
 
   get permissions() {
@@ -235,6 +242,7 @@ export default class User {
       lastName,
       email,
       permissions,
+      grnPermissions,
       timezone,
       preferences,
       roles,
@@ -258,6 +266,7 @@ export default class User {
       email,
       permissions,
       timezone,
+      grnPermissions,
       preferences,
       roles,
       readOnly,
@@ -290,6 +299,7 @@ export default class User {
     clientAddress: $PropertyType<InternalState, 'clientAddress'>,
     lastActivity: $PropertyType<InternalState, 'lastActivity'>,
     accountStatus: $PropertyType<InternalState, 'accountStatus'>,
+    grnPermissions: $PropertyType<InternalState, 'grnPermissions'>,
   ) {
     return new User(
       id,
@@ -310,6 +320,7 @@ export default class User {
       clientAddress,
       lastActivity,
       accountStatus,
+      grnPermissions,
     );
   }
 
@@ -326,6 +337,7 @@ export default class User {
       firstName,
       lastName,
       email,
+      grnPermissions,
       permissions,
       timezone,
       preferences,
@@ -347,6 +359,7 @@ export default class User {
       first_name: firstName,
       last_name: lastName,
       email,
+      grn_permissions: grnPermissions ? grnPermissions.toJS() : [],
       permissions: permissions ? permissions.toArray() : [],
       timezone,
       preferences,
@@ -370,6 +383,7 @@ export default class User {
       first_name,
       last_name,
       email,
+      grn_permissions,
       permissions,
       timezone,
       preferences,
@@ -403,6 +417,7 @@ export default class User {
       client_address,
       last_activity,
       account_status,
+      Immutable.List(grn_permissions),
     );
   }
 
@@ -444,6 +459,10 @@ class Builder {
 
   email(value: $PropertyType<InternalState, 'email'>) {
     return new Builder(this.value.set('email', value));
+  }
+
+  grnPermissions(value: $PropertyType<InternalState, 'grnPermissions'>) {
+    return new Builder(this.value.set('grnPermissions', value));
   }
 
   permissions(value: $PropertyType<InternalState, 'permissions'>) {
@@ -514,6 +533,7 @@ class Builder {
       clientAddress,
       lastActivity,
       accountStatus,
+      grnPermissions,
     } = this.value.toObject();
 
     return new User(
@@ -535,6 +555,7 @@ class Builder {
       clientAddress,
       lastActivity,
       accountStatus,
+      grnPermissions,
     );
   }
 }

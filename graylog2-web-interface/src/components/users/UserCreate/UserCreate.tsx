@@ -134,7 +134,7 @@ const UserCreate = () => {
 
       return (
         <>
-          {CloudEmailFormGroup && <CloudEmailFormGroup /> }
+          {CloudEmailFormGroup && <CloudEmailFormGroup />}
         </>
       );
     }

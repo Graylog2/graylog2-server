@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { readFileSync } from 'fs';
-
 import { dirname } from 'path';
+
 import md5 from 'md5';
 import { flow, merge, fill } from 'lodash';
 
@@ -194,7 +194,7 @@ describe('Chart helper functions', () => {
   describe('generateChart', () => {
     it('should allow passing a generator function modelling the chart config', () => {
       const input = readFixture('ChartData.test.simple.json');
-      const generatorFunction = (type, name, labels, values) => md5(JSON.stringify({ type, name, labels, values }));
+      const generatorFunction = (type, name, labels, values) => ({ type: 'md5', name: md5(JSON.stringify({ type, name, labels, values })) });
       const pipeline = flow([
         transformKeys(config.rowPivots, config.columnPivots),
         extractSeries(),
@@ -203,12 +203,12 @@ describe('Chart helper functions', () => {
       ]);
       const result = pipeline(input);
       const expectedResult = [
-        '99fff4aaa8e33abf060756997b07172c',
-        '07493899371a4a8b67c14a305774f9d9',
-        '1846191e09cf20e5f2090abeb01877a7',
-        '8e560cc5648d21674230dfbb5e99f4d7',
-        '57469e98b570e77672233b258c7d91a0',
-        '88648c9ca14f65ef199856a4fda8836e',
+        { type: 'md5', name: '99fff4aaa8e33abf060756997b07172c' },
+        { type: 'md5', name: '07493899371a4a8b67c14a305774f9d9' },
+        { type: 'md5', name: '1846191e09cf20e5f2090abeb01877a7' },
+        { type: 'md5', name: '8e560cc5648d21674230dfbb5e99f4d7' },
+        { type: 'md5', name: '57469e98b570e77672233b258c7d91a0' },
+        { type: 'md5', name: '88648c9ca14f65ef199856a4fda8836e' },
       ];
 
       expect(result).toHaveLength(6);

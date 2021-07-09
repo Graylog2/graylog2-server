@@ -23,8 +23,8 @@ import UserHasNoStreamAccess from 'pages/UserHasNoStreamAccess';
 jest.mock('components/layout/Footer', () => mockComponent('Footer'));
 
 describe('UserHasNoStreamAccess', () => {
-  it('should render error message', () => {
+  it('should render error message', async () => {
     render(<UserHasNoStreamAccess />);
-    screen.findByText(/We cannot start a search right now, because you are not allowed to access any stream./);
+    await screen.findByText(/We cannot start a search right now, because you are not allowed to access any stream./);
   });
 });

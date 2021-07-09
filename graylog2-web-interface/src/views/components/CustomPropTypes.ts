@@ -89,7 +89,6 @@ const prototypesOf = (target) => {
 const createInstanceOf = (expectedClass, required = false) => {
   const expectedConstructorName = get(expectedClass, 'name');
 
-  // eslint-disable-next-line consistent-return
   return (props, propName, componentName) => {
     const value = props[propName];
 
@@ -107,6 +106,8 @@ const createInstanceOf = (expectedClass, required = false) => {
     if (!constructorNames.includes(expectedConstructorName)) {
       return new Error(`Invalid prop ${propName} supplied to ${componentName}: ${valueConstructorName} expected to be instance of ${expectedConstructorName}`);
     }
+
+    return undefined;
   };
 };
 

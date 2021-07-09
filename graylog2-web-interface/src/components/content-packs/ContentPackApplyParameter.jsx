@@ -62,7 +62,7 @@ class ContentPackApplyParameter extends React.Component {
       <tr key={paramMap.configKey}>
         <td>{paramMap.configKey}</td>
         <td>{paramMap.paramName}</td>
-        { lastCol }
+        {lastCol}
       </tr>
     );
   };

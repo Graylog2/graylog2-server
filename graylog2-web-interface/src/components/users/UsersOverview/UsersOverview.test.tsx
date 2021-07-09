@@ -17,7 +17,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { render, waitFor, fireEvent, screen } from 'wrappedTestingLibrary';
-import { admin } from 'fixtures/users';
+import { adminUser as currentUser } from 'fixtures/users';
 import { paginatedUsers, alice, bob, admin as adminOverview } from 'fixtures/userOverviews';
 import asMock from 'helpers/mocking/AsMock';
 import mockAction from 'helpers/mocking/MockAction';
@@ -107,7 +107,7 @@ describe('UsersOverview', () => {
     let oldConfirm;
 
     const UsersOverviewAsAdmin = () => (
-      <CurrentUserContext.Provider value={admin}>
+      <CurrentUserContext.Provider value={currentUser}>
         <UsersOverview />
       </CurrentUserContext.Provider>
     );

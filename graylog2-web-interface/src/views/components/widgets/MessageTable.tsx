@@ -39,10 +39,8 @@ import InteractiveContext from '../contexts/InteractiveContext';
 const Table = styled.table(({ theme }) => css`
   position: relative;
   font-size: ${theme.fonts.size.small};
-  margin-top: 0;
-  margin-bottom: 60px;
+  margin: 0;
   border-collapse: collapse;
-  padding-left: 13px;
   width: 100%;
   word-break: break-all;
 
@@ -50,7 +48,6 @@ const Table = styled.table(({ theme }) => css`
     td,
     th {
       position: relative;
-      left: 13px;
     }
   }
 
@@ -299,7 +296,6 @@ class MessageTable extends React.Component<Props, State> {
                                        expanded={expandedMessages.contains(messageKey)}
                                        toggleDetail={this._toggleMessageDetail}
                                        highlightMessage={highlightMessageId}
-                                       highlight
                                        expandAllRenderAsync={false} />
                   )}
                 </HighlightMessageContext.Consumer>

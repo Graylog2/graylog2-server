@@ -196,14 +196,14 @@ describe('AggregationWizard', () => {
     expect(onChangeMock).toHaveBeenCalledWith(updatedConfig);
   });
 
-  it('should display group by section even if config has no pivots', () => {
+  it('should display group by section even if config has no pivots', async () => {
     const config = widgetConfig
       .toBuilder()
       .build();
 
     renderSUT({ config });
 
-    const configureElementsSection = screen.getByTestId('configure-elements-section');
+    const configureElementsSection = await screen.findByTestId('configure-elements-section');
 
     expect(within(configureElementsSection).queryByText('Group By')).toBeInTheDocument();
   });

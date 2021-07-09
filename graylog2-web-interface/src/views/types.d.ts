@@ -36,8 +36,9 @@ import {
   VisualizationConfigFormValues,
   VisualizationFormValues,
   WidgetConfigFormValues,
-} from 'views/components/aggregationwizard/WidgetConfigForm';
+} from 'views/components/aggregationwizard';
 import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
+import { TimeRange } from 'views/logic/queries/Query';
 
 interface EditWidgetComponentProps<Config extends WidgetConfig = WidgetConfig> {
   children: React.ReactNode,
@@ -49,9 +50,13 @@ interface EditWidgetComponentProps<Config extends WidgetConfig = WidgetConfig> {
   onChange: (newConfig: Config) => void,
 }
 
-interface WidgetComponentProps<Config extends WidgetConfig = WidgetConfig> {
+interface WidgetResults {
+ [key: string]: Result,
+}
+
+interface WidgetComponentProps<Config extends WidgetConfig = WidgetConfig, Result = WidgetResults> {
   config: Config;
-  data: { [key: string]: Result };
+  data: Result;
   editing: boolean;
   fields: Immutable.List<FieldTypeMapping>;
   filter: string;
@@ -158,6 +163,23 @@ interface SystemConfiguration {
     updateConfig: (newConfig: any) => any,
   }>;
 }
+
+export type SearchTypeResult = {
+  type: string,
+  effective_timerange: TimeRange,
+};
+
+export type MessageResult = {
+  type: 'messages',
+  total: number,
+};
+
+export interface SearchTypeResultTypes {
+  generic: SearchTypeResult,
+  messages: MessageResult,
+}
+
+export type SearchTypeResults = { [id: string]: SearchTypeResultTypes[keyof SearchTypeResultTypes] };
 
 declare module 'graylog-web-plugin/plugin' {
   export interface PluginExports {

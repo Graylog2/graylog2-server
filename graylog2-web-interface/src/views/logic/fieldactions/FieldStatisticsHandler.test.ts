@@ -24,11 +24,10 @@ import handler from './FieldStatisticsHandler';
 
 import FieldType from '../fieldtypes/FieldType';
 import { createElasticsearchQueryString } from '../queries/Query';
-import AggregationWidget from '../aggregationbuilder/AggregationWidget';
 
 jest.mock('views/stores/WidgetStore', () => ({
   WidgetActions: {
-    create: jest.fn((widget) => Promise.resolve(widget)),
+    create: jest.fn((widget: Widget) => Promise.resolve(widget)),
   },
 }));
 
@@ -122,7 +121,7 @@ describe('FieldStatisticsHandler', () => {
     }).then(() => {
       expect(WidgetActions.create).toHaveBeenCalled();
 
-      const { filter, query, streams, timerange }: AggregationWidget = asMock(WidgetActions.create).mock.calls[0][0];
+      const { filter, query, streams, timerange } = asMock(WidgetActions.create).mock.calls[0][0];
 
       expect(filter).toEqual('author: "Vanth"');
       expect(query).toEqual(createElasticsearchQueryString('foo:42'));

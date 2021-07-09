@@ -168,8 +168,8 @@ class MessageDetail extends React.Component {
               <dt>Stored in index</dt>
               <dd>{message.index ? message.index : 'Message is not stored'}</dd>
 
-              { streamIds.size > 0 && <dt>Routed into streams</dt> }
-              { streamIds.size > 0
+              {streamIds.size > 0 && <dt>Routed into streams</dt>}
+              {streamIds.size > 0
             && (
             <dd className="stream-list">
               <ul>

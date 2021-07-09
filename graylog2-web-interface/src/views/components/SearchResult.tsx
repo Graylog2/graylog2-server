@@ -74,12 +74,10 @@ const SearchResult = React.memo(({ hasErrors }: Props) => {
   const hasFocusedWidget = !!focusedWidget?.id;
 
   const currentResults = results ? results.forId(queryId) : undefined;
-  const allFields = fieldTypes.all;
   const queryFields = fieldTypes.queryFields.get(queryId, fieldTypes.all);
   const positions = viewState.state && viewState.state.widgetPositions;
   const content = currentResults ? (
-    <QueryWithWidgets allFields={allFields}
-                      fields={queryFields}
+    <QueryWithWidgets fields={queryFields}
                       queryId={queryId}
                       results={currentResults}
                       positions={positions}

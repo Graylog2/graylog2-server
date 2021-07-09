@@ -20,21 +20,15 @@ import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricFilter;
 import com.codahale.metrics.MetricRegistry;
 import com.google.auto.value.AutoValue;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import org.antlr.v4.runtime.CommonToken;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.BooleanExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.LogicalExpression;
 import org.graylog.plugins.pipelineprocessor.ast.statements.Statement;
-import org.graylog.plugins.pipelineprocessor.codegen.GeneratedRule;
-import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
-import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
@@ -62,12 +56,6 @@ public abstract class Rule {
     public abstract LogicalExpression when();
 
     public abstract Collection<Statement> then();
-
-    @Nullable
-    public abstract Class<? extends GeneratedRule> generatedRuleClass();
-
-    @Nullable
-    public abstract GeneratedRule generatedRule();
 
     public static Builder builder() {
         return new AutoValue_Rule.Builder();
@@ -166,41 +154,24 @@ public abstract class Rule {
     }
 
     /**
-     * Creates a copy of this Rule with a new instance of the generated rule class if present.
+     * Creates a copy of this Rule.
      *
-     * This prevents sharing instances across threads, which is not supported for performance reasons.
-     * Otherwise the generated code would need to be thread safe, adding to the runtime overhead.
-     * Instead we buy speed by spending more memory.
-     *
-     * @param functionRegistry the registered functions of the system
-     * @return a copy of this rule with a new instance of its generated code
+     * @return a copy of this rule
      */
-    public Rule invokableCopy(FunctionRegistry functionRegistry) {
-        final Builder builder = toBuilder();
-        final Class<? extends GeneratedRule> ruleClass = generatedRuleClass();
-        if (ruleClass != null) {
-            try {
-                //noinspection unchecked
-                final Set<Constructor> constructors = ReflectionUtils.getConstructors(ruleClass);
-                final Constructor onlyElement = Iterables.getOnlyElement(constructors);
-                final GeneratedRule instance = (GeneratedRule) onlyElement.newInstance(functionRegistry);
-                builder.generatedRule(instance);
-            } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
-                LOG.warn("Unable to generate code for rule {}: {}", id(), e);
-            }
-        }
-        return builder.build();
+    public Rule copy() {
+        return toBuilder().build();
     }
 
     @AutoValue.Builder
     public abstract static class Builder {
 
         public abstract Builder id(String id);
+
         public abstract Builder name(String name);
+
         public abstract Builder when(LogicalExpression condition);
+
         public abstract Builder then(Collection<Statement> actions);
-        public abstract Builder generatedRuleClass(@Nullable Class<? extends GeneratedRule> klass);
-        public abstract Builder generatedRule(GeneratedRule instance);
 
         public abstract Rule build();
     }

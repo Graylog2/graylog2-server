@@ -25,7 +25,8 @@ import { UsersActions } from 'stores/users/UsersStore';
 import PasswordSection from './PasswordSection';
 
 const exampleUser = alice;
-const currentUser = adminUser.toBuilder()
+const currentUser = adminUser
+  .toBuilder()
   .permissions(Immutable.List(['*']))
   .build();
 
@@ -41,7 +42,7 @@ describe('<PasswordSection />', () => {
   });
 
   const SimplePasswordSection = (props) => (
-    <CurrentUserContext.Provider value={{ ...currentUser.toJSON() }}>
+    <CurrentUserContext.Provider value={currentUser}>
       <PasswordSection {...props} />
     </CurrentUserContext.Provider>
   );

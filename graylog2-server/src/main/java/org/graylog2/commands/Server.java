@@ -63,6 +63,7 @@ import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.configuration.EmailConfiguration;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.configuration.MongoDbConfiguration;
+import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.configuration.VersionCheckConfiguration;
 import org.graylog2.contentpacks.ContentPacksModule;
 import org.graylog2.decorators.DecoratorBindings;
@@ -119,6 +120,7 @@ public class Server extends ServerBootstrap {
     private final JobSchedulerConfiguration jobSchedulerConfiguration = new JobSchedulerConfiguration();
     private final FreeEnterpriseConfiguration freeEnterpriseConfiguration = new FreeEnterpriseConfiguration();
     private final PrometheusExporterConfiguration prometheusExporterConfiguration = new PrometheusExporterConfiguration();
+    private final TLSProtocolsConfiguration tlsConfiguration = new TLSProtocolsConfiguration();
 
     public Server() {
         super("server", configuration);
@@ -190,7 +192,8 @@ public class Server extends ServerBootstrap {
                 processingStatusConfig,
                 jobSchedulerConfiguration,
                 freeEnterpriseConfiguration,
-                prometheusExporterConfiguration);
+                prometheusExporterConfiguration,
+                tlsConfiguration);
     }
 
     @Override

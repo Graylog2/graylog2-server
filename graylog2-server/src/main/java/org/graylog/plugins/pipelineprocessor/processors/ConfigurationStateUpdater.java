@@ -17,7 +17,6 @@
 package org.graylog.plugins.pipelineprocessor.processors;
 
 import com.codahale.metrics.MetricRegistry;
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSetMultimap;
@@ -26,7 +25,6 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
-import org.graylog.plugins.pipelineprocessor.codegen.PipelineClassloader;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
 import org.graylog.plugins.pipelineprocessor.db.RuleMetricsConfigDto;
@@ -36,7 +34,6 @@ import org.graylog.plugins.pipelineprocessor.events.PipelineConnectionsChangedEv
 import org.graylog.plugins.pipelineprocessor.events.PipelinesChangedEvent;
 import org.graylog.plugins.pipelineprocessor.events.RuleMetricsConfigChangedEvent;
 import org.graylog.plugins.pipelineprocessor.events.RulesChangedEvent;
-import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
@@ -47,7 +44,6 @@ import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.tools.ToolProvider;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -68,7 +64,6 @@ public class ConfigurationStateUpdater {
     private final PipelineRuleParser pipelineRuleParser;
     private final RuleMetricsConfigService ruleMetricsConfigService;
     private final MetricRegistry metricRegistry;
-    private final FunctionRegistry functionRegistry;
     private final ScheduledExecutorService scheduler;
     private final EventBus serverEventBus;
     private final PipelineInterpreter.State.Factory stateFactory;
@@ -76,7 +71,6 @@ public class ConfigurationStateUpdater {
      * non-null if the update has successfully loaded a state
      */
     private final AtomicReference<PipelineInterpreter.State> latestState = new AtomicReference<>();
-    private static boolean allowCodeGeneration = false;
 
     @Inject
     public ConfigurationStateUpdater(RuleService ruleService,
@@ -85,23 +79,18 @@ public class ConfigurationStateUpdater {
                                      PipelineRuleParser pipelineRuleParser,
                                      RuleMetricsConfigService ruleMetricsConfigService,
                                      MetricRegistry metricRegistry,
-                                     FunctionRegistry functionRegistry,
                                      @Named("daemonScheduler") ScheduledExecutorService scheduler,
                                      EventBus serverEventBus,
-                                     PipelineInterpreter.State.Factory stateFactory,
-                                     @Named("generate_native_code") boolean allowCodeGeneration) {
+                                     PipelineInterpreter.State.Factory stateFactory) {
         this.ruleService = ruleService;
         this.pipelineService = pipelineService;
         this.pipelineStreamConnectionsService = pipelineStreamConnectionsService;
         this.pipelineRuleParser = pipelineRuleParser;
         this.ruleMetricsConfigService = ruleMetricsConfigService;
         this.metricRegistry = metricRegistry;
-        this.functionRegistry = functionRegistry;
         this.scheduler = scheduler;
         this.serverEventBus = serverEventBus;
         this.stateFactory = stateFactory;
-        // ignore global config, never allow generating code
-        setAllowCodeGeneration(false);
 
         // listens to cluster wide Rule, Pipeline and pipeline stream connection changes
         serverEventBus.register(this);
@@ -109,32 +98,15 @@ public class ConfigurationStateUpdater {
         reloadAndSave();
     }
 
-    private static void setAllowCodeGeneration(Boolean allowCodeGeneration) {
-        if (allowCodeGeneration && ToolProvider.getSystemJavaCompiler() == null) {
-            log.warn("Your Java runtime does not have a compiler available, turning off dynamic " +
-                    "code generation. Please consider running Graylog in a JDK, not a JRE, to " +
-                    "avoid a performance penalty in pipeline processing.");
-            allowCodeGeneration = false;
-        }
-        ConfigurationStateUpdater.allowCodeGeneration = allowCodeGeneration;
-    }
-
-    public static boolean isAllowCodeGeneration() {
-        return allowCodeGeneration;
-    }
-
     // only the singleton instance should mutate itself, others are welcome to reload a new state, but we don't
     // currently allow direct global state updates from external sources (if you need to, send an event on the bus instead)
     private synchronized PipelineInterpreter.State reloadAndSave() {
-        // this classloader will hold all generated rule classes
-        PipelineClassloader commonClassLoader = allowCodeGeneration ? new PipelineClassloader() : null;
-
         // read all rules and parse them
         Map<String, Rule> ruleNameMap = Maps.newHashMap();
         ruleService.loadAll().forEach(ruleDao -> {
             Rule rule;
             try {
-                rule = pipelineRuleParser.parseRule(ruleDao.id(), ruleDao.source(), false, commonClassLoader);
+                rule = pipelineRuleParser.parseRule(ruleDao.id(), ruleDao.source(), false);
             } catch (ParseException e) {
                 log.warn("Ignoring non parseable rule <{}/{}> with errors <{}>", ruleDao.title(), ruleDao.id(), e.getErrors());
                 rule = Rule.alwaysFalse("Failed to parse rule: " + ruleDao.id());
@@ -177,6 +149,7 @@ public class ConfigurationStateUpdater {
     /**
      * Can be used to inspect or use the current state of the pipeline system.
      * For example, the interpreter
+     *
      * @return the currently loaded state of the updater
      */
     public PipelineInterpreter.State getLatestState() {
@@ -195,8 +168,7 @@ public class ConfigurationStateUpdater {
                             rule = Rule.alwaysFalse("Unresolved rule " + ref);
                         }
                         // make a copy so that the metrics match up (we don't share actual objects between stages)
-                        // this also makes sure we don't accidentally share state of generated code between threads
-                        rule = rule.invokableCopy(functionRegistry);
+                        rule = rule.copy();
                         log.debug("Resolved rule `{}` to {}", ref, rule);
                         // include back reference to stage
                         rule.registerMetrics(metricRegistry, pipeline.id(), String.valueOf(stage.stage()));
@@ -248,10 +220,5 @@ public class ConfigurationStateUpdater {
     public void handleRuleMetricsConfigChange(RuleMetricsConfigChangedEvent event) {
         log.debug("Rule metrics config changed: {}", event);
         scheduler.schedule(() -> serverEventBus.post(reloadAndSave()), 0, TimeUnit.SECONDS);
-    }
-
-    @VisibleForTesting
-    PipelineInterpreter.State reload() {
-        return reloadAndSave();
     }
 }

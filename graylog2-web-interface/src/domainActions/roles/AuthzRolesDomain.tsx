@@ -14,14 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { $PropertyType } from 'utility-types';
-
-import type { ActionsType } from 'actions/roles/AuthzRolesActions';
 import { AuthzRolesActions } from 'stores/roles/AuthzRolesStore';
 
 import notifyingAction from '../notifyingAction';
 
-const load: $PropertyType<ActionsType, 'load'> = notifyingAction({
+const load = notifyingAction({
   action: AuthzRolesActions.load,
   error: (error, roleId) => ({
     message: `Loading role with id "${roleId}" failed with status: ${error}`,
@@ -29,7 +26,7 @@ const load: $PropertyType<ActionsType, 'load'> = notifyingAction({
   notFoundRedirect: true,
 });
 
-const deleteAction: $PropertyType<ActionsType, 'delete'> = notifyingAction({
+const deleteAction = notifyingAction({
   action: AuthzRolesActions.delete,
   success: (roleId, roleName) => ({
     message: `Role "${roleName}" was deleted successfully`,
@@ -39,7 +36,7 @@ const deleteAction: $PropertyType<ActionsType, 'delete'> = notifyingAction({
   }),
 });
 
-const addMembers: $PropertyType<ActionsType, 'addMembers'> = notifyingAction({
+const addMembers = notifyingAction({
   action: AuthzRolesActions.addMembers,
   success: (roleId, usernames) => ({
     message: `Users:"${usernames.join(', ')}" were assigned successfully`,
@@ -49,7 +46,7 @@ const addMembers: $PropertyType<ActionsType, 'addMembers'> = notifyingAction({
   }),
 });
 
-const removeMember: $PropertyType<ActionsType, 'removeMember'> = notifyingAction({
+const removeMember = notifyingAction({
   action: AuthzRolesActions.removeMember,
   success: (roleId, username) => ({
     message: `User "${username}" was unassigned successfully`,
@@ -59,21 +56,21 @@ const removeMember: $PropertyType<ActionsType, 'removeMember'> = notifyingAction
   }),
 });
 
-const loadUsersForRole: $PropertyType<ActionsType, 'loadUsersForRole'> = notifyingAction({
+const loadUsersForRole = notifyingAction({
   action: AuthzRolesActions.loadUsersForRole,
   error: (error, username, roleName) => ({
     message: `Loading users for role "${roleName}" failed with status: ${error}`,
   }),
 });
 
-const loadRolesForUser: $PropertyType<ActionsType, 'loadRolesForUser'> = notifyingAction({
+const loadRolesForUser = notifyingAction({
   action: AuthzRolesActions.loadRolesForUser,
   error: (error, username) => ({
     message: `Loading roles for user "${username}" failed with status: ${error}`,
   }),
 });
 
-const loadRolesPaginated: $PropertyType<ActionsType, 'loadRolesPaginated'> = notifyingAction({
+const loadRolesPaginated = notifyingAction({
   action: AuthzRolesActions.loadRolesPaginated,
   error: (error) => ({
     message: `Loading roles failed with status: ${error}`,

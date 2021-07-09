@@ -93,7 +93,8 @@ class RegexReplaceExtractorConfiguration extends React.Component {
     const replacementHelpMessage = (
       <span>The replacement used for the matching text. Please refer to the{' '}
         <a target="_blank"
-           href="https://docs.oracle.com/javase/7/docs/api/java/util/regex/Matcher.html#replaceAll(java.lang.String)">Matcher
+           href="https://docs.oracle.com/javase/7/docs/api/java/util/regex/Matcher.html#replaceAll(java.lang.String)"
+           rel="noreferrer">Matcher
         </a>{' '}
         API documentation for the possible options.
       </span>

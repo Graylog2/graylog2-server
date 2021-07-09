@@ -78,11 +78,12 @@ const _getDataAndErrors = (widget, widgetMapping, results) => {
   return { widgetData: data, error };
 };
 
-const _renderWidgetGrid = (widgetDefs, widgetMapping, results, positions, queryId, fields, allFields) => {
+const _renderWidgetGrid = (widgetDefs, widgetMapping, results, positions, queryId, fields) => {
   const widgets = {};
   const data = {};
   const errors = {};
 
+  // eslint-disable-next-line react/destructuring-assignment
   widgetDefs.forEach((widget) => {
     widgets[widget.id] = widget;
 
@@ -95,8 +96,7 @@ const _renderWidgetGrid = (widgetDefs, widgetMapping, results, positions, queryI
   return (
     <InteractiveContext.Consumer>
       {(interactive) => (
-        <WidgetGrid allFields={allFields}
-                    data={data}
+        <WidgetGrid data={data}
                     errors={errors}
                     fields={fields}
                     locked={!interactive}
@@ -139,13 +139,13 @@ const EmptyDashboardInfo = () => (
   </StyledJumbotron>
 );
 
-const Query = ({ allFields, fields, results, positions, widgetMapping, widgets, queryId }) => {
+const Query = ({ fields, results, positions, widgetMapping, widgets, queryId }) => {
   if (!widgets || widgets.isEmpty()) {
     return <EmptyDashboardInfo />;
   }
 
   if (results) {
-    const widgetGrid = _renderWidgetGrid(widgets, widgetMapping.toJS(), results, positions, queryId, fields, allFields);
+    const widgetGrid = _renderWidgetGrid(widgets, widgetMapping.toJS(), results, positions, queryId, fields);
 
     return (<>{widgetGrid}</>);
   }
@@ -154,7 +154,6 @@ const Query = ({ allFields, fields, results, positions, widgetMapping, widgets, 
 };
 
 Query.propTypes = {
-  allFields: PropTypes.object.isRequired,
   fields: PropTypes.object.isRequired,
   positions: PositionsMap,
   queryId: PropTypes.string.isRequired,

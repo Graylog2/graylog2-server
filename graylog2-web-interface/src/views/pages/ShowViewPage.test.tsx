@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { List } from 'immutable';
-import { mount } from 'wrappedEnzyme';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import mockAction from 'helpers/mocking/MockAction';
 import asMock from 'helpers/mocking/AsMock';
 
@@ -65,6 +65,8 @@ jest.mock('views/components/Search', () => 'extended-search-page');
 jest.mock('routing/withLocation', () => (x) => x);
 jest.mock('routing/withParams', () => (x) => x);
 
+jest.mock('components/common/Spinner', () => () => <span>Spinner</span>);
+
 describe('ShowViewPage', () => {
   const viewJson = {
     id: 'foo',
@@ -93,44 +95,43 @@ describe('ShowViewPage', () => {
     jest.resetModules();
   });
 
-  it('renders Spinner while loading', () => {
+  it('renders Spinner while loading', async () => {
     const mockGet = () => new Promise<ViewJson>((resolve) => setTimeout(resolve, 30000, viewJson));
 
     asMock(ViewManagementActions.get).mockImplementation(mockAction(mockGet));
-    const wrapper = mount(<SimpleShowViewPage />);
 
-    expect(wrapper.find('Spinner')).toExist();
+    render(<SimpleShowViewPage />);
+
+    await screen.findByText('Spinner');
   });
 
   it('loads view with id passed from props', () => {
     asMock(ViewManagementActions.get).mockImplementation(mockAction(jest.fn(() => Promise.reject())));
-    mount(<SimpleShowViewPage />);
+    render(<SimpleShowViewPage />);
 
     expect(ViewManagementActions.get).toHaveBeenCalledWith('foo');
   });
 
-  it('reports NotForundError error if loading view returns 404', (done) => {
+  it('reports NotFoundError error if loading view returns 404', async () => {
     const error = new Error('Not found');
 
     // @ts-ignore
     error.status = 404;
     asMock(ViewManagementActions.get).mockImplementation(mockAction(jest.fn(() => Promise.reject(error))));
 
-    mount(<SimpleShowViewPage />);
+    render(<SimpleShowViewPage />);
 
-    setImmediate(() => {
+    await waitFor(() => {
       expect(ErrorsActions.report).toHaveBeenCalledTimes(1);
 
       expect(ErrorsActions.report).toHaveBeenCalledWith({
         error,
         type: NotFoundErrorType,
       });
-
-      done();
     });
   });
 
-  it('passes loaded view to ViewDeserializer', (done) => {
+  it('passes loaded view to ViewDeserializer', async () => {
     asMock(ViewManagementActions.get).mockImplementation(mockAction(jest.fn(() => Promise.resolve(viewJson))));
     SearchExecutionStateActions.setParameterValues = mockAction(jest.fn());
     const search = Search.create().toBuilder().parameters([]).build();
@@ -141,43 +142,39 @@ describe('ShowViewPage', () => {
       return Promise.resolve(view);
     });
 
-    mount(<SimpleShowViewPage />);
+    render(<SimpleShowViewPage />);
 
-    setImmediate(() => {
-      expect(ViewDeserializer).toHaveBeenCalledWith(viewJson);
-
-      done();
-    });
+    await waitFor(() => expect(ViewDeserializer).toHaveBeenCalledWith(viewJson));
   });
 
   it('calls ViewLoader upon mount', () => {
     const viewLoader = jest.fn(() => Promise.resolve());
 
-    mount(<SimpleShowViewPage viewLoader={viewLoader} />);
+    render(<SimpleShowViewPage viewLoader={viewLoader} />);
 
     expect(viewLoader).toHaveBeenCalled();
   });
 
   it('calls ViewLoader again if view id prop changes', () => {
     const viewLoader = jest.fn(() => Promise.resolve());
-    const wrapper = mount(<SimpleShowViewPage viewLoader={viewLoader} />);
+    const { rerender } = render(<SimpleShowViewPage viewLoader={viewLoader} />);
 
     expect(viewLoader).toHaveBeenCalledWith('foo', [], [], {}, expect.anything(), expect.anything());
 
-    wrapper.setProps({ params: { viewId: 'bar' } });
+    rerender(<SimpleShowViewPage viewLoader={viewLoader} params={{ viewId: 'bar' }} />);
 
     expect(viewLoader).toHaveBeenCalledWith('bar', [], [], {}, expect.anything(), expect.anything());
   });
 
   it('does not call ViewLoader again if view id prop does not change', () => {
     const viewLoader = jest.fn(() => Promise.resolve());
-    const wrapper = mount(<SimpleShowViewPage viewLoader={viewLoader} />);
+    const { rerender } = render(<SimpleShowViewPage viewLoader={viewLoader} />);
 
     expect(viewLoader).toHaveBeenCalledWith('foo', [], [], {}, expect.anything(), expect.anything());
 
     viewLoader.mockClear();
 
-    wrapper.setProps({ params: { viewId: 'foo' } });
+    rerender(<SimpleShowViewPage viewLoader={viewLoader} params={{ viewId: 'foo' }} />);
 
     expect(viewLoader).not.toHaveBeenCalled();
   });

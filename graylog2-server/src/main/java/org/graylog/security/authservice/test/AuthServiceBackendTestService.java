@@ -37,13 +37,16 @@ public class AuthServiceBackendTestService {
     }
 
     public AuthServiceBackendTestResult testConnection(AuthServiceBackendTestRequest request) {
-        final Optional<AuthServiceBackend> backend = createNewBackend(request);
+        try {
+            final Optional<AuthServiceBackend> backend = createNewBackend(request);
 
-        if (backend.isPresent()) {
-            return backend.get().testConnection(getExistingBackendConfig(request).orElse(null));
+            if (backend.isPresent()) {
+                return backend.get().testConnection(getExistingBackendConfig(request).orElse(null));
+            }
+            return AuthServiceBackendTestResult.createFailure("Unknown authentication service type: " + request.backendConfiguration().config().type());
+        } catch (Exception e) {
+            return AuthServiceBackendTestResult.createFailure("Failed with error: " + e.getMessage());
         }
-
-        return AuthServiceBackendTestResult.createFailure("Unknown authentication service type: " + request.backendConfiguration().config().type());
     }
 
     public AuthServiceBackendTestResult testLogin(AuthServiceBackendTestRequest request) {

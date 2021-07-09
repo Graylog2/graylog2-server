@@ -34,7 +34,7 @@ type Props = {
   url: string,
   labelClassName: string,
   wrapperClassName: string,
-  urlType: string,
+  urlType: React.ComponentProps<typeof URLWhiteListFormModal>['urlType'],
 };
 
 const URLWhiteListInput = ({ label, onChange, validationMessage, validationState, url, labelClassName, wrapperClassName, urlType }: Props) => {

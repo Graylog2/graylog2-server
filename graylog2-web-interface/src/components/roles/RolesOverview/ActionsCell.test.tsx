@@ -19,7 +19,7 @@ import * as Immutable from 'immutable';
 import asMock from 'helpers/mocking/AsMock';
 import { render, waitFor, fireEvent, screen } from 'wrappedTestingLibrary';
 import { paginatedUsers } from 'fixtures/userOverviews';
-import { viewsManager } from 'fixtures/users';
+import { alice as currentUser } from 'fixtures/users';
 
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import { AuthzRolesActions } from 'stores/roles/AuthzRolesStore';
@@ -42,18 +42,22 @@ describe('ActionsCell', () => {
 
   const customRoleName = 'custom-role-name';
   const customRoleId = 'custom-role-id';
-  const currentUser = viewsManager;
-  const renderSUT = ({ permissions, readOnly, roleName, roleId }) => (
-    <CurrentUserContext.Provider value={{ ...currentUser, permissions }}>
-      <table>
-        <tbody>
-          <tr>
-            <ActionsCell readOnly={readOnly} roleName={roleName} roleId={roleId} />
-          </tr>
-        </tbody>
-      </table>
-    </CurrentUserContext.Provider>
-  );
+
+  const renderSUT = ({ permissions, readOnly, roleName, roleId }) => {
+    const user = currentUser.toBuilder().permissions(permissions).build();
+
+    return (
+      <CurrentUserContext.Provider value={user}>
+        <table>
+          <tbody>
+            <tr>
+              <ActionsCell readOnly={readOnly} roleName={roleName} roleId={roleId} />
+            </tr>
+          </tbody>
+        </table>
+      </CurrentUserContext.Provider>
+    );
+  };
 
   describe('role deletion', () => {
     let oldConfirm;

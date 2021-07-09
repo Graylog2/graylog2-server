@@ -17,11 +17,11 @@
 import * as React from 'react';
 import { useCallback, useMemo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import type { LocationShape } from 'react-router';
+import type { Location } from 'history';
 
 import history from 'util/History';
 
-export type HistoryElement = LocationShape;
+export type HistoryElement = Location;
 
 const _targetPathname = (to) => {
   const target = typeof to?.pathname === 'string' ? to.pathname : to;
@@ -47,7 +47,7 @@ type ChildrenProps = {
 type Props = {
   children: React.ReactElement<ChildrenProps, React.ComponentType>,
   onClick?: () => unknown,
-  to: string | HistoryElement,
+  to: string,
 };
 
 const isLeftClickEvent = (e) => (e.button === 0);

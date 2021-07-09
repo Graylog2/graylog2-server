@@ -73,12 +73,9 @@ describe('NewSearchPage', () => {
     </StreamsContext.Provider>
   );
 
-  beforeAll(() => {
-    jest.useFakeTimers();
-  });
-
   afterEach(() => {
     jest.clearAllMocks();
+    jest.useRealTimers();
   });
 
   it('should render minimal', async () => {
@@ -88,12 +85,14 @@ describe('NewSearchPage', () => {
   });
 
   it('should show spinner while loading view', async () => {
-    const { findByText, getByText } = render(<SimpleNewSearchPage />);
+    jest.useFakeTimers();
+
+    const { findByText } = render(<SimpleNewSearchPage />);
 
     // @ts-ignore
     act(() => jest.advanceTimersByTime(200));
 
-    expect(getByText('Loading...')).not.toBeNull();
+    expect(await findByText('Loading...')).not.toBeNull();
 
     await findByText('Extended search page');
   });
