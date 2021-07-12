@@ -14,6 +14,32 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+
+declare global {
+  const DEVELOPMENT: boolean | undefined;
+  const GRAYLOG_API_URL: string | undefined;
+  const FEATURES: string | undefined;
+  const IS_CLOUD: boolean | undefined;
+}
+
+export type AppConfigs = {
+  gl2ServerUrl: string,
+  gl2AppPathPrefix: string,
+  rootTimeZone: string,
+  isCloud: boolean,
+  pluginUISettings: { [key: string]: {} },
+};
+
+declare global {
+  interface Window {
+    appConfig: AppConfigs
+  }
+}
+
+const appConfig = (): AppConfigs => {
+  return (window.appConfig || {}) as AppConfigs;
+};
+
 const AppConfig = {
   gl2ServerUrl() {
     if (typeof (GRAYLOG_API_URL) !== 'undefined') {
@@ -22,11 +48,11 @@ const AppConfig = {
       return GRAYLOG_API_URL;
     }
 
-    return this.appConfig().gl2ServerUrl;
+    return appConfig().gl2ServerUrl;
   },
 
   gl2AppPathPrefix() {
-    return this.appConfig().gl2AppPathPrefix;
+    return appConfig().gl2AppPathPrefix;
   },
 
   gl2DevMode() {
@@ -35,7 +61,7 @@ const AppConfig = {
     return typeof (DEVELOPMENT) !== 'undefined' && DEVELOPMENT;
   },
 
-  isFeatureEnabled(feature) {
+  isFeatureEnabled(feature: string) {
     // eslint-disable-next-line no-undef
     return typeof (FEATURES) !== 'undefined' && FEATURES.split(',')
       .filter((s) => typeof s === 'string')
@@ -44,7 +70,7 @@ const AppConfig = {
   },
 
   rootTimeZone() {
-    return this.appConfig().rootTimeZone;
+    return appConfig().rootTimeZone;
   },
 
   isCloud() {
@@ -54,20 +80,17 @@ const AppConfig = {
       return IS_CLOUD;
     }
 
-    return this.appConfig().isCloud;
+    return appConfig().isCloud;
   },
 
   customThemeColors() {
-    return this.appConfig()?.pluginUISettings?.['org.graylog.plugins.customization.theme'] ?? {};
+    return appConfig()?.pluginUISettings?.['org.graylog.plugins.customization.theme'] ?? {};
   },
 
   publicNotifications() {
-    return this.appConfig()?.pluginUISettings?.['org.graylog.plugins.customization.notifications'] ?? {};
+    return appConfig()?.pluginUISettings?.['org.graylog.plugins.customization.notifications'] ?? {};
   },
 
-  appConfig() {
-    return window.appConfig || {};
-  },
 };
 
 export default AppConfig;
