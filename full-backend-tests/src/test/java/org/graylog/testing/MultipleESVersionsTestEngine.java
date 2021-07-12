@@ -14,6 +14,7 @@ import org.junit.platform.engine.discovery.PackageSelector;
 import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.function.Predicate;
 
@@ -52,8 +53,8 @@ public class MultipleESVersionsTestEngine implements TestEngine {
         if (IS_MULTIPLE_ES_CONTAINER.test(javaClass)) {
             Optional<MultipleESVersionsTest> annotation = AnnotationSupport.findAnnotation(javaClass, MultipleESVersionsTest.class);
             if(annotation.isPresent()) {
-                String[] versions = annotation.get().esVersions();
-                Arrays.stream(versions).forEach(version ->
+                // convert to set to make sure that versions are unique and not listed multiple times
+                new HashSet<>(Arrays.asList(annotation.get().esVersions())).forEach(version ->
                         engineDescriptor.addChild(new MultipleESVersionsTestClassDescriptor(javaClass, engineDescriptor, version))
                      );
             }
