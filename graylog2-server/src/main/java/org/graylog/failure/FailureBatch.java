@@ -16,11 +16,12 @@
  */
 package org.graylog.failure;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
- * The primary purpose of this class is to guarantee failures
- * within the list to have the same type.
+ * This class encapsulates a structure responsible for bearing a batch of failures for further processing.
+ * Also it verifies whether failures with one batch are all of the same type.
  */
 public class FailureBatch {
 
@@ -38,7 +39,7 @@ public class FailureBatch {
         });
     }
 
-    public List<? extends Failure> getFailures() {
+    public Collection<? extends Failure> getFailures() {
         return failures;
     }
 

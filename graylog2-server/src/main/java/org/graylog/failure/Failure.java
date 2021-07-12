@@ -21,6 +21,14 @@ import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
 
+/**
+/**
+ * The interface is designed to deliver "necessary" information about a failure occurring during
+ * message processing (e.g. Elasticsearch indexing, extraction, pipeline processing and etc).
+ *
+ * The eventual destination are implementations of {@link org.graylog.failure.FailureHandler}, whose
+ * role is making this information available for further troubleshooting / failure recovery.
+ */
 public interface Failure {
 
     String failureType();
