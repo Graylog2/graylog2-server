@@ -20,11 +20,11 @@ import PropTypes from 'prop-types';
 import style from './ExpandableList.css';
 
 type Props = {
-  children?: React.ReactNode,
+  children?: React.ReactElement,
 };
 
 /**
- * The ExpandableList will take a array or one of ExpandeableListItem to render
+ * The ExpandableList will take a array or one of ExpandableListItem to render
  * in list. This list can be expanded or flattened to give the user a overview
  * of categories. Inside the categories the user has the possibility of doing a selection.
  * The ExpandableList can be used nested.

@@ -28,8 +28,8 @@ const StyledList = styled.ul`
 `;
 
 type Props = {
-  bsNoItemsStyle: 'info' | 'success' | 'warning',
-  noItemsText: string | React.ReactNode,
+  bsNoItemsStyle?: 'info' | 'success' | 'warning',
+  noItemsText?: string | React.ReactNode,
   items: Array<React.ReactNode>,
 }
 

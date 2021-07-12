@@ -46,7 +46,7 @@ const ExternalLink = ({ children, className, href, iconClass, target }: Props) =
   }
 
   return (
-    <a href={href} target={target} className={className}>
+    <a href={href} target={target} className={className} rel="noopener noreferrer">
       {content}
     </a>
   );

@@ -96,16 +96,16 @@ const ExpandableContent = styled.div(({ theme }) => css`
 `);
 
 type Props = {
-  checked: boolean,
-  indetermined: boolean,
-  selectable: boolean,
-  expandable: boolean,
-  expanded: boolean,
-  stayExpanded: boolean,
   header: React.ReactNode | string,
+  checked?: boolean,
+  indetermined?: boolean,
+  selectable?: boolean,
+  expandable?: boolean,
+  expanded?: boolean,
+  stayExpanded?: boolean,
   subheader?: string | React.ReactNode,
-  children: React.ReactNode,
-  padded: boolean,
+  children?: React.ReactNode,
+  padded?: boolean,
   readOnly?: boolean,
   onChange?: (e: React.MouseEvent<Checkbox>) => void,
 };

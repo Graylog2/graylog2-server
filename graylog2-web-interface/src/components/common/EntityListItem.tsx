@@ -20,8 +20,6 @@ import styled, { css } from 'styled-components';
 
 import { Row, Col } from 'components/graylog';
 
-import Icon from './Icon';
-
 const StyledListItem = styled.li(({ theme }) => css`
   display: block;
   padding: 15px 0;
@@ -51,18 +49,17 @@ const StyledListItem = styled.li(({ theme }) => css`
 
 type Props = {
   title: string | React.ReactNode,
-  titleSuffix: string | React.ReactNode,
-  description: string | React.ReactNode,
-  actions: React.ReactNode | Array<React.ReactNode>,
-  createdFromContentPack: boolean,
-  contentRow: React.ReactNode,
+  titleSuffix?: string | React.ReactNode,
+  description?: string | React.ReactNode,
+  actions?: React.ReactNode | Array<React.ReactNode>,
+  contentRow?: React.ReactNode,
 }
 
 /**
  * Component that let you render an entity item using a similar look and feel as other entities in Graylog.
  * This component is meant to use alongside `EntityList`. Look there for an example of how to use this component.
  */
-const EntityListItem = ({ actions, contentRow, createdFromContentPack, description, title, titleSuffix }: Props) => {
+const EntityListItem = ({ actions, contentRow, description, title, titleSuffix }: Props) => {
   const wrappedTitleSuffix = titleSuffix ? <small>{titleSuffix}</small> : null;
   const actionsContainer = (
     <div className="item-actions text-right">
@@ -78,14 +75,12 @@ const EntityListItem = ({ actions, contentRow, createdFromContentPack, descripti
             {actionsContainer}
           </div>
           <h2>{title} {wrappedTitleSuffix}</h2>
-          {(createdFromContentPack || description)
-              && (
-              <div className="item-description">
-                {createdFromContentPack
-                && <span><Icon name="cube" title="Created from content pack" />&nbsp;</span>}
-                <span>{description}</span>
-              </div>
-              )}
+          {description
+          && (
+            <div className="item-description">
+              <span>{description}</span>
+            </div>
+          )}
         </Col>
 
         <Col sm={12} lgHidden mdHidden smHidden>
@@ -111,8 +106,6 @@ EntityListItem.propTypes = {
   description: PropTypes.any,
   /** Action buttons or menus shown on the right side of the entity item container. */
   actions: PropTypes.oneOfType([PropTypes.array, PropTypes.node]),
-  /** Flag that controls whether the content pack marker will be shown next to the description or not. */
-  createdFromContentPack: PropTypes.bool,
   /**
    * Add any content that is related to the entity and needs more space to be displayed. This is mostly use
    * to show configuration options.
@@ -123,7 +116,6 @@ EntityListItem.propTypes = {
 EntityListItem.defaultProps = {
   actions: undefined,
   contentRow: undefined,
-  createdFromContentPack: false,
   description: undefined,
   titleSuffix: undefined,
 };
