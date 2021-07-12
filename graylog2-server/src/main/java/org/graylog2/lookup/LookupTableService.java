@@ -338,8 +338,10 @@ public class LookupTableService extends AbstractIdleService {
         scheduler.schedule(() -> updated.ids().stream().forEach(dataAdapterId -> {
             liveTables.values().stream()
                     .filter(table -> table.dataAdapter().id().equals(dataAdapterId))
-                    .map(LookupTable::cache)
-                    .forEach(LookupCache::purge);
+                    // Caches can be shared between lookup table, make sure we only purge the entries for the
+                    // changed data adapter
+                    .map(lookupTable -> new CachePurge(liveTables, lookupTable.dataAdapter()))
+                    .forEach(CachePurge::purgeAll);
         }), 0, TimeUnit.SECONDS);
     }
 

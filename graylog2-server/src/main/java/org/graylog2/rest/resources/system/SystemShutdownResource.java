@@ -17,8 +17,7 @@
 package org.graylog2.rest.resources.system;
 
 import com.codahale.metrics.annotation.Timed;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import com.google.common.collect.ImmutableMap;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
@@ -26,18 +25,29 @@ import org.graylog2.plugin.ServerStatus;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.system.shutdown.GracefulShutdown;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import static javax.ws.rs.core.Response.accepted;
 
+/**
+ * @deprecated shutting down the node using an API request is discouraged in favor of using a service manager to
+ *         control the server process.
+ */
 @RequiresAuthentication
-@Api(value = "System/Shutdown", description = "Shutdown this node gracefully.")
 @Path("/system/shutdown")
+@Produces(MediaType.APPLICATION_JSON)
+@Deprecated
 public class SystemShutdownResource extends RestResource {
+    private static final Logger LOG = LoggerFactory.getLogger(SystemShutdownResource.class);
+
     private final GracefulShutdown gracefulShutdown;
     private final ServerStatus serverStatus;
 
@@ -50,15 +60,18 @@ public class SystemShutdownResource extends RestResource {
 
     @POST
     @Timed
-    @ApiOperation(value = "Shutdown this node gracefully.",
-            notes = "Attempts to process all buffered and cached messages before exiting, " +
-                    "shuts down inputs first to make sure that no new messages are accepted.")
     @Path("/shutdown")
     @AuditEvent(type = AuditEventTypes.NODE_SHUTDOWN_INITIATE)
+    @Deprecated
     public Response shutdown() {
         checkPermission(RestPermissions.NODE_SHUTDOWN, serverStatus.getNodeId().toString());
 
         new Thread(gracefulShutdown).start();
-        return accepted().build();
+
+        final String msg =
+                "Deprecated API endpoint /system/shutdown/shutdown was called. Shutting down the node via the API is " +
+                        "discouraged in favor of using a service manager to control the server process.";
+        LOG.warn(msg);
+        return accepted(ImmutableMap.of("message", msg)).build();
     }
 }
