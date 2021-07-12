@@ -66,7 +66,7 @@ const Routes = {
       FAILURES: '/system/indices/failures',
     },
     INDEX_SETS: {
-      CONFIGURATION: (indexSetId: string, from: string) => {
+      CONFIGURATION: (indexSetId: string, from?: string) => {
         if (from) {
           return `/system/index_sets/${indexSetId}/configuration?from=${from}`;
         }
@@ -221,7 +221,7 @@ const Routes = {
   local_input_extractors: (nodeId: string, inputId: string) => `/system/inputs/${nodeId}/${inputId}/extractors`,
   export_extractors: (nodeId: string, inputId: string) => `${Routes.local_input_extractors(nodeId, inputId)}/export`,
   import_extractors: (nodeId: string, inputId: string) => `${Routes.local_input_extractors(nodeId, inputId)}/import`,
-  new_extractor: (nodeId: string, inputId: string, extractorType: string, fieldName: string, index: string, messageId: string) => {
+  new_extractor: (nodeId: string, inputId: string, extractorType?: string, fieldName?: string, index?: string, messageId?: string) => {
     const route = new URI(`/system/inputs/${nodeId}/${inputId}/extractors/new`);
     const queryParams = {
       extractor_type: extractorType,
