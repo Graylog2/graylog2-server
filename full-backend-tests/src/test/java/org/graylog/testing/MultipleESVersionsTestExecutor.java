@@ -35,6 +35,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -44,10 +45,12 @@ public class MultipleESVersionsTestExecutor {
     private boolean skipPackaging = false;
 
     public void execute(ExecutionRequest request, TestDescriptor descriptor) {
-        if (descriptor instanceof EngineDescriptor)
+        if (descriptor instanceof EngineDescriptor) {
             executeContainer(request, descriptor);
-        if (descriptor instanceof MultipleESVersionsTestClassDescriptor)
+        }
+        if (descriptor instanceof MultipleESVersionsTestClassDescriptor) {
             executeMethods(((MultipleESVersionsTestClassDescriptor)descriptor).getEsVersion(), request, (MultipleESVersionsTestClassDescriptor)descriptor);
+        }
     }
 
     private GraylogBackend constructBackendFrom(String version, Class testClass, boolean skipPackaging) {
@@ -117,9 +120,9 @@ public class MultipleESVersionsTestExecutor {
 
             executionResult = TestExecutionResult.successful();
         } catch (Throwable throwable) {
-            String message = String.format( //
-                    "Cannot create instance of class '%s'. Maybe it has no default constructor?", //
-                    containerDescriptor.getTestClass() //
+            String message = String.format(Locale.getDefault(),
+                    "Cannot create instance of class '%s'. Maybe it has no default constructor?",
+                    containerDescriptor.getTestClass()
             );
             executionResult = TestExecutionResult.failed(new RuntimeException(message, throwable));
         }
@@ -136,13 +139,13 @@ public class MultipleESVersionsTestExecutor {
         try {
 
             boolean success = (boolean) ReflectionUtils.invokeMethod(methodTestDescriptor.getTestMethod(), testInstance);
-            if (success)
+            if (success) {
                 return TestExecutionResult.successful();
-            else {
-                String message = String.format( //
-                        "Test '%s' failed for instance '%s'", //
-                        methodTestDescriptor.getDisplayName(), //
-                        testInstance.toString() //
+            } else {
+                String message = String.format(Locale.getDefault(),
+                        "Test '%s' failed for instance '%s'",
+                        methodTestDescriptor.getDisplayName(),
+                        testInstance.toString()
                 );
                 return TestExecutionResult.failed(new AssertionFailedError(message));
             }
