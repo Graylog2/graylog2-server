@@ -32,12 +32,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.testing.completebackend.Lifecycle.CLASS;
 
 @MultipleESVersionsTest(serverLifecycle = CLASS, elasticsearchFactory = ElasticSearchInstanceFactoryByVersion.class, esVersions = { "6.8.4", "7.10.2" })
-//@EnabledIf("org.graylog.testing.MultipleESVersionsTestEngine#testWithMultipleESVersions")
 @Disabled
 class MessagesResourceMultipleESVersionsIT implements ESVersionTest {
     private GraylogBackend backend;
     private RequestSpecification requestSpec;
 
+    @Override
     public void setEsVersion(GraylogBackend backend, RequestSpecification specification) {
         this.backend = backend;
         this.requestSpec = specification;

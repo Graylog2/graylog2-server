@@ -41,11 +41,31 @@ public class GraylogBackend {
     private final MongoDBInstance mongodb;
     private final NodeInstance node;
 
-    public static GraylogBackend createStarted(int[] extraPorts, Optional<String> esVersion,
-            ElasticsearchInstanceFactory elasticsearchInstanceFactory, List<Path> pluginJars, Path mavenProjectDir,
-            List<URL> mongoDBFixtures, boolean skipPackaging) {
-        return createStartedBackend(extraPorts, esVersion, elasticsearchInstanceFactory, pluginJars, mavenProjectDir,
+    private static GraylogBackend instance;
+
+    public static GraylogBackend createStarted(int[] extraPorts, String esVersion,
+                                               ElasticsearchInstanceFactory elasticsearchInstanceFactory, List<Path> pluginJars, Path mavenProjectDir,
+                                               List<URL> mongoDBFixtures, boolean skipPackaging) {
+        // if a cached version exists, shut it down first
+        if (instance != null) {
+            instance.close();
+        }
+        return createStartedBackend(extraPorts, Optional.of(esVersion), elasticsearchInstanceFactory, pluginJars, mavenProjectDir,
+                mongoDBFixtures, skipPackaging);
+    }
+
+    public static GraylogBackend createStarted(int[] extraPorts,
+                                               ElasticsearchInstanceFactory elasticsearchInstanceFactory, List<Path> pluginJars, Path mavenProjectDir,
+                                               List<URL> mongoDBFixtures, boolean skipPackaging) {
+        if (instance == null) {
+            instance = createStartedBackend(extraPorts, Optional.empty(), elasticsearchInstanceFactory, pluginJars, mavenProjectDir,
                     mongoDBFixtures, skipPackaging);
+        } else {
+            instance.fullReset(mongoDBFixtures);
+            LOG.info("Reusing running backend");
+        }
+
+        return instance;
     }
 
     // Starting ES instance in parallel thread to save time.

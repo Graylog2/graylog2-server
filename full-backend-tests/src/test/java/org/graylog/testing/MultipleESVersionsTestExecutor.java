@@ -36,7 +36,6 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static io.restassured.http.ContentType.JSON;
@@ -72,7 +71,7 @@ public class MultipleESVersionsTestExecutor {
         final ElasticsearchInstanceFactory esInstanceFactory = instantiateFactory(annotation.elasticsearchFactory());
         final List<Path> pluginJars = instantiateFactory(annotation.pluginJarsProvider()).getJars();
         final Path mavenProjectDir = instantiateFactory(annotation.mavenProjectDirProvider()).getProjectDir();
-        return GraylogBackend.createStarted(annotation.extraPorts(), Optional.of(version), esInstanceFactory, pluginJars, mavenProjectDir,
+        return GraylogBackend.createStarted(annotation.extraPorts(), version, esInstanceFactory, pluginJars, mavenProjectDir,
                 mongoDBFixtures, skipPackaging);
     }
 
