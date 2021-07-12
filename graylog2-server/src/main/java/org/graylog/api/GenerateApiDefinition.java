@@ -17,6 +17,10 @@
 package org.graylog.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableSet;
+import io.github.classgraph.ClassGraph;
+import io.github.classgraph.ClassInfo;
+import io.github.classgraph.ScanResult;
 import org.graylog2.shared.rest.documentation.generator.Generator;
 
 import java.io.File;
@@ -29,7 +33,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class GenerateApiDefinition {
     private static final ObjectMapper objectMapper = new ObjectMapper();
@@ -43,15 +46,31 @@ public class GenerateApiDefinition {
         System.exit(-1);
     }
 
+    private static Set<Class<?>> findResources(String[] controllerPackages) {
+        final ImmutableSet.Builder<Class<?>> resources = ImmutableSet.builder();
+        final ClassGraph classGraph = new ClassGraph().enableAnnotationInfo().acceptPackages(controllerPackages);
+
+        try (final ScanResult scanResult = classGraph.scan()) {
+            for (final ClassInfo classInfo : scanResult.getClassesWithAnnotation("javax.ws.rs.Path")) {
+                resources.add(classInfo.loadClass());
+            }
+        }
+
+        return resources.build();
+    }
+
     public static void main(String[] args) throws IOException {
         if (args.length < 2) {
-           bail("Syntax: " + GenerateApiDefinition.class.getSimpleName() + " <outfile> <package1> ... <packageN>");
+           bail("Syntax: " + GenerateApiDefinition.class.getSimpleName() + " <outdir> <package1> ... <packageN>");
         }
         final String targetName = args[0];
         Files.createDirectories(Paths.get(targetName));
         log("Generating Swagger definition for API ...");
-        final Set<String> packageNames = Arrays.stream(args).skip(1).collect(Collectors.toSet());
-        final Generator generator = new Generator(packageNames, Collections.emptyMap(), "/plugins", new ObjectMapper());
+        final String[] packageNames = Arrays.stream(args).skip(1).toArray(String[]::new);
+
+        final Set<Class<?>> resourceClasses = findResources(packageNames);
+
+        final Generator generator = new Generator(resourceClasses, Collections.emptyMap(), "/plugins", new ObjectMapper());
 
         final Map<String, Object> overview = generator.generateOverview();
         writeJsonToFile(targetName + "/api.json", overview);
@@ -74,6 +93,7 @@ public class GenerateApiDefinition {
     private static String pathFromApi(Map<String, Object> api) {
         return (String)api.get("path");
     }
+
     private static List<Map<String, Object>> retrieveApis(Map<String, Object> overview) {
         return overview.containsKey("apis")
                 ? (List<Map<String, Object>>)overview.get("apis")
@@ -83,7 +103,9 @@ public class GenerateApiDefinition {
     private static void writeJsonToFile(String filename, Object content) throws IOException {
         final File file = new File(filename);
         file.getParentFile().mkdirs();
-        file.createNewFile();
+        if (!file.createNewFile()) {
+            throw new RuntimeException("Unable to create file " + file.getAbsolutePath());
+        }
 
         final FileOutputStream outputStream = new FileOutputStream(file);
 
