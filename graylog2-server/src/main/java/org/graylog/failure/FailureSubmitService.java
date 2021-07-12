@@ -21,11 +21,15 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 @Singleton
-public class FailureSubmitQueue {
+public class FailureSubmitService {
 
     private final BlockingQueue<FailureBatch> queue = new LinkedBlockingQueue<>(1000);
 
-    public BlockingQueue<FailureBatch> get() {
-        return queue;
+    public void submitBlocking(FailureBatch batch) throws InterruptedException {
+        queue.put(batch);
+    }
+
+    FailureBatch consumeBlocking() throws InterruptedException {
+        return queue.take();
     }
 }

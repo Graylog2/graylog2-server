@@ -19,7 +19,7 @@ package org.graylog2.indexer.messages;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import de.huxhorn.sulky.ulid.ULID;
-import org.graylog.failure.FailureSubmitQueue;
+import org.graylog.failure.FailureSubmitService;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.plugin.Message;
 import org.graylog2.system.processing.ProcessingStatusRecorder;
@@ -48,13 +48,13 @@ class MessagesBulkIndexRetryingTest {
     private final TrafficAccounting trafficAccounting = mock(TrafficAccounting.class);
     private final MessagesAdapter messagesAdapter = mock(MessagesAdapter.class);
     private final ProcessingStatusRecorder processingStatusRecorder = mock(ProcessingStatusRecorder.class);
-    private final FailureSubmitQueue failureSubmitQueue = new FailureSubmitQueue();
+    private final FailureSubmitService failureSubmitService = new FailureSubmitService();
 
     private Messages messages;
 
     @BeforeEach
     void setUp() {
-        this.messages = new Messages(trafficAccounting, messagesAdapter, processingStatusRecorder, failureSubmitQueue, new ObjectMapper(), new ULID());
+        this.messages = new Messages(trafficAccounting, messagesAdapter, processingStatusRecorder, failureSubmitService, new ObjectMapper(), new ULID());
     }
 
     @Test

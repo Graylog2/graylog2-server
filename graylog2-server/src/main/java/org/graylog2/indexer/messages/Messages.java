@@ -33,7 +33,7 @@ import com.google.common.collect.Sets;
 import de.huxhorn.sulky.ulid.ULID;
 import org.graylog.failure.Failure;
 import org.graylog.failure.FailureBatch;
-import org.graylog.failure.FailureSubmitQueue;
+import org.graylog.failure.FailureSubmitService;
 import org.graylog.failure.IndexingFailure;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.InvalidWriteTargetException;
@@ -95,7 +95,7 @@ public class Messages {
                 });
     }
 
-    private final FailureSubmitQueue failureSubmitQueue;
+    private final FailureSubmitService failureSubmitService;
     private final MessagesAdapter messagesAdapter;
     private final ProcessingStatusRecorder processingStatusRecorder;
     private final TrafficAccounting trafficAccounting;
@@ -106,14 +106,14 @@ public class Messages {
     public Messages(TrafficAccounting trafficAccounting,
                     MessagesAdapter messagesAdapter,
                     ProcessingStatusRecorder processingStatusRecorder,
-                    FailureSubmitQueue failureSubmitQueue,
+                    FailureSubmitService failureSubmitService,
                     // TODO user ObjectMapperProvider?
                     ObjectMapper objectMapper,
                     ULID ulid) {
         this.trafficAccounting = trafficAccounting;
         this.messagesAdapter = messagesAdapter;
         this.processingStatusRecorder = processingStatusRecorder;
-        this.failureSubmitQueue = failureSubmitQueue;
+        this.failureSubmitService = failureSubmitService;
         this.objectMapper = objectMapper;
         this.ulid = ulid;
     }
@@ -289,9 +289,9 @@ public class Messages {
 
         try {
             // TODO handle shutdown
-            failureSubmitQueue.get().put(new FailureBatch(indexingFailures, IndexingFailure.class));
+            failureSubmitService.submitBlocking(new FailureBatch(indexingFailures, IndexingFailure.class));
         } catch (InterruptedException e) {
-            LOG.warn("Interrupted in failureSubmitQueue", e);
+            LOG.warn("Interrupted in failureSubmitService", e);
             // TODO
         }
 

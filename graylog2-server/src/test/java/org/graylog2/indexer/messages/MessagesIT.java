@@ -25,7 +25,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import de.huxhorn.sulky.ulid.ULID;
 import joptsimple.internal.Strings;
 import org.graylog.failure.FailureBatch;
-import org.graylog.failure.FailureSubmitQueue;
+import org.graylog.failure.FailureSubmitService;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.TestIndexSet;
@@ -91,7 +91,7 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
 
     protected abstract MessagesAdapter createMessagesAdapter(MetricRegistry metricRegistry);
 
-    private final FailureSubmitQueue failureSubmitQueue = mock(FailureSubmitQueue.class);
+    private final FailureSubmitService failureSubmitService = mock(FailureSubmitService.class);
 
     @Before
     public void setUp() throws Exception {
@@ -100,7 +100,7 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         client().waitForGreenStatus(INDEX_NAME);
         final MetricRegistry metricRegistry = new MetricRegistry();
         messages = new Messages(mock(TrafficAccounting.class), createMessagesAdapter(metricRegistry), mock(ProcessingStatusRecorder.class),
-                failureSubmitQueue, new ObjectMapper(), new ULID());
+                failureSubmitService, new ObjectMapper(), new ULID());
     }
 
     @After
@@ -189,7 +189,7 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
 
         assertThat(failedItems).hasSize(1);
 
-        verify(failureSubmitQueue.get()).put(any(FailureBatch.class));
+        verify(failureSubmitService).submitBlocking(any(FailureBatch.class));
     }
 
     @Test

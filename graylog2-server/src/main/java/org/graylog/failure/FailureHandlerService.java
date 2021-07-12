@@ -35,18 +35,18 @@ public class FailureHandlerService extends AbstractExecutionThreadService {
 
     private final List<FailureHandler> fallbackFailureHandlerAsList;
     private final Set<FailureHandler> failureHandlers;
-    private final FailureSubmitQueue failureSubmitQueue;
+    private final FailureSubmitService failureSubmitService;
     private Thread executionThread;
 
     @Inject
     public FailureHandlerService(
             @Named("fallbackFailureHandler") FailureHandler fallbackFailureHandler,
             Set<FailureHandler> failureHandlers,
-            FailureSubmitQueue failureSubmitQueue
+            FailureSubmitService failureSubmitService
     ) {
         this.fallbackFailureHandlerAsList = Lists.newArrayList(fallbackFailureHandler);
         this.failureHandlers = failureHandlers;
-        this.failureSubmitQueue = failureSubmitQueue;
+        this.failureSubmitService = failureSubmitService;
     }
 
     @Override
@@ -69,7 +69,7 @@ public class FailureHandlerService extends AbstractExecutionThreadService {
     protected void run() throws Exception {
         while (isRunning()) {
             try {
-                handle(failureSubmitQueue.get().take());
+                handle(failureSubmitService.consumeBlocking());
             } catch (InterruptedException ignored) {
             } catch (Exception e) {
                 logger.error("Error occurred while handling a failure!", e);
