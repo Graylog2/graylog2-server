@@ -19,6 +19,12 @@ import URI from 'urijs';
 let Routes;
 const prefix = '/test';
 
+declare global {
+  interface Window {
+    appConfig: {}
+  }
+}
+
 describe('Routes', () => {
   describe('without prefix', () => {
     beforeAll(() => {

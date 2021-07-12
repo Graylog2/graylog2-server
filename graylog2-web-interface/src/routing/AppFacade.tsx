@@ -25,6 +25,10 @@ import LoginQueryClientProvider from 'contexts/LoginQueryClientProvider';
 
 import 'bootstrap/less/bootstrap.less';
 import 'toastr/toastr.less';
+import { Store } from 'stores/StoreTypes';
+import { CurrentUserStoreState } from 'stores/users/CurrentUserStore';
+import { ServerAvailabilityStoreState } from 'stores/sessions/ServerAvailabilityStore';
+import { SessionStoreState } from 'stores/sessions/SessionStore';
 
 const SessionStore = StoreProvider.getStore('Session');
 const ServerAvailabilityStore = StoreProvider.getStore('ServerAvailability');
@@ -77,11 +81,11 @@ AppFacade.defaultProps = {
 };
 
 export default connect(AppFacade, {
-  currentUser: CurrentUserStore,
-  server: ServerAvailabilityStore,
-  sessionId: SessionStore,
+  currentUser: CurrentUserStore as Store<CurrentUserStoreState>,
+  server: ServerAvailabilityStore as Store<ServerAvailabilityStoreState>,
+  sessionId: SessionStore as Store<SessionStoreState>,
 }, ({
-  currentUser: { currentUser } = {},
-  server: { server } = {},
-  sessionId: { sessionId } = '',
+  currentUser: { currentUser = undefined } = {},
+  server: { server  },
+  sessionId: { sessionId = '' } = {},
 }) => ({ currentUser, server, sessionId }));
