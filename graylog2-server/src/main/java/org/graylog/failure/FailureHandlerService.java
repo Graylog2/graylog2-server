@@ -17,51 +17,75 @@
 package org.graylog.failure;
 
 import com.google.common.collect.Lists;
+import com.google.common.util.concurrent.AbstractExecutionThreadService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Singleton
-public class FailureService {
+public class FailureHandlerService extends AbstractExecutionThreadService {
 
-    private final ExecutorService executor;
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     private final List<FailureHandler> fallbackFailureHandlerAsList;
     private final Set<FailureHandler> failureHandlers;
+    private final FailureSubmitService failureSubmitService;
+    private Thread executionThread;
 
     @Inject
-    public FailureService(
+    public FailureHandlerService(
             @Named("fallbackFailureHandler") FailureHandler fallbackFailureHandler,
-            Set<FailureHandler> failureHandlers
+            Set<FailureHandler> failureHandlers,
+            FailureSubmitService failureSubmitService
     ) {
         this.fallbackFailureHandlerAsList = Lists.newArrayList(fallbackFailureHandler);
         this.failureHandlers = failureHandlers;
-        // TODO: the executor uses 'offer' instead of 'add' => will cause lost messages if the queue is full
-        this.executor = new ThreadPoolExecutor(1, 1,
-                0L, TimeUnit.MILLISECONDS,
-                new LinkedBlockingQueue<>(1000));
+        this.failureSubmitService = failureSubmitService;
     }
 
-    public void submit(Failure failure) {
-        executor.submit(() -> handle(failure));
+    @Override
+    protected void startUp() throws Exception {
+        super.startUp();
+        executionThread = Thread.currentThread();
     }
 
-    private void handle(Failure failure) {
-        suitableHandlers(failure)
-                .forEach(handler -> handler.handle(failure));
+    @Override
+    protected void shutDown() throws Exception {
+        super.shutDown();
     }
 
-    private List<FailureHandler> suitableHandlers(Failure failure) {
+    @Override
+    protected void triggerShutdown() {
+        executionThread.interrupt();
+    }
+
+    @Override
+    protected void run() throws Exception {
+        while (isRunning()) {
+            try {
+                handle(failureSubmitService.consumeBlocking());
+            } catch (InterruptedException ignored) {
+            } catch (Exception e) {
+                logger.error("Error occurred while handling a failure!", e);
+            }
+        }
+    }
+
+    private void handle(FailureBatch failureBatch) {
+        suitableHandlers(failureBatch)
+                .forEach(handler -> handler.handle(failureBatch));
+    }
+
+    private List<FailureHandler> suitableHandlers(FailureBatch failureBatch) {
         final List<FailureHandler> suitableHandlers = failureHandlers.stream()
                 .filter(FailureHandler::isEnabled)
-                .filter(h -> h.supports(failure))
+                .filter(h -> h.supports(failureBatch))
                 .collect(Collectors.toList());
 
         return suitableHandlers.isEmpty() ? fallbackFailureHandlerAsList : suitableHandlers;

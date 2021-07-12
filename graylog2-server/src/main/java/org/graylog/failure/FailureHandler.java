@@ -16,11 +16,40 @@
  */
 package org.graylog.failure;
 
+/**
+ * Custom failure handlers must implement this interface and must be registered via
+ * {@link com.google.inject.multibindings.Multibinder} in a corresponding plugin module.
+ *
+ * Example:
+ *
+ * Multibinder<FailureHandler> failureHandlerBinder = Multibinder.newSetBinder(binder(), FailureHandler.class);
+ * failureHandlerBinder.addBinding().to(MyCustomFailureHandler.class);
+ */
 public interface FailureHandler {
 
-    void handle(Failure failure);
+    /**
+     * @return a name of the handler. For debugging purposes.
+     */
+    default String name() {
+        return "Default name";
+    }
 
-    boolean supports(Failure failure);
+    /**
+     * An implementation of this method is expected to contain
+     * the actual logic of failure handling.
+     */
+    void handle(FailureBatch failureBatch);
 
+    /**
+     * This method guides the master failure handler service
+     * when deciding whether the handler is applicable for a
+     * certain batch of failures.
+     */
+    boolean supports(FailureBatch failureBatch);
+
+    /**
+     * Tells the master failure handler service whether the handler
+     * is available for handling failures. Added to make handling configurable.
+     */
     boolean isEnabled();
 }

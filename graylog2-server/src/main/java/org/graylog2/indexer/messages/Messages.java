@@ -16,6 +16,9 @@
  */
 package org.graylog2.indexer.messages;
 
+import com.codahale.metrics.Meter;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
 import com.github.rholder.retry.Attempt;
 import com.github.rholder.retry.RetryException;
@@ -26,12 +29,12 @@ import com.github.rholder.retry.WaitStrategies;
 import com.github.rholder.retry.WaitStrategy;
 import com.google.auto.value.AutoValue;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
-import org.graylog.failure.FailureService;
+import de.huxhorn.sulky.ulid.ULID;
+import org.graylog.failure.Failure;
+import org.graylog.failure.FailureBatch;
+import org.graylog.failure.FailureSubmitService;
 import org.graylog.failure.IndexingFailure;
-import org.graylog2.indexer.IndexFailure;
-import org.graylog2.indexer.IndexFailureImpl;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.InvalidWriteTargetException;
 import org.graylog2.indexer.results.ResultMessage;
@@ -92,21 +95,27 @@ public class Messages {
                 });
     }
 
-    private final FailureService failureService;
+    private final FailureSubmitService failureSubmitService;
     private final MessagesAdapter messagesAdapter;
     private final ProcessingStatusRecorder processingStatusRecorder;
     private final TrafficAccounting trafficAccounting;
+    private final ObjectMapper objectMapper;
+    private final ULID ulid;
 
     @Inject
     public Messages(TrafficAccounting trafficAccounting,
                     MessagesAdapter messagesAdapter,
                     ProcessingStatusRecorder processingStatusRecorder,
-                    FailureService failureService
-                    ) {
+                    FailureSubmitService failureSubmitService,
+                    // TODO user ObjectMapperProvider?
+                    ObjectMapper objectMapper,
+                    ULID ulid) {
         this.trafficAccounting = trafficAccounting;
         this.messagesAdapter = messagesAdapter;
         this.processingStatusRecorder = processingStatusRecorder;
-        this.failureService = failureService;
+        this.failureSubmitService = failureSubmitService;
+        this.objectMapper = objectMapper;
+        this.ulid = ulid;
     }
 
     public ResultMessage get(String messageId, String index) throws DocumentNotFoundException, IOException {
@@ -274,16 +283,20 @@ public class Messages {
             return Collections.emptyList();
         }
 
-        final List<IndexFailure> indexFailures = indexingErrors.stream()
-                .map(IndexingError::toIndexFailure)
+        final List<Failure> indexingFailures = indexingErrors.stream()
+                .map((ie) -> ie.toFailure(objectMapper))
                 .collect(Collectors.toList());
 
-        for(IndexFailure ie : indexFailures) {
-            failureService.submit(new IndexingFailure(ie));
+        try {
+            // TODO handle shutdown
+            failureSubmitService.submitBlocking(new FailureBatch(indexingFailures, IndexingFailure.class));
+        } catch (InterruptedException e) {
+            LOG.warn("Interrupted in failureSubmitService", e);
+            // TODO
         }
 
-        return indexFailures.stream()
-                .map(IndexFailure::letterId)
+        return indexingFailures.stream()
+                .map(Failure::messageId)
                 .collect(Collectors.toList());
     }
 
@@ -307,17 +320,21 @@ public class Messages {
             return create(message, index, ErrorType.Unknown, "");
         }
 
-        public IndexFailure toIndexFailure() {
-            final Indexable message = this.message();
-            final Map<String, Object> doc = ImmutableMap.<String, Object>builder()
-                    .put("letter_id", message.getId())
-                    .put("index", this.index())
-                    .put("type", this.errorType().toString())
-                    .put("message", this.errorMessage())
-                    .put("timestamp", message.getTimestamp())
-                    .build();
-
-            return new IndexFailureImpl(doc);
+        public Failure toFailure(ObjectMapper objectMapper) {
+            final Indexable message = message();
+            try {
+                final String messageJson = objectMapper.writeValueAsString(message.toElasticSearchObject(objectMapper, new Meter()));
+                return new IndexingFailure(
+                        message.getId(),
+                        index(),
+                        errorType().toString(),
+                        errorMessage(),
+                        message.getTimestamp(),
+                        messageJson
+                );
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 }

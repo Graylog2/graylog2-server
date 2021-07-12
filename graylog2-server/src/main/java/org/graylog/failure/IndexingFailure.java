@@ -16,27 +16,66 @@
  */
 package org.graylog.failure;
 
-import org.graylog2.indexer.IndexFailure;
+import org.joda.time.DateTime;
 
-public class IndexingFailure implements Failure{
+import javax.annotation.Nullable;
 
-    private final IndexFailure internalFailure;
+public class IndexingFailure implements Failure {
 
-    public IndexingFailure(IndexFailure internalFailure) {
-        this.internalFailure = internalFailure;
-    }
+    private final String messageId;
+    private final String targetIndex;
+    private final String errorType;
+    private final String errorMessage;
+    private final DateTime timestamp;
+    private final String messageJson;
 
-    public IndexFailure getInternalFailure() {
-        return internalFailure;
+    public IndexingFailure(String messageId,
+                           String targetIndex,
+                           String errorType,
+                           String errorMessage,
+                           DateTime timestamp,
+                           String messageJson) {
+        this.messageId = messageId;
+        this.targetIndex = targetIndex;
+        this.errorType = errorType;
+        this.errorMessage = errorMessage;
+        this.timestamp = timestamp;
+        this.messageJson = messageJson;
     }
 
     @Override
-    public String type() {
+    public String failureType() {
         return "indexing";
     }
 
     @Override
-    public String toString() {
-        return internalFailure.asMap().toString();
+    public String messageId() {
+        return messageId;
+    }
+
+    @Nullable
+    @Override
+    public String targetIndex() {
+        return targetIndex;
+    }
+
+    @Override
+    public String errorType() {
+        return errorType;
+    }
+
+    @Override
+    public String errorMessage() {
+        return errorMessage;
+    }
+
+    @Override
+    public DateTime timestamp() {
+        return timestamp;
+    }
+
+    @Override
+    public String messageJson() {
+        return messageJson;
     }
 }
