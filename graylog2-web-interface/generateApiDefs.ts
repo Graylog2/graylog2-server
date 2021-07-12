@@ -1,6 +1,6 @@
-import * as fs from 'fs';
+const fs = require('fs');
 
-import * as ts from 'typescript';
+const ts = require('typescript');
 
 // ===== Types ===== //
 const primitiveTypeMappings = {
@@ -78,6 +78,7 @@ const createModel = ([name, definition]) => ts.factory.createInterfaceDeclaratio
 );
 
 // ==== APIs/Operations ==== //
+// === Types === //
 const createParameter = (({ name, description, required, defaultValue, type }) => ts.factory.createParameterDeclaration(
   undefined,
   undefined,
@@ -117,7 +118,7 @@ const createEndpoint = (endpoint) => {
   return operations.map(createOperationWithPath);
 };
 
-const createApi = (api, name) => {
+const createApiType = (api, name) => {
   const endpoints = api.apis.flatMap(createEndpoint);
 
   return ts.factory.createInterfaceDeclaration(
@@ -130,6 +131,75 @@ const createApi = (api, name) => {
   );
 };
 
+// === Functions === //
+
+const block = ts.factory.createBlock(
+  [
+    ts.factory.createReturnStatement(
+      ts.factory.createCallExpression(
+        ts.factory.createIdentifier('fetch'),
+        undefined,
+        [ts.factory.createIdentifier('foo'), ts.factory.createIdentifier('bar')],
+      ),
+    ),
+  ],
+  true,
+);
+
+const isNumeric = (type) => ['integer'].includes(type);
+
+const createInitializer = (type, defaultValue) => (isNumeric(type)
+  ? ts.factory.createNumericLiteral(defaultValue)
+  : ts.factory.createStringLiteral(defaultValue));
+
+const createFunctionParameter = ({ name, description, required, defaultValue, type }) => ts.factory.createParameterDeclaration(
+  undefined,
+  undefined,
+  undefined,
+  name,
+  required ? undefined : ts.factory.createToken(ts.SyntaxKind.QuestionToken),
+  createTypeFor({ type }),
+  defaultValue ? createInitializer(type, defaultValue) : undefined,
+);
+
+const createRoute = ({ nickname, parameters, method, type, path: operationPath }) => ts.factory.createVariableDeclaration(
+  nickname,
+  undefined,
+  undefined,
+  ts.factory.createArrowFunction(
+    undefined,
+    undefined,
+    parameters.map(createFunctionParameter),
+    createResultTypeFor(createTypeFor({ type })),
+    undefined,
+    block,
+  ),
+);
+
+const createRoutes = (api) => api.operations.map(createRoute);
+
+const createApiObject = (api, name) => {
+  const routes = api.apis.flatMap(createRoutes);
+
+  return ts.factory.createExportDeclaration(
+    undefined,
+    undefined,
+    undefined,
+    ts.factory.createVariableDeclarationList([
+      ts.factory.createVariableDeclaration(
+        name,
+        undefined,
+        undefined,
+        ts.factory.createObjectLiteralExpression(
+          routes,
+          true,
+        ),
+      ),
+    ],
+    ts.NodeFlags.Const),
+  );
+};
+
 // ==== ///
 const srcDir = '../target/swagger';
 const apiFile = '/streams/alerts.json';
@@ -137,10 +207,12 @@ const apiFile = '/streams/alerts.json';
 const apiJson = fs.readFileSync(`${srcDir}${apiFile}`).toString();
 const api = JSON.parse(apiJson);
 
+const name = 'StreamAlertsApi';
 const models = Object.entries(api.models).map(createModel);
-const apiDef = createApi(api, 'StreamAlertsApi');
+const apiDef = createApiType(api, name);
+const apiObject = createApiObject(api, name);
 
-const rootNode = ts.factory.createNodeArray([...models, apiDef]);
+const rootNode = ts.factory.createNodeArray([...models, apiDef, apiObject]);
 
 const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed });
 
