@@ -363,6 +363,11 @@
             <artifactId>lucene-queryparser</artifactId>
             <version>${lucene.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.github.classgraph</groupId>
+            <artifactId>classgraph</artifactId>
+        </dependency>
+
 
         <!-- Logging dependencies -->
         <dependency>
@@ -947,7 +952,7 @@
                         <configuration>
                             <mainClass>org.graylog.api.GenerateApiDefinition</mainClass>
                             <arguments>
-                                <argument>target/swagger.json</argument>
+                                <argument>target/swagger</argument>
                                 <argument>org.graylog</argument>
                                 <argument>org.graylog2</argument>
                             </arguments>
