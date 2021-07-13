@@ -19,6 +19,8 @@ package org.graylog.testing.elasticsearch;
 import com.github.zafarkhaja.semver.Version;
 import com.google.common.io.Resources;
 import org.junit.rules.ExternalResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.elasticsearch.ElasticsearchContainer;
@@ -27,8 +29,10 @@ import org.testcontainers.utility.DockerImageName;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
 
@@ -36,6 +40,8 @@ import static java.util.Objects.isNull;
  * This rule starts an Elasticsearch instance and provides a configured {@link Client}.
  */
 public abstract class ElasticsearchInstance extends ExternalResource {
+    private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchInstance.class);
+
     private static final Map<Version, ElasticsearchContainer> containersByVersion = new HashMap<>();
 
     private static final String DEFAULT_IMAGE_OSS = "docker.elastic.co/elasticsearch/elasticsearch-oss";
@@ -93,6 +99,11 @@ public abstract class ElasticsearchInstance extends ExternalResource {
 
     public void close() {
         container.close();
+        final List<Version> version = containersByVersion.keySet().stream().filter(k -> container == containersByVersion.get(k)).collect(Collectors.toList());
+        version.forEach(v -> {
+            containersByVersion.remove(v);
+        });
+
     }
 
     public static String internalUri() {

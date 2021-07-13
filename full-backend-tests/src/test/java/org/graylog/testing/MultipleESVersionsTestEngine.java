@@ -28,6 +28,8 @@ import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.discovery.ClassSelector;
 import org.junit.platform.engine.discovery.PackageSelector;
 import org.junit.platform.engine.support.descriptor.EngineDescriptor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -35,13 +37,17 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 public class MultipleESVersionsTestEngine implements TestEngine {
+    private static final Logger LOG = LoggerFactory.getLogger(MultipleESVersionsTestEngine.class);
+
     private static final String ENGINE_ID = "graylog-multiple-es";
 
     private static final Predicate<Class<?>> IS_MULTIPLE_ES_CONTAINER = classCandidate -> {
-        if (ReflectionUtils.isAbstract(classCandidate))
+        if (ReflectionUtils.isAbstract(classCandidate)) {
             return false;
-        if (ReflectionUtils.isPrivate(classCandidate))
+        }
+        if (ReflectionUtils.isPrivate(classCandidate)) {
             return false;
+        }
         return AnnotationSupport.isAnnotated(classCandidate, MultipleESVersionsTest.class);
     };
 

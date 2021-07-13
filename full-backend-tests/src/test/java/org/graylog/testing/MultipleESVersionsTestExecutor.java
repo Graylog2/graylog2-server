@@ -29,6 +29,8 @@ import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 import org.opentest4j.AssertionFailedError;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URL;
 import java.nio.file.Path;
@@ -41,6 +43,8 @@ import java.util.stream.Collectors;
 import static io.restassured.http.ContentType.JSON;
 
 public class MultipleESVersionsTestExecutor {
+    private static final Logger LOG = LoggerFactory.getLogger(MultipleESVersionsTestExecutor.class);
+
     private boolean skipPackaging = false;
 
     public void execute(ExecutionRequest request, TestDescriptor descriptor) {
@@ -48,7 +52,7 @@ public class MultipleESVersionsTestExecutor {
             executeContainer(request, descriptor);
         }
         if (descriptor instanceof MultipleESVersionsTestClassDescriptor) {
-            executeMethods(((MultipleESVersionsTestClassDescriptor)descriptor).getEsVersion(), request, (MultipleESVersionsTestClassDescriptor)descriptor);
+            executeMethods(((MultipleESVersionsTestClassDescriptor) descriptor).getEsVersion(), request, (MultipleESVersionsTestClassDescriptor) descriptor);
         }
     }
 
@@ -112,7 +116,7 @@ public class MultipleESVersionsTestExecutor {
             testInstance.setEsVersion(backend, specification);
 
             for (TestDescriptor descriptor : containerDescriptor.getChildren()) {
-                executeMethod(testInstance, request, (MultipleESVersionsTestMethodDescriptor)descriptor);
+                executeMethod(testInstance, request, (MultipleESVersionsTestMethodDescriptor) descriptor);
             }
 
             backend.close();
