@@ -20,7 +20,7 @@ import PropTypes from 'prop-types';
 import loadAsync from 'routing/loadAsync';
 import ServerUnavailablePage from 'pages/ServerUnavailablePage';
 import StoreProvider from 'injection/StoreProvider';
-import connect, { useStore } from 'stores/connect';
+import { useStore } from 'stores/connect';
 import LoginQueryClientProvider from 'contexts/LoginQueryClientProvider';
 
 import 'bootstrap/less/bootstrap.less';
@@ -41,10 +41,10 @@ const LoggedInPage = loadAsync(() => import(/* webpackChunkName: "LoggedInPage" 
 const SERVER_PING_TIMEOUT = 20000;
 
 const AppFacade = () => {
-  const currentUser = useStore(CurrentUserStore as Store<CurrentUserStoreState>, state => state?.currentUser);
-  const server = useStore(ServerAvailabilityStore as Store<ServerAvailabilityStoreState>, state => state?.server);
-  const sessionId = useStore(SessionStore as Store<SessionStoreState>, state => (state?.sessionId ?? ''));
-  
+  const currentUser = useStore(CurrentUserStore as Store<CurrentUserStoreState>, (state) => state?.currentUser);
+  const server = useStore(ServerAvailabilityStore as Store<ServerAvailabilityStoreState>, (state) => state?.server);
+  const sessionId = useStore(SessionStore as Store<SessionStoreState>, (state) => (state?.sessionId ?? ''));
+
   useEffect(() => {
     const interval = setInterval(ServerAvailabilityStore.ping, SERVER_PING_TIMEOUT);
 
