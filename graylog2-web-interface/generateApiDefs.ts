@@ -1,4 +1,5 @@
 const fs = require('fs');
+const { dirname } = require('path');
 
 const ts = require('typescript');
 
@@ -79,54 +80,7 @@ const createModel = ([name, definition]) => ts.factory.createInterfaceDeclaratio
 
 // ==== APIs/Operations ==== //
 // === Types === //
-const createParameter = (({ name, required, type, paramType }) => ts.factory.createParameterDeclaration(
-  undefined,
-  undefined,
-  undefined,
-  paramType === 'body' ? 'body' : name,
-  required ? undefined : ts.factory.createToken(ts.SyntaxKind.QuestionToken),
-  createTypeFor({ type }),
-));
-
 const createResultTypeFor = (typeNode) => ts.factory.createTypeReferenceNode('Promise', [typeNode]);
-
-const createFunction = (parameters, type) => {
-  return ts.factory.createFunctionTypeNode(
-    undefined,
-    parameters ? parameters.map(createParameter) : [],
-    createResultTypeFor(createTypeFor({ type })),
-  );
-};
-
-const createOperation = (operation) => {
-  const { nickname, parameters, type } = operation;
-
-  return ts.factory.createPropertySignature(
-    [],
-    nickname,
-    undefined,
-    createFunction(parameters, type),
-  );
-};
-
-const createEndpoint = (endpoint) => {
-  const { operations } = endpoint;
-
-  return operations.map(createOperation);
-};
-
-const createApiType = (api, name) => {
-  const endpoints = api.apis.flatMap(createEndpoint);
-
-  return ts.factory.createInterfaceDeclaration(
-    undefined,
-    undefined,
-    name,
-    undefined,
-    undefined,
-    endpoints,
-  );
-};
 
 // === Functions === //
 
@@ -165,7 +119,7 @@ const createInitializer = (type, defaultValue) => (isNumeric(type)
   ? ts.factory.createNumericLiteral(defaultValue)
   : ts.factory.createStringLiteral(defaultValue));
 
-const createFunctionParameter = ({ name, description, required, defaultValue, type, paramType }) => ts.factory.createParameterDeclaration(
+const createFunctionParameter = ({ name, required, defaultValue, type, paramType }) => ts.factory.createParameterDeclaration(
   undefined,
   undefined,
   undefined,
@@ -174,6 +128,8 @@ const createFunctionParameter = ({ name, description, required, defaultValue, ty
   createTypeFor({ type }),
   defaultValue ? createInitializer(type, defaultValue) : undefined,
 );
+
+const firstNonEmpty = (...strings) => strings.find((s) => (s !== undefined && s.trim() !== ''));
 
 const createRoute = ({ nickname, parameters = [], method, type, path: operationPath, summary }, path) => {
   const queryParameters = parameters.filter((parameter) => parameter.paramType === 'query');
@@ -197,7 +153,7 @@ const createRoute = ({ nickname, parameters = [], method, type, path: operationP
         parameters.map(createFunctionParameter),
         createResultTypeFor(createTypeFor({ type })),
         undefined,
-        createBlock(method, operationPath || path, bodyParameter[0], queryParameters),
+        createBlock(method, firstNonEmpty(operationPath, path) || '/', bodyParameter[0], queryParameters),
       ),
     )];
 };
@@ -233,19 +189,23 @@ const createApiObject = (api, name) => {
 };
 
 // ==== ///
-const srcDir = '../target/swagger';
+
+const [srcDir, dstDir] = process.argv.slice(2);
+
 const apiFile = '/api.json';
 
 const apiSummary = JSON.parse(fs.readFileSync(`${srcDir}/${apiFile}`).toString());
 
 const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed });
 
-apiSummary.apis.forEach(({ path, name }) => {
+fs.mkdirSync(dstDir, { recursive: true });
+
+apiSummary.apis.forEach(({ path, name: rawName }) => {
+  const name = rawName.replace(/ /g, '');
   const apiJson = fs.readFileSync(`${srcDir}${path}.json`).toString();
   const api = JSON.parse(apiJson);
 
   const models = Object.entries(api.models).map(createModel);
-  const apiDef = createApiType(api, name);
   const apiObject = createApiObject(api, name);
 
   const rootNode = ts.factory.createNodeArray([...models, apiObject]);
@@ -254,6 +214,13 @@ apiSummary.apis.forEach(({ path, name }) => {
   const file = ts.createSourceFile(filename, '', ts.ScriptTarget.ESNext, false, ts.ScriptKind.TS);
   const result = printer.printList(ts.ListFormat.MultiLine, rootNode, file);
 
-  console.log(`===== ${filename} =====`);
-  console.log(result);
+  const fullFilename = `${dstDir}/${filename}`;
+  console.log(`Generating ${fullFilename} ...`);
+
+  const directory = dirname(fullFilename);
+  fs.mkdirSync(directory, { recursive: true });
+
+  fs.writeFileSync(fullFilename, result);
 });
+
+console.log('done.');
