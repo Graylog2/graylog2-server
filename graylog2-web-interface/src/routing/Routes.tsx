@@ -19,7 +19,19 @@ import URI from 'urijs';
 
 import AppConfig from 'util/AppConfig';
 import { extendedSearchPath, viewsPath } from 'views/Constants';
-import { TimeRange, TimeRangeTypes } from 'views/logic/queries/Query';
+import { TimeRangeTypes } from 'views/logic/queries/Query';
+
+type RoutesRelativeTimeRange = {
+  relative: number
+};
+type RoutesAbsoluteTimeRange = {
+  from: string,
+  to: string,
+};
+type RoutesKeywordTimeRange = {
+  keyword: string
+};
+type RoutesTimeRange = RoutesRelativeTimeRange | RoutesAbsoluteTimeRange | RoutesKeywordTimeRange;
 
 const Routes = {
   STARTPAGE: '/',
@@ -163,7 +175,7 @@ const Routes = {
     VIEWID: (id: string) => `${viewsPath}/${id}`,
   },
   EXTENDEDSEARCH: extendedSearchPath,
-  search_with_query: (query: string, rangeType: TimeRangeTypes, timeRange: TimeRange) => {
+  search_with_query: (query: string, rangeType: TimeRangeTypes, timeRange: RoutesTimeRange) => {
     const route = new URI(Routes.SEARCH);
     const queryParams = {
       q: query,
@@ -177,7 +189,7 @@ const Routes = {
 
     return route.resource();
   },
-  _common_search_url: (resource: string, query: string | undefined, timeRange: TimeRange | undefined, resolution: number | undefined) => {
+  _common_search_url: (resource: string, query: string | undefined, timeRange: RoutesTimeRange | undefined, resolution: number | undefined) => {
     const route = new URI(resource);
     const queryParams = {
       q: query,
@@ -194,14 +206,14 @@ const Routes = {
 
     return route.resource();
   },
-  search: (query: string, timeRange: TimeRange, resolution: number) => {
+  search: (query: string, timeRange: RoutesTimeRange, resolution?: number) => {
     return Routes._common_search_url(Routes.SEARCH, query, timeRange, resolution);
   },
   message_show: (index: string, messageId: string) => `/messages/${index}/${messageId}`,
   stream_edit: (streamId: string) => `/streams/${streamId}/edit`,
   stream_edit_example: (streamId: string, index: string, messageId: string) => `${Routes.stream_edit(streamId)}?index=${index}&message_id=${messageId}`,
   stream_outputs: (streamId: string) => `/streams/${streamId}/outputs`,
-  stream_search: (streamId: string, query?: string, timeRange?: TimeRange, resolution?: number) => {
+  stream_search: (streamId: string, query?: string, timeRange?: RoutesTimeRange, resolution?: number) => {
     return Routes._common_search_url(`${Routes.STREAMS}/${streamId}/search`, query, timeRange, resolution);
   },
   stream_alerts: (streamId: string) => `/alerts/?stream_id=${streamId}`,
