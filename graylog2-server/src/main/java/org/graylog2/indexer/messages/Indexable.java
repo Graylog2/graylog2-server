@@ -24,7 +24,9 @@ import javax.annotation.Nonnull;
 import java.util.Map;
 
 public interface Indexable {
+    @Deprecated
     String getId();
+    String getMessageId();
     long getSize();
     DateTime getReceiveTime();
     Map<String, Object> toElasticSearchObject(ObjectMapper objectMapper,@Nonnull final Meter invalidTimestampMeter);

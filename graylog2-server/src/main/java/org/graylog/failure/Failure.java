@@ -33,10 +33,10 @@ public interface Failure {
 
     String failureType();
 
-    String messageId();
+    String failedMessageId();
 
     //TODO: examine the type of this "getter"
-    String messageJson();
+    String failedMessageJson();
 
     @Nullable
     String targetIndex();

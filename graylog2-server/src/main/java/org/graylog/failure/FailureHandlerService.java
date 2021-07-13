@@ -88,6 +88,10 @@ public class FailureHandlerService extends AbstractExecutionThreadService {
                 .filter(h -> h.supports(failureBatch))
                 .collect(Collectors.toList());
 
-        return suitableHandlers.isEmpty() ? fallbackFailureHandlerAsList : suitableHandlers;
+        if (suitableHandlers.isEmpty()) {
+            return fallbackFailureHandlerAsList.stream().filter(h -> h.supports(failureBatch)).collect(Collectors.toList());
+        } else {
+            return suitableHandlers;
+        }
     }
 }

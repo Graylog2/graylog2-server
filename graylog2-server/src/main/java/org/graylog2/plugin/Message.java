@@ -362,6 +362,10 @@ public class Message implements Messages, Indexable {
         return getFieldAs(String.class, FIELD_ID);
     }
 
+    public String getMessageId() {
+        return getFieldAs(String.class, FIELD_GL2_MESSAGE_ID);
+    }
+
     @Override
     public DateTime getTimestamp() {
         return getFieldAs(DateTime.class, FIELD_TIMESTAMP).withZone(UTC);

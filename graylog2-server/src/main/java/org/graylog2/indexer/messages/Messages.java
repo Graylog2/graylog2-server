@@ -295,8 +295,8 @@ public class Messages {
             // TODO
         }
 
-        return indexingFailures.stream()
-                .map(Failure::messageId)
+        return indexingErrors.stream()
+                .map(IndexingError::message).map(Indexable::getId)
                 .collect(Collectors.toList());
     }
 
@@ -325,7 +325,7 @@ public class Messages {
             try {
                 final String messageJson = objectMapper.writeValueAsString(message.toElasticSearchObject(objectMapper, new Meter()));
                 return new IndexingFailure(
-                        message.getId(),
+                        message.getMessageId(),
                         index(),
                         errorType().toString(),
                         errorMessage(),

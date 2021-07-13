@@ -19,9 +19,12 @@ package org.graylog.plugins.pipelineprocessor.processors;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSetMultimap;
@@ -30,6 +33,9 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
+import org.graylog.failure.FailureBatch;
+import org.graylog.failure.FailureSubmitService;
+import org.graylog.failure.ProcessingFailure;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
@@ -45,6 +51,7 @@ import org.graylog2.plugin.MessageCollection;
 import org.graylog2.plugin.Messages;
 import org.graylog2.plugin.messageprocessors.MessageProcessor;
 import org.graylog2.plugin.streams.Stream;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.graylog2.shared.metrics.MetricUtils;
@@ -72,20 +79,28 @@ public class PipelineInterpreter implements MessageProcessor {
 
     private final MessageQueueAcknowledger messageQueueAcknowledger;
     private final Meter filteredOutMessages;
+    private final Meter failedMessages;
     private final Timer executionTime;
     private final MetricRegistry metricRegistry;
     private final ConfigurationStateUpdater stateUpdater;
+    private final FailureSubmitService failureSubmitService;
+    private final ObjectMapper objectMapper;
 
     @Inject
     public PipelineInterpreter(MessageQueueAcknowledger messageQueueAcknowledger,
                                MetricRegistry metricRegistry,
-                               ConfigurationStateUpdater stateUpdater) {
+                               ConfigurationStateUpdater stateUpdater,
+                               FailureSubmitService failureSubmitService,
+                               ObjectMapperProvider objectMapperProvider) {
 
         this.messageQueueAcknowledger = messageQueueAcknowledger;
         this.filteredOutMessages = metricRegistry.meter(name(ProcessBufferProcessor.class, "filteredOutMessages"));
+        this.failedMessages = metricRegistry.meter(name(ProcessBufferProcessor.class, "failedMessages"));
         this.executionTime = metricRegistry.timer(name(PipelineInterpreter.class, "executionTime"));
         this.metricRegistry = metricRegistry;
         this.stateUpdater = stateUpdater;
+        this.failureSubmitService = failureSubmitService;
+        this.objectMapper = objectMapperProvider.get();
     }
 
     /**
@@ -152,6 +167,7 @@ public class PipelineInterpreter implements MessageProcessor {
                         message,
                         initialStreamIds);
                 potentiallyDropFilteredMessage(message);
+                handleFailedMessage(message);
 
                 // go to 1 and iterate over all messages again until no more streams are being assigned
                 if (!addedStreams || message.getFilterOut()) {
@@ -168,6 +184,31 @@ public class PipelineInterpreter implements MessageProcessor {
         interpreterListener.finishProcessing();
         // 7. return the processed messages
         return new MessageCollection(fullyProcessed);
+    }
+
+    private void handleFailedMessage(Message message) {
+        // TODO we probably want a configuration option to disable this feature
+        // TODO if storing failed messages in ES is disabled, we don't want to mark the message as filteredOut either
+        final String processingError = message.getFieldAs(String.class, Message.FIELD_GL2_PROCESSING_ERROR);
+        if (processingError != null) {
+            message.setFilterOut(true);
+            messageQueueAcknowledger.acknowledge(message);
+            failedMessages.mark();
+            submitFailure(message, processingError);
+        }
+    }
+
+    private void submitFailure(Message message, String error) {
+        try {
+            final String messageJson = objectMapper.writeValueAsString(message.toElasticSearchObject(objectMapper, new Meter()));
+            // TODO use message.getMesssgeId() once this field is set early in processing
+            final ProcessingFailure processingFailure = new ProcessingFailure(message.getId(), "pipeline-processor", error, message.getTimestamp(), messageJson);
+            final FailureBatch failureBatch = new FailureBatch(ImmutableList.of(processingFailure), ProcessingFailure.class);
+            failureSubmitService.submitBlocking(failureBatch);
+        } catch (JsonProcessingException e) {
+            log.error("Failed to serialize failed message", e);
+        } catch (InterruptedException ignored) {
+        }
     }
 
     private void potentiallyDropFilteredMessage(Message message) {
