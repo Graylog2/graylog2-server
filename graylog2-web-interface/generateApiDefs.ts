@@ -1,7 +1,11 @@
+// import * as ts from 'typescript';
+
 const fs = require('fs');
 const { dirname } = require('path');
 
 const ts = require('typescript');
+
+const createString = (s) => ts.factory.createStringLiteral(s, true);
 
 // ===== Types ===== //
 const primitiveTypeMappings = {
@@ -102,15 +106,16 @@ const createBlock = (method, path, bodyParameter, queryParameter, rawProduces) =
           ts.factory.createIdentifier('request'),
           undefined,
           [
-            ts.factory.createStringLiteral(method),
-            ts.factory.createStringLiteral(transformTemplate(path)),
+            createString(method),
+            createString(transformTemplate(path)),
             bodyParameter ? ts.factory.createIdentifier('body') : ts.factory.createNull(),
             queryParameters,
             ts.factory.createObjectLiteralExpression(
               [ts.factory.createPropertyAssignment(
-                'accepts',
-                ts.factory.createArrayLiteralExpression(produces.map((contentType) => ts.factory.createStringLiteral(contentType)), produces.length > 1),
+                'Accept',
+                ts.factory.createArrayLiteralExpression(produces.map((contentType) => createString(contentType)), produces.length > 1),
               )],
+              true,
             ),
           ],
         ),
@@ -124,7 +129,7 @@ const isNumeric = (type) => ['integer'].includes(type);
 
 const createInitializer = (type, defaultValue) => (isNumeric(type)
   ? ts.factory.createNumericLiteral(defaultValue)
-  : ts.factory.createStringLiteral(defaultValue));
+  : createString(defaultValue));
 
 const createFunctionParameter = ({ name, required, defaultValue, type, paramType }) => ts.factory.createParameterDeclaration(
   undefined,
@@ -150,18 +155,15 @@ const createRoute = ({ nickname, parameters = [], method, type, path: operationP
 
   return [
     jsDoc,
-    ts.factory.createVariableDeclaration(
-      nickname,
+    ts.factory.createFunctionDeclaration(
       undefined,
+      [ts.factory.createToken(ts.SyntaxKind.ExportKeyword)],
       undefined,
-      ts.factory.createArrowFunction(
-        undefined,
-        undefined,
-        parameters.map(createFunctionParameter),
-        createResultTypeFor(createTypeFor({ type })),
-        undefined,
-        createBlock(method, firstNonEmpty(operationPath, path) || '/', bodyParameter[0], queryParameters, produces),
-      ),
+      ts.factory.createIdentifier(nickname),
+      undefined,
+      parameters.map(createFunctionParameter),
+      createResultTypeFor(createTypeFor({ type })),
+      createBlock(method, firstNonEmpty(operationPath, path) || '/', bodyParameter[0], queryParameters, produces),
     )];
 };
 
@@ -173,33 +175,14 @@ const createRoutes = (api) => {
 };
 
 const createApiObject = (api, name) => {
-  const routes = api.apis.flatMap(createRoutes);
-  const cleanName = name.replace(/\//g, '');
-
-  return ts.factory.createExportDeclaration(
-    undefined,
-    undefined,
-    undefined,
-    ts.factory.createVariableDeclarationList([
-      ts.factory.createVariableDeclaration(
-        cleanName,
-        undefined,
-        undefined,
-        ts.factory.createObjectLiteralExpression(
-          routes,
-          true,
-        ),
-      ),
-    ],
-    ts.NodeFlags.Const),
-  );
+  return api.apis.flatMap(createRoutes);
 };
 
 const importDeclaration = ts.factory.createImportDeclaration(
   undefined,
   undefined,
-  ts.factory.createImportClause(false, ts.factory.createIdentifier('request')),
-  ts.factory.createStringLiteral('routing/request'),
+  ts.factory.createImportClause(false, ts.factory.createIdentifier('request'), undefined),
+  createString('routing/request'),
 );
 
 // ==== ///
@@ -222,7 +205,7 @@ apiSummary.apis.forEach(({ path, name: rawName }) => {
   const models = Object.entries(api.models).map(createModel);
   const apiObject = createApiObject(api, name);
 
-  const rootNode = ts.factory.createNodeArray([importDeclaration, ...models, apiObject]);
+  const rootNode = ts.factory.createNodeArray([importDeclaration, ...models, ...apiObject]);
 
   const filename = `${name}.ts`;
   const file = ts.createSourceFile(filename, '', ts.ScriptTarget.ESNext, false, ts.ScriptKind.TS);
