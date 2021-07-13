@@ -86,7 +86,8 @@ const createResultTypeFor = (typeNode) => ts.factory.createTypeReferenceNode('Pr
 
 const transformTemplate = (path) => path.replace(/{/g, '${');
 
-const createBlock = (method, path, bodyParameter, queryParameter) => {
+const createBlock = (method, path, bodyParameter, queryParameter, rawProduces) => {
+  const produces = rawProduces || [];
   const queryParameters = ts.factory.createObjectLiteralExpression(
     queryParameter.map((q) => ts.factory.createPropertyAssignment(
       q.name,
@@ -105,6 +106,12 @@ const createBlock = (method, path, bodyParameter, queryParameter) => {
             ts.factory.createStringLiteral(transformTemplate(path)),
             bodyParameter ? ts.factory.createIdentifier('body') : ts.factory.createNull(),
             queryParameters,
+            ts.factory.createObjectLiteralExpression(
+              [ts.factory.createPropertyAssignment(
+                'accepts',
+                ts.factory.createArrayLiteralExpression(produces.map((contentType) => ts.factory.createStringLiteral(contentType)), produces.length > 1),
+              )],
+            ),
           ],
         ),
       ),
@@ -131,7 +138,7 @@ const createFunctionParameter = ({ name, required, defaultValue, type, paramType
 
 const firstNonEmpty = (...strings) => strings.find((s) => (s !== undefined && s.trim() !== ''));
 
-const createRoute = ({ nickname, parameters = [], method, type, path: operationPath, summary }, path) => {
+const createRoute = ({ nickname, parameters = [], method, type, path: operationPath, summary, produces }, path) => {
   const queryParameters = parameters.filter((parameter) => parameter.paramType === 'query');
   const bodyParameter = parameters.filter((parameter) => parameter.paramType === 'body');
 
@@ -153,7 +160,7 @@ const createRoute = ({ nickname, parameters = [], method, type, path: operationP
         parameters.map(createFunctionParameter),
         createResultTypeFor(createTypeFor({ type })),
         undefined,
-        createBlock(method, firstNonEmpty(operationPath, path) || '/', bodyParameter[0], queryParameters),
+        createBlock(method, firstNonEmpty(operationPath, path) || '/', bodyParameter[0], queryParameters, produces),
       ),
     )];
 };
