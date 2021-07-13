@@ -195,6 +195,13 @@ const createApiObject = (api, name) => {
   );
 };
 
+const importDeclaration = ts.factory.createImportDeclaration(
+  undefined,
+  undefined,
+  ts.factory.createImportClause(false, ts.factory.createIdentifier('request')),
+  ts.factory.createStringLiteral('routing/request'),
+);
+
 // ==== ///
 
 const [srcDir, dstDir] = process.argv.slice(2);
@@ -215,7 +222,7 @@ apiSummary.apis.forEach(({ path, name: rawName }) => {
   const models = Object.entries(api.models).map(createModel);
   const apiObject = createApiObject(api, name);
 
-  const rootNode = ts.factory.createNodeArray([...models, apiObject]);
+  const rootNode = ts.factory.createNodeArray([importDeclaration, ...models, apiObject]);
 
   const filename = `${name}.ts`;
   const file = ts.createSourceFile(filename, '', ts.ScriptTarget.ESNext, false, ts.ScriptKind.TS);
