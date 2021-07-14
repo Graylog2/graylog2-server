@@ -18,6 +18,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import Immutable from 'immutable';
 import { PluginStore } from 'graylog-web-plugin/plugin';
+import ImmutablePropTypes from 'react-immutable-proptypes';
 
 import { Link } from 'components/graylog/router';
 import { Col, Label, Row } from 'components/graylog';
@@ -26,17 +27,16 @@ import { MessageFields } from 'views/components/messagelist';
 import MessageDetailsTitle from 'components/search/MessageDetailsTitle';
 import { Icon, Spinner, Timestamp } from 'components/common';
 import Routes from 'routing/Routes';
-
-import MessageActions from './MessageActions';
-import MessageMetadata from './MessageMetadata';
-import NodeName from './NodeName';
 import { SearchesConfig } from 'components/search/SearchConfig';
 import { Message } from 'views/components/messagelist/Types';
 import { Input } from 'components/messageloaders/Types';
 import { Stream } from 'views/stores/StreamsStore';
-import ImmutablePropTypes from 'react-immutable-proptypes';
 import CustomPropTypes from 'views/components/CustomPropTypes';
 import { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
+
+import NodeName from './NodeName';
+import MessageMetadata from './MessageMetadata';
+import MessageActions from './MessageActions';
 
 type Props = {
   allStreams?: Immutable.List<Stream>,
@@ -58,7 +58,6 @@ type State = {
 class MessageDetail extends React.Component<Props, State> {
   static propTypes = {
     allStreams: ImmutablePropTypes.list,
-    disableFieldActions: PropTypes.bool,
     disableMessageActions: PropTypes.bool,
     disableSurroundingSearch: PropTypes.bool,
     disableTestAgainstStream: PropTypes.bool,
@@ -77,6 +76,7 @@ class MessageDetail extends React.Component<Props, State> {
     disableSurroundingSearch: false,
     disableTestAgainstStream: false,
     expandAllRenderAsync: false,
+    fields: Immutable.List(),
     inputs: Immutable.Map(),
     message: {} as Message,
     searchConfig: {} as SearchesConfig,

@@ -26,6 +26,7 @@ type Props = {
   streams: Array<{ key: string, value: string }>,
   onChange: (newStreamIds: Array<string>) => void,
 };
+
 const StreamsFilter = ({ disabled, value, streams, onChange }: Props) => {
   const selectedStreams = value.join(',');
   const placeholder = 'Select streams the search should include. Searches in all streams if empty.';

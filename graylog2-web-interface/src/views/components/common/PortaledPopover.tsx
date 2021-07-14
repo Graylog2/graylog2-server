@@ -51,9 +51,10 @@ export default class PortaledPopover extends React.Component<Props, State> {
 
   private target: HTMLAnchorElement | undefined;
 
-  state = {
-    isOpen: false,
-  };
+  constructor(props: Readonly<Props>) {
+    super(props);
+    this.state = { isOpen: false };
+  }
 
   _onClick = () => this.setState((state) => ({ isOpen: !state.isOpen }));
 
