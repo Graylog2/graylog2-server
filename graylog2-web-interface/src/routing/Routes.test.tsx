@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import URI from 'urijs';
+
 import { AppConfigs } from 'util/AppConfig';
 
 let Routes;

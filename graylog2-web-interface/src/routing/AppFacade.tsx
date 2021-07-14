@@ -22,7 +22,6 @@ import ServerUnavailablePage from 'pages/ServerUnavailablePage';
 import StoreProvider from 'injection/StoreProvider';
 import { useStore } from 'stores/connect';
 import LoginQueryClientProvider from 'contexts/LoginQueryClientProvider';
-
 import 'bootstrap/less/bootstrap.less';
 import 'toastr/toastr.less';
 import { Store } from 'stores/StoreTypes';

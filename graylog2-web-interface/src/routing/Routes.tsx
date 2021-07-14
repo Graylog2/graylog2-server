@@ -303,8 +303,8 @@ const unqualified = Routes;
 const pluginRoute = (routeKey, throwError = true) => {
   const pluginRoutes = {};
 
-  PluginStore.exports('routes').forEach((pluginRoute) => {
-    const uri = new URI(pluginRoute.path);
+  PluginStore.exports('routes').forEach((route) => {
+    const uri = new URI(route.path);
     const segments = uri.segment();
     const key = segments.map((segment) => segment.replace(':', '')).join('_').toUpperCase();
     const paramNames = segments.filter((segment) => segment.startsWith(':'));
@@ -323,7 +323,7 @@ const pluginRoute = (routeKey, throwError = true) => {
       return;
     }
 
-    pluginRoutes[key] = pluginRoute.path;
+    pluginRoutes[key] = route.path;
   });
 
   const route = (AppConfig.gl2AppPathPrefix() ? qualifyUrls(pluginRoutes, AppConfig.gl2AppPathPrefix()) : pluginRoutes)[routeKey];
