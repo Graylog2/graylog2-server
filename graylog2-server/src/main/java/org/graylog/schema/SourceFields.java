@@ -59,7 +59,7 @@ public class SourceFields {
     public static final String SOURCE_GEO_COUNTRY_NAME = SOURCE_PREFIX + GeoFields.GEO_COUNTRY_NAME;
     public static final String SOURCE_GEO_COORDINATES = SOURCE_PREFIX + GeoFields.GEO_COORDINATES;
     public static final String SOURCE_GEO_NAME = SOURCE_PREFIX + GeoFields.GEO_NAME;
-    public static final String SORUCE_GEO_STATE = SOURCE_PREFIX + GeoFields.GEO_STATE;
+    public static final String SOURCE_GEO_STATE = SOURCE_PREFIX + GeoFields.GEO_STATE;
 
     // User Fields
     public static final String SOURCE_USER = SOURCE_PREFIX + UserFields.USER;
