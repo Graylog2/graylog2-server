@@ -78,8 +78,6 @@ class AddDecoratorButton extends React.Component<Props, State> {
     stream: null,
   };
 
-  private readonly PLACEHOLDER: string = 'Please select decorator';
-
   private configurationForm: any;
 
   constructor(props: Props) {
@@ -105,7 +103,7 @@ class AddDecoratorButton extends React.Component<Props, State> {
     };
 
     onCreate(request);
-    this.setState({ typeName: this.PLACEHOLDER });
+    this.setState({ typeName: undefined });
   };
 
   _openModal = () => this.configurationForm.open();
@@ -128,7 +126,7 @@ class AddDecoratorButton extends React.Component<Props, State> {
 
     const decoratorTypeOptions = jQuery.map(decoratorTypes, this._formatDecoratorType);
     const wrapperComponent = InlineForm();
-    const configurationForm = (typeName !== this.PLACEHOLDER
+    const configurationForm = (typeName !== undefined
       ? (
         <ConfigurationForm ref={(elem) => { this.configurationForm = elem; }}
                            key="configuration-form-output"
