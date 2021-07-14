@@ -69,18 +69,4 @@ const AppFacade = () => {
   return <LoggedInPage />;
 };
 
-AppFacade.propTypes = {
-  currentUser: PropTypes.object,
-  server: PropTypes.shape({
-    up: PropTypes.bool,
-  }),
-  sessionId: PropTypes.string,
-};
-
-AppFacade.defaultProps = {
-  currentUser: undefined,
-  server: undefined,
-  sessionId: undefined,
-};
-
 export default AppFacade;
