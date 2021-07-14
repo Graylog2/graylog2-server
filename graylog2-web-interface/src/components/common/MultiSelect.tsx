@@ -15,17 +15,24 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-
 import Select from 'components/common/Select';
+
+type Props = React.ComponentProps<typeof Select>;
 
 /**
  * Component that wraps and render a `Select` where multiple options can be selected. It passes all
  * props to the underlying `Select` component, so please look there to find more information about them.
  */
-const MultiSelect = ({ onChange, ...rest }) => {
-  return <Select multi {...rest} />;
-};
+class MultiSelect extends React.Component<Props> {
+  _select = undefined;
 
-MultiSelect.propTypes = Select.propTypes;
+  getValue = () => {
+    return this._select.getValue();
+  };
 
-return MultiSelect;
+  render() {
+    return <Select ref={(c) => { this._select = c; }} multi {...this.props} />;
+  }
+}
+
+export default MultiSelect;
