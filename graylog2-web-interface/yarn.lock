@@ -2549,6 +2549,9 @@
   version "0.32.25"
   resolved "https://registry.yarnpkg.com/@types/react-bootstrap/-/react-bootstrap-0.32.25.tgz#fdea798f9a2623a161ed61939898078ae841df1e"
   integrity sha512-VTa6viz5L+uPblEiF2pZz/n425cC49hrjLTsiLySxf7fw+UkchkjpskrsOHRvC6cCgCAG9futRWvOOjD1IBQqQ==
+  dependencies:
+    "@types/react" "*"
+
 "@types/react-dom@*":
   version "17.0.8"
   resolved "https://registry.yarnpkg.com/@types/react-dom/-/react-dom-17.0.8.tgz#3180de6d79bf53762001ad854e3ce49f36dd71fc"
@@ -2598,10 +2601,27 @@
     "@types/history" "*"
     "@types/react" "*"
 
+"@types/react-select@^4.0.15":
+  version "4.0.17"
+  resolved "https://registry.yarnpkg.com/@types/react-select/-/react-select-4.0.17.tgz#2e5ab4042c09c988bfc2711550329b0c3c9f8513"
+  integrity sha512-ZK5wcBhJaqC8ntQl0CJvK2KXNNsk1k5flM7jO+vNPPlceRzdJQazA6zTtQUyNr6exp5yrAiwiudtYxgGlgGHLg==
+  dependencies:
+    "@emotion/serialize" "^1.0.0"
+    "@types/react" "*"
+    "@types/react-dom" "*"
+    "@types/react-transition-group" "*"
+
 "@types/react-test-renderer@>=16.9.0":
   version "17.0.1"
   resolved "https://registry.yarnpkg.com/@types/react-test-renderer/-/react-test-renderer-17.0.1.tgz#3120f7d1c157fba9df0118dae20cb0297ee0e06b"
   integrity sha512-3Fi2O6Zzq/f3QR9dRnlnHso9bMl7weKCviFmfF6B4LS1Uat6Hkm15k0ZAQuDz+UBq6B3+g+NM6IT2nr5QgPzCw==
+  dependencies:
+    "@types/react" "*"
+
+"@types/react-transition-group@*":
+  version "4.4.2"
+  resolved "https://registry.yarnpkg.com/@types/react-transition-group/-/react-transition-group-4.4.2.tgz#38890fd9db68bf1f2252b99a942998dc7877c5b3"
+  integrity sha512-KibDWL6nshuOJ0fu8ll7QnV/LVTo3PzQ9aCPnRUYPfX7eZohHwLIdNHj7pftanREzHNP4/nJa8oeM73uSiavMQ==
   dependencies:
     "@types/react" "*"
 
@@ -8629,11 +8649,19 @@ graceful-fs@^4.2.4:
     "@babel/preset-env" "7.13.10"
     "@babel/preset-typescript" "7.13.0"
     create-react-class "15.7.0"
+<<<<<<< HEAD
     eslint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.2.0-SNAPSHOT-b68054fe-143a-4cf7-a307-e7ab414da33c-1625832678756/node_modules/eslint-config-graylog"
     formik "2.2.6"
     html-webpack-plugin "^4.2.0"
     javascript-natural-sort "0.7.1"
     jest-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.2.0-SNAPSHOT-b68054fe-143a-4cf7-a307-e7ab414da33c-1625832678756/node_modules/jest-preset-graylog"
+=======
+    eslint-config-graylog "file:../../../../Library/Caches/Yarn/v6/npm-graylog-web-plugin-4.2.0-SNAPSHOT-92ec73a8-879b-4ab0-a55f-beaa3cb68124-1626179112802/node_modules/eslint-config-graylog"
+    formik "2.2.6"
+    html-webpack-plugin "^4.2.0"
+    javascript-natural-sort "0.7.1"
+    jest-preset-graylog "file:../../../../Library/Caches/Yarn/v6/npm-graylog-web-plugin-4.2.0-SNAPSHOT-92ec73a8-879b-4ab0-a55f-beaa3cb68124-1626179112802/node_modules/jest-preset-graylog"
+>>>>>>> da00185edc (Updating yarn.lock.)
     jquery "3.5.1"
     moment "2.29.1"
     moment-timezone "0.5.31"
@@ -8647,7 +8675,11 @@ graceful-fs@^4.2.4:
     react-router-dom "5.2.0"
     reflux "0.2.13"
     styled-components "5.2.3"
+<<<<<<< HEAD
     stylelint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.2.0-SNAPSHOT-b68054fe-143a-4cf7-a307-e7ab414da33c-1625832678756/node_modules/stylelint-config-graylog"
+=======
+    stylelint-config-graylog "file:../../../../Library/Caches/Yarn/v6/npm-graylog-web-plugin-4.2.0-SNAPSHOT-92ec73a8-879b-4ab0-a55f-beaa3cb68124-1626179112802/node_modules/stylelint-config-graylog"
+>>>>>>> da00185edc (Updating yarn.lock.)
     typescript "4.3.2"
     webpack "4.44.2"
     webpack-cleanup-plugin "0.5.1"
