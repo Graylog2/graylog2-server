@@ -25,10 +25,12 @@ public class HostFields {
     public static final String HOST_IPV6 = "host_ipv6";
     public static final String HOST_MAC = "host_mac";
     public static final String HOST_REFERENCE = "host_reference";
+    public static final String HOST_REGION = "host_region";
     public static final String HOST_TYPE_VERSION = "host_type_version";
     public static final String HOST_VIRTFW_HOSTNAME = "host_virtfw_hostname";
     public static final String HOST_VIRTFW_ID = "host_virtfw_id";
     public static final String HOST_VIRTFW_UID = "host_virtfw_uid";
+    public static final String HOST_VM_NAME = "host_vm_name";
 
     // Derived and Enriched Fields
     public static final String HOST_CATEGORY = "host_category";
@@ -44,10 +46,17 @@ public class HostFields {
     public static final String HOST_AS_ORGANIZATION = HOST_PREFIX + AutonomousSystemFields.AS_ORGANIZATION;
 
     // Geo Fields
-    public static final String HOST_GEO_CITY_NAME = HOST_PREFIX + GeoFields.GEO_CITY_NAME;
+    public static final String HOST_GEO_CITY = HOST_PREFIX + GeoFields.GEO_CITY;
+    public static final String HOST_GEO_CONTINENT = HOST_PREFIX + GeoFields.GEO_CONTINENT;
     public static final String HOST_GEO_COUNTRY_ISO = HOST_PREFIX + GeoFields.GEO_COUNTRY_ISO;
     public static final String HOST_GEO_COUNTRY_NAME = HOST_PREFIX + GeoFields.GEO_COUNTRY_NAME;
     public static final String HOST_GEO_COORDINATES = HOST_PREFIX + GeoFields.GEO_COORDINATES;
     public static final String HOST_GEO_NAME = HOST_PREFIX + GeoFields.GEO_NAME;
+    public static final String HOST_GEO_STATE = HOST_PREFIX + GeoFields.GEO_STATE;
+
+    // To be removed
+    @Deprecated
+    public static final String HOST_GEO_CITY_NAME = HOST_PREFIX + GeoFields.GEO_CITY_NAME;
+    @Deprecated
     public static final String HOST_GEO_STATE_NAME = HOST_PREFIX + GeoFields.GEO_STATE_NAME;
 }
