@@ -95,7 +95,6 @@ const ShowMessagePage = ({ params: { index, messageId } }: Props) => {
                              streams={streams}
                              allStreams={allStreams}
                              disableSurroundingSearch
-                             disableFieldActions
                              inputs={inputs}
                              message={message} />
             </InteractiveContext.Provider>
