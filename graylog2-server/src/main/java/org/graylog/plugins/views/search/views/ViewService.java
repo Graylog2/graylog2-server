@@ -66,11 +66,13 @@ public class ViewService extends PaginatedDbService<ViewDTO> {
 
     private PaginatedList<ViewDTO> searchPaginated(DBQuery.Query query,
                                                    Predicate<ViewDTO> filter,
+                                                   DBQuery.Query grandTotalQuery,
                                                    String order,
                                                    String sortField,
                                                    int page,
                                                    int perPage) {
-        final PaginatedList<ViewDTO> viewsList = findPaginatedWithQueryFilterAndSort(query, filter, getSortBuilder(order, sortField), page, perPage);
+        final PaginatedList<ViewDTO> viewsList = findPaginatedWithQueryFilterAndSortWithGrandTotalQuery(
+                query, filter, getSortBuilder(order, sortField), grandTotalQuery, page, perPage);
         return viewsList.stream()
                 .map(this::requirementsForView)
                 .collect(Collectors.toCollection(() -> viewsList.grandTotal()
@@ -84,7 +86,7 @@ public class ViewService extends PaginatedDbService<ViewDTO> {
                                                   String sortField,
                                                   int page,
                                                   int perPage) {
-        return searchPaginated(query.toDBQuery(), filter, order, sortField, page, perPage);
+        return searchPaginated(query.toDBQuery(), filter, DBQuery.empty(), order, sortField, page, perPage);
     }
 
     public PaginatedList<ViewDTO> searchPaginatedByType(ViewDTO.Type type,
@@ -101,6 +103,7 @@ public class ViewService extends PaginatedDbService<ViewDTO> {
                         query.toDBQuery()
                 ),
                 filter,
+                DBQuery.or(DBQuery.is(ViewDTO.FIELD_TYPE, type), DBQuery.notExists(ViewDTO.FIELD_TYPE)),
                 order,
                 sortField,
                 page,
