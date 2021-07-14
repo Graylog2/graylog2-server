@@ -130,6 +130,7 @@ public abstract class CmdLineTool implements CliCommand {
 
     protected Injector injector;
     protected Injector coreConfigInjector;
+    protected FeatureFlags featureFlags;
 
     protected CmdLineTool(BaseConfiguration configuration) {
         this(null, configuration);
@@ -236,6 +237,8 @@ public abstract class CmdLineTool implements CliCommand {
             dumpDefaultConfigAndExit();
         }
 
+        featureFlags = getFeatureFlags();
+
         installConfigRepositories();
         installCommandConfig();
 
@@ -247,8 +250,6 @@ public abstract class CmdLineTool implements CliCommand {
         coreConfigInjector = setupCoreConfigInjector();
 
         final Set<Plugin> plugins = loadPlugins(getPluginPath(configFile), chainingClassLoader);
-
-        FeatureFlags featureFlags = getFeatureFlags();
 
         installPluginConfig(plugins);
         processConfiguration(jadConfig);
@@ -266,12 +267,7 @@ public abstract class CmdLineTool implements CliCommand {
         final List<String> arguments = ManagementFactory.getRuntimeMXBean().getInputArguments();
         LOG.info("Running with JVM arguments: {}", Joiner.on(' ').join(arguments));
 
-        injector = setupInjector(new NamedConfigParametersModule(jadConfig.getConfigurationBeans()),
-                new PluginBindings(plugins),
-                binder -> {
-                    binder.bind(ChainingClassLoader.class).toInstance(chainingClassLoader);
-                    binder.bind(FeatureFlags.class).toInstance(featureFlags);
-                });
+        injector = setupInjector(new NamedConfigParametersModule(jadConfig.getConfigurationBeans()), new PluginBindings(plugins));
 
         if (injector == null) {
             LOG.error("Injector could not be created, exiting! (Please include the previous error messages in bug " +
@@ -449,16 +445,18 @@ public abstract class CmdLineTool implements CliCommand {
         return Lists.newArrayList();
     }
 
-    protected Injector setupInjector(NamedConfigParametersModule configModule, Module... otherModules) {
+    protected Injector setupInjector(Module... modules) {
         try {
-            final ImmutableList.Builder<Module> modules = ImmutableList.builder();
-            modules.add(configModule);
-            modules.addAll(getSharedBindingsModules());
-            modules.addAll(getCommandBindings());
-            modules.addAll(Arrays.asList(otherModules));
-            modules.add(binder -> binder.bind(String.class).annotatedWith(Names.named("BootstrapCommand")).toInstance(commandName));
-
-            return GuiceInjectorHolder.createInjector(modules.build());
+            final ImmutableList.Builder<Module> builder = ImmutableList.builder();
+            builder.addAll(getSharedBindingsModules());
+            builder.addAll(getCommandBindings());
+            builder.addAll(Arrays.asList(modules));
+            builder.add(binder -> {
+                binder.bind(ChainingClassLoader.class).toInstance(chainingClassLoader);
+                featureFlagsBinding(binder);
+                binder.bind(String.class).annotatedWith(Names.named("BootstrapCommand")).toInstance(commandName);
+            });
+            return GuiceInjectorHolder.createInjector(builder.build());
         } catch (CreationException e) {
             annotateInjectorCreationException(e);
             return null;
@@ -479,7 +477,7 @@ public abstract class CmdLineTool implements CliCommand {
         Injector coreConfigInjector = null;
         try {
             coreConfigInjector = Guice.createInjector(Stage.PRODUCTION, ImmutableList.of(configModule,
-                    (Module) Binder::requireExplicitBindings));
+                    (Module) Binder::requireExplicitBindings, this::featureFlagsBinding));
         } catch (CreationException e) {
             annotateInjectorCreationException(e);
         } catch (Exception e) {
@@ -492,6 +490,10 @@ public abstract class CmdLineTool implements CliCommand {
             System.exit(1);
         }
         return coreConfigInjector;
+    }
+
+    private void featureFlagsBinding(Binder binder) {
+        binder.bind(FeatureFlags.class).toInstance(featureFlags);
     }
 
     protected void annotateInjectorCreationException(CreationException e) {
