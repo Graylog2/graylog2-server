@@ -59,8 +59,9 @@ export default class PortaledPopover extends React.Component<Props, State> {
   _onClick = () => this.setState((state) => ({ isOpen: !state.isOpen }));
 
   render() {
-    const { container, popover, title, ...rest } = this.props;
-    const popoverElem = this.state.isOpen && (
+    const { children, container, popover, title, ...rest } = this.props;
+    const { isOpen } = this.state;
+    const popoverElem = isOpen && (
       <Portal node={container}>
         <Position container={container}
                   placement="bottom"
@@ -81,7 +82,7 @@ export default class PortaledPopover extends React.Component<Props, State> {
            }}
            {...rest}
            onClick={this._onClick}>
-          {this.props.children}
+          {children}
         </a>
         {popoverElem}
       </span>
