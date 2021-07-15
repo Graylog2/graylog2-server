@@ -32,7 +32,9 @@ public class SourceFields {
     public static final String SOURCE_OS_VERSION = "source_os_version";
     public static final String SOURCE_PACKETS_SENT = "source_packets_sent";
     public static final String SOURCE_PORT = "source_port";
+    public static final String SOURCE_REGION = "source_region";
     public static final String SOURCE_TYPE = "source_type";
+    public static final String SOURCE_VM_NAME = "source_vm_name";
     public static final String SOURCE_VSYS_UUID = "source_vsys_uuid";
     public static final String SOURCE_ZONE = "source_zone";
 
@@ -51,12 +53,13 @@ public class SourceFields {
     public static final String SOURCE_AS_ORGANIZATION = SOURCE_PREFIX + AutonomousSystemFields.AS_ORGANIZATION;
 
     // Geo Fields
-    public static final String SOURCE_GEO_CITY_NAME = SOURCE_PREFIX + GeoFields.GEO_CITY_NAME;
+    public static final String SOURCE_GEO_CITY = SOURCE_PREFIX + GeoFields.GEO_CITY;
+    public static final String SOURCE_GEO_CONTINENT = SOURCE_PREFIX + GeoFields.GEO_CONTINENT;
     public static final String SOURCE_GEO_COUNTRY_ISO = SOURCE_PREFIX + GeoFields.GEO_COUNTRY_ISO;
     public static final String SOURCE_GEO_COUNTRY_NAME = SOURCE_PREFIX + GeoFields.GEO_COUNTRY_NAME;
     public static final String SOURCE_GEO_COORDINATES = SOURCE_PREFIX + GeoFields.GEO_COORDINATES;
     public static final String SOURCE_GEO_NAME = SOURCE_PREFIX + GeoFields.GEO_NAME;
-    public static final String SOURCE_GEO_STATE_NAME = SOURCE_PREFIX + GeoFields.GEO_STATE_NAME;
+    public static final String SOURCE_GEO_STATE = SOURCE_PREFIX + GeoFields.GEO_STATE;
 
     // User Fields
     public static final String SOURCE_USER = SOURCE_PREFIX + UserFields.USER;
@@ -68,4 +71,8 @@ public class SourceFields {
     public static final String SOURCE_PACKETS = SOURCE_PACKETS_SENT;
     @Deprecated
     public static final String SOURCE_AS_ORGANIZATION_NAME = SOURCE_PREFIX + AutonomousSystemFields.AS_ORGANIZATION;
+    @Deprecated
+    public static final String SOURCE_GEO_CITY_NAME = SOURCE_PREFIX + GeoFields.GEO_CITY_NAME;
+    @Deprecated
+    public static final String SOURCE_GEO_STATE_NAME = SOURCE_PREFIX + GeoFields.GEO_STATE_NAME;
 }
