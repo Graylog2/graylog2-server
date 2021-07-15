@@ -60,7 +60,7 @@ const WidgetTopRow = styled(Row)`
 `;
 
 type Props = {
-  availableStreams: Array<any>,
+  availableStreams: Array<{ key: string, value: string }>,
   globalOverride: GlobalOverride | undefined | null,
 };
 

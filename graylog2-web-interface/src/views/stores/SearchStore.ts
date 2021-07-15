@@ -139,8 +139,6 @@ export const SearchStore: Store<SearchStoreState> = singletonStore(
     },
 
     trackJobStatus(job: SearchJobResult, search: Search) {
-      console.log({ job });
-
       return new Bluebird((resolve) => {
         if (job && job.execution.done) {
           return resolve(new SearchResult(job));

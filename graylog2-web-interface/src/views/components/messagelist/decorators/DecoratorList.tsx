@@ -31,7 +31,7 @@ const AlertContainer = styled.div`
 type ReorderedItems = Array<{ id: string }>;
 type DecoratorSummary = {
   id: string,
-  order: number,
+  order?: number,
   title: React.ReactElement,
 };
 type Props = {
