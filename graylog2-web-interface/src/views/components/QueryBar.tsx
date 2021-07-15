@@ -37,9 +37,7 @@ import QueryTabs from './QueryTabs';
 
 const onTitleChange = (queryId, newTitle) => TitlesActions.set('tab', 'title', newTitle);
 
-const onSelectQuery = (queryId) => (queryId === 'new' ? NewQueryActionHandler() : ViewActions.selectQuery(queryId));
-
-const onCloseTab = (queryId: string, currentQuery: string, queries: Immutable.OrderedSet<string>, setDashboardPage: (page: string | undefined) => void) => {
+const onCloseTab = (queryId: string, currentQuery: string, queries: Immutable.OrderedSet<string>, setDashboardPage: (page: string) => void) => {
   if (queries.size === 1) {
     return Promise.resolve();
   }
@@ -68,9 +66,17 @@ const QueryBar = ({ queries, queryTitles, viewMetadata }: Props) => {
   const { setDashboardPage } = useContext(DashboardPageContext);
 
   const onSelectPage = useCallback((pageId) => {
+    if (pageId === 'new') {
+      return NewQueryActionHandler().then((newPage) => {
+        setDashboardPage(newPage.id);
+
+        return newPage;
+      });
+    }
+
     setDashboardPage(pageId);
 
-    return onSelectQuery(pageId);
+    return ViewActions.selectQuery(pageId);
   }, [setDashboardPage]);
 
   const onRemove = useCallback((queryId) => onCloseTab(queryId, activeQuery, queries, setDashboardPage), [activeQuery, queries, setDashboardPage]);

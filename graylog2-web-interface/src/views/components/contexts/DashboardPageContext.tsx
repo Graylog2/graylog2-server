@@ -30,6 +30,6 @@ const defaultContext = {
   unsetDashboardPage: () => undefined,
 };
 
-const DashboardPage = React.createContext<DashboardPageContextType>(defaultContext);
+const DashboardPageContext = React.createContext<DashboardPageContextType>(defaultContext);
 
-export default singleton('contexts.DashboardPage', () => DashboardPage);
+export default singleton('contexts.DashboardPage', () => DashboardPageContext);
