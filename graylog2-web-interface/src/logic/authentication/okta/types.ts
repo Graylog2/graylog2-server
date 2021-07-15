@@ -20,8 +20,8 @@ import * as Immutable from 'immutable';
 import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
 
 export interface OktaBackendConfig {
-  type: 'okta';
-  oktaBaseUrl: string;
+  type: string;
+  baseUrl: string;
   clientId: string;
   clientSecret: string;
   tokenVerifierConnectTimeout: string;
@@ -29,13 +29,14 @@ export interface OktaBackendConfig {
 }
 
 export interface OktaBackendConfigJson {
-  type: 'okta';
+  type: string;
   base_url: string;
   client_id: string;
   client_secret: string;
   token_verifier_connect_timeout: string;
   callback_url: string;
 }
+
 export interface OktaTeamSyncConfig {
   teamSelectionType?: 'all' | 'include' | 'exclude',
   teamSelection?: Immutable.Set<string>,
