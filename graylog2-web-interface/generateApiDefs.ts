@@ -37,6 +37,23 @@ const stripURN = (type) => {
 const isMappedType = (type) => Object.keys(typeMappings).includes(type);
 const mapType = (type) => typeMappings[type];
 
+const isEnumType = (propDef) => propDef.enum !== undefined;
+
+const creatorForType = (type) => {
+  switch (type) {
+    case 'number': return (number) => ts.factory.createNumericLiteral(number);
+    default: return (text) => ts.factory.createStringLiteral(text, true);
+  }
+};
+
+const createEnumType = ({ type, enum: enumOptions }) => {
+  const mappedPrimitiveType = mapPrimitiveType(type);
+  const creator = creatorForType(mappedPrimitiveType);
+  const types = enumOptions.map((option) => creator(option));
+
+  return ts.factory.createUnionTypeNode(types);
+};
+
 const createTypeFor = (propDef) => {
   const { type, ...rest } = propDef;
 
@@ -57,7 +74,7 @@ const createTypeFor = (propDef) => {
   }
 
   if (isPrimitiveType(type)) {
-    return ts.factory.createTypeReferenceNode(mapPrimitiveType(type));
+    return isEnumType(propDef) ? createEnumType(propDef) : ts.factory.createTypeReferenceNode(mapPrimitiveType(type));
   }
 
   return ts.factory.createTypeReferenceNode(type);
