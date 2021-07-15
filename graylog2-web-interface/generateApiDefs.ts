@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 // import * as ts from 'typescript';
 
 const fs = require('fs');
@@ -79,7 +80,6 @@ const createModel = ([name, definition]) => ts.factory.createInterfaceDeclaratio
   name,
   undefined,
   undefined,
-  // @ts-ignore
   createProps(definition.properties),
 );
 
@@ -89,10 +89,10 @@ const createResultTypeFor = (typeNode) => ts.factory.createTypeReferenceNode('Pr
 
 // === Functions === //
 
-const extractVariable = (segment) => segment.replace(/[\{\}]/g, '');
+const extractVariable = (segment) => segment.replace(/[{}]/g, '');
 
 const createTemplateString = (path) => {
-  const segments = path.split(/(\{.+?\})/);
+  const segments = path.split(/({.+?})/);
 
   if (segments.length === 1) {
     return ts.factory.createStringLiteral(path);
@@ -173,7 +173,13 @@ const createFunctionParameter = ({ name, required, defaultValue, type, paramType
 
 const firstNonEmpty = (...strings) => strings.find((s) => (s !== undefined && s.trim() !== ''));
 
-const createRoute = ({ nickname, parameters = [], method, type, path: operationPath, summary, produces }, path) => {
+const deriveNameFromParameters = (functionName, parameters) => {
+  const joinedParameters = parameters.map(({ name }) => name).join('And');
+
+  return `${functionName}By${joinedParameters}`;
+};
+
+const createRoute = ({ nickname, parameters = [], method, type, path: operationPath, summary, produces }, path, assignedNames) => {
   const queryParameters = parameters.filter((parameter) => parameter.paramType === 'query');
   const bodyParameter = parameters.filter((parameter) => parameter.paramType === 'body');
 
@@ -183,29 +189,49 @@ const createRoute = ({ nickname, parameters = [], method, type, path: operationP
         .map((p) => ts.factory.createJSDocParameterTag(undefined, ts.factory.createIdentifier(p.name), undefined, undefined, undefined, p.description)),
     ));
 
-  return [
-    jsDoc,
-    ts.factory.createFunctionDeclaration(
-      undefined,
-      [ts.factory.createToken(ts.SyntaxKind.ExportKeyword)],
-      undefined,
-      ts.factory.createIdentifier(nickname),
-      undefined,
-      parameters.map(createFunctionParameter),
-      createResultTypeFor(createTypeFor({ type })),
-      createBlock(method, firstNonEmpty(operationPath, path) || '/', bodyParameter[0], queryParameters, produces),
-    )];
+  const functionName = assignedNames.includes(nickname)
+    ? deriveNameFromParameters(nickname, parameters)
+    : nickname;
+
+  return {
+    name: functionName,
+    nodes: [
+      jsDoc,
+      ts.factory.createFunctionDeclaration(
+        undefined,
+        [ts.factory.createToken(ts.SyntaxKind.ExportKeyword)],
+        undefined,
+        ts.factory.createIdentifier(functionName),
+        undefined,
+        parameters.map(createFunctionParameter),
+        createResultTypeFor(createTypeFor({ type })),
+        createBlock(method, firstNonEmpty(operationPath, path) || '/', bodyParameter[0], queryParameters, produces),
+      )],
+  };
 };
 
-const createRoutes = (api) => {
+const createRoutes = (api, alreadyAssigned) => {
   const { operations, path } = api;
-  const createRouteWithDefaultPath = (operation) => createRoute(operation, path);
+  const createRouteWithDefaultPath = (operation, assignedNames) => createRoute(operation, path, assignedNames);
 
-  return operations.flatMap(createRouteWithDefaultPath);
+  return operations.reduce((prev, cur) => {
+    const assigned = [...alreadyAssigned, ...prev.map(({ name }) => name)];
+    const newOperation = createRouteWithDefaultPath(cur, assigned);
+
+    return [...prev, newOperation];
+  }, []);
 };
 
-const createApiObject = (api, name) => {
-  return api.apis.flatMap(createRoutes);
+const createApiObject = (api) => {
+  const result = api.apis.reduce((prev, cur) => {
+    const assignedNames = prev.map(({ name }) => name);
+
+    const genRoutes = createRoutes(cur, assignedNames);
+
+    return [...prev, ...genRoutes];
+  }, []);
+
+  return result.flatMap(({ nodes }) => nodes);
 };
 
 const importDeclaration = ts.factory.createImportDeclaration(
@@ -233,7 +259,7 @@ apiSummary.apis.forEach(({ path, name: rawName }) => {
   const api = JSON.parse(apiJson);
 
   const models = Object.entries(api.models).map(createModel);
-  const apiObject = createApiObject(api, name);
+  const apiObject = createApiObject(api);
 
   const rootNode = ts.factory.createNodeArray([importDeclaration, ...models, ...apiObject]);
 
