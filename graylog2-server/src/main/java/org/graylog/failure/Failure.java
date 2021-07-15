@@ -36,7 +36,6 @@ public interface Failure {
 
     String failedMessageId();
 
-    //TODO: examine the type of this "getter"
     Indexable failedMessage();
 
     @Nullable
