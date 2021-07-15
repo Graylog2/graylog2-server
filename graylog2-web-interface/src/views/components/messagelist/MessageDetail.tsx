@@ -18,6 +18,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import Immutable from 'immutable';
 import { PluginStore } from 'graylog-web-plugin/plugin';
+import ImmutablePropTypes from 'react-immutable-proptypes';
 
 import { Link } from 'components/graylog/router';
 import { Col, Label, Row } from 'components/graylog';
@@ -26,39 +27,61 @@ import { MessageFields } from 'views/components/messagelist';
 import MessageDetailsTitle from 'components/search/MessageDetailsTitle';
 import { Icon, Spinner, Timestamp } from 'components/common';
 import Routes from 'routing/Routes';
+import { SearchesConfig } from 'components/search/SearchConfig';
+import { Message } from 'views/components/messagelist/Types';
+import { Input } from 'components/messageloaders/Types';
+import { Stream } from 'views/stores/StreamsStore';
+import CustomPropTypes from 'views/components/CustomPropTypes';
+import { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 
-import MessageActions from './MessageActions';
-import MessageMetadata from './MessageMetadata';
 import NodeName from './NodeName';
+import MessageMetadata from './MessageMetadata';
+import MessageActions from './MessageActions';
 
-class MessageDetail extends React.Component {
+type Props = {
+  allStreams?: Immutable.List<Stream>,
+  disableMessageActions?: boolean,
+  disableSurroundingSearch?: boolean,
+  disableTestAgainstStream?: boolean,
+  expandAllRenderAsync?: boolean,
+  fields: FieldTypeMappingsList,
+  inputs?: Immutable.Map<string, Input>,
+  message?: Message,
+  searchConfig?: SearchesConfig,
+  showTimestamp?: boolean,
+  streams?: Immutable.Map<string, Stream>,
+};
+type State = {
+  showOriginal: boolean,
+};
+
+class MessageDetail extends React.Component<Props, State> {
   static propTypes = {
-    allStreams: PropTypes.object,
-    disableFieldActions: PropTypes.bool,
+    allStreams: ImmutablePropTypes.list,
     disableMessageActions: PropTypes.bool,
     disableSurroundingSearch: PropTypes.bool,
     disableTestAgainstStream: PropTypes.bool,
     expandAllRenderAsync: PropTypes.bool,
-    fields: PropTypes.object.isRequired,
-    inputs: PropTypes.object,
-    message: PropTypes.object,
-    searchConfig: PropTypes.object,
+    fields: ImmutablePropTypes.list,
+    inputs: ImmutablePropTypes.map,
+    message: CustomPropTypes.Message,
+    searchConfig: PropTypes.any,
     showTimestamp: PropTypes.bool,
-    streams: PropTypes.object,
+    streams: ImmutablePropTypes.map,
   };
 
-  static defaultProps = {
-    allStreams: {},
-    disableFieldActions: false,
+  static defaultProps: Partial<Props> = {
+    allStreams: Immutable.List(),
     disableMessageActions: false,
     disableSurroundingSearch: false,
     disableTestAgainstStream: false,
     expandAllRenderAsync: false,
-    inputs: {},
-    message: {},
-    searchConfig: {},
+    fields: Immutable.List(),
+    inputs: Immutable.Map(),
+    message: {} as Message,
+    searchConfig: {} as SearchesConfig,
     showTimestamp: true,
-    streams: {},
+    streams: Immutable.Map(),
   };
 
   constructor(props) {
@@ -120,7 +143,6 @@ class MessageDetail extends React.Component {
       message,
       fields: messageFields,
       allStreams,
-      disableFieldActions,
       disableMessageActions,
       disableSurroundingSearch,
       disableTestAgainstStream,
@@ -141,7 +163,7 @@ class MessageDetail extends React.Component {
       );
     }
 
-    const streamIds = Immutable.Set(fields.streams);
+    const streamIds = Immutable.Set(fields.streams as Array<string>);
     const streams = streamIds.map((streamId) => {
       // eslint-disable-next-line react/destructuring-assignment
       const stream = this.props.streams.get(streamId);
@@ -151,7 +173,7 @@ class MessageDetail extends React.Component {
       }
 
       return null;
-    });
+    }).toSet();
 
     let timestamp = null;
 
@@ -199,9 +221,7 @@ class MessageDetail extends React.Component {
           </Col>
           <Col md={9}>
             <MessageFields message={message}
-                           fields={messageFields}
-                           disableFieldActions={disableFieldActions}
-                           showDecoration={showOriginal} />
+                           fields={messageFields} />
           </Col>
         </Row>
       </>

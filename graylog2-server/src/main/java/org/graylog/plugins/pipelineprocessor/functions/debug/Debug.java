@@ -30,7 +30,7 @@ public class Debug extends AbstractFunction<Void> {
 
     public static final String NAME = "debug";
 
-    Debug() {
+    public Debug() {
         valueParam = ParameterDescriptor.object("value").description("The value to print in the graylog-server log.").build();
     }
 

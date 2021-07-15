@@ -23,7 +23,17 @@ import { Popover } from 'components/graylog';
 
 import CustomPropTypes from '../CustomPropTypes';
 
-export default class PortaledPopover extends React.Component {
+type Props = {
+  children: React.ReactNode,
+  container?: any,
+  popover: React.ReactElement,
+  title?: string,
+};
+type State = {
+  isOpen: boolean,
+};
+
+export default class PortaledPopover extends React.Component<Props, State> {
   static propTypes = {
     children: PropTypes.oneOfType([
       CustomPropTypes.OneOrMoreChildren,
@@ -39,15 +49,19 @@ export default class PortaledPopover extends React.Component {
     title: null,
   };
 
-  state = {
-    isOpen: false,
-  };
+  private target: HTMLAnchorElement | undefined;
+
+  constructor(props: Readonly<Props>) {
+    super(props);
+    this.state = { isOpen: false };
+  }
 
   _onClick = () => this.setState((state) => ({ isOpen: !state.isOpen }));
 
   render() {
-    const { container, popover, title, ...rest } = this.props;
-    const popoverElem = this.state.isOpen && (
+    const { children, container, popover, title, ...rest } = this.props;
+    const { isOpen } = this.state;
+    const popoverElem = isOpen && (
       <Portal node={container}>
         <Position container={container}
                   placement="bottom"
@@ -68,7 +82,7 @@ export default class PortaledPopover extends React.Component {
            }}
            {...rest}
            onClick={this._onClick}>
-          {this.props.children}
+          {children}
         </a>
         {popoverElem}
       </span>

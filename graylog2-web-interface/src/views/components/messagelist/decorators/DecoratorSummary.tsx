@@ -19,13 +19,27 @@ import React from 'react';
 
 import { DropdownButton, MenuItem } from 'components/graylog';
 import { ConfigurationForm, ConfigurationWell } from 'components/configurationforms';
+import { Decorator } from 'views/logic/widgets/MessagesWidgetConfig';
+import type { DecoratorType } from 'views/components/messagelist/decorators/Types';
 
 import InlineForm from './InlineForm';
 
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import DecoratorStyles from '!style!css!./decoratorStyles.css';
 
-class DecoratorSummary extends React.Component {
+type Props = {
+  decorator: Decorator,
+  decoratorTypes: { [key: string]: DecoratorType },
+  disableMenu?: boolean,
+  typeDefinition: DecoratorType,
+  onDelete: (id: string) => void,
+  onUpdate: (id: string, decorator: Decorator) => void,
+};
+type State = {
+  editing: boolean,
+};
+
+class DecoratorSummary extends React.Component<Props, State> {
   static propTypes = {
     decorator: PropTypes.object.isRequired,
     decoratorTypes: PropTypes.object.isRequired,
@@ -39,7 +53,7 @@ class DecoratorSummary extends React.Component {
     disableMenu: false,
   };
 
-  constructor(props) {
+  constructor(props: Props) {
     super(props);
 
     this.state = {

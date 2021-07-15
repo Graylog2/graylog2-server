@@ -20,6 +20,8 @@ import React from 'react';
 import CombinedProvider from 'injection/CombinedProvider';
 import connect from 'stores/connect';
 import { Spinner } from 'components/common';
+import { Decorator } from 'views/logic/widgets/MessagesWidgetConfig';
+import { Store } from 'stores/StoreTypes';
 
 import AddDecoratorButton from './AddDecoratorButton';
 import DecoratorSummary from './DecoratorSummary';
@@ -30,7 +32,13 @@ import DecoratorStyles from '!style!css!./decoratorStyles.css';
 
 const { DecoratorsActions, DecoratorsStore } = CombinedProvider.get('Decorators');
 
-class DecoratorSidebar extends React.Component {
+type Props = {
+  decorators: Array<Decorator>,
+  decoratorTypes: {},
+  onChange: (decorators: Array<Decorator>) => void,
+};
+
+class DecoratorSidebar extends React.Component<Props> {
   static propTypes = {
     decorators: PropTypes.array.isRequired,
     decoratorTypes: PropTypes.object.isRequired,
@@ -41,7 +49,7 @@ class DecoratorSidebar extends React.Component {
     DecoratorsActions.available();
   }
 
-  _formatDecorator = (decorator) => {
+  _formatDecorator = (decorator: Decorator) => {
     const { decorators, decoratorTypes, onChange } = this.props;
     const typeDefinition = decoratorTypes[decorator.type] || { requested_configuration: {}, name: `Unknown type: ${decorator.type}` };
     const deleteDecorator = (decoratorId) => onChange(decorators.filter((_decorator) => _decorator.id !== decoratorId));
@@ -58,7 +66,7 @@ class DecoratorSidebar extends React.Component {
     });
   };
 
-  _updateOrder = (orderedDecorators) => {
+  _updateOrder = (orderedDecorators: Array<Decorator>) => {
     const { decorators, onChange } = this.props;
 
     orderedDecorators.forEach((item, idx) => {
@@ -82,17 +90,24 @@ class DecoratorSidebar extends React.Component {
     const nextDecoratorOrder = sortedDecorators.length > 0 ? sortedDecorators[sortedDecorators.length - 1].order + 1 : 0;
     const decoratorItems = sortedDecorators.map(this._formatDecorator);
 
-    const addDecorator = (decorator) => onChange([...decorators, decorator]);
+    const addDecorator = (decorator: Decorator) => onChange([...decorators, decorator]);
 
     return (
       <div>
         <AddDecoratorButton decoratorTypes={decoratorTypes} nextOrder={nextDecoratorOrder} onCreate={addDecorator} />
-        <div ref={(decoratorsContainer) => { this.decoratorsContainer = decoratorsContainer; }} className={DecoratorStyles.decoratorListContainer}>
-          <DecoratorList decorators={decoratorItems} onReorder={this._updateOrder} onChange={onChange} />
+        <div className={DecoratorStyles.decoratorListContainer}>
+          <DecoratorList decorators={decoratorItems} onReorder={this._updateOrder} />
         </div>
       </div>
     );
   }
 }
 
-export default connect(DecoratorSidebar, { decoratorStore: DecoratorsStore }, ({ decoratorStore: { types = {} } = {} }) => ({ decoratorTypes: types }));
+type DecoratorsStoreState = {
+  decorators: Array<Decorator>,
+  types: {},
+};
+
+export default connect(DecoratorSidebar,
+  { decoratorStore: DecoratorsStore as Store<DecoratorsStoreState> },
+  ({ decoratorStore: { types = {} } = {} }) => ({ decoratorTypes: types }));
