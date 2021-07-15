@@ -3,6 +3,7 @@
 const fs = require('fs');
 const { dirname } = require('path');
 
+const { chunk } = require('lodash');
 const ts = require('typescript');
 
 const createString = (s) => ts.factory.createStringLiteral(s, true);
@@ -88,7 +89,36 @@ const createResultTypeFor = (typeNode) => ts.factory.createTypeReferenceNode('Pr
 
 // === Functions === //
 
-const transformTemplate = (path) => path.replace(/{/g, '${');
+const extractVariable = (segment) => segment.replace(/[\{\}]/g, '');
+
+const createTemplateString = (path) => {
+  const segments = path.split(/(\{.+?\})/);
+
+  if (segments.length === 1) {
+    return ts.factory.createStringLiteral(path);
+  }
+
+  const headSegment = segments[0];
+  const headIsSpan = headSegment.startsWith('{');
+  const head = ts.factory.createTemplateHead(headIsSpan ? '' : headSegment);
+
+  const spanSegments = headIsSpan ? segments : segments.slice(1);
+
+  const chunks = chunk(spanSegments, 2);
+  const spans = chunks.flatMap(([variable, text], index) => {
+    const isLastChunk = index === chunks.length - 1;
+    const identifier = ts.factory.createIdentifier(extractVariable(variable));
+    const literalText = text || '';
+    const literal = isLastChunk ? ts.factory.createTemplateTail(literalText) : ts.factory.createTemplateMiddle(literalText);
+
+    return ts.factory.createTemplateSpan(identifier, literal);
+  });
+
+  return ts.factory.createTemplateExpression(
+    head,
+    spans,
+  );
+};
 
 const createBlock = (method, path, bodyParameter, queryParameter, rawProduces) => {
   const produces = rawProduces || [];
@@ -107,7 +137,7 @@ const createBlock = (method, path, bodyParameter, queryParameter, rawProduces) =
           undefined,
           [
             createString(method),
-            createString(transformTemplate(path)),
+            createTemplateString(path),
             bodyParameter ? ts.factory.createIdentifier('body') : ts.factory.createNull(),
             queryParameters,
             ts.factory.createObjectLiteralExpression(
