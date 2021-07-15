@@ -178,12 +178,14 @@ const createInitializer = (type, defaultValue) => (isNumeric(type)
   ? ts.factory.createNumericLiteral(defaultValue)
   : createString(defaultValue));
 
+const sortByOptionality = (parameter1, parameter2) => parameter2.required - parameter1.required;
+
 const createFunctionParameter = ({ name, required, defaultValue, type, paramType }) => ts.factory.createParameterDeclaration(
   undefined,
   undefined,
   undefined,
   paramType === 'body' ? 'body' : name,
-  required ? undefined : ts.factory.createToken(ts.SyntaxKind.QuestionToken),
+  (required || defaultValue) ? undefined : ts.factory.createToken(ts.SyntaxKind.QuestionToken),
   createTypeFor({ type }),
   defaultValue ? createInitializer(type, defaultValue) : undefined,
 );
@@ -228,7 +230,7 @@ const createRoute = ({ nickname, parameters = [], method, type, path: operationP
         undefined,
         ts.factory.createIdentifier(functionName),
         undefined,
-        parameters.map(createFunctionParameter),
+        parameters.sort(sortByOptionality).map(createFunctionParameter),
         createResultTypeFor(createTypeFor({ type })),
         createBlock(method, firstNonEmpty(operationPath, path) || '/', bodyParameter[0], queryParameters, produces),
       )],
