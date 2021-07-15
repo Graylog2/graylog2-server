@@ -16,9 +16,6 @@
  */
 package org.graylog2.indexer.messages;
 
-import com.codahale.metrics.Meter;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
 import com.github.rholder.retry.Attempt;
 import com.github.rholder.retry.RetryException;
@@ -30,7 +27,6 @@ import com.github.rholder.retry.WaitStrategy;
 import com.google.auto.value.AutoValue;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Sets;
-import de.huxhorn.sulky.ulid.ULID;
 import org.graylog.failure.Failure;
 import org.graylog.failure.FailureBatch;
 import org.graylog.failure.FailureSubmitService;
@@ -99,23 +95,16 @@ public class Messages {
     private final MessagesAdapter messagesAdapter;
     private final ProcessingStatusRecorder processingStatusRecorder;
     private final TrafficAccounting trafficAccounting;
-    private final ObjectMapper objectMapper;
-    private final ULID ulid;
 
     @Inject
     public Messages(TrafficAccounting trafficAccounting,
                     MessagesAdapter messagesAdapter,
                     ProcessingStatusRecorder processingStatusRecorder,
-                    FailureSubmitService failureSubmitService,
-                    // TODO user ObjectMapperProvider?
-                    ObjectMapper objectMapper,
-                    ULID ulid) {
+                    FailureSubmitService failureSubmitService) {
         this.trafficAccounting = trafficAccounting;
         this.messagesAdapter = messagesAdapter;
         this.processingStatusRecorder = processingStatusRecorder;
         this.failureSubmitService = failureSubmitService;
-        this.objectMapper = objectMapper;
-        this.ulid = ulid;
     }
 
     public ResultMessage get(String messageId, String index) throws DocumentNotFoundException, IOException {
@@ -284,7 +273,7 @@ public class Messages {
         }
 
         final List<Failure> indexingFailures = indexingErrors.stream()
-                .map((ie) -> ie.toFailure(objectMapper))
+                .map(IndexingError::toFailure)
                 .collect(Collectors.toList());
 
         try {
@@ -320,21 +309,16 @@ public class Messages {
             return create(message, index, ErrorType.Unknown, "");
         }
 
-        public Failure toFailure(ObjectMapper objectMapper) {
+        public Failure toFailure() {
             final Indexable message = message();
-            try {
-                final String messageJson = objectMapper.writeValueAsString(message.toElasticSearchObject(objectMapper, new Meter()));
-                return new IndexingFailure(
-                        message.getMessageId(),
-                        index(),
-                        errorType().toString(),
-                        errorMessage(),
-                        message.getTimestamp(),
-                        messageJson
-                );
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
+            return new IndexingFailure(
+                    message.getMessageId(),
+                    index(),
+                    errorType().toString(),
+                    errorMessage(),
+                    message.getTimestamp(),
+                    message
+            );
         }
     }
 }

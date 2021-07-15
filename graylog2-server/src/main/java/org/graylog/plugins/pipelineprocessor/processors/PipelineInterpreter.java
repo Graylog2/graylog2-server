@@ -200,13 +200,10 @@ public class PipelineInterpreter implements MessageProcessor {
 
     private void submitFailure(Message message, String error) {
         try {
-            final String messageJson = objectMapper.writeValueAsString(message.toElasticSearchObject(objectMapper, new Meter()));
             // TODO use message.getMesssgeId() once this field is set early in processing
-            final ProcessingFailure processingFailure = new ProcessingFailure(message.getId(), "pipeline-processor", error, message.getTimestamp(), messageJson);
+            final ProcessingFailure processingFailure = new ProcessingFailure(message.getId(), "pipeline-processor", error, message.getTimestamp(), message);
             final FailureBatch failureBatch = new FailureBatch(ImmutableList.of(processingFailure), ProcessingFailure.class);
             failureSubmitService.submitBlocking(failureBatch);
-        } catch (JsonProcessingException e) {
-            log.error("Failed to serialize failed message", e);
         } catch (InterruptedException ignored) {
         }
     }

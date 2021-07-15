@@ -16,6 +16,7 @@
  */
 package org.graylog.failure;
 
+import org.graylog2.indexer.messages.Indexable;
 import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
@@ -27,25 +28,25 @@ public class IndexingFailure implements Failure {
     private final String errorType;
     private final String errorMessage;
     private final DateTime timestamp;
-    private final String failedMessageJson;
+    private final Indexable failedMessage;
 
     public IndexingFailure(String failedMessageId,
                            String targetIndex,
                            String errorType,
                            String errorMessage,
                            DateTime timestamp,
-                           String failedMessageJson) {
+                           Indexable failedMessage) {
         this.failedMessageId = failedMessageId;
         this.targetIndex = targetIndex;
         this.errorType = errorType;
         this.errorMessage = errorMessage;
         this.timestamp = timestamp;
-        this.failedMessageJson = failedMessageJson;
+        this.failedMessage = failedMessage;
     }
 
     @Override
-    public String failureType() {
-        return "indexing";
+    public FailureType failureType() {
+        return FailureType.INDEXING;
     }
 
     @Override
@@ -75,7 +76,7 @@ public class IndexingFailure implements Failure {
     }
 
     @Override
-    public String failedMessageJson() {
-        return failedMessageJson;
+    public Indexable failedMessage() {
+        return failedMessage;
     }
 }

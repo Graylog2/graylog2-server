@@ -17,6 +17,7 @@
 package org.graylog.failure;
 
 
+import org.graylog2.indexer.messages.Indexable;
 import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
@@ -31,12 +32,12 @@ import javax.annotation.Nullable;
  */
 public interface Failure {
 
-    String failureType();
+    FailureType failureType();
 
     String failedMessageId();
 
     //TODO: examine the type of this "getter"
-    String failedMessageJson();
+    Indexable failedMessage();
 
     @Nullable
     String targetIndex();
