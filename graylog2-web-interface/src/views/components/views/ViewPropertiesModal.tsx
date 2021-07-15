@@ -22,8 +22,22 @@ import * as FormsUtils from 'util/FormsUtils';
 import ViewTypeLabel from 'views/components/ViewTypeLabel';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import Input from 'components/bootstrap/Input';
+import View from 'views/logic/views/View';
 
-export default class ViewPropertiesModal extends React.Component {
+type Props = {
+  onClose: () => void,
+  onSave: (view: View) => void,
+  title: string,
+  view: View,
+  show: boolean
+};
+
+type State = {
+  view: View,
+  title: string,
+};
+
+export default class ViewPropertiesModal extends React.Component<Props, State> {
   static propTypes = {
     onClose: PropTypes.func.isRequired,
     onSave: PropTypes.func.isRequired,

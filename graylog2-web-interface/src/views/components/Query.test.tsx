@@ -24,7 +24,7 @@ import View from 'views/logic/views/View';
 
 import Query from './Query';
 import WidgetGrid from './WidgetGrid';
-import WidgetFocusContext from './contexts/WidgetFocusContext';
+import WidgetFocusContext, { WidgetFocusContextType } from './contexts/WidgetFocusContext';
 
 import AggregationWidget from '../logic/aggregationbuilder/AggregationWidget';
 import AggregationWidgetConfig from '../logic/aggregationbuilder/AggregationWidgetConfig';
@@ -48,9 +48,17 @@ const widget2 = AggregationWidget.builder()
   .build();
 const widgets = Immutable.Map({ widget1, widget2 });
 
+const widgetFocusContext: WidgetFocusContextType = {
+  focusedWidget: undefined,
+  setWidgetFocusing: () => {},
+  setWidgetEditing: () => {},
+  unsetWidgetEditing: () => {},
+  unsetWidgetFocusing: () => {},
+};
+
 describe('Query', () => {
   const SUT = (props) => (
-    <WidgetFocusContext.Provider value={{ focusedWidget: undefined, setWidgetFocusing: () => {}, setWidgetEditing: () => {} }}>
+    <WidgetFocusContext.Provider value={widgetFocusContext}>
       <Query results={{ errors: [], searchTypes: {} }}
              widgetMapping={widgetMapping}
              widgets={widgets}

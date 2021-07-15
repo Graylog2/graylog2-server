@@ -95,9 +95,7 @@ const EditMessageList = ({ children, config, fields, onChange }: EditWidgetCompo
                                onChange={(data) => _onSortDirectionChange(data, config, onChange)} />
         </DescriptionBox>
         <DescriptionBox description="Decorators">
-          <DecoratorSidebar stream="000000000000000000000001"
-                            decorators={config.decorators}
-                            maximumHeight={600}
+          <DecoratorSidebar decorators={config.decorators}
                             onChange={onDecoratorsChange} />
         </DescriptionBox>
       </FullHeightCol>

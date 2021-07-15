@@ -33,7 +33,9 @@ public class DestinationFields {
     public static final String DESTINATION_OS_VERSION = "destination_os_version";
     public static final String DESTINATION_PACKETS_SENT = "destination_packets_sent";
     public static final String DESTINATION_PORT = "destination_port";
+    public static final String DESTINATION_REGION = "destination_region";
     public static final String DESTINATION_TYPE = "destination_type";
+    public static final String DESTINATION_VM_NAME = "destination_vm_name";
     public static final String DESTINATION_VSYS_UUID = "destination_vsys_uuid";
     public static final String DESTINATION_ZONE = "destination_zone";
 
@@ -52,12 +54,13 @@ public class DestinationFields {
     public static final String DESTINATION_AS_ORGANIZATION = DESTINATION_PREFIX + AutonomousSystemFields.AS_ORGANIZATION;
 
     // Geo Fields
-    public static final String DESTINATION_GEO_CITY_NAME = DESTINATION_PREFIX + GeoFields.GEO_CITY_NAME;
+    public static final String DESTINATION_GEO_CITY = DESTINATION_PREFIX + GeoFields.GEO_CITY;
+    public static final String DESTINATION_GEO_CONTINENT = DESTINATION_PREFIX + GeoFields.GEO_CONTINENT;
     public static final String DESTINATION_GEO_COUNTRY_ISO = DESTINATION_PREFIX + GeoFields.GEO_COUNTRY_ISO;
     public static final String DESTINATION_GEO_COUNTRY_NAME = DESTINATION_PREFIX + GeoFields.GEO_COUNTRY_NAME;
     public static final String DESTINATION_GEO_COORDINATES = DESTINATION_PREFIX + GeoFields.GEO_COORDINATES;
     public static final String DESTINATION_GEO_NAME = DESTINATION_PREFIX + GeoFields.GEO_NAME;
-    public static final String DESTINATION_GEO_STATE_NAME = DESTINATION_PREFIX + GeoFields.GEO_STATE_NAME;
+    public static final String DESTINATION_GEO_STATE = DESTINATION_PREFIX + GeoFields.GEO_STATE;
 
     // User Fields
     public static final String DESTINATION_USER_NAME = DESTINATION_PREFIX + UserFields.USER_NAME;
@@ -65,4 +68,8 @@ public class DestinationFields {
     // To be removed
     @Deprecated
     public static final String DESTINATION_PACKETS = DESTINATION_PACKETS_SENT;
+    @Deprecated
+    public static final String DESTINATION_GEO_CITY_NAME = DESTINATION_PREFIX + GeoFields.GEO_CITY_NAME;
+    @Deprecated
+    public static final String DESTINATION_GEO_STATE_NAME = DESTINATION_PREFIX + GeoFields.GEO_STATE_NAME;
 }
