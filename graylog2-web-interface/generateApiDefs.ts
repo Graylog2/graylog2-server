@@ -179,6 +179,12 @@ const deriveNameFromParameters = (functionName, parameters) => {
   return `${functionName}By${joinedParameters}`;
 };
 
+const bannedFunctionNames = {
+  delete: 'remove',
+};
+
+const unbanFunctionname = (nickname) => (Object.keys(bannedFunctionNames).includes(nickname) ? bannedFunctionNames[nickname] : nickname);
+
 const createRoute = ({ nickname, parameters = [], method, type, path: operationPath, summary, produces }, path, assignedNames) => {
   const queryParameters = parameters.filter((parameter) => parameter.paramType === 'query');
   const bodyParameter = parameters.filter((parameter) => parameter.paramType === 'body');
@@ -189,9 +195,11 @@ const createRoute = ({ nickname, parameters = [], method, type, path: operationP
         .map((p) => ts.factory.createJSDocParameterTag(undefined, ts.factory.createIdentifier(p.name), undefined, undefined, undefined, p.description)),
     ));
 
-  const functionName = assignedNames.includes(nickname)
-    ? deriveNameFromParameters(nickname, parameters)
-    : nickname;
+  const unbannedNickname = unbanFunctionname(nickname);
+
+  const functionName = assignedNames.includes(unbannedNickname)
+    ? deriveNameFromParameters(unbannedNickname, parameters)
+    : unbannedNickname;
 
   return {
     name: functionName,
