@@ -14,16 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import Reflux from 'reflux';
+import * as React from 'react';
 
-const RulesActions = Reflux.createActions({
-  delete: { asyncResult: true },
-  list: { asyncResult: true },
-  listPaginated: { asyncResult: true },
-  get: { asyncResult: true },
-  save: { asyncResult: true },
-  update: { asyncResult: true },
-  parse: { asyncResult: true },
-});
+import { LinkContainer } from 'components/graylog/router';
+import { Button } from 'components/graylog';
+import Routes from 'routing/Routes';
 
-export default RulesActions;
+const CreatePipelineButton = () => (
+  <div className="pull-right">
+    <LinkContainer to={Routes.SYSTEM.PIPELINES.PIPELINE('new')}>
+      <Button bsStyle="success">Add new pipeline</Button>
+    </LinkContainer>
+  </div>
+);
+
+export default CreatePipelineButton;

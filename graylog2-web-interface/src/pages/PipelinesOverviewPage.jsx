@@ -24,10 +24,13 @@ import ProcessingTimelineComponent from 'components/pipelines/ProcessingTimeline
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 
+import CreatePipelineButton from '../components/pipelines/CreatePipelineButton';
+
 const PipelinesOverviewPage = () => (
   <DocumentTitle title="Pipelines">
     <div>
-      <PageHeader title="Pipelines overview">
+      <PageHeader title="Pipelines overview"
+                  subactions={(<CreatePipelineButton />)}>
         <span>
           Pipelines let you transform and process messages coming from streams. Pipelines consist of stages where
           rules are evaluated and applied. Messages can go through one or more stages.

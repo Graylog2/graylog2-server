@@ -385,6 +385,7 @@ const ApiRoutes = {
   },
   PipelinesController: {
     list: () => { return { url: '/system/pipelines/pipeline' }; },
+    paginatedList: () => { return { url: '/system/pipelines/pipeline/paginated' }; },
     create: () => { return { url: '/system/pipelines/pipeline' }; },
     get: (pipelineId) => { return { url: `/system/pipelines/pipeline/${pipelineId}` }; },
     update: (pipelineId) => { return { url: `/system/pipelines/pipeline/${pipelineId}` }; },

@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSortedSet;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Stage;
+import org.graylog.plugins.pipelineprocessor.db.PaginatedPipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
@@ -55,11 +56,14 @@ public class PipelineResourceTest {
     @Mock
     private PipelineService pipelineService;
 
+    @Mock
+    private PaginatedPipelineService paginatedPipelineService;
+
     private PipelineResource pipelineResource;
 
     @Before
     public void setup() {
-        pipelineResource = new PipelineResource(pipelineService, pipelineRuleParser);
+        pipelineResource = new PipelineResource(pipelineService, paginatedPipelineService, pipelineRuleParser);
     }
 
     @Test
