@@ -102,6 +102,21 @@ const createProps = (properties) => Object.entries(properties)
 const bannedModels = [...Object.keys(typeMappings), 'DateTime', 'DateTimeZone', 'Chronology', 'String>', 'LocalDateTime', 'Type'];
 const isNotBannedModel = ([name]) => !bannedModels.includes(name) && !name.endsWith('>');
 
+const createIndexerSignature = (additionalProperties) => (additionalProperties ? [ts.factory.createIndexSignature(
+  undefined,
+  undefined,
+  [ts.factory.createParameterDeclaration(
+    undefined,
+    undefined,
+    undefined,
+    ts.factory.createIdentifier('_key'),
+    undefined,
+    ts.factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
+    undefined,
+  )],
+  createTypeFor(additionalProperties),
+)] : []);
+
 const createModel = ([name, definition]) => (definition.type === 'object'
   ? ts.factory.createInterfaceDeclaration(
     undefined,
@@ -109,7 +124,7 @@ const createModel = ([name, definition]) => (definition.type === 'object'
     name,
     undefined,
     undefined,
-    createProps(definition.properties),
+    [...createProps(definition.properties), ...createIndexerSignature(definition.additional_properties)],
   )
   : ts.factory.createTypeAliasDeclaration(
     undefined,
