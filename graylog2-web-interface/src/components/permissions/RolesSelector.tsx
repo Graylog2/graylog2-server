@@ -30,6 +30,8 @@ import { Select, Spinner, ErrorAlert } from 'components/common';
 type Props = {
   assignedRolesIds: Immutable.Set<string>,
   identifier: (role: Role) => string,
+  multi?: boolean,
+  placeholder?: string,
   onSubmit: (role: Immutable.Set<Role>) => Promise<void>,
 };
 
@@ -59,19 +61,19 @@ const _options = (roles, assignedRolesIds, identifier) => roles
   .toArray()
   .map((r) => ({ label: r.name, value: r.name, role: r }));
 
-const _assignRole = (selectedRoleName, roles, onSubmit, setSelectedRoleName, setIsSubmitting, setError) => {
-  if (!selectedRoleName) {
+const _assignRole = (selectedRoleNames, roles, onSubmit, setSelectedRoleNames, setIsSubmitting, setError) => {
+  if (!selectedRoleNames) {
     return;
   }
 
-  const selectedRoleNames = selectedRoleName.split(',');
+  const selectedRoleNamess = selectedRoleNames.split(',');
 
-  const selectedRoles = Immutable.Set(compact(selectedRoleNames.map((selection) => {
+  const selectedRoles = Immutable.Set(compact(selectedRoleNamess.map((selection) => {
     return roles.find((r) => r.name === selection);
   })));
 
   if (selectedRoles.size <= 0) {
-    setError(`Role assignment failed, because the roles ${selectedRoleName ?? '(undefined)'} does not exist`);
+    setError(`Role assignment failed, because the roles ${selectedRoleNames ?? '(undefined)'} does not exist`);
 
     return;
   }
@@ -80,7 +82,7 @@ const _assignRole = (selectedRoleName, roles, onSubmit, setSelectedRoleName, set
   setIsSubmitting(true);
 
   onSubmit(selectedRoles).then(() => {
-    setSelectedRoleName();
+    setSelectedRoleNames();
     setIsSubmitting(false);
   });
 };
@@ -91,9 +93,9 @@ const _loadRoles = (setPaginatedRoles) => {
   AuthzRolesDomain.loadRolesPaginated(getUnlimited).then(setPaginatedRoles);
 };
 
-const RolesSelector = ({ assignedRolesIds, onSubmit, identifier }: Props) => {
+const RolesSelector = ({ assignedRolesIds, onSubmit, identifier, multi, placeholder }: Props) => {
   const [paginatedRoles, setPaginatedRoles] = useState<PaginatedRoles | undefined>();
-  const [selectedRoleName, setSelectedRoleName] = useState();
+  const [selectedRoleNames, setSelectedRoleNames] = useState();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | undefined>();
 
@@ -103,26 +105,37 @@ const RolesSelector = ({ assignedRolesIds, onSubmit, identifier }: Props) => {
     return <Spinner />;
   }
 
-  const _onSubmit = () => _assignRole(selectedRoleName, paginatedRoles.list, onSubmit, setSelectedRoleName, setIsSubmitting, setError);
+  const _onSubmit = (newSelectedRoleNames) => _assignRole(newSelectedRoleNames, paginatedRoles.list, onSubmit, setSelectedRoleNames, setIsSubmitting, setError);
+
+  const _onRoleSelect = (newSelectedRoleNames) => {
+    if (multi) {
+      setSelectedRoleNames(newSelectedRoleNames);
+    } else {
+      _assignRole(newSelectedRoleNames, paginatedRoles.list, onSubmit, setSelectedRoleNames, setIsSubmitting, setError);
+    }
+  };
+
   const options = _options(paginatedRoles.list, assignedRolesIds, identifier);
 
   return (
     <div>
       <FormElements>
         <StyledSelect inputProps={{ 'aria-label': 'Search for roles' }}
-                      onChange={setSelectedRoleName}
+                      onChange={_onRoleSelect}
                       optionRenderer={_renderRoleOption}
                       options={options}
-                      placeholder="Search for roles"
-                      multi
-                      value={selectedRoleName} />
-        <SubmitButton bsStyle="success"
-                      onClick={_onSubmit}
-                      disabled={isSubmitting || !selectedRoleName}
-                      title="Assign Role"
-                      type="button">
-          Assign Role
-        </SubmitButton>
+                      placeholder={placeholder}
+                      multi={multi}
+                      value={multi ? selectedRoleNames : null} />
+        {multi && (
+          <SubmitButton bsStyle="success"
+                        onClick={() => _onSubmit(selectedRoleNames)}
+                        disabled={isSubmitting || !selectedRoleNames}
+                        title="Assign Role"
+                        type="button">
+            Assign Role
+          </SubmitButton>
+        )}
       </FormElements>
       <ErrorAlert runtimeError onClose={setError}>
         {error}
@@ -133,10 +146,14 @@ const RolesSelector = ({ assignedRolesIds, onSubmit, identifier }: Props) => {
 
 RolesSelector.defaultProps = {
   identifier: (role) => role.id,
+  placeholder: 'Search for roles',
+  multi: false,
 };
 
 RolesSelector.propTypes = {
   identifier: PropTypes.func,
+  multi: PropTypes.bool,
+  placeholder: PropTypes.string,
   onSubmit: PropTypes.func.isRequired,
 };
 
