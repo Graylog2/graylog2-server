@@ -19,4 +19,10 @@ package org.graylog.failure;
 public enum FailureType {
     INDEXING,
     PROCESSING
+    ;
+
+    @Override
+    public String toString() {
+        return name().toLowerCase();
+    }
 }
