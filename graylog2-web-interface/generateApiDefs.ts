@@ -24,6 +24,7 @@ const mapPrimitiveType = (type) => primitiveTypeMappings[type];
 
 const typeMappings = {
   'urn:jsonschema:org:joda:time:DateTime': 'Date',
+  String: 'string',
 };
 
 const isURN = (type) => type.split(':').length > 1;
@@ -56,28 +57,29 @@ const createEnumType = ({ type, enum: enumOptions }) => {
 
 const createTypeFor = (propDef) => {
   const { type, ...rest } = propDef;
+  const cleanType = type ? type.replace(/>/, '') : type;
 
-  if (type && isURN(type)) {
-    return ts.factory.createTypeReferenceNode(stripURN(type));
+  if (cleanType && isURN(cleanType)) {
+    return ts.factory.createTypeReferenceNode(stripURN(cleanType));
   }
 
-  if (isArrayType(type)) {
+  if (isArrayType(cleanType)) {
     return ts.factory.createArrayTypeNode(createTypeFor(rest.items));
   }
 
-  if (isMappedType(type)) {
-    return ts.factory.createTypeReferenceNode(mapType(type));
+  if (isMappedType(cleanType)) {
+    return ts.factory.createTypeReferenceNode(mapType(cleanType));
   }
 
   if (propDef.$ref) {
     return createTypeFor({ type: propDef.$ref });
   }
 
-  if (isPrimitiveType(type)) {
-    return isEnumType(propDef) ? createEnumType(propDef) : ts.factory.createTypeReferenceNode(mapPrimitiveType(type));
+  if (isPrimitiveType(cleanType)) {
+    return isEnumType(propDef) ? createEnumType(propDef) : ts.factory.createTypeReferenceNode(mapPrimitiveType(cleanType));
   }
 
-  return ts.factory.createTypeReferenceNode(type);
+  return ts.factory.createTypeReferenceNode(cleanType);
 };
 
 const readonlyModifier = ts.factory.createModifier(ts.SyntaxKind.ReadonlyKeyword);
