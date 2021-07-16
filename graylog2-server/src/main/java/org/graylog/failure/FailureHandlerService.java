@@ -16,7 +16,6 @@
  */
 package org.graylog.failure;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.AbstractExecutionThreadService;
 import org.slf4j.Logger;
@@ -25,9 +24,13 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static org.graylog.failure.FailureBatch.EMPTY_PROCESSING_FAILURE_BATCH;
 
 @Singleton
 public class FailureHandlerService extends AbstractExecutionThreadService {
@@ -52,52 +55,81 @@ public class FailureHandlerService extends AbstractExecutionThreadService {
 
     @Override
     protected void startUp() throws Exception {
-        super.startUp();
         executionThread = Thread.currentThread();
+
+        logger.info("Starting up the service.");
     }
 
     @Override
     protected void shutDown() throws Exception {
-        super.shutDown();
+
+        final List<FailureBatch> remainingFailures = failureSubmitService.drain();
+
+        logger.info("Shutting down the service. {} remaining failure batches to be processed.", remainingFailures.size());
+
+        remainingFailures.forEach(this::handle);
     }
 
     @Override
     protected void triggerShutdown() {
+        logger.debug("Requested to shut down.");
+
         executionThread.interrupt();
+
+        failureSubmitService.shutDown();
     }
 
     @Override
     protected void run() throws Exception {
+
+        if (isRunning()) {
+            logger.debug("The service is up and running!");
+        }
+
         while (isRunning()) {
             try {
                 handle(failureSubmitService.consumeBlocking());
             } catch (InterruptedException ignored) {
+                logger.info("The service's thread has been interrupted. The queue currently contains {} failure batches.",
+                        failureSubmitService.queueSize());
             } catch (Exception e) {
-                logger.error("Error occurred while handling a failure!", e);
+                logger.error("Error occurred while handling failures!", e);
             }
         }
+
+        logger.debug("The service has been interrupted.");
     }
 
     private void handle(FailureBatch failureBatch) {
         suitableHandlers(failureBatch)
-                .forEach(handler -> handler.handle(failureBatch));
+                .forEach(handler -> {
+                    try {
+                        handler.handle(failureBatch);
+                    } catch (Exception e) {
+                        logger.error("Error occurred while handling failures by {}", handler.getClass().getName());
+                    }
+                });
     }
 
     private List<FailureHandler> suitableHandlers(FailureBatch failureBatch) {
-        final List<FailureHandler> suitableHandlers = failureHandlers.stream()
+        final List<FailureHandler> suitableHandlers = suitableHandlers(failureHandlers, failureBatch)
                 .filter(FailureHandler::isEnabled)
-                .filter(h -> h.supports(failureBatch))
                 .collect(Collectors.toList());
 
         if (suitableHandlers.isEmpty()) {
-            return fallbackFailureHandlerAsList.stream().filter(h -> h.supports(failureBatch)).collect(Collectors.toList());
+            return suitableHandlers(fallbackFailureHandlerAsList, failureBatch)
+                    .collect(Collectors.toList());
         } else {
             return suitableHandlers;
         }
     }
 
+    private Stream<FailureHandler> suitableHandlers(Collection<FailureHandler> handlers, FailureBatch failureBatch) {
+        return handlers.stream()
+                .filter(h -> h.supports(failureBatch));
+    }
+
     public boolean canHandleProcessingErrors() {
-        // TODO this should probably be cached
-        return !suitableHandlers(new FailureBatch(ImmutableList.of(), ProcessingFailure.class)).isEmpty();
+        return !suitableHandlers(EMPTY_PROCESSING_FAILURE_BATCH).isEmpty();
     }
 }

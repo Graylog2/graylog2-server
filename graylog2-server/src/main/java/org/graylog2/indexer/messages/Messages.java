@@ -27,7 +27,6 @@ import com.github.rholder.retry.WaitStrategy;
 import com.google.auto.value.AutoValue;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Sets;
-import org.graylog.failure.Failure;
 import org.graylog.failure.FailureBatch;
 import org.graylog.failure.FailureSubmitService;
 import org.graylog.failure.IndexingFailure;
@@ -272,16 +271,16 @@ public class Messages {
             return Collections.emptyList();
         }
 
-        final List<Failure> indexingFailures = indexingErrors.stream()
-                .map(IndexingError::toFailure)
-                .collect(Collectors.toList());
-
         try {
-            // TODO handle shutdown
-            failureSubmitService.submitBlocking(new FailureBatch(indexingFailures, IndexingFailure.class));
+            failureSubmitService.submitBlocking(FailureBatch.indexingFailureBatch(
+                    indexingErrors.stream()
+                            .map(IndexingError::toFailure)
+                            .collect(Collectors.toList())
+            ));
         } catch (InterruptedException e) {
-            LOG.warn("Interrupted in failureSubmitService", e);
-            // TODO
+            LOG.warn("Failed to submit {} indexing errors for failure handling. The thread has been interrupted!",
+                    indexingErrors.size());
+            Thread.currentThread().interrupt();
         }
 
         return indexingErrors.stream()
@@ -309,7 +308,7 @@ public class Messages {
             return create(message, index, ErrorType.Unknown, "");
         }
 
-        public Failure toFailure() {
+        public IndexingFailure toFailure() {
             final Indexable message = message();
             return new IndexingFailure(
                     message.getMessageId(),

@@ -16,6 +16,8 @@
  */
 package org.graylog.failure;
 
+import com.google.common.collect.ImmutableList;
+
 import java.util.Collection;
 import java.util.List;
 
@@ -24,6 +26,8 @@ import java.util.List;
  * Also it verifies whether failures with one batch are all of the same type.
  */
 public class FailureBatch {
+
+    public static final FailureBatch EMPTY_PROCESSING_FAILURE_BATCH = FailureBatch.processingFailureBatch(ImmutableList.of());
 
     private final List<? extends Failure> failures;
     private final Class<? extends Failure> failureClass;
@@ -39,8 +43,24 @@ public class FailureBatch {
         });
     }
 
+    public static FailureBatch indexingFailureBatch(List<IndexingFailure> failures) {
+        return new FailureBatch(failures, IndexingFailure.class);
+    }
+
+    public static FailureBatch processingFailureBatch(List<ProcessingFailure> processingFailures) {
+        return new FailureBatch(processingFailures, ProcessingFailure.class);
+    }
+
+    public static FailureBatch processingFailureBatch(ProcessingFailure processingFailure) {
+        return new FailureBatch(ImmutableList.of(processingFailure), ProcessingFailure.class);
+    }
+
     public Collection<? extends Failure> getFailures() {
         return failures;
+    }
+
+    public int size() {
+        return failures.size();
     }
 
     public Class<? extends Failure> getFailureClass() {

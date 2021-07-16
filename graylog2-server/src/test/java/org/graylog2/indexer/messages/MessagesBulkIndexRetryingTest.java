@@ -16,6 +16,7 @@
  */
 package org.graylog2.indexer.messages;
 
+import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.ImmutableList;
 import org.graylog.failure.FailureSubmitService;
 import org.graylog2.indexer.IndexSet;
@@ -46,7 +47,7 @@ class MessagesBulkIndexRetryingTest {
     private final TrafficAccounting trafficAccounting = mock(TrafficAccounting.class);
     private final MessagesAdapter messagesAdapter = mock(MessagesAdapter.class);
     private final ProcessingStatusRecorder processingStatusRecorder = mock(ProcessingStatusRecorder.class);
-    private final FailureSubmitService failureSubmitService = new FailureSubmitService();
+    private final FailureSubmitService failureSubmitService = new FailureSubmitService(mock(MetricRegistry.class));
 
     private Messages messages;
 

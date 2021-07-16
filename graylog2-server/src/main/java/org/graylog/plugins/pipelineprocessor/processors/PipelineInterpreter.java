@@ -23,7 +23,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSetMultimap;
@@ -209,7 +208,7 @@ public class PipelineInterpreter implements MessageProcessor {
         try {
             // TODO use message.getMesssgeId() once this field is set early in processing
             final ProcessingFailure processingFailure = new ProcessingFailure(message.getId(), "pipeline-processor", error, message.getTimestamp(), message);
-            final FailureBatch failureBatch = new FailureBatch(ImmutableList.of(processingFailure), ProcessingFailure.class);
+            final FailureBatch failureBatch = FailureBatch.processingFailureBatch(processingFailure);
             failureSubmitService.submitBlocking(failureBatch);
         } catch (InterruptedException ignored) {
         }
