@@ -35,7 +35,7 @@
     <description>Graylog Storage Module for Elasticsearch 6</description>
 
     <properties>
-        <elasticsearch.version>5.6.16-2</elasticsearch.version>
+        <elasticsearch.version>5.6.16-3</elasticsearch.version>
         <jest.version>2.4.15+jackson</jest.version>
         <maven.deploy.skip>true</maven.deploy.skip>
     </properties>
