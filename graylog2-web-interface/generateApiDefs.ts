@@ -91,13 +91,22 @@ const createProps = (properties) => Object.entries(properties)
     createTypeFor(propDef),
   ));
 
-const createModel = ([name, definition]) => ts.factory.createInterfaceDeclaration(
-  undefined,
-  undefined,
-  name,
-  undefined,
-  undefined,
-  createProps(definition.properties),
+const createModel = ([name, definition]) => (definition.type === 'object'
+  ? ts.factory.createInterfaceDeclaration(
+    undefined,
+    undefined,
+    name,
+    undefined,
+    undefined,
+    createProps(definition.properties),
+  )
+  : ts.factory.createTypeAliasDeclaration(
+    undefined,
+    undefined,
+    ts.factory.createIdentifier(name),
+    undefined,
+    createTypeFor(definition),
+  )
 );
 
 // ==== APIs/Operations ==== //
