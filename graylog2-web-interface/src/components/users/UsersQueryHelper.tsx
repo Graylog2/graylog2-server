@@ -47,7 +47,7 @@ const userQueryHelperPopover = (
     <p><strong>Examples</strong></p>
     <p>
       Find users with a email containing example.com:<br />
-      <kbd>email:example.com</kbd><br />
+      <code>email:example.com</code><br />
     </p>
   </Popover>
 );

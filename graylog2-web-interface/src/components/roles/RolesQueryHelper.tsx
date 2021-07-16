@@ -43,7 +43,7 @@ const RolesQueryHelperPopover = (
     <p><strong>Examples</strong></p>
     <p>
       Find role with a name containing manager:<br />
-      <kbd>name:manager</kbd><br />
+      <code>name:manager</code><br />
     </p>
   </Popover>
 );

@@ -88,13 +88,13 @@ class DataAdaptersOverview extends React.Component {
         <p><strong>Example</strong></p>
         <p>
           Find data adapters by parts of their names:<br />
-          <kbd>name:geoip</kbd><br />
-          <kbd>name:geo</kbd>
+          <code>name:geoip</code><br />
+          <code>name:geo</code>
         </p>
         <p>
           Searching without a field name matches against the <code>title</code> field:<br />
-          <kbd>geoip</kbd> <br />is the same as<br />
-          <kbd>title:geoip</kbd>
+          <code>geoip</code> <br />is the same as<br />
+          <code>title:geoip</code>
         </p>
       </Popover>
     );

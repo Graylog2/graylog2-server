@@ -42,7 +42,7 @@ const GrokPatternQueryHelper = () => (
     <p><strong>Examples</strong></p>
     <p>
       Find grok patterns containing COMMON in the pattern:<br />
-      <kbd>pattern:COMMON</kbd><br />
+      <code>pattern:COMMON</code><br />
     </p>
   </Popover>
 );

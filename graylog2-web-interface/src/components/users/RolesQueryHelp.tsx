@@ -43,7 +43,7 @@ const rolesQueryHelpPopover = (
     <p><strong>Examples</strong></p>
     <p>
       Find roles with a description containing creator:<br />
-      <kbd>description:creator</kbd><br />
+      <code>description:creator</code><br />
     </p>
   </Popover>
 );

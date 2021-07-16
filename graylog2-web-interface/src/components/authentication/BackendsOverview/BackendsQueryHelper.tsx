@@ -43,7 +43,7 @@ const backendQueryHelperPopover = (
     <p><strong>Examples</strong></p>
     <p>
       Find backends with a title containing LDAP:<br />
-      <kbd>title:LDAP</kbd><br />
+      <code>title:LDAP</code><br />
     </p>
   </Popover>
 );

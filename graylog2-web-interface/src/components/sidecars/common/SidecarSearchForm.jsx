@@ -77,11 +77,11 @@ class SidecarSearchForm extends React.Component {
         <p><strong>Examples</strong></p>
         <p>
           Find sidecars that did not communicate with Graylog since a date:<br />
-          <kbd>{'last_seen:<=2018-04-10'}</kbd><br />
+          <code>{'last_seen:<=2018-04-10'}</code><br />
         </p>
         <p>
           Find sidecars with <code>failing</code> or <code>unknown</code> status:<br />
-          <kbd>status:failing status:unknown</kbd><br />
+          <code>status:failing status:unknown</code><br />
         </p>
       </Popover>
     );
