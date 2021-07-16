@@ -93,6 +93,9 @@ const createProps = (properties) => Object.entries(properties)
     createTypeFor(propDef),
   ));
 
+const bannedModels = ['DateTime', 'DateTimeZone', 'Chronology', 'String>'];
+const isNotBannedModel = ([name]) => !bannedModels.includes(name);
+
 const createModel = ([name, definition]) => (definition.type === 'object'
   ? ts.factory.createInterfaceDeclaration(
     undefined,
@@ -296,7 +299,9 @@ apiSummary.apis.forEach(({ path, name: rawName }) => {
   const apiJson = fs.readFileSync(`${srcDir}${path}.json`).toString();
   const api = JSON.parse(apiJson);
 
-  const models = Object.entries(api.models).map(createModel);
+  const models = Object.entries(api.models)
+    .filter(isNotBannedModel)
+    .map(createModel);
   const apiObject = createApiObject(api);
 
   const rootNode = ts.factory.createNodeArray([importDeclaration, ...models, ...apiObject]);
