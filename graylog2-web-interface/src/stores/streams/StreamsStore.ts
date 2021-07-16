@@ -302,7 +302,7 @@ const StreamsStore = singletonStore('Streams', () => Reflux.createStore({
     return promise;
   },
   addOutput(streamId: string, outputId: string, callback: (response: any) => void) {
-    const url = qualifyUrl(ApiRoutes.StreamOutputsApiController.add(streamId, outputId).url);
+    const url = qualifyUrl(ApiRoutes.StreamOutputsApiController.add(streamId).url);
 
     const promise = fetch('POST', url, { outputs: [outputId] })
       .then(callback, (errorThrown) => {
