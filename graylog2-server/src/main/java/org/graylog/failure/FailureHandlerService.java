@@ -57,7 +57,7 @@ public class FailureHandlerService extends AbstractExecutionThreadService {
     protected void startUp() throws Exception {
         executionThread = Thread.currentThread();
 
-        logger.info("Starting up the service.");
+        logger.debug("Starting up the service.");
     }
 
     @Override
