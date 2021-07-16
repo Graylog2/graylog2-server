@@ -46,10 +46,11 @@ const ErrorMessage = styled.span(({ theme }) => css`
 `);
 
 const _parseKeywordPreview = (data) => {
-  const from = DateTime.fromUTCDateTime(data.from).toString();
-  const to = DateTime.fromUTCDateTime(data.to).toString();
+  const { timezone } = data;
+  const from = DateTime.fromDateTimeAndTZ(data.from, timezone).toString();
+  const to = DateTime.fromDateTimeAndTZ(data.to, timezone).toString();
 
-  return { from, to };
+  return { from, to, timezone };
 };
 
 type Props = {
@@ -62,9 +63,9 @@ const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: P
   const [nextRangeProps, , nextRangeHelpers] = useField('nextTimeRange');
   const mounted = useRef(true);
   const keywordRef = useRef();
-  const [keywordPreview, setKeywordPreview] = useState({ from: '', to: '' });
+  const [keywordPreview, setKeywordPreview] = useState({ from: '', to: '', timezone: '' });
 
-  const _setSuccessfullPreview = useCallback((response: { from: string, to: string }) => {
+  const _setSuccessfullPreview = useCallback((response: { from: string, to: string, timezone: string }) => {
     setValidatingKeyword(false);
 
     return setKeywordPreview(_parseKeywordPreview(response));
@@ -72,7 +73,7 @@ const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: P
   [setValidatingKeyword]);
 
   const _setFailedPreview = useCallback(() => {
-    setKeywordPreview({ from: EMPTY_RANGE, to: EMPTY_RANGE });
+    setKeywordPreview({ from: EMPTY_RANGE, to: EMPTY_RANGE, timezone: DateTime.getUserTimezone() });
 
     return 'Unable to parse keyword.';
   }, [setKeywordPreview]);

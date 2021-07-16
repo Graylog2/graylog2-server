@@ -21,7 +21,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
-import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.KeywordRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
@@ -34,14 +33,20 @@ import java.util.Map;
 public abstract class KeywordRangeEntity extends TimeRangeEntity {
     static final String TYPE = "keyword";
     private static final String FIELD_KEYWORD = "keyword";
+    private static final String FIELD_TIMEZONE = "timezone";
 
     @JsonProperty(FIELD_KEYWORD)
     public abstract ValueReference keyword();
 
+    @JsonProperty(FIELD_TIMEZONE)
+    public abstract ValueReference timezone();
+
     public static KeywordRangeEntity of(KeywordRange keywordRange) {
         final String keyword = keywordRange.keyword();
+        final String timezone = keywordRange.timezone();
         return builder()
                 .keyword(ValueReference.of(keyword))
+                .timezone(ValueReference.of(timezone))
                 .build();
     }
 
@@ -52,8 +57,9 @@ public abstract class KeywordRangeEntity extends TimeRangeEntity {
     @Override
     public final TimeRange convert(Map<String, ValueReference> parameters) {
         final String keyword = keyword().asString(parameters);
+        final String timezone = timezone().asString(parameters);
         try {
-            return KeywordRange.create(keyword);
+            return KeywordRange.create(keyword, timezone);
         } catch (InvalidRangeParametersException e) {
             throw new RuntimeException("Invalid timerange.", e);
         }
@@ -63,6 +69,9 @@ public abstract class KeywordRangeEntity extends TimeRangeEntity {
     abstract static class Builder implements TimeRangeBuilder<Builder> {
         @JsonProperty(FIELD_KEYWORD)
         abstract Builder keyword(ValueReference keyword);
+
+        @JsonProperty(FIELD_TIMEZONE)
+        abstract Builder timezone(ValueReference timezone);
 
         abstract KeywordRangeEntity autoBuild();
 

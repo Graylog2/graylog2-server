@@ -39,6 +39,7 @@ type RawAbsoluteRange = {
 type RawKeywordRange = {
   rangetype: 'keyword';
   keyword?: string;
+  timezone?: string;
 };
 
 const _getRange = (query): RawAbsoluteRange | RawRelativeRange | RawKeywordRange => {
@@ -84,7 +85,7 @@ const _getTimerange = (query = {}) => {
         } as AbsoluteTimeRange
         : undefined;
     case 'keyword':
-      return range.keyword ? { type: range.rangetype, keyword: range.keyword } as KeywordTimeRange : undefined;
+      return range.keyword ? { type: range.rangetype, keyword: range.keyword, timezone: range.timezone } as KeywordTimeRange : undefined;
     default:
       // @ts-ignore
       throw new Error(`Unsupported range type ${range.rangetype}`);
