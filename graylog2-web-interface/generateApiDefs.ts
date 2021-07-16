@@ -112,7 +112,7 @@ const createTemplateString = (path) => {
   const segments = path.split(/({.+?})/);
 
   if (segments.length === 1) {
-    return ts.factory.createStringLiteral(path);
+    return ts.factory.createStringLiteral(path, true);
   }
 
   const headSegment = segments[0];
