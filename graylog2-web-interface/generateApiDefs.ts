@@ -14,8 +14,9 @@ const primitiveTypeMappings = {
   string: 'string',
   integer: 'number',
   boolean: 'boolean',
-  DateTime: 'Date',
+  DateTime: 'string',
   object: '{}',
+  any: 'unknown',
 };
 
 const isArrayType = (type) => (type === 'array');
