@@ -169,7 +169,7 @@ const createBlock = (method, path, bodyParameter, queryParameter, rawProduces) =
           [
             createString(method),
             createTemplateString(path),
-            bodyParameter ? ts.factory.createIdentifier('body') : ts.factory.createNull(),
+            bodyParameter ? ts.factory.createIdentifier(bodyParameter.name) : ts.factory.createNull(),
             queryParameters,
             ts.factory.createObjectLiteralExpression(
               [ts.factory.createPropertyAssignment(
@@ -194,11 +194,13 @@ const createInitializer = (type, defaultValue) => (isNumeric(type)
 
 const sortByOptionality = (parameter1, parameter2) => parameter2.required - parameter1.required;
 
+const cleanParameterName = (name) => name.replace(/\s/g, '');
+
 const createFunctionParameter = ({ name, required, defaultValue, type, paramType, enum: allowableValues }) => ts.factory.createParameterDeclaration(
   undefined,
   undefined,
   undefined,
-  paramType === 'body' ? 'body' : name,
+  cleanParameterName(name),
   (required || defaultValue) ? undefined : ts.factory.createToken(ts.SyntaxKind.QuestionToken),
   createTypeFor({ type, enum: allowableValues }),
   defaultValue ? createInitializer(type, defaultValue) : undefined,
@@ -207,7 +209,7 @@ const createFunctionParameter = ({ name, required, defaultValue, type, paramType
 const firstNonEmpty = (...strings) => strings.find((s) => (s !== undefined && s.trim() !== ''));
 
 const deriveNameFromParameters = (functionName, parameters) => {
-  const joinedParameters = parameters.map(({ name }) => name).join('And');
+  const joinedParameters = parameters.map(({ name }) => cleanParameterName(name)).join('And');
 
   return `${functionName}By${joinedParameters}`;
 };
@@ -218,7 +220,8 @@ const bannedFunctionNames = {
 
 const unbanFunctionname = (nickname) => (Object.keys(bannedFunctionNames).includes(nickname) ? bannedFunctionNames[nickname] : nickname);
 
-const createRoute = ({ nickname, parameters = [], method, type, path: operationPath, summary, produces }, path, assignedNames) => {
+const createRoute = ({ nickname, parameters: rawParameters = [], method, type, path: operationPath, summary, produces }, path, assignedNames) => {
+  const parameters = rawParameters.map((parameter) => ({ ...parameter, name: cleanParameterName(parameter.name) }));
   const queryParameters = parameters.filter((parameter) => parameter.paramType === 'query');
   const bodyParameter = parameters.filter((parameter) => parameter.paramType === 'body');
 
