@@ -36,8 +36,8 @@ public class NodeInstance {
     private final GenericContainer<?> container;
 
     public static NodeInstance createStarted(Network network, String mongoDbUri, String elasticsearchUri, String elasticsearchVersion, int[] extraPorts,
-            List<Path> pluginJars, Path mavenProjectDir) {
-        NodeContainerConfig config = NodeContainerConfig.create(network, mongoDbUri, elasticsearchUri, elasticsearchVersion, extraPorts);
+            List<Path> pluginJars, Path mavenProjectDir, boolean skipPackaging) {
+        NodeContainerConfig config = NodeContainerConfig.create(network, mongoDbUri, elasticsearchUri, elasticsearchVersion, extraPorts, skipPackaging);
         GenericContainer<?> container = NodeContainerFactory.buildContainer(config, pluginJars, mavenProjectDir);
         return new NodeInstance(container);
     }
@@ -52,6 +52,10 @@ public class NodeInstance {
         container.start();
         sw.stop();
         LOG.info("Restarted node container in " + sw.elapsed(TimeUnit.SECONDS));
+    }
+
+    public void close() {
+        container.close();
     }
 
     public String uri() {

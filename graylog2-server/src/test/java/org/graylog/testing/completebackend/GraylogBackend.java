@@ -27,6 +27,7 @@ import org.testcontainers.containers.Network;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -42,12 +43,23 @@ public class GraylogBackend {
 
     private static GraylogBackend instance;
 
+    public static GraylogBackend createStarted(int[] extraPorts, String esVersion,
+                                               ElasticsearchInstanceFactory elasticsearchInstanceFactory, List<Path> pluginJars, Path mavenProjectDir,
+                                               List<URL> mongoDBFixtures, boolean skipPackaging) {
+        // if a cached version exists, shut it down first
+        if (instance != null) {
+            instance.close();
+        }
+        return createStartedBackend(extraPorts, Optional.of(esVersion), elasticsearchInstanceFactory, pluginJars, mavenProjectDir,
+                mongoDBFixtures, skipPackaging);
+    }
+
     public static GraylogBackend createStarted(int[] extraPorts,
-            ElasticsearchInstanceFactory elasticsearchInstanceFactory, List<Path> pluginJars, Path mavenProjectDir,
-            List<URL> mongoDBFixtures) {
+                                               ElasticsearchInstanceFactory elasticsearchInstanceFactory, List<Path> pluginJars, Path mavenProjectDir,
+                                               List<URL> mongoDBFixtures, boolean skipPackaging) {
         if (instance == null) {
-            instance = createStartedBackend(extraPorts, elasticsearchInstanceFactory, pluginJars, mavenProjectDir,
-                    mongoDBFixtures);
+            instance = createStartedBackend(extraPorts, Optional.empty(), elasticsearchInstanceFactory, pluginJars, mavenProjectDir,
+                    mongoDBFixtures, skipPackaging);
         } else {
             instance.fullReset(mongoDBFixtures);
             LOG.info("Reusing running backend");
@@ -59,17 +71,18 @@ public class GraylogBackend {
     // Starting ES instance in parallel thread to save time.
     // MongoDB and the node have to be started in sequence however, because the the node might crash,
     // if a MongoDb instance isn't already present while it's starting up.
-    private static GraylogBackend createStartedBackend(int[] extraPorts,
+    private static GraylogBackend createStartedBackend(int[] extraPorts, Optional<String> esVersion,
             ElasticsearchInstanceFactory elasticsearchInstanceFactory, List<Path> pluginJars, Path mavenProjectDir,
-            List<URL> mongoDBFixtures) {
+            List<URL> mongoDBFixtures, boolean skipPackaging) {
         Network network = Network.newNetwork();
 
         ExecutorService executor = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("build-es-container-for-api-it").build());
 
-        Future<ElasticsearchInstance> esFuture = executor.submit(() -> elasticsearchInstanceFactory.create(network));
+        Future<ElasticsearchInstance> esFuture = executor.submit(() -> esVersion.isPresent() ? elasticsearchInstanceFactory.create(esVersion.get(), network) : elasticsearchInstanceFactory.create(network));
 
-        MongoDBInstance mongoDB =
-                MongoDBInstance.createStarted(network, MongoDBInstance.Lifecycle.CLASS);
+        MongoDBInstance mongoDB = esVersion.isPresent() ?
+                MongoDBInstance.createStartedWithUniqueName(network, MongoDBInstance.Lifecycle.CLASS, esVersion.get())
+                : MongoDBInstance.createStarted(network, MongoDBInstance.Lifecycle.CLASS);
         mongoDB.dropDatabase();
         mongoDB.importFixtures(mongoDBFixtures);
 
@@ -82,7 +95,7 @@ public class GraylogBackend {
                     ElasticsearchInstance.internalUri(),
                     elasticsearchInstanceFactory.version(),
                     extraPorts,
-                    pluginJars, mavenProjectDir);
+                    pluginJars, mavenProjectDir, skipPackaging);
 
             return new GraylogBackend(network, esInstance, mongoDB, node);
         } catch (InterruptedException | ExecutionException e) {
@@ -110,6 +123,12 @@ public class GraylogBackend {
         purgeData();
         mongodb.importFixtures(mongoDBFixtures);
         node.restart();
+    }
+
+    public void close() {
+        node.close();
+        es.close();
+        mongodb.close();
     }
 
     public void importElasticsearchFixture(String resourcePath, Class<?> testClass) {

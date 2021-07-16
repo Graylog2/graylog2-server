@@ -77,7 +77,7 @@ public class GraylogBackendExtension implements AfterEachCallback, BeforeAllCall
         final List<Path> pluginJars = instantiateFactory(annotation.pluginJarsProvider()).getJars();
         final Path mavenProjectDir = instantiateFactory(annotation.mavenProjectDirProvider()).getProjectDir();
         return GraylogBackend.createStarted(annotation.extraPorts(), esInstanceFactory, pluginJars, mavenProjectDir,
-                mongoDBFixtures);
+                mongoDBFixtures, false);
     }
 
     private static List<URL> getMongoDBFixtures(ExtensionContext context) {
@@ -107,8 +107,9 @@ public class GraylogBackendExtension implements AfterEachCallback, BeforeAllCall
     private static ApiIntegrationTest annotationFrom(ExtensionContext context) {
         Optional<Class<?>> testClass = context.getTestClass();
 
-        if (!testClass.isPresent())
+        if (!testClass.isPresent()) {
             throw new RuntimeException("Error determining test class from ExtensionContext");
+        }
 
         return testClass.get().getAnnotation(ApiIntegrationTest.class);
     }

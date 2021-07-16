@@ -14,15 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.testing.completebackend;
+package org.graylog.testing;
 
-import org.graylog.testing.elasticsearch.ElasticsearchInstance;
-import org.testcontainers.containers.Network;
+import io.restassured.specification.RequestSpecification;
+import org.graylog.testing.completebackend.GraylogBackend;
 
-public interface ElasticsearchInstanceFactory {
-    ElasticsearchInstance create(Network network);
-
-    ElasticsearchInstance create(String version, Network network);
-
-    String version();
+public interface ESVersionTest {
+    void setEsVersion(GraylogBackend backend, RequestSpecification specification);
 }
