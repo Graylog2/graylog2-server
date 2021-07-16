@@ -48,7 +48,7 @@ public class ContentPackPersistenceServiceTest {
 
         contentPackPersistenceService = new ContentPackPersistenceService(
                 mongoJackObjectMapperProvider,
-                mongodb.mongoConnection());
+                mongodb.mongoConnection(), null);
     }
 
     @Test
