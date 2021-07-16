@@ -97,6 +97,12 @@ const createTypeFor = (propDef) => {
   }
 
   if (isObjectType(type)) {
+    const { id } = propDef;
+
+    if (id && isMappedType(id)) {
+      return createTypeFor({ type: id });
+    }
+
     const properties = propDef.properties
       ? Object.entries(propDef.properties).map(([propName, propType]) => ts.factory.createPropertySignature(
         undefined,
