@@ -32,13 +32,10 @@ const _updateQueryParams = (
   newPage: string | undefined,
   query: string,
 ) => {
-  let baseUri = _clearURI(query);
+  const baseUri = _clearURI(query);
+  const newUri = baseUri.setSearch('page', newPage);
 
-  if (newPage && newPage !== 'new') {
-    baseUri = baseUri.setSearch('page', newPage);
-  }
-
-  return baseUri.toString();
+  return newUri.toString();
 };
 
 const useSyncStateWithQueryParams = ({ dashboardPage, uriParams, setDashboardPage, states }) => {
