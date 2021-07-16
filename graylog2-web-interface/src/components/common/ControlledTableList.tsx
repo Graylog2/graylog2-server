@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 
 import { ListGroup } from 'components/graylog';
@@ -23,32 +22,29 @@ import { ListGroup } from 'components/graylog';
 import ControlledTableListHeader from './ControlledTableListHeader';
 import ControlledTableListItem from './ControlledTableListItem';
 
-const ControlledTableList = createReactClass({
-  propTypes: {
-    children: PropTypes.node.isRequired,
-  },
+const ControlledTableList = ({ children }: { children: Array<React.ReactNode>}) => {
+  let effectiveChildren;
 
-  render() {
-    const { children } = this.props;
-    let effectiveChildren;
+  if (children.length === 0) {
+    effectiveChildren = <ControlledTableListItem>No items to display</ControlledTableListItem>;
+  } else {
+    effectiveChildren = children;
+  }
 
-    if (children.length === 0) {
-      effectiveChildren = <ControlledTableListItem>No items to display</ControlledTableListItem>;
-    } else {
-      effectiveChildren = children;
-    }
-
-    return (
-      <div>
-        <ListGroup>
-          {effectiveChildren}
-        </ListGroup>
-      </div>
-    );
-  },
-});
+  return (
+    <div>
+      <ListGroup>
+        {effectiveChildren}
+      </ListGroup>
+    </div>
+  );
+};
 
 ControlledTableList.Header = ControlledTableListHeader;
 ControlledTableList.Item = ControlledTableListItem;
+
+ControlledTableList.propTypes = {
+  children: PropTypes.node.isRequired,
+};
 
 export default ControlledTableList;

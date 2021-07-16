@@ -16,7 +16,7 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
-import DayPicker from 'react-day-picker';
+import DayPicker, { DayModifiers } from 'react-day-picker';
 import styled, { css } from 'styled-components';
 
 import DateTime from 'logic/datetimes/DateTime';
@@ -58,7 +58,14 @@ const StyledDayPicker = styled(DayPicker)(({ theme }) => css`
   }
 `);
 
-const DatePicker = ({ date, fromDate, onChange, showOutsideDays }) => {
+type Props = {
+  date?: string | undefined,
+  onChange: (day: Date, modifiers: DayModifiers, event: React.MouseEvent<HTMLDivElement>) => void,
+  fromDate: Date,
+  showOutsideDays: boolean,
+};
+
+const DatePicker = ({ date, fromDate, onChange, showOutsideDays }: Props) => {
   let selectedDate;
 
   if (date) {

@@ -21,7 +21,6 @@ import { LinkContainer, Link } from 'components/graylog/router';
 import { Button } from 'components/graylog';
 import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';
-import { ContentPackMarker } from 'components/common';
 import { MetricsMapper, MetricContainer, CounterRate } from 'components/metrics';
 import NumberUtils from 'util/NumberUtils';
 
@@ -88,7 +87,6 @@ class LUTTableEntry extends React.Component {
         <tr>
           <td>
             <Link to={Routes.SYSTEM.LOOKUPTABLES.CACHES.show(cache.name)}>{cache.title}</Link>
-            <ContentPackMarker contentPack={cache.content_pack} marginLeft={5} />
           </td>
           <td>{cache.description}</td>
           <td>{cache.name}</td>

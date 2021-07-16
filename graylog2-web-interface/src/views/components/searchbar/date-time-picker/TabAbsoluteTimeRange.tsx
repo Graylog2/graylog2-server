@@ -96,8 +96,7 @@ const TabAbsoluteTimeRange = ({ disabled, limitDuration }: Props) => {
 
         <AccordionItem name="Calendar">
           <RangeWrapper>
-            <AbsoluteCalendar disabled={disabled}
-                              startDate={fromStartDate}
+            <AbsoluteCalendar startDate={fromStartDate}
                               nextTimeRange={nextTimeRange}
                               range="from" />
 
@@ -108,8 +107,7 @@ const TabAbsoluteTimeRange = ({ disabled, limitDuration }: Props) => {
           </IconWrap>
 
           <RangeWrapper>
-            <AbsoluteCalendar disabled={disabled}
-                              startDate={toStartDate}
+            <AbsoluteCalendar startDate={toStartDate}
                               nextTimeRange={nextTimeRange}
                               range="to" />
           </RangeWrapper>

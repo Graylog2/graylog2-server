@@ -17,13 +17,21 @@
 import * as React from 'react';
 import { useCallback } from 'react';
 import PropTypes from 'prop-types';
-import { SwatchesPicker } from 'react-color';
+import { SwatchesPicker, ColorResult } from 'react-color';
+
+type Props = {
+  color: string,
+  colors: Array<Array<string>>,
+  height: number,
+  width: number,
+  onChange: (color: string, event: React.ChangeEvent<HTMLInputElement>) => void,
+};
 
 /**
  * Color picker component that let the user select a color from a list of 95 colors grouped by hue.
  */
-const ColorPicker = ({ onChange, ...rest }) => {
-  const onColorChange = useCallback((color, event) => {
+const ColorPicker = ({ onChange, ...rest }: Props) => {
+  const onColorChange = useCallback((color: ColorResult, event: React.ChangeEvent<HTMLInputElement>) => {
     onChange(color.hex, event);
   }, [onChange]);
 

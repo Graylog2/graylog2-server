@@ -14,8 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import * as React from 'react';
+import { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import React from 'react';
+
+type Props = {
+  title: React.ReactNode,
+  children: React.ReactNode,
+}
 
 /**
  * React component that modifies the page `document.title` dynamically. When the component is unmounted, it
@@ -29,30 +35,26 @@ import React from 'react';
  * </DocumentTitle>
  * ```
  */
-class DocumentTitle extends React.Component {
-  static propTypes = {
-    /** Title to prepend to the page `document.title`. */
-    title: PropTypes.string.isRequired,
-    /** Children to be rendered. */
-    children: PropTypes.oneOfType([
-      PropTypes.arrayOf(PropTypes.element),
-      PropTypes.element,
-    ]).isRequired,
-  };
+const DocumentTitle = ({ children, title }: Props) => {
+  const DEFAULT_TITLE = 'Graylog';
 
-  componentDidMount() {
-    document.title = `${document.title} - ${this.props.title}`;
-  }
+  useEffect(() => {
+    document.title = `${document.title} - ${title}`;
 
-  componentWillUnmount() {
-    document.title = this.defaultTitle;
-  }
+    return () => { document.title = DEFAULT_TITLE; };
+  }, [title]);
 
-  defaultTitle = 'Graylog';
+  return <>{children}</>;
+};
 
-  render() {
-    return this.props.children;
-  }
-}
+DocumentTitle.propTypes = {
+  /** Title to prepend to the page `document.title`. */
+  title: PropTypes.string.isRequired,
+  /** Children to be rendered. */
+  children: PropTypes.oneOfType([
+    PropTypes.arrayOf(PropTypes.element),
+    PropTypes.element,
+  ]).isRequired,
+};
 
 export default DocumentTitle;

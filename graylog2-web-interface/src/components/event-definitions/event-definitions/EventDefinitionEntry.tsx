@@ -116,7 +116,6 @@ const EventDefinitionEntry = ({
                       title={linkTitle}
                       titleSuffix={titleSuffix}
                       description={renderDescription(eventDefinition, context)}
-                      noItemsText="Could not find any items with the given filter."
                       actions={actions} />
       {showEntityShareModal && (
         <EntityShareModal entityId={eventDefinition.id}

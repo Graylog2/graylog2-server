@@ -23,7 +23,6 @@ export { default as ColorPicker } from './ColorPicker';
 export { default as ColorPickerPopover } from './ColorPickerPopover';
 export { default as ConfirmLeaveDialog } from './ConfirmLeaveDialog';
 export { default as ContentHeadRow } from './ContentHeadRow';
-export { default as ContentPackMarker } from './ContentPackMarker';
 export { default as ControlledTableList } from './ControlledTableList';
 export { default as CopyToClipboardCapture } from './CopyToClipboardCapture';
 export { default as CountBadge } from './CountBadge';

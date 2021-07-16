@@ -25,7 +25,6 @@ import AbsoluteDatePicker from './AbsoluteDatePicker';
 import AbsoluteTimeInput from './AbsoluteTimeInput';
 
 type Props = {
-  disabled: boolean,
   startDate?: Date,
   range: 'to' | 'from',
   nextTimeRange: AbsoluteTimeRange,
@@ -39,7 +38,7 @@ const ErrorMessage = styled.span(({ theme }) => css`
   height: 1.5em;
 `);
 
-const AbsoluteCalendar = ({ disabled, startDate, nextTimeRange, range }: Props) => {
+const AbsoluteCalendar = ({ startDate, nextTimeRange, range }: Props) => {
   return (
     <Field name={`nextTimeRange[${range}]`}>
       {({ field: { value, onChange, name }, meta: { error } }) => {
@@ -48,9 +47,7 @@ const AbsoluteCalendar = ({ disabled, startDate, nextTimeRange, range }: Props) 
 
         return (
           <>
-            <AbsoluteDatePicker name={name}
-                                disabled={disabled}
-                                onChange={_onChange}
+            <AbsoluteDatePicker onChange={_onChange}
                                 startDate={startDate}
                                 dateTime={dateTime} />
 
@@ -67,14 +64,12 @@ const AbsoluteCalendar = ({ disabled, startDate, nextTimeRange, range }: Props) 
 };
 
 AbsoluteCalendar.propTypes = {
-  disabled: PropTypes.bool,
   nextTimeRange: PropTypes.shape({ from: PropTypes.string, to: PropTypes.string }).isRequired,
   startDate: PropTypes.instanceOf(Date),
   range: PropTypes.oneOf(['to', 'from']).isRequired,
 };
 
 AbsoluteCalendar.defaultProps = {
-  disabled: false,
   startDate: undefined,
 };
 
