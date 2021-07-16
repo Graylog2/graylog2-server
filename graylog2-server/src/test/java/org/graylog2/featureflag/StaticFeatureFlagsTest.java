@@ -34,8 +34,8 @@ import static org.mockito.BDDMockito.given;
 @ExtendWith(MockitoExtension.class)
 class StaticFeatureFlagsTest {
 
-    private static final String PREFIX_SYSTEM_PROPERTY = "graylog.ff.";
-    private static final String PREFIX_ENVIRONMENT_VARIABLE = "GRAYLOG_FF_";
+    private static final String PREFIX_SYSTEM_PROPERTY = "graylog.feature.";
+    private static final String PREFIX_ENVIRONMENT_VARIABLE = "GRAYLOG_FEATURE_";
 
     private static final String FEATURE_1 = "f1";
     private static final String FEATURE_2 = "f2";

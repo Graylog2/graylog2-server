@@ -30,8 +30,8 @@ import static org.graylog2.featureflag.FeatureFlagStringUtil.startsWithIgnoreCas
 public class FeatureFlagsFactory {
 
     private static final Logger LOG = LoggerFactory.getLogger(FeatureFlagsFactory.class);
-    private static final String GRAYLOG_FF_ENVIRONMENT_VAR_PREFIX = GRAYLOG_ENVIRONMENT_VAR_PREFIX + "FF_";
-    private static final String GRAYLOG_FF_SYSTEM_PROP_PREFIX = GRAYLOG_SYSTEM_PROP_PREFIX + "ff.";
+    private static final String GRAYLOG_FF_ENVIRONMENT_VAR_PREFIX = GRAYLOG_ENVIRONMENT_VAR_PREFIX + "FEATURE_";
+    private static final String GRAYLOG_FF_SYSTEM_PROP_PREFIX = GRAYLOG_SYSTEM_PROP_PREFIX + "feature.";
     private static final String DEFAULT_PROPERTIES_FILE = "/org/graylog2/featureflag/feature-flag.config";
 
     public FeatureFlags createStaticFeatureFlags(String customPropertiesFile) {
