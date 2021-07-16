@@ -22,11 +22,14 @@ import com.google.common.io.Resources;
 import org.glassfish.grizzly.utils.Charsets;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.util.Map;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
 abstract class GIMMappingTest {
     private static final ObjectMapper mapper = new ObjectMapperProvider().get();
@@ -45,4 +48,18 @@ abstract class GIMMappingTest {
     String resource(String filename) throws IOException {
         return Resources.toString(Resources.getResource(this.getClass(), filename), Charsets.UTF8_CHARSET);
     }
+
+    @Test
+    void matchesJsonSource() throws Exception {
+        final IndexMappingTemplate template = createTemplate();
+        final IndexSetConfig indexSetConfig = mockIndexSetConfig();
+
+        final Map<String, Object> result = template.toTemplate(indexSetConfig, "myindex*", -2147483648);
+
+        assertEquals(expectedGimTemplate(), json(result), true);
+    }
+
+    abstract IndexMappingTemplate createTemplate();
+
+    abstract String expectedGimTemplate() throws IOException;
 }
