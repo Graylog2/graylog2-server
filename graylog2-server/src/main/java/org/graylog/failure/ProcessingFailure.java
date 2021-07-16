@@ -21,23 +21,20 @@ import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
 
-public class IndexingFailure implements Failure {
+public class ProcessingFailure implements Failure {
 
     private final String failedMessageId;
-    private final String targetIndex;
     private final String errorType;
     private final String errorMessage;
     private final DateTime timestamp;
     private final Indexable failedMessage;
 
-    public IndexingFailure(String failedMessageId,
-                           String targetIndex,
-                           String errorType,
-                           String errorMessage,
-                           DateTime timestamp,
-                           Indexable failedMessage) {
+    public ProcessingFailure(String failedMessageId,
+                             String errorType,
+                             String errorMessage,
+                             DateTime timestamp,
+                             Indexable failedMessage) {
         this.failedMessageId = failedMessageId;
-        this.targetIndex = targetIndex;
         this.errorType = errorType;
         this.errorMessage = errorMessage;
         this.timestamp = timestamp;
@@ -46,7 +43,7 @@ public class IndexingFailure implements Failure {
 
     @Override
     public FailureType failureType() {
-        return FailureType.INDEXING;
+        return FailureType.PROCESSING;
     }
 
     @Override
@@ -57,7 +54,7 @@ public class IndexingFailure implements Failure {
     @Nullable
     @Override
     public String targetIndex() {
-        return targetIndex;
+        return null;
     }
 
     @Override

@@ -22,6 +22,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.eventbus.EventBus;
+import org.graylog.failure.FailureHandlerService;
+import org.graylog.failure.FailureSubmitService;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
@@ -50,6 +52,7 @@ import org.graylog2.plugin.Messages;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.SuppressForbidden;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.junit.Test;
 
@@ -270,8 +273,10 @@ public class PipelineInterpreterTest {
         return new PipelineInterpreter(
                 mock(MessageQueueAcknowledger.class),
                 new MetricRegistry(),
-                stateUpdater
-        );
+                stateUpdater,
+                mock(FailureSubmitService.class),
+                mock(FailureHandlerService.class),
+                new ObjectMapperProvider());
     }
 
     @Test
@@ -326,8 +331,10 @@ public class PipelineInterpreterTest {
         final PipelineInterpreter interpreter = new PipelineInterpreter(
                 mock(MessageQueueAcknowledger.class),
                 metricRegistry,
-                stateUpdater
-        );
+                stateUpdater,
+                mock(FailureSubmitService.class),
+                mock(FailureHandlerService.class),
+                new ObjectMapperProvider());
 
         interpreter.process(messageInDefaultStream("", ""));
 

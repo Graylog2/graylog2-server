@@ -35,9 +35,9 @@ public class DefaultFailureHandler implements FailureHandler {
     public void handle(FailureBatch failureBatch) {
         failureBatch.getFailures().forEach(failure ->
                 indexFailureService.saveWithoutValidation(new IndexFailureImpl(ImmutableMap.<String, Object>builder()
-                    .put("letter_id", failure.messageId())
+                    .put("letter_id", failure.failedMessageId())
                     .put("index", failure.targetIndex())
-                    .put("type", failure.failureType())
+                    .put("type", failure.failureType().toString())
                     .put("message", failure.errorMessage())
                     .put("timestamp", failure.timestamp())
                     .build())));

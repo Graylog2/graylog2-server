@@ -17,12 +17,10 @@
 package org.graylog2.indexer.messages;
 
 import com.codahale.metrics.MetricRegistry;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import de.huxhorn.sulky.ulid.ULID;
 import joptsimple.internal.Strings;
 import org.graylog.failure.FailureBatch;
 import org.graylog.failure.FailureSubmitService;
@@ -100,7 +98,7 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         client().waitForGreenStatus(INDEX_NAME);
         final MetricRegistry metricRegistry = new MetricRegistry();
         messages = new Messages(mock(TrafficAccounting.class), createMessagesAdapter(metricRegistry), mock(ProcessingStatusRecorder.class),
-                failureSubmitService, new ObjectMapper(), new ULID());
+                failureSubmitService);
     }
 
     @After
