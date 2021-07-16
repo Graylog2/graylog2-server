@@ -24,9 +24,7 @@ import org.graylog2.search.SearchQuery;
 import org.mongojack.DBQuery;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -45,11 +43,7 @@ public class ViewSummaryService extends PaginatedDbService<ViewSummaryDTO> {
                                                    String sortField,
                                                    int page,
                                                    int perPage) {
-        final PaginatedList<ViewSummaryDTO> viewsList = findPaginatedWithQueryFilterAndSort(query, filter, getSortBuilder(order, sortField), page, perPage);
-        return viewsList.stream()
-                .collect(Collectors.toCollection(() -> viewsList.grandTotal()
-                        .map(grandTotal -> new PaginatedList<ViewSummaryDTO>(new ArrayList<>(viewsList.size()), viewsList.pagination().total(), page, perPage, grandTotal))
-                        .orElseGet(() -> new PaginatedList<>(new ArrayList<>(viewsList.size()), viewsList.pagination().total(), page, perPage))));
+        return findPaginatedWithQueryFilterAndSort(query, filter, getSortBuilder(order, sortField), page, perPage);
     }
 
     public PaginatedList<ViewSummaryDTO> searchPaginatedByType(ViewDTO.Type type,
