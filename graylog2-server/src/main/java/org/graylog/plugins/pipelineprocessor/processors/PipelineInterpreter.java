@@ -19,7 +19,6 @@ package org.graylog.plugins.pipelineprocessor.processors;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -34,6 +33,7 @@ import com.google.common.collect.Sets;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog.failure.FailureBatch;
+import org.graylog.failure.FailureHandlerService;
 import org.graylog.failure.FailureSubmitService;
 import org.graylog.failure.ProcessingFailure;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
@@ -84,6 +84,7 @@ public class PipelineInterpreter implements MessageProcessor {
     private final MetricRegistry metricRegistry;
     private final ConfigurationStateUpdater stateUpdater;
     private final FailureSubmitService failureSubmitService;
+    private final FailureHandlerService failureHandlerService;
     private final ObjectMapper objectMapper;
 
     @Inject
@@ -91,6 +92,7 @@ public class PipelineInterpreter implements MessageProcessor {
                                MetricRegistry metricRegistry,
                                ConfigurationStateUpdater stateUpdater,
                                FailureSubmitService failureSubmitService,
+                               FailureHandlerService failureHandlerService,
                                ObjectMapperProvider objectMapperProvider) {
 
         this.messageQueueAcknowledger = messageQueueAcknowledger;
@@ -100,6 +102,7 @@ public class PipelineInterpreter implements MessageProcessor {
         this.metricRegistry = metricRegistry;
         this.stateUpdater = stateUpdater;
         this.failureSubmitService = failureSubmitService;
+        this.failureHandlerService = failureHandlerService;
         this.objectMapper = objectMapperProvider.get();
     }
 
@@ -188,7 +191,11 @@ public class PipelineInterpreter implements MessageProcessor {
 
     private void handleFailedMessage(Message message) {
         // TODO we probably want a configuration option to disable this feature
-        // TODO if storing failed messages in ES is disabled, we don't want to mark the message as filteredOut either
+
+        if (!failureHandlerService.canHandleProcessingErrors()) {
+            // If we cannot store messages with processing errors separately, keep the default behaviour.
+            return;
+        }
         final String processingError = message.getFieldAs(String.class, Message.FIELD_GL2_PROCESSING_ERROR);
         if (processingError != null) {
             message.setFilterOut(true);

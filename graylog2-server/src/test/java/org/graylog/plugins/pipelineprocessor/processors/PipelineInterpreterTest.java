@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.eventbus.EventBus;
+import org.graylog.failure.FailureHandlerService;
 import org.graylog.failure.FailureSubmitService;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
@@ -274,6 +275,7 @@ public class PipelineInterpreterTest {
                 new MetricRegistry(),
                 stateUpdater,
                 mock(FailureSubmitService.class),
+                mock(FailureHandlerService.class),
                 new ObjectMapperProvider());
     }
 
@@ -331,6 +333,7 @@ public class PipelineInterpreterTest {
                 metricRegistry,
                 stateUpdater,
                 mock(FailureSubmitService.class),
+                mock(FailureHandlerService.class),
                 new ObjectMapperProvider());
 
         interpreter.process(messageInDefaultStream("", ""));

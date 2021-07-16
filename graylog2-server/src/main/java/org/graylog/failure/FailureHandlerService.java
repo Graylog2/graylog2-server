@@ -16,6 +16,7 @@
  */
 package org.graylog.failure;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.AbstractExecutionThreadService;
 import org.slf4j.Logger;
@@ -93,5 +94,10 @@ public class FailureHandlerService extends AbstractExecutionThreadService {
         } else {
             return suitableHandlers;
         }
+    }
+
+    public boolean canHandleProcessingErrors() {
+        // TODO this should probably be cached
+        return !suitableHandlers(new FailureBatch(ImmutableList.of(), ProcessingFailure.class)).isEmpty();
     }
 }
