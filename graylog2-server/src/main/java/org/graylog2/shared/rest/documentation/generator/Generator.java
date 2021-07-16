@@ -18,11 +18,22 @@ package org.graylog2.shared.rest.documentation.generator;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonAnyFormatVisitor;
+import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonArrayFormatVisitor;
+import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonBooleanFormatVisitor;
+import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonIntegerFormatVisitor;
+import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonMapFormatVisitor;
+import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonNullFormatVisitor;
+import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonNumberFormatVisitor;
+import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonObjectFormatVisitor;
+import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonStringFormatVisitor;
 import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
 import com.fasterxml.jackson.module.jsonSchema.JsonSchemaGenerator;
+import com.fasterxml.jackson.module.jsonSchema.customProperties.TitleSchemaFactoryWrapper;
 import com.fasterxml.jackson.module.jsonSchema.factories.SchemaFactoryWrapper;
+import com.fasterxml.jackson.module.jsonSchema.factories.VisitorContext;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.ComparisonChain;
@@ -358,7 +369,7 @@ public class Generator {
     private TypeSchema typeSchema(Type genericType) {
         final Class<?> returnType = classForType(genericType);
         if (returnType.isAssignableFrom(Response.class)) {
-            return createPrimitiveSchema("string");
+            return createPrimitiveSchema("any");
         }
 
         if (returnType.isEnum()) {
@@ -544,6 +555,56 @@ public class Generator {
                 this.schema = s;
                 return visitorFactory.anyFormatVisitor(new AnySchema());*/
                 return super.expectAnyFormat(convertedType);
+            }
+
+            @Override
+            public JsonObjectFormatVisitor expectObjectFormat(JavaType convertedType) {
+                return super.expectObjectFormat(convertedType);
+            }
+
+            @Override
+            public JsonStringFormatVisitor expectStringFormat(JavaType convertedType) {
+                return super.expectStringFormat(convertedType);
+            }
+
+            @Override
+            public JsonArrayFormatVisitor expectArrayFormat(JavaType convertedType) {
+                return super.expectArrayFormat(convertedType);
+            }
+
+            @Override
+            public JsonBooleanFormatVisitor expectBooleanFormat(JavaType convertedType) {
+                return super.expectBooleanFormat(convertedType);
+            }
+
+            @Override
+            public JsonIntegerFormatVisitor expectIntegerFormat(JavaType convertedType) {
+                return super.expectIntegerFormat(convertedType);
+            }
+
+            @Override
+            public JsonNullFormatVisitor expectNullFormat(JavaType convertedType) {
+                return super.expectNullFormat(convertedType);
+            }
+
+            @Override
+            public JsonNumberFormatVisitor expectNumberFormat(JavaType convertedType) {
+                return super.expectNumberFormat(convertedType);
+            }
+
+            @Override
+            public JsonMapFormatVisitor expectMapFormat(JavaType type) throws JsonMappingException {
+                return super.expectMapFormat(type);
+            }
+
+            @Override
+            public SchemaFactoryWrapper setVisitorContext(VisitorContext rvc) {
+                return super.setVisitorContext(rvc);
+            }
+
+            @Override
+            public JsonSchema finalSchema() {
+                return super.finalSchema();
             }
         };
         final JsonSchemaGenerator schemaGenerator = new JsonSchemaGenerator(mapper, schemaFactoryWrapper);
