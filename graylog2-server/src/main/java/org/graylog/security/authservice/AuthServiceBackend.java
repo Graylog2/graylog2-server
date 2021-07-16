@@ -41,6 +41,19 @@ public interface AuthServiceBackend {
 
     default Optional<AuthenticationDetails> authenticateAndProvision(AuthServiceToken token,
             ProvisionerService provisionerService) {
+        return authenticateAndProvision(token, provisionerService, true);
+    }
+
+    /**
+     * Authenticate user and provision a local user record
+     * @param token
+     * @param provisionerService
+     * @param isExternal user is managed by external service (e.g. Okta) and cannot be modified locally
+     * @return authentication details; empty if a problem was encountered
+     */
+    default Optional<AuthenticationDetails> authenticateAndProvision(AuthServiceToken token,
+                                                                     ProvisionerService provisionerService,
+                                                                     boolean isExternal) {
         log.debug("Cannot authenticate by token. Token-based authentication is not supported by auth service backend " +
                 "type <" + backendTitle() + ">.");
         return Optional.empty();

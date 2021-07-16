@@ -19,6 +19,7 @@ package org.graylog.security.authservice;
 import com.google.auto.value.AutoValue;
 
 import javax.annotation.Nullable;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 
@@ -55,6 +56,11 @@ public abstract class UserDetails {
 
     public abstract Set<String> defaultRoles();
 
+    /**
+     * Only used in Cloud context
+     */
+    public abstract Set<String> initialGraylogRoles();
+
     public UserDetails withDatabaseId(String id) {
         checkArgument(!isNullOrEmpty(id), "id cannot be null or empty");
 
@@ -70,7 +76,7 @@ public abstract class UserDetails {
     @AutoValue.Builder
     public abstract static class Builder {
         public static Builder create() {
-            return new AutoValue_UserDetails.Builder();
+            return new AutoValue_UserDetails.Builder().initialGraylogRoles(Collections.emptySet());
         }
 
         public abstract Builder databaseId(@Nullable String databaseId);
@@ -102,6 +108,8 @@ public abstract class UserDetails {
         public abstract Builder isExternal(boolean isExternal);
 
         public abstract Builder defaultRoles(Set<String> defaultRoles);
+
+        public abstract Builder initialGraylogRoles(Set<String> initialGraylogRoles);
 
         abstract UserDetails autoBuild();
 

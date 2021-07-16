@@ -32,6 +32,8 @@ public abstract class AuthenticationDetails {
         return Builder.create();
     }
 
+    public abstract AuthenticationDetails.Builder toBuilder();
+
     @AutoValue.Builder
     public abstract static class Builder {
 
