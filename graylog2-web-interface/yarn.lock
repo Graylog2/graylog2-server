@@ -13795,16 +13795,16 @@ react-fast-compare@^2.0.1:
   resolved "https://registry.yarnpkg.com/react-fast-compare/-/react-fast-compare-2.0.4.tgz#e84b4d455b0fec113e0402c329352715196f81f9"
   integrity sha512-suNP+J1VU1MWFKcyt7RtjiSWUjvidmQSlqu+eHslq+342xCbGTYmC0mEhPCOHxlW0CywylOC1u2DFAT+bv4dBw==
 
-react-grid-layout@^0.18.3:
-  version "0.18.3"
-  resolved "https://registry.yarnpkg.com/react-grid-layout/-/react-grid-layout-0.18.3.tgz#4f9540199f35211077eae0aa5bc83096a672c39c"
-  integrity sha512-lHkrk941Tk5nTwZPa9uj6ttHBT0VehSHwEhWbINBJKvM1GRaFNOefvjcuxSyuCI5JWjVUP+Qm3ARt2470AlxMA==
+react-grid-layout@^1.2.2:
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/react-grid-layout/-/react-grid-layout-1.2.2.tgz#42cdb4b27fcdc4fad1655d8862b9d54c6f011d6d"
+  integrity sha512-i5/xPkyi0llA6PCEW2B26e7pTY+JLp0zPvs6MYbbEXWaO1FWG0xr6Q/FqPrh6K86glV5ZRU7DEbvnedZVdFglg==
   dependencies:
     classnames "2.x"
     lodash.isequal "^4.0.0"
     prop-types "^15.0.0"
     react-draggable "^4.0.0"
-    react-resizable "^1.9.0"
+    react-resizable "^1.10.0"
 
 react-group@^3.0.2:
   version "3.0.2"
@@ -13950,10 +13950,10 @@ react-redux@^7.2.0:
     prop-types "^15.7.2"
     react-is "^16.13.1"
 
-react-resizable@^1.8.0, react-resizable@^1.9.0:
-  version "1.10.1"
-  resolved "https://registry.yarnpkg.com/react-resizable/-/react-resizable-1.10.1.tgz#f0c2cf1d83b3470b87676ce6d6b02bbe3f4d8cd4"
-  integrity sha512-Jd/bKOKx6+19NwC4/aMLRu/J9/krfxlDnElP41Oc+oLiUWs/zwV1S9yBfBZRnqAwQb6vQ/HRSk3bsSWGSgVbpw==
+react-resizable@^1.10.0, react-resizable@^1.8.0:
+  version "1.11.1"
+  resolved "https://registry.yarnpkg.com/react-resizable/-/react-resizable-1.11.1.tgz#02ca6850afa7a22c1b3e623e64aef71ee252af69"
+  integrity sha512-S70gbLaAYqjuAd49utRHibtHLrHXInh7GuOR+6OO6RO6uleQfuBnWmZjRABfqNEx3C3Z6VPLg0/0uOYFrkfu9Q==
   dependencies:
     prop-types "15.x"
     react-draggable "^4.0.3"
