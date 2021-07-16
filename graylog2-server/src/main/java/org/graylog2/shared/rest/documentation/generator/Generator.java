@@ -64,6 +64,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.AbstractMap;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -593,6 +595,11 @@ public class Generator {
                     if (!isNullOrEmpty(apiParam.defaultValue())) {
                         param.setDefaultValue(apiParam.defaultValue());
                     }
+
+                    if (!isNullOrEmpty(apiParam.allowableValues()) && !apiParam.allowableValues().startsWith("range[")) {
+                        final List<String> allowableValues = Arrays.asList(apiParam.allowableValues().split(","));
+                        param.setAllowableValues(allowableValues);
+                    }
                 }
 
                 if (annotation instanceof DefaultValue) {
@@ -762,6 +769,7 @@ public class Generator {
         private TypeSchema typeSchema;
         private Kind kind;
         private String defaultValue;
+        private Collection<String> allowableValues;
 
         public void setName(String name) {
             this.name = name;
@@ -807,6 +815,8 @@ public class Generator {
             this.defaultValue = defaultValue;
         }
 
+        public void setAllowableValues(Collection<String> allowableValues) { this.allowableValues = allowableValues; }
+
         @JsonValue
         public Map<String, Object> jsonValue() {
             ImmutableMap.Builder<String, Object> builder = ImmutableMap.<String, Object>builder()
@@ -817,6 +827,10 @@ public class Generator {
 
             if (defaultValue != null) {
                 builder = builder.put("defaultValue", defaultValue);
+            }
+
+            if (allowableValues != null) {
+                builder = builder.put("enum", allowableValues);
             }
 
             if (typeSchema.type() == null || isObjectSchema(typeSchema.type())) {

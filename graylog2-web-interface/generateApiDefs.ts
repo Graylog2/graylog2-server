@@ -180,13 +180,13 @@ const createInitializer = (type, defaultValue) => (isNumeric(type)
 
 const sortByOptionality = (parameter1, parameter2) => parameter2.required - parameter1.required;
 
-const createFunctionParameter = ({ name, required, defaultValue, type, paramType }) => ts.factory.createParameterDeclaration(
+const createFunctionParameter = ({ name, required, defaultValue, type, paramType, enum: allowableValues }) => ts.factory.createParameterDeclaration(
   undefined,
   undefined,
   undefined,
   paramType === 'body' ? 'body' : name,
   (required || defaultValue) ? undefined : ts.factory.createToken(ts.SyntaxKind.QuestionToken),
-  createTypeFor({ type }),
+  createTypeFor({ type, enum: allowableValues }),
   defaultValue ? createInitializer(type, defaultValue) : undefined,
 );
 
