@@ -675,6 +675,10 @@ public class Generator {
                 if (annotation instanceof QueryParam) {
                     paramKind = Parameter.Kind.QUERY;
                 } else if (annotation instanceof PathParam) {
+                    final String annotationValue = ((PathParam)annotation).value();
+                    if (!Strings.isNullOrEmpty(annotationValue)) {
+                        param.setName(annotationValue);
+                    }
                     paramKind = Parameter.Kind.PATH;
                 } else if (annotation instanceof HeaderParam) {
                     paramKind = Parameter.Kind.HEADER;
