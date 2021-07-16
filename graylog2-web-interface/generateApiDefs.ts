@@ -13,6 +13,7 @@ const createString = (s) => ts.factory.createStringLiteral(s, true);
 const primitiveTypeMappings = {
   string: 'string',
   integer: 'number',
+  Integer: 'number',
   boolean: 'boolean',
   DateTime: 'string',
   object: '{}',
@@ -24,8 +25,10 @@ const isPrimitiveType = (type) => Object.keys(primitiveTypeMappings).includes(ty
 const mapPrimitiveType = (type) => primitiveTypeMappings[type];
 
 const typeMappings = {
-  'urn:jsonschema:org:joda:time:DateTime': 'Date',
+  'urn:jsonschema:org:joda:time:DateTime': 'string',
+  DateTime: 'string',
   String: 'string',
+  ChunkedOutput: 'unknown',
 };
 
 const isURN = (type) => type.split(':').length > 1;
@@ -57,30 +60,32 @@ const createEnumType = ({ type, enum: enumOptions }) => {
 };
 
 const createTypeFor = (propDef) => {
-  const { type, ...rest } = propDef;
-  const cleanType = type ? type.replace(/>/, '') : type;
+  const { type: rawType, ...rest } = propDef;
+  const isOptional = rawType && rawType.endsWith('>');
+  const cleanType = rawType ? rawType.replace(/>/, '') : rawType;
+  const type = isMappedType(cleanType) ? mapType(cleanType) : cleanType;
 
-  if (cleanType && isURN(cleanType)) {
-    return ts.factory.createTypeReferenceNode(stripURN(cleanType));
+  if (type && isURN(type)) {
+    return ts.factory.createTypeReferenceNode(stripURN(type));
   }
 
-  if (isArrayType(cleanType)) {
+  if (isArrayType(type)) {
     return ts.factory.createArrayTypeNode(createTypeFor(rest.items));
-  }
-
-  if (isMappedType(cleanType)) {
-    return ts.factory.createTypeReferenceNode(mapType(cleanType));
   }
 
   if (propDef.$ref) {
     return createTypeFor({ type: propDef.$ref });
   }
 
-  if (isPrimitiveType(cleanType)) {
-    return isEnumType(propDef) ? createEnumType(propDef) : ts.factory.createTypeReferenceNode(mapPrimitiveType(cleanType));
+  if (isPrimitiveType(type)) {
+    return isEnumType(propDef) ? createEnumType(propDef) : ts.factory.createTypeReferenceNode(mapPrimitiveType(type));
   }
 
-  return ts.factory.createTypeReferenceNode(cleanType);
+  const typeReferenceNode = ts.factory.createTypeReferenceNode(type);
+
+  return isOptional
+    ? ts.factory.createUnionTypeNode([typeReferenceNode, ts.factory.createKeywordTypeNode(ts.SyntaxKind.UndefinedKeyword)])
+    : typeReferenceNode;
 };
 
 const readonlyModifier = ts.factory.createModifier(ts.SyntaxKind.ReadonlyKeyword);
@@ -94,8 +99,8 @@ const createProps = (properties) => Object.entries(properties)
     createTypeFor(propDef),
   ));
 
-const bannedModels = ['DateTime', 'DateTimeZone', 'Chronology', 'String>'];
-const isNotBannedModel = ([name]) => !bannedModels.includes(name);
+const bannedModels = [...Object.keys(typeMappings), 'DateTime', 'DateTimeZone', 'Chronology', 'String>', 'LocalDateTime', 'Type'];
+const isNotBannedModel = ([name]) => !bannedModels.includes(name) && !name.endsWith('>');
 
 const createModel = ([name, definition]) => (definition.type === 'object'
   ? ts.factory.createInterfaceDeclaration(
