@@ -16,7 +16,6 @@
  */
 package org.graylog2.featureflag;
 
-import org.graylog2.featureflag.FeatureFlagsResources.FeatureFlagResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,64 +25,58 @@ import java.util.Optional;
 
 import static org.graylog2.bootstrap.CmdLineTool.GRAYLOG_ENVIRONMENT_VAR_PREFIX;
 import static org.graylog2.bootstrap.CmdLineTool.GRAYLOG_SYSTEM_PROP_PREFIX;
-import static org.graylog2.featureflag.FeatureFlagStringUtil.*;
+import static org.graylog2.featureflag.FeatureFlagStringUtil.startsWithIgnoreCase;
 
 public class FeatureFlagsFactory {
 
     private static final Logger LOG = LoggerFactory.getLogger(FeatureFlagsFactory.class);
     private static final String GRAYLOG_FF_ENVIRONMENT_VAR_PREFIX = GRAYLOG_ENVIRONMENT_VAR_PREFIX + "FF_";
     private static final String GRAYLOG_FF_SYSTEM_PROP_PREFIX = GRAYLOG_SYSTEM_PROP_PREFIX + "ff.";
+    private static final String DEFAULT_PROPERTIES_FILE = "/org/graylog2/featureflag/feature-flag.config";
 
     public FeatureFlags createStaticFeatureFlags(String customPropertiesFile) {
-        return createStaticFeatureFlags(FeatureFlagsResources.create(customPropertiesFile));
+        return createStaticFeatureFlags(new FeatureFlagsResources(), DEFAULT_PROPERTIES_FILE, customPropertiesFile);
     }
 
-    public FeatureFlags createStaticFeatureFlags(FeatureFlagsResources resources) {
+    public FeatureFlags createStaticFeatureFlags(FeatureFlagsResources resources, String defaultPropertiesFile, String customPropertiesFile) {
         Map<String, String> flags = new HashMap<>();
-        addDefaultPropertiesFlags(flags, resources.defaultPropertiesResource());
-        addCustomPropertiesFlags(flags, resources.customPropertiesResource());
-        addSystemPropertiesFlags(flags, resources.systemPropertiesResource());
-        addEnvironmentVariableFlags(flags, resources.environmentVariableResource());
+        addDefaultPropertiesFlags(flags, resources, defaultPropertiesFile);
+        addCustomPropertiesFlags(flags, resources, customPropertiesFile);
+        addSystemPropertiesFlags(flags, resources);
+        addEnvironmentVariableFlags(flags, resources);
         LOG.info("Following feature flags are used: {}", flags);
         return new StaticFeatureFlags(flags);
     }
 
-    private void addDefaultPropertiesFlags(Map<String, String> flags, FeatureFlagResource resource) {
+    private void addDefaultPropertiesFlags(Map<String, String> flags, FeatureFlagsResources resource, String file) {
         try {
-            addFlags(flags, resource);
+            addFlags(flags, resource.defaultProperties(file));
         } catch (Exception e) {
-            throw new RuntimeException("Unable to read default properties feature flags!", e);
+            throw new RuntimeException(
+                    String.format("Unable to read default feature flags file %s!", file), e);
         }
     }
 
-    private void addCustomPropertiesFlags(Map<String, String> flags, FeatureFlagResource resource) {
+    private void addCustomPropertiesFlags(Map<String, String> flags, FeatureFlagsResources resource, String file) {
         try {
-            addFlags(flags, resource);
+            addFlags(flags, resource.customProperties(file));
         } catch (Exception e) {
-            LOG.info("Custom properties feature flags could not be determined. Skipping...");
+            LOG.info("Unable to read custom feature flags file {}! Skipping...", file);
         }
     }
 
-    private void addSystemPropertiesFlags(Map<String, String> flags, FeatureFlagResource resource) {
-        try {
-            addFlagsWithPrefix(GRAYLOG_FF_SYSTEM_PROP_PREFIX, flags, resource);
-        } catch (Exception e) {
-            LOG.info("System properties feature flags could not be determined. Skipping ...");
-        }
+    private void addSystemPropertiesFlags(Map<String, String> flags, FeatureFlagsResources resource) {
+        addFlagsWithPrefix(GRAYLOG_FF_SYSTEM_PROP_PREFIX, flags, resource.systemProperties());
     }
 
-    private void addEnvironmentVariableFlags(Map<String, String> builder, FeatureFlagResource resource) {
-        try {
-            addFlagsWithPrefix(GRAYLOG_FF_ENVIRONMENT_VAR_PREFIX, builder, resource);
-        } catch (Exception e) {
-            LOG.info("Environment variable feature flags could not be determined. Skipping ...");
-        }
+    private void addEnvironmentVariableFlags(Map<String, String> builder, FeatureFlagsResources resource) {
+        addFlagsWithPrefix(GRAYLOG_FF_ENVIRONMENT_VAR_PREFIX, builder, resource.environmentVariables());
     }
 
     private void addFlagsWithPrefix(String prefix,
                                     Map<String, String> flags,
-                                    FeatureFlagResource resource) throws Exception {
-        for (Map.Entry<String, String> resourceEntry : resource.flags().entrySet()) {
+                                    Map<String, String> resource) {
+        for (Map.Entry<String, String> resourceEntry : resource.entrySet()) {
             if (startsWithIgnoreCase(resourceEntry.getKey(), prefix)) {
                 String feature = resourceEntry.getKey().substring(prefix.length());
                 addFlag(flags, feature, resourceEntry.getValue());
@@ -91,18 +84,18 @@ public class FeatureFlagsFactory {
         }
     }
 
-    private void addFlag(Map<String, String> flags, String key, String value) {
-        Optional<String> existingFlag = flags.keySet().stream()
+    private void addFlag(Map<String, String> existingFlags, String key, String value) {
+        Optional<String> existingFlag = existingFlags.keySet().stream()
                 .filter(k -> k.equalsIgnoreCase(key))
                 .findFirst();
         if (existingFlag.isPresent()) {
-            flags.put(existingFlag.get(), value);
+            existingFlags.put(existingFlag.get(), value);
         } else {
-            flags.put(key, value);
+            existingFlags.put(key, value);
         }
     }
 
-    private void addFlags(Map<String, String> flags, FeatureFlagResource resource) throws Exception {
-        resource.flags().forEach((key, value) -> addFlag(flags, key, value));
+    private void addFlags(Map<String, String> existingFlags, Map<String, String> newFlags) {
+        newFlags.forEach((key, value) -> addFlag(existingFlags, key, value));
     }
 }

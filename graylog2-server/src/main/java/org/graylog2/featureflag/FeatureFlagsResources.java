@@ -16,9 +16,6 @@
  */
 package org.graylog2.featureflag;
 
-import com.google.auto.value.AutoValue;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -28,66 +25,29 @@ import java.util.Properties;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-@AutoValue
-abstract class FeatureFlagsResources {
 
-    private static final Logger LOG = LoggerFactory.getLogger(FeatureFlagsResources.class);
+class FeatureFlagsResources {
 
-    static FeatureFlagsResources create(String customPropertiesFile) {
-        return create(defaultPropertiesFeatureFlags(),
-                customPropertiesFeatureFlags(customPropertiesFile),
-                () -> toMap(System.getProperties()),
-                System::getenv);
+    Map<String, String> defaultProperties(String file) throws IOException {
+        return loadProperties(FeatureFlagsResources.class.getResourceAsStream(file));
     }
 
-    static FeatureFlagsResources create(FeatureFlagResource defaultPropertiesResource,
-                                        FeatureFlagResource customPropertiesResource,
-                                        FeatureFlagResource systemPropertiesResource,
-                                        FeatureFlagResource environmentVariableResource) {
-        return new AutoValue_FeatureFlagsResources(
-                defaultPropertiesResource, customPropertiesResource, systemPropertiesResource, environmentVariableResource
-        );
+    Map<String, String> customProperties(String file) throws IOException {
+        return loadProperties(new FileInputStream(file));
     }
 
-    abstract FeatureFlagResource defaultPropertiesResource();
-
-    abstract FeatureFlagResource customPropertiesResource();
-
-    abstract FeatureFlagResource systemPropertiesResource();
-
-    abstract FeatureFlagResource environmentVariableResource();
-
-
-    public interface FeatureFlagResource {
-        Map<String, String> flags() throws Exception;
+    private Map<String, String> loadProperties(InputStream inputStream) throws IOException {
+        Properties properties = new Properties();
+        properties.load(inputStream);
+        return toMap(properties);
     }
 
-    public static FeatureFlagResource defaultPropertiesFeatureFlags() {
-        return () -> {
-            String path = "/org/graylog2/featureflag/feature-flag.config";
-            InputStream resourceAsStream = FeatureFlagsResources.class.getResourceAsStream(path);
-            Properties properties = new Properties();
-            try {
-                properties.load(resourceAsStream);
-            } catch (IOException e) {
-                LOG.error("Unable to read default feature flag file {}: ", path);
-                throw e;
-            }
-            return toMap(properties);
-        };
+    Map<String, String> systemProperties() {
+        return toMap(System.getProperties());
     }
 
-    public static FeatureFlagResource customPropertiesFeatureFlags(String file) {
-        return () -> {
-            Properties properties = new Properties();
-            try {
-                properties.load(new FileInputStream(file));
-            } catch (IOException e) {
-                LOG.info("Unable to read custom feature flag file {}.", file);
-                throw e;
-            }
-            return toMap(properties);
-        };
+    Map<String, String> environmentVariables() {
+        return System.getenv();
     }
 
     private static Map<String, String> toMap(Properties properties) {
