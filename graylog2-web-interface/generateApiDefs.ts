@@ -16,11 +16,11 @@ const primitiveTypeMappings = {
   Integer: 'number',
   boolean: 'boolean',
   DateTime: 'string',
-  object: '{}',
   any: 'unknown',
 };
 
 const isArrayType = (type) => (type === 'array');
+const isObjectType = (type) => (type === 'object');
 const isPrimitiveType = (type) => Object.keys(primitiveTypeMappings).includes(type);
 const mapPrimitiveType = (type) => primitiveTypeMappings[type];
 
@@ -59,6 +59,21 @@ const createEnumType = ({ type, enum: enumOptions }) => {
   return ts.factory.createUnionTypeNode(types);
 };
 
+const createIndexerSignature = (additionalProperties) => (additionalProperties ? [ts.factory.createIndexSignature(
+  undefined,
+  undefined,
+  [ts.factory.createParameterDeclaration(
+    undefined,
+    undefined,
+    undefined,
+    ts.factory.createIdentifier('_key'),
+    undefined,
+    ts.factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
+    undefined,
+  )],
+  createTypeFor(additionalProperties),
+)] : []);
+
 const createTypeFor = (propDef) => {
   const { type: rawType, ...rest } = propDef;
   const isOptional = rawType && rawType.endsWith('>');
@@ -69,16 +84,31 @@ const createTypeFor = (propDef) => {
     return ts.factory.createTypeReferenceNode(stripURN(type));
   }
 
-  if (isArrayType(type)) {
-    return ts.factory.createArrayTypeNode(createTypeFor(rest.items));
-  }
-
   if (propDef.$ref) {
     return createTypeFor({ type: propDef.$ref });
   }
 
   if (isPrimitiveType(type)) {
     return isEnumType(propDef) ? createEnumType(propDef) : ts.factory.createTypeReferenceNode(mapPrimitiveType(type));
+  }
+
+  if (isArrayType(type)) {
+    return ts.factory.createArrayTypeNode(createTypeFor(rest.items));
+  }
+
+  if (isObjectType(type)) {
+    const properties = propDef.properties
+      ? Object.entries(propDef.properties).map(([propName, propType]) => ts.factory.createPropertySignature(
+        undefined,
+        ts.factory.createIdentifier(propName),
+        undefined,
+        createTypeFor(propType),
+      ))
+      : [];
+
+    const additionalProperties = createIndexerSignature(propDef.additionalProperties);
+
+    return ts.factory.createTypeLiteralNode([...properties, ...additionalProperties]);
   }
 
   const typeReferenceNode = ts.factory.createTypeReferenceNode(type);
@@ -101,21 +131,6 @@ const createProps = (properties) => Object.entries(properties)
 
 const bannedModels = [...Object.keys(typeMappings), 'DateTime', 'DateTimeZone', 'Chronology', 'String>', 'LocalDateTime', 'Type'];
 const isNotBannedModel = ([name]) => !bannedModels.includes(name) && !name.endsWith('>');
-
-const createIndexerSignature = (additionalProperties) => (additionalProperties ? [ts.factory.createIndexSignature(
-  undefined,
-  undefined,
-  [ts.factory.createParameterDeclaration(
-    undefined,
-    undefined,
-    undefined,
-    ts.factory.createIdentifier('_key'),
-    undefined,
-    ts.factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
-    undefined,
-  )],
-  createTypeFor(additionalProperties),
-)] : []);
 
 const createModel = ([name, definition]) => (definition.type === 'object'
   ? ts.factory.createInterfaceDeclaration(
