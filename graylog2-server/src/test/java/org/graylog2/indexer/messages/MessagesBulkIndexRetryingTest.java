@@ -47,7 +47,7 @@ class MessagesBulkIndexRetryingTest {
     private final TrafficAccounting trafficAccounting = mock(TrafficAccounting.class);
     private final MessagesAdapter messagesAdapter = mock(MessagesAdapter.class);
     private final ProcessingStatusRecorder processingStatusRecorder = mock(ProcessingStatusRecorder.class);
-    private final FailureSubmitService failureSubmitService = new FailureSubmitService(mock(MetricRegistry.class));
+    private final FailureSubmitService failureSubmitService = new FailureSubmitService(new MetricRegistry());
 
     private Messages messages;
 

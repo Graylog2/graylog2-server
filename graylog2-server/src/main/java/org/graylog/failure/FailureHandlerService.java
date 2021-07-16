@@ -74,9 +74,9 @@ public class FailureHandlerService extends AbstractExecutionThreadService {
     protected void triggerShutdown() {
         logger.debug("Requested to shut down.");
 
-        executionThread.interrupt();
-
         failureSubmitService.shutDown();
+
+        executionThread.interrupt();
     }
 
     @Override
