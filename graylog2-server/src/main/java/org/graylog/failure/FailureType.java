@@ -16,6 +16,8 @@
  */
 package org.graylog.failure;
 
+import java.util.Locale;
+
 public enum FailureType {
     INDEXING,
     PROCESSING
@@ -23,6 +25,6 @@ public enum FailureType {
 
     @Override
     public String toString() {
-        return name().toLowerCase();
+        return name().toLowerCase(Locale.US);
     }
 }
