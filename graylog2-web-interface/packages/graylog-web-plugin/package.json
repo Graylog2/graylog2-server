@@ -45,7 +45,7 @@
     "html-webpack-plugin": "^4.2.0",
     "javascript-natural-sort": "0.7.1",
     "jest-preset-graylog": "file:../jest-preset-graylog",
-    "jquery": "3.5.1",
+    "jquery": "3.6.0",
     "moment": "2.29.1",
     "moment-timezone": "0.5.31",
     "prop-types": "15.7.2",
