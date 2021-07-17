@@ -73,11 +73,18 @@ public class NetFlowFormatter {
         if (octetCount == 0L) {
             octetCount = (long) fields.getOrDefault("fwd_flow_delta_bytes", 0L);
         }
-        final String srcAddr = (String) fields.get("ipv4_src_addr");
-        final String dstAddr = (String) fields.get("ipv4_dst_addr");
+        String srcAddr = (String) fields.get("ipv4_src_addr");
+        String dstAddr = (String) fields.get("ipv4_dst_addr");
         final Integer srcPort = (Integer) fields.get("l4_src_port");
         final Integer dstPort = (Integer) fields.get("l4_dst_port");
         final Short protocol = (Short) fields.get("protocol");
+
+        if (srcAddr == null) {
+            srcAddr = (String) fields.get("ipv6_src_addr");
+        }
+        if (dstAddr == null) {
+            dstAddr = (String) fields.get("ipv6_dst_addr");
+        }
 
         return String.format(Locale.ROOT, "NetFlowV9 [%s]:%d <> [%s]:%d proto:%d pkts:%d bytes:%d",
                 srcAddr, srcPort,
