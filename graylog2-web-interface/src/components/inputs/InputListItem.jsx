@@ -82,7 +82,7 @@ const InputListItem = createReactClass({
     if (this.isPermitted(this.props.permissions, ['searches:relative'])) {
       actions.push(
         <LinkContainer key={`received-messages-${this.props.input.id}`}
-                       to={Routes.search(`gl2_source_input:${this.props.input.id}`, { relative: 0 })}>
+                       to={Routes.search(`gl2_source_input:${this.props.input.id}`, { relative: 604800 })}>
           <Button bsStyle="info">Show received messages</Button>
         </LinkContainer>,
       );
