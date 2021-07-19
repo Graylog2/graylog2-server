@@ -16,6 +16,8 @@
  */
 import URI from 'urijs';
 
+import { AppConfigs } from 'util/AppConfig';
+
 let Routes;
 const prefix = '/test';
 
@@ -23,7 +25,7 @@ describe('Routes', () => {
   describe('without prefix', () => {
     beforeAll(() => {
       jest.resetModules();
-      window.appConfig = {}; // Ensure no prefix is set
+      window.appConfig = {} as AppConfigs; // Ensure no prefix is set
       Routes = jest.requireActual('./Routes').default;
     });
 
@@ -52,7 +54,7 @@ describe('Routes', () => {
 
       window.appConfig = {
         gl2AppPathPrefix: prefix,
-      };
+      } as AppConfigs;
 
       Routes = jest.requireActual('./Routes').default;
     });

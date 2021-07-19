@@ -39,6 +39,7 @@ import {
 } from 'views/components/aggregationwizard';
 import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 import { TimeRange } from 'views/logic/queries/Query';
+import { CopyWidgetToDashboardHook } from 'views/logic/views/CopyWidgetToDashboard';
 
 interface EditWidgetComponentProps<Config extends WidgetConfig = WidgetConfig> {
   children: React.ReactNode,
@@ -196,6 +197,7 @@ declare module 'graylog-web-plugin/plugin' {
     'views.hooks.executingView'?: Array<ViewHook>,
     'views.hooks.loadingView'?: Array<ViewHook>,
     'views.hooks.searchRefresh'?: Array<SearchRefreshCondition>;
+    'views.hooks.copyWidgetToDashboard'?: Array<CopyWidgetToDashboardHook>;
     'views.overrides.widgetEdit'?: Array<React.ComponentType<OverrideProps>>;
     'views.widgets.actions'?: Array<WidgetActionType>;
     'views.requires.provided'?: Array<string>;
