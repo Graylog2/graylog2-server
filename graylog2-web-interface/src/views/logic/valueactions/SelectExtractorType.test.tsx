@@ -61,7 +61,7 @@ describe('SelectExtractorType', () => {
       </AdditionalContext.Provider>,
     );
     const select = wrapper.find(Select);
-    const { onChange } = select.at(0).props();
+    const { onChange }: { onChange?: React.ComponentProps<typeof Select>['onChange']} = select.at(0).props();
 
     const form = wrapper.find('form');
 
