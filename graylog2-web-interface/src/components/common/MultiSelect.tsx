@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+
 import Select from 'components/common/Select';
 
 type Props = React.ComponentProps<typeof Select>;
