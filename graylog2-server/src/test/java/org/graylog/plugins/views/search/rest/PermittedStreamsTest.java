@@ -30,7 +30,7 @@ import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.graylog2.plugin.streams.Stream.DEFAULT_EVENT_STREAM_IDS;
+import static org.graylog2.plugin.streams.Stream.NON_MESSAGE_STREAM_IDS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -75,7 +75,7 @@ public class PermittedStreamsTest {
 
     @Test
     public void filtersDefaultStreams() {
-        List<String> streamIds = new ArrayList<>(DEFAULT_EVENT_STREAM_IDS);
+        List<String> streamIds = new ArrayList<>(NON_MESSAGE_STREAM_IDS);
         streamIds.add("i'm ok");
 
         stubStreams(streamIds.toArray(new String[]{}));

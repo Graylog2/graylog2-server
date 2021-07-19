@@ -287,7 +287,7 @@ public class StreamResource extends RestResource {
                                  @ApiParam(name = "JSON body", required = true)
                                  @Valid @NotNull UpdateStreamRequest cr) throws NotFoundException, ValidationException {
         checkPermission(RestPermissions.STREAMS_EDIT, streamId);
-        checkNotDefaultStream(streamId, "The default stream cannot be edited.");
+        checkNotEditableStream(streamId, "The stream cannot be edited.");
 
         final Stream stream = streamService.load(streamId);
 
@@ -343,7 +343,7 @@ public class StreamResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.STREAM_DELETE)
     public void delete(@ApiParam(name = "streamId", required = true) @PathParam("streamId") String streamId) throws NotFoundException {
         checkPermission(RestPermissions.STREAMS_EDIT, streamId);
-        checkNotDefaultStream(streamId, "The default stream cannot be deleted.");
+        checkNotEditableStream(streamId, "The stream cannot be deleted.");
 
         final Stream stream = streamService.load(streamId);
         streamService.destroy(stream);
@@ -361,7 +361,7 @@ public class StreamResource extends RestResource {
     public void pause(@ApiParam(name = "streamId", required = true)
                       @PathParam("streamId") @NotEmpty String streamId) throws NotFoundException, ValidationException {
         checkAnyPermission(new String[]{RestPermissions.STREAMS_CHANGESTATE, RestPermissions.STREAMS_EDIT}, streamId);
-        checkNotDefaultStream(streamId, "The default stream cannot be paused.");
+        checkNotEditableStream(streamId, "The stream cannot be paused.");
 
         final Stream stream = streamService.load(streamId);
         streamService.pause(stream);
@@ -379,7 +379,7 @@ public class StreamResource extends RestResource {
     public void resume(@ApiParam(name = "streamId", required = true)
                        @PathParam("streamId") @NotEmpty String streamId) throws NotFoundException, ValidationException {
         checkAnyPermission(new String[]{RestPermissions.STREAMS_CHANGESTATE, RestPermissions.STREAMS_EDIT}, streamId);
-        checkNotDefaultStream(streamId, "The default stream cannot be resumed.");
+        checkNotEditableStream(streamId, "The stream cannot be resumed.");
 
         final Stream stream = streamService.load(streamId);
         streamService.resume(stream);
@@ -442,7 +442,7 @@ public class StreamResource extends RestResource {
                                 @Context UserContext userContext) throws ValidationException, NotFoundException {
         checkPermission(RestPermissions.STREAMS_CREATE);
         checkPermission(RestPermissions.STREAMS_READ, streamId);
-        checkNotDefaultStream(streamId, "The default stream cannot be cloned.");
+        checkNotEditableStream(streamId, "The stream cannot be cloned.");
 
         final Stream sourceStream = streamService.load(streamId);
         final String creatorUser = getCurrentUser().getName();
@@ -548,8 +548,8 @@ public class StreamResource extends RestResource {
             .collect(Collectors.toSet());
     }
 
-    private void checkNotDefaultStream(String streamId, String message) {
-        if (Stream.DEFAULT_STREAM_ID.equals(streamId)) {
+    private void checkNotEditableStream(String streamId, String message) {
+        if (Stream.DEFAULT_STREAM_ID.equals(streamId) || Stream.READ_ONLY_STREAM_IDS.contains(streamId)) {
             throw new BadRequestException(message);
         }
     }
