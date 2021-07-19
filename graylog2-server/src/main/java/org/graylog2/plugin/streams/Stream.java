@@ -49,6 +49,8 @@ public interface Stream extends Persisted {
      */
     ImmutableSet<String> DEFAULT_EVENT_STREAM_IDS = ImmutableSet.of(DEFAULT_EVENTS_STREAM_ID, DEFAULT_SYSTEM_EVENTS_STREAM_ID);
 
+    ImmutableSet<String> READ_ONLY_STREAM_IDS = ImmutableSet.of(DEFAULT_EVENTS_STREAM_ID, DEFAULT_SYSTEM_EVENTS_STREAM_ID, FAILURES_STREAM_ID);
+
     enum MatchingType {
         AND,
         OR;
