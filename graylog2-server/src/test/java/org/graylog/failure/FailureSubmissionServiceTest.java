@@ -19,6 +19,7 @@ package org.graylog.failure;
 import com.codahale.metrics.MetricRegistry;
 import org.graylog2.Configuration;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.Test;
 
 import java.util.List;
@@ -198,7 +199,7 @@ public class FailureSubmissionServiceTest {
     private ProcessingFailure createProcessingFailure() {
         return new ProcessingFailure(
                 UUID.randomUUID().toString(), "error-type", "error-message",
-                DateTime.now(), null
+                DateTime.now(DateTimeZone.UTC), null
         );
     }
 }
