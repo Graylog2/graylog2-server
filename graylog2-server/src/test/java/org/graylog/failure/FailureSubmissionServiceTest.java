@@ -116,7 +116,7 @@ public class FailureSubmissionServiceTest {
         final long waited = System.currentTimeMillis() - stared;
 
         // then
-        assertThat(waited).isBetween(300L, 500L);
+        assertThat(waited).isGreaterThan(200);
         assertThat(underTest.queueSize()).isEqualTo(2);
         assertThat(underTest.consumeBlocking()).isEqualTo(FailureBatch.processingFailureBatch(prcFailure2));
         assertThat(underTest.consumeBlocking()).isEqualTo(FailureBatch.processingFailureBatch(prcFailure3));
@@ -182,7 +182,7 @@ public class FailureSubmissionServiceTest {
         final long waited = System.currentTimeMillis() - stared;
 
         // then
-        assertThat(waited).isBetween(300L, 500L);
+        assertThat(waited).isGreaterThan(200);
         assertThat(consumedBatch).isEqualTo(FailureBatch.processingFailureBatch(prcFailure1));
     }
 
