@@ -31,10 +31,19 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * The purpose of this service is to consume/process failure batches submitted via {@link FailureSubmissionService}.
+ * The processing is done in a dedicated service thread, the lifecycle of the service is managed
+ * by {@link com.google.common.util.concurrent.ServiceManager}.
+ *
+ * The service is designed with an idea of extensibility, so that Graylog plugins can inject
+ * custom failure handlers via a DI framework (Guice in our case). If no custom handlers
+ * found, then the fallback one will be used instead.
+ */
 @Singleton
 public class FailureHandlerService extends AbstractExecutionThreadService {
 
-    private static final FailureBatch EMPTY_PROCESSING_FAILURE_BATCH = FailureBatch.processingFailureBatch(ImmutableList.of());
+    static final FailureBatch EMPTY_PROCESSING_FAILURE_BATCH = FailureBatch.processingFailureBatch(ImmutableList.of());
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -130,6 +139,10 @@ public class FailureHandlerService extends AbstractExecutionThreadService {
                 .filter(h -> h.supports(failureBatch));
     }
 
+    /**
+     * @return true if any of the provided handlers (either custom or the fallback one)
+     * supports processing failures.
+     */
     public boolean canHandleProcessingErrors() {
         return !suitableHandlers(EMPTY_PROCESSING_FAILURE_BATCH).isEmpty();
     }
