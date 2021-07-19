@@ -37,6 +37,7 @@ import org.junit.Test;
 
 import java.time.ZonedDateTime;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -74,7 +75,7 @@ public abstract class IndexFieldTypePollerIT extends ElasticsearchBaseTest {
     public void setUp() throws Exception {
         final Node node = mock(Node.class);
         @SuppressWarnings("UnstableApiUsage") final Indices indices = new Indices(
-                new IndexMappingFactory(node),
+                new IndexMappingFactory(node, Optional.empty()),
                 mock(NodeId.class),
                 new NullAuditEventSender(),
                 mock(EventBus.class),

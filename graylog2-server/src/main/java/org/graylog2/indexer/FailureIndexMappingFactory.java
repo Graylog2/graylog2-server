@@ -16,6 +16,8 @@
  */
 package org.graylog2.indexer;
 
-public class Constants {
-    public static final String ES_DATE_FORMAT = "8yyyy-MM-dd HH:mm:ss.SSS";
+import com.github.zafarkhaja.semver.Version;
+
+public interface FailureIndexMappingFactory {
+    IndexMappingTemplate failureIndexMappingFor(Version elasticsearchVersion);
 }

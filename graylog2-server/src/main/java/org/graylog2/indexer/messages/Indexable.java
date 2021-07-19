@@ -24,7 +24,20 @@ import javax.annotation.Nonnull;
 import java.util.Map;
 
 public interface Indexable {
+    /**
+     * Returns the id to address the document in Elasticsearch.
+     * Depending on the implementation this might return a {@link com.eaio.uuid.UUID} or {@link de.huxhorn.sulky.ulid.ULID}
+     * This method should only be used where backwards compatibility is needed.
+     * Newer code should use {@link Indexable#getMessageId()} instead.
+     */
+    @Deprecated
     String getId();
+
+    /**
+     * Returns the id to address the document in Elasticsearch.
+     * The message id is represented as a {@link de.huxhorn.sulky.ulid.ULID}
+     */
+    String getMessageId();
     long getSize();
     DateTime getReceiveTime();
     Map<String, Object> toElasticSearchObject(ObjectMapper objectMapper,@Nonnull final Meter invalidTimestampMeter);

@@ -14,8 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.indexer;
+package org.graylog.failure;
 
-public class Constants {
-    public static final String ES_DATE_FORMAT = "8yyyy-MM-dd HH:mm:ss.SSS";
+import java.util.Locale;
+
+public enum FailureType {
+    INDEXING,
+    PROCESSING
+    ;
+
+    @Override
+    public String toString() {
+        return name().toLowerCase(Locale.US);
+    }
 }

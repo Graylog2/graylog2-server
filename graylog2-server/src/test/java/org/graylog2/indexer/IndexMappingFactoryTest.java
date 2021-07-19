@@ -40,7 +40,7 @@ public class IndexMappingFactoryTest {
     @BeforeEach
     public void setUp() throws Exception {
         this.node = mock(Node.class);
-        this.sut = new IndexMappingFactory(node);
+        this.sut = new IndexMappingFactory(node, Optional.empty());
     }
 
     @ParameterizedTest

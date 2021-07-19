@@ -26,10 +26,11 @@ import com.github.rholder.retry.WaitStrategies;
 import com.github.rholder.retry.WaitStrategy;
 import com.google.auto.value.AutoValue;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
-import org.graylog2.indexer.IndexFailure;
-import org.graylog2.indexer.IndexFailureImpl;
+import org.graylog.failure.Failure;
+import org.graylog.failure.FailureBatch;
+import org.graylog.failure.FailureSubmitService;
+import org.graylog.failure.IndexingFailure;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.InvalidWriteTargetException;
 import org.graylog2.indexer.results.ResultMessage;
@@ -49,8 +50,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Singleton
@@ -92,7 +91,7 @@ public class Messages {
                 });
     }
 
-    private final LinkedBlockingQueue<List<IndexFailure>> indexFailureQueue;
+    private final FailureSubmitService failureSubmitService;
     private final MessagesAdapter messagesAdapter;
     private final ProcessingStatusRecorder processingStatusRecorder;
     private final TrafficAccounting trafficAccounting;
@@ -100,13 +99,12 @@ public class Messages {
     @Inject
     public Messages(TrafficAccounting trafficAccounting,
                     MessagesAdapter messagesAdapter,
-                    ProcessingStatusRecorder processingStatusRecorder) {
+                    ProcessingStatusRecorder processingStatusRecorder,
+                    FailureSubmitService failureSubmitService) {
         this.trafficAccounting = trafficAccounting;
         this.messagesAdapter = messagesAdapter;
         this.processingStatusRecorder = processingStatusRecorder;
-
-        // TODO: Magic number
-        this.indexFailureQueue = new LinkedBlockingQueue<>(1000);
+        this.failureSubmitService = failureSubmitService;
     }
 
     public ResultMessage get(String messageId, String index) throws DocumentNotFoundException, IOException {
@@ -274,24 +272,21 @@ public class Messages {
             return Collections.emptyList();
         }
 
-        final List<IndexFailure> indexFailures = indexingErrors.stream()
-                .map(IndexingError::toIndexFailure)
+        final List<Failure> indexingFailures = indexingErrors.stream()
+                .map(IndexingError::toFailure)
                 .collect(Collectors.toList());
 
         try {
-            // TODO: Magic number
-            indexFailureQueue.offer(indexFailures, 25, TimeUnit.MILLISECONDS);
+            // TODO handle shutdown
+            failureSubmitService.submitBlocking(new FailureBatch(indexingFailures, IndexingFailure.class));
         } catch (InterruptedException e) {
-            LOG.warn("Couldn't save index failures.", e);
+            LOG.warn("Interrupted in failureSubmitService", e);
+            // TODO
         }
 
-        return indexFailures.stream()
-                .map(IndexFailure::letterId)
+        return indexingErrors.stream()
+                .map(IndexingError::message).map(Indexable::getId)
                 .collect(Collectors.toList());
-    }
-
-    public LinkedBlockingQueue<List<IndexFailure>> getIndexFailureQueue() {
-        return indexFailureQueue;
     }
 
     @AutoValue
@@ -314,17 +309,16 @@ public class Messages {
             return create(message, index, ErrorType.Unknown, "");
         }
 
-        public IndexFailure toIndexFailure() {
-            final Indexable message = this.message();
-            final Map<String, Object> doc = ImmutableMap.<String, Object>builder()
-                    .put("letter_id", message.getId())
-                    .put("index", this.index())
-                    .put("type", this.errorType().toString())
-                    .put("message", this.errorMessage())
-                    .put("timestamp", message.getTimestamp())
-                    .build();
-
-            return new IndexFailureImpl(doc);
+        public Failure toFailure() {
+            final Indexable message = message();
+            return new IndexingFailure(
+                    message.getMessageId(),
+                    index(),
+                    errorType().toString(),
+                    errorMessage(),
+                    message.getTimestamp(),
+                    message
+            );
         }
     }
 }

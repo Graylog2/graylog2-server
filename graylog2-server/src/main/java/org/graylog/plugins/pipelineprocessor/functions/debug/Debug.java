@@ -40,6 +40,9 @@ public class Debug extends AbstractFunction<Void> {
 
         if(value == null) {
             log.info("PIPELINE DEBUG: Passed value is NULL.");
+        } else if (value.equals("EXCEPTION")) {
+            // TODO remove from the final PR
+            throw new RuntimeException(value.toString());
         } else {
             log.info("PIPELINE DEBUG: {}", value.toString());
         }

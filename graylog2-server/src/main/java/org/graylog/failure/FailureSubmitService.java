@@ -14,8 +14,22 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.indexer;
+package org.graylog.failure;
 
-public class Constants {
-    public static final String ES_DATE_FORMAT = "8yyyy-MM-dd HH:mm:ss.SSS";
+import javax.inject.Singleton;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+
+@Singleton
+public class FailureSubmitService {
+
+    private final BlockingQueue<FailureBatch> queue = new LinkedBlockingQueue<>(1000);
+
+    public void submitBlocking(FailureBatch batch) throws InterruptedException {
+        queue.put(batch);
+    }
+
+    FailureBatch consumeBlocking() throws InterruptedException {
+        return queue.take();
+    }
 }

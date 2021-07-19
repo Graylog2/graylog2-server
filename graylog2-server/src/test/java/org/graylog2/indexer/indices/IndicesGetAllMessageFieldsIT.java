@@ -31,6 +31,7 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -49,7 +50,7 @@ public abstract class IndicesGetAllMessageFieldsIT extends ElasticsearchBaseTest
         final Node node = new Node(mock(NodeAdapter.class));
         //noinspection UnstableApiUsage
         indices = new Indices(
-                new IndexMappingFactory(node),
+                new IndexMappingFactory(node, Optional.empty()),
                 mock(NodeId.class),
                 new NullAuditEventSender(),
                 new EventBus(),

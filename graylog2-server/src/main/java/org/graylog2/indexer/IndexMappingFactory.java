@@ -22,14 +22,17 @@ import org.graylog2.indexer.indexset.IndexSetConfig;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.Optional;
 
 @Singleton
 public class IndexMappingFactory {
     private final Node node;
+    private final Optional<FailureIndexMappingFactory> failureIndexMappingFactory;
 
     @Inject
-    public IndexMappingFactory(Node node) {
+    public IndexMappingFactory(Node node, Optional<FailureIndexMappingFactory> failureIndexMappingFactory) {
         this.node = node;
+        this.failureIndexMappingFactory = failureIndexMappingFactory;
     }
 
     public IndexMappingTemplate createIndexMapping(IndexSetConfig.TemplateType templateType) {
@@ -39,6 +42,8 @@ public class IndexMappingFactory {
             case MESSAGES: return indexMappingFor(elasticsearchVersion);
             case EVENTS: return eventsIndexMappingFor(elasticsearchVersion);
             case GIM_V1: return gimMappingFor(elasticsearchVersion);
+            case FAILURES: return failureIndexMappingFactory.map(f -> f.failureIndexMappingFor(elasticsearchVersion))
+                    .orElseThrow(() -> new IllegalStateException("No `FailureIndexMappingFactory` implementation provided!"));
             default: throw new IllegalStateException("Invalid index template type: " + templateType);
         }
     }
