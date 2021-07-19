@@ -16,6 +16,7 @@
  */
 package org.graylog.failure;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.AbstractExecutionThreadService;
 import org.slf4j.Logger;
@@ -30,10 +31,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.graylog.failure.FailureBatch.EMPTY_PROCESSING_FAILURE_BATCH;
-
 @Singleton
 public class FailureHandlerService extends AbstractExecutionThreadService {
+
+    private static final FailureBatch EMPTY_PROCESSING_FAILURE_BATCH = FailureBatch.processingFailureBatch(ImmutableList.of());
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
