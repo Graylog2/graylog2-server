@@ -16,6 +16,7 @@
  */
 package org.graylog.failure;
 
+import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
 
 import java.util.Collection;
@@ -84,5 +85,18 @@ public class FailureBatch {
      */
     public Class<? extends Failure> getFailureClass() {
         return failureClass;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        final FailureBatch that = (FailureBatch) o;
+        return Objects.equal(failures, that.failures) && Objects.equal(failureClass, that.failureClass);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(failures, failureClass);
     }
 }
