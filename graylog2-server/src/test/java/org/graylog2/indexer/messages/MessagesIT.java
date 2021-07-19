@@ -23,7 +23,7 @@ import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import joptsimple.internal.Strings;
 import org.graylog.failure.FailureBatch;
-import org.graylog.failure.FailureSubmitService;
+import org.graylog.failure.FailureSubmissionService;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.TestIndexSet;
@@ -89,7 +89,7 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
 
     protected abstract MessagesAdapter createMessagesAdapter(MetricRegistry metricRegistry);
 
-    private final FailureSubmitService failureSubmitService = mock(FailureSubmitService.class);
+    private final FailureSubmissionService failureSubmissionService = mock(FailureSubmissionService.class);
 
     @Before
     public void setUp() throws Exception {
@@ -98,7 +98,7 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         client().waitForGreenStatus(INDEX_NAME);
         final MetricRegistry metricRegistry = new MetricRegistry();
         messages = new Messages(mock(TrafficAccounting.class), createMessagesAdapter(metricRegistry), mock(ProcessingStatusRecorder.class),
-                failureSubmitService);
+                failureSubmissionService);
     }
 
     @After
@@ -187,7 +187,7 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
 
         assertThat(failedItems).hasSize(1);
 
-        verify(failureSubmitService).submitBlocking(any(FailureBatch.class));
+        verify(failureSubmissionService).submitBlocking(any(FailureBatch.class));
     }
 
     @Test

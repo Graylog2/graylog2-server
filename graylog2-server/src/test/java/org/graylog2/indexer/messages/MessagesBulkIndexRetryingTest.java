@@ -18,7 +18,7 @@ package org.graylog2.indexer.messages;
 
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.ImmutableList;
-import org.graylog.failure.FailureSubmitService;
+import org.graylog.failure.FailureSubmissionService;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.plugin.Message;
 import org.graylog2.system.processing.ProcessingStatusRecorder;
@@ -47,13 +47,13 @@ class MessagesBulkIndexRetryingTest {
     private final TrafficAccounting trafficAccounting = mock(TrafficAccounting.class);
     private final MessagesAdapter messagesAdapter = mock(MessagesAdapter.class);
     private final ProcessingStatusRecorder processingStatusRecorder = mock(ProcessingStatusRecorder.class);
-    private final FailureSubmitService failureSubmitService = new FailureSubmitService(new MetricRegistry());
+    private final FailureSubmissionService failureSubmissionService = new FailureSubmissionService(new MetricRegistry());
 
     private Messages messages;
 
     @BeforeEach
     void setUp() {
-        this.messages = new Messages(trafficAccounting, messagesAdapter, processingStatusRecorder, failureSubmitService);
+        this.messages = new Messages(trafficAccounting, messagesAdapter, processingStatusRecorder, failureSubmissionService);
     }
 
     @Test

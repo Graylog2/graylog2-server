@@ -32,11 +32,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import static com.codahale.metrics.MetricRegistry.name;
 
 @Singleton
-public class FailureSubmitService {
+public class FailureSubmissionService {
+
+    private final static int MAX_CAPACITY = 1000;
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final BlockingQueue<FailureBatch> queue = new LinkedBlockingQueue<>(1000);
+    private final BlockingQueue<FailureBatch> queue = new LinkedBlockingQueue<>(MAX_CAPACITY);
     private final AtomicBoolean isUp = new AtomicBoolean(true);
     private final Meter submittedFailureBatches;
     private final Meter submittedFailures;
@@ -44,16 +46,21 @@ public class FailureSubmitService {
     private final Meter consumedFailures;
 
     @Inject
-    public FailureSubmitService(MetricRegistry metricRegistry) {
-        this.submittedFailureBatches = metricRegistry.meter(name(FailureSubmitService.class, "submittedFailureBatches"));
-        this.submittedFailures = metricRegistry.meter(name(FailureSubmitService.class, "submittedFailures"));
-        this.consumedFailureBatches = metricRegistry.meter(name(FailureSubmitService.class, "consumedFailureBatches"));
-        this.consumedFailures = metricRegistry.meter(name(FailureSubmitService.class, "consumedFailures"));
+    public FailureSubmissionService(MetricRegistry metricRegistry) {
+        this.submittedFailureBatches = metricRegistry.meter(name(FailureSubmissionService.class, "submittedFailureBatches"));
+        this.submittedFailures = metricRegistry.meter(name(FailureSubmissionService.class, "submittedFailures"));
+        this.consumedFailureBatches = metricRegistry.meter(name(FailureSubmissionService.class, "consumedFailureBatches"));
+        this.consumedFailures = metricRegistry.meter(name(FailureSubmissionService.class, "consumedFailures"));
     }
 
     public void submitBlocking(FailureBatch batch) throws InterruptedException {
         if (isUp.get()) {
             queue.put(batch);
+
+            if (queue.size() == MAX_CAPACITY) {
+                logger.debug("The queue is full! Current capacity: {}", MAX_CAPACITY);
+            }
+
             submittedFailureBatches.mark();
             submittedFailures.mark(batch.size());
         } else {

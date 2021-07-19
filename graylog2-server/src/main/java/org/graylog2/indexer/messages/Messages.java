@@ -28,7 +28,7 @@ import com.google.auto.value.AutoValue;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Sets;
 import org.graylog.failure.FailureBatch;
-import org.graylog.failure.FailureSubmitService;
+import org.graylog.failure.FailureSubmissionService;
 import org.graylog.failure.IndexingFailure;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.InvalidWriteTargetException;
@@ -90,7 +90,7 @@ public class Messages {
                 });
     }
 
-    private final FailureSubmitService failureSubmitService;
+    private final FailureSubmissionService failureSubmissionService;
     private final MessagesAdapter messagesAdapter;
     private final ProcessingStatusRecorder processingStatusRecorder;
     private final TrafficAccounting trafficAccounting;
@@ -99,11 +99,11 @@ public class Messages {
     public Messages(TrafficAccounting trafficAccounting,
                     MessagesAdapter messagesAdapter,
                     ProcessingStatusRecorder processingStatusRecorder,
-                    FailureSubmitService failureSubmitService) {
+                    FailureSubmissionService failureSubmissionService) {
         this.trafficAccounting = trafficAccounting;
         this.messagesAdapter = messagesAdapter;
         this.processingStatusRecorder = processingStatusRecorder;
-        this.failureSubmitService = failureSubmitService;
+        this.failureSubmissionService = failureSubmissionService;
     }
 
     public ResultMessage get(String messageId, String index) throws DocumentNotFoundException, IOException {
@@ -272,7 +272,7 @@ public class Messages {
         }
 
         try {
-            failureSubmitService.submitBlocking(FailureBatch.indexingFailureBatch(
+            failureSubmissionService.submitBlocking(FailureBatch.indexingFailureBatch(
                     indexingErrors.stream()
                             .map(IndexingError::toFailure)
                             .collect(Collectors.toList())

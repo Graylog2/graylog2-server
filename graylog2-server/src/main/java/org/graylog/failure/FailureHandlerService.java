@@ -39,18 +39,18 @@ public class FailureHandlerService extends AbstractExecutionThreadService {
 
     private final List<FailureHandler> fallbackFailureHandlerAsList;
     private final Set<FailureHandler> failureHandlers;
-    private final FailureSubmitService failureSubmitService;
+    private final FailureSubmissionService failureSubmissionService;
     private Thread executionThread;
 
     @Inject
     public FailureHandlerService(
             @Named("fallbackFailureHandler") FailureHandler fallbackFailureHandler,
             Set<FailureHandler> failureHandlers,
-            FailureSubmitService failureSubmitService
+            FailureSubmissionService failureSubmissionService
     ) {
         this.fallbackFailureHandlerAsList = Lists.newArrayList(fallbackFailureHandler);
         this.failureHandlers = failureHandlers;
-        this.failureSubmitService = failureSubmitService;
+        this.failureSubmissionService = failureSubmissionService;
     }
 
     @Override
@@ -63,7 +63,7 @@ public class FailureHandlerService extends AbstractExecutionThreadService {
     @Override
     protected void shutDown() throws Exception {
 
-        final List<FailureBatch> remainingFailures = failureSubmitService.drain();
+        final List<FailureBatch> remainingFailures = failureSubmissionService.drain();
 
         logger.info("Shutting down the service. {} remaining failure batches to be processed.", remainingFailures.size());
 
@@ -74,7 +74,7 @@ public class FailureHandlerService extends AbstractExecutionThreadService {
     protected void triggerShutdown() {
         logger.debug("Requested to shut down.");
 
-        failureSubmitService.shutDown();
+        failureSubmissionService.shutDown();
 
         executionThread.interrupt();
     }
@@ -88,10 +88,10 @@ public class FailureHandlerService extends AbstractExecutionThreadService {
 
         while (isRunning()) {
             try {
-                handle(failureSubmitService.consumeBlocking());
+                handle(failureSubmissionService.consumeBlocking());
             } catch (InterruptedException ignored) {
                 logger.info("The service's thread has been interrupted. The queue currently contains {} failure batches.",
-                        failureSubmitService.queueSize());
+                        failureSubmissionService.queueSize());
             } catch (Exception e) {
                 logger.error("Error occurred while handling failures!", e);
             }
