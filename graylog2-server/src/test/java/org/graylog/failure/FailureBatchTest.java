@@ -17,6 +17,7 @@
 package org.graylog.failure;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.Test;
 import org.testcontainers.shaded.com.google.common.collect.ImmutableList;
 
@@ -110,14 +111,14 @@ public class FailureBatchTest {
     private IndexingFailure createIndexingFailure() {
         return new IndexingFailure(
                 UUID.randomUUID().toString(), "target-index", "error-type", "error-message",
-                DateTime.now(), null
+                DateTime.now(DateTimeZone.UTC), null
         );
     }
 
     private ProcessingFailure createProcessingFailure() {
         return new ProcessingFailure(
                 UUID.randomUUID().toString(), "error-type", "error-message",
-                DateTime.now(), null
+                DateTime.now(DateTimeZone.UTC), null
         );
     }
 }
@@ -125,6 +126,6 @@ public class FailureBatchTest {
 class CustomIndexingFailure extends IndexingFailure {
     CustomIndexingFailure() {
         super(UUID.randomUUID().toString(), "target-index", "error-type", "error-message",
-                DateTime.now(), null);
+                DateTime.now(DateTimeZone.UTC), null);
     }
 }
