@@ -39,26 +39,38 @@ public class PaginatedList<E> extends ForwardingList<E> {
 
     /**
      * Creates a PaginatedList
+     *
      * @param delegate the actual entries
-     * @param total the count of all entries (ignoring pagination)
-     * @param page  the page this PaginatedList represents
-     * @param perPage the size limit for each page
+     * @param total    the count of all entries (ignoring pagination)
+     * @param page     the page this PaginatedList represents
+     * @param perPage  the size limit for each page
      */
     public PaginatedList(@Nonnull List<E> delegate, int total, int page, int perPage) {
         this(delegate, total, page, perPage, null);
     }
 
+    public PaginatedList(@Nonnull List<E> delegate, int total, int page, int perPage, int count) {
+        this(delegate, total, page, perPage, count, null);
+    }
+
     /**
      * Creates a PaginatedList
-     * @param delegate the actual entries
-     * @param total the count of all entries (ignoring pagination)
-     * @param page  the page this PaginatedList represents
-     * @param perPage the size limit for each page
+     *
+     * @param delegate   the actual entries
+     * @param total      the count of all entries (ignoring pagination)
+     * @param page       the page this PaginatedList represents
+     * @param perPage    the size limit for each page
      * @param grandTotal the count of all entries (ignoring query filters and pagination)
      */
     public PaginatedList(@Nonnull List<E> delegate, int total, int page, int perPage, Long grandTotal) {
         this.delegate = delegate;
         this.paginationInfo = PaginationInfo.create(total, delegate.size(), page, perPage);
+        this.grandTotal = grandTotal;
+    }
+
+    public PaginatedList(@Nonnull List<E> delegate, int total, int page, int perPage, int count, Long grandTotal) {
+        this.delegate = delegate;
+        this.paginationInfo = PaginationInfo.create(total, count, page, perPage);
         this.grandTotal = grandTotal;
     }
 
@@ -77,8 +89,12 @@ public class PaginatedList<E> extends ForwardingList<E> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof PaginatedList)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof PaginatedList)) {
+            return false;
+        }
         PaginatedList<?> that = (PaginatedList<?>) o;
         return Objects.equals(pagination(), that.pagination()) &&
                 Objects.equals(delegate(), that.delegate()) &&
