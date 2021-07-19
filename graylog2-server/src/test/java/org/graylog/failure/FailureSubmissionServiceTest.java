@@ -17,6 +17,7 @@
 package org.graylog.failure;
 
 import com.codahale.metrics.MetricRegistry;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog2.Configuration;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -25,6 +26,7 @@ import org.junit.Test;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -35,6 +37,11 @@ import static org.mockito.Mockito.when;
 public class FailureSubmissionServiceTest {
 
     private final Configuration configuration = mock(Configuration.class);
+
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1, new ThreadFactoryBuilder()
+            .setNameFormat("failure-scheduled-%d")
+            .setDaemon(false)
+            .build());
 
     @Test
     public void submitBlocking_whenTheServiceIsUp_itAcceptsNewBatches() throws Exception {
@@ -95,7 +102,7 @@ public class FailureSubmissionServiceTest {
         underTest.submitBlocking(FailureBatch.processingFailureBatch(prcFailure2));
 
         // when
-        Executors.newScheduledThreadPool(1).schedule(() -> {
+        scheduler.schedule(() -> {
             assertThat(underTest.queueSize()).isEqualTo(2);
             try {
                 assertThat(underTest.consumeBlocking()).isEqualTo(FailureBatch.processingFailureBatch(prcFailure1));
@@ -162,7 +169,7 @@ public class FailureSubmissionServiceTest {
         final ProcessingFailure prcFailure1 = createProcessingFailure();
 
         // when
-        Executors.newScheduledThreadPool(1).schedule(() -> {
+        scheduler.schedule(() -> {
             try {
                 underTest.submitBlocking(FailureBatch.processingFailureBatch(prcFailure1));
             } catch (InterruptedException e) {

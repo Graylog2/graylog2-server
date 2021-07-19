@@ -21,6 +21,7 @@ import org.awaitility.Awaitility;
 import org.awaitility.Duration;
 import org.graylog2.Configuration;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Test;
 import org.testcontainers.shaded.com.google.common.collect.ImmutableList;
@@ -240,7 +241,7 @@ public class FailureHandlerServiceTest {
     private IndexingFailure createIndexingFailure() {
         return new IndexingFailure(
                 UUID.randomUUID().toString(), "target-index", "error-type", "error-message",
-                DateTime.now(), null
+                DateTime.now(DateTimeZone.UTC), null
         );
     }
 
