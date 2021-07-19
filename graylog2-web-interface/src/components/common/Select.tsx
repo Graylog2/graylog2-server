@@ -28,8 +28,6 @@ import Icon from './Icon';
 
 export const CONTROL_CLASS = 'common-select-control';
 
-type Option = { [key: string]: any }
-
 const MultiValueRemove = ({ children, ...props }: React.ComponentProps<typeof Components.MultiValueRemove>) => (
   <Components.MultiValueRemove {...props}>{children}</Components.MultiValueRemove>
 );
@@ -71,7 +69,7 @@ const CustomOption = (optionRenderer: (Option) => React.ReactElement) => (
   }
 );
 
-const CustomSingleValue = (valueRenderer: (option: Option) => React.ReactElement) => (props: React.ComponentProps<typeof Components.SingleValue>) => {
+const CustomSingleValue = <LabelKey extends string, ValueKey extends string, OptionValue>(valueRenderer: (option: Option<LabelKey, ValueKey, OptionValue>) => React.ReactElement) => (props: React.ComponentProps<typeof Components.SingleValue>) => {
   const { data } = props;
 
   return <Components.SingleValue {...props}>{valueRenderer(data)}</Components.SingleValue>;
@@ -209,7 +207,18 @@ type ComponentsProp = {
   SelectContainer?: React.ComponentType<any>,
 };
 
-export type Props<OptionValue extends any> = {
+type Option<LabelKey extends string, ValueKey extends string, T> = Label<LabelKey> & Value<ValueKey, T>
+type Options<LabelKey extends string, ValueKey extends string, T> = Array<Option<LabelKey, ValueKey, T>>
+
+type Label<LabelKey extends string> = {
+  [key in LabelKey]: string
+}
+
+type Value<ValueKey extends string, T> = {
+  [key in ValueKey]: T
+}
+
+export type BaseProps<Opts, LabelKey extends string, ValueKey extends string, OptionValue> = {
   addLabelText?: string,
   allowCreate?: boolean,
   autoFocus?: boolean,
@@ -217,7 +226,6 @@ export type Props<OptionValue extends any> = {
   components?: ComponentsProp | null | undefined,
   delimiter?: string,
   disabled?: boolean,
-  displayKey: string,
   id?: string,
   ignoreAccents?: boolean,
   inputId?: string,
@@ -227,19 +235,46 @@ export type Props<OptionValue extends any> = {
   menuPortalTarget?: HTMLElement,
   name?: string,
   onBlur?: (event: React.FocusEvent<HTMLInputElement>) => void,
-  onChange: (value: OptionValue) => void,
-  onReactSelectChange?: (option: Option | Option[]) => void,
-  optionRenderer?: (option: Option) => React.ReactElement,
-  options: Array<Option>,
+  onChange: (value: OptionValue | string) => void,
+  onReactSelectChange?: (option: Option<LabelKey, ValueKey, OptionValue> | Options<LabelKey, ValueKey, OptionValue>) => void,
+  optionRenderer?: (option: Option<LabelKey, ValueKey, OptionValue>) => React.ReactElement,
+  options: Opts,
   placeholder: string,
   ref?: React.Ref<React.ComponentType>,
   size?: 'normal' | 'small',
   theme: DefaultTheme,
   required?: boolean,
   value?: OptionValue,
-  valueKey: string,
-  valueRenderer?: (option: Option) => React.ReactElement,
+  displayKey: LabelKey,
+  valueKey: ValueKey,
+  valueRenderer?: (option: Option<LabelKey, ValueKey, OptionValue>) => React.ReactElement,
 };
+
+type OptionsValueType<Opts, LabelKey extends string, ValueKey extends string> = Opts extends Options<LabelKey, ValueKey, infer T> ? T : never;
+
+type DefaultProps<Opts, LabelKey extends string, ValueKey extends string, OptionValue> = BaseProps<Opts, LabelKey, ValueKey, OptionValue> & {
+  multi: false,
+  allowCreate: false,
+}
+
+type MultiProps<Opts, LabelKey extends string, ValueKey extends string> = BaseProps<Opts, LabelKey, ValueKey, string> & {
+  multi: true,
+}
+
+type AllowCreateProps<Opts, LabelKey extends string, ValueKey extends string> = BaseProps<Opts, LabelKey, ValueKey, string> & {
+  allowCreate: true,
+}
+
+type AllowCreateAndMultiProps<Opts, LabelKey extends string, ValueKey extends string> = BaseProps<Opts, LabelKey, ValueKey, string> & {
+  allowCreate: true,
+  multi: true
+}
+
+type Props<Opts, LabelKey extends string, ValueKey extends string, OptionValue> =
+  DefaultProps<Opts, LabelKey, ValueKey, OptionValue> |
+  MultiProps<Opts, LabelKey, ValueKey> |
+  AllowCreateProps<Opts, LabelKey, ValueKey> |
+  AllowCreateAndMultiProps<Opts, LabelKey, ValueKey>;
 
 type CustomComponents = {
   Input?: React.ComponentType<any>,
@@ -252,7 +287,7 @@ type State = {
   value: any,
 };
 
-class Select<OptionValue extends any> extends React.Component<Props<OptionValue>, State> {
+class Select<Opts, LabelKey extends string, ValueKey extends string, OptionValue extends OptionsValueType<Opts, LabelKey, ValueKey>> extends React.Component<Props<Opts, LabelKey, ValueKey, OptionValue>, State> {
   static propTypes = {
     /** Specifies if the user can create new entries in `multi` Selects. */
     allowCreate: PropTypes.bool,
@@ -267,7 +302,7 @@ class Select<OptionValue extends any> extends React.Component<Props<OptionValue>
     /** Indicates whether the Select component is disabled or not. */
     disabled: PropTypes.bool,
     /** Indicates which option object key contains the text to display in the select input. Same as react-select's `labelKey` prop. */
-    displayKey: PropTypes.string,
+    // displayKey: PropTypes.string,
     /** ID of Select container component */
     id: PropTypes.string,
     /** ID of underlying input */
@@ -300,7 +335,7 @@ class Select<OptionValue extends any> extends React.Component<Props<OptionValue>
      * (specified in `valueKey`).
      * Options including an optional `disabled: true` key-value pair, will be disabled in the Select component.
      */
-    options: PropTypes.array.isRequired,
+    // options: PropTypes.array.isRequired,
     /** Custom function to render the options in the menu. */
     optionRenderer: PropTypes.func,
     /** required attribute for input element */
@@ -320,7 +355,7 @@ class Select<OptionValue extends any> extends React.Component<Props<OptionValue>
       PropTypes.arrayOf(PropTypes.object),
     ]),
     /** Indicates which option object key contains the value of the option. */
-    valueKey: PropTypes.string,
+    // valueKey: PropTypes.string,
     /** Custom function to render the selected option in the Select. */
     valueRenderer: PropTypes.func,
     /** Label text for add button */
@@ -366,7 +401,7 @@ class Select<OptionValue extends any> extends React.Component<Props<OptionValue>
     maxMenuHeight: 300,
   };
 
-  constructor(props: Props<OptionValue>) {
+  constructor(props: Props<Opts, LabelKey, ValueKey, OptionValue>) {
     super(props);
     const { inputProps, optionRenderer, value, valueRenderer } = props;
 
@@ -376,7 +411,7 @@ class Select<OptionValue extends any> extends React.Component<Props<OptionValue>
     };
   }
 
-  UNSAFE_componentWillReceiveProps = (nextProps: Props<OptionValue>) => {
+  UNSAFE_componentWillReceiveProps = (nextProps: Props<Opts, LabelKey, ValueKey, OptionValue>) => {
     const { inputProps, optionRenderer, value, valueRenderer } = this.props;
 
     if (value !== nextProps.value) {
@@ -390,8 +425,8 @@ class Select<OptionValue extends any> extends React.Component<Props<OptionValue>
     }
   };
 
-  getCustomComponents = (inputProps?: { [key: string]: any }, optionRenderer?: (option: Option) => React.ReactElement,
-    valueRenderer?: (option: Option) => React.ReactElement): any => {
+  getCustomComponents = (inputProps?: { [key: string]: any }, optionRenderer?: (option: Option<LabelKey, ValueKey, OptionValue>) => React.ReactElement,
+    valueRenderer?: (option: Option<LabelKey, ValueKey, OptionValue>) => React.ReactElement): any => {
     const customComponents: { [key: string]: any } = {};
 
     if (inputProps) {
@@ -419,18 +454,24 @@ class Select<OptionValue extends any> extends React.Component<Props<OptionValue>
     this.setState({ value: undefined });
   };
 
-  _extractOptionValue = (onChangeValue: Option | Array<Option>) => {
+  _extractOptionValue = (onChangeValue: Option<LabelKey, ValueKey, OptionValue> | Options<LabelKey, ValueKey, OptionValue>) => {
     const { multi, valueKey, delimiter } = this.props;
 
     if (onChangeValue) {
-      return multi && Array.isArray(onChangeValue) ? onChangeValue.map((i) => i[valueKey]).join(delimiter) : onChangeValue[valueKey || ''];
+      if (multi && Array.isArray(onChangeValue)) {
+        return onChangeValue.map((i) => i[valueKey]).join(delimiter);
+      }
+
+      if (!Array.isArray(onChangeValue)) {
+        return onChangeValue[valueKey];
+      }
     }
 
     return '';
   };
 
-  _onChange = (selectedOption: Option) => {
-    const value = this._extractOptionValue(selectedOption);
+  _onChange = (selectedOption: Option<LabelKey, ValueKey, OptionValue>) => {
+    const value: OptionValue | string = this._extractOptionValue(selectedOption);
 
     this.setState({ value: value });
 
@@ -442,7 +483,7 @@ class Select<OptionValue extends any> extends React.Component<Props<OptionValue>
 
   // Using ReactSelect.Creatable now needs to get values as objects or they are not display
   // This method takes care of formatting a string value into options react-select supports.
-  _formatInputValue = (value: OptionValue): Array<Option> => {
+  _formatInputValue = (value: OptionValue): Options<LabelKey, ValueKey, OptionValue> => {
     const { options, displayKey, valueKey, delimiter, allowCreate } = this.props;
 
     if (allowCreate && value && typeof value === 'string') {
