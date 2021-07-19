@@ -25,9 +25,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
 
 import java.io.IOException;
+import java.util.Locale;
 import java.util.Map;
 
+import static java.util.Objects.requireNonNull;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
@@ -118,6 +121,49 @@ class StaticFeatureFlagsTest {
         assertThat(on).isEqualTo(defaultValue);
     }
 
+    @Test
+    void testFeatureFlagResourcesCouldBeRead() {
+        String file = requireNonNull(this.getClass().getResource("/org/graylog2/featureflag/custom-feature-flag.config")).getPath();
+
+        FeatureFlags flags = factory.createStaticFeatureFlags(file);
+
+        assertThat(flags.getAll().keySet()).contains("feature1");
+    }
+
+    @Test
+    void testNoDuplicateFeatureFlagNamesAreAllowedWithinDefaultProperties() {
+        assertThatIllegalStateException().isThrownBy(() -> mockAndCreate(() ->
+                given(featureFlagsResources.defaultProperties(any())).willReturn(duplicate())));
+    }
+
+    @Test
+    void testNoDuplicateFeatureFlagNamesAreAllowedWithinCustomProperties() {
+        assertThatIllegalStateException().isThrownBy(() -> mockAndCreate(() ->
+                given(featureFlagsResources.customProperties(any())).willReturn(duplicate())));
+    }
+
+    @Test
+    void testNoDuplicateFeatureFlagNamesAreAllowedWithinSystemProperties() {
+        assertThatIllegalStateException().isThrownBy(() -> mockAndCreate(() ->
+                given(featureFlagsResources.systemProperties()).willReturn(duplicate(PREFIX_SYSTEM_PROPERTY))));
+    }
+
+    @Test
+    void testNoDuplicateFeatureFlagNamesAreAllowedWithinEnvironmentVariables() {
+        assertThatIllegalStateException().isThrownBy(() -> mockAndCreate(() ->
+                given(featureFlagsResources.environmentVariables()).willReturn(duplicate(PREFIX_ENVIRONMENT_VARIABLE))));
+    }
+
+    private ImmutableMap<String, String> duplicate() {
+        return duplicate("");
+    }
+
+    private ImmutableMap<String, String> duplicate(String prefix) {
+        String key = prefix + "feature";
+        return ImmutableMap.of(
+                key.toUpperCase(Locale.ROOT), "on",
+                key.toLowerCase(Locale.ROOT), "on");
+    }
 
     private FeatureFlags create(String feature, String value) throws IOException {
         return create(ImmutableMap.of(feature, value), EMPTY, EMPTY, EMPTY);
@@ -132,10 +178,20 @@ class StaticFeatureFlagsTest {
                                 Map<String, String> systemProperties,
                                 Map<String, String> environmentVariables) throws IOException {
 
-        given(featureFlagsResources.defaultProperties(any())).willReturn(defaultProperties);
-        given(featureFlagsResources.customProperties(any())).willReturn(customProperties);
-        given(featureFlagsResources.systemProperties()).willReturn(systemProperties);
-        given(featureFlagsResources.environmentVariables()).willReturn(environmentVariables);
+        return mockAndCreate(() -> {
+            given(featureFlagsResources.defaultProperties(any())).willReturn(defaultProperties);
+            given(featureFlagsResources.customProperties(any())).willReturn(customProperties);
+            given(featureFlagsResources.systemProperties()).willReturn(systemProperties);
+            given(featureFlagsResources.environmentVariables()).willReturn(environmentVariables);
+        });
+    }
+
+    private FeatureFlags mockAndCreate(Action action) throws IOException {
+        action.execute();
         return factory.createStaticFeatureFlags(featureFlagsResources, FILE, FILE);
+    }
+
+    interface Action {
+        void execute() throws IOException;
     }
 }
