@@ -27,8 +27,8 @@ import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
 import java.io.IOException;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
-import static java.util.Objects.requireNonNull;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 import static org.mockito.ArgumentMatchers.any;
@@ -122,8 +122,9 @@ class StaticFeatureFlagsTest {
     }
 
     @Test
-    void testFeatureFlagResourcesCouldBeRead() {
-        String file = requireNonNull(this.getClass().getResource("/org/graylog2/featureflag/custom-feature-flag.config")).getPath();
+    void testFeatureFlagResourcesCouldBeRead() throws Exception {
+        String file = Objects.requireNonNull(this.getClass()
+                .getResource("/org/graylog2/featureflag/custom-feature-flag.config")).toURI().getPath();
 
         FeatureFlags flags = factory.createStaticFeatureFlags(file);
 

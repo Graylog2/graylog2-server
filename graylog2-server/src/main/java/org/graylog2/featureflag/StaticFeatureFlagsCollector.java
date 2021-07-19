@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
@@ -36,6 +35,8 @@ import static java.util.stream.Collectors.toList;
 import static org.graylog2.bootstrap.CmdLineTool.GRAYLOG_ENVIRONMENT_VAR_PREFIX;
 import static org.graylog2.bootstrap.CmdLineTool.GRAYLOG_SYSTEM_PROP_PREFIX;
 import static org.graylog2.featureflag.FeatureFlagStringUtil.startsWithIgnoreCase;
+import static org.graylog2.featureflag.FeatureFlagStringUtil.stringFormat;
+import static org.graylog2.featureflag.FeatureFlagStringUtil.toUpperCase;
 
 class StaticFeatureFlagsCollector {
 
@@ -75,7 +76,7 @@ class StaticFeatureFlagsCollector {
             addFlags(resources.defaultProperties(file), "default properties file");
         } catch (IOException e) {
             throw new RuntimeException(
-                    String.format("Unable to read default feature flags file %s!", file), e);
+                    stringFormat("Unable to read default feature flags file %s!", file), e);
         }
     }
 
@@ -112,7 +113,7 @@ class StaticFeatureFlagsCollector {
             if (predicate.test(entry.getKey())) {
                 String key = transform.apply(entry.getKey());
                 addFlag(key, entry.getValue(), resourceType);
-                possibleDuplicates.put(key.toUpperCase(Locale.ROOT), key);
+                possibleDuplicates.put(toUpperCase(key), key);
             }
         }
         checkForDuplicates(possibleDuplicates, resourceType);
@@ -123,8 +124,7 @@ class StaticFeatureFlagsCollector {
                 .filter(collection -> collection.size() > 1)
                 .collect(toList());
         if (!duplicates.isEmpty()) {
-            throw new IllegalStateException(String.format(
-                    "The following duplicate feature flags are found in %s: %s", source, duplicates));
+            throw new IllegalStateException(stringFormat("The following duplicate feature flags are found in %s: %s", source, duplicates));
         }
     }
 

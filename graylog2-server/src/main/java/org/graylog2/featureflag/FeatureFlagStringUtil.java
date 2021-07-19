@@ -27,4 +27,8 @@ class FeatureFlagStringUtil {
     static boolean startsWithIgnoreCase(String text, String start) {
         return toUpperCase(text).startsWith(toUpperCase(start));
     }
+
+    static String stringFormat(String s, Object... args) {
+        return String.format(Locale.ROOT, s, args);
+    }
 }
