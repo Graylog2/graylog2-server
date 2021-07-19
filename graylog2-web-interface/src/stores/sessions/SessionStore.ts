@@ -24,7 +24,9 @@ import ActionsProvider from 'injection/ActionsProvider';
 
 const SessionActions = ActionsProvider.getActions('Session');
 
-const SessionStore = Reflux.createStore({
+export type SessionStoreState = { sessionId: string, username: string, validatingSession: boolean };
+
+const SessionStore = Reflux.createStore<SessionStoreState>({
   listenables: [SessionActions],
   sourceUrl: '/system/sessions',
   sessionId: undefined,
