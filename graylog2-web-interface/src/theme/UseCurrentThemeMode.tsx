@@ -15,12 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { useCallback, useContext, useState } from 'react';
+import type { TThemeMode } from '@graylog/sawmill/types';
 
 import { useStore } from 'stores/connect';
 import CombinedProvider from 'injection/CombinedProvider';
 import Store from 'logic/local-storage/Store';
 
-import { PREFERENCES_THEME_MODE, DEFAULT_THEME_MODE, ThemeMode } from './constants';
+import { PREFERENCES_THEME_MODE, DEFAULT_THEME_MODE } from './constants';
 
 import UserPreferencesContext from '../contexts/UserPreferencesContext';
 import usePrefersColorScheme from '../hooks/usePrefersColorScheme';
@@ -45,7 +46,7 @@ const _getInitialThemeMode = (userPreferences, browserThemePreference, initialTh
   return userThemePreference ?? browserThemePreference ?? DEFAULT_THEME_MODE;
 };
 
-const useCurrentThemeMode = (initialThemeModeOverride: ThemeMode): [ThemeMode, (newThemeMode: ThemeMode) => void] => {
+const useCurrentThemeMode = (initialThemeModeOverride: TThemeMode): [TThemeMode, (newThemeMode: TThemeMode) => void] => {
   const browserThemePreference = usePrefersColorScheme();
 
   const { userIsReadOnly, username } = useStore(CurrentUserStore, (userStore) => ({
@@ -55,9 +56,9 @@ const useCurrentThemeMode = (initialThemeModeOverride: ThemeMode): [ThemeMode, (
 
   const userPreferences = useContext(UserPreferencesContext);
   const initialThemeMode = _getInitialThemeMode(userPreferences, browserThemePreference, initialThemeModeOverride);
-  const [currentThemeMode, setCurrentThemeMode] = useState<ThemeMode>(initialThemeMode);
+  const [currentThemeMode, setCurrentThemeMode] = useState<TThemeMode>(initialThemeMode);
 
-  const changeCurrentThemeMode = useCallback((newThemeMode: ThemeMode) => {
+  const changeCurrentThemeMode = useCallback((newThemeMode: TThemeMode) => {
     setCurrentThemeMode(newThemeMode);
     Store.set(PREFERENCES_THEME_MODE, newThemeMode);
 

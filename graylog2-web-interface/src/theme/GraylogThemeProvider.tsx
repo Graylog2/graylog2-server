@@ -18,13 +18,11 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { ThemeProvider, DefaultTheme } from 'styled-components';
-import type { TColors, TUtils, TThemeMode } from '@graylog/sawmill/types';
+import Sawmill, { colors } from '@graylog/sawmill';
+import type { TColors, TThemeMode } from '@graylog/sawmill/types';
 
-import buttonStyles from 'components/graylog/styles/buttonStyles';
-import aceEditorStyles from 'components/graylog/styles/aceEditorStyles';
 import usePluginEntities from 'views/logic/usePluginEntities';
 
-import { breakpoints, colors, fonts, utils, spacings } from './index';
 import RegeneratableThemeContext from './RegeneratableThemeContext';
 import { THEME_MODES } from './constants';
 import useCurrentThemeMode from './UseCurrentThemeMode';
@@ -42,28 +40,6 @@ interface generateThemeType {
   generateCustomThemeColors: ({ graylogColors, mode, initialLoad }: generateCustomThemeColorsType) => Promise<TColors> | undefined,
 }
 
-function buildTheme(currentThemeColors, changeMode, mode): DefaultTheme {
-  const formattedUtils = {
-    ...utils,
-    colorLevel: utils.colorLevel(currentThemeColors),
-    readableColor: utils.readableColor(currentThemeColors),
-  } as TUtils;
-
-  return {
-    mode,
-    changeMode,
-    breakpoints,
-    colors: currentThemeColors,
-    fonts,
-    spacings,
-    components: {
-      button: buttonStyles({ colors: currentThemeColors, utils: formattedUtils }),
-      aceEditor: aceEditorStyles({ colors: currentThemeColors }),
-    },
-    utils: formattedUtils,
-  };
-}
-
 const _generateTheme = ({ changeMode, mode, generateCustomThemeColors, initialLoad = false }: generateThemeType) => {
   if (generateCustomThemeColors) {
     return generateCustomThemeColors({
@@ -71,12 +47,12 @@ const _generateTheme = ({ changeMode, mode, generateCustomThemeColors, initialLo
       mode,
       initialLoad,
     }).then((currentThemeColors) => {
-      return buildTheme(currentThemeColors, changeMode, mode);
+      return new Sawmill(currentThemeColors, changeMode, mode);
     });
   }
 
   return Promise.resolve(colors[mode]).then((currentThemeColors) => {
-    return buildTheme(currentThemeColors, changeMode, mode);
+    return new Sawmill(currentThemeColors, changeMode, mode);
   });
 };
 
