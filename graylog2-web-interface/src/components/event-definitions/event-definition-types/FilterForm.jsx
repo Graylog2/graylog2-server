@@ -135,12 +135,6 @@ class FilterForm extends React.Component {
     onChange('config', config);
   };
 
-  _userCanViewLookupTables = () => {
-    const { currentUser } = this.props;
-
-    return !isPermitted(currentUser.permissions, LOOKUP_PERMISSIONS);
-  };
-
   _syncParamsWithQuery = (paramsInQuery) => {
     const { eventDefinition, onChange } = this.props;
     const config = lodash.cloneDeep(eventDefinition.config);
@@ -173,6 +167,12 @@ class FilterForm extends React.Component {
 
     config.query_parameters = keptParameters.concat(newParameters);
     onChange('config', config);
+  };
+
+  _userCanViewLookupTables = () => {
+    const { currentUser } = this.props;
+
+    return isPermitted(currentUser.permissions, LOOKUP_PERMISSIONS);
   };
 
   _buildNewParameter = (name) => {
