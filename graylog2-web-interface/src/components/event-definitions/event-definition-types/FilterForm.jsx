@@ -31,7 +31,7 @@ import { naturalSortIgnoreCase } from 'util/SortUtils';
 import * as FormsUtils from 'util/FormsUtils';
 import CombinedProvider from 'injection/CombinedProvider';
 import { SearchMetadataActions } from 'views/stores/SearchMetadataStore';
-import PermissionsMixin from 'util/PermissionsMixin';
+import { isPermitted } from 'util/PermissionsMixin';
 
 import EditQueryParameterModal from '../event-definition-form/EditQueryParameterModal';
 import commonStyles from '../common/commonStyles.css';
@@ -42,11 +42,6 @@ export const TIME_UNITS = ['HOURS', 'MINUTES', 'SECONDS'];
 
 const LOOKUP_PERMISSIONS = [
   'lookuptables:read',
-];
-const PREVIEW_PERMISSIONS = [
-  'streams:read',
-  'extendedsearch:create',
-  'extendedsearch:use',
 ];
 
 class FilterForm extends React.Component {
@@ -70,9 +65,7 @@ class FilterForm extends React.Component {
   );
 
   _parseQuery = lodash.debounce((queryString) => {
-    const { currentUser } = this.props;
-
-    if (!PermissionsMixin.isPermitted(currentUser.permissions, PREVIEW_PERMISSIONS)) {
+    if (!this._userCanViewLookupTables()) {
       return;
     }
 
@@ -128,13 +121,9 @@ class FilterForm extends React.Component {
   }
 
   componentDidMount() {
-    const { currentUser } = this.props;
-
-    if (!PermissionsMixin.isPermitted(currentUser.permissions, LOOKUP_PERMISSIONS)) {
-      return;
+    if (this._userCanViewLookupTables()) {
+      LookupTablesActions.searchPaginated(1, 0, undefined, false);
     }
-
-    LookupTablesActions.searchPaginated(1, 0, undefined, false);
   }
 
   propagateChange = (key, value) => {
@@ -143,6 +132,12 @@ class FilterForm extends React.Component {
 
     config[key] = value;
     onChange('config', config);
+  };
+
+  _userCanViewLookupTables = () => {
+    const { currentUser } = this.props;
+
+    return isPermitted(currentUser.permissions, LOOKUP_PERMISSIONS);
   };
 
   _syncParamsWithQuery = (paramsInQuery) => {
@@ -223,6 +218,15 @@ class FilterForm extends React.Component {
   renderQueryParameters = () => {
     const { eventDefinition, onChange, lookupTables, validation } = this.props;
     const { query_parameters: queryParameters } = eventDefinition.config;
+
+    if (!this._userCanViewLookupTables()) {
+      return (
+        <Alert bsStyle="info">
+          Only Admins are able to declare Query Parameters from Lookup Tables.
+        </Alert>
+      );
+    }
+
     const parameterButtons = queryParameters.map((queryParam) => {
       return (
         <EditQueryParameterModal key={queryParam.name}
