@@ -66,7 +66,7 @@ class FilterForm extends React.Component {
   );
 
   _parseQuery = lodash.debounce((queryString) => {
-    if (!this._userCanViewLookupTables) {
+    if (!this._userCanViewLookupTables()) {
       return;
     }
 
@@ -122,11 +122,9 @@ class FilterForm extends React.Component {
   }
 
   componentDidMount() {
-    if (!this._userCanViewLookupTables) {
-      return;
+    if (this._userCanViewLookupTables()) {
+      LookupTablesActions.searchPaginated(1, 0, undefined, false);
     }
-
-    LookupTablesActions.searchPaginated(1, 0, undefined, false);
   }
 
   propagateChange = (key, value) => {
@@ -228,7 +226,7 @@ class FilterForm extends React.Component {
       return onChange('config', newConfig);
     };
 
-    if (!this._userCanViewLookupTables) {
+    if (!this._userCanViewLookupTables()) {
       return (
         <Alert bsStyle="info">
           Only Admins are able to declare Query Parameters from Lookup Tables.
