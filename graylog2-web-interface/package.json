@@ -137,6 +137,7 @@
     "@types/react-router-dom": "^5.1.7",
     "@types/react-window": "^1.8.3",
     "@types/ua-parser-js": "^0.7.36",
+    "@types/react-select": "^4.0.15",
     "@types/urijs": "^1.19.15",
     "assets-webpack-plugin": "^5.1.2",
     "babel-loader": "^8.2.2",
