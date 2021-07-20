@@ -209,7 +209,7 @@ type ComponentsProp = {
   SelectContainer?: React.ComponentType<any>,
 };
 
-export type Props<OptionValue extends any> = {
+export type Props<OptionValue> = {
   addLabelText?: string,
   allowCreate?: boolean,
   autoFocus?: boolean,
@@ -252,7 +252,7 @@ type State = {
   value: any,
 };
 
-class Select<OptionValue extends any> extends React.Component<Props<OptionValue>, State> {
+class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
   static propTypes = {
     /** Specifies if the user can create new entries in `multi` Selects. */
     allowCreate: PropTypes.bool,
