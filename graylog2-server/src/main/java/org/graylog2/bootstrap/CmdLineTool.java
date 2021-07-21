@@ -375,7 +375,7 @@ public abstract class CmdLineTool implements CliCommand {
     }
 
     private FeatureFlags getFeatureFlags() {
-        return new FeatureFlagsFactory().createStaticFeatureFlags(customFeatureFlagFile);
+        return new FeatureFlagsFactory().createImmutableFeatureFlags(customFeatureFlagFile);
     }
 
     protected Set<Plugin> loadPlugins(Path pluginPath, ChainingClassLoader chainingClassLoader) {

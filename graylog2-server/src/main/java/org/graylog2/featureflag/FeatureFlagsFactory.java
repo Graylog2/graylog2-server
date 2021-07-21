@@ -20,11 +20,11 @@ public class FeatureFlagsFactory {
 
     private static final String DEFAULT_PROPERTIES_FILE = "/org/graylog2/featureflag/feature-flag.config";
 
-    public FeatureFlags createStaticFeatureFlags(String customPropertiesFile) {
-        return createStaticFeatureFlags(new FeatureFlagsResources(), DEFAULT_PROPERTIES_FILE, customPropertiesFile);
+    public FeatureFlags createImmutableFeatureFlags(String customPropertiesFile) {
+        return createImmutableFeatureFlags(new FeatureFlagsResources(), DEFAULT_PROPERTIES_FILE, customPropertiesFile);
     }
 
-    public FeatureFlags createStaticFeatureFlags(FeatureFlagsResources resources, String defaultPropertiesFile, String customPropertiesFile) {
-        return new StaticFeatureFlags(new StaticFeatureFlagsCollector(resources, defaultPropertiesFile, customPropertiesFile).toMap());
+    public FeatureFlags createImmutableFeatureFlags(FeatureFlagsResources resources, String defaultPropertiesFile, String customPropertiesFile) {
+        return new ImmutableFeatureFlags(new ImmutableFeatureFlagsCollector(resources, defaultPropertiesFile, customPropertiesFile).toMap());
     }
 }

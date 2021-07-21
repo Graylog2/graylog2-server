@@ -35,7 +35,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
-class StaticFeatureFlagsTest {
+class ImmutableFeatureFlagsTest {
 
     private static final String PREFIX_SYSTEM_PROPERTY = "graylog.feature.";
     private static final String PREFIX_ENVIRONMENT_VARIABLE = "GRAYLOG_FEATURE_";
@@ -126,7 +126,7 @@ class StaticFeatureFlagsTest {
         String file = Objects.requireNonNull(this.getClass()
                 .getResource("/org/graylog2/featureflag/custom-feature-flag.config")).toURI().getPath();
 
-        FeatureFlags flags = factory.createStaticFeatureFlags(file);
+        FeatureFlags flags = factory.createImmutableFeatureFlags(file);
 
         assertThat(flags.getAll().keySet()).contains("feature1");
     }
@@ -189,7 +189,7 @@ class StaticFeatureFlagsTest {
 
     private FeatureFlags mockAndCreate(Action action) throws IOException {
         action.execute();
-        return factory.createStaticFeatureFlags(featureFlagsResources, FILE, FILE);
+        return factory.createImmutableFeatureFlags(featureFlagsResources, FILE, FILE);
     }
 
     interface Action {

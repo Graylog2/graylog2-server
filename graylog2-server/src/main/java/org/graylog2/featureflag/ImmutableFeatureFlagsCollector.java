@@ -38,9 +38,9 @@ import static org.graylog2.featureflag.FeatureFlagStringUtil.startsWithIgnoreCas
 import static org.graylog2.featureflag.FeatureFlagStringUtil.stringFormat;
 import static org.graylog2.featureflag.FeatureFlagStringUtil.toUpperCase;
 
-class StaticFeatureFlagsCollector {
+class ImmutableFeatureFlagsCollector {
 
-    private static final Logger LOG = LoggerFactory.getLogger(StaticFeatureFlagsCollector.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ImmutableFeatureFlagsCollector.class);
 
     private static final String GRAYLOG_FF_ENVIRONMENT_VAR_PREFIX = GRAYLOG_ENVIRONMENT_VAR_PREFIX + "FEATURE_";
     private static final String GRAYLOG_FF_SYSTEM_PROP_PREFIX = GRAYLOG_SYSTEM_PROP_PREFIX + "feature.";
@@ -50,7 +50,7 @@ class StaticFeatureFlagsCollector {
     private final String defaultPropertiesFile;
     private final String customPropertiesFile;
 
-    public StaticFeatureFlagsCollector(FeatureFlagsResources resources, String defaultPropertiesFile, String customPropertiesFile) {
+    public ImmutableFeatureFlagsCollector(FeatureFlagsResources resources, String defaultPropertiesFile, String customPropertiesFile) {
         this.resources = resources;
         this.defaultPropertiesFile = defaultPropertiesFile;
         this.customPropertiesFile = customPropertiesFile;

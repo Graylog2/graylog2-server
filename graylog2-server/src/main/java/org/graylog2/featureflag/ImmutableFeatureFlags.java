@@ -23,17 +23,17 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static org.graylog2.featureflag.FeatureFlagStringUtil.*;
+import static org.graylog2.featureflag.FeatureFlagStringUtil.toUpperCase;
 
-class StaticFeatureFlags implements FeatureFlags {
+class ImmutableFeatureFlags implements FeatureFlags {
 
-    private static final Logger LOG = LoggerFactory.getLogger(StaticFeatureFlags.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ImmutableFeatureFlags.class);
 
     private static final String ON = "ON";
     private final Map<String, String> flags;
     private final Map<String, String> upperCaseFlags;
 
-    public StaticFeatureFlags(Map<String, String> flags) {
+    public ImmutableFeatureFlags(Map<String, String> flags) {
         this.flags = Collections.unmodifiableMap(flags);
         upperCaseFlags = flags.entrySet().stream()
                 .collect(Collectors.toMap(e -> toUpperCase(e.getKey()), Map.Entry::getValue));
