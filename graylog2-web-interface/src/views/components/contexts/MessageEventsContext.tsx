@@ -23,7 +23,7 @@ import { singleton } from 'views/logic/singleton';
 type FieldName = string;
 
 type MessageEventsContextType = {
-  eventTypes: Immutable.Map<EventType['gl2EventType'], EventType>,
+  eventTypes: Immutable.Map<EventType['gl2EventTypeCode'], EventType>,
   eventActions: Immutable.Map<ExternalEventAction['id'], ExternalEventAction>,
   fieldValueActions: Immutable.Map<FieldName, Array<ExternalEventAction>>,
 }

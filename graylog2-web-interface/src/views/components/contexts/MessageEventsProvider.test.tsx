@@ -35,8 +35,8 @@ const simpleEventType = createSimpleEventType();
 const simpleExternalAction = createSimpleExternalAction();
 
 const mockSecurityContent = {
-  eventTypes: [createSimpleEventType()],
-  externalActions: [createSimpleExternalAction()],
+  eventTypes: [simpleEventType],
+  externalActions: [simpleExternalAction],
 };
 
 const simpleContextValue = {
