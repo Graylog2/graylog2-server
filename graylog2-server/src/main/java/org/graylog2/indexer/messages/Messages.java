@@ -78,7 +78,7 @@ public class Messages {
     @SuppressWarnings("UnstableApiUsage")
     private RetryerBuilder<List<IndexingError>> createBulkRequestRetryerBuilder() {
         return RetryerBuilder.<List<IndexingError>>newBuilder()
-                .retryIfException(t -> t instanceof IOException || t instanceof InvalidWriteTargetException)
+                .retryIfException(t -> t instanceof IOException || t instanceof InvalidWriteTargetException || t.getCause().getCause() instanceof IOException)
                 .withWaitStrategy(WaitStrategies.exponentialWait(MAX_WAIT_TIME.getQuantity(), MAX_WAIT_TIME.getUnit()))
                 .withRetryListener(new RetryListener() {
                     @Override
