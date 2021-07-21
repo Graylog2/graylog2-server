@@ -136,7 +136,13 @@ export const ViewStore: ViewStoreType = singletonStore(
       this.view = view;
       this.activeQuery = query.id;
 
-      const promise = (isModified ? ViewActions.search(view.search) : Promise.resolve(view)).then(() => this._trigger());
+      const promise = (isModified ? ViewActions.search(view.search) : Promise.resolve(view)).then(
+        () => {
+          this._trigger();
+
+          return Immutable.OrderedMap<QueryId, Query>(newSearch.queries.map((q) => [q.id, q]).toArray());
+        },
+      );
 
       QueriesActions.create.promise(promise);
     },

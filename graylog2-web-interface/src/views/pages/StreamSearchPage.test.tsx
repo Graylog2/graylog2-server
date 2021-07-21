@@ -40,6 +40,13 @@ const mockView = View.create()
 jest.mock('views/components/Search', () => jest.fn(() => <div>Extended search page</div>));
 jest.mock('views/stores/SearchStore', () => ({ SearchActions: {} }));
 
+jest.mock('views/stores/ViewStatesStore', () => ({
+  ViewStatesStore: {
+    listen: jest.fn(),
+    getInitialState: jest.fn(() => ({ has: jest.fn(() => false) })),
+  },
+}));
+
 jest.mock('views/stores/ViewStore', () => ({
   ViewActions: {
     create: jest.fn(() => Promise.resolve({ view: mockView })),
