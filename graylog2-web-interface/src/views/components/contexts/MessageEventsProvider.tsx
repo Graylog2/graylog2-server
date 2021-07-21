@@ -60,7 +60,11 @@ const getMessageEventsContextValue = (securityContent) => {
   }, initialContextValue);
 };
 
-const MessageEventsProvider = ({ children }: { children: React.ReactElement }): React.ReactElement => {
+type Props = {
+  children: React.ReactElement
+};
+
+const MessageEventsProvider = ({ children }: Props) => {
   const securityContent = PluginStore.exports('securityContent');
   const contextValue = getMessageEventsContextValue(securityContent);
 
