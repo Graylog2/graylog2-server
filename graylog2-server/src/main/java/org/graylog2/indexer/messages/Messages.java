@@ -34,6 +34,7 @@ import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.InvalidWriteTargetException;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.plugin.Message;
+import org.graylog2.shared.utilities.ExceptionUtils;
 import org.graylog2.system.processing.ProcessingStatusRecorder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,7 +77,7 @@ public class Messages {
     @SuppressWarnings("UnstableApiUsage")
     private RetryerBuilder<List<IndexingError>> createBulkRequestRetryerBuilder() {
         return RetryerBuilder.<List<IndexingError>>newBuilder()
-                .retryIfException(t -> t instanceof IOException || t instanceof InvalidWriteTargetException)
+                .retryIfException(t -> ExceptionUtils.hasCauseOf(t, IOException.class) || t instanceof InvalidWriteTargetException)
                 .withWaitStrategy(WaitStrategies.exponentialWait(MAX_WAIT_TIME.getQuantity(), MAX_WAIT_TIME.getUnit()))
                 .withRetryListener(new RetryListener() {
                     @Override
