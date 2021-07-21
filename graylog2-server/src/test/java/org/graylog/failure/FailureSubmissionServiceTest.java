@@ -23,14 +23,12 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Test;
 
-import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -38,17 +36,19 @@ public class FailureSubmissionServiceTest {
 
     private final Configuration configuration = mock(Configuration.class);
 
+    private final MetricRegistry metricRegistry = new MetricRegistry();
+
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1, new ThreadFactoryBuilder()
             .setNameFormat("failure-scheduled-%d")
             .setDaemon(false)
             .build());
 
     @Test
-    public void submitBlocking_whenTheServiceIsUp_itAcceptsNewBatches() throws Exception {
+    public void submitBlocking_whenQueueNotFull_acceptsNewBatches() throws Exception {
         //given
         when(configuration.getFailureHandlingQueueCapacity()).thenReturn(1000);
 
-        final FailureSubmissionService underTest = new FailureSubmissionService(configuration, new MetricRegistry());
+        final FailureSubmissionService underTest = new FailureSubmissionService(configuration, metricRegistry);
 
         final ProcessingFailure prcFailure1 = createProcessingFailure();
         final ProcessingFailure prcFailure2 = createProcessingFailure();
@@ -64,35 +64,11 @@ public class FailureSubmissionServiceTest {
     }
 
     @Test
-    public void submitBlocking_whenTheServiceIsDown_noNewBatchesAccepted() throws Exception {
-        //given
-        when(configuration.getFailureHandlingQueueCapacity()).thenReturn(1000);
-
-        final FailureSubmissionService underTest = new FailureSubmissionService(configuration, new MetricRegistry());
-
-        final ProcessingFailure prcFailure1 = createProcessingFailure();
-        final ProcessingFailure prcFailure2 = createProcessingFailure();
-
-        underTest.submitBlocking(FailureBatch.processingFailureBatch(prcFailure1));
-        underTest.submitBlocking(FailureBatch.processingFailureBatch(prcFailure2));
-
-        // when
-        underTest.shutDown();
-
-        underTest.submitBlocking(FailureBatch.processingFailureBatch(createProcessingFailure()));
-
-        // then
-        assertThat(underTest.queueSize()).isEqualTo(2);
-        assertThat(underTest.consumeBlocking()).isEqualTo(FailureBatch.processingFailureBatch(prcFailure1));
-        assertThat(underTest.consumeBlocking()).isEqualTo(FailureBatch.processingFailureBatch(prcFailure2));
-    }
-
-    @Test
-    public void submitBlocking_whenTheQueueIsFull_submissionIsBlocked() throws Exception {
+    public void submitBlocking_whenQueueIsFull_submissionIsBlocked() throws Exception {
         //given
         when(configuration.getFailureHandlingQueueCapacity()).thenReturn(2);
 
-        final FailureSubmissionService underTest = new FailureSubmissionService(configuration, new MetricRegistry());
+        final FailureSubmissionService underTest = new FailureSubmissionService(configuration, metricRegistry);
 
         final ProcessingFailure prcFailure1 = createProcessingFailure();
         final ProcessingFailure prcFailure2 = createProcessingFailure();
@@ -124,47 +100,11 @@ public class FailureSubmissionServiceTest {
     }
 
     @Test
-    public void drain_mustNotBeCalled_whenTheServiceIsUp() {
+    public void consumeBlocking_waitsForBatch_whenQueueIsEmpty() throws Exception {
         //given
         when(configuration.getFailureHandlingQueueCapacity()).thenReturn(2);
 
-        final FailureSubmissionService underTest = new FailureSubmissionService(configuration, new MetricRegistry());
-
-        // when + then
-        assertThatCode(underTest::drain).isExactlyInstanceOf(IllegalStateException.class);
-    }
-
-
-    @Test
-    public void drain_returnsRemainingBatches_whenTheServiceIsDown() throws Exception {
-        //given
-        when(configuration.getFailureHandlingQueueCapacity()).thenReturn(3);
-
-        final FailureSubmissionService underTest = new FailureSubmissionService(configuration, new MetricRegistry());
-
-        final ProcessingFailure prcFailure1 = createProcessingFailure();
-        final ProcessingFailure prcFailure2 = createProcessingFailure();
-        final ProcessingFailure prcFailure3 = createProcessingFailure();
-
-        underTest.submitBlocking(FailureBatch.processingFailureBatch(prcFailure1));
-        underTest.submitBlocking(FailureBatch.processingFailureBatch(prcFailure2));
-        underTest.submitBlocking(FailureBatch.processingFailureBatch(prcFailure3));
-
-        // when + then
-        underTest.consumeBlocking();
-
-        underTest.shutDown();
-
-        final List<FailureBatch> drained = underTest.drain();
-        assertThat(drained).containsExactly(FailureBatch.processingFailureBatch(prcFailure2), FailureBatch.processingFailureBatch(prcFailure3));
-    }
-
-    @Test
-    public void consumeBlocking_waitsForBatch_whenTheQueueIsEmpty() throws Exception {
-        //given
-        when(configuration.getFailureHandlingQueueCapacity()).thenReturn(2);
-
-        final FailureSubmissionService underTest = new FailureSubmissionService(configuration, new MetricRegistry());
+        final FailureSubmissionService underTest = new FailureSubmissionService(configuration, metricRegistry);
 
         final ProcessingFailure prcFailure1 = createProcessingFailure();
 
@@ -186,21 +126,57 @@ public class FailureSubmissionServiceTest {
         assertThat(consumedBatch).isEqualTo(FailureBatch.processingFailureBatch(prcFailure1));
     }
 
-
     @Test
-    public void consumeBlocking_returnsBatches_whenTheServiceIsDown() throws Exception {
+    public void consumeBlockingWithTimeout_returnsBatch_whenSubmittedWithinWaitingTimeout() throws Exception {
         //given
         when(configuration.getFailureHandlingQueueCapacity()).thenReturn(2);
 
-        final FailureSubmissionService underTest = new FailureSubmissionService(configuration, new MetricRegistry());
+        final FailureSubmissionService underTest = new FailureSubmissionService(configuration, metricRegistry);
 
         final ProcessingFailure prcFailure1 = createProcessingFailure();
-        underTest.submitBlocking(FailureBatch.processingFailureBatch(prcFailure1));
 
-        // when + them
-        underTest.shutDown();
+        // when
+        scheduler.schedule(() -> {
+            try {
+                underTest.submitBlocking(FailureBatch.processingFailureBatch(prcFailure1));
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }, 300, TimeUnit.MILLISECONDS);
 
-        assertThat(underTest.consumeBlocking()).isEqualTo(FailureBatch.processingFailureBatch(prcFailure1));
+        final long stared = System.currentTimeMillis();
+        final FailureBatch consumedBatch = underTest.consumeBlockingWithTimeout(500);
+        final long waited = System.currentTimeMillis() - stared;
+
+        // then
+        assertThat(waited).isGreaterThan(200);
+        assertThat(consumedBatch).isEqualTo(FailureBatch.processingFailureBatch(prcFailure1));
+    }
+
+    @Test
+    public void consumeBlockingWithTimeout_returnsNull_whenReachedWaitingTimeout() throws Exception {
+        //given
+        when(configuration.getFailureHandlingQueueCapacity()).thenReturn(2);
+
+        final FailureSubmissionService underTest = new FailureSubmissionService(configuration, metricRegistry);
+
+        final ProcessingFailure prcFailure1 = createProcessingFailure();
+
+        // when
+        scheduler.schedule(() -> {
+            try {
+                underTest.submitBlocking(FailureBatch.processingFailureBatch(prcFailure1));
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }, 300, TimeUnit.MILLISECONDS);
+
+        final long stared = System.currentTimeMillis();
+        final FailureBatch consumedBatch = underTest.consumeBlockingWithTimeout(50);
+        final long waited = System.currentTimeMillis() - stared;
+
+        // then
+        assertThat(consumedBatch).isNull();
     }
 
     private ProcessingFailure createProcessingFailure() {

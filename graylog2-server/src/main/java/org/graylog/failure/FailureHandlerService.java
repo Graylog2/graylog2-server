@@ -19,6 +19,8 @@ package org.graylog.failure;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.AbstractExecutionThreadService;
+import org.graylog2.Configuration;
+import org.graylog2.shared.journal.Journal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,17 +52,23 @@ public class FailureHandlerService extends AbstractExecutionThreadService {
     private final List<FailureHandler> fallbackFailureHandlerAsList;
     private final Set<FailureHandler> failureHandlers;
     private final FailureSubmissionService failureSubmissionService;
+    private final Configuration configuration;
+    private final Journal journal;
     private Thread executionThread;
 
     @Inject
     public FailureHandlerService(
             @Named("fallbackFailureHandler") FailureHandler fallbackFailureHandler,
             Set<FailureHandler> failureHandlers,
-            FailureSubmissionService failureSubmissionService
+            FailureSubmissionService failureSubmissionService,
+            Configuration configuration,
+            Journal journal
     ) {
         this.fallbackFailureHandlerAsList = Lists.newArrayList(fallbackFailureHandler);
         this.failureHandlers = failureHandlers;
         this.failureSubmissionService = failureSubmissionService;
+        this.configuration = configuration;
+        this.journal = journal;
     }
 
     @Override
@@ -73,20 +81,38 @@ public class FailureHandlerService extends AbstractExecutionThreadService {
     @Override
     protected void shutDown() throws Exception {
 
-        final List<FailureBatch> remainingFailures = failureSubmissionService.drain();
+        // if no new batches have been submitted within a certain period of time
+        // we consider the processing being done with its job and we don't expect
+        // further failures.
+        final long shutdownAwaitInsMs = configuration.getFailureHandlingShutdownAwait().toMilliseconds();
+        int remainingBatchCount = 0;
+        FailureBatch remainingFailureBatch = failureSubmissionService.consumeBlockingWithTimeout(shutdownAwaitInsMs);
 
-        logger.info("Shutting down the service. {} remaining failure batches to be processed.", remainingFailures.size());
+        while (remainingFailureBatch != null) {
+            handle(remainingFailureBatch);
+            remainingBatchCount++;
+            remainingFailureBatch = failureSubmissionService.consumeBlockingWithTimeout(shutdownAwaitInsMs);
+        }
 
-        remainingFailures.forEach(this::handle);
+        // very likely that the LocalKafkaJournal service will shut down
+        // way earlier before we are done with the failures, in this way
+        // the journal offset value will be left in inconsistent state,
+        // what in its turn will lead to reprocessing and duplicates.
+        // Therefore this explicit call is required here.
+        journal.flush();
+
+        logger.info("Shutting down the service. Processed {} remaining failure batches.", remainingBatchCount);
+
+        failureSubmissionService.logStats("FailureHandlerService#shutDown");
     }
 
     @Override
     protected void triggerShutdown() {
         logger.debug("Requested to shut down.");
 
-        failureSubmissionService.shutDown();
-
         executionThread.interrupt();
+
+        failureSubmissionService.logStats("FailureHandlerService#triggerShutdown");
     }
 
     @Override

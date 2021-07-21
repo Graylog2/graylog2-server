@@ -20,6 +20,7 @@ import com.codahale.metrics.MetricRegistry;
 import org.awaitility.Awaitility;
 import org.awaitility.Duration;
 import org.graylog2.Configuration;
+import org.graylog2.shared.journal.Journal;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
@@ -42,6 +43,8 @@ import static org.mockito.Mockito.when;
 public class FailureHandlerServiceTest {
 
     private final Configuration configuration = mock(Configuration.class);
+    private final MetricRegistry metricRegistry = new MetricRegistry();
+    private final Journal journal = mock(Journal.class);
 
     private FailureSubmissionService failureSubmissionService;
 
@@ -49,7 +52,7 @@ public class FailureHandlerServiceTest {
     public void setup() {
         when(configuration.getFailureHandlingQueueCapacity()).thenReturn(1000);
 
-        failureSubmissionService = new FailureSubmissionService(configuration, new MetricRegistry());
+        failureSubmissionService = new FailureSubmissionService(configuration, metricRegistry);
     }
 
     @Test
@@ -61,7 +64,7 @@ public class FailureHandlerServiceTest {
         final FailureHandler fallbackIndexingFailureHandler = enabledFailureHandler(indexingFailureBatch);
 
         final FailureHandlerService underTest = new FailureHandlerService(fallbackIndexingFailureHandler,
-                ImmutableSet.of(customFailureHandler), failureSubmissionService);
+                ImmutableSet.of(customFailureHandler), failureSubmissionService, configuration, journal);
 
         underTest.startAsync();
         underTest.awaitRunning();
@@ -93,7 +96,7 @@ public class FailureHandlerServiceTest {
         final FailureHandler fallbackFailureHandler = enabledFailureHandler();
 
         final FailureHandlerService underTest = new FailureHandlerService(fallbackFailureHandler,
-                ImmutableSet.of(customFailureHandler), failureSubmissionService);
+                ImmutableSet.of(customFailureHandler), failureSubmissionService, configuration, journal);
 
         underTest.startAsync();
         underTest.awaitRunning();
@@ -126,7 +129,7 @@ public class FailureHandlerServiceTest {
         final FailureHandler fallbackIndexingFailureHandler = enabledFailureHandler(indexingFailureBatch);
 
         final FailureHandlerService underTest = new FailureHandlerService(fallbackIndexingFailureHandler,
-                ImmutableSet.of(customIndexingFailureHandler1, customIndexingFailureHandler2), failureSubmissionService);
+                ImmutableSet.of(customIndexingFailureHandler1, customIndexingFailureHandler2), failureSubmissionService, configuration, journal);
 
         underTest.startAsync();
         underTest.awaitRunning();
@@ -144,7 +147,7 @@ public class FailureHandlerServiceTest {
     }
 
     @Test
-    public void uponShutdownAllRemainingFailuresAreHandled() {
+    public void uponShutdownAllRemainingFailuresAreHandled() throws Exception {
         // given
         final FailureBatch indexingFailureBatch = indexingFailureBatch(createIndexingFailure());
 
@@ -153,9 +156,12 @@ public class FailureHandlerServiceTest {
 
         final FailureSubmissionService failureSubmissionService = mock(FailureSubmissionService.class);
         final FailureHandlerService underTest = new FailureHandlerService(fallbackFailureHandler,
-                ImmutableSet.of(customFailureHandler), failureSubmissionService);
+                ImmutableSet.of(customFailureHandler), failureSubmissionService, configuration, journal);
 
-        when(failureSubmissionService.drain()).thenReturn(ImmutableList.of(indexingFailureBatch));
+        when(configuration.getFailureHandlingShutdownAwait()).thenReturn(com.github.joschi.jadconfig.util.Duration.milliseconds(300));
+        when(failureSubmissionService.consumeBlockingWithTimeout(300L))
+                .thenReturn(indexingFailureBatch)
+                .thenReturn(null);
 
         underTest.startAsync();
         underTest.awaitRunning();
@@ -165,8 +171,9 @@ public class FailureHandlerServiceTest {
         underTest.awaitTerminated();
 
         // then
-        verify(failureSubmissionService, times(1)).drain();
+        verify(failureSubmissionService, times(2)).consumeBlockingWithTimeout(300L);
         verify(fallbackFailureHandler, times(1)).handle(indexingFailureBatch);
+        verify(journal).flush();
     }
 
 
@@ -182,7 +189,7 @@ public class FailureHandlerServiceTest {
         doThrow(new RuntimeException()).when(fallbackIndexingFailureHandler).handle(indexingFailureBatch2);
 
         final FailureHandlerService underTest = new FailureHandlerService(fallbackIndexingFailureHandler,
-                ImmutableSet.of(), failureSubmissionService);
+                ImmutableSet.of(), failureSubmissionService, configuration, journal);
 
         underTest.startAsync();
         underTest.awaitRunning();
@@ -206,7 +213,7 @@ public class FailureHandlerServiceTest {
         final FailureHandler fallbackFailureHandler = enabledFailureHandler();
 
         final FailureHandlerService underTest = new FailureHandlerService(fallbackFailureHandler,
-                ImmutableSet.of(customProcessingFailureHandler1), failureSubmissionService);
+                ImmutableSet.of(customProcessingFailureHandler1), failureSubmissionService, configuration, journal);
 
         // when + then
         assertThat(underTest.canHandleProcessingErrors()).isTrue();
@@ -219,7 +226,7 @@ public class FailureHandlerServiceTest {
         final FailureHandler fallbackProcessingFailureHandler = enabledFailureHandler(EMPTY_PROCESSING_FAILURE_BATCH);
 
         final FailureHandlerService underTest = new FailureHandlerService(fallbackProcessingFailureHandler,
-                ImmutableSet.of(customFailureHandler1), failureSubmissionService);
+                ImmutableSet.of(customFailureHandler1), failureSubmissionService, configuration, journal);
 
         // when + then
         assertThat(underTest.canHandleProcessingErrors()).isTrue();
@@ -232,7 +239,7 @@ public class FailureHandlerServiceTest {
         final FailureHandler fallbackFailureHandler = enabledFailureHandler();
 
         final FailureHandlerService underTest = new FailureHandlerService(fallbackFailureHandler,
-                ImmutableSet.of(customFailureHandler1), failureSubmissionService);
+                ImmutableSet.of(customFailureHandler1), failureSubmissionService, configuration, journal);
 
         // when + then
         assertThat(underTest.canHandleProcessingErrors()).isFalse();

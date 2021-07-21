@@ -165,6 +165,9 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "failure_handling_queue_capacity", validators = {PositiveIntegerValidator.class})
     private int failureHandlingQueueCapacity = 1000;
 
+    @Parameter(value = "failure_handling_shutdown_await", validators = {PositiveDurationValidator.class})
+    private Duration failureHandlingShutdownAwait = Duration.milliseconds(3000);
+
     @Parameter(value = "is_cloud")
     private boolean isCloud = false;
 
@@ -329,6 +332,11 @@ public class Configuration extends BaseConfiguration {
 
     public int getFailureHandlingQueueCapacity() {
         return failureHandlingQueueCapacity;
+    }
+
+
+    public Duration getFailureHandlingShutdownAwait() {
+        return failureHandlingShutdownAwait;
     }
 
     /**
