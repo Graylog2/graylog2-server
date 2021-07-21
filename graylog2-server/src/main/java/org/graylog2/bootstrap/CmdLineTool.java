@@ -53,6 +53,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
+import org.graylog2.featureflag.FeatureFlags;
+import org.graylog2.featureflag.FeatureFlagsFactory;
 import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.DocsHelper;
 import org.graylog2.plugin.Plugin;
@@ -90,6 +92,10 @@ import java.util.stream.Stream;
 import static com.google.common.base.Strings.nullToEmpty;
 
 public abstract class CmdLineTool implements CliCommand {
+
+    public static final String GRAYLOG_ENVIRONMENT_VAR_PREFIX = "GRAYLOG_";
+    public static final String GRAYLOG_SYSTEM_PROP_PREFIX = "graylog.";
+
     static {
         // Set up JDK Logging adapter, https://logging.apache.org/log4j/2.x/log4j-jul/index.html
         System.setProperty("java.util.logging.manager", "org.apache.logging.log4j.jul.LogManager");
@@ -117,10 +123,14 @@ public abstract class CmdLineTool implements CliCommand {
     @Option(name = {"-f", "--configfile"}, description = "Configuration file for Graylog")
     private String configFile = "/etc/graylog/server/server.conf";
 
+    @Option(name = {"-ff", "--featureflagfile"}, description = "Configuration file for Graylog feature flags")
+    private String customFeatureFlagFile = "/etc/graylog/server/feature-flag.conf";
+
     protected String commandName = "command";
 
     protected Injector injector;
     protected Injector coreConfigInjector;
+    protected FeatureFlags featureFlags;
 
     protected CmdLineTool(BaseConfiguration configuration) {
         this(null, configuration);
@@ -227,6 +237,8 @@ public abstract class CmdLineTool implements CliCommand {
             dumpDefaultConfigAndExit();
         }
 
+        featureFlags = getFeatureFlags();
+
         installConfigRepositories();
         installCommandConfig();
 
@@ -255,9 +267,7 @@ public abstract class CmdLineTool implements CliCommand {
         final List<String> arguments = ManagementFactory.getRuntimeMXBean().getInputArguments();
         LOG.info("Running with JVM arguments: {}", Joiner.on(' ').join(arguments));
 
-        injector = setupInjector(new NamedConfigParametersModule(jadConfig.getConfigurationBeans()),
-                new PluginBindings(plugins),
-                binder -> binder.bind(ChainingClassLoader.class).toInstance(chainingClassLoader));
+        injector = setupInjector(new NamedConfigParametersModule(jadConfig.getConfigurationBeans()), new PluginBindings(plugins));
 
         if (injector == null) {
             LOG.error("Injector could not be created, exiting! (Please include the previous error messages in bug " +
@@ -364,6 +374,10 @@ public abstract class CmdLineTool implements CliCommand {
         return pluginLoaderConfig.getPluginDir();
     }
 
+    private FeatureFlags getFeatureFlags() {
+        return new FeatureFlagsFactory().createImmutableFeatureFlags(customFeatureFlagFile);
+    }
+
     protected Set<Plugin> loadPlugins(Path pluginPath, ChainingClassLoader chainingClassLoader) {
         final Set<Plugin> plugins = new HashSet<>();
 
@@ -390,8 +404,8 @@ public abstract class CmdLineTool implements CliCommand {
 
     protected Collection<Repository> getConfigRepositories(String configFile) {
         return Arrays.asList(
-                new EnvironmentRepository("GRAYLOG_"),
-                new SystemPropertiesRepository("graylog."),
+                new EnvironmentRepository(GRAYLOG_ENVIRONMENT_VAR_PREFIX),
+                new SystemPropertiesRepository(GRAYLOG_SYSTEM_PROP_PREFIX),
                 // Legacy prefixes
                 new EnvironmentRepository("GRAYLOG2_"),
                 new SystemPropertiesRepository("graylog2."),
@@ -431,21 +445,18 @@ public abstract class CmdLineTool implements CliCommand {
         return Lists.newArrayList();
     }
 
-    protected Injector setupInjector(NamedConfigParametersModule configModule, Module... otherModules) {
+    protected Injector setupInjector(Module... modules) {
         try {
-            final ImmutableList.Builder<Module> modules = ImmutableList.builder();
-            modules.add(configModule);
-            modules.addAll(getSharedBindingsModules());
-            modules.addAll(getCommandBindings());
-            modules.addAll(Arrays.asList(otherModules));
-            modules.add(new Module() {
-                @Override
-                public void configure(Binder binder) {
-                    binder.bind(String.class).annotatedWith(Names.named("BootstrapCommand")).toInstance(commandName);
-                }
+            final ImmutableList.Builder<Module> builder = ImmutableList.builder();
+            builder.addAll(getSharedBindingsModules());
+            builder.addAll(getCommandBindings());
+            builder.addAll(Arrays.asList(modules));
+            builder.add(binder -> {
+                binder.bind(ChainingClassLoader.class).toInstance(chainingClassLoader);
+                featureFlagsBinding(binder);
+                binder.bind(String.class).annotatedWith(Names.named("BootstrapCommand")).toInstance(commandName);
             });
-
-            return GuiceInjectorHolder.createInjector(modules.build());
+            return GuiceInjectorHolder.createInjector(builder.build());
         } catch (CreationException e) {
             annotateInjectorCreationException(e);
             return null;
@@ -466,7 +477,7 @@ public abstract class CmdLineTool implements CliCommand {
         Injector coreConfigInjector = null;
         try {
             coreConfigInjector = Guice.createInjector(Stage.PRODUCTION, ImmutableList.of(configModule,
-                    (Module) Binder::requireExplicitBindings));
+                    (Module) Binder::requireExplicitBindings, this::featureFlagsBinding));
         } catch (CreationException e) {
             annotateInjectorCreationException(e);
         } catch (Exception e) {
@@ -479,6 +490,10 @@ public abstract class CmdLineTool implements CliCommand {
             System.exit(1);
         }
         return coreConfigInjector;
+    }
+
+    private void featureFlagsBinding(Binder binder) {
+        binder.bind(FeatureFlags.class).toInstance(featureFlags);
     }
 
     protected void annotateInjectorCreationException(CreationException e) {
