@@ -182,6 +182,41 @@ export interface SearchTypeResultTypes {
 
 export type SearchTypeResults = { [id: string]: SearchTypeResultTypes[keyof SearchTypeResultTypes] };
 
+type SecurityContent = {
+  eventTypes: Array<EventTypes>,
+  externalActions: Array<EventAction>
+}
+
+type EventType = {
+  gl2EventTypeCode: string,
+  gl2EventType: string,
+  title: string,
+  summary: string,
+  eventActions: Array<string>,
+}
+
+type ExternalActionBase = {
+  id: string,
+  title: string,
+  fields: Array<string>,
+}
+
+type ExternalActionHttpGet = {
+  type: 'http_get'
+  options: {
+    action: string,
+  }
+}
+
+type ExternalActionWatchlist = {
+  type: 'lookuptable'
+  options: {
+    watchListName: string,
+  }
+}
+
+type EventAction = ExternalActionHttpGet | ExternalActionWatchlist;
+
 declare module 'graylog-web-plugin/plugin' {
   export interface PluginExports {
     creators?: Array<Creator>;
@@ -203,5 +238,6 @@ declare module 'graylog-web-plugin/plugin' {
     'views.requires.provided'?: Array<string>;
     visualizationConfigTypes?: Array<VisualizationConfigType>;
     visualizationTypes?: Array<VisualizationType>;
+    securityContent?: Array<SecurityContent>;
   }
 }
