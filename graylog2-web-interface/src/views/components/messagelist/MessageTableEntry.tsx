@@ -172,7 +172,7 @@ const MessageTableEntry = ({
         </tr>
       )}
 
-      {messageSummary && (
+      {!!messageSummary && (
         <tr className="message-row" onClick={_toggleDetail}>
           <td colSpan={colSpanFixup}>
             <div className="message-wrapper">
