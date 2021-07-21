@@ -91,7 +91,7 @@ const getMessageSummary = (messageFields, messageEvents) => {
   const gl2EventTypeCode = messageFields.gl2_event_type_code;
   const eventTypes = messageEvents?.eventTypes;
 
-  const summaryFormatString = eventTypes[gl2EventTypeCode]?.summary ?? '';
+  const summaryFormatString = eventTypes?.[gl2EventTypeCode]?.summary ?? '';
 
   return summaryFormatString.replace(/{\w+}/g, (fieldNamePlaceholder) => {
     const fieldName = fieldNamePlaceholder.substring(1, fieldNamePlaceholder.length - 1);
