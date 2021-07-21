@@ -15,7 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-export const createSimpleEventType = (index = 1, overrides = {}) => ({
+import type { EventType, ExternalEventAction } from 'views/types';
+
+export const createSimpleEventType = (index = 1, overrides: Partial<EventType> = {}) => ({
   gl2EventTypeCode: `event-type-code-${index}`,
   gl2EventType: `event type name ${index}`,
   title: `Event type title ${index}`,
@@ -24,7 +26,7 @@ export const createSimpleEventType = (index = 1, overrides = {}) => ({
   ...overrides,
 });
 
-export const createSimpleExternalAction = (index = 1, overrides = {}) => ({
+export const createSimpleExternalAction = (index = 1, overrides: Partial<ExternalEventAction> = {}) => ({
   id: `action-id-${index}`,
   type: 'http_get',
   title: `External action ${index}`,

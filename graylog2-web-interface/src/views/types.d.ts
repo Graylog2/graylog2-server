@@ -184,10 +184,10 @@ export type SearchTypeResults = { [id: string]: SearchTypeResultTypes[keyof Sear
 
 type SecurityContent = {
   eventTypes: Array<EventTypes>,
-  externalActions: Array<EventAction>
+  externalActions: Array<ExternalEventAction>
 }
 
-type EventType = {
+export type EventType = {
   gl2EventTypeCode: string,
   gl2EventType: string,
   title: string,
@@ -201,21 +201,21 @@ type ExternalActionBase = {
   fields: Array<string>,
 }
 
-type ExternalActionHttpGet = {
+type ExternalActionHttpGet = ExternalActionBase & {
   type: 'http_get'
   options: {
     action: string,
   }
 }
 
-type ExternalActionWatchlist = {
+type ExternalActionWatchlist = ExternalActionBase & {
   type: 'lookuptable'
   options: {
     watchListName: string,
   }
 }
 
-type EventAction = ExternalActionHttpGet | ExternalActionWatchlist;
+export type ExternalEventAction = ExternalActionHttpGet | ExternalActionWatchlist;
 
 declare module 'graylog-web-plugin/plugin' {
   export interface PluginExports {

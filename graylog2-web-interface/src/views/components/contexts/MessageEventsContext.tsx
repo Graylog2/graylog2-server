@@ -15,36 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import * as Immutable from 'immutable';
+import { ExternalEventAction, EventType } from 'views/types';
 
 import { singleton } from 'views/logic/singleton';
 
-type FormatString = string; // e.g. "{field1} - {field2}"
-
-type EventType = {
-  gl2EventTypeCode: string,
-  eventName: string,
-  summary: FormatString
-};
-
-type EventActionId = string;
-
-type EventAction = {
-  id: EventActionId,
-  type: string,
-  title: string,
-  fields: Array<string>,
-}
+type FieldName = string;
 
 type MessageEventsContextType = {
-  eventTypes: {
-    [eventTypeCode: string]: EventType | undefined,
-  },
-  eventActions: {
-    [eventActionId: string]: EventAction | string,
-  },
-  fieldValueActions: {
-    [fieldName: string]: Array<EventAction> | undefined,
-  }
+  eventTypes: Immutable.Map<EventType['gl2EventType'], EventType>,
+  eventActions: Immutable.Map<ExternalEventAction['id'], ExternalEventAction>,
+  fieldValueActions: Immutable.Map<FieldName, Array<ExternalEventAction>>,
 }
 
 const MessageEventsContext = React.createContext<MessageEventsContextType | undefined>(undefined);
