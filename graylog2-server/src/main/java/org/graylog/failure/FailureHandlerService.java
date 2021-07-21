@@ -20,7 +20,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.AbstractExecutionThreadService;
 import org.graylog2.Configuration;
-import org.graylog2.shared.journal.Journal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +52,6 @@ public class FailureHandlerService extends AbstractExecutionThreadService {
     private final Set<FailureHandler> failureHandlers;
     private final FailureSubmissionService failureSubmissionService;
     private final Configuration configuration;
-    private final Journal journal;
     private Thread executionThread;
 
     @Inject
@@ -61,14 +59,12 @@ public class FailureHandlerService extends AbstractExecutionThreadService {
             @Named("fallbackFailureHandler") FailureHandler fallbackFailureHandler,
             Set<FailureHandler> failureHandlers,
             FailureSubmissionService failureSubmissionService,
-            Configuration configuration,
-            Journal journal
+            Configuration configuration
     ) {
         this.fallbackFailureHandlerAsList = Lists.newArrayList(fallbackFailureHandler);
         this.failureHandlers = failureHandlers;
         this.failureSubmissionService = failureSubmissionService;
         this.configuration = configuration;
-        this.journal = journal;
     }
 
     @Override
@@ -93,13 +89,6 @@ public class FailureHandlerService extends AbstractExecutionThreadService {
             remainingBatchCount++;
             remainingFailureBatch = failureSubmissionService.consumeBlockingWithTimeout(shutdownAwaitInsMs);
         }
-
-        // very likely that the LocalKafkaJournal service will shut down
-        // way earlier before we are done with the failures, in this way
-        // the journal offset value will be left in inconsistent state,
-        // what in its turn will lead to reprocessing and duplicates.
-        // Therefore this explicit call is required here.
-        journal.flush();
 
         logger.info("Shutting down the service. Processed {} remaining failure batches.", remainingBatchCount);
 
