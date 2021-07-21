@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useContext } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 
@@ -26,6 +27,7 @@ import FieldType from 'views/logic/fieldtypes/FieldType';
 import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import { Store } from 'stores/StoreTypes';
 import { MESSAGE_FIELD } from 'views/Constants';
+import MessageEventsContext from 'views/components/contexts/MessageEventsContext';
 
 import MessageDetail from './MessageDetail';
 import DecoratedValue from './decoration/DecoratedValue';
@@ -85,6 +87,19 @@ const fieldType = (fieldName, { decoration_stats: decorationStats }: { decoratio
   ? FieldType.Decorated
   : ((fields && fields.find((f) => f.name === fieldName)) || { type: FieldType.Unknown }).type);
 
+const getMessageSummary = (messageFields, messageEvents) => {
+  const gl2EventTypeCode = messageFields.gl2_event_type_code;
+  const eventTypes = messageEvents?.eventTypes;
+
+  const summaryFormatString = eventTypes[gl2EventTypeCode]?.summary ?? '';
+
+  return summaryFormatString.replace(/{\w+}/g, (fieldNamePlaceholder) => {
+    const fieldName = fieldNamePlaceholder.substring(1, fieldNamePlaceholder.length - 1);
+
+    return messageFields[fieldName] || fieldName;
+  });
+};
+
 const MessageTableEntry = ({
   disableSurroundingSearch,
   expandAllRenderAsync,
@@ -96,6 +111,9 @@ const MessageTableEntry = ({
   selectedFields = Immutable.OrderedSet<string>(),
   toggleDetail,
 }: Props) => {
+  const messageEvents = useContext(MessageEventsContext);
+  const messageSummary = getMessageSummary(message.fields, messageEvents);
+
   const _toggleDetail = () => {
     toggleDetail(`${message.index}-${message.id}`);
   };
@@ -142,8 +160,7 @@ const MessageTableEntry = ({
         })}
       </tr>
 
-      {showMessageRow
-      && (
+      {showMessageRow && (
         <tr className="message-row" onClick={_toggleDetail}>
           <td colSpan={colSpanFixup}>
             <div className="message-wrapper">
@@ -154,8 +171,18 @@ const MessageTableEntry = ({
           </td>
         </tr>
       )}
-      {expanded
-      && (
+
+      {messageSummary && (
+        <tr className="message-row" onClick={_toggleDetail}>
+          <td colSpan={colSpanFixup}>
+            <div className="message-wrapper">
+              {messageSummary}
+            </div>
+          </td>
+        </tr>
+      )}
+
+      {expanded && (
         <tr className="message-detail-row" style={{ display: 'table-row' }}>
           <td colSpan={colSpanFixup}>
             {/* @ts-ignore */}
