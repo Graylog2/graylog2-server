@@ -193,7 +193,7 @@ public class PipelineInterpreter implements MessageProcessor {
         final String processingError = message.getFieldAs(String.class, Message.FIELD_GL2_PROCESSING_ERROR);
         if (processingError != null) {
             message.setFilterOut(true);
-            messageQueueAcknowledger.acknowledge(message);
+            // Message will be acknowledged in the FailureHandlerService
             failedMessages.mark();
             submitFailure(message, processingError);
         }

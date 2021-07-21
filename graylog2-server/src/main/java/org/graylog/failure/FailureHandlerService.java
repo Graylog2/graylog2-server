@@ -20,6 +20,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.AbstractExecutionThreadService;
 import org.graylog2.Configuration;
+import org.graylog2.plugin.Message;
+import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,6 +54,7 @@ public class FailureHandlerService extends AbstractExecutionThreadService {
     private final Set<FailureHandler> failureHandlers;
     private final FailureSubmissionService failureSubmissionService;
     private final Configuration configuration;
+    private final MessageQueueAcknowledger acknowledger;
     private Thread executionThread;
 
     @Inject
@@ -59,12 +62,13 @@ public class FailureHandlerService extends AbstractExecutionThreadService {
             @Named("fallbackFailureHandler") FailureHandler fallbackFailureHandler,
             Set<FailureHandler> failureHandlers,
             FailureSubmissionService failureSubmissionService,
-            Configuration configuration
-    ) {
+            Configuration configuration,
+            MessageQueueAcknowledger acknowledger) {
         this.fallbackFailureHandlerAsList = Lists.newArrayList(fallbackFailureHandler);
         this.failureHandlers = failureHandlers;
         this.failureSubmissionService = failureSubmissionService;
         this.configuration = configuration;
+        this.acknowledger = acknowledger;
     }
 
     @Override
@@ -130,6 +134,14 @@ public class FailureHandlerService extends AbstractExecutionThreadService {
                 .forEach(handler -> {
                     try {
                         handler.handle(failureBatch);
+
+                        if (failureBatch.getFailureClass().equals(ProcessingFailure.class)) {
+                            acknowledger.acknowledge(failureBatch.getFailures().stream()
+                                    .map(Failure::failedMessage)
+                                    .filter(Message.class::isInstance).map(Message.class::cast)
+                                    .collect(Collectors.toList())
+                            );
+                        }
                     } catch (Exception e) {
                         logger.error("Error occurred while handling failures by {}", handler.getClass().getName());
                     }
