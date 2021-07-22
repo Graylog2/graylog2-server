@@ -27,7 +27,7 @@ import FieldType from 'views/logic/fieldtypes/FieldType';
 import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import { Store } from 'stores/StoreTypes';
 import { MESSAGE_FIELD } from 'views/Constants';
-import MessageEventsContext from 'views/components/contexts/MessageEventsContext';
+import MessageEventTypesContext from 'views/components/contexts/MessageEventTypesContext';
 
 import MessageDetail from './MessageDetail';
 import DecoratedValue from './decoration/DecoratedValue';
@@ -107,7 +107,7 @@ const MessageTableEntry = ({
   selectedFields = Immutable.OrderedSet<string>(),
   toggleDetail,
 }: Props) => {
-  const messageEvents = useContext(MessageEventsContext);
+  const messageEvents = useContext(MessageEventTypesContext);
   const messageSummary = getMessageSummary(message.fields, messageEvents);
 
   const _toggleDetail = () => {

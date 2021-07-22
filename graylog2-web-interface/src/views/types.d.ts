@@ -182,12 +182,7 @@ export interface SearchTypeResultTypes {
 
 export type SearchTypeResults = { [id: string]: SearchTypeResultTypes[keyof SearchTypeResultTypes] };
 
-type SecurityContent = {
-  eventTypes: Array<EventTypes>,
-  externalActions: Array<ExternalEventAction>
-}
-
-export type EventType = {
+export type MessageEventType = {
   gl2EventTypeCode: string,
   gl2EventType: string,
   title: string,
@@ -195,27 +190,30 @@ export type EventType = {
   eventActions: Array<string>,
 }
 
-type ExternalActionBase = {
+type ExternalValueActionBase = {
   id: string,
   title: string,
   fields: Array<string>,
 }
 
-type ExternalActionHttpGet = ExternalActionBase & {
+type ExternalValueActionHttpGet = ExternalValueActionBase & {
   type: 'http_get'
   options: {
     action: string,
   }
 }
 
-type ExternalActionWatchlist = ExternalActionBase & {
+type ExternalValueActionWatchlist = ExternalValueActionBase & {
   type: 'lookuptable'
   options: {
     watchListName: string,
   }
 }
 
-export type ExternalEventAction = ExternalActionHttpGet | ExternalActionWatchlist;
+export type ExternalValueAction = ExternalValueActionHttpGet | ExternalValueActionWatchlist;
+
+type ExternalValueActions = { [id: ExternalValueAction.id]: ExternalValueAction | undefined };
+type MessageEventTypes = { [gl2EventTypeCode: MessageEventType.gl2EventTypeCode]: MessageEventType | undefined };
 
 declare module 'graylog-web-plugin/plugin' {
   export interface PluginExports {
@@ -238,6 +236,7 @@ declare module 'graylog-web-plugin/plugin' {
     'views.requires.provided'?: Array<string>;
     visualizationConfigTypes?: Array<VisualizationConfigType>;
     visualizationTypes?: Array<VisualizationType>;
-    securityContent?: Array<SecurityContent>;
+    externalValueActions?: ExternalValueActions;
+    messageEventTypes?: MessageEventTypes;
   }
 }

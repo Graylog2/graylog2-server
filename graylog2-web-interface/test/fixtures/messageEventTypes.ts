@@ -15,24 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import type { EventType, ExternalEventAction } from 'views/types';
+import type { MessageEventType } from 'views/types';
 
-export const createSimpleEventType = (index = 1, overrides: Partial<EventType> = {}) => ({
+// eslint-disable-next-line import/prefer-default-export
+export const createSimpleMessageEventType = (index = 1, overrides: Partial<MessageEventType> = {}) => ({
   gl2EventTypeCode: `event-type-code-${index}`,
   gl2EventType: `event type name ${index}`,
   title: `Event type title ${index}`,
   summary: '{field1} - {field2}',
   eventActions: ['action-id-1'],
-  ...overrides,
-});
-
-export const createSimpleExternalAction = (index = 1, overrides: Partial<ExternalEventAction> = {}) => ({
-  id: `action-id-${index}`,
-  type: 'http_get',
-  title: `External action ${index}`,
-  fields: ['field1', 'field2'],
-  options: {
-    action: 'http://example.org/{field_value}',
-  },
   ...overrides,
 });

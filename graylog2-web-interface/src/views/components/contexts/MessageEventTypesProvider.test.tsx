@@ -18,10 +18,10 @@ import * as React from 'react';
 import Immutable from 'immutable';
 import { render, screen } from 'wrappedTestingLibrary';
 import { PluginStore } from 'graylog-web-plugin/plugin';
-import { createSimpleEventType, createSimpleExternalAction } from 'fixtures/messageEvents';
+import { createSimpleMessageEventType, createSimpleExternalAction } from 'fixtures/messageEventTypes';
 
-import MessageEventsProvider from './MessageEventsProvider';
-import MessageEventsContext from './MessageEventsContext';
+import MessageEventTypesProvider from './MessageEventTypesProvider';
+import MessageEventTypesContext from './MessageEventTypesContext';
 
 import asMock from '../../../../test/helpers/mocking/AsMock';
 
@@ -31,7 +31,7 @@ jest.mock('graylog-web-plugin/plugin', () => ({
   },
 }));
 
-const simpleEventType = createSimpleEventType();
+const simpleEventType = createSimpleMessageEventType();
 const simpleExternalAction = createSimpleExternalAction();
 
 const mockSecurityContent = {
@@ -48,17 +48,17 @@ const simpleContextValue = {
   }),
 };
 
-describe('MessageEventsProvider', () => {
+describe('MessageEventTypesProvider', () => {
   const renderSUT = (consume) => render(
-    <MessageEventsProvider>
-      <MessageEventsContext.Consumer>
+    <MessageEventTypesProvider>
+      <MessageEventTypesContext.Consumer>
         {consume}
-      </MessageEventsContext.Consumer>
-    </MessageEventsProvider>,
+      </MessageEventTypesContext.Consumer>
+    </MessageEventTypesProvider>,
   );
 
   it('renders children when there is no security content in plugin store', () => {
-    render(<MessageEventsProvider><>The content</></MessageEventsProvider>);
+    render(<MessageEventTypesProvider><>The content</></MessageEventTypesProvider>);
 
     expect(screen.getByText('The content')).toBeInTheDocument();
   });
@@ -78,7 +78,7 @@ describe('MessageEventsProvider', () => {
   });
 
   it('provides correct data, when plugin store contains multiple entries for security content', () => {
-    const simpleEventType2 = createSimpleEventType(2);
+    const simpleEventType2 = createSimpleMessageEventType(2);
     const simpleExternalAction2 = createSimpleExternalAction(2);
 
     const mockSecurityContent2 = {

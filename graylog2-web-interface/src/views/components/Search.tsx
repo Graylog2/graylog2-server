@@ -62,7 +62,7 @@ import WidgetFocusProvider from 'views/components/contexts/WidgetFocusProvider';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import { RefluxActions } from 'stores/StoreTypes';
-import MessageEventsProvider from 'views/components/contexts/MessageEventsProvider';
+import MessageEventsProvider from 'views/components/contexts/MessageEventTypesProvider';
 
 const GridContainer = styled.div<{ interactive: boolean }>(({ interactive }) => {
   return interactive ? css`

@@ -18,10 +18,10 @@ import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
 import MockStore from 'helpers/mocking/StoreMock';
-import { createSimpleEventType, createSimpleExternalAction } from 'fixtures/messageEvents';
-import { ExternalEventAction } from 'views/types';
+import { createSimpleMessageEventType } from 'fixtures/messageEventTypes';
+import type { ExternalValueAction } from 'views/types';
 
-import MessageEventsContext from 'views/components/contexts/MessageEventsContext';
+import MessageEventTypesContext from 'views/components/contexts/MessageEventTypesContext';
 
 import MessageTableEntry from './MessageTableEntry';
 
@@ -54,12 +54,12 @@ describe('MessageTableEntry', () => {
   });
 
   it('displays message summary', () => {
-    const simpleEventType = createSimpleEventType(1, { summary: '{field1} - {field2}', gl2EventTypeCode: 'event-type-code' });
+    const simpleEventType = createSimpleMessageEventType(1, { summary: '{field1} - {field2}', gl2EventTypeCode: 'event-type-code' });
 
     const messageEvents = {
       eventTypes: Immutable.Map({ [simpleEventType.gl2EventTypeCode]: simpleEventType }),
-      eventActions: Immutable.Map<ExternalEventAction['id'], ExternalEventAction>(),
-      fieldValueActions: Immutable.Map<string, Array<ExternalEventAction>>(),
+      eventActions: Immutable.Map<ExternalValueAction['id'], ExternalValueAction>(),
+      fieldValueActions: Immutable.Map<string, Array<ExternalValueAction>>(),
     };
 
     const message = {
@@ -74,7 +74,7 @@ describe('MessageTableEntry', () => {
     };
 
     render(
-      <MessageEventsContext.Provider value={messageEvents}>
+      <MessageEventTypesContext.Provider value={messageEvents}>
         <table>
           <MessageTableEntry expandAllRenderAsync
                              toggleDetail={() => {}}
@@ -83,7 +83,7 @@ describe('MessageTableEntry', () => {
                              selectedFields={Immutable.OrderedSet(['message'])}
                              expanded={false} />
         </table>,
-      </MessageEventsContext.Provider>,
+      </MessageEventTypesContext.Provider>,
     );
 
     expect(screen.getByText('Value for field 1 - Value for field 2')).toBeInTheDocument();

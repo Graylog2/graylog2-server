@@ -19,9 +19,9 @@ import Immutable from 'immutable';
 import PropTypes from 'prop-types';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import MessageEventsContext from './MessageEventsContext';
+import MessageEventTypesContext from './MessageEventTypesContext';
 
-const getMessageEventsContextValue = (securityContent) => {
+const getMessageEventTypesContextValue = (securityContent) => {
   if (!securityContent) {
     return undefined;
   }
@@ -64,21 +64,21 @@ type Props = {
   children: React.ReactElement
 };
 
-const MessageEventsProvider = ({ children }: Props) => {
-  const securityContent = PluginStore.exports('securityContent');
-  const contextValue = getMessageEventsContextValue(securityContent);
+const MessageEventTypesProvider = ({ children }: Props) => {
+  const securityContent = PluginStore.exports('messageEventTypes');
+  const contextValue = getMessageEventTypesContextValue(securityContent);
 
   return contextValue
     ? (
-      <MessageEventsContext.Provider value={contextValue}>
+      <MessageEventTypesContext.Provider value={contextValue}>
         {children}
-      </MessageEventsContext.Provider>
+      </MessageEventTypesContext.Provider>
     )
     : children;
 };
 
-MessageEventsProvider.propTypes = {
+MessageEventTypesProvider.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
-export default MessageEventsProvider;
+export default MessageEventTypesProvider;
