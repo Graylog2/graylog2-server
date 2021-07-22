@@ -24,9 +24,7 @@ import org.graylog2.search.SearchQuery;
 import org.mongojack.DBQuery;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -40,16 +38,13 @@ public class ViewSummaryService extends PaginatedDbService<ViewSummaryDTO> {
     }
 
     private PaginatedList<ViewSummaryDTO> searchPaginated(DBQuery.Query query,
-                                                   Predicate<ViewSummaryDTO> filter,
-                                                   String order,
-                                                   String sortField,
-                                                   int page,
-                                                   int perPage) {
-        final PaginatedList<ViewSummaryDTO> viewsList = findPaginatedWithQueryFilterAndSort(query, filter, getSortBuilder(order, sortField), page, perPage);
-        return viewsList.stream()
-                .collect(Collectors.toCollection(() -> viewsList.grandTotal()
-                        .map(grandTotal -> new PaginatedList<ViewSummaryDTO>(new ArrayList<>(viewsList.size()), viewsList.pagination().total(), page, perPage, grandTotal))
-                        .orElseGet(() -> new PaginatedList<>(new ArrayList<>(viewsList.size()), viewsList.pagination().total(), page, perPage))));
+                                                          Predicate<ViewSummaryDTO> filter,
+                                                          String order,
+                                                          DBQuery.Query grandTotalQuery,
+                                                          String sortField,
+                                                          int page,
+                                                          int perPage) {
+        return findPaginatedWithQueryFilterAndSortWithGrandTotalQuery(query, filter, getSortBuilder(order, sortField), grandTotalQuery, page, perPage);
     }
 
     public PaginatedList<ViewSummaryDTO> searchPaginatedByType(ViewDTO.Type type,
@@ -67,6 +62,7 @@ public class ViewSummaryService extends PaginatedDbService<ViewSummaryDTO> {
                 ),
                 filter,
                 order,
+                DBQuery.or(DBQuery.is(ViewDTO.FIELD_TYPE, type), DBQuery.notExists(ViewDTO.FIELD_TYPE)),
                 sortField,
                 page,
                 perPage
