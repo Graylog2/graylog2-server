@@ -188,6 +188,8 @@ export type MessageEventType = Immutable.Map<{
   title: string,
   summary: string,
   eventActions: Array<string>,
+  requiredFields: Array<string>,
+  optionalFields: Array<string>,
 }>
 
 type MessageEventTypes = Array<Immutable.Map<MessageEventType['gl2EventTypeCode'], MessageEventType>>;
