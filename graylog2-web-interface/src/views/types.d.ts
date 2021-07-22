@@ -41,6 +41,8 @@ import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/V
 import { TimeRange } from 'views/logic/queries/Query';
 import { CopyWidgetToDashboardHook } from 'views/logic/views/CopyWidgetToDashboard';
 
+import type { MessageEventTypes } from './types/messageEventTypes';
+
 interface EditWidgetComponentProps<Config extends WidgetConfig = WidgetConfig> {
   children: React.ReactNode,
   config: Config,
