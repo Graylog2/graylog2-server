@@ -87,9 +87,9 @@ public class FailureSubmissionServiceTest {
             }
         }, 300, TimeUnit.MILLISECONDS);
 
-        final long stared = System.currentTimeMillis();
+        final long started = System.currentTimeMillis();
         underTest.submitBlocking(FailureBatch.processingFailureBatch(prcFailure3));
-        final long waited = System.currentTimeMillis() - stared;
+        final long waited = System.currentTimeMillis() - started;
 
         // then
         assertThat(waited).isGreaterThan(200);
@@ -117,9 +117,9 @@ public class FailureSubmissionServiceTest {
             }
         }, 300, TimeUnit.MILLISECONDS);
 
-        final long stared = System.currentTimeMillis();
+        final long started = System.currentTimeMillis();
         final FailureBatch consumedBatch = underTest.consumeBlocking();
-        final long waited = System.currentTimeMillis() - stared;
+        final long waited = System.currentTimeMillis() - started;
 
         // then
         assertThat(waited).isGreaterThan(200);
@@ -144,9 +144,9 @@ public class FailureSubmissionServiceTest {
             }
         }, 300, TimeUnit.MILLISECONDS);
 
-        final long stared = System.currentTimeMillis();
+        final long started = System.currentTimeMillis();
         final FailureBatch consumedBatch = underTest.consumeBlockingWithTimeout(500);
-        final long waited = System.currentTimeMillis() - stared;
+        final long waited = System.currentTimeMillis() - started;
 
         // then
         assertThat(waited).isGreaterThan(200);
@@ -171,9 +171,7 @@ public class FailureSubmissionServiceTest {
             }
         }, 300, TimeUnit.MILLISECONDS);
 
-        final long stared = System.currentTimeMillis();
         final FailureBatch consumedBatch = underTest.consumeBlockingWithTimeout(50);
-        final long waited = System.currentTimeMillis() - stared;
 
         // then
         assertThat(consumedBatch).isNull();
