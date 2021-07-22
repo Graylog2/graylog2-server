@@ -53,6 +53,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import static org.graylog2.shared.utilities.ExceptionUtils.getRootCause;
+
 @Singleton
 public class Messages {
     public interface IndexingListener {
@@ -78,7 +80,7 @@ public class Messages {
     @SuppressWarnings("UnstableApiUsage")
     private RetryerBuilder<List<IndexingError>> createBulkRequestRetryerBuilder() {
         return RetryerBuilder.<List<IndexingError>>newBuilder()
-                .retryIfException(t -> t instanceof IOException || t instanceof InvalidWriteTargetException || t.getCause().getCause() instanceof IOException)
+                .retryIfException(t -> t instanceof IOException || getRootCause(t) instanceof IOException || t instanceof InvalidWriteTargetException)
                 .withWaitStrategy(WaitStrategies.exponentialWait(MAX_WAIT_TIME.getQuantity(), MAX_WAIT_TIME.getUnit()))
                 .withRetryListener(new RetryListener() {
                     @Override
