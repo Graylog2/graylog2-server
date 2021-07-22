@@ -29,10 +29,10 @@ import com.google.inject.multibindings.OptionalBinder;
 import com.google.inject.name.Names;
 import okhttp3.OkHttpClient;
 import org.graylog.failure.DefaultFailureHandler;
-import org.graylog.failure.DefaultProcessingFailureRoutingConfiguration;
+import org.graylog.failure.DefaultFailureHandlingConfigSupplier;
 import org.graylog.failure.FailureHandler;
-import org.graylog.failure.FailureHandlerService;
-import org.graylog.failure.ProcessingFailureRoutingConfiguration;
+import org.graylog.failure.FailureHandlingService;
+import org.graylog.failure.FailureHandlingConfigSupplier;
 import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.buffers.InputBuffer;
@@ -91,11 +91,11 @@ public class GenericBindings extends AbstractModule {
 
         Multibinder.newSetBinder(binder(), FailureHandler.class);
 
-        OptionalBinder.newOptionalBinder(binder(), ProcessingFailureRoutingConfiguration.class)
+        OptionalBinder.newOptionalBinder(binder(), FailureHandlingConfigSupplier.class)
                 .setDefault()
-                .to(DefaultProcessingFailureRoutingConfiguration.class);
+                .to(DefaultFailureHandlingConfigSupplier.class);
 
-        serviceBinder().addBinding().to(FailureHandlerService.class).in(Scopes.SINGLETON);
+        serviceBinder().addBinding().to(FailureHandlingService.class).in(Scopes.SINGLETON);
     }
 
     // TODO inherit from Graylog2Module instead?

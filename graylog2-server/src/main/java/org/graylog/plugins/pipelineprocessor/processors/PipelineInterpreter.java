@@ -31,10 +31,9 @@ import com.google.common.collect.Sets;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog.failure.FailureBatch;
-import org.graylog.failure.FailureHandlerService;
+import org.graylog.failure.FailureHandlingConfigSupplier;
 import org.graylog.failure.FailureSubmissionService;
 import org.graylog.failure.ProcessingFailure;
-import org.graylog.failure.ProcessingFailureRoutingConfiguration;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
@@ -82,16 +81,14 @@ public class PipelineInterpreter implements MessageProcessor {
     private final MetricRegistry metricRegistry;
     private final ConfigurationStateUpdater stateUpdater;
     private final FailureSubmissionService failureSubmissionService;
-    private final FailureHandlerService failureHandlerService;
-    private final ProcessingFailureRoutingConfiguration processingFailureRoutingConfiguration;
+    private final FailureHandlingConfigSupplier failureHandlingConfigSupplier;
 
     @Inject
     public PipelineInterpreter(MessageQueueAcknowledger messageQueueAcknowledger,
                                MetricRegistry metricRegistry,
                                ConfigurationStateUpdater stateUpdater,
                                FailureSubmissionService failureSubmissionService,
-                               FailureHandlerService failureHandlerService,
-                               ProcessingFailureRoutingConfiguration processingFailureRoutingConfiguration) {
+                               FailureHandlingConfigSupplier failureHandlingConfigSupplier) {
 
         this.messageQueueAcknowledger = messageQueueAcknowledger;
         this.filteredOutMessages = metricRegistry.meter(name(ProcessBufferProcessor.class, "filteredOutMessages"));
@@ -100,8 +97,7 @@ public class PipelineInterpreter implements MessageProcessor {
         this.metricRegistry = metricRegistry;
         this.stateUpdater = stateUpdater;
         this.failureSubmissionService = failureSubmissionService;
-        this.failureHandlerService = failureHandlerService;
-        this.processingFailureRoutingConfiguration = processingFailureRoutingConfiguration;
+        this.failureHandlingConfigSupplier = failureHandlingConfigSupplier;
     }
 
     /**
@@ -188,20 +184,18 @@ public class PipelineInterpreter implements MessageProcessor {
     }
 
     private void handleFailedMessage(Message message) {
-        // TODO we probably want a configuration option to disable this feature
-
-        if (!failureHandlerService.canHandleProcessingErrors() || !processingFailureRoutingConfiguration.submitProcessingFailure()) {
-            // If we cannot store messages with processing errors separately, keep the default behaviour.
-            return;
-        }
         final String processingError = message.getFieldAs(String.class, Message.FIELD_GL2_PROCESSING_ERROR);
         if (processingError != null) {
-            if (!processingFailureRoutingConfiguration.writeOriginalMessageWithError()) {
+            if (!failureHandlingConfigSupplier.writeOriginalMessageWithErrorUponPipelineFailure()) {
                 message.setFilterOut(true);
                 // Message will be acknowledged in the FailureHandlerService
             }
+
             failedMessages.mark();
-            submitFailure(message, processingError);
+
+            if (failureHandlingConfigSupplier.submitProcessingFailures()) {
+                submitFailure(message, processingError);
+            }
         }
     }
 

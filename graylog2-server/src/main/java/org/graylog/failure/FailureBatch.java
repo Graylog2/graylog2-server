@@ -87,6 +87,20 @@ public class FailureBatch {
         return failureClass;
     }
 
+    /**
+     * @return true if the batch contains indexing failures.
+     */
+    public boolean containsIndexingFailures() {
+        return getFailureClass().equals(IndexingFailure.class);
+    }
+
+    /**
+     * @return true if the batch contains processing failures.
+     */
+    public boolean containsProcessingFailures() {
+        return getFailureClass().equals(ProcessingFailure.class);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

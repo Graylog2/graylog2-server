@@ -34,8 +34,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
-import static org.graylog.failure.FailureHandlerService.EMPTY_PROCESSING_FAILURE_BATCH;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doThrow;
@@ -44,7 +42,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class FailureHandlerServiceTest {
+public class FailureHandlingServiceTest {
 
     private final Configuration configuration = mock(Configuration.class);
     private final MessageQueueAcknowledger acknowledger = mock(MessageQueueAcknowledger.class);
@@ -67,7 +65,7 @@ public class FailureHandlerServiceTest {
         final FailureHandler customFailureHandler = enabledFailureHandler();
         final FailureHandler fallbackIndexingFailureHandler = enabledFailureHandler(indexingFailureBatch);
 
-        final FailureHandlerService underTest = new FailureHandlerService(fallbackIndexingFailureHandler,
+        final FailureHandlingService underTest = new FailureHandlingService(fallbackIndexingFailureHandler,
                 ImmutableSet.of(customFailureHandler), failureSubmissionService, configuration, acknowledger);
 
         underTest.startAsync();
@@ -99,7 +97,7 @@ public class FailureHandlerServiceTest {
         final FailureHandler customFailureHandler = enabledFailureHandler();
         final FailureHandler fallbackFailureHandler = enabledFailureHandler();
 
-        final FailureHandlerService underTest = new FailureHandlerService(fallbackFailureHandler,
+        final FailureHandlingService underTest = new FailureHandlingService(fallbackFailureHandler,
                 ImmutableSet.of(customFailureHandler), failureSubmissionService, configuration, acknowledger);
 
         underTest.startAsync();
@@ -132,7 +130,7 @@ public class FailureHandlerServiceTest {
         final FailureHandler customIndexingFailureHandler2 = enabledFailureHandler(indexingFailureBatch);
         final FailureHandler fallbackIndexingFailureHandler = enabledFailureHandler(indexingFailureBatch);
 
-        final FailureHandlerService underTest = new FailureHandlerService(fallbackIndexingFailureHandler,
+        final FailureHandlingService underTest = new FailureHandlingService(fallbackIndexingFailureHandler,
                 ImmutableSet.of(customIndexingFailureHandler1, customIndexingFailureHandler2), failureSubmissionService, configuration, acknowledger);
 
         underTest.startAsync();
@@ -159,7 +157,7 @@ public class FailureHandlerServiceTest {
         final FailureHandler fallbackFailureHandler = enabledFailureHandler(indexingFailureBatch);
 
         final FailureSubmissionService failureSubmissionService = mock(FailureSubmissionService.class);
-        final FailureHandlerService underTest = new FailureHandlerService(fallbackFailureHandler,
+        final FailureHandlingService underTest = new FailureHandlingService(fallbackFailureHandler,
                 ImmutableSet.of(customFailureHandler), failureSubmissionService, configuration, acknowledger);
 
         when(configuration.getFailureHandlingShutdownAwait()).thenReturn(com.github.joschi.jadconfig.util.Duration.milliseconds(300));
@@ -191,7 +189,7 @@ public class FailureHandlerServiceTest {
 
         doThrow(new RuntimeException()).when(fallbackIndexingFailureHandler).handle(indexingFailureBatch2);
 
-        final FailureHandlerService underTest = new FailureHandlerService(fallbackIndexingFailureHandler,
+        final FailureHandlingService underTest = new FailureHandlingService(fallbackIndexingFailureHandler,
                 ImmutableSet.of(), failureSubmissionService, configuration, acknowledger);
 
         underTest.startAsync();
@@ -210,45 +208,6 @@ public class FailureHandlerServiceTest {
     }
 
     @Test
-    public void canHandleProcessingErrors_returnsTrueIfAnyCustomHandlerCanHandlerProcessingFailures() {
-        // given
-        final FailureHandler customProcessingFailureHandler1 = enabledFailureHandler(EMPTY_PROCESSING_FAILURE_BATCH);
-        final FailureHandler fallbackFailureHandler = enabledFailureHandler();
-
-        final FailureHandlerService underTest = new FailureHandlerService(fallbackFailureHandler,
-                ImmutableSet.of(customProcessingFailureHandler1), failureSubmissionService, configuration, acknowledger);
-
-        // when + then
-        assertThat(underTest.canHandleProcessingErrors()).isTrue();
-    }
-
-    @Test
-    public void canHandleProcessingErrors_returnsTrueIfFallbackHandlerCanHandlerProcessingFailures() {
-        // given
-        final FailureHandler customFailureHandler1 = enabledFailureHandler();
-        final FailureHandler fallbackProcessingFailureHandler = enabledFailureHandler(EMPTY_PROCESSING_FAILURE_BATCH);
-
-        final FailureHandlerService underTest = new FailureHandlerService(fallbackProcessingFailureHandler,
-                ImmutableSet.of(customFailureHandler1), failureSubmissionService, configuration, acknowledger);
-
-        // when + then
-        assertThat(underTest.canHandleProcessingErrors()).isTrue();
-    }
-
-    @Test
-    public void canHandleProcessingErrors_returnsFalseIfNoneOfHandlersCanHandlerProcessingFailures() {
-        // given
-        final FailureHandler customFailureHandler1 = enabledFailureHandler();
-        final FailureHandler fallbackFailureHandler = enabledFailureHandler();
-
-        final FailureHandlerService underTest = new FailureHandlerService(fallbackFailureHandler,
-                ImmutableSet.of(customFailureHandler1), failureSubmissionService, configuration, acknowledger);
-
-        // when + then
-        assertThat(underTest.canHandleProcessingErrors()).isFalse();
-    }
-
-    @Test
     public void acknowledgesProcessingErrors() throws InterruptedException {
         // given
         final FailureHandler fallbackFailureHandler = enabledFailureHandler();
@@ -256,7 +215,7 @@ public class FailureHandlerServiceTest {
         final FailureBatch processingFailureBatch = processingFailureBatch(processingFailure);
         final FailureHandler customFailureHandler1 = enabledFailureHandler(processingFailureBatch);
 
-        final FailureHandlerService underTest = new FailureHandlerService(fallbackFailureHandler,
+        final FailureHandlingService underTest = new FailureHandlingService(fallbackFailureHandler,
                 ImmutableSet.of(customFailureHandler1), failureSubmissionService, configuration, acknowledger);
 
         // when
@@ -279,7 +238,7 @@ public class FailureHandlerServiceTest {
         final FailureBatch indexingFailureBatch = indexingFailureBatch(createIndexingFailure());
         final FailureHandler customFailureHandler1 = enabledFailureHandler(indexingFailureBatch);
 
-        final FailureHandlerService underTest = new FailureHandlerService(fallbackFailureHandler,
+        final FailureHandlingService underTest = new FailureHandlingService(fallbackFailureHandler,
                 ImmutableSet.of(customFailureHandler1), failureSubmissionService, configuration, acknowledger);
 
         // when

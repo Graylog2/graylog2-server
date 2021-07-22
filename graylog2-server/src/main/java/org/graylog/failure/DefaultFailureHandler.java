@@ -45,7 +45,7 @@ public class DefaultFailureHandler implements FailureHandler {
 
     @Override
     public boolean supports(FailureBatch failureBatch) {
-        return failureBatch.getFailureClass().equals(IndexingFailure.class);
+        return failureBatch.containsIndexingFailures();
     }
 
     @Override

@@ -16,7 +16,6 @@
  */
 package org.graylog.failure;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.AbstractExecutionThreadService;
 import org.graylog2.Configuration;
@@ -44,9 +43,7 @@ import java.util.stream.Stream;
  * found, then the fallback one will be used instead.
  */
 @Singleton
-public class FailureHandlerService extends AbstractExecutionThreadService {
-
-    static final FailureBatch EMPTY_PROCESSING_FAILURE_BATCH = FailureBatch.processingFailureBatch(ImmutableList.of());
+public class FailureHandlingService extends AbstractExecutionThreadService {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -58,7 +55,7 @@ public class FailureHandlerService extends AbstractExecutionThreadService {
     private Thread executionThread;
 
     @Inject
-    public FailureHandlerService(
+    public FailureHandlingService(
             @Named("fallbackFailureHandler") FailureHandler fallbackFailureHandler,
             Set<FailureHandler> failureHandlers,
             FailureSubmissionService failureSubmissionService,
@@ -163,13 +160,5 @@ public class FailureHandlerService extends AbstractExecutionThreadService {
     private Stream<FailureHandler> suitableHandlers(Collection<FailureHandler> handlers, FailureBatch failureBatch) {
         return handlers.stream()
                 .filter(h -> h.supports(failureBatch));
-    }
-
-    /**
-     * @return true if any of the provided handlers (either custom or the fallback one)
-     * supports processing failures.
-     */
-    public boolean canHandleProcessingErrors() {
-        return !suitableHandlers(EMPTY_PROCESSING_FAILURE_BATCH).isEmpty();
     }
 }
