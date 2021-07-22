@@ -37,6 +37,7 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.graylog.failure.FailureHandlerService.EMPTY_PROCESSING_FAILURE_BATCH;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -251,7 +252,8 @@ public class FailureHandlerServiceTest {
     public void acknowledgesProcessingErrors() throws InterruptedException {
         // given
         final FailureHandler fallbackFailureHandler = enabledFailureHandler();
-        final FailureBatch processingFailureBatch = processingFailureBatch(createProcessingFailure());
+        final ProcessingFailure processingFailure = createProcessingFailure();
+        final FailureBatch processingFailureBatch = processingFailureBatch(processingFailure);
         final FailureHandler customFailureHandler1 = enabledFailureHandler(processingFailureBatch);
 
         final FailureHandlerService underTest = new FailureHandlerService(fallbackFailureHandler,
@@ -267,7 +269,7 @@ public class FailureHandlerServiceTest {
                 .until(() -> failureSubmissionService.queueSize() == 0);
 
         // then
-        verify(acknowledger, times(1)).acknowledge(any(List.class));
+        verify(acknowledger, times(1)).acknowledge((List<Message>) argThat(argument -> !((List)argument).isEmpty()));
     }
 
     @Test
@@ -290,7 +292,7 @@ public class FailureHandlerServiceTest {
                 .until(() -> failureSubmissionService.queueSize() == 0);
 
         // then
-        verify(acknowledger, times(0)).acknowledge(any(List.class));
+        verify(acknowledger, times(1)).acknowledge((List<Message>) argThat(argument -> ((List)argument).isEmpty()));
     }
 
     private IndexingFailure createIndexingFailure() {

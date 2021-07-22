@@ -135,13 +135,12 @@ public class FailureHandlerService extends AbstractExecutionThreadService {
                     try {
                         handler.handle(failureBatch);
 
-                        if (failureBatch.getFailureClass().equals(ProcessingFailure.class)) {
-                            acknowledger.acknowledge(failureBatch.getFailures().stream()
-                                    .map(Failure::failedMessage)
-                                    .filter(Message.class::isInstance).map(Message.class::cast)
-                                    .collect(Collectors.toList())
-                            );
-                        }
+                        acknowledger.acknowledge(failureBatch.getFailures().stream()
+                                .filter(Failure::requiresAcknowledgement)
+                                .map(Failure::failedMessage)
+                                .filter(Message.class::isInstance).map(Message.class::cast)
+                                .collect(Collectors.toList())
+                        );
                     } catch (Exception e) {
                         logger.error("Error occurred while handling failures by {}", handler.getClass().getName());
                     }
