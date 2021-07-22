@@ -15,13 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import * as Immutable from 'immutable';
-import { MessageEventType } from 'views/types';
+import type { MessageEventTypes } from 'views/types';
 
 import { singleton } from 'views/logic/singleton';
 
 export type MessageEventTypesContextType = {
-  eventTypes: Immutable.Map<MessageEventType['gl2EventTypeCode'], MessageEventType>,
+  eventTypes: MessageEventTypes,
 }
 
 const MessageEventTypesContext = React.createContext<MessageEventTypesContextType | undefined>(undefined);

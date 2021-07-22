@@ -90,7 +90,7 @@ const fieldType = (fieldName, { decoration_stats: decorationStats }: { decoratio
 const getMessageSummary = (messageFields: Message['fields'], messageEvents: MessageEventTypesContextType) => {
   const gl2EventTypeCode = messageFields.gl2_event_type_code;
   const eventTypes = messageEvents?.eventTypes;
-  const summaryFormatString = eventTypes?.get(gl2EventTypeCode)?.get('summary') ?? '';
+  const summaryFormatString = eventTypes?.[gl2EventTypeCode]?.summary ?? '';
 
   return summaryFormatString.replace(/{(\w+)}/g, (fieldNamePlaceholder, fieldName) => messageFields[fieldName] || fieldName);
 };

@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import Immutable from 'immutable';
 import { render, screen } from 'wrappedTestingLibrary';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import { createSimpleMessageEventType } from 'fixtures/messageEventTypes';
@@ -34,7 +33,7 @@ jest.mock('graylog-web-plugin/plugin', () => ({
 const simpleEventType = createSimpleMessageEventType();
 
 const simpleContextValue = {
-  eventTypes: Immutable.Map({ [simpleEventType.get('gl2EventTypeCode')]: simpleEventType }),
+  eventTypes: { [simpleEventType.gl2EventTypeCode]: simpleEventType },
 };
 
 describe('MessageEventTypesProvider', () => {
@@ -54,7 +53,7 @@ describe('MessageEventTypesProvider', () => {
 
   it('provides event types', () => {
     asMock(PluginStore.exports).mockImplementation((type) => ({
-      messageEventTypes: [Immutable.Map({ [simpleEventType.get('gl2EventTypeCode')]: simpleEventType })],
+      messageEventTypes: [{ [simpleEventType.gl2EventTypeCode]: simpleEventType }],
     }[type]));
 
     let contextValue;
@@ -70,13 +69,13 @@ describe('MessageEventTypesProvider', () => {
     const simpleEventType2 = createSimpleMessageEventType(2);
 
     const newSimpleContextValue = {
-      eventTypes: Immutable.Map({ [simpleEventType.gl2EventTypeCode]: simpleEventType, [simpleEventType2.gl2EventTypeCode]: simpleEventType2 }),
+      eventTypes: { [simpleEventType.gl2EventTypeCode]: simpleEventType, [simpleEventType2.gl2EventTypeCode]: simpleEventType2 },
     };
 
     asMock(PluginStore.exports).mockImplementation((type) => ({
       messageEventTypes: [
-        Immutable.Map({ [simpleEventType.gl2EventTypeCode]: simpleEventType }),
-        Immutable.Map({ [simpleEventType2.gl2EventTypeCode]: simpleEventType2 }),
+        { [simpleEventType.gl2EventTypeCode]: simpleEventType },
+        { [simpleEventType2.gl2EventTypeCode]: simpleEventType2 },
       ],
     }[type]));
 

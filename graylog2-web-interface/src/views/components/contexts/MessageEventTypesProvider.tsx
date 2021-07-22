@@ -15,18 +15,18 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import Immutable from 'immutable';
 import PropTypes from 'prop-types';
 import { PluginStore } from 'graylog-web-plugin/plugin';
+import type { MessageEventTypes } from 'views/types';
 
 import MessageEventTypesContext from './MessageEventTypesContext';
 
-const mergeMessageEventTypeLists = (messageEventTypeLists) => {
+const mergeMessageEventTypeLists = (messageEventTypeLists: Array<MessageEventTypes>) => {
   if (!messageEventTypeLists) {
     return undefined;
   }
 
-  return Immutable.Map().merge(...messageEventTypeLists);
+  return messageEventTypeLists.reduce((allEventTypes, eventTypes) => ({ ...allEventTypes, ...eventTypes }), {});
 };
 
 type Props = {
@@ -34,12 +34,12 @@ type Props = {
 };
 
 const MessageEventTypesProvider = ({ children }: Props) => {
-  const messageEventTypeLists = PluginStore.exports('messageEventTypes');
-  const messageEventTypes = mergeMessageEventTypeLists(messageEventTypeLists);
+  const eventTypeLists = PluginStore.exports('messageEventTypes');
+  const eventTypes = mergeMessageEventTypeLists(eventTypeLists);
 
-  return messageEventTypes
+  return eventTypes
     ? (
-      <MessageEventTypesContext.Provider value={{ eventTypes: messageEventTypes }}>
+      <MessageEventTypesContext.Provider value={{ eventTypes }}>
         {children}
       </MessageEventTypesContext.Provider>
     )
