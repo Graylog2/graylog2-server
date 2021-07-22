@@ -25,11 +25,14 @@ import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.Multibinder;
+import com.google.inject.multibindings.OptionalBinder;
 import com.google.inject.name.Names;
 import okhttp3.OkHttpClient;
 import org.graylog.failure.DefaultFailureHandler;
+import org.graylog.failure.DefaultProcessingFailureRoutingConfiguration;
 import org.graylog.failure.FailureHandler;
 import org.graylog.failure.FailureHandlerService;
+import org.graylog.failure.ProcessingFailureRoutingConfiguration;
 import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.buffers.InputBuffer;
@@ -87,6 +90,10 @@ public class GenericBindings extends AbstractModule {
                 .to(DefaultFailureHandler.class).asEagerSingleton();
 
         Multibinder.newSetBinder(binder(), FailureHandler.class);
+
+        OptionalBinder.newOptionalBinder(binder(), ProcessingFailureRoutingConfiguration.class)
+                .setDefault()
+                .to(DefaultProcessingFailureRoutingConfiguration.class);
 
         serviceBinder().addBinding().to(FailureHandlerService.class).in(Scopes.SINGLETON);
     }
