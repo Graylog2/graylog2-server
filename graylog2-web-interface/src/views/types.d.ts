@@ -182,15 +182,15 @@ export interface SearchTypeResultTypes {
 
 export type SearchTypeResults = { [id: string]: SearchTypeResultTypes[keyof SearchTypeResultTypes] };
 
-export type MessageEventType = {
+export type MessageEventType = Immutable.Map<{
   gl2EventTypeCode: string,
   gl2EventType: string,
   title: string,
   summary: string,
   eventActions: Array<string>,
-}
+}>
 
-type MessageEventTypes = Array<{ [gl2EventTypeCode: MessageEventType['gl2EventTypeCode']]: MessageEventType | undefined }>;
+type MessageEventTypes = Array<Immutable.Map<MessageEventType['gl2EventTypeCode'], MessageEventType>>;
 
 declare module 'graylog-web-plugin/plugin' {
   export interface PluginExports {

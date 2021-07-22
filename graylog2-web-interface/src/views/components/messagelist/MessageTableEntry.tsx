@@ -27,7 +27,7 @@ import FieldType from 'views/logic/fieldtypes/FieldType';
 import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import { Store } from 'stores/StoreTypes';
 import { MESSAGE_FIELD } from 'views/Constants';
-import MessageEventTypesContext from 'views/components/contexts/MessageEventTypesContext';
+import MessageEventTypesContext, { MessageEventTypesContextType } from 'views/components/contexts/MessageEventTypesContext';
 
 import MessageDetail from './MessageDetail';
 import DecoratedValue from './decoration/DecoratedValue';
@@ -87,11 +87,10 @@ const fieldType = (fieldName, { decoration_stats: decorationStats }: { decoratio
   ? FieldType.Decorated
   : ((fields && fields.find((f) => f.name === fieldName)) || { type: FieldType.Unknown }).type);
 
-const getMessageSummary = (messageFields, messageEvents) => {
+const getMessageSummary = (messageFields: Message['fields'], messageEvents: MessageEventTypesContextType) => {
   const gl2EventTypeCode = messageFields.gl2_event_type_code;
   const eventTypes = messageEvents?.eventTypes;
-
-  const summaryFormatString = eventTypes?.get(gl2EventTypeCode)?.summary ?? '';
+  const summaryFormatString = eventTypes?.get(gl2EventTypeCode)?.get('summary') ?? '';
 
   return summaryFormatString.replace(/{(\w+)}/g, (fieldNamePlaceholder, fieldName) => messageFields[fieldName] || fieldName);
 };

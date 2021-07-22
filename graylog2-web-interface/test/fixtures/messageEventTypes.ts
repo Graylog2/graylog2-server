@@ -16,13 +16,14 @@
  */
 
 import type { MessageEventType } from 'views/types';
+import * as Immutable from 'immutable';
 
 // eslint-disable-next-line import/prefer-default-export
-export const createSimpleMessageEventType = (index = 1, overrides: Partial<MessageEventType> = {}) => ({
+export const createSimpleMessageEventType = (index = 1, overrides: Partial<MessageEventType> = {}): MessageEventType => (Immutable.Map({
   gl2EventTypeCode: `event-type-code-${index}`,
   gl2EventType: `event type name ${index}`,
   title: `Event type title ${index}`,
   summary: '{field1} - {field2}',
   eventActions: ['action-id-1'],
   ...overrides,
-});
+}));

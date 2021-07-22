@@ -18,22 +18,15 @@ import * as React from 'react';
 import Immutable from 'immutable';
 import PropTypes from 'prop-types';
 import { PluginStore } from 'graylog-web-plugin/plugin';
-import type { MessageEventType } from 'views/types';
 
 import MessageEventTypesContext from './MessageEventTypesContext';
 
-const getImmutableMessageEventTypes = () => {
-  const messageEventTypes = PluginStore.exports('messageEventTypes');
-
-  if (!messageEventTypes) {
+const mergeMessageEventTypeLists = (messageEventTypeLists) => {
+  if (!messageEventTypeLists) {
     return undefined;
   }
 
-  return Immutable.List(messageEventTypes).reduce((
-    eventTypes,
-    eventTypeMap,
-  ) => eventTypes.merge(Immutable.Map(eventTypeMap)),
-  Immutable.Map<MessageEventType['gl2EventTypeCode'], MessageEventType>());
+  return Immutable.Map().merge(...messageEventTypeLists);
 };
 
 type Props = {
@@ -41,7 +34,8 @@ type Props = {
 };
 
 const MessageEventTypesProvider = ({ children }: Props) => {
-  const messageEventTypes = getImmutableMessageEventTypes();
+  const messageEventTypeLists = PluginStore.exports('messageEventTypes');
+  const messageEventTypes = mergeMessageEventTypeLists(messageEventTypeLists);
 
   return messageEventTypes
     ? (

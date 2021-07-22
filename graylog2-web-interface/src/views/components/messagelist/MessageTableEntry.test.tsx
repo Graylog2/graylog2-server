@@ -56,7 +56,7 @@ describe('MessageTableEntry', () => {
     const simpleEventType = createSimpleMessageEventType(1, { summary: '{field1} - {field2}', gl2EventTypeCode: 'event-type-code' });
 
     const messageEventsContextValue = {
-      eventTypes: Immutable.Map({ [simpleEventType.gl2EventTypeCode]: simpleEventType }),
+      eventTypes: Immutable.Map({ [simpleEventType.get('gl2EventTypeCode')]: simpleEventType }),
     };
 
     const message = {

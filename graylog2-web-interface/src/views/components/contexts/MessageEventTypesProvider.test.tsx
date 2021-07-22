@@ -34,7 +34,7 @@ jest.mock('graylog-web-plugin/plugin', () => ({
 const simpleEventType = createSimpleMessageEventType();
 
 const simpleContextValue = {
-  eventTypes: Immutable.Map({ [simpleEventType.gl2EventTypeCode]: simpleEventType }),
+  eventTypes: Immutable.Map({ [simpleEventType.get('gl2EventTypeCode')]: simpleEventType }),
 };
 
 describe('MessageEventTypesProvider', () => {
@@ -54,7 +54,7 @@ describe('MessageEventTypesProvider', () => {
 
   it('provides event types', () => {
     asMock(PluginStore.exports).mockImplementation((type) => ({
-      messageEventTypes: [{ [simpleEventType.gl2EventTypeCode]: simpleEventType }],
+      messageEventTypes: [Immutable.Map({ [simpleEventType.get('gl2EventTypeCode')]: simpleEventType })],
     }[type]));
 
     let contextValue;
@@ -75,8 +75,8 @@ describe('MessageEventTypesProvider', () => {
 
     asMock(PluginStore.exports).mockImplementation((type) => ({
       messageEventTypes: [
-        { [simpleEventType.gl2EventTypeCode]: simpleEventType },
-        { [simpleEventType2.gl2EventTypeCode]: simpleEventType2 },
+        Immutable.Map({ [simpleEventType.gl2EventTypeCode]: simpleEventType }),
+        Immutable.Map({ [simpleEventType2.gl2EventTypeCode]: simpleEventType2 }),
       ],
     }[type]));
 
