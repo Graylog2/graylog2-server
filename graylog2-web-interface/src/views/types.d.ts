@@ -40,6 +40,7 @@ import {
 import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 import { TimeRange } from 'views/logic/queries/Query';
 import { CopyWidgetToDashboardHook } from 'views/logic/views/CopyWidgetToDashboard';
+import { ColorVariants } from 'theme/colors';
 
 interface EditWidgetComponentProps<Config extends WidgetConfig = WidgetConfig> {
   children: React.ReactNode,
@@ -184,9 +185,8 @@ export type SearchTypeResults = { [id: string]: SearchTypeResultTypes[keyof Sear
 
 export type MessageEventType = {
   gl2EventTypeCode: string,
-  gl2EventType: string,
-  title: string,
   summary: string,
+  category: ColorVariants,
   eventActions: Array<string>,
   requiredFields: Array<string>,
   optionalFields: Array<string>,
@@ -199,6 +199,7 @@ declare module 'graylog-web-plugin/plugin' {
     creators?: Array<Creator>;
     enterpriseWidgets?: Array<WidgetExport>;
     fieldActions?: Array<ActionDefinition>;
+    messageEventTypes?: Array<MessageEventTypes>;
     searchTypes?: Array<SearchType>;
     systemConfigurations?: Array<SystemConfiguration>;
     valueActions?: Array<ActionDefinition>;
@@ -215,6 +216,5 @@ declare module 'graylog-web-plugin/plugin' {
     'views.requires.provided'?: Array<string>;
     visualizationConfigTypes?: Array<VisualizationConfigType>;
     visualizationTypes?: Array<VisualizationType>;
-    messageEventTypes?: Array<MessageEventTypes>;
   }
 }

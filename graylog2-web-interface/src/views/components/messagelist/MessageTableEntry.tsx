@@ -88,11 +88,20 @@ const fieldType = (fieldName, { decoration_stats: decorationStats }: { decoratio
   : ((fields && fields.find((f) => f.name === fieldName)) || { type: FieldType.Unknown }).type);
 
 const getMessageSummary = (messageFields: Message['fields'], messageEvents: MessageEventTypesContextType) => {
-  const gl2EventTypeCode = messageFields.gl2_event_type_code;
+  const gl2EventTypeCode = messageFields.gl2_event_type_code ?? '100001';
   const eventTypes = messageEvents?.eventTypes;
-  const summaryFormatString = eventTypes?.[gl2EventTypeCode]?.summary ?? '';
+  const template = eventTypes?.[gl2EventTypeCode]?.summary;
 
-  return summaryFormatString.replace(/{(\w+)}/g, (fieldNamePlaceholder, fieldName) => messageFields[fieldName] || fieldName);
+  if (!template) {
+    return undefined;
+  }
+
+  const summary = template.replace(/{(\w+)}/g, (fieldNamePlaceholder, fieldName) => messageFields[fieldName] || fieldName);
+
+  return {
+    summary,
+    template,
+  };
 };
 
 const MessageTableEntry = ({
@@ -168,10 +177,10 @@ const MessageTableEntry = ({
       )}
 
       {!!messageSummary && (
-        <tr className="message-row" onClick={_toggleDetail}>
+        <tr className="message-row" onClick={_toggleDetail} title={messageSummary.template}>
           <td colSpan={colSpanFixup}>
             <div className="message-wrapper">
-              {messageSummary}
+              {messageSummary.summary}
             </div>
           </td>
         </tr>
