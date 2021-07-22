@@ -39,7 +39,7 @@ const StreamsFilter = ({ disabled, value, streams, onChange }: Props) => {
               inputProps={{ 'aria-label': placeholder }}
               displayKey="key"
               inputId="streams-filter"
-              onChange={(selected) => onChange(selected === '' ? [] : selected.split(','))}
+              onChange={(selected: string) => onChange(selected === '' ? [] : selected.split(','))}
               options={options}
               multi
               value={selectedStreams} />
