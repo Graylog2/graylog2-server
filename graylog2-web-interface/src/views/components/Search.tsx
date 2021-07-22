@@ -74,7 +74,7 @@ const GridContainer = styled.div<{ interactive: boolean }>(({ interactive }) => 
       flex-grow: 1;
     }
   ` : css`
-    flex: 1
+    flex: 1;
   `;
 });
 
