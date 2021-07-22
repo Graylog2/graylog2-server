@@ -549,7 +549,7 @@ public class StreamResource extends RestResource {
     }
 
     private void checkNotEditableStream(String streamId, String message) {
-        if (Stream.DEFAULT_STREAM_ID.equals(streamId) || Stream.READ_ONLY_STREAM_IDS.contains(streamId)) {
+        if (Stream.DEFAULT_STREAM_ID.equals(streamId) || Stream.NON_EDITABLE_STREAM_IDS.contains(streamId)) {
             throw new BadRequestException(message);
         }
     }

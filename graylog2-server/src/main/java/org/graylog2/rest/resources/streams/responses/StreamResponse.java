@@ -30,7 +30,7 @@ import javax.annotation.Nullable;
 import java.util.Collection;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
-import static org.graylog2.plugin.streams.Stream.READ_ONLY_STREAM_IDS;
+import static org.graylog2.plugin.streams.Stream.NON_EDITABLE_STREAM_IDS;
 
 @AutoValue
 @WithBeanGetter
@@ -84,8 +84,8 @@ public abstract class StreamResponse {
     @JsonProperty("index_set_id")
     public abstract String indexSetId();
 
-    @JsonProperty("is_read_only")
-    public abstract boolean isReadOnly();
+    @JsonProperty("is_editable")
+    public abstract boolean isEditable();
 
     @JsonCreator
     public static StreamResponse create(@JsonProperty("id") String id,
@@ -119,10 +119,10 @@ public abstract class StreamResponse {
                 firstNonNull(isDefault, false),
                 firstNonNull(removeMatchesFromDefaultStream, false),
                 indexSetId,
-                streamIsReadonly(id));
+                streamIsEditable(id));
     }
 
-    private static boolean streamIsReadonly(String streamId) {
-        return READ_ONLY_STREAM_IDS.contains(streamId);
+    private static boolean streamIsEditable(String streamId) {
+        return !NON_EDITABLE_STREAM_IDS.contains(streamId);
     }
 }
