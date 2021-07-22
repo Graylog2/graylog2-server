@@ -122,7 +122,7 @@ public interface Stream extends Persisted {
     void setIndexSetId(String indexSetId);
 
     static boolean isSystemStreamId(String id) {
-        return ALL_SYSTEM_STREAM_IDS.equals(id);
+        return ALL_SYSTEM_STREAM_IDS.contains(id);
     }
 
     static boolean streamIsEditable(String streamId) {
