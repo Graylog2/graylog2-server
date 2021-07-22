@@ -276,7 +276,7 @@ public class PipelineInterpreterTest {
                 stateUpdater,
                 mock(FailureSubmitService.class),
                 mock(FailureHandlerService.class),
-                new ObjectMapperProvider());
+                new ObjectMapperProvider(), null);
     }
 
     @Test
@@ -334,7 +334,7 @@ public class PipelineInterpreterTest {
                 stateUpdater,
                 mock(FailureSubmitService.class),
                 mock(FailureHandlerService.class),
-                new ObjectMapperProvider());
+                new ObjectMapperProvider(), null);
 
         interpreter.process(messageInDefaultStream("", ""));
 

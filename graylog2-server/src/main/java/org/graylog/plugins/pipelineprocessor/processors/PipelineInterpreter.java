@@ -36,6 +36,7 @@ import org.graylog.failure.FailureBatch;
 import org.graylog.failure.FailureHandlerService;
 import org.graylog.failure.FailureSubmitService;
 import org.graylog.failure.ProcessingFailure;
+import org.graylog.failure.ProcessingFailureRoutingConfiguration;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
@@ -86,6 +87,7 @@ public class PipelineInterpreter implements MessageProcessor {
     private final FailureSubmitService failureSubmitService;
     private final FailureHandlerService failureHandlerService;
     private final ObjectMapper objectMapper;
+    private final ProcessingFailureRoutingConfiguration processingFailureRoutingConfiguration;
 
     @Inject
     public PipelineInterpreter(MessageQueueAcknowledger messageQueueAcknowledger,
@@ -93,7 +95,8 @@ public class PipelineInterpreter implements MessageProcessor {
                                ConfigurationStateUpdater stateUpdater,
                                FailureSubmitService failureSubmitService,
                                FailureHandlerService failureHandlerService,
-                               ObjectMapperProvider objectMapperProvider) {
+                               ObjectMapperProvider objectMapperProvider,
+                               ProcessingFailureRoutingConfiguration processingFailureRoutingConfiguration) {
 
         this.messageQueueAcknowledger = messageQueueAcknowledger;
         this.filteredOutMessages = metricRegistry.meter(name(ProcessBufferProcessor.class, "filteredOutMessages"));
@@ -104,6 +107,7 @@ public class PipelineInterpreter implements MessageProcessor {
         this.failureSubmitService = failureSubmitService;
         this.failureHandlerService = failureHandlerService;
         this.objectMapper = objectMapperProvider.get();
+        this.processingFailureRoutingConfiguration = processingFailureRoutingConfiguration;
     }
 
     /**
@@ -192,14 +196,16 @@ public class PipelineInterpreter implements MessageProcessor {
     private void handleFailedMessage(Message message) {
         // TODO we probably want a configuration option to disable this feature
 
-        if (!failureHandlerService.canHandleProcessingErrors()) {
+        if (!failureHandlerService.canHandleProcessingErrors() || !processingFailureRoutingConfiguration.submitProcessingFailure()) {
             // If we cannot store messages with processing errors separately, keep the default behaviour.
             return;
         }
         final String processingError = message.getFieldAs(String.class, Message.FIELD_GL2_PROCESSING_ERROR);
         if (processingError != null) {
-            message.setFilterOut(true);
-            messageQueueAcknowledger.acknowledge(message);
+            if (!processingFailureRoutingConfiguration.writeOriginalMessageWithError()) {
+                message.setFilterOut(true);
+                messageQueueAcknowledger.acknowledge(message);
+            }
             failedMessages.mark();
             submitFailure(message, processingError);
         }
