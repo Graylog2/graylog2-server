@@ -213,7 +213,6 @@ declare module 'graylog-web-plugin/plugin' {
     'views.requires.provided'?: Array<string>;
     visualizationConfigTypes?: Array<VisualizationConfigType>;
     visualizationTypes?: Array<VisualizationType>;
-    externalValueActions?: ExternalValueActions;
     messageEventTypes?: MessageEventTypes;
   }
 }
