@@ -16,18 +16,14 @@
  */
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { ExternalValueAction, MessageEventType } from 'views/types';
+import { MessageEventType } from 'views/types';
 
 import { singleton } from 'views/logic/singleton';
 
-type FieldName = string;
-
-type MessageEventsContextType = {
+export type MessageEventTypesContextType = {
   eventTypes: Immutable.Map<MessageEventType['gl2EventTypeCode'], MessageEventType>,
-  eventActions: Immutable.Map<ExternalValueAction['id'], ExternalValueAction>,
-  fieldValueActions: Immutable.Map<FieldName, Array<ExternalValueAction>>,
 }
 
-const MessageEventsContext = React.createContext<MessageEventsContextType | undefined>(undefined);
+const MessageEventTypesContext = React.createContext<MessageEventTypesContextType | undefined>(undefined);
 
-export default singleton('contexts.MessageEventsContext', () => MessageEventsContext);
+export default singleton('contexts.MessageEventsContext', () => MessageEventTypesContext);

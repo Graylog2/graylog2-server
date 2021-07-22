@@ -18,46 +18,22 @@ import * as React from 'react';
 import Immutable from 'immutable';
 import PropTypes from 'prop-types';
 import { PluginStore } from 'graylog-web-plugin/plugin';
+import type { MessageEventType } from 'views/types';
 
 import MessageEventTypesContext from './MessageEventTypesContext';
 
-const getMessageEventTypesContextValue = (securityContent) => {
-  if (!securityContent) {
+const getImmutableMessageEventTypes = () => {
+  const messageEventTypes = PluginStore.exports('messageEventTypes');
+
+  if (!messageEventTypes) {
     return undefined;
   }
 
-  const initialContextValue = {
-    eventTypes: Immutable.Map(),
-    eventActions: Immutable.Map(),
-    fieldValueActions: Immutable.Map(),
-  };
-
-  return securityContent.reduce((contextValue, secContent) => {
-    const eventTypes = secContent.eventTypes.reduce((eventTypesById, eventType) => {
-      return eventTypesById.set(eventType.gl2EventTypeCode, eventType);
-    }, contextValue.eventTypes);
-
-    const eventActions = secContent.externalActions.reduce((eventActionsById, eventAction) => {
-      return eventActionsById.set(eventAction.id, eventAction);
-    }, contextValue.eventActions);
-
-    const fieldValueActions = eventActions.reduce((actionsByField, eventAction) => {
-      let newEventActionsByField = actionsByField;
-
-      eventAction.fields.forEach((field) => {
-        const existingFieldValueActions = actionsByField.get(field) ?? Immutable.Map();
-        newEventActionsByField = newEventActionsByField.set(field, existingFieldValueActions.merge(Immutable.Map({ [eventAction.id]: eventAction })));
-      });
-
-      return newEventActionsByField;
-    }, contextValue.fieldValueActions);
-
-    return {
-      eventTypes,
-      eventActions,
-      fieldValueActions,
-    };
-  }, initialContextValue);
+  return Immutable.List(messageEventTypes).reduce((
+    eventTypes,
+    eventTypeMap,
+  ) => eventTypes.merge(Immutable.Map(eventTypeMap)),
+  Immutable.Map<MessageEventType['gl2EventTypeCode'], MessageEventType>());
 };
 
 type Props = {
@@ -65,12 +41,11 @@ type Props = {
 };
 
 const MessageEventTypesProvider = ({ children }: Props) => {
-  const securityContent = PluginStore.exports('messageEventTypes');
-  const contextValue = getMessageEventTypesContextValue(securityContent);
+  const messageEventTypes = getImmutableMessageEventTypes();
 
-  return contextValue
+  return messageEventTypes
     ? (
-      <MessageEventTypesContext.Provider value={contextValue}>
+      <MessageEventTypesContext.Provider value={{ eventTypes: messageEventTypes }}>
         {children}
       </MessageEventTypesContext.Provider>
     )

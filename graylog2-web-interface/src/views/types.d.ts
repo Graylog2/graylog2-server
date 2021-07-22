@@ -190,30 +190,7 @@ export type MessageEventType = {
   eventActions: Array<string>,
 }
 
-type ExternalValueActionBase = {
-  id: string,
-  title: string,
-  fields: Array<string>,
-}
-
-type ExternalValueActionHttpGet = ExternalValueActionBase & {
-  type: 'http_get'
-  options: {
-    action: string,
-  }
-}
-
-type ExternalValueActionWatchlist = ExternalValueActionBase & {
-  type: 'lookuptable'
-  options: {
-    watchListName: string,
-  }
-}
-
-export type ExternalValueAction = ExternalValueActionHttpGet | ExternalValueActionWatchlist;
-
-type ExternalValueActions = { [id: ExternalValueAction.id]: ExternalValueAction | undefined };
-type MessageEventTypes = { [gl2EventTypeCode: MessageEventType.gl2EventTypeCode]: MessageEventType | undefined };
+type MessageEventTypes = Array<{ [gl2EventTypeCode: MessageEventType['gl2EventTypeCode']]: MessageEventType | undefined }>;
 
 declare module 'graylog-web-plugin/plugin' {
   export interface PluginExports {

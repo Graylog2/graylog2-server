@@ -19,7 +19,6 @@ import { render, screen } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
 import MockStore from 'helpers/mocking/StoreMock';
 import { createSimpleMessageEventType } from 'fixtures/messageEventTypes';
-import type { ExternalValueAction } from 'views/types';
 
 import MessageEventTypesContext from 'views/components/contexts/MessageEventTypesContext';
 
@@ -56,10 +55,8 @@ describe('MessageTableEntry', () => {
   it('displays message summary', () => {
     const simpleEventType = createSimpleMessageEventType(1, { summary: '{field1} - {field2}', gl2EventTypeCode: 'event-type-code' });
 
-    const messageEvents = {
+    const messageEventsContextValue = {
       eventTypes: Immutable.Map({ [simpleEventType.gl2EventTypeCode]: simpleEventType }),
-      eventActions: Immutable.Map<ExternalValueAction['id'], ExternalValueAction>(),
-      fieldValueActions: Immutable.Map<string, Array<ExternalValueAction>>(),
     };
 
     const message = {
@@ -74,7 +71,7 @@ describe('MessageTableEntry', () => {
     };
 
     render(
-      <MessageEventTypesContext.Provider value={messageEvents}>
+      <MessageEventTypesContext.Provider value={messageEventsContextValue}>
         <table>
           <MessageTableEntry expandAllRenderAsync
                              toggleDetail={() => {}}
