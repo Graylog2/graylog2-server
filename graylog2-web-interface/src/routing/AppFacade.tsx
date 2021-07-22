@@ -14,17 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect } from 'react';
-import PropTypes from 'prop-types';
+import * as React from 'react';
+import { useEffect } from 'react';
 
 import loadAsync from 'routing/loadAsync';
 import ServerUnavailablePage from 'pages/ServerUnavailablePage';
 import StoreProvider from 'injection/StoreProvider';
-import connect from 'stores/connect';
+import { useStore } from 'stores/connect';
 import LoginQueryClientProvider from 'contexts/LoginQueryClientProvider';
-
 import 'bootstrap/less/bootstrap.less';
 import 'toastr/toastr.less';
+import { Store } from 'stores/StoreTypes';
+import { CurrentUserStoreState } from 'stores/users/CurrentUserStore';
+import { ServerAvailabilityStoreState } from 'stores/sessions/ServerAvailabilityStore';
+import { SessionStoreState } from 'stores/sessions/SessionStore';
 
 const SessionStore = StoreProvider.getStore('Session');
 const ServerAvailabilityStore = StoreProvider.getStore('ServerAvailability');
@@ -36,7 +39,11 @@ const LoggedInPage = loadAsync(() => import(/* webpackChunkName: "LoggedInPage" 
 
 const SERVER_PING_TIMEOUT = 20000;
 
-const AppFacade = ({ currentUser, server, sessionId }) => {
+const AppFacade = () => {
+  const currentUser = useStore(CurrentUserStore as Store<CurrentUserStoreState>, (state) => state?.currentUser);
+  const server = useStore(ServerAvailabilityStore as Store<ServerAvailabilityStoreState>, (state) => state?.server);
+  const sessionId = useStore(SessionStore as Store<SessionStoreState>, (state) => (state?.sessionId ?? ''));
+
   useEffect(() => {
     const interval = setInterval(ServerAvailabilityStore.ping, SERVER_PING_TIMEOUT);
 
@@ -62,26 +69,4 @@ const AppFacade = ({ currentUser, server, sessionId }) => {
   return <LoggedInPage />;
 };
 
-AppFacade.propTypes = {
-  currentUser: PropTypes.object,
-  server: PropTypes.shape({
-    up: PropTypes.bool,
-  }),
-  sessionId: PropTypes.string,
-};
-
-AppFacade.defaultProps = {
-  currentUser: undefined,
-  server: undefined,
-  sessionId: undefined,
-};
-
-export default connect(AppFacade, {
-  currentUser: CurrentUserStore,
-  server: ServerAvailabilityStore,
-  sessionId: SessionStore,
-}, ({
-  currentUser: { currentUser } = {},
-  server: { server } = {},
-  sessionId: { sessionId } = '',
-}) => ({ currentUser, server, sessionId }));
+export default AppFacade;

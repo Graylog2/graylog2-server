@@ -23,7 +23,11 @@ import ActionsProvider from 'injection/ActionsProvider';
 
 const ServerAvailabilityActions = ActionsProvider.getActions('ServerAvailability');
 
-const ServerAvailabilityStore = Reflux.createStore({
+export type ServerAvailabilityStoreState = {
+  server: { up: true } | { up: false, error: string },
+};
+
+const ServerAvailabilityStore = Reflux.createStore<ServerAvailabilityStoreState>({
   listenables: [ServerAvailabilityActions],
   server: { up: true },
   init() {
