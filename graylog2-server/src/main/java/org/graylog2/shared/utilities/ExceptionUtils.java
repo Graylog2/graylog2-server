@@ -16,6 +16,7 @@
  */
 package org.graylog2.shared.utilities;
 
+import com.google.common.base.Throwables;
 import org.apache.commons.lang3.StringUtils;
 
 import java.net.UnknownHostException;
@@ -68,5 +69,11 @@ public class ExceptionUtils {
     public static String getRootCauseOrMessage(Throwable t) {
         final Throwable rootCause = getRootCause(t, true);
         return formatMessageCause(rootCause != null ? rootCause : t);
+    }
+
+    public static boolean hasCauseOf(Throwable t, Class<? extends Throwable> causeType) {
+        return Throwables.getCausalChain(t)
+                .stream()
+                .anyMatch(c -> causeType.isAssignableFrom(c.getClass()));
     }
 }

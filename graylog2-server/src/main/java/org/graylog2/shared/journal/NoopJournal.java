@@ -61,4 +61,9 @@ public class NoopJournal extends AbstractIdleService implements Journal {
     protected void shutDown() throws Exception {
         // nothing to do
     }
+
+    @Override
+    public void flush() {
+        // nothing to do
+    }
 }

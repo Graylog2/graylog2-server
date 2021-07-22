@@ -377,6 +377,11 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
         }
     }
 
+    @Override
+    public void flush() {
+        offsetFlusher.run();
+    }
+
     /**
      * This class has been renamed. For backwards compatibility, register the metrics under the old name as well.
      */

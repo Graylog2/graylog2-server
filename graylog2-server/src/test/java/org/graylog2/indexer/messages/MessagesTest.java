@@ -17,7 +17,7 @@
 package org.graylog2.indexer.messages;
 
 import com.google.common.collect.ImmutableList;
-import org.graylog.failure.FailureSubmitService;
+import org.graylog.failure.FailureSubmissionService;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.plugin.Message;
 import org.graylog2.system.processing.ProcessingStatusRecorder;
@@ -54,13 +54,13 @@ public class MessagesTest {
     private TrafficAccounting trafficAccounting;
 
     @Mock
-    private FailureSubmitService failureSubmitService;
+    private FailureSubmissionService failureSubmissionService;
 
     private Messages messages;
 
     @Before
     public void setUp() throws Exception {
-        this.messages = new Messages(trafficAccounting, messagesAdapter, mock(ProcessingStatusRecorder.class), failureSubmitService);
+        this.messages = new Messages(trafficAccounting, messagesAdapter, mock(ProcessingStatusRecorder.class), failureSubmissionService);
     }
 
     @Test

@@ -79,4 +79,9 @@ public class IndexingFailure implements Failure {
     public Indexable failedMessage() {
         return failedMessage;
     }
+
+    @Override
+    public boolean requiresAcknowledgement() {
+        return false;
+    }
 }

@@ -18,6 +18,9 @@ package org.graylog2.shared.utilities;
 
 import org.junit.Test;
 
+import java.io.IOException;
+import java.net.SocketTimeoutException;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ExceptionUtilsTest {
@@ -46,5 +49,26 @@ public class ExceptionUtilsTest {
             assertThat(m).isNotBlank();
             assertThat(m).isEqualTo("cause1.");
         });
+    }
+
+    @Test
+    public void hasCauseOf_returnsTrueIfTheExceptionItselfIsSubtypeOfTheProvidedType() {
+        assertThat(ExceptionUtils.hasCauseOf(new SocketTimeoutException("asdasd"), IOException.class)).isTrue();
+        assertThat(ExceptionUtils.hasCauseOf(new IOException("asdasd"), IOException.class)).isTrue();
+    }
+
+    @Test
+    public void hasCauseOf_returnsFalseIfNoCauseOfTheProvidedTypeFound() {
+        assertThat(ExceptionUtils.hasCauseOf(
+                new RuntimeException("parent", new RuntimeException("asdasd", new IllegalArgumentException())), IOException.class)).isFalse();
+    }
+
+    @Test
+    public void hasCauseOf_returnsTrueIfTheCauseIsSubtypeOfTheProvidedType() {
+        assertThat(ExceptionUtils.hasCauseOf(
+                new RuntimeException("parent", new SocketTimeoutException("asdasd")), IOException.class)).isTrue();
+
+        assertThat(ExceptionUtils.hasCauseOf(
+                new RuntimeException("parent", new IOException("asdasd")), IOException.class)).isTrue();
     }
 }

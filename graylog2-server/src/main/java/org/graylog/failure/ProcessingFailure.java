@@ -76,4 +76,9 @@ public class ProcessingFailure implements Failure {
     public Indexable failedMessage() {
         return failedMessage;
     }
+
+    @Override
+    public boolean requiresAcknowledgement() {
+        return true;
+    }
 }

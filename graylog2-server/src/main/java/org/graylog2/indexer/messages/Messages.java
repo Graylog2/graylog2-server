@@ -27,14 +27,14 @@ import com.github.rholder.retry.WaitStrategy;
 import com.google.auto.value.AutoValue;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Sets;
-import org.graylog.failure.Failure;
 import org.graylog.failure.FailureBatch;
-import org.graylog.failure.FailureSubmitService;
+import org.graylog.failure.FailureSubmissionService;
 import org.graylog.failure.IndexingFailure;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.InvalidWriteTargetException;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.plugin.Message;
+import org.graylog2.shared.utilities.ExceptionUtils;
 import org.graylog2.system.processing.ProcessingStatusRecorder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,7 +77,7 @@ public class Messages {
     @SuppressWarnings("UnstableApiUsage")
     private RetryerBuilder<List<IndexingError>> createBulkRequestRetryerBuilder() {
         return RetryerBuilder.<List<IndexingError>>newBuilder()
-                .retryIfException(t -> t instanceof IOException || t instanceof InvalidWriteTargetException)
+                .retryIfException(t -> ExceptionUtils.hasCauseOf(t, IOException.class) || t instanceof InvalidWriteTargetException)
                 .withWaitStrategy(WaitStrategies.exponentialWait(MAX_WAIT_TIME.getQuantity(), MAX_WAIT_TIME.getUnit()))
                 .withRetryListener(new RetryListener() {
                     @Override
@@ -91,7 +91,7 @@ public class Messages {
                 });
     }
 
-    private final FailureSubmitService failureSubmitService;
+    private final FailureSubmissionService failureSubmissionService;
     private final MessagesAdapter messagesAdapter;
     private final ProcessingStatusRecorder processingStatusRecorder;
     private final TrafficAccounting trafficAccounting;
@@ -100,11 +100,11 @@ public class Messages {
     public Messages(TrafficAccounting trafficAccounting,
                     MessagesAdapter messagesAdapter,
                     ProcessingStatusRecorder processingStatusRecorder,
-                    FailureSubmitService failureSubmitService) {
+                    FailureSubmissionService failureSubmissionService) {
         this.trafficAccounting = trafficAccounting;
         this.messagesAdapter = messagesAdapter;
         this.processingStatusRecorder = processingStatusRecorder;
-        this.failureSubmitService = failureSubmitService;
+        this.failureSubmissionService = failureSubmissionService;
     }
 
     public ResultMessage get(String messageId, String index) throws DocumentNotFoundException, IOException {
@@ -272,16 +272,16 @@ public class Messages {
             return Collections.emptyList();
         }
 
-        final List<Failure> indexingFailures = indexingErrors.stream()
-                .map(IndexingError::toFailure)
-                .collect(Collectors.toList());
-
         try {
-            // TODO handle shutdown
-            failureSubmitService.submitBlocking(new FailureBatch(indexingFailures, IndexingFailure.class));
+            failureSubmissionService.submitBlocking(FailureBatch.indexingFailureBatch(
+                    indexingErrors.stream()
+                            .map(IndexingError::toFailure)
+                            .collect(Collectors.toList())
+            ));
         } catch (InterruptedException e) {
-            LOG.warn("Interrupted in failureSubmitService", e);
-            // TODO
+            LOG.warn("Failed to submit {} indexing errors for failure handling. The thread has been interrupted!",
+                    indexingErrors.size());
+            Thread.currentThread().interrupt();
         }
 
         return indexingErrors.stream()
@@ -309,7 +309,7 @@ public class Messages {
             return create(message, index, ErrorType.Unknown, "");
         }
 
-        public Failure toFailure() {
+        public IndexingFailure toFailure() {
             final Indexable message = message();
             return new IndexingFailure(
                     message.getMessageId(),

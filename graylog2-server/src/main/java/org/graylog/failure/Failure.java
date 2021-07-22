@@ -46,4 +46,6 @@ public interface Failure {
     String errorMessage();
 
     DateTime timestamp();
+
+    boolean requiresAcknowledgement();
 }

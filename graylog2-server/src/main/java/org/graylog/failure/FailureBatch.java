@@ -16,6 +16,9 @@
  */
 package org.graylog.failure;
 
+import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableList;
+
 import java.util.Collection;
 import java.util.List;
 
@@ -28,9 +31,9 @@ public class FailureBatch {
     private final List<? extends Failure> failures;
     private final Class<? extends Failure> failureClass;
 
-    public FailureBatch(List<? extends Failure> failures,
+    private FailureBatch(List<? extends Failure> failures,
                         Class<? extends Failure> failureClass) {
-        this.failures = failures;
+        this.failures = ImmutableList.copyOf(failures);
         this.failureClass = failureClass;
         this.failures.forEach(f -> {
             if (!f.getClass().equals(failureClass)) {
@@ -39,11 +42,61 @@ public class FailureBatch {
         });
     }
 
+    /**
+     * @param indexingFailures a list of indexing failures to be included in the batch.
+     * @return a batch of indexing failures.
+     */
+    public static FailureBatch indexingFailureBatch(List<IndexingFailure> indexingFailures) {
+        return new FailureBatch(indexingFailures, IndexingFailure.class);
+    }
+
+    /**
+     * @param processingFailures a list of processing failures to be included in the batch.
+     * @return a batch of processing failures.
+     */
+    public static FailureBatch processingFailureBatch(List<ProcessingFailure> processingFailures) {
+        return new FailureBatch(processingFailures, ProcessingFailure.class);
+    }
+
+    /**
+     * Creates a batch containing only one processing failure. A shortcut for
+     * FailureBatch.processingFailureBatch(ImmutableList.of(processingFailure));
+     */
+    public static FailureBatch processingFailureBatch(ProcessingFailure processingFailure) {
+        return processingFailureBatch(ImmutableList.of(processingFailure));
+    }
+
+    /**
+     * @return an underlying immutable collection contains the failures.
+     */
     public Collection<? extends Failure> getFailures() {
         return failures;
     }
 
+    /**
+     * @return a number of failures within the batch.
+     */
+    public int size() {
+        return failures.size();
+    }
+
+    /**
+     * @return a class of failures within the batch.
+     */
     public Class<? extends Failure> getFailureClass() {
         return failureClass;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        final FailureBatch that = (FailureBatch) o;
+        return Objects.equal(failures, that.failures) && Objects.equal(failureClass, that.failureClass);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(failures, failureClass);
     }
 }
