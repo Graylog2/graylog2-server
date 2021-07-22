@@ -14,15 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
 
-import type { MessageEventTypes } from 'views/types/messageEventTypes';
-import { singleton } from 'views/logic/singleton';
+import type { ColorVariants } from 'theme/colors';
 
-export type MessageEventTypesContextType = {
-  eventTypes: MessageEventTypes,
+export type MessageEventType = {
+  gl2EventTypeCode: string,
+  summaryTemplate: string,
+  category: ColorVariants,
+  eventActions: Array<string>,
+  requiredFields: Array<string>,
+  optionalFields: Array<string>,
 }
 
-const MessageEventTypesContext = React.createContext<MessageEventTypesContextType | undefined>(undefined);
-
-export default singleton('contexts.MessageEventsContext', () => MessageEventTypesContext);
+export type MessageEventTypes = { [eventTypeCode: string]: MessageEventType | undefined };

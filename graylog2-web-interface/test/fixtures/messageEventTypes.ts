@@ -15,14 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import type { MessageEventType } from 'views/types';
+import type { MessageEventType } from 'views/types/messageEventTypes';
 
 // eslint-disable-next-line import/prefer-default-export
 export const createSimpleMessageEventType = (index = 1, overrides: Partial<MessageEventType> = {}): MessageEventType => ({
   gl2EventTypeCode: `event-type-code-${index}`,
-  gl2EventType: `event type name ${index}`,
-  title: `Event type title ${index}`,
-  summary: '{field1} - {field2}',
+  summaryTemplate: '{field1} - {field2}',
+  category: 'success',
   eventActions: ['action-id-1'],
   requiredFields: ['field1', 'field2'],
   optionalFields: ['field3'],

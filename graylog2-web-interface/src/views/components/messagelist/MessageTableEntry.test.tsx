@@ -53,7 +53,7 @@ describe('MessageTableEntry', () => {
   });
 
   it('displays message summary', () => {
-    const simpleEventType = createSimpleMessageEventType(1, { summary: '{field1} - {field2}', gl2EventTypeCode: 'event-type-code' });
+    const simpleEventType = createSimpleMessageEventType(1, { summaryTemplate: '{field1} - {field2}', gl2EventTypeCode: 'event-type-code' });
 
     const messageEventsContextValue = {
       eventTypes: { [simpleEventType.gl2EventTypeCode]: simpleEventType },

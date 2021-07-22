@@ -17,7 +17,8 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import { PluginStore } from 'graylog-web-plugin/plugin';
-import type { MessageEventTypes } from 'views/types';
+
+import type { MessageEventTypes } from 'views/types/messageEventTypes';
 
 import MessageEventTypesContext from './MessageEventTypesContext';
 
