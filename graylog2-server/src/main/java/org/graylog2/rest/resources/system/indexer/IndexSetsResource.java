@@ -281,7 +281,7 @@ public class IndexSetsResource extends RestResource {
         final IndexSetConfig indexSet = indexSetService.get(id)
                 .orElseThrow(() -> new NotFoundException("Index set <" + id + "> does not exist"));
 
-        if (!IndexSetConfig.indexCanBeDefault(indexSet.indexTemplateType().orElse(null), indexSet.isWritable())) {
+        if (!IndexSetConfig.isRegularIndex(indexSet)) {
             throw new ClientErrorException("Index set not eligible as default", Response.Status.CONFLICT);
         }
 

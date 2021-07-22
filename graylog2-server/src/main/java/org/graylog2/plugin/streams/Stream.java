@@ -60,6 +60,11 @@ public interface Stream extends Persisted {
      */
     ImmutableSet<String> NON_MESSAGE_STREAM_IDS = NON_EDITABLE_STREAM_IDS;
 
+    /**
+     * A list of all streams that are provided by Graylog
+     */
+    ImmutableSet<String> ALL_SYSTEM_STREAM_IDS = ImmutableSet.of(DEFAULT_STREAM_ID, DEFAULT_EVENTS_STREAM_ID, DEFAULT_SYSTEM_EVENTS_STREAM_ID, FAILURES_STREAM_ID);
+
     enum MatchingType {
         AND,
         OR;
@@ -116,7 +121,11 @@ public interface Stream extends Persisted {
 
     void setIndexSetId(String indexSetId);
 
-    static boolean isDefaultStreamId(String id) {
-        return DEFAULT_STREAM_ID.equals(id) || DEFAULT_EVENT_STREAM_IDS.contains(id);
+    static boolean isSystemStreamId(String id) {
+        return ALL_SYSTEM_STREAM_IDS.equals(id);
+    }
+
+    static boolean streamIsEditable(String streamId) {
+        return !NON_EDITABLE_STREAM_IDS.contains(streamId);
     }
 }

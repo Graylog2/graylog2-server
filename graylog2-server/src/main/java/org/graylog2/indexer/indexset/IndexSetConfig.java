@@ -54,13 +54,16 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
 
     private static final Duration DEFAULT_FIELD_TYPE_REFRESH_INTERVAL = Duration.standardSeconds(5L);
     public static final TemplateType DEFAULT_INDEX_TEMPLATE_TYPE = TemplateType.MESSAGES;
-    public static final ImmutableSet<TemplateType> ELEGIBLE_FOR_DEFAULT_INDEX = ImmutableSet.of(TemplateType.MESSAGES);
+    public static final ImmutableSet<TemplateType> REGULAR_INDEX_TYPES = ImmutableSet.of(TemplateType.MESSAGES);
 
-    public static boolean indexCanBeDefault(@Nullable TemplateType templateType, boolean isWritable) {
+    public static boolean isRegularIndex(@Nullable TemplateType templateType, boolean isWritable) {
         TemplateType type = templateType == null ? DEFAULT_INDEX_TEMPLATE_TYPE : templateType;
 
         // "isWritable == false" marks the restored-archive index set, which can also not be used as a default
-        return isWritable && ELEGIBLE_FOR_DEFAULT_INDEX.contains(type);
+        return isWritable && REGULAR_INDEX_TYPES.contains(type);
+    }
+    public static boolean isRegularIndex(IndexSetConfig config) {
+        return isRegularIndex(config.indexTemplateType().orElse(null), config.isWritable());
     }
 
     public enum TemplateType {

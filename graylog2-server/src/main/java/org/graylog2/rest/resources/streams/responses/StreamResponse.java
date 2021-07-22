@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.rest.models.alarmcallbacks.requests.AlertReceivers;
 import org.graylog2.rest.models.streams.alerts.AlertConditionSummary;
@@ -30,7 +31,6 @@ import javax.annotation.Nullable;
 import java.util.Collection;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
-import static org.graylog2.plugin.streams.Stream.NON_EDITABLE_STREAM_IDS;
 
 @AutoValue
 @WithBeanGetter
@@ -119,10 +119,6 @@ public abstract class StreamResponse {
                 firstNonNull(isDefault, false),
                 firstNonNull(removeMatchesFromDefaultStream, false),
                 indexSetId,
-                streamIsEditable(id));
-    }
-
-    private static boolean streamIsEditable(String streamId) {
-        return !NON_EDITABLE_STREAM_IDS.contains(streamId);
+                Stream.streamIsEditable(id));
     }
 }

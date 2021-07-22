@@ -58,7 +58,7 @@ public class EntityDescriptorIds {
     }
 
     public static boolean isDefaultStreamDescriptor(EntityDescriptor descriptor) {
-        return ModelTypes.STREAM_V1.equals(descriptor.type()) && Stream.isDefaultStreamId(descriptor.id().id());
+        return ModelTypes.STREAM_V1.equals(descriptor.type()) && Stream.isSystemStreamId(descriptor.id().id());
     }
 
     private EntityDescriptorIds(ImmutableMap<EntityDescriptor, String> descriptorIds) {
