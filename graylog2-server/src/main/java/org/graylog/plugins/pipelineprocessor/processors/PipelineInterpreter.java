@@ -19,11 +19,9 @@ package org.graylog.plugins.pipelineprocessor.processors;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSetMultimap;
@@ -34,7 +32,7 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog.failure.FailureBatch;
 import org.graylog.failure.FailureHandlerService;
-import org.graylog.failure.FailureSubmitService;
+import org.graylog.failure.FailureSubmissionService;
 import org.graylog.failure.ProcessingFailure;
 import org.graylog.failure.ProcessingFailureRoutingConfiguration;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
@@ -52,7 +50,6 @@ import org.graylog2.plugin.MessageCollection;
 import org.graylog2.plugin.Messages;
 import org.graylog2.plugin.messageprocessors.MessageProcessor;
 import org.graylog2.plugin.streams.Stream;
-import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.graylog2.shared.metrics.MetricUtils;
@@ -84,18 +81,16 @@ public class PipelineInterpreter implements MessageProcessor {
     private final Timer executionTime;
     private final MetricRegistry metricRegistry;
     private final ConfigurationStateUpdater stateUpdater;
-    private final FailureSubmitService failureSubmitService;
+    private final FailureSubmissionService failureSubmissionService;
     private final FailureHandlerService failureHandlerService;
-    private final ObjectMapper objectMapper;
     private final ProcessingFailureRoutingConfiguration processingFailureRoutingConfiguration;
 
     @Inject
     public PipelineInterpreter(MessageQueueAcknowledger messageQueueAcknowledger,
                                MetricRegistry metricRegistry,
                                ConfigurationStateUpdater stateUpdater,
-                               FailureSubmitService failureSubmitService,
+                               FailureSubmissionService failureSubmissionService,
                                FailureHandlerService failureHandlerService,
-                               ObjectMapperProvider objectMapperProvider,
                                ProcessingFailureRoutingConfiguration processingFailureRoutingConfiguration) {
 
         this.messageQueueAcknowledger = messageQueueAcknowledger;
@@ -104,9 +99,8 @@ public class PipelineInterpreter implements MessageProcessor {
         this.executionTime = metricRegistry.timer(name(PipelineInterpreter.class, "executionTime"));
         this.metricRegistry = metricRegistry;
         this.stateUpdater = stateUpdater;
-        this.failureSubmitService = failureSubmitService;
+        this.failureSubmissionService = failureSubmissionService;
         this.failureHandlerService = failureHandlerService;
-        this.objectMapper = objectMapperProvider.get();
         this.processingFailureRoutingConfiguration = processingFailureRoutingConfiguration;
     }
 
@@ -204,7 +198,7 @@ public class PipelineInterpreter implements MessageProcessor {
         if (processingError != null) {
             if (!processingFailureRoutingConfiguration.writeOriginalMessageWithError()) {
                 message.setFilterOut(true);
-                messageQueueAcknowledger.acknowledge(message);
+                // Message will be acknowledged in the FailureHandlerService
             }
             failedMessages.mark();
             submitFailure(message, processingError);
@@ -215,8 +209,8 @@ public class PipelineInterpreter implements MessageProcessor {
         try {
             // TODO use message.getMesssgeId() once this field is set early in processing
             final ProcessingFailure processingFailure = new ProcessingFailure(message.getId(), "pipeline-processor", error, message.getTimestamp(), message);
-            final FailureBatch failureBatch = new FailureBatch(ImmutableList.of(processingFailure), ProcessingFailure.class);
-            failureSubmitService.submitBlocking(failureBatch);
+            final FailureBatch failureBatch = FailureBatch.processingFailureBatch(processingFailure);
+            failureSubmissionService.submitBlocking(failureBatch);
         } catch (InterruptedException ignored) {
         }
     }
