@@ -35,7 +35,7 @@ public interface RemoteLoggersResource {
     Call<Void> setSubsystemLoggerLevel(@Path("subsystem") String subsystemTitle, @Path("level") String level);
 
     @PUT("system/loggers/{loggerName}/level/{level}")
-    Call<Void> setSingleLoggerLevel(String loggerName, String level);
+    Call<Void> setSingleLoggerLevel(@Path("loggerName") String loggerName, @Path("level") String level);
 
     @GET("system/loggers/messages/recent")
     Call<LogMessagesSummary> messages(int limit, String level);
