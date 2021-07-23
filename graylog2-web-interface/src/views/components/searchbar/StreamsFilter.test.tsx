@@ -30,7 +30,7 @@ describe('StreamsFilter', () => {
       { key: '101 Stream', value: 'streamId4' },
     ];
     const wrapper = mount(<StreamsFilter streams={streams} onChange={() => {}} />);
-    const { options } = wrapper.find(Select).first().props();
+    const { options }: { options?: React.ComponentProps<typeof Select>['options'] } = wrapper.find(Select).first().props();
 
     expect(options).toEqual([
       { key: '101 Stream', value: 'streamId4' },

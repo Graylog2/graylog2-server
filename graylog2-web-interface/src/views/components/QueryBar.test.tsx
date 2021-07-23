@@ -21,6 +21,7 @@ import { MockStore } from 'helpers/mocking';
 
 import QueryBar from 'views/components/QueryBar';
 import { ViewActions } from 'views/stores/ViewStore';
+import DashboardPageContext from 'views/components/contexts/DashboardPageContext';
 
 jest.mock('react-sizeme', () => ({
   SizeMe: ({ children: fn }) => fn({ size: { width: 1024, height: 768 } }),
@@ -76,7 +77,17 @@ describe('QueryBar', () => {
   });
 
   it('allows closing current tab', async () => {
-    render(<QueryBar queries={queries} queryTitles={queryTitles} viewMetadata={viewMetadata} />);
+    const setDashboard = jest.fn();
+
+    render(
+      <DashboardPageContext.Provider value={{
+        setDashboardPage: setDashboard,
+        unsetDashboardPage: jest.fn(),
+        dashboardPage: undefined,
+      }}>
+        <QueryBar queries={queries} queryTitles={queryTitles} viewMetadata={viewMetadata} />
+      </DashboardPageContext.Provider>,
+    );
 
     const currentTab = await screen.findByRole('button', { name: 'Second Query' });
 
@@ -88,7 +99,7 @@ describe('QueryBar', () => {
 
     fireEvent.click(closeButton);
 
-    await waitFor(() => expect(ViewActions.selectQuery).toHaveBeenCalledWith('foo'));
+    await waitFor(() => expect(setDashboard).toHaveBeenCalled());
     await waitFor(() => expect(ViewActions.search).toHaveBeenCalled());
   });
 });
