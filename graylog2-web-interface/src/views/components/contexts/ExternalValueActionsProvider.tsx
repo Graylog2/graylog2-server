@@ -19,6 +19,7 @@ import PropTypes from 'prop-types';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { ExternalValueActions } from 'views/types/externalValueActions';
+import { ActionDefinition } from 'views/components/actions/ActionHandler';
 
 import ExternalValueActionsContext from './ExternalValueActionsContext';
 
@@ -30,8 +31,28 @@ const mergeExternalValueActionLists = (externalValueActionLists) => {
   return externalValueActionLists.reduce((allExternalActions, externalActions) => ({ ...allExternalActions, ...externalActions }), {});
 };
 
-const _getActionsForField = (externalValueActions: ExternalValueActions | undefined = {}, fieldName: string) => {
-  return Object.values(externalValueActions).filter((valueAction) => valueAction.fields.includes(fieldName));
+const _getActionsForField = (externalValueActions: ExternalValueActions | undefined = {}, fieldName: string): Array<ActionDefinition> => {
+  return Object.values(externalValueActions)
+    .filter((valueAction) => valueAction.fields.includes(fieldName))
+    .map((externalAction) => {
+      const { title } = externalAction;
+
+      const baseProps: ActionDefinition = {
+        type: 'value',
+        resetFocus: false,
+        title,
+      };
+
+      if ('handler' in externalAction) {
+        baseProps.handler = (args) => externalAction.handler(externalAction, args);
+      }
+
+      if ('linkTarget' in externalAction) {
+        baseProps.linkTarget = (args) => externalAction.linkTarget(externalAction, args);
+      }
+
+      return baseProps;
+    });
 };
 
 type Props = {

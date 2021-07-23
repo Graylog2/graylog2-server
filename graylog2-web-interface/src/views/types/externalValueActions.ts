@@ -14,25 +14,29 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { ActionHandler, ActionHandlerArguments } from 'views/components/actions/ActionHandler';
+
 type ExternalValueActionBase = {
   id: string,
   title: string,
   fields: Array<string>,
 }
 
-type ExternalValueActionHttpGet = ExternalValueActionBase & {
+export type ExternalValueActionHttpGet = ExternalValueActionBase & {
   type: 'http_get'
+  linkTarget: (externalAction: ExternalValueActionHttpGet, actionHandlerArgs: ActionHandlerArguments) => string,
   options: {
     action: string,
   }
 }
 
-type ExternalValueActionWatchlist = ExternalValueActionBase & {
-  type: 'lookuptable'
+export type ExternalValueActionLookupTable = ExternalValueActionBase & {
+  type: 'lookup_table'
+  handler: (externalAction: ExternalValueActionLookupTable, actionHandlerArgs: ActionHandlerArguments) => ReturnType<ActionHandler>,
   options: {
-    watchListName: string,
+    lookupTableName: string,
   }
 }
 
-export type ExternalValueAction = ExternalValueActionHttpGet | ExternalValueActionWatchlist;
-export type ExternalValueActions = { [valueActionId: string]: ExternalValueAction };
+export type ExternalValueAction = ExternalValueActionHttpGet | ExternalValueActionLookupTable;
+export type ExternalValueActions = { [valueActionId: string]: ExternalValueAction }

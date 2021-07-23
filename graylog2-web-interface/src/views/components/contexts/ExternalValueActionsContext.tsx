@@ -16,12 +16,13 @@
  */
 import * as React from 'react';
 
+import type { ActionDefinition } from 'views/components/actions/ActionHandler';
 import { singleton } from 'views/logic/singleton';
-import { ExternalValueActions, ExternalValueAction } from 'views/types/externalValueActions';
+import { ExternalValueActions } from 'views/types/externalValueActions';
 
 export type ExternalValueActionsType = {
   externalValueActions: ExternalValueActions | undefined,
-  getActionsForField: (fieldName: string) => Array<ExternalValueAction>,
+  getActionsForField: (fieldName: string) => Array<ActionDefinition>,
 }
 
 const ExternalValueActionsContext = React.createContext<ExternalValueActionsType | undefined>(undefined);

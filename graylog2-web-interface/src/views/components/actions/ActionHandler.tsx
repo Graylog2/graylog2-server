@@ -58,6 +58,7 @@ export type HandlerAction = {
   component?: ActionComponentType,
   handler?: ActionHandler,
   resetFocus: boolean,
+  linkTarget?: (args: ActionHandlerArguments) => string,
 };
 
 export type ActionDefinition = HandlerAction & ActionHandlerConditions;
@@ -90,5 +91,9 @@ export function createHandlerFor(action: ActionDefinition, setActionComponents: 
     };
   }
 
-  throw new Error(`Invalid binding for action: ${String(action)} - has neither 'handler' nor 'component'.`);
+  if (action.linkTarget) {
+    return () => Promise.resolve();
+  }
+
+  throw new Error(`Invalid binding for action: ${String(action)} - has neither 'handler' nor 'component' nor 'linkTarget'.`);
 }
