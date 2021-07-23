@@ -19,26 +19,20 @@ package org.graylog2.inputs.random.generators;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
-import com.google.common.primitives.Ints;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.configuration.Configuration;
 import org.joda.time.DateTime;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import static java.util.Objects.requireNonNull;
 import static org.graylog2.inputs.random.generators.FakeHttpRawMessageGenerator.GeneratorState.Method.DELETE;
 import static org.graylog2.inputs.random.generators.FakeHttpRawMessageGenerator.GeneratorState.Method.GET;
 import static org.graylog2.inputs.random.generators.FakeHttpRawMessageGenerator.GeneratorState.Method.POST;
 import static org.graylog2.inputs.random.generators.FakeHttpRawMessageGenerator.GeneratorState.Method.PUT;
 
-public class FakeHttpRawMessageGenerator {
-    private static final Random RANDOM = new Random();
-    private static final int MAX_WEIGHT = 50;
-    private long msgSequenceNumber;
-
+public class FakeHttpRawMessageGenerator extends FakeMessageGenerator {
     private static final ImmutableList<Resource> GET_RESOURCES = ImmutableList.of(
             new Resource("/login", "LoginController", "login", 10),
             new Resource("/users", "UsersController", "index", 2),
@@ -55,40 +49,19 @@ public class FakeHttpRawMessageGenerator {
             new UserId(6476752, 12),
             new UserId(6469981, 40));
 
-    private final String source;
-
-    public FakeHttpRawMessageGenerator(String source) {
-        this.source = requireNonNull(source);
-        msgSequenceNumber = 1;
+    public FakeHttpRawMessageGenerator(Configuration configuration) {
+        super(configuration);
     }
 
-    public static int rateDeviation(int val, int maxDeviation, Random rand) {
-        final int deviationPercent = rand.nextInt(maxDeviation);
-        final double x = val / 100.0 * deviationPercent;
-
-        // Add or substract?
-        final double result;
-        if (rand.nextBoolean()) {
-            result = val - x;
-        } else {
-            result = val + x;
-        }
-
-        if (result < 0) {
-            return 1;
-        } else {
-            return Ints.saturatedCast(Math.round(result));
-        }
-    }
-
+    @Override
     public GeneratorState generateState() {
         final GeneratorState generatorState = new GeneratorState();
 
         final int methodProb = RANDOM.nextInt(100);
         final int successProb = RANDOM.nextInt(100);
 
-        generatorState.msgSequenceNr = msgSequenceNumber++;
-        generatorState.source = source;
+        generatorState.msgSequenceNr = this.msgSequenceNumber++;
+        generatorState.source = this.source;
         generatorState.isSuccessful = successProb < 98;
         generatorState.isTimeout = RANDOM.nextInt(5) == 1;
         generatorState.isSlowRequest = RANDOM.nextInt(500) == 1;
@@ -130,17 +103,6 @@ public class FakeHttpRawMessageGenerator {
 
     private static String shortMessage(DateTime ingestTime, GeneratorState.Method method, String resource, int code, int tookMs) {
         return ingestTime + " " + method + " " + resource + " [" + code + "]" + " " + tookMs + "ms";
-    }
-
-    private Weighted getWeighted(List<? extends Weighted> list) {
-        while (true) {
-            int x = RANDOM.nextInt(MAX_WEIGHT);
-            Weighted obj = list.get(RANDOM.nextInt(list.size()));
-
-            if (obj.getWeight() >= x) {
-                return obj;
-            }
-        }
     }
 
     private static Map<String, Object> ingestTimeFields(DateTime ingestTime) {
@@ -259,24 +221,6 @@ public class FakeHttpRawMessageGenerator {
         return createMessage(state, code, resource, tookMs);
     }
 
-    private static abstract class Weighted {
-
-        protected final int weight;
-
-        protected Weighted(int weight) {
-            if (weight <= 0 || weight > MAX_WEIGHT) {
-                throw new RuntimeException("Invalid resource weight: " + weight);
-            }
-
-            this.weight = weight;
-        }
-
-        public int getWeight() {
-            return weight;
-        }
-
-    }
-
     private static class Resource extends Weighted {
 
         private final String resource;
@@ -319,7 +263,7 @@ public class FakeHttpRawMessageGenerator {
         }
     }
 
-    public static class GeneratorState {
+    public static class GeneratorState extends FakeMessageGenerator.GeneratorState {
         public long msgSequenceNr;
         public String source;
         public boolean isSuccessful;

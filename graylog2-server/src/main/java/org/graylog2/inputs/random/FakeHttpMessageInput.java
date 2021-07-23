@@ -20,7 +20,7 @@ import com.codahale.metrics.MetricRegistry;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.inputs.codecs.RandomHttpMessageCodec;
-import org.graylog2.inputs.transports.RandomMessageTransport;
+import org.graylog2.inputs.transports.RandomHttpMessageTransport;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.configuration.Configuration;
@@ -34,9 +34,13 @@ public class FakeHttpMessageInput extends MessageInput {
 
     @AssistedInject
     public FakeHttpMessageInput(@Assisted Configuration configuration,
-                                RandomMessageTransport.Factory transportFactory,
+                                RandomHttpMessageTransport.Factory transportFactory,
                                 RandomHttpMessageCodec.Factory codecFactory,
-                                MetricRegistry metricRegistry, LocalMetricRegistry localRegistry, Config config, Descriptor descriptor, ServerStatus serverStatus) {
+                                MetricRegistry metricRegistry,
+                                LocalMetricRegistry localRegistry,
+                                Config config,
+                                Descriptor descriptor,
+                                ServerStatus serverStatus) {
         super(metricRegistry,
                 configuration,
                 transportFactory.create(configuration),
@@ -64,7 +68,7 @@ public class FakeHttpMessageInput extends MessageInput {
 
     public static class Config extends MessageInput.Config {
         @Inject
-        public Config(RandomMessageTransport.Factory transport, RandomHttpMessageCodec.Factory codec) {
+        public Config(RandomHttpMessageTransport.Factory transport, RandomHttpMessageCodec.Factory codec) {
             super(transport.getConfig(), codec.getConfig());
         }
     }

@@ -31,7 +31,8 @@ public class TransportsModule extends Graylog2Module {
         installTransport(mapBinder, "udp", UdpTransport.class);
         installTransport(mapBinder, "tcp", TcpTransport.class);
         installTransport(mapBinder, "http", HttpTransport.class);
-        installTransport(mapBinder, "randomhttp", RandomMessageTransport.class);
+        installTransport(mapBinder, "randomhttp", RandomHttpMessageTransport.class);
+        installTransport(mapBinder, "randomeventmessage", RandomEventMessageTransport.class);
         installTransport(mapBinder, "kafka", KafkaTransport.class);
         installTransport(mapBinder, "amqp", AmqpTransport.class);
         installTransport(mapBinder, "httppoll", HttpPollTransport.class);
