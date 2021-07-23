@@ -184,11 +184,17 @@ public class PipelineInterpreter implements MessageProcessor {
     }
 
     private void handleFailedMessage(Message message) {
+        if (message.getFilterOut()) {
+            return;
+        }
+
         final String processingError = message.getFieldAs(String.class, Message.FIELD_GL2_PROCESSING_ERROR);
         if (processingError != null) {
             if (!failureHandlingConfigSupplier.writeOriginalMessageWithErrorUponPipelineFailure()) {
                 message.setFilterOut(true);
-                // Message will be acknowledged in the FailureHandlerService
+                if (!failureHandlingConfigSupplier.submitProcessingFailures()) {
+                    messageQueueAcknowledger.acknowledge(message);
+                }
             }
 
             failedMessages.mark();

@@ -16,6 +16,7 @@
  */
 package org.graylog.failure;
 
+import com.google.common.base.Objects;
 import org.graylog2.indexer.messages.Indexable;
 import org.joda.time.DateTime;
 
@@ -80,5 +81,18 @@ public class ProcessingFailure implements Failure {
     @Override
     public boolean requiresAcknowledgement() {
         return true;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        final ProcessingFailure that = (ProcessingFailure) o;
+        return Objects.equal(failedMessageId, that.failedMessageId) && Objects.equal(errorType, that.errorType) && Objects.equal(errorMessage, that.errorMessage) && Objects.equal(timestamp, that.timestamp) && Objects.equal(failedMessage, that.failedMessage);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(failedMessageId, errorType, errorMessage, timestamp, failedMessage);
     }
 }
