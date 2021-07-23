@@ -53,6 +53,9 @@ public abstract class IndexSetSummary {
     @JsonProperty("default")
     public abstract boolean isDefault();
 
+    @JsonProperty("can_be_default")
+    public abstract boolean canBeDefault();
+
     @JsonProperty("writable")
     public abstract boolean isWritable();
 
@@ -124,7 +127,8 @@ public abstract class IndexSetSummary {
                                          @JsonProperty("index_optimization_disabled") boolean indexOptimizationDisabled,
                                          @JsonProperty("field_type_refresh_interval") Duration fieldTypeRefreshInterval,
                                          @JsonProperty("index_template_type") @Nullable IndexSetConfig.TemplateType templateType) {
-        return new AutoValue_IndexSetSummary(id, title, description, isDefault, isWritable, indexPrefix, shards, replicas,
+        return new AutoValue_IndexSetSummary(id, title, description, isDefault, IndexSetConfig.isRegularIndex(templateType, isWritable),
+                isWritable, indexPrefix, shards, replicas,
                 rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy, creationDate,
                 indexAnalyzer, indexOptimizationMaxNumSegments, indexOptimizationDisabled, fieldTypeRefreshInterval,
                 Optional.ofNullable(templateType));

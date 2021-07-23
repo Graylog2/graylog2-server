@@ -281,8 +281,8 @@ public class IndexSetsResource extends RestResource {
         final IndexSetConfig indexSet = indexSetService.get(id)
                 .orElseThrow(() -> new NotFoundException("Index set <" + id + "> does not exist"));
 
-        if (!indexSet.isWritable()) {
-            throw new ClientErrorException("Default index set must be writable.", Response.Status.CONFLICT);
+        if (!IndexSetConfig.isRegularIndex(indexSet)) {
+            throw new ClientErrorException("Index set not eligible as default", Response.Status.CONFLICT);
         }
 
         clusterConfigService.write(DefaultIndexSetConfig.create(indexSet.id()));

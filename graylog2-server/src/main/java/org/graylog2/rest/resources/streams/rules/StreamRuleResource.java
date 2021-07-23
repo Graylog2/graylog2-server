@@ -83,7 +83,7 @@ public class StreamRuleResource extends RestResource {
                            @ApiParam(name = "JSON body", required = true)
                            @Valid @NotNull CreateStreamRuleRequest cr) throws NotFoundException, ValidationException {
         checkPermission(RestPermissions.STREAMS_EDIT, streamId);
-        checkNotDefaultStream(streamId, "Cannot add stream rules to the default stream.");
+        checkNotEditable(streamId, "Cannot add stream rules to non editable streams.");
 
         // Check if stream exists
         streamService.load(streamId);
@@ -118,7 +118,7 @@ public class StreamRuleResource extends RestResource {
                                                   @ApiParam(name = "JSON body", required = true)
                                                   @Valid @NotNull CreateStreamRuleRequest cr) throws NotFoundException, ValidationException {
         checkPermission(RestPermissions.STREAMS_EDIT, streamid);
-        checkNotDefaultStream(streamid, "Cannot update stream rules on default stream.");
+        checkNotEditable(streamid, "Cannot update stream rules on non-editable streams.");
 
         final StreamRule streamRule;
         streamRule = streamRuleService.load(streamRuleId);
@@ -154,7 +154,7 @@ public class StreamRuleResource extends RestResource {
     public SingleStreamRuleSummaryResponse updateDeprecated(@PathParam("streamid") String streamid,
                                                             @PathParam("streamRuleId") String streamRuleId,
                                                             @Valid @NotNull CreateStreamRuleRequest cr) throws NotFoundException, ValidationException {
-        checkNotDefaultStream(streamid, "Cannot remove stream rule from default stream.");
+        checkNotEditable(streamid, "Cannot remove stream rule on non-editable streams.");
         return update(streamid, streamRuleId, cr);
     }
 
@@ -198,7 +198,7 @@ public class StreamRuleResource extends RestResource {
                        @ApiParam(name = "streamRuleId", required = true)
                        @PathParam("streamRuleId") @NotEmpty String streamRuleId) throws NotFoundException {
         checkPermission(RestPermissions.STREAMS_EDIT, streamid);
-        checkNotDefaultStream(streamid, "Cannot delete stream rule from default stream.");
+        checkNotEditable(streamid, "Cannot delete stream rule on non-editable streams.");
 
         final StreamRule streamRule = streamRuleService.load(streamRuleId);
         if (streamRule.getStreamId().equals(streamid)) {
@@ -224,8 +224,8 @@ public class StreamRuleResource extends RestResource {
         return result;
     }
 
-    private void checkNotDefaultStream(String streamId, String message) {
-        if (Stream.DEFAULT_STREAM_ID.equals(streamId)) {
+    private void checkNotEditable(String streamId, String message) {
+        if (Stream.DEFAULT_STREAM_ID.equals(streamId) || !Stream.streamIsEditable(streamId)) {
             throw new BadRequestException(message);
         }
     }
