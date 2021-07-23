@@ -18,11 +18,13 @@ import React from 'react';
 
 import Select from 'components/common/Select';
 
+type Props = React.ComponentProps<typeof Select>;
+
 /**
  * Component that wraps and render a `Select` where multiple options can be selected. It passes all
  * props to the underlying `Select` component, so please look there to find more information about them.
  */
-class MultiSelect extends React.Component {
+class MultiSelect extends React.Component<Props> {
   static propTypes = Select.propTypes;
 
   _select = undefined;
