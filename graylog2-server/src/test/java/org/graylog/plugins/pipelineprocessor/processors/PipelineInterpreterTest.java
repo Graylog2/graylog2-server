@@ -60,7 +60,6 @@ import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.junit.Test;
 
-import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -607,10 +606,8 @@ public class PipelineInterpreterTest {
         return msg;
     }
 
-    private List<Message> extractMessagesFromMessageCollection(Messages messages) throws Exception {
-        final Field messagesField = MessageCollection.class.getDeclaredField("messages");
-        messagesField.setAccessible(true);
-        return (List<Message>) messagesField.get(messages);
+    private List<Message> extractMessagesFromMessageCollection(Messages messages) {
+        return ((MessageCollection) messages).source();
     }
 
     private Message messageInDefaultStream(String message, String source) {
