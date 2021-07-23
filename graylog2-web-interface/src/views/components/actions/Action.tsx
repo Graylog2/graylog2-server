@@ -20,8 +20,9 @@ import { useCallback, useContext, useState } from 'react';
 
 import { MenuItem } from 'components/graylog';
 import usePluginEntities from 'views/logic/usePluginEntities';
-import { ActionDefinition, ActionHandlerArguments, createHandlerFor } from 'views/components/actions/ActionHandler';
-import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
+import ActionMenuItem from 'views/components/actions/ActionMenuItem';
+import { ActionDefinition, ActionHandlerArguments } from 'views/components/actions/ActionHandler';
+import ExternalValueActionsContext from 'views/components/contexts/ExternalValueActionsContext';
 
 import OverlayDropdown from '../OverlayDropdown';
 
@@ -34,63 +35,54 @@ type Props = {
 };
 
 const DropdownHeader = styled.span`
-    padding-left: 10px;
-    padding-right: 10px;
-    padding-bottom: 5px;
-    margin-bottom: 5px;
-    font-weight: 600;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-bottom: 5px;
+  margin-bottom: 5px;
+  font-weight: 600;
 `;
+
 const StyledListItem = styled.li`
-    margin-bottom: 10px;
-    list-style: none;
+  margin-bottom: 10px;
+  list-style: none;
 `;
+
+const getInternalActionsPluginKey = (type: Props['type']) => {
+  switch (type) {
+    case 'value':
+      return 'valueActions';
+    case 'field':
+      return 'fieldActions';
+    default:
+      return undefined;
+  }
+};
+
+const useInternalActions = (type: Props['type'], handlerArgs: Props['handlerArgs']) => {
+  const actionsPluginKey = getInternalActionsPluginKey(type);
+  const internalActions = usePluginEntities(actionsPluginKey) ?? [];
+
+  return internalActions.filter((action: ActionDefinition) => {
+    const { isHidden = () => false } = action;
+
+    return !isHidden(handlerArgs);
+  });
+};
+
+const useExternalActions = (type: Props['type'], handlerArgs: Props['handlerArgs']) => {
+  const externalValueActions = useContext(ExternalValueActionsContext);
+
+  return type === 'value' ? externalValueActions?.getActionsForField(handlerArgs.field) : undefined;
+};
 
 const Action = ({ type, handlerArgs, menuContainer, element: Element, children }: Props) => {
-  const { unsetWidgetFocusing } = useContext(WidgetFocusContext);
   const [open, setOpen] = useState(false);
   const [overflowingComponents, setOverflowingComponents] = useState({});
+  const internalActions = useInternalActions(type, handlerArgs);
+  const externalActions = useExternalActions(type, handlerArgs);
+
   const _onMenuToggle = useCallback(() => setOpen(!open), [open]);
-  const actions = usePluginEntities(`${type}Actions`);
   const overflowingComponentsValues: Array<React.ReactNode> = Object.values(overflowingComponents);
-
-  const menuItems = actions
-    .filter((action: ActionDefinition) => {
-      const { isHidden = () => false } = action;
-
-      return !isHidden(handlerArgs);
-    })
-    .map((action: ActionDefinition) => {
-      const setActionComponents = (fn) => {
-        setOverflowingComponents(fn(overflowingComponents));
-      };
-
-      const handler = createHandlerFor(action, setActionComponents);
-
-      const onSelect = () => {
-        const { resetFocus = false } = action;
-
-        if (resetFocus) {
-          unsetWidgetFocusing();
-        }
-
-        _onMenuToggle();
-        handler(handlerArgs);
-      };
-
-      const { isEnabled = () => true } = action;
-      const actionDisabled = !isEnabled(handlerArgs);
-
-      const { field } = handlerArgs;
-
-      return (
-        <MenuItem key={`${type}-action-${action.type}`}
-                  disabled={actionDisabled}
-                  eventKey={{ action: type, field }}
-                  onSelect={onSelect}>{action.title}
-        </MenuItem>
-      );
-    });
-
   const element = <Element active={open} />;
 
   return (
@@ -108,7 +100,29 @@ const Action = ({ type, handlerArgs, menuContainer, element: Element, children }
 
         <MenuItem divider />
         <MenuItem header>Actions</MenuItem>
-        {menuItems}
+        {internalActions.map((action) => (
+          <ActionMenuItem action={action}
+                          handlerArgs={handlerArgs}
+                          setOverflowingComponents={setOverflowingComponents}
+                          overflowingComponents={overflowingComponents}
+                          type={type}
+                          onMenuToggle={_onMenuToggle} />
+        ))}
+
+        {(externalActions && externalActions.length !== 0) && (
+          <>
+            <MenuItem divider />
+            <MenuItem header>External Actions</MenuItem>
+            {externalActions.map((action) => (
+              <ActionMenuItem action={action}
+                              handlerArgs={handlerArgs}
+                              setOverflowingComponents={setOverflowingComponents}
+                              overflowingComponents={overflowingComponents}
+                              type={type}
+                              onMenuToggle={_onMenuToggle} />
+            ))}
+          </>
+        )}
       </OverlayDropdown>
       {overflowingComponentsValues}
     </>
