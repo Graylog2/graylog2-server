@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.rest.models.alarmcallbacks.requests.AlertReceivers;
 import org.graylog2.rest.models.streams.alerts.AlertConditionSummary;
@@ -83,6 +84,9 @@ public abstract class StreamResponse {
     @JsonProperty("index_set_id")
     public abstract String indexSetId();
 
+    @JsonProperty("is_editable")
+    public abstract boolean isEditable();
+
     @JsonCreator
     public static StreamResponse create(@JsonProperty("id") String id,
                                         @JsonProperty("creator_user_id") String creatorUserId,
@@ -114,6 +118,7 @@ public abstract class StreamResponse {
                 contentPack,
                 firstNonNull(isDefault, false),
                 firstNonNull(removeMatchesFromDefaultStream, false),
-                indexSetId);
+                indexSetId,
+                Stream.streamIsEditable(id));
     }
 }
