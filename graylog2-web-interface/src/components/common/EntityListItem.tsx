@@ -48,9 +48,9 @@ const StyledListItem = styled.li(({ theme }) => css`
 `);
 
 type Props = {
-  title: string | React.ReactNode,
-  titleSuffix?: string | React.ReactNode,
-  description?: string | React.ReactNode,
+  title: React.ReactNode,
+  titleSuffix?: React.ReactNode,
+  description?: React.ReactNode,
   actions?: React.ReactNode | Array<React.ReactNode>,
   contentRow?: React.ReactNode,
 }

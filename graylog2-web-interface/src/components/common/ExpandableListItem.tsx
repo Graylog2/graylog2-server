@@ -96,14 +96,14 @@ const ExpandableContent = styled.div(({ theme }) => css`
 `);
 
 type Props = {
-  header: React.ReactNode | string,
+  header: React.ReactNode,
   checked?: boolean,
   indetermined?: boolean,
   selectable?: boolean,
   expandable?: boolean,
   expanded?: boolean,
   stayExpanded?: boolean,
-  subheader?: string | React.ReactNode,
+  subheader?: React.ReactNode,
   children?: React.ReactNode,
   padded?: boolean,
   readOnly?: boolean,
