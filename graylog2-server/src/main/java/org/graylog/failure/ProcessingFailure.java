@@ -91,11 +91,16 @@ public class ProcessingFailure implements Failure {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         final ProcessingFailure that = (ProcessingFailure) o;
-        return Objects.equal(failedMessageId, that.failedMessageId) && Objects.equal(errorType, that.errorType) && Objects.equal(errorMessage, that.errorMessage) && Objects.equal(timestamp, that.timestamp) && Objects.equal(failedMessage, that.failedMessage);
+        return Objects.equal(failedMessageId, that.failedMessageId)
+                && Objects.equal(errorType, that.errorType)
+                && Objects.equal(errorMessage, that.errorMessage)
+                && Objects.equal(timestamp, that.timestamp)
+                && Objects.equal(failedMessage, that.failedMessage)
+                && Objects.equal(requiresAcknowledgement, that.requiresAcknowledgement);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(failedMessageId, errorType, errorMessage, timestamp, failedMessage);
+        return Objects.hashCode(failedMessageId, errorType, errorMessage, timestamp, failedMessage, requiresAcknowledgement);
     }
 }
