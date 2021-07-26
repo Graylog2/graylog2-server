@@ -120,7 +120,6 @@ const Action = ({ type, handlerArgs, menuContainer, element: Element, children }
         {(externalActions && externalActions.length !== 0) && (
           <>
             <MenuItem divider />
-            <MenuItem header>External Actions</MenuItem>
             {externalActions.map((action) => (
               <ActionMenuItem action={action}
                               handlerArgs={handlerArgs}
