@@ -137,6 +137,7 @@ export type Colors = {
 };
 
 export type ColorVariants = 'danger' | 'default' | 'info' | 'primary' | 'success' | 'warning';
+export const colorVariants: Array<ColorVariants> = ['success', 'warning', 'danger', 'info', 'default', 'primary'];
 
 export const colorsPropTypes = PropTypes.shape({
   brand: PropTypes.shape({

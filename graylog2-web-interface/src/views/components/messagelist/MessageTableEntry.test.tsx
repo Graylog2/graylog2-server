@@ -15,9 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { mount } from 'wrappedEnzyme';
+import { render, screen } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
 import MockStore from 'helpers/mocking/StoreMock';
+import { createSimpleMessageEventType } from 'fixtures/messageEventTypes';
+
+import MessageEventTypesContext from 'views/components/contexts/MessageEventTypesContext';
 
 import MessageTableEntry from './MessageTableEntry';
 
@@ -34,7 +37,8 @@ describe('MessageTableEntry', () => {
         message: 'Something happened!',
       },
     };
-    const wrapper = mount((
+
+    render(
       <table>
         <MessageTableEntry expandAllRenderAsync
                            toggleDetail={() => {}}
@@ -42,9 +46,43 @@ describe('MessageTableEntry', () => {
                            message={message}
                            selectedFields={Immutable.OrderedSet(['message', 'notexisting'])}
                            expanded={false} />
-      </table>
-    ));
+      </table>,
+    );
 
-    expect(wrapper).toIncludeText('Something happened!');
+    expect(screen.getByText('Something happened!')).toBeInTheDocument();
+  });
+
+  it('displays message summary', () => {
+    const simpleEventType = createSimpleMessageEventType(1, { summaryTemplate: '{field1} - {field2}', gl2EventTypeCode: 'event-type-code' });
+
+    const messageEventsContextValue = {
+      eventTypes: { [simpleEventType.gl2EventTypeCode]: simpleEventType },
+    };
+
+    const message = {
+      id: 'deadbeef',
+      index: 'test_0',
+      fields: {
+        gl2_event_type_code: 'event-type-code',
+        message: 'Something happened!',
+        field1: 'Value for field 1',
+        field2: 'Value for field 2',
+      },
+    };
+
+    render(
+      <MessageEventTypesContext.Provider value={messageEventsContextValue}>
+        <table>
+          <MessageTableEntry expandAllRenderAsync
+                             toggleDetail={() => {}}
+                             fields={Immutable.List()}
+                             message={message}
+                             selectedFields={Immutable.OrderedSet(['message'])}
+                             expanded={false} />
+        </table>,
+      </MessageEventTypesContext.Provider>,
+    );
+
+    expect(screen.getByText('Value for field 1 - Value for field 2')).toBeInTheDocument();
   });
 });
