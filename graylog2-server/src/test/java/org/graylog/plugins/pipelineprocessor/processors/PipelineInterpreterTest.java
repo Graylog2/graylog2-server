@@ -448,7 +448,7 @@ public class PipelineInterpreterTest {
     }
 
     @Test
-    public void process_failureHandledAndMessageAcknowledgedLaterAndNotFilteredOut_whenMessageNotDroppedAndConfiguredToHandleAndConfiguredNotToFilterOut() throws Exception {
+    public void process_failureHandledAndMessageAcknowledgedLaterAndNotFilteredOut_whenMessageNotDroppedAndConfiguredToHandleAndConfiguredToKeepDuplicate() throws Exception {
         // given
         when(ruleService.loadAll()).thenReturn(ImmutableList.of(RULE_WITH_RUNTIME_EXCEPTION));
 
@@ -488,7 +488,7 @@ public class PipelineInterpreterTest {
     }
 
     @Test
-    public void process_failureNotHandledAndMessageAcknowledgedLaterAndNotFilteredOut_whenMessageNotDroppedAndConfiguredNotToHandleAndConfiguredNotToFilterOut() throws Exception {
+    public void process_failureNotHandledAndMessageAcknowledgedLaterAndNotFilteredOut_whenMessageNotDroppedAndConfiguredNotToHandle() throws Exception {
         // given
         when(ruleService.loadAll()).thenReturn(ImmutableList.of(RULE_WITH_RUNTIME_EXCEPTION));
 
@@ -503,7 +503,6 @@ public class PipelineInterpreterTest {
         ));
 
         when(failureHandlingConfiguration.submitProcessingFailures()).thenReturn(false);
-        when(failureHandlingConfiguration.keepFailedMessageDuplicate()).thenReturn(true);
 
         final PipelineInterpreter interpreter = createPipelineInterpreter(ruleService, pipelineService, FUNCTIONS);
 
@@ -524,7 +523,7 @@ public class PipelineInterpreterTest {
     }
 
     @Test
-    public void process_failureHandledAndMessageAcknowledgedLaterAndFilteredOut_whenMessageNotDroppedAndConfiguredToHandleAndConfiguredToFilterOut() throws Exception {
+    public void process_failureHandledAndMessageAcknowledgedLaterAndFilteredOut_whenMessageNotDroppedAndConfiguredToHandleAndConfiguredToKeepNoDuplicate() throws Exception {
         // given
         when(ruleService.loadAll()).thenReturn(ImmutableList.of(RULE_WITH_RUNTIME_EXCEPTION));
 
@@ -563,42 +562,6 @@ public class PipelineInterpreterTest {
         verifyNoInteractions(messageQueueAcknowledger);
     }
 
-
-    @Test
-    public void process_failureNotHandledAndMessageAcknowledgedAndFilteredOut_whenMessageNotDroppedAndConfiguredNotToHandleAndConfiguredToFilterOut() throws Exception {
-        // given
-        when(ruleService.loadAll()).thenReturn(ImmutableList.of(RULE_WITH_RUNTIME_EXCEPTION));
-
-        when(pipelineService.loadAll()).thenReturn(Collections.singleton(
-                PipelineDao.create("p1", "title", "description",
-                        "pipeline \"pipeline\"\n" +
-                                "stage 0 match all\n" +
-                                "    rule \"problematic_rule\";\n" +
-                                "end\n",
-                        Tools.nowUTC(),
-                        null)
-        ));
-
-        when(failureHandlingConfiguration.submitProcessingFailures()).thenReturn(false);
-        when(failureHandlingConfiguration.keepFailedMessageDuplicate()).thenReturn(false);
-
-        final PipelineInterpreter interpreter = createPipelineInterpreter(ruleService, pipelineService, FUNCTIONS);
-
-        // when
-        final List<Message> processed = extractMessagesFromMessageCollection(interpreter.process(messageWithNumField()));
-        final Message processedMessage = processed.get(0);
-
-        // then
-        assertThat(ImmutableList.copyOf(processed))
-                .hasSize(1)
-                .hasOnlyOneElementSatisfying(m -> {
-                    assertThat(m.hasField(FIELD_GL2_PROCESSING_ERROR)).isTrue();
-                    assertThat(processedMessage.getFilterOut()).isTrue();
-                });
-
-        verifyNoInteractions(failureSubmissionService);
-        verify(messageQueueAcknowledger).acknowledge(processedMessage);
-    }
 
     private Message messageWithNumField() {
         final Message msg = messageInDefaultStream("message", "test");
