@@ -28,15 +28,8 @@ package org.graylog.failure;
 public interface FailureHandler {
 
     /**
-     * @return a name of the handler. For debugging purposes.
-     */
-    default String name() {
-        return "Default name";
-    }
-
-    /**
      * An implementation of this method is expected to contain
-     * the actual logic of failure handling.
+     * the actual logic of failure handling. Should be blocking.
      */
     void handle(FailureBatch failureBatch);
 
@@ -48,7 +41,7 @@ public interface FailureHandler {
     boolean supports(FailureBatch failureBatch);
 
     /**
-     * Tells the master failure handler service whether the handler
+     * Tells the master failure handling service whether the handler
      * is available for handling failures. Added to make handling configurable.
      */
     boolean isEnabled();

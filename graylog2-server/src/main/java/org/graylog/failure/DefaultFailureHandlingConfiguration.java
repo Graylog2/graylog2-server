@@ -14,30 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.plugin;
+package org.graylog.failure;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterators;
+/**
+ * The default set of configuration values, which leaves
+ * the original failure handling behaviour intact.
+ */
+public class DefaultFailureHandlingConfiguration implements FailureHandlingConfiguration {
 
-import java.util.Iterator;
-import java.util.List;
-
-public class MessageCollection implements Messages  {
-
-    private final ImmutableList<Message> messages;
-
-    public MessageCollection(Iterable<Message> other) {
-        messages = ImmutableList.copyOf(other);
+    @Override
+    public boolean keepFailedMessageDuplicate() {
+        return true;
     }
 
     @Override
-    public Iterator<Message> iterator() {
-        return Iterators.filter(messages.iterator(), e -> !e.getFilterOut());
-    }
-
-    @VisibleForTesting
-    public List<Message> source() {
-        return messages;
+    public boolean submitProcessingFailures() {
+        return false;
     }
 }

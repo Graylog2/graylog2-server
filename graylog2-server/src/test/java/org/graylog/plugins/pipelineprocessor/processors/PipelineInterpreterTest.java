@@ -22,8 +22,10 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.eventbus.EventBus;
-import org.graylog.failure.FailureHandlerService;
+import org.graylog.failure.FailureBatch;
+import org.graylog.failure.FailureHandlingConfiguration;
 import org.graylog.failure.FailureSubmissionService;
+import org.graylog.failure.ProcessingFailure;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
@@ -40,14 +42,17 @@ import org.graylog.plugins.pipelineprocessor.db.memory.InMemoryRuleService;
 import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineService;
 import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineStreamConnectionsService;
 import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbRuleService;
+import org.graylog.plugins.pipelineprocessor.functions.conversion.LongConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.StringConversion;
 import org.graylog.plugins.pipelineprocessor.functions.messages.CreateMessage;
+import org.graylog.plugins.pipelineprocessor.functions.messages.DropMessage;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetField;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageCollection;
 import org.graylog2.plugin.Messages;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.streams.Stream;
@@ -63,9 +68,13 @@ import java.util.concurrent.Executors;
 
 import static com.codahale.metrics.MetricRegistry.name;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog2.plugin.Message.FIELD_GL2_PROCESSING_ERROR;
 import static org.graylog2.plugin.streams.Stream.DEFAULT_STREAM_ID;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 public class PipelineInterpreterTest {
@@ -85,6 +94,31 @@ public class PipelineInterpreterTest {
                     "then\n" +
                     "  set_field(\"foobar\", \"covfefe\");\n" +
                     "end", null, null);
+
+    private static final RuleDao RULE_WITH_RUNTIME_EXCEPTION = RuleDao.create("problematic_rule", "problematic_rule", "problematic_rule",
+            "rule \"problematic_rule\"\n" +
+                    "when true\n" +
+                    "then\n" +
+                    "  set_field(\"num\", $message.num / $message.num);\n" +
+                    "end", null, null);
+
+    private static final RuleDao DROP_RULE = RuleDao.create("drop_rule", "drop_rule", "drop_rule",
+            "rule \"drop_rule\"\n" +
+                    "when true\n" +
+                    "then\n" +
+                    "  drop_message();\n" +
+                    "end", null, null);
+
+    private static final Map<String, Function<?>> FUNCTIONS = ImmutableMap.of(
+            SetField.NAME, new SetField(),
+            LongConversion.NAME, new LongConversion(),
+            DropMessage.NAME, new DropMessage());
+
+    private final RuleService ruleService = mock(MongoDbRuleService.class);
+    private final PipelineService pipelineService = mock(MongoDbPipelineService.class);
+    private final FailureSubmissionService failureSubmissionService = mock(FailureSubmissionService.class);
+    private final FailureHandlingConfiguration failureHandlingConfiguration = mock(FailureHandlingConfiguration.class);
+    private final MessageQueueAcknowledger messageQueueAcknowledger = mock(MessageQueueAcknowledger.class);
 
     @Test
     public void testCreateMessage() {
@@ -270,11 +304,11 @@ public class PipelineInterpreterTest {
                 (currentPipelines, streamPipelineConnections, ruleMetricsConfig) -> new PipelineInterpreter.State(currentPipelines, streamPipelineConnections, ruleMetricsConfig, new MetricRegistry(), 1, true)
         );
         return new PipelineInterpreter(
-                mock(MessageQueueAcknowledger.class),
+                messageQueueAcknowledger,
                 new MetricRegistry(),
                 stateUpdater,
-                mock(FailureSubmissionService.class),
-                mock(FailureHandlerService.class));
+                failureSubmissionService,
+                failureHandlingConfiguration);
     }
 
     @Test
@@ -331,7 +365,7 @@ public class PipelineInterpreterTest {
                 metricRegistry,
                 stateUpdater,
                 mock(FailureSubmissionService.class),
-                mock(FailureHandlerService.class));
+                mock(FailureHandlingConfiguration.class));
 
         interpreter.process(messageInDefaultStream("", ""));
 
@@ -375,6 +409,171 @@ public class PipelineInterpreterTest {
         assertThat(meters.get(name(Rule.class, "abc", "cde", "0", "failed")).getCount()).isEqualTo(0L);
         assertThat(meters.get(name(Rule.class, "abc", "cde", "1", "failed")).getCount()).isEqualTo(0L);
 
+    }
+
+    @Test
+    public void process_failureNotHandled_whenMessageDropped() throws Exception {
+        // given
+        when(ruleService.loadAll()).thenReturn(ImmutableList.of(RULE_WITH_RUNTIME_EXCEPTION, DROP_RULE));
+
+        when(pipelineService.loadAll()).thenReturn(Collections.singleton(
+                PipelineDao.create("p1", "title", "description",
+                        "pipeline \"pipeline\"\n" +
+                                "stage 0 match all\n" +
+                                "    rule \"drop_rule\";\n" +
+                                "    rule \"problematic_rule\";\n" +
+                                "end\n",
+                        Tools.nowUTC(),
+                        null)
+        ));
+
+        when(failureHandlingConfiguration.submitProcessingFailures()).thenReturn(true);
+        when(failureHandlingConfiguration.keepFailedMessageDuplicate()).thenReturn(true);
+
+        final PipelineInterpreter interpreter = createPipelineInterpreter(ruleService, pipelineService, FUNCTIONS);
+
+        // when
+        final List<Message> processed = extractMessagesFromMessageCollection(interpreter.process(messageWithNumField()));
+
+        // then
+        assertThat(ImmutableList.copyOf(processed))
+                .hasSize(1)
+                .hasOnlyOneElementSatisfying(m -> {
+                    assertThat(m.hasField(FIELD_GL2_PROCESSING_ERROR)).isTrue();
+                    assertThat(m.getFilterOut()).isTrue();
+                });
+
+        verifyNoInteractions(failureSubmissionService);
+        verify(messageQueueAcknowledger).acknowledge(processed.get(0));
+    }
+
+    @Test
+    public void process_failureHandledAndMessageAcknowledgedLaterAndNotFilteredOut_whenMessageNotDroppedAndConfiguredToHandleAndConfiguredToKeepDuplicate() throws Exception {
+        // given
+        when(ruleService.loadAll()).thenReturn(ImmutableList.of(RULE_WITH_RUNTIME_EXCEPTION));
+
+        when(pipelineService.loadAll()).thenReturn(Collections.singleton(
+                PipelineDao.create("p1", "title", "description",
+                        "pipeline \"pipeline\"\n" +
+                                "stage 0 match all\n" +
+                                "    rule \"problematic_rule\";\n" +
+                                "end\n",
+                        Tools.nowUTC(),
+                        null)
+        ));
+
+        when(failureHandlingConfiguration.submitProcessingFailures()).thenReturn(true);
+        when(failureHandlingConfiguration.keepFailedMessageDuplicate()).thenReturn(true);
+
+        final PipelineInterpreter interpreter = createPipelineInterpreter(ruleService, pipelineService, FUNCTIONS);
+
+        // when
+        final List<Message> processed = extractMessagesFromMessageCollection(interpreter.process(messageWithNumField()));
+        final Message processedMessage = processed.get(0);
+
+        // then
+        assertThat(ImmutableList.copyOf(processed))
+                .hasSize(1)
+                .hasOnlyOneElementSatisfying(m -> {
+                    assertThat(m.hasField(FIELD_GL2_PROCESSING_ERROR)).isTrue();
+                    assertThat(m.getFilterOut()).isFalse();
+                });
+
+        verify(failureSubmissionService).submitBlocking(eq(FailureBatch.processingFailureBatch(
+                new ProcessingFailure(processedMessage.getId(), "pipeline-processor",
+                        processedMessage.getField(FIELD_GL2_PROCESSING_ERROR).toString(),
+                        processedMessage.getTimestamp(), processedMessage, false))));
+
+        // this only checks for calls directly made from the PipelineInterpreter
+        verifyNoInteractions(messageQueueAcknowledger);
+    }
+
+    @Test
+    public void process_failureNotHandledAndMessageAcknowledgedLaterAndNotFilteredOut_whenMessageNotDroppedAndConfiguredNotToHandle() throws Exception {
+        // given
+        when(ruleService.loadAll()).thenReturn(ImmutableList.of(RULE_WITH_RUNTIME_EXCEPTION));
+
+        when(pipelineService.loadAll()).thenReturn(Collections.singleton(
+                PipelineDao.create("p1", "title", "description",
+                        "pipeline \"pipeline\"\n" +
+                                "stage 0 match all\n" +
+                                "    rule \"problematic_rule\";\n" +
+                                "end\n",
+                        Tools.nowUTC(),
+                        null)
+        ));
+
+        when(failureHandlingConfiguration.submitProcessingFailures()).thenReturn(false);
+
+        final PipelineInterpreter interpreter = createPipelineInterpreter(ruleService, pipelineService, FUNCTIONS);
+
+        // when
+        final List<Message> processed = extractMessagesFromMessageCollection(interpreter.process(messageWithNumField()));
+        final Message processedMessage = processed.get(0);
+
+        // then
+        assertThat(ImmutableList.copyOf(processed))
+                .hasSize(1)
+                .hasOnlyOneElementSatisfying(m -> {
+                    assertThat(m.hasField(FIELD_GL2_PROCESSING_ERROR)).isTrue();
+                    assertThat(processedMessage.getFilterOut()).isFalse();
+                });
+
+        verifyNoInteractions(failureSubmissionService);
+        // this only checks for calls directly made from the PipelineInterpreter
+        verifyNoInteractions(messageQueueAcknowledger);
+    }
+
+    @Test
+    public void process_failureHandledAndMessageAcknowledgedLaterAndFilteredOut_whenMessageNotDroppedAndConfiguredToHandleAndConfiguredToKeepNoDuplicate() throws Exception {
+        // given
+        when(ruleService.loadAll()).thenReturn(ImmutableList.of(RULE_WITH_RUNTIME_EXCEPTION));
+
+        when(pipelineService.loadAll()).thenReturn(Collections.singleton(
+                PipelineDao.create("p1", "title", "description",
+                        "pipeline \"pipeline\"\n" +
+                                "stage 0 match all\n" +
+                                "    rule \"problematic_rule\";\n" +
+                                "end\n",
+                        Tools.nowUTC(),
+                        null)
+        ));
+
+        when(failureHandlingConfiguration.submitProcessingFailures()).thenReturn(true);
+        when(failureHandlingConfiguration.keepFailedMessageDuplicate()).thenReturn(false);
+
+        final PipelineInterpreter interpreter = createPipelineInterpreter(ruleService, pipelineService, FUNCTIONS);
+
+        // when
+        final List<Message> processed = extractMessagesFromMessageCollection(interpreter.process(messageWithNumField()));
+        final Message processedMessage = processed.get(0);
+
+        // then
+        assertThat(ImmutableList.copyOf(processed))
+                .hasSize(1)
+                .hasOnlyOneElementSatisfying(m -> {
+                    assertThat(m.hasField(FIELD_GL2_PROCESSING_ERROR)).isTrue();
+                    assertThat(processedMessage.getFilterOut()).isTrue();
+                });
+
+        verify(failureSubmissionService).submitBlocking(eq(FailureBatch.processingFailureBatch(
+                new ProcessingFailure(processedMessage.getId(), "pipeline-processor",
+                        processedMessage.getField(FIELD_GL2_PROCESSING_ERROR).toString(),
+                        processedMessage.getTimestamp(), processedMessage, true))));
+
+        // this only checks for calls directly made from the PipelineInterpreter
+        verifyNoInteractions(messageQueueAcknowledger);
+    }
+
+
+    private Message messageWithNumField() {
+        final Message msg = messageInDefaultStream("message", "test");
+        msg.addField("num", new Integer(5));
+        return msg;
+    }
+
+    private List<Message> extractMessagesFromMessageCollection(Messages messages) {
+        return ((MessageCollection) messages).source();
     }
 
     private Message messageInDefaultStream(String message, String source) {

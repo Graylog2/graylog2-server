@@ -31,7 +31,7 @@ import com.google.common.collect.Sets;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog.failure.FailureBatch;
-import org.graylog.failure.FailureHandlerService;
+import org.graylog.failure.FailureHandlingConfiguration;
 import org.graylog.failure.FailureSubmissionService;
 import org.graylog.failure.ProcessingFailure;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
@@ -81,14 +81,14 @@ public class PipelineInterpreter implements MessageProcessor {
     private final MetricRegistry metricRegistry;
     private final ConfigurationStateUpdater stateUpdater;
     private final FailureSubmissionService failureSubmissionService;
-    private final FailureHandlerService failureHandlerService;
+    private final FailureHandlingConfiguration failureHandlingConfiguration;
 
     @Inject
     public PipelineInterpreter(MessageQueueAcknowledger messageQueueAcknowledger,
                                MetricRegistry metricRegistry,
                                ConfigurationStateUpdater stateUpdater,
                                FailureSubmissionService failureSubmissionService,
-                               FailureHandlerService failureHandlerService) {
+                               FailureHandlingConfiguration failureHandlingConfiguration) {
 
         this.messageQueueAcknowledger = messageQueueAcknowledger;
         this.filteredOutMessages = metricRegistry.meter(name(ProcessBufferProcessor.class, "filteredOutMessages"));
@@ -97,7 +97,7 @@ public class PipelineInterpreter implements MessageProcessor {
         this.metricRegistry = metricRegistry;
         this.stateUpdater = stateUpdater;
         this.failureSubmissionService = failureSubmissionService;
-        this.failureHandlerService = failureHandlerService;
+        this.failureHandlingConfiguration = failureHandlingConfiguration;
     }
 
     /**
@@ -184,25 +184,34 @@ public class PipelineInterpreter implements MessageProcessor {
     }
 
     private void handleFailedMessage(Message message) {
-        // TODO we probably want a configuration option to disable this feature
-
-        if (!failureHandlerService.canHandleProcessingErrors()) {
-            // If we cannot store messages with processing errors separately, keep the default behaviour.
+        if (message.getFilterOut()) {
+            // Message will be dropped
             return;
         }
-        final String processingError = message.getFieldAs(String.class, Message.FIELD_GL2_PROCESSING_ERROR);
-        if (processingError != null) {
-            message.setFilterOut(true);
-            // Message will be acknowledged in the FailureHandlerService
-            failedMessages.mark();
-            submitFailure(message, processingError);
+        if (!failureHandlingConfiguration.submitProcessingFailures()) {
+            // We don't handle processing errors
+            return;
         }
+
+        final String processingError = message.getFieldAs(String.class, Message.FIELD_GL2_PROCESSING_ERROR);
+        if (processingError == null) {
+            return;
+        }
+
+        if (!failureHandlingConfiguration.keepFailedMessageDuplicate()) {
+            message.setFilterOut(true);
+        }
+        submitFailure(message, processingError);
+
+        failedMessages.mark();
     }
 
     private void submitFailure(Message message, String error) {
         try {
+            // If we store the regular message, the acknowledgement happens in the output path
+            boolean needsAcknowledgement = !failureHandlingConfiguration.keepFailedMessageDuplicate();
             // TODO use message.getMesssgeId() once this field is set early in processing
-            final ProcessingFailure processingFailure = new ProcessingFailure(message.getId(), "pipeline-processor", error, message.getTimestamp(), message);
+            final ProcessingFailure processingFailure = new ProcessingFailure(message.getId(), "pipeline-processor", error, message.getTimestamp(), message, needsAcknowledgement);
             final FailureBatch failureBatch = FailureBatch.processingFailureBatch(processingFailure);
             failureSubmissionService.submitBlocking(failureBatch);
         } catch (InterruptedException ignored) {
