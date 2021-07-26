@@ -63,7 +63,7 @@ import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import { RefluxActions } from 'stores/StoreTypes';
 import MessageEventTypesProvider from 'views/components/contexts/MessageEventTypesProvider';
-import ExternalValueActionsProvider from 'views/components/contexts/ExternalValueActionsProvider';
+import FieldAndValueActionsProvider from 'views/components/contexts/FieldAndValueActionsProvider';
 
 const GridContainer = styled.div<{ interactive: boolean }>(({ interactive }) => {
   return interactive ? css`
@@ -195,7 +195,7 @@ const Search = ({ location }: Props) => {
 
   return (
     <MessageEventTypesProvider>
-      <ExternalValueActionsProvider>
+      <FieldAndValueActionsProvider>
         <WidgetFocusProvider>
           <WidgetFocusContext.Consumer>
             {({ focusedWidget: { focusing: focusingWidget, editing: editingWidget } = { focusing: false, editing: false } }) => (
@@ -248,7 +248,7 @@ const Search = ({ location }: Props) => {
             )}
           </WidgetFocusContext.Consumer>
         </WidgetFocusProvider>
-      </ExternalValueActionsProvider>
+      </FieldAndValueActionsProvider>
     </MessageEventTypesProvider>
   );
 };

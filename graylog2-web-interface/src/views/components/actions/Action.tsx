@@ -19,10 +19,9 @@ import styled from 'styled-components';
 import { useCallback, useContext, useState } from 'react';
 
 import { MenuItem } from 'components/graylog';
-import usePluginEntities from 'views/logic/usePluginEntities';
 import ActionMenuItem from 'views/components/actions/ActionMenuItem';
 import { ActionDefinition, ActionHandlerArguments } from 'views/components/actions/ActionHandler';
-import ExternalValueActionsContext from 'views/components/contexts/ExternalValueActionsContext';
+import FieldAndValueActionsContext from 'views/components/contexts/FieldAndValueActionsContext';
 
 import OverlayDropdown from '../OverlayDropdown';
 
@@ -47,18 +46,7 @@ const StyledListItem = styled.li`
   list-style: none;
 `;
 
-const getInternalActionsPluginKey = (type: Props['type']) => {
-  switch (type) {
-    case 'value':
-      return 'valueActions';
-    case 'field':
-      return 'fieldActions';
-    default:
-      return undefined;
-  }
-};
-
-const filterVisibleActions = (actions: Array<ActionDefinition> | undefined, handlerArgs: Props['handlerArgs']) => {
+const filterVisibleActions = (actions: Array<ActionDefinition> | undefined = [], handlerArgs: Props['handlerArgs']) => {
   return actions?.filter((action: ActionDefinition) => {
     const { isHidden = () => false } = action;
 
@@ -67,20 +55,27 @@ const filterVisibleActions = (actions: Array<ActionDefinition> | undefined, hand
 };
 
 const useInternalActions = (type: Props['type'], handlerArgs: Props['handlerArgs']) => {
-  const actionsPluginKey = getInternalActionsPluginKey(type);
-  const internalActions = usePluginEntities(actionsPluginKey) ?? [];
+  const fieldAndValueActions = useContext(FieldAndValueActionsContext);
 
-  return filterVisibleActions(internalActions, handlerArgs);
+  if (type === 'value' && fieldAndValueActions) {
+    return filterVisibleActions(fieldAndValueActions.valueActions.internal, handlerArgs);
+  }
+
+  if (type === 'field' && fieldAndValueActions) {
+    return filterVisibleActions(fieldAndValueActions.fieldActions.internal, handlerArgs);
+  }
+
+  return [];
 };
 
 const useExternalActions = (type: Props['type'], handlerArgs: Props['handlerArgs']) => {
-  const { externalValueActions } = useContext(ExternalValueActionsContext) ?? {};
+  const fieldAndValueActions = useContext(FieldAndValueActionsContext);
 
-  if (type !== 'value') {
-    return undefined;
+  if (type !== 'value' || !fieldAndValueActions) {
+    return [];
   }
 
-  return filterVisibleActions(externalValueActions, handlerArgs);
+  return filterVisibleActions(fieldAndValueActions.valueActions.external, handlerArgs);
 };
 
 const Action = ({ type, handlerArgs, menuContainer, element: Element, children }: Props) => {

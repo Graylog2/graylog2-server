@@ -20,8 +20,8 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import { createSimpleExternalValueAction } from 'fixtures/externalValueActions';
 import asMock from 'helpers/mocking/AsMock';
 
-import ExternalValueActionsProvider from './ExternalValueActionsProvider';
-import ExternalValueActionsContext from './ExternalValueActionsContext';
+import FieldAndValueActionsProvider from './FieldAndValueActionsProvider';
+import FieldAndValueActionsContext from './FieldAndValueActionsContext';
 
 jest.mock('graylog-web-plugin/plugin', () => ({
   PluginStore: {
@@ -31,20 +31,22 @@ jest.mock('graylog-web-plugin/plugin', () => ({
 
 const simpleValueAction = createSimpleExternalValueAction();
 const simpleContextValue = {
-  externalValueActions: [simpleValueAction],
+  valueActions: {
+    external: [simpleValueAction],
+  },
 };
 
-describe('ExternalValueActionsProvider', () => {
+describe('FieldAndValueActionsProvider', () => {
   const renderSUT = (consume) => render(
-    <ExternalValueActionsProvider>
-      <ExternalValueActionsContext.Consumer>
+    <FieldAndValueActionsProvider>
+      <FieldAndValueActionsContext.Consumer>
         {consume}
-      </ExternalValueActionsContext.Consumer>
-    </ExternalValueActionsProvider>,
+      </FieldAndValueActionsContext.Consumer>
+    </FieldAndValueActionsProvider>,
   );
 
   it('renders children when there are no external value actions in plugin store', () => {
-    render(<ExternalValueActionsProvider><>The content</></ExternalValueActionsProvider>);
+    render(<FieldAndValueActionsProvider><>The content</></FieldAndValueActionsProvider>);
 
     expect(screen.getByText('The content')).toBeInTheDocument();
   });
@@ -60,17 +62,14 @@ describe('ExternalValueActionsProvider', () => {
       contextValue = value;
     });
 
-    expect(contextValue.externalValueActions).toStrictEqual(simpleContextValue.externalValueActions);
+    expect(contextValue.valueActions.external).toStrictEqual(simpleContextValue.valueActions.external);
   });
 
   it('provides correct data, when plugin store contains multiple entries for external value actions', () => {
     const simpleValueAction2 = createSimpleExternalValueAction({ title: 'External Value Action 2' });
 
     asMock(PluginStore.exports).mockImplementation((type) => ({
-      externalValueActions: [
-        [simpleValueAction],
-        [simpleValueAction2],
-      ],
+      externalValueActions: [[simpleValueAction], [simpleValueAction2]],
     }[type]));
 
     let contextValue;
@@ -80,9 +79,11 @@ describe('ExternalValueActionsProvider', () => {
     });
 
     const expectedContextValue = {
-      externalValueActions: [simpleValueAction, simpleValueAction2],
+      valueActions: {
+        external: [simpleValueAction, simpleValueAction2],
+      },
     };
 
-    expect(contextValue.externalValueActions).toStrictEqual(expectedContextValue.externalValueActions);
+    expect(contextValue.valueActions.external).toStrictEqual(expectedContextValue.valueActions.external);
   });
 });

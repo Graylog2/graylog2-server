@@ -19,10 +19,16 @@ import * as React from 'react';
 import type { ActionDefinition } from 'views/components/actions/ActionHandler';
 import { singleton } from 'views/logic/singleton';
 
-export type ExternalValueActionsType = {
-  externalValueActions: Array<ActionDefinition> | undefined,
+export type FieldAndValueActionsContextType = {
+  fieldActions: {
+    internal: Array<ActionDefinition> | undefined,
+  },
+  valueActions: {
+    external: Array<ActionDefinition> | undefined,
+    internal: Array<ActionDefinition> | undefined,
+  }
 }
 
-const ExternalValueActionsContext = React.createContext<ExternalValueActionsType | undefined>(undefined);
+const FieldAndValueActionsContext = React.createContext<FieldAndValueActionsContextType | undefined>(undefined);
 
-export default singleton('contexts.ExternalValueActionsContext', () => ExternalValueActionsContext);
+export default singleton('contexts.FieldAndValueActionsContext', () => FieldAndValueActionsContext);

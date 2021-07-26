@@ -18,27 +18,36 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import ExternalValueActionsContext from './ExternalValueActionsContext';
+import FieldAndValueActionsContext from './FieldAndValueActionsContext';
 
 type Props = {
   children: React.ReactElement
 };
 
-const ExternalValueActionsProvider = ({ children }: Props) => {
-  const externalValueActionLists = PluginStore.exports('externalValueActions');
-  const externalValueActions = externalValueActionLists?.flat();
+const FieldAndValueActionsProvider = ({ children }: Props) => {
+  const internalValueActions = PluginStore.exports('valueActions');
+  const internalFieldActions = PluginStore.exports('fieldActions');
+  const externalValueActions = PluginStore.exports('externalValueActions')?.flat();
 
-  return externalValueActions
-    ? (
-      <ExternalValueActionsContext.Provider value={{ externalValueActions }}>
-        {children}
-      </ExternalValueActionsContext.Provider>
-    )
-    : children;
+  const contextValue = {
+    fieldActions: {
+      internal: internalFieldActions,
+    },
+    valueActions: {
+      internal: internalValueActions,
+      external: externalValueActions,
+    },
+  };
+
+  return (
+    <FieldAndValueActionsContext.Provider value={contextValue}>
+      {children}
+    </FieldAndValueActionsContext.Provider>
+  );
 };
 
-ExternalValueActionsProvider.propTypes = {
+FieldAndValueActionsProvider.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
-export default ExternalValueActionsProvider;
+export default FieldAndValueActionsProvider;

@@ -17,11 +17,9 @@
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
-import asMock from 'helpers/mocking/AsMock';
 import { createSimpleExternalValueAction } from 'fixtures/externalValueActions';
 
-import ExternalValueActionsContext from 'views/components/contexts/ExternalValueActionsContext';
-import usePluginEntities from 'views/logic/usePluginEntities';
+import FieldAndValueActionsContext, { FieldAndValueActionsContextType } from 'views/components/contexts/FieldAndValueActionsContext';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 
 import Action from './Action';
@@ -37,21 +35,28 @@ describe('Action', () => {
     contexts: {},
   };
 
+  type Props = Partial<React.ComponentProps<typeof Action>> & {
+    fieldActions?: FieldAndValueActionsContextType['fieldActions'],
+    valueActions?: FieldAndValueActionsContextType['valueActions'],
+  }
+
   const SimpleAction = ({
     children = 'The dropdown header',
     handlerArgs = exampleHandlerArgs,
     menuContainer = undefined,
     type = 'field',
-  }: Partial<React.ComponentProps<typeof Action>>) => {
+    fieldActions = { internal: undefined },
+    valueActions = { internal: undefined, external: undefined },
+  }: Props) => {
     return (
-      <>
+      <FieldAndValueActionsContext.Provider value={{ fieldActions, valueActions }}>
         <Action element={() => <div>Open Actions Menu</div>}
                 handlerArgs={handlerArgs}
                 menuContainer={menuContainer}
                 type={type}>
           {children}
         </Action>
-      </>
+      </FieldAndValueActionsContext.Provider>
     );
   };
 
@@ -70,22 +75,19 @@ describe('Action', () => {
 
   it('should work with internal field actions', async () => {
     const mockActionHandler = jest.fn();
-
-    asMock(usePluginEntities).mockImplementation((entityKey) => {
-      if (entityKey === 'fieldActions') {
-        return [{
+    const fieldActions = {
+      internal: [
+        {
           type: 'aggregate',
           title: 'Show top values',
           handler: mockActionHandler,
           isEnabled: () => true,
           resetFocus: true,
-        }];
-      }
+        },
+      ],
+    };
 
-      return [];
-    });
-
-    render(<SimpleAction type="field" />);
+    render(<SimpleAction type="field" fieldActions={fieldActions} />);
 
     await openDropdown();
 
@@ -98,11 +100,10 @@ describe('Action', () => {
   it('should work with external value actions', async () => {
     const mockActionHandler = jest.fn();
     const simpleExternalAction = createSimpleExternalValueAction({ handler: mockActionHandler, title: 'External value action' });
+    const valueActions = { external: [simpleExternalAction], internal: undefined };
 
     render(
-      <ExternalValueActionsContext.Provider value={{ externalValueActions: [simpleExternalAction] }}>
-        <SimpleAction type="value" />
-      </ExternalValueActionsContext.Provider>,
+      <SimpleAction type="value" valueActions={valueActions} />,
     );
 
     await openDropdown();

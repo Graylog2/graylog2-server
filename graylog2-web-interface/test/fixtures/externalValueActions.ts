@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-// eslint-disable-next-line import/prefer-default-export
 import { ActionDefinition } from 'views/components/actions/ActionHandler';
 
 // eslint-disable-next-line import/prefer-default-export
