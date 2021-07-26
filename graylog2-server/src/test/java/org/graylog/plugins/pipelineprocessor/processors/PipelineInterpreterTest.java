@@ -428,7 +428,7 @@ public class PipelineInterpreterTest {
         ));
 
         when(failureHandlingConfiguration.submitProcessingFailures()).thenReturn(true);
-        when(failureHandlingConfiguration.writeOriginalMessageWithErrorUponPipelineFailure()).thenReturn(true);
+        when(failureHandlingConfiguration.keepFailedMessageDuplicate()).thenReturn(true);
 
         final PipelineInterpreter interpreter = createPipelineInterpreter(ruleService, pipelineService, FUNCTIONS);
 
@@ -463,7 +463,7 @@ public class PipelineInterpreterTest {
         ));
 
         when(failureHandlingConfiguration.submitProcessingFailures()).thenReturn(true);
-        when(failureHandlingConfiguration.writeOriginalMessageWithErrorUponPipelineFailure()).thenReturn(true);
+        when(failureHandlingConfiguration.keepFailedMessageDuplicate()).thenReturn(true);
 
         final PipelineInterpreter interpreter = createPipelineInterpreter(ruleService, pipelineService, FUNCTIONS);
 
@@ -503,7 +503,7 @@ public class PipelineInterpreterTest {
         ));
 
         when(failureHandlingConfiguration.submitProcessingFailures()).thenReturn(false);
-        when(failureHandlingConfiguration.writeOriginalMessageWithErrorUponPipelineFailure()).thenReturn(true);
+        when(failureHandlingConfiguration.keepFailedMessageDuplicate()).thenReturn(true);
 
         final PipelineInterpreter interpreter = createPipelineInterpreter(ruleService, pipelineService, FUNCTIONS);
 
@@ -539,7 +539,7 @@ public class PipelineInterpreterTest {
         ));
 
         when(failureHandlingConfiguration.submitProcessingFailures()).thenReturn(true);
-        when(failureHandlingConfiguration.writeOriginalMessageWithErrorUponPipelineFailure()).thenReturn(false);
+        when(failureHandlingConfiguration.keepFailedMessageDuplicate()).thenReturn(false);
 
         final PipelineInterpreter interpreter = createPipelineInterpreter(ruleService, pipelineService, FUNCTIONS);
 
@@ -580,7 +580,7 @@ public class PipelineInterpreterTest {
         ));
 
         when(failureHandlingConfiguration.submitProcessingFailures()).thenReturn(false);
-        when(failureHandlingConfiguration.writeOriginalMessageWithErrorUponPipelineFailure()).thenReturn(false);
+        when(failureHandlingConfiguration.keepFailedMessageDuplicate()).thenReturn(false);
 
         final PipelineInterpreter interpreter = createPipelineInterpreter(ruleService, pipelineService, FUNCTIONS);
 

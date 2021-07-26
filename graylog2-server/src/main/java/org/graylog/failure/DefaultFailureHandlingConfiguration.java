@@ -23,7 +23,7 @@ package org.graylog.failure;
 public class DefaultFailureHandlingConfiguration implements FailureHandlingConfiguration {
 
     @Override
-    public boolean writeOriginalMessageWithErrorUponPipelineFailure() {
+    public boolean keepFailedMessageDuplicate() {
         return true;
     }
 

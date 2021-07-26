@@ -198,7 +198,7 @@ public class PipelineInterpreter implements MessageProcessor {
             return;
         }
 
-        if (!failureHandlingConfiguration.writeOriginalMessageWithErrorUponPipelineFailure()) {
+        if (!failureHandlingConfiguration.keepFailedMessageDuplicate()) {
             message.setFilterOut(true);
         }
         submitFailure(message, processingError);
