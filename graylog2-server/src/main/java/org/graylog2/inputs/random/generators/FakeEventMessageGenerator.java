@@ -141,7 +141,7 @@ public class FakeEventMessageGenerator extends FakeMessageGenerator {
         msg.addField("source_reference", state.sourceRef);
         msg.addField("event_outcome", state.isSuccessful);
         user.ifPresent(u -> msg.addField("user_domain", u.userDomain));
-        msg.addField("user_username", state.userName);
+        msg.addField("user_name", state.userName);
 
         return msg;
     }
@@ -151,7 +151,7 @@ public class FakeEventMessageGenerator extends FakeMessageGenerator {
         msg.addField("application_name", state.applicationName);
         msg.addField("source_reference", state.sourceRef);
         user.ifPresent(u -> msg.addField("user_domain", u.userDomain));
-        msg.addField("user_username", state.userName);
+        msg.addField("user_name", state.userName);
 
         return msg;
     }
