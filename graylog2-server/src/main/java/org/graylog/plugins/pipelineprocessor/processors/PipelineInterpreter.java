@@ -208,8 +208,10 @@ public class PipelineInterpreter implements MessageProcessor {
 
     private void submitFailure(Message message, String error) {
         try {
+            // If we store the regular message, the acknowledgement happens in the output path
+            boolean needsAcknowledgement = !failureHandlingConfiguration.keepFailedMessageDuplicate();
             // TODO use message.getMesssgeId() once this field is set early in processing
-            final ProcessingFailure processingFailure = new ProcessingFailure(message.getId(), "pipeline-processor", error, message.getTimestamp(), message);
+            final ProcessingFailure processingFailure = new ProcessingFailure(message.getId(), "pipeline-processor", error, message.getTimestamp(), message, needsAcknowledgement);
             final FailureBatch failureBatch = FailureBatch.processingFailureBatch(processingFailure);
             failureSubmissionService.submitBlocking(failureBatch);
         } catch (InterruptedException ignored) {

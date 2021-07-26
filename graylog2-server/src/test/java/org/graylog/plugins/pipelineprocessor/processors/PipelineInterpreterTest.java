@@ -482,8 +482,9 @@ public class PipelineInterpreterTest {
         verify(failureSubmissionService).submitBlocking(eq(FailureBatch.processingFailureBatch(
                 new ProcessingFailure(processedMessage.getId(), "pipeline-processor",
                         processedMessage.getField(FIELD_GL2_PROCESSING_ERROR).toString(),
-                        processedMessage.getTimestamp(), processedMessage))));
+                        processedMessage.getTimestamp(), processedMessage, false))));
 
+        // this only checks for calls directly made from the PipelineInterpreter
         verifyNoInteractions(messageQueueAcknowledger);
     }
 
@@ -519,6 +520,7 @@ public class PipelineInterpreterTest {
                 });
 
         verifyNoInteractions(failureSubmissionService);
+        // this only checks for calls directly made from the PipelineInterpreter
         verifyNoInteractions(messageQueueAcknowledger);
     }
 
@@ -557,8 +559,9 @@ public class PipelineInterpreterTest {
         verify(failureSubmissionService).submitBlocking(eq(FailureBatch.processingFailureBatch(
                 new ProcessingFailure(processedMessage.getId(), "pipeline-processor",
                         processedMessage.getField(FIELD_GL2_PROCESSING_ERROR).toString(),
-                        processedMessage.getTimestamp(), processedMessage))));
+                        processedMessage.getTimestamp(), processedMessage, true))));
 
+        // this only checks for calls directly made from the PipelineInterpreter
         verifyNoInteractions(messageQueueAcknowledger);
     }
 

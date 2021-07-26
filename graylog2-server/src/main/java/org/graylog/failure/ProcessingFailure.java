@@ -29,17 +29,20 @@ public class ProcessingFailure implements Failure {
     private final String errorMessage;
     private final DateTime timestamp;
     private final Indexable failedMessage;
+    private final boolean requiresAcknowledgement;
 
     public ProcessingFailure(String failedMessageId,
                              String errorType,
                              String errorMessage,
                              DateTime timestamp,
-                             Indexable failedMessage) {
+                             Indexable failedMessage,
+                             boolean requiresAcknowledgement) {
         this.failedMessageId = failedMessageId;
         this.errorType = errorType;
         this.errorMessage = errorMessage;
         this.timestamp = timestamp;
         this.failedMessage = failedMessage;
+        this.requiresAcknowledgement = requiresAcknowledgement;
     }
 
     @Override
@@ -80,7 +83,7 @@ public class ProcessingFailure implements Failure {
 
     @Override
     public boolean requiresAcknowledgement() {
-        return true;
+        return requiresAcknowledgement;
     }
 
     @Override
