@@ -15,9 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useContext } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
+import styled, { DefaultTheme } from 'styled-components';
 
+import { MessageEventType } from 'views/types/messageEventTypes';
 import connect from 'stores/connect';
 import CombinedProvider from 'injection/CombinedProvider';
 import { StreamsStore } from 'views/stores/StreamsStore';
@@ -26,6 +29,8 @@ import FieldType from 'views/logic/fieldtypes/FieldType';
 import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import { Store } from 'stores/StoreTypes';
 import { MESSAGE_FIELD } from 'views/Constants';
+import MessageEventTypesContext, { MessageEventTypesContextType } from 'views/components/contexts/MessageEventTypesContext';
+import { colorVariants, ColorVariants } from 'theme/colors';
 
 import MessageDetail from './MessageDetail';
 import DecoratedValue from './decoration/DecoratedValue';
@@ -43,6 +48,26 @@ type Input = { id: string };
 type InputsStoreState = {
   inputs: Array<Input>;
 };
+
+const getSummaryColor = (theme: DefaultTheme, category: ColorVariants) => {
+  if (colorVariants.includes(category)) {
+    return theme.colors.variant.darker[category];
+  }
+
+  return theme.colors.variant.darker.info;
+};
+
+const StyledSummaryRow = styled.tr<{ category: ColorVariants }>(({ theme, category }) => {
+  const color = getSummaryColor(theme, category);
+
+  return `
+    && {
+      &.message-row td {
+        color: ${color};
+      }
+    }
+  `;
+});
 
 const ConnectedMessageDetail = connect(
   MessageDetail,
@@ -85,6 +110,24 @@ const fieldType = (fieldName, { decoration_stats: decorationStats }: { decoratio
   ? FieldType.Decorated
   : ((fields && fields.find((f) => f.name === fieldName)) || { type: FieldType.Unknown }).type);
 
+const getMessageSummary = (messageFields: Message['fields'], messageEvents: MessageEventTypesContextType) => {
+  const gl2EventTypeCode = messageFields.gl2_event_type_code;
+  const eventType: MessageEventType | undefined = messageEvents?.eventTypes?.[gl2EventTypeCode];
+
+  if (!eventType) {
+    return undefined;
+  }
+
+  const { summaryTemplate: template, category } = eventType;
+  const summary = template.replace(/{(\w+)}/g, (fieldNamePlaceholder, fieldName) => messageFields[fieldName] || fieldName);
+
+  return {
+    category,
+    template,
+    summary,
+  };
+};
+
 const MessageTableEntry = ({
   disableSurroundingSearch,
   expandAllRenderAsync,
@@ -96,6 +139,9 @@ const MessageTableEntry = ({
   selectedFields = Immutable.OrderedSet<string>(),
   toggleDetail,
 }: Props) => {
+  const messageEvents = useContext(MessageEventTypesContext);
+  const messageSummary = getMessageSummary(message.fields, messageEvents);
+
   const _toggleDetail = () => {
     toggleDetail(`${message.index}-${message.id}`);
   };
@@ -142,8 +188,7 @@ const MessageTableEntry = ({
         })}
       </tr>
 
-      {showMessageRow
-      && (
+      {showMessageRow && (
         <tr className="message-row" onClick={_toggleDetail}>
           <td colSpan={colSpanFixup}>
             <div className="message-wrapper">
@@ -154,8 +199,18 @@ const MessageTableEntry = ({
           </td>
         </tr>
       )}
-      {expanded
-      && (
+
+      {!!messageSummary && (
+        <StyledSummaryRow className="message-row" onClick={_toggleDetail} title={messageSummary.template} category={messageSummary.category}>
+          <td colSpan={colSpanFixup}>
+            <div className="message-wrapper">
+              {messageSummary.summary}
+            </div>
+          </td>
+        </StyledSummaryRow>
+      )}
+
+      {expanded && (
         <tr className="message-detail-row" style={{ display: 'table-row' }}>
           <td colSpan={colSpanFixup}>
             {/* @ts-ignore */}
