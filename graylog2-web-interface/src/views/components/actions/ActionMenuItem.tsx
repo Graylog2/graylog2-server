@@ -16,10 +16,24 @@
  */
 import * as React from 'react';
 import { useContext } from 'react';
+import styled from 'styled-components';
 
+import { Icon } from 'components/common';
 import { MenuItem } from 'components/graylog';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import { ActionDefinition, createHandlerFor, ActionHandlerArguments } from 'views/components/actions/ActionHandler';
+
+const StyledMenuItem = styled(MenuItem)`
+  && > a {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+`;
+
+const ExternalLinkIcon = styled(Icon)(({ theme }) => `
+  margin-left: ${theme.spacings.xxs};
+`);
 
 type Props = {
   action: ActionDefinition,
@@ -64,13 +78,14 @@ const ActionMenuItem = ({ action, handlerArgs, setOverflowingComponents, overflo
   const { field } = handlerArgs;
 
   return (
-    <MenuItem key={`${type}-action-${action.type}`}
-              disabled={actionDisabled}
-              eventKey={{ action: type, field }}
-              onSelect={onSelect}
-              {...linkProps}>
+    <StyledMenuItem key={`${type}-action-${action.type}`}
+                    disabled={actionDisabled}
+                    eventKey={{ action: type, field }}
+                    onSelect={onSelect}
+                    {...linkProps}>
       {action.title}
-    </MenuItem>
+      {hasLinkTarget && <ExternalLinkIcon name="external-link" />}
+    </StyledMenuItem>
   );
 };
 
