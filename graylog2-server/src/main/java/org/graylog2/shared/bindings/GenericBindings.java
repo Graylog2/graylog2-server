@@ -29,10 +29,10 @@ import com.google.inject.multibindings.OptionalBinder;
 import com.google.inject.name.Names;
 import okhttp3.OkHttpClient;
 import org.graylog.failure.DefaultFailureHandler;
-import org.graylog.failure.DefaultFailureHandlingConfigSupplier;
+import org.graylog.failure.DefaultFailureHandlingConfiguration;
 import org.graylog.failure.FailureHandler;
 import org.graylog.failure.FailureHandlingService;
-import org.graylog.failure.FailureHandlingConfigSupplier;
+import org.graylog.failure.FailureHandlingConfiguration;
 import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.buffers.InputBuffer;
@@ -91,9 +91,9 @@ public class GenericBindings extends AbstractModule {
 
         Multibinder.newSetBinder(binder(), FailureHandler.class);
 
-        OptionalBinder.newOptionalBinder(binder(), FailureHandlingConfigSupplier.class)
+        OptionalBinder.newOptionalBinder(binder(), FailureHandlingConfiguration.class)
                 .setDefault()
-                .to(DefaultFailureHandlingConfigSupplier.class);
+                .to(DefaultFailureHandlingConfiguration.class);
 
         serviceBinder().addBinding().to(FailureHandlingService.class).in(Scopes.SINGLETON);
     }

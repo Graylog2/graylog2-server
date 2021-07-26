@@ -20,7 +20,7 @@ package org.graylog.failure;
  * This interface was added to decouple failure handling configuration
  * management from the actual configuration consumption.
  */
-public interface FailureHandlingConfigSupplier {
+public interface FailureHandlingConfiguration {
 
     /**
      * @return true if the original behaviour of writing a message, along

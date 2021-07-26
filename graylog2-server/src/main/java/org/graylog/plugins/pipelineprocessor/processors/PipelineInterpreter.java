@@ -31,7 +31,7 @@ import com.google.common.collect.Sets;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog.failure.FailureBatch;
-import org.graylog.failure.FailureHandlingConfigSupplier;
+import org.graylog.failure.FailureHandlingConfiguration;
 import org.graylog.failure.FailureSubmissionService;
 import org.graylog.failure.ProcessingFailure;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
@@ -81,14 +81,14 @@ public class PipelineInterpreter implements MessageProcessor {
     private final MetricRegistry metricRegistry;
     private final ConfigurationStateUpdater stateUpdater;
     private final FailureSubmissionService failureSubmissionService;
-    private final FailureHandlingConfigSupplier failureHandlingConfigSupplier;
+    private final FailureHandlingConfiguration failureHandlingConfiguration;
 
     @Inject
     public PipelineInterpreter(MessageQueueAcknowledger messageQueueAcknowledger,
                                MetricRegistry metricRegistry,
                                ConfigurationStateUpdater stateUpdater,
                                FailureSubmissionService failureSubmissionService,
-                               FailureHandlingConfigSupplier failureHandlingConfigSupplier) {
+                               FailureHandlingConfiguration failureHandlingConfiguration) {
 
         this.messageQueueAcknowledger = messageQueueAcknowledger;
         this.filteredOutMessages = metricRegistry.meter(name(ProcessBufferProcessor.class, "filteredOutMessages"));
@@ -97,7 +97,7 @@ public class PipelineInterpreter implements MessageProcessor {
         this.metricRegistry = metricRegistry;
         this.stateUpdater = stateUpdater;
         this.failureSubmissionService = failureSubmissionService;
-        this.failureHandlingConfigSupplier = failureHandlingConfigSupplier;
+        this.failureHandlingConfiguration = failureHandlingConfiguration;
     }
 
     /**
@@ -188,7 +188,7 @@ public class PipelineInterpreter implements MessageProcessor {
             // Message will be dropped
             return;
         }
-        if (!failureHandlingConfigSupplier.submitProcessingFailures()) {
+        if (!failureHandlingConfiguration.submitProcessingFailures()) {
             // We don't handle processing errors
             return;
         }
@@ -198,7 +198,7 @@ public class PipelineInterpreter implements MessageProcessor {
             return;
         }
 
-        if (!failureHandlingConfigSupplier.writeOriginalMessageWithErrorUponPipelineFailure()) {
+        if (!failureHandlingConfiguration.writeOriginalMessageWithErrorUponPipelineFailure()) {
             message.setFilterOut(true);
         }
         submitFailure(message, processingError);

@@ -23,7 +23,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.eventbus.EventBus;
 import org.graylog.failure.FailureBatch;
-import org.graylog.failure.FailureHandlingConfigSupplier;
+import org.graylog.failure.FailureHandlingConfiguration;
 import org.graylog.failure.FailureSubmissionService;
 import org.graylog.failure.ProcessingFailure;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
@@ -117,7 +117,7 @@ public class PipelineInterpreterTest {
     private final RuleService ruleService = mock(MongoDbRuleService.class);
     private final PipelineService pipelineService = mock(MongoDbPipelineService.class);
     private final FailureSubmissionService failureSubmissionService = mock(FailureSubmissionService.class);
-    private final FailureHandlingConfigSupplier failureHandlingConfigSupplier = mock(FailureHandlingConfigSupplier.class);
+    private final FailureHandlingConfiguration failureHandlingConfiguration = mock(FailureHandlingConfiguration.class);
     private final MessageQueueAcknowledger messageQueueAcknowledger = mock(MessageQueueAcknowledger.class);
 
     @Test
@@ -308,7 +308,7 @@ public class PipelineInterpreterTest {
                 new MetricRegistry(),
                 stateUpdater,
                 failureSubmissionService,
-                failureHandlingConfigSupplier);
+                failureHandlingConfiguration);
     }
 
     @Test
@@ -365,7 +365,7 @@ public class PipelineInterpreterTest {
                 metricRegistry,
                 stateUpdater,
                 mock(FailureSubmissionService.class),
-                mock(FailureHandlingConfigSupplier.class));
+                mock(FailureHandlingConfiguration.class));
 
         interpreter.process(messageInDefaultStream("", ""));
 
@@ -427,8 +427,8 @@ public class PipelineInterpreterTest {
                         null)
         ));
 
-        when(failureHandlingConfigSupplier.submitProcessingFailures()).thenReturn(true);
-        when(failureHandlingConfigSupplier.writeOriginalMessageWithErrorUponPipelineFailure()).thenReturn(true);
+        when(failureHandlingConfiguration.submitProcessingFailures()).thenReturn(true);
+        when(failureHandlingConfiguration.writeOriginalMessageWithErrorUponPipelineFailure()).thenReturn(true);
 
         final PipelineInterpreter interpreter = createPipelineInterpreter(ruleService, pipelineService, FUNCTIONS);
 
@@ -462,8 +462,8 @@ public class PipelineInterpreterTest {
                         null)
         ));
 
-        when(failureHandlingConfigSupplier.submitProcessingFailures()).thenReturn(true);
-        when(failureHandlingConfigSupplier.writeOriginalMessageWithErrorUponPipelineFailure()).thenReturn(true);
+        when(failureHandlingConfiguration.submitProcessingFailures()).thenReturn(true);
+        when(failureHandlingConfiguration.writeOriginalMessageWithErrorUponPipelineFailure()).thenReturn(true);
 
         final PipelineInterpreter interpreter = createPipelineInterpreter(ruleService, pipelineService, FUNCTIONS);
 
@@ -502,8 +502,8 @@ public class PipelineInterpreterTest {
                         null)
         ));
 
-        when(failureHandlingConfigSupplier.submitProcessingFailures()).thenReturn(false);
-        when(failureHandlingConfigSupplier.writeOriginalMessageWithErrorUponPipelineFailure()).thenReturn(true);
+        when(failureHandlingConfiguration.submitProcessingFailures()).thenReturn(false);
+        when(failureHandlingConfiguration.writeOriginalMessageWithErrorUponPipelineFailure()).thenReturn(true);
 
         final PipelineInterpreter interpreter = createPipelineInterpreter(ruleService, pipelineService, FUNCTIONS);
 
@@ -538,8 +538,8 @@ public class PipelineInterpreterTest {
                         null)
         ));
 
-        when(failureHandlingConfigSupplier.submitProcessingFailures()).thenReturn(true);
-        when(failureHandlingConfigSupplier.writeOriginalMessageWithErrorUponPipelineFailure()).thenReturn(false);
+        when(failureHandlingConfiguration.submitProcessingFailures()).thenReturn(true);
+        when(failureHandlingConfiguration.writeOriginalMessageWithErrorUponPipelineFailure()).thenReturn(false);
 
         final PipelineInterpreter interpreter = createPipelineInterpreter(ruleService, pipelineService, FUNCTIONS);
 
@@ -579,8 +579,8 @@ public class PipelineInterpreterTest {
                         null)
         ));
 
-        when(failureHandlingConfigSupplier.submitProcessingFailures()).thenReturn(false);
-        when(failureHandlingConfigSupplier.writeOriginalMessageWithErrorUponPipelineFailure()).thenReturn(false);
+        when(failureHandlingConfiguration.submitProcessingFailures()).thenReturn(false);
+        when(failureHandlingConfiguration.writeOriginalMessageWithErrorUponPipelineFailure()).thenReturn(false);
 
         final PipelineInterpreter interpreter = createPipelineInterpreter(ruleService, pipelineService, FUNCTIONS);
 
