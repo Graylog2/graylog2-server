@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
-import org.graylog2.inputs.random.generators.FakeEventMessageGenerator;
+import org.graylog2.inputs.random.generators.FakeGIMMessageGenerator;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
@@ -31,19 +31,19 @@ import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.inputs.transports.GeneratorTransport;
 import org.graylog2.plugin.inputs.transports.Transport;
 
-public class RandomEventMessageTransport extends RandomMessageTransport {
+public class RandomGIMMessageTransport extends RandomMessageTransport {
     @AssistedInject
-    public RandomEventMessageTransport(@Assisted  Configuration configuration, EventBus eventBus, ObjectMapper objectMapper) {
+    public RandomGIMMessageTransport(@Assisted  Configuration configuration, EventBus eventBus, ObjectMapper objectMapper) {
         super(configuration, eventBus, objectMapper);
 
-        this.generator = new FakeEventMessageGenerator(configuration);
+        this.generator = new FakeGIMMessageGenerator(configuration);
     }
 
 
     @FactoryClass
-    public interface Factory extends Transport.Factory<RandomEventMessageTransport> {
+    public interface Factory extends Transport.Factory<RandomGIMMessageTransport> {
         @Override
-        RandomEventMessageTransport create(Configuration configuration);
+        RandomGIMMessageTransport create(Configuration configuration);
 
         @Override
         Config getConfig();

@@ -28,7 +28,7 @@ import java.util.Random;
 
 import static org.graylog2.inputs.random.generators.states.Country.COUNTRIES;
 
-public class FakeEventMessageGenerator extends FakeMessageGenerator {
+public class FakeGIMMessageGenerator extends FakeMessageGenerator {
     private static final ImmutableList<Category> CATEGORIES = ImmutableList.of(
             new Category("100000", GeneratorState.CategoryName.AUTHENTICATION, "logon", "logon", 8),
             new Category("100001", GeneratorState.CategoryName.AUTHENTICATION, "logon", "logon success", 10),
@@ -76,7 +76,7 @@ public class FakeEventMessageGenerator extends FakeMessageGenerator {
             new EventSource("thunderbrid", 2)
     );
 
-    public FakeEventMessageGenerator(Configuration configuration) {
+    public FakeGIMMessageGenerator(Configuration configuration) {
         super(configuration);
     }
 

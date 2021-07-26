@@ -19,7 +19,7 @@ package org.graylog2.inputs.codecs;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.assistedinject.Assisted;
 import org.graylog2.plugin.configuration.Configuration;
-import org.graylog2.inputs.random.generators.FakeEventMessageGenerator;
+import org.graylog2.inputs.random.generators.FakeGIMMessageGenerator;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.inputs.annotations.Codec;
@@ -36,13 +36,13 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.io.IOException;
 
-@Codec(name = "random-event-msg", displayName = "Random Event Message")
-public class RandomEventMessageCodec extends AbstractCodec {
-    private static final Logger log = LoggerFactory.getLogger(RandomEventMessageCodec.class);
+@Codec(name = "random-event-msg", displayName = "Random GIM Message")
+public class RandomGIMMessageCodec extends AbstractCodec {
+    private static final Logger log = LoggerFactory.getLogger(RandomGIMMessageCodec.class);
     private final ObjectMapper objectMapper;
 
     @Inject
-    public RandomEventMessageCodec(@Assisted Configuration configuration, ObjectMapper objectMapper) {
+    public RandomGIMMessageCodec(@Assisted Configuration configuration, ObjectMapper objectMapper) {
         super(configuration);
         this.objectMapper = objectMapper;
     }
@@ -56,10 +56,10 @@ public class RandomEventMessageCodec extends AbstractCodec {
             return null;
         }
         try {
-            final FakeEventMessageGenerator.GeneratorState state = objectMapper.readValue(rawMessage.getPayload(), FakeEventMessageGenerator.GeneratorState.class);
-            return FakeEventMessageGenerator.generateMessage(state);
+            final FakeGIMMessageGenerator.GeneratorState state = objectMapper.readValue(rawMessage.getPayload(), FakeGIMMessageGenerator.GeneratorState.class);
+            return FakeGIMMessageGenerator.generateMessage(state);
         } catch (IOException e) {
-            log.error("Cannot decode message to class FakeEventMessageGenerator.GeneratorState", e);
+            log.error("Cannot decode message to class FakeGIMMessageGenerator.GeneratorState", e);
         }
         return null;
     }
@@ -71,9 +71,9 @@ public class RandomEventMessageCodec extends AbstractCodec {
     }
 
     @FactoryClass
-    public interface Factory extends AbstractCodec.Factory<RandomEventMessageCodec> {
+    public interface Factory extends AbstractCodec.Factory<RandomGIMMessageCodec> {
         @Override
-        RandomEventMessageCodec create(Configuration configuration);
+        RandomGIMMessageCodec create(Configuration configuration);
 
         @Override
         RandomHttpMessageCodec.Config getConfig();
@@ -93,7 +93,7 @@ public class RandomEventMessageCodec extends AbstractCodec {
     public static class Descriptor extends AbstractCodec.Descriptor {
         @Inject
         public Descriptor() {
-            super(RandomEventMessageCodec.class.getAnnotation(Codec.class).displayName());
+            super(RandomGIMMessageCodec.class.getAnnotation(Codec.class).displayName());
         }
     }
 }
