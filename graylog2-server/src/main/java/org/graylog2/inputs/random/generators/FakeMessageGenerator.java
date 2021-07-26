@@ -69,11 +69,11 @@ public abstract class FakeMessageGenerator {
         }
     }
 
-    protected static abstract class Weighted {
+    public static abstract class Weighted {
 
         protected final int weight;
 
-        protected Weighted(int weight) {
+        public Weighted(int weight) {
             if (weight <= 0 || weight > MAX_WEIGHT) {
                 throw new RuntimeException("Invalid resource weight: " + weight);
             }
