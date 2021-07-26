@@ -38,12 +38,22 @@ public class ViewSummaryService extends PaginatedDbService<ViewSummaryDTO> {
     }
 
     private PaginatedList<ViewSummaryDTO> searchPaginated(DBQuery.Query query,
+                                                          Predicate<ViewSummaryDTO> filter,
+                                                          String order,
+                                                          String sortField,
+                                                          int page,
+                                                          int perPage) {
+        return findPaginatedWithQueryFilterAndSort(query, filter, getSortBuilder(order, sortField), page, perPage);
+    }
+
+    private PaginatedList<ViewSummaryDTO> searchPaginatedWithGrandTotal(DBQuery.Query query,
                                                    Predicate<ViewSummaryDTO> filter,
                                                    String order,
                                                    String sortField,
+                                                   DBQuery.Query grandTotalQuery,
                                                    int page,
                                                    int perPage) {
-        return findPaginatedWithQueryFilterAndSort(query, filter, getSortBuilder(order, sortField), page, perPage);
+        return findPaginatedWithQueryFilterAndSortWithGrandTotal(query, filter, getSortBuilder(order, sortField), grandTotalQuery, page, perPage);
     }
 
     public PaginatedList<ViewSummaryDTO> searchPaginatedByType(ViewDTO.Type type,
@@ -54,7 +64,7 @@ public class ViewSummaryService extends PaginatedDbService<ViewSummaryDTO> {
                                                         int page,
                                                         int perPage) {
         checkNotNull(sortField);
-        return searchPaginated(
+        return searchPaginatedWithGrandTotal(
                 DBQuery.and(
                         DBQuery.or(DBQuery.is(ViewDTO.FIELD_TYPE, type), DBQuery.notExists(ViewDTO.FIELD_TYPE)),
                         query.toDBQuery()
@@ -62,6 +72,7 @@ public class ViewSummaryService extends PaginatedDbService<ViewSummaryDTO> {
                 filter,
                 order,
                 sortField,
+                DBQuery.or(DBQuery.is(ViewDTO.FIELD_TYPE, type), DBQuery.notExists(ViewDTO.FIELD_TYPE)),
                 page,
                 perPage
         );
