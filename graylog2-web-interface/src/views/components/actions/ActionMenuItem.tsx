@@ -78,8 +78,7 @@ const ActionMenuItem = ({ action, handlerArgs, setOverflowingComponents, overflo
   const { field } = handlerArgs;
 
   return (
-    <StyledMenuItem key={`${type}-action-${action.type}`}
-                    disabled={actionDisabled}
+    <StyledMenuItem disabled={actionDisabled}
                     eventKey={{ action: type, field }}
                     onSelect={onSelect}
                     {...linkProps}>

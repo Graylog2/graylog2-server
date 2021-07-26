@@ -110,6 +110,7 @@ const Action = ({ type, handlerArgs, menuContainer, element: Element, children }
         <MenuItem header>Actions</MenuItem>
         {internalActions.map((action) => (
           <ActionMenuItem action={action}
+                          key={`${type}-action-${action.type}`}
                           handlerArgs={handlerArgs}
                           setOverflowingComponents={setOverflowingComponents}
                           overflowingComponents={overflowingComponents}
@@ -122,6 +123,7 @@ const Action = ({ type, handlerArgs, menuContainer, element: Element, children }
             <MenuItem divider />
             {externalActions.map((action) => (
               <ActionMenuItem action={action}
+                              key={`${type}-action-${action.type}`}
                               handlerArgs={handlerArgs}
                               setOverflowingComponents={setOverflowingComponents}
                               overflowingComponents={overflowingComponents}

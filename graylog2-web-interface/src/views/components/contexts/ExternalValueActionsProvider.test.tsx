@@ -18,11 +18,10 @@ import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import { createSimpleExternalValueAction } from 'fixtures/externalValueActions';
+import asMock from 'helpers/mocking/AsMock';
 
 import ExternalValueActionsProvider from './ExternalValueActionsProvider';
 import ExternalValueActionsContext from './ExternalValueActionsContext';
-
-import asMock from '../../../../test/helpers/mocking/AsMock';
 
 jest.mock('graylog-web-plugin/plugin', () => ({
   PluginStore: {
