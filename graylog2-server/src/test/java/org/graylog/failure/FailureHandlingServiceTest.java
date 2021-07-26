@@ -211,7 +211,7 @@ public class FailureHandlingServiceTest {
     public void acknowledgesProcessingErrors() throws InterruptedException {
         // given
         final FailureHandler fallbackFailureHandler = enabledFailureHandler();
-        final ProcessingFailure processingFailure = createProcessingFailure();
+        final ProcessingFailure processingFailure = createProcessingFailure(true);
         final FailureBatch processingFailureBatch = processingFailureBatch(processingFailure);
         final FailureHandler customFailureHandler1 = enabledFailureHandler(processingFailureBatch);
 
@@ -229,6 +229,30 @@ public class FailureHandlingServiceTest {
 
         // then
         verify(acknowledger, times(1)).acknowledge((List<Message>) argThat(argument -> !((List)argument).isEmpty()));
+    }
+
+    @Test
+    public void doesNotAcknowledgeProcessingErrorsThatAreFlagged() throws InterruptedException {
+        // given
+        final FailureHandler fallbackFailureHandler = enabledFailureHandler();
+        final ProcessingFailure processingFailure = createProcessingFailure(false);
+        final FailureBatch processingFailureBatch = processingFailureBatch(processingFailure);
+        final FailureHandler customFailureHandler1 = enabledFailureHandler(processingFailureBatch);
+
+        final FailureHandlingService underTest = new FailureHandlingService(fallbackFailureHandler,
+                ImmutableSet.of(customFailureHandler1), failureSubmissionService, configuration, acknowledger);
+
+        // when
+        underTest.startAsync();
+        underTest.awaitRunning();
+
+        failureSubmissionService.submitBlocking(processingFailureBatch);
+
+        Awaitility.waitAtMost(Duration.ONE_SECOND)
+                .until(() -> failureSubmissionService.queueSize() == 0);
+
+        // then
+        verify(acknowledger, times(1)).acknowledge((List<Message>) argThat(argument -> ((List)argument).isEmpty()));
     }
 
     @Test
@@ -261,9 +285,9 @@ public class FailureHandlingServiceTest {
         );
     }
 
-    private ProcessingFailure createProcessingFailure() {
+    private ProcessingFailure createProcessingFailure(boolean withAcknowledgement) {
         return new ProcessingFailure("failed-id", "pipeline", "error error", DateTime.now(DateTimeZone.UTC),
-                new Message(ImmutableMap.of("_id", "1234")));
+                new Message(ImmutableMap.of("_id", "1234")), withAcknowledgement);
     }
 
     private FailureBatch indexingFailureBatch(IndexingFailure indexingFailure) {

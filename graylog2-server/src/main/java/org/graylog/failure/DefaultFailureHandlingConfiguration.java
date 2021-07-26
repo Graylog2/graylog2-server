@@ -20,10 +20,10 @@ package org.graylog.failure;
  * The default set of configuration values, which leaves
  * the original failure handling behaviour intact.
  */
-public class DefaultFailureHandlingConfigSupplier implements FailureHandlingConfigSupplier {
+public class DefaultFailureHandlingConfiguration implements FailureHandlingConfiguration {
 
     @Override
-    public boolean writeOriginalMessageWithErrorUponPipelineFailure() {
+    public boolean keepFailedMessageDuplicate() {
         return true;
     }
 

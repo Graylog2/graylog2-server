@@ -180,7 +180,7 @@ public class FailureSubmissionServiceTest {
     private ProcessingFailure createProcessingFailure() {
         return new ProcessingFailure(
                 UUID.randomUUID().toString(), "error-type", "error-message",
-                DateTime.now(DateTimeZone.UTC), null
-        );
+                DateTime.now(DateTimeZone.UTC), null,
+                true);
     }
 }

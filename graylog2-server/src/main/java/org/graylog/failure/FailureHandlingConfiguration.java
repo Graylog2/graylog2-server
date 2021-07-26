@@ -20,15 +20,16 @@ package org.graylog.failure;
  * This interface was added to decouple failure handling configuration
  * management from the actual configuration consumption.
  */
-public interface FailureHandlingConfigSupplier {
+public interface FailureHandlingConfiguration {
 
     /**
-     * @return true if the original behaviour of writing a message, along
-     * with its processing error string, in ES should be preserved.
+     * @return true if messages with failures should also be written
+     * to their regular index along with a processing error message
+     * in the {@link org.graylog2.plugin.Message#FIELD_GL2_PROCESSING_ERROR} field.
      *
      * See {@link org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter#handleFailedMessage}
      */
-    boolean writeOriginalMessageWithErrorUponPipelineFailure();
+    boolean keepFailedMessageDuplicate();
 
     /**
      * @return true if processing failures (i.e. pipeline interpreter exceptions,

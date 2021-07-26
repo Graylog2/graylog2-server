@@ -23,7 +23,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.eventbus.EventBus;
 import org.graylog.failure.FailureBatch;
-import org.graylog.failure.FailureHandlingConfigSupplier;
+import org.graylog.failure.FailureHandlingConfiguration;
 import org.graylog.failure.FailureSubmissionService;
 import org.graylog.failure.ProcessingFailure;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
@@ -117,7 +117,7 @@ public class PipelineInterpreterTest {
     private final RuleService ruleService = mock(MongoDbRuleService.class);
     private final PipelineService pipelineService = mock(MongoDbPipelineService.class);
     private final FailureSubmissionService failureSubmissionService = mock(FailureSubmissionService.class);
-    private final FailureHandlingConfigSupplier failureHandlingConfigSupplier = mock(FailureHandlingConfigSupplier.class);
+    private final FailureHandlingConfiguration failureHandlingConfiguration = mock(FailureHandlingConfiguration.class);
     private final MessageQueueAcknowledger messageQueueAcknowledger = mock(MessageQueueAcknowledger.class);
 
     @Test
@@ -308,7 +308,7 @@ public class PipelineInterpreterTest {
                 new MetricRegistry(),
                 stateUpdater,
                 failureSubmissionService,
-                failureHandlingConfigSupplier);
+                failureHandlingConfiguration);
     }
 
     @Test
@@ -365,7 +365,7 @@ public class PipelineInterpreterTest {
                 metricRegistry,
                 stateUpdater,
                 mock(FailureSubmissionService.class),
-                mock(FailureHandlingConfigSupplier.class));
+                mock(FailureHandlingConfiguration.class));
 
         interpreter.process(messageInDefaultStream("", ""));
 
@@ -427,8 +427,8 @@ public class PipelineInterpreterTest {
                         null)
         ));
 
-        when(failureHandlingConfigSupplier.submitProcessingFailures()).thenReturn(true);
-        when(failureHandlingConfigSupplier.writeOriginalMessageWithErrorUponPipelineFailure()).thenReturn(true);
+        when(failureHandlingConfiguration.submitProcessingFailures()).thenReturn(true);
+        when(failureHandlingConfiguration.keepFailedMessageDuplicate()).thenReturn(true);
 
         final PipelineInterpreter interpreter = createPipelineInterpreter(ruleService, pipelineService, FUNCTIONS);
 
@@ -448,7 +448,7 @@ public class PipelineInterpreterTest {
     }
 
     @Test
-    public void process_failureHandledAndMessageAcknowledgedLaterAndNotFilteredOut_whenMessageNotDroppedAndConfiguredToHandleAndConfiguredNotToFilterOut() throws Exception {
+    public void process_failureHandledAndMessageAcknowledgedLaterAndNotFilteredOut_whenMessageNotDroppedAndConfiguredToHandleAndConfiguredToKeepDuplicate() throws Exception {
         // given
         when(ruleService.loadAll()).thenReturn(ImmutableList.of(RULE_WITH_RUNTIME_EXCEPTION));
 
@@ -462,8 +462,8 @@ public class PipelineInterpreterTest {
                         null)
         ));
 
-        when(failureHandlingConfigSupplier.submitProcessingFailures()).thenReturn(true);
-        when(failureHandlingConfigSupplier.writeOriginalMessageWithErrorUponPipelineFailure()).thenReturn(true);
+        when(failureHandlingConfiguration.submitProcessingFailures()).thenReturn(true);
+        when(failureHandlingConfiguration.keepFailedMessageDuplicate()).thenReturn(true);
 
         final PipelineInterpreter interpreter = createPipelineInterpreter(ruleService, pipelineService, FUNCTIONS);
 
@@ -482,13 +482,14 @@ public class PipelineInterpreterTest {
         verify(failureSubmissionService).submitBlocking(eq(FailureBatch.processingFailureBatch(
                 new ProcessingFailure(processedMessage.getId(), "pipeline-processor",
                         processedMessage.getField(FIELD_GL2_PROCESSING_ERROR).toString(),
-                        processedMessage.getTimestamp(), processedMessage))));
+                        processedMessage.getTimestamp(), processedMessage, false))));
 
+        // this only checks for calls directly made from the PipelineInterpreter
         verifyNoInteractions(messageQueueAcknowledger);
     }
 
     @Test
-    public void process_failureNotHandledAndMessageAcknowledgedLaterAndNotFilteredOut_whenMessageNotDroppedAndConfiguredNotToHandleAndConfiguredNotToFilterOut() throws Exception {
+    public void process_failureNotHandledAndMessageAcknowledgedLaterAndNotFilteredOut_whenMessageNotDroppedAndConfiguredNotToHandle() throws Exception {
         // given
         when(ruleService.loadAll()).thenReturn(ImmutableList.of(RULE_WITH_RUNTIME_EXCEPTION));
 
@@ -502,8 +503,7 @@ public class PipelineInterpreterTest {
                         null)
         ));
 
-        when(failureHandlingConfigSupplier.submitProcessingFailures()).thenReturn(false);
-        when(failureHandlingConfigSupplier.writeOriginalMessageWithErrorUponPipelineFailure()).thenReturn(true);
+        when(failureHandlingConfiguration.submitProcessingFailures()).thenReturn(false);
 
         final PipelineInterpreter interpreter = createPipelineInterpreter(ruleService, pipelineService, FUNCTIONS);
 
@@ -520,11 +520,12 @@ public class PipelineInterpreterTest {
                 });
 
         verifyNoInteractions(failureSubmissionService);
+        // this only checks for calls directly made from the PipelineInterpreter
         verifyNoInteractions(messageQueueAcknowledger);
     }
 
     @Test
-    public void process_failureHandledAndMessageAcknowledgedLaterAndFilteredOut_whenMessageNotDroppedAndConfiguredToHandleAndConfiguredToFilterOut() throws Exception {
+    public void process_failureHandledAndMessageAcknowledgedLaterAndFilteredOut_whenMessageNotDroppedAndConfiguredToHandleAndConfiguredToKeepNoDuplicate() throws Exception {
         // given
         when(ruleService.loadAll()).thenReturn(ImmutableList.of(RULE_WITH_RUNTIME_EXCEPTION));
 
@@ -538,8 +539,8 @@ public class PipelineInterpreterTest {
                         null)
         ));
 
-        when(failureHandlingConfigSupplier.submitProcessingFailures()).thenReturn(true);
-        when(failureHandlingConfigSupplier.writeOriginalMessageWithErrorUponPipelineFailure()).thenReturn(false);
+        when(failureHandlingConfiguration.submitProcessingFailures()).thenReturn(true);
+        when(failureHandlingConfiguration.keepFailedMessageDuplicate()).thenReturn(false);
 
         final PipelineInterpreter interpreter = createPipelineInterpreter(ruleService, pipelineService, FUNCTIONS);
 
@@ -558,47 +559,12 @@ public class PipelineInterpreterTest {
         verify(failureSubmissionService).submitBlocking(eq(FailureBatch.processingFailureBatch(
                 new ProcessingFailure(processedMessage.getId(), "pipeline-processor",
                         processedMessage.getField(FIELD_GL2_PROCESSING_ERROR).toString(),
-                        processedMessage.getTimestamp(), processedMessage))));
+                        processedMessage.getTimestamp(), processedMessage, true))));
 
+        // this only checks for calls directly made from the PipelineInterpreter
         verifyNoInteractions(messageQueueAcknowledger);
     }
 
-
-    @Test
-    public void process_failureNotHandledAndMessageAcknowledgedAndFilteredOut_whenMessageNotDroppedAndConfiguredNotToHandleAndConfiguredToFilterOut() throws Exception {
-        // given
-        when(ruleService.loadAll()).thenReturn(ImmutableList.of(RULE_WITH_RUNTIME_EXCEPTION));
-
-        when(pipelineService.loadAll()).thenReturn(Collections.singleton(
-                PipelineDao.create("p1", "title", "description",
-                        "pipeline \"pipeline\"\n" +
-                                "stage 0 match all\n" +
-                                "    rule \"problematic_rule\";\n" +
-                                "end\n",
-                        Tools.nowUTC(),
-                        null)
-        ));
-
-        when(failureHandlingConfigSupplier.submitProcessingFailures()).thenReturn(false);
-        when(failureHandlingConfigSupplier.writeOriginalMessageWithErrorUponPipelineFailure()).thenReturn(false);
-
-        final PipelineInterpreter interpreter = createPipelineInterpreter(ruleService, pipelineService, FUNCTIONS);
-
-        // when
-        final List<Message> processed = extractMessagesFromMessageCollection(interpreter.process(messageWithNumField()));
-        final Message processedMessage = processed.get(0);
-
-        // then
-        assertThat(ImmutableList.copyOf(processed))
-                .hasSize(1)
-                .hasOnlyOneElementSatisfying(m -> {
-                    assertThat(m.hasField(FIELD_GL2_PROCESSING_ERROR)).isTrue();
-                    assertThat(processedMessage.getFilterOut()).isTrue();
-                });
-
-        verifyNoInteractions(failureSubmissionService);
-        verify(messageQueueAcknowledger).acknowledge(processedMessage);
-    }
 
     private Message messageWithNumField() {
         final Message msg = messageInDefaultStream("message", "test");
