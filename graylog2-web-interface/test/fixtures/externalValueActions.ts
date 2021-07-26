@@ -15,17 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { ExternalValueActionHttpGet } from 'views/types/externalValueActions';
+// eslint-disable-next-line import/prefer-default-export
+import { ActionDefinition } from 'views/components/actions/ActionHandler';
 
 // eslint-disable-next-line import/prefer-default-export
-export const createSimpleExternalValueAction = (index = 1, overrides: Partial<ExternalValueActionHttpGet> = {}): ExternalValueActionHttpGet => ({
-  id: `external-action-${index}`,
-  type: 'http_get',
+export const createSimpleExternalValueAction = (overrides: Partial<ActionDefinition> = {}): ActionDefinition => ({
+  type: 'http-get',
   title: 'Pivot to example.org',
-  fields: ['field1'],
+  isHidden: ({ field }) => !['field1'].includes(field),
   linkTarget: () => 'the-link',
-  options: {
-    action: 'the-action',
-  },
+  resetFocus: false,
   ...overrides,
 });

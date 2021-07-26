@@ -42,7 +42,6 @@ import { TimeRange } from 'views/logic/queries/Query';
 import { CopyWidgetToDashboardHook } from 'views/logic/views/CopyWidgetToDashboard';
 
 import type { MessageEventTypes } from './types/messageEventTypes';
-import type { ExternalValueActions } from './types/externalValueActions';
 
 interface EditWidgetComponentProps<Config extends WidgetConfig = WidgetConfig> {
   children: React.ReactNode,
@@ -189,7 +188,7 @@ declare module 'graylog-web-plugin/plugin' {
   export interface PluginExports {
     creators?: Array<Creator>;
     enterpriseWidgets?: Array<WidgetExport>;
-    externalValueActions?: Array<ExternalValueActions>;
+    externalValueActions?: Array<Array<ActionDefinition>>;
     fieldActions?: Array<ActionDefinition>;
     messageEventTypes?: Array<MessageEventTypes>;
     searchTypes?: Array<SearchType>;

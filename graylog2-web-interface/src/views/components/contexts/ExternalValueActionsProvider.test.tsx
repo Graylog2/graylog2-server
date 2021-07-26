@@ -32,7 +32,7 @@ jest.mock('graylog-web-plugin/plugin', () => ({
 
 const simpleValueAction = createSimpleExternalValueAction();
 const simpleContextValue = {
-  externalValueActions: { [simpleValueAction.id]: simpleValueAction },
+  externalValueActions: [simpleValueAction],
 };
 
 describe('ExternalValueActionsProvider', () => {
@@ -52,7 +52,7 @@ describe('ExternalValueActionsProvider', () => {
 
   it('provides external value actions from plugin store', () => {
     asMock(PluginStore.exports).mockImplementation((type) => ({
-      externalValueActions: [{ [simpleValueAction.id]: simpleValueAction }],
+      externalValueActions: [[simpleValueAction]],
     }[type]));
 
     let contextValue;
@@ -65,12 +65,12 @@ describe('ExternalValueActionsProvider', () => {
   });
 
   it('provides correct data, when plugin store contains multiple entries for external value actions', () => {
-    const simpleValueAction2 = createSimpleExternalValueAction(2);
+    const simpleValueAction2 = createSimpleExternalValueAction({ title: 'External Value Action 2' });
 
     asMock(PluginStore.exports).mockImplementation((type) => ({
       externalValueActions: [
-        { [simpleValueAction.id]: simpleValueAction },
-        { [simpleValueAction2.id]: simpleValueAction2 },
+        [simpleValueAction],
+        [simpleValueAction2],
       ],
     }[type]));
 
@@ -81,35 +81,9 @@ describe('ExternalValueActionsProvider', () => {
     });
 
     const expectedContextValue = {
-      externalValueActions: { [simpleValueAction.id]: simpleValueAction, [simpleValueAction2.id]: simpleValueAction2 },
+      externalValueActions: [simpleValueAction, simpleValueAction2],
     };
 
     expect(contextValue.externalValueActions).toStrictEqual(expectedContextValue.externalValueActions);
-  });
-
-  it('provides external value actions for a field', () => {
-    const simpleValueAction2 = createSimpleExternalValueAction(2, { fields: ['field2'] });
-
-    asMock(PluginStore.exports).mockImplementation((type) => ({
-      externalValueActions: [
-        { [simpleValueAction.id]: simpleValueAction },
-        { [simpleValueAction2.id]: simpleValueAction2 },
-      ],
-    }[type]));
-
-    let contextValue;
-
-    renderSUT((value) => {
-      contextValue = value;
-    });
-
-    const expectedAction = {
-      title: simpleValueAction2.title,
-      resetFocus: false,
-      type: 'value',
-      linkTarget: expect.any(Function),
-    };
-
-    expect(contextValue.getActionsForField('field2')).toEqual([expectedAction]);
   });
 });

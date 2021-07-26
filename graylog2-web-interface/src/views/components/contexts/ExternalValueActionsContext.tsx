@@ -18,11 +18,9 @@ import * as React from 'react';
 
 import type { ActionDefinition } from 'views/components/actions/ActionHandler';
 import { singleton } from 'views/logic/singleton';
-import { ExternalValueActions } from 'views/types/externalValueActions';
 
 export type ExternalValueActionsType = {
-  externalValueActions: ExternalValueActions | undefined,
-  getActionsForField: (fieldName: string) => Array<ActionDefinition>,
+  externalValueActions: Array<ActionDefinition> | undefined,
 }
 
 const ExternalValueActionsContext = React.createContext<ExternalValueActionsType | undefined>(undefined);

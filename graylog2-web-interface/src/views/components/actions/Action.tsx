@@ -58,21 +58,29 @@ const getInternalActionsPluginKey = (type: Props['type']) => {
   }
 };
 
-const useInternalActions = (type: Props['type'], handlerArgs: Props['handlerArgs']) => {
-  const actionsPluginKey = getInternalActionsPluginKey(type);
-  const internalActions = usePluginEntities(actionsPluginKey) ?? [];
-
-  return internalActions.filter((action: ActionDefinition) => {
+const filterVisibleActions = (actions: Array<ActionDefinition> | undefined, handlerArgs: Props['handlerArgs']) => {
+  return actions?.filter((action: ActionDefinition) => {
     const { isHidden = () => false } = action;
 
     return !isHidden(handlerArgs);
   });
 };
 
-const useExternalActions = (type: Props['type'], handlerArgs: Props['handlerArgs']) => {
-  const externalValueActions = useContext(ExternalValueActionsContext);
+const useInternalActions = (type: Props['type'], handlerArgs: Props['handlerArgs']) => {
+  const actionsPluginKey = getInternalActionsPluginKey(type);
+  const internalActions = usePluginEntities(actionsPluginKey) ?? [];
 
-  return type === 'value' ? externalValueActions?.getActionsForField(handlerArgs.field) : undefined;
+  return filterVisibleActions(internalActions, handlerArgs);
+};
+
+const useExternalActions = (type: Props['type'], handlerArgs: Props['handlerArgs']) => {
+  const { externalValueActions } = useContext(ExternalValueActionsContext) ?? {};
+
+  if (type !== 'value') {
+    return undefined;
+  }
+
+  return filterVisibleActions(externalValueActions, handlerArgs);
 };
 
 const Action = ({ type, handlerArgs, menuContainer, element: Element, children }: Props) => {
