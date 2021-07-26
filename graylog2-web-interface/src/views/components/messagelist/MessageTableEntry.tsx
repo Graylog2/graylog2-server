@@ -61,9 +61,11 @@ const StyledSummaryRow = styled.tr<{ category: ColorVariants }>(({ theme, catego
   const color = getSummaryColor(theme, category);
 
   return `
-    &.message-row td {
-      color: ${color};
-     }
+    && {
+      &.message-row td {
+        color: ${color};
+      }
+    }
   `;
 });
 
