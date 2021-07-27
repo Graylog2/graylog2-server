@@ -206,7 +206,10 @@ public class PipelineInterpreter implements MessageProcessor {
         failedMessages.mark();
     }
 
-    private void submitFailure(Message message, String error) {
+    private void submitFailure(Message failedMessage, String error) {
+        final Message message = new Message(failedMessage);
+        message.removeField(Message.FIELD_GL2_PROCESSING_ERROR);
+
         try {
             // If we store the regular message, the acknowledgement happens in the output path
             boolean needsAcknowledgement = !failureHandlingConfiguration.keepFailedMessageDuplicate();

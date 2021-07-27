@@ -328,6 +328,21 @@ public class Message implements Messages, Indexable {
         addFields(newFields);
     }
 
+    // copy constructor
+    public Message(Message message) {
+        message.fields.forEach(this::addField);
+
+        indexSets = message.indexSets;
+        streams = message.streams;
+        sourceInputId = message.sourceInputId;
+        messageQueueId = message.messageQueueId;
+        filterOut = message.filterOut;
+        receiveTime = message.receiveTime;
+        processingTime = message.processingTime;
+        recordings = message.recordings;
+        sizeCounter = message.sizeCounter;
+    }
+
     public boolean isComplete() {
         for (final String key : REQUIRED_FIELDS) {
             final Object field = getField(key);
@@ -362,6 +377,7 @@ public class Message implements Messages, Indexable {
         return getFieldAs(String.class, FIELD_ID);
     }
 
+    @Override
     public String getMessageId() {
         return getFieldAs(String.class, FIELD_GL2_MESSAGE_ID);
     }
