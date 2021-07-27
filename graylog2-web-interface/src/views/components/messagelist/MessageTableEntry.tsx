@@ -35,7 +35,6 @@ import { colorVariants, ColorVariants } from 'theme/colors';
 import MessageDetail from './MessageDetail';
 import DecoratedValue from './decoration/DecoratedValue';
 import CustomHighlighting from './CustomHighlighting';
-import style from './MessageTableEntry.css';
 import type { Message } from './Types';
 
 import TypeSpecificValue from '../TypeSpecificValue';
@@ -49,6 +48,72 @@ type InputsStoreState = {
   inputs: Array<Input>;
 };
 
+const TableBody = styled.tbody<{ expanded?: boolean, highlighted?: boolean }>(({ expanded, highlighted, theme }) => `
+  && {
+    border-top: 0;
+  
+    ${expanded ? `
+      border-left: 7px solid ${theme.colors.variant.light.info};
+    ` : ''}
+    
+    ${highlighted ? `
+      border-left: 7px solid ${theme.colors.variant.light.success};
+    ` : ''}
+  }
+`);
+
+const FieldsRow = styled.tr(({ theme }) => `
+  cursor: pointer;
+  
+  td {
+    min-width: 50px;
+    word-break: break-word;
+  }
+
+  time {
+    font-size: ${theme.fonts.size.body};
+  }
+`);
+
+const MessageRow = styled.tr(({ theme }) => `
+  && {
+    margin-bottom: 5px;
+    cursor: pointer;
+    // display: table-row;
+  
+    td {
+      border-top: 0;
+      padding-top: 0;
+      padding-bottom: 5px;
+      font-family: ${theme.fonts.family.monospace};
+      color: ${theme.colors.variant.dark.info};
+    }
+  }
+`);
+
+const MessageWrapper = styled.div`
+  line-height: 1.5em;
+  white-space: pre-line;
+  max-height: 6em; /* show 4 lines: line-height * 4 */
+  overflow: hidden;
+`;
+
+const MessageDetailRow = styled.tr`
+  td {
+    padding-top: 5px;
+    border-top: 0;
+  }
+
+  .row {
+      margin-right: 0;
+    }
+  
+    div[class*="col-"] {
+      padding-right: 0;
+    }
+  }
+`;
+
 const getSummaryColor = (theme: DefaultTheme, category: ColorVariants) => {
   if (colorVariants.includes(category)) {
     return theme.colors.variant.darker[category];
@@ -57,7 +122,7 @@ const getSummaryColor = (theme: DefaultTheme, category: ColorVariants) => {
   return theme.colors.variant.darker.info;
 };
 
-const StyledSummaryRow = styled.tr<{ category: ColorVariants }>(({ theme, category }) => {
+const StyledSummaryRow = styled(MessageRow)<{ category: ColorVariants }>(({ theme, category }) => {
   const color = getSummaryColor(theme, category);
 
   return `
@@ -156,24 +221,14 @@ const MessageTableEntry = ({
 
   const colSpanFixup = selectedFields.size + 1;
 
-  let classes = 'message-group';
-
-  if (expanded) {
-    classes += ' message-group-toggled';
-  }
-
-  if (message.id === highlightMessage) {
-    classes += ' message-highlight';
-  }
-
   return (
-    <tbody className={classes}>
-      <tr className="fields-row" onClick={_toggleDetail}>
+    <TableBody expanded={expanded} highlighted={message.id === highlightMessage}>
+      <FieldsRow onClick={_toggleDetail}>
         {selectedFields.toArray().map((selectedFieldName, idx) => {
           const type = fieldType(selectedFieldName, message, fields);
 
           return (
-            <td className={style.fieldsRowField} key={selectedFieldName}>
+            <td key={selectedFieldName}>
               {_renderStrong(
                 <CustomHighlighting field={selectedFieldName} value={message.fields[selectedFieldName]}>
                   <TypeSpecificValue value={message.fields[selectedFieldName]}
@@ -186,32 +241,32 @@ const MessageTableEntry = ({
             </td>
           );
         })}
-      </tr>
+      </FieldsRow>
 
       {showMessageRow && (
-        <tr className="message-row" onClick={_toggleDetail}>
+        <MessageRow onClick={_toggleDetail}>
           <td colSpan={colSpanFixup}>
-            <div className="message-wrapper">
+            <MessageWrapper>
               <CustomHighlighting field="message" value={message.fields[MESSAGE_FIELD]}>
                 <TypeSpecificValue field="message" value={message.fields[MESSAGE_FIELD]} type={fieldType(MESSAGE_FIELD, message, fields)} render={DecoratedValue} />
               </CustomHighlighting>
-            </div>
+            </MessageWrapper>
           </td>
-        </tr>
+        </MessageRow>
       )}
 
       {!!messageSummary && (
-        <StyledSummaryRow className="message-row" onClick={_toggleDetail} title={messageSummary.template} category={messageSummary.category}>
+        <StyledSummaryRow onClick={_toggleDetail} title={messageSummary.template} category={messageSummary.category}>
           <td colSpan={colSpanFixup}>
-            <div className="message-wrapper">
+            <MessageWrapper>
               {messageSummary.summary}
-            </div>
+            </MessageWrapper>
           </td>
         </StyledSummaryRow>
       )}
 
       {expanded && (
-        <tr className="message-detail-row" style={{ display: 'table-row' }}>
+        <MessageDetailRow>
           <td colSpan={colSpanFixup}>
             {/* @ts-ignore */}
             <ConnectedMessageDetail message={message}
@@ -219,9 +274,9 @@ const MessageTableEntry = ({
                                     disableSurroundingSearch={disableSurroundingSearch}
                                     expandAllRenderAsync={expandAllRenderAsync} />
           </td>
-        </tr>
+        </MessageDetailRow>
       )}
-    </tbody>
+    </TableBody>
   );
 };
 
