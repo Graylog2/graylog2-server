@@ -37,12 +37,8 @@ public class DefaultPluginJarsProvider implements PluginJarsProvider {
                         "graylog-storage-elasticsearch6-" + projectVersion + ".jar"),
                 Paths.get(reposDir, "graylog2-server/graylog-storage-elasticsearch7/target",
                         "graylog-storage-elasticsearch7-" + projectVersion + ".jar"),
-                Paths.get(reposDir, "graylog-plugin-aws/target",
-                        "graylog-plugin-aws-" + projectVersion + ".jar"),
                 Paths.get(reposDir, "graylog-plugin-threatintel/target",
                         "graylog-plugin-threatintel-" + projectVersion + ".jar"),
-                Paths.get(reposDir, "graylog-plugin-collector/target",
-                        "graylog-plugin-collector-" + projectVersion + ".jar")
         );
     }
 

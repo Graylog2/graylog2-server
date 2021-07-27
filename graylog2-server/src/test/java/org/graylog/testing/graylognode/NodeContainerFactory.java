@@ -29,6 +29,7 @@ import org.testcontainers.images.builder.ImageFromDockerfile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
@@ -118,7 +119,9 @@ public class NodeContainerFactory {
 
         pluginJars.forEach(hostPath -> {
             final Path containerPath = Paths.get(graylogHome, "plugin", hostPath.getFileName().toString());
-            container.addFileSystemBind(hostPath.toString(), containerPath.toString(), BindMode.READ_ONLY);
+            if (Files.exists(containerPath)) {
+                container.addFileSystemBind(hostPath.toString(), containerPath.toString(), BindMode.READ_ONLY);
+            }
         });
 
         container.start();
