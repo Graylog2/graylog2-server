@@ -31,7 +31,6 @@ import com.google.common.collect.Sets;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog.failure.FailureBatch;
-import org.graylog.failure.FailureHandlingConfiguration;
 import org.graylog.failure.FailureSubmissionService;
 import org.graylog.failure.ProcessingFailure;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
@@ -81,14 +80,13 @@ public class PipelineInterpreter implements MessageProcessor {
     private final MetricRegistry metricRegistry;
     private final ConfigurationStateUpdater stateUpdater;
     private final FailureSubmissionService failureSubmissionService;
-    private final FailureHandlingConfiguration failureHandlingConfiguration;
 
     @Inject
     public PipelineInterpreter(MessageQueueAcknowledger messageQueueAcknowledger,
                                MetricRegistry metricRegistry,
                                ConfigurationStateUpdater stateUpdater,
-                               FailureSubmissionService failureSubmissionService,
-                               FailureHandlingConfiguration failureHandlingConfiguration) {
+                               FailureSubmissionService failureSubmissionService
+    ) {
 
         this.messageQueueAcknowledger = messageQueueAcknowledger;
         this.filteredOutMessages = metricRegistry.meter(name(ProcessBufferProcessor.class, "filteredOutMessages"));
@@ -97,7 +95,6 @@ public class PipelineInterpreter implements MessageProcessor {
         this.metricRegistry = metricRegistry;
         this.stateUpdater = stateUpdater;
         this.failureSubmissionService = failureSubmissionService;
-        this.failureHandlingConfiguration = failureHandlingConfiguration;
     }
 
     /**
@@ -188,7 +185,7 @@ public class PipelineInterpreter implements MessageProcessor {
             // Message will be dropped
             return;
         }
-        if (!failureHandlingConfiguration.submitProcessingFailures()) {
+        if (!failureSubmissionService.submitProcessingFailures()) {
             // We don't handle processing errors
             return;
         }
@@ -198,7 +195,7 @@ public class PipelineInterpreter implements MessageProcessor {
             return;
         }
 
-        if (!failureHandlingConfiguration.keepFailedMessageDuplicate()) {
+        if (!failureSubmissionService.keepFailedMessageDuplicate()) {
             message.setFilterOut(true);
         }
         submitFailure(message, processingError);
@@ -212,7 +209,7 @@ public class PipelineInterpreter implements MessageProcessor {
 
         try {
             // If we store the regular message, the acknowledgement happens in the output path
-            boolean needsAcknowledgement = !failureHandlingConfiguration.keepFailedMessageDuplicate();
+            boolean needsAcknowledgement = !failureSubmissionService.keepFailedMessageDuplicate();
             // TODO use message.getMesssgeId() once this field is set early in processing
             final ProcessingFailure processingFailure = new ProcessingFailure(message.getId(), "pipeline-processor", error, message.getTimestamp(), message, needsAcknowledgement);
             final FailureBatch failureBatch = FailureBatch.processingFailureBatch(processingFailure);

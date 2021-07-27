@@ -54,7 +54,7 @@ public class FailureHandlingServiceTest {
     public void setup() {
         when(configuration.getFailureHandlingQueueCapacity()).thenReturn(1000);
 
-        failureSubmissionService = new FailureSubmissionService(configuration, metricRegistry);
+        failureSubmissionService = new FailureSubmissionService(configuration, metricRegistry, mock(FailureHandlingConfiguration.class));
     }
 
     @Test

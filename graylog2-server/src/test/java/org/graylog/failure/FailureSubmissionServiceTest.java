@@ -48,7 +48,7 @@ public class FailureSubmissionServiceTest {
         //given
         when(configuration.getFailureHandlingQueueCapacity()).thenReturn(1000);
 
-        final FailureSubmissionService underTest = new FailureSubmissionService(configuration, metricRegistry);
+        final FailureSubmissionService underTest = getFailureSubmissionService();
 
         final ProcessingFailure prcFailure1 = createProcessingFailure();
         final ProcessingFailure prcFailure2 = createProcessingFailure();
@@ -68,7 +68,7 @@ public class FailureSubmissionServiceTest {
         //given
         when(configuration.getFailureHandlingQueueCapacity()).thenReturn(2);
 
-        final FailureSubmissionService underTest = new FailureSubmissionService(configuration, metricRegistry);
+        final FailureSubmissionService underTest = getFailureSubmissionService();
 
         final ProcessingFailure prcFailure1 = createProcessingFailure();
         final ProcessingFailure prcFailure2 = createProcessingFailure();
@@ -104,7 +104,7 @@ public class FailureSubmissionServiceTest {
         //given
         when(configuration.getFailureHandlingQueueCapacity()).thenReturn(2);
 
-        final FailureSubmissionService underTest = new FailureSubmissionService(configuration, metricRegistry);
+        final FailureSubmissionService underTest = getFailureSubmissionService();
 
         final ProcessingFailure prcFailure1 = createProcessingFailure();
 
@@ -131,7 +131,7 @@ public class FailureSubmissionServiceTest {
         //given
         when(configuration.getFailureHandlingQueueCapacity()).thenReturn(2);
 
-        final FailureSubmissionService underTest = new FailureSubmissionService(configuration, metricRegistry);
+        final FailureSubmissionService underTest = getFailureSubmissionService();
 
         final ProcessingFailure prcFailure1 = createProcessingFailure();
 
@@ -158,7 +158,7 @@ public class FailureSubmissionServiceTest {
         //given
         when(configuration.getFailureHandlingQueueCapacity()).thenReturn(2);
 
-        final FailureSubmissionService underTest = new FailureSubmissionService(configuration, metricRegistry);
+        final FailureSubmissionService underTest = getFailureSubmissionService();
 
         final ProcessingFailure prcFailure1 = createProcessingFailure();
 
@@ -183,4 +183,9 @@ public class FailureSubmissionServiceTest {
                 DateTime.now(DateTimeZone.UTC), null,
                 true);
     }
+
+    private FailureSubmissionService getFailureSubmissionService() {
+        return new FailureSubmissionService(configuration, metricRegistry, mock(FailureHandlingConfiguration.class));
+    }
+
 }

@@ -53,16 +53,27 @@ public class FailureSubmissionService {
     private final Meter submittedFailures;
     private final Meter consumedFailureBatches;
     private final Meter consumedFailures;
+    private final FailureHandlingConfiguration failureHandlingConfiguration;
 
     @Inject
     public FailureSubmissionService(Configuration configuration,
-                                    MetricRegistry metricRegistry) {
+                                    MetricRegistry metricRegistry,
+                                    FailureHandlingConfiguration failureHandlingConfiguration) {
         this.queue = new LinkedBlockingQueue<>(configuration.getFailureHandlingQueueCapacity());
         this.configuration = configuration;
         this.submittedFailureBatches = metricRegistry.meter(name(FailureSubmissionService.class, "submittedFailureBatches"));
         this.submittedFailures = metricRegistry.meter(name(FailureSubmissionService.class, "submittedFailures"));
         this.consumedFailureBatches = metricRegistry.meter(name(FailureSubmissionService.class, "consumedFailureBatches"));
         this.consumedFailures = metricRegistry.meter(name(FailureSubmissionService.class, "consumedFailures"));
+        this.failureHandlingConfiguration = failureHandlingConfiguration;
+    }
+
+    public boolean keepFailedMessageDuplicate() {
+        return failureHandlingConfiguration.keepFailedMessageDuplicate();
+    }
+
+    public boolean submitProcessingFailures() {
+        return failureHandlingConfiguration.submitProcessingFailures();
     }
 
     /**
