@@ -14,6 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import Immutable from 'immutable';
+
 const AppConfig = {
   gl2ServerUrl() {
     if (typeof (GRAYLOG_API_URL) !== 'undefined') {
@@ -36,8 +38,9 @@ const AppConfig = {
   },
 
   isFeatureEnabled(feature) {
-    // eslint-disable-next-line no-undef
-    return typeof (FEATURES) !== 'undefined' && FEATURES.split(',')
+    return Immutable.Map(this.appConfig().featureFlags)
+      .filter((value) => value.trim().toLowerCase() === 'on')
+      .keySeq().toList()
       .filter((s) => typeof s === 'string')
       .map((s) => s.trim().toLowerCase())
       .includes(feature.toLowerCase());
