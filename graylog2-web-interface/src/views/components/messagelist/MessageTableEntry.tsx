@@ -37,7 +37,7 @@ import TypeSpecificValue from '../TypeSpecificValue';
 
 const { InputsStore } = CombinedProvider.get('Inputs');
 
-const TableBody = styled.tbody<{ expanded?: boolean, highlighted?: boolean }>(({ expanded, highlighted, theme }) => `
+export const TableBody = styled.tbody<{ expanded?: boolean, highlighted?: boolean }>(({ expanded, highlighted, theme }) => `
   && {
     border-top: 0;
   
