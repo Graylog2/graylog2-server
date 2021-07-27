@@ -15,12 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
-import styled, { DefaultTheme } from 'styled-components';
+import styled from 'styled-components';
 
-import { MessageEventType } from 'views/types/messageEventTypes';
 import connect from 'stores/connect';
 import CombinedProvider from 'injection/CombinedProvider';
 import { StreamsStore } from 'views/stores/StreamsStore';
@@ -29,13 +27,12 @@ import FieldType from 'views/logic/fieldtypes/FieldType';
 import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import { Store } from 'stores/StoreTypes';
 import { MESSAGE_FIELD } from 'views/Constants';
-import MessageEventTypesContext, { MessageEventTypesContextType } from 'views/components/contexts/MessageEventTypesContext';
-import { colorVariants, ColorVariants } from 'theme/colors';
 
 import MessageDetail from './MessageDetail';
 import DecoratedValue from './decoration/DecoratedValue';
 import CustomHighlighting from './CustomHighlighting';
 import type { Message } from './Types';
+import MessageSummaryRow from './MessageSummaryRow';
 
 import TypeSpecificValue from '../TypeSpecificValue';
 
@@ -75,11 +72,10 @@ const FieldsRow = styled.tr(({ theme }) => `
   }
 `);
 
-const MessageRow = styled.tr(({ theme }) => `
+export const MessageRow = styled.tr(({ theme }) => `
   && {
     margin-bottom: 5px;
     cursor: pointer;
-    // display: table-row;
   
     td {
       border-top: 0;
@@ -91,7 +87,7 @@ const MessageRow = styled.tr(({ theme }) => `
   }
 `);
 
-const MessageWrapper = styled.div`
+export const MessageWrapper = styled.div`
   line-height: 1.5em;
   white-space: pre-line;
   max-height: 6em; /* show 4 lines: line-height * 4 */
@@ -106,33 +102,12 @@ const MessageDetailRow = styled.tr`
 
   .row {
       margin-right: 0;
-    }
+  }
   
-    div[class*="col-"] {
-      padding-right: 0;
-    }
+  div[class*="col-"] {
+    padding-right: 0;
   }
 `;
-
-const getSummaryColor = (theme: DefaultTheme, category: ColorVariants) => {
-  if (colorVariants.includes(category)) {
-    return theme.colors.variant.darker[category];
-  }
-
-  return theme.colors.variant.darker.info;
-};
-
-const StyledSummaryRow = styled(MessageRow)<{ category: ColorVariants }>(({ theme, category }) => {
-  const color = getSummaryColor(theme, category);
-
-  return `
-    && {
-      &.message-row td {
-        color: ${color};
-      }
-    }
-  `;
-});
 
 const ConnectedMessageDetail = connect(
   MessageDetail,
@@ -175,24 +150,6 @@ const fieldType = (fieldName, { decoration_stats: decorationStats }: { decoratio
   ? FieldType.Decorated
   : ((fields && fields.find((f) => f.name === fieldName)) || { type: FieldType.Unknown }).type);
 
-const getMessageSummary = (messageFields: Message['fields'], messageEvents: MessageEventTypesContextType) => {
-  const gl2EventTypeCode = messageFields.gl2_event_type_code;
-  const eventType: MessageEventType | undefined = messageEvents?.eventTypes?.[gl2EventTypeCode];
-
-  if (!eventType) {
-    return undefined;
-  }
-
-  const { summaryTemplate: template, category } = eventType;
-  const summary = template.replace(/{(\w+)}/g, (fieldNamePlaceholder, fieldName) => messageFields[fieldName] || fieldName);
-
-  return {
-    category,
-    template,
-    summary,
-  };
-};
-
 const MessageTableEntry = ({
   disableSurroundingSearch,
   expandAllRenderAsync,
@@ -204,9 +161,6 @@ const MessageTableEntry = ({
   selectedFields = Immutable.OrderedSet<string>(),
   toggleDetail,
 }: Props) => {
-  const messageEvents = useContext(MessageEventTypesContext);
-  const messageSummary = getMessageSummary(message.fields, messageEvents);
-
   const _toggleDetail = () => {
     toggleDetail(`${message.index}-${message.id}`);
   };
@@ -255,20 +209,11 @@ const MessageTableEntry = ({
         </MessageRow>
       )}
 
-      {!!messageSummary && (
-        <StyledSummaryRow onClick={_toggleDetail} title={messageSummary.template} category={messageSummary.category}>
-          <td colSpan={colSpanFixup}>
-            <MessageWrapper>
-              {messageSummary.summary}
-            </MessageWrapper>
-          </td>
-        </StyledSummaryRow>
-      )}
+      <MessageSummaryRow onClick={_toggleDetail} colSpanFixup={colSpanFixup} message={message} />
 
       {expanded && (
         <MessageDetailRow>
           <td colSpan={colSpanFixup}>
-            {/* @ts-ignore */}
             <ConnectedMessageDetail message={message}
                                     fields={fields}
                                     disableSurroundingSearch={disableSurroundingSearch}
