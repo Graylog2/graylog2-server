@@ -95,13 +95,15 @@ public class FakeGIMMessageGenerator extends FakeMessageGenerator {
         generatorState.sourceRef = ((Reference) getWeighted(REFERENCES)).referenceName;
         generatorState.eventSource = ((EventSource) getWeighted(EVENT_SOURCES)).eventSource;
         generatorState.country = ((Country) getWeighted(COUNTRIES)).getCountry();
+        generatorState.timestamp = Tools.nowUTC();
 
         return generatorState;
     }
 
     private static Message createMessage(GeneratorState state, Category category, String shortMessage) {
-        final Message msg = new Message(shortMessage, state.source, Tools.nowUTC());
+        final Message msg = new Message(shortMessage, state.source, state.timestamp);
         final Country country = COUNTRIES.stream().filter(c -> c.getCountry().equals(state.country)).findFirst().orElseThrow(() -> new RuntimeException("Could not find country: " + state.country));
+        msg.addField("timestamp", state.timestamp);
         msg.addField("sequence_nr", state.msgSequenceNr);
         msg.addField("gl2_event_type_code", category.gl2EventTypeCode);
         msg.addField("gl2_event_category", category.gl2EventCategory);
@@ -139,16 +141,16 @@ public class FakeGIMMessageGenerator extends FakeMessageGenerator {
 
     public static String getShortMessage(GeneratorState state) {
         switch (state.eventTypeCode) {
-            case "100000": return DateTime.now() + ": User " + state.userName + " is logging on " + state.destinationRef;
-            case "100001": return DateTime.now() + ": User " + state.userName + " is successfully logging on " + state.destinationRef;
-            case "100002": return DateTime.now() + ": User " + state.userName + " failed to logon " + state.destinationRef;
-            case "100003": return DateTime.now() + ": User " + state.userName + " is logging on with alternate credentials " + state.destinationRef;
-            case "100004": return DateTime.now() + ": User " + state.userName + " the session was reconnected to " + state.destinationRef;
-            case "102500": return DateTime.now() + ": User " + state.userName + " has logged of from " + state.destinationRef;
-            case "102501": return DateTime.now() + ": User " + state.userName + " was disconnected from" + state.destinationRef;
-            case "160500": return DateTime.now() + ": User " + state.userName + " opened port for " + state.eventSource;
-            case "160501": return DateTime.now() + ": User " + state.userName + " closed port for " + state.eventSource;
-            case "160502": return DateTime.now() + ": User " + state.userName + " has open ports for " + state.eventSource;
+            case "100000": return state.timestamp + ": User " + state.userName + " is logging on " + state.destinationRef;
+            case "100001": return state.timestamp + ": User " + state.userName + " is successfully logging on " + state.destinationRef;
+            case "100002": return state.timestamp + ": User " + state.userName + " failed to logon " + state.destinationRef;
+            case "100003": return state.timestamp + ": User " + state.userName + " is logging on with alternate credentials " + state.destinationRef;
+            case "100004": return state.timestamp + ": User " + state.userName + " the session was reconnected to " + state.destinationRef;
+            case "102500": return state.timestamp + ": User " + state.userName + " has logged of from " + state.destinationRef;
+            case "102501": return state.timestamp + ": User " + state.userName + " was disconnected from" + state.destinationRef;
+            case "160500": return state.timestamp + ": User " + state.userName + " opened port for " + state.eventSource;
+            case "160501": return state.timestamp + ": User " + state.userName + " closed port for " + state.eventSource;
+            case "160502": return state.timestamp + ": User " + state.userName + " has open ports for " + state.eventSource;
             default: return "unknown event type";
         }
     }
@@ -198,6 +200,7 @@ public class FakeGIMMessageGenerator extends FakeMessageGenerator {
         public String sourceRef;
         public String eventSource;
         public String country;
+        public DateTime timestamp;
 
         public enum CategoryName {
             AUTHENTICATION, ENDPOINT,
