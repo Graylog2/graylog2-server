@@ -21,7 +21,6 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import { LinkContainer } from 'components/graylog/router';
 import { Row, Col, Button } from 'components/graylog';
 import { Input } from 'components/bootstrap';
-import { ContentPackMarker } from 'components/common';
 import { getValueFromInput } from 'util/FormsUtils';
 import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';
@@ -81,7 +80,6 @@ class DataAdapter extends React.Component {
         <Col md={6}>
           <h2>
             {dataAdapter.title}
-            <ContentPackMarker contentPack={dataAdapter.content_pack} marginLeft={5} />
             {' '}
             <small>({plugin.displayName})</small>
           </h2>
