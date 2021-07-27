@@ -23,7 +23,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.eventbus.EventBus;
 import org.graylog.failure.FailureBatch;
-import org.graylog.failure.FailureHandlingConfiguration;
 import org.graylog.failure.FailureSubmissionService;
 import org.graylog.failure.ProcessingFailure;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
@@ -71,8 +70,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.plugin.Message.FIELD_GL2_PROCESSING_ERROR;
 import static org.graylog2.plugin.streams.Stream.DEFAULT_STREAM_ID;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -117,7 +118,6 @@ public class PipelineInterpreterTest {
     private final RuleService ruleService = mock(MongoDbRuleService.class);
     private final PipelineService pipelineService = mock(MongoDbPipelineService.class);
     private final FailureSubmissionService failureSubmissionService = mock(FailureSubmissionService.class);
-    private final FailureHandlingConfiguration failureHandlingConfiguration = mock(FailureHandlingConfiguration.class);
     private final MessageQueueAcknowledger messageQueueAcknowledger = mock(MessageQueueAcknowledger.class);
 
     @Test
@@ -425,8 +425,8 @@ public class PipelineInterpreterTest {
                         null)
         ));
 
-        when(failureHandlingConfiguration.submitProcessingFailures()).thenReturn(true);
-        when(failureHandlingConfiguration.keepFailedMessageDuplicate()).thenReturn(true);
+        when(failureSubmissionService.submitProcessingFailures()).thenReturn(true);
+        when(failureSubmissionService.keepFailedMessageDuplicate()).thenReturn(true);
 
         final PipelineInterpreter interpreter = createPipelineInterpreter(ruleService, pipelineService, FUNCTIONS);
 
@@ -460,8 +460,8 @@ public class PipelineInterpreterTest {
                         null)
         ));
 
-        when(failureHandlingConfiguration.submitProcessingFailures()).thenReturn(true);
-        when(failureHandlingConfiguration.keepFailedMessageDuplicate()).thenReturn(true);
+        when(failureSubmissionService.submitProcessingFailures()).thenReturn(true);
+        when(failureSubmissionService.keepFailedMessageDuplicate()).thenReturn(true);
 
         final PipelineInterpreter interpreter = createPipelineInterpreter(ruleService, pipelineService, FUNCTIONS);
 
@@ -501,7 +501,7 @@ public class PipelineInterpreterTest {
                         null)
         ));
 
-        when(failureHandlingConfiguration.submitProcessingFailures()).thenReturn(false);
+        when(failureSubmissionService.submitProcessingFailures()).thenReturn(false);
 
         final PipelineInterpreter interpreter = createPipelineInterpreter(ruleService, pipelineService, FUNCTIONS);
 
@@ -517,7 +517,7 @@ public class PipelineInterpreterTest {
                     assertThat(processedMessage.getFilterOut()).isFalse();
                 });
 
-        verifyNoInteractions(failureSubmissionService);
+        verify(failureSubmissionService, times(0)).submitBlocking(any());
         // this only checks for calls directly made from the PipelineInterpreter
         verifyNoInteractions(messageQueueAcknowledger);
     }
@@ -537,8 +537,8 @@ public class PipelineInterpreterTest {
                         null)
         ));
 
-        when(failureHandlingConfiguration.submitProcessingFailures()).thenReturn(true);
-        when(failureHandlingConfiguration.keepFailedMessageDuplicate()).thenReturn(false);
+        when(failureSubmissionService.submitProcessingFailures()).thenReturn(true);
+        when(failureSubmissionService.keepFailedMessageDuplicate()).thenReturn(false);
 
         final PipelineInterpreter interpreter = createPipelineInterpreter(ruleService, pipelineService, FUNCTIONS);
 
