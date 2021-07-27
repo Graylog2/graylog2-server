@@ -27,7 +27,7 @@ type Props = {
 const FieldAndValueActionsProvider = ({ children }: Props) => {
   const internalValueActions = PluginStore.exports('valueActions');
   const internalFieldActions = PluginStore.exports('fieldActions');
-  const externalValueActions = PluginStore.exports('externalValueActions')?.flat();
+  const externalValueActions = PluginStore.exports('externalValueActions');
 
   const contextValue = {
     fieldActions: {

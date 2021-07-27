@@ -188,7 +188,7 @@ declare module 'graylog-web-plugin/plugin' {
   export interface PluginExports {
     creators?: Array<Creator>;
     enterpriseWidgets?: Array<WidgetExport>;
-    externalValueActions?: Array<Array<ActionDefinition>>;
+    externalValueActions?: Array<ActionDefinition>;
     fieldActions?: Array<ActionDefinition>;
     messageEventTypes?: Array<MessageEventTypes>;
     searchTypes?: Array<SearchType>;
