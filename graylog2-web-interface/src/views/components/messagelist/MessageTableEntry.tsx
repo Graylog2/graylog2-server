@@ -19,14 +19,13 @@ import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import styled from 'styled-components';
 
-import connect from 'stores/connect';
+import { useStore } from 'stores/connect';
 import CombinedProvider from 'injection/CombinedProvider';
-import { StreamsStore } from 'views/stores/StreamsStore';
-import { SearchConfigStore } from 'views/stores/SearchConfigStore';
+import { StreamsStore, Stream } from 'views/stores/StreamsStore';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
-import { Store } from 'stores/StoreTypes';
 import { MESSAGE_FIELD } from 'views/Constants';
+import { Input } from 'components/messageloaders/Types';
 
 import MessageDetail from './MessageDetail';
 import DecoratedValue from './decoration/DecoratedValue';
@@ -37,13 +36,6 @@ import MessageSummaryRow from './MessageSummaryRow';
 import TypeSpecificValue from '../TypeSpecificValue';
 
 const { InputsStore } = CombinedProvider.get('Inputs');
-
-type Stream = { id: string };
-type Input = { id: string };
-
-type InputsStoreState = {
-  inputs: Array<Input>;
-};
 
 const TableBody = styled.tbody<{ expanded?: boolean, highlighted?: boolean }>(({ expanded, highlighted, theme }) => `
   && {
@@ -101,35 +93,13 @@ const MessageDetailRow = styled.tr`
   }
 
   .row {
-      margin-right: 0;
+    margin-right: 0;
   }
   
   div[class*="col-"] {
     padding-right: 0;
   }
 `;
-
-const ConnectedMessageDetail = connect(
-  MessageDetail,
-  {
-    availableInputs: InputsStore as Store<InputsStoreState>,
-    availableStreams: StreamsStore,
-    configurations: SearchConfigStore,
-  },
-  ({ availableStreams = {}, availableInputs = {}, configurations = {}, ...rest }) => {
-    const { streams = [] } = availableStreams;
-    const { inputs = [] } = availableInputs;
-    const { searchesClusterConfig } = configurations;
-
-    return ({
-      ...rest,
-      allStreams: Immutable.List<Stream>(streams),
-      streams: Immutable.Map<string, Stream>(streams.map((stream) => [stream.id, stream])),
-      inputs: Immutable.Map<string, Input>(inputs.map((input) => [input.id, input])),
-      searchConfig: searchesClusterConfig,
-    });
-  },
-);
 
 type Props = {
   disableSurroundingSearch?: boolean,
@@ -161,6 +131,12 @@ const MessageTableEntry = ({
   selectedFields = Immutable.OrderedSet<string>(),
   toggleDetail,
 }: Props) => {
+  const { inputs: inputsList = [] } = useStore(InputsStore);
+  const { streams: streamsList = [] } = useStore(StreamsStore);
+  const allStreams = Immutable.List<Stream>(streamsList);
+  const streams = Immutable.Map<string, Stream>(streamsList.map((stream) => [stream.id, stream]));
+  const inputs = Immutable.Map<string, Input>(inputsList.map((input) => [input.id, input]));
+
   const _toggleDetail = () => {
     toggleDetail(`${message.index}-${message.id}`);
   };
@@ -214,10 +190,13 @@ const MessageTableEntry = ({
       {expanded && (
         <MessageDetailRow>
           <td colSpan={colSpanFixup}>
-            <ConnectedMessageDetail message={message}
-                                    fields={fields}
-                                    disableSurroundingSearch={disableSurroundingSearch}
-                                    expandAllRenderAsync={expandAllRenderAsync} />
+            <MessageDetail message={message}
+                           fields={fields}
+                           streams={streams}
+                           allStreams={allStreams}
+                           inputs={inputs}
+                           disableSurroundingSearch={disableSurroundingSearch}
+                           expandAllRenderAsync={expandAllRenderAsync} />
           </td>
         </MessageDetailRow>
       )}
