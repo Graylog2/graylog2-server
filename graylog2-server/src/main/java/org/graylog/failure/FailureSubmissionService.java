@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit;
 import static com.codahale.metrics.MetricRegistry.name;
 
 /**
- * This class represents a blocking FIFO queue accepting failure batches for further handling.
+ * A blocking FIFO queue accepting failure batches for further handling.
  * It should be used as an entry point for failure producers.
  *
  * The service was introduced for 2 essential reasons:
