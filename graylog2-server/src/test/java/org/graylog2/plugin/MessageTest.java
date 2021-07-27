@@ -638,4 +638,16 @@ public class MessageTest {
         message.addField(Message.FIELD_TIMESTAMP, ThaiBuddhistDate.of(0, 4, 19));
         assertThat(message.getTimestamp()).isGreaterThan(new DateTime(2018, 4, 19, 0, 0, 0, 0, DateTimeZone.UTC));
     }
+
+    @Test
+    public void copyConstructor() {
+        final Message message = new Message("message", "source", Tools.nowUTC());
+        message.addField("field", 1234L);
+        message.setMessageQueueId(Long.valueOf(858483));
+        message.addStream(mock(Stream.class));
+        message.setProcessingTime(Tools.nowUTC());
+
+        final Message copy = new Message(message);
+        assertThat(copy).isEqualTo(message);
+    }
 }

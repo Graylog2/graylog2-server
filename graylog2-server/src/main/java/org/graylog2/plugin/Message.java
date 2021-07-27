@@ -21,6 +21,7 @@ import com.eaio.uuid.UUID;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
+import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -330,7 +331,7 @@ public class Message implements Messages, Indexable {
 
     // copy constructor
     public Message(Message message) {
-        message.fields.forEach(this::addField);
+        message.fields.forEach(this.fields::put);
 
         indexSets = message.indexSets;
         streams = message.streams;
@@ -875,6 +876,28 @@ public class Message implements Messages, Indexable {
         if (processingTime != null) {
             this.processingTime = processingTime;
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        final Message that = (Message) o;
+        return (Objects.equal(fields, that.fields)
+                && Objects.equal(indexSets, that.indexSets)
+                && Objects.equal(streams, that.streams)
+                && Objects.equal(sourceInputId, that.sourceInputId)
+                && Objects.equal(messageQueueId, that.messageQueueId)
+                && Objects.equal(filterOut, that.filterOut)
+                && Objects.equal(receiveTime, that.receiveTime)
+                && Objects.equal(processingTime, that.processingTime)
+                && Objects.equal(recordings, that.recordings)
+                && Objects.equal(sizeCounter, that.sizeCounter)
+        );
     }
 
     // helper methods to optionally record timing information per message, useful for debugging or benchmarking
