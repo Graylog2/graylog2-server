@@ -53,7 +53,7 @@ describe('FieldAndValueActionsProvider', () => {
 
   it('provides external value actions from plugin store', () => {
     asMock(PluginStore.exports).mockImplementation((type) => ({
-      externalValueActions: [[simpleValueAction]],
+      externalValueActions: [simpleValueAction],
     }[type]));
 
     let contextValue;
@@ -69,7 +69,7 @@ describe('FieldAndValueActionsProvider', () => {
     const simpleValueAction2 = createSimpleExternalValueAction({ title: 'External Value Action 2' });
 
     asMock(PluginStore.exports).mockImplementation((type) => ({
-      externalValueActions: [[simpleValueAction], [simpleValueAction2]],
+      externalValueActions: [simpleValueAction, simpleValueAction2],
     }[type]));
 
     let contextValue;
