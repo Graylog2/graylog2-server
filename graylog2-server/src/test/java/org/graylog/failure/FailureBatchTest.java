@@ -18,7 +18,7 @@ package org.graylog.failure;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.testcontainers.shaded.com.google.common.collect.ImmutableList;
 
 import java.util.ArrayList;
@@ -106,6 +106,18 @@ public class FailureBatchTest {
         assertThat(failureBatch.size()).isEqualTo(1);
         assertThat(failureBatch.getFailureClass()).isEqualTo(ProcessingFailure.class);
         assertThat(failureBatch.getFailures().contains(prcFailure)).isTrue();
+    }
+
+    @Test
+    public void containsIndexingFailures_returnsTrueForIndexingFailuresAndFalseForOtherFailures() {
+        assertThat(FailureBatch.indexingFailureBatch(ImmutableList.of(createIndexingFailure())).containsIndexingFailures()).isTrue();
+        assertThat(FailureBatch.processingFailureBatch(ImmutableList.of(createProcessingFailure())).containsIndexingFailures()).isFalse();
+    }
+
+    @Test
+    public void containsProcessingFailures_returnsTrueForProcessingFailuresAndFalseForOtherFailures() {
+        assertThat(FailureBatch.processingFailureBatch(ImmutableList.of(createProcessingFailure())).containsProcessingFailures()).isTrue();
+        assertThat(FailureBatch.indexingFailureBatch(ImmutableList.of(createIndexingFailure())).containsProcessingFailures()).isFalse();
     }
 
     private IndexingFailure createIndexingFailure() {

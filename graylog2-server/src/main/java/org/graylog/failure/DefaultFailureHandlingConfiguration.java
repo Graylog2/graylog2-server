@@ -17,7 +17,7 @@
 package org.graylog.failure;
 
 /**
- * The default set of configuration values, which leaves
+ * A default set of configuration values, which leaves
  * the original failure handling behaviour intact.
  */
 public class DefaultFailureHandlingConfiguration implements FailureHandlingConfiguration {
