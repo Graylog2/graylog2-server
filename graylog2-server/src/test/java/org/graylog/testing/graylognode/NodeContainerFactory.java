@@ -118,8 +118,8 @@ public class NodeContainerFactory {
                 .withStartupTimeout(Duration.of(120, SECONDS));
 
         pluginJars.forEach(hostPath -> {
-            final Path containerPath = Paths.get(graylogHome, "plugin", hostPath.getFileName().toString());
-            if (Files.exists(containerPath)) {
+            if (Files.exists(hostPath)) {
+                final Path containerPath = Paths.get(graylogHome, "plugin", hostPath.getFileName().toString());
                 container.addFileSystemBind(hostPath.toString(), containerPath.toString(), BindMode.READ_ONLY);
             }
         });
