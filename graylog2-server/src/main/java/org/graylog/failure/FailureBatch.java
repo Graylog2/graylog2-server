@@ -19,7 +19,6 @@ package org.graylog.failure;
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
 
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -73,7 +72,7 @@ public class FailureBatch {
     /**
      * @return a list of failures within the batch. The returned collection is immutable.
      */
-    public Collection<? extends Failure> getFailures() {
+    public List<? extends Failure> getFailures() {
         return failures;
     }
 
