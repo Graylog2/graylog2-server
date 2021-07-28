@@ -98,10 +98,10 @@ public class MongoDbSessionDAO extends CachingSessionDAO {
         final MongoDbSession dbSession = mongoDBSessionService.load(session.getId().toString());
 
         if (null == dbSession) {
-            throw new RuntimeException("Couldn't load session <" + session.getId() + ">");
+            throw new RuntimeException("Couldn't load session");
         }
 
-        LOG.debug("Updating session {}", session);
+        LOG.debug("Updating session");
         dbSession.setHost(session.getHost());
         dbSession.setTimeout(session.getTimeout());
         dbSession.setStartTimestamp(session.getStartTimestamp());
@@ -135,14 +135,14 @@ public class MongoDbSessionDAO extends CachingSessionDAO {
 
     @Override
     protected void doDelete(Session session) {
-        LOG.debug("Deleting session {}", session);
+        LOG.debug("Deleting session");
         final Serializable id = session.getId();
         final MongoDbSession dbSession = mongoDBSessionService.load(id.toString());
         if (dbSession != null) {
             final int deleted = mongoDBSessionService.destroy(dbSession);
-            LOG.debug("Deleted {} sessions with ID {} from database", deleted, id);
+            LOG.debug("Deleted {} sessions from database", deleted);
         } else {
-            LOG.debug("Session {} not found in database", id);
+            LOG.debug("Session not found in database");
         }
     }
 
