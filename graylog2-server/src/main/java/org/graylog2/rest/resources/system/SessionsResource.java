@@ -151,7 +151,7 @@ public class SessionsResource extends RestResource {
         // there's no valid session, but the authenticator would like us to create one
         if (subject.getSession(false) == null && ShiroSecurityContext.isSessionCreationRequested()) {
             final Session session = subject.getSession();
-            LOG.debug("Session created {}", session.getId());
+            LOG.debug("Create session");
             session.touch();
             // save subject in session, otherwise we can't get the username back in subsequent requests.
             ((DefaultSecurityManager) SecurityUtils.getSecurityManager()).getSubjectDAO().save(subject);
