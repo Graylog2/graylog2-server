@@ -23,6 +23,7 @@ import org.graylog2.plugin.PluginModule;
 import org.graylog2.rest.models.system.sessions.responses.DefaultSessionResponseFactory;
 import org.graylog2.rest.models.system.sessions.responses.SessionResponseFactory;
 import org.graylog2.security.DefaultX509TrustManager;
+import org.graylog2.security.UserSessionTerminationService;
 import org.graylog2.security.ldap.LdapConnector;
 
 import javax.net.ssl.TrustManager;
@@ -33,6 +34,7 @@ public class SecurityBindings extends PluginModule {
         bind(Permissions.class).asEagerSingleton();
         bind(SessionCreator.class).in(Scopes.SINGLETON);
         addPermissions(RestPermissions.class);
+        addInitializer(UserSessionTerminationService.class);
 
         install(new FactoryModuleBuilder()
                 .implement(TrustManager.class, DefaultX509TrustManager.class)
