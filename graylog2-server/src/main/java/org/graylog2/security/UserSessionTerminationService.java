@@ -41,7 +41,6 @@ import java.io.Serializable;
 import java.util.EnumSet;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
@@ -142,13 +141,13 @@ public class UserSessionTerminationService extends AbstractIdleService {
             return;
         }
 
-        final AtomicLong terminatedSessions = new AtomicLong(0);
+        long terminatedSessions = 0;
         for (final Session activeSession : sessionDao.getActiveSessions()) {
             terminateSessionForID(activeSession.getId());
-            terminatedSessions.incrementAndGet();
+            terminatedSessions++;
         }
 
-        LOG.info("Globally terminated {} session(s)", terminatedSessions.get());
+        LOG.info("Globally terminated {} session(s)", terminatedSessions);
         clusterConfigService.write(GlobalTerminationRevisionConfig.next());
     }
 
