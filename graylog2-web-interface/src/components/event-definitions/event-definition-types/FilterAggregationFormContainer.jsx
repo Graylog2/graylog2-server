@@ -29,6 +29,7 @@ import withStreams from './withStreams';
 const HIDDEN_STREAMS = [
   '000000000000000000000002',
   '000000000000000000000003',
+  '000000000000000000000004',
 ];
 
 class FilterAggregationFormContainer extends React.Component {
