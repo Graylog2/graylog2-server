@@ -21,7 +21,8 @@ import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
 
 export interface OktaBackendConfig {
   type: string;
-  baseUrl: string;
+  baseUrl?: string;
+  oktaBaseUrl?: string;
   clientId: string;
   clientSecret: string;
   tokenVerifierConnectTimeout: string;
@@ -30,7 +31,8 @@ export interface OktaBackendConfig {
 
 export interface OktaBackendConfigJson {
   type: string;
-  base_url: string;
+  base_url?: string;
+  okta_base_url?: string;
   client_id: string;
   client_secret: string;
   token_verifier_connect_timeout: string;
