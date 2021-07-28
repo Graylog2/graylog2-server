@@ -45,13 +45,13 @@ describe('MessageEventTypesProvider', () => {
     </MessageEventTypesProvider>,
   );
 
-  it('renders children when there is no security content in plugin store', () => {
+  it('renders children when there are no message event types in plugin store', () => {
     render(<MessageEventTypesProvider><>The content</></MessageEventTypesProvider>);
 
     expect(screen.getByText('The content')).toBeInTheDocument();
   });
 
-  it('provides event types', () => {
+  it('provides message event types from plugin store', () => {
     asMock(PluginStore.exports).mockImplementation((type) => ({
       messageEventTypes: [{ [simpleEventType.gl2EventTypeCode]: simpleEventType }],
     }[type]));
@@ -68,10 +68,6 @@ describe('MessageEventTypesProvider', () => {
   it('provides correct data, when plugin store contains multiple entries for message event types', () => {
     const simpleEventType2 = createSimpleMessageEventType(2);
 
-    const newSimpleContextValue = {
-      eventTypes: { [simpleEventType.gl2EventTypeCode]: simpleEventType, [simpleEventType2.gl2EventTypeCode]: simpleEventType2 },
-    };
-
     asMock(PluginStore.exports).mockImplementation((type) => ({
       messageEventTypes: [
         { [simpleEventType.gl2EventTypeCode]: simpleEventType },
@@ -85,6 +81,10 @@ describe('MessageEventTypesProvider', () => {
       contextValue = value;
     });
 
-    expect(contextValue).toStrictEqual(newSimpleContextValue);
+    const expectedContextValue = {
+      eventTypes: { [simpleEventType.gl2EventTypeCode]: simpleEventType, [simpleEventType2.gl2EventTypeCode]: simpleEventType2 },
+    };
+
+    expect(contextValue).toStrictEqual(expectedContextValue);
   });
 });

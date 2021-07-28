@@ -22,7 +22,6 @@ import CombinedProvider from 'injection/CombinedProvider';
 import Routes from 'routing/Routes';
 import { Button } from 'components/graylog';
 import { ErrorPopover } from 'components/lookup-tables';
-import { ContentPackMarker } from 'components/common';
 
 const { LookupTablesActions } = CombinedProvider.get('LookupTables');
 
@@ -56,7 +55,6 @@ class LUTTableEntry extends React.Component {
           <td>
             {this.props.errors.table && (<ErrorPopover placement="right" errorText={this.props.errors.table} title="Lookup Table problem" />)}
             <Link to={Routes.SYSTEM.LOOKUPTABLES.show(this.props.table.name)}>{this.props.table.title}</Link>
-            <ContentPackMarker contentPack={this.props.table.content_pack} marginLeft={5} />
           </td>
           <td>{this.props.table.description}</td>
           <td>{this.props.table.name}</td>

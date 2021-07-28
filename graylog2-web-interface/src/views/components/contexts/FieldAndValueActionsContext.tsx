@@ -14,24 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import createReactClass from 'create-react-class';
-import PropTypes from 'prop-types';
+import * as React from 'react';
 
-import { ListGroupItem } from 'components/graylog';
+import type { ActionDefinition } from 'views/components/actions/ActionHandler';
+import { singleton } from 'views/logic/singleton';
 
-const ControlledTableListItem = createReactClass({
-  propTypes: {
-    children: PropTypes.node.isRequired,
+export type FieldAndValueActionsContextType = {
+  fieldActions: {
+    internal: Array<ActionDefinition> | undefined,
   },
+  valueActions: {
+    external: Array<ActionDefinition> | undefined,
+    internal: Array<ActionDefinition> | undefined,
+  }
+}
 
-  render() {
-    return (
-      <ListGroupItem>
-        {this.props.children}
-      </ListGroupItem>
-    );
-  },
-});
+const FieldAndValueActionsContext = React.createContext<FieldAndValueActionsContextType | undefined>(undefined);
 
-export default ControlledTableListItem;
+export default singleton('contexts.FieldAndValueActionsContext', () => FieldAndValueActionsContext);
