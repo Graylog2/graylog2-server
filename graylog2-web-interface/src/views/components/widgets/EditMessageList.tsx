@@ -56,6 +56,12 @@ const _onShowMessageRowChanged = (config, onChange) => {
   return onChange(newConfig);
 };
 
+const _onShowSummaryRow = (config, onChange) => {
+  const newConfig = config.toBuilder().showSummaryRow(!config.showSummaryRow).build();
+
+  return onChange(newConfig);
+};
+
 const _onSortChange = (sort: $PropertyType<AggregationWidgetConfig, 'sort'>, config, onChange) => {
   const newConfig = config.toBuilder().sort(sort).build();
 
@@ -84,6 +90,9 @@ const EditMessageList = ({ children, config, fields, onChange }: EditWidgetCompo
                        value={selectedFieldsForSelect} />
           <Checkbox checked={config.showMessageRow} onChange={() => _onShowMessageRowChanged(config, onChange)}>
             Show message in new row
+          </Checkbox>
+          <Checkbox checked={config.showSummaryRow} onChange={() => _onShowSummaryRow(config, onChange)}>
+            Show message summary
           </Checkbox>
         </DescriptionBox>
         <DescriptionBox description="Sorting">
