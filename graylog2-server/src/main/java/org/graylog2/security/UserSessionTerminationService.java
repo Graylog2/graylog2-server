@@ -148,7 +148,7 @@ public class UserSessionTerminationService extends AbstractIdleService {
         }
 
         LOG.info("Globally terminated {} session(s)", terminatedSessions);
-        clusterConfigService.write(GlobalTerminationRevisionConfig.next());
+        clusterConfigService.write(GlobalTerminationRevisionConfig.current());
     }
 
     private void terminateSessionsForUser(User user) {
@@ -201,7 +201,7 @@ public class UserSessionTerminationService extends AbstractIdleService {
             return create(0);
         }
 
-        public static GlobalTerminationRevisionConfig next() {
+        public static GlobalTerminationRevisionConfig current() {
             return create(TERMINATION_REVISION);
         }
 
