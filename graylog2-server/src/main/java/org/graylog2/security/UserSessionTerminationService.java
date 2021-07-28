@@ -28,7 +28,6 @@ import org.apache.shiro.session.mgt.DefaultSessionKey;
 import org.apache.shiro.session.mgt.SessionManager;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.cluster.ClusterConfigService;
-import org.graylog2.users.events.UserChangedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,8 +39,6 @@ import java.util.Optional;
 /**
  * This service checks on startup if all user sessions should be terminated. This can be requested by bumping the
  * {@code TERMINATION_REVISION} number.
- *
- * The service also listens for {@link UserChangedEvent} events and terminates all sessions for disabled users.
  */
 @Singleton
 public class UserSessionTerminationService extends AbstractIdleService {
