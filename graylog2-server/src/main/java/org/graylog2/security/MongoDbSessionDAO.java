@@ -74,7 +74,6 @@ public class MongoDbSessionDAO extends CachingSessionDAO {
     @Override
     protected Session doReadSession(Serializable sessionId) {
         final MongoDbSession dbSession = mongoDBSessionService.load(sessionId.toString());
-        LOG.debug("Reading session for id {} from MongoDB: {}", sessionId, dbSession);
         if (dbSession == null) {
             // expired session or it was never there to begin with
             return null;
