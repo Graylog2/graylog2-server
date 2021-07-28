@@ -61,19 +61,19 @@ public class SessionAuthenticator extends AuthenticatingRealm {
         final Subject subject = new Subject.Builder().sessionId(sessionIdToken.getSessionId()).buildSubject();
         final Session session = subject.getSession(false);
         if (session == null) {
-            LOG.debug("Invalid session {}. Either it has expired or did not exist.", sessionIdToken.getSessionId());
+            LOG.debug("Invalid session. Either it has expired or did not exist.");
             return null;
         }
 
         final Object userId = subject.getPrincipal();
         final User user = userService.loadById(String.valueOf(userId));
         if (user == null) {
-            LOG.debug("No user with userId {} found for session {}", userId, sessionIdToken.getSessionId());
+            LOG.debug("No user with userId {} found for session", userId);
             return null;
         }
 
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Found session {} for userId {}", session.getId(), userId);
+            LOG.debug("Found session for userId {}", userId);
         }
 
         final String sessionUsername = (String) session.getAttribute(HTTPHeaderAuthenticationRealm.SESSION_AUTH_HEADER);
