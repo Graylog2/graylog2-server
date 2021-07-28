@@ -73,7 +73,7 @@ public class SessionAuthenticator extends AuthenticatingRealm {
         }
 
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Found session {} for userId {}", session.getId(), userId);
+            LOG.debug("Found session for userId {}", userId);
         }
 
         final String sessionUsername = (String) session.getAttribute(HTTPHeaderAuthenticationRealm.SESSION_AUTH_HEADER);
