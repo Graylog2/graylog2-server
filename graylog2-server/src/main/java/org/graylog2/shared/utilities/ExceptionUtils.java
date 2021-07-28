@@ -20,6 +20,8 @@ import com.google.common.base.Throwables;
 import org.apache.commons.lang3.StringUtils;
 
 import java.net.UnknownHostException;
+import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ExceptionUtils {
 
@@ -66,6 +68,7 @@ public class ExceptionUtils {
     public static String getRootCauseMessage(Throwable t) {
         return formatMessageCause(getRootCause(t));
     }
+
     public static String getRootCauseOrMessage(Throwable t) {
         final Throwable rootCause = getRootCause(t, true);
         return formatMessageCause(rootCause != null ? rootCause : t);
@@ -75,5 +78,34 @@ public class ExceptionUtils {
         return Throwables.getCausalChain(t)
                 .stream()
                 .anyMatch(c -> causeType.isAssignableFrom(c.getClass()));
+    }
+
+    public static String getShortenedStackTrace(Throwable t) {
+        StringBuilder trace = new StringBuilder();
+
+        final AtomicInteger position = new AtomicInteger(0);
+        Throwables.getCausalChain(t)
+                .stream()
+                .filter(c -> StringUtils.isNotBlank(c.getMessage()))
+                .forEach(c -> {
+                    if (position.get() > 0) {
+                        trace.append("Caused by: ");
+                    }
+                    appendWithNewline(trace, c);
+                    Arrays.stream(c.getStackTrace()).findFirst().ifPresent(firstStackElement -> {
+                        trace.append("\tat ");
+                        appendWithNewline(trace, firstStackElement);
+                        trace.append("\t... ").append(c.getStackTrace().length - 1);
+                        appendWithNewline(trace, " more");
+                    });
+
+                    position.getAndIncrement();
+                });
+
+        return trace.toString();
+    }
+
+    private static StringBuilder appendWithNewline(StringBuilder stringBuilder, Object append) {
+        return stringBuilder.append(append).append(System.lineSeparator());
     }
 }

@@ -71,4 +71,33 @@ public class ExceptionUtilsTest {
         assertThat(ExceptionUtils.hasCauseOf(
                 new RuntimeException("parent", new IOException("asdasd")), IOException.class)).isTrue();
     }
+
+    @Test
+    public void getShortenedStackTrace() {
+        final IOException ioException = new IOException("io message");
+        setTestStackTrace(ioException);
+        final RuntimeException ex1 = new RuntimeException("socket message", ioException);
+        setTestStackTrace(ex1);
+        final RuntimeException ex0 = new RuntimeException("parent message", ex1);
+        setTestStackTrace(ex0);
+
+        final String shortTrace = ExceptionUtils.getShortenedStackTrace(ex0);
+
+        final String expected = "java.lang.RuntimeException: parent message\n" +
+                "\tat FooClass.fooMethod(Foo.java:42)\n" +
+                "\t... 1 more\n" +
+                "Caused by: java.lang.RuntimeException: socket message\n" +
+                "\tat FooClass.fooMethod(Foo.java:42)\n" +
+                "\t... 1 more\n" +
+                "Caused by: java.io.IOException: io message\n" +
+                "\tat FooClass.fooMethod(Foo.java:42)\n" +
+                "\t... 1 more\n";
+
+        assertThat(shortTrace).isEqualTo(expected);
+    }
+
+    private void setTestStackTrace(Throwable t) {
+        final StackTraceElement traceElement = new StackTraceElement("FooClass", "fooMethod", "Foo.java", 42);
+        t.setStackTrace(new StackTraceElement[]{traceElement, traceElement});
+    }
 }
