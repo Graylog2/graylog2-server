@@ -84,5 +84,6 @@ describe('MessageTableEntry', () => {
     );
 
     expect(screen.getByText('Value for field 1 - Value for field 2')).toBeInTheDocument();
+    expect(screen.getByText('Value for field 1 - Value for field 2')).toHaveStyle('color: #00752c');
   });
 });

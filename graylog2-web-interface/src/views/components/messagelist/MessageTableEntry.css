@@ -1,7 +1,0 @@
-:local(.fieldsRowField) {
-    word-break: break-word;
-}
-
-:local(.fieldsRowField) time {
-    font-size: 1rem; /* theme.fonts.size.body */
-}
