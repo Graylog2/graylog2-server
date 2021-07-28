@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import com.google.common.util.concurrent.AbstractIdleService;
 import org.apache.shiro.mgt.DefaultSecurityManager;
+import org.apache.shiro.session.ExpiredSessionException;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.mgt.DefaultSessionKey;
 import org.apache.shiro.session.mgt.SessionManager;
@@ -114,18 +115,22 @@ public class UserSessionTerminationService extends AbstractIdleService {
 
     private void terminateSessionForID(Serializable sessionId) {
         try {
-            getSessionForID(sessionId).ifPresent(Session::stop);
+            getActiveSessionForID(sessionId).ifPresent(Session::stop);
         } catch (Exception e) {
             LOG.error("Couldn't terminate session", e);
         }
     }
 
-    private Optional<Session> getSessionForID(Serializable sessionId) {
+    private Optional<Session> getActiveSessionForID(Serializable sessionId) {
         final SessionManager sessionManager = securityManager.getSessionManager();
 
         // Using the session manager to get the session instead of getting it directly from the SessionDAO
         // because the session manager wraps it in a DelegatingSession that might do additional cleanup.
-        return Optional.ofNullable(sessionManager.getSession(new DefaultSessionKey(sessionId)));
+        try {
+            return Optional.ofNullable(sessionManager.getSession(new DefaultSessionKey(sessionId)));
+        } catch (ExpiredSessionException e) {
+            return Optional.empty();
+        }
     }
 
     @AutoValue
