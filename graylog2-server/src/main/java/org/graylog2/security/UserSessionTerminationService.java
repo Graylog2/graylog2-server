@@ -94,13 +94,10 @@ public class UserSessionTerminationService extends AbstractIdleService {
     }
 
     // Listens on the event bus to terminate users sessions when a user gets disabled or deleted.
+    // The UserChangedEvent is only published on the local EventBus and not the cluster EventBus so every node
+    // should react to change events.
     @Subscribe
     public void handleUserChanged(UserChangedEvent event) {
-        if (isNotPrimaryNode()) {
-            LOG.debug("Only run on the primary node to avoid concurrent session termination");
-            return;
-        }
-
         final User user = userService.loadById(event.userId());
 
         if (user != null && SESSION_TERMINATION_STATUS.contains(user.getAccountStatus())) {
