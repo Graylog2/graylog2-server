@@ -14,9 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { Formik, Form } from 'formik';
+import { Form, Formik } from 'formik';
 import * as React from 'react';
-import { render, fireEvent, waitFor } from 'wrappedTestingLibrary';
+import { fireEvent, render, waitFor } from 'wrappedTestingLibrary';
 
 import FormikInput from './FormikInput';
 
@@ -89,5 +89,22 @@ describe('<FormikInput />', () => {
     fireEvent.click(submitButton);
 
     await waitFor(() => expect(submitStub).toHaveBeenCalledWith({ newsletter: true }));
+  });
+
+  it('should disable input with disabled prop', async () => {
+    const submitStub = jest.fn();
+    const { getByLabelText } = render(
+      <SimpleForm onSubmit={submitStub}>
+        <FormikInput label="Username"
+                     id="username"
+                     name="username"
+                     type="text"
+                     disabled />
+      </SimpleForm>,
+    );
+
+    const usernameInput = getByLabelText('Username');
+
+    expect(usernameInput).toHaveAttribute('disabled');
   });
 });
