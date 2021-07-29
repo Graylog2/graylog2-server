@@ -29,9 +29,17 @@ const { IndexSetsActions } = CombinedProvider.get('IndexSets');
 class StreamForm extends React.Component {
   static propTypes = {
     onSubmit: PropTypes.func.isRequired,
-    stream: PropTypes.object.isRequired,
+    stream: PropTypes.object,
     title: PropTypes.string.isRequired,
     indexSets: PropTypes.array.isRequired,
+  };
+
+  static defaultProps = {
+    stream: {
+      title: '',
+      description: '',
+      remove_matches_from_default_stream: false,
+    },
   };
 
   constructor(props) {
