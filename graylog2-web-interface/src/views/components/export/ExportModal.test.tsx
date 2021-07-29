@@ -168,7 +168,7 @@ describe('ExportModal', () => {
   });
 
   it('initial fields should not contain the message field if message list config showMessageRow is false', async () => {
-    const widgetConfig = new MessagesWidgetConfig(['level', 'http_method'], false, [], []);
+    const widgetConfig = new MessagesWidgetConfig(['level', 'http_method'], false, false, [], []);
     const widgetWithoutMessageRow = messagesWidget().toBuilder().config(widgetConfig).build();
     const viewStateMap: ViewStateMap = Immutable.Map({
       'query-id-1': stateWithOneWidget(messagesWidget()).toBuilder()
