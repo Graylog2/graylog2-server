@@ -77,6 +77,7 @@ describe('MessageTableEntry', () => {
                              toggleDetail={() => {}}
                              fields={Immutable.List()}
                              message={message}
+                             showSummaryRow
                              selectedFields={Immutable.OrderedSet(['message'])}
                              expanded={false} />
         </table>,
@@ -84,5 +85,6 @@ describe('MessageTableEntry', () => {
     );
 
     expect(screen.getByText('Value for field 1 - Value for field 2')).toBeInTheDocument();
+    expect(screen.getByText('Value for field 1 - Value for field 2')).toHaveStyle('color: #00752c');
   });
 });

@@ -2560,6 +2560,14 @@
   dependencies:
     "@types/react" "*"
 
+"@types/react-color@^3.0.5":
+  version "3.0.5"
+  resolved "https://registry.yarnpkg.com/@types/react-color/-/react-color-3.0.5.tgz#b8bdf8df7085bd1577658fb37d9a18d7ba3963bb"
+  integrity sha512-0VZy8Uq5x04cW5QFz24Qw8MMMlsMi8Bb+XG5h59ATqPnWVq6OheHtrwv5LeakdTRDaECQnExJNSFOsSe4Eo/zQ==
+  dependencies:
+    "@types/react" "*"
+    "@types/reactcss" "*"
+
 "@types/react-dom@*":
   version "17.0.8"
   resolved "https://registry.yarnpkg.com/@types/react-dom/-/react-dom-17.0.8.tgz#3180de6d79bf53762001ad854e3ce49f36dd71fc"
@@ -2664,6 +2672,13 @@
   dependencies:
     "@types/prop-types" "*"
     csstype "^2.2.0"
+
+"@types/reactcss@*":
+  version "1.2.4"
+  resolved "https://registry.yarnpkg.com/@types/reactcss/-/reactcss-1.2.4.tgz#66c5f6afe123ffa1a50dbe724aa1fe68eb9fab00"
+  integrity sha512-1rhVqteMSD6KQjO+dPBObE1OkKadw00HVJkG5WCYsyvMwGgdTZ530wF7Bkrg/4TWxB2AtINIzFotjW51eViw+w==
+  dependencies:
+    "@types/react" "*"
 
 "@types/scheduler@*":
   version "0.16.1"
@@ -8657,11 +8672,11 @@ graceful-fs@^4.2.4:
     "@babel/preset-env" "7.13.10"
     "@babel/preset-typescript" "7.13.0"
     create-react-class "15.7.0"
-    eslint-config-graylog "file:../../../../Library/Caches/Yarn/v6/npm-graylog-web-plugin-4.2.0-SNAPSHOT-ee47b2e8-9672-4765-b9f3-0d5dc5cf3ca3-1626702365375/node_modules/eslint-config-graylog"
+    eslint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.2.0-SNAPSHOT-da1b4aa2-c2a7-4112-b002-4e4fce3e0f0e-1627301373422/node_modules/eslint-config-graylog"
     formik "2.2.6"
     html-webpack-plugin "^4.2.0"
     javascript-natural-sort "0.7.1"
-    jest-preset-graylog "file:../../../../Library/Caches/Yarn/v6/npm-graylog-web-plugin-4.2.0-SNAPSHOT-ee47b2e8-9672-4765-b9f3-0d5dc5cf3ca3-1626702365375/node_modules/jest-preset-graylog"
+    jest-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.2.0-SNAPSHOT-da1b4aa2-c2a7-4112-b002-4e4fce3e0f0e-1627301373422/node_modules/jest-preset-graylog"
     jquery "3.5.1"
     moment "2.29.1"
     moment-timezone "0.5.31"
@@ -8675,7 +8690,7 @@ graceful-fs@^4.2.4:
     react-router-dom "5.2.0"
     reflux "0.2.13"
     styled-components "5.2.3"
-    stylelint-config-graylog "file:../../../../Library/Caches/Yarn/v6/npm-graylog-web-plugin-4.2.0-SNAPSHOT-ee47b2e8-9672-4765-b9f3-0d5dc5cf3ca3-1626702365375/node_modules/stylelint-config-graylog"
+    stylelint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.2.0-SNAPSHOT-da1b4aa2-c2a7-4112-b002-4e4fce3e0f0e-1627301373422/node_modules/stylelint-config-graylog"
     typescript "4.3.2"
     webpack "4.44.2"
     webpack-cleanup-plugin "0.5.1"

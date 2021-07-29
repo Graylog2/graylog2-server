@@ -24,7 +24,7 @@ import org.graylog2.rest.models.system.sessions.responses.DefaultSessionResponse
 import org.graylog2.rest.models.system.sessions.responses.SessionResponseFactory;
 import org.graylog2.security.DefaultX509TrustManager;
 import org.graylog2.security.TrustManagerProvider;
-import org.graylog2.security.UserSessionTerminationListener;
+import org.graylog2.security.UserSessionTerminationService;
 import org.graylog2.security.encryption.EncryptedValueService;
 
 import javax.net.ssl.TrustManager;
@@ -33,10 +33,10 @@ public class SecurityBindings extends PluginModule {
     @Override
     protected void configure() {
         bind(EncryptedValueService.class).asEagerSingleton();
-        bind(UserSessionTerminationListener.class).asEagerSingleton();
         bind(Permissions.class).asEagerSingleton();
         bind(SessionCreator.class).in(Scopes.SINGLETON);
         addPermissions(RestPermissions.class);
+        addInitializer(UserSessionTerminationService.class);
 
         install(new FactoryModuleBuilder()
                 .implement(TrustManager.class, DefaultX509TrustManager.class)

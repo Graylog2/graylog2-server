@@ -14,20 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { WidgetActions } from 'views/stores/WidgetStore';
-import { DEFAULT_MESSAGE_FIELDS } from 'views/Constants';
 
-import MessagesWidget from '../widgets/MessagesWidget';
-import MessagesWidgetConfig from '../widgets/MessagesWidgetConfig';
+import { ActionDefinition } from 'views/components/actions/ActionHandler';
 
-export default () => WidgetActions.create(
-  MessagesWidget.builder()
-    .newId()
-    .config(
-      MessagesWidgetConfig.builder()
-        .fields(DEFAULT_MESSAGE_FIELDS)
-        .showMessageRow(true)
-        .showSummaryRow(true)
-        .build(),
-    ).build(),
-);
+// eslint-disable-next-line import/prefer-default-export
+export const createSimpleExternalValueAction = (overrides: Partial<ActionDefinition> = {}): ActionDefinition => ({
+  type: 'http-get',
+  title: 'Pivot to example.org',
+  isHidden: ({ field }) => !['field1'].includes(field),
+  linkTarget: () => 'the-link',
+  resetFocus: false,
+  ...overrides,
+});

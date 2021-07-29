@@ -39,6 +39,7 @@ const { StreamsStore } = CombinedProvider.get('Streams');
 const HIDDEN_STREAMS = [
   '000000000000000000000002',
   '000000000000000000000003',
+  '000000000000000000000004',
 ];
 
 function filterPipeline(state) {
@@ -95,9 +96,7 @@ const PipelineDetailsPage = createReactClass({
     const newPipeline = ObjectUtils.clone(pipeline);
 
     newPipeline.stages = newStages;
-    const pipelineSource = SourceGenerator.generatePipeline(newPipeline);
-
-    newPipeline.source = pipelineSource;
+    newPipeline.source = SourceGenerator.generatePipeline(newPipeline);
     PipelinesActions.update(newPipeline);
 
     if (typeof callback === 'function') {
