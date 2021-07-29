@@ -174,7 +174,7 @@ class Stream extends React.Component {
     const { loading, showStreamRuleForm, showEntityShareModal } = this.state;
 
     const isDefaultStream = stream.is_default;
-    const isProcessingFailure = stream.id === '000000000000000000000004';
+    const isNotEditable = !stream.is_editable;
     const defaultStreamTooltip = isDefaultStream
       ? <Tooltip id="default-stream-tooltip">Action not available for the default stream</Tooltip> : null;
 
@@ -184,7 +184,7 @@ class Stream extends React.Component {
     if (isPermitted(permissions, [`streams:edit:${stream.id}`])) {
       editRulesLink = (
         <OverlayElement overlay={defaultStreamTooltip} placement="top" useOverlay={isDefaultStream}>
-          <LinkContainer disabled={isDefaultStream || isProcessingFailure} to={Routes.stream_edit(stream.id)}>
+          <LinkContainer disabled={isDefaultStream || isNotEditable} to={Routes.stream_edit(stream.id)}>
             <Button bsStyle="info">
               <Icon name="stream" /> Manage Rules
             </Button>
@@ -194,7 +194,7 @@ class Stream extends React.Component {
 
       manageAlertsLink = (
         <LinkContainer to={Routes.stream_alerts(stream.id)}>
-          <Button bsStyle="info" disabled={isProcessingFailure}>
+          <Button bsStyle="info" disabled={isNotEditable}>
             <Icon name="bell" /> Manage Alerts
           </Button>
         </LinkContainer>
@@ -209,7 +209,7 @@ class Stream extends React.Component {
           <OverlayElement overlay={defaultStreamTooltip} placement="top" useOverlay={isDefaultStream}>
             <ToggleButton bsStyle="success"
                           onClick={this._onResume}
-                          disabled={isDefaultStream || loading}>
+                          disabled={isDefaultStream || loading || isNotEditable}>
               <Icon name="play" /> {loading ? 'Starting...' : 'Start Stream'}
             </ToggleButton>
           </OverlayElement>
@@ -219,7 +219,7 @@ class Stream extends React.Component {
           <OverlayElement overlay={defaultStreamTooltip} placement="top" useOverlay={isDefaultStream}>
             <ToggleButton bsStyle="primary"
                           onClick={this._onPause}
-                          disabled={isDefaultStream || loading}>
+                          disabled={loading || isNotEditable}>
               <Icon name="pause" /> {loading ? 'Pausing...' : 'Pause Stream'}
             </ToggleButton>
           </OverlayElement>
@@ -241,7 +241,7 @@ class Stream extends React.Component {
                         onQuickAdd={this._openStreamRuleForm}
                         indexSets={indexSets}
                         isDefaultStream={isDefaultStream}
-                        disabled={isProcessingFailure} />
+                        disabled={isNotEditable} />
       </OverlayElement>
     );
 
