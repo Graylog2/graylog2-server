@@ -19,6 +19,7 @@ package org.graylog.failure;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog2.Configuration;
+import org.graylog2.plugin.Message;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Test;
@@ -175,6 +176,89 @@ public class FailureSubmissionServiceTest {
 
         // then
         assertThat(consumedBatch).isNull();
+    }
+
+    @Test
+    public void processingFailureWithoutKeepDuplicate() throws InterruptedException {
+        when(configuration.getFailureHandlingQueueCapacity()).thenReturn(2);
+        final FailureHandlingConfiguration handlingConfiguration = mock(FailureHandlingConfiguration.class);
+        when(handlingConfiguration.submitProcessingFailures()).thenReturn(true);
+        when(handlingConfiguration.keepFailedMessageDuplicate()).thenReturn(false);
+
+        final FailureSubmissionService underTest = new FailureSubmissionService(configuration, metricRegistry, handlingConfiguration);
+
+        final Message message = new Message("message", "source", new DateTime(2016, 1, 1, 0, 0, DateTimeZone.UTC));
+        message.addProcessingError("pipeline rule 123 failed");
+
+        underTest.handleProcessingFailure(message, "test");
+
+        final FailureBatch consumedBatch = underTest.consumeBlockingWithTimeout(50);
+
+        assertThat(consumedBatch.getFailures()).hasSize(1);
+        assertThat(message.getFilterOut()).isTrue();
+    }
+
+    @Test
+    public void processingFailureWithKeepDuplicate() throws InterruptedException {
+        when(configuration.getFailureHandlingQueueCapacity()).thenReturn(2);
+        final FailureHandlingConfiguration handlingConfiguration = mock(FailureHandlingConfiguration.class);
+        when(handlingConfiguration.submitProcessingFailures()).thenReturn(true);
+        when(handlingConfiguration.keepFailedMessageDuplicate()).thenReturn(true);
+
+        final FailureSubmissionService underTest = new FailureSubmissionService(configuration, metricRegistry, handlingConfiguration);
+
+        final Message message = new Message("message", "source", new DateTime(2016, 1, 1, 0, 0, DateTimeZone.UTC));
+        message.addProcessingError("pipeline rule 123 failed");
+
+        underTest.handleProcessingFailure(message, "test");
+
+        final FailureBatch consumedBatch = underTest.consumeBlockingWithTimeout(50);
+
+        assertThat(consumedBatch.getFailures()).hasSize(1);
+        assertThat(message.getFilterOut()).isFalse();
+    }
+
+    @Test
+    public void processingExceptions() throws InterruptedException {
+        when(configuration.getFailureHandlingQueueCapacity()).thenReturn(2);
+        final FailureHandlingConfiguration handlingConfiguration = mock(FailureHandlingConfiguration.class);
+        when(handlingConfiguration.submitProcessingFailures()).thenReturn(true);
+        when(handlingConfiguration.keepFailedMessageDuplicate()).thenReturn(false);
+
+        final FailureSubmissionService underTest = new FailureSubmissionService(configuration, metricRegistry, handlingConfiguration);
+
+        final Message message = new Message("message", "source", new DateTime(2016, 1, 1, 0, 0, DateTimeZone.UTC));
+
+        underTest.handleProcessingException(message, "test", new RuntimeException("bad processing"));
+
+        final FailureBatch consumedBatch = underTest.consumeBlockingWithTimeout(50);
+
+        assertThat(consumedBatch.getFailures()).satisfies(failures -> {
+            assertThat(failures).hasSize(1);
+            assertThat(failures.iterator().next().errorMessage()).contains("RuntimeException: bad processing");
+            assertThat(failures.iterator().next().context()).isEqualTo("test");
+            assertThat(failures.iterator().next().failureType()).isEqualTo(FailureType.PROCESSING);
+            assertThat(failures.iterator().next().requiresAcknowledgement()).isTrue();
+        });
+        assertThat(message.getFilterOut()).isTrue();
+    }
+
+    @Test
+    public void disabledProcessingExceptions() throws InterruptedException {
+        when(configuration.getFailureHandlingQueueCapacity()).thenReturn(2);
+        final FailureHandlingConfiguration handlingConfiguration = mock(FailureHandlingConfiguration.class);
+        when(handlingConfiguration.submitProcessingFailures()).thenReturn(false);
+
+        final FailureSubmissionService underTest = new FailureSubmissionService(configuration, metricRegistry, handlingConfiguration);
+
+        final Message message = new Message("message", "source", new DateTime(2016, 1, 1, 0, 0, DateTimeZone.UTC));
+
+        underTest.handleProcessingException(message, "test", new RuntimeException("bad processing"));
+
+        final FailureBatch consumedBatch = underTest.consumeBlockingWithTimeout(50);
+
+        assertThat(consumedBatch).isNull();
+        assertThat(message.getFilterOut()).isFalse();
     }
 
     private ProcessingFailure createProcessingFailure() {
