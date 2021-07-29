@@ -194,7 +194,7 @@ class Stream extends React.Component {
 
       manageAlertsLink = (
         <LinkContainer to={Routes.stream_alerts(stream.id)}>
-          <Button bsStyle="info" disabled={isNotEditable}>
+          <Button bsStyle="info">
             <Icon name="bell" /> Manage Alerts
           </Button>
         </LinkContainer>
