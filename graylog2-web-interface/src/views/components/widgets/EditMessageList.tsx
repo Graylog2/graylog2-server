@@ -30,6 +30,7 @@ import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationW
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import DescriptionBox from 'views/components/aggregationbuilder/DescriptionBox';
 import DecoratorSidebar from 'views/components/messagelist/decorators/DecoratorSidebar';
+import { HoverForHelp } from 'components/common';
 
 const FullHeightRow = styled(Row)`
   height: 100%;
@@ -41,6 +42,13 @@ const FullHeightCol = styled(Col)`
   height: 100%;
   padding-bottom: 10px;
   overflow: auto;
+`;
+
+const SummaryCheckbox = styled(Checkbox)`
+  label {
+    display: flex;
+    justify-content: space-between;
+  }
 `;
 
 const _onFieldSelectionChanged = (fields, config, onChange) => {
@@ -91,9 +99,12 @@ const EditMessageList = ({ children, config, fields, onChange }: EditWidgetCompo
           <Checkbox checked={config.showMessageRow} onChange={() => _onShowMessageRowChanged(config, onChange)}>
             Show message in new row
           </Checkbox>
-          <Checkbox checked={config.showSummaryRow} onChange={() => _onShowSummaryRow(config, onChange)}>
+          <SummaryCheckbox checked={config.showSummaryRow} onChange={() => _onShowSummaryRow(config, onChange)}>
             Show message summary
-          </Checkbox>
+            <HoverForHelp title="Message Summary">
+              Display a summary of the most relevant information of a message, based on the message event type.
+            </HoverForHelp>
+          </SummaryCheckbox>
         </DescriptionBox>
         <DescriptionBox description="Sorting">
           <FieldSortSelect fields={fields} sort={sort} onChange={(data) => _onSortChange(data, config, onChange)} />
