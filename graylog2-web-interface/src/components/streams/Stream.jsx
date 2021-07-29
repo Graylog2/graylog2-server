@@ -21,9 +21,9 @@ import styled, { css } from 'styled-components';
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import { Link, LinkContainer } from 'components/graylog/router';
 import { Button, Tooltip } from 'components/graylog';
-import { OverlayElement, Icon, ShareButton } from 'components/common';
+import { Icon, OverlayElement, ShareButton } from 'components/common';
 import StreamRuleForm from 'components/streamrules/StreamRuleForm';
-import { isPermitted, isAnyPermitted } from 'util/PermissionsMixin';
+import { isAnyPermitted, isPermitted } from 'util/PermissionsMixin';
 import UserNotification from 'util/UserNotification';
 import StoreProvider from 'injection/StoreProvider';
 import Routes from 'routing/Routes';
@@ -174,6 +174,7 @@ class Stream extends React.Component {
     const { loading, showStreamRuleForm, showEntityShareModal } = this.state;
 
     const isDefaultStream = stream.is_default;
+    const isProcessingFailure = stream.id === '000000000000000000000004';
     const defaultStreamTooltip = isDefaultStream
       ? <Tooltip id="default-stream-tooltip">Action not available for the default stream</Tooltip> : null;
 
@@ -183,7 +184,7 @@ class Stream extends React.Component {
     if (isPermitted(permissions, [`streams:edit:${stream.id}`])) {
       editRulesLink = (
         <OverlayElement overlay={defaultStreamTooltip} placement="top" useOverlay={isDefaultStream}>
-          <LinkContainer disabled={isDefaultStream} to={Routes.stream_edit(stream.id)}>
+          <LinkContainer disabled={isDefaultStream || isProcessingFailure} to={Routes.stream_edit(stream.id)}>
             <Button bsStyle="info">
               <Icon name="stream" /> Manage Rules
             </Button>
@@ -193,7 +194,7 @@ class Stream extends React.Component {
 
       manageAlertsLink = (
         <LinkContainer to={Routes.stream_alerts(stream.id)}>
-          <Button bsStyle="info">
+          <Button bsStyle="info" disabled={isProcessingFailure}>
             <Icon name="bell" /> Manage Alerts
           </Button>
         </LinkContainer>
@@ -239,7 +240,8 @@ class Stream extends React.Component {
                         onClone={this._onClone}
                         onQuickAdd={this._openStreamRuleForm}
                         indexSets={indexSets}
-                        isDefaultStream={isDefaultStream} />
+                        isDefaultStream={isDefaultStream}
+                        disabled={isProcessingFailure} />
       </OverlayElement>
     );
 
