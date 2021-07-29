@@ -72,6 +72,7 @@ export const allMessagesTable = (id: string = uuid(), decorators: Array<Decorato
   .config(MessageWidgetConfig.builder()
     .fields(DEFAULT_MESSAGE_FIELDS)
     .showMessageRow(true)
+    .showSummaryRow(true)
     .decorators(decorators)
     .build())
   .build();

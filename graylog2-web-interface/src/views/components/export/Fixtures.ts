@@ -43,7 +43,7 @@ const queries = [
   Query.builder().id('query-id-1').searchTypes([searchType]).build(),
 ];
 const currentSort = new SortConfig(SortConfig.PIVOT_TYPE, 'level', Direction.Descending);
-const config = new MessagesWidgetConfig(['level', 'http_method'], true, [], [currentSort]);
+const config = new MessagesWidgetConfig(['level', 'http_method'], true, true, [], [currentSort]);
 
 export const messagesWidget = (id: string = 'widget-id-1') => MessagesWidget.builder()
   .id(id)
