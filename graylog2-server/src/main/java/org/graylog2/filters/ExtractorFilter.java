@@ -73,12 +73,23 @@ public class ExtractorFilter implements MessageFilter {
         }
 
         for (final Extractor extractor : extractors.getOrDefault(msg.getSourceInputId(), Collections.emptyList())) {
+            // TODO remove testing code below
+            if (msg.hasField("took_ms")) {
+                final long took_ms = msg.getFieldAs(Integer.class, "took_ms");
+                if (took_ms == 38) {
+                    throw new RuntimeException("WHOAAAA");
+                }
+            }
+            // TODO remove testing code above
+
             try {
                 extractor.runExtractor(msg);
             } catch (Exception e) {
                 extractor.incrementExceptions();
-                LOG.error("Could not apply extractor \"" + extractor.getTitle() + "\" (id=" + extractor.getId() + ") "
-                        + "to message " + msg.getId(), e);
+                final String error = "Could not apply extractor \"" + extractor.getTitle() + "\" (id=" + extractor.getId() + ") "
+                        + "to message " + msg.getId();
+                LOG.error(error, e);
+                msg.addProcessingError(error);
             }
         }
 

@@ -19,6 +19,8 @@ package org.graylog.failure;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import org.graylog2.Configuration;
+import org.graylog2.plugin.Message;
+import org.graylog2.shared.utilities.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,6 +91,46 @@ public class FailureSubmissionService {
 
         submittedFailureBatches.mark();
         submittedFailures.mark(batch.size());
+    }
+
+    public void handleProcessingException(Message message, String failureContext, Exception e) {
+        if (!submitProcessingFailures()) {
+            return;
+        }
+        if (!keepFailedMessageDuplicate()) {
+            message.setFilterOut(true);
+        }
+        submitFailure(message, failureContext, ExceptionUtils.getShortenedStackTrace(e));
+    }
+
+    public void handleProcessingFailure(Message message, String failureContext) {
+        if (!submitProcessingFailures()) {
+            // We don't handle processing errors
+            return;
+        }
+        final String processingError = message.getFieldAs(String.class, Message.FIELD_GL2_PROCESSING_ERROR);
+        if (processingError == null) {
+            return;
+        }
+        if (!keepFailedMessageDuplicate()) {
+            message.setFilterOut(true);
+        }
+
+        final Message failedMessage = new Message(message);
+        failedMessage.removeField(Message.FIELD_GL2_PROCESSING_ERROR);
+        submitFailure(failedMessage, failureContext, processingError);
+    }
+
+    private void submitFailure(Message failedMessage, String errorType, String error) {
+        try {
+            // If we store the regular message, the acknowledgement happens in the output path
+            boolean needsAcknowledgement = keepFailedMessageDuplicate();
+            // TODO use message.getMesssgeId() once this field is set early in processing
+            final ProcessingFailure processingFailure = new ProcessingFailure(failedMessage.getId(), errorType, error, failedMessage.getTimestamp(), failedMessage, needsAcknowledgement);
+            final FailureBatch failureBatch = FailureBatch.processingFailureBatch(processingFailure);
+            submitBlocking(failureBatch);
+        } catch (InterruptedException ignored) {
+        }
     }
 
     /**

@@ -24,6 +24,7 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import com.lmax.disruptor.WorkHandler;
 import de.huxhorn.sulky.ulid.ULID;
+import org.graylog.failure.FailureSubmissionService;
 import org.graylog2.buffers.OutputBuffer;
 import org.graylog2.messageprocessors.OrderedMessageProcessors;
 import org.graylog2.plugin.Message;
@@ -50,6 +51,7 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
     private final Meter incomingMessages;
 
     private final Timer processTime;
+    private final FailureSubmissionService failureSubmissionService;
     private final Meter outgoingMessages;
     private final OrderedMessageProcessors orderedMessageProcessors;
 
@@ -67,7 +69,8 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
                                   ProcessingStatusRecorder processingStatusRecorder,
                                   ULID ulid,
                                   @Assisted DecodingProcessor decodingProcessor,
-                                  @DefaultStream Provider<Stream> defaultStreamProvider) {
+                                  @DefaultStream Provider<Stream> defaultStreamProvider,
+                                  FailureSubmissionService failureSubmissionService) {
         this.orderedMessageProcessors = orderedMessageProcessors;
         this.outputBuffer = outputBuffer;
         this.processingStatusRecorder = processingStatusRecorder;
@@ -78,6 +81,7 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
         incomingMessages = metricRegistry.meter(name(ProcessBufferProcessor.class, "incomingMessages"));
         outgoingMessages = metricRegistry.meter(name(ProcessBufferProcessor.class, "outgoingMessages"));
         processTime = metricRegistry.timer(name(ProcessBufferProcessor.class, "processTime"));
+        this.failureSubmissionService = failureSubmissionService;
         currentMessage = null;
     }
 
@@ -134,6 +138,7 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
                 // Only logs a single line warning without stacktrace
                 LOG.warn("Unable to process message <{}>: {}", msg.getId(), e);
             }
+            failureSubmissionService.handleProcessingException(msg, "process-buffer-processor", e);
         } finally {
             currentMessage = null;
             outgoingMessages.mark();

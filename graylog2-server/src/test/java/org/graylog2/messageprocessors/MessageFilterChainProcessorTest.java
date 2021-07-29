@@ -19,6 +19,8 @@ package org.graylog2.messageprocessors;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
+import org.graylog.failure.FailureHandlingConfiguration;
+import org.graylog.failure.FailureSubmissionService;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Messages;
 import org.graylog2.plugin.ServerStatus;
@@ -50,6 +52,10 @@ public class MessageFilterChainProcessorTest {
     private ServerStatus serverStatus;
     @Mock
     private MessageQueueAcknowledger acknowledger;
+    @Mock
+    private FailureSubmissionService failureSubmissionService;
+    @Mock
+    private FailureHandlingConfiguration failureHandlingConfiguration;
 
     @Before
     public void setUp() throws Exception {
@@ -62,10 +68,7 @@ public class MessageFilterChainProcessorTest {
         final DummyFilter first = new DummyFilter(10);
         final DummyFilter second = new DummyFilter(20);
         final Set<MessageFilter> filters = ImmutableSet.of(third, first, second);
-        final MessageFilterChainProcessor processor = new MessageFilterChainProcessor(new MetricRegistry(),
-                                                                                      filters,
-                                                                                      acknowledger,
-                                                                                      serverStatus);
+        final MessageFilterChainProcessor processor = getFilterChainProcessor(filters);
         final List<MessageFilter> filterRegistry = processor.getFilterRegistry();
 
         Assert.assertEquals(filterRegistry.get(0), first);
@@ -76,10 +79,7 @@ public class MessageFilterChainProcessorTest {
     @Test
     public void testHandleMessageEmptyFilterSet() throws Exception {
         try {
-            new MessageFilterChainProcessor(new MetricRegistry(),
-                                            Collections.emptySet(),
-                                            acknowledger,
-                                            serverStatus);
+            getFilterChainProcessor(Collections.emptySet());
             Assert.fail("A processor without message filters should fail on creation");
         } catch (RuntimeException ignored) {}
     }
@@ -111,10 +111,7 @@ public class MessageFilterChainProcessorTest {
             }
         };
 
-        final MessageFilterChainProcessor filterTest = new MessageFilterChainProcessor(new MetricRegistry(),
-                                                                                       Collections.singleton(filterOnlyFirst),
-                                                                                       acknowledger,
-                                                                                       serverStatus);
+        final MessageFilterChainProcessor filterTest = getFilterChainProcessor(ImmutableSet.of(filterOnlyFirst));
         Message filteredoutMessage = new Message("filtered out", "source", Tools.nowUTC());
         filteredoutMessage.setJournalOffset(1);
         Message unfilteredMessage = new Message("filtered out", "source", Tools.nowUTC());
@@ -134,10 +131,7 @@ public class MessageFilterChainProcessorTest {
         final DummyFilter second = new DummyFilter(20);
         final DummyFilter third = new DummyFilter(30);
         final Set<MessageFilter> filters = ImmutableSet.of(first, second, third);
-        final MessageFilterChainProcessor processor = new MessageFilterChainProcessor(new MetricRegistry(),
-                filters,
-                acknowledger,
-                serverStatus);
+        final MessageFilterChainProcessor processor = getFilterChainProcessor(filters);
 
         final Message message = new Message("message", "source", new DateTime(2016, 1, 1, 0, 0, DateTimeZone.UTC));
         final Message result = Iterables.getFirst(processor.process(message), null);
@@ -151,15 +145,20 @@ public class MessageFilterChainProcessorTest {
         final MessageFilter first = new DummyFilter(10);
         final MessageFilter second = new RemovingMessageFilter();
         final Set<MessageFilter> filters = ImmutableSet.of(first, second);
-        final MessageFilterChainProcessor processor = new MessageFilterChainProcessor(new MetricRegistry(),
-                filters,
-                acknowledger,
-                serverStatus);
+        final MessageFilterChainProcessor processor = getFilterChainProcessor(filters);
 
         final Message message = new Message("message", "source", new DateTime(2016, 1, 1, 0, 0, DateTimeZone.UTC));
         final Messages result = processor.process(message);
 
         assertThat(result).isEmpty();
+    }
+
+    private MessageFilterChainProcessor getFilterChainProcessor(Set<MessageFilter> filters) {
+        return new MessageFilterChainProcessor(new MetricRegistry(),
+                filters,
+                acknowledger,
+                serverStatus,
+                failureSubmissionService);
     }
 
     private static class DummyFilter implements MessageFilter {

@@ -22,6 +22,7 @@ import com.codahale.metrics.Timer;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Ordering;
+import org.graylog.failure.FailureSubmissionService;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Messages;
 import org.graylog2.plugin.ServerStatus;
@@ -29,6 +30,7 @@ import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.plugin.messageprocessors.MessageProcessor;
 import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
+import org.graylog2.shared.utilities.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,12 +61,14 @@ public class MessageFilterChainProcessor implements MessageProcessor {
     private final MessageQueueAcknowledger messageQueueAcknowledger;
     private final ServerStatus serverStatus;
     private final Meter filteredOutMessages;
+    private final FailureSubmissionService failureSubmissionService;
 
     @Inject
     public MessageFilterChainProcessor(MetricRegistry metricRegistry,
                                        Set<MessageFilter> filterRegistry,
                                        MessageQueueAcknowledger messageQueueAcknowledger,
-                                       ServerStatus serverStatus) {
+                                       ServerStatus serverStatus,
+                                       FailureSubmissionService failureSubmissionService) {
         this.metricRegistry = metricRegistry;
         this.messageQueueAcknowledger = messageQueueAcknowledger;
         this.serverStatus = serverStatus;
@@ -78,9 +82,11 @@ public class MessageFilterChainProcessor implements MessageProcessor {
                         .result();
             }
         }).immutableSortedCopy(filterRegistry);
+        this.failureSubmissionService = failureSubmissionService;
 
-        if (filterRegistry.size() == 0)
+        if (filterRegistry.size() == 0) {
             throw new RuntimeException("Empty filter registry!");
+        }
 
         this.filteredOutMessages = metricRegistry.meter(name(ProcessBufferProcessor.class, "filteredOutMessages"));
     }
@@ -104,10 +110,18 @@ public class MessageFilterChainProcessor implements MessageProcessor {
                         msg.setFilterOut(true);
                         filteredOutMessages.mark();
                         messageQueueAcknowledger.acknowledge(msg);
+                    } else {
+                        failureSubmissionService.handleProcessingFailure(msg, "message-processor-error");
                     }
                 } catch (Exception e) {
-                    LOG.error("Could not apply filter [" + filter.getName() + "] on message <" + msg.getId() + ">: ",
-                            e);
+                    if (LOG.isDebugEnabled()) {
+                        LOG.error("Could not apply filter [" + filter.getName() + "] on message <" + msg.getId() + ">: ", e);
+                    } else {
+                        LOG.error("Could not apply filter [" + filter.getName() + "] on message <" + msg.getId() + ">:{}{}",
+                                System.lineSeparator(),
+                                ExceptionUtils.getShortenedStackTrace(e));
+                    }
+                    failureSubmissionService.handleProcessingException(msg, "message-processor-exception", e);
                 } finally {
                     final long elapsedNanos = timerContext.stop();
                     msg.recordTiming(serverStatus, timerName, elapsedNanos);

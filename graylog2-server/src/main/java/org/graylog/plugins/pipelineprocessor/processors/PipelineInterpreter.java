@@ -30,9 +30,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
-import org.graylog.failure.FailureBatch;
 import org.graylog.failure.FailureSubmissionService;
-import org.graylog.failure.ProcessingFailure;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
@@ -75,7 +73,6 @@ public class PipelineInterpreter implements MessageProcessor {
 
     private final MessageQueueAcknowledger messageQueueAcknowledger;
     private final Meter filteredOutMessages;
-    private final Meter failedMessages;
     private final Timer executionTime;
     private final MetricRegistry metricRegistry;
     private final ConfigurationStateUpdater stateUpdater;
@@ -90,7 +87,6 @@ public class PipelineInterpreter implements MessageProcessor {
 
         this.messageQueueAcknowledger = messageQueueAcknowledger;
         this.filteredOutMessages = metricRegistry.meter(name(ProcessBufferProcessor.class, "filteredOutMessages"));
-        this.failedMessages = metricRegistry.meter(name(ProcessBufferProcessor.class, "failedMessages"));
         this.executionTime = metricRegistry.timer(name(PipelineInterpreter.class, "executionTime"));
         this.metricRegistry = metricRegistry;
         this.stateUpdater = stateUpdater;
@@ -161,7 +157,9 @@ public class PipelineInterpreter implements MessageProcessor {
                         message,
                         initialStreamIds);
                 potentiallyDropFilteredMessage(message);
-                handleFailedMessage(message);
+                if (!message.getFilterOut()) {
+                    failureSubmissionService.handleProcessingFailure(message, "pipeline-processor");
+                }
 
                 // go to 1 and iterate over all messages again until no more streams are being assigned
                 if (!addedStreams || message.getFilterOut()) {
@@ -178,44 +176,6 @@ public class PipelineInterpreter implements MessageProcessor {
         interpreterListener.finishProcessing();
         // 7. return the processed messages
         return new MessageCollection(fullyProcessed);
-    }
-
-    private void handleFailedMessage(Message message) {
-        if (message.getFilterOut()) {
-            // Message will be dropped
-            return;
-        }
-        if (!failureSubmissionService.submitProcessingFailures()) {
-            // We don't handle processing errors
-            return;
-        }
-
-        final String processingError = message.getFieldAs(String.class, Message.FIELD_GL2_PROCESSING_ERROR);
-        if (processingError == null) {
-            return;
-        }
-
-        if (!failureSubmissionService.keepFailedMessageDuplicate()) {
-            message.setFilterOut(true);
-        }
-        submitFailure(message, processingError);
-
-        failedMessages.mark();
-    }
-
-    private void submitFailure(Message failedMessage, String error) {
-        final Message message = new Message(failedMessage);
-        message.removeField(Message.FIELD_GL2_PROCESSING_ERROR);
-
-        try {
-            // If we store the regular message, the acknowledgement happens in the output path
-            boolean needsAcknowledgement = !failureSubmissionService.keepFailedMessageDuplicate();
-            // TODO use message.getMesssgeId() once this field is set early in processing
-            final ProcessingFailure processingFailure = new ProcessingFailure(message.getId(), "pipeline-processor", error, message.getTimestamp(), message, needsAcknowledgement);
-            final FailureBatch failureBatch = FailureBatch.processingFailureBatch(processingFailure);
-            failureSubmissionService.submitBlocking(failureBatch);
-        } catch (InterruptedException ignored) {
-        }
     }
 
     private void potentiallyDropFilteredMessage(Message message) {
@@ -469,11 +429,7 @@ public class PipelineInterpreter implements MessageProcessor {
 
     private void appendProcessingError(Rule rule, Message message, String errorString) {
         final String msg = "For rule '" + rule.name() + "': " + errorString;
-        if (message.hasField(Message.FIELD_GL2_PROCESSING_ERROR)) {
-            message.addField(Message.FIELD_GL2_PROCESSING_ERROR, message.getFieldAs(String.class, Message.FIELD_GL2_PROCESSING_ERROR) + "," + msg);
-        } else {
-            message.addField(Message.FIELD_GL2_PROCESSING_ERROR, msg);
-        }
+        message.addProcessingError(msg);
     }
 
     public static class Descriptor implements MessageProcessor.Descriptor {

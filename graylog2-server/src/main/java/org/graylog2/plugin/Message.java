@@ -518,6 +518,14 @@ public class Message implements Messages, Indexable {
         addField(key, value, false);
     }
 
+    public void addProcessingError(final String error) {
+        if (hasField(FIELD_GL2_PROCESSING_ERROR)) {
+            addField(FIELD_GL2_PROCESSING_ERROR, getFieldAs(String.class, FIELD_GL2_PROCESSING_ERROR) + "\n" + error);
+        } else {
+            addField(FIELD_GL2_PROCESSING_ERROR, error);
+        }
+    }
+
     private void addRequiredField(final String key, final Object value) {
         addField(key, value, true);
     }

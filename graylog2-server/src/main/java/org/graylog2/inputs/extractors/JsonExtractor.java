@@ -17,7 +17,6 @@
 package org.graylog2.inputs.extractors;
 
 import com.codahale.metrics.MetricRegistry;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Joiner;
@@ -28,6 +27,7 @@ import org.graylog2.ConfigurationException;
 import org.graylog2.jackson.TypeReferences;
 import org.graylog2.plugin.inputs.Converter;
 import org.graylog2.plugin.inputs.Extractor;
+import org.graylog2.shared.utilities.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,7 +94,12 @@ public class JsonExtractor extends Extractor {
 
     @Override
     protected Result[] run(String value) {
-        final Map<String, Object> extractedJson = extractJson(value);
+        final Map<String, Object> extractedJson;
+        try {
+            extractedJson = extractJson(value);
+        } catch (IOException e) {
+            return new Result[]{new Result(null, null, -1, -1, ExceptionUtils.getShortenedStackTrace(e))};
+        }
         final List<Result> results = new ArrayList<>(extractedJson.size());
         for (Map.Entry<String, Object> entry : extractedJson.entrySet()) {
             results.add(new Result(entry.getValue(), entry.getKey(), -1, -1));
@@ -103,17 +108,12 @@ public class JsonExtractor extends Extractor {
         return results.toArray(new Result[results.size()]);
     }
 
-    public Map<String, Object> extractJson(String value) {
+    public Map<String, Object> extractJson(String value) throws IOException {
         if (isNullOrEmpty(value)) {
             return Collections.emptyMap();
         }
 
-        final Map<String, Object> json;
-        try {
-            json = mapper.readValue(value, TypeReferences.MAP_STRING_OBJECT);
-        } catch (IOException e) {
-            return Collections.emptyMap();
-        }
+        final Map<String, Object> json = mapper.readValue(value, TypeReferences.MAP_STRING_OBJECT);
 
         final Map<String, Object> results = new HashMap<>(json.size());
         for (Map.Entry<String, Object> mapEntry : json.entrySet()) {

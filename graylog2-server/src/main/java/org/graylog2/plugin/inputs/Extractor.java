@@ -24,6 +24,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.database.EmbeddedPersistable;
+import org.graylog2.shared.utilities.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -214,6 +215,8 @@ public abstract class Extractor implements EmbeddedPersistable {
                 final Result[] results = run(field);
                 if (results == null || results.length == 0 || Arrays.stream(results).anyMatch(result -> result.getValue() == null)) {
                     return;
+                } else if (results.length == 1 && results[0].errorString != null) {
+                    msg.addProcessingError(results[0].errorString);
                 } else if (results.length == 1 && results[0].target == null) {
                     // results[0].target is null if this extractor cannot produce multiple fields use targetField in that case
                     msg.addField(targetField, results[0].getValue());
@@ -281,7 +284,13 @@ public abstract class Extractor implements EmbeddedPersistable {
                     }
                 } catch (Exception e) {
                     this.converterExceptions.incrementAndGet();
-                    LOG.error("Could not apply converter [" + converter.getType() + "] of extractor [" + getId() + "].", e);
+                    final String error = "Could not apply converter [" + converter.getType() + "] of extractor [" + getId() + "].";
+                    if (LOG.isDebugEnabled()) {
+                        LOG.error(error, e);
+                    } else {
+                        LOG.error(error + ": {}{}", System.lineSeparator(), ExceptionUtils.getShortenedStackTrace(e));
+                    }
+                    msg.addProcessingError(error);
                 }
             }
         }
@@ -419,16 +428,22 @@ public abstract class Extractor implements EmbeddedPersistable {
         private final String target;
         private final int beginIndex;
         private final int endIndex;
+        private final String errorString;
 
         public Result(String value, int beginIndex, int endIndex) {
             this(value, null, beginIndex, endIndex);
         }
 
         public Result(Object value, String target, int beginIndex, int endIndex) {
+            this(value, target, beginIndex, endIndex, null);
+        }
+
+        public Result(Object value, String target, int beginIndex, int endIndex, String errorString) {
             this.value = value;
             this.target = target;
             this.beginIndex = beginIndex;
             this.endIndex = endIndex;
+            this.errorString = errorString;
         }
 
         public Object getValue() {
@@ -447,20 +462,29 @@ public abstract class Extractor implements EmbeddedPersistable {
             return endIndex;
         }
 
+        public String getErrorString() {
+            return errorString;
+        }
+
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             Result result = (Result) o;
             return Objects.equals(beginIndex, result.beginIndex) &&
                     Objects.equals(endIndex, result.endIndex) &&
                     Objects.equals(value, result.value) &&
-                    Objects.equals(target, result.target);
+                    Objects.equals(target, result.target) &&
+                    Objects.equals(errorString, result.errorString);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(value, target, beginIndex, endIndex);
+            return Objects.hash(value, target, beginIndex, endIndex, errorString);
         }
 
         @Override
@@ -470,6 +494,7 @@ public abstract class Extractor implements EmbeddedPersistable {
                     .add("target", target)
                     .add("beginIndex", beginIndex)
                     .add("endIndex", endIndex)
+                    .add("errorString", errorString)
                     .toString();
         }
     }
