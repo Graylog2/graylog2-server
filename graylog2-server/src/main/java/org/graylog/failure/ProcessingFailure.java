@@ -25,20 +25,20 @@ import javax.annotation.Nullable;
 public class ProcessingFailure implements Failure {
 
     private final String failedMessageId;
-    private final String errorType;
+    private final String context;
     private final String errorMessage;
     private final DateTime timestamp;
     private final Indexable failedMessage;
     private final boolean requiresAcknowledgement;
 
     public ProcessingFailure(String failedMessageId,
-                             String errorType,
+                             String context,
                              String errorMessage,
                              DateTime timestamp,
                              Indexable failedMessage,
                              boolean requiresAcknowledgement) {
         this.failedMessageId = failedMessageId;
-        this.errorType = errorType;
+        this.context = context;
         this.errorMessage = errorMessage;
         this.timestamp = timestamp;
         this.failedMessage = failedMessage;
@@ -62,8 +62,8 @@ public class ProcessingFailure implements Failure {
     }
 
     @Override
-    public String errorType() {
-        return errorType;
+    public String context() {
+        return context;
     }
 
     @Override
@@ -88,11 +88,15 @@ public class ProcessingFailure implements Failure {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         final ProcessingFailure that = (ProcessingFailure) o;
         return Objects.equal(failedMessageId, that.failedMessageId)
-                && Objects.equal(errorType, that.errorType)
+                && Objects.equal(context, that.context)
                 && Objects.equal(errorMessage, that.errorMessage)
                 && Objects.equal(timestamp, that.timestamp)
                 && Objects.equal(failedMessage, that.failedMessage)
@@ -101,6 +105,6 @@ public class ProcessingFailure implements Failure {
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(failedMessageId, errorType, errorMessage, timestamp, failedMessage, requiresAcknowledgement);
+        return Objects.hashCode(failedMessageId, context, errorMessage, timestamp, failedMessage, requiresAcknowledgement);
     }
 }

@@ -41,7 +41,7 @@ public interface Failure {
     @Nullable
     String targetIndex();
 
-    String errorType();
+    String context();
 
     String errorMessage();
 
