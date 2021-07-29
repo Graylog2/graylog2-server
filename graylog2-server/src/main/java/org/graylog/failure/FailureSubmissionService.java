@@ -124,7 +124,7 @@ public class FailureSubmissionService {
     private void submitFailure(Message failedMessage, String errorType, String error) {
         try {
             // If we store the regular message, the acknowledgement happens in the output path
-            boolean needsAcknowledgement = keepFailedMessageDuplicate();
+            boolean needsAcknowledgement = !keepFailedMessageDuplicate();
             // TODO use message.getMesssgeId() once this field is set early in processing
             final ProcessingFailure processingFailure = new ProcessingFailure(failedMessage.getId(), errorType, error, failedMessage.getTimestamp(), failedMessage, needsAcknowledgement);
             final FailureBatch failureBatch = FailureBatch.processingFailureBatch(processingFailure);
