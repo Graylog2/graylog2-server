@@ -30,7 +30,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
-import org.graylog.failure.FailureSubmissionService;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
@@ -76,13 +75,11 @@ public class PipelineInterpreter implements MessageProcessor {
     private final Timer executionTime;
     private final MetricRegistry metricRegistry;
     private final ConfigurationStateUpdater stateUpdater;
-    private final FailureSubmissionService failureSubmissionService;
 
     @Inject
     public PipelineInterpreter(MessageQueueAcknowledger messageQueueAcknowledger,
                                MetricRegistry metricRegistry,
-                               ConfigurationStateUpdater stateUpdater,
-                               FailureSubmissionService failureSubmissionService
+                               ConfigurationStateUpdater stateUpdater
     ) {
 
         this.messageQueueAcknowledger = messageQueueAcknowledger;
@@ -90,7 +87,6 @@ public class PipelineInterpreter implements MessageProcessor {
         this.executionTime = metricRegistry.timer(name(PipelineInterpreter.class, "executionTime"));
         this.metricRegistry = metricRegistry;
         this.stateUpdater = stateUpdater;
-        this.failureSubmissionService = failureSubmissionService;
     }
 
     /**
@@ -157,9 +153,6 @@ public class PipelineInterpreter implements MessageProcessor {
                         message,
                         initialStreamIds);
                 potentiallyDropFilteredMessage(message);
-                if (!message.getFilterOut()) {
-                    failureSubmissionService.handleProcessingFailure(message, "pipeline-processor");
-                }
 
                 // go to 1 and iterate over all messages again until no more streams are being assigned
                 if (!addedStreams || message.getFilterOut()) {

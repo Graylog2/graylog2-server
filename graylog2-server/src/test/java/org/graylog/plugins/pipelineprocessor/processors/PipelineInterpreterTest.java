@@ -22,7 +22,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.eventbus.EventBus;
-import org.graylog.failure.FailureSubmissionService;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
@@ -85,7 +84,6 @@ public class PipelineInterpreterTest {
                     "  set_field(\"foobar\", \"covfefe\");\n" +
                     "end", null, null);
 
-    private final FailureSubmissionService failureSubmissionService = mock(FailureSubmissionService.class);
     private final MessageQueueAcknowledger messageQueueAcknowledger = mock(MessageQueueAcknowledger.class);
 
     @Test
@@ -274,8 +272,8 @@ public class PipelineInterpreterTest {
         return new PipelineInterpreter(
                 messageQueueAcknowledger,
                 new MetricRegistry(),
-                stateUpdater,
-                failureSubmissionService);
+                stateUpdater
+        );
     }
 
     @Test
@@ -330,8 +328,8 @@ public class PipelineInterpreterTest {
         final PipelineInterpreter interpreter = new PipelineInterpreter(
                 mock(MessageQueueAcknowledger.class),
                 metricRegistry,
-                stateUpdater,
-                failureSubmissionService);
+                stateUpdater
+        );
 
         interpreter.process(messageInDefaultStream("", ""));
 

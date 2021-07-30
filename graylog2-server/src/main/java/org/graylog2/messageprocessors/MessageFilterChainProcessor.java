@@ -110,8 +110,6 @@ public class MessageFilterChainProcessor implements MessageProcessor {
                         msg.setFilterOut(true);
                         filteredOutMessages.mark();
                         messageQueueAcknowledger.acknowledge(msg);
-                    } else {
-                        failureSubmissionService.handleProcessingFailure(msg, "message-processor-error");
                     }
                 } catch (Exception e) {
                     if (LOG.isDebugEnabled()) {

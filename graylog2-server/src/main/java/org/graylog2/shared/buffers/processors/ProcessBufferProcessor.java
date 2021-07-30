@@ -163,7 +163,14 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
             message.setProcessingTime(Tools.nowUTC());
             processingStatusRecorder.updatePostProcessingReceiveTime(message.getReceiveTime());
 
-            outputBuffer.insertBlocking(message);
+            if (message.hasField(Message.FIELD_GL2_PROCESSING_ERROR)) {
+                failureSubmissionService.handleProcessingFailure(message, "process-buffer-processor");
+                if (!message.getFilterOut()) {
+                    outputBuffer.insertBlocking(message);
+                }
+            } else {
+                outputBuffer.insertBlocking(message);
+            }
         }
     }
 
