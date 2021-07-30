@@ -246,6 +246,7 @@ public class PipelineInterpreterTest {
         assertThat(actualMessage.hasField("foobar")).isFalse();
     }
 
+    @Test
     public void testMatchPassContinuesIfOneRuleMatched() {
         final RuleService ruleService = mock(MongoDbRuleService.class);
         when(ruleService.loadAll()).thenReturn(ImmutableList.of(RULE_TRUE, RULE_FALSE, RULE_ADD_FOOBAR));
