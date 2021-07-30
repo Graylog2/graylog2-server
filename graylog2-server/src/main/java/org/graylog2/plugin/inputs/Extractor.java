@@ -213,10 +213,10 @@ public abstract class Extractor implements EmbeddedPersistable {
 
             try (final Timer.Context ignored2 = executionTimer.time()) {
                 final Result[] results = run(field);
-                if (results == null || results.length == 0 || Arrays.stream(results).anyMatch(result -> result.getValue() == null)) {
-                    return;
-                } else if (results.length == 1 && results[0].errorString != null) {
+                if (results != null && results.length == 1 && results[0].errorString != null) {
                     msg.addProcessingError(results[0].errorString);
+                } else if (results == null || results.length == 0 || Arrays.stream(results).anyMatch(result -> result.getValue() == null)) {
+                    return;
                 } else if (results.length == 1 && results[0].target == null) {
                     // results[0].target is null if this extractor cannot produce multiple fields use targetField in that case
                     msg.addField(targetField, results[0].getValue());
