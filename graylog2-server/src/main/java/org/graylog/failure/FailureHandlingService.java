@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * The purpose of this service is to consume/process failure batches submitted via {@link FailureSubmissionService}.
+ * The purpose of this service is to consume/process failure batches submitted via {@link FailureSubmissionQueue}.
  * The processing is done in a dedicated service thread, the lifecycle of the service is managed
  * by {@link com.google.common.util.concurrent.ServiceManager}.
  *
@@ -49,7 +49,7 @@ public class FailureHandlingService extends AbstractExecutionThreadService {
 
     private final List<FailureHandler> fallbackFailureHandlerAsList;
     private final Set<FailureHandler> failureHandlers;
-    private final FailureSubmissionService failureSubmissionService;
+    private final FailureSubmissionQueue failureSubmissionQueue;
     private final Configuration configuration;
     private final MessageQueueAcknowledger acknowledger;
     private Thread executionThread;
@@ -58,12 +58,12 @@ public class FailureHandlingService extends AbstractExecutionThreadService {
     public FailureHandlingService(
             @Named("fallbackFailureHandler") FailureHandler fallbackFailureHandler,
             Set<FailureHandler> failureHandlers,
-            FailureSubmissionService failureSubmissionService,
+            FailureSubmissionQueue failureSubmissionQueue,
             Configuration configuration,
             MessageQueueAcknowledger acknowledger) {
         this.fallbackFailureHandlerAsList = Lists.newArrayList(fallbackFailureHandler);
         this.failureHandlers = failureHandlers;
-        this.failureSubmissionService = failureSubmissionService;
+        this.failureSubmissionQueue = failureSubmissionQueue;
         this.configuration = configuration;
         this.acknowledger = acknowledger;
     }
@@ -83,17 +83,17 @@ public class FailureHandlingService extends AbstractExecutionThreadService {
         // further failures.
         final long shutdownAwaitInsMs = configuration.getFailureHandlingShutdownAwait().toMilliseconds();
         int remainingBatchCount = 0;
-        FailureBatch remainingFailureBatch = failureSubmissionService.consumeBlockingWithTimeout(shutdownAwaitInsMs);
+        FailureBatch remainingFailureBatch = failureSubmissionQueue.consumeBlockingWithTimeout(shutdownAwaitInsMs);
 
         while (remainingFailureBatch != null) {
             handle(remainingFailureBatch);
             remainingBatchCount++;
-            remainingFailureBatch = failureSubmissionService.consumeBlockingWithTimeout(shutdownAwaitInsMs);
+            remainingFailureBatch = failureSubmissionQueue.consumeBlockingWithTimeout(shutdownAwaitInsMs);
         }
 
         logger.info("Shutting down the service. Processed {} remaining failure batches.", remainingBatchCount);
 
-        failureSubmissionService.logStats("FailureHandlerService#shutDown");
+        failureSubmissionQueue.logStats("FailureHandlerService#shutDown");
     }
 
     @Override
@@ -102,7 +102,7 @@ public class FailureHandlingService extends AbstractExecutionThreadService {
 
         executionThread.interrupt();
 
-        failureSubmissionService.logStats("FailureHandlerService#triggerShutdown");
+        failureSubmissionQueue.logStats("FailureHandlerService#triggerShutdown");
     }
 
     @Override
@@ -114,10 +114,10 @@ public class FailureHandlingService extends AbstractExecutionThreadService {
 
         while (isRunning()) {
             try {
-                handle(failureSubmissionService.consumeBlocking());
+                handle(failureSubmissionQueue.consumeBlocking());
             } catch (InterruptedException ignored) {
                 logger.info("The service's thread has been interrupted. The queue currently contains {} failure batches.",
-                        failureSubmissionService.queueSize());
+                        failureSubmissionQueue.queueSize());
             } catch (Exception e) {
                 logger.error("Error occurred while handling failures!", e);
             }

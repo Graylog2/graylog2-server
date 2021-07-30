@@ -27,9 +27,7 @@ import com.github.rholder.retry.WaitStrategy;
 import com.google.auto.value.AutoValue;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Sets;
-import org.graylog.failure.FailureBatch;
 import org.graylog.failure.FailureSubmissionService;
-import org.graylog.failure.IndexingFailure;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.InvalidWriteTargetException;
 import org.graylog2.indexer.results.ResultMessage;
@@ -273,11 +271,7 @@ public class Messages {
         }
 
         try {
-            failureSubmissionService.submitBlocking(FailureBatch.indexingFailureBatch(
-                    indexingErrors.stream()
-                            .map(IndexingError::toFailure)
-                            .collect(Collectors.toList())
-            ));
+            failureSubmissionService.handleIndexingErrors(indexingErrors);
         } catch (InterruptedException e) {
             LOG.warn("Failed to submit {} indexing errors for failure handling. The thread has been interrupted!",
                     indexingErrors.size());
@@ -294,7 +288,7 @@ public class Messages {
         public enum ErrorType {
             IndexBlocked,
             MappingError,
-            Unknown;
+            Unknown
         }
         public abstract Indexable message();
         public abstract String index();
@@ -307,18 +301,6 @@ public class Messages {
 
         public static IndexingError create(Indexable message, String index) {
             return create(message, index, ErrorType.Unknown, "");
-        }
-
-        public IndexingFailure toFailure() {
-            final Indexable message = message();
-            return new IndexingFailure(
-                    message.getMessageId(),
-                    index(),
-                    errorType().toString(),
-                    errorMessage(),
-                    message.getTimestamp(),
-                    message
-            );
         }
     }
 }

@@ -331,7 +331,7 @@ public class PipelineInterpreterTest {
                 mock(MessageQueueAcknowledger.class),
                 metricRegistry,
                 stateUpdater,
-                mock(FailureSubmissionService.class));
+                failureSubmissionService);
 
         interpreter.process(messageInDefaultStream("", ""));
 

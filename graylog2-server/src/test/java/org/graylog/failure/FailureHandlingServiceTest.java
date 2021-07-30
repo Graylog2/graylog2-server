@@ -48,13 +48,13 @@ public class FailureHandlingServiceTest {
     private final MessageQueueAcknowledger acknowledger = mock(MessageQueueAcknowledger.class);
     private final MetricRegistry metricRegistry = new MetricRegistry();
 
-    private FailureSubmissionService failureSubmissionService;
+    private FailureSubmissionQueue failureSubmissionQueue;
 
     @Before
     public void setup() {
         when(configuration.getFailureHandlingQueueCapacity()).thenReturn(1000);
 
-        failureSubmissionService = new FailureSubmissionService(configuration, metricRegistry, mock(FailureHandlingConfiguration.class));
+        failureSubmissionQueue = new FailureSubmissionQueue(configuration, metricRegistry, mock(FailureHandlingConfiguration.class));
     }
 
     @Test
@@ -66,16 +66,16 @@ public class FailureHandlingServiceTest {
         final FailureHandler fallbackIndexingFailureHandler = enabledFailureHandler(indexingFailureBatch);
 
         final FailureHandlingService underTest = new FailureHandlingService(fallbackIndexingFailureHandler,
-                ImmutableSet.of(customFailureHandler), failureSubmissionService, configuration, acknowledger);
+                ImmutableSet.of(customFailureHandler), failureSubmissionQueue, configuration, acknowledger);
 
         underTest.startAsync();
         underTest.awaitRunning();
 
         //when
-        failureSubmissionService.submitBlocking(indexingFailureBatch);
+        failureSubmissionQueue.submitBlocking(indexingFailureBatch);
 
         Awaitility.waitAtMost(Duration.ONE_SECOND)
-                .until(() -> failureSubmissionService.queueSize() == 0);
+                .until(() -> failureSubmissionQueue.queueSize() == 0);
 
         //then
         verify(customFailureHandler, times(0)).handle(any());
@@ -98,16 +98,16 @@ public class FailureHandlingServiceTest {
         final FailureHandler fallbackFailureHandler = enabledFailureHandler();
 
         final FailureHandlingService underTest = new FailureHandlingService(fallbackFailureHandler,
-                ImmutableSet.of(customFailureHandler), failureSubmissionService, configuration, acknowledger);
+                ImmutableSet.of(customFailureHandler), failureSubmissionQueue, configuration, acknowledger);
 
         underTest.startAsync();
         underTest.awaitRunning();
 
         //when
-        failureSubmissionService.submitBlocking(indexingFailureBatch);
+        failureSubmissionQueue.submitBlocking(indexingFailureBatch);
 
         Awaitility.waitAtMost(Duration.ONE_SECOND)
-                .until(() -> failureSubmissionService.queueSize() == 0);
+                .until(() -> failureSubmissionQueue.queueSize() == 0);
 
         //then
         verify(customFailureHandler, times(0)).handle(any());
@@ -131,16 +131,16 @@ public class FailureHandlingServiceTest {
         final FailureHandler fallbackIndexingFailureHandler = enabledFailureHandler(indexingFailureBatch);
 
         final FailureHandlingService underTest = new FailureHandlingService(fallbackIndexingFailureHandler,
-                ImmutableSet.of(customIndexingFailureHandler1, customIndexingFailureHandler2), failureSubmissionService, configuration, acknowledger);
+                ImmutableSet.of(customIndexingFailureHandler1, customIndexingFailureHandler2), failureSubmissionQueue, configuration, acknowledger);
 
         underTest.startAsync();
         underTest.awaitRunning();
 
         // when
-        failureSubmissionService.submitBlocking(indexingFailureBatch);
+        failureSubmissionQueue.submitBlocking(indexingFailureBatch);
 
         Awaitility.waitAtMost(Duration.ONE_SECOND)
-                .until(() -> failureSubmissionService.queueSize() == 0);
+                .until(() -> failureSubmissionQueue.queueSize() == 0);
 
         // then
         verify(customIndexingFailureHandler1).handle(indexingFailureBatch);
@@ -156,12 +156,12 @@ public class FailureHandlingServiceTest {
         final FailureHandler customFailureHandler = enabledFailureHandler();
         final FailureHandler fallbackFailureHandler = enabledFailureHandler(indexingFailureBatch);
 
-        final FailureSubmissionService failureSubmissionService = mock(FailureSubmissionService.class);
+        final FailureSubmissionQueue failureSubmissionQueue = mock(FailureSubmissionQueue.class);
         final FailureHandlingService underTest = new FailureHandlingService(fallbackFailureHandler,
-                ImmutableSet.of(customFailureHandler), failureSubmissionService, configuration, acknowledger);
+                ImmutableSet.of(customFailureHandler), failureSubmissionQueue, configuration, acknowledger);
 
         when(configuration.getFailureHandlingShutdownAwait()).thenReturn(com.github.joschi.jadconfig.util.Duration.milliseconds(300));
-        when(failureSubmissionService.consumeBlockingWithTimeout(300L))
+        when(failureSubmissionQueue.consumeBlockingWithTimeout(300L))
                 .thenReturn(indexingFailureBatch)
                 .thenReturn(null);
 
@@ -173,7 +173,7 @@ public class FailureHandlingServiceTest {
         underTest.awaitTerminated();
 
         // then
-        verify(failureSubmissionService, times(2)).consumeBlockingWithTimeout(300L);
+        verify(failureSubmissionQueue, times(2)).consumeBlockingWithTimeout(300L);
         verify(fallbackFailureHandler, times(1)).handle(indexingFailureBatch);
     }
 
@@ -190,17 +190,17 @@ public class FailureHandlingServiceTest {
         doThrow(new RuntimeException()).when(fallbackIndexingFailureHandler).handle(indexingFailureBatch2);
 
         final FailureHandlingService underTest = new FailureHandlingService(fallbackIndexingFailureHandler,
-                ImmutableSet.of(), failureSubmissionService, configuration, acknowledger);
+                ImmutableSet.of(), failureSubmissionQueue, configuration, acknowledger);
 
         underTest.startAsync();
         underTest.awaitRunning();
 
         // when
-        failureSubmissionService.submitBlocking(indexingFailureBatch2);
-        failureSubmissionService.submitBlocking(indexingFailureBatch1);
+        failureSubmissionQueue.submitBlocking(indexingFailureBatch2);
+        failureSubmissionQueue.submitBlocking(indexingFailureBatch1);
 
         Awaitility.waitAtMost(Duration.ONE_SECOND)
-                .until(() -> failureSubmissionService.queueSize() == 0);
+                .until(() -> failureSubmissionQueue.queueSize() == 0);
 
         // then
         verify(fallbackIndexingFailureHandler).handle(indexingFailureBatch2);
@@ -216,16 +216,16 @@ public class FailureHandlingServiceTest {
         final FailureHandler customFailureHandler1 = enabledFailureHandler(processingFailureBatch);
 
         final FailureHandlingService underTest = new FailureHandlingService(fallbackFailureHandler,
-                ImmutableSet.of(customFailureHandler1), failureSubmissionService, configuration, acknowledger);
+                ImmutableSet.of(customFailureHandler1), failureSubmissionQueue, configuration, acknowledger);
 
         // when
         underTest.startAsync();
         underTest.awaitRunning();
 
-        failureSubmissionService.submitBlocking(processingFailureBatch);
+        failureSubmissionQueue.submitBlocking(processingFailureBatch);
 
         Awaitility.waitAtMost(Duration.ONE_SECOND)
-                .until(() -> failureSubmissionService.queueSize() == 0);
+                .until(() -> failureSubmissionQueue.queueSize() == 0);
 
         // then
         verify(acknowledger, times(1)).acknowledge((List<Message>) argThat(argument -> !((List)argument).isEmpty()));
@@ -240,16 +240,16 @@ public class FailureHandlingServiceTest {
         final FailureHandler customFailureHandler1 = enabledFailureHandler(processingFailureBatch);
 
         final FailureHandlingService underTest = new FailureHandlingService(fallbackFailureHandler,
-                ImmutableSet.of(customFailureHandler1), failureSubmissionService, configuration, acknowledger);
+                ImmutableSet.of(customFailureHandler1), failureSubmissionQueue, configuration, acknowledger);
 
         // when
         underTest.startAsync();
         underTest.awaitRunning();
 
-        failureSubmissionService.submitBlocking(processingFailureBatch);
+        failureSubmissionQueue.submitBlocking(processingFailureBatch);
 
         Awaitility.waitAtMost(Duration.ONE_SECOND)
-                .until(() -> failureSubmissionService.queueSize() == 0);
+                .until(() -> failureSubmissionQueue.queueSize() == 0);
 
         // then
         verify(acknowledger, times(1)).acknowledge((List<Message>) argThat(argument -> ((List)argument).isEmpty()));
@@ -263,16 +263,16 @@ public class FailureHandlingServiceTest {
         final FailureHandler customFailureHandler1 = enabledFailureHandler(indexingFailureBatch);
 
         final FailureHandlingService underTest = new FailureHandlingService(fallbackFailureHandler,
-                ImmutableSet.of(customFailureHandler1), failureSubmissionService, configuration, acknowledger);
+                ImmutableSet.of(customFailureHandler1), failureSubmissionQueue, configuration, acknowledger);
 
         // when
         underTest.startAsync();
         underTest.awaitRunning();
 
-        failureSubmissionService.submitBlocking(indexingFailureBatch);
+        failureSubmissionQueue.submitBlocking(indexingFailureBatch);
 
         Awaitility.waitAtMost(Duration.ONE_SECOND)
-                .until(() -> failureSubmissionService.queueSize() == 0);
+                .until(() -> failureSubmissionQueue.queueSize() == 0);
 
         // then
         verify(acknowledger, times(1)).acknowledge((List<Message>) argThat(argument -> ((List)argument).isEmpty()));

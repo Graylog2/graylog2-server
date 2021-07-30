@@ -16,260 +16,126 @@
  */
 package org.graylog.failure;
 
-import com.codahale.metrics.MetricRegistry;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import org.graylog2.Configuration;
+import com.google.common.collect.ImmutableList;
+import org.graylog2.indexer.messages.Messages;
 import org.graylog2.plugin.Message;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Test;
 
-import java.util.UUID;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.RETURNS_DEFAULTS;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class FailureSubmissionServiceTest {
 
-    private final Configuration configuration = mock(Configuration.class);
-
-    private final MetricRegistry metricRegistry = new MetricRegistry();
-
-    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1, new ThreadFactoryBuilder()
-            .setNameFormat("failure-scheduled-%d")
-            .setDaemon(false)
-            .build());
-
-    @Test
-    public void submitBlocking_whenQueueNotFull_acceptsNewBatches() throws Exception {
-        //given
-        when(configuration.getFailureHandlingQueueCapacity()).thenReturn(1000);
-
-        final FailureSubmissionService underTest = getFailureSubmissionService();
-
-        final ProcessingFailure prcFailure1 = createProcessingFailure();
-        final ProcessingFailure prcFailure2 = createProcessingFailure();
-
-        // when
-        underTest.submitBlocking(FailureBatch.processingFailureBatch(prcFailure1));
-        underTest.submitBlocking(FailureBatch.processingFailureBatch(prcFailure2));
-
-        // then
-        assertThat(underTest.queueSize()).isEqualTo(2);
-        assertThat(underTest.consumeBlocking()).isEqualTo(FailureBatch.processingFailureBatch(prcFailure1));
-        assertThat(underTest.consumeBlocking()).isEqualTo(FailureBatch.processingFailureBatch(prcFailure2));
-    }
-
-    @Test
-    public void submitBlocking_whenQueueIsFull_submissionIsBlocked() throws Exception {
-        //given
-        when(configuration.getFailureHandlingQueueCapacity()).thenReturn(2);
-
-        final FailureSubmissionService underTest = getFailureSubmissionService();
-
-        final ProcessingFailure prcFailure1 = createProcessingFailure();
-        final ProcessingFailure prcFailure2 = createProcessingFailure();
-        final ProcessingFailure prcFailure3 = createProcessingFailure();
-
-        underTest.submitBlocking(FailureBatch.processingFailureBatch(prcFailure1));
-        underTest.submitBlocking(FailureBatch.processingFailureBatch(prcFailure2));
-
-        // when
-        scheduler.schedule(() -> {
-            assertThat(underTest.queueSize()).isEqualTo(2);
-            try {
-                assertThat(underTest.consumeBlocking()).isEqualTo(FailureBatch.processingFailureBatch(prcFailure1));
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }, 300, TimeUnit.MILLISECONDS);
-
-        final long started = System.currentTimeMillis();
-        underTest.submitBlocking(FailureBatch.processingFailureBatch(prcFailure3));
-        final long waited = System.currentTimeMillis() - started;
-
-        // then
-        assertThat(waited).isGreaterThan(200);
-        assertThat(underTest.queueSize()).isEqualTo(2);
-        assertThat(underTest.consumeBlocking()).isEqualTo(FailureBatch.processingFailureBatch(prcFailure2));
-        assertThat(underTest.consumeBlocking()).isEqualTo(FailureBatch.processingFailureBatch(prcFailure3));
-
-    }
-
-    @Test
-    public void consumeBlocking_waitsForBatch_whenQueueIsEmpty() throws Exception {
-        //given
-        when(configuration.getFailureHandlingQueueCapacity()).thenReturn(2);
-
-        final FailureSubmissionService underTest = getFailureSubmissionService();
-
-        final ProcessingFailure prcFailure1 = createProcessingFailure();
-
-        // when
-        scheduler.schedule(() -> {
-            try {
-                underTest.submitBlocking(FailureBatch.processingFailureBatch(prcFailure1));
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }, 300, TimeUnit.MILLISECONDS);
-
-        final long started = System.currentTimeMillis();
-        final FailureBatch consumedBatch = underTest.consumeBlocking();
-        final long waited = System.currentTimeMillis() - started;
-
-        // then
-        assertThat(waited).isGreaterThan(200);
-        assertThat(consumedBatch).isEqualTo(FailureBatch.processingFailureBatch(prcFailure1));
-    }
-
-    @Test
-    public void consumeBlockingWithTimeout_returnsBatch_whenSubmittedWithinWaitingTimeout() throws Exception {
-        //given
-        when(configuration.getFailureHandlingQueueCapacity()).thenReturn(2);
-
-        final FailureSubmissionService underTest = getFailureSubmissionService();
-
-        final ProcessingFailure prcFailure1 = createProcessingFailure();
-
-        // when
-        scheduler.schedule(() -> {
-            try {
-                underTest.submitBlocking(FailureBatch.processingFailureBatch(prcFailure1));
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }, 300, TimeUnit.MILLISECONDS);
-
-        final long started = System.currentTimeMillis();
-        final FailureBatch consumedBatch = underTest.consumeBlockingWithTimeout(500);
-        final long waited = System.currentTimeMillis() - started;
-
-        // then
-        assertThat(waited).isGreaterThan(200);
-        assertThat(consumedBatch).isEqualTo(FailureBatch.processingFailureBatch(prcFailure1));
-    }
-
-    @Test
-    public void consumeBlockingWithTimeout_returnsNull_whenReachedWaitingTimeout() throws Exception {
-        //given
-        when(configuration.getFailureHandlingQueueCapacity()).thenReturn(2);
-
-        final FailureSubmissionService underTest = getFailureSubmissionService();
-
-        final ProcessingFailure prcFailure1 = createProcessingFailure();
-
-        // when
-        scheduler.schedule(() -> {
-            try {
-                underTest.submitBlocking(FailureBatch.processingFailureBatch(prcFailure1));
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }, 300, TimeUnit.MILLISECONDS);
-
-        final FailureBatch consumedBatch = underTest.consumeBlockingWithTimeout(50);
-
-        // then
-        assertThat(consumedBatch).isNull();
-    }
+    private final FailureSubmissionQueue failureSubmissionQueue = mock(FailureSubmissionQueue.class);
+    private final FailureHandlingConfiguration handlingConfiguration = mock(FailureHandlingConfiguration.class);
 
     @Test
     public void processingFailureWithoutKeepDuplicate() throws InterruptedException {
-        when(configuration.getFailureHandlingQueueCapacity()).thenReturn(2);
-        final FailureHandlingConfiguration handlingConfiguration = mock(FailureHandlingConfiguration.class);
         when(handlingConfiguration.submitProcessingFailures()).thenReturn(true);
         when(handlingConfiguration.keepFailedMessageDuplicate()).thenReturn(false);
 
-        final FailureSubmissionService underTest = new FailureSubmissionService(configuration, metricRegistry, handlingConfiguration);
+        final FailureSubmissionService underTest = new FailureSubmissionService(failureSubmissionQueue, handlingConfiguration);
 
         final Message message = new Message("message", "source", new DateTime(2016, 1, 1, 0, 0, DateTimeZone.UTC));
         message.addProcessingError("pipeline rule 123 failed");
 
         underTest.handleProcessingFailure(message, "test");
 
-        final FailureBatch consumedBatch = underTest.consumeBlockingWithTimeout(50);
+        verify(failureSubmissionQueue, times(1)).submitBlocking(argThat(argument ->
+        {
+            assertThat(argument.getFailures()).hasSize(1);
+            return true;
+        }));
 
-        assertThat(consumedBatch.getFailures()).hasSize(1);
         assertThat(message.getFilterOut()).isTrue();
     }
 
     @Test
     public void processingFailureWithKeepDuplicate() throws InterruptedException {
-        when(configuration.getFailureHandlingQueueCapacity()).thenReturn(2);
-        final FailureHandlingConfiguration handlingConfiguration = mock(FailureHandlingConfiguration.class);
         when(handlingConfiguration.submitProcessingFailures()).thenReturn(true);
         when(handlingConfiguration.keepFailedMessageDuplicate()).thenReturn(true);
 
-        final FailureSubmissionService underTest = new FailureSubmissionService(configuration, metricRegistry, handlingConfiguration);
+        final FailureSubmissionService underTest = new FailureSubmissionService(failureSubmissionQueue, handlingConfiguration);
 
         final Message message = new Message("message", "source", new DateTime(2016, 1, 1, 0, 0, DateTimeZone.UTC));
         message.addProcessingError("pipeline rule 123 failed");
 
         underTest.handleProcessingFailure(message, "test");
 
-        final FailureBatch consumedBatch = underTest.consumeBlockingWithTimeout(50);
+        verify(failureSubmissionQueue, times(1)).submitBlocking(argThat(argument ->
+        {
+            assertThat(argument.getFailures()).hasSize(1);
+            return true;
+        }));
 
-        assertThat(consumedBatch.getFailures()).hasSize(1);
         assertThat(message.getFilterOut()).isFalse();
     }
 
     @Test
     public void processingExceptions() throws InterruptedException {
-        when(configuration.getFailureHandlingQueueCapacity()).thenReturn(2);
-        final FailureHandlingConfiguration handlingConfiguration = mock(FailureHandlingConfiguration.class);
         when(handlingConfiguration.submitProcessingFailures()).thenReturn(true);
         when(handlingConfiguration.keepFailedMessageDuplicate()).thenReturn(false);
 
-        final FailureSubmissionService underTest = new FailureSubmissionService(configuration, metricRegistry, handlingConfiguration);
+        final FailureSubmissionService underTest = new FailureSubmissionService(failureSubmissionQueue, handlingConfiguration);
 
         final Message message = new Message("message", "source", new DateTime(2016, 1, 1, 0, 0, DateTimeZone.UTC));
 
         underTest.handleProcessingException(message, "test", new RuntimeException("bad processing"));
 
-        final FailureBatch consumedBatch = underTest.consumeBlockingWithTimeout(50);
-
-        assertThat(consumedBatch.getFailures()).satisfies(failures -> {
-            assertThat(failures).hasSize(1);
-            assertThat(failures.iterator().next().errorMessage()).contains("RuntimeException: bad processing");
-            assertThat(failures.iterator().next().context()).isEqualTo("test");
-            assertThat(failures.iterator().next().failureType()).isEqualTo(FailureType.PROCESSING);
-            assertThat(failures.iterator().next().requiresAcknowledgement()).isTrue();
-        });
+        verify(failureSubmissionQueue, times(1)).submitBlocking(argThat(argument ->
+        {
+            assertThat(argument.getFailures()).satisfies(failures -> {
+                assertThat(failures).hasSize(1);
+                assertThat(failures.iterator().next().errorMessage()).contains("RuntimeException: bad processing");
+                assertThat(failures.iterator().next().context()).isEqualTo("test");
+                assertThat(failures.iterator().next().failureType()).isEqualTo(FailureType.PROCESSING);
+                assertThat(failures.iterator().next().requiresAcknowledgement()).isTrue();
+            });
+            return true;
+        }));
         assertThat(message.getFilterOut()).isTrue();
     }
 
     @Test
     public void disabledProcessingExceptions() throws InterruptedException {
-        when(configuration.getFailureHandlingQueueCapacity()).thenReturn(2);
-        final FailureHandlingConfiguration handlingConfiguration = mock(FailureHandlingConfiguration.class);
         when(handlingConfiguration.submitProcessingFailures()).thenReturn(false);
 
-        final FailureSubmissionService underTest = new FailureSubmissionService(configuration, metricRegistry, handlingConfiguration);
+        final FailureSubmissionService underTest = new FailureSubmissionService(failureSubmissionQueue, handlingConfiguration);
 
         final Message message = new Message("message", "source", new DateTime(2016, 1, 1, 0, 0, DateTimeZone.UTC));
 
         underTest.handleProcessingException(message, "test", new RuntimeException("bad processing"));
 
-        final FailureBatch consumedBatch = underTest.consumeBlockingWithTimeout(50);
-
-        assertThat(consumedBatch).isNull();
+        verify(failureSubmissionQueue, times(0)).submitBlocking(any());
         assertThat(message.getFilterOut()).isFalse();
     }
 
-    private ProcessingFailure createProcessingFailure() {
-        return new ProcessingFailure(
-                UUID.randomUUID().toString(), "error-type", "error-message",
-                DateTime.now(DateTimeZone.UTC), null,
-                true);
-    }
+    @Test
+    public void handleIndexingErrors() throws InterruptedException {
+        final FailureSubmissionService underTest = new FailureSubmissionService(failureSubmissionQueue, handlingConfiguration);
 
-    private FailureSubmissionService getFailureSubmissionService() {
-        return new FailureSubmissionService(configuration, metricRegistry, mock(FailureHandlingConfiguration.class));
-    }
+        final Message message = new Message("message", "source", new DateTime(2016, 1, 1, 0, 0, DateTimeZone.UTC));
+        final Messages.IndexingError indexingError = mock(Messages.IndexingError.class, invocation -> {
+            if (String.class.equals(invocation.getMethod().getReturnType())) {
+                return "dummy";
+            } else {
+                return RETURNS_DEFAULTS.answer(invocation);
+            }
+        });
+        when(indexingError.message()).thenReturn(message);
+        when(indexingError.errorType()).thenReturn(Messages.IndexingError.ErrorType.MappingError);
 
+        final ImmutableList<Messages.IndexingError> indexingErrors = ImmutableList.of(indexingError, indexingError);
+        underTest.handleIndexingErrors(indexingErrors);
+
+        verify(failureSubmissionQueue, times(1)).submitBlocking(any());
+    }
 }
