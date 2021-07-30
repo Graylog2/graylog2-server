@@ -153,6 +153,24 @@ public abstract class PaginatedDbService<DTO> {
                                                                      DBSort.SortBuilder sort,
                                                                      int page,
                                                                      int perPage) {
+        return findPaginatedWithQueryFilterAndSortWithGrandTotalQuery(
+                query,
+                filter,
+                sort,
+                DBQuery.empty(),
+                page,
+                perPage
+        );
+
+    }
+
+    protected PaginatedList<DTO> findPaginatedWithQueryFilterAndSortWithGrandTotalQuery(DBQuery.Query query,
+                                                                                        Predicate<DTO> filter,
+                                                                                        DBSort.SortBuilder sort,
+                                                                                        DBQuery.Query grandTotalQuery,
+                                                                                        int page,
+                                                                                        int perPage) {
+
         // Calculate the total amount of items matching the query/filter, but before pagination
         final long total;
         try (final Stream<DTO> cursor = streamQueryWithSort(query, sort)) {
@@ -166,7 +184,7 @@ public abstract class PaginatedDbService<DTO> {
                 filteredResultStream = filteredResultStream.skip(perPage * Math.max(0, page - 1)).limit(perPage);
             }
 
-            final long grandTotal = db.count();
+            final long grandTotal = db.getCount(grandTotalQuery);
 
             return new PaginatedList<>(filteredResultStream.collect(Collectors.toList()), Math.toIntExact(total), page, perPage, grandTotal);
         }
