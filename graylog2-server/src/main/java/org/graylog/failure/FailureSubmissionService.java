@@ -88,8 +88,7 @@ public class FailureSubmissionService {
         try {
             // If we store the regular message, the acknowledgement happens in the output path
             boolean needsAcknowledgement = !failureHandlingConfiguration.keepFailedMessageDuplicate();
-            // TODO use message.getMesssgeId() once this field is set early in processing
-            final ProcessingFailure processingFailure = new ProcessingFailure(failedMessage.getId(), errorType, error, failedMessage.getTimestamp(), failedMessage, needsAcknowledgement);
+            final ProcessingFailure processingFailure = new ProcessingFailure(failedMessage.getMessageId(), errorType, error, failedMessage.getTimestamp(), failedMessage, needsAcknowledgement);
             final FailureBatch failureBatch = FailureBatch.processingFailureBatch(processingFailure);
             failureSubmissionQueue.submitBlocking(failureBatch);
         } catch (InterruptedException ignored) {
