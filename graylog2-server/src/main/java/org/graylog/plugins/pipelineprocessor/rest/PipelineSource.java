@@ -107,7 +107,7 @@ public abstract class PipelineSource {
         final List<StageSource> stageSources = (pipeline == null) ? Collections.emptyList() :
                 pipeline.stages().stream()
                         .map(stage -> StageSource.builder()
-                                .matchAll(stage.matchAll())
+                                .match(stage.match())
                                 .rules(stage.ruleReferences())
                                 .stage(stage.stage())
                                 .build())
