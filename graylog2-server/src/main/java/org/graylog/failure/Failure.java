@@ -18,34 +18,61 @@ package org.graylog.failure;
 
 
 import org.graylog2.indexer.messages.Indexable;
+import org.graylog2.plugin.Message;
 import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
 
 /**
-/**
- * The interface is designed to deliver "necessary" information about a failure occurring during
- * message processing (e.g. Elasticsearch indexing, extraction, pipeline processing and etc).
- *
- * The eventual destination are implementations of {@link org.graylog.failure.FailureHandler}, whose
- * role is making this information available for further troubleshooting / failure recovery.
+ * A failure occurring at different stages of message processing
+ * (e.g. pipeline processing, extraction, Elasticsearch indexing)
  */
 public interface Failure {
 
+    /**
+     * Returns a type of this failure
+     */
     FailureType failureType();
 
+    /**
+     * Returns an id of a failed message. The id is represented
+     * by a value of the {@link Message#FIELD_GL2_MESSAGE_ID} field
+     *
+     * TODO: currently it's false for processing failures !!!
+     */
     String failedMessageId();
 
+    /**
+     * Returns a failed message
+     */
     Indexable failedMessage();
 
+    /**
+     * Returns an ElasticSearch index name targeted by
+     * the failed message. For non-indexing failures
+     * the value might be null.
+     */
     @Nullable
     String targetIndex();
 
+    /**
+     * Returns a subcategory of this failure
+     */
     String failureOrigin();
 
+    /**
+     * Returns a detailed error message
+     */
     String errorMessage();
 
+    /**
+     * Returns a timestamp of the failed message
+     */
     DateTime timestamp();
 
+    /**
+     * Returns true if the failed message must
+     * be acknowledged upon failure handling
+     */
     boolean requiresAcknowledgement();
 }

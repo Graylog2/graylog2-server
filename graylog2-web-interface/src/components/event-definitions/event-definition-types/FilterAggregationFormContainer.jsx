@@ -24,14 +24,6 @@ import { FieldTypesStore } from 'views/stores/FieldTypesStore';
 import FilterAggregationForm from './FilterAggregationForm';
 import withStreams from './withStreams';
 
-// We currently don't support creating Events from these Streams, since they also contain Events
-// and it's not possible to access custom Fields defined in them.
-const HIDDEN_STREAMS = [
-  '000000000000000000000002',
-  '000000000000000000000003',
-  '000000000000000000000004',
-];
-
 class FilterAggregationFormContainer extends React.Component {
   static propTypes = {
     action: PropTypes.oneOf(['create', 'edit']).isRequired,
@@ -54,6 +46,6 @@ class FilterAggregationFormContainer extends React.Component {
   }
 }
 
-export default connect(withStreams(FilterAggregationFormContainer, HIDDEN_STREAMS), {
+export default connect(withStreams(FilterAggregationFormContainer), {
   fieldTypes: FieldTypesStore,
 });

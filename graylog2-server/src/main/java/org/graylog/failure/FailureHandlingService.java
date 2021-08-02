@@ -34,13 +34,14 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * The purpose of this service is to consume/process failure batches submitted via {@link FailureSubmissionQueue}.
- * The processing is done in a dedicated service thread, the lifecycle of the service is managed
+ * A service consuming and processing failure batches submitted via {@link FailureSubmissionQueue}.
+ * The processing is done in a dedicated thread, the lifecycle of this service is managed
  * by {@link com.google.common.util.concurrent.ServiceManager}.
  *
- * The service is designed with an idea of extensibility, so that Graylog plugins can inject
- * custom failure handlers via a DI framework (Guice in our case). If no custom handlers
- * found, then the fallback one will be used instead.
+ * This service is designed with an idea of extensibility, so that Graylog plugins can inject
+ * custom failure handlers via {@link com.google.inject.multibindings.Multibinder} -
+ * see {@link org.graylog.failure.FailureHandler}. If no custom handlers found,
+ * then the fallback one will be picked instead.
  */
 @Singleton
 public class FailureHandlingService extends AbstractExecutionThreadService {
@@ -131,17 +132,21 @@ public class FailureHandlingService extends AbstractExecutionThreadService {
                 .forEach(handler -> {
                     try {
                         handler.handle(failureBatch);
-
-                        acknowledger.acknowledge(failureBatch.getFailures().stream()
-                                .filter(Failure::requiresAcknowledgement)
-                                .map(Failure::failedMessage)
-                                .filter(Message.class::isInstance).map(Message.class::cast)
-                                .collect(Collectors.toList())
-                        );
                     } catch (Exception e) {
                         logger.error("Error occurred while handling failures by {}", handler.getClass().getName());
                     }
                 });
+
+        final List<Message> requiresAcknowledgement = failureBatch.getFailures().stream()
+                .filter(Failure::requiresAcknowledgement)
+                .map(Failure::failedMessage)
+                .filter(Message.class::isInstance)
+                .map(Message.class::cast)
+                .collect(Collectors.toList());
+
+        if (!requiresAcknowledgement.isEmpty()) {
+            acknowledger.acknowledge(requiresAcknowledgement);
+        }
     }
 
     private List<FailureHandler> suitableHandlers(FailureBatch failureBatch) {

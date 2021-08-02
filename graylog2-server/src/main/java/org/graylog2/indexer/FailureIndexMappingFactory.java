@@ -18,6 +18,16 @@ package org.graylog2.indexer;
 
 import com.github.zafarkhaja.semver.Version;
 
+/**
+ * A factory creating an index mapping template for the failure index.
+ * Since ES failure storage is not a part of Graylog Open, an actual
+ * implementation of this interface must be provided in a plugin.
+ */
 public interface FailureIndexMappingFactory {
+
+    /**
+     * Creates an index mapping template for the failure index
+     * @param elasticsearchVersion a target version of Elastic Search
+     */
     IndexMappingTemplate failureIndexMappingFor(Version elasticsearchVersion);
 }

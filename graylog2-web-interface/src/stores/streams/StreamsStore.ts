@@ -84,6 +84,7 @@ export type StreamResponse = {
   alert_receivers: AlertReceiver
   title: string,
   is_default: boolean | null | undefined,
+  is_editable: boolean,
   remove_matches_from_default_stream: boolean,
   index_set_id: string,
 }

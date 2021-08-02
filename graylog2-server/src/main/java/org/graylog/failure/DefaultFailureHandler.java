@@ -22,6 +22,10 @@ import org.graylog2.indexer.IndexFailureService;
 
 import javax.inject.Inject;
 
+/**
+ * A fallback failure handler, which persists submitted failures in Mongo via {@link IndexFailureService}.
+ * Only indexing failures supported.
+ */
 public class DefaultFailureHandler implements FailureHandler {
 
     private final IndexFailureService indexFailureService;

@@ -51,6 +51,7 @@ public abstract class StreamDTO {
     public static final String FIELD_REMOVE_MATCHES_FROM_DEFAULT_STREAM = "remove_matches_from_default_stream";
     public static final String FIELD_INDEX_SET_ID = "index_set_id";
     public static final String EMBEDDED_ALERT_CONDITIONS = "alert_conditions";
+    public static final String FIELD_IS_EDITABLE = "is_editable";
 
     @JsonProperty("id")
     public abstract String id();
@@ -105,6 +106,9 @@ public abstract class StreamDTO {
     @JsonProperty(FIELD_INDEX_SET_ID)
     public abstract String indexSetId();
 
+    @JsonProperty(FIELD_IS_EDITABLE)
+    public abstract boolean isEditable();
+
     public abstract Builder toBuilder();
 
     static Builder builder() {
@@ -118,6 +122,7 @@ public abstract class StreamDTO {
             return new AutoValue_StreamDTO.Builder()
                     .matchingType(Stream.MatchingType.AND.toString())
                     .isDefault(false)
+                    .isEditable(false)
                     .removeMatchesFromDefaultStream(false);
         }
 
@@ -166,6 +171,16 @@ public abstract class StreamDTO {
         @JsonProperty(FIELD_INDEX_SET_ID)
         public abstract Builder indexSetId(String indexSetId);
 
-        public abstract StreamDTO build();
+        @JsonProperty(FIELD_IS_EDITABLE)
+        public abstract Builder isEditable(boolean isEditable);
+
+        public abstract String id();
+
+        public abstract StreamDTO autoBuild();
+
+        public StreamDTO build() {
+            isEditable(Stream.streamIsEditable(id()));
+            return autoBuild();
+        }
     }
 }

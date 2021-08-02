@@ -32,12 +32,12 @@ import java.util.concurrent.TimeUnit;
 import static com.codahale.metrics.MetricRegistry.name;
 
 /**
- * This class represents a blocking FIFO queue accepting failure batches for further handling.
+ * A blocking FIFO queue accepting failure batches for further handling.
  * It should be used as an entry point for failure producers.
  *
  * The service was introduced for 2 essential reasons:
- * 1. To control pressure on the failure handling framework.
- * 2. To decouple failure producers from failure consumers.
+ *  1. To control pressure on the failure handling framework.
+ *  2. To decouple failure producers from failure consumers.
  *
  * The capacity of the underlying queue is controlled by `failure_handling_queue_capacity` configuration
  * property. By default its value is 1000.
