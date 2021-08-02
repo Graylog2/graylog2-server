@@ -16,15 +16,25 @@
  */
 package org.graylog2.featureflag;
 
+import com.codahale.metrics.MetricRegistry;
+
 public class FeatureFlagsFactory {
 
     private static final String DEFAULT_PROPERTIES_FILE = "/org/graylog2/featureflag/feature-flag.config";
 
-    public FeatureFlags createImmutableFeatureFlags(String customPropertiesFile) {
-        return createImmutableFeatureFlags(new FeatureFlagsResources(), DEFAULT_PROPERTIES_FILE, customPropertiesFile);
+    public FeatureFlags createImmutableFeatureFlags(String customPropertiesFile, MetricRegistry metricRegistry) {
+        return createImmutableFeatureFlags(
+                new FeatureFlagsResources(),
+                DEFAULT_PROPERTIES_FILE,
+                customPropertiesFile,
+                metricRegistry);
     }
 
-    public FeatureFlags createImmutableFeatureFlags(FeatureFlagsResources resources, String defaultPropertiesFile, String customPropertiesFile) {
-        return new ImmutableFeatureFlags(new ImmutableFeatureFlagsCollector(resources, defaultPropertiesFile, customPropertiesFile).toMap());
+    public FeatureFlags createImmutableFeatureFlags(FeatureFlagsResources resources,
+                                                    String defaultPropertiesFile,
+                                                    String customPropertiesFile,
+                                                    MetricRegistry metricRegistry) {
+        return new ImmutableFeatureFlags(new ImmutableFeatureFlagsCollector(
+                resources, defaultPropertiesFile, customPropertiesFile).toMap(), metricRegistry);
     }
 }

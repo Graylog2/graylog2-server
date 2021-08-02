@@ -46,35 +46,19 @@ public class ImmutableFeatureFlagsMetricsTest {
     @BeforeEach
     void setUp() throws IOException {
         given(resources.defaultProperties(any())).willReturn(Maps.of(FEATURE, STATE));
-        underTest = new FeatureFlagsFactory().createImmutableFeatureFlags(resources, "file", "file");
         metricRegistry = new MetricRegistry();
+        underTest = new FeatureFlagsFactory().createImmutableFeatureFlags(resources, "file", "file", metricRegistry);
     }
 
     @Test
-    void testMetricInitialization() {
-        underTest.initMetrics(metricRegistry);
-
+    void testMetricsInitialized() {
         assertThat(getFeatureFlagUsedCount()).isEqualTo(0);
         assertThat(getFeatureUsedCount()).isEqualTo(0);
         assertThat(featureStateGaugeExist()).isTrue();
     }
 
     @Test
-    void testSecondMetricInitialization() {
-        underTest.initMetrics(metricRegistry);
-        underTest.incrementFeatureIsUsedCounter(FEATURE);
-
-        underTest.initMetrics(metricRegistry);
-
-        assertThat(metricRegistry.getCounters().size()).isEqualTo(2);
-        assertThat(metricRegistry.getGauges().size()).isEqualTo(1);
-        assertThat(getFeatureUsedCount()).isEqualTo(1);
-    }
-
-    @Test
     void testIncrementFeatureFlagIsUsedCounter() {
-        underTest.initMetrics(metricRegistry);
-
         underTest.isOn(FEATURE, false);
 
         assertThat(getFeatureFlagUsedCount()).isEqualTo(1);
@@ -82,8 +66,6 @@ public class ImmutableFeatureFlagsMetricsTest {
 
     @Test
     void testIncrementFeatureIsUsedCounter() {
-        underTest.initMetrics(metricRegistry);
-
         underTest.incrementFeatureIsUsedCounter(FEATURE);
 
         assertThat(getFeatureUsedCount()).isEqualTo(1);
@@ -91,8 +73,6 @@ public class ImmutableFeatureFlagsMetricsTest {
 
     @Test
     void testIncrementFeatureIsUsedCounterForNotExistingFeature() {
-        underTest.initMetrics(metricRegistry);
-
         underTest.incrementFeatureIsUsedCounter("not exist");
 
         assertThat(metricRegistry.getCounters().size()).isEqualTo(2);

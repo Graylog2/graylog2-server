@@ -67,6 +67,7 @@ import org.graylog2.plugin.system.NodeIdPersistenceException;
 import org.graylog2.shared.UI;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.graylog2.shared.bindings.PluginBindings;
+import org.graylog2.shared.metrics.MetricRegistryFactory;
 import org.graylog2.shared.plugins.ChainingClassLoader;
 import org.graylog2.shared.plugins.PluginLoader;
 import org.graylog2.shared.utilities.ExceptionUtils;
@@ -236,8 +237,9 @@ public abstract class CmdLineTool implements CliCommand {
         if (isDumpDefaultConfig()) {
             dumpDefaultConfigAndExit();
         }
-
-        featureFlags = getFeatureFlags();
+        // This is holding all our metrics.
+        MetricRegistry metricRegistry = MetricRegistryFactory.create();
+        featureFlags = getFeatureFlags(metricRegistry);
 
         installConfigRepositories();
         installCommandConfig();
@@ -267,7 +269,11 @@ public abstract class CmdLineTool implements CliCommand {
         final List<String> arguments = ManagementFactory.getRuntimeMXBean().getInputArguments();
         LOG.info("Running with JVM arguments: {}", Joiner.on(' ').join(arguments));
 
-        injector = setupInjector(new NamedConfigParametersModule(jadConfig.getConfigurationBeans()), new PluginBindings(plugins));
+        injector = setupInjector(
+                new NamedConfigParametersModule(jadConfig.getConfigurationBeans()),
+                new PluginBindings(plugins),
+                binder -> binder.bind(MetricRegistry.class).toInstance(metricRegistry)
+        );
 
         if (injector == null) {
             LOG.error("Injector could not be created, exiting! (Please include the previous error messages in bug " +
@@ -275,14 +281,9 @@ public abstract class CmdLineTool implements CliCommand {
             System.exit(1);
         }
 
-        // This is holding all our metrics.
-        final MetricRegistry metrics = injector.getInstance(MetricRegistry.class);
-        featureFlags.initMetrics(metrics);
-
-        addInstrumentedAppender(metrics, logLevel);
-
+        addInstrumentedAppender(metricRegistry, logLevel);
         // Report metrics via JMX.
-        final JmxReporter reporter = JmxReporter.forRegistry(metrics).build();
+        final JmxReporter reporter = JmxReporter.forRegistry(metricRegistry).build();
         reporter.start();
 
         startCommand();
@@ -375,8 +376,8 @@ public abstract class CmdLineTool implements CliCommand {
         return pluginLoaderConfig.getPluginDir();
     }
 
-    private FeatureFlags getFeatureFlags() {
-        return new FeatureFlagsFactory().createImmutableFeatureFlags(customFeatureFlagFile);
+    private FeatureFlags getFeatureFlags(MetricRegistry metricRegistry) {
+        return new FeatureFlagsFactory().createImmutableFeatureFlags(customFeatureFlagFile, metricRegistry);
     }
 
     protected Set<Plugin> loadPlugins(Path pluginPath, ChainingClassLoader chainingClassLoader) {
