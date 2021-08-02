@@ -682,7 +682,7 @@ public class Message implements Messages, Indexable {
     }
 
     public void removeField(final String key) {
-        if (!RESERVED_FIELDS.contains(key)) {
+        if (!(RESERVED_FIELDS.contains(key) && !RESERVED_SETTABLE_FIELDS.contains(key))) {
             final Object removedValue = fields.remove(key);
             updateSize(key, null, removedValue);
         }
