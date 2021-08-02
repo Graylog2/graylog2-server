@@ -25,20 +25,20 @@ public class IndexingFailure implements Failure {
 
     private final String failedMessageId;
     private final String targetIndex;
-    private final String context;
+    private final String failureOrigin;
     private final String errorMessage;
     private final DateTime timestamp;
     private final Indexable failedMessage;
 
     public IndexingFailure(String failedMessageId,
                            String targetIndex,
-                           String context,
+                           String failureOrigin,
                            String errorMessage,
                            DateTime timestamp,
                            Indexable failedMessage) {
         this.failedMessageId = failedMessageId;
         this.targetIndex = targetIndex;
-        this.context = context;
+        this.failureOrigin = failureOrigin;
         this.errorMessage = errorMessage;
         this.timestamp = timestamp;
         this.failedMessage = failedMessage;
@@ -61,8 +61,8 @@ public class IndexingFailure implements Failure {
     }
 
     @Override
-    public String context() {
-        return context;
+    public String failureOrigin() {
+        return failureOrigin;
     }
 
     @Override

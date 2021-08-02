@@ -25,20 +25,20 @@ import javax.annotation.Nullable;
 public class ProcessingFailure implements Failure {
 
     private final String failedMessageId;
-    private final String context;
+    private final String failureOrigin;
     private final String errorMessage;
     private final DateTime timestamp;
     private final Indexable failedMessage;
     private final boolean requiresAcknowledgement;
 
     public ProcessingFailure(String failedMessageId,
-                             String context,
+                             String failureOrigin,
                              String errorMessage,
                              DateTime timestamp,
                              Indexable failedMessage,
                              boolean requiresAcknowledgement) {
         this.failedMessageId = failedMessageId;
-        this.context = context;
+        this.failureOrigin = failureOrigin;
         this.errorMessage = errorMessage;
         this.timestamp = timestamp;
         this.failedMessage = failedMessage;
@@ -62,8 +62,8 @@ public class ProcessingFailure implements Failure {
     }
 
     @Override
-    public String context() {
-        return context;
+    public String failureOrigin() {
+        return failureOrigin;
     }
 
     @Override
@@ -96,7 +96,7 @@ public class ProcessingFailure implements Failure {
         }
         final ProcessingFailure that = (ProcessingFailure) o;
         return Objects.equal(failedMessageId, that.failedMessageId)
-                && Objects.equal(context, that.context)
+                && Objects.equal(failureOrigin, that.failureOrigin)
                 && Objects.equal(errorMessage, that.errorMessage)
                 && Objects.equal(timestamp, that.timestamp)
                 && Objects.equal(failedMessage, that.failedMessage)
@@ -105,6 +105,6 @@ public class ProcessingFailure implements Failure {
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(failedMessageId, context, errorMessage, timestamp, failedMessage, requiresAcknowledgement);
+        return Objects.hashCode(failedMessageId, failureOrigin, errorMessage, timestamp, failedMessage, requiresAcknowledgement);
     }
 }

@@ -95,7 +95,7 @@ public class FailureSubmissionServiceTest {
             assertThat(argument.getFailures()).satisfies(failures -> {
                 assertThat(failures).hasSize(1);
                 assertThat(failures.iterator().next().errorMessage()).contains("RuntimeException: bad processing");
-                assertThat(failures.iterator().next().context()).isEqualTo("test");
+                assertThat(failures.iterator().next().failureOrigin()).isEqualTo("test");
                 assertThat(failures.iterator().next().failureType()).isEqualTo(FailureType.PROCESSING);
                 assertThat(failures.iterator().next().requiresAcknowledgement()).isTrue();
             });

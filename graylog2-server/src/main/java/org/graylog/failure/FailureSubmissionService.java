@@ -84,7 +84,7 @@ public class FailureSubmissionService {
         submitProcessingFailure(failedMessage, failureContext, processingError);
     }
 
-    private void submitProcessingFailure(Message failedMessage, String errorType, String error) {
+    private void submitProcessingFailure(Message failedMessage, String failureOrigin, String errorMessage) {
         try {
             // If we store the regular message, the acknowledgement happens in the output path
             boolean needsAcknowledgement = !failureHandlingConfiguration.keepFailedMessageDuplicate();
@@ -92,7 +92,7 @@ public class FailureSubmissionService {
             if (failedMessageId == null) {
                 failedMessageId = failedMessage.getId();
             }
-            final ProcessingFailure processingFailure = new ProcessingFailure(failedMessageId, errorType, error, failedMessage.getTimestamp(), failedMessage, needsAcknowledgement);
+            final ProcessingFailure processingFailure = new ProcessingFailure(failedMessageId, failureOrigin, errorMessage, failedMessage.getTimestamp(), failedMessage, needsAcknowledgement);
             final FailureBatch failureBatch = FailureBatch.processingFailureBatch(processingFailure);
             failureSubmissionQueue.submitBlocking(failureBatch);
         } catch (InterruptedException ignored) {
