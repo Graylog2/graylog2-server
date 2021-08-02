@@ -82,6 +82,7 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
         outgoingMessages = metricRegistry.meter(name(ProcessBufferProcessor.class, "outgoingMessages"));
         processTime = metricRegistry.timer(name(ProcessBufferProcessor.class, "processTime"));
         this.failureSubmissionService = failureSubmissionService;
+        //noinspection AssignmentToNull
         currentMessage = null;
     }
 
@@ -140,6 +141,7 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
             }
             failureSubmissionService.handleProcessingException(msg, "process-buffer-processor", e);
         } finally {
+            //noinspection AssignmentToNull
             currentMessage = null;
             outgoingMessages.mark();
         }
