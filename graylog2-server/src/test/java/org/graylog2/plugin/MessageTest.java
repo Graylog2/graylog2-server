@@ -217,13 +217,9 @@ public class MessageTest {
 
     @Test
     public void testRemoveFieldNotDeletingReservedFields() throws Exception {
-        message.removeField("message");
-        message.removeField("source");
-        message.removeField("timestamp");
+        message.removeField("_id");
 
-        assertNotNull(message.getField("message"));
-        assertNotNull(message.getField("source"));
-        assertNotNull(message.getField("timestamp"));
+        assertNotNull(message.getField("_id"));
     }
 
     @Test
