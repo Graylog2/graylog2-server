@@ -118,8 +118,8 @@ const StreamsStore = singletonStore('Streams', () => Reflux.createStore({
 
   callbacks: [],
 
-  searchPaginated(page, perPage, query) {
-    const url = PaginationURL(ApiRoutes.StreamsApiController.paginated().url, page, perPage, query);
+  searchPaginated(newPage, newPerPage, newQuery) {
+    const url = PaginationURL(ApiRoutes.StreamsApiController.paginated().url, newPage, newPerPage, newQuery);
 
     const promise = fetch('GET', qualifyUrl(url))
       .then((response: PaginatedResponse) => {
@@ -131,7 +131,7 @@ const StreamsStore = singletonStore('Streams', () => Reflux.createStore({
             total,
             page,
             per_page: perPage,
-          }
+          },
         } = response;
 
         return {
