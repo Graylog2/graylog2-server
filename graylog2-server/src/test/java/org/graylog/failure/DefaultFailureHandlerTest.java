@@ -49,11 +49,6 @@ public class DefaultFailureHandlerTest {
     }
 
     @Test
-    public void supports_indexingFailuresNotSupported() {
-        assertThat(underTest.supports(FailureBatch.indexingFailureBatch(new ArrayList<>()))).isTrue();
-    }
-
-    @Test
     public void supports_processingFailuresNotSupported() {
         assertThat(underTest.supports(FailureBatch.processingFailureBatch(new ArrayList<>()))).isFalse();
     }
