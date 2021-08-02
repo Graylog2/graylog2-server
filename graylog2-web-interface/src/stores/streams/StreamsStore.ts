@@ -123,17 +123,26 @@ const StreamsStore = singletonStore('Streams', () => Reflux.createStore({
 
     const promise = fetch('GET', qualifyUrl(url))
       .then((response: PaginatedResponse) => {
-        const pagination = {
-          count: response.pagination.count,
-          total: response.pagination.total,
-          page: response.pagination.page,
-          perPage: response.pagination.per_page,
-          query: response.pagination.query,
-        };
+        const {
+          streams,
+          query,
+          pagination: {
+            count,
+            total,
+            page,
+            per_page: perPage,
+          }
+        } = response;
 
         return {
-          streams: response.streams,
-          pagination,
+          streams,
+          pagination: {
+            count,
+            total,
+            page,
+            perPage,
+            query,
+          },
         };
       })
       .catch((errorThrown) => {
