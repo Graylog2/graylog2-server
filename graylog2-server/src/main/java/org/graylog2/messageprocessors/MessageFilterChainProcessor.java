@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import static com.codahale.metrics.MetricRegistry.name;
@@ -112,14 +113,14 @@ public class MessageFilterChainProcessor implements MessageProcessor {
                         messageQueueAcknowledger.acknowledge(msg);
                     }
                 } catch (Exception e) {
+                    final String shortError = String.format(Locale.US, "Could not apply filter [%s] on message <%s>:\n%s",
+                            filter.getName(), msg.getId(), ExceptionUtils.getShortenedStackTrace(e));
                     if (LOG.isDebugEnabled()) {
                         LOG.error("Could not apply filter [" + filter.getName() + "] on message <" + msg.getId() + ">: ", e);
                     } else {
-                        LOG.error("Could not apply filter [" + filter.getName() + "] on message <" + msg.getId() + ">:{}{}",
-                                System.lineSeparator(),
-                                ExceptionUtils.getShortenedStackTrace(e));
+                        LOG.error(shortError);
                     }
-                    failureSubmissionService.handleProcessingException(msg, "message-processor-exception", e);
+                    msg.addProcessingError(shortError);
                 } finally {
                     final long elapsedNanos = timerContext.stop();
                     msg.recordTiming(serverStatus, timerName, elapsedNanos);
