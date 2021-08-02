@@ -108,8 +108,8 @@ type PaginatedResponse = {
     total: number,
     page: number,
     per_page: number,
-    query: string,
   },
+  query: string,
   streams: Array<Stream>,
 };
 
