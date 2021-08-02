@@ -14,21 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.failure;
+package org.graylog.testing.utils;
 
-/**
- * A default set of configuration values, which leaves
- * the original failure handling behaviour intact.
- */
-public class DefaultFailureHandlingConfiguration implements FailureHandlingConfiguration {
+import com.fasterxml.jackson.core.JsonProcessingException;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 
-    @Override
-    public boolean keepFailedMessageDuplicate() {
-        return true;
-    }
+public final class JsonUtils {
 
-    @Override
-    public boolean submitProcessingFailures() {
-        return false;
+    private JsonUtils(){}
+
+    public static String toJsonString(Object s) {
+        try {
+            return new ObjectMapperProvider().get().writeValueAsString(s);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Failed to serialize Search", e);
+        }
     }
 }

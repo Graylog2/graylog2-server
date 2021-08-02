@@ -412,7 +412,7 @@ public class PipelineInterpreterTest {
     }
 
     @Test
-    public void process_failureNotHandled_whenMessageDropped() throws Exception {
+    public void process_failureNotSubmitted_whenMessageDropped() throws Exception {
         // given
         when(ruleService.loadAll()).thenReturn(ImmutableList.of(RULE_WITH_RUNTIME_EXCEPTION, DROP_RULE));
 
@@ -448,7 +448,7 @@ public class PipelineInterpreterTest {
     }
 
     @Test
-    public void process_failureHandledAndMessageAcknowledgedLaterAndNotFilteredOut_whenMessageNotDroppedAndConfiguredToHandleAndConfiguredToKeepDuplicate() throws Exception {
+    public void process_failureSbmittedAndMessageAcknowledgedLaterAndNotFilteredOut_whenMessageNotDroppedAndConfiguredToSubmitAndConfiguredToKeepDuplicate() throws Exception {
         // given
         when(ruleService.loadAll()).thenReturn(ImmutableList.of(RULE_WITH_RUNTIME_EXCEPTION));
 
@@ -489,7 +489,7 @@ public class PipelineInterpreterTest {
     }
 
     @Test
-    public void process_failureNotHandledAndMessageAcknowledgedLaterAndNotFilteredOut_whenMessageNotDroppedAndConfiguredNotToHandle() throws Exception {
+    public void process_failureNotSubmittedAndMessageAcknowledgedLaterAndNotFilteredOut_whenMessageNotDroppedAndConfiguredNotToSubmit() throws Exception {
         // given
         when(ruleService.loadAll()).thenReturn(ImmutableList.of(RULE_WITH_RUNTIME_EXCEPTION));
 
@@ -525,7 +525,7 @@ public class PipelineInterpreterTest {
     }
 
     @Test
-    public void process_failureHandledAndMessageAcknowledgedLaterAndFilteredOut_whenMessageNotDroppedAndConfiguredToHandleAndConfiguredToKeepNoDuplicate() throws Exception {
+    public void process_failureSubmittedAndMessageAcknowledgedLaterAndFilteredOut_whenMessageNotDroppedAndConfiguredToSubmitAndConfiguredToKeepNoDuplicate() throws Exception {
         // given
         when(ruleService.loadAll()).thenReturn(ImmutableList.of(RULE_WITH_RUNTIME_EXCEPTION));
 

@@ -14,21 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.failure;
+package org.graylog.testing.utils;
 
-/**
- * A default set of configuration values, which leaves
- * the original failure handling behaviour intact.
- */
-public class DefaultFailureHandlingConfiguration implements FailureHandlingConfiguration {
+import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
+import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 
-    @Override
-    public boolean keepFailedMessageDuplicate() {
-        return true;
-    }
+public final class RangeUtils {
+    private RangeUtils(){}
 
-    @Override
-    public boolean submitProcessingFailures() {
-        return false;
+    public static AbsoluteRange allMessagesTimeRange() {
+        try {
+            return AbsoluteRange.create("2010-01-01T00:00:00.0Z", "2050-01-01T00:00:00.0Z");
+        } catch (InvalidRangeParametersException e) {
+            throw new RuntimeException("boo hoo", e);
+        }
     }
 }

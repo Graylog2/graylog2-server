@@ -17,32 +17,39 @@
 package org.graylog.failure;
 
 /**
- * Custom failure handlers must implement this interface and must be registered via
- * {@link com.google.inject.multibindings.Multibinder} in a corresponding plugin module.
+ * A handler for failures, occurring at different stages of message processing
+ * (e.g. pipeline processing, extraction, Elasticsearch indexing). To register
+ * a handler implementation you need to inform Guice about the new dependency
+ * via {@link com.google.inject.multibindings.Multibinder}:
  *
- * Example:
- *
+ * <pre>{@code
  * Multibinder<FailureHandler> failureHandlerBinder = Multibinder.newSetBinder(binder(), FailureHandler.class);
  * failureHandlerBinder.addBinding().to(MyCustomFailureHandler.class);
+ * }</pre>
  */
 public interface FailureHandler {
 
     /**
-     * An implementation of this method is expected to contain
-     * the actual logic of failure handling. Should be blocking.
+     * Handles a batch of failures
+     *
+     * @param failureBatch a batch of failures, supported by this handler
      */
     void handle(FailureBatch failureBatch);
 
     /**
-     * This method guides the master failure handler service
-     * when deciding whether the handler is applicable for a
-     * certain batch of failures.
+     * Guides the master failure handling service, when deciding
+     * whether this handler is suitable for a certain batch of failures
+     *
+     * @param failureBatch a batch of failures to test
+     * @return true if the batch can be processed by this handler
      */
     boolean supports(FailureBatch failureBatch);
 
     /**
-     * Tells the master failure handling service whether the handler
-     * is available for handling failures. Added to make handling configurable.
+     * Guides the master failure handling service, when deciding
+     * whether this handler is available for processing.
+     *
+     * @return true if this handler can accept failure batches
      */
     boolean isEnabled();
 }

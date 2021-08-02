@@ -19,12 +19,11 @@ package org.graylog.failure;
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
 
-import java.util.Collection;
 import java.util.List;
 
 /**
- * This class encapsulates a structure responsible for bearing a batch of failures for further processing.
- * Also it verifies whether failures with one batch are all of the same type.
+ * A structure bearing a batch of failures. It guarantees all failures
+ * to be instances of the same class
  */
 public class FailureBatch {
 
@@ -43,33 +42,37 @@ public class FailureBatch {
     }
 
     /**
-     * @param indexingFailures a list of indexing failures to be included in the batch.
-     * @return a batch of indexing failures.
+     * @param indexingFailures a list of indexing failures to include in this batch
+     * @return a batch of indexing failures
+     * @throws IllegalArgumentException if not all failures are instances of {@link IndexingFailure}
      */
     public static FailureBatch indexingFailureBatch(List<IndexingFailure> indexingFailures) {
         return new FailureBatch(indexingFailures, IndexingFailure.class);
     }
 
     /**
-     * @param processingFailures a list of processing failures to be included in the batch.
-     * @return a batch of processing failures.
+     * @param processingFailures a list of processing failures to include in this batch
+     * @return a batch of processing failures
+     * @throws IllegalArgumentException if not all failures are instances of {@link ProcessingFailure}
      */
     public static FailureBatch processingFailureBatch(List<ProcessingFailure> processingFailures) {
         return new FailureBatch(processingFailures, ProcessingFailure.class);
     }
 
     /**
-     * Creates a batch containing only one processing failure. A shortcut for
-     * FailureBatch.processingFailureBatch(ImmutableList.of(processingFailure));
+     * Creates a batch containing only one processing failure
+     * @param processingFailure a processing failure to include in this batch
+     * @return a batch with the processing failure
+     * @throws IllegalArgumentException if the failure is not instances of {@link ProcessingFailure}
      */
     public static FailureBatch processingFailureBatch(ProcessingFailure processingFailure) {
         return processingFailureBatch(ImmutableList.of(processingFailure));
     }
 
     /**
-     * @return an underlying immutable collection contains the failures.
+     * @return a list of failures within the batch. The returned collection is immutable.
      */
-    public Collection<? extends Failure> getFailures() {
+    public List<? extends Failure> getFailures() {
         return failures;
     }
 

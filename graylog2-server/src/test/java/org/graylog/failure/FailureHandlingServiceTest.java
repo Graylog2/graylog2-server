@@ -25,11 +25,12 @@ import org.graylog2.plugin.Message;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.testcontainers.shaded.com.google.common.collect.ImmutableList;
 import org.testcontainers.shaded.com.google.common.collect.ImmutableSet;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -40,6 +41,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 public class FailureHandlingServiceTest {
@@ -50,7 +52,7 @@ public class FailureHandlingServiceTest {
 
     private FailureSubmissionService failureSubmissionService;
 
-    @Before
+    @BeforeEach
     public void setup() {
         when(configuration.getFailureHandlingQueueCapacity()).thenReturn(1000);
 
@@ -58,7 +60,7 @@ public class FailureHandlingServiceTest {
     }
 
     @Test
-    public void whenNoSuitableCustomHandlerProvided_thenSuitableFallbackOneIsUsed() throws Exception {
+    public void run_whenNoSuitableCustomHandlerProvided_thenSuitableFallbackOneIsUsed() throws Exception {
         // given
         final FailureBatch indexingFailureBatch = indexingFailureBatch(createIndexingFailure());
 
@@ -90,7 +92,7 @@ public class FailureHandlingServiceTest {
     }
 
     @Test
-    public void whenNoSuitableCustomHandlerAndNoSuitableFallbackHandlerFound_thenNoHandlingDone() throws Exception {
+    public void run_whenNoSuitableCustomHandlerAndNoSuitableFallbackHandlerFound_thenNoHandlingDone() throws Exception {
         // given
         final FailureBatch indexingFailureBatch = indexingFailureBatch(createIndexingFailure());
 
@@ -122,7 +124,7 @@ public class FailureHandlingServiceTest {
     }
 
     @Test
-    public void whenCustomHandlersProvided_thenFallbackHandlerIgnored() throws Exception {
+    public void run_whenCustomHandlersProvided_thenFallbackHandlerIgnored() throws Exception {
         // given
         final FailureBatch indexingFailureBatch = indexingFailureBatch(createIndexingFailure());
 
@@ -149,37 +151,7 @@ public class FailureHandlingServiceTest {
     }
 
     @Test
-    public void uponShutdownAllRemainingFailuresAreHandled() throws Exception {
-        // given
-        final FailureBatch indexingFailureBatch = indexingFailureBatch(createIndexingFailure());
-
-        final FailureHandler customFailureHandler = enabledFailureHandler();
-        final FailureHandler fallbackFailureHandler = enabledFailureHandler(indexingFailureBatch);
-
-        final FailureSubmissionService failureSubmissionService = mock(FailureSubmissionService.class);
-        final FailureHandlingService underTest = new FailureHandlingService(fallbackFailureHandler,
-                ImmutableSet.of(customFailureHandler), failureSubmissionService, configuration, acknowledger);
-
-        when(configuration.getFailureHandlingShutdownAwait()).thenReturn(com.github.joschi.jadconfig.util.Duration.milliseconds(300));
-        when(failureSubmissionService.consumeBlockingWithTimeout(300L))
-                .thenReturn(indexingFailureBatch)
-                .thenReturn(null);
-
-        underTest.startAsync();
-        underTest.awaitRunning();
-
-        //when
-        underTest.stopAsync();
-        underTest.awaitTerminated();
-
-        // then
-        verify(failureSubmissionService, times(2)).consumeBlockingWithTimeout(300L);
-        verify(fallbackFailureHandler, times(1)).handle(indexingFailureBatch);
-    }
-
-
-    @Test
-    public void serviceNotInterruptedUponHandlerException() throws Exception {
+    public void run_serviceNotInterruptedUponHandlerException() throws Exception {
         // given
         final FailureBatch indexingFailureBatch1 = indexingFailureBatch(createIndexingFailure());
         final FailureBatch indexingFailureBatch2 = indexingFailureBatch(createIndexingFailure());
@@ -208,15 +180,18 @@ public class FailureHandlingServiceTest {
     }
 
     @Test
-    public void acknowledgesProcessingErrors() throws InterruptedException {
+    public void run_acknowledgesFlaggedProcessingErrorsOnlyOnce() throws InterruptedException {
         // given
+        final ProcessingFailure processingFailureWithAck = createProcessingFailure(true);
+        final ProcessingFailure processingFailureNoAck = createProcessingFailure(false);
+        final FailureBatch processingFailureBatch = processingFailureBatch(processingFailureWithAck, processingFailureNoAck);
+
         final FailureHandler fallbackFailureHandler = enabledFailureHandler();
-        final ProcessingFailure processingFailure = createProcessingFailure(true);
-        final FailureBatch processingFailureBatch = processingFailureBatch(processingFailure);
         final FailureHandler customFailureHandler1 = enabledFailureHandler(processingFailureBatch);
+        final FailureHandler customFailureHandler2 = enabledFailureHandler(processingFailureBatch);
 
         final FailureHandlingService underTest = new FailureHandlingService(fallbackFailureHandler,
-                ImmutableSet.of(customFailureHandler1), failureSubmissionService, configuration, acknowledger);
+                ImmutableSet.of(customFailureHandler1, customFailureHandler2), failureSubmissionService, configuration, acknowledger);
 
         // when
         underTest.startAsync();
@@ -228,42 +203,20 @@ public class FailureHandlingServiceTest {
                 .until(() -> failureSubmissionService.queueSize() == 0);
 
         // then
-        verify(acknowledger, times(1)).acknowledge((List<Message>) argThat(argument -> !((List)argument).isEmpty()));
+        verify(acknowledger, times(1)).acknowledge(argThat((List<Message> arg) ->
+                arg.size() == 1 && arg.get(0) == processingFailureWithAck.failedMessage()));
     }
 
     @Test
-    public void doesNotAcknowledgeProcessingErrorsThatAreFlagged() throws InterruptedException {
+    public void run_doesNotAcknowledgeIndexingErrors() throws InterruptedException {
         // given
         final FailureHandler fallbackFailureHandler = enabledFailureHandler();
-        final ProcessingFailure processingFailure = createProcessingFailure(false);
-        final FailureBatch processingFailureBatch = processingFailureBatch(processingFailure);
-        final FailureHandler customFailureHandler1 = enabledFailureHandler(processingFailureBatch);
 
-        final FailureHandlingService underTest = new FailureHandlingService(fallbackFailureHandler,
-                ImmutableSet.of(customFailureHandler1), failureSubmissionService, configuration, acknowledger);
-
-        // when
-        underTest.startAsync();
-        underTest.awaitRunning();
-
-        failureSubmissionService.submitBlocking(processingFailureBatch);
-
-        Awaitility.waitAtMost(Duration.ONE_SECOND)
-                .until(() -> failureSubmissionService.queueSize() == 0);
-
-        // then
-        verify(acknowledger, times(1)).acknowledge((List<Message>) argThat(argument -> ((List)argument).isEmpty()));
-    }
-
-    @Test
-    public void doesNotacknowledgeIndexingErrors() throws InterruptedException {
-        // given
-        final FailureHandler fallbackFailureHandler = enabledFailureHandler();
         final FailureBatch indexingFailureBatch = indexingFailureBatch(createIndexingFailure());
-        final FailureHandler customFailureHandler1 = enabledFailureHandler(indexingFailureBatch);
+        final FailureHandler customFailureHandler = enabledFailureHandler(indexingFailureBatch);
 
         final FailureHandlingService underTest = new FailureHandlingService(fallbackFailureHandler,
-                ImmutableSet.of(customFailureHandler1), failureSubmissionService, configuration, acknowledger);
+                ImmutableSet.of(customFailureHandler), failureSubmissionService, configuration, acknowledger);
 
         // when
         underTest.startAsync();
@@ -275,7 +228,35 @@ public class FailureHandlingServiceTest {
                 .until(() -> failureSubmissionService.queueSize() == 0);
 
         // then
-        verify(acknowledger, times(1)).acknowledge((List<Message>) argThat(argument -> ((List)argument).isEmpty()));
+        verifyNoInteractions(acknowledger);
+    }
+
+    @Test
+    public void shutDown_uponShutdownAllRemainingFailuresAreHandled() throws Exception {
+        // given
+        final FailureBatch indexingFailureBatch = indexingFailureBatch(createIndexingFailure());
+
+        final FailureHandler fallbackFailureHandler = enabledFailureHandler(indexingFailureBatch);
+
+        final FailureSubmissionService failureSubmissionService = mock(FailureSubmissionService.class);
+        final FailureHandlingService underTest = new FailureHandlingService(fallbackFailureHandler,
+                ImmutableSet.of(), failureSubmissionService, configuration, acknowledger);
+
+        when(configuration.getFailureHandlingShutdownAwait()).thenReturn(com.github.joschi.jadconfig.util.Duration.milliseconds(300));
+        when(failureSubmissionService.consumeBlockingWithTimeout(300L))
+                .thenReturn(indexingFailureBatch)
+                .thenReturn(null);
+
+        underTest.startAsync();
+        underTest.awaitRunning();
+
+        //when
+        underTest.stopAsync();
+        underTest.awaitTerminated();
+
+        // then
+        verify(failureSubmissionService, times(2)).consumeBlockingWithTimeout(300L);
+        verify(fallbackFailureHandler, times(1)).handle(indexingFailureBatch);
     }
 
     private IndexingFailure createIndexingFailure() {
@@ -294,7 +275,7 @@ public class FailureHandlingServiceTest {
         return FailureBatch.indexingFailureBatch(ImmutableList.of(indexingFailure));
     }
 
-    private FailureBatch processingFailureBatch(ProcessingFailure processingFailure) {
-        return FailureBatch.processingFailureBatch(processingFailure);
+    private FailureBatch processingFailureBatch(ProcessingFailure... processingFailure) {
+        return FailureBatch.processingFailureBatch(Arrays.asList(processingFailure));
     }
 }

@@ -17,8 +17,7 @@
 package org.graylog.failure;
 
 /**
- * This interface was added to decouple failure handling configuration
- * management from the actual configuration consumption.
+ * A <b>runtime</b> failure handling configuration.
  */
 public interface FailureHandlingConfiguration {
 
