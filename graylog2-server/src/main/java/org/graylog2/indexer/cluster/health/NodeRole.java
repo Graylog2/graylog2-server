@@ -27,33 +27,38 @@ import java.util.stream.Stream;
 
 public enum NodeRole {
 
-    COLD('c'),
-    DATA('d'),
-    FROZEN('f'),
-    HOT('h'),
-    INGEST('i'),
-    MACHINE_LEARNING('l'),
-    MASTER_ELIGIBLE('m'),
-    REMOTE_CLUSTER_CLIENT('r'),
-    CONTENT('s'),
-    TRANSFORM('t'),
-    VOTING_ONLY('v'),
-    WARM('w'),
-    COORDINATING_ONLY('-');
+    COORDINATING_ONLY('-', false),
+    DATA('d', true),
+    DATA_COLD('c', true),
+    DATA_CONTENT('s', true),
+    DATA_HOT('h', true),
+    DATA_WARM('w', true),
+    FROZEN('f', true),
+    INGEST('i', false),
+    MACHINE_LEARNING('l', false),
+    MASTER_ELIGIBLE('m', false),
+    REMOTE_CLUSTER_CLIENT('r', false),
+    TRANSFORM('t', false),
+    VOTING_ONLY('v', false);
 
     private static final Logger log = LoggerFactory.getLogger(NodeRole.class);
 
     private final int symbol;
-
+    private final boolean holdsData;
     private static final Map<Integer, NodeRole> symbolToRole = Stream.of(NodeRole.values())
             .collect(Collectors.toMap(NodeRole::getSymbol, r -> r));
 
-    NodeRole(int symbol) {
+    NodeRole(int symbol, boolean holdsData) {
         this.symbol = symbol;
+        this.holdsData = holdsData;
     }
 
     public int getSymbol() {
         return symbol;
+    }
+
+    public boolean holdsData() {
+        return holdsData;
     }
 
     public static EnumSet<NodeRole> parseSymbolString(String symbols) {
