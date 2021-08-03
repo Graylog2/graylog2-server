@@ -28,6 +28,7 @@ public class NodeDiskUsageStatsTest {
     public void createWithValidValues() {
         nodeDiskUsageStats = NodeDiskUsageStats.create(
                 "name",
+                "mdi",
                 "0.0.0.0",
                 "myelasticnode.graylog.org",
                 "1gb",
@@ -46,6 +47,7 @@ public class NodeDiskUsageStatsTest {
     public void hostCanBeNull() {
         nodeDiskUsageStats = NodeDiskUsageStats.create(
                 "name",
+                "mdi",
                 "0.0.0.0",
                 null,
                 "1mb",
@@ -59,6 +61,7 @@ public class NodeDiskUsageStatsTest {
     public void diskAvailabileIsCorrect() {
         nodeDiskUsageStats = NodeDiskUsageStats.create(
                 "name",
+                "mdi",
                 "0.0.0.0",
                 null,
                 "1gb",
