@@ -277,6 +277,7 @@ public abstract class CmdLineTool implements CliCommand {
 
         // This is holding all our metrics.
         final MetricRegistry metrics = injector.getInstance(MetricRegistry.class);
+        featureFlags.initMetrics(metrics);
 
         addInstrumentedAppender(metrics, logLevel);
 
