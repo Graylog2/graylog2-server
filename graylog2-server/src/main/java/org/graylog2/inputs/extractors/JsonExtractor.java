@@ -27,7 +27,6 @@ import org.graylog2.ConfigurationException;
 import org.graylog2.jackson.TypeReferences;
 import org.graylog2.plugin.inputs.Converter;
 import org.graylog2.plugin.inputs.Extractor;
-import org.graylog2.shared.utilities.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -98,7 +97,7 @@ public class JsonExtractor extends Extractor {
         try {
             extractedJson = extractJson(value);
         } catch (IOException e) {
-            return new Result[]{new Result(null, null, -1, -1, ExceptionUtils.getShortenedStackTrace(e))};
+            return new Result[]{new Result(null, null, -1, -1, e)};
         }
         final List<Result> results = new ArrayList<>(extractedJson.size());
         for (Map.Entry<String, Object> entry : extractedJson.entrySet()) {

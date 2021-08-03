@@ -213,8 +213,9 @@ public abstract class Extractor implements EmbeddedPersistable {
 
             try (final Timer.Context ignored2 = executionTimer.time()) {
                 final Result[] results = run(field);
-                if (results != null && results.length == 1 && results[0].errorString != null) {
-                    msg.addProcessingError(results[0].errorString);
+                if (results != null && results.length == 1 && results[0].exception != null) {
+                    final String error = "Could not apply extractor \"" + getTitle() + "\" (id=" + getId() + ") ";
+                    msg.addProcessingException(error, results[0].exception);
                 } else if (results == null || results.length == 0 || Arrays.stream(results).anyMatch(result -> result.getValue() == null)) {
                     return;
                 } else if (results.length == 1 && results[0].target == null) {
@@ -428,7 +429,7 @@ public abstract class Extractor implements EmbeddedPersistable {
         private final String target;
         private final int beginIndex;
         private final int endIndex;
-        private final String errorString;
+        private final Exception exception;
 
         public Result(String value, int beginIndex, int endIndex) {
             this(value, null, beginIndex, endIndex);
@@ -438,12 +439,12 @@ public abstract class Extractor implements EmbeddedPersistable {
             this(value, target, beginIndex, endIndex, null);
         }
 
-        public Result(Object value, String target, int beginIndex, int endIndex, String errorString) {
+        public Result(Object value, String target, int beginIndex, int endIndex, Exception exception) {
             this.value = value;
             this.target = target;
             this.beginIndex = beginIndex;
             this.endIndex = endIndex;
-            this.errorString = errorString;
+            this.exception = exception;
         }
 
         public Object getValue() {
@@ -462,10 +463,6 @@ public abstract class Extractor implements EmbeddedPersistable {
             return endIndex;
         }
 
-        public String getErrorString() {
-            return errorString;
-        }
-
         @Override
         public boolean equals(Object o) {
             if (this == o) {
@@ -479,12 +476,12 @@ public abstract class Extractor implements EmbeddedPersistable {
                     Objects.equals(endIndex, result.endIndex) &&
                     Objects.equals(value, result.value) &&
                     Objects.equals(target, result.target) &&
-                    Objects.equals(errorString, result.errorString);
+                    Objects.equals(exception, result.exception);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(value, target, beginIndex, endIndex, errorString);
+            return Objects.hash(value, target, beginIndex, endIndex, exception);
         }
 
         @Override
@@ -494,7 +491,7 @@ public abstract class Extractor implements EmbeddedPersistable {
                     .add("target", target)
                     .add("beginIndex", beginIndex)
                     .add("endIndex", endIndex)
-                    .add("errorString", errorString)
+                    .add("errorString", exception)
                     .toString();
         }
     }

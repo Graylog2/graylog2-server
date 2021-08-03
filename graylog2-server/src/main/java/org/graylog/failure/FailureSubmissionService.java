@@ -16,6 +16,7 @@
  */
 package org.graylog.failure;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.graylog2.indexer.messages.Indexable;
 import org.graylog2.indexer.messages.Messages.IndexingError;
 import org.graylog2.plugin.Message;
@@ -23,6 +24,7 @@ import org.graylog2.shared.utilities.ExceptionUtils;
 
 import javax.inject.Inject;
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class FailureSubmissionService {
@@ -64,6 +66,25 @@ public class FailureSubmissionService {
             message.setFilterOut(true);
         }
         submitProcessingFailure(message, failureContext, ExceptionUtils.getShortenedStackTrace(e));
+    }
+
+    public void handleProcessingErrors(Message message) {
+        final List<Pair<String, Object>> processingErrors = message.getProcessingErrors();
+
+        final Pair<String, String> reduced = processingErrors.stream().map((pair) -> {
+            String formatedError;
+
+                    if (pair.getRight() instanceof Exception) {
+                        final Throwable rootCause = ExceptionUtils.getRootCause((Throwable) pair.getRight());
+                        formatedError =
+
+                    } else if (pair.getRight() instanceof String) {
+                        return Pair.of(pair.getLeft(), pair.getRight());
+                    }// else { // TODO
+
+                    return Pair.of(pair.getLeft(), formatedError);
+                })
+                .reduce(Pair.of("", ""), (acc, pair) -> Pair.of("", "")));
     }
 
     public void handleProcessingFailure(Message message, String failureContext) {

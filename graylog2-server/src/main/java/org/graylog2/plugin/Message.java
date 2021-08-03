@@ -30,6 +30,7 @@ import com.google.common.collect.Iterators;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.net.InetAddresses;
+import org.apache.commons.lang3.tuple.Pair;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.messages.Indexable;
 import org.graylog2.plugin.streams.Stream;
@@ -279,9 +280,12 @@ public class Message implements Messages, Indexable {
 
     private ArrayList<Recording> recordings;
 
+    private List<Pair<String, Object>> processingErrors = new ArrayList<>(2);
+
     private com.codahale.metrics.Counter sizeCounter = new com.codahale.metrics.Counter();
 
     private static final IdentityHashMap<Class<?>, Integer> classSizes = Maps.newIdentityHashMap();
+
     static {
         classSizes.put(byte.class, 1);
         classSizes.put(Byte.class, 1);
@@ -524,6 +528,22 @@ public class Message implements Messages, Indexable {
         } else {
             addField(FIELD_GL2_PROCESSING_ERROR, error);
         }
+    }
+
+    public void addProcessingError(final String context, String error) {
+        processingErrors.add(Pair.of(context, error));
+    }
+
+    public void addProcessingException(final String context, Exception exception) {
+        processingErrors.add(Pair.of(context, exception));
+    }
+
+    public boolean hasProcessingErrors() {
+        return !processingErrors.isEmpty();
+    }
+
+    public List<Pair<String, Object>> getProcessingErrors() {
+        return processingErrors;
     }
 
     private void addRequiredField(final String key, final Object value) {
