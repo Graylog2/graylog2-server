@@ -61,7 +61,7 @@ public class ImmutableFeatureFlagsMetricsTest {
     void testIncrementFeatureFlagIsUsedCounter() throws IOException {
         FeatureFlags underTest = createFeatureFlags();
 
-        underTest.isOn(FEATURE, false);
+        underTest.isOn(FEATURE);
 
         assertThat(getFeatureFlagUsedCount()).isEqualTo(1);
     }

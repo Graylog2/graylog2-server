@@ -109,19 +109,16 @@ class ImmutableFeatureFlagsTest {
     void testGetBoolFeatureFlag(String init, String feature, String value, boolean expected) throws IOException {
         FeatureFlags flags = create(init, value);
 
-        boolean on = flags.isOn(feature, false);
+        boolean on = flags.isOn(feature);
 
         assertThat(on).isEqualTo(expected);
     }
 
-    @ParameterizedTest
-    @CsvSource({"true", "false"})
-    void testGetBoolFeatureFlagDefaultValue(boolean defaultValue) throws IOException {
+    @Test
+    void testGetBoolFeatureFlagDefaultValue() throws IOException {
         FeatureFlags flags = empty();
 
-        boolean on = flags.isOn("notExist", defaultValue);
-
-        assertThat(on).isEqualTo(defaultValue);
+        assertThat(flags.isOn("notExist")).isFalse();
     }
 
     @Test

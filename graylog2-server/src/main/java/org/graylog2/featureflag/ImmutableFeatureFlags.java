@@ -45,11 +45,11 @@ class ImmutableFeatureFlags implements FeatureFlags {
     }
 
     @Override
-    public boolean isOn(String feature, boolean defaultValue) {
+    public boolean isOn(String feature) {
         FeatureFlag flag = getFlag(feature);
         if (flag == null) {
-            LOG.warn("Feature flag '{}' is not set. Fall back to default value '{}'", feature, defaultValue);
-            return defaultValue;
+            LOG.warn("Feature flag '{}' is not set. Fall back to default value 'false'", feature);
+            return false;
         }
         return flag.isOn();
     }
