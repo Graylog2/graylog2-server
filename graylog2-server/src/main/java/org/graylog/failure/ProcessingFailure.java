@@ -24,23 +24,24 @@ import javax.annotation.Nullable;
 
 public class ProcessingFailure implements Failure {
 
-    private final String failedMessageId;
-    private final String errorType;
-    private final String errorMessage;
-    private final DateTime timestamp;
+    private final FailureCause failureCause;
+    private final String message;
+    private final String failureDetails;
+    private final DateTime failureTimestamp;
     private final Indexable failedMessage;
     private final boolean requiresAcknowledgement;
 
-    public ProcessingFailure(String failedMessageId,
-                             String errorType,
-                             String errorMessage,
-                             DateTime timestamp,
-                             Indexable failedMessage,
-                             boolean requiresAcknowledgement) {
-        this.failedMessageId = failedMessageId;
-        this.errorType = errorType;
-        this.errorMessage = errorMessage;
-        this.timestamp = timestamp;
+    public ProcessingFailure(
+            FailureCause failureCause,
+            String message,
+            String failureDetails,
+            DateTime failureTimestamp,
+            Indexable failedMessage,
+            boolean requiresAcknowledgement) {
+        this.failureCause = failureCause;
+        this.message = message;
+        this.failureDetails = failureDetails;
+        this.failureTimestamp = failureTimestamp;
         this.failedMessage = failedMessage;
         this.requiresAcknowledgement = requiresAcknowledgement;
     }
@@ -51,34 +52,34 @@ public class ProcessingFailure implements Failure {
     }
 
     @Override
-    public String failedMessageId() {
-        return failedMessageId;
+    public FailureCause failureCause() {
+        return failureCause;
+    }
+
+    @Override
+    public String message() {
+        return message;
+    }
+
+    @Override
+    public String failureDetails() {
+        return failureDetails;
+    }
+
+    @Override
+    public DateTime failureTimestamp() {
+        return failureTimestamp;
+    }
+
+    @Override
+    public Indexable failedMessage() {
+        return failedMessage;
     }
 
     @Nullable
     @Override
     public String targetIndex() {
         return null;
-    }
-
-    @Override
-    public String errorType() {
-        return errorType;
-    }
-
-    @Override
-    public String errorMessage() {
-        return errorMessage;
-    }
-
-    @Override
-    public DateTime timestamp() {
-        return timestamp;
-    }
-
-    @Override
-    public Indexable failedMessage() {
-        return failedMessage;
     }
 
     @Override
@@ -91,16 +92,16 @@ public class ProcessingFailure implements Failure {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         final ProcessingFailure that = (ProcessingFailure) o;
-        return Objects.equal(failedMessageId, that.failedMessageId)
-                && Objects.equal(errorType, that.errorType)
-                && Objects.equal(errorMessage, that.errorMessage)
-                && Objects.equal(timestamp, that.timestamp)
-                && Objects.equal(failedMessage, that.failedMessage)
-                && Objects.equal(requiresAcknowledgement, that.requiresAcknowledgement);
+        return requiresAcknowledgement == that.requiresAcknowledgement
+                && Objects.equal(failureCause, that.failureCause)
+                && Objects.equal(message, that.message)
+                && Objects.equal(failureDetails, that.failureDetails)
+                && Objects.equal(failureTimestamp, that.failureTimestamp)
+                && Objects.equal(failedMessage, that.failedMessage);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(failedMessageId, errorType, errorMessage, timestamp, failedMessage, requiresAcknowledgement);
+        return Objects.hashCode(failureCause, message, failureDetails, failureTimestamp, failedMessage, requiresAcknowledgement);
     }
 }

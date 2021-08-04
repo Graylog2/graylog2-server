@@ -30,10 +30,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
-import org.graylog.failure.FailureBatch;
-import org.graylog.failure.FailureHandlingConfiguration;
-import org.graylog.failure.FailureSubmissionService;
-import org.graylog.failure.ProcessingFailure;
+import org.graylog.failure.ProcessingFailureCause;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
@@ -62,6 +59,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -80,15 +78,11 @@ public class PipelineInterpreter implements MessageProcessor {
     private final Timer executionTime;
     private final MetricRegistry metricRegistry;
     private final ConfigurationStateUpdater stateUpdater;
-    private final FailureSubmissionService failureSubmissionService;
-    private final FailureHandlingConfiguration failureHandlingConfiguration;
 
     @Inject
     public PipelineInterpreter(MessageQueueAcknowledger messageQueueAcknowledger,
                                MetricRegistry metricRegistry,
-                               ConfigurationStateUpdater stateUpdater,
-                               FailureSubmissionService failureSubmissionService,
-                               FailureHandlingConfiguration failureHandlingConfiguration) {
+                               ConfigurationStateUpdater stateUpdater) {
 
         this.messageQueueAcknowledger = messageQueueAcknowledger;
         this.filteredOutMessages = metricRegistry.meter(name(ProcessBufferProcessor.class, "filteredOutMessages"));
@@ -96,8 +90,6 @@ public class PipelineInterpreter implements MessageProcessor {
         this.executionTime = metricRegistry.timer(name(PipelineInterpreter.class, "executionTime"));
         this.metricRegistry = metricRegistry;
         this.stateUpdater = stateUpdater;
-        this.failureSubmissionService = failureSubmissionService;
-        this.failureHandlingConfiguration = failureHandlingConfiguration;
     }
 
     /**
@@ -164,7 +156,6 @@ public class PipelineInterpreter implements MessageProcessor {
                         message,
                         initialStreamIds);
                 potentiallyDropFilteredMessage(message);
-                handleFailedMessage(message);
 
                 // go to 1 and iterate over all messages again until no more streams are being assigned
                 if (!addedStreams || message.getFilterOut()) {
@@ -181,41 +172,6 @@ public class PipelineInterpreter implements MessageProcessor {
         interpreterListener.finishProcessing();
         // 7. return the processed messages
         return new MessageCollection(fullyProcessed);
-    }
-
-    private void handleFailedMessage(Message message) {
-        if (message.getFilterOut()) {
-            // Message will be dropped
-            return;
-        }
-        if (!failureHandlingConfiguration.submitProcessingFailures()) {
-            // We don't handle processing errors
-            return;
-        }
-
-        final String processingError = message.getFieldAs(String.class, Message.FIELD_GL2_PROCESSING_ERROR);
-        if (processingError == null) {
-            return;
-        }
-
-        if (!failureHandlingConfiguration.keepFailedMessageDuplicate()) {
-            message.setFilterOut(true);
-        }
-        submitFailure(message, processingError);
-
-        failedMessages.mark();
-    }
-
-    private void submitFailure(Message message, String error) {
-        try {
-            // If we store the regular message, the acknowledgement happens in the output path
-            boolean needsAcknowledgement = !failureHandlingConfiguration.keepFailedMessageDuplicate();
-            // TODO use message.getMesssgeId() once this field is set early in processing
-            final ProcessingFailure processingFailure = new ProcessingFailure(message.getId(), "pipeline-processor", error, message.getTimestamp(), message, needsAcknowledgement);
-            final FailureBatch failureBatch = FailureBatch.processingFailureBatch(processingFailure);
-            failureSubmissionService.submitBlocking(failureBatch);
-        } catch (InterruptedException ignored) {
-        }
     }
 
     private void potentiallyDropFilteredMessage(Message message) {
@@ -426,7 +382,13 @@ public class PipelineInterpreter implements MessageProcessor {
         if (context.hasEvaluationErrors()) {
             // if the last statement resulted in an error, do not continue to execute this rules
             final EvaluationContext.EvalError lastError = Iterables.getLast(context.evaluationErrors());
-            appendProcessingError(rule, message, lastError.toString());
+            message.addProcessingError(new Message.ProcessingError(
+                    ProcessingFailureCause.RuleStatementEvaluationError,
+                    String.format(Locale.ENGLISH,
+                            "Error evaluating action for rule <%s/%s> (pipeline <%s/%s>)",
+                            rule.name(), rule.id(), pipeline.name(), pipeline.id()),
+                    lastError.toString()
+            ));
             interpreterListener.failExecuteRule(rule, pipeline);
             log.debug("Encountered evaluation error, skipping rest of the rule: {}",
                     lastError);
@@ -449,7 +411,13 @@ public class PipelineInterpreter implements MessageProcessor {
 
             if (context.hasEvaluationErrors()) {
                 final EvaluationContext.EvalError lastError = Iterables.getLast(context.evaluationErrors());
-                appendProcessingError(rule, message, lastError.toString());
+                message.addProcessingError(new Message.ProcessingError(
+                        ProcessingFailureCause.RuleConditionEvaluationError,
+                        String.format(Locale.ENGLISH,
+                                "Error evaluating condition for rule <%s/%s> (pipeline <%s/%s>)",
+                                rule.name(), rule.id(), pipeline.name(), pipeline.id()),
+                        lastError.toString()
+                ));
                 interpreterListener.failEvaluateRule(rule, pipeline);
                 log.debug("Encountered evaluation error during condition, skipping rule actions: {}",
                         lastError);
@@ -465,15 +433,6 @@ public class PipelineInterpreter implements MessageProcessor {
             log.debug("[{}] rule `{}` does not match", msgId, rule.name());
         }
         return false;
-    }
-
-    private void appendProcessingError(Rule rule, Message message, String errorString) {
-        final String msg = "For rule '" + rule.name() + "': " + errorString;
-        if (message.hasField(Message.FIELD_GL2_PROCESSING_ERROR)) {
-            message.addField(Message.FIELD_GL2_PROCESSING_ERROR, message.getFieldAs(String.class, Message.FIELD_GL2_PROCESSING_ERROR) + "," + msg);
-        } else {
-            message.addField(Message.FIELD_GL2_PROCESSING_ERROR, msg);
-        }
     }
 
     public static class Descriptor implements MessageProcessor.Descriptor {

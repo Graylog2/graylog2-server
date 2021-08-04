@@ -23,7 +23,6 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Test;
 
-import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -32,7 +31,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class FailureSubmissionServiceTest {
+public class FailureSubmissionQueueTest {
 
     private final Configuration configuration = mock(Configuration.class);
 
@@ -48,7 +47,7 @@ public class FailureSubmissionServiceTest {
         //given
         when(configuration.getFailureHandlingQueueCapacity()).thenReturn(1000);
 
-        final FailureSubmissionService underTest = new FailureSubmissionService(configuration, metricRegistry);
+        final FailureSubmissionQueue underTest = new FailureSubmissionQueue(configuration, metricRegistry);
 
         final ProcessingFailure prcFailure1 = createProcessingFailure();
         final ProcessingFailure prcFailure2 = createProcessingFailure();
@@ -68,7 +67,7 @@ public class FailureSubmissionServiceTest {
         //given
         when(configuration.getFailureHandlingQueueCapacity()).thenReturn(2);
 
-        final FailureSubmissionService underTest = new FailureSubmissionService(configuration, metricRegistry);
+        final FailureSubmissionQueue underTest = new FailureSubmissionQueue(configuration, metricRegistry);
 
         final ProcessingFailure prcFailure1 = createProcessingFailure();
         final ProcessingFailure prcFailure2 = createProcessingFailure();
@@ -104,7 +103,7 @@ public class FailureSubmissionServiceTest {
         //given
         when(configuration.getFailureHandlingQueueCapacity()).thenReturn(2);
 
-        final FailureSubmissionService underTest = new FailureSubmissionService(configuration, metricRegistry);
+        final FailureSubmissionQueue underTest = new FailureSubmissionQueue(configuration, metricRegistry);
 
         final ProcessingFailure prcFailure1 = createProcessingFailure();
 
@@ -131,7 +130,7 @@ public class FailureSubmissionServiceTest {
         //given
         when(configuration.getFailureHandlingQueueCapacity()).thenReturn(2);
 
-        final FailureSubmissionService underTest = new FailureSubmissionService(configuration, metricRegistry);
+        final FailureSubmissionQueue underTest = new FailureSubmissionQueue(configuration, metricRegistry);
 
         final ProcessingFailure prcFailure1 = createProcessingFailure();
 
@@ -158,7 +157,7 @@ public class FailureSubmissionServiceTest {
         //given
         when(configuration.getFailureHandlingQueueCapacity()).thenReturn(2);
 
-        final FailureSubmissionService underTest = new FailureSubmissionService(configuration, metricRegistry);
+        final FailureSubmissionQueue underTest = new FailureSubmissionQueue(configuration, metricRegistry);
 
         final ProcessingFailure prcFailure1 = createProcessingFailure();
 
@@ -179,7 +178,7 @@ public class FailureSubmissionServiceTest {
 
     private ProcessingFailure createProcessingFailure() {
         return new ProcessingFailure(
-                UUID.randomUUID().toString(), "error-type", "error-message",
+                ProcessingFailureCause.UNKNOWN, "message", "details",
                 DateTime.now(DateTimeZone.UTC), null,
                 true);
     }

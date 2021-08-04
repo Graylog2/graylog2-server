@@ -17,10 +17,7 @@
 package org.graylog2.indexer.messages;
 
 import com.google.common.collect.ImmutableList;
-import org.graylog.failure.Failure;
-import org.graylog.failure.FailureBatch;
 import org.graylog.failure.FailureSubmissionService;
-import org.graylog.failure.FailureType;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
@@ -37,6 +34,7 @@ import org.mockito.junit.MockitoRule;
 
 import java.io.IOException;
 import java.util.AbstractMap;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -67,7 +65,7 @@ public class MessagesTest {
     private FailureSubmissionService failureSubmissionService;
 
     @Captor
-    private ArgumentCaptor<FailureBatch> failureBatchArgumentCaptor;
+    private ArgumentCaptor<Collection<Messages.IndexingError>> indexingErrorsArgumentCaptor;
 
     private Messages messages;
 
@@ -148,33 +146,21 @@ public class MessagesTest {
         assertThat(failureIds).hasSize(2)
                 .containsExactlyInAnyOrder("msg-2", "msg-3");
 
-        verify(failureSubmissionService, times(1)).submitBlocking(failureBatchArgumentCaptor.capture());
+        verify(failureSubmissionService, times(1)).submitIndexingErrors(indexingErrorsArgumentCaptor.capture());
 
-        assertThat(failureBatchArgumentCaptor.getValue().getFailures()
+        assertThat(indexingErrorsArgumentCaptor.getValue()
                 .stream()
-                .sorted(Comparator.comparing(Failure::failedMessageId))
+                .sorted(Comparator.comparing(e -> e.message().getMessageId()))
                 .collect(Collectors.toList())
-        ).satisfies(failures -> {
-            assertThat(failures.get(0)).satisfies(indexingFailure -> {
-                assertThat(indexingFailure.failedMessageId()).isEqualTo("msg-2");
-                assertThat(indexingFailure.failureType()).isEqualTo(FailureType.INDEXING);
-                assertThat(indexingFailure.failedMessage()).isEqualTo(message2);
-                assertThat(indexingFailure.targetIndex()).isEqualTo("msg-index");
-                assertThat(indexingFailure.errorType()).isEqualTo("MappingError");
-                assertThat(indexingFailure.errorMessage()).isEqualTo("Some error message");
-                assertThat(indexingFailure.requiresAcknowledgement()).isFalse();
-                assertThat(indexingFailure.timestamp()).isEqualTo(ts);
+        ).satisfies(indexingErrors -> {
+            assertThat(indexingErrors.get(0)).satisfies(indexingError -> {
+                assertThat(indexingError.errorType()).isEqualTo(Messages.IndexingError.ErrorType.MappingError);
+                assertThat(indexingError.message()).isEqualTo(message2);
             });
 
-            assertThat(failures.get(1)).satisfies(indexingFailure -> {
-                assertThat(indexingFailure.failedMessageId()).isEqualTo("msg-3");
-                assertThat(indexingFailure.failureType()).isEqualTo(FailureType.INDEXING);
-                assertThat(indexingFailure.failedMessage()).isEqualTo(message3);
-                assertThat(indexingFailure.targetIndex()).isEqualTo("msg-index");
-                assertThat(indexingFailure.errorType()).isEqualTo("MappingError");
-                assertThat(indexingFailure.errorMessage()).isEqualTo("Some error message");
-                assertThat(indexingFailure.requiresAcknowledgement()).isFalse();
-                assertThat(indexingFailure.timestamp()).isEqualTo(ts);
+            assertThat(indexingErrors.get(1)).satisfies(indexingError -> {
+                assertThat(indexingError.errorType()).isEqualTo(Messages.IndexingError.ErrorType.MappingError);
+                assertThat(indexingError.message()).isEqualTo(message3);
             });
         });
     }
