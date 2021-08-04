@@ -17,11 +17,10 @@ exports[`ShowMessagePage renders for generic event 1`] = `
     >
       <span>
         {
-  "fields": {},
+  "fields": [],
   "streams": {},
   "allStreams": [],
   "disableSurroundingSearch": true,
-  "disableFieldActions": true,
   "inputs": {},
   "message": {
     "id": "01DFZQ64CMGV30NT7DW2P7HQX2",
@@ -106,11 +105,10 @@ exports[`ShowMessagePage renders for generic message 1`] = `
     >
       <span>
         {
-  "fields": {},
+  "fields": [],
   "streams": {},
   "allStreams": [],
   "disableSurroundingSearch": true,
-  "disableFieldActions": true,
   "inputs": {
     "5c26a37b3885e50480aa12a2": {
       "title": "syslog udp",

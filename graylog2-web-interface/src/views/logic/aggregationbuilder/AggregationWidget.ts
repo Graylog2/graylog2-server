@@ -18,11 +18,11 @@ import { Map } from 'immutable';
 
 import isDeepEqual from 'stores/isDeepEqual';
 import isEqualForSearch from 'views/stores/isEqualForSearch';
+import { QueryString, TimeRange } from 'views/logic/queries/Query';
 
 import AggregationWidgetConfig from './AggregationWidgetConfig';
 
 import Widget from '../widgets/Widget';
-import { QueryString, TimeRange } from 'views/logic/queries/Query';
 
 export default class AggregationWidget extends Widget {
   constructor(id: string, config: AggregationWidgetConfig, filter?: string, timerange?: TimeRange, query?: QueryString, streams: Array<string> = []) {

@@ -94,6 +94,7 @@ public class FakeHttpRawMessageGenerator {
         generatorState.isSlowRequest = RANDOM.nextInt(500) == 1;
         generatorState.userId = ((UserId) getWeighted(USER_IDS)).getId();
         generatorState.resource = ((Resource) getWeighted(GET_RESOURCES)).getResource();
+        generatorState.timeStamp = Tools.nowUTC();
 
         if (methodProb <= 85) {
             generatorState.method = GET;
@@ -163,10 +164,10 @@ public class FakeHttpRawMessageGenerator {
                 .build();
     }
 
-    private static Message createMessage(GeneratorState state, int httpCode, Resource resource, int tookMs, DateTime ingestTime) {
-        final Message msg = new Message(shortMessage(ingestTime, state.method, state.resource, httpCode, tookMs), state.source, Tools.nowUTC());
+    private static Message createMessage(GeneratorState state, int httpCode, Resource resource, int tookMs) {
+        final Message msg = new Message(shortMessage(state.timeStamp, state.method, state.resource, httpCode, tookMs), state.source, state.timeStamp);
         msg.addField("sequence_nr", state.msgSequenceNr);
-        msg.addFields(ingestTimeFields(ingestTime));
+        msg.addFields(ingestTimeFields(state.timeStamp));
         msg.addFields(resourceFields(resource));
         msg.addField("ticks", System.nanoTime());
         msg.addField("http_method", state.method.name());
@@ -191,11 +192,10 @@ public class FakeHttpRawMessageGenerator {
             msBase = 400;
         }
 
-        final DateTime ingestTime = Tools.nowUTC();
         final Resource resource = RESOURCE_MAP.get(state.resource);
         final int tookMs = rateDeviation(msBase, deviation, rand);
 
-        return createMessage(state, code, resource, tookMs, ingestTime);
+        return createMessage(state, code, resource, tookMs);
     }
 
 
@@ -213,11 +213,10 @@ public class FakeHttpRawMessageGenerator {
             msBase = 400;
         }
 
-        final DateTime ingestTime = Tools.nowUTC();
         final Resource resource = RESOURCE_MAP.get(state.resource);
         final int tookMs = rateDeviation(msBase, deviation, rand);
 
-        return createMessage(state, code, resource, tookMs, ingestTime);
+        return createMessage(state, code, resource, tookMs);
     }
 
     private static Message simulatePUT(GeneratorState state, Random rand) {
@@ -234,11 +233,10 @@ public class FakeHttpRawMessageGenerator {
             msBase = 400;
         }
 
-        final DateTime ingestTime = Tools.nowUTC();
         final Resource resource = RESOURCE_MAP.get(state.resource);
         final int tookMs = rateDeviation(msBase, deviation, rand);
 
-        return createMessage(state, code, resource, tookMs, ingestTime);
+        return createMessage(state, code, resource, tookMs);
     }
 
     private static Message simulateDELETE(GeneratorState state, Random rand) {
@@ -255,11 +253,10 @@ public class FakeHttpRawMessageGenerator {
             msBase = 400;
         }
 
-        final DateTime ingestTime = Tools.nowUTC();
         final Resource resource = RESOURCE_MAP.get(state.resource);
         final int tookMs = rateDeviation(msBase, deviation, rand);
 
-        return createMessage(state, code, resource, tookMs, ingestTime);
+        return createMessage(state, code, resource, tookMs);
     }
 
     private static abstract class Weighted {
@@ -331,6 +328,7 @@ public class FakeHttpRawMessageGenerator {
         public boolean isSlowRequest;
         public int userId;
         public String resource;
+        public DateTime timeStamp;
 
         public enum Method {
             GET, POST, DELETE, PUT

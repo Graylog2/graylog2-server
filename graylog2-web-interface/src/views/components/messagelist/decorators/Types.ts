@@ -14,12 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-export type Decorator = {
-  id: string,
-  order: number,
-  type: string,
-  stream: string | undefined | null,
-};
+export type { Decorator } from 'views/logic/widgets/MessagesWidgetConfig';
 
 // Not properly typed yet, but not needed for the current scope.
 export type RequestedConfiguration = {};

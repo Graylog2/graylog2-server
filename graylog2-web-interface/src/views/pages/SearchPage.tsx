@@ -21,6 +21,7 @@ import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
 import Search from 'views/components/Search';
 import { loadNewView as defaultLoadNewView, loadView as defaultLoadView } from 'views/logic/views/Actions';
 import IfUserHasAccessToAnyStream from 'views/components/IfUserHasAccessToAnyStream';
+import DashboardPageContextProvider from 'views/components/contexts/DashboardPageContextProvider';
 
 type Props = {
   loadNewView?: () => unknown,
@@ -28,13 +29,15 @@ type Props = {
 };
 
 const SearchPage = ({ loadNewView = defaultLoadNewView, loadView = defaultLoadView }: Props) => (
-  <NewViewLoaderContext.Provider value={loadNewView}>
-    <ViewLoaderContext.Provider value={loadView}>
-      <IfUserHasAccessToAnyStream>
-        <Search />
-      </IfUserHasAccessToAnyStream>
-    </ViewLoaderContext.Provider>
-  </NewViewLoaderContext.Provider>
+  <DashboardPageContextProvider>
+    <NewViewLoaderContext.Provider value={loadNewView}>
+      <ViewLoaderContext.Provider value={loadView}>
+        <IfUserHasAccessToAnyStream>
+          <Search />
+        </IfUserHasAccessToAnyStream>
+      </ViewLoaderContext.Provider>
+    </NewViewLoaderContext.Provider>
+  </DashboardPageContextProvider>
 );
 
 SearchPage.defaultProps = {

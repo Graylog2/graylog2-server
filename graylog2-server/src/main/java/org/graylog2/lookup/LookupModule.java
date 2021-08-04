@@ -24,6 +24,7 @@ import org.graylog2.lookup.adapters.DnsLookupDataAdapter;
 import org.graylog2.lookup.adapters.HTTPJSONPathDataAdapter;
 import org.graylog2.lookup.caches.CaffeineLookupCache;
 import org.graylog2.lookup.caches.NullCache;
+import org.graylog2.lookup.db.DBLookupTableConfigService;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.system.urlwhitelist.UrlWhitelistNotificationService;
 import org.graylog2.system.urlwhitelist.UrlWhitelistService;
@@ -41,6 +42,7 @@ public class LookupModule extends Graylog2Module {
         binder().bind(UrlWhitelistNotificationService.class).in(Scopes.SINGLETON);
         binder().bind(AllowedAuxiliaryPathChecker.class).in(Scopes.SINGLETON);
 
+        bind(LookupTableConfigService.class).to(DBLookupTableConfigService.class).asEagerSingleton();
         serviceBinder().addBinding().to(LookupTableService.class).asEagerSingleton();
 
         installLookupCache(NullCache.NAME,

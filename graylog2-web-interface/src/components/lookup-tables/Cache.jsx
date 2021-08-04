@@ -21,7 +21,6 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import { LinkContainer } from 'components/graylog/router';
 import Routes from 'routing/Routes';
 import { Row, Col, Button } from 'components/graylog';
-import { ContentPackMarker } from 'components/common';
 
 import ConfigSummaryDefinitionListWrapper from './ConfigSummaryDefinitionListWrapper';
 
@@ -45,7 +44,6 @@ const Cache = ({ cache }) => {
       <Col md={6}>
         <h2>
           {cache.title}
-          <ContentPackMarker contentPack={cache.content_pack} marginLeft={5} />
           {' '}
           <small>({plugin.displayName})</small>
         </h2>

@@ -30,6 +30,7 @@ import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationW
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import DescriptionBox from 'views/components/aggregationbuilder/DescriptionBox';
 import DecoratorSidebar from 'views/components/messagelist/decorators/DecoratorSidebar';
+import { HoverForHelp } from 'components/common';
 
 const FullHeightRow = styled(Row)`
   height: 100%;
@@ -43,6 +44,13 @@ const FullHeightCol = styled(Col)`
   overflow: auto;
 `;
 
+const SummaryCheckbox = styled(Checkbox)`
+  label {
+    display: flex;
+    justify-content: space-between;
+  }
+`;
+
 const _onFieldSelectionChanged = (fields, config, onChange) => {
   const newFields = fields.map(({ value }) => value);
   const newConfig = config.toBuilder().fields(newFields).build();
@@ -52,6 +60,12 @@ const _onFieldSelectionChanged = (fields, config, onChange) => {
 
 const _onShowMessageRowChanged = (config, onChange) => {
   const newConfig = config.toBuilder().showMessageRow(!config.showMessageRow).build();
+
+  return onChange(newConfig);
+};
+
+const _onShowSummaryRow = (config, onChange) => {
+  const newConfig = config.toBuilder().showSummaryRow(!config.showSummaryRow).build();
 
   return onChange(newConfig);
 };
@@ -85,6 +99,12 @@ const EditMessageList = ({ children, config, fields, onChange }: EditWidgetCompo
           <Checkbox checked={config.showMessageRow} onChange={() => _onShowMessageRowChanged(config, onChange)}>
             Show message in new row
           </Checkbox>
+          <SummaryCheckbox checked={config.showSummaryRow} onChange={() => _onShowSummaryRow(config, onChange)}>
+            Show message summary
+            <HoverForHelp title="Message Summary">
+              Display a summary of the most relevant information of a message, based on the message event type.
+            </HoverForHelp>
+          </SummaryCheckbox>
         </DescriptionBox>
         <DescriptionBox description="Sorting">
           <FieldSortSelect fields={fields} sort={sort} onChange={(data) => _onSortChange(data, config, onChange)} />
@@ -95,9 +115,7 @@ const EditMessageList = ({ children, config, fields, onChange }: EditWidgetCompo
                                onChange={(data) => _onSortDirectionChange(data, config, onChange)} />
         </DescriptionBox>
         <DescriptionBox description="Decorators">
-          <DecoratorSidebar stream="000000000000000000000001"
-                            decorators={config.decorators}
-                            maximumHeight={600}
+          <DecoratorSidebar decorators={config.decorators}
                             onChange={onDecoratorsChange} />
         </DescriptionBox>
       </FullHeightCol>

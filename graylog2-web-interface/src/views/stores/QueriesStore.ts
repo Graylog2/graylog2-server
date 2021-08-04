@@ -76,7 +76,9 @@ export const QueriesStore: QueriesStoreType = singletonStore(
     duplicate(queryId: QueryId) {
       const newQuery = this.queries.get(queryId).toBuilder().newId().build();
       const promise: Promise<QueriesList> = ViewStatesActions.duplicate(queryId)
-        .then((newViewState) => QueriesActions.create(newQuery, newViewState));
+        .then((newViewState) => {
+          return QueriesActions.create(newQuery, newViewState);
+        });
 
       QueriesActions.duplicate.promise(promise);
 
