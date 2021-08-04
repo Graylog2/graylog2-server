@@ -21,8 +21,8 @@ import useFeature from 'hooks/useFeature';
 
 type Props = {
   name: string;
-  fallback?: React.ReactNode,
-  children: React.ReactNode,
+  fallback?: React.ReactElement,
+  children: React.ReactElement,
 }
 
 const Feature = ({ name, fallback, children }: Props) => {
