@@ -14,6 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import * as Immutable from 'immutable';
 
 declare global {
   const DEVELOPMENT: boolean | undefined;
@@ -28,6 +29,7 @@ export type AppConfigs = {
   rootTimeZone: string,
   isCloud: boolean,
   pluginUISettings: { [key: string]: {} },
+  featureFlags: { [key: string]: string },
 };
 
 declare global {
@@ -40,7 +42,15 @@ const appConfig = (): AppConfigs => {
   return (window.appConfig || {}) as AppConfigs;
 };
 
+const getEnabledFeature = () => {
+  return Immutable.Map(appConfig().featureFlags)
+    .filter((value) => value.trim().toLowerCase() === 'on')
+    .keySeq().toList()
+    .filter((s) => typeof s === 'string');
+};
+
 const AppConfig = {
+  features: getEnabledFeature(),
   gl2ServerUrl() {
     if (typeof (GRAYLOG_API_URL) !== 'undefined') {
       // The GRAYLOG_API_URL variable will be set by webpack via the DefinePlugin.
@@ -62,10 +72,7 @@ const AppConfig = {
   },
 
   isFeatureEnabled(feature: string) {
-    return Immutable.Map(this.appConfig().featureFlags)
-      .filter((value) => value.trim().toLowerCase() === 'on')
-      .keySeq().toList()
-      .filter((s) => typeof s === 'string')
+    return this.features && this.features
       .map((s) => s.trim().toLowerCase())
       .includes(feature.toLowerCase());
   },
