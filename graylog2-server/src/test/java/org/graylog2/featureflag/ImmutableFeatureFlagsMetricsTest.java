@@ -26,6 +26,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.IOException;
 import java.util.Locale;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -40,43 +41,65 @@ public class ImmutableFeatureFlagsMetricsTest {
 
     @Mock
     FeatureFlagsResources resources;
-    private FeatureFlags underTest;
-    private MetricRegistry metricRegistry;
+    MetricRegistry metricRegistry;
 
     @BeforeEach
-    void setUp() throws IOException {
-        given(resources.defaultProperties(any())).willReturn(Maps.of(FEATURE, STATE));
+    void setUp() {
         metricRegistry = new MetricRegistry();
-        underTest = new FeatureFlagsFactory().createImmutableFeatureFlags(resources, "file", "file", metricRegistry);
     }
 
     @Test
-    void testMetricsInitialized() {
+    void testMetricsInitialized() throws IOException {
+        createFeatureFlags();
+
         assertThat(getFeatureFlagUsedCount()).isEqualTo(0);
         assertThat(getFeatureUsedCount()).isEqualTo(0);
         assertThat(featureStateGaugeExist()).isTrue();
     }
 
     @Test
-    void testIncrementFeatureFlagIsUsedCounter() {
+    void testIncrementFeatureFlagIsUsedCounter() throws IOException {
+        FeatureFlags underTest = createFeatureFlags();
+
         underTest.isOn(FEATURE, false);
 
         assertThat(getFeatureFlagUsedCount()).isEqualTo(1);
     }
 
     @Test
-    void testIncrementFeatureIsUsedCounter() {
+    void testIncrementFeatureIsUsedCounter() throws IOException {
+        FeatureFlags underTest = createFeatureFlags();
+
         underTest.incrementFeatureIsUsedCounter(FEATURE);
 
         assertThat(getFeatureUsedCount()).isEqualTo(1);
     }
 
     @Test
-    void testIncrementFeatureIsUsedCounterForNotExistingFeature() {
+    void testIncrementFeatureIsUsedCounterForNotExistingFeature() throws IOException {
+        FeatureFlags underTest = createFeatureFlags();
+
         underTest.incrementFeatureIsUsedCounter("not exist");
 
         assertThat(metricRegistry.getCounters().size()).isEqualTo(2);
         assertThat(getFeatureUsedCount()).isEqualTo(0);
+    }
+
+    @Test
+    void testInvalidFeatureFlagNameDoNotHaveMetrics() throws IOException {
+        createFeatureFlags(Maps.of("ignore.metric", "on"));
+
+        assertThat(metricRegistry.getCounters()).isEmpty();
+        assertThat(metricRegistry.getGauges()).isEmpty();
+    }
+
+    private FeatureFlags createFeatureFlags() throws IOException {
+        return createFeatureFlags(Maps.of(FEATURE, STATE));
+    }
+
+    private FeatureFlags createFeatureFlags(Map<String, String> flags) throws IOException {
+        given(resources.defaultProperties(any())).willReturn(flags);
+        return new FeatureFlagsFactory().createImmutableFeatureFlags(resources, "file", "file", metricRegistry);
     }
 
     private long getFeatureFlagUsedCount() {
