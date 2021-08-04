@@ -16,7 +16,6 @@
  */
 package org.graylog2.shared.bindings;
 
-import com.codahale.metrics.MetricRegistry;
 import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.ServiceManager;
 import com.google.inject.AbstractModule;
@@ -32,7 +31,6 @@ import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.bindings.providers.EventBusProvider;
-import org.graylog2.shared.bindings.providers.MetricRegistryProvider;
 import org.graylog2.shared.bindings.providers.NodeIdProvider;
 import org.graylog2.shared.bindings.providers.OkHttpClientProvider;
 import org.graylog2.shared.bindings.providers.ProxiedRequestsExecutorService;
@@ -50,8 +48,6 @@ public class GenericBindings extends AbstractModule {
 
     @Override
     protected void configure() {
-        // This is holding all our metrics.
-        bind(MetricRegistry.class).toProvider(MetricRegistryProvider.class).asEagerSingleton();
         bind(LocalMetricRegistry.class).in(Scopes.NO_SCOPE); // must not be a singleton!
 
         install(new FactoryModuleBuilder().build(DecodingProcessor.Factory.class));

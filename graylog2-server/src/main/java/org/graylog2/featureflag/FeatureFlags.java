@@ -16,8 +16,6 @@
  */
 package org.graylog2.featureflag;
 
-import com.codahale.metrics.MetricRegistry;
-
 import java.util.Map;
 
 public interface FeatureFlags {
@@ -26,6 +24,4 @@ public interface FeatureFlags {
     boolean isOn(String feature, boolean defaultValue);
 
     void incrementFeatureIsUsedCounter(String feature);
-
-    void initMetrics(MetricRegistry metricRegistry);
 }

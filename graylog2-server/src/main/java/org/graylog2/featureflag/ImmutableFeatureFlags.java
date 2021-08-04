@@ -34,9 +34,9 @@ class ImmutableFeatureFlags implements FeatureFlags {
     private static final Logger LOG = LoggerFactory.getLogger(ImmutableFeatureFlags.class);
     private final Map<String, FeatureFlag> flags;
 
-    public ImmutableFeatureFlags(Map<String, String> flags) {
+    public ImmutableFeatureFlags(Map<String, String> flags, MetricRegistry metricRegistry) {
         this.flags = flags.entrySet().stream()
-                .collect(Collectors.toMap(e -> toUpperCase(e.getKey()), e -> new FeatureFlag(e.getKey(), e.getValue())));
+                .collect(Collectors.toMap(e -> toUpperCase(e.getKey()), e -> new FeatureFlag(e.getKey(), e.getValue(), metricRegistry)));
     }
 
     @Override
@@ -68,46 +68,29 @@ class ImmutableFeatureFlags implements FeatureFlags {
         return flags.get(toUpperCase(feature));
     }
 
-    @Override
-    public void initMetrics(MetricRegistry metricRegistry) {
-        flags.values().forEach(flag -> flag.initMetrics(metricRegistry));
-    }
-
     private static class FeatureFlag {
         private static final String ON = "ON";
-        private Counter featureUsedCounter;
-        private Counter featureFlagUsedCounter;
+        private final Counter featureUsedCounter;
+        private final Counter featureFlagUsedCounter;
         private final String name;
         private final String value;
-        private final String featureFlagUsedMetricName;
-        private final String featureUsedMetricName;
-        private final String featureFlagStateMetricName;
 
-        FeatureFlag(String name, String state) {
+        FeatureFlag(String name, String state, MetricRegistry metricRegistry) {
             this.name = name;
             this.value = state;
-            featureFlagUsedMetricName = stringFormat("org.graylog.featureflag.used.%s", name);
-            featureUsedMetricName = stringFormat("org.graylog.feature.used.%s", name);
-            featureFlagStateMetricName = stringFormat("org.graylog.featureflag.state.%s.%s", name, state);
+            featureUsedCounter = metricRegistry.counter(stringFormat("org.graylog.feature.used.%s", name));
+            featureFlagUsedCounter = metricRegistry.counter(stringFormat("org.graylog.featureflag.used.%s", name));
+            MetricUtils.getOrRegister(metricRegistry,
+                    stringFormat("org.graylog.featureflag.state.%s.%s", name, state), (Gauge<Integer>) () -> 0);
         }
 
         boolean isOn() {
-            if (featureFlagUsedCounter != null) {
-                featureFlagUsedCounter.inc();
-            }
+            featureFlagUsedCounter.inc();
             return ON.equalsIgnoreCase(value);
         }
 
         void incrementFeatureIsUsedCounter() {
-            if (featureUsedCounter != null) {
-                featureUsedCounter.inc();
-            }
-        }
-
-        void initMetrics(MetricRegistry metricRegistry) {
-            featureUsedCounter = metricRegistry.counter(featureUsedMetricName);
-            featureFlagUsedCounter = metricRegistry.counter(featureFlagUsedMetricName);
-            MetricUtils.getOrRegister(metricRegistry, featureFlagStateMetricName, (Gauge<Integer>) () -> 0);
+            featureUsedCounter.inc();
         }
     }
 }
