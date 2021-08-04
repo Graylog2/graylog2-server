@@ -58,22 +58,33 @@ class ImmutableFeatureFlagsCollector {
 
     public Map<String, String> toMap() {
         existingFlags = new HashMap<>();
-        addDefaultPropertiesFlags(defaultPropertiesFile);
+        Map<String, String> defaultPropertiesFlags = getDefaultPropertiesFlags(defaultPropertiesFile);
+        addFlags(defaultPropertiesFlags, "default properties file");
         addCustomPropertiesFlags(customPropertiesFile);
         addSystemPropertiesFlags();
         addEnvironmentVariableFlags();
-        printUsedFeatureFlags();
+        logUsedFeatureFlags();
+        logWarningForNoDefaultFlags(defaultPropertiesFlags.keySet());
         return existingFlags.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().value));
     }
 
-    private void printUsedFeatureFlags() {
+    private void logWarningForNoDefaultFlags(Collection<String> defaultFlags) {
+        Map<String, List<Map.Entry<String, FeatureFlagValue>>> flagsWithoutDefault = existingFlags.entrySet().stream()
+                .filter(e -> !defaultFlags.contains(e.getKey()))
+                .collect(Collectors.groupingBy(e -> e.getValue().resourceType));
+        if (!flagsWithoutDefault.isEmpty()) {
+            LOG.warn("Following feature flags have no entry in the default config file: {}", flagsWithoutDefault);
+        }
+    }
+
+    private void logUsedFeatureFlags() {
         LOG.info("Following feature flags are used: {}", existingFlags.entrySet().stream()
                 .collect(Collectors.groupingBy(e -> e.getValue().resourceType)));
     }
 
-    private void addDefaultPropertiesFlags(String file) {
+    private Map<String, String> getDefaultPropertiesFlags(String file) {
         try {
-            addFlags(resources.defaultProperties(file), "default properties file");
+            return resources.defaultProperties(file);
         } catch (IOException e) {
             throw new RuntimeException(
                     stringFormat("Unable to read default feature flags file %s!", file), e);

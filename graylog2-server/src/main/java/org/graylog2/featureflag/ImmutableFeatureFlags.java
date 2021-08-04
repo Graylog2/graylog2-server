@@ -60,7 +60,7 @@ class ImmutableFeatureFlags implements FeatureFlags {
         if (flag != null) {
             flag.incrementFeatureIsUsedCounter();
         } else {
-            LOG.error("Feature flag {} don't exist! Could not update metric!", feature);
+            LOG.warn("Feature flag '{}' don't exist! Could not update metric!", feature);
         }
     }
 
