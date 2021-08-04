@@ -106,7 +106,10 @@ describe('Aggregation Widget', () => {
   };
 
   beforeEach(() => {
-    jest.useFakeTimers('modern').setSystemTime(mockedUnixTime);
+    jest.useFakeTimers()
+      // @ts-expect-error
+      .setSystemTime(mockedUnixTime);
+
     ViewStore.getInitialState = jest.fn(() => viewStoreState);
   });
 

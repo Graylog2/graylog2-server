@@ -17,54 +17,89 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
+import styled from 'styled-components';
 
-import connect from 'stores/connect';
+import { useStore } from 'stores/connect';
 import CombinedProvider from 'injection/CombinedProvider';
-import { StreamsStore } from 'views/stores/StreamsStore';
-import { SearchConfigStore } from 'views/stores/SearchConfigStore';
+import { StreamsStore, Stream } from 'views/stores/StreamsStore';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
-import { Store } from 'stores/StoreTypes';
 import { MESSAGE_FIELD } from 'views/Constants';
+import { Input } from 'components/messageloaders/Types';
 
 import MessageDetail from './MessageDetail';
 import DecoratedValue from './decoration/DecoratedValue';
 import CustomHighlighting from './CustomHighlighting';
-import style from './MessageTableEntry.css';
 import type { Message } from './Types';
+import MessageSummaryRow from './MessageSummaryRow';
 
 import TypeSpecificValue from '../TypeSpecificValue';
 
 const { InputsStore } = CombinedProvider.get('Inputs');
 
-type Stream = { id: string };
-type Input = { id: string };
+export const TableBody = styled.tbody<{ expanded?: boolean, highlighted?: boolean }>(({ expanded, highlighted, theme }) => `
+  && {
+    border-top: 0;
+  
+    ${expanded ? `
+      border-left: 7px solid ${theme.colors.variant.light.info};
+    ` : ''}
+    
+    ${highlighted ? `
+      border-left: 7px solid ${theme.colors.variant.light.success};
+    ` : ''}
+  }
+`);
 
-type InputsStoreState = {
-  inputs: Array<Input>;
-};
+const FieldsRow = styled.tr(({ theme }) => `
+  cursor: pointer;
+  
+  td {
+    min-width: 50px;
+    word-break: break-word;
+  }
 
-const ConnectedMessageDetail = connect(
-  MessageDetail,
-  {
-    availableInputs: InputsStore as Store<InputsStoreState>,
-    availableStreams: StreamsStore,
-    configurations: SearchConfigStore,
-  },
-  ({ availableStreams = {}, availableInputs = {}, configurations = {}, ...rest }) => {
-    const { streams = [] } = availableStreams;
-    const { inputs = [] } = availableInputs;
-    const { searchesClusterConfig } = configurations;
+  time {
+    font-size: ${theme.fonts.size.body};
+  }
+`);
 
-    return ({
-      ...rest,
-      allStreams: Immutable.List<Stream>(streams),
-      streams: Immutable.Map<string, Stream>(streams.map((stream) => [stream.id, stream])),
-      inputs: Immutable.Map<string, Input>(inputs.map((input) => [input.id, input])),
-      searchConfig: searchesClusterConfig,
-    });
-  },
-);
+export const MessageRow = styled.tr(({ theme }) => `
+  && {
+    margin-bottom: 5px;
+    cursor: pointer;
+  
+    td {
+      border-top: 0;
+      padding-top: 0;
+      padding-bottom: 5px;
+      font-family: ${theme.fonts.family.monospace};
+      color: ${theme.colors.variant.dark.info};
+    }
+  }
+`);
+
+export const MessageWrapper = styled.div`
+  line-height: 1.5em;
+  white-space: pre-line;
+  max-height: 6em; /* show 4 lines: line-height * 4 */
+  overflow: hidden;
+`;
+
+const MessageDetailRow = styled.tr`
+  td {
+    padding-top: 5px;
+    border-top: 0;
+  }
+
+  .row {
+    margin-right: 0;
+  }
+  
+  div[class*="col-"] {
+    padding-right: 0;
+  }
+`;
 
 type Props = {
   disableSurroundingSearch?: boolean,
@@ -75,6 +110,7 @@ type Props = {
   message: Message,
   selectedFields?: Immutable.OrderedSet<string>,
   showMessageRow?: boolean,
+  showSummaryRow?: boolean,
   toggleDetail: (string) => void,
 };
 
@@ -92,10 +128,17 @@ const MessageTableEntry = ({
   fields,
   highlightMessage = '',
   message,
-  showMessageRow = false,
+  showMessageRow,
+  showSummaryRow,
   selectedFields = Immutable.OrderedSet<string>(),
   toggleDetail,
 }: Props) => {
+  const { inputs: inputsList = [] } = useStore(InputsStore);
+  const { streams: streamsList = [] } = useStore(StreamsStore);
+  const allStreams = Immutable.List<Stream>(streamsList);
+  const streams = Immutable.Map<string, Stream>(streamsList.map((stream) => [stream.id, stream]));
+  const inputs = Immutable.Map<string, Input>(inputsList.map((input) => [input.id, input]));
+
   const _toggleDetail = () => {
     toggleDetail(`${message.index}-${message.id}`);
   };
@@ -110,24 +153,14 @@ const MessageTableEntry = ({
 
   const colSpanFixup = selectedFields.size + 1;
 
-  let classes = 'message-group';
-
-  if (expanded) {
-    classes += ' message-group-toggled';
-  }
-
-  if (message.id === highlightMessage) {
-    classes += ' message-highlight';
-  }
-
   return (
-    <tbody className={classes}>
-      <tr className="fields-row" onClick={_toggleDetail}>
+    <TableBody expanded={expanded} highlighted={message.id === highlightMessage}>
+      <FieldsRow onClick={_toggleDetail}>
         {selectedFields.toArray().map((selectedFieldName, idx) => {
           const type = fieldType(selectedFieldName, message, fields);
 
           return (
-            <td className={style.fieldsRowField} key={selectedFieldName}>
+            <td key={selectedFieldName}>
               {_renderStrong(
                 <CustomHighlighting field={selectedFieldName} value={message.fields[selectedFieldName]}>
                   <TypeSpecificValue value={message.fields[selectedFieldName]}
@@ -140,33 +173,40 @@ const MessageTableEntry = ({
             </td>
           );
         })}
-      </tr>
+      </FieldsRow>
 
-      {showMessageRow
-      && (
-        <tr className="message-row" onClick={_toggleDetail}>
+      {showMessageRow && (
+        <MessageRow onClick={_toggleDetail}>
           <td colSpan={colSpanFixup}>
-            <div className="message-wrapper">
+            <MessageWrapper>
               <CustomHighlighting field="message" value={message.fields[MESSAGE_FIELD]}>
                 <TypeSpecificValue field="message" value={message.fields[MESSAGE_FIELD]} type={fieldType(MESSAGE_FIELD, message, fields)} render={DecoratedValue} />
               </CustomHighlighting>
-            </div>
+            </MessageWrapper>
           </td>
-        </tr>
+        </MessageRow>
       )}
-      {expanded
-      && (
-        <tr className="message-detail-row" style={{ display: 'table-row' }}>
+
+      {showSummaryRow && (
+        <MessageSummaryRow onClick={_toggleDetail}
+                           colSpanFixup={colSpanFixup}
+                           message={message} />
+      )}
+
+      {expanded && (
+        <MessageDetailRow>
           <td colSpan={colSpanFixup}>
-            {/* @ts-ignore */}
-            <ConnectedMessageDetail message={message}
-                                    fields={fields}
-                                    disableSurroundingSearch={disableSurroundingSearch}
-                                    expandAllRenderAsync={expandAllRenderAsync} />
+            <MessageDetail message={message}
+                           fields={fields}
+                           streams={streams}
+                           allStreams={allStreams}
+                           inputs={inputs}
+                           disableSurroundingSearch={disableSurroundingSearch}
+                           expandAllRenderAsync={expandAllRenderAsync} />
           </td>
-        </tr>
+        </MessageDetailRow>
       )}
-    </tbody>
+    </TableBody>
   );
 };
 
@@ -190,6 +230,7 @@ MessageTableEntry.propTypes = {
   // @ts-ignore
   selectedFields: PropTypes.instanceOf(Immutable.OrderedSet),
   showMessageRow: PropTypes.bool,
+  showSummaryRow: PropTypes.bool,
   toggleDetail: PropTypes.func.isRequired,
 };
 
@@ -198,6 +239,7 @@ MessageTableEntry.defaultProps = {
   highlightMessage: undefined,
   selectedFields: Immutable.OrderedSet(),
   showMessageRow: false,
+  showSummaryRow: false,
 };
 
 export default MessageTableEntry;

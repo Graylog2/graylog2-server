@@ -43,15 +43,6 @@ const StreamRulesStore = Reflux.createStore({
 
     return promise;
   },
-  list(streamId: string, callback: ((streamRules: Array<StreamRule>) => void)) {
-    const failCallback = (error) => {
-      UserNotification.error(`Fetching Stream Rules failed with status: ${error}`,
-        'Could not retrieve Stream Rules');
-    };
-
-    fetch('GET', URLUtils.qualifyUrl(ApiRoutes.StreamRulesApiController.list(streamId).url))
-      .then(callback, failCallback);
-  },
   update(streamId: string, streamRuleId: string, data: StreamRule, callback: (() => void)) {
     const failCallback = (error) => {
       UserNotification.error(`Updating Stream Rule failed with status: ${error}`,

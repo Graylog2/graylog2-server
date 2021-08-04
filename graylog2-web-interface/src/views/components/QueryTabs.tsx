@@ -55,7 +55,7 @@ const QueryTabs = ({ onRemove, onSelect, onTitleChange, queries, selectedQueryId
                                 onSelect={onSelect}
                                 queryTitleEditModal={queryTitleEditModal}
                                 onTitleChange={onTitleChange} />
-          ) : null)}
+          ) : <div />)}
         </SizeMe>
 
         {/*

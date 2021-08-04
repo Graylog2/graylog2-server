@@ -28,7 +28,7 @@ import WidgetConfig from './WidgetConfig';
 export type Decorator = {
   id: string,
   type: string,
-  config: any,
+  config?: any,
   stream: string | undefined | null,
   order: number,
 };
@@ -38,6 +38,7 @@ type InternalState = {
   fields: Array<string>,
   sort: Array<SortConfig>,
   showMessageRow: boolean,
+  showSummaryRow: boolean,
 };
 
 export type MessagesWidgetConfigJSON = {
@@ -45,6 +46,7 @@ export type MessagesWidgetConfigJSON = {
   fields: Array<string>,
   sort: Array<SortConfigJson>,
   show_message_row: boolean,
+  show_summary_row: boolean,
 };
 
 export const defaultSortDirection = Direction.Descending;
@@ -53,9 +55,9 @@ export const defaultSort = [new SortConfig(SortConfig.PIVOT_TYPE, TIMESTAMP_FIEL
 export default class MessagesWidgetConfig extends WidgetConfig {
   _value: InternalState;
 
-  constructor(fields: Array<string>, showMessageRow: boolean, decorators: Array<Decorator>, sort: Array<SortConfig>) {
+  constructor(fields: Array<string>, showMessageRow: boolean, showSummaryRow: boolean, decorators: Array<Decorator>, sort: Array<SortConfig>) {
     super();
-    this._value = { decorators, fields: fields.slice(0), showMessageRow, sort: sort && sort.length > 0 ? sort : defaultSort };
+    this._value = { decorators, fields: fields.slice(0), showMessageRow, showSummaryRow, sort: sort && sort.length > 0 ? sort : defaultSort };
   }
 
   get decorators() {
@@ -74,18 +76,23 @@ export default class MessagesWidgetConfig extends WidgetConfig {
     return this._value.showMessageRow;
   }
 
+  get showSummaryRow() {
+    return this._value.showSummaryRow;
+  }
+
   toBuilder() {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder(Immutable.Map((this._value)));
   }
 
   toJSON() {
-    const { decorators, fields, showMessageRow, sort } = this._value;
+    const { decorators, fields, showMessageRow, showSummaryRow, sort } = this._value;
 
     return {
       decorators,
       fields,
       show_message_row: showMessageRow,
+      show_summary_row: showSummaryRow,
       sort,
     };
   }
@@ -95,7 +102,8 @@ export default class MessagesWidgetConfig extends WidgetConfig {
       && isDeepEqual(this.decorators, other.decorators)
       && isDeepEqual(this.fields, other.fields)
       && isDeepEqual(this.sort, other.sort)
-      && this.showMessageRow === other.showMessageRow;
+      && this.showMessageRow === other.showMessageRow
+      && this.showSummaryRow === other.showSummaryRow;
   }
 
   equalsForSearch(other: any): boolean {
@@ -114,9 +122,9 @@ export default class MessagesWidgetConfig extends WidgetConfig {
   }
 
   static fromJSON(value: MessagesWidgetConfigJSON) {
-    const { decorators, show_message_row, fields, sort } = value;
+    const { decorators, show_message_row, show_summary_row, fields, sort } = value;
 
-    return new MessagesWidgetConfig(fields, show_message_row, decorators, sort.map(SortConfig.fromJSON));
+    return new MessagesWidgetConfig(fields, show_message_row, show_summary_row, decorators, sort.map(SortConfig.fromJSON));
   }
 }
 
@@ -141,13 +149,17 @@ class Builder {
     return new Builder(this.value.set('showMessageRow', value));
   }
 
+  showSummaryRow(value: boolean) {
+    return new Builder(this.value.set('showSummaryRow', value));
+  }
+
   sort(sorts: Array<SortConfig>) {
     return new Builder(this.value.set('sort', sorts));
   }
 
   build() {
-    const { decorators, fields, showMessageRow, sort } = this.value.toObject();
+    const { decorators, fields, showMessageRow, showSummaryRow, sort } = this.value.toObject();
 
-    return new MessagesWidgetConfig(fields, showMessageRow, decorators, sort);
+    return new MessagesWidgetConfig(fields, showMessageRow, showSummaryRow, decorators, sort);
   }
 }
