@@ -20,15 +20,16 @@ import { createSimpleMessageEventType } from 'fixtures/messageEventTypes';
 import asMock from 'helpers/mocking/AsMock';
 
 import usePluginEntities from 'views/logic/usePluginEntities';
+import FieldType from 'views/logic/fieldtypes/FieldType';
 
-import MessageSummaryRow from './MessageSummaryRow';
+import MessagePreview from './MessagePreview';
 
 const simpleEventType = createSimpleMessageEventType(1, { summaryTemplate: '{field1} - {field2}', gl2EventTypeCode: 'event-type-code' });
 const mockMessageEventTypes = [simpleEventType];
 
 jest.mock('views/logic/usePluginEntities', () => jest.fn(() => mockMessageEventTypes));
 
-describe('MessageSummaryRow', () => {
+describe('MessagePreview', () => {
   afterEach(() => {
     jest.clearAllTimers();
   });
@@ -49,15 +50,47 @@ describe('MessageSummaryRow', () => {
   const SUT = ({ message = simpleMessage, ...rest }: Props) => (
     <table>
       <tbody>
-        <MessageSummaryRow message={message} {...rest} />
+        <MessagePreview message={message}
+                        onRowClick={() => {}}
+                        colSpanFixup={1}
+                        showSummaryRow
+                        showMessageRow
+                        preferSummaryRow={false}
+                        messageFieldType={new FieldType('string', [], [])}
+                        {...rest} />
       </tbody>
     </table>
   );
 
+  it('displays message field', () => {
+    render(<SUT showMessageRow preferSummaryRow={false} />);
+
+    expect(screen.getByText('Something happened!')).toBeInTheDocument();
+  });
+
+  it('does not display message field when `showMessageRow` is false', () => {
+    render(<SUT showMessageRow={false} />);
+
+    expect(screen.queryByText('Something happened!')).not.toBeInTheDocument();
+  });
+
   it('displays message summary', () => {
-    render(<SUT />);
+    render(<SUT showSummaryRow />);
 
     expect(screen.getByText('Value for field 1 - Value for field 2')).toBeInTheDocument();
+  });
+
+  it('does not display message summary when `showSummaryRow` is false', () => {
+    render(<SUT showSummaryRow={false} />);
+
+    expect(screen.queryByText('Value for field 1 - Value for field 2')).not.toBeInTheDocument();
+  });
+
+  it('displays message summary instead of message field when `preferSummaryRow` is true', () => {
+    render(<SUT showSummaryRow showMessageRow preferSummaryRow />);
+
+    expect(screen.getByText('Value for field 1 - Value for field 2')).toBeInTheDocument();
+    expect(screen.queryByText('Something happened!')).not.toBeInTheDocument();
   });
 
   it('displays message summary color based on event category', () => {

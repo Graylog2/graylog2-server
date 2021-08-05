@@ -24,14 +24,14 @@ import CombinedProvider from 'injection/CombinedProvider';
 import { StreamsStore, Stream } from 'views/stores/StreamsStore';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
-import { MESSAGE_FIELD } from 'views/Constants';
 import { Input } from 'components/messageloaders/Types';
+import { MESSAGE_FIELD } from 'views/Constants';
 
+import CustomHighlighting from './CustomHighlighting';
 import MessageDetail from './MessageDetail';
 import DecoratedValue from './decoration/DecoratedValue';
-import CustomHighlighting from './CustomHighlighting';
+import MessagePreview from './MessagePreview';
 import type { Message } from './Types';
-import MessageSummaryRow from './MessageSummaryRow';
 
 import TypeSpecificValue from '../TypeSpecificValue';
 
@@ -64,28 +64,6 @@ const FieldsRow = styled.tr(({ theme }) => `
   }
 `);
 
-export const MessageRow = styled.tr(({ theme }) => `
-  && {
-    margin-bottom: 5px;
-    cursor: pointer;
-  
-    td {
-      border-top: 0;
-      padding-top: 0;
-      padding-bottom: 5px;
-      font-family: ${theme.fonts.family.monospace};
-      color: ${theme.colors.variant.dark.info};
-    }
-  }
-`);
-
-export const MessageWrapper = styled.div`
-  line-height: 1.5em;
-  white-space: pre-line;
-  max-height: 6em; /* show 4 lines: line-height * 4 */
-  overflow: hidden;
-`;
-
 const MessageDetailRow = styled.tr`
   td {
     padding-top: 5px;
@@ -111,6 +89,7 @@ type Props = {
   selectedFields?: Immutable.OrderedSet<string>,
   showMessageRow?: boolean,
   showSummaryRow?: boolean,
+  preferSummaryRow?: boolean,
   toggleDetail: (string) => void,
 };
 
@@ -130,6 +109,7 @@ const MessageTableEntry = ({
   message,
   showMessageRow,
   showSummaryRow,
+  preferSummaryRow,
   selectedFields = Immutable.OrderedSet<string>(),
   toggleDetail,
 }: Props) => {
@@ -175,23 +155,13 @@ const MessageTableEntry = ({
         })}
       </FieldsRow>
 
-      {showMessageRow && (
-        <MessageRow onClick={_toggleDetail}>
-          <td colSpan={colSpanFixup}>
-            <MessageWrapper>
-              <CustomHighlighting field="message" value={message.fields[MESSAGE_FIELD]}>
-                <TypeSpecificValue field="message" value={message.fields[MESSAGE_FIELD]} type={fieldType(MESSAGE_FIELD, message, fields)} render={DecoratedValue} />
-              </CustomHighlighting>
-            </MessageWrapper>
-          </td>
-        </MessageRow>
-      )}
-
-      {showSummaryRow && (
-        <MessageSummaryRow onClick={_toggleDetail}
-                           colSpanFixup={colSpanFixup}
-                           message={message} />
-      )}
+      <MessagePreview showMessageRow={showMessageRow}
+                      showSummaryRow={showSummaryRow}
+                      colSpanFixup={colSpanFixup}
+                      messageFieldType={fieldType(MESSAGE_FIELD, message, fields)}
+                      onRowClick={_toggleDetail}
+                      message={message}
+                      preferSummaryRow={preferSummaryRow} />
 
       {expanded && (
         <MessageDetailRow>
@@ -240,6 +210,7 @@ MessageTableEntry.defaultProps = {
   selectedFields: Immutable.OrderedSet(),
   showMessageRow: false,
   showSummaryRow: false,
+  preferSummaryRow: false,
 };
 
 export default MessageTableEntry;

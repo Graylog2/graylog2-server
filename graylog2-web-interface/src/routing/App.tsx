@@ -26,11 +26,7 @@ import Navigation from 'components/navigation/Navigation';
 import ReportedErrorBoundary from 'components/errors/ReportedErrorBoundary';
 import RuntimeErrorBoundary from 'components/errors/RuntimeErrorBoundary';
 
-<<<<<<< HEAD
 import GlobalContextProviders from './GlobalContextProviders';
-=======
-import GlobalProviders from './GlobalProviders';
->>>>>>> e47493432f (Wrap `App` content with plugable global providers.)
 import 'stylesheets/typeahead.less';
 
 const AppLayout = styled.div`

@@ -79,7 +79,7 @@ describe('MessageTableEntry', () => {
                            toggleDetail={() => {}}
                            fields={Immutable.List()}
                            message={message}
-                           showSummaryRow
+                           showSummary
                            selectedFields={Immutable.OrderedSet(['message'])}
                            expanded={false} />
       </table>,

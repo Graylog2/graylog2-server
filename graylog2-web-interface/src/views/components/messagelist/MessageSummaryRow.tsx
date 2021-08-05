@@ -21,8 +21,7 @@ import { Message } from 'views/components/messagelist/Types';
 import { MessageEventType } from 'views/types/messageEventTypes';
 import { ColorVariants, colorVariants } from 'theme/colors';
 import usePluginEntities from 'views/logic/usePluginEntities';
-
-import { MessageRow } from './MessageTableEntry';
+import { TableRow } from 'views/components/messagelist/MessageFieldRow';
 
 const getSummaryColor = (theme: DefaultTheme, category: ColorVariants) => {
   if (colorVariants.includes(category)) {
@@ -41,8 +40,6 @@ const StyledMessageWrapper = styled.div<{ category: ColorVariants }>(({ theme, c
     white-space: pre-line;
   `;
 });
-
-const getMessageEventType = (gl2EventTypeCode: string, messageEventTypes: Array<MessageEventType> = []) => {
   if (!gl2EventTypeCode) {
     return undefined;
   }
@@ -70,9 +67,13 @@ const getMessageSummary = (messageFields: Message['fields'], messageEventTypes: 
 };
 
 type Props = {
-  message: Message,
   onClick?: () => void,
   colSpanFixup?: number,
+  messageSummary: {
+    template: string,
+    category: ColorVariants,
+    summary: string,
+  },
 };
 
 const MessageSummaryRow = ({ message, onClick, colSpanFixup }: Props) => {
@@ -84,13 +85,13 @@ const MessageSummaryRow = ({ message, onClick, colSpanFixup }: Props) => {
   }
 
   return (
-    <MessageRow onClick={onClick} title={messageSummary.template}>
+    <TableRow onClick={onClick} title={messageSummary.template}>
       <td colSpan={colSpanFixup}>
         <StyledMessageWrapper category={messageSummary.category}>
           {messageSummary.summary}
         </StyledMessageWrapper>
       </td>
-    </MessageRow>
+    </TableRow>
   );
 };
 

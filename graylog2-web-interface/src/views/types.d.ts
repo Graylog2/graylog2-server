@@ -44,6 +44,7 @@ import View from 'views/logic/views/View';
 import User from 'logic/users/User';
 import { Message } from 'views/components/messagelist/Types';
 import { ValuePath } from 'views/logic/valueactions/ValueActionHandler';
+import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 
 import type { MessageEventType } from './types/messageEventTypes';
 
@@ -197,6 +198,15 @@ export interface ActionContexts {
 
 export type SearchTypeResults = { [id: string]: SearchTypeResultTypes[keyof SearchTypeResultTypes] };
 
+export type MessagePreviewOption = {
+  title: string,
+  isChecked: (config: MessagesWidgetConfig) => boolean,
+  isDisabled: (config: MessagesWidgetConfig) => boolean,
+  help?: string,
+  onChange: (config: MessagesWidgetConfig, onConfigChange: (config: MessagesWidgetConfig) => void) => void
+  sort: number,
+}
+
 declare module 'graylog-web-plugin/plugin' {
   export interface PluginExports {
     creators?: Array<Creator>;
@@ -208,6 +218,7 @@ declare module 'graylog-web-plugin/plugin' {
     systemConfigurations?: Array<SystemConfiguration>;
     valueActions?: Array<ActionDefinition>;
     'views.completers'?: Array<Completer>;
+    'views.components.widgets.messageTable.previewOptions'?: Array<MessagePreviewOption>
     'views.elements.header'?: Array<React.ComponentType>;
     'views.elements.queryBar'?: Array<React.ComponentType>;
     'views.export.formats'?: Array<ExportFormat>;

@@ -223,6 +223,7 @@ class MessageTable extends React.Component<Props, State> {
                                        message={message}
                                        showMessageRow={config && config.showMessageRow}
                                        showSummaryRow={config && config.showSummaryRow}
+                                       preferSummaryRow={config && config.preferSummaryRow}
                                        selectedFields={selectedFields}
                                        expanded={expandedMessages.contains(messageKey)}
                                        toggleDetail={this._toggleMessageDetail}
