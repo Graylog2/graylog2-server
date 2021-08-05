@@ -326,7 +326,7 @@ public class PipelineInterpreterTest {
                 new MetricRegistry(),
                 Executors.newScheduledThreadPool(1),
                 mock(EventBus.class),
-                (currentPipelines, streamPipelineConnections, ruleMetricsConfig) -> new PipelineInterpreter.State(currentPipelines, streamPipelineConnections, ruleMetricsConfig, new MetricRegistry(), 1, true)
+                (currentPipelines, streamPipelineConnections, ruleMetricsConfig) -> new PipelineInterpreterState(currentPipelines, streamPipelineConnections, ruleMetricsConfig, new MetricRegistry(), 1, true)
         );
         return new PipelineInterpreter(
                 mock(MessageQueueAcknowledger.class),
@@ -382,7 +382,7 @@ public class PipelineInterpreterTest {
                 metricRegistry,
                 Executors.newScheduledThreadPool(1),
                 mock(EventBus.class),
-                (currentPipelines, streamPipelineConnections, ruleMetricsConfig) -> new PipelineInterpreter.State(currentPipelines, streamPipelineConnections, ruleMetricsConfig, new MetricRegistry(), 1, true)
+                (currentPipelines, streamPipelineConnections, ruleMetricsConfig) -> new PipelineInterpreterState(currentPipelines, streamPipelineConnections, ruleMetricsConfig, new MetricRegistry(), 1, true)
         );
         final PipelineInterpreter interpreter = new PipelineInterpreter(
                 mock(MessageQueueAcknowledger.class),

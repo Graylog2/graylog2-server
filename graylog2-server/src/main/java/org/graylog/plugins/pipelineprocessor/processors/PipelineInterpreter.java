@@ -19,27 +19,19 @@ package org.graylog.plugins.pipelineprocessor.processors;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.google.inject.assistedinject.Assisted;
-import com.google.inject.assistedinject.AssistedInject;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.Stage;
 import org.graylog.plugins.pipelineprocessor.ast.statements.Statement;
-import org.graylog.plugins.pipelineprocessor.db.RuleMetricsConfigDto;
 import org.graylog.plugins.pipelineprocessor.processors.listeners.InterpreterListener;
 import org.graylog.plugins.pipelineprocessor.processors.listeners.NoopInterpreterListener;
 import org.graylog.plugins.pipelineprocessor.processors.listeners.RuleMetricsListener;
-import org.graylog2.metrics.CacheStatsSet;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageCollection;
 import org.graylog2.plugin.Messages;
@@ -47,21 +39,16 @@ import org.graylog2.plugin.messageprocessors.MessageProcessor;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
-import org.graylog2.shared.metrics.MetricUtils;
-import org.graylog2.shared.utilities.ExceptionUtils;
 import org.jooq.lambda.tuple.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nonnull;
 import javax.inject.Inject;
-import javax.inject.Named;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import static com.codahale.metrics.MetricRegistry.name;
@@ -95,7 +82,7 @@ public class PipelineInterpreter implements MessageProcessor {
     @Override
     public Messages process(Messages messages) {
         try (Timer.Context ignored = executionTime.time()) {
-            final State latestState = stateUpdater.getLatestState();
+            final PipelineInterpreterState latestState = stateUpdater.getLatestState();
             if (latestState.enableRuleMetrics()) {
                 return process(messages, new RuleMetricsListener(metricRegistry), latestState);
             }
@@ -117,7 +104,7 @@ public class PipelineInterpreter implements MessageProcessor {
      *                            processing
      * @return the processed messages
      */
-    public Messages process(Messages messages, InterpreterListener interpreterListener, State state) {
+    public Messages process(Messages messages, InterpreterListener interpreterListener, PipelineInterpreterState state) {
         interpreterListener.startProcessing();
         // message id + stream id
         final Set<Tuple2<String, String>> processingBlacklist = Sets.newHashSet();
@@ -236,7 +223,7 @@ public class PipelineInterpreter implements MessageProcessor {
     public List<Message> processForPipelines(Message message,
                                              Set<String> pipelineIds,
                                              InterpreterListener interpreterListener,
-                                             State state) {
+                                             PipelineInterpreterState state) {
         final Map<String, Pipeline> currentPipelines = state.getCurrentPipelines();
         final ImmutableSet<Pipeline> pipelinesToRun = pipelineIds.stream()
                 .map(currentPipelines::get)
@@ -250,7 +237,7 @@ public class PipelineInterpreter implements MessageProcessor {
                                                       String msgId,
                                                       Set<Pipeline> pipelines,
                                                       InterpreterListener interpreterListener,
-                                                      State state) {
+                                                      PipelineInterpreterState state) {
         final List<Message> result = new ArrayList<>();
         // record execution of pipeline in metrics
         pipelines.forEach(Pipeline::markExecution);
@@ -441,72 +428,4 @@ public class PipelineInterpreter implements MessageProcessor {
         }
     }
 
-    public static class State {
-        private static final Logger LOG = LoggerFactory.getLogger(State.class);
-
-        private final ImmutableMap<String, Pipeline> currentPipelines;
-        private final ImmutableSetMultimap<String, Pipeline> streamPipelineConnections;
-        private final LoadingCache<Set<Pipeline>, StageIterator.Configuration> cache;
-        private final boolean cachedIterators;
-        private final RuleMetricsConfigDto ruleMetricsConfig;
-
-        @AssistedInject
-        public State(@Assisted ImmutableMap<String, Pipeline> currentPipelines,
-                     @Assisted ImmutableSetMultimap<String, Pipeline> streamPipelineConnections,
-                     @Assisted RuleMetricsConfigDto ruleMetricsConfig,
-                     MetricRegistry metricRegistry,
-                     @Named("processbuffer_processors") int processorCount,
-                     @Named("cached_stageiterators") boolean cachedIterators) {
-            this.currentPipelines = currentPipelines;
-            this.streamPipelineConnections = streamPipelineConnections;
-            this.cachedIterators = cachedIterators;
-            this.ruleMetricsConfig = ruleMetricsConfig;
-
-            cache = CacheBuilder.newBuilder()
-                    .concurrencyLevel(processorCount)
-                    .recordStats()
-                    .build(new CacheLoader<Set<Pipeline>, StageIterator.Configuration>() {
-                        @Override
-                        public StageIterator.Configuration load(@Nonnull Set<Pipeline> pipelines) {
-                            return new StageIterator.Configuration(pipelines);
-                        }
-                    });
-
-            // we have to remove the metrics, because otherwise we leak references to the cache (and the register call with throw)
-            metricRegistry.removeMatching((name, metric) -> name.startsWith(name(PipelineInterpreter.class, "stage-cache")));
-            MetricUtils.safelyRegisterAll(metricRegistry, new CacheStatsSet(name(PipelineInterpreter.class, "stage-cache"), cache));
-        }
-
-        public ImmutableMap<String, Pipeline> getCurrentPipelines() {
-            return currentPipelines;
-        }
-
-        public ImmutableSetMultimap<String, Pipeline> getStreamPipelineConnections() {
-            return streamPipelineConnections;
-        }
-
-        public boolean enableRuleMetrics() {
-            return ruleMetricsConfig.metricsEnabled();
-        }
-
-        public StageIterator getStageIterator(Set<Pipeline> pipelines) {
-            try {
-                if (cachedIterators) {
-                    return new StageIterator(cache.get(pipelines));
-                } else {
-                    return new StageIterator(pipelines);
-                }
-            } catch (ExecutionException e) {
-                LOG.error("Unable to get StageIterator from cache, this should not happen.", ExceptionUtils.getRootCause(e));
-                return new StageIterator(pipelines);
-            }
-        }
-
-
-        public interface Factory {
-            State newState(ImmutableMap<String, Pipeline> currentPipelines,
-                           ImmutableSetMultimap<String, Pipeline> streamPipelineConnections,
-                           RuleMetricsConfigDto ruleMetricsConfig);
-        }
-    }
 }
