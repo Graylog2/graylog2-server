@@ -45,11 +45,11 @@ class ImmutableFeatureFlags implements FeatureFlags {
     }
 
     @Override
-    public boolean isOn(String feature, boolean defaultValue) {
+    public boolean isOn(String feature) {
         FeatureFlag flag = getFlag(feature);
         if (flag == null) {
-            LOG.warn("Feature flag '{}' is not set. Fall back to default value '{}'", feature, defaultValue);
-            return defaultValue;
+            LOG.warn("Feature flag '{}' is not set. Fall back to default value 'false'", feature);
+            return false;
         }
         return flag.isOn();
     }
@@ -60,7 +60,7 @@ class ImmutableFeatureFlags implements FeatureFlags {
         if (flag != null) {
             flag.incrementFeatureIsUsedCounter();
         } else {
-            LOG.error("Feature flag {} don't exist! Could not update metric!", feature);
+            LOG.warn("Feature flag '{}' don't exist! Could not update metric!", feature);
         }
     }
 
@@ -70,14 +70,27 @@ class ImmutableFeatureFlags implements FeatureFlags {
 
     private static class FeatureFlag {
         private static final String ON = "ON";
-        private final Counter featureUsedCounter;
-        private final Counter featureFlagUsedCounter;
+        private static final String VALID_METRIC_NAME_PATTERN = "[a-zA-Z_][a-zA-Z0-9_]*";
+        private Counter featureUsedCounter;
+        private Counter featureFlagUsedCounter;
         private final String name;
         private final String value;
 
         FeatureFlag(String name, String state, MetricRegistry metricRegistry) {
             this.name = name;
             this.value = state;
+            if (validMetricName(name)) {
+                initMetrics(name, state, metricRegistry);
+            } else {
+                LOG.warn("Metrics for feature flag '{}' can not be collected! Invalid characters.", name);
+            }
+        }
+
+        private boolean validMetricName(String name) {
+            return name.matches(VALID_METRIC_NAME_PATTERN);
+        }
+
+        private void initMetrics(String name, String state, MetricRegistry metricRegistry) {
             featureUsedCounter = metricRegistry.counter(stringFormat("org.graylog.feature.used.%s", name));
             featureFlagUsedCounter = metricRegistry.counter(stringFormat("org.graylog.featureflag.used.%s", name));
             MetricUtils.getOrRegister(metricRegistry,
@@ -85,12 +98,18 @@ class ImmutableFeatureFlags implements FeatureFlags {
         }
 
         boolean isOn() {
-            featureFlagUsedCounter.inc();
+            incrementCounter(featureFlagUsedCounter);
             return ON.equalsIgnoreCase(value);
         }
 
         void incrementFeatureIsUsedCounter() {
-            featureUsedCounter.inc();
+            incrementCounter(featureUsedCounter);
+        }
+
+        private void incrementCounter(Counter counter) {
+            if (counter != null) {
+                counter.inc();
+            }
         }
     }
 }

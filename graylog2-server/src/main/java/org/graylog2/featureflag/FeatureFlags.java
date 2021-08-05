@@ -21,7 +21,11 @@ import java.util.Map;
 public interface FeatureFlags {
     Map<String, String> getAll();
 
-    boolean isOn(String feature, boolean defaultValue);
+    /**
+     * @param feature name of the feature
+     * @return true if feature is found and is on, false otherwise
+     */
+    boolean isOn(String feature);
 
     void incrementFeatureIsUsedCounter(String feature);
 }
