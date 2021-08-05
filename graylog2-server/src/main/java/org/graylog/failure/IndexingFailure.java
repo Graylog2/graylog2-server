@@ -16,6 +16,7 @@
  */
 package org.graylog.failure;
 
+import com.google.common.base.Objects;
 import org.graylog2.indexer.messages.Indexable;
 import org.joda.time.DateTime;
 
@@ -23,25 +24,26 @@ import javax.annotation.Nullable;
 
 public class IndexingFailure implements Failure {
 
-    private final String failedMessageId;
-    private final String targetIndex;
-    private final String errorType;
-    private final String errorMessage;
-    private final DateTime timestamp;
+    private final FailureCause failureCause;
+    private final String message;
+    private final String failureDetails;
+    private final DateTime failureTimestamp;
     private final Indexable failedMessage;
+    private final String targetIndex;
 
-    public IndexingFailure(String failedMessageId,
-                           String targetIndex,
-                           String errorType,
-                           String errorMessage,
-                           DateTime timestamp,
-                           Indexable failedMessage) {
-        this.failedMessageId = failedMessageId;
-        this.targetIndex = targetIndex;
-        this.errorType = errorType;
-        this.errorMessage = errorMessage;
-        this.timestamp = timestamp;
+    public IndexingFailure(
+            FailureCause failureCause,
+            String message,
+            String failureDetails,
+            DateTime failureTimestamp,
+            Indexable failedMessage,
+            String targetIndex) {
+        this.failureCause = failureCause;
+        this.message = message;
+        this.failureDetails = failureDetails;
+        this.failureTimestamp = failureTimestamp;
         this.failedMessage = failedMessage;
+        this.targetIndex = targetIndex;
     }
 
     @Override
@@ -50,8 +52,28 @@ public class IndexingFailure implements Failure {
     }
 
     @Override
-    public String failedMessageId() {
-        return failedMessageId;
+    public FailureCause failureCause() {
+        return failureCause;
+    }
+
+    @Override
+    public String message() {
+        return message;
+    }
+
+    @Override
+    public String failureDetails() {
+        return failureDetails;
+    }
+
+    @Override
+    public DateTime failureTimestamp() {
+        return failureTimestamp;
+    }
+
+    @Override
+    public Indexable failedMessage() {
+        return failedMessage;
     }
 
     @Nullable
@@ -61,27 +83,25 @@ public class IndexingFailure implements Failure {
     }
 
     @Override
-    public String errorType() {
-        return errorType;
-    }
-
-    @Override
-    public String errorMessage() {
-        return errorMessage;
-    }
-
-    @Override
-    public DateTime timestamp() {
-        return timestamp;
-    }
-
-    @Override
-    public Indexable failedMessage() {
-        return failedMessage;
-    }
-
-    @Override
     public boolean requiresAcknowledgement() {
         return false;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        final IndexingFailure that = (IndexingFailure) o;
+        return Objects.equal(failureCause, that.failureCause)
+                && Objects.equal(message, that.message)
+                && Objects.equal(failureDetails, that.failureDetails)
+                && Objects.equal(failureTimestamp, that.failureTimestamp)
+                && Objects.equal(failedMessage, that.failedMessage)
+                && Objects.equal(targetIndex, that.targetIndex);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(failureCause, message, failureDetails, failureTimestamp, failedMessage, targetIndex);
     }
 }

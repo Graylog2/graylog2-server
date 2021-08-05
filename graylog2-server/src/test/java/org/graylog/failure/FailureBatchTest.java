@@ -16,14 +16,12 @@
  */
 package org.graylog.failure;
 
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
+import org.graylog2.plugin.Tools;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.shaded.com.google.common.collect.ImmutableList;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
@@ -122,22 +120,22 @@ public class FailureBatchTest {
 
     private IndexingFailure createIndexingFailure() {
         return new IndexingFailure(
-                UUID.randomUUID().toString(), "target-index", "error-type", "error-message",
-                DateTime.now(DateTimeZone.UTC), null
+                IndexingFailureCause.MappingError, "Mapping Failed", "Cannot cast String to Double",
+                Tools.nowUTC(), null, "target-index"
         );
     }
 
     private ProcessingFailure createProcessingFailure() {
         return new ProcessingFailure(
-                UUID.randomUUID().toString(), "error-type", "error-message",
-                DateTime.now(DateTimeZone.UTC), null,
+                ProcessingFailureCause.UNKNOWN, "failure-cause", "failure-details",
+                Tools.nowUTC(), null,
                 true);
     }
 }
 
 class CustomIndexingFailure extends IndexingFailure {
     CustomIndexingFailure() {
-        super(UUID.randomUUID().toString(), "target-index", "error-type", "error-message",
-                DateTime.now(DateTimeZone.UTC), null);
+        super(IndexingFailureCause.UNKNOWN, "Mapping Failed", "Cannot cast String to Double",
+                Tools.nowUTC(), null, "target-index");
     }
 }

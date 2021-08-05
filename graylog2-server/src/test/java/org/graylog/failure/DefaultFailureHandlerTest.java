@@ -19,6 +19,7 @@ package org.graylog.failure;
 import com.google.common.collect.ImmutableList;
 import org.graylog2.indexer.IndexFailureService;
 import org.graylog2.indexer.messages.Indexable;
+import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.Test;
@@ -31,6 +32,7 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 
 public class DefaultFailureHandlerTest {
@@ -57,16 +59,22 @@ public class DefaultFailureHandlerTest {
     public void handle_allFailuresHandedOverToIndexFailureService() {
         // given
         final DateTime ts = DateTime.now(DateTimeZone.UTC);
+
         final Indexable indexable1 = mock(Indexable.class);
+        when(indexable1.getMessageId()).thenReturn("msg-1");
+        when(indexable1.getTimestamp()).thenReturn(ts);
+
         final Indexable indexable2 = mock(Indexable.class);
+        when(indexable2.getMessageId()).thenReturn("msg-2");
+        when(indexable2.getTimestamp()).thenReturn(ts);
 
         final IndexingFailure indexingFailure1 = new IndexingFailure(
-                "indexingFailure1", "index1",
-                "indexing", "Failure Error #1", ts, indexable1);
+                IndexingFailureCause.MappingError, "indexingFailureMessage1",
+                "indexingFailureDetails1", Tools.nowUTC(), indexable1, "index1");
 
         final IndexingFailure indexingFailure2 = new IndexingFailure(
-                "indexingFailure2", "index2",
-                "indexing", "Failure Error #2", ts, indexable2);
+                IndexingFailureCause.MappingError, "indexingFailureMessage2",
+                "indexingFailureDetails2", Tools.nowUTC(), indexable2, "index2");
 
         final FailureBatch indexingFailureBatch = FailureBatch.indexingFailureBatch(ImmutableList.of(indexingFailure1, indexingFailure2));
 
@@ -77,18 +85,18 @@ public class DefaultFailureHandlerTest {
         verify(indexFailureService, times(2)).saveWithoutValidation(any());
 
         verify(indexFailureService, times(1)).saveWithoutValidation(argThat(arg ->
-                arg.asMap().get("letter_id").equals("indexingFailure1") &&
+                arg.asMap().get("letter_id").equals("msg-1") &&
                         arg.asMap().get("index").equals("index1") &&
                         arg.asMap().get("type").equals("indexing") &&
-                        arg.asMap().get("message").equals("Failure Error #1") &&
+                        arg.asMap().get("message").equals("indexingFailureDetails1") &&
                         arg.asMap().get("timestamp") != null
                 ));
 
         verify(indexFailureService, times(1)).saveWithoutValidation(argThat(arg ->
-                arg.asMap().get("letter_id").equals("indexingFailure2") &&
+                arg.asMap().get("letter_id").equals("msg-2") &&
                         arg.asMap().get("index").equals("index2") &&
                         arg.asMap().get("type").equals("indexing") &&
-                        arg.asMap().get("message").equals("Failure Error #2") &&
+                        arg.asMap().get("message").equals("indexingFailureDetails2") &&
                         arg.asMap().get("timestamp") != null
         ));
     }

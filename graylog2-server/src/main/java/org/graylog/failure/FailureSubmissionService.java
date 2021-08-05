@@ -16,111 +16,152 @@
  */
 package org.graylog.failure;
 
-import com.codahale.metrics.Meter;
-import com.codahale.metrics.MetricRegistry;
-import org.graylog2.Configuration;
+import com.google.common.collect.ImmutableList;
+import org.apache.commons.lang3.StringUtils;
+import org.graylog2.indexer.messages.Messages;
+import org.graylog2.plugin.Message;
+import org.graylog2.plugin.Tools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
-
-import static com.codahale.metrics.MetricRegistry.name;
+import java.util.Collection;
+import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
 
 /**
- * A blocking FIFO queue accepting failure batches for further handling.
- * It should be used as an entry point for failure producers.
- *
- * The service was introduced for 2 essential reasons:
- *  1. To control pressure on the failure handling framework.
- *  2. To decouple failure producers from failure consumers.
- *
- * The capacity of the underlying queue is controlled by `failure_handling_queue_capacity` configuration
- * property. By default its value is 1000.
+ * A supplementary service layer, which is aimed to simplify failure
+ * submission for the calling code. Apart from the <b>input transformation</b>,
+ * it also encapsulates integration with <b>the failure handling configuration</b>.
  */
 @Singleton
 public class FailureSubmissionService {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final BlockingQueue<FailureBatch> queue;
-    private final Configuration configuration;
-    private final Meter submittedFailureBatches;
-    private final Meter submittedFailures;
-    private final Meter consumedFailureBatches;
-    private final Meter consumedFailures;
+    private final FailureSubmissionQueue failureSubmissionQueue;
+    private final FailureHandlingConfiguration failureHandlingConfiguration;
 
     @Inject
-    public FailureSubmissionService(Configuration configuration,
-                                    MetricRegistry metricRegistry) {
-        this.queue = new LinkedBlockingQueue<>(configuration.getFailureHandlingQueueCapacity());
-        this.configuration = configuration;
-        this.submittedFailureBatches = metricRegistry.meter(name(FailureSubmissionService.class, "submittedFailureBatches"));
-        this.submittedFailures = metricRegistry.meter(name(FailureSubmissionService.class, "submittedFailures"));
-        this.consumedFailureBatches = metricRegistry.meter(name(FailureSubmissionService.class, "consumedFailureBatches"));
-        this.consumedFailures = metricRegistry.meter(name(FailureSubmissionService.class, "consumedFailures"));
+    public FailureSubmissionService(
+            FailureSubmissionQueue failureSubmissionQueue,
+            FailureHandlingConfiguration failureHandlingConfiguration) {
+        this.failureSubmissionQueue = failureSubmissionQueue;
+        this.failureHandlingConfiguration = failureHandlingConfiguration;
     }
 
     /**
-     * Submits a failure batch for handling. If the underlying queue is full,
-     * the call will block until the queue is ready to accept new batches.
+     * Submits an unrecognized processing error to the failure queue.
+     * Depending on the configuration might ignore the error
+     *
+     * Must be called the last in the processing chain!
+     *
+     * @param message a problematic message
+     * @param details error details
+     * @return true if the message is not filtered out
      */
-    public void submitBlocking(FailureBatch batch) throws InterruptedException {
-        queue.put(batch);
+    public boolean submitUnknownProcessingError(Message message, String details) {
+        return submitProcessingErrorsInternal(message, ImmutableList.of(new Message.ProcessingError(
+                ProcessingFailureCause.UNKNOWN,
+                "Encountered an unrecognizable processing error",
+                details)));
+    }
 
-        if (queueSize() == configuration.getFailureHandlingQueueCapacity()) {
-            logger.debug("The queue is full! Current capacity: {}", configuration.getFailureHandlingQueueCapacity());
+    /**
+     * Submits message's processing errors to the failure queue. The errors
+     * are obtained via {@link Message#processingErrors()}. Depending on the
+     * configuration might ignore the errors.
+     *
+     * Must be called the last in the processing chain!
+     *
+     * @param message a message with processing errors
+     * @return true if the message is not filtered out
+     */
+    public boolean submitProcessingErrors(Message message) {
+        return submitProcessingErrorsInternal(message, message.processingErrors());
+    }
+
+    private boolean submitProcessingErrorsInternal(Message message, List<Message.ProcessingError> processingErrors) {
+        if (!failureHandlingConfiguration.submitProcessingFailures()) {
+            // We don't handle processing errors
+            return true;
+        }
+        if (processingErrors.isEmpty()) {
+            return true;
+        }
+        if (!failureHandlingConfiguration.keepFailedMessageDuplicate()) {
+            message.setFilterOut(true);
         }
 
-        submittedFailureBatches.mark();
-        submittedFailures.mark(batch.size());
+        processingErrors.forEach(pe -> submitProcessingFailure(message, pe));
+
+        return failureHandlingConfiguration.keepFailedMessageDuplicate();
     }
 
-    /**
-     * Logs current submission/consumption stats.
-     */
-    void logStats(String tag) {
-        logger.info("[{}] Total number of submitted batches: {} ({} failures), total number of consumed batches: {} ({} failures)",
-                tag,
-                submittedFailureBatches.getCount(), submittedFailures.getCount(),
-                consumedFailureBatches.getCount(), consumedFailures.getCount());
-    }
+    private void submitProcessingFailure(Message failedMessage, Message.ProcessingError processingError) {
+        try {
+            // If we store the regular message, the acknowledgement happens in the output path
+            final boolean needsAcknowledgement = !failureHandlingConfiguration.keepFailedMessageDuplicate();
 
-    /**
-     * @return one batch from the queue. If the queue is empty,
-     * waits for a batch to become available.
-     */
-    FailureBatch consumeBlocking() throws InterruptedException {
-        final FailureBatch fb = queue.take();
-        consumedFailureBatches.mark();
-        consumedFailures.mark(fb.size());
-        return fb;
-    }
+            final String message;
 
+            if (StringUtils.isBlank(failedMessage.getMessageId())) {
+                message = String.format(Locale.ENGLISH,
+                        "Failed to process a message with unknown id: %s",
+                        processingError.getMessage());
+            } else {
+                message = String.format(Locale.ENGLISH,
+                        "Failed to process message with id '%s': %s",
+                        failedMessage.getMessageId(),
+                        processingError.getMessage());
+            }
 
-    /**
-     * @return one batch from the queue. If the queue is empty,
-     * waits for the specified period of time for a batch to become available,
-     * otherwise returns null.
-     */
-    @Nullable
-    FailureBatch consumeBlockingWithTimeout(long timeoutInMs) throws InterruptedException {
-        final FailureBatch fb = queue.poll(timeoutInMs, TimeUnit.MILLISECONDS);
-        if (fb != null) {
-            consumedFailureBatches.mark();
-            consumedFailures.mark(fb.size());
+            final ProcessingFailure processingFailure = new ProcessingFailure(
+                    processingError.getCause(),
+                    message,
+                    processingError.getDetails(),
+                    Tools.nowUTC(),
+                    failedMessage,
+                    needsAcknowledgement);
+
+            failureSubmissionQueue.submitBlocking(FailureBatch.processingFailureBatch(processingFailure));
+        } catch (InterruptedException ignored) {
+            logger.warn("Failed to submit a processing failure for failure handling. The thread has been interrupted!");
+            Thread.currentThread().interrupt();
         }
-        return fb;
     }
 
     /**
-     * @return the current amount of failure batches in the queue.
+     * Submits Elasticsearch indexing errors to the failure queue
+     * @param indexingErrors a collection of indexing errors
      */
-    int queueSize() {
-        return queue.size();
+    public void submitIndexingErrors(Collection<Messages.IndexingError> indexingErrors) {
+        try {
+            failureSubmissionQueue.submitBlocking(FailureBatch.indexingFailureBatch(
+                    indexingErrors.stream()
+                            .map(this::fromIndexingError)
+                            .collect(Collectors.toList())));
+
+        } catch (InterruptedException ignored) {
+            logger.warn("Failed to submit {} indexing errors for failure handling. The thread has been interrupted!",
+                    indexingErrors.size());
+            Thread.currentThread().interrupt();
+        }
+    }
+
+    private IndexingFailure fromIndexingError(Messages.IndexingError indexingError) {
+        return new IndexingFailure(
+                indexingError.errorType() == Messages.IndexingError.ErrorType.MappingError ?
+                        IndexingFailureCause.MappingError : IndexingFailureCause.UNKNOWN,
+                String.format(Locale.ENGLISH,
+                        "Failed to index message with id '%s' targeting '%s'",
+                        indexingError.message().getMessageId(), indexingError.index()),
+                indexingError.errorMessage(),
+                Tools.nowUTC(),
+                indexingError.message(),
+                indexingError.index()
+        );
     }
 }

@@ -18,7 +18,6 @@ package org.graylog.failure;
 
 
 import org.graylog2.indexer.messages.Indexable;
-import org.graylog2.plugin.Message;
 import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
@@ -35,12 +34,28 @@ public interface Failure {
     FailureType failureType();
 
     /**
-     * Returns an id of a failed message. The id is represented
-     * by a value of the {@link Message#FIELD_GL2_MESSAGE_ID} field
-     *
-     * TODO: currently it's false for processing failures !!!
+     * Returns a cause of this failure
      */
-    String failedMessageId();
+    FailureCause failureCause();
+
+    /**
+     * Returns a brief description of this failure, which
+     * is supposed to answer the following 2 questions:
+     *      1) WHAT has happened?
+     *      2) WHICH component has caused it?
+     */
+    String message();
+
+    /**
+     * Returns further failure details, which are supposed
+     * to answer the question "WHY this failure has happened?"
+     */
+    String failureDetails();
+
+    /**
+     * Returns a timestamp of this failure
+     */
+    DateTime failureTimestamp();
 
     /**
      * Returns a failed message
@@ -55,20 +70,6 @@ public interface Failure {
     @Nullable
     String targetIndex();
 
-    /**
-     * Returns a subcategory of this failure
-     */
-    String errorType();
-
-    /**
-     * Returns a detailed error message
-     */
-    String errorMessage();
-
-    /**
-     * Returns a timestamp of the failed message
-     */
-    DateTime timestamp();
 
     /**
      * Returns true if the failed message must

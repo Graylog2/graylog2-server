@@ -16,171 +16,279 @@
  */
 package org.graylog.failure;
 
-import com.codahale.metrics.MetricRegistry;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import org.graylog2.Configuration;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.junit.Test;
+import org.graylog2.indexer.messages.Messages;
+import org.graylog2.plugin.Message;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
+import org.testcontainers.shaded.com.google.common.collect.ImmutableList;
 
-import java.util.UUID;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 public class FailureSubmissionServiceTest {
 
-    private final Configuration configuration = mock(Configuration.class);
+    private final FailureSubmissionQueue failureSubmissionQueue = Mockito.mock(FailureSubmissionQueue.class);
+    private final FailureHandlingConfiguration failureHandlingConfiguration = Mockito.mock(FailureHandlingConfiguration.class);
+    private final FailureSubmissionService underTest = new FailureSubmissionService(failureSubmissionQueue, failureHandlingConfiguration);
 
-    private final MetricRegistry metricRegistry = new MetricRegistry();
-
-    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1, new ThreadFactoryBuilder()
-            .setNameFormat("failure-scheduled-%d")
-            .setDaemon(false)
-            .build());
+    private final ArgumentCaptor<FailureBatch> failureBatchCaptor = ArgumentCaptor.forClass(FailureBatch.class);
 
     @Test
-    public void submitBlocking_whenQueueNotFull_acceptsNewBatches() throws Exception {
-        //given
-        when(configuration.getFailureHandlingQueueCapacity()).thenReturn(1000);
+    public void submitIndexingErrors_allIndexingErrorsTransformedAndSubmittedToFailureQueue() throws Exception {
+        // given
+        final Message msg1 = Mockito.mock(Message.class);
+        when(msg1.getMessageId()).thenReturn("msg-1");
+        final Message msg2 = Mockito.mock(Message.class);
+        when(msg2.getMessageId()).thenReturn("msg-2");
 
-        final FailureSubmissionService underTest = new FailureSubmissionService(configuration, metricRegistry);
-
-        final ProcessingFailure prcFailure1 = createProcessingFailure();
-        final ProcessingFailure prcFailure2 = createProcessingFailure();
+        final List<Messages.IndexingError> indexingErrors = ImmutableList.of(
+                Messages.IndexingError.create(msg1, "index-1", Messages.IndexingError.ErrorType.MappingError, "Error"),
+                Messages.IndexingError.create(msg2, "index-2", Messages.IndexingError.ErrorType.Unknown, "Error2")
+        );
 
         // when
-        underTest.submitBlocking(FailureBatch.processingFailureBatch(prcFailure1));
-        underTest.submitBlocking(FailureBatch.processingFailureBatch(prcFailure2));
+        underTest.submitIndexingErrors(indexingErrors);
 
         // then
-        assertThat(underTest.queueSize()).isEqualTo(2);
-        assertThat(underTest.consumeBlocking()).isEqualTo(FailureBatch.processingFailureBatch(prcFailure1));
-        assertThat(underTest.consumeBlocking()).isEqualTo(FailureBatch.processingFailureBatch(prcFailure2));
+        verify(failureSubmissionQueue, times(1)).submitBlocking(failureBatchCaptor.capture());
+
+        assertThat(failureBatchCaptor.getValue()).satisfies(fb -> {
+            assertThat(fb.containsIndexingFailures()).isTrue();
+            assertThat(fb.size()).isEqualTo(2);
+
+            assertThat(fb.getFailures().get(0)).satisfies(indexingFailure -> {
+                assertThat(indexingFailure.failureType()).isEqualTo(FailureType.INDEXING);
+                assertThat(indexingFailure.failureCause().label()).isEqualTo("MappingError");
+                assertThat(indexingFailure.message()).isEqualTo("Failed to index message with id 'msg-1' targeting 'index-1'");
+                assertThat(indexingFailure.failureDetails()).isEqualTo("Error");
+                assertThat(indexingFailure.failureTimestamp()).isNotNull();
+                assertThat(indexingFailure.failedMessage()).isEqualTo(msg1);
+                assertThat(indexingFailure.targetIndex()).isEqualTo("index-1");
+                assertThat(indexingFailure.requiresAcknowledgement()).isFalse();
+            });
+
+            assertThat(fb.getFailures().get(1)).satisfies(indexingFailure -> {
+                assertThat(indexingFailure.failureType()).isEqualTo(FailureType.INDEXING);
+                assertThat(indexingFailure.failureCause().label()).isEqualTo("UNKNOWN");
+                assertThat(indexingFailure.message()).isEqualTo("Failed to index message with id 'msg-2' targeting 'index-2'");
+                assertThat(indexingFailure.failureDetails()).isEqualTo("Error2");
+                assertThat(indexingFailure.failureTimestamp()).isNotNull();
+                assertThat(indexingFailure.failedMessage()).isEqualTo(msg2);
+                assertThat(indexingFailure.targetIndex()).isEqualTo("index-2");
+                assertThat(indexingFailure.requiresAcknowledgement()).isFalse();
+            });
+        });
+    }
+
+
+    @Test
+    public void submitProcessingErrors_allProcessingErrorsSubmittedToQueueAndMessageNotFilteredOut_ifSubmissionEnabledAndDuplicatesAreKept() throws Exception {
+        // given
+        final Message msg = Mockito.mock(Message.class);
+        when(msg.getMessageId()).thenReturn("msg-x");
+
+        when(msg.processingErrors()).thenReturn(ImmutableList.of(
+                new Message.ProcessingError(() -> "Cause 1", "Message 1", "Details 1"),
+                new Message.ProcessingError(() -> "Cause 2", "Message 2", "Details 2")
+        ));
+
+        when(failureHandlingConfiguration.submitProcessingFailures()).thenReturn(true);
+        when(failureHandlingConfiguration.keepFailedMessageDuplicate()).thenReturn(true);
+
+        // when
+        final boolean notFilterOut = underTest.submitProcessingErrors(msg);
+
+        // then
+
+        assertThat(notFilterOut).isTrue();
+
+        verify(failureSubmissionQueue, times(2)).submitBlocking(failureBatchCaptor.capture());
+
+        assertThat(failureBatchCaptor.getAllValues().get(0)).satisfies(fb -> {
+            assertThat(fb.containsProcessingFailures()).isTrue();
+            assertThat(fb.size()).isEqualTo(1);
+
+            assertThat(fb.getFailures().get(0)).satisfies(processingFailure -> {
+                assertThat(processingFailure.failureType()).isEqualTo(FailureType.PROCESSING);
+                assertThat(processingFailure.failureCause().label()).isEqualTo("Cause 1");
+                assertThat(processingFailure.message()).isEqualTo("Failed to process message with id 'msg-x': Message 1");
+                assertThat(processingFailure.failureDetails()).isEqualTo("Details 1");
+                assertThat(processingFailure.failureTimestamp()).isNotNull();
+                assertThat(processingFailure.failedMessage()).isEqualTo(msg);
+                assertThat(processingFailure.targetIndex()).isNull();
+                assertThat(processingFailure.requiresAcknowledgement()).isFalse();
+            });
+        });
+
+        assertThat(failureBatchCaptor.getAllValues().get(1)).satisfies(fb -> {
+            assertThat(fb.containsProcessingFailures()).isTrue();
+            assertThat(fb.size()).isEqualTo(1);
+
+            assertThat(fb.getFailures().get(0)).satisfies(processingFailure -> {
+                assertThat(processingFailure.failureType()).isEqualTo(FailureType.PROCESSING);
+                assertThat(processingFailure.failureCause().label()).isEqualTo("Cause 2");
+                assertThat(processingFailure.message()).isEqualTo("Failed to process message with id 'msg-x': Message 2");
+                assertThat(processingFailure.failureDetails()).isEqualTo("Details 2");
+                assertThat(processingFailure.failureTimestamp()).isNotNull();
+                assertThat(processingFailure.failedMessage()).isEqualTo(msg);
+                assertThat(processingFailure.targetIndex()).isNull();
+                assertThat(processingFailure.requiresAcknowledgement()).isFalse();
+            });
+        });
+    }
+
+
+    @Test
+    public void submitProcessingErrors_nothingSubmittedAndMessageNotFilteredOut_ifSubmissionDisabledAndDuplicatesAreKept() throws Exception {
+        // given
+        final Message msg = Mockito.mock(Message.class);
+        when(msg.getMessageId()).thenReturn("msg-x");
+
+        when(msg.processingErrors()).thenReturn(ImmutableList.of(
+                new Message.ProcessingError(() -> "Cause 1", "Message 1", "Details 1"),
+                new Message.ProcessingError(() -> "Cause 2", "Message 2", "Details 2")
+        ));
+
+        when(failureHandlingConfiguration.submitProcessingFailures()).thenReturn(false);
+        when(failureHandlingConfiguration.keepFailedMessageDuplicate()).thenReturn(true);
+
+        // when
+        final boolean notFilterOut = underTest.submitProcessingErrors(msg);
+
+        // then
+
+        assertThat(notFilterOut).isTrue();
+
+        verifyNoInteractions(failureSubmissionQueue);
     }
 
     @Test
-    public void submitBlocking_whenQueueIsFull_submissionIsBlocked() throws Exception {
-        //given
-        when(configuration.getFailureHandlingQueueCapacity()).thenReturn(2);
+    public void submitProcessingErrors_nothingSubmittedAndMessageNotFilteredOut_ifSubmissionDisabledAndDuplicatesAreNotKept() throws Exception {
+        // given
+        final Message msg = Mockito.mock(Message.class);
+        when(msg.getMessageId()).thenReturn("msg-x");
 
-        final FailureSubmissionService underTest = new FailureSubmissionService(configuration, metricRegistry);
+        when(msg.processingErrors()).thenReturn(ImmutableList.of(
+                new Message.ProcessingError(() -> "Cause 1", "Message 1", "Details 1"),
+                new Message.ProcessingError(() -> "Cause 2", "Message 2", "Details 2")
+        ));
 
-        final ProcessingFailure prcFailure1 = createProcessingFailure();
-        final ProcessingFailure prcFailure2 = createProcessingFailure();
-        final ProcessingFailure prcFailure3 = createProcessingFailure();
-
-        underTest.submitBlocking(FailureBatch.processingFailureBatch(prcFailure1));
-        underTest.submitBlocking(FailureBatch.processingFailureBatch(prcFailure2));
+        when(failureHandlingConfiguration.submitProcessingFailures()).thenReturn(false);
+        when(failureHandlingConfiguration.keepFailedMessageDuplicate()).thenReturn(false);
 
         // when
-        scheduler.schedule(() -> {
-            assertThat(underTest.queueSize()).isEqualTo(2);
-            try {
-                assertThat(underTest.consumeBlocking()).isEqualTo(FailureBatch.processingFailureBatch(prcFailure1));
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }, 300, TimeUnit.MILLISECONDS);
-
-        final long started = System.currentTimeMillis();
-        underTest.submitBlocking(FailureBatch.processingFailureBatch(prcFailure3));
-        final long waited = System.currentTimeMillis() - started;
+        final boolean notFilterOut = underTest.submitProcessingErrors(msg);
 
         // then
-        assertThat(waited).isGreaterThan(200);
-        assertThat(underTest.queueSize()).isEqualTo(2);
-        assertThat(underTest.consumeBlocking()).isEqualTo(FailureBatch.processingFailureBatch(prcFailure2));
-        assertThat(underTest.consumeBlocking()).isEqualTo(FailureBatch.processingFailureBatch(prcFailure3));
 
+        assertThat(notFilterOut).isTrue();
+
+        verifyNoInteractions(failureSubmissionQueue);
     }
 
     @Test
-    public void consumeBlocking_waitsForBatch_whenQueueIsEmpty() throws Exception {
-        //given
-        when(configuration.getFailureHandlingQueueCapacity()).thenReturn(2);
+    public void submitProcessingErrors_nothingSubmittedAndMessageNotFilteredOut_ifMessageHasNoErrors() throws Exception {
+        // given
+        final Message msg = Mockito.mock(Message.class);
+        when(msg.getMessageId()).thenReturn("msg-x");
 
-        final FailureSubmissionService underTest = new FailureSubmissionService(configuration, metricRegistry);
+        when(msg.processingErrors()).thenReturn(ImmutableList.of());
 
-        final ProcessingFailure prcFailure1 = createProcessingFailure();
+        when(failureHandlingConfiguration.submitProcessingFailures()).thenReturn(true);
+        when(failureHandlingConfiguration.keepFailedMessageDuplicate()).thenReturn(false);
 
         // when
-        scheduler.schedule(() -> {
-            try {
-                underTest.submitBlocking(FailureBatch.processingFailureBatch(prcFailure1));
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }, 300, TimeUnit.MILLISECONDS);
-
-        final long started = System.currentTimeMillis();
-        final FailureBatch consumedBatch = underTest.consumeBlocking();
-        final long waited = System.currentTimeMillis() - started;
+        final boolean notFilterOut = underTest.submitProcessingErrors(msg);
 
         // then
-        assertThat(waited).isGreaterThan(200);
-        assertThat(consumedBatch).isEqualTo(FailureBatch.processingFailureBatch(prcFailure1));
+
+        assertThat(notFilterOut).isTrue();
+
+        verifyNoInteractions(failureSubmissionQueue);
+    }
+
+
+    @Test
+    public void submitProcessingErrors_processingErrorSubmittedToQueueAndMessageFilteredOut_ifSubmissionEnabledAndDuplicatesAreNotKept() throws Exception {
+        // given
+        final Message msg = Mockito.mock(Message.class);
+        when(msg.getMessageId()).thenReturn("msg-x");
+
+        when(msg.processingErrors()).thenReturn(ImmutableList.of(
+                new Message.ProcessingError(() -> "Cause", "Message", "Details")
+        ));
+
+        when(failureHandlingConfiguration.submitProcessingFailures()).thenReturn(true);
+        when(failureHandlingConfiguration.keepFailedMessageDuplicate()).thenReturn(false);
+
+        // when
+        final boolean notFilterOut = underTest.submitProcessingErrors(msg);
+
+        // then
+
+        assertThat(notFilterOut).isFalse();
+
+        verify(msg).setFilterOut(true);
+
+        verify(failureSubmissionQueue, times(1)).submitBlocking(failureBatchCaptor.capture());
+
+        assertThat(failureBatchCaptor.getValue()).satisfies(fb -> {
+            assertThat(fb.containsProcessingFailures()).isTrue();
+            assertThat(fb.size()).isEqualTo(1);
+
+            assertThat(fb.getFailures().get(0)).satisfies(processingFailure -> {
+                assertThat(processingFailure.failureType()).isEqualTo(FailureType.PROCESSING);
+                assertThat(processingFailure.failureCause().label()).isEqualTo("Cause");
+                assertThat(processingFailure.message()).isEqualTo("Failed to process message with id 'msg-x': Message");
+                assertThat(processingFailure.failureDetails()).isEqualTo("Details");
+                assertThat(processingFailure.failureTimestamp()).isNotNull();
+                assertThat(processingFailure.failedMessage()).isEqualTo(msg);
+                assertThat(processingFailure.targetIndex()).isNull();
+                assertThat(processingFailure.requiresAcknowledgement()).isTrue();
+            });
+        });
     }
 
     @Test
-    public void consumeBlockingWithTimeout_returnsBatch_whenSubmittedWithinWaitingTimeout() throws Exception {
-        //given
-        when(configuration.getFailureHandlingQueueCapacity()).thenReturn(2);
+    public void submitUnknownProcessingError_unknownProcessingErrorSubmittedToQueue() throws Exception {
+        // given
+        final Message msg = Mockito.mock(Message.class);
 
-        final FailureSubmissionService underTest = new FailureSubmissionService(configuration, metricRegistry);
+        when(msg.processingErrors()).thenReturn(ImmutableList.of());
 
-        final ProcessingFailure prcFailure1 = createProcessingFailure();
-
-        // when
-        scheduler.schedule(() -> {
-            try {
-                underTest.submitBlocking(FailureBatch.processingFailureBatch(prcFailure1));
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }, 300, TimeUnit.MILLISECONDS);
-
-        final long started = System.currentTimeMillis();
-        final FailureBatch consumedBatch = underTest.consumeBlockingWithTimeout(500);
-        final long waited = System.currentTimeMillis() - started;
-
-        // then
-        assertThat(waited).isGreaterThan(200);
-        assertThat(consumedBatch).isEqualTo(FailureBatch.processingFailureBatch(prcFailure1));
-    }
-
-    @Test
-    public void consumeBlockingWithTimeout_returnsNull_whenReachedWaitingTimeout() throws Exception {
-        //given
-        when(configuration.getFailureHandlingQueueCapacity()).thenReturn(2);
-
-        final FailureSubmissionService underTest = new FailureSubmissionService(configuration, metricRegistry);
-
-        final ProcessingFailure prcFailure1 = createProcessingFailure();
+        when(failureHandlingConfiguration.submitProcessingFailures()).thenReturn(true);
+        when(failureHandlingConfiguration.keepFailedMessageDuplicate()).thenReturn(true);
 
         // when
-        scheduler.schedule(() -> {
-            try {
-                underTest.submitBlocking(FailureBatch.processingFailureBatch(prcFailure1));
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }, 300, TimeUnit.MILLISECONDS);
-
-        final FailureBatch consumedBatch = underTest.consumeBlockingWithTimeout(50);
+        final boolean notFilterOut = underTest.submitUnknownProcessingError(msg, "Details of the unknown error!");
 
         // then
-        assertThat(consumedBatch).isNull();
-    }
 
-    private ProcessingFailure createProcessingFailure() {
-        return new ProcessingFailure(
-                UUID.randomUUID().toString(), "error-type", "error-message",
-                DateTime.now(DateTimeZone.UTC), null,
-                true);
+        assertThat(notFilterOut).isTrue();
+
+        verify(failureSubmissionQueue, times(1)).submitBlocking(failureBatchCaptor.capture());
+
+        assertThat(failureBatchCaptor.getValue()).satisfies(fb -> {
+            assertThat(fb.containsProcessingFailures()).isTrue();
+            assertThat(fb.size()).isEqualTo(1);
+
+            assertThat(fb.getFailures().get(0)).satisfies(processingFailure -> {
+                assertThat(processingFailure.failureType()).isEqualTo(FailureType.PROCESSING);
+                assertThat(processingFailure.failureCause().label()).isEqualTo("UNKNOWN");
+                assertThat(processingFailure.message()).isEqualTo("Failed to process a message with unknown id: Encountered an unrecognizable processing error");
+                assertThat(processingFailure.failureDetails()).isEqualTo("Details of the unknown error!");
+                assertThat(processingFailure.failureTimestamp()).isNotNull();
+                assertThat(processingFailure.failedMessage()).isEqualTo(msg);
+                assertThat(processingFailure.targetIndex()).isNull();
+                assertThat(processingFailure.requiresAcknowledgement()).isFalse();
+            });
+        });
+
     }
 }

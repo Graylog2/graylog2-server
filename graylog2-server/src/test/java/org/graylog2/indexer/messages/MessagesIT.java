@@ -22,7 +22,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import joptsimple.internal.Strings;
-import org.graylog.failure.FailureBatch;
 import org.graylog.failure.FailureSubmissionService;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog2.indexer.IndexSet;
@@ -59,7 +58,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -187,7 +186,7 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
 
         assertThat(failedItems).hasSize(1);
 
-        verify(failureSubmissionService).submitBlocking(any(FailureBatch.class));
+        verify(failureSubmissionService).submitIndexingErrors(argThat(arg -> arg.size() == 1));
     }
 
     @Test
