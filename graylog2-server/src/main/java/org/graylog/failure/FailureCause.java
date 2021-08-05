@@ -16,6 +16,9 @@
  */
 package org.graylog.failure;
 
+/**
+ * A tag-like label representing a failure cause
+ */
 public interface FailureCause {
     String label();
 }

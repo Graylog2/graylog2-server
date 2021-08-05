@@ -31,6 +31,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
+/**
+ * A supplementary service layer, which is aimed to simplify failure
+ * submission for the calling code. Apart from the <b>input transformation</b>,
+ * it also encapsulates integration with <b>the failure handling configuration</b>.
+ */
 @Singleton
 public class FailureSubmissionService {
 
@@ -47,7 +52,16 @@ public class FailureSubmissionService {
         this.failureHandlingConfiguration = failureHandlingConfiguration;
     }
 
-
+    /**
+     * Submits an unrecognized processing error to the failure queue.
+     * Depending on the configuration might ignore the error
+     *
+     * Must be called the last in the processing chain!
+     *
+     * @param message a problematic message
+     * @param details error details
+     * @return true if the message is not filtered out
+     */
     public boolean submitUnknownProcessingError(Message message, String details) {
         return submitProcessingErrorsInternal(message, ImmutableList.of(new Message.ProcessingError(
                 ProcessingFailureCause.UNKNOWN,
@@ -55,6 +69,16 @@ public class FailureSubmissionService {
                 details)));
     }
 
+    /**
+     * Submits message's processing errors to the failure queue. The errors
+     * are obtained via {@link Message#processingErrors()}. Depending on the
+     * configuration might ignore the errors.
+     *
+     * Must be called the last in the processing chain!
+     *
+     * @param message a message with processing errors
+     * @return true if the message is not filtered out
+     */
     public boolean submitProcessingErrors(Message message) {
         return submitProcessingErrorsInternal(message, message.processingErrors());
     }
@@ -73,7 +97,7 @@ public class FailureSubmissionService {
 
         processingErrors.forEach(pe -> submitProcessingFailure(message, pe));
 
-        return !message.getFilterOut();
+        return failureHandlingConfiguration.keepFailedMessageDuplicate();
     }
 
     private void submitProcessingFailure(Message failedMessage, Message.ProcessingError processingError) {
@@ -85,11 +109,11 @@ public class FailureSubmissionService {
 
             if (StringUtils.isBlank(failedMessage.getMessageId())) {
                 message = String.format(Locale.ENGLISH,
-                        "Failed to process a message with unknown id. %s",
+                        "Failed to process a message with unknown id: %s",
                         processingError.getMessage());
             } else {
                 message = String.format(Locale.ENGLISH,
-                        "Failed to process message with id '%s'. %s",
+                        "Failed to process message with id '%s': %s",
                         failedMessage.getMessageId(),
                         processingError.getMessage());
             }
@@ -109,6 +133,10 @@ public class FailureSubmissionService {
         }
     }
 
+    /**
+     * Submits Elasticsearch indexing errors to the failure queue
+     * @param indexingErrors a collection of indexing errors
+     */
     public void submitIndexingErrors(Collection<Messages.IndexingError> indexingErrors) {
         try {
             failureSubmissionQueue.submitBlocking(FailureBatch.indexingFailureBatch(

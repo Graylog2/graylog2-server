@@ -425,7 +425,7 @@ public class Message implements Messages, Indexable {
             obj.put(FIELD_GL2_PROCESSING_ERROR,
                     processingErrors.stream()
                             .map(ProcessingError::getDetails)
-                            .collect(Collectors.joining(",")));
+                            .collect(Collectors.joining(", ")));
         }
 
         final Object timestampValue = getField(FIELD_TIMESTAMP);
@@ -914,16 +914,13 @@ public class Message implements Messages, Indexable {
     }
 
     /**
-     * Appends another processing error. After being done with processing, all errors
-     * are joined into one string and stored in {@link org.graylog2.plugin.Message.FIELD_GL2_PROCESSING_ERROR}
+     * Appends another processing error.
      *
      * @param processingError another processing error to be appended.
      *                        Must not be null.
-     * @return this message
      */
-    public Message addProcessingError(@Nonnull ProcessingError processingError) {
+    public void addProcessingError(@Nonnull ProcessingError processingError) {
         processingErrors.add(processingError);
-        return this;
     }
 
     /**
