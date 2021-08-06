@@ -19,7 +19,6 @@ import PropTypes from 'prop-types';
 
 import Feature from './Feature';
 
-// High Order Component API
 const withFeature = <Props extends {}>(
   featureName: string,
   Component: React.ComponentType<Props>,

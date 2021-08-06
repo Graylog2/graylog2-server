@@ -42,7 +42,7 @@ const appConfig = (): AppConfigs => {
   return (window.appConfig || {}) as AppConfigs;
 };
 
-const getEnabledFeature = () => {
+const getEnabledFeatures = () => {
   return Immutable.Map(appConfig().featureFlags)
     .filter((value) => value.trim().toLowerCase() === 'on')
     .keySeq().toList()
@@ -50,7 +50,7 @@ const getEnabledFeature = () => {
 };
 
 const AppConfig = {
-  features: getEnabledFeature(),
+  features: getEnabledFeatures(),
   gl2ServerUrl() {
     if (typeof (GRAYLOG_API_URL) !== 'undefined') {
       // The GRAYLOG_API_URL variable will be set by webpack via the DefinePlugin.
