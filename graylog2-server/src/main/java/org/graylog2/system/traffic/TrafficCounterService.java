@@ -60,12 +60,16 @@ public class TrafficCounterService {
     }
 
     private static DateTime getDayBucket(DateTime observationTime) {
+        return observationTime.withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
+    }
+
+    private static DateTime getHourBucket(DateTime observationTime) {
         return observationTime.withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
     }
 
     public void updateTraffic(DateTime observationTime, NodeId nodeId, long inLastMinute, long outLastMinute, long decodedLastMinute) {
-        // we bucket our database by days
-        final DateTime dayBucket = getDayBucket(observationTime);
+        // we bucket traffic data by the hour and aggregate it to a day bucket for reporting
+        final DateTime dayBucket = getHourBucket(observationTime);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Updating traffic for node {} at {}:  in/decoded/out {}/{}/{} bytes",
@@ -95,7 +99,7 @@ public class TrafficCounterService {
 
         final DBQuery.Query query = DBQuery.and(
                 DBQuery.lessThanEquals(BUCKET, to),
-                DBQuery.greaterThan(BUCKET, from)
+                DBQuery.greaterThanEquals(BUCKET, from)
         );
 
         try (DBCursor<TrafficDto> cursor = db.find(query)) {
