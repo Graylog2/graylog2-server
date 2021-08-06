@@ -246,6 +246,67 @@ public class PipelineInterpreterTest {
         assertThat(actualMessage.hasField("foobar")).isFalse();
     }
 
+    @Test
+    public void testMatchPassContinuesIfOneRuleMatched() {
+        final RuleService ruleService = mock(MongoDbRuleService.class);
+        when(ruleService.loadAll()).thenReturn(ImmutableList.of(RULE_TRUE, RULE_FALSE, RULE_ADD_FOOBAR));
+
+        final PipelineService pipelineService = mock(MongoDbPipelineService.class);
+        when(pipelineService.loadAll()).thenReturn(Collections.singleton(
+                PipelineDao.create("p1", "title", "description",
+                        "pipeline \"pipeline\"\n" +
+                                "stage 0 match pass\n" +
+                                "    rule \"true\";\n" +
+                                "    rule \"false\";\n" +
+                                "stage 1 match pass\n" +
+                                "    rule \"add_foobar\";\n" +
+                                "end\n",
+                        Tools.nowUTC(),
+                        null)
+        ));
+
+        final Map<String, Function<?>> functions = ImmutableMap.of(SetField.NAME, new SetField());
+        final PipelineInterpreter interpreter = createPipelineInterpreter(ruleService, pipelineService, functions);
+
+        final Messages processed = interpreter.process(messageInDefaultStream("message", "test"));
+
+        final List<Message> messages = ImmutableList.copyOf(processed);
+        assertThat(messages).hasSize(1);
+
+        final Message actualMessage = messages.get(0);
+        assertThat(actualMessage.getFieldAs(String.class, "foobar")).isEqualTo("covfefe");
+    }
+
+    @Test
+    public void testMatchPassContinuesIfNoRuleMatched() {
+        final RuleService ruleService = mock(MongoDbRuleService.class);
+        when(ruleService.loadAll()).thenReturn(ImmutableList.of(RULE_TRUE, RULE_FALSE, RULE_ADD_FOOBAR));
+
+        final PipelineService pipelineService = mock(MongoDbPipelineService.class);
+        when(pipelineService.loadAll()).thenReturn(Collections.singleton(
+                PipelineDao.create("p1", "title", "description",
+                        "pipeline \"pipeline\"\n" +
+                                "stage 0 match pass\n" +
+                                "    rule \"false\";\n" +
+                                "stage 1 match pass\n" +
+                                "    rule \"add_foobar\";\n" +
+                                "end\n",
+                        Tools.nowUTC(),
+                        null)
+        ));
+
+        final Map<String, Function<?>> functions = ImmutableMap.of(SetField.NAME, new SetField());
+        final PipelineInterpreter interpreter = createPipelineInterpreter(ruleService, pipelineService, functions);
+
+        final Messages processed = interpreter.process(messageInDefaultStream("message", "test"));
+
+        final List<Message> messages = ImmutableList.copyOf(processed);
+        assertThat(messages).hasSize(1);
+
+        final Message actualMessage = messages.get(0);
+        assertThat(actualMessage.getFieldAs(String.class, "foobar")).isEqualTo("covfefe");
+    }
+
     @SuppressForbidden("Allow using default thread factory")
     private PipelineInterpreter createPipelineInterpreter(RuleService ruleService, PipelineService pipelineService, Map<String, Function<?>> functions) {
         final RuleMetricsConfigService ruleMetricsConfigService = mock(RuleMetricsConfigService.class);

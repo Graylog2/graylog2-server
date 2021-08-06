@@ -37,7 +37,7 @@ export type PipelineType = {
 
 export type StageType = {
   stage: number,
-  match_all: boolean,
+  match: string,
   rules: [string],
 };
 

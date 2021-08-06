@@ -28,6 +28,10 @@ import static com.codahale.metrics.MetricRegistry.name;
 
 @AutoValue
 public abstract class Stage implements Comparable<Stage> {
+    public enum Match {
+        ALL, EITHER, PASS
+    }
+
     private List<Rule> rules;
     // not an autovalue property, because it introduces a cycle in hashCode() and we have no way of excluding it
     private transient Pipeline pipeline;
@@ -35,7 +39,9 @@ public abstract class Stage implements Comparable<Stage> {
     private transient String meterName;
 
     public abstract int stage();
-    public abstract boolean matchAll();
+
+    public abstract Match match();
+
     public abstract List<String> ruleReferences();
 
     public List<Rule> getRules() {
@@ -100,7 +106,7 @@ public abstract class Stage implements Comparable<Stage> {
 
         public abstract Builder stage(int stageNumber);
 
-        public abstract Builder matchAll(boolean mustMatchAll);
+        public abstract Builder match(Match match);
 
         public abstract Builder ruleReferences(List<String> ruleRefs);
     }
