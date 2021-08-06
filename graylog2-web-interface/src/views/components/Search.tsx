@@ -22,7 +22,7 @@ import styled, { css } from 'styled-components';
 import PageContentLayout from 'components/layout/PageContentLayout';
 import withLocation from 'routing/withLocation';
 import type { Location } from 'routing/withLocation';
-import connect from 'stores/connect';
+import connect, { useStore } from 'stores/connect';
 import Sidebar from 'views/components/sidebar/Sidebar';
 import WithSearchStatus from 'views/components/WithSearchStatus';
 import SearchResult from 'views/components/SearchResult';
@@ -64,6 +64,7 @@ import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import { RefluxActions } from 'stores/StoreTypes';
 import MessageEventTypesProvider from 'views/components/contexts/MessageEventTypesProvider';
 import FieldAndValueActionsProvider from 'views/components/contexts/FieldAndValueActionsProvider';
+import CurrentUserContext from 'contexts/CurrentUserContext';
 
 const GridContainer = styled.div<{ interactive: boolean }>(({ interactive }) => {
   return interactive ? css`
@@ -141,11 +142,17 @@ const _refreshIfNotUndeclared = (searchRefreshHooks: Array<SearchRefreshConditio
 const SearchBarWithStatus = WithSearchStatus(SearchBar);
 const DashboardSearchBarWithStatus = WithSearchStatus(DashboardSearchBar);
 
-const ViewAdditionalContextProvider = connect(
-  AdditionalContext.Provider,
-  { view: ViewStore, configs: SearchConfigStore },
-  ({ view, configs: { searchesClusterConfig } }) => ({ value: { view: view.view, analysisDisabledFields: searchesClusterConfig?.analysis_disabled_fields } } as { value: object}),
-);
+const ViewAdditionalContextProvider = ({ children }: { children: React.ReactNode }) => {
+  const { view } = useStore(ViewStore);
+  const { searchesClusterConfig } = useStore(SearchConfigStore) ?? {};
+  const currentUser = useContext(CurrentUserContext);
+
+  return (
+    <AdditionalContext.Provider value={{ view, analysisDisabledFields: searchesClusterConfig.analysis_disabled_fields, currentUser }}>
+      {children}
+    </AdditionalContext.Provider>
+  );
+};
 
 ViewAdditionalContextProvider.displayName = 'ViewAdditionalContextProvider';
 
