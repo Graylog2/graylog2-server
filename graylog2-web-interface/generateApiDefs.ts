@@ -136,7 +136,7 @@ const createProps = (properties) => Object.entries(properties)
   ));
 
 const bannedModels = [...Object.keys(typeMappings), 'DateTime', 'DateTimeZone', 'Chronology', 'String>', 'LocalDateTime', 'Type'];
-const isNotBannedModel = ([name]: [string, ...any]) => !bannedModels.includes(name) && !name.endsWith('>');
+const isNotBannedModel = ([name]) => !bannedModels.includes(name) && !name.endsWith('>');
 
 const createModel = ([name, definition]) => (definition.type === 'object'
   ? ts.factory.createInterfaceDeclaration(
