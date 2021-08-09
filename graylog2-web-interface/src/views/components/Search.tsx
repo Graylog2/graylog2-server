@@ -148,7 +148,7 @@ const ViewAdditionalContextProvider = ({ children }: { children: React.ReactNode
   const currentUser = useContext(CurrentUserContext);
 
   return (
-    <AdditionalContext.Provider value={{ view, analysisDisabledFields: searchesClusterConfig.analysis_disabled_fields, currentUser }}>
+    <AdditionalContext.Provider value={{ view, analysisDisabledFields: searchesClusterConfig?.analysis_disabled_fields, currentUser }}>
       {children}
     </AdditionalContext.Provider>
   );
