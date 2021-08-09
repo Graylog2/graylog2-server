@@ -136,7 +136,7 @@ const createProps = (properties) => Object.entries(properties)
   ));
 
 const bannedModels = [...Object.keys(typeMappings), 'DateTime', 'DateTimeZone', 'Chronology', 'String>', 'LocalDateTime', 'Type'];
-const isNotBannedModel = ([name]) => !bannedModels.includes(name) && !name.endsWith('>');
+const isNotBannedModel = ([name]: [string, ...any]) => !bannedModels.includes(name) && !name.endsWith('>');
 
 const createModel = ([name, definition]) => (definition.type === 'object'
   ? ts.factory.createInterfaceDeclaration(
@@ -238,7 +238,7 @@ const sortByOptionality = (parameter1, parameter2) => parameter2.required - para
 
 const cleanParameterName = (name) => name.replace(/\s/g, '');
 
-const createFunctionParameter = ({ name, required, defaultValue, type, paramType, enum: allowableValues }) => ts.factory.createParameterDeclaration(
+const createFunctionParameter = ({ name, required, defaultValue, type, enum: allowableValues }) => ts.factory.createParameterDeclaration(
   undefined,
   undefined,
   undefined,
