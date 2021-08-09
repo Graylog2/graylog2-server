@@ -37,6 +37,7 @@ class NodesActions extends React.Component {
   _toggleMessageProcessing = () => {
     const { systemOverview, node } = this.props;
 
+    // eslint-disable-next-line no-alert
     if (window.confirm(`You are about to ${systemOverview.is_processing ? 'pause' : 'resume'} message processing in this node. Are you sure?`)) {
       if (systemOverview.is_processing) {
         SystemProcessingStore.pause(node.node_id);
@@ -48,6 +49,7 @@ class NodesActions extends React.Component {
 
   _changeLBStatus = (status) => {
     return () => {
+      // eslint-disable-next-line no-alert
       if (window.confirm(`You are about to change the load balancer status for this node to ${status}. Are you sure?`)) {
         const { node } = this.props;
         SystemLoadBalancerStore.override(node.node_id, status);
