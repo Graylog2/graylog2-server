@@ -27,7 +27,6 @@ import HideOnCloud from 'util/conditional/HideOnCloud';
 
 const SystemProcessingStore = StoreProvider.getStore('SystemProcessing');
 const SystemLoadBalancerStore = StoreProvider.getStore('SystemLoadBalancer');
-const SystemShutdownStore = StoreProvider.getStore('SystemShutdown');
 
 class NodesActions extends React.Component {
   static propTypes = {
@@ -51,12 +50,6 @@ class NodesActions extends React.Component {
         SystemLoadBalancerStore.override(this.props.node.node_id, status);
       }
     };
-  };
-
-  _shutdown = () => {
-    if (prompt('Do you really want to shutdown this node? Confirm by typing "SHUTDOWN".') === 'SHUTDOWN') {
-      SystemShutdownStore.shutdown(this.props.node.node_id);
-    }
   };
 
   render() {
@@ -88,10 +81,6 @@ class NodesActions extends React.Component {
               <MenuItem onSelect={this._changeLBStatus('ALIVE')}>ALIVE</MenuItem>
               <MenuItem onSelect={this._changeLBStatus('DEAD')}>DEAD</MenuItem>
             </DropdownSubmenu>
-          </IfPermitted>
-
-          <IfPermitted permissions="node:shutdown">
-            <MenuItem onSelect={this._shutdown}>Graceful shutdown</MenuItem>
           </IfPermitted>
 
           <IfPermitted permissions={['processing:changestate', 'lbstatus:change', 'node:shutdown']} anyPermissions>
