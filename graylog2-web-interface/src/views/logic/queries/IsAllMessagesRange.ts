@@ -20,7 +20,7 @@ import { isTypeRelativeWithEnd, isTypeRelativeWithStartOnly } from 'views/typeGu
 import { TimeRange } from 'views/logic/queries/Query';
 
 const isAllMessagesRange = (timeRange: TimeRange) => {
-  return (isTypeRelativeWithEnd(timeRange) && timeRange.from === RELATIVE_ALL_TIME && !timeRange.to) || (isTypeRelativeWithStartOnly(timeRange) && timeRange.range === RELATIVE_ALL_TIME);
+  return (isTypeRelativeWithEnd(timeRange) && timeRange.from === RELATIVE_ALL_TIME) || (isTypeRelativeWithStartOnly(timeRange) && timeRange.range === RELATIVE_ALL_TIME);
 };
 
 export default isAllMessagesRange;
