@@ -339,6 +339,8 @@ const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed });
 
 fs.mkdirSync(dstDir, { recursive: true });
 
+const apisSet = new Set();
+
 apiSummary.apis.forEach(({ path, name: rawName }) => {
   const name = rawName.replace(/ /g, '');
   const apiJson = fs.readFileSync(`${srcDir}${path}.json`).toString();
@@ -362,6 +364,23 @@ apiSummary.apis.forEach(({ path, name: rawName }) => {
   fs.mkdirSync(directory, { recursive: true });
 
   fs.writeFileSync(fullFilename, result);
+  apisSet.add(name);
 });
+
+const cleanIdentifier = (name) => name.replace(/\//g, '');
+
+const apis = [...apisSet];
+const packageIndexFile = ts.createSourceFile('index.ts', '', ts.ScriptTarget.ESNext, false, ts.ScriptKind.TS);
+const reexports = ts.factory.createNodeArray(apis.map((name) => ts.factory.createExportDeclaration(
+  undefined,
+  undefined,
+  false,
+  ts.factory.createNamespaceExport(ts.factory.createIdentifier(cleanIdentifier(name))),
+  createString(`./${name}`),
+)));
+
+const packageIndex = printer.printList(ts.ListFormat.MultiLine, reexports, packageIndexFile);
+const fullPackageIndexPath = `${dstDir}/index.ts`;
+fs.writeFileSync(fullPackageIndexPath, packageIndex);
 
 console.log('done.');
