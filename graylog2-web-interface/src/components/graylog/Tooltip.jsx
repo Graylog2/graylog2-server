@@ -135,7 +135,7 @@ Tooltip.defaultProps = {
   positionLeft: undefined,
   arrowOffsetTop: undefined,
   arrowOffsetLeft: undefined,
-  show: false,
+  show: true,
 };
 
 /** @component */
