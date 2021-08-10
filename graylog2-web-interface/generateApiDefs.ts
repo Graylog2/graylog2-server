@@ -7,7 +7,10 @@ const { dirname } = require('path');
 const { chunk } = require('lodash');
 const ts = require('typescript');
 
+const readonlyModifier = ts.factory.createModifier(ts.SyntaxKind.ReadonlyKeyword);
+
 const createString = (s) => ts.factory.createStringLiteral(s, true);
+const quotePropNameIfNeeded = (propName) => (propName.match(/^[0-9]/) ? createString(propName) : propName);
 
 // ===== Types ===== //
 const primitiveTypeMappings = {
@@ -61,7 +64,7 @@ const createEnumType = ({ type, enum: enumOptions }) => {
 
 const createIndexerSignature = (additionalProperties) => (additionalProperties ? [ts.factory.createIndexSignature(
   undefined,
-  undefined,
+  [readonlyModifier],
   [ts.factory.createParameterDeclaration(
     undefined,
     undefined,
@@ -105,8 +108,8 @@ const createTypeFor = (propDef) => {
 
     const properties = propDef.properties
       ? Object.entries(propDef.properties).map(([propName, propType]) => ts.factory.createPropertySignature(
-        undefined,
-        ts.factory.createIdentifier(propName),
+        [readonlyModifier],
+        quotePropNameIfNeeded(propName),
         undefined,
         createTypeFor(propType),
       ))
@@ -124,13 +127,11 @@ const createTypeFor = (propDef) => {
     : typeReferenceNode;
 };
 
-const readonlyModifier = ts.factory.createModifier(ts.SyntaxKind.ReadonlyKeyword);
-
 // ===== Models ===== //
 const createProps = (properties) => Object.entries(properties)
   .map(([propName, propDef]) => ts.factory.createPropertySignature(
     [readonlyModifier],
-    propName,
+    quotePropNameIfNeeded(propName),
     undefined,
     createTypeFor(propDef),
   ));
@@ -162,7 +163,7 @@ const createResultTypeFor = (typeNode) => ts.factory.createTypeReferenceNode('Pr
 
 // === Functions === //
 
-const extractVariable = (segment) => segment.replace(/[{}]/g, '');
+const extractVariable = (segment) => segment.replace(/[{}]/g, '').split(':')[0];
 
 const createTemplateString = (path) => {
   const segments = path.split(/({.+?})/);
