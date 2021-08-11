@@ -22,9 +22,11 @@ import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import ActionsProvider from 'injection/ActionsProvider';
 
+import { singletonStore } from '../../views/logic/singleton';
+
 const LookupTablesActions = ActionsProvider.getActions('LookupTables');
 
-const LookupTablesStore = Reflux.createStore({
+const LookupTablesStore = singletonStore('LookupTables', () => Reflux.createStore({
   listenables: [LookupTablesActions],
   pagination: {
     page: 1,
@@ -274,6 +276,7 @@ const LookupTablesStore = Reflux.createStore({
   _urlClusterWise(path) {
     return qualifyUrl(`/cluster/system/lookup/${path}`);
   },
-});
+}));
 
+export { LookupTablesStore, LookupTablesActions };
 export default LookupTablesStore;
