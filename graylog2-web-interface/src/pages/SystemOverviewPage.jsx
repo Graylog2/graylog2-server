@@ -14,7 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
+import { useEffect, useState } from 'react';
 
 import { DocumentTitle, IfPermitted } from 'components/common';
 import { IndexerClusterHealth, IndexerFailuresComponent } from 'components/indexers';
@@ -24,43 +25,55 @@ import { SystemMessagesComponent } from 'components/systemmessages';
 import { TimesList } from 'components/times';
 import { GraylogClusterOverview } from 'components/cluster';
 import HideOnCloud from 'util/conditional/HideOnCloud';
+import CombinedProvider from 'injection/CombinedProvider';
+import usePluginEntities from 'views/logic/usePluginEntities';
 
-class SystemOverviewPage extends React.Component {
-  render() {
-    return (
-      <DocumentTitle title="System overview">
-        <span>
-          <IfPermitted permissions="notifications:read">
-            <NotificationsList />
+const { EnterpriseActions } = CombinedProvider.get('Enterprise');
+
+const SystemOverviewPage = () => {
+  const [loadEnterpriseIndexerFailures, setLoadEnterpriseIndexerFailures] = useState(false);
+  const pluginSystemOverview = usePluginEntities('systemOverview');
+  const EnterpriseIndexerFailures = pluginSystemOverview[0].component;
+
+  useEffect(() => {
+    EnterpriseActions.getLicenseInfo().then((response) => {
+      setLoadEnterpriseIndexerFailures(response.free_license_info.license_status === 'installed');
+    });
+  });
+
+  return (
+    <DocumentTitle title="System overview">
+      <span>
+        <IfPermitted permissions="notifications:read">
+          <NotificationsList />
+        </IfPermitted>
+
+        <HideOnCloud>
+          <IfPermitted permissions="systemjobs:read">
+            <SystemJobsComponent />
+          </IfPermitted>
+        </HideOnCloud>
+
+        <GraylogClusterOverview />
+
+        <HideOnCloud>
+          <IfPermitted permissions="indexercluster:read">
+            <IndexerClusterHealth />
           </IfPermitted>
 
-          <HideOnCloud>
-            <IfPermitted permissions="systemjobs:read">
-              <SystemJobsComponent />
-            </IfPermitted>
-          </HideOnCloud>
-
-          <GraylogClusterOverview />
-
-          <HideOnCloud>
-            <IfPermitted permissions="indexercluster:read">
-              <IndexerClusterHealth />
-            </IfPermitted>
-
-            <IfPermitted permissions="indices:failures">
-              <IndexerFailuresComponent />
-            </IfPermitted>
-          </HideOnCloud>
-
-          <TimesList />
-
-          <IfPermitted permissions="systemmessages:read">
-            <SystemMessagesComponent />
+          <IfPermitted permissions="indices:failures">
+            {loadEnterpriseIndexerFailures ? <EnterpriseIndexerFailures /> : <IndexerFailuresComponent />}
           </IfPermitted>
-        </span>
-      </DocumentTitle>
-    );
-  }
-}
+        </HideOnCloud>
+
+        <TimesList />
+
+        <IfPermitted permissions="systemmessages:read">
+          <SystemMessagesComponent />
+        </IfPermitted>
+      </span>
+    </DocumentTitle>
+  );
+};
 
 export default SystemOverviewPage;
