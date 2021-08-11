@@ -62,6 +62,8 @@ const createEnumType = ({ type, enum: enumOptions }) => {
   return ts.factory.createUnionTypeNode(types);
 };
 
+const wrapAdditionalProperties = (additionalProperties) => (typeof additionalProperties === 'string' ? ({ type: additionalProperties }) : additionalProperties);
+
 const createIndexerSignature = (additionalProperties) => (additionalProperties ? [ts.factory.createIndexSignature(
   undefined,
   [readonlyModifier],
@@ -74,7 +76,7 @@ const createIndexerSignature = (additionalProperties) => (additionalProperties ?
     ts.factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
     undefined,
   )],
-  createTypeFor(additionalProperties),
+  createTypeFor(wrapAdditionalProperties(additionalProperties)),
 )] : []);
 
 const createTypeFor = (propDef) => {
