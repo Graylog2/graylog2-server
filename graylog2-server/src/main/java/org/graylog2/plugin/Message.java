@@ -281,7 +281,7 @@ public class Message implements Messages, Indexable {
     private ArrayList<Recording> recordings;
 
     /**
-     * A metadata map for storing custom-defined attributes that need to accompany the message throughout the Graylog
+     * A metadata map for storing custom-defined attributes that need to accompany the message throughout the
      * processing lifecycle. The value is intentionally not initialized by default, to avoid allocating unneeded
      * memory for messages that don't need to use metadata.
      */
