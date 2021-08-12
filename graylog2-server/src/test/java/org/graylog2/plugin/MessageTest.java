@@ -353,13 +353,13 @@ public class MessageTest {
         final DateTime dateTime = new DateTime(2015, 9, 8, 0, 0, DateTimeZone.UTC);
 
         message.addField(Message.FIELD_TIMESTAMP,
-                dateTime.toDate());
+                         dateTime.toDate());
 
         final Map<String, Object> elasticSearchObject = message.toElasticSearchObject(objectMapper, invalidTimestampMeter);
         final Object esTimestampFormatted = elasticSearchObject.get(Message.FIELD_TIMESTAMP);
 
         assertEquals("Setting message timestamp as java.util.Date results in correct format for elasticsearch",
-                Tools.buildElasticSearchTimeFormat(dateTime), esTimestampFormatted);
+                     Tools.buildElasticSearchTimeFormat(dateTime), esTimestampFormatted);
     }
 
     @Test

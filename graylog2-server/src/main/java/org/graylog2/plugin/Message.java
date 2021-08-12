@@ -196,20 +196,20 @@ public class Message implements Messages, Indexable {
     private static final char KEY_REPLACEMENT_CHAR = '_';
 
     private static final ImmutableSet<String> GRAYLOG_FIELDS = ImmutableSet.of(
-            FIELD_GL2_ACCOUNTED_MESSAGE_SIZE,
-            FIELD_GL2_ORIGINAL_TIMESTAMP,
-            FIELD_GL2_PROCESSING_ERROR,
-            FIELD_GL2_PROCESSING_TIMESTAMP,
-            FIELD_GL2_RECEIVE_TIMESTAMP,
-            FIELD_GL2_REMOTE_HOSTNAME,
-            FIELD_GL2_REMOTE_IP,
-            FIELD_GL2_REMOTE_PORT,
-            FIELD_GL2_SOURCE_COLLECTOR,
-            FIELD_GL2_SOURCE_COLLECTOR_INPUT,
-            FIELD_GL2_SOURCE_INPUT,
-            FIELD_GL2_SOURCE_NODE,
-            FIELD_GL2_SOURCE_RADIO,
-            FIELD_GL2_SOURCE_RADIO_INPUT
+        FIELD_GL2_ACCOUNTED_MESSAGE_SIZE,
+        FIELD_GL2_ORIGINAL_TIMESTAMP,
+        FIELD_GL2_PROCESSING_ERROR,
+        FIELD_GL2_PROCESSING_TIMESTAMP,
+        FIELD_GL2_RECEIVE_TIMESTAMP,
+        FIELD_GL2_REMOTE_HOSTNAME,
+        FIELD_GL2_REMOTE_IP,
+        FIELD_GL2_REMOTE_PORT,
+        FIELD_GL2_SOURCE_COLLECTOR,
+        FIELD_GL2_SOURCE_COLLECTOR_INPUT,
+        FIELD_GL2_SOURCE_INPUT,
+        FIELD_GL2_SOURCE_NODE,
+        FIELD_GL2_SOURCE_RADIO,
+        FIELD_GL2_SOURCE_RADIO_INPUT
     );
 
     // Graylog Illuminate Fields
@@ -222,41 +222,41 @@ public class Message implements Messages, Indexable {
     );
 
     private static final ImmutableSet<String> CORE_MESSAGE_FIELDS = ImmutableSet.of(
-            FIELD_MESSAGE,
-            FIELD_SOURCE,
-            FIELD_TIMESTAMP
+        FIELD_MESSAGE,
+        FIELD_SOURCE,
+        FIELD_TIMESTAMP
     );
 
     private static final ImmutableSet<String> ES_FIELDS = ImmutableSet.of(
-            // ElasticSearch fields.
-            FIELD_ID,
-            "_ttl",
-            "_source",
-            "_all",
-            "_index",
-            "_type",
-            "_score"
+        // ElasticSearch fields.
+        FIELD_ID,
+        "_ttl",
+        "_source",
+        "_all",
+        "_index",
+        "_type",
+        "_score"
     );
 
     public static final ImmutableSet<String> RESERVED_SETTABLE_FIELDS = new ImmutableSet.Builder<String>()
-            .addAll(GRAYLOG_FIELDS)
-            .addAll(CORE_MESSAGE_FIELDS)
-            .build();
+        .addAll(GRAYLOG_FIELDS)
+        .addAll(CORE_MESSAGE_FIELDS)
+        .build();
 
     public static final ImmutableSet<String> RESERVED_FIELDS = new ImmutableSet.Builder<String>()
-            .addAll(RESERVED_SETTABLE_FIELDS)
-            .addAll(ES_FIELDS)
-            .build();
+        .addAll(RESERVED_SETTABLE_FIELDS)
+        .addAll(ES_FIELDS)
+        .build();
 
     public static final ImmutableSet<String> FILTERED_FIELDS = new ImmutableSet.Builder<String>()
-            .addAll(GRAYLOG_FIELDS)
-            .addAll(ES_FIELDS)
-            .add(FIELD_STREAMS)
-            .add(FIELD_FULL_MESSAGE)
-            .build();
+        .addAll(GRAYLOG_FIELDS)
+        .addAll(ES_FIELDS)
+        .add(FIELD_STREAMS)
+        .add(FIELD_FULL_MESSAGE)
+        .build();
 
     private static final ImmutableSet<String> REQUIRED_FIELDS = ImmutableSet.of(
-            FIELD_MESSAGE, FIELD_ID
+        FIELD_MESSAGE, FIELD_ID
     );
 
     @Deprecated
@@ -290,7 +290,6 @@ public class Message implements Messages, Indexable {
     private com.codahale.metrics.Counter sizeCounter = new com.codahale.metrics.Counter();
 
     private static final IdentityHashMap<Class<?>, Integer> classSizes = Maps.newIdentityHashMap();
-
     static {
         classSizes.put(byte.class, 1);
         classSizes.put(Byte.class, 1);
@@ -400,7 +399,7 @@ public class Message implements Messages, Indexable {
                     obj.put(newKey, value);
                 } else {
                     LOG.warn("Keys must not contain a \".\" character! Ignoring field \"{}\"=\"{}\" in message [{}] - Unable to replace \".\" with a \"{}\" because of key conflict: \"{}\"=\"{}\"",
-                            key, value, getId(), KEY_REPLACEMENT_CHAR, newKey, obj.get(newKey));
+                        key, value, getId(), KEY_REPLACEMENT_CHAR, newKey, obj.get(newKey));
                     LOG.debug("Full message with \".\" in message key: {}", this);
                 }
             } else {
@@ -409,7 +408,7 @@ public class Message implements Messages, Indexable {
                     // Deliberate warning duplicates because the key with the "." might be transformed before reaching
                     // the duplicate original key with a "_". Otherwise we would silently overwrite the transformed key.
                     LOG.warn("Keys must not contain a \".\" character! Ignoring field \"{}\"=\"{}\" in message [{}] - Unable to replace \".\" with a \"{}\" because of key conflict: \"{}\"=\"{}\"",
-                            newKey, fields.get(newKey), getId(), KEY_REPLACEMENT_CHAR, key, value);
+                        newKey, fields.get(newKey), getId(), KEY_REPLACEMENT_CHAR, key, value);
                     LOG.debug("Full message with \".\" in message key: {}", this);
                 }
                 obj.put(key, value);
@@ -919,7 +918,6 @@ public class Message implements Messages, Indexable {
         static Timing timing(String name, long elapsedNanos) {
             return new Timing(name, elapsedNanos);
         }
-
         public static Message.Counter counter(String name, int counter) {
             return new Counter(name, counter);
         }
