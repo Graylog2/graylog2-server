@@ -10,7 +10,7 @@ const ts = require('typescript');
 const readonlyModifier = ts.factory.createModifier(ts.SyntaxKind.ReadonlyKeyword);
 
 const createString = (s) => ts.factory.createStringLiteral(s, true);
-const quotePropNameIfNeeded = (propName) => (propName.match(/^[0-9]/) ? createString(propName) : propName);
+const quotePropNameIfNeeded = (propName) => (propName.match(/^[0-9@]/) ? createString(propName) : propName);
 
 // ===== Types ===== //
 const primitiveTypeMappings = {
@@ -32,6 +32,7 @@ const typeMappings = {
   DateTime: 'string',
   String: 'string',
   ChunkedOutput: 'unknown',
+  ZonedDateTime: 'string',
 };
 
 const isURN = (type) => type.split(':').length > 1;
@@ -138,7 +139,7 @@ const createProps = (properties) => Object.entries(properties)
     createTypeFor(propDef),
   ));
 
-const bannedModels = [...Object.keys(typeMappings), 'DateTime', 'DateTimeZone', 'Chronology', 'String>', 'LocalDateTime', 'Type'];
+const bannedModels = [...Object.keys(typeMappings), 'DateTime', 'DateTimeZone', 'Chronology', 'String>', 'LocalDateTime', 'Type', 'TemporalUnit'];
 const isNotBannedModel = ([name]) => !bannedModels.includes(name) && !name.endsWith('>');
 
 const createModel = ([name, definition]) => (definition.type === 'object'
@@ -232,10 +233,23 @@ const createBlock = (method, path, bodyParameter, queryParameter, rawProduces) =
 };
 
 const isNumeric = (type) => ['integer'].includes(type);
+const isBoolean = (type) => ['boolean'].includes(type);
 
-const createInitializer = (type, defaultValue) => (isNumeric(type)
-  ? ts.factory.createNumericLiteral(defaultValue)
-  : createString(defaultValue));
+const createInitializer = (type, defaultValue) => {
+  if (isNumeric(type)) {
+    return ts.factory.createNumericLiteral(defaultValue);
+  }
+
+  if (isBoolean(type)) {
+    switch (defaultValue) {
+      case 'true': return ts.factory.createTrue();
+      case 'false': return ts.factory.createFalse();
+      default: throw new Error(`Invalid boolean value: ${defaultValue}`);
+    }
+  }
+
+  return createString(defaultValue);
+};
 
 const sortByOptionality = (parameter1, parameter2) => parameter2.required - parameter1.required;
 
