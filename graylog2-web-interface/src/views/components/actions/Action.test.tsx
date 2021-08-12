@@ -18,6 +18,7 @@ import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import { createSimpleExternalValueAction } from 'fixtures/externalValueActions';
+import { ActionContexts } from 'views/types';
 
 import FieldAndValueActionsContext, { FieldAndValueActionsContextType } from 'views/components/contexts/FieldAndValueActionsContext';
 import FieldType from 'views/logic/fieldtypes/FieldType';
@@ -32,7 +33,7 @@ describe('Action', () => {
     field: 'field1',
     value: 'field-value',
     type: new FieldType('string', [], []),
-    contexts: {},
+    contexts: {} as ActionContexts,
   };
 
   type Props = Partial<React.ComponentProps<typeof Action>> & {
