@@ -68,7 +68,7 @@ export default class Search {
 
   get requiredParameters(): Immutable.Set<Parameter> {
     return this.parameters
-      .filter((p) => (!p.defaultValue && (!p.optional || p.needsBinding))).toSet();
+      .filter((p) => (!p.defaultValue && (!p.optional && p.needsBinding))).toSet();
   }
 
   // eslint-disable-next-line @typescript-eslint/no-use-before-define
