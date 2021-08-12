@@ -16,7 +16,7 @@
     "@babel/eslint-parser": "7.13.14",
     "@typescript-eslint/parser": "4.29.1",
     "@typescript-eslint/eslint-plugin": "4.26.1",
-    "eslint": "7.30.0",
+    "eslint": "7.32.0",
     "eslint-config-airbnb": "18.2.0",
     "eslint-import-resolver-webpack": "0.13.1",
     "eslint-plugin-compat": "3.12.0",
