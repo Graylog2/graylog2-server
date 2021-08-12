@@ -19,7 +19,7 @@ import styled from 'styled-components';
 
 import { Panel } from 'components/graylog';
 import { Input } from 'components/bootstrap';
-import { Select } from 'components/common';
+import Select from 'components/common/Select';
 import { naturalSortIgnoreCase } from 'util/SortUtils';
 import Spinner from 'components/common/Spinner';
 

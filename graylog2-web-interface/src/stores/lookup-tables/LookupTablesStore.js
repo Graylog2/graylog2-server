@@ -20,11 +20,9 @@ import UserNotification from 'util/UserNotification';
 import PaginationURL from 'util/PaginationURL';
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
-import ActionsProvider from 'injection/ActionsProvider';
+import LookupTablesActions from 'actions/lookup-tables/LookupTablesActions';
 
 import { singletonStore } from '../../views/logic/singleton';
-
-const LookupTablesActions = ActionsProvider.getActions('LookupTables');
 
 const LookupTablesStore = singletonStore('LookupTables', () => Reflux.createStore({
   listenables: [LookupTablesActions],
