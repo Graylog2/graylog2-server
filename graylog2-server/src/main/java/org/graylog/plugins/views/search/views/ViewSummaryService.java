@@ -37,15 +37,6 @@ public class ViewSummaryService extends PaginatedDbService<ViewSummaryDTO> {
         super(mongoConnection, mapper, ViewSummaryDTO.class, COLLECTION_NAME);
     }
 
-    private PaginatedList<ViewSummaryDTO> searchPaginated(DBQuery.Query query,
-                                                          Predicate<ViewSummaryDTO> filter,
-                                                          String order,
-                                                          String sortField,
-                                                          int page,
-                                                          int perPage) {
-        return findPaginatedWithQueryFilterAndSort(query, filter, getSortBuilder(order, sortField), page, perPage);
-    }
-
     private PaginatedList<ViewSummaryDTO> searchPaginatedWithGrandTotal(DBQuery.Query query,
                                                    Predicate<ViewSummaryDTO> filter,
                                                    String order,
