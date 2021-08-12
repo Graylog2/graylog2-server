@@ -19,23 +19,38 @@ import * as Immutable from 'immutable';
 
 import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
 
-export interface OktaBackendConfig {
-  type: 'okta';
-  oktaBaseUrl: string;
+export interface SharedBackendConfig {
+  type: string;
   clientId: string;
   clientSecret: string;
   tokenVerifierConnectTimeout: string;
   callbackUrl: string;
 }
 
-export interface OktaBackendConfigJson {
-  type: 'okta';
-  okta_base_url: string;
+export interface OktaBackendConfig extends SharedBackendConfig {
+  oktaBaseUrl?: string;
+}
+export interface OidcBackendConfig extends SharedBackendConfig {
+  baseUrl?: string;
+}
+
+export type BackendConfig = OktaBackendConfig | OidcBackendConfig;
+export interface SharedBackendConfigJson {
+  type: string;
   client_id: string;
   client_secret: string;
   token_verifier_connect_timeout: string;
   callback_url: string;
 }
+export interface OktaBackendConfigJson extends SharedBackendConfigJson {
+  okta_base_url: string;
+}
+
+export interface OidcBackendConfigJson extends SharedBackendConfigJson {
+  base_url: string;
+}
+
+export type BackendConfigJson = OktaBackendConfigJson | OidcBackendConfigJson
 export interface OktaTeamSyncConfig {
   teamSelectionType?: 'all' | 'include' | 'exclude',
   teamSelection?: Immutable.Set<string>,
@@ -54,12 +69,23 @@ export interface OktaTeamSyncConfigJson {
   },
 }
 
-export interface OktaBackend {
+export interface SharedBackendProps {
   id: $PropertyType<AuthenticationBackend, 'id'>;
   defaultRoles: $PropertyType<AuthenticationBackend, 'defaultRoles'>;
   title: $PropertyType<AuthenticationBackend, 'title'>;
   description: $PropertyType<AuthenticationBackend, 'description'>;
+}
+
+export interface OktaBackend extends SharedBackendProps{
   config: Omit<OktaBackendConfig, 'clientSecret'> & {
     clientSecret: { is_set: boolean };
   };
 }
+
+export interface OidcBackend extends SharedBackendProps {
+  config: Omit<OidcBackendConfig, 'clientSecret'> & {
+    clientSecret: { is_set: boolean };
+  };
+}
+
+export type Backend = OidcBackend | OktaBackend;
