@@ -32,6 +32,7 @@ import * as FormsUtils from 'util/FormsUtils';
 import CombinedProvider from 'injection/CombinedProvider';
 import { SearchMetadataActions } from 'views/stores/SearchMetadataStore';
 import PermissionsMixin from 'util/PermissionsMixin';
+import LookupTableParameter from 'views/logic/parameters/LookupTableParameter';
 
 import EditQueryParameterModal from '../event-definition-form/EditQueryParameterModal';
 import commonStyles from '../common/commonStyles.css';
@@ -226,9 +227,9 @@ class FilterForm extends React.Component {
     const parameterButtons = queryParameters.map((queryParam) => {
       return (
         <EditQueryParameterModal key={queryParam.name}
-                                 queryParameter={queryParam}
+                                 queryParameter={LookupTableParameter.fromJSON(queryParam)}
                                  eventDefinition={eventDefinition}
-                                 lookupTables={lookupTables.tables || []}
+                                 lookupTables={lookupTables.tables}
                                  validation={validation}
                                  onChange={onChange} />
       );
