@@ -29,6 +29,7 @@ import com.google.common.collect.Iterators;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.net.InetAddresses;
+import org.apache.commons.lang3.StringUtils;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.messages.Indexable;
 import org.graylog2.plugin.streams.Stream;
@@ -52,6 +53,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
@@ -194,20 +196,20 @@ public class Message implements Messages, Indexable {
     private static final char KEY_REPLACEMENT_CHAR = '_';
 
     private static final ImmutableSet<String> GRAYLOG_FIELDS = ImmutableSet.of(
-        FIELD_GL2_ACCOUNTED_MESSAGE_SIZE,
-        FIELD_GL2_ORIGINAL_TIMESTAMP,
-        FIELD_GL2_PROCESSING_ERROR,
-        FIELD_GL2_PROCESSING_TIMESTAMP,
-        FIELD_GL2_RECEIVE_TIMESTAMP,
-        FIELD_GL2_REMOTE_HOSTNAME,
-        FIELD_GL2_REMOTE_IP,
-        FIELD_GL2_REMOTE_PORT,
-        FIELD_GL2_SOURCE_COLLECTOR,
-        FIELD_GL2_SOURCE_COLLECTOR_INPUT,
-        FIELD_GL2_SOURCE_INPUT,
-        FIELD_GL2_SOURCE_NODE,
-        FIELD_GL2_SOURCE_RADIO,
-        FIELD_GL2_SOURCE_RADIO_INPUT
+            FIELD_GL2_ACCOUNTED_MESSAGE_SIZE,
+            FIELD_GL2_ORIGINAL_TIMESTAMP,
+            FIELD_GL2_PROCESSING_ERROR,
+            FIELD_GL2_PROCESSING_TIMESTAMP,
+            FIELD_GL2_RECEIVE_TIMESTAMP,
+            FIELD_GL2_REMOTE_HOSTNAME,
+            FIELD_GL2_REMOTE_IP,
+            FIELD_GL2_REMOTE_PORT,
+            FIELD_GL2_SOURCE_COLLECTOR,
+            FIELD_GL2_SOURCE_COLLECTOR_INPUT,
+            FIELD_GL2_SOURCE_INPUT,
+            FIELD_GL2_SOURCE_NODE,
+            FIELD_GL2_SOURCE_RADIO,
+            FIELD_GL2_SOURCE_RADIO_INPUT
     );
 
     // Graylog Illuminate Fields
@@ -220,41 +222,41 @@ public class Message implements Messages, Indexable {
     );
 
     private static final ImmutableSet<String> CORE_MESSAGE_FIELDS = ImmutableSet.of(
-        FIELD_MESSAGE,
-        FIELD_SOURCE,
-        FIELD_TIMESTAMP
+            FIELD_MESSAGE,
+            FIELD_SOURCE,
+            FIELD_TIMESTAMP
     );
 
     private static final ImmutableSet<String> ES_FIELDS = ImmutableSet.of(
-        // ElasticSearch fields.
-        FIELD_ID,
-        "_ttl",
-        "_source",
-        "_all",
-        "_index",
-        "_type",
-        "_score"
+            // ElasticSearch fields.
+            FIELD_ID,
+            "_ttl",
+            "_source",
+            "_all",
+            "_index",
+            "_type",
+            "_score"
     );
 
     public static final ImmutableSet<String> RESERVED_SETTABLE_FIELDS = new ImmutableSet.Builder<String>()
-        .addAll(GRAYLOG_FIELDS)
-        .addAll(CORE_MESSAGE_FIELDS)
-        .build();
+            .addAll(GRAYLOG_FIELDS)
+            .addAll(CORE_MESSAGE_FIELDS)
+            .build();
 
     public static final ImmutableSet<String> RESERVED_FIELDS = new ImmutableSet.Builder<String>()
-        .addAll(RESERVED_SETTABLE_FIELDS)
-        .addAll(ES_FIELDS)
-        .build();
+            .addAll(RESERVED_SETTABLE_FIELDS)
+            .addAll(ES_FIELDS)
+            .build();
 
     public static final ImmutableSet<String> FILTERED_FIELDS = new ImmutableSet.Builder<String>()
-        .addAll(GRAYLOG_FIELDS)
-        .addAll(ES_FIELDS)
-        .add(FIELD_STREAMS)
-        .add(FIELD_FULL_MESSAGE)
-        .build();
+            .addAll(GRAYLOG_FIELDS)
+            .addAll(ES_FIELDS)
+            .add(FIELD_STREAMS)
+            .add(FIELD_FULL_MESSAGE)
+            .build();
 
     private static final ImmutableSet<String> REQUIRED_FIELDS = ImmutableSet.of(
-        FIELD_MESSAGE, FIELD_ID
+            FIELD_MESSAGE, FIELD_ID
     );
 
     @Deprecated
@@ -278,9 +280,17 @@ public class Message implements Messages, Indexable {
 
     private ArrayList<Recording> recordings;
 
+    /**
+     * A metadata map for storing custom-defined attributes that need to accompany the message throughout the Graylog
+     * processing lifecycle. The value is intentionally not initialized by default, to avoid allocating unneeded
+     * memory for messages that don't need to use metadata.
+     */
+    private Map<String, Object> metadata;
+
     private com.codahale.metrics.Counter sizeCounter = new com.codahale.metrics.Counter();
 
     private static final IdentityHashMap<Class<?>, Integer> classSizes = Maps.newIdentityHashMap();
+
     static {
         classSizes.put(byte.class, 1);
         classSizes.put(Byte.class, 1);
@@ -390,7 +400,7 @@ public class Message implements Messages, Indexable {
                     obj.put(newKey, value);
                 } else {
                     LOG.warn("Keys must not contain a \".\" character! Ignoring field \"{}\"=\"{}\" in message [{}] - Unable to replace \".\" with a \"{}\" because of key conflict: \"{}\"=\"{}\"",
-                        key, value, getId(), KEY_REPLACEMENT_CHAR, newKey, obj.get(newKey));
+                            key, value, getId(), KEY_REPLACEMENT_CHAR, newKey, obj.get(newKey));
                     LOG.debug("Full message with \".\" in message key: {}", this);
                 }
             } else {
@@ -399,7 +409,7 @@ public class Message implements Messages, Indexable {
                     // Deliberate warning duplicates because the key with the "." might be transformed before reaching
                     // the duplicate original key with a "_". Otherwise we would silently overwrite the transformed key.
                     LOG.warn("Keys must not contain a \".\" character! Ignoring field \"{}\"=\"{}\" in message [{}] - Unable to replace \".\" with a \"{}\" because of key conflict: \"{}\"=\"{}\"",
-                        newKey, fields.get(newKey), getId(), KEY_REPLACEMENT_CHAR, key, value);
+                            newKey, fields.get(newKey), getId(), KEY_REPLACEMENT_CHAR, key, value);
                     LOG.debug("Full message with \".\" in message key: {}", this);
                 }
                 obj.put(key, value);
@@ -909,6 +919,7 @@ public class Message implements Messages, Indexable {
         static Timing timing(String name, long elapsedNanos) {
             return new Timing(name, elapsedNanos);
         }
+
         public static Message.Counter counter(String name, int counter) {
             return new Counter(name, counter);
         }
@@ -952,5 +963,41 @@ public class Message implements Messages, Indexable {
         public String apply(final Message input) {
             return input.getId();
         }
+    }
+
+    /**
+     * Store the specified metadata value within the message's internal metadata map.
+     *
+     * @param key   A globally unique string key identifier for the metadata value.
+     * @param value The metadata object value.
+     */
+    public void setMetadata(String key, Object value) {
+        Preconditions.checkArgument(StringUtils.isNotEmpty(key), "A non-empty key is required.");
+        Preconditions.checkNotNull(value);
+        if (metadata == null) {
+            metadata = new HashMap<>();
+        }
+    }
+
+    /**
+     * Get the metadata value for the specified key.
+     *
+     * @param key The string key for the metadata entry.
+     */
+    public Object getMetadataValue(String key) {
+        return metadata.get(key);
+    }
+
+    /**
+     * Remove the metadata value for the specified key.
+     *
+     * @param key The string key for the metadata entry.
+     */
+    public void removeMetadata(String key) {
+        Preconditions.checkArgument(StringUtils.isNotEmpty(key), "A non-empty key is required.");
+        if (metadata == null) {
+            return;
+        }
+        metadata.remove(key);
     }
 }

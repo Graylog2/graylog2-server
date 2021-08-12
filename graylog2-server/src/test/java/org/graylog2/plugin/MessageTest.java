@@ -38,6 +38,7 @@ import org.junit.Test;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
+import java.lang.reflect.Field;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -352,13 +353,13 @@ public class MessageTest {
         final DateTime dateTime = new DateTime(2015, 9, 8, 0, 0, DateTimeZone.UTC);
 
         message.addField(Message.FIELD_TIMESTAMP,
-                         dateTime.toDate());
+                dateTime.toDate());
 
         final Map<String, Object> elasticSearchObject = message.toElasticSearchObject(objectMapper, invalidTimestampMeter);
         final Object esTimestampFormatted = elasticSearchObject.get(Message.FIELD_TIMESTAMP);
 
         assertEquals("Setting message timestamp as java.util.Date results in correct format for elasticsearch",
-                     Tools.buildElasticSearchTimeFormat(dateTime), esTimestampFormatted);
+                Tools.buildElasticSearchTimeFormat(dateTime), esTimestampFormatted);
     }
 
     @Test
@@ -637,5 +638,19 @@ public class MessageTest {
         final Message message = new Message("message", "source", Tools.nowUTC());
         message.addField(Message.FIELD_TIMESTAMP, ThaiBuddhistDate.of(0, 4, 19));
         assertThat(message.getTimestamp()).isGreaterThan(new DateTime(2018, 4, 19, 0, 0, 0, 0, DateTimeZone.UTC));
+    }
+
+    @Test
+    public void testSetMessageState() throws NoSuchFieldException, IllegalAccessException {
+        final Message message = new Message("message", "source", Tools.nowUTC());
+        final Field stateMap = Message.class.getDeclaredField("metadata");
+        assertNull(stateMap.get(message));
+        message.setMetadata("stateKey", 10L);
+        assertNotNull(stateMap.get(message));
+        assertEquals(10L, message.getMetadataValue("stateKey"));
+        message.removeMetadata("badKey");
+        assertEquals(10L, message.getMetadataValue("stateKey"));
+        message.removeMetadata("stateKey");
+        assertNull(message.getMetadataValue("stateKey"));
     }
 }
