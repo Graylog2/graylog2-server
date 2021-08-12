@@ -136,7 +136,7 @@ const LookupTableParameterEdit = ({
             <h5>Limitations</h5>
             <p>
               Please note that maximum number of supported results is 1024. If the lookup table returns
-              more results, the event definition is not executed.
+              more results, the query is not executed.
             </p>
           </Panel.Body>
         </Panel.Collapse>
