@@ -36,10 +36,15 @@ import CurrentViewTypeProvider from 'views/components/views/CurrentViewTypeProvi
 import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 import { SearchExecutionResult } from 'views/actions/SearchActions';
 import WindowLeaveMessage from 'views/components/common/WindowLeaveMessage';
+import MockSearchPageLayoutProvider from 'views/components/contexts/SearchPageLayoutProvider';
 
 import Search from './Search';
 
 import { useSyncWithQueryParameters } from '../hooks/SyncWithQueryParameters';
+
+jest.mock('views/components/contexts/SearchPageLayoutProvider', () => jest.fn(
+  jest.requireActual('views/components/contexts/SearchPageLayoutProvider').default,
+));
 
 jest.mock('util/History');
 jest.mock('components/layout/Footer', () => mockComponent('Footer'));
@@ -288,6 +293,10 @@ describe('Search', () => {
   });
 
   it('changing current query in view does not trigger search execution', async () => {
+    const MockTest = <div>Test</div>;
+
+    asMock(MockSearchPageLayoutProvider).mockReturnValue(MockTest);
+
     render(<SimpleSearch />);
 
     asMock(SearchActions.execute).mockClear();

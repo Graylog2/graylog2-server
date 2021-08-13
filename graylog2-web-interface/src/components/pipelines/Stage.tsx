@@ -59,9 +59,26 @@ const Stage = ({ stage, pipeline, isLastStage, onUpdate, onDelete }: Props) => {
   if (isLastStage) {
     description = 'There are no further stages in this pipeline. Once rules in this stage are applied, the pipeline will have finished processing.';
   } else {
+    let matchText;
+
+    switch (stage.match) {
+      case 'ALL':
+        matchText = 'all rules';
+        break;
+      case 'EITHER':
+        matchText = 'at least one rule';
+        break;
+      case 'PASS':
+        matchText = 'none or more rules';
+        break;
+      default:
+        matchText = 'UNKNOWN';
+        break;
+    }
+
     description = (
       <span>
-        Messages satisfying <strong>{stage.match_all ? 'all rules' : 'at least one rule'}</strong>{' '}
+        Messages satisfying <strong>{matchText}</strong>{' '}
         in this stage, will continue to the next stage.
       </span>
     );

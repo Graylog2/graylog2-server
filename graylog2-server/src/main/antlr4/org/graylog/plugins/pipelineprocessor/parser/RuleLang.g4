@@ -55,7 +55,7 @@ pipelineDeclaration
     ;
 
 stageDeclaration
-    :   Stage stage=Integer Match modifier=(All|Either)
+    :   Stage stage=Integer Match modifier=(All|Either|Pass)
         ruleRef*
     ;
 
@@ -125,6 +125,7 @@ literal
 
 All : A L L;
 Either: E I T H E R;
+Pass: P A S S;
 And : A N D | '&&';
 Or: O R | '||';
 Not: N O T | '!';

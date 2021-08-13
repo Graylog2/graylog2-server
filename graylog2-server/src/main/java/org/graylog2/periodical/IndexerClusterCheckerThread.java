@@ -23,6 +23,7 @@ import org.graylog2.indexer.cluster.health.AbsoluteValueWatermarkSettings;
 import org.graylog2.indexer.cluster.health.ClusterAllocationDiskSettings;
 import org.graylog2.indexer.cluster.health.NodeDiskUsageStats;
 import org.graylog2.indexer.cluster.health.NodeFileDescriptorStats;
+import org.graylog2.indexer.cluster.health.NodeRole;
 import org.graylog2.indexer.cluster.health.PercentageWatermarkSettings;
 import org.graylog2.indexer.cluster.health.WatermarkSettings;
 import org.graylog2.notifications.Notification;
@@ -113,6 +114,11 @@ public class IndexerClusterCheckerThread extends Periodical {
                 final Set<NodeDiskUsageStats> diskUsageStats = cluster.getDiskUsageStats();
 
                 for (NodeDiskUsageStats nodeDiskUsageStats : diskUsageStats) {
+                    if (!nodeHoldsData(nodeDiskUsageStats)) {
+                        LOG.debug("Ignoring non-data ES node <{}/{}> with roles <{}> for disk usage check.",
+                                nodeDiskUsageStats.host(), nodeDiskUsageStats.ip(), nodeDiskUsageStats.roles());
+                        continue;
+                    }
                     Notification.Type currentNodeNotificationType = null;
                     WatermarkSettings<?> watermarkSettings = settings.watermarkSettings();
                     if (watermarkSettings instanceof PercentageWatermarkSettings) {
@@ -138,6 +144,10 @@ public class IndexerClusterCheckerThread extends Periodical {
         } catch (Exception e) {
             LOG.error("Error while trying to check Elasticsearch disk usage.Details: " + e.getMessage());
         }
+    }
+
+    private boolean nodeHoldsData(NodeDiskUsageStats nodeDiskUsageStats) {
+        return nodeDiskUsageStats.roles().stream().anyMatch(NodeRole::holdsData);
     }
 
     private Notification.Type getDiskUsageNotificationTypeByPercentage(PercentageWatermarkSettings settings, NodeDiskUsageStats nodeDiskUsageStats) {
