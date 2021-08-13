@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
+// eslint-disable-next-line import/prefer-default-export
 export const createLookupTable = (index = 1, overrides = {}) => ({
   cache_id: 'cache-id',
   content_pack: null,
