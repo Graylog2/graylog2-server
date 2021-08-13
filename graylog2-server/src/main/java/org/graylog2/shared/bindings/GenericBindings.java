@@ -18,9 +18,7 @@ package org.graylog2.shared.bindings;
 
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.eventbus.EventBus;
-import com.google.common.util.concurrent.Service;
 import com.google.common.util.concurrent.ServiceManager;
-import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
@@ -31,11 +29,12 @@ import okhttp3.OkHttpClient;
 import org.graylog.failure.DefaultFailureHandler;
 import org.graylog.failure.DefaultFailureHandlingConfiguration;
 import org.graylog.failure.FailureHandler;
-import org.graylog.failure.FailureHandlingService;
 import org.graylog.failure.FailureHandlingConfiguration;
+import org.graylog.failure.FailureHandlingService;
 import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.buffers.InputBuffer;
+import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
 import org.graylog2.plugin.system.NodeId;
@@ -54,7 +53,7 @@ import javax.activation.MimetypesFileTypeMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Semaphore;
 
-public class GenericBindings extends AbstractModule {
+public class GenericBindings extends Graylog2Module {
 
     @Override
     protected void configure() {
@@ -96,11 +95,6 @@ public class GenericBindings extends AbstractModule {
                 .to(DefaultFailureHandlingConfiguration.class);
 
         serviceBinder().addBinding().to(FailureHandlingService.class).in(Scopes.SINGLETON);
-    }
-
-    // TODO inherit from Graylog2Module instead?
-    protected Multibinder<Service> serviceBinder() {
-        return Multibinder.newSetBinder(binder(), Service.class);
     }
 
 }
