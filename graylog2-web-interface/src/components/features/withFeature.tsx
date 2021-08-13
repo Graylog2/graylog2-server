@@ -17,16 +17,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import Feature from './Feature';
+import IfFeatureEnabled from './IfFeatureEnabled';
 
 const withFeature = <Props extends {}>(
   featureName: string,
   Component: React.ComponentType<Props>,
 ): React.ComponentType<Props> => {
   return (props) => (
-    <Feature name={featureName}>
+    <IfFeatureEnabled name={featureName}>
       <Component {...props} />
-    </Feature>
+    </IfFeatureEnabled>
   );
 };
 

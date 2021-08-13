@@ -25,7 +25,7 @@ type Props = {
   children: React.ReactElement,
 }
 
-const Feature = ({ name, fallback, children }: Props) => {
+const IfFeatureEnabled = ({ name, fallback, children }: Props) => {
   const hasFeature = useFeature(name);
 
   if (hasFeature) {
@@ -35,14 +35,14 @@ const Feature = ({ name, fallback, children }: Props) => {
   return fallback;
 };
 
-Feature.propTypes = {
+IfFeatureEnabled.propTypes = {
   name: PropTypes.string.isRequired,
   fallback: PropTypes.node,
   children: PropTypes.node.isRequired,
 };
 
-Feature.defaultProps = {
+IfFeatureEnabled.defaultProps = {
   fallback: null,
 };
 
-export default Feature;
+export default IfFeatureEnabled;
