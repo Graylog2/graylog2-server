@@ -638,4 +638,24 @@ public class MessageTest {
         message.addField(Message.FIELD_TIMESTAMP, ThaiBuddhistDate.of(0, 4, 19));
         assertThat(message.getTimestamp()).isGreaterThan(new DateTime(2018, 4, 19, 0, 0, 0, 0, DateTimeZone.UTC));
     }
+
+    @Test
+    public void testMetadata() throws NoSuchFieldException, IllegalAccessException {
+        final Message message = new Message("message", "source", Tools.nowUTC());
+
+        // Ensure an exception is not thrown for an uninitialized metadata map.
+        assertThat(message.getMetadataValue("stateKey")).isNull();
+
+        // Set and get value.
+        message.setMetadata("stateKey", 10L);
+        assertThat(message.getMetadataValue("stateKey")).isEqualTo(10L);
+        assertThat(message.getMetadataValue("stateKey", "default")).isEqualTo(10L);
+        assertThat(message.getMetadataValue("badKey", "default")).isEqualTo("default");
+
+        // Test value removal.
+        message.removeMetadata("badKey");
+        assertThat(message.getMetadataValue("stateKey")).isEqualTo(10L);
+        message.removeMetadata("stateKey");
+        assertThat(message.getMetadataValue("stateKey")).isNull();
+    }
 }
