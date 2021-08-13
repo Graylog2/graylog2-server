@@ -979,8 +979,14 @@ metric_mappings:
   - metric_name: "elasticsearch_output_writes"
     match_pattern: "org.graylog2.outputs.ElasticSearchOutput.writes"
 
-  - metric_name: "elasticsearch_output_queue_size"
-    match_pattern: "org.graylog2.periodical.IndexFailuresPeriodical.queueSize"
+  - metric_name: "failure_queue_size"
+    match_pattern: "org.graylog.failure.FailureSubmissionQueue.queueSize"
+
+  - metric_name: "failure_queue_submitted_failures"
+    match_pattern: "org.graylog.failure.FailureSubmissionQueue.submittedFailures"
+
+  - metric_name: "failure_queue_consumed_failures"
+    match_pattern: "org.graylog.failure.FailureSubmissionQueue.consumedFailures"
 
   - metric_name: "mongodb_auth_cache_manager_evictions"
     match_pattern: "org.graylog2.security.MongoDbAuthorizationCacheManager.cache.evictions"
