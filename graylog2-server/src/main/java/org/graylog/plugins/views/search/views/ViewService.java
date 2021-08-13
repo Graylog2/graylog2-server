@@ -30,6 +30,7 @@ import org.mongojack.DBQuery;
 import org.mongojack.WriteResult;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
@@ -70,7 +71,12 @@ public class ViewService extends PaginatedDbService<ViewDTO> {
                                                    DBQuery.Query grandTotalQuery,
                                                    int page,
                                                    int perPage) {
-        return findPaginatedWithQueryFilterAndSortWithGrandTotal(query, filter, getSortBuilder(order, sortField), grandTotalQuery, page, perPage);
+        final PaginatedList<ViewDTO> viewsList = findPaginatedWithQueryFilterAndSortWithGrandTotal(query, filter, getSortBuilder(order, sortField), grandTotalQuery, page, perPage);
+        return viewsList.stream()
+                .map(this::requirementsForView)
+                .collect(Collectors.toCollection(() -> viewsList.grandTotal()
+                        .map(grandTotal -> new PaginatedList<ViewDTO>(new ArrayList<>(viewsList.size()), viewsList.pagination().total(), page, perPage, grandTotal))
+                        .orElseGet(() -> new PaginatedList<>(new ArrayList<>(viewsList.size()), viewsList.pagination().total(), page, perPage))));
     }
 
     public PaginatedList<ViewDTO> searchPaginated(SearchQuery query,
