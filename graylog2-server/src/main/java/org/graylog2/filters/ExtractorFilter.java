@@ -19,6 +19,7 @@ package org.graylog2.filters;
 import com.google.common.collect.ImmutableList;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import org.graylog.failure.ProcessingFailureCause;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
@@ -31,6 +32,7 @@ import org.graylog2.plugin.inputs.Extractor;
 import org.graylog2.rest.models.system.inputs.responses.InputCreated;
 import org.graylog2.rest.models.system.inputs.responses.InputDeleted;
 import org.graylog2.rest.models.system.inputs.responses.InputUpdated;
+import org.graylog2.shared.utilities.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,8 +79,11 @@ public class ExtractorFilter implements MessageFilter {
                 extractor.runExtractor(msg);
             } catch (Exception e) {
                 extractor.incrementExceptions();
-                LOG.error("Could not apply extractor \"" + extractor.getTitle() + "\" (id=" + extractor.getId() + ") "
-                        + "to message " + msg.getId(), e);
+                final String error = "Could not apply extractor \"" + extractor.getTitle() + "\" (id=" + extractor.getId() + ") "
+                        + "to message " + msg.getId();
+                LOG.error(error, e);
+                msg.addProcessingError(new Message.ProcessingError(ProcessingFailureCause.ExtractorException,
+                        error, ExceptionUtils.getShortenedStackTrace(e)));
             }
         }
 
