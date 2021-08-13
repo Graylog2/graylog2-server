@@ -20,7 +20,9 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog.plugins.pipelineprocessor.ast.Stage;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.Min;
 import java.util.List;
 
@@ -31,19 +33,19 @@ public abstract class StageSource {
     @JsonProperty("stage")
     public abstract int stage();
 
-    @JsonProperty("match_all")
-    public abstract boolean matchAll();
+    @JsonProperty("match")
+    public abstract Stage.Match match();
 
     @JsonProperty("rules")
     public abstract List<String> rules();
 
     @JsonCreator
     public static StageSource create(@JsonProperty("stage") @Min(0) int stage,
-                                     @JsonProperty("match_all") boolean matchAll,
+                                     @JsonProperty("match") @Nullable Stage.Match match,
                                      @JsonProperty("rules") List<String> rules) {
         return builder()
                 .stage(stage)
-                .matchAll(matchAll)
+                .match(match)
                 .rules(rules)
                 .build();
     }
@@ -60,7 +62,7 @@ public abstract class StageSource {
 
         public abstract Builder stage(int stageNumber);
 
-        public abstract Builder matchAll(boolean mustMatchAll);
+        public abstract Builder match(Stage.Match match);
 
         public abstract Builder rules(List<String> ruleRefs);
     }
