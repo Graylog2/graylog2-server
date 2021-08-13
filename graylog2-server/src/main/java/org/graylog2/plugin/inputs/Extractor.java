@@ -22,8 +22,10 @@ import com.codahale.metrics.Timer;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.graylog.failure.ProcessingFailureCause;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.database.EmbeddedPersistable;
+import org.graylog2.shared.utilities.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -212,7 +214,10 @@ public abstract class Extractor implements EmbeddedPersistable {
 
             try (final Timer.Context ignored2 = executionTimer.time()) {
                 final Result[] results = run(field);
-                if (results == null || results.length == 0 || Arrays.stream(results).anyMatch(result -> result.getValue() == null)) {
+                if (results != null && results.length == 1 && results[0].exception != null) {
+                    final String error = "Could not apply extractor \"" + getTitle() + "\" (id=" + getId() + ") ";
+                    msg.addProcessingError(new Message.ProcessingError(ProcessingFailureCause.ExtractorException, error, ExceptionUtils.getShortenedStackTrace(results[0].exception)));
+                } else if (results == null || results.length == 0 || Arrays.stream(results).anyMatch(result -> result.getValue() == null)) {
                     return;
                 } else if (results.length == 1 && results[0].target == null) {
                     // results[0].target is null if this extractor cannot produce multiple fields use targetField in that case
@@ -419,16 +424,22 @@ public abstract class Extractor implements EmbeddedPersistable {
         private final String target;
         private final int beginIndex;
         private final int endIndex;
+        private final Throwable exception;
 
         public Result(String value, int beginIndex, int endIndex) {
             this(value, null, beginIndex, endIndex);
         }
 
         public Result(Object value, String target, int beginIndex, int endIndex) {
+            this(value, target, beginIndex, endIndex, null);
+        }
+
+        public Result(Object value, String target, int beginIndex, int endIndex, Throwable exception) {
             this.value = value;
             this.target = target;
             this.beginIndex = beginIndex;
             this.endIndex = endIndex;
+            this.exception = exception;
         }
 
         public Object getValue() {
@@ -449,8 +460,12 @@ public abstract class Extractor implements EmbeddedPersistable {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             Result result = (Result) o;
             return Objects.equals(beginIndex, result.beginIndex) &&
                     Objects.equals(endIndex, result.endIndex) &&
