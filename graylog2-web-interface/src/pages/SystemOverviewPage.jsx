@@ -15,9 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
-import { DocumentTitle, IfPermitted } from 'components/common';
+import { DocumentTitle, IfPermitted, Spinner } from 'components/common';
 import { IndexerClusterHealth, IndexerFailuresComponent } from 'components/indexers';
 import { NotificationsList } from 'components/notifications';
 import { SystemJobsComponent } from 'components/systemjobs';
@@ -31,17 +31,22 @@ import usePluginEntities from 'views/logic/usePluginEntities';
 const { EnterpriseActions } = CombinedProvider.get('Enterprise');
 
 const SystemOverviewPage = () => {
-  const [loadEnterpriseIndexerFailures, setLoadEnterpriseIndexerFailures] = useState(false);
+  const [loadIndexerFailuresComponent, setLoadIndexerFailuresComponent] = useState(<Spinner text="Looking for Index Failures..." />);
+
   const pluginSystemOverview = usePluginEntities('systemOverview');
   const EnterpriseIndexerFailures = pluginSystemOverview?.[0]?.component;
 
-  useEffect(() => {
+  const renderEnterpriseIndexerFailures = () => {
     if (EnterpriseIndexerFailures) {
       EnterpriseActions.getLicenseInfo().then((response) => {
-        setLoadEnterpriseIndexerFailures(response.free_license_info.license_status === 'installed');
+        setLoadIndexerFailuresComponent(response.free_license_info.license_status === 'installed' ? <EnterpriseIndexerFailures /> : <IndexerFailuresComponent />);
       });
+    } else {
+      setLoadIndexerFailuresComponent(<IndexerFailuresComponent />);
     }
-  });
+
+    return null;
+  };
 
   return (
     <DocumentTitle title="System overview">
@@ -64,7 +69,8 @@ const SystemOverviewPage = () => {
           </IfPermitted>
 
           <IfPermitted permissions="indices:failures">
-            {loadEnterpriseIndexerFailures ? <EnterpriseIndexerFailures /> : <IndexerFailuresComponent />}
+            {renderEnterpriseIndexerFailures()}
+            {loadIndexerFailuresComponent}
           </IfPermitted>
         </HideOnCloud>
 
