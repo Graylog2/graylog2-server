@@ -176,7 +176,6 @@ public class IndicesAdapterES6 implements IndicesAdapter {
 
     @Override
     public Set<String> resolveAlias(String alias) {
-<<<<<<< HEAD
         // TODO: This is basically getting all indices and later we filter out the alias we want to check for.
         //       This can be done in a more efficient way by either using the /_cat/aliases/<alias-name> API or
         //       the regular /_alias/<alias-name> API.
@@ -194,23 +193,8 @@ public class IndicesAdapterES6 implements IndicesAdapter {
                     .map(JsonNode::fields)
                     .map(ImmutableList::copyOf)
                     .filter(aliases -> !aliases.isEmpty())
-                    .filter(aliases -> aliases.stream().anyMatch(aliasEntry -> aliasEntry.getKey().equals(alias)))
+                    .filter(aliases -> aliases.stream().anyMatch(aliasEntry -> aliasEntry.getKey().equals(uncheckedURLEncode(alias))))
                     .ifPresent(x -> indicesBuilder.add(indexName));
-=======
-        final GetSingleAlias request = new GetSingleAlias.Builder()
-                .alias(uncheckedURLEncode(alias))
-                .build();
-        try {
-            final JestResult jestResult = JestUtils.execute(jestClient, request, () -> "Couldn't collect indices for alias " + alias);
-
-            // The ES return value of this has an awkward format: The first key of the hash is the target index. Thanks.
-            return ImmutableSet.copyOf(jestResult.getJsonObject().fieldNames());
-        } catch (ElasticsearchException e) {
-            if (e.getMessage().startsWith("Couldn't collect indices for alias ")) {
-                return Collections.emptySet();
-            }
-            throw e;
->>>>>>> 4f9e8a2a82... Fixing resolving alias target for index sets with plus in prefix on ES6. (#11142)
         }
 
         return indicesBuilder.build();
