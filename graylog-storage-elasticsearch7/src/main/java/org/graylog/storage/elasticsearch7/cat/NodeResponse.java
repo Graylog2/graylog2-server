@@ -30,6 +30,8 @@ public abstract class NodeResponse {
 
     public abstract String name();
 
+    public abstract String role();
+
     @Nullable
     public abstract String host();
 
@@ -46,6 +48,7 @@ public abstract class NodeResponse {
     @JsonCreator
     public static NodeResponse create(@JsonProperty("id") String id,
                                       @JsonProperty("name") String name,
+                                      @JsonProperty("role") String role,
                                       @JsonProperty("host") @Nullable String host,
                                       @JsonProperty("ip") String ip,
                                       @JsonProperty("diskUsed") String diskUsed,
@@ -55,6 +58,7 @@ public abstract class NodeResponse {
         return new AutoValue_NodeResponse(
                 id,
                 name,
+                role,
                 host,
                 ip,
                 diskUsed,

@@ -16,9 +16,9 @@
  */
 import * as React from 'react';
 import uuid from 'uuid/v4';
+import { ActionContexts } from 'views/types';
 
 import type { FieldName, FieldValue } from 'views/logic/fieldtypes/FieldType';
-import type { ActionContexts } from 'views/logic/ActionContext';
 import type { QueryId } from 'views/logic/queries/Query';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 
@@ -36,35 +36,35 @@ export type ActionComponents = { [key: string]: React.ReactElement<ActionCompone
 
 export type SetActionComponents = (fn: (component: ActionComponents) => ActionComponents) => void;
 
-export type ActionHandlerArguments = {
+export type ActionHandlerArguments<Contexts = ActionContexts> = {
   queryId: QueryId,
   field: FieldName,
   value?: FieldValue,
   type: FieldType,
-  contexts: ActionContexts,
+  contexts: Contexts,
 };
 
-export type ActionHandler = (args: ActionHandlerArguments) => Promise<unknown>;
-export type ActionHandlerCondition = (args: ActionHandlerArguments) => boolean;
+export type ActionHandler<Contexts> = (args: ActionHandlerArguments<Contexts>) => Promise<unknown>;
+export type ActionHandlerCondition<Contexts> = (args: ActionHandlerArguments<Contexts>) => boolean;
 
-export type ActionHandlerConditions = {
-  isEnabled?: ActionHandlerCondition,
-  isHidden?: ActionHandlerCondition,
+export type ActionHandlerConditions<Contexts> = {
+  isEnabled?: ActionHandlerCondition<Contexts>,
+  isHidden?: ActionHandlerCondition<Contexts>,
 };
 
-export type HandlerAction = {
+export type HandlerAction<Contexts> = {
   type: string,
   title: string,
   component?: ActionComponentType,
-  handler?: ActionHandler,
+  handler?: ActionHandler<Contexts>,
   resetFocus: boolean,
-  linkTarget?: (args: ActionHandlerArguments) => string,
+  linkTarget?: (args: ActionHandlerArguments<Contexts>) => string,
 };
 
-export type ActionDefinition = HandlerAction & ActionHandlerConditions;
+export type ActionDefinition<Contexts = ActionContexts> = HandlerAction<Contexts> & ActionHandlerConditions<Contexts>;
 
 // eslint-disable-next-line import/prefer-default-export
-export function createHandlerFor(action: ActionDefinition, setActionComponents: SetActionComponents): ActionHandler {
+export function createHandlerFor<T>(action: ActionDefinition<T>, setActionComponents: SetActionComponents): ActionHandler<T> {
   if (action.handler) {
     return action.handler;
   }

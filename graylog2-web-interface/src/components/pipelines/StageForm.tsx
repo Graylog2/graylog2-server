@@ -130,19 +130,27 @@ const StageForm = ({ pipeline, stage, create, save }: Props) => {
 
           <Input type="radio"
                  id="match_all"
-                 name="match_all"
-                 value="true"
+                 name="match"
+                 value="ALL"
                  label="All rules on this stage match the message"
                  onChange={_onChange}
-                 checked={nextStage.match_all} />
+                 checked={nextStage.match === 'ALL'} />
 
           <Input type="radio"
                  id="match_any"
-                 name="match_all"
-                 value="false"
+                 name="match"
+                 value="EITHER"
                  label="At least one of the rules on this stage matches the message"
                  onChange={_onChange}
-                 checked={!nextStage.match_all} />
+                 checked={nextStage.match === 'EITHER'} />
+
+          <Input type="radio"
+                 id="match_pass"
+                 name="match"
+                 value="PASS"
+                 label="None or more rules on this stage match"
+                 onChange={_onChange}
+                 checked={nextStage.match === 'PASS'} />
 
           <Input id="stage-rules-select"
                  label="Stage rules"
@@ -169,7 +177,7 @@ StageForm.defaultProps = {
   create: false,
   stage: {
     stage: 0,
-    match_all: false,
+    match: 'EITHER',
     rules: [],
   },
 };
