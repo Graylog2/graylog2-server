@@ -975,6 +975,7 @@ public class Message implements Messages, Indexable {
         if (metadata == null) {
             metadata = new HashMap<>();
         }
+        metadata.put(key, value);
     }
 
     /**
@@ -982,8 +983,26 @@ public class Message implements Messages, Indexable {
      *
      * @param key The string key for the metadata entry.
      */
+    @Nullable
     public Object getMetadataValue(String key) {
+        if (metadata == null) {
+            return null;
+        }
         return metadata.get(key);
+    }
+
+    /**
+     * Get the metadata value for the specified key. If not present, then return the default value.
+     *
+     * @param key The string key for the metadata entry.
+     */
+    @Nullable
+    public Object getMetadataValue(String key, Object defaultValue) {
+        if (metadata == null) {
+            return null;
+        }
+        final Object value = metadata.get(key);
+        return value != null ? value : defaultValue;
     }
 
     /**

@@ -38,7 +38,6 @@ import org.junit.Test;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import java.lang.reflect.Field;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -641,16 +640,22 @@ public class MessageTest {
     }
 
     @Test
-    public void testSetMessageState() throws NoSuchFieldException, IllegalAccessException {
+    public void testMetadata() throws NoSuchFieldException, IllegalAccessException {
         final Message message = new Message("message", "source", Tools.nowUTC());
-        final Field stateMap = Message.class.getDeclaredField("metadata");
-        assertNull(stateMap.get(message));
+
+        // Ensure an exception is not thrown for an uninitialized metadata map.
+        assertThat(message.getMetadataValue("stateKey")).isNull();
+
+        // Set and get value.
         message.setMetadata("stateKey", 10L);
-        assertNotNull(stateMap.get(message));
-        assertEquals(10L, message.getMetadataValue("stateKey"));
+        assertThat(message.getMetadataValue("stateKey")).isEqualTo(10L);
+        assertThat(message.getMetadataValue("stateKey", "default")).isEqualTo(10L);
+        assertThat(message.getMetadataValue("badKey", "default")).isEqualTo("default");
+
+        // Test value removal.
         message.removeMetadata("badKey");
-        assertEquals(10L, message.getMetadataValue("stateKey"));
+        assertThat(message.getMetadataValue("stateKey")).isEqualTo(10L);
         message.removeMetadata("stateKey");
-        assertNull(message.getMetadataValue("stateKey"));
+        assertThat(message.getMetadataValue("stateKey")).isNull();
     }
 }
