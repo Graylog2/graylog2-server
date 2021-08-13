@@ -33,12 +33,14 @@ const { EnterpriseActions } = CombinedProvider.get('Enterprise');
 const SystemOverviewPage = () => {
   const [loadEnterpriseIndexerFailures, setLoadEnterpriseIndexerFailures] = useState(false);
   const pluginSystemOverview = usePluginEntities('systemOverview');
-  const EnterpriseIndexerFailures = pluginSystemOverview[0].component;
+  const EnterpriseIndexerFailures = pluginSystemOverview?.[0]?.component ?? null;
 
   useEffect(() => {
-    EnterpriseActions.getLicenseInfo().then((response) => {
-      setLoadEnterpriseIndexerFailures(response.free_license_info.license_status === 'installed');
-    });
+    if (EnterpriseIndexerFailures) {
+      EnterpriseActions.getLicenseInfo().then((response) => {
+        setLoadEnterpriseIndexerFailures(response.free_license_info.license_status === 'installed');
+      });
+    }
   });
 
   return (
