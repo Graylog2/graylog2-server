@@ -38,7 +38,7 @@ export default class AddToQueryHandler extends QueryManipulationHandler {
     return addToQuery(oldQuery, fieldPredicate);
   };
 
-  handle: ActionHandler = ({ queryId, field, value = '', type }) => {
+  handle: ActionHandler<{}> = ({ queryId, field, value = '', type }) => {
     const oldQuery = this.currentQueryString(queryId);
     const newQuery = this.formatNewQuery(oldQuery, field, value, type);
 

@@ -15,14 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import type { ActionContexts } from 'views/types';
 
-export type ActionContexts = { [key: string]: any };
-
-const ActionContext = React.createContext<ActionContexts>({});
+const ActionContext = React.createContext<ActionContexts>({} as ActionContexts);
 
 type Props = {
   children: React.ReactNode,
-  value: ActionContexts;
+  value: Partial<ActionContexts>;
 };
 
 const AdditionalContext = {

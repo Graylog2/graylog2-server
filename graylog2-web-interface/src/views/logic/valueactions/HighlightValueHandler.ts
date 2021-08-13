@@ -34,7 +34,7 @@ const HighlightValueHandler: ValueActionHandler = ({ field, value }) => {
   );
 };
 
-const isEnabled: ActionHandlerCondition = ({ field, value }) => {
+const isEnabled: ActionHandlerCondition<{}> = ({ field, value }) => {
   const highlightingRules = HighlightingRulesStore.getInitialState();
 
   return highlightingRules.find(({ field: f, value: v }) => (field === f && value === v)) === undefined;

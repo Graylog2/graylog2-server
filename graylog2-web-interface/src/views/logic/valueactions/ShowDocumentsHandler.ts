@@ -18,7 +18,6 @@ import { DEFAULT_MESSAGE_FIELDS } from 'views/Constants';
 import { WidgetActions } from 'views/stores/WidgetStore';
 import { escape, addToQuery } from 'views/logic/queries/QueryHelper';
 import TitleTypes from 'views/stores/TitleTypes';
-import { ActionHandlerArguments } from 'views/components/actions/ActionHandler';
 
 import type { ValueActionHandler, ValuePath } from './ValueActionHandler';
 
@@ -46,7 +45,7 @@ const extractFieldsFromValuePath = (valuePath: ValuePath): Array<string> => {
     .reduce((prev, cur) => (prev.includes(cur) ? prev : [...prev, cur]), []);
 };
 
-const ShowDocumentsHandler: ValueActionHandler = ({ contexts: { valuePath, widget } }: ActionHandlerArguments & Arguments) => {
+const ShowDocumentsHandler: ValueActionHandler<Contexts> = ({ contexts: { valuePath, widget } }: Arguments) => {
   const mergedObject = valuePath.reduce((elem, acc) => ({
     ...acc,
     ...elem,
