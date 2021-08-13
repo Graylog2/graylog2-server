@@ -60,7 +60,7 @@ public class FailureSubmissionQueue {
         this.queue = new LinkedBlockingQueue<>(configuration.getFailureHandlingQueueCapacity());
         this.configuration = configuration;
 
-            this.submittedFailureBatches = metricRegistry.meter(name(FailureSubmissionQueue.class, "submittedFailureBatches"));
+        this.submittedFailureBatches = metricRegistry.meter(name(FailureSubmissionQueue.class, "submittedFailureBatches"));
         this.submittedFailures = metricRegistry.meter(name(FailureSubmissionQueue.class, "submittedFailures"));
         this.consumedFailureBatches = metricRegistry.meter(name(FailureSubmissionQueue.class, "consumedFailureBatches"));
         this.consumedFailures = metricRegistry.meter(name(FailureSubmissionQueue.class, "consumedFailures"));
