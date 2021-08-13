@@ -33,7 +33,7 @@ const { EnterpriseActions } = CombinedProvider.get('Enterprise');
 const SystemOverviewPage = () => {
   const [loadEnterpriseIndexerFailures, setLoadEnterpriseIndexerFailures] = useState(false);
   const pluginSystemOverview = usePluginEntities('systemOverview');
-  const EnterpriseIndexerFailures = pluginSystemOverview?.[0]?.component ?? null;
+  const EnterpriseIndexerFailures = pluginSystemOverview?.[0]?.component;
 
   useEffect(() => {
     if (EnterpriseIndexerFailures) {
