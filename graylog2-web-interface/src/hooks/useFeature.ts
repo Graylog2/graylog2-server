@@ -14,27 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import type { ActionContexts } from 'views/types';
 
-const ActionContext = React.createContext<ActionContexts>({} as ActionContexts);
+import AppConfig from 'util/AppConfig';
 
-type Props = {
-  children: React.ReactNode,
-  value: Partial<ActionContexts>;
+const useFeature = (name: string) => {
+  return AppConfig.isFeatureEnabled(name);
 };
 
-const AdditionalContext = {
-  Provider: ({ children, value }: Props) => (
-    <ActionContext.Consumer>
-      {(contexts) => (
-        <ActionContext.Provider value={{ ...contexts, ...value }}>
-          {children}
-        </ActionContext.Provider>
-      )}
-    </ActionContext.Consumer>
-  ),
-  Consumer: ActionContext.Consumer,
-};
-
-export { ActionContext, AdditionalContext };
+export default useFeature;

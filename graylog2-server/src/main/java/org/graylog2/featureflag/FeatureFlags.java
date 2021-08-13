@@ -14,27 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import type { ActionContexts } from 'views/types';
+package org.graylog2.featureflag;
 
-const ActionContext = React.createContext<ActionContexts>({} as ActionContexts);
+import java.util.Map;
 
-type Props = {
-  children: React.ReactNode,
-  value: Partial<ActionContexts>;
-};
+public interface FeatureFlags {
+    Map<String, String> getAll();
 
-const AdditionalContext = {
-  Provider: ({ children, value }: Props) => (
-    <ActionContext.Consumer>
-      {(contexts) => (
-        <ActionContext.Provider value={{ ...contexts, ...value }}>
-          {children}
-        </ActionContext.Provider>
-      )}
-    </ActionContext.Consumer>
-  ),
-  Consumer: ActionContext.Consumer,
-};
+    /**
+     * @param feature name of the feature
+     * @return true if feature is found and is on, false otherwise
+     */
+    boolean isOn(String feature);
 
-export { ActionContext, AdditionalContext };
+    void incrementFeatureIsUsedCounter(String feature);
+}

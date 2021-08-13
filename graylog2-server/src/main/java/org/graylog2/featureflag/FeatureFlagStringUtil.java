@@ -14,27 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import type { ActionContexts } from 'views/types';
+package org.graylog2.featureflag;
 
-const ActionContext = React.createContext<ActionContexts>({} as ActionContexts);
+import java.util.Locale;
 
-type Props = {
-  children: React.ReactNode,
-  value: Partial<ActionContexts>;
-};
+class FeatureFlagStringUtil {
 
-const AdditionalContext = {
-  Provider: ({ children, value }: Props) => (
-    <ActionContext.Consumer>
-      {(contexts) => (
-        <ActionContext.Provider value={{ ...contexts, ...value }}>
-          {children}
-        </ActionContext.Provider>
-      )}
-    </ActionContext.Consumer>
-  ),
-  Consumer: ActionContext.Consumer,
-};
+    static String toUpperCase(String s) {
+        return s.toUpperCase(Locale.ROOT);
+    }
 
-export { ActionContext, AdditionalContext };
+    static boolean startsWithIgnoreCase(String text, String start) {
+        return toUpperCase(text).startsWith(toUpperCase(start));
+    }
+
+    static String stringFormat(String s, Object... args) {
+        return String.format(Locale.ROOT, s, args);
+    }
+}

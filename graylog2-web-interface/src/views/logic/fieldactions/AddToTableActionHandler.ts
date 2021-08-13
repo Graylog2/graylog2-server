@@ -17,8 +17,11 @@
 import { WidgetActions } from 'views/stores/WidgetStore';
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import type { FieldActionHandler, FieldActionHandlerCondition } from 'views/logic/fieldactions/FieldActionHandler';
+import Widget from 'views/logic/widgets/Widget';
 
-const AddToTableActionHandler: FieldActionHandler = ({ field, contexts: { widget } }) => {
+type Contexts = { widget: Widget };
+
+const AddToTableActionHandler: FieldActionHandler<Contexts> = ({ field, contexts: { widget } }) => {
   const newFields = [].concat(widget.config.fields, [field]);
   const newConfig = widget.config.toBuilder()
     .fields(newFields)
@@ -27,7 +30,7 @@ const AddToTableActionHandler: FieldActionHandler = ({ field, contexts: { widget
   return WidgetActions.updateConfig(widget.id, newConfig);
 };
 
-const isEnabled: FieldActionHandlerCondition = ({ contexts: { widget }, field }) => {
+const isEnabled: FieldActionHandlerCondition<Contexts> = ({ contexts: { widget }, field }) => {
   if (MessagesWidget.isMessagesWidget(widget) && widget.config) {
     const fields = widget.config.fields || [];
 
@@ -38,7 +41,7 @@ const isEnabled: FieldActionHandlerCondition = ({ contexts: { widget }, field })
 };
 
 /* Hide AddToTableHandler in the sidebar */
-const isHidden: FieldActionHandlerCondition = ({ contexts: { widget } }) => !widget;
+const isHidden: FieldActionHandlerCondition<Contexts> = ({ contexts: { widget } }) => !widget;
 
 AddToTableActionHandler.isEnabled = isEnabled;
 AddToTableActionHandler.isHidden = isHidden;

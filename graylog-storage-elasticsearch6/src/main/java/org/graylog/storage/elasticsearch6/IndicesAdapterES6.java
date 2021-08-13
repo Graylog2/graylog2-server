@@ -179,7 +179,7 @@ public class IndicesAdapterES6 implements IndicesAdapter {
     @Override
     public Set<String> resolveAlias(String alias) {
         final GetSingleAlias request = new GetSingleAlias.Builder()
-                .alias(alias)
+                .alias(uncheckedURLEncode(alias))
                 .build();
         try {
             final JestResult jestResult = JestUtils.execute(jestClient, request, () -> "Couldn't collect indices for alias " + alias);
