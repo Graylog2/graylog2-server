@@ -23,7 +23,6 @@ import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
-import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.audit.PipelineProcessorAuditEventTypes;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
@@ -118,7 +117,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
                 .stages(pipeline.stages().stream()
                         .map(stage -> StageSource.create(
                                 stage.stage(),
-                                stage.matchAll(),
+                                stage.match(),
                                 stage.ruleReferences()))
                         .collect(Collectors.toList()))
                 .createdAt(now)

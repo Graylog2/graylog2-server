@@ -46,7 +46,7 @@ public class CatApi {
 
     public List<NodeResponse> nodes() {
         final Request request = request("GET", "nodes");
-        request.addParameter("h", "id,name,host,ip,fileDescriptorMax,diskUsed,diskTotal,diskUsedPercent");
+        request.addParameter("h", "id,name,role,host,ip,fileDescriptorMax,diskUsed,diskTotal,diskUsedPercent");
         request.addParameter("full_id", "true");
         return perform(request, new TypeReference<List<NodeResponse>>() {}, "Unable to retrieve nodes list");
     }
