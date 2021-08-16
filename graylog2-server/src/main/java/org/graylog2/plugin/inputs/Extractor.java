@@ -215,8 +215,9 @@ public abstract class Extractor implements EmbeddedPersistable {
             try (final Timer.Context ignored2 = executionTimer.time()) {
                 final Result[] results = run(field);
                 if (results != null && results.length == 1 && results[0].exception != null) {
-                    final String error = "Could not apply extractor \"" + getTitle() + "\" (id=" + getId() + ") ";
-                    msg.addProcessingError(new Message.ProcessingError(ProcessingFailureCause.ExtractorException, error, ExceptionUtils.getShortenedStackTrace(results[0].exception)));
+                    final String error = "Could not apply extractor <" + getTitle() + "(" + getId() + ")>";
+                    msg.addProcessingError(new Message.ProcessingError(
+                            ProcessingFailureCause.ExtractorException, error, ExceptionUtils.getRootCauseMessage(results[0].exception)));
                 } else if (results == null || results.length == 0 || Arrays.stream(results).anyMatch(result -> result.getValue() == null)) {
                     return;
                 } else if (results.length == 1 && results[0].target == null) {
@@ -286,7 +287,14 @@ public abstract class Extractor implements EmbeddedPersistable {
                     }
                 } catch (Exception e) {
                     this.converterExceptions.incrementAndGet();
-                    LOG.error("Could not apply converter [" + converter.getType() + "] of extractor [" + getId() + "].", e);
+                    final String error = "Could not apply converter [" + converter.getType() + "] of extractor <" + getTitle() + " (" + getId() + ")>";
+                    if (LOG.isDebugEnabled()) {
+                        LOG.error(error, e);
+                    } else {
+                        LOG.error("{}:\n{}", error, ExceptionUtils.getShortenedStackTrace(e));
+                    }
+                    msg.addProcessingError(new Message.ProcessingError(ProcessingFailureCause.ExtractorException,
+                            error, ExceptionUtils.getRootCauseMessage(e)));
                 }
             }
         }

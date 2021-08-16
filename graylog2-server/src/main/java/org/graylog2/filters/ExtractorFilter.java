@@ -79,11 +79,14 @@ public class ExtractorFilter implements MessageFilter {
                 extractor.runExtractor(msg);
             } catch (Exception e) {
                 extractor.incrementExceptions();
-                final String error = "Could not apply extractor \"" + extractor.getTitle() + "\" (id=" + extractor.getId() + ") "
-                        + "to message " + msg.getId();
-                LOG.error(error, e);
+                final String error = "Could not apply extractor <" + extractor.getTitle() + "(" + extractor.getId() + ")>";
+                if (LOG.isDebugEnabled()) {
+                    LOG.error(error + " to message " + msg.getId(), e);
+                } else {
+                    LOG.error("{} to message {}:\n{}", error, msg.getId(), ExceptionUtils.getShortenedStackTrace(e));
+                }
                 msg.addProcessingError(new Message.ProcessingError(ProcessingFailureCause.ExtractorException,
-                        error, ExceptionUtils.getShortenedStackTrace(e)));
+                        error, ExceptionUtils.getRootCauseMessage(e)));
             }
         }
 
