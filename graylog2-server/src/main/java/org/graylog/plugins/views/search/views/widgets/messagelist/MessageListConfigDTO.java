@@ -40,7 +40,6 @@ public abstract class MessageListConfigDTO implements WidgetConfigDTO {
     private static final String FIELD_FIELDS = "fields";
     private static final String FIELD_SHOW_MESSAGE_ROW = "show_message_row";
     private static final String FIELD_SHOW_SUMMARY_ROW = "show_summary_row";
-    private static final String FIELD_PREFER_SUMMARY_ROW = "prefer_summary_row";
     private static final String FIELD_DECORATORS = "decorators";
     private static final String FIELD_SORT = "sort";
 
@@ -53,10 +52,6 @@ public abstract class MessageListConfigDTO implements WidgetConfigDTO {
     @JsonProperty(FIELD_SHOW_SUMMARY_ROW)
     @Nullable
     public abstract Boolean showSummaryRow();
-
-    @JsonProperty(FIELD_PREFER_SUMMARY_ROW)
-    @Nullable
-    public abstract Boolean preferSummaryRow();
 
     @JsonProperty(FIELD_DECORATORS)
     public abstract List<Decorator> decorators();
@@ -75,10 +70,6 @@ public abstract class MessageListConfigDTO implements WidgetConfigDTO {
         @JsonProperty(FIELD_SHOW_SUMMARY_ROW)
         @Nullable
         public abstract Builder showSummaryRow(Boolean showSummaryRow);
-
-        @JsonProperty(FIELD_PREFER_SUMMARY_ROW)
-        @Nullable
-        public abstract Builder preferSummaryRow(Boolean preferSummaryRow);
 
         @JsonProperty(FIELD_DECORATORS)
         public Builder _decorators(List<DecoratorImpl> decorators) {

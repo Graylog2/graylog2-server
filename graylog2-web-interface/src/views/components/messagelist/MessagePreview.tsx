@@ -49,18 +49,17 @@ type Props = {
   message: Message,
   showMessageRow?: boolean,
   showSummaryRow?: boolean,
-  preferSummaryRow?: boolean,
   messageFieldType: FieldType,
 };
 
-const MessagePreview = ({ showMessageRow, showSummaryRow, preferSummaryRow, onRowClick, colSpanFixup, message, messageFieldType }: Props) => {
+const MessagePreview = ({ showMessageRow, showSummaryRow, onRowClick, colSpanFixup, message, messageFieldType }: Props) => {
   const messageEvents = useContext(MessageEventTypesContext);
-  const messageSummary = (preferSummaryRow || showSummaryRow) ? getMessageSummary(message.fields, messageEvents) : undefined;
+  const messageSummary = showSummaryRow ? getMessageSummary(message.fields, messageEvents) : undefined;
   const hasMessageSummary = !!messageSummary;
 
   return (
     <>
-      {showMessageRow && !(preferSummaryRow && hasMessageSummary) && (
+      {(showMessageRow && !hasMessageSummary) && (
         <MessageFieldRow onRowClick={onRowClick}
                          colSpanFixup={colSpanFixup}
                          message={message}
@@ -79,7 +78,6 @@ const MessagePreview = ({ showMessageRow, showSummaryRow, preferSummaryRow, onRo
 MessagePreview.defaultProps = {
   showMessageRow: false,
   showSummaryRow: false,
-  preferSummaryRow: false,
 };
 
 export default MessagePreview;

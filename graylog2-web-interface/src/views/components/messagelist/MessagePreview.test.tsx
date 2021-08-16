@@ -63,7 +63,7 @@ describe('MessagePreview', () => {
   );
 
   it('displays message field', () => {
-    render(<SUT showMessageRow preferSummaryRow={false} />);
+    render(<SUT showMessageRow />);
 
     expect(screen.getByText('Something happened!')).toBeInTheDocument();
   });
@@ -86,12 +86,12 @@ describe('MessagePreview', () => {
     expect(screen.queryByText('Value for field 1 - Value for field 2')).not.toBeInTheDocument();
   });
 
-  it('displays message summary instead of message field when `preferSummaryRow` is true', () => {
-    render(<SUT showSummaryRow showMessageRow preferSummaryRow />);
-
-    expect(screen.getByText('Value for field 1 - Value for field 2')).toBeInTheDocument();
-    expect(screen.queryByText('Something happened!')).not.toBeInTheDocument();
-  });
+  // it('displays message summary instead of message field when `preferSummaryRow` is true', () => {
+  //   render(<SUT showSummaryRow showMessageRow preferSummaryRow />);
+  //
+  //   expect(screen.getByText('Value for field 1 - Value for field 2')).toBeInTheDocument();
+  //   expect(screen.queryByText('Something happened!')).not.toBeInTheDocument();
+  // });
 
   it('displays message summary color based on event category', () => {
     const messageEventType = { ...simpleEventType, category: 'success' } as const;

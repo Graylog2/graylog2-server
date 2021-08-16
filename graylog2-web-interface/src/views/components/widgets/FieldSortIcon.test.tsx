@@ -25,7 +25,7 @@ import FieldSortIcon from './FieldSortIcon';
 
 describe('FieldSortIcon', () => {
   const currentSort = new SortConfig(SortConfig.PIVOT_TYPE, 'timestamp', Direction.Descending);
-  const config = new MessagesWidgetConfig(['timestamp', 'source'], true, true, true, [], [currentSort]);
+  const config = new MessagesWidgetConfig(['timestamp', 'source'], true, true, [], [currentSort]);
 
   it('should set descending sort on click, if field sort is not defined', () => {
     const onSortChangeStub = jest.fn(() => Promise.resolve());
@@ -57,7 +57,7 @@ describe('FieldSortIcon', () => {
 
   it('should set descending sort on click, if field sort is descending', () => {
     const initialSort = new SortConfig(SortConfig.PIVOT_TYPE, 'source', Direction.Ascending);
-    const initialConfig = new MessagesWidgetConfig(['timestamp', 'source'], true, true, true, [], [initialSort]);
+    const initialConfig = new MessagesWidgetConfig(['timestamp', 'source'], true, true, [], [initialSort]);
     const onSortChangeStub = jest.fn(() => Promise.resolve());
 
     const { getByTestId } = render(<FieldSortIcon config={initialConfig} fieldName="source" onSortChange={onSortChangeStub} setLoadingState={() => {}} />);

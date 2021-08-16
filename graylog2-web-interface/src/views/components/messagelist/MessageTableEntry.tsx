@@ -89,7 +89,6 @@ type Props = {
   selectedFields?: Immutable.OrderedSet<string>,
   showMessageRow?: boolean,
   showSummaryRow?: boolean,
-  preferSummaryRow?: boolean,
   toggleDetail: (string) => void,
 };
 
@@ -109,7 +108,6 @@ const MessageTableEntry = ({
   message,
   showMessageRow,
   showSummaryRow,
-  preferSummaryRow,
   selectedFields = Immutable.OrderedSet<string>(),
   toggleDetail,
 }: Props) => {
@@ -160,8 +158,7 @@ const MessageTableEntry = ({
                       colSpanFixup={colSpanFixup}
                       messageFieldType={fieldType(MESSAGE_FIELD, message, fields)}
                       onRowClick={_toggleDetail}
-                      message={message}
-                      preferSummaryRow={preferSummaryRow} />
+                      message={message} />
 
       {expanded && (
         <MessageDetailRow>
@@ -210,7 +207,6 @@ MessageTableEntry.defaultProps = {
   selectedFields: Immutable.OrderedSet(),
   showMessageRow: false,
   showSummaryRow: false,
-  preferSummaryRow: false,
 };
 
 export default MessageTableEntry;

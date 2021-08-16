@@ -359,7 +359,7 @@ const exports: PluginExports = {
   ],
   'views.components.widgets.messageTable.previewOptions': [
     {
-      title: 'Show message',
+      title: 'Show message in row',
       isChecked: (config) => config.showMessageRow,
       isDisabled: () => false,
       onChange: (config, onConfigChange) => {
