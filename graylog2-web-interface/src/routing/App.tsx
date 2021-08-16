@@ -26,6 +26,7 @@ import Navigation from 'components/navigation/Navigation';
 import ReportedErrorBoundary from 'components/errors/ReportedErrorBoundary';
 import RuntimeErrorBoundary from 'components/errors/RuntimeErrorBoundary';
 
+import GlobalProviders from './GlobalProviders';
 import 'stylesheets/typeahead.less';
 
 const AppLayout = styled.div`
@@ -65,22 +66,24 @@ const App = ({ children }) => (
       }
 
       return (
-        <ScratchpadProvider loginName={currentUser.username}>
-          <AppLayout>
-            <Navigation />
-            <ScrollToHint id="scroll-to-hint">
-              <Icon name="arrow-up" />
-            </ScrollToHint>
-            <Scratchpad />
-            <ReportedErrorBoundary>
-              <RuntimeErrorBoundary>
-                <PageContent>
-                  {children}
-                </PageContent>
-              </RuntimeErrorBoundary>
-            </ReportedErrorBoundary>
-          </AppLayout>
-        </ScratchpadProvider>
+        <GlobalProviders>
+          <ScratchpadProvider loginName={currentUser.username}>
+            <AppLayout>
+              <Navigation />
+              <ScrollToHint id="scroll-to-hint">
+                <Icon name="arrow-up" />
+              </ScrollToHint>
+              <Scratchpad />
+              <ReportedErrorBoundary>
+                <RuntimeErrorBoundary>
+                  <PageContent>
+                    {children}
+                  </PageContent>
+                </RuntimeErrorBoundary>
+              </ReportedErrorBoundary>
+            </AppLayout>
+          </ScratchpadProvider>
+        </GlobalProviders>
       );
     }}
   </CurrentUserContext.Consumer>

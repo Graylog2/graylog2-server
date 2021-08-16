@@ -88,6 +88,7 @@ declare module 'graylog-web-plugin/plugin' {
     navigation?: Array<PluginNavigation>;
     navigationItems?: Array<PluginNavigationItems>;
     globalNotifications?: Array<GlobalNotification>
+    globalProviders?: Array<React.ComponentType>,
     routes?: Array<PluginRoute>;
     pages?: PluginPages;
     pageFooter?: Array<PluginPageFooter>;
