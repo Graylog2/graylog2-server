@@ -291,11 +291,11 @@ public class PipelineRuleParserTest extends BaseParserTest {
         final Stage stage1 = pipeline.stages().first();
         final Stage stage2 = pipeline.stages().last();
 
-        assertEquals(true, stage1.matchAll());
+        assertEquals(Stage.Match.ALL, stage1.match());
         assertEquals(1, stage1.stage());
         assertArrayEquals(new Object[]{"check_ip_whitelist", "cisco_device"}, stage1.ruleReferences().toArray());
 
-        assertEquals(false, stage2.matchAll());
+        assertEquals(Stage.Match.EITHER, stage2.match());
         assertEquals(2, stage2.stage());
         assertArrayEquals(new Object[]{"parse_cisco_time", "extract_src_dest", "normalize_src_dest", "lookup_ips", "resolve_ips"},
                 stage2.ruleReferences().toArray());

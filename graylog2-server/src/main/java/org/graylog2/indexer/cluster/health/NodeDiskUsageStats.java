@@ -19,12 +19,15 @@ package org.graylog2.indexer.cluster.health;
 import com.google.auto.value.AutoValue;
 
 import javax.annotation.Nullable;
+import java.util.EnumSet;
 
 @AutoValue
 public abstract class NodeDiskUsageStats {
     public static final double DEFAULT_DISK_USED_PERCENT = -1D;
 
     public abstract String name();
+
+    public abstract EnumSet<NodeRole> roles();
 
     public abstract String ip();
 
@@ -39,12 +42,13 @@ public abstract class NodeDiskUsageStats {
 
     public abstract Double diskUsedPercent();
 
-    public static NodeDiskUsageStats create(String name, String ip, @Nullable String host, String diskUsedString, String diskTotalString, Double diskUsedPercent) {
+    public static NodeDiskUsageStats create(String name, String roles, String ip, @Nullable String host, String diskUsedString, String diskTotalString, Double diskUsedPercent) {
         ByteSize diskTotal = SIUnitParser.parseBytesSizeValue(diskTotalString);
         ByteSize diskUsed = SIUnitParser.parseBytesSizeValue(diskUsedString);
         ByteSize diskAvailable = () -> diskTotal.getBytes() - diskUsed.getBytes();
         return new AutoValue_NodeDiskUsageStats(
                 name,
+                NodeRole.parseSymbolString(roles),
                 ip,
                 host,
                 diskTotal,

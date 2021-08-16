@@ -293,7 +293,7 @@ public class PipelineInterpreter implements MessageProcessor {
         log.debug("[{}] evaluating rule conditions in stage {}: match {}",
                 msgId,
                 stage.stage(),
-                stage.matchAll() ? "all" : "either");
+                stage.match());
 
         // TODO the message should be decorated to allow layering changes and isolate stages
         final EvaluationContext context = new EvaluationContext(message);
@@ -329,17 +329,18 @@ public class PipelineInterpreter implements MessageProcessor {
         // OR
         // any rule could match, but at least one had to,
         // record that it is ok to proceed with the pipeline
-        final boolean matchAllSuccess = stage.matchAll() && allRulesMatched;
-        final boolean matchEitherSuccess = !stage.matchAll() && anyRulesMatched;
-        if (matchAllSuccess || matchEitherSuccess) {
+        final boolean matchAllSuccess = Stage.Match.ALL == stage.match() && allRulesMatched;
+        final boolean matchEitherSuccess = Stage.Match.EITHER == stage.match() && anyRulesMatched;
+        final boolean matchIsPass = Stage.Match.PASS == stage.match();
+        if (matchAllSuccess || matchEitherSuccess || matchIsPass) {
             interpreterListener.continuePipelineExecution(pipeline, stage);
             log.debug("[{}] stage {} for pipeline `{}` required match: {}, ok to proceed with next stage",
-                    msgId, stage.stage(), pipeline.name(), stage.matchAll() ? "all" : "either");
+                    msgId, stage.stage(), pipeline.name(), stage.match());
         } else {
             // no longer execute stages from this pipeline, the guard prevents it
             interpreterListener.stopPipelineExecution(pipeline, stage);
             log.debug("[{}] stage {} for pipeline `{}` required match: {}, NOT ok to proceed with next stage",
-                    msgId, stage.stage(), pipeline.name(), stage.matchAll() ? "all" : "either");
+                    msgId, stage.stage(), pipeline.name(), stage.match());
             pipelinesToSkip.add(pipeline);
         }
 

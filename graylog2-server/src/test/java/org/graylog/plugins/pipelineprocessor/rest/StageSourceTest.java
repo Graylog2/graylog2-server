@@ -18,6 +18,7 @@ package org.graylog.plugins.pipelineprocessor.rest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.graylog.plugins.pipelineprocessor.ast.Stage;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Test;
 
@@ -30,11 +31,11 @@ public class StageSourceTest {
 
     @Test
     public void testSerialization() throws Exception {
-        final StageSource stageSource = StageSource.create(23, true, Collections.singletonList("some-rule"));
+        final StageSource stageSource = StageSource.create(23, Stage.Match.ALL, Collections.singletonList("some-rule"));
         final JsonNode json = objectMapper.convertValue(stageSource, JsonNode.class);
 
         assertThat(json.path("stage").asInt()).isEqualTo(23);
-        assertThat(json.path("match_all").asBoolean()).isTrue();
+        assertThat(json.path("match").asText()).isEqualTo("ALL");
         assertThat(json.path("rules").isArray()).isTrue();
         assertThat(json.path("rules")).hasSize(1);
         assertThat(json.path("rules").get(0).asText()).isEqualTo("some-rule");
@@ -42,10 +43,10 @@ public class StageSourceTest {
 
     @Test
     public void testDeserialization() throws Exception {
-        final String json = "{\"stage\":23,\"match_all\":true,\"rules\":[\"some-rule\"]}";
+        final String json = "{\"stage\":23,\"match\":\"ALL\",\"rules\":[\"some-rule\"]}";
         final StageSource stageSource = objectMapper.readValue(json, StageSource.class);
         assertThat(stageSource.stage()).isEqualTo(23);
-        assertThat(stageSource.matchAll()).isTrue();
+        assertThat(stageSource.match()).isEqualTo(Stage.Match.ALL);
         assertThat(stageSource.rules())
                 .hasSize(1)
                 .containsOnly("some-rule");

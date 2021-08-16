@@ -102,13 +102,14 @@ public class ClusterAdapterES6 implements ClusterAdapter {
 
     @Override
     public Set<NodeDiskUsageStats> diskUsageStats() {
-        final JsonNode nodes = catNodes("name", "host", "ip", "diskUsed", "diskTotal","diskUsedPercent");
+        final JsonNode nodes = catNodes("name", "role", "host", "ip", "diskUsed", "diskTotal", "diskUsedPercent");
         final ImmutableSet.Builder<NodeDiskUsageStats> setBuilder = ImmutableSet.builder();
         for (JsonNode jsonElement : nodes) {
             if (jsonElement.isObject()) {
                 setBuilder.add(
                         NodeDiskUsageStats.create(
                                 jsonElement.path("name").asText(),
+                                jsonElement.path("role").asText(),
                                 jsonElement.path("ip").asText(),
                                 jsonElement.path("host").asText(null),
                                 jsonElement.path("diskUsed").asText(),
