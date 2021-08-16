@@ -45,7 +45,7 @@ describe('MessagePreview', () => {
     },
   };
 
-  type Props = Partial<React.ComponentProps<typeof MessageSummaryRow>>
+  type Props = Partial<React.ComponentProps<typeof MessagePreview>>
 
   const SUT = ({ message = simpleMessage, ...rest }: Props) => (
     <table>
@@ -75,19 +75,19 @@ describe('MessagePreview', () => {
   });
 
   it('displays message summary', () => {
-    render(<SUT showSummaryRow />);
+    render(<SUT showSummary />);
 
     expect(screen.getByText('Value for field 1 - Value for field 2')).toBeInTheDocument();
   });
 
-  it('does not display message summary when `showSummaryRow` is false', () => {
-    render(<SUT showSummaryRow={false} />);
+  it('does not display message summary when `showSummary` is false', () => {
+    render(<SUT showSummary={false} />);
 
     expect(screen.queryByText('Value for field 1 - Value for field 2')).not.toBeInTheDocument();
   });
 
   // it('displays message summary instead of message field when `preferSummaryRow` is true', () => {
-  //   render(<SUT showSummaryRow showMessageRow preferSummaryRow />);
+  //   render(<SUT showSummary showMessageRow preferSummaryRow />);
   //
   //   expect(screen.getByText('Value for field 1 - Value for field 2')).toBeInTheDocument();
   //   expect(screen.queryByText('Something happened!')).not.toBeInTheDocument();
