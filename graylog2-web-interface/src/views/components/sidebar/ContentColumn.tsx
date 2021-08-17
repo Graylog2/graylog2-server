@@ -28,7 +28,6 @@ type Props = {
   closeSidebar: () => void,
   searchPageLayout: SearchPageLayout | undefined | null,
   sectionTitle: string,
-  viewIsNew: boolean,
   viewMetadata: ViewMetadata,
 };
 
@@ -153,7 +152,7 @@ const toggleSidebarPinning = (searchPageLayout) => {
   togglePinning();
 };
 
-const ContentColumn = ({ children, sectionTitle, closeSidebar, searchPageLayout, viewMetadata, viewIsNew }: Props) => {
+const ContentColumn = ({ children, sectionTitle, closeSidebar, searchPageLayout, viewMetadata }: Props) => {
   const sidebarIsPinned = searchPageLayout?.config.sidebar.isPinned;
 
   return (

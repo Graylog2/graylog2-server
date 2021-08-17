@@ -65,7 +65,6 @@ describe('<Sidebar />', () => {
   it('should render and open when clicking on header', async () => {
     render(
       <Sidebar viewMetadata={viewMetaData}
-               viewIsNew={false}
                queryId={query.id}
                results={queryResult}>
         <TestComponent />
@@ -80,7 +79,6 @@ describe('<Sidebar />', () => {
   it('should render with a description about the query results', async () => {
     render(
       <Sidebar viewMetadata={viewMetaData}
-               viewIsNew={false}
                queryId={query.id}
                results={queryResult}>
         <TestComponent />
@@ -101,7 +99,6 @@ describe('<Sidebar />', () => {
     render(
       <ViewTypeContext.Provider value={View.Type.Search}>
         <Sidebar viewMetadata={emptyViewMetaData}
-                 viewIsNew={false}
                  queryId={query.id}
                  results={queryResult}>
           <TestComponent />
@@ -118,7 +115,6 @@ describe('<Sidebar />', () => {
     render(
       <ViewTypeContext.Provider value={View.Type.Dashboard}>
         <Sidebar viewMetadata={emptyViewMetaData}
-                 viewIsNew={false}
                  queryId={query.id}
                  results={queryResult}>
           <TestComponent />
@@ -129,47 +125,12 @@ describe('<Sidebar />', () => {
     fireEvent.click(await screen.findByTitle(/open sidebar/i));
 
     await screen.findByText('Unsaved Dashboard');
-  });
-
-  it('should render with a specific title for unsaved dashboards', async () => {
-    render(
-      <ViewTypeContext.Provider value={View.Type.Dashboard}>
-        <Sidebar viewMetadata={emptyViewMetaData}
-                 viewIsNew
-                 queryId={query.id}
-                 results={queryResult}>
-          <TestComponent />
-        </Sidebar>
-      </ViewTypeContext.Provider>,
-    );
-
-    fireEvent.click(await screen.findByTitle(/open sidebar/i));
-
-    await screen.findByText('Unsaved Dashboard');
-  });
-
-  it('should render with a specific title for unsaved searches', async () => {
-    render(
-      <ViewTypeContext.Provider value={View.Type.Search}>
-        <Sidebar viewMetadata={emptyViewMetaData}
-                 viewIsNew
-                 queryId={query.id}
-                 results={queryResult}>
-          <TestComponent />
-        </Sidebar>
-      </ViewTypeContext.Provider>,
-    );
-
-    fireEvent.click(await screen.findByTitle(/open sidebar/i));
-
-    await screen.findByText('Unsaved Search');
   });
 
   it('should render summary and description of a view', async () => {
     render(
       <ViewTypeContext.Provider value={View.Type.Dashboard}>
         <Sidebar viewMetadata={viewMetaData}
-                 viewIsNew={false}
                  queryId={query.id}
                  results={queryResult}>
           <TestComponent />
@@ -187,7 +148,6 @@ describe('<Sidebar />', () => {
     render(
       <ViewTypeContext.Provider value={View.Type.Dashboard}>
         <Sidebar viewMetadata={{ ...viewMetaData, description: undefined, summary: undefined }}
-                 viewIsNew={false}
                  queryId={query.id}
                  results={queryResult}>
           <TestComponent />
@@ -205,7 +165,6 @@ describe('<Sidebar />', () => {
     render(
       <ViewTypeContext.Provider value={View.Type.Search}>
         <Sidebar viewMetadata={{ ...viewMetaData, description: undefined, summary: undefined }}
-                 viewIsNew={false}
                  queryId={query.id}
                  results={queryResult}>
           <TestComponent />
@@ -223,7 +182,6 @@ describe('<Sidebar />', () => {
     render(
       <ViewTypeContext.Provider value={View.Type.Search}>
         <Sidebar viewMetadata={viewMetaData}
-                 viewIsNew={false}
                  queryId={query.id}
                  results={queryResult}>
           <TestComponent />
@@ -240,7 +198,6 @@ describe('<Sidebar />', () => {
   it('should not render a summary and description, if the view is an ad hoc search', async () => {
     render(
       <Sidebar viewMetadata={{ ...viewMetaData, id: undefined }}
-               viewIsNew={false}
                queryId={query.id}
                results={queryResult}>
         <TestComponent />
@@ -258,7 +215,6 @@ describe('<Sidebar />', () => {
   it('should render widget create options', async () => {
     render(
       <Sidebar viewMetadata={viewMetaData}
-               viewIsNew={false}
                queryId={query.id}
                results={queryResult}>
         <TestComponent />
@@ -273,7 +229,6 @@ describe('<Sidebar />', () => {
   it('should render passed children', async () => {
     render(
       <Sidebar viewMetadata={viewMetaData}
-               viewIsNew={false}
                queryId={query.id}
                results={queryResult}>
         <TestComponent />
@@ -289,7 +244,6 @@ describe('<Sidebar />', () => {
     render(
       <ViewTypeContext.Provider value={View.Type.Search}>
         <Sidebar viewMetadata={viewMetaData}
-                 viewIsNew={false}
                  queryId={query.id}
                  results={queryResult}>
           <TestComponent />
@@ -309,7 +263,6 @@ describe('<Sidebar />', () => {
   it('should close an active section when clicking on its navigation item', async () => {
     render(
       <Sidebar viewMetadata={viewMetaData}
-               viewIsNew={false}
                queryId={query.id}
                results={queryResult}>
         <TestComponent />

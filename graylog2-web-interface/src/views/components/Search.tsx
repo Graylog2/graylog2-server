@@ -100,10 +100,9 @@ const SearchArea = styled(PageContentLayout)(() => {
 
 const ConnectedSidebar = connect(
   Sidebar,
-  { viewMetadata: ViewMetadataStore, searches: SearchStore, view: ViewStore },
-  ({ viewMetadata, view, searches }) => ({
+  { viewMetadata: ViewMetadataStore, searches: SearchStore },
+  ({ viewMetadata, searches }) => ({
     viewMetadata,
-    viewIsNew: view.isNew,
     queryId: viewMetadata.activeQuery,
     results: searches?.result?.forId(viewMetadata.activeQuery),
   }),
