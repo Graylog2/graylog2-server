@@ -15,13 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext } from 'react';
 import styled, { DefaultTheme } from 'styled-components';
 
-import MessageEventTypesContext, { MessageEventTypesContextType } from 'views/components/contexts/MessageEventTypesContext';
 import { Message } from 'views/components/messagelist/Types';
 import { MessageEventType } from 'views/types/messageEventTypes';
 import { ColorVariants, colorVariants } from 'theme/colors';
+import usePluginEntities from 'views/logic/usePluginEntities';
 
 import { MessageRow } from './MessageTableEntry';
 
@@ -43,15 +42,24 @@ const StyledMessageWrapper = styled.div<{ category: ColorVariants }>(({ theme, c
   `;
 });
 
-const getMessageSummary = (messageFields: Message['fields'], messageEvents: MessageEventTypesContextType) => {
-  const gl2EventTypeCode = messageFields.gl2_event_type_code;
-  const eventType: MessageEventType | undefined = messageEvents?.eventTypes?.[gl2EventTypeCode];
-
-  if (!eventType) {
+const getMessageEventType = (gl2EventTypeCode: string, messageEventTypes: Array<MessageEventType> = []) => {
+  if (!gl2EventTypeCode) {
     return undefined;
   }
 
-  const { summaryTemplate: template, category } = eventType;
+  return messageEventTypes.find((eventType) => (
+    eventType.gl2EventTypeCode === gl2EventTypeCode
+  ));
+};
+
+const getMessageSummary = (messageFields: Message['fields'], messageEventTypes: Array<MessageEventType>) => {
+  const messageEventType = getMessageEventType(messageFields.gl2_event_type_code, messageEventTypes);
+
+  if (!messageEventType) {
+    return undefined;
+  }
+
+  const { summaryTemplate: template, category } = messageEventType;
   const summary = template.replace(/{(\w+)}/g, (fieldNamePlaceholder, fieldName) => messageFields[fieldName] || fieldName);
 
   return {
@@ -68,8 +76,8 @@ type Props = {
 };
 
 const MessageSummaryRow = ({ message, onClick, colSpanFixup }: Props) => {
-  const messageEvents = useContext(MessageEventTypesContext);
-  const messageSummary = getMessageSummary(message.fields, messageEvents);
+  const messageEventTypes = usePluginEntities('messageEventTypes');
+  const messageSummary = getMessageSummary(message.fields, messageEventTypes);
 
   if (!messageSummary) {
     return null;

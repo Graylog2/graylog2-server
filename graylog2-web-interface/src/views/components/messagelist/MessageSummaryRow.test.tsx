@@ -17,16 +17,21 @@
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import { createSimpleMessageEventType } from 'fixtures/messageEventTypes';
+import asMock from 'helpers/mocking/AsMock';
 
-import MessageEventTypesContext, { MessageEventTypesContextType } from 'views/components/contexts/MessageEventTypesContext';
+import usePluginEntities from 'views/logic/usePluginEntities';
 
 import MessageSummaryRow from './MessageSummaryRow';
 
+const simpleEventType = createSimpleMessageEventType(1, { summaryTemplate: '{field1} - {field2}', gl2EventTypeCode: 'event-type-code' });
+const mockMessageEventTypes = [simpleEventType];
+
+jest.mock('views/logic/usePluginEntities', () => jest.fn(() => mockMessageEventTypes));
+
 describe('MessageSummaryRow', () => {
-  const simpleEventType = createSimpleMessageEventType(1, { summaryTemplate: '{field1} - {field2}', gl2EventTypeCode: 'event-type-code' });
-  const simpleMessageEventsContextValue = {
-    eventTypes: { [simpleEventType.gl2EventTypeCode]: simpleEventType },
-  };
+  afterEach(() => {
+    jest.clearAllTimers();
+  });
 
   const simpleMessage = {
     id: 'deadbeef',
@@ -39,19 +44,14 @@ describe('MessageSummaryRow', () => {
     },
   };
 
-  type Props = Partial<React.ComponentProps<typeof MessageSummaryRow>> & {
-    messageEventsContextValue?: MessageEventTypesContextType,
-  }
+  type Props = Partial<React.ComponentProps<typeof MessageSummaryRow>>
 
-  const SUT = ({ messageEventsContextValue = simpleMessageEventsContextValue, message = simpleMessage, ...rest }: Props) => (
-    <MessageEventTypesContext.Provider value={messageEventsContextValue}>
-      <table>
-        <tbody>
-          <MessageSummaryRow message={message} {...rest} />
-        </tbody>
-
-      </table>,
-    </MessageEventTypesContext.Provider>
+  const SUT = ({ message = simpleMessage, ...rest }: Props) => (
+    <table>
+      <tbody>
+        <MessageSummaryRow message={message} {...rest} />
+      </tbody>
+    </table>
   );
 
   it('displays message summary', () => {
@@ -61,11 +61,11 @@ describe('MessageSummaryRow', () => {
   });
 
   it('displays message summary color based on event category', () => {
-    const messageEventsContextValue = {
-      eventTypes: { [simpleEventType.gl2EventTypeCode]: { ...simpleEventType, category: 'success' } },
-    } as const;
+    const messageEventType = { ...simpleEventType, category: 'success' } as const;
 
-    render(<SUT messageEventsContextValue={messageEventsContextValue} />);
+    asMock(usePluginEntities).mockReturnValue([messageEventType]);
+
+    render(<SUT />);
 
     expect(screen.getByText('Value for field 1 - Value for field 2')).toHaveStyle('color: #00752c');
   });
