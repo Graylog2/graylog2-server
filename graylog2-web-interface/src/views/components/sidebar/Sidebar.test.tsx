@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { mount } from 'wrappedEnzyme';
+import { fireEvent, render, screen } from 'wrappedTestingLibrary';
 import { StoreMock as MockStore } from 'helpers/mocking';
 
 import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
@@ -62,8 +62,8 @@ describe('<Sidebar />', () => {
 
   const TestComponent = () => <div id="martian">Marc Watney</div>;
 
-  it('should render and open when clicking on header', () => {
-    const wrapper = mount(
+  it('should render and open when clicking on header', async () => {
+    render(
       <Sidebar viewMetadata={viewMetaData}
                viewIsNew={false}
                queryId={query.id}
@@ -72,13 +72,13 @@ describe('<Sidebar />', () => {
       </Sidebar>,
     );
 
-    wrapper.find('SidebarNavigation NavItem').first().simulate('click');
+    fireEvent.click(await screen.findByTitle(/open sidebar/i));
 
-    expect(wrapper.find('h1').text()).toBe(viewMetaData.title);
+    await screen.findByText(viewMetaData.title);
   });
 
-  it('should render with a description about the query results', () => {
-    const wrapper = mount(
+  it('should render with a description about the query results', async () => {
+    render(
       <Sidebar viewMetadata={viewMetaData}
                viewIsNew={false}
                queryId={query.id}
@@ -87,9 +87,9 @@ describe('<Sidebar />', () => {
       </Sidebar>,
     );
 
-    wrapper.find('SidebarNavigation NavItem').first().simulate('click');
+    fireEvent.click(await screen.findByTitle(/open sidebar/i));
 
-    expect(wrapper.find('SearchResultOverview').text()).toBe('Query executed in 64ms at 2018-08-28 09:39:26.');
+    await screen.findAllByText((content, node) => (node.textContent === 'Query executed in 64ms at 2018-08-28 09:39:26.'));
   });
 
   const emptyViewMetaData = {
@@ -97,8 +97,8 @@ describe('<Sidebar />', () => {
     id: '5b34f4c44880a54df9616380',
   } as ViewMetaData;
 
-  it('should render with a specific default title in the context of a new search', () => {
-    const wrapper = mount(
+  it('should render with a specific default title in the context of a new search', async () => {
+    render(
       <ViewTypeContext.Provider value={View.Type.Search}>
         <Sidebar viewMetadata={emptyViewMetaData}
                  viewIsNew={false}
@@ -109,13 +109,13 @@ describe('<Sidebar />', () => {
       </ViewTypeContext.Provider>,
     );
 
-    wrapper.find('SidebarNavigation NavItem').first().simulate('click');
+    fireEvent.click(await screen.findByTitle(/open sidebar/i));
 
-    expect(wrapper.find('h1').text()).toBe('Untitled Search');
+    await screen.findByText('Unsaved Search');
   });
 
-  it('should render with a specific default title in the context of a new dashboard', () => {
-    const wrapper = mount(
+  it('should render with a specific default title in the context of a new dashboard', async () => {
+    render(
       <ViewTypeContext.Provider value={View.Type.Dashboard}>
         <Sidebar viewMetadata={emptyViewMetaData}
                  viewIsNew={false}
@@ -126,13 +126,13 @@ describe('<Sidebar />', () => {
       </ViewTypeContext.Provider>,
     );
 
-    wrapper.find('SidebarNavigation NavItem').first().simulate('click');
+    fireEvent.click(await screen.findByTitle(/open sidebar/i));
 
-    expect(wrapper.find('h1').text()).toBe('Untitled Dashboard');
+    await screen.findByText('Unsaved Dashboard');
   });
 
-  it('should render with a specific title for unsaved dashboards', () => {
-    const wrapper = mount(
+  it('should render with a specific title for unsaved dashboards', async () => {
+    render(
       <ViewTypeContext.Provider value={View.Type.Dashboard}>
         <Sidebar viewMetadata={emptyViewMetaData}
                  viewIsNew
@@ -143,13 +143,13 @@ describe('<Sidebar />', () => {
       </ViewTypeContext.Provider>,
     );
 
-    wrapper.find('SidebarNavigation NavItem').first().simulate('click');
+    fireEvent.click(await screen.findByTitle(/open sidebar/i));
 
-    expect(wrapper.find('h1').text()).toBe('Unsaved Dashboard');
+    await screen.findByText('Unsaved Dashboard');
   });
 
-  it('should render with a specific title for unsaved searches', () => {
-    const wrapper = mount(
+  it('should render with a specific title for unsaved searches', async () => {
+    render(
       <ViewTypeContext.Provider value={View.Type.Search}>
         <Sidebar viewMetadata={emptyViewMetaData}
                  viewIsNew
@@ -160,13 +160,13 @@ describe('<Sidebar />', () => {
       </ViewTypeContext.Provider>,
     );
 
-    wrapper.find('SidebarNavigation NavItem').first().simulate('click');
+    fireEvent.click(await screen.findByTitle(/open sidebar/i));
 
-    expect(wrapper.find('h1').text()).toBe('Unsaved Search');
+    await screen.findByText('Unsaved Search');
   });
 
-  it('should render summary and description of a view', () => {
-    const wrapper = mount(
+  it('should render summary and description of a view', async () => {
+    render(
       <ViewTypeContext.Provider value={View.Type.Dashboard}>
         <Sidebar viewMetadata={viewMetaData}
                  viewIsNew={false}
@@ -177,15 +177,14 @@ describe('<Sidebar />', () => {
       </ViewTypeContext.Provider>,
     );
 
-    wrapper.find('SidebarNavigation NavItem').first().simulate('click');
+    fireEvent.click(await screen.findByTitle(/open sidebar/i));
 
-    expect(wrapper.find('ViewDescription').text()).toContain(viewMetaData.summary);
-
-    expect(wrapper.find('ViewDescription').text()).toContain(viewMetaData.description);
+    await screen.findByText(viewMetaData.summary);
+    await screen.findByText(viewMetaData.description);
   });
 
-  it('should render placeholder if dashboard has no summary or description', () => {
-    const wrapper = mount(
+  it('should render placeholder if dashboard has no summary or description', async () => {
+    render(
       <ViewTypeContext.Provider value={View.Type.Dashboard}>
         <Sidebar viewMetadata={{ ...viewMetaData, description: undefined, summary: undefined }}
                  viewIsNew={false}
@@ -196,15 +195,14 @@ describe('<Sidebar />', () => {
       </ViewTypeContext.Provider>,
     );
 
-    wrapper.find('SidebarNavigation NavItem').first().simulate('click');
+    fireEvent.click(await screen.findByTitle(/open sidebar/i));
 
-    expect(wrapper.find('ViewDescription').text()).toContain('This dashboard has no description');
-
-    expect(wrapper.find('ViewDescription').text()).toContain('This dashboard has no summary');
+    await screen.findByText(/This dashboard has no description/);
+    await screen.findByText(/This dashboard has no summary/);
   });
 
-  it('should render placeholder if saved search has no summary or description', () => {
-    const wrapper = mount(
+  it('should render placeholder if saved search has no summary or description', async () => {
+    render(
       <ViewTypeContext.Provider value={View.Type.Search}>
         <Sidebar viewMetadata={{ ...viewMetaData, description: undefined, summary: undefined }}
                  viewIsNew={false}
@@ -215,15 +213,14 @@ describe('<Sidebar />', () => {
       </ViewTypeContext.Provider>,
     );
 
-    wrapper.find('SidebarNavigation NavItem').first().simulate('click');
+    fireEvent.click(await screen.findByTitle(/open sidebar/i));
 
-    expect(wrapper.find('ViewDescription').text()).toContain('This search has no description');
-
-    expect(wrapper.find('ViewDescription').text()).toContain('This search has no summary');
+    await screen.findByText(/This search has no description/);
+    await screen.findByText(/This search has no summary/);
   });
 
-  it('should render a summary and description, for a saved search', () => {
-    const wrapper = mount(
+  it('should render a summary and description, for a saved search', async () => {
+    render(
       <ViewTypeContext.Provider value={View.Type.Search}>
         <Sidebar viewMetadata={viewMetaData}
                  viewIsNew={false}
@@ -234,15 +231,14 @@ describe('<Sidebar />', () => {
       </ViewTypeContext.Provider>,
     );
 
-    wrapper.find('SidebarNavigation NavItem').first().simulate('click');
+    fireEvent.click(await screen.findByTitle(/open sidebar/i));
 
-    expect(wrapper.find('ViewDescription').text()).toContain(viewMetaData.summary);
-
-    expect(wrapper.find('ViewDescription').text()).toContain(viewMetaData.description);
+    await screen.findByText(viewMetaData.summary);
+    await screen.findByText(viewMetaData.description);
   });
 
-  it('should not render a summary and description, if the view is an ad hoc search', () => {
-    const wrapper = mount(
+  it('should not render a summary and description, if the view is an ad hoc search', async () => {
+    render(
       <Sidebar viewMetadata={{ ...viewMetaData, id: undefined }}
                viewIsNew={false}
                queryId={query.id}
@@ -251,17 +247,16 @@ describe('<Sidebar />', () => {
       </Sidebar>,
     );
 
-    wrapper.find('SidebarNavigation NavItem').first().simulate('click');
+    fireEvent.click(await screen.findByTitle(/open sidebar/i));
 
-    expect(wrapper.find('ViewDescription').text()).not.toContain(viewMetaData.summary);
+    await screen.findByText('Save the search or export it to a dashboard to add a custom summary and description.');
 
-    expect(wrapper.find('ViewDescription').text()).not.toContain(viewMetaData.description);
-
-    expect(wrapper.find('ViewDescription').text()).toContain('Save the search or export it to a dashboard to add a custom summary and description.');
+    expect(screen.queryByText(viewMetaData.summary)).toBeNull();
+    expect(screen.queryByText(viewMetaData.description)).toBeNull();
   });
 
-  it('should render widget create options', () => {
-    const wrapper = mount(
+  it('should render widget create options', async () => {
+    render(
       <Sidebar viewMetadata={viewMetaData}
                viewIsNew={false}
                queryId={query.id}
@@ -270,15 +265,13 @@ describe('<Sidebar />', () => {
       </Sidebar>,
     );
 
-    wrapper.find('SidebarNavigation NavItem').first().simulate('click');
+    fireEvent.click(await screen.findByLabelText('Create'));
 
-    wrapper.find('span[children="Create"]').simulate('click');
-
-    expect(wrapper.find('AddWidgetButton').text()).toContain('Predefined Aggregation');
+    await screen.findByText('Predefined Aggregation');
   });
 
-  it('should render passed children', () => {
-    const wrapper = mount(
+  it('should render passed children', async () => {
+    render(
       <Sidebar viewMetadata={viewMetaData}
                viewIsNew={false}
                queryId={query.id}
@@ -287,15 +280,34 @@ describe('<Sidebar />', () => {
       </Sidebar>,
     );
 
-    wrapper.find('SidebarNavigation NavItem').first().simulate('click');
+    fireEvent.click(await screen.findByLabelText('Fields'));
 
-    wrapper.find('span[children="Fields"]').simulate('click');
-
-    expect(wrapper.find('div#martian').text()).toBe('Marc Watney');
+    await screen.findByText('Marc Watney');
   });
 
-  it('should close a section when clicking on its title', () => {
-    const wrapper = mount(
+  it('should close a section when clicking on its title', async () => {
+    render(
+      <ViewTypeContext.Provider value={View.Type.Search}>
+        <Sidebar viewMetadata={viewMetaData}
+                 viewIsNew={false}
+                 queryId={query.id}
+                 results={queryResult}>
+          <TestComponent />
+        </Sidebar>
+      </ViewTypeContext.Provider>,
+    );
+
+    fireEvent.click(await screen.findByLabelText('Description'));
+
+    await screen.findByText('Execution');
+
+    fireEvent.click(await screen.findByText('Query Title'));
+
+    expect(screen.queryByText('Execution')).toBeNull();
+  });
+
+  it('should close an active section when clicking on its navigation item', async () => {
+    render(
       <Sidebar viewMetadata={viewMetaData}
                viewIsNew={false}
                queryId={query.id}
@@ -304,32 +316,12 @@ describe('<Sidebar />', () => {
       </Sidebar>,
     );
 
-    wrapper.find('SidebarNavigation NavItem').first().simulate('click');
+    fireEvent.click(await screen.findByLabelText('Fields'));
 
-    expect(wrapper.find('SearchResultOverview')).toExist();
+    await screen.findByText('Marc Watney');
 
-    wrapper.find('h1').simulate('click');
+    fireEvent.click(await screen.findByLabelText('Fields'));
 
-    expect(wrapper.find('SearchResultOverview')).not.toExist();
-  });
-
-  it('should close an active section when clicking on its navigation item', () => {
-    const wrapper = mount(
-      <Sidebar viewMetadata={viewMetaData}
-               viewIsNew={false}
-               queryId={query.id}
-               results={queryResult}>
-        <TestComponent />
-      </Sidebar>,
-    );
-
-    wrapper.find('SidebarNavigation NavItem').first().simulate('click');
-    wrapper.find('div[aria-label="Create"]').simulate('click');
-
-    expect(wrapper.find('h2').text()).toBe('Create');
-
-    wrapper.find('div[aria-label="Create"]').simulate('click');
-
-    expect(wrapper.find('h2')).not.toExist();
+    expect(screen.queryByText('Marc Watney')).toBeNull();
   });
 });
