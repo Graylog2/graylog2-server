@@ -31,7 +31,7 @@ import { naturalSortIgnoreCase } from 'util/SortUtils';
 import * as FormsUtils from 'util/FormsUtils';
 import CombinedProvider from 'injection/CombinedProvider';
 import { SearchMetadataActions } from 'views/stores/SearchMetadataStore';
-import PermissionsMixin from 'util/PermissionsMixin';
+import { isPermitted } from 'util/PermissionsMixin';
 import LookupTableParameter from 'views/logic/parameters/LookupTableParameter';
 
 import EditQueryParameterModal from '../event-definition-form/EditQueryParameterModal';
@@ -73,7 +73,7 @@ class FilterForm extends React.Component {
   _parseQuery = lodash.debounce((queryString) => {
     const { currentUser } = this.props;
 
-    if (!PermissionsMixin.isPermitted(currentUser.permissions, PREVIEW_PERMISSIONS)) {
+    if (!isPermitted(currentUser.permissions, PREVIEW_PERMISSIONS)) {
       return;
     }
 
@@ -131,7 +131,7 @@ class FilterForm extends React.Component {
   componentDidMount() {
     const { currentUser } = this.props;
 
-    if (!PermissionsMixin.isPermitted(currentUser.permissions, LOOKUP_PERMISSIONS)) {
+    if (!isPermitted(currentUser.permissions, LOOKUP_PERMISSIONS)) {
       return;
     }
 

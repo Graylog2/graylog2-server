@@ -21,7 +21,6 @@ import React from 'react';
 import LookupTableParameterEdit from 'components/lookup-table-parameters/LookupTableParameterEdit';
 import { Button } from 'components/graylog';
 import { BootstrapModalForm } from 'components/bootstrap';
-import LookupTableParameter from 'views/logic/parameters/LookupTableParameter';
 
 class EditQueryParameterModal extends React.Component {
   static propTypes = {
