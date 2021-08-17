@@ -449,4 +449,27 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
 
         indices.optimizeIndex("graylog_0", 1, Duration.minutes(1));
     }
+
+    @Test
+    public void aliasTargetReturnsListOfTargetsGivenAliasIsPointingToWithWildcards() {
+        final String index = client().createRandomIndex("indices_it_");
+        final String alias = "graylog_alias_target";
+        assertThat(indices.aliasTarget(alias)).isEmpty();
+
+        client().addAliasMapping(index, alias);
+
+        assertThat(indices.aliasTarget("graylog_alias_*")).contains(index);
+    }
+
+    @Test
+    public void aliasTargetSupportsIndicesWithPlusInName() {
+        final String prefixWithPlus = "index+set_";
+        final String index = client().createRandomIndex(prefixWithPlus);
+        final String alias = prefixWithPlus + "deflector";
+        assertThat(indices.aliasTarget(alias)).isEmpty();
+
+        client().addAliasMapping(index, alias);
+
+        assertThat(indices.aliasTarget(prefixWithPlus + "*")).contains(index);
+    }
 }

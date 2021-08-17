@@ -151,6 +151,10 @@ public class Indices {
         return indices.stream().findFirst();
     }
 
+    public Set<String> aliasTargets(String alias) {
+        return indicesAdapter.resolveAlias(alias);
+    }
+
     public void ensureIndexTemplate(IndexSet indexSet) {
         final IndexSetConfig indexSetConfig = indexSet.getConfig();
         final String templateName = indexSetConfig.indexTemplateName();
@@ -253,9 +257,9 @@ public class Indices {
     }
 
     public boolean isReopened(String indexName) {
-        final Optional<String> aliasTarget = aliasTarget(indexName + REOPENED_ALIAS_SUFFIX);
+        final Set<String> aliasTarget = aliasTargets(indexName + REOPENED_ALIAS_SUFFIX);
 
-        return aliasTarget.map(target -> target.equals(indexName)).orElse(false);
+        return !aliasTarget.isEmpty();
     }
 
     public Map<String, Boolean> areReopened(Collection<String> indices) {
