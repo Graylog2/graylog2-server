@@ -940,6 +940,11 @@ public class Message implements Messages, Indexable {
         return Iterators.singletonIterator(this);
     }
 
+    @Override
+    public boolean supportsFailureHandling() {
+        return true;
+    }
+
     public static abstract class Recording {
         static Timing timing(String name, long elapsedNanos) {
             return new Timing(name, elapsedNanos);

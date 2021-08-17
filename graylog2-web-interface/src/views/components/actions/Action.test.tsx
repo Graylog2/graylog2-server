@@ -18,6 +18,7 @@ import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import { createSimpleExternalValueAction } from 'fixtures/externalValueActions';
+import { ActionContexts } from 'views/types';
 
 import FieldAndValueActionsContext, { FieldAndValueActionsContextType } from 'views/components/contexts/FieldAndValueActionsContext';
 import FieldType from 'views/logic/fieldtypes/FieldType';
@@ -32,7 +33,7 @@ describe('Action', () => {
     field: 'field1',
     value: 'field-value',
     type: new FieldType('string', [], []),
-    contexts: {},
+    contexts: {} as ActionContexts,
   };
 
   type Props = Partial<React.ComponentProps<typeof Action>> & {
@@ -98,8 +99,8 @@ describe('Action', () => {
   });
 
   it('should work with external value actions', async () => {
-    const mockActionHandler = jest.fn();
-    const simpleExternalAction = createSimpleExternalValueAction({ handler: mockActionHandler, title: 'External value action' });
+    const linkTarget = ({ field }) => `the-link-to-${field}`;
+    const simpleExternalAction = createSimpleExternalValueAction({ title: 'External value action', linkTarget });
     const valueActions = { external: [simpleExternalAction], internal: undefined };
 
     render(
@@ -108,9 +109,8 @@ describe('Action', () => {
 
     await openDropdown();
 
-    const actionMenuItem = screen.getByText('External value action');
-    userEvent.click(actionMenuItem);
+    const actionMenuItem = await screen.findByText('External value action') as HTMLAnchorElement;
 
-    expect(mockActionHandler).toHaveBeenCalledTimes(1);
+    expect(actionMenuItem.href).toContain('the-link-to-field1');
   });
 });

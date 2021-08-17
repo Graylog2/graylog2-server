@@ -14,14 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { ActionContexts } from 'views/types';
+package org.graylog2.featureflag;
 
-import type {
-  ActionHandler,
-  ActionHandlerArguments,
-  ActionConditions,
-} from 'views/components/actions/ActionHandler';
+import java.util.Map;
 
-export type FieldActionHandlerCondition<Contexts = ActionContexts> = (args: ActionHandlerArguments<Contexts>) => boolean;
+public interface FeatureFlags {
+    Map<String, String> getAll();
 
-export type FieldActionHandler<Contexts = ActionContexts> = ActionHandler<Contexts> & ActionConditions<Contexts>;
+    /**
+     * @param feature name of the feature
+     * @return true if feature is found and is on, false otherwise
+     */
+    boolean isOn(String feature);
+
+    void incrementFeatureIsUsedCounter(String feature);
+}

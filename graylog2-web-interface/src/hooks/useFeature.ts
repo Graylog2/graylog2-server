@@ -14,14 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { ActionContexts } from 'views/types';
 
-import type {
-  ActionHandler,
-  ActionHandlerArguments,
-  ActionConditions,
-} from 'views/components/actions/ActionHandler';
+import AppConfig from 'util/AppConfig';
 
-export type FieldActionHandlerCondition<Contexts = ActionContexts> = (args: ActionHandlerArguments<Contexts>) => boolean;
+const useFeature = (name: string) => {
+  return AppConfig.isFeatureEnabled(name);
+};
 
-export type FieldActionHandler<Contexts = ActionContexts> = ActionHandler<Contexts> & ActionConditions<Contexts>;
+export default useFeature;

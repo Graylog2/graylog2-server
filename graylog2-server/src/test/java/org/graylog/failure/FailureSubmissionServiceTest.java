@@ -44,8 +44,10 @@ public class FailureSubmissionServiceTest {
         // given
         final Message msg1 = Mockito.mock(Message.class);
         when(msg1.getMessageId()).thenReturn("msg-1");
+        when(msg1.supportsFailureHandling()).thenReturn(true);
         final Message msg2 = Mockito.mock(Message.class);
         when(msg2.getMessageId()).thenReturn("msg-2");
+        when(msg2.supportsFailureHandling()).thenReturn(true);
 
         final List<Messages.IndexingError> indexingErrors = ImmutableList.of(
                 Messages.IndexingError.create(msg1, "index-1", Messages.IndexingError.ErrorType.MappingError, "Error"),
@@ -86,12 +88,35 @@ public class FailureSubmissionServiceTest {
         });
     }
 
+    @Test
+    public void submitIndexingErrors_messageNotSupportingFailureHandlingNotSubmittedToQueue() throws Exception {
+        // given
+        final Message msg1 = Mockito.mock(Message.class);
+        when(msg1.getMessageId()).thenReturn("msg-1");
+        when(msg1.supportsFailureHandling()).thenReturn(false);
+        final Message msg2 = Mockito.mock(Message.class);
+        when(msg2.getMessageId()).thenReturn("msg-2");
+        when(msg2.supportsFailureHandling()).thenReturn(false);
+
+        final List<Messages.IndexingError> indexingErrors = ImmutableList.of(
+                Messages.IndexingError.create(msg1, "index-1", Messages.IndexingError.ErrorType.MappingError, "Error"),
+                Messages.IndexingError.create(msg2, "index-2", Messages.IndexingError.ErrorType.Unknown, "Error2")
+        );
+
+        // when
+        underTest.submitIndexingErrors(indexingErrors);
+
+        // then
+        verifyNoInteractions(failureSubmissionQueue);
+    }
+
 
     @Test
     public void submitProcessingErrors_allProcessingErrorsSubmittedToQueueAndMessageNotFilteredOut_ifSubmissionEnabledAndDuplicatesAreKept() throws Exception {
         // given
         final Message msg = Mockito.mock(Message.class);
         when(msg.getMessageId()).thenReturn("msg-x");
+        when(msg.supportsFailureHandling()).thenReturn(true);
 
         when(msg.processingErrors()).thenReturn(ImmutableList.of(
                 new Message.ProcessingError(() -> "Cause 1", "Message 1", "Details 1"),
@@ -143,12 +168,37 @@ public class FailureSubmissionServiceTest {
         });
     }
 
+    @Test
+    public void submitProcessingErrors_nothingSubmittedAndMessageNotFilteredOut_ifSubmissionEnabledAndDuplicatesAreKeptAndMessageDoesntSupportFailureHandling() throws Exception {
+        // given
+        final Message msg = Mockito.mock(Message.class);
+        when(msg.getMessageId()).thenReturn("msg-x");
+        when(msg.supportsFailureHandling()).thenReturn(false);
+
+        when(msg.processingErrors()).thenReturn(ImmutableList.of(
+                new Message.ProcessingError(() -> "Cause 1", "Message 1", "Details 1"),
+                new Message.ProcessingError(() -> "Cause 2", "Message 2", "Details 2")
+        ));
+
+        when(failureHandlingConfiguration.submitProcessingFailures()).thenReturn(true);
+        when(failureHandlingConfiguration.keepFailedMessageDuplicate()).thenReturn(true);
+
+        // when
+        final boolean notFilterOut = underTest.submitProcessingErrors(msg);
+
+        // then
+        assertThat(notFilterOut).isTrue();
+
+        verifyNoInteractions(failureSubmissionQueue);
+    }
+
 
     @Test
     public void submitProcessingErrors_nothingSubmittedAndMessageNotFilteredOut_ifSubmissionDisabledAndDuplicatesAreKept() throws Exception {
         // given
         final Message msg = Mockito.mock(Message.class);
         when(msg.getMessageId()).thenReturn("msg-x");
+        when(msg.supportsFailureHandling()).thenReturn(true);
 
         when(msg.processingErrors()).thenReturn(ImmutableList.of(
                 new Message.ProcessingError(() -> "Cause 1", "Message 1", "Details 1"),
@@ -173,6 +223,7 @@ public class FailureSubmissionServiceTest {
         // given
         final Message msg = Mockito.mock(Message.class);
         when(msg.getMessageId()).thenReturn("msg-x");
+        when(msg.supportsFailureHandling()).thenReturn(true);
 
         when(msg.processingErrors()).thenReturn(ImmutableList.of(
                 new Message.ProcessingError(() -> "Cause 1", "Message 1", "Details 1"),
@@ -197,7 +248,7 @@ public class FailureSubmissionServiceTest {
         // given
         final Message msg = Mockito.mock(Message.class);
         when(msg.getMessageId()).thenReturn("msg-x");
-
+        when(msg.supportsFailureHandling()).thenReturn(true);
         when(msg.processingErrors()).thenReturn(ImmutableList.of());
 
         when(failureHandlingConfiguration.submitProcessingFailures()).thenReturn(true);
@@ -219,7 +270,7 @@ public class FailureSubmissionServiceTest {
         // given
         final Message msg = Mockito.mock(Message.class);
         when(msg.getMessageId()).thenReturn("msg-x");
-
+        when(msg.supportsFailureHandling()).thenReturn(true);
         when(msg.processingErrors()).thenReturn(ImmutableList.of(
                 new Message.ProcessingError(() -> "Cause", "Message", "Details")
         ));
@@ -259,8 +310,8 @@ public class FailureSubmissionServiceTest {
     public void submitUnknownProcessingError_unknownProcessingErrorSubmittedToQueue() throws Exception {
         // given
         final Message msg = Mockito.mock(Message.class);
-
         when(msg.processingErrors()).thenReturn(ImmutableList.of());
+        when(msg.supportsFailureHandling()).thenReturn(true);
 
         when(failureHandlingConfiguration.submitProcessingFailures()).thenReturn(true);
         when(failureHandlingConfiguration.keepFailedMessageDuplicate()).thenReturn(true);

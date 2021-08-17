@@ -88,6 +88,12 @@ public class FailureSubmissionService {
             // We don't handle processing errors
             return true;
         }
+
+        if (!message.supportsFailureHandling()) {
+            logger.warn("Submitted a message with processing errors, which doesn't support failure handling!");
+            return true;
+        }
+
         if (processingErrors.isEmpty()) {
             return true;
         }
@@ -140,10 +146,22 @@ public class FailureSubmissionService {
      */
     public void submitIndexingErrors(Collection<Messages.IndexingError> indexingErrors) {
         try {
-            failureSubmissionQueue.submitBlocking(FailureBatch.indexingFailureBatch(
+            final FailureBatch fb = FailureBatch.indexingFailureBatch(
                     indexingErrors.stream()
+                            .filter(ie -> {
+                                if (!ie.message().supportsFailureHandling()) {
+                                    logger.warn("Submitted a message with indexing errors, which doesn't support failure handling!");
+                                    return false;
+                                } else {
+                                    return true;
+                                }
+                            })
                             .map(this::fromIndexingError)
-                            .collect(Collectors.toList())));
+                            .collect(Collectors.toList()));
+
+            if (fb.size() > 0) {
+                failureSubmissionQueue.submitBlocking(fb);
+            }
 
         } catch (InterruptedException ignored) {
             logger.warn("Failed to submit {} indexing errors for failure handling. The thread has been interrupted!",

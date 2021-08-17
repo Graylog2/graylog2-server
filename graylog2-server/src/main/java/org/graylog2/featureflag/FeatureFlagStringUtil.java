@@ -14,14 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { ActionContexts } from 'views/types';
+package org.graylog2.featureflag;
 
-import type {
-  ActionHandler,
-  ActionHandlerArguments,
-  ActionConditions,
-} from 'views/components/actions/ActionHandler';
+import java.util.Locale;
 
-export type FieldActionHandlerCondition<Contexts = ActionContexts> = (args: ActionHandlerArguments<Contexts>) => boolean;
+class FeatureFlagStringUtil {
 
-export type FieldActionHandler<Contexts = ActionContexts> = ActionHandler<Contexts> & ActionConditions<Contexts>;
+    static String toUpperCase(String s) {
+        return s.toUpperCase(Locale.ROOT);
+    }
+
+    static boolean startsWithIgnoreCase(String text, String start) {
+        return toUpperCase(text).startsWith(toUpperCase(start));
+    }
+
+    static String stringFormat(String s, Object... args) {
+        return String.format(Locale.ROOT, s, args);
+    }
+}

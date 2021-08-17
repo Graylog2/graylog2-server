@@ -40,6 +40,10 @@ import {
 import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 import { TimeRange } from 'views/logic/queries/Query';
 import { CopyWidgetToDashboardHook } from 'views/logic/views/CopyWidgetToDashboard';
+import View from 'views/logic/views/View';
+import User from 'logic/users/User';
+import { Message } from 'views/components/messagelist/Types';
+import { ValuePath } from 'views/logic/valueactions/ValueActionHandler';
 
 import type { MessageEventTypes } from './types/messageEventTypes';
 
@@ -180,6 +184,15 @@ export type MessageResult = {
 export interface SearchTypeResultTypes {
   generic: SearchTypeResult,
   messages: MessageResult,
+}
+
+export interface ActionContexts {
+  view: View,
+  analysisDisabledFields: Array<string>,
+  currentUser: User,
+  widget: Widget,
+  message: Message,
+  valuePath: ValuePath,
 }
 
 export type SearchTypeResults = { [id: string]: SearchTypeResultTypes[keyof SearchTypeResultTypes] };

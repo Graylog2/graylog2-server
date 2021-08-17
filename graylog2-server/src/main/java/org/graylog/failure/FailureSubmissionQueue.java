@@ -16,6 +16,7 @@
  */
 package org.graylog.failure;
 
+import com.codahale.metrics.Gauge;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import org.graylog2.Configuration;
@@ -35,15 +36,14 @@ import static com.codahale.metrics.MetricRegistry.name;
  * A blocking FIFO queue accepting failure batches for further handling.
  * It should be used as an entry point for failure producers.
  *
- * The service was introduced for 2 essential reasons:
+ * The queue was introduced for 2 essential reasons:
  *  1. To control pressure on the failure handling framework.
  *  2. To decouple failure producers from failure consumers.
  *
- * The capacity of the underlying queue is controlled by `failure_handling_queue_capacity` configuration
- * property. By default its value is 1000.
+ * The capacity of the underlying queue is controlled by {@link org.graylog2.Configuration#failureHandlingQueueCapacity}
  */
 @Singleton
-public class FailureSubmissionQueue {
+class FailureSubmissionQueue {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -55,21 +55,25 @@ public class FailureSubmissionQueue {
     private final Meter consumedFailures;
 
     @Inject
-    public FailureSubmissionQueue(Configuration configuration,
+    FailureSubmissionQueue(Configuration configuration,
                                   MetricRegistry metricRegistry) {
         this.queue = new LinkedBlockingQueue<>(configuration.getFailureHandlingQueueCapacity());
         this.configuration = configuration;
+
         this.submittedFailureBatches = metricRegistry.meter(name(FailureSubmissionQueue.class, "submittedFailureBatches"));
         this.submittedFailures = metricRegistry.meter(name(FailureSubmissionQueue.class, "submittedFailures"));
         this.consumedFailureBatches = metricRegistry.meter(name(FailureSubmissionQueue.class, "consumedFailureBatches"));
         this.consumedFailures = metricRegistry.meter(name(FailureSubmissionQueue.class, "consumedFailures"));
+
+        metricRegistry.register(MetricRegistry.name(FailureSubmissionQueue.class, "queueSize"),
+                (Gauge<Integer>) queue::size);
     }
 
     /**
      * Submits a failure batch for handling. If the underlying queue is full,
      * the call will block until the queue is ready to accept new batches.
      */
-    public void submitBlocking(FailureBatch batch) throws InterruptedException {
+    void submitBlocking(FailureBatch batch) throws InterruptedException {
         queue.put(batch);
 
         if (queueSize() == configuration.getFailureHandlingQueueCapacity()) {

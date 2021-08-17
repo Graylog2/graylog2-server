@@ -14,14 +14,35 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { ActionContexts } from 'views/types';
+import React from 'react';
+import PropTypes from 'prop-types';
 
-import type {
-  ActionHandler,
-  ActionHandlerArguments,
-  ActionConditions,
-} from 'views/components/actions/ActionHandler';
+import useFeature from 'hooks/useFeature';
 
-export type FieldActionHandlerCondition<Contexts = ActionContexts> = (args: ActionHandlerArguments<Contexts>) => boolean;
+type Props = {
+  name: string;
+  fallback?: React.ReactElement,
+  children: React.ReactElement,
+}
 
-export type FieldActionHandler<Contexts = ActionContexts> = ActionHandler<Contexts> & ActionConditions<Contexts>;
+const IfFeatureEnabled = ({ name, fallback, children }: Props) => {
+  const hasFeature = useFeature(name);
+
+  if (hasFeature) {
+    return children;
+  }
+
+  return fallback;
+};
+
+IfFeatureEnabled.propTypes = {
+  name: PropTypes.string.isRequired,
+  fallback: PropTypes.node,
+  children: PropTypes.node.isRequired,
+};
+
+IfFeatureEnabled.defaultProps = {
+  fallback: null,
+};
+
+export default IfFeatureEnabled;
