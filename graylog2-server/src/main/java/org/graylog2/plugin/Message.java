@@ -124,11 +124,6 @@ public class Message implements Messages, Indexable {
     public static final String FIELD_GL2_MESSAGE_ID = "gl2_message_id";
 
     /**
-     * Can be set when a message timestamp gets modified to preserve the original timestamp. (e.g. "clone_message" pipeline function)
-     */
-    public static final String FIELD_GL2_ORIGINAL_TIMESTAMP = "gl2_original_timestamp";
-
-    /**
      * Can be set to indicate a message processing error. (e.g. set by the pipeline interpreter when an error occurs)
      */
     public static final String FIELD_GL2_PROCESSING_ERROR = "gl2_processing_error";
@@ -200,7 +195,6 @@ public class Message implements Messages, Indexable {
 
     private static final ImmutableSet<String> GRAYLOG_FIELDS = ImmutableSet.of(
         FIELD_GL2_ACCOUNTED_MESSAGE_SIZE,
-        FIELD_GL2_ORIGINAL_TIMESTAMP,
         FIELD_GL2_PROCESSING_ERROR,
         FIELD_GL2_PROCESSING_TIMESTAMP,
         FIELD_GL2_RECEIVE_TIMESTAMP,
