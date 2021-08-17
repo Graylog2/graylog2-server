@@ -106,15 +106,16 @@ public class FailureSubmissionService {
             final boolean needsAcknowledgement = !failureHandlingConfiguration.keepFailedMessageDuplicate();
 
             final String message;
+            final String messageId = StringUtils.isBlank(failedMessage.getMessageId()) ? failedMessage.getId() : failedMessage.getMessageId();
 
-            if (StringUtils.isBlank(failedMessage.getMessageId())) {
+            if (StringUtils.isBlank(messageId)) {
                 message = String.format(Locale.ENGLISH,
                         "Failed to process a message with unknown id: %s",
                         processingError.getMessage());
             } else {
                 message = String.format(Locale.ENGLISH,
                         "Failed to process message with id '%s': %s",
-                        failedMessage.getMessageId(),
+                        messageId,
                         processingError.getMessage());
             }
 
