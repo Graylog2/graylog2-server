@@ -424,6 +424,9 @@ public class Message implements Messages, Indexable {
         obj.put(FIELD_GL2_ACCOUNTED_MESSAGE_SIZE, getSize());
 
         if (!processingErrors.isEmpty()) {
+            if (processingErrors.stream().anyMatch(processingError -> processingError.getCause().equals(ProcessingFailureCause.InvalidTimestampException))) {
+                invalidTimestampMeter.mark();
+            }
             obj.put(FIELD_GL2_PROCESSING_ERROR,
                     processingErrors.stream()
                             .map(ProcessingError::getDetails)
@@ -472,14 +475,12 @@ public class Message implements Messages, Indexable {
             } catch (IllegalArgumentException e) {
                 final String error = "Invalid format for field timestamp '" + value + "' in message " + getId() + ", forcing to current time.";
                 LOG.trace(error, e);
-                // TODO invalidTimestampMeter.mark();
                 addProcessingError(new ProcessingError(ProcessingFailureCause.InvalidTimestampException, error, ExceptionUtils.getRootCauseMessage(e)));
                 dateTime = Tools.nowUTC();
             }
         } else if (value == null) {
             final String error = "null value for field timestamp in message " + getId() + ", forcing to current time.";
             LOG.trace(error);
-            // TODO invalidTimestampMeter.mark();
             addProcessingError(new ProcessingError(ProcessingFailureCause.InvalidTimestampException, error, ""));
             dateTime = Tools.nowUTC();
         } else {
@@ -487,7 +488,6 @@ public class Message implements Messages, Indexable {
             final String error = "Invalid type for field timestamp '" + value.getClass().getSimpleName() + "' in message " + getId() + ", forcing to current time.";
             LOG.trace(error);
             addProcessingError(new ProcessingError(ProcessingFailureCause.InvalidTimestampException, error, ""));
-            //TODO invalidTimestampMeter.mark();
             dateTime = Tools.nowUTC();
         }
         return dateTime;
