@@ -42,4 +42,13 @@ public interface Indexable {
     DateTime getReceiveTime();
     Map<String, Object> toElasticSearchObject(ObjectMapper objectMapper,@Nonnull final Meter invalidTimestampMeter);
     DateTime getTimestamp();
+
+    /**
+     * Guides the failure handling framework when deciding whether this particular
+     * message should be accepted for the further failure processing. By default
+     * disabled for all messages.
+     */
+    default boolean supportsFailureHandling() {
+        return false;
+    }
 }

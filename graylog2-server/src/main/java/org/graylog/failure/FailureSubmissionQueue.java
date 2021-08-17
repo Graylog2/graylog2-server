@@ -43,7 +43,7 @@ import static com.codahale.metrics.MetricRegistry.name;
  * The capacity of the underlying queue is controlled by {@link org.graylog2.Configuration#failureHandlingQueueCapacity}
  */
 @Singleton
-public class FailureSubmissionQueue {
+class FailureSubmissionQueue {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -55,7 +55,7 @@ public class FailureSubmissionQueue {
     private final Meter consumedFailures;
 
     @Inject
-    public FailureSubmissionQueue(Configuration configuration,
+    FailureSubmissionQueue(Configuration configuration,
                                   MetricRegistry metricRegistry) {
         this.queue = new LinkedBlockingQueue<>(configuration.getFailureHandlingQueueCapacity());
         this.configuration = configuration;
@@ -73,7 +73,7 @@ public class FailureSubmissionQueue {
      * Submits a failure batch for handling. If the underlying queue is full,
      * the call will block until the queue is ready to accept new batches.
      */
-    public void submitBlocking(FailureBatch batch) throws InterruptedException {
+    void submitBlocking(FailureBatch batch) throws InterruptedException {
         queue.put(batch);
 
         if (queueSize() == configuration.getFailureHandlingQueueCapacity()) {
