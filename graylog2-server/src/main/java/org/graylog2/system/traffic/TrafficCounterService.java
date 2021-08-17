@@ -71,14 +71,16 @@ public class TrafficCounterService {
             LOG.debug("Updating traffic for node {} at {}:  in/decoded/out {}/{}/{} bytes",
                     nodeId.toString(), dayBucket, inLastMinute, decodedLastMinute, outLastMinute);
         }
+
+        final String escapedNodeId = nodeId.toEscapedString();
         final WriteResult<TrafficDto, ObjectId> update = db.update(DBQuery.is("bucket", dayBucket),
                 // sigh DBUpdate.inc only takes integers, but we have a long.
                 new DBUpdate.Builder()
-                        .addOperation("$inc", "input." + nodeId.toString(),
+                        .addOperation("$inc", "input." + escapedNodeId,
                                 new SingleUpdateOperationValue(false, false, inLastMinute))
-                        .addOperation("$inc", "output." + nodeId.toString(),
+                        .addOperation("$inc", "output." + escapedNodeId,
                                 new SingleUpdateOperationValue(false, false, outLastMinute))
-                        .addOperation("$inc", "decoded." + nodeId.toString(),
+                        .addOperation("$inc", "decoded." + escapedNodeId,
                                 new SingleUpdateOperationValue(false, false, decodedLastMinute)),
                 true, false);
         if (update.getN() == 0) {
