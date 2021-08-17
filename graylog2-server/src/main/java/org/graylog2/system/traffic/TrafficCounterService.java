@@ -115,6 +115,10 @@ public class TrafficCounterService {
                 decodedHistogram = aggregateToDaily(decodedHistogram);
             }
             return TrafficHistogram.create(from, to, inputHistogram, outputHistogram, decodedHistogram);
+        } catch (Exception e) {
+            // TODO: remove this diagnostic logging after fixing https://github.com/Graylog2/graylog2-server/issues/9559
+            LOG.error("Unable to load traffic data range {} to {}", from, to);
+            throw e;
         }
     }
 
