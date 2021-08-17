@@ -28,6 +28,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static org.joda.time.DateTimeZone.UTC;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
@@ -57,7 +58,7 @@ public class LocalKafkaMessageQueueAcknowledgerTest {
 
     @Test
     void acknowledgeMessage() {
-        final Message message = new Message("message", "source", DateTime.now());
+        final Message message = new Message("message", "source", DateTime.now(UTC));
         message.setMessageQueueId(1L);
         acknowledger.acknowledge(message);
         verify(kafkaJournal).markJournalOffsetCommitted(1L);
@@ -65,14 +66,14 @@ public class LocalKafkaMessageQueueAcknowledgerTest {
 
     @Test
     void acknowledgeMessageWithoutMessageQueueId() {
-        final Message message = new Message("message", "source", DateTime.now());
+        final Message message = new Message("message", "source", DateTime.now(UTC));
         acknowledger.acknowledge(message);
         verifyNoMoreInteractions(kafkaJournal);
     }
 
     @Test
     void acknowledgeMessageWithWrongTypeOfMessageQueueId() {
-        final Message message = new Message("message", "source", DateTime.now());
+        final Message message = new Message("message", "source", DateTime.now(UTC));
         message.setMessageQueueId("foo");
         acknowledger.acknowledge(message);
         verifyNoMoreInteractions(kafkaJournal);
@@ -80,15 +81,15 @@ public class LocalKafkaMessageQueueAcknowledgerTest {
 
     @Test
     void acknowledgeMessages() {
-        final Message firstMessage = new Message("message", "source", DateTime.now());
+        final Message firstMessage = new Message("message", "source", DateTime.now(UTC));
         firstMessage.setMessageQueueId(1L);
 
-        final Message nullOffsetMessage = new Message("message", "source", DateTime.now());
+        final Message nullOffsetMessage = new Message("message", "source", DateTime.now(UTC));
 
-        final Message secondMessage = new Message("message", "source", DateTime.now());
+        final Message secondMessage = new Message("message", "source", DateTime.now(UTC));
         secondMessage.setMessageQueueId(2L);
 
-        final Message wrongOffsetTypeMessage = new Message("message", "source", DateTime.now());
+        final Message wrongOffsetTypeMessage = new Message("message", "source", DateTime.now(UTC));
         wrongOffsetTypeMessage.setMessageQueueId("foo");
 
         acknowledger.acknowledge(ImmutableList.of(firstMessage, nullOffsetMessage, secondMessage, wrongOffsetTypeMessage));
