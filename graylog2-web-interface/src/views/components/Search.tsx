@@ -62,7 +62,6 @@ import WidgetFocusProvider from 'views/components/contexts/WidgetFocusProvider';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import { RefluxActions } from 'stores/StoreTypes';
-import FieldAndValueActionsProvider from 'views/components/contexts/FieldAndValueActionsProvider';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 
 const GridContainer = styled.div<{ interactive: boolean }>(({ interactive }) => {
@@ -200,22 +199,21 @@ const Search = ({ location }: Props) => {
   }, []);
 
   return (
-    <FieldAndValueActionsProvider>
-      <WidgetFocusProvider>
-        <WidgetFocusContext.Consumer>
-          {({ focusedWidget: { focusing: focusingWidget, editing: editingWidget } = { focusing: false, editing: false } }) => (
-            <CurrentViewTypeProvider>
-              <IfInteractive>
-                <IfDashboard>
-                  <WindowLeaveMessage />
-                </IfDashboard>
-              </IfInteractive>
-              <InteractiveContext.Consumer>
-                {(interactive) => (
-                  <SearchPageLayoutProvider>
-                    <DefaultFieldTypesProvider>
-                      <ViewAdditionalContextProvider>
-                        <HighlightingRulesProvider>
+    <WidgetFocusProvider>
+      <WidgetFocusContext.Consumer>
+        {({ focusedWidget: { focusing: focusingWidget, editing: editingWidget } = { focusing: false, editing: false } }) => (
+          <CurrentViewTypeProvider>
+            <IfInteractive>
+              <IfDashboard>
+                <WindowLeaveMessage />
+              </IfDashboard>
+            </IfInteractive>
+            <InteractiveContext.Consumer>
+              {(interactive) => (
+                <SearchPageLayoutProvider>
+                  <DefaultFieldTypesProvider>
+                    <ViewAdditionalContextProvider>
+                      <HighlightingRulesProvider>
                           <GridContainer id="main-row" interactive={interactive}>
                             <IfInteractive>
                               <ConnectedSidebar>
@@ -244,16 +242,15 @@ const Search = ({ location }: Props) => {
                             </SearchArea>
                           </GridContainer>
                         </HighlightingRulesProvider>
-                      </ViewAdditionalContextProvider>
-                    </DefaultFieldTypesProvider>
-                  </SearchPageLayoutProvider>
-                )}
-              </InteractiveContext.Consumer>
-            </CurrentViewTypeProvider>
-          )}
-        </WidgetFocusContext.Consumer>
-      </WidgetFocusProvider>
-    </FieldAndValueActionsProvider>
+                    </ViewAdditionalContextProvider>
+                  </DefaultFieldTypesProvider>
+                </SearchPageLayoutProvider>
+              )}
+            </InteractiveContext.Consumer>
+          </CurrentViewTypeProvider>
+        )}
+      </WidgetFocusContext.Consumer>
+    </WidgetFocusProvider>
   );
 };
 
