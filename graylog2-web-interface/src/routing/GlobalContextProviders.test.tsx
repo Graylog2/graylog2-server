@@ -18,8 +18,8 @@ import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import asMock from 'helpers/mocking/AsMock';
 import suppressConsole from 'helpers/suppressConsole';
+import GlobalContextProviders from 'routing/GlobalContextProviders';
 
-import GlobalProviders from 'routing/GlobalProviders';
 import usePluginEntities from 'views/logic/usePluginEntities';
 
 jest.mock('views/logic/usePluginEntities');
@@ -38,7 +38,7 @@ const renderProvider = (children, index, throwError = false) => {
   );
 };
 
-describe('GlobalProviders', () => {
+describe('GlobalContextProviders', () => {
   afterEach(() => {
     jest.clearAllMocks();
   });
@@ -47,9 +47,9 @@ describe('GlobalProviders', () => {
     asMock(usePluginEntities).mockReturnValue(undefined);
 
     render(
-      <GlobalProviders>
+      <GlobalContextProviders>
         <>The children</>
-      </GlobalProviders>,
+      </GlobalContextProviders>,
     );
 
     expect(screen.getByText('The children')).toBeInTheDocument();
@@ -59,9 +59,9 @@ describe('GlobalProviders', () => {
     asMock(usePluginEntities).mockReturnValue([({ children }) => renderProvider(children, 1)]);
 
     render(
-      <GlobalProviders>
+      <GlobalContextProviders>
         <>The children</>
-      </GlobalProviders>,
+      </GlobalContextProviders>,
     );
 
     expect(screen.getByText(/The provider 1/)).toBeInTheDocument();
@@ -75,9 +75,9 @@ describe('GlobalProviders', () => {
     ]);
 
     render(
-      <GlobalProviders>
+      <GlobalContextProviders>
         <>The children</>
-      </GlobalProviders>,
+      </GlobalContextProviders>,
     );
 
     expect(screen.getByText('The provider 1')).toBeInTheDocument();
@@ -94,9 +94,9 @@ describe('GlobalProviders', () => {
 
     await suppressConsole(() => {
       render(
-        <GlobalProviders>
+        <GlobalContextProviders>
           <>The children</>
-        </GlobalProviders>,
+        </GlobalContextProviders>,
       );
     });
 

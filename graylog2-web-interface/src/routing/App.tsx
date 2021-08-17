@@ -26,7 +26,7 @@ import Navigation from 'components/navigation/Navigation';
 import ReportedErrorBoundary from 'components/errors/ReportedErrorBoundary';
 import RuntimeErrorBoundary from 'components/errors/RuntimeErrorBoundary';
 
-import GlobalProviders from './GlobalProviders';
+import GlobalContextProviders from './GlobalContextProviders';
 import 'stylesheets/typeahead.less';
 
 const AppLayout = styled.div`
@@ -66,7 +66,7 @@ const App = ({ children }) => (
       }
 
       return (
-        <GlobalProviders>
+        <GlobalContextProviders>
           <ScratchpadProvider loginName={currentUser.username}>
             <AppLayout>
               <Navigation />
@@ -83,7 +83,7 @@ const App = ({ children }) => (
               </ReportedErrorBoundary>
             </AppLayout>
           </ScratchpadProvider>
-        </GlobalProviders>
+        </GlobalContextProviders>
       );
     }}
   </CurrentUserContext.Consumer>

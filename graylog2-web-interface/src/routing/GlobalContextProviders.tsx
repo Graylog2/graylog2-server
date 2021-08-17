@@ -23,20 +23,20 @@ type Props = {
   children: React.ReactElement,
 };
 
-const GlobalProviders = ({ children }: Props) => {
-  const providers = usePluginEntities('globalProviders');
+const GlobalContextProviders = ({ children }: Props) => {
+  const contextProviders = usePluginEntities('globalContextProviders');
 
-  if (!providers || providers?.length === 0) {
+  if (!contextProviders || contextProviders?.length === 0) {
     return children;
   }
 
-  return providers.reduce((nestedChildren, GlobalProvider) => (
+  return contextProviders.reduce((nestedChildren, GlobalContextProvider) => (
     <ErrorBoundary FallbackComponent={() => nestedChildren}>
-      <GlobalProvider>
+      <GlobalContextProvider>
         {nestedChildren}
-      </GlobalProvider>;
+      </GlobalContextProvider>;
     </ErrorBoundary>
   ), children);
 };
 
-export default GlobalProviders;
+export default GlobalContextProviders;
