@@ -69,11 +69,11 @@ public class TrafficCounterService {
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Updating traffic for node {} at {}:  in/decoded/out {}/{}/{} bytes",
-                    nodeId.toString(), dayBucket, inLastMinute, decodedLastMinute, outLastMinute);
+                    nodeId, dayBucket, inLastMinute, decodedLastMinute, outLastMinute);
         }
 
         final String escapedNodeId = nodeId.toEscapedString();
-        final WriteResult<TrafficDto, ObjectId> update = db.update(DBQuery.is("bucket", dayBucket),
+        final WriteResult<TrafficDto, ObjectId> update = db.update(DBQuery.is(BUCKET, dayBucket),
                 // sigh DBUpdate.inc only takes integers, but we have a long.
                 new DBUpdate.Builder()
                         .addOperation("$inc", "input." + escapedNodeId,
@@ -117,10 +117,6 @@ public class TrafficCounterService {
                 decodedHistogram = aggregateToDaily(decodedHistogram);
             }
             return TrafficHistogram.create(from, to, inputHistogram, outputHistogram, decodedHistogram);
-        } catch (Exception e) {
-            // TODO: remove this diagnostic logging after fixing https://github.com/Graylog2/graylog2-server/issues/9559
-            LOG.error("Unable to load traffic data range {} to {}", from, to);
-            throw e;
         }
     }
 
