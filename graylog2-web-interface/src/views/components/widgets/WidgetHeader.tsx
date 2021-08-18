@@ -33,6 +33,7 @@ const Container = styled.div(({ theme }) => css`
   margin-bottom: 5px;
   display: grid;
   grid-template-columns: max-content auto max-content;
+  align-items: center;
 `);
 
 const WidgetDragHandle = styled(Icon)`
