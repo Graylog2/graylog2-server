@@ -26,8 +26,8 @@ jest.mock('util/AppConfig', () => ({
 }));
 
 const items: Array<ActionDefinition> = [
-  { type: 'something', title: 'something', resetFocus: false },
-  { type: 'delete-me', title: 'delete me', resetFocus: false },
+  { type: 'something', title: 'something', resetFocus: false, handler: () => Promise.resolve(42) },
+  { type: 'delete-me', title: 'delete me', resetFocus: false, handler: () => Promise.resolve(42) },
 ];
 
 describe('filterValueActions', () => {

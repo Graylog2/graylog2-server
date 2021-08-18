@@ -74,7 +74,6 @@ public class PipelineInterpreter implements MessageProcessor {
 
     private final MessageQueueAcknowledger messageQueueAcknowledger;
     private final Meter filteredOutMessages;
-    private final Meter failedMessages;
     private final Timer executionTime;
     private final MetricRegistry metricRegistry;
     private final ConfigurationStateUpdater stateUpdater;
@@ -86,7 +85,6 @@ public class PipelineInterpreter implements MessageProcessor {
 
         this.messageQueueAcknowledger = messageQueueAcknowledger;
         this.filteredOutMessages = metricRegistry.meter(name(ProcessBufferProcessor.class, "filteredOutMessages"));
-        this.failedMessages = metricRegistry.meter(name(ProcessBufferProcessor.class, "failedMessages"));
         this.executionTime = metricRegistry.timer(name(PipelineInterpreter.class, "executionTime"));
         this.metricRegistry = metricRegistry;
         this.stateUpdater = stateUpdater;
