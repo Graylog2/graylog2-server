@@ -662,7 +662,7 @@ public class MessageTest {
         final Message message = new Message("message", "source", Tools.nowUTC());
 
         // Verify that appropriate default value is returned for uninitialized metadata.
-        assertThat(message.getMetadataValue("stateKey", "default")).isEqualTo("default");
+        assertThat(message.getMetadataValue("nonExistentKey", "default")).isEqualTo("default");
 
         // Set value, and confirm appropriate default is still returned.
         message.setMetadata("stateKey", 10L);
