@@ -23,6 +23,9 @@ import styles from './EditableTitle.css';
 const StyledStaticSpan = styled.span(({ theme }) => css`
   border: 1px solid ${theme.colors.global.contentBackground};
   font-size: ${theme.fonts.size.large};
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 `);
 
 const StyledInput = styled.input(({ theme }) => css`

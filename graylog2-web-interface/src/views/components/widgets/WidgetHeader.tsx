@@ -31,6 +31,8 @@ const Container = styled.div(({ theme }) => css`
   font-size: ${theme.fonts.size.large};
   text-overflow: ellipsis;
   margin-bottom: 5px;
+  display: grid;
+  grid-template-columns: max-content auto max-content;
 `);
 
 const WidgetDragHandle = styled(Icon)`
