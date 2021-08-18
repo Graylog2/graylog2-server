@@ -16,6 +16,7 @@
  */
 package org.graylog.testing.graylognode;
 
+import com.google.common.base.MoreObjects;
 import org.apache.commons.lang.ArrayUtils;
 import org.testcontainers.containers.Network;
 
@@ -61,5 +62,17 @@ public class NodeContainerConfig {
         }
 
         return Arrays.stream(allPorts).boxed().toArray(Integer[]::new);
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("mongoDbUri", mongoDbUri)
+                .add("elasticsearchVersion", elasticsearchVersion)
+                .add("elasticsearchUri", elasticsearchUri)
+                .add("portsToExpose", portsToExpose())
+                .add("enableDebugging", enableDebugging)
+                .add("skipPackaging", skipPackaging)
+                .toString();
     }
 }

@@ -83,6 +83,8 @@ public class NodeContainerFactory {
             List<Path> pluginJars) {
         String graylogHome = "/usr/share/graylog";
 
+        LOG.info("Creating and running a Graylog node. Config = {}", config.toString());
+
         GenericContainer<?> container = new GenericContainer<>(image)
                 .withFileSystemBind(property("server_jar"), graylogHome + "/graylog.jar", BindMode.READ_ONLY)
                 .withNetwork(config.network)
