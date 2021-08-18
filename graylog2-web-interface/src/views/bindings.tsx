@@ -363,7 +363,9 @@ const exports: PluginExports = {
       isChecked: (config) => config.showMessageRow,
       isDisabled: () => false,
       onChange: (config, onConfigChange) => {
-        const newConfig = config.toBuilder().showMessageRow(!config.showMessageRow).build();
+        const willShowRowMessage = !config.showMessageRow;
+        const willShowSummary = !willShowRowMessage ? false : config.showSummary;
+        const newConfig = config.toBuilder().showMessageRow(willShowRowMessage).showSummary(willShowSummary).build();
 
         return onConfigChange(newConfig);
       },
