@@ -24,8 +24,8 @@ import org.graylog.testing.completebackend.GraylogBackend;
 import static org.graylog.testing.completebackend.Lifecycle.CLASS;
 
 @ApiIntegrationTest(serverLifecycle = CLASS, extraPorts = {ElasticsearchE2E.GELF_HTTP_PORT}, elasticsearchFactory = ElasticsearchInstanceES6Factory.class)
-public class ElasticsearchE2EES6 extends ElasticsearchE2E {
-    public ElasticsearchE2EES6(GraylogBackend sut, RequestSpecification requestSpec) {
+public class ElasticsearchE2EES6IT extends ElasticsearchE2E {
+    public ElasticsearchE2EES6IT(GraylogBackend sut, RequestSpecification requestSpec) {
         super(sut, requestSpec);
     }
 }
