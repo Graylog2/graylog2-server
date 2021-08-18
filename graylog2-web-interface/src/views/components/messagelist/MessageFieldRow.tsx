@@ -26,21 +26,6 @@ import DecoratedValue from './decoration/DecoratedValue';
 
 import TypeSpecificValue from '../TypeSpecificValue';
 
-export const TableRow = styled.tr(({ theme }) => `
-  && {
-    margin-bottom: 5px;
-    cursor: pointer;
-  
-    td {
-      border-top: 0;
-      padding-top: 0;
-      padding-bottom: 5px;
-      font-family: ${theme.fonts.family.monospace};
-      color: ${theme.colors.variant.dark.info};
-    }
-  }
-`);
-
 export const MessageWrapper = styled.div`
   line-height: 1.5em;
   white-space: pre-line;
@@ -49,26 +34,20 @@ export const MessageWrapper = styled.div`
 `;
 
 type Props = {
-  onRowClick: () => void,
-  colSpanFixup: number,
   message: Message,
   messageFieldType: FieldType,
 };
 
-const MessageFieldRow = ({ onRowClick, colSpanFixup, message, messageFieldType }: Props) => (
-  <TableRow onClick={onRowClick}>
-    <td colSpan={colSpanFixup}>
-      <MessageWrapper>
-        <CustomHighlighting field="message"
-                            value={message.fields[MESSAGE_FIELD]}>
-          <TypeSpecificValue field="message"
-                             value={message.fields[MESSAGE_FIELD]}
-                             type={messageFieldType}
-                             render={DecoratedValue} />
-        </CustomHighlighting>
-      </MessageWrapper>
-    </td>
-  </TableRow>
+const MessageFieldRow = ({ message, messageFieldType }: Props) => (
+  <MessageWrapper>
+    <CustomHighlighting field="message"
+                        value={message.fields[MESSAGE_FIELD]}>
+      <TypeSpecificValue field="message"
+                         value={message.fields[MESSAGE_FIELD]}
+                         type={messageFieldType}
+                         render={DecoratedValue} />
+    </CustomHighlighting>
+  </MessageWrapper>
 );
 
 export default MessageFieldRow;

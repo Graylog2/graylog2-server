@@ -15,32 +15,35 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext } from 'react';
+import styled, { css } from 'styled-components';
 
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import { Message } from 'views/components/messagelist/Types';
-import MessageEventTypesContext, { MessageEventTypesContextType } from 'views/components/contexts/MessageEventTypesContext';
+import usePluginEntities from 'views/logic/usePluginEntities';
 import { MessageEventType } from 'views/types/messageEventTypes';
+import MessageFieldRow from 'views/components/messagelist/MessageFieldRow';
 
-import MessageSummaryRow from './MessageSummaryRow';
-import MessageFieldRow from './MessageFieldRow';
+const TableRow = styled.tr(({ theme }) => css`
+  && {
+    margin-bottom: 5px;
+    cursor: pointer;
+  
+    td {
+      border-top: 0;
+      padding-top: 0;
+      padding-bottom: 5px;
+      font-family: ${theme.fonts.family.monospace};
+      color: ${theme.colors.variant.dark.info};
+    }
+  }
+`);
 
-const getMessageSummary = (messageFields: Message['fields'], messageEvents: MessageEventTypesContextType) => {
-  const gl2EventTypeCode = messageFields.gl2_event_type_code ?? '100001';
-  const eventType: MessageEventType | undefined = messageEvents?.eventTypes?.[gl2EventTypeCode];
-
-  if (!eventType) {
+const getMessageEventType = (eventTypeCode: string | undefined, messageEvents: Array<MessageEventType>) => {
+  if (!eventTypeCode) {
     return undefined;
   }
 
-  const { summaryTemplate: template, category } = eventType;
-  const summary = template.replace(/{(\w+)}/g, (fieldNamePlaceholder, fieldName) => messageFields[fieldName] || fieldName);
-
-  return {
-    category,
-    template,
-    summary,
-  };
+  return messageEvents?.find((eventType) => eventType.gl2EventTypeCode === eventTypeCode);
 };
 
 type Props = {
@@ -53,25 +56,27 @@ type Props = {
 };
 
 const MessagePreview = ({ showMessageRow, showSummary, onRowClick, colSpanFixup, message, messageFieldType }: Props) => {
-  const messageEvents = useContext(MessageEventTypesContext);
-  const messageSummary = showSummary ? getMessageSummary(message.fields, messageEvents) : undefined;
-  const hasMessageSummary = !!messageSummary;
+  const messageEvents = usePluginEntities('messageEventTypes');
+  const messageEventType = getMessageEventType(message.fields.gl2_event_type_code ?? '100001', messageEvents);
+  const messageSummaryComponents = usePluginEntities('views.components.widgets.messageTable.summary');
+  const hasMessageSummary = !!showSummary && !!messageEventType && !!messageSummaryComponents && messageSummaryComponents.length !== 0;
 
   return (
-    <>
-      {(showMessageRow && !hasMessageSummary) && (
-        <MessageFieldRow onRowClick={onRowClick}
-                         colSpanFixup={colSpanFixup}
-                         message={message}
-                         messageFieldType={messageFieldType} />
-      )}
+    <TableRow onClick={onRowClick}>
+      <td colSpan={colSpanFixup}>
+        {(showMessageRow && !hasMessageSummary) && (
+          <MessageFieldRow message={message}
+                           messageFieldType={messageFieldType} />
+        )}
 
-      {hasMessageSummary && (
-        <MessageSummaryRow onClick={onRowClick}
-                           colSpanFixup={colSpanFixup}
-                           messageSummary={messageSummary} />
-      )}
-    </>
+        {hasMessageSummary && messageSummaryComponents.map((SummaryComponent) => (
+          <SummaryComponent messageFields={message.fields}
+                            key={messageEventType.gl2EventTypeCode}
+                            messageEventType={messageEventType} />
+
+        ))}
+      </td>
+    </TableRow>
   );
 };
 

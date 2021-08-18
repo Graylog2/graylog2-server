@@ -17,9 +17,7 @@
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import { createSimpleMessageEventType } from 'fixtures/messageEventTypes';
-import asMock from 'helpers/mocking/AsMock';
 
-import usePluginEntities from 'views/logic/usePluginEntities';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 
 import MessagePreview from './MessagePreview';
@@ -27,7 +25,10 @@ import MessagePreview from './MessagePreview';
 const simpleEventType = createSimpleMessageEventType(1, { summaryTemplate: '{field1} - {field2}', gl2EventTypeCode: 'event-type-code' });
 const mockMessageEventTypes = [simpleEventType];
 
-jest.mock('views/logic/usePluginEntities', () => jest.fn(() => mockMessageEventTypes));
+jest.mock('views/logic/usePluginEntities', () => jest.fn((entityKey) => ({
+  messageEventTypes: mockMessageEventTypes,
+  'views.components.widgets.messageTable.summary': [() => <>The message summary</>],
+}[entityKey])));
 
 describe('MessagePreview', () => {
   afterEach(() => {
@@ -45,17 +46,14 @@ describe('MessagePreview', () => {
     },
   };
 
-  type Props = Partial<React.ComponentProps<typeof MessagePreview>>
-
-  const SUT = ({ message = simpleMessage, ...rest }: Props) => (
+  const SUT = ({ message = simpleMessage, ...rest }: Partial<React.ComponentProps<typeof MessagePreview>>) => (
     <table>
       <tbody>
         <MessagePreview message={message}
                         onRowClick={() => {}}
                         colSpanFixup={1}
-                        showSummaryRow
+                        showSummary={false}
                         showMessageRow
-                        preferSummaryRow={false}
                         messageFieldType={new FieldType('string', [], [])}
                         {...rest} />
       </tbody>
@@ -77,29 +75,13 @@ describe('MessagePreview', () => {
   it('displays message summary', () => {
     render(<SUT showSummary />);
 
-    expect(screen.getByText('Value for field 1 - Value for field 2')).toBeInTheDocument();
+    expect(screen.getByText('The message summary')).toBeInTheDocument();
   });
 
-  it('does not display message summary when `showSummary` is false', () => {
-    render(<SUT showSummary={false} />);
+  it('does not display message summary when summary is being displayed', () => {
+    render(<SUT showSummary showMessageRow />);
 
-    expect(screen.queryByText('Value for field 1 - Value for field 2')).not.toBeInTheDocument();
-  });
-
-  // it('displays message summary instead of message field when `preferSummaryRow` is true', () => {
-  //   render(<SUT showSummary showMessageRow preferSummaryRow />);
-  //
-  //   expect(screen.getByText('Value for field 1 - Value for field 2')).toBeInTheDocument();
-  //   expect(screen.queryByText('Something happened!')).not.toBeInTheDocument();
-  // });
-
-  it('displays message summary color based on event category', () => {
-    const messageEventType = { ...simpleEventType, category: 'success' } as const;
-
-    asMock(usePluginEntities).mockReturnValue([messageEventType]);
-
-    render(<SUT />);
-
-    expect(screen.getByText('Value for field 1 - Value for field 2')).toHaveStyle('color: #00752c');
+    expect(screen.getByText('The message summary')).toBeInTheDocument();
+    expect(screen.queryByText('Something happened!')).not.toBeInTheDocument();
   });
 });

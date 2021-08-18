@@ -207,6 +207,11 @@ export type MessagePreviewOption = {
   sort: number,
 }
 
+export type MessageSummaryProps = {
+  messageEventType: MessageEventType,
+  messageFields: { [key: string]: any },
+}
+
 declare module 'graylog-web-plugin/plugin' {
   export interface PluginExports {
     creators?: Array<Creator>;
@@ -219,6 +224,7 @@ declare module 'graylog-web-plugin/plugin' {
     valueActions?: Array<ActionDefinition>;
     'views.completers'?: Array<Completer>;
     'views.components.widgets.messageTable.previewOptions'?: Array<MessagePreviewOption>
+    'views.components.widgets.messageTable.summary'?: Array<React.ComponentType<MessageSummaryProps>>
     'views.elements.header'?: Array<React.ComponentType>;
     'views.elements.queryBar'?: Array<React.ComponentType>;
     'views.export.formats'?: Array<ExportFormat>;
