@@ -24,7 +24,7 @@ type Props = {
 };
 
 const GlobalProviders = ({ children }: Props) => {
-  const providers = usePluginEntities('globalProviders');
+  const providers = usePluginEntities('globalContextProviders');
 
   if (!providers || providers?.length === 0) {
     return children;
