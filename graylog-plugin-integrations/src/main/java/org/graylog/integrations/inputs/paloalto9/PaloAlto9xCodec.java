@@ -30,10 +30,6 @@ import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.inputs.codecs.Codec;
 import org.graylog2.plugin.inputs.codecs.CodecAggregator;
 import org.graylog2.plugin.journal.RawMessage;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +51,6 @@ public class PaloAlto9xCodec implements Codec {
     private static final Logger LOG = LoggerFactory.getLogger(PaloAlto9xCodec.class);
 
     static final String CK_STORE_FULL_MESSAGE = "store_full_message";
-    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormat.forPattern("yyyy/MM/dd HH:mm:ssZZ");
 
     public static final String NAME = "PaloAlto9x";
 
@@ -123,7 +118,6 @@ public class PaloAlto9xCodec implements Codec {
         }
 
         message.addField(EventFields.EVENT_SOURCE_PRODUCT, "PAN");
-        fixTimestampField(message);
 
         // Store full message if configured.
         if (configuration.getBoolean(CK_STORE_FULL_MESSAGE)) {
@@ -182,14 +176,5 @@ public class PaloAlto9xCodec implements Codec {
     @Override
     public CodecAggregator getAggregator() {
         return null;
-    }
-
-    private void fixTimestampField(Message message) {
-        Object timestampObj = message.getField(Message.FIELD_TIMESTAMP);
-        if (timestampObj instanceof String) {
-            String timestampString = timestampObj + "Z";
-            DateTime parsedTimestamp = DateTime.parse(timestampString, DATE_TIME_FORMATTER).withZone(DateTimeZone.UTC);
-            message.addField(Message.FIELD_TIMESTAMP, parsedTimestamp);
-        }
     }
 }
