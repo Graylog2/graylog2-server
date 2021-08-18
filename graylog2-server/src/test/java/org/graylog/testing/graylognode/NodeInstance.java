@@ -16,6 +16,8 @@
  */
 package org.graylog.testing.graylognode;
 
+import com.github.dockerjava.api.command.InspectContainerResponse;
+import com.github.dockerjava.api.model.Ports;
 import com.google.common.base.Stopwatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +28,8 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.graylog.testing.graylognode.NodeContainerConfig.API_PORT;
 
@@ -64,6 +68,17 @@ public class NodeInstance {
 
     public int mappedPortFor(int originalPort) {
         return container.getMappedPort(originalPort);
+    }
+
+    public void printDebugInfo() {
+        final InspectContainerResponse containerInfo = container.getContainerInfo();
+        if (containerInfo != null) {
+            containerInfo.getNetworkSettings().getPorts().getBindings().forEach((p, b) -> {
+                LOG.info("Found a port binding: {} -> {}", p.getPort(), Stream.of(b).map(Ports.Binding::toString).collect(Collectors.joining(", ")));
+            });
+        }
+
+        LOG.info("Exposed ports: {}", container.getExposedPorts());
     }
 
     public void printLog() {

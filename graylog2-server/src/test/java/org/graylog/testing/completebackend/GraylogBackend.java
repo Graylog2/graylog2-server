@@ -132,6 +132,10 @@ public class GraylogBackend {
         return node.mappedPortFor(originalPort);
     }
 
+    public void printDebugInfo() {
+        node.printDebugInfo();
+    }
+
     public Network network() {
         return this.network;
     }

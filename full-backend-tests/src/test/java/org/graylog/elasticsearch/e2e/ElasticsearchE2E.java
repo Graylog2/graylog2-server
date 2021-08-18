@@ -40,6 +40,9 @@ abstract class ElasticsearchE2E {
 
     @Test
     void inputMessageCanBeSearched() {
+
+        sut.printDebugInfo();
+
         int mappedPort = sut.mappedPortFor(GELF_HTTP_PORT);
 
         GelfInputUtils.createGelfHttpInput(mappedPort, GELF_HTTP_PORT, requestSpec);
