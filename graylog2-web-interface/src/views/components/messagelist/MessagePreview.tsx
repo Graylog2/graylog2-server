@@ -54,7 +54,7 @@ const useMessageSummaries = (showSummary, message) => {
     return undefined;
   }
 
-  const messageEventType = getMessageEventType(message.fields.gl2_event_type_code ?? '100001', messageEvents);
+  const messageEventType = getMessageEventType(message.fields.gl2_event_type_code, messageEvents);
   const summaries = messageEventType && messageSummaryComponents?.map((renderSummaryComponent) => (
     renderSummaryComponent({
       messageFields: message.fields,
