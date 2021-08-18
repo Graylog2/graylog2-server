@@ -27,7 +27,7 @@ const mockMessageEventTypes = [simpleEventType];
 
 jest.mock('views/logic/usePluginEntities', () => jest.fn((entityKey) => ({
   messageEventTypes: mockMessageEventTypes,
-  'views.components.widgets.messageTable.summary': [() => <>The message summary</>],
+  'views.components.widgets.messageTable.summary': [() => <div key="the-summary">The message summary</div>],
 }[entityKey])));
 
 describe('MessagePreview', () => {

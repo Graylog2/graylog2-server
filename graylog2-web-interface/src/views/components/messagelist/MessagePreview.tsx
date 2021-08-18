@@ -46,6 +46,25 @@ const getMessageEventType = (eventTypeCode: string | undefined, messageEvents: A
   return messageEvents?.find((eventType) => eventType.gl2EventTypeCode === eventTypeCode);
 };
 
+const useMessageSummaries = (showSummary, message) => {
+  const messageEvents = usePluginEntities('messageEventTypes');
+  const messageSummaryComponents = usePluginEntities('views.components.widgets.messageTable.summary');
+
+  if (!showSummary) {
+    return undefined;
+  }
+
+  const messageEventType = getMessageEventType(message.fields.gl2_event_type_code ?? '100001', messageEvents);
+  const summaries = messageEventType && messageSummaryComponents?.map((renderSummaryComponent) => (
+    renderSummaryComponent({
+      messageFields: message.fields,
+      messageEventType,
+    })
+  ));
+
+  return summaries?.filter((summary) => summary !== null);
+};
+
 type Props = {
   onRowClick: () => void,
   colSpanFixup: number,
@@ -56,10 +75,8 @@ type Props = {
 };
 
 const MessagePreview = ({ showMessageRow, showSummary, onRowClick, colSpanFixup, message, messageFieldType }: Props) => {
-  const messageEvents = usePluginEntities('messageEventTypes');
-  const messageEventType = getMessageEventType(message.fields.gl2_event_type_code ?? '100001', messageEvents);
-  const messageSummaryComponents = usePluginEntities('views.components.widgets.messageTable.summary');
-  const hasMessageSummary = !!showSummary && !!messageEventType && !!messageSummaryComponents && messageSummaryComponents.length !== 0;
+  const summaries = useMessageSummaries(showSummary, message);
+  const hasMessageSummary = summaries && summaries.length !== 0;
 
   return (
     <TableRow onClick={onRowClick}>
@@ -69,12 +86,7 @@ const MessagePreview = ({ showMessageRow, showSummary, onRowClick, colSpanFixup,
                            messageFieldType={messageFieldType} />
         )}
 
-        {hasMessageSummary && messageSummaryComponents.map((SummaryComponent) => (
-          <SummaryComponent messageFields={message.fields}
-                            key={messageEventType.gl2EventTypeCode}
-                            messageEventType={messageEventType} />
-
-        ))}
+        {hasMessageSummary && summaries}
       </td>
     </TableRow>
   );
