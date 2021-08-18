@@ -649,13 +649,24 @@ public class MessageTest {
         // Set and get value.
         message.setMetadata("stateKey", 10L);
         assertThat(message.getMetadataValue("stateKey")).isEqualTo(10L);
-        assertThat(message.getMetadataValue("stateKey", "default")).isEqualTo(10L);
-        assertThat(message.getMetadataValue("badKey", "default")).isEqualTo("default");
 
         // Test value removal.
         message.removeMetadata("badKey");
         assertThat(message.getMetadataValue("stateKey")).isEqualTo(10L);
         message.removeMetadata("stateKey");
         assertThat(message.getMetadataValue("stateKey")).isNull();
+    }
+
+    @Test
+    public void testMetadataDefault() throws NoSuchFieldException, IllegalAccessException {
+        final Message message = new Message("message", "source", Tools.nowUTC());
+
+        // Verify that appropriate default value is returned for uninitialized metadata.
+        assertThat(message.getMetadataValue("stateKey", "default")).isEqualTo("default");
+
+        // Set value, and confirm appropriate default is still returned.
+        message.setMetadata("stateKey", 10L);
+        assertThat(message.getMetadataValue("badKey", "default")).isEqualTo("default");
+        assertThat(message.getMetadataValue("stateKey", "default")).isEqualTo(10L);
     }
 }

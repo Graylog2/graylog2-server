@@ -999,7 +999,7 @@ public class Message implements Messages, Indexable {
     @Nullable
     public Object getMetadataValue(String key, Object defaultValue) {
         if (metadata == null) {
-            return null;
+            return defaultValue;
         }
         final Object value = metadata.get(key);
         return value != null ? value : defaultValue;
