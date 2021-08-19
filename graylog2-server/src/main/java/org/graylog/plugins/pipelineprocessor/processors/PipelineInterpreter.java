@@ -431,8 +431,6 @@ public class PipelineInterpreter implements MessageProcessor {
                     lastEvalError.toString()
             ));
 
-            log.debug("Encountered evaluation error during condition, skipping rule actions: {}", lastEvalError);
-
             interpreterListener.failEvaluateRule(rule, pipeline);
 
             return false;
