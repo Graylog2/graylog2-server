@@ -29,6 +29,7 @@ import com.google.common.collect.Iterators;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.net.InetAddresses;
+import org.apache.commons.lang3.StringUtils;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.messages.Indexable;
 import org.graylog2.plugin.streams.Stream;
@@ -52,6 +53,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
@@ -277,6 +279,13 @@ public class Message implements Messages, Indexable {
     private DateTime processingTime;
 
     private ArrayList<Recording> recordings;
+
+    /**
+     * A metadata map for storing custom-defined attributes that need to accompany the message throughout the
+     * processing lifecycle. The value is intentionally not initialized by default, to avoid allocating unneeded
+     * memory for messages that don't need to use metadata.
+     */
+    private Map<String, Object> metadata;
 
     private com.codahale.metrics.Counter sizeCounter = new com.codahale.metrics.Counter();
 
@@ -952,5 +961,60 @@ public class Message implements Messages, Indexable {
         public String apply(final Message input) {
             return input.getId();
         }
+    }
+
+    /**
+     * Store the specified metadata value within the message's internal metadata map.
+     *
+     * @param key   A globally unique string key identifier for the metadata value.
+     * @param value The metadata object value.
+     */
+    public void setMetadata(String key, Object value) {
+        Preconditions.checkArgument(StringUtils.isNotEmpty(key), "A non-empty key is required.");
+        Preconditions.checkNotNull(value);
+        if (metadata == null) {
+            metadata = new HashMap<>();
+        }
+        metadata.put(key, value);
+    }
+
+    /**
+     * Get the metadata value for the specified key.
+     *
+     * @param key The string key for the metadata entry.
+     */
+    @Nullable
+    public Object getMetadataValue(String key) {
+        if (metadata == null) {
+            return null;
+        }
+        return metadata.get(key);
+    }
+
+    /**
+     * Get the metadata value for the specified key. If not present, then return the default value.
+     *
+     * @param key The string key for the metadata entry.
+     */
+    @Nullable
+    public Object getMetadataValue(String key, Object defaultValue) {
+        if (metadata == null) {
+            return defaultValue;
+        }
+        final Object value = metadata.get(key);
+        return value != null ? value : defaultValue;
+    }
+
+    /**
+     * Remove the metadata value for the specified key.
+     *
+     * @param key The string key for the metadata entry.
+     */
+    public void removeMetadata(String key) {
+        Preconditions.checkArgument(StringUtils.isNotEmpty(key), "A non-empty key is required.");
+        if (metadata == null) {
+            return;
+        }
+        metadata.remove(key);
     }
 }
