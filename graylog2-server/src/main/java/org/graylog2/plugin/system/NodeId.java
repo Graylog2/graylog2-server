@@ -93,6 +93,14 @@ public class NodeId {
         return id;
     }
 
+    public String toEscapedString() {
+        return id.replace("\\", "\\\\").replace("$", "\\u0024").replace(".", "\\u002e");
+    }
+
+    public String toUnescapedString() {
+        return id.replace("\\u002e", ".").replace("\\u0024", "$").replace("\\\\", "\\");
+    }
+
     /**
      * Generate an "anonymized" node ID for use with external services. Currently it just hashes the actual node ID
      * using SHA-256.
