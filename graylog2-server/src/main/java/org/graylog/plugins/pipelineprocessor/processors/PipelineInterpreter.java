@@ -411,7 +411,7 @@ public class PipelineInterpreter implements MessageProcessor {
                                           EvaluationContext context,
                                           List<Rule> rulesToRun, InterpreterListener interpreterListener) {
         interpreterListener.evaluateRule(rule, pipeline);
-        boolean matched;
+        final boolean matched;
         final LogicalExpression logicalExpression = rule.when();
         try {
             matched = logicalExpression.evaluateBool(context);
