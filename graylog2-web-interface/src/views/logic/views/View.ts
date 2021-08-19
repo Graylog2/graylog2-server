@@ -71,10 +71,10 @@ export type ViewJson = {
 };
 
 export default class View {
-  static Type: { Search: SearchType, Dashboard: DashboardType } = {
+  static Type = {
     Search: 'SEARCH',
     Dashboard: 'DASHBOARD',
-  };
+  } as const;
 
   _value: InternalState;
 

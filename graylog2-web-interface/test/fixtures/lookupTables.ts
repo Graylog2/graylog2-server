@@ -14,22 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import Reflux from 'reflux';
 
-import { singletonActions } from 'views/logic/singleton';
-
-const LookupTablesActions = singletonActions('LookupTables', () => Reflux.createActions({
-  searchPaginated: { asyncResult: true },
-  reloadPage: { asyncResult: true },
-  get: { asyncResult: true },
-  create: { asyncResult: true },
-  delete: { asyncResult: true },
-  update: { asyncResult: true },
-  getErrors: { asyncResult: true },
-  lookup: { asyncResult: true },
-  purgeKey: { asyncResult: true },
-  purgeAll: { asyncResult: true },
-  validate: { asyncResult: true },
-}));
-
-export default LookupTablesActions;
+// eslint-disable-next-line import/prefer-default-export
+export const createLookupTable = (index = 1, overrides = {}) => ({
+  cache_id: 'cache-id',
+  content_pack: null,
+  data_adapter_id: 'data-adapter-id',
+  default_multi_value: '',
+  default_multi_value_type: 'NULL',
+  default_single_value: '',
+  default_single_value_type: 'NULL',
+  description: `Description lookup-table-${index}`,
+  id: `lookup-table-id-${index}`,
+  name: `lookup-table-name-${index}`,
+  title: `Lookup Table Title ${index}`,
+  ...overrides,
+});

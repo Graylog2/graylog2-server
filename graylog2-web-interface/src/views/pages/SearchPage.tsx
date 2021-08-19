@@ -22,22 +22,38 @@ import Search from 'views/components/Search';
 import { loadNewView as defaultLoadNewView, loadView as defaultLoadView } from 'views/logic/views/Actions';
 import IfUserHasAccessToAnyStream from 'views/components/IfUserHasAccessToAnyStream';
 import DashboardPageContextProvider from 'views/components/contexts/DashboardPageContextProvider';
+import { useStore } from 'stores/connect';
+import { DocumentTitle } from 'components/common';
+import viewTitle from 'views/logic/views/ViewTitle';
+import { ViewStore } from 'views/stores/ViewStore';
 
 type Props = {
   loadNewView?: () => unknown,
   loadView?: (string) => unknown,
 };
 
+const SearchPageTitle = ({ children }: { children: React.ReactNode }) => {
+  const title = useStore(ViewStore, ({ view }) => viewTitle(view?.title, view?.type));
+
+  return (
+    <DocumentTitle title={title}>
+      {children}
+    </DocumentTitle>
+  );
+};
+
 const SearchPage = ({ loadNewView = defaultLoadNewView, loadView = defaultLoadView }: Props) => (
-  <DashboardPageContextProvider>
-    <NewViewLoaderContext.Provider value={loadNewView}>
-      <ViewLoaderContext.Provider value={loadView}>
-        <IfUserHasAccessToAnyStream>
-          <Search />
-        </IfUserHasAccessToAnyStream>
-      </ViewLoaderContext.Provider>
-    </NewViewLoaderContext.Provider>
-  </DashboardPageContextProvider>
+  <SearchPageTitle>
+    <DashboardPageContextProvider>
+      <NewViewLoaderContext.Provider value={loadNewView}>
+        <ViewLoaderContext.Provider value={loadView}>
+          <IfUserHasAccessToAnyStream>
+            <Search />
+          </IfUserHasAccessToAnyStream>
+        </ViewLoaderContext.Provider>
+      </NewViewLoaderContext.Provider>
+    </DashboardPageContextProvider>
+  </SearchPageTitle>
 );
 
 SearchPage.defaultProps = {

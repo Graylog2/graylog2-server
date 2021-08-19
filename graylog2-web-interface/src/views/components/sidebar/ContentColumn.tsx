@@ -17,19 +17,17 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
-import type { ViewType } from 'views/logic/views/View';
 import { SearchPageLayout } from 'views/components/contexts/SearchPageLayoutContext';
 import { ViewMetaData as ViewMetadata } from 'views/stores/ViewMetadataStore';
 import { IconButton } from 'components/common';
-import ViewTypeLabel from 'views/components/ViewTypeLabel';
 import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
+import viewTitle from 'views/logic/views/ViewTitle';
 
 type Props = {
   children: React.ReactNode,
   closeSidebar: () => void,
   searchPageLayout: SearchPageLayout | undefined | null,
   sectionTitle: string,
-  viewIsNew: boolean,
   viewMetadata: ViewMetadata,
 };
 
@@ -154,25 +152,13 @@ const toggleSidebarPinning = (searchPageLayout) => {
   togglePinning();
 };
 
-const sidebarTitle = (viewMetadata: ViewMetadata, viewType: ViewType | undefined | null, viewIsNew: boolean) => {
-  const viewTypeLabel = ViewTypeLabel({ type: viewType, capitalize: true });
-  const unsavedViewTitle = `Unsaved ${viewTypeLabel}`;
-  const savedViewTitle = viewMetadata.title ?? `Untitled ${viewTypeLabel}`;
-
-  if (viewIsNew) {
-    return unsavedViewTitle;
-  }
-
-  return savedViewTitle;
-};
-
-const ContentColumn = ({ children, sectionTitle, closeSidebar, searchPageLayout, viewMetadata, viewIsNew }: Props) => {
+const ContentColumn = ({ children, sectionTitle, closeSidebar, searchPageLayout, viewMetadata }: Props) => {
   const sidebarIsPinned = searchPageLayout?.config.sidebar.isPinned;
 
   return (
     <ViewTypeContext.Consumer>
       {(viewType) => {
-        const title = sidebarTitle(viewMetadata, viewType, viewIsNew);
+        const title = viewTitle(viewMetadata?.title, viewType);
 
         return (
           <Container sidebarIsPinned={sidebarIsPinned}>
