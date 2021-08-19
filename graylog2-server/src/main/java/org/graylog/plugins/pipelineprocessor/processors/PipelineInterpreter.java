@@ -411,24 +411,20 @@ public class PipelineInterpreter implements MessageProcessor {
                                           EvaluationContext context,
                                           List<Rule> rulesToRun, InterpreterListener interpreterListener) {
         interpreterListener.evaluateRule(rule, pipeline);
-        boolean matched = false;
+        boolean matched;
         final LogicalExpression logicalExpression = rule.when();
-        boolean caughtEvaluationException = false;
         try {
             matched = logicalExpression.evaluateBool(context);
         } catch (Exception e) {
-            context.onEvaluationException(e, logicalExpression);
-            caughtEvaluationException = true;
-        }
 
-        if (caughtEvaluationException) {
-            final EvaluationContext.EvalError lastEvalError = context.lastEvaluationError();
+            context.onEvaluationException(e, logicalExpression);
+
             message.addProcessingError(new Message.ProcessingError(
                     ProcessingFailureCause.RuleConditionEvaluationError,
                     String.format(Locale.ENGLISH,
                             "Error evaluating condition for rule <%s/%s> (pipeline <%s/%s>)",
                             rule.name(), rule.id(), pipeline.name(), pipeline.id()),
-                    lastEvalError.toString()
+                    context.lastEvaluationError().toString()
             ));
 
             interpreterListener.failEvaluateRule(rule, pipeline);
