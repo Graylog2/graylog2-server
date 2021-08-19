@@ -46,24 +46,10 @@ const getMessageEventType = (eventTypeCode: string | undefined, messageEvents: A
   return messageEvents?.find((eventType) => eventType.gl2EventTypeCode === eventTypeCode);
 };
 
-const useMessageSummaries = (showSummary, message) => {
-  const messageEvents = usePluginEntities('messageEventTypes');
-  const messageSummaryComponents = usePluginEntities('views.components.widgets.messageTable.summary');
-
-  if (!showSummary) {
-    return undefined;
-  }
-
-  const messageEventType = getMessageEventType(message.fields.gl2_event_type_code, messageEvents);
-  const summaries = messageEventType && messageSummaryComponents?.map((renderSummaryComponent) => (
-    renderSummaryComponent({
-      messageFields: message.fields,
-      messageEventType,
-    })
-  ));
-
-  return summaries?.filter((summary) => summary !== null);
-};
+const renderMessageFieldRow = (message, messageFieldType) => (
+  <MessageFieldRow message={message}
+                   messageFieldType={messageFieldType} />
+);
 
 type Props = {
   onRowClick: () => void,
@@ -74,19 +60,36 @@ type Props = {
   messageFieldType: FieldType,
 };
 
+const useMessageSummary = (showSummary, message, messageFieldType) => {
+  const messageEvents = usePluginEntities('messageEventTypes');
+  const MessageSummaryComponent = usePluginEntities('views.components.widgets.messageTable.summary')?.[0];
+
+  if (!showSummary || !MessageSummaryComponent) {
+    return null;
+  }
+
+  const messageEventType = getMessageEventType(message.fields.gl2_event_type_code, messageEvents);
+
+  if (!messageEventType) {
+    return null;
+  }
+
+  return (
+    <MessageSummaryComponent messageEventType={messageEventType}
+                             messageFields={message.fields}
+                             renderFallback={() => renderMessageFieldRow(message, messageFieldType)} />
+  );
+};
+
 const MessagePreview = ({ showMessageRow, showSummary, onRowClick, colSpanFixup, message, messageFieldType }: Props) => {
-  const summaries = useMessageSummaries(showSummary, message);
-  const hasMessageSummary = summaries && summaries.length !== 0;
+  const messageSummary = useMessageSummary(showSummary, message, messageFieldType);
 
   return (
     <TableRow onClick={onRowClick}>
       <td colSpan={colSpanFixup}>
-        {(showMessageRow && !hasMessageSummary) && (
-          <MessageFieldRow message={message}
-                           messageFieldType={messageFieldType} />
-        )}
+        {(showMessageRow && !messageSummary) && renderMessageFieldRow(message, messageFieldType)}
 
-        {hasMessageSummary && summaries}
+        {messageSummary}
       </td>
     </TableRow>
   );

@@ -210,6 +210,7 @@ export type MessagePreviewOption = {
 export type MessageSummaryProps = {
   messageEventType: MessageEventType,
   messageFields: { [key: string]: any },
+  renderFallback: () => React.ReactNode;
 }
 
 declare module 'graylog-web-plugin/plugin' {
@@ -223,13 +224,13 @@ declare module 'graylog-web-plugin/plugin' {
     systemConfigurations?: Array<SystemConfiguration>;
     valueActions?: Array<ActionDefinition>;
     'views.completers'?: Array<Completer>;
-    'views.components.widgets.messageTable.previewOptions'?: Array<MessagePreviewOption>
-    'views.components.widgets.messageTable.summary'?: Array<React.FunctionComponent<MessageSummaryProps>>
+    'views.components.widgets.messageTable.previewOptions'?: Array<MessagePreviewOption>;
+    'views.components.widgets.messageTable.summary'?: Array<React.ComponentType<MessageSummaryProps>>;
     'views.elements.header'?: Array<React.ComponentType>;
     'views.elements.queryBar'?: Array<React.ComponentType>;
     'views.export.formats'?: Array<ExportFormat>;
-    'views.hooks.executingView'?: Array<ViewHook>,
-    'views.hooks.loadingView'?: Array<ViewHook>,
+    'views.hooks.executingView'?: Array<ViewHook>;
+    'views.hooks.loadingView'?: Array<ViewHook>;
     'views.hooks.searchRefresh'?: Array<SearchRefreshCondition>;
     'views.hooks.copyWidgetToDashboard'?: Array<CopyWidgetToDashboardHook>;
     'views.overrides.widgetEdit'?: Array<React.ComponentType<OverrideProps>>;

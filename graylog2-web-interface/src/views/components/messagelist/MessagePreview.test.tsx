@@ -17,7 +17,9 @@
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import { createSimpleMessageEventType } from 'fixtures/messageEventTypes';
+import { asMock } from 'helpers/mocking';
 
+import usePluginEntities from 'views/logic/usePluginEntities';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 
 import MessagePreview from './MessagePreview';
@@ -27,7 +29,7 @@ const mockMessageEventTypes = [simpleEventType];
 
 jest.mock('views/logic/usePluginEntities', () => jest.fn((entityKey) => ({
   messageEventTypes: mockMessageEventTypes,
-  'views.components.widgets.messageTable.summary': [() => <div key="the-summary">The message summary</div>],
+  'views.components.widgets.messageTable.summary': [() => <div>The message summary</div>],
 }[entityKey])));
 
 describe('MessagePreview', () => {
@@ -73,15 +75,32 @@ describe('MessagePreview', () => {
   });
 
   it('displays message summary', () => {
-    render(<SUT showSummary />);
+    render(<SUT showSummary showMessageRow />);
 
     expect(screen.getByText('The message summary')).toBeInTheDocument();
   });
 
-  it('does not display message summary when summary is being displayed', () => {
+  it('replaces message row with summary, when summary is available', () => {
     render(<SUT showSummary showMessageRow />);
 
     expect(screen.getByText('The message summary')).toBeInTheDocument();
     expect(screen.queryByText('Something happened!')).not.toBeInTheDocument();
+  });
+
+  it('message summary receives message row as fallback', () => {
+    asMock(usePluginEntities).mockImplementation((entityKey) => ({
+      messageEventTypes: mockMessageEventTypes,
+      'views.components.widgets.messageTable.summary': [({ renderFallback }) => (
+        <div>
+          The summary component {renderFallback()}
+        </div>
+      )],
+    }[entityKey]));
+
+    render(<SUT showSummary showMessageRow />);
+
+    expect(screen.queryByText('The message summary')).not.toBeInTheDocument();
+    expect(screen.getByText(/The summary component/)).toBeInTheDocument();
+    expect(screen.getByText('Something happened!')).toBeInTheDocument();
   });
 });
