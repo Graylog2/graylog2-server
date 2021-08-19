@@ -20,7 +20,6 @@ import * as Immutable from 'immutable';
 import Parameter from 'views/logic/parameters/Parameter';
 
 import type { ParameterJson } from './Parameter';
-import ParameterBinding from './ParameterBinding';
 
 type InternalBuilderState = Immutable.Map<string, any>;
 
@@ -43,7 +42,7 @@ export default class LookupTableParameter extends Parameter {
   static Builder: typeof Builder;
 
   constructor(name: string, title: string, description: string, dataType: string, defaultValue: any, optional: boolean, lookupTable: string, key: string) {
-    super(LookupTableParameter.type, name, title, description, dataType, defaultValue, optional, ParameterBinding.empty());
+    super(LookupTableParameter.type, name, title, description, dataType, defaultValue, optional);
     this._value2 = { lookupTable, key };
   }
 
@@ -53,11 +52,11 @@ export default class LookupTableParameter extends Parameter {
 
   // eslint-disable-next-line @typescript-eslint/no-use-before-define
   toBuilder(): Builder {
-    const { type, name, title, description, dataType, defaultValue, optional, binding } = this._value;
+    const { type, name, title, description, dataType, defaultValue, optional } = this._value;
     const { lookupTable, key } = this._value2;
 
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    return new Builder(Immutable.Map({ type, name, title, description, dataType, defaultValue, optional, binding, lookupTable, key }));
+    return new Builder(Immutable.Map({ type, name, title, description, dataType, defaultValue, optional, lookupTable, key }));
   }
 
   // screw you eslint, using param.constructor.needsBinding() is ugly

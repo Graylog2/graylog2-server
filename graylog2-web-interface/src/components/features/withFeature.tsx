@@ -14,15 +14,25 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 
-import type { MessageEventTypes } from 'views/types/messageEventTypes';
-import { singleton } from 'views/logic/singleton';
+import IfFeatureEnabled from './IfFeatureEnabled';
 
-export type MessageEventTypesContextType = {
-  eventTypes: MessageEventTypes,
-}
+const withFeature = <Props extends {}>(
+  featureName: string,
+  Component: React.ComponentType<Props>,
+): React.ComponentType<Props> => {
+  return (props) => (
+    <IfFeatureEnabled name={featureName}>
+      <Component {...props} />
+    </IfFeatureEnabled>
+  );
+};
 
-const MessageEventTypesContext = React.createContext<MessageEventTypesContextType | undefined>(undefined);
+withFeature.propTypes = {
+  featureName: PropTypes.string,
+  Component: PropTypes.node,
+};
 
-export default singleton('contexts.MessageEventsContext', () => MessageEventTypesContext);
+export default withFeature;

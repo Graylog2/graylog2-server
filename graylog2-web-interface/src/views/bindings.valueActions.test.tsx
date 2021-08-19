@@ -17,6 +17,7 @@
 import MockStore from 'helpers/mocking/StoreMock';
 
 import FieldType, { FieldTypes, Properties } from 'views/logic/fieldtypes/FieldType';
+import { ActionDefinition } from 'views/components/actions/ActionHandler';
 
 import bindings from './bindings';
 
@@ -41,7 +42,7 @@ describe('Views bindings value actions', () => {
     },
     type: FieldType.Unknown,
   };
-  const findAction = (type) => valueActions.find((binding) => binding.type === type);
+  const findAction = (type): ActionDefinition<{}> => valueActions.find((binding) => binding.type === type);
 
   describe('CreateExtractor', () => {
     const action = findAction('create-extractor');

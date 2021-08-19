@@ -14,21 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
 
-import type { ActionDefinition } from 'views/components/actions/ActionHandler';
-import { singleton } from 'views/logic/singleton';
+import AppConfig from 'util/AppConfig';
 
-export type FieldAndValueActionsContextType = {
-  fieldActions: {
-    internal: Array<ActionDefinition> | undefined,
-  },
-  valueActions: {
-    external: Array<ActionDefinition> | undefined,
-    internal: Array<ActionDefinition> | undefined,
-  }
-}
+const useFeature = (name: string) => {
+  return AppConfig.isFeatureEnabled(name);
+};
 
-const FieldAndValueActionsContext = React.createContext<FieldAndValueActionsContextType | undefined>(undefined);
-
-export default singleton('contexts.FieldAndValueActionsContext', () => FieldAndValueActionsContext);
+export default useFeature;

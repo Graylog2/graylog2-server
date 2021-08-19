@@ -16,7 +16,9 @@
  */
 import Reflux from 'reflux';
 
-const LookupTablesActions = Reflux.createActions({
+import { singletonActions } from 'views/logic/singleton';
+
+const LookupTablesActions = singletonActions('LookupTables', () => Reflux.createActions({
   searchPaginated: { asyncResult: true },
   reloadPage: { asyncResult: true },
   get: { asyncResult: true },
@@ -28,6 +30,6 @@ const LookupTablesActions = Reflux.createActions({
   purgeKey: { asyncResult: true },
   purgeAll: { asyncResult: true },
   validate: { asyncResult: true },
-});
+}));
 
 export default LookupTablesActions;
