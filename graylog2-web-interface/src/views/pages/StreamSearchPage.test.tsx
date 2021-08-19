@@ -18,6 +18,7 @@ import * as React from 'react';
 import { render, waitFor, fireEvent } from 'wrappedTestingLibrary';
 import { act } from 'react-dom/test-utils';
 import asMock from 'helpers/mocking/AsMock';
+import { MockStore } from 'helpers/mocking';
 
 import StreamsContext from 'contexts/StreamsContext';
 import { processHooks } from 'views/logic/views/ViewLoader';
@@ -51,6 +52,7 @@ jest.mock('views/stores/ViewStore', () => ({
   ViewActions: {
     create: jest.fn(() => Promise.resolve({ view: mockView })),
   },
+  ViewStore: MockStore(['getInitialState', () => ({ view: mockView })]),
 }));
 
 jest.mock('routing/withLocation', () => (x) => x);
