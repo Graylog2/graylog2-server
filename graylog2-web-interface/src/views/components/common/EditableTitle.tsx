@@ -26,7 +26,6 @@ const StyledStaticSpan = styled.span(({ theme }) => css`
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
-  min-width: 20px;
 `);
 
 const StyledInput = styled.input(({ theme }) => css`
