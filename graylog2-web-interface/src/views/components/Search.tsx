@@ -62,7 +62,6 @@ import WidgetFocusProvider from 'views/components/contexts/WidgetFocusProvider';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import { RefluxActions } from 'stores/StoreTypes';
-import FieldAndValueActionsProvider from 'views/components/contexts/FieldAndValueActionsProvider';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 
 const GridContainer = styled.div<{ interactive: boolean }>(({ interactive }) => {
@@ -199,60 +198,58 @@ const Search = ({ location }: Props) => {
   }, []);
 
   return (
-    <FieldAndValueActionsProvider>
-      <WidgetFocusProvider>
-        <WidgetFocusContext.Consumer>
-          {({ focusedWidget: { focusing: focusingWidget, editing: editingWidget } = { focusing: false, editing: false } }) => (
-            <CurrentViewTypeProvider>
-              <IfInteractive>
-                <IfDashboard>
-                  <WindowLeaveMessage />
-                </IfDashboard>
-              </IfInteractive>
-              <InteractiveContext.Consumer>
-                {(interactive) => (
-                  <SearchPageLayoutProvider>
-                    <DefaultFieldTypesProvider>
-                      <ViewAdditionalContextProvider>
-                        <HighlightingRulesProvider>
-                          <GridContainer id="main-row" interactive={interactive}>
+    <WidgetFocusProvider>
+      <WidgetFocusContext.Consumer>
+        {({ focusedWidget: { focusing: focusingWidget, editing: editingWidget } = { focusing: false, editing: false } }) => (
+          <CurrentViewTypeProvider>
+            <IfInteractive>
+              <IfDashboard>
+                <WindowLeaveMessage />
+              </IfDashboard>
+            </IfInteractive>
+            <InteractiveContext.Consumer>
+              {(interactive) => (
+                <SearchPageLayoutProvider>
+                  <DefaultFieldTypesProvider>
+                    <ViewAdditionalContextProvider>
+                      <HighlightingRulesProvider>
+                        <GridContainer id="main-row" interactive={interactive}>
+                          <IfInteractive>
+                            <ConnectedSidebar>
+                              <FieldsOverview />
+                            </ConnectedSidebar>
+                          </IfInteractive>
+                          <SearchArea>
                             <IfInteractive>
-                              <ConnectedSidebar>
-                                <FieldsOverview />
-                              </ConnectedSidebar>
+                              <HeaderElements />
+                              <IfDashboard>
+                                {!editingWidget && <DashboardSearchBarWithStatus onExecute={refreshIfNotUndeclared} />}
+                              </IfDashboard>
+                              <IfSearch>
+                                <SearchBarWithStatus onExecute={refreshIfNotUndeclared} />
+                              </IfSearch>
+
+                              <QueryBarElements />
+
+                              <IfDashboard>
+                                {!focusingWidget && <QueryBar />}
+                              </IfDashboard>
                             </IfInteractive>
-                            <SearchArea>
-                              <IfInteractive>
-                                <HeaderElements />
-                                <IfDashboard>
-                                  {!editingWidget && <DashboardSearchBarWithStatus onExecute={refreshIfNotUndeclared} />}
-                                </IfDashboard>
-                                <IfSearch>
-                                  <SearchBarWithStatus onExecute={refreshIfNotUndeclared} />
-                                </IfSearch>
-
-                                <QueryBarElements />
-
-                                <IfDashboard>
-                                  {!focusingWidget && <QueryBar />}
-                                </IfDashboard>
-                              </IfInteractive>
-                              <HighlightMessageInQuery>
-                                <SearchResult hasErrors={hasErrors} />
-                              </HighlightMessageInQuery>
-                            </SearchArea>
-                          </GridContainer>
-                        </HighlightingRulesProvider>
-                      </ViewAdditionalContextProvider>
-                    </DefaultFieldTypesProvider>
-                  </SearchPageLayoutProvider>
-                )}
-              </InteractiveContext.Consumer>
-            </CurrentViewTypeProvider>
-          )}
-        </WidgetFocusContext.Consumer>
-      </WidgetFocusProvider>
-    </FieldAndValueActionsProvider>
+                            <HighlightMessageInQuery>
+                              <SearchResult hasErrors={hasErrors} />
+                            </HighlightMessageInQuery>
+                          </SearchArea>
+                        </GridContainer>
+                      </HighlightingRulesProvider>
+                    </ViewAdditionalContextProvider>
+                  </DefaultFieldTypesProvider>
+                </SearchPageLayoutProvider>
+              )}
+            </InteractiveContext.Consumer>
+          </CurrentViewTypeProvider>
+        )}
+      </WidgetFocusContext.Consumer>
+    </WidgetFocusProvider>
   );
 };
 
