@@ -14,22 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import Reflux from 'reflux';
 
-import { singletonActions } from 'views/logic/singleton';
+import ValueParameter from 'views/logic/parameters/ValueParameter';
 
-const LookupTablesActions = singletonActions('LookupTables', () => Reflux.createActions({
-  searchPaginated: { asyncResult: true },
-  reloadPage: { asyncResult: true },
-  get: { asyncResult: true },
-  create: { asyncResult: true },
-  delete: { asyncResult: true },
-  update: { asyncResult: true },
-  getErrors: { asyncResult: true },
-  lookup: { asyncResult: true },
-  purgeKey: { asyncResult: true },
-  purgeAll: { asyncResult: true },
-  validate: { asyncResult: true },
-}));
-
-export default LookupTablesActions;
+// eslint-disable-next-line import/prefer-default-export
+export const valueParameter = ValueParameter.create('paraemterName', 'Parameter Title', '', 'any', undefined, false);
