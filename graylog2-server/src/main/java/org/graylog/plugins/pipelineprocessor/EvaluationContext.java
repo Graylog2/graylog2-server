@@ -139,6 +139,12 @@ public class EvaluationContext {
         return evalErrors == null ? Collections.emptyList() : Collections.unmodifiableList(evalErrors);
     }
 
+    @Nullable
+    public EvalError lastEvaluationError() {
+        return evalErrors == null || evalErrors.isEmpty() ? null
+                : evalErrors.get(evalErrors.size() - 1);
+    }
+
     public static class TypedValue {
         private final Class type;
         private final Object value;

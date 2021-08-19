@@ -307,6 +307,13 @@ public class PipelineInterpreter implements MessageProcessor {
                 final boolean ruleCondition = evaluateRuleCondition(rule, message, msgId, pipeline, context, rulesToRun, interpreterListener);
                 anyRulesMatched |= ruleCondition;
                 allRulesMatched &= ruleCondition;
+
+                if (context.hasEvaluationErrors()) {
+                    log.warn("Error evaluating condition for rule <{}/{}> with message: {} (Error: {})",
+                            rule.name(), rule.id(), message, context.lastEvaluationError());
+                    break;
+                }
+
             } catch (Exception e) {
                 log.warn("Error evaluating condition for rule <{}/{}> with message: {} (Error: {})",
                         rule.name(), rule.id(), message, e.getMessage());
@@ -316,9 +323,8 @@ public class PipelineInterpreter implements MessageProcessor {
 
         for (Rule rule : rulesToRun) {
             if (!executeRuleActions(rule, message, msgId, pipeline, context, interpreterListener)) {
-                final EvaluationContext.EvalError lastError = Iterables.getLast(context.evaluationErrors());
                 log.warn("Error evaluating action for rule <{}/{}> with message: {} (Error: {})",
-                        rule.name(), rule.id(), message, lastError);
+                        rule.name(), rule.id(), message, context.lastEvaluationError());
                 // if any of the rules raise an error, skip the rest of the rules
                 break;
             }
@@ -407,32 +413,33 @@ public class PipelineInterpreter implements MessageProcessor {
         interpreterListener.evaluateRule(rule, pipeline);
         boolean matched = false;
         final LogicalExpression logicalExpression = rule.when();
+        boolean caughtEvaluationException = false;
         try {
             matched = logicalExpression.evaluateBool(context);
         } catch (Exception e) {
             context.onEvaluationException(e, logicalExpression);
+            caughtEvaluationException = true;
         }
 
-        if (context.hasEvaluationErrors()) {
-            final EvaluationContext.EvalError lastError = Iterables.getLast(context.evaluationErrors());
+        if (caughtEvaluationException) {
+            final EvaluationContext.EvalError lastEvalError = context.lastEvaluationError();
             message.addProcessingError(new Message.ProcessingError(
                     ProcessingFailureCause.RuleConditionEvaluationError,
                     String.format(Locale.ENGLISH,
                             "Error evaluating condition for rule <%s/%s> (pipeline <%s/%s>)",
                             rule.name(), rule.id(), pipeline.name(), pipeline.id()),
-                    lastError.toString()
+                    lastEvalError.toString()
             ));
-            log.debug("Encountered evaluation error during condition, skipping rule actions: {}",
-                    lastError);
+
+            log.debug("Encountered evaluation error during condition, skipping rule actions: {}", lastEvalError);
+
+            interpreterListener.failEvaluateRule(rule, pipeline);
+
+            return false;
         }
 
         if (matched) {
             rule.markMatch();
-
-            if (context.hasEvaluationErrors()) {
-                interpreterListener.failEvaluateRule(rule, pipeline);
-                return false;
-            }
             interpreterListener.satisfyRule(rule, pipeline);
             log.debug("[{}] rule `{}` matches, scheduling to run", msgId, rule.name());
             rulesToRun.add(rule);
