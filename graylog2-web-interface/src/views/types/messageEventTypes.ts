@@ -25,5 +25,3 @@ export type MessageEventType = {
   requiredFields: Array<string>,
   optionalFields: Array<string>,
 }
-
-export type MessageEventTypes = { [eventTypeCode: string]: MessageEventType | undefined };
