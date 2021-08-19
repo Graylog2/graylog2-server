@@ -21,14 +21,35 @@ import React from 'react';
 import LookupTableParameterEdit from 'components/lookup-table-parameters/LookupTableParameterEdit';
 import { Button } from 'components/graylog';
 import { BootstrapModalForm } from 'components/bootstrap';
+import { LookupTable } from 'components/lookup-tables/types';
+import LookupTableParameter, { LookupTableParameterJson } from 'views/logic/parameters/LookupTableParameter';
 
-class EditQueryParameterModal extends React.Component {
+type Props = {
+  queryParameters: Array<LookupTableParameterJson>,
+  lookupTables: Array<LookupTable>,
+  onChange: (newQueryParameters: Array<LookupTableParameterJson>) => void,
+  queryParameter: LookupTableParameter,
+  embryonic: boolean,
+}
+
+type State = {
+  queryParameter: LookupTableParameter,
+  validation: {
+    lookupTable?: string,
+    key?: string,
+  },
+}
+
+class EditQueryParameterModal extends React.Component<Props, State> {
   static propTypes = {
-    eventDefinition: PropTypes.object.isRequired,
+    queryParameters: PropTypes.array.isRequired,
     queryParameter: PropTypes.object.isRequired,
     lookupTables: PropTypes.array.isRequired,
     onChange: PropTypes.func.isRequired,
+    embryonic: PropTypes.bool.isRequired,
   };
+
+  modal: BootstrapModalForm = React.createRef();
 
   constructor(props) {
     super(props);
@@ -63,18 +84,17 @@ class EditQueryParameterModal extends React.Component {
   }
 
   propagateChanges = () => {
-    const { eventDefinition, onChange, queryParameter: prevQueryParameter } = this.props;
+    const { queryParameters, onChange, queryParameter: prevQueryParameter } = this.props;
     const { queryParameter } = this.state;
-    const config = lodash.cloneDeep(eventDefinition.config);
-    const { query_parameters: queryParameters } = config;
+    const newQueryParameters = [...queryParameters];
     const index = queryParameters.findIndex((p) => p.name === prevQueryParameter.name);
 
     if (index < 0) {
       throw new Error(`Query parameter "${queryParameter.name}" not found`);
     }
 
-    queryParameters[index] = lodash.omit(queryParameter.toJSON(), 'embryonic');
-    onChange('config', config);
+    newQueryParameters[index] = queryParameter.toJSON();
+    onChange(newQueryParameters);
   };
 
   handleParameterChange = (key, value) => {
@@ -85,7 +105,7 @@ class EditQueryParameterModal extends React.Component {
   };
 
   _validate = (queryParameter) => {
-    const newValidation = {};
+    const newValidation: State['validation'] = {};
 
     if (!queryParameter.lookupTable) {
       newValidation.lookupTable = 'Cannot be empty';
@@ -101,10 +121,13 @@ class EditQueryParameterModal extends React.Component {
   };
 
   render() {
-    const { lookupTables } = this.props;
+    const { lookupTables, embryonic } = this.props;
     const { queryParameter, validation } = this.state;
 
-    const validationState = {
+    const validationState: {
+      lookupTable?: [string, string],
+      key?: [string, string],
+    } = {
       lookupTable: validation.lookupTable ? ['error', validation.lookupTable] : undefined,
       key: validation.key ? ['error', validation.key] : undefined,
     };
@@ -112,9 +135,9 @@ class EditQueryParameterModal extends React.Component {
     return (
       <>
         <Button bsSize="small"
-                bsStyle={queryParameter.embryonic ? 'primary' : 'info'}
+                bsStyle={embryonic ? 'primary' : 'info'}
                 onClick={() => this.openModal()}>
-          {queryParameter.name}{queryParameter.embryonic && ': undeclared'}
+          {queryParameter.name}{embryonic && ': undeclared'}
         </Button>
 
         <BootstrapModalForm ref={(ref) => { this.modal = ref; }}
