@@ -214,34 +214,34 @@ const Search = ({ location }: Props) => {
                   <DefaultFieldTypesProvider>
                     <ViewAdditionalContextProvider>
                       <HighlightingRulesProvider>
-                          <GridContainer id="main-row" interactive={interactive}>
+                        <GridContainer id="main-row" interactive={interactive}>
+                          <IfInteractive>
+                            <ConnectedSidebar>
+                              <FieldsOverview />
+                            </ConnectedSidebar>
+                          </IfInteractive>
+                          <SearchArea>
                             <IfInteractive>
-                              <ConnectedSidebar>
-                                <FieldsOverview />
-                              </ConnectedSidebar>
+                              <HeaderElements />
+                              <IfDashboard>
+                                {!editingWidget && <DashboardSearchBarWithStatus onExecute={refreshIfNotUndeclared} />}
+                              </IfDashboard>
+                              <IfSearch>
+                                <SearchBarWithStatus onExecute={refreshIfNotUndeclared} />
+                              </IfSearch>
+
+                              <QueryBarElements />
+
+                              <IfDashboard>
+                                {!focusingWidget && <QueryBar />}
+                              </IfDashboard>
                             </IfInteractive>
-                            <SearchArea>
-                              <IfInteractive>
-                                <HeaderElements />
-                                <IfDashboard>
-                                  {!editingWidget && <DashboardSearchBarWithStatus onExecute={refreshIfNotUndeclared} />}
-                                </IfDashboard>
-                                <IfSearch>
-                                  <SearchBarWithStatus onExecute={refreshIfNotUndeclared} />
-                                </IfSearch>
-
-                                <QueryBarElements />
-
-                                <IfDashboard>
-                                  {!focusingWidget && <QueryBar />}
-                                </IfDashboard>
-                              </IfInteractive>
-                              <HighlightMessageInQuery>
-                                <SearchResult hasErrors={hasErrors} />
-                              </HighlightMessageInQuery>
-                            </SearchArea>
-                          </GridContainer>
-                        </HighlightingRulesProvider>
+                            <HighlightMessageInQuery>
+                              <SearchResult hasErrors={hasErrors} />
+                            </HighlightMessageInQuery>
+                          </SearchArea>
+                        </GridContainer>
+                      </HighlightingRulesProvider>
                     </ViewAdditionalContextProvider>
                   </DefaultFieldTypesProvider>
                 </SearchPageLayoutProvider>
