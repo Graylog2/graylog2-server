@@ -19,9 +19,9 @@ import { useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
-import StoreProvider from 'injection/StoreProvider';
 import { isTypeKeyword, isTypeRelativeWithStartOnly, isTypeRelativeWithEnd } from 'views/typeGuards/timeRange';
 import { readableRange } from 'views/logic/queries/TimeRangeToString';
+import ToolsStore from 'stores/tools/ToolsStore';
 
 type Props = {
   timerange: TimeRange | NoTimeRangeOverride | null | undefined,
@@ -30,8 +30,6 @@ type Props = {
 
 export const EMPTY_RANGE = '----/--/-- --:--:--.---';
 export const EMPTY_OUTPUT = { from: EMPTY_RANGE, until: EMPTY_RANGE };
-
-const ToolsStore = StoreProvider.getStore('Tools');
 
 const TimeRangeWrapper = styled.p(({ theme }) => css`
   width: 100%;

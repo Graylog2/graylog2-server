@@ -16,7 +16,7 @@
  */
 import React from 'react';
 import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
-import { StoreMock as MockStore } from 'helpers/mocking';
+import { StoreMock as MockStore, asMock } from 'helpers/mocking';
 import mockSearchClusterConfig from 'fixtures/searchClusterConfig';
 
 import ToolsStore from 'stores/tools/ToolsStore';
@@ -36,7 +36,9 @@ jest.mock('views/stores/SearchConfigStore', () => ({
   ),
 }));
 
-jest.mock('stores/tools/ToolsStore', () => ({}));
+jest.mock('stores/tools/ToolsStore', () => ({
+  testNaturalDate: jest.fn(),
+}));
 
 const defaultProps = {
   currentTimeRange: {
@@ -60,7 +62,7 @@ const TimeRangeDropdown = (allProps: TimeRangeDropdownProps) => (
 
 describe('TimeRangeDropdown', () => {
   beforeEach(() => {
-    ToolsStore.testNaturalDate = jest.fn(() => Promise.resolve({
+    asMock(ToolsStore.testNaturalDate).mockImplementation(() => Promise.resolve({
       from: '2018-11-14 13:52:38',
       to: '2018-11-14 13:57:38',
     }));
