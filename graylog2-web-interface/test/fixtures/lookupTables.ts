@@ -14,18 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
 
-import { useStore } from 'stores/connect';
-import ConfirmLeaveDialog from 'components/common/ConfirmLeaveDialog';
-import { ViewStore } from 'views/stores/ViewStore';
-
-const WindowLeaveMessage = () => {
-  const dirty = useStore(ViewStore, (state) => state.dirty);
-
-  return dirty
-    ? <ConfirmLeaveDialog question="Are you sure you want to leave the page? Any unsaved changes will be lost." />
-    : null;
-};
-
-export default WindowLeaveMessage;
+// eslint-disable-next-line import/prefer-default-export
+export const createLookupTable = (index = 1, overrides = {}) => ({
+  cache_id: 'cache-id',
+  content_pack: null,
+  data_adapter_id: 'data-adapter-id',
+  default_multi_value: '',
+  default_multi_value_type: 'NULL',
+  default_single_value: '',
+  default_single_value_type: 'NULL',
+  description: `Description lookup-table-${index}`,
+  id: `lookup-table-id-${index}`,
+  name: `lookup-table-name-${index}`,
+  title: `Lookup Table Title ${index}`,
+  ...overrides,
+});

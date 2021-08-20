@@ -14,18 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
 
-import { useStore } from 'stores/connect';
-import ConfirmLeaveDialog from 'components/common/ConfirmLeaveDialog';
-import { ViewStore } from 'views/stores/ViewStore';
+declare module 'graylog-web-plugin/plugin' {
+  import { Component } from 'react';
 
-const WindowLeaveMessage = () => {
-  const dirty = useStore(ViewStore, (state) => state.dirty);
-
-  return dirty
-    ? <ConfirmLeaveDialog question="Are you sure you want to leave the page? Any unsaved changes will be lost." />
-    : null;
-};
-
-export default WindowLeaveMessage;
+  interface PluginExports {
+    'systemOverview'?: Array<{ component: typeof Component }>;
+  }
+}

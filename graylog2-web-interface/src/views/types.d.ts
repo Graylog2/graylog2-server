@@ -45,7 +45,7 @@ import User from 'logic/users/User';
 import { Message } from 'views/components/messagelist/Types';
 import { ValuePath } from 'views/logic/valueactions/ValueActionHandler';
 
-import type { MessageEventTypes } from './types/messageEventTypes';
+import type { MessageEventType } from './types/messageEventTypes';
 
 interface EditWidgetComponentProps<Config extends WidgetConfig = WidgetConfig> {
   children: React.ReactNode,
@@ -203,7 +203,7 @@ declare module 'graylog-web-plugin/plugin' {
     enterpriseWidgets?: Array<WidgetExport>;
     externalValueActions?: Array<ActionDefinition>;
     fieldActions?: Array<ActionDefinition>;
-    messageEventTypes?: Array<MessageEventTypes>;
+    messageEventTypes?: Array<MessageEventType>;
     searchTypes?: Array<SearchType>;
     systemConfigurations?: Array<SystemConfiguration>;
     valueActions?: Array<ActionDefinition>;

@@ -14,18 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import { ViewType } from 'views/logic/views/View';
+import ViewTypeLabel from 'views/components/ViewTypeLabel';
 
-import { useStore } from 'stores/connect';
-import ConfirmLeaveDialog from 'components/common/ConfirmLeaveDialog';
-import { ViewStore } from 'views/stores/ViewStore';
-
-const WindowLeaveMessage = () => {
-  const dirty = useStore(ViewStore, (state) => state.dirty);
-
-  return dirty
-    ? <ConfirmLeaveDialog question="Are you sure you want to leave the page? Any unsaved changes will be lost." />
-    : null;
-};
-
-export default WindowLeaveMessage;
+export default (title: string, type: ViewType) => title ?? `Unsaved ${ViewTypeLabel({ type, capitalize: true })}`;

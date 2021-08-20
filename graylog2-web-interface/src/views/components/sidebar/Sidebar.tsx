@@ -36,7 +36,6 @@ type Props = {
   results: QueryResult,
   searchPageLayout?: SearchPageLayout,
   sections?: Array<SidebarSection>,
-  viewIsNew: boolean,
   viewMetadata: ViewMetadata,
 };
 
@@ -76,7 +75,7 @@ const _selectSidebarSection = (sectionKey, activeSectionKey, setActiveSectionKey
   setActiveSectionKey(sectionKey);
 };
 
-const Sidebar = ({ searchPageLayout, results, children, queryId, sections, viewMetadata, viewIsNew }: Props) => {
+const Sidebar = ({ searchPageLayout, results, children, queryId, sections, viewMetadata }: Props) => {
   const sidebarIsPinned = searchPageLayout?.config.sidebar.isPinned ?? false;
   const initialSectionKey = sections[0].key;
   const [activeSectionKey, setActiveSectionKey] = useState<string | undefined>(sidebarIsPinned ? initialSectionKey : null);
@@ -96,7 +95,6 @@ const Sidebar = ({ searchPageLayout, results, children, queryId, sections, viewM
         <ContentColumn closeSidebar={toggleSidebar}
                        searchPageLayout={searchPageLayout}
                        sectionTitle={activeSection.title}
-                       viewIsNew={viewIsNew}
                        viewMetadata={viewMetadata}>
           <SectionContent results={results}
                           queryId={queryId}
@@ -118,7 +116,6 @@ Sidebar.propTypes = {
   queryId: PropTypes.string.isRequired,
   results: PropTypes.object,
   sections: PropTypes.arrayOf(PropTypes.object),
-  viewIsNew: PropTypes.bool.isRequired,
   viewMetadata: PropTypes.shape({
     activeQuery: PropTypes.string,
     description: PropTypes.string,
