@@ -21,7 +21,7 @@ import React from 'react';
 import LookupTableParameterEdit from 'components/lookup-table-parameters/LookupTableParameterEdit';
 import { Button } from 'components/graylog';
 import { BootstrapModalForm } from 'components/bootstrap';
-import { LookupTable } from 'components/lookup-tables/types';
+import type { LookupTable } from 'logic/lookup-tables/types';
 import LookupTableParameter, { LookupTableParameterJson } from 'views/logic/parameters/LookupTableParameter';
 
 type Props = {
