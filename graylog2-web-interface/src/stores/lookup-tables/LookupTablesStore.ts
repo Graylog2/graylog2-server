@@ -24,26 +24,41 @@ import LookupTablesActions from 'actions/lookup-tables/LookupTablesActions';
 import { singletonStore } from 'views/logic/singleton';
 import { Store } from 'stores/StoreTypes';
 import type { LookupTable, LookupTableAdapter, LookupTableCache } from 'logic/lookup-tables/types';
+import { PaginatedResponseType } from 'stores/PaginationTypes';
+
+type LookupResult = {
+  multi_value: string | number | object | boolean | null,
+  single_value: string | number | object | boolean | null,
+  string_list_value: Array<string> | null,
+  ttl: number,
+  has_error: boolean,
+}
+
+type ValidationErrors = {
+  error_context: {
+    [fieldName: string]: Array<string> | undefined,
+  },
+  failed: boolean,
+  errors: {
+    [fieldName: string]: Array<string> | undefined,
+  },
+}
+
+type ErrorState = {
+  tables: {
+    [tableId: string]: string | undefined,
+  },
+  caches: {
+    [cacheId: string]: string | undefined,
+  },
+  dataAdapters: {
+    [adapterId: string]: string | undefined,
+  }
+}
 
 type LookupTablesStoreState = {
-  pagination: {
-    page: number,
-    per_page: 10,
-    total: number,
-    count: number,
-    query: string | null,
-  },
-  errorState: {
-    tables: {
-      [tableId: string]: string | undefined,
-    },
-    caches: {
-      [cacheId: string]: string | undefined,
-    },
-    dataAdapters: {
-      [adapterId: string]: string | undefined,
-    }
-  }
+  pagination: PaginatedResponseType,
+  errorState: ErrorState,
   table: LookupTable | null,
   cache: LookupTableCache | null,
   dataAdapter: LookupTableAdapter | null,
@@ -55,23 +70,9 @@ type LookupTablesStoreState = {
   },
   dataAdapters: {
     [adapterId: string]: LookupTableAdapter | undefined,
-  }
-  lookupResult: {
-    multi_value: string | number | object | boolean | null,
-    single_value: string | number | object | boolean | null,
-    string_list_value: Array<string> | null,
-    ttl: number,
-    has_error: boolean,
-  } | null,
-  validationErrors: {
-    error_context: {
-      [fieldName: string]: Array<string> | undefined,
-    },
-    failed: boolean,
-    errors: {
-      [fieldName: string]: Array<string> | undefined,
-    },
-  }
+  },
+  lookupResult: LookupResult | null,
+  validationErrors: ValidationErrors,
 }
 
 const LookupTablesStore: Store<LookupTablesStoreState> = singletonStore('LookupTables', () => Reflux.createStore({
