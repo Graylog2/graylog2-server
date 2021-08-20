@@ -14,15 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
 
-import type { MessageEventTypes } from 'views/types/messageEventTypes';
-import { singleton } from 'views/logic/singleton';
-
-export type MessageEventTypesContextType = {
-  eventTypes: MessageEventTypes,
+export type LookupTable = {
+  cache_id: string,
+  data_adapter_id: string,
+  default_multi_value: string,
+  default_multi_value_type: string,
+  default_single_value: string,
+  default_single_value_type: string,
+  description: string,
+  id: string,
+  name: string,
+  title: string,
 }
-
-const MessageEventTypesContext = React.createContext<MessageEventTypesContextType | undefined>(undefined);
-
-export default singleton('contexts.MessageEventsContext', () => MessageEventTypesContext);
