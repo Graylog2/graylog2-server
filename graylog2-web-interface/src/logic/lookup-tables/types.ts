@@ -41,19 +41,19 @@ export type LookupTableAdapter = {
   config: LookupDataAdapterConfiguration,
   content_pack: string | null,
   custom_error_ttl_unit: 'NANOSECONDS' | 'MICROSECONDS' | 'MILLISECONDS' | 'SECONDS' | 'MINUTES' | 'HOURS' | 'DAYS' | null,
-  custom_error_ttl_enabled (boolean, optional)
+  custom_error_ttl_enabled (boolean, optional),
 }
 
 export type LookupTable = {
-  cache_id: string;
-  default_multi_value_type: string | number | object | boolean | null;
-  name: string;
-  description: string | null;
-  id: string | null;
-  title: string;
-  default_single_value_type: string | number | object | boolean | null;
-  content_pack: string | null;
-  data_adapter_id: string;
-  default_multi_value: string | null;
-  default_single_value: string | null;
+  cache_id: string,
+  default_multi_value_type: string | number | object | boolean | null,
+  name: string,
+  description: string | null,
+  id: string | null,
+  title: string,
+  default_single_value_type: string | number | object | boolean | null,
+  content_pack: string | null,
+  data_adapter_id: string,
+  default_multi_value: string | null,
+  default_single_value: string | null,
 }
