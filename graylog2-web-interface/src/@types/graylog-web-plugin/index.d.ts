@@ -88,8 +88,8 @@ declare module 'graylog-web-plugin/plugin' {
     navigation?: Array<PluginNavigation>;
     navigationItems?: Array<PluginNavigationItems>;
     globalNotifications?: Array<GlobalNotification>
-    // Global context providers can be useful, when you want to fetch and process data once
-    // and provide its value for all components in your plugin.
+    // Global context providers allow to fetch and process data once
+    // and provide the result for all components in your plugin.
     globalContextProviders?: Array<React.ComponentType>,
     routes?: Array<PluginRoute>;
     pages?: PluginPages;
