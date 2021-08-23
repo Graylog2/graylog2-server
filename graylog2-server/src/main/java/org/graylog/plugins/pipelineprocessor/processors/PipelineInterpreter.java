@@ -35,6 +35,7 @@ import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.Stage;
+import org.graylog.plugins.pipelineprocessor.ast.expressions.LogicalExpression;
 import org.graylog.plugins.pipelineprocessor.ast.statements.Statement;
 import org.graylog.plugins.pipelineprocessor.db.RuleMetricsConfigDto;
 import org.graylog.plugins.pipelineprocessor.processors.listeners.InterpreterListener;
@@ -306,6 +307,13 @@ public class PipelineInterpreter implements MessageProcessor {
                 final boolean ruleCondition = evaluateRuleCondition(rule, message, msgId, pipeline, context, rulesToRun, interpreterListener);
                 anyRulesMatched |= ruleCondition;
                 allRulesMatched &= ruleCondition;
+
+                if (context.hasEvaluationErrors()) {
+                    log.warn("Error evaluating condition for rule <{}/{}> with message: {} (Error: {})",
+                            rule.name(), rule.id(), message, context.lastEvaluationError());
+                    break;
+                }
+
             } catch (Exception e) {
                 log.warn("Error evaluating condition for rule <{}/{}> with message: {} (Error: {})",
                         rule.name(), rule.id(), message, e.getMessage());
@@ -315,9 +323,8 @@ public class PipelineInterpreter implements MessageProcessor {
 
         for (Rule rule : rulesToRun) {
             if (!executeRuleActions(rule, message, msgId, pipeline, context, interpreterListener)) {
-                final EvaluationContext.EvalError lastError = Iterables.getLast(context.evaluationErrors());
                 log.warn("Error evaluating action for rule <{}/{}> with message: {} (Error: {})",
-                        rule.name(), rule.id(), message, lastError);
+                        rule.name(), rule.id(), message, context.lastEvaluationError());
                 // if any of the rules raise an error, skip the rest of the rules
                 break;
             }
@@ -404,24 +411,29 @@ public class PipelineInterpreter implements MessageProcessor {
                                           EvaluationContext context,
                                           List<Rule> rulesToRun, InterpreterListener interpreterListener) {
         interpreterListener.evaluateRule(rule, pipeline);
-        boolean matched = rule.when().evaluateBool(context);
+        final boolean matched;
+        final LogicalExpression logicalExpression = rule.when();
+        try {
+            matched = logicalExpression.evaluateBool(context);
+        } catch (Exception e) {
+
+            context.onEvaluationException(e, logicalExpression);
+
+            message.addProcessingError(new Message.ProcessingError(
+                    ProcessingFailureCause.RuleConditionEvaluationError,
+                    String.format(Locale.ENGLISH,
+                            "Error evaluating condition for rule <%s/%s> (pipeline <%s/%s>)",
+                            rule.name(), rule.id(), pipeline.name(), pipeline.id()),
+                    context.lastEvaluationError().toString()
+            ));
+
+            interpreterListener.failEvaluateRule(rule, pipeline);
+
+            return false;
+        }
+
         if (matched) {
             rule.markMatch();
-
-            if (context.hasEvaluationErrors()) {
-                final EvaluationContext.EvalError lastError = Iterables.getLast(context.evaluationErrors());
-                message.addProcessingError(new Message.ProcessingError(
-                        ProcessingFailureCause.RuleConditionEvaluationError,
-                        String.format(Locale.ENGLISH,
-                                "Error evaluating condition for rule <%s/%s> (pipeline <%s/%s>)",
-                                rule.name(), rule.id(), pipeline.name(), pipeline.id()),
-                        lastError.toString()
-                ));
-                interpreterListener.failEvaluateRule(rule, pipeline);
-                log.debug("Encountered evaluation error during condition, skipping rule actions: {}",
-                        lastError);
-                return false;
-            }
             interpreterListener.satisfyRule(rule, pipeline);
             log.debug("[{}] rule `{}` matches, scheduling to run", msgId, rule.name());
             rulesToRun.add(rule);
