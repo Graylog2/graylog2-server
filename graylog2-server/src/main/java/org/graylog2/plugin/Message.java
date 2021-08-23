@@ -293,7 +293,7 @@ public class Message implements Messages, Indexable {
 
     private com.codahale.metrics.Counter sizeCounter = new com.codahale.metrics.Counter();
 
-    private List<ProcessingError> processingErrors = new ArrayList<>();
+    private List<ProcessingError> processingErrors;
 
     private static final IdentityHashMap<Class<?>, Integer> classSizes = Maps.newIdentityHashMap();
 
@@ -432,7 +432,7 @@ public class Message implements Messages, Indexable {
         obj.put(FIELD_STREAMS, getStreamIds());
         obj.put(FIELD_GL2_ACCOUNTED_MESSAGE_SIZE, getSize());
 
-        if (!processingErrors.isEmpty()) {
+        if (processingErrors != null && !processingErrors.isEmpty()) {
             obj.put(FIELD_GL2_PROCESSING_ERROR,
                     processingErrors.stream()
                             .map(ProcessingError::getDetails)
@@ -931,6 +931,9 @@ public class Message implements Messages, Indexable {
      *                        Must not be null.
      */
     public void addProcessingError(@Nonnull ProcessingError processingError) {
+        if (processingErrors == null) {
+            processingErrors = new ArrayList<>();
+        }
         processingErrors.add(processingError);
     }
 
@@ -938,6 +941,9 @@ public class Message implements Messages, Indexable {
      * Returns a list of submitted processing errors
      */
     public List<ProcessingError> processingErrors() {
+        if (processingErrors == null) {
+            return ImmutableList.of();
+        }
         return ImmutableList.copyOf(processingErrors);
     }
 
