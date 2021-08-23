@@ -20,6 +20,7 @@ public enum ProcessingFailureCause implements FailureCause {
     RuleStatementEvaluationError("RuleStatementEvaluationError"),
     RuleConditionEvaluationError("RuleConditionEvaluationError"),
     ExtractorException("ExtractorException"),
+    MessageFilterException("MessageFilterException"),
     InvalidTimestampException("InvalidTimestampException"),
     UNKNOWN("UNKNOWN"),
     ;

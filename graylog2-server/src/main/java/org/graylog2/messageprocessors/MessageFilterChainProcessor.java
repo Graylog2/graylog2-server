@@ -117,7 +117,7 @@ public class MessageFilterChainProcessor implements MessageProcessor {
                     } else {
                         LOG.error("{}:\n{}", shortError, ExceptionUtils.getShortenedStackTrace(e));
                     }
-                    msg.addProcessingError(new Message.ProcessingError(ProcessingFailureCause.ExtractorException,
+                    msg.addProcessingError(new Message.ProcessingError(ProcessingFailureCause.MessageFilterException,
                             shortError, ExceptionUtils.getRootCauseMessage(e)));
                 } finally {
                     final long elapsedNanos = timerContext.stop();
