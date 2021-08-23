@@ -685,6 +685,7 @@ public class MessageTest {
         message.addField(Message.FIELD_TIMESTAMP, 1234);
 
         assertThat(message.getTimestamp()).isInstanceOf(DateTime.class);
+        // got replaced by a current timestamp
         assertThat(message.getTimestamp()).isNotEqualTo(previousTimestamp);
 
         assertThat(message.processingErrors()).satisfies(e -> {
