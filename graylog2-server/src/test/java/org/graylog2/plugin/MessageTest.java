@@ -691,7 +691,7 @@ public class MessageTest {
         assertThat(message.processingErrors()).satisfies(e -> {
             assertThat(e).hasSize(1);
             assertThat(e.get(0).getCause()).isEqualTo(ProcessingFailureCause.InvalidTimestampException);
-            assertThat(e.get(0).getMessage()).startsWith("Invalid type for field timestamp \'Integer\'");
+            assertThat(e.get(0).getMessage()).startsWith("Invalid type for field timestamp 'Integer'");
         });
     }
 
@@ -722,13 +722,13 @@ public class MessageTest {
         DateTimeUtils.setCurrentMillisSystem();
 
         final Message message = new Message("message", "source", Tools.nowUTC().minusMinutes(2));
-        final LocalDateTime localDate = LocalDateTime.of(2021, Month.AUGUST, 19, 12, 00);
+        final LocalDateTime localDate = LocalDateTime.of(2021, Month.AUGUST, 19, 12, 0);
+        final ZonedDateTime zonedDateTime = ZonedDateTime.of(localDate, ZoneOffset.UTC);
 
-        message.addField(Message.FIELD_TIMESTAMP, localDate);
+        message.addField(Message.FIELD_TIMESTAMP, zonedDateTime);
         assertThat(message.getTimestamp()).isInstanceOf(DateTime.class);
-        final DateTimeZone defaultTimeZone = DateTimeZone.getDefault();
-        final DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm").withZone(defaultTimeZone);
-        final DateTime expectedLocalDateEquivalent = formatter.parseDateTime("2021-08-19 12:00").withZone(DateTimeZone.UTC);
+        final DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm").withZone(DateTimeZone.UTC);
+        final DateTime expectedLocalDateEquivalent = formatter.parseDateTime("2021-08-19 12:00");
 
         assertThat(message.getTimestamp()).isEqualTo(expectedLocalDateEquivalent);
 
