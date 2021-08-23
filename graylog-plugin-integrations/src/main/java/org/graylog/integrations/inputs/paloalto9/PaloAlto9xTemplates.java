@@ -43,6 +43,7 @@ import java.util.SortedSet;
 import static org.graylog.integrations.inputs.paloalto.PaloAltoFieldTemplate.create;
 import static org.graylog.integrations.inputs.paloalto.PaloAltoFieldType.LONG;
 import static org.graylog.integrations.inputs.paloalto.PaloAltoFieldType.STRING;
+import static org.graylog.integrations.inputs.paloalto.PaloAltoFieldType.TIMESTAMP;
 
 public class PaloAlto9xTemplates {
 
@@ -62,7 +63,7 @@ public class PaloAlto9xTemplates {
         fields.add(create(PaloAlto9xFields.PAN_LOG_SUBTYPE, 4, STRING));
 
         // Field 5 is FUTURE USE
-        fields.add(create(Message.FIELD_TIMESTAMP, 6, STRING));
+        fields.add(create(Message.FIELD_TIMESTAMP, 6, TIMESTAMP));
         fields.add(create(SourceFields.SOURCE_REFERENCE, 7, STRING));
         fields.add(create(HostFields.HOST_VIRTFW_ID, 8, STRING));
         fields.add(create(UserFields.USER_COMMAND, 9, STRING));
@@ -97,7 +98,7 @@ public class PaloAlto9xTemplates {
         fields.add(create(PaloAlto9xFields.PAN_LOG_SUBTYPE, 4, STRING));
 
         // Field 5 is FUTURE USE
-        fields.add(create(Message.FIELD_TIMESTAMP, 6, STRING));
+        fields.add(create(Message.FIELD_TIMESTAMP, 6, TIMESTAMP));
         fields.add(create(SourceFields.SOURCE_IP, 7, STRING));
         fields.add(create(UserFields.USER_NAME, 8, STRING));
         fields.add(create(HostFields.HOST_VIRTFW_ID, 9, STRING));
@@ -130,7 +131,7 @@ public class PaloAlto9xTemplates {
         fields.add(create(PaloAlto9xFields.PAN_LOG_SUBTYPE, 4, STRING));
 
         // Field 5 is FUTURE USE
-        fields.add(create(Message.FIELD_TIMESTAMP, 6, STRING));
+        fields.add(create(Message.FIELD_TIMESTAMP, 6, TIMESTAMP));
         fields.add(create(UserFields.USER_NAME, 7, STRING));
         fields.add(create(HostFields.HOST_VIRTFW_ID, 8, STRING));
         fields.add(create(HostFields.HOST_HOSTNAME, 9, STRING));
@@ -176,7 +177,7 @@ public class PaloAlto9xTemplates {
         fields.add(create(EventFields.EVENT_LOG_NAME, 5, STRING));
         // Field 6 is FUTURE USE
         // Field 7 is FUTURE USE
-        fields.add(create(Message.FIELD_TIMESTAMP, 8, STRING));
+        fields.add(create(Message.FIELD_TIMESTAMP, 8, TIMESTAMP));
         fields.add(create(HostFields.HOST_VIRTFW_ID, 9, STRING));
 
         fields.add(create(PaloAlto9xFields.PAN_EVENT_NAME, 10, STRING));
@@ -225,7 +226,7 @@ public class PaloAlto9xTemplates {
         fields.add(create(PaloAlto9xFields.PAN_LOG_SUBTYPE, 4, STRING));
 
         // Field 5 is FUTURE USE
-        fields.add(create(Message.FIELD_TIMESTAMP, 6, STRING));
+        fields.add(create(Message.FIELD_TIMESTAMP, 6, TIMESTAMP));
         fields.add(create(HostFields.HOST_VIRTFW_ID, 7, STRING));
         fields.add(create(PaloAlto9xFields.PAN_EVENT_NAME, 8, STRING));
         fields.add(create(PaloAlto9xFields.PAN_TUNNEL_STAGE, 9, STRING));
@@ -281,7 +282,7 @@ public class PaloAlto9xTemplates {
         fields.add(create(PaloAlto9xFields.PAN_LOG_SUBTYPE, 4, STRING));
 
         // Field 5 is FUTURE USE
-        fields.add(create(Message.FIELD_TIMESTAMP, 6, STRING));
+        fields.add(create(Message.FIELD_TIMESTAMP, 6, TIMESTAMP));
         fields.add(create(HostFields.HOST_VIRTFW_ID, 7, STRING));
         fields.add(create(PaloAlto9xFields.PAN_EVENT_NAME, 8, STRING));
         fields.add(create(PaloAlto9xFields.PAN_EVENT_OBJECT, 9, STRING));
@@ -316,7 +317,7 @@ public class PaloAlto9xTemplates {
         fields.add(create(PaloAlto9xFields.PAN_LOG_SUBTYPE, 4, STRING));
 
         // Field 5 is FUTURE USE
-        fields.add(create(Message.FIELD_TIMESTAMP, 6, STRING));
+        fields.add(create(Message.FIELD_TIMESTAMP, 6, TIMESTAMP));
         fields.add(create(SourceFields.SOURCE_IP, 7, STRING));
         fields.add(create(DestinationFields.DESTINATION_IP, 8, STRING));
         fields.add(create(SourceFields.SOURCE_NAT_IP, 9, STRING));
@@ -456,7 +457,7 @@ public class PaloAlto9xTemplates {
         fields.add(create(PaloAlto9xFields.PAN_LOG_SUBTYPE, 4, STRING));
 
         // Field 5 is FUTURE USE
-        fields.add(create(Message.FIELD_TIMESTAMP, 6, STRING));
+        fields.add(create(Message.FIELD_TIMESTAMP, 6, TIMESTAMP));
         fields.add(create(SourceFields.SOURCE_IP, 7, STRING));
         fields.add(create(DestinationFields.DESTINATION_IP, 8, STRING));
         fields.add(create(SourceFields.SOURCE_NAT_IP, 9, STRING));
@@ -588,7 +589,7 @@ public class PaloAlto9xTemplates {
         fields.add(create(PaloAlto9xFields.PAN_LOG_SUBTYPE, 4, STRING));
 
         // Field 5 is FUTURE USE
-        fields.add(create(Message.FIELD_TIMESTAMP, 6, STRING));
+        fields.add(create(Message.FIELD_TIMESTAMP, 6, TIMESTAMP));
         fields.add(create(HostFields.HOST_VIRTFW_ID, 7, STRING));
         fields.add(create(SourceFields.SOURCE_IP, 8, STRING));
         fields.add(create(SourceFields.SOURCE_USER, 9, STRING));
