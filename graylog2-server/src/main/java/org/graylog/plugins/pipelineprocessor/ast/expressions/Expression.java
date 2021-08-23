@@ -18,16 +18,11 @@ package org.graylog.plugins.pipelineprocessor.ast.expressions;
 
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Maps;
-
 import org.antlr.v4.runtime.Token;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
-import org.graylog.plugins.pipelineprocessor.ast.exceptions.FunctionEvaluationException;
-
-import java.util.Map;
 
 import javax.annotation.Nullable;
-
-import static org.graylog2.shared.utilities.ExceptionUtils.getRootCause;
+import java.util.Map;
 
 public interface Expression {
 
@@ -39,13 +34,8 @@ public interface Expression {
     default Object evaluate(EvaluationContext context) {
         try {
             return evaluateUnsafe(context);
-        } catch (FunctionEvaluationException fee) {
-            context.addEvaluationError(fee.getStartToken().getLine(),
-                                       fee.getStartToken().getCharPositionInLine(),
-                                       fee.getFunctionExpression().getFunction().descriptor(),
-                                       getRootCause(fee));
         } catch (Exception e) {
-            context.addEvaluationError(getStartToken().getLine(), getStartToken().getCharPositionInLine(), null, getRootCause(e));
+            context.onEvaluationException(e, this);
         }
         return null;
     }
