@@ -17,8 +17,10 @@ const primitiveTypeMappings = {
   string: 'string',
   integer: 'number',
   Integer: 'number',
+  long: 'number',
   boolean: 'boolean',
   DateTime: 'string',
+  String: 'string',
   any: 'unknown',
 };
 
@@ -30,7 +32,6 @@ const mapPrimitiveType = (type) => primitiveTypeMappings[type];
 const typeMappings = {
   'urn:jsonschema:org:joda:time:DateTime': 'string',
   DateTime: 'string',
-  String: 'string',
   ChunkedOutput: 'unknown',
   ZonedDateTime: 'string',
 };
@@ -55,10 +56,11 @@ const creatorForType = (type) => {
   }
 };
 
-const createEnumType = ({ type, enum: enumOptions }) => {
+const createEnumType = ({ type, enum: enumOptions, defaultValue }) => {
   const mappedPrimitiveType = mapPrimitiveType(type);
   const creator = creatorForType(mappedPrimitiveType);
-  const types = enumOptions.map((option) => creator(option));
+  const options = defaultValue ? [...new Set(enumOptions).add(defaultValue)] : enumOptions;
+  const types = options.map((option) => creator(option));
 
   return ts.factory.createUnionTypeNode(types);
 };
@@ -235,7 +237,7 @@ const createBlock = (method, path, bodyParameter, queryParameter, rawProduces) =
   );
 };
 
-const isNumeric = (type) => ['integer'].includes(type);
+const isNumeric = (type) => ['integer', 'number'].includes(type);
 const isBoolean = (type) => ['boolean'].includes(type);
 
 const createInitializer = (type, defaultValue) => {
@@ -258,17 +260,19 @@ const sortByOptionality = (parameter1, parameter2) => parameter2.required - para
 
 const cleanParameterName = (name) => name.replace(/\s/g, '');
 
-const mergeEnumWithDefaultValue = (allowableValues, defaultValue) => (defaultValue ? [...new Set(allowableValues).add(defaultValue)] : allowableValues);
+const createFunctionParameter = ({ name, required, defaultValue, type, enum: allowableValues }) => {
+  const mappedType = isPrimitiveType(type) ? mapPrimitiveType(type) : type;
 
-const createFunctionParameter = ({ name, required, defaultValue, type, enum: allowableValues }) => ts.factory.createParameterDeclaration(
-  undefined,
-  undefined,
-  undefined,
-  cleanParameterName(name),
-  (required || defaultValue) ? undefined : ts.factory.createToken(ts.SyntaxKind.QuestionToken),
-  createTypeFor({ type, enum: mergeEnumWithDefaultValue(allowableValues, defaultValue) }),
-  defaultValue ? createInitializer(type, defaultValue) : undefined,
-);
+  return ts.factory.createParameterDeclaration(
+    undefined,
+    undefined,
+    undefined,
+    cleanParameterName(name),
+    (required || defaultValue) ? undefined : ts.factory.createToken(ts.SyntaxKind.QuestionToken),
+    createTypeFor({ type: mappedType, enum: allowableValues, defaultValue }),
+    defaultValue ? createInitializer(mappedType, defaultValue) : undefined,
+  );
+};
 
 const firstNonEmpty = (...strings) => strings.find((s) => (s !== undefined && s.trim() !== ''));
 
