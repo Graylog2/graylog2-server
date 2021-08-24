@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import org.graylog.failure.ProcessingFailureCause;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.inputs.Extractor.Result;
 import org.joda.time.DateTime;
@@ -818,7 +819,7 @@ public class ExtractorTest {
                     @Nullable
                     @Override
                     public Object apply(Object input) {
-                        throw new NullPointerException("EEK");
+                        throw new NullPointerException("ORKS");
                     }
                 })
                 .build();
@@ -843,9 +844,47 @@ public class ExtractorTest {
         // The two exceptions should have been recorded.
         assertThat(extractor.getConverterExceptionCount()).isEqualTo(2);
 
+        assertThat(msg.processingErrors()).hasSize(2);
+        assertThat(msg.processingErrors().get(0)).satisfies(pe -> {
+            assertThat(pe.getCause()).isEqualTo(ProcessingFailureCause.ExtractorException);
+            assertThat(pe.getMessage()).isEqualTo("Could not apply converter [NUMERIC] of extractor <test-title (test-id)>");
+            assertThat(pe.getDetails()).isEqualTo("EEK.");
+        });
+
+        assertThat(msg.processingErrors().get(1)).satisfies(pe -> {
+            assertThat(pe.getCause()).isEqualTo(ProcessingFailureCause.ExtractorException);
+            assertThat(pe.getMessage()).isEqualTo("Could not apply converter [NUMERIC] of extractor <test-title (test-id)>");
+            assertThat(pe.getDetails()).isEqualTo("ORKS.");
+        });
+
         // It ignores all converters which throw an exception but executes the ones that don't.
         // TODO: Is this really the expected behaviour? The converters are executed in order and basically depend on the output of the previous. This might not work for all converters.
         assertThat(msg.getField("target")).isEqualTo("converter2");
+    }
+
+    @Test
+    public void testExtractorsWithExceptions() throws Exception {
+        final TestExtractor extractor = new TestExtractor.Builder()
+                .callback(new Callable<Result[]>() {
+                    @Override
+                    public Result[] call() throws Exception {
+                        return new Result[]{
+                                new Result(null, null, -1, -1, new IllegalStateException("BARF"))
+                        };
+                    }
+                })
+                .build();
+
+        final Message msg = createMessage("message");
+
+        extractor.runExtractor(msg);
+
+        assertThat(msg.processingErrors()).hasSize(1);
+        assertThat(msg.processingErrors().get(0)).satisfies(pe -> {
+            assertThat(pe.getCause()).isEqualTo(ProcessingFailureCause.ExtractorException);
+            assertThat(pe.getMessage()).isEqualTo("Could not apply extractor <test-title (test-id)>");
+            assertThat(pe.getDetails()).isEqualTo("BARF.");
+        });
     }
 
     @Test

@@ -215,7 +215,7 @@ public abstract class Extractor implements EmbeddedPersistable {
             try (final Timer.Context ignored2 = executionTimer.time()) {
                 final Result[] results = run(field);
                 if (results != null && results.length == 1 && results[0].exception != null) {
-                    final String error = "Could not apply extractor <" + getTitle() + "(" + getId() + ")>";
+                    final String error = "Could not apply extractor <" + getTitle() + " (" + getId() + ")>";
                     msg.addProcessingError(new Message.ProcessingError(
                             ProcessingFailureCause.ExtractorException, error, ExceptionUtils.getRootCauseMessage(results[0].exception)));
                 } else if (results == null || results.length == 0 || Arrays.stream(results).anyMatch(result -> result.getValue() == null)) {
