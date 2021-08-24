@@ -38,12 +38,12 @@ const TableRow = styled.tr(({ theme }) => css`
   }
 `);
 
-const getMessageEventType = (eventTypeCode: string | undefined, messageEvents: Array<MessageEventType>) => {
+const getMessageEventType = (eventTypeCode: string | undefined, messageEventTypes: Array<MessageEventType>) => {
   if (!eventTypeCode) {
     return undefined;
   }
 
-  return messageEvents?.find((eventType) => eventType.gl2EventTypeCode === eventTypeCode);
+  return messageEventTypes?.find((eventType) => eventType.gl2EventTypeCode === eventTypeCode);
 };
 
 const renderMessageFieldRow = (message, messageFieldType) => (
@@ -61,14 +61,14 @@ type Props = {
 };
 
 const useMessageSummary = (showSummary, message, messageFieldType) => {
-  const messageEvents = usePluginEntities('messageEventTypes');
+  const messageEventTypes = usePluginEntities('messageEventTypes');
   const MessageSummaryComponent = usePluginEntities('views.components.widgets.messageTable.summary')?.[0];
 
   if (!showSummary || !MessageSummaryComponent) {
     return null;
   }
 
-  const messageEventType = getMessageEventType(message.fields.gl2_event_type_code, messageEvents);
+  const messageEventType = getMessageEventType(message.fields.gl2_event_type_code, messageEventTypes);
 
   if (!messageEventType) {
     return null;
