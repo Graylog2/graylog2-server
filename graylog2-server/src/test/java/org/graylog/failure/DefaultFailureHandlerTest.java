@@ -61,11 +61,11 @@ public class DefaultFailureHandlerTest {
         final DateTime ts = DateTime.now(DateTimeZone.UTC);
 
         final Indexable indexable1 = mock(Indexable.class);
-        when(indexable1.getMessageId()).thenReturn("msg-1");
+        when(indexable1.getId()).thenReturn("msg-1");
         when(indexable1.getTimestamp()).thenReturn(ts);
 
         final Indexable indexable2 = mock(Indexable.class);
-        when(indexable2.getMessageId()).thenReturn("msg-2");
+        when(indexable2.getId()).thenReturn("msg-2");
         when(indexable2.getTimestamp()).thenReturn(ts);
 
         final IndexingFailure indexingFailure1 = new IndexingFailure(
