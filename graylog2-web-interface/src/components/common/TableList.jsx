@@ -57,6 +57,8 @@ class TableList extends React.Component {
     filterLabel: PropTypes.string,
     /** Hide description */
     hideDescription: PropTypes.bool,
+    /** Provide custom react component that renders in place of `descriptionKey` string */
+    customDescription: PropTypes.node,
     /**
      * Immutable List of objects to display in the list. Objects are expected
      * to have an ID (`idKey` prop), a title (`title` prop), and an optional
@@ -88,6 +90,8 @@ class TableList extends React.Component {
     idKey: 'id',
     titleKey: 'title',
     descriptionKey: 'description',
+    hideDescription: false,
+    customDescription: null,
     enableFilter: true,
     filterLabel: 'Filter',
     enableBulkActions: true,
@@ -95,34 +99,41 @@ class TableList extends React.Component {
     itemActionsFactory: () => {},
   };
 
-  state = {
-    filteredItems: this.props.items,
-    selected: Immutable.Set(),
-  };
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      filteredItems: props.items,
+      selected: Immutable.Set(),
+    };
+  }
 
   componentDidUpdate(prevProps) {
     const { filteredItems, selected } = this.state;
+    const { enableFilter, items } = this.props;
 
     this._setSelectAllCheckboxState(this.selectAllInput, filteredItems, selected);
 
-    if (!this.props.items.equals(prevProps.items)) {
-      if (this.props.enableFilter) {
+    if (!items.equals(prevProps.items)) {
+      if (enableFilter) {
         // This will apply the current filter to new items and update the state
         this.filter.filterData();
       } else {
-        this._updateFilteredItems(this.props.items);
+        this._updateFilteredItems(items);
       }
     }
   }
 
   _recalculateSelection = (selected, nextFilteredItems) => {
-    const nextFilteredIds = Immutable.Set(nextFilteredItems.map((item) => item[this.props.idKey]));
+    const { idKey } = this.props;
+    const nextFilteredIds = Immutable.Set(nextFilteredItems.map((item) => item[idKey]));
 
     return selected.intersect(nextFilteredIds);
   };
 
   _updateFilteredItems = (nextFilteredItems) => {
-    const filteredSelected = this._recalculateSelection(this.state.selected, nextFilteredItems);
+    const { selected } = this.state;
+    const filteredSelected = this._recalculateSelection(selected, nextFilteredItems);
 
     this.setState({ filteredItems: nextFilteredItems, selected: filteredSelected });
   };
@@ -147,8 +158,10 @@ class TableList extends React.Component {
   };
 
   _headerItem = () => {
-    if (!this.props.enableBulkActions) {
-      return <ControlledTableList.Header />;
+    const { bulkActionsFactory, enableBulkActions } = this.props;
+
+    if (!enableBulkActions) {
+      return <ControlledTableList.Header><></></ControlledTableList.Header>;
     }
 
     const { filteredItems, selected } = this.state;
@@ -159,7 +172,7 @@ class TableList extends React.Component {
         {selectedItems > 0
         && (
         <div className={style.headerComponentsWrapper}>
-          {this.props.bulkActionsFactory(selected)}
+          {bulkActionsFactory(selected)}
         </div>
         )}
         <Input ref={(c) => { this.selectAllInput = c; }}
@@ -175,36 +188,49 @@ class TableList extends React.Component {
   };
 
   _toggleSelectAll = (event) => {
-    const newSelected = event.target.checked ? Immutable.Set(this.state.filteredItems.map((item) => item[this.props.idKey])) : Immutable.Set();
+    const { filteredItems } = this.state;
+    const { idKey } = this.props;
+
+    const newSelected = event.target.checked ? Immutable.Set(filteredItems.map((item) => item[idKey])) : Immutable.Set();
 
     this.setState({ selected: newSelected });
   };
 
+  _descriptionRenderer = (item) => {
+    const { customDescription, descriptionKey, hideDescription } = this.props;
+    const descriptionOutput = customDescription || (<span className="description">{item[descriptionKey]}</span>);
+
+    return hideDescription ? null : descriptionOutput;
+  };
+
   _formatItem = (item) => {
+    const { selected } = this.state;
+    const { enableBulkActions, idKey, itemActionsFactory, titleKey } = this.props;
+
     let formattedItem;
 
-    if (this.props.enableBulkActions) {
+    if (enableBulkActions) {
       formattedItem = (
-        <Input id={`${this.props.idKey}-checkbox`}
+        <Input id={`${idKey}-checkbox`}
                type="checkbox"
-               label={item[this.props.titleKey]}
-               checked={this.state.selected.includes(item[this.props.idKey])}
-               onChange={this._onItemSelect(item[this.props.idKey])}
+               label={item[titleKey]}
+               checked={selected.includes(item[idKey])}
+               onChange={this._onItemSelect(item[idKey])}
                wrapperClassName="form-group-inline" />
       );
     } else {
-      formattedItem = <div id={`${this.props.idKey}-input`} className="header">{item[this.props.titleKey]}</div>;
+      formattedItem = <div id={`${idKey}-input`} className="header">{item[titleKey]}</div>;
     }
 
     return (
-      <ControlledTableList.Item key={`item-${item[this.props.idKey]}`}>
-        <div className={`${style.itemWrapper} ${this.props.enableBulkActions ? '' : style.itemWrapperStatic}`}>
+      <ControlledTableList.Item key={`item-${item[idKey]}`}>
+        <div className={`${style.itemWrapper} ${enableBulkActions ? '' : style.itemWrapperStatic}`}>
           <div className={style.itemActionsWrapper}>
-            {this.props.itemActionsFactory(item)}
+            {itemActionsFactory(item)}
           </div>
 
           {formattedItem}
-          {this.props.hideDescription ? null : <span className="description">{item[this.props.descriptionKey]}</span>}
+          {this._descriptionRenderer(item)}
         </div>
       </ControlledTableList.Item>
     );
@@ -212,26 +238,29 @@ class TableList extends React.Component {
 
   _onItemSelect = (id) => {
     return (event) => {
-      const newSelected = event.target.checked ? this.state.selected.add(id) : this.state.selected.delete(id);
+      const { selected } = this.state;
+      const newSelected = event.target.checked ? selected.add(id) : selected.delete(id);
 
       this.setState({ selected: newSelected });
     };
   };
 
   render() {
+    const { enableFilter, filterLabel, filterKeys, items } = this.props;
+    const { filteredItems } = this.state;
     let filter;
 
-    if (this.props.enableFilter) {
+    if (enableFilter) {
       filter = (
         <Row>
           <Col md={12}>
             <TypeAheadDataFilter ref={(c) => { this.filter = c; }}
-                                 id={`${lodash.kebabCase(this.props.filterLabel)}-data-filter`}
-                                 label={this.props.filterLabel}
-                                 data={this.props.items.toJS()}
+                                 id={`${lodash.kebabCase(filterLabel)}-data-filter`}
+                                 label={filterLabel}
+                                 data={items.toJS()}
                                  displayKey="value"
                                  filterSuggestions={[]}
-                                 searchInKeys={this.props.filterKeys}
+                                 searchInKeys={filterKeys}
                                  onDataFiltered={this._filterItems} />
           </Col>
         </Row>
@@ -240,16 +269,16 @@ class TableList extends React.Component {
 
     let formattedItems;
 
-    if (this.props.items.count() === 0) {
+    if (items.count() === 0) {
       formattedItems = (
         <ControlledTableList.Item>No items to display</ControlledTableList.Item>
       );
-    } else if (this.state.filteredItems.count() === 0) {
+    } else if (filteredItems.count() === 0) {
       formattedItems = (
         <ControlledTableList.Item>No items match your filter criteria</ControlledTableList.Item>
       );
     } else {
-      formattedItems = this.state.filteredItems.map((item) => this._formatItem(item)).toJS();
+      formattedItems = filteredItems.map((item) => this._formatItem(item)).toJS();
     }
 
     return (
