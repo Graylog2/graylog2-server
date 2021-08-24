@@ -83,7 +83,8 @@ const createIndexerSignature = (additionalProperties) => (additionalProperties ?
 const createTypeFor = (propDef) => {
   const { type: rawType, ...rest } = propDef;
   const isOptional = rawType && rawType.endsWith('>');
-  const cleanType = rawType ? rawType.replace(/>/, '') : rawType;
+
+  const cleanType = rawType ? rawType.replace(/>/g, '') : rawType;
   const type = isMappedType(cleanType) ? mapType(cleanType) : cleanType;
 
   if (type && isURN(type)) {
@@ -140,13 +141,15 @@ const createProps = (properties) => Object.entries(properties)
   ));
 
 const bannedModels = [...Object.keys(typeMappings), 'DateTime', 'DateTimeZone', 'Chronology', 'String>', 'LocalDateTime', 'Type', 'TemporalUnit'];
-const isNotBannedModel = ([name]) => !bannedModels.includes(name) && !name.endsWith('>');
+const isNotBannedModel = ([name]) => !bannedModels.includes(name);
+
+const cleanName = (name) => name.replace(/>/g, '');
 
 const createModel = ([name, definition]) => (definition.type === 'object'
   ? ts.factory.createInterfaceDeclaration(
     undefined,
     undefined,
-    name,
+    cleanName(name),
     undefined,
     undefined,
     [...createProps(definition.properties), ...createIndexerSignature(definition.additional_properties)],
