@@ -34,7 +34,7 @@ const GlobalContextProviders = ({ children }: Props) => {
     <ErrorBoundary FallbackComponent={() => nestedChildren}>
       <GlobalContextProvider>
         {nestedChildren}
-      </GlobalContextProvider>;
+      </GlobalContextProvider>
     </ErrorBoundary>
   ), children);
 };
