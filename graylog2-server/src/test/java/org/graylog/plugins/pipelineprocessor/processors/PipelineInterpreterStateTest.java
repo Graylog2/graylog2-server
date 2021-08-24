@@ -9,7 +9,6 @@ public class PipelineInterpreterStateTest {
 
     @Test
     public void testMetricName() {
-
         final PipelineInterpreterState state = new PipelineInterpreterState(null, null, null,
                 new LocalMetricRegistry(), 1, false);
         assertEquals("org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.stage-cache",
