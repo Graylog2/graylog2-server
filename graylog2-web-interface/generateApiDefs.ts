@@ -258,13 +258,15 @@ const sortByOptionality = (parameter1, parameter2) => parameter2.required - para
 
 const cleanParameterName = (name) => name.replace(/\s/g, '');
 
+const mergeEnumWithDefaultValue = (allowableValues, defaultValue) => (defaultValue ? [...new Set(allowableValues).add(defaultValue)] : allowableValues);
+
 const createFunctionParameter = ({ name, required, defaultValue, type, enum: allowableValues }) => ts.factory.createParameterDeclaration(
   undefined,
   undefined,
   undefined,
   cleanParameterName(name),
   (required || defaultValue) ? undefined : ts.factory.createToken(ts.SyntaxKind.QuestionToken),
-  createTypeFor({ type, enum: allowableValues }),
+  createTypeFor({ type, enum: mergeEnumWithDefaultValue(allowableValues, defaultValue) }),
   defaultValue ? createInitializer(type, defaultValue) : undefined,
 );
 
