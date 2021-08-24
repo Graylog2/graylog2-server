@@ -7,6 +7,8 @@ const { dirname } = require('path');
 const { chunk } = require('lodash');
 const ts = require('typescript');
 
+const REQUEST_FUNCTION_NAME = '__request__';
+const REQUEST_FUNCTION_IMPORT = 'routing/request';
 const readonlyModifier = ts.factory.createModifier(ts.SyntaxKind.ReadonlyKeyword);
 
 const createString = (s) => ts.factory.createStringLiteral(s, true);
@@ -215,7 +217,7 @@ const createBlock = (method, path, bodyParameter, queryParameter, rawProduces) =
     [
       ts.factory.createReturnStatement(
         ts.factory.createCallExpression(
-          ts.factory.createIdentifier('request'),
+          ts.factory.createIdentifier(REQUEST_FUNCTION_NAME),
           undefined,
           [
             createString(method),
@@ -349,8 +351,8 @@ const createApiObject = (api) => {
 const importDeclaration = ts.factory.createImportDeclaration(
   undefined,
   undefined,
-  ts.factory.createImportClause(false, ts.factory.createIdentifier('request'), undefined),
-  createString('routing/request'),
+  ts.factory.createImportClause(false, ts.factory.createIdentifier(REQUEST_FUNCTION_NAME), undefined),
+  createString(REQUEST_FUNCTION_IMPORT),
 );
 
 // ==== ///
