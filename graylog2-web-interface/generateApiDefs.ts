@@ -144,7 +144,7 @@ const createProps = (properties) => Object.entries(properties)
     createTypeFor(propDef),
   ));
 
-const bannedModels = [...Object.keys(typeMappings), 'DateTime', 'DateTimeZone', 'Chronology', 'String>', 'LocalDateTime', 'Type', 'TemporalUnit'];
+const bannedModels = [...Object.keys(typeMappings), 'DateTime', 'DateTimeZone', 'Chronology', 'String>', 'LocalDateTime', 'TemporalUnit'];
 const isNotBannedModel = ([name]) => !bannedModels.includes(name);
 
 const cleanName = (name) => name.replace(/>/g, '');
