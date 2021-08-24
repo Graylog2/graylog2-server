@@ -427,6 +427,12 @@ public class Message implements Messages, Indexable {
         obj.put(FIELD_STREAMS, getStreamIds());
         obj.put(FIELD_GL2_ACCOUNTED_MESSAGE_SIZE, getSize());
 
+        final Object timestampValue = getField(FIELD_TIMESTAMP);
+        DateTime dateTime = convertToDateTime(timestampValue);
+        if (dateTime != null) {
+            obj.put(FIELD_TIMESTAMP, buildElasticSearchTimeFormat(dateTime.withZone(UTC)));
+        }
+
         if (processingErrors != null && !processingErrors.isEmpty()) {
             if (processingErrors.stream().anyMatch(processingError -> processingError.getCause().equals(ProcessingFailureCause.InvalidTimestampException))) {
                 invalidTimestampMeter.mark();
@@ -435,12 +441,6 @@ public class Message implements Messages, Indexable {
                     processingErrors.stream()
                             .map(ProcessingError::getDetails)
                             .collect(Collectors.joining(", ")));
-        }
-
-        final Object timestampValue = getField(FIELD_TIMESTAMP);
-        DateTime dateTime = convertToDateTime(timestampValue);
-        if (dateTime != null) {
-            obj.put(FIELD_TIMESTAMP, buildElasticSearchTimeFormat(dateTime.withZone(UTC)));
         }
 
         return obj;
