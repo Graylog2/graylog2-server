@@ -111,19 +111,12 @@ public class FailureSubmissionService {
             // If we store the regular message, the acknowledgement happens in the output path
             final boolean needsAcknowledgement = !failureHandlingConfiguration.keepFailedMessageDuplicate();
 
-            final String message;
             final String messageId = StringUtils.isBlank(failedMessage.getMessageId()) ? failedMessage.getId() : failedMessage.getMessageId();
 
-            if (StringUtils.isBlank(messageId)) {
-                message = String.format(Locale.ENGLISH,
-                        "Failed to process a message with unknown id: %s",
-                        processingError.getMessage());
-            } else {
-                message = String.format(Locale.ENGLISH,
-                        "Failed to process message with id '%s': %s",
-                        messageId,
-                        processingError.getMessage());
-            }
+            final String message = String.format(Locale.ENGLISH,
+                    "Failed to process message with id '%s': %s",
+                    StringUtils.isBlank(messageId) ? "UNKNOWN" : messageId,
+                    processingError.getMessage());
 
             final ProcessingFailure processingFailure = new ProcessingFailure(
                     processingError.getCause(),
