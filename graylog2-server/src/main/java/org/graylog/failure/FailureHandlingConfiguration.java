@@ -16,6 +16,8 @@
  */
 package org.graylog.failure;
 
+import org.graylog2.plugin.Message;
+
 /**
  * A <b>runtime</b> failure handling configuration.
  */
@@ -26,7 +28,7 @@ public interface FailureHandlingConfiguration {
      * to their regular index along with a processing error message
      * in the {@link org.graylog2.plugin.Message#FIELD_GL2_PROCESSING_ERROR} field.
      *
-     * See {@link org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter#handleFailedMessage}
+     * See {@link org.graylog.failure.FailureSubmissionService#submitProcessingErrors(Message)}
      */
     boolean keepFailedMessageDuplicate();
 
