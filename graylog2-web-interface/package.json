@@ -16,6 +16,7 @@
     "build": "cross-env disable_plugins=true webpack --config webpack.bundled.js",
     "build:stats": "cross-env disable_plugins=true webpack --profile --json > ./webpack/stats-$(git rev-parse --abbrev-ref HEAD).json",
     "build:analyze": "yarn build:stats && webpack-bundle-analyzer ./webpack/stats-$(git rev-parse --abbrev-ref HEAD).json ./target/web/build --mode=\"static\" --report=\"./webpack/analysis-$(git rev-parse --abbrev-ref HEAD).html\"",
+    "generate:apidefs": "node ./generateApiDefs.ts ../target/swagger ./src/api",
     "lint": "eslint src",
     "lint:path": "eslint",
     "lint:styles": "stylelint './src/**/*.{js,jsx,ts,tsx}'",
