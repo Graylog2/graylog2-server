@@ -451,50 +451,48 @@ public class Message implements Messages, Indexable {
             return (DateTime) value;
         }
 
-        DateTime dateTime;
         if (value instanceof Date) {
-            dateTime = new DateTime(value);
+            return new DateTime(value);
         } else if (value instanceof ZonedDateTime) {
-            dateTime = new DateTime(Date.from(((ZonedDateTime) value).toInstant()));
+            return new DateTime(Date.from(((ZonedDateTime) value).toInstant()));
         } else if (value instanceof OffsetDateTime) {
-            dateTime = new DateTime(Date.from(((OffsetDateTime) value).toInstant()));
+            return new DateTime(Date.from(((OffsetDateTime) value).toInstant()));
         } else if (value instanceof LocalDateTime) {
             final LocalDateTime localDateTime = (LocalDateTime) value;
             final ZoneId defaultZoneId = ZoneId.systemDefault();
             final ZoneOffset offset = defaultZoneId.getRules().getOffset(localDateTime);
-            dateTime = new DateTime(Date.from(localDateTime.toInstant(offset)));
+            return new DateTime(Date.from(localDateTime.toInstant(offset)));
         } else if (value instanceof LocalDate) {
             final LocalDate localDate = (LocalDate) value;
             final LocalDateTime localDateTime = localDate.atStartOfDay();
             final ZoneId defaultZoneId = ZoneId.systemDefault();
             final ZoneOffset offset = defaultZoneId.getRules().getOffset(localDateTime);
-            dateTime = new DateTime(Date.from(localDateTime.toInstant(offset)));
+            return new DateTime(Date.from(localDateTime.toInstant(offset)));
         } else if (value instanceof Instant) {
-            dateTime = new DateTime(Date.from((Instant) value));
+            return new DateTime(Date.from((Instant) value));
         } else if (value instanceof String) {
             // if the timestamp value is a string, we try to parse it in the correct format.
             // we fall back to "now", this avoids losing messages which happen to have the wrong timestamp format
             try {
-                dateTime = ES_DATE_FORMAT_FORMATTER.parseDateTime((String) value);
+                return ES_DATE_FORMAT_FORMATTER.parseDateTime((String) value);
             } catch (IllegalArgumentException e) {
                 final String error = "Invalid format for field timestamp '" + value + "' in message " + getId() + ", forcing to current time.";
                 LOG.trace(error, e);
                 addProcessingError(new ProcessingError(ProcessingFailureCause.InvalidTimestampException, error, ExceptionUtils.getRootCauseMessage(e)));
-                dateTime = Tools.nowUTC();
+                return Tools.nowUTC();
             }
         } else if (value == null) {
             final String error = "null value for field timestamp in message " + getId() + ", forcing to current time.";
             LOG.trace(error);
             addProcessingError(new ProcessingError(ProcessingFailureCause.InvalidTimestampException, error, ""));
-            dateTime = Tools.nowUTC();
+            return Tools.nowUTC();
         } else {
             // don't allow any other types for timestamp, force to "now"
             final String error = "Invalid type for field timestamp '" + value.getClass().getSimpleName() + "' in message " + getId() + ", forcing to current time.";
             LOG.trace(error);
             addProcessingError(new ProcessingError(ProcessingFailureCause.InvalidTimestampException, error, ""));
-            dateTime = Tools.nowUTC();
+            return Tools.nowUTC();
         }
-        return dateTime;
     }
 
     // estimate the byte/char length for a field and its value
