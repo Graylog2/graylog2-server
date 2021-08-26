@@ -36,6 +36,7 @@ import { useStore } from 'stores/connect';
 import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 import FormatReceivedBy from 'views/components/messagelist/FormatReceivedBy';
 
+import MessageDetailProviders from './MessageDetailProviders';
 import MessageActions from './MessageActions';
 import MessageAugmentations from './MessageAugmentations';
 import MessageMetadata from './MessageMetadata';
@@ -122,41 +123,43 @@ const MessageDetail = ({
   const messageTitle = _formatMessageTitle(index, id);
 
   return (
-    <>
-      <Row className="row-sm">
-        <Col md={12}>
-          <MessageActions index={index}
-                          id={id}
-                          fields={fields}
-                          decorationStats={decorationStats}
-                          disabled={disableMessageActions}
-                          disableSurroundingSearch={disableSurroundingSearch}
-                          disableTestAgainstStream={disableTestAgainstStream}
-                          showOriginal={showOriginal}
-                          toggleShowOriginal={_toggleShowOriginal}
-                          searchConfig={searchesClusterConfig}
-                          streams={allStreams} />
-          <MessageDetailsTitle>
-            <Icon name="envelope" />
-            &nbsp;
-            {messageTitle}
-          </MessageDetailsTitle>
-        </Col>
-      </Row>
-      <Row id={`sticky-augmentations-boundary-${message.id}`}>
-        <Col md={3}>
-          <MessageMetadata timestamp={timestamp}
-                           index={index}
-                           receivedBy={<FormatReceivedBy inputs={inputs} sourceNodeId={gl2_source_node} sourceInputId={gl2_source_input} />}
-                           streams={streamsListItems} />
-          <MessageAugmentations message={message} />
-        </Col>
-        <Col md={9}>
-          <MessageFields message={message}
-                         fields={messageFields} />
-        </Col>
-      </Row>
-    </>
+    <MessageDetailProviders message={message}>
+      <>
+        <Row className="row-sm">
+          <Col md={12}>
+            <MessageActions index={index}
+                            id={id}
+                            fields={fields}
+                            decorationStats={decorationStats}
+                            disabled={disableMessageActions}
+                            disableSurroundingSearch={disableSurroundingSearch}
+                            disableTestAgainstStream={disableTestAgainstStream}
+                            showOriginal={showOriginal}
+                            toggleShowOriginal={_toggleShowOriginal}
+                            searchConfig={searchesClusterConfig}
+                            streams={allStreams} />
+            <MessageDetailsTitle>
+              <Icon name="envelope" />
+              &nbsp;
+              {messageTitle}
+            </MessageDetailsTitle>
+          </Col>
+        </Row>
+        <Row id={`sticky-augmentations-boundary-${message.id}`}>
+          <Col md={3}>
+            <MessageMetadata timestamp={timestamp}
+                             index={index}
+                             receivedBy={<FormatReceivedBy inputs={inputs} sourceNodeId={gl2_source_node} sourceInputId={gl2_source_input} />}
+                             streams={streamsListItems} />
+            <MessageAugmentations message={message} />
+          </Col>
+          <Col md={9}>
+            <MessageFields message={message}
+                           fields={messageFields} />
+          </Col>
+        </Row>
+      </>
+    </MessageDetailProviders>
   );
 };
 
@@ -185,5 +188,3 @@ MessageDetail.defaultProps = {
   showTimestamp: true,
   streams: Immutable.Map(),
 };
-
-export default MessageDetail;
