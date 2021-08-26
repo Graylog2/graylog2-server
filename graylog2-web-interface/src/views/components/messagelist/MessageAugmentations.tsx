@@ -15,14 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled from 'styled-components';
 
 import usePluginEntities from 'views/logic/usePluginEntities';
-
-const AugmentationsContainer = styled.dl`
-  position: sticky;
-  top: 0;
-`;
 
 const MessageAugmentations = () => {
   const augmentations = usePluginEntities('messageAugmentations');
@@ -32,9 +26,9 @@ const MessageAugmentations = () => {
   }
 
   return (
-    <AugmentationsContainer>
+    <dl>
       {augmentations.map(({ component: Augmentation, id }) => <Augmentation key={id} />)}
-    </AugmentationsContainer>
+    </dl>
   );
 };
 
