@@ -17,8 +17,13 @@
 import * as React from 'react';
 
 import usePluginEntities from 'views/logic/usePluginEntities';
+import { Message } from 'views/components/messagelist/Types';
 
-const MessageAugmentations = () => {
+type Props = {
+  message: Message
+}
+
+const MessageAugmentations = ({ message }: Props) => {
   const augmentations = usePluginEntities('messageAugmentations');
 
   if (!augmentations || augmentations.length === 0) {
@@ -27,7 +32,7 @@ const MessageAugmentations = () => {
 
   return (
     <dl>
-      {augmentations.map(({ component: Augmentation, id }) => <Augmentation key={id} />)}
+      {augmentations.map(({ component: Augmentation, id }) => <Augmentation key={id} message={message} />)}
     </dl>
   );
 };

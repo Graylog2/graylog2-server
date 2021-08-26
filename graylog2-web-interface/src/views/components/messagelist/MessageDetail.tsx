@@ -193,7 +193,7 @@ const MessageDetail = ({
                            index={index}
                            receivedBy={<FormatReceivedBy inputs={inputs} sourceNodeId={gl2_source_node} sourceInputId={gl2_source_input} />}
                            streams={streamsListItems} />
-          <MessageAugmentations />
+          <MessageAugmentations message={message} />
         </Col>
         <Col md={9}>
           <MessageFields message={message}
