@@ -56,5 +56,12 @@ module.exports = {
     '.fixtures.[jt]s$',
   ],
   testTimeout: applyTimeoutMultiplier(5000),
-  reporters: ['default', 'jest-junit'],
+  reporters: [
+    'default',
+    [
+      'jest-junit', {
+        outputDirectory: 'target',
+      },
+    ],
+  ],
 };
