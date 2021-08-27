@@ -109,7 +109,7 @@ const NumberVisualization = ({ config, currentView, fields, data }: Props) => {
 
   useEffect(onRenderComplete, [onRenderComplete]);
   const { activeQuery } = currentView;
-  const chartRows = data.chart || Object.values(data)[0];
+  const chartRows = (data.chart ?? Object.values(data)[0]) as Rows;
   const trendRows = data.trend;
   const { value } = _extractValueAndField(chartRows);
   const { value: previousValue } = _extractValueAndField(trendRows || []);

@@ -23,6 +23,7 @@ import type { VisualizationComponentProps } from 'views/components/aggregationbu
 import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import AreaVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/AreaVisualizationConfig';
 import { makeVisualization } from 'views/components/aggregationbuilder/AggregationBuilder';
+import { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 
 import type { ChartDefinition } from '../ChartData';
 import XYPlot from '../XYPlot';
@@ -54,7 +55,9 @@ const AreaVisualization = makeVisualization(({ config, data, effectiveTimerange,
     line: { shape: toPlotly(interpolation) },
   }), [interpolation]);
 
-  const chartDataResult = chartData(config, data.chart || Object.values(data)[0], 'scatter', chartGenerator);
+  const rows = (data.chart ?? Object.values(data)[0]) as Rows;
+
+  const chartDataResult = chartData(config, rows, 'scatter', chartGenerator);
   const layout: { shapes?: Shapes } = {};
 
   if (config.eventAnnotation && data.events) {
