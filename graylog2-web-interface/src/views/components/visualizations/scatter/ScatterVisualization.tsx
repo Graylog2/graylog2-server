@@ -20,8 +20,7 @@ import PropTypes from 'prop-types';
 import EventHandler, { Shapes } from 'views/logic/searchtypes/events/EventHandler';
 import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
-import { makeVisualization } from 'views/components/aggregationbuilder/AggregationBuilder';
-import { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
+import { makeVisualization, retrieveChartData } from 'views/components/aggregationbuilder/AggregationBuilder';
 
 import { chartData } from '../ChartData';
 import XYPlot from '../XYPlot';
@@ -31,7 +30,7 @@ const seriesGenerator = (type, name, labels, values) => ({ type, name, x: labels
 const setChartColor = (chart, colors) => ({ marker: { color: colors.get(chart.name) } });
 
 const ScatterVisualization = makeVisualization(({ config, data, effectiveTimerange, height }: VisualizationComponentProps) => {
-  const rows = (data.chart ?? Object.values(data)[0]) as Rows;
+  const rows = retrieveChartData(data);
   const chartDataResult = chartData(config, rows, 'scatter', seriesGenerator);
   const layout: { shapes?: Shapes } = {};
 
