@@ -21,6 +21,7 @@ import { AggregationType, AggregationResult } from 'views/components/aggregation
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import { makeVisualization } from 'views/components/aggregationbuilder/AggregationBuilder';
 import PlotLegend from 'views/components/visualizations/PlotLegend';
+import { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 
 import GenericPlot from '../GenericPlot';
 import { chartData } from '../ChartData';
@@ -82,7 +83,8 @@ const labelMapper = (data: Array<{ labels: Array<string>}>) => data.reduce((acc,
 }, []);
 
 const PieVisualization = makeVisualization(({ config, data }: VisualizationComponentProps) => {
-  const transformedData = chartData(config, data.chart || Object.values(data)[0], 'pie', _generateSeries);
+  const rows = (data.chart ?? Object.values(data)[0]) as Rows;
+  const transformedData = chartData(config, rows, 'pie', _generateSeries);
 
   return (
     <PlotLegend config={config} chartData={transformedData} labelMapper={labelMapper} neverHide>
