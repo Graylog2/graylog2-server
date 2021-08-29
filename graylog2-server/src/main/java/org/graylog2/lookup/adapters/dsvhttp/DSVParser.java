@@ -57,7 +57,9 @@ public class DSVParser {
 
         if (!keyOnly) {
             //noinspection ResultOfMethodCallIgnored
-            valueColumn.orElseThrow(() -> new IllegalStateException("No value column and not key only parsing specified!"));
+            if (!valueColumn.isPresent()) {
+                throw new IllegalStateException("No value column and not key only parsing specified!");
+            }
         }
 
         if (Strings.isNullOrEmpty(quoteChar)) {

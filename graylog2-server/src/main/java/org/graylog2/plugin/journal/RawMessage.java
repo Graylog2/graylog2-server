@@ -117,7 +117,7 @@ public class RawMessage implements Serializable {
                   .setInputId(sourceInputId)
                   .setId(nodeId.toString())
                   .setType(JournalMessages.SourceNode.Type.SERVER)
-                  .build();
+                  .isInitialized();
     }
 
     public RawMessage(JournalMessage journalMessage, Object messageQueueId) {

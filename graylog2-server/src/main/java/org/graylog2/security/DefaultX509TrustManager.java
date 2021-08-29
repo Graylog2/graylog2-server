@@ -36,6 +36,7 @@ import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 public class DefaultX509TrustManager extends X509ExtendedTrustManager {
     private final List<String> hosts;
@@ -133,10 +134,11 @@ public class DefaultX509TrustManager extends X509ExtendedTrustManager {
     }
 
     private void validateHostnames(X509Certificate[] x509Certificates, String s) throws CertificateException {
-        Arrays.stream(x509Certificates)
+        Optional<X509Certificate> cert = Arrays.stream(x509Certificates)
                 .filter(this::certificateMatchesHostname)
-                .findFirst()
-                .orElseThrow(() -> new CertificateException("Presented certificate does not match configured hostname!"));
+                .findFirst();
+        if (!cert.isPresent())
+            throw new CertificateException("Presented certificate does not match configured hostname!");
     }
 
     private boolean certificateMatchesHostname(X509Certificate x509Certificate) {

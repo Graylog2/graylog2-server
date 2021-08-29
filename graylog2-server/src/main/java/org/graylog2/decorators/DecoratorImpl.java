@@ -34,6 +34,7 @@ import java.util.Optional;
 @WithBeanGetter
 @JsonAutoDetect
 @CollectionName("decorators")
+@SuppressWarnings("ComparableType")
 public abstract class DecoratorImpl implements Decorator, Comparable {
     static final String FIELD_ID = "id";
     static final String FIELD_TYPE = "type";

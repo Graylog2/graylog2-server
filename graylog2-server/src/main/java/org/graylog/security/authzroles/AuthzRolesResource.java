@@ -247,7 +247,8 @@ public class AuthzRolesResource extends RestResource {
             if (user == null) {
                 throw new NotFoundException("Cannot find user with name: " + username);
             }
-            authzRolesService.get(roleId).orElseThrow(() -> new NotFoundException("Cannot find role with id: " + roleId));
+            if (!authzRolesService.get(roleId).isPresent())
+                throw new NotFoundException("Cannot find role with id: " + roleId);
             Set<String> roles = user.getRoleIds();
             rolesUpdater.update(roles, roleId);
             user.setRoleIds(roles);

@@ -352,7 +352,7 @@ public class LookupTableService extends AbstractIdleService {
     public void handleLookupTableUpdate(LookupTablesUpdated updated) {
         scheduler.schedule(() -> {
             // load the DTO, and recreate the table
-            updated.lookupTableIds().forEach(id -> configService.getTable(id).map(this::createLookupTable));
+            updated.lookupTableIds().forEach(id -> configService.getTable(id).ifPresent(this::createLookupTable));
         }, 0, TimeUnit.SECONDS);
     }
 

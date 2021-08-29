@@ -166,8 +166,8 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                            @ApiParam(name = "JSON Body") EventDefinitionDto dto) {
         checkPermission(RestPermissions.EVENT_DEFINITIONS_EDIT, definitionId);
         checkEventDefinitionPermissions(dto, "update");
-        dbService.get(definitionId)
-                .orElseThrow(() -> new NotFoundException("Event definition <" + definitionId + "> doesn't exist"));
+        if (!dbService.get(definitionId).isPresent())
+            throw new NotFoundException("Event definition <" + definitionId + "> doesn't exist");
 
         final ValidationResult result = dto.validate();
         if (!definitionId.equals(dto.id())) {

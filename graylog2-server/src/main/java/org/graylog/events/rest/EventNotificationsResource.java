@@ -134,8 +134,8 @@ public class EventNotificationsResource extends RestResource implements PluginRe
     public Response update(@ApiParam(name = "notificationId") @PathParam("notificationId") @NotBlank String notificationId,
                                   @ApiParam(name = "JSON Body") NotificationDto dto) {
         checkPermission(RestPermissions.EVENT_NOTIFICATIONS_EDIT, notificationId);
-        dbNotificationService.get(notificationId)
-                .orElseThrow(() -> new NotFoundException("Notification " + notificationId + " doesn't exist"));
+        if (!dbNotificationService.get(notificationId).isPresent())
+            throw new NotFoundException("Notification " + notificationId + " doesn't exist");
 
         if (!notificationId.equals(dto.id())) {
             throw new BadRequestException("Notification IDs don't match");

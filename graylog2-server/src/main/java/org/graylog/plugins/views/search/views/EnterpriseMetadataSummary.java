@@ -55,6 +55,32 @@ public class EnterpriseMetadataSummary extends PluginMetadataSummary {
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof EnterpriseMetadataSummary;
+        if (obj == null) {
+            return false;
+        }
+
+        if (this == obj) {
+            return true;
+        }
+
+        if (obj instanceof EnterpriseMetadataSummary) {
+            EnterpriseMetadataSummary ems = (EnterpriseMetadataSummary) obj;
+            if (ems.name() == this.name()
+                    && ems.author() == this.author()
+                    && ems.url() == this.url()
+                    && ems.version() == this.version()
+                    && ems.description() == this.description()) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return (this.name() + this.author() + this.url() + this.version() + this.description()).hashCode();
     }
 }

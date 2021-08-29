@@ -112,7 +112,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
 
         // add the optional root query filters
         generateFilterClause(query.filter(), job, query, results)
-                .map(boolQuery::filter);
+                .ifPresent(boolQuery::filter);
 
         final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
                 .query(boolQuery)

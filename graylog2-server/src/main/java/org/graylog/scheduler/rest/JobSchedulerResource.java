@@ -100,8 +100,8 @@ public class JobSchedulerResource extends RestResource implements PluginRestReso
     @AuditEvent(type = JobSchedulerAuditEventTypes.SCHEDULER_JOB_UPDATE)
     public JobDefinitionDto update(@ApiParam(name = "jobDefinitionId") @PathParam("jobDefinitionId") @NotBlank String jobDefinitionId,
                                    JobDefinitionDto dto) {
-        dbJobDefinitionService.get(jobDefinitionId)
-                .orElseThrow(() -> new NotFoundException("Job definition " + jobDefinitionId + " doesn't exist"));
+        if(!dbJobDefinitionService.get(jobDefinitionId).isPresent())
+            throw new NotFoundException("Job definition " + jobDefinitionId + " doesn't exist");
 
         if (!jobDefinitionId.equals(dto.id())) {
             throw new BadRequestException("Job definition IDs don't match");

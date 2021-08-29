@@ -50,7 +50,11 @@ public abstract class CreateConditionRequest {
     public static CreateConditionRequest create(@JsonProperty("type") @Nullable String type,
                                                 @JsonProperty("title") @Nullable String title,
                                                 @JsonProperty("parameters") Map<String, Object> parameters) {
-        return new AutoValue_CreateConditionRequest(type, title, parameters);
+        return new AutoValue_CreateConditionRequest.Builder()
+                .setType(type)
+                .setTitle(title)
+                .setParameters(parameters)
+                .build();
     }
 
     @AutoValue.Builder

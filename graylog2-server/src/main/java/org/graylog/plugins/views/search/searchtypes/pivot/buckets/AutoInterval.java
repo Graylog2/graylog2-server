@@ -81,7 +81,7 @@ public abstract class AutoInterval implements Interval {
     public DateInterval toDateInterval(TimeRange timerange) {
         //noinspection UnnecessaryBoxing
         final Duration duration = Duration.ofMillis(
-                Math.round(new Double(timerange.getTo().getMillis() - timerange.getFrom().getMillis()) / 1000 * scaling() * 1000)
+                Math.round(Double.valueOf(timerange.getTo().getMillis() - timerange.getFrom().getMillis()) / 1000 * scaling() * 1000)
         );
         return boundaries.get(duration);
     }

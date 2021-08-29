@@ -62,7 +62,7 @@ public class DefaultSecurityManagerProvider implements Provider<DefaultSecurityM
         List<Realm> authorizingRealms = new ArrayList<>();
         authorizingRealms.addAll(authorizingOnlyRealms.values());
         // root account realm might be deactivated and won't be present in that case
-        orderedAuthenticatingRealms.getRootAccountRealm().map(authorizingRealms::add);
+        orderedAuthenticatingRealms.getRootAccountRealm().ifPresent(authorizingRealms::add);
 
         final ModularRealmAuthorizer authorizer = new ModularRealmAuthorizer(authorizingRealms);
 

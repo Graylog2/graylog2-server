@@ -64,7 +64,16 @@ public abstract class ShardRouting {
                                       @JsonProperty("node_name") @Nullable String nodeName,
                                       @JsonProperty("node_hostname") @Nullable String nodeHostname,
                                       @JsonProperty("relocating_to") @Nullable String relocatingTo) {
-        return new AutoValue_ShardRouting(id, state, active, primary, nodeId, nodeName, nodeHostname, relocatingTo);
+        return new AutoValue_ShardRouting.Builder()
+                .id(id)
+                .state(state)
+                .active(active)
+                .primary(primary)
+                .nodeId(nodeId)
+                .nodeName(nodeName)
+                .nodeHostname(nodeHostname)
+                .relocatingTo(relocatingTo)
+                .build();
     }
 
     public static Builder builder() {
