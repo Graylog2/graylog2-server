@@ -32,7 +32,7 @@ const MessageAugmentations = ({ message }: Props) => {
   }
 
   return (
-    <Sticky scrollElement="#sticky-augmentations-container" boundaryElement={`#sticky-augmentations-boundary-${message.id}`}>
+    <Sticky scrollElement="#sticky-augmentations-container" boundaryElement={`#sticky-augmentations-boundary-${message.id}`} positionRecheckInterval={400}>
       <dl>
         {augmentations.map(({ component: Augmentation, id }) => <Augmentation key={id} message={message} />)}
       </dl>
