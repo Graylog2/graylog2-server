@@ -221,8 +221,8 @@ class MessageTable extends React.Component<Props, State> {
                   {(highlightMessageId) => (
                     <MessageTableEntry fields={fields}
                                        message={message}
+                                       config={config}
                                        showMessageRow={config && config.showMessageRow}
-                                       showSummary={config && config.showSummary}
                                        selectedFields={selectedFields}
                                        expanded={expandedMessages.contains(messageKey)}
                                        toggleDetail={this._toggleMessageDetail}

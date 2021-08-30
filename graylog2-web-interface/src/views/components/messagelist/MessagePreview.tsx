@@ -17,10 +17,10 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
+import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import { Message } from 'views/components/messagelist/Types';
 import usePluginEntities from 'views/logic/usePluginEntities';
-import { MessageEventType } from 'views/types/messageEventTypes';
 import MessageFieldRow from 'views/components/messagelist/MessageFieldRow';
 
 const TableRow = styled.tr(({ theme }) => css`
@@ -38,14 +38,6 @@ const TableRow = styled.tr(({ theme }) => css`
   }
 `);
 
-const getMessageEventType = (eventTypeCode: string | undefined, messageEventTypes: Array<MessageEventType>) => {
-  if (!eventTypeCode) {
-    return undefined;
-  }
-
-  return messageEventTypes?.find((eventType) => eventType.gl2EventTypeCode === eventTypeCode);
-};
-
 const renderMessageFieldRow = (message, messageFieldType) => (
   <MessageFieldRow message={message}
                    messageFieldType={messageFieldType} />
@@ -56,40 +48,22 @@ type Props = {
   colSpanFixup: number,
   message: Message,
   showMessageRow?: boolean,
-  showSummary?: boolean,
   messageFieldType: FieldType,
+  config: MessagesWidgetConfig,
 };
 
-const useMessageSummary = (showSummary, message, messageFieldType) => {
-  const messageEventTypes = usePluginEntities('messageEventTypes');
-  const MessageSummaryComponent = usePluginEntities('views.components.widgets.messageTable.summary')?.[0];
-
-  if (!showSummary || !MessageSummaryComponent) {
-    return null;
-  }
-
-  const messageEventType = getMessageEventType(message.fields.gl2_event_type_code, messageEventTypes);
-
-  if (!messageEventType) {
-    return null;
-  }
-
-  return (
-    <MessageSummaryComponent messageEventType={messageEventType}
-                             messageFields={message.fields}
-                             renderFallback={() => renderMessageFieldRow(message, messageFieldType)} />
-  );
-};
-
-const MessagePreview = ({ showMessageRow, showSummary, onRowClick, colSpanFixup, message, messageFieldType }: Props) => {
-  const messageSummary = useMessageSummary(showSummary, message, messageFieldType);
+const MessagePreview = ({ onRowClick, colSpanFixup, message, messageFieldType, showMessageRow, config }: Props) => {
+  const MessageRowOverride = usePluginEntities('views.components.widgets.messageTable.messageRowOverride')?.[0];
 
   return (
     <TableRow onClick={onRowClick}>
       <td colSpan={colSpanFixup}>
-        {(showMessageRow && !messageSummary) && renderMessageFieldRow(message, messageFieldType)}
-
-        {messageSummary}
+        {!!MessageRowOverride && (
+          <MessageRowOverride messageFields={message.fields}
+                              config={config}
+                              renderMessageRow={() => renderMessageFieldRow(message, messageFieldType)} />
+        )}
+        {(showMessageRow && !MessageRowOverride) && renderMessageFieldRow(message, messageFieldType)}
       </td>
     </TableRow>
   );

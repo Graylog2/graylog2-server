@@ -26,6 +26,7 @@ import FieldType from 'views/logic/fieldtypes/FieldType';
 import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import { Input } from 'components/messageloaders/Types';
 import { MESSAGE_FIELD } from 'views/Constants';
+import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 
 import CustomHighlighting from './CustomHighlighting';
 import MessageDetail from './MessageDetail';
@@ -80,6 +81,7 @@ const MessageDetailRow = styled.tr`
 `;
 
 type Props = {
+  config: MessagesWidgetConfig,
   disableSurroundingSearch?: boolean,
   expandAllRenderAsync: boolean,
   expanded: boolean,
@@ -100,6 +102,7 @@ const fieldType = (fieldName, { decoration_stats: decorationStats }: { decoratio
   : ((fields && fields.find((f) => f.name === fieldName)) || { type: FieldType.Unknown }).type);
 
 const MessageTableEntry = ({
+  config,
   disableSurroundingSearch,
   expandAllRenderAsync,
   expanded,
@@ -155,6 +158,7 @@ const MessageTableEntry = ({
 
       <MessagePreview showMessageRow={showMessageRow}
                       showSummary={showSummary}
+                      config={config}
                       colSpanFixup={colSpanFixup}
                       messageFieldType={fieldType(MESSAGE_FIELD, message, fields)}
                       onRowClick={_toggleDetail}

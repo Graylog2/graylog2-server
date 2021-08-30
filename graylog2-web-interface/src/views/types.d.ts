@@ -208,9 +208,9 @@ export type MessagePreviewOption = {
 }
 
 export type MessageSummaryProps = {
-  messageEventType: MessageEventType,
   messageFields: { [key: string]: any },
-  renderFallback: () => React.ReactNode;
+  renderMessageRow: () => React.ReactNode;
+  config: MessagesWidgetConfig,
 }
 
 declare module 'graylog-web-plugin/plugin' {
@@ -225,7 +225,7 @@ declare module 'graylog-web-plugin/plugin' {
     valueActions?: Array<ActionDefinition>;
     'views.completers'?: Array<Completer>;
     'views.components.widgets.messageTable.previewOptions'?: Array<MessagePreviewOption>;
-    'views.components.widgets.messageTable.summary'?: Array<React.ComponentType<MessageSummaryProps>>;
+    'views.components.widgets.messageTable.messageRowOverride'?: Array<React.ComponentType<MessageRowOverrideProps>>;
     'views.elements.header'?: Array<React.ComponentType>;
     'views.elements.queryBar'?: Array<React.ComponentType>;
     'views.export.formats'?: Array<ExportFormat>;
