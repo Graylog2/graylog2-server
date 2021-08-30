@@ -151,7 +151,7 @@ const MessageDetail = ({
                            streams={streamsListItems} />
           <MessageAugmentations message={message} />
         </Col>
-        <Col md={9}>
+        <Col md={9} topOffset={250}>
           <MessageFields message={message}
                          fields={messageFields} />
         </Col>
