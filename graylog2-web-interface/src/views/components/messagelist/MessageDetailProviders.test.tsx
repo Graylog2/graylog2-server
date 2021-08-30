@@ -18,6 +18,7 @@ import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import asMock from 'helpers/mocking/AsMock';
 import suppressConsole from 'helpers/suppressConsole';
+import { simpleMessage as message } from 'fixtures/messages';
 
 import usePluginEntities from 'views/logic/usePluginEntities';
 
@@ -48,7 +49,7 @@ describe('MessageDetailProviders', () => {
     asMock(usePluginEntities).mockReturnValue(undefined);
 
     render(
-      <MessageDetailProviders>
+      <MessageDetailProviders message={message}>
         <>The children</>
       </MessageDetailProviders>,
     );
@@ -60,7 +61,7 @@ describe('MessageDetailProviders', () => {
     asMock(usePluginEntities).mockReturnValue([({ children }) => renderProvider(children, 1)]);
 
     render(
-      <MessageDetailProviders>
+      <MessageDetailProviders message={message}>
         <>The children</>
       </MessageDetailProviders>,
     );
@@ -76,7 +77,7 @@ describe('MessageDetailProviders', () => {
     ]);
 
     render(
-      <MessageDetailProviders>
+      <MessageDetailProviders message={message}>
         <>The children</>
       </MessageDetailProviders>,
     );
@@ -95,7 +96,7 @@ describe('MessageDetailProviders', () => {
 
     await suppressConsole(() => {
       render(
-        <MessageDetailProviders>
+        <MessageDetailProviders message={message}>
           <>The children</>
         </MessageDetailProviders>,
       );
