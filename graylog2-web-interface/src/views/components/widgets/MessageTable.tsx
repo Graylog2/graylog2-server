@@ -68,6 +68,7 @@ const TableWrapper = styled.div(({ theme }) => css`
   display: flex;
   flex-direction: column;
   overflow: auto;
+  clip-path: inset(0 0 0 0); // Fixes overflow of children with position: fixed.
 
   @media screen and (max-width: ${theme.breakpoints.max.md}) {
     &.table-responsive {
