@@ -45,7 +45,7 @@ describe('MessageAugmentations', () => {
     ];
     asMock(usePluginEntities).mockImplementation((entityKey) => ({ messageAugmentations: simpleAugmentations }[entityKey]));
 
-    render(<SimpleMessageAugmentation />);
+    render(<MessageAugmentations message={simpleMessage} />);
 
     expect(screen.getByText('The First Augmentation')).toBeInTheDocument();
     expect(screen.getByText('The Second Augmentation')).toBeInTheDocument();
