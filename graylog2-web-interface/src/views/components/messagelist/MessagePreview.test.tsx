@@ -21,16 +21,14 @@ import { asMock } from 'helpers/mocking';
 
 import usePluginEntities from 'views/logic/usePluginEntities';
 import FieldType from 'views/logic/fieldtypes/FieldType';
+import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 
 import MessagePreview from './MessagePreview';
 
 const simpleEventType = createSimpleMessageEventType(1, { summaryTemplate: '{field1} - {field2}', gl2EventTypeCode: 'event-type-code' });
 const mockMessageEventTypes = [simpleEventType];
 
-jest.mock('views/logic/usePluginEntities', () => jest.fn((entityKey) => ({
-  messageEventTypes: mockMessageEventTypes,
-  'views.components.widgets.messageTable.summary': [() => <div>The message summary</div>],
-}[entityKey])));
+jest.mock('views/logic/usePluginEntities', () => jest.fn());
 
 describe('MessagePreview', () => {
   afterEach(() => {
@@ -56,6 +54,7 @@ describe('MessagePreview', () => {
                         colSpanFixup={1}
                         showSummary={false}
                         showMessageRow
+                        config={MessagesWidgetConfig.builder().build()}
                         messageFieldType={new FieldType('string', [], [])}
                         {...rest} />
       </tbody>
@@ -74,33 +73,29 @@ describe('MessagePreview', () => {
     expect(screen.queryByText('Something happened!')).not.toBeInTheDocument();
   });
 
-  it('displays message summary', () => {
-    render(<SUT showSummary showMessageRow />);
+  it('displays pluggable message row override', () => {
+    asMock(usePluginEntities).mockImplementation((entityKey) => ({
+      'views.components.widgets.messageTable.messageRowOverride': [() => <div>The message row override</div>],
+    }[entityKey]));
 
-    expect(screen.getByText('The message summary')).toBeInTheDocument();
+    render(<SUT showMessageRow />);
+
+    expect(screen.getByText('The message row override')).toBeInTheDocument();
   });
 
-  it('replaces message row with summary, when summary is available', () => {
-    render(<SUT showSummary showMessageRow />);
-
-    expect(screen.getByText('The message summary')).toBeInTheDocument();
-    expect(screen.queryByText('Something happened!')).not.toBeInTheDocument();
-  });
-
-  it('message summary receives message row as fallback', () => {
+  it('pluggable message row override receives message row renderer as prop', () => {
     asMock(usePluginEntities).mockImplementation((entityKey) => ({
       messageEventTypes: mockMessageEventTypes,
-      'views.components.widgets.messageTable.summary': [({ renderFallback }) => (
+      'views.components.widgets.messageTable.summary': [({ renderMessageRow }) => (
         <div>
-          The summary component {renderFallback()}
+          The row override {renderMessageRow()}
         </div>
       )],
     }[entityKey]));
 
-    render(<SUT showSummary showMessageRow />);
+    render(<SUT showMessageRow />);
 
-    expect(screen.queryByText('The message summary')).not.toBeInTheDocument();
-    expect(screen.getByText(/The summary component/)).toBeInTheDocument();
+    expect(screen.getByText(/The message row override/)).toBeInTheDocument();
     expect(screen.getByText('Something happened!')).toBeInTheDocument();
   });
 });

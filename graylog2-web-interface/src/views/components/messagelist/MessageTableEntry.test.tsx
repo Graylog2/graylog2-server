@@ -19,6 +19,8 @@ import { render, screen } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
 import MockStore from 'helpers/mocking/StoreMock';
 
+import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
+
 import MessageTableEntry from './MessageTableEntry';
 
 jest.mock('stores/configurations/ConfigurationsStore', () => ({
@@ -41,6 +43,7 @@ describe('MessageTableEntry', () => {
                            toggleDetail={() => {}}
                            fields={Immutable.List()}
                            message={message}
+                           config={MessagesWidgetConfig.builder().build()}
                            selectedFields={Immutable.OrderedSet(['message', 'notexisting'])}
                            expanded={false} />
       </table>,
