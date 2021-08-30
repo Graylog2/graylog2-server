@@ -29,6 +29,7 @@ import authStyles from 'theme/styles/authStyles';
 import CombinedProvider from 'injection/CombinedProvider';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 import AppConfig from 'util/AppConfig';
+import { isCallbackUrl } from 'util/URLUtils';
 
 import LoadingPage from './LoadingPage';
 
@@ -159,6 +160,9 @@ const LoginPage = () => {
     );
   }
 
+  const isCallback = isCallbackUrl();
+  const displayOnCallback = !isCallback || (isCallback && lastError);
+
   return (
     <DocumentTitle title="Sign in">
       <LoginBox>
@@ -166,10 +170,10 @@ const LoginPage = () => {
         <LoginPageStyles />
         {formatLastError()}
         {renderLoginForm()}
-        {hasCustomLogin && enableExternalBackend && !isCloud && (
-          <StyledButton as="a" onClick={() => setUseFallback(!useFallback)}>
-            {`Login with ${useFallback ? loginComponent.type.replace(/^\w/, (c) => c.toUpperCase()) : 'default method'}`}
-          </StyledButton>
+        {hasCustomLogin && enableExternalBackend && !isCloud && displayOnCallback && (
+        <StyledButton as="a" onClick={() => setUseFallback(!useFallback)}>
+          {`Login with ${useFallback ? loginComponent.type.replace(/^\w/, (c) => c.toUpperCase()) : 'default method'}`}
+        </StyledButton>
         )}
       </LoginBox>
     </DocumentTitle>
