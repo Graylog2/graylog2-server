@@ -185,7 +185,7 @@ class MessageTable extends React.Component<Props, State> {
     const selectedFields = this._getSelectedFields();
 
     return (
-      <TableWrapper className="table-responsive">
+      <TableWrapper className="table-responsive" id="sticky-augmentations-container">
         <Table className="table table-condensed">
           <TableHead>
             <tr>

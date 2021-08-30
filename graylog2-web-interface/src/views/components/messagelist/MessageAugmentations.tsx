@@ -15,12 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import Sticky from 'react-sticky-el';
 
 import usePluginEntities from 'views/logic/usePluginEntities';
 import { Message } from 'views/components/messagelist/Types';
 
 type Props = {
-  message: Message
+  message: Message,
 }
 
 const MessageAugmentations = ({ message }: Props) => {
@@ -31,9 +32,11 @@ const MessageAugmentations = ({ message }: Props) => {
   }
 
   return (
-    <dl>
-      {augmentations.map(({ component: Augmentation, id }) => <Augmentation key={id} message={message} />)}
-    </dl>
+    <Sticky scrollElement="#sticky-augmentations-container" boundaryElement={`#sticky-augmentations-boundary-${message.id}`}>
+      <dl>
+        {augmentations.map(({ component: Augmentation, id }) => <Augmentation key={id} message={message} />)}
+      </dl>
+    </Sticky>
   );
 };
 

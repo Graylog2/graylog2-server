@@ -187,7 +187,7 @@ const MessageDetail = ({
           </MessageDetailsTitle>
         </Col>
       </Row>
-      <Row>
+      <Row id={`sticky-augmentations-boundary-${message.id}`}>
         <Col md={3}>
           <MessageMetadata timestamp={timestamp}
                            index={index}
@@ -195,7 +195,7 @@ const MessageDetail = ({
                            streams={streamsListItems} />
           <MessageAugmentations message={message} />
         </Col>
-        <Col md={9}>
+        <Col md={9} topOffset={250}>
           <MessageFields message={message}
                          fields={messageFields} />
         </Col>
