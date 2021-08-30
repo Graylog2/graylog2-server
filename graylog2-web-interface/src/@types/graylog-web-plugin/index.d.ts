@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import FetchError from 'logic/errors/FetchError';
-import { NodeInfo } from 'stores/nodes/NodesStore';
 
 interface PluginRoute {
   path: string;
@@ -51,7 +50,7 @@ interface PluginForwarder {
     inputId: string;
     forwarderNodeId: string;
   }>;
-  isLocalNode: (nodeId: string) => NodeInfo;
+  isLocalNode: (nodeId: string) => Promise<boolean>;
   messageLoaders: {
     ForwarderInputDropdown: React.ComponentType<{
       autoLoadMessage?: boolean;
