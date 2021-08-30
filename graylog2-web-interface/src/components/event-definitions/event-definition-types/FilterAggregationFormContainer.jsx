@@ -24,6 +24,7 @@ import { FieldTypesStore } from 'views/stores/FieldTypesStore';
 import FilterAggregationForm from './FilterAggregationForm';
 import withStreams from './withStreams';
 
+// eslint-disable-next-line react/prefer-stateless-function
 class FilterAggregationFormContainer extends React.Component {
   static propTypes = {
     action: PropTypes.oneOf(['create', 'edit']).isRequired,
