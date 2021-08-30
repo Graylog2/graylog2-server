@@ -24,6 +24,15 @@ import MessageAugmentations from './MessageAugmentations';
 
 jest.mock('views/logic/usePluginEntities');
 
+const simpleMessage = {
+  decoration_stats: null,
+  fields: { took_ms: 62, source: 'example.org' },
+  formatted_fields: { took_ms: 62, source: 'example.org' },
+  highlight_ranges: {},
+  id: 'message-id',
+  index: 'grayog_0',
+};
+
 describe('MessageAugmentations', () => {
   it('should render augmentations', () => {
     const simpleAugmentations = [
@@ -38,7 +47,7 @@ describe('MessageAugmentations', () => {
     ];
     asMock(usePluginEntities).mockImplementation((entityKey) => ({ messageAugmentations: simpleAugmentations }[entityKey]));
 
-    render(<MessageAugmentations />);
+    render(<MessageAugmentations message={simpleMessage} />);
 
     expect(screen.getByText('The First Augmentation')).toBeInTheDocument();
     expect(screen.getByText('The Second Augmentation')).toBeInTheDocument();
