@@ -476,21 +476,27 @@ public class Message implements Messages, Indexable {
             try {
                 return ES_DATE_FORMAT_FORMATTER.parseDateTime((String) value);
             } catch (IllegalArgumentException e) {
-                final String error = "Invalid format for field timestamp '" + value + "' in message " + getId() + ", forcing to current time.";
+                final String error = "Invalid format for field timestamp '" + value + "' in message <" + getId() + ">, forcing to current time.";
                 LOG.trace(error, e);
-                addProcessingError(new ProcessingError(ProcessingFailureCause.InvalidTimestampException, error, ExceptionUtils.getRootCauseMessage(e)));
+                addProcessingError(new ProcessingError(ProcessingFailureCause.InvalidTimestampException,
+                        "Replaced invalid timestamp value in message <" + getId() + "> with current time"
+                        , "Value <" + value + "> caused exception: " + ExceptionUtils.getRootCauseMessage(e)));
                 return Tools.nowUTC();
             }
         } else if (value == null) {
-            final String error = "null value for field timestamp in message " + getId() + ", forcing to current time.";
+            final String error = "<null> value for field timestamp in message <" + getId() + ">, forcing to current time";
             LOG.trace(error);
-            addProcessingError(new ProcessingError(ProcessingFailureCause.InvalidTimestampException, error, ""));
+            addProcessingError(new ProcessingError(ProcessingFailureCause.InvalidTimestampException,
+                    "Replaced invalid timestamp value in message <" + getId() + "> with current time",
+                    "<null> value provided"));
             return Tools.nowUTC();
         } else {
             // don't allow any other types for timestamp, force to "now"
-            final String error = "Invalid type for field timestamp '" + value.getClass().getSimpleName() + "' in message " + getId() + ", forcing to current time.";
+            final String error = "Invalid type for field timestamp <" + value.getClass().getSimpleName() + "> in message <" + getId() + ">, forcing to current time.";
             LOG.trace(error);
-            addProcessingError(new ProcessingError(ProcessingFailureCause.InvalidTimestampException, error, ""));
+            addProcessingError(new ProcessingError(ProcessingFailureCause.InvalidTimestampException,
+                    "Replaced invalid timestamp value in message <" + getId() + "> with current time",
+                    "Value of invalid type <" + value.getClass().getSimpleName() + "> provided"));
             return Tools.nowUTC();
         }
     }
