@@ -154,7 +154,7 @@ const WidgetGrid = ({
     const newPositions = Object.keys(positions).map((id) => {
       const { col, row, height, width } = positions[id];
 
-      return { id: id, col: col, row: row, height: height, width: width };
+      return { id, col, row, height, width };
     });
 
     onPositionsChange([...newPositions, newPosition]);
