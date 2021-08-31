@@ -55,9 +55,9 @@ const formatSinglePluginRoute = ({ description, path, permissions }, topLevel = 
   return link;
 };
 
-const formatPluginRoute = (pluginRoute, permissions, location) => {
+const formatPluginRoute = (pluginRoute, permissions, pathname) => {
   if (pluginRoute.children) {
-    const activeChild = pluginRoute.children.filter(({ path }) => (path && _isActive(location.pathname, path)));
+    const activeChild = pluginRoute.children.filter(({ path }) => (path && _isActive(pathname, path)));
     const title = activeChild.length > 0 ? `${pluginRoute.description} / ${activeChild[0].description}` : pluginRoute.description;
     const isEmpty = !pluginRoute.children.some((child) => isPermitted(permissions, child.permissions));
 
@@ -76,12 +76,10 @@ const formatPluginRoute = (pluginRoute, permissions, location) => {
 };
 
 type Props = {
-  location: {
-    pathname: string,
-  },
+  pathname: string,
 };
 
-const Navigation = ({ location }: Props) => {
+const Navigation = React.memo(({ pathname }: Props) => {
   const currentUser = useContext(CurrentUserContext);
   const { permissions, fullName, readOnly, id: userId } = currentUser || {};
 
@@ -100,7 +98,7 @@ const Navigation = ({ location }: Props) => {
 
   const pluginNavigations = pluginExports
     .sort((route1, route2) => naturalSort(route1.description.toLowerCase(), route2.description.toLowerCase()))
-    .map((pluginRoute) => formatPluginRoute(pluginRoute, permissions, location));
+    .map((pluginRoute) => formatPluginRoute(pluginRoute, permissions, pathname));
   const pluginItems = PluginStore.exports('navigationItems');
 
   return (
@@ -157,15 +155,17 @@ const Navigation = ({ location }: Props) => {
 
           <ScratchpadToggle />
 
-          <HelpMenu active={_isActive(location.pathname, Routes.GETTING_STARTED)} />
+          <HelpMenu active={_isActive(pathname, Routes.GETTING_STARTED)} />
 
           <UserMenu fullName={fullName} readOnly={readOnly} userId={userId} />
         </Nav>
       </Navbar.Collapse>
     </StyledNavbar>
   );
-};
+});
 
 Navigation.propTypes = {};
 
-export default withLocation(Navigation);
+const NavigationContainer = ({ location: { pathname } }) => <Navigation pathname={pathname} />;
+
+export default withLocation(NavigationContainer);
