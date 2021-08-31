@@ -99,7 +99,7 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
         //noinspection UnstableApiUsage
         eventBus = new EventBus("indices-test");
         final Node node = new Node(createNodeAdapter());
-        final IndexMappingFactory indexMappingFactory = new IndexMappingFactory(node);
+        final IndexMappingFactory indexMappingFactory = new IndexMappingFactory(node, Optional.empty());
         indices = new Indices(
                 indexMappingFactory,
                 mock(NodeId.class),

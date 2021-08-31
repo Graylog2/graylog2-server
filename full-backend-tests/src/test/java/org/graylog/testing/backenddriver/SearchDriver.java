@@ -16,7 +16,6 @@
  */
 package org.graylog.testing.backenddriver;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.ImmutableSet;
 import io.restassured.specification.RequestSpecification;
 import org.bson.types.ObjectId;
@@ -24,10 +23,9 @@ import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
-import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
-import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
+import org.graylog.testing.utils.JsonUtils;
+import org.graylog.testing.utils.RangeUtils;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
-import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 
 import java.util.List;
 
@@ -48,7 +46,7 @@ public class SearchDriver {
      * @return all messages' "message" field as List<String>
      */
     public static List<String> searchAllMessages(RequestSpecification requestSpec) {
-      return searchAllMessagesInTimeRange(requestSpec, allMessagesTimeRange());
+      return searchAllMessagesInTimeRange(requestSpec, RangeUtils.allMessagesTimeRange());
     }
 
     public static List<String> searchAllMessagesInTimeRange(RequestSpecification requestSpec, TimeRange timeRange) {
@@ -78,27 +76,11 @@ public class SearchDriver {
                 .build();
         Search s = Search.builder().id(new ObjectId().toHexString()).queries(ImmutableSet.of(q)).build();
 
-        return toJsonString(s);
-    }
-
-    private static AbsoluteRange allMessagesTimeRange() {
-        try {
-            return AbsoluteRange.create("2010-01-01T00:00:00.0Z", "2050-01-01T00:00:00.0Z");
-        } catch (InvalidRangeParametersException e) {
-            throw new RuntimeException("boo hoo", e);
-        }
+        return JsonUtils.toJsonString(s);
     }
 
     @SuppressWarnings("SameParameterValue")
     private static String allMessagesJsonPath(String queryId, String messageListId) {
         return "results." + queryId + ".search_types." + messageListId + ".messages.message.message";
-    }
-
-    private static String toJsonString(Search s) {
-        try {
-            return new ObjectMapperProvider().get().writeValueAsString(s);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("Failed to serialize Search", e);
-        }
     }
 }

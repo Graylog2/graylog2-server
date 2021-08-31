@@ -30,10 +30,12 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
+import org.graylog.failure.ProcessingFailureCause;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.Stage;
+import org.graylog.plugins.pipelineprocessor.ast.expressions.LogicalExpression;
 import org.graylog.plugins.pipelineprocessor.ast.statements.Statement;
 import org.graylog.plugins.pipelineprocessor.db.RuleMetricsConfigDto;
 import org.graylog.plugins.pipelineprocessor.processors.listeners.InterpreterListener;
@@ -58,6 +60,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -304,6 +307,13 @@ public class PipelineInterpreter implements MessageProcessor {
                 final boolean ruleCondition = evaluateRuleCondition(rule, message, msgId, pipeline, context, rulesToRun, interpreterListener);
                 anyRulesMatched |= ruleCondition;
                 allRulesMatched &= ruleCondition;
+
+                if (context.hasEvaluationErrors()) {
+                    log.warn("Error evaluating condition for rule <{}/{}> with message: {} (Error: {})",
+                            rule.name(), rule.id(), message, context.lastEvaluationError());
+                    break;
+                }
+
             } catch (Exception e) {
                 log.warn("Error evaluating condition for rule <{}/{}> with message: {} (Error: {})",
                         rule.name(), rule.id(), message, e.getMessage());
@@ -313,9 +323,8 @@ public class PipelineInterpreter implements MessageProcessor {
 
         for (Rule rule : rulesToRun) {
             if (!executeRuleActions(rule, message, msgId, pipeline, context, interpreterListener)) {
-                final EvaluationContext.EvalError lastError = Iterables.getLast(context.evaluationErrors());
                 log.warn("Error evaluating action for rule <{}/{}> with message: {} (Error: {})",
-                        rule.name(), rule.id(), message, lastError);
+                        rule.name(), rule.id(), message, context.lastEvaluationError());
                 // if any of the rules raise an error, skip the rest of the rules
                 break;
             }
@@ -379,7 +388,13 @@ public class PipelineInterpreter implements MessageProcessor {
         if (context.hasEvaluationErrors()) {
             // if the last statement resulted in an error, do not continue to execute this rules
             final EvaluationContext.EvalError lastError = Iterables.getLast(context.evaluationErrors());
-            appendProcessingError(rule, message, lastError.toString());
+            message.addProcessingError(new Message.ProcessingError(
+                    ProcessingFailureCause.RuleStatementEvaluationError,
+                    String.format(Locale.ENGLISH,
+                            "Error evaluating action for rule <%s/%s> (pipeline <%s/%s>)",
+                            rule.name(), rule.id(), pipeline.name(), pipeline.id()),
+                    lastError.toString()
+            ));
             interpreterListener.failExecuteRule(rule, pipeline);
             log.debug("Encountered evaluation error, skipping rest of the rule: {}",
                     lastError);
@@ -396,18 +411,29 @@ public class PipelineInterpreter implements MessageProcessor {
                                           EvaluationContext context,
                                           List<Rule> rulesToRun, InterpreterListener interpreterListener) {
         interpreterListener.evaluateRule(rule, pipeline);
-        boolean matched = rule.when().evaluateBool(context);
+        final boolean matched;
+        final LogicalExpression logicalExpression = rule.when();
+        try {
+            matched = logicalExpression.evaluateBool(context);
+        } catch (Exception e) {
+
+            context.onEvaluationException(e, logicalExpression);
+
+            message.addProcessingError(new Message.ProcessingError(
+                    ProcessingFailureCause.RuleConditionEvaluationError,
+                    String.format(Locale.ENGLISH,
+                            "Error evaluating condition for rule <%s/%s> (pipeline <%s/%s>)",
+                            rule.name(), rule.id(), pipeline.name(), pipeline.id()),
+                    context.lastEvaluationError().toString()
+            ));
+
+            interpreterListener.failEvaluateRule(rule, pipeline);
+
+            return false;
+        }
+
         if (matched) {
             rule.markMatch();
-
-            if (context.hasEvaluationErrors()) {
-                final EvaluationContext.EvalError lastError = Iterables.getLast(context.evaluationErrors());
-                appendProcessingError(rule, message, lastError.toString());
-                interpreterListener.failEvaluateRule(rule, pipeline);
-                log.debug("Encountered evaluation error during condition, skipping rule actions: {}",
-                        lastError);
-                return false;
-            }
             interpreterListener.satisfyRule(rule, pipeline);
             log.debug("[{}] rule `{}` matches, scheduling to run", msgId, rule.name());
             rulesToRun.add(rule);
@@ -418,15 +444,6 @@ public class PipelineInterpreter implements MessageProcessor {
             log.debug("[{}] rule `{}` does not match", msgId, rule.name());
         }
         return false;
-    }
-
-    private void appendProcessingError(Rule rule, Message message, String errorString) {
-        final String msg = "For rule '" + rule.name() + "': " + errorString;
-        if (message.hasField(Message.FIELD_GL2_PROCESSING_ERROR)) {
-            message.addField(Message.FIELD_GL2_PROCESSING_ERROR, message.getFieldAs(String.class, Message.FIELD_GL2_PROCESSING_ERROR) + "," + msg);
-        } else {
-            message.addField(Message.FIELD_GL2_PROCESSING_ERROR, msg);
-        }
     }
 
     public static class Descriptor implements MessageProcessor.Descriptor {

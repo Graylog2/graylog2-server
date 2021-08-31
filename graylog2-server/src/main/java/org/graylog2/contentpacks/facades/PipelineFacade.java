@@ -161,7 +161,7 @@ public class PipelineFacade implements EntityFacade<PipelineDao> {
             if (stream instanceof Stream) {
                 streams.add((Stream) stream);
             } else {
-                if (EntityDescriptorIds.isDefaultStreamDescriptor(descriptor)) {
+                if (EntityDescriptorIds.isSystemStreamDescriptor(descriptor)) {
                     try {
                         streams.add(streamService.load(descriptor.id().id()));
                     }

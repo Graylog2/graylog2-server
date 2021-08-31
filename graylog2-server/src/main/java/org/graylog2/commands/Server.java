@@ -83,6 +83,7 @@ import org.graylog2.shared.UI;
 import org.graylog2.shared.bindings.MessageInputBindings;
 import org.graylog2.shared.bindings.ObjectMapperModule;
 import org.graylog2.shared.bindings.RestApiBindings;
+import org.graylog2.shared.journal.Journal;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.graylog2.storage.VersionAwareStorageModule;
@@ -241,15 +242,21 @@ public class Server extends ServerBootstrap {
         private final NodeId nodeId;
         private final GracefulShutdown gracefulShutdown;
         private final AuditEventSender auditEventSender;
+        private final Journal journal;
 
         @Inject
-        public ShutdownHook(ActivityWriter activityWriter, ServiceManager serviceManager, NodeId nodeId,
-                            GracefulShutdown gracefulShutdown, AuditEventSender auditEventSender) {
+        public ShutdownHook(ActivityWriter activityWriter,
+                            ServiceManager serviceManager,
+                            NodeId nodeId,
+                            GracefulShutdown gracefulShutdown,
+                            AuditEventSender auditEventSender,
+                            Journal journal) {
             this.activityWriter = activityWriter;
             this.serviceManager = serviceManager;
             this.nodeId = nodeId;
             this.gracefulShutdown = gracefulShutdown;
             this.auditEventSender = auditEventSender;
+            this.journal = journal;
         }
 
         @Override
@@ -262,6 +269,13 @@ public class Server extends ServerBootstrap {
 
             gracefulShutdown.runWithoutExit();
             serviceManager.stopAsync().awaitStopped();
+
+            // Some services might continue performing processing
+            // after the Journal service being down. Therefore it's
+            // important to flush the most actual journal offset value
+            // right before shutting down to avoid repetitive processing
+            // and duplicates.
+            journal.flush();
         }
     }
 

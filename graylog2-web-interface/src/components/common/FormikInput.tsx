@@ -25,6 +25,7 @@ type Props = {
   autoComplete?: string,
   buttonAfter?: React.ReactElement | string,
   bsSize?: 'large' | 'small' | 'xsmall',
+  disabled?: boolean,
   id: string,
   label?: React.ReactElement | string,
   name: string,
@@ -96,6 +97,7 @@ FormikInput.propTypes = {
 FormikInput.defaultProps = {
   buttonAfter: undefined,
   bsSize: undefined,
+  disabled: false,
   autoComplete: undefined,
   label: undefined,
   help: undefined,
