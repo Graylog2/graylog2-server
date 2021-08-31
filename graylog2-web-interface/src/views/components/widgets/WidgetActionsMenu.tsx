@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useState, useContext, useCallback } from 'react';
 import styled from 'styled-components';
+import { BackendWidgetPosition } from 'views/types';
 
 import ExportModal from 'views/components/export/ExportModal';
 import MoveWidgetToTab from 'views/logic/views/MoveWidgetToTab';
@@ -130,7 +131,7 @@ const _onDuplicate = (widgetId, setFocusWidget, title) => {
 
 type Props = {
   isFocused: boolean,
-  onPositionsChange: () => void,
+  onPositionsChange: (position: BackendWidgetPosition) => void,
   position: WidgetPosition,
   title: string,
   toggleEdit: () => void

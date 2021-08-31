@@ -18,6 +18,7 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import { BackendWidgetPosition } from 'views/types';
 
 import connect from 'stores/connect';
 import { widgetDefinition } from 'views/logic/Widgets';
@@ -61,7 +62,7 @@ export type Props = {
   title: string,
   position: WidgetPosition,
   onSizeChange: () => void,
-  onPositionsChange: () => void,
+  onPositionsChange: (position: BackendWidgetPosition) => void,
 };
 
 type State = {

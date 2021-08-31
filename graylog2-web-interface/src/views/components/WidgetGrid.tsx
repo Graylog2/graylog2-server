@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState, useContext, useMemo } from 'react';
+import { useCallback, useState, useContext, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import ImmutablePropTypes from 'react-immutable-proptypes';
@@ -24,11 +24,9 @@ import styled, { css } from 'styled-components';
 import { SizeMe } from 'react-sizeme';
 import { WidgetPositions, BackendWidgetPosition } from 'views/types';
 
-import connect from 'stores/connect';
 import CustomPropTypes from 'views/components/CustomPropTypes';
 import ReactGridContainer from 'components/common/ReactGridContainer';
 import { widgetDefinition } from 'views/logic/Widgets';
-import { TitlesStore, TitleTypes } from 'views/stores/TitlesStore';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import WidgetFocusContext, { FocusContextState } from 'views/components/contexts/WidgetFocusContext';
 import SearchError from 'views/logic/SearchError';
@@ -39,7 +37,6 @@ import { TitlesMap } from 'views/stores/TitleTypes';
 import WidgetContainer from './WidgetContainer';
 import { PositionsMap, WidgetDataMap, WidgetErrorsMap, WidgetsMap } from './widgets/WidgetPropTypes';
 import WidgetComponent from './WidgetComponent';
-import defaultTitle from './defaultTitle';
 
 const COLUMNS = {
   xxl: 12,
@@ -91,10 +88,11 @@ type Props = {
   titles: TitlesMap,
 };
 
-type WidgetsProps = Omit<Props, 'staticWidgets' | 'locked'> & {
+type WidgetsProps = Omit<Props, 'staticWidgets' | 'locked' | 'onPositionsChange'> & {
   setWidgetDimensions: (newWidgetDimensions: { [widgetId: string]: WidgetDimensions }) => void,
   widgetDimensions: { [widgetId: string]: WidgetDimensions },
   focusedWidget: FocusContextState | undefined,
+  onPositionsChange: (position: BackendWidgetPosition) => void,
 };
 
 const renderWidgets = ({
@@ -104,7 +102,6 @@ const renderWidgets = ({
   onPositionsChange,
   positions,
   setWidgetDimensions,
-  titles,
   widgetDimensions,
   widgets,
   focusedWidget,
@@ -113,20 +110,7 @@ const renderWidgets = ({
     return [];
   }
 
-  const _onPositionsChange = (newPosition) => {
-    const newPositions = Object.keys(positions).map((id) => {
-      const { col, row, height, width } = positions[id];
-
-      return { id: id, col: col, row: row, height: height, width: width };
-    });
-
-    newPositions.push(newPosition);
-    onPositionsChange(newPositions);
-  };
-
-  return Object.keys(widgets).map((widgetId) => {
-    const widget = widgets[widgetId];
-    const widgetTitle = titles.getIn([TitleTypes.Widget, widget.id], defaultTitle(widget));
+  return Object.entries(widgets).map(([widgetId, widget]) => {
     const isFocused = focusedWidget?.id === widgetId && focusedWidget?.focusing;
     const editing = focusedWidget?.id === widgetId && focusedWidget?.editing;
 
@@ -136,10 +120,9 @@ const renderWidgets = ({
                          editing={editing}
                          errors={errors}
                          fields={fields}
-                         onPositionsChange={_onPositionsChange}
+                         onPositionsChange={onPositionsChange}
                          onWidgetSizeChange={_onWidgetSizeChange(widgetDimensions, setWidgetDimensions)}
                          position={positions[widgetId]}
-                         title={widgetTitle}
                          widgetDimension={widgetDimensions[widgetId] || {} as WidgetDimensions}
                          widget={widget} />
       </WidgetContainer>
@@ -167,6 +150,16 @@ const WidgetGrid = ({
 
   const positions = useMemo(() => { return generatePositions(Object.entries(propsWidgets).map(([id, { type }]) => ({ id, type })), propsPositions); }, [propsWidgets, propsPositions]);
 
+  const _onPositionsChange = useCallback((newPosition: BackendWidgetPosition) => {
+    const newPositions = Object.keys(positions).map((id) => {
+      const { col, row, height, width } = positions[id];
+
+      return { id: id, col: col, row: row, height: height, width: width };
+    });
+
+    onPositionsChange([...newPositions, newPosition]);
+  }, [onPositionsChange, positions]);
+
   // The SizeMe component is required to update the widget grid
   // when its content height results in a scrollbar
   return (
@@ -178,7 +171,7 @@ const WidgetGrid = ({
                                     isResizable={!focusedWidget?.id}
                                     locked={locked}
                                     measureBeforeMount
-                                    onPositionsChange={onPositionsChange}
+                                    onPositionsChange={_onPositionsChange}
                                     positions={positions}
                                     width={width}
                                     useDragHandle=".widget-drag-handle">
@@ -186,7 +179,7 @@ const WidgetGrid = ({
               data,
               errors,
               fields,
-              onPositionsChange,
+              onPositionsChange: _onPositionsChange,
               positions,
               widgets: propsWidgets,
               setWidgetDimensions,
@@ -231,4 +224,4 @@ WidgetGrid.defaultProps = {
 
 const MemoizedWidgetGrid = React.memo(WidgetGrid);
 
-export default connect(MemoizedWidgetGrid, { titles: TitlesStore });
+export default MemoizedWidgetGrid;
