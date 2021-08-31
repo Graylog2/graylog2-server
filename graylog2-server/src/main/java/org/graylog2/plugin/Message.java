@@ -477,7 +477,7 @@ public class Message implements Messages, Indexable {
                 return ES_DATE_FORMAT_FORMATTER.parseDateTime((String) value);
             } catch (IllegalArgumentException e) {
                 final String error = "Invalid format for field timestamp '" + value + "' in message <" + getId() + ">, forcing to current time.";
-                LOG.trace(error, e);
+                LOG.trace("{}: {}", error, e);
                 addProcessingError(new ProcessingError(ProcessingFailureCause.InvalidTimestampException,
                         "Replaced invalid timestamp value in message <" + getId() + "> with current time"
                         , "Value <" + value + "> caused exception: " + ExceptionUtils.getRootCauseMessage(e)));
