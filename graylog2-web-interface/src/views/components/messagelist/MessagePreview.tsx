@@ -58,7 +58,7 @@ const MessagePreview = ({ onRowClick, colSpanFixup, message, messageFieldType, s
   return (
     <TableRow onClick={onRowClick}>
       <td colSpan={colSpanFixup}>
-        {!!MessageRowOverride && (
+        {showMessageRow && !!MessageRowOverride && (
           <MessageRowOverride messageFields={message.fields}
                               config={config}
                               renderMessageRow={() => renderMessageFieldRow(message, messageFieldType)} />
