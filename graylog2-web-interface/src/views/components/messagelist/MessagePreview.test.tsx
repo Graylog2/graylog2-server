@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
-import { createSimpleMessageEventType } from 'fixtures/messageEventTypes';
 import { asMock } from 'helpers/mocking';
 
 import usePluginEntities from 'views/logic/usePluginEntities';
@@ -24,9 +23,6 @@ import FieldType from 'views/logic/fieldtypes/FieldType';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 
 import MessagePreview from './MessagePreview';
-
-const simpleEventType = createSimpleMessageEventType(1, { summaryTemplate: '{field1} - {field2}', gl2EventTypeCode: 'event-type-code' });
-const mockMessageEventTypes = [simpleEventType];
 
 jest.mock('views/logic/usePluginEntities', () => jest.fn());
 
@@ -39,7 +35,6 @@ describe('MessagePreview', () => {
     id: 'deadbeef',
     index: 'test_0',
     fields: {
-      gl2_event_type_code: 'event-type-code',
       message: 'Something happened!',
       field1: 'Value for field 1',
       field2: 'Value for field 2',
@@ -52,7 +47,6 @@ describe('MessagePreview', () => {
         <MessagePreview message={message}
                         onRowClick={() => {}}
                         colSpanFixup={1}
-                        showSummary={false}
                         showMessageRow
                         config={MessagesWidgetConfig.builder().build()}
                         messageFieldType={new FieldType('string', [], [])}
@@ -85,10 +79,9 @@ describe('MessagePreview', () => {
 
   it('pluggable message row override receives message row renderer as prop', () => {
     asMock(usePluginEntities).mockImplementation((entityKey) => ({
-      messageEventTypes: mockMessageEventTypes,
-      'views.components.widgets.messageTable.summary': [({ renderMessageRow }) => (
+      'views.components.widgets.messageTable.messageRowOverride': [({ renderMessageRow }) => (
         <div>
-          The row override {renderMessageRow()}
+          The message row override {renderMessageRow()}
         </div>
       )],
     }[entityKey]));

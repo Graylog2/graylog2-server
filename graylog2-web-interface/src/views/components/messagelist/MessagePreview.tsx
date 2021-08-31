@@ -71,7 +71,6 @@ const MessagePreview = ({ onRowClick, colSpanFixup, message, messageFieldType, s
 
 MessagePreview.defaultProps = {
   showMessageRow: false,
-  showSummary: false,
 };
 
 export default MessagePreview;
