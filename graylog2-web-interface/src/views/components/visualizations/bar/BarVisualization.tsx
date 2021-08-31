@@ -23,6 +23,7 @@ import EventHandler, { Shapes } from 'views/logic/searchtypes/events/EventHandle
 import { DateType } from 'views/logic/aggregationbuilder/Pivot';
 import { makeVisualization } from 'views/components/aggregationbuilder/AggregationBuilder';
 import BarVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
+import { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 
 import { chartData } from '../ChartData';
 import XYPlot from '../XYPlot';
@@ -91,7 +92,7 @@ const BarVisualization = makeVisualization(({ config, data, effectiveTimerange, 
 
   const _seriesGenerator = (type, name, labels, values): ChartDefinition => ({ type, name, x: labels, y: values, opacity });
 
-  const rows = data.chart || Object.values(data)[0];
+  const rows = (data.chart ?? Object.values(data)[0]) as Rows;
   const chartDataResult = chartData(config, rows, 'bar', _seriesGenerator);
 
   if (config.eventAnnotation && data.events) {

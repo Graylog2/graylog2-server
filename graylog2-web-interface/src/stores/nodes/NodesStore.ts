@@ -99,7 +99,7 @@ const NodesStore = Reflux.createStore<NodesStoreState>({
   },
 
   getNode(nodeId) {
-    return this.nodes[nodeId];
+    return this.nodes?.[nodeId];
   },
 
   _clusterId() {

@@ -427,6 +427,13 @@ public class Message implements Messages, Indexable {
         obj.put(FIELD_STREAMS, getStreamIds());
         obj.put(FIELD_GL2_ACCOUNTED_MESSAGE_SIZE, getSize());
 
+        if (processingErrors != null && !processingErrors.isEmpty()) {
+            obj.put(FIELD_GL2_PROCESSING_ERROR,
+                    processingErrors.stream()
+                            .map(ProcessingError::getDetails)
+                            .collect(Collectors.joining(", ")));
+        }
+
         final Object timestampValue = getField(FIELD_TIMESTAMP);
         DateTime dateTime = convertToDateTime(timestampValue);
         if (dateTime != null) {

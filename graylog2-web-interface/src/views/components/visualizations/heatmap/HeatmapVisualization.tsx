@@ -21,6 +21,7 @@ import { AggregationType, AggregationResult } from 'views/components/aggregation
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import { makeVisualization } from 'views/components/aggregationbuilder/AggregationBuilder';
 import HeatmapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/HeatmapVisualizationConfig';
+import { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 
 import type { ChartDefinition, ExtractedSeries } from '../ChartData';
 import GenericPlot from '../GenericPlot';
@@ -130,7 +131,7 @@ const _leafSourceMatcher = ({ source }) => source.endsWith('leaf') && source !==
 
 const HeatmapVisualization = makeVisualization(({ config, data }: VisualizationComponentProps) => {
   const visualizationConfig = (config.visualizationConfig || HeatmapVisualizationConfig.empty()) as HeatmapVisualizationConfig;
-  const rows = data.chart || Object.values(data)[0];
+  const rows = (data.chart ?? Object.values(data)[0]) as Rows;
   const heatmapData = chartData(config, rows, 'heatmap', _generateSeries(visualizationConfig), _formatSeries(visualizationConfig), _leafSourceMatcher);
   const layout = _chartLayout(heatmapData);
 

@@ -72,6 +72,8 @@ public class ExceptionUtilsTest {
                 new RuntimeException("parent", new IOException("asdasd")), IOException.class)).isTrue();
     }
 
+
+
     @Test
     public void getShortenedStackTrace() {
         final IOException ioException = new IOException("io message");

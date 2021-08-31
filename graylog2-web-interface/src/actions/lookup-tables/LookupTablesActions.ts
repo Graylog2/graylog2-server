@@ -17,8 +17,24 @@
 import Reflux from 'reflux';
 
 import { singletonActions } from 'views/logic/singleton';
+import { LookupTable } from 'logic/lookup-tables/types';
+import { RefluxActions } from 'stores/StoreTypes';
 
-const LookupTablesActions = singletonActions('LookupTables', () => Reflux.createActions({
+type LookupTableActionsType = {
+  searchPaginated: (page: number, perPage: number, query: string, resolve: boolean) => Promise<unknown>,
+  reloadPage: () => Promise<unknown>,
+  get: (idOrName: string) => Promise<unknown>,
+  create: (table: LookupTable) => Promise<unknown>,
+  delete: (idOrName: string) => Promise<unknown>,
+  update: (table: LookupTable) => Promise<unknown>,
+  getErrors: (tableNames: Array<string> | undefined, cacheNames: Array<string> | undefined, dataAdapterNames: Array<string> | undefined) => Promise<unknown>,
+  lookup: (tableName: string, key: string) => Promise<unknown>,
+  purgeKey: (table: LookupTable, key: string) => Promise<unknown>,
+  purgeAll: (table: LookupTable, key: string) => Promise<unknown>,
+  validate: (table: LookupTable) => Promise<unknown>,
+}
+
+const LookupTablesActions: RefluxActions<LookupTableActionsType> = singletonActions('LookupTables', () => Reflux.createActions({
   searchPaginated: { asyncResult: true },
   reloadPage: { asyncResult: true },
   get: { asyncResult: true },

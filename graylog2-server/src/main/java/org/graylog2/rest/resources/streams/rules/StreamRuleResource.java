@@ -83,7 +83,7 @@ public class StreamRuleResource extends RestResource {
                            @ApiParam(name = "JSON body", required = true)
                            @Valid @NotNull CreateStreamRuleRequest cr) throws NotFoundException, ValidationException {
         checkPermission(RestPermissions.STREAMS_EDIT, streamId);
-        checkNotEditable(streamId, "Cannot add stream rules to non editable streams.");
+        checkNotEditable(streamId, "Cannot add stream rules to non-editable streams.");
 
         // Check if stream exists
         streamService.load(streamId);
