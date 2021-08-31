@@ -24,6 +24,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+import java.util.Locale;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.jodatime.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -57,7 +59,7 @@ public class NaturalDateParserTest {
 
     final String[] testsThatAlignToStartOfDay = {
             "yesterday", "the day before yesterday", "today",
-            "monday", "monday to friday", "last week"
+            "monday", "monday to friday", "last week", "last month"
     };
 
     final String[][] singleDaytestsThatAlignToAGivenTime = {
@@ -284,14 +286,65 @@ public class NaturalDateParserTest {
     }
 
     @Test
-    public void testParseLastWeek() throws Exception {
+    public void testParseMondayLastWeek() throws Exception {
+        DateTime reference = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("12.06.2021 09:45:23");
+        NaturalDateParser.Result result = naturalDateParser.parse("monday last week", reference.toDate());
+
+        DateTime lastMondayStart = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("31.05.2021 00:00:00");
+        DateTime lastMondayEnd = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("01.06.2021 00:00:00");
+
+        assertThat(result.getFrom()).as("should be equal to").isEqualTo(lastMondayStart);
+        assertThat(result.getTo()).as("should be equal to").isEqualTo(lastMondayEnd);
+    }
+
+    @Test
+    public void testParseLastWeekGermany() throws Exception {
+        final NaturalDateParser naturalDateParser = new NaturalDateParser(Locale.GERMANY);
         DateTime reference = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("12.06.2021 09:45:23");
         NaturalDateParser.Result result = naturalDateParser.parse("last week", reference.toDate());
 
-        DateTime lastMonday = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("05.06.2021 00:00:00");
+        DateTime lastMonday = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("31.05.2021 00:00:00");
+        DateTime nextMonday = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("07.06.2021 00:00:00");
 
         assertThat(result.getFrom()).as("should be equal to").isEqualTo(lastMonday);
-        assertThat(result.getTo()).as("should differ from").isNotEqualTo(lastMonday);
+        assertThat(result.getTo()).as("should be equal to").isEqualTo(nextMonday);
+    }
+
+    @Test
+    public void testParseLastWeekUS() throws Exception {
+        final NaturalDateParser naturalDateParser = new NaturalDateParser(Locale.US);
+        DateTime reference = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("12.06.2021 09:45:23");
+        NaturalDateParser.Result result = naturalDateParser.parse("last week", reference.toDate());
+
+        DateTime lastMonday = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("30.05.2021 00:00:00");
+        DateTime nextMonday = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("06.06.2021 00:00:00");
+
+        assertThat(result.getFrom()).as("should be equal to").isEqualTo(lastMonday);
+        assertThat(result.getTo()).as("should be equal to").isEqualTo(nextMonday);
+    }
+
+    @Test
+    public void testParseLastMonth() throws Exception {
+        DateTime reference = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("12.06.2021 09:45:23");
+        NaturalDateParser.Result result = naturalDateParser.parse("last month", reference.toDate());
+
+        DateTime lastMonthStart = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("01.05.2021 00:00:00");
+        DateTime lastMonthEnd = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("01.06.2021 00:00:00");
+
+        assertThat(result.getFrom()).as("should be equal to").isEqualTo(lastMonthStart);
+        assertThat(result.getTo()).as("should be equal to").isEqualTo(lastMonthEnd);
+    }
+
+    @Test
+    public void testParseLastYear() throws Exception {
+        DateTime reference = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("12.06.2021 09:45:23");
+        NaturalDateParser.Result result = naturalDateParser.parse("last year", reference.toDate());
+
+        DateTime lastYearStart = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("01.01.2020 00:00:00");
+        DateTime lastYearEnd = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("01.01.2021 00:00:00");
+
+        assertThat(result.getFrom()).as("should be equal to").isEqualTo(lastYearStart);
+        assertThat(result.getTo()).as("should be equal to").isEqualTo(lastYearEnd);
     }
 
     @Test
