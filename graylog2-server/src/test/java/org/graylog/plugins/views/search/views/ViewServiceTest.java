@@ -161,6 +161,8 @@ public class ViewServiceTest {
                 .extracting("title")
                 .containsExactly("View D", "View B", "View A");
 
+        assertThat(result1.grandTotal()).hasValue(5L);
+
         final PaginatedList<ViewDTO> result2 = dbService.searchPaginated(
                 queryParser.parse("A B D"),
                 view -> view.title().contains("B") || view.title().contains("D"), "desc",
@@ -173,6 +175,73 @@ public class ViewServiceTest {
                 .hasSize(2)
                 .extracting("title")
                 .containsExactly("View D", "View B");
+
+        assertThat(result2.grandTotal()).hasValue(5L);
+    }
+
+    @Test
+    public void searchPaginatedByType() {
+        final ImmutableMap<String, SearchQueryField> searchFieldMapping = ImmutableMap.<String, SearchQueryField>builder()
+                .put("id", SearchQueryField.create(ViewDTO.FIELD_ID))
+                .put("title", SearchQueryField.create(ViewDTO.FIELD_TITLE))
+                .put("summary", SearchQueryField.create(ViewDTO.FIELD_DESCRIPTION))
+                .build();
+
+        dbService.save(ViewDTO.builder().type(ViewDTO.Type.DASHBOARD).title("View A").searchId("abc123").state(Collections.emptyMap()).owner("franz").build());
+        dbService.save(ViewDTO.builder().type(ViewDTO.Type.DASHBOARD).title("View B").searchId("abc123").state(Collections.emptyMap()).owner("franz").build());
+        dbService.save(ViewDTO.builder().type(ViewDTO.Type.DASHBOARD).title("View C").searchId("abc123").state(Collections.emptyMap()).owner("franz").build());
+        dbService.save(ViewDTO.builder().type(ViewDTO.Type.SEARCH).title("View D").searchId("abc123").state(Collections.emptyMap()).owner("franz").build());
+        dbService.save(ViewDTO.builder().type(ViewDTO.Type.SEARCH).title("View E").searchId("abc123").state(Collections.emptyMap()).owner("franz").build());
+
+        final SearchQueryParser queryParser = new SearchQueryParser(ViewDTO.FIELD_TITLE, searchFieldMapping);
+
+        final PaginatedList<ViewDTO> result1 = dbService.searchPaginatedByType(
+                ViewDTO.Type.DASHBOARD,
+                queryParser.parse("A B D"),
+                view -> true, "desc",
+                "title",
+                1,
+                5
+        );
+
+        assertThat(result1)
+                .hasSize(2)
+                .extracting("title")
+                .containsExactly("View B", "View A");
+
+        assertThat(result1.grandTotal()).hasValue(3L);
+
+        final PaginatedList<ViewDTO> result2 = dbService.searchPaginatedByType(
+                ViewDTO.Type.DASHBOARD,
+                queryParser.parse("A B D"),
+                view -> view.title().contains("B") || view.title().contains("D"), "desc",
+                "title",
+                1,
+                5
+        );
+
+        assertThat(result2)
+                .hasSize(1)
+                .extracting("title")
+                .containsExactly("View B");
+
+        assertThat(result1.grandTotal()).hasValue(3L);
+
+        final PaginatedList<ViewDTO> result3 = dbService.searchPaginatedByType(
+                ViewDTO.Type.SEARCH,
+                queryParser.parse(""),
+                view -> true, "asc",
+                "title",
+                1,
+                5
+        );
+
+        assertThat(result3)
+                .hasSize(2)
+                .extracting("title")
+                .containsExactly("View D", "View E");
+
+        assertThat(result3.grandTotal()).hasValue(2L);
     }
 
     @Test
