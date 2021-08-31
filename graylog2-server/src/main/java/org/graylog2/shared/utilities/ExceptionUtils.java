@@ -21,7 +21,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.net.UnknownHostException;
 import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class ExceptionUtils {
 
@@ -83,24 +84,29 @@ public class ExceptionUtils {
     public static String getShortenedStackTrace(Throwable t) {
         StringBuilder trace = new StringBuilder();
 
-        final AtomicInteger position = new AtomicInteger(0);
-        Throwables.getCausalChain(t)
+        final List<Throwable> causalChain = Throwables.getCausalChain(t)
                 .stream()
                 .filter(c -> StringUtils.isNotBlank(c.getMessage()))
-                .forEach(c -> {
-                    if (position.get() > 0) {
-                        trace.append("Caused by: ");
-                    }
-                    appendWithNewline(trace, c);
-                    Arrays.stream(c.getStackTrace()).findFirst().ifPresent(firstStackElement -> {
-                        trace.append("\tat ");
-                        appendWithNewline(trace, firstStackElement);
-                        trace.append("\t... ").append(c.getStackTrace().length - 1);
-                        appendWithNewline(trace, " more");
-                    });
+                .collect(Collectors.toList());
 
-                    position.getAndIncrement();
-                });
+        int position = 0;
+        for (Throwable c : causalChain) {
+            if (position > 0) {
+                trace.append("Caused by: ");
+            }
+            appendWithNewline(trace, c);
+            Arrays.stream(c.getStackTrace()).findFirst().ifPresent(firstStackElement -> {
+                trace.append("\tat ");
+                appendWithNewline(trace, firstStackElement);
+                final int more = c.getStackTrace().length - 1;
+                if (more > 0) {
+                    trace.append("\t... ").append(more);
+                    appendWithNewline(trace, " more");
+                }
+            });
+
+            position++;
+        }
 
         return trace.toString();
     }
