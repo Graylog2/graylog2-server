@@ -44,7 +44,19 @@ import View from 'views/logic/views/View';
 import User from 'logic/users/User';
 import { Message } from 'views/components/messagelist/Types';
 import { ValuePath } from 'views/logic/valueactions/ValueActionHandler';
+import WidgetPosition from 'views/logic/widgets/WidgetPosition';
+
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
+
+type BackendWidgetPosition = {
+  id: string,
+  col: number,
+  row: number,
+  height: number,
+  width: number,
+};
+
+type WidgetPositions = { [widgetId: string]: WidgetPosition };
 
 interface EditWidgetComponentProps<Config extends WidgetConfig = WidgetConfig> {
   children: React.ReactNode,

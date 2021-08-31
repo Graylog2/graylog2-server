@@ -20,22 +20,15 @@ import styled, { css } from 'styled-components';
 
 import Spinner from 'components/common/Spinner';
 import Query from 'views/components/Query';
-import connect, { useStore } from 'stores/connect';
+import { useStore } from 'stores/connect';
 import { SearchStore } from 'views/stores/SearchStore';
 import { CurrentViewStateStore } from 'views/stores/CurrentViewStateStore';
 import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
-import { WidgetStore } from 'views/stores/WidgetStore';
 import { SearchLoadingStateStore } from 'views/stores/SearchLoadingStateStore';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import LoadingIndicator from 'components/common/LoadingIndicator';
 import { Row, Col } from 'components/graylog';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
-
-type IndicatorProps = {
-  searchLoadingState: {
-    isLoading: boolean;
-  };
-};
 
 const StyledRow = styled(Row)(({ $hasFocusedWidget }: { $hasFocusedWidget: boolean }) => css`
   height: ${$hasFocusedWidget ? '100%' : 'auto'};
@@ -46,12 +39,11 @@ const StyledCol = styled(Col)`
   height: 100%;
 `;
 
-const SearchLoadingIndicator = connect(
-  ({ searchLoadingState }: IndicatorProps) => (searchLoadingState.isLoading && <LoadingIndicator text="Updating search results..." />),
-  { searchLoadingState: SearchLoadingStateStore },
-);
+const SearchLoadingIndicator = () => {
+  const searchLoadingState = useStore(SearchLoadingStateStore);
 
-const QueryWithWidgets = connect(Query, { widgets: WidgetStore });
+  return (searchLoadingState.isLoading && <LoadingIndicator text="Updating search results..." />);
+};
 
 type Props = {
   hasErrors: boolean,
@@ -68,20 +60,19 @@ const SearchResult = React.memo(({ hasErrors }: Props) => {
     return <Spinner />;
   }
 
-  const results = searches && searches.result;
-  const widgetMapping = searches && searches.widgetMapping;
+  const widgetMapping = searches?.widgetMapping;
 
   const hasFocusedWidget = !!focusedWidget?.id;
 
-  const currentResults = results ? results.forId(queryId) : undefined;
+  const currentResults = searches?.result?.forId(queryId);
+
   const queryFields = fieldTypes.queryFields.get(queryId, fieldTypes.all);
-  const positions = viewState.state && viewState.state.widgetPositions;
+  const positions = viewState.state?.widgetPositions;
   const content = currentResults ? (
-    <QueryWithWidgets fields={queryFields}
-                      queryId={queryId}
-                      results={currentResults}
-                      positions={positions}
-                      widgetMapping={widgetMapping} />
+    <Query fields={queryFields}
+           results={currentResults}
+           positions={positions}
+           widgetMapping={widgetMapping} />
   ) : hasErrors ? null : <Spinner />;
 
   return (

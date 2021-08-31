@@ -18,6 +18,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import Immutable from 'immutable';
 import styled, { css } from 'styled-components';
+import { BackendWidgetPosition } from 'views/types';
 
 import DocsHelper from 'util/DocsHelper';
 import { Jumbotron } from 'components/graylog';
@@ -29,8 +30,14 @@ import IfDashboard from 'views/components/dashboard/IfDashboard';
 import IfSearch from 'views/components/search/IfSearch';
 import WidgetGrid from 'views/components/WidgetGrid';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
+import { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
+import Widget from 'views/logic/widgets/Widget';
+import QueryResult from 'views/logic/QueryResult';
+import { WidgetMapping } from 'views/logic/views/types';
+import { useStore } from 'stores/connect';
+import { WidgetStore } from 'views/stores/WidgetStore';
 
-import { PositionsMap, ImmutableWidgetsMap } from './widgets/WidgetPropTypes';
+import { PositionsMap } from './widgets/WidgetPropTypes';
 import InteractiveContext from './contexts/InteractiveContext';
 
 const StyledJumbotron = styled(Jumbotron)(({ theme }) => css`
@@ -44,10 +51,10 @@ const StyledJumbotron = styled(Jumbotron)(({ theme }) => css`
 
 const MAXIMUM_GRID_SIZE = 12;
 
-const _onPositionsChange = (positions) => {
-  const newPositions: Record<string, WidgetPosition> = Immutable.Map<string, WidgetPosition>(
+const _onPositionsChange = (positions: Array<BackendWidgetPosition>) => {
+  const newPositions = Immutable.Map<string, WidgetPosition>(
     positions.map(({ col, height, row, width, id }) => [id, new WidgetPosition(col, row, height, width >= MAXIMUM_GRID_SIZE ? Infinity : width)]),
-  ).toJS();
+  ).toObject();
 
   CurrentViewStateActions.widgetPositions(newPositions);
 };
@@ -56,7 +63,7 @@ const _getDataAndErrors = (widget, widgetMapping, results) => {
   const { searchTypes } = results;
   const widgetType = widgetDefinition(widget.type);
   const dataTransformer = widgetType.searchResultTransformer || ((x) => x);
-  const searchTypeIds = (widgetMapping[widget.id] || []);
+  const searchTypeIds = widgetMapping[widget.id] ?? [];
   const widgetData = searchTypeIds.map((searchTypeId) => searchTypes[searchTypeId]).filter((result) => result);
   const widgetErrors = results.errors.filter((e) => searchTypeIds.includes(e.searchTypeId));
   let error;
@@ -78,7 +85,15 @@ const _getDataAndErrors = (widget, widgetMapping, results) => {
   return { widgetData: data, error };
 };
 
-const _renderWidgetGrid = (widgetDefs, widgetMapping, results, positions, queryId, fields) => {
+type GridProps = {
+  widgetDefs: Immutable.Map<string, Widget>,
+  widgetMapping: { [widgetId: string]: Array<string> },
+  results: QueryResult,
+  positions: { [widgetId: string]: WidgetPosition },
+  fields: FieldTypeMappingsList,
+}
+
+const RenderedWidgetGrid = ({ widgetDefs, widgetMapping, results, positions, fields }: GridProps) => {
   const widgets = {};
   const data = {};
   const errors = {};
@@ -139,27 +154,30 @@ const EmptyDashboardInfo = () => (
   </StyledJumbotron>
 );
 
-const Query = ({ fields, results, positions, widgetMapping, widgets, queryId }) => {
+type Props = {
+  fields: FieldTypeMappingsList,
+  results: QueryResult,
+  positions: { [key: string]: WidgetPosition },
+  widgetMapping: WidgetMapping,
+};
+
+const Query = ({ fields, results, positions, widgetMapping }: Props) => {
+  const widgets = useStore(WidgetStore);
+
   if (!widgets || widgets.isEmpty()) {
     return <EmptyDashboardInfo />;
   }
 
-  if (results) {
-    const widgetGrid = _renderWidgetGrid(widgets, widgetMapping.toJS(), results, positions, queryId, fields);
-
-    return (<>{widgetGrid}</>);
-  }
-
-  return <Spinner />;
+  return results
+    ? <RenderedWidgetGrid widgetDefs={widgets} widgetMapping={widgetMapping.toJS()} results={results} positions={positions} fields={fields} />
+    : <Spinner />;
 };
 
 Query.propTypes = {
   fields: PropTypes.object.isRequired,
   positions: PositionsMap,
-  queryId: PropTypes.string.isRequired,
   results: PropTypes.object.isRequired,
   widgetMapping: PropTypes.object.isRequired,
-  widgets: ImmutableWidgetsMap.isRequired,
 };
 
 Query.defaultProps = {

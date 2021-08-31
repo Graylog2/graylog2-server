@@ -41,7 +41,7 @@ type Props = {
   onWidgetSizeChange: (widgetId?: string, dimensions?: { height: number, width: number }) => void,
   position: WidgetPosition,
   title: string,
-  widget: WidgetClass & { data: string };
+  widget: WidgetClass & { data?: string };
   widgetDimension: { height: number | null | undefined, width: number | null | undefined },
 };
 

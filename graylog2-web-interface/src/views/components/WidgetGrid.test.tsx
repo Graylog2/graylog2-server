@@ -73,15 +73,11 @@ describe('<WidgetGrid />', () => {
       widget1: [],
     };
 
-    const titles = Immutable.Map({
-      widget1: 'A dummy widget',
-    });
     const wrapper = mount((
       <WidgetGrid widgets={widgets}
                   errors={{}}
                   positions={positions}
                   data={data}
-                  titles={titles}
                   fields={Immutable.List()}
                   onPositionsChange={() => {}} />
     ));
@@ -99,15 +95,11 @@ describe('<WidgetGrid />', () => {
     const data = {
     };
 
-    const titles = Immutable.Map({
-      widget1: 'A dummy widget',
-    });
     const wrapper = mount((
       <WidgetGrid widgets={widgets}
                   errors={{}}
                   positions={positions}
                   data={data}
-                  titles={titles}
                   fields={Immutable.List()}
                   onPositionsChange={() => {}} />
     ));
