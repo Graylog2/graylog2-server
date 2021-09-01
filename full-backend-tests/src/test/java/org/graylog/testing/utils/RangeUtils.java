@@ -14,16 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+package org.graylog.testing.utils;
 
-import type { MessageEventType } from 'views/types/messageEventTypes';
+import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
+import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 
-// eslint-disable-next-line import/prefer-default-export
-export const createSimpleMessageEventType = (index = 1, overrides: Partial<MessageEventType> = {}): MessageEventType => ({
-  gl2EventTypeCode: `event-type-code-${index}`,
-  summaryTemplate: '{field1} - {field2}',
-  category: 'success',
-  eventActions: ['action-id-1'],
-  requiredFields: ['field1', 'field2'],
-  optionalFields: ['field3'],
-  ...overrides,
-});
+public final class RangeUtils {
+    private RangeUtils(){}
+
+    public static AbsoluteRange allMessagesTimeRange() {
+        try {
+            return AbsoluteRange.create("2010-01-01T00:00:00.0Z", "2050-01-01T00:00:00.0Z");
+        } catch (InvalidRangeParametersException e) {
+            throw new RuntimeException("boo hoo", e);
+        }
+    }
+}

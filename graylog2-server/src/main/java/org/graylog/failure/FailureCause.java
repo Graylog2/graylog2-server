@@ -14,22 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import Reflux from 'reflux';
+package org.graylog.failure;
 
-import { singletonActions } from 'views/logic/singleton';
-
-const LookupTablesActions = singletonActions('LookupTables', () => Reflux.createActions({
-  searchPaginated: { asyncResult: true },
-  reloadPage: { asyncResult: true },
-  get: { asyncResult: true },
-  create: { asyncResult: true },
-  delete: { asyncResult: true },
-  update: { asyncResult: true },
-  getErrors: { asyncResult: true },
-  lookup: { asyncResult: true },
-  purgeKey: { asyncResult: true },
-  purgeAll: { asyncResult: true },
-  validate: { asyncResult: true },
-}));
-
-export default LookupTablesActions;
+/**
+ * A tag-like label representing a failure cause
+ */
+public interface FailureCause {
+    String label();
+}

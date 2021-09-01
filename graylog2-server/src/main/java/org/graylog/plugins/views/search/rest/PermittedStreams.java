@@ -24,7 +24,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 import static java.util.stream.Collectors.toSet;
-import static org.graylog2.plugin.streams.Stream.DEFAULT_EVENT_STREAM_IDS;
+import static org.graylog2.plugin.streams.Stream.NON_MESSAGE_STREAM_IDS;
 
 public class PermittedStreams {
     private final StreamService streamService;
@@ -37,11 +37,11 @@ public class PermittedStreams {
     public ImmutableSet<String> load(Predicate<String> isStreamIdPermitted) {
         final Set<String> result = streamService.loadAll().stream()
                 .map(org.graylog2.plugin.streams.Stream::getId)
-                // Unless explicitly queried, exclude event indices by default
-                // Having the event indices in every search, makes sorting almost impossible
+                // Unless explicitly queried, exclude event and failure indices by default
+                // Having these indices in every search, makes sorting almost impossible
                 // because it triggers https://github.com/Graylog2/graylog2-server/issues/6378
-                // TODO: this filter can be removed, once we implement https://github.com/Graylog2/graylog2-server/issues/6490
-                .filter(id -> !DEFAULT_EVENT_STREAM_IDS.contains(id))
+                // TODO: this filter could be removed, once we implement https://github.com/Graylog2/graylog2-server/issues/6490
+                .filter(id -> !NON_MESSAGE_STREAM_IDS.contains(id))
                 .filter(isStreamIdPermitted)
                 .collect(toSet());
 

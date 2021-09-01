@@ -23,6 +23,7 @@ import UserNotification from 'util/UserNotification';
 import ActionsProvider from 'injection/ActionsProvider';
 
 export type IndexSet = {
+  can_be_default: boolean,
   id: string,
   title: string,
   description: string,

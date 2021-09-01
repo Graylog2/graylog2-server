@@ -21,7 +21,9 @@ import com.eaio.uuid.UUID;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
+import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -30,6 +32,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.net.InetAddresses;
 import org.apache.commons.lang3.StringUtils;
+import org.graylog.failure.FailureCause;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.messages.Indexable;
 import org.graylog2.plugin.streams.Stream;
@@ -62,6 +65,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Predicates.equalTo;
 import static com.google.common.base.Predicates.not;
@@ -289,7 +293,10 @@ public class Message implements Messages, Indexable {
 
     private com.codahale.metrics.Counter sizeCounter = new com.codahale.metrics.Counter();
 
+    private List<ProcessingError> processingErrors;
+
     private static final IdentityHashMap<Class<?>, Integer> classSizes = Maps.newIdentityHashMap();
+
     static {
         classSizes.put(byte.class, 1);
         classSizes.put(Byte.class, 1);
@@ -372,6 +379,11 @@ public class Message implements Messages, Indexable {
     }
 
     @Override
+    public String getMessageId() {
+        return getFieldAs(String.class, FIELD_GL2_MESSAGE_ID);
+    }
+
+    @Override
     public DateTime getTimestamp() {
         return getFieldAs(DateTime.class, FIELD_TIMESTAMP).withZone(UTC);
     }
@@ -419,6 +431,13 @@ public class Message implements Messages, Indexable {
         obj.put(FIELD_SOURCE, getSource());
         obj.put(FIELD_STREAMS, getStreamIds());
         obj.put(FIELD_GL2_ACCOUNTED_MESSAGE_SIZE, getSize());
+
+        if (processingErrors != null && !processingErrors.isEmpty()) {
+            obj.put(FIELD_GL2_PROCESSING_ERROR,
+                    processingErrors.stream()
+                            .map(ProcessingError::getDetails)
+                            .collect(Collectors.joining(", ")));
+        }
 
         final Object timestampValue = getField(FIELD_TIMESTAMP);
         DateTime dateTime;
@@ -905,6 +924,29 @@ public class Message implements Messages, Indexable {
         return !serverStatus.getDetailedMessageRecordingStrategy().shouldRecord(this);
     }
 
+    /**
+     * Appends another processing error.
+     *
+     * @param processingError another processing error to be appended.
+     *                        Must not be null.
+     */
+    public void addProcessingError(@Nonnull ProcessingError processingError) {
+        if (processingErrors == null) {
+            processingErrors = new ArrayList<>();
+        }
+        processingErrors.add(processingError);
+    }
+
+    /**
+     * Returns a list of submitted processing errors
+     */
+    public List<ProcessingError> processingErrors() {
+        if (processingErrors == null) {
+            return ImmutableList.of();
+        }
+        return ImmutableList.copyOf(processingErrors);
+    }
+
     @Override
     @Nonnull
     public Iterator<Message> iterator() {
@@ -912,6 +954,11 @@ public class Message implements Messages, Indexable {
             return Collections.emptyIterator();
         }
         return Iterators.singletonIterator(this);
+    }
+
+    @Override
+    public boolean supportsFailureHandling() {
+        return true;
     }
 
     public static abstract class Recording {
@@ -1016,5 +1063,52 @@ public class Message implements Messages, Indexable {
             return;
         }
         metadata.remove(key);
+    }
+
+    public static class ProcessingError {
+
+        private final FailureCause cause;
+        private final String message;
+        private final String details;
+
+        public ProcessingError(@Nonnull FailureCause cause,
+                               @Nonnull String message,
+                               @Nonnull String details) {
+            this.cause = cause;
+            this.message = message;
+            this.details = details;
+        }
+
+        @Nonnull
+        public FailureCause getCause() {
+            return cause;
+        }
+
+        @Nonnull
+        public String getMessage() {
+            return message;
+        }
+
+        @Nonnull
+        public String getDetails() {
+            return details;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            final ProcessingError that = (ProcessingError) o;
+            return Objects.equal(cause, that.cause) && Objects.equal(message, that.message) && Objects.equal(details, that.details);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(cause, message, details);
+        }
     }
 }

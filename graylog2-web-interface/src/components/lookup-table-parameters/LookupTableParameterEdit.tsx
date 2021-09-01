@@ -22,8 +22,7 @@ import { Input } from 'components/bootstrap';
 import Select from 'components/common/Select';
 import { naturalSortIgnoreCase } from 'util/SortUtils';
 import Spinner from 'components/common/Spinner';
-
-import type { LookupTable } from '../lookup-tables/types';
+import type { LookupTable } from 'logic/lookup-tables/types';
 
 const StyledInlineCode = styled('code')`
   margin: 0 0.25em;

@@ -14,16 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+package org.graylog.failure;
 
-export type LookupTable = {
-  cache_id: string,
-  data_adapter_id: string,
-  default_multi_value: string,
-  default_multi_value_type: string,
-  default_single_value: string,
-  default_single_value_type: string,
-  description: string,
-  id: string,
-  name: string,
-  title: string,
+public enum ProcessingFailureCause implements FailureCause {
+    RuleStatementEvaluationError("RuleStatementEvaluationError"),
+    RuleConditionEvaluationError("RuleConditionEvaluationError"),
+    UNKNOWN("UNKNOWN"),
+    ;
+
+    private final String label;
+
+    ProcessingFailureCause(String label) {
+        this.label = label;
+    }
+
+    public String label() {
+        return label;
+    }
 }

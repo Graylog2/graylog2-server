@@ -14,14 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+package org.graylog.testing.utils;
 
-import type { ColorVariants } from 'theme/colors';
+import com.fasterxml.jackson.core.JsonProcessingException;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 
-export type MessageEventType = {
-  gl2EventTypeCode: string,
-  summaryTemplate: string,
-  category: ColorVariants,
-  eventActions: Array<string>,
-  requiredFields: Array<string>,
-  optionalFields: Array<string>,
+public final class JsonUtils {
+
+    private JsonUtils(){}
+
+    public static String toJsonString(Object s) {
+        try {
+            return new ObjectMapperProvider().get().writeValueAsString(s);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Failed to serialize Search", e);
+        }
+    }
 }

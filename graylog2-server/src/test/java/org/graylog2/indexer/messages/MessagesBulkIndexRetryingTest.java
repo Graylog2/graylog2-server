@@ -17,6 +17,8 @@
 package org.graylog2.indexer.messages;
 
 import com.google.common.collect.ImmutableList;
+import org.graylog.failure.FailureSubmissionService;
+import org.graylog2.Configuration;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.plugin.Message;
 import org.graylog2.system.processing.ProcessingStatusRecorder;
@@ -45,12 +47,15 @@ class MessagesBulkIndexRetryingTest {
     private final TrafficAccounting trafficAccounting = mock(TrafficAccounting.class);
     private final MessagesAdapter messagesAdapter = mock(MessagesAdapter.class);
     private final ProcessingStatusRecorder processingStatusRecorder = mock(ProcessingStatusRecorder.class);
+    private final Configuration conf = mock(Configuration.class);
 
     private Messages messages;
 
     @BeforeEach
     void setUp() {
-        this.messages = new Messages(trafficAccounting, messagesAdapter, processingStatusRecorder);
+        when(conf.getFailureHandlingQueueCapacity()).thenReturn(1000);
+        this.messages = new Messages(trafficAccounting, messagesAdapter, processingStatusRecorder,
+                mock(FailureSubmissionService.class));
     }
 
     @Test
