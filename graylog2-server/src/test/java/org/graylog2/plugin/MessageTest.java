@@ -692,7 +692,7 @@ public class MessageTest {
             assertThat(e).hasSize(1);
             assertThat(e.get(0).getCause()).isEqualTo(ProcessingFailureCause.InvalidTimestampException);
             assertThat(e.get(0).getMessage()).startsWith("Replaced invalid timestamp value in message <");
-            assertThat(e.get(0).getDetails()).startsWith("Value of invalid type <Integer> provided");
+            assertThat(e.get(0).getDetails()).startsWith("Value <1234> caused exception: Value of invalid type <Integer> provided");
         });
     }
 

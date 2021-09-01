@@ -37,6 +37,7 @@ import org.graylog.failure.ProcessingFailureCause;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.messages.Indexable;
 import org.graylog2.plugin.streams.Stream;
+import org.graylog2.plugin.utilities.date.DateTimeConverter;
 import org.graylog2.shared.utilities.ExceptionUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -46,12 +47,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 import java.net.InetAddress;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -75,7 +70,6 @@ import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_EVENT_SUBC
 import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_EVENT_TYPE;
 import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_EVENT_TYPE_CODE;
 import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_TAGS;
-import static org.graylog2.plugin.Tools.ES_DATE_FORMAT_FORMATTER;
 import static org.graylog2.plugin.Tools.buildElasticSearchTimeFormat;
 import static org.joda.time.DateTimeZone.UTC;
 
@@ -447,56 +441,23 @@ public class Message implements Messages, Indexable {
     }
 
     private DateTime convertToDateTime(Object value) {
-        if (value instanceof DateTime) {
-            return (DateTime) value;
-        }
-
-        if (value instanceof Date) {
-            return new DateTime(value);
-        } else if (value instanceof ZonedDateTime) {
-            return new DateTime(Date.from(((ZonedDateTime) value).toInstant()));
-        } else if (value instanceof OffsetDateTime) {
-            return new DateTime(Date.from(((OffsetDateTime) value).toInstant()));
-        } else if (value instanceof LocalDateTime) {
-            final LocalDateTime localDateTime = (LocalDateTime) value;
-            final ZoneId defaultZoneId = ZoneId.systemDefault();
-            final ZoneOffset offset = defaultZoneId.getRules().getOffset(localDateTime);
-            return new DateTime(Date.from(localDateTime.toInstant(offset)));
-        } else if (value instanceof LocalDate) {
-            final LocalDate localDate = (LocalDate) value;
-            final LocalDateTime localDateTime = localDate.atStartOfDay();
-            final ZoneId defaultZoneId = ZoneId.systemDefault();
-            final ZoneOffset offset = defaultZoneId.getRules().getOffset(localDateTime);
-            return new DateTime(Date.from(localDateTime.toInstant(offset)));
-        } else if (value instanceof Instant) {
-            return new DateTime(Date.from((Instant) value));
-        } else if (value instanceof String) {
-            // if the timestamp value is a string, we try to parse it in the correct format.
-            // we fall back to "now", this avoids losing messages which happen to have the wrong timestamp format
-            try {
-                return ES_DATE_FORMAT_FORMATTER.parseDateTime((String) value);
-            } catch (IllegalArgumentException e) {
-                final String error = "Invalid format for field timestamp '" + value + "' in message <" + getId() + ">, forcing to current time.";
-                LOG.trace("{}: {}", error, e);
-                addProcessingError(new ProcessingError(ProcessingFailureCause.InvalidTimestampException,
-                        "Replaced invalid timestamp value in message <" + getId() + "> with current time"
-                        , "Value <" + value + "> caused exception: " + ExceptionUtils.getRootCauseMessage(e)));
-                return Tools.nowUTC();
-            }
-        } else if (value == null) {
+        if (value == null) {
             final String error = "<null> value for field timestamp in message <" + getId() + ">, forcing to current time";
             LOG.trace(error);
             addProcessingError(new ProcessingError(ProcessingFailureCause.InvalidTimestampException,
                     "Replaced invalid timestamp value in message <" + getId() + "> with current time",
                     "<null> value provided"));
             return Tools.nowUTC();
-        } else {
-            // don't allow any other types for timestamp, force to "now"
-            final String error = "Invalid type for field timestamp <" + value.getClass().getSimpleName() + "> in message <" + getId() + ">, forcing to current time.";
-            LOG.trace(error);
+        }
+
+        try {
+            return DateTimeConverter.convertToDateTime(value);
+        } catch (IllegalArgumentException e) {
+            final String error = "Invalid value for field timestamp in message <" + getId() + ">, forcing to current time.";
+            LOG.trace("{}: {}", error, e);
             addProcessingError(new ProcessingError(ProcessingFailureCause.InvalidTimestampException,
-                    "Replaced invalid timestamp value in message <" + getId() + "> with current time",
-                    "Value of invalid type <" + value.getClass().getSimpleName() + "> provided"));
+                    "Replaced invalid timestamp value in message <" + getId() + "> with current time"
+                    , "Value <" + value + "> caused exception: " + ExceptionUtils.getRootCauseMessage(e)));
             return Tools.nowUTC();
         }
     }
