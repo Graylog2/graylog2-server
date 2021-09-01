@@ -32,8 +32,6 @@ import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -729,9 +727,8 @@ public class MessageTest {
 
         message.addField(Message.FIELD_TIMESTAMP, zonedDateTime);
         assertThat(message.getTimestamp()).isInstanceOf(DateTime.class);
-        final DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm").withZone(DateTimeZone.UTC);
-        final DateTime expectedLocalDateEquivalent = formatter.parseDateTime("2021-08-19 12:00");
 
+        final DateTime expectedLocalDateEquivalent = new DateTime(2021, 8, 19, 12, 0, DateTimeZone.UTC);
         assertThat(message.getTimestamp()).isEqualTo(expectedLocalDateEquivalent);
 
         assertThat(message.processingErrors()).isEmpty();
