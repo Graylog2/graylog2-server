@@ -34,6 +34,12 @@ const simpleMessage = {
 };
 
 describe('MessageAugmentations', () => {
+  const SimpleMessageAugmentation = () => (
+    <div id="sticky-augmentations-container">
+      <MessageAugmentations message={simpleMessage} />
+    </div>
+  );
+
   it('should render augmentations', () => {
     const simpleAugmentations = [
       {
@@ -47,7 +53,7 @@ describe('MessageAugmentations', () => {
     ];
     asMock(usePluginEntities).mockImplementation((entityKey) => ({ messageAugmentations: simpleAugmentations }[entityKey]));
 
-    render(<MessageAugmentations message={simpleMessage} />);
+    render(<SimpleMessageAugmentation />);
 
     expect(screen.getByText('The First Augmentation')).toBeInTheDocument();
     expect(screen.getByText('The Second Augmentation')).toBeInTheDocument();

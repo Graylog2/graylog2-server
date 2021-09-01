@@ -34,8 +34,6 @@ const Container = styled.div(({ theme, $hideDragHandle }: {theme: DefaultTheme, 
   display: grid;
   grid-template-columns: ${$hideDragHandle ? 'minmax(20px, auto) max-content' : 'max-content minmax(20px, auto) max-content'};
   align-items: center;
-  background-color: ${theme.colors.global.contentBackground};
-  z-index: 1;
 `);
 
 const WidgetDragHandle = styled(Icon)`
