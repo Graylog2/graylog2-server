@@ -145,6 +145,14 @@ const ApiRoutes = {
     load: () => ({ url: '/system/authentication/http-header-auth-config' }),
     update: () => ({ url: '/system/authentication/http-header-auth-config' }),
   },
+  Illuminate: {
+    listPacks: (bundleId: string) => ({ url: `/illuminate/bundles/${bundleId}/packs` }),
+    updatePack: (bundleId: string, packId: string) => ({ url: `/illuminate/bundles/${bundleId}/pack/${packId}` }),
+    deleteBundle: (bundleId: string) => ({ url: `/illuminate/bundles/${bundleId}/delete` }),
+    listBundles: () => ({ url: '/illuminate/bundles' }),
+    updateBundle: (bundleId: string) => ({ url: `/illuminate/bundles/${bundleId}` }),
+    uploadBundle: () => ({ url: '/illuminate/bundles/upload' }),
+  },
   IndexerClusterApiController: {
     health: () => { return { url: '/system/indexer/cluster/health' }; },
     name: () => { return { url: '/system/indexer/cluster/name' }; },
