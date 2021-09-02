@@ -54,7 +54,6 @@ describe('<WidgetGrid />', () => {
       <WidgetGrid data={{}}
                   errors={{}}
                   onPositionsChange={() => {}}
-                  titles={Immutable.Map()}
                   widgets={{}}
                   fields={Immutable.List()} />
     ));

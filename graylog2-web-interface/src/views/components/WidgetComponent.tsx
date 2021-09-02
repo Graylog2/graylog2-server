@@ -21,7 +21,6 @@ import { BackendWidgetPosition } from 'views/types';
 
 import { AdditionalContext } from 'views/logic/ActionContext';
 import WidgetContext from 'views/components/contexts/WidgetContext';
-import WidgetClass from 'views/logic/widgets/Widget';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import TFieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import ExportSettingsContextProvider from 'views/components/ExportSettingsContextProvider';
@@ -30,6 +29,7 @@ import View from 'views/logic/views/View';
 import { useStore } from 'stores/connect';
 import { TitlesStore, TitleTypes } from 'views/stores/TitlesStore';
 import defaultTitle from 'views/components/defaultTitle';
+import { WidgetStore } from 'views/stores/WidgetStore';
 
 import { Position, WidgetDataMap, WidgetErrorsMap } from './widgets/WidgetPropTypes';
 import Widget from './widgets/Widget';
@@ -44,7 +44,7 @@ type Props = {
   onPositionsChange: (position: BackendWidgetPosition) => void,
   onWidgetSizeChange: (widgetId?: string, dimensions?: { height: number, width: number }) => void,
   position: WidgetPosition,
-  widget: WidgetClass & { data?: string };
+  widgetId: string,
   widgetDimension: { height: number | null | undefined, width: number | null | undefined },
 };
 
@@ -56,12 +56,12 @@ const WidgetComponent = ({
   onPositionsChange = () => undefined,
   onWidgetSizeChange = () => {},
   position,
-  widget,
+  widgetId,
   widgetDimension: { height, width },
 }: Props) => {
-  const dataKey = widget.data || widget.id;
-  const widgetData = data[dataKey];
-  const widgetErrors = errors[widget.id] || [];
+  const widget = useStore(WidgetStore, (state) => state.get(widgetId));
+  const widgetData = data[widgetId];
+  const widgetErrors = errors[widgetId] || [];
   const viewType = useContext(ViewTypeContext);
   const title = useStore(TitlesStore, (titles) => titles.getIn([TitleTypes.Widget, widget.id], defaultTitle(widget)) as string);
 
@@ -101,7 +101,6 @@ WidgetComponent.propTypes = {
   onPositionsChange: PropTypes.func,
   onWidgetSizeChange: PropTypes.func,
   position: PropTypes.shape(Position).isRequired,
-  widget: PropTypes.object.isRequired,
   widgetDimension: PropTypes.object.isRequired,
 };
 

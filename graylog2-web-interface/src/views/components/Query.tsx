@@ -22,7 +22,7 @@ import { BackendWidgetPosition } from 'views/types';
 
 import DocsHelper from 'util/DocsHelper';
 import { Jumbotron } from 'components/graylog';
-import { CurrentViewStateActions } from 'views/stores/CurrentViewStateStore';
+import { CurrentViewStateActions, CurrentViewStateStore } from 'views/stores/CurrentViewStateStore';
 import { Spinner } from 'components/common';
 import { widgetDefinition } from 'views/logic/Widgets';
 import DocumentationLink from 'components/support/DocumentationLink';
@@ -37,7 +37,6 @@ import { WidgetMapping } from 'views/logic/views/types';
 import { useStore } from 'stores/connect';
 import { WidgetStore } from 'views/stores/WidgetStore';
 
-import { PositionsMap } from './widgets/WidgetPropTypes';
 import InteractiveContext from './contexts/InteractiveContext';
 
 const StyledJumbotron = styled(Jumbotron)(({ theme }) => css`
@@ -94,14 +93,11 @@ type GridProps = {
 }
 
 const RenderedWidgetGrid = ({ widgetDefs, widgetMapping, results, positions, fields }: GridProps) => {
-  const widgets = {};
   const data = {};
   const errors = {};
 
   // eslint-disable-next-line react/destructuring-assignment
   widgetDefs.forEach((widget) => {
-    widgets[widget.id] = widget;
-
     const { widgetData, error } = _getDataAndErrors(widget, widgetMapping, results);
 
     data[widget.id] = widgetData;
@@ -115,9 +111,8 @@ const RenderedWidgetGrid = ({ widgetDefs, widgetMapping, results, positions, fie
                     errors={errors}
                     fields={fields}
                     locked={!interactive}
-                    onPositionsChange={(p) => _onPositionsChange(p)}
-                    positions={positions}
-                    widgets={widgets} />
+                    onPositionsChange={_onPositionsChange}
+                    positions={positions} />
       )}
     </InteractiveContext.Consumer>
   );
@@ -157,12 +152,12 @@ const EmptyDashboardInfo = () => (
 type Props = {
   fields: FieldTypeMappingsList,
   results: QueryResult,
-  positions: { [key: string]: WidgetPosition },
   widgetMapping: WidgetMapping,
 };
 
-const Query = ({ fields, results, positions, widgetMapping }: Props) => {
+const Query = ({ fields, results, widgetMapping }: Props) => {
   const widgets = useStore(WidgetStore);
+  const positions = useStore(CurrentViewStateStore, (viewState) => viewState?.state?.widgetPositions);
 
   if (!widgets || widgets.isEmpty()) {
     return <EmptyDashboardInfo />;
@@ -175,13 +170,11 @@ const Query = ({ fields, results, positions, widgetMapping }: Props) => {
 
 Query.propTypes = {
   fields: PropTypes.object.isRequired,
-  positions: PositionsMap,
   results: PropTypes.object.isRequired,
   widgetMapping: PropTypes.object.isRequired,
 };
 
-Query.defaultProps = {
-  positions: {},
-};
+const memoizedQuery = React.memo(Query);
+memoizedQuery.displayName = 'Query';
 
-export default Query;
+export default memoizedQuery;

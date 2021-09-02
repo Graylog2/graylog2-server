@@ -17,9 +17,6 @@
 import * as React from 'react';
 import { useCallback, useState, useContext, useMemo } from 'react';
 import PropTypes from 'prop-types';
-import * as Immutable from 'immutable';
-import ImmutablePropTypes from 'react-immutable-proptypes';
-import _ from 'lodash';
 import styled, { css } from 'styled-components';
 import { SizeMe } from 'react-sizeme';
 import { WidgetPositions, BackendWidgetPosition } from 'views/types';
@@ -31,11 +28,11 @@ import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import WidgetFocusContext, { FocusContextState } from 'views/components/contexts/WidgetFocusContext';
 import SearchError from 'views/logic/SearchError';
 import { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
-import Widget from 'views/logic/widgets/Widget';
-import { TitlesMap } from 'views/stores/TitleTypes';
+import { useStore } from 'stores/connect';
+import { WidgetStore } from 'views/stores/WidgetStore';
 
 import WidgetContainer from './WidgetContainer';
-import { PositionsMap, WidgetDataMap, WidgetErrorsMap, WidgetsMap } from './widgets/WidgetPropTypes';
+import { PositionsMap, WidgetDataMap, WidgetErrorsMap } from './widgets/WidgetPropTypes';
 import WidgetComponent from './WidgetComponent';
 
 const COLUMNS = {
@@ -76,26 +73,28 @@ const _onWidgetSizeChange = (
   setWidgetDimensions({ ...widgetDimensions, [widgetId]: dimensions });
 };
 
-type Props = {
+type SharedProps = {
   data: { [id: string]: any },
   errors: { [id: string]: undefined | SearchError[] },
-  locked?: boolean,
   fields: FieldTypeMappingsList,
   positions: WidgetPositions,
-  widgets: { [widgetId: string]: Widget },
-  staticWidgets?: React.ReactNode,
-  onPositionsChange: (newPositions: Array<BackendWidgetPosition>) => void,
-  titles: TitlesMap,
 };
 
-type WidgetsProps = Omit<Props, 'staticWidgets' | 'locked' | 'onPositionsChange'> & {
+type Props = SharedProps & {
+  locked?: boolean,
+  staticWidgets?: React.ReactNode,
+  onPositionsChange: (newPositions: Array<BackendWidgetPosition>) => void,
+};
+
+type WidgetsProps = SharedProps & {
+  widgetId: string,
   setWidgetDimensions: (newWidgetDimensions: { [widgetId: string]: WidgetDimensions }) => void,
   widgetDimensions: { [widgetId: string]: WidgetDimensions },
   focusedWidget: FocusContextState | undefined,
   onPositionsChange: (position: BackendWidgetPosition) => void,
 };
 
-const renderWidgets = ({
+const WidgetGridItem = ({
   data,
   errors,
   fields,
@@ -103,31 +102,24 @@ const renderWidgets = ({
   positions,
   setWidgetDimensions,
   widgetDimensions,
-  widgets,
+  widgetId,
   focusedWidget,
 }: WidgetsProps) => {
-  if (!widgets || _.isEmpty(widgets) || !data) {
-    return [];
-  }
+  const editing = focusedWidget?.id === widgetId && focusedWidget?.editing;
+  const widgetPosition = positions[widgetId];
+  const onWidgetSizeChange = useMemo(() => _onWidgetSizeChange(widgetDimensions, setWidgetDimensions), [widgetDimensions, setWidgetDimensions]);
 
-  return Object.entries(widgets).map(([widgetId, widget]) => {
-    const isFocused = focusedWidget?.id === widgetId && focusedWidget?.focusing;
-    const editing = focusedWidget?.id === widgetId && focusedWidget?.editing;
-
-    return (
-      <WidgetContainer isFocused={isFocused} key={widget.id}>
-        <WidgetComponent data={data}
-                         editing={editing}
-                         errors={errors}
-                         fields={fields}
-                         onPositionsChange={onPositionsChange}
-                         onWidgetSizeChange={_onWidgetSizeChange(widgetDimensions, setWidgetDimensions)}
-                         position={positions[widgetId]}
-                         widgetDimension={widgetDimensions[widgetId] || {} as WidgetDimensions}
-                         widget={widget} />
-      </WidgetContainer>
-    );
-  });
+  return (
+    <WidgetComponent data={data}
+                     editing={editing}
+                     errors={errors}
+                     fields={fields}
+                     onPositionsChange={onPositionsChange}
+                     onWidgetSizeChange={onWidgetSizeChange}
+                     position={widgetPosition}
+                     widgetDimension={widgetDimensions[widgetId] || {} as WidgetDimensions}
+                     widgetId={widgetId} />
+  );
 };
 
 const generatePositions = (widgets: Array<{ id: string, type: string }>, positions: { [widgetId: string]: WidgetPosition }) => widgets
@@ -140,15 +132,15 @@ const WidgetGrid = ({
   errors,
   locked,
   onPositionsChange,
-  widgets: propsWidgets,
   positions: propsPositions,
   fields,
-  titles,
 }: Props) => {
   const { focusedWidget } = useContext(WidgetFocusContext);
   const [widgetDimensions, setWidgetDimensions] = useState({});
 
-  const positions = useMemo(() => { return generatePositions(Object.entries(propsWidgets).map(([id, { type }]) => ({ id, type })), propsPositions); }, [propsWidgets, propsPositions]);
+  const widgets = useStore(WidgetStore, (state) => state.map(({ id, type }) => ({ id, type })).toArray());
+
+  const positions = useMemo(() => generatePositions(widgets, propsPositions), [widgets, propsPositions]);
 
   const _onPositionsChange = useCallback((newPosition: BackendWidgetPosition) => {
     const newPositions = Object.keys(positions).map((id) => {
@@ -165,7 +157,7 @@ const WidgetGrid = ({
   return (
     <SizeMe monitorWidth refreshRate={100}>
       {({ size: { width } }) => {
-        const grid = propsWidgets && Object.keys(propsWidgets).length > 0 ? (
+        const grid = widgets?.length > 0 && data ? (
           <StyledReactGridContainer hasFocusedWidget={!!focusedWidget?.id}
                                     columns={COLUMNS}
                                     isResizable={!focusedWidget?.id}
@@ -175,18 +167,20 @@ const WidgetGrid = ({
                                     positions={positions}
                                     width={width}
                                     useDragHandle=".widget-drag-handle">
-            {renderWidgets({
-              data,
-              errors,
-              fields,
-              onPositionsChange: _onPositionsChange,
-              positions,
-              widgets: propsWidgets,
-              setWidgetDimensions,
-              titles,
-              widgetDimensions,
-              focusedWidget,
-            })}
+            {widgets.map(({ id: widgetId }) => (
+              <WidgetContainer key={widgetId} isFocused={focusedWidget?.id === widgetId && focusedWidget?.focusing}>
+
+                <WidgetGridItem data={data}
+                                errors={errors}
+                                fields={fields}
+                                positions={positions}
+                                widgetId={widgetId}
+                                setWidgetDimensions={setWidgetDimensions}
+                                widgetDimensions={widgetDimensions}
+                                focusedWidget={focusedWidget}
+                                onPositionsChange={_onPositionsChange} />
+              </WidgetContainer>
+            ))}
           </StyledReactGridContainer>
         ) : <span />;
 
@@ -211,15 +205,12 @@ WidgetGrid.propTypes = {
   onPositionsChange: PropTypes.func.isRequired,
   positions: PositionsMap,
   staticWidgets: PropTypes.arrayOf(PropTypes.node),
-  titles: ImmutablePropTypes.map,
-  widgets: WidgetsMap.isRequired,
 };
 
 WidgetGrid.defaultProps = {
   locked: true,
   staticWidgets: [],
   positions: {},
-  titles: Immutable.Map(),
 };
 
 const MemoizedWidgetGrid = React.memo(WidgetGrid);

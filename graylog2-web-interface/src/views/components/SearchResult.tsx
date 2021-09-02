@@ -22,7 +22,6 @@ import Spinner from 'components/common/Spinner';
 import Query from 'views/components/Query';
 import { useStore } from 'stores/connect';
 import { SearchStore } from 'views/stores/SearchStore';
-import { CurrentViewStateStore } from 'views/stores/CurrentViewStateStore';
 import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import { SearchLoadingStateStore } from 'views/stores/SearchLoadingStateStore';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
@@ -54,7 +53,6 @@ const SearchResult = React.memo(({ hasErrors }: Props) => {
   const { focusedWidget } = useContext(WidgetFocusContext);
   const searches = useStore(SearchStore, ({ result, widgetMapping }) => ({ result, widgetMapping }));
   const queryId = useStore(ViewMetadataStore, (viewMetadataStore) => viewMetadataStore.activeQuery);
-  const viewState = useStore(CurrentViewStateStore);
 
   if (!fieldTypes) {
     return <Spinner />;
@@ -67,11 +65,9 @@ const SearchResult = React.memo(({ hasErrors }: Props) => {
   const currentResults = searches?.result?.forId(queryId);
 
   const queryFields = fieldTypes.queryFields.get(queryId, fieldTypes.all);
-  const positions = viewState.state?.widgetPositions;
   const content = currentResults ? (
     <Query fields={queryFields}
            results={currentResults}
-           positions={positions}
            widgetMapping={widgetMapping} />
   ) : hasErrors ? null : <Spinner />;
 
@@ -84,5 +80,7 @@ const SearchResult = React.memo(({ hasErrors }: Props) => {
     </StyledRow>
   );
 });
+
+SearchResult.displayName = 'SearchResult';
 
 export default SearchResult;
