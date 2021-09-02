@@ -19,6 +19,7 @@ package org.graylog.scheduler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.events.JobSchedulerTestClock;
 import org.graylog.events.TestJobTriggerData;
@@ -27,6 +28,8 @@ import org.graylog.scheduler.schedule.OnceJobSchedule;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.cluster.Node;
+import org.graylog2.cluster.NodeService;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
@@ -63,6 +66,10 @@ public class DBJobTriggerServiceTest {
 
     @Mock
     private NodeId nodeId;
+    @Mock
+    NodeService nodeService;
+    @Mock
+    Node node;
 
     private DBJobTriggerService dbJobTriggerService;
     private JobSchedulerTestClock clock = new JobSchedulerTestClock(DateTime.now(DateTimeZone.UTC));
@@ -72,6 +79,7 @@ public class DBJobTriggerServiceTest {
     @Before
     public void setUp() throws Exception {
         when(nodeId.toString()).thenReturn(NODE_ID);
+        when(nodeService.allActive()).thenReturn(ImmutableMap.of(NODE_ID, node));
 
         objectMapper = new ObjectMapperProvider().get();
         objectMapper.registerSubtypes(new NamedType(IntervalJobSchedule.class, IntervalJobSchedule.TYPE_NAME));
@@ -79,7 +87,7 @@ public class DBJobTriggerServiceTest {
         objectMapper.registerSubtypes(new NamedType(TestJobTriggerData.class, TestJobTriggerData.TYPE_NAME));
 
         mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
-        this.dbJobTriggerService = new DBJobTriggerService(mongodb.mongoConnection(), mapperProvider, nodeId, clock);
+        this.dbJobTriggerService = new DBJobTriggerService(mongodb.mongoConnection(), mapperProvider, nodeId, clock, nodeService);
     }
 
     @Test
@@ -156,7 +164,7 @@ public class DBJobTriggerServiceTest {
             assertThat(dto.triggeredAt()).isPresent().get().isEqualTo(DateTime.parse("2019-01-01T01:00:00.000Z"));
             assertThat(dto.status()).isEqualTo(JobTriggerStatus.RUNNING);
 
-            assertThat(dto.lock().owner()).isEqualTo("node-a");
+            assertThat(dto.lock().owner()).isEqualTo(NODE_ID);
             assertThat(dto.lock().lastLockTime()).isEqualTo(DateTime.parse("2019-01-01T01:00:00.000Z"));
             assertThat(dto.lock().clock()).isEqualTo(5L);
             assertThat(dto.lock().progress()).isEqualTo(80);
@@ -504,7 +512,7 @@ public class DBJobTriggerServiceTest {
     public void nextRunnableTriggerWithEndTime() {
         // Set clock to base date used in the fixture file
         final JobSchedulerTestClock clock = new JobSchedulerTestClock(DateTime.parse("2019-01-01T00:00:00.000Z"));
-        final DBJobTriggerService service = new DBJobTriggerService(mongodb.mongoConnection(), mapperProvider, nodeId, clock);
+        final DBJobTriggerService service = new DBJobTriggerService(mongodb.mongoConnection(), mapperProvider, nodeId, clock, nodeService);
 
         // No triggers yet because 54e3deadbeefdeadbeef0002 is already locked and RUNNING
         assertThat(service.nextRunnableTrigger()).isEmpty();
@@ -740,4 +748,17 @@ public class DBJobTriggerServiceTest {
         // Running triggers not owned by this node should not be released
         assertThat(newTriggerIds).containsOnly("54e3deadbeefdeadbeef0002");
     }
+
+    @Test
+    @MongoDBFixtures("stale-job-trigger.json")
+    public void nextStaleTrigger() {
+        final JobSchedulerTestClock clock = new JobSchedulerTestClock(DateTime.parse("2019-01-01T02:00:00.000Z"));
+        final DBJobTriggerService service = new DBJobTriggerService(mongodb.mongoConnection(), mapperProvider, nodeId, clock, nodeService);
+
+        assertThat(service.nextRunnableTrigger())
+                .isNotEmpty()
+                .get()
+                .satisfies(trigger -> assertThat(trigger.id()).isEqualTo("54e3deadbeefdeadbeef0002"));
+    }
+
 }

@@ -33,6 +33,7 @@ import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.cluster.NodeService;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -72,6 +73,9 @@ public class EventDefinitionHandlerTest {
     private DBEventProcessorStateService stateService;
     @Mock
     private NodeId nodeId;
+    @Mock
+    private NodeService nodeService;
+
 
     private EventDefinitionHandler handler;
     private JobSchedulerTestClock clock;
@@ -96,7 +100,7 @@ public class EventDefinitionHandlerTest {
         this.clock = new JobSchedulerTestClock(DateTime.now(DateTimeZone.UTC));
         this.eventDefinitionService = spy(new DBEventDefinitionService(mongodb.mongoConnection(), mapperProvider, stateService, mock(EntityOwnershipService.class)));
         this.jobDefinitionService = spy(new DBJobDefinitionService(mongodb.mongoConnection(), mapperProvider));
-        this.jobTriggerService = spy(new DBJobTriggerService(mongodb.mongoConnection(), mapperProvider, nodeId, clock));
+        this.jobTriggerService = spy(new DBJobTriggerService(mongodb.mongoConnection(), mapperProvider, nodeId, clock, nodeService));
 
         this.handler = new EventDefinitionHandler(eventDefinitionService, jobDefinitionService, jobTriggerService, clock);
     }

@@ -24,6 +24,7 @@ import org.bson.types.ObjectId;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog.scheduler.schedule.OnceJobSchedule;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.cluster.NodeService;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.system.NodeId;
 import org.joda.time.DateTime;
@@ -67,14 +68,17 @@ public class DBJobTriggerService {
     private final String nodeId;
     private final JacksonDBCollection<JobTriggerDto, ObjectId> db;
     private final JobSchedulerClock clock;
+    private final NodeService nodeService;
 
     @Inject
     public DBJobTriggerService(MongoConnection mongoConnection,
                                MongoJackObjectMapperProvider mapper,
                                NodeId nodeId,
-                               JobSchedulerClock clock) {
+                               JobSchedulerClock clock,
+                               NodeService nodeService) {
         this.nodeId = nodeId.toString();
         this.clock = clock;
+        this.nodeService = nodeService;
         this.db = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection(COLLECTION_NAME),
                 JobTriggerDto.class,
                 ObjectId.class,
@@ -290,7 +294,9 @@ public class DBJobTriggerService {
     public Optional<JobTriggerDto> nextRunnableTrigger() {
         final DateTime now = clock.nowUTC();
 
-        final DBQuery.Query query = DBQuery.and(
+        // TODO extract threshold to graylog.conf?
+        DateTime lockThresholdDate = now.minusSeconds(60);
+        final DBQuery.Query query = DBQuery.or(DBQuery.and(
                 // We cannot lock a trigger that is already locked by another node
                 DBQuery.is(FIELD_LOCK_OWNER, null),
                 DBQuery.is(FIELD_STATUS, JobTriggerStatus.RUNNABLE),
@@ -303,8 +309,12 @@ public class DBJobTriggerService {
                 // TODO: Using the wall clock time here can be problematic if the node time is off
                 //       The scheduler should not lock any new triggers if it detects that its clock is wrong
                 DBQuery.lessThanEquals(FIELD_NEXT_TIME, now)
+                ), DBQuery.and(
+                DBQuery.notEquals(FIELD_LOCK_OWNER, null),
+                DBQuery.notIn(FIELD_LOCK_OWNER, nodeService.allActive().keySet()),
+                DBQuery.is(FIELD_STATUS, JobTriggerStatus.RUNNING),
+                DBQuery.lessThan(FIELD_LAST_LOCK_TIME, lockThresholdDate))
         );
-
         // We want to lock the trigger with the oldest next time
         final DBSort.SortBuilder sort = DBSort.asc(FIELD_NEXT_TIME);
 
