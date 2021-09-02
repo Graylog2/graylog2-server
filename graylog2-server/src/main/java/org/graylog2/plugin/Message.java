@@ -69,7 +69,17 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.Predicates.equalTo;
 import static com.google.common.base.Predicates.not;
-import static org.graylog.schema.GraylogSchemaFields.*;
+import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_EVENT_CATEGORY;
+import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_EVENT_SUBCATEGORY;
+import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_EVENT_TYPE;
+import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_EVENT_TYPE_CODE;
+import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_GIM_EVENT_CATEGORY;
+import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_GIM_EVENT_CLASS;
+import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_GIM_EVENT_TYPE;
+import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_GIM_EVENT_TYPE_CODE;
+import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_GIM_TAGS;
+import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_GIM_VERSION;
+import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_TAGS;
 import static org.graylog2.plugin.Tools.ES_DATE_FORMAT_FORMATTER;
 import static org.graylog2.plugin.Tools.buildElasticSearchTimeFormat;
 import static org.joda.time.DateTimeZone.UTC;
