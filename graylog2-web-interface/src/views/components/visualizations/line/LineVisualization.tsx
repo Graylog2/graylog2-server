@@ -23,7 +23,6 @@ import LineVisualizationConfig from 'views/logic/aggregationbuilder/visualizatio
 import toPlotly from 'views/logic/aggregationbuilder/visualizations/Interpolation';
 import EventHandler, { Shapes } from 'views/logic/searchtypes/events/EventHandler';
 import { makeVisualization, retrieveChartData } from 'views/components/aggregationbuilder/AggregationBuilder';
-import { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 
 import type { ChartDefinition } from '../ChartData';
 import { chartData } from '../ChartData';
