@@ -157,7 +157,7 @@ public class PipelineInterpreter implements MessageProcessor {
         return new MessageCollection(fullyProcessed);
     }
 
-    private void potentiallyDropFilteredMessage(Message message) {
+    public void potentiallyDropFilteredMessage(Message message) {
         if (message.getFilterOut()) {
             log.debug("[{}] marked message to be discarded. Dropping message.", message.getId());
             filteredOutMessages.mark();
@@ -233,11 +233,11 @@ public class PipelineInterpreter implements MessageProcessor {
         return processForResolvedPipelines(message, message.getId(), pipelinesToRun, interpreterListener, state);
     }
 
-    private List<Message> processForResolvedPipelines(Message message,
-                                                      String msgId,
-                                                      Set<Pipeline> pipelines,
-                                                      InterpreterListener interpreterListener,
-                                                      PipelineInterpreterState state) {
+    public List<Message> processForResolvedPipelines(Message message,
+                                                     String msgId,
+                                                     Set<Pipeline> pipelines,
+                                                     InterpreterListener interpreterListener,
+                                                     PipelineInterpreterState state) {
         final List<Message> result = new ArrayList<>();
         // record execution of pipeline in metrics
         pipelines.forEach(Pipeline::markExecution);
