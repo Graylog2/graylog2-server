@@ -33,7 +33,7 @@ import { WidgetStore } from 'views/stores/WidgetStore';
 import { CurrentViewStateStore } from 'views/stores/CurrentViewStateStore';
 
 import WidgetContainer from './WidgetContainer';
-import { PositionsMap, WidgetDataMap, WidgetErrorsMap } from './widgets/WidgetPropTypes';
+import { WidgetDataMap, WidgetErrorsMap } from './widgets/WidgetPropTypes';
 import WidgetComponent from './WidgetComponent';
 
 const COLUMNS = {
@@ -78,7 +78,6 @@ type SharedProps = {
   data: { [id: string]: any },
   errors: { [id: string]: undefined | SearchError[] },
   fields: FieldTypeMappingsList,
-  positions: WidgetPositions,
 };
 
 type Props = SharedProps & {
@@ -93,6 +92,7 @@ type WidgetsProps = SharedProps & {
   widgetDimensions: { [widgetId: string]: WidgetDimensions },
   focusedWidget: FocusContextState | undefined,
   onPositionsChange: (position: BackendWidgetPosition) => void,
+  positions: WidgetPositions,
 };
 
 const WidgetGridItem = ({
@@ -217,14 +217,12 @@ WidgetGrid.propTypes = {
   fields: CustomPropTypes.FieldListType.isRequired,
   locked: PropTypes.bool,
   onPositionsChange: PropTypes.func.isRequired,
-  positions: PositionsMap,
   staticWidgets: PropTypes.arrayOf(PropTypes.node),
 };
 
 WidgetGrid.defaultProps = {
   locked: true,
   staticWidgets: [],
-  positions: {},
 };
 
 const MemoizedWidgetGrid = React.memo(WidgetGrid);

@@ -74,7 +74,6 @@ describe('<WidgetGrid />', () => {
       <WidgetGrid data={{}}
                   errors={{}}
                   onPositionsChange={() => {}}
-                  positions={{}}
                   fields={Immutable.List()} />
     ));
 
@@ -102,7 +101,6 @@ describe('<WidgetGrid />', () => {
 
     const wrapper = mount((
       <WidgetGrid errors={{}}
-                  positions={positions}
                   data={data}
                   fields={Immutable.List()}
                   onPositionsChange={() => {}} />
@@ -131,7 +129,6 @@ describe('<WidgetGrid />', () => {
 
     const wrapper = mount((
       <WidgetGrid errors={{}}
-                  positions={positions}
                   data={data}
                   fields={Immutable.List()}
                   onPositionsChange={() => {}} />

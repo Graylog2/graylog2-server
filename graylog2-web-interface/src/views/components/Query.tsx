@@ -22,7 +22,7 @@ import { BackendWidgetPosition } from 'views/types';
 
 import DocsHelper from 'util/DocsHelper';
 import { Jumbotron } from 'components/graylog';
-import { CurrentViewStateActions, CurrentViewStateStore } from 'views/stores/CurrentViewStateStore';
+import { CurrentViewStateActions } from 'views/stores/CurrentViewStateStore';
 import { Spinner } from 'components/common';
 import { widgetDefinition } from 'views/logic/Widgets';
 import DocumentationLink from 'components/support/DocumentationLink';
@@ -88,11 +88,10 @@ type GridProps = {
   widgetDefs: Immutable.Map<string, Widget>,
   widgetMapping: { [widgetId: string]: Array<string> },
   results: QueryResult,
-  positions: { [widgetId: string]: WidgetPosition },
   fields: FieldTypeMappingsList,
 }
 
-const RenderedWidgetGrid = ({ widgetDefs, widgetMapping, results, positions, fields }: GridProps) => {
+const RenderedWidgetGrid = ({ widgetDefs, widgetMapping, results, fields }: GridProps) => {
   const data = {};
   const errors = {};
 
@@ -111,8 +110,7 @@ const RenderedWidgetGrid = ({ widgetDefs, widgetMapping, results, positions, fie
                     errors={errors}
                     fields={fields}
                     locked={!interactive}
-                    onPositionsChange={_onPositionsChange}
-                    positions={positions} />
+                    onPositionsChange={_onPositionsChange} />
       )}
     </InteractiveContext.Consumer>
   );
