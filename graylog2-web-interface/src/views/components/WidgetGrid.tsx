@@ -30,6 +30,7 @@ import SearchError from 'views/logic/SearchError';
 import { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import { useStore } from 'stores/connect';
 import { WidgetStore } from 'views/stores/WidgetStore';
+import { CurrentViewStateStore } from 'views/stores/CurrentViewStateStore';
 
 import WidgetContainer from './WidgetContainer';
 import { PositionsMap, WidgetDataMap, WidgetErrorsMap } from './widgets/WidgetPropTypes';
@@ -126,6 +127,33 @@ const generatePositions = (widgets: Array<{ id: string, type: string }>, positio
   .map<[string, WidgetPosition]>(({ id, type }) => [id, positions[id] ?? _defaultDimensions(type)])
   .reduce((prev, [id, position]) => ({ ...prev, [id]: position }), {});
 
+const Grid = ({ children, locked, onPositionsChange }) => {
+  const { focusedWidget } = useContext(WidgetFocusContext);
+
+  const initialPositions = useStore(CurrentViewStateStore, (viewState) => viewState?.state?.widgetPositions);
+  const widgets = useStore(WidgetStore, (state) => state.map(({ id, type }) => ({ id, type })).toArray());
+
+  const positions = useMemo(() => generatePositions(widgets, initialPositions), [widgets, initialPositions]);
+
+  return (
+    <SizeMe monitorWidth refreshRate={100}>
+      {({ size: { width } }) => (
+        <StyledReactGridContainer hasFocusedWidget={!!focusedWidget?.id}
+                                  columns={COLUMNS}
+                                  isResizable={!focusedWidget?.id}
+                                  locked={locked}
+                                  measureBeforeMount
+                                  onPositionsChange={onPositionsChange}
+                                  positions={positions}
+                                  width={width}
+                                  useDragHandle=".widget-drag-handle">
+          {children}
+        </StyledReactGridContainer>
+      )}
+    </SizeMe>
+  );
+};
+
 const WidgetGrid = ({
   staticWidgets,
   data,
@@ -155,43 +183,26 @@ const WidgetGrid = ({
   // The SizeMe component is required to update the widget grid
   // when its content height results in a scrollbar
   return (
-    <SizeMe monitorWidth refreshRate={100}>
-      {({ size: { width } }) => {
-        const grid = widgets?.length > 0 && data ? (
-          <StyledReactGridContainer hasFocusedWidget={!!focusedWidget?.id}
-                                    columns={COLUMNS}
-                                    isResizable={!focusedWidget?.id}
-                                    locked={locked}
-                                    measureBeforeMount
-                                    onPositionsChange={_onPositionsChange}
-                                    positions={positions}
-                                    width={width}
-                                    useDragHandle=".widget-drag-handle">
-            {widgets.map(({ id: widgetId }) => (
-              <WidgetContainer key={widgetId} isFocused={focusedWidget?.id === widgetId && focusedWidget?.focusing}>
+    <DashboardWrap>
+      <Grid locked={locked}
+            onPositionsChange={_onPositionsChange}>
+        {widgets.map(({ id: widgetId }) => (
+          <WidgetContainer key={widgetId} isFocused={focusedWidget?.id === widgetId && focusedWidget?.focusing}>
 
-                <WidgetGridItem data={data}
-                                errors={errors}
-                                fields={fields}
-                                positions={positions}
-                                widgetId={widgetId}
-                                setWidgetDimensions={setWidgetDimensions}
-                                widgetDimensions={widgetDimensions}
-                                focusedWidget={focusedWidget}
-                                onPositionsChange={_onPositionsChange} />
-              </WidgetContainer>
-            ))}
-          </StyledReactGridContainer>
-        ) : <span />;
-
-        return (
-          <DashboardWrap>
-            {grid}
-            {staticWidgets}
-          </DashboardWrap>
-        );
-      }}
-    </SizeMe>
+            <WidgetGridItem data={data}
+                            errors={errors}
+                            fields={fields}
+                            positions={positions}
+                            widgetId={widgetId}
+                            setWidgetDimensions={setWidgetDimensions}
+                            widgetDimensions={widgetDimensions}
+                            focusedWidget={focusedWidget}
+                            onPositionsChange={_onPositionsChange} />
+          </WidgetContainer>
+        ))}
+      </Grid>
+      {staticWidgets}
+    </DashboardWrap>
   );
 };
 

@@ -157,14 +157,13 @@ type Props = {
 
 const Query = ({ fields, results, widgetMapping }: Props) => {
   const widgets = useStore(WidgetStore);
-  const positions = useStore(CurrentViewStateStore, (viewState) => viewState?.state?.widgetPositions);
 
   if (!widgets || widgets.isEmpty()) {
     return <EmptyDashboardInfo />;
   }
 
   return results
-    ? <RenderedWidgetGrid widgetDefs={widgets} widgetMapping={widgetMapping.toJS()} results={results} positions={positions} fields={fields} />
+    ? <RenderedWidgetGrid widgetDefs={widgets} widgetMapping={widgetMapping.toJS()} results={results} fields={fields} />
     : <Spinner />;
 };
 
