@@ -71,10 +71,7 @@ describe('<WidgetGrid />', () => {
 
   it('should render with minimal props', () => {
     const wrapper = mount((
-      <WidgetGrid data={{}}
-                  errors={{}}
-                  onPositionsChange={() => {}}
-                  fields={Immutable.List()} />
+      <WidgetGrid onPositionsChange={() => {}} />
     ));
 
     expect(wrapper).toExist();
@@ -100,10 +97,7 @@ describe('<WidgetGrid />', () => {
     };
 
     const wrapper = mount((
-      <WidgetGrid errors={{}}
-                  data={data}
-                  fields={Immutable.List()}
-                  onPositionsChange={() => {}} />
+      <WidgetGrid onPositionsChange={() => {}} />
     ));
 
     expect(wrapper.find(Widget)).toHaveLength(1);
@@ -128,10 +122,7 @@ describe('<WidgetGrid />', () => {
     };
 
     const wrapper = mount((
-      <WidgetGrid errors={{}}
-                  data={data}
-                  fields={Immutable.List()}
-                  onPositionsChange={() => {}} />
+      <WidgetGrid onPositionsChange={() => {}} />
     ));
 
     expect(wrapper.find(Widget)).toHaveLength(1);

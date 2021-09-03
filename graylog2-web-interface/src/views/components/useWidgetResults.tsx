@@ -9,6 +9,7 @@ import Widget from 'views/logic/widgets/Widget';
 import { WidgetMapping } from 'views/logic/views/types';
 import QueryResult from 'views/logic/QueryResult';
 import { ViewStore } from 'views/stores/ViewStore';
+import SearchError from 'views/logic/SearchError';
 
 const _getDataAndErrors = (widget: Widget, widgetMapping: WidgetMapping, results: QueryResult) => {
   const { searchTypes } = results;
@@ -36,6 +37,11 @@ const _getDataAndErrors = (widget: Widget, widgetMapping: WidgetMapping, results
   return { widgetData: data, error };
 };
 
+type WidgetResults = {
+  widgetData: unknown | undefined,
+  error: SearchError[],
+};
+
 const useWidgetResults = (widgetId: string) => {
   const { widgetMapping, results } = useStore(SearchStore, ({ result: r, widgetMapping: w }) => ({ results: r, widgetMapping: w }));
   const widgets = useStore(WidgetStore);
@@ -46,7 +52,7 @@ const useWidgetResults = (widgetId: string) => {
     ? widgets.map((widget) => _getDataAndErrors(widget, widgetMapping, currentQueryResults)).toMap()
     : Immutable.Map()), [currentQueryResults, widgetMapping, widgets]);
 
-  return widgetResults.get(widgetId, {});
+  return widgetResults.get(widgetId, { widgetData: undefined, error: [] }) as WidgetResults;
 };
 
 export default useWidgetResults;

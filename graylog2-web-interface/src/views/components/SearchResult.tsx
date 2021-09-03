@@ -21,7 +21,6 @@ import styled, { css } from 'styled-components';
 import Spinner from 'components/common/Spinner';
 import Query from 'views/components/Query';
 import { useStore } from 'stores/connect';
-import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import { SearchLoadingStateStore } from 'views/stores/SearchLoadingStateStore';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import LoadingIndicator from 'components/common/LoadingIndicator';
