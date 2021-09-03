@@ -38,7 +38,7 @@ public class DateTimeConverter {
         }
 
         if (value instanceof Date) {
-            return new DateTime(value);
+            return new DateTime(value, DateTimeZone.UTC);
         } else if (value instanceof ZonedDateTime) {
             final ZoneId zone = ((ZonedDateTime) value).getZone();
             return new DateTime(Date.from(((ZonedDateTime) value).toInstant()), DateTimeZone.forID(zone.getId()));
@@ -56,7 +56,7 @@ public class DateTimeConverter {
             final ZoneOffset offset = defaultZoneId.getRules().getOffset(localDateTime);
             return new DateTime(Date.from(localDateTime.toInstant(offset)));
         } else if (value instanceof Instant) {
-            return new DateTime(Date.from((Instant) value));
+            return new DateTime(Date.from((Instant) value), DateTimeZone.UTC);
         } else if (value instanceof String) {
             return ES_DATE_FORMAT_FORMATTER.parseDateTime((String) value);
         } else {

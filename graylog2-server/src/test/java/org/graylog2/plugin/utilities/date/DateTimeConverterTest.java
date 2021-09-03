@@ -16,6 +16,7 @@
  */
 package org.graylog2.plugin.utilities.date;
 
+import org.graylog2.shared.SuppressForbidden;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.Test;
@@ -51,7 +52,7 @@ class DateTimeConverterTest {
 
         final DateTime output = DateTimeConverter.convertToDateTime(input);
 
-        final DateTime expectedOutput = new DateTime(currentTimeMillis);
+        final DateTime expectedOutput = new DateTime(currentTimeMillis, DateTimeZone.UTC);
         assertThat(output).isEqualTo(expectedOutput);
     }
 
@@ -87,6 +88,7 @@ class DateTimeConverterTest {
     }
 
     @Test
+    @SuppressForbidden("Comparing twice with default timezone is okay in tests")
     void convertFromLocalDateTime() {
         final LocalDateTime input = LocalDateTime.of(2021, Month.AUGUST, 19, 12, 0);
 
@@ -99,6 +101,7 @@ class DateTimeConverterTest {
     }
 
     @Test
+    @SuppressForbidden("Comparing twice with default timezone is okay in tests")
     void convertFromLocalDate() {
         final LocalDate input = LocalDate.of(2021, Month.SEPTEMBER, 2);
 
@@ -115,7 +118,7 @@ class DateTimeConverterTest {
 
         final DateTime output = DateTimeConverter.convertToDateTime(input);
 
-        final DateTime expectedOutput = new DateTime(currentTimeMillis);
+        final DateTime expectedOutput = new DateTime(currentTimeMillis, DateTimeZone.UTC);
         assertThat(output).isEqualTo(expectedOutput);
     }
 
