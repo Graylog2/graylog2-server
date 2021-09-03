@@ -25,7 +25,7 @@ const FormatReceivedBy = ({ inputs, sourceInputId, sourceNodeId }: { inputs: Inp
 
   useEffect(() => {
     if (sourceNodeId && _isLocalNode) {
-      _isLocalNode(sourceNodeId).then(setIsLocalNode);
+      _isLocalNode(sourceNodeId).then(setIsLocalNode, () => setIsLocalNode(true));
     } else {
       setIsLocalNode(true);
     }

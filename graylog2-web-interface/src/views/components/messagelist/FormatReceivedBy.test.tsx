@@ -20,6 +20,12 @@ type ForwarderReceivedByProps = {
 };
 
 describe('FormatReceivedBy', () => {
+  const inputs = Immutable.Map<string, Input>({
+    bar: {
+      title: 'My awesome input',
+    },
+  });
+
   it('shows that input is deleted if it is unknown', async () => {
     render(<FormatReceivedBy inputs={Immutable.Map()} sourceNodeId="foo" sourceInputId="bar" />);
     await screen.findByText('deleted input');
@@ -31,11 +37,6 @@ describe('FormatReceivedBy', () => {
   });
 
   it('shows input information if present', async () => {
-    const inputs = Immutable.Map<string, Input>({
-      bar: {
-        title: 'My awesome input',
-      },
-    });
     render(<FormatReceivedBy inputs={inputs} sourceNodeId="foo" sourceInputId="bar" />);
     await screen.findByText('My awesome input');
   });
@@ -49,25 +50,37 @@ describe('FormatReceivedBy', () => {
     expect(within(nodeLink).getByText('foobar')).not.toBeNull();
   });
 
-  it('allows overriding node information through plugin', async () => {
+  describe('allows overriding node information through plugin', () => {
     const ForwarderReceivedBy = ({ inputId, forwarderNodeId }: ForwarderReceivedByProps) => <span>Mighty plugin magic: {inputId}/{forwarderNodeId}</span>;
+    const isLocalNode = jest.fn(() => Promise.resolve(false));
     const pluginManifest = {
       exports: {
         forwarder: [{
-          isLocalNode: () => Promise.resolve(false),
+          isLocalNode,
           ForwarderReceivedBy,
           messageLoaders: { ForwarderInputDropdown: () => <></> },
         }],
       },
     };
-    PluginStore.register(pluginManifest);
-    const inputs = Immutable.Map<string, Input>({
-      bar: {
-        title: 'My awesome input',
-      },
+
+    beforeEach(() => PluginStore.register(pluginManifest));
+
+    afterEach(() => PluginStore.unregister(pluginManifest));
+
+    it('with correct definition', async () => {
+      render(<FormatReceivedBy inputs={inputs} sourceNodeId="foo" sourceInputId="bar" />);
+      await screen.findByText('Mighty plugin magic: bar/foo');
+
+      expect(isLocalNode).toHaveBeenCalledWith('foo');
     });
 
-    render(<FormatReceivedBy inputs={inputs} sourceNodeId="foo" sourceInputId="bar" />);
-    await screen.findByText('Mighty plugin magic: bar/foo');
+    it('but handles exception being thrown in `isLocalNode`', async () => {
+      isLocalNode.mockImplementation(() => new Promise(() => {
+        throw Error('Boom!');
+      }));
+
+      render(<FormatReceivedBy inputs={inputs} sourceNodeId="foo" sourceInputId="bar" />);
+      await screen.findByText('stopped node');
+    });
   });
 });
