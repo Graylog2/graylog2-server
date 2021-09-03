@@ -35,6 +35,7 @@ type CurrentViewStateActionsType = RefluxActions<{
   fields: (fields: Immutable.Set<string>) => Promise<unknown>,
   formatting: (formatting: FormattingSettings) => Promise<unknown>,
   titles: (titles: Immutable.Map<TitleType, Immutable.Map<string, string>>) => Promise<unknown>,
+  updateWidgetPosition: (widgetId: string, newPosition: WidgetPosition) => Promise<unknown>,
   widgets: (widgets: Immutable.List<Widget>) => Promise<unknown>,
   widgetPositions: (newPositions: Record<string, WidgetPosition>) => Promise<unknown>,
 }>;
@@ -45,6 +46,7 @@ export const CurrentViewStateActions: CurrentViewStateActionsType = singletonAct
     fields: { asyncResult: true },
     formatting: { asyncResult: true },
     titles: { asyncResult: true },
+    updateWidgetPosition: { asyncResult: true },
     widgets: { asyncResult: true },
     widgetPositions: { asyncResult: true },
   }),
@@ -128,6 +130,18 @@ export const CurrentViewStateStore: CurrentViewStateStoreType = singletonStore(
       const promise = ViewStatesActions.update(this.activeQuery, newActiveState);
 
       CurrentViewStateActions.widgetPositions.promise(promise);
+    },
+
+    updateWidgetPosition(widgetId: string, newPosition) {
+      const { widgetPositions } = this._activeState();
+      const newPositions = { ...widgetPositions, [widgetId]: newPosition };
+
+      const newActiveState = this._activeState().toBuilder().widgetPositions(newPositions).build();
+      const promise = ViewStatesActions.update(this.activeQuery, newActiveState);
+
+      CurrentViewStateActions.updateWidgetPosition.promise(promise);
+
+      return promise;
     },
 
     formatting(formatting) {

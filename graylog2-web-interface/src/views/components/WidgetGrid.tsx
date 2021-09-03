@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useState, useContext, useMemo } from 'react';
+import { useState, useContext, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import { SizeMe } from 'react-sizeme';
@@ -28,7 +28,7 @@ import WidgetFocusContext, { FocusContextState } from 'views/components/contexts
 import { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import { useStore } from 'stores/connect';
 import { WidgetStore } from 'views/stores/WidgetStore';
-import { CurrentViewStateStore } from 'views/stores/CurrentViewStateStore';
+import { CurrentViewStateStore, CurrentViewStateActions } from 'views/stores/CurrentViewStateStore';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 
@@ -75,7 +75,6 @@ const _onWidgetSizeChange = (
 
 type Props = {
   locked?: boolean,
-  onPositionsChange: (newPositions: Array<BackendWidgetPosition>) => void,
 };
 
 type WidgetsProps = {
@@ -161,23 +160,21 @@ const useQueryFieldTypes = () => {
   return queryFields;
 };
 
-const WidgetGrid = ({ locked, onPositionsChange }: Props) => {
+const MAXIMUM_GRID_SIZE = 12;
+
+const onPositionsChange = (newPosition: BackendWidgetPosition) => {
+  const { col, row, height, width, id } = newPosition;
+  const widgetPosition = new WidgetPosition(col, row, height, width >= MAXIMUM_GRID_SIZE ? Infinity : width);
+  CurrentViewStateActions.updateWidgetPosition(id, widgetPosition);
+};
+
+const WidgetGrid = ({ locked }: Props) => {
   const { focusedWidget } = useContext(WidgetFocusContext);
   const [widgetDimensions, setWidgetDimensions] = useState({});
 
   const widgets = useStore(WidgetStore, (state) => state.map(({ id, type }) => ({ id, type })).toArray());
 
   const positions = useWidgetPositions();
-
-  const _onPositionsChange = useCallback((newPosition: BackendWidgetPosition) => {
-    const newPositions = Object.keys(positions).map((id) => {
-      const { col, row, height, width } = positions[id];
-
-      return { id, col, row, height, width };
-    });
-
-    onPositionsChange([...newPositions, newPosition]);
-  }, [onPositionsChange, positions]);
 
   const fields = useQueryFieldTypes();
 
@@ -186,7 +183,7 @@ const WidgetGrid = ({ locked, onPositionsChange }: Props) => {
   return (
     <DashboardWrap>
       <Grid locked={locked}
-            onPositionsChange={_onPositionsChange}>
+            onPositionsChange={onPositionsChange}>
         {widgets.map(({ id: widgetId }) => (
           <WidgetContainer key={widgetId} isFocused={focusedWidget?.id === widgetId && focusedWidget?.focusing}>
             <WidgetGridItem fields={fields}
@@ -195,7 +192,7 @@ const WidgetGrid = ({ locked, onPositionsChange }: Props) => {
                             setWidgetDimensions={setWidgetDimensions}
                             widgetDimensions={widgetDimensions}
                             focusedWidget={focusedWidget}
-                            onPositionsChange={_onPositionsChange} />
+                            onPositionsChange={onPositionsChange} />
           </WidgetContainer>
         ))}
       </Grid>
@@ -207,7 +204,6 @@ WidgetGrid.displayName = 'WidgetGrid';
 
 WidgetGrid.propTypes = {
   locked: PropTypes.bool,
-  onPositionsChange: PropTypes.func.isRequired,
 };
 
 WidgetGrid.defaultProps = {

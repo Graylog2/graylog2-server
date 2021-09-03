@@ -15,18 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import Immutable from 'immutable';
 import styled, { css } from 'styled-components';
-import { BackendWidgetPosition } from 'views/types';
 
 import DocsHelper from 'util/DocsHelper';
 import { Jumbotron } from 'components/graylog';
-import { CurrentViewStateActions } from 'views/stores/CurrentViewStateStore';
 import DocumentationLink from 'components/support/DocumentationLink';
 import IfDashboard from 'views/components/dashboard/IfDashboard';
 import IfSearch from 'views/components/search/IfSearch';
 import WidgetGrid from 'views/components/WidgetGrid';
-import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import { useStore } from 'stores/connect';
 import { WidgetStore } from 'views/stores/WidgetStore';
 
@@ -41,21 +37,10 @@ const StyledJumbotron = styled(Jumbotron)(({ theme }) => css`
   }
 `);
 
-const MAXIMUM_GRID_SIZE = 12;
-
-const _onPositionsChange = (positions: Array<BackendWidgetPosition>) => {
-  const newPositions = Immutable.Map<string, WidgetPosition>(
-    positions.map(({ col, height, row, width, id }) => [id, new WidgetPosition(col, row, height, width >= MAXIMUM_GRID_SIZE ? Infinity : width)]),
-  ).toObject();
-
-  CurrentViewStateActions.widgetPositions(newPositions);
-};
-
 const RenderedWidgetGrid = () => (
   <InteractiveContext.Consumer>
     {(interactive) => (
-      <WidgetGrid locked={!interactive}
-                  onPositionsChange={_onPositionsChange} />
+      <WidgetGrid locked={!interactive} />
     )}
   </InteractiveContext.Consumer>
 );
