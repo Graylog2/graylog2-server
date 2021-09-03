@@ -71,7 +71,7 @@ describe('<WidgetGrid />', () => {
 
   it('should render with minimal props', () => {
     const wrapper = mount((
-      <WidgetGrid onPositionsChange={() => {}} />
+      <WidgetGrid />
     ));
 
     expect(wrapper).toExist();
@@ -97,7 +97,7 @@ describe('<WidgetGrid />', () => {
     };
 
     const wrapper = mount((
-      <WidgetGrid onPositionsChange={() => {}} />
+      <WidgetGrid />
     ));
 
     expect(wrapper.find(Widget)).toHaveLength(1);
@@ -122,7 +122,7 @@ describe('<WidgetGrid />', () => {
     };
 
     const wrapper = mount((
-      <WidgetGrid onPositionsChange={() => {}} />
+      <WidgetGrid />
     ));
 
     expect(wrapper.find(Widget)).toHaveLength(1);
