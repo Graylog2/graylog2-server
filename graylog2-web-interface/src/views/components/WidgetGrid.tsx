@@ -127,13 +127,17 @@ const generatePositions = (widgets: Array<{ id: string, type: string }>, positio
   .map<[string, WidgetPosition]>(({ id, type }) => [id, positions[id] ?? _defaultDimensions(type)])
   .reduce((prev, [id, position]) => ({ ...prev, [id]: position }), {});
 
-const Grid = ({ children, locked, onPositionsChange }) => {
-  const { focusedWidget } = useContext(WidgetFocusContext);
-
+const useWidgetPositions = () => {
   const initialPositions = useStore(CurrentViewStateStore, (viewState) => viewState?.state?.widgetPositions);
   const widgets = useStore(WidgetStore, (state) => state.map(({ id, type }) => ({ id, type })).toArray());
 
-  const positions = useMemo(() => generatePositions(widgets, initialPositions), [widgets, initialPositions]);
+  return useMemo(() => generatePositions(widgets, initialPositions), [widgets, initialPositions]);
+};
+
+const Grid = ({ children, locked, onPositionsChange }) => {
+  const { focusedWidget } = useContext(WidgetFocusContext);
+
+  const positions = useWidgetPositions();
 
   return (
     <SizeMe monitorWidth refreshRate={100}>
@@ -160,7 +164,6 @@ const WidgetGrid = ({
   errors,
   locked,
   onPositionsChange,
-  positions: propsPositions,
   fields,
 }: Props) => {
   const { focusedWidget } = useContext(WidgetFocusContext);
@@ -168,7 +171,7 @@ const WidgetGrid = ({
 
   const widgets = useStore(WidgetStore, (state) => state.map(({ id, type }) => ({ id, type })).toArray());
 
-  const positions = useMemo(() => generatePositions(widgets, propsPositions), [widgets, propsPositions]);
+  const positions = useWidgetPositions();
 
   const _onPositionsChange = useCallback((newPosition: BackendWidgetPosition) => {
     const newPositions = Object.keys(positions).map((id) => {

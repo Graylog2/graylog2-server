@@ -27,9 +27,10 @@ import ExportSettingsContextProvider from 'views/components/ExportSettingsContex
 import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 import View from 'views/logic/views/View';
 import { useStore } from 'stores/connect';
-import { TitlesStore, TitleTypes } from 'views/stores/TitlesStore';
+import { TitlesStore } from 'views/stores/TitlesStore';
 import defaultTitle from 'views/components/defaultTitle';
 import { WidgetStore } from 'views/stores/WidgetStore';
+import TitleTypes from 'views/stores/TitleTypes';
 
 import { Position, WidgetDataMap, WidgetErrorsMap } from './widgets/WidgetPropTypes';
 import Widget from './widgets/Widget';
