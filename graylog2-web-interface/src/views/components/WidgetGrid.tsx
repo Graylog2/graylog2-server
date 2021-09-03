@@ -21,19 +21,18 @@ import styled, { css } from 'styled-components';
 import { SizeMe } from 'react-sizeme';
 import { WidgetPositions, BackendWidgetPosition } from 'views/types';
 
-import CustomPropTypes from 'views/components/CustomPropTypes';
 import ReactGridContainer from 'components/common/ReactGridContainer';
 import { widgetDefinition } from 'views/logic/Widgets';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import WidgetFocusContext, { FocusContextState } from 'views/components/contexts/WidgetFocusContext';
-import SearchError from 'views/logic/SearchError';
 import { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import { useStore } from 'stores/connect';
 import { WidgetStore } from 'views/stores/WidgetStore';
 import { CurrentViewStateStore } from 'views/stores/CurrentViewStateStore';
+import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
+import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 
 import WidgetContainer from './WidgetContainer';
-import { WidgetDataMap, WidgetErrorsMap } from './widgets/WidgetPropTypes';
 import WidgetComponent from './WidgetComponent';
 
 const COLUMNS = {
@@ -74,19 +73,14 @@ const _onWidgetSizeChange = (
   setWidgetDimensions({ ...widgetDimensions, [widgetId]: dimensions });
 };
 
-type SharedProps = {
-  data: { [id: string]: any },
-  errors: { [id: string]: undefined | SearchError[] },
-  fields: FieldTypeMappingsList,
-};
-
-type Props = SharedProps & {
+type Props = {
   locked?: boolean,
   staticWidgets?: React.ReactNode,
   onPositionsChange: (newPositions: Array<BackendWidgetPosition>) => void,
 };
 
-type WidgetsProps = SharedProps & {
+type WidgetsProps = {
+  fields: FieldTypeMappingsList,
   widgetId: string,
   setWidgetDimensions: (newWidgetDimensions: { [widgetId: string]: WidgetDimensions }) => void,
   widgetDimensions: { [widgetId: string]: WidgetDimensions },
@@ -96,8 +90,6 @@ type WidgetsProps = SharedProps & {
 };
 
 const WidgetGridItem = ({
-  data,
-  errors,
   fields,
   onPositionsChange,
   positions,
@@ -111,9 +103,7 @@ const WidgetGridItem = ({
   const onWidgetSizeChange = useMemo(() => _onWidgetSizeChange(widgetDimensions, setWidgetDimensions), [widgetDimensions, setWidgetDimensions]);
 
   return (
-    <WidgetComponent data={data}
-                     editing={editing}
-                     errors={errors}
+    <WidgetComponent editing={editing}
                      fields={fields}
                      onPositionsChange={onPositionsChange}
                      onWidgetSizeChange={onWidgetSizeChange}
@@ -134,7 +124,13 @@ const useWidgetPositions = () => {
   return useMemo(() => generatePositions(widgets, initialPositions), [widgets, initialPositions]);
 };
 
-const Grid = ({ children, locked, onPositionsChange }) => {
+type GridProps = {
+  children: React.ReactNode,
+  locked: boolean,
+  onPositionsChange: (newPosition: BackendWidgetPosition) => void,
+};
+
+const Grid = ({ children, locked, onPositionsChange }: GridProps) => {
   const { focusedWidget } = useContext(WidgetFocusContext);
 
   const positions = useWidgetPositions();
@@ -158,13 +154,18 @@ const Grid = ({ children, locked, onPositionsChange }) => {
   );
 };
 
+const useQueryFieldTypes = () => {
+  const fieldTypes = useContext(FieldTypesContext);
+  const queryId = useStore(ViewMetadataStore, (viewMetadataStore) => viewMetadataStore.activeQuery);
+  const queryFields = useMemo(() => fieldTypes.queryFields.get(queryId, fieldTypes.all), [fieldTypes.all, fieldTypes.queryFields, queryId]);
+
+  return queryFields;
+};
+
 const WidgetGrid = ({
   staticWidgets,
-  data,
-  errors,
   locked,
   onPositionsChange,
-  fields,
 }: Props) => {
   const { focusedWidget } = useContext(WidgetFocusContext);
   const [widgetDimensions, setWidgetDimensions] = useState({});
@@ -183,6 +184,8 @@ const WidgetGrid = ({
     onPositionsChange([...newPositions, newPosition]);
   }, [onPositionsChange, positions]);
 
+  const fields = useQueryFieldTypes();
+
   // The SizeMe component is required to update the widget grid
   // when its content height results in a scrollbar
   return (
@@ -191,10 +194,7 @@ const WidgetGrid = ({
             onPositionsChange={_onPositionsChange}>
         {widgets.map(({ id: widgetId }) => (
           <WidgetContainer key={widgetId} isFocused={focusedWidget?.id === widgetId && focusedWidget?.focusing}>
-
-            <WidgetGridItem data={data}
-                            errors={errors}
-                            fields={fields}
+            <WidgetGridItem fields={fields}
                             positions={positions}
                             widgetId={widgetId}
                             setWidgetDimensions={setWidgetDimensions}
@@ -212,9 +212,6 @@ const WidgetGrid = ({
 WidgetGrid.displayName = 'WidgetGrid';
 
 WidgetGrid.propTypes = {
-  data: WidgetDataMap.isRequired,
-  errors: WidgetErrorsMap.isRequired,
-  fields: CustomPropTypes.FieldListType.isRequired,
   locked: PropTypes.bool,
   onPositionsChange: PropTypes.func.isRequired,
   staticWidgets: PropTypes.arrayOf(PropTypes.node),

@@ -31,16 +31,15 @@ import { TitlesStore } from 'views/stores/TitlesStore';
 import defaultTitle from 'views/components/defaultTitle';
 import { WidgetStore } from 'views/stores/WidgetStore';
 import TitleTypes from 'views/stores/TitleTypes';
+import useWidgetResults from 'views/components/useWidgetResults';
 
-import { Position, WidgetDataMap, WidgetErrorsMap } from './widgets/WidgetPropTypes';
+import { Position } from './widgets/WidgetPropTypes';
 import Widget from './widgets/Widget';
 import DrilldownContextProvider from './contexts/DrilldownContextProvider';
 import WidgetFieldTypesContextProvider from './contexts/WidgetFieldTypesContextProvider';
 
 type Props = {
-  data: {},
   editing: boolean,
-  errors: { [widgetId: string]: Array<{ description: string }> },
   fields: Immutable.List<TFieldTypeMapping>,
   onPositionsChange: (position: BackendWidgetPosition) => void,
   onWidgetSizeChange: (widgetId?: string, dimensions?: { height: number, width: number }) => void,
@@ -50,9 +49,7 @@ type Props = {
 };
 
 const WidgetComponent = ({
-  data,
   editing,
-  errors,
   fields,
   onPositionsChange = () => undefined,
   onWidgetSizeChange = () => {},
@@ -61,8 +58,7 @@ const WidgetComponent = ({
   widgetDimension: { height, width },
 }: Props) => {
   const widget = useStore(WidgetStore, (state) => state.get(widgetId));
-  const widgetData = data[widgetId];
-  const widgetErrors = errors[widgetId] || [];
+  const { widgetData, error: widgetErrors = [] } = useWidgetResults(widgetId);
   const viewType = useContext(ViewTypeContext);
   const title = useStore(TitlesStore, (titles) => titles.getIn([TitleTypes.Widget, widget.id], defaultTitle(widget)) as string);
 
@@ -74,7 +70,7 @@ const WidgetComponent = ({
         <AdditionalContext.Provider value={{ widget }}>
           <ExportSettingsContextProvider>
             <WidgetFieldTypesIfDashboard>
-              <Widget data={widgetData}
+              <Widget data={widgetData as React.ComponentProps<typeof Widget>['data']}
                       editing={editing}
                       errors={widgetErrors}
                       fields={fields}
@@ -95,9 +91,7 @@ const WidgetComponent = ({
 };
 
 WidgetComponent.propTypes = {
-  data: WidgetDataMap.isRequired,
   editing: PropTypes.bool.isRequired,
-  errors: WidgetErrorsMap.isRequired,
   fields: PropTypes.object.isRequired,
   onPositionsChange: PropTypes.func,
   onWidgetSizeChange: PropTypes.func,

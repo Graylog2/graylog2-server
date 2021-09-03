@@ -21,7 +21,6 @@ import styled, { css } from 'styled-components';
 import Spinner from 'components/common/Spinner';
 import Query from 'views/components/Query';
 import { useStore } from 'stores/connect';
-import { SearchStore } from 'views/stores/SearchStore';
 import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import { SearchLoadingStateStore } from 'views/stores/SearchLoadingStateStore';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
@@ -51,25 +50,14 @@ type Props = {
 const SearchResult = React.memo(({ hasErrors }: Props) => {
   const fieldTypes = useContext(FieldTypesContext);
   const { focusedWidget } = useContext(WidgetFocusContext);
-  const searches = useStore(SearchStore, ({ result, widgetMapping }) => ({ result, widgetMapping }));
-  const queryId = useStore(ViewMetadataStore, (viewMetadataStore) => viewMetadataStore.activeQuery);
 
   if (!fieldTypes) {
     return <Spinner />;
   }
 
-  const widgetMapping = searches?.widgetMapping;
-
   const hasFocusedWidget = !!focusedWidget?.id;
 
-  const currentResults = searches?.result?.forId(queryId);
-
-  const queryFields = fieldTypes.queryFields.get(queryId, fieldTypes.all);
-  const content = currentResults ? (
-    <Query fields={queryFields}
-           results={currentResults}
-           widgetMapping={widgetMapping} />
-  ) : hasErrors ? null : <Spinner />;
+  const content = hasErrors ? null : <Query />;
 
   return (
     <StyledRow $hasFocusedWidget={hasFocusedWidget}>
