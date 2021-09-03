@@ -16,9 +16,8 @@
  */
 import PropTypes from 'prop-types';
 import * as React from 'react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Immutable from 'immutable';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 
 import { Link } from 'components/graylog/router';
@@ -35,54 +34,11 @@ import CustomPropTypes from 'views/components/CustomPropTypes';
 import { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import { useStore } from 'stores/connect';
 import { SearchConfigStore } from 'views/stores/SearchConfigStore';
+import FormatReceivedBy from 'views/components/messagelist/FormatReceivedBy';
 
-import NodeName from './NodeName';
 import MessageActions from './MessageActions';
 import MessageAugmentations from './MessageAugmentations';
 import MessageMetadata from './MessageMetadata';
-
-const _inputName = (inputs: Props['inputs'], inputId: string) => {
-  // eslint-disable-next-line react/destructuring-assignment
-  const input = inputs.get(inputId);
-
-  return input ? <span style={{ wordBreak: 'break-word' }}>{input.title}</span> : 'deleted input';
-};
-
-const FormatReceivedBy = ({ inputs, sourceInputId, sourceNodeId }: { inputs: Props['inputs'], sourceNodeId: string, sourceInputId: string }) => {
-  const [isLocalNode, setIsLocalNode] = useState<boolean | undefined>();
-
-  const forwarderPlugin = PluginStore.exports('forwarder');
-  const ForwarderReceivedBy = forwarderPlugin?.[0]?.ForwarderReceivedBy;
-  const _isLocalNode = forwarderPlugin?.[0]?.isLocalNode;
-
-  useEffect(() => {
-    if (sourceNodeId) {
-      _isLocalNode(sourceNodeId).then(setIsLocalNode);
-    }
-  }, [sourceNodeId, _isLocalNode]);
-
-  if (!sourceNodeId) {
-    return null;
-  }
-
-  if (isLocalNode === undefined) {
-    return <Spinner />;
-  }
-
-  if (isLocalNode === false) {
-    return <ForwarderReceivedBy inputId={sourceInputId} forwarderNodeId={sourceNodeId} />;
-  }
-
-  return (
-    <div>
-      <dt>Received by</dt>
-      <dd>
-        <em>{_inputName(inputs, sourceInputId)}</em>{' '}
-        on <NodeName nodeId={sourceNodeId} />
-      </dd>
-    </div>
-  );
-};
 
 const _formatMessageTitle = (index, id) => {
   if (index) {
