@@ -17,6 +17,7 @@
 package org.graylog2.plugin.utilities.date;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 import javax.annotation.Nonnull;
 import java.time.Instant;
@@ -39,9 +40,10 @@ public class DateTimeConverter {
         if (value instanceof Date) {
             return new DateTime(value);
         } else if (value instanceof ZonedDateTime) {
-            return new DateTime(Date.from(((ZonedDateTime) value).toInstant()));
+            final ZoneId zone = ((ZonedDateTime) value).getZone();
+            return new DateTime(Date.from(((ZonedDateTime) value).toInstant()), DateTimeZone.forID(zone.getId()));
         } else if (value instanceof OffsetDateTime) {
-            return new DateTime(Date.from(((OffsetDateTime) value).toInstant()));
+            return new DateTime(Date.from(((OffsetDateTime) value).toInstant()), DateTimeZone.UTC);
         } else if (value instanceof LocalDateTime) {
             final LocalDateTime localDateTime = (LocalDateTime) value;
             final ZoneId defaultZoneId = ZoneId.systemDefault();
