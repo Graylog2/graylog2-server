@@ -75,7 +75,6 @@ const _onWidgetSizeChange = (
 
 type Props = {
   locked?: boolean,
-  staticWidgets?: React.ReactNode,
   onPositionsChange: (newPositions: Array<BackendWidgetPosition>) => void,
 };
 
@@ -162,11 +161,7 @@ const useQueryFieldTypes = () => {
   return queryFields;
 };
 
-const WidgetGrid = ({
-  staticWidgets,
-  locked,
-  onPositionsChange,
-}: Props) => {
+const WidgetGrid = ({ locked, onPositionsChange }: Props) => {
   const { focusedWidget } = useContext(WidgetFocusContext);
   const [widgetDimensions, setWidgetDimensions] = useState({});
 
@@ -204,7 +199,6 @@ const WidgetGrid = ({
           </WidgetContainer>
         ))}
       </Grid>
-      {staticWidgets}
     </DashboardWrap>
   );
 };
@@ -214,12 +208,10 @@ WidgetGrid.displayName = 'WidgetGrid';
 WidgetGrid.propTypes = {
   locked: PropTypes.bool,
   onPositionsChange: PropTypes.func.isRequired,
-  staticWidgets: PropTypes.arrayOf(PropTypes.node),
 };
 
 WidgetGrid.defaultProps = {
   locked: true,
-  staticWidgets: [],
 };
 
 const MemoizedWidgetGrid = React.memo(WidgetGrid);
