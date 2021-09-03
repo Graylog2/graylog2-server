@@ -28,6 +28,7 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Date;
+import java.util.TimeZone;
 
 import static org.graylog2.plugin.Tools.ES_DATE_FORMAT_FORMATTER;
 
@@ -40,8 +41,8 @@ public class DateTimeConverter {
         if (value instanceof Date) {
             return new DateTime(value, DateTimeZone.UTC);
         } else if (value instanceof ZonedDateTime) {
-            final ZoneId zone = ((ZonedDateTime) value).getZone();
-            return new DateTime(Date.from(((ZonedDateTime) value).toInstant()), DateTimeZone.forID(zone.getId()));
+            final DateTimeZone dateTimeZone = DateTimeZone.forTimeZone(TimeZone.getTimeZone(((ZonedDateTime) value).getZone()));
+            return new DateTime(Date.from(((ZonedDateTime) value).toInstant()), dateTimeZone);
         } else if (value instanceof OffsetDateTime) {
             return new DateTime(Date.from(((OffsetDateTime) value).toInstant()), DateTimeZone.UTC);
         } else if (value instanceof LocalDateTime) {

@@ -57,13 +57,23 @@ class DateTimeConverterTest {
     }
 
     @Test
-    void convertFromZonedDateTime() {
-        final ZoneId europeBerlin = ZoneId.of("America/New_York");
-        final ZonedDateTime input = ZonedDateTime.of(2020, 10, 24, 10, 59, 0, 0, europeBerlin);
+    void convertFromZonedDateTimeNewYork() {
+        final ZoneId newYork = ZoneId.of("America/New_York");
+        final ZonedDateTime input = ZonedDateTime.of(2020, 10, 24, 10, 59, 0, 0, newYork);
 
         final DateTime output = DateTimeConverter.convertToDateTime(input);
 
         final DateTime expectedOutput = new DateTime(2020, 10, 24, 10, 59, DateTimeZone.forID("America/New_York"));
+        assertThat(output).isEqualTo(expectedOutput);
+    }
+
+    @Test
+    void convertFromZonedDateTimeUTC() {
+        final ZonedDateTime input = ZonedDateTime.of(2020, 10, 24, 10, 59, 0, 0, ZoneOffset.UTC);
+
+        final DateTime output = DateTimeConverter.convertToDateTime(input);
+
+        final DateTime expectedOutput = new DateTime(2020, 10, 24, 10, 59, DateTimeZone.UTC);
         assertThat(output).isEqualTo(expectedOutput);
     }
 
