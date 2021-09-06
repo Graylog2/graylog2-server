@@ -22,6 +22,7 @@ import mockAction from 'helpers/mocking/MockAction';
 import { PluginRegistration, PluginStore } from 'graylog-web-plugin/plugin';
 import MockStore from 'helpers/mocking/StoreMock';
 import { createSearch } from 'fixtures/searches';
+import asMock from 'helpers/mocking/AsMock';
 
 import WidgetModel from 'views/logic/widgets/Widget';
 import { WidgetActions, Widgets } from 'views/stores/WidgetStore';
@@ -30,6 +31,8 @@ import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import { ViewStore } from 'views/stores/ViewStore';
 import type { ViewStoreState } from 'views/stores/ViewStore';
 import { TitlesMap } from 'views/stores/TitleTypes';
+import useWidgetResults from 'views/components/useWidgetResults';
+import SearchError from 'views/logic/SearchError';
 
 import Widget from './Widget';
 import type { Props as WidgetComponentProps } from './Widget';
@@ -40,6 +43,7 @@ import WidgetFocusContext, { WidgetFocusContextType } from '../contexts/WidgetFo
 jest.mock('../searchbar/QueryInput', () => mockComponent('QueryInput'));
 jest.mock('./WidgetHeader', () => 'widget-header');
 jest.mock('./WidgetColorContext', () => ({ children }) => children);
+jest.mock('views/components/useWidgetResults');
 
 jest.mock('views/stores/WidgetStore', () => ({
   WidgetStore: MockStore(),
@@ -142,25 +146,31 @@ describe('<Widget />', () => {
   });
 
   it('should render loading widget for widget without data', () => {
+    asMock(useWidgetResults).mockReturnValue({ widgetData: undefined, error: undefined });
     render(<DummyWidget />);
 
     expect(screen.queryAllByTestId('loading-widget')).toHaveLength(1);
   });
 
   it('should render error widget for widget with one error', () => {
-    render(<DummyWidget errors={[{ description: 'The widget has failed: the dungeon collapsed, you die!' }]} />);
+    asMock(useWidgetResults).mockReturnValue({ error: [{ description: 'The widget has failed: the dungeon collapsed, you die!' } as SearchError], widgetData: undefined });
+    render(<DummyWidget />);
+
     const errorWidgets = screen.queryAllByText('The widget has failed: the dungeon collapsed, you die!');
 
     expect(errorWidgets).toHaveLength(1);
   });
 
   it('should render error widget including all error messages for widget with multiple errors', () => {
-    render((
-      <DummyWidget errors={[
-        { description: 'Something is wrong' },
-        { description: 'Very wrong' },
-      ]} />
-    ));
+    asMock(useWidgetResults).mockReturnValue({
+      error: [
+        { description: 'Something is wrong' } as SearchError,
+        { description: 'Very wrong' } as SearchError,
+      ],
+      widgetData: undefined,
+    });
+
+    render(<DummyWidget />);
 
     const errorWidgets1 = screen.queryAllByText('Something is wrong');
 
@@ -172,7 +182,8 @@ describe('<Widget />', () => {
   });
 
   it('should render correct widget visualization for widget with data', () => {
-    render(<DummyWidget data={{}} />);
+    asMock(useWidgetResults).mockReturnValue({ widgetData: {}, error: [] });
+    render(<DummyWidget />);
 
     expect(screen.queryAllByTestId('loading-widget')).toHaveLength(0);
     expect(screen.queryAllByTitle('Widget Title')).toHaveLength(1);
