@@ -125,7 +125,7 @@ const useWidgetPositions = () => {
 type GridProps = {
   children: React.ReactNode,
   locked: boolean,
-  onPositionsChange: (newPosition: BackendWidgetPosition) => void,
+  onPositionsChange: (newPositions: Array<BackendWidgetPosition>) => void,
 };
 
 const Grid = ({ children, locked, onPositionsChange }: GridProps) => {
@@ -162,10 +162,17 @@ const useQueryFieldTypes = () => {
 
 const MAXIMUM_GRID_SIZE = 12;
 
-const onPositionsChange = (newPosition: BackendWidgetPosition) => {
-  const { col, row, height, width, id } = newPosition;
-  const widgetPosition = new WidgetPosition(col, row, height, width >= MAXIMUM_GRID_SIZE ? Infinity : width);
+const convertPosition = ({ col, row, height, width }: BackendWidgetPosition) => new WidgetPosition(col, row, height, width >= MAXIMUM_GRID_SIZE ? Infinity : width);
+
+const onPositionChange = (newPosition: BackendWidgetPosition) => {
+  const { id } = newPosition;
+  const widgetPosition = convertPosition(newPosition);
   CurrentViewStateActions.updateWidgetPosition(id, widgetPosition);
+};
+
+const onPositionsChange = (newPositions: Array<BackendWidgetPosition>) => {
+  const widgetPositions = Object.fromEntries(newPositions.map((newPosition) => [newPosition.id, convertPosition(newPosition)]));
+  CurrentViewStateActions.widgetPositions(widgetPositions);
 };
 
 const WidgetGrid = ({ locked }: Props) => {
@@ -192,7 +199,7 @@ const WidgetGrid = ({ locked }: Props) => {
                             setWidgetDimensions={setWidgetDimensions}
                             widgetDimensions={widgetDimensions}
                             focusedWidget={focusedWidget}
-                            onPositionsChange={onPositionsChange} />
+                            onPositionsChange={onPositionChange} />
           </WidgetContainer>
         ))}
       </Grid>
