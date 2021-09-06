@@ -45,7 +45,6 @@ import User from 'logic/users/User';
 import { Message } from 'views/components/messagelist/Types';
 import { ValuePath } from 'views/logic/valueactions/ValueActionHandler';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
-
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 
 type BackendWidgetPosition = {
