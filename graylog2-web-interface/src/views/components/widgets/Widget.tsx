@@ -15,18 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useContext, useState } from 'react';
+import { useCallback, useContext, useMemo, useState } from 'react';
 import * as Immutable from 'immutable';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { BackendWidgetPosition } from 'views/types';
 
-import connect from 'stores/connect';
+import { useStore } from 'stores/connect';
 import { widgetDefinition } from 'views/logic/Widgets';
 import { WidgetActions, Widgets } from 'views/stores/WidgetStore';
 import { TitlesActions } from 'views/stores/TitlesStore';
 import { ViewStore } from 'views/stores/ViewStore';
-import type { ViewStoreState } from 'views/stores/ViewStore';
 import { RefreshActions } from 'views/stores/RefreshStore';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import WidgetModel from 'views/logic/widgets/Widget';
@@ -54,7 +53,6 @@ import InteractiveContext from '../contexts/InteractiveContext';
 
 export type Props = {
   id: string,
-  view: ViewStoreState,
   widget: WidgetModel,
   data?: { [key: string]: Result },
   editing?: boolean,
@@ -90,7 +88,7 @@ const WidgetFooter = styled.div`
   justify-content: flex-end;
 `;
 
-type VisualizationProps = Omit<Props, 'view'> & {
+type VisualizationProps = Pick<Props, 'data' | 'errors' | 'title' | 'id' | 'widget' | 'height' | 'width' | 'fields' | 'editing'> & {
   queryId: string,
   setLoadingState: (loading: boolean) => void,
   onToggleEdit: () => void,
@@ -98,13 +96,14 @@ type VisualizationProps = Omit<Props, 'view'> & {
 };
 
 const Visualization = ({ data, errors, title, id, widget, height, width, fields, queryId, editing, setLoadingState, onToggleEdit, onWidgetConfigChange }: VisualizationProps) => {
+  const VisComponent = useMemo(() => _visualizationForType(widget.type), [widget.type]);
+
   if (errors && errors.length > 0) {
     return <ErrorWidget errors={errors} />;
   }
 
   if (data) {
     const { config, filter } = widget;
-    const VisComponent = _visualizationForType(widget.type);
 
     return (
       <VisComponent config={config}
@@ -140,7 +139,7 @@ type EditWrapperProps = {
 };
 
 const EditWrapper = ({ children, config, editing, fields, id, onToggleEdit, onCancelEdit, onWidgetConfigChange, type }: EditWrapperProps) => {
-  const EditComponent = _editComponentForType(type);
+  const EditComponent = useMemo(() => _editComponentForType(type), [type]);
 
   return editing ? (
     <EditWidgetFrame onFinish={onToggleEdit} onCancel={onCancelEdit}>
@@ -156,7 +155,7 @@ const EditWrapper = ({ children, config, editing, fields, id, onToggleEdit, onCa
   ) : <>{children}</>;
 };
 
-const Widget = ({ id, data, errors, editing, widget, fields, onSizeChange, title, position, onPositionsChange, view }: Props) => {
+const Widget = ({ id, data, errors, editing, height, width, widget, fields, onSizeChange, title, position, onPositionsChange }: Props) => {
   const [loading, setLoading] = useState(false);
   const [oldWidget, setOldWidget] = useState(editing ? widget : undefined);
   const { focusedWidget, setWidgetEditing, unsetWidgetEditing } = useContext(WidgetFocusContext);
@@ -179,6 +178,7 @@ const Widget = ({ id, data, errors, editing, widget, fields, onSizeChange, title
   }, [id, oldWidget, onToggleEdit]);
   const onRenameWidget = useCallback((newTitle: string) => TitlesActions.set('widget', id, newTitle), [id]);
   const onWidgetConfigChange = useCallback((newWidgetConfig: WidgetConfig) => WidgetActions.updateConfig(id, newWidgetConfig), [id]);
+  const activeQuery = useStore(ViewStore, ({ activeQuery: currentQuery }) => currentQuery);
 
   const { config } = widget;
   const isFocused = focusedWidget?.id === id;
@@ -196,7 +196,6 @@ const Widget = ({ id, data, errors, editing, widget, fields, onSizeChange, title
                 <WidgetActionsMenu isFocused={isFocused}
                                    toggleEdit={onToggleEdit}
                                    title={title}
-                                   view={view}
                                    position={position}
                                    onPositionsChange={onPositionsChange} />
               ) : null}
@@ -215,13 +214,12 @@ const Widget = ({ id, data, errors, editing, widget, fields, onSizeChange, title
             <Visualization id={id}
                            data={data}
                            errors={errors}
-                           queryId={view.activeQuery}
+                           queryId={activeQuery}
                            widget={widget}
                            fields={fields}
                            title={title}
-                           position={position}
-                           onSizeChange={onSizeChange}
-                           onPositionsChange={onPositionsChange}
+                           height={height}
+                           width={width}
                            setLoadingState={setLoading}
                            onToggleEdit={onToggleEdit}
                            onWidgetConfigChange={onWidgetConfigChange} />
@@ -229,7 +227,7 @@ const Widget = ({ id, data, errors, editing, widget, fields, onSizeChange, title
         </EditWrapper>
         <WidgetFooter>
           <IfDashboard>
-            {!editing && <TimerangeInfo widget={widget} activeQuery={view.activeQuery} widgetId={id} />}
+            {!editing && <TimerangeInfo widget={widget} activeQuery={activeQuery} widgetId={id} />}
           </IfDashboard>
         </WidgetFooter>
       </WidgetFrame>
@@ -259,4 +257,4 @@ Widget.defaultProps = {
   editing: false,
 };
 
-export default connect(Widget, { view: ViewStore });
+export default Widget;

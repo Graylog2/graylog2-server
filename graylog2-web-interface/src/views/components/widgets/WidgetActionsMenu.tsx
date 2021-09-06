@@ -26,7 +26,7 @@ import { IconButton } from 'components/common';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import { TitlesActions, TitleTypes } from 'views/stores/TitlesStore';
-import { ViewActions } from 'views/stores/ViewStore';
+import { ViewActions, ViewStore } from 'views/stores/ViewStore';
 import View from 'views/logic/views/View';
 import SearchActions from 'views/actions/SearchActions';
 import Search from 'views/logic/search/Search';
@@ -35,6 +35,7 @@ import type { ViewStoreState } from 'views/stores/ViewStore';
 import IfSearch from 'views/components/search/IfSearch';
 import { MenuItem } from 'components/graylog';
 import { WidgetActions } from 'views/stores/WidgetStore';
+import { useStore } from 'stores/connect';
 
 import ReplaySearchButton from './ReplaySearchButton';
 import ExtraWidgetActions from './ExtraWidgetActions';
@@ -135,7 +136,6 @@ type Props = {
   position: WidgetPosition,
   title: string,
   toggleEdit: () => void
-  view: ViewStoreState,
 };
 
 const WidgetActionsMenu = ({
@@ -144,9 +144,9 @@ const WidgetActionsMenu = ({
   position,
   title,
   toggleEdit,
-  view,
 }: Props) => {
   const widget = useContext(WidgetContext);
+  const view = useStore(ViewStore);
   const { setWidgetFocusing, unsetWidgetFocusing } = useContext(WidgetFocusContext);
   const [showCopyToDashboard, setShowCopyToDashboard] = useState(false);
   const [showExport, setShowExport] = useState(false);
