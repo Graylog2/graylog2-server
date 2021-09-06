@@ -17,11 +17,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import Spinner from 'components/common/Spinner';
 import { widgetDefinition } from 'views/logic/Widgets';
 import { IconButton } from 'components/common';
 import { Position } from 'views/components/widgets/WidgetPropTypes';
 
-type Position = {
+type PositionType = {
   col: number,
   row: number,
   height: number,
@@ -29,8 +30,8 @@ type Position = {
 };
 
 type Props = {
-  onStretch: (args: { id: string } & Position) => void,
-  position: Position,
+  onStretch: (args: { id: string } & PositionType) => void,
+  position: PositionType,
   widgetId: string,
   widgetType: string,
 }
@@ -55,6 +56,11 @@ class WidgetHorizontalStretch extends React.Component<Props> {
 
   render() {
     const { position } = this.props;
+
+    if (!position) {
+      return <Spinner />;
+    }
+
     const { width } = position;
     const stretched = width === Infinity;
     const icon = stretched ? 'compress' : 'arrows-alt-h';
