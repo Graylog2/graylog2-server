@@ -62,11 +62,7 @@ const AppFacade = () => {
     );
   }
 
-  console.log({ currentUser, server, sessionId });
-
   if (!currentUser) {
-    console.log('Showing loading message');
-
     return <LoadingPage text="We are preparing Graylog for you..." />;
   }
 
