@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useCallback, useContext, useState } from 'react';
 import * as Immutable from 'immutable';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
@@ -22,7 +23,7 @@ import { BackendWidgetPosition } from 'views/types';
 
 import connect from 'stores/connect';
 import { widgetDefinition } from 'views/logic/Widgets';
-import { WidgetActions } from 'views/stores/WidgetStore';
+import { WidgetActions, Widgets } from 'views/stores/WidgetStore';
 import { TitlesActions } from 'views/stores/TitlesStore';
 import { ViewStore } from 'views/stores/ViewStore';
 import type { ViewStoreState } from 'views/stores/ViewStore';
@@ -37,6 +38,8 @@ import type VisualizationConfig from 'views/logic/aggregationbuilder/visualizati
 import TimerangeInfo from 'views/components/widgets/TimerangeInfo';
 import IfDashboard from 'views/components/dashboard/IfDashboard';
 import { WidgetErrorsList } from 'views/components/widgets/WidgetPropTypes';
+import WidgetConfig from 'views/logic/widgets/WidgetConfig';
+import { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 
 import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';
@@ -65,11 +68,6 @@ export type Props = {
   onPositionsChange: (position: BackendWidgetPosition) => void,
 };
 
-type State = {
-  loading: boolean;
-  oldWidget?: WidgetModel,
-};
-
 export type Result = {
   total: number,
   rows: Rows,
@@ -92,187 +90,173 @@ const WidgetFooter = styled.div`
   justify-content: flex-end;
 `;
 
-class Widget extends React.Component<Props, State> {
-  static propTypes = {
-    data: PropTypes.any,
-    editing: PropTypes.bool,
-    errors: WidgetErrorsList,
-    fields: PropTypes.any.isRequired,
-    height: PropTypes.number,
-    id: PropTypes.string.isRequired,
-    onPositionsChange: PropTypes.func.isRequired,
-    onSizeChange: PropTypes.func.isRequired,
-    title: PropTypes.string.isRequired,
-    widget: PropTypes.instanceOf(WidgetModel).isRequired,
-    width: PropTypes.number,
-  };
+type VisualizationProps = Omit<Props, 'view'> & {
+  queryId: string,
+  setLoadingState: (loading: boolean) => void,
+  onToggleEdit: () => void,
+  onWidgetConfigChange: (newWidgetConfig: WidgetConfig) => Promise<Widgets>,
+};
 
-  static defaultProps = {
-    height: 1,
-    width: 1,
-    data: undefined,
-    errors: undefined,
-    editing: false,
-  };
-
-  constructor(props) {
-    super(props);
-    const { editing } = props;
-
-    this.state = {
-      loading: false,
-    };
-
-    if (editing) {
-      this.state = { ...this.state, oldWidget: props.widget };
-    }
+const Visualization = ({ data, errors, title, id, widget, height, width, fields, queryId, editing, setLoadingState, onToggleEdit, onWidgetConfigChange }: VisualizationProps) => {
+  if (errors && errors.length > 0) {
+    return <ErrorWidget errors={errors} />;
   }
 
-  _onEdit = (setWidgetFocusing) => {
-    const { widget } = this.props;
+  if (data) {
+    const { config, filter } = widget;
+    const VisComponent = _visualizationForType(widget.type);
 
-    this.setState(() => {
-      RefreshActions.disable();
-      setWidgetFocusing({ id: widget.id, editing: true });
+    return (
+      <VisComponent config={config}
+                    data={data}
+                    editing={editing}
+                    fields={fields}
+                    filter={filter}
+                    height={height}
+                    queryId={queryId}
+                    onConfigChange={onWidgetConfigChange}
+                    setLoadingState={setLoadingState}
+                    title={title}
+                    toggleEdit={onToggleEdit}
+                    type={widget.type}
+                    width={width}
+                    id={id} />
+    );
+  }
 
-      return {
-        oldWidget: widget,
-      };
-    });
-  };
+  return <LoadingWidget />;
+};
 
-  _onToggleEdit = () => {
-    const { widget, editing } = this.props;
-    const { setWidgetEditing, unsetWidgetEditing } = this.context;
+type EditWrapperProps = {
+  children: React.ReactNode,
+  config: WidgetConfig,
+  editing: boolean,
+  fields: FieldTypeMappingsList,
+  id: string,
+  onToggleEdit: () => void,
+  onCancelEdit: () => void,
+  onWidgetConfigChange: (newWidgetConfig: WidgetConfig) => void,
+  type: string,
+};
 
-    this.setState(() => {
-      if (editing) {
-        unsetWidgetEditing();
+const EditWrapper = ({ children, config, editing, fields, id, onToggleEdit, onCancelEdit, onWidgetConfigChange, type }: EditWrapperProps) => {
+  const EditComponent = _editComponentForType(type);
 
-        return {
-          oldWidget: undefined,
-        };
-      }
+  return editing ? (
+    <EditWidgetFrame onFinish={onToggleEdit} onCancel={onCancelEdit}>
+      <EditComponent config={config}
+                     fields={fields}
+                     editing={editing}
+                     id={id}
+                     type={type}
+                     onChange={onWidgetConfigChange}>
+        {children}
+      </EditComponent>
+    </EditWidgetFrame>
+  ) : <>{children}</>;
+};
 
+const Widget = ({ id, data, errors, editing, widget, fields, onSizeChange, title, position, onPositionsChange, view }: Props) => {
+  const [loading, setLoading] = useState(false);
+  const [oldWidget, setOldWidget] = useState(editing ? widget : undefined);
+  const { focusedWidget, setWidgetEditing, unsetWidgetEditing } = useContext(WidgetFocusContext);
+  const onToggleEdit = useCallback(() => {
+    if (editing) {
+      unsetWidgetEditing();
+      setOldWidget(undefined);
+    } else {
       RefreshActions.disable();
       setWidgetEditing(widget.id);
-
-      return {
-        oldWidget: widget,
-      };
-    });
-  };
-
-  _onCancelEdit = () => {
-    const { oldWidget } = this.state;
-
+      setOldWidget(widget);
+    }
+  }, [editing, setWidgetEditing, unsetWidgetEditing, widget]);
+  const onCancelEdit = useCallback(() => {
     if (oldWidget) {
-      const { id } = this.props;
-
       WidgetActions.update(id, oldWidget);
     }
 
-    this._onToggleEdit();
-  };
+    onToggleEdit();
+  }, [id, oldWidget, onToggleEdit]);
+  const onRenameWidget = useCallback((newTitle: string) => TitlesActions.set('widget', id, newTitle), [id]);
+  const onWidgetConfigChange = useCallback((newWidgetConfig: WidgetConfig) => WidgetActions.updateConfig(id, newWidgetConfig), [id]);
 
-  _onWidgetConfigChange = (widgetId, config) => WidgetActions.updateConfig(widgetId, config);
+  const { config } = widget;
+  const isFocused = focusedWidget?.id === id;
 
-  _setLoadingState = (loading: boolean) => this.setState({ loading });
-
-  visualize = () => {
-    const { data, errors, title } = this.props;
-
-    if (errors && errors.length > 0) {
-      return <ErrorWidget errors={errors} />;
-    }
-
-    if (data) {
-      const { id, widget, height, width, fields, view: { activeQuery: queryId }, editing } = this.props;
-      const { config, filter } = widget;
-      const VisComponent = _visualizationForType(widget.type);
-
-      return (
-        <VisComponent config={config}
-                      data={data}
-                      editing={editing}
-                      fields={fields}
-                      filter={filter}
-                      height={height}
-                      queryId={queryId}
-                      onConfigChange={(newWidgetConfig) => this._onWidgetConfigChange(id, newWidgetConfig)}
-                      setLoadingState={this._setLoadingState}
-                      title={title}
-                      toggleEdit={() => this._onToggleEdit()}
-                      type={widget.type}
-                      width={width}
-                      id={id} />
-      );
-    }
-
-    return <LoadingWidget />;
-  };
-
-  // TODO: Clean up different code paths for normal/edit modes
-  render() {
-    const { id, widget, fields, onSizeChange, title, position, onPositionsChange, view, editing } = this.props;
-    const { loading } = this.state;
-
-    const { config } = widget;
-    const { focusedWidget } = this.context;
-    const isFocused = focusedWidget?.id === id;
-    const visualization = this.visualize();
-    const EditComponent = _editComponentForType(widget.type);
-
-    return (
-      <WidgetColorContext id={id}>
-        <WidgetFrame widgetId={id} onSizeChange={onSizeChange}>
-          <InteractiveContext.Consumer>
-            {(interactive) => (
-              <WidgetHeader title={title}
-                            hideDragHandle={!interactive || isFocused}
-                            loading={loading}
-                            onRename={(newTitle) => TitlesActions.set('widget', id, newTitle)}>
-                {!editing ? (
-                  <WidgetActionsMenu isFocused={isFocused}
-                                     toggleEdit={this._onToggleEdit}
-                                     title={title}
-                                     view={view}
-                                     position={position}
-                                     onPositionsChange={onPositionsChange} />
-                ) : null}
-              </WidgetHeader>
-            )}
-          </InteractiveContext.Consumer>
-          {editing && (
-            <EditWidgetFrame onFinish={this._onToggleEdit} onCancel={this._onCancelEdit}>
-              <EditComponent config={config}
-                             fields={fields}
-                             editing={editing}
-                             id={id}
-                             type={widget.type}
-                             onChange={(newWidgetConfig) => this._onWidgetConfigChange(id, newWidgetConfig)}>
-                <WidgetErrorBoundary>
-                  {visualization}
-                </WidgetErrorBoundary>
-              </EditComponent>
-            </EditWidgetFrame>
+  return (
+    <WidgetColorContext id={id}>
+      <WidgetFrame widgetId={id} onSizeChange={onSizeChange}>
+        <InteractiveContext.Consumer>
+          {(interactive) => (
+            <WidgetHeader title={title}
+                          hideDragHandle={!interactive || isFocused}
+                          loading={loading}
+                          onRename={onRenameWidget}>
+              {!editing ? (
+                <WidgetActionsMenu isFocused={isFocused}
+                                   toggleEdit={onToggleEdit}
+                                   title={title}
+                                   view={view}
+                                   position={position}
+                                   onPositionsChange={onPositionsChange} />
+              ) : null}
+            </WidgetHeader>
           )}
-          {!editing && (
-            <WidgetErrorBoundary>
-              {visualization}
-            </WidgetErrorBoundary>
-          )}
-          <WidgetFooter>
-            <IfDashboard>
-              {!editing && <TimerangeInfo widget={widget} activeQuery={view.activeQuery} widgetId={id} />}
-            </IfDashboard>
-          </WidgetFooter>
-        </WidgetFrame>
-      </WidgetColorContext>
-    );
-  }
-}
+        </InteractiveContext.Consumer>
+        <EditWrapper onToggleEdit={onToggleEdit}
+                     onCancelEdit={onCancelEdit}
+                     onWidgetConfigChange={onWidgetConfigChange}
+                     config={config}
+                     editing={editing}
+                     fields={fields}
+                     id={id}
+                     type={widget.type}>
+          <WidgetErrorBoundary>
+            <Visualization id={id}
+                           data={data}
+                           errors={errors}
+                           queryId={view.activeQuery}
+                           widget={widget}
+                           fields={fields}
+                           title={title}
+                           position={position}
+                           onSizeChange={onSizeChange}
+                           onPositionsChange={onPositionsChange}
+                           setLoadingState={setLoading}
+                           onToggleEdit={onToggleEdit}
+                           onWidgetConfigChange={onWidgetConfigChange} />
+          </WidgetErrorBoundary>
+        </EditWrapper>
+        <WidgetFooter>
+          <IfDashboard>
+            {!editing && <TimerangeInfo widget={widget} activeQuery={view.activeQuery} widgetId={id} />}
+          </IfDashboard>
+        </WidgetFooter>
+      </WidgetFrame>
+    </WidgetColorContext>
+  );
+};
 
-Widget.contextType = WidgetFocusContext;
+Widget.propTypes = {
+  data: PropTypes.any,
+  editing: PropTypes.bool,
+  errors: WidgetErrorsList,
+  fields: PropTypes.any.isRequired,
+  height: PropTypes.number,
+  id: PropTypes.string.isRequired,
+  onPositionsChange: PropTypes.func.isRequired,
+  onSizeChange: PropTypes.func.isRequired,
+  title: PropTypes.string.isRequired,
+  widget: PropTypes.instanceOf(WidgetModel).isRequired,
+  width: PropTypes.number,
+};
+
+Widget.defaultProps = {
+  height: 1,
+  width: 1,
+  data: undefined,
+  errors: undefined,
+  editing: false,
+};
 
 export default connect(Widget, { view: ViewStore });
