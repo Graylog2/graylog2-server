@@ -205,10 +205,9 @@ export type MessagePreviewOption = {
   sort: number,
 }
 
-export type MessageSummaryProps = {
-  messageFields: { [key: string]: any },
-  renderMessageRow: () => React.ReactNode;
-  config: MessagesWidgetConfig,
+type MessageAugmentation = {
+  id: string,
+  component: React.ComponentType<{ message: Message }>,
 }
 
 declare module 'graylog-web-plugin/plugin' {
@@ -217,6 +216,7 @@ declare module 'graylog-web-plugin/plugin' {
     enterpriseWidgets?: Array<WidgetExport>;
     externalValueActions?: Array<ActionDefinition>;
     fieldActions?: Array<ActionDefinition>;
+    messageAugmentations?: Array<MessageAugmentation>;
     searchTypes?: Array<SearchType>;
     systemConfigurations?: Array<SystemConfiguration>;
     valueActions?: Array<ActionDefinition>;

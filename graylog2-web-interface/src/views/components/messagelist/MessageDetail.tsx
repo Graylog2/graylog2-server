@@ -37,8 +37,9 @@ import { useStore } from 'stores/connect';
 import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 
 import NodeName from './NodeName';
-import MessageMetadata from './MessageMetadata';
 import MessageActions from './MessageActions';
+import MessageAugmentations from './MessageAugmentations';
+import MessageMetadata from './MessageMetadata';
 
 const _inputName = (inputs: Props['inputs'], inputId: string) => {
   // eslint-disable-next-line react/destructuring-assignment
@@ -186,12 +187,13 @@ const MessageDetail = ({
           </MessageDetailsTitle>
         </Col>
       </Row>
-      <Row>
+      <Row id={`sticky-augmentations-boundary-${message.id}`}>
         <Col md={3}>
           <MessageMetadata timestamp={timestamp}
                            index={index}
                            receivedBy={<FormatReceivedBy inputs={inputs} sourceNodeId={gl2_source_node} sourceInputId={gl2_source_input} />}
                            streams={streamsListItems} />
+          <MessageAugmentations message={message} />
         </Col>
         <Col md={9}>
           <MessageFields message={message}
