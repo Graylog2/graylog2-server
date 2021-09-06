@@ -31,7 +31,6 @@ import { TitlesStore } from 'views/stores/TitlesStore';
 import defaultTitle from 'views/components/defaultTitle';
 import { WidgetStore } from 'views/stores/WidgetStore';
 import TitleTypes from 'views/stores/TitleTypes';
-import useWidgetResults from 'views/components/useWidgetResults';
 
 import { Position } from './widgets/WidgetPropTypes';
 import Widget from './widgets/Widget';
@@ -58,7 +57,6 @@ const WidgetComponent = ({
   widgetDimension: { height, width },
 }: Props) => {
   const widget = useStore(WidgetStore, (state) => state.get(widgetId));
-  const { widgetData, error: widgetErrors = [] } = useWidgetResults(widgetId);
   const viewType = useContext(ViewTypeContext);
   const title = useStore(TitlesStore, (titles) => titles.getIn([TitleTypes.Widget, widget.id], defaultTitle(widget)) as string);
 
@@ -70,9 +68,7 @@ const WidgetComponent = ({
         <AdditionalContext.Provider value={{ widget }}>
           <ExportSettingsContextProvider>
             <WidgetFieldTypesIfDashboard>
-              <Widget data={widgetData as React.ComponentProps<typeof Widget>['data']}
-                      editing={editing}
-                      errors={widgetErrors}
+              <Widget editing={editing}
                       fields={fields}
                       height={height}
                       id={widget.id}

@@ -19,7 +19,7 @@ import { useCallback, useContext, useMemo, useState } from 'react';
 import * as Immutable from 'immutable';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { BackendWidgetPosition } from 'views/types';
+import { BackendWidgetPosition, WidgetResults } from 'views/types';
 
 import { useStore } from 'stores/connect';
 import { widgetDefinition } from 'views/logic/Widgets';
@@ -36,9 +36,9 @@ import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import type VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 import TimerangeInfo from 'views/components/widgets/TimerangeInfo';
 import IfDashboard from 'views/components/dashboard/IfDashboard';
-import { WidgetErrorsList } from 'views/components/widgets/WidgetPropTypes';
 import WidgetConfig from 'views/logic/widgets/WidgetConfig';
 import { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
+import useWidgetResults from 'views/components/useWidgetResults';
 
 import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';
@@ -54,9 +54,7 @@ import InteractiveContext from '../contexts/InteractiveContext';
 export type Props = {
   id: string,
   widget: WidgetModel,
-  data?: { [key: string]: Result },
   editing?: boolean,
-  errors?: Array<{ description: string }>,
   fields: Immutable.List<FieldTypeMapping>,
   height?: number,
   width?: number,
@@ -88,15 +86,16 @@ const WidgetFooter = styled.div`
   justify-content: flex-end;
 `;
 
-type VisualizationProps = Pick<Props, 'data' | 'errors' | 'title' | 'id' | 'widget' | 'height' | 'width' | 'fields' | 'editing'> & {
+type VisualizationProps = Pick<Props, 'title' | 'id' | 'widget' | 'height' | 'width' | 'fields' | 'editing'> & {
   queryId: string,
   setLoadingState: (loading: boolean) => void,
   onToggleEdit: () => void,
   onWidgetConfigChange: (newWidgetConfig: WidgetConfig) => Promise<Widgets>,
 };
 
-const Visualization = ({ data, errors, title, id, widget, height, width, fields, queryId, editing, setLoadingState, onToggleEdit, onWidgetConfigChange }: VisualizationProps) => {
+const Visualization = ({ title, id, widget, height, width, fields, queryId, editing, setLoadingState, onToggleEdit, onWidgetConfigChange }: VisualizationProps) => {
   const VisComponent = useMemo(() => _visualizationForType(widget.type), [widget.type]);
+  const { error: errors, widgetData: data } = useWidgetResults(id);
 
   if (errors && errors.length > 0) {
     return <ErrorWidget errors={errors} />;
@@ -107,7 +106,7 @@ const Visualization = ({ data, errors, title, id, widget, height, width, fields,
 
     return (
       <VisComponent config={config}
-                    data={data}
+                    data={data as WidgetResults}
                     editing={editing}
                     fields={fields}
                     filter={filter}
@@ -155,7 +154,7 @@ const EditWrapper = ({ children, config, editing, fields, id, onToggleEdit, onCa
   ) : <>{children}</>;
 };
 
-const Widget = ({ id, data, errors, editing, height, width, widget, fields, onSizeChange, title, position, onPositionsChange }: Props) => {
+const Widget = ({ id, editing, height, width, widget, fields, onSizeChange, title, position, onPositionsChange }: Props) => {
   const [loading, setLoading] = useState(false);
   const [oldWidget, setOldWidget] = useState(editing ? widget : undefined);
   const { focusedWidget, setWidgetEditing, unsetWidgetEditing } = useContext(WidgetFocusContext);
@@ -212,8 +211,6 @@ const Widget = ({ id, data, errors, editing, height, width, widget, fields, onSi
                      type={widget.type}>
           <WidgetErrorBoundary>
             <Visualization id={id}
-                           data={data}
-                           errors={errors}
                            queryId={activeQuery}
                            widget={widget}
                            fields={fields}
@@ -236,9 +233,7 @@ const Widget = ({ id, data, errors, editing, height, width, widget, fields, onSi
 };
 
 Widget.propTypes = {
-  data: PropTypes.any,
   editing: PropTypes.bool,
-  errors: WidgetErrorsList,
   fields: PropTypes.any.isRequired,
   height: PropTypes.number,
   id: PropTypes.string.isRequired,
@@ -252,8 +247,6 @@ Widget.propTypes = {
 Widget.defaultProps = {
   height: 1,
   width: 1,
-  data: undefined,
-  errors: undefined,
   editing: false,
 };
 
