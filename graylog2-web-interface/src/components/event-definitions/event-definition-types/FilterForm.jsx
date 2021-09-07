@@ -229,7 +229,7 @@ class FilterForm extends React.Component {
     if (!this._userCanViewLookupTables()) {
       return (
         <Alert bsStyle="info">
-          Only Admins are able to declare Query Parameters from Lookup Tables.
+          This account lacks permission to declare Query Parameters from Lookup Tables.
         </Alert>
       );
     }
