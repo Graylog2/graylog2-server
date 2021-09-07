@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 /// <reference types="jest-enzyme" />
-import React from 'react';
+import * as React from 'react';
 import { act } from 'react-dom/test-utils';
 import { mount } from 'wrappedEnzyme';
 import Reflux from 'reflux';
@@ -38,9 +38,7 @@ import {
 
 import connect, { useStore } from '../connect';
 
-const SimpleComponentWithoutStores = () => <span>Hello World!</span>;
-
-const SimpleStore = Reflux.createStore<{ value: number }>({
+const createSimpleStore = () => Reflux.createStore<{ value: number }>({
   getInitialState() {
     return this.state;
   },
@@ -55,27 +53,31 @@ const SimpleStore = Reflux.createStore<{ value: number }>({
   },
 });
 
-const SimpleComponentWithDummyStore = ({ simpleStore }) => {
-  if (simpleStore && simpleStore.value) {
-    return <span>Value is: {simpleStore.value}</span>;
-  }
-
-  return <span>No value.</span>;
-};
-
-SimpleComponentWithDummyStore.propTypes = {
-  simpleStore: PropTypes.shape({
-    value: PropTypes.number,
-  }),
-};
-
-SimpleComponentWithDummyStore.defaultProps = {
-  simpleStore: undefined,
-};
-
 describe('connect()', () => {
+  const SimpleComponentWithoutStores = () => <span>Hello World!</span>;
+
+  const SimpleComponentWithDummyStore = ({ simpleStore }) => {
+    if (simpleStore && simpleStore.value) {
+      return <span>Value is: {simpleStore.value}</span>;
+    }
+
+    return <span>No value.</span>;
+  };
+
+  SimpleComponentWithDummyStore.propTypes = {
+    simpleStore: PropTypes.shape({
+      value: PropTypes.number,
+    }),
+  };
+
+  SimpleComponentWithDummyStore.defaultProps = {
+    simpleStore: undefined,
+  };
+
+  let SimpleStore: ReturnType<typeof createSimpleStore>;
+
   beforeEach(() => {
-    SimpleStore.reset();
+    SimpleStore = createSimpleStore();
   });
 
   it('does not do anything if no stores are provided', () => {
@@ -258,6 +260,8 @@ describe('connect()', () => {
 });
 
 describe('useStore', () => {
+  let SimpleStore: ReturnType<typeof createSimpleStore>;
+
   const SimpleComponent = () => {
     const { value } = useStore(SimpleStore) || {};
 
@@ -265,7 +269,8 @@ describe('useStore', () => {
   };
 
   beforeEach(() => {
-    act(() => SimpleStore.reset());
+    SimpleStore = createSimpleStore();
+    jest.clearAllMocks();
   });
 
   it('renders state from store', () => {
@@ -340,8 +345,32 @@ describe('useStore', () => {
     expect(renderCount).toEqual(beforeSecondSet);
   });
 
-  it('does not reregister if props mapper is provided as arrow function', () => {
+  it('does not reregister if same props mapper is provided', () => {
     const listenSpy = jest.spyOn(SimpleStore, 'listen');
+    const _propsMapper = (x) => x;
+
+    const ComponentWithPropsMapper = ({ propsMapper }: { propsMapper: (state: { value: number }) => ({ value: number }) }) => {
+      const { value } = useStore(SimpleStore, propsMapper) || { value: undefined };
+
+      return <span>{value ? `Value is: ${value}` : 'No value.'}</span>;
+    };
+
+    expect(listenSpy).toHaveBeenCalledTimes(0);
+
+    const wrapper = mount(<ComponentWithPropsMapper propsMapper={_propsMapper} />);
+
+    expect(wrapper).toHaveText('No value.');
+
+    wrapper.setProps({ propsMapper: _propsMapper });
+    act(() => SimpleStore.setValue(42));
+
+    expect(wrapper).toHaveText('Value is: 42');
+
+    expect(listenSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('reretrieves store state when props mapper function changes', () => {
+    act(() => SimpleStore.setValue(42));
 
     const ComponentWithPropsMapper = ({ propsMapper }: { propsMapper: (state: { value: number }) => ({ value: number }) }) => {
       const { value } = useStore(SimpleStore, propsMapper) || { value: undefined };
@@ -351,13 +380,60 @@ describe('useStore', () => {
 
     const wrapper = mount(<ComponentWithPropsMapper propsMapper={(x) => x} />);
 
-    expect(wrapper).toHaveText('No value.');
+    expect(wrapper).toHaveText('Value is: 42');
 
     wrapper.setProps({ propsMapper: ({ value: v } = { value: 0 }) => ({ value: v * 2 }) });
-    act(() => SimpleStore.setValue(42));
 
     expect(wrapper).toHaveText('Value is: 84');
+  });
 
-    expect(listenSpy).toHaveBeenCalledTimes(1);
+  it('does not rerender component if mapped state is constant', () => {
+    act(() => SimpleStore.setValue(3));
+
+    const ComponentWithPropsMapper = () => {
+      const value = useStore(SimpleStore, (state) => (state.value % 2 === 0 ? 'even' : 'odd'));
+
+      return <span>Value is: {value}</span>;
+    };
+
+    const onRender = jest.fn();
+
+    const wrapper = mount(<React.Profiler id="useStore" onRender={onRender}><ComponentWithPropsMapper /></React.Profiler>);
+
+    expect(wrapper).toHaveText('Value is: odd');
+
+    act(() => SimpleStore.setValue(9));
+
+    expect(wrapper).toHaveText('Value is: odd');
+
+    expect(onRender).toHaveBeenCalledTimes(1);
+
+    act(() => SimpleStore.setValue(6));
+
+    expect(wrapper).toHaveText('Value is: even');
+
+    expect(onRender).toHaveBeenCalledTimes(2);
+  });
+
+  it('allows connecting states of different stores', () => {
+    const AnotherSimpleStore = createSimpleStore();
+
+    act(() => SimpleStore.setValue(2));
+    act(() => AnotherSimpleStore.setValue(3));
+
+    const ComponentWithPropsMapper = () => {
+      const value1 = useStore(SimpleStore, (state) => state?.value ?? 0);
+      const value2 = useStore(AnotherSimpleStore, (state) => (state?.value ?? 0) * value1);
+
+      return <span>Value is: {value2}</span>;
+    };
+
+    const wrapper = mount(<ComponentWithPropsMapper />);
+
+    expect(wrapper).toHaveText('Value is: 6');
+
+    act(() => SimpleStore.setValue(3));
+
+    expect(wrapper).toHaveText('Value is: 9');
   });
 });
