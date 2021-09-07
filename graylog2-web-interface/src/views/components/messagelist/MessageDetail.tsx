@@ -188,3 +188,5 @@ MessageDetail.defaultProps = {
   showTimestamp: true,
   streams: Immutable.Map(),
 };
+
+export default MessageDetail;
