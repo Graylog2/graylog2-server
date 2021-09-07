@@ -60,15 +60,18 @@ type WidgetResults = {
 
 const useWidgetResults = (widgetId: string) => {
   const { widgetMapping, results } = useStore(SearchStore, ({ result: r, widgetMapping: w }) => ({ results: r, widgetMapping: w }));
-  const widgets = useStore(WidgetStore);
+  const widget = useStore(WidgetStore, (widgets) => widgets.get(widgetId));
   const currentQueryId = useStore(ViewStore, ({ activeQuery }) => activeQuery);
-  const currentQueryResults = useMemo(() => results?.forId(currentQueryId), [currentQueryId, results]);
 
-  const widgetResults = useMemo(() => (currentQueryResults
-    ? widgets.map((widget) => _getDataAndErrors(widget, widgetMapping, currentQueryResults)).toMap()
-    : Immutable.Map()), [currentQueryResults, widgetMapping, widgets]);
+  const widgetResults = useMemo(() => {
+    const currentQueryResults = results?.forId(currentQueryId);
 
-  return widgetResults.get(widgetId, { widgetData: undefined, error: [] }) as WidgetResults;
+    return (currentQueryResults
+      ? _getDataAndErrors(widget, widgetMapping, currentQueryResults)
+      : { widgetData: undefined, error: [] });
+  }, [currentQueryId, results, widget, widgetMapping]);
+
+  return widgetResults as WidgetResults;
 };
 
 export default useWidgetResults;
