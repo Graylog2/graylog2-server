@@ -111,12 +111,6 @@ const URLUtils = {
 
     return isValid;
   },
-  isCallbackUrl() {
-    const uri = new URI(window.location.href);
-
-    return uri.path() === '/authorization-code/callback';
-  },
-
   hasAcceptedProtocol(string: string, acceptedProtocols = ACCEPTED_PROTOCOLS) {
     // eslint-disable-next-line compat/compat
     const url = new URL(string);
@@ -150,6 +144,5 @@ export const {
   concatURLPath,
   areCredentialsInURLSupported,
   isValidURL,
-  isCallbackUrl,
   hasAcceptedProtocol,
 } = URLUtils;
