@@ -104,8 +104,7 @@ class DateTimeConverterTest {
 
         final DateTime output = DateTimeConverter.convertToDateTime(input);
 
-        // represented in local timezone, but then converted to UTC
-        //final DateTime expectedOutput = new DateTime(2021, 8, 19, 12, 0).withZone(DateTimeZone.UTC);
+        // both input and output are represented with local timezone.
         final DateTime expectedOutput = new DateTime(2021, 8, 19, 12, 0);
         assertThat(output).isEqualTo(expectedOutput);
     }
