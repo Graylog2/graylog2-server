@@ -27,7 +27,7 @@ type Props = {
 };
 
 const MessageDetailProviders = ({ children, message }: Props) => {
-  const contextProviders = usePluginEntities('views.widgets.messageDetails.contextProvider');
+  const contextProviders = usePluginEntities('views.components.widgets.messageDetails.contextProviders');
 
   if (!contextProviders || contextProviders?.length === 0) {
     return children;

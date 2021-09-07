@@ -227,6 +227,7 @@ declare module 'graylog-web-plugin/plugin' {
     'views.completers'?: Array<Completer>;
     'views.components.widgets.messageTable.previewOptions'?: Array<MessagePreviewOption>;
     'views.components.widgets.messageTable.messageRowOverride'?: Array<React.ComponentType<MessageRowOverrideProps>>;
+    'views.components.widgets.messageDetails.contextProviders'?: Array<React.ComponentType<MessageDetailContextProviderProps>>,
     'views.elements.header'?: Array<React.ComponentType>;
     'views.elements.queryBar'?: Array<React.ComponentType>;
     'views.export.formats'?: Array<ExportFormat>;
@@ -236,7 +237,6 @@ declare module 'graylog-web-plugin/plugin' {
     'views.hooks.copyWidgetToDashboard'?: Array<CopyWidgetToDashboardHook>;
     'views.overrides.widgetEdit'?: Array<React.ComponentType<OverrideProps>>;
     'views.widgets.actions'?: Array<WidgetActionType>;
-    'views.widgets.messageDetails.contextProvider'?: Array<React.ComponentType<MessageDetailContextProviderProps>>,
     'views.requires.provided'?: Array<string>;
     visualizationConfigTypes?: Array<VisualizationConfigType>;
     visualizationTypes?: Array<VisualizationType>;
