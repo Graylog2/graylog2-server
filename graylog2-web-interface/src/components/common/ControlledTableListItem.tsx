@@ -19,7 +19,7 @@ import PropTypes from 'prop-types';
 
 import { ListGroupItem } from 'components/graylog';
 
-const ControlledTableListItem = ({ className, children }: { className: string | string[], children: React.ReactNode }) => {
+const ControlledTableListItem = ({ className, children }: { className?: string, children: React.ReactNode }) => {
   return (
     <ListGroupItem className={className}>
       {children}
@@ -29,6 +29,11 @@ const ControlledTableListItem = ({ className, children }: { className: string | 
 
 ControlledTableListItem.propTypes = {
   children: PropTypes.node.isRequired,
+  className: PropTypes.string,
+};
+
+ControlledTableListItem.defaultProps = {
+  className: undefined,
 };
 
 export default ControlledTableListItem;
