@@ -250,7 +250,7 @@ public abstract class Query implements ContentPackable<QueryEntity> {
         }
 
         public Query build() {
-            if(id() == null) {
+            if (id() == null) {
                 id(UUID.randomUUID().toString());
             }
             return autoBuild();

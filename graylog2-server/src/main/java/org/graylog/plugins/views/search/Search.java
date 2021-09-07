@@ -222,7 +222,7 @@ public abstract class Search implements ContentPackable<SearchEntity> {
 
         public Search build() {
 
-            if(id() == null) {
+            if (id() == null) {
                 id(org.bson.types.ObjectId.get().toString());
             }
 

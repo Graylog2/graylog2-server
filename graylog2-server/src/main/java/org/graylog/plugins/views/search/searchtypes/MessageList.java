@@ -179,7 +179,7 @@ public abstract class MessageList implements SearchType {
         abstract MessageList autoBuild();
 
         public MessageList build() {
-            if(id() == null) {
+            if (id() == null) {
                 id(UUID.randomUUID().toString());
             }
             return autoBuild();

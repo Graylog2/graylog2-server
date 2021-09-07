@@ -159,7 +159,7 @@ public abstract class Pivot implements SearchType {
         abstract Pivot autoBuild();
 
         public Pivot build() {
-            if(id() == null) {
+            if (id() == null) {
                 id(UUID.randomUUID().toString());
             }
             return autoBuild();
