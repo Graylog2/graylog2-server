@@ -26,8 +26,6 @@ import WidgetGrid from 'views/components/WidgetGrid';
 import { useStore } from 'stores/connect';
 import { WidgetStore } from 'views/stores/WidgetStore';
 
-import InteractiveContext from './contexts/InteractiveContext';
-
 const StyledJumbotron = styled(Jumbotron)(({ theme }) => css`
   .container-fluid & {
     border: 1px solid ${theme.colors.gray[80]};
@@ -36,14 +34,6 @@ const StyledJumbotron = styled(Jumbotron)(({ theme }) => css`
     margin-bottom: 0;
   }
 `);
-
-const RenderedWidgetGrid = () => (
-  <InteractiveContext.Consumer>
-    {(interactive) => (
-      <WidgetGrid locked={!interactive} />
-    )}
-  </InteractiveContext.Consumer>
-);
 
 const NoWidgetsInfo = () => (
   <StyledJumbotron>
@@ -82,7 +72,7 @@ const Query = () => {
   const hasWidgets = useHasWidgets();
 
   return hasWidgets
-    ? <RenderedWidgetGrid />
+    ? <WidgetGrid />
     : <NoWidgetsInfo />;
 };
 

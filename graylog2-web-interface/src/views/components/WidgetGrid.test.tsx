@@ -74,7 +74,7 @@ describe('<WidgetGrid />', () => {
     all: Immutable.List(),
     queryFields: Immutable.Map(),
   };
-  const SimpleWidgetGrid = (props) => <FieldTypesContext.Provider value={fieldTypes}><WidgetGrid {...props} /></FieldTypesContext.Provider>;
+  const SimpleWidgetGrid = () => <FieldTypesContext.Provider value={fieldTypes}><WidgetGrid /></FieldTypesContext.Provider>;
 
   it('should render with minimal props', () => {
     const wrapper = mount((

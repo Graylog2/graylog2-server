@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useState, useContext, useMemo } from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import { SizeMe } from 'react-sizeme';
 import { WidgetPositions, BackendWidgetPosition } from 'views/types';
@@ -30,6 +29,7 @@ import { useStore } from 'stores/connect';
 import { WidgetStore } from 'views/stores/WidgetStore';
 import { CurrentViewStateStore, CurrentViewStateActions } from 'views/stores/CurrentViewStateStore';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
+import InteractiveContext from 'views/components/contexts/InteractiveContext';
 import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 
 import WidgetContainer from './WidgetContainer';
@@ -71,10 +71,6 @@ const _onWidgetSizeChange = (
   setWidgetDimensions: (newWidgetDimensions: { [widgetId: string]: WidgetDimensions }) => void,
 ) => (widgetId: string, dimensions: WidgetDimensions) => {
   setWidgetDimensions({ ...widgetDimensions, [widgetId]: dimensions });
-};
-
-type Props = {
-  locked?: boolean,
 };
 
 type WidgetsProps = {
@@ -175,7 +171,8 @@ const onPositionsChange = (newPositions: Array<BackendWidgetPosition>) => {
   CurrentViewStateActions.widgetPositions(widgetPositions);
 };
 
-const WidgetGrid = ({ locked }: Props) => {
+const WidgetGrid = () => {
+  const isInteractive = useContext(InteractiveContext);
   const { focusedWidget } = useContext(WidgetFocusContext);
   const [widgetDimensions, setWidgetDimensions] = useState({});
 
@@ -189,7 +186,7 @@ const WidgetGrid = ({ locked }: Props) => {
   // when its content height results in a scrollbar
   return (
     <DashboardWrap>
-      <Grid locked={locked}
+      <Grid locked={!isInteractive}
             onPositionsChange={onPositionsChange}>
         {widgets.map(({ id: widgetId }) => (
           <WidgetContainer key={widgetId} isFocused={focusedWidget?.id === widgetId && focusedWidget?.focusing}>
@@ -208,14 +205,6 @@ const WidgetGrid = ({ locked }: Props) => {
 };
 
 WidgetGrid.displayName = 'WidgetGrid';
-
-WidgetGrid.propTypes = {
-  locked: PropTypes.bool,
-};
-
-WidgetGrid.defaultProps = {
-  locked: true,
-};
 
 const MemoizedWidgetGrid = React.memo(WidgetGrid);
 
