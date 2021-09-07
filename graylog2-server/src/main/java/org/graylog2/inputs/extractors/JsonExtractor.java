@@ -97,7 +97,7 @@ public class JsonExtractor extends Extractor {
         try {
             extractedJson = extractJson(value);
         } catch (IOException e) {
-            return new Result[]{new Result(null, null, -1, -1, e)};
+            throw new ExtractorException(e);
         }
         final List<Result> results = new ArrayList<>(extractedJson.size());
         for (Map.Entry<String, Object> entry : extractedJson.entrySet()) {

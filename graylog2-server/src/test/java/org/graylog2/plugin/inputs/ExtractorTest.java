@@ -23,6 +23,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.graylog.failure.ProcessingFailureCause;
+import org.graylog2.inputs.extractors.ExtractorException;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.inputs.Extractor.Result;
 import org.joda.time.DateTime;
@@ -31,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -868,9 +870,7 @@ public class ExtractorTest {
                 .callback(new Callable<Result[]>() {
                     @Override
                     public Result[] call() throws Exception {
-                        return new Result[]{
-                                new Result(null, null, -1, -1, new IllegalStateException("BARF"))
-                        };
+                        throw new ExtractorException(new IOException("BARF"));
                     }
                 })
                 .build();
@@ -990,6 +990,9 @@ public class ExtractorTest {
             try {
                 return callback.call();
             } catch (Exception e) {
+                if (e instanceof ExtractorException) {
+                    throw (ExtractorException) e;
+                }
                 LOG.error("Error calling callback", e);
                 return null;
             }
