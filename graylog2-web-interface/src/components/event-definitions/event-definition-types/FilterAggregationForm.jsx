@@ -55,6 +55,11 @@ class FilterAggregationForm extends React.Component {
     currentUser: PropTypes.object.isRequired,
   };
 
+  static defaultConfig = {
+    ...initialFilterConfig,
+    ...initialAggregationConfig,
+  };
+
   constructor(props) {
     super(props);
 
@@ -117,11 +122,6 @@ class FilterAggregationForm extends React.Component {
     this.propagateChange(name, FormsUtils.getValueFromInput(event.target));
   };
 
-  static defaultConfig = {
-    ...initialFilterConfig,
-    ...initialAggregationConfig,
-  };
-
   render() {
     const { conditionType } = this.state;
     const { allFieldTypes, entityTypes, eventDefinition, streams, validation, currentUser } = this.props;
@@ -132,7 +132,7 @@ class FilterAggregationForm extends React.Component {
           <Col md={7} lg={6}>
             <FilterForm eventDefinition={eventDefinition}
                         validation={validation}
-                        streams={streams}
+                        streams={streams.filter((s) => s.is_editable)}
                         currentUser={currentUser}
                         onChange={this.propagateChange} />
 

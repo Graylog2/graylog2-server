@@ -15,11 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
-import { LinkContainer, Link } from 'components/graylog/router';
-import { Col, Label, DropdownButton, MenuItem, Button } from 'components/graylog';
+import { Link, LinkContainer } from 'components/graylog/router';
+import { Button, Col, DropdownButton, Label, MenuItem } from 'components/graylog';
 import { EntityList, EntityListItem, PaginatedList, Spinner } from 'components/common';
 import Routes from 'routing/Routes';
 import StringUtils from 'util/StringUtils';
@@ -75,6 +76,8 @@ const IndexSetsComponent = createReactClass({
   },
 
   _formatIndexSet(indexSet) {
+    const { indexSetStats } = this.state;
+
     const actions = (
       <div>
         <LinkContainer to={Routes.SYSTEM.INDEX_SETS.CONFIGURATION(indexSet.id)}>
@@ -83,7 +86,7 @@ const IndexSetsComponent = createReactClass({
         {' '}
         <DropdownButton title="More Actions" id={`index-set-dropdown-${indexSet.id}`} pullRight>
           <MenuItem onSelect={this._onSetDefault(indexSet)}
-                    disabled={!indexSet.writable || indexSet.default}>Set as default
+                    disabled={!indexSet.can_be_default || indexSet.default}>Set as default
           </MenuItem>
           <MenuItem divider />
           <MenuItem onSelect={this._onDelete(indexSet)}>Delete</MenuItem>
@@ -114,7 +117,7 @@ const IndexSetsComponent = createReactClass({
     }
 
     let statsString;
-    const stats = this.state.indexSetStats[indexSet.id];
+    const stats = indexSetStats[indexSet.id];
 
     if (stats) {
       statsString = this._formatStatsString(stats);
@@ -143,7 +146,9 @@ const IndexSetsComponent = createReactClass({
   },
 
   _isLoading() {
-    return !this.state.indexSets;
+    const { indexSets } = this.state;
+
+    return !indexSets;
   },
 
   render() {
@@ -151,19 +156,21 @@ const IndexSetsComponent = createReactClass({
       return <Spinner />;
     }
 
+    const { globalIndexSetStats, indexSetsCount, indexSets } = this.state;
+
     return (
       <div>
-        <h4><strong>Total:</strong> {this._formatStatsString(this.state.globalIndexSetStats)}</h4>
+        <h4><strong>Total:</strong> {this._formatStatsString(globalIndexSetStats)}</h4>
 
         <hr style={{ marginBottom: 0 }} />
 
         <PaginatedList pageSize={this.PAGE_SIZE}
-                       totalItems={this.state.indexSetsCount}
+                       totalItems={indexSetsCount}
                        onChange={this._onChangePaginatedList}
                        showPageSizeSelect={false}>
           <EntityList bsNoItemsStyle="info"
                       noItemsText="There are no index sets to display"
-                      items={this.state.indexSets.map((indexSet) => this._formatIndexSet(indexSet))} />
+                      items={indexSets.map((indexSet) => this._formatIndexSet(indexSet))} />
         </PaginatedList>
       </div>
     );

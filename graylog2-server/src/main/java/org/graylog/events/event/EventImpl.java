@@ -84,6 +84,11 @@ public class EventImpl implements Event {
     }
 
     @Override
+    public String getMessageId() {
+        return eventId;
+    }
+
+    @Override
     public String getEventDefinitionType() {
         return eventDefinitionType;
     }

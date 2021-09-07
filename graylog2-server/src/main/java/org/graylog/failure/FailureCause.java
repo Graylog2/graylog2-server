@@ -14,16 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+package org.graylog.failure;
 
-import type { MessageEventType } from 'views/types/messageEventTypes';
-
-// eslint-disable-next-line import/prefer-default-export
-export const createSimpleMessageEventType = (index = 1, overrides: Partial<MessageEventType> = {}): MessageEventType => ({
-  gl2EventTypeCode: `event-type-code-${index}`,
-  summaryTemplate: '{field1} - {field2}',
-  category: 'success',
-  eventActions: ['action-id-1'],
-  requiredFields: ['field1', 'field2'],
-  optionalFields: ['field3'],
-  ...overrides,
-});
+/**
+ * A tag-like label representing a failure cause
+ */
+public interface FailureCause {
+    String label();
+}

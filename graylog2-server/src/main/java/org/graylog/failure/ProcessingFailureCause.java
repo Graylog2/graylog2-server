@@ -14,14 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+package org.graylog.failure;
 
-import type { ColorVariants } from 'theme/colors';
+public enum ProcessingFailureCause implements FailureCause {
+    RuleStatementEvaluationError("RuleStatementEvaluationError"),
+    RuleConditionEvaluationError("RuleConditionEvaluationError"),
+    UNKNOWN("UNKNOWN"),
+    ;
 
-export type MessageEventType = {
-  gl2EventTypeCode: string,
-  summaryTemplate: string,
-  category: ColorVariants,
-  eventActions: Array<string>,
-  requiredFields: Array<string>,
-  optionalFields: Array<string>,
+    private final String label;
+
+    ProcessingFailureCause(String label) {
+        this.label = label;
+    }
+
+    public String label() {
+        return label;
+    }
 }

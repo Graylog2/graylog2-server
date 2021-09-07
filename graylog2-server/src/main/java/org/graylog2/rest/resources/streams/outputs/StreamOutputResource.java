@@ -43,6 +43,7 @@ import org.joda.time.DateTime;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -138,6 +139,8 @@ public class StreamOutputResource extends RestResource {
         checkPermission(RestPermissions.STREAMS_EDIT, streamid);
         checkPermission(RestPermissions.STREAM_OUTPUTS_CREATE);
 
+        checkNotEditable(streamid, "Cannot assign outputs to a non-editable stream.");
+
         // Check if stream exists
         streamService.load(streamid);
 
@@ -176,5 +179,11 @@ public class StreamOutputResource extends RestResource {
 
         streamService.removeOutput(stream, output);
         outputRegistry.removeOutput(output);
+    }
+
+    private void checkNotEditable(String streamId, String message) {
+        if (!Stream.streamIsEditable(streamId)) {
+            throw new BadRequestException(message);
+        }
     }
 }

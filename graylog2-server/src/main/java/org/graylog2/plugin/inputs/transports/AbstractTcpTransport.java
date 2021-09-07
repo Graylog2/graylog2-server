@@ -476,8 +476,8 @@ public abstract class AbstractTcpTransport extends NettyTransport {
 
                 final ServerSocketChannelConfig channelConfig = (ServerSocketChannelConfig) channel.config();
                 final int receiveBufferSize = channelConfig.getReceiveBufferSize();
-                if (receiveBufferSize != expectedRecvBufferSize) {
-                    LOG.warn("receiveBufferSize (SO_RCVBUF) for input {} (channel {}) should be {} but is {}.",
+                if (receiveBufferSize < expectedRecvBufferSize) {
+                    LOG.warn("receiveBufferSize (SO_RCVBUF) for input {} (channel {}) should be >= {} but is {}.",
                             input, channel, expectedRecvBufferSize, receiveBufferSize);
                 }
             } else {
