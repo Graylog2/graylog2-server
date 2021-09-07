@@ -164,6 +164,13 @@ public class QueryTest {
         Query query = sut.applyExecutionState(objectMapper, objectMapper.convertValue(executionState, JsonNode.class));
         assertThat(query.globalOverride()).isEmpty();
     }
+
+    @Test
+    public void builderGeneratesQueryId() {
+        final Query build = Query.builder().timerange(mock(TimeRange.class)).query(new BackendQuery.Fallback()).build();
+        assertThat(build.id()).isNotNull();
+    }
+
     private RelativeRange relativeRange(int range) {
         try {
             return RelativeRange.create(range);
