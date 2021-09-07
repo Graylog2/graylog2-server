@@ -146,11 +146,13 @@ describe('connect()', () => {
     expect(Component.displayName).toEqual('ConnectStoresWrapper[Unknown/Anonymous] stores=simpleStore');
   });
 
+  // eslint-disable-next-line jest/expect-expect
   it('types store props as optional', () => {
     const Component = connect(() => <span>hello!</span>, { simpleStore: SimpleStore });
     mount(<Component />);
   });
 
+  // eslint-disable-next-line jest/expect-expect
   it('types mapped props as optional', () => {
     const Component = connect(
       () => <span>hello!</span>,
@@ -160,6 +162,7 @@ describe('connect()', () => {
     mount(<Component />);
   });
 
+  // eslint-disable-next-line jest/expect-expect
   it('types props which have a default value (defaultProps) as optional', () => {
     const BaseComponent = ({ exampleProp }: { exampleProp: string }) => <span>{exampleProp}</span>;
 
