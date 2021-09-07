@@ -33,7 +33,6 @@ import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
-import type VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 import TimerangeInfo from 'views/components/widgets/TimerangeInfo';
 import IfDashboard from 'views/components/dashboard/IfDashboard';
 import WidgetConfig from 'views/logic/widgets/WidgetConfig';
@@ -54,7 +53,7 @@ import InteractiveContext from '../contexts/InteractiveContext';
 export type Props = {
   id: string,
   widget: WidgetModel,
-  editing?: boolean,
+  editing: boolean,
   fields: Immutable.List<FieldTypeMapping>,
   height?: number,
   width?: number,
@@ -69,8 +68,6 @@ export type Result = {
   rows: Rows,
   effective_timerange: AbsoluteTimeRange,
 };
-
-export type OnVisualizationConfigChange = (newConfig: VisualizationConfig) => void;
 
 const _visualizationForType = (type) => {
   return widgetDefinition(type).visualizationComponent;
@@ -211,6 +208,7 @@ const Widget = ({ id, editing, height, width, widget, fields, onSizeChange, titl
                      type={widget.type}>
           <WidgetErrorBoundary>
             <Visualization id={id}
+                           editing={editing}
                            queryId={activeQuery}
                            widget={widget}
                            fields={fields}
