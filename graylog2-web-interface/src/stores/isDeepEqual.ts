@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { isEqualWith, isFunction } from 'lodash';
+import isEqual from 'react-fast-compare';
 
 const hasFn = (obj, fn) => (obj && obj[fn] && isFunction(obj[fn]));
 const hasEquals = (obj) => hasFn(obj, 'equals');
@@ -29,7 +30,7 @@ const _isEqual = (first, second) => {
     return first.equals(second);
   }
 
-  return undefined;
+  return isEqual(first, second);
 };
 
 const isDeepEqual = (first: any, second: any): boolean => isEqualWith(first, second, _isEqual);
