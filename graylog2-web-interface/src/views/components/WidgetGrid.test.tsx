@@ -25,6 +25,7 @@ import Widget from 'views/components/widgets/Widget';
 import _Widget from 'views/logic/widgets/Widget';
 import { WidgetStore } from 'views/stores/WidgetStore';
 import { CurrentViewStateStore } from 'views/stores/CurrentViewStateStore';
+import FieldTypesContext, { FieldTypes } from 'views/components/contexts/FieldTypesContext';
 
 import WidgetGrid from './WidgetGrid';
 
@@ -69,9 +70,15 @@ describe('<WidgetGrid />', () => {
     asMock(WidgetStore.getInitialState).mockReturnValue(Immutable.Map());
   });
 
+  const fieldTypes: FieldTypes = {
+    all: Immutable.List(),
+    queryFields: Immutable.Map(),
+  };
+  const SimpleWidgetGrid = (props) => <FieldTypesContext.Provider value={fieldTypes}><WidgetGrid {...props} /></FieldTypesContext.Provider>;
+
   it('should render with minimal props', () => {
     const wrapper = mount((
-      <WidgetGrid />
+      <SimpleWidgetGrid />
     ));
 
     expect(wrapper).toExist();
@@ -92,12 +99,8 @@ describe('<WidgetGrid />', () => {
       },
     });
 
-    const data = {
-      widget1: [],
-    };
-
     const wrapper = mount((
-      <WidgetGrid />
+      <SimpleWidgetGrid />
     ));
 
     expect(wrapper.find(Widget)).toHaveLength(1);
@@ -118,11 +121,8 @@ describe('<WidgetGrid />', () => {
       },
     });
 
-    const data = {
-    };
-
     const wrapper = mount((
-      <WidgetGrid />
+      <SimpleWidgetGrid />
     ));
 
     expect(wrapper.find(Widget)).toHaveLength(1);
