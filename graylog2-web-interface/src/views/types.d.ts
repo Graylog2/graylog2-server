@@ -237,7 +237,6 @@ declare module 'graylog-web-plugin/plugin' {
     'views.hooks.copyWidgetToDashboard'?: Array<CopyWidgetToDashboardHook>;
     'views.overrides.widgetEdit'?: Array<React.ComponentType<OverrideProps>>;
     'views.widgets.actions'?: Array<WidgetActionType>;
-    'views.widgets.messageDetails.contextProvider'?: Array<React.ComponentType<MessageDetailContextProviderProps>>,
     'views.requires.provided'?: Array<string>;
     visualizationConfigTypes?: Array<VisualizationConfigType>;
     visualizationTypes?: Array<VisualizationType>;
