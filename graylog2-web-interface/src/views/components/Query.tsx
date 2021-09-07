@@ -45,7 +45,7 @@ const RenderedWidgetGrid = () => (
   </InteractiveContext.Consumer>
 );
 
-const EmptyDashboardInfo = () => (
+const NoWidgetsInfo = () => (
   <StyledJumbotron>
     <h2>
       <IfDashboard>
@@ -76,14 +76,14 @@ const EmptyDashboardInfo = () => (
   </StyledJumbotron>
 );
 
-const useWidgetCount = () => useStore(WidgetStore, (widgets) => widgets?.size ?? 0);
+const useHasWidgets = () => useStore(WidgetStore, (widgets) => widgets?.size > 0);
 
 const Query = () => {
-  const widgetCount = useWidgetCount();
+  const hasWidgets = useHasWidgets();
 
-  return widgetCount > 0
+  return hasWidgets
     ? <RenderedWidgetGrid />
-    : <EmptyDashboardInfo />;
+    : <NoWidgetsInfo />;
 };
 
 const memoizedQuery = React.memo(Query);
