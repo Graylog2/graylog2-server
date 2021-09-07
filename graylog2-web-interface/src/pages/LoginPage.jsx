@@ -160,7 +160,10 @@ const LoginPage = () => {
     );
   }
 
-  const shouldDisplayLink = loginFormState === LOGIN_INITIALIZED_STATE;
+  const shouldDisplayFallbackLink = hasCustomLogin
+  && enableExternalBackend
+  && !isCloud
+  && loginFormState === LOGIN_INITIALIZED_STATE;
 
   return (
     <DocumentTitle title="Sign in">
@@ -169,7 +172,7 @@ const LoginPage = () => {
         <LoginPageStyles />
         {formatLastError()}
         {renderLoginForm()}
-        {hasCustomLogin && enableExternalBackend && !isCloud && shouldDisplayLink && (
+        {shouldDisplayFallbackLink && (
         <StyledButton as="a" onClick={() => setUseFallback(!useFallback)}>
           {`Login with ${useFallback ? loginComponent.type.replace(/^\w/, (c) => c.toUpperCase()) : 'default method'}`}
         </StyledButton>
