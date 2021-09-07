@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useMemo } from 'react';
+import { useCallback } from 'react';
 import * as Immutable from 'immutable';
 
 import { widgetDefinition } from 'views/logic/Widgets';
@@ -58,18 +58,22 @@ type WidgetResults = {
   error: SearchError[],
 };
 
-const useWidgetResults = (widgetId: string) => {
-  const { widgetMapping, results } = useStore(SearchStore, ({ result: r, widgetMapping: w }) => ({ results: r, widgetMapping: w }));
-  const widget = useStore(WidgetStore, (widgets) => widgets.get(widgetId));
-  const currentQueryId = useStore(ViewStore, ({ activeQuery }) => activeQuery);
+const viewStoreMapper = ({ activeQuery }) => activeQuery;
 
-  const widgetResults = useMemo(() => {
-    const currentQueryResults = results?.forId(currentQueryId);
+const useWidgetResults = (widgetId: string) => {
+  const currentQueryId = useStore(ViewStore, viewStoreMapper);
+
+  const widgetStoreMapper = useCallback((widgets) => widgets.get(widgetId), [widgetId]);
+  const widget = useStore(WidgetStore, widgetStoreMapper);
+
+  const searchStoreMapper = useCallback(({ result, widgetMapping }) => {
+    const currentQueryResults = result?.forId(currentQueryId);
 
     return (currentQueryResults
       ? _getDataAndErrors(widget, widgetMapping, currentQueryResults)
       : { widgetData: undefined, error: [] });
-  }, [currentQueryId, results, widget, widgetMapping]);
+  }, [currentQueryId, widget]);
+  const widgetResults = useStore(SearchStore, searchStoreMapper);
 
   return widgetResults as WidgetResults;
 };
