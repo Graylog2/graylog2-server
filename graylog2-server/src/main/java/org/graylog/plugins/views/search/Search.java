@@ -44,6 +44,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -192,6 +193,8 @@ public abstract class Search implements ContentPackable<SearchEntity> {
         @JsonProperty
         public abstract Builder id(String id);
 
+        public abstract String id();
+
         @JsonProperty
         public abstract Builder queries(ImmutableSet<Query> queries);
 
@@ -218,6 +221,11 @@ public abstract class Search implements ContentPackable<SearchEntity> {
         }
 
         public Search build() {
+
+            if(id() == null) {
+                id(UUID.randomUUID().toString());
+            }
+
             final Search search = autoBuild();
             search.queryIndex = Maps.uniqueIndex(search.queries(), Query::id);
             search.parameterIndex = Maps.uniqueIndex(search.parameters(), Parameter::name);

@@ -43,6 +43,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 import static com.google.common.collect.ImmutableList.of;
 
@@ -113,6 +114,8 @@ public abstract class Pivot implements SearchType {
         @JsonProperty
         public abstract Builder id(@Nullable String id);
 
+        abstract String id();
+
         @JsonProperty
         public abstract Builder name(@Nullable String name);
 
@@ -153,7 +156,14 @@ public abstract class Pivot implements SearchType {
         @JsonProperty
         public abstract Builder streams(Set<String> streams);
 
-        public abstract Pivot build();
+        abstract Pivot autoBuild();
+
+        public Pivot build() {
+            if(id() == null) {
+                id(UUID.randomUUID().toString());
+            }
+            return autoBuild();
+        }
     }
 
     @Override

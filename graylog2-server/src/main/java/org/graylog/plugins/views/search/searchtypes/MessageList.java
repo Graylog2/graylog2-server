@@ -49,6 +49,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 @AutoValue
 @JsonTypeName(MessageList.NAME)
@@ -132,6 +133,8 @@ public abstract class MessageList implements SearchType {
         @JsonProperty
         public abstract Builder id(@Nullable String id);
 
+        abstract String id();
+
         @JsonProperty
         public abstract Builder name(@Nullable String name);
 
@@ -173,7 +176,14 @@ public abstract class MessageList implements SearchType {
 
         public abstract Builder decorators(List<Decorator> decorators);
 
-        public abstract MessageList build();
+        abstract MessageList autoBuild();
+
+        public MessageList build() {
+            if(id() == null) {
+                id(UUID.randomUUID().toString());
+            }
+            return autoBuild();
+        }
     }
 
     @AutoValue

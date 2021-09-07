@@ -47,6 +47,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -61,6 +62,7 @@ import static java.util.stream.Collectors.toSet;
 public abstract class Query implements ContentPackable<QueryEntity> {
     private static final Logger LOG = LoggerFactory.getLogger(Query.class);
 
+    @Nullable
     @JsonProperty
     public abstract String id();
 
@@ -224,6 +226,8 @@ public abstract class Query implements ContentPackable<QueryEntity> {
         @JsonProperty
         public abstract Builder id(String id);
 
+        public abstract String id();
+
         @JsonProperty
         public abstract Builder timerange(TimeRange timerange);
 
@@ -246,6 +250,9 @@ public abstract class Query implements ContentPackable<QueryEntity> {
         }
 
         public Query build() {
+            if(id() == null) {
+                id(UUID.randomUUID().toString());
+            }
             return autoBuild();
         }
     }
