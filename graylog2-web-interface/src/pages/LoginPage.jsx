@@ -29,7 +29,7 @@ import authStyles from 'theme/styles/authStyles';
 import CombinedProvider from 'injection/CombinedProvider';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 import AppConfig from 'util/AppConfig';
-import { isCallbackUrl } from 'util/URLUtils';
+import { LOGIN_INITIALIZING_STATE, LOGIN_INITIALIZED_STATE } from 'logic/authentication/constants';
 
 import LoadingPage from './LoadingPage';
 
@@ -96,7 +96,7 @@ const LoginPage = () => {
   const [lastError, setLastError] = useState(undefined);
   const [useFallback, setUseFallback] = useState(false);
   const [enableExternalBackend, setEnableExternalBackend] = useState(true);
-
+  const [loginFormState, setLoginFormState] = useState(LOGIN_INITIALIZING_STATE);
   const isCloud = AppConfig.isCloud();
   const [activeBackend, isBackendDetermined] = useActiveBackend(isCloud);
 
@@ -146,7 +146,7 @@ const LoginPage = () => {
         <ErrorBoundary FallbackComponent={ErrorFallback}
                        onError={() => setEnableExternalBackend(false)}
                        onReset={() => setUseFallback(true)}>
-          <PluginLoginForm onErrorChange={setLastError} />
+          <PluginLoginForm onErrorChange={setLastError} setLoginFormState={setLoginFormState} />
         </ErrorBoundary>
       );
     }
@@ -160,8 +160,7 @@ const LoginPage = () => {
     );
   }
 
-  const isCallback = isCallbackUrl();
-  const displayOnCallback = !isCallback || (isCallback && lastError);
+  const shouldDisplayLink = loginFormState === LOGIN_INITIALIZED_STATE;
 
   return (
     <DocumentTitle title="Sign in">
@@ -170,7 +169,7 @@ const LoginPage = () => {
         <LoginPageStyles />
         {formatLastError()}
         {renderLoginForm()}
-        {hasCustomLogin && enableExternalBackend && !isCloud && displayOnCallback && (
+        {hasCustomLogin && enableExternalBackend && !isCloud && shouldDisplayLink && (
         <StyledButton as="a" onClick={() => setUseFallback(!useFallback)}>
           {`Login with ${useFallback ? loginComponent.type.replace(/^\w/, (c) => c.toUpperCase()) : 'default method'}`}
         </StyledButton>
