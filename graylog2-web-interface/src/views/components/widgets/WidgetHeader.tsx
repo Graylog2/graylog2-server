@@ -66,7 +66,7 @@ const WidgetHeader = ({ children, onRename, hideDragHandle, title, loading }: Pr
       <EditableTitle key={title} disabled={!onRename} value={title} onChange={onRename} />
       {loading && <LoadingSpinner text="" delay={0} />}
     </Col>
-    <WidgetActionDropdown className="pull-right">
+    <WidgetActionDropdown>
       {children}
     </WidgetActionDropdown>
   </Container>
