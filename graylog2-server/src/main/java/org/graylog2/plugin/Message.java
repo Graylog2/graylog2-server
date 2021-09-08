@@ -422,10 +422,8 @@ public class Message implements Messages, Indexable {
         obj.put(FIELD_GL2_ACCOUNTED_MESSAGE_SIZE, getSize());
 
         final Object timestampValue = getField(FIELD_TIMESTAMP);
-        DateTime dateTime = convertToDateTime(timestampValue);
-        if (dateTime != null) {
-            obj.put(FIELD_TIMESTAMP, buildElasticSearchTimeFormat(dateTime.withZone(UTC)));
-        }
+        DateTime dateTime = timestampValue == null ? fallbackForNullTimestamp() : convertToDateTime(timestampValue);
+        obj.put(FIELD_TIMESTAMP, buildElasticSearchTimeFormat(dateTime.withZone(UTC)));
 
         if (processingErrors != null && !processingErrors.isEmpty()) {
             if (processingErrors.stream().anyMatch(processingError -> processingError.getCause().equals(ProcessingFailureCause.InvalidTimestampException))) {
@@ -440,16 +438,7 @@ public class Message implements Messages, Indexable {
         return obj;
     }
 
-    private DateTime convertToDateTime(Object value) {
-        if (value == null) {
-            final String error = "<null> value for field timestamp in message <" + getId() + ">, forcing to current time";
-            LOG.trace(error);
-            addProcessingError(new ProcessingError(ProcessingFailureCause.InvalidTimestampException,
-                    "Replaced invalid timestamp value in message <" + getId() + "> with current time",
-                    "<null> value provided"));
-            return Tools.nowUTC();
-        }
-
+    private DateTime convertToDateTime(@Nonnull Object value) {
         try {
             return DateTimeConverter.convertToDateTime(value);
         } catch (IllegalArgumentException e) {
@@ -460,6 +449,15 @@ public class Message implements Messages, Indexable {
                     , "Value <" + value + "> caused exception: " + ExceptionUtils.getRootCauseMessage(e)));
             return Tools.nowUTC();
         }
+    }
+
+    private DateTime fallbackForNullTimestamp() {
+        final String error = "<null> value for field timestamp in message <" + getId() + ">, forcing to current time";
+        LOG.trace(error);
+        addProcessingError(new ProcessingError(ProcessingFailureCause.InvalidTimestampException,
+                "Replaced invalid timestamp value in message <" + getId() + "> with current time",
+                "<null> value provided"));
+        return Tools.nowUTC();
     }
 
     // estimate the byte/char length for a field and its value
@@ -536,7 +534,7 @@ public class Message implements Messages, Indexable {
 
         final boolean isTimestamp = FIELD_TIMESTAMP.equals(trimmedKey);
         if (isTimestamp) {
-            final DateTime timeStamp = convertToDateTime(value);
+            final DateTime timeStamp = value == null ? fallbackForNullTimestamp() : convertToDateTime(value);
             final Object previousValue = fields.put(FIELD_TIMESTAMP, timeStamp);
             updateSize(trimmedKey, timeStamp, previousValue);
         } else if (value instanceof String) {
