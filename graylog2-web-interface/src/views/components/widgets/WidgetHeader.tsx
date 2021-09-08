@@ -16,7 +16,7 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled, { css, DefaultTheme } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { Spinner, Icon } from 'components/common';
 import EditableTitle from 'views/components/common/EditableTitle';
@@ -27,14 +27,19 @@ const LoadingSpinner = styled(Spinner)`
   margin-left: 10px;
 `;
 
-const Container = styled.div(({ theme, $hideDragHandle }: {theme: DefaultTheme, $hideDragHandle: boolean }) => css`
+const Container = styled.div(({ theme }) => css`
   font-size: ${theme.fonts.size.large};
   text-overflow: ellipsis;
   margin-bottom: 5px;
   display: grid;
-  grid-template-columns: ${$hideDragHandle ? 'minmax(20px, auto) max-content' : 'max-content minmax(20px, auto) max-content'};
+  grid-template-columns: minmax(35px, 1fr) max-content;
   align-items: center;
 `);
+
+const Col = styled.div`
+  display: flex;
+  align-items: center;
+`;
 
 const WidgetDragHandle = styled(Icon)`
   cursor: move;
@@ -55,10 +60,12 @@ type Props = {
 };
 
 const WidgetHeader = ({ children, onRename, hideDragHandle, title, loading }: Props) => (
-  <Container $hideDragHandle={hideDragHandle}>
-    {hideDragHandle || <WidgetDragHandle name="bars" className="widget-drag-handle" />}
-    <EditableTitle key={title} disabled={!onRename} value={title} onChange={onRename} />
-    {loading && <LoadingSpinner text="" delay={0} />}
+  <Container>
+    <Col>
+      {hideDragHandle || <WidgetDragHandle name="bars" className="widget-drag-handle" />}
+      <EditableTitle key={title} disabled={!onRename} value={title} onChange={onRename} />
+      {loading && <LoadingSpinner text="" delay={0} />}
+    </Col>
     <WidgetActionDropdown className="pull-right">
       {children}
     </WidgetActionDropdown>
