@@ -76,7 +76,7 @@ const viewsUrl = qualifyUrl('/views');
 const viewsIdUrl = (id) => qualifyUrl(`/views/${id}`);
 const forValueUrl = () => qualifyUrl('/views/forValue');
 
-type ViewManagementStoreState = {
+export type ViewManagementStoreState = {
   pagination: Pagination;
   list: Array<ViewJson>;
 };

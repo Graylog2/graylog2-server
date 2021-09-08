@@ -71,7 +71,7 @@ const EntityListItem = ({ actions, contentRow, description, title, titleSuffix }
     <StyledListItem>
       <Row className="row-sm">
         <Col md={12}>
-          <div className="pull-right hidden-xs">
+          <div className="pull-right hidden-xs" data-testid="actions-container">
             {actionsContainer}
           </div>
           <h2>{title} {wrappedTitleSuffix}</h2>
