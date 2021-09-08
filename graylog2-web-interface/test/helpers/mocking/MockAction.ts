@@ -19,11 +19,11 @@ import type { ListenableAction, PromiseProvider } from 'stores/StoreTypes';
 
 const listenable = () => ({ listen: jest.fn(() => jest.fn()) });
 
-const noop: PromiseProvider = jest.fn(() => Promise.resolve());
+const noop: () => PromiseProvider = () => jest.fn(() => Promise.resolve());
 
-function mockAction(): ListenableAction<typeof noop>;
+function mockAction(): ListenableAction<ReturnType<typeof noop>>;
 function mockAction<R extends PromiseProvider>(fn: R): ListenableAction<R>;
-function mockAction(fn = noop) {
+function mockAction(fn = noop()) {
   return Object.assign(fn, listenable(), {
     completed: listenable(),
     promise: jest.fn(),
