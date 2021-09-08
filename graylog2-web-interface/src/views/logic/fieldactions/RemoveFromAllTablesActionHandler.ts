@@ -17,7 +17,7 @@
 import { WidgetStore, WidgetActions } from 'views/stores/WidgetStore';
 import type { FieldActionHandler } from 'views/logic/fieldactions/FieldActionHandler';
 
-const RemoveFromAllTablesActionHandler: FieldActionHandler = ({ field }) => {
+const RemoveFromAllTablesActionHandler: FieldActionHandler<{}> = ({ field }) => {
   const widgets = WidgetStore.getInitialState();
   const newWidgets = widgets.map((widget) => {
     if (widget.type.toUpperCase() === 'MESSAGES') {

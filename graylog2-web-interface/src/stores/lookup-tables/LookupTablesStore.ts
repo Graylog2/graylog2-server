@@ -20,11 +20,62 @@ import UserNotification from 'util/UserNotification';
 import PaginationURL from 'util/PaginationURL';
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
-import ActionsProvider from 'injection/ActionsProvider';
+import LookupTablesActions from 'actions/lookup-tables/LookupTablesActions';
+import { singletonStore } from 'views/logic/singleton';
+import { Store } from 'stores/StoreTypes';
+import type { LookupTable, LookupTableAdapter, LookupTableCache } from 'logic/lookup-tables/types';
+import { PaginatedResponseType } from 'stores/PaginationTypes';
 
-const LookupTablesActions = ActionsProvider.getActions('LookupTables');
+type LookupResult = {
+  multi_value: string | number | object | boolean | null,
+  single_value: string | number | object | boolean | null,
+  string_list_value: Array<string> | null,
+  ttl: number,
+  has_error: boolean,
+}
 
-const LookupTablesStore = Reflux.createStore({
+type ValidationErrors = {
+  error_context: {
+    [fieldName: string]: Array<string> | undefined,
+  },
+  failed: boolean,
+  errors: {
+    [fieldName: string]: Array<string> | undefined,
+  },
+}
+
+type ErrorState = {
+  tables: {
+    [tableId: string]: string | undefined,
+  },
+  caches: {
+    [cacheId: string]: string | undefined,
+  },
+  dataAdapters: {
+    [adapterId: string]: string | undefined,
+  }
+}
+
+type LookupTablesStoreState = {
+  pagination: PaginatedResponseType,
+  errorState: ErrorState,
+  table: LookupTable | null,
+  cache: LookupTableCache | null,
+  dataAdapter: LookupTableAdapter | null,
+  tables: {
+    [tableId: string]: LookupTable | undefined,
+  },
+  caches: {
+    [cacheId: string]: LookupTableCache | undefined,
+  },
+  dataAdapters: {
+    [adapterId: string]: LookupTableAdapter | undefined,
+  },
+  lookupResult: LookupResult | null,
+  validationErrors: ValidationErrors,
+}
+
+const LookupTablesStore: Store<LookupTablesStoreState> = singletonStore('LookupTables', () => Reflux.createStore({
   listenables: [LookupTablesActions],
   pagination: {
     page: 1,
@@ -79,7 +130,7 @@ const LookupTablesStore = Reflux.createStore({
     return promise;
   },
 
-  searchPaginated(page, perPage, query, resolve = true) {
+  searchPaginated(page: number, perPage: number, query: string, resolve: boolean = true) {
     const url = this._url(PaginationURL('tables', page, perPage, query, { resolve }));
     const promise = fetch('GET', url);
 
@@ -103,7 +154,7 @@ const LookupTablesStore = Reflux.createStore({
     return promise;
   },
 
-  get(idOrName) {
+  get(idOrName: string) {
     const url = this._url(`tables/${idOrName}?resolve=true`);
     const promise = fetch('GET', url);
 
@@ -123,7 +174,7 @@ const LookupTablesStore = Reflux.createStore({
     return promise;
   },
 
-  create(table) {
+  create(table: LookupTable) {
     const url = this._url('tables');
     const promise = fetch('POST', url, table);
 
@@ -134,7 +185,7 @@ const LookupTablesStore = Reflux.createStore({
     return promise;
   },
 
-  update(table) {
+  update(table: LookupTable) {
     const url = this._url(`tables/${table.id}`);
     const promise = fetch('PUT', url, table);
 
@@ -145,7 +196,7 @@ const LookupTablesStore = Reflux.createStore({
     return promise;
   },
 
-  delete(idOrName) {
+  delete(idOrName: string) {
     const url = this._url(`tables/${idOrName}`);
     const promise = fetch('DELETE', url);
 
@@ -156,8 +207,12 @@ const LookupTablesStore = Reflux.createStore({
     return promise;
   },
 
-  getErrors(tableNames, cacheNames, dataAdapterNames) {
-    const request = {};
+  getErrors(tableNames: Array<string> | undefined, cacheNames: Array<string> | undefined, dataAdapterNames: Array<string> | undefined) {
+    const request: {
+      tables?: Array<string>;
+      caches?: Array<string>;
+      data_adapters?: Array<string>;
+    } = {};
 
     if (tableNames) {
       request.tables = tableNames;
@@ -188,7 +243,7 @@ const LookupTablesStore = Reflux.createStore({
     return promise;
   },
 
-  lookup(tableName, key) {
+  lookup(tableName: string, key: string) {
     const promise = fetch('GET', this._url(`tables/${tableName}/query?key=${encodeURIComponent(key)}`));
 
     promise.then((response) => {
@@ -201,7 +256,7 @@ const LookupTablesStore = Reflux.createStore({
     return promise;
   },
 
-  purgeKey(table, key) {
+  purgeKey(table: LookupTable, key: string) {
     const promise = fetch('POST', this._urlClusterWise(`tables/${table.id}/purge?key=${encodeURIComponent(key)}`));
 
     promise.then(() => {
@@ -213,7 +268,7 @@ const LookupTablesStore = Reflux.createStore({
     return promise;
   },
 
-  purgeAll(table) {
+  purgeAll(table: LookupTable) {
     const promise = fetch('POST', this._urlClusterWise(`tables/${table.id}/purge`));
 
     promise.then(() => {
@@ -225,7 +280,7 @@ const LookupTablesStore = Reflux.createStore({
     return promise;
   },
 
-  validate(table) {
+  validate(table: LookupTable) {
     const url = this._url('tables/validate');
     const promise = fetch('POST', url, table);
 
@@ -239,7 +294,7 @@ const LookupTablesStore = Reflux.createStore({
     return promise;
   },
 
-  _errorHandler(message, title, cb) {
+  _errorHandler(message: string, title: string, cb: (error: Error) => void | undefined) {
     return (error) => {
       try {
         // Do not show the user notification if the error is a hibernate error message. We cannot display those
@@ -267,13 +322,14 @@ const LookupTablesStore = Reflux.createStore({
     };
   },
 
-  _url(path) {
+  _url(path: string) {
     return qualifyUrl(`/system/lookup/${path}`);
   },
 
-  _urlClusterWise(path) {
+  _urlClusterWise(path: string) {
     return qualifyUrl(`/cluster/system/lookup/${path}`);
   },
-});
+}));
 
+export { LookupTablesStore, LookupTablesActions };
 export default LookupTablesStore;

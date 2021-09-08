@@ -268,7 +268,7 @@ public class PipelineFacadeTest {
     public void resolveEntityDescriptor() {
         final Stage stage = Stage.builder()
                 .stage(0)
-                .matchAll(false)
+                .match(Stage.Match.EITHER)
                 .ruleReferences(Collections.singletonList("no-op"))
                 .build();
         final Pipeline pipeline = Pipeline.builder()
@@ -347,7 +347,7 @@ public class PipelineFacadeTest {
     public void resolve() {
         final Stage stage = Stage.builder()
                 .stage(0)
-                .matchAll(false)
+                .match(Stage.Match.EITHER)
                 .ruleReferences(ImmutableList.of("debug", "no-op"))
                 .build();
 

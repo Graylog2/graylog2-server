@@ -16,10 +16,12 @@
  */
 package org.graylog2.plugin;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterators;
 
 import java.util.Iterator;
+import java.util.List;
 
 public class MessageCollection implements Messages  {
 
@@ -32,5 +34,10 @@ public class MessageCollection implements Messages  {
     @Override
     public Iterator<Message> iterator() {
         return Iterators.filter(messages.iterator(), e -> !e.getFilterOut());
+    }
+
+    @VisibleForTesting
+    public List<Message> source() {
+        return messages;
     }
 }

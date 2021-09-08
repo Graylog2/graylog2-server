@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.shared.bindings.providers;
+package org.graylog2.shared.metrics;
 
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.jvm.BufferPoolMetricSet;
@@ -23,26 +23,20 @@ import com.codahale.metrics.jvm.GarbageCollectorMetricSet;
 import com.codahale.metrics.jvm.MemoryUsageGaugeSet;
 import com.codahale.metrics.jvm.ThreadStatesGaugeSet;
 
-import javax.inject.Provider;
 import javax.inject.Singleton;
 import java.lang.management.ManagementFactory;
 
 @Singleton
-public class MetricRegistryProvider implements Provider<MetricRegistry> {
-    private final MetricRegistry metricRegistry;
+public class MetricRegistryFactory {
 
-    public MetricRegistryProvider() {
-        this.metricRegistry = new MetricRegistry();
+    public static MetricRegistry create() {
+        MetricRegistry metricRegistry = new MetricRegistry();
 
         metricRegistry.register("jvm.buffers", new BufferPoolMetricSet(ManagementFactory.getPlatformMBeanServer()));
         metricRegistry.register("jvm.cl", new ClassLoadingGaugeSet());
         metricRegistry.register("jvm.gc", new GarbageCollectorMetricSet());
         metricRegistry.register("jvm.memory", new MemoryUsageGaugeSet());
         metricRegistry.register("jvm.threads", new ThreadStatesGaugeSet());
-    }
-
-    @Override
-    public MetricRegistry get() {
         return metricRegistry;
     }
 }

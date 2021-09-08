@@ -65,7 +65,7 @@ describe('ShowDocumentsHandler', () => {
   });
 
   it('adds a new message widget for an empty value path', () => {
-    return ShowDocumentsHandler({ queryId, field, value: 42, type: FieldType.Unknown, contexts: { widget: widget, valuePath: [] } })
+    return ShowDocumentsHandler({ queryId, field, value: 42, type: FieldType.Unknown, contexts: { widget, valuePath: [] } })
       .then(() => {
         expect(WidgetActions.create).toHaveBeenCalled();
 
@@ -76,7 +76,7 @@ describe('ShowDocumentsHandler', () => {
   });
 
   it('adds the given value path as widget filter for new message widget', () => {
-    return ShowDocumentsHandler({ queryId, field, value: 42, type: FieldType.Unknown, contexts: { widget: widget, valuePath: [{ bar: 42 }, { [field]: 'Hello!' }] } })
+    return ShowDocumentsHandler({ queryId, field, value: 42, type: FieldType.Unknown, contexts: { widget, valuePath: [{ bar: 42 }, { [field]: 'Hello!' }] } })
       .then(() => {
         expect(WidgetActions.create).toHaveBeenCalled();
 

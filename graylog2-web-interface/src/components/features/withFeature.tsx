@@ -14,20 +14,25 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import Reflux from 'reflux';
+import React from 'react';
+import PropTypes from 'prop-types';
 
-const LookupTablesActions = Reflux.createActions({
-  searchPaginated: { asyncResult: true },
-  reloadPage: { asyncResult: true },
-  get: { asyncResult: true },
-  create: { asyncResult: true },
-  delete: { asyncResult: true },
-  update: { asyncResult: true },
-  getErrors: { asyncResult: true },
-  lookup: { asyncResult: true },
-  purgeKey: { asyncResult: true },
-  purgeAll: { asyncResult: true },
-  validate: { asyncResult: true },
-});
+import IfFeatureEnabled from './IfFeatureEnabled';
 
-export default LookupTablesActions;
+const withFeature = <Props extends {}>(
+  featureName: string,
+  Component: React.ComponentType<Props>,
+): React.ComponentType<Props> => {
+  return (props) => (
+    <IfFeatureEnabled name={featureName}>
+      <Component {...props} />
+    </IfFeatureEnabled>
+  );
+};
+
+withFeature.propTypes = {
+  featureName: PropTypes.string,
+  Component: PropTypes.node,
+};
+
+export default withFeature;

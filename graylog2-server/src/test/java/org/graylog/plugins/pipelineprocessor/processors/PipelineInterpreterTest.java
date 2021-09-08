@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.eventbus.EventBus;
+import org.graylog.failure.ProcessingFailureCause;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
@@ -38,20 +39,24 @@ import org.graylog.plugins.pipelineprocessor.db.memory.InMemoryRuleService;
 import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineService;
 import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineStreamConnectionsService;
 import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbRuleService;
+import org.graylog.plugins.pipelineprocessor.functions.conversion.DoubleConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.StringConversion;
 import org.graylog.plugins.pipelineprocessor.functions.messages.CreateMessage;
+import org.graylog.plugins.pipelineprocessor.functions.messages.HasField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetField;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageCollection;
 import org.graylog2.plugin.Messages;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import java.util.Collections;
 import java.util.List;
@@ -83,6 +88,11 @@ public class PipelineInterpreterTest {
                     "then\n" +
                     "  set_field(\"foobar\", \"covfefe\");\n" +
                     "end", null, null);
+
+    private final MessageQueueAcknowledger messageQueueAcknowledger = mock(MessageQueueAcknowledger.class);
+
+    private final RuleService ruleService = Mockito.mock(RuleService.class);
+    private final PipelineService pipelineService = Mockito.mock(PipelineService.class);
 
     @Test
     public void testCreateMessage() {
@@ -246,6 +256,67 @@ public class PipelineInterpreterTest {
         assertThat(actualMessage.hasField("foobar")).isFalse();
     }
 
+    @Test
+    public void testMatchPassContinuesIfOneRuleMatched() {
+        final RuleService ruleService = mock(MongoDbRuleService.class);
+        when(ruleService.loadAll()).thenReturn(ImmutableList.of(RULE_TRUE, RULE_FALSE, RULE_ADD_FOOBAR));
+
+        final PipelineService pipelineService = mock(MongoDbPipelineService.class);
+        when(pipelineService.loadAll()).thenReturn(Collections.singleton(
+                PipelineDao.create("p1", "title", "description",
+                        "pipeline \"pipeline\"\n" +
+                                "stage 0 match pass\n" +
+                                "    rule \"true\";\n" +
+                                "    rule \"false\";\n" +
+                                "stage 1 match pass\n" +
+                                "    rule \"add_foobar\";\n" +
+                                "end\n",
+                        Tools.nowUTC(),
+                        null)
+        ));
+
+        final Map<String, Function<?>> functions = ImmutableMap.of(SetField.NAME, new SetField());
+        final PipelineInterpreter interpreter = createPipelineInterpreter(ruleService, pipelineService, functions);
+
+        final Messages processed = interpreter.process(messageInDefaultStream("message", "test"));
+
+        final List<Message> messages = ImmutableList.copyOf(processed);
+        assertThat(messages).hasSize(1);
+
+        final Message actualMessage = messages.get(0);
+        assertThat(actualMessage.getFieldAs(String.class, "foobar")).isEqualTo("covfefe");
+    }
+
+    @Test
+    public void testMatchPassContinuesIfNoRuleMatched() {
+        final RuleService ruleService = mock(MongoDbRuleService.class);
+        when(ruleService.loadAll()).thenReturn(ImmutableList.of(RULE_TRUE, RULE_FALSE, RULE_ADD_FOOBAR));
+
+        final PipelineService pipelineService = mock(MongoDbPipelineService.class);
+        when(pipelineService.loadAll()).thenReturn(Collections.singleton(
+                PipelineDao.create("p1", "title", "description",
+                        "pipeline \"pipeline\"\n" +
+                                "stage 0 match pass\n" +
+                                "    rule \"false\";\n" +
+                                "stage 1 match pass\n" +
+                                "    rule \"add_foobar\";\n" +
+                                "end\n",
+                        Tools.nowUTC(),
+                        null)
+        ));
+
+        final Map<String, Function<?>> functions = ImmutableMap.of(SetField.NAME, new SetField());
+        final PipelineInterpreter interpreter = createPipelineInterpreter(ruleService, pipelineService, functions);
+
+        final Messages processed = interpreter.process(messageInDefaultStream("message", "test"));
+
+        final List<Message> messages = ImmutableList.copyOf(processed);
+        assertThat(messages).hasSize(1);
+
+        final Message actualMessage = messages.get(0);
+        assertThat(actualMessage.getFieldAs(String.class, "foobar")).isEqualTo("covfefe");
+    }
+
     @SuppressForbidden("Allow using default thread factory")
     private PipelineInterpreter createPipelineInterpreter(RuleService ruleService, PipelineService pipelineService, Map<String, Function<?>> functions) {
         final RuleMetricsConfigService ruleMetricsConfigService = mock(RuleMetricsConfigService.class);
@@ -268,10 +339,9 @@ public class PipelineInterpreterTest {
                 (currentPipelines, streamPipelineConnections, ruleMetricsConfig) -> new PipelineInterpreterState(currentPipelines, streamPipelineConnections, ruleMetricsConfig, new MetricRegistry(), 1, true)
         );
         return new PipelineInterpreter(
-                mock(MessageQueueAcknowledger.class),
+                messageQueueAcknowledger,
                 new MetricRegistry(),
-                stateUpdater
-        );
+                stateUpdater);
     }
 
     @Test
@@ -326,8 +396,7 @@ public class PipelineInterpreterTest {
         final PipelineInterpreter interpreter = new PipelineInterpreter(
                 mock(MessageQueueAcknowledger.class),
                 metricRegistry,
-                stateUpdater
-        );
+                stateUpdater);
 
         interpreter.process(messageInDefaultStream("", ""));
 
@@ -371,6 +440,148 @@ public class PipelineInterpreterTest {
         assertThat(meters.get(name(Rule.class, "abc", "cde", "0", "failed")).getCount()).isEqualTo(0L);
         assertThat(meters.get(name(Rule.class, "abc", "cde", "1", "failed")).getCount()).isEqualTo(0L);
 
+    }
+
+    @Test
+    public void process_ruleConditionEvaluationErrorConvertedIntoMessageProcessingError() throws Exception {
+        // given
+        when(ruleService.loadAll()).thenReturn(ImmutableList.of(RuleDao.create("broken_condition", "broken_condition",
+                "broken_condition",
+                "rule \"broken_condition\"\n" +
+                        "when\n" +
+                        "    to_double($message.num * $message.num) > 0.0\n" +
+                        "then\n" +
+                        "    set_field(\"num_sqr\", $message.num * $message.num);\n" +
+                        "end", null, null)));
+
+        when(pipelineService.loadAll()).thenReturn(Collections.singleton(
+                PipelineDao.create("p1", "title", "description",
+                        "pipeline \"pipeline\"\n" +
+                                "stage 0 match all\n" +
+                                "    rule \"broken_condition\";\n" +
+                                "end\n",
+                        Tools.nowUTC(),
+                        null)
+        ));
+
+
+        final PipelineInterpreter interpreter = createPipelineInterpreter(ruleService, pipelineService, ImmutableMap.of(
+                SetField.NAME, new SetField(),
+                DoubleConversion.NAME, new DoubleConversion())
+        );
+
+        // when
+        final List<Message> processed = extractMessagesFromMessageCollection(interpreter.process(messageWithNumField("ABC")));
+
+        // then
+        assertThat(processed)
+                .hasSize(1)
+                .hasOnlyOneElementSatisfying(m -> {
+                    assertThat(m.processingErrors())
+                            .hasSize(1)
+                            .hasOnlyOneElementSatisfying(pe -> {
+                                assertThat(pe.getCause()).isEqualTo(ProcessingFailureCause.RuleConditionEvaluationError);
+                                assertThat(pe.getMessage()).isEqualTo("Error evaluating condition for rule <broken_condition/broken_condition> (pipeline <pipeline/p1>)");
+                                assertThat(pe.getDetails()).isEqualTo("In call to function 'to_double' at 3:4 an exception was thrown: java.lang.String cannot be cast to java.lang.Double");
+                            });
+                });
+    }
+
+    @Test
+    public void process_ruleStatementEvaluationErrorConvertedIntoMessageProcessingError() throws Exception {
+        // given
+        when(ruleService.loadAll()).thenReturn(ImmutableList.of(RuleDao.create("broken_statement", "broken_statement",
+                "broken_statement",
+                "rule \"broken_statement\"\n" +
+                        "when\n" +
+                        "    has_field(\"num\")\n" +
+                        "then\n" +
+                        "    set_field(\"num_sqr\", $message.num * $message.num);\n" +
+                        "end", null, null)));
+
+        when(pipelineService.loadAll()).thenReturn(Collections.singleton(
+                PipelineDao.create("p1", "title", "description",
+                        "pipeline \"pipeline\"\n" +
+                                "stage 0 match all\n" +
+                                "    rule \"broken_statement\";\n" +
+                                "end\n",
+                        Tools.nowUTC(),
+                        null)
+        ));
+
+
+        final PipelineInterpreter interpreter = createPipelineInterpreter(ruleService, pipelineService, ImmutableMap.of(
+                SetField.NAME, new SetField(),
+                DoubleConversion.NAME, new DoubleConversion(),
+                HasField.NAME, new HasField()
+                ));
+
+        // when
+        final List<Message> processed = extractMessagesFromMessageCollection(interpreter.process(messageWithNumField(new Long(1))));
+
+        // then
+        assertThat(processed)
+                .hasSize(1)
+                .hasOnlyOneElementSatisfying(m -> {
+                    assertThat(m.processingErrors())
+                            .hasSize(1)
+                            .hasOnlyOneElementSatisfying(pe -> {
+                                assertThat(pe.getCause()).isEqualTo(ProcessingFailureCause.RuleStatementEvaluationError);
+                                assertThat(pe.getMessage()).isEqualTo("Error evaluating action for rule <broken_statement/broken_statement> (pipeline <pipeline/p1>)");
+                                assertThat(pe.getDetails()).isEqualTo("In call to function 'set_field' at 5:4 an exception was thrown: java.lang.Long cannot be cast to java.lang.Double");
+                            });
+                });
+    }
+
+    @Test
+    public void process_noEvaluationErrorsResultIntoNoMessageProcessingErrors() throws Exception {
+        // given
+        when(ruleService.loadAll()).thenReturn(ImmutableList.of(RuleDao.create("valid_rule", "valid_rule",
+                "valid_rule",
+                "rule \"valid_rule\"\n" +
+                        "when\n" +
+                        "    has_field(\"num\")\n" +
+                        "then\n" +
+                        "    set_field(\"num_sqr\", to_double($message.num) * to_double($message.num));\n" +
+                        "end", null, null)));
+
+        when(pipelineService.loadAll()).thenReturn(Collections.singleton(
+                PipelineDao.create("p1", "title", "description",
+                        "pipeline \"pipeline\"\n" +
+                                "stage 0 match all\n" +
+                                "    rule \"valid_rule\";\n" +
+                                "end\n",
+                        Tools.nowUTC(),
+                        null)
+        ));
+
+
+        final PipelineInterpreter interpreter = createPipelineInterpreter(ruleService, pipelineService, ImmutableMap.of(
+                SetField.NAME, new SetField(),
+                DoubleConversion.NAME, new DoubleConversion(),
+                HasField.NAME, new HasField()
+        ));
+
+        // when
+        final List<Message> processed = extractMessagesFromMessageCollection(interpreter.process(messageWithNumField(new Long(5))));
+
+        // then
+        assertThat(processed)
+                .hasSize(1)
+                .hasOnlyOneElementSatisfying(m -> {
+                    assertThat(m.processingErrors()).isEmpty();
+                    assertThat(m.getField("num_sqr")).isEqualTo(new Double(25.0));
+                });
+    }
+
+    private Message messageWithNumField(Object numValue) {
+        final Message msg = messageInDefaultStream("message", "test");
+        msg.addField("num", numValue);
+        return msg;
+    }
+
+    private List<Message> extractMessagesFromMessageCollection(Messages messages) {
+        return ((MessageCollection) messages).source();
     }
 
     private Message messageInDefaultStream(String message, String source) {

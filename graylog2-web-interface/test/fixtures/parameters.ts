@@ -14,15 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
 
-import type { MessageEventTypes } from 'views/types/messageEventTypes';
-import { singleton } from 'views/logic/singleton';
+import ValueParameter from 'views/logic/parameters/ValueParameter';
 
-export type MessageEventTypesContextType = {
-  eventTypes: MessageEventTypes,
-}
-
-const MessageEventTypesContext = React.createContext<MessageEventTypesContextType | undefined>(undefined);
-
-export default singleton('contexts.MessageEventsContext', () => MessageEventTypesContext);
+// eslint-disable-next-line import/prefer-default-export
+export const valueParameter = ValueParameter.create('paraemterName', 'Parameter Title', '', 'any', undefined, false);

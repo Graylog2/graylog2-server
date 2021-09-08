@@ -48,12 +48,8 @@ import WidgetFocusContext from '../contexts/WidgetFocusContext';
 import WidgetContext from '../contexts/WidgetContext';
 
 const Container = styled.div`
-  > * {
-    margin-right: 5px;
-
-    :last-child {
-      margin-right: 0;
-    }
+  > *:not(:last-child) {
+    margin-right: 2px;
   }
 `;
 

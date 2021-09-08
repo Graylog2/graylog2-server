@@ -54,7 +54,7 @@ const fieldTypeFor = (fieldName: string, queryId: string): FieldType => {
   return mapping.type;
 };
 
-const ChartActionHandler: FieldActionHandler = ({ queryId, field, contexts: { widget: origWidget = Widget.empty() } }) => {
+const ChartActionHandler: FieldActionHandler<{ widget?: Widget }> = ({ queryId, field, contexts: { widget: origWidget = Widget.empty() } }) => {
   const series = isFunction(field) ? Series.forFunction(field) : Series.forFunction(`avg(${field})`);
   const config = AggregationWidgetConfig.builder()
     .rowPivots([pivotForField(TIMESTAMP_FIELD, fieldTypeFor(TIMESTAMP_FIELD, queryId))])

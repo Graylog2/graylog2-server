@@ -18,7 +18,7 @@
 import { ActionDefinition } from 'views/components/actions/ActionHandler';
 
 // eslint-disable-next-line import/prefer-default-export
-export const createSimpleExternalValueAction = (overrides: Partial<ActionDefinition> = {}): ActionDefinition => ({
+export const createSimpleExternalValueAction = (overrides: Partial<ActionDefinition> = {}): ActionDefinition<{}> => ({
   type: 'http-get',
   title: 'Pivot to example.org',
   isHidden: ({ field }) => !['field1'].includes(field),

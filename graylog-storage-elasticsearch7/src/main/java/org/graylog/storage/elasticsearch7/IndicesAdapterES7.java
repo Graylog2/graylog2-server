@@ -42,6 +42,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.CloseI
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.CreateIndexRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.DeleteAliasRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.PutIndexTemplateRequest;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.PutMappingRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.cluster.metadata.AliasMetadata;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.unit.TimeValue;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders;
@@ -72,6 +73,7 @@ import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import java.util.Arrays;
 import java.util.Collection;
@@ -150,6 +152,18 @@ public class IndicesAdapterES7 implements IndicesAdapter {
 
         client.execute((c, requestOptions) -> c.indices().create(request, requestOptions),
                 "Unable to create index " + index);
+    }
+
+    @Override
+    public void updateIndexMapping(@Nonnull String indexName,
+                                   @Nonnull String mappingType,
+                                   @Nonnull Map<String, Object> mapping) {
+
+        final PutMappingRequest request = new PutMappingRequest(indexName)
+                .source(mapping);
+
+        client.execute((c, requestOptions) -> c.indices().putMapping(request, requestOptions),
+                "Unable to update index mapping " + indexName);
     }
 
     @Override

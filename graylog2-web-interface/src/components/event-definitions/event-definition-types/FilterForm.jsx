@@ -31,7 +31,8 @@ import { naturalSortIgnoreCase } from 'util/SortUtils';
 import * as FormsUtils from 'util/FormsUtils';
 import CombinedProvider from 'injection/CombinedProvider';
 import { SearchMetadataActions } from 'views/stores/SearchMetadataStore';
-import PermissionsMixin from 'util/PermissionsMixin';
+import { isPermitted } from 'util/PermissionsMixin';
+import LookupTableParameter from 'views/logic/parameters/LookupTableParameter';
 
 import EditQueryParameterModal from '../event-definition-form/EditQueryParameterModal';
 import commonStyles from '../common/commonStyles.css';
@@ -72,7 +73,7 @@ class FilterForm extends React.Component {
   _parseQuery = lodash.debounce((queryString) => {
     const { currentUser } = this.props;
 
-    if (!PermissionsMixin.isPermitted(currentUser.permissions, PREVIEW_PERMISSIONS)) {
+    if (!isPermitted(currentUser.permissions, PREVIEW_PERMISSIONS)) {
       return;
     }
 
@@ -130,7 +131,7 @@ class FilterForm extends React.Component {
   componentDidMount() {
     const { currentUser } = this.props;
 
-    if (!PermissionsMixin.isPermitted(currentUser.permissions, LOOKUP_PERMISSIONS)) {
+    if (!isPermitted(currentUser.permissions, LOOKUP_PERMISSIONS)) {
       return;
     }
 
@@ -223,14 +224,22 @@ class FilterForm extends React.Component {
   renderQueryParameters = () => {
     const { eventDefinition, onChange, lookupTables, validation } = this.props;
     const { query_parameters: queryParameters } = eventDefinition.config;
+
+    const onChangeQueryParameters = (newQueryParameters) => {
+      const newConfig = { ...eventDefinition.config, query_parameters: newQueryParameters };
+
+      return onChange('config', newConfig);
+    };
+
     const parameterButtons = queryParameters.map((queryParam) => {
       return (
         <EditQueryParameterModal key={queryParam.name}
-                                 queryParameter={queryParam}
-                                 eventDefinition={eventDefinition}
-                                 lookupTables={lookupTables.tables || []}
+                                 queryParameter={LookupTableParameter.fromJSON(queryParam)}
+                                 embryonic={!!queryParam.embryonic}
+                                 queryParameters={queryParameters}
+                                 lookupTables={lookupTables.tables}
                                  validation={validation}
-                                 onChange={onChange} />
+                                 onChange={onChangeQueryParameters} />
       );
     });
 

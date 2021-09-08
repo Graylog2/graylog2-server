@@ -53,6 +53,7 @@ import io.searchbox.indices.aliases.AliasMapping;
 import io.searchbox.indices.aliases.GetAliases;
 import io.searchbox.indices.aliases.ModifyAliases;
 import io.searchbox.indices.aliases.RemoveAliasMapping;
+import io.searchbox.indices.mapping.PutMapping;
 import io.searchbox.indices.settings.GetSettings;
 import io.searchbox.indices.settings.UpdateSettings;
 import io.searchbox.indices.template.DeleteTemplate;
@@ -85,6 +86,7 @@ import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -179,7 +181,7 @@ public class IndicesAdapterES6 implements IndicesAdapter {
     @Override
     public Set<String> resolveAlias(String alias) {
         final GetSingleAlias request = new GetSingleAlias.Builder()
-                .alias(alias)
+                .alias(uncheckedURLEncode(alias))
                 .build();
         try {
             final JestResult jestResult = JestUtils.execute(jestClient, request, () -> "Couldn't collect indices for alias " + alias);
@@ -209,6 +211,25 @@ public class IndicesAdapterES6 implements IndicesAdapter {
             jestResult = jestClient.execute(request);
         } catch (IOException e) {
             throw new ElasticsearchException("Couldn't create index " + indexName, e);
+        }
+
+        if (!jestResult.isSucceeded()){
+            throw new ElasticsearchException(jestResult.getErrorMessage());
+        }
+    }
+
+    @Override
+    public void updateIndexMapping(@Nonnull String indexName,
+                                   @Nonnull String mappingType,
+                                   @Nonnull Map<String, Object> mapping) {
+
+        final PutMapping request = new PutMapping.Builder(indexName, mappingType, mapping).build();
+
+        final JestResult jestResult;
+        try {
+            jestResult = jestClient.execute(request);
+        } catch (IOException e) {
+            throw new ElasticsearchException("Couldn't update index mapping " + indexName + "/" + mappingType, e);
         }
 
         if (!jestResult.isSucceeded()){

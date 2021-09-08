@@ -26,7 +26,7 @@ export default class ExcludeFromQueryHandler extends QueryManipulationHandler {
     return addToQuery(oldQuery, fieldPredicate);
   };
 
-  handle: ActionHandler = ({ queryId, field, value }) => {
+  handle: ActionHandler<{}> = ({ queryId, field, value }) => {
     const oldQuery = this.currentQueryString(queryId);
     const newQuery = this.formatNewQuery(oldQuery, field, value);
 

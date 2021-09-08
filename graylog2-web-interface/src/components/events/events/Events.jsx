@@ -143,7 +143,7 @@ class Events extends React.Component {
 
     return (
       <>
-        <OverlayTrigger placement="top" overlay={tooltip}>
+        <OverlayTrigger placement="top" trigger={['hover', 'click', 'focus']} overlay={tooltip}>
           <EventsIcon name={icon} fixedWidth className={style} />
         </OverlayTrigger>
       </>

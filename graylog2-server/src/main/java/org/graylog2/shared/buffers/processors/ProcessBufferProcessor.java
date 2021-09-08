@@ -24,6 +24,7 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import com.lmax.disruptor.WorkHandler;
 import de.huxhorn.sulky.ulid.ULID;
+import org.graylog.failure.FailureSubmissionService;
 import org.graylog2.buffers.OutputBuffer;
 import org.graylog2.messageprocessors.OrderedMessageProcessors;
 import org.graylog2.plugin.Message;
@@ -39,6 +40,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;
+import java.util.Locale;
 import java.util.Optional;
 
 import static com.codahale.metrics.MetricRegistry.name;
@@ -58,6 +60,7 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
     private final ULID ulid;
     private final DecodingProcessor decodingProcessor;
     private final Provider<Stream> defaultStreamProvider;
+    private final FailureSubmissionService failureSubmissionService;
     private volatile Message currentMessage;
 
     @AssistedInject
@@ -67,13 +70,15 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
                                   ProcessingStatusRecorder processingStatusRecorder,
                                   ULID ulid,
                                   @Assisted DecodingProcessor decodingProcessor,
-                                  @DefaultStream Provider<Stream> defaultStreamProvider) {
+                                  @DefaultStream Provider<Stream> defaultStreamProvider,
+                                  FailureSubmissionService failureSubmissionService) {
         this.orderedMessageProcessors = orderedMessageProcessors;
         this.outputBuffer = outputBuffer;
         this.processingStatusRecorder = processingStatusRecorder;
         this.ulid = ulid;
         this.decodingProcessor = decodingProcessor;
         this.defaultStreamProvider = defaultStreamProvider;
+        this.failureSubmissionService = failureSubmissionService;
 
         incomingMessages = metricRegistry.meter(name(ProcessBufferProcessor.class, "incomingMessages"));
         outgoingMessages = metricRegistry.meter(name(ProcessBufferProcessor.class, "outgoingMessages"));
@@ -134,6 +139,11 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
                 // Only logs a single line warning without stacktrace
                 LOG.warn("Unable to process message <{}>: {}", msg.getId(), e);
             }
+
+            failureSubmissionService.submitUnknownProcessingError(msg, String.format(Locale.ENGLISH,
+                    "Unable to process message <%s>: %s",
+                    msg.getId(), e));
+
         } finally {
             currentMessage = null;
             outgoingMessages.mark();
@@ -158,7 +168,9 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
             message.setProcessingTime(Tools.nowUTC());
             processingStatusRecorder.updatePostProcessingReceiveTime(message.getReceiveTime());
 
-            outputBuffer.insertBlocking(message);
+            if(failureSubmissionService.submitProcessingErrors(message)) {
+                outputBuffer.insertBlocking(message);
+            }
         }
     }
 

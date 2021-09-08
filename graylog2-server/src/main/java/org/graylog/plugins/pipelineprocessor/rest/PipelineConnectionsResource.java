@@ -28,6 +28,7 @@ import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamService;
@@ -36,6 +37,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -74,6 +76,8 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
     @AuditEvent(type = PipelineProcessorAuditEventTypes.PIPELINE_CONNECTION_UPDATE)
     public PipelineConnections connectPipelines(@ApiParam(name = "Json body", required = true) @NotNull PipelineConnections connection) throws NotFoundException {
         final String streamId = connection.streamId();
+
+        checkNotEditable(streamId, "Cannot connect pipeline to non editable stream");
         // verify the stream exists
         checkPermission(RestPermissions.STREAMS_READ, streamId);
         streamService.load(streamId);
@@ -104,6 +108,9 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
                 .filter(p -> p.pipelineIds().contains(pipelineId))
                 .collect(Collectors.toSet());
 
+        connection.streamIds().forEach(streamId ->
+                checkNotEditable(streamId, "Cannot connect pipeline to non editable stream")
+        );
         // remove deleted pipeline connections
         for (PipelineConnections pipelineConnection : pipelineConnections) {
             if (!connection.streamIds().contains(pipelineConnection.streamId())) {
@@ -185,6 +192,12 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
         }
 
         return filteredConnections;
+    }
+
+    private void checkNotEditable(String streamId, String message) {
+        if (!Stream.streamIsEditable(streamId)) {
+            throw new BadRequestException(message);
+        }
     }
 
 }
