@@ -28,6 +28,7 @@ import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.graph.Traverser;
+import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.engine.EmptyTimeRange;
 import org.graylog.plugins.views.search.filter.AndFilter;
@@ -36,6 +37,8 @@ import org.graylog2.contentpacks.ContentPackable;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.QueryEntity;
+import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
+import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -246,7 +249,14 @@ public abstract class Query implements ContentPackable<QueryEntity> {
 
         @JsonCreator
         static Builder createWithDefaults() {
-            return new AutoValue_Query.Builder().searchTypes(of());
+            try {
+                return new AutoValue_Query.Builder()
+                        .searchTypes(of())
+                        .query(ElasticsearchQueryString.empty())
+                        .timerange(RelativeRange.create(300));
+            } catch (InvalidRangeParametersException e) {
+                throw new RuntimeException("Unable to create relative timerange - this should not happen!");
+            }
         }
 
         public Query build() {
