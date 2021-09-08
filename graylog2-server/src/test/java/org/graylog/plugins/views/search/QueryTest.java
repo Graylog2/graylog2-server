@@ -171,6 +171,14 @@ public class QueryTest {
         assertThat(build.id()).isNotNull();
     }
 
+    @Test
+    public void builderGeneratesDefaultQueryAndRange() {
+        final Query build = Query.builder().build();
+        final ElasticsearchQueryString query = (ElasticsearchQueryString) build.query();
+        assertThat(query.queryString()).isEqualTo("");
+        assertThat(build.timerange()).isNotNull();
+    }
+
     private RelativeRange relativeRange(int range) {
         try {
             return RelativeRange.create(range);
