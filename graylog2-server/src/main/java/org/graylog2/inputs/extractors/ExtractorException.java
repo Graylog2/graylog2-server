@@ -14,25 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.failure;
+package org.graylog2.inputs.extractors;
 
-public enum ProcessingFailureCause implements FailureCause {
-    RuleStatementEvaluationError("RuleStatementEvaluationError"),
-    RuleConditionEvaluationError("RuleConditionEvaluationError"),
-    ExtractorException("ExtractorException"),
-    MessageFilterException("MessageFilterException"),
-    InvalidTimestampException("InvalidTimestampException"),
-    UNKNOWN("UNKNOWN"),
-    ;
-
-    private final String label;
-
-    ProcessingFailureCause(String label) {
-        this.label = label;
-    }
-
-    @Override
-    public String label() {
-        return label;
+public class ExtractorException extends RuntimeException {
+    public ExtractorException(Throwable cause) {
+        super(cause);
     }
 }

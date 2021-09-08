@@ -33,9 +33,12 @@ import com.google.common.collect.Sets;
 import com.google.common.net.InetAddresses;
 import org.apache.commons.lang3.StringUtils;
 import org.graylog.failure.FailureCause;
+import org.graylog.failure.ProcessingFailureCause;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.messages.Indexable;
 import org.graylog2.plugin.streams.Stream;
+import org.graylog2.plugin.utilities.date.DateTimeConverter;
+import org.graylog2.shared.utilities.ExceptionUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,14 +47,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 import java.net.InetAddress;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.time.temporal.Temporal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -74,7 +70,6 @@ import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_EVENT_SUBC
 import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_EVENT_TYPE;
 import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_EVENT_TYPE_CODE;
 import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_TAGS;
-import static org.graylog2.plugin.Tools.ES_DATE_FORMAT_FORMATTER;
 import static org.graylog2.plugin.Tools.buildElasticSearchTimeFormat;
 import static org.joda.time.DateTimeZone.UTC;
 
@@ -123,11 +118,6 @@ public class Message implements Messages, Indexable {
      * See: https://github.com/Graylog2/graylog2-server/issues/5994
      */
     public static final String FIELD_GL2_MESSAGE_ID = "gl2_message_id";
-
-    /**
-     * Can be set when a message timestamp gets modified to preserve the original timestamp. (e.g. "clone_message" pipeline function)
-     */
-    public static final String FIELD_GL2_ORIGINAL_TIMESTAMP = "gl2_original_timestamp";
 
     /**
      * Can be set to indicate a message processing error. (e.g. set by the pipeline interpreter when an error occurs)
@@ -201,7 +191,6 @@ public class Message implements Messages, Indexable {
 
     private static final ImmutableSet<String> GRAYLOG_FIELDS = ImmutableSet.of(
         FIELD_GL2_ACCOUNTED_MESSAGE_SIZE,
-        FIELD_GL2_ORIGINAL_TIMESTAMP,
         FIELD_GL2_PROCESSING_ERROR,
         FIELD_GL2_PROCESSING_TIMESTAMP,
         FIELD_GL2_RECEIVE_TIMESTAMP,
@@ -432,40 +421,43 @@ public class Message implements Messages, Indexable {
         obj.put(FIELD_STREAMS, getStreamIds());
         obj.put(FIELD_GL2_ACCOUNTED_MESSAGE_SIZE, getSize());
 
+        final Object timestampValue = getField(FIELD_TIMESTAMP);
+        DateTime dateTime = timestampValue == null ? fallbackForNullTimestamp() : convertToDateTime(timestampValue);
+        obj.put(FIELD_TIMESTAMP, buildElasticSearchTimeFormat(dateTime.withZone(UTC)));
+
         if (processingErrors != null && !processingErrors.isEmpty()) {
+            if (processingErrors.stream().anyMatch(processingError -> processingError.getCause().equals(ProcessingFailureCause.InvalidTimestampException))) {
+                invalidTimestampMeter.mark();
+            }
             obj.put(FIELD_GL2_PROCESSING_ERROR,
                     processingErrors.stream()
                             .map(ProcessingError::getDetails)
                             .collect(Collectors.joining(", ")));
         }
 
-        final Object timestampValue = getField(FIELD_TIMESTAMP);
-        DateTime dateTime;
-        if (timestampValue instanceof Date) {
-            dateTime = new DateTime(timestampValue);
-        } else if (timestampValue instanceof DateTime) {
-            dateTime = (DateTime) timestampValue;
-        } else if (timestampValue instanceof String) {
-            // if the timestamp value is a string, we try to parse it in the correct format.
-            // we fall back to "now", this avoids losing messages which happen to have the wrong timestamp format
-            try {
-                dateTime = ES_DATE_FORMAT_FORMATTER.parseDateTime((String) timestampValue);
-            } catch (IllegalArgumentException e) {
-                LOG.trace("Invalid format for field timestamp '{}' in message {}, forcing to current time.", timestampValue, getId());
-                invalidTimestampMeter.mark();
-                dateTime = Tools.nowUTC();
-            }
-        } else {
-            // don't allow any other types for timestamp, force to "now"
-            LOG.trace("Invalid type for field timestamp '{}' in message {}, forcing to current time.", timestampValue.getClass().getSimpleName(), getId());
-            invalidTimestampMeter.mark();
-            dateTime = Tools.nowUTC();
-        }
-        if (dateTime != null) {
-            obj.put(FIELD_TIMESTAMP, buildElasticSearchTimeFormat(dateTime.withZone(UTC)));
-        }
-
         return obj;
+    }
+
+    private DateTime convertToDateTime(@Nonnull Object value) {
+        try {
+            return DateTimeConverter.convertToDateTime(value);
+        } catch (IllegalArgumentException e) {
+            final String error = "Invalid value for field timestamp in message <" + getId() + ">, forcing to current time.";
+            LOG.trace("{}: {}", error, e);
+            addProcessingError(new ProcessingError(ProcessingFailureCause.InvalidTimestampException,
+                    "Replaced invalid timestamp value in message <" + getId() + "> with current time"
+                    , "Value <" + value + "> caused exception: " + ExceptionUtils.getRootCauseMessage(e)));
+            return Tools.nowUTC();
+        }
+    }
+
+    private DateTime fallbackForNullTimestamp() {
+        final String error = "<null> value for field timestamp in message <" + getId() + ">, forcing to current time";
+        LOG.trace(error);
+        addProcessingError(new ProcessingError(ProcessingFailureCause.InvalidTimestampException,
+                "Replaced invalid timestamp value in message <" + getId() + "> with current time",
+                "<null> value provided"));
+        return Tools.nowUTC();
     }
 
     // estimate the byte/char length for a field and its value
@@ -541,39 +533,10 @@ public class Message implements Messages, Indexable {
         }
 
         final boolean isTimestamp = FIELD_TIMESTAMP.equals(trimmedKey);
-        if (isTimestamp && value instanceof Date) {
-            final DateTime timestamp = new DateTime(value);
-            final Object previousValue = fields.put(FIELD_TIMESTAMP, timestamp);
-            updateSize(trimmedKey, timestamp, previousValue);
-        } else if (isTimestamp && value instanceof Temporal) {
-            final Date date;
-            if (value instanceof ZonedDateTime) {
-                date = Date.from(((ZonedDateTime) value).toInstant());
-            } else if (value instanceof OffsetDateTime) {
-                date = Date.from(((OffsetDateTime) value).toInstant());
-            } else if (value instanceof LocalDateTime) {
-                final LocalDateTime localDateTime = (LocalDateTime) value;
-                final ZoneId defaultZoneId = ZoneId.systemDefault();
-                final ZoneOffset offset = defaultZoneId.getRules().getOffset(localDateTime);
-                date = Date.from(localDateTime.toInstant(offset));
-            } else if (value instanceof LocalDate) {
-                final LocalDate localDate = (LocalDate) value;
-                final LocalDateTime localDateTime = localDate.atStartOfDay();
-                final ZoneId defaultZoneId = ZoneId.systemDefault();
-                final ZoneOffset offset = defaultZoneId.getRules().getOffset(localDateTime);
-                date = Date.from(localDateTime.toInstant(offset));
-            } else if (value instanceof Instant) {
-                date = Date.from((Instant) value);
-            } else {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Unsupported temporal type {}. Using current date and time in message {}.", value.getClass(), getId());
-                }
-                date = new Date();
-            }
-
-            final DateTime timestamp = new DateTime(date);
-            final Object previousValue = fields.put(FIELD_TIMESTAMP, timestamp);
-            updateSize(trimmedKey, timestamp, previousValue);
+        if (isTimestamp) {
+            final DateTime timeStamp = value == null ? fallbackForNullTimestamp() : convertToDateTime(value);
+            final Object previousValue = fields.put(FIELD_TIMESTAMP, timeStamp);
+            updateSize(trimmedKey, timeStamp, previousValue);
         } else if (value instanceof String) {
             final String str = ((String) value).trim();
 

@@ -43,9 +43,11 @@ type EventResult = {
   name: 'events',
 };
 
+type VisualizationResult = { [key: string]: Rows } & { events?: Events };
+
 export type VisualizationComponentProps = {
   config: AggregationWidgetConfig,
-  data: { [key: string]: Rows } & { events?: Events },
+  data: VisualizationResult,
   editing?: boolean,
   effectiveTimerange: AbsoluteTimeRange,
   fields: FieldTypeMappingsList,
@@ -58,6 +60,8 @@ export type VisualizationComponentProps = {
 export type VisualizationComponent<T extends string> =
   { type: T, propTypes?: any }
   & React.ComponentType<VisualizationComponentProps>;
+
+export const retrieveChartData = (data: VisualizationResult): Rows => data.chart ?? data[Object.keys(data).filter((name) => name !== 'events')[0]];
 
 export const makeVisualization = <T extends string>(component: React.ComponentType<VisualizationComponentProps>, type: T): VisualizationComponent<T> => {
   const visualizationComponent = component as VisualizationComponent<T>;

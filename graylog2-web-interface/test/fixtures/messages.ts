@@ -14,25 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.failure;
 
-public enum ProcessingFailureCause implements FailureCause {
-    RuleStatementEvaluationError("RuleStatementEvaluationError"),
-    RuleConditionEvaluationError("RuleConditionEvaluationError"),
-    ExtractorException("ExtractorException"),
-    MessageFilterException("MessageFilterException"),
-    InvalidTimestampException("InvalidTimestampException"),
-    UNKNOWN("UNKNOWN"),
-    ;
-
-    private final String label;
-
-    ProcessingFailureCause(String label) {
-        this.label = label;
-    }
-
-    @Override
-    public String label() {
-        return label;
-    }
-}
+// eslint-disable-next-line import/prefer-default-export
+export const simpleMessage = {
+  decoration_stats: null,
+  fields: { took_ms: 62, source: 'example.org' },
+  formatted_fields: { took_ms: 62, source: 'example.org' },
+  highlight_ranges: {},
+  id: 'message-id',
+  index: 'grayog_0',
+};

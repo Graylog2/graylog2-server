@@ -69,6 +69,9 @@ const TableWrapper = styled.div(({ theme }) => css`
   flex-direction: column;
   overflow: auto;
 
+  /* Fixes overflow of children with position: fixed */
+  clip-path: inset(0 0 0 0);
+
   @media screen and (max-width: ${theme.breakpoints.max.md}) {
     &.table-responsive {
       overflow-y: auto;
@@ -185,7 +188,7 @@ class MessageTable extends React.Component<Props, State> {
     const selectedFields = this._getSelectedFields();
 
     return (
-      <TableWrapper className="table-responsive">
+      <TableWrapper className="table-responsive" id="sticky-augmentations-container">
         <Table className="table table-condensed">
           <TableHead>
             <tr>

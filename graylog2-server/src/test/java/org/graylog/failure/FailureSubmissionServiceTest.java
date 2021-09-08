@@ -18,6 +18,7 @@ package org.graylog.failure;
 
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.plugin.Message;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
@@ -332,7 +333,7 @@ public class FailureSubmissionServiceTest {
             assertThat(fb.getFailures().get(0)).satisfies(processingFailure -> {
                 assertThat(processingFailure.failureType()).isEqualTo(FailureType.PROCESSING);
                 assertThat(processingFailure.failureCause().label()).isEqualTo("UNKNOWN");
-                assertThat(processingFailure.message()).isEqualTo("Failed to process a message with unknown id: Encountered an unrecognizable processing error");
+                assertThat(processingFailure.message()).isEqualTo("Failed to process message with id 'UNKNOWN': Encountered an unrecognizable processing error");
                 assertThat(processingFailure.failureDetails()).isEqualTo("Details of the unknown error!");
                 assertThat(processingFailure.failureTimestamp()).isNotNull();
                 assertThat(processingFailure.failedMessage()).isEqualTo(msg);
@@ -340,6 +341,33 @@ public class FailureSubmissionServiceTest {
                 assertThat(processingFailure.requiresAcknowledgement()).isFalse();
             });
         });
+    }
 
+    @Test
+    @DisplayName("Ensure Message#getId() is used as a fallback for Message#getMessageId()")
+    public void submitProcessingErrorWithIdButnoMessageId() throws Exception {
+        // given
+        final Message msg = Mockito.mock(Message.class);
+        when(msg.getId()).thenReturn("msg-uuid");
+        when(msg.processingErrors()).thenReturn(ImmutableList.of());
+        when(msg.supportsFailureHandling()).thenReturn(true);
+
+        when(failureHandlingConfiguration.submitProcessingFailures()).thenReturn(true);
+        when(failureHandlingConfiguration.keepFailedMessageDuplicate()).thenReturn(true);
+
+        // when
+        underTest.submitUnknownProcessingError(msg, "Details of the unknown error!");
+
+        // then
+        verify(failureSubmissionQueue, times(1)).submitBlocking(failureBatchCaptor.capture());
+
+        assertThat(failureBatchCaptor.getValue()).satisfies(fb -> {
+            assertThat(fb.containsProcessingFailures()).isTrue();
+            assertThat(fb.size()).isEqualTo(1);
+
+            assertThat(fb.getFailures().get(0)).satisfies(processingFailure -> {
+                assertThat(processingFailure.message()).isEqualTo("Failed to process message with id 'msg-uuid': Encountered an unrecognizable processing error");
+            });
+        });
     }
 }
