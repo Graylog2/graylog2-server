@@ -103,7 +103,7 @@ public class JsonTesterResource extends RestResource {
         try {
             result = extractor.extractJson(testString);
         } catch (IOException e) {
-            throw new BadRequestException("Failure running JSON extractor", e);
+            throw new BadRequestException("Failure running JSON extractor: " + e.getMessage(), e);
         }
         return JsonTesterResponse.create(result, flatten, listSeparator, keySeparator, kvSeparator, testString);
     }
