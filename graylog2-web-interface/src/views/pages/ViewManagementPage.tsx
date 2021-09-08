@@ -34,7 +34,7 @@ const handleViewDelete = (view) => {
     return ViewManagementActions.delete(view);
   }
 
-  return null;
+  return Promise.resolve();
 };
 
 const ViewManagementPage = () => {
