@@ -14,14 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+package org.graylog2.inputs.extractors;
 
-import type { ColorVariants } from 'theme/colors';
-
-export type MessageEventType = {
-  gl2EventTypeCode: string,
-  summaryTemplate: string,
-  category: ColorVariants,
-  eventActions: Array<string>,
-  requiredFields: Array<string>,
-  optionalFields: Array<string>,
+public class ExtractorException extends RuntimeException {
+    public ExtractorException(Throwable cause) {
+        super(cause);
+    }
 }

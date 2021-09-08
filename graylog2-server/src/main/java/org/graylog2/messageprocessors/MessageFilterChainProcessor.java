@@ -22,6 +22,7 @@ import com.codahale.metrics.Timer;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Ordering;
+import org.graylog.failure.ProcessingFailureCause;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Messages;
 import org.graylog2.plugin.ServerStatus;
@@ -29,12 +30,14 @@ import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.plugin.messageprocessors.MessageProcessor;
 import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
+import org.graylog2.shared.utilities.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import static com.codahale.metrics.MetricRegistry.name;
@@ -79,8 +82,9 @@ public class MessageFilterChainProcessor implements MessageProcessor {
             }
         }).immutableSortedCopy(filterRegistry);
 
-        if (filterRegistry.size() == 0)
+        if (filterRegistry.size() == 0) {
             throw new RuntimeException("Empty filter registry!");
+        }
 
         this.filteredOutMessages = metricRegistry.meter(name(ProcessBufferProcessor.class, "filteredOutMessages"));
     }
@@ -106,8 +110,15 @@ public class MessageFilterChainProcessor implements MessageProcessor {
                         messageQueueAcknowledger.acknowledge(msg);
                     }
                 } catch (Exception e) {
-                    LOG.error("Could not apply filter [" + filter.getName() + "] on message <" + msg.getId() + ">: ",
-                            e);
+                    final String shortError = String.format(Locale.US, "Could not apply filter [%s] on message <%s>",
+                            filter.getName(), msg.getId());
+                    if (LOG.isDebugEnabled()) {
+                        LOG.error("{}:", shortError, e);
+                    } else {
+                        LOG.error("{}:\n{}", shortError, ExceptionUtils.getShortenedStackTrace(e));
+                    }
+                    msg.addProcessingError(new Message.ProcessingError(ProcessingFailureCause.MessageFilterException,
+                            shortError, ExceptionUtils.getRootCauseMessage(e)));
                 } finally {
                     final long elapsedNanos = timerContext.stop();
                     msg.recordTiming(serverStatus, timerName, elapsedNanos);

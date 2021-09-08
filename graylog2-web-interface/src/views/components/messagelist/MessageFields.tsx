@@ -35,8 +35,6 @@ const MessageDetailsDL = styled(MessageDetailsDefinitionList)(({ theme }: { them
   color: ${theme.colors.gray[40]};
 
   dd {
-    font-family: ${theme.fonts.family.monospace};
-
     &:not(:last-child) {
       border-bottom: 1px solid  ${theme.colors.gray[90]};
     }

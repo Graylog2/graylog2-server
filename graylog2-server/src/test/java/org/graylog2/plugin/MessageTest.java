@@ -25,6 +25,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.graylog.failure.FailureCause;
+import org.graylog.failure.ProcessingFailureCause;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.SuppressForbidden;
@@ -42,6 +43,7 @@ import org.mockito.junit.MockitoRule;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Month;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -734,5 +736,67 @@ public class MessageTest {
         // then
         assertThat(esObject.get(Message.FIELD_GL2_PROCESSING_ERROR))
                 .isEqualTo("Failure Details #1, Failure Details #2");
+    }
+
+    @Test
+    public void testTimestampConversionWithWrongDate() {
+        // Do not use fixed time from setUp() in this test
+        DateTimeUtils.setCurrentMillisSystem();
+
+        final Message message = new Message("message", "source", Tools.nowUTC().minusMinutes(2));
+        final DateTime previousTimestamp = message.getTimestamp();
+
+        message.addField(Message.FIELD_TIMESTAMP, 1234);
+
+        assertThat(message.getTimestamp()).isInstanceOf(DateTime.class);
+        // got replaced by a current timestamp
+        assertThat(message.getTimestamp()).isNotEqualTo(previousTimestamp);
+
+        assertThat(message.processingErrors()).satisfies(e -> {
+            assertThat(e).hasSize(1);
+            assertThat(e.get(0).getCause()).isEqualTo(ProcessingFailureCause.InvalidTimestampException);
+            assertThat(e.get(0).getMessage()).startsWith("Replaced invalid timestamp value in message <");
+            assertThat(e.get(0).getDetails()).startsWith("Value <1234> caused exception: Value of invalid type <Integer> provided");
+        });
+    }
+
+    @Test
+    public void testTimestampConversionWithNullDate() {
+        // Do not use fixed time from setUp() in this test
+        DateTimeUtils.setCurrentMillisSystem();
+
+        final Message message = new Message("message", "source", Tools.nowUTC().minusMinutes(2));
+        final DateTime previousTimestamp = message.getTimestamp();
+
+        message.addField(Message.FIELD_TIMESTAMP, null);
+
+        assertThat(message.getTimestamp()).isInstanceOf(DateTime.class);
+        // got replaced by a current timestamp
+        assertThat(message.getTimestamp()).isNotEqualTo(previousTimestamp);
+
+        assertThat(message.processingErrors()).satisfies(e -> {
+            assertThat(e).hasSize(1);
+            assertThat(e.get(0).getCause()).isEqualTo(ProcessingFailureCause.InvalidTimestampException);
+            assertThat(e.get(0).getMessage()).startsWith("Replaced invalid timestamp value in message <");
+            assertThat(e.get(0).getDetails()).startsWith("<null> value provided");
+        });
+    }
+
+    @Test
+    public void testTimestampConversionWithLocalDateTime() {
+        // Do not use fixed time from setUp() in this test
+        DateTimeUtils.setCurrentMillisSystem();
+
+        final Message message = new Message("message", "source", Tools.nowUTC().minusMinutes(2));
+        final LocalDateTime localDate = LocalDateTime.of(2021, Month.AUGUST, 19, 12, 0);
+        final ZonedDateTime zonedDateTime = ZonedDateTime.of(localDate, ZoneOffset.UTC);
+
+        message.addField(Message.FIELD_TIMESTAMP, zonedDateTime);
+        assertThat(message.getTimestamp()).isInstanceOf(DateTime.class);
+
+        final DateTime expectedLocalDateEquivalent = new DateTime(2021, 8, 19, 12, 0, DateTimeZone.UTC);
+        assertThat(message.getTimestamp()).isEqualTo(expectedLocalDateEquivalent);
+
+        assertThat(message.processingErrors()).isEmpty();
     }
 }

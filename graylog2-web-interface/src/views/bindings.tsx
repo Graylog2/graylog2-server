@@ -357,6 +357,21 @@ const exports: PluginExports = {
       fileExtension: 'csv',
     },
   ],
+  'views.components.widgets.messageTable.previewOptions': [
+    {
+      title: 'Show message in new row',
+      isChecked: (config) => config.showMessageRow,
+      isDisabled: () => false,
+      onChange: (config, onConfigChange) => {
+        const willShowRowMessage = !config.showMessageRow;
+        const willShowSummary = !willShowRowMessage ? false : config.showSummary;
+        const newConfig = config.toBuilder().showMessageRow(willShowRowMessage).showSummary(willShowSummary).build();
+
+        return onConfigChange(newConfig);
+      },
+      sort: 1,
+    },
+  ],
 };
 
 export default exports;

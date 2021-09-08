@@ -41,6 +41,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
 
@@ -98,7 +99,12 @@ public class JsonTesterResource extends RestResource {
             throw new BadRequestException("Invalid extractor configuration", e);
         }
 
-        final Map<String, Object> result = extractor.extractJson(testString);
+        final Map<String, Object> result;
+        try {
+            result = extractor.extractJson(testString);
+        } catch (IOException e) {
+            throw new BadRequestException("Failure running JSON extractor: " + e.getMessage(), e);
+        }
         return JsonTesterResponse.create(result, flatten, listSeparator, keySeparator, kvSeparator, testString);
     }
 }
