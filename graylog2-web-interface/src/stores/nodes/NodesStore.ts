@@ -41,7 +41,7 @@ type NodesListResponse = {
 };
 
 export type NodesStoreState = {
-  nodes: Array<NodeInfo>;
+  nodes: { [nodeId: string]: NodeInfo };
   clusterId: string;
   nodeCount: number;
 };

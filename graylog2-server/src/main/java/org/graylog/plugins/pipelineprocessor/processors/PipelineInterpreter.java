@@ -200,7 +200,7 @@ public class PipelineInterpreter implements MessageProcessor {
     }
 
     // determine which pipelines should be executed give the stream-pipeline connections and the current message
-    // the initialStreamIds are not mutated, but are begin passed for efficiency, as they are being used later in #process()
+    // the initialStreamIds are not mutated, but are being passed for efficiency, as they are used later in #process()
     private ImmutableSet<Pipeline> selectPipelines(InterpreterListener interpreterListener,
                                                    Set<Tuple2<String, String>> processingBlacklist,
                                                    Message message,

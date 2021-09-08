@@ -18,7 +18,6 @@ import PropTypes from 'prop-types';
 import * as React from 'react';
 import { useState } from 'react';
 import Immutable from 'immutable';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 
 import { Link } from 'components/graylog/router';
@@ -35,41 +34,11 @@ import CustomPropTypes from 'views/components/CustomPropTypes';
 import { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import { useStore } from 'stores/connect';
 import { SearchConfigStore } from 'views/stores/SearchConfigStore';
+import FormatReceivedBy from 'views/components/messagelist/FormatReceivedBy';
 
-import NodeName from './NodeName';
-import MessageMetadata from './MessageMetadata';
 import MessageActions from './MessageActions';
-
-const _inputName = (inputs: Props['inputs'], inputId: string) => {
-  // eslint-disable-next-line react/destructuring-assignment
-  const input = inputs.get(inputId);
-
-  return input ? <span style={{ wordBreak: 'break-word' }}>{input.title}</span> : 'deleted input';
-};
-
-const _formatReceivedBy = (inputs: Props['inputs'], sourceNodeId: string, sourceInputId: string) => {
-  if (!sourceNodeId) {
-    return null;
-  }
-
-  const forwarderPlugin = PluginStore.exports('forwarder');
-  const ForwarderReceivedBy = forwarderPlugin?.[0]?.ForwarderReceivedBy;
-  const isLocalNode = forwarderPlugin?.[0]?.isLocalNode;
-
-  if (isLocalNode && !isLocalNode(sourceNodeId)) {
-    return <ForwarderReceivedBy inputId={sourceInputId} forwarderNodeId={sourceNodeId} />;
-  }
-
-  return (
-    <div>
-      <dt>Received by</dt>
-      <dd>
-        <em>{_inputName(inputs, sourceInputId)}</em>{' '}
-        on <NodeName nodeId={sourceNodeId} />
-      </dd>
-    </div>
-  );
-};
+import MessageAugmentations from './MessageAugmentations';
+import MessageMetadata from './MessageMetadata';
 
 const _formatMessageTitle = (index, id) => {
   if (index) {
@@ -149,7 +118,6 @@ const MessageDetail = ({
   }
 
   const { gl2_source_node, gl2_source_input } = fields;
-  const receivedBy = _formatReceivedBy(inputs, gl2_source_node, gl2_source_input);
 
   const messageTitle = _formatMessageTitle(index, id);
 
@@ -175,12 +143,13 @@ const MessageDetail = ({
           </MessageDetailsTitle>
         </Col>
       </Row>
-      <Row>
+      <Row id={`sticky-augmentations-boundary-${message.id}`}>
         <Col md={3}>
           <MessageMetadata timestamp={timestamp}
                            index={index}
-                           receivedBy={receivedBy}
+                           receivedBy={<FormatReceivedBy inputs={inputs} sourceNodeId={gl2_source_node} sourceInputId={gl2_source_input} />}
                            streams={streamsListItems} />
+          <MessageAugmentations message={message} />
         </Col>
         <Col md={9}>
           <MessageFields message={message}
