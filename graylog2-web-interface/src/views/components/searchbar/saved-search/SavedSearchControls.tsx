@@ -38,6 +38,8 @@ import * as ViewsPermissions from 'views/Permissions';
 import User from 'logic/users/User';
 import ViewPropertiesModal from 'views/components/views/ViewPropertiesModal';
 import { loadAsDashboard, loadNewSearch } from 'views/logic/views/Actions';
+import IfPermitted from 'components/common/IfPermitted';
+import Routes from 'routing/Routes';
 
 import SavedSearchForm from './SavedSearchForm';
 import SavedSearchList from './SavedSearchList';
@@ -261,11 +263,13 @@ class SavedSearchControls extends React.Component<Props, State> {
                                onClick={this.toggleShareSearch}
                                bsStyle="default"
                                disabledInfo={!view.id && 'Only saved searches can be shared.'} />
-                  <DropdownButton title={<Icon name="ellipsis-h" />} id="search-actions-dropdown" pullRight noCaret>
+                  <DropdownButton title={<Icon name="ellipsis-h" />} aria-label="Open search actions dropdown" id="search-actions-dropdown" pullRight noCaret>
                     <MenuItem onSelect={this.toggleMetadataEdit} disabled={!isAllowedToEdit}>
                       <Icon name="edit" /> Edit metadata
                     </MenuItem>
-                    <MenuItem onSelect={this._loadAsDashboard}><Icon name="tachometer-alt" /> Export to dashboard</MenuItem>
+                    <IfPermitted permissions="dashboards:create">
+                      <MenuItem onSelect={this._loadAsDashboard}><Icon name="tachometer-alt" /> Export to dashboard</MenuItem>
+                    </IfPermitted>
                     <MenuItem onSelect={this.toggleExport}><Icon name="cloud-download-alt" /> Export</MenuItem>
                     <MenuItem disabled={disableReset} onSelect={() => loadNewView()} data-testid="reset-search">
                       <Icon name="eraser" /> Reset search

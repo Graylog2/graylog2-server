@@ -30,10 +30,14 @@ import * as Permissions from 'views/Permissions';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import User from 'logic/users/User';
 import type { ViewStoreState } from 'views/stores/ViewStore';
+import history from 'util/History';
 
 import SavedSearchControls from './SavedSearchControls';
 
+jest.mock('routing/Routes', () => ({ pluginRoute: (x) => x }));
+
 jest.mock('views/stores/FieldTypesStore', () => ({}));
+jest.mock('util/History');
 
 describe('SavedSearchControls', () => {
   const createViewStoreState = (dirty = true, id = undefined) => ({
@@ -49,6 +53,8 @@ describe('SavedSearchControls', () => {
     dirty,
     isNew: false,
   });
+
+  const defaultViewStoreState = createViewStoreState();
 
   type SimpleSavedSearchControlsProps = {
     loadNewView?: NewViewLoaderContextType,
@@ -73,7 +79,7 @@ describe('SavedSearchControls', () => {
     loadNewView: () => Promise.resolve(),
     onLoadView: () => Promise.resolve(),
     currentUser,
-    viewStoreState: createViewStoreState(),
+    viewStoreState: defaultViewStoreState,
   };
 
   describe('Button handling', () => {
@@ -207,6 +213,45 @@ describe('SavedSearchControls', () => {
       render(<SimpleSavedSearchControls viewStoreState={viewStoreState} />);
 
       await screen.findByRole('button', { name: 'Unsaved changes' });
+    });
+  });
+
+  describe('actions dropdown', () => {
+    const openActionsDropdown = () => {
+      const dropDownButton = screen.getByLabelText('Open search actions dropdown');
+      userEvent.click(dropDownButton);
+    };
+
+    it('should export current search as dashboard', async () => {
+      const user = currentUser.toBuilder()
+        .permissions(Immutable.List(['dashboards:create']))
+        .build();
+
+      render(<SimpleSavedSearchControls currentUser={user} />);
+
+      openActionsDropdown();
+
+      const exportDashboardMenuItem = await screen.findByText('Export to dashboard');
+
+      userEvent.click(exportDashboardMenuItem);
+
+      await waitFor(() => expect(history.push).toHaveBeenCalledTimes(1));
+
+      expect(history.push).toHaveBeenCalledWith({ pathname: 'DASHBOARDS_NEW', state: { view: defaultViewStoreState.view } });
+    });
+
+    it('should not allow exporting search as dashboard if user does not have required permissions', async () => {
+      const user = currentUser.toBuilder()
+        .permissions(Immutable.List([]))
+        .build();
+
+      render(<SimpleSavedSearchControls currentUser={user} />);
+
+      openActionsDropdown();
+
+      await screen.findByText('Export');
+
+      expect(screen.queryByText('Export to dashboard')).not.toBeInTheDocument();
     });
   });
 });
