@@ -86,7 +86,7 @@ public class QueryPlanTest {
         return Query.builder()
                 .id(id == null ? randomUUID() : id)
                 .timerange(timerange)
-                .query(ElasticsearchQueryString.builder().queryString(queryString).build());
+                .query(ElasticsearchQueryString.of(queryString));
     }
 
     private Query.Builder wildcardQueryBuilder() {

@@ -65,7 +65,7 @@ public class ElasticsearchBackendTest {
     public void generatesSearchForEmptySearchTypes() throws Exception {
         final Query query = Query.builder()
                 .id("query1")
-                .query(ElasticsearchQueryString.builder().queryString("").build())
+                .query(ElasticsearchQueryString.of(""))
                 .timerange(RelativeRange.create(300))
                 .build();
         final Search search = Search.builder().queries(ImmutableSet.of(query)).build();
@@ -78,7 +78,7 @@ public class ElasticsearchBackendTest {
     public void executesSearchForEmptySearchTypes() throws Exception {
         final Query query = Query.builder()
                 .id("query1")
-                .query(ElasticsearchQueryString.builder().queryString("").build())
+                .query(ElasticsearchQueryString.of(""))
                 .timerange(RelativeRange.create(300))
                 .build();
         final Search search = Search.builder().queries(ImmutableSet.of(query)).build();

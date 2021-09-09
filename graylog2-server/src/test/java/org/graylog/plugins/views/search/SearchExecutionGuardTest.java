@@ -17,6 +17,7 @@
 package org.graylog.plugins.views.search;
 
 import com.google.common.collect.ImmutableSet;
+import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.errors.MissingCapabilitiesException;
 import org.graylog.plugins.views.search.filter.OrFilter;
@@ -122,7 +123,7 @@ public class SearchExecutionGuardTest {
                                         .streams(ImmutableSet.copyOf(streamIds))
                                         .build())
                 )
-                .query(new BackendQuery.Fallback())
+                .query(ElasticsearchQueryString.empty())
                 .filter(OrFilter.or(filters))
                 .build();
         return Search.Builder.create().id("searchId").queries(ImmutableSet.of(query)).build();

@@ -26,27 +26,30 @@ import com.google.auto.value.AutoValue;
 import com.google.common.base.Strings;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 
+import javax.annotation.Nullable;
+
 @AutoValue
-@JsonTypeName(ElasticsearchQueryString.NAME)
 @JsonAutoDetect
+@JsonDeserialize(as = AutoValue_ElasticsearchQueryString.class)
 public abstract class ElasticsearchQueryString implements BackendQuery {
 
     public static final String NAME = "elasticsearch";
 
     public static ElasticsearchQueryString empty() {
-        return ElasticsearchQueryString.builder().queryString("").build();
+        return ElasticsearchQueryString.of("");
     }
 
     @JsonCreator
-    public static ElasticsearchQueryString create(final String query) {
-        return builder().queryString(query).build();
+    public static ElasticsearchQueryString of(final String query) {
+        return new AutoValue_ElasticsearchQueryString(NAME, query);
     }
 
     @JsonCreator
     public static ElasticsearchQueryString create(final @JsonProperty("type") String type, final @JsonProperty("query_string") String query) {
-        return builder().type(type).queryString(query).build();
+        return new AutoValue_ElasticsearchQueryString(type, query);
     }
 
+    @Nullable
     @Override
     public abstract String type();
 
@@ -58,12 +61,6 @@ public abstract class ElasticsearchQueryString implements BackendQuery {
         String trimmed = queryString().trim();
         return trimmed.equals("") || trimmed.equals("*");
     }
-
-    public static Builder builder() {
-        return new AutoValue_ElasticsearchQueryString.Builder().type(NAME);
-    }
-
-    abstract Builder toBuilder();
 
     public ElasticsearchQueryString concatenate(ElasticsearchQueryString other) {
         final String thisQueryString = Strings.nullToEmpty(this.queryString()).trim();
@@ -77,24 +74,11 @@ public abstract class ElasticsearchQueryString implements BackendQuery {
             finalStringBuilder.append(otherQueryString);
         }
 
-        return toBuilder()
-                .queryString(finalStringBuilder.toString())
-                .build();
+        return new AutoValue_ElasticsearchQueryString(NAME, finalStringBuilder.toString());
     }
 
     @Override
     public String toString() {
         return type() + ": " + queryString();
-    }
-
-    @AutoValue.Builder
-    public abstract static class Builder {
-        @JsonProperty
-        public abstract Builder type(String type);
-
-        @JsonProperty
-        public abstract Builder queryString(String queryString);
-
-        public abstract ElasticsearchQueryString build();
     }
 }

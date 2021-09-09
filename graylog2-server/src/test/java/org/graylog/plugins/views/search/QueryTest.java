@@ -96,7 +96,7 @@ public class QueryTest {
         Query query = Query.builder()
                 .id("abc123")
                 .timerange(RelativeRange.create(600))
-                .query(ElasticsearchQueryString.builder().queryString("*").build())
+                .query(ElasticsearchQueryString.of("*"))
                 .searchTypes(ImmutableSet.of(MessageList.builder().id(messageListId).build()))
                 .build();
         Map<String, Object> executionState = of(
@@ -137,7 +137,7 @@ public class QueryTest {
         Query sut = validQueryBuilder().build();
         Query query = sut.applyExecutionState(objectMapper, objectMapper.convertValue(executionState, JsonNode.class));
         assertThat(query.globalOverride()).hasValueSatisfying(go ->
-                assertThat(go.query()).contains(ElasticsearchQueryString.builder().queryString("NACKEN").build()));
+                assertThat(go.query()).contains(ElasticsearchQueryString.of("NACKEN")));
     }
     @Test
     public void appliesExecutionStateTimeRangeAndQueryToGlobalOverrideIfBothArePresent() {
@@ -149,7 +149,7 @@ public class QueryTest {
         Query query = sut.applyExecutionState(objectMapper, objectMapper.convertValue(executionState, JsonNode.class));
         assertThat(query.globalOverride()).hasValueSatisfying(go -> {
             assertThat(go.timerange()).contains(relativeRange(60));
-            assertThat(go.query()).contains(ElasticsearchQueryString.builder().queryString("NACKEN").build());
+            assertThat(go.query()).contains(ElasticsearchQueryString.of("NACKEN"));
         });
     }
     @Test
@@ -187,6 +187,6 @@ public class QueryTest {
         }
     }
     private Query.Builder validQueryBuilder() {
-        return Query.builder().id(UUID.randomUUID().toString()).timerange(mock(TimeRange.class)).query(new BackendQuery.Fallback());
+        return Query.builder().id(UUID.randomUUID().toString()).timerange(mock(TimeRange.class)).query(ElasticsearchQueryString.empty());
     }
 }
