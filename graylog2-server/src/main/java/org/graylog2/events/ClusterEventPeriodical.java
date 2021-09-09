@@ -43,6 +43,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 
+import java.util.Collections;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class ClusterEventPeriodical extends Periodical {
@@ -174,10 +176,11 @@ public class ClusterEventPeriodical extends Periodical {
         }
 
         final String className = AutoValueUtils.getCanonicalName(event.getClass());
-        final ClusterEvent clusterEvent = ClusterEvent.create(nodeId.toString(), className, event);
+        final ClusterEvent clusterEvent = ClusterEvent.create(nodeId.toString(), className, Collections.singleton(nodeId.toString()), event);
 
         try {
             final String id = dbCollection.save(clusterEvent, WriteConcern.JOURNALED).getSavedId();
+            serverEventBus.post(event);
             LOG.debug("Published cluster event with ID <{}> and type <{}>", id, className);
         } catch (MongoException e) {
             LOG.error("Couldn't publish cluster event of type <" + className + ">", e);
