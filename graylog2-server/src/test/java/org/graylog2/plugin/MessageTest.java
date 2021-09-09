@@ -57,6 +57,7 @@ import java.util.regex.Pattern;
 
 import static com.google.common.collect.Sets.symmetricDifference;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_EVENT_CATEGORY;
 import static org.graylog2.plugin.streams.Stream.DEFAULT_STREAM_ID;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -471,6 +472,21 @@ public class MessageTest {
         message.addStream(defaultStream);
 
         assertThat(message.getSize()).isEqualTo(53);
+    }
+
+    @Test
+    public void testMessageSizeIgnoresIlluminateFields() {
+        final Message message = new Message("1234567890", "12345", Tools.nowUTC());
+        assertThat(message.getSize()).isEqualTo(45);
+
+        // this field should not be counted into the overall message size
+        message.addField(FIELD_ILLUMINATE_EVENT_CATEGORY, "foobar");
+        // the size should stay exactly same as before adding the field
+        assertThat(message.getSize()).isEqualTo(45);
+
+        // this field should increase message size
+        message.addField("http_url", "https//www.wikipedia.org");
+        assertThat(message.getSize()).isEqualTo(77);
     }
 
     @Test
