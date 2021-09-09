@@ -20,10 +20,13 @@ import { mount } from 'wrappedEnzyme';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import mockComponent from 'helpers/mocking/MockComponent';
 import { alice as currentUser } from 'fixtures/users';
+import { asMock } from 'helpers/mocking';
+import { Route, MemoryRouter } from 'react-router-dom';
 
 import Routes from 'routing/Routes';
 import AppConfig from 'util/AppConfig';
 import CurrentUserContext from 'contexts/CurrentUserContext';
+import Navigation from 'components/navigation/Navigation';
 
 jest.mock('./SystemMenu', () => mockComponent('SystemMenu'));
 jest.mock('./NavigationBrand', () => mockComponent('NavigationBrand'));
@@ -47,11 +50,9 @@ const findLink = (wrapper, title) => wrapper.find(`NavigationLink[description="$
 jest.mock('./DevelopmentHeaderBadge', () => () => <span />);
 
 describe('Navigation', () => {
-  let Navigation;
-
   // We can't use prop types here, they are not compatible with mount and require in this case
   // eslint-disable-next-line react/prop-types
-  const SimpleNavigation = ({ component: Component, permissions, ...props }) => {
+  const SimpleNavigation = ({ component: Component, permissions = [], ...props }) => {
     const user = currentUser.toBuilder().permissions(Immutable.List(permissions)).build();
 
     return (
@@ -60,16 +61,6 @@ describe('Navigation', () => {
       </CurrentUserContext.Provider>
     );
   };
-
-  SimpleNavigation.defaultProps = {
-    location: { pathname: '/' },
-    permissions: [],
-  };
-
-  beforeEach(() => {
-    // eslint-disable-next-line global-require
-    Navigation = require('./Navigation').default;
-  });
 
   describe('has common elements', () => {
     let wrapper;
@@ -115,6 +106,7 @@ describe('Navigation', () => {
           { path: '/system/archives', description: 'Archives', permissions: 'archive:read' },
           {
             description: 'Neat Stuff',
+            path: '/',
             children: [
               { path: '/somethingelse', description: 'Something Else', permissions: 'somethingelse' },
               { path: '/completelydiffrent', description: 'Completely Different', permissions: 'completelydifferent' },
@@ -140,7 +132,7 @@ describe('Navigation', () => {
     });
 
     it('prefix plugin navigation item paths with app prefix', () => {
-      AppConfig.gl2AppPathPrefix.mockReturnValue('/my/crazy/prefix');
+      asMock(AppConfig.gl2AppPathPrefix).mockReturnValue('/my/crazy/prefix');
       const wrapper = mount(<SimpleNavigation component={Navigation} />);
 
       expect(findLink(wrapper, 'Perpetuum Mobile')).toHaveProp('path', '/my/crazy/prefix/something');
@@ -173,9 +165,15 @@ describe('Navigation', () => {
     });
 
     it('sets dropdown title based on match', () => {
-      const wrapper = mount(<SimpleNavigation component={Navigation}
-                                              location={{ pathname: '/somethingelse' }}
-                                              permissions={['somethingelse', 'completelydifferent']} />);
+      const wrapper = mount((
+        <MemoryRouter initialEntries={['/somethingelse']}>
+          <Route path="/somethingelse">
+            <SimpleNavigation component={Navigation}
+                              location={{ pathname: '/somethingelse' }}
+                              permissions={['somethingelse', 'completelydifferent']} />
+          </Route>
+        </MemoryRouter>
+      ));
 
       expect(wrapper.find('NavDropdown[title="Neat Stuff / Something Else"]')).toExist();
     });
