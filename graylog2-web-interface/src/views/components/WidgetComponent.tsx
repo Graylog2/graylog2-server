@@ -58,7 +58,7 @@ const WidgetComponent = ({
 }: Props) => {
   const widget = useStore(WidgetStore, (state) => state.get(widgetId));
   const viewType = useContext(ViewTypeContext);
-  const title = useStore(TitlesStore, (titles) => titles.getIn([TitleTypes.Widget, widget.id], defaultTitle(widget)) as string);
+  const title = useStore(TitlesStore, (titles) => titles?.getIn([TitleTypes.Widget, widget.id], defaultTitle(widget)) as string);
 
   const WidgetFieldTypesIfDashboard = viewType === View.Type.Dashboard ? WidgetFieldTypesContextProvider : React.Fragment;
 
