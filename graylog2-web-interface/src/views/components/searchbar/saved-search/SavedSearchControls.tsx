@@ -39,7 +39,6 @@ import User from 'logic/users/User';
 import ViewPropertiesModal from 'views/components/views/ViewPropertiesModal';
 import { loadAsDashboard, loadNewSearch } from 'views/logic/views/Actions';
 import IfPermitted from 'components/common/IfPermitted';
-import Routes from 'routing/Routes';
 
 import SavedSearchForm from './SavedSearchForm';
 import SavedSearchList from './SavedSearchList';
@@ -271,7 +270,7 @@ class SavedSearchControls extends React.Component<Props, State> {
                       <MenuItem onSelect={this._loadAsDashboard}><Icon name="tachometer-alt" /> Export to dashboard</MenuItem>
                     </IfPermitted>
                     <MenuItem onSelect={this.toggleExport}><Icon name="cloud-download-alt" /> Export</MenuItem>
-                    <MenuItem disabled={disableReset} onSelect={() => loadNewView()} data-testid="reset-search">
+                    <MenuItem disabled={disableReset} onSelect={() => loadNewView()}>
                       <Icon name="eraser" /> Reset search
                     </MenuItem>
                     <MenuItem divider />
