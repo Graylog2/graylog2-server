@@ -180,6 +180,9 @@ public class ClusterEventPeriodical extends Periodical {
 
         try {
             final String id = dbCollection.save(clusterEvent, WriteConcern.JOURNALED).getSavedId();
+            // We are handling a locally generated event, so we can speed up processing by posting it to the local event
+            // bus immediately. Due to having added the local node id to its list of consumers, it will not be picked up
+            // by the db cursor again, avoiding double processing of the event. See #11263 for details.
             serverEventBus.post(event);
             LOG.debug("Published cluster event with ID <{}> and type <{}>", id, className);
         } catch (MongoException e) {
