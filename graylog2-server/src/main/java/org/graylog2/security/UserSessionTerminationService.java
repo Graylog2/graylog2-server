@@ -63,6 +63,8 @@ public class UserSessionTerminationService extends AbstractIdleService {
     private static final Logger LOG = LoggerFactory.getLogger(UserSessionTerminationService.class);
 
     // Sessions should be terminated when a user's account status is one of the following
+    // (Note: the DELETED status is not yet used throughout Graylog and won't be set for any user atm.
+    // But it will probably be used in the future to mark user accounts as deleted instead of purging them from the DB.)
     private static final EnumSet<User.AccountStatus> SESSION_TERMINATION_STATUS = EnumSet.of(
             User.AccountStatus.DELETED,
             User.AccountStatus.DISABLED
