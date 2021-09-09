@@ -16,6 +16,8 @@
  */
 package org.graylog.plugins.views.search.elasticsearch;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -26,13 +28,23 @@ import org.graylog.plugins.views.search.engine.BackendQuery;
 
 @AutoValue
 @JsonTypeName(ElasticsearchQueryString.NAME)
-@JsonDeserialize(builder = AutoValue_ElasticsearchQueryString.Builder.class)
+@JsonAutoDetect
 public abstract class ElasticsearchQueryString implements BackendQuery {
 
     public static final String NAME = "elasticsearch";
 
     public static ElasticsearchQueryString empty() {
         return ElasticsearchQueryString.builder().queryString("").build();
+    }
+
+    @JsonCreator
+    public static ElasticsearchQueryString create(final String query) {
+        return builder().queryString(query).build();
+    }
+
+    @JsonCreator
+    public static ElasticsearchQueryString create(final @JsonProperty("type") String type, final @JsonProperty("query_string") String query) {
+        return builder().type(type).queryString(query).build();
     }
 
     @Override

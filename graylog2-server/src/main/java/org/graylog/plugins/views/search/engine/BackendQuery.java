@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 
 import java.util.Objects;
 
@@ -28,7 +29,7 @@ import java.util.Objects;
         include = JsonTypeInfo.As.PROPERTY,
         property = BackendQuery.TYPE_FIELD,
         visible = true,
-        defaultImpl = BackendQuery.Fallback.class)
+        defaultImpl = ElasticsearchQueryString.class)
 @JsonAutoDetect
 public interface BackendQuery {
     String TYPE_FIELD = "type";
