@@ -54,6 +54,7 @@ public class GrantsCleanupListenerTest {
             .id("a")
             .username("a@graylog.local")
             .email("a@graylog.local")
+            .fullName("a")
             .build();
 
     private final GrantDTO grantUserA = GrantDTO.of(
