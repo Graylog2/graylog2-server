@@ -84,6 +84,7 @@ describe('SavedSearchControls', () => {
   );
 
   const findShareButton = () => screen.findByRole('button', { name: 'Share' });
+  const expectShareButton = findShareButton;
 
   SimpleSavedSearchControls.defaultProps = {
     loadNewView: () => Promise.resolve(),
@@ -166,7 +167,7 @@ describe('SavedSearchControls', () => {
       it('includes the option to share the current search', async () => {
         render(<SimpleSavedSearchControls viewStoreState={createViewStoreState(false, 'some-id')} />);
 
-        await findShareButton();
+        await expectShareButton();
       });
 
       it('which should be disabled if current user is neither owner nor permitted to edit search', async () => {
