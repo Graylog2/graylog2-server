@@ -21,7 +21,7 @@ import Immutable from 'immutable';
 
 import { LinkContainer, Link } from 'components/graylog/router';
 import { Button } from 'components/graylog';
-import { DataTable, Spinner, PaginatedList, SearchForm } from 'components/common';
+import { DataTable, Spinner, PaginatedList, SearchForm, QueryHelper } from 'components/common';
 import { MetricContainer, CounterRate } from 'components/metrics';
 import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';
@@ -77,6 +77,8 @@ const StreamListTD = styled.td`
 
 const PipelineFilter = ({ onSearch }: { onSearch: (query: string) => void }) => (
   <SearchForm onSearch={onSearch}
+              queryWidth={400}
+              queryHelpComponent={<QueryHelper entityName="pipelines" />}
               wrapperClass="has-bm"
               onReset={() => onSearch('')}
               topMargin={0} />
