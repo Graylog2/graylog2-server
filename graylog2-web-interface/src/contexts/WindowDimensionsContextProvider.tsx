@@ -45,7 +45,7 @@ const useWindowDimension = () => {
   return windowDimensions;
 };
 
-const ExampleComponent = ({ children }: Props) => {
+const WindowDimensionsContextProvider = ({ children }: Props) => {
   const windowDimensions = useWindowDimension();
 
   return (
@@ -55,4 +55,4 @@ const ExampleComponent = ({ children }: Props) => {
   );
 };
 
-export default ExampleComponent;
+export default WindowDimensionsContextProvider;
