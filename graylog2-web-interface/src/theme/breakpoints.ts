@@ -16,6 +16,22 @@
  */
 import PropTypes from 'prop-types';
 
+type Breakpoint = {
+  xs: string;
+  sm: string;
+  md: string;
+  lg: string;
+};
+
+export type Breakpoints = {
+  min: Breakpoint,
+  max: Breakpoint,
+  px: {
+    min: Record<keyof Breakpoint, number>,
+    max: Record<keyof Breakpoint, number>,
+  }
+};
+
 const breakpointSizes: { [key: string]: number } = {
   xs: 480,
   sm: 768,
@@ -42,23 +58,7 @@ const breakpoints = Object.entries(breakpointSizes).reduce((sizes, [bp, size]) =
     min: {},
     max: {},
   },
-});
-
-type Breakpoint = {
-  xs: string;
-  sm: string;
-  md: string;
-  lg: string;
-};
-
-export type Breakpoints = {
-  min: Breakpoint,
-  max: Breakpoint,
-  px: {
-    min: Record<keyof Breakpoint, number>,
-    max: Record<keyof Breakpoint, number>,
-  }
-};
+} as Breakpoints);
 
 const breakpointPropType = PropTypes.shape({
   xs: PropTypes.string,
