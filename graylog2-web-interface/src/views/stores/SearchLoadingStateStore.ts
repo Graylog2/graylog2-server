@@ -16,7 +16,6 @@
  */
 import Reflux from 'reflux';
 
-import { Store } from 'stores/StoreTypes';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
 
 import { SearchActions } from './SearchStore';
@@ -30,9 +29,9 @@ type SearchLoadingStateStoreState = {
   isLoading: boolean;
 };
 
-export const SearchLoadingStateStore: Store<SearchLoadingStateStoreState> = singletonStore(
+export const SearchLoadingStateStore = singletonStore(
   'views.SearchLoadingState',
-  () => Reflux.createStore({
+  () => Reflux.createStore<SearchLoadingStateStoreState>({
     listenables: [SearchLoadingStateActions],
     isLoading: false,
     init() {

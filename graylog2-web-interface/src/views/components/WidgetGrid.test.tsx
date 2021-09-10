@@ -14,13 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import Immutable from 'immutable';
+import * as React from 'react';
+import * as Immutable from 'immutable';
+import { Map as MockMap } from 'immutable';
 import { mount } from 'wrappedEnzyme';
+import { MockStore, asMock } from 'helpers/mocking';
 
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import Widget from 'views/components/widgets/Widget';
 import _Widget from 'views/logic/widgets/Widget';
+import { WidgetStore } from 'views/stores/WidgetStore';
+import { CurrentViewStateStore } from 'views/stores/CurrentViewStateStore';
+import FieldTypesContext, { FieldTypes } from 'views/components/contexts/FieldTypesContext';
 
 import WidgetGrid from './WidgetGrid';
 
@@ -48,15 +53,32 @@ jest.mock('react-sizeme', () => ({
 
 jest.mock('views/components/contexts/WidgetFieldTypesContextProvider', () => ({ children }) => children);
 
+jest.mock('views/stores/WidgetStore', () => ({
+  WidgetStore: MockStore(['getInitialState', jest.fn()]),
+}));
+
+jest.mock('views/stores/CurrentViewStateStore', () => ({
+  CurrentViewStateStore: MockStore(['getInitialState', jest.fn(() => ({ state: { widgetPositions: {} } }))]),
+}));
+
+jest.mock('views/stores/TitlesStore', () => ({
+  TitlesStore: MockStore(['getInitialState', jest.fn(() => MockMap())]),
+}));
+
 describe('<WidgetGrid />', () => {
+  beforeEach(() => {
+    asMock(WidgetStore.getInitialState).mockReturnValue(Immutable.Map());
+  });
+
+  const fieldTypes: FieldTypes = {
+    all: Immutable.List(),
+    queryFields: Immutable.Map(),
+  };
+  const SimpleWidgetGrid = () => <FieldTypesContext.Provider value={fieldTypes}><WidgetGrid /></FieldTypesContext.Provider>;
+
   it('should render with minimal props', () => {
     const wrapper = mount((
-      <WidgetGrid data={{}}
-                  errors={{}}
-                  onPositionsChange={() => {}}
-                  titles={Immutable.Map()}
-                  widgets={{}}
-                  fields={Immutable.List()} />
+      <SimpleWidgetGrid />
     ));
 
     expect(wrapper).toExist();
@@ -66,24 +88,19 @@ describe('<WidgetGrid />', () => {
     const widgets = {
       widget1: _Widget.builder().type('dummy').id('widget1').build(),
     };
+    asMock(WidgetStore.getInitialState).mockReturnValue(Immutable.Map(widgets));
     const positions = {
       widget1: new WidgetPosition(1, 1, 1, 1),
     };
-    const data = {
-      widget1: [],
-    };
 
-    const titles = Immutable.Map({
-      widget1: 'A dummy widget',
+    asMock(CurrentViewStateStore.getInitialState).mockReturnValue({
+      state: {
+        widgetPositions: positions,
+      },
     });
+
     const wrapper = mount((
-      <WidgetGrid widgets={widgets}
-                  errors={{}}
-                  positions={positions}
-                  data={data}
-                  titles={titles}
-                  fields={Immutable.List()}
-                  onPositionsChange={() => {}} />
+      <SimpleWidgetGrid />
     ));
 
     expect(wrapper.find(Widget)).toHaveLength(1);
@@ -93,23 +110,19 @@ describe('<WidgetGrid />', () => {
     const widgets = {
       widget1: _Widget.builder().type('dummy').id('widget1').build(),
     };
+    asMock(WidgetStore.getInitialState).mockReturnValue(Immutable.Map(widgets));
     const positions = {
       widget1: new WidgetPosition(1, 1, 1, 1),
     };
-    const data = {
-    };
 
-    const titles = Immutable.Map({
-      widget1: 'A dummy widget',
+    asMock(CurrentViewStateStore.getInitialState).mockReturnValue({
+      state: {
+        widgetPositions: positions,
+      },
     });
+
     const wrapper = mount((
-      <WidgetGrid widgets={widgets}
-                  errors={{}}
-                  positions={positions}
-                  data={data}
-                  titles={titles}
-                  fields={Immutable.List()}
-                  onPositionsChange={() => {}} />
+      <SimpleWidgetGrid />
     ));
 
     expect(wrapper.find(Widget)).toHaveLength(1);

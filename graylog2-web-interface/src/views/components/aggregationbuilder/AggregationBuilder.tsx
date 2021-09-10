@@ -17,13 +17,14 @@
 import * as React from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import { WidgetComponentProps } from 'views/types';
+import { useContext } from 'react';
 
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import type { Events } from 'views/logic/searchtypes/events/EventHandler';
 import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
-import type { VisualizationConfigFormValues } from 'views/components/aggregationwizard';
+import OnVisualizationConfigChangeContext, { OnVisualizationConfigChange } from 'views/components/aggregationwizard/OnVisualizationConfigChangeContext';
 
 import EmptyAggregationContent from './EmptyAggregationContent';
 import FullSizeContainer from './FullSizeContainer';
@@ -90,13 +91,9 @@ const getResult = (value: RowResult | EventResult): Rows | Events => {
   return value.rows;
 };
 
-type OnVisualizationConfigChange = (newConfig: VisualizationConfigFormValues) => void;
+const AggregationBuilder = ({ config, data, editing = false, fields, toggleEdit }: WidgetComponentProps<AggregationWidgetConfig>) => {
+  const onVisualizationConfigChange = useContext(OnVisualizationConfigChangeContext);
 
-type AggregationBuilderProps = WidgetComponentProps<AggregationWidgetConfig> & {
-  onVisualizationConfigChange: OnVisualizationConfigChange,
-};
-
-const AggregationBuilder = ({ config, data, editing = false, fields, onVisualizationConfigChange = () => {}, toggleEdit }: AggregationBuilderProps) => {
   if (!config || config.isEmpty) {
     return <EmptyAggregationContent toggleEdit={toggleEdit} editing={editing} />;
   }

@@ -16,25 +16,34 @@
  */
 import * as React from 'react';
 import { useState, useContext, useMemo } from 'react';
-import PropTypes from 'prop-types';
-import * as Immutable from 'immutable';
-import ImmutablePropTypes from 'react-immutable-proptypes';
-import _ from 'lodash';
 import styled, { css } from 'styled-components';
 import { SizeMe } from 'react-sizeme';
+import { WidgetPositions, BackendWidgetPosition } from 'views/types';
 
-import connect from 'stores/connect';
-import CustomPropTypes from 'views/components/CustomPropTypes';
 import ReactGridContainer from 'components/common/ReactGridContainer';
 import { widgetDefinition } from 'views/logic/Widgets';
-import { TitlesStore, TitleTypes } from 'views/stores/TitlesStore';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
-import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
+import WidgetFocusContext, { FocusContextState } from 'views/components/contexts/WidgetFocusContext';
+import { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
+import { useStore } from 'stores/connect';
+import { WidgetStore } from 'views/stores/WidgetStore';
+import { CurrentViewStateActions, CurrentViewStateStore } from 'views/stores/CurrentViewStateStore';
+import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
+import InteractiveContext from 'views/components/contexts/InteractiveContext';
+import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
+import { StoreState } from 'stores/StoreTypes';
 
 import WidgetContainer from './WidgetContainer';
-import { PositionsMap, WidgetDataMap, WidgetErrorsMap, WidgetsMap } from './widgets/WidgetPropTypes';
 import WidgetComponent from './WidgetComponent';
-import defaultTitle from './defaultTitle';
+
+const COLUMNS = {
+  xxl: 12,
+  xl: 12,
+  lg: 12,
+  md: 12,
+  sm: 12,
+  xs: 12,
+};
 
 const DashboardWrap = styled.div(({ theme }) => css`
   color: ${theme.colors.global.textDefault};
@@ -56,157 +65,167 @@ const _defaultDimensions = (type) => {
   return new WidgetPosition(1, 1, widgetDef.defaultHeight, widgetDef.defaultWidth);
 };
 
-const _onWidgetSizeChange = (widgetDimensions, setWidgetDimensions) => (widgetId, dimensions) => {
+type WidgetDimensions = { height: number, width: number };
+
+const _onWidgetSizeChange = (
+  widgetDimensions: { [widgetId: string]: WidgetDimensions },
+  setWidgetDimensions: (newWidgetDimensions: { [widgetId: string]: WidgetDimensions }) => void,
+) => (widgetId: string, dimensions: WidgetDimensions) => {
   setWidgetDimensions({ ...widgetDimensions, [widgetId]: dimensions });
 };
 
-const _renderWidgets = ({
-  data,
-  errors,
+type WidgetsProps = {
+  fields: FieldTypeMappingsList,
+  widgetId: string,
+  setWidgetDimensions: (newWidgetDimensions: { [widgetId: string]: WidgetDimensions }) => void,
+  widgetDimensions: { [widgetId: string]: WidgetDimensions },
+  focusedWidget: FocusContextState | undefined,
+  onPositionsChange: (position: BackendWidgetPosition) => void,
+  positions: WidgetPositions,
+};
+
+const WidgetGridItem = ({
   fields,
   onPositionsChange,
   positions,
   setWidgetDimensions,
-  titles,
   widgetDimensions,
-  widgets,
+  widgetId,
   focusedWidget,
-}) => {
-  const returnedWidgets = { positions: {}, widgets: [] };
+}: WidgetsProps) => {
+  const editing = focusedWidget?.id === widgetId && focusedWidget?.editing;
+  const widgetPosition = positions[widgetId];
+  const onWidgetSizeChange = useMemo(() => _onWidgetSizeChange(widgetDimensions, setWidgetDimensions), [widgetDimensions, setWidgetDimensions]);
 
-  if (!widgets || _.isEmpty(widgets) || !data) {
-    return returnedWidgets;
-  }
-
-  const _onPositionsChange = (newPosition) => {
-    const newPositions = Object.keys(positions).map((id) => {
-      const { col, row, height, width } = positions[id]._value;
-
-      return { id: id, col: col, row: row, height: height, width: width };
-    });
-
-    newPositions.push(newPosition);
-    // eslint-disable-next-line react/destructuring-assignment
-    onPositionsChange(newPositions);
-  };
-
-  Object.keys(widgets).forEach((widgetId) => {
-    const widget = widgets[widgetId];
-    returnedWidgets.positions[widgetId] = positions[widgetId] || _defaultDimensions(widget.type);
-    const widgetTitle = titles.getIn([TitleTypes.Widget, widget.id], defaultTitle(widget));
-    const isFocused = focusedWidget?.id === widgetId && focusedWidget?.focusing;
-    const editing = focusedWidget?.id === widgetId && focusedWidget?.editing;
-
-    returnedWidgets.widgets.push(
-      <WidgetContainer isFocused={isFocused} key={widget.id}>
-        <WidgetComponent data={data}
-                         editing={editing}
-                         errors={errors}
-                         fields={fields}
-                         onPositionsChange={_onPositionsChange}
-                         onWidgetSizeChange={_onWidgetSizeChange(widgetDimensions, setWidgetDimensions)}
-                         position={returnedWidgets.positions[widgetId]}
-                         title={widgetTitle}
-                         widgetDimension={widgetDimensions[widgetId] || {}}
-                         widget={widget} />
-      </WidgetContainer>,
-    );
-  });
-
-  return returnedWidgets;
+  return (
+    <WidgetComponent editing={editing}
+                     fields={fields}
+                     onPositionsChange={onPositionsChange}
+                     onWidgetSizeChange={onWidgetSizeChange}
+                     position={widgetPosition}
+                     widgetDimension={widgetDimensions[widgetId] || {} as WidgetDimensions}
+                     widgetId={widgetId} />
+  );
 };
 
-const WidgetGrid = ({
-  staticWidgets,
-  data,
-  errors,
-  locked,
-  onPositionsChange,
-  widgets: propsWidgets,
-  positions: propsPositions,
-  fields,
-  titles,
-}) => {
+const generatePositions = (widgets: Array<{ id: string, type: string }>, positions: { [widgetId: string]: WidgetPosition }) => widgets
+  .map<[string, WidgetPosition]>(({ id, type }) => [id, positions[id] ?? _defaultDimensions(type)])
+  .reduce((prev, [id, position]) => ({ ...prev, [id]: position }), {});
+
+const mapWidgetPositions = ({ state }: StoreState<typeof CurrentViewStateStore>) => state.widgetPositions;
+const mapWidgets = (state: StoreState<typeof WidgetStore>) => state.map(({ id, type }) => ({ id, type })).toArray();
+
+const useWidgetPositions = () => {
+  const initialPositions = useStore(CurrentViewStateStore, mapWidgetPositions);
+  const widgets = useStore(WidgetStore, mapWidgets);
+
+  return useMemo(() => generatePositions(widgets, initialPositions), [widgets, initialPositions]);
+};
+
+type GridProps = {
+  children: React.ReactNode,
+  locked: boolean,
+  onPositionsChange: (newPositions: Array<BackendWidgetPosition>) => void,
+};
+
+const Grid = ({ children, locked, onPositionsChange }: GridProps) => {
   const { focusedWidget } = useContext(WidgetFocusContext);
-  const [widgetDimensions, setWidgetDimensions] = useState({});
 
-  const { widgets, positions } = useMemo(() => _renderWidgets({
-    data,
-    errors,
-    fields,
-    onPositionsChange,
-    positions: propsPositions,
-    widgets: propsWidgets,
-    setWidgetDimensions,
-    titles,
-    widgetDimensions,
-    focusedWidget,
-  }), [
-    data,
-    errors,
-    fields,
-    onPositionsChange,
-    propsPositions,
-    propsWidgets,
-    setWidgetDimensions,
-    titles,
-    widgetDimensions,
-    focusedWidget,
-  ]);
-
-  const grid = widgets && widgets.length > 0 ? (
-    <StyledReactGridContainer hasFocusedWidget={!!focusedWidget?.id}
-                              columns={{
-                                xxl: 12,
-                                xl: 12,
-                                lg: 12,
-                                md: 12,
-                                sm: 12,
-                                xs: 12,
-                              }}
-                              isResizable={!focusedWidget?.id}
-                              locked={locked}
-                              measureBeforeMount
-                              onPositionsChange={onPositionsChange}
-                              positions={positions}
-                              useDragHandle=".widget-drag-handle">
-      {widgets}
-    </StyledReactGridContainer>
-  ) : <span />;
-
-  // The SizeMe component is required to update the widget grid
-  // when its content height results in a scrollbar
   return (
     <SizeMe monitorWidth refreshRate={100}>
-      {({ size }) => {
-        return (
-          <DashboardWrap>
-            {React.cloneElement(grid, { width: size.width })}
-            {staticWidgets}
-          </DashboardWrap>
-        );
-      }}
+      {({ size: { width } }) => (
+        <StyledReactGridContainer hasFocusedWidget={!!focusedWidget?.id}
+                                  columns={COLUMNS}
+                                  isResizable={!focusedWidget?.id}
+                                  locked={locked}
+                                  measureBeforeMount
+                                  onPositionsChange={onPositionsChange}
+                                  width={width}
+                                  useDragHandle=".widget-drag-handle">
+          {children}
+        </StyledReactGridContainer>
+      )}
     </SizeMe>
   );
 };
 
-WidgetGrid.propTypes = {
-  data: WidgetDataMap.isRequired,
-  errors: WidgetErrorsMap.isRequired,
-  fields: CustomPropTypes.FieldListType.isRequired,
-  locked: PropTypes.bool,
-  onPositionsChange: PropTypes.func.isRequired,
-  positions: PositionsMap,
-  staticWidgets: PropTypes.arrayOf(PropTypes.node),
-  titles: ImmutablePropTypes.map,
-  widgets: WidgetsMap.isRequired,
+const useQueryFieldTypes = () => {
+  const fieldTypes = useContext(FieldTypesContext);
+  const queryId = useStore(ViewMetadataStore, (viewMetadataStore) => viewMetadataStore.activeQuery);
+
+  return useMemo(() => fieldTypes.queryFields.get(queryId, fieldTypes.all), [fieldTypes.all, fieldTypes.queryFields, queryId]);
 };
 
-WidgetGrid.defaultProps = {
-  locked: true,
-  staticWidgets: [],
-  positions: {},
-  titles: Immutable.Map(),
+const MAXIMUM_GRID_SIZE = 12;
+
+const convertPosition = ({ col, row, height, width }: BackendWidgetPosition) => new WidgetPosition(col, row, height, width >= MAXIMUM_GRID_SIZE ? Infinity : width);
+
+const onPositionChange = (newPosition: BackendWidgetPosition) => {
+  const { id } = newPosition;
+  const widgetPosition = convertPosition(newPosition);
+  CurrentViewStateActions.updateWidgetPosition(id, widgetPosition);
 };
 
-export default connect(WidgetGrid, { titles: TitlesStore });
+const onPositionsChange = (newPositions: Array<BackendWidgetPosition>) => {
+  const widgetPositions = Object.fromEntries(newPositions.map((newPosition) => [newPosition.id, convertPosition(newPosition)]));
+  CurrentViewStateActions.widgetPositions(widgetPositions);
+};
+
+const mapPosition = (id, { col, row, height, width }) => ({
+  i: id,
+  x: col ? Math.max(col - 1, 0) : 0,
+  y: (row === undefined || row <= 0 ? Infinity : row - 1),
+  h: height || 1,
+  w: width || 1,
+});
+
+const WidgetGrid = () => {
+  const isInteractive = useContext(InteractiveContext);
+  const { focusedWidget } = useContext(WidgetFocusContext);
+  const [widgetDimensions, setWidgetDimensions] = useState({});
+
+  const widgets = useStore(WidgetStore, (state) => state.map(({ id, type }) => ({ id, type })).toArray().reverse());
+
+  const positions = useWidgetPositions();
+
+  const fields = useQueryFieldTypes();
+
+  const children = useMemo(() => widgets.map(({ id: widgetId }) => {
+    const position = positions[widgetId];
+
+    if (!position) {
+      return null;
+    }
+
+    const gridCoordinates = mapPosition(widgetId, position);
+
+    return (
+      <WidgetContainer key={widgetId} data-grid={gridCoordinates} isFocused={focusedWidget?.id === widgetId && focusedWidget?.focusing}>
+        <WidgetGridItem fields={fields}
+                        positions={positions}
+                        widgetId={widgetId}
+                        setWidgetDimensions={setWidgetDimensions}
+                        widgetDimensions={widgetDimensions}
+                        focusedWidget={focusedWidget}
+                        onPositionsChange={onPositionChange} />
+      </WidgetContainer>
+    );
+  }).filter((x) => (x !== null)), [fields, focusedWidget, positions, widgetDimensions, widgets]);
+
+  // The SizeMe component is required to update the widget grid
+  // when its content height results in a scrollbar
+  return (
+    <DashboardWrap>
+      <Grid locked={!isInteractive}
+            onPositionsChange={onPositionsChange}>
+        {children}
+      </Grid>
+    </DashboardWrap>
+  );
+};
+
+WidgetGrid.displayName = 'WidgetGrid';
+
+const MemoizedWidgetGrid = React.memo(WidgetGrid);
+
+export default MemoizedWidgetGrid;
