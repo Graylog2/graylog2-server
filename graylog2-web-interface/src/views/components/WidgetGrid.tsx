@@ -27,10 +27,11 @@ import WidgetFocusContext, { FocusContextState } from 'views/components/contexts
 import { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import { useStore } from 'stores/connect';
 import { WidgetStore } from 'views/stores/WidgetStore';
-import { CurrentViewStateStore, CurrentViewStateActions } from 'views/stores/CurrentViewStateStore';
+import { CurrentViewStateActions } from 'views/stores/CurrentViewStateStore';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
 import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
+import { ViewStatesStore, ViewStatesStoreState } from 'views/stores/ViewStatesStore';
 
 import WidgetContainer from './WidgetContainer';
 import WidgetComponent from './WidgetComponent';
@@ -111,9 +112,19 @@ const generatePositions = (widgets: Array<{ id: string, type: string }>, positio
   .map<[string, WidgetPosition]>(({ id, type }) => [id, positions[id] ?? _defaultDimensions(type)])
   .reduce((prev, [id, position]) => ({ ...prev, [id]: position }), {});
 
+const mapViewStatesStore = (viewState: ViewStatesStoreState) => {
+  const positions = viewState?.map((state) => state.widgetPositions)
+    .reduce((prev, cur) => ({ ...prev, ...cur }), {});
+  const widgets = viewState.map((state) => state.widgets.toArray())
+    .reduce((prev, cur) => [...prev, ...cur], [])
+    .map(({ id, type }) => ({ id, type }))
+    .reverse();
+
+  return { positions, widgets };
+};
+
 const useWidgetPositions = () => {
-  const initialPositions = useStore(CurrentViewStateStore, (viewState) => viewState?.state?.widgetPositions);
-  const widgets = useStore(WidgetStore, (state) => state.map(({ id, type }) => ({ id, type })).toArray());
+  const { positions: initialPositions, widgets } = useStore(ViewStatesStore, mapViewStatesStore);
 
   return useMemo(() => generatePositions(widgets, initialPositions), [widgets, initialPositions]);
 };
@@ -127,8 +138,6 @@ type GridProps = {
 const Grid = ({ children, locked, onPositionsChange }: GridProps) => {
   const { focusedWidget } = useContext(WidgetFocusContext);
 
-  const positions = useWidgetPositions();
-
   return (
     <SizeMe monitorWidth refreshRate={100}>
       {({ size: { width } }) => (
@@ -138,7 +147,7 @@ const Grid = ({ children, locked, onPositionsChange }: GridProps) => {
                                   locked={locked}
                                   measureBeforeMount
                                   onPositionsChange={onPositionsChange}
-                                  positions={positions}
+                                  // positions={positions}
                                   width={width}
                                   useDragHandle=".widget-drag-handle">
           {children}
@@ -151,9 +160,8 @@ const Grid = ({ children, locked, onPositionsChange }: GridProps) => {
 const useQueryFieldTypes = () => {
   const fieldTypes = useContext(FieldTypesContext);
   const queryId = useStore(ViewMetadataStore, (viewMetadataStore) => viewMetadataStore.activeQuery);
-  const queryFields = useMemo(() => fieldTypes.queryFields.get(queryId, fieldTypes.all), [fieldTypes.all, fieldTypes.queryFields, queryId]);
 
-  return queryFields;
+  return useMemo(() => fieldTypes.queryFields.get(queryId, fieldTypes.all), [fieldTypes.all, fieldTypes.queryFields, queryId]);
 };
 
 const MAXIMUM_GRID_SIZE = 12;
@@ -171,16 +179,46 @@ const onPositionsChange = (newPositions: Array<BackendWidgetPosition>) => {
   CurrentViewStateActions.widgetPositions(widgetPositions);
 };
 
+const mapPosition = (id, { col, row, height, width }) => ({
+  i: id,
+  x: col ? Math.max(col - 1, 0) : 0,
+  y: (row === undefined || row <= 0 ? Infinity : row - 1),
+  h: height || 1,
+  w: width || 1,
+});
+
 const WidgetGrid = () => {
   const isInteractive = useContext(InteractiveContext);
   const { focusedWidget } = useContext(WidgetFocusContext);
   const [widgetDimensions, setWidgetDimensions] = useState({});
 
-  const widgets = useStore(WidgetStore, (state) => state.map(({ id, type }) => ({ id, type })).toArray());
+  const widgets = useStore(WidgetStore, (state) => state.map(({ id, type }) => ({ id, type })).toArray().reverse());
 
   const positions = useWidgetPositions();
 
   const fields = useQueryFieldTypes();
+
+  const children = useMemo(() => widgets.map(({ id: widgetId }) => {
+    const position = positions[widgetId];
+
+    if (!position) {
+      return null;
+    }
+
+    const gridCoordinates = mapPosition(widgetId, position);
+
+    return (
+      <WidgetContainer key={widgetId} data-grid={gridCoordinates} isFocused={focusedWidget?.id === widgetId && focusedWidget?.focusing}>
+        <WidgetGridItem fields={fields}
+                        positions={positions}
+                        widgetId={widgetId}
+                        setWidgetDimensions={setWidgetDimensions}
+                        widgetDimensions={widgetDimensions}
+                        focusedWidget={focusedWidget}
+                        onPositionsChange={onPositionChange} />
+      </WidgetContainer>
+    );
+  }).filter((x) => (x !== null)), [fields, focusedWidget, positions, widgetDimensions, widgets]);
 
   // The SizeMe component is required to update the widget grid
   // when its content height results in a scrollbar
@@ -188,17 +226,7 @@ const WidgetGrid = () => {
     <DashboardWrap>
       <Grid locked={!isInteractive}
             onPositionsChange={onPositionsChange}>
-        {widgets.map(({ id: widgetId }) => (
-          <WidgetContainer key={widgetId} isFocused={focusedWidget?.id === widgetId && focusedWidget?.focusing}>
-            <WidgetGridItem fields={fields}
-                            positions={positions}
-                            widgetId={widgetId}
-                            setWidgetDimensions={setWidgetDimensions}
-                            widgetDimensions={widgetDimensions}
-                            focusedWidget={focusedWidget}
-                            onPositionsChange={onPositionChange} />
-          </WidgetContainer>
-        ))}
+        {children}
       </Grid>
     </DashboardWrap>
   );
