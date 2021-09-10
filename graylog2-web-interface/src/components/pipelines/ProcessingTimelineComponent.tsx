@@ -137,7 +137,7 @@ const ProcessingTimelineComponent = () => {
     const stageNumbers = stages.map((stage) => stage.stage);
 
     return pipelines
-      .map(({ stages: pStages }) => pStages.map(({ stage }) => stage))
+      .map(({ stages: pipelineStages }) => pipelineStages.map(({ stage }) => stage))
       .reduce((usedStagesAcc: number[], pipelineStages: number[]) => {
         // Concat stages in a single array removing duplicates
         return Array.from(new Set([...usedStagesAcc, ...pipelineStages]));
@@ -165,7 +165,7 @@ const ProcessingTimelineComponent = () => {
   };
 
   const _pipelineFormatter = (pipeline) => {
-    const { id, title, description, stages: pStages } = pipeline;
+    const { id, title, description, stages } = pipeline;
 
     return (
       <tr key={id}>
@@ -185,7 +185,7 @@ const ProcessingTimelineComponent = () => {
                                    streamsFormatter={_formatConnectedStreams}
                                    noConnectionsMessage={<em>Not connected</em>} />
         </StreamListTD>
-        <td>{_formatStages(pipeline, pStages)}</td>
+        <td>{_formatStages(pipeline, stages)}</td>
         <td>
           <Button bsStyle="primary" bsSize="xsmall" onClick={_deletePipeline(pipeline)}>Delete</Button>
           &nbsp;
