@@ -32,7 +32,7 @@ const breakpoints = Object.entries(breakpointSizes).reduce((sizes, [bp, size]) =
     max: { ...sizes.max, [bp]: `${max}px` },
     px: {
       min: { ...sizes.px.min, [bp]: min },
-      max: { ...sizes.px.max, [bp]: min },
+      max: { ...sizes.px.max, [bp]: max },
     },
   };
 }, {
