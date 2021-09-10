@@ -27,11 +27,11 @@ import WidgetFocusContext, { FocusContextState } from 'views/components/contexts
 import { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import { useStore } from 'stores/connect';
 import { WidgetStore } from 'views/stores/WidgetStore';
-import { CurrentViewStateActions } from 'views/stores/CurrentViewStateStore';
+import { CurrentViewStateActions, CurrentViewStateStore } from 'views/stores/CurrentViewStateStore';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
 import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
-import { ViewStatesStore, ViewStatesStoreState } from 'views/stores/ViewStatesStore';
+import { StoreState } from 'stores/StoreTypes';
 
 import WidgetContainer from './WidgetContainer';
 import WidgetComponent from './WidgetComponent';
@@ -112,19 +112,12 @@ const generatePositions = (widgets: Array<{ id: string, type: string }>, positio
   .map<[string, WidgetPosition]>(({ id, type }) => [id, positions[id] ?? _defaultDimensions(type)])
   .reduce((prev, [id, position]) => ({ ...prev, [id]: position }), {});
 
-const mapViewStatesStore = (viewState: ViewStatesStoreState) => {
-  const positions = viewState?.map((state) => state.widgetPositions)
-    .reduce((prev, cur) => ({ ...prev, ...cur }), {});
-  const widgets = viewState.map((state) => state.widgets.toArray())
-    .reduce((prev, cur) => [...prev, ...cur], [])
-    .map(({ id, type }) => ({ id, type }))
-    .reverse();
-
-  return { positions, widgets };
-};
+const mapWidgetPositions = ({ state }: StoreState<typeof CurrentViewStateStore>) => state.widgetPositions;
+const mapWidgets = (state: StoreState<typeof WidgetStore>) => state.map(({ id, type }) => ({ id, type })).toArray();
 
 const useWidgetPositions = () => {
-  const { positions: initialPositions, widgets } = useStore(ViewStatesStore, mapViewStatesStore);
+  const initialPositions = useStore(CurrentViewStateStore, mapWidgetPositions);
+  const widgets = useStore(WidgetStore, mapWidgets);
 
   return useMemo(() => generatePositions(widgets, initialPositions), [widgets, initialPositions]);
 };
@@ -147,7 +140,6 @@ const Grid = ({ children, locked, onPositionsChange }: GridProps) => {
                                   locked={locked}
                                   measureBeforeMount
                                   onPositionsChange={onPositionsChange}
-                                  // positions={positions}
                                   width={width}
                                   useDragHandle=".widget-drag-handle">
           {children}

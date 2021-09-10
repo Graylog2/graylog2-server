@@ -58,9 +58,9 @@ type CurrentViewStateStoreState = {
 };
 export type CurrentViewStateStoreType = Store<CurrentViewStateStoreState>;
 
-export const CurrentViewStateStore: CurrentViewStateStoreType = singletonStore(
+export const CurrentViewStateStore = singletonStore(
   'views.CurrentViewState',
-  () => Reflux.createStore({
+  () => Reflux.createStore<CurrentViewStateStoreState>({
     listenables: [CurrentViewStateActions],
     states: Immutable.Map(),
     activeQuery: undefined,
