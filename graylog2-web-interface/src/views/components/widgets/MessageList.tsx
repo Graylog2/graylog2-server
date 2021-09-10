@@ -23,7 +23,6 @@ import { WidgetComponentProps } from 'views/types';
 import connect from 'stores/connect';
 import CombinedProvider from 'injection/CombinedProvider';
 import { Messages } from 'views/Constants';
-import { SelectedFieldsStore, SelectedFieldsStoreState } from 'views/stores/SelectedFieldsStore';
 import { ViewStore } from 'views/stores/ViewStore';
 import { SearchActions, SearchStore, SearchStoreState } from 'views/stores/SearchStore';
 import { RefreshActions } from 'views/stores/RefreshStore';
@@ -196,17 +195,14 @@ class MessageList extends React.Component<Props, State> {
 }
 
 const mapProps = (props: {
-  selectedFields: SelectedFieldsStoreState,
   currentView: ViewStoreState,
   searches: SearchStoreState,
 }) => ({
-  selectedFields: props.selectedFields,
   currentView: props.currentView,
   searchTypes: get(props, ['searches', 'result', 'results', props.currentView.activeQuery, 'searchTypes']) as { [searchTypeId: string]: SearchType },
 });
 
 export default connect(MessageList, {
-  selectedFields: SelectedFieldsStore,
   currentView: ViewStore,
   searches: SearchStore,
 }, mapProps);
