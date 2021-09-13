@@ -46,6 +46,7 @@ import org.joda.time.Period;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -188,5 +189,25 @@ public class QueryTest {
     }
     private Query.Builder validQueryBuilder() {
         return Query.builder().id(UUID.randomUUID().toString()).timerange(mock(TimeRange.class)).query(ElasticsearchQueryString.empty());
+    }
+
+    /**
+     * Test that json parser recognizes full query with its type and query string value as an object (backwards compatibility)
+     */
+    @Test
+    public void testFullQueryWithType() throws IOException {
+        final Query query = objectMapper.readValue(getClass().getResourceAsStream("/org/graylog/plugins/views/search/query/full-query.json"), Query.class);
+        final ElasticsearchQueryString queryString = (ElasticsearchQueryString) query.query();
+        assertThat(queryString.queryString()).isEqualTo("some-full-query");
+    }
+
+    /**
+     * Test that json parser recognizes query that's just a string, not object
+     */
+    @Test
+    public void testSimpleQuery() throws IOException {
+        final Query query = objectMapper.readValue(getClass().getResourceAsStream("/org/graylog/plugins/views/search/query/simple-query.json"), Query.class);
+        final ElasticsearchQueryString queryString = (ElasticsearchQueryString) query.query();
+        assertThat(queryString.queryString()).isEqualTo("some-simple-query");
     }
 }
