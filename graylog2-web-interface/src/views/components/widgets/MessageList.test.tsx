@@ -186,6 +186,7 @@ describe('MessageList', () => {
     expect(td.props().children).toMatchSnapshot();
   });
 
+  // eslint-disable-next-line jest/expect-expect
   it('renders also when `inputs` is undefined', () => {
     InputsStore.getInitialState = jest.fn(() => ({ inputs: undefined }));
     const config = MessagesWidgetConfig.builder().fields([]).build();
@@ -255,6 +256,7 @@ describe('MessageList', () => {
     expect(wrapper.find('ErrorWidget').text()).toContain('Error description');
   });
 
+  // eslint-disable-next-line jest/expect-expect
   it('calls render completion callback after first render', () => {
     const config = MessagesWidgetConfig.builder().fields([]).build();
     const Component = () => (
