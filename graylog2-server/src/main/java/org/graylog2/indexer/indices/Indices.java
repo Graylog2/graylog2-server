@@ -157,6 +157,14 @@ public class Indices {
 
     public void ensureIndexTemplate(IndexSet indexSet) {
         final IndexSetConfig indexSetConfig = indexSet.getConfig();
+
+        if (indexSetConfig.hasSelfManagedIndexTemplateType()) {
+            LOG.warn("Index template creation is skipped for indices with prefix '{}' due to " +
+                    "the self managed index template type [IndexSet<{}/{}>]", indexSetConfig.indexPrefix(),
+                    indexSetConfig.id(), indexSetConfig.title());
+            return;
+        }
+
         final String templateName = indexSetConfig.indexTemplateName();
         final Map<String, Object> template = buildTemplate(indexSet, indexSetConfig);
 
@@ -178,8 +186,16 @@ public class Indices {
     }
 
     public void deleteIndexTemplate(IndexSet indexSet) {
-        final String templateName = indexSet.getConfig().indexTemplateName();
+        final IndexSetConfig indexSetConfig = indexSet.getConfig();
 
+        if (indexSet.getConfig().hasSelfManagedIndexTemplateType()) {
+            LOG.warn("Index template deletion is skipped for indices with prefix '{}' due to " +
+                            "the self managed index template type [IndexSet<{}/{}>]", indexSetConfig.indexPrefix(),
+                    indexSetConfig.id(), indexSetConfig.title());
+            return;
+        }
+
+        final String templateName = indexSetConfig.indexTemplateName();
         final boolean result = indicesAdapter.deleteIndexTemplate(templateName);
         if (result) {
             LOG.info("Successfully deleted index template {}", templateName);
@@ -198,7 +214,13 @@ public class Indices {
 
         try {
             // Make sure our index template exists before creating an index!
-            indicesAdapter.ensureIndexTemplate(templateName, template);
+            if (!indexSetConfig.hasSelfManagedIndexTemplateType()) {
+                indicesAdapter.ensureIndexTemplate(templateName, template);
+            } else {
+                LOG.warn("Index template creation (while creating a new index set) is skipped for indices with prefix '{}' due to " +
+                                "the self managed index template type [IndexSet<{}/{}>]", indexSetConfig.indexPrefix(),
+                        indexSetConfig.id(), indexSetConfig.title());
+            }
             indicesAdapter.create(indexName, indexSettings, templateName, template);
         } catch (Exception e) {
             LOG.warn("Couldn't create index {}. Error: {}", indexName, e.getMessage(), e);

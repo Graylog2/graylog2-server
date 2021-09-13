@@ -42,6 +42,7 @@ public class IndexMappingFactory {
             case MESSAGES: return indexMappingFor(elasticsearchVersion);
             case EVENTS: return eventsIndexMappingFor(elasticsearchVersion);
             case GIM_V1: return gimMappingFor(elasticsearchVersion);
+            case MESSAGES_SELF_MANAGED: return NullIndexMappingTemplate.INSTANCE;
             case FAILURES: return failureIndexMappingFactory.map(f -> f.failureIndexMappingFor(elasticsearchVersion))
                     .orElseThrow(() -> new IllegalStateException("No `FailureIndexMappingFactory` implementation provided!"));
             default: throw new IllegalStateException("Invalid index template type: " + templateType);

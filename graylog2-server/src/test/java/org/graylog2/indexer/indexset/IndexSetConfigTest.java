@@ -20,7 +20,9 @@ import org.graylog2.indexer.retention.strategies.NoopRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -119,5 +121,58 @@ public class IndexSetConfigTest {
 
         // A template type value of "null" should result in an empty template type
         assertThat(config4.indexTemplateType()).isNotPresent();
+    }
+
+    @Test
+    public void hasSelfManagedIndexTemplateType_returnsTrue_ifIndexTemplateTypeIs_MESSAGES_SELF_MANAGED() {
+        final IndexSetConfig config = IndexSetConfig.builder()
+                .isWritable(true)
+                .title("Test 1")
+                .description("A test index-set.")
+                .indexPrefix("graylog1")
+                .indexWildcard("graylog1_*")
+                .rotationStrategy(MessageCountRotationStrategyConfig.create(Integer.MAX_VALUE))
+                .rotationStrategyClass(MessageCountRotationStrategy.class.getCanonicalName())
+                .retentionStrategy(NoopRetentionStrategyConfig.create(Integer.MAX_VALUE))
+                .retentionStrategyClass(NoopRetentionStrategy.class.getCanonicalName())
+                .shards(4)
+                .replicas(0)
+                .creationDate(ZonedDateTime.now(ZoneOffset.UTC))
+                .indexTemplateName("graylog1-template")
+                .indexTemplateType(IndexSetConfig.TemplateType.MESSAGES_SELF_MANAGED)
+                .indexAnalyzer("standard")
+                .indexOptimizationMaxNumSegments(1)
+                .indexOptimizationDisabled(false)
+                .build();
+
+        assertThat(config.hasSelfManagedIndexTemplateType()).isTrue();
+    }
+
+    @ParameterizedTest
+    @EnumSource(mode = EnumSource.Mode.EXCLUDE, names = {"MESSAGES_SELF_MANAGED"})
+    public void hasSelfManagedIndexTemplateType_returnsFalse_ifIndexTemplateTypeIsNOT_MESSAGES_SELF_MANAGED(
+            IndexSetConfig.TemplateType templateType) {
+
+        final IndexSetConfig config = IndexSetConfig.builder()
+                .isWritable(true)
+                .title("Test 1")
+                .description("A test index-set.")
+                .indexPrefix("graylog1")
+                .indexWildcard("graylog1_*")
+                .rotationStrategy(MessageCountRotationStrategyConfig.create(Integer.MAX_VALUE))
+                .rotationStrategyClass(MessageCountRotationStrategy.class.getCanonicalName())
+                .retentionStrategy(NoopRetentionStrategyConfig.create(Integer.MAX_VALUE))
+                .retentionStrategyClass(NoopRetentionStrategy.class.getCanonicalName())
+                .shards(4)
+                .replicas(0)
+                .creationDate(ZonedDateTime.now(ZoneOffset.UTC))
+                .indexTemplateName("graylog1-template")
+                .indexTemplateType(templateType)
+                .indexAnalyzer("standard")
+                .indexOptimizationMaxNumSegments(1)
+                .indexOptimizationDisabled(false)
+                .build();
+
+        assertThat(config.hasSelfManagedIndexTemplateType()).isFalse();
     }
 }

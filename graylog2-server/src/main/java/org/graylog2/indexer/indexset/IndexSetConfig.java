@@ -54,7 +54,8 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
 
     private static final Duration DEFAULT_FIELD_TYPE_REFRESH_INTERVAL = Duration.standardSeconds(5L);
     public static final TemplateType DEFAULT_INDEX_TEMPLATE_TYPE = TemplateType.MESSAGES;
-    public static final ImmutableSet<TemplateType> REGULAR_INDEX_TYPES = ImmutableSet.of(TemplateType.MESSAGES);
+    public static final ImmutableSet<TemplateType> REGULAR_INDEX_TYPES = ImmutableSet.of(TemplateType.MESSAGES,
+            TemplateType.MESSAGES_SELF_MANAGED);
 
     public static boolean isRegularIndex(@Nullable TemplateType templateType, boolean isWritable) {
         TemplateType type = templateType == null ? DEFAULT_INDEX_TEMPLATE_TYPE : templateType;
@@ -75,6 +76,13 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
         GIM_V1,
         @JsonProperty("failures")
         FAILURES,
+        /**
+         * This template type was introduced to indicate
+         * regular indices whose index templates are managed outside
+         * of the index set framework
+         */
+        @JsonProperty("messages_self_managed")
+        MESSAGES_SELF_MANAGED,
     }
 
     @JsonProperty("id")
@@ -156,6 +164,14 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
 
     @JsonProperty("field_type_refresh_interval")
     public abstract Duration fieldTypeRefreshInterval();
+
+    /**
+     * Returns true if the index template is not managed
+     * by the index set framework
+     */
+    public boolean hasSelfManagedIndexTemplateType() {
+        return indexTemplateType().map(itt -> itt == TemplateType.MESSAGES_SELF_MANAGED).orElse(false);
+    }
 
     @JsonCreator
     public static IndexSetConfig create(@Id @ObjectId @JsonProperty("_id") @Nullable String id,
