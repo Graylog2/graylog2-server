@@ -38,6 +38,24 @@ import {
   WidgetConfigFormValues,
 } from 'views/components/aggregationwizard';
 import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
+import { TimeRange } from 'views/logic/queries/Query';
+import { CopyWidgetToDashboardHook } from 'views/logic/views/CopyWidgetToDashboard';
+import View from 'views/logic/views/View';
+import User from 'logic/users/User';
+import { Message } from 'views/components/messagelist/Types';
+import { ValuePath } from 'views/logic/valueactions/ValueActionHandler';
+import WidgetPosition from 'views/logic/widgets/WidgetPosition';
+import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
+
+type BackendWidgetPosition = {
+  id: string,
+  col: number,
+  row: number,
+  height: number,
+  width: number,
+};
+
+type WidgetPositions = { [widgetId: string]: WidgetPosition };
 
 interface EditWidgetComponentProps<Config extends WidgetConfig = WidgetConfig> {
   children: React.ReactNode,
@@ -49,9 +67,13 @@ interface EditWidgetComponentProps<Config extends WidgetConfig = WidgetConfig> {
   onChange: (newConfig: Config) => void,
 }
 
-interface WidgetComponentProps<Config extends WidgetConfig = WidgetConfig> {
+interface WidgetResults {
+ [key: string]: Result,
+}
+
+interface WidgetComponentProps<Config extends WidgetConfig = WidgetConfig, Result = WidgetResults> {
   config: Config;
-  data: { [key: string]: Result };
+  data: Result;
   editing: boolean;
   fields: Immutable.List<FieldTypeMapping>;
   filter: string;
@@ -159,21 +181,71 @@ interface SystemConfiguration {
   }>;
 }
 
+export type SearchTypeResult = {
+  type: string,
+  effective_timerange: TimeRange,
+};
+
+export type MessageResult = {
+  type: 'messages',
+  total: number,
+};
+
+export interface SearchTypeResultTypes {
+  generic: SearchTypeResult,
+  messages: MessageResult,
+}
+
+export interface ActionContexts {
+  view: View,
+  analysisDisabledFields: Array<string>,
+  currentUser: User,
+  widget: Widget,
+  message: Message,
+  valuePath: ValuePath,
+}
+
+export type SearchTypeResults = { [id: string]: SearchTypeResultTypes[keyof SearchTypeResultTypes] };
+
+export type MessagePreviewOption = {
+  title: string,
+  isChecked: (config: MessagesWidgetConfig) => boolean,
+  isDisabled: (config: MessagesWidgetConfig) => boolean,
+  help?: string,
+  onChange: (config: MessagesWidgetConfig, onConfigChange: (config: MessagesWidgetConfig) => void) => void
+  sort: number,
+}
+
+type MessageAugmentation = {
+  id: string,
+  component: React.ComponentType<{ message: Message }>,
+}
+
+type MessageDetailContextProviderProps = {
+  message: Message,
+}
+
 declare module 'graylog-web-plugin/plugin' {
   export interface PluginExports {
     creators?: Array<Creator>;
     enterpriseWidgets?: Array<WidgetExport>;
+    externalValueActions?: Array<ActionDefinition>;
     fieldActions?: Array<ActionDefinition>;
+    messageAugmentations?: Array<MessageAugmentation>;
     searchTypes?: Array<SearchType>;
     systemConfigurations?: Array<SystemConfiguration>;
     valueActions?: Array<ActionDefinition>;
     'views.completers'?: Array<Completer>;
+    'views.components.widgets.messageTable.previewOptions'?: Array<MessagePreviewOption>;
+    'views.components.widgets.messageTable.messageRowOverride'?: Array<React.ComponentType<MessageRowOverrideProps>>;
+    'views.components.widgets.messageDetails.contextProviders'?: Array<React.ComponentType<MessageDetailContextProviderProps>>,
     'views.elements.header'?: Array<React.ComponentType>;
     'views.elements.queryBar'?: Array<React.ComponentType>;
     'views.export.formats'?: Array<ExportFormat>;
-    'views.hooks.executingView'?: Array<ViewHook>,
-    'views.hooks.loadingView'?: Array<ViewHook>,
+    'views.hooks.executingView'?: Array<ViewHook>;
+    'views.hooks.loadingView'?: Array<ViewHook>;
     'views.hooks.searchRefresh'?: Array<SearchRefreshCondition>;
+    'views.hooks.copyWidgetToDashboard'?: Array<CopyWidgetToDashboardHook>;
     'views.overrides.widgetEdit'?: Array<React.ComponentType<OverrideProps>>;
     'views.widgets.actions'?: Array<WidgetActionType>;
     'views.requires.provided'?: Array<string>;

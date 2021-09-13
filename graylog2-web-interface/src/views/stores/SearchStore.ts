@@ -37,6 +37,7 @@ import Parameter from 'views/logic/parameters/Parameter';
 import type { WidgetMapping } from 'views/logic/views/types';
 import type { TimeRange } from 'views/logic/queries/Query';
 import { singletonStore } from 'views/logic/singleton';
+import { SearchErrorResponse } from 'views/logic/SearchError';
 
 const createSearchUrl = qualifyUrl('/views/search');
 
@@ -56,6 +57,22 @@ export type SearchStoreState = {
   result: SearchResult,
   widgetMapping: WidgetMapping,
   widgetsToSearch: WidgetsToSearch | null;
+};
+
+type SearchJobId = string;
+type SearchExecution = {
+  cancelled: boolean,
+  completed_exceptionally: boolean,
+  done: boolean,
+};
+
+export type SearchJobResult = {
+  execution: SearchExecution,
+  id: SearchJobId,
+  owner: string,
+  results: { [id: string]: any },
+  search_id: SearchId,
+  errors: Array<SearchErrorResponse>,
 };
 
 export const SearchStore: Store<SearchStoreState> = singletonStore(
@@ -87,11 +104,11 @@ export const SearchStore: Store<SearchStoreState> = singletonStore(
         this._trigger();
       }
     },
-    onSearchExecutionStateUpdate(executionState) {
+    onSearchExecutionStateUpdate(executionState: SearchExecutionState) {
       this.executionState = executionState;
     },
 
-    onUpdate(search) {
+    onUpdate(search: Search) {
       const { queries } = search;
 
       if (queries && queries.size > 0) {
@@ -121,7 +138,7 @@ export const SearchStore: Store<SearchStoreState> = singletonStore(
       return promise;
     },
 
-    trackJobStatus(job, search: Search) {
+    trackJobStatus(job: SearchJobResult, search: Search) {
       return new Bluebird((resolve) => {
         if (job && job.execution.done) {
           return resolve(new SearchResult(job));
@@ -191,7 +208,9 @@ export const SearchStore: Store<SearchStoreState> = singletonStore(
       return promise;
     },
 
-    _executePromise(executionStateParam: SearchExecutionState, startActionPromise: (promise: Promise<SearchResult>) => void, handleSearchResult: (result: SearchResult) => SearchResult): Promise<SearchExecutionResult> {
+    _executePromise(executionStateParam: SearchExecutionState,
+      startActionPromise: (promise: Promise<SearchResult>) => void,
+      handleSearchResult: (result: SearchResult) => SearchResult): Promise<SearchExecutionResult> {
       const { widgetsToSearch } = this._state();
 
       if (this.executePromise && this.executePromise.cancel) {

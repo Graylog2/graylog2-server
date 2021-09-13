@@ -24,9 +24,7 @@ import org.graylog2.search.SearchQuery;
 import org.mongojack.DBQuery;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -39,17 +37,14 @@ public class ViewSummaryService extends PaginatedDbService<ViewSummaryDTO> {
         super(mongoConnection, mapper, ViewSummaryDTO.class, COLLECTION_NAME);
     }
 
-    private PaginatedList<ViewSummaryDTO> searchPaginated(DBQuery.Query query,
+    private PaginatedList<ViewSummaryDTO> searchPaginatedWithGrandTotal(DBQuery.Query query,
                                                    Predicate<ViewSummaryDTO> filter,
                                                    String order,
                                                    String sortField,
+                                                   DBQuery.Query grandTotalQuery,
                                                    int page,
                                                    int perPage) {
-        final PaginatedList<ViewSummaryDTO> viewsList = findPaginatedWithQueryFilterAndSort(query, filter, getSortBuilder(order, sortField), page, perPage);
-        return viewsList.stream()
-                .collect(Collectors.toCollection(() -> viewsList.grandTotal()
-                        .map(grandTotal -> new PaginatedList<ViewSummaryDTO>(new ArrayList<>(viewsList.size()), viewsList.pagination().total(), page, perPage, grandTotal))
-                        .orElseGet(() -> new PaginatedList<>(new ArrayList<>(viewsList.size()), viewsList.pagination().total(), page, perPage))));
+        return findPaginatedWithQueryFilterAndSortWithGrandTotal(query, filter, getSortBuilder(order, sortField), grandTotalQuery, page, perPage);
     }
 
     public PaginatedList<ViewSummaryDTO> searchPaginatedByType(ViewDTO.Type type,
@@ -60,7 +55,7 @@ public class ViewSummaryService extends PaginatedDbService<ViewSummaryDTO> {
                                                         int page,
                                                         int perPage) {
         checkNotNull(sortField);
-        return searchPaginated(
+        return searchPaginatedWithGrandTotal(
                 DBQuery.and(
                         DBQuery.or(DBQuery.is(ViewDTO.FIELD_TYPE, type), DBQuery.notExists(ViewDTO.FIELD_TYPE)),
                         query.toDBQuery()
@@ -68,6 +63,7 @@ public class ViewSummaryService extends PaginatedDbService<ViewSummaryDTO> {
                 filter,
                 order,
                 sortField,
+                DBQuery.or(DBQuery.is(ViewDTO.FIELD_TYPE, type), DBQuery.notExists(ViewDTO.FIELD_TYPE)),
                 page,
                 perPage
         );

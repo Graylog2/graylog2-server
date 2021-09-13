@@ -41,7 +41,7 @@ type NodesListResponse = {
 };
 
 export type NodesStoreState = {
-  nodes: Array<NodeInfo>;
+  nodes: { [nodeId: string]: NodeInfo };
   clusterId: string;
   nodeCount: number;
 };
@@ -99,7 +99,7 @@ const NodesStore = Reflux.createStore<NodesStoreState>({
   },
 
   getNode(nodeId) {
-    return this.nodes[nodeId];
+    return this.nodes?.[nodeId];
   },
 
   _clusterId() {

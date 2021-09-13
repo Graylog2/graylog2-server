@@ -26,6 +26,7 @@ import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 
 import MessageTable from './MessageTable';
 
+import { TableBody } from '../messagelist/MessageTableEntry';
 import InteractiveContext from '../contexts/InteractiveContext';
 import HighlightMessageContext from '../contexts/HighlightMessageContext';
 
@@ -109,16 +110,16 @@ describe('MessageTable', () => {
     expect(tableHeadFields).toEqual(configFields);
   });
 
-  it('highlights messsage with id passed in `HighlightMessageContext`', () => {
+  it('highlights message with id passed in `HighlightMessageContext`', () => {
     const wrapper = mount((
       <HighlightMessageContext.Provider value="message-id-1">
         <SimpleMessageTable />
       </HighlightMessageContext.Provider>
     ));
 
-    const highlightedMessage = wrapper.find('.message-highlight');
+    const highlightedMessage = wrapper.find(TableBody);
 
-    expect(highlightedMessage).toExist();
+    expect(highlightedMessage).toHaveProp('highlighted', true);
   });
 
   it('does not highlight non-existing message id', () => {
@@ -128,9 +129,9 @@ describe('MessageTable', () => {
       </HighlightMessageContext.Provider>
     ));
 
-    const highlightedMessage = wrapper.find('.message-highlight');
+    const highlightedMessage = wrapper.find(TableBody);
 
-    expect(highlightedMessage).not.toExist();
+    expect(highlightedMessage).toHaveProp('highlighted', false);
   });
 
   it('shows sort icons next to table headers', () => {

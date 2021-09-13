@@ -22,7 +22,6 @@ import { ButtonToolbar, Row, Col, Button } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import * as FormsUtils from 'util/FormsUtils';
-import { ContentPackMarker } from 'components/common';
 import CombinedProvider from 'injection/CombinedProvider';
 
 const { LookupTablesActions } = CombinedProvider.get('LookupTables');
@@ -75,7 +74,6 @@ class LookupTable extends React.Component {
         <Col md={6}>
           <h2>
             {this.props.table.title}
-            <ContentPackMarker contentPack={this.props.table.content_pack} marginLeft={5} />
           </h2>
           <p>{this.props.table.description}</p>
           <dl>

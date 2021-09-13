@@ -17,6 +17,7 @@
 import MockStore from 'helpers/mocking/StoreMock';
 
 import FieldType, { FieldTypes, Properties } from 'views/logic/fieldtypes/FieldType';
+import { ActionDefinition } from 'views/components/actions/ActionHandler';
 
 import bindings from './bindings';
 
@@ -39,7 +40,7 @@ describe('Views bindings field actions', () => {
     contexts: {},
     type: FieldType.Unknown,
   };
-  const findAction = (type: string) => fieldActions.find((binding) => binding.type === type);
+  const findAction = (type: string): ActionDefinition<{ analysisDisabledFields?: Array<string> }> => fieldActions.find((binding) => binding.type === type);
 
   describe('Aggregate', () => {
     const action = findAction('aggregate');

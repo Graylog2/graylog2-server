@@ -42,6 +42,7 @@ import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
+import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.AlertCondition;
@@ -167,11 +168,14 @@ public class StreamResource extends RestResource {
         final Stream stream = streamService.create(cr, getCurrentUser().getName());
         stream.setDisabled(true);
 
-        if (!stream.getIndexSet().getConfig().isWritable()) {
+        final IndexSet indexSet = stream.getIndexSet();
+        if (!indexSet.getConfig().isWritable()) {
             throw new BadRequestException("Assigned index set must be writable!");
+        } else if (!IndexSetConfig.isRegularIndex(indexSet.getConfig())) {
+            throw new BadRequestException("Assigned index set is not usable");
         }
 
-        final Set<StreamRule> streamRules = cr.rules().stream()
+    final Set<StreamRule> streamRules = cr.rules().stream()
                 .map(streamRule -> streamRuleService.create(null, streamRule))
                 .collect(Collectors.toSet());
         final String id = streamService.saveWithRulesAndOwnership(stream, streamRules, userContext.getUser());
@@ -287,7 +291,7 @@ public class StreamResource extends RestResource {
                                  @ApiParam(name = "JSON body", required = true)
                                  @Valid @NotNull UpdateStreamRequest cr) throws NotFoundException, ValidationException {
         checkPermission(RestPermissions.STREAMS_EDIT, streamId);
-        checkNotDefaultStream(streamId, "The default stream cannot be edited.");
+        checkNotEditableStream(streamId, "The stream cannot be edited.");
 
         final Stream stream = streamService.load(streamId);
 
@@ -325,6 +329,8 @@ public class StreamResource extends RestResource {
             throw new BadRequestException("Index set with ID <" + stream.getIndexSetId() + "> does not exist!");
         } else if (!indexSet.get().getConfig().isWritable()) {
             throw new BadRequestException("Assigned index set must be writable!");
+        } else if (!IndexSetConfig.isRegularIndex(indexSet.get().getConfig())) {
+            throw new BadRequestException("Assigned index set is not usable");
         }
 
         streamService.save(stream);
@@ -343,7 +349,7 @@ public class StreamResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.STREAM_DELETE)
     public void delete(@ApiParam(name = "streamId", required = true) @PathParam("streamId") String streamId) throws NotFoundException {
         checkPermission(RestPermissions.STREAMS_EDIT, streamId);
-        checkNotDefaultStream(streamId, "The default stream cannot be deleted.");
+        checkNotEditableStream(streamId, "The stream cannot be deleted.");
 
         final Stream stream = streamService.load(streamId);
         streamService.destroy(stream);
@@ -361,7 +367,7 @@ public class StreamResource extends RestResource {
     public void pause(@ApiParam(name = "streamId", required = true)
                       @PathParam("streamId") @NotEmpty String streamId) throws NotFoundException, ValidationException {
         checkAnyPermission(new String[]{RestPermissions.STREAMS_CHANGESTATE, RestPermissions.STREAMS_EDIT}, streamId);
-        checkNotDefaultStream(streamId, "The default stream cannot be paused.");
+        checkNotEditableStream(streamId, "The stream cannot be paused.");
 
         final Stream stream = streamService.load(streamId);
         streamService.pause(stream);
@@ -379,7 +385,7 @@ public class StreamResource extends RestResource {
     public void resume(@ApiParam(name = "streamId", required = true)
                        @PathParam("streamId") @NotEmpty String streamId) throws NotFoundException, ValidationException {
         checkAnyPermission(new String[]{RestPermissions.STREAMS_CHANGESTATE, RestPermissions.STREAMS_EDIT}, streamId);
-        checkNotDefaultStream(streamId, "The default stream cannot be resumed.");
+        checkNotEditableStream(streamId, "The stream cannot be resumed.");
 
         final Stream stream = streamService.load(streamId);
         streamService.resume(stream);
@@ -442,7 +448,7 @@ public class StreamResource extends RestResource {
                                 @Context UserContext userContext) throws ValidationException, NotFoundException {
         checkPermission(RestPermissions.STREAMS_CREATE);
         checkPermission(RestPermissions.STREAMS_READ, streamId);
-        checkNotDefaultStream(streamId, "The default stream cannot be cloned.");
+        checkNotEditableStream(streamId, "The stream cannot be cloned.");
 
         final Stream sourceStream = streamService.load(streamId);
         final String creatorUser = getCurrentUser().getName();
@@ -548,8 +554,8 @@ public class StreamResource extends RestResource {
             .collect(Collectors.toSet());
     }
 
-    private void checkNotDefaultStream(String streamId, String message) {
-        if (Stream.DEFAULT_STREAM_ID.equals(streamId)) {
+    private void checkNotEditableStream(String streamId, String message) {
+        if (Stream.DEFAULT_STREAM_ID.equals(streamId) || !Stream.streamIsEditable(streamId)) {
             throw new BadRequestException(message);
         }
     }

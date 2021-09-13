@@ -99,7 +99,7 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
         //noinspection UnstableApiUsage
         eventBus = new EventBus("indices-test");
         final Node node = new Node(createNodeAdapter());
-        final IndexMappingFactory indexMappingFactory = new IndexMappingFactory(node);
+        final IndexMappingFactory indexMappingFactory = new IndexMappingFactory(node, Optional.empty());
         indices = new Indices(
                 indexMappingFactory,
                 mock(NodeId.class),
@@ -466,5 +466,17 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
         client().addAliasMapping(index, alias);
 
         assertThat(indices.aliasTarget("graylog_alias_*")).contains(index);
+    }
+
+    @Test
+    public void aliasTargetSupportsIndicesWithPlusInName() {
+        final String prefixWithPlus = "index+set_";
+        final String index = client().createRandomIndex(prefixWithPlus);
+        final String alias = prefixWithPlus + "deflector";
+        assertThat(indices.aliasTarget(alias)).isEmpty();
+
+        client().addAliasMapping(index, alias);
+
+        assertThat(indices.aliasTarget(prefixWithPlus + "*")).contains(index);
     }
 }

@@ -18,6 +18,7 @@ import * as React from 'react';
 import { act } from 'react-dom/test-utils';
 import { render, waitFor, fireEvent } from 'wrappedTestingLibrary';
 import asMock from 'helpers/mocking/AsMock';
+import { MockStore } from 'helpers/mocking';
 
 import { processHooks } from 'views/logic/views/ViewLoader';
 import { ViewActions } from 'views/stores/ViewStore';
@@ -41,8 +42,16 @@ jest.mock('routing/withLocation', () => (x) => x);
 jest.mock('views/components/Search', () => jest.fn(() => <div>Extended search page</div>));
 jest.mock('views/stores/SearchStore');
 
+jest.mock('views/stores/ViewStatesStore', () => ({
+  ViewStatesStore: {
+    listen: jest.fn(),
+    getInitialState: jest.fn(() => ({ has: jest.fn(() => false) })),
+  },
+}));
+
 jest.mock('views/stores/ViewStore', () => ({
   ViewActions: { create: jest.fn(() => Promise.resolve({ view: mockView })) },
+  ViewStore: MockStore(['getInitialState', () => ({ view: mockView })]),
 }));
 
 jest.mock('views/hooks/SyncWithQueryParameters');

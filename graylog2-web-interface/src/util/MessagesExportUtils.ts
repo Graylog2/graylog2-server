@@ -52,7 +52,7 @@ export const exportSearchMessages = (exportPayload: ExportPayload, searchId: str
 };
 
 export const exportSearchTypeMessages = (exportPayload: ExportPayload, searchId: string, searchTypeId: string, mimeType: string, filename?: string) => {
-  const { url } = ApiRoutes.ExportJobsController.exportSearchType(searchId, searchTypeId, filename);
+  const { url } = ApiRoutes.ExportJobsController.exportSearchType(searchId, searchTypeId);
 
   return fetchFile('POST', qualifyUrl(url), exportPayload, mimeType)
     .then((result: string) => downloadFile(result, filename))

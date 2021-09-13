@@ -17,6 +17,7 @@
 import React from 'react';
 import { get } from 'lodash';
 import { PluginExports } from 'graylog-web-plugin/plugin';
+import { WidgetComponentProps } from 'views/types';
 
 import Routes from 'routing/Routes';
 import App from 'routing/App';
@@ -139,7 +140,8 @@ const exports: PluginExports = {
       defaultHeight: 5,
       reportStyle: () => ({ width: 800 }),
       defaultWidth: 6,
-      visualizationComponent: MessageList,
+      // TODO: Subtyping needs to be taked into account
+      visualizationComponent: MessageList as unknown as React.ComponentType<WidgetComponentProps>,
       editComponent: EditMessageList,
       needsControlledHeight: () => false,
       searchResultTransformer: (data: Array<unknown>) => data[0],
@@ -353,6 +355,21 @@ const exports: PluginExports = {
       displayName: () => 'Comma-Separated Values (CSV)',
       mimeType: 'text/csv',
       fileExtension: 'csv',
+    },
+  ],
+  'views.components.widgets.messageTable.previewOptions': [
+    {
+      title: 'Show message in new row',
+      isChecked: (config) => config.showMessageRow,
+      isDisabled: () => false,
+      onChange: (config, onConfigChange) => {
+        const willShowRowMessage = !config.showMessageRow;
+        const willShowSummary = !willShowRowMessage ? false : config.showSummary;
+        const newConfig = config.toBuilder().showMessageRow(willShowRowMessage).showSummary(willShowSummary).build();
+
+        return onConfigChange(newConfig);
+      },
+      sort: 1,
     },
   ],
 };

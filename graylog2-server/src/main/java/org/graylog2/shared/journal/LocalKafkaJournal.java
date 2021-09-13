@@ -377,6 +377,11 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
         }
     }
 
+    @Override
+    public void flush() {
+        offsetFlusher.run();
+    }
+
     /**
      * This class has been renamed. For backwards compatibility, register the metrics under the old name as well.
      */
@@ -591,9 +596,60 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
 
     @Override
     public List<JournalReadEntry> read(long requestedMaximumCount) {
-        return read(nextReadOffset, requestedMaximumCount);
+        return readNext(nextReadOffset, requestedMaximumCount);
     }
 
+    /**
+     * Read next messages from the journal, starting at the given offset. If the underlying journal implementation
+     * returns an empty list of entries, but we know there are more entries in the journal, we'll try to skip the
+     * problematic offset(s) until we find entries again.
+     *
+     * @param startOffset Offset to start reading at
+     * @param requestedMaximumCount Maximum number of entries to return.
+     * @return A list of entries
+     */
+    public List<JournalReadEntry> readNext(long startOffset, long requestedMaximumCount) {
+        // Capture the log end offset early for the failure handling below. The end offset will change during the
+        // runtime of the retry loop because new messages are written to the journal. If we would use the changing
+        // end offset in the error handling while loop, we would skip valid messages.
+        final long logEndOffset = getLogEndOffset();
+
+        List<JournalReadEntry> messages = read(startOffset, requestedMaximumCount);
+
+        if (messages.isEmpty()) {
+            // If we got an empty result BUT we know that there are more messages in the log, we bump the readOffset
+            // by 1 and try to read again. We continue until we either get an non-empty result or we reached the
+            // end of the log.
+            // This can happen when a log segment is truncated at the end but later segments have valid messages again.
+            long failedReadOffset = startOffset;
+            long retryReadOffset = failedReadOffset + 1;
+
+            while (messages.isEmpty() && failedReadOffset < (logEndOffset - 1)) {
+                LOG.warn(
+                        "Couldn't read any messages from offset <{}> but journal has more messages. Skipping and " +
+                                "trying to read from offset <{}>",
+                        failedReadOffset, retryReadOffset);
+
+                // Retry the read with an increased offset to skip corrupt segments
+                messages = read(retryReadOffset, requestedMaximumCount);
+
+                // Bump offsets in case we still read an empty result
+                failedReadOffset++;
+                retryReadOffset++;
+            }
+        }
+
+        return messages;
+    }
+
+    /**
+     * Read from the journal, starting at the given offset. If the underlying journal implementation returns an empty
+     * list of entries, it will be returned even if we know there are more entries in the journal.
+     *
+     * @param readOffset Offset to start reading at
+     * @param requestedMaximumCount Maximum number of entries to return.
+     * @return A list of entries
+     */
     public List<JournalReadEntry> read(long readOffset, long requestedMaximumCount) {
         // Always read at least one!
         final long maximumCount = Math.max(1, requestedMaximumCount);

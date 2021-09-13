@@ -18,6 +18,7 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import styled from 'styled-components';
 import { isEmpty, get } from 'lodash';
+import { WidgetComponentProps } from 'views/types';
 
 import connect from 'stores/connect';
 import CombinedProvider from 'injection/CombinedProvider';
@@ -28,7 +29,6 @@ import { SearchActions, SearchStore, SearchStoreState } from 'views/stores/Searc
 import { RefreshActions } from 'views/stores/RefreshStore';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import type { TimeRange } from 'views/logic/queries/Query';
-import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import type { ViewStoreState } from 'views/stores/ViewStore';
 import type { SearchTypeOptions } from 'views/logic/search/GlobalOverride';
 import { PaginatedList } from 'components/common';
@@ -36,6 +36,8 @@ import MessageTable from 'views/components/widgets/MessageTable';
 import ErrorWidget from 'views/components/widgets/ErrorWidget';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import { BackendMessage } from 'views/components/messagelist/Types';
+import Widget from 'views/logic/widgets/Widget';
+import WindowDimensionsContextProvider from 'contexts/WindowDimensionsContextProvider';
 
 import RenderCompletionCallback from './RenderCompletionCallback';
 
@@ -57,22 +59,24 @@ type State = {
   currentPage: number,
 };
 
+export type MessageListResult = {
+  messages: Array<BackendMessage>,
+  total: number,
+  id: string,
+  type: 'messages'
+};
+
 type SearchType = { effectiveTimerange: TimeRange };
-type Props = {
-  config: MessagesWidgetConfig,
+type Props = WidgetComponentProps<MessagesWidgetConfig, MessageListResult> & {
   currentView: ViewStoreState,
-  data: { messages: Array<BackendMessage>, total: number, id: string },
-  fields: FieldTypeMappingsList,
-  onConfigChange?: (MessagesWidgetConfig) => Promise<void>,
   pageSize?: number,
   searchTypes: { [searchTypeId: string]: SearchType },
   selectedFields: Immutable.Set<string> | undefined,
-  setLoadingState: (loading: boolean) => void,
 };
 
 class MessageList extends React.Component<Props, State> {
   static defaultProps = {
-    onConfigChange: () => Promise.resolve(),
+    onConfigChange: () => Promise.resolve(Immutable.OrderedMap<string, Widget>()),
     pageSize: Messages.DEFAULT_LIMIT,
     selectedFields: Immutable.Set<string>(),
   };
@@ -149,7 +153,7 @@ class MessageList extends React.Component<Props, State> {
     const { onConfigChange, config } = this.props;
     const newConfig = config.toBuilder().sort(newSort).build();
 
-    return onConfigChange(newConfig);
+    return onConfigChange(newConfig).then(() => {});
   }
 
   render() {
@@ -167,24 +171,26 @@ class MessageList extends React.Component<Props, State> {
     const listKey = this._getListKey();
 
     return (
-      <Wrapper>
-        <PaginatedList onChange={this._handlePageChange}
-                       activePage={Number(currentPage)}
-                       showPageSizeSelect={false}
-                       totalItems={totalMessages}
-                       pageSize={pageSize}>
-          {!hasError ? (
-            <MessageTable activeQueryId={activeQueryId}
-                          config={config}
-                          fields={fields}
-                          key={listKey}
-                          onSortChange={this._onSortChange}
-                          selectedFields={selectedFields}
-                          setLoadingState={setLoadingState}
-                          messages={messages} />
-          ) : <ErrorWidget errors={errors} />}
-        </PaginatedList>
-      </Wrapper>
+      <WindowDimensionsContextProvider>
+        <Wrapper>
+          <PaginatedList onChange={this._handlePageChange}
+                         activePage={Number(currentPage)}
+                         showPageSizeSelect={false}
+                         totalItems={totalMessages}
+                         pageSize={pageSize}>
+            {!hasError ? (
+              <MessageTable activeQueryId={activeQueryId}
+                            config={config}
+                            fields={fields}
+                            key={listKey}
+                            onSortChange={this._onSortChange}
+                            selectedFields={selectedFields}
+                            setLoadingState={setLoadingState}
+                            messages={messages} />
+            ) : <ErrorWidget errors={errors} />}
+          </PaginatedList>
+        </Wrapper>
+      </WindowDimensionsContextProvider>
     );
   }
 }

@@ -361,7 +361,7 @@ public class ContentPackService {
 
         final ImmutableSet.Builder<Entity> entities = ImmutableSet.builder();
         for (EntityDescriptor entityDescriptor : resolvedEntities) {
-            if (EntityDescriptorIds.isDefaultStreamDescriptor(entityDescriptor)) {
+            if (EntityDescriptorIds.isSystemStreamDescriptor(entityDescriptor)) {
                 continue;
             }
             final EntityFacade<?> facade = entityFacades.getOrDefault(entityDescriptor.type(), UnsupportedEntityFacade.INSTANCE);

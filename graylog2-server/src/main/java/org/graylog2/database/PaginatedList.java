@@ -33,8 +33,9 @@ public class PaginatedList<E> extends ForwardingList<E> {
 
     private final List<E> delegate;
 
-    private final PaginationInfo paginationInfo;
-
+    private final int total;
+    private final int page;
+    private final int perPage;
     private final Long grandTotal;
 
     /**
@@ -58,7 +59,9 @@ public class PaginatedList<E> extends ForwardingList<E> {
      */
     public PaginatedList(@Nonnull List<E> delegate, int total, int page, int perPage, Long grandTotal) {
         this.delegate = delegate;
-        this.paginationInfo = PaginationInfo.create(total, delegate.size(), page, perPage);
+        this.total = total;
+        this.page = page;
+        this.perPage = perPage;
         this.grandTotal = grandTotal;
     }
 
@@ -68,7 +71,7 @@ public class PaginatedList<E> extends ForwardingList<E> {
     }
 
     public PaginationInfo pagination() {
-        return paginationInfo;
+        return PaginationInfo.create(total, delegate.size(), page, perPage);
     }
 
     public Optional<Long> grandTotal() {

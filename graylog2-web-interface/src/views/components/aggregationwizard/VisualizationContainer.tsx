@@ -15,9 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo, useCallback } from 'react';
+import { useCallback } from 'react';
 import styled from 'styled-components';
 import { useFormikContext } from 'formik';
+
+import OnVisualizationConfigChangeContext from 'views/components/aggregationwizard/OnVisualizationConfigChangeContext';
 
 import type { WidgetConfigFormValues } from './WidgetConfigForm';
 
@@ -37,13 +39,11 @@ const VisualizationContainer = ({ children }: Props) => {
     setFieldValue('visualization', { ...values.visualization, config: { ...values.visualization.config, ...newVisualizationConfig } });
   }, [values.visualization, setFieldValue]);
 
-  const childrenWithCallback = useMemo(() => React.Children.map(children, (child) => React.cloneElement(child, {
-    onVisualizationConfigChange: onVisualizationConfigChange,
-  })), [children, onVisualizationConfigChange]);
-
   return (
     <Container>
-      {childrenWithCallback}
+      <OnVisualizationConfigChangeContext.Provider value={onVisualizationConfigChange}>
+        {children}
+      </OnVisualizationConfigChangeContext.Provider>
     </Container>
   );
 };

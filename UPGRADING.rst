@@ -1,41 +1,33 @@
 **************************
-Upgrading to Graylog 4.1.x
+Upgrading to Graylog 4.2.x
 **************************
 
-.. _upgrade-from-40-to-41:
+.. _upgrade-from-41-to-42:
 
 .. contents:: Overview
    :depth: 3
    :backlinks: top
 
-.. warning:: Please make sure to create a MongoDB database backup before starting the upgrade to Graylog 4.1!
+.. warning:: Please make sure to create a MongoDB database backup before starting the upgrade to Graylog 4.2!
 
 Breaking Changes
 ================
 
-The limit parameter in the legacy search api (``/search/universal/(absolute|keyword|relative)``) semantics has changed
-to fix an inconsistency introduced in ``4.0``: prior to ``4.0``, ``0`` meant "no limit", with ``4.0`` this changed to ``-1``
-and ``0`` for "empty result". With 4.1 this has been fixed to work again like in the past but the underlying
-``Searches#scroll`` method has been tagged as ``@deprecated`` now, too.
+Search From/To by Keyword
+-------------------------
+Prior to this version, if the time was inferred from the keyword string (e.g. "last week" or "last monday"),
+the interval did not make much sense, because the hour/minute/sec part of the interval was taken from the moment
+in time, the query was submitted. So, the intervals were not aligned to something that made sense.
+This has been changed so that. e.g. "last monday" is indeed aligned to start at 00:00:00 and ends on the next day at 00:00:00.
+Also, ending on the next day at 00:00:00 is a breaking change. This was chosen so that millis/nanos etc. until the very end
+of the interval are included in the search (and not because of different messages with handling of millis, nanos etc. some messages
+get omitted).
 
 Changes to the Elasticsearch Support
 ------------------------------------
 
-When you have version-probing for the used Elasticsearch version enabled, and Graylog starts up but can not
-connect to ES, the startup stopped immediately with v4.0 and prior. Starting from 4.1 the default behaviour is,
-that Graylog retries connecting with a delay until it can connect to Elasticsearch. See the Elasticsearch
-configuration_ for details.
-
-.. _configuration: https://docs.graylog.org/en/4.1/pages/configuration/elasticsearch.html
-
-Configuration options: ``elasticsearch_version_probe_attempts`` and ``elasticsearch_version_probe_delay``.
-
 Configuration file changes
 --------------------------
-
-The system stats collector has been reimplemented using OSHI instead of SIGAR.
-The configuration option `disable_sigar` has been renamed to `disable_native_system_stats_collector`.
-
 
 Change of API endpoint for user retrieval and modification
 ----------------------------------------------------------
@@ -50,10 +42,10 @@ Change of API endpoint for user retrieval and modification
 API Endpoint Deprecations
 =========================
 
-The following API endpoints are deprecated beginning with 4.1.
+The following API endpoints are deprecated beginning with 4.2.
 
 API Endpoint Removals
 =====================
 
-The following API endpoints have been removed in 4.1.
+The following API endpoints have been removed in 4.2.
 

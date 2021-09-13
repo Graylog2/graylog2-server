@@ -23,9 +23,6 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.common.util.concurrent.Service;
-import org.graylog2.lookup.db.DBCacheService;
-import org.graylog2.lookup.db.DBDataAdapterService;
-import org.graylog2.lookup.db.DBLookupTableService;
 import org.graylog2.lookup.dto.CacheDto;
 import org.graylog2.lookup.dto.DataAdapterDto;
 import org.graylog2.lookup.dto.LookupTableDto;
@@ -79,10 +76,7 @@ import static org.graylog2.utilities.ObjectUtils.objectId;
 public class LookupTableService extends AbstractIdleService {
     private static final Logger LOG = LoggerFactory.getLogger(LookupTableService.class);
 
-    private DBDataAdapterService dbAdapters;
-    private final DBCacheService dbCaches;
-    private final DBLookupTableService dbTables;
-
+    private final LookupTableConfigService configService;
     private final Map<String, LookupCache.Factory> cacheFactories;
     private final Map<String, LookupDataAdapter.Factory> adapterFactories;
     private final Map<String, LookupDataAdapter.Factory2> adapterFactories2;
@@ -99,17 +93,13 @@ public class LookupTableService extends AbstractIdleService {
     private final ConcurrentMap<String, LookupCache> liveCaches = new ConcurrentHashMap<>();
 
     @Inject
-    public LookupTableService(DBDataAdapterService dbAdapters,
-                              DBCacheService dbCaches,
-                              DBLookupTableService dbTables,
+    public LookupTableService(LookupTableConfigService configService,
                               Map<String, LookupCache.Factory> cacheFactories,
                               Map<String, LookupDataAdapter.Factory> adapterFactories,
                               Map<String, LookupDataAdapter.Factory2> adapterFactories2,
                               @Named("daemonScheduler") ScheduledExecutorService scheduler,
                               EventBus eventBus) {
-        this.dbAdapters = dbAdapters;
-        this.dbCaches = dbCaches;
-        this.dbTables = dbTables;
+        this.configService = configService;
         this.cacheFactories = cacheFactories;
         this.adapterFactories = adapterFactories;
         this.adapterFactories2 = adapterFactories2;
@@ -177,7 +167,8 @@ public class LookupTableService extends AbstractIdleService {
         private final Consumer<LookupDataAdapter> replacedAdapterConsumer;
 
         public DataAdapterListener(DataAdapterDto dto, LookupDataAdapter adapter, CountDownLatch latch) {
-            this(dto, adapter, latch, replacedAdapter -> {});
+            this(dto, adapter, latch, replacedAdapter -> {
+            });
         }
 
         public DataAdapterListener(DataAdapterDto dto,
@@ -220,7 +211,8 @@ public class LookupTableService extends AbstractIdleService {
         private final Consumer<LookupCache> replacedCacheConsumer;
 
         public CacheListener(CacheDto dto, LookupCache cache, CountDownLatch latch) {
-            this(dto, cache, latch, replacedCache -> {});
+            this(dto, cache, latch, replacedCache -> {
+            });
         }
 
         public CacheListener(CacheDto dto,
@@ -264,13 +256,13 @@ public class LookupTableService extends AbstractIdleService {
             // then we retrieve the old one so we can safely stop it later
             // then we build a new lookup table instance with the new adapter instance
             // last we can remove the old lookup table instance and stop the original adapter
-            final Collection<LookupTableDto> tablesToUpdate = dbTables.findByDataAdapterIds(updated.ids());
+            final Collection<LookupTableDto> tablesToUpdate = configService.findTablesForDataAdapterIds(updated.ids());
 
             // collect old adapter instances
             final ImmutableSet.Builder<LookupDataAdapter> existingAdapters = ImmutableSet.builder();
 
             // create new adapter and lookup table instances
-            final Map<DataAdapterDto, LookupDataAdapter> newAdapters = createAdapters(dbAdapters.findByIds(updated.ids()));
+            final Map<DataAdapterDto, LookupDataAdapter> newAdapters = createAdapters(configService.findDataAdaptersForIds(updated.ids()));
 
             final CountDownLatch runningLatch = new CountDownLatch(newAdapters.size());
 
@@ -308,13 +300,13 @@ public class LookupTableService extends AbstractIdleService {
             // then we retrieve the old one so we can safely stop it later
             // then we build a new lookup table instance with the new cache instance
             // last we can remove the old lookup table instance and stop the original cache
-            final Collection<LookupTableDto> tablesToUpdate = dbTables.findByCacheIds(updated.ids());
+            final Collection<LookupTableDto> tablesToUpdate = configService.findTablesForCacheIds(updated.ids());
 
             // collect old cache instances
             final ImmutableSet.Builder<LookupCache> existingCaches = ImmutableSet.builder();
 
             // create new cache and lookup table instances
-            final Map<CacheDto, LookupCache> newCaches = createCaches(dbCaches.findByIds(updated.ids()));
+            final Map<CacheDto, LookupCache> newCaches = createCaches(configService.findCachesForIds(updated.ids()));
             final CountDownLatch runningLatch = new CountDownLatch(newCaches.size());
 
             newCaches.forEach((cacheDto, cache) -> {
@@ -338,8 +330,10 @@ public class LookupTableService extends AbstractIdleService {
         scheduler.schedule(() -> updated.ids().stream().forEach(dataAdapterId -> {
             liveTables.values().stream()
                     .filter(table -> table.dataAdapter().id().equals(dataAdapterId))
-                    .map(LookupTable::cache)
-                    .forEach(LookupCache::purge);
+                    // Caches can be shared between lookup table, make sure we only purge the entries for the
+                    // changed data adapter
+                    .map(lookupTable -> new CachePurge(liveTables, lookupTable.dataAdapter()))
+                    .forEach(CachePurge::purgeAll);
         }), 0, TimeUnit.SECONDS);
     }
 
@@ -358,7 +352,7 @@ public class LookupTableService extends AbstractIdleService {
     public void handleLookupTableUpdate(LookupTablesUpdated updated) {
         scheduler.schedule(() -> {
             // load the DTO, and recreate the table
-            updated.lookupTableIds().forEach(id -> dbTables.get(id).map(this::createLookupTable));
+            updated.lookupTableIds().forEach(id -> configService.getTable(id).map(this::createLookupTable));
         }, 0, TimeUnit.SECONDS);
     }
 
@@ -368,7 +362,7 @@ public class LookupTableService extends AbstractIdleService {
     }
 
     private CountDownLatch createAndStartAdapters() {
-        final Map<DataAdapterDto, LookupDataAdapter> adapters = createAdapters(dbAdapters.findAll());
+        final Map<DataAdapterDto, LookupDataAdapter> adapters = createAdapters(configService.loadAllDataAdapters());
         final CountDownLatch latch = new CountDownLatch(toIntExact(adapters.size()));
 
         adapters.forEach((dto, adapter) -> {
@@ -415,7 +409,7 @@ public class LookupTableService extends AbstractIdleService {
     }
 
     private CountDownLatch createAndStartCaches() {
-        final Map<CacheDto, LookupCache> caches = createCaches(dbCaches.findAll());
+        final Map<CacheDto, LookupCache> caches = createCaches(configService.loadAllCaches());
         final CountDownLatch latch = new CountDownLatch(toIntExact(caches.size()));
 
         caches.forEach((cacheDto, lookupCache) -> {
@@ -455,7 +449,7 @@ public class LookupTableService extends AbstractIdleService {
 
     private void createLookupTables() {
         try {
-            dbTables.forEach(dto -> {
+            configService.loadAllTables().forEach(dto -> {
                 try {
                     createLookupTable(dto);
                 } catch (Exception e) {
@@ -549,7 +543,7 @@ public class LookupTableService extends AbstractIdleService {
         } else {
             try {
                 // Do a more expensive DB lookup as fallback (live tables might not be populated yet)
-                return dbTables.get(name).isPresent();
+                return configService.getTable(name).isPresent();
             } catch (Exception e) {
                 LOG.error("Couldn't load lookup table <{}> from database", name, e);
                 return false;

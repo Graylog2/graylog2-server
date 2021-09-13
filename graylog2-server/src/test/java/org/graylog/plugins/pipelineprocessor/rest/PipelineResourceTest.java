@@ -74,11 +74,11 @@ public class PipelineResourceTest {
                 Stage.builder()
                         .stage(0)
                         .ruleReferences(ImmutableList.of("geo loc of dev", "open source dev"))
-                        .matchAll(false)
+                        .match(Stage.Match.EITHER)
                         .build()
         );
         final List<StageSource> expectedStages = ImmutableList.of(
-                StageSource.create(0, false, ImmutableList.of(
+                StageSource.create(0, Stage.Match.EITHER, ImmutableList.of(
                         "geo loc of dev", "open source dev"
                 ))
         );

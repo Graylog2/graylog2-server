@@ -219,7 +219,7 @@ class ReactGridContainer extends React.Component {
     }
   }
 
-  computeLayout = (positions) => {
+  computeLayout = (positions = {}) => {
     return Object.keys(positions).map((id) => {
       const { col, row, height, width } = positions[id];
 

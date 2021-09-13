@@ -17,50 +17,48 @@
 import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
+import { BackendWidgetPosition } from 'views/types';
 
 import { AdditionalContext } from 'views/logic/ActionContext';
 import WidgetContext from 'views/components/contexts/WidgetContext';
-import WidgetClass from 'views/logic/widgets/Widget';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import TFieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import ExportSettingsContextProvider from 'views/components/ExportSettingsContextProvider';
 import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 import View from 'views/logic/views/View';
+import { useStore } from 'stores/connect';
+import { TitlesStore } from 'views/stores/TitlesStore';
+import defaultTitle from 'views/components/defaultTitle';
+import { WidgetStore } from 'views/stores/WidgetStore';
+import TitleTypes from 'views/stores/TitleTypes';
 
-import { WidgetDataMap, WidgetErrorsMap } from './widgets/WidgetPropTypes';
+import { Position } from './widgets/WidgetPropTypes';
 import Widget from './widgets/Widget';
 import DrilldownContextProvider from './contexts/DrilldownContextProvider';
 import WidgetFieldTypesContextProvider from './contexts/WidgetFieldTypesContextProvider';
 
 type Props = {
-  data: WidgetDataMap,
   editing: boolean,
-  errors: WidgetErrorsMap,
   fields: Immutable.List<TFieldTypeMapping>,
-  onPositionsChange: (position?: WidgetPosition) => void,
+  onPositionsChange: (position: BackendWidgetPosition) => void,
   onWidgetSizeChange: (widgetId?: string, dimensions?: { height: number, width: number }) => void,
   position: WidgetPosition,
-  title: string,
-  widget: WidgetClass & { data: string };
+  widgetId: string,
   widgetDimension: { height: number | null | undefined, width: number | null | undefined },
 };
 
 const WidgetComponent = ({
-  data,
   editing,
-  errors,
   fields,
   onPositionsChange = () => undefined,
   onWidgetSizeChange = () => {},
   position,
-  title,
-  widget,
+  widgetId,
   widgetDimension: { height, width },
 }: Props) => {
-  const dataKey = widget.data || widget.id;
-  const widgetData = data[dataKey];
-  const widgetErrors = errors[widget.id] || [];
+  const widget = useStore(WidgetStore, (state) => state.get(widgetId));
   const viewType = useContext(ViewTypeContext);
+  const title = useStore(TitlesStore, (titles) => titles?.getIn([TitleTypes.Widget, widget.id], defaultTitle(widget)) as string);
 
   const WidgetFieldTypesIfDashboard = viewType === View.Type.Dashboard ? WidgetFieldTypesContextProvider : React.Fragment;
 
@@ -70,9 +68,7 @@ const WidgetComponent = ({
         <AdditionalContext.Provider value={{ widget }}>
           <ExportSettingsContextProvider>
             <WidgetFieldTypesIfDashboard>
-              <Widget data={widgetData}
-                      editing={editing}
-                      errors={widgetErrors}
+              <Widget editing={editing}
                       fields={fields}
                       height={height}
                       id={widget.id}
@@ -91,15 +87,11 @@ const WidgetComponent = ({
 };
 
 WidgetComponent.propTypes = {
-  data: PropTypes.object.isRequired,
   editing: PropTypes.bool.isRequired,
-  errors: PropTypes.object.isRequired,
   fields: PropTypes.object.isRequired,
   onPositionsChange: PropTypes.func,
   onWidgetSizeChange: PropTypes.func,
-  position: PropTypes.object.isRequired,
-  title: PropTypes.string.isRequired,
-  widget: PropTypes.object.isRequired,
+  position: PropTypes.shape(Position).isRequired,
   widgetDimension: PropTypes.object.isRequired,
 };
 

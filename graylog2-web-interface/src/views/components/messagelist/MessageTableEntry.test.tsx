@@ -15,9 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { mount } from 'wrappedEnzyme';
+import { render, screen } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
 import MockStore from 'helpers/mocking/StoreMock';
+
+import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 
 import MessageTableEntry from './MessageTableEntry';
 
@@ -34,17 +36,19 @@ describe('MessageTableEntry', () => {
         message: 'Something happened!',
       },
     };
-    const wrapper = mount((
+
+    render(
       <table>
         <MessageTableEntry expandAllRenderAsync
                            toggleDetail={() => {}}
                            fields={Immutable.List()}
                            message={message}
+                           config={MessagesWidgetConfig.builder().build()}
                            selectedFields={Immutable.OrderedSet(['message', 'notexisting'])}
                            expanded={false} />
-      </table>
-    ));
+      </table>,
+    );
 
-    expect(wrapper).toIncludeText('Something happened!');
+    expect(screen.getByText('Something happened!')).toBeInTheDocument();
   });
 });

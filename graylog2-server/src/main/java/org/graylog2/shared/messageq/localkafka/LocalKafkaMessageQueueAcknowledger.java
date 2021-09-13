@@ -18,9 +18,8 @@ package org.graylog2.shared.messageq.localkafka;
 
 import org.graylog2.plugin.Message;
 import org.graylog2.shared.journal.LocalKafkaJournal;
+import org.graylog2.shared.messageq.AbstractMessageQueueAcknowledger;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -28,44 +27,31 @@ import java.util.List;
 import java.util.Optional;
 
 @Singleton
-public class LocalKafkaMessageQueueAcknowledger implements MessageQueueAcknowledger {
-    private static final Logger LOG = LoggerFactory.getLogger(LocalKafkaMessageQueueAcknowledger.class);
-    private LocalKafkaJournal kafkaJournal;
-    private final Metrics metrics;
+public class LocalKafkaMessageQueueAcknowledger extends AbstractMessageQueueAcknowledger<Long> {
+    private final LocalKafkaJournal kafkaJournal;
 
     @Inject
     public LocalKafkaMessageQueueAcknowledger(LocalKafkaJournal kafkaJournal,
                                               MessageQueueAcknowledger.Metrics metrics) {
+        super(Long.class, metrics);
         this.kafkaJournal = kafkaJournal;
-        this.metrics = metrics;
-    }
-
-    @Override
-    public void acknowledge(Object offset) {
-        doAcknowledge(offset);
-        metrics.acknowledgedMessages().mark();
-    }
-
-    @Override
-    public void acknowledge(Message message) {
-        doAcknowledge(message.getMessageQueueId());
-        metrics.acknowledgedMessages().mark();
     }
 
     @Override
     public void acknowledge(List<Message> messages) {
+        @SuppressWarnings("ConstantConditions")
         final Optional<Long> max =
-                messages.stream().map(Message::getMessageQueueId).filter(Long.class::isInstance).map(Long.class::cast).max(Long::compare);
+                messages.stream()
+                        .map(Message::getMessageQueueId)
+                        .filter(this::isValidMessageQueueId)
+                        .map(Long.class::cast)
+                        .max(Long::compare);
         max.ifPresent(this::doAcknowledge);
         metrics.acknowledgedMessages().mark(messages.size());
     }
 
-    private void doAcknowledge(Object object) {
-        if (!(object instanceof Long)) {
-            LOG.error("Couldn't acknowledge message. Expected <" + object + "> to be of type Long");
-            return;
-        }
-        final long offset = (Long) object;
-        kafkaJournal.markJournalOffsetCommitted(offset);
+    @Override
+    protected void doAcknowledge(Long queueId) {
+        kafkaJournal.markJournalOffsetCommitted(queueId);
     }
 }

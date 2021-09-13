@@ -21,6 +21,7 @@ import com.codahale.metrics.MetricRegistry;
 import com.google.auto.value.AutoValue;
 import org.graylog2.plugin.Message;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.util.List;
 
@@ -28,7 +29,7 @@ import static com.codahale.metrics.MetricRegistry.name;
 
 public interface MessageQueueAcknowledger {
 
-    void acknowledge(Object messageQueueId);
+    void acknowledge(@Nullable Object messageQueueId);
 
     void acknowledge(Message message);
 

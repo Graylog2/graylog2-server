@@ -31,7 +31,7 @@ import Widget from '../widgets/Widget';
 
 jest.mock('views/stores/WidgetStore', () => ({
   WidgetActions: {
-    create: jest.fn((widget) => Promise.resolve(widget)),
+    create: jest.fn((widget: Widget) => Promise.resolve(widget)),
   },
 }));
 
@@ -65,7 +65,7 @@ describe('ShowDocumentsHandler', () => {
   });
 
   it('adds a new message widget for an empty value path', () => {
-    return ShowDocumentsHandler({ queryId, field, value: 42, type: FieldType.Unknown, contexts: { widget: widget, valuePath: [] } })
+    return ShowDocumentsHandler({ queryId, field, value: 42, type: FieldType.Unknown, contexts: { widget, valuePath: [] } })
       .then(() => {
         expect(WidgetActions.create).toHaveBeenCalled();
 
@@ -76,7 +76,7 @@ describe('ShowDocumentsHandler', () => {
   });
 
   it('adds the given value path as widget filter for new message widget', () => {
-    return ShowDocumentsHandler({ queryId, field, value: 42, type: FieldType.Unknown, contexts: { widget: widget, valuePath: [{ bar: 42 }, { [field]: 'Hello!' }] } })
+    return ShowDocumentsHandler({ queryId, field, value: 42, type: FieldType.Unknown, contexts: { widget, valuePath: [{ bar: 42 }, { [field]: 'Hello!' }] } })
       .then(() => {
         expect(WidgetActions.create).toHaveBeenCalled();
 
@@ -148,7 +148,7 @@ describe('ShowDocumentsHandler', () => {
       }).then(() => {
         expect(WidgetActions.create).toHaveBeenCalled();
 
-        const { filter, query, streams, timerange }: AggregationWidget = asMock(WidgetActions.create).mock.calls[0][0];
+        const { filter, query, streams, timerange } = asMock(WidgetActions.create).mock.calls[0][0];
 
         expect(filter).toEqual('author: "Vanth"');
         expect(query).toEqual(createElasticsearchQueryString('foo:42 AND hello:world AND bar:42'));

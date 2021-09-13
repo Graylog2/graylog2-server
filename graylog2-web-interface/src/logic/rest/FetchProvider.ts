@@ -136,7 +136,7 @@ export class Builder {
     return this;
   }
 
-  json(body) {
+  json(body?: any) {
     this.body = { body: maybeStringify(body), mimeType: 'application/json' };
     this.accept = 'application/json';
 

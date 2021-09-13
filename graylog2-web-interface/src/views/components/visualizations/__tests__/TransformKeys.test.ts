@@ -144,14 +144,14 @@ describe('TransformKeys', () => {
   it('transforms complete results using current user\'s timezone', () => {
     CurrentUserStore.get.mockReturnValueOnce({ timezone: 'America/New_York' });
     const { rowPivots, columnPivots, input, output } = fixtures.singleRowPivot;
-    const result = transformKeys(rowPivots, columnPivots)(input);
+    const result = transformKeys(rowPivots as Pivot[], columnPivots)(input);
 
     expect(result).toEqual(output);
   });
 
   it('does not transform complete results without time pivots', () => {
     const { rowPivots, columnPivots, input, output } = fixtures.noTimePivots;
-    const result = transformKeys(rowPivots, columnPivots)(input);
+    const result = transformKeys(rowPivots as Pivot[], columnPivots as Pivot[])(input);
 
     expect(result).toEqual(output);
   });
