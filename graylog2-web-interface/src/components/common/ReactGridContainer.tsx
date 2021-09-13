@@ -27,7 +27,7 @@ import { WidgetPositionJSON } from 'views/logic/widgets/WidgetPosition';
 
 const WidthAdjustedReactGridLayout = WidthProvider(Responsive);
 
-const WidthProvidedGridLayout = (props) => {
+const WidthProvidedGridLayout = (props: React.ComponentProps<typeof WidthAdjustedReactGridLayout> & { children: React.ReactNode }) => {
   const { width } = props;
 
   return width ? <Responsive {...props} /> : <WidthAdjustedReactGridLayout {...props} />;
@@ -153,11 +153,12 @@ const ReactGridContainer = ({
 }: Props) => {
   const cellMargin = theme.spacings.px.xs;
   const onLayoutChange = useCallback((layout) => _onLayoutChange(layout, onPositionsChange), [onPositionsChange]);
+  const gridClass = _gridClass(locked, isResizable, draggableHandle, className);
 
   // We need to use a className and draggableHandle to avoid re-rendering all graphs on lock/unlock. See:
   // https://github.com/STRML/react-grid-layout/issues/371
   return (
-    <StyledWidthProvidedGridLayout className={_gridClass(locked, isResizable, draggableHandle, className)}
+    <StyledWidthProvidedGridLayout className={gridClass}
                                    width={width}
                                    breakpoints={BREAKPOINTS}
                                    cols={columns}
