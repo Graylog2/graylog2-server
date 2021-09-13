@@ -17,13 +17,13 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Responsive, WidthProvider } from 'react-grid-layout';
-import { isEqual } from 'lodash';
 import styled, { css, withTheme } from 'styled-components';
 
 import { themePropTypes } from 'theme';
 
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
+import { WidgetPositionJSON } from 'views/logic/widgets/WidgetPosition';
 
 const WidthAdjustedReactGridLayout = WidthProvider(Responsive);
 
@@ -79,19 +79,41 @@ const BREAKPOINTS = {
   xs: COLUMN_WIDTH * COLUMNS.xs,
 };
 
-const _gridClass = (locked, isResizable, useDragHandle, propsClassName) => {
+const _gridClass = (locked, isResizable, draggableHandle, propsClassName) => {
   const className = `${propsClassName}`;
 
   if (locked || !isResizable) {
     return `${className} locked`;
   }
 
-  if (useDragHandle) {
+  if (draggableHandle) {
     return className;
   }
 
   return `${className} unlocked`;
 };
+
+type Props = {
+  animate?: boolean,
+  children: React.ReactNode,
+  className?: string,
+  columns?: {
+    xxl: number,
+    xl: number,
+    lg: number,
+    md: number,
+    sm: number,
+    xs: number,
+  },
+  draggableHandle?: string,
+  isResizable?: boolean,
+  locked?: boolean,
+  measureBeforeMount?: boolean,
+  onPositionsChange: (newPositions: Array<WidgetPositionJSON>) => void,
+  rowHeight?: number,
+  theme,
+  width?: number,
+}
 
 /**
  * Component that renders a draggable and resizable grid. You can control
@@ -99,7 +121,7 @@ const _gridClass = (locked, isResizable, useDragHandle, propsClassName) => {
  * or draggable. Use this for dashboards or pages where the user should
  * be able to decide how to arrange the content.
  */
-class ReactGridContainer extends React.Component {
+class ReactGridContainer extends React.Component<Props> {
   static propTypes = {
     /**
      * Array of children, each one being one element in the grid. Each
@@ -164,7 +186,7 @@ class ReactGridContainer extends React.Component {
      * If this prop is defined, the css class specified will define which item can be used for dragging if unlocked.
      *
      */
-    useDragHandle: PropTypes.string,
+    draggableHandle: PropTypes.string,
     /**
      * Specifies whether the grid is measured before mounting the grid component. Otherwise the grid is initialized with
      * a width of 1280 before it is being resized.
@@ -185,7 +207,7 @@ class ReactGridContainer extends React.Component {
     locked: false,
     measureBeforeMount: false,
     rowHeight: ROW_HEIGHT,
-    useDragHandle: undefined,
+    draggableHandle: undefined,
     width: undefined,
   };
 
@@ -218,7 +240,7 @@ class ReactGridContainer extends React.Component {
       measureBeforeMount,
       rowHeight,
       theme,
-      useDragHandle,
+      draggableHandle,
       width,
     } = this.props;
     // const { layout } = this.state;
@@ -227,7 +249,7 @@ class ReactGridContainer extends React.Component {
     // We need to use a className and draggableHandle to avoid re-rendering all graphs on lock/unlock. See:
     // https://github.com/STRML/react-grid-layout/issues/371
     return (
-      <StyledWidthProvidedGridLayout className={_gridClass(locked, isResizable, useDragHandle, className)}
+      <StyledWidthProvidedGridLayout className={_gridClass(locked, isResizable, draggableHandle, className)}
                                      width={width}
                                      breakpoints={BREAKPOINTS}
                                      cols={columns}
@@ -243,7 +265,7 @@ class ReactGridContainer extends React.Component {
                                      onDragStop={this._onLayoutChange}
                                      onResizeStop={this._onLayoutChange}
                                      useCSSTransforms={animate}
-                                     draggableHandle={locked ? '' : useDragHandle}>
+                                     draggableHandle={locked ? '' : draggableHandle}>
         {children}
       </StyledWidthProvidedGridLayout>
     );

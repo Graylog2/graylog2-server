@@ -53,10 +53,10 @@ const DashboardWrap = styled.div(({ theme }) => css`
   height: 100%;
 `);
 
-const StyledReactGridContainer = styled(ReactGridContainer)(({ hasFocusedWidget }) => css`
-  height: ${hasFocusedWidget ? '100% !important' : '100%'};
-  max-height: ${hasFocusedWidget ? '100%' : 'auto'};
-  overflow: ${hasFocusedWidget ? 'hidden' : 'visible'};
+const StyledReactGridContainer = styled(ReactGridContainer)(({ $hasFocusedWidget }: { $hasFocusedWidget: boolean }) => css`
+  height: ${$hasFocusedWidget ? '100% !important' : '100%'};
+  max-height: ${$hasFocusedWidget ? '100%' : 'auto'};
+  overflow: ${$hasFocusedWidget ? 'hidden' : 'visible'};
   transition: none;
 `);
 
@@ -138,7 +138,7 @@ const Grid = ({ children, locked, onPositionsChange, positions }: GridProps) => 
   return (
     <SizeMe monitorWidth refreshRate={100}>
       {({ size: { width } }) => (
-        <StyledReactGridContainer hasFocusedWidget={!!focusedWidget?.id}
+        <StyledReactGridContainer $hasFocusedWidget={!!focusedWidget?.id}
                                   columns={COLUMNS}
                                   isResizable={!focusedWidget?.id}
                                   locked={locked}
@@ -146,7 +146,7 @@ const Grid = ({ children, locked, onPositionsChange, positions }: GridProps) => 
                                   measureBeforeMount
                                   onPositionsChange={onPositionsChange}
                                   width={width}
-                                  useDragHandle=".widget-drag-handle">
+                                  draggableHandle=".widget-drag-handle">
           {children}
         </StyledReactGridContainer>
       )}
