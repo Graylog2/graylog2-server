@@ -102,20 +102,6 @@ const _gridClass = (locked, isResizable, useDragHandle, propsClassName) => {
 class ReactGridContainer extends React.Component {
   static propTypes = {
     /**
-     * Object of positions in this format:
-     * ```
-     * {
-     *  id: { col: column, row: row, height: height, width: width },
-     *  // E.g.
-     *  '2': { col: 2, row: 0, height: 1, width: 4 },
-     * }
-     * ```
-     *
-     * **Important** All positions and sizes are specified in grid coordinates,
-     * not in pixels.
-     */
-    positions: PropTypes.object.isRequired,
-    /**
      * Array of children, each one being one element in the grid. Each
      * children's outermost element must have a `key` prop set to the `id`
      * specified in the position object. If you don't set that `key` to the
@@ -203,46 +189,7 @@ class ReactGridContainer extends React.Component {
     width: undefined,
   };
 
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      layout: this.computeLayout(props.positions),
-    };
-  }
-
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    const { positions } = this.props;
-
-    if (!isEqual(nextProps.positions, positions)) {
-      this.setState({ layout: this.computeLayout(nextProps.positions) });
-    }
-  }
-
-  computeLayout = (positions = {}) => {
-    return Object.keys(positions).map((id) => {
-      const { col, row, height, width } = positions[id];
-
-      return {
-        i: id,
-        x: col ? Math.max(col - 1, 0) : 0,
-        y: (row === undefined || row <= 0 ? Infinity : row - 1),
-        h: height || 1,
-        w: width || 1,
-      };
-    });
-  };
-
   _onLayoutChange = (newLayout) => {
-    // `onLayoutChange` may be triggered when clicking somewhere in a widget, check before propagating the change.
-    // Filter out additional Object properties in nextLayout, as it comes directly from react-grid-layout
-    const filteredNewLayout = newLayout.map((item) => ({ i: item.i, x: item.x, y: item.y, h: item.h, w: item.w }));
-    const { layout } = this.state;
-
-    if (isEqual(layout, filteredNewLayout)) {
-      return;
-    }
-
     const newPositions = [];
 
     newLayout.forEach((widget) => {
@@ -261,8 +208,20 @@ class ReactGridContainer extends React.Component {
   };
 
   render() {
-    const { children, width, locked, isResizable, rowHeight, columns, animate, useDragHandle, measureBeforeMount, className, theme } = this.props;
-    const { layout } = this.state;
+    const {
+      animate,
+      children,
+      className,
+      columns,
+      isResizable,
+      locked,
+      measureBeforeMount,
+      rowHeight,
+      theme,
+      useDragHandle,
+      width,
+    } = this.props;
+    // const { layout } = this.state;
     const cellMargin = theme.spacings.px.xs;
 
     // We need to use a className and draggableHandle to avoid re-rendering all graphs on lock/unlock. See:
@@ -270,7 +229,6 @@ class ReactGridContainer extends React.Component {
     return (
       <StyledWidthProvidedGridLayout className={_gridClass(locked, isResizable, useDragHandle, className)}
                                      width={width}
-                                     layouts={{ xxl: layout, xl: layout, lg: layout, md: layout, sm: layout, xs: layout }}
                                      breakpoints={BREAKPOINTS}
                                      cols={columns}
                                      rowHeight={rowHeight}
