@@ -28,7 +28,7 @@ import InlineForm from './InlineForm';
 import PopoverHelp from './PopoverHelp';
 
 // eslint-disable-next-line import/no-webpack-loader-syntax
-import DecoratorStyles from '!style!css!./decoratorStyles.css';
+import DecoratorStyles from '!style-loader!css-loader!./decoratorStyles.css';
 
 const ConfigurationFormContainer = styled.div(({ theme }) => css`
   margin-bottom: 10px;

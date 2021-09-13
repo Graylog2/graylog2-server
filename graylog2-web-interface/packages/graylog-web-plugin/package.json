@@ -60,9 +60,9 @@
     "styled-components": "5.3.3",
     "stylelint-config-graylog": "file:../stylelint-config-graylog",
     "typescript": "4.5.2",
-    "webpack": "4.44.2",
+    "webpack": "5.52.1",
     "webpack-cleanup-plugin": "0.5.1",
-    "webpack-cli": "3.3.12",
+    "webpack-cli": "4.8.0",
     "webpack-merge": "4.2.2"
   },
   "devDependencies": {

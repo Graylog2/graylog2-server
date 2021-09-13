@@ -15,8 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 // webpack.vendor.js
-const webpack = require('webpack');
 const path = require('path');
+
+const webpack = require('webpack');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const AssetsPlugin = require('assets-webpack-plugin');
 const merge = require('webpack-merge');
@@ -41,6 +42,7 @@ const webpackConfig = {
     vendor: vendorModules,
   },
   output: {
+    publicPath: '',
     path: BUILD_PATH,
     filename: '[name].js',
     library: '__[name]',

@@ -163,7 +163,7 @@
     "fork-ts-checker-webpack-plugin": "^6.0.0",
     "form-data": "^4.0.0",
     "glob": "^7.0.0",
-    "html-webpack-plugin": "^4.2.0",
+    "html-webpack-plugin": "^5.3.2",
     "json-loader": "^0.5.3",
     "less": "^3.0.1",
     "less-loader": "^7.0.0",
@@ -175,14 +175,15 @@
     "trace-unhandled": "^2.0.1",
     "url-loader": "^4.0.0",
     "webpack-bundle-analyzer": "^3.5.2",
-    "webpack-cli": "3.3.12",
-    "webpack-dev-middleware": "^3.7.1",
-    "webpack-dev-server": "^3.8.0",
+    "webpack-cli": "4.8.0",
+    "webpack-dev-middleware": "^5.1.0",
+    "webpack-dev-server": "^4.2.0",
     "webpack-hot-middleware": "^2.25.0",
     "webpack-merge": "^4.2.2",
     "yargs": "^17.0.1"
   },
   "resolutions": {
-    "jquery": "3.5.1"
+    "jquery": "3.5.1",
+    "@babel/runtime-corejs2": "7.13.10"
   }
 }

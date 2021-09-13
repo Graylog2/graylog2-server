@@ -61,14 +61,10 @@ app.use(history()); // Enables HTML5 History API middleware
 
 app.use(webpackDevMiddleware(vendorCompiler, {
   publicPath: appConfig.output.publicPath,
-  lazy: false,
-  noInfo: true,
 }));
 
 app.use(webpackDevMiddleware(appCompiler, {
   publicPath: appConfig.output.publicPath,
-  lazy: false,
-  noInfo: true,
 }));
 
 app.use(webpackHotMiddleware(appCompiler));
