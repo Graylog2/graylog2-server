@@ -28,8 +28,10 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static io.restassured.RestAssured.given;
+import static org.assertj.core.api.Assertions.anyOf;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.testing.completebackend.Lifecycle.CLASS;
+import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.core.IsEqual.equalTo;
 
 @ApiIntegrationTest(serverLifecycle = CLASS, elasticsearchFactory = ElasticsearchInstanceES7Factory.class, extraPorts = {SearchSyncIT.GELF_HTTP_PORT})
@@ -76,7 +78,6 @@ public class SearchSyncIT {
                 .then()
                 .statusCode(200);
         validatableResponse.assertThat().body("execution.completed_exceptionally", equalTo(false));
-        final String body = validatableResponse.extract().body().asString();
-        assertThat(body).contains("Hello there");
+        validatableResponse.assertThat().body("results*.value.search_types[0]*.value.messages.message.message[0]", hasItem("Hello there"));
     }
 }
