@@ -37,6 +37,7 @@ import ErrorWidget from 'views/components/widgets/ErrorWidget';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import { BackendMessage } from 'views/components/messagelist/Types';
 import Widget from 'views/logic/widgets/Widget';
+import WindowDimensionsContextProvider from 'contexts/WindowDimensionsContextProvider';
 
 import RenderCompletionCallback from './RenderCompletionCallback';
 
@@ -170,24 +171,26 @@ class MessageList extends React.Component<Props, State> {
     const listKey = this._getListKey();
 
     return (
-      <Wrapper>
-        <PaginatedList onChange={this._handlePageChange}
-                       activePage={Number(currentPage)}
-                       showPageSizeSelect={false}
-                       totalItems={totalMessages}
-                       pageSize={pageSize}>
-          {!hasError ? (
-            <MessageTable activeQueryId={activeQueryId}
-                          config={config}
-                          fields={fields}
-                          key={listKey}
-                          onSortChange={this._onSortChange}
-                          selectedFields={selectedFields}
-                          setLoadingState={setLoadingState}
-                          messages={messages} />
-          ) : <ErrorWidget errors={errors} />}
-        </PaginatedList>
-      </Wrapper>
+      <WindowDimensionsContextProvider>
+        <Wrapper>
+          <PaginatedList onChange={this._handlePageChange}
+                         activePage={Number(currentPage)}
+                         showPageSizeSelect={false}
+                         totalItems={totalMessages}
+                         pageSize={pageSize}>
+            {!hasError ? (
+              <MessageTable activeQueryId={activeQueryId}
+                            config={config}
+                            fields={fields}
+                            key={listKey}
+                            onSortChange={this._onSortChange}
+                            selectedFields={selectedFields}
+                            setLoadingState={setLoadingState}
+                            messages={messages} />
+            ) : <ErrorWidget errors={errors} />}
+          </PaginatedList>
+        </Wrapper>
+      </WindowDimensionsContextProvider>
     );
   }
 }

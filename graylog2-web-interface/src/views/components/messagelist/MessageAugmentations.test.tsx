@@ -20,6 +20,7 @@ import asMock from 'helpers/mocking/AsMock';
 import { simpleMessage as message } from 'fixtures/messages';
 
 import usePluginEntities from 'views/logic/usePluginEntities';
+import WindowDimensionsContext from 'contexts/WindowDimensionsContext';
 
 import MessageAugmentations from './MessageAugmentations';
 
@@ -27,9 +28,11 @@ jest.mock('views/logic/usePluginEntities');
 
 describe('MessageAugmentations', () => {
   const SimpleMessageAugmentation = () => (
-    <div id="sticky-augmentations-container">
-      <MessageAugmentations message={message} />
-    </div>
+    <WindowDimensionsContext.Provider value={{ width: 1000, height: 600 }}>
+      <div id="sticky-augmentations-container">
+        <MessageAugmentations message={message} />
+      </div>
+    </WindowDimensionsContext.Provider>
   );
 
   it('should render augmentations', () => {
