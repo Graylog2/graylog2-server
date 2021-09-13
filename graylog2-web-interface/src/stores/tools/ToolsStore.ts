@@ -21,10 +21,12 @@ import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
+import DateTime from 'logic/datetimes/DateTime';
 
 const ToolsStore = Reflux.createStore({
-  testNaturalDate(text: string): Promise<string[]> {
-    const { url } = ApiRoutes.ToolsApiController.naturalDateTest(encodeURIComponent(text));
+  testNaturalDate(keyword: string): Promise<string[]> {
+    const timezone = DateTime.getUserTimezone();
+    const { url } = ApiRoutes.ToolsApiController.naturalDateTest(encodeURIComponent(keyword), encodeURIComponent(timezone));
     const promise = fetch('GET', qualifyUrl(url));
 
     promise.catch((errorThrown) => {

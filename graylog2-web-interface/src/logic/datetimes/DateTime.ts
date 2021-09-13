@@ -46,6 +46,10 @@ class DateTime {
     return new DateTime(moment.utc(dateTime));
   }
 
+  static fromDateTimeAndTZ(dateTime, timezone) {
+    return new DateTime(moment(dateTime).tz(timezone));
+  }
+
   static _cleanDateTimeString(dateTimeString) {
     if (dateTimeString instanceof String) {
       return dateTimeString.trim();

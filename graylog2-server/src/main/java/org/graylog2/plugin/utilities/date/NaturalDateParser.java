@@ -194,6 +194,7 @@ public class NaturalDateParser {
 
             result.put("from", dateFormat(getFrom()));
             result.put("to", dateFormat(getTo()));
+            result.put("timezone", getDateTimeZone().getID());
 
             return result;
         }
