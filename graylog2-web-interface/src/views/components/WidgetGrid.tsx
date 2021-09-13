@@ -199,9 +199,10 @@ const WidgetGrid = () => {
     }
 
     const gridCoordinates = mapPosition(widgetId, position);
+    const coordinatesIdentifier = JSON.stringify(gridCoordinates);
 
     return (
-      <WidgetContainer key={widgetId} data-grid={gridCoordinates} isFocused={focusedWidget?.id === widgetId && focusedWidget?.focusing}>
+      <WidgetContainer key={`${widgetId}-${coordinatesIdentifier}`} data-grid={gridCoordinates} isFocused={focusedWidget?.id === widgetId && focusedWidget?.focusing}>
         <WidgetGridItem fields={fields}
                         positions={positions}
                         widgetId={widgetId}
