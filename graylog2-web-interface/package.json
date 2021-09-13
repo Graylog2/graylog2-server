@@ -54,6 +54,7 @@
     "bluebird": "^3.4.0",
     "bootstrap": "3.4.1",
     "bson-objectid": "^1.2.5",
+    "buffer": "^6.0.3",
     "chroma-js": "^2.0.3",
     "classnames": "^2.2.0",
     "clipboard": "^2.0.0",

@@ -180,6 +180,9 @@ const webpackConfig = {
   resolveLoader: { modules: [path.join(ROOT_PATH, 'node_modules')] },
   devtool: 'source-map',
   plugins: [
+    new webpack.ProvidePlugin({
+      Buffer: ['buffer', 'Buffer'],
+    }),
     new UniqueChunkIdPlugin(),
     new webpack.DllReferencePlugin({ manifest: VENDOR_MANIFEST_PATH, context: ROOT_PATH }),
     new HtmlWebpackPlugin({
@@ -238,8 +241,8 @@ if (TARGET.startsWith('build')) {
 
   module.exports = merge(webpackConfig, {
     mode: 'production',
-    moduleIds: 'deterministic',
     optimization: {
+      moduleIds: 'deterministic',
       minimizer: [new TerserPlugin({
         sourceMap: true,
         terserOptions: {
