@@ -44,7 +44,15 @@ describe('ViewStore', () => {
     firstQueryId: ViewState.builder().build(),
     secondQueryId: ViewState.builder().build(),
   });
-  const dummyView = View.builder().state(dummyState).build();
+  const dummySearch = Search.builder()
+    .queries([
+      Query.builder().id('firstQueryId').build(),
+      Query.builder().id('secondQueryId').build(),
+    ]).build();
+  const dummyView = View.builder()
+    .state(dummyState)
+    .search(dummySearch)
+    .build();
 
   it('.load should select first query if activeQuery is not set', () => ViewActions.load(dummyView)
     .then((state) => expect(state.activeQuery).toBe('firstQueryId')));
