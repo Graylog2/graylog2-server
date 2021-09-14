@@ -22,6 +22,7 @@ import com.google.common.eventbus.EventBus;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog2.audit.NullAuditEventSender;
 import org.graylog2.indexer.IndexMappingFactory;
+import org.graylog2.indexer.MessageIndexTemplateProvider;
 import org.graylog2.indexer.TestIndexSet;
 import org.graylog2.indexer.cluster.Node;
 import org.graylog2.indexer.indexset.IndexSetConfig;
@@ -37,7 +38,6 @@ import org.junit.Test;
 
 import java.time.ZonedDateTime;
 import java.util.Collections;
-import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -75,7 +75,7 @@ public abstract class IndexFieldTypePollerIT extends ElasticsearchBaseTest {
     public void setUp() throws Exception {
         final Node node = mock(Node.class);
         @SuppressWarnings("UnstableApiUsage") final Indices indices = new Indices(
-                new IndexMappingFactory(node, Optional.empty()),
+                new IndexMappingFactory(node, ImmutableSet.of(new MessageIndexTemplateProvider())),
                 mock(NodeId.class),
                 new NullAuditEventSender(),
                 mock(EventBus.class),

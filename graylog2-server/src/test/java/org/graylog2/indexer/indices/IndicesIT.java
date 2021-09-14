@@ -27,6 +27,7 @@ import org.graylog2.indexer.IndexMappingFactory;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetStatsCreator;
+import org.graylog2.indexer.MessageIndexTemplateProvider;
 import org.graylog2.indexer.TestIndexSet;
 import org.graylog2.indexer.cluster.Node;
 import org.graylog2.indexer.cluster.NodeAdapter;
@@ -99,7 +100,8 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
         //noinspection UnstableApiUsage
         eventBus = new EventBus("indices-test");
         final Node node = new Node(createNodeAdapter());
-        final IndexMappingFactory indexMappingFactory = new IndexMappingFactory(node, Optional.empty());
+        final IndexMappingFactory indexMappingFactory = new IndexMappingFactory(node,
+                ImmutableSet.of(new MessageIndexTemplateProvider()));
         indices = new Indices(
                 indexMappingFactory,
                 mock(NodeId.class),

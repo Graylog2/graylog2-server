@@ -17,10 +17,10 @@
 package org.graylog2.indexer;
 
 import com.github.zafarkhaja.semver.Version;
+import com.google.common.collect.ImmutableSet;
 import org.graylog2.indexer.cluster.Node;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -28,10 +28,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class IndexMappingFactoryTest {
@@ -43,7 +41,10 @@ public class IndexMappingFactoryTest {
     @BeforeEach
     public void setUp() throws Exception {
         this.node = mock(Node.class);
-        this.sut = new IndexMappingFactory(node, Optional.empty());
+        this.sut = new IndexMappingFactory(node, ImmutableSet.of(
+                new MessageIndexTemplateProvider(),
+                new EventIndexTemplateProvider()
+        ));
     }
 
     @ParameterizedTest
@@ -72,7 +73,7 @@ public class IndexMappingFactoryTest {
         testForUnsupportedVersion(version, IndexSetConfig.TemplateType.EVENTS);
     }
 
-    private void testForUnsupportedVersion(String version, IndexSetConfig.TemplateType templateType) {
+    private void testForUnsupportedVersion(String version, String templateType) {
         mockNodeVersion(version);
 
         assertThatThrownBy(() -> sut.createIndexMapping(templateType))
@@ -111,33 +112,7 @@ public class IndexMappingFactoryTest {
         testForIndexMappingType(version, expectedMappingClass, IndexSetConfig.TemplateType.EVENTS);
     }
 
-    @Test
-    void createIndexMapping_ifNoFailureIndexMappingFactoryProvided_thenIllegalSateExceptionThrown() {
-        // given
-        mockNodeVersion("6.8.1");
-        sut = new IndexMappingFactory(node, Optional.empty());
-
-        // when + then
-        assertThatCode(() -> sut.createIndexMapping(IndexSetConfig.TemplateType.FAILURES))
-                .isExactlyInstanceOf(IllegalStateException.class);
-    }
-
-    @Test
-    void createIndexMapping_ifFailureIndexMappingFactoryProvided_thenIndexMappingTemplateCreated() {
-        // given
-        mockNodeVersion("6.8.1");
-        final FailureIndexMappingFactory f = mock(FailureIndexMappingFactory.class);
-        when(f.failureIndexMappingFor(Version.valueOf("6.8.1"))).thenReturn(mock(IndexMappingTemplate.class));
-        sut = new IndexMappingFactory(node, Optional.of(f));
-
-        // when
-        sut.createIndexMapping(IndexSetConfig.TemplateType.FAILURES);
-
-        // then
-        verify(f).failureIndexMappingFor(Version.valueOf("6.8.1"));
-    }
-
-    private void testForIndexMappingType(String version, String mappingClassName, IndexSetConfig.TemplateType templateType) throws ClassNotFoundException {
+    private void testForIndexMappingType(String version, String mappingClassName, String templateType) throws ClassNotFoundException {
         mockNodeVersion(version);
 
         final Class<?> expectedMappingClass = Class.forName("org.graylog2.indexer." + mappingClassName);

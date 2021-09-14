@@ -747,7 +747,7 @@ public class IndexSetsResourceTest {
                 ZonedDateTime.of(2016, 10, 10, 12, 0, 0, 0, ZoneOffset.UTC),
                 "standard",
                 "index-template",
-                IndexSetConfig.TemplateType.FAILURES,
+                "failures",
                 1,
                 false
         );

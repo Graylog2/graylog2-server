@@ -211,7 +211,7 @@ public class Indices {
     }
 
     private Map<String, Object> buildTemplate(IndexSet indexSet, IndexSetConfig indexSetConfig) {
-        final IndexSetConfig.TemplateType templateType = indexSetConfig.indexTemplateType().orElse(IndexSetConfig.DEFAULT_INDEX_TEMPLATE_TYPE);
+        final String templateType = indexSetConfig.indexTemplateType().orElse(IndexSetConfig.DEFAULT_INDEX_TEMPLATE_TYPE);
         final IndexMappingTemplate indexMapping = indexMappingFactory.createIndexMapping(templateType);
 
         return indexMapping.toTemplate(indexSetConfig, indexSet.getIndexWildcard(), -1);

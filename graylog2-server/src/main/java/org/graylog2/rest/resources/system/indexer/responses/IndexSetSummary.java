@@ -106,7 +106,7 @@ public abstract class IndexSetSummary {
     public abstract Duration fieldTypeRefreshInterval();
 
     @JsonProperty("index_template_type")
-    public abstract Optional<IndexSetConfig.TemplateType> templateType();
+    public abstract Optional<String> templateType();
 
     @JsonCreator
     public static IndexSetSummary create(@JsonProperty("id") @Nullable String id,
@@ -126,7 +126,7 @@ public abstract class IndexSetSummary {
                                          @JsonProperty("index_optimization_max_num_segments") @Min(1L) int indexOptimizationMaxNumSegments,
                                          @JsonProperty("index_optimization_disabled") boolean indexOptimizationDisabled,
                                          @JsonProperty("field_type_refresh_interval") Duration fieldTypeRefreshInterval,
-                                         @JsonProperty("index_template_type") @Nullable IndexSetConfig.TemplateType templateType) {
+                                         @JsonProperty("index_template_type") @Nullable String templateType) {
         return new AutoValue_IndexSetSummary(id, title, description, isDefault, IndexSetConfig.isRegularIndex(templateType, isWritable),
                 isWritable, indexPrefix, shards, replicas,
                 rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy, creationDate,

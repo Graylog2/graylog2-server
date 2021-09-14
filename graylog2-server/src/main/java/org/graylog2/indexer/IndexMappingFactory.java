@@ -18,65 +18,49 @@ package org.graylog2.indexer;
 
 import com.github.zafarkhaja.semver.Version;
 import org.graylog2.indexer.cluster.Node;
-import org.graylog2.indexer.indexset.IndexSetConfig;
 
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.Optional;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 @Singleton
 public class IndexMappingFactory {
     private final Node node;
-    private final Optional<FailureIndexMappingFactory> failureIndexMappingFactory;
+    private final Set<IndexTemplateProvider> providers;
 
     @Inject
-    public IndexMappingFactory(Node node, Optional<FailureIndexMappingFactory> failureIndexMappingFactory) {
+    public IndexMappingFactory(Node node, Set<IndexTemplateProvider> providers) {
         this.node = node;
-        this.failureIndexMappingFactory = failureIndexMappingFactory;
+        this.providers = providers;
     }
 
-    public IndexMappingTemplate createIndexMapping(IndexSetConfig.TemplateType templateType) {
-        final Version elasticsearchVersion = node.getVersion().orElseThrow(() -> new ElasticsearchException("Unable to retrieve Elasticsearch version."));
+    public IndexMappingTemplate createIndexMapping(@Nonnull String templateType) {
+        final Version elasticsearchVersion = node.getVersion()
+                .orElseThrow(() -> new ElasticsearchException("Unable to retrieve Elasticsearch version."));
 
-        switch (templateType) {
-            case MESSAGES: return indexMappingFor(elasticsearchVersion);
-            case EVENTS: return eventsIndexMappingFor(elasticsearchVersion);
-            case GIM_V1: return gimMappingFor(elasticsearchVersion);
-            case FAILURES: return failureIndexMappingFactory.map(f -> f.failureIndexMappingFor(elasticsearchVersion))
-                    .orElseThrow(() -> new IllegalStateException("No `FailureIndexMappingFactory` implementation provided!"));
-            default: throw new IllegalStateException("Invalid index template type: " + templateType);
-        }
+        return resolveIndexMappingTemplateProvider(templateType)
+                .forVersion(elasticsearchVersion);
     }
 
-    private IndexMapping gimMappingFor(Version elasticsearchVersion) {
-        if (elasticsearchVersion.satisfies("^6.0.0")) {
-            return new GIMMapping6();
-        } else if (elasticsearchVersion.satisfies("^7.0.0")) {
-            return new GIMMapping7();
-        } else {
-            throw new ElasticsearchException("Unsupported Elasticsearch version: " + elasticsearchVersion);
-        }
-    }
+    private IndexTemplateProvider resolveIndexMappingTemplateProvider(@Nonnull String templateType) {
+        final List<IndexTemplateProvider> matching = providers.stream()
+                .filter(p -> p.templateType().equals(templateType))
+                .collect(Collectors.toList());
 
-    public static IndexMapping indexMappingFor(Version elasticsearchVersion) {
-        if (elasticsearchVersion.satisfies("^5.0.0")) {
-            return new IndexMapping5();
-        } else if (elasticsearchVersion.satisfies("^6.0.0")) {
-            return new IndexMapping6();
-        } else if (elasticsearchVersion.satisfies("^7.0.0")) {
-            return new IndexMapping7();
-        } else {
-            throw new ElasticsearchException("Unsupported Elasticsearch version: " + elasticsearchVersion);
+        if (matching.isEmpty()) {
+            throw new IllegalStateException(f("No index mapping template provider found for type '%s'", templateType));
         }
-    }
 
-    public static IndexMappingTemplate eventsIndexMappingFor(Version elasticsearchVersion) {
-        if (elasticsearchVersion.satisfies("^5.0.0 | ^6.0.0")) {
-            return new EventsIndexMapping6();
-        } else if (elasticsearchVersion.satisfies("^7.0.0")) {
-            return new EventsIndexMapping7();
-        } else {
-            throw new ElasticsearchException("Unsupported Elasticsearch version: " + elasticsearchVersion);
+        if (matching.size() > 1) {
+            throw new IllegalStateException(f("Found %s mapping template providers matching type '%s'",
+                    matching.size(), templateType));
         }
+
+        return matching.get(0);
     }
 }
