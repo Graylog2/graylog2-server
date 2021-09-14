@@ -18,9 +18,13 @@ package org.graylog2.indexer;
 
 import com.github.zafarkhaja.semver.Version;
 
+import javax.annotation.Nonnull;
+
 public interface IndexTemplateProvider {
 
-    IndexMappingTemplate forVersion(Version elasticsearchVersion);
+    @Nonnull
+    IndexMappingTemplate forVersion(@Nonnull Version elasticsearchVersion);
 
+    @Nonnull
     String templateType();
 }
