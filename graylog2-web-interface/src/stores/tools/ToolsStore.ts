@@ -21,10 +21,15 @@ import ApiRoutes from 'routing/ApiRoutes';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import DateTime from 'logic/datetimes/DateTime';
-import { AbsoluteTimeRange } from 'views/logic/queries/Query';
+
+type NaturalDateResponse = {
+  from: string,
+  to: string,
+  timezone: string,
+};
 
 const ToolsStore = {
-  testNaturalDate(keyword: string): Promise<AbsoluteTimeRange> {
+  testNaturalDate(keyword: string): Promise<NaturalDateResponse> {
     const timezone = DateTime.getUserTimezone();
     const { url } = ApiRoutes.ToolsApiController.naturalDateTest(encodeURIComponent(keyword), encodeURIComponent(timezone));
     const promise = fetch('GET', qualifyUrl(url));
