@@ -69,14 +69,14 @@ export const ViewActions: ViewActionsType = singletonActions(
 
 type ViewStoreType = Store<ViewStoreState>;
 
-const _selectedQuery = (queries: Immutable.List<string>, activeQuery: string, queryId: string) => {
+const _selectedQuery = (queries: QuerySet = Immutable.Set(), activeQuery: string, queryId: string): QueryId => {
   const selectedQuery = queryId ?? activeQuery;
 
-  if (selectedQuery && queries.find((id) => (id === selectedQuery))) {
+  if (selectedQuery && queries.find(({ id }) => (id === selectedQuery))) {
     return selectedQuery;
   }
 
-  return queries.first();
+  return queries.first()?.id;
 };
 
 export const ViewStore: ViewStoreType = singletonStore(
@@ -170,9 +170,9 @@ export const ViewStore: ViewStoreType = singletonStore(
       this.view = view;
       this.dirty = false;
 
-      /* Select query id passed thorugh URL, selected query (activeQuery) or first query in view (for now).
+      /* Select query id passed through URL, selected query (activeQuery) or first query in view (for now).
          Selected query might become a property on the view later. */
-      const queries = view.state.keySeq().toList();
+      const queries = view?.search?.queries;
       const selectedQuery = _selectedQuery(queries, this.activeQuery, queryId);
 
       this.selectQuery(selectedQuery);
