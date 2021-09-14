@@ -1,0 +1,19 @@
+{
+  "queries": [
+    {
+      "query": {
+        "type": "elasticsearch",
+        "query_string": ""
+      },
+      "timerange": {
+        "type": "relative",
+        "from": 300
+      },
+      "search_types": [
+        {
+          "type": "messages"
+        }
+      ]
+    }
+  ]
+}
