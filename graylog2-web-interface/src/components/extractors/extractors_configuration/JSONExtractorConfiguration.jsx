@@ -21,11 +21,9 @@ import createReactClass from 'create-react-class';
 import { Col, Row, Button } from 'components/graylog';
 import { Icon } from 'components/common';
 import { Input } from 'components/bootstrap';
-import StoreProvider from 'injection/StoreProvider';
 import ExtractorUtils from 'util/ExtractorUtils';
 import FormUtils from 'util/FormsUtils';
-
-const ToolsStore = StoreProvider.getStore('Tools');
+import * as ToolsStore from 'stores/tools/ToolsStore';
 
 const JSONExtractorConfiguration = createReactClass({
   displayName: 'JSONExtractorConfiguration',
