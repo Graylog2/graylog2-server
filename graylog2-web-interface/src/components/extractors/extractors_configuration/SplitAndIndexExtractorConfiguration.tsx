@@ -72,7 +72,7 @@ const SplitAndIndexExtractorConfiguration = ({ configuration: initialConfigurati
     });
 
     promise.finally(() => setTrying(false));
-  }, []);
+  }, [configuration.index, configuration.split_by, exampleMessage, onExtractorPreviewLoad]);
 
   const splitByHelpMessage = (
     <span>
