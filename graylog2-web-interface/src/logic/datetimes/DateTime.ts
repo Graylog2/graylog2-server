@@ -47,7 +47,7 @@ class DateTime {
   }
 
   static fromDateTimeAndTZ(dateTime, timezone) {
-    return new DateTime(moment(dateTime).tz(timezone));
+    return new DateTime(moment.utc(dateTime).tz(timezone));
   }
 
   static _cleanDateTimeString(dateTimeString) {
