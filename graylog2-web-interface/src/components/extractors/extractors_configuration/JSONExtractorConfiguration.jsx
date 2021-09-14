@@ -23,7 +23,7 @@ import { Icon } from 'components/common';
 import { Input } from 'components/bootstrap';
 import ExtractorUtils from 'util/ExtractorUtils';
 import FormUtils from 'util/FormsUtils';
-import * as ToolsStore from 'stores/tools/ToolsStore';
+import ToolsStore from 'stores/tools/ToolsStore';
 
 const JSONExtractorConfiguration = createReactClass({
   displayName: 'JSONExtractorConfiguration',

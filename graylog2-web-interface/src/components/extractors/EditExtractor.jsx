@@ -22,7 +22,7 @@ import { Input } from 'components/bootstrap';
 import ActionsProvider from 'injection/ActionsProvider';
 import ExtractorUtils from 'util/ExtractorUtils';
 import FormUtils from 'util/FormsUtils';
-import * as ToolsStore from 'stores/tools/ToolsStore';
+import ToolsStore from 'stores/tools/ToolsStore';
 
 import EditExtractorConverters from './EditExtractorConverters';
 import EditExtractorConfiguration from './EditExtractorConfiguration';
