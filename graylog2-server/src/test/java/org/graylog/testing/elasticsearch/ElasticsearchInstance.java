@@ -24,6 +24,7 @@ import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.elasticsearch.ElasticsearchContainer;
 import org.testcontainers.utility.DockerImageName;
 
+import java.io.Closeable;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -35,7 +36,7 @@ import static java.util.Objects.isNull;
 /**
  * This rule starts an Elasticsearch instance and provides a configured {@link Client}.
  */
-public abstract class ElasticsearchInstance extends ExternalResource {
+public abstract class ElasticsearchInstance extends ExternalResource implements Closeable {
     private static final Map<Version, ElasticsearchContainer> containersByVersion = new HashMap<>();
 
     private static final String DEFAULT_IMAGE_OSS = "docker.elastic.co/elasticsearch/elasticsearch-oss";
@@ -111,5 +112,10 @@ public abstract class ElasticsearchInstance extends ExternalResource {
 
         // Make sure the data we just imported is visible
         client().refreshNode();
+    }
+
+    @Override
+    public void close() {
+        container.stop();
     }
 }
