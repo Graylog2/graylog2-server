@@ -70,14 +70,12 @@ type Props = WidgetComponentProps<MessagesWidgetConfig, MessageListResult> & {
   currentView: ViewStoreState,
   pageSize?: number,
   searchTypes: { [searchTypeId: string]: SearchType },
-  selectedFields: Immutable.Set<string> | undefined,
 };
 
 class MessageList extends React.Component<Props, State> {
   static defaultProps = {
     onConfigChange: () => Promise.resolve(Immutable.OrderedMap<string, Widget>()),
     pageSize: Messages.DEFAULT_LIMIT,
-    selectedFields: Immutable.Set<string>(),
   };
 
   static contextType = RenderCompletionCallback;
@@ -162,7 +160,6 @@ class MessageList extends React.Component<Props, State> {
       data: { messages, total: totalMessages },
       fields,
       pageSize,
-      selectedFields,
       setLoadingState,
     } = this.props;
     const { currentPage, errors } = this.state;
@@ -183,7 +180,6 @@ class MessageList extends React.Component<Props, State> {
                             fields={fields}
                             key={listKey}
                             onSortChange={this._onSortChange}
-                            selectedFields={selectedFields}
                             setLoadingState={setLoadingState}
                             messages={messages} />
             ) : <ErrorWidget errors={errors} />}

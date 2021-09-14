@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import styled, { css } from 'styled-components';
@@ -103,7 +103,6 @@ type Props = {
   fields: Immutable.List<FieldTypeMapping>,
   messages: Array<BackendMessage>,
   onSortChange: (newSortConfig: SortConfig[]) => Promise<void>,
-  selectedFields?: Immutable.Set<string>,
   setLoadingState: (loading: boolean) => void,
 };
 
@@ -123,8 +122,6 @@ const _getFormattedMessages = (messages): Array<Message> => messages.map((m) => 
   decoration_stats: m.decoration_stats,
 }));
 
-const _getSelectedFields = (selectedFields, config): Immutable.OrderedSet<string> => Immutable.OrderedSet<string>(config ? config.fields : (selectedFields || Immutable.Set<string>()));
-
 const _toggleMessageDetail = (id: string, expandedMessages: Immutable.Set<string>, setExpandedMessages: (newValue: Immutable.Set<string>) => void) => {
   let newSet;
 
@@ -138,10 +135,10 @@ const _toggleMessageDetail = (id: string, expandedMessages: Immutable.Set<string
   setExpandedMessages(newSet);
 };
 
-const MessageTable = ({ fields, activeQueryId, messages, config, onSortChange, setLoadingState, selectedFields: defaultFields }: Props) => {
+const MessageTable = ({ fields, activeQueryId, messages, config, onSortChange, setLoadingState }: Props) => {
   const [expandedMessages, setExpandedMessages] = useState(Immutable.Set<string>());
-  const formattedMessages = _getFormattedMessages(messages);
-  const selectedFields = _getSelectedFields(defaultFields, config);
+  const formattedMessages = useMemo(() => _getFormattedMessages(messages), [messages]);
+  const selectedFields = useMemo(() => Immutable.OrderedSet<string>(config?.fields ?? []), [config?.fields]);
 
   const toggleDetail = useCallback((id: string) => _toggleMessageDetail(id, expandedMessages, setExpandedMessages), [expandedMessages]);
 
@@ -183,7 +180,7 @@ const MessageTable = ({ fields, activeQueryId, messages, config, onSortChange, s
                   <MessageTableEntry fields={fields}
                                      message={message}
                                      config={config}
-                                     showMessageRow={config && config.showMessageRow}
+                                     showMessageRow={config?.showMessageRow}
                                      selectedFields={selectedFields}
                                      expanded={expandedMessages.contains(messageKey)}
                                      toggleDetail={toggleDetail}
@@ -205,12 +202,7 @@ MessageTable.propTypes = {
   fields: CustomPropTypes.FieldListType.isRequired,
   messages: PropTypes.arrayOf(PropTypes.object).isRequired,
   onSortChange: PropTypes.func.isRequired,
-  selectedFields: PropTypes.object,
   setLoadingState: PropTypes.func.isRequired,
-};
-
-MessageTable.defaultProps = {
-  selectedFields: Immutable.Set<string>(),
 };
 
 export default React.memo(MessageTable);
