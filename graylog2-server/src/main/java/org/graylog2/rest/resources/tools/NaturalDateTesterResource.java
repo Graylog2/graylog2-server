@@ -40,11 +40,11 @@ public class NaturalDateTesterResource extends RestResource {
     @GET
     @Timed
     @Produces(MediaType.APPLICATION_JSON)
-    public Map<String, String> naturalDateTester(@QueryParam("string") @NotEmpty String string) {
+    public Map<String, String> naturalDateTester(@QueryParam("string") @NotEmpty final String string, @QueryParam("timezone") @NotEmpty final String timezone) {
         try {
-            return new NaturalDateParser().parse(string).asMap();
+            return new NaturalDateParser(timezone).parse(string).asMap();
         } catch (NaturalDateParser.DateNotParsableException e) {
-            LOG.debug("Could not parse from natural date: " + string, e);
+            LOG.debug("Could not parse from natural date: " + string + " and TimeZone: " + timezone, e);
             throw new WebApplicationException(e, 422);
         }
     }
