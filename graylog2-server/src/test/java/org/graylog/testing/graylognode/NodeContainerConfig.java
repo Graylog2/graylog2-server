@@ -26,7 +26,6 @@ public class NodeContainerConfig {
     static final int API_PORT = 9000;
     public static final int GELF_HTTP_PORT = 12201;
     static final int DEBUG_PORT = 5005;
-    public static final int GELF_HTTP_PORT = 12201;
 
     public final Network network;
     public final String mongoDbUri;
