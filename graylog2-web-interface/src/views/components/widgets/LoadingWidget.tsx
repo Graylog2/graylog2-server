@@ -15,15 +15,21 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import styled from 'styled-components';
 
-import { Icon } from 'components/common';
+import Spinner from 'components/common/Spinner';
 
-import styles from './MessageWidgets.css';
+const Container = styled.div`
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
 
 const LoadingWidget = () => (
-  <div className={styles.spinnerContainer}>
-    <Icon data-testid="loading-widget" name="sync" size="3x" className="spinner" />
-  </div>
+  <Container>
+    <Spinner data-testid="loading-widget" />
+  </Container>
 );
 
 LoadingWidget.propTypes = {};

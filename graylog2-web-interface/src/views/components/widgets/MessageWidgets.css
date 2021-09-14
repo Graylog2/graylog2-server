@@ -1,10 +1,3 @@
-:local(.spinnerContainer) {
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
 :local(.iconMargin) {
     margin-right: 15px;
     margin: 3px 15px 0 0;
