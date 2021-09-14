@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { TColors, TColorVariants, TThemeColorModes, TThemeMode } from '@graylog/sawmill/types';
+import type { TColors, TColorVariantKeys, TThemeColorModes, TThemeMode } from '@graylog/sawmill/types';
 
 interface CustomizationHooks {
   useThemeCustomizer: () => ({
@@ -46,7 +46,7 @@ export interface Notification {
   isDismissible: boolean,
   atLogin: boolean,
   isGlobal: boolean,
-  variant: TColorVariants,
+  variant: TColorVariantKeys,
   hiddenTitle: boolean,
 }
 type NotificationId = string;
