@@ -24,13 +24,11 @@ import { Field, useField } from 'formik';
 
 import { Col, FormControl, FormGroup, Panel, Row } from 'components/graylog';
 import DateTime from 'logic/datetimes/DateTime';
-import StoreProvider from 'injection/StoreProvider';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
+import ToolsStore from 'stores/tools/ToolsStore';
 
 import { EMPTY_RANGE } from '../TimeRangeDisplay';
-
-const ToolsStore = StoreProvider.getStore('Tools');
 
 const KeywordInput = styled(FormControl)(({ theme }) => css`
   min-height: 34px;
@@ -78,7 +76,7 @@ const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: P
     return 'Unable to parse keyword.';
   }, [setKeywordPreview]);
 
-  const _validateKeyword = (keyword: string): Promise<string> | undefined | null => {
+  const _validateKeyword = (keyword: string): Promise<string | void> | undefined | null => {
     if (keyword === undefined) {
       return undefined;
     }

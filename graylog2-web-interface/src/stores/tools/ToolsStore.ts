@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import Reflux from 'reflux';
 import URI from 'urijs';
 
 import fetch from 'logic/rest/FetchProvider';
@@ -23,8 +22,14 @@ import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import DateTime from 'logic/datetimes/DateTime';
 
-const ToolsStore = Reflux.createStore({
-  testNaturalDate(keyword: string): Promise<string[]> {
+type NaturalDateResponse = {
+  from: string,
+  to: string,
+  timezone: string,
+};
+
+const ToolsStore = {
+  testNaturalDate(keyword: string): Promise<NaturalDateResponse> {
     const timezone = DateTime.getUserTimezone();
     const { url } = ApiRoutes.ToolsApiController.naturalDateTest(encodeURIComponent(keyword), encodeURIComponent(timezone));
     const promise = fetch('GET', qualifyUrl(url));
@@ -96,7 +101,7 @@ const ToolsStore = Reflux.createStore({
     return promise;
   },
 
-  testRegexValidity(regex: string): Promise<Object> {
+  testRegexValidity(regex: string): Promise<{ is_valid: boolean }> {
     const encodedRegex = URI.encode(regex);
     const { url } = ApiRoutes.ToolsApiController.regexValidate(encodedRegex);
     const promise = fetch('GET', qualifyUrl(url));
@@ -110,6 +115,7 @@ const ToolsStore = Reflux.createStore({
   },
   urlWhiteListCheck(urlToCheck: string): Promise<{
     url: string,
+    is_whitelisted: boolean,
   }> {
     const { url } = ApiRoutes.ToolsApiController.urlWhitelistCheck();
     const promise = fetch('POST', qualifyUrl(url), {
@@ -183,6 +189,8 @@ const ToolsStore = Reflux.createStore({
     split_by: string,
     index: number,
     string: string,
+    successful: boolean,
+    cut?: string,
   }> {
     const { url } = ApiRoutes.ToolsApiController.splitAndIndexTest();
     const payload = {
@@ -255,6 +263,6 @@ const ToolsStore = Reflux.createStore({
 
     return promise;
   },
-});
+};
 
 export default ToolsStore;

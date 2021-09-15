@@ -21,12 +21,10 @@ import createReactClass from 'create-react-class';
 import { Button, Col, Row } from 'components/graylog';
 import { Icon } from 'components/common';
 import { Input } from 'components/bootstrap';
-import StoreProvider from 'injection/StoreProvider';
 import UserNotification from 'util/UserNotification';
 import ExtractorUtils from 'util/ExtractorUtils';
 import FormUtils from 'util/FormsUtils';
-
-const ToolsStore = StoreProvider.getStore('Tools');
+import ToolsStore from 'stores/tools/ToolsStore';
 
 const SubstringExtractorConfiguration = createReactClass({
   displayName: 'SubstringExtractorConfiguration',
