@@ -68,7 +68,7 @@ const ViewLoader = (viewId: string,
   onSuccess: OnSuccess = () => {},
   onError: OnError = () => {}) => {
   const promise = ViewManagementActions.get(viewId)
-    .then(ViewDeserializer, (error) => {
+    .then((viewJson) => ViewDeserializer(viewJson, query), (error) => {
       if (error.status === 404) {
         ErrorsActions.report(createFromFetchError(error));
       } else {

@@ -44,7 +44,7 @@ export type ViewStoreState = {
 
 type ViewActionsType = RefluxActions<{
   create: (type: ViewType, streamId?: string) => Promise<ViewStoreState>,
-  load: (view: View, isNew?: boolean) => Promise<ViewStoreState>,
+  load: (view: View, isNew?: boolean, queryId?: string) => Promise<ViewStoreState>,
   properties: (properties: Properties) => Promise<void>,
   search: (search: Search) => Promise<View>,
   selectQuery: (queryId: string) => Promise<string>,
@@ -68,6 +68,16 @@ export const ViewActions: ViewActionsType = singletonActions(
 );
 
 type ViewStoreType = Store<ViewStoreState>;
+
+const _selectedQuery = (queries: QuerySet = Immutable.Set(), activeQuery: string, queryId: string): QueryId => {
+  const selectedQuery = queryId ?? activeQuery;
+
+  if (selectedQuery && queries.find(({ id }) => (id === selectedQuery))) {
+    return selectedQuery;
+  }
+
+  return queries.first()?.id;
+};
 
 export const ViewStore: ViewStoreType = singletonStore(
   'views.View',
@@ -156,15 +166,14 @@ export const ViewStore: ViewStoreType = singletonStore(
 
       return promise;
     },
-    load(view: View, isNew = false): Promise<ViewStoreState> {
+    load(view: View, isNew = false, queryId: string = undefined): Promise<ViewStoreState> {
       this.view = view;
       this.dirty = false;
 
-      /* Select selected query (activeQuery) or first query in view (for now).
+      /* Select query id passed through URL, selected query (activeQuery) or first query in view (for now).
          Selected query might become a property on the view later. */
-      const queries = view.state.keySeq().toList();
-      const firstQueryId = view?.search?.queries?.first()?.id ?? queries.first();
-      const selectedQuery = this.activeQuery && queries.find((id) => (id === this.activeQuery)) ? this.activeQuery : firstQueryId;
+      const queries = view?.search?.queries;
+      const selectedQuery = _selectedQuery(queries, this.activeQuery, queryId);
 
       this.selectQuery(selectedQuery);
       this.isNew = isNew;

@@ -23,7 +23,6 @@ import { WidgetComponentProps } from 'views/types';
 import connect from 'stores/connect';
 import CombinedProvider from 'injection/CombinedProvider';
 import { Messages } from 'views/Constants';
-import { SelectedFieldsStore, SelectedFieldsStoreState } from 'views/stores/SelectedFieldsStore';
 import { ViewStore } from 'views/stores/ViewStore';
 import { SearchActions, SearchStore, SearchStoreState } from 'views/stores/SearchStore';
 import { RefreshActions } from 'views/stores/RefreshStore';
@@ -71,14 +70,12 @@ type Props = WidgetComponentProps<MessagesWidgetConfig, MessageListResult> & {
   currentView: ViewStoreState,
   pageSize?: number,
   searchTypes: { [searchTypeId: string]: SearchType },
-  selectedFields: Immutable.Set<string> | undefined,
 };
 
 class MessageList extends React.Component<Props, State> {
   static defaultProps = {
     onConfigChange: () => Promise.resolve(Immutable.OrderedMap<string, Widget>()),
     pageSize: Messages.DEFAULT_LIMIT,
-    selectedFields: Immutable.Set<string>(),
   };
 
   static contextType = RenderCompletionCallback;
@@ -163,7 +160,6 @@ class MessageList extends React.Component<Props, State> {
       data: { messages, total: totalMessages },
       fields,
       pageSize,
-      selectedFields,
       setLoadingState,
     } = this.props;
     const { currentPage, errors } = this.state;
@@ -184,7 +180,6 @@ class MessageList extends React.Component<Props, State> {
                             fields={fields}
                             key={listKey}
                             onSortChange={this._onSortChange}
-                            selectedFields={selectedFields}
                             setLoadingState={setLoadingState}
                             messages={messages} />
             ) : <ErrorWidget errors={errors} />}
@@ -196,17 +191,14 @@ class MessageList extends React.Component<Props, State> {
 }
 
 const mapProps = (props: {
-  selectedFields: SelectedFieldsStoreState,
   currentView: ViewStoreState,
   searches: SearchStoreState,
 }) => ({
-  selectedFields: props.selectedFields,
   currentView: props.currentView,
   searchTypes: get(props, ['searches', 'result', 'results', props.currentView.activeQuery, 'searchTypes']) as { [searchTypeId: string]: SearchType },
 });
 
 export default connect(MessageList, {
-  selectedFields: SelectedFieldsStore,
   currentView: ViewStore,
   searches: SearchStore,
 }, mapProps);
