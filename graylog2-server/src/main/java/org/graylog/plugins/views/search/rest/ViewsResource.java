@@ -22,8 +22,10 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
+import org.graylog.plugins.views.search.db.SearchDbService;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewService;
+import org.graylog.plugins.views.search.views.WidgetDTO;
 import org.graylog.security.UserContext;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.dashboards.events.DashboardDeletedEvent;
@@ -44,6 +46,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -57,6 +60,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static java.util.Locale.ENGLISH;
 
@@ -75,12 +80,14 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     private final ViewService dbService;
     private final SearchQueryParser searchQueryParser;
     private final ClusterEventBus clusterEventBus;
+    private final SearchDbService searchDbService;
 
     @Inject
     public ViewsResource(ViewService dbService,
-                         ClusterEventBus clusterEventBus) {
+                         ClusterEventBus clusterEventBus, SearchDbService searchDbService) {
         this.dbService = dbService;
         this.clusterEventBus = clusterEventBus;
+        this.searchDbService = searchDbService;
         this.searchQueryParser = new SearchQueryParser(ViewDTO.FIELD_TITLE, SEARCH_FIELD_MAPPING);
     }
 
@@ -139,13 +146,43 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     @POST
     @ApiOperation("Create a new view")
     @AuditEvent(type = ViewsAuditEventTypes.VIEW_CREATE)
-    public ViewDTO create(@ApiParam @Valid ViewDTO dto, @Context UserContext userContext) throws ValidationException {
+    public ViewDTO create(@ApiParam @Valid  @NotNull(message = "View is mandatory") ViewDTO dto, @Context UserContext userContext) throws ValidationException {
         if (dto.type().equals(ViewDTO.Type.DASHBOARD)) {
             checkPermission(RestPermissions.DASHBOARDS_CREATE);
         }
+
+        validateIntegrity(dto);
+
         final User user = userContext.getUser();
         final ViewDTO savedDto = dbService.saveWithOwner(dto.toBuilder().owner(user.getName()).build(), user);
         return savedDto;
+    }
+
+    private void validateIntegrity(ViewDTO dto) {
+        if(!searchDbService.get(dto.searchId()).isPresent()) {
+            throw new BadRequestException("Search " + dto.searchId() + " doesn't exist");
+        }
+
+        final Set<String> widgetIds = dto.state().values().stream()
+                .flatMap(v -> v.widgets().stream())
+                .map(WidgetDTO::id)
+                .collect(Collectors.toSet());
+
+        final Set<String> widgetMappings = dto.state().values().stream()
+                .flatMap(v -> v.widgetMapping().keySet().stream()).collect(Collectors.toSet());
+
+
+        final Set<String> widgetPositions = dto.state().values().stream()
+                .flatMap(v -> v.widgetPositions().keySet().stream()).collect(Collectors.toSet());
+
+        if(!widgetMappings.equals(widgetIds)) {
+            throw new BadRequestException("Widget mappings don't correspond to widgets");
+        }
+
+        if(!widgetPositions.equals(widgetIds)) {
+            throw new BadRequestException("Widget positions don't correspond to widgets");
+        }
+
     }
 
     @PUT
@@ -162,6 +199,9 @@ public class ViewsResource extends RestResource implements PluginRestResource {
         } else {
             checkPermission(ViewsRestPermissions.VIEW_EDIT, id);
         }
+
+        validateIntegrity(dto);
+
         return dbService.update(dto.toBuilder().id(id).build());
     }
 
