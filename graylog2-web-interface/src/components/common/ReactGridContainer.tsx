@@ -19,6 +19,7 @@ import { useCallback } from 'react';
 import PropTypes from 'prop-types';
 import styled, { css, withTheme, DefaultTheme } from 'styled-components';
 import { Responsive, WidthProvider } from 'react-grid-layout';
+import type { WidgetPositions } from 'views/types';
 
 import { themePropTypes } from 'theme';
 import 'react-grid-layout/css/styles.css';
@@ -126,10 +127,25 @@ type Props = {
   locked?: boolean,
   measureBeforeMount?: boolean,
   onPositionsChange: (newPositions: Array<WidgetPositionJSON>) => void,
+  positions: WidgetPositions,
   rowHeight?: number,
   theme: DefaultTheme,
   width?: number,
 }
+
+const computeLayout = (positions = {}) => {
+  return Object.keys(positions).map((id) => {
+    const { col, row, height, width } = positions[id];
+
+    return {
+      i: id,
+      x: col ? Math.max(col - 1, 0) : 0,
+      y: (row === undefined || row <= 0 ? Infinity : row - 1),
+      h: height || 1,
+      w: width || 1,
+    };
+  });
+};
 
 /**
  * Component that renders a draggable and resizable grid. You can control
@@ -147,6 +163,7 @@ const ReactGridContainer = ({
   locked,
   measureBeforeMount,
   onPositionsChange,
+  positions,
   rowHeight,
   theme,
   width,
@@ -154,6 +171,7 @@ const ReactGridContainer = ({
   const cellMargin = theme.spacings.px.xs;
   const onLayoutChange = useCallback((layout) => _onLayoutChange(layout, onPositionsChange), [onPositionsChange]);
   const gridClass = _gridClass(locked, isResizable, draggableHandle, className);
+  const layout = computeLayout(positions);
 
   // We need to use a className and draggableHandle to avoid re-rendering all graphs on lock/unlock. See:
   // https://github.com/STRML/react-grid-layout/issues/371
@@ -162,6 +180,7 @@ const ReactGridContainer = ({
                                    width={width}
                                    breakpoints={BREAKPOINTS}
                                    cols={columns}
+                                   layouts={{ xxl: layout, xl: layout, lg: layout, md: layout, sm: layout, xs: layout }}
                                    rowHeight={rowHeight}
                                    containerPadding={[0, 0]}
                                    margin={[cellMargin, cellMargin]}
@@ -206,6 +225,20 @@ ReactGridContainer.propTypes = {
    */
   onPositionsChange: PropTypes.func.isRequired,
   /**
+   * Object of positions in this format:
+   * ```
+   * {
+   *  id: { col: column, row: row, height: height, width: width },
+   *  // E.g.
+   *  '2': { col: 2, row: 0, height: 1, width: 4 },
+   * }
+   * ```
+   *
+   * **Important** All positions and sizes are specified in grid coordinates,
+   * not in pixels.
+   */
+  positions: PropTypes.object.isRequired,
+  /**
    * Specifies if the grid is locked or not. A user cannot move or
    * resize grid elements if this is set to true.
    */
@@ -214,6 +247,7 @@ ReactGridContainer.propTypes = {
    * Specifies if the grid elements can be resized or not **only when the
    * grid is unlocked**.
    */
+
   isResizable: PropTypes.bool,
   /** Height in pixels of a row. */
   rowHeight: PropTypes.number,
