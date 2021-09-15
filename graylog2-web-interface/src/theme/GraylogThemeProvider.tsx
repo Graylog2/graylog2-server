@@ -19,7 +19,7 @@ import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { ThemeProvider, DefaultTheme } from 'styled-components';
 import Sawmill, { colors } from '@graylog/sawmill';
-import type { TColors, TThemeMode } from '@graylog/sawmill/types';
+import type { TColors, TThemeMode } from '@graylog/sawmill';
 
 import usePluginEntities from 'views/logic/usePluginEntities';
 

@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import Reflux from 'reflux';
-import type { TThemeMode } from '@graylog/sawmill/types';
+import type { TThemeMode } from '@graylog/sawmill';
 
 import { PREFERENCES_THEME_MODE } from 'theme/constants';
 import fetch from 'logic/rest/FetchProvider';

@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { useCallback, useContext, useState } from 'react';
-import type { TThemeMode } from '@graylog/sawmill/types';
+import type { TThemeMode } from '@graylog/sawmill';
 
 import { useStore } from 'stores/connect';
 import CombinedProvider from 'injection/CombinedProvider';
