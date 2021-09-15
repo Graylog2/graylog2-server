@@ -44,7 +44,7 @@ public class EventsIndexMappingTest {
     })
     void createsValidMappingTemplates(String versionString) throws Exception {
         final Version version = Version.valueOf(versionString);
-        final IndexMappingTemplate mapping = new EventIndexTemplateProvider().forVersion(version);
+        final IndexMappingTemplate mapping = new EventIndexTemplateProvider().create(version, null);
 
         assertJsonPath(mapping.toTemplate(indexSetConfig, "test_*"), at -> {
             at.jsonPathAsString("$.index_patterns").isEqualTo("test_*");

@@ -17,13 +17,16 @@
 package org.graylog2.indexer;
 
 import com.github.zafarkhaja.semver.Version;
+import org.graylog2.indexer.indexset.IndexSetConfig;
+
+import javax.annotation.Nonnull;
 
 public class MessageIndexTemplateProvider implements IndexTemplateProvider {
 
     public static final String MESSAGE_TEMPLATE_TYPE = "messages";
 
     @Override
-    public IndexMapping forVersion(Version elasticsearchVersion) {
+    public IndexMapping create(@Nonnull Version elasticsearchVersion, @Nonnull IndexSetConfig indexSetConfig) {
         if (elasticsearchVersion.satisfies("^5.0.0")) {
             return new IndexMapping5();
         } else if (elasticsearchVersion.satisfies("^6.0.0")) {

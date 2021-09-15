@@ -25,7 +25,6 @@ import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.IndexMappingFactory;
-import org.graylog2.indexer.IndexMappingTemplate;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
@@ -168,13 +167,8 @@ public class Indices {
     }
 
     public Map<String, Object> getIndexTemplate(IndexSet indexSet) {
-        final String indexWildcard = indexSet.getIndexWildcard();
-
-        return indexMappingFactory.createIndexMapping(
-                indexSet.getConfig()
-                        .indexTemplateType()
-                        .orElse(IndexSetConfig.DEFAULT_INDEX_TEMPLATE_TYPE)
-        ).toTemplate(indexSet.getConfig(), indexWildcard);
+        return indexMappingFactory.createIndexMapping(indexSet.getConfig())
+                .toTemplate(indexSet.getConfig(), indexSet.getIndexWildcard());
     }
 
     public void deleteIndexTemplate(IndexSet indexSet) {
@@ -211,10 +205,8 @@ public class Indices {
     }
 
     private Map<String, Object> buildTemplate(IndexSet indexSet, IndexSetConfig indexSetConfig) {
-        final String templateType = indexSetConfig.indexTemplateType().orElse(IndexSetConfig.DEFAULT_INDEX_TEMPLATE_TYPE);
-        final IndexMappingTemplate indexMapping = indexMappingFactory.createIndexMapping(templateType);
-
-        return indexMapping.toTemplate(indexSetConfig, indexSet.getIndexWildcard(), -1);
+        return indexMappingFactory.createIndexMapping(indexSetConfig)
+                .toTemplate(indexSetConfig, indexSet.getIndexWildcard(), -1);
     }
 
     public Map<String, Set<String>> getAllMessageFieldsForIndices(final String[] writeIndexWildcards) {

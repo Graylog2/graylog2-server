@@ -17,13 +17,16 @@
 package org.graylog2.indexer;
 
 import com.github.zafarkhaja.semver.Version;
+import org.graylog2.indexer.indexset.IndexSetConfig;
+
+import javax.annotation.Nonnull;
 
 public class EventIndexTemplateProvider implements IndexTemplateProvider {
 
     public static final String EVENT_TEMPLATE_TYPE = "events";
 
     @Override
-    public IndexMappingTemplate forVersion(Version elasticsearchVersion) {
+    public IndexMappingTemplate create(@Nonnull Version elasticsearchVersion, @Nonnull IndexSetConfig indexSetConfig) {
         if (elasticsearchVersion.satisfies("^5.0.0 | ^6.0.0")) {
             return new EventsIndexMapping6();
         } else if (elasticsearchVersion.satisfies("^7.0.0")) {

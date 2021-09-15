@@ -19,6 +19,7 @@ package org.graylog2.indexer;
 import com.github.zafarkhaja.semver.Version;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.indexer.cluster.Node;
+import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -37,11 +38,14 @@ public class IndexMappingFactoryTest {
 
     private Node node;
 
+    private IndexSetConfig indexSetConfig;
+
     private IndexMappingFactory sut;
 
     @BeforeEach
     public void setUp() throws Exception {
         this.node = mock(Node.class);
+        this.indexSetConfig = mock(IndexSetConfig.class);
         this.sut = new IndexMappingFactory(node, ImmutableMap.of(
                 MESSAGE_TEMPLATE_TYPE, new MessageIndexTemplateProvider(),
                 EVENT_TEMPLATE_TYPE, new EventIndexTemplateProvider()
@@ -77,7 +81,7 @@ public class IndexMappingFactoryTest {
     private void testForUnsupportedVersion(String version, String templateType) {
         mockNodeVersion(version);
 
-        assertThatThrownBy(() -> sut.createIndexMapping(templateType))
+        assertThatThrownBy(() -> sut.createIndexMapping(indexSetConfig))
                 .isInstanceOf(ElasticsearchException.class)
                 .hasMessageStartingWith("Unsupported Elasticsearch version: " + version)
                 .hasNoCause();
@@ -116,9 +120,11 @@ public class IndexMappingFactoryTest {
     private void testForIndexMappingType(String version, String mappingClassName, String templateType) throws ClassNotFoundException {
         mockNodeVersion(version);
 
+        when(indexSetConfig.indexTemplateType()).thenReturn(Optional.of(templateType));
+
         final Class<?> expectedMappingClass = Class.forName("org.graylog2.indexer." + mappingClassName);
 
-        assertThat(sut.createIndexMapping(templateType)).isInstanceOf(expectedMappingClass);
+        assertThat(sut.createIndexMapping(indexSetConfig)).isInstanceOf(expectedMappingClass);
     }
 
     private void mockNodeVersion(String version) {
