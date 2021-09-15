@@ -285,7 +285,7 @@ const ApiRoutes = {
   ToolsApiController: {
     grokTest: () => { return { url: '/tools/grok_tester' }; },
     jsonTest: () => { return { url: '/tools/json_tester' }; },
-    naturalDateTest: (text: string) => { return { url: `/tools/natural_date_tester?string=${text}` }; },
+    naturalDateTest: (string, timezone) => { return { url: `/tools/natural_date_tester?string=${string}&timezone=${timezone}` }; },
     regexTest: () => { return { url: '/tools/regex_tester' }; },
     regexValidate: (regex: string) => { return { url: `/tools/regex_tester/validate?regex=${regex}` }; },
     regexReplaceTest: () => { return { url: '/tools/regex_replace_tester' }; },

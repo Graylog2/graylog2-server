@@ -20,63 +20,42 @@ import com.github.zafarkhaja.semver.Version;
 import org.graylog2.indexer.cluster.Node;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.Optional;
+import java.util.Map;
+
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 @Singleton
 public class IndexMappingFactory {
     private final Node node;
-    private final Optional<FailureIndexMappingFactory> failureIndexMappingFactory;
+    private final Map<String, IndexTemplateProvider> providers;
 
     @Inject
-    public IndexMappingFactory(Node node, Optional<FailureIndexMappingFactory> failureIndexMappingFactory) {
+    public IndexMappingFactory(Node node, Map<String, IndexTemplateProvider> providers) {
         this.node = node;
-        this.failureIndexMappingFactory = failureIndexMappingFactory;
+        this.providers = providers;
     }
 
-    public IndexMappingTemplate createIndexMapping(IndexSetConfig.TemplateType templateType) {
-        final Version elasticsearchVersion = node.getVersion().orElseThrow(() -> new ElasticsearchException("Unable to retrieve Elasticsearch version."));
+    @Nonnull
+    public IndexMappingTemplate createIndexMapping(@Nonnull IndexSetConfig indexSetConfig) {
+        final Version elasticsearchVersion = node.getVersion()
+                .orElseThrow(() -> new ElasticsearchException("Unable to retrieve Elasticsearch version."));
 
-        switch (templateType) {
-            case MESSAGES: return indexMappingFor(elasticsearchVersion);
-            case EVENTS: return eventsIndexMappingFor(elasticsearchVersion);
-            case GIM_V1: return gimMappingFor(elasticsearchVersion);
-            case FAILURES: return failureIndexMappingFactory.map(f -> f.failureIndexMappingFor(elasticsearchVersion))
-                    .orElseThrow(() -> new IllegalStateException("No `FailureIndexMappingFactory` implementation provided!"));
-            default: throw new IllegalStateException("Invalid index template type: " + templateType);
-        }
+        final String templateType = indexSetConfig
+                .indexTemplateType()
+                .orElse(IndexSetConfig.DEFAULT_INDEX_TEMPLATE_TYPE);
+
+        return resolveIndexMappingTemplateProvider(templateType)
+                .create(elasticsearchVersion, indexSetConfig);
     }
 
-    private IndexMapping gimMappingFor(Version elasticsearchVersion) {
-        if (elasticsearchVersion.satisfies("^6.0.0")) {
-            return new GIMMapping6();
-        } else if (elasticsearchVersion.satisfies("^7.0.0")) {
-            return new GIMMapping7();
+    private IndexTemplateProvider resolveIndexMappingTemplateProvider(@Nonnull String templateType) {
+        if (providers.containsKey(templateType)) {
+            return providers.get(templateType);
         } else {
-            throw new ElasticsearchException("Unsupported Elasticsearch version: " + elasticsearchVersion);
-        }
-    }
-
-    public static IndexMapping indexMappingFor(Version elasticsearchVersion) {
-        if (elasticsearchVersion.satisfies("^5.0.0")) {
-            return new IndexMapping5();
-        } else if (elasticsearchVersion.satisfies("^6.0.0")) {
-            return new IndexMapping6();
-        } else if (elasticsearchVersion.satisfies("^7.0.0")) {
-            return new IndexMapping7();
-        } else {
-            throw new ElasticsearchException("Unsupported Elasticsearch version: " + elasticsearchVersion);
-        }
-    }
-
-    public static IndexMappingTemplate eventsIndexMappingFor(Version elasticsearchVersion) {
-        if (elasticsearchVersion.satisfies("^5.0.0 | ^6.0.0")) {
-            return new EventsIndexMapping6();
-        } else if (elasticsearchVersion.satisfies("^7.0.0")) {
-            return new EventsIndexMapping7();
-        } else {
-            throw new ElasticsearchException("Unsupported Elasticsearch version: " + elasticsearchVersion);
+            throw new IllegalStateException(f("No index template provider found for type '%s'", templateType));
         }
     }
 }

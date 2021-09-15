@@ -14,23 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.indexer;
+package org.graylog2.shared.utilities;
 
-import com.google.common.collect.ImmutableMap;
+import java.util.Locale;
 
-import java.util.Map;
+public final class StringUtils {
 
-public class GIMMapping6 extends GIMMapping {
-    @Override
-    Map<String, Object> dynamicStrings() {
-        return ImmutableMap.of(
-                "match_mapping_type", "string",
-                "mapping", notAnalyzedString()
-        );
-    }
+    private StringUtils() { }
 
-    @Override
-    protected String dateFormats() {
-        return "8yyyy-MM-dd HH:mm:ss||8yyyy-MM-dd";
+    public static String f(String format, Object... args) {
+        return String.format(Locale.ENGLISH, format, args);
     }
 }

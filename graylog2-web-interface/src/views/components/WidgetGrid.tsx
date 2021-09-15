@@ -27,11 +27,12 @@ import WidgetFocusContext, { FocusContextState } from 'views/components/contexts
 import { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import { useStore } from 'stores/connect';
 import { WidgetStore } from 'views/stores/WidgetStore';
-import { CurrentViewStateActions, CurrentViewStateStore } from 'views/stores/CurrentViewStateStore';
+import { CurrentViewStateActions } from 'views/stores/CurrentViewStateStore';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
 import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import { StoreState } from 'stores/StoreTypes';
+import { ViewStatesStore } from 'views/stores/ViewStatesStore';
 
 import WidgetContainer from './WidgetContainer';
 import WidgetComponent from './WidgetComponent';
@@ -112,11 +113,11 @@ const generatePositions = (widgets: Array<{ id: string, type: string }>, positio
   .map<[string, WidgetPosition]>(({ id, type }) => [id, positions[id] ?? _defaultDimensions(type)])
   .reduce((prev, [id, position]) => ({ ...prev, [id]: position }), {});
 
-const mapWidgetPositions = ({ state }: StoreState<typeof CurrentViewStateStore>) => state.widgetPositions;
+const mapWidgetPositions = (states: StoreState<typeof ViewStatesStore>) => states.map((state) => state.widgetPositions).reduce((prev, cur) => ({ ...prev, ...cur }), {});
 const mapWidgets = (state: StoreState<typeof WidgetStore>) => state.map(({ id, type }) => ({ id, type })).toArray();
 
-const useWidgetPositions = () => {
-  const initialPositions = useStore(CurrentViewStateStore, mapWidgetPositions);
+const useWidgetPositions = (): WidgetPositions => {
+  const initialPositions = useStore(ViewStatesStore, mapWidgetPositions);
   const widgets = useStore(WidgetStore, mapWidgets);
 
   return useMemo(() => generatePositions(widgets, initialPositions), [widgets, initialPositions]);
@@ -126,9 +127,10 @@ type GridProps = {
   children: React.ReactNode,
   locked: boolean,
   onPositionsChange: (newPositions: Array<BackendWidgetPosition>) => void,
+  positions: WidgetPositions,
 };
 
-const Grid = ({ children, locked, onPositionsChange }: GridProps) => {
+const Grid = ({ children, locked, onPositionsChange, positions }: GridProps) => {
   const { focusedWidget } = useContext(WidgetFocusContext);
 
   return (
@@ -138,6 +140,7 @@ const Grid = ({ children, locked, onPositionsChange }: GridProps) => {
                                   columns={COLUMNS}
                                   isResizable={!focusedWidget?.id}
                                   locked={locked}
+                                  positions={positions}
                                   measureBeforeMount
                                   onPositionsChange={onPositionsChange}
                                   width={width}
@@ -171,14 +174,6 @@ const onPositionsChange = (newPositions: Array<BackendWidgetPosition>) => {
   CurrentViewStateActions.widgetPositions(widgetPositions);
 };
 
-const mapPosition = (id, { col, row, height, width }) => ({
-  i: id,
-  x: col ? Math.max(col - 1, 0) : 0,
-  y: (row === undefined || row <= 0 ? Infinity : row - 1),
-  h: height || 1,
-  w: width || 1,
-});
-
 const WidgetGrid = () => {
   const isInteractive = useContext(InteractiveContext);
   const { focusedWidget } = useContext(WidgetFocusContext);
@@ -197,10 +192,8 @@ const WidgetGrid = () => {
       return null;
     }
 
-    const gridCoordinates = mapPosition(widgetId, position);
-
     return (
-      <WidgetContainer key={widgetId} data-grid={gridCoordinates} isFocused={focusedWidget?.id === widgetId && focusedWidget?.focusing}>
+      <WidgetContainer key={widgetId} isFocused={focusedWidget?.id === widgetId && focusedWidget?.focusing}>
         <WidgetGridItem fields={fields}
                         positions={positions}
                         widgetId={widgetId}
@@ -217,6 +210,7 @@ const WidgetGrid = () => {
   return (
     <DashboardWrap>
       <Grid locked={!isInteractive}
+            positions={positions}
             onPositionsChange={onPositionsChange}>
         {children}
       </Grid>

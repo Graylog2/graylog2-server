@@ -24,13 +24,11 @@ import { Field, useField } from 'formik';
 
 import { Col, FormControl, FormGroup, Panel, Row } from 'components/graylog';
 import DateTime from 'logic/datetimes/DateTime';
-import StoreProvider from 'injection/StoreProvider';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
+import ToolsStore from 'stores/tools/ToolsStore';
 
 import { EMPTY_RANGE } from '../TimeRangeDisplay';
-
-const ToolsStore = StoreProvider.getStore('Tools');
 
 const KeywordInput = styled(FormControl)(({ theme }) => css`
   min-height: 34px;
@@ -46,10 +44,11 @@ const ErrorMessage = styled.span(({ theme }) => css`
 `);
 
 const _parseKeywordPreview = (data) => {
-  const from = DateTime.fromUTCDateTime(data.from).toString();
-  const to = DateTime.fromUTCDateTime(data.to).toString();
+  const { timezone } = data;
+  const from = DateTime.fromDateTimeAndTZ(data.from, timezone).toString();
+  const to = DateTime.fromDateTimeAndTZ(data.to, timezone).toString();
 
-  return { from, to };
+  return { from, to, timezone };
 };
 
 type Props = {
@@ -62,9 +61,9 @@ const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: P
   const [nextRangeProps, , nextRangeHelpers] = useField('nextTimeRange');
   const mounted = useRef(true);
   const keywordRef = useRef();
-  const [keywordPreview, setKeywordPreview] = useState({ from: '', to: '' });
+  const [keywordPreview, setKeywordPreview] = useState({ from: '', to: '', timezone: '' });
 
-  const _setSuccessfullPreview = useCallback((response: { from: string, to: string }) => {
+  const _setSuccessfullPreview = useCallback((response: { from: string, to: string, timezone: string }) => {
     setValidatingKeyword(false);
 
     return setKeywordPreview(_parseKeywordPreview(response));
@@ -72,12 +71,12 @@ const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: P
   [setValidatingKeyword]);
 
   const _setFailedPreview = useCallback(() => {
-    setKeywordPreview({ from: EMPTY_RANGE, to: EMPTY_RANGE });
+    setKeywordPreview({ from: EMPTY_RANGE, to: EMPTY_RANGE, timezone: DateTime.getUserTimezone() });
 
     return 'Unable to parse keyword.';
   }, [setKeywordPreview]);
 
-  const _validateKeyword = (keyword: string): Promise<string> | undefined | null => {
+  const _validateKeyword = (keyword: string): Promise<string | void> | undefined | null => {
     if (keyword === undefined) {
       return undefined;
     }
