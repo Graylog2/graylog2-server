@@ -19,7 +19,7 @@ import * as React from 'react';
 import styled, { css, DefaultTheme } from 'styled-components';
 // eslint-disable-next-line no-restricted-imports
 import { Alert as BootstrapAlert } from 'react-bootstrap';
-import type { TColorVariantKeys } from '@graylog/sawmill/types';
+import { TColorVariantKeys } from '@graylog/sawmill/types';
 
 interface AlertProps {
   $bsStyle: TColorVariantKeys,
