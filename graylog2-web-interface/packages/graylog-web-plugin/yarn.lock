@@ -981,9 +981,9 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
-"@graylog/sawmill@Graylog2/sawmill-ux#9caf019":
+"@graylog/sawmill@Graylog2/sawmill-ux#904ef05":
   version "1.0.0"
-  resolved "git+ssh://git@github.com/Graylog2/sawmill-ux.git#9caf019488519de647c93c3334de0d5991bc0d14"
+  resolved "git+ssh://git@github.com/Graylog2/sawmill-ux.git#904ef05efd710d0f7a9416097480e98c0ecbe0cf"
   dependencies:
     "@openfonts/roboto-mono_latin" "1.44.1"
     babel-plugin-styled-components "^1.13.2"
