@@ -17,9 +17,8 @@
 package org.graylog2.indexer;
 
 import com.github.zafarkhaja.semver.Version;
-import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableMap;
 import org.graylog2.indexer.cluster.Node;
-import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -29,6 +28,8 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.graylog2.indexer.EventIndexTemplateProvider.EVENT_TEMPLATE_TYPE;
+import static org.graylog2.indexer.MessageIndexTemplateProvider.MESSAGE_TEMPLATE_TYPE;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -41,9 +42,9 @@ public class IndexMappingFactoryTest {
     @BeforeEach
     public void setUp() throws Exception {
         this.node = mock(Node.class);
-        this.sut = new IndexMappingFactory(node, ImmutableSet.of(
-                new MessageIndexTemplateProvider(),
-                new EventIndexTemplateProvider()
+        this.sut = new IndexMappingFactory(node, ImmutableMap.of(
+                MESSAGE_TEMPLATE_TYPE, new MessageIndexTemplateProvider(),
+                EVENT_TEMPLATE_TYPE, new EventIndexTemplateProvider()
         ));
     }
 
@@ -57,7 +58,7 @@ public class IndexMappingFactoryTest {
             "9.0.0"
     })
     void messageMappingFailsForUnsupportedElasticsearchVersion(String version) {
-        testForUnsupportedVersion(version, IndexSetConfig.TemplateType.MESSAGES);
+        testForUnsupportedVersion(version, MESSAGE_TEMPLATE_TYPE);
     }
 
     @ParameterizedTest
@@ -70,7 +71,7 @@ public class IndexMappingFactoryTest {
             "9.0.0"
     })
     void eventsMappingFailsForUnsupportedElasticsearchVersion(String version) {
-        testForUnsupportedVersion(version, IndexSetConfig.TemplateType.EVENTS);
+        testForUnsupportedVersion(version, EVENT_TEMPLATE_TYPE);
     }
 
     private void testForUnsupportedVersion(String version, String templateType) {
@@ -94,7 +95,7 @@ public class IndexMappingFactoryTest {
             "7.8.0, IndexMapping7"
     })
     void createsMessageIndexMappings(String version, String expectedMappingClass) throws ClassNotFoundException {
-        testForIndexMappingType(version, expectedMappingClass, IndexSetConfig.TemplateType.MESSAGES);
+        testForIndexMappingType(version, expectedMappingClass, MESSAGE_TEMPLATE_TYPE);
     }
 
     @ParameterizedTest
@@ -109,7 +110,7 @@ public class IndexMappingFactoryTest {
             "7.8.0, EventsIndexMapping7"
     })
     void createsEventIndexMappings(String version, String expectedMappingClass) throws ClassNotFoundException {
-        testForIndexMappingType(version, expectedMappingClass, IndexSetConfig.TemplateType.EVENTS);
+        testForIndexMappingType(version, expectedMappingClass, EVENT_TEMPLATE_TYPE);
     }
 
     private void testForIndexMappingType(String version, String mappingClassName, String templateType) throws ClassNotFoundException {

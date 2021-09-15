@@ -22,19 +22,17 @@ import org.graylog2.indexer.cluster.Node;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
 
 @Singleton
 public class IndexMappingFactory {
     private final Node node;
-    private final Set<IndexTemplateProvider> providers;
+    private final Map<String, IndexTemplateProvider> providers;
 
     @Inject
-    public IndexMappingFactory(Node node, Set<IndexTemplateProvider> providers) {
+    public IndexMappingFactory(Node node, Map<String, IndexTemplateProvider> providers) {
         this.node = node;
         this.providers = providers;
     }
@@ -48,19 +46,10 @@ public class IndexMappingFactory {
     }
 
     private IndexTemplateProvider resolveIndexMappingTemplateProvider(@Nonnull String templateType) {
-        final List<IndexTemplateProvider> matching = providers.stream()
-                .filter(p -> p.templateType().equals(templateType))
-                .collect(Collectors.toList());
-
-        if (matching.isEmpty()) {
-            throw new IllegalStateException(f("No index mapping template provider found for type '%s'", templateType));
+        if (providers.containsKey(templateType)) {
+            return providers.get(templateType);
+        } else {
+            throw new IllegalStateException(f("No index template provider found for type '%s'", templateType));
         }
-
-        if (matching.size() > 1) {
-            throw new IllegalStateException(f("Found %s mapping template providers matching type '%s'",
-                    matching.size(), templateType));
-        }
-
-        return matching.get(0);
     }
 }

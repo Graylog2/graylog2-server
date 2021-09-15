@@ -39,6 +39,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import static org.graylog2.indexer.MessageIndexTemplateProvider.MESSAGE_TEMPLATE_TYPE;
+
 public class StreamMock implements Stream {
     private String id;
     private String title;
@@ -82,7 +84,7 @@ public class StreamMock implements Stream {
                 ZonedDateTime.of(2017, 3, 29, 12, 0, 0, 0, ZoneOffset.UTC),
                 "standard",
                 "template",
-                IndexSetConfig.TemplateType.MESSAGES,
+                MESSAGE_TEMPLATE_TYPE,
                 1,
                 false));
     }

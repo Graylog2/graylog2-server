@@ -17,6 +17,7 @@
 package org.graylog2.indexer.fieldtypes;
 
 import com.codahale.metrics.MetricRegistry;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
@@ -41,6 +42,7 @@ import java.util.Collections;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog2.indexer.MessageIndexTemplateProvider.MESSAGE_TEMPLATE_TYPE;
 import static org.mockito.Mockito.mock;
 
 // JSON data in: src/test/resources/org/graylog2/indexer/fieldtypes/IndexFieldTypePollerIT.json
@@ -75,7 +77,9 @@ public abstract class IndexFieldTypePollerIT extends ElasticsearchBaseTest {
     public void setUp() throws Exception {
         final Node node = mock(Node.class);
         @SuppressWarnings("UnstableApiUsage") final Indices indices = new Indices(
-                new IndexMappingFactory(node, ImmutableSet.of(new MessageIndexTemplateProvider())),
+                new IndexMappingFactory(node, ImmutableMap.of(
+                        MESSAGE_TEMPLATE_TYPE, new MessageIndexTemplateProvider()
+                )),
                 mock(NodeId.class),
                 new NullAuditEventSender(),
                 mock(EventBus.class),

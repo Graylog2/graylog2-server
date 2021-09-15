@@ -16,7 +16,7 @@
  */
 package org.graylog2.indexer.indices;
 
-import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.eventbus.EventBus;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog.testing.elasticsearch.SkipDefaultIndexTemplate;
@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog2.indexer.MessageIndexTemplateProvider.MESSAGE_TEMPLATE_TYPE;
 import static org.mockito.Mockito.mock;
 
 public abstract class IndicesGetAllMessageFieldsIT extends ElasticsearchBaseTest {
@@ -51,7 +52,8 @@ public abstract class IndicesGetAllMessageFieldsIT extends ElasticsearchBaseTest
         final Node node = new Node(mock(NodeAdapter.class));
         //noinspection UnstableApiUsage
         indices = new Indices(
-                new IndexMappingFactory(node, ImmutableSet.of(new MessageIndexTemplateProvider())),
+                new IndexMappingFactory(node,
+                        ImmutableMap.of(MESSAGE_TEMPLATE_TYPE, new MessageIndexTemplateProvider())),
                 mock(NodeId.class),
                 new NullAuditEventSender(),
                 new EventBus(),

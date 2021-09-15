@@ -51,6 +51,7 @@ import java.util.Optional;
 
 import static java.util.Locale.US;
 import static java.util.Objects.requireNonNull;
+import static org.graylog2.indexer.EventIndexTemplateProvider.EVENT_TEMPLATE_TYPE;
 
 public class V20190705071400_AddEventIndexSetsMigration extends Migration {
     private static final Logger LOG = LoggerFactory.getLogger(V20190705071400_AddEventIndexSetsMigration.class);
@@ -120,7 +121,7 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
 
     private void checkIndexPrefixConflicts(String indexPrefix, String configKey) {
         final DBQuery.Query query = DBQuery.and(
-                DBQuery.notEquals(IndexSetConfig.FIELD_INDEX_TEMPLATE_TYPE, Optional.of(IndexSetConfig.TemplateType.EVENTS)),
+                DBQuery.notEquals(IndexSetConfig.FIELD_INDEX_TEMPLATE_TYPE, Optional.of(EVENT_TEMPLATE_TYPE)),
                 DBQuery.is(IndexSetConfig.FIELD_INDEX_PREFIX, indexPrefix)
         );
 
@@ -133,7 +134,7 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
 
     private Optional<IndexSetConfig> getEventsIndexSetConfig(String indexPrefix) {
         final DBQuery.Query query = DBQuery.and(
-                DBQuery.is(IndexSetConfig.FIELD_INDEX_TEMPLATE_TYPE, Optional.of(IndexSetConfig.TemplateType.EVENTS)),
+                DBQuery.is(IndexSetConfig.FIELD_INDEX_TEMPLATE_TYPE, Optional.of(EVENT_TEMPLATE_TYPE)),
                 DBQuery.is(IndexSetConfig.FIELD_INDEX_PREFIX, indexPrefix)
         );
         return indexSetService.findOne(query);
@@ -148,7 +149,7 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
         final IndexSetConfig indexSetConfig = IndexSetConfig.builder()
                 .title(indexSetTitle)
                 .description(indexSetDescription)
-                .indexTemplateType(IndexSetConfig.TemplateType.EVENTS)
+                .indexTemplateType(EVENT_TEMPLATE_TYPE)
                 .isWritable(true)
                 .indexPrefix(indexPrefix)
                 .shards(elasticsearchConfiguration.getShards())

@@ -17,9 +17,10 @@
 package org.graylog2.indexer;
 
 import com.github.zafarkhaja.semver.Version;
-import org.graylog2.indexer.indexset.IndexSetConfig;
 
 public class MessageIndexTemplateProvider implements IndexTemplateProvider {
+
+    public static final String MESSAGE_TEMPLATE_TYPE = "messages";
 
     @Override
     public IndexMapping forVersion(Version elasticsearchVersion) {
@@ -32,10 +33,5 @@ public class MessageIndexTemplateProvider implements IndexTemplateProvider {
         } else {
             throw new ElasticsearchException("Unsupported Elasticsearch version: " + elasticsearchVersion);
         }
-    }
-
-    @Override
-    public String templateType() {
-        return IndexSetConfig.TemplateType.MESSAGES;
     }
 }

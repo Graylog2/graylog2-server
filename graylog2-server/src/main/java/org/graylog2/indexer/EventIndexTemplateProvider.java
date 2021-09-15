@@ -17,9 +17,10 @@
 package org.graylog2.indexer;
 
 import com.github.zafarkhaja.semver.Version;
-import org.graylog2.indexer.indexset.IndexSetConfig;
 
 public class EventIndexTemplateProvider implements IndexTemplateProvider {
+
+    public static final String EVENT_TEMPLATE_TYPE = "events";
 
     @Override
     public IndexMappingTemplate forVersion(Version elasticsearchVersion) {
@@ -30,10 +31,5 @@ public class EventIndexTemplateProvider implements IndexTemplateProvider {
         } else {
             throw new ElasticsearchException("Unsupported Elasticsearch version: " + elasticsearchVersion);
         }
-    }
-
-    @Override
-    public String templateType() {
-        return IndexSetConfig.TemplateType.EVENTS;
     }
 }

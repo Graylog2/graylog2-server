@@ -24,7 +24,4 @@ public interface IndexTemplateProvider {
 
     @Nonnull
     IndexMappingTemplate forVersion(@Nonnull Version elasticsearchVersion);
-
-    @Nonnull
-    String templateType();
 }

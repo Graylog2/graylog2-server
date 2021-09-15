@@ -101,7 +101,7 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
         eventBus = new EventBus("indices-test");
         final Node node = new Node(createNodeAdapter());
         final IndexMappingFactory indexMappingFactory = new IndexMappingFactory(node,
-                ImmutableSet.of(new MessageIndexTemplateProvider()));
+                ImmutableMap.of(MessageIndexTemplateProvider.MESSAGE_TEMPLATE_TYPE, new MessageIndexTemplateProvider()));
         indices = new Indices(
                 indexMappingFactory,
                 mock(NodeId.class),
