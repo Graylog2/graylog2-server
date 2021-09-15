@@ -16,10 +16,8 @@
  */
 import React, { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
-import { parse, stringify } from 'qs';
 import naturalSort from 'javascript-natural-sort';
 import Immutable from 'immutable';
-import { useHistory, useLocation } from 'react-router-dom';
 
 import { LinkContainer, Link } from 'components/graylog/router';
 import { Button } from 'components/graylog';
@@ -30,7 +28,8 @@ import CombinedProvider from 'injection/CombinedProvider';
 import { useStore } from 'stores/connect';
 import StreamsStore, { Stream } from 'stores/streams/StreamsStore';
 import { PaginatedPipelines } from 'stores/pipelines/PipelinesStore';
-import { DEFAULT_PAGINATION, Pagination } from 'stores/PaginationTypes';
+import { DEFAULT_PAGINATION } from 'stores/PaginationTypes';
+import useLocationSearchPagination from 'hooks/useLocationSearchPagination';
 
 import PipelineConnectionsList from './PipelineConnectionsList';
 
@@ -105,32 +104,9 @@ const ProcessingTimelineComponent = () => {
   const [streams, setStreams] = useState<Stream[] | undefined>();
   const [paginatedPipelines, setPaginatedPipelines] = useState<PaginatedPipelines|undefined>();
   const [loading, setLoading] = useState(false);
-  const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
   const { list: pipelines = Immutable.List(), pagination: { total = 0 } = {} } = paginatedPipelines || {};
+  const [pagination, setPagination] = useLocationSearchPagination(DEFAULT_PAGINATION);
   const { page, query, perPage } = pagination;
-  const history = useHistory();
-  const location = useLocation();
-
-  useEffect(() => {
-    const convertToSafePositiveInteger = (maybeNumber: any): number | undefined => {
-      const parsedNumber = Number.parseInt(maybeNumber, 10);
-
-      return (Number.isSafeInteger(parsedNumber) && parsedNumber > 0) ? parsedNumber : undefined;
-    };
-
-    const parsePaginationFromSearch = (search: string): Pagination => {
-      const parsedSearch = parse(search, { ignoreQueryPrefix: true }) ?? {};
-      const { page: searchPage, perPage: searchPerPage, query: searchQuery } = parsedSearch;
-
-      return {
-        page: convertToSafePositiveInteger(searchPage) ?? DEFAULT_PAGINATION.page,
-        perPage: convertToSafePositiveInteger(searchPerPage) ?? DEFAULT_PAGINATION.perPage,
-        query: typeof searchQuery === 'string' ? searchQuery : DEFAULT_PAGINATION.query,
-      };
-    };
-
-    setPagination(parsePaginationFromSearch(location.search));
-  }, [location.search]);
 
   useEffect(() => {
     _loadPipelines(pagination, setLoading, setPaginatedPipelines);
@@ -146,11 +122,6 @@ const ProcessingTimelineComponent = () => {
 
   const handlePaginationChange = (nextPagination) => {
     setPagination(nextPagination);
-
-    history.push({
-      pathname: location.pathname,
-      search: stringify(nextPagination),
-    });
   };
 
   const searchFilter = (
