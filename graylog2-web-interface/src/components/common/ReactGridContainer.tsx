@@ -111,7 +111,6 @@ const _onLayoutChange = (newLayout, onPositionsChange) => {
 };
 
 type Props = {
-  animate?: boolean,
   children: React.ReactNode,
   className?: string,
   columns?: {
@@ -154,7 +153,6 @@ const computeLayout = (positions = {}) => {
  * be able to decide how to arrange the content.
  */
 const ReactGridContainer = ({
-  animate,
   children,
   className,
   columns,
@@ -192,7 +190,7 @@ const ReactGridContainer = ({
                                    draggableCancel=".actions"
                                    onDragStop={onLayoutChange}
                                    onResizeStop={onLayoutChange}
-                                   useCSSTransforms={animate}
+                                   useCSSTransforms
                                    draggableHandle={locked ? '' : draggableHandle}>
       {children}
     </StyledWidthProvidedGridLayout>
@@ -268,8 +266,6 @@ ReactGridContainer.propTypes = {
    * Each column is by default 350 pixels wide.
    */
   columns: PropTypes.object,
-  /** Specifies whether the grid should use CSS animations or not. */
-  animate: PropTypes.bool,
   /**
    * Specifies whether (and which css class) a drag handle should be used.
    *
@@ -292,7 +288,6 @@ ReactGridContainer.propTypes = {
 };
 
 ReactGridContainer.defaultProps = {
-  animate: false,
   className: undefined,
   columns: COLUMNS,
   isResizable: true,
