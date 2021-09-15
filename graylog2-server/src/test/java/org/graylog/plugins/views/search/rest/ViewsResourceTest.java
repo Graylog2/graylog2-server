@@ -19,6 +19,7 @@ package org.graylog.plugins.views.search.rest;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.apache.shiro.subject.Subject;
+import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.db.SearchDbService;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewService;
@@ -37,6 +38,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
@@ -111,6 +113,7 @@ public class ViewsResourceTest {
     public void setUp() throws Exception {
         this.viewsResource = new ViewsTestResource(viewService, clusterEventBus, userService, searchDbService);
         when(subject.isPermitted("dashboards:create")).thenReturn(true);
+        when(searchDbService.get("6141d457d3a6b9d73c8ac55a")).thenReturn(Optional.of(Mockito.mock(Search.class)));
     }
 
     @Test
@@ -119,6 +122,7 @@ public class ViewsResourceTest {
 
         when(view.toBuilder()).thenReturn(builder);
         when(view.type()).thenReturn(ViewDTO.Type.DASHBOARD);
+        when(view.searchId()).thenReturn("6141d457d3a6b9d73c8ac55a");
         when(builder.owner(any())).thenReturn(builder);
         when(builder.build()).thenReturn(view);
 
