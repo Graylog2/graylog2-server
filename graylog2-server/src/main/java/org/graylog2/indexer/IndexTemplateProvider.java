@@ -16,21 +16,13 @@
  */
 package org.graylog2.indexer;
 
+import com.github.zafarkhaja.semver.Version;
 import org.graylog2.indexer.indexset.IndexSetConfig;
-import org.junit.jupiter.api.Test;
 
-import java.util.Map;
+import javax.annotation.Nonnull;
 
-import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
+public interface IndexTemplateProvider {
 
-class GIMMapping6Test extends GIMMappingTest {
-    @Test
-    void matchesJsonSource() throws Exception {
-        final IndexMappingTemplate template = new GIMMapping6();
-        final IndexSetConfig indexSetConfig = mockIndexSetConfig();
-
-        final Map<String, Object> result = template.toTemplate(indexSetConfig, "myindex*", -2147483648);
-
-        assertEquals(resource("expected_gim_template6.json"), json(result), true);
-    }
+    @Nonnull
+    IndexMappingTemplate create(@Nonnull Version elasticsearchVersion, @Nonnull IndexSetConfig indexSetConfig);
 }

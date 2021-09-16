@@ -23,31 +23,103 @@ import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import java.time.ZoneId;
+import java.time.temporal.WeekFields;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 
 public class NaturalDateParser {
     private final TimeZone timeZone;
+    private final ZoneId zoneId;
     private final DateTimeZone dateTimeZone;
+    private final Locale locale;
 
     public NaturalDateParser() {
-        this("Etc/UTC");
+        this("Etc/UTC", Locale.getDefault());
+    }
+
+    public NaturalDateParser(final Locale locale) {
+        this("Etc/UTC", locale);
     }
 
     public NaturalDateParser(final String timeZone) throws IllegalArgumentException {
-        if(!isValidTimeZone(timeZone))
-            throw new IllegalArgumentException("Invalid timeZone: " + timeZone);
+        this(timeZone, Locale.getDefault());
+    }
 
+    public NaturalDateParser(final String timeZone, final Locale locale) throws IllegalArgumentException {
+        if (!isValidTimeZone(timeZone)) {
+            throw new IllegalArgumentException("Invalid timeZone: " + timeZone);
+        }
+
+        this.locale = locale;
         this.timeZone = TimeZone.getTimeZone(timeZone);
+        this.zoneId = ZoneId.of(timeZone);
         this.dateTimeZone = DateTimeZone.forTimeZone(this.timeZone);
     }
 
     boolean isValidTimeZone(final String timeZone) {
         return Arrays.stream(TimeZone.getAvailableIDs()).anyMatch(id -> id.equals(timeZone));
+    }
+
+    Date alignToStartOf(final Date dateToConvert, final String string) {
+        if ("last year" .equals(string.trim())) {
+            return alignToStartOfYear(dateToConvert);
+        } else if ("last month" .equals(string.trim())) {
+            return alignToStartOfMonth(dateToConvert);
+        } else if ("last week" .equals(string.trim())) {
+            return alignToStartOfWeek(dateToConvert);
+        } else {
+            return alignToStartOfDay(dateToConvert);
+        }
+    }
+
+    Date alignToEndOf(final Date dateToConvert, final String string) {
+        if ("last year" .equals(string.trim())) {
+            return alignToEndOfYear(dateToConvert);
+        } else if ("last month" .equals(string.trim())) {
+            return alignToEndOfMonth(dateToConvert);
+        } else if ("last week" .equals(string.trim())) {
+            return alignToEndOfWeek(dateToConvert);
+        } else {
+            return alignToEndOfDay(dateToConvert);
+        }
+    }
+
+    Date alignToStartOfYear(Date dateToConvert) {
+        return java.util.Date.from(dateToConvert.toInstant().atZone(zoneId).toLocalDate().atStartOfDay().atZone(zoneId).withDayOfYear(1).toInstant());
+    }
+
+    Date alignToEndOfYear(Date dateToConvert) {
+        return java.util.Date.from(dateToConvert.toInstant().atZone(zoneId).toLocalDate().atStartOfDay().atZone(zoneId).withDayOfYear(1).plusYears(1).toInstant());
+    }
+
+    Date alignToStartOfMonth(Date dateToConvert) {
+        return java.util.Date.from(dateToConvert.toInstant().atZone(zoneId).toLocalDate().atStartOfDay().atZone(zoneId).withDayOfMonth(1).toInstant());
+    }
+
+    Date alignToEndOfMonth(Date dateToConvert) {
+        return java.util.Date.from(dateToConvert.toInstant().atZone(zoneId).toLocalDate().atStartOfDay().atZone(zoneId).withDayOfMonth(1).plusMonths(1).toInstant());
+    }
+
+    Date alignToStartOfWeek(Date dateToConvert) {
+        return java.util.Date.from(dateToConvert.toInstant().atZone(zoneId).toLocalDate().atStartOfDay().atZone(zoneId).with(WeekFields.of(this.locale).dayOfWeek(), 1L).toInstant());
+    }
+
+    Date alignToEndOfWeek(Date dateToConvert) {
+        return java.util.Date.from(dateToConvert.toInstant().atZone(zoneId).toLocalDate().atStartOfDay().atZone(zoneId).with(WeekFields.of(this.locale).dayOfWeek(), 7L).plusDays(1).toInstant());
+    }
+
+    Date alignToStartOfDay(Date dateToConvert) {
+        return java.util.Date.from(dateToConvert.toInstant().atZone(zoneId).toLocalDate().atStartOfDay().atZone(zoneId).toInstant());
+    }
+
+    Date alignToEndOfDay(Date dateToConvert) {
+        return java.util.Date.from(dateToConvert.toInstant().atZone(zoneId).plusDays(1).toLocalDate().atStartOfDay().atZone(zoneId).toInstant());
     }
 
     public Result parse(final String string) throws DateNotParsableException {
@@ -61,15 +133,21 @@ public class NaturalDateParser {
         final Parser parser = new Parser(this.timeZone);
         final List<DateGroup> groups = parser.parse(string, referenceDate);
         if (!groups.isEmpty()) {
-            final List<Date> dates = groups.get(0).getDates();
+            // only working on with the first DateGroup
+            final DateGroup group = groups.get(0);
+            final boolean timeIsInferred = group.isTimeInferred();
+
+            final List<Date> dates = group.getDates();
             Collections.sort(dates);
 
             if (dates.size() >= 1) {
-                from = dates.get(0);
+                from = timeIsInferred ? alignToStartOf(dates.get(0), string) : dates.get(0);
             }
 
             if (dates.size() >= 2) {
-                to = dates.get(1);
+                to = timeIsInferred ? alignToEndOf(dates.get(1), string) : dates.get(1);
+            } else {
+                to = timeIsInferred ? alignToEndOf(dates.get(0), string) : null;
             }
         } else {
             throw new DateNotParsableException("Unparsable date: " + string);
@@ -116,6 +194,7 @@ public class NaturalDateParser {
 
             result.put("from", dateFormat(getFrom()));
             result.put("to", dateFormat(getTo()));
+            result.put("timezone", getDateTimeZone().getID());
 
             return result;
         }

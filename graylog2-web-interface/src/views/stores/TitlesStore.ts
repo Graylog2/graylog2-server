@@ -37,9 +37,11 @@ export const TitlesActions: TitlesActionsTypes = singletonActions(
 
 export { default as TitleTypes } from './TitleTypes';
 
+type TitlesStoreState = Immutable.Map<TitleType, Immutable.Map<string, string>>;
+
 export const TitlesStore = singletonStore(
   'views.Titles',
-  () => Reflux.createStore({
+  () => Reflux.createStore<TitlesStoreState>({
     listenables: [TitlesActions],
 
     titles: Immutable.Map<TitleType, Immutable.Map<string, string>>(),

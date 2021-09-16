@@ -14,23 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.indexer;
+import * as React from 'react';
 
-import com.google.common.collect.ImmutableMap;
+import { singleton } from 'views/logic/singleton';
 
-import java.util.Map;
-
-public class GIMMapping6 extends GIMMapping {
-    @Override
-    Map<String, Object> dynamicStrings() {
-        return ImmutableMap.of(
-                "match_mapping_type", "string",
-                "mapping", notAnalyzedString()
-        );
-    }
-
-    @Override
-    protected String dateFormats() {
-        return "8yyyy-MM-dd HH:mm:ss||8yyyy-MM-dd";
-    }
+type WindowDimensions = {
+  height: number,
+  width: number,
 }
+
+const WindowDimensionsContext = React.createContext<WindowDimensions | undefined>(undefined);
+
+export default singleton('contexts.WindowDimensionsContext', () => WindowDimensionsContext);

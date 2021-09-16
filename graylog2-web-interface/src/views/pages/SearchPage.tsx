@@ -61,4 +61,4 @@ SearchPage.defaultProps = {
   loadView: defaultLoadView,
 };
 
-export default SearchPage;
+export default React.memo(SearchPage);

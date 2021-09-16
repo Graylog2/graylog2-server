@@ -15,6 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { isEqualWith, isFunction } from 'lodash';
+import { isValidElement } from 'react';
+import isEqual from 'react-fast-compare';
 
 const hasFn = (obj, fn) => (obj && obj[fn] && isFunction(obj[fn]));
 const hasEquals = (obj) => hasFn(obj, 'equals');
@@ -27,6 +29,10 @@ const _isEqual = (first, second) => {
 
   if (hasEquals(first)) {
     return first.equals(second);
+  }
+
+  if (isValidElement(first) || isValidElement(second)) {
+    return isEqual(first, second);
   }
 
   return undefined;

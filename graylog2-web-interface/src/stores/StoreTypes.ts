@@ -32,3 +32,5 @@ export type Store<State> = {
   listen: (cb: (state: State) => unknown) => () => void;
   getInitialState: () => State;
 };
+
+export type StoreState<R> = R extends Store<infer T> ? T : never;

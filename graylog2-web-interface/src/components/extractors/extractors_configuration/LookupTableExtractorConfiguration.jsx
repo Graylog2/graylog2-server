@@ -24,10 +24,9 @@ import { Select, Spinner, Icon } from 'components/common';
 import Routes from 'routing/Routes';
 import UserNotification from 'util/UserNotification';
 import FormUtils from 'util/FormsUtils';
-import StoreProvider from 'injection/StoreProvider';
 import CombinedProvider from 'injection/CombinedProvider';
+import ToolsStore from 'stores/tools/ToolsStore';
 
-const ToolsStore = StoreProvider.getStore('Tools');
 const { LookupTablesActions } = CombinedProvider.get('LookupTables');
 
 class LookupTableExtractorConfiguration extends React.Component {

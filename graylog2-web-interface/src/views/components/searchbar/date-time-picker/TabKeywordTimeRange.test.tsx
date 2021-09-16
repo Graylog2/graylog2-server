@@ -24,7 +24,9 @@ import ToolsStore from 'stores/tools/ToolsStore';
 
 import OriginalTabKeywordTimeRange from './TabKeywordTimeRange';
 
-jest.mock('stores/tools/ToolsStore', () => ({}));
+jest.mock('stores/tools/ToolsStore', () => ({
+  testNaturalDate: jest.fn(),
+}));
 
 const TabKeywordTimeRange = ({ defaultValue, ...props }: { defaultValue: string } & React.ComponentProps<typeof TabKeywordTimeRange>) => (
   <Formik initialValues={{ nextTimeRange: { type: 'keyword', keyword: defaultValue } }}
@@ -36,14 +38,22 @@ const TabKeywordTimeRange = ({ defaultValue, ...props }: { defaultValue: string 
   </Formik>
 );
 
-jest.mock('logic/datetimes/DateTime', () => ({ fromUTCDateTime: (date) => date }));
+jest.mock('logic/datetimes/DateTime', () => ({
+  fromUTCDateTime: (date) => date,
+  getUserTimezone: () => 'Europe/Berlin',
+  fromDateTimeAndTZ: (date) => date,
+}));
 
 describe('TabKeywordTimeRange', () => {
   beforeEach(() => {
-    ToolsStore.testNaturalDate = jest.fn(() => Promise.resolve({
+    asMock(ToolsStore.testNaturalDate).mockImplementation(() => Promise.resolve({
+      type: 'absolute',
       from: '2018-11-14 13:52:38',
       to: '2018-11-14 13:57:38',
+      timezone: 'Europe/Berlin',
     }));
+
+    asMock(ToolsStore.testNaturalDate).mockClear();
   });
 
   const findValidationState = (container) => {
@@ -102,7 +112,7 @@ describe('TabKeywordTimeRange', () => {
   });
 
   it('sets validation state to error if parsing fails initially', async () => {
-    ToolsStore.testNaturalDate = () => Promise.reject();
+    asMock(ToolsStore.testNaturalDate).mockImplementation(() => Promise.reject());
 
     const { container } = render(<TabKeywordTimeRange defaultValue="invalid" />);
 
@@ -110,7 +120,7 @@ describe('TabKeywordTimeRange', () => {
   });
 
   it('sets validation state to error if parsing fails after changing input', async () => {
-    ToolsStore.testNaturalDate = () => Promise.reject();
+    asMock(ToolsStore.testNaturalDate).mockImplementation(() => Promise.reject());
 
     const { container, getByDisplayValue } = render(<TabKeywordTimeRange defaultValue="last week" />);
     const input = getByDisplayValue('last week');
@@ -130,7 +140,7 @@ describe('TabKeywordTimeRange', () => {
   });
 
   it('does not show keyword preview if parsing fails', async () => {
-    ToolsStore.testNaturalDate = () => Promise.reject();
+    asMock(ToolsStore.testNaturalDate).mockImplementation(() => Promise.reject());
     const { queryByText } = await asyncRender(<TabKeywordTimeRange defaultValue="invalid" />);
 
     expect(queryByText('Preview:')).toBeNull();

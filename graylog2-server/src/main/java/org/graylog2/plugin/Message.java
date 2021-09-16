@@ -69,6 +69,12 @@ import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_EVENT_CATE
 import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_EVENT_SUBCATEGORY;
 import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_EVENT_TYPE;
 import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_EVENT_TYPE_CODE;
+import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_GIM_EVENT_CATEGORY;
+import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_GIM_EVENT_CLASS;
+import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_GIM_EVENT_TYPE;
+import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_GIM_EVENT_TYPE_CODE;
+import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_GIM_TAGS;
+import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_GIM_VERSION;
 import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_TAGS;
 import static org.graylog2.plugin.Tools.buildElasticSearchTimeFormat;
 import static org.joda.time.DateTimeZone.UTC;
@@ -211,7 +217,13 @@ public class Message implements Messages, Indexable {
             FIELD_ILLUMINATE_EVENT_SUBCATEGORY,
             FIELD_ILLUMINATE_EVENT_TYPE,
             FIELD_ILLUMINATE_EVENT_TYPE_CODE,
-            FIELD_ILLUMINATE_TAGS
+            FIELD_ILLUMINATE_TAGS,
+            FIELD_ILLUMINATE_GIM_EVENT_CLASS,
+            FIELD_ILLUMINATE_GIM_EVENT_CATEGORY,
+            FIELD_ILLUMINATE_GIM_EVENT_TYPE,
+            FIELD_ILLUMINATE_GIM_EVENT_TYPE_CODE,
+            FIELD_ILLUMINATE_GIM_TAGS,
+            FIELD_ILLUMINATE_GIM_VERSION
     );
 
     private static final ImmutableSet<String> CORE_MESSAGE_FIELDS = ImmutableSet.of(
