@@ -104,7 +104,7 @@ const ProcessingTimelineComponent = () => {
   const [streams, setStreams] = useState<Stream[] | undefined>();
   const [paginatedPipelines, setPaginatedPipelines] = useState<PaginatedPipelines|undefined>();
   const [loading, setLoading] = useState(false);
-  const { list: pipelines = Immutable.List(), pagination: { total = 0 } = {} } = paginatedPipelines || {};
+  const { list: pipelines = Immutable.List(), pagination: { total = 0, count = 0 } = {} } = paginatedPipelines || {};
   const { isInitialized: isPaginationReady, pagination, setPagination } = useLocationSearchPagination(DEFAULT_PAGINATION);
   const { page, query, perPage } = pagination;
 
@@ -168,7 +168,13 @@ const ProcessingTimelineComponent = () => {
       // eslint-disable-next-line no-alert
       if (window.confirm(`Do you really want to delete pipeline "${pipeline.title}"? This action cannot be undone.`)) {
         PipelinesActions.delete(pipeline.id).then(() => {
-          setPagination({ page: DEFAULT_PAGINATION.page, perPage, query });
+          if (count > 1) {
+            _loadPipelines(pagination, setLoading, setPaginatedPipelines);
+
+            return;
+          }
+
+          setPagination({ page: Math.max(DEFAULT_PAGINATION.page, pagination.page - 1), perPage, query });
         });
       }
     };
