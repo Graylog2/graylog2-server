@@ -23,15 +23,15 @@ import org.graylog.testing.completebackend.GraylogBackend;
 import org.junit.jupiter.api.Test;
 
 import static io.restassured.RestAssured.given;
-import static org.graylog.testing.completebackend.Lifecycle.CLASS;
+import static org.graylog.testing.completebackend.Lifecycle.METHOD;
 import static org.hamcrest.core.IsEqual.equalTo;
 
-@ApiIntegrationTest(serverLifecycle = CLASS, elasticsearchFactory = ElasticsearchInstanceES7Factory.class)
-public class ViewsIT {
+@ApiIntegrationTest(serverLifecycle = METHOD, elasticsearchFactory = ElasticsearchInstanceES7Factory.class)
+public class ViewsResourceIT {
     private final GraylogBackend sut;
     private final RequestSpecification requestSpec;
 
-    public ViewsIT(GraylogBackend sut, RequestSpecification requestSpec) {
+    public ViewsResourceIT(GraylogBackend sut, RequestSpecification requestSpec) {
         this.sut = sut;
         this.requestSpec = requestSpec;
     }
@@ -76,5 +76,26 @@ public class ViewsIT {
                 .post("/views")
                 .then()
                 .statusCode(200);
+    }
+
+    @Test
+    void testInvalidWidgetMappings() {
+        given()
+                .spec(requestSpec)
+                .when()
+                .body(getClass().getClassLoader().getResourceAsStream("org/graylog/plugins/views/save-search-request.json"))
+                .post("/views/search")
+                .then()
+                .statusCode(201);
+
+        given()
+                .spec(requestSpec)
+                .when()
+                .body(getClass().getClassLoader().getResourceAsStream("org/graylog/plugins/views/views-request-invalid-widgets.json"))
+                .post("/views")
+                .then()
+                .statusCode(400)
+                .assertThat()
+                .body("message", equalTo("Widget mappings don't correspond to widgets"));
     }
 }
