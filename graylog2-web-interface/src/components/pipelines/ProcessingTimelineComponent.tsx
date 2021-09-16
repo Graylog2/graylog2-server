@@ -105,14 +105,16 @@ const ProcessingTimelineComponent = () => {
   const [paginatedPipelines, setPaginatedPipelines] = useState<PaginatedPipelines|undefined>();
   const [loading, setLoading] = useState(false);
   const { list: pipelines = Immutable.List(), pagination: { total = 0 } = {} } = paginatedPipelines || {};
-  const [pagination, setPagination] = useLocationSearchPagination(DEFAULT_PAGINATION);
+  const { isInitialized: isPaginationReady, pagination, setPagination } = useLocationSearchPagination(DEFAULT_PAGINATION);
   const { page, query, perPage } = pagination;
 
   useEffect(() => {
-    _loadPipelines(pagination, setLoading, setPaginatedPipelines);
-    PipelineConnectionsActions.list();
-    StreamsStore.listStreams().then(setStreams);
-  }, [pagination]);
+    if (isPaginationReady) {
+      _loadPipelines(pagination, setLoading, setPaginatedPipelines);
+      PipelineConnectionsActions.list();
+      StreamsStore.listStreams().then(setStreams);
+    }
+  }, [isPaginationReady, pagination]);
 
   const isLoading = !pipelines || !streams || !connections;
 

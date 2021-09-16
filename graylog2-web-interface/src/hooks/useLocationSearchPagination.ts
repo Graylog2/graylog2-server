@@ -20,10 +20,17 @@ import { parse, stringify } from 'qs';
 
 import { Pagination } from 'stores/PaginationTypes';
 
-const useLocationSearchPagination = (defaultPagination: Pagination): [Pagination, (nextPagination: Pagination) => void] => {
+type UseLocationSearchPaginationType = {
+  isInitialized: boolean,
+  pagination: Pagination,
+  setPagination: (nextPagination: Pagination) => void,
+}
+
+const useLocationSearchPagination = (defaultPagination: Pagination): UseLocationSearchPaginationType => {
   const history = useHistory();
   const location = useLocation();
-  const [parsedPagination, setParsedPagination] = useState(defaultPagination);
+  const [parsedPagination, setParsedPagination] = useState<Pagination>(defaultPagination);
+  const [isInitialized, setIsInitialized] = useState<boolean>(false);
 
   useEffect(() => {
     const convertToSafePositiveInteger = (maybeNumber: any): number | undefined => {
@@ -44,6 +51,7 @@ const useLocationSearchPagination = (defaultPagination: Pagination): [Pagination
     };
 
     setParsedPagination(parsePaginationFromSearch(location.search));
+    setIsInitialized(true);
   }, [location.search, defaultPagination]);
 
   const setLocationSearchPagination = (nextPagination: Pagination) => {
@@ -53,7 +61,11 @@ const useLocationSearchPagination = (defaultPagination: Pagination): [Pagination
     });
   };
 
-  return [parsedPagination, setLocationSearchPagination];
+  return {
+    isInitialized,
+    pagination: parsedPagination,
+    setPagination: setLocationSearchPagination,
+  };
 };
 
 export default useLocationSearchPagination;

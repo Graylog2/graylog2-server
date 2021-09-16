@@ -40,8 +40,9 @@ describe('useLocationSearchPagination custom hook', () => {
   it('uses default pagination information when location search is empty', () => {
     const { result } = renderHook(() => useLocationSearchPagination(DEFAULT_PAGINATION));
 
-    const [pagination] = result.current;
+    const { isInitialized, pagination } = result.current;
 
+    expect(isInitialized).toEqual(true);
     expect(pagination).toEqual(DEFAULT_PAGINATION);
   });
 
@@ -54,8 +55,9 @@ describe('useLocationSearchPagination custom hook', () => {
 
     const { result } = renderHook(() => useLocationSearchPagination(DEFAULT_PAGINATION));
 
-    const [pagination, setPagination] = result.current;
+    const { isInitialized, pagination, setPagination } = result.current;
 
+    expect(isInitialized).toEqual(true);
     expect(pagination).toEqual(currentPage);
 
     const nextPage = { page: 2, perPage: 10, query: 'lolwut' };
@@ -87,8 +89,6 @@ describe('useLocationSearchPagination custom hook', () => {
 
     const { result } = renderHook(() => useLocationSearchPagination(DEFAULT_PAGINATION));
 
-    const [pagination] = result.current;
-
-    expect(pagination).toEqual({ ...DEFAULT_PAGINATION, [param]: expectedReturn });
+    expect(result.current.pagination).toEqual({ ...DEFAULT_PAGINATION, [param]: expectedReturn });
   });
 });
