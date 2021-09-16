@@ -19,12 +19,11 @@ import { useCallback } from 'react';
 import PropTypes from 'prop-types';
 import styled, { css, withTheme, DefaultTheme } from 'styled-components';
 import { Responsive, WidthProvider } from 'react-grid-layout';
-import type { WidgetPositions } from 'views/types';
 
 import { themePropTypes } from 'theme';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
-import { WidgetPositionJSON } from 'views/logic/widgets/WidgetPosition';
+import WidgetPosition, { WidgetPositionJSON } from 'views/logic/widgets/WidgetPosition';
 
 const WidthAdjustedReactGridLayout = WidthProvider(Responsive);
 
@@ -126,7 +125,7 @@ type Props = {
   locked?: boolean,
   measureBeforeMount?: boolean,
   onPositionsChange: (newPositions: Array<WidgetPositionJSON>) => void,
-  positions: WidgetPositions,
+  positions: { [widgetId: string]: WidgetPosition },
   rowHeight?: number,
   theme: DefaultTheme,
   width?: number,
