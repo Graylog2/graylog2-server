@@ -22,6 +22,9 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
+import org.graylog.plugins.views.search.Query;
+import org.graylog.plugins.views.search.Search;
+import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.db.SearchDbService;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewService;
@@ -60,6 +63,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -159,8 +163,31 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     }
 
     private void validateIntegrity(ViewDTO dto) {
-        if(!searchDbService.get(dto.searchId()).isPresent()) {
-            throw new BadRequestException("Search " + dto.searchId() + " doesn't exist");
+        final Search search = searchDbService.get(dto.searchId()).orElseThrow(() -> new BadRequestException("Search " + dto.searchId() + " doesn't exist"));
+
+        final Set<String> searchQueries = search.queries().stream()
+                .map(Query::id)
+                .collect(Collectors.toSet());
+
+        final Set<String> stateQueries = dto.state().keySet();
+
+        if(!searchQueries.equals(stateQueries)) {
+            throw new BadRequestException("Search queries do not correspond to view/state queries");
+        }
+
+        final Set<String> searchTypes = search.queries().stream()
+                .flatMap(q -> q.searchTypes().stream())
+                .map(SearchType::id)
+                .collect(Collectors.toSet());
+
+
+        final Set<String> stateTypes = dto.state().values().stream()
+                .flatMap(v -> v.widgetMapping().values().stream())
+                .flatMap(Collection::stream)
+                .collect(Collectors.toSet());
+
+        if(!searchTypes.equals(stateTypes)) {
+            throw new BadRequestException("Search types do not correspond to view/search types");
         }
 
         final Set<String> widgetIds = dto.state().values().stream()
@@ -170,7 +197,6 @@ public class ViewsResource extends RestResource implements PluginRestResource {
 
         final Set<String> widgetMappings = dto.state().values().stream()
                 .flatMap(v -> v.widgetMapping().keySet().stream()).collect(Collectors.toSet());
-
 
         final Set<String> widgetPositions = dto.state().values().stream()
                 .flatMap(v -> v.widgetPositions().keySet().stream()).collect(Collectors.toSet());

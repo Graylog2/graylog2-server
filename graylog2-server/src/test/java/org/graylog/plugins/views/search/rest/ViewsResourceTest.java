@@ -38,6 +38,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.mockito.MockSettings;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
@@ -51,6 +52,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -113,7 +115,9 @@ public class ViewsResourceTest {
     public void setUp() throws Exception {
         this.viewsResource = new ViewsTestResource(viewService, clusterEventBus, userService, searchDbService);
         when(subject.isPermitted("dashboards:create")).thenReturn(true);
-        when(searchDbService.get("6141d457d3a6b9d73c8ac55a")).thenReturn(Optional.of(Mockito.mock(Search.class)));
+        final Search search = mock(Search.class, RETURNS_DEEP_STUBS);
+        when(search.queries()).thenReturn(ImmutableSet.of());
+        when(searchDbService.get("6141d457d3a6b9d73c8ac55a")).thenReturn(Optional.of(search));
     }
 
     @Test
