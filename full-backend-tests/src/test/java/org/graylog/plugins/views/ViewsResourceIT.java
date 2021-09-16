@@ -19,7 +19,6 @@ package org.graylog.plugins.views;
 import io.restassured.specification.RequestSpecification;
 import org.graylog.storage.elasticsearch7.ElasticsearchInstanceES7Factory;
 import org.graylog.testing.completebackend.ApiIntegrationTest;
-import org.graylog.testing.completebackend.GraylogBackend;
 import org.junit.jupiter.api.Test;
 
 import static io.restassured.RestAssured.given;
@@ -28,11 +27,9 @@ import static org.hamcrest.core.IsEqual.equalTo;
 
 @ApiIntegrationTest(serverLifecycle = METHOD, elasticsearchFactory = ElasticsearchInstanceES7Factory.class)
 public class ViewsResourceIT {
-    private final GraylogBackend sut;
     private final RequestSpecification requestSpec;
 
-    public ViewsResourceIT(GraylogBackend sut, RequestSpecification requestSpec) {
-        this.sut = sut;
+    public ViewsResourceIT(RequestSpecification requestSpec) {
         this.requestSpec = requestSpec;
     }
 
@@ -97,5 +94,26 @@ public class ViewsResourceIT {
                 .statusCode(400)
                 .assertThat()
                 .body("message", equalTo("Widget mappings don't correspond to widgets"));
+    }
+
+    @Test
+    void testInvalidSearchType() {
+        given()
+                .spec(requestSpec)
+                .when()
+                .body(getClass().getClassLoader().getResourceAsStream("org/graylog/plugins/views/save-search-request.json"))
+                .post("/views/search")
+                .then()
+                .statusCode(201);
+
+        given()
+                .spec(requestSpec)
+                .when()
+                .body(getClass().getClassLoader().getResourceAsStream("org/graylog/plugins/views/views-request-invalid-search-type.json"))
+                .post("/views")
+                .then()
+                .statusCode(400)
+                .assertThat()
+                .body("message", equalTo("Search types do not correspond to view/search types"));
     }
 }
