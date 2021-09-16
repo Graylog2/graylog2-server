@@ -95,6 +95,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
     private final SearchDomain searchDomain;
     private final EventBus serverEventBus;
 
+
     @Inject
     public SearchResource(QueryEngine queryEngine,
                           SearchDbService searchDbService,
