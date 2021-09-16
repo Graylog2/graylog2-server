@@ -55,7 +55,7 @@ type BackendWidgetPosition = {
   width: number,
 };
 
-type WidgetPositions = { [widgetId: string]: WidgetPosition };
+export type WidgetPositions = { [widgetId: string]: WidgetPosition };
 
 interface EditWidgetComponentProps<Config extends WidgetConfig = WidgetConfig> {
   children: React.ReactNode,
