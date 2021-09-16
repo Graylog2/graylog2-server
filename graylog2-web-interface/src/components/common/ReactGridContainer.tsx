@@ -244,7 +244,6 @@ ReactGridContainer.propTypes = {
    * Specifies if the grid elements can be resized or not **only when the
    * grid is unlocked**.
    */
-
   isResizable: PropTypes.bool,
   /** Height in pixels of a row. */
   rowHeight: PropTypes.number,
