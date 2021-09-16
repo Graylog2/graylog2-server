@@ -20,23 +20,19 @@ import PropTypes from 'prop-types';
 import Routes from 'routing/Routes';
 import { Icon } from 'components/common';
 import CombinedProvider from 'injection/CombinedProvider';
-import connect from 'stores/connect';
+import { useStore } from 'stores/connect';
 import { NodesStoreState } from 'stores/nodes/NodesStore';
 import { Store } from 'stores/StoreTypes';
 
-const { NodesStore } = CombinedProvider.get('Nodes');
+const { NodesStore }: { NodesStore: Store<NodesStoreState> } = CombinedProvider.get('Nodes');
 
 type NodeId = string;
-type NodeInfo = {
-  short_node_id: string,
-  hostname: string,
-};
 type Props = {
   nodeId: NodeId,
-  nodes: { [key: string]: NodeInfo },
 };
 
-const NodeName = ({ nodeId, nodes }: Props) => {
+const NodeName = ({ nodeId }: Props) => {
+  const nodes = useStore(NodesStore, (state) => state?.nodes ?? {});
   const node = nodes[nodeId];
 
   if (node) {
@@ -63,4 +59,4 @@ NodeName.propTypes = {
   nodeId: PropTypes.string.isRequired,
 };
 
-export default connect(NodeName, { nodes: NodesStore as Store<NodesStoreState> }, ({ nodes: { nodes = {} } = {} }) => ({ nodes }));
+export default NodeName;

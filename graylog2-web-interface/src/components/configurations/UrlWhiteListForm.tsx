@@ -27,9 +27,7 @@ import Icon from 'components/common/Icon';
 import { Button, Table } from 'components/graylog';
 import { getValueFromInput } from 'util/FormsUtils';
 import type { Url, WhiteListConfig } from 'stores/configurations/ConfigurationsStore';
-import StoreProvider from 'injection/StoreProvider';
-
-const ToolsStore = StoreProvider.getStore('Tools');
+import ToolsStore from 'stores/tools/ToolsStore';
 
 type Props = {
   urls: Array<Url>,

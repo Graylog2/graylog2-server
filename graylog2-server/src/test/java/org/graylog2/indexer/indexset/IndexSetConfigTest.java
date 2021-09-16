@@ -26,6 +26,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog2.indexer.EventIndexTemplateProvider.EVENT_TEMPLATE_TYPE;
 
 public class IndexSetConfigTest {
     @Test
@@ -63,7 +64,7 @@ public class IndexSetConfigTest {
                 .replicas(0)
                 .creationDate(ZonedDateTime.now(ZoneOffset.UTC))
                 .indexTemplateName("graylog2-template")
-                .indexTemplateType(IndexSetConfig.TemplateType.EVENTS)
+                .indexTemplateType(EVENT_TEMPLATE_TYPE)
                 .indexAnalyzer("standard")
                 .indexOptimizationMaxNumSegments(1)
                 .indexOptimizationDisabled(false)
@@ -84,7 +85,7 @@ public class IndexSetConfigTest {
                 ZonedDateTime.now(ZoneOffset.UTC),
                 "standard",
                 "graylog3-template",
-                IndexSetConfig.TemplateType.EVENTS,
+                EVENT_TEMPLATE_TYPE,
                 1,
                 false
         );
@@ -114,8 +115,8 @@ public class IndexSetConfigTest {
         assertThat(config1.indexTemplateType()).isNotPresent();
 
         // Types can be set with the builder and the create() method
-        assertThat(config2.indexTemplateType()).isPresent().get().isEqualTo(IndexSetConfig.TemplateType.EVENTS);
-        assertThat(config3.indexTemplateType()).isPresent().get().isEqualTo(IndexSetConfig.TemplateType.EVENTS);
+        assertThat(config2.indexTemplateType()).isPresent().get().isEqualTo(EVENT_TEMPLATE_TYPE);
+        assertThat(config3.indexTemplateType()).isPresent().get().isEqualTo(EVENT_TEMPLATE_TYPE);
 
         // A template type value of "null" should result in an empty template type
         assertThat(config4.indexTemplateType()).isNotPresent();

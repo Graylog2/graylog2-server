@@ -15,13 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import type { ColorVariants } from 'theme/colors';
+const LOGIN_INITIALIZING_STATE = 'INITIALIZING'; // Initial State for the plugin login form set on the login page in created.
+const LOGIN_INITIALIZED_STATE = 'INITIALIZED'; // Should be set once the plugin based login form is initialized
+const LOGIN_TRANSITIONING_STATE = 'TRANSITIONING'; // value when the plugin based form is in transition state for example handling login callback
 
-export type MessageEventType = {
-  gl2EventTypeCode: string,
-  summaryTemplate: string,
-  category: ColorVariants,
-  eventActions: Array<string>,
-  requiredFields: Array<string>,
-  optionalFields: Array<string>,
-}
+export {
+  LOGIN_INITIALIZING_STATE,
+  LOGIN_INITIALIZED_STATE,
+  LOGIN_TRANSITIONING_STATE,
+};

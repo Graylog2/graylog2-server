@@ -48,6 +48,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog2.indexer.MessageIndexTemplateProvider.MESSAGE_TEMPLATE_TYPE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -92,7 +93,7 @@ public class MongoIndexSetTest {
             ZonedDateTime.of(2016, 11, 8, 0, 0, 0, 0, ZoneOffset.UTC),
             "standard",
             "index-template",
-            IndexSetConfig.TemplateType.MESSAGES,
+            MESSAGE_TEMPLATE_TYPE,
             1,
             false
     );

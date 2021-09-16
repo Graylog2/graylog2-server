@@ -18,13 +18,11 @@ import React, { useRef, useState, useEffect, SyntheticEvent } from 'react';
 import PropTypes from 'prop-types';
 
 import { Input } from 'components/bootstrap';
-import StoreProvider from 'injection/StoreProvider';
 import { isValidURL } from 'util/URLUtils';
 import * as FormsUtils from 'util/FormsUtils';
 // Explicit import to fix eslint import/no-cycle
 import URLWhiteListFormModal from 'components/common/URLWhiteListFormModal';
-
-const ToolsStore = StoreProvider.getStore('Tools');
+import ToolsStore from 'stores/tools/ToolsStore';
 
 type Props = {
   label: string,

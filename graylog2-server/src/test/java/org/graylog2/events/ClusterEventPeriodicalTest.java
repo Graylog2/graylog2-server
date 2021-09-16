@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.eventbus.DeadEvent;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
@@ -301,6 +302,47 @@ public class ClusterEventPeriodicalTest {
         assertThat(collection.getName()).isEqualTo(ClusterEventPeriodical.COLLECTION_NAME);
         assertThat(collection.getIndexInfo()).hasSize(2);
         assertThat(collection.getWriteConcern()).isEqualTo(WriteConcern.JOURNALED);
+    }
+
+    @Test
+    public void localNodeIsMarkedAsHavingConsumedEvent() {
+        @SuppressWarnings("deprecation")
+        DBCollection collection = mongoConnection.getDatabase().getCollection(ClusterEventPeriodical.COLLECTION_NAME);
+        SimpleEvent event = new SimpleEvent("test");
+
+        clusterEventPeriodical.publishClusterEvent(event);
+
+        DBObject dbObject = collection.findOne();
+
+        assertThat(((BasicDBList)dbObject.get("consumers")).toArray()).isEqualTo(new String[] { nodeId.toString() });
+    }
+
+    @Test
+    public void localEventIsPostedToServerBusImmediately() {
+        SimpleEvent event = new SimpleEvent("test");
+
+        clusterEventPeriodical.publishClusterEvent(event);
+
+        verify(serverEventBus, times(1)).post(event);
+    }
+
+    @Test
+    public void localEventIsNotProcessedFromDB() {
+        DBObject event = new BasicDBObjectBuilder()
+                .add("timestamp", TIME.getMillis())
+                .add("producer", "TEST-PRODUCER")
+                .add("consumers", Collections.singletonList(nodeId.toString()))
+                .add("event_class", SimpleEvent.class.getCanonicalName())
+                .add("payload", ImmutableMap.of("payload", "test"))
+                .get();
+        @SuppressWarnings("deprecation")
+        final DBCollection collection = mongoConnection.getDatabase().getCollection(ClusterEventPeriodical.COLLECTION_NAME);
+        collection.save(event);
+
+        clusterEventPeriodical.run();
+
+        verify(serverEventBus, never()).post(any());
+        verify(clusterEventBus, never()).post(any());
     }
 
     public static class SimpleEventHandler {

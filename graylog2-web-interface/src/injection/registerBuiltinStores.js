@@ -146,7 +146,6 @@ const stores = {
   SystemMessages: () => require('stores/systemmessages/SystemMessagesStore'),
   SystemProcessing: () => require('stores/system-processing/SystemProcessingStore'),
   ConfigurationVariable: () => require('stores/sidecars/ConfigurationVariableStore'),
-  Tools: () => require('stores/tools/ToolsStore'),
   UniversalSearch: () => require('stores/search/UniversalSearchStore'),
   Users: () => require('stores/users/UsersStore'),
 };

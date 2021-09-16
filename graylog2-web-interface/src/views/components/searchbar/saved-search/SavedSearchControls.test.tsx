@@ -26,14 +26,20 @@ import Search from 'views/logic/search/Search';
 import ViewLoaderContext, { ViewLoaderContextType } from 'views/logic/ViewLoaderContext';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import NewViewLoaderContext, { NewViewLoaderContextType } from 'views/logic/NewViewLoaderContext';
-import * as Permissions from 'views/Permissions';
+import * as ViewsPermissions from 'views/Permissions';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import User from 'logic/users/User';
 import type { ViewStoreState } from 'views/stores/ViewStore';
+import history from 'util/History';
+import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
+import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 
 import SavedSearchControls from './SavedSearchControls';
 
+jest.mock('routing/Routes', () => ({ pluginRoute: (x) => x }));
+
 jest.mock('views/stores/FieldTypesStore', () => ({}));
+jest.mock('util/History');
 
 describe('SavedSearchControls', () => {
   const createViewStoreState = (dirty = true, id = undefined) => ({
@@ -43,12 +49,20 @@ describe('SavedSearchControls', () => {
       .title('title')
       .type(View.Type.Search)
       .description('description')
+      .state(Immutable.Map())
       .search(Search.create().toBuilder().id('id-beef').build())
       .owner('owningUser')
       .build(),
     dirty,
     isNew: false,
   });
+
+  const defaultViewStoreState = createViewStoreState();
+
+  const fieldTypes = {
+    all: Immutable.List<FieldTypeMapping>(),
+    queryFields: Immutable.Map<string, Immutable.List<FieldTypeMapping>>(),
+  };
 
   type SimpleSavedSearchControlsProps = {
     loadNewView?: NewViewLoaderContextType,
@@ -58,32 +72,79 @@ describe('SavedSearchControls', () => {
   };
 
   const SimpleSavedSearchControls = ({ loadNewView = () => Promise.resolve(), onLoadView, currentUser: user, ...props }: SimpleSavedSearchControlsProps) => (
-    <ViewLoaderContext.Provider value={onLoadView}>
-      <CurrentUserContext.Provider value={user}>
-        <NewViewLoaderContext.Provider value={loadNewView}>
-          <SavedSearchControls {...props} />
-        </NewViewLoaderContext.Provider>
-      </CurrentUserContext.Provider>
-    </ViewLoaderContext.Provider>
+    <FieldTypesContext.Provider value={fieldTypes}>
+      <ViewLoaderContext.Provider value={onLoadView}>
+        <CurrentUserContext.Provider value={user}>
+          <NewViewLoaderContext.Provider value={loadNewView}>
+            <SavedSearchControls {...props} />
+          </NewViewLoaderContext.Provider>
+        </CurrentUserContext.Provider>
+      </ViewLoaderContext.Provider>
+    </FieldTypesContext.Provider>
   );
 
   const findShareButton = () => screen.findByRole('button', { name: 'Share' });
+  const expectShareButton = findShareButton;
 
   SimpleSavedSearchControls.defaultProps = {
     loadNewView: () => Promise.resolve(),
     onLoadView: () => Promise.resolve(),
     currentUser,
-    viewStoreState: createViewStoreState(),
+    viewStoreState: defaultViewStoreState,
   };
 
   describe('Button handling', () => {
+    it('should export current search as dashboard', async () => {
+      const user = currentUser.toBuilder()
+        .permissions(Immutable.List(['dashboards:create']))
+        .build();
+      render(<SimpleSavedSearchControls currentUser={user} />);
+
+      const exportAsDashboardMenuItem = await screen.findByText('Export to dashboard');
+      userEvent.click(exportAsDashboardMenuItem);
+      await waitFor(() => expect(history.push).toHaveBeenCalledTimes(1));
+
+      expect(history.push).toHaveBeenCalledWith({ pathname: 'DASHBOARDS_NEW', state: { view: defaultViewStoreState.view } });
+    });
+
+    it('should not allow exporting search as dashboard if user does not have required permissions', async () => {
+      const user = currentUser.toBuilder()
+        .permissions(Immutable.List([]))
+        .build();
+      render(<SimpleSavedSearchControls currentUser={user} />);
+
+      await screen.findByText('Export');
+
+      expect(screen.queryByText('Export to dashboard')).not.toBeInTheDocument();
+    });
+
+    it('should open file export modal', async () => {
+      render(<SimpleSavedSearchControls />);
+
+      const exportMenuItem = await screen.findByText('Export');
+      userEvent.click(exportMenuItem);
+
+      await screen.findByText('Export all search results');
+    });
+
+    it('should open search metadata modal', async () => {
+      const user = currentUser.toBuilder()
+        .permissions(Immutable.List([ViewsPermissions.View.Edit('some-id')]))
+        .build();
+      render(<SimpleSavedSearchControls currentUser={user} viewStoreState={createViewStoreState(false, 'some-id')} />);
+
+      const exportMenuItem = await screen.findByText('Edit metadata');
+      userEvent.click(exportMenuItem);
+
+      await screen.findByText('Editing saved search');
+    });
+
     it('should clear a view', async () => {
       const loadNewView = jest.fn(() => Promise.resolve());
 
       render(<SimpleSavedSearchControls loadNewView={loadNewView} />);
 
-      const resetSearch = await screen.findByTestId('reset-search');
-
+      const resetSearch = await screen.findByText('Reset search');
       fireEvent.click(resetSearch);
 
       expect(loadNewView).toHaveBeenCalledTimes(1);
@@ -106,7 +167,7 @@ describe('SavedSearchControls', () => {
       it('includes the option to share the current search', async () => {
         render(<SimpleSavedSearchControls viewStoreState={createViewStoreState(false, 'some-id')} />);
 
-        await findShareButton();
+        await expectShareButton();
       });
 
       it('which should be disabled if current user is neither owner nor permitted to edit search', async () => {
@@ -137,7 +198,7 @@ describe('SavedSearchControls', () => {
       it('which should be enabled if current user is permitted to edit search', async () => {
         const owningUser = currentUser.toBuilder()
           .grnPermissions(Immutable.List([`entity:own:grn::::search:${currentUser.id}`]))
-          .permissions(Immutable.List([Permissions.View.Edit(currentUser.id)]))
+          .permissions(Immutable.List([ViewsPermissions.View.Edit(currentUser.id)]))
           .build();
 
         render(<SimpleSavedSearchControls currentUser={owningUser} viewStoreState={createViewStoreState(false, owningUser.id)} />);

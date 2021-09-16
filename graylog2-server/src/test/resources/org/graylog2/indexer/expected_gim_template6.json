@@ -102,10 +102,28 @@
         "gl2_event_type": {
           "type": "keyword"
         },
+        "gim_event_class": {
+          "type": "keyword"
+        },
+        "gim_event_category": {
+          "type": "keyword"
+        },
+        "gim_event_type": {
+          "type": "keyword"
+        },
+        "gim_tags": {
+          "type": "keyword"
+        },
+        "gim_version": {
+          "type": "keyword"
+        },
         "user_command": {
           "type": "keyword"
         },
         "gl2_event_type_code": {
+          "type": "integer"
+        },
+        "gim_event_type_code": {
           "type": "integer"
         },
         "user_command_path": {

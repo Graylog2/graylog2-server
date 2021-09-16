@@ -19,6 +19,9 @@ package org.graylog.failure;
 public enum ProcessingFailureCause implements FailureCause {
     RuleStatementEvaluationError("RuleStatementEvaluationError"),
     RuleConditionEvaluationError("RuleConditionEvaluationError"),
+    ExtractorException("ExtractorException"),
+    MessageFilterException("MessageFilterException"),
+    InvalidTimestampException("InvalidTimestampException"),
     UNKNOWN("UNKNOWN"),
     ;
 
@@ -28,6 +31,7 @@ public enum ProcessingFailureCause implements FailureCause {
         this.label = label;
     }
 
+    @Override
     public String label() {
         return label;
     }

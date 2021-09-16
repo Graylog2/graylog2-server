@@ -25,7 +25,6 @@ import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import { AdditionalContext } from 'views/logic/ActionContext';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
-import { SelectedFieldsStore } from 'views/stores/SelectedFieldsStore';
 import { SearchActions } from 'views/stores/SearchStore';
 import { RefreshActions } from 'views/stores/RefreshStore';
 import * as messageList from 'views/components/messagelist';
@@ -65,10 +64,6 @@ jest.mock('views/stores/ViewStore', () => ({
 
 jest.mock('stores/inputs/InputsStore', () => MockStore('listen', 'getInitialState'));
 jest.mock('actions/inputs/InputsActions', () => ({ list: jest.fn(() => Promise.resolve()) }));
-
-jest.mock('views/stores/SelectedFieldsStore', () => ({
-  SelectedFieldsStore: MockStore('listen', 'selectedFields'),
-}));
 
 jest.mock('views/stores/SearchConfigStore', () => ({
   SearchConfigStore: MockStore('listSearchesClusterConfig', 'configurations', 'listen'),
@@ -154,7 +149,6 @@ describe('MessageList', () => {
   it('should render with and without fields', () => {
     const fields = [new FieldTypeMapping('file_name', new FieldType('string', ['full-text-search'], []))];
 
-    SelectedFieldsStore.getInitialState = jest.fn(() => Immutable.Set([TIMESTAMP_FIELD, 'file_name']));
     const config = MessagesWidgetConfig.builder().fields([TIMESTAMP_FIELD, 'file_name']).build();
     const wrapper1 = mount(
       <SimpleMessageList data={data}
@@ -167,7 +161,6 @@ describe('MessageList', () => {
 
     const emptyConfig = MessagesWidgetConfig.builder().fields([]).build();
 
-    SelectedFieldsStore.getInitialState = jest.fn(() => Immutable.Set([]));
     const wrapper2 = mount(
       <SimpleMessageList data={data}
                          config={emptyConfig}
@@ -193,6 +186,7 @@ describe('MessageList', () => {
     expect(td.props().children).toMatchSnapshot();
   });
 
+  // eslint-disable-next-line jest/expect-expect
   it('renders also when `inputs` is undefined', () => {
     InputsStore.getInitialState = jest.fn(() => ({ inputs: undefined }));
     const config = MessagesWidgetConfig.builder().fields([]).build();
@@ -262,6 +256,7 @@ describe('MessageList', () => {
     expect(wrapper.find('ErrorWidget').text()).toContain('Error description');
   });
 
+  // eslint-disable-next-line jest/expect-expect
   it('calls render completion callback after first render', () => {
     const config = MessagesWidgetConfig.builder().fields([]).build();
     const Component = () => (

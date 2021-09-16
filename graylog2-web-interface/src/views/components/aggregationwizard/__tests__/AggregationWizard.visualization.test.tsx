@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useContext } from 'react';
 import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
 import { PluginRegistration, PluginStore } from 'graylog-web-plugin/plugin';
@@ -25,6 +26,7 @@ import AggregationWizard from 'views/components/aggregationwizard/AggregationWiz
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import { makeVisualization } from 'views/components/aggregationbuilder/AggregationBuilder';
 import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
+import OnVisualizationConfigChangeContext from 'views/components/aggregationwizard/OnVisualizationConfigChangeContext';
 
 const widgetConfig = AggregationWidgetConfig
   .builder()
@@ -186,16 +188,23 @@ describe('AggregationWizard/Visualizations', () => {
     const worldMapConfig = widgetConfig.toBuilder().visualization('map').build();
     const onChange = jest.fn();
 
-    const WorldMap = ({ onVisualizationConfigChange }: { onVisualizationConfigChange?: (newViewport: { zoom: number, centerX: number, centerY: number }) => void }) => (
-      <button type="button" onClick={() => onVisualizationConfigChange({ zoom: 2, centerX: 40, centerY: 50 })}>Change Viewport</button>
-    );
+    const WorldMap = () => {
+      const onVisualizationConfigChange = useContext(OnVisualizationConfigChangeContext);
+
+      return (
+        <button type="button" onClick={() => onVisualizationConfigChange({ zoom: 2, centerX: 40, centerY: 50 })}>Change
+          Viewport
+        </button>
+      );
+    };
+
     WorldMap.defaultProps = { onVisualizationConfigChange: undefined };
 
-    render(
+    render((
       <SimpleAggregationWizard onChange={onChange} config={worldMapConfig}>
         <WorldMap />
-      </SimpleAggregationWizard>,
-    );
+      </SimpleAggregationWizard>
+    ));
 
     const updateViewportButton = await screen.findByRole('button', { name: 'Change Viewport' });
     userEvent.click(updateViewportButton);

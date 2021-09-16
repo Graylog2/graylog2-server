@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 
+import java.io.Closeable;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Locale;
@@ -29,7 +30,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.graylog.testing.graylognode.NodeContainerConfig.API_PORT;
 
-public class NodeInstance {
+public class NodeInstance implements Closeable {
 
     private static final Logger LOG = LoggerFactory.getLogger(NodeInstance.class);
 
@@ -68,5 +69,10 @@ public class NodeInstance {
 
     public void printLog() {
         System.out.println(container.getLogs());
+    }
+
+    @Override
+    public void close() {
+        container.stop();
     }
 }

@@ -14,23 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.indexer;
+import * as React from 'react';
 
-import org.graylog2.indexer.indexset.IndexSetConfig;
-import org.junit.jupiter.api.Test;
+import { VisualizationConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
 
-import java.util.Map;
+export type OnVisualizationConfigChange = (newConfig: VisualizationConfigFormValues) => void;
 
-import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
+const OnVisualizationConfigChangeContext = React.createContext<OnVisualizationConfigChange>(() => {});
 
-class GIMMapping7Test extends GIMMappingTest {
-    @Test
-    void matchesJsonSource() throws Exception {
-        final IndexMappingTemplate template = new GIMMapping7();
-        final IndexSetConfig indexSetConfig = mockIndexSetConfig();
-
-        final Map<String, Object> result = template.toTemplate(indexSetConfig, "myindex*", -2147483648);
-
-        assertEquals(resource("expected_gim_template7.json"), json(result), true);
-    }
-}
+export default OnVisualizationConfigChangeContext;

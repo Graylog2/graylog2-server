@@ -14,23 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.indexer;
 
-import com.google.common.collect.ImmutableMap;
-
-import java.util.Map;
-
-public class GIMMapping6 extends GIMMapping {
-    @Override
-    Map<String, Object> dynamicStrings() {
-        return ImmutableMap.of(
-                "match_mapping_type", "string",
-                "mapping", notAnalyzedString()
-        );
-    }
-
-    @Override
-    protected String dateFormats() {
-        return "8yyyy-MM-dd HH:mm:ss||8yyyy-MM-dd";
-    }
-}
+// eslint-disable-next-line import/prefer-default-export
+export const simpleMessage = {
+  decoration_stats: null,
+  fields: { took_ms: 62, source: 'example.org' },
+  formatted_fields: { took_ms: 62, source: 'example.org' },
+  highlight_ranges: {},
+  id: 'message-id',
+  index: 'grayog_0',
+};

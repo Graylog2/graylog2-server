@@ -20,6 +20,7 @@ import { render, waitFor, fireEvent, screen } from 'wrappedTestingLibrary';
 import { Map } from 'immutable';
 import mockAction from 'helpers/mocking/MockAction';
 import asMock from 'helpers/mocking/AsMock';
+import { MockStore } from 'helpers/mocking';
 
 import { WidgetActions } from 'views/stores/WidgetStore';
 import { TitlesActions, TitleTypes } from 'views/stores/TitlesStore';
@@ -38,6 +39,7 @@ import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import { loadDashboard } from 'views/logic/views/Actions';
 import { TitlesMap } from 'views/stores/TitleTypes';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
+import { ViewStore } from 'views/stores/ViewStore';
 
 import WidgetActionsMenu from './WidgetActionsMenu';
 
@@ -53,6 +55,24 @@ jest.mock('views/stores/ChartColorRulesStore', () => ({
 }));
 
 jest.mock('views/logic/views/Actions');
+
+jest.mock('views/stores/ViewStore', () => ({
+  ViewStore: MockStore(),
+  ViewActions: {
+    create: mockAction(),
+    load: mockAction(),
+  },
+}));
+
+jest.mock('views/stores/WidgetStore', () => ({
+  WidgetActions: {},
+}));
+
+jest.mock('views/stores/CurrentQueryStore', () => ({
+  CurrentQueryStore: MockStore(),
+}));
+
+jest.mock('views/stores/CurrentViewStateStore', () => ({ CurrentViewStateStore: MockStore(['getInitialState', () => ({})]) }));
 
 describe('<Widget />', () => {
   const widget = WidgetModel.builder().newId()
@@ -77,6 +97,8 @@ describe('<Widget />', () => {
     isNew: false,
     dirty: false,
   };
+
+  asMock(ViewStore.getInitialState).mockReturnValue(viewStoreState);
 
   const searchDB1 = Search.builder().id('search-1').build();
   const dashboard1 = View.builder().type(View.Type.Dashboard).id('view-1').title('view 1')
@@ -127,7 +149,6 @@ describe('<Widget />', () => {
           <WidgetActionsMenu isFocused={false}
                              toggleEdit={() => {}}
                              title="Widget Title"
-                             view={viewStoreState}
                              position={new WidgetPosition(1, 1, 1, 1)}
                              onPositionsChange={() => {}}
                              {...props} />

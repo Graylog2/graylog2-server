@@ -16,9 +16,9 @@
  */
 import styled, { css } from 'styled-components';
 
-const SectionGrid = styled.div(({ theme }) => css`
+const SectionGrid = styled.div<{ $columns?: string } >(({ $columns, theme }) => css`
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: ${$columns ?? '1fr 1fr'};
   grid-column-gap: 40px;
 
   @media (max-width: ${theme.breakpoints.max.md}) {
