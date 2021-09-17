@@ -20,8 +20,6 @@ import styled, { css } from 'styled-components';
 import PropTypes from 'prop-types';
 import { useFormikContext } from 'formik';
 
-import 'moment-duration-format';
-import 'moment-precise-range-plugin';
 import { readableRange } from 'views/logic/queries/TimeRangeToString';
 import { isTypeRelative, isTypeRelativeWithEnd, isTypeRelativeWithStartOnly } from 'views/typeGuards/timeRange';
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';

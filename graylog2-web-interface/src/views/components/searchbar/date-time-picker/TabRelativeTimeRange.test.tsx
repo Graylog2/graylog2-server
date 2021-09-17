@@ -37,7 +37,16 @@ const defaultProps = {
 const initialValues = {
   nextTimeRange: {
     type: 'relative',
-    from: 3600,
+    from: {
+      value: 1,
+      unit: 'hours',
+      isAllTime: false,
+    },
+    to: {
+      value: 0,
+      unit: 'seconds',
+      isAllTime: true,
+    },
   },
 };
 
@@ -85,8 +94,16 @@ describe('TabRelativeTimeRange', () => {
       ...initialValues,
       nextTimeRange: {
         ...initialValues.nextTimeRange,
-        from: 300,
-        to: 240,
+        from: {
+          value: 5,
+          unit: 'minutes',
+          isAllTime: false,
+        },
+        to: {
+          value: 4,
+          unit: 'minutes',
+          isAllTime: false,
+        },
       },
     };
     renderSUT(undefined, initialFormValues);

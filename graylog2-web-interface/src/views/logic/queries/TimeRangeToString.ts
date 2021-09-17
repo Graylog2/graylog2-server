@@ -16,6 +16,8 @@
  */
 
 import moment from 'moment';
+import 'moment-duration-format';
+import 'moment-precise-range-plugin';
 
 import { AbsoluteTimeRange, KeywordTimeRange, RelativeTimeRange, TimeRange } from 'views/logic/queries/Query';
 import { isTypeRelativeWithStartOnly } from 'views/typeGuards/timeRange';
