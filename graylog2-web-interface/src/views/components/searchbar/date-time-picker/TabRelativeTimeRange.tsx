@@ -49,26 +49,28 @@ const TabRelativeTimeRange = ({ disabled, limitDuration }: Props) => {
 
   return (
     <RelativeWrapper>
-      <RelativeRangeSelect classifyRange={(range) => classifyFromRange(range)}
-                           defaultRange={classifyFromRange(DEFAULT_RELATIVE_FROM)}
-                           disableUnsetRange={limitDuration !== 0}
-                           disabled={disabled}
-                           fieldName="from"
-                           limitDuration={limitDuration}
-                           title="From:"
-                           unsetRangeLabel="All Time"
-                           unsetRangeValue={0} />
-      <StyledIcon name="arrow-right" />
+      <>
+        <RelativeRangeSelect classifyRange={(range) => classifyFromRange(range)}
+                             defaultRange={classifyFromRange(DEFAULT_RELATIVE_FROM)}
+                             disableUnsetRange={limitDuration !== 0}
+                             disabled={disabled}
+                             fieldName="from"
+                             limitDuration={limitDuration}
+                             title="From:"
+                             unsetRangeLabel="All Time"
+                             unsetRangeValue={0} />
+        <StyledIcon name="arrow-right" />
 
-      <RelativeRangeSelect classifyRange={(range) => classifyToRange(range)}
-                           defaultRange={classifyToRange(DEFAULT_RELATIVE_TO)}
-                           disableUnsetRange={disableUntil}
-                           disabled={disableUntil}
-                           fieldName="to"
-                           limitDuration={limitDuration}
-                           title="Until:"
-                           unsetRangeLabel="Now"
-                           unsetRangeValue={undefined} />
+        <RelativeRangeSelect classifyRange={(range) => classifyToRange(range)}
+                             defaultRange={classifyToRange(DEFAULT_RELATIVE_TO)}
+                             disableUnsetRange={disableUntil}
+                             disabled={disableUntil}
+                             fieldName="to"
+                             limitDuration={limitDuration}
+                             title="Until:"
+                             unsetRangeLabel="Now"
+                             unsetRangeValue={undefined} />
+      </>
     </RelativeWrapper>
   );
 };
