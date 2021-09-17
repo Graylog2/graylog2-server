@@ -123,7 +123,7 @@ const FilterPreviewStore = Reflux.createStore({
 
             return result;
           },
-          () => UserNotification.error('Could not execute search, wat'),
+          () => UserNotification.error('Could not execute search'),
         );
 
       FilterPreviewActions.execute.promise(this.executePromise);
