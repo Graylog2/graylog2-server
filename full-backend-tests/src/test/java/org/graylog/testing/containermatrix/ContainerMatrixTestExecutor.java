@@ -200,8 +200,10 @@ public class ContainerMatrixTestExecutor {
         request.getEngineExecutionListener().executionStarted(containerDescriptor);
         for (TestDescriptor descriptor : containerDescriptor.getChildren()) {
             if (descriptor instanceof ContainerMatrixTestsDescriptor && !lastContainerMatrixMvnCombination.equals(((ContainerMatrixTestsDescriptor) descriptor).getMavenProjectDirProvider().getUniqueId())) {
-                makeSureExecutableIsFound("mvn");
-                MavenPackager.packageJar(((ContainerMatrixTestsDescriptor) descriptor).getMavenProjectDirProvider().getProjectDir());
+                if (!MavenPackager.isRunFromMaven()) {
+                    makeSureExecutableIsFound("mvn");
+                    MavenPackager.packageJar(((ContainerMatrixTestsDescriptor) descriptor).getMavenProjectDirProvider().getProjectDir());
+                }
                 lastContainerMatrixMvnCombination = ((ContainerMatrixTestsDescriptor) descriptor).getMavenProjectDirProvider().getUniqueId();
             }
             execute(request, descriptor);
