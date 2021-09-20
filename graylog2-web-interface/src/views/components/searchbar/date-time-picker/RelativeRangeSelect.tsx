@@ -23,7 +23,7 @@ import { RELATIVE_RANGE_TYPES } from 'views/Constants';
 import { Select } from 'components/common';
 import { RangeClassified } from 'views/components/searchbar/date-time-picker/types';
 
-import { isTypeRelativeClassified } from './relativeTimeRangeClassifiedHelper';
+import { isTypeRelativeClassified, RELATIVE_CLASSIFIED_ALL_TIME_RANGE } from './RelativeTimeRangeClassifiedHelper';
 import RelativeRangeValueInput from './RelativeRangeValueInput';
 import type { TimeRangeDropDownFormValues } from './TimeRangeDropdown';
 
@@ -170,13 +170,12 @@ const RelativeRangeSelectInner = ({
   };
 
   const _onUnsetRange = (event) => {
-    const unsetClassifiedRangeValue = { value: 0, unit: 'seconds', isAllTime: true };
     const hasInitialRelativeRange = isTypeRelativeClassified(initialValues.nextTimeRange);
     const _defaultRange = (hasInitialRelativeRange && !initialValues.nextTimeRange[fieldName].isAllTime)
       ? initialValues.nextTimeRange[fieldName]
       : defaultRange;
 
-    _onChange(event.target.checked ? unsetClassifiedRangeValue : _defaultRange);
+    _onChange(event.target.checked ? RELATIVE_CLASSIFIED_ALL_TIME_RANGE : _defaultRange);
   };
 
   const _onSetPreset = (range) => {

@@ -20,6 +20,8 @@ import { Formik, Form } from 'formik';
 import MockStore from 'helpers/mocking/StoreMock';
 import MockAction from 'helpers/mocking/MockAction';
 
+import { RELATIVE_CLASSIFIED_ALL_TIME_RANGE } from 'views/components/searchbar/date-time-picker/RelativeTimeRangeClassifiedHelper';
+
 import TabRelativeTimeRange from './TabRelativeTimeRange';
 
 jest.mock('stores/configurations/ConfigurationsStore', () => ({
@@ -42,11 +44,7 @@ const initialValues = {
       unit: 'hours',
       isAllTime: false,
     },
-    to: {
-      value: 0,
-      unit: 'seconds',
-      isAllTime: true,
-    },
+    to: RELATIVE_CLASSIFIED_ALL_TIME_RANGE,
   },
 };
 
@@ -101,7 +99,7 @@ describe('TabRelativeTimeRange', () => {
         },
         to: {
           value: 4,
-          unit: 'minutes',
+          unit: 'minutes' as const,
           isAllTime: false,
         },
       },

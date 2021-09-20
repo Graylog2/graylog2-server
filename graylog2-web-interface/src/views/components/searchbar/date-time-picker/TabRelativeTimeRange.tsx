@@ -23,7 +23,7 @@ import { isTypeRelativeWithEnd } from 'views/typeGuards/timeRange';
 import { RELATIVE_ALL_TIME, DEFAULT_RELATIVE_FROM, DEFAULT_RELATIVE_TO } from 'views/Constants';
 import { Icon } from 'components/common';
 
-import { classifyToRange, classifyFromRange } from './relativeTimeRangeClassifiedHelper';
+import { classifyToRange, classifyFromRange } from './RelativeTimeRangeClassifiedHelper';
 import type { TimeRangeDropDownFormValues } from './TimeRangeDropdown';
 import RelativeRangeSelect from './RelativeRangeSelect';
 

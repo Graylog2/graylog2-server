@@ -25,8 +25,8 @@ import { RelativeTimeRangeClassified } from 'views/components/searchbar/date-tim
 import {
   classifyFromRange,
   isTypeRelativeClassified,
-  normalizeClassifiedRange,
-} from './relativeTimeRangeClassifiedHelper';
+  normalizeClassifiedRange, RELATIVE_CLASSIFIED_ALL_TIME_RANGE,
+} from './RelativeTimeRangeClassifiedHelper';
 
 const formatDatetime = (datetime) => datetime.toString(DateTime.Formats.TIMESTAMP);
 
@@ -52,7 +52,7 @@ const migrationStrategies = {
     from: formatDatetime(new DateTime(moment().subtract(getDefaultAbsoluteFromRange(oldTimeRange), 'seconds'))),
     to: formatDatetime(new DateTime(moment().subtract(getDefaultAbsoluteToRange(oldTimeRange), 'seconds'))),
   }),
-  relative: () => ({ type: 'relative', from: classifyFromRange(DEFAULT_RELATIVE_FROM), to: { value: 0, unit: 'seconds', isAllTime: true } }),
+  relative: () => ({ type: 'relative', from: classifyFromRange(DEFAULT_RELATIVE_FROM), to: RELATIVE_CLASSIFIED_ALL_TIME_RANGE }),
   keyword: () => ({ type: 'keyword', keyword: 'Last five minutes' }),
   disabled: () => undefined,
 };

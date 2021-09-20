@@ -90,10 +90,8 @@ const StyledQueryInput = styled(QueryInput)`
 `;
 
 const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onExecute: performSearch }: Props) => {
-  const submitForm = useCallback(({ timerange, queryString }) => {
-    return GlobalOverrideActions.set(timerange, queryString)
-      .then(() => performSearch());
-  }, [performSearch]);
+  const submitForm = useCallback(({ timerange, queryString }) => GlobalOverrideActions.set(timerange, queryString)
+    .then(() => performSearch()), [performSearch]);
 
   if (!config) {
     return <Spinner />;

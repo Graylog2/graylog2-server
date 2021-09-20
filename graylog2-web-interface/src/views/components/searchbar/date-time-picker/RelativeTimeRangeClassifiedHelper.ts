@@ -26,10 +26,16 @@ import {
 import { RelativeTimeRangeClassified, RangeClassified } from 'views/components/searchbar/date-time-picker/types';
 import { isTypeRelativeWithStartOnly } from 'views/typeGuards/timeRange';
 
-const DEFAULT_CLASSIFIED_RANGE = {
+const DEFAULT_CLASSIFIED_RANGE: RangeClassified = {
   value: 5,
-  unit: 'minutes' as const,
+  unit: 'minutes',
   isAllTime: false,
+};
+
+export const RELATIVE_CLASSIFIED_ALL_TIME_RANGE: RangeClassified = {
+  value: 0,
+  unit: 'seconds',
+  isAllTime: true,
 };
 
 export const classifyRange = (range: number | undefined | null, allTimeValue: number | undefined) => {
@@ -38,11 +44,7 @@ export const classifyRange = (range: number | undefined | null, allTimeValue: nu
   }
 
   if (range === allTimeValue) {
-    return {
-      value: 0,
-      unit: 'seconds' as const,
-      isAllTime: true,
-    };
+    return RELATIVE_CLASSIFIED_ALL_TIME_RANGE;
   }
 
   return RELATIVE_RANGE_TYPES.map(({ type }) => {

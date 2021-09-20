@@ -38,7 +38,7 @@ import TabRelativeTimeRange from './TabRelativeTimeRange';
 import TabDisabledTimeRange from './TabDisabledTimeRange';
 import TimeRangeLivePreview from './TimeRangeLivePreview';
 import { DateTimeContext } from './DateTimeProvider';
-import { classifyRelativeTimeRange, normalizeIfClassifiedRelativeTimeRange } from './relativeTimeRangeClassifiedHelper';
+import { classifyRelativeTimeRange, normalizeIfClassifiedRelativeTimeRange, RELATIVE_CLASSIFIED_ALL_TIME_RANGE } from './RelativeTimeRangeClassifiedHelper';
 
 export type TimeRangeDropDownFormValues = {
   nextTimeRange: RelativeTimeRangeClassified | AbsoluteTimeRange | KeywordTimeRange | NoTimeRangeOverride,
@@ -62,7 +62,7 @@ type TimeRangeTabsArguments = {
   tabs: Array<TimeRangeType>,
 }
 
-export const DEFAULT_RANGES = {
+const DEFAULT_RANGES = {
   absolute: {
     type: 'absolute',
     from: DateTime.now().subtract(300, 'seconds').format(DateTime.Formats.TIMESTAMP),
@@ -75,11 +75,7 @@ export const DEFAULT_RANGES = {
       unit: 'minutes',
       isAllTime: false,
     },
-    to: {
-      value: 0,
-      unit: 'seconds',
-      isAllTime: true,
-    },
+    to: RELATIVE_CLASSIFIED_ALL_TIME_RANGE,
   },
   keyword: {
     type: 'keyword',
