@@ -46,7 +46,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
 
-import static java.lang.String.format;
+import static org.graylog2.shared.utilities.StringUtils.f;
 import static org.junit.jupiter.api.extension.ConditionEvaluationResult.disabled;
 import static org.junit.jupiter.api.extension.ConditionEvaluationResult.enabled;
 
@@ -64,15 +64,15 @@ public class ContainerMatrixTestEngine implements TestEngine {
 
         // Nothing to match against?
         if (actual == null) {
-            return enabled(format("Environment variable [%s] does not exist", name));
+            return enabled(f("Environment variable [%s] does not exist", name));
         }
 
         if (actual.matches(regex)) {
-            return disabled(format("Environment variable [%s] with value [%s] matches regular expression [%s]", name,
+            return disabled(f("Environment variable [%s] with value [%s] matches regular expression [%s]", name,
                     actual, regex), annotation.disabledReason());
         }
         // else
-        return enabled(format("Environment variable [%s] with value [%s] does not match regular expression [%s]", name,
+        return enabled(f("Environment variable [%s] with value [%s] does not match regular expression [%s]", name,
                 actual, regex));
     }
 
@@ -86,13 +86,13 @@ public class ContainerMatrixTestEngine implements TestEngine {
 
         // Nothing to match against?
         if (actual == null) {
-            return disabled(format("Environment variable [%s] does not exist", name), annotation.disabledReason());
+            return disabled(f("Environment variable [%s] does not exist", name), annotation.disabledReason());
         }
         if (actual.matches(regex)) {
-            return enabled(format("Environment variable [%s] with value [%s] matches regular expression [%s]", name,
+            return enabled(f("Environment variable [%s] with value [%s] matches regular expression [%s]", name,
                     actual, regex));
         }
-        return disabled(format("Environment variable [%s] with value [%s] does not match regular expression [%s]", name,
+        return disabled(f("Environment variable [%s] with value [%s] does not match regular expression [%s]", name,
                 actual, regex), annotation.disabledReason());
     }
 
