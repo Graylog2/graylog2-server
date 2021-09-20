@@ -18,6 +18,7 @@ import loadAsync from 'routing/loadAsync';
 
 const SourceCodeEditor = loadAsync(() => import('./SourceCodeEditor'));
 
+export { default as CenterContent } from './CenterContent';
 export { default as ClipboardButton } from './ClipboardButton';
 export { default as ColorPicker } from './ColorPicker';
 export { default as ColorPickerPopover } from './ColorPickerPopover';
