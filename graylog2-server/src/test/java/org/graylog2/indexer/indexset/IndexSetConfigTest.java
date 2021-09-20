@@ -16,6 +16,7 @@
  */
 package org.graylog2.indexer.indexset;
 
+import org.graylog2.indexer.MessageIndexTemplateProvider;
 import org.graylog2.indexer.retention.strategies.NoopRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
@@ -74,7 +75,7 @@ public class IndexSetConfigTest {
                 "57f3d721a43c2d59cb750001",
                 "Test 3",
                 "A test index-set.",
-                true,
+                true, true,
                 "graylog3",
                 4,
                 1,
@@ -94,7 +95,7 @@ public class IndexSetConfigTest {
                 "57f3d721a43c2d59cb750001",
                 "Test 3",
                 "A test index-set.",
-                true,
+                true, true,
                 "graylog3",
                 4,
                 1,
@@ -120,5 +121,161 @@ public class IndexSetConfigTest {
 
         // A template type value of "null" should result in an empty template type
         assertThat(config4.indexTemplateType()).isNotPresent();
+    }
+
+    @Test
+    public void writableIndexWithMissingTemplateType_isRegularIndex() {
+        final IndexSetConfig config = IndexSetConfig.create(
+                "57f3d721a43c2d59cb750001",
+                "Test Regular Index",
+                "Test Regular Index",
+                true, false,
+                "regular_index_test",
+                4,
+                1,
+                MessageCountRotationStrategy.class.getCanonicalName(),
+                MessageCountRotationStrategyConfig.create(1000),
+                NoopRetentionStrategy.class.getCanonicalName(),
+                NoopRetentionStrategyConfig.create(10),
+                ZonedDateTime.now(ZoneOffset.UTC),
+                "standard",
+                "graylog3-template",
+                null,
+                1,
+                false
+        );
+
+        assertThat(config.isRegular()).contains(false);
+        assertThat(config.isRegularIndex()).isTrue();
+    }
+
+    @Test
+    public void writableIndexWithDefaultIndexTemplateType_isRegularIndex() {
+        final IndexSetConfig config = IndexSetConfig.create(
+                "57f3d721a43c2d59cb750001",
+                "Test Regular Index",
+                "Test Regular Index",
+                true, false,
+                "regular_index_test",
+                4,
+                1,
+                MessageCountRotationStrategy.class.getCanonicalName(),
+                MessageCountRotationStrategyConfig.create(1000),
+                NoopRetentionStrategy.class.getCanonicalName(),
+                NoopRetentionStrategyConfig.create(10),
+                ZonedDateTime.now(ZoneOffset.UTC),
+                "standard",
+                "graylog3-template",
+                MessageIndexTemplateProvider.MESSAGE_TEMPLATE_TYPE,
+                1,
+                false
+        );
+
+        assertThat(config.isRegular()).contains(false);
+        assertThat(config.isRegularIndex()).isTrue();
+    }
+
+    @Test
+    public void writableIndexWithIsRegularFlag_isRegularIndex() {
+        final IndexSetConfig config = IndexSetConfig.create(
+                "57f3d721a43c2d59cb750001",
+                "Test Regular Index",
+                "Test Regular Index",
+                true, true,
+                "regular_index_test",
+                4,
+                1,
+                MessageCountRotationStrategy.class.getCanonicalName(),
+                MessageCountRotationStrategyConfig.create(1000),
+                NoopRetentionStrategy.class.getCanonicalName(),
+                NoopRetentionStrategyConfig.create(10),
+                ZonedDateTime.now(ZoneOffset.UTC),
+                "standard",
+                "graylog3-template",
+                EVENT_TEMPLATE_TYPE,
+                1,
+                false
+        );
+
+        assertThat(config.isRegular()).contains(true);
+        assertThat(config.isRegularIndex()).isTrue();
+    }
+
+    @Test
+    public void writableIndexWithNonDefaultIndexTemplateType_isNotRegularIndex() {
+        final IndexSetConfig config = IndexSetConfig.create(
+                "57f3d721a43c2d59cb750001",
+                "Test Regular Index",
+                "Test Regular Index",
+                true, false,
+                "regular_index_test",
+                4,
+                1,
+                MessageCountRotationStrategy.class.getCanonicalName(),
+                MessageCountRotationStrategyConfig.create(1000),
+                NoopRetentionStrategy.class.getCanonicalName(),
+                NoopRetentionStrategyConfig.create(10),
+                ZonedDateTime.now(ZoneOffset.UTC),
+                "standard",
+                "graylog3-template",
+                EVENT_TEMPLATE_TYPE,
+                1,
+                false
+        );
+
+        assertThat(config.isRegular()).contains(false);
+        assertThat(config.isRegularIndex()).isFalse();
+    }
+
+    @Test
+    public void nonWritableIndex_isNotRegularIndex() {
+        final IndexSetConfig config = IndexSetConfig.create(
+                "57f3d721a43c2d59cb750001",
+                "Test Regular Index",
+                "Test Regular Index",
+                false, true,
+                "regular_index_test",
+                4,
+                1,
+                MessageCountRotationStrategy.class.getCanonicalName(),
+                MessageCountRotationStrategyConfig.create(1000),
+                NoopRetentionStrategy.class.getCanonicalName(),
+                NoopRetentionStrategyConfig.create(10),
+                ZonedDateTime.now(ZoneOffset.UTC),
+                "standard",
+                "graylog3-template",
+                MessageIndexTemplateProvider.MESSAGE_TEMPLATE_TYPE,
+                1,
+                false
+        );
+
+        assertThat(config.isRegular()).contains(true);
+        assertThat(config.isRegularIndex()).isFalse();
+    }
+
+    @Test
+    public void missingIsRegularField_defaultsToFalse() {
+        final IndexSetConfig config = IndexSetConfig.create(
+                "57f3d721a43c2d59cb750001",
+                "Test Regular Index",
+                "Test Regular Index",
+                true, null,
+                "regular_index_test",
+                4,
+                1,
+                MessageCountRotationStrategy.class.getCanonicalName(),
+                MessageCountRotationStrategyConfig.create(1000),
+                NoopRetentionStrategy.class.getCanonicalName(),
+                NoopRetentionStrategyConfig.create(10),
+                ZonedDateTime.now(ZoneOffset.UTC),
+                "standard",
+                "graylog3-template",
+                EVENT_TEMPLATE_TYPE,
+                1,
+                false
+        );
+
+        assertThat(config.isRegular()).isEmpty();
+        assertThat(config.isRegularIndex()).isFalse();
     }
 }

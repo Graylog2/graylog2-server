@@ -82,7 +82,7 @@ public class MongoIndexSetTest {
     private final IndexSetConfig config = IndexSetConfig.create(
             "Test",
             "Test",
-            true,
+            true, true,
             "graylog",
             1,
             0,

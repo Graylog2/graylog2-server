@@ -151,6 +151,7 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
                 .description(indexSetDescription)
                 .indexTemplateType(EVENT_TEMPLATE_TYPE)
                 .isWritable(true)
+                .isRegular(false)
                 .indexPrefix(indexPrefix)
                 .shards(elasticsearchConfiguration.getShards())
                 .replicas(elasticsearchConfiguration.getReplicas())
