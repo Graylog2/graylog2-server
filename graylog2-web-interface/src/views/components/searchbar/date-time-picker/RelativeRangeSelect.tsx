@@ -116,6 +116,7 @@ type Props = {
   disabled?: boolean,
   fieldName: 'range' | 'from' | 'to',
   limitDuration: number,
+  onUnsetRange?: () => void,
   title: string,
   unsetRangeLabel: string,
   unsetRangeValue: number | undefined,
@@ -132,6 +133,7 @@ const RelativeRangeSelectInner = ({
   limitDuration,
   name,
   onChange,
+  onUnsetRange,
   title,
   unsetRangeLabel,
   unsetRangeValue,
@@ -170,16 +172,27 @@ const RelativeRangeSelectInner = ({
   };
 
   const _onUnsetRange = (event) => {
+    const isUnsetting = event.target.checked;
     const hasInitialRelativeRange = isTypeRelativeClassified(initialValues.nextTimeRange);
     const _defaultRange = (hasInitialRelativeRange && !initialValues.nextTimeRange[fieldName].isAllTime)
       ? initialValues.nextTimeRange[fieldName]
       : defaultRange;
 
-    _onChange(event.target.checked ? RELATIVE_CLASSIFIED_ALL_TIME_RANGE : _defaultRange);
+    if (isUnsetting && !!onUnsetRange) {
+      onUnsetRange();
+    }
+
+    _onChange(isUnsetting ? RELATIVE_CLASSIFIED_ALL_TIME_RANGE : _defaultRange);
   };
 
   const _onSetPreset = (range) => {
-    const newRange = range === 0 ? unsetRangeValue : range;
+    const isUnsetting = range === 0;
+    const newRange = isUnsetting ? unsetRangeValue : range;
+
+    if (isUnsetting && !!onUnsetRange) {
+      onUnsetRange();
+    }
+
     _onChange(classifyRange(newRange));
   };
 
@@ -239,6 +252,7 @@ const RelativeRangeSelect = ({
   disabled,
   fieldName,
   limitDuration,
+  onUnsetRange,
   title,
   unsetRangeLabel,
   unsetRangeValue,
@@ -254,6 +268,7 @@ const RelativeRangeSelect = ({
                                 fieldName={fieldName}
                                 limitDuration={limitDuration}
                                 name={name}
+                                onUnsetRange={onUnsetRange}
                                 onChange={onChange}
                                 title={title}
                                 unsetRangeLabel={unsetRangeLabel}

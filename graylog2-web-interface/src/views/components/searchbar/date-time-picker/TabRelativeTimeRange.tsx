@@ -23,7 +23,7 @@ import { isTypeRelativeWithEnd } from 'views/typeGuards/timeRange';
 import { RELATIVE_ALL_TIME, DEFAULT_RELATIVE_FROM, DEFAULT_RELATIVE_TO } from 'views/Constants';
 import { Icon } from 'components/common';
 
-import { classifyToRange, classifyFromRange } from './RelativeTimeRangeClassifiedHelper';
+import { classifyToRange, classifyFromRange, RELATIVE_CLASSIFIED_ALL_TIME_RANGE } from './RelativeTimeRangeClassifiedHelper';
 import type { TimeRangeDropDownFormValues } from './TimeRangeDropdown';
 import RelativeRangeSelect from './RelativeRangeSelect';
 
@@ -44,7 +44,7 @@ const StyledIcon = styled(Icon)`
 `;
 
 const TabRelativeTimeRange = ({ disabled, limitDuration }: Props) => {
-  const { values: { nextTimeRange } } = useFormikContext<TimeRangeDropDownFormValues>();
+  const { values: { nextTimeRange }, setFieldValue } = useFormikContext<TimeRangeDropDownFormValues>();
   const disableUntil = disabled || (isTypeRelativeWithEnd(nextTimeRange) && nextTimeRange.from === RELATIVE_ALL_TIME);
 
   return (
@@ -56,6 +56,7 @@ const TabRelativeTimeRange = ({ disabled, limitDuration }: Props) => {
                              disabled={disabled}
                              fieldName="from"
                              limitDuration={limitDuration}
+                             onUnsetRange={() => { setFieldValue('nextTimeRange.to', RELATIVE_CLASSIFIED_ALL_TIME_RANGE); }}
                              title="From:"
                              unsetRangeLabel="All Time"
                              unsetRangeValue={0} />
