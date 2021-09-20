@@ -280,6 +280,7 @@ const RelativeRangeSelect = ({
 RelativeRangeSelect.defaultProps = {
   disabled: false,
   disableUnsetRange: false,
+  onUnsetRange: undefined,
 };
 
 export default RelativeRangeSelect;
