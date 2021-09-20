@@ -42,7 +42,6 @@ import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
-import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.AlertCondition;
@@ -171,7 +170,7 @@ public class StreamResource extends RestResource {
         final IndexSet indexSet = stream.getIndexSet();
         if (!indexSet.getConfig().isWritable()) {
             throw new BadRequestException("Assigned index set must be writable!");
-        } else if (!IndexSetConfig.isRegularIndex(indexSet.getConfig())) {
+        } else if (!indexSet.getConfig().isRegularIndex()) {
             throw new BadRequestException("Assigned index set is not usable");
         }
 
@@ -329,7 +328,7 @@ public class StreamResource extends RestResource {
             throw new BadRequestException("Index set with ID <" + stream.getIndexSetId() + "> does not exist!");
         } else if (!indexSet.get().getConfig().isWritable()) {
             throw new BadRequestException("Assigned index set must be writable!");
-        } else if (!IndexSetConfig.isRegularIndex(indexSet.get().getConfig())) {
+        } else if (!indexSet.get().getConfig().isRegularIndex()) {
             throw new BadRequestException("Assigned index set is not usable");
         }
 

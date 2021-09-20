@@ -53,10 +53,10 @@ const DashboardWrap = styled.div(({ theme }) => css`
   height: 100%;
 `);
 
-const StyledReactGridContainer = styled(ReactGridContainer)(({ hasFocusedWidget }) => css`
-  height: ${hasFocusedWidget ? '100% !important' : '100%'};
-  max-height: ${hasFocusedWidget ? '100%' : 'auto'};
-  overflow: ${hasFocusedWidget ? 'hidden' : 'visible'};
+const StyledReactGridContainer = styled(ReactGridContainer)(({ $hasFocusedWidget }: { $hasFocusedWidget: boolean }) => css`
+  height: ${$hasFocusedWidget ? '100% !important' : '100%'};
+  max-height: ${$hasFocusedWidget ? '100%' : 'auto'};
+  overflow: ${$hasFocusedWidget ? 'hidden' : 'visible'};
   transition: none;
 `);
 
@@ -133,10 +133,12 @@ type GridProps = {
 const Grid = ({ children, locked, onPositionsChange, positions }: GridProps) => {
   const { focusedWidget } = useContext(WidgetFocusContext);
 
+  // The SizeMe component is required to update the widget grid
+  // when its content height results in a scrollbar
   return (
     <SizeMe monitorWidth refreshRate={100}>
       {({ size: { width } }) => (
-        <StyledReactGridContainer hasFocusedWidget={!!focusedWidget?.id}
+        <StyledReactGridContainer $hasFocusedWidget={!!focusedWidget?.id}
                                   columns={COLUMNS}
                                   isResizable={!focusedWidget?.id}
                                   locked={locked}
@@ -144,7 +146,7 @@ const Grid = ({ children, locked, onPositionsChange, positions }: GridProps) => 
                                   measureBeforeMount
                                   onPositionsChange={onPositionsChange}
                                   width={width}
-                                  useDragHandle=".widget-drag-handle">
+                                  draggableHandle=".widget-drag-handle">
           {children}
         </StyledReactGridContainer>
       )}
@@ -205,8 +207,6 @@ const WidgetGrid = () => {
     );
   }).filter((x) => (x !== null)), [fields, focusedWidget, positions, widgetDimensions, widgets]);
 
-  // The SizeMe component is required to update the widget grid
-  // when its content height results in a scrollbar
   return (
     <DashboardWrap>
       <Grid locked={!isInteractive}

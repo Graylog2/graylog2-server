@@ -35,9 +35,9 @@ public class TrafficCounterCalculator extends Periodical {
     private final NodeId nodeId;
     private final TrafficCounterService trafficService;
     private final MetricRegistry metricRegistry;
-    private long previousInputBytes = 0L;
-    private long previousOutputBytes = 0L;
-    private long previousDecodedBytes = 0L;
+    private volatile long previousInputBytes = 0L;
+    private volatile long previousOutputBytes = 0L;
+    private volatile long previousDecodedBytes = 0L;
     private Counter inputCounter;
     private Counter outputCounter;
     private Counter decodedCounter;
