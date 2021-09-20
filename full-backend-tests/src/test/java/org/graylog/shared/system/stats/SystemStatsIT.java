@@ -17,10 +17,9 @@
 package org.graylog.shared.system.stats;
 
 import io.restassured.specification.RequestSpecification;
-import org.graylog.storage.elasticsearch6.ElasticsearchInstanceES6Factory;
-import org.graylog.testing.completebackend.ApiIntegrationTest;
 import org.graylog.testing.completebackend.GraylogBackend;
-import org.junit.jupiter.api.Test;
+import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
+import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 
 import java.util.HashMap;
@@ -32,7 +31,7 @@ import static org.graylog.testing.completebackend.Lifecycle.CLASS;
 
 // This test doesn't seem to work within github runners
 @DisabledIfEnvironmentVariable(named = "GITHUB_WORKSPACE", matches = ".+")
-@ApiIntegrationTest(serverLifecycle = CLASS, elasticsearchFactory = ElasticsearchInstanceES6Factory.class)
+@ContainerMatrixTestsConfiguration(serverLifecycle = CLASS, esVersions = {"6.8.4"})
 public class SystemStatsIT {
     private final GraylogBackend sut;
     private final RequestSpecification requestSpec;
@@ -42,7 +41,7 @@ public class SystemStatsIT {
         this.requestSpec = requestSpec;
     }
 
-    @Test
+    @ContainerMatrixTest
     void filesystemStats() {
         final Map<Object, Object> filesystems = given()
                 .spec(requestSpec)

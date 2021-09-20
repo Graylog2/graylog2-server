@@ -131,12 +131,6 @@ public class GraylogBackend {
         node.restart();
     }
 
-    public void close() {
-        node.close();
-        es.close();
-        mongodb.close();
-    }
-
     public void importElasticsearchFixture(String resourcePath, Class<?> testClass) {
         es.importFixtureResource(resourcePath, testClass);
     }

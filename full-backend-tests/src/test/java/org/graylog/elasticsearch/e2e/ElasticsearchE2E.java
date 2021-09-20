@@ -18,16 +18,19 @@ package org.graylog.elasticsearch.e2e;
 
 import io.restassured.specification.RequestSpecification;
 import org.graylog.testing.completebackend.GraylogBackend;
+import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
+import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.graylog.testing.utils.GelfInputUtils;
 import org.graylog.testing.utils.SearchUtils;
-import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog.testing.completebackend.Lifecycle.VM;
 import static org.graylog.testing.graylognode.NodeContainerConfig.GELF_HTTP_PORT;
 
-abstract class ElasticsearchE2E {
+@ContainerMatrixTestsConfiguration(serverLifecycle = VM, esVersions = {"6.8.4", "7.10.2"}, mongoVersions = {"3.6", "4.0"})
+public class ElasticsearchE2E {
 
     private final GraylogBackend sut;
     private final RequestSpecification requestSpec;
@@ -37,7 +40,7 @@ abstract class ElasticsearchE2E {
         this.requestSpec = requestSpec;
     }
 
-    @Test
+    @ContainerMatrixTest
     void inputMessageCanBeSearched() {
         int mappedPort = sut.mappedPortFor(GELF_HTTP_PORT);
 

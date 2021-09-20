@@ -100,6 +100,7 @@ public abstract class ElasticsearchInstance extends ExternalResource implements 
         client().cleanUp();
     }
 
+    @Override
     public void close() {
         container.close();
         final List<Version> version = containersByVersion.keySet().stream().filter(k -> container == containersByVersion.get(k)).collect(Collectors.toList());
@@ -129,10 +130,5 @@ public abstract class ElasticsearchInstance extends ExternalResource implements 
 
         // Make sure the data we just imported is visible
         client().refreshNode();
-    }
-
-    @Override
-    public void close() {
-        container.stop();
     }
 }

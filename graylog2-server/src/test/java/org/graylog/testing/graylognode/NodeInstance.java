@@ -55,10 +55,6 @@ public class NodeInstance implements Closeable {
         LOG.info("Restarted node container in " + sw.elapsed(TimeUnit.SECONDS));
     }
 
-    public void close() {
-        container.close();
-    }
-
     public String uri() {
         return String.format(Locale.US, "http://%s", container.getContainerIpAddress());
     }
@@ -77,6 +73,6 @@ public class NodeInstance implements Closeable {
 
     @Override
     public void close() {
-        container.stop();
+        container.close();
     }
 }

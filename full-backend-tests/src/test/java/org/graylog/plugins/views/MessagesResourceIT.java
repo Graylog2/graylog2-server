@@ -19,14 +19,17 @@ package org.graylog.plugins.views;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import org.graylog.testing.completebackend.GraylogBackend;
-import org.junit.jupiter.api.Test;
+import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
+import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 
 import java.util.Arrays;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog.testing.completebackend.Lifecycle.CLASS;
 
-abstract class MessagesResourceIT {
+@ContainerMatrixTestsConfiguration(serverLifecycle = CLASS, esVersions = {"6.8.4", "7.10.2"}, mongoVersions = {"3.6", "4.0"})
+public class MessagesResourceIT {
     private final GraylogBackend sut;
     private final RequestSpecification requestSpec;
 
@@ -35,7 +38,7 @@ abstract class MessagesResourceIT {
         this.requestSpec = requestSpec;
     }
 
-    @Test
+    @ContainerMatrixTest
     void canDownloadCsv() {
         sut.importElasticsearchFixture("messages-for-export.json", MessagesResourceIT.class);
 
