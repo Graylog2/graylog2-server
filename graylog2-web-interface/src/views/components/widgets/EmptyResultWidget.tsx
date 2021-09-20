@@ -17,7 +17,7 @@
 import React from 'react';
 
 import { DocumentationLink } from 'components/support';
-import { Icon, CenterContent } from 'components/common';
+import { Icon, Center } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import PortaledPopover from 'views/components/common/PortaledPopover';
 
@@ -48,7 +48,7 @@ const popover = (
 );
 
 const EmptyResultWidget = () => (
-  <CenterContent>
+  <Center>
     <Icon name="times" size="3x" className={styles.iconMargin} />
     <div>
       <strong>
@@ -61,7 +61,7 @@ const EmptyResultWidget = () => (
       if you need help with the search syntax or the time range selector.
       Or <PortaledPopover popover={popover} title="Need help?">click here</PortaledPopover> if you are stuck!
     </div>
-  </CenterContent>
+  </Center>
 );
 
 EmptyResultWidget.propTypes = {};

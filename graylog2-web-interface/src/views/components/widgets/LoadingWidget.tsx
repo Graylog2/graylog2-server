@@ -16,13 +16,13 @@
  */
 import * as React from 'react';
 
-import { CenterContent } from 'components/common';
+import { Center } from 'components/common';
 import Spinner from 'components/common/Spinner';
 
 const LoadingWidget = () => (
-  <CenterContent>
+  <Center>
     <Spinner data-testid="loading-widget" />
-  </CenterContent>
+  </Center>
 );
 
 LoadingWidget.propTypes = {};

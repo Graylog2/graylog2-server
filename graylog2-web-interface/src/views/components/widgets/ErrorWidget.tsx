@@ -18,7 +18,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import { Icon, CenterContent } from 'components/common';
+import { Icon, Center } from 'components/common';
 
 import { WidgetErrorsList } from './WidgetPropTypes';
 import styles from './MessageWidgets.css';
@@ -49,7 +49,7 @@ const Row = styled.div`
 `;
 
 const ErrorWidget = ({ errors, title }: Props) => (
-  <CenterContent>
+  <Center>
     <Icon name="exclamation-triangle" size="3x" className={styles.iconMargin} />
     <Description>
       <Row>
@@ -59,7 +59,7 @@ const ErrorWidget = ({ errors, title }: Props) => (
         {errors.map((e) => <Row as="li" key={e.description}>{e.description}</Row>)}
       </ErrorList>
     </Description>
-  </CenterContent>
+  </Center>
 );
 
 ErrorWidget.propTypes = {
