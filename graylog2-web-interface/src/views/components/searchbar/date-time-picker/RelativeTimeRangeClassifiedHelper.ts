@@ -49,15 +49,6 @@ export const classifyRange = (range: number | undefined | null, allTimeValue: nu
 
   return RELATIVE_RANGE_TYPES.map(({ type }) => {
     const diff = moment.duration(range, 'seconds').as(type);
-    const valueInputIsEmpty = range === null;
-
-    if (valueInputIsEmpty) {
-      return {
-        value: range,
-        unit: type,
-        isAllTime: false,
-      };
-    }
 
     if (diff - Math.floor(diff) === 0) {
       return {
