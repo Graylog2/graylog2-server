@@ -18,33 +18,28 @@ package org.graylog.plugins.views;
 
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
-import org.graylog.storage.ElasticSearchInstanceFactoryByVersion;
-import org.graylog.testing.ESVersionTest;
 import org.graylog.testing.completebackend.GraylogBackend;
-import org.graylog.testing.completebackend.MultipleESVersionsTest;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
+import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
+import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 
 import java.util.Arrays;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.graylog.testing.completebackend.Lifecycle.CLASS;
+import static org.graylog.testing.completebackend.Lifecycle.VM;
 
-@MultipleESVersionsTest(serverLifecycle = CLASS, elasticsearchFactory = ElasticSearchInstanceFactoryByVersion.class, esVersions = { "6.8.4", "7.10.2" })
-@Disabled
-class MessagesResourceMultipleESVersionsIT implements ESVersionTest {
+@ContainerMatrixTestsConfiguration(serverLifecycle = VM, esVersions = {"6.8.4", "7.10.2"}, mongoVersions = {"3.6", "4.0"})
+class MessagesResourceMultipleESVersionsIT {
     private GraylogBackend backend;
     private RequestSpecification requestSpec;
 
-    @Override
-    public void setEsVersion(GraylogBackend backend, RequestSpecification specification) {
+    public MessagesResourceMultipleESVersionsIT(GraylogBackend backend, RequestSpecification specification) {
         this.backend = backend;
         this.requestSpec = specification;
     }
 
-    @Test
-    boolean canDownloadCsv() {
+    @ContainerMatrixTest
+    public void canDownloadCsv() {
         backend.importElasticsearchFixture("messages-for-export.json", MessagesResourceMultipleESVersionsIT.class);
 
         String allMessagesTimeRange = "{\"timerange\": {\"type\": \"absolute\", \"from\": \"2015-01-01T00:00:00\", \"to\": \"2015-01-01T23:59:59\"}}";
@@ -69,7 +64,5 @@ class MessagesResourceMultipleESVersionsIT implements ESVersionTest {
                 "\"2015-01-01T02:00:00.000Z\",\"source-2\",\"He\"",
                 "\"2015-01-01T01:00:00.000Z\",\"source-1\",\"Ha\""
         );
-
-        return true;
     }
 }

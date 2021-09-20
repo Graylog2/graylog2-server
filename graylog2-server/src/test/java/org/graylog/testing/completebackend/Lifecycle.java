@@ -24,6 +24,12 @@ import java.util.List;
  */
 public enum Lifecycle {
     /**
+     * {@link GraylogBackend} will be reused for all tests in the running VM. Use this, if you can make sure
+     * that the individual tests will not interfere with each other, e.g., by creating test data that
+     * would affect the outcome of a different test.
+     */
+    VM,
+    /**
      * {@link GraylogBackend} will be reused for all tests in a class. Use this, if you can make sure
      * that the individual tests will not interfere with each other, e.g., by creating test data that
      * would affect the outcome of a different test.

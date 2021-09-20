@@ -36,8 +36,8 @@ public class NodeInstance {
     private final GenericContainer<?> container;
 
     public static NodeInstance createStarted(Network network, String mongoDbUri, String elasticsearchUri, String elasticsearchVersion, int[] extraPorts,
-            List<Path> pluginJars, Path mavenProjectDir, boolean skipPackaging) {
-        NodeContainerConfig config = NodeContainerConfig.create(network, mongoDbUri, elasticsearchUri, elasticsearchVersion, extraPorts, skipPackaging);
+                                             List<Path> pluginJars, Path mavenProjectDir) {
+        NodeContainerConfig config = NodeContainerConfig.create(network, mongoDbUri, elasticsearchUri, elasticsearchVersion, extraPorts);
         GenericContainer<?> container = NodeContainerFactory.buildContainer(config, pluginJars, mavenProjectDir);
         return new NodeInstance(container);
     }

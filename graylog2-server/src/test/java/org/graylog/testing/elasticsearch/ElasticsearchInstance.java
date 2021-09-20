@@ -40,6 +40,8 @@ import static java.util.Objects.isNull;
  * This rule starts an Elasticsearch instance and provides a configured {@link Client}.
  */
 public abstract class ElasticsearchInstance extends ExternalResource {
+    public static final String DEFAULT_VERSION = "7.10.2";
+
     private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchInstance.class);
 
     private static final Map<Version, ElasticsearchContainer> containersByVersion = new HashMap<>();

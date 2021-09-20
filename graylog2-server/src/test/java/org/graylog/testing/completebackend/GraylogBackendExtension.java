@@ -77,7 +77,7 @@ public class GraylogBackendExtension implements AfterEachCallback, BeforeAllCall
         final List<Path> pluginJars = instantiateFactory(annotation.pluginJarsProvider()).getJars();
         final Path mavenProjectDir = instantiateFactory(annotation.mavenProjectDirProvider()).getProjectDir();
         return GraylogBackend.createStarted(annotation.extraPorts(), esInstanceFactory, pluginJars, mavenProjectDir,
-                mongoDBFixtures, false);
+                mongoDBFixtures);
     }
 
     private static List<URL> getMongoDBFixtures(ExtensionContext context) {

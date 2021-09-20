@@ -14,21 +14,22 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.testing;
+package org.graylog.testing.containermatrix.descriptors;
 
-import org.junit.platform.engine.support.descriptor.*;
+import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
+import org.junit.platform.engine.support.descriptor.MethodSource;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Method;
 
-public class MultipleESVersionsTestMethodDescriptor extends AbstractTestDescriptor {
+public class ContainerMatrixTestMethodDescriptor extends AbstractTestDescriptor {
     private final Method testMethod;
     private final Class testClass;
 
-    public MultipleESVersionsTestMethodDescriptor(Method testMethod, Class testClass, MultipleESVersionsTestClassDescriptor parent) {
-        super( //
-                parent.getUniqueId().append("method", testMethod.getName()), //
-                determineDisplayName(testMethod), //
-                MethodSource.from(testMethod) //
+    public ContainerMatrixTestMethodDescriptor(Method testMethod, Class testClass, ContainerMatrixTestClassDescriptor parent) {
+        super(
+                parent.getUniqueId().append("method", testMethod.getName()),
+                determineDisplayName(testMethod),
+                MethodSource.from(testMethod)
         );
         this.testMethod = testMethod;
         this.testClass = testClass;
@@ -36,7 +37,7 @@ public class MultipleESVersionsTestMethodDescriptor extends AbstractTestDescript
     }
 
     private static String determineDisplayName(Method testMethod) {
-        return DisplayName.canonize(testMethod.getName());
+        return testMethod.getName().replaceAll("_", " ");
     }
 
     public Method getTestMethod() {

@@ -19,6 +19,7 @@ package org.graylog.testing.completebackend;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog.testing.elasticsearch.ElasticsearchInstance;
 import org.graylog.testing.graylognode.NodeInstance;
+import org.graylog.testing.mongodb.MongoDBContainer;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +35,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public class GraylogBackend {
-
     private static final Logger LOG = LoggerFactory.getLogger(GraylogBackend.class);
     private final Network network;
     private final ElasticsearchInstance es;
@@ -43,23 +43,23 @@ public class GraylogBackend {
 
     private static GraylogBackend instance;
 
-    public static GraylogBackend createStarted(int[] extraPorts, String esVersion,
+    public static GraylogBackend createStarted(int[] extraPorts, String esVersion, String mongoVersion,
                                                ElasticsearchInstanceFactory elasticsearchInstanceFactory, List<Path> pluginJars, Path mavenProjectDir,
-                                               List<URL> mongoDBFixtures, boolean skipPackaging) {
+                                               List<URL> mongoDBFixtures) {
         // if a cached version exists, shut it down first
         if (instance != null) {
             instance.close();
         }
-        return createStartedBackend(extraPorts, Optional.of(esVersion), elasticsearchInstanceFactory, pluginJars, mavenProjectDir,
-                mongoDBFixtures, skipPackaging);
+        return createStartedBackend(extraPorts, Optional.of(esVersion), Optional.of(mongoVersion), elasticsearchInstanceFactory, pluginJars, mavenProjectDir,
+                mongoDBFixtures);
     }
 
     public static GraylogBackend createStarted(int[] extraPorts,
                                                ElasticsearchInstanceFactory elasticsearchInstanceFactory, List<Path> pluginJars, Path mavenProjectDir,
-                                               List<URL> mongoDBFixtures, boolean skipPackaging) {
+                                               List<URL> mongoDBFixtures) {
         if (instance == null) {
-            instance = createStartedBackend(extraPorts, Optional.empty(), elasticsearchInstanceFactory, pluginJars, mavenProjectDir,
-                    mongoDBFixtures, skipPackaging);
+            instance = createStartedBackend(extraPorts, Optional.empty(), Optional.empty(), elasticsearchInstanceFactory, pluginJars, mavenProjectDir,
+                    mongoDBFixtures);
         } else {
             instance.fullReset(mongoDBFixtures);
             LOG.info("Reusing running backend");
@@ -71,9 +71,9 @@ public class GraylogBackend {
     // Starting ES instance in parallel thread to save time.
     // MongoDB and the node have to be started in sequence however, because the the node might crash,
     // if a MongoDb instance isn't already present while it's starting up.
-    private static GraylogBackend createStartedBackend(int[] extraPorts, Optional<String> esVersion,
-            ElasticsearchInstanceFactory elasticsearchInstanceFactory, List<Path> pluginJars, Path mavenProjectDir,
-            List<URL> mongoDBFixtures, boolean skipPackaging) {
+    private static GraylogBackend createStartedBackend(int[] extraPorts, Optional<String> esVersion, Optional<String> mongoVersion,
+                                                       ElasticsearchInstanceFactory elasticsearchInstanceFactory, List<Path> pluginJars, Path mavenProjectDir,
+                                                       List<URL> mongoDBFixtures) {
         Network network = Network.newNetwork();
 
         ExecutorService executor = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("build-es-container-for-api-it").build());
@@ -81,8 +81,8 @@ public class GraylogBackend {
         Future<ElasticsearchInstance> esFuture = executor.submit(() -> esVersion.isPresent() ? elasticsearchInstanceFactory.create(esVersion.get(), network) : elasticsearchInstanceFactory.create(network));
 
         MongoDBInstance mongoDB = esVersion.isPresent() ?
-                MongoDBInstance.createStartedWithUniqueName(network, MongoDBInstance.Lifecycle.CLASS, esVersion.get())
-                : MongoDBInstance.createStarted(network, MongoDBInstance.Lifecycle.CLASS);
+                MongoDBInstance.createStartedWithUniqueName(network, Lifecycle.CLASS, mongoVersion.orElse(MongoDBContainer.DEFAULT_VERSION))
+                : MongoDBInstance.createStarted(network, Lifecycle.CLASS, mongoVersion.orElse(MongoDBContainer.DEFAULT_VERSION));
         mongoDB.dropDatabase();
         mongoDB.importFixtures(mongoDBFixtures);
 
@@ -95,7 +95,7 @@ public class GraylogBackend {
                     ElasticsearchInstance.internalUri(),
                     elasticsearchInstanceFactory.version(),
                     extraPorts,
-                    pluginJars, mavenProjectDir, skipPackaging);
+                    pluginJars, mavenProjectDir);
 
             return new GraylogBackend(network, esInstance, mongoDB, node);
         } catch (InterruptedException | ExecutionException e) {

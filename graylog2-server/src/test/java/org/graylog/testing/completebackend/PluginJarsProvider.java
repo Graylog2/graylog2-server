@@ -21,4 +21,6 @@ import java.util.List;
 
 public interface PluginJarsProvider {
     List<Path> getJars();
+
+    String getUniqueId();
 }

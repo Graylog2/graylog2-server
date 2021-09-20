@@ -32,11 +32,14 @@ import static org.graylog.testing.graylognode.ExecutableFileUtil.makeSureExecuta
 
 public class MavenPackager {
     private static final Logger LOG = LoggerFactory.getLogger(MavenPackager.class);
-    private static final String MVN_COMMAND = "mvn package -DskipTests -Dskip.web.build -Dforbiddenapis.skip=true -Dmaven.javadoc.skip=true";
+    private static final String MVN_COMMAND = "mvn -V package -DskipTests -Dskip.web.build -Dforbiddenapis.skip=true -Dmaven.javadoc.skip=true";
+    private static boolean jarHasBeenPackagedInThisRun = false;
 
-    static void packageJarIfNecessary(Path projectDir) {
+    public static void packageJarIfNecessary(Path projectDir) {
         if (isRunFromMaven()) {
             LOG.info("Running from Maven. Assuming jars are current.");
+        } else if (jarHasBeenPackagedInThisRun) {
+            LOG.info("Assuming jars are current.");
         } else {
             LOG.info("Running from outside Maven. Packaging server jar now...");
             makeSureExecutableIsFound("mvn");
@@ -44,12 +47,12 @@ public class MavenPackager {
         }
     }
 
-    private static boolean isRunFromMaven() {
+    public static boolean isRunFromMaven() {
         // surefire-related properties should only be present when the tests are started from surefire, i.e. maven
         return System.getProperty("surefire.test.class.path") != null;
     }
 
-    static void packageJar(Path pomDir) {
+    public static void packageJar(Path pomDir) {
         Process p = startProcess(pomDir);
 
         Stopwatch sw = Stopwatch.createStarted();
@@ -58,6 +61,7 @@ public class MavenPackager {
 
         sw.stop();
         LOG.info("Finished packaging after {} seconds", sw.elapsed(TimeUnit.SECONDS));
+        jarHasBeenPackagedInThisRun = true;
 
         ensureZeroExitCode(p, exitCode);
     }

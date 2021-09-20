@@ -16,6 +16,7 @@
  */
 package org.graylog.testing.mongodb;
 
+import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog2.database.MongoConnection;
 import org.junit.rules.ExternalResource;
 import org.junit.runner.Description;
@@ -26,6 +27,7 @@ import org.testcontainers.containers.Network;
 
 import java.net.URL;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -42,10 +44,6 @@ import java.util.concurrent.ConcurrentMap;
  * }</pre>
  */
 public class MongoDBInstance extends ExternalResource implements AutoCloseable {
-    public enum Lifecycle {
-        METHOD, CLASS
-    }
-
     private static final Logger LOG = LoggerFactory.getLogger(MongoDBInstance.class);
 
     private static final String DEFAULT_INSTANCE_NAME = "default";
@@ -69,14 +67,18 @@ public class MongoDBInstance extends ExternalResource implements AutoCloseable {
         return new MongoDBInstance(DEFAULT_INSTANCE_NAME, lifecycle, MongoDBContainer.DEFAULT_VERSION, network);
     }
 
-    public static MongoDBInstance createStarted(Network network, Lifecycle lifecycle) {
-        MongoDBInstance mongoDb = createWithDefaults(network, lifecycle);
+    private static MongoDBInstance createWithNameAndVersion(Network network, Lifecycle lifecycle, String name, String version) {
+        return new MongoDBInstance(name, lifecycle, version, network);
+    }
+
+    public static MongoDBInstance createStarted(Network network, Lifecycle lifecycle, String version) {
+        final MongoDBInstance mongoDb = createWithNameAndVersion(network, lifecycle, DEFAULT_INSTANCE_NAME, version);
         mongoDb.start();
         return mongoDb;
     }
 
-    public static MongoDBInstance createStartedWithUniqueName(Network network, Lifecycle lifecycle, String name) {
-        MongoDBInstance mongoDb = new MongoDBInstance(DEFAULT_INSTANCE_NAME + "_" + name, lifecycle, MongoDBContainer.DEFAULT_VERSION, network);
+    public static MongoDBInstance createStartedWithUniqueName(Network network, Lifecycle lifecycle, String version) {
+        final MongoDBInstance mongoDb = createWithNameAndVersion(network, lifecycle, UUID.randomUUID().toString(), version);
         mongoDb.start();
         return mongoDb;
     }
