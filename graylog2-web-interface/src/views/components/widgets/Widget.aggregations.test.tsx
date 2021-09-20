@@ -56,8 +56,10 @@ jest.mock('views/stores/FieldTypesStore', () => ({
   FieldTypesStore: MockStore(['getInitialState', () => ({ all: {}, queryFields: {} })]),
 }));
 
+const MockWidgetStoreState = Immutable.Map();
+
 jest.mock('views/stores/WidgetStore', () => ({
-  WidgetStore: MockStore(),
+  WidgetStore: MockStore(['getInitialState', () => MockWidgetStoreState]),
   WidgetActions: {
     update: mockAction(),
   },
