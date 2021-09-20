@@ -25,7 +25,7 @@ import DataTable from 'views/components/datatable/DataTable';
 import type { FieldActionHandler } from './FieldActionHandler';
 import duplicateCommonWidgetSettings from './DuplicateCommonWidgetSettings';
 
-const AggregateActionHandler: FieldActionHandler = ({ field, type, contexts: { widget = Widget.empty() } }) => {
+const AggregateActionHandler: FieldActionHandler<{ widget?: Widget }> = ({ field, type, contexts: { widget = Widget.empty() } }) => {
   const newWidgetBuilder = AggregationWidget.builder()
     .newId()
     .config(AggregationWidgetConfig.builder()

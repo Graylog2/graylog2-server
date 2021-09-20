@@ -23,6 +23,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ComparisonChain;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog2.indexer.MessageIndexTemplateProvider;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 import org.joda.time.Duration;
@@ -51,16 +52,16 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
     public static final String FIELD_INDEX_TEMPLATE_TYPE = "index_template_type";
     public static final String INDEX_PREFIX_REGEX = "^[a-z0-9][a-z0-9_+-]*$";
 
-    private static final Duration DEFAULT_FIELD_TYPE_REFRESH_INTERVAL = Duration.standardSeconds(5L);
-    public static final TemplateType DEFAULT_INDEX_TEMPLATE_TYPE = TemplateType.MESSAGES;
+    public static final String DEFAULT_INDEX_TEMPLATE_TYPE = MessageIndexTemplateProvider.MESSAGE_TEMPLATE_TYPE;
 
-    public enum TemplateType {
-        @JsonProperty("messages")
-        MESSAGES,
-        @JsonProperty("events")
-        EVENTS,
-        @JsonProperty("gim_v1")
-        GIM_V1
+    private static final Duration DEFAULT_FIELD_TYPE_REFRESH_INTERVAL = Duration.standardSeconds(5L);
+
+    public static boolean isRegularIndex(@Nullable String templateType, boolean isWritable) {
+        // "isWritable == false" marks the restored-archive index set, which can also not be used as a default
+        return isWritable && (templateType == null || DEFAULT_INDEX_TEMPLATE_TYPE.equals(templateType));
+    }
+    public static boolean isRegularIndex(IndexSetConfig config) {
+        return isRegularIndex(config.indexTemplateType().orElse(null), config.isWritable());
     }
 
     @JsonProperty("id")
@@ -131,7 +132,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
 
     @JsonProperty(FIELD_INDEX_TEMPLATE_TYPE)
     @NotBlank
-    public abstract Optional<TemplateType> indexTemplateType();
+    public abstract Optional<String> indexTemplateType();
 
     @JsonProperty("index_optimization_max_num_segments")
     @Min(1L)
@@ -160,7 +161,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
                                         @JsonProperty(FIELD_CREATION_DATE) @NotNull ZonedDateTime creationDate,
                                         @JsonProperty("index_analyzer") @Nullable String indexAnalyzer,
                                         @JsonProperty("index_template_name") @Nullable String indexTemplateName,
-                                        @JsonProperty(FIELD_INDEX_TEMPLATE_TYPE) @Nullable TemplateType indexTemplateType,
+                                        @JsonProperty(FIELD_INDEX_TEMPLATE_TYPE) @Nullable String indexTemplateType,
                                         @JsonProperty("index_optimization_max_num_segments") @Nullable Integer maxNumSegments,
                                         @JsonProperty("index_optimization_disabled") @Nullable Boolean indexOptimizationDisabled,
                                         @JsonProperty("field_type_refresh_interval") @Nullable Duration fieldTypeRefreshInterval) {
@@ -211,7 +212,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
                                         ZonedDateTime creationDate,
                                         String indexAnalyzer,
                                         String indexTemplateName,
-                                        TemplateType indexTemplateType,
+                                        String indexTemplateType,
                                         int indexOptimizationMaxNumSegments,
                                         boolean indexOptimizationDisabled,
                                         Duration fieldTypeRefreshInterval) {
@@ -234,7 +235,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
                                         ZonedDateTime creationDate,
                                         String indexAnalyzer,
                                         String indexTemplateName,
-                                        TemplateType indexTemplateType,
+                                        String indexTemplateType,
                                         int indexOptimizationMaxNumSegments,
                                         boolean indexOptimizationDisabled,
                                         Duration fieldTypeRefreshInterval) {
@@ -259,7 +260,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
                                         ZonedDateTime creationDate,
                                         String indexAnalyzer,
                                         String indexTemplateName,
-                                        TemplateType indexTemplateType,
+                                        String indexTemplateType,
                                         int indexOptimizationMaxNumSegments,
                                         boolean indexOptimizationDisabled) {
         return create(id, title, description, isWritable, indexPrefix, null, null, shards, replicas,
@@ -282,7 +283,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
                                         ZonedDateTime creationDate,
                                         String indexAnalyzer,
                                         String indexTemplateName,
-                                        TemplateType indexTemplateType,
+                                        String indexTemplateType,
                                         int indexOptimizationMaxNumSegments,
                                         boolean indexOptimizationDisabled) {
         return create(null, title, description, isWritable, indexPrefix, null, null, shards, replicas,
@@ -343,7 +344,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
 
         public abstract Builder indexTemplateName(String templateName);
 
-        public abstract Builder indexTemplateType(@Nullable TemplateType templateType);
+        public abstract Builder indexTemplateType(@Nullable String templateType);
 
         public abstract Builder indexOptimizationMaxNumSegments(int indexOptimizationMaxNumSegments);
 

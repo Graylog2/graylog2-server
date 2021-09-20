@@ -112,6 +112,7 @@ export type KeywordTimeRange = {
   keyword: string,
   from?: string,
   to?: string,
+  timezone?: string,
 };
 
 export type TimeRange = RelativeTimeRange | AbsoluteTimeRange | KeywordTimeRange;

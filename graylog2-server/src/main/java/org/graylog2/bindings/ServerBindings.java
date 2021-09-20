@@ -80,6 +80,7 @@ import org.graylog2.system.jobs.SystemJobFactory;
 import org.graylog2.system.jobs.SystemJobManager;
 import org.graylog2.system.shutdown.GracefulShutdown;
 import org.graylog2.system.stats.ClusterStatsModule;
+import org.graylog2.users.GrantsCleanupListener;
 import org.graylog2.users.RoleService;
 import org.graylog2.users.RoleServiceImpl;
 import org.graylog2.users.StartPageCleanupListener;
@@ -193,6 +194,7 @@ public class ServerBindings extends Graylog2Module {
         bind(LocalDebugEventListener.class).asEagerSingleton();
         bind(ClusterDebugEventListener.class).asEagerSingleton();
         bind(StartPageCleanupListener.class).asEagerSingleton();
+        bind(GrantsCleanupListener.class).asEagerSingleton();
     }
 
     private void bindSearchResponseDecorators() {

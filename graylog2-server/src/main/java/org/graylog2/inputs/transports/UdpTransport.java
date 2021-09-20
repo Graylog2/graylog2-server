@@ -105,6 +105,7 @@ public class UdpTransport extends NettyTransport {
         return handlers;
     }
 
+    @Override
     protected LinkedHashMap<String, Callable<? extends ChannelHandler>> getChildChannelHandlers(final MessageInput input) {
         final LinkedHashMap<String, Callable<? extends ChannelHandler>> handlerList = new LinkedHashMap<>(getCustomChildChannelHandlers(input));
 
@@ -201,8 +202,8 @@ public class UdpTransport extends NettyTransport {
 
                 final DatagramChannelConfig channelConfig = (DatagramChannelConfig) channel.config();
                 final int receiveBufferSize = channelConfig.getReceiveBufferSize();
-                if (receiveBufferSize != expectedRecvBufferSize) {
-                    LOG.warn("receiveBufferSize (SO_RCVBUF) for input {} (channel {}) should be {} but is {}.",
+                if (receiveBufferSize < expectedRecvBufferSize) {
+                    LOG.warn("receiveBufferSize (SO_RCVBUF) for input {} (channel {}) should be >= {} but is {}.",
                             input, channel, expectedRecvBufferSize, receiveBufferSize);
                 }
             } else {

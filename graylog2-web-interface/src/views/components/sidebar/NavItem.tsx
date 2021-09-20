@@ -31,79 +31,29 @@ type Props = {
 
 type ContainerProps = {
   isSelected: boolean,
-  showTitleOnHover: boolean,
   sidebarIsPinned: boolean,
 };
 
-const Title = styled.div(({ theme }) => css`
-  display: none;
-  position: absolute;
-  padding: 0 10px;
-  left: 100%;
-  top: calc(50% - 13px);
-  height: 25px;
-  background-color: ${theme.colors.variant.lightest.info};
-  border: 1px solid ${theme.colors.variant.light.info};
-  border-left: none;
-  box-shadow: 3px 3px 3px ${theme.colors.global.navigationBoxShadow};
-  z-index: 4;
-  border-radius: 0 3px 3px 0;
-  align-items: center;
-
-  span {
-    color: ${theme.colors.variant.darker.info};
-    font-size: ${theme.fonts.size.body};
-    font-weight: bold;
-    text-transform: uppercase;
-  }
-`);
-
-const IconWrap = styled.span`
-  display: flex;
-  width: 100%;
-  height: 100%;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-
-  ::after {
-    content: ' ';
-    position: absolute;
-    left: 82.5%;
-    top: calc(50% - 9px);
-    width: 18px;
-    height: 18px;
-    transform: rotate(45deg);
-  }
-`;
-
-const Container = styled.div<ContainerProps>(({ theme, isSelected, showTitleOnHover, sidebarIsPinned }) => css`
+const Container = styled.div<ContainerProps>(({ theme: { colors, fonts }, isSelected, sidebarIsPinned }) => css`
   position: relative;
   z-index: 4; /* to render over SidebarNav::before */
   width: 100%;
   height: 40px;
   text-align: center;
   cursor: pointer;
-  font-size: ${theme.fonts.size.h3};
-  color: ${theme.colors.variant.darkest.default};
-  background: ${isSelected ? theme.colors.gray[90] : theme.colors.global.contentBackground};
+  font-size: ${fonts.size.h3};
+  color: ${colors.variant.darkest.default};
+  background: ${isSelected ? colors.gray[90] : colors.global.contentBackground};
 
   :hover {
-    color: ${isSelected ? theme.colors.variant.darkest.default : theme.colors.variant.darker.default};
-    background: ${isSelected ? theme.colors.gray[80] : theme.colors.variant.lightest.default};
-
-    ${Title} {
-      display: ${(showTitleOnHover && !isSelected) ? 'flex' : 'none'};
-    }
-
-    ${IconWrap}::after {
-      display: ${(showTitleOnHover) ? 'block' : 'none'};
-    }
+    color: ${isSelected ? colors.variant.darkest.default : colors.variant.darker.default};
+    background: ${isSelected ? colors.gray[80] : colors.variant.lightest.default};
   }
 
   :active {
-    background: ${theme.colors.variant.lighter.default};
+    background: ${colors.variant.lighter.default};
   }
+
   /* stylelint-disable selector-max-empty-lines, indentation */
   ${(isSelected && !sidebarIsPinned) && css`
     ::before,
@@ -113,7 +63,7 @@ const Container = styled.div<ContainerProps>(({ theme, isSelected, showTitleOnHo
       right: -5px;
       height: 15px;
       width: 5px;
-      background-color: ${theme.colors.global.contentBackground};
+      background-color: ${colors.global.contentBackground};
     }
 
     ::before {
@@ -127,32 +77,83 @@ const Container = styled.div<ContainerProps>(({ theme, isSelected, showTitleOnHo
     }
   `}
   /* stylelint-enable selector-max-empty-lines, indentation */
+`);
 
-  ${IconWrap} {
-    overflow: hidden;
+type IconWrapProps = {
+  showTitleOnHover: boolean,
+  isSelected: boolean,
+  sidebarIsPinned: boolean,
+}
+const IconWrap = styled.span<IconWrapProps>(({ showTitleOnHover, isSelected, theme: { colors }, sidebarIsPinned }) => `
+  display: flex;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+
+  :hover {
+    + div {
+      display: ${(showTitleOnHover && !isSelected) ? 'flex' : 'none'};
+    }
 
     ::after {
-      display: ${isSelected ? 'block' : 'none'};
-      box-shadow: ${(isSelected && !sidebarIsPinned) ? `inset 2px -2px 2px 0 ${theme.colors.global.navigationBoxShadow}` : 'none'};
-      background-color: ${isSelected ? theme.colors.global.contentBackground : theme.colors.variant.lightest.info};
-      border: ${isSelected ? 'none' : `1px solid ${theme.colors.variant.light.info}`};
+      display: ${(showTitleOnHover) ? 'block' : 'none'};
     }
+  }
+
+  ::after {
+    display: ${isSelected ? 'block' : 'none'};
+    box-shadow: ${(isSelected && !sidebarIsPinned) ? `inset 2px -2px 2px 0 ${colors.global.navigationBoxShadow}` : 'none'};
+    background-color: ${isSelected ? colors.global.contentBackground : colors.variant.lightest.info};
+    border: ${isSelected ? 'none' : `1px solid ${colors.variant.light.info}`};
+    content: ' ';
+    position: absolute;
+    left: 82.5%;
+    top: calc(50% - 9px);
+    width: 18px;
+    height: 18px;
+    transform: rotate(45deg);
   }
 `);
 
-const NavItem = ({ isSelected, title, icon, onClick, showTitleOnHover, sidebarIsPinned }: Props) => {
-  return (
-    <Container aria-label={title}
-               isSelected={isSelected}
-               onClick={onClick}
-               showTitleOnHover={showTitleOnHover}
-               title={showTitleOnHover ? '' : title}
-               sidebarIsPinned={sidebarIsPinned}>
-      <IconWrap><Icon name={icon} /></IconWrap>
-      {(showTitleOnHover && !isSelected) && <Title><span>{title}</span></Title>}
-    </Container>
-  );
-};
+const Title = styled.div(({ theme: { colors, fonts } }) => css`
+  display: none;
+  position: absolute;
+  padding: 0 10px;
+  left: 100%;
+  top: calc(50% - 13px);
+  height: 25px;
+  background-color: ${colors.variant.lightest.info};
+  border: 1px solid ${colors.variant.light.info};
+  border-left: none;
+  box-shadow: 3px 3px 3px ${colors.global.navigationBoxShadow};
+  z-index: 4;
+  border-radius: 0 3px 3px 0;
+  align-items: center;
+
+  span {
+    color: ${colors.variant.darker.info};
+    font-size: ${fonts.size.body};
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+`);
+
+const NavItem = ({ isSelected, title, icon, onClick, showTitleOnHover, sidebarIsPinned }: Props) => (
+  <Container aria-label={title}
+             isSelected={isSelected}
+             onClick={onClick}
+             title={showTitleOnHover ? '' : title}
+             sidebarIsPinned={sidebarIsPinned}>
+    <IconWrap showTitleOnHover={showTitleOnHover}
+              isSelected={isSelected}
+              sidebarIsPinned={sidebarIsPinned}>
+      <Icon name={icon} />
+    </IconWrap>
+    {(showTitleOnHover && !isSelected) && <Title><span>{title}</span></Title>}
+  </Container>
+);
 
 NavItem.propTypes = {
   icon: PropTypes.node.isRequired,

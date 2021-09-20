@@ -26,6 +26,7 @@ import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.elasticsearch.ElasticsearchContainer;
 import org.testcontainers.utility.DockerImageName;
 
+import java.io.Closeable;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -39,7 +40,7 @@ import static java.util.Objects.isNull;
 /**
  * This rule starts an Elasticsearch instance and provides a configured {@link Client}.
  */
-public abstract class ElasticsearchInstance extends ExternalResource {
+public abstract class ElasticsearchInstance extends ExternalResource implements Closeable {
     public static final String DEFAULT_VERSION = "7.10.2";
 
     private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchInstance.class);
@@ -128,5 +129,10 @@ public abstract class ElasticsearchInstance extends ExternalResource {
 
         // Make sure the data we just imported is visible
         client().refreshNode();
+    }
+
+    @Override
+    public void close() {
+        container.stop();
     }
 }

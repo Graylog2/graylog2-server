@@ -27,6 +27,7 @@ import org.graylog2.indexer.IndexMappingFactory;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetStatsCreator;
+import org.graylog2.indexer.MessageIndexTemplateProvider;
 import org.graylog2.indexer.TestIndexSet;
 import org.graylog2.indexer.cluster.Node;
 import org.graylog2.indexer.cluster.NodeAdapter;
@@ -99,7 +100,8 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
         //noinspection UnstableApiUsage
         eventBus = new EventBus("indices-test");
         final Node node = new Node(createNodeAdapter());
-        final IndexMappingFactory indexMappingFactory = new IndexMappingFactory(node);
+        final IndexMappingFactory indexMappingFactory = new IndexMappingFactory(node,
+                ImmutableMap.of(MessageIndexTemplateProvider.MESSAGE_TEMPLATE_TYPE, new MessageIndexTemplateProvider()));
         indices = new Indices(
                 indexMappingFactory,
                 mock(NodeId.class),
@@ -466,5 +468,17 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
         client().addAliasMapping(index, alias);
 
         assertThat(indices.aliasTarget("graylog_alias_*")).contains(index);
+    }
+
+    @Test
+    public void aliasTargetSupportsIndicesWithPlusInName() {
+        final String prefixWithPlus = "index+set_";
+        final String index = client().createRandomIndex(prefixWithPlus);
+        final String alias = prefixWithPlus + "deflector";
+        assertThat(indices.aliasTarget(alias)).isEmpty();
+
+        client().addAliasMapping(index, alias);
+
+        assertThat(indices.aliasTarget(prefixWithPlus + "*")).contains(index);
     }
 }

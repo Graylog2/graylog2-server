@@ -18,10 +18,11 @@ import React from 'react';
 import { render } from 'wrappedTestingLibrary';
 
 import { AdditionalContext } from 'views/logic/ActionContext';
+import { Message } from 'views/components/messagelist/Types';
 
 import Highlight from './Highlight';
 
-const messageFor = (ranges) => ({ highlight_ranges: ranges });
+const messageFor = (ranges) => ({ highlight_ranges: ranges } as Message);
 
 const hasBrokenUpText = (text) => (content, node) => {
   const hasText = (currentNode) => currentNode.textContent === text;

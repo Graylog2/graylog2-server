@@ -42,12 +42,14 @@ const StreamControls = createReactClass({
     onQuickAdd: PropTypes.func.isRequired,
     onUpdate: PropTypes.func.isRequired,
     isDefaultStream: PropTypes.bool,
+    disabled: PropTypes.bool,
   },
 
   mixins: [PermissionsMixin],
 
   getDefaultProps() {
     return {
+      disabled: false,
       isDefaultStream: false,
     };
   },
@@ -81,13 +83,14 @@ const StreamControls = createReactClass({
   },
 
   render() {
-    const { stream, isDefaultStream, user, onUpdate, indexSets } = this.props;
+    const { stream, disabled, isDefaultStream, user, onUpdate, indexSets } = this.props;
 
     return (
       <span>
         <DropdownButton title="More Actions"
                         pullRight
-                        id={`more-actions-dropdown-${stream.id}`}>
+                        id={`more-actions-dropdown-${stream.id}`}
+                        disabled={disabled}>
           <IfPermitted permissions={`streams:edit:${stream.id}`}>
             <MenuItem key={`editStreams-${stream.id}`} onSelect={this._onEdit} disabled={isDefaultStream}>
               Edit stream

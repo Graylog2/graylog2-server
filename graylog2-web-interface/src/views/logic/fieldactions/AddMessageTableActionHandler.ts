@@ -27,7 +27,7 @@ export default () => WidgetActions.create(
       MessagesWidgetConfig.builder()
         .fields(DEFAULT_MESSAGE_FIELDS)
         .showMessageRow(true)
-        .showSummaryRow(true)
+        .showSummary(true)
         .build(),
     ).build(),
 );

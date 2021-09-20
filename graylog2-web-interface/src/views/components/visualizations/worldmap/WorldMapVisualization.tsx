@@ -23,7 +23,7 @@ import { AggregationType, AggregationResult } from 'views/components/aggregation
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import type Pivot from 'views/logic/aggregationbuilder/Pivot';
-import { makeVisualization } from 'views/components/aggregationbuilder/AggregationBuilder';
+import { makeVisualization, retrieveChartData } from 'views/components/aggregationbuilder/AggregationBuilder';
 
 import MapVisualization from './MapVisualization';
 
@@ -74,7 +74,7 @@ const WorldMapVisualization = makeVisualization(({ config, data, editing, onChan
     _formatSeriesForMap(rowPivots),
   ]);
 
-  const rows = data.chart || Object.values(data)[0];
+  const rows = retrieveChartData(data);
 
   const series = pipeline(rows);
 

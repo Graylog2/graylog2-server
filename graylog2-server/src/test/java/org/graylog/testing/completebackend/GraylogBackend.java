@@ -96,8 +96,14 @@ public class GraylogBackend {
                     elasticsearchInstanceFactory.version(),
                     extraPorts,
                     pluginJars, mavenProjectDir);
+            final GraylogBackend backend = new GraylogBackend(network, esInstance, mongoDB, node);
 
-            return new GraylogBackend(network, esInstance, mongoDB, node);
+            // ensure that all containers and networks will be removed after all tests finish
+            // We can't close the resources in an afterAll callback, as the instances are cached and reused
+            // so we need a solution that will be triggered only once after all test classes
+            Runtime.getRuntime().addShutdownHook(new Thread(backend::close));
+
+            return backend;
         } catch (InterruptedException | ExecutionException e) {
             LOG.error("Container creation aborted", e);
             throw new RuntimeException(e);
@@ -153,5 +159,12 @@ public class GraylogBackend {
 
     public Network network() {
         return this.network;
+    }
+
+    public void close() {
+        node.close();
+        mongodb.close();
+        es.close();
+        network.close();
     }
 }

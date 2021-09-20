@@ -719,7 +719,44 @@ public class IndexSetsResourceTest {
         when(indexSetService.get(readOnlyIndexSetId)).thenReturn(Optional.of(readOnlyIndexSetConfig));
 
         expectedException.expect(ClientErrorException.class);
-        expectedException.expectMessage("Default index set must be writable.");
+        expectedException.expectMessage("Index set not eligible as default");
+
+        try {
+            indexSetsResource.setDefault(readOnlyIndexSetId);
+        } finally {
+            verifyZeroInteractions(clusterConfigService);
+        }
+    }
+
+    @Test
+    public void setDefaultDoesNotDoAnythingIfIndexSetIsNotElegibleAsDefault() throws Exception {
+        final String readOnlyIndexSetId = "newDefaultIndexSetId";
+        final IndexSet readOnlyIndexSet = mock(IndexSet.class);
+        final IndexSetConfig readOnlyIndexSetConfig = IndexSetConfig.create(
+                readOnlyIndexSetId,
+                "title",
+                "description",
+                true,
+                "prefix",
+                1,
+                0,
+                MessageCountRotationStrategy.class.getCanonicalName(),
+                MessageCountRotationStrategyConfig.create(1000),
+                NoopRetentionStrategy.class.getCanonicalName(),
+                NoopRetentionStrategyConfig.create(1),
+                ZonedDateTime.of(2016, 10, 10, 12, 0, 0, 0, ZoneOffset.UTC),
+                "standard",
+                "index-template",
+                "failures",
+                1,
+                false
+        );
+
+        when(readOnlyIndexSet.getConfig()).thenReturn(readOnlyIndexSetConfig);
+        when(indexSetService.get(readOnlyIndexSetId)).thenReturn(Optional.of(readOnlyIndexSetConfig));
+
+        expectedException.expect(ClientErrorException.class);
+        expectedException.expectMessage("Index set not eligible as default");
 
         try {
             indexSetsResource.setDefault(readOnlyIndexSetId);

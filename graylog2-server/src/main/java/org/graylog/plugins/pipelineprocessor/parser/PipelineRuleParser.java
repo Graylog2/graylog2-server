@@ -93,6 +93,7 @@ import javax.inject.Inject;
 import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -989,8 +990,12 @@ public class PipelineRuleParser {
                     parseContext.addError(new SyntaxError(null, stageToken.getLine(), stageToken.getCharPositionInLine(), "", null));
                     return;
                 }
-                final boolean isAllModifier = modifier.getText().equalsIgnoreCase("all");
-                stageBuilder.matchAll(isAllModifier);
+                try {
+                    stageBuilder.match(Stage.Match.valueOf(modifier.getText().toUpperCase(Locale.ROOT)));
+                } catch (IllegalArgumentException e) {
+                    parseContext.addError(new SyntaxError(null, stageToken.getLine(), stageToken.getCharPositionInLine(), "", null));
+                    return;
+                }
 
                 final List<String> ruleRefs = stage.ruleRef().stream()
                         .map(ruleRefContext -> {

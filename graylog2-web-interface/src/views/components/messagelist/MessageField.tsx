@@ -48,6 +48,10 @@ const DecoratedField = styled.small(({ theme }) => css`
   font-weight: normal;
 `);
 
+const DefinitionDescription = styled.dd(({ theme }) => `
+  font-family: ${theme.fonts.family.monospace};
+`);
+
 const MessageField = ({ fieldName, fieldType, message, value, currentView }: Props) => {
   const innerValue = SPECIAL_FIELDS.indexOf(fieldName) !== -1 ? message.fields[fieldName] : value;
   const { activeQuery } = currentView;
@@ -76,11 +80,11 @@ const MessageField = ({ fieldName, fieldType, message, value, currentView }: Pro
       <dt>
         <Field queryId={activeQuery} name={fieldName} type={isDecoratedField ? FieldType.Decorated : fieldType}>{fieldName}</Field>
       </dt>
-      <dd>
+      <DefinitionDescription>
         <ValueContext>
           <Value queryId={activeQuery} field={fieldName} value={innerValue} type={isDecoratedField ? FieldType.Decorated : fieldType} render={DecoratedValue} />
         </ValueContext>
-      </dd>
+      </DefinitionDescription>
     </>
   );
 };

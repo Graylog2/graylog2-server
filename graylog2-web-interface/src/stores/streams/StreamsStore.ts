@@ -84,6 +84,7 @@ export type StreamResponse = {
   alert_receivers: AlertReceiver
   title: string,
   is_default: boolean | null | undefined,
+  is_editable: boolean,
   remove_matches_from_default_stream: boolean,
   index_set_id: string,
 }
@@ -108,8 +109,8 @@ type PaginatedResponse = {
     total: number,
     page: number,
     per_page: number,
-    query: string,
   },
+  query: string,
   streams: Array<Stream>,
 };
 
@@ -118,22 +119,31 @@ const StreamsStore = singletonStore('Streams', () => Reflux.createStore({
 
   callbacks: [],
 
-  searchPaginated(page, perPage, query) {
-    const url = PaginationURL(ApiRoutes.StreamsApiController.paginated().url, page, perPage, query);
+  searchPaginated(newPage, newPerPage, newQuery) {
+    const url = PaginationURL(ApiRoutes.StreamsApiController.paginated().url, newPage, newPerPage, newQuery);
 
     const promise = fetch('GET', qualifyUrl(url))
       .then((response: PaginatedResponse) => {
-        const pagination = {
-          count: response.pagination.count,
-          total: response.pagination.total,
-          page: response.pagination.page,
-          perPage: response.pagination.per_page,
-          query: response.pagination.query,
-        };
+        const {
+          streams,
+          query,
+          pagination: {
+            count,
+            total,
+            page,
+            per_page: perPage,
+          },
+        } = response;
 
         return {
-          streams: response.streams,
-          pagination,
+          streams,
+          pagination: {
+            count,
+            total,
+            page,
+            perPage,
+            query,
+          },
         };
       })
       .catch((errorThrown) => {

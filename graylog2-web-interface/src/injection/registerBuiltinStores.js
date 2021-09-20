@@ -145,9 +145,7 @@ const stores = {
   SystemLoadBalancer: () => require('stores/load-balancer/SystemLoadBalancerStore'),
   SystemMessages: () => require('stores/systemmessages/SystemMessagesStore'),
   SystemProcessing: () => require('stores/system-processing/SystemProcessingStore'),
-  SystemShutdown: () => require('stores/system-shutdown/SystemShutdownStore'),
   ConfigurationVariable: () => require('stores/sidecars/ConfigurationVariableStore'),
-  Tools: () => require('stores/tools/ToolsStore'),
   UniversalSearch: () => require('stores/search/UniversalSearchStore'),
   Users: () => require('stores/users/UsersStore'),
 };

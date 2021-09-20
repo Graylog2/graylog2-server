@@ -141,6 +141,13 @@ public class SearchResourceTest {
     }
 
     @Test
+    public void testBuilderGeneratesSearchId() {
+        final Search search = Search.builder().build();
+        assertThat(search.id()).isNotNull();
+        assertThat(org.bson.types.ObjectId.isValid(search.id())).isTrue();
+    }
+
+    @Test
     public void getSearchLoadsSearch() {
         final Search search = mockExistingSearch();
 

@@ -111,7 +111,7 @@ public class ClusterAdapterES7 implements ClusterAdapter {
     public Set<NodeDiskUsageStats> diskUsageStats() {
         final List<NodeResponse> result = nodes();
         return result.stream()
-                .map(node -> NodeDiskUsageStats.create(node.name(), node.ip(), node.host(), node.diskUsed(), node.diskTotal(), node.diskUsedPercent()))
+                .map(node -> NodeDiskUsageStats.create(node.name(), node.role(), node.ip(), node.host(), node.diskUsed(), node.diskTotal(), node.diskUsedPercent()))
                 .collect(Collectors.toSet());
     }
 

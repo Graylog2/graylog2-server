@@ -60,7 +60,7 @@ class IndexMappingTest {
     })
     void createsValidMappingTemplates(String versionString) throws Exception {
         final Version version = Version.valueOf(versionString);
-        final IndexMappingTemplate mapping = IndexMappingFactory.indexMappingFor(version);
+        final IndexMappingTemplate mapping = new MessageIndexTemplateProvider().create(version, null);
 
         final Map<String, Object> template = mapping.toTemplate(indexSetConfig, "sampleIndexTemplate");
         final String fixture = fixtureFor(version);

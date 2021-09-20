@@ -214,7 +214,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @ApiOperation(value = "Execute a new synchronous search", notes = "Executes a new search and waits for its result")
     @Path("sync")
     @NoAuditEvent("Creating audit event manually in method body.")
-    public Response executeSyncJob(@ApiParam Search search,
+    public Response executeSyncJob(@ApiParam @NotNull(message = "Search body is mandatory") Search search,
                                    @ApiParam(name = "timeout", defaultValue = "60000")
                                    @QueryParam("timeout") @DefaultValue("60000") long timeout) {
         final String username = username();

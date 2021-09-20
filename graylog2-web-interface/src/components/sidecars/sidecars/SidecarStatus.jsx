@@ -172,7 +172,7 @@ const SidecarStatus = createReactClass({
         </Row>
         <VerboseMessageModal ref={(c) => { this.modal = c; }}
                              collectorName={this.state.collectorName}
-                             collectorVerbose={this.state.collectorVerbose} />,
+                             collectorVerbose={this.state.collectorVerbose} />
       </div>
     );
   },

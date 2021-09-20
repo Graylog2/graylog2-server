@@ -28,21 +28,22 @@ import DocumentationLink from 'components/support/DocumentationLink';
 
 type Props = {
   authenticationBackend?: DirectoryServiceBackend | OktaBackend,
+  title?: string,
 };
 
-const _pageTitle = (authBackend) => {
+const _pageTitle = (authBackend, title) => {
   if (authBackend) {
     const backendTitle = StringUtils.truncateWithEllipses(authBackend.title, 30);
 
     return <>Edit Authentication Service - <i>{backendTitle}</i></>;
   }
 
-  return 'Create LDAP Authentication Service';
+  return title || 'Create LDAP Authentication Service';
 };
 
-const WizardPageHeader = ({ authenticationBackend: authBackend }: Props) => {
+const WizardPageHeader = ({ authenticationBackend: authBackend, title }: Props) => {
   const { finishedLoading, activeBackend } = useActiveBackend();
-  const pageTitle = _pageTitle(authBackend);
+  const pageTitle = _pageTitle(authBackend, title);
 
   return (
     <PageHeader title={pageTitle}
@@ -63,6 +64,7 @@ const WizardPageHeader = ({ authenticationBackend: authBackend }: Props) => {
 
 WizardPageHeader.defaultProps = {
   authenticationBackend: undefined,
+  title: undefined,
 };
 
 export default WizardPageHeader;

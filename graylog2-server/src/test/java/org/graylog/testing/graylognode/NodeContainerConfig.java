@@ -24,6 +24,7 @@ import java.util.Arrays;
 public class NodeContainerConfig {
 
     static final int API_PORT = 9000;
+    public static final int GELF_HTTP_PORT = 12201;
     static final int DEBUG_PORT = 5005;
 
     public final Network network;
@@ -54,7 +55,8 @@ public class NodeContainerConfig {
     }
 
     public Integer[] portsToExpose() {
-        int[] allPorts = ArrayUtils.add(extraPorts, 0, API_PORT);
+        int[] allPorts = ArrayUtils.add(extraPorts, 0, GELF_HTTP_PORT);
+        allPorts = ArrayUtils.add(allPorts, 0, API_PORT);
 
         if (enableDebugging) {
             allPorts = ArrayUtils.add(allPorts, 0, DEBUG_PORT);

@@ -700,14 +700,14 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         final Message clonedMessage = Iterables.get(context.createdMessages(), 0);
 
         assertThat(origMessage).isNotEqualTo(clonedMessage);
-        assertThat(origMessage.getField("timestamp")).isNotInstanceOf(DateTime.class);
+        assertThat(origMessage.getField("timestamp")).isInstanceOf(DateTime.class);
 
         assertThat(clonedMessage).isNotNull();
         assertThat(clonedMessage.getMessage()).isEqualTo(origMessage.getMessage());
         assertThat(clonedMessage.getSource()).isEqualTo(origMessage.getSource());
         assertThat(clonedMessage.getStreams()).isEqualTo(origMessage.getStreams());
         assertThat(clonedMessage.getTimestamp()).isNotNull();
-        assertThat(clonedMessage.getField("gl2_original_timestamp")).isEqualTo(origMessage.getField("timestamp"));
+        assertThat(clonedMessage.getTimestamp()).isEqualTo(origMessage.getTimestamp());
     }
 
     @Test

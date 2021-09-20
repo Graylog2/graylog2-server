@@ -29,6 +29,8 @@ public interface Journal {
 
     void markJournalOffsetCommitted(long offset);
 
+    void flush();
+
     class Entry {
         private final byte[] idBytes;
         private final byte[] messageBytes;

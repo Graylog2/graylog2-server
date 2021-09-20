@@ -20,11 +20,7 @@ import { mount } from 'wrappedEnzyme';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 
 import { createHandlerFor } from './ActionHandler';
-import type {
-  ActionComponentProps,
-  ActionComponents, ActionDefinition,
-  ActionHandler,
-} from './ActionHandler';
+import type { ActionComponentProps, ActionComponents, ActionDefinition } from './ActionHandler';
 
 describe('ActionHandler', () => {
   it('returns the handler for a function-based definition', () => {
@@ -43,13 +39,13 @@ describe('ActionHandler', () => {
   it('generates a handler from a component-based definition', () => {
     const setState = jest.fn();
     const setActionComponents = jest.fn((fn) => setState(fn({})));
-    const actionDefinition: ActionDefinition = {
+    const actionDefinition: ActionDefinition<{}> = {
       type: 'dummy-action',
       title: 'A Dummy Action',
       component: () => <div>Hello world!</div>,
       resetFocus: false,
     };
-    const handler: ActionHandler = createHandlerFor(actionDefinition, setActionComponents);
+    const handler = createHandlerFor(actionDefinition, setActionComponents);
 
     expect(handler).toBeDefined();
 
@@ -76,13 +72,13 @@ describe('ActionHandler', () => {
   it('supplied onClose removes component from state', () => {
     const setState = jest.fn();
     const setActionComponents = jest.fn((fn) => setState(fn({})));
-    const actionDefinition: ActionDefinition = {
+    const actionDefinition: ActionDefinition<{}> = {
       type: 'dummy-action',
       title: 'A Dummy Action',
       component: () => <div>Hello world!</div>,
       resetFocus: false,
     };
-    const handler: ActionHandler = createHandlerFor(actionDefinition, setActionComponents);
+    const handler = createHandlerFor(actionDefinition, setActionComponents);
 
     return handler({ queryId: 'foo', field: 'bar', value: 42, type: FieldType.Unknown, contexts: {} })
       .then(() => {
