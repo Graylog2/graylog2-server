@@ -19,6 +19,7 @@ package org.graylog.scheduler;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import com.mongodb.BasicDBObject;
+import com.mongodb.DuplicateKeyException;
 import one.util.streamex.StreamEx;
 import org.bson.types.ObjectId;
 import org.graylog.scheduler.clock.JobSchedulerClock;
@@ -192,6 +193,29 @@ public class DBJobTriggerService {
         }
 
         return db.insert(trigger).getSavedObject();
+    }
+
+    public void saveSingleton(JobTriggerDto trigger) {
+        requireNonNull(trigger, "trigger cannot be null");
+
+        if (trigger.id() == null) {
+            throw new IllegalArgumentException("Unique triggers must have a fixed ID");
+        }
+
+        try {
+            db.insert(trigger).getSavedObject();
+        } catch (DuplicateKeyException e) {
+            // the trigger exists, but it may be completed
+            // in that case, reset it (or create a new one if it was deleted in the meantime)
+            DBQuery.Query query = DBQuery.and(
+                    DBQuery.is(FIELD_ID, trigger.id()),
+                    DBQuery.is(FIELD_STATUS, JobTriggerStatus.COMPLETE));
+            try {
+                db.findAndModify(query, null, null, false, trigger, false, true);
+            } catch (DuplicateKeyException f) {
+                // ok, some other process created the trigger in the meantime
+            }
+        }
     }
 
     /**

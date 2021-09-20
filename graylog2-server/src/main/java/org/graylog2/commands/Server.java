@@ -39,6 +39,7 @@ import org.graylog.plugins.views.ViewsBindings;
 import org.graylog.plugins.views.ViewsConfig;
 import org.graylog.scheduler.JobSchedulerConfiguration;
 import org.graylog.scheduler.JobSchedulerModule;
+import org.graylog.scheduler.SystemJobsModule;
 import org.graylog.security.SecurityModule;
 import org.graylog2.Configuration;
 import org.graylog2.alerts.AlertConditionBindings;
@@ -171,7 +172,8 @@ public class Server extends ServerBootstrap {
                 new FreeEnterpriseModule(),
                 new GRNTypesModule(),
                 new SecurityModule(),
-                new PrometheusMetricsModule()
+                new PrometheusMetricsModule(),
+                new SystemJobsModule()
         );
 
         return modules.build();

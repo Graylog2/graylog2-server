@@ -28,6 +28,12 @@ import org.apache.shiro.session.ExpiredSessionException;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.mgt.DefaultSessionKey;
 import org.apache.shiro.session.mgt.SessionManager;
+import org.graylog.scheduler.DBJobDefinitionService;
+import org.graylog.scheduler.DBJobTriggerService;
+import org.graylog.scheduler.FixedIDs;
+import org.graylog.scheduler.JobDefinitionDto;
+import org.graylog.scheduler.JobTriggerDto;
+import org.graylog.scheduler.schedule.OnceJobSchedule;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
@@ -77,6 +83,8 @@ public class UserSessionTerminationService extends AbstractIdleService {
     private final UserService userService;
     private final ServerStatus serverStatus;
     private final EventBus eventBus;
+    private final DBJobTriggerService jobTriggerService;
+    private final DBJobDefinitionService jobDefinitionService;
 
     @Inject
     public UserSessionTerminationService(MongoDbSessionDAO sessionDao,
@@ -85,7 +93,7 @@ public class UserSessionTerminationService extends AbstractIdleService {
                                          ClusterConfigService clusterConfigService,
                                          UserService userService,
                                          ServerStatus serverStatus,
-                                         EventBus eventBus) {
+                                         EventBus eventBus, DBJobTriggerService jobTriggerService, DBJobDefinitionService jobDefinitionService) {
         this.sessionDao = sessionDao;
         this.securityManager = securityManager;
         this.clusterConfigService = clusterConfigService;
@@ -93,6 +101,8 @@ public class UserSessionTerminationService extends AbstractIdleService {
         this.userService = userService;
         this.serverStatus = serverStatus;
         this.eventBus = eventBus;
+        this.jobTriggerService = jobTriggerService;
+        this.jobDefinitionService = jobDefinitionService;
     }
 
     // Listens on the event bus to terminate users sessions when a user gets disabled or deleted.
@@ -107,32 +117,8 @@ public class UserSessionTerminationService extends AbstractIdleService {
         }
     }
 
-    @Override
-    protected void startUp() throws Exception {
-        try {
-            runGlobalSessionTermination();
-        } catch (Exception e) {
-            LOG.error("Couldn't run global session termination", e);
-        }
-
-        eventBus.register(this);
-    }
-
-    @Override
-    protected void shutDown() throws Exception {
-        eventBus.unregister(this);
-    }
-
-    private boolean isNotPrimaryNode() {
-        return !serverStatus.hasCapability(ServerStatus.Capability.MASTER);
-    }
-
     // Terminates all active user sessions when the TERMINATION_REVISION has been bumped.
-    private void runGlobalSessionTermination() {
-        if (isNotPrimaryNode()) {
-            LOG.debug("Only run on the primary node to avoid concurrent session termination");
-            return;
-        }
+    public void runGlobalSessionTermination() {
 
         final GlobalTerminationRevisionConfig globalTerminationRevisionConfig = clusterConfigService.getOrDefault(
                 GlobalTerminationRevisionConfig.class,
@@ -152,6 +138,40 @@ public class UserSessionTerminationService extends AbstractIdleService {
 
         LOG.info("Globally terminated {} session(s)", terminatedSessions);
         clusterConfigService.write(GlobalTerminationRevisionConfig.withCurrentRevision());
+    }
+
+
+    @Override
+    protected void startUp() throws Exception {
+        try {
+            scheduleGlobalSessionTermination();
+        } catch (Exception e) {
+            LOG.error("Couldn't run global session termination", e);
+        }
+
+        eventBus.register(this);
+    }
+
+    @Override
+    protected void shutDown() throws Exception {
+        eventBus.unregister(this);
+    }
+
+    private void scheduleGlobalSessionTermination() {
+
+        // TODO: no need to save this in mongo. Use some kind of in-memory system job definitions
+        final JobDefinitionDto jobDefinition = jobDefinitionService.save(JobDefinitionDto.builder()
+                .id(FixedIDs.SESSION_TERMINATION)
+                .title("user session termination")
+                .description("terminates a users' sessions")
+                .config(new UserSessionTerminationJob.JobDefinitionConfig())
+                .build());
+
+        jobTriggerService.saveSingleton(JobTriggerDto.builder()
+                .id(FixedIDs.SESSION_TERMINATION)
+                .jobDefinitionId(jobDefinition.id())
+                .schedule(OnceJobSchedule.create())
+                .build());
     }
 
     private void terminateSessionsForUser(User user) {

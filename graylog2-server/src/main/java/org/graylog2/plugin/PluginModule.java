@@ -271,9 +271,9 @@ public abstract class PluginModule extends Graylog2Module {
     }
 
     protected void addSchedulerJob(String name,
-                                 Class<? extends Job> jobClass,
-                                 Class<? extends Job.Factory> factoryClass,
-                                 Class<? extends JobDefinitionConfig> configClass) {
+                                   Class<? extends Job> jobClass,
+                                   Class<? extends Job.Factory> factoryClass,
+                                   Class<? extends JobDefinitionConfig> configClass) {
         addSchedulerJob(name, jobClass, factoryClass, configClass, null);
     }
 
