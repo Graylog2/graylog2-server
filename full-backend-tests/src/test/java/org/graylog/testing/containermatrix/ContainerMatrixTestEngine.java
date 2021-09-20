@@ -20,8 +20,12 @@ import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfi
 import org.graylog.testing.containermatrix.descriptors.ContainerMatrixEngineDescriptor;
 import org.graylog.testing.containermatrix.descriptors.ContainerMatrixTestClassDescriptor;
 import org.graylog.testing.containermatrix.descriptors.ContainerMatrixTestsDescriptor;
+import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
+import org.junit.jupiter.api.extension.ConditionEvaluationResult;
 import org.junit.platform.commons.support.AnnotationSupport;
 import org.junit.platform.commons.support.ReflectionSupport;
+import org.junit.platform.commons.util.Preconditions;
 import org.junit.platform.commons.util.ReflectionUtils;
 import org.junit.platform.engine.EngineDiscoveryRequest;
 import org.junit.platform.engine.ExecutionRequest;
@@ -42,10 +46,66 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
 
+import static java.lang.String.format;
+import static org.junit.jupiter.api.extension.ConditionEvaluationResult.disabled;
+import static org.junit.jupiter.api.extension.ConditionEvaluationResult.enabled;
+
 public class ContainerMatrixTestEngine implements TestEngine {
     private static final Logger LOG = LoggerFactory.getLogger(ContainerMatrixTestEngine.class);
 
     private static final String ENGINE_ID = "graylog-container-matrix-tests";
+
+    protected static ConditionEvaluationResult evaluate(DisabledIfEnvironmentVariable annotation) {
+        String name = annotation.named().trim();
+        String regex = annotation.matches();
+        Preconditions.notBlank(name, () -> "The 'named' attribute must not be blank in " + annotation);
+        Preconditions.notBlank(regex, () -> "The 'matches' attribute must not be blank in " + annotation);
+        String actual = getEnvironmentVariable(name);
+
+        // Nothing to match against?
+        if (actual == null) {
+            return enabled(format("Environment variable [%s] does not exist", name));
+        }
+
+        if (actual.matches(regex)) {
+            return disabled(format("Environment variable [%s] with value [%s] matches regular expression [%s]", name,
+                    actual, regex), annotation.disabledReason());
+        }
+        // else
+        return enabled(format("Environment variable [%s] with value [%s] does not match regular expression [%s]", name,
+                actual, regex));
+    }
+
+    protected static ConditionEvaluationResult evaluate(EnabledIfEnvironmentVariable annotation) {
+
+        String name = annotation.named().trim();
+        String regex = annotation.matches();
+        Preconditions.notBlank(name, () -> "The 'named' attribute must not be blank in " + annotation);
+        Preconditions.notBlank(regex, () -> "The 'matches' attribute must not be blank in " + annotation);
+        String actual = getEnvironmentVariable(name);
+
+        // Nothing to match against?
+        if (actual == null) {
+            return disabled(format("Environment variable [%s] does not exist", name), annotation.disabledReason());
+        }
+        if (actual.matches(regex)) {
+            return enabled(format("Environment variable [%s] with value [%s] matches regular expression [%s]", name,
+                    actual, regex));
+        }
+        return disabled(format("Environment variable [%s] with value [%s] does not match regular expression [%s]", name,
+                actual, regex), annotation.disabledReason());
+    }
+
+    /**
+     * Get the value of the named environment variable.
+     *
+     * <p>The default implementation simply delegates to
+     * {@link System#getenv(String)}. Can be overridden in a subclass for
+     * testing purposes.
+     */
+    protected static String getEnvironmentVariable(String name) {
+        return System.getenv(name);
+    }
 
     private static final Predicate<Class<?>> IS_CANDIDATE = classCandidate -> {
         if (ReflectionUtils.isAbstract(classCandidate)) {
@@ -54,7 +114,20 @@ public class ContainerMatrixTestEngine implements TestEngine {
         if (ReflectionUtils.isPrivate(classCandidate)) {
             return false;
         }
-        return AnnotationSupport.isAnnotated(classCandidate, ContainerMatrixTestsConfiguration.class);
+        if (AnnotationSupport.isAnnotated(classCandidate, ContainerMatrixTestsConfiguration.class)) {
+            if (AnnotationSupport.isAnnotated(classCandidate, EnabledIfEnvironmentVariable.class)) {
+                return AnnotationSupport
+                        .findAnnotation(classCandidate, EnabledIfEnvironmentVariable.class).map(a -> !evaluate(a).isDisabled())
+                        .orElseThrow(() -> new RuntimeException("Annotation should exist - it has been checked for the given class before..."));
+            }
+            if (AnnotationSupport.isAnnotated(classCandidate, DisabledIfEnvironmentVariable.class)) {
+                return AnnotationSupport
+                        .findAnnotation(classCandidate, DisabledIfEnvironmentVariable.class).map(a -> !evaluate(a).isDisabled())
+                        .orElseThrow(() -> new RuntimeException("Annotation should exist - it has been checked for the given class before..."));
+            }
+            return true;
+        }
+        return false;
     };
 
     @Override
