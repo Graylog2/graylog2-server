@@ -24,15 +24,29 @@ import { DataTable, Timestamp } from 'components/common';
 import { MetricContainer, CounterRate } from 'components/metrics';
 import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';
+import { RuleType, MetricsConfigType, RulesStoreState } from 'stores/rules/RulesStore';
+import { Store } from 'stores/StoreTypes';
 
 import RuleMetricsConfigContainer from './RuleMetricsConfigContainer';
 
 const { RulesActions, RulesStore } = CombinedProvider.get('Rules');
 
-class RuleList extends React.Component {
+type Props = {
+  rules: Array<RuleType>,
+  metricsConfig?: MetricsConfigType,
+  onDelete: (RuleType) => void,
+};
+
+type State = {
+  openMetricsConfig: boolean,
+};
+
+class RuleList extends React.Component<Props, State> {
   static propTypes = {
     rules: PropTypes.array.isRequired,
-    metricsConfig: PropTypes.object,
+    metricsConfig: PropTypes.exact({
+      metrics_enabled: PropTypes.bool.isRequired,
+    }),
     onDelete: PropTypes.func.isRequired,
   };
 
@@ -40,9 +54,13 @@ class RuleList extends React.Component {
     metricsConfig: undefined,
   };
 
-  state = {
-    openMetricsConfig: false,
-  };
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      openMetricsConfig: false,
+    };
+  }
 
   componentDidMount() {
     RulesActions.loadMetricsConfig();
@@ -53,8 +71,10 @@ class RuleList extends React.Component {
   };
 
   _ruleInfoFormatter = (rule) => {
+    const { onDelete } = this.props;
+
     const actions = [
-      <Button key="delete" bsStyle="primary" bsSize="xsmall" onClick={this.props.onDelete(rule)} title="Delete rule">
+      <Button key="delete" bsStyle="primary" bsSize="xsmall" onClick={onDelete(rule)} title="Delete rule">
         Delete
       </Button>,
       <span key="space">&nbsp;</span>,
@@ -131,6 +151,6 @@ class RuleList extends React.Component {
   }
 }
 
-export default connect(RuleList, { rules: RulesStore }, ({ rules }) => {
-  return { metricsConfig: rules ? rules.metricsConfig : rules };
+export default connect(RuleList, { rules: RulesStore as Store<RulesStoreState> }, ({ rules }) => {
+  return { metricsConfig: rules.metricsConfig };
 });
