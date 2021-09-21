@@ -18,10 +18,10 @@ import React, { useEffect, useRef, useState } from 'react';
 
 import { LinkContainer } from 'components/graylog/router';
 import { Row, Col, Button } from 'components/graylog';
-import { SearchForm, PaginatedList, DocumentTitle, PageHeader } from 'components/common';
+import { SearchForm, PaginatedList, DocumentTitle, PageHeader, Spinner } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
-import RulesComponent from 'components/rules/RulesComponent';
+import RuleList from 'components/rules/RuleList';
 import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';
 import { Pagination, DEFAULT_PAGINATION } from 'stores/PaginationTypes';
@@ -47,22 +47,22 @@ const _loadData = (pagination: Pagination, setIsLoading, setPaginatedRules) => {
 };
 
 const RulesPage = () => {
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isDataLoading, setIsDataLoading] = useState<boolean>(false);
   const [pagination, setPagination] = useState<Pagination>(DEFAULT_PAGINATION);
   const resetSearchIsLoading = useRef<() => void | undefined>();
   const [paginatedRules, setPaginatedRules] = useState<PaginatedRules | undefined>();
   const { list: rules, pagination: { total = 0 } = {} } = paginatedRules ?? {};
 
   useEffect(() => {
-    _loadData(pagination, setIsLoading, setPaginatedRules);
+    _loadData(pagination, setIsDataLoading, setPaginatedRules);
   }, [pagination]);
 
   useEffect(() => {
-    if (!isLoading && resetSearchIsLoading.current) {
+    if (!isDataLoading && resetSearchIsLoading.current) {
       resetSearchIsLoading.current();
       resetSearchIsLoading.current = undefined;
     }
-  }, [isLoading, resetSearchIsLoading]);
+  }, [isDataLoading, resetSearchIsLoading]);
 
   const handlePageChange = (newPage, newPerPage) => {
     setPagination({ ...pagination, page: newPage, perPage: newPerPage });
@@ -81,11 +81,13 @@ const RulesPage = () => {
     return () => {
       if (window.confirm(`Do you really want to delete rule "${rule.title}"?`)) {
         RulesActions.delete(rule).then(() => {
-          _loadData(pagination, setIsLoading, setPaginatedRules);
+          _loadData(pagination, setIsDataLoading, setPaginatedRules);
         });
       }
     };
   };
+
+  const isLoading = !rules;
 
   return (
     <DocumentTitle title="Pipeline rules">
@@ -118,20 +120,24 @@ const RulesPage = () => {
 
         <Row className="content">
           <Col md={12}>
-            <div>
-              <Row className="row-sm">
-                <Col md={2}>
-                  <SearchForm onSearch={handleSearch} onReset={handleReset} useLoadingState />
-                </Col>
-              </Row>
-              <Row>
-                <Col md={12}>
-                  <PaginatedList onChange={handlePageChange} totalItems={total}>
-                    <RulesComponent rules={rules} onDelete={handleDelete} />
-                  </PaginatedList>
-                </Col>
-              </Row>
-            </div>
+            {isLoading ? (
+              <Spinner />
+            ) : (
+              <>
+                <Row className="row-sm">
+                  <Col md={2}>
+                    <SearchForm onSearch={handleSearch} onReset={handleReset} useLoadingState />
+                  </Col>
+                </Row>
+                <Row>
+                  <Col md={12}>
+                    <PaginatedList onChange={handlePageChange} totalItems={total}>
+                      <RuleList rules={rules} onDelete={handleDelete} />
+                    </PaginatedList>
+                  </Col>
+                </Row>
+              </>
+            )}
           </Col>
         </Row>
       </span>
