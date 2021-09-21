@@ -27,9 +27,15 @@ import RulesComponent from 'components/rules/RulesComponent';
 import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';
 
-import RulesPageStyle from './RulesPage.css';
-
 const { RulesStore, RulesActions } = CombinedProvider.get('Rules');
+
+const CreateRuleButton = () => (
+  <div className="pull-right">
+    <LinkContainer to={Routes.SYSTEM.PIPELINES.RULE('new')}>
+      <Button bsStyle="success">Create Rule</Button>
+    </LinkContainer>
+  </div>
+);
 
 const RulesPage = createReactClass({
   displayName: 'RulesPage',
@@ -84,18 +90,10 @@ const RulesPage = createReactClass({
   },
 
   render() {
-    const addRuleButton = (
-      <div className={RulesPageStyle.addButton}>
-        <LinkContainer to={Routes.SYSTEM.PIPELINES.RULE('new')}>
-          <Button bsStyle="success">Create Rule</Button>
-        </LinkContainer>
-      </div>
-    );
-
     return (
       <DocumentTitle title="Pipeline rules">
         <span>
-          <PageHeader title="Pipeline Rules">
+          <PageHeader title="Pipeline Rules" subactions={<CreateRuleButton />}>
             <span>
               Rules are a way of applying changes to messages in Graylog. A rule consists of a condition and a list of actions.
               Graylog evaluates the condition against a message and executes the actions if the condition is satisfied.
@@ -127,9 +125,6 @@ const RulesPage = createReactClass({
                 <Row className="row-sm">
                   <Col md={2}>
                     <SearchForm onSearch={this._onSearch} onReset={this._onReset} useLoadingState />
-                  </Col>
-                  <Col>
-                    {addRuleButton}
                   </Col>
                 </Row>
                 <Row>
