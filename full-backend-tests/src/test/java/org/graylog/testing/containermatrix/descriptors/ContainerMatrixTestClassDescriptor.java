@@ -17,6 +17,8 @@
 package org.graylog.testing.containermatrix.descriptors;
 
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
+import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.junit.platform.commons.support.AnnotationSupport;
 import org.junit.platform.commons.util.ReflectionUtils;
 import org.junit.platform.engine.TestDescriptor;
@@ -25,6 +27,8 @@ import org.junit.platform.engine.support.descriptor.ClassSource;
 
 import java.lang.reflect.Method;
 import java.util.function.Predicate;
+
+import static org.graylog.testing.containermatrix.ContainerMatrixTestEngine.evaluate;
 
 public class ContainerMatrixTestClassDescriptor extends AbstractTestDescriptor {
     private final Class<?> testClass;
@@ -51,9 +55,25 @@ public class ContainerMatrixTestClassDescriptor extends AbstractTestDescriptor {
         return testClass.getSimpleName().replaceAll("_", " ");
     }
 
+    private static final Predicate<Method> IS_CANDIDATE = method -> {
+        if (AnnotationSupport.isAnnotated(method, ContainerMatrixTest.class)) {
+            if (AnnotationSupport.isAnnotated(method, EnabledIfEnvironmentVariable.class)) {
+                return AnnotationSupport
+                        .findAnnotation(method, EnabledIfEnvironmentVariable.class).map(a -> !evaluate(a).isDisabled())
+                        .orElseThrow(() -> new RuntimeException("Annotation should exist - it has been checked for the given class before..."));
+            }
+            if (AnnotationSupport.isAnnotated(method, DisabledIfEnvironmentVariable.class)) {
+                return AnnotationSupport
+                        .findAnnotation(method, DisabledIfEnvironmentVariable.class).map(a -> !evaluate(a).isDisabled())
+                        .orElseThrow(() -> new RuntimeException("Annotation should exist - it has been checked for the given class before..."));
+            }
+            return true;
+        }
+        return false;
+    };
+
     private void addAllChildren() {
-        Predicate<Method> isTestMethod = method -> AnnotationSupport.isAnnotated(method, ContainerMatrixTest.class);
-        ReflectionUtils.findMethods(testClass, isTestMethod).stream()
+        ReflectionUtils.findMethods(testClass, IS_CANDIDATE).stream()
                 .map(method -> new ContainerMatrixTestMethodDescriptor(method, testClass, this))
                 .forEach(this::addChild);
     }

@@ -55,7 +55,7 @@ public class ContainerMatrixTestEngine implements TestEngine {
 
     private static final String ENGINE_ID = "graylog-container-matrix-tests";
 
-    protected static ConditionEvaluationResult evaluate(DisabledIfEnvironmentVariable annotation) {
+    public static ConditionEvaluationResult evaluate(DisabledIfEnvironmentVariable annotation) {
         String name = annotation.named().trim();
         String regex = annotation.matches();
         Preconditions.notBlank(name, () -> "The 'named' attribute must not be blank in " + annotation);
@@ -76,7 +76,7 @@ public class ContainerMatrixTestEngine implements TestEngine {
                 actual, regex));
     }
 
-    protected static ConditionEvaluationResult evaluate(EnabledIfEnvironmentVariable annotation) {
+    public static ConditionEvaluationResult evaluate(EnabledIfEnvironmentVariable annotation) {
 
         String name = annotation.named().trim();
         String regex = annotation.matches();
