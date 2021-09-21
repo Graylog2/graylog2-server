@@ -15,12 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import Reflux from 'reflux';
+import Immutable from 'immutable';
 
 import UserNotification from 'util/UserNotification';
 import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import CombinedProvider from 'injection/CombinedProvider';
+import { PaginatedList, PaginatedListJSON, Pagination } from 'stores/PaginationTypes';
+import PaginationURL from 'util/PaginationURL';
 
 const { PipelinesActions } = CombinedProvider.get('Pipelines');
 
@@ -39,6 +42,17 @@ export type StageType = {
   stage: number,
   match: string,
   rules: [string],
+};
+
+export type PaginatedPipelineResponse = PaginatedListJSON & {
+  pipelines: Array<PipelineType>,
+};
+
+export type PaginatedPipelines = PaginatedList<PipelineType>;
+
+const listFailCallback = (error) => {
+  UserNotification.error(`Fetching pipelines failed with status: ${error.message}`,
+    'Could not retrieve processing pipelines');
 };
 
 const PipelinesStore = Reflux.createStore({
@@ -66,17 +80,35 @@ const PipelinesStore = Reflux.createStore({
   },
 
   list() {
-    const failCallback = (error) => {
-      UserNotification.error(`Fetching pipelines failed with status: ${error.message}`,
-        'Could not retrieve processing pipelines');
-    };
-
     const url = qualifyUrl(ApiRoutes.PipelinesController.list().url);
 
     return fetch('GET', url).then((response) => {
       this.pipelines = response;
       this.trigger({ pipelines: response });
-    }, failCallback);
+    }, listFailCallback);
+  },
+
+  listPaginated({
+    page,
+    perPage,
+    query,
+  }: Pagination): Promise<PaginatedPipelines> {
+    const url = PaginationURL(ApiRoutes.PipelinesController.paginatedList().url, page, perPage, query);
+
+    const promise = fetch('GET', qualifyUrl(url)).then((response: PaginatedPipelineResponse) => ({
+      list: Immutable.List(response.pipelines),
+      pagination: {
+        page: response.page,
+        perPage: response.per_page,
+        query: response.query,
+        count: response.count,
+        total: response.total,
+      },
+    }), listFailCallback);
+
+    PipelinesActions.listPaginated.promise(promise);
+
+    return promise;
   },
 
   get(pipelineId) {
@@ -149,13 +181,17 @@ const PipelinesStore = Reflux.createStore({
 
     const url = qualifyUrl(ApiRoutes.PipelinesController.delete(pipelineId).url);
 
-    return fetch('DELETE', url).then(() => {
+    const promise = fetch('DELETE', url).then(() => {
       const updatedPipelines = this.pipelines || [];
 
       this.pipelines = updatedPipelines.filter((el) => el.id !== pipelineId);
       this.trigger({ pipelines: this.pipelines });
       UserNotification.success(`Pipeline "${pipelineId}" deleted successfully`);
     }, failCallback);
+
+    PipelinesActions.delete.promise(promise);
+
+    return promise;
   },
   parse(pipelineSource, callback) {
     const url = qualifyUrl(ApiRoutes.PipelinesController.parse().url);
