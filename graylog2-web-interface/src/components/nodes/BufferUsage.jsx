@@ -15,10 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import PropTypes from 'prop-types';
-import React from 'react';
-// eslint-disable-next-line no-restricted-imports
-import createReactClass from 'create-react-class';
-import Reflux from 'reflux';
+import * as React from 'react';
+import { useEffect } from 'react';
 import styled from 'styled-components';
 
 import { LinkContainer } from 'components/graylog/router';
@@ -28,6 +26,7 @@ import ActionsProvider from 'injection/ActionsProvider';
 import Routes from 'routing/Routes';
 import NumberUtils from 'util/NumberUtils';
 import { Spinner } from 'components/common';
+import { useStore } from 'stores/connect';
 
 const MetricsStore = StoreProvider.getStore('Metrics');
 const MetricsActions = ActionsProvider.getActions('Metrics');
@@ -41,74 +40,61 @@ const StyledProgressBar = styled(ProgressBar)`
   margin-bottom: 5px;
 `;
 
-const BufferUsage = createReactClass({
-  displayName: 'BufferUsage',
+const _metricPrefix = (bufferType) => `org.graylog2.buffers.${bufferType}`;
 
-  propTypes: {
-    bufferType: PropTypes.string.isRequired,
-    nodeId: PropTypes.string.isRequired,
-    title: PropTypes.node.isRequired,
-  },
+const _metricFilter = (bufferType) => `org\\.graylog2\\.buffers\\.${bufferType}\\.|${bufferType}buffer`;
 
-  mixins: [Reflux.connect(MetricsStore)],
-
-  UNSAFE_componentWillMount() {
-    const { nodeId } = this.props;
-    const prefix = this._metricPrefix();
+const BufferUsage = ({ nodeId, bufferType, title }) => {
+  useEffect(() => {
+    const prefix = _metricPrefix(bufferType);
     const metricNames = [
       `${prefix}.usage`,
       `${prefix}.size`,
     ];
 
     metricNames.forEach((metricName) => MetricsActions.add(nodeId, metricName));
-  },
 
-  _metricPrefix() {
-    const { bufferType } = this.props;
+    return () => metricNames.forEach((metricName) => MetricsActions.remove(nodeId, metricName));
+  }, [nodeId, bufferType]);
 
-    return `org.graylog2.buffers.${bufferType}`;
-  },
+  const { metrics } = useStore(MetricsStore);
 
-  _metricFilter() {
-    const { bufferType } = this.props;
+  if (!metrics) {
+    return <Spinner />;
+  }
 
-    return `org\\.graylog2\\.buffers\\.${bufferType}\\.|${bufferType}buffer`;
-  },
+  const prefix = _metricPrefix(bufferType);
 
-  render() {
-    const { metrics } = this.state;
+  const usageMetric = metrics[nodeId][`${prefix}.usage`];
+  const usage = usageMetric ? usageMetric.metric.value : NaN;
+  const sizeMetric = metrics[nodeId][`${prefix}.size`];
+  const size = sizeMetric ? sizeMetric.metric.value : NaN;
+  // eslint-disable-next-line no-restricted-globals
+  const usagePercentage = ((!isNaN(usage) && !isNaN(size)) ? usage / size : 0);
+  const percentLabel = NumberUtils.formatPercentage(usagePercentage);
 
-    if (!metrics) {
-      return <Spinner />;
-    }
+  return (
+    <div>
+      <LinkContainer to={Routes.filtered_metrics(nodeId, _metricFilter(bufferType))}>
+        <Button bsSize="xsmall" className="pull-right">Metrics</Button>
+      </LinkContainer>
+      <h3>{title}</h3>
+      <NodeBufferUsage>
+        <StyledProgressBar bars={[{
+          value: usagePercentage * 100,
+          bsStyle: 'warning',
+          label: percentLabel,
+        }]} />
+      </NodeBufferUsage>
+      <span><strong>{usage} messages</strong> in {title.toLowerCase()}, {percentLabel} utilized.</span>
+    </div>
+  );
+};
 
-    const { nodeId, title } = this.props;
-    const prefix = this._metricPrefix();
-    const usageMetric = metrics[nodeId][`${prefix}.usage`];
-    const usage = usageMetric ? usageMetric.metric.value : NaN;
-    const sizeMetric = metrics[nodeId][`${prefix}.size`];
-    const size = sizeMetric ? sizeMetric.metric.value : NaN;
-    // eslint-disable-next-line no-restricted-globals
-    const usagePercentage = ((!isNaN(usage) && !isNaN(size)) ? usage / size : 0);
-    const percentLabel = NumberUtils.formatPercentage(usagePercentage);
-
-    return (
-      <div>
-        <LinkContainer to={Routes.filtered_metrics(nodeId, this._metricFilter())}>
-          <Button bsSize="xsmall" className="pull-right">Metrics</Button>
-        </LinkContainer>
-        <h3>{title}</h3>
-        <NodeBufferUsage>
-          <StyledProgressBar bars={[{
-            value: usagePercentage * 100,
-            bsStyle: 'warning',
-            label: percentLabel,
-          }]} />
-        </NodeBufferUsage>
-        <span><strong>{usage} messages</strong> in {title.toLowerCase()}, {percentLabel} utilized.</span>
-      </div>
-    );
-  },
-});
+BufferUsage.propTypes = {
+  bufferType: PropTypes.string.isRequired,
+  nodeId: PropTypes.string.isRequired,
+  title: PropTypes.node.isRequired,
+};
 
 export default BufferUsage;
