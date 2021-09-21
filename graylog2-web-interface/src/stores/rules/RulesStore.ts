@@ -23,6 +23,7 @@ import PaginationURL from 'util/PaginationURL';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import CombinedProvider from 'injection/CombinedProvider';
+import { Pagination, PaginatedList, PaginatedListJSON } from 'stores/PaginationTypes';
 
 const { RulesActions } = CombinedProvider.get('Rules');
 
@@ -36,6 +37,12 @@ export type RuleType = {
   errors?: [],
 };
 
+export type PaginatedRulesResponse = PaginatedListJSON & {
+  rules: Array<RuleType>,
+};
+
+export type PaginatedRules = PaginatedList<RuleType>;
+
 const RulesStore = Reflux.createStore({
   listenables: [RulesActions],
   rules: undefined,
@@ -47,13 +54,6 @@ const RulesStore = Reflux.createStore({
       rules: this.rules,
       functionDescriptors: this.functionDescriptors,
       metricsConfig: this.metricsConfig,
-      pagination: {
-        page: 1,
-        perPage: 10,
-        total: 0,
-        count: 0,
-        query: '',
-      },
     };
   },
 
@@ -95,28 +95,24 @@ const RulesStore = Reflux.createStore({
     }, failCallback);
   },
 
-  listPage(page, perPage, query) {
+  listPage({ page, perPage, query }: Pagination): Promise<PaginatedRules> {
     const url = PaginationURL(ApiRoutes.RulesController.listPage().url, page, perPage, query);
-    const promise = fetch('GET', qualifyUrl(url));
-
-    promise.then((response) => {
-      this.pagination = {
-        count: response.pagination.count,
-        total: response.pagination.total,
-        page: response.pagination.page,
-        perPage: response.pagination.per_page,
-        query: response.query,
-      };
-
-      this.trigger({
-        rules: response.rules,
-        pagination: this.pagination,
+    const promise = fetch('GET', qualifyUrl(url))
+      .then((response: PaginatedRulesResponse) => ({
+        list: response.rules,
+        pagination: {
+          count: response.count,
+          total: response.total,
+          page: response.page,
+          perPage: response.per_page,
+          query: response.query,
+        },
+      }),
+      (error) => {
+        if (!error.additional || error.additional.status !== 404) {
+          UserNotification.error(`Loading rules list failed with status: ${error}`, 'Could not load rules.');
+        }
       });
-    }, (error) => {
-      if (!error.additional || error.additional.status !== 404) {
-        UserNotification.error(`Loading rules list failed with status: ${error}`, 'Could not load rules.');
-      }
-    });
 
     RulesActions.listPage.promise(promise);
 
