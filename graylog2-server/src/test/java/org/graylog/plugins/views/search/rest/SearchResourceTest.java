@@ -171,7 +171,7 @@ public class SearchResourceTest {
 
         final Search search = mockExistingSearch();
 
-        this.searchResource.executeQuery(search.id(), Collections.emptyMap());
+        this.searchResource.executeQuery(search.id(), ExecutionState.empty());
 
         final ArgumentCaptor<String> usernameCaptor = ArgumentCaptor.forClass(String.class);
         verify(searchJobService, times(1)).create(eq(search), usernameCaptor.capture());
@@ -185,7 +185,7 @@ public class SearchResourceTest {
 
         final Search search = mockExistingSearch();
 
-        final Response response = this.searchResource.executeQuery(search.id(), Collections.emptyMap());
+        final Response response = this.searchResource.executeQuery(search.id(), ExecutionState.empty());
 
         final ArgumentCaptor<SearchJobExecutionEvent> eventCaptor = ArgumentCaptor.forClass(SearchJobExecutionEvent.class);
         verify(this.eventBus, times(1)).post(eventCaptor.capture());
@@ -203,7 +203,7 @@ public class SearchResourceTest {
         throwGuardExceptionFor(search);
 
         try {
-            this.searchResource.executeQuery(search.id(), Collections.emptyMap());
+            this.searchResource.executeQuery(search.id(), ExecutionState.empty());
         } catch (ForbiddenException ignored) {}
 
         verify(this.eventBus, never()).post(any(SearchJobExecutionEvent.class));
@@ -256,14 +256,18 @@ public class SearchResourceTest {
     @Test
     public void executeQueryAppliesExecutionState() {
         final Search search = mockExistingSearch();
-        final Map<String, Object> executionState = ImmutableMap.of("foo", 42);
+
+        final ExecutionState.Builder builder = ExecutionState.builder();
+        builder.addAdditionalParameter("foo", 42);
+
 
         when(searchDbService.get(search.id())).thenReturn(Optional.of(search));
 
+        final ExecutionState executionState = builder.build();
         this.searchResource.executeQuery(search.id(), executionState);
 
         //noinspection unchecked
-        final ArgumentCaptor<Map<String, Object>> executionStateCaptor = ArgumentCaptor.forClass(Map.class);
+        final ArgumentCaptor<ExecutionState> executionStateCaptor = ArgumentCaptor.forClass(ExecutionState.class);
         verify(search, times(1)).applyExecutionState(any(), executionStateCaptor.capture());
 
         assertThat(executionStateCaptor.getValue()).isEqualTo(executionState);
