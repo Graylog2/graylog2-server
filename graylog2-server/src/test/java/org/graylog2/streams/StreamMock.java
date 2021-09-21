@@ -73,7 +73,7 @@ public class StreamMock implements Stream {
                 "index-set-id",
                 "title",
                 "description",
-                true,
+                true, true,
                 "prefix",
                 1,
                 0,
