@@ -21,7 +21,7 @@ import { act } from 'react-dom/test-utils';
 
 import { ScratchpadContext } from 'contexts/ScratchpadProvider';
 
-import Scratchpad from './Scratchpad';
+import Scratchpad from './index';
 
 const setScratchpadVisibility = jest.fn();
 
@@ -91,7 +91,7 @@ describe('<Scratchpad />', () => {
 
     fireEvent.change(textarea, { target: { value: 'foo' } });
 
-    await waitFor(() => expect(screen.getByText(/auto saved\./i)).toBeInTheDocument());
+    await screen.findByText(/auto saved\./i);
   });
 
   it('shows copied status', () => {
