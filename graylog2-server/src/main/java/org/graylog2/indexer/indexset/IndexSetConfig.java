@@ -18,6 +18,7 @@ package org.graylog2.indexer.indexset;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
@@ -56,14 +57,6 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
 
     private static final Duration DEFAULT_FIELD_TYPE_REFRESH_INTERVAL = Duration.standardSeconds(5L);
 
-    public static boolean isRegularIndex(@Nullable String templateType, boolean isWritable) {
-        // "isWritable == false" marks the restored-archive index set, which can also not be used as a default
-        return isWritable && (templateType == null || DEFAULT_INDEX_TEMPLATE_TYPE.equals(templateType));
-    }
-    public static boolean isRegularIndex(IndexSetConfig config) {
-        return isRegularIndex(config.indexTemplateType().orElse(null), config.isWritable());
-    }
-
     @JsonProperty("id")
     @Nullable
     @Id
@@ -80,6 +73,13 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
 
     @JsonProperty("writable")
     public abstract boolean isWritable();
+
+    /**
+     * Indicates whether this index set is intended to
+     * store messages ingested by user, not by the system
+     */
+    @JsonProperty("regular")
+    public abstract Optional<Boolean> isRegular();
 
     @JsonProperty(FIELD_INDEX_PREFIX)
     @NotBlank
@@ -144,11 +144,19 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
     @JsonProperty("field_type_refresh_interval")
     public abstract Duration fieldTypeRefreshInterval();
 
+    @JsonIgnore
+    public boolean isRegularIndex() {
+        final String indexTemplate = indexTemplateType().orElse(null);
+        return isWritable() && (indexTemplate == null || DEFAULT_INDEX_TEMPLATE_TYPE.equals(indexTemplate) ||
+                isRegular().orElse(false));
+    }
+
     @JsonCreator
     public static IndexSetConfig create(@Id @ObjectId @JsonProperty("_id") @Nullable String id,
                                         @JsonProperty("title") @NotBlank String title,
                                         @JsonProperty("description") @Nullable String description,
                                         @JsonProperty("writable") @Nullable Boolean isWritable,
+                                        @JsonProperty("regular") @Nullable Boolean isRegular,
                                         @JsonProperty(FIELD_INDEX_PREFIX) @Pattern(regexp = INDEX_PREFIX_REGEX) String indexPrefix,
                                         @JsonProperty("index_match_pattern") @Nullable String indexMatchPattern,
                                         @JsonProperty("index_wildcard") @Nullable String indexWildcard,
@@ -179,6 +187,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
                 .title(title)
                 .description(description)
                 .isWritable(writableValue)
+                .isRegular(isRegular)
                 .indexPrefix(indexPrefix)
                 .indexMatchPattern(indexMatchPattern)
                 .indexWildcard(indexWildcard)
@@ -198,58 +207,13 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
                 .build();
     }
 
-    public static IndexSetConfig create(String id,
-                                        String title,
-                                        String description,
-                                        boolean isWritable,
-                                        String indexPrefix,
-                                        int shards,
-                                        int replicas,
-                                        String rotationStrategyClass,
-                                        RotationStrategyConfig rotationStrategy,
-                                        String retentionStrategyClass,
-                                        RetentionStrategyConfig retentionStrategy,
-                                        ZonedDateTime creationDate,
-                                        String indexAnalyzer,
-                                        String indexTemplateName,
-                                        String indexTemplateType,
-                                        int indexOptimizationMaxNumSegments,
-                                        boolean indexOptimizationDisabled,
-                                        Duration fieldTypeRefreshInterval) {
-        return create(id, title, description, isWritable, indexPrefix, null, null, shards, replicas,
-                rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy, creationDate,
-                indexAnalyzer, indexTemplateName, indexTemplateType, indexOptimizationMaxNumSegments, indexOptimizationDisabled,
-                fieldTypeRefreshInterval);
-    }
-
-    public static IndexSetConfig create(String title,
-                                        String description,
-                                        boolean isWritable,
-                                        String indexPrefix,
-                                        int shards,
-                                        int replicas,
-                                        String rotationStrategyClass,
-                                        RotationStrategyConfig rotationStrategy,
-                                        String retentionStrategyClass,
-                                        RetentionStrategyConfig retentionStrategy,
-                                        ZonedDateTime creationDate,
-                                        String indexAnalyzer,
-                                        String indexTemplateName,
-                                        String indexTemplateType,
-                                        int indexOptimizationMaxNumSegments,
-                                        boolean indexOptimizationDisabled,
-                                        Duration fieldTypeRefreshInterval) {
-        return create(null, title, description, isWritable, indexPrefix, null, null, shards, replicas,
-                rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy, creationDate,
-                indexAnalyzer, indexTemplateName, indexTemplateType, indexOptimizationMaxNumSegments, indexOptimizationDisabled,
-                fieldTypeRefreshInterval);
-    }
 
     // Compatibility creator after field type refresh interval has been introduced
     public static IndexSetConfig create(String id,
                                         String title,
                                         String description,
                                         boolean isWritable,
+                                        Boolean isRegular,
                                         String indexPrefix,
                                         int shards,
                                         int replicas,
@@ -263,7 +227,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
                                         String indexTemplateType,
                                         int indexOptimizationMaxNumSegments,
                                         boolean indexOptimizationDisabled) {
-        return create(id, title, description, isWritable, indexPrefix, null, null, shards, replicas,
+        return create(id, title, description, isWritable, isRegular, indexPrefix, null, null, shards, replicas,
                 rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy, creationDate,
                 indexAnalyzer, indexTemplateName, indexTemplateType, indexOptimizationMaxNumSegments, indexOptimizationDisabled,
                 DEFAULT_FIELD_TYPE_REFRESH_INTERVAL);
@@ -273,6 +237,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
     public static IndexSetConfig create(String title,
                                         String description,
                                         boolean isWritable,
+                                        Boolean isRegular,
                                         String indexPrefix,
                                         int shards,
                                         int replicas,
@@ -286,7 +251,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
                                         String indexTemplateType,
                                         int indexOptimizationMaxNumSegments,
                                         boolean indexOptimizationDisabled) {
-        return create(null, title, description, isWritable, indexPrefix, null, null, shards, replicas,
+        return create(null, title, description, isWritable, isRegular, indexPrefix, null, null, shards, replicas,
                 rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy, creationDate,
                 indexAnalyzer, indexTemplateName, indexTemplateType, indexOptimizationMaxNumSegments, indexOptimizationDisabled,
                 DEFAULT_FIELD_TYPE_REFRESH_INTERVAL);
@@ -319,6 +284,8 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
         public abstract Builder description(String description);
 
         public abstract Builder isWritable(boolean isWritable);
+
+        public abstract Builder isRegular(@Nullable Boolean isRegular);
 
         public abstract Builder indexPrefix(String indexPrefix);
 

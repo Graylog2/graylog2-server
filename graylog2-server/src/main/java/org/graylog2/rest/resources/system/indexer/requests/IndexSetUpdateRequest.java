@@ -122,6 +122,7 @@ public abstract class IndexSetUpdateRequest {
                 .title(title())
                 .description(description())
                 .isWritable(isWritable())
+                .isRegular(oldConfig.isRegular().orElse(null))
                 .indexPrefix(oldConfig.indexPrefix())
                 .indexMatchPattern(oldConfig.indexMatchPattern())
                 .indexWildcard(oldConfig.indexWildcard())
