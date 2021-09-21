@@ -25,7 +25,7 @@ import RuleList from 'components/rules/RuleList';
 import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';
 import { Pagination, DEFAULT_PAGINATION } from 'stores/PaginationTypes';
-import { PaginatedRules } from 'stores/rules/RulesStore';
+import { PaginatedRules, RuleType } from 'stores/rules/RulesStore';
 
 const { RulesActions } = CombinedProvider.get('Rules');
 
@@ -77,7 +77,7 @@ const RulesPage = () => {
     setPagination({ ...pagination, query: '' });
   };
 
-  const handleDelete = (rule) => {
+  const handleDelete = (rule: RuleType) => {
     return () => {
       if (window.confirm(`Do you really want to delete rule "${rule.title}"?`)) {
         RulesActions.delete(rule).then(() => {

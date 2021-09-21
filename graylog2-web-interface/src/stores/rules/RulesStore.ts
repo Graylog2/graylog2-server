@@ -23,7 +23,7 @@ import PaginationURL from 'util/PaginationURL';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import CombinedProvider from 'injection/CombinedProvider';
-import { Pagination, PaginatedList, PaginatedListJSON } from 'stores/PaginationTypes';
+import { Pagination, PaginatedListJSON, ListPagination } from 'stores/PaginationTypes';
 
 const { RulesActions } = CombinedProvider.get('Rules');
 
@@ -37,13 +37,26 @@ export type RuleType = {
   errors?: [],
 };
 
+export type MetricsConfigType = {
+  metrics_enabled: boolean,
+};
+
 export type PaginatedRulesResponse = PaginatedListJSON & {
   rules: Array<RuleType>,
 };
 
-export type PaginatedRules = PaginatedList<RuleType>;
+export type PaginatedRules = {
+  list: Array<RuleType>,
+  pagination: ListPagination,
+};
 
-const RulesStore = Reflux.createStore({
+export type RulesStoreState = {
+  rules: Array<RuleType>,
+  functionDescriptors: any,
+  metricsConfig: MetricsConfigType | undefined,
+};
+
+const RulesStore = Reflux.createStore<RulesStoreState>({
   listenables: [RulesActions],
   rules: undefined,
   functionDescriptors: undefined,
@@ -249,7 +262,7 @@ const RulesStore = Reflux.createStore({
     const promise = fetch('GET', url);
 
     promise.then(
-      (response) => {
+      (response: MetricsConfigType) => {
         this.metricsConfig = response;
         this.trigger({ rules: this.rules, functionDescriptors: this.functionDescriptors, metricsConfig: this.metricsConfig });
       },
