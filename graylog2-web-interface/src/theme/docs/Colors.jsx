@@ -66,9 +66,10 @@ const Swatch = styled.button(({ color, theme }) => css`
 const ColorSwatch = ({ className, color, name, copyText }) => {
   const [opened, setOpened] = useState(false);
   const swatchRef = useRef();
-  let clipboard;
 
   useEffect(() => {
+    let clipboard;
+
     if (ClipboardJS.isSupported() && !!copyText) {
       clipboard = new ClipboardJS(swatchRef.current, {});
 

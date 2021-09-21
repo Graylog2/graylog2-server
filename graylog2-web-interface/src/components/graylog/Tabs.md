@@ -55,8 +55,7 @@ const TabExample = () => {
 ```js
 import { Row, Col, Nav, NavItem, NavDropdown, MenuItem, Tab } from 'components/graylog';
 
-<Tab.Container id="tabs-with-dropdown"
-               defaultActiveKey="first">
+<Tab.Container defaultActiveKey="first">
   <Row className="clearfix">
     <Col sm={12}>
       <Nav bsStyle="tabs">

@@ -26,12 +26,12 @@ describe('ClipboardButton', () => {
   it('does not pass container option to clipboard.js if not specified', () => {
     mount(<ClipboardButton title="Copy" />);
 
-    expect(ClipboardJS).toHaveBeenCalledWith('[data-clipboard-button]', {});
+    expect(ClipboardJS).toHaveBeenCalledWith('[data-gl-clipboard-button]', {});
   });
 
   it('uses `container` prop to pass as an option to clipboard.js', () => {
     mount(<ClipboardButton title="Copy" container={42} />);
 
-    expect(ClipboardJS).toHaveBeenCalledWith('[data-clipboard-button]', { container: 42 });
+    expect(ClipboardJS).toHaveBeenCalledWith('[data-gl-clipboard-button]', { container: 42 });
   });
 });
