@@ -59,7 +59,8 @@ const BufferUsage = ({ nodeId, bufferType, title }) => {
 
   const { metrics } = useStore(MetricsStore);
 
-  if (!metrics) {
+  // metrics for this node could be undefined
+  if (!metrics?.[nodeId]) {
     return <Spinner />;
   }
 
