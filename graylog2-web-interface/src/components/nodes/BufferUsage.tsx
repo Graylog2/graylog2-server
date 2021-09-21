@@ -44,7 +44,13 @@ const _metricPrefix = (bufferType) => `org.graylog2.buffers.${bufferType}`;
 
 const _metricFilter = (bufferType) => `org\\.graylog2\\.buffers\\.${bufferType}\\.|${bufferType}buffer`;
 
-const BufferUsage = ({ nodeId, bufferType, title }) => {
+type Props = {
+  nodeId: string,
+  bufferType: string,
+  title: string,
+};
+
+const BufferUsage = ({ nodeId, bufferType, title }: Props) => {
   useEffect(() => {
     const prefix = _metricPrefix(bufferType);
     const metricNames = [
