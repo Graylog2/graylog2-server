@@ -87,7 +87,7 @@ const ColorSwatch = ({ className, color, name, copyText }) => {
         clipboard.destroy();
       }
     };
-  }, []);
+  }, [copyText]);
 
   return (
     <Wrapped className={className}>
