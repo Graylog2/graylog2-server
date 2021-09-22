@@ -65,7 +65,8 @@ public class SearchExecutionGuardTest {
         final SearchesClusterConfig searchesConfig = mock(SearchesClusterConfig.class);
         when(searchesConfig.queryTimeRangeLimit()).thenReturn(Period.minutes(10));
         when(clusterConfig.get(SearchesClusterConfig.class)).thenReturn(searchesConfig);
-        sut = new SearchExecutionGuard(providedCapabilities, clusterConfig);
+
+        sut = new SearchExecutionGuard(providedCapabilities);
     }
 
     @Test
@@ -106,14 +107,6 @@ public class SearchExecutionGuardTest {
         final Search search = searchWithCapabilityRequirements(onlyRequirement);
 
         assertSucceeds(search, id -> true);
-    }
-
-    @Test
-    public void testTimeRangeOutOfLimit() {
-        // ask for one hour search results but only have 10 minute search limit => should throw an exception
-        final Search oneHourSearch = searchWithStreamIds(createRelativeTimeRange(3600), "streamId");
-        assertThatExceptionOfType(IllegalTimeRangeException.class)
-                .isThrownBy(() -> sut.check(oneHourSearch, id -> true));
     }
 
     private void assertSucceeds(Search search, Predicate<String> isStreamIdPermitted) {

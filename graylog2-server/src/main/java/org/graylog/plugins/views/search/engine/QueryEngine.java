@@ -25,9 +25,16 @@ import org.graylog.plugins.views.search.QueryMetadataDecorator;
 import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchJob;
+import org.graylog.plugins.views.search.errors.IllegalTimeRangeException;
 import org.graylog.plugins.views.search.errors.QueryError;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.plugins.views.search.errors.SearchException;
+import org.graylog.plugins.views.search.errors.SearchTypeError;
+import org.graylog2.indexer.searches.SearchesClusterConfig;
+import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.joda.time.DateTime;
+import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,6 +56,7 @@ public class QueryEngine {
 
     private final Set<QueryMetadataDecorator> queryMetadataDecorators;
     private final QueryParser queryParser;
+    private final ClusterConfigService clusterConfigService;
 
     // TODO proper thread pool with tunable settings
     private final Executor queryPool = Executors.newFixedThreadPool(4, new ThreadFactoryBuilder().setNameFormat("query-engine-%d").build());
@@ -57,18 +65,19 @@ public class QueryEngine {
     @Inject
     public QueryEngine(QueryBackend<? extends GeneratedQueryContext> elasticsearchBackend,
                        Set<QueryMetadataDecorator> queryMetadataDecorators,
-                       QueryParser queryParser) {
+                       QueryParser queryParser, ClusterConfigService clusterConfigService) {
         this.elasticsearchBackend = elasticsearchBackend;
         this.queryMetadataDecorators = queryMetadataDecorators;
         this.queryParser = queryParser;
+        this.clusterConfigService = clusterConfigService;
     }
 
     // TODO: Backwards-compatible constructor to avoid breakage. Remove at some point.
     @Deprecated
     public QueryEngine(Map<String, QueryBackend<? extends GeneratedQueryContext>> backends,
                        Set<QueryMetadataDecorator> queryMetadataDecorators,
-                       QueryParser queryParser) {
-        this(backends.get("elasticsearch"), queryMetadataDecorators, queryParser);
+                       QueryParser queryParser, ClusterConfigService clusterConfigService) {
+        this(backends.get("elasticsearch"), queryMetadataDecorators, queryParser, clusterConfigService);
     }
 
     private static Set<QueryResult> allOfResults(Set<CompletableFuture<QueryResult>> futures) {
@@ -156,10 +165,12 @@ public class QueryEngine {
         LOG.debug("[{}] Preparing query execution with results of queries: ({})",
                 query.id(), StreamEx.of(results.stream()).map(QueryResult::query).map(Query::id).joining());
 
+        final SearchesClusterConfig searchesClusterConfig = clusterConfigService.get(SearchesClusterConfig.class);
+
         // with all the results done, we can execute the current query and eventually complete our own result
         // if any of this throws an exception, the handle in #execute will convert it to an error and return a "failed" result instead
         // if the backend already returns a "failed result" then nothing special happens here
-        final GeneratedQueryContext generatedQueryContext = backend.generate(searchJob, query, results);
+        final GeneratedQueryContext generatedQueryContext = backend.generate(searchJob, query, results, searchesClusterConfig);
         LOG.trace("[{}] Generated query {}, running it on backend {}", query.id(), generatedQueryContext, backend);
         final QueryResult result = backend.run(searchJob, query, generatedQueryContext, results);
         LOG.debug("[{}] Query returned {}", query.id(), result);

@@ -34,6 +34,7 @@ import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.MultiSearchResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchRequest;
 import org.graylog.storage.elasticsearch7.testing.TestMultisearchResponse;
+import org.graylog2.indexer.searches.SearchesClusterConfig;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
@@ -54,6 +55,7 @@ import java.util.stream.Collectors;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.storage.elasticsearch7.views.ViewsUtils.indicesOf;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class ElasticsearchBackendSearchTypeOverridesTest extends ElasticsearchBackendGeneratedRequestTestBase {
@@ -96,7 +98,7 @@ public class ElasticsearchBackendSearchTypeOverridesTest extends ElasticsearchBa
 
     @Test
     public void overridesInSearchTypeAreIncorporatedIntoGeneratedQueries() throws IOException {
-        final ESGeneratedQueryContext queryContext = this.elasticsearchBackend.generate(searchJob, query, Collections.emptySet());
+        final ESGeneratedQueryContext queryContext = this.elasticsearchBackend.generate(searchJob, query, Collections.emptySet(), mock(SearchesClusterConfig.class));
         final MultiSearchResponse response = TestMultisearchResponse.fromFixture("successfulMultiSearchResponse.json");
         final List<MultiSearchResponse.Item> items = Arrays.stream(response.getResponses())
                 .collect(Collectors.toList());
@@ -151,7 +153,7 @@ public class ElasticsearchBackendSearchTypeOverridesTest extends ElasticsearchBa
         when(indexLookup.indexNamesForStreamsInTimeRange(ImmutableSet.of("stream1"), tr))
                 .thenReturn(ImmutableSet.of("searchTypeIndex"));
 
-        final ESGeneratedQueryContext queryContext = this.elasticsearchBackend.generate(searchJob, query, Collections.emptySet());
+        final ESGeneratedQueryContext queryContext = this.elasticsearchBackend.generate(searchJob, query, Collections.emptySet(), mock(SearchesClusterConfig.class));
         final MultiSearchResponse response = TestMultisearchResponse.fromFixture("successfulMultiSearchResponse.json");
         final List<MultiSearchResponse.Item> items = Arrays.stream(response.getResponses())
                 .collect(Collectors.toList());

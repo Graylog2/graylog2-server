@@ -26,6 +26,7 @@ import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Max;
+import org.graylog2.indexer.searches.SearchesClusterConfig;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -37,6 +38,7 @@ import java.util.stream.Collectors;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -124,7 +126,7 @@ public class ElasticsearchBackendSearchTypesWithStreamsOverridesTest extends Ela
 
     private MultiSearch run(Query query) throws IOException {
         final SearchJob job = searchJobForQuery(query);
-        final ESGeneratedQueryContext context = this.elasticsearchBackend.generate(job, query, Collections.emptySet());
+        final ESGeneratedQueryContext context = this.elasticsearchBackend.generate(job, query, Collections.emptySet(), mock(SearchesClusterConfig.class));
 
         this.elasticsearchBackend.doRun(job, query, context, Collections.emptySet());
 

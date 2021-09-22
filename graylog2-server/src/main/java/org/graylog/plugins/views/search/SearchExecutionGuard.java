@@ -17,23 +17,15 @@
 package org.graylog.plugins.views.search;
 
 import com.google.common.base.Joiner;
-import org.graylog.plugins.views.search.errors.IllegalTimeRangeException;
 import org.graylog.plugins.views.search.errors.MissingCapabilitiesException;
 import org.graylog.plugins.views.search.views.PluginMetadataSummary;
-import org.graylog2.indexer.searches.SearchesClusterConfig;
 import org.graylog2.plugin.PluginMetaData;
-import org.graylog2.plugin.cluster.ClusterConfigService;
-import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
-import org.graylog2.plugin.rest.ValidationFailureException;
 import org.graylog2.shared.rest.exceptions.MissingStreamPermissionException;
-import org.joda.time.DateTime;
-import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -43,44 +35,16 @@ public class SearchExecutionGuard {
     private static final Logger LOG = LoggerFactory.getLogger(SearchExecutionGuard.class);
 
     private final Map<String, PluginMetaData> providedCapabilities;
-    private final ClusterConfigService clusterConfigService;
 
     @Inject
-    public SearchExecutionGuard(Map<String, PluginMetaData> providedCapabilities, ClusterConfigService clusterConfigService) {
+    public SearchExecutionGuard(Map<String, PluginMetaData> providedCapabilities) {
         this.providedCapabilities = providedCapabilities;
-        this.clusterConfigService = clusterConfigService;
     }
 
     public void check(Search search, Predicate<String> hasReadPermissionForStream) {
         checkUserIsPermittedToSeeStreams(search.streamIdsForPermissionsCheck(), hasReadPermissionForStream);
+
         checkMissingRequirements(search);
-        checkTimeRange(search);
-    }
-
-    private void checkTimeRange(Search search) {
-        final SearchesClusterConfig config = clusterConfigService.get(SearchesClusterConfig.class);
-
-        if (config == null || Period.ZERO.equals(config.queryTimeRangeLimit())) {
-            return; // all time ranges allowed, stop checking here
-        }
-
-        final Period timeRangeLimit = config.queryTimeRangeLimit();
-        final boolean timeRangeLimitViolation = search.queries().stream()
-                .map(Query::timerange)
-                .filter(Objects::nonNull)
-                .filter(tr -> tr.getFrom() != null && tr.getTo() != null)
-                .anyMatch(tr -> isOutOfLimit(tr, timeRangeLimit));
-
-        if(timeRangeLimitViolation) {
-            throw new IllegalTimeRangeException("Search out of allowed time range limit");
-        }
-    }
-
-    private boolean isOutOfLimit(TimeRange timeRange, Period limit) {
-        final DateTime start = timeRange.getFrom();
-        final DateTime end = timeRange.getTo();
-        final DateTime allowedStart = end.minus(limit);
-        return start.isBefore(allowedStart);
     }
 
     public void checkUserIsPermittedToSeeStreams(Set<String> streamIds, Predicate<String> hasReadPermissionForStream) {

@@ -33,9 +33,11 @@ import org.graylog.plugins.views.search.engine.QueryPlan;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.storage.elasticsearch7.views.searchtypes.ESMessageList;
 import org.graylog.storage.elasticsearch7.views.searchtypes.ESSearchTypeHandler;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import javax.inject.Provider;
 import java.util.Collections;
@@ -44,6 +46,7 @@ import java.util.UUID;
 
 import static com.google.common.collect.ImmutableSet.of;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 
 public class QueryPlanTest {
@@ -63,7 +66,7 @@ public class QueryPlanTest {
                 new QueryStringDecorators.Fake(),
                 (elasticsearchBackend, ssb, job, query, results) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, results, fieldTypesLookup),
                 false);
-        queryEngine = new QueryEngine(backend, Collections.emptySet(), new QueryParser(queryStringParser));
+        queryEngine = new QueryEngine(backend, Collections.emptySet(), new QueryParser(queryStringParser), mock(ClusterConfigService.class, RETURNS_DEEP_STUBS));
     }
 
     private static String randomUUID() {

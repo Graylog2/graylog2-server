@@ -48,6 +48,7 @@ import org.graylog.storage.elasticsearch7.TimeRangeQueryFactory;
 import org.graylog.storage.elasticsearch7.views.searchtypes.ESSearchTypeHandler;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.FieldTypeException;
+import org.graylog2.indexer.searches.SearchesClusterConfig;
 import org.graylog2.plugin.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -99,7 +100,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
     }
 
     @Override
-    public ESGeneratedQueryContext generate(SearchJob job, Query query, Set<QueryResult> results) {
+    public ESGeneratedQueryContext generate(SearchJob job, Query query, Set<QueryResult> results, SearchesClusterConfig searchesClusterConfig) {
         final ElasticsearchQueryString backendQuery = (ElasticsearchQueryString) query.query();
 
         final Set<SearchType> searchTypes = query.searchTypes();
@@ -122,6 +123,14 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
 
         final ESGeneratedQueryContext queryContext = queryContextFactory.create(this, searchSourceBuilder, job, query, results);
         for (SearchType searchType : searchTypes) {
+
+            final SearchTypeError searchTypeError = validateSearchType(query, searchType, searchesClusterConfig);
+            if(searchTypeError != null) {
+                LOG.error("Invalid search type {} for elasticsearch backend, cannot generate query part. Skipping this search type.", searchType.type());
+                queryContext.addError(searchTypeError);
+                continue;
+            }
+
             final SearchSourceBuilder searchTypeSourceBuilder = queryContext.searchSourceBuilder(searchType);
 
             final Set<String> effectiveStreamIds = searchType.effectiveStreams().isEmpty()
@@ -154,6 +163,12 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
             if (searchTypeHandler == null) {
                 LOG.error("Unknown search type {} for elasticsearch backend, cannot generate query part. Skipping this search type.", type);
                 queryContext.addError(new SearchTypeError(query, searchType.id(), "Unknown search type '" + type + "' for elasticsearch backend, cannot generate query"));
+                continue;
+            }
+
+            if(isSearchTypeWithError(queryContext, searchType.id())) {
+                LOG.error("Failed search type '{}', cannot convert query result, skipping.", searchType.type());
+                // no need to add another error here, as the query generation code will have added the error about the missing handler already
                 continue;
             }
 
@@ -246,6 +261,13 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                 // no need to add another error here, as the query generation code will have added the error about the missing handler already
                 continue;
             }
+
+            if(isSearchTypeWithError(queryContext, searchTypeId)) {
+                LOG.error("Failed search type '{}', cannot convert query result, skipping.", searchType.type());
+                // no need to add another error here, as the query generation code will have added the error about the missing handler already
+                continue;
+            }
+
             // we create a new instance because some search type handlers might need to track information between generating the query and
             // processing its result, such as aggregations, which depend on the name and type
             final ESSearchTypeHandler<? extends SearchType> handler = handlerProvider.get();
