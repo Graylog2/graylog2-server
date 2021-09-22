@@ -31,10 +31,10 @@ import { useStore } from 'stores/connect';
 const MetricsStore = StoreProvider.getStore('Metrics');
 const MetricsActions = ActionsProvider.getActions('Metrics');
 
-const NodeBufferUsage = styled.div`
-  margin-top: 10px;
-  margin-bottom: 7px;
-`;
+const NodeBufferUsage = styled.div(({ theme }) => css`
+  margin-top: ${theme.spacings.sm};
+  margin-bottom: ${theme.spacings.xs};
+`);
 
 const StyledProgressBar = styled(ProgressBar)`
   margin-bottom: 5px;
