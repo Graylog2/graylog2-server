@@ -36,9 +36,9 @@ const NodeBufferUsage = styled.div(({ theme }) => css`
   margin-bottom: ${theme.spacings.xs};
 `);
 
-const StyledProgressBar = styled(ProgressBar)`
-  margin-bottom: 5px;
-`;
+const StyledProgressBar = styled(ProgressBar)(({ theme }) => css`
+  margin-bottom: ${theme.spacings.xs};
+`);
 
 const _metricPrefix = (bufferType) => `org.graylog2.buffers.${bufferType}`;
 
