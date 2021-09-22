@@ -19,7 +19,8 @@ import PropTypes from 'prop-types';
 import naturalSort from 'javascript-natural-sort';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import { ButtonToolbar, Button, DataTable } from 'components/common';
+import { ButtonToolbar, Button } from 'components/bootstrap';
+import { DataTable } from 'components/common';
 
 import styles from './FieldsList.css';
 

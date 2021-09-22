@@ -16,7 +16,7 @@
  */
 import React from 'react';
 import lodash from 'lodash';
-import { PropTypes } from 'prop-types';
+import PropTypes from 'prop-types';
 import { Resizable } from 'react-resizable';
 import AceEditor from 'react-ace';
 import styled, { css } from 'styled-components';
@@ -24,7 +24,7 @@ import styled, { css } from 'styled-components';
 import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
-import { OverlayTrigger } from 'components/common';
+import OverlayTrigger from 'components/common/OverlayTrigger';
 import { Button, ButtonGroup, ButtonToolbar, Tooltip } from 'components/bootstrap';
 import PipelineRulesMode from 'components/rules/mode-pipeline';
 

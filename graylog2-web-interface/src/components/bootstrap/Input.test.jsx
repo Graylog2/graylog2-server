@@ -17,7 +17,7 @@
 import React from 'react';
 import { mount } from 'wrappedEnzyme';
 
-import { Button } from 'components/common';
+import { Button } from 'components/bootstrap';
 
 import Input from './Input';
 

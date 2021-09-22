@@ -16,8 +16,8 @@
  */
 import * as React from 'react';
 
-import { Row, Col, FormikInput } from 'components/common';
-import { Input } from 'components/bootstrap';
+import { FormikInput } from 'components/common';
+import { Row, Col, Input } from 'components/bootstrap';
 
 export const PASSWORD_MIN_LENGTH = 6;
 

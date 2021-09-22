@@ -19,8 +19,8 @@ import React from 'react';
 
 import { LinkContainer } from 'components/common/router';
 import Routes from 'routing/Routes';
-import { DataTable, Button, DropdownButton, ButtonToolbar, MenuItem, Modal } from 'components/common';
-import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
+import { DataTable } from 'components/common';
+import { BootstrapModalWrapper, Button, DropdownButton, ButtonToolbar, MenuItem, Modal } from 'components/bootstrap';
 import ContentPackDownloadControl from 'components/content-packs/ContentPackDownloadControl';
 import ContentPackInstall from 'components/content-packs/ContentPackInstall';
 

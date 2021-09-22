@@ -20,7 +20,7 @@ import { $PropertyType } from 'utility-types';
 import { LinkContainer } from 'components/common/router';
 import User from 'logic/users/User';
 import Routes from 'routing/Routes';
-import { ButtonToolbar, Button } from 'components/common';
+import { ButtonToolbar, Button } from 'components/bootstrap';
 
 type Props = {
   userId: $PropertyType<User, 'id'>,

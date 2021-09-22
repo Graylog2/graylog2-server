@@ -22,7 +22,8 @@ import type { PaginatedUsers } from 'actions/users/UsersActions';
 import UsersDomain from 'domainActions/users/UsersDomain';
 import { UsersActions } from 'stores/users/UsersStore';
 import CurrentUserContext from 'contexts/CurrentUserContext';
-import { DataTable, Spinner, PaginatedList, EmptyResult, Col, Row } from 'components/common';
+import { DataTable, Spinner, PaginatedList, EmptyResult } from 'components/common';
+import { Col, Row } from 'components/bootstrap';
 import UserOverview from 'logic/users/UserOverview';
 
 import UserOverviewItem from './UserOverviewItem';

@@ -16,7 +16,8 @@
  */
 import React from 'react';
 
-import { Col, Row, Pagination, Spinner } from 'components/common';
+import { Col, Row } from 'components/bootstrap';
+import { Pagination, Spinner } from 'components/common';
 import StoreProvider from 'injection/StoreProvider';
 import { SystemMessagesList } from 'components/systemmessages';
 

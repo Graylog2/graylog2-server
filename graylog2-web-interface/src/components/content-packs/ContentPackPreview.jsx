@@ -17,7 +17,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Row, Col, Button } from 'components/common';
+import { Row, Col, Button } from 'components/bootstrap';
 import ContentPackDetails from 'components/content-packs/ContentPackDetails';
 import ContentPackConstraints from 'components/content-packs/ContentPackConstraints';
 

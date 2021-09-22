@@ -18,7 +18,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { LinkContainer, Link } from 'components/common/router';
-import { Button } from 'components/common';
+import { Button } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';
 import { MetricsMapper, MetricContainer, CounterRate } from 'components/metrics';

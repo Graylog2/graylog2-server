@@ -18,7 +18,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import { HelpBlock } from 'components/common';
+import { HelpBlock } from 'components/bootstrap';
 
 const ErrorMessage = styled.span(({ theme }) => `
   color: ${theme.colors.variant.danger};

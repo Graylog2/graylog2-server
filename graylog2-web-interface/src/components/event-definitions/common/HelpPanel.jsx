@@ -18,7 +18,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import { Panel, Icon } from 'components/common';
+import { Panel } from 'components/bootstrap';
+import { Icon } from 'components/common';
 
 import styles from './HelpPanel.css';
 

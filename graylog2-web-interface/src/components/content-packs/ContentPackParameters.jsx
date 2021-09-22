@@ -18,8 +18,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import lodash from 'lodash';
 
-import { Row, Col } from 'components/common';
-import { BootstrapModalConfirm } from 'components/bootstrap';
+import { Row, Col, BootstrapModalConfirm } from 'components/bootstrap';
 import ObjectUtils from 'util/ObjectUtils';
 
 import ContentPackEntitiesList from './ContentPackEntitiesList';

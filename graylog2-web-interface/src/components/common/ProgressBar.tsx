@@ -32,7 +32,7 @@ type BarProps = StyledBarProps & {
 
 type ProgressBarProps = {
   bars: Array<BarProps>,
-  className: string,
+  className?: string,
 };
 
 const DEFAULT_BAR = {

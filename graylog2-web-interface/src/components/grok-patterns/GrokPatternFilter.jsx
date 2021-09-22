@@ -18,8 +18,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { isEqual } from 'lodash';
 
-import { ListGroup, ListGroupItem, Button } from 'components/common';
-import { Input } from 'components/bootstrap';
+import { ListGroup, ListGroupItem, Button, Input } from 'components/bootstrap';
 
 import GrokPatternFilterStyle from './GrokPatternFilter.css';
 

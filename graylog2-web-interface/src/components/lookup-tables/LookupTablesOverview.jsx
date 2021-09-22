@@ -20,7 +20,8 @@ import React from 'react';
 import { LinkContainer } from 'components/common/router';
 import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';
-import { Row, Col, Table, Popover, OverlayTrigger, Button, PaginatedList, SearchForm, Icon } from 'components/common';
+import { Row, Col, Table, Popover, Button } from 'components/bootstrap';
+import { OverlayTrigger, PaginatedList, SearchForm, Icon } from 'components/common';
 import LUTTableEntry from 'components/lookup-tables/LUTTableEntry';
 
 import Styles from './Overview.css';

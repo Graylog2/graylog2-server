@@ -17,7 +17,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Alert, DataTable, ExternalLink, Spinner, Icon } from 'components/common';
+import { Alert } from 'components/bootstrap';
+import { DataTable, ExternalLink, Spinner, Icon } from 'components/common';
 
 class InputTypesDataTable extends React.Component {
   static propTypes = {

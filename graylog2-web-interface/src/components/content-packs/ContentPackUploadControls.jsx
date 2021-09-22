@@ -17,8 +17,7 @@
 import React from 'react';
 
 import UserNotification from 'util/UserNotification';
-import { BootstrapModalForm, Input } from 'components/bootstrap';
-import { Button } from 'components/common';
+import { BootstrapModalForm, Input, Button } from 'components/bootstrap';
 import CombinedProvider from 'injection/CombinedProvider';
 
 import style from './ContentPackUploadControls.css';

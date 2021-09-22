@@ -17,7 +17,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { ListGroupItem } from 'components/common';
+import { ListGroupItem } from 'components/bootstrap';
 
 const ControlledTableListItem = ({ className, children }: { className?: string, children: React.ReactNode }) => {
   return (

@@ -18,7 +18,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import ClipboardJS from 'clipboard';
 
-import { OverlayTrigger } from 'components/common';
+import OverlayTrigger from 'components/common/OverlayTrigger';
 import { Tooltip, Button } from 'components/bootstrap';
 
 /**

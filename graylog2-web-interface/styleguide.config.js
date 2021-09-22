@@ -59,10 +59,6 @@ module.exports = {
           components: 'src/components/common/[A-Z]*.{jsx,tsx}',
         },
         {
-          name: 'Themeable',
-          components: 'src/components/graylog/[A-Z]*.{jsx,tsx}',
-        },
-        {
           name: 'Configuration Forms',
           components: 'src/components/configurationforms/[A-Z]*.{jsx,tsx}',
         },

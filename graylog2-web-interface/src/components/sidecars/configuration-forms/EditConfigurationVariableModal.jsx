@@ -18,8 +18,7 @@ import PropTypes from 'prop-types';
 import { debounce, cloneDeep } from 'lodash';
 import React from 'react';
 
-import { Button } from 'components/common';
-import { BootstrapModalForm, Input } from 'components/bootstrap';
+import { Button, BootstrapModalForm, Input } from 'components/bootstrap';
 import CombinedProvider from 'injection/CombinedProvider';
 
 import ConfigurationHelperStyle from './ConfigurationHelper.css';

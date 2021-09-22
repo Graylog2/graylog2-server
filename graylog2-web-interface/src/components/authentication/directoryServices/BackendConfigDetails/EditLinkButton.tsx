@@ -18,7 +18,7 @@ import * as React from 'react';
 
 import { LinkContainer } from 'components/common/router';
 import Routes from 'routing/Routes';
-import { Button } from 'components/common';
+import { Button } from 'components/bootstrap';
 
 type Props = {
   authenticationBackendId: string,

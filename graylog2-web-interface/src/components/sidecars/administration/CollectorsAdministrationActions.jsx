@@ -18,7 +18,7 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 
-import { ButtonToolbar } from 'components/common';
+import { ButtonToolbar } from 'components/bootstrap';
 
 import CollectorConfigurationSelector from './CollectorConfigurationSelector';
 import CollectorProcessControl from './CollectorProcessControl';

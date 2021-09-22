@@ -19,7 +19,8 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import Promise from 'bluebird';
 
-import { Button, EntityList, PaginatedList, Spinner } from 'components/common';
+import { Button } from 'components/bootstrap';
+import { EntityList, PaginatedList, Spinner } from 'components/common';
 import { Alert } from 'components/alerts';
 import CombinedProvider from 'injection/CombinedProvider';
 

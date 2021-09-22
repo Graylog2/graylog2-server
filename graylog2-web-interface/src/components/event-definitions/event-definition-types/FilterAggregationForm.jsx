@@ -18,7 +18,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 
-import { Col, ControlLabel, FormGroup, Radio, Row } from 'components/common';
+import { Col, ControlLabel, FormGroup, Radio, Row } from 'components/bootstrap';
 import * as FormsUtils from 'util/FormsUtils';
 
 import FilterForm from './FilterForm';

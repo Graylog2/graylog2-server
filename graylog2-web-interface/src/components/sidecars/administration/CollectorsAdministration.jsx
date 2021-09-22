@@ -22,9 +22,9 @@ import lodash from 'lodash';
 import styled, { css } from 'styled-components';
 
 import { Link } from 'components/common/router';
-import { Col, Row, ControlledTableList, PaginatedList } from 'components/common';
+import { ControlledTableList, PaginatedList } from 'components/common';
 import Routes from 'routing/Routes';
-import { Input } from 'components/bootstrap';
+import { Col, Row, Input } from 'components/bootstrap';
 import ColorLabel from 'components/sidecars/common/ColorLabel';
 import OperatingSystemIcon from 'components/sidecars/common/OperatingSystemIcon';
 import SidecarSearchForm from 'components/sidecars/common/SidecarSearchForm';

@@ -23,7 +23,8 @@ import { LinkContainer } from 'components/common/router';
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import Routes from 'routing/Routes';
 import Role from 'logic/roles/Role';
-import { Button, IfPermitted, Spinner } from 'components/common';
+import { Button } from 'components/bootstrap';
+import { IfPermitted, Spinner } from 'components/common';
 
 type Props = {
   readOnly: $PropertyType<Role, 'readOnly'>,

@@ -18,7 +18,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
-import { Checkbox } from 'components/common';
+import { Checkbox } from 'components/bootstrap';
 
 import Icon from './Icon';
 

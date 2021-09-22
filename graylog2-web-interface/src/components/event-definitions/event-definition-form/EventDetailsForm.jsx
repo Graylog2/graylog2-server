@@ -18,8 +18,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 
-import { Col, ControlLabel, FormGroup, HelpBlock, Row, Select } from 'components/common';
-import { Input } from 'components/bootstrap';
+import { Select } from 'components/common';
+import { Col, ControlLabel, FormGroup, HelpBlock, Row, Input } from 'components/bootstrap';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 import * as FormsUtils from 'util/FormsUtils';
 

@@ -18,7 +18,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { Link } from 'components/common/router';
-import { Col, Label, EntityListItem, Timestamp } from 'components/common';
+import { Col, Label } from 'components/bootstrap';
+import { EntityListItem, Timestamp } from 'components/common';
 import Routes from 'routing/Routes';
 import DateTime from 'logic/datetimes/DateTime';
 

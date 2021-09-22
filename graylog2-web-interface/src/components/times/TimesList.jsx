@@ -19,7 +19,8 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import moment from 'moment';
 
-import { Col, Row, Spinner, Timestamp } from 'components/common';
+import { Col, Row } from 'components/bootstrap';
+import { Spinner, Timestamp } from 'components/common';
 import DateTime from 'logic/datetimes/DateTime';
 import StoreProvider from 'injection/StoreProvider';
 

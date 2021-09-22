@@ -17,7 +17,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { OverlayTrigger } from 'components/common';
+import OverlayTrigger from 'components/common/OverlayTrigger';
 
 /**
  * Helper component for react-bootstrap's `OverlayTrigger`. It only wraps the content into a `span` element,

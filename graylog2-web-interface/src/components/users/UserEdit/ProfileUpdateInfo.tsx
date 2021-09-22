@@ -16,7 +16,8 @@
  */
 import * as React from 'react';
 
-import { Alert, Icon } from 'components/common';
+import { Alert } from 'components/bootstrap';
+import { Icon } from 'components/common';
 
 const ProfileUpdateInfo = () => (
   <Alert bsStyle="info">

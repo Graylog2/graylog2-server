@@ -19,7 +19,7 @@ import React from 'react';
 import Immutable from 'immutable';
 import { isEqual } from 'lodash';
 
-import { Button } from 'components/common';
+import { Button } from 'components/bootstrap';
 import TypeAheadInput from 'components/common/TypeAheadInput';
 
 /**

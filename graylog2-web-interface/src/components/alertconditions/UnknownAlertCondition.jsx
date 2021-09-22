@@ -17,7 +17,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Alert, Col, DropdownButton, MenuItem, EntityListItem } from 'components/common';
+import { Alert, Col, DropdownButton, MenuItem } from 'components/bootstrap';
+import { EntityListItem } from 'components/common';
 
 class UnknownAlertCondition extends React.Component {
   static propTypes = {

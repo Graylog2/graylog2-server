@@ -21,10 +21,10 @@ import ClipboardJS from 'clipboard';
 import debounce from 'lodash/debounce';
 
 import { ScratchpadContext } from 'contexts/ScratchpadProvider';
-import { Alert, Button, ButtonGroup, OverlayTrigger, Tooltip } from 'components/common';
-import { BootstrapModalConfirm } from 'components/bootstrap';
+import { Alert, Button, ButtonGroup, BootstrapModalConfirm, Tooltip } from 'components/bootstrap';
 import InteractableModal from 'components/common/InteractableModal';
 import Icon from 'components/common/Icon';
+import OverlayTrigger from 'components/common/OverlayTrigger';
 import Store from 'logic/local-storage/Store';
 
 const DEFAULT_SCRATCHDATA = '';

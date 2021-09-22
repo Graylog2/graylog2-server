@@ -18,7 +18,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import Immutable from 'immutable';
 
-import { Col, Row } from 'components/common';
+import { Col, Row } from 'components/bootstrap';
 import StringUtils from 'util/StringUtils';
 
 import MessageDetail from './MessageDetail';

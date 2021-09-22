@@ -19,8 +19,8 @@ import React from 'react';
 import naturalSort from 'javascript-natural-sort';
 import { cloneDeep } from 'lodash';
 
-import { Col, HelpBlock, Panel, Row, ExpandableList, ExpandableListItem, Icon, SearchForm } from 'components/common';
-import { Input } from 'components/bootstrap';
+import { ExpandableList, ExpandableListItem, Icon, SearchForm } from 'components/common';
+import { Col, HelpBlock, Panel, Row, Input } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
 import Entity from 'logic/content-packs/Entity';
 import { hasAcceptedProtocol } from 'util/URLUtils';

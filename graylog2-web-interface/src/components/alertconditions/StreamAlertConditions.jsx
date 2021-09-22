@@ -20,7 +20,7 @@ import createReactClass from 'create-react-class';
 import naturalSort from 'javascript-natural-sort';
 
 import { LinkContainer } from 'components/common/router';
-import { Button } from 'components/common';
+import { Button } from 'components/bootstrap';
 import { AlertConditionsList } from 'components/alertconditions';
 import Routes from 'routing/Routes';
 

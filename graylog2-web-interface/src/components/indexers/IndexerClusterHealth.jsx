@@ -18,7 +18,8 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
-import { Row, Col, Spinner } from 'components/common';
+import { Spinner } from 'components/common';
+import { Row, Col } from 'components/bootstrap';
 import StoreProvider from 'injection/StoreProvider';
 import { DocumentationLink, SmallSupportLink } from 'components/support';
 import DocsHelper from 'util/DocsHelper';

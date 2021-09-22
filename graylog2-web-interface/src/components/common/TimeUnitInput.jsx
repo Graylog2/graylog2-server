@@ -28,9 +28,9 @@ import {
   FormGroup,
   HelpBlock,
   InputGroup,
+  InputWrapper,
   MenuItem,
-} from 'components/common';
-import { InputWrapper } from 'components/bootstrap';
+} from 'components/bootstrap';
 import * as FormsUtils from 'util/FormsUtils';
 
 const unitValues = [

@@ -18,7 +18,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { LinkContainer } from 'components/common/router';
-import { Alert, Button, PaginatedList, Spinner, Timestamp } from 'components/common';
+import { Alert, Button } from 'components/bootstrap';
+import { PaginatedList, Spinner, Timestamp } from 'components/common';
 import CombinedProvider from 'injection/CombinedProvider';
 import Routes from 'routing/Routes';
 import DateTime from 'logic/datetimes/DateTime';

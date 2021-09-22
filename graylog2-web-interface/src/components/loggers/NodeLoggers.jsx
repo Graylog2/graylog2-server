@@ -20,7 +20,8 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
-import { Col, Row, Button, LinkToNode, IfPermitted, Icon } from 'components/common';
+import { Col, Row, Button } from 'components/bootstrap';
+import { LinkToNode, IfPermitted, Icon } from 'components/common';
 import { LoggingSubsystem, LogLevelMetricsOverview } from 'components/loggers';
 import ActionsProvider from 'injection/ActionsProvider';
 import StoreProvider from 'injection/StoreProvider';

@@ -20,7 +20,7 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
 import { LinkContainer } from 'components/common/router';
-import { DropdownButton, MenuItem, Button } from 'components/common';
+import { DropdownButton, MenuItem, Button } from 'components/bootstrap';
 import { AlertConditionForm, AlertConditionSummary, AlertConditionTestModal, UnknownAlertCondition } from 'components/alertconditions';
 import PermissionsMixin from 'util/PermissionsMixin';
 import CombinedProvider from 'injection/CombinedProvider';

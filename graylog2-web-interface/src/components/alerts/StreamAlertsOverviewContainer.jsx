@@ -20,7 +20,8 @@ import PropTypes from 'prop-types';
 import Reflux from 'reflux';
 import Promise from 'bluebird';
 
-import { Col, Row, Spinner } from 'components/common';
+import { Col, Row } from 'components/bootstrap';
+import { Spinner } from 'components/common';
 import { StreamAlerts } from 'components/alerts';
 import { StreamAlertConditions } from 'components/alertconditions';
 import { StreamAlertNotifications } from 'components/alertnotifications';

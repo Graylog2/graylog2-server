@@ -22,8 +22,8 @@ import Routes from 'routing/Routes';
 import history from 'util/History';
 import HTTPHeaderAuthConfig from 'logic/authentication/HTTPHeaderAuthConfig';
 import HTTPHeaderAuthConfigDomain from 'domainActions/authentication/HTTPHeaderAuthConfigDomain';
-import { Input } from 'components/bootstrap';
-import { Button, Col, Row, Alert, FormikFormGroup, ErrorAlert, Spinner, Icon } from 'components/common';
+import { Input, Button, Col, Row, Alert } from 'components/bootstrap';
+import { FormikFormGroup, ErrorAlert, Spinner, Icon } from 'components/common';
 import SectionComponent from 'components/common/Section/SectionComponent';
 
 const HTTPHeaderAuthConfigSection = () => {

@@ -18,7 +18,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import styled from 'styled-components';
 
-import { Alert } from 'components/common';
+import { Alert } from 'components/bootstrap';
 
 import Icon from './Icon';
 

@@ -17,7 +17,8 @@
 import * as React from 'react';
 
 import { LinkContainer } from 'components/common/router';
-import { IfPermitted, ButtonToolbar, Button } from 'components/common';
+import { IfPermitted } from 'components/common';
+import { ButtonToolbar, Button } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 
 const UserOverviewLinks = () => {

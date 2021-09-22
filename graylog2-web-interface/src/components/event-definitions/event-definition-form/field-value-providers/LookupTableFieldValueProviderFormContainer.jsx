@@ -17,7 +17,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { Col, Row, Spinner } from 'components/common';
+import { Col, Row } from 'components/bootstrap';
+import { Spinner } from 'components/common';
 import connect from 'stores/connect';
 import CombinedProvider from 'injection/CombinedProvider';
 import { FieldTypesStore } from 'views/stores/FieldTypesStore';

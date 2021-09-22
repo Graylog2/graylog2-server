@@ -18,7 +18,8 @@ import * as React from 'react';
 
 import DocsHelper from 'util/DocsHelper';
 import DocumentationLink from 'components/support/DocumentationLink';
-import { Col, Row, Alert, Icon } from 'components/common';
+import { Col, Row, Alert } from 'components/bootstrap';
+import { Icon } from 'components/common';
 
 const PermissionsUpdateInfo = () => (
   <Row className="content">

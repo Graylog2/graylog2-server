@@ -17,8 +17,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Col, Row, Button, Icon } from 'components/common';
-import { Input } from 'components/bootstrap';
+import { Icon } from 'components/common';
+import { Col, Row, Button, Input } from 'components/bootstrap';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
 import UserNotification from 'util/UserNotification';

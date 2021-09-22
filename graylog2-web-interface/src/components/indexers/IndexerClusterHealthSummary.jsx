@@ -18,7 +18,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import styled from 'styled-components';
 
-import { Alert, Icon } from 'components/common';
+import { Alert } from 'components/bootstrap';
+import { Icon } from 'components/common';
 import { DocumentationLink } from 'components/support';
 import DocsHelper from 'util/DocsHelper';
 

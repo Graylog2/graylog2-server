@@ -22,7 +22,8 @@ import styled, { css } from 'styled-components';
 import EntityShareState, { GranteesList, CapabilitiesList } from 'logic/permissions/EntityShareState';
 import Capability from 'logic/permissions/Capability';
 import Grantee from 'logic/permissions/Grantee';
-import { Button, Select } from 'components/common';
+import { Button } from 'components/bootstrap';
+import { Select } from 'components/common';
 import SelectGroup from 'components/common/SelectGroup';
 
 import GranteeIcon from './GranteeIcon';

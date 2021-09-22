@@ -18,7 +18,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 
-import { Button, Col, Row, Icon } from 'components/common';
+import { Button, Col, Row } from 'components/bootstrap';
+import { Icon } from 'components/common';
 import SidecarStatusEnum from 'logic/sidecar/SidecarStatusEnum';
 
 import style from './FiltersSummary.css';

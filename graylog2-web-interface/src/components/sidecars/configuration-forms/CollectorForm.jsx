@@ -20,8 +20,8 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import lodash from 'lodash';
 
-import { Button, ButtonToolbar, Col, ControlLabel, FormGroup, HelpBlock, Row, Select, SourceCodeEditor } from 'components/common';
-import { Input } from 'components/bootstrap';
+import { Select, SourceCodeEditor } from 'components/common';
+import { Button, ButtonToolbar, Col, ControlLabel, FormGroup, HelpBlock, Row, Input } from 'components/bootstrap';
 import history from 'util/History';
 import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';

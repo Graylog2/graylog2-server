@@ -17,7 +17,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Col, Row } from 'components/common';
+import { Col, Row } from 'components/bootstrap';
 import { AlertMessages, AlertTimeline } from 'components/alerts';
 import { AlarmCallbackHistoryOverview } from 'components/alarmcallbacks';
 import CombinedProvider from 'injection/CombinedProvider';

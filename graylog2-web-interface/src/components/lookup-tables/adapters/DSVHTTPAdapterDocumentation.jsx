@@ -16,7 +16,7 @@
  */
 import React from 'react';
 
-import { Alert } from 'components/common';
+import { Alert } from 'components/bootstrap';
 
 const DSVHTTPAdapterDocumentation = () => {
   const csvFile1 = `"127.0.0.1","localhost"

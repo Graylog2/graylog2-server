@@ -17,7 +17,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { Button } from 'components/common';
+import { Button } from 'components/bootstrap';
 import ExternalLink from 'components/common/ExternalLink';
 
 /**

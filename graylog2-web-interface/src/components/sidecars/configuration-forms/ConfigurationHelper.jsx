@@ -17,7 +17,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Col, Panel, Row, Tab, Tabs } from 'components/common';
+import { Col, Panel, Row, Tab, Tabs } from 'components/bootstrap';
 
 import TemplatesHelper from './TemplatesHelper';
 import ConfigurationVariablesHelper from './ConfigurationVariablesHelper';

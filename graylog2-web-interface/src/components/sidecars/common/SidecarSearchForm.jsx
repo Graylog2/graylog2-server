@@ -17,7 +17,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { OverlayTrigger, Popover, Table, Button, SearchForm, Icon } from 'components/common';
+import { OverlayTrigger, SearchForm, Icon } from 'components/common';
+import { Popover, Table, Button } from 'components/bootstrap';
 
 import style from './SidecarSearchForm.css';
 

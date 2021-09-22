@@ -18,7 +18,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { LinkContainer } from 'components/common/router';
-import { Row, Col, Table, Popover, OverlayTrigger, Button, PaginatedList, SearchForm, Spinner, Icon } from 'components/common';
+import { OverlayTrigger, PaginatedList, SearchForm, Spinner, Icon } from 'components/common';
+import { Row, Col, Table, Popover, Button } from 'components/bootstrap';
 import DataAdapterTableEntry from 'components/lookup-tables/DataAdapterTableEntry';
 import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';

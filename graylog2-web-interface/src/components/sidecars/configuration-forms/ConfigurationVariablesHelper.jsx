@@ -18,9 +18,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import Routes from 'routing/Routes';
-import { Button, Alert, Table, Modal, Spinner } from 'components/common';
-import { BootstrapModalConfirm } from 'components/bootstrap';
-import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
+import { Spinner } from 'components/common';
+import { Button, Alert, Table, Modal, BootstrapModalConfirm, BootstrapModalWrapper } from 'components/bootstrap';
 import CombinedProvider from 'injection/CombinedProvider';
 
 import EditConfigurationVariableModal from './EditConfigurationVariableModal';

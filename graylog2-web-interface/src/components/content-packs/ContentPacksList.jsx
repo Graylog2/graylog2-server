@@ -27,6 +27,8 @@ import {
   MenuItem,
   Modal,
   Row,
+} from 'components/bootstrap';
+import {
   Pagination, PageSizeSelect,
 } from 'components/common';
 import TypeAheadDataFilter from 'components/common/TypeAheadDataFilter';

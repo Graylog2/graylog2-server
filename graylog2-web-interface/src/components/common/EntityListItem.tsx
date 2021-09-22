@@ -18,7 +18,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import { Row, Col } from 'components/common';
+import { Row, Col } from 'components/bootstrap';
 
 const StyledListItem = styled.li(({ theme }) => css`
   display: block;

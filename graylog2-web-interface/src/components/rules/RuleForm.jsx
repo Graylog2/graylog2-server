@@ -17,8 +17,8 @@
 import React, { useContext, useState } from 'react';
 import PropTypes from 'prop-types';
 
-import { Button, Col, ControlLabel, FormControl, FormGroup, Row, ConfirmLeaveDialog, SourceCodeEditor } from 'components/common';
-import { Input } from 'components/bootstrap';
+import { Button, Col, ControlLabel, FormControl, FormGroup, Row, Input } from 'components/bootstrap';
+import { ConfirmLeaveDialog, SourceCodeEditor } from 'components/common';
 import Routes from 'routing/Routes';
 import history from 'util/History';
 

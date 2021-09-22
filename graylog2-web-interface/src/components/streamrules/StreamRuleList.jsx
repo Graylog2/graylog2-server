@@ -18,7 +18,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import StreamRule from 'components/streamrules/StreamRule';
-import { Spinner, ListGroup, ListGroupItem } from 'components/common';
+import { Spinner } from 'components/common';
+import { ListGroup, ListGroupItem } from 'components/bootstrap';
 
 class StreamRuleList extends React.Component {
   static propTypes = {

@@ -17,7 +17,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Alert, Table, Icon } from 'components/common';
+import { Alert, Table } from 'components/bootstrap';
+import { Icon } from 'components/common';
 import { IndexerFailure } from 'components/indexers';
 
 class IndexerFailuresList extends React.Component {

@@ -20,7 +20,8 @@ import Reflux from 'reflux';
 import naturalSort from 'javascript-natural-sort';
 
 import { LinkContainer } from 'components/common/router';
-import { Button, Spinner } from 'components/common';
+import { Button } from 'components/bootstrap';
+import { Spinner } from 'components/common';
 import { AlertConditionsList } from 'components/alertconditions';
 import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';

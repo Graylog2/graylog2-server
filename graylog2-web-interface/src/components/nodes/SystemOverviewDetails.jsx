@@ -17,7 +17,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Row, Col, Alert, Button, IfPermitted, Icon } from 'components/common';
+import { Row, Col, Alert, Button } from 'components/bootstrap';
+import { IfPermitted, Icon } from 'components/common';
 import { DocumentationLink } from 'components/support';
 import NodeThroughput from 'components/throughput/NodeThroughput';
 import DocsHelper from 'util/DocsHelper';

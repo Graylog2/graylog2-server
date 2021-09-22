@@ -19,7 +19,8 @@ import React from 'react';
 import naturalSort from 'javascript-natural-sort';
 
 import { LinkContainer } from 'components/common/router';
-import { Button, Spinner } from 'components/common';
+import { Button } from 'components/bootstrap';
+import { Spinner } from 'components/common';
 import { AlertNotificationsList } from 'components/alertnotifications';
 import CombinedProvider from 'injection/CombinedProvider';
 import Routes from 'routing/Routes';

@@ -19,8 +19,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 
 import ActionsProvider from 'injection/ActionsProvider';
-
-import { Button } from '../common/index';
+import { Button } from 'components/bootstrap';
 
 const MessagesActions = ActionsProvider.getActions('Messages');
 

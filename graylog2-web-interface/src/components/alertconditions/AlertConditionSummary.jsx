@@ -20,7 +20,8 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
-import { Col, EntityListItem } from 'components/common';
+import { Col } from 'components/bootstrap';
+import { EntityListItem } from 'components/common';
 import { GenericAlertConditionSummary } from 'components/alertconditions';
 
 class AlertConditionSummary extends React.Component {
