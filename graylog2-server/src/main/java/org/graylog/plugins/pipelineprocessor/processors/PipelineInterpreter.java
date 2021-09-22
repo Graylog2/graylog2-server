@@ -462,7 +462,7 @@ public class PipelineInterpreter implements MessageProcessor {
 
     public static class State {
         private final Logger LOG = LoggerFactory.getLogger(getClass());
-        public static final String STAGE_CACHE_METRIC_SUFFIX = "stage-cache";
+        protected static final String STAGE_CACHE_METRIC_SUFFIX = "stage-cache";
 
         private final ImmutableMap<String, Pipeline> currentPipelines;
         private final ImmutableSetMultimap<String, Pipeline> streamPipelineConnections;
@@ -497,7 +497,7 @@ public class PipelineInterpreter implements MessageProcessor {
             MetricUtils.safelyRegisterAll(metricRegistry, new CacheStatsSet(getStageCacheMetricName(), cache));
         }
 
-        public String getStageCacheMetricName() {
+        protected String getStageCacheMetricName() {
             return name(PipelineInterpreter.class, STAGE_CACHE_METRIC_SUFFIX);
         }
 
