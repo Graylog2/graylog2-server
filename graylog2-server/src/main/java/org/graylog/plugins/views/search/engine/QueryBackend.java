@@ -144,17 +144,14 @@ public interface QueryBackend<T extends GeneratedQueryContext> {
     }
 
     default void validateQueryTimeRange(Query query, SearchesClusterConfig config) {
-        if (config == null || Period.ZERO.equals(config.queryTimeRangeLimit())) {
-            return; // all time ranges allowed, stop checking here
-        }
-
-        final Period timeRangeLimit = config.queryTimeRangeLimit();
-
-        final TimeRange timerange = query.timerange();
-        if(timerange != null && timerange.getFrom() != null && timerange.getTo() != null) {
-            if(isOutOfLimit(timerange, timeRangeLimit)) {
-                throw new IllegalTimeRangeException("Search out of allowed time range limit");
-            }
-        }
+        Optional.ofNullable(config)
+                .map(SearchesClusterConfig::queryTimeRangeLimit)
+                .filter(limit -> limit != Period.ZERO)
+                .flatMap(timeRangeLimit -> Optional.ofNullable(query.timerange())
+                        .filter(tr -> tr.getFrom() != null && tr.getTo() != null) // TODO: is this check necessary?
+                        .filter(tr -> isOutOfLimit(tr, timeRangeLimit)))
+                .ifPresent(tr -> {
+                    throw new IllegalTimeRangeException("Search out of allowed time range limit");
+                });
     }
 }
