@@ -66,11 +66,11 @@ public class ConfigurationStateUpdater {
     private final MetricRegistry metricRegistry;
     private final ScheduledExecutorService scheduler;
     private final EventBus serverEventBus;
-    private final PipelineInterpreterState.Factory stateFactory;
+    private final PipelineInterpreter.State.Factory stateFactory;
     /**
      * non-null if the update has successfully loaded a state
      */
-    private final AtomicReference<PipelineInterpreterState> latestState = new AtomicReference<>();
+    private final AtomicReference<PipelineInterpreter.State> latestState = new AtomicReference<>();
 
     @Inject
     public ConfigurationStateUpdater(RuleService ruleService,
@@ -81,7 +81,7 @@ public class ConfigurationStateUpdater {
                                      MetricRegistry metricRegistry,
                                      @Named("daemonScheduler") ScheduledExecutorService scheduler,
                                      EventBus serverEventBus,
-                                     PipelineInterpreterState.Factory stateFactory) {
+                                     PipelineInterpreter.State.Factory stateFactory) {
         this.ruleService = ruleService;
         this.pipelineService = pipelineService;
         this.pipelineStreamConnectionsService = pipelineStreamConnectionsService;
@@ -100,7 +100,7 @@ public class ConfigurationStateUpdater {
 
     // only the singleton instance should mutate itself, others are welcome to reload a new state, but we don't
     // currently allow direct global state updates from external sources (if you need to, send an event on the bus instead)
-    private synchronized PipelineInterpreterState reloadAndSave() {
+    private synchronized PipelineInterpreter.State reloadAndSave() {
         // read all rules and parse them
         Map<String, Rule> ruleNameMap = Maps.newHashMap();
         ruleService.loadAll().forEach(ruleDao -> {
@@ -140,7 +140,7 @@ public class ConfigurationStateUpdater {
         ImmutableSetMultimap<String, Pipeline> streamPipelineConnections = ImmutableSetMultimap.copyOf(connections);
 
         final RuleMetricsConfigDto ruleMetricsConfig = ruleMetricsConfigService.get();
-        final PipelineInterpreterState newState = stateFactory.newState(currentPipelines, streamPipelineConnections, ruleMetricsConfig);
+        final PipelineInterpreter.State newState = stateFactory.newState(currentPipelines, streamPipelineConnections, ruleMetricsConfig);
         latestState.set(newState);
         return newState;
     }
@@ -152,7 +152,7 @@ public class ConfigurationStateUpdater {
      *
      * @return the currently loaded state of the updater
      */
-    public PipelineInterpreterState getLatestState() {
+    public PipelineInterpreter.State getLatestState() {
         return latestState.get();
     }
 
@@ -212,7 +212,7 @@ public class ConfigurationStateUpdater {
     }
 
     @Subscribe
-    public void handlePipelineStateChange(PipelineInterpreterState event) {
+    public void handlePipelineStateChange(PipelineInterpreter.State event) {
         log.debug("Pipeline interpreter state got updated");
     }
 

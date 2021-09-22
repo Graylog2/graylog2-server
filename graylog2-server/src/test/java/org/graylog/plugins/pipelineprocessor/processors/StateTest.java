@@ -21,11 +21,11 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class PipelineInterpreterStateTest {
+public class StateTest {
 
     @Test
     public void testMetricName() {
-        final PipelineInterpreterState state = new PipelineInterpreterState(null, null, null,
+        final PipelineInterpreter.State state = new PipelineInterpreter.State(null, null, null,
                 new LocalMetricRegistry(), 1, false);
         assertEquals("org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.stage-cache",
                 state.getStageCacheMetricName());
