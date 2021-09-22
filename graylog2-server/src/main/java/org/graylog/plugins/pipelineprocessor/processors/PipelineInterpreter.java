@@ -173,7 +173,7 @@ public class PipelineInterpreter implements MessageProcessor {
         return new MessageCollection(fullyProcessed);
     }
 
-    // Public access is required due to use in the IlluminateProcessor.
+    // Public access is required due to use in the Illuminate processor.
     public void potentiallyDropFilteredMessage(Message message) {
         if (message.getFilterOut()) {
             log.debug("[{}] marked message to be discarded. Dropping message.", message.getId());
@@ -250,7 +250,7 @@ public class PipelineInterpreter implements MessageProcessor {
         return processForResolvedPipelines(message, message.getId(), pipelinesToRun, interpreterListener, state);
     }
 
-    // Public access is required due to use in the IlluminateProcessor.
+    // Public access is required due to use in the Illuminate processor.
     public List<Message> processForResolvedPipelines(Message message,
                                                      String msgId,
                                                      Set<Pipeline> pipelines,
