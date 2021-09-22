@@ -124,10 +124,10 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
         final ESGeneratedQueryContext queryContext = queryContextFactory.create(this, searchSourceBuilder, job, query, results);
         for (SearchType searchType : searchTypes) {
 
-            final SearchTypeError searchTypeError = validateSearchType(query, searchType, searchesClusterConfig);
-            if(searchTypeError != null) {
+            final Optional<SearchTypeError> searchTypeError = validateSearchType(query, searchType, searchesClusterConfig);
+            if(searchTypeError.isPresent()) {
                 LOG.error("Invalid search type {} for elasticsearch backend, cannot generate query part. Skipping this search type.", searchType.type());
-                queryContext.addError(searchTypeError);
+                queryContext.addError(searchTypeError.get());
                 continue;
             }
 

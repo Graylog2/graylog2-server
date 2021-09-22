@@ -26,7 +26,6 @@ import org.graylog.plugins.views.search.errors.IllegalTimeRangeException;
 import org.graylog.plugins.views.search.errors.QueryError;
 import org.graylog.plugins.views.search.errors.SearchTypeError;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
-import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
 import org.graylog2.indexer.searches.SearchesClusterConfig;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
@@ -119,22 +118,14 @@ public interface QueryBackend<T extends GeneratedQueryContext> {
      */
     QueryResult doRun(SearchJob job, Query query, T queryContext, Set<QueryResult> predecessorResults);
 
-    default SearchTypeError validateSearchType(Query query, SearchType searchType, SearchesClusterConfig searchesClusterConfig) {
-
-        if (searchesClusterConfig == null || Period.ZERO.equals(searchesClusterConfig.queryTimeRangeLimit())) {
-            return null; // all time ranges allowed, stop checking here
-        }
-
-        final Period timeRangeLimit = searchesClusterConfig.queryTimeRangeLimit();
-
-        if(searchType.timerange().isPresent()) {
-            final DerivedTimeRange tr = searchType.timerange().get();
-            final TimeRange effectiveTimeRange = tr.effectiveTimeRange(query, searchType);
-            if(isOutOfLimit(effectiveTimeRange, timeRangeLimit)) {
-                return new SearchTypeError(query, searchType.id(), "Search type '" + searchType.type() + "' out of allowed time range limit");
-            }
-        }
-        return null;
+    default Optional<SearchTypeError> validateSearchType(Query query, SearchType searchType, SearchesClusterConfig searchesClusterConfig) {
+        return Optional.ofNullable(searchesClusterConfig) // we have a config
+                .map(config -> searchesClusterConfig.queryTimeRangeLimit()) // the config has a limit
+                .filter(timeLimit -> Period.ZERO != timeLimit) // and the limit is valid, limiting
+                .flatMap(configuredTimeLimit -> searchType.timerange() // TODO: what if there is no timerange for the type but there is a global limit?
+                        .map(tr -> tr.effectiveTimeRange(query, searchType))
+                        .filter(tr -> isOutOfLimit(tr, configuredTimeLimit))
+                        .map(tr -> new SearchTypeError(query, searchType.id(), "Search type '" + searchType.type() + "' out of allowed time range limit")));
     }
 
     default boolean isOutOfLimit(TimeRange timeRange, Period limit) {
