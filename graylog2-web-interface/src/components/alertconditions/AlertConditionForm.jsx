@@ -19,7 +19,7 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
-import { ControlLabel, FormControl, FormGroup } from 'components/graylog';
+import { ControlLabel, FormControl, FormGroup } from 'components/common';
 import { ConfigurationForm } from 'components/configurationforms';
 import CombinedProvider from 'injection/CombinedProvider';
 

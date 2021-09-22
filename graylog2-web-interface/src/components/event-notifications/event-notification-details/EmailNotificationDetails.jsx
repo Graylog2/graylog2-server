@@ -17,8 +17,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 
-import { ReadOnlyFormGroup } from 'components/common';
-import { Well } from 'components/graylog';
+import { ReadOnlyFormGroup, Well } from 'components/common';
 
 import styles from '../event-notification-types/EmailNotificationSummary.css';
 

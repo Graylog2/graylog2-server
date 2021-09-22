@@ -18,7 +18,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 import { capitalize } from 'lodash';
 
-import { Alert } from 'components/graylog';
+import { Alert } from 'components/common';
 import { GranteesList } from 'logic/permissions/EntityShareState';
 import ValidationResult from 'logic/permissions/ValidationResult';
 

@@ -17,10 +17,10 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { LinkContainer, Link } from 'components/graylog/router';
+import { LinkContainer, Link } from 'components/common/router';
 import CombinedProvider from 'injection/CombinedProvider';
 import Routes from 'routing/Routes';
-import { Button } from 'components/graylog';
+import { Button } from 'components/common';
 import { ErrorPopover } from 'components/lookup-tables';
 
 const { LookupTablesActions } = CombinedProvider.get('LookupTables');

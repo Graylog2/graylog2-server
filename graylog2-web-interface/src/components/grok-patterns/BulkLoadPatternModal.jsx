@@ -17,7 +17,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Button } from 'components/graylog';
+import { Button } from 'components/common';
 import { Input } from 'components/bootstrap';
 import UserNotification from 'util/UserNotification';
 import StoreProvider from 'injection/StoreProvider';

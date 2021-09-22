@@ -16,8 +16,7 @@
  */
 import * as React from 'react';
 
-import { Row, Col } from 'components/graylog';
-import { EmptyEntity } from 'components/common';
+import { Row, Col, EmptyEntity } from 'components/common';
 
 import ServiceSelect from './ServiceSelect';
 

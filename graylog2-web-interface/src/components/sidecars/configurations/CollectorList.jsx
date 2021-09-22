@@ -18,9 +18,8 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 
-import { LinkContainer } from 'components/graylog/router';
-import { Col, Row, Button } from 'components/graylog';
-import { DataTable, PaginatedList, SearchForm } from 'components/common';
+import { LinkContainer } from 'components/common/router';
+import { Col, Row, Button, DataTable, PaginatedList, SearchForm } from 'components/common';
 import Routes from 'routing/Routes';
 
 import CollectorRow from './CollectorRow';

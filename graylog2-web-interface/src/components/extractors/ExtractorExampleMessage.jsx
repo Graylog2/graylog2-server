@@ -18,7 +18,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import { Well } from 'components/graylog';
+import { Well } from 'components/common';
 
 import MessageLoader from './MessageLoader';
 

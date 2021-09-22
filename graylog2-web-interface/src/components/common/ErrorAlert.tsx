@@ -18,7 +18,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import { Alert, Button, Col, Row } from 'components/graylog';
+import { Alert, Button, Col, Row } from 'components/common';
 import Icon from 'components/common/Icon';
 
 const StyledRow = styled(Row)`

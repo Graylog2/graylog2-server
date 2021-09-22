@@ -19,9 +19,8 @@ import styled, { css } from 'styled-components';
 import naturalSort from 'javascript-natural-sort';
 import Immutable from 'immutable';
 
-import { LinkContainer, Link } from 'components/graylog/router';
-import { Button } from 'components/graylog';
-import { DataTable, Spinner, PaginatedList, SearchForm, QueryHelper } from 'components/common';
+import { LinkContainer, Link } from 'components/common/router';
+import { Button, DataTable, Spinner, PaginatedList, SearchForm, QueryHelper } from 'components/common';
 import { MetricContainer, CounterRate } from 'components/metrics';
 import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';

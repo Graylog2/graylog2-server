@@ -17,8 +17,8 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { groupBy } from 'lodash';
 
+import { Button } from 'components/bootstrap';
 import { IfPermitted } from 'components/common';
-import { Button } from 'components/graylog';
 import Spinner from 'components/common/Spinner';
 import CombinedProvider from 'injection/CombinedProvider';
 import { StreamsActions, Stream } from 'stores/streams/StreamsStore';

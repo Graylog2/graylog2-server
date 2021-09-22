@@ -17,7 +17,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Col, ControlLabel, FormControl, FormGroup, Row, Button } from 'components/graylog';
+import { Col, ControlLabel, FormControl, FormGroup, Row, Button } from 'components/common';
 import { Input } from 'components/bootstrap';
 import ActionsProvider from 'injection/ActionsProvider';
 import ExtractorUtils from 'util/ExtractorUtils';

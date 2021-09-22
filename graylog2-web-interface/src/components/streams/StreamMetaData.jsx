@@ -19,8 +19,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import CollapsibleStreamRuleList from 'components/streamrules/CollapsibleStreamRuleList';
-import { Pluralize } from 'components/common';
-import { Button } from 'components/graylog';
+import { Pluralize, Button } from 'components/common';
 
 import StreamThroughput from './StreamThroughput';
 

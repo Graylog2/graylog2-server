@@ -19,7 +19,7 @@ import React from 'react';
 import marked from 'marked';
 import DOMPurify from 'dompurify';
 
-import { Col, Row, Well } from 'components/graylog';
+import { Col, Row, Well } from 'components/common';
 import ContentPackStatus from 'components/content-packs/ContentPackStatus';
 import ContentPackConstraints from 'components/content-packs/ContentPackConstraints';
 import ContentPackEntitiesList from 'components/content-packs/ContentPackEntitiesList';

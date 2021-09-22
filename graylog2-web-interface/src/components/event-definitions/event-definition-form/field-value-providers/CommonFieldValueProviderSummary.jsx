@@ -17,8 +17,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { Table, Button } from 'components/graylog';
-import { Icon } from 'components/common';
+import { Table, Button, Icon } from 'components/common';
 
 import styles from './CommonFieldValueProviderSummary.css';
 

@@ -17,10 +17,10 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 
-import { Col, Row } from 'components/graylog';
+import { Col, Row } from 'components/bootstrap';
+import { Spinner } from 'components/common';
 import connect from 'stores/connect';
 import CombinedProvider from 'injection/CombinedProvider';
-import { Spinner } from 'components/common';
 import { SystemJobsList } from 'components/systemjobs';
 
 const { SystemJobsStore, SystemJobsActions } = CombinedProvider.get('SystemJobs');

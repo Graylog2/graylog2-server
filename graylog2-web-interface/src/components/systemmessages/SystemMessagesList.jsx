@@ -18,7 +18,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import { Table } from 'components/graylog';
+import { Table } from 'components/common';
 import { SystemMessage } from 'components/systemmessages';
 
 const SystemMessagesTable = styled(Table)(({ theme }) => css`

@@ -22,7 +22,7 @@ import { useQuery } from 'react-query';
 import { ErrorBoundary } from 'react-error-boundary';
 
 import { DocumentTitle, Icon } from 'components/common';
-import { Alert, Button } from 'components/graylog';
+import { Alert, Button } from 'components/bootstrap';
 import LoginForm from 'components/login/LoginForm';
 import LoginBox from 'components/login/LoginBox';
 import authStyles from 'theme/styles/authStyles';

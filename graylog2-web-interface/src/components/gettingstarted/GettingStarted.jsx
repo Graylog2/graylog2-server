@@ -19,7 +19,7 @@ import PropTypes from 'prop-types';
 import Qs from 'qs';
 import styled, { css } from 'styled-components';
 
-import { Grid, Col, Button } from 'components/graylog';
+import { Grid, Col, Button } from 'components/bootstrap';
 import { ContentHeadRow, Spinner, Icon } from 'components/common';
 import ActionsProvider from 'injection/ActionsProvider';
 

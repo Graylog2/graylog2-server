@@ -20,7 +20,7 @@ import PropTypes from 'prop-types';
 
 import ActionsProvider from 'injection/ActionsProvider';
 
-import { Button } from '../graylog';
+import { Button } from '../common/index';
 
 const MessagesActions = ActionsProvider.getActions('Messages');
 

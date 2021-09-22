@@ -18,7 +18,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
-import { Button } from 'components/graylog';
+import { Button } from 'components/bootstrap';
 import { Icon } from 'components/common';
 import { SearchActions } from 'views/stores/SearchStore';
 

@@ -19,8 +19,7 @@ import PropTypes from 'prop-types';
 import moment from 'moment';
 import lodash from 'lodash';
 
-import { ButtonGroup, ControlLabel, FormControl, FormGroup, Button } from 'components/graylog';
-import { SearchForm, TimeUnitInput, Icon } from 'components/common';
+import { ButtonGroup, ControlLabel, FormControl, FormGroup, Button, SearchForm, TimeUnitInput, Icon } from 'components/common';
 import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
 import * as FormsUtils from 'util/FormsUtils';
 

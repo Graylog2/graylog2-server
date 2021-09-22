@@ -17,8 +17,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Button } from 'components/graylog';
-import { Icon } from 'components/common';
+import { Button, Icon } from 'components/common';
 import StoreProvider from 'injection/StoreProvider';
 
 const InputStaticFieldsStore = StoreProvider.getStore('InputStaticFields');

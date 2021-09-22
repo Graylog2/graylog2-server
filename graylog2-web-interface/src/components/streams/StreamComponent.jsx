@@ -17,8 +17,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Alert } from 'components/graylog';
-import { Icon, IfPermitted, PaginatedList, SearchForm } from 'components/common';
+import { Alert, Icon, IfPermitted, PaginatedList, SearchForm } from 'components/common';
 import StoreProvider from 'injection/StoreProvider';
 import Spinner from 'components/common/Spinner';
 import QueryHelper from 'components/common/QueryHelper';

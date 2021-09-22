@@ -21,8 +21,7 @@ import Reflux from 'reflux';
 
 import CombinedProvider from 'injection/CombinedProvider';
 import { sortByDate } from 'util/SortUtils';
-import { Row, Col } from 'components/graylog';
-import { EntityList, Spinner } from 'components/common';
+import { Row, Col, EntityList, Spinner } from 'components/common';
 import { AlarmCallbackHistory } from 'components/alarmcallbacks';
 
 const { AlarmCallbackHistoryStore } = CombinedProvider.get('AlarmCallbackHistory');

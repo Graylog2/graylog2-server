@@ -17,8 +17,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { Panel, Table } from 'components/graylog';
-import { Spinner } from 'components/common';
+import { Panel, Table, Spinner } from 'components/common';
 import HelpPanel from 'components/event-definitions/common/HelpPanel';
 
 import styles from './FilterPreview.css';

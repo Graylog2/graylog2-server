@@ -18,9 +18,8 @@ import PropTypes from 'prop-types';
 import React, { useMemo, useRef, useState } from 'react';
 import naturalSort from 'javascript-natural-sort';
 
-import { Link } from 'components/graylog/router';
-import { ControlLabel, FormGroup, HelpBlock, Button } from 'components/graylog';
-import { SelectableList } from 'components/common';
+import { Link } from 'components/common/router';
+import { ControlLabel, FormGroup, HelpBlock, Button, SelectableList } from 'components/common';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import Routes from 'routing/Routes';
 import { PipelineType } from 'stores/pipelines/PipelinesStore';

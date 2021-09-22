@@ -17,7 +17,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Col, Panel, Row, Tab, Tabs } from 'components/graylog';
+import { Col, Panel, Row, Tab, Tabs } from 'components/common';
 
 import TemplatesHelper from './TemplatesHelper';
 import ConfigurationVariablesHelper from './ConfigurationVariablesHelper';

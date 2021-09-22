@@ -18,8 +18,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { findIndex } from 'lodash';
 
-import { Button, Modal, ButtonToolbar, Badge } from 'components/graylog';
-import { DataTable, SearchForm, Icon } from 'components/common';
+import { Button, Modal, ButtonToolbar, Badge, DataTable, SearchForm, Icon } from 'components/common';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import ContentPackEditParameter from 'components/content-packs/ContentPackEditParameter';
 import ObjectUtils from 'util/ObjectUtils';

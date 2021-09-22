@@ -20,10 +20,9 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import styled from 'styled-components';
 
-import { Row, Col } from 'components/graylog';
+import { Row, Col, IfPermitted, Spinner, SearchForm } from 'components/common';
 import { naturalSortIgnoreCase } from 'util/SortUtils';
 import EntityList from 'components/common/EntityList';
-import { IfPermitted, Spinner, SearchForm } from 'components/common';
 import StoreProvider from 'injection/StoreProvider';
 import ActionsProvider from 'injection/ActionsProvider';
 

@@ -17,8 +17,7 @@
 import React, { useContext, useEffect } from 'react';
 import PropTypes from 'prop-types';
 
-import { Alert } from 'components/graylog';
-import { Icon } from 'components/common';
+import { Alert, Icon } from 'components/common';
 import RenderCompletionCallback from 'views/components/widgets/RenderCompletionCallback';
 
 type Props = {

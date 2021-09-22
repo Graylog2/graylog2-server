@@ -18,7 +18,7 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
-import { Col, Row } from 'components/graylog';
+import { Col, Row } from 'components/bootstrap';
 import DocumentationLink from 'components/support/DocumentationLink';
 import { DocumentTitle, PageHeader } from 'components/common';
 import { AlertsHeaderToolbar } from 'components/alerts';

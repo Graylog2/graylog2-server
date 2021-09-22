@@ -17,10 +17,10 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { LinkContainer } from 'components/graylog/router';
+import { LinkContainer } from 'components/common/router';
 import StoreProvider from 'injection/StoreProvider';
 import ActionsProvider from 'injection/ActionsProvider';
-import { NavDropdown, MenuItem } from 'components/graylog';
+import { NavDropdown, MenuItem } from 'components/bootstrap';
 import { Icon } from 'components/common';
 import Routes from 'routing/Routes';
 import history from 'util/History';

@@ -18,10 +18,10 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import { Link, LinkContainer } from 'components/graylog/router';
-import { Button, ButtonToolbar } from 'components/graylog';
-import Routes from 'routing/Routes';
+import { Link, LinkContainer } from 'components/common/router';
+import { Button, ButtonToolbar } from 'components/bootstrap';
 import { Timestamp } from 'components/common';
+import Routes from 'routing/Routes';
 import OperatingSystemIcon from 'components/sidecars/common/OperatingSystemIcon';
 import StatusIndicator from 'components/sidecars/common/StatusIndicator';
 import SidecarStatusEnum from 'logic/sidecar/SidecarStatusEnum';

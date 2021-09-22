@@ -18,7 +18,7 @@ import React from 'react';
 import numeral from 'numeral';
 import moment from 'moment';
 
-import { Col, Row } from 'components/graylog';
+import { Col, Row } from 'components/bootstrap';
 import StoreProvider from 'injection/StoreProvider';
 import DocsHelper from 'util/DocsHelper';
 import { DocumentTitle, Spinner, PageHeader, PaginatedList } from 'components/common';

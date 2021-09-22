@@ -18,7 +18,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import $ from 'jquery';
 
-import { Button, Modal } from 'components/graylog';
+import { Button, Modal } from 'components/common';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import { validate } from 'legacy/validations.js';
 

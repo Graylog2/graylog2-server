@@ -21,7 +21,7 @@ import ClipboardJS from 'clipboard';
 import debounce from 'lodash/debounce';
 
 import { ScratchpadContext } from 'contexts/ScratchpadProvider';
-import { Alert, Button, ButtonGroup, OverlayTrigger, Tooltip } from 'components/graylog';
+import { Alert, Button, ButtonGroup, OverlayTrigger, Tooltip } from 'components/common';
 import { BootstrapModalConfirm } from 'components/bootstrap';
 import InteractableModal from 'components/common/InteractableModal';
 import Icon from 'components/common/Icon';

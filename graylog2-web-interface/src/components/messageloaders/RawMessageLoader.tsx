@@ -21,9 +21,8 @@ import * as Immutable from 'immutable';
 import { Subtract } from 'utility-types';
 
 import { getValueFromInput } from 'util/FormsUtils';
-import { Col, Row, Button } from 'components/graylog';
+import { Col, Row, Button, Select } from 'components/common';
 import { Input } from 'components/bootstrap';
-import { Select } from 'components/common';
 import { BooleanField, DropdownField, NumberField, TextField } from 'components/configurationforms';
 import CombinedProvider from 'injection/CombinedProvider';
 import connect from 'stores/connect';

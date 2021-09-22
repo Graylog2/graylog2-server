@@ -17,8 +17,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { Select } from 'components/common';
-import { Button, ButtonToolbar, Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/graylog';
+import { Select, Button, ButtonToolbar, Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/common';
 import EventNotificationFormContainer
   from 'components/event-notifications/event-notification-form/EventNotificationFormContainer';
 

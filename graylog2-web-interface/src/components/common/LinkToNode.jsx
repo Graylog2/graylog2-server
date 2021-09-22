@@ -19,7 +19,7 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
-import { Link } from 'components/graylog/router';
+import { Link } from 'components/common/router';
 import StoreProvider from 'injection/StoreProvider';
 import Routes from 'routing/Routes';
 import AppConfig from 'util/AppConfig';

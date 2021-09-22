@@ -20,8 +20,8 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
-import { LinkContainer } from 'components/graylog/router';
-import { Button, Col, Row } from 'components/graylog';
+import { LinkContainer } from 'components/common/router';
+import { Button, Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import Pipeline from 'components/pipelines/Pipeline';
 import NewPipeline from 'components/pipelines/NewPipeline';

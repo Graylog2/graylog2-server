@@ -19,9 +19,8 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import Promise from 'bluebird';
 
-import { Button } from 'components/graylog';
+import { Button, EntityList, PaginatedList, Spinner } from 'components/common';
 import { Alert } from 'components/alerts';
-import { EntityList, PaginatedList, Spinner } from 'components/common';
 import CombinedProvider from 'injection/CombinedProvider';
 
 const { AlertsStore, AlertsActions } = CombinedProvider.get('Alerts');

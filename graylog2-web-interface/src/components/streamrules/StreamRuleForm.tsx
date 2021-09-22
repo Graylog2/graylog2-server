@@ -17,9 +17,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Col, Well } from 'components/graylog';
+import { Col, Well, Icon, TypeAheadFieldInput } from 'components/common';
 import { BootstrapModalForm, Input } from 'components/bootstrap';
-import { Icon, TypeAheadFieldInput } from 'components/common';
 import { DocumentationLink } from 'components/support';
 import HumanReadableStreamRule from 'components/streamrules//HumanReadableStreamRule';
 import CombinedProvider from 'injection/CombinedProvider';

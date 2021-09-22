@@ -18,9 +18,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 
-import { Button } from 'components/graylog';
+import { Button, BootstrapModalConfirm } from 'components/bootstrap';
 import { SelectPopover } from 'components/common';
-import { BootstrapModalConfirm } from 'components/bootstrap';
 import { naturalSortIgnoreCase } from 'util/SortUtils';
 import CollectorIndicator from 'components/sidecars/common/CollectorIndicator';
 import ColorLabel from 'components/sidecars/common/ColorLabel';

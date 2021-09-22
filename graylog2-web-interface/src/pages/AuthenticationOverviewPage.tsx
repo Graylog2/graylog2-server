@@ -18,7 +18,7 @@ import * as React from 'react';
 
 import AuthenticationAction from 'actions/authentication/AuthenticationActions';
 import {} from 'components/authentication/bindings'; // Bind all authentication plugins
-import { Alert, Row, Col } from 'components/graylog';
+import { Alert, Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Icon } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import DocumentationLink from 'components/support/DocumentationLink';

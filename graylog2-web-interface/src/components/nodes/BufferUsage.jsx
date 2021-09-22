@@ -21,13 +21,13 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import styled from 'styled-components';
 
-import { LinkContainer } from 'components/graylog/router';
-import { Button, ProgressBar } from 'components/graylog';
+import { LinkContainer } from 'components/common/router';
+import { Button } from 'components/bootstrap';
+import { ProgressBar, Spinner } from 'components/common';
 import StoreProvider from 'injection/StoreProvider';
 import ActionsProvider from 'injection/ActionsProvider';
 import Routes from 'routing/Routes';
 import NumberUtils from 'util/NumberUtils';
-import { Spinner } from 'components/common';
 
 const MetricsStore = StoreProvider.getStore('Metrics');
 const MetricsActions = ActionsProvider.getActions('Metrics');

@@ -17,9 +17,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Link } from 'components/graylog/router';
-import { Col, Label } from 'components/graylog';
-import { EntityListItem, Timestamp } from 'components/common';
+import { Link } from 'components/common/router';
+import { Col, Label, EntityListItem, Timestamp } from 'components/common';
 import Routes from 'routing/Routes';
 import DateTime from 'logic/datetimes/DateTime';
 

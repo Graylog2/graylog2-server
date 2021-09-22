@@ -20,7 +20,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { Overlay } from 'react-overlays';
 
-import { Popover } from 'components/graylog';
+import { Popover } from 'components/common';
 import ColorPicker from 'components/common/ColorPicker';
 
 const StyledPopover = styled(Popover)`

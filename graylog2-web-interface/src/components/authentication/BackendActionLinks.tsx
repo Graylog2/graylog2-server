@@ -16,10 +16,10 @@
  */
 import * as React from 'react';
 
-import { LinkContainer } from 'components/graylog/router';
+import { LinkContainer } from 'components/common/router';
 import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
 import Routes from 'routing/Routes';
-import { ButtonToolbar, Button } from 'components/graylog';
+import { ButtonToolbar, Button } from 'components/common';
 
 type Props = {
   activeBackend: AuthenticationBackend | undefined,

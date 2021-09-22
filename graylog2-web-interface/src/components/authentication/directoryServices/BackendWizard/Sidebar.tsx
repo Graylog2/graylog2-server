@@ -20,7 +20,7 @@ import styled from 'styled-components';
 import { $PropertyType } from 'utility-types';
 
 import { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
-import { PanelGroup, Panel } from 'components/graylog';
+import { PanelGroup, Panel } from 'components/common';
 import { Step } from 'components/common/Wizard';
 
 import { STEP_KEY as SERVER_CONFIG_KEY } from './ServerConfigStep';

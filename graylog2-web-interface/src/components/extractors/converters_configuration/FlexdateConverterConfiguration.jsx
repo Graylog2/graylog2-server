@@ -17,9 +17,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Row, Col } from 'components/graylog';
+import { Row, Col, TimezoneSelect } from 'components/common';
 import { Input } from 'components/bootstrap';
-import { TimezoneSelect } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
 import FormUtils from 'util/FormsUtils';

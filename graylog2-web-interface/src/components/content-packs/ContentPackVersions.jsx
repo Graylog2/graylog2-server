@@ -17,10 +17,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { LinkContainer } from 'components/graylog/router';
+import { LinkContainer } from 'components/common/router';
 import Routes from 'routing/Routes';
-import { DataTable } from 'components/common';
-import { Button, DropdownButton, ButtonToolbar, MenuItem, Modal } from 'components/graylog';
+import { DataTable, Button, DropdownButton, ButtonToolbar, MenuItem, Modal } from 'components/common';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import ContentPackDownloadControl from 'components/content-packs/ContentPackDownloadControl';
 import ContentPackInstall from 'components/content-packs/ContentPackInstall';

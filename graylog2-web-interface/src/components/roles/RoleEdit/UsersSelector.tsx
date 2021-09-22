@@ -26,7 +26,7 @@ import Role from 'logic/roles/Role';
 import { PaginatedListType } from 'components/common/PaginatedItemOverview';
 import UserOverview from 'logic/users/UserOverview';
 import UsersDomain from 'domainActions/users/UsersDomain';
-import { Button } from 'components/graylog';
+import { Button } from 'components/bootstrap';
 import { Select, ErrorAlert } from 'components/common';
 
 type Props = {

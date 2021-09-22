@@ -21,8 +21,7 @@ import {} from 'moment-duration-format';
 import lodash from 'lodash';
 import styled, { css } from 'styled-components';
 
-import { Button, Col, Row } from 'components/graylog';
-import { Icon, Pluralize, Timestamp } from 'components/common';
+import { Button, Col, Row, Icon, Pluralize, Timestamp } from 'components/common';
 
 const DetailsList = styled.dl`
 `;

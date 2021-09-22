@@ -18,10 +18,9 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import { Link } from 'components/graylog/router';
+import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
-import { Col } from 'components/graylog';
-import { EntityListItem } from 'components/common';
+import { Col, EntityListItem } from 'components/common';
 import { GenericAlertConditionSummary } from 'components/alertconditions';
 
 class AlertConditionSummary extends React.Component {

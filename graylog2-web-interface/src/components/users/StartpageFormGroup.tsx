@@ -21,7 +21,7 @@ import { Field } from 'formik';
 import styled from 'styled-components';
 
 import { getValuesFromGRN } from 'logic/permissions/GRN';
-import { Button, Alert } from 'components/graylog';
+import { Button, Alert } from 'components/common';
 import { Input } from 'components/bootstrap';
 import SharedEntity from 'logic/permissions/SharedEntity';
 import EntityShareDomain from 'domainActions/permissions/EntityShareDomain';

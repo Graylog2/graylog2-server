@@ -20,8 +20,7 @@ import { useContext } from 'react';
 import { Formik, Form, Field, FormikProps } from 'formik';
 
 import { validateField, formHasErrors } from 'util/FormsUtils';
-import { FormikFormGroup, FormikInput, InputOptionalInfo as Opt } from 'components/common';
-import { Button, ButtonToolbar } from 'components/graylog';
+import { FormikFormGroup, FormikInput, InputOptionalInfo as Opt, Button, ButtonToolbar } from 'components/common';
 import { Input } from 'components/bootstrap';
 
 import BackendWizardContext, { WizardFormValues } from './BackendWizardContext';

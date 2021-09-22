@@ -17,16 +17,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { LinkContainer } from 'components/graylog/router';
-import { Button, Col, Row } from 'components/graylog';
-import Routes from 'routing/Routes';
+import { LinkContainer } from 'components/common/router';
 import {
+  Button, Col, Row,
   EmptyEntity,
   EntityList,
   IfPermitted,
   PaginatedList,
   SearchForm,
 } from 'components/common';
+import Routes from 'routing/Routes';
 import QueryHelper from 'components/common/QueryHelper';
 
 import styles from './EventDefinitions.css';

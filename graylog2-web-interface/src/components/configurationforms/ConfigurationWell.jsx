@@ -17,7 +17,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { Well } from 'components/graylog';
+import { Well } from 'components/common';
 
 class ConfigurationWell extends React.Component {
   PASSWORD_PLACEHOLDER = '********';

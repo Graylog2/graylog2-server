@@ -20,8 +20,7 @@ import { Field } from 'formik';
 
 import { Icon, HoverForHelp } from 'components/common';
 import { TimeUnits } from 'views/Constants';
-import { FormControl, Checkbox, DropdownButton, MenuItem, InputGroup } from 'components/graylog';
-import { Input } from 'components/bootstrap';
+import { FormControl, Checkbox, DropdownButton, MenuItem, InputGroup, Input } from 'components/bootstrap';
 
 const RangeSelect = styled.div`
   display: flex;

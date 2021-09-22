@@ -20,8 +20,7 @@ import styled, { css } from 'styled-components';
 // eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 
-import { Col, Row } from 'components/graylog';
-import { Pluralize } from 'components/common';
+import { Col, Row, Pluralize } from 'components/common';
 
 const SimulationChangesWrap = styled.div`
   padding-top: 15px;

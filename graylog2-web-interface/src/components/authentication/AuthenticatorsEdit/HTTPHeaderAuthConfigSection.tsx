@@ -23,8 +23,7 @@ import history from 'util/History';
 import HTTPHeaderAuthConfig from 'logic/authentication/HTTPHeaderAuthConfig';
 import HTTPHeaderAuthConfigDomain from 'domainActions/authentication/HTTPHeaderAuthConfigDomain';
 import { Input } from 'components/bootstrap';
-import { Button, Col, Row, Alert } from 'components/graylog';
-import { FormikFormGroup, ErrorAlert, Spinner, Icon } from 'components/common';
+import { Button, Col, Row, Alert, FormikFormGroup, ErrorAlert, Spinner, Icon } from 'components/common';
 import SectionComponent from 'components/common/Section/SectionComponent';
 
 const HTTPHeaderAuthConfigSection = () => {

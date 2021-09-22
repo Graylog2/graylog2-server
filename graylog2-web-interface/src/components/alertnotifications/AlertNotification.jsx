@@ -19,10 +19,10 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
-import { LinkContainer } from 'components/graylog/router';
+import { LinkContainer } from 'components/common/router';
 import PermissionsMixin from 'util/PermissionsMixin';
 import CombinedProvider from 'injection/CombinedProvider';
-import { Col, DropdownButton, MenuItem, Button } from 'components/graylog';
+import { Col, DropdownButton, MenuItem, Button } from 'components/bootstrap';
 import { EntityListItem, IfPermitted, Spinner } from 'components/common';
 import { UnknownAlertNotification } from 'components/alertnotifications';
 import { ConfigurationForm, ConfigurationWell } from 'components/configurationforms';

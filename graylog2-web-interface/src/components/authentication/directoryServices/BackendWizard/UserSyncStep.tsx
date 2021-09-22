@@ -21,8 +21,7 @@ import { Formik, Form, Field, FormikProps } from 'formik';
 
 import Role from 'logic/roles/Role';
 import { validateField, formHasErrors } from 'util/FormsUtils';
-import { Alert, Button, ButtonToolbar, Row, Col, Panel } from 'components/graylog';
-import { Icon, FormikFormGroup, Select } from 'components/common';
+import { Alert, Button, ButtonToolbar, Row, Col, Panel, Icon, FormikFormGroup, Select } from 'components/common';
 import { Input } from 'components/bootstrap';
 
 import BackendWizardContext, { WizardFormValues } from './BackendWizardContext';

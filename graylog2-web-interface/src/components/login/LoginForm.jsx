@@ -18,7 +18,7 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import { Button, FormGroup } from 'components/graylog';
+import { Button, FormGroup } from 'components/common';
 import { Input } from 'components/bootstrap';
 import CombinedProvider from 'injection/CombinedProvider';
 

@@ -17,8 +17,8 @@
 import * as React from 'react';
 import { useEffect, useState, useContext } from 'react';
 
-import { LinkContainer, Link } from 'components/graylog/router';
-import { ButtonToolbar, Col, Row, Button } from 'components/graylog';
+import { LinkContainer, Link } from 'components/common/router';
+import { ButtonToolbar, Col, Row, Button } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { isPermitted } from 'util/PermissionsMixin';
 import CurrentUserContext from 'contexts/CurrentUserContext';

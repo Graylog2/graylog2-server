@@ -18,8 +18,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import styled, { StyledComponent } from 'styled-components';
 
-import { Button, ControlLabel, FormControl, FormGroup } from 'components/graylog';
-import { Spinner } from 'components/common';
+import { Button, ControlLabel, FormControl, FormGroup, Spinner } from 'components/common';
 
 const StyledForm: StyledComponent<'form', {}> = styled.form`
   margin-top: 10px;

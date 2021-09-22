@@ -19,8 +19,8 @@ import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 
-import { LinkContainer } from 'components/graylog/router';
-import { ButtonToolbar, DropdownButton, MenuItem, Button } from 'components/graylog';
+import { LinkContainer } from 'components/common/router';
+import { ButtonToolbar, DropdownButton, MenuItem, Button } from 'components/common';
 import Routes from 'routing/Routes';
 import OperatingSystemIcon from 'components/sidecars/common/OperatingSystemIcon';
 

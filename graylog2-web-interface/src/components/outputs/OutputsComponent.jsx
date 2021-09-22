@@ -17,7 +17,7 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
 
-import { Row, Col } from 'components/graylog';
+import { Row, Col } from 'components/bootstrap';
 import StoreProvider from 'injection/StoreProvider';
 import UserNotification from 'util/UserNotification';
 import PermissionsMixin from 'util/PermissionsMixin';

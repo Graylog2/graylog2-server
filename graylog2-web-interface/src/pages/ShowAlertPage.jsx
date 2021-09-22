@@ -19,8 +19,8 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
-import { LinkContainer } from 'components/graylog/router';
-import { ButtonToolbar, Label, Tooltip, Button } from 'components/graylog';
+import { LinkContainer } from 'components/common/router';
+import { ButtonToolbar, Label, Tooltip, Button } from 'components/bootstrap';
 import { DocumentTitle, OverlayElement, PageHeader, Spinner, Timestamp } from 'components/common';
 import { AlertDetails } from 'components/alerts';
 import DateTime from 'logic/datetimes/DateTime';

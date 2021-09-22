@@ -16,10 +16,9 @@
  */
 import * as React from 'react';
 
-import { LinkContainer } from 'components/graylog/router';
-import { IfPermitted } from 'components/common';
+import { LinkContainer } from 'components/common/router';
+import { IfPermitted, ButtonToolbar, Button } from 'components/common';
 import Routes from 'routing/Routes';
-import { ButtonToolbar, Button } from 'components/graylog';
 
 const UserOverviewLinks = () => {
   const teamsRoute = Routes.getPluginRoute('SYSTEM_TEAMS');

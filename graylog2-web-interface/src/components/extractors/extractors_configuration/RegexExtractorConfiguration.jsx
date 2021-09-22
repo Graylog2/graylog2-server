@@ -17,8 +17,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Row, Col, Button } from 'components/graylog';
-import { Icon } from 'components/common';
+import { Row, Col, Button, Icon } from 'components/common';
 import { Input } from 'components/bootstrap';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';

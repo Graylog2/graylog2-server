@@ -19,7 +19,7 @@ import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import ClipboardJS from 'clipboard';
 
-import { Tooltip } from 'components/graylog';
+import { Tooltip } from 'components/bootstrap';
 
 const Name = styled.span`
   flex: 1;

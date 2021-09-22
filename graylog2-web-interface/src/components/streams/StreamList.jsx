@@ -19,8 +19,7 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import styled from 'styled-components';
 
-import { Alert } from 'components/graylog';
-import { Icon } from 'components/common';
+import { Alert, Icon } from 'components/common';
 import PermissionsMixin from 'util/PermissionsMixin';
 
 import Stream from './Stream';

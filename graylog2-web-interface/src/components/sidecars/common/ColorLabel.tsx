@@ -19,7 +19,7 @@ import PropTypes from 'prop-types';
 import styled, { css, withTheme, DefaultTheme } from 'styled-components';
 
 import { themePropTypes } from 'theme';
-import { Label } from 'components/graylog';
+import { Label } from 'components/common';
 
 type Size = 'normal' | 'small' | 'xsmall';
 

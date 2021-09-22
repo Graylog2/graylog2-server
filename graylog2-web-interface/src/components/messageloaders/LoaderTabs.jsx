@@ -18,7 +18,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 
-import { Col, Tab, Tabs } from 'components/graylog';
+import { Col, Tab, Tabs } from 'components/bootstrap';
 import connect from 'stores/connect';
 import StoreProvider from 'injection/StoreProvider';
 import ActionsProvider from 'injection/ActionsProvider';

@@ -21,8 +21,7 @@ import styled from 'styled-components';
 import moment from 'moment';
 import { useFormikContext } from 'formik';
 
-import { Icon } from 'components/common';
-import { Accordion, AccordionItem } from 'components/graylog';
+import { Icon, Accordion, AccordionItem } from 'components/common';
 import { AbsoluteTimeRange } from 'views/logic/queries/Query';
 import DateTime from 'logic/datetimes/DateTime';
 

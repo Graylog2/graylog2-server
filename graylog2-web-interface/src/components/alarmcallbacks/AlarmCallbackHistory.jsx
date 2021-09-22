@@ -17,8 +17,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Alert, Col, Label } from 'components/graylog';
-import { EntityListItem, Timestamp } from 'components/common';
+import { Alert, Col, Label, EntityListItem, Timestamp } from 'components/common';
 import { ConfigurationWell } from 'components/configurationforms';
 import DateTime from 'logic/datetimes/DateTime';
 

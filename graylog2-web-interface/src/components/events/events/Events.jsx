@@ -19,9 +19,9 @@ import PropTypes from 'prop-types';
 import lodash from 'lodash';
 import styled, { css } from 'styled-components';
 
-import { Link, LinkContainer } from 'components/graylog/router';
-import { Alert, Col, Label, OverlayTrigger, Row, Table, Tooltip, Button } from 'components/graylog';
-import { EmptyEntity, IfPermitted, PaginatedList, Timestamp, Icon } from 'components/common';
+import { Link, LinkContainer } from 'components/common/router';
+import { OverlayTrigger, EmptyEntity, IfPermitted, PaginatedList, Timestamp, Icon } from 'components/common';
+import { Alert, Col, Label, Row, Table, Tooltip, Button } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import DateTime from 'logic/datetimes/DateTime';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';

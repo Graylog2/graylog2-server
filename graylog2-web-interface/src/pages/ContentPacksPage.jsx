@@ -20,8 +20,8 @@ import Reflux from 'reflux';
 import createReactClass from 'create-react-class';
 import styled, { css } from 'styled-components';
 
-import { LinkContainer } from 'components/graylog/router';
-import { Row, Col, ButtonToolbar, Button } from 'components/graylog';
+import { LinkContainer } from 'components/common/router';
+import { Row, Col, ButtonToolbar, Button } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import Spinner from 'components/common/Spinner';
 import UserNotification from 'util/UserNotification';

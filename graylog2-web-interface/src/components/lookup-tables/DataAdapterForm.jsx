@@ -19,12 +19,11 @@ import React from 'react';
 import _ from 'lodash';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import { Col, Row, Button } from 'components/graylog';
+import { Col, Row, Button, TimeUnitInput } from 'components/common';
 import { Input } from 'components/bootstrap';
 import ObjectUtils from 'util/ObjectUtils';
 import { getValueFromInput } from 'util/FormsUtils';
 import CombinedProvider from 'injection/CombinedProvider';
-import { TimeUnitInput } from 'components/common';
 
 const { LookupTableDataAdaptersActions } = CombinedProvider.get('LookupTableDataAdapters');
 

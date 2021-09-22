@@ -23,8 +23,7 @@ import Routes from 'routing/Routes';
 import { validateField } from 'util/FormsUtils';
 import history from 'util/History';
 import { defaultCompare } from 'views/logic/DefaultCompare';
-import { Select, InputDescription } from 'components/common';
-import { Button } from 'components/graylog';
+import { Select, InputDescription, Button } from 'components/common';
 
 const ElementsContainer = styled.div`
   display: flex;

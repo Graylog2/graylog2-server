@@ -19,7 +19,7 @@ import React, { useRef, useState } from 'react';
 import { cloneDeep } from 'lodash';
 import styled from 'styled-components';
 
-import { Row, Col, Button } from 'components/graylog';
+import { Row, Col, Button } from 'components/common';
 import { BootstrapModalForm, Input } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
 import { PipelineType } from 'stores/pipelines/PipelinesStore';

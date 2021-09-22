@@ -18,7 +18,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import lodash from 'lodash';
 
-import { Modal, Button } from 'components/graylog';
+import { Modal, Button } from 'components/common';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import CombinedProvider from 'injection/CombinedProvider';
 

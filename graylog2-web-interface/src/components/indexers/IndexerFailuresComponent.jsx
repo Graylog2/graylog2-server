@@ -18,9 +18,8 @@ import React from 'react';
 import numeral from 'numeral';
 import moment from 'moment';
 
-import { LinkContainer } from 'components/graylog/router';
-import { Alert, Col, Row, Button } from 'components/graylog';
-import { Icon, Spinner } from 'components/common';
+import { LinkContainer } from 'components/common/router';
+import { Alert, Col, Row, Button, Icon, Spinner } from 'components/common';
 import StoreProvider from 'injection/StoreProvider';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';

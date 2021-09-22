@@ -20,7 +20,7 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import lodash from 'lodash';
 
-import { DropdownButton, MenuItem } from 'components/graylog';
+import { DropdownButton, MenuItem } from 'components/bootstrap';
 import CombinedProvider from 'injection/CombinedProvider';
 
 const { LoggersStore, LoggersActions } = CombinedProvider.get('Loggers');

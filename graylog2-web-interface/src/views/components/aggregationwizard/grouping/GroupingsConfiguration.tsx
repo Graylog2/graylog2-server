@@ -20,7 +20,7 @@ import { useFormikContext, FieldArray, Field } from 'formik';
 import styled from 'styled-components';
 
 import { HoverForHelp, SortableList } from 'components/common';
-import { Checkbox } from 'components/graylog';
+import { Checkbox } from 'components/bootstrap';
 
 import GroupingConfiguration from './GroupingConfiguration';
 import GroupingElement from './GroupingElement';

@@ -18,7 +18,7 @@ import * as React from 'react';
 import styled, { css } from 'styled-components';
 
 import Spinner from 'components/common/Spinner';
-import { Row, Col } from 'components/graylog';
+import { Row, Col } from 'components/common';
 
 type Props = {
   children: React.ReactNode,

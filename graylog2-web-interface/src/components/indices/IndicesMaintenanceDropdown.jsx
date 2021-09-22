@@ -17,7 +17,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { ButtonGroup, DropdownButton, MenuItem } from 'components/graylog';
+import { ButtonGroup, DropdownButton, MenuItem } from 'components/bootstrap';
 import ActionsProvider from 'injection/ActionsProvider';
 import StoreProvider from 'injection/StoreProvider';
 

@@ -17,7 +17,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { ListGroupItem } from 'components/graylog';
+import { ListGroupItem } from 'components/common';
 
 const ControlledTableListItem = ({ className, children }: { className?: string, children: React.ReactNode }) => {
   return (

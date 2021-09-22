@@ -18,9 +18,8 @@ import * as React from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import PropTypes from 'prop-types';
 
-import { ReadOnlyFormGroup } from 'components/common';
+import { ReadOnlyFormGroup, Alert } from 'components/common';
 import SectionComponent from 'components/common/Section/SectionComponent';
-import { Alert } from 'components/graylog';
 
 const _getNotificationPlugin = (type) => {
   if (type === undefined) {

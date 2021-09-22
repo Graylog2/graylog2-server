@@ -19,8 +19,8 @@ import PropTypes from 'prop-types';
 import numeral from 'numeral';
 
 import HideOnCloud from 'util/conditional/HideOnCloud';
-import { LinkContainer } from 'components/graylog/router';
-import { Alert, Row, Col, Panel, Button } from 'components/graylog';
+import { LinkContainer } from 'components/common/router';
+import { Alert, Row, Col, Panel, Button } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner, Icon } from 'components/common';
 import { IndicesMaintenanceDropdown, IndicesOverview, IndexSetDetails } from 'components/indices';
 import { IndexerClusterHealthSummary } from 'components/indexers';

@@ -19,7 +19,7 @@ import PropTypes from 'prop-types';
 import lodash from 'lodash';
 import styled, { css, DefaultTheme } from 'styled-components';
 
-import { Button, ButtonToolbar, Col, Nav, NavItem, Row } from 'components/graylog';
+import { Button, ButtonToolbar, Col, Nav, NavItem, Row } from 'components/common';
 
 import Icon from './Icon';
 

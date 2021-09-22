@@ -21,10 +21,9 @@ import PropTypes from 'prop-types';
 import lodash from 'lodash';
 import styled, { css } from 'styled-components';
 
-import { Link } from 'components/graylog/router';
-import { Col, Row } from 'components/graylog';
+import { Link } from 'components/common/router';
+import { Col, Row, ControlledTableList, PaginatedList } from 'components/common';
 import Routes from 'routing/Routes';
-import { ControlledTableList, PaginatedList } from 'components/common';
 import { Input } from 'components/bootstrap';
 import ColorLabel from 'components/sidecars/common/ColorLabel';
 import OperatingSystemIcon from 'components/sidecars/common/OperatingSystemIcon';

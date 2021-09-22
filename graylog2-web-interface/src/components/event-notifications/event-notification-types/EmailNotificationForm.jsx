@@ -18,8 +18,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 
-import { ControlLabel, FormGroup, HelpBlock } from 'components/graylog';
-import { MultiSelect, SourceCodeEditor } from 'components/common';
+import { ControlLabel, FormGroup, HelpBlock, MultiSelect, SourceCodeEditor } from 'components/common';
 import { Input } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
 import HideOnCloud from 'util/conditional/HideOnCloud';

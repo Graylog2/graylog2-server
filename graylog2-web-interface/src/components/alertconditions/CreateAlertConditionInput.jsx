@@ -20,9 +20,8 @@ import PropTypes from 'prop-types';
 import Reflux from 'reflux';
 import naturalSort from 'javascript-natural-sort';
 
-import { Col, Row, Button } from 'components/graylog';
+import { Col, Row, Button, Select, Spinner } from 'components/common';
 import { Input } from 'components/bootstrap';
-import { Select, Spinner } from 'components/common';
 import { AlertConditionForm } from 'components/alertconditions';
 import Routes from 'routing/Routes';
 import UserNotification from 'util/UserNotification';

@@ -20,8 +20,7 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import lodash from 'lodash';
 import naturalSort from 'javascript-natural-sort';
 
-import { Clearfix, Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/graylog';
-import { Select } from 'components/common';
+import { Clearfix, Col, ControlLabel, FormGroup, HelpBlock, Row, Select } from 'components/common';
 import HelpPanel from 'components/event-definitions/common/HelpPanel';
 
 import styles from './EventConditionForm.css';

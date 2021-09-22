@@ -19,9 +19,8 @@ import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 
-import { Button, ButtonToolbar } from 'components/graylog';
+import { Button, ButtonToolbar, SelectPopover } from 'components/common';
 import { naturalSortIgnoreCase } from 'util/SortUtils';
-import { SelectPopover } from 'components/common';
 import CollectorIndicator from 'components/sidecars/common/CollectorIndicator';
 import ColorLabel from 'components/sidecars/common/ColorLabel';
 import SidecarStatusEnum from 'logic/sidecar/SidecarStatusEnum';

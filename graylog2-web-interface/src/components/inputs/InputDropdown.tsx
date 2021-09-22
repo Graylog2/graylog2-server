@@ -20,7 +20,7 @@ import * as PropTypes from 'prop-types';
 import styled from 'styled-components';
 import * as Immutable from 'immutable';
 
-import { Button } from 'components/graylog';
+import { Button } from 'components/common';
 import { Input } from 'components/bootstrap';
 import Spinner from 'components/common/Spinner';
 

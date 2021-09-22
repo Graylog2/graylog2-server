@@ -19,8 +19,7 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
 import StoreProvider from 'injection/StoreProvider';
-import { Alert, Row, Col } from 'components/graylog';
-import { Icon, Spinner } from 'components/common';
+import { Alert, Row, Col, Icon, Spinner } from 'components/common';
 import Notification from 'components/notifications/Notification';
 
 const NotificationsStore = StoreProvider.getStore('Notifications');

@@ -19,8 +19,7 @@ import { forwardRef } from 'react';
 import styled from 'styled-components';
 import type { DraggableProvidedDraggableProps, DraggableProvidedDragHandleProps } from 'react-beautiful-dnd';
 
-import { ListGroupItem } from 'components/graylog';
-import { Icon } from 'components/common';
+import { ListGroupItem, Icon } from 'components/common';
 
 export type ListItemType = {
   id: string,

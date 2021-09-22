@@ -18,8 +18,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import { Button, ProgressBar } from 'components/graylog';
-import { LinkToNode, Timestamp, Icon } from 'components/common';
+import { ProgressBar, LinkToNode, Timestamp, Icon } from 'components/common';
+import { Button } from 'components/bootstrap';
 import ActionsProvider from 'injection/ActionsProvider';
 
 const SystemJobsActions = ActionsProvider.getActions('SystemJobs');

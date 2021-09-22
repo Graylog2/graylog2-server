@@ -18,9 +18,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 
-import { Button } from 'components/graylog';
+import { Button, IfPermitted, Select } from 'components/common';
 import { BootstrapModalForm, Input } from 'components/bootstrap';
-import { IfPermitted, Select } from 'components/common';
 import { DocumentationLink } from 'components/support';
 import ObjectUtils from 'util/ObjectUtils';
 

@@ -19,8 +19,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { get } from 'lodash';
 
-import { Alert, Row } from 'components/graylog';
-import { Icon } from 'components/common';
+import { Alert, Row, Icon } from 'components/common';
 import { emptyComparisonExpressionConfig } from 'logic/alerts/AggregationExpressionConfig';
 import validateExpression from 'logic/alerts/AggregationExpressionValidation';
 

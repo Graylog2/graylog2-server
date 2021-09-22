@@ -19,7 +19,7 @@ import * as React from 'react';
 import Promise from 'bluebird';
 import styled from 'styled-components';
 
-import { Button } from 'components/graylog';
+import { Button } from 'components/common';
 import Spinner from 'components/common/Spinner';
 
 const FormContent = styled.div(({ buttonLeftMargin }) => `

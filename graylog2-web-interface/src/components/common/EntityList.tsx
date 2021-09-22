@@ -18,7 +18,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import styled from 'styled-components';
 
-import { Alert } from 'components/graylog';
+import { Alert } from 'components/common';
 
 import Icon from './Icon';
 

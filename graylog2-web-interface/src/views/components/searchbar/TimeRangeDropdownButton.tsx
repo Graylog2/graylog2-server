@@ -21,7 +21,7 @@ import styled from 'styled-components';
 import { useFormikContext } from 'formik';
 
 import { TimeRange, NoTimeRangeOverride, RelativeTimeRangeWithEnd } from 'views/logic/queries/Query';
-import { ButtonGroup } from 'components/graylog';
+import { ButtonGroup } from 'components/bootstrap';
 import { normalizeIfAllMessagesRange } from 'views/logic/queries/NormalizeTimeRange';
 
 import RangePresetDropdown from './RangePresetDropdown';

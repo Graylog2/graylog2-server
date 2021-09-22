@@ -24,7 +24,8 @@ import styled, { css } from 'styled-components';
 import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
-import { Button, ButtonGroup, ButtonToolbar, OverlayTrigger, Tooltip } from 'components/graylog';
+import { OverlayTrigger } from 'components/common';
+import { Button, ButtonGroup, ButtonToolbar, Tooltip } from 'components/bootstrap';
 import PipelineRulesMode from 'components/rules/mode-pipeline';
 
 import ClipboardButton from './ClipboardButton';

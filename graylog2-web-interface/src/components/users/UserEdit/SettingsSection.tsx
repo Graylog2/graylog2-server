@@ -18,10 +18,9 @@ import * as React from 'react';
 import { Formik, Form } from 'formik';
 import { $PropertyType } from 'utility-types';
 
-import { Button, Row, Col } from 'components/graylog';
+import { Button, Row, Col, IfPermitted } from 'components/common';
 import User from 'logic/users/User';
 import SectionComponent from 'components/common/Section/SectionComponent';
-import { IfPermitted } from 'components/common';
 
 import TimezoneFormGroup from '../UserCreate/TimezoneFormGroup';
 import TimeoutFormGroup from '../UserCreate/TimeoutFormGroup';

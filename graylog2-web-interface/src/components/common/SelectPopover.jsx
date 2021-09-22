@@ -26,7 +26,7 @@ import {
   ListGroupItem,
   OverlayTrigger,
   Popover,
-} from 'components/graylog';
+} from 'components/common';
 import Icon from 'components/common/Icon';
 
 import style from './SelectPopover.css';

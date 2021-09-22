@@ -17,7 +17,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { LinkContainer, Link } from 'components/graylog/router';
+import { LinkContainer, Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import {
   Button,
@@ -27,8 +27,8 @@ import {
   MenuItem,
   Modal,
   Row,
-} from 'components/graylog';
-import { Pagination, PageSizeSelect } from 'components/common';
+  Pagination, PageSizeSelect,
+} from 'components/common';
 import TypeAheadDataFilter from 'components/common/TypeAheadDataFilter';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import ControlledTableList from 'components/common/ControlledTableList';

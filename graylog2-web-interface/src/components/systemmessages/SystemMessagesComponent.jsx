@@ -16,9 +16,8 @@
  */
 import React from 'react';
 
-import { Col, Row } from 'components/graylog';
+import { Col, Row, Pagination, Spinner } from 'components/common';
 import StoreProvider from 'injection/StoreProvider';
-import { Pagination, Spinner } from 'components/common';
 import { SystemMessagesList } from 'components/systemmessages';
 
 const SystemMessagesStore = StoreProvider.getStore('SystemMessages');

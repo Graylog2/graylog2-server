@@ -17,7 +17,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { Alert } from 'components/graylog';
+import { Alert } from 'components/common';
 
 import CommonNotificationSummary from './CommonNotificationSummary';
 import commonStyles from './LegacyNotificationCommonStyles.css';

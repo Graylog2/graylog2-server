@@ -19,7 +19,7 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
-import { Button } from 'components/graylog';
+import { Button } from 'components/common';
 import StoreProvider from 'injection/StoreProvider';
 
 const InputStatesStore = StoreProvider.getStore('InputStates');

@@ -20,8 +20,7 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 
 import Routes from 'routing/Routes';
-import { DropdownButton, MenuItem } from 'components/graylog';
-import { IfPermitted } from 'components/common';
+import { DropdownButton, MenuItem, IfPermitted } from 'components/common';
 import PermissionsMixin from 'util/PermissionsMixin';
 import StoreProvider from 'injection/StoreProvider';
 import HideOnCloud from 'util/conditional/HideOnCloud';

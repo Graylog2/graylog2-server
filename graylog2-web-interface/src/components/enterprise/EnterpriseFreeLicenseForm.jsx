@@ -18,7 +18,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { isEmpty, trim } from 'lodash';
 
-import { Button, ButtonToolbar, Col, Row } from 'components/graylog';
+import { Button, ButtonToolbar, Col, Row } from 'components/common';
 import { Input } from 'components/bootstrap';
 
 const FORM_FIELDS = ['firstName', 'lastName', 'email', 'phone', 'company'];

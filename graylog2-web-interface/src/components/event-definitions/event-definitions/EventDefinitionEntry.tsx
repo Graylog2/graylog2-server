@@ -20,14 +20,13 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import Routes from 'routing/Routes';
-import { Link, LinkContainer } from 'components/graylog/router';
+import { Link, LinkContainer } from 'components/common/router';
 import {
   Button,
   DropdownButton,
   Label,
   MenuItem,
-} from 'components/graylog';
-import {
+
   EntityListItem,
   IfPermitted,
   Icon,

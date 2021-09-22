@@ -22,7 +22,7 @@ import trim from 'lodash/trim';
 import isEqual from 'lodash/isEqual';
 import { Field, useField } from 'formik';
 
-import { Col, FormControl, FormGroup, Panel, Row } from 'components/graylog';
+import { Col, FormControl, FormGroup, Panel, Row } from 'components/bootstrap';
 import DateTime from 'logic/datetimes/DateTime';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';

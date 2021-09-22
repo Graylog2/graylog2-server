@@ -18,8 +18,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import { Link } from 'components/graylog/router';
-import { StyledBadge } from 'components/graylog/Badge';
+import { StyledBadge } from 'components/bootstrap/Badge';
+import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 
 const StatusBadge = styled(StyledBadge)(({ status, theme }) => {

@@ -18,7 +18,8 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import { Popover, OverlayTrigger } from 'components/graylog';
+import { OverlayTrigger } from 'components/common';
+import { Popover } from 'components/bootstrap';
 import Icon from 'components/common/Icon';
 
 const StyledPopover = styled(Popover)(({ theme }) => `

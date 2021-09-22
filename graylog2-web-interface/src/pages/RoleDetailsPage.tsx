@@ -18,13 +18,13 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 
 import withParams from 'routing/withParams';
-import { LinkContainer } from 'components/graylog/router';
+import { LinkContainer } from 'components/common/router';
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import RoleDetails from 'components/roles/RoleDetails';
 import RoleActionLinks from 'components/roles/navigation/RoleActionLinks';
 import DocsHelper from 'util/DocsHelper';
 import { PageHeader, DocumentTitle } from 'components/common';
-import { Button } from 'components/graylog';
+import { Button } from 'components/bootstrap';
 import DocumentationLink from 'components/support/DocumentationLink';
 import Routes from 'routing/Routes';
 import Role from 'logic/roles/Role';

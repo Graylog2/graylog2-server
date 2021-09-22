@@ -19,8 +19,8 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
-import { LinkContainer } from 'components/graylog/router';
-import { Row, Col, Button } from 'components/graylog';
+import { LinkContainer } from 'components/common/router';
+import { Row, Col, Button } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { IndexSetConfigurationForm } from 'components/indices';
 import { DocumentationLink } from 'components/support';

@@ -18,7 +18,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import HideOnCloud from 'util/conditional/HideOnCloud';
-import { Col } from 'components/graylog';
+import { Col } from 'components/common';
 import { IndicesConfiguration } from 'components/indices';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 

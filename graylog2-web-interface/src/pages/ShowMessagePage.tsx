@@ -22,7 +22,7 @@ import ActionsProvider from 'injection/ActionsProvider';
 import StoreProvider from 'injection/StoreProvider';
 import DocumentTitle from 'components/common/DocumentTitle';
 import Spinner from 'components/common/Spinner';
-import { Col, Row } from 'components/graylog';
+import { Col, Row } from 'components/bootstrap';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
 import MessageDetail from 'views/components/messagelist/MessageDetail';
 import withParams from 'routing/withParams';

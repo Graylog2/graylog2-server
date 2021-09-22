@@ -20,12 +20,12 @@ import { useLocation } from 'react-router-dom';
 import naturalSort from 'javascript-natural-sort';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import { LinkContainer } from 'components/graylog/router';
+import { LinkContainer } from 'components/common/router';
 import { appPrefixed } from 'util/URLUtils';
 import AppConfig from 'util/AppConfig';
+import { Navbar, Nav, NavItem, NavDropdown } from 'components/bootstrap';
 import { IfPermitted } from 'components/common';
 import { isPermitted } from 'util/PermissionsMixin';
-import { Navbar, Nav, NavItem, NavDropdown } from 'components/graylog';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import GlobalThroughput from 'components/throughput/GlobalThroughput';
 import Routes from 'routing/Routes';

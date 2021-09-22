@@ -19,7 +19,7 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
-import { Row, Col } from 'components/graylog';
+import { Row, Col } from 'components/bootstrap';
 import { Spinner, EntityList, Pluralize } from 'components/common';
 import StoreProvider from 'injection/StoreProvider';
 

@@ -17,8 +17,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Alert } from 'components/graylog';
-import { DataTable, ExternalLink, Spinner, Icon } from 'components/common';
+import { Alert, DataTable, ExternalLink, Spinner, Icon } from 'components/common';
 
 class PluginsDataTable extends React.Component {
   static propTypes = {

@@ -29,7 +29,7 @@ import {
   HelpBlock,
   InputGroup,
   MenuItem,
-} from 'components/graylog';
+} from 'components/common';
 import { InputWrapper } from 'components/bootstrap';
 import * as FormsUtils from 'util/FormsUtils';
 

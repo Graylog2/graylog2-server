@@ -20,9 +20,9 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
-import { Label, OverlayTrigger, Popover } from 'components/graylog';
+import { OverlayTrigger, LinkToNode, Spinner } from 'components/common';
+import { Label, Popover } from 'components/bootstrap';
 import StoreProvider from 'injection/StoreProvider';
-import { LinkToNode, Spinner } from 'components/common';
 import InputStateComparator from 'logic/inputs/InputStateComparator';
 
 const InputStatesStore = StoreProvider.getStore('InputStates');

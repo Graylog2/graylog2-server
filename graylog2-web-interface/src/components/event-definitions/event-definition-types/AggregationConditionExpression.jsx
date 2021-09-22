@@ -18,8 +18,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 
-import { Button, ButtonToolbar, Clearfix, Col, FormGroup } from 'components/graylog';
-import { Icon } from 'components/common';
+import { Button, ButtonToolbar, Clearfix, Col, FormGroup, Icon } from 'components/common';
 import { emptyBooleanExpressionConfig, emptyGroupExpressionConfig, replaceBooleanExpressionOperatorInGroup } from 'logic/alerts/AggregationExpressionConfig';
 import { internalNodePropType } from 'logic/alerts/AggregationExpressionTypes';
 

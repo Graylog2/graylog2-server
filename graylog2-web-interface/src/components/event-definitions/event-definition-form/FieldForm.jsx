@@ -30,9 +30,9 @@ import {
   InputGroup,
   OverlayTrigger,
   Row,
-} from 'components/graylog';
+  Icon, Select,
+} from 'components/common';
 import { Input } from 'components/bootstrap';
-import { Icon, Select } from 'components/common';
 import EventKeyHelpPopover from 'components/event-definitions/common/EventKeyHelpPopover';
 import * as FormsUtils from 'util/FormsUtils';
 

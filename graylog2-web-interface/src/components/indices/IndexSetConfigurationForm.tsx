@@ -21,10 +21,9 @@ import lodash from 'lodash';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import HideOnCloud from 'util/conditional/HideOnCloud';
-import { LinkContainer } from 'components/graylog/router';
-import { Col, Row, Button } from 'components/graylog';
+import { LinkContainer } from 'components/common/router';
+import { Col, Row, Button, Spinner, TimeUnitInput } from 'components/common';
 import { Input } from 'components/bootstrap';
-import { Spinner, TimeUnitInput } from 'components/common';
 import IndexMaintenanceStrategiesConfiguration from 'components/indices/IndexMaintenanceStrategiesConfiguration';
 import 'components/indices/rotation';
 import 'components/indices/retention';

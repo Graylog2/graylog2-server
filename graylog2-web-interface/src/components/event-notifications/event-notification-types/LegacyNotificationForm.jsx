@@ -18,8 +18,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 
-import { Alert, ControlLabel, FormGroup, HelpBlock } from 'components/graylog';
-import { Select } from 'components/common';
+import { Alert, ControlLabel, FormGroup, HelpBlock, Select } from 'components/common';
 import { ConfigurationFormField } from 'components/configurationforms';
 
 import commonStyles from './LegacyNotificationCommonStyles.css';

@@ -17,8 +17,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { LinkContainer } from 'components/graylog/router';
-import { Button, ButtonToolbar, DropdownButton, MenuItem } from 'components/graylog';
+import { LinkContainer } from 'components/common/router';
+import { Button, ButtonToolbar, DropdownButton, MenuItem } from 'components/common';
 import Routes from 'routing/Routes';
 import CollectorIndicator from 'components/sidecars/common/CollectorIndicator';
 import ColorLabel from 'components/sidecars/common/ColorLabel';

@@ -20,7 +20,7 @@ import lodash from 'lodash';
 import naturalSort from 'javascript-natural-sort';
 
 import { Select } from 'components/common';
-import { Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/graylog';
+import { Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/bootstrap';
 import { numberRefNodePropType } from 'logic/alerts/AggregationExpressionTypes';
 
 const formatFunctions = (functions) => {

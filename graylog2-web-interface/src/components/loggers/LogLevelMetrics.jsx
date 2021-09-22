@@ -21,7 +21,7 @@ import Reflux from 'reflux';
 import lodash from 'lodash';
 import numeral from 'numeral';
 
-import { Col } from 'components/graylog';
+import { Col } from 'components/bootstrap';
 import { Spinner } from 'components/common';
 import CombinedProvider from 'injection/CombinedProvider';
 

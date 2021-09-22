@@ -17,7 +17,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { Modal, Button } from 'components/graylog';
+import { Modal, Button } from 'components/common';
 
 /**
  * Component that displays a confirmation dialog box that the user can

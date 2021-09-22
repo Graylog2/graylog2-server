@@ -16,7 +16,7 @@
  */
 import React from 'react';
 
-import { Table } from 'components/graylog';
+import { Table } from 'components/common';
 
 class TemplatesHelper extends React.Component {
   _buildVariableName = (name) => {

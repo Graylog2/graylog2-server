@@ -24,8 +24,7 @@ import styled from 'styled-components';
 import type { PaginatedRoles } from 'actions/roles/AuthzRolesActions';
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import Role from 'logic/roles/Role';
-import { Button } from 'components/graylog';
-import { Select, Spinner, ErrorAlert } from 'components/common';
+import { Button, Select, Spinner, ErrorAlert } from 'components/common';
 
 type Props = {
   assignedRolesIds: Immutable.Set<string>,

@@ -23,8 +23,7 @@ import ReactDOM from 'react-dom';
 import Reflux from 'reflux';
 import _ from 'lodash';
 
-import { Col, Row } from 'components/graylog';
-import { Spinner } from 'components/common';
+import { Col, Row, Spinner } from 'components/common';
 import StoreProvider from 'injection/StoreProvider';
 import ActionsProvider from 'injection/ActionsProvider';
 import NumberUtils from 'util/NumberUtils';

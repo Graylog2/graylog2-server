@@ -16,7 +16,7 @@
  */
 import React from 'react';
 
-import { Panel } from 'components/graylog';
+import { Panel } from 'components/common';
 
 import styles from './TemplateFieldValueProviderPreview.css';
 

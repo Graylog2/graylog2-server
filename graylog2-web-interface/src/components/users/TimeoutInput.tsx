@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 
-import { Row, Col, HelpBlock } from 'components/graylog';
+import { Row, Col, HelpBlock } from 'components/common';
 import { Input } from 'components/bootstrap';
 import TimeoutUnitSelect from 'components/users/TimeoutUnitSelect';
 

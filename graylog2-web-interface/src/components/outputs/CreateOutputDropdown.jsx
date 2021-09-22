@@ -17,7 +17,7 @@
 import React from 'react';
 import $ from 'jquery';
 
-import { Button } from 'components/graylog';
+import { Button } from 'components/bootstrap';
 import { ConfigurationForm } from 'components/configurationforms';
 
 class CreateOutputDropdown extends React.Component {

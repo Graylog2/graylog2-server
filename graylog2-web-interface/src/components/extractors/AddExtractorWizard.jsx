@@ -17,7 +17,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Row, Col, Button } from 'components/graylog';
+import { Row, Col, Button } from 'components/common';
 import LoaderTabs from 'components/messageloaders/LoaderTabs';
 import MessageFieldExtractorActions from 'components/search/MessageFieldExtractorActions';
 

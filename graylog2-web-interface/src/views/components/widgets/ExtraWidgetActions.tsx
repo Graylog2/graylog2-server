@@ -19,7 +19,7 @@ import { useContext, useMemo } from 'react';
 
 import Widget from 'views/logic/widgets/Widget';
 import usePluginEntities from 'views/logic/usePluginEntities';
-import { MenuItem } from 'components/graylog';
+import { MenuItem } from 'components/bootstrap';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 
 type Props = {

@@ -19,8 +19,8 @@ import PropTypes from 'prop-types';
 import createReactClass from 'create-react-class';
 import naturalSort from 'javascript-natural-sort';
 
-import { LinkContainer } from 'components/graylog/router';
-import { Button } from 'components/graylog';
+import { LinkContainer } from 'components/common/router';
+import { Button } from 'components/common';
 import { AlertConditionsList } from 'components/alertconditions';
 import Routes from 'routing/Routes';
 
