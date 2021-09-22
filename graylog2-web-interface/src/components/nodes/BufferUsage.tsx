@@ -17,7 +17,7 @@
 import PropTypes from 'prop-types';
 import * as React from 'react';
 import { useEffect } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { LinkContainer } from 'components/graylog/router';
 import { Button, ProgressBar } from 'components/graylog';
