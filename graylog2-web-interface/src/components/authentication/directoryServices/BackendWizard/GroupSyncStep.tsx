@@ -18,7 +18,8 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import { FormikProps } from 'formik';
 
-import { Row, Col, Button, ButtonToolbar, EnterprisePluginNotFound } from 'components/common';
+import { Row, Col, Button, ButtonToolbar } from 'components/bootstrap';
+import { EnterprisePluginNotFound } from 'components/common';
 import Role from 'logic/roles/Role';
 import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
 import { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';

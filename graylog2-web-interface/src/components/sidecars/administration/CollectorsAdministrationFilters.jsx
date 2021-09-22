@@ -19,7 +19,8 @@ import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 
-import { Button, ButtonToolbar, SelectPopover } from 'components/common';
+import { SelectPopover } from 'components/common';
+import { Button, ButtonToolbar } from 'components/bootstrap';
 import { naturalSortIgnoreCase } from 'util/SortUtils';
 import CollectorIndicator from 'components/sidecars/common/CollectorIndicator';
 import ColorLabel from 'components/sidecars/common/ColorLabel';

@@ -17,7 +17,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { Modal, Button } from 'components/common';
+import { Modal, Button } from 'components/bootstrap';
 
 /**
  * Component that displays a confirmation dialog box that the user can

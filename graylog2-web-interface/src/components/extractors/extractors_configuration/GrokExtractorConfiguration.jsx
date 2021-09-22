@@ -17,8 +17,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { Row, Col, ControlLabel, Button, Icon } from 'components/common';
-import { Input } from 'components/bootstrap';
+import { Icon } from 'components/common';
+import { Row, Col, ControlLabel, Button, Input } from 'components/bootstrap';
 import GrokPatternInput from 'components/grok-patterns/GrokPatternInput';
 import UserNotification from 'util/UserNotification';
 import FormUtils from 'util/FormsUtils';

@@ -16,7 +16,7 @@
  */
 import React from 'react';
 
-import { Table } from 'components/common';
+import { Table } from 'components/bootstrap';
 
 class TemplatesHelper extends React.Component {
   _buildVariableName = (name) => {

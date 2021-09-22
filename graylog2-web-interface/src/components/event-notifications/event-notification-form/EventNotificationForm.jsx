@@ -19,8 +19,8 @@ import PropTypes from 'prop-types';
 import lodash from 'lodash';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import { Alert, Button, ButtonToolbar, Col, ControlLabel, FormControl, FormGroup, HelpBlock, Row, Select, Spinner } from 'components/common';
-import { Input } from 'components/bootstrap';
+import { Select, Spinner } from 'components/common';
+import { Alert, Button, ButtonToolbar, Col, ControlLabel, FormControl, FormGroup, HelpBlock, Row, Input } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
 
 class EventNotificationForm extends React.Component {

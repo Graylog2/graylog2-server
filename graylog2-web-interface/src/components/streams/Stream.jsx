@@ -20,7 +20,8 @@ import styled, { css } from 'styled-components';
 
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import { Link, LinkContainer } from 'components/common/router';
-import { Button, Tooltip, Icon, OverlayElement, ShareButton } from 'components/common';
+import { Button, Tooltip } from 'components/bootstrap';
+import { Icon, OverlayElement, ShareButton } from 'components/common';
 import StreamRuleForm from 'components/streamrules/StreamRuleForm';
 import { isAnyPermitted, isPermitted } from 'util/PermissionsMixin';
 import UserNotification from 'util/UserNotification';

@@ -17,8 +17,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Row, Col, Modal, Button } from 'components/common';
-import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
+import { Row, Col, Modal, Button, BootstrapModalWrapper } from 'components/bootstrap';
 import SortableList from 'components/common/SortableList';
 import ActionsProvider from 'injection/ActionsProvider';
 

@@ -19,7 +19,8 @@ import PropTypes from 'prop-types';
 
 import ObjectUtils from 'util/ObjectUtils';
 import connect from 'stores/connect';
-import { Row, Col, Panel, Table, Tabs, Tab, Icon, PaginatedList, Spinner, SearchForm } from 'components/common';
+import { Icon, PaginatedList, Spinner, SearchForm } from 'components/common';
+import { Row, Col, Panel, Table, Tabs, Tab } from 'components/bootstrap';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
 import CombinedProvider from 'injection/CombinedProvider';

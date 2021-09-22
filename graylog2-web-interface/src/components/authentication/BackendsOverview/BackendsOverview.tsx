@@ -22,7 +22,8 @@ import { PaginatedRoles } from 'actions/roles/AuthzRolesActions';
 import AuthenticationActions, { PaginatedBackends } from 'actions/authentication/AuthenticationActions';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
-import { DataTable, PaginatedList, Spinner, Col, Row } from 'components/common';
+import { DataTable, PaginatedList, Spinner } from 'components/common';
+import { Col, Row } from 'components/bootstrap';
 
 import BackendsFilter from './BackendsFilter';
 import BackendsOverviewItem from './BackendsOverviewItem';

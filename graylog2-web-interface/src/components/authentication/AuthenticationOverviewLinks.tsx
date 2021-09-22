@@ -18,7 +18,7 @@ import * as React from 'react';
 
 import Routes from 'routing/Routes';
 import { LinkContainer } from 'components/common/router';
-import { ButtonToolbar, Button } from 'components/common';
+import { ButtonToolbar, Button } from 'components/bootstrap';
 
 const AuthenticationOverviewLinks = () => (
   <ButtonToolbar className="pull-right">

@@ -18,9 +18,11 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import $ from 'jquery';
 
-import { Button, Modal } from 'components/common';
-import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import { validate } from 'legacy/validations.js';
+
+import Modal from './Modal';
+import BootstrapModalWrapper from './BootstrapModalWrapper';
+import Button from './Button';
 
 /**
  * Encapsulates a form element inside a bootstrap modal, hiding some custom logic that this kind of component

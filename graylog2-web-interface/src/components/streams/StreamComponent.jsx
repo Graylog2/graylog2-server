@@ -17,7 +17,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Alert, Icon, IfPermitted, PaginatedList, SearchForm } from 'components/common';
+import { Alert } from 'components/bootstrap';
+import { Icon, IfPermitted, PaginatedList, SearchForm } from 'components/common';
 import StoreProvider from 'injection/StoreProvider';
 import Spinner from 'components/common/Spinner';
 import QueryHelper from 'components/common/QueryHelper';

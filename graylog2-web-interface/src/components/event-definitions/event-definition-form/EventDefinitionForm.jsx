@@ -19,7 +19,8 @@ import PropTypes from 'prop-types';
 import lodash from 'lodash';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import { Button, ButtonToolbar, Col, Row, Wizard } from 'components/common';
+import { Button, ButtonToolbar, Col, Row } from 'components/bootstrap';
+import { Wizard } from 'components/common';
 
 import EventDetailsForm from './EventDetailsForm';
 import EventConditionForm from './EventConditionForm';

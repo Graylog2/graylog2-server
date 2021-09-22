@@ -19,7 +19,8 @@ import { useState, useContext } from 'react';
 
 import { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
-import { Button, Spinner } from 'components/common';
+import { Button } from 'components/bootstrap';
+import { Spinner } from 'components/common';
 
 import ConnectionErrors, { NotificationContainer } from './ConnectionErrors';
 import BackendWizardContext, { WizardFormValues } from './BackendWizardContext';

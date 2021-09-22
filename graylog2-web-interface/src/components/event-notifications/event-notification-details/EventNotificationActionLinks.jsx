@@ -18,7 +18,8 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 
 import { LinkContainer } from 'components/common/router';
-import { IfPermitted, Button, ButtonToolbar } from 'components/common';
+import { Button, ButtonToolbar } from 'components/bootstrap';
+import { IfPermitted } from 'components/common';
 import Routes from 'routing/Routes';
 
 const EventNotificationActionLinks = ({ notificationId }) => (

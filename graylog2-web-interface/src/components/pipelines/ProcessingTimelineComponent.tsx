@@ -20,7 +20,8 @@ import naturalSort from 'javascript-natural-sort';
 import Immutable from 'immutable';
 
 import { LinkContainer, Link } from 'components/common/router';
-import { Button, DataTable, Spinner, PaginatedList, SearchForm, QueryHelper } from 'components/common';
+import { Button } from 'components/bootstrap';
+import { DataTable, Spinner, PaginatedList, SearchForm, QueryHelper } from 'components/common';
 import { MetricContainer, CounterRate } from 'components/metrics';
 import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';

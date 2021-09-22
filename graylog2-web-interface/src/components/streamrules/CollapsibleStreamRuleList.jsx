@@ -18,7 +18,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import styled from 'styled-components';
 
-import { Collapse } from 'components/common';
+import { Collapse } from 'components/bootstrap';
 import StreamRuleList from 'components/streamrules/StreamRuleList';
 
 const RuleWrapper = styled.div`

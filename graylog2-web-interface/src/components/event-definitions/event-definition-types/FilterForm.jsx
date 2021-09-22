@@ -20,12 +20,12 @@ import lodash from 'lodash';
 import uuid from 'uuid/v4';
 import moment from 'moment';
 
-import { Alert, ButtonToolbar, ControlLabel, FormGroup, HelpBlock, MultiSelect, TimeUnitInput } from 'components/common';
+import { MultiSelect, TimeUnitInput } from 'components/common';
 import connect from 'stores/connect';
 import Query from 'views/logic/queries/Query';
 import Search from 'views/logic/search/Search';
 import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
-import { Input } from 'components/bootstrap';
+import { Alert, ButtonToolbar, ControlLabel, FormGroup, HelpBlock, Input } from 'components/bootstrap';
 import { naturalSortIgnoreCase } from 'util/SortUtils';
 import * as FormsUtils from 'util/FormsUtils';
 import CombinedProvider from 'injection/CombinedProvider';

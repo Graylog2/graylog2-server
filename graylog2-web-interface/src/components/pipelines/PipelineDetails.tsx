@@ -18,7 +18,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import styled from 'styled-components';
 
-import { Row, Col, Timestamp } from 'components/common';
+import { Row, Col } from 'components/bootstrap';
+import { Timestamp } from 'components/common';
 import { MetricContainer, CounterRate } from 'components/metrics';
 import { PipelineType } from 'stores/pipelines/PipelinesStore';
 

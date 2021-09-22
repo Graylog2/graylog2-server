@@ -22,7 +22,7 @@ import { LinkContainer, Link } from 'components/common/router';
 import Role from 'logic/roles/Role';
 import Routes from 'routing/Routes';
 import UserOverview from 'logic/users/UserOverview';
-import { Button, ButtonToolbar } from 'components/common';
+import { Button, ButtonToolbar } from 'components/bootstrap';
 import RolesCell from 'components/permissions/RolesCell';
 
 type Props = {

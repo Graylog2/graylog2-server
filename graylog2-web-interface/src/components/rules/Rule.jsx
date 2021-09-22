@@ -18,7 +18,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { LinkContainer } from 'components/common/router';
-import { Row, Col, Button, PageHeader } from 'components/common';
+import { PageHeader } from 'components/common';
+import { Row, Col, Button } from 'components/bootstrap';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';

@@ -19,7 +19,7 @@ import React from 'react';
 import numeral from 'numeral';
 
 import { LinkContainer } from 'components/common/router';
-import { Button, Row, Col, Well } from 'components/common';
+import { Button, Row, Col, Well } from 'components/bootstrap';
 import EntityListItem from 'components/common/EntityListItem';
 import ExtractorUtils from 'util/ExtractorUtils';
 import ActionsProvider from 'injection/ActionsProvider';

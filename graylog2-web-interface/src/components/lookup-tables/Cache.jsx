@@ -20,7 +20,7 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { LinkContainer } from 'components/common/router';
 import Routes from 'routing/Routes';
-import { Row, Col, Button } from 'components/common';
+import { Row, Col, Button } from 'components/bootstrap';
 
 import ConfigSummaryDefinitionListWrapper from './ConfigSummaryDefinitionListWrapper';
 

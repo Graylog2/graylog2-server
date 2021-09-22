@@ -16,10 +16,15 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
+import { Checkbox, Radio } from 'react-bootstrap';
 
-import { Checkbox, ControlLabel, FormControl, FormGroup, InputGroup, Radio } from 'components/common';
-import InputDescription from 'components/common/InputDescription';
+import { InputDescription } from 'components/common';
 
+import ControlLabel from './ControlLabel';
+import FormControl from './FormControl';
+import FormGroup from './FormGroup';
+import InputGroup from './InputGroup';
 import InputWrapper from './InputWrapper';
 
 /*

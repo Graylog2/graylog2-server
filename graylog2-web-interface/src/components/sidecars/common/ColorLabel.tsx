@@ -19,7 +19,7 @@ import PropTypes from 'prop-types';
 import styled, { css, withTheme, DefaultTheme } from 'styled-components';
 
 import { themePropTypes } from 'theme';
-import { Label } from 'components/common';
+import { Label } from 'components/bootstrap';
 
 type Size = 'normal' | 'small' | 'xsmall';
 

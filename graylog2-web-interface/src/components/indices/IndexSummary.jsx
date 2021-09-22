@@ -17,7 +17,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Label, Timestamp, Icon } from 'components/common';
+import { Label } from 'components/bootstrap';
+import { Timestamp, Icon } from 'components/common';
 import DateTime from 'logic/datetimes/DateTime';
 import { IndexSizeSummary } from 'components/indices';
 

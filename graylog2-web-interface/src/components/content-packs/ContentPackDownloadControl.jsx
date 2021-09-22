@@ -19,7 +19,8 @@ import React from 'react';
 
 import { qualifyUrlWithSessionCredentials } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
-import { Modal, Button, Icon } from 'components/common';
+import { Modal, Button } from 'components/bootstrap';
+import { Icon } from 'components/common';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import * as URLUtils from 'util/URLUtils';
 import StoreProvider from 'injection/StoreProvider';

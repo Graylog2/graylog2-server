@@ -19,13 +19,13 @@ import PropTypes from 'prop-types';
 
 import { LinkContainer } from 'components/common/router';
 import {
-  Button, Col, Row,
   EmptyEntity,
   EntityList,
   IfPermitted,
   PaginatedList,
   SearchForm,
 } from 'components/common';
+import { Button, Col, Row } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import QueryHelper from 'components/common/QueryHelper';
 

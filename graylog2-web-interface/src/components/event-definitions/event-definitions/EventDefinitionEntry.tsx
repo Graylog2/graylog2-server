@@ -22,16 +22,17 @@ import EntityShareModal from 'components/permissions/EntityShareModal';
 import Routes from 'routing/Routes';
 import { Link, LinkContainer } from 'components/common/router';
 import {
-  Button,
-  DropdownButton,
-  Label,
-  MenuItem,
-
   EntityListItem,
   IfPermitted,
   Icon,
   ShareButton,
 } from 'components/common';
+import {
+  Button,
+  DropdownButton,
+  Label,
+  MenuItem,
+} from 'components/bootstrap';
 
 import EventDefinitionDescription from './EventDefinitionDescription';
 

@@ -19,7 +19,8 @@ import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 
 import CombinedProvider from 'injection/CombinedProvider';
-import { ReadOnlyFormGroup, Spinner, Alert, Well } from 'components/common';
+import { ReadOnlyFormGroup, Spinner } from 'components/common';
+import { Alert, Well } from 'components/bootstrap';
 
 import emailStyles from '../event-notification-types/EmailNotificationSummary.css';
 import notificationStyles from '../event-notification-types/LegacyNotificationCommonStyles.css';

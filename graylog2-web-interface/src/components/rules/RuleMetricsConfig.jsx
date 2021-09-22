@@ -18,8 +18,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 
-import { Alert, Spinner } from 'components/common';
-import { BootstrapModalForm, Input } from 'components/bootstrap';
+import { Spinner } from 'components/common';
+import { Alert, BootstrapModalForm, Input } from 'components/bootstrap';
 import * as FormsUtils from 'util/FormsUtils';
 
 export default class RuleMetricsConfig extends React.Component {

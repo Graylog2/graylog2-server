@@ -16,7 +16,8 @@
  */
 import * as React from 'react';
 
-import { Row, Col, EmptyEntity } from 'components/common';
+import { Row, Col } from 'components/bootstrap';
+import { EmptyEntity } from 'components/common';
 
 import ServiceSelect from './ServiceSelect';
 

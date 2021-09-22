@@ -17,7 +17,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { ListGroup } from 'components/common';
+import { ListGroup } from 'components/bootstrap';
 
 import ControlledTableListHeader from './ControlledTableListHeader';
 import ControlledTableListItem from './ControlledTableListItem';

@@ -19,8 +19,8 @@ import React, { useMemo, useRef, useState } from 'react';
 import naturalSort from 'javascript-natural-sort';
 
 import { Link } from 'components/common/router';
-import { ControlLabel, FormGroup, HelpBlock, Button, SelectableList } from 'components/common';
-import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
+import { SelectableList } from 'components/common';
+import { ControlLabel, FormGroup, HelpBlock, Button, BootstrapModalForm } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import { PipelineType } from 'stores/pipelines/PipelinesStore';
 import { Stream } from 'stores/streams/StreamsStore';

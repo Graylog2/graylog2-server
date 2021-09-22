@@ -19,7 +19,8 @@ import { forwardRef } from 'react';
 import styled from 'styled-components';
 import type { DraggableProvidedDraggableProps, DraggableProvidedDragHandleProps } from 'react-beautiful-dnd';
 
-import { ListGroupItem, Icon } from 'components/common';
+import { ListGroupItem } from 'components/bootstrap';
+import { Icon } from 'components/common';
 
 export type ListItemType = {
   id: string,

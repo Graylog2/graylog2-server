@@ -25,7 +25,8 @@ import Routes from 'routing/Routes';
 import Role from 'logic/roles/Role';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
-import { TextOverflowEllipsis, Button, ButtonToolbar } from 'components/common';
+import { TextOverflowEllipsis } from 'components/common';
+import { Button, ButtonToolbar } from 'components/bootstrap';
 
 type Props = {
   authenticationBackend: AuthenticationBackend,

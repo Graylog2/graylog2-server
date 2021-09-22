@@ -17,8 +17,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Row, Col, Panel, Button, Select } from 'components/common';
-import { Input } from 'components/bootstrap';
+import { Select } from 'components/common';
+import { Row, Col, Panel, Button, Input } from 'components/bootstrap';
 import {
   CSVConverterConfiguration,
   DateConverterConfiguration,
