@@ -16,6 +16,7 @@
  */
 package org.graylog.scheduler;
 
+import org.graylog2.periodical.LegacyPeriodicalSchedulerJob;
 import org.graylog2.plugin.PluginConfigBean;
 import org.graylog2.plugin.PluginModule;
 import org.graylog2.security.UserSessionTerminationJob;
@@ -35,5 +36,10 @@ public class SystemJobsModule extends PluginModule {
                 UserSessionTerminationJob.class,
                 UserSessionTerminationJob.Factory.class,
                 UserSessionTerminationJob.JobDefinitionConfig.class);
+        addSchedulerJob(LegacyPeriodicalSchedulerJob.TYPE_NAME,
+                LegacyPeriodicalSchedulerJob.class,
+                LegacyPeriodicalSchedulerJob.Factory.class,
+                LegacyPeriodicalSchedulerJob.JobDefinitionConfig.class,
+                LegacyPeriodicalSchedulerJob.Data.class);
     }
 }

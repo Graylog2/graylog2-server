@@ -19,7 +19,7 @@ package org.graylog.scheduler;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import com.mongodb.BasicDBObject;
-import com.mongodb.DuplicateKeyException;
+import com.mongodb.MongoCommandException;
 import one.util.streamex.StreamEx;
 import org.bson.types.ObjectId;
 import org.graylog.scheduler.clock.JobSchedulerClock;
@@ -202,18 +202,20 @@ public class DBJobTriggerService {
             throw new IllegalArgumentException("Unique triggers must have a fixed ID");
         }
 
+        // Find the trigger by ID.
+        // - if there is none, we'll insert a new one (upsert = true)
+        // - if there is one, but it is locked, we'll try to insert a new one but fail and ignore the duplicate key error
+        // - if there is one and it is not locked, we'll update it. This will reset triggers which are in a non-runnable state, like "completed"
+        DBQuery.Query query = DBQuery.and(
+                DBQuery.is(FIELD_ID, trigger.id()),
+                DBQuery.is(FIELD_LOCK_OWNER, null));
         try {
-            db.insert(trigger).getSavedObject();
-        } catch (DuplicateKeyException e) {
-            // the trigger exists, but it may be completed
-            // in that case, reset it (or create a new one if it was deleted in the meantime)
-            DBQuery.Query query = DBQuery.and(
-                    DBQuery.is(FIELD_ID, trigger.id()),
-                    DBQuery.is(FIELD_STATUS, JobTriggerStatus.COMPLETE));
-            try {
-                db.findAndModify(query, null, null, false, trigger, false, true);
-            } catch (DuplicateKeyException f) {
-                // ok, some other process created the trigger in the meantime
+            db.findAndModify(query, null, null, false, trigger, false, true);
+        } catch (MongoCommandException failure) {
+            // Unfortunately findAndModify doesn't throw a DuplicateKeyException, so we'll have to check for
+            // corresponding error code.
+            if (failure.getErrorCode() != 11000) {
+                throw failure;
             }
         }
     }
