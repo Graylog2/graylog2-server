@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.pipelineprocessor.rest;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -24,6 +25,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.audit.PipelineProcessorAuditEventTypes;
+import org.graylog.plugins.pipelineprocessor.db.PaginatedPipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
@@ -31,7 +33,12 @@ import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.rest.models.PaginatedResponse;
+import org.graylog2.search.SearchQuery;
+import org.graylog2.search.SearchQueryField;
+import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -43,16 +50,20 @@ import javax.validation.constraints.NotNull;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Api(value = "Pipelines/Pipelines", description = "Pipelines for the pipeline message processor")
@@ -63,14 +74,26 @@ import java.util.stream.Collectors;
 public class PipelineResource extends RestResource implements PluginRestResource {
     private static final Logger log = LoggerFactory.getLogger(PipelineResource.class);
 
+    private static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
+            .put(PipelineDao.FIELD_ID, SearchQueryField.create("_id", SearchQueryField.Type.OBJECT_ID))
+            .put(PipelineDao.FIELD_TITLE, SearchQueryField.create(PipelineDao.FIELD_TITLE))
+            .put(PipelineDao.FIELD_DESCRIPTION, SearchQueryField.create(PipelineDao.FIELD_DESCRIPTION))
+            .build();
+
+    private final SearchQueryParser searchQueryParser;
+    private final PaginatedPipelineService paginatedPipelineService;
+
     private final PipelineService pipelineService;
     private final PipelineRuleParser pipelineRuleParser;
 
     @Inject
     public PipelineResource(PipelineService pipelineService,
+                            PaginatedPipelineService paginatedPipelineService,
                             PipelineRuleParser pipelineRuleParser) {
         this.pipelineService = pipelineService;
         this.pipelineRuleParser = pipelineRuleParser;
+        this.paginatedPipelineService = paginatedPipelineService;
+        this.searchQueryParser = new SearchQueryParser(PipelineDao.FIELD_TITLE, SEARCH_FIELD_MAPPING);
     }
 
     @ApiOperation(value = "Create a processing pipeline from source")
@@ -137,6 +160,41 @@ public class PipelineResource extends RestResource implements PluginRestResource
         }
 
         return results;
+    }
+
+    @GET
+    @Path("/paginated")
+    @ApiOperation(value = "Get a paginated list of pipelines")
+    @Produces(MediaType.APPLICATION_JSON)
+    public PaginatedResponse<PipelineSource> getPage(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+                                     @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+                                     @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
+                                     @ApiParam(name = "sort",
+                                             value = "The field to sort the result on",
+                                             required = true,
+                                             allowableValues = "title,description,id")
+                                     @DefaultValue(PipelineDao.FIELD_TITLE) @QueryParam("sort") String sort,
+                                     @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
+                                     @DefaultValue("asc") @QueryParam("order") String order) {
+
+        SearchQuery searchQuery;
+        try {
+            searchQuery = searchQueryParser.parse(query);
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException("Invalid argument in search query: " + e.getMessage());
+        }
+
+        Predicate<PipelineDao> filter = dao -> isPermitted(PipelineRestPermissions.PIPELINE_READ, dao.id());
+
+        final PaginatedList<PipelineDao> result = paginatedPipelineService
+                .findPaginated(searchQuery, filter, page, perPage, sort, order);
+        final long total = paginatedPipelineService.count();
+        final List<PipelineSource> pipelineList = result.stream()
+                .map(dao -> PipelineSource.fromDao(pipelineRuleParser, dao))
+                .collect(Collectors.toList());
+        final PaginatedList<PipelineSource> pipelines = new PaginatedList<>(pipelineList,
+                result.pagination().total(), result.pagination().page(), result.pagination().perPage());
+        return PaginatedResponse.create("pipelines", pipelines);
     }
 
     @ApiOperation(value = "Get a processing pipeline", notes = "It can take up to a second until the change is applied")
