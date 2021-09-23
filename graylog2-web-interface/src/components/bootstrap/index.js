@@ -46,22 +46,4 @@ export { default as Tabs } from './Tabs';
 export { default as Tooltip } from './Tooltip';
 export { default as Well } from './Well';
 
-// eslint-disable-next-line no-restricted-imports
-export {
-  /* 👇 no custom theme colors needed 👇 */
-  ButtonGroup,
-  ButtonToolbar,
-  Checkbox, // NOTE: do we want custom or keep OS styles
-  Clearfix,
-  Col,
-  Collapse,
-  Dropdown,
-  Form,
-  Grid,
-  MenuItem,
-  NavItem,
-  Pager,
-  PanelGroup,
-  Radio, // NOTE: do we want custom or keep OS styles
-  /* 👆 no custom theme colors needed 👆 */
-} from 'react-bootstrap';
+export * from './imports';

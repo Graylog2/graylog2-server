@@ -17,8 +17,8 @@
 import * as React from 'react';
 import { render, waitFor } from 'wrappedTestingLibrary';
 import { fireEvent } from '@testing-library/react';
-import history from 'graylog2-server/graylog2-web-interface/src/util/History';
 
+import history from 'util/History';
 import { Button } from 'components/bootstrap';
 
 import { LinkContainer } from './router';

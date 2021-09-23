@@ -19,7 +19,8 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { get } from 'lodash';
 
-import { Alert, Row, Icon } from 'components/common';
+import { Alert, Row } from 'components/bootstrap';
+import { Icon } from 'components/common';
 import { emptyComparisonExpressionConfig } from 'logic/alerts/AggregationExpressionConfig';
 import validateExpression from 'logic/alerts/AggregationExpressionValidation';
 
@@ -59,9 +60,13 @@ class AggregationConditionsForm extends React.Component {
     onChange: PropTypes.func.isRequired,
   };
 
-  state = {
-    showInlineValidation: false,
-  };
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      showInlineValidation: false,
+    };
+  }
 
   toggleShowInlineValidation = () => {
     const { showInlineValidation } = this.state;

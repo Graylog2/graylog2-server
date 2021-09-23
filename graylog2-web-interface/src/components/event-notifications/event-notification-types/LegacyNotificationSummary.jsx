@@ -17,7 +17,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { Alert } from 'components/common';
+import { Alert } from 'components/bootstrap';
 
 import CommonNotificationSummary from './CommonNotificationSummary';
 import commonStyles from './LegacyNotificationCommonStyles.css';

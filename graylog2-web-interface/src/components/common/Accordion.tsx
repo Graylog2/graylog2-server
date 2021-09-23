@@ -18,13 +18,14 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import { PanelGroup } from 'components/bootstrap';
+import { PanelGroup } from 'components/bootstrap/imports';
 
 type Props = {
   activeKey?: string,
   children: React.ReactNode,
+  defaultActiveKey?: string,
   id: string,
-  onSelect?: () => string,
+  onSelect?: (nextKey: string) => void,
 }
 
 const StyledPanelGroup = styled(PanelGroup)`
@@ -54,6 +55,7 @@ Accordion.propTypes = {
 
 Accordion.defaultProps = {
   activeKey: undefined,
+  defaultActiveKey: undefined,
   onSelect: () => {},
 };
 

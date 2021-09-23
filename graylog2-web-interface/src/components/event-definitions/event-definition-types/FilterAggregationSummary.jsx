@@ -19,7 +19,8 @@ import PropTypes from 'prop-types';
 import lodash from 'lodash';
 
 import { Link } from 'components/common/router';
-import { Alert, Icon } from 'components/common';
+import { Alert } from 'components/bootstrap';
+import { Icon } from 'components/common';
 import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
 import { isPermitted } from 'util/PermissionsMixin';
 import { naturalSortIgnoreCase } from 'util/SortUtils';

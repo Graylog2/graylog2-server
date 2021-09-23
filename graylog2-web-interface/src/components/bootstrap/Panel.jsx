@@ -19,7 +19,8 @@ import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 // eslint-disable-next-line no-restricted-imports
 import { Panel as BootstrapPanel } from 'react-bootstrap';
-import deprecationNotice from 'graylog2-server/graylog2-web-interface/src/util/deprecationNotice';
+
+import deprecationNotice from 'util/deprecationNotice';
 
 const PanelHeading = styled(BootstrapPanel.Heading)`
   .panel-title {

@@ -19,7 +19,7 @@ import React from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { Checkbox, Radio } from 'react-bootstrap';
 
-import { InputDescription } from 'components/common';
+import InputDescription from 'components/common/InputDescription';
 
 import ControlLabel from './ControlLabel';
 import FormControl from './FormControl';
