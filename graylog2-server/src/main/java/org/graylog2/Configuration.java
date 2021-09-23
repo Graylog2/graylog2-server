@@ -44,9 +44,6 @@ import java.util.Set;
  */
 @SuppressWarnings("FieldMayBeFinal")
 public class Configuration extends BaseConfiguration {
-    @Parameter(value = "is_master", required = true)
-    private boolean isMaster = true;
-
     @Parameter(value = "password_secret", required = true, validator = StringNotBlankValidator.class)
     private String passwordSecret;
 
@@ -170,14 +167,6 @@ public class Configuration extends BaseConfiguration {
 
     @Parameter(value = "is_cloud")
     private boolean isCloud = false;
-
-    public boolean isMaster() {
-        return isMaster;
-    }
-
-    public void setIsMaster(boolean is) {
-        isMaster = is;
-    }
 
     public String getPasswordSecret() {
         return passwordSecret.trim();

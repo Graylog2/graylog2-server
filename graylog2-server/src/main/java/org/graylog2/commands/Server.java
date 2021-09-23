@@ -74,8 +74,6 @@ import org.graylog2.indexer.rotation.RotationStrategyBindings;
 import org.graylog2.inputs.transports.NettyTransportConfiguration;
 import org.graylog2.messageprocessors.MessageProcessorModule;
 import org.graylog2.migrations.MigrationsModule;
-import org.graylog2.notifications.Notification;
-import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.KafkaJournalConfiguration;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
@@ -99,7 +97,6 @@ import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 import static org.graylog2.audit.AuditEventTypes.NODE_SHUTDOWN_INITIATE;
 
@@ -204,38 +201,11 @@ public class Server extends ServerBootstrap {
         // Register this node.
         final NodeService nodeService = injector.getInstance(NodeService.class);
         final ServerStatus serverStatus = injector.getInstance(ServerStatus.class);
-        final ActivityWriter activityWriter = injector.getInstance(ActivityWriter.class);
         nodeService.registerServer(serverStatus.getNodeId().toString(),
-                configuration.isMaster(),
+                false,
                 httpConfiguration.getHttpPublishUri(),
                 Tools.getLocalCanonicalHostname());
         serverStatus.setLocalMode(isLocal());
-        if (configuration.isMaster() && !nodeService.isOnlyMaster(serverStatus.getNodeId())) {
-            LOG.warn("Detected another master in the cluster. Retrying in {} seconds to make sure it is not "
-                    + "an old stale instance.", TimeUnit.MILLISECONDS.toSeconds(configuration.getStaleMasterTimeout()));
-            try {
-                Thread.sleep(configuration.getStaleMasterTimeout());
-            } catch (InterruptedException e) { /* nope */ }
-
-            if (!nodeService.isOnlyMaster(serverStatus.getNodeId())) {
-                // All devils here.
-                String what = "Detected other master node in the cluster! Starting as non-master! "
-                        + "This is a mis-configuration you should fix.";
-                LOG.warn(what);
-                activityWriter.write(new Activity(what, Server.class));
-
-                // Write a notification.
-                final NotificationService notificationService = injector.getInstance(NotificationService.class);
-                Notification notification = notificationService.buildNow()
-                        .addType(Notification.Type.MULTI_MASTER)
-                        .addSeverity(Notification.Severity.URGENT);
-                notificationService.publishIfFirst(notification);
-
-                configuration.setIsMaster(false);
-            } else {
-                LOG.warn("Stale master has gone. Starting as master.");
-            }
-        }
     }
 
     private static class ShutdownHook implements Runnable {
@@ -301,10 +271,6 @@ public class Server extends ServerBootstrap {
 
     @Override
     protected Set<ServerStatus.Capability> capabilities() {
-        if (configuration.isMaster()) {
-            return EnumSet.of(ServerStatus.Capability.SERVER, ServerStatus.Capability.MASTER);
-        } else {
-            return EnumSet.of(ServerStatus.Capability.SERVER);
-        }
+        return EnumSet.of(ServerStatus.Capability.SERVER);
     }
 }

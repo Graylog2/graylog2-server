@@ -23,5 +23,6 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
+// TODO: This doesn't do anything anymore. Remove once all usages have been refactored to not require a master anymore
 public @interface RestrictToMaster {
 }

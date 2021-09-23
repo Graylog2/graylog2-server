@@ -49,7 +49,7 @@ public class ServerStatus {
 
     public enum Capability {
         SERVER,
-        MASTER,
+        MASTER, // TODO: probably remove this so that we fail fast for anyone still using this
         LOCALMODE
     }
 

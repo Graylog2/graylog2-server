@@ -30,7 +30,6 @@ import org.graylog2.indexer.indices.TooManyAliasesException;
 import org.graylog2.rest.models.system.deflector.responses.DeflectorSummary;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
-import org.graylog2.shared.security.RestrictToMaster;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.slf4j.Logger;
@@ -85,12 +84,12 @@ public class DeflectorResource extends RestResource {
         return DeflectorSummary.create(indexSet.isUp(), indexSet.getActiveWriteIndex());
     }
 
+    // TODO: this was restricted to master. was there any reason to it? if so, convert the cycle action to scheduled job
     @POST
     @Timed
     @ApiOperation(value = "Cycle deflector to new/next index")
     @RequiresPermissions(RestPermissions.DEFLECTOR_CYCLE)
     @Path("/cycle")
-    @RestrictToMaster
     @AuditEvent(type = AuditEventTypes.ES_WRITE_INDEX_UPDATE_JOB_START)
     @Deprecated
     public void deprecatedCycle() {
@@ -105,12 +104,12 @@ public class DeflectorResource extends RestResource {
         indexSet.cycle();
     }
 
+    // TODO: this was restricted to master. was there any reason to it? if so, convert the cycle action to scheduled job
     @POST
     @Timed
     @ApiOperation(value = "Cycle deflector to new/next index in index set")
     @RequiresPermissions(RestPermissions.DEFLECTOR_CYCLE)
     @Path("/{indexSetId}/cycle")
-    @RestrictToMaster
     @AuditEvent(type = AuditEventTypes.ES_WRITE_INDEX_UPDATE_JOB_START)
     public void cycle(@ApiParam(name = "indexSetId") @PathParam("indexSetId") String indexSetId) {
         final IndexSet indexSet = getIndexSet(indexSetRegistry, indexSetId);
