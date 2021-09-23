@@ -21,16 +21,12 @@ import io.restassured.specification.RequestSpecification;
 import org.graylog.storage.elasticsearch7.ElasticsearchInstanceES7Factory;
 import org.graylog.testing.completebackend.ApiIntegrationTest;
 import org.graylog.testing.completebackend.GraylogBackend;
-import org.graylog.testing.utils.GelfInputUtils;
-import org.graylog.testing.utils.SearchUtils;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.testing.completebackend.Lifecycle.CLASS;
-import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.core.IsEqual.equalTo;
 
 @ApiIntegrationTest(serverLifecycle = CLASS, elasticsearchFactory = ElasticsearchInstanceES7Factory.class, extraPorts = {TimeLimitIT.GELF_HTTP_PORT})
@@ -44,6 +40,17 @@ public class TimeLimitIT {
     public TimeLimitIT(GraylogBackend sut, RequestSpecification requestSpec) {
         this.sut = sut;
         this.requestSpec = requestSpec;
+    }
+
+    @AfterEach
+    public void resetConfig() {
+        final ValidatableResponse response = given()
+                .spec(requestSpec)
+                .when()
+                .body(getClass().getClassLoader().getResourceAsStream("org/graylog/plugins/views/cluster-search-config-reset.json"))
+                .put("/system/cluster_config/org.graylog2.indexer.searches.SearchesClusterConfig")
+                .then()
+                .statusCode(202);
     }
 
     @Test

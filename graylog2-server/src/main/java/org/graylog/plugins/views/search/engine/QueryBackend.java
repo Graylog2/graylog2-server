@@ -146,7 +146,7 @@ public interface QueryBackend<T extends GeneratedQueryContext> {
     default void validateQueryTimeRange(Query query, SearchesClusterConfig config) {
         Optional.ofNullable(config)
                 .map(SearchesClusterConfig::queryTimeRangeLimit)
-                .filter(limit -> limit != Period.ZERO)
+                .filter(limit -> !Period.ZERO.equals(limit))
                 .flatMap(timeRangeLimit -> Optional.ofNullable(query.timerange())
                         .filter(tr -> tr.getFrom() != null && tr.getTo() != null) // TODO: is this check necessary?
                         .filter(tr -> isOutOfLimit(tr, timeRangeLimit)))
