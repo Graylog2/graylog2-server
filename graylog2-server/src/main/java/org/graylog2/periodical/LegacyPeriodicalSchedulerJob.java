@@ -70,6 +70,15 @@ public class LegacyPeriodicalSchedulerJob implements Job {
                 .orElseThrow(
                         () -> new IllegalArgumentException("Cannot find periodical for class name " + triggerData.periodicalClass()));
         try {
+            // TODO: some periodicals determine if they should run, by looking at the config from graylog.conf.
+            //  Here we make the assumption, that all nodes are configured equally, so that if #startOnThisNode() is false
+            //  for the current node, it will be false for all the nodes in the cluster.
+            //  We also can't easily move this check to where we the periodical is scheduled initially, because #startOnThisNode might
+            //  check for some state in the DB (like UserPermissionMigrationPeriodical.startOnThisNode) and we need a
+            //  lock around this check to avoid race conditions.
+            if (!periodical.startOnThisNode()) {
+                return JobTriggerUpdate.withoutNextTime();
+            }
             periodical.initialize();
             periodical.run();
         } catch (Exception e) {
