@@ -79,6 +79,8 @@ const RulesPage = () => {
 
   const handleDelete = (rule: RuleType) => {
     return () => {
+      // TODO: Replace with custom confirm dialog
+      // eslint-disable-next-line no-alert
       if (window.confirm(`Do you really want to delete rule "${rule.title}"?`)) {
         RulesActions.delete(rule).then(() => {
           _loadData(pagination, setIsDataLoading, setPaginatedRules);
