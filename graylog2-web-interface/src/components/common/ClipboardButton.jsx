@@ -83,7 +83,7 @@ class ClipboardButton extends React.Component {
       options.container = container;
     }
 
-    this.clipboard = new ClipboardJS('[data-clipboard-button]', options);
+    this.clipboard = new ClipboardJS('[data-gl-clipboard-button]', options);
     this.clipboard.on('success', this._onSuccess);
     this.clipboard.on('error', this._onError);
   }
@@ -131,7 +131,7 @@ class ClipboardButton extends React.Component {
 
     return (
       <OverlayTrigger placement="top" trigger="click" overlay={tooltip} rootClose>
-        <Button data-clipboard-button data-clipboard-action={action} {...filteredProps}>
+        <Button data-gl-clipboard-button data-clipboard-action={action} {...filteredProps}>
           {title}
         </Button>
       </OverlayTrigger>
