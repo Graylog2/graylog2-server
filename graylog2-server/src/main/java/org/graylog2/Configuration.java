@@ -171,6 +171,9 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "is_cloud")
     private boolean isCloud = false;
 
+    @Parameter(value = "autostart_inputs")
+    private boolean autostartInputs = false;
+
     @Parameter(value = "run_migrations")
     private boolean runMigrations = true;
 
@@ -212,6 +215,10 @@ public class Configuration extends BaseConfiguration {
 
     public boolean isCloud() {
         return isCloud;
+    }
+
+    public boolean getAutostartInputs() {
+        return autostartInputs;
     }
 
     public boolean runMigrations() {

@@ -58,6 +58,7 @@ public abstract class MessageInput implements Stoppable {
     public static final String FIELD_ATTRIBUTES = "attributes";
     public static final String FIELD_STATIC_FIELDS = "static_fields";
     public static final String FIELD_GLOBAL = "global";
+    public static final String FIELD_AUTOSTART = "autostart";
     public static final String FIELD_CONTENT_PACK = "content_pack";
 
     @SuppressWarnings("StaticNonFinalField")
@@ -88,6 +89,7 @@ public abstract class MessageInput implements Stoppable {
     protected String persistId;
     protected DateTime createdAt;
     protected Boolean global = false;
+    protected Boolean autoStart = true;
     protected String contentPack;
 
     protected final Configuration configuration;
@@ -170,13 +172,17 @@ public abstract class MessageInput implements Stoppable {
     }
 
     private void cleanupMetrics() {
-        if (localRegistry != null && localRegistry.getMetrics() != null)
-            for (String metricName : localRegistry.getMetrics().keySet())
+        if (localRegistry != null && localRegistry.getMetrics() != null) {
+            for (String metricName : localRegistry.getMetrics().keySet()) {
                 metricRegistry.remove(getUniqueReadableId() + "." + metricName);
+            }
+        }
 
-        if (this.transportMetrics != null && this.transportMetrics.getMetrics() != null)
-            for (String metricName : this.transportMetrics.getMetrics().keySet())
+        if (this.transportMetrics != null && this.transportMetrics.getMetrics() != null) {
+            for (String metricName : this.transportMetrics.getMetrics().keySet()) {
                 metricRegistry.remove(getUniqueReadableId() + "." + metricName);
+            }
+        }
     }
 
     public ConfigurationRequest getRequestedConfiguration() {
@@ -243,6 +249,14 @@ public abstract class MessageInput implements Stoppable {
         this.global = global;
     }
 
+    public Boolean getAutoStart() {
+        return autoStart;
+    }
+
+    public void setAutoStart(Boolean autoStart) {
+        this.autoStart = autoStart;
+    }
+
     public String getContentPack() {
         return contentPack;
     }
@@ -273,6 +287,7 @@ public abstract class MessageInput implements Stoppable {
         map.put(FIELD_TITLE, getTitle());
         map.put(FIELD_CREATOR_USER_ID, getCreatorUserId());
         map.put(FIELD_GLOBAL, isGlobal());
+        map.put(FIELD_AUTOSTART, getAutoStart());
         map.put(FIELD_CONTENT_PACK, getContentPack());
         map.put(FIELD_CONFIGURATION, getConfiguration().getSource());
 
