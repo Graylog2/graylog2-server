@@ -68,7 +68,7 @@ public class ClusterEventCleanupPeriodicalTest {
 
     @Test
     public void testDoRun() throws Exception {
-        final DBCollection collection = mongoConnection.getDatabase().getCollection(ClusterEventPeriodical.COLLECTION_NAME);
+        final DBCollection collection = mongoConnection.getDatabase().getCollection(ClusterEventAdapter.COLLECTION_NAME);
         assertThat(insertEvent(collection, 0L)).isTrue();
         assertThat(insertEvent(collection, TIME.getMillis())).isTrue();
         assertThat(insertEvent(collection, TIME.minus(ClusterEventCleanupPeriodical.DEFAULT_MAX_EVENT_AGE).getMillis())).isTrue();

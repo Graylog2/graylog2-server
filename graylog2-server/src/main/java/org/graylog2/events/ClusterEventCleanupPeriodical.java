@@ -37,7 +37,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public class ClusterEventCleanupPeriodical extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(ClusterEventCleanupPeriodical.class);
-    private static final String COLLECTION_NAME = ClusterEventPeriodical.COLLECTION_NAME;
+    private static final String COLLECTION_NAME = ClusterEventAdapter.COLLECTION_NAME;
 
     @VisibleForTesting
     static final long DEFAULT_MAX_EVENT_AGE = TimeUnit.DAYS.toMillis(1L);
