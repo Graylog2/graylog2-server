@@ -210,6 +210,7 @@ public class DBJobTriggerService {
                 DBQuery.is(FIELD_ID, trigger.id()),
                 DBQuery.is(FIELD_LOCK_OWNER, null));
         try {
+            // TODO: update only select fields to avoid overriding existing state. Check if $setOnInsert comes to rescue
             db.findAndModify(query, null, null, false, trigger, false, true);
         } catch (MongoCommandException failure) {
             // Unfortunately findAndModify doesn't throw a DuplicateKeyException, so we'll have to check for
