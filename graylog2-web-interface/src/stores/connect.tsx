@@ -45,12 +45,17 @@ export function useStore(store, propsMapper = id) {
 
   const mappedStoreState = useMemo(() => propsMapper(storeState), [propsMapper, storeState]);
 
-  useEffect(() => store.listen((newState) => {
-    if (!isDeepEqual(newState, storeStateRef.current)) {
-      setStoreState(newState);
-      storeStateRef.current = newState;
-    }
-  }), [store]);
+  useEffect(() => {
+    const unsub = store.listen((newState) => {
+      if (!isDeepEqual(newState, storeStateRef.current)) {
+        setStoreState(newState);
+        storeStateRef.current = newState;
+      }
+    });
+    setStoreState(store.getInitialState());
+
+    return unsub;
+  }, [store]);
 
   return mappedStoreState;
 }
