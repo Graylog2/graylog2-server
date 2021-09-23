@@ -19,6 +19,7 @@ package org.graylog.events.processor.aggregation;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -48,7 +49,7 @@ import org.graylog2.plugin.MessageSummary;
 import org.graylog2.plugin.database.Persisted;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
-import org.graylog2.streams.StreamImpl;
+import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -196,10 +197,9 @@ public class AggregationEventProcessor implements EventProcessor {
                 final Event event = eventFactory.createEvent(eventDefinition, msg.getTimestamp(), eventDefinition.title());
                 event.setOriginContext(EventOriginContext.elasticsearchMessage(resultMessage.getIndex(), msg.getId()));
 
-                // We don't want source streams in the event which are unrelated to the event definition
-                msg.getStreamIds().stream()
-                    .filter(stream -> getStreams(parameters).contains(stream))
-                    .forEach(event::addSourceStream);
+                // Ensure the event has values in the "source_streams" field for permission checks to work
+                buildEventSourceStreams(getStreams(parameters), ImmutableSet.copyOf(msg.getStreamIds()))
+                        .forEach(event::addSourceStream);
 
                 eventsWithContext.add(EventWithContext.create(event, msg));
             }
@@ -247,30 +247,7 @@ public class AggregationEventProcessor implements EventProcessor {
     @VisibleForTesting
     ImmutableList<EventWithContext> eventsFromAggregationResult(EventFactory eventFactory, AggregationEventProcessorParameters parameters, AggregationResult result) {
         final ImmutableList.Builder<EventWithContext> eventsWithContext = ImmutableList.builder();
-
-        final Set<String> searchStreams = getStreams(parameters);
-        final Set<String> sourceStreams;
-
-        if (searchStreams.isEmpty() && result.sourceStreams().isEmpty()) {
-            // This can happen if the user didn't select any stream in the event definition and an event should be
-            // created based on the absence of a search result. (e.g. count() < 1)
-            // When the source streams field of an event is empty, every user can see it. That's why we need to add
-            // streams to the field. We decided to use all currently existing streams (minus the default event streams)
-            // to make sure only users that have access to all message streams can see the event.
-            sourceStreams = streamService.loadAll().stream()
-                    .map(Persisted::getId)
-                    .filter(streamId -> !StreamImpl.DEFAULT_EVENT_STREAM_IDS.contains(streamId))
-                    .collect(Collectors.toSet());
-        } else if (searchStreams.isEmpty()) {
-            // If the search streams is empty, we search in all streams and so we include all source streams from the result.
-            sourceStreams = result.sourceStreams();
-        } else if (result.sourceStreams().isEmpty()) {
-            // With an empty result we just include all streams from the event definition.
-            sourceStreams = searchStreams;
-        } else {
-            // We don't want source streams in the event which are unrelated to the event definition.
-            sourceStreams = Sets.intersection(searchStreams, result.sourceStreams());
-        }
+        final Set<String> sourceStreams = buildEventSourceStreams(getStreams(parameters), result.sourceStreams());
 
         for (final AggregationKeyResult keyResult : result.keyResults()) {
             if (!satisfiesConditions(keyResult)) {
@@ -340,6 +317,32 @@ public class AggregationEventProcessor implements EventProcessor {
         }
 
         return eventsWithContext.build();
+    }
+
+    // Determine event source streams based on given search and result streams
+    private Set<String> buildEventSourceStreams(Set<String> searchStreams, Set<String> resultSourceStreams) {
+        Set<String> sourceStreams;
+        if (searchStreams.isEmpty() && resultSourceStreams.isEmpty()) {
+            // This can happen if the user didn't select any stream in the event definition and an event should be
+            // created based on the absence of a search result. (e.g. count() < 1)
+            // When the source streams field of an event is empty, every user can see it. That's why we need to add
+            // streams to the field. We decided to use all currently existing streams (minus the default event streams)
+            // to make sure only users that have access to all message streams can see the event.
+            sourceStreams = streamService.loadAll().stream()
+                    .map(Persisted::getId)
+                    .filter(streamId -> !Stream.DEFAULT_EVENT_STREAM_IDS.contains(streamId))
+                    .collect(Collectors.toSet());
+        } else if (searchStreams.isEmpty()) {
+            // If the search streams is empty, we search in all streams and so we include all source streams from the result.
+            sourceStreams = resultSourceStreams;
+        } else if (resultSourceStreams.isEmpty()) {
+            // With an empty result we just include all streams from the event definition.
+            sourceStreams = searchStreams;
+        } else {
+            // We don't want source streams in the event which are unrelated to the event definition.
+            sourceStreams = Sets.intersection(searchStreams, resultSourceStreams);
+        }
+        return sourceStreams;
     }
 
     // Build a human readable event message string that contains somewhat useful information
