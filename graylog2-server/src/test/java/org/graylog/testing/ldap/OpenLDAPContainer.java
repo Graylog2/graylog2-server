@@ -56,7 +56,7 @@ public class OpenLDAPContainer extends GenericContainer<OpenLDAPContainer> {
                 .withFileSystemBind(LDAPTestUtils.testTLSCertsPath("server-key.pem"), CONTAINER_CERTS_PATH + "/server-key.pem", BindMode.READ_ONLY)
                 .withFileSystemBind(LDAPTestUtils.testTLSCertsPath("CA-cert.pem"), CONTAINER_CERTS_PATH + "/CA-cert.pem", BindMode.READ_ONLY)
                 .withFileSystemBind(LDAPTestUtils.testTLSCertsPath("dhparam.pem"), CONTAINER_CERTS_PATH + "/dhparam.pem", BindMode.READ_ONLY)
-                .withExposedPorts(TLS_PORT);
+                .withExposedPorts(PORT, TLS_PORT);
     }
 
     public OpenLDAPContainer() {
