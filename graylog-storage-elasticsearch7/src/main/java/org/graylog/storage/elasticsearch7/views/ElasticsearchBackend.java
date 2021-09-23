@@ -103,6 +103,8 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
     public ESGeneratedQueryContext generate(SearchJob job, Query query, Set<QueryResult> results, SearchesClusterConfig searchesClusterConfig) {
         final ElasticsearchQueryString backendQuery = (ElasticsearchQueryString) query.query();
 
+        validateQueryTimeRange(query, searchesClusterConfig);
+
         final Set<SearchType> searchTypes = query.searchTypes();
 
         final String queryString = this.queryStringDecorators.decorate(backendQuery.queryString(), job, query, results);
