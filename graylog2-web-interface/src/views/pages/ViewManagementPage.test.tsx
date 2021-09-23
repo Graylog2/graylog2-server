@@ -50,7 +50,7 @@ describe('ViewManagementPage', () => {
   };
 
   beforeEach(() => {
-    mockViewManagementStore.getInitialState.mockImplementationOnce(() => viewsResult);
+    mockViewManagementStore.getInitialState.mockImplementation(() => viewsResult);
   });
 
   it('passes retrieved views to list component', () => {
