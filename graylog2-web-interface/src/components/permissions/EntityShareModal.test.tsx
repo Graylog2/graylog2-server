@@ -37,13 +37,17 @@ jest.mock('stores/permissions/EntityShareStore', () => ({
   },
   EntityShareStore: {
     listen: jest.fn(),
-    getInitialState: jest.fn(() => ({ state: mockEntityShareState })),
+    getInitialState: jest.fn(),
   },
 }));
 
 jest.setTimeout(10000);
 
 describe('EntityShareModal', () => {
+  beforeEach(() => {
+    asMock(EntityShareStore.getInitialState).mockReturnValue({ state: mockEntityShareState });
+  });
+
   beforeAll(() => {
     jest.useFakeTimers();
   });
@@ -102,7 +106,7 @@ describe('EntityShareModal', () => {
 
   describe('displays', () => {
     it('loading spinner while loading entity share state', () => {
-      asMock(EntityShareStore.getInitialState).mockReturnValueOnce(mockEmptyStore);
+      asMock(EntityShareStore.getInitialState).mockReturnValue(mockEmptyStore);
       const { getByText } = render(<SimpleEntityShareModal />);
 
       act(() => { jest.advanceTimersByTime(200); });
@@ -111,7 +115,7 @@ describe('EntityShareModal', () => {
     });
 
     it('displays an error if validation failed and disables submit', () => {
-      asMock(EntityShareStore.getInitialState).mockReturnValueOnce(mockFailedStore);
+      asMock(EntityShareStore.getInitialState).mockReturnValue(mockFailedStore);
       const { getByText } = render(<SimpleEntityShareModal />);
 
       expect(getByText('Removing the following owners will leave the entity ownerless:')).not.toBeNull();
@@ -264,7 +268,7 @@ describe('EntityShareModal', () => {
         .build();
 
       beforeEach(() => {
-        asMock(EntityShareStore.getInitialState).mockReturnValueOnce({ state: entityShareState });
+        asMock(EntityShareStore.getInitialState).mockReturnValue({ state: entityShareState });
       });
 
       const deleteGrantee = async ({ grantee }) => {
