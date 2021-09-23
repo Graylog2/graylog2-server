@@ -173,8 +173,7 @@ public class PipelineInterpreter implements MessageProcessor {
         return new MessageCollection(fullyProcessed);
     }
 
-    // Public access is required due to use in the Illuminate processor.
-    public void potentiallyDropFilteredMessage(Message message) {
+    private void potentiallyDropFilteredMessage(Message message) {
         if (message.getFilterOut()) {
             log.debug("[{}] marked message to be discarded. Dropping message.", message.getId());
             filteredOutMessages.mark();
@@ -250,12 +249,11 @@ public class PipelineInterpreter implements MessageProcessor {
         return processForResolvedPipelines(message, message.getId(), pipelinesToRun, interpreterListener, state);
     }
 
-    // Public access is required due to use in the Illuminate processor.
-    public List<Message> processForResolvedPipelines(Message message,
-                                                     String msgId,
-                                                     Set<Pipeline> pipelines,
-                                                     InterpreterListener interpreterListener,
-                                                     State state) {
+    private List<Message> processForResolvedPipelines(Message message,
+                                                      String msgId,
+                                                      Set<Pipeline> pipelines,
+                                                      InterpreterListener interpreterListener,
+                                                      State state) {
         final List<Message> result = new ArrayList<>();
         // record execution of pipeline in metrics
         pipelines.forEach(Pipeline::markExecution);
@@ -461,8 +459,7 @@ public class PipelineInterpreter implements MessageProcessor {
     }
 
     public static class State {
-        private final Logger LOG = LoggerFactory.getLogger(getClass());
-        protected static final String STAGE_CACHE_METRIC_SUFFIX = "stage-cache";
+        private static final Logger LOG = LoggerFactory.getLogger(State.class);
 
         private final ImmutableMap<String, Pipeline> currentPipelines;
         private final ImmutableSetMultimap<String, Pipeline> streamPipelineConnections;
@@ -493,12 +490,8 @@ public class PipelineInterpreter implements MessageProcessor {
                     });
 
             // we have to remove the metrics, because otherwise we leak references to the cache (and the register call with throw)
-            metricRegistry.removeMatching((name, metric) -> name.startsWith(getStageCacheMetricName()));
-            MetricUtils.safelyRegisterAll(metricRegistry, new CacheStatsSet(getStageCacheMetricName(), cache));
-        }
-
-        protected String getStageCacheMetricName() {
-            return name(PipelineInterpreter.class, STAGE_CACHE_METRIC_SUFFIX);
+            metricRegistry.removeMatching((name, metric) -> name.startsWith(name(PipelineInterpreter.class, "stage-cache")));
+            MetricUtils.safelyRegisterAll(metricRegistry, new CacheStatsSet(name(PipelineInterpreter.class, "stage-cache"), cache));
         }
 
         public ImmutableMap<String, Pipeline> getCurrentPipelines() {
