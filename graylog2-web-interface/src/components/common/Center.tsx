@@ -15,16 +15,31 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import styled from 'styled-components';
 
-import { Center } from 'components/common';
-import Spinner from 'components/common/Spinner';
+const Container = styled.div<{ $fullHeight: boolean }>(({ $fullHeight }) => `
+  display: flex;
+  height: ${$fullHeight ? '100%' : 'auto'};
+  justify-content: center;
+  align-items: center;
+`);
 
-const LoadingWidget = () => (
-  <Center>
-    <Spinner data-testid="loading-widget" />
-  </Center>
+type Props = {
+  children: React.ReactNode,
+  fullHeight?: boolean,
+};
+
+/**
+ * This component centers its children horizontally and vertically.
+ */
+const Center = ({ children, fullHeight }: Props) => (
+  <Container $fullHeight={fullHeight}>
+    {children}
+  </Container>
 );
 
-LoadingWidget.propTypes = {};
+Center.defaultProps = {
+  fullHeight: true,
+};
 
-export default LoadingWidget;
+export default Center;

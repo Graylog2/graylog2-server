@@ -14,17 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+package org.graylog.plugins.pipelineprocessor.processors;
 
-import { Center } from 'components/common';
-import Spinner from 'components/common/Spinner';
+import org.graylog2.plugin.LocalMetricRegistry;
+import org.junit.Test;
 
-const LoadingWidget = () => (
-  <Center>
-    <Spinner data-testid="loading-widget" />
-  </Center>
-);
+import static org.junit.Assert.assertEquals;
 
-LoadingWidget.propTypes = {};
+public class StateTest {
 
-export default LoadingWidget;
+    @Test
+    public void testMetricName() {
+        final PipelineInterpreter.State state = new PipelineInterpreter.State(null, null, null,
+                new LocalMetricRegistry(), 1, false);
+        assertEquals("org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.stage-cache",
+                state.getStageCacheMetricName());
+    }
+}
