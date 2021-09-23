@@ -99,9 +99,9 @@ module.exports = {
             'src/components/common/Wizard.tsx',
             'src/components/common/PublicNotifications.tsx',
             'src/components/common/KeyCapture.tsx',
-            'src/components/graylog/MessageDetailsDefinitionList.jsx',
-            'src/components/graylog/Button.jsx',
-            'src/components/graylog/Accordion.tsx',
+            'src/components/common/MessageDetailsDefinitionList.jsx',
+            'src/components/common/Button.jsx',
+            'src/components/common/Accordion.tsx',
           ],
         },
         {

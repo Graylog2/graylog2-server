@@ -8,7 +8,7 @@ Simple page header with only a title and description:
 Experimental page header with description, support message, and action. Notice
 that there is no border around the header, as the `subpage` prop is set:
 ```js
-import { Button } from 'components/graylog';
+import { Button } from 'components/bootstrap';
 
 <PageHeader title="Here goes the page title" lifecycle="experimental" subpage>
   <span>This is a page description</span>

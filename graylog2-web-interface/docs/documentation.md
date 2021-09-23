@@ -44,5 +44,5 @@ Here is a summary of what to do if you just want to document a component:
    modules you need. Try to not require too many modules, though, as they will
    make the example more obscure and harder to understand. You can also use
    object destructuring when requiring more than one thing from the same module.
-   E.g. `const { ButtonToolbar } = require('components/graylog');` can
+   E.g. `const { ButtonToolbar } = require('components/bootstrap');` can
    save a line of the example without making it harder to read.
