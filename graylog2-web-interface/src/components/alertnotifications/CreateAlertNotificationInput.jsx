@@ -28,9 +28,9 @@ import Routes from 'routing/Routes';
 import UserNotification from 'util/UserNotification';
 import history from 'util/History';
 import CombinedProvider from 'injection/CombinedProvider';
+import { AlarmCallbacksActions } from 'stores/alarmcallbacks/AlarmCallbacksStore';
 
 const { AlertNotificationsStore, AlertNotificationsActions } = CombinedProvider.get('AlertNotifications');
-const { AlarmCallbacksActions } = CombinedProvider.get('AlarmCallbacks');
 const { StreamsStore } = CombinedProvider.get('Streams');
 
 const CreateAlertNotificationInput = createReactClass({

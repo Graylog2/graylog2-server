@@ -27,9 +27,9 @@ import { EntityListItem, IfPermitted, Spinner } from 'components/common';
 import { UnknownAlertNotification } from 'components/alertnotifications';
 import { ConfigurationForm, ConfigurationWell } from 'components/configurationforms';
 import Routes from 'routing/Routes';
+import { AlarmCallbacksActions } from 'stores/alarmcallbacks/AlarmCallbacksStore';
 
 const { AlertNotificationsStore } = CombinedProvider.get('AlertNotifications');
-const { AlarmCallbacksActions } = CombinedProvider.get('AlarmCallbacks');
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 
 const AlertNotification = createReactClass({

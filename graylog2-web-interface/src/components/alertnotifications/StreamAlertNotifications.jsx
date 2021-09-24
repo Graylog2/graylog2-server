@@ -24,8 +24,8 @@ import { Spinner } from 'components/common';
 import { AlertNotificationsList } from 'components/alertnotifications';
 import CombinedProvider from 'injection/CombinedProvider';
 import Routes from 'routing/Routes';
+import { AlarmCallbacksActions } from 'stores/alarmcallbacks/AlarmCallbacksStore';
 
-const { AlarmCallbacksActions } = CombinedProvider.get('AlarmCallbacks');
 const { AlertNotificationsActions } = CombinedProvider.get('AlertNotifications');
 
 class StreamAlertNotifications extends React.Component {
