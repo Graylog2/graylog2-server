@@ -19,14 +19,12 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
-import CombinedProvider from 'injection/CombinedProvider';
 import { sortByDate } from 'util/SortUtils';
 import { Row, Col } from 'components/graylog';
 import { EntityList, Spinner } from 'components/common';
 import { AlarmCallbackHistory } from 'components/alarmcallbacks';
 import { AlarmCallbackHistoryStore } from 'stores/alarmcallbacks/AlarmCallbackHistoryStore';
-
-const { AlertNotificationsStore } = CombinedProvider.get('AlertNotifications');
+import { AlertNotificationsStore } from 'stores/alertnotifications/AlertNotificationsStore';
 
 const AlarmCallbackHistoryOverview = createReactClass({
   displayName: 'AlarmCallbackHistoryOverview',

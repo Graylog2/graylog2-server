@@ -22,11 +22,9 @@ import { LinkContainer } from 'components/graylog/router';
 import { Button } from 'components/graylog';
 import { Spinner } from 'components/common';
 import { AlertNotificationsList } from 'components/alertnotifications';
-import CombinedProvider from 'injection/CombinedProvider';
 import Routes from 'routing/Routes';
 import { AlarmCallbacksActions } from 'stores/alarmcallbacks/AlarmCallbacksStore';
-
-const { AlertNotificationsActions } = CombinedProvider.get('AlertNotifications');
+import { AlertNotificationsActions } from 'stores/alertnotifications/AlertNotificationsStore';
 
 class StreamAlertNotifications extends React.Component {
   static propTypes = {

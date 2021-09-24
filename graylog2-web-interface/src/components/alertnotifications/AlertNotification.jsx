@@ -28,8 +28,8 @@ import { UnknownAlertNotification } from 'components/alertnotifications';
 import { ConfigurationForm, ConfigurationWell } from 'components/configurationforms';
 import Routes from 'routing/Routes';
 import { AlarmCallbacksActions } from 'stores/alarmcallbacks/AlarmCallbacksStore';
+import { AlertNotificationsStore } from 'stores/alertnotifications/AlertNotificationsStore';
 
-const { AlertNotificationsStore } = CombinedProvider.get('AlertNotifications');
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 
 const AlertNotification = createReactClass({
