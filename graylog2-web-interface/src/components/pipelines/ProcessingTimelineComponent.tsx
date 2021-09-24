@@ -80,7 +80,7 @@ const PipelineFilter = ({ query, onSearch }: { query: string, onSearch: (query: 
   <SearchForm query={query}
               onSearch={onSearch}
               queryWidth={400}
-              queryHelpComponent={<QueryHelper entityName="pipelines" />}
+              queryHelpComponent={<QueryHelper entityName="Pipeline" />}
               wrapperClass="has-bm"
               onReset={() => onSearch('')}
               topMargin={0} />

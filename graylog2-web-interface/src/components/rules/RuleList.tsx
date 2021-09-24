@@ -35,6 +35,7 @@ type Props = {
   rules: Array<RuleType>,
   metricsConfig?: MetricsConfigType,
   onDelete: (RuleType) => void,
+  searchFilter: React.ReactNode,
 };
 
 type State = {
@@ -48,6 +49,7 @@ class RuleList extends React.Component<Props, State> {
       metrics_enabled: PropTypes.bool.isRequired,
     }),
     onDelete: PropTypes.func.isRequired,
+    searchFilter: PropTypes.node.isRequired,
   };
 
   static defaultProps = {
@@ -123,7 +125,7 @@ class RuleList extends React.Component<Props, State> {
   };
 
   render() {
-    const { rules, metricsConfig } = this.props;
+    const { rules, metricsConfig, searchFilter } = this.props;
     const headers = ['Title', 'Description', 'Created', 'Last modified', 'Throughput', 'Errors', 'Actions'];
     const { openMetricsConfig } = this.state;
 
@@ -135,7 +137,7 @@ class RuleList extends React.Component<Props, State> {
                    headerCellFormatter={this._headerCellFormatter}
                    sortByKey="title"
                    rows={rules}
-                   filterBy="Title"
+                   customFilter={searchFilter}
                    dataRowFormatter={this._ruleInfoFormatter}
                    filterKeys={[]}>
           <ButtonToolbar className="pull-right">

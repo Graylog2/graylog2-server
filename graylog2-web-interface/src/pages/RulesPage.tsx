@@ -15,10 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useEffect, useRef, useState } from 'react';
+import styled from 'styled-components';
 
 import { LinkContainer } from 'components/graylog/router';
 import { Row, Col, Button } from 'components/graylog';
-import { SearchForm, PaginatedList, DocumentTitle, PageHeader, Spinner } from 'components/common';
+import { SearchForm, PaginatedList, DocumentTitle, PageHeader, Spinner, QueryHelper } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
 import RuleList from 'components/rules/RuleList';
@@ -28,6 +29,10 @@ import { Pagination, DEFAULT_PAGINATION } from 'stores/PaginationTypes';
 import { PaginatedRules, RuleType } from 'stores/rules/RulesStore';
 
 const { RulesActions } = CombinedProvider.get('Rules');
+
+const Flex = styled.div`
+  display: flex;
+`;
 
 const CreateRuleButton = () => (
   <div className="pull-right">
@@ -52,6 +57,7 @@ const RulesPage = () => {
   const resetSearchIsLoading = useRef<() => void | undefined>();
   const [paginatedRules, setPaginatedRules] = useState<PaginatedRules | undefined>();
   const { list: rules, pagination: { total = 0 } = {} } = paginatedRules ?? {};
+  const { query } = pagination;
 
   useEffect(() => {
     _loadData(pagination, setIsDataLoading, setPaginatedRules);
@@ -68,8 +74,8 @@ const RulesPage = () => {
     setPagination({ ...pagination, page: newPage, perPage: newPerPage });
   };
 
-  const handleSearch = (query, resetLoadingCallback) => {
-    setPagination({ ...pagination, query: query });
+  const handleSearch = (nextQuery, resetLoadingCallback) => {
+    setPagination({ ...pagination, query: nextQuery });
     resetSearchIsLoading.current = resetLoadingCallback;
   };
 
@@ -90,6 +96,19 @@ const RulesPage = () => {
   };
 
   const isLoading = !rules;
+
+  const searchFilter = (
+    <Flex>
+      <SearchForm query={query}
+                  onSearch={handleSearch}
+                  queryWidth={400}
+                  queryHelpComponent={<QueryHelper entityName="Pipeline Rule" />}
+                  wrapperClass="has-bm"
+                  onReset={handleReset}
+                  useLoadingState
+                  topMargin={0} />
+    </Flex>
+  );
 
   return (
     <DocumentTitle title="Pipeline rules">
@@ -125,20 +144,13 @@ const RulesPage = () => {
             {isLoading ? (
               <Spinner />
             ) : (
-              <>
-                <Row className="row-sm">
-                  <Col md={2}>
-                    <SearchForm onSearch={handleSearch} onReset={handleReset} useLoadingState />
-                  </Col>
-                </Row>
-                <Row>
-                  <Col md={12}>
-                    <PaginatedList onChange={handlePageChange} totalItems={total}>
-                      <RuleList rules={rules} onDelete={handleDelete} />
-                    </PaginatedList>
-                  </Col>
-                </Row>
-              </>
+              <Row>
+                <Col md={12}>
+                  <PaginatedList onChange={handlePageChange} totalItems={total}>
+                    <RuleList rules={rules} onDelete={handleDelete} searchFilter={searchFilter} />
+                  </PaginatedList>
+                </Col>
+              </Row>
             )}
           </Col>
         </Row>
