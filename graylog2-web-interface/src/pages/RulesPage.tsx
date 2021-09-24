@@ -27,6 +27,7 @@ import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';
 import { Pagination, DEFAULT_PAGINATION } from 'stores/PaginationTypes';
 import { PaginatedRules, RuleType } from 'stores/rules/RulesStore';
+import useLocationSearchPagination from 'hooks/useLocationSearchPagination';
 
 const { RulesActions } = CombinedProvider.get('Rules');
 
@@ -53,11 +54,11 @@ const _loadData = (pagination: Pagination, setIsLoading, setPaginatedRules) => {
 
 const RulesPage = () => {
   const [isDataLoading, setIsDataLoading] = useState<boolean>(false);
-  const [pagination, setPagination] = useState<Pagination>(DEFAULT_PAGINATION);
+  const { pagination, setPagination } = useLocationSearchPagination(DEFAULT_PAGINATION);
   const resetSearchIsLoading = useRef<() => void | undefined>();
   const [paginatedRules, setPaginatedRules] = useState<PaginatedRules | undefined>();
   const { list: rules, pagination: { total = 0 } = {} } = paginatedRules ?? {};
-  const { query } = pagination;
+  const { page, perPage, query } = pagination;
 
   useEffect(() => {
     _loadData(pagination, setIsDataLoading, setPaginatedRules);
@@ -146,7 +147,7 @@ const RulesPage = () => {
             ) : (
               <Row>
                 <Col md={12}>
-                  <PaginatedList onChange={handlePageChange} totalItems={total}>
+                  <PaginatedList onChange={handlePageChange} totalItems={total} activePage={page} pageSize={perPage}>
                     <RuleList rules={rules} onDelete={handleDelete} searchFilter={searchFilter} />
                   </PaginatedList>
                 </Col>
