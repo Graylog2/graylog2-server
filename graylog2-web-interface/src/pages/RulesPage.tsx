@@ -75,7 +75,7 @@ const RulesPage = () => {
   };
 
   const handleSearch = (nextQuery) => {
-    setPagination({ ...pagination, query: nextQuery });
+    setPagination({ ...pagination, query: nextQuery, page: DEFAULT_PAGINATION.page });
   };
 
   const handleDelete = (rule: RuleType) => {
