@@ -14,8 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect, useRef, useState } from 'react';
-import styled from 'styled-components';
+import React, { useEffect, useState } from 'react';
+import styled, { css } from 'styled-components';
 
 import { LinkContainer } from 'components/graylog/router';
 import { Row, Col, Button } from 'components/graylog';
@@ -34,6 +34,11 @@ const { RulesActions } = CombinedProvider.get('Rules');
 const Flex = styled.div`
   display: flex;
 `;
+
+const SpinnerWrapper = styled.div(({ theme }) => css`
+  font-size: ${theme.fonts.size.h3};
+  padding: ${theme.spacings.xxs} ${theme.spacings.sm};
+`);
 
 const CreateRuleButton = () => (
   <div className="pull-right">
@@ -55,7 +60,6 @@ const _loadData = (pagination: Pagination, setIsLoading, setPaginatedRules) => {
 const RulesPage = () => {
   const [isDataLoading, setIsDataLoading] = useState<boolean>(false);
   const { pagination, setPagination } = useLocationSearchPagination(DEFAULT_PAGINATION);
-  const resetSearchIsLoading = useRef<() => void | undefined>();
   const [paginatedRules, setPaginatedRules] = useState<PaginatedRules | undefined>();
   const { list: rules, pagination: { total = 0 } = {} } = paginatedRules ?? {};
   const { page, perPage, query } = pagination;
@@ -64,24 +68,12 @@ const RulesPage = () => {
     _loadData(pagination, setIsDataLoading, setPaginatedRules);
   }, [pagination]);
 
-  useEffect(() => {
-    if (!isDataLoading && resetSearchIsLoading.current) {
-      resetSearchIsLoading.current();
-      resetSearchIsLoading.current = undefined;
-    }
-  }, [isDataLoading, resetSearchIsLoading]);
-
   const handlePageChange = (newPage, newPerPage) => {
     setPagination({ ...pagination, page: newPage, perPage: newPerPage });
   };
 
-  const handleSearch = (nextQuery, resetLoadingCallback) => {
+  const handleSearch = (nextQuery) => {
     setPagination({ ...pagination, query: nextQuery });
-    resetSearchIsLoading.current = resetLoadingCallback;
-  };
-
-  const handleReset = () => {
-    setPagination({ ...pagination, query: '' });
   };
 
   const handleDelete = (rule: RuleType) => {
@@ -105,9 +97,9 @@ const RulesPage = () => {
                   queryWidth={400}
                   queryHelpComponent={<QueryHelper entityName="Pipeline Rule" />}
                   wrapperClass="has-bm"
-                  onReset={handleReset}
-                  useLoadingState
+                  onReset={() => handleSearch('')}
                   topMargin={0} />
+      {isDataLoading && <SpinnerWrapper><Spinner text="" delay={0} /></SpinnerWrapper>}
     </Flex>
   );
 
