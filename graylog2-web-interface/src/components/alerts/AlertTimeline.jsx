@@ -22,10 +22,10 @@ import Reflux from 'reflux';
 import { Spinner, Timestamp } from 'components/common';
 import CombinedProvider from 'injection/CombinedProvider';
 import { sortByDate } from 'util/SortUtils';
+import { AlarmCallbackHistoryStore } from 'stores/alarmcallbacks/AlarmCallbackHistoryStore';
 
 import style from './AlertTimeline.css';
 
-const { AlarmCallbackHistoryStore } = CombinedProvider.get('AlarmCallbackHistory');
 const { AlertNotificationsStore } = CombinedProvider.get('AlertNotifications');
 
 const AlertTimeline = createReactClass({
