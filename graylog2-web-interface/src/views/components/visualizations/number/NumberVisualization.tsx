@@ -29,6 +29,7 @@ import RenderCompletionCallback from 'views/components/widgets/RenderCompletionC
 import NumberVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import { makeVisualization, retrieveChartData } from 'views/components/aggregationbuilder/AggregationBuilder';
+import { Center } from 'components/common';
 
 import Trend from './Trend';
 import AutoFontSizer from './AutoFontSizer';
@@ -38,7 +39,7 @@ import type { CurrentViewType } from '../../CustomPropTypes';
 const GridContainer = styled.div`
   display: grid;
   grid-template-columns: 1fr;
-  grid-template-rows: 4fr 1fr;
+  grid-template-rows: 4fr auto;
   grid-column-gap: 0;
   grid-row-gap: 0;
   height: 100%;
