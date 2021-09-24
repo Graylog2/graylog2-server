@@ -30,10 +30,10 @@ import DocsHelper from 'util/DocsHelper';
 import history from 'util/History';
 import CombinedProvider from 'injection/CombinedProvider';
 import withParams from 'routing/withParams';
+import { AlertConditionsStore, AlertConditionsActions } from 'stores/alertconditions/AlertConditionsStore';
 
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 const { StreamsStore } = CombinedProvider.get('Streams');
-const { AlertConditionsStore, AlertConditionsActions } = CombinedProvider.get('AlertConditions');
 
 const EditAlertConditionPage = createReactClass({
   displayName: 'EditAlertConditionPage',

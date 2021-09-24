@@ -18,7 +18,6 @@ import CombinedProvider from './CombinedProvider';
 
 /* eslint-disable global-require */
 const actions = {
-  AlertConditions: () => require('actions/alertconditions/AlertConditionsActions'),
   AlertNotifications: () => require('actions/alertnotifications/AlertNotificationsActions'),
   Alerts: () => require('actions/alerts/AlertsActions'),
   Authentication: () => require('actions/authentication/AuthenticationActions'),
@@ -73,7 +72,6 @@ const actions = {
 };
 
 const stores = {
-  AlertConditions: () => require('stores/alertconditions/AlertConditionsStore'),
   AlertNotifications: () => require('stores/alertnotifications/AlertNotificationsStore'),
   Alerts: () => require('stores/alerts/AlertsStore'),
   Authentication: () => require('stores/authentication/AuthenticationStore'),

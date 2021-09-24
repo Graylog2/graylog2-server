@@ -28,8 +28,8 @@ import Routes from 'routing/Routes';
 import UserNotification from 'util/UserNotification';
 import history from 'util/History';
 import CombinedProvider from 'injection/CombinedProvider';
+import { AlertConditionsStore, AlertConditionsActions } from 'stores/alertconditions/AlertConditionsStore';
 
-const { AlertConditionsStore, AlertConditionsActions } = CombinedProvider.get('AlertConditions');
 const { StreamsStore } = CombinedProvider.get('Streams');
 
 const CreateAlertConditionInput = createReactClass({

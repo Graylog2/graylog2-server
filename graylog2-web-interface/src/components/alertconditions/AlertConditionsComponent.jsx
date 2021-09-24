@@ -25,9 +25,9 @@ import { Spinner } from 'components/common';
 import { AlertConditionsList } from 'components/alertconditions';
 import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';
+import { AlertConditionsStore, AlertConditionsActions } from 'stores/alertconditions/AlertConditionsStore';
 
 const { StreamsStore } = CombinedProvider.get('Streams');
-const { AlertConditionsStore, AlertConditionsActions } = CombinedProvider.get('AlertConditions');
 
 const AlertConditionsComponent = createReactClass({
   displayName: 'AlertConditionsComponent',

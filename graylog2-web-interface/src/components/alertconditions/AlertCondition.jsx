@@ -25,8 +25,8 @@ import { AlertConditionForm, AlertConditionSummary, AlertConditionTestModal, Unk
 import PermissionsMixin from 'util/PermissionsMixin';
 import CombinedProvider from 'injection/CombinedProvider';
 import Routes from 'routing/Routes';
+import { AlertConditionsActions } from 'stores/alertconditions/AlertConditionsStore';
 
-const { AlertConditionsActions } = CombinedProvider.get('AlertConditions');
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 
 const AlertCondition = createReactClass({
