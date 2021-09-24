@@ -18,6 +18,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
+import { AlertsStore, AlertsActions } from 'stores/alerts/Alerts';
 
 import { LinkContainer } from 'components/graylog/router';
 import { ButtonToolbar, Label, Tooltip, Button } from 'components/graylog';
@@ -32,7 +33,6 @@ import { AlertConditionsStore, AlertConditionsActions } from 'stores/alertcondit
 
 import style from './ShowAlertPage.css';
 
-const { AlertsStore, AlertsActions } = CombinedProvider.get('Alerts');
 const { StreamsStore } = CombinedProvider.get('Streams');
 
 const ShowAlertPage = createReactClass({
