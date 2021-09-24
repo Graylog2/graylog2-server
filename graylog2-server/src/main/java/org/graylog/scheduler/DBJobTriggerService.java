@@ -33,9 +33,11 @@ import org.mongojack.DBQuery;
 import org.mongojack.DBSort;
 import org.mongojack.DBUpdate;
 import org.mongojack.JacksonDBCollection;
+import org.mongojack.internal.update.SingleUpdateOperationValue;
 
 import javax.inject.Inject;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,6 +49,8 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Objects.requireNonNull;
+import static org.graylog.scheduler.JobTriggerDto.FIELD_CREATED_AT;
+import static org.graylog.scheduler.JobTriggerDto.FIELD_LOCK;
 
 // This class does NOT use PaginatedDbService because we use the triggers collection for locking and need to handle
 // updates very carefully.
@@ -202,21 +206,40 @@ public class DBJobTriggerService {
             throw new IllegalArgumentException("Unique triggers must have a fixed ID");
         }
 
-        // Find the trigger by ID.
-        // - if there is none, we'll insert a new one (upsert = true)
-        // - if there is one, but it is locked, we'll try to insert a new one but fail and ignore the duplicate key error
-        // - if there is one and it is not locked, we'll update it. This will reset triggers which are in a non-runnable state, like "completed"
+        // We want to make sure that a trigger with a fixed ID exists exactly once and is runnable.
+        //  - if there is a runnable or running trigger already, we don't want to touch it.
+        //  - if there is a trigger which was completed, or had an error, we want to reset it so that it will be
+        //    picked up by the execution engine again
+        //  - if there is no trigger at all, we want to create a new one
+
         DBQuery.Query query = DBQuery.and(
                 DBQuery.is(FIELD_ID, trigger.id()),
-                DBQuery.is(FIELD_LOCK_OWNER, null));
+                DBQuery.in(FIELD_STATUS, JobTriggerStatus.COMPLETE, JobTriggerStatus.ERROR));
+
+        // For existing triggers, only reset the status and some time fields.
+        final DBUpdate.Builder update = DBUpdate
+                .set(FIELD_UPDATED_AT, clock.nowUTC())
+                .set(FIELD_STATUS, trigger.status())
+                .set(FIELD_START_TIME, trigger.startTime())
+                .set(FIELD_END_TIME, trigger.endTime())
+                .set(FIELD_NEXT_TIME, trigger.nextTime())
+                .addOperation("$setOnInsert", FIELD_CREATED_AT, new SingleUpdateOperationValue(false, true, trigger.createdAt()))
+                .addOperation("$setOnInsert", FIELD_LOCK, new SingleUpdateOperationValue(false, true, trigger.lock()))
+                .addOperation("$setOnInsert", FIELD_JOB_DEFINITION_ID, new SingleUpdateOperationValue(false, true, trigger.jobDefinitionId()))
+                .addOperation("$setOnInsert", FIELD_DATA, new SingleUpdateOperationValue(false, true, trigger.data()));
+
+        trigger.schedule().toDBUpdate(FIELD_SCHEDULE + ".").orElse(Collections.emptyMap()).forEach((field, value) ->
+                update.addOperation("$setOnInsert", field, new SingleUpdateOperationValue(false, true, value)));
+
         try {
-            // TODO: update only select fields to avoid overriding existing state. Check if $setOnInsert comes to rescue
-            db.findAndModify(query, null, null, false, trigger, false, true);
-        } catch (MongoCommandException failure) {
-            // Unfortunately findAndModify doesn't throw a DuplicateKeyException, so we'll have to check for
+            db.findAndModify(query, null, null, false, update, true, true);
+        } catch (MongoCommandException e) {
+            // If we get a duplicate key error, it means that there was a trigger in any of the desired states already.
+            // In that case we can just ignore the exception.
+            // Unfortunately findAndModify doesn't throw a DuplicateKeyException, so we'll have to check for the
             // corresponding error code.
-            if (failure.getErrorCode() != 11000) {
-                throw failure;
+            if (e.getErrorCode() != 11000) {
+                throw e;
             }
         }
     }

@@ -19,6 +19,7 @@ package org.graylog.scheduler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.events.JobSchedulerTestClock;
 import org.graylog.events.TestJobTriggerData;
@@ -739,5 +740,80 @@ public class DBJobTriggerServiceTest {
 
         // Running triggers not owned by this node should not be released
         assertThat(newTriggerIds).containsOnly("54e3deadbeefdeadbeef0002");
+    }
+
+    @Test
+    public void saveSingletonTrigger_createsNewTrigger() {
+        final JobTriggerDto trigger = JobTriggerDto.Builder.create(clock)
+                .jobDefinitionId("abc-123")
+                .id("000000000000000000000001")
+                .schedule(OnceJobSchedule.create())
+                .endTime(clock.nowUTC())
+                .data(TestJobTriggerData.builder().map(ImmutableMap.of("key", "value")).build())
+                .build();
+
+        dbJobTriggerService.saveSingleton(trigger);
+
+        assertThat(dbJobTriggerService.get(trigger.id())).hasValueSatisfying(t ->
+                assertThat(t).isEqualTo(trigger));
+    }
+
+    @Test
+    public void saveSingletonTrigger_ignoresRunnableTrigger() {
+        final JobTriggerDto originalTrigger = JobTriggerDto.Builder.create(clock)
+                .jobDefinitionId("abc-123")
+                .id("000000000000000000000001")
+                .schedule(OnceJobSchedule.create())
+                .data(TestJobTriggerData.builder().map(ImmutableMap.of("original", "data")).build())
+                .build();
+
+        final JobTriggerDto modifiedTrigger =
+                originalTrigger.toBuilder()
+                        .data(TestJobTriggerData.builder().map(ImmutableMap.of("modified", "data")).build())
+                        .build();
+
+
+        dbJobTriggerService.saveSingleton(originalTrigger);
+        dbJobTriggerService.saveSingleton(modifiedTrigger);
+
+        assertThat(dbJobTriggerService.get(originalTrigger.id())).hasValueSatisfying(t ->
+                assertThat(t).isEqualTo(originalTrigger));
+    }
+
+    @Test
+    public void saveSingletonTrigger_resetsCompleteTrigger() {
+        final JobTriggerDto originalTrigger = JobTriggerDto.Builder.create(clock)
+                .jobDefinitionId("abc-123")
+                .id("000000000000000000000001")
+                .schedule(OnceJobSchedule.create())
+                .status(JobTriggerStatus.COMPLETE)
+                .endTime(clock.nowUTC())
+                .data(TestJobTriggerData.builder().map(ImmutableMap.of("original", "data")).build())
+                .build();
+
+        clock.plus(1, TimeUnit.MINUTES);
+
+        final JobTriggerDto modifiedTrigger =
+                JobTriggerDto.Builder.create(clock)
+                        .jobDefinitionId("abc-123")
+                        .id("000000000000000000000001")
+                        .schedule(OnceJobSchedule.create())
+                        .status(JobTriggerStatus.RUNNABLE)
+                        .data(TestJobTriggerData.builder().map(ImmutableMap.of("modified", "data")).build())
+                        .build();
+
+        dbJobTriggerService.saveSingleton(originalTrigger);
+        dbJobTriggerService.saveSingleton(modifiedTrigger);
+
+        final JobTriggerDto expectedTrigger = originalTrigger.toBuilder()
+                .status(modifiedTrigger.status())
+                .updatedAt(modifiedTrigger.updatedAt())
+                .startTime(modifiedTrigger.startTime())
+                .nextTime(modifiedTrigger.nextTime())
+                .endTime(null)
+                .build();
+
+        assertThat(dbJobTriggerService.get(originalTrigger.id())).hasValueSatisfying(t ->
+                assertThat(t).isEqualTo(expectedTrigger));
     }
 }
