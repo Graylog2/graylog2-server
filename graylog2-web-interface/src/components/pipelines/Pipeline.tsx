@@ -93,14 +93,15 @@ const Pipeline = ({ pipeline, connections, streams, onConnectionsChange, onStage
     };
   }, [pipeline, onStagesChange]);
 
-  const _formatConnectedStreams = (connectedStreams) => {
+  const _formatConnectedStreams = (connectedStreams: Stream[]) => {
+    // eslint-disable-next-line react/destructuring-assignment
     const formattedStreams = connectedStreams.map((s) => `"${s.title}"`);
-    const streamList = connectedStreams.length > 1 ? [formattedStreams.slice(0, -1).join(', '), formattedStreams.slice(-1)].join(' and ') : formattedStreams[0];
+    const streamList = formattedStreams.length > 1 ? [formattedStreams.slice(0, -1).join(', '), formattedStreams.slice(-1)].join(' and ') : formattedStreams[0];
 
     return (
       <span>
         This pipeline is processing messages from the{' '}
-        <Pluralize singular="stream" plural="streams" value={connectedStreams.length} />{' '}
+        <Pluralize singular="stream" plural="streams" value={formattedStreams.length} />{' '}
         {streamList}.
       </span>
     );
