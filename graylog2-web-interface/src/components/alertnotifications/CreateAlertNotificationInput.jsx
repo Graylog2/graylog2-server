@@ -30,8 +30,7 @@ import history from 'util/History';
 import CombinedProvider from 'injection/CombinedProvider';
 import { AlarmCallbacksActions } from 'stores/alarmcallbacks/AlarmCallbacksStore';
 import { AlertNotificationsStore, AlertNotificationsActions } from 'stores/alertnotifications/AlertNotificationsStore';
-
-const { StreamsStore } = CombinedProvider.get('Streams');
+import { StreamsStore } from 'stores/streams/StreamsStore';
 
 const CreateAlertNotificationInput = createReactClass({
   displayName: 'CreateAlertNotificationInput',

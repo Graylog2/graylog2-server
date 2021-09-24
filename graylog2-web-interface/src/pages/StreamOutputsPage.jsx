@@ -27,9 +27,9 @@ import SupportLink from 'components/support/SupportLink';
 import StoreProvider from 'injection/StoreProvider';
 import Routes from 'routing/Routes';
 import withParams from 'routing/withParams';
+import StreamsStore from 'stores/streams/StreamsStore';
 
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
-const StreamsStore = StoreProvider.getStore('Streams');
 
 const StreamOutputsPage = createReactClass({
   displayName: 'StreamOutputsPage',

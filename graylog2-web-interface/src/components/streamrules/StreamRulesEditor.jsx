@@ -28,8 +28,8 @@ import StreamRuleList from 'components/streamrules/StreamRuleList';
 import StreamRuleForm from 'components/streamrules/StreamRuleForm';
 import Spinner from 'components/common/Spinner';
 import StoreProvider from 'injection/StoreProvider';
+import StreamsStore from 'stores/streams/StreamsStore';
 
-const StreamsStore = StoreProvider.getStore('Streams');
 const StreamRulesStore = StoreProvider.getStore('StreamRules');
 
 const StreamAlertHeader = styled(Panel.Heading)`

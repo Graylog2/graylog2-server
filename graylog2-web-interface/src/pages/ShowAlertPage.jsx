@@ -30,10 +30,9 @@ import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';
 import withParams from 'routing/withParams';
 import { AlertConditionsStore, AlertConditionsActions } from 'stores/alertconditions/AlertConditionsStore';
+import { StreamsStore } from 'stores/streams/StreamsStore';
 
 import style from './ShowAlertPage.css';
-
-const { StreamsStore } = CombinedProvider.get('Streams');
 
 const ShowAlertPage = createReactClass({
   displayName: 'ShowAlertPage',

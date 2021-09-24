@@ -25,9 +25,9 @@ import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import StoreProvider from 'injection/StoreProvider';
 import withParams from 'routing/withParams';
 import withLocation from 'routing/withLocation';
+import StreamsStore from 'stores/streams/StreamsStore';
 
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
-const StreamsStore = StoreProvider.getStore('Streams');
 
 const StreamEditPage = createReactClass({
   displayName: 'StreamEditPage',

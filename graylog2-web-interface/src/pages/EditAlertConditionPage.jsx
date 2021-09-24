@@ -31,9 +31,9 @@ import history from 'util/History';
 import CombinedProvider from 'injection/CombinedProvider';
 import withParams from 'routing/withParams';
 import { AlertConditionsStore, AlertConditionsActions } from 'stores/alertconditions/AlertConditionsStore';
+import { StreamsStore } from 'stores/streams/StreamsStore';
 
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
-const { StreamsStore } = CombinedProvider.get('Streams');
 
 const EditAlertConditionPage = createReactClass({
   displayName: 'EditAlertConditionPage',

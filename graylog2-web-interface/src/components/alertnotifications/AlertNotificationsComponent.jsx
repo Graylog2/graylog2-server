@@ -26,8 +26,7 @@ import { AlertNotificationsList } from 'components/alertnotifications';
 import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';
 import { AlertNotificationsStore, AlertNotificationsActions } from 'stores/alertnotifications/AlertNotificationsStore';
-
-const { StreamsStore } = CombinedProvider.get('Streams');
+import { StreamsStore } from 'stores/streams/StreamsStore';
 
 const AlertNotificationsComponent = createReactClass({
   displayName: 'AlertNotificationsComponent',

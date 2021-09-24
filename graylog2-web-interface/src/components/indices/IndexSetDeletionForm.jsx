@@ -23,8 +23,7 @@ import { Input } from 'components/bootstrap';
 import { Spinner } from 'components/common';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import CombinedProvider from 'injection/CombinedProvider';
-
-const { StreamsStore } = CombinedProvider.get('Streams');
+import { StreamsStore } from 'stores/streams/StreamsStore';
 
 class IndexSetDeletionForm extends React.Component {
   static propTypes = {

@@ -65,7 +65,6 @@ const actions = {
   SidecarsAdministration: () => require('actions/sidecars/SidecarsAdministrationActions'),
   Simulator: () => require('actions/simulator/SimulatorActions'),
   SingleNode: () => require('actions/nodes/SingleNodeActions'),
-  Streams: () => require('actions/streams/StreamsActions'),
   SystemJobs: () => require('actions/systemjobs/SystemJobsActions'),
 };
 
@@ -129,7 +128,6 @@ const stores = {
   SingleNode: () => require('stores/nodes/SingleNodeStore'),
   Startpage: () => require('stores/users/StartpageStore'),
   StreamRules: () => require('stores/streams/StreamRulesStore'),
-  Streams: () => require('stores/streams/StreamsStore'),
   System: () => require('stores/system/SystemStore'),
   SystemJobs: () => require('stores/systemjobs/SystemJobsStore'),
   SystemLoadBalancer: () => require('stores/load-balancer/SystemLoadBalancerStore'),

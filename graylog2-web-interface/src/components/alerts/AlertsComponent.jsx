@@ -25,8 +25,7 @@ import { Alert } from 'components/alerts';
 import { EntityList, PaginatedList, Spinner } from 'components/common';
 import CombinedProvider from 'injection/CombinedProvider';
 import { AlertConditionsStore, AlertConditionsActions } from 'stores/alertconditions/AlertConditionsStore';
-
-const { StreamsStore } = CombinedProvider.get('Streams');
+import { StreamsStore } from 'stores/streams/StreamsStore';
 
 const ALERTS_REFRESH_INTERVAL = 10000;
 

@@ -19,7 +19,6 @@ import React, { useEffect, useMemo, useState } from 'react';
 import * as Immutable from 'immutable';
 
 import ActionsProvider from 'injection/ActionsProvider';
-import StoreProvider from 'injection/StoreProvider';
 import DocumentTitle from 'components/common/DocumentTitle';
 import Spinner from 'components/common/Spinner';
 import { Col, Row } from 'components/graylog';
@@ -32,11 +31,11 @@ import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
 import { Message } from 'views/components/messagelist/Types';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import WindowDimensionsContextProvider from 'contexts/WindowDimensionsContextProvider';
+import StreamsStore from 'stores/streams/StreamsStore';
 
 const NodesActions = ActionsProvider.getActions('Nodes');
 const InputsActions = ActionsProvider.getActions('Inputs');
 const MessagesActions = ActionsProvider.getActions('Messages');
-const StreamsStore = StoreProvider.getStore('Streams');
 
 type Props = {
   params: {

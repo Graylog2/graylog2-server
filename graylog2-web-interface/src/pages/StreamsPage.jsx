@@ -28,9 +28,9 @@ import DocsHelper from 'util/DocsHelper';
 import UserNotification from 'util/UserNotification';
 import StoreProvider from 'injection/StoreProvider';
 import ActionsProvider from 'injection/ActionsProvider';
+import StreamsStore from 'stores/streams/StreamsStore';
 
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
-const StreamsStore = StoreProvider.getStore('Streams');
 const IndexSetsStore = StoreProvider.getStore('IndexSets');
 const IndexSetsActions = ActionsProvider.getActions('IndexSets');
 

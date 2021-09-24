@@ -27,12 +27,12 @@ import { isAnyPermitted, isPermitted } from 'util/PermissionsMixin';
 import UserNotification from 'util/UserNotification';
 import StoreProvider from 'injection/StoreProvider';
 import Routes from 'routing/Routes';
+import StreamsStore from 'stores/streams/StreamsStore';
 
 import StreamMetaData from './StreamMetaData';
 import StreamControls from './StreamControls';
 import StreamStateBadge from './StreamStateBadge';
 
-const StreamsStore = StoreProvider.getStore('Streams');
 const StreamRulesStore = StoreProvider.getStore('StreamRules');
 
 const StreamListItem = styled.li(({ theme }) => css`

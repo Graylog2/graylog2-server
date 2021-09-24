@@ -29,8 +29,7 @@ import UserNotification from 'util/UserNotification';
 import history from 'util/History';
 import CombinedProvider from 'injection/CombinedProvider';
 import { AlertConditionsStore, AlertConditionsActions } from 'stores/alertconditions/AlertConditionsStore';
-
-const { StreamsStore } = CombinedProvider.get('Streams');
+import { StreamsStore } from 'stores/streams/StreamsStore';
 
 const CreateAlertConditionInput = createReactClass({
   displayName: 'CreateAlertConditionInput',

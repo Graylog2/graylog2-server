@@ -26,8 +26,7 @@ import { AlertConditionsList } from 'components/alertconditions';
 import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';
 import { AlertConditionsStore, AlertConditionsActions } from 'stores/alertconditions/AlertConditionsStore';
-
-const { StreamsStore } = CombinedProvider.get('Streams');
+import { StreamsStore } from 'stores/streams/StreamsStore';
 
 const AlertConditionsComponent = createReactClass({
   displayName: 'AlertConditionsComponent',

@@ -24,12 +24,12 @@ import StoreProvider from 'injection/StoreProvider';
 import ActionsProvider from 'injection/ActionsProvider';
 import MessageShow from 'components/search/MessageShow';
 import MessageLoader from 'components/extractors/MessageLoader';
+import StreamsStore from 'stores/streams/StreamsStore';
 
 import RawMessageLoader from './RawMessageLoader';
 import RecentMessageLoader from './RecentMessageLoader';
 
 const InputsStore = StoreProvider.getStore('Inputs');
-const StreamsStore = StoreProvider.getStore('Streams');
 const InputsActions = ActionsProvider.getActions('Inputs');
 
 class LoaderTabs extends React.Component {

@@ -22,11 +22,11 @@ import { Icon, IfPermitted, PaginatedList, SearchForm } from 'components/common'
 import StoreProvider from 'injection/StoreProvider';
 import Spinner from 'components/common/Spinner';
 import QueryHelper from 'components/common/QueryHelper';
+import StreamsStore from 'stores/streams/StreamsStore';
 
 import StreamList from './StreamList';
 import CreateStreamButton from './CreateStreamButton';
 
-const StreamsStore = StoreProvider.getStore('Streams');
 const StreamRulesStore = StoreProvider.getStore('StreamRules');
 
 class StreamComponent extends React.Component {
