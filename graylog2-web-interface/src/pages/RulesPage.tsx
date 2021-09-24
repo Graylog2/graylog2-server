@@ -59,14 +59,16 @@ const _loadData = (pagination: Pagination, setIsLoading, setPaginatedRules) => {
 
 const RulesPage = () => {
   const [isDataLoading, setIsDataLoading] = useState<boolean>(false);
-  const { pagination, setPagination } = useLocationSearchPagination(DEFAULT_PAGINATION);
+  const { isInitialized: isPaginationReady, pagination, setPagination } = useLocationSearchPagination(DEFAULT_PAGINATION);
   const [paginatedRules, setPaginatedRules] = useState<PaginatedRules | undefined>();
   const { list: rules, pagination: { total = 0 } = {} } = paginatedRules ?? {};
   const { page, perPage, query } = pagination;
 
   useEffect(() => {
-    _loadData(pagination, setIsDataLoading, setPaginatedRules);
-  }, [pagination]);
+    if (isPaginationReady) {
+      _loadData(pagination, setIsDataLoading, setPaginatedRules);
+    }
+  }, [isPaginationReady, pagination]);
 
   const handlePageChange = (newPage, newPerPage) => {
     setPagination({ ...pagination, page: newPage, perPage: newPerPage });
