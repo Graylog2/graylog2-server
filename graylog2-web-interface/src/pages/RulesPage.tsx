@@ -26,7 +26,7 @@ import RuleList from 'components/rules/RuleList';
 import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';
 import { Pagination, DEFAULT_PAGINATION } from 'stores/PaginationTypes';
-import { PaginatedRules, RuleType } from 'stores/rules/RulesStore';
+import type { PaginatedRules, RuleType } from 'stores/rules/RulesStore';
 import useLocationSearchPagination from 'hooks/useLocationSearchPagination';
 
 const { RulesActions } = CombinedProvider.get('Rules');

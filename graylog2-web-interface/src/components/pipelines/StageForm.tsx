@@ -25,7 +25,7 @@ import { BootstrapModalForm, Input } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
 import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';
-import { PipelineType, StageType } from 'stores/pipelines/PipelinesStore';
+import type { PipelineType, StageType } from 'stores/pipelines/PipelinesStore';
 
 const { RulesStore } = CombinedProvider.get('Rules');
 

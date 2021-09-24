@@ -27,7 +27,7 @@ import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';
 import { useStore } from 'stores/connect';
 import StreamsStore, { Stream } from 'stores/streams/StreamsStore';
-import { PaginatedPipelines } from 'stores/pipelines/PipelinesStore';
+import type { PaginatedPipelines } from 'stores/pipelines/PipelinesStore';
 import { DEFAULT_PAGINATION } from 'stores/PaginationTypes';
 import useLocationSearchPagination from 'hooks/useLocationSearchPagination';
 

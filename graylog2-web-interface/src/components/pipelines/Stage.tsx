@@ -21,9 +21,9 @@ import { Col, Button } from 'components/graylog';
 import { EntityListItem, Spinner } from 'components/common';
 import { MetricContainer, CounterRate } from 'components/metrics';
 import CombinedProvider from 'injection/CombinedProvider';
-import { PipelineType, StageType } from 'stores/pipelines/PipelinesStore';
+import type { PipelineType, StageType } from 'stores/pipelines/PipelinesStore';
 import { useStore } from 'stores/connect';
-import { RuleType } from 'stores/rules/RulesStore';
+import type { RuleType } from 'stores/rules/RulesStore';
 
 import StageForm from './StageForm';
 import StageRules from './StageRules';

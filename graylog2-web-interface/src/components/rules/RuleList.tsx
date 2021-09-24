@@ -24,7 +24,7 @@ import { DataTable, Timestamp } from 'components/common';
 import { MetricContainer, CounterRate } from 'components/metrics';
 import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';
-import { RuleType, MetricsConfigType, RulesStoreState } from 'stores/rules/RulesStore';
+import type { RuleType, MetricsConfigType, RulesStoreState } from 'stores/rules/RulesStore';
 import { Store } from 'stores/StoreTypes';
 
 import RuleMetricsConfigContainer from './RuleMetricsConfigContainer';

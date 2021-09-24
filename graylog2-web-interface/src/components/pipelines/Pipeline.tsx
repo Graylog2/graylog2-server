@@ -20,9 +20,9 @@ import styled from 'styled-components';
 
 import { Row, Col, Alert } from 'components/graylog';
 import { EntityList, Pluralize } from 'components/common';
-import { PipelineType, StageType } from 'stores/pipelines/PipelinesStore';
+import type { PipelineType, StageType } from 'stores/pipelines/PipelinesStore';
 import { Stream } from 'stores/streams/StreamsStore';
-import { PipelineConnectionsType } from 'stores/pipelines/PipelineConnectionsStore';
+import type { PipelineConnectionsType } from 'stores/pipelines/PipelineConnectionsStore';
 
 import Stage from './Stage';
 import StageForm from './StageForm';
