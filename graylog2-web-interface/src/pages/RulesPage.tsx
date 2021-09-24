@@ -51,7 +51,7 @@ const CreateRuleButton = () => (
 const _loadData = (pagination: Pagination, setIsLoading, setPaginatedRules) => {
   setIsLoading(true);
 
-  RulesActions.listPage(pagination).then((paginatedRules) => {
+  RulesActions.listPaginated(pagination).then((paginatedRules) => {
     setPaginatedRules(paginatedRules);
     setIsLoading(false);
   });

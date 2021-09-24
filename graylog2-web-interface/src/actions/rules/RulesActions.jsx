@@ -19,7 +19,7 @@ import Reflux from 'reflux';
 const RulesActions = Reflux.createActions({
   delete: { asyncResult: true },
   list: { asyncResult: true },
-  listPage: { asyncResult: true },
+  listPaginated: { asyncResult: true },
   get: { asyncResult: true },
   save: { asyncResult: true },
   update: { asyncResult: true },
