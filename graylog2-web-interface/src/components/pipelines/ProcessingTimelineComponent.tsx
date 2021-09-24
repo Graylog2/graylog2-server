@@ -42,9 +42,9 @@ const StyledPaginatedList = styled(PaginatedList)`
   }
 `;
 
-const LoadingSpinner = styled(Spinner)(({ theme }) => css`
-  margin-left: 10px;
+const SpinnerWrapper = styled.div(({ theme }) => css`
   font-size: ${theme.fonts.size.h3};
+  padding: ${theme.spacings.xxs} ${theme.spacings.sm};
 `);
 
 const Header = styled.div`
@@ -129,7 +129,7 @@ const ProcessingTimelineComponent = () => {
   const searchFilter = (
     <Header>
       <PipelineFilter query={query} onSearch={(newQuery) => handlePaginationChange({ ...pagination, query: newQuery, page: DEFAULT_PAGINATION.page })} />
-      {loading && <LoadingSpinner text="" delay={0} />}
+      {loading && <SpinnerWrapper><Spinner text="" delay={0} /></SpinnerWrapper>}
     </Header>
   );
 
