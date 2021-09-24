@@ -87,6 +87,13 @@ class CollectorConfigurationSelector extends React.Component {
     );
   };
 
+  configurationFilterKeyFormatter = (configurationId) => {
+    const { configurations } = this.props;
+    const configuration = configurations.find((c) => c.id === configurationId);
+
+    return configuration.name;
+  };
+
   renderConfigurationSummary = (nextAssignedConfigurations, selectedSidecarCollectorPairs) => {
     const exampleSidecarCollectorPair = selectedSidecarCollectorPairs[0];
     const collectorIndicator = (
@@ -164,6 +171,7 @@ class CollectorConfigurationSelector extends React.Component {
                        triggerNode={<Button bsSize="small" bsStyle="link">Configure <span className="caret" /></Button>}
                        items={configurationIds}
                        itemFormatter={this.configurationFormatter}
+                       itemFilterKeyFormatter={this.configurationFilterKeyFormatter}
                        onItemSelect={this.handleConfigurationSelect}
                        selectedItems={assignedConfigurations.map((config) => config.id)}
                        filterPlaceholder="Filter by configuration" />

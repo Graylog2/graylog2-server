@@ -58,6 +58,8 @@ class SelectPopover extends React.Component {
      * and must return a React node that will be displayed on screen.
      */
     itemFormatter: PropTypes.func,
+    /** Function that returns a string representing the item when filtering the list of items. */
+    itemFilterKeyFormatter: PropTypes.func,
     /** Indicates whether the component will allow multiple selected items or not. */
     multiple: PropTypes.bool,
     /** Indicates which items are selected. This should be the same string that appears in the `items` list. */
@@ -83,6 +85,7 @@ class SelectPopover extends React.Component {
     triggerAction: 'click',
     items: [],
     itemFormatter: (item) => item,
+    itemFilterKeyFormatter: (item) => item,
     multiple: false,
     selectedItems: [],
     displayDataFilter: true,
@@ -143,7 +146,9 @@ class SelectPopover extends React.Component {
   };
 
   filterData = (filterText, items) => {
-    const newFilteredItems = items.filter((item) => item.match(new RegExp(filterText, 'i')));
+    const { itemFilterKeyFormatter } = this.props;
+    const filterRegex = new RegExp(filterText, 'i');
+    const newFilteredItems = items.filter((item) => itemFilterKeyFormatter(item).match(filterRegex));
 
     this.setState({ filterText: filterText, filteredItems: newFilteredItems });
   };

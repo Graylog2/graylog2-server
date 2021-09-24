@@ -43,40 +43,34 @@ const CollectorsAdministrationFilters = createReactClass({
 
   getCollectorsFilter() {
     const { collectors, filters } = this.props;
-    const collectorMapper = (collector) => `${collector.id};${collector.name}`;
 
-    const collectorItems = collectors
+    const collectorIds = collectors
       .sort((c1, c2) => naturalSortIgnoreCase(c1.name, c2.name))
-      // TODO: Hack to be able to filter in SelectPopover. We should change that to avoid this hack.
-      .map(collectorMapper);
+      .map((c) => c.id);
 
     const collectorFormatter = (collectorId) => {
-      const [id] = collectorId.split(';');
-      const collector = lodash.find(collectors, { id: id });
+      const collector = lodash.find(collectors, { id: collectorId });
 
       return <CollectorIndicator collector={collector.name} operatingSystem={collector.node_operating_system} />;
     };
 
-    const filter = ([collectorId], callback) => {
-      const [id] = collectorId ? collectorId.split(';') : [];
+    const collectorFilterKeyFormatter = (collectorId) => {
+      const collector = lodash.find(collectors, { id: collectorId });
 
-      this.onFilterChange('collector', id, callback);
+      return `${collector.name} on ${collector.node_operating_system}`;
     };
 
-    let collectorFilter;
+    const filter = ([collectorId], callback) => this.onFilterChange('collector', collectorId, callback);
 
-    if (filters.collector) {
-      const collector = collectors.find((c) => c.id === filters.collector);
-
-      collectorFilter = collector ? collectorMapper(collector) : undefined;
-    }
+    const collectorFilter = filters.collector ? collectors.find((c) => c.id === filters.collector) : undefined;
 
     return (
       <SelectPopover id="collector-filter"
                      title="Filter by collector"
                      triggerNode={<Button bsSize="small" bsStyle="link">Collector <span className="caret" /></Button>}
-                     items={collectorItems}
+                     items={collectorIds}
                      itemFormatter={collectorFormatter}
+                     itemFilterKeyFormatter={collectorFilterKeyFormatter}
                      onItemSelect={filter}
                      selectedItems={collectorFilter ? [collectorFilter] : []}
                      filterPlaceholder="Filter by collector" />
@@ -86,39 +80,33 @@ const CollectorsAdministrationFilters = createReactClass({
   getConfigurationFilter() {
     const { configurations, filters } = this.props;
 
-    const configurationMapper = (configuration) => `${configuration.id};${configuration.name}`;
-    const configurationItems = configurations
+    const configurationIds = configurations
       .sort((c1, c2) => naturalSortIgnoreCase(c1.name, c2.name))
-      // TODO: Hack to be able to filter in SelectPopover. We should change that to avoid this hack.
-      .map(configurationMapper);
+      .map((c) => c.id);
 
     const configurationFormatter = (configurationId) => {
-      const [id] = configurationId.split(';');
-      const configuration = lodash.find(configurations, { id: id });
+      const configuration = lodash.find(configurations, { id: configurationId });
 
       return <span><ColorLabel color={configuration.color} size="xsmall" /> {configuration.name}</span>;
     };
 
-    const filter = ([configurationId], callback) => {
-      const [id] = configurationId ? configurationId.split(';') : [];
+    const configurationFilterKeyFormatter = (configurationId) => {
+      const configuration = lodash.find(configurations, { id: configurationId });
 
-      this.onFilterChange('configuration', id, callback);
+      return configuration.name;
     };
 
-    let configurationFilter;
+    const filter = ([configurationId], callback) => this.onFilterChange('configuration', configurationId, callback);
 
-    if (filters.configuration) {
-      const configuration = configurations.find((c) => c.id === filters.configuration);
-
-      configurationFilter = configuration ? configurationMapper(configuration) : undefined;
-    }
+    const configurationFilter = filters.configuration ? configurations.find((c) => c.id === filters.configuration) : undefined;
 
     return (
       <SelectPopover id="configuration-filter"
                      title="Filter by configuration"
                      triggerNode={<Button bsSize="small" bsStyle="link">Configuration <span className="caret" /></Button>}
-                     items={configurationItems}
+                     items={configurationIds}
                      itemFormatter={configurationFormatter}
+                     itemFilterKeyFormatter={configurationFilterKeyFormatter}
                      onItemSelect={filter}
                      selectedItems={configurationFilter ? [configurationFilter] : []}
                      filterPlaceholder="Filter by configuration" />
