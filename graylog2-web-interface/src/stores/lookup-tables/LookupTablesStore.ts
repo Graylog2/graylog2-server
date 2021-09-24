@@ -21,7 +21,7 @@ import PaginationURL from 'util/PaginationURL';
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import LookupTablesActions from 'actions/lookup-tables/LookupTablesActions';
-import { singletonStore } from 'views/logic/singleton';
+import { singletonStore } from 'logic/singleton';
 import { Store } from 'stores/StoreTypes';
 import type { LookupTable, LookupTableAdapter, LookupTableCache } from 'logic/lookup-tables/types';
 import { PaginatedResponseType } from 'stores/PaginationTypes';

@@ -18,7 +18,7 @@ import Reflux from 'reflux';
 import { $PropertyType } from 'utility-types';
 
 import AuthenticationBackend, { AuthenticationBackendJSON } from 'logic/authentication/AuthenticationBackend';
-import { singletonActions } from 'views/logic/singleton';
+import { singletonActions } from 'logic/singleton';
 import { RefluxActions } from 'stores/StoreTypes';
 import { Pagination, PaginatedList } from 'stores/PaginationTypes';
 import { PaginatedUsers } from 'actions/users/UsersActions';

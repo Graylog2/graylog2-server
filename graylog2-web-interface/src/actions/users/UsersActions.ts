@@ -18,7 +18,7 @@ import Reflux from 'reflux';
 import * as Immutable from 'immutable';
 import { $PropertyType, $Shape } from 'utility-types';
 
-import { singletonActions } from 'views/logic/singleton';
+import { singletonActions } from 'logic/singleton';
 import { RefluxActions } from 'stores/StoreTypes';
 import { Pagination, PaginatedList } from 'stores/PaginationTypes';
 import User, { UserJSON } from 'logic/users/User';

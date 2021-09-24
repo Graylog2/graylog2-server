@@ -17,7 +17,7 @@
 import * as React from 'react';
 import type { ActionContexts } from 'views/types';
 
-import { singleton } from 'views/logic/singleton';
+import { singleton } from 'logic/singleton';
 
 const ActionContext = singleton('contexts.ActionContext', () => React.createContext<ActionContexts>({} as ActionContexts));
 

@@ -21,7 +21,7 @@ import { get, isEqualWith } from 'lodash';
 import type { RefluxActions } from 'stores/StoreTypes';
 import type { QueryId } from 'views/logic/queries/Query';
 import ViewState from 'views/logic/views/ViewState';
-import { singletonActions, singletonStore } from 'views/logic/singleton';
+import { singletonActions, singletonStore } from 'logic/singleton';
 
 import { ViewActions, ViewStore } from './ViewStore';
 

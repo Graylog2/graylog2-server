@@ -22,7 +22,7 @@ import type { RefluxActions } from 'stores/StoreTypes';
 import Widget from 'views/logic/widgets/Widget';
 import { WidgetActions, Widgets, WidgetStore } from 'views/stores/WidgetStore';
 import WidgetFormattingSettings from 'views/logic/aggregationbuilder/WidgetFormattingSettings';
-import { singletonActions, singletonStore } from 'views/logic/singleton';
+import { singletonActions, singletonStore } from 'logic/singleton';
 
 type Color = string;
 

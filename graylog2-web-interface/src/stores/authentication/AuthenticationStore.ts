@@ -22,7 +22,7 @@ import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
 import type { Store } from 'stores/StoreTypes';
 import { qualifyUrl } from 'util/URLUtils';
 import fetch, { Builder } from 'logic/rest/FetchProvider';
-import { singletonStore } from 'views/logic/singleton';
+import { singletonStore } from 'logic/singleton';
 import AuthenticationActions from 'actions/authentication/AuthenticationActions';
 import PaginationURL from 'util/PaginationURL';
 import type {

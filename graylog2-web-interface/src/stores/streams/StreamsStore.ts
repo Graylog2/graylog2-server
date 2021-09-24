@@ -24,7 +24,7 @@ import UserNotification from 'util/UserNotification';
 import CombinedProvider from 'injection/CombinedProvider';
 import PaginationURL from 'util/PaginationURL';
 import StreamsActions from 'actions/streams/StreamsActions';
-import { singletonStore } from 'views/logic/singleton';
+import { singletonStore } from 'logic/singleton';
 
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 

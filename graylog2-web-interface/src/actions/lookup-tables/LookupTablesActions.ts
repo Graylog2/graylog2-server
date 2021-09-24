@@ -16,7 +16,7 @@
  */
 import Reflux from 'reflux';
 
-import { singletonActions } from 'views/logic/singleton';
+import { singletonActions } from 'logic/singleton';
 import { LookupTable } from 'logic/lookup-tables/types';
 import { RefluxActions } from 'stores/StoreTypes';
 

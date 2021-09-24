@@ -36,7 +36,7 @@ import View from 'views/logic/views/View';
 import Parameter from 'views/logic/parameters/Parameter';
 import type { WidgetMapping } from 'views/logic/views/types';
 import type { TimeRange } from 'views/logic/queries/Query';
-import { singletonStore } from 'views/logic/singleton';
+import { singletonStore } from 'logic/singleton';
 import { SearchErrorResponse } from 'views/logic/SearchError';
 
 const createSearchUrl = qualifyUrl('/views/search');

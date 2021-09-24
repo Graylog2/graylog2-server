@@ -21,7 +21,7 @@ import { Store } from 'stores/StoreTypes';
 import UserOverview, { UserOverviewJSON, AccountStatus } from 'logic/users/UserOverview';
 import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
-import { singletonStore } from 'views/logic/singleton';
+import { singletonStore } from 'logic/singleton';
 import { qualifyUrl } from 'util/URLUtils';
 import PaginationURL from 'util/PaginationURL';
 import User from 'logic/users/User';

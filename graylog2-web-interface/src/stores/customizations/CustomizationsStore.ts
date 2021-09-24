@@ -21,7 +21,7 @@ import ApiRoutes from 'routing/ApiRoutes';
 import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import ActionsProvider from 'injection/ActionsProvider';
-import { singletonStore } from 'views/logic/singleton';
+import { singletonStore } from 'logic/singleton';
 
 const CustomizationActions = ActionsProvider.getActions('Customizations');
 
