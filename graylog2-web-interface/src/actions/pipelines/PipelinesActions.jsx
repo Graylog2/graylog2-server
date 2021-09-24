@@ -16,7 +16,7 @@
  */
 import Reflux from 'reflux';
 
-const RulesActions = Reflux.createActions({
+const PipelinesActions = Reflux.createActions({
   delete: { asyncResult: true },
   list: { asyncResult: true },
   listPaginated: { asyncResult: true },
@@ -26,4 +26,4 @@ const RulesActions = Reflux.createActions({
   parse: { asyncResult: true },
 });
 
-export default RulesActions;
+export default PipelinesActions;
