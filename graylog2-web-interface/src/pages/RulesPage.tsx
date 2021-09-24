@@ -61,7 +61,7 @@ const RulesPage = () => {
   const [isDataLoading, setIsDataLoading] = useState<boolean>(false);
   const { isInitialized: isPaginationReady, pagination, setPagination } = useLocationSearchPagination(DEFAULT_PAGINATION);
   const [paginatedRules, setPaginatedRules] = useState<PaginatedRules | undefined>();
-  const { list: rules, pagination: { total = 0 } = {} } = paginatedRules ?? {};
+  const { list: rules, pagination: { total = 0, count = 0 } = {} } = paginatedRules ?? {};
   const { page, perPage, query } = pagination;
 
   useEffect(() => {
@@ -84,7 +84,13 @@ const RulesPage = () => {
       // eslint-disable-next-line no-alert
       if (window.confirm(`Do you really want to delete rule "${rule.title}"?`)) {
         RulesActions.delete(rule).then(() => {
-          _loadData(pagination, setIsDataLoading, setPaginatedRules);
+          if (count > 1) {
+            _loadData(pagination, setIsDataLoading, setPaginatedRules);
+
+            return;
+          }
+
+          setPagination({ page: Math.max(DEFAULT_PAGINATION.page, pagination.page - 1), perPage, query });
         });
       }
     };
