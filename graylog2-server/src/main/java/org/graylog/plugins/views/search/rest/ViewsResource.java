@@ -175,8 +175,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
 
         if(!searchQueries.containsAll(stateQueries)) {
             final Sets.SetView<String> diff = Sets.difference(searchQueries, stateQueries);
-            final String error = String.format("Search queries do not correspond to view/state queries, missing query IDs: %s", diff);
-            throw new BadRequestException(error);
+            throw new BadRequestException("Search queries do not correspond to view/state queries, missing query IDs: " + diff);
         }
 
         final Set<String> searchTypes = search.queries().stream()
