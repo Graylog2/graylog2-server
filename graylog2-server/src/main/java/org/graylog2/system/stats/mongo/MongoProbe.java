@@ -173,7 +173,7 @@ public class MongoProbe {
                     dbStatsResult.getDouble("avgObjSize"),
                     dbStatsResult.getLong("dataSize"),
                     dbStatsResult.getLong("storageSize"),
-                    dbStatsResult.getLong("numExtents"),
+                    dbStatsResult.containsField("numExtents") ? dbStatsResult.getLong("numExtents") : null,
                     dbStatsResult.getLong("indexes"),
                     dbStatsResult.getLong("indexSize"),
                     dbStatsResult.containsField("fileSize") ? dbStatsResult.getLong("fileSize") : null,
