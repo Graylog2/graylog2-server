@@ -15,8 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, waitFor } from 'wrappedTestingLibrary';
-import { StoreMock as MockStore } from 'helpers/mocking';
+import { render, waitFor, screen } from 'wrappedTestingLibrary';
+import { StoreMock as MockStore, asMock } from 'helpers/mocking';
+
+import DefaultQueryClientProvider from 'contexts/DefaultQueryClientProvider';
+import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
 
 import ShowMessagePage from './ShowMessagePage';
 import { message, event, input } from './ShowMessagePage.fixtures';
@@ -48,24 +51,42 @@ jest.mock('injection/CombinedProvider', () => ({
   }[type])),
 }));
 
+jest.mock('views/logic/fieldtypes/useFieldTypes');
 jest.mock('routing/withParams', () => (x) => x);
 
+type SimpleShowMessagePageProps = {
+  index: string,
+  messageId: string,
+};
+
+const SimpleShowMessagePage = ({ index, messageId }: SimpleShowMessagePageProps) => (
+  <DefaultQueryClientProvider>
+    {/* @ts-expect-error */}
+    <ShowMessagePage params={{ index, messageId }} />
+  </DefaultQueryClientProvider>
+);
+
 describe('ShowMessagePage', () => {
+  beforeEach(() => {
+    asMock(useFieldTypes).mockReturnValue({ data: [] });
+  });
+
   it('triggers a node list refresh on mount', async () => {
     mockLoadMessage.mockImplementation(() => Promise.resolve(message));
     mockGetInput.mockImplementation(() => Promise.resolve(input));
-    // @ts-ignore
-    render(<ShowMessagePage params={{ index: 'graylog_5', messageId: '20f683d2-a874-11e9-8a11-0242ac130004' }} />);
+
+    render(<SimpleShowMessagePage index="graylog_5" messageId="20f683d2-a874-11e9-8a11-0242ac130004" />);
+
     await waitFor(() => expect(mockListNodes).toHaveBeenCalled());
   });
 
   it('renders for generic message', async () => {
     mockLoadMessage.mockImplementation(() => Promise.resolve(message));
     mockGetInput.mockImplementation(() => Promise.resolve(input));
-    // @ts-ignore
-    const { container, queryByTestId } = render(<ShowMessagePage params={{ index: 'graylog_5', messageId: '20f683d2-a874-11e9-8a11-0242ac130004' }} />);
 
-    await waitFor(() => expect(queryByTestId('spinner')).toBeNull());
+    const { container } = render(<SimpleShowMessagePage index="graylog_5" messageId="20f683d2-a874-11e9-8a11-0242ac130004" />);
+
+    await screen.findByText(/Deprecated field/);
 
     expect(container).toMatchSnapshot();
   });
@@ -73,10 +94,10 @@ describe('ShowMessagePage', () => {
   it('renders for generic event', async () => {
     mockLoadMessage.mockImplementation(() => Promise.resolve(event));
     mockGetInput.mockImplementation(() => Promise.resolve());
-    // @ts-ignore
-    const { container, queryByTestId } = render(<ShowMessagePage params={{ index: 'gl-events_0', messageId: '01DFZQ64CMGV30NT7DW2P7HQX2' }} />);
 
-    await waitFor(() => expect(queryByTestId('spinner')).toBeNull());
+    const { container } = render(<SimpleShowMessagePage index="gl-events_0" messageId="01DFZQ64CMGV30NT7DW2P7HQX2" />);
+
+    await screen.findByText(/SSH Brute Force/);
 
     expect(container).toMatchSnapshot();
   });

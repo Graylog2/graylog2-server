@@ -28,6 +28,10 @@ import MessageDetail from 'views/components/messagelist/MessageDetail';
 import withParams from 'routing/withParams';
 import { Stream } from 'views/stores/StreamsStore';
 import { Input } from 'components/messageloaders/Types';
+import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
+import { Message } from 'views/components/messagelist/Types';
+import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
+import WindowDimensionsContextProvider from 'contexts/WindowDimensionsContextProvider';
 
 const NodesActions = ActionsProvider.getActions('Nodes');
 const InputsActions = ActionsProvider.getActions('Inputs');
@@ -41,17 +45,27 @@ type Props = {
   },
 };
 
-const ShowMessagePage = ({ params: { index, messageId } }: Props) => {
-  if (!index || !messageId) {
-    throw new Error('index and messageId need to be specified!');
-  }
-
-  const [message, setMessage] = useState();
-  const [inputs, setInputs] = useState<Immutable.Map<string, Input>>(Immutable.Map());
+const useStreams = () => {
   const [streams, setStreams] = useState<Immutable.Map<string, Stream>>();
   const [allStreams, setAllStreams] = useState<Immutable.List<Stream>>();
 
-  useEffect(() => { NodesActions.list(); }, []);
+  useEffect(() => {
+    StreamsStore.listStreams().then((newStreams) => {
+      if (newStreams) {
+        const streamsMap = newStreams.reduce((prev, stream) => ({ ...prev, [stream.id]: stream }), {});
+
+        setStreams(Immutable.Map(streamsMap));
+        setAllStreams(Immutable.List(newStreams));
+      }
+    });
+  }, [setStreams, setAllStreams]);
+
+  return { streams, allStreams };
+};
+
+const useMessage = (index: string, messageId: string) => {
+  const [message, setMessage] = useState<Message | undefined>();
+  const [inputs, setInputs] = useState<Immutable.Map<string, Input>>(Immutable.Map());
 
   useEffect(() => {
     MessagesActions.loadMessage(index, messageId)
@@ -69,16 +83,36 @@ const ShowMessagePage = ({ params: { index, messageId } }: Props) => {
       });
   }, [index, messageId, setMessage, setInputs]);
 
-  useEffect(() => {
-    StreamsStore.listStreams().then((newStreams) => {
-      if (newStreams) {
-        const streamsMap = newStreams.reduce((prev, stream) => ({ ...prev, [stream.id]: stream }), {});
+  return { message, inputs };
+};
 
-        setStreams(Immutable.Map(streamsMap));
-        setAllStreams(Immutable.List(newStreams));
-      }
-    });
-  }, [setStreams, setAllStreams]);
+type FieldTypesProviderProps = {
+  children: React.ReactNode,
+  streams: Array<string>,
+  timestamp: string,
+};
+
+const FieldTypesProvider = ({ streams, timestamp, children }: FieldTypesProviderProps) => {
+  const { data: fieldTypes } = useFieldTypes(streams, { type: 'absolute', from: timestamp, to: timestamp });
+  const fieldTypesList = Immutable.List(fieldTypes);
+  const types = { all: fieldTypesList, queryFields: Immutable.Map({ query: fieldTypesList }) };
+
+  return (
+    <FieldTypesContext.Provider value={types}>
+      {children}
+    </FieldTypesContext.Provider>
+  );
+};
+
+const ShowMessagePage = ({ params: { index, messageId } }: Props) => {
+  if (!index || !messageId) {
+    throw new Error('index and messageId need to be specified!');
+  }
+
+  const { streams, allStreams } = useStreams();
+  const { message, inputs } = useMessage(index, messageId);
+
+  useEffect(() => { NodesActions.list(); }, []);
 
   const isLoaded = useMemo(() => (message !== undefined
     && streams !== undefined
@@ -86,18 +120,24 @@ const ShowMessagePage = ({ params: { index, messageId } }: Props) => {
     && allStreams !== undefined), [message, streams, inputs, allStreams]);
 
   if (isLoaded) {
+    const { streams: messageStreams, timestamp } = message.fields;
+
     return (
       <DocumentTitle title={`Message ${messageId} on ${index}`}>
-        <Row className="content">
+        <Row className="content" id="sticky-augmentations-container">
           <Col md={12}>
-            <InteractiveContext.Provider value={false}>
-              <MessageDetail fields={Immutable.List()}
-                             streams={streams}
-                             allStreams={allStreams}
-                             disableSurroundingSearch
-                             inputs={inputs}
-                             message={message} />
-            </InteractiveContext.Provider>
+            <WindowDimensionsContextProvider>
+              <FieldTypesProvider streams={messageStreams as Array<string>} timestamp={timestamp as string}>
+                <InteractiveContext.Provider value={false}>
+                  <MessageDetail fields={Immutable.List()}
+                                 streams={streams}
+                                 allStreams={allStreams}
+                                 disableSurroundingSearch
+                                 inputs={inputs}
+                                 message={message} />
+                </InteractiveContext.Provider>
+              </FieldTypesProvider>
+            </WindowDimensionsContextProvider>
           </Col>
         </Row>
       </DocumentTitle>
