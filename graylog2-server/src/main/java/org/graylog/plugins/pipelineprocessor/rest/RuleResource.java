@@ -38,6 +38,7 @@ import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.rest.models.PaginatedResponse;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
@@ -165,17 +166,16 @@ public class RuleResource extends RestResource implements PluginRestResource {
     @ApiOperation(value = "Get a paginated list of pipeline rules")
     @Produces(MediaType.APPLICATION_JSON)
     @RequiresPermissions(PipelineRestPermissions.PIPELINE_RULE_READ)
-    public RulePageList getPage(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
-                                    @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
-                                    @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
-                                    @ApiParam(name = "sort",
-                                            value = "The field to sort the result on",
-                                            required = true,
-                                            allowableValues = "title,description,id")
-                                    @DefaultValue(RuleDao.FIELD_TITLE) @QueryParam("sort") String sort,
-                                    @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
-                                    @DefaultValue("asc") @QueryParam("order") String order) {
-
+    public PaginatedResponse<RuleSource> getPage(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+                                                 @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+                                                 @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
+                                                 @ApiParam(name = "sort",
+                                                           value = "The field to sort the result on",
+                                                           required = true,
+                                                           allowableValues = "title,description,id")
+                                                 @DefaultValue(RuleDao.FIELD_TITLE) @QueryParam("sort") String sort,
+                                                 @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
+                                                 @DefaultValue("asc") @QueryParam("order") String order) {
         SearchQuery searchQuery;
         try {
             searchQuery = searchQueryParser.parse(query);
@@ -185,13 +185,12 @@ public class RuleResource extends RestResource implements PluginRestResource {
 
         final PaginatedList<RuleDao> result = paginatedRuleService
                 .findPaginated(searchQuery, page, perPage, sort, order);
-        final long total = paginatedRuleService.count();
         final List<RuleSource> ruleSourceList = result.stream()
                 .map(dao -> RuleSource.fromDao(pipelineRuleParser, dao))
                 .collect(Collectors.toList());
         final PaginatedList<RuleSource> rules = new PaginatedList<>(ruleSourceList,
                 result.pagination().total(), result.pagination().page(), result.pagination().perPage());
-        return RulePageList.create(query, result.pagination(), total, sort, order, rules);
+        return PaginatedResponse.create("rules", rules);
     }
 
     @ApiOperation(value = "Get a processing rule", notes = "It can take up to a second until the change is applied")
