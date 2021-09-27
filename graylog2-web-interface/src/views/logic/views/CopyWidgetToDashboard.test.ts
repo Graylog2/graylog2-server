@@ -49,7 +49,7 @@ describe('copyWidgetToDashboard', () => {
     Parameter.registerSubtype(ValueParameter.type, ValueParameter);
   });
 
-  it('should copy a Widget to a dashboard', () => {
+  it('should copy a widget to first page of a dashboard', () => {
     const searchViewFixture = View.fromJSON(readFixture('./CopyWidgetToDashboard.Search-View.fixture.json'));
     const searchSearchFixture = Search.fromJSON(readFixture('./CopyWidgetToDashboard.Search-Search.fixture.json'));
     const searchView = searchViewFixture.toBuilder()
