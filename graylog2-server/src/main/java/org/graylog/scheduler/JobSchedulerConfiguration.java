@@ -19,6 +19,7 @@ package org.graylog.scheduler;
 import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.util.Duration;
 import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
+import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import org.graylog2.plugin.PluginConfigBean;
 
 /**
@@ -27,11 +28,19 @@ import org.graylog2.plugin.PluginConfigBean;
 @SuppressWarnings({"FieldCanBeLocal", "unused", "WeakerAccess"})
 public class JobSchedulerConfiguration implements PluginConfigBean {
     public static final String LOOP_SLEEP_DURATION = "job_scheduler_loop_sleep_duration";
+    public static final String LOCK_EXPIRATION_TIME_MINUTES = "job_lock_expiration_time_minutes";
 
     @Parameter(value = LOOP_SLEEP_DURATION, validators = PositiveDurationValidator.class)
     private Duration loopSleepDuration = Duration.seconds(1);
 
+    @Parameter(value = LOCK_EXPIRATION_TIME_MINUTES, validators = PositiveIntegerValidator.class)
+    private int lockExpirationTimeMinutes = 5;
+
     public Duration getLoopSleepDuration() {
         return loopSleepDuration;
+    }
+
+    public int getLockExpirationTimeMinutes() {
+        return lockExpirationTimeMinutes;
     }
 }

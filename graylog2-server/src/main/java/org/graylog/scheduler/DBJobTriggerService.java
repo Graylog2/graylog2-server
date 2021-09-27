@@ -35,6 +35,7 @@ import org.mongojack.DBUpdate;
 import org.mongojack.JacksonDBCollection;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -47,6 +48,7 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Objects.requireNonNull;
+import static org.graylog.scheduler.JobSchedulerConfiguration.LOCK_EXPIRATION_TIME_MINUTES;
 
 // This class does NOT use PaginatedDbService because we use the triggers collection for locking and need to handle
 // updates very carefully.
@@ -69,16 +71,19 @@ public class DBJobTriggerService {
     private final JacksonDBCollection<JobTriggerDto, ObjectId> db;
     private final JobSchedulerClock clock;
     private final NodeService nodeService;
+    private final int lockExpirationTimeMinutes;
 
     @Inject
     public DBJobTriggerService(MongoConnection mongoConnection,
                                MongoJackObjectMapperProvider mapper,
                                NodeId nodeId,
                                JobSchedulerClock clock,
-                               NodeService nodeService) {
+                               NodeService nodeService,
+                               @Named(LOCK_EXPIRATION_TIME_MINUTES) int lockExpirationTimeMinutes) {
         this.nodeId = nodeId.toString();
         this.clock = clock;
         this.nodeService = nodeService;
+        this.lockExpirationTimeMinutes = lockExpirationTimeMinutes;
         this.db = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection(COLLECTION_NAME),
                 JobTriggerDto.class,
                 ObjectId.class,
@@ -295,7 +300,6 @@ public class DBJobTriggerService {
         final DateTime now = clock.nowUTC();
 
         // TODO extract threshold to graylog.conf?
-        DateTime lockThresholdDate = now.minusSeconds(60);
         final DBQuery.Query query = DBQuery.or(DBQuery.and(
                 // We cannot lock a trigger that is already locked by another node
                 DBQuery.is(FIELD_LOCK_OWNER, null),
@@ -313,7 +317,7 @@ public class DBJobTriggerService {
                 DBQuery.notEquals(FIELD_LOCK_OWNER, null),
                 DBQuery.notIn(FIELD_LOCK_OWNER, nodeService.allActive().keySet()),
                 DBQuery.is(FIELD_STATUS, JobTriggerStatus.RUNNING),
-                DBQuery.lessThan(FIELD_LAST_LOCK_TIME, lockThresholdDate))
+                DBQuery.lessThan(FIELD_LAST_LOCK_TIME, now.minusMinutes(lockExpirationTimeMinutes)))
         );
         // We want to lock the trigger with the oldest next time
         final DBSort.SortBuilder sort = DBSort.asc(FIELD_NEXT_TIME);

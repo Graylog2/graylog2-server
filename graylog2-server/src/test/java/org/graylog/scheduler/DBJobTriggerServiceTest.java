@@ -87,7 +87,7 @@ public class DBJobTriggerServiceTest {
         objectMapper.registerSubtypes(new NamedType(TestJobTriggerData.class, TestJobTriggerData.TYPE_NAME));
 
         mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
-        this.dbJobTriggerService = new DBJobTriggerService(mongodb.mongoConnection(), mapperProvider, nodeId, clock, nodeService);
+        this.dbJobTriggerService = new DBJobTriggerService(mongodb.mongoConnection(), mapperProvider, nodeId, clock, nodeService, 5);
     }
 
     @Test
@@ -512,7 +512,7 @@ public class DBJobTriggerServiceTest {
     public void nextRunnableTriggerWithEndTime() {
         // Set clock to base date used in the fixture file
         final JobSchedulerTestClock clock = new JobSchedulerTestClock(DateTime.parse("2019-01-01T00:00:00.000Z"));
-        final DBJobTriggerService service = new DBJobTriggerService(mongodb.mongoConnection(), mapperProvider, nodeId, clock, nodeService);
+        final DBJobTriggerService service = new DBJobTriggerService(mongodb.mongoConnection(), mapperProvider, nodeId, clock, nodeService, 5);
 
         // No triggers yet because 54e3deadbeefdeadbeef0002 is already locked and RUNNING
         assertThat(service.nextRunnableTrigger()).isEmpty();
@@ -753,7 +753,7 @@ public class DBJobTriggerServiceTest {
     @MongoDBFixtures("stale-job-trigger.json")
     public void nextStaleTrigger() {
         final JobSchedulerTestClock clock = new JobSchedulerTestClock(DateTime.parse("2019-01-01T02:00:00.000Z"));
-        final DBJobTriggerService service = new DBJobTriggerService(mongodb.mongoConnection(), mapperProvider, nodeId, clock, nodeService);
+        final DBJobTriggerService service = new DBJobTriggerService(mongodb.mongoConnection(), mapperProvider, nodeId, clock, nodeService, 5);
 
         assertThat(service.nextRunnableTrigger())
                 .isNotEmpty()
