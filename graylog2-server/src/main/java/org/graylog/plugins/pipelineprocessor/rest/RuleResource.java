@@ -162,7 +162,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
     }
 
     @GET
-    @Path("/page")
+    @Path("/paginated")
     @ApiOperation(value = "Get a paginated list of pipeline rules")
     @Produces(MediaType.APPLICATION_JSON)
     @RequiresPermissions(PipelineRestPermissions.PIPELINE_RULE_READ)

@@ -109,7 +109,7 @@ const RulesStore = Reflux.createStore<RulesStoreState>({
   },
 
   listPaginated({ page, perPage, query }: Pagination): Promise<PaginatedRules> {
-    const url = PaginationURL(ApiRoutes.RulesController.listPage().url, page, perPage, query);
+    const url = PaginationURL(ApiRoutes.RulesController.paginatedList().url, page, perPage, query);
     const promise = fetch('GET', qualifyUrl(url))
       .then((response: PaginatedRulesResponse) => ({
         list: response.rules,

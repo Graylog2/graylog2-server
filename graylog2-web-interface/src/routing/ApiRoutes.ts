@@ -406,7 +406,7 @@ const ApiRoutes = {
   },
   RulesController: {
     list: () => { return { url: '/system/pipelines/rule' }; },
-    listPage: () => { return { url: '/system/pipelines/rule/page' }; },
+    paginatedList: () => { return { url: '/system/pipelines/rule/paginated' }; },
     create: () => { return { url: '/system/pipelines/rule' }; },
     get: (ruleId: string) => { return { url: `/system/pipelines/rule/${ruleId}` }; },
     update: (ruleId: string) => { return { url: `/system/pipelines/rule/${ruleId}` }; },
