@@ -168,7 +168,7 @@ public class QueryTest {
 
     @Test
     public void builderGeneratesQueryId() {
-        final Query build = Query.builder().timerange(mock(TimeRange.class)).query(new BackendQuery.Fallback()).build();
+        final Query build = Query.builder().timerange(mock(TimeRange.class)).query(ElasticsearchQueryString.empty()).build();
         assertThat(build.id()).isNotNull();
     }
 
