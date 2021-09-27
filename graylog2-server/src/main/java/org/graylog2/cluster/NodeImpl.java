@@ -48,7 +48,8 @@ public class NodeImpl extends PersistedImpl implements Node {
     @Override
     @JsonProperty("is_master")
     public boolean isMaster() {
-        return (Boolean) fields.get("is_master");
+        // TODO: there is no master anymore. check all callers, make them do the right thing and then remove this method
+        return true;
     }
 
     @Override
