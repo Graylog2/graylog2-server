@@ -11,6 +11,7 @@ exports[`ShowMessagePage renders for generic event 1`] = `
 <div>
   <div
     class="c0 content row"
+    id="sticky-augmentations-container"
   >
     <div
       class="col-md-12"
@@ -99,6 +100,7 @@ exports[`ShowMessagePage renders for generic message 1`] = `
 <div>
   <div
     class="c0 content row"
+    id="sticky-augmentations-container"
   >
     <div
       class="col-md-12"
