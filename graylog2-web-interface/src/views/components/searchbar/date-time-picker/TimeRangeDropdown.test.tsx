@@ -65,6 +65,7 @@ describe('TimeRangeDropdown', () => {
     asMock(ToolsStore.testNaturalDate).mockImplementation(() => Promise.resolve({
       from: '2018-11-14 13:52:38',
       to: '2018-11-14 13:57:38',
+      timezone: 'Asia/Tokyo',
     }));
   });
 
