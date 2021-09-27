@@ -53,7 +53,7 @@ public class ViewsResourceIT {
                 .post("/views")
                 .then()
                 .statusCode(400)
-                .assertThat().body("message", equalTo("Search 6141d457d3a6b9d73c8ac55a doesn't exist"));
+                .assertThat().body("message", equalTo("Search 6141d457d3a6b9d73c8ac55a not available"));
     }
 
     @Test
@@ -76,27 +76,6 @@ public class ViewsResourceIT {
     }
 
     @Test
-    void testInvalidWidgetMappings() {
-        given()
-                .spec(requestSpec)
-                .when()
-                .body(getClass().getClassLoader().getResourceAsStream("org/graylog/plugins/views/save-search-request.json"))
-                .post("/views/search")
-                .then()
-                .statusCode(201);
-
-        given()
-                .spec(requestSpec)
-                .when()
-                .body(getClass().getClassLoader().getResourceAsStream("org/graylog/plugins/views/views-request-invalid-widgets.json"))
-                .post("/views")
-                .then()
-                .statusCode(400)
-                .assertThat()
-                .body("message", equalTo("Widget mappings don't correspond to widgets"));
-    }
-
-    @Test
     void testInvalidSearchType() {
         given()
                 .spec(requestSpec)
@@ -114,6 +93,6 @@ public class ViewsResourceIT {
                 .then()
                 .statusCode(400)
                 .assertThat()
-                .body("message", equalTo("Search types do not correspond to view/search types"));
+                .body("message", equalTo("Search types do not correspond to view/search types, missing searches: [967d2217-fd99-48a6-b829-5acdab906807]"));
     }
 }

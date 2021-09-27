@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.apache.shiro.subject.Subject;
 import org.graylog.plugins.views.search.Search;
+import org.graylog.plugins.views.search.SearchDomain;
 import org.graylog.plugins.views.search.db.SearchDbService;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewService;
@@ -38,7 +39,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.MockSettings;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
@@ -52,6 +52,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -89,13 +90,13 @@ public class ViewsResourceTest {
     private UserService userService;
 
     @Mock
-    private SearchDbService searchDbService;
+    private SearchDomain searchDomain;
 
     private ViewsResource viewsResource;
 
     class ViewsTestResource extends ViewsResource {
-        ViewsTestResource(ViewService viewService, ClusterEventBus clusterEventBus, UserService userService, SearchDbService searchDbService) {
-            super(viewService, clusterEventBus, searchDbService);
+        ViewsTestResource(ViewService viewService, ClusterEventBus clusterEventBus, UserService userService, SearchDomain searchDomain) {
+            super(viewService, clusterEventBus, searchDomain);
             this.userService = userService;
         }
 
@@ -113,11 +114,11 @@ public class ViewsResourceTest {
 
     @Before
     public void setUp() throws Exception {
-        this.viewsResource = new ViewsTestResource(viewService, clusterEventBus, userService, searchDbService);
+        this.viewsResource = new ViewsTestResource(viewService, clusterEventBus, userService, searchDomain);
         when(subject.isPermitted("dashboards:create")).thenReturn(true);
         final Search search = mock(Search.class, RETURNS_DEEP_STUBS);
         when(search.queries()).thenReturn(ImmutableSet.of());
-        when(searchDbService.get("6141d457d3a6b9d73c8ac55a")).thenReturn(Optional.of(search));
+        when(searchDomain.getForUser(eq("6141d457d3a6b9d73c8ac55a"), Mockito.any(), any())).thenReturn(Optional.of(search));
     }
 
     @Test

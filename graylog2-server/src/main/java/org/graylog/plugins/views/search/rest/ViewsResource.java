@@ -17,6 +17,7 @@
 package org.graylog.plugins.views.search.rest;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Sets;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -24,8 +25,8 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
+import org.graylog.plugins.views.search.SearchDomain;
 import org.graylog.plugins.views.search.SearchType;
-import org.graylog.plugins.views.search.db.SearchDbService;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.WidgetDTO;
@@ -84,14 +85,14 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     private final ViewService dbService;
     private final SearchQueryParser searchQueryParser;
     private final ClusterEventBus clusterEventBus;
-    private final SearchDbService searchDbService;
+    private final SearchDomain searchDomain;
 
     @Inject
     public ViewsResource(ViewService dbService,
-                         ClusterEventBus clusterEventBus, SearchDbService searchDbService) {
+                         ClusterEventBus clusterEventBus, SearchDomain searchDomain) {
         this.dbService = dbService;
         this.clusterEventBus = clusterEventBus;
-        this.searchDbService = searchDbService;
+        this.searchDomain = searchDomain;
         this.searchQueryParser = new SearchQueryParser(ViewDTO.FIELD_TITLE, SEARCH_FIELD_MAPPING);
     }
 
@@ -163,7 +164,8 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     }
 
     private void validateIntegrity(ViewDTO dto) {
-        final Search search = searchDbService.get(dto.searchId()).orElseThrow(() -> new BadRequestException("Search " + dto.searchId() + " doesn't exist"));
+        final Search search = searchDomain.getForUser(dto.searchId(), getCurrentUser(), this::hasViewReadPermission)
+                .orElseThrow(() -> new BadRequestException("Search " + dto.searchId() + " not available"));
 
         final Set<String> searchQueries = search.queries().stream()
                 .map(Query::id)
@@ -171,8 +173,10 @@ public class ViewsResource extends RestResource implements PluginRestResource {
 
         final Set<String> stateQueries = dto.state().keySet();
 
-        if(!searchQueries.equals(stateQueries)) {
-            throw new BadRequestException("Search queries do not correspond to view/state queries");
+        if(!searchQueries.containsAll(stateQueries)) {
+            final Sets.SetView<String> diff = Sets.difference(searchQueries, stateQueries);
+            final String error = String.format("Search queries do not correspond to view/state queries, missing query IDs: %s", diff);
+            throw new BadRequestException(error);
         }
 
         final Set<String> searchTypes = search.queries().stream()
@@ -186,8 +190,9 @@ public class ViewsResource extends RestResource implements PluginRestResource {
                 .flatMap(Collection::stream)
                 .collect(Collectors.toSet());
 
-        if(!searchTypes.equals(stateTypes)) {
-            throw new BadRequestException("Search types do not correspond to view/search types");
+        if(!searchTypes.containsAll(stateTypes)) {
+            final Sets.SetView<String> diff = Sets.difference(searchTypes, stateTypes);
+            throw new BadRequestException("Search types do not correspond to view/search types, missing searches: " + diff);
         }
 
         final Set<String> widgetIds = dto.state().values().stream()
@@ -195,20 +200,19 @@ public class ViewsResource extends RestResource implements PluginRestResource {
                 .map(WidgetDTO::id)
                 .collect(Collectors.toSet());
 
-        final Set<String> widgetMappings = dto.state().values().stream()
-                .flatMap(v -> v.widgetMapping().keySet().stream()).collect(Collectors.toSet());
-
         final Set<String> widgetPositions = dto.state().values().stream()
                 .flatMap(v -> v.widgetPositions().keySet().stream()).collect(Collectors.toSet());
 
-        if(!widgetMappings.equals(widgetIds)) {
-            throw new BadRequestException("Widget mappings don't correspond to widgets");
+        if(!widgetPositions.containsAll(widgetIds)) {
+            final Sets.SetView<String> diff = Sets.difference(widgetPositions, widgetIds);
+            throw new BadRequestException("Widget positions don't correspond to widgets, missing widget possitions: " + diff);
         }
+    }
 
-        if(!widgetPositions.equals(widgetIds)) {
-            throw new BadRequestException("Widget positions don't correspond to widgets");
-        }
-
+    private boolean hasViewReadPermission(ViewDTO view) {
+        final String viewId = view.id();
+        return isPermitted(ViewsRestPermissions.VIEW_READ, viewId)
+                || (view.type().equals(ViewDTO.Type.DASHBOARD) && isPermitted(RestPermissions.DASHBOARDS_READ, viewId));
     }
 
     @PUT
