@@ -19,18 +19,19 @@ import React from 'react';
 import AppRouter from 'routing/AppRouter';
 import ThemeAndUserProvider from 'contexts/ThemeAndUserProvider';
 import StreamsProvider from 'contexts/StreamsProvider';
+import GlobalContextProviders from 'contexts/GlobalContextProviders';
 import DefaultQueryClientProvider from 'contexts/DefaultQueryClientProvider';
 
-const LoggedInPage = () => {
-  return (
-    <DefaultQueryClientProvider>
-      <ThemeAndUserProvider>
+const LoggedInPage = () => (
+  <DefaultQueryClientProvider>
+    <ThemeAndUserProvider>
+      <GlobalContextProviders>
         <StreamsProvider>
           <AppRouter />
         </StreamsProvider>
-      </ThemeAndUserProvider>
-    </DefaultQueryClientProvider>
-  );
-};
+      </GlobalContextProviders>
+    </ThemeAndUserProvider>
+  </DefaultQueryClientProvider>
+);
 
 export default LoggedInPage;
