@@ -58,18 +58,13 @@ describe('copyWidgetToDashboard', () => {
       .build();
   };
 
-  const generateDashboardView = (viewFixture: View) => {
-    const dashboardSearchFixture = Search.fromJSON(readFixture('./CopyWidgetToDashboard.Dashboard-Search.fixture.json'));
-
-    return viewFixture.toBuilder()
-      .search(dashboardSearchFixture)
-      .build();
-  };
-
   it('should copy a widget to a dashboard', () => {
     const searchView = generateSearchView();
     const dashboardViewFixture = View.fromJSON(readFixture('./CopyWidgetToDashboard.Dashboard-View.fixture.json'));
-    const dashboardView = generateDashboardView(dashboardViewFixture);
+    const dashboardSearchFixture = Search.fromJSON(readFixture('./CopyWidgetToDashboard.Dashboard-Search.fixture.json'));
+    const dashboardView = dashboardViewFixture.toBuilder()
+      .search(dashboardSearchFixture)
+      .build();
 
     const widgetId = '4d73ccaa-aabf-451a-b36e-309f55798e04';
 
@@ -80,8 +75,11 @@ describe('copyWidgetToDashboard', () => {
 
   it('should copy a widget to first dashboard page, when dashboard has multiple pages', () => {
     const searchView = generateSearchView();
-    const dashboardViewMultipleQueriesFixture = View.fromJSON(readFixture('./CopyWidgetToDashboard.Dashboard-View-Multiple-Queries.fixture.json'));
-    const dashboardView = generateDashboardView(dashboardViewMultipleQueriesFixture);
+    const dashboardViewFixture = View.fromJSON(readFixture('./CopyWidgetToDashboard.Dashboard-View-Multiple-Queries.fixture.json'));
+    const dashboardSearchFixture = Search.fromJSON(readFixture('./CopyWidgetToDashboard.Dashboard-Search-Multiple-Queries.fixture.json'));
+    const dashboardView = dashboardViewFixture.toBuilder()
+      .search(dashboardSearchFixture)
+      .build();
 
     const widgetId = '4d73ccaa-aabf-451a-b36e-309f55798e04';
 
