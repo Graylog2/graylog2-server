@@ -87,11 +87,11 @@ public class MongoDBInstance extends ExternalResource implements AutoCloseable {
         this.lifecycle = lifecycle;
 
         switch (lifecycle) {
-            case CLASS:
+            case VM:
                 this.service = CACHED_SERVICE.computeIfAbsent(instanceName, k -> createContainer(version, network));
                 break;
-            case METHOD:
-                this.service = createContainer(version, network);
+            case CLASS:
+                this.service = CACHED_SERVICE.computeIfAbsent(instanceName, k -> createContainer(version, network));
                 break;
             default:
                 throw new IllegalArgumentException("Support for lifecycle " + lifecycle.toString() + " not implemented yet");
@@ -149,13 +149,6 @@ public class MongoDBInstance extends ExternalResource implements AutoCloseable {
     @Override
     protected void after() {
         dropDatabase();
-        switch (lifecycle) {
-            case CLASS:
-                break;
-            case METHOD:
-                close();
-                break;
-        }
     }
 
     /**

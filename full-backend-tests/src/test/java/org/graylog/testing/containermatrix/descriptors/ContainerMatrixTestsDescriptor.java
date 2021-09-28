@@ -29,6 +29,7 @@ import org.junit.platform.engine.UniqueId;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Optional;
@@ -51,7 +52,7 @@ public class ContainerMatrixTestsDescriptor implements TestDescriptor {
     private final PluginJarsProvider pluginJarsProvider;
 
     private final Map<String, Set<TestDescriptor>> children = Collections.synchronizedMap(new HashMap<>());
-    private final Set<Integer> extraPorts = Collections.synchronizedSet(emptySet());
+    private final Set<Integer> extraPorts = Collections.synchronizedSet(new HashSet<>());
 
     public ContainerMatrixTestsDescriptor(TestDescriptor parent, Lifecycle lifecycle, Class<? extends MavenProjectDirProvider> mavenProjectDirProvider, Class<? extends PluginJarsProvider> pluginJarsProvider) {
         setParent(parent);
@@ -218,5 +219,9 @@ public class ContainerMatrixTestsDescriptor implements TestDescriptor {
 
     public void addExtraPorts(final int[] ports) {
         Arrays.stream(ports).forEach(e -> extraPorts.add(e));
+    }
+
+    public int[] getExtraPorts() {
+        return extraPorts.stream().mapToInt(i -> i).toArray();
     }
 }

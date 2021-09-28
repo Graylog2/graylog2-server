@@ -61,11 +61,19 @@ import static org.graylog.testing.graylognode.ExecutableFileUtil.makeSureExecuta
 public class ContainerMatrixTestExecutor {
     private static final Logger LOG = LoggerFactory.getLogger(ContainerMatrixTestExecutor.class);
 
-    private int[] extraPorts = {};
+    int[] extraPorts(TestDescriptor descriptor) {
+        if (descriptor instanceof ContainerMatrixTestsDescriptor) {
+            return ((ContainerMatrixTestsDescriptor) descriptor).getExtraPorts();
+        } else if (descriptor.getParent().isPresent()) {
+            return extraPorts(descriptor.getParent().get());
+        } else {
+            return new int[0];
+        }
+    }
 
     public void execute(ExecutionRequest request, TestDescriptor descriptor) {
         if (descriptor instanceof ContainerMatrixTestClassDescriptor) {
-            executeMethods(((ContainerMatrixTestClassDescriptor) descriptor).getEsVersion(), ((ContainerMatrixTestClassDescriptor) descriptor).getMongoVersion(), extraPorts, request, (ContainerMatrixTestClassDescriptor) descriptor);
+            executeMethods(((ContainerMatrixTestClassDescriptor) descriptor).getEsVersion(), ((ContainerMatrixTestClassDescriptor) descriptor).getMongoVersion(), extraPorts(descriptor), request, (ContainerMatrixTestClassDescriptor) descriptor);
         } else if (descriptor instanceof ContainerMatrixEngineDescriptor) {
             executeContainer(request, (ContainerMatrixEngineDescriptor) descriptor);
         } else if (descriptor instanceof ContainerMatrixTestsDescriptor) {
