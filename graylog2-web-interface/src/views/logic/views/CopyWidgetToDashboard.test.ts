@@ -74,6 +74,8 @@ describe('copyWidgetToDashboard', () => {
   });
 
   it('should copy a widget to first dashboard page, when dashboard has multiple pages', () => {
+    // The fixtures view state queries order is different than the search queries order.
+    // This test ensures that we are still determining the first dashboard page (query) correctly.
     const searchView = generateSearchView();
     const dashboardViewFixture = View.fromJSON(readFixture('./CopyWidgetToDashboard.Dashboard-View-Multiple-Queries.fixture.json'));
     const dashboardSearchFixture = Search.fromJSON(readFixture('./CopyWidgetToDashboard.Dashboard-Search-Multiple-Queries.fixture.json'));
