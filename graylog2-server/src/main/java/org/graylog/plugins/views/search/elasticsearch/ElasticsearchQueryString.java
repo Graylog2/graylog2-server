@@ -20,41 +20,46 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.google.auto.value.AutoValue;
 import com.google.common.base.Strings;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 
 import javax.annotation.Nullable;
+import java.util.Objects;
 
-@AutoValue
 @JsonAutoDetect
-@JsonDeserialize(as = AutoValue_ElasticsearchQueryString.class)
-public abstract class ElasticsearchQueryString implements BackendQuery {
+public class ElasticsearchQueryString implements BackendQuery {
 
     public static final String NAME = "elasticsearch";
+    private final String queryString;
+
+    @JsonCreator
+    public ElasticsearchQueryString(String queryString) {
+        this.queryString = queryString;
+    }
+
+    @JsonCreator
+    public ElasticsearchQueryString(@JsonProperty("type") String type, @JsonProperty("query_string") String query) {
+        this.queryString = query;
+    }
 
     public static ElasticsearchQueryString empty() {
         return ElasticsearchQueryString.of("");
     }
 
-    @JsonCreator
     public static ElasticsearchQueryString of(final String query) {
-        return new AutoValue_ElasticsearchQueryString(NAME, query);
-    }
-
-    @JsonCreator
-    public static ElasticsearchQueryString create(final @JsonProperty("type") String type, final @JsonProperty("query_string") String query) {
-        return new AutoValue_ElasticsearchQueryString(type, query);
+        return new ElasticsearchQueryString(NAME, query);
     }
 
     @Nullable
     @Override
-    public abstract String type();
+    public String type() {
+        return NAME;
+    }
 
     @JsonProperty
-    public abstract String queryString();
+    public String queryString() {
+        return this.queryString;
+    }
 
     @JsonIgnore
     public boolean isEmpty() {
@@ -73,12 +78,24 @@ public abstract class ElasticsearchQueryString implements BackendQuery {
         if (!otherQueryString.isEmpty()) {
             finalStringBuilder.append(otherQueryString);
         }
-
-        return new AutoValue_ElasticsearchQueryString(NAME, finalStringBuilder.toString());
+        return new ElasticsearchQueryString(NAME, finalStringBuilder.toString());
     }
 
     @Override
     public String toString() {
         return type() + ": " + queryString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        final ElasticsearchQueryString that = (ElasticsearchQueryString) o;
+        return Objects.equals(queryString, that.queryString);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(queryString);
     }
 }

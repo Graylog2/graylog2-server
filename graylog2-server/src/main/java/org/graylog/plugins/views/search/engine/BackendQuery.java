@@ -16,10 +16,16 @@
  */
 package org.graylog.plugins.views.search.engine;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 
-@JsonDeserialize(as = ElasticsearchQueryString.class)
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.NAME,
+        property = BackendQuery.TYPE_FIELD,
+        visible = true,
+        defaultImpl = ElasticsearchQueryString.class)
 public interface BackendQuery {
+    String TYPE_FIELD = "type";
+
     String type();
 }
