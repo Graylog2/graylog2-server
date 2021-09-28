@@ -25,7 +25,6 @@ import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.events.inputs.IOStateChangedEvent;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.shared.inputs.InputRegistry;
-import org.graylog2.shared.inputs.PersistedInputs;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.slf4j.Logger;
@@ -38,18 +37,15 @@ public class InputStateListener {
     private NotificationService notificationService;
     private ActivityWriter activityWriter;
     private ServerStatus serverStatus;
-    private PersistedInputs persistedInputs;
 
     @Inject
     public InputStateListener(EventBus eventBus,
                               NotificationService notificationService,
                               ActivityWriter activityWriter,
-                              ServerStatus serverStatus,
-                              PersistedInputs persistedInputs) {
+                              ServerStatus serverStatus) {
         this.notificationService = notificationService;
         this.activityWriter = activityWriter;
         this.serverStatus = serverStatus;
-        this.persistedInputs = persistedInputs;
         eventBus.register(this);
     }
 
@@ -66,33 +62,16 @@ public class InputStateListener {
                 notification.addDetail("reason", state.getDetailedMessage());
                 notificationService.publishIfFirst(notification);
                 break;
-            case STOPPED:
-                String msg = "Input [" + input.getName() + "/" + input.getId() + "] is now STOPPED";
-                activityWriter.write(new Activity(msg, InputStateListener.class));
-                //persistAutoStart(input.getId(), false);
-                break;
             case RUNNING:
                 notificationService.fixed(Notification.Type.NO_INPUT_RUNNING);
-                persistAutoStart(input.getId(), true);
                 // fall through
             default:
-                msg = "Input [" + input.getName() + "/" + input.getId() + "] is now " + event.newState().toString();
+                final String msg = "Input [" + input.getName() + "/" + input.getId() + "] is now " + event.newState().toString();
                 activityWriter.write(new Activity(msg, InputStateListener.class));
                 break;
         }
 
         LOG.debug("Input State of [{}/{}] changed: {} -> {}", input.getTitle(), input.getId(), event.oldState(), event.newState());
         LOG.info("Input [{}/{}] is now {}", input.getName(), input.getId(), event.newState());
-    }
-
-    /**
-     * Update autostart flag in DB
-     */
-    private void persistAutoStart(String id, boolean autoStart) {
-        final MessageInput messageInput = persistedInputs.get(id);
-        if (messageInput != null) {
-            messageInput.setAutoStart(autoStart);
-            persistedInputs.update(id, messageInput);
-        }
     }
 }

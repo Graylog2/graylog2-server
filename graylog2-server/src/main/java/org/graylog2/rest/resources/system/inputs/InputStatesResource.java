@@ -36,6 +36,7 @@ import org.graylog2.rest.models.system.inputs.responses.InputStatesList;
 import org.graylog2.rest.models.system.inputs.responses.InputSummary;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.inputs.MessageInputFactory;
+import org.graylog2.shared.inputs.PersistedInputs;
 import org.graylog2.shared.security.RestPermissions;
 
 import javax.inject.Inject;
@@ -58,16 +59,19 @@ public class InputStatesResource extends AbstractInputsResource {
     private final InputRegistry inputRegistry;
     private final EventBus serverEventBus;
     private final InputService inputService;
+    private final PersistedInputs persistedInputs;
 
     @Inject
     public InputStatesResource(InputRegistry inputRegistry,
                                EventBus serverEventBus,
                                InputService inputService,
-                               MessageInputFactory messageInputFactory) {
+                               MessageInputFactory messageInputFactory,
+                               PersistedInputs persistedInputs) {
         super(messageInputFactory.getAvailableInputs());
         this.inputRegistry = inputRegistry;
         this.serverEventBus = serverEventBus;
         this.inputService = inputService;
+        this.persistedInputs = persistedInputs;
     }
 
     @GET
@@ -109,6 +113,7 @@ public class InputStatesResource extends AbstractInputsResource {
     public InputCreated start(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) throws org.graylog2.database.NotFoundException {
         checkPermission(RestPermissions.INPUTS_CHANGESTATE, inputId);
         inputService.find(inputId);
+        persistDesiredState(inputId, IOState.Type.RUNNING.toString());
         final InputCreated result = InputCreated.create(inputId);
         this.serverEventBus.post(result);
 
@@ -126,6 +131,7 @@ public class InputStatesResource extends AbstractInputsResource {
     public InputDeleted stop(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) throws org.graylog2.database.NotFoundException {
         checkPermission(RestPermissions.INPUTS_CHANGESTATE, inputId);
         inputService.find(inputId);
+        persistDesiredState(inputId, IOState.Type.STOPPED.toString());
         final InputDeleted result = InputDeleted.create(inputId);
         this.serverEventBus.post(result);
 
@@ -157,5 +163,13 @@ public class InputStatesResource extends AbstractInputsResource {
                         messageInput.getNodeId()
                 )
         );
+    }
+
+    private void persistDesiredState(String id, String desiredState) {
+        final MessageInput messageInput = persistedInputs.get(id);
+        if (messageInput != null) {
+            messageInput.setDesiredState(desiredState);
+            persistedInputs.update(id, messageInput);
+        }
     }
 }

@@ -94,8 +94,9 @@ public class PersistedInputsImpl implements PersistedInputs {
     public boolean remove(Object o) {
         if (o instanceof MessageInput) {
             final MessageInput messageInput = (MessageInput) o;
-            if (isNullOrEmpty(messageInput.getId()))
+            if (isNullOrEmpty(messageInput.getId())) {
                 return false;
+            }
             try {
                 final Input input = inputService.find(messageInput.getId());
                 inputService.destroy(input);
@@ -118,13 +119,15 @@ public class PersistedInputsImpl implements PersistedInputs {
             final List<Extractor> extractors = inputService.getExtractors(oldInput);
             final Map<String, String> staticFields = oldInput.getStaticFields();
 
-            inputService.save(mongoInput);
+            inputService.update(mongoInput);
 
-            for (Map.Entry<String, String> entry : staticFields.entrySet())
+            for (Map.Entry<String, String> entry : staticFields.entrySet()) {
                 inputService.addStaticField(mongoInput, entry.getKey(), entry.getValue());
+            }
 
-            for (Extractor extractor : extractors)
+            for (Extractor extractor : extractors) {
                 inputService.addExtractor(mongoInput, extractor);
+            }
 
             return true;
         } catch (NotFoundException | ValidationException e) {
@@ -138,10 +141,11 @@ public class PersistedInputsImpl implements PersistedInputs {
 
         // ... and check if it would pass validation. We don't need to go on if it doesn't.
         final Input mongoInput;
-        if (input.getId() != null)
+        if (input.getId() != null) {
             mongoInput = inputService.create(input.getId(), inputData);
-        else
+        } else {
             mongoInput = inputService.create(inputData);
+        }
 
         return mongoInput;
     }

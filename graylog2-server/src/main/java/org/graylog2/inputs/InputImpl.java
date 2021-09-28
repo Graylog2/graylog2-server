@@ -27,6 +27,7 @@ import org.graylog2.database.validators.DateValidator;
 import org.graylog2.database.validators.FilledStringValidator;
 import org.graylog2.database.validators.MapValidator;
 import org.graylog2.database.validators.OptionalStringValidator;
+import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.database.validators.Validator;
 import org.graylog2.plugin.inputs.Extractor;
 import org.graylog2.plugin.inputs.MessageInput;
@@ -160,6 +161,15 @@ public class InputImpl extends PersistedImpl implements Input {
 
     @Override
     public String getNodeId() {
-        return emptyToNull((String)fields.get(MessageInput.FIELD_NODE_ID));
+        return emptyToNull((String) fields.get(MessageInput.FIELD_NODE_ID));
+    }
+
+    @Override
+    public String getDesiredState() {
+        if (fields.containsKey(MessageInput.FIELD_DESIRED_STATE)) {
+            return (String) fields.get(MessageInput.FIELD_DESIRED_STATE);
+        } else {
+            return IOState.Type.RUNNING.toString();
+        }
     }
 }
