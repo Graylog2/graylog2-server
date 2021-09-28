@@ -29,7 +29,6 @@ import RenderCompletionCallback from 'views/components/widgets/RenderCompletionC
 import NumberVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import { makeVisualization, retrieveChartData } from 'views/components/aggregationbuilder/AggregationBuilder';
-import { Center } from 'components/common';
 
 import Trend from './Trend';
 import AutoFontSizer from './AutoFontSizer';
@@ -90,7 +89,7 @@ const _extractValueAndField = (rows: Rows) => {
 };
 
 type Props = {
-  currentView: CurrentViewType,
+  currentView: CurrentViewType;
 } & VisualizationComponentProps;
 
 const _extractFirstSeriesName = (config) => {
