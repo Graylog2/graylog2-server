@@ -18,6 +18,7 @@ import React from 'react';
 import { fireEvent, render, screen } from 'wrappedTestingLibrary';
 import { Notifications } from 'theme/types';
 import { asMock } from 'helpers/mocking';
+import { PluginExports } from 'graylog-web-plugin/plugin';
 
 import usePluginEntities from 'views/logic/usePluginEntities';
 
@@ -84,7 +85,7 @@ const beforeMock = () => {
 
   return asMock(usePluginEntities).mockImplementation((entityKey) => {
     if (entityKey === 'customization.publicNotifications') {
-      return [mockedFn];
+      return [mockedFn] as PluginExports['customization.publicNotifications'];
     }
 
     return [];
