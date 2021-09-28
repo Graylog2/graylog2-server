@@ -2,6 +2,7 @@
 
 [![License](https://img.shields.io/badge/license-SSPL-green)](https://www.mongodb.com/licensing/server-side-public-license)
 [![Maven Central](https://img.shields.io/maven-central/v/org.graylog2/graylog2-server.svg)](http://mvnrepository.com/artifact/org.graylog2/graylog2-server)
+[![Build](https://github.com/Graylog2/graylog2-server/actions/workflows/build.yml/badge.svg)](https://github.com/Graylog2/graylog2-server/actions/workflows/build.yml)
 
 Welcome! _Graylog_ is an open source log management platform.
 
@@ -23,7 +24,7 @@ Do you want to get paid for developing our open source product? Apply for one of
 
 ## Staying in Touch
 
-Come chat with us in the [`#graylog` channel on freenode IRC](https://webchat.freenode.net/?channels=%23graylog) or create a topic in our [community discussion forums](https://community.graylog.org/).
+Come chat with us in the [`#graylog` channel on freenode IRC](https://webchat.freenode.net/?channels=%23graylog), the `#graylog` channel on [libera](https://libera.chat/) or create a topic in our [community discussion forums](https://community.graylog.org/).
 
 ## License
 
