@@ -27,8 +27,9 @@ import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.testing.backenddriver.SearchDriver.searchAllMessages;
 import static org.graylog.testing.completebackend.Lifecycle.CLASS;
+import static org.graylog.testing.containermatrix.ContainerVersions.ES6;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = CLASS, esVersions = {"6.8.4"})
+@ContainerMatrixTestsConfiguration(serverLifecycle = CLASS, esVersions = {ES6})
 class BackendStartupIT {
 
     private final GraylogBackend sut;

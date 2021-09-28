@@ -37,6 +37,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.Collections.emptySet;
+import static org.graylog.testing.containermatrix.ContainerVersions.DEFAULT_ES;
+import static org.graylog.testing.containermatrix.ContainerVersions.DEFAULT_MONGO;
 
 public class ContainerMatrixTestsDescriptor implements TestDescriptor {
     private final UniqueId uniqueId;
@@ -130,7 +132,7 @@ public class ContainerMatrixTestsDescriptor implements TestDescriptor {
     }
 
     private String getDefaultKey() {
-        return ContainerMatrixTestsConfiguration.DEFAULT_ES + "_" + ContainerMatrixTestsConfiguration.DEFAULT_MONGO;
+        return DEFAULT_ES + "_" + DEFAULT_MONGO;
     }
 
     @Override

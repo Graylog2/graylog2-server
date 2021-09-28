@@ -22,8 +22,6 @@ import org.graylog.testing.completebackend.DefaultPluginJarsProvider;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.MavenProjectDirProvider;
 import org.graylog.testing.completebackend.PluginJarsProvider;
-import org.graylog.testing.elasticsearch.ElasticsearchInstance;
-import org.graylog.testing.mongodb.MongoDBContainer;
 import org.junit.jupiter.api.Tag;
 import org.junit.platform.commons.annotation.Testable;
 
@@ -32,6 +30,8 @@ import java.lang.annotation.Target;
 
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static org.graylog.testing.containermatrix.ContainerVersions.DEFAULT_ES;
+import static org.graylog.testing.containermatrix.ContainerVersions.DEFAULT_MONGO;
 
 /**
  * This annotation can be used to create tests for a matrix of ES- and Mongo-instances
@@ -41,11 +41,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Tag("integration")
 @Testable
 public @interface ContainerMatrixTestsConfiguration {
-    String DEFAULT_ES = ElasticsearchInstance.DEFAULT_VERSION;
-    String DEFAULT_MONGO = MongoDBContainer.DEFAULT_VERSION;
-
     // combination rule
-    Lifecycle serverLifecycle() default Lifecycle.CLASS;
+    Lifecycle serverLifecycle() default Lifecycle.VM;
 
     // combination rule
     Class<? extends MavenProjectDirProvider> mavenProjectDirProvider() default DefaultMavenProjectDirProvider.class;

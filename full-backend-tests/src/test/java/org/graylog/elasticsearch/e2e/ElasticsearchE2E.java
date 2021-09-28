@@ -27,9 +27,13 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.testing.completebackend.Lifecycle.VM;
+import static org.graylog.testing.containermatrix.ContainerVersions.ES6;
+import static org.graylog.testing.containermatrix.ContainerVersions.ES7;
+import static org.graylog.testing.containermatrix.ContainerVersions.MONGO3;
+import static org.graylog.testing.containermatrix.ContainerVersions.MONGO4;
 import static org.graylog.testing.graylognode.NodeContainerConfig.GELF_HTTP_PORT;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = VM, esVersions = {"6.8.4", "7.10.2"}, mongoVersions = {"3.6", "4.0"})
+@ContainerMatrixTestsConfiguration(serverLifecycle = VM, esVersions = {ES6, ES7}, mongoVersions = {MONGO3, MONGO4})
 public class ElasticsearchE2E {
 
     private final GraylogBackend sut;

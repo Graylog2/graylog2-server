@@ -16,9 +16,6 @@
  */
 package org.graylog.testing.completebackend;
 
-import java.net.URL;
-import java.util.List;
-
 /**
  * Controls the lifecycle of the {@link GraylogBackend} used in tests
  */
@@ -34,19 +31,5 @@ public enum Lifecycle {
      * that the individual tests will not interfere with each other, e.g., by creating test data that
      * would affect the outcome of a different test.
      */
-    CLASS,
-    /**
-     * A fresh {@link GraylogBackend} will be instantiated for each tests in a class. This is the safest
-     * way to isolate tests. Test execution will take much longer due to the time it takes to spin up
-     * the necessary container, especially the server node itself.
-     */
-    METHOD {
-        @Override
-        void afterEach(GraylogBackend backend, List<URL> mongoDBFixtures) {
-            backend.fullReset(mongoDBFixtures);
-        }
-    };
-
-    void afterEach(GraylogBackend backend, List<URL> mongoDBFixtures) {
-    }
+    CLASS
 }

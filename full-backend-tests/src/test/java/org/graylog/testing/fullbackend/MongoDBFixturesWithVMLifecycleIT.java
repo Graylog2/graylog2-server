@@ -25,14 +25,15 @@ import java.util.List;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.graylog.testing.completebackend.Lifecycle.METHOD;
+import static org.graylog.testing.completebackend.Lifecycle.VM;
+import static org.graylog.testing.containermatrix.ContainerVersions.ES6;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = METHOD, esVersions = {"6.8.4"}, mongoDBFixtures = "access-token.json")
-class MongoDBFixturesWithMethodLifecycleIT {
+@ContainerMatrixTestsConfiguration(serverLifecycle = VM, esVersions = {ES6}, mongoDBFixtures = "access-token.json")
+class MongoDBFixturesWithVMLifecycleIT {
     private final GraylogBackend sut;
     private final RequestSpecification requestSpec;
 
-    public MongoDBFixturesWithMethodLifecycleIT(GraylogBackend sut, RequestSpecification requestSpec) {
+    public MongoDBFixturesWithVMLifecycleIT(GraylogBackend sut, RequestSpecification requestSpec) {
         this.sut = sut;
         this.requestSpec = requestSpec;
     }
