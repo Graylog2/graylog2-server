@@ -19,7 +19,7 @@ import { render, screen } from 'wrappedTestingLibrary';
 import asMock from 'helpers/mocking/AsMock';
 import suppressConsole from 'helpers/suppressConsole';
 
-import GlobalContextProviders from 'routing/GlobalContextProviders';
+import GlobalContextProviders from 'contexts/GlobalContextProviders';
 import usePluginEntities from 'views/logic/usePluginEntities';
 
 jest.mock('views/logic/usePluginEntities');
