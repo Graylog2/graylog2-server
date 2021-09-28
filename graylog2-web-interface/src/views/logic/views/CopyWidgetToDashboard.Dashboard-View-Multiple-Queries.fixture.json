@@ -85,8 +85,6 @@
       },
       "titles": {
         "widget": {
-          "8532ff94-2881-42b4-b26d-080d09305e95": "Message Count",
-          "32889f0b-fe5a-4f18-baa0-773869d49af3": "All Messages",
           "a8058a41-34ea-4846-83d0-1acc2fbc1d7f": "Aggregating stddev(files_changed) by author (copy)"
         }
       },
@@ -137,24 +135,6 @@
         ]
       },
       "positions": {
-        "546b13fe-eae7-4fb8-abb9-e0e3a907c3e6": {
-          "col": 1,
-          "row": 5,
-          "height": 3,
-          "width": "Infinity"
-        },
-        "32889f0b-fe5a-4f18-baa0-773869d49af3": {
-          "col": 1,
-          "row": 10,
-          "height": 6,
-          "width": "Infinity"
-        },
-        "8532ff94-2881-42b4-b26d-080d09305e95": {
-          "col": 1,
-          "row": 8,
-          "height": 2,
-          "width": "Infinity"
-        },
         "a8058a41-34ea-4846-83d0-1acc2fbc1d7f": {
           "col": 1,
           "row": 1,
