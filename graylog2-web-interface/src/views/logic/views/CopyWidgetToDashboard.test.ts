@@ -49,23 +49,46 @@ describe('copyWidgetToDashboard', () => {
     Parameter.registerSubtype(ValueParameter.type, ValueParameter);
   });
 
-  it('should copy a widget to first page of a dashboard', () => {
+  const generateSearchView = () => {
     const searchViewFixture = View.fromJSON(readFixture('./CopyWidgetToDashboard.Search-View.fixture.json'));
     const searchSearchFixture = Search.fromJSON(readFixture('./CopyWidgetToDashboard.Search-Search.fixture.json'));
-    const searchView = searchViewFixture.toBuilder()
+
+    return searchViewFixture.toBuilder()
       .search(searchSearchFixture)
       .build();
+  };
 
-    const dashboardViewFixture = View.fromJSON(readFixture('./CopyWidgetToDashboard.Dashboard-View.fixture.json'));
+  const generateDashboardView = (viewFixture: View) => {
     const dashboardSearchFixture = Search.fromJSON(readFixture('./CopyWidgetToDashboard.Dashboard-Search.fixture.json'));
-    const dashboardView = dashboardViewFixture.toBuilder()
+
+    return viewFixture.toBuilder()
       .search(dashboardSearchFixture)
       .build();
+  };
+
+  it('should copy a widget to a dashboard', () => {
+    const searchView = generateSearchView();
+    const dashboardViewFixture = View.fromJSON(readFixture('./CopyWidgetToDashboard.Dashboard-View.fixture.json'));
+    const dashboardView = generateDashboardView(dashboardViewFixture);
 
     const widgetId = '4d73ccaa-aabf-451a-b36e-309f55798e04';
 
     const newDashboard = copyWidgetToDashboard(widgetId, searchView, dashboardView);
 
     expect(newDashboard).toMatchSnapshot();
+  });
+
+  it('should copy a widget to first dashboard page, when dashboard has multiple pages', () => {
+    const searchView = generateSearchView();
+    const dashboardViewMultipleQueriesFixture = View.fromJSON(readFixture('./CopyWidgetToDashboard.Dashboard-View-Multiple-Queries.fixture.json'));
+    const dashboardView = generateDashboardView(dashboardViewMultipleQueriesFixture);
+
+    const widgetId = '4d73ccaa-aabf-451a-b36e-309f55798e04';
+
+    const newDashboard = copyWidgetToDashboard(widgetId, searchView, dashboardView);
+    const firstQueryId = newDashboard.search.queries.first().id;
+    const widgetQueryId = newDashboard.state.findKey((query) => !!query.widgets.find(({ id }) => id === 'dead-beef'));
+
+    expect(widgetQueryId).toBe(firstQueryId);
   });
 });

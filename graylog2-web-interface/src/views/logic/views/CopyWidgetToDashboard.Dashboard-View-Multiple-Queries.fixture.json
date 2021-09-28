@@ -7,6 +7,74 @@
   "search_id": "5d9b51d6af140aba42e87469",
   "properties": [],
   "state": {
+    "595447e8-50f8-48a9-a99c-078aa5b1f6f4": {
+      "selected_fields": [
+        "source",
+        "message"
+      ],
+      "formatting": {
+        "highlighting": []
+      },
+      "titles": {
+        "widget": {
+          "da99bfc5-6542-4b4d-b2eb-cf7b2dfca981": "Aggregating stddev(files_changed)"
+        }
+      },
+      "widgets": [
+        {
+          "id": "da99bfc5-6542-4b4d-b2eb-cf7b2dfca981",
+          "type": "aggregation",
+          "config": {
+            "column_pivots": [],
+            "formatting_settings": {
+              "chart_colors": {
+                "stddev(files_changed)": "#8bc34a"
+              }
+            },
+            "rollup": true,
+            "row_pivots": [
+              {
+                "field": "author",
+                "type": "values",
+                "config": {
+                  "limit": 15
+                }
+              }
+            ],
+            "series": [
+              {
+                "config": {
+                  "name": null
+                },
+                "function": "stddev(files_changed)"
+              }
+            ],
+            "sort": [],
+            "visualization": "bar",
+            "visualization_config": null
+          },
+          "timerange": null,
+          "query": {
+            "type": "elasticsearch",
+            "query_string": ""
+          },
+          "streams": []
+        }
+      ],
+      "widget_mapping": {
+        "da99bfc5-6542-4b4d-b2eb-cf7b2dfca981": [
+          "68083979-98b6-4714-802a-f632b8a85b12"
+        ]
+      },
+      "positions": {
+        "da99bfc5-6542-4b4d-b2eb-cf7b2dfca981": {
+          "col": 1,
+          "row": 1,
+          "height": 4,
+          "width": "Infinity"
+        }
+      }
+    },
     "f0a1f93c-8400-40de-83ac-94149dbf447c": {
       "selected_fields": [
         "source",
