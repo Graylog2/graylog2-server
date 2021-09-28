@@ -18,16 +18,16 @@ import isDeepEqual from 'stores/isDeepEqual';
 import { QueriesActions } from 'views/stores/QueriesStore';
 import { ViewHook } from 'views/logic/hooks/ViewHook';
 import View from 'views/logic/views/View';
-import normalizeSearchURLQueryParams, { RawQuery } from 'views/logic/NormalizeSearchURLQueryParmas';
+import normalizeSearchURLQueryParams, { RawQuery } from 'views/logic/NormalizeSearchURLQueryParams';
 
 const bindSearchParamsFromQuery: ViewHook = ({ query, view }: {query: RawQuery, view: View }) => {
   if (view.type !== View.Type.Search) {
     return Promise.resolve(true);
   }
 
-  const { queryString, timeRange, streams } = normalizeSearchURLQueryParams(query);
+  const { queryString, timeRange, streamsFilter } = normalizeSearchURLQueryParams(query);
 
-  if (!queryString && !timeRange && !streams) {
+  if (!queryString && !timeRange && !streamsFilter) {
     return Promise.resolve(true);
   }
 
@@ -48,8 +48,8 @@ const bindSearchParamsFromQuery: ViewHook = ({ query, view }: {query: RawQuery, 
     queryBuilder = queryBuilder.timerange(timeRange);
   }
 
-  if (streams) {
-    queryBuilder = queryBuilder.filter(streams);
+  if (streamsFilter) {
+    queryBuilder = queryBuilder.filter(streamsFilter);
   }
 
   const newQuery = queryBuilder.build();

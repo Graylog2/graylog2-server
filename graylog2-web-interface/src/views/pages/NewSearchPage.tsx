@@ -21,7 +21,7 @@ import type { Location } from 'routing/withLocation';
 import { Spinner } from 'components/common';
 import useLoadView from 'views/logic/views/UseLoadView';
 import useCreateSavedSearch from 'views/logic/views/UseCreateSavedSearch';
-import normalizeSearchURLQueryParams, { RawQuery } from 'views/logic/NormalizeSearchURLQueryParmas';
+import normalizeSearchURLQueryParams, { RawQuery } from 'views/logic/NormalizeSearchURLQueryParams';
 
 import SearchPage from './SearchPage';
 

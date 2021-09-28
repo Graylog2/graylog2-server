@@ -58,7 +58,7 @@ type StreamsQuery = {
   streams?: string,
 };
 
-export type RawQuery = RawTimeRange & StreamsQuery & { q?: string };
+export type RawQuery = Partial<RawTimeRange> & StreamsQuery & { q?: string };
 
 const _getRange = (query): RawTimeRange => {
   const rangetype = query.rangetype || DEFAULT_RANGE_TYPE;
@@ -124,18 +124,18 @@ const normalizeStreams = (query: StreamsQuery = {}): Array<string> => {
 
 type NormalizedSearchURLQueryParams = {
   timeRange: TimeRange | undefined,
-  streams: FilterType | undefined,
+  streamsFilter: FilterType | undefined,
   queryString: ElasticsearchQueryString | undefined
 }
 
 const normalizeSearchURLQueryParams = (query: RawQuery): NormalizedSearchURLQueryParams => {
   const { q: queryString } = query ?? {};
   const timeRange = normalizeTimeRange(query);
-  const streams = filtersForQuery(normalizeStreams(query));
+  const streamsFilter = filtersForQuery(normalizeStreams(query));
 
   return {
     timeRange,
-    streams,
+    streamsFilter,
     queryString: queryString ? createElasticsearchQueryString(queryString) : undefined,
   };
 };
