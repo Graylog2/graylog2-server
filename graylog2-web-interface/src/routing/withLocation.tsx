@@ -21,10 +21,10 @@ import { Subtract } from 'utility-types';
 
 import useQuery from './useQuery';
 
-export type Location = {
-  query: {
-    [key: string]: unknown | null | undefined;
-  };
+export type Location<
+  Query = { [key: string]: unknown | null | undefined; }
+> = {
+  query: Query;
   pathname: string;
   search: string;
 };
