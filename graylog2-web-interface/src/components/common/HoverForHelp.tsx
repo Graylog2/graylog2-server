@@ -41,10 +41,10 @@ const StyledPopover = styled(Popover)(({ theme }) => `
 
 type Props = {
   children: React.ReactNode,
-  className: string,
+  className?: string,
   id?: string,
-  placement: 'top' | 'right' | 'bottom' | 'left',
-  pullRight: boolean,
+  placement?: 'top' | 'right' | 'bottom' | 'left',
+  pullRight?: boolean,
   title: string,
 };
 
