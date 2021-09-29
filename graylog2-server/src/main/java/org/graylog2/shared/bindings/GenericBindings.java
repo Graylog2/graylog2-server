@@ -31,6 +31,7 @@ import org.graylog.failure.DefaultFailureHandlingConfiguration;
 import org.graylog.failure.FailureHandler;
 import org.graylog.failure.FailureHandlingConfiguration;
 import org.graylog.failure.FailureHandlingService;
+import org.graylog2.cluster.LeaderElectionService;
 import org.graylog2.indexer.EventIndexTemplateProvider;
 import org.graylog2.indexer.IndexTemplateProvider;
 import org.graylog2.indexer.MessageIndexTemplateProvider;
@@ -103,6 +104,7 @@ public class GenericBindings extends Graylog2Module {
                 .to(EventIndexTemplateProvider.class);
 
         serviceBinder().addBinding().to(FailureHandlingService.class).in(Scopes.SINGLETON);
+        serviceBinder().addBinding().to(LeaderElectionService.class).in(Scopes.SINGLETON);
     }
 
 }
