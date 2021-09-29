@@ -183,15 +183,7 @@ export class Builder {
     this.body = { body, mimeType: 'text/plain' };
     this.accept = 'application/json';
 
-    this.responseHandler = (resp) => {
-      if (resp.ok) {
-        reportServerSuccess();
-
-        return resp.json();
-      }
-
-      throw resp;
-    };
+    this.responseHandler = defaultResponseHandler;
 
     this.errorHandler = (error) => onServerError(error, onUnauthorized);
 
