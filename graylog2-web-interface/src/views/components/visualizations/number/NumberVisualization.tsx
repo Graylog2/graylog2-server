@@ -38,7 +38,7 @@ import type { CurrentViewType } from '../../CustomPropTypes';
 const GridContainer = styled.div`
   display: grid;
   grid-template-columns: 1fr;
-  grid-template-rows: 4fr 1fr;
+  grid-template-rows: 1fr auto;
   grid-column-gap: 0;
   grid-row-gap: 0;
   height: 100%;
@@ -89,7 +89,7 @@ const _extractValueAndField = (rows: Rows) => {
 };
 
 type Props = {
-  currentView: CurrentViewType,
+  currentView: CurrentViewType;
 } & VisualizationComponentProps;
 
 const _extractFirstSeriesName = (config) => {
