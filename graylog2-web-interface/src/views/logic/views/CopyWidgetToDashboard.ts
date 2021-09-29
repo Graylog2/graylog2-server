@@ -52,7 +52,7 @@ const _newTitlesMap = (titlesMap, widget, title) => {
 };
 
 const _addWidgetToDashboard = (widget: Widget, dashboard: View, oldPosition: WidgetPosition, title: string | undefined | null): View => {
-  const dashboardQueryId = dashboard.state.keySeq().first();
+  const dashboardQueryId = dashboard.search.queries.first().id;
   const viewState = dashboard.state.get(dashboardQueryId);
   const widgets = viewState.widgets.push(widget);
 
