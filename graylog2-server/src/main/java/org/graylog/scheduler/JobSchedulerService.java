@@ -135,6 +135,10 @@ public class JobSchedulerService extends AbstractExecutionThreadService {
         executionThread.interrupt();
     }
 
+    public void updateLockedJobs() {
+        jobExecutionEngine.updateLockedJobs();
+    }
+
     /**
      * This class provides a sleep method that can be interrupted without interrupting threads.
      * The same could be achieved by using a {@link CountDownLatch} but that one cannot be reused and we would need

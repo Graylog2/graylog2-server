@@ -750,7 +750,7 @@ public class DBJobTriggerServiceTest {
     }
 
     @Test
-    @MongoDBFixtures("stale-job-trigger.json")
+    @MongoDBFixtures("stale-job-triggers-with-expired-lock.json")
     public void nextStaleTrigger() {
         final JobSchedulerTestClock clock = new JobSchedulerTestClock(DateTime.parse("2019-01-01T02:00:00.000Z"));
         final DBJobTriggerService service = new DBJobTriggerService(mongodb.mongoConnection(), mapperProvider, nodeId, clock, nodeService, 5);
@@ -761,4 +761,19 @@ public class DBJobTriggerServiceTest {
                 .satisfies(trigger -> assertThat(trigger.id()).isEqualTo("54e3deadbeefdeadbeef0002"));
     }
 
+    @Test
+    @MongoDBFixtures("locked-job-triggers.json")
+    public void updateLockedJobTriggers() {
+        DateTime newLockTime = DateTime.parse("2019-01-01T02:00:00.000Z");
+        final JobSchedulerTestClock clock = new JobSchedulerTestClock(newLockTime);
+        final DBJobTriggerService service = new DBJobTriggerService(mongodb.mongoConnection(), mapperProvider, nodeId, clock, nodeService, 5);
+
+        service.updateLockedJobTriggers();
+
+        List<String> updatedJobTriggerIds = service.all().stream()
+                .filter(jobTriggerDto -> newLockTime.equals(jobTriggerDto.lock().lastLockTime()))
+                .map(JobTriggerDto::id)
+                .collect(Collectors.toList());
+        assertThat(updatedJobTriggerIds).containsOnly("54e3deadbeefdeadbeef0001", "54e3deadbeefdeadbeef0002");
+    }
 }

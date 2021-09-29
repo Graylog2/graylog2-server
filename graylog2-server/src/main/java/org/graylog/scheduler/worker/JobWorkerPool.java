@@ -54,6 +54,7 @@ public class JobWorkerPool implements GracefulShutdownHook {
     private static final Pattern NAME_PATTERN = Pattern.compile("[a-zA-Z0-9\\-]+");
 
     private final GracefulShutdownService gracefulShutdownService;
+    private final int poolSize;
     private final ExecutorService executor;
     private final Semaphore slots;
 
@@ -64,6 +65,7 @@ public class JobWorkerPool implements GracefulShutdownHook {
                          GracefulShutdownService gracefulShutdownService,
                          MetricRegistry metricRegistry) {
         this.gracefulShutdownService = gracefulShutdownService;
+        this.poolSize = poolSize;
         checkArgument(NAME_PATTERN.matcher(name).matches(), "Pool name must match %s", NAME_PATTERN);
 
         this.executor = buildExecutor(name, poolSize, metricRegistry);
@@ -89,6 +91,15 @@ public class JobWorkerPool implements GracefulShutdownHook {
      */
     public boolean hasFreeSlots() {
         return freeSlots() > 0;
+    }
+
+    /**
+     * Checks if there are any slots used in the worker pool
+     *
+     * @return true if there are slots used, false otherwise
+     */
+    public boolean anySlotsUsed() {
+        return poolSize != freeSlots();
     }
 
     /**

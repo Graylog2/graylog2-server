@@ -40,6 +40,7 @@ public class JobWorkerPoolTest {
 
         // Before we do anything, the number of free slots should be the same as the pool size
         assertThat(pool.freeSlots()).isEqualTo(2);
+        assertThat(pool.anySlotsUsed()).isFalse();
 
         // Execute the first task
         assertThat(pool.execute(() -> {
@@ -49,6 +50,7 @@ public class JobWorkerPoolTest {
 
         // The number of free slots should be reduced by one
         assertThat(pool.freeSlots()).isEqualTo(1);
+        assertThat(pool.anySlotsUsed()).isTrue();
 
         // Execute the second task
         assertThat(pool.execute(() -> {
@@ -70,6 +72,7 @@ public class JobWorkerPoolTest {
         // Wait for the second task to finish
         task2Latch.countDown();
         assertThat(latch2.await(60, TimeUnit.SECONDS)).isTrue();
+        assertThat(pool.anySlotsUsed()).isFalse();
 
         pool.shutdown();
         pool.awaitTermination(30, TimeUnit.SECONDS);

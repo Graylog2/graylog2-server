@@ -299,25 +299,24 @@ public class DBJobTriggerService {
     public Optional<JobTriggerDto> nextRunnableTrigger() {
         final DateTime now = clock.nowUTC();
 
-        // TODO extract threshold to graylog.conf?
         final DBQuery.Query query = DBQuery.or(DBQuery.and(
-                // We cannot lock a trigger that is already locked by another node
-                DBQuery.is(FIELD_LOCK_OWNER, null),
-                DBQuery.is(FIELD_STATUS, JobTriggerStatus.RUNNABLE),
-                DBQuery.lessThanEquals(FIELD_START_TIME, now),
-                DBQuery.or( // Skip triggers that have an endTime which is due
-                        DBQuery.notExists(FIELD_END_TIME),
-                        DBQuery.is(FIELD_END_TIME, null),
-                        DBQuery.greaterThan(FIELD_END_TIME, Optional.of(now))
-                ),
-                // TODO: Using the wall clock time here can be problematic if the node time is off
-                //       The scheduler should not lock any new triggers if it detects that its clock is wrong
-                DBQuery.lessThanEquals(FIELD_NEXT_TIME, now)
+                        // We cannot lock a trigger that is already locked by another node
+                        DBQuery.is(FIELD_LOCK_OWNER, null),
+                        DBQuery.is(FIELD_STATUS, JobTriggerStatus.RUNNABLE),
+                        DBQuery.lessThanEquals(FIELD_START_TIME, now),
+                        DBQuery.or( // Skip triggers that have an endTime which is due
+                                DBQuery.notExists(FIELD_END_TIME),
+                                DBQuery.is(FIELD_END_TIME, null),
+                                DBQuery.greaterThan(FIELD_END_TIME, Optional.of(now))
+                        ),
+                        // TODO: Using the wall clock time here can be problematic if the node time is off
+                        //       The scheduler should not lock any new triggers if it detects that its clock is wrong
+                        DBQuery.lessThanEquals(FIELD_NEXT_TIME, now)
                 ), DBQuery.and(
-                DBQuery.notEquals(FIELD_LOCK_OWNER, null),
-                DBQuery.notIn(FIELD_LOCK_OWNER, nodeService.allActive().keySet()),
-                DBQuery.is(FIELD_STATUS, JobTriggerStatus.RUNNING),
-                DBQuery.lessThan(FIELD_LAST_LOCK_TIME, now.minusMinutes(lockExpirationTimeMinutes)))
+                        DBQuery.notEquals(FIELD_LOCK_OWNER, null),
+                        DBQuery.notIn(FIELD_LOCK_OWNER, nodeService.allActive().keySet()),
+                        DBQuery.is(FIELD_STATUS, JobTriggerStatus.RUNNING),
+                        DBQuery.lessThan(FIELD_LAST_LOCK_TIME, now.minusMinutes(lockExpirationTimeMinutes)))
         );
         // We want to lock the trigger with the oldest next time
         final DBSort.SortBuilder sort = DBSort.asc(FIELD_NEXT_TIME);
@@ -432,5 +431,15 @@ public class DBJobTriggerService {
 
     private ObjectId getId(JobTriggerDto trigger) {
         return new ObjectId(requireNonNull(trigger.id(), "trigger ID cannot be null"));
+    }
+
+    public void updateLockedJobTriggers() {
+        final DateTime now = clock.nowUTC();
+        DBQuery.Query query = DBQuery.and(
+                DBQuery.is(FIELD_LOCK_OWNER, nodeId),
+                DBQuery.is(FIELD_STATUS, JobTriggerStatus.RUNNING)
+        );
+        DBUpdate.Builder update = DBUpdate.set(FIELD_LAST_LOCK_TIME, now);
+        db.updateMulti(query, update);
     }
 }

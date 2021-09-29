@@ -53,7 +53,9 @@
       "status": "running",
       "lock": {
         "owner": "node-1",
-        "last_lock_time": "2019-01-01T00:00:00.000Z",
+        "last_lock_time": {
+          "$date": "2019-01-01T00:00:00.000Z"
+        },
         "clock": 0,
         "progress": 0
       },
@@ -91,9 +93,9 @@
       },
       "status": "running",
       "lock": {
-        "owner": "node-2",
+        "owner": "node-1",
         "last_lock_time": {
-          "$date": "2019-01-01T00:01:00.000Z"
+          "$date": "2019-01-01T00:00:00.000Z"
         },
         "clock": 5,
         "progress": 80
@@ -134,7 +136,7 @@
       "lock": {
         "owner": "node-2",
         "last_lock_time": {
-          "$date": "2019-01-01T01:59:01.000Z"
+          "$date": "2019-01-01T00:00:00.000Z"
         },
         "clock": 5,
         "progress": 80
