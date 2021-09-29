@@ -33,7 +33,7 @@ describe('RuntimeErrorPage', () => {
   });
 
   it('displays component stack', async () => {
-    const { getByText, queryByText } = render(<SimpleRuntimeErrorPage />);
+    const { getByText, queryByText, findByText } = render(<SimpleRuntimeErrorPage />);
 
     expect(getByText('Something went wrong.')).not.toBeNull();
     expect(queryByText('The component stack')).toBeNull();
@@ -42,6 +42,6 @@ describe('RuntimeErrorPage', () => {
 
     fireEvent.click(showMoreButton);
 
-    await waitFor(() => expect(getByText(/The component stack/)).not.toBeNull());
+    await findByText(/The component stack/);
   });
 });

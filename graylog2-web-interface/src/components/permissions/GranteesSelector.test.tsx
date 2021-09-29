@@ -22,7 +22,7 @@ import GranteesSelector from './GranteesSelector';
 
 describe('GranteesSelector', () => {
   it('shows validation error', async () => {
-    const { getByText } = render(
+    const { getByText, findByText } = render(
       <GranteesSelector availableGrantees={availableGrantees}
                         availableCapabilities={availableCapabilities}
                         onSubmit={() => Promise.resolve(mockEntityShareState)} />,
@@ -32,6 +32,6 @@ describe('GranteesSelector', () => {
 
     fireEvent.click(submitButton);
 
-    await waitFor(() => expect(getByText('The grantee is required.')).not.toBeNull());
+    await findByText('The grantee is required.');
   });
 });
