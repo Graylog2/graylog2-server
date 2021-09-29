@@ -1,11 +1,9 @@
 /* eslint-disable no-console */
-// import * as ts from 'typescript';
+import * as fs from 'fs';
+import { dirname } from 'path';
 
-const fs = require('fs');
-const { dirname } = require('path');
-
-const { chunk } = require('lodash');
-const ts = require('typescript');
+import * as ts from 'typescript';
+import { chunk } from 'lodash';
 
 const REQUEST_FUNCTION_NAME = '__request__';
 const REQUEST_FUNCTION_IMPORT = 'routing/request';
@@ -81,6 +79,7 @@ const createIndexerSignature = (additionalProperties) => (additionalProperties ?
     ts.factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
     undefined,
   )],
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
   createTypeFor(wrapAdditionalProperties(additionalProperties)),
 )] : []);
 
@@ -192,7 +191,7 @@ const createTemplateString = (path) => {
   const spans = chunks.flatMap(([variable, text], index) => {
     const isLastChunk = index === chunks.length - 1;
     const identifier = ts.factory.createIdentifier(extractVariable(variable));
-    const literalText = text || '';
+    const literalText = text as string || '';
     const literal = isLastChunk ? ts.factory.createTemplateTail(literalText) : ts.factory.createTemplateMiddle(literalText);
 
     return ts.factory.createTemplateSpan(identifier, literal);
@@ -375,7 +374,7 @@ apiSummary.apis.forEach(({ path, name: rawName }) => {
   const api = JSON.parse(apiJson);
 
   const models = Object.entries(api.models)
-    .filter(isNotBannedModel)
+    .filter(([n]) => isNotBannedModel([n]))
     .map(createModel);
   const apiObject = createApiObject(api);
 
