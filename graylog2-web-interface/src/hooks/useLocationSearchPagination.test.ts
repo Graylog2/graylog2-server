@@ -18,6 +18,7 @@ import { renderHook, act } from '@testing-library/react-hooks';
 import { useLocation } from 'react-router-dom';
 import { stringify } from 'qs';
 import { asMock } from 'helpers/mocking';
+import type { Location } from 'history';
 
 import useLocationSearchPagination from './useLocationSearchPagination';
 
@@ -51,7 +52,7 @@ describe('useLocationSearchPagination custom hook', () => {
 
     asMock(useLocation).mockReturnValue({
       search: stringify(currentPage),
-    });
+    } as Location<{ search: string }>);
 
     const { result } = renderHook(() => useLocationSearchPagination(DEFAULT_PAGINATION));
 
@@ -85,7 +86,7 @@ describe('useLocationSearchPagination custom hook', () => {
   `('uses default values when $param is $description', ({ param, value, expectedReturn }) => {
     asMock(useLocation).mockReturnValue({
       search: stringify({ ...DEFAULT_PAGINATION, [param]: value }),
-    });
+    } as Location<{ search: string }>);
 
     const { result } = renderHook(() => useLocationSearchPagination(DEFAULT_PAGINATION));
 

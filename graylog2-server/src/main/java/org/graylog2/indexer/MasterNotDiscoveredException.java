@@ -14,17 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+package org.graylog2.indexer;
 
-import { Center } from 'components/common';
-import Spinner from 'components/common/Spinner';
-
-const LoadingWidget = () => (
-  <Center>
-    <Spinner data-testid="loading-widget" />
-  </Center>
-);
-
-LoadingWidget.propTypes = {};
-
-export default LoadingWidget;
+public class MasterNotDiscoveredException extends ElasticsearchException {
+    public MasterNotDiscoveredException() {
+        super("Cluster has not elected a master.");
+    }
+}

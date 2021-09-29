@@ -1,0 +1,149 @@
+{
+  "id": "5d03952f7aafdc6c1cdc014c",
+  "type": "DASHBOARD",
+  "title": "GIT data 5",
+  "summary": "",
+  "description": "",
+  "search_id": "5d9b51d6af140aba42e87469",
+  "properties": [],
+  "state": {
+    "595447e8-50f8-48a9-a99c-078aa5b1f6f4": {
+      "selected_fields": [
+        "source",
+        "message"
+      ],
+      "formatting": {
+        "highlighting": []
+      },
+      "titles": {
+        "widget": {
+          "da99bfc5-6542-4b4d-b2eb-cf7b2dfca981": "Aggregating stddev(files_changed)"
+        }
+      },
+      "widgets": [
+        {
+          "id": "da99bfc5-6542-4b4d-b2eb-cf7b2dfca981",
+          "type": "aggregation",
+          "config": {
+            "column_pivots": [],
+            "formatting_settings": {
+              "chart_colors": {
+                "stddev(files_changed)": "#8bc34a"
+              }
+            },
+            "rollup": true,
+            "row_pivots": [
+              {
+                "field": "author",
+                "type": "values",
+                "config": {
+                  "limit": 15
+                }
+              }
+            ],
+            "series": [
+              {
+                "config": {
+                  "name": null
+                },
+                "function": "stddev(files_changed)"
+              }
+            ],
+            "sort": [],
+            "visualization": "bar",
+            "visualization_config": null
+          },
+          "timerange": null,
+          "query": {
+            "type": "elasticsearch",
+            "query_string": ""
+          },
+          "streams": []
+        }
+      ],
+      "widget_mapping": {
+        "da99bfc5-6542-4b4d-b2eb-cf7b2dfca981": [
+          "68083979-98b6-4714-802a-f632b8a85b12"
+        ]
+      },
+      "positions": {
+        "da99bfc5-6542-4b4d-b2eb-cf7b2dfca981": {
+          "col": 1,
+          "row": 1,
+          "height": 4,
+          "width": "Infinity"
+        }
+      }
+    },
+    "f0a1f93c-8400-40de-83ac-94149dbf447c": {
+      "selected_fields": [
+        "source",
+        "message"
+      ],
+      "formatting": {
+        "highlighting": []
+      },
+      "titles": {
+        "widget": {
+          "a8058a41-34ea-4846-83d0-1acc2fbc1d7f": "Aggregating stddev(files_changed) by author (copy)"
+        }
+      },
+      "widgets": [
+        {
+          "id": "a8058a41-34ea-4846-83d0-1acc2fbc1d7f",
+          "type": "aggregation",
+          "config": {
+            "column_pivots": [],
+            "formatting_settings": {
+              "chart_colors": {
+                "stddev(files_changed)": "#8bc34a"
+              }
+            },
+            "rollup": true,
+            "row_pivots": [
+              {
+                "field": "author",
+                "type": "values",
+                "config": {
+                  "limit": 15
+                }
+              }
+            ],
+            "series": [
+              {
+                "config": {
+                  "name": null
+                },
+                "function": "stddev(files_changed)"
+              }
+            ],
+            "sort": [],
+            "visualization": "bar",
+            "visualization_config": null
+          },
+          "timerange": null,
+          "query": {
+            "type": "elasticsearch",
+            "query_string": ""
+          },
+          "streams": []
+        }
+      ],
+      "widget_mapping": {
+        "a8058a41-34ea-4846-83d0-1acc2fbc1d7f": [
+          "76414720-2191-4fa3-8037-074facf16a56"
+        ]
+      },
+      "positions": {
+        "a8058a41-34ea-4846-83d0-1acc2fbc1d7f": {
+          "col": 1,
+          "row": 1,
+          "height": 4,
+          "width": "Infinity"
+        }
+      }
+    }
+  },
+  "created_at": "2019-06-14T09:48:10.550Z",
+  "owner": "admin"
+}

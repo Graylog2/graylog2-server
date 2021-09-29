@@ -14,23 +14,32 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
+import styled from 'styled-components';
 
-import AppRouter from 'routing/AppRouter';
-import ThemeAndUserProvider from 'contexts/ThemeAndUserProvider';
-import StreamsProvider from 'contexts/StreamsProvider';
-import DefaultQueryClientProvider from 'contexts/DefaultQueryClientProvider';
+const Container = styled.div<{ $fullHeight: boolean }>(({ $fullHeight }) => `
+  display: flex;
+  height: ${$fullHeight ? '100%' : 'auto'};
+  justify-content: center;
+  align-items: center;
+`);
 
-const LoggedInPage = () => {
-  return (
-    <DefaultQueryClientProvider>
-      <ThemeAndUserProvider>
-        <StreamsProvider>
-          <AppRouter />
-        </StreamsProvider>
-      </ThemeAndUserProvider>
-    </DefaultQueryClientProvider>
-  );
+type Props = {
+  children: React.ReactNode,
+  fullHeight?: boolean,
 };
 
-export default LoggedInPage;
+/**
+ * This component centers its children horizontally and vertically.
+ */
+const Center = ({ children, fullHeight }: Props) => (
+  <Container $fullHeight={fullHeight}>
+    {children}
+  </Container>
+);
+
+Center.defaultProps = {
+  fullHeight: true,
+};
+
+export default Center;

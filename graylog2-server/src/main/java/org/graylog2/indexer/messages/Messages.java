@@ -30,6 +30,7 @@ import com.google.common.collect.Sets;
 import org.graylog.failure.FailureSubmissionService;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.InvalidWriteTargetException;
+import org.graylog2.indexer.MasterNotDiscoveredException;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.plugin.Message;
 import org.graylog2.shared.utilities.ExceptionUtils;
@@ -75,7 +76,9 @@ public class Messages {
     @SuppressWarnings("UnstableApiUsage")
     private RetryerBuilder<List<IndexingError>> createBulkRequestRetryerBuilder() {
         return RetryerBuilder.<List<IndexingError>>newBuilder()
-                .retryIfException(t -> ExceptionUtils.hasCauseOf(t, IOException.class) || t instanceof InvalidWriteTargetException)
+                .retryIfException(t -> ExceptionUtils.hasCauseOf(t, IOException.class)
+                        || t instanceof InvalidWriteTargetException
+                        || t instanceof MasterNotDiscoveredException)
                 .withWaitStrategy(WaitStrategies.exponentialWait(MAX_WAIT_TIME.getQuantity(), MAX_WAIT_TIME.getUnit()))
                 .withRetryListener(new RetryListener() {
                     @Override

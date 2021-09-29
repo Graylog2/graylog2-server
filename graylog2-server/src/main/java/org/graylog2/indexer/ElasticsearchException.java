@@ -30,11 +30,6 @@ import java.util.List;
 public class ElasticsearchException extends RuntimeException {
     private final List<String> errorDetails;
 
-    public ElasticsearchException() {
-        super();
-        this.errorDetails = Collections.emptyList();
-    }
-
     public ElasticsearchException(String message) {
         super(message);
         this.errorDetails = Collections.emptyList();

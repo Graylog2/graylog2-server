@@ -15,23 +15,23 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { mount } from 'wrappedEnzyme';
-import ClipboardJS from 'clipboard';
 
-import ClipboardButton from './ClipboardButton';
+import AppRouter from 'routing/AppRouter';
+import ThemeAndUserProvider from 'contexts/ThemeAndUserProvider';
+import StreamsProvider from 'contexts/StreamsProvider';
+import GlobalContextProviders from 'contexts/GlobalContextProviders';
+import DefaultQueryClientProvider from 'contexts/DefaultQueryClientProvider';
 
-jest.mock('clipboard');
+const LoggedInPage = () => (
+  <DefaultQueryClientProvider>
+    <ThemeAndUserProvider>
+      <GlobalContextProviders>
+        <StreamsProvider>
+          <AppRouter />
+        </StreamsProvider>
+      </GlobalContextProviders>
+    </ThemeAndUserProvider>
+  </DefaultQueryClientProvider>
+);
 
-describe('ClipboardButton', () => {
-  it('does not pass container option to clipboard.js if not specified', () => {
-    mount(<ClipboardButton title="Copy" />);
-
-    expect(ClipboardJS).toHaveBeenCalledWith('[data-gl-clipboard-button]', {});
-  });
-
-  it('uses `container` prop to pass as an option to clipboard.js', () => {
-    mount(<ClipboardButton title="Copy" container={42} />);
-
-    expect(ClipboardJS).toHaveBeenCalledWith('[data-gl-clipboard-button]', { container: 42 });
-  });
-});
+export default LoggedInPage;
