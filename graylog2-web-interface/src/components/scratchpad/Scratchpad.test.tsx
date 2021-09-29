@@ -21,7 +21,7 @@ import { act } from 'react-dom/test-utils';
 
 import { ScratchpadContext } from 'contexts/ScratchpadProvider';
 
-import Scratchpad from './index';
+import Scratchpad from './Scratchpad';
 
 const setScratchpadVisibility = jest.fn();
 
