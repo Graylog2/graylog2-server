@@ -46,16 +46,18 @@ type Props = {
   placement?: 'top' | 'right' | 'bottom' | 'left',
   pullRight?: boolean,
   title: string,
+  testId?: string,
 };
 
-const HoverForHelp = ({ children, className, title, id, pullRight, placement }: Props) => (
+const HoverForHelp = ({ children, className, title, id, pullRight, placement, testId }: Props) => (
   <OverlayTrigger trigger={['hover', 'focus']}
                   placement={placement}
                   overlay={(
                     <StyledPopover title={title} id={id}>
                       {children}
                     </StyledPopover>
-                  )}>
+                  )}
+                  testId={testId}>
     <Icon className={`${className} ${pullRight ? 'pull-right' : ''}`} name="question-circle" />
   </OverlayTrigger>
 );
@@ -67,6 +69,7 @@ HoverForHelp.propTypes = {
   placement: PropTypes.oneOf(['top', 'right', 'bottom', 'left']),
   pullRight: PropTypes.bool,
   title: PropTypes.string.isRequired,
+  testId: PropTypes.string,
 };
 
 HoverForHelp.defaultProps = {
@@ -74,6 +77,7 @@ HoverForHelp.defaultProps = {
   className: '',
   pullRight: true,
   placement: 'bottom',
+  testId: undefined,
 };
 
 export default HoverForHelp;

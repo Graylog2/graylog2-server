@@ -67,7 +67,7 @@ const ActionTitle = ({ action, handlerArgs }: { action: ActionDefinition, handle
       return (
         <>
           {action.title}
-          <StyledHoverForHelp title={title}>
+          <StyledHoverForHelp title={title} testId="menu-item-help">
             {description}
           </StyledHoverForHelp>
         </>
