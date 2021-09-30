@@ -91,10 +91,10 @@ class URLWhiteListFormModal extends React.Component<Props, State> {
     const { newUrlEntry } = this.props;
     const urlwhitelistConfig = this._getConfig(URL_WHITELIST_CONFIG);
 
-    if (urlwhitelistConfig && entries.length === 0) {
-      this._setDefaultWhiteListState(urlwhitelistConfig);
-    } else if (prevProps.newUrlEntry !== newUrlEntry) {
-      this._setDefaultWhiteListState({ entries: [], disabled: false });
+    if (urlwhitelistConfig) {
+      if (entries.length === 0 || prevProps.newUrlEntry !== newUrlEntry) {
+        this._setDefaultWhiteListState(urlwhitelistConfig);
+      }
     }
   }
 
@@ -197,7 +197,7 @@ export default connect(URLWhiteListFormModal,
     currentUser: CurrentUserStore as Store<CurrentUserStoreState>,
   },
   ({ configurations, currentUser, ...otherProps }) => ({
-    ...configurations,
+    configuration: configurations?.configuration ?? {},
     ...currentUser,
     ...otherProps,
   }));
