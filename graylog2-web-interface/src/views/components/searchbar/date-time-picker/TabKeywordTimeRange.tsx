@@ -60,7 +60,7 @@ type Props = {
 const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: Props) => {
   const [nextRangeProps, , nextRangeHelpers] = useField('nextTimeRange');
   const mounted = useRef(true);
-  const keywordRef = useRef();
+  const keywordRef = useRef<string>();
   const [keywordPreview, setKeywordPreview] = useState({ from: '', to: '', timezone: '' });
 
   const _setSuccessfullPreview = useCallback((response: { from: string, to: string, timezone: string }) => {
@@ -81,15 +81,21 @@ const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: P
       return undefined;
     }
 
-    setValidatingKeyword(true);
+    if (keywordRef.current !== keyword) {
+      keywordRef.current = keyword;
 
-    return trim(keyword) === ''
-      ? Promise.resolve('Keyword must not be empty!')
-      : ToolsStore.testNaturalDate(keyword)
-        .then((response) => {
-          if (mounted.current) _setSuccessfullPreview(response);
-        })
-        .catch(_setFailedPreview);
+      setValidatingKeyword(true);
+
+      return trim(keyword) === ''
+        ? Promise.resolve('Keyword must not be empty!')
+        : ToolsStore.testNaturalDate(keyword)
+          .then((response) => {
+            if (mounted.current) _setSuccessfullPreview(response);
+          })
+          .catch(_setFailedPreview);
+    }
+
+    return undefined;
   }, [_setFailedPreview, _setSuccessfullPreview, setValidatingKeyword]);
 
   useEffect(() => {
@@ -99,12 +105,8 @@ const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: P
   }, []);
 
   useEffect(() => {
-    if (keywordRef.current !== nextRangeProps?.value?.keyword) {
-      keywordRef.current = nextRangeProps.value.keyword;
-
-      _validateKeyword(keywordRef.current);
-    }
-  });
+    _validateKeyword(keywordRef.current);
+  }, [_validateKeyword]);
 
   useEffect(() => {
     if (nextRangeProps?.value) {
@@ -124,7 +126,7 @@ const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: P
   return (
     <Row className="no-bm">
       <Col sm={5}>
-        <Field name="nextTimeRange.keyword">
+        <Field name="nextTimeRange.keyword" validate={_validateKeyword}>
           {({ field: { name, value, onChange }, meta: { error } }) => (
             <FormGroup controlId="form-inline-keyword"
                        style={{ marginRight: 5, width: '100%', marginBottom: 0 }}
