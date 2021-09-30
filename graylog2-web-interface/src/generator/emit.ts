@@ -149,12 +149,14 @@ const emitBlock = (method: string, path: any, bodyParameter: Parameter, queryPar
 const isNumeric = (type: string) => ['integer', 'number'].includes(type);
 const isBoolean = (type: string) => ['boolean'].includes(type);
 
-const emitInitializer = (type: string, defaultValue: string) => {
-  if (isNumeric(type)) {
+const emitInitializer = (type: Type, defaultValue: string) => {
+  const typeName = 'name' in type ? type.name : undefined;
+
+  if (typeName && isNumeric(typeName)) {
     return ts.factory.createNumericLiteral(defaultValue);
   }
 
-  if (isBoolean(type)) {
+  if (typeName && isBoolean(typeName)) {
     switch (defaultValue) {
       case 'true': return ts.factory.createTrue();
       case 'false': return ts.factory.createFalse();
@@ -165,7 +167,7 @@ const emitInitializer = (type: string, defaultValue: string) => {
   return emitString(defaultValue);
 };
 
-const sortByOptionality = (parameter1, parameter2) => parameter2.required - parameter1.required;
+const sortByOptionality = (parameter1: Parameter, parameter2: Parameter) => Number(parameter2.required) - Number(parameter1.required);
 
 const cleanParameterName = (name: string) => name.replace(/\s/g, '');
 
@@ -207,33 +209,15 @@ function emitType(type: Type) {
   return undefined;
 }
 
-const emitFunctionParameter = ({ name, required, type }: Parameter) => {
-  const { type: typeName } = type;
-
-  if (typeName === 'enum') {
-    const { defaultValue } = type;
-
-    return ts.factory.createParameterDeclaration(
-      undefined,
-      undefined,
-      undefined,
-      cleanParameterName(name),
-      (required || defaultValue) ? undefined : ts.factory.createToken(ts.SyntaxKind.QuestionToken),
-      emitType(type),
-      defaultValue ? emitInitializer(typeName, defaultValue as string) : undefined,
-    );
-  }
-
-  return ts.factory.createParameterDeclaration(
-    undefined,
-    undefined,
-    undefined,
-    cleanParameterName(name),
-    (required) ? undefined : ts.factory.createToken(ts.SyntaxKind.QuestionToken),
-    emitType(type),
-    undefined,
-  );
-};
+const emitFunctionParameter = ({ name, required, type, defaultValue }: Parameter) => ts.factory.createParameterDeclaration(
+  undefined,
+  undefined,
+  undefined,
+  cleanParameterName(name),
+  (required || defaultValue) ? undefined : ts.factory.createToken(ts.SyntaxKind.QuestionToken),
+  emitType(type),
+  defaultValue ? emitInitializer(type, defaultValue as string) : undefined,
+);
 
 const firstNonEmpty = (...strings) => strings.find((s) => (s !== undefined && s.trim() !== ''));
 

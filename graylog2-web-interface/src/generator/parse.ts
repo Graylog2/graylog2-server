@@ -23,33 +23,18 @@ const typeMappings = {
 };
 const isPrimitiveType = (type: RawType): type is PrimitiveType => ('type' in type && Object.keys(primitiveTypeMappings).includes(type.type));
 const mapPrimitiveType = (type: keyof typeof primitiveTypeMappings) => primitiveTypeMappings[type];
-const isEnumType = (type: PrimitiveType): type is PrimitiveEnumType<typeof type['type']> => ('enum' in type);
+const isEnumType = (type: RawType): type is EnumType => ('enum' in type && type.enum !== undefined);
 
 type Primitives = keyof typeof primitiveTypeMappings;
-type MapPrimitiveType<R extends Primitives> = R extends 'string'
-  ? string
-  : R extends 'String'
-    ? string
-    : R extends 'integer'
-      ? number
-      : R extends 'Integer'
-        ? number
-        : R extends 'long'
-          ? number
-          : R extends 'boolean'
-            ? boolean
-            : R extends 'DateTime'
-              ? string
-              : unknown;
 
 type PrimitiveType = {
   type: Primitives;
 };
 
-type PrimitiveEnumType<R extends Primitives> = {
-  type: R;
-  enum: Array<MapPrimitiveType<R>>;
-  defaultValue?: MapPrimitiveType<R>;
+type EnumType = {
+  type: Primitives;
+  enum: Array<string>;
+  defaultValue?: string;
 }
 
 type ArrayType = {
@@ -73,7 +58,7 @@ type ObjectType = {
   additionalProperties?: RawType;
 }
 
-type RawType = PrimitiveType | ArrayType | RefType | ObjectType;
+type RawType = PrimitiveType | EnumType | ArrayType | RefType | ObjectType;
 
 const isMappedType = (type: string): type is keyof typeof typeMappings => Object.keys(typeMappings).includes(type);
 const mapType = (type: keyof typeof typeMappings) => typeMappings[type];
@@ -88,16 +73,17 @@ const stripURN = (type) => {
 const isArrayType = (typeDef: RawType): typeDef is ArrayType => ('type' in typeDef && typeDef.type === 'array');
 const isObjectType = (typeDef: RawType): typeDef is ObjectType => ('type' in typeDef && typeDef.type === 'object');
 
-const createEnumType = <T extends Primitives>({ type, enum: enumOptions, defaultValue }: PrimitiveEnumType<T>) => {
-  const mappedPrimitiveType = mapPrimitiveType(type);
-  const options = defaultValue ? [...new Set(enumOptions).add(defaultValue)] : enumOptions;
+const createEnumType = (enumType: EnumType) => {
+  const { enum: options, defaultValue } = enumType;
+  const mappedPrimitiveType = mapPrimitiveType(enumType.type);
 
-  return {
+  const result = {
     type: 'enum',
     name: mappedPrimitiveType,
     options,
-    defaultValue,
   } as const;
+
+  return defaultValue !== undefined ? { ...result, defaultValue } : result;
 };
 
 function createTypeReference(name: string, optional: boolean = false) {
@@ -140,10 +126,12 @@ function createType(_typeDefinition: RawType): Type {
 
   const typeDefinition = { ..._typeDefinition, type };
 
+  if (isEnumType(typeDefinition)) {
+    return createEnumType(typeDefinition);
+  }
+
   if (isPrimitiveType(typeDefinition)) {
-    return isEnumType(typeDefinition)
-      ? createEnumType(typeDefinition)
-      : createTypeReference(mapPrimitiveType(typeDefinition.type));
+    return createTypeReference(mapPrimitiveType(typeDefinition.type));
   }
 
   if (isArrayType(typeDefinition)) {
@@ -202,17 +190,33 @@ type RawParameter = {
   description: string;
   paramType: 'path' | 'query' | 'body';
   type: string | RawType;
+  defaultValue?: string;
   required: boolean;
+  enum?: Array<string>,
 }
 
-function createParameter({ name, description, paramType, type, required }: RawParameter): Parameter {
-  return {
+function mergeValues(enumValues: Array<string>, defaultValue: string) {
+  if (enumValues === undefined || defaultValue === undefined) {
+    return enumValues;
+  }
+
+  return [...new Set(enumValues).add(defaultValue)];
+}
+
+function createParameter({ name, description, paramType, type, required, defaultValue, enum: enumValues }: RawParameter): Parameter {
+  let parameter: Parameter = {
     name,
     description,
     paramType,
     required,
-    type: createType(typeof type === 'string' ? { type } : type),
+    type: createType(typeof type === 'string' ? { type: type as Primitives, enum: mergeValues(enumValues, defaultValue), defaultValue } : type),
   };
+
+  if (defaultValue !== undefined) {
+    parameter = { ...parameter, defaultValue };
+  }
+
+  return parameter;
 }
 
 type RawContentType = 'application/json';
@@ -264,6 +268,16 @@ type RawApi = {
   apis: Array<RawRoute>;
 }
 
+export function parseApi(name: string, api: RawApi) {
+  const models = Object.fromEntries(
+    Object.entries(api.models)
+      .filter(([n]) => isNotBannedModel([n]))
+      .map(([n, model]) => [n, createModel(model)]),
+  );
+
+  return createApiObject(name, api, models);
+}
+
 export default function parse(srcDir: string): Array<Api> {
   const apiSummary = JSON.parse(fs.readFileSync(`${srcDir}/${apiFile}`).toString());
 
@@ -273,12 +287,6 @@ export default function parse(srcDir: string): Array<Api> {
     console.log(`Reading ${srcDir}${path}.json`);
     const api = JSON.parse(apiJson) as RawApi;
 
-    const models = Object.fromEntries(
-      Object.entries(api.models)
-        .filter(([n]) => isNotBannedModel([n]))
-        .map(([n, model]) => [n, createModel(model)]),
-    );
-
-    return createApiObject(name, api, models);
+    return parseApi(name, api);
   });
 }

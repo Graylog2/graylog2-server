@@ -6,7 +6,7 @@ export interface EnumType {
   type: 'enum';
   name: 'string' | 'number' | 'boolean' | 'unknown';
   options: Array<unknown>;
-  defaultValue: unknown;
+  defaultValue?: unknown;
 }
 export interface TypeLiteral {
   type: 'type_literal';
@@ -30,6 +30,7 @@ export interface Parameter {
   required: boolean;
   paramType: 'path' | 'query' | 'body';
   type: Type;
+  defaultValue?: string;
 }
 
 type ContentType = 'application/json';
