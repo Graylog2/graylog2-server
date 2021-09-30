@@ -11,4 +11,41 @@ describe('parse', () => {
 
     expect(result).toMatchSnapshot();
   });
+
+  it('parses arrays of referenced types', () => {
+    const api = {
+      models: {
+        InputStateSummaryArray: {
+          type: 'array',
+          id: 'InputStateSummaryArray',
+          properties: {},
+          items: {
+            $ref: 'InputStateSummary',
+          },
+        },
+      },
+      apis: [],
+    };
+
+    const result = parseApi('sample', api);
+
+    expect(result).toMatchInlineSnapshot(`
+Object {
+  "description": undefined,
+  "models": Object {
+    "InputStateSummaryArray": Object {
+      "id": "InputStateSummaryArray",
+      "items": Object {
+        "name": "InputStateSummary",
+        "optional": false,
+        "type": "type_reference",
+      },
+      "type": "array",
+    },
+  },
+  "name": "sample",
+  "routes": Array [],
+}
+`);
+  });
 });

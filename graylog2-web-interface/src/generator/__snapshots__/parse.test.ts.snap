@@ -40,16 +40,23 @@ Object {
       "type": "type_literal",
     },
     "PaginatedResponse": Object {
-      "additionalProperties": undefined,
+      "additionalProperties": Object {
+        "name": "unknown",
+        "optional": false,
+        "type": "type_reference",
+      },
       "id": undefined,
       "properties": Object {},
       "type": "type_literal",
     },
     "stringArray": Object {
-      "additionalProperties": undefined,
       "id": "stringArray",
-      "properties": Object {},
-      "type": "type_literal",
+      "items": Object {
+        "name": "string",
+        "optional": false,
+        "type": "type_reference",
+      },
+      "type": "array",
     },
   },
   "name": "sample",
