@@ -30,7 +30,7 @@ jobs:
         with:
           title: Fixing linter hints automatically
           body: This PR was created by a job that is running periodically to find and fix linter hints.
-          author: Dr. Lint-a-lot <hello@graylog.com>
+          author: Dr. Lint-a-lot <garybot2@graylog.com>
           branch: fix/linter-hints
           committer: Dr. Lint-a-lot <garybot2@graylog.com>
           commit-message: Running lint --fix
