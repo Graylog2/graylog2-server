@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.cluster;
+package org.graylog2.cluster.leader;
 
 import com.google.common.util.concurrent.AbstractExecutionThreadService;
 import net.javacrumbs.shedlock.core.DefaultLockingTaskExecutor;
@@ -32,7 +32,7 @@ import java.time.Instant;
 import java.util.Optional;
 
 @Singleton
-public class LeaderElectionService extends AbstractExecutionThreadService {
+public class LockBasedLeaderElectionService extends AbstractExecutionThreadService implements LeaderElectionService {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
 
@@ -43,7 +43,7 @@ public class LeaderElectionService extends AbstractExecutionThreadService {
 
 
     @Inject
-    public LeaderElectionService(MongoConnection mongoConnection) {
+    public LockBasedLeaderElectionService(MongoConnection mongoConnection) {
         this.mongoConnection = mongoConnection;
         lockProvider = new MongoLockProvider(mongoConnection.getMongoDatabase());
         lockingTaskExecutor = new DefaultLockingTaskExecutor(lockProvider);

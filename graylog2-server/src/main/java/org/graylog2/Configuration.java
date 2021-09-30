@@ -171,12 +171,19 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "is_cloud")
     private boolean isCloud = false;
 
+    @Parameter(value = "leader_election_mode")
+    private String leaderElectionMode = "fixed";
+
     public boolean isMaster() {
         return isMaster;
     }
 
     public void setIsMaster(boolean is) {
         isMaster = is;
+    }
+
+    public String getLeaderElectionMode() {
+        return leaderElectionMode;
     }
 
     public String getPasswordSecret() {
