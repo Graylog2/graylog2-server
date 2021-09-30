@@ -76,7 +76,7 @@ const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: P
     return 'Unable to parse keyword.';
   }, [setKeywordPreview]);
 
-  const _validateKeyword = (keyword: string): Promise<string | void> | undefined | null => {
+  const _validateKeyword = useCallback((keyword: string) => {
     if (keyword === undefined) {
       return undefined;
     }
@@ -90,7 +90,7 @@ const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: P
           if (mounted.current) _setSuccessfullPreview(response);
         })
         .catch(_setFailedPreview);
-  };
+  }, [_setFailedPreview, _setSuccessfullPreview, setValidatingKeyword]);
 
   useEffect(() => {
     return () => {
@@ -124,7 +124,7 @@ const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: P
   return (
     <Row className="no-bm">
       <Col sm={5}>
-        <Field name="nextTimeRange.keyword" validate={_validateKeyword}>
+        <Field name="nextTimeRange.keyword">
           {({ field: { name, value, onChange }, meta: { error } }) => (
             <FormGroup controlId="form-inline-keyword"
                        style={{ marginRight: 5, width: '100%', marginBottom: 0 }}
