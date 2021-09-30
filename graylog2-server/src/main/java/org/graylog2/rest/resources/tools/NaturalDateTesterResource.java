@@ -19,6 +19,7 @@ package org.graylog2.rest.resources.tools;
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.plugin.utilities.date.NaturalDateParser;
@@ -42,10 +43,12 @@ public class NaturalDateTesterResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(RegexTesterResource.class);
 
     @AutoValue
-    @JsonAutoDetect
     public abstract static class NaturalDateResponse {
+        @JsonProperty
         public abstract DateTime from();
+        @JsonProperty
         public abstract DateTime to();
+        @JsonProperty
         public abstract String timezone();
 
         static NaturalDateResponse create(NaturalDateParser.Result result) {
