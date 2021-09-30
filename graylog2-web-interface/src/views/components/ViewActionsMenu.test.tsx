@@ -105,12 +105,12 @@ describe('ViewActionsMenu', () => {
   });
 
   it('should open edit dashboard meta information modal', async () => {
-    const { getByText } = render(<SimpleViewActionMenu />);
+    const { getByText, findByText } = render(<SimpleViewActionMenu />);
     const editMenuItem = getByText(/Edit metadata/i);
 
     fireEvent.click(editMenuItem);
 
-    await waitFor(() => expect(getByText(/Editing dashboard/)).toBeInTheDocument());
+    await findByText(/Editing dashboard/);
   });
 
   it('should dashboard share modal', () => {
