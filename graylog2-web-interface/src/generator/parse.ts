@@ -109,6 +109,8 @@ function createTypeLiteralNode(properties: Record<string, Type>, additionalPrope
   } as const;
 }
 
+const wrapAdditionalProperties = (additionalProperties: RawModel['additional_properties']) => (typeof additionalProperties === 'string' ? ({ type: additionalProperties }) : additionalProperties);
+
 function createType(_typeDefinition: RawType): Type {
   if ('$ref' in _typeDefinition) {
     return createType({ type: _typeDefinition.$ref });
@@ -135,7 +137,7 @@ function createType(_typeDefinition: RawType): Type {
   }
 
   if (isArrayType(typeDefinition)) {
-    return createArray(createType(typeDefinition.items));
+    return createArray(createType(wrapAdditionalProperties(typeDefinition.items)));
   }
 
   if (isObjectType(typeDefinition)) {
@@ -166,23 +168,13 @@ const isNotBannedModel = ([name]) => !bannedModels.includes(name);
 
 type RawModel = {
   id: string;
-  type: 'object';
+  type: string;
   properties: Record<string, RawType>;
   additional_properties?: string | RawType;
 }
 
-const wrapAdditionalProperties = (additionalProperties: RawModel['additional_properties']) => (typeof additionalProperties === 'string' ? ({ type: additionalProperties }) : additionalProperties);
-
-function createModel({ id, properties, additional_properties }: RawModel): Model {
-  return {
-    id,
-    type: 'type_literal',
-    properties: Object.fromEntries(
-      Object.entries(properties)
-        .map(([name, rawType]) => [name, createType(rawType)]),
-    ),
-    additionalProperties: additional_properties ? createType(wrapAdditionalProperties(additional_properties)) : undefined,
-  };
+function createModel(model: RawModel): Model {
+  return { ...createType(model), id: model.id };
 }
 
 type RawParameter = {
