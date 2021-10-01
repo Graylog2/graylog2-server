@@ -21,6 +21,7 @@ import selectEvent from 'react-select-event';
 import userEvent from '@testing-library/user-event';
 import { PluginRegistration, PluginStore } from 'graylog-web-plugin/plugin';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
+import { MockStore } from 'helpers/mocking';
 
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import DataTable from 'views/components/datatable/DataTable';
@@ -33,6 +34,10 @@ import dataTable from 'views/components/datatable/bindings';
 import AggregationWizard from '../AggregationWizard';
 
 const extendedTimeout = applyTimeoutMultiplier(15000);
+
+jest.mock('views/stores/ViewMetadataStore', () => ({
+  ViewMetadataStore: MockStore(['getInitialState', () => ({ activeQuery: 'queryId' })]),
+}));
 
 const widgetConfig = AggregationWidgetConfig
   .builder()
@@ -93,7 +98,7 @@ describe('AggregationWizard', () => {
 
     await addElement('Grouping');
 
-    await waitFor(() => expect(screen.getByText('Field is required.')).toBeInTheDocument());
+    await screen.findByText('Field is required.');
   });
 
   it('should change the config when applied', async () => {
