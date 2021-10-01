@@ -107,7 +107,7 @@ class IndexSetPage extends React.Component<Props, State> {
   }
 
   _totalIndexCount = () => {
-    const { indexerOverview: {indices} } = this.props;
+    const { indexerOverview: { indices } } = this.props;
 
     return indices ? Object.keys(indices).length : null;
   };
