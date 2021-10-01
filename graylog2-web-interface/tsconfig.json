@@ -31,7 +31,8 @@
     "jsx": "react",
     "baseUrl": ".",
     "paths": {
-      "*": ["*", "./src/*", "./test/*"]
+      "*": ["*", "./src/*", "./test/*"],
+      "@graylog/server-api": ["./target/api"]
     }
   },
   "include": [
@@ -40,7 +41,7 @@
   ],
   "ts-node": {
     "compilerOptions": {
-      "module": "commonjs",
+      "module": "commonjs"
     }
   }
 }
