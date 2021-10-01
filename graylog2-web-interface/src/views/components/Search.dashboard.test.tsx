@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import Immutable from 'immutable';
-import { render, waitFor, screen } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
 import { StoreMock as MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
 import mockComponent from 'helpers/mocking/MockComponent';

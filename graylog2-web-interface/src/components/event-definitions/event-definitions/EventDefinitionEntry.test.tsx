@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
+import { render, screen, fireEvent } from 'wrappedTestingLibrary';
 import { alice } from 'fixtures/users';
 import { simpleEventDefinition } from 'fixtures/eventDefinition';
 

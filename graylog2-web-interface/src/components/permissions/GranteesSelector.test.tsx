@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, fireEvent, waitFor } from 'wrappedTestingLibrary';
+import { render, fireEvent } from 'wrappedTestingLibrary';
 import mockEntityShareState, { availableGrantees, availableCapabilities } from 'fixtures/entityShareState';
 
 import GranteesSelector from './GranteesSelector';

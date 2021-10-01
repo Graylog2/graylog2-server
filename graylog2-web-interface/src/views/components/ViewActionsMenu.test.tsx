@@ -16,7 +16,7 @@
  */
 import React from 'react';
 import * as mockImmutable from 'immutable';
-import { render, fireEvent, waitFor } from 'wrappedTestingLibrary';
+import { render, fireEvent } from 'wrappedTestingLibrary';
 import { alice } from 'fixtures/users';
 
 import User from 'logic/users/User';

@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { render, fireEvent, waitFor } from 'wrappedTestingLibrary';
+import { render, fireEvent } from 'wrappedTestingLibrary';
 import mockComponent from 'helpers/mocking/MockComponent';
 
 import RuntimeErrorPage from './RuntimeErrorPage';
