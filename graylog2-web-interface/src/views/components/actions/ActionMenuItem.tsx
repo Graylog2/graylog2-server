@@ -30,6 +30,7 @@ import {
   ExternalLinkAction,
   HandlerAction,
 } from 'views/components/actions/ActionHandler';
+import HoverForHelp from 'components/common/HoverForHelp';
 
 const StyledMenuItem = styled(MenuItem)`
   && > a {
@@ -51,6 +52,31 @@ type Props = {
   setOverflowingComponents: (components: React.ReactNode) => void,
   type: 'field' | 'value',
 }
+
+const StyledHoverForHelp = styled(HoverForHelp)`
+  margin-left: 5px;
+`;
+
+const ActionTitle = ({ action, handlerArgs }: { action: ActionDefinition, handlerArgs: ActionHandlerArguments }) => {
+  if (action.help) {
+    const help = action.help(handlerArgs);
+
+    if (help) {
+      const { title, description } = help;
+
+      return (
+        <>
+          {action.title}
+          <StyledHoverForHelp title={title} testId="menu-item-help">
+            {description}
+          </StyledHoverForHelp>
+        </>
+      );
+    }
+  }
+
+  return <>{action.title}</>;
+};
 
 type ExternalLinkItemProps = Pick<Props, 'handlerArgs' | 'onMenuToggle' | 'type'> & {
   action: ExternalLinkAction<ActionContexts>,
@@ -82,7 +108,7 @@ const ExternalLinkItem = ({ action, disabled, field, handlerArgs, onMenuToggle, 
                     eventKey={{ action: type, field }}
                     onSelect={onSelect}
                     {...linkProps}>
-      {action.title}
+      <ActionTitle action={action} handlerArgs={handlerArgs} />
       <ExternalLinkIcon name="external-link" />
     </StyledMenuItem>
   );
@@ -121,7 +147,7 @@ const ActionHandlerItem = ({ disabled, action, handlerArgs, setOverflowingCompon
     <StyledMenuItem disabled={disabled}
                     eventKey={{ action: type, field }}
                     onSelect={onSelect}>
-      {action.title}
+      <ActionTitle action={action} handlerArgs={handlerArgs} />
     </StyledMenuItem>
   );
 };

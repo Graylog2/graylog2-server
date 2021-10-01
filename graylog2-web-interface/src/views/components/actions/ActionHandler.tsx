@@ -52,10 +52,11 @@ export type ActionConditions<Contexts> = {
   isHidden?: ActionHandlerCondition<Contexts>,
 };
 
-type ActionDefinitionBase = {
+type ActionDefinitionBase<Contexts> = {
   type: string,
   title: string,
   resetFocus: boolean,
+  help?: (args: ActionHandlerArguments<Contexts>) => { title: string, description: React.ReactNode } | undefined,
 };
 
 type FunctionHandlerAction<Contexts> = {
@@ -65,11 +66,11 @@ type ComponentsHandlerAction = {
   component: ActionComponentType,
 };
 
-export type HandlerAction<Contexts> = (FunctionHandlerAction<Contexts> | ComponentsHandlerAction) & ActionDefinitionBase;
+export type HandlerAction<Contexts> = (FunctionHandlerAction<Contexts> | ComponentsHandlerAction) & ActionDefinitionBase<Contexts>;
 
 export type ExternalLinkAction<Contexts> = {
   linkTarget: (args: ActionHandlerArguments<Contexts>) => string,
-} & ActionDefinitionBase;
+} & ActionDefinitionBase<Contexts>;
 
 export type ActionDefinition<Contexts = ActionContexts> = (HandlerAction<Contexts> | ExternalLinkAction<Contexts>) & ActionConditions<Contexts>;
 
@@ -77,7 +78,7 @@ export function isExternalLinkAction<T>(action: ActionDefinition<T>): action is 
   return 'linkTarget' in action;
 }
 
-export function createHandlerFor<T>(action: ActionDefinitionBase & HandlerAction<T>, setActionComponents: SetActionComponents): ActionHandler<T> {
+export function createHandlerFor<T>(action: ActionDefinitionBase<T> & HandlerAction<T>, setActionComponents: SetActionComponents): ActionHandler<T> {
   if ('handler' in action) {
     return action.handler;
   }
