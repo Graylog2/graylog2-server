@@ -15,12 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext } from 'react';
+import { useContext, useMemo } from 'react';
+import * as Immutable from 'immutable';
 
 import { defaultCompare } from 'views/logic/DefaultCompare';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import { Input } from 'components/bootstrap';
 import Select from 'components/common/Select';
+import { useStore } from 'stores/connect';
+import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 
 type Props = {
   ariaLabel?: string,
@@ -36,8 +39,14 @@ type Props = {
 const sortByLabel = ({ label: label1 }: { label: string }, { label: label2 }: { label: string }) => defaultCompare(label1, label2);
 
 const FieldSelect = ({ name, id, error, clearable, value, onChange, label, ariaLabel }: Props) => {
+  const { activeQuery } = useStore(ViewMetadataStore);
   const fieldTypes = useContext(FieldTypesContext);
-  const fieldTypeOptions = fieldTypes.all.map((fieldType) => ({ label: fieldType.name, value: fieldType.name })).toArray().sort(sortByLabel);
+  const fieldTypeOptions = useMemo(() => fieldTypes.queryFields
+    .get(activeQuery, Immutable.List())
+    .map((fieldType) => ({ label: fieldType.name, value: fieldType.name }))
+    .toArray()
+    .sort(sortByLabel),
+  [activeQuery, fieldTypes.queryFields]);
 
   return (
     <Input id={id}
