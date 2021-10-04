@@ -58,6 +58,7 @@ import org.graylog2.bindings.ServerBindings;
 import org.graylog2.bootstrap.Main;
 import org.graylog2.bootstrap.ServerBootstrap;
 import org.graylog2.cluster.NodeService;
+import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.configuration.ElasticsearchClientConfiguration;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.configuration.EmailConfiguration;
@@ -203,12 +204,13 @@ public class Server extends ServerBootstrap {
         final NodeService nodeService = injector.getInstance(NodeService.class);
         final ServerStatus serverStatus = injector.getInstance(ServerStatus.class);
         final ActivityWriter activityWriter = injector.getInstance(ActivityWriter.class);
+        final LeaderElectionService leaderElectionService = injector.getInstance(LeaderElectionService.class);
         nodeService.registerServer(serverStatus.getNodeId().toString(),
-                configuration.isMaster(),
+                leaderElectionService.isLeader(),
                 httpConfiguration.getHttpPublishUri(),
                 Tools.getLocalCanonicalHostname());
         serverStatus.setLocalMode(isLocal());
-        if (configuration.isMaster() && !nodeService.isOnlyMaster(serverStatus.getNodeId())) {
+        if (leaderElectionService.isLeader() && !nodeService.isOnlyMaster(serverStatus.getNodeId())) {
             LOG.warn("Detected another master in the cluster. Retrying in {} seconds to make sure it is not "
                     + "an old stale instance.", TimeUnit.MILLISECONDS.toSeconds(configuration.getStaleMasterTimeout()));
             try {

@@ -27,6 +27,7 @@ import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.PositiveLongValidator;
 import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
+import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.security.realm.RootAccountRealm;
 import org.graylog2.utilities.IPSubnetConverter;
@@ -172,8 +173,12 @@ public class Configuration extends BaseConfiguration {
     private boolean isCloud = false;
 
     @Parameter(value = "leader_election_mode")
-    private String leaderElectionMode = "manual";
+    private String leaderElectionMode = "legacy";
 
+    /**
+     * @deprecated Try not to rely on a leader, or use {@link LeaderElectionService#isLeader()} instead.
+     */
+    @Deprecated
     public boolean isMaster() {
         return isMaster;
     }

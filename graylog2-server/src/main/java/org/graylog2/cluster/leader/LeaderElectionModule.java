@@ -33,6 +33,9 @@ public class LeaderElectionModule extends PluginModule {
         final String leaderElectionMode = configuration.getLeaderElectionMode();
 
         switch (leaderElectionMode) {
+            case "legacy":
+                bind(LeaderElectionService.class).to(LegacyLeaderElectionService.class).in(Scopes.SINGLETON);
+                break;
             case "manual":
                 bind(LeaderElectionService.class).to(ManualLeaderElectionService.class).in(Scopes.SINGLETON);
                 serviceBinder().addBinding().to(ManualLeaderElectionService.class).in(Scopes.SINGLETON);
