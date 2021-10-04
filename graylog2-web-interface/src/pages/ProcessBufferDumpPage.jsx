@@ -24,10 +24,10 @@ import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import StoreProvider from 'injection/StoreProvider';
 import DateTime from 'logic/datetimes/DateTime';
 import withParams from 'routing/withParams';
+import { ClusterOverviewStore } from 'stores/cluster/ClusterOverviewStore';
 
 const NodesStore = StoreProvider.getStore('Nodes');
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
-const ClusterOverviewStore = StoreProvider.getStore('ClusterOverview');
 
 function nodeFilter(state) {
   return state.nodes ? state.nodes[this.props.params.nodeId] : state.nodes;

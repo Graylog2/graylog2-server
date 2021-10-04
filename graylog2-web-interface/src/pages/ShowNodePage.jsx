@@ -23,9 +23,9 @@ import StoreProvider from 'injection/StoreProvider';
 import { NodeMaintenanceDropdown, NodeOverview } from 'components/nodes';
 import { DocumentTitle, PageErrorOverview, PageHeader, Spinner } from 'components/common';
 import withParams from 'routing/withParams';
+import { ClusterOverviewStore } from 'stores/cluster/ClusterOverviewStore';
 
 const NodesStore = StoreProvider.getStore('Nodes');
-const ClusterOverviewStore = StoreProvider.getStore('ClusterOverview');
 const PluginsStore = StoreProvider.getStore('Plugins');
 const InputStatesStore = StoreProvider.getStore('InputStates');
 const InputTypesStore = StoreProvider.getStore('InputTypes');
