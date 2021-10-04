@@ -27,9 +27,9 @@ import Routes from 'routing/Routes';
 import history from 'util/History';
 import SidecarStatus from 'components/sidecars/sidecars/SidecarStatus';
 import withParams from 'routing/withParams';
+import { CollectorsActions } from 'stores/sidecars/CollectorsStore';
 
 const { SidecarsActions } = CombinedProvider.get('Sidecars');
-const { CollectorsActions } = CombinedProvider.get('Collectors');
 
 class SidecarStatusPage extends React.Component {
   static propTypes = {
