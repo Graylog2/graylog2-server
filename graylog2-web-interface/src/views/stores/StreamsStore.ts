@@ -16,11 +16,11 @@
  */
 import Reflux from 'reflux';
 
-import { Store } from 'stores/StoreTypes';
+import type { Store } from 'stores/StoreTypes';
 import CombinedProvider from 'injection/CombinedProvider';
 import { singletonActions, singletonStore } from 'logic/singleton';
+import OriginalStreamsStore from 'stores/streams/StreamsStore';
 
-const OriginalStreamsStore = CombinedProvider.get('Streams').StreamsStore;
 const { SessionActions } = CombinedProvider.get('Session');
 
 export const StreamsActions = singletonActions(
