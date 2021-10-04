@@ -22,6 +22,7 @@ import styled from 'styled-components';
 type Triggers = 'click' | 'focus' | 'hover';
 
 type Props = {
+  testId?: string,
   children: React.ReactElement,
   overlay: React.ReactElement,
   placement: 'top' | 'right' | 'bottom' | 'left',
@@ -51,6 +52,7 @@ class OverlayTrigger extends React.Component<Props, State> {
     trigger: 'click',
     rootClose: false,
     container: null,
+    testId: undefined,
   }
 
   constructor(props) {
@@ -67,7 +69,7 @@ class OverlayTrigger extends React.Component<Props, State> {
 
   render() {
     let triggerables;
-    const { children, container, placement, overlay, rootClose, trigger, ...overlayProps } = this.props;
+    const { children, container, placement, overlay, rootClose, trigger, testId, ...overlayProps } = this.props;
     const { show } = this.state;
 
     const setShow = (isShown: boolean) => this.setState({ show: isShown });
@@ -98,7 +100,7 @@ class OverlayTrigger extends React.Component<Props, State> {
     }
 
     return (
-      <Container ref={() => this.containerRef}>
+      <Container ref={() => this.containerRef} data-testid={testId}>
         <TriggerWrap ref={this.targetRef} className={children.props.className} role="button">
           {React.cloneElement(children, { ...triggerables, className: '' })}
         </TriggerWrap>

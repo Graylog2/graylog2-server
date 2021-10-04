@@ -189,7 +189,9 @@ const ReactGridContainer = ({
                                    draggableCancel=".actions"
                                    onDragStop={onLayoutChange}
                                    onResizeStop={onLayoutChange}
-                                   useCSSTransforms
+      // While CSS transform improves the paint performance,
+      // it currently results in bug when using `react-sticky-el` inside a grid item.
+                                   useCSSTransforms={false}
                                    draggableHandle={locked ? '' : draggableHandle}>
       {children}
     </StyledWidthProvidedGridLayout>

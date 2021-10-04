@@ -26,6 +26,7 @@ import _Widget from 'views/logic/widgets/Widget';
 import { WidgetStore } from 'views/stores/WidgetStore';
 import { CurrentViewStateStore } from 'views/stores/CurrentViewStateStore';
 import FieldTypesContext, { FieldTypes } from 'views/components/contexts/FieldTypesContext';
+import ViewState from 'views/logic/views/ViewState';
 
 import WidgetGrid from './WidgetGrid';
 
@@ -93,11 +94,7 @@ describe('<WidgetGrid />', () => {
       widget1: new WidgetPosition(1, 1, 1, 1),
     };
 
-    asMock(CurrentViewStateStore.getInitialState).mockReturnValue({
-      state: {
-        widgetPositions: positions,
-      },
-    });
+    asMock(CurrentViewStateStore.getInitialState).mockReturnValue({ state: ViewState.builder().widgetPositions(positions).build(), activeQuery: 'query1' });
 
     const wrapper = mount((
       <SimpleWidgetGrid />
@@ -115,11 +112,7 @@ describe('<WidgetGrid />', () => {
       widget1: new WidgetPosition(1, 1, 1, 1),
     };
 
-    asMock(CurrentViewStateStore.getInitialState).mockReturnValue({
-      state: {
-        widgetPositions: positions,
-      },
-    });
+    asMock(CurrentViewStateStore.getInitialState).mockReturnValue({ state: ViewState.builder().widgetPositions(positions).build(), activeQuery: 'query1' });
 
     const wrapper = mount((
       <SimpleWidgetGrid />

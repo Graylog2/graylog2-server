@@ -15,21 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled from 'styled-components';
 
+import { Center } from 'components/common';
 import Spinner from 'components/common/Spinner';
 
-const Container = styled.div`
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-
 const LoadingWidget = () => (
-  <Container>
+  <Center>
     <Spinner data-testid="loading-widget" />
-  </Container>
+  </Center>
 );
 
 LoadingWidget.propTypes = {};

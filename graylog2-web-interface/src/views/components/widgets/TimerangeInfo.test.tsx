@@ -75,6 +75,10 @@ describe('TimerangeInfo', () => {
     </TimeLocalizeContext.Provider>
   );
 
+  beforeEach(() => {
+    asMock(GlobalOverrideStore.getInitialState).mockReturnValue(GlobalOverride.empty());
+  });
+
   it('should display the effective timerange as title', () => {
     const relativeWidget = widget.toBuilder().timerange({ type: 'relative', range: 3000 }).build();
     render(<SUT widget={relativeWidget} activeQuery="active-query-id" widgetId="widget-id" />);
@@ -123,7 +127,7 @@ describe('TimerangeInfo', () => {
 
   it('should display global override', () => {
     const state: GlobalOverrideStoreState = GlobalOverride.empty().toBuilder().timerange({ type: 'relative', range: 3000 }).build();
-    asMock(GlobalOverrideStore.getInitialState).mockReturnValueOnce(state);
+    asMock(GlobalOverrideStore.getInitialState).mockReturnValue(state);
 
     const keywordWidget = widget.toBuilder()
       .timerange({ type: 'keyword', keyword: '5 minutes ago' })
@@ -137,7 +141,7 @@ describe('TimerangeInfo', () => {
   it('should not throw error when related search type is empty', () => {
     const relativeWidget = widget.toBuilder().timerange({ type: 'relative', range: 3000 }).build();
 
-    asMock(SearchStore.getInitialState).mockReturnValueOnce(mockSearchStoreState({
+    asMock(SearchStore.getInitialState).mockReturnValue(mockSearchStoreState({
       result: {
         results: {
           'active-query-id': {
@@ -153,7 +157,7 @@ describe('TimerangeInfo', () => {
   });
 
   it('should not throw error and display default time range when widget id does not exist in search widget mapping', () => {
-    asMock(SearchStore.getInitialState).mockReturnValueOnce(mockSearchStoreState({
+    asMock(SearchStore.getInitialState).mockReturnValue(mockSearchStoreState({
       widgetMapping: Immutable.Map(),
     }) as SearchStoreState);
 

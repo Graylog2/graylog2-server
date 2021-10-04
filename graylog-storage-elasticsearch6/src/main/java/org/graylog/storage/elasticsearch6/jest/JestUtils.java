@@ -26,6 +26,7 @@ import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.FieldTypeException;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.InvalidWriteTargetException;
+import org.graylog2.indexer.MasterNotDiscoveredException;
 import org.graylog2.indexer.QueryParsingException;
 
 import java.io.IOException;
@@ -100,6 +101,12 @@ public class JestUtils {
                 continue;
             }
             switch(type.asText()) {
+                case "master_not_discovered_exception":
+                    return new MasterNotDiscoveredException();
+                case "cluster_block_exception":
+                    if (reason.asText().contains("no master")) {
+                        return new MasterNotDiscoveredException();
+                    }
                 case "query_parsing_exception":
                     return buildQueryParsingException(errorMessage, rootCause, reasons);
                 case "index_not_found_exception":
