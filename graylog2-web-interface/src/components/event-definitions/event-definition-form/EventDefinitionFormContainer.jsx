@@ -24,6 +24,7 @@ import connect from 'stores/connect';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 import CombinedProvider from 'injection/CombinedProvider';
 import { ConfirmLeaveDialog, Spinner } from 'components/common';
+import { AvailableEventDefinitionTypesStore } from 'stores/event-definitions/AvailableEventDefinitionTypesStore';
 
 import EventDefinitionForm from './EventDefinitionForm';
 // Import built-in plugins
@@ -31,7 +32,6 @@ import {} from 'components/event-definitions/event-definition-types';
 import {} from 'components/event-notifications/event-notification-types';
 
 const { EventDefinitionsActions } = CombinedProvider.get('EventDefinitions');
-const { AvailableEventDefinitionTypesStore } = CombinedProvider.get('AvailableEventDefinitionTypes');
 const { EventNotificationsStore, EventNotificationsActions } = CombinedProvider.get('EventNotifications');
 const { ConfigurationActions } = CombinedProvider.get('Configuration');
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
