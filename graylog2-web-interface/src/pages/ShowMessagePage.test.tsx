@@ -41,7 +41,6 @@ jest.mock('injection/CombinedProvider', () => ({
       NodesStore: MockStore(['listen', () => () => {}], ['getInitialState', () => ({ nodes: {} })]),
     },
     Messages: { MessagesActions: { loadMessage: (...args) => mockLoadMessage(...args) } },
-    Streams: { StreamsStore: { listStreams: (...args) => mockListStreams(...args) } },
     CurrentUser: {
       CurrentUserStore: MockStore(),
     },
@@ -50,6 +49,8 @@ jest.mock('injection/CombinedProvider', () => ({
     },
   }[type])),
 }));
+
+jest.mock('stores/streams/StreamsStore', () => ({ listStreams: (...args) => mockListStreams(...args) }));
 
 jest.mock('views/logic/fieldtypes/useFieldTypes');
 jest.mock('routing/withParams', () => (x) => x);
