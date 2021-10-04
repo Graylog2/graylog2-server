@@ -24,8 +24,8 @@ import history from 'util/History';
 import PermissionsMixin from 'util/PermissionsMixin';
 import StoreProvider from 'injection/StoreProvider';
 import ActionsProvider from 'injection/ActionsProvider';
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 
-const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 const GettingStartedStore = StoreProvider.getStore('GettingStarted');
 const GettingStartedActions = ActionsProvider.getActions('GettingStarted');
 

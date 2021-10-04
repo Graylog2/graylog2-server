@@ -28,12 +28,10 @@ import { StreamAlertNotifications } from 'components/alertnotifications';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 import history from 'util/History';
-import CombinedProvider from 'injection/CombinedProvider';
 import withParams from 'routing/withParams';
 import { AlertConditionsStore, AlertConditionsActions } from 'stores/alertconditions/AlertConditionsStore';
 import { StreamsStore } from 'stores/streams/StreamsStore';
-
-const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 
 const EditAlertConditionPage = createReactClass({
   displayName: 'EditAlertConditionPage',

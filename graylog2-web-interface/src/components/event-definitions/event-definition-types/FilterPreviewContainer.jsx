@@ -24,11 +24,11 @@ import Search from 'views/logic/search/Search';
 import CombinedProvider from 'injection/CombinedProvider';
 import connect from 'stores/connect';
 import PermissionsMixin from 'util/PermissionsMixin';
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 
 import FilterPreview from './FilterPreview';
 
 const { FilterPreviewStore, FilterPreviewActions } = CombinedProvider.get('FilterPreview');
-const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 
 class FilterPreviewContainer extends React.Component {
   state = {

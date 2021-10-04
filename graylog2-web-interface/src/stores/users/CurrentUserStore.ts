@@ -20,60 +20,62 @@ import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
 import CombinedProvider from 'injection/CombinedProvider';
-import User from 'logic/users/User';
+import { UserJSON } from 'logic/users/User';
+import { singletonStore } from 'logic/singleton';
 
 const { SessionStore, SessionActions } = CombinedProvider.get('Session');
 const { StartpageStore } = CombinedProvider.get('Startpage');
 const { PreferencesActions } = CombinedProvider.get('Preferences');
 
 export type CurrentUserStoreState = {
-  currentUser: User,
+  currentUser: UserJSON,
 };
 
-const CurrentUserStore = Reflux.createStore<CurrentUserStoreState>({
-  listenables: [SessionActions],
-  currentUser: undefined,
+export const CurrentUserStore = singletonStore(
+  'core.CurrentUser',
+  () => Reflux.createStore<CurrentUserStoreState>({
+    listenables: [SessionActions],
+    currentUser: undefined,
 
-  init() {
-    this.listenTo(SessionStore, this.sessionUpdate, this.sessionUpdate);
-    this.listenTo(StartpageStore, this.reload, this.reload);
-    PreferencesActions.saveUserPreferences.completed.listen(this.reload);
-  },
+    init() {
+      this.listenTo(SessionStore, this.sessionUpdate, this.sessionUpdate);
+      this.listenTo(StartpageStore, this.reload, this.reload);
+      PreferencesActions.saveUserPreferences.completed.listen(this.reload);
+    },
 
-  getInitialState() {
-    return { currentUser: this.currentUser };
-  },
+    getInitialState() {
+      return { currentUser: this.currentUser };
+    },
 
-  get() {
-    return this.currentUser;
-  },
+    get() {
+      return this.currentUser;
+    },
 
-  sessionUpdate(sessionInfo) {
-    if (sessionInfo.sessionId && sessionInfo.username) {
-      const { username } = sessionInfo;
+    sessionUpdate(sessionInfo) {
+      if (sessionInfo.sessionId && sessionInfo.username) {
+        const { username } = sessionInfo;
 
-      this.update(username);
-    } else {
-      this.currentUser = undefined;
-      this.trigger({ currentUser: this.currentUser });
-    }
-  },
-
-  reload() {
-    if (this.currentUser !== undefined) {
-      return this.update(this.currentUser.username);
-    }
-
-    return Promise.resolve();
-  },
-
-  update(username) {
-    return fetch('GET', qualifyUrl(ApiRoutes.UsersApiController.loadByUsername(encodeURIComponent(username)).url))
-      .then((resp) => {
-        this.currentUser = resp;
+        this.update(username);
+      } else {
+        this.currentUser = undefined;
         this.trigger({ currentUser: this.currentUser });
-      });
-  },
-});
+      }
+    },
 
-export default CurrentUserStore;
+    reload() {
+      if (this.currentUser !== undefined) {
+        return this.update(this.currentUser.username);
+      }
+
+      return Promise.resolve();
+    },
+
+    update(username) {
+      return fetch('GET', qualifyUrl(ApiRoutes.UsersApiController.loadByUsername(encodeURIComponent(username)).url))
+        .then((resp) => {
+          this.currentUser = resp;
+          this.trigger({ currentUser: this.currentUser });
+        });
+    },
+  }),
+);

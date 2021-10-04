@@ -29,8 +29,8 @@ import UserNotification from 'util/UserNotification';
 import StoreProvider from 'injection/StoreProvider';
 import ActionsProvider from 'injection/ActionsProvider';
 import StreamsStore from 'stores/streams/StreamsStore';
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 
-const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 const IndexSetsStore = StoreProvider.getStore('IndexSets');
 const IndexSetsActions = ActionsProvider.getActions('IndexSets');
 

@@ -19,13 +19,13 @@ import Reflux from 'reflux';
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 import { qualifyUrl } from 'util/URLUtils';
-import StoreProvider from 'injection/StoreProvider';
 import type { RefluxActions } from 'stores/StoreTypes';
 import View from 'views/logic/views/View';
 import Parameter from 'views/logic/parameters/Parameter';
 import type { ViewJson } from 'views/logic/views/View';
 import { singletonActions, singletonStore } from 'logic/singleton';
 import { Pagination } from 'stores/PaginationTypes';
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 
 export type SortOrder = 'asc' | 'desc';
 
@@ -118,8 +118,6 @@ const ViewManagementStore = singletonStore(
     },
 
     createCompleted(): Promise<void> {
-      const CurrentUserStore = StoreProvider.getStore('CurrentUser');
-
       return CurrentUserStore.reload();
     },
 

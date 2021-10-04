@@ -23,11 +23,9 @@ import { LinkContainer } from 'components/graylog/router';
 import { DropdownButton, MenuItem, Button } from 'components/graylog';
 import { AlertConditionForm, AlertConditionSummary, AlertConditionTestModal, UnknownAlertCondition } from 'components/alertconditions';
 import PermissionsMixin from 'util/PermissionsMixin';
-import CombinedProvider from 'injection/CombinedProvider';
 import Routes from 'routing/Routes';
 import { AlertConditionsActions } from 'stores/alertconditions/AlertConditionsStore';
-
-const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 
 const AlertCondition = createReactClass({
   displayName: 'AlertCondition',

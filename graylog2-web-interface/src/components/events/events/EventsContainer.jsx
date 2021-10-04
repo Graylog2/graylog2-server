@@ -22,6 +22,7 @@ import { Spinner } from 'components/common';
 import connect from 'stores/connect';
 import CombinedProvider from 'injection/CombinedProvider';
 import Store from 'logic/local-storage/Store';
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 
 import Events from './Events';
 
@@ -29,7 +30,6 @@ import {} from 'components/event-definitions/event-definition-types';
 
 const { EventsStore, EventsActions } = CombinedProvider.get('Events');
 const { EventDefinitionsStore, EventDefinitionsActions } = CombinedProvider.get('EventDefinitions');
-const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 
 const LOCAL_STORAGE_ITEM = 'events-last-search';
 

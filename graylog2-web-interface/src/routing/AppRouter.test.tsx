@@ -41,6 +41,7 @@ jest.mock('components/errors/RouterErrorBoundary', () => mockComponent('RouterEr
 
 jest.mock('pages/StartPage', () => () => <>This is the start page</>);
 jest.mock('views/logic/usePluginEntities');
+jest.mock('stores/users/CurrentUserStore', () => ({ CurrentUserStore: MockStore() }));
 
 describe('AppRouter', () => {
   beforeEach(() => {

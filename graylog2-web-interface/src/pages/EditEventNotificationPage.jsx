@@ -30,9 +30,9 @@ import history from 'util/History';
 import EventNotificationFormContainer from 'components/event-notifications/event-notification-form/EventNotificationFormContainer';
 import EventNotificationActionLinks from 'components/event-notifications/event-notification-details/EventNotificationActionLinks';
 import withParams from 'routing/withParams';
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 
 const { EventNotificationsActions } = CombinedProvider.get('EventNotifications');
-const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 
 const { isPermitted } = PermissionsMixin;
 

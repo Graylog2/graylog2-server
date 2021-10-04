@@ -30,11 +30,11 @@ import DocsHelper from 'util/DocsHelper';
 import { isPermitted } from 'util/PermissionsMixin';
 import history from 'util/History';
 import withParams from 'routing/withParams';
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 
 import StreamPermissionErrorPage from './StreamPermissionErrorPage';
 
 const { EventDefinitionsActions } = CombinedProvider.get('EventDefinitions');
-const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 
 class EditEventDefinitionPage extends React.Component {
   static propTypes = {

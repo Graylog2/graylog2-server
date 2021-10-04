@@ -21,7 +21,6 @@ import Reflux from 'reflux';
 
 import { LinkContainer } from 'components/graylog/router';
 import PermissionsMixin from 'util/PermissionsMixin';
-import CombinedProvider from 'injection/CombinedProvider';
 import { Col, DropdownButton, MenuItem, Button } from 'components/graylog';
 import { EntityListItem, IfPermitted, Spinner } from 'components/common';
 import { UnknownAlertNotification } from 'components/alertnotifications';
@@ -29,8 +28,7 @@ import { ConfigurationForm, ConfigurationWell } from 'components/configurationfo
 import Routes from 'routing/Routes';
 import { AlarmCallbacksActions } from 'stores/alarmcallbacks/AlarmCallbacksStore';
 import { AlertNotificationsStore } from 'stores/alertnotifications/AlertNotificationsStore';
-
-const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 
 const AlertNotification = createReactClass({
   displayName: 'AlertNotification',

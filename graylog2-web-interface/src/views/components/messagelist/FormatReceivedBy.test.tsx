@@ -30,6 +30,8 @@ jest.mock('injection/CombinedProvider', () => new MockCombinedProvider({
   },
 }));
 
+jest.mock('stores/users/CurrentUserStore', () => ({ CurrentUserStore: MockStore() }));
+
 type ForwarderReceivedByProps = {
   inputId: string,
   forwarderNodeId: string,

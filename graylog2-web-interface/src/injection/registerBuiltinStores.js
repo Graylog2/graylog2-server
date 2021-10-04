@@ -59,7 +59,6 @@ const actions = {
 
 const stores = {
   Authentication: () => require('stores/authentication/AuthenticationStore'),
-  CurrentUser: () => require('stores/users/CurrentUserStore'),
   Decorators: () => require('stores/decorators/DecoratorsStore'),
   Deflector: () => require('stores/indices/DeflectorStore'),
   Enterprise: () => require('stores/enterprise/EnterpriseStore'),

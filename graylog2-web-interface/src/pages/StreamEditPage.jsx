@@ -22,12 +22,10 @@ import Reflux from 'reflux';
 import { Alert } from 'components/graylog';
 import StreamRulesEditor from 'components/streamrules/StreamRulesEditor';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
-import StoreProvider from 'injection/StoreProvider';
 import withParams from 'routing/withParams';
 import withLocation from 'routing/withLocation';
 import StreamsStore from 'stores/streams/StreamsStore';
-
-const CurrentUserStore = StoreProvider.getStore('CurrentUser');
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 
 const StreamEditPage = createReactClass({
   displayName: 'StreamEditPage',

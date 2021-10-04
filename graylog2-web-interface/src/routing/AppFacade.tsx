@@ -25,13 +25,12 @@ import LoginQueryClientProvider from 'contexts/LoginQueryClientProvider';
 import 'bootstrap/less/bootstrap.less';
 import 'toastr/toastr.less';
 import { Store } from 'stores/StoreTypes';
-import { CurrentUserStoreState } from 'stores/users/CurrentUserStore';
+import { CurrentUserStoreState, CurrentUserStore } from 'stores/users/CurrentUserStore';
 import { ServerAvailabilityStoreState } from 'stores/sessions/ServerAvailabilityStore';
 import { SessionStoreState } from 'stores/sessions/SessionStore';
 
 const SessionStore = StoreProvider.getStore('Session');
 const ServerAvailabilityStore = StoreProvider.getStore('ServerAvailability');
-const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
 const LoginPage = loadAsync(() => import(/* webpackChunkName: "LoginPage" */ 'pages/LoginPage'));
 const LoadingPage = loadAsync(() => import(/* webpackChunkName: "LoadingPage" */ 'pages/LoadingPage'));

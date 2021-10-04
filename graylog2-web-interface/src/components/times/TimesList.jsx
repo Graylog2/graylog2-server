@@ -23,8 +23,8 @@ import { Col, Row } from 'components/graylog';
 import DateTime from 'logic/datetimes/DateTime';
 import StoreProvider from 'injection/StoreProvider';
 import { Spinner, Timestamp } from 'components/common';
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 
-const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 const SystemStore = StoreProvider.getStore('System');
 
 const TimesList = createReactClass({

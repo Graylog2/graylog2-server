@@ -27,7 +27,9 @@ import Sidebar from './Sidebar';
 
 const mockCurrentUser = { timezone: 'UTC' };
 
-jest.mock('stores/users/CurrentUserStore', () => MockStore(['get', () => mockCurrentUser], ['getInitialState', () => ({ mockCurrentUser })]));
+jest.mock('stores/users/CurrentUserStore', () => ({
+  CurrentUserStore: MockStore(['get', () => mockCurrentUser], ['getInitialState', () => ({ mockCurrentUser })]),
+}));
 
 jest.mock('stores/sessions/SessionStore', () => MockStore('isLoggedIn'));
 
