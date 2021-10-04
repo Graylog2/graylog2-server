@@ -24,13 +24,11 @@ import { Button } from 'components/graylog';
 import history from 'util/History';
 import UserNotification from 'util/UserNotification';
 import { DocumentTitle, PageHeader } from 'components/common';
-import CombinedProvider from 'injection/CombinedProvider';
 import ContentPackEdit from 'components/content-packs/ContentPackEdit';
 import ContentPack from 'logic/content-packs/ContentPack';
 import Entity from 'logic/content-packs/Entity';
 import { CatalogStore, CatalogActions } from 'stores/content-packs/CatalogStore';
-
-const { ContentPacksActions } = CombinedProvider.get('ContentPacks');
+import { ContentPacksActions } from 'stores/content-packs/ContentPacksStore';
 
 const CreateContentPackPage = createReactClass({
   displayName: 'CreateContentPackPage',

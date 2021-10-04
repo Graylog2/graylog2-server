@@ -22,7 +22,6 @@ const actions = {
   Configuration: () => require('actions/configurations/ConfigurationActions'),
   Configurations: () => require('actions/configurations/ConfigurationActions'),
   ConfigurationVariable: () => require('actions/sidecars/ConfigurationVariableActions'),
-  ContentPacks: () => require('actions/content-packs/ContentPacksActions'),
   Decorators: () => require('actions/decorators/DecoratorsActions'),
   Deflector: () => require('actions/indices/DeflectorActions'),
   Enterprise: () => require('actions/enterprise/EnterpriseActions'),
@@ -63,7 +62,6 @@ const actions = {
 
 const stores = {
   Authentication: () => require('stores/authentication/AuthenticationStore'),
-  ContentPacks: () => require('stores/content-packs/ContentPacksStore'),
   Configuration: () => require('stores/configurations/ConfigurationsStore'),
   Configurations: () => require('stores/configurations/ConfigurationsStore'),
   CurrentUser: () => require('stores/users/CurrentUserStore'),
