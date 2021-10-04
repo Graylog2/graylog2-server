@@ -20,6 +20,7 @@ import { act, fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
 import userEvent from '@testing-library/user-event';
 import { PluginRegistration, PluginStore } from 'graylog-web-plugin/plugin';
+import { MockStore } from 'helpers/mocking';
 
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';
@@ -51,6 +52,10 @@ jest.mock('views/stores/AggregationFunctionsStore', () => ({
     percentile: { type: 'percentile', description: 'Percentile' },
   })),
   listen: jest.fn(),
+}));
+
+jest.mock('views/stores/ViewMetadataStore', () => ({
+  ViewMetadataStore: MockStore(['getInitialState', () => ({ activeQuery: 'queryId' })]),
 }));
 
 const selectEventConfig = { container: document.body };
