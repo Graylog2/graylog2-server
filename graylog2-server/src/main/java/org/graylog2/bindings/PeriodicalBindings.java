@@ -39,6 +39,7 @@ import org.graylog2.periodical.NodePingThread;
 import org.graylog2.periodical.ThrottleStateUpdaterThread;
 import org.graylog2.periodical.TrafficCounterCalculator;
 import org.graylog2.periodical.UserPermissionMigrationPeriodical;
+import org.graylog2.periodical.UserSessionTerminationPeriodical;
 import org.graylog2.periodical.VersionCheckThread;
 import org.graylog2.plugin.periodical.Periodical;
 
@@ -68,5 +69,6 @@ public class PeriodicalBindings extends AbstractModule {
         periodicalBinder.addBinding().to(IndexFieldTypePollerPeriodical.class);
         periodicalBinder.addBinding().to(ScheduleTriggerCleanUp.class);
         periodicalBinder.addBinding().to(ESVersionCheckPeriodical.class);
+        periodicalBinder.addBinding().to(UserSessionTerminationPeriodical.class);
     }
 }
