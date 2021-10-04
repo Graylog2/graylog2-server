@@ -19,7 +19,6 @@ import CombinedProvider from './CombinedProvider';
 /* eslint-disable global-require */
 const actions = {
   Authentication: () => require('actions/authentication/AuthenticationActions'),
-  Catalog: () => require('actions/content-packs/CatalogActions'),
   ClusterTraffic: () => require('actions/cluster/ClusterTrafficActions'),
   CodecTypes: () => require('actions/codecs/CodecTypesActions'),
   CollectorConfigurations: () => require('actions/sidecars/CollectorConfigurationsActions'),
@@ -68,7 +67,6 @@ const actions = {
 
 const stores = {
   Authentication: () => require('stores/authentication/AuthenticationStore'),
-  Catalog: () => require('stores/content-packs/CatalogStore'),
   ClusterOverview: () => require('stores/cluster/ClusterOverviewStore'),
   ClusterTraffic: () => require('stores/cluster/ClusterTrafficStore'),
   CodecTypes: () => require('stores/codecs/CodecTypesStore'),

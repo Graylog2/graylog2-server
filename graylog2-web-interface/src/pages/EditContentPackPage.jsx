@@ -31,8 +31,8 @@ import ValueReferenceData from 'util/ValueReferenceData';
 import ContentPackEdit from 'components/content-packs/ContentPackEdit';
 import Entity from 'logic/content-packs/Entity';
 import withParams from 'routing/withParams';
+import { CatalogActions, CatalogStore } from 'stores/content-packs/CatalogStore';
 
-const { CatalogActions, CatalogStore } = CombinedProvider.get('Catalog');
 const { ContentPacksActions, ContentPacksStore } = CombinedProvider.get('ContentPacks');
 
 const EditContentPackPage = createReactClass({

@@ -28,9 +28,9 @@ import CombinedProvider from 'injection/CombinedProvider';
 import ContentPackEdit from 'components/content-packs/ContentPackEdit';
 import ContentPack from 'logic/content-packs/ContentPack';
 import Entity from 'logic/content-packs/Entity';
+import { CatalogStore, CatalogActions } from 'stores/content-packs/CatalogStore';
 
 const { ContentPacksActions } = CombinedProvider.get('ContentPacks');
-const { CatalogActions, CatalogStore } = CombinedProvider.get('Catalog');
 
 const CreateContentPackPage = createReactClass({
   displayName: 'CreateContentPackPage',
