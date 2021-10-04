@@ -56,7 +56,7 @@ describe('EventDefinitionEntry', () => {
     const button = screen.getAllByRole('button', { name: /Share/ })[0];
     fireEvent.click(button);
 
-    await waitFor(() => expect(screen.queryByText('EntityShareModal content')).not.toBeNull());
+    await screen.findByText('EntityShareModal content');
   });
 
   it('allows sharing for admins', async () => {
@@ -65,7 +65,7 @@ describe('EventDefinitionEntry', () => {
     const button = screen.getAllByRole('button', { name: /Share/ })[0];
     fireEvent.click(button);
 
-    await waitFor(() => expect(screen.queryByText('EntityShareModal content')).not.toBeNull());
+    await screen.findByText('EntityShareModal content');
   });
 
   it('does not allow sharing for viewer', () => {

@@ -103,7 +103,7 @@ describe('AggregationWizard', () => {
 
     await addElement('Metric');
 
-    await waitFor(() => expect(screen.getByText('Function is required.')).toBeInTheDocument());
+    await screen.findByText('Function is required.');
   });
 
   it('should require metric field when metric function is not count', async () => {
@@ -115,7 +115,7 @@ describe('AggregationWizard', () => {
     await selectEvent.openMenu(functionSelect);
     await selectEvent.select(functionSelect, 'Minimum', selectEventConfig);
 
-    await waitFor(() => expect(screen.getByText('Field is required for function min.')).toBeInTheDocument());
+    await screen.findByText('Field is required for function min.');
   });
 
   it('should not require metric field when metric function count', async () => {
