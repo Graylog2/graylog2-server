@@ -16,46 +16,48 @@
  */
 package org.graylog.scheduler;
 
-import org.graylog2.cluster.NodeNotFoundException;
-import org.graylog2.cluster.NodeService;
-import org.graylog2.plugin.system.NodeId;
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
+import org.graylog2.cluster.leader.LeaderChangedEvent;
+import org.graylog2.cluster.leader.LeaderElectionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * This is the default {@link JobSchedulerConfig}.
  */
+@Singleton
 public class DefaultJobSchedulerConfig implements JobSchedulerConfig {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultJobSchedulerConfig.class);
 
-    private final NodeService nodeService;
-    private final NodeId nodeId;
+    private final AtomicBoolean isLeader;
+
+    private final LeaderElectionService leaderElectionService;
 
     @Inject
-    public DefaultJobSchedulerConfig(NodeService nodeService, NodeId nodeId) {
-        this.nodeService = nodeService;
-        this.nodeId = nodeId;
-    }
+    public DefaultJobSchedulerConfig(LeaderElectionService leaderElectionService, EventBus eventBus) {
+        this.leaderElectionService = leaderElectionService;
 
-    @Override
-    public boolean canStart() {
-        try {
-            return nodeService.byNodeId(nodeId).isMaster();
-        } catch (NodeNotFoundException e) {
-            LOG.error("Couldn't find current node <{}> in the database", nodeId.toString(), e);
-            return false;
-        }
+        eventBus.register(this);
+        isLeader = new AtomicBoolean(leaderElectionService.isLeader());
     }
 
     @Override
     public boolean canExecute() {
-        return true;
+        return isLeader.get();
     }
 
     @Override
     public int numberOfWorkerThreads() {
         return 5;
+    }
+
+    @Subscribe
+    public void leaderChanged(LeaderChangedEvent event) {
+        isLeader.set(leaderElectionService.isLeader());
     }
 }

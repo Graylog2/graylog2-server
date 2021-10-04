@@ -86,37 +86,32 @@ public class JobSchedulerService extends AbstractExecutionThreadService {
         }
         LOG.debug("Server entered RUNNING state, starting scheduler loop");
 
-        if (schedulerConfig.canStart()) {
-            boolean executionEnabled = true;
-            while (isRunning()) {
-                if (!schedulerConfig.canExecute()) {
-                    executionEnabled = logExecutionConfigState(executionEnabled, false);
-                    clock.sleepUninterruptibly(1, TimeUnit.SECONDS);
-                    continue;
-                }
-                executionEnabled = logExecutionConfigState(executionEnabled, true);
-
-                LOG.debug("Starting scheduler loop iteration");
-                try {
-                    if (!jobExecutionEngine.execute() && isRunning()) {
-                        // When the execution engine returned false, there are either no free worker threads or no
-                        // runnable triggers. To avoid busy spinning we sleep for the configured duration or until
-                        // we receive a job completion event via the scheduler event bus.
-                        if (sleeper.sleep(loopSleepDuration.getQuantity(), loopSleepDuration.getUnit())) {
-                            LOG.debug("Waited for {} {} because there are either no free worker threads or no runnable triggers",
-                                loopSleepDuration.getQuantity(), loopSleepDuration.getUnit());
-                        }
-                    }
-                } catch (InterruptedException e) {
-                    LOG.debug("Received interrupted exception", e);
-                } catch (Exception e) {
-                    LOG.error("Error running job execution engine", e);
-                }
-                LOG.debug("Ending scheduler loop iteration");
+        boolean executionEnabled = true;
+        while (isRunning()) {
+            if (!schedulerConfig.canExecute()) {
+                executionEnabled = logExecutionConfigState(executionEnabled, false);
+                clock.sleepUninterruptibly(1, TimeUnit.SECONDS);
+                continue;
             }
-        } else {
-            LOG.debug("Scheduler cannot run on this node, waiting for shutdown");
-            shutdownLatch.await();
+            executionEnabled = logExecutionConfigState(executionEnabled, true);
+
+            LOG.debug("Starting scheduler loop iteration");
+            try {
+                if (!jobExecutionEngine.execute() && isRunning()) {
+                    // When the execution engine returned false, there are either no free worker threads or no
+                    // runnable triggers. To avoid busy spinning we sleep for the configured duration or until
+                    // we receive a job completion event via the scheduler event bus.
+                    if (sleeper.sleep(loopSleepDuration.getQuantity(), loopSleepDuration.getUnit())) {
+                        LOG.debug("Waited for {} {} because there are either no free worker threads or no runnable triggers",
+                                loopSleepDuration.getQuantity(), loopSleepDuration.getUnit());
+                    }
+                }
+            } catch (InterruptedException e) {
+                LOG.debug("Received interrupted exception", e);
+            } catch (Exception e) {
+                LOG.error("Error running job execution engine", e);
+            }
+            LOG.debug("Ending scheduler loop iteration");
         }
     }
 
@@ -130,7 +125,6 @@ public class JobSchedulerService extends AbstractExecutionThreadService {
     protected void triggerShutdown() {
         // We don't want to process events when shutting down, so do this first
         schedulerEventBus.unregister(this);
-        shutdownLatch.countDown();
         jobExecutionEngine.shutdown();
         executionThread.interrupt();
     }
@@ -183,7 +177,7 @@ public class JobSchedulerService extends AbstractExecutionThreadService {
 
     /**
      * {@link JobSchedulerConfig#canExecute()} may return false for a lot of consecutive calls. We don't want to log
-     * this on every scheduler loop iteration but only when there is a change in state .
+     * this on every scheduler loop iteration but only when there is a change in state.
      */
     private boolean logExecutionConfigState(boolean previouslyEnabled, boolean nowEnabled) {
         if (previouslyEnabled && !nowEnabled) {
