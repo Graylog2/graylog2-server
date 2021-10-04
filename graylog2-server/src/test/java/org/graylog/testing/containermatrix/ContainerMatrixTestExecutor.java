@@ -19,7 +19,6 @@ package org.graylog.testing.containermatrix;
 import com.google.common.io.Resources;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.specification.RequestSpecification;
-import org.graylog.storage.ElasticSearchInstanceFactoryByVersion;
 import org.graylog.testing.completebackend.ElasticsearchInstanceFactory;
 import org.graylog.testing.completebackend.GraylogBackend;
 import org.graylog.testing.containermatrix.annotations.AfterVersion;
@@ -99,7 +98,7 @@ public class ContainerMatrixTestExecutor {
             return Resources.getResource(resourceName);
         }).collect(Collectors.toList());
 
-        final ElasticsearchInstanceFactory esInstanceFactory = instantiateFactory(ElasticSearchInstanceFactoryByVersion.class);
+        final ElasticsearchInstanceFactory esInstanceFactory = instantiateFactory(annotation.elasticsearchFactory());
         final List<Path> pluginJars = instantiateFactory(annotation.pluginJarsProvider()).getJars();
         return GraylogBackend.createStarted(extraPorts, esVersion, mongoVersion, esInstanceFactory, pluginJars, null,
                 mongoDBFixtures);

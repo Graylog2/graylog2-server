@@ -17,6 +17,7 @@
 package org.graylog.elasticsearch.e2e;
 
 import io.restassured.specification.RequestSpecification;
+import org.graylog.storage.ElasticSearchInstanceFactoryByVersion;
 import org.graylog.testing.completebackend.GraylogBackend;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
@@ -33,7 +34,7 @@ import static org.graylog.testing.containermatrix.ContainerVersions.MONGO3;
 import static org.graylog.testing.containermatrix.ContainerVersions.MONGO4;
 import static org.graylog.testing.graylognode.NodeContainerConfig.GELF_HTTP_PORT;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = VM, esVersions = {ES6, ES7}, mongoVersions = {MONGO3, MONGO4})
+@ContainerMatrixTestsConfiguration(serverLifecycle = VM, elasticsearchFactory = ElasticSearchInstanceFactoryByVersion.class, esVersions = {ES6, ES7}, mongoVersions = {MONGO3, MONGO4})
 public class ElasticsearchE2E {
 
     private final GraylogBackend sut;

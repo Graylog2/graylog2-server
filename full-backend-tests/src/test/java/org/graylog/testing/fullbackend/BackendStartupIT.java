@@ -17,6 +17,7 @@
 package org.graylog.testing.fullbackend;
 
 import io.restassured.specification.RequestSpecification;
+import org.graylog.storage.ElasticSearchInstanceFactoryByVersion;
 import org.graylog.testing.completebackend.GraylogBackend;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
@@ -29,7 +30,7 @@ import static org.graylog.testing.backenddriver.SearchDriver.searchAllMessages;
 import static org.graylog.testing.completebackend.Lifecycle.CLASS;
 import static org.graylog.testing.containermatrix.ContainerVersions.ES6;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = CLASS, esVersions = {ES6})
+@ContainerMatrixTestsConfiguration(serverLifecycle = CLASS, elasticsearchFactory = ElasticSearchInstanceFactoryByVersion.class, esVersions = {ES6})
 class BackendStartupIT {
 
     private final GraylogBackend sut;

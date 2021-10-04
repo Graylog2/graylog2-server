@@ -17,6 +17,7 @@
 package org.graylog.shared.system.stats;
 
 import io.restassured.specification.RequestSpecification;
+import org.graylog.storage.ElasticSearchInstanceFactoryByVersion;
 import org.graylog.testing.completebackend.GraylogBackend;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
@@ -32,7 +33,7 @@ import static org.graylog.testing.containermatrix.ContainerVersions.ES6;
 
 // This test doesn't seem to work within github runners
 @DisabledIfEnvironmentVariable(named = "GITHUB_WORKSPACE", matches = ".+")
-@ContainerMatrixTestsConfiguration(serverLifecycle = CLASS, esVersions = {ES6})
+@ContainerMatrixTestsConfiguration(serverLifecycle = CLASS, elasticsearchFactory = ElasticSearchInstanceFactoryByVersion.class, esVersions = {ES6})
 public class SystemStatsIT {
     private final GraylogBackend sut;
     private final RequestSpecification requestSpec;
