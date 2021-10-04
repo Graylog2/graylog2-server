@@ -20,10 +20,10 @@ import Reflux from 'reflux';
 
 import { Spinner } from 'components/common';
 import CombinedProvider from 'injection/CombinedProvider';
+import { CollectorConfigurationsActions, CollectorConfigurationsStore } from 'stores/sidecars/CollectorConfigurationsStore';
 
 import ConfigurationList from './ConfigurationList';
 
-const { CollectorConfigurationsStore, CollectorConfigurationsActions } = CombinedProvider.get('CollectorConfigurations');
 const { CollectorsStore, CollectorsActions } = CombinedProvider.get('Collectors');
 
 const ConfigurationListContainer = createReactClass({

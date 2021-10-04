@@ -27,12 +27,12 @@ import history from 'util/History';
 import Routes from 'routing/Routes';
 import ColorLabel from 'components/sidecars/common/ColorLabel';
 import CombinedProvider from 'injection/CombinedProvider';
+import { CollectorConfigurationsActions } from 'stores/sidecars/CollectorConfigurationsStore';
 
 import SourceViewModal from './SourceViewModal';
 import ImportsViewModal from './ImportsViewModal';
 
 const { CollectorsStore, CollectorsActions } = CombinedProvider.get('Collectors');
-const { CollectorConfigurationsActions } = CombinedProvider.get('CollectorConfigurations');
 
 const ConfigurationForm = createReactClass({
   displayName: 'ConfigurationForm',

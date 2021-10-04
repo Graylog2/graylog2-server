@@ -23,12 +23,12 @@ import lodash from 'lodash';
 import { naturalSortIgnoreCase } from 'util/SortUtils';
 import CombinedProvider from 'injection/CombinedProvider';
 import { Spinner } from 'components/common';
+import { CollectorConfigurationsActions, CollectorConfigurationsStore } from 'stores/sidecars/CollectorConfigurationsStore';
 
 import CollectorsAdministration from './CollectorsAdministration';
 
 const { CollectorsStore, CollectorsActions } = CombinedProvider.get('Collectors');
 const { SidecarsAdministrationStore, SidecarsAdministrationActions } = CombinedProvider.get('SidecarsAdministration');
-const { CollectorConfigurationsStore, CollectorConfigurationsActions } = CombinedProvider.get('CollectorConfigurations');
 const { SidecarsActions } = CombinedProvider.get('Sidecars');
 
 const CollectorsAdministrationContainer = createReactClass({

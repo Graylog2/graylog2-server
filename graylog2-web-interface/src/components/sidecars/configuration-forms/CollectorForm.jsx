@@ -26,9 +26,9 @@ import { Input } from 'components/bootstrap';
 import history from 'util/History';
 import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';
+import { CollectorConfigurationsActions } from 'stores/sidecars/CollectorConfigurationsStore';
 
 const { CollectorsStore, CollectorsActions } = CombinedProvider.get('Collectors');
-const { CollectorConfigurationsActions } = CombinedProvider.get('CollectorConfigurations');
 
 const CollectorForm = createReactClass({
   displayName: 'CollectorForm',

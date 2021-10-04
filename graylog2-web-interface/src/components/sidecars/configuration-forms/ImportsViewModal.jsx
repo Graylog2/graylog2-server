@@ -19,11 +19,9 @@ import React from 'react';
 
 import { Button, Alert, Modal, OverlayTrigger, Tooltip } from 'components/graylog';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
-import CombinedProvider from 'injection/CombinedProvider';
 import { PaginatedList, Spinner, Timestamp, Icon } from 'components/common';
 import UserNotification from 'util/UserNotification';
-
-const { CollectorConfigurationsActions } = CombinedProvider.get('CollectorConfigurations');
+import { CollectorConfigurationsActions } from 'stores/sidecars/CollectorConfigurationsStore';
 
 class ImportsViewModal extends React.Component {
   static propTypes = {
