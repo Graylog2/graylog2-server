@@ -98,7 +98,7 @@ describe('AggregationWizard', () => {
 
     await addElement('Grouping');
 
-    await waitFor(() => expect(screen.getByText('Field is required.')).toBeInTheDocument());
+    await screen.findByText('Field is required.');
   });
 
   it('should change the config when applied', async () => {
