@@ -172,7 +172,7 @@ public class Configuration extends BaseConfiguration {
     private boolean isCloud = false;
 
     @Parameter(value = "leader_election_mode")
-    private String leaderElectionMode = "fixed";
+    private String leaderElectionMode = "manual";
 
     public boolean isMaster() {
         return isMaster;

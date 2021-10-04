@@ -33,9 +33,9 @@ public class LeaderElectionModule extends PluginModule {
         final String leaderElectionMode = configuration.getLeaderElectionMode();
 
         switch (leaderElectionMode) {
-            case "fixed":
-                bind(LeaderElectionService.class).to(FixedLeaderElectionService.class).in(Scopes.SINGLETON);
-                serviceBinder().addBinding().to(FixedLeaderElectionService.class).in(Scopes.SINGLETON);
+            case "manual":
+                bind(LeaderElectionService.class).to(ManualLeaderElectionService.class).in(Scopes.SINGLETON);
+                serviceBinder().addBinding().to(ManualLeaderElectionService.class).in(Scopes.SINGLETON);
                 break;
             case "lock-based":
                 bind(LeaderElectionService.class).to(LockBasedLeaderElectionService.class).in(Scopes.SINGLETON);

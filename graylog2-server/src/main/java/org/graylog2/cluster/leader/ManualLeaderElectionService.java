@@ -32,8 +32,8 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 @Singleton
-public class FixedLeaderElectionService extends AbstractIdleService implements LeaderElectionService {
-    private final Logger log = LoggerFactory.getLogger(FixedLeaderElectionService.class);
+public class ManualLeaderElectionService extends AbstractIdleService implements LeaderElectionService {
+    private final Logger log = LoggerFactory.getLogger(ManualLeaderElectionService.class);
 
     private final ClusterConfigService clusterConfigService;
     private final NodeId nodeId;
@@ -41,7 +41,7 @@ public class FixedLeaderElectionService extends AbstractIdleService implements L
 
 
     @Inject
-    public FixedLeaderElectionService(ClusterConfigService clusterConfigService, NodeId nodeId, EventBus eventBus) {
+    public ManualLeaderElectionService(ClusterConfigService clusterConfigService, NodeId nodeId, EventBus eventBus) {
         this.clusterConfigService = clusterConfigService;
         this.nodeId = nodeId;
         this.eventBus = eventBus;
