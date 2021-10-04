@@ -114,17 +114,17 @@ describe('StreamSearchPage', () => {
 
   it('should create view with streamId passed from props', async () => {
     render(<SimpleStreamSearchPage />);
-    await waitFor(() => expect(ViewActions.create).toHaveBeenCalledWith(View.Type.Search, 'stream-id-1'));
+    await waitFor(() => expect(ViewActions.create).toHaveBeenCalledWith(View.Type.Search, 'stream-id-1', undefined, undefined));
   });
 
   it('should recreate view when streamId passed from props changes', async () => {
     const { rerender } = render(<SimpleStreamSearchPage />);
 
-    await waitFor(() => expect(ViewActions.create).toHaveBeenCalledWith(View.Type.Search, 'stream-id-1'));
+    await waitFor(() => expect(ViewActions.create).toHaveBeenCalledWith(View.Type.Search, 'stream-id-1', undefined, undefined));
 
     rerender(<SimpleStreamSearchPage params={{ streamId: 'stream-id-2' }} />);
 
-    await waitFor(() => expect(ViewActions.create).toHaveBeenCalledWith(View.Type.Search, 'stream-id-2'));
+    await waitFor(() => expect(ViewActions.create).toHaveBeenCalledWith(View.Type.Search, 'stream-id-2', undefined, undefined));
   });
 
   describe('loading another view', () => {
