@@ -19,7 +19,6 @@ import CombinedProvider from './CombinedProvider';
 /* eslint-disable global-require */
 const actions = {
   Authentication: () => require('actions/authentication/AuthenticationActions'),
-  ConfigurationVariable: () => require('actions/sidecars/ConfigurationVariableActions'),
   Decorators: () => require('actions/decorators/DecoratorsActions'),
   Deflector: () => require('actions/indices/DeflectorActions'),
   Enterprise: () => require('actions/enterprise/EnterpriseActions'),

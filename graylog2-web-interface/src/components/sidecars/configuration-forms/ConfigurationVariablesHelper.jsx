@@ -22,12 +22,10 @@ import { Button, Alert, Table, Modal } from 'components/graylog';
 import { Spinner } from 'components/common';
 import { BootstrapModalConfirm } from 'components/bootstrap';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
-import CombinedProvider from 'injection/CombinedProvider';
+import { ConfigurationVariableActions } from 'stores/sidecars/ConfigurationVariableStore';
 
 import EditConfigurationVariableModal from './EditConfigurationVariableModal';
 import ConfigurationHelperStyle from './ConfigurationHelper.css';
-
-const { ConfigurationVariableActions } = CombinedProvider.get('ConfigurationVariable');
 
 class ConfigurationVariablesHelper extends React.Component {
   static propTypes = {
