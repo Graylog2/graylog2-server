@@ -19,6 +19,7 @@ package org.graylog2.periodical;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodeService;
+import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationImpl;
@@ -41,23 +42,25 @@ public class NodePingThread extends Periodical {
     private final ActivityWriter activityWriter;
     private final HttpConfiguration httpConfiguration;
     private final ServerStatus serverStatus;
+    private final LeaderElectionService leaderElectionService;
 
     @Inject
     public NodePingThread(NodeService nodeService,
                           NotificationService notificationService,
                           ActivityWriter activityWriter,
                           HttpConfiguration httpConfiguration,
-                          ServerStatus serverStatus) {
+                          ServerStatus serverStatus, LeaderElectionService leaderElectionService) {
         this.nodeService = nodeService;
         this.notificationService = notificationService;
         this.activityWriter = activityWriter;
         this.httpConfiguration = httpConfiguration;
         this.serverStatus = serverStatus;
+        this.leaderElectionService = leaderElectionService;
     }
 
     @Override
     public void doRun() {
-        final boolean isMaster = serverStatus.hasCapability(ServerStatus.Capability.MASTER);
+        final boolean isMaster = leaderElectionService.isLeader();
         try {
             Node node = nodeService.byNodeId(serverStatus.getNodeId());
             nodeService.markAsAlive(node, isMaster, httpConfiguration.getHttpPublishUri().resolve(HttpConfiguration.PATH_API));
