@@ -16,6 +16,7 @@
  */
 package org.graylog2.cluster;
 
+import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.plugin.database.Persisted;
 import org.joda.time.DateTime;
 
@@ -26,6 +27,10 @@ public interface Node extends Persisted {
 
     String getNodeId();
 
+    @Deprecated
+    /**
+     * @deprecated Try not to rely on a leader, or use {@link LeaderElectionService#isLeader()} instead.
+     */
     boolean isMaster();
 
     String getTransportAddress();
