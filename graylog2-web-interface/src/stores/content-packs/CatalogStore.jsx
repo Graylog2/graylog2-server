@@ -21,14 +21,17 @@ import * as URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import EntityIndex from 'logic/content-packs/EntityIndex';
-import { singleton } from 'logic/singleton';
+import { singletonStore, singletonActions } from 'logic/singleton';
 
-export const CatalogActions = Reflux.createActions({
-  showEntityIndex: { asyncResult: true },
-  getSelectedEntities: { asyncResult: true },
-});
+export const CatalogActions = singletonActions(
+  'core.Catalog',
+  () => Reflux.createActions({
+    showEntityIndex: { asyncResult: true },
+    getSelectedEntities: { asyncResult: true },
+  }),
+);
 
-export const CatalogStore = singleton(
+export const CatalogStore = singletonStore(
   'core.Catalog',
   () => Reflux.createStore({
     listenables: [CatalogActions],

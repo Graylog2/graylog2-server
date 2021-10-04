@@ -18,13 +18,16 @@ import Reflux from 'reflux';
 
 import * as URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
-import { singleton } from 'logic/singleton';
+import { singletonStore, singletonActions } from 'logic/singleton';
 
-export const AvailableEventDefinitionTypesActions = Reflux.createActions({
-  get: { asyncResult: true },
-});
+export const AvailableEventDefinitionTypesActions = singletonActions(
+  'core.AvailableEventDefinitionTypes',
+  () => Reflux.createActions({
+    get: { asyncResult: true },
+  }),
+);
 
-export const AvailableEventDefinitionTypesStore = singleton(
+export const AvailableEventDefinitionTypesStore = singletonStore(
   'core.AvailableEventDefinitionTypes',
   () => Reflux.createStore({
     listenables: [AvailableEventDefinitionTypesActions],
