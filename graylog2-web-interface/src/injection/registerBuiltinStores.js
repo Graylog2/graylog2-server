@@ -19,7 +19,6 @@ import CombinedProvider from './CombinedProvider';
 /* eslint-disable global-require */
 const actions = {
   Authentication: () => require('actions/authentication/AuthenticationActions'),
-  Configurations: () => require('actions/configurations/ConfigurationActions'),
   ConfigurationVariable: () => require('actions/sidecars/ConfigurationVariableActions'),
   Decorators: () => require('actions/decorators/DecoratorsActions'),
   Deflector: () => require('actions/indices/DeflectorActions'),
@@ -61,7 +60,6 @@ const actions = {
 
 const stores = {
   Authentication: () => require('stores/authentication/AuthenticationStore'),
-  Configurations: () => require('stores/configurations/ConfigurationsStore'),
   CurrentUser: () => require('stores/users/CurrentUserStore'),
   Decorators: () => require('stores/decorators/DecoratorsStore'),
   Deflector: () => require('stores/indices/DeflectorStore'),

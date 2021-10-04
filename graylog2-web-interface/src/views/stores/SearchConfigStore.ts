@@ -19,7 +19,7 @@ import Reflux from 'reflux';
 import { singletonActions, singletonStore } from 'logic/singleton';
 import { Store } from 'stores/StoreTypes';
 import { SearchesConfig } from 'components/search/SearchConfig';
-import { ConfigurationActions } from 'stores/configurations/ConfigurationsStore';
+import { ConfigurationsActions } from 'stores/configurations/ConfigurationsStore';
 
 type SearchConfigActionsType = {
   refresh: () => Promise<void>;
@@ -51,7 +51,7 @@ export const SearchConfigStore: Store<SearchConfigStoreState> = singletonStore(
     },
 
     refresh() {
-      ConfigurationActions.listSearchesClusterConfig().then((response) => {
+      ConfigurationsActions.listSearchesClusterConfig().then((response) => {
         this.searchesClusterConfig = response;
         this._trigger();
       });

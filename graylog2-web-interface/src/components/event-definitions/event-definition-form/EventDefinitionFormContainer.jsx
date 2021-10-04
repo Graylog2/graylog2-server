@@ -25,7 +25,7 @@ import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnu
 import CombinedProvider from 'injection/CombinedProvider';
 import { ConfirmLeaveDialog, Spinner } from 'components/common';
 import { AvailableEventDefinitionTypesStore } from 'stores/event-definitions/AvailableEventDefinitionTypesStore';
-import { ConfigurationActions } from 'stores/configurations/ConfigurationsStore';
+import { ConfigurationsActions } from 'stores/configurations/ConfigurationsStore';
 
 import EventDefinitionForm from './EventDefinitionForm';
 
@@ -91,7 +91,7 @@ class EventDefinitionFormContainer extends React.Component {
   };
 
   fetchClusterConfig = () => {
-    ConfigurationActions.listEventsClusterConfig().then((config) => this.setState({ eventsClusterConfig: config }));
+    ConfigurationsActions.listEventsClusterConfig().then((config) => this.setState({ eventsClusterConfig: config }));
   };
 
   handleChange = (key, value) => {

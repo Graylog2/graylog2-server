@@ -23,19 +23,19 @@ import UserNotification from 'util/UserNotification';
 import { SearchesConfig } from 'components/search/SearchConfig';
 import { singletonStore, singletonActions } from 'logic/singleton';
 
-type ConfigurationActionsType = {
+type ConfigurationsActionsType = {
   list: (configType: any) => Promise<unknown>,
   listSearchesClusterConfig: () => Promise<unknown>,
   listMessageProcessorsConfig: (configType: any) => Promise<unknown>,
   listEventsClusterConfig: () => Promise<unknown>,
   listWhiteListConfig: (configType: any) => Promise<unknown>,
-  update: (configType: any, config: any) => Promise<unknown>,
-  updateWhitelist: (configType: any, config: any) => Promise<unknown>,
-  updateMessageProcessorsConfig: (configType: any, config: any) => Promise<unknown>,
+  update: (configType: any, config: any) => Promise<void>,
+  updateWhitelist: (configType: any, config: any) => Promise<void>,
+  updateMessageProcessorsConfig: (configType: any, config: any) => Promise<void>,
 }
-export const ConfigurationActions = singletonActions(
+export const ConfigurationsActions = singletonActions(
   'core.Configuration',
-  () => Reflux.createActions<ConfigurationActionsType>({
+  () => Reflux.createActions<ConfigurationsActionsType>({
     list: { asyncResult: true },
     listSearchesClusterConfig: { asyncResult: true },
     listMessageProcessorsConfig: { asyncResult: true },
@@ -69,7 +69,7 @@ export type ConfigurationsStoreState = {
 export const ConfigurationsStore = singletonStore(
   'core.Configuration',
   () => Reflux.createStore<ConfigurationsStoreState>({
-    listenables: [ConfigurationActions],
+    listenables: [ConfigurationsActions],
 
     configuration: {},
     searchesClusterConfig: {},
@@ -104,7 +104,7 @@ export const ConfigurationsStore = singletonStore(
         return response;
       });
 
-      ConfigurationActions.list.promise(promise);
+      ConfigurationsActions.list.promise(promise);
     },
 
     listSearchesClusterConfig() {
@@ -115,7 +115,7 @@ export const ConfigurationsStore = singletonStore(
         return response;
       });
 
-      ConfigurationActions.listSearchesClusterConfig.promise(promise);
+      ConfigurationsActions.listSearchesClusterConfig.promise(promise);
     },
 
     listMessageProcessorsConfig(configType) {
@@ -126,7 +126,7 @@ export const ConfigurationsStore = singletonStore(
         return response;
       });
 
-      ConfigurationActions.listMessageProcessorsConfig.promise(promise);
+      ConfigurationsActions.listMessageProcessorsConfig.promise(promise);
     },
 
     listWhiteListConfig(configType) {
@@ -137,7 +137,7 @@ export const ConfigurationsStore = singletonStore(
         return response;
       });
 
-      ConfigurationActions.listWhiteListConfig.promise(promise);
+      ConfigurationsActions.listWhiteListConfig.promise(promise);
     },
 
     listEventsClusterConfig() {
@@ -148,7 +148,7 @@ export const ConfigurationsStore = singletonStore(
         return response;
       });
 
-      ConfigurationActions.listEventsClusterConfig.promise(promise);
+      ConfigurationsActions.listEventsClusterConfig.promise(promise);
     },
 
     update(configType, config) {
@@ -167,7 +167,7 @@ export const ConfigurationsStore = singletonStore(
         },
       );
 
-      ConfigurationActions.update.promise(promise);
+      ConfigurationsActions.update.promise(promise);
     },
 
     updateWhitelist(configType, config) {
@@ -186,7 +186,7 @@ export const ConfigurationsStore = singletonStore(
         },
       );
 
-      ConfigurationActions.updateWhitelist.promise(promise);
+      ConfigurationsActions.updateWhitelist.promise(promise);
     },
 
     updateMessageProcessorsConfig(configType, config) {
@@ -205,7 +205,7 @@ export const ConfigurationsStore = singletonStore(
         },
       );
 
-      ConfigurationActions.updateMessageProcessorsConfig.promise(promise);
+      ConfigurationsActions.updateMessageProcessorsConfig.promise(promise);
     },
   }),
 );

@@ -31,6 +31,7 @@ import 'components/maps/configurations';
 import { Store } from 'stores/StoreTypes';
 import usePluginEntities from 'views/logic/usePluginEntities';
 import ConfigletRow from 'pages/configurations/ConfigletRow';
+import { ConfigurationsActions, ConfigurationsStore } from 'stores/configurations/ConfigurationsStore';
 
 import ConfigletContainer from './configurations/ConfigletContainer';
 import PluginConfigRows from './configurations/PluginConfigRows';
@@ -38,7 +39,6 @@ import PluginConfigRows from './configurations/PluginConfigRows';
 import DecoratorsConfig from '../components/configurations/DecoratorsConfig';
 
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
-const { ConfigurationsActions, ConfigurationsStore } = CombinedProvider.get('Configurations');
 
 const SEARCHES_CLUSTER_CONFIG = 'org.graylog2.indexer.searches.SearchesClusterConfig';
 const MESSAGE_PROCESSORS_CONFIG = 'org.graylog2.messageprocessors.MessageProcessorsConfig';
