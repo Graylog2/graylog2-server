@@ -94,7 +94,7 @@ public class ManualLeaderElectionService extends AbstractIdleService implements 
 
         @JsonCreator
         public static Leader create(@JsonProperty("node_id") String nodeId) {
-            return new AutoValue_FixedLeaderElectionService_Leader(nodeId);
+            return new AutoValue_ManualLeaderElectionService_Leader(nodeId);
         }
     }
 }
