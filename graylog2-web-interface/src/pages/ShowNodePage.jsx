@@ -19,7 +19,6 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
-import StoreProvider from 'injection/StoreProvider';
 import { NodeMaintenanceDropdown, NodeOverview } from 'components/nodes';
 import { DocumentTitle, PageErrorOverview, PageHeader, Spinner } from 'components/common';
 import withParams from 'routing/withParams';
@@ -28,7 +27,7 @@ import { InputStatesStore } from 'stores/inputs/InputStatesStore';
 import { InputTypesStore } from 'stores/inputs/InputTypesStore';
 import { NodesStore } from 'stores/nodes/NodesStore';
 
-const PluginsStore = StoreProvider.getStore('Plugins');
+import { PluginsStore } from '../stores/plugins/PluginsStore';
 
 function nodeFilter(state) {
   return state.nodes ? state.nodes[this.props.params.nodeId] : state.nodes;

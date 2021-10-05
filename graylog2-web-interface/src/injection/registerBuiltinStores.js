@@ -33,7 +33,6 @@ const actions = {
 
 const stores = {
   Authentication: () => require('stores/authentication/AuthenticationStore'),
-  Plugins: () => require('stores/plugins/PluginsStore'),
   Preferences: () => require('stores/users/PreferencesStore'),
   FilterPreview: () => require('stores/event-definitions/FilterPreviewStore'),
   Roles: () => require('stores/users/RolesStore'),
