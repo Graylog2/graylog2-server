@@ -31,11 +31,11 @@ import type { Message } from 'views/components/messagelist/Types';
 import useForwarderMessageLoaders from 'components/messageloaders/useForwarderMessageLoaders';
 import AppConfig from 'util/AppConfig';
 import { CodecTypesStore, CodecTypesActions } from 'stores/codecs/CodecTypesStore';
+import { InputsActions, InputsStore } from 'stores/inputs/InputsStore';
 
 import type { Input as InputType, CodecTypes } from './Types';
 
 const { MessagesActions } = CombinedProvider.get('Messages');
-const { InputsActions, InputsStore } = CombinedProvider.get('Inputs');
 const DEFAULT_REMOTE_ADDRESS = '127.0.0.1';
 
 type InputSelectProps = {

@@ -25,13 +25,11 @@ import EditExtractor from 'components/extractors/EditExtractor';
 import DocsHelper from 'util/DocsHelper';
 import history from 'util/History';
 import Routes from 'routing/Routes';
-import ActionsProvider from 'injection/ActionsProvider';
 import StoreProvider from 'injection/StoreProvider';
 import withParams from 'routing/withParams';
 import { ExtractorsActions, ExtractorsStore } from 'stores/extractors/ExtractorsStore';
+import { InputsActions, InputsStore } from 'stores/inputs/InputsStore';
 
-const InputsActions = ActionsProvider.getActions('Inputs');
-const InputsStore = StoreProvider.getStore('Inputs');
 const UniversalSearchstore = StoreProvider.getStore('UniversalSearch');
 
 const EditExtractorsPage = createReactClass({

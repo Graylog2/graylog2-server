@@ -28,8 +28,7 @@ import StreamRuleForm from 'components/streamrules/StreamRuleForm';
 import HumanReadableStreamRule from 'components/streamrules/HumanReadableStreamRule';
 import StoreProvider from 'injection/StoreProvider';
 import UserNotification from 'util/UserNotification';
-
-const { InputsStore, InputsActions } = CombinedProvider.get('Inputs');
+import { InputsActions, InputsStore } from 'stores/inputs/InputsStore';
 
 const StreamRulesStore = StoreProvider.getStore('StreamRules');
 

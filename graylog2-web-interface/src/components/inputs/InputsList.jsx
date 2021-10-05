@@ -26,15 +26,14 @@ import EntityList from 'components/common/EntityList';
 import { IfPermitted, Spinner, SearchForm } from 'components/common';
 import StoreProvider from 'injection/StoreProvider';
 import ActionsProvider from 'injection/ActionsProvider';
+import { InputsActions, InputsStore } from 'stores/inputs/InputsStore';
 
 import InputListItem from './InputListItem';
 import CreateInputControl from './CreateInputControl';
 
-const InputsActions = ActionsProvider.getActions('Inputs');
 const SingleNodeActions = ActionsProvider.getActions('SingleNode');
 const InputTypesActions = ActionsProvider.getActions('InputTypes');
 
-const InputsStore = StoreProvider.getStore('Inputs');
 const SingleNodeStore = StoreProvider.getStore('SingleNode');
 
 const InputListRow = styled(Row)`

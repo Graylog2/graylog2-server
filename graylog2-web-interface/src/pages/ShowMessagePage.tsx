@@ -32,9 +32,9 @@ import { Message } from 'views/components/messagelist/Types';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import WindowDimensionsContextProvider from 'contexts/WindowDimensionsContextProvider';
 import StreamsStore from 'stores/streams/StreamsStore';
+import { InputsActions } from 'stores/inputs/InputsStore';
 
 const NodesActions = ActionsProvider.getActions('Nodes');
-const InputsActions = ActionsProvider.getActions('Inputs');
 const MessagesActions = ActionsProvider.getActions('Messages');
 
 type Props = {

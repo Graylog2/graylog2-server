@@ -31,11 +31,10 @@ import ActionsProvider from 'injection/ActionsProvider';
 import withParams from 'routing/withParams';
 import withLocation from 'routing/withLocation';
 import { ExtractorsStore } from 'stores/extractors/ExtractorsStore';
+import { InputsActions, InputsStore } from 'stores/inputs/InputsStore';
 
-const InputsStore = StoreProvider.getStore('Inputs');
 // eslint-disable-next-line no-unused-vars
 const MessagesStore = StoreProvider.getStore('Messages');
-const InputsActions = ActionsProvider.getActions('Inputs');
 const MessagesActions = ActionsProvider.getActions('Messages');
 
 const CreateExtractorsPage = createReactClass({

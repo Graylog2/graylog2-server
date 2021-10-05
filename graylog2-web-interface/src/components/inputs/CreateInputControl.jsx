@@ -25,9 +25,9 @@ import { ExternalLinkButton, Select } from 'components/common';
 import ActionsProvider from 'injection/ActionsProvider';
 import StoreProvider from 'injection/StoreProvider';
 import { InputForm } from 'components/inputs';
+import { InputsActions } from 'stores/inputs/InputsStore';
 
 const InputTypesActions = ActionsProvider.getActions('InputTypes');
-const InputsActions = ActionsProvider.getActions('Inputs');
 const InputTypesStore = StoreProvider.getStore('InputTypes');
 
 const NewInputRow = styled(Row)`
