@@ -19,7 +19,6 @@ import CombinedProvider from './CombinedProvider';
 /* eslint-disable global-require */
 const actions = {
   Authentication: () => require('actions/authentication/AuthenticationActions'),
-  LookupTableCaches: () => require('actions/lookup-tables/LookupTableCachesActions'),
   LookupTableDataAdapters: () => require('actions/lookup-tables/LookupTableDataAdaptersActions'),
   Messages: () => require('actions/messages/MessagesActions'),
   Metrics: () => require('actions/metrics/MetricsActions'),
@@ -41,7 +40,6 @@ const actions = {
 
 const stores = {
   Authentication: () => require('stores/authentication/AuthenticationStore'),
-  LookupTableCaches: () => require('stores/lookup-tables/LookupTableCachesStore'),
   LookupTableDataAdapters: () => require('stores/lookup-tables/LookupTableDataAdaptersStore'),
   Messages: () => require('stores/messages/MessagesStore'),
   Metrics: () => require('stores/metrics/MetricsStore'),
