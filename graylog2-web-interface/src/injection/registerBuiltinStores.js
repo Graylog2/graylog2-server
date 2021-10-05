@@ -19,7 +19,6 @@ import CombinedProvider from './CombinedProvider';
 /* eslint-disable global-require */
 const actions = {
   Authentication: () => require('actions/authentication/AuthenticationActions'),
-  SidecarsAdministration: () => require('actions/sidecars/SidecarsAdministrationActions'),
   Simulator: () => require('actions/simulator/SimulatorActions'),
   SingleNode: () => require('actions/nodes/SingleNodeActions'),
   SystemJobs: () => require('actions/systemjobs/SystemJobsActions'),
@@ -27,7 +26,6 @@ const actions = {
 
 const stores = {
   Authentication: () => require('stores/authentication/AuthenticationStore'),
-  SidecarsAdministration: () => require('stores/sidecars/SidecarsAdministrationStore'),
   Simulator: () => require('stores/simulator/SimulatorStore'),
   SingleNode: () => require('stores/nodes/SingleNodeStore'),
   Startpage: () => require('stores/users/StartpageStore'),

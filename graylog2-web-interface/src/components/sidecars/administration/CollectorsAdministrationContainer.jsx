@@ -21,15 +21,13 @@ import Reflux from 'reflux';
 import lodash from 'lodash';
 
 import { naturalSortIgnoreCase } from 'util/SortUtils';
-import CombinedProvider from 'injection/CombinedProvider';
 import { Spinner } from 'components/common';
 import { CollectorConfigurationsActions, CollectorConfigurationsStore } from 'stores/sidecars/CollectorConfigurationsStore';
 import { CollectorsActions, CollectorsStore } from 'stores/sidecars/CollectorsStore';
 import { SidecarsActions } from 'stores/sidecars/SidecarsStore';
+import { SidecarsAdministrationActions, SidecarsAdministrationStore } from 'stores/sidecars/SidecarsAdministrationStore';
 
 import CollectorsAdministration from './CollectorsAdministration';
-
-const { SidecarsAdministrationStore, SidecarsAdministrationActions } = CombinedProvider.get('SidecarsAdministration');
 
 const CollectorsAdministrationContainer = createReactClass({
   propTypes: {
