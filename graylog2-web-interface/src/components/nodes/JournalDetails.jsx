@@ -35,10 +35,10 @@ import StoreProvider from 'injection/StoreProvider';
 import { Spinner, Timestamp, Icon } from 'components/common';
 import NumberUtils from 'util/NumberUtils';
 import Routes from 'routing/Routes';
+import { JournalStore } from 'stores/journal/JournalStore';
 
 const MetricsActions = ActionsProvider.getActions('Metrics');
 const MetricsStore = StoreProvider.getStore('Metrics');
-const JournalStore = StoreProvider.getStore('Journal');
 
 const JournalUsageProgressBar = styled(ProgressBar)`
   margin-bottom: 5px;

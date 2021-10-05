@@ -43,7 +43,6 @@ const actions = {
 
 const stores = {
   Authentication: () => require('stores/authentication/AuthenticationStore'),
-  Journal: () => require('stores/journal/JournalStore'),
   Loggers: () => require('stores/system/LoggersStore'),
   LookupTables: () => require('stores/lookup-tables/LookupTablesStore'),
   LookupTableCaches: () => require('stores/lookup-tables/LookupTableCachesStore'),
