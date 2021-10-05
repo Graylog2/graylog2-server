@@ -24,14 +24,12 @@ import _ from 'lodash';
 
 import { Col, Row } from 'components/graylog';
 import { Spinner } from 'components/common';
-import StoreProvider from 'injection/StoreProvider';
 import NumberUtils from 'util/NumberUtils';
 import EventHandlersThrottler from 'util/EventHandlersThrottler';
 import { ClusterTrafficActions, ClusterTrafficStore } from 'stores/cluster/ClusterTrafficStore';
+import { NodesStore } from 'stores/nodes/NodesStore';
 
 import TrafficGraph from './TrafficGraph';
-
-const NodesStore = StoreProvider.getStore('Nodes');
 
 const GraylogClusterOverview = createReactClass({
   displayName: 'GraylogClusterOverview',

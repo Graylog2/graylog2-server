@@ -26,8 +26,8 @@ import withParams from 'routing/withParams';
 import { ClusterOverviewStore } from 'stores/cluster/ClusterOverviewStore';
 import { InputStatesStore } from 'stores/inputs/InputStatesStore';
 import { InputTypesStore } from 'stores/inputs/InputTypesStore';
+import { NodesStore } from 'stores/nodes/NodesStore';
 
-const NodesStore = StoreProvider.getStore('Nodes');
 const PluginsStore = StoreProvider.getStore('Plugins');
 
 function nodeFilter(state) {

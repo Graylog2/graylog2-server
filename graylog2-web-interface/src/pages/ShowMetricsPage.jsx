@@ -19,14 +19,12 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
-import StoreProvider from 'injection/StoreProvider';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { MetricsComponent } from 'components/metrics';
 import withParams from 'routing/withParams';
 import withLocation from 'routing/withLocation';
 import { MetricsActions, MetricsStore } from 'stores/metrics/MetricsStore';
-
-const NodesStore = StoreProvider.getStore('Nodes');
+import { NodesStore } from 'stores/nodes/NodesStore';
 
 const ShowMetricsPage = createReactClass({
   displayName: 'ShowMetricsPage',

@@ -21,12 +21,10 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
 import { Label, OverlayTrigger, Popover } from 'components/graylog';
-import StoreProvider from 'injection/StoreProvider';
 import { LinkToNode, Spinner } from 'components/common';
 import InputStateComparator from 'logic/inputs/InputStateComparator';
 import { InputStatesStore } from 'stores/inputs/InputStatesStore';
-
-const NodesStore = StoreProvider.getStore('Nodes');
+import { NodesStore } from 'stores/nodes/NodesStore';
 
 const InputStateBadge = createReactClass({
   displayName: 'InputStateBadge',

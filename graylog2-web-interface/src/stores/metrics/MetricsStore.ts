@@ -23,9 +23,9 @@ import TimeHelper from 'util/TimeHelper';
 import StoreProvider from 'injection/StoreProvider';
 import ActionsProvider from 'injection/ActionsProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
+import { NodesStore } from 'stores/nodes/NodesStore';
 
 const SessionStore = StoreProvider.getStore('Session');
-const NodesStore = StoreProvider.getStore('Nodes');
 const SessionActions = ActionsProvider.getActions('Session');
 
 type MetricsActionsType = {

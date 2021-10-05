@@ -18,7 +18,6 @@ import PropTypes from 'prop-types';
 import React, { useEffect, useMemo, useState } from 'react';
 import * as Immutable from 'immutable';
 
-import ActionsProvider from 'injection/ActionsProvider';
 import DocumentTitle from 'components/common/DocumentTitle';
 import Spinner from 'components/common/Spinner';
 import { Col, Row } from 'components/graylog';
@@ -34,8 +33,7 @@ import WindowDimensionsContextProvider from 'contexts/WindowDimensionsContextPro
 import StreamsStore from 'stores/streams/StreamsStore';
 import { InputsActions } from 'stores/inputs/InputsStore';
 import { MessagesActions } from 'stores/messages/MessagesStore';
-
-const NodesActions = ActionsProvider.getActions('Nodes');
+import { NodesActions } from 'stores/nodes/NodesStore';
 
 type Props = {
   params: {

@@ -20,8 +20,21 @@ import { qualifyUrl } from 'util/URLUtils';
 import { fetchPeriodically } from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
 import CombinedProvider from 'injection/CombinedProvider';
+import { singletonStore, singletonActions } from 'logic/singleton';
 
-const { NodesActions } = CombinedProvider.get('Nodes');
+type ListResponse = {
+  nodes: Array<NodeInfo>;
+
+}
+type NodesActionsType = {
+  list: () => Promise<ListResponse>,
+};
+export const NodesActions = singletonActions(
+  'core.Nodes',
+  () => Reflux.createActions<NodesActionsType>({
+    list: { asyncResult: true },
+  }),
+);
 const { SessionStore } = CombinedProvider.get('Session');
 
 export type NodeInfo = {
@@ -45,76 +58,77 @@ export type NodesStoreState = {
   clusterId: string;
   nodeCount: number;
 };
-const NodesStore = Reflux.createStore<NodesStoreState>({
-  listenables: [NodesActions],
-  nodes: undefined,
-  clusterId: undefined,
-  nodeCount: 0,
-  INTERVAL: 5000, // 5 seconds
-  promises: {},
+export const NodesStore = singletonStore(
+  'core.Nodes',
+  () => Reflux.createStore<NodesStoreState>({
+    listenables: [NodesActions],
+    nodes: undefined,
+    clusterId: undefined,
+    nodeCount: 0,
+    INTERVAL: 5000, // 5 seconds
+    promises: {},
 
-  init() {
-    if (this.nodes === undefined) {
-      this._triggerList();
-      setInterval(this._triggerList, this.INTERVAL);
-    }
-  },
+    init() {
+      if (this.nodes === undefined) {
+        this._triggerList();
+        setInterval(this._triggerList, this.INTERVAL);
+      }
+    },
 
-  _triggerList() {
-    if (SessionStore.isLoggedIn()) {
-      NodesActions.list();
-    }
-  },
+    _triggerList() {
+      if (SessionStore.isLoggedIn()) {
+        NodesActions.list();
+      }
+    },
 
-  getInitialState() {
-    return this.getNodesInfo();
-  },
+    getInitialState() {
+      return this.getNodesInfo();
+    },
 
-  getNodesInfo() {
-    return { nodes: this.nodes, clusterId: this.clusterId, nodeCount: this.nodeCount };
-  },
+    getNodesInfo() {
+      return { nodes: this.nodes, clusterId: this.clusterId, nodeCount: this.nodeCount };
+    },
 
-  list() {
-    const promise = this.promises.list || fetchPeriodically('GET', qualifyUrl(ApiRoutes.ClusterApiResource.list().url))
-      .then((response: NodesListResponse) => {
-        this.nodes = {};
+    list() {
+      const promise = this.promises.list || fetchPeriodically('GET', qualifyUrl(ApiRoutes.ClusterApiResource.list().url))
+        .then((response: NodesListResponse) => {
+          this.nodes = {};
 
-        if (response.nodes) {
-          this.nodes = response.nodes
-            .map<[string, NodeInfo]>((node) => [node.node_id, node])
-            .reduce((prev, [key, value]) => ({ ...prev, [key]: value }), {});
+          if (response.nodes) {
+            this.nodes = response.nodes
+              .map<[string, NodeInfo]>((node) => [node.node_id, node])
+              .reduce((prev, [key, value]) => ({ ...prev, [key]: value }), {});
 
-          this.clusterId = this._clusterId();
-          this.nodeCount = this._nodeCount();
-          this._propagateState();
-        }
+            this.clusterId = this._clusterId();
+            this.nodeCount = this._nodeCount();
+            this._propagateState();
+          }
 
-        return response;
-      })
-      .finally(() => delete this.promises.list);
+          return response;
+        })
+        .finally(() => delete this.promises.list);
 
-    this.promises.list = promise;
+      this.promises.list = promise;
 
-    NodesActions.list.promise(promise);
-  },
+      NodesActions.list.promise(promise);
+    },
 
-  getNode(nodeId) {
-    return this.nodes?.[nodeId];
-  },
+    getNode(nodeId) {
+      return this.nodes?.[nodeId];
+    },
 
-  _clusterId() {
-    const nodeInCluster = Object.keys(this.nodes).map((id) => this.nodes[id]).find((node) => node.cluster_id);
+    _clusterId() {
+      const nodeInCluster = Object.keys(this.nodes).map((id) => this.nodes[id]).find((node) => node.cluster_id);
 
-    return (nodeInCluster ? nodeInCluster.cluster_id.toUpperCase() : undefined);
-  },
+      return (nodeInCluster ? nodeInCluster.cluster_id.toUpperCase() : undefined);
+    },
 
-  _nodeCount() {
-    return Object.keys(this.nodes).length;
-  },
+    _nodeCount() {
+      return Object.keys(this.nodes).length;
+    },
 
-  _propagateState() {
-    this.trigger(this.getNodesInfo());
-  },
-});
-
-export default NodesStore;
+    _propagateState() {
+      this.trigger(this.getNodesInfo());
+    },
+  }),
+);

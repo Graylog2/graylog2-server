@@ -21,13 +21,11 @@ import Reflux from 'reflux';
 
 import { Row, Col } from 'components/graylog';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
-import StoreProvider from 'injection/StoreProvider';
 import DateTime from 'logic/datetimes/DateTime';
 import withParams from 'routing/withParams';
 import { ClusterOverviewStore } from 'stores/cluster/ClusterOverviewStore';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
-
-const NodesStore = StoreProvider.getStore('Nodes');
+import { NodesStore } from 'stores/nodes/NodesStore';
 
 function nodeFilter(state) {
   return state.nodes ? state.nodes[this.props.params.nodeId] : state.nodes;

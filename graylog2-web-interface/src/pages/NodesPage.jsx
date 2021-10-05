@@ -20,12 +20,10 @@ import Reflux from 'reflux';
 import URI from 'urijs';
 
 import * as URLUtils from 'util/URLUtils';
-import StoreProvider from 'injection/StoreProvider';
 import { DocumentTitle, ExternalLinkButton, PageHeader, Spinner } from 'components/common';
 import { NodesList } from 'components/nodes';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
-
-const NodesStore = StoreProvider.getStore('Nodes');
+import { NodesStore } from 'stores/nodes/NodesStore';
 
 const GLOBAL_API_BROWSER_URL = '/api-browser/global/index.html';
 

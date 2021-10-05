@@ -21,8 +21,8 @@ import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import StoreProvider from 'injection/StoreProvider';
 import { singletonStore } from 'logic/singleton';
+import { NodesStore } from 'stores/nodes/NodesStore';
 
-const NodesStore = StoreProvider.getStore('Nodes');
 const SystemProcessingStore = StoreProvider.getStore('SystemProcessing');
 const SystemLoadBalancerStore = StoreProvider.getStore('SystemLoadBalancer');
 
