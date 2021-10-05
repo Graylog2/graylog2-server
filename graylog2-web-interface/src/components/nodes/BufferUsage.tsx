@@ -25,7 +25,7 @@ import Routes from 'routing/Routes';
 import NumberUtils from 'util/NumberUtils';
 import { Spinner } from 'components/common';
 import { useStore } from 'stores/connect';
-import { MetricsActions, MetricsStore } from 'stores/metrics/MetricsStore';
+import { MetricsActions, MetricsStore, GaugeMetric } from 'stores/metrics/MetricsStore';
 
 const NodeBufferUsage = styled.div(({ theme }) => css`
   margin-top: ${theme.spacings.sm};
@@ -68,9 +68,9 @@ const BufferUsage = ({ nodeId, bufferType, title }: Props) => {
 
   const prefix = _metricPrefix(bufferType);
 
-  const usageMetric = metrics[nodeId][`${prefix}.usage`];
+  const usageMetric = metrics[nodeId][`${prefix}.usage`] as GaugeMetric;
   const usage = usageMetric ? usageMetric.metric.value : NaN;
-  const sizeMetric = metrics[nodeId][`${prefix}.size`];
+  const sizeMetric = metrics[nodeId][`${prefix}.size`] as GaugeMetric;
   const size = sizeMetric ? sizeMetric.metric.value : NaN;
   // eslint-disable-next-line no-restricted-globals
   const usagePercentage = ((!isNaN(usage) && !isNaN(size)) ? usage / size : 0);

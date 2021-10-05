@@ -29,14 +29,14 @@ const NodesStore = StoreProvider.getStore('Nodes');
 const SessionActions = ActionsProvider.getActions('Session');
 
 type MetricsActionsType = {
-  add: () => Promise<unknown>,
-  addGlobal: () => Promise<unknown>,
+  add: (nodeId: string, metricName: string) => Promise<unknown>,
+  addGlobal: (name: string) => Promise<unknown>,
   clear: () => Promise<unknown>,
   filter: () => Promise<unknown>,
   list: () => Promise<unknown>,
   names: () => Promise<unknown>,
-  remove: () => Promise<unknown>,
-  removeGlobal: () => Promise<unknown>,
+  remove: (nodeId: string, metricName: string) => Promise<unknown>,
+  removeGlobal: (name: string) => Promise<unknown>,
 }
 export const MetricsActions = singletonActions(
   'core.Metrics',
@@ -59,7 +59,7 @@ type CounterMetric = {
   type: 'counter',
 };
 
-type GaugeMetric = {
+export type GaugeMetric = {
   metric: {
     value: number,
   },
@@ -100,9 +100,12 @@ export type ClusterMetric = {
   [nodeId: string]: NodeMetric,
 };
 
+type MetricsStoreState = {
+  metrics: ClusterMetric,
+}
 export const MetricsStore = singletonStore(
   'core.Metrics',
-  () => Reflux.createStore({
+  () => Reflux.createStore<MetricsStoreState>({
     listenables: [MetricsActions, SessionActions],
     namespace: 'org',
     registrations: {},
