@@ -27,10 +27,8 @@ import MatchingTypeSwitcher from 'components/streams/MatchingTypeSwitcher';
 import StreamRuleList from 'components/streamrules/StreamRuleList';
 import StreamRuleForm from 'components/streamrules/StreamRuleForm';
 import Spinner from 'components/common/Spinner';
-import StoreProvider from 'injection/StoreProvider';
 import StreamsStore from 'stores/streams/StreamsStore';
-
-const StreamRulesStore = StoreProvider.getStore('StreamRules');
+import { StreamRulesStore } from 'stores/streams/StreamRulesStore';
 
 const StreamAlertHeader = styled(Panel.Heading)`
   font-weight: bold;

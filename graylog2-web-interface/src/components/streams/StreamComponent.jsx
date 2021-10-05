@@ -23,11 +23,10 @@ import StoreProvider from 'injection/StoreProvider';
 import Spinner from 'components/common/Spinner';
 import QueryHelper from 'components/common/QueryHelper';
 import StreamsStore from 'stores/streams/StreamsStore';
+import { StreamRulesStore } from 'stores/streams/StreamRulesStore';
 
 import StreamList from './StreamList';
 import CreateStreamButton from './CreateStreamButton';
-
-const StreamRulesStore = StoreProvider.getStore('StreamRules');
 
 class StreamComponent extends React.Component {
   static propTypes = {

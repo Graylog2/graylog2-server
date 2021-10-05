@@ -23,7 +23,6 @@ const actions = {
 
 const stores = {
   Authentication: () => require('stores/authentication/AuthenticationStore'),
-  StreamRules: () => require('stores/streams/StreamRulesStore'),
   System: () => require('stores/system/SystemStore'),
   SystemLoadBalancer: () => require('stores/load-balancer/SystemLoadBalancerStore'),
   SystemMessages: () => require('stores/systemmessages/SystemMessagesStore'),

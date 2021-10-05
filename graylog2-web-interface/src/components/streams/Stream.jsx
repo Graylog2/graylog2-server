@@ -25,15 +25,13 @@ import { Icon, OverlayElement, ShareButton } from 'components/common';
 import StreamRuleForm from 'components/streamrules/StreamRuleForm';
 import { isAnyPermitted, isPermitted } from 'util/PermissionsMixin';
 import UserNotification from 'util/UserNotification';
-import StoreProvider from 'injection/StoreProvider';
 import Routes from 'routing/Routes';
 import StreamsStore from 'stores/streams/StreamsStore';
+import { StreamRulesStore } from 'stores/streams/StreamRulesStore';
 
 import StreamMetaData from './StreamMetaData';
 import StreamControls from './StreamControls';
 import StreamStateBadge from './StreamStateBadge';
-
-const StreamRulesStore = StoreProvider.getStore('StreamRules');
 
 const StreamListItem = styled.li(({ theme }) => css`
   display: block;

@@ -26,11 +26,9 @@ import { Button, ListGroupItem } from 'components/graylog';
 import { isPermitted } from 'util/PermissionsMixin';
 import StreamRuleForm from 'components/streamrules/StreamRuleForm';
 import HumanReadableStreamRule from 'components/streamrules/HumanReadableStreamRule';
-import StoreProvider from 'injection/StoreProvider';
 import UserNotification from 'util/UserNotification';
 import { InputsActions, InputsStore } from 'stores/inputs/InputsStore';
-
-const StreamRulesStore = StoreProvider.getStore('StreamRules');
+import { StreamRulesStore } from 'stores/streams/StreamRulesStore';
 
 const ActionButtonsWrap = styled.span`
   margin-right: 6px;
