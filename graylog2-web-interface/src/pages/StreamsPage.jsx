@@ -26,13 +26,9 @@ import PageHeader from 'components/common/PageHeader';
 import { DocumentTitle, IfPermitted, Spinner } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import UserNotification from 'util/UserNotification';
-import StoreProvider from 'injection/StoreProvider';
-import ActionsProvider from 'injection/ActionsProvider';
 import StreamsStore from 'stores/streams/StreamsStore';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
-
-const IndexSetsStore = StoreProvider.getStore('IndexSets');
-const IndexSetsActions = ActionsProvider.getActions('IndexSets');
+import { IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore';
 
 const StreamsPage = createReactClass({
   displayName: 'StreamsPage',

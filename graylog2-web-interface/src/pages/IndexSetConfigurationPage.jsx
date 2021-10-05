@@ -30,8 +30,8 @@ import history from 'util/History';
 import Routes from 'routing/Routes';
 import withParams from 'routing/withParams';
 import withLocation from 'routing/withLocation';
+import { IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore';
 
-const { IndexSetsStore, IndexSetsActions } = CombinedProvider.get('IndexSets');
 const { IndicesConfigurationStore, IndicesConfigurationActions } = CombinedProvider.get('IndicesConfiguration');
 
 const IndexSetConfigurationPage = createReactClass({
