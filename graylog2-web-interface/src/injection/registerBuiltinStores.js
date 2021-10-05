@@ -35,7 +35,6 @@ const actions = {
 
 const stores = {
   Authentication: () => require('stores/authentication/AuthenticationStore'),
-  Outputs: () => require('stores/outputs/OutputsStore'),
   PipelineConnections: () => require('stores/pipelines/PipelineConnectionsStore'),
   Pipelines: () => require('stores/pipelines/PipelinesStore'),
   Plugins: () => require('stores/plugins/PluginsStore'),
