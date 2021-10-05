@@ -25,11 +25,11 @@ import CombinedProvider from 'injection/CombinedProvider';
 import { Spinner } from 'components/common';
 import { CollectorConfigurationsActions, CollectorConfigurationsStore } from 'stores/sidecars/CollectorConfigurationsStore';
 import { CollectorsActions, CollectorsStore } from 'stores/sidecars/CollectorsStore';
+import { SidecarsActions } from 'stores/sidecars/SidecarsStore';
 
 import CollectorsAdministration from './CollectorsAdministration';
 
 const { SidecarsAdministrationStore, SidecarsAdministrationActions } = CombinedProvider.get('SidecarsAdministration');
-const { SidecarsActions } = CombinedProvider.get('Sidecars');
 
 const CollectorsAdministrationContainer = createReactClass({
   propTypes: {
