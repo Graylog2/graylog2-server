@@ -27,11 +27,11 @@ import { DataAdapter, DataAdapterCreate, DataAdapterForm, DataAdaptersOverview }
 import CombinedProvider from 'injection/CombinedProvider';
 import withParams from 'routing/withParams';
 import withLocation from 'routing/withLocation';
+import { LookupTablesActions, LookupTablesStore } from 'stores/lookup-tables/LookupTablesStore';
 
 const { LookupTableDataAdaptersStore, LookupTableDataAdaptersActions } = CombinedProvider.get(
   'LookupTableDataAdapters',
 );
-const { LookupTablesStore, LookupTablesActions } = CombinedProvider.get('LookupTables');
 
 class LUTDataAdaptersPage extends React.Component {
   errorStatesTimer = undefined;

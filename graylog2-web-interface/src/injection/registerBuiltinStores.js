@@ -21,7 +21,6 @@ const actions = {
   Authentication: () => require('actions/authentication/AuthenticationActions'),
   LookupTableCaches: () => require('actions/lookup-tables/LookupTableCachesActions'),
   LookupTableDataAdapters: () => require('actions/lookup-tables/LookupTableDataAdaptersActions'),
-  LookupTables: () => require('actions/lookup-tables/LookupTablesActions'),
   Messages: () => require('actions/messages/MessagesActions'),
   Metrics: () => require('actions/metrics/MetricsActions'),
   Nodes: () => require('actions/nodes/NodesActions'),
@@ -42,7 +41,6 @@ const actions = {
 
 const stores = {
   Authentication: () => require('stores/authentication/AuthenticationStore'),
-  LookupTables: () => require('stores/lookup-tables/LookupTablesStore'),
   LookupTableCaches: () => require('stores/lookup-tables/LookupTableCachesStore'),
   LookupTableDataAdapters: () => require('stores/lookup-tables/LookupTableDataAdaptersStore'),
   Messages: () => require('stores/messages/MessagesStore'),
