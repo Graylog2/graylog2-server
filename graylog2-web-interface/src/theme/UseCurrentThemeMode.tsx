@@ -17,16 +17,14 @@
 import { useCallback, useContext, useState } from 'react';
 
 import { useStore } from 'stores/connect';
-import CombinedProvider from 'injection/CombinedProvider';
 import Store from 'logic/local-storage/Store';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
+import { PreferencesStore } from 'stores/users/PreferencesStore';
 
 import { PREFERENCES_THEME_MODE, DEFAULT_THEME_MODE, ThemeMode } from './constants';
 
 import UserPreferencesContext from '../contexts/UserPreferencesContext';
 import usePrefersColorScheme from '../hooks/usePrefersColorScheme';
-
-const { PreferencesStore } = CombinedProvider.get('Preferences');
 
 type CurrentUser = {
   currentUser?: {

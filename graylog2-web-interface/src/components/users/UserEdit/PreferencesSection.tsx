@@ -23,9 +23,7 @@ import { Input } from 'components/bootstrap';
 import { FormikFormGroup, ReadOnlyFormGroup } from 'components/common';
 import SectionComponent from 'components/common/Section/SectionComponent';
 import User from 'logic/users/User';
-import CombinedProvider from 'injection/CombinedProvider';
-
-const { PreferencesActions } = CombinedProvider.get('Preferences');
+import { PreferencesActions } from 'stores/users/PreferencesStore';
 
 type Props = {
   user: User,

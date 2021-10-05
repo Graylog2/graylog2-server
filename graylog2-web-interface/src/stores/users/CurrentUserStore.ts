@@ -22,10 +22,10 @@ import ApiRoutes from 'routing/ApiRoutes';
 import CombinedProvider from 'injection/CombinedProvider';
 import { UserJSON } from 'logic/users/User';
 import { singletonStore } from 'logic/singleton';
+import { PreferencesActions } from 'stores/users/PreferencesStore';
 
 const { SessionStore, SessionActions } = CombinedProvider.get('Session');
 const { StartpageStore } = CombinedProvider.get('Startpage');
-const { PreferencesActions } = CombinedProvider.get('Preferences');
 
 export type CurrentUserStoreState = {
   currentUser: UserJSON,

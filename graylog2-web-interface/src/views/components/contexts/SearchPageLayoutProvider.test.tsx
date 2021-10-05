@@ -20,31 +20,29 @@ import asMock from 'helpers/mocking/AsMock';
 import { MockCombinedProvider, MockStore } from 'helpers/mocking';
 
 import CurrentUserProvider from 'contexts/CurrentUserProvider';
-import CombinedProvider from 'injection/CombinedProvider';
 import CurrentUserPreferencesProvider from 'contexts/CurrentUserPreferencesProvider';
 import Store from 'logic/local-storage/Store';
 import View from 'views/logic/views/View';
 import CurrentViewTypeProvider from 'views/components/views/CurrentViewTypeProvider';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import { UserJSON } from 'logic/users/User';
+import { PreferencesActions } from 'stores/users/PreferencesStore';
 
 import SearchPageLayoutContext from './SearchPageLayoutContext';
 import SearchPageLayoutProvider from './SearchPageLayoutProvider';
-
-const { PreferencesActions } = CombinedProvider.get('Preferences');
 
 jest.mock('stores/users/CurrentUserStore', () => ({
   CurrentUserStore: MockStore(),
 }));
 
-jest.mock('injection/CombinedProvider', () => new MockCombinedProvider({
-  Preferences: {
-    PreferencesActions: {
-      list: jest.fn(),
-      saveUserPreferences: jest.fn(),
-    },
-    PreferencesStore: MockStore(),
+jest.mock('injection/CombinedProvider', () => new MockCombinedProvider({}));
+
+jest.mock('stores/users/PreferencesStore', () => ({
+  PreferencesActions: {
+    list: jest.fn(),
+    saveUserPreferences: jest.fn(),
   },
+  PreferencesStore: MockStore(),
 }));
 
 jest.mock('logic/local-storage/Store', () => ({
