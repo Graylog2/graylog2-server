@@ -47,9 +47,12 @@ type PipelineReverseConnectionsType = {
   stream_ids: string[],
 };
 
+type PipelineConnectionsStoreState = {
+  connections: any,
+}
 export const PipelineConnectionsStore = singletonStore(
   'core.PipelineConnections',
-  () => Reflux.createStore({
+  () => Reflux.createStore<PipelineConnectionsStoreState>({
     listenables: [PipelineConnectionsActions],
     connections: undefined,
 

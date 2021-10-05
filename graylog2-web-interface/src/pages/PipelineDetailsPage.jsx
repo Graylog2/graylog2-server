@@ -32,8 +32,8 @@ import CombinedProvider from 'injection/CombinedProvider';
 import withParams from 'routing/withParams';
 import { StreamsStore } from 'stores/streams/StreamsStore';
 import { PipelineConnectionsStore, PipelineConnectionsActions } from 'stores/pipelines/PipelineConnectionsStore';
+import { PipelinesStore, PipelinesActions } from 'stores/pipelines/PipelinesStore';
 
-const { PipelinesStore, PipelinesActions } = CombinedProvider.get('Pipelines');
 const { RulesStore } = CombinedProvider.get('Rules');
 
 function filterPipeline(state) {

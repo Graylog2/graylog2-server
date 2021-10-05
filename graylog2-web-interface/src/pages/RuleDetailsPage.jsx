@@ -23,9 +23,9 @@ import Rule from 'components/rules/Rule';
 import CombinedProvider from 'injection/CombinedProvider';
 import { PipelineRulesProvider } from 'components/rules/RuleContext';
 import withParams from 'routing/withParams';
+import { PipelinesStore, PipelinesActions } from 'stores/pipelines/PipelinesStore';
 
 const { RulesStore, RulesActions } = CombinedProvider.get('Rules');
-const { PipelinesStore, PipelinesActions } = CombinedProvider.get('Pipelines');
 
 function filterRules(rule, ruleId) {
   return rule?.rules?.filter((r) => r.id === ruleId)[0];
