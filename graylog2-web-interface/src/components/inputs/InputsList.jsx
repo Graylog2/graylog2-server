@@ -24,17 +24,12 @@ import { Row, Col } from 'components/graylog';
 import { naturalSortIgnoreCase } from 'util/SortUtils';
 import EntityList from 'components/common/EntityList';
 import { IfPermitted, Spinner, SearchForm } from 'components/common';
-import StoreProvider from 'injection/StoreProvider';
-import ActionsProvider from 'injection/ActionsProvider';
 import { InputsActions, InputsStore } from 'stores/inputs/InputsStore';
 import { InputTypesActions } from 'stores/inputs/InputTypesStore';
+import { SingleNodeActions, SingleNodeStore } from 'stores/nodes/SingleNodeStore';
 
 import InputListItem from './InputListItem';
 import CreateInputControl from './CreateInputControl';
-
-const SingleNodeActions = ActionsProvider.getActions('SingleNode');
-
-const SingleNodeStore = StoreProvider.getStore('SingleNode');
 
 const InputListRow = styled(Row)`
   h2 {

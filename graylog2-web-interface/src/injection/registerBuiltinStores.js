@@ -19,13 +19,11 @@ import CombinedProvider from './CombinedProvider';
 /* eslint-disable global-require */
 const actions = {
   Authentication: () => require('actions/authentication/AuthenticationActions'),
-  SingleNode: () => require('actions/nodes/SingleNodeActions'),
   SystemJobs: () => require('actions/systemjobs/SystemJobsActions'),
 };
 
 const stores = {
   Authentication: () => require('stores/authentication/AuthenticationStore'),
-  SingleNode: () => require('stores/nodes/SingleNodeStore'),
   Startpage: () => require('stores/users/StartpageStore'),
   StreamRules: () => require('stores/streams/StreamRulesStore'),
   System: () => require('stores/system/SystemStore'),
