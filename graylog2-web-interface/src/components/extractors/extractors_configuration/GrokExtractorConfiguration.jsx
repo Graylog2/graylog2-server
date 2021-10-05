@@ -23,12 +23,10 @@ import { Input } from 'components/bootstrap';
 import GrokPatternInput from 'components/grok-patterns/GrokPatternInput';
 import UserNotification from 'util/UserNotification';
 import FormUtils from 'util/FormsUtils';
-import StoreProvider from 'injection/StoreProvider';
 import ToolsStore from 'stores/tools/ToolsStore';
+import { GrokPatternsStore } from 'stores/grok-patterns/GrokPatternsStore';
 
 import Style from './GrokExtractorConfiguration.css';
-
-const GrokPatternsStore = StoreProvider.getStore('GrokPatterns');
 
 class GrokExtractorConfiguration extends React.Component {
   static propTypes = {
