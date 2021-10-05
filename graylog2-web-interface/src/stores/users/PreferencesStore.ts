@@ -24,8 +24,8 @@ import UserNotification from 'util/UserNotification';
 import { singletonStore, singletonActions } from 'logic/singleton';
 
 type PreferencesActionsType = {
-  loadUserPreferences: () => Promise<unknown>,
-  saveUserPreferences: () => Promise<unknown>,
+  loadUserPreferences: (userName: string, callback?: (preferences: PreferencesMap) => void) => Promise<unknown>,
+  saveUserPreferences: (userName: string, preferences: PreferencesUpdateMap, callback?: (preferences: PreferencesUpdateMap) => void, displaySuccessNotification?: boolean) => Promise<unknown>,
 }
 export const PreferencesActions = singletonActions(
   'core.Preferences',
