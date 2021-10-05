@@ -19,12 +19,10 @@ import Reflux from 'reflux';
 import * as URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
-import StoreProvider from 'injection/StoreProvider';
 import { singletonStore } from 'logic/singleton';
 import { NodesStore } from 'stores/nodes/NodesStore';
 import { SystemLoadBalancerStore } from 'stores/load-balancer/SystemLoadBalancerStore';
-
-const SystemProcessingStore = StoreProvider.getStore('SystemProcessing');
+import { SystemProcessingStore } from 'stores/system-processing/SystemProcessingStore';
 
 // eslint-disable-next-line import/prefer-default-export
 export const ClusterOverviewStore = singletonStore(
