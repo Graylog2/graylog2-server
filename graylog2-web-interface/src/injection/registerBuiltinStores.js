@@ -50,7 +50,6 @@ const actions = {
 
 const stores = {
   Authentication: () => require('stores/authentication/AuthenticationStore'),
-  IndexerFailures: () => require('stores/indexers/IndexerFailuresStore'),
   IndexerOverview: () => require('stores/indexers/IndexerOverviewStore'),
   IndexRanges: () => require('stores/indices/IndexRangesStore'),
   IndexSets: () => require('stores/indices/IndexSetsStore'),
