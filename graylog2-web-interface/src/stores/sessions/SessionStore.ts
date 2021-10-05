@@ -23,8 +23,8 @@ import { Builder } from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
 
 type SessionActionsType = {
-  login: () => Promise<unknown>,
-  logout: () => Promise<unknown>,
+  login: (username: string, password: string, host: string) => Promise<unknown>,
+  logout: (sessionId: string) => Promise<unknown>,
   validate: () => Promise<unknown>,
 }
 export const SessionActions = singletonActions(

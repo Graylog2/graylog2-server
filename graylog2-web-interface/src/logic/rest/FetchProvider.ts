@@ -16,7 +16,6 @@
  */
 import FetchError from 'logic/errors/FetchError';
 import ErrorsActions from 'actions/errors/ErrorsActions';
-// eslint-disable-next-line import/no-cycle
 import { createFromFetchError } from 'logic/errors/ReportedErrors';
 import Routes from 'routing/Routes';
 import history from 'util/History';
