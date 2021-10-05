@@ -21,9 +21,7 @@ import styled, { css } from 'styled-components';
 
 import { Grid, Col, Button } from 'components/graylog';
 import { ContentHeadRow, Spinner, Icon } from 'components/common';
-import ActionsProvider from 'injection/ActionsProvider';
-
-const GettingStartedActions = ActionsProvider.getActions('GettingStarted');
+import { GettingStartedActions } from 'stores/gettingstarted/GettingStartedStore';
 
 const Container = styled.div`
   height: 100%;

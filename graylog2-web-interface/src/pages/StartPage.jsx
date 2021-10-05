@@ -22,12 +22,8 @@ import { Spinner } from 'components/common';
 import Routes from 'routing/Routes';
 import history from 'util/History';
 import PermissionsMixin from 'util/PermissionsMixin';
-import StoreProvider from 'injection/StoreProvider';
-import ActionsProvider from 'injection/ActionsProvider';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
-
-const GettingStartedStore = StoreProvider.getStore('GettingStarted');
-const GettingStartedActions = ActionsProvider.getActions('GettingStarted');
+import { GettingStartedActions, GettingStartedStore } from 'stores/gettingstarted/GettingStartedStore';
 
 const StartPage = createReactClass({
   displayName: 'StartPage',
