@@ -23,7 +23,7 @@ import { qualifyUrl } from 'util/URLUtils';
 import fetch, { Builder } from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
 import PaginationURL from 'util/PaginationURL';
-import type { PaginatedUsers } from 'actions/users/UsersActions';
+import type { PaginatedUsers } from 'stores/users/UsersStore';
 import type { PaginatedResponseType, Pagination } from 'stores/PaginationTypes';
 import type { AuthenticationBackendJSON } from 'logic/authentication/AuthenticationBackend';
 import ApiRoutes from 'routing/ApiRoutes';
