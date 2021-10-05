@@ -23,11 +23,7 @@ import Reflux from 'reflux';
 import { Col, Row, Button } from 'components/graylog';
 import { LinkToNode, IfPermitted, Icon } from 'components/common';
 import { LoggingSubsystem, LogLevelMetricsOverview } from 'components/loggers';
-import ActionsProvider from 'injection/ActionsProvider';
-import StoreProvider from 'injection/StoreProvider';
-
-const MetricsActions = ActionsProvider.getActions('Metrics');
-const MetricsStore = StoreProvider.getStore('Metrics');
+import { MetricsActions, MetricsStore } from 'stores/metrics/MetricsStore';
 
 const NodeLoggers = createReactClass({
   displayName: 'NodeLoggers',

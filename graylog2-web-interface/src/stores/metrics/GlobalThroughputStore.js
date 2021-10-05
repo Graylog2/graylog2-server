@@ -16,12 +16,8 @@
  */
 import Reflux from 'reflux';
 
-import StoreProvider from 'injection/StoreProvider';
-import ActionsProvider from 'injection/ActionsProvider';
 import { singletonStore } from 'logic/singleton';
-
-const MetricsStore = StoreProvider.getStore('Metrics');
-const MetricsActions = ActionsProvider.getActions('Metrics');
+import { MetricsActions, MetricsStore } from 'stores/metrics/MetricsStore';
 
 // eslint-disable-next-line import/prefer-default-export
 export const GlobalThroughputStore = singletonStore(

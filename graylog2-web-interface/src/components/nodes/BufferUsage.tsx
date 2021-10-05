@@ -21,15 +21,11 @@ import styled, { css } from 'styled-components';
 
 import { LinkContainer } from 'components/graylog/router';
 import { Button, ProgressBar } from 'components/graylog';
-import StoreProvider from 'injection/StoreProvider';
-import ActionsProvider from 'injection/ActionsProvider';
 import Routes from 'routing/Routes';
 import NumberUtils from 'util/NumberUtils';
 import { Spinner } from 'components/common';
 import { useStore } from 'stores/connect';
-
-const MetricsStore = StoreProvider.getStore('Metrics');
-const MetricsActions = ActionsProvider.getActions('Metrics');
+import { MetricsActions, MetricsStore } from 'stores/metrics/MetricsStore';
 
 const NodeBufferUsage = styled.div(({ theme }) => css`
   margin-top: ${theme.spacings.sm};
