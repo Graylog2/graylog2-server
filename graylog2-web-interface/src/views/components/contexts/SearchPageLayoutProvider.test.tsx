@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { render, fireEvent } from 'wrappedTestingLibrary';
 import asMock from 'helpers/mocking/AsMock';
-import { MockCombinedProvider, MockStore } from 'helpers/mocking';
+import { MockStore } from 'helpers/mocking';
 
 import CurrentUserProvider from 'contexts/CurrentUserProvider';
 import CurrentUserPreferencesProvider from 'contexts/CurrentUserPreferencesProvider';
@@ -34,8 +34,6 @@ import SearchPageLayoutProvider from './SearchPageLayoutProvider';
 jest.mock('stores/users/CurrentUserStore', () => ({
   CurrentUserStore: MockStore(),
 }));
-
-jest.mock('injection/CombinedProvider', () => new MockCombinedProvider({}));
 
 jest.mock('stores/users/PreferencesStore', () => ({
   PreferencesActions: {

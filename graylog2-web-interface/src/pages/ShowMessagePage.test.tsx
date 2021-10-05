@@ -33,14 +33,6 @@ const mockListNodes = jest.fn();
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const mockListStreams = jest.fn((...args) => Promise.resolve([]));
 
-jest.mock('injection/CombinedProvider', () => ({
-  get: jest.fn((type) => ({
-    Preferences: {
-      PreferencesStore: MockStore(),
-    },
-  }[type])),
-}));
-
 jest.mock('stores/nodes/NodesStore', () => ({
   NodesActions: { list: (...args) => mockListNodes(...args) },
   NodesStore: MockStore(['listen', () => () => {}], ['getInitialState', () => ({ nodes: {} })]),
