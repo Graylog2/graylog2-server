@@ -18,11 +18,9 @@ import CombinedProvider from './CombinedProvider';
 
 /* eslint-disable global-require */
 const actions = {
-  Authentication: () => require('actions/authentication/AuthenticationActions'),
 };
 
 const stores = {
-  Authentication: () => require('stores/authentication/AuthenticationStore'),
   ConfigurationVariable: () => require('stores/sidecars/ConfigurationVariableStore'),
 };
 /* eslint-enable global-require */
