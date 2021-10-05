@@ -27,10 +27,8 @@ import DateTime from 'logic/datetimes/DateTime';
 import history from 'util/History';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
-import CombinedProvider from 'injection/CombinedProvider';
 import { IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore';
-
-const { IndicesConfigurationStore, IndicesConfigurationActions } = CombinedProvider.get('IndicesConfiguration');
+import { IndicesConfigurationActions, IndicesConfigurationStore } from 'stores/indices/IndicesConfigurationStore';
 
 const IndexSetCreationPage = createReactClass({
   displayName: 'IndexSetCreationPage',

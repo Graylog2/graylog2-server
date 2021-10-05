@@ -31,8 +31,7 @@ import Routes from 'routing/Routes';
 import withParams from 'routing/withParams';
 import withLocation from 'routing/withLocation';
 import { IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore';
-
-const { IndicesConfigurationStore, IndicesConfigurationActions } = CombinedProvider.get('IndicesConfiguration');
+import { IndicesConfigurationActions, IndicesConfigurationStore } from 'stores/indices/IndicesConfigurationStore';
 
 const IndexSetConfigurationPage = createReactClass({
   displayName: 'IndexSetConfigurationPage',
