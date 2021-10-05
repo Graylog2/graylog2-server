@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import GlobalThroughputStore from './GlobalThroughputStore';
+import { GlobalThroughputStore } from './GlobalThroughputStore';
 
 const expectedThroughput = (input, output) => ({ throughput: { input, output, loading: false } });
 const nodeThroughput = (input, output) => ({
