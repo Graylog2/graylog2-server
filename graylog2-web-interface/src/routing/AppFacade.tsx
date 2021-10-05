@@ -26,11 +26,10 @@ import 'bootstrap/less/bootstrap.less';
 import 'toastr/toastr.less';
 import { Store } from 'stores/StoreTypes';
 import { CurrentUserStoreState, CurrentUserStore } from 'stores/users/CurrentUserStore';
-import { ServerAvailabilityStoreState } from 'stores/sessions/ServerAvailabilityStore';
+import { ServerAvailabilityStore } from 'stores/sessions/ServerAvailabilityStore';
 import { SessionStoreState } from 'stores/sessions/SessionStore';
 
 const SessionStore = StoreProvider.getStore('Session');
-const ServerAvailabilityStore = StoreProvider.getStore('ServerAvailability');
 
 const LoginPage = loadAsync(() => import(/* webpackChunkName: "LoginPage" */ 'pages/LoginPage'));
 const LoadingPage = loadAsync(() => import(/* webpackChunkName: "LoadingPage" */ 'pages/LoadingPage'));
@@ -40,7 +39,7 @@ const SERVER_PING_TIMEOUT = 20000;
 
 const AppFacade = () => {
   const currentUser = useStore(CurrentUserStore as Store<CurrentUserStoreState>, (state) => state?.currentUser);
-  const server = useStore(ServerAvailabilityStore as Store<ServerAvailabilityStoreState>, (state) => state?.server);
+  const server = useStore(ServerAvailabilityStore, (state) => state?.server);
   const sessionId = useStore(SessionStore as Store<SessionStoreState>, (state) => (state?.sessionId ?? ''));
 
   useEffect(() => {

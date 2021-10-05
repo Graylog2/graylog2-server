@@ -23,10 +23,9 @@ import { createFromFetchError } from 'logic/errors/ReportedErrors';
 import Routes from 'routing/Routes';
 import history from 'util/History';
 import CancellablePromise from 'logic/rest/CancellablePromise';
+import { ServerAvailabilityActions } from 'stores/sessions/ServerAvailabilityStore';
 
 const reportServerSuccess = () => {
-  const ServerAvailabilityActions = ActionsProvider.getActions('ServerAvailability');
-
   ServerAvailabilityActions.reportSuccess();
 };
 
@@ -52,8 +51,6 @@ const onServerError = async (error: Response | undefined, onUnauthorized = defau
   }
 
   if (error && !error.status) {
-    const ServerAvailabilityActions = ActionsProvider.getActions('ServerAvailability');
-
     ServerAvailabilityActions.reportError(fetchError);
   }
 
