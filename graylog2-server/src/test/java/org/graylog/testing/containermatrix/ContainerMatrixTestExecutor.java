@@ -19,6 +19,7 @@ package org.graylog.testing.containermatrix;
 import com.google.common.io.Resources;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.specification.RequestSpecification;
+import org.graylog.testing.completebackend.ElasticSearchInstanceFactoryByVersion;
 import org.graylog.testing.completebackend.ElasticsearchInstanceFactory;
 import org.graylog.testing.completebackend.GraylogBackend;
 import org.graylog.testing.containermatrix.annotations.AfterVersion;
@@ -28,6 +29,7 @@ import org.graylog.testing.containermatrix.descriptors.ContainerMatrixEngineDesc
 import org.graylog.testing.containermatrix.descriptors.ContainerMatrixTestClassDescriptor;
 import org.graylog.testing.containermatrix.descriptors.ContainerMatrixTestMethodDescriptor;
 import org.graylog.testing.containermatrix.descriptors.ContainerMatrixTestsDescriptor;
+import org.graylog.testing.elasticsearch.ElasticsearchInstance;
 import org.graylog.testing.graylognode.MavenPackager;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -52,6 +54,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static io.restassured.http.ContentType.JSON;
@@ -98,7 +101,7 @@ public class ContainerMatrixTestExecutor {
             return Resources.getResource(resourceName);
         }).collect(Collectors.toList());
 
-        final ElasticsearchInstanceFactory esInstanceFactory = instantiateFactory(annotation.elasticsearchFactory());
+        final ElasticsearchInstanceFactory esInstanceFactory = instantiateFactory(ElasticSearchInstanceFactoryByVersion.class);
         final List<Path> pluginJars = instantiateFactory(annotation.pluginJarsProvider()).getJars();
         return GraylogBackend.createStarted(extraPorts, esVersion, mongoVersion, esInstanceFactory, pluginJars, null,
                 mongoDBFixtures);
@@ -125,17 +128,28 @@ public class ContainerMatrixTestExecutor {
 
     private void runAnnotatedMethods(Object instance, Class<? extends Annotation> annotation) {
         List<Method> methods = AnnotationSupport.findAnnotatedMethods(instance.getClass(), annotation, HierarchyTraversalMode.TOP_DOWN);
-        methods.stream().forEach(method -> ReflectionUtils.invokeMethod(method, instance));
-
+        methods.forEach(method -> ReflectionUtils.invokeMethod(method, instance));
     }
 
     // TODO: also be able to instantiate classes with only one ore no args (or different order)
     private Object createNewInstance(Class clazz, GraylogBackend backend, RequestSpecification specification) {
-        final Constructor constructor = ReflectionUtils.findConstructors(clazz, c -> {
+        Optional<Constructor<?>> constructor = ReflectionUtils.findConstructors(clazz, c -> {
             Class<?>[] parameterTypes = c.getParameterTypes();
             return (parameterTypes[0].equals(GraylogBackend.class) && parameterTypes[1].equals(RequestSpecification.class));
-        }).stream().findFirst().orElseThrow(() -> new RuntimeException("Could not find suitable constructor."));
-        return ReflectionUtils.newInstance(constructor, backend, specification);
+        }).stream().findFirst();
+        if (constructor.isPresent()) {
+            return ReflectionUtils.newInstance(constructor.get(), backend, specification);
+        }
+
+        constructor = ReflectionUtils.findConstructors(clazz, c -> {
+            Class<?>[] parameterTypes = c.getParameterTypes();
+            return (parameterTypes[0].equals(ElasticsearchInstance.class));
+        }).stream().findFirst();
+        if (constructor.isPresent()) {
+            return ReflectionUtils.newInstance(constructor.get(), backend.elasticsearchInstance());
+        }
+
+        throw new RuntimeException("Could not find suitable constructor.");
     }
 
     private void executeMethods(String esVersion, String mongoVersion, int[] extraPorts, ExecutionRequest request, ContainerMatrixTestClassDescriptor containerDescriptor) {
@@ -193,8 +207,11 @@ public class ContainerMatrixTestExecutor {
                     methodTestDescriptor.getDisplayName(),
                     testInstance.toString()
             );
-            return TestExecutionResult.failed(new AssertionFailedError(message));
+            return TestExecutionResult.failed(new AssertionFailedError(message, e));
         } catch (Throwable throwable) {
+            if (methodTestDescriptor.isExpected(throwable)) {
+                return TestExecutionResult.successful();
+            }
             return TestExecutionResult.failed(throwable);
         }
     }

@@ -161,4 +161,8 @@ public class GraylogBackend {
         es.close();
         network.close();
     }
+
+    public ElasticsearchInstance elasticsearchInstance() {
+        return es;
+    }
 }

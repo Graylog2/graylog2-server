@@ -19,7 +19,6 @@ package org.graylog.testing.containermatrix.annotations;
 
 import org.graylog.testing.completebackend.DefaultMavenProjectDirProvider;
 import org.graylog.testing.completebackend.DefaultPluginJarsProvider;
-import org.graylog.testing.completebackend.ElasticsearchInstanceFactory;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.MavenProjectDirProvider;
 import org.graylog.testing.completebackend.PluginJarsProvider;
@@ -50,8 +49,6 @@ public @interface ContainerMatrixTestsConfiguration {
 
     // combination rule
     Class<? extends PluginJarsProvider> pluginJarsProvider() default DefaultPluginJarsProvider.class;
-
-    Class<? extends ElasticsearchInstanceFactory> elasticsearchFactory();
 
     // matrix rule
     String[] esVersions() default {DEFAULT_ES};

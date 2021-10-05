@@ -16,6 +16,9 @@
  */
 package org.graylog.testing.containermatrix.descriptors;
 
+import org.graylog.testing.containermatrix.Unexpected;
+import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
+import org.junit.platform.commons.support.AnnotationSupport;
 import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
 import org.junit.platform.engine.support.descriptor.MethodSource;
 
@@ -24,6 +27,7 @@ import java.lang.reflect.Method;
 public class ContainerMatrixTestMethodDescriptor extends AbstractTestDescriptor {
     private final Method testMethod;
     private final Class testClass;
+    private Class expected = Unexpected.class;
 
     public ContainerMatrixTestMethodDescriptor(Method testMethod, Class testClass, ContainerMatrixTestClassDescriptor parent) {
         super(
@@ -34,6 +38,8 @@ public class ContainerMatrixTestMethodDescriptor extends AbstractTestDescriptor 
         this.testMethod = testMethod;
         this.testClass = testClass;
         setParent(parent);
+
+        AnnotationSupport.findAnnotation(testMethod, ContainerMatrixTest.class).ifPresent(a -> expected = a.expected());
     }
 
     private static String determineDisplayName(Method testMethod) {
@@ -53,4 +59,7 @@ public class ContainerMatrixTestMethodDescriptor extends AbstractTestDescriptor 
         return Type.TEST;
     }
 
+    public boolean isExpected(Throwable throwable) {
+        return throwable.getClass().equals(expected);
+    }
 }

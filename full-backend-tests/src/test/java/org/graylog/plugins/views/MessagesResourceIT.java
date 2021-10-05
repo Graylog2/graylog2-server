@@ -18,7 +18,6 @@ package org.graylog.plugins.views;
 
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
-import org.graylog.storage.ElasticSearchInstanceFactoryByVersion;
 import org.graylog.testing.completebackend.GraylogBackend;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
@@ -33,7 +32,7 @@ import static org.graylog.testing.containermatrix.ContainerVersions.ES7;
 import static org.graylog.testing.containermatrix.ContainerVersions.MONGO3;
 import static org.graylog.testing.containermatrix.ContainerVersions.MONGO4;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = CLASS, elasticsearchFactory = ElasticSearchInstanceFactoryByVersion.class, esVersions = {ES6, ES7}, mongoVersions = {MONGO3, MONGO4})
+@ContainerMatrixTestsConfiguration(serverLifecycle = CLASS, esVersions = {ES6, ES7}, mongoVersions = {MONGO3, MONGO4})
 public class MessagesResourceIT {
     private final GraylogBackend sut;
     private final RequestSpecification requestSpec;

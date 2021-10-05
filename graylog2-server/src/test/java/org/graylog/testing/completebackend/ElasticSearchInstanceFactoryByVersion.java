@@ -14,14 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage;
+package org.graylog.testing.completebackend;
 
 import org.apache.commons.lang3.NotImplementedException;
-import org.graylog.storage.elasticsearch6.testing.ElasticsearchInstanceES6;
-import org.graylog.storage.elasticsearch7.testing.ElasticsearchInstanceES7;
-import org.graylog.testing.completebackend.ElasticsearchInstanceFactory;
 import org.graylog.testing.elasticsearch.ElasticsearchInstance;
 import org.testcontainers.containers.Network;
+
+import java.lang.reflect.Method;
 
 public class ElasticSearchInstanceFactoryByVersion implements ElasticsearchInstanceFactory {
     private String version;
@@ -31,13 +30,23 @@ public class ElasticSearchInstanceFactoryByVersion implements ElasticsearchInsta
         throw new NotImplementedException("Create without version not implemented with this factory.");
     }
 
+    private ElasticsearchInstance create(final String cName, final String version, final Network network) {
+        try {
+            Class<?> clazz = Class.forName(cName);
+            Method method = clazz.getMethod("create", String.class, Network.class);
+            return (ElasticsearchInstance) method.invoke(null, version, network);
+        } catch (Exception ex) {
+            throw new NotImplementedException("Could not create ES6 instance.");
+        }
+    }
+
     @Override
     public ElasticsearchInstance create(String version, Network network) {
         this.version = version;
-        if("6".equals(version())) {
-            return ElasticsearchInstanceES6.create(version, network);
-        } else if("7".equals(version())) {
-            return ElasticsearchInstanceES7.create(version, network);
+        if ("6".equals(version())) {
+            return create("org.graylog.storage.elasticsearch6.testing.ElasticsearchInstanceES6", version, network);
+        } else if ("7".equals(version())) {
+            return create("org.graylog.storage.elasticsearch7.testing.ElasticsearchInstanceES7", version, network);
         } else {
             throw new NotImplementedException("ES version " + version + " not supported.");
         }
