@@ -51,7 +51,6 @@ const actions = {
 
 const stores = {
   Authentication: () => require('stores/authentication/AuthenticationStore'),
-  GlobalThroughput: () => require('stores/metrics/GlobalThroughputStore'),
   GrokPatterns: () => require('stores/grok-patterns/GrokPatternsStore'),
   IndexerCluster: () => require('stores/indexers/IndexerClusterStore'),
   IndexerFailures: () => require('stores/indexers/IndexerFailuresStore'),
