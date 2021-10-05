@@ -33,9 +33,9 @@ import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import WindowDimensionsContextProvider from 'contexts/WindowDimensionsContextProvider';
 import StreamsStore from 'stores/streams/StreamsStore';
 import { InputsActions } from 'stores/inputs/InputsStore';
+import { MessagesActions } from 'stores/messages/MessagesStore';
 
 const NodesActions = ActionsProvider.getActions('Nodes');
-const MessagesActions = ActionsProvider.getActions('Messages');
 
 type Props = {
   params: {

@@ -26,16 +26,11 @@ import DocsHelper from 'util/DocsHelper';
 import StringUtils from 'util/StringUtils';
 import history from 'util/History';
 import Routes from 'routing/Routes';
-import StoreProvider from 'injection/StoreProvider';
-import ActionsProvider from 'injection/ActionsProvider';
 import withParams from 'routing/withParams';
 import withLocation from 'routing/withLocation';
 import { ExtractorsStore } from 'stores/extractors/ExtractorsStore';
 import { InputsActions, InputsStore } from 'stores/inputs/InputsStore';
-
-// eslint-disable-next-line no-unused-vars
-const MessagesStore = StoreProvider.getStore('Messages');
-const MessagesActions = ActionsProvider.getActions('Messages');
+import { MessagesActions } from 'stores/messages/MessagesStore';
 
 const CreateExtractorsPage = createReactClass({
   displayName: 'CreateExtractorsPage',
