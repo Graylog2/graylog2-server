@@ -39,11 +39,14 @@ jest.mock('injection/CombinedProvider', () => ({
       NodesActions: { list: (...args) => mockListNodes(...args) },
       NodesStore: MockStore(['listen', () => () => {}], ['getInitialState', () => ({ nodes: {} })]),
     },
-    Messages: { MessagesActions: { loadMessage: (...args) => mockLoadMessage(...args) } },
     Preferences: {
       PreferencesStore: MockStore(),
     },
   }[type])),
+}));
+
+jest.mock('stores/messages/MessagesStore', () => ({
+  MessagesActions: { loadMessage: (...args) => mockLoadMessage(...args) },
 }));
 
 jest.mock('stores/inputs/InputsStore', () => ({
