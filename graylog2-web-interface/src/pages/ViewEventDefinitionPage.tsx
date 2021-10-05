@@ -30,8 +30,8 @@ import DocumentationLink from 'components/support/DocumentationLink';
 import { isPermitted } from 'util/PermissionsMixin';
 import history from 'util/History';
 import EventDefinitionSummary from 'components/event-definitions/event-definition-form/EventDefinitionSummary';
+import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitionsStore';
 
-const { EventDefinitionsActions } = CombinedProvider.get('EventDefinitions');
 const { EventNotificationsStore, EventNotificationsActions } = CombinedProvider.get('EventNotifications');
 
 type Props = {

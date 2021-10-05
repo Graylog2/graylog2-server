@@ -27,6 +27,7 @@ import { ConfirmLeaveDialog, Spinner } from 'components/common';
 import { AvailableEventDefinitionTypesStore } from 'stores/event-definitions/AvailableEventDefinitionTypesStore';
 import { ConfigurationsActions } from 'stores/configurations/ConfigurationsStore';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
+import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitionsStore';
 
 import EventDefinitionForm from './EventDefinitionForm';
 
@@ -34,7 +35,6 @@ import EventDefinitionForm from './EventDefinitionForm';
 import {} from 'components/event-definitions/event-definition-types';
 import {} from 'components/event-notifications/event-notification-types';
 
-const { EventDefinitionsActions } = CombinedProvider.get('EventDefinitions');
 const { EventNotificationsStore, EventNotificationsActions } = CombinedProvider.get('EventNotifications');
 
 class EventDefinitionFormContainer extends React.Component {
