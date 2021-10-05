@@ -31,7 +31,6 @@ const actions = {
 
 const stores = {
   Authentication: () => require('stores/authentication/AuthenticationStore'),
-  Roles: () => require('stores/users/RolesStore'),
   Rules: () => require('stores/rules/RulesStore'),
   ServerAvailability: () => require('stores/sessions/ServerAvailabilityStore'),
   Session: () => require('stores/sessions/SessionStore'),
