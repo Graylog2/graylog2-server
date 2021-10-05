@@ -33,10 +33,10 @@ import connect from 'stores/connect';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import type { IndexerOverview } from 'stores/indexers/IndexerOverviewStore';
 import type { Indices } from 'stores/indices/IndicesStore';
+import { IndexerOverviewActions, IndexerOverviewStore } from 'stores/indexers/IndexerOverviewStore';
 
 const { IndexSetsStore, IndexSetsActions } = CombinedProvider.get('IndexSets');
 const { IndicesStore, IndicesActions } = CombinedProvider.get('Indices');
-const { IndexerOverviewStore, IndexerOverviewActions } = CombinedProvider.get('IndexerOverview');
 
 const REFRESH_INTERVAL = 2000;
 
