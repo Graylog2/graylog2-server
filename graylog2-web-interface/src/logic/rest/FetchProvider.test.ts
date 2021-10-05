@@ -22,28 +22,23 @@ import FormData from 'form-data';
 import fetch, { Builder, fetchFile } from './FetchProvider';
 
 jest.unmock('./FetchProvider');
-
-jest.mock('injection/StoreProvider', () => ({
-  getStore: (key) => ({
-    Session: {
-      isLoggedIn: jest.fn(() => true),
-      getSessionId: jest.fn(() => 'foobar'),
-    },
-  }[key]),
-}));
-
 const mockLogout = jest.fn();
 
-jest.mock('injection/ActionsProvider', () => ({
-  getActions: (key) => ({
-    Session: {
-      logout: mockLogout,
-    },
-    ServerAvailability: {
-      reportSuccess: jest.fn(),
-      reportError: jest.fn(),
-    },
-  }[key]),
+jest.mock('stores/sessions/SessionStore', () => ({
+  SessionStore: {
+    isLoggedIn: jest.fn(() => true),
+    getSessionId: jest.fn(() => 'foobar'),
+  },
+  SessionActions: {
+    logout: mockLogout,
+  },
+}));
+
+jest.mock('stores/sessions/ServerAvailabilityStore', () => ({
+  ServerAvailabilityActions: {
+    reportSuccess: jest.fn(),
+    reportError: jest.fn(),
+  },
 }));
 
 const PORT = 0;

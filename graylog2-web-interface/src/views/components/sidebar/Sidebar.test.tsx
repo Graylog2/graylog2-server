@@ -31,7 +31,7 @@ jest.mock('stores/users/CurrentUserStore', () => ({
   CurrentUserStore: MockStore(['get', () => mockCurrentUser], ['getInitialState', () => ({ mockCurrentUser })]),
 }));
 
-jest.mock('stores/sessions/SessionStore', () => MockStore('isLoggedIn'));
+jest.mock('stores/sessions/SessionStore', () => ({ SessionStore: MockStore('isLoggedIn') }));
 
 jest.mock('util/AppConfig', () => ({
   gl2AppPathPrefix: jest.fn(() => ''),
