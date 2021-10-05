@@ -28,13 +28,11 @@ import NewPipeline from 'components/pipelines/NewPipeline';
 import SourceGenerator from 'logic/pipelines/SourceGenerator';
 import ObjectUtils from 'util/ObjectUtils';
 import Routes from 'routing/Routes';
-import CombinedProvider from 'injection/CombinedProvider';
 import withParams from 'routing/withParams';
 import { StreamsStore } from 'stores/streams/StreamsStore';
 import { PipelineConnectionsStore, PipelineConnectionsActions } from 'stores/pipelines/PipelineConnectionsStore';
 import { PipelinesStore, PipelinesActions } from 'stores/pipelines/PipelinesStore';
-
-const { RulesStore } = CombinedProvider.get('Rules');
+import { RulesStore } from 'stores/rules/RulesStore';
 
 function filterPipeline(state) {
   return state.pipelines ? state.pipelines.filter((p) => p.id === this.props.params.pipelineId)[0] : undefined;
