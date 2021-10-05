@@ -38,6 +38,10 @@ jest.mock('injection/CombinedProvider', () => new MockCombinedProvider({
   },
 }));
 
+jest.mock('stores/system/SystemStore', () => ({
+  SystemStore: MockStore(),
+}));
+
 jest.mock('stores/nodes/NodesStore', () => ({ NodesStore: MockStore() }));
 
 jest.mock('stores/users/CurrentUserStore', () => ({ CurrentUserStore: MockStore() }));
