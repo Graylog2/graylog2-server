@@ -22,20 +22,19 @@ import history from 'util/History';
 import Routes from 'routing/Routes';
 import connect from 'stores/connect';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
-import CombinedProvider from 'injection/CombinedProvider';
 import { ConfirmLeaveDialog, Spinner } from 'components/common';
 import { AvailableEventDefinitionTypesStore } from 'stores/event-definitions/AvailableEventDefinitionTypesStore';
 import { ConfigurationsActions } from 'stores/configurations/ConfigurationsStore';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitionsStore';
+import { EventNotificationsActions, EventNotificationsStore } from 'stores/event-notifications/EventNotificationsStore';
 
 import EventDefinitionForm from './EventDefinitionForm';
 
 // Import built-in plugins
 import {} from 'components/event-definitions/event-definition-types';
-import {} from 'components/event-notifications/event-notification-types';
 
-const { EventNotificationsStore, EventNotificationsActions } = CombinedProvider.get('EventNotifications');
+import {} from 'components/event-notifications/event-notification-types';
 
 class EventDefinitionFormContainer extends React.Component {
   static propTypes = {

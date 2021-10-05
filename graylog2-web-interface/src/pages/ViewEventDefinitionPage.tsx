@@ -21,7 +21,6 @@ import { useStore } from 'stores/connect';
 import withParams from 'routing/withParams';
 import { LinkContainer } from 'components/graylog/router';
 import { ButtonToolbar, Col, Row, Button } from 'components/graylog';
-import CombinedProvider from 'injection/CombinedProvider';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
@@ -31,8 +30,7 @@ import { isPermitted } from 'util/PermissionsMixin';
 import history from 'util/History';
 import EventDefinitionSummary from 'components/event-definitions/event-definition-form/EventDefinitionSummary';
 import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitionsStore';
-
-const { EventNotificationsStore, EventNotificationsActions } = CombinedProvider.get('EventNotifications');
+import { EventNotificationsActions, EventNotificationsStore } from 'stores/event-notifications/EventNotificationsStore';
 
 type Props = {
   params: {
