@@ -19,7 +19,6 @@ import CombinedProvider from './CombinedProvider';
 /* eslint-disable global-require */
 const actions = {
   Authentication: () => require('actions/authentication/AuthenticationActions'),
-  Enterprise: () => require('actions/enterprise/EnterpriseActions'),
   EventDefinitions: () => require('actions/event-definitions/EventDefinitionsActions'),
   EventNotifications: () => require('actions/event-notifications/EventNotificationsActions'),
   Events: () => require('actions/events/EventsActions'),
@@ -57,7 +56,6 @@ const actions = {
 
 const stores = {
   Authentication: () => require('stores/authentication/AuthenticationStore'),
-  Enterprise: () => require('stores/enterprise/EnterpriseStore'),
   EventDefinitions: () => require('stores/event-definitions/EventDefinitionsStore'),
   EventNotifications: () => require('stores/event-notifications/EventNotificationsStore'),
   Events: () => require('stores/events/EventsStore'),
