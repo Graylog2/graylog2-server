@@ -19,7 +19,6 @@ import CombinedProvider from './CombinedProvider';
 /* eslint-disable global-require */
 const actions = {
   Authentication: () => require('actions/authentication/AuthenticationActions'),
-  SystemJobs: () => require('actions/systemjobs/SystemJobsActions'),
 };
 
 const stores = {
@@ -27,7 +26,6 @@ const stores = {
   Startpage: () => require('stores/users/StartpageStore'),
   StreamRules: () => require('stores/streams/StreamRulesStore'),
   System: () => require('stores/system/SystemStore'),
-  SystemJobs: () => require('stores/systemjobs/SystemJobsStore'),
   SystemLoadBalancer: () => require('stores/load-balancer/SystemLoadBalancerStore'),
   SystemMessages: () => require('stores/systemmessages/SystemMessagesStore'),
   SystemProcessing: () => require('stores/system-processing/SystemProcessingStore'),
