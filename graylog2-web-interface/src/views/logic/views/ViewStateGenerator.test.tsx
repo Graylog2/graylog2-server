@@ -19,11 +19,11 @@ import ViewStateGenerator from './ViewStateGenerator';
 
 import MessagesWidget from '../widgets/MessagesWidget';
 
-const mockList = jest.fn((...args) => Promise.resolve([]));
+const mockList = jest.fn(() => Promise.resolve([]));
 
 jest.mock('stores/decorators/DecoratorsStore', () => ({
   DecoratorsActions: {
-    list: (...args) => mockList(...args),
+    list: () => mockList(),
   },
 }));
 
