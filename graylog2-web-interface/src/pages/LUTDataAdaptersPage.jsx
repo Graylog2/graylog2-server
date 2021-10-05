@@ -24,14 +24,10 @@ import history from 'util/History';
 import { ButtonToolbar, Col, Row, Button } from 'components/graylog';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { DataAdapter, DataAdapterCreate, DataAdapterForm, DataAdaptersOverview } from 'components/lookup-tables';
-import CombinedProvider from 'injection/CombinedProvider';
 import withParams from 'routing/withParams';
 import withLocation from 'routing/withLocation';
 import { LookupTablesActions, LookupTablesStore } from 'stores/lookup-tables/LookupTablesStore';
-
-const { LookupTableDataAdaptersStore, LookupTableDataAdaptersActions } = CombinedProvider.get(
-  'LookupTableDataAdapters',
-);
+import { LookupTableDataAdaptersActions, LookupTableDataAdaptersStore } from 'stores/lookup-tables/LookupTableDataAdaptersStore';
 
 class LUTDataAdaptersPage extends React.Component {
   errorStatesTimer = undefined;
