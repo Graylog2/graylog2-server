@@ -30,11 +30,11 @@ import StreamsStore, { Stream } from 'stores/streams/StreamsStore';
 import { PaginatedPipelines } from 'stores/pipelines/PipelinesStore';
 import { DEFAULT_PAGINATION } from 'stores/PaginationTypes';
 import useLocationSearchPagination from 'hooks/useLocationSearchPagination';
+import { PipelineConnectionsStore, PipelineConnectionsActions } from 'stores/pipelines/PipelineConnectionsStore';
 
 import PipelineConnectionsList from './PipelineConnectionsList';
 
 const { PipelinesActions } = CombinedProvider.get('Pipelines');
-const { PipelineConnectionsStore, PipelineConnectionsActions } = CombinedProvider.get('PipelineConnections');
 
 const StyledPaginatedList = styled(PaginatedList)`
   .pagination {

@@ -31,10 +31,10 @@ import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';
 import withParams from 'routing/withParams';
 import { StreamsStore } from 'stores/streams/StreamsStore';
+import { PipelineConnectionsStore, PipelineConnectionsActions } from 'stores/pipelines/PipelineConnectionsStore';
 
 const { PipelinesStore, PipelinesActions } = CombinedProvider.get('Pipelines');
 const { RulesStore } = CombinedProvider.get('Rules');
-const { PipelineConnectionsStore, PipelineConnectionsActions } = CombinedProvider.get('PipelineConnections');
 
 function filterPipeline(state) {
   return state.pipelines ? state.pipelines.filter((p) => p.id === this.props.params.pipelineId)[0] : undefined;
