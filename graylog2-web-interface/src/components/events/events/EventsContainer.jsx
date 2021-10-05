@@ -20,16 +20,14 @@ import { isObject } from 'lodash';
 
 import { Spinner } from 'components/common';
 import connect from 'stores/connect';
-import CombinedProvider from 'injection/CombinedProvider';
 import Store from 'logic/local-storage/Store';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import { EventDefinitionsActions, EventDefinitionsStore } from 'stores/event-definitions/EventDefinitionsStore';
+import { EventsActions, EventsStore } from 'stores/events/EventsStore';
 
 import Events from './Events';
 
 import {} from 'components/event-definitions/event-definition-types';
-
-const { EventsStore, EventsActions } = CombinedProvider.get('Events');
 
 const LOCAL_STORAGE_ITEM = 'events-last-search';
 

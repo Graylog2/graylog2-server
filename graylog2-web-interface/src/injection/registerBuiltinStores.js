@@ -19,7 +19,6 @@ import CombinedProvider from './CombinedProvider';
 /* eslint-disable global-require */
 const actions = {
   Authentication: () => require('actions/authentication/AuthenticationActions'),
-  Events: () => require('actions/events/EventsActions'),
   Extractors: () => require('actions/extractors/ExtractorsActions'),
   GettingStarted: () => require('actions/gettingstarted/GettingStartedActions'),
   IndexerCluster: () => require('actions/indexers/IndexerClusterActions'),
@@ -54,7 +53,6 @@ const actions = {
 
 const stores = {
   Authentication: () => require('stores/authentication/AuthenticationStore'),
-  Events: () => require('stores/events/EventsStore'),
   Extractors: () => require('stores/extractors/ExtractorsStore'),
   GettingStarted: () => require('stores/gettingstarted/GettingStartedStore'),
   GlobalThroughput: () => require('stores/metrics/GlobalThroughputStore'),
