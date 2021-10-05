@@ -24,9 +24,9 @@ import { ExternalLinkButton, IfPermitted } from 'components/common';
 import StoreProvider from 'injection/StoreProvider';
 import Routes from 'routing/Routes';
 import HideOnCloud from 'util/conditional/HideOnCloud';
+import { SystemLoadBalancerStore } from 'stores/load-balancer/SystemLoadBalancerStore';
 
 const SystemProcessingStore = StoreProvider.getStore('SystemProcessing');
-const SystemLoadBalancerStore = StoreProvider.getStore('SystemLoadBalancer');
 
 class NodesActions extends React.Component {
   static propTypes = {

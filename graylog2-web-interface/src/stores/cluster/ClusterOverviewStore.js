@@ -22,10 +22,11 @@ import fetch from 'logic/rest/FetchProvider';
 import StoreProvider from 'injection/StoreProvider';
 import { singletonStore } from 'logic/singleton';
 import { NodesStore } from 'stores/nodes/NodesStore';
+import { SystemLoadBalancerStore } from 'stores/load-balancer/SystemLoadBalancerStore';
 
 const SystemProcessingStore = StoreProvider.getStore('SystemProcessing');
-const SystemLoadBalancerStore = StoreProvider.getStore('SystemLoadBalancer');
 
+// eslint-disable-next-line import/prefer-default-export
 export const ClusterOverviewStore = singletonStore(
   'core.ClusterOverview',
   () => Reflux.createStore({
