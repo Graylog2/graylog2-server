@@ -24,7 +24,6 @@ const actions = {
 const stores = {
   Authentication: () => require('stores/authentication/AuthenticationStore'),
   ConfigurationVariable: () => require('stores/sidecars/ConfigurationVariableStore'),
-  UniversalSearch: () => require('stores/search/UniversalSearchStore'),
   Users: () => require('stores/users/UsersStore'),
 };
 /* eslint-enable global-require */

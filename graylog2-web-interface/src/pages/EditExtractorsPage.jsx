@@ -25,12 +25,10 @@ import EditExtractor from 'components/extractors/EditExtractor';
 import DocsHelper from 'util/DocsHelper';
 import history from 'util/History';
 import Routes from 'routing/Routes';
-import StoreProvider from 'injection/StoreProvider';
 import withParams from 'routing/withParams';
 import { ExtractorsActions, ExtractorsStore } from 'stores/extractors/ExtractorsStore';
 import { InputsActions, InputsStore } from 'stores/inputs/InputsStore';
-
-const UniversalSearchstore = StoreProvider.getStore('UniversalSearch');
+import { UniversalSearchStore } from 'stores/search/UniversalSearchStore';
 
 const EditExtractorsPage = createReactClass({
   displayName: 'EditExtractorsPage',
@@ -54,7 +52,7 @@ const EditExtractorsPage = createReactClass({
     InputsActions.get.triggerPromise(params.inputId);
     ExtractorsActions.get.triggerPromise(params.inputId, params.extractorId);
 
-    UniversalSearchstore.search('relative', `gl2_source_input:${params.inputId} OR gl2_source_radio_input:${params.inputId}`, { relative: 3600 }, undefined, 1)
+    UniversalSearchStore.search('relative', `gl2_source_input:${params.inputId} OR gl2_source_radio_input:${params.inputId}`, { relative: 3600 }, undefined, 1)
       .then((response) => {
         if (response.total_results > 0) {
           this.setState({ exampleMessage: response.messages[0] });
