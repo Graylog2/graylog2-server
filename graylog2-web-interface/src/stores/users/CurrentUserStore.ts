@@ -23,8 +23,8 @@ import CombinedProvider from 'injection/CombinedProvider';
 import { UserJSON } from 'logic/users/User';
 import { singletonStore } from 'logic/singleton';
 import { PreferencesActions } from 'stores/users/PreferencesStore';
+import { SessionActions, SessionStore } from 'stores/sessions/SessionStore';
 
-const { SessionStore, SessionActions } = CombinedProvider.get('Session');
 const { StartpageStore } = CombinedProvider.get('Startpage');
 
 export type CurrentUserStoreState = {

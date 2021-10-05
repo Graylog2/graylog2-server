@@ -17,11 +17,9 @@
 import Reflux from 'reflux';
 
 import type { Store } from 'stores/StoreTypes';
-import CombinedProvider from 'injection/CombinedProvider';
 import { singletonActions, singletonStore } from 'logic/singleton';
 import OriginalStreamsStore from 'stores/streams/StreamsStore';
-
-const { SessionActions } = CombinedProvider.get('Session');
+import { SessionActions } from 'stores/sessions/SessionStore';
 
 export const StreamsActions = singletonActions(
   'views.Streams',

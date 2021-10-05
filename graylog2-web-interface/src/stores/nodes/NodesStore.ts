@@ -19,8 +19,8 @@ import Reflux from 'reflux';
 import { qualifyUrl } from 'util/URLUtils';
 import { fetchPeriodically } from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
-import CombinedProvider from 'injection/CombinedProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
+import { SessionStore } from 'stores/sessions/SessionStore';
 
 type ListResponse = {
   nodes: Array<NodeInfo>;
@@ -35,8 +35,6 @@ export const NodesActions = singletonActions(
     list: { asyncResult: true },
   }),
 );
-const { SessionStore } = CombinedProvider.get('Session');
-
 export type NodeInfo = {
   cluster_id: string,
   hostname: string,
