@@ -27,7 +27,6 @@ import { AlertConditionForm } from 'components/alertconditions';
 import Routes from 'routing/Routes';
 import UserNotification from 'util/UserNotification';
 import history from 'util/History';
-import CombinedProvider from 'injection/CombinedProvider';
 import { AlertConditionsStore, AlertConditionsActions } from 'stores/alertconditions/AlertConditionsStore';
 import { StreamsStore } from 'stores/streams/StreamsStore';
 

@@ -20,7 +20,6 @@ import { isEmpty } from 'lodash';
 import styled from 'styled-components';
 
 import { useStore } from 'stores/connect';
-import CombinedProvider from 'injection/CombinedProvider';
 import { Icon } from 'components/common';
 import { Button, ListGroupItem } from 'components/graylog';
 import { isPermitted } from 'util/PermissionsMixin';

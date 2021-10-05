@@ -27,7 +27,6 @@ import { ConfigurationForm } from 'components/configurationforms';
 import Routes from 'routing/Routes';
 import UserNotification from 'util/UserNotification';
 import history from 'util/History';
-import CombinedProvider from 'injection/CombinedProvider';
 import { AlarmCallbacksActions } from 'stores/alarmcallbacks/AlarmCallbacksStore';
 import { AlertNotificationsStore, AlertNotificationsActions } from 'stores/alertnotifications/AlertNotificationsStore';
 import { StreamsStore } from 'stores/streams/StreamsStore';

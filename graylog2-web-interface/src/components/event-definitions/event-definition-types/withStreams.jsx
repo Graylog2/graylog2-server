@@ -17,7 +17,6 @@
 import React from 'react';
 
 import { Spinner } from 'components/common';
-import CombinedProvider from 'injection/CombinedProvider';
 import { StreamsStore } from 'stores/streams/StreamsStore';
 
 export default function withStreams(WrappedComponent, hiddenStreams = []) {
