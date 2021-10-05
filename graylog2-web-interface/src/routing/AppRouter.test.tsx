@@ -36,6 +36,8 @@ jest.mock('injection/CombinedProvider', () => {
   });
 });
 
+jest.mock('stores/nodes/NodesStore', () => ({ NodesStore: MockStore() }));
+
 // To prevent exceptions from getting swallowed
 jest.mock('components/errors/RouterErrorBoundary', () => mockComponent('RouterErrorBoundary'));
 

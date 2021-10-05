@@ -24,10 +24,10 @@ import { Input } from 'components/messageloaders/Types';
 
 import FormatReceivedBy from './FormatReceivedBy';
 
-jest.mock('injection/CombinedProvider', () => new MockCombinedProvider({
-  Nodes: {
-    NodesStore: MockStore(['getInitialState', () => ({ nodes: { existingNode: { short_node_id: 'foobar', hostname: 'existing.node' } } })]),
-  },
+jest.mock('injection/CombinedProvider', () => new MockCombinedProvider({}));
+
+jest.mock('stores/nodes/NodesStore', () => ({
+  NodesStore: MockStore(['getInitialState', () => ({ nodes: { existingNode: { short_node_id: 'foobar', hostname: 'existing.node' } } })]),
 }));
 
 jest.mock('stores/users/CurrentUserStore', () => ({ CurrentUserStore: MockStore() }));

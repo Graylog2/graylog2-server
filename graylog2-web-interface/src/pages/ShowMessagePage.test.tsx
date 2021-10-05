@@ -35,14 +35,15 @@ const mockListStreams = jest.fn((...args) => Promise.resolve([]));
 
 jest.mock('injection/CombinedProvider', () => ({
   get: jest.fn((type) => ({
-    Nodes: {
-      NodesActions: { list: (...args) => mockListNodes(...args) },
-      NodesStore: MockStore(['listen', () => () => {}], ['getInitialState', () => ({ nodes: {} })]),
-    },
     Preferences: {
       PreferencesStore: MockStore(),
     },
   }[type])),
+}));
+
+jest.mock('stores/nodes/NodesStore', () => ({
+  NodesActions: { list: (...args) => mockListNodes(...args) },
+  NodesStore: MockStore(['listen', () => () => {}], ['getInitialState', () => ({ nodes: {} })]),
 }));
 
 jest.mock('stores/messages/MessagesStore', () => ({
