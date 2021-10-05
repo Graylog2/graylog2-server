@@ -25,11 +25,9 @@ import { EntityListItem, IfPermitted, LinkToNode, Spinner } from 'components/com
 import { ConfigurationWell } from 'components/configurationforms';
 import PermissionsMixin from 'util/PermissionsMixin';
 import Routes from 'routing/Routes';
-import StoreProvider from 'injection/StoreProvider';
 import { InputForm, InputStateBadge, InputStateControl, InputStaticFields, InputThroughput, StaticFieldForm } from 'components/inputs';
 import { InputsActions } from 'stores/inputs/InputsStore';
-
-const InputTypesStore = StoreProvider.getStore('InputTypes');
+import { InputTypesStore } from 'stores/inputs/InputTypesStore';
 
 const InputListItem = createReactClass({
   displayName: 'InputListItem',

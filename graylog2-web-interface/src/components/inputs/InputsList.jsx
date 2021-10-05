@@ -27,12 +27,12 @@ import { IfPermitted, Spinner, SearchForm } from 'components/common';
 import StoreProvider from 'injection/StoreProvider';
 import ActionsProvider from 'injection/ActionsProvider';
 import { InputsActions, InputsStore } from 'stores/inputs/InputsStore';
+import { InputTypesActions } from 'stores/inputs/InputTypesStore';
 
 import InputListItem from './InputListItem';
 import CreateInputControl from './CreateInputControl';
 
 const SingleNodeActions = ActionsProvider.getActions('SingleNode');
-const InputTypesActions = ActionsProvider.getActions('InputTypes');
 
 const SingleNodeStore = StoreProvider.getStore('SingleNode');
 

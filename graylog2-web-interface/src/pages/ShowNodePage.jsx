@@ -25,10 +25,10 @@ import { DocumentTitle, PageErrorOverview, PageHeader, Spinner } from 'component
 import withParams from 'routing/withParams';
 import { ClusterOverviewStore } from 'stores/cluster/ClusterOverviewStore';
 import { InputStatesStore } from 'stores/inputs/InputStatesStore';
+import { InputTypesStore } from 'stores/inputs/InputTypesStore';
 
 const NodesStore = StoreProvider.getStore('Nodes');
 const PluginsStore = StoreProvider.getStore('Plugins');
-const InputTypesStore = StoreProvider.getStore('InputTypes');
 
 function nodeFilter(state) {
   return state.nodes ? state.nodes[this.props.params.nodeId] : state.nodes;
