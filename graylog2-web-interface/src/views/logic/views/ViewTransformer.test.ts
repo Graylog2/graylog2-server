@@ -30,14 +30,10 @@ import viewTransformer from './ViewTransformer';
 
 const mockList = jest.fn((...args) => Promise.resolve([]));
 
-jest.mock('injection/CombinedProvider', () => ({
-  get: (type) => ({
-    Decorators: {
-      DecoratorsActions: {
-        list: (...args) => mockList(...args),
-      },
-    },
-  })[type],
+jest.mock('stores/decorators/DecoratorsStore', () => ({
+  DecoratorsActions: {
+    list: (...args) => mockList(...args),
+  },
 }));
 
 const cwd = dirname(__filename);
