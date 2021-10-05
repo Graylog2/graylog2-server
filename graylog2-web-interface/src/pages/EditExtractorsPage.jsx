@@ -28,10 +28,9 @@ import Routes from 'routing/Routes';
 import ActionsProvider from 'injection/ActionsProvider';
 import StoreProvider from 'injection/StoreProvider';
 import withParams from 'routing/withParams';
+import { ExtractorsActions, ExtractorsStore } from 'stores/extractors/ExtractorsStore';
 
 const InputsActions = ActionsProvider.getActions('Inputs');
-const ExtractorsActions = ActionsProvider.getActions('Extractors');
-const ExtractorsStore = StoreProvider.getStore('Extractors');
 const InputsStore = StoreProvider.getStore('Inputs');
 const UniversalSearchstore = StoreProvider.getStore('UniversalSearch');
 

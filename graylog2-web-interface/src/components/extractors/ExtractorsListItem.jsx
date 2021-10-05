@@ -22,10 +22,8 @@ import { LinkContainer } from 'components/graylog/router';
 import { Button, Row, Col, Well } from 'components/graylog';
 import EntityListItem from 'components/common/EntityListItem';
 import ExtractorUtils from 'util/ExtractorUtils';
-import ActionsProvider from 'injection/ActionsProvider';
 import Routes from 'routing/Routes';
-
-const ExtractorsActions = ActionsProvider.getActions('Extractors');
+import { ExtractorsActions } from 'stores/extractors/ExtractorsStore';
 
 class ExtractorsListItem extends React.Component {
   static propTypes = {

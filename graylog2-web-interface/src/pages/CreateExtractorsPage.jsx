@@ -30,8 +30,8 @@ import StoreProvider from 'injection/StoreProvider';
 import ActionsProvider from 'injection/ActionsProvider';
 import withParams from 'routing/withParams';
 import withLocation from 'routing/withLocation';
+import { ExtractorsStore } from 'stores/extractors/ExtractorsStore';
 
-const ExtractorsStore = StoreProvider.getStore('Extractors');
 const InputsStore = StoreProvider.getStore('Inputs');
 // eslint-disable-next-line no-unused-vars
 const MessagesStore = StoreProvider.getStore('Messages');
