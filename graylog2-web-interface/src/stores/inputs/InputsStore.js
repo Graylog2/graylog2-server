@@ -19,10 +19,9 @@ import Reflux from 'reflux';
 import * as URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
-import StoreProvider from 'injection/StoreProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
+import { InputStaticFieldsStore } from 'stores/inputs/InputStaticFieldsStore';
 
-const InputStaticFieldsStore = StoreProvider.getStore('InputStaticFields');
 export const InputsActions = singletonActions(
   'core.Inputs',
   () => Reflux.createActions({
