@@ -24,8 +24,8 @@ import { Label, OverlayTrigger, Popover } from 'components/graylog';
 import StoreProvider from 'injection/StoreProvider';
 import { LinkToNode, Spinner } from 'components/common';
 import InputStateComparator from 'logic/inputs/InputStateComparator';
+import { InputStatesStore } from 'stores/inputs/InputStatesStore';
 
-const InputStatesStore = StoreProvider.getStore('InputStates');
 const NodesStore = StoreProvider.getStore('Nodes');
 
 const InputStateBadge = createReactClass({

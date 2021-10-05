@@ -26,9 +26,9 @@ import { InputsList } from 'components/inputs';
 import Routes from 'routing/Routes';
 import withParams from 'routing/withParams';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
+import { InputStatesStore } from 'stores/inputs/InputStatesStore';
 
 const NodesStore = StoreProvider.getStore('Nodes');
-const InputStatesStore = StoreProvider.getStore('InputStates');
 
 function nodeFilter(state) {
   return state.nodes ? state.nodes[this.props.params.nodeId] : state.nodes;

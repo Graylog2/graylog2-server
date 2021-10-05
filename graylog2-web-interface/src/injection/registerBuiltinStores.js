@@ -44,7 +44,6 @@ const actions = {
 
 const stores = {
   Authentication: () => require('stores/authentication/AuthenticationStore'),
-  InputStates: () => require('stores/inputs/InputStatesStore'),
   InputStaticFields: () => require('stores/inputs/InputStaticFieldsStore'),
   InputTypes: () => require('stores/inputs/InputTypesStore'),
   Journal: () => require('stores/journal/JournalStore'),
