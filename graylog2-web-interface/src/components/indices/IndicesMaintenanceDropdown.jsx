@@ -18,10 +18,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { ButtonGroup, DropdownButton, MenuItem } from 'components/graylog';
-import ActionsProvider from 'injection/ActionsProvider';
 import { DeflectorActions } from 'stores/indices/DeflectorStore';
-
-const IndexRangesActions = ActionsProvider.getActions('IndexRanges');
+import { IndexRangesActions } from 'stores/indices/IndexRangesStore';
 
 class IndicesMaintenanceDropdown extends React.Component {
   static propTypes = {
@@ -31,14 +29,17 @@ class IndicesMaintenanceDropdown extends React.Component {
 
   _onRecalculateIndexRange = () => {
     if (window.confirm('This will recalculate index ranges for this index set using a background system job. Do you want to proceed?')) {
-      IndexRangesActions.recalculate(this.props.indexSetId);
+      const { indexSetId } = this.props;
+      IndexRangesActions.recalculate(indexSetId);
     }
   };
 
   _onCycleDeflector = () => {
     if (window.confirm('This will manually cycle the current active write index on this index set. Do you want to proceed?')) {
-      DeflectorActions.cycle(this.props.indexSetId).then(() => {
-        DeflectorActions.list(this.props.indexSetId);
+      const { indexSetId } = this.props;
+
+      DeflectorActions.cycle(indexSetId).then(() => {
+        DeflectorActions.list(indexSetId);
       });
     }
   };
@@ -46,7 +47,9 @@ class IndicesMaintenanceDropdown extends React.Component {
   render() {
     let cycleButton;
 
-    if (this.props.indexSet && this.props.indexSet.writable) {
+    const { indexSet } = this.props;
+
+    if (indexSet?.writable) {
       cycleButton = <MenuItem eventKey="2" onClick={this._onCycleDeflector}>Rotate active write index</MenuItem>;
     }
 
