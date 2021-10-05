@@ -19,13 +19,11 @@ import Reflux from 'reflux';
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
-import CombinedProvider from 'injection/CombinedProvider';
 import { UserJSON } from 'logic/users/User';
 import { singletonStore } from 'logic/singleton';
 import { PreferencesActions } from 'stores/users/PreferencesStore';
 import { SessionActions, SessionStore } from 'stores/sessions/SessionStore';
-
-const { StartpageStore } = CombinedProvider.get('Startpage');
+import { StartpageStore } from 'stores/users/StartpageStore';
 
 export type CurrentUserStoreState = {
   currentUser: UserJSON,
