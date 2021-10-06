@@ -69,8 +69,9 @@ public class InputLauncher {
             inputRegistry.add(inputState);
         } else {
             inputState = inputRegistry.getInputState(input.getId());
-            if (inputState.getState() == IOState.Type.RUNNING || inputState.getState() == IOState.Type.STARTING)
+            if (inputState.getState() == IOState.Type.RUNNING || inputState.getState() == IOState.Type.STARTING) {
                 return inputState;
+            }
             inputState.setStoppable(input);
         }
 
@@ -107,8 +108,7 @@ public class InputLauncher {
         // Clean up.
         //cleanInput(input);
 
-        inputState.setState(IOState.Type.FAILED);
-        inputState.setDetailedMessage(causeMsg);
+        inputState.setState(IOState.Type.FAILED, causeMsg);
     }
 
     public void launchAllPersisted() {

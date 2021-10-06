@@ -17,6 +17,7 @@
 package org.graylog2.inputs;
 
 import com.google.common.collect.Lists;
+import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.database.ValidationException;
@@ -38,11 +39,13 @@ public class PersistedInputsImpl implements PersistedInputs {
     private static final Logger LOG = LoggerFactory.getLogger(PersistedInputsImpl.class);
     private final InputService inputService;
     private final ServerStatus serverStatus;
+    private final LeaderElectionService leaderElectionService;
 
     @Inject
-    public PersistedInputsImpl(InputService inputService, ServerStatus serverStatus) {
+    public PersistedInputsImpl(InputService inputService, ServerStatus serverStatus, LeaderElectionService leaderElectionService) {
         this.inputService = inputService;
         this.serverStatus = serverStatus;
+        this.leaderElectionService = leaderElectionService;
     }
 
     @Override
@@ -52,7 +55,11 @@ public class PersistedInputsImpl implements PersistedInputs {
         for (Input io : inputService.allOfThisNode(serverStatus.getNodeId().toString())) {
             try {
                 final MessageInput input = inputService.getMessageInput(io);
-                result.add(input);
+                if (input.onlyOnePerCluster() && input.isGlobal() && !leaderElectionService.isLeader()) {
+                    LOG.info("Not starting 'onlyOnePerCluster' input <{}/{}>", input.getName(), input.getId());
+                } else {
+                    result.add(input);
+                }
             } catch (NoSuchInputTypeException e) {
                 LOG.warn("Cannot instantiate persisted input. No such type [{}].", io.getType());
             } catch (Throwable e) {
@@ -94,8 +101,9 @@ public class PersistedInputsImpl implements PersistedInputs {
     public boolean remove(Object o) {
         if (o instanceof MessageInput) {
             final MessageInput messageInput = (MessageInput) o;
-            if (isNullOrEmpty(messageInput.getId()))
+            if (isNullOrEmpty(messageInput.getId())) {
                 return false;
+            }
             try {
                 final Input input = inputService.find(messageInput.getId());
                 inputService.destroy(input);
@@ -120,11 +128,13 @@ public class PersistedInputsImpl implements PersistedInputs {
 
             inputService.save(mongoInput);
 
-            for (Map.Entry<String, String> entry : staticFields.entrySet())
+            for (Map.Entry<String, String> entry : staticFields.entrySet()) {
                 inputService.addStaticField(mongoInput, entry.getKey(), entry.getValue());
+            }
 
-            for (Extractor extractor : extractors)
+            for (Extractor extractor : extractors) {
                 inputService.addExtractor(mongoInput, extractor);
+            }
 
             return true;
         } catch (NotFoundException | ValidationException e) {
@@ -138,10 +148,11 @@ public class PersistedInputsImpl implements PersistedInputs {
 
         // ... and check if it would pass validation. We don't need to go on if it doesn't.
         final Input mongoInput;
-        if (input.getId() != null)
+        if (input.getId() != null) {
             mongoInput = inputService.create(input.getId(), inputData);
-        else
+        } else {
             mongoInput = inputService.create(inputData);
+        }
 
         return mongoInput;
     }

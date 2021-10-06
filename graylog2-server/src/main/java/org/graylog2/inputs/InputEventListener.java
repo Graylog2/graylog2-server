@@ -18,6 +18,8 @@ package org.graylog2.inputs;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import org.graylog2.cluster.leader.LeaderChangedEvent;
+import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.inputs.MessageInput;
@@ -28,6 +30,7 @@ import org.graylog2.rest.models.system.inputs.responses.InputUpdated;
 import org.graylog2.shared.inputs.InputLauncher;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.inputs.NoSuchInputTypeException;
+import org.graylog2.shared.inputs.PersistedInputs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,17 +42,23 @@ public class InputEventListener {
     private final InputRegistry inputRegistry;
     private final InputService inputService;
     private final NodeId nodeId;
+    private final LeaderElectionService leaderElectionService;
+    private final PersistedInputs persistedInputs;
 
     @Inject
     public InputEventListener(EventBus eventBus,
                               InputLauncher inputLauncher,
                               InputRegistry inputRegistry,
                               InputService inputService,
-                              NodeId nodeId) {
+                              NodeId nodeId,
+                              LeaderElectionService leaderElectionService,
+                              PersistedInputs persistedInputs) {
         this.inputLauncher = inputLauncher;
         this.inputRegistry = inputRegistry;
         this.inputService = inputService;
         this.nodeId = nodeId;
+        this.leaderElectionService = leaderElectionService;
+        this.persistedInputs = persistedInputs;
         eventBus.register(this);
     }
 
@@ -109,6 +118,14 @@ public class InputEventListener {
             LOG.warn("Input {} ({}) is of invalid type {}", input.getTitle(), input.getId(), input.getType(), e);
             return;
         }
+        startMessageInput(messageInput);
+    }
+
+    private void startMessageInput(MessageInput messageInput) {
+        if (messageInput.isGlobal() && messageInput.onlyOnePerCluster() && !leaderElectionService.isLeader()) {
+            LOG.info("Ignoring start request for 'onlyOnePerCluster' input <{}/{}> this node is not a leader", messageInput.getName(), messageInput.getId());
+            return;
+        }
         messageInput.initialize();
 
         final IOState<MessageInput> newInputState = inputLauncher.launch(messageInput);
@@ -123,4 +140,20 @@ public class InputEventListener {
             inputRegistry.remove(inputState);
         }
     }
+
+    // TODO consider moving this into separate class
+    @Subscribe
+    public void leaderChanged(LeaderChangedEvent event) {
+        if (leaderElectionService.isLeader()) {
+            for (MessageInput input : persistedInputs) {
+                final IOState<MessageInput> inputState = inputRegistry.getInputState(input.getId());
+                if (inputState == null || inputState.canBeStarted()) {
+                    LOG.info("Got leader role. Starting input <{}/{}>", input.getName(), input.getId());
+                    startMessageInput(input);
+                }
+            }
+
+        }
+    }
+
 }

@@ -39,4 +39,5 @@ public interface Input extends Persisted {
     String getContentPack();
 
     String getNodeId();
+
 }

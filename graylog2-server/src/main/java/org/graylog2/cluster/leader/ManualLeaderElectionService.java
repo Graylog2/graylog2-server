@@ -23,6 +23,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.AbstractIdleService;
 import org.graylog2.cluster.ClusterConfigChangedEvent;
+import org.graylog2.periodical.NodePingThread;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.system.NodeId;
 import org.slf4j.Logger;
@@ -38,13 +39,15 @@ public class ManualLeaderElectionService extends AbstractIdleService implements 
     private final ClusterConfigService clusterConfigService;
     private final NodeId nodeId;
     private final EventBus eventBus;
+    private final NodePingThread nodePingThread;
 
 
     @Inject
-    public ManualLeaderElectionService(ClusterConfigService clusterConfigService, NodeId nodeId, EventBus eventBus) {
+    public ManualLeaderElectionService(ClusterConfigService clusterConfigService, NodeId nodeId, EventBus eventBus, NodePingThread nodePingThread) {
         this.clusterConfigService = clusterConfigService;
         this.nodeId = nodeId;
         this.eventBus = eventBus;
+        this.nodePingThread = nodePingThread;
     }
 
     public void promoteSelf() {
@@ -82,6 +85,16 @@ public class ManualLeaderElectionService extends AbstractIdleService implements 
             if (leader == null) {
                 throw new IllegalStateException("Cannot find leader in cluster config after event.");
             }
+
+            log.info("Leader changed to <{}>", leader.nodeId());
+            if (isLeader()) {
+                log.info("We are the new leader");
+            } else {
+                log.info("We are a now following node <{}>", leader.nodeId());
+            }
+
+            // Ensure the nodes collection is up to date before we publish the event
+            nodePingThread.doRun();
 
             eventBus.post(LeaderChangedEvent.create(leader.nodeId()));
         }

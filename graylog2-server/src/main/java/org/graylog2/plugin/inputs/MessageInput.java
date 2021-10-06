@@ -170,13 +170,17 @@ public abstract class MessageInput implements Stoppable {
     }
 
     private void cleanupMetrics() {
-        if (localRegistry != null && localRegistry.getMetrics() != null)
-            for (String metricName : localRegistry.getMetrics().keySet())
+        if (localRegistry != null && localRegistry.getMetrics() != null) {
+            for (String metricName : localRegistry.getMetrics().keySet()) {
                 metricRegistry.remove(getUniqueReadableId() + "." + metricName);
+            }
+        }
 
-        if (this.transportMetrics != null && this.transportMetrics.getMetrics() != null)
-            for (String metricName : this.transportMetrics.getMetrics().keySet())
+        if (this.transportMetrics != null && this.transportMetrics.getMetrics() != null) {
+            for (String metricName : this.transportMetrics.getMetrics().keySet()) {
                 metricRegistry.remove(getUniqueReadableId() + "." + metricName);
+            }
+        }
     }
 
     public ConfigurationRequest getRequestedConfiguration() {
@@ -237,6 +241,10 @@ public abstract class MessageInput implements Stoppable {
 
     public Boolean isGlobal() {
         return global;
+    }
+
+    public boolean onlyOnePerCluster() {
+        return false;
     }
 
     public void setGlobal(Boolean global) {

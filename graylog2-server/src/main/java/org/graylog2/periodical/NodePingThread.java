@@ -33,7 +33,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
+@Singleton
 public class NodePingThread extends Periodical {
 
     private static final Logger LOG = LoggerFactory.getLogger(NodePingThread.class);
@@ -59,7 +61,7 @@ public class NodePingThread extends Periodical {
     }
 
     @Override
-    public void doRun() {
+    public synchronized void doRun() {
         final boolean isMaster = leaderElectionService.isLeader();
         try {
             Node node = nodeService.byNodeId(serverStatus.getNodeId());
@@ -82,8 +84,8 @@ public class NodePingThread extends Periodical {
                 boolean removedNotification = notificationService.fixed(notification);
                 if (removedNotification) {
                     activityWriter.write(
-                        new Activity("Notification condition [" + NotificationImpl.Type.NO_MASTER + "] " +
-                                             "has been fixed.", NodePingThread.class));
+                            new Activity("Notification condition [" + NotificationImpl.Type.NO_MASTER + "] " +
+                                    "has been fixed.", NodePingThread.class));
                 }
             } else {
                 Notification notification = notificationService.buildNow()
