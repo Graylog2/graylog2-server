@@ -18,6 +18,8 @@
 
 const path = require('path');
 
+const requireIt = require('react-styleguidist/lib/loaders/utils/requireIt').default;
+
 const webpackConfig = require('./webpack.config.js');
 
 const defaultComponentIgnore = [
@@ -35,88 +37,13 @@ module.exports = {
     'toastr/toastr.less',
     'stylesheets/typeahead.less',
   ],
+  // propsParser: require('react-docgen-typescript').parse,
   sections: [
     {
-      name: 'Introduction',
-      content: 'docs/introduction.md',
+      name: 'Alert',
+      components: 'src/components/graylog/Alert.tsx',
     },
-    {
-      name: 'Style Guide',
-      content: 'docs/styleguide.md',
-    },
-    {
-      name: 'Documentation',
-      content: 'docs/documentation.md',
-    },
-    {
-      name: 'Tests',
-      content: 'docs/tests.md',
-    },
-    {
-      name: 'Theming Details',
-      content: 'src/theme/docs/Details.md',
-      sections: [
-        {
-          name: 'ThemeProvider & Usage',
-          content: 'src/theme/docs/ThemeProvider.md',
-        },
-        {
-          name: 'Fonts',
-          content: 'src/theme/docs/Fonts.md',
-        },
-        {
-          name: 'Colors',
-          content: 'src/theme/docs/Colors.md',
-        },
-        {
-          name: 'Color Utilities',
-          content: 'src/theme/docs/Utilities.md',
-        },
-        {
-          name: 'Spacings',
-          content: 'src/theme/docs/Spacings.md',
-        },
-      ],
-    },
-    {
-      name: 'Shared Components',
-      sections: [
-        {
-          name: 'Bootstrap',
-          components: 'src/components/bootstrap/[A-Z]*.{jsx,tsx}',
-        },
-        {
-          name: 'Common',
-          components: 'src/components/common/[A-Z]*.{jsx,tsx}',
-          ignore: [
-            ...defaultComponentIgnore,
-            'src/components/common/URLWhiteListFormModal.tsx',
-            'src/components/common/FlatContentRow.tsx',
-            'src/components/common/Wizard.tsx',
-            'src/components/common/PublicNotifications.tsx',
-            'src/components/common/KeyCapture.tsx',
-          ],
-        },
-        {
-          name: 'Themeable',
-          components: 'src/components/graylog/[A-Z]*.{jsx,tsx}',
-          ignore: [
-            ...defaultComponentIgnore,
-            'src/components/graylog/MessageDetailsDefinitionList.jsx',
-            'src/components/graylog/Button.jsx',
-            'src/components/graylog/Accordion.tsx',
-          ],
-        },
-        {
-          name: 'Configuration Forms',
-          components: 'src/components/configurationforms/[A-Z]*.{jsx,tsx}',
-          ignore: [
-            ...defaultComponentIgnore,
-            'src/components/configurationforms/ListField.tsx',
-          ],
-        },
-      ],
-    },
+
   ],
   usageMode: 'collapse',
   styleguideComponents: {
@@ -124,6 +51,16 @@ module.exports = {
   },
   styleguideDir: 'docs/styleguide',
   title: 'Graylog UI documentation',
+  getExampleFilename(componentPath) {
+    return componentPath.replace(/\.tsx?$/, '.example.tsx');
+  },
+  updateDocs(docs) {
+    const loader = path.join(__dirname, 'webpack/examples-loader.js');
+    const requirePath = docs.examples.require.replace(/^!!([^!]*)!/, `!!${loader}!`);
+    docs.examples = requireIt(requirePath);
+
+    return docs;
+  },
   webpackConfig: {
     module: webpackConfig.module,
     resolve: webpackConfig.resolve,

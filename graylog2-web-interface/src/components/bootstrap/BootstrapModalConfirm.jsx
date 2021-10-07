@@ -132,4 +132,5 @@ class BootstrapModalConfirm extends React.Component {
   }
 }
 
+/** @component */
 export default BootstrapModalConfirm;

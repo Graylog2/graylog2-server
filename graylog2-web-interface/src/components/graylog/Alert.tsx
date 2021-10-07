@@ -64,7 +64,7 @@ const StyledAlert = styled(BootstrapAlert).attrs(({ bsStyle }: { bsStyle: ColorV
   `;
 });
 
-const Alert = ({ bsStyle, ...rest }: {bsStyle: ColorVariants}) => {
+const Alert = ({ bsStyle, ...rest }: { bsStyle: ColorVariants, children: React.ReactNode }) => {
   return <StyledAlert bsStyle={bsStyle} {...rest} />;
 };
 

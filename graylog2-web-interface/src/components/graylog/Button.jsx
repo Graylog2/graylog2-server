@@ -22,4 +22,5 @@ const Button = styled(BootstrapButton)(({ theme }) => css`
   ${theme.components.button}
 `);
 
+/** @component */
 export default Button;

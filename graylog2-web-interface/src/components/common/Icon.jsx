@@ -96,4 +96,5 @@ Icon.defaultProps = {
   type: 'solid',
 };
 
+/** @component */
 export default Icon;
