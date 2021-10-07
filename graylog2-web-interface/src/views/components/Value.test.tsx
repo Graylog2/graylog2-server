@@ -25,7 +25,7 @@ import EmptyValue from './EmptyValue';
 import InteractiveContext from './contexts/InteractiveContext';
 
 jest.mock('./actions/ValueActions', () => mockComponent('ValueActions'));
-jest.mock('views/components/common/UserTimezoneTimestamp', () => mockComponent('UserTimezoneTimestamp'));
+jest.mock('components/common/Timestamp', () => mockComponent('Timestamp'));
 
 describe('Value', () => {
   describe('shows value actions menu', () => {
@@ -43,7 +43,7 @@ describe('Value', () => {
                                        queryId="someQueryId"
                                        value="2018-10-02T14:45:40Z"
                                        type={new FieldType('date', [], [])} />);
-      const userTimestamp = wrapper.find('UserTimezoneTimestamp');
+      const userTimestamp = wrapper.find('Timestamp');
 
       expect(userTimestamp).toExist();
     });
@@ -53,7 +53,7 @@ describe('Value', () => {
                                        queryId="someQueryId"
                                        value={1571302317}
                                        type={new FieldType('date', [], [])} />);
-      const userTimeStamp = wrapper.find('UserTimezoneTimestamp');
+      const userTimeStamp = wrapper.find('Timestamp');
 
       expect(userTimeStamp).toExist();
     });

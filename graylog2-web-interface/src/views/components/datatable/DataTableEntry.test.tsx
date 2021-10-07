@@ -28,7 +28,7 @@ import DataTableEntry from './DataTableEntry';
 
 import EmptyValue from '../EmptyValue';
 
-jest.mock('views/components/common/UserTimezoneTimestamp', () => mockComponent('UserTimezoneTimestamp'));
+jest.mock('components/common/Timestamp', () => mockComponent('Timestamp'));
 
 const f = (source: string, field: string = source): { field: string, source: string } => ({ field, source });
 const createFields = (fields: Array<string>) => OrderedSet(fields.map((field) => f(field)));
