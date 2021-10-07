@@ -71,11 +71,9 @@ const DashboardSearchForm = ({ initialValues, limitDuration, onSubmit, validateQ
                                  validate={_validate}
                                  validateOnMount>
       {(...args) => (
-        <DateTimeProvider limitDuration={limitDuration}>
-          <Form>
-            {_isFunction(children) ? children(...args) : children}
-          </Form>
-        </DateTimeProvider>
+        <Form>
+          {_isFunction(children) ? children(...args) : children}
+        </Form>
       )}
     </Formik>
   );

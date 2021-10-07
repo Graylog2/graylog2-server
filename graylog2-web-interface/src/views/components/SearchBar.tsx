@@ -156,6 +156,7 @@ const SearchBar = ({
                     <TopRow>
                       <Col md={5}>
                         <TimeRangeInput disabled={disableSearch}
+                                        limitDuration={limitDuration}
                                         onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
                                         value={values?.timerange}
                                         hasErrorOnMount={!!errors.timerange} />

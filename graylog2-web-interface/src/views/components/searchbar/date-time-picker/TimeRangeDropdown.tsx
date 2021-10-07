@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext, useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Form, Formik } from 'formik';
 import styled, { css } from 'styled-components';
 import moment from 'moment';
@@ -37,7 +37,6 @@ import TabKeywordTimeRange from './TabKeywordTimeRange';
 import TabRelativeTimeRange from './TabRelativeTimeRange';
 import TabDisabledTimeRange from './TabDisabledTimeRange';
 import TimeRangeLivePreview from './TimeRangeLivePreview';
-import { DateTimeContext } from './DateTimeProvider';
 import { classifyRelativeTimeRange, normalizeIfClassifiedRelativeTimeRange, RELATIVE_CLASSIFIED_ALL_TIME_RANGE } from './RelativeTimeRangeClassifiedHelper';
 
 export type TimeRangeDropDownFormValues = {
@@ -46,6 +45,7 @@ export type TimeRangeDropDownFormValues = {
 
 export type TimeRangeDropdownProps = {
   currentTimeRange: SearchBarFormValues['timerange'] | NoTimeRangeOverride,
+  limitDuration: number,
   noOverride?: boolean,
   position: 'bottom'|'right',
   setCurrentTimeRange: (nextTimeRange: SearchBarFormValues['timerange'] | NoTimeRangeOverride) => void,
@@ -184,8 +184,8 @@ const TimeRangeDropdown = ({
   setCurrentTimeRange,
   validTypes = allTimeRangeTypes,
   position,
+  limitDuration,
 }: TimeRangeDropdownProps) => {
-  const { limitDuration } = useContext(DateTimeContext);
   const [validatingKeyword, setValidatingKeyword] = useState(false);
   const [activeTab, setActiveTab] = useState('type' in currentTimeRange ? currentTimeRange.type : undefined);
 
