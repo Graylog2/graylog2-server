@@ -15,11 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import PropTypes from 'prop-types';
-import React from 'react';
+import * as React from 'react';
+import moment from 'moment';
 
 import DateTime from 'logic/datetimes/DateTime';
 
-export const formatDateTime = (dateTime, format, tz, relative = false) => {
+export const formatDateTime = (dateTime, format, tz, relative = false): string => {
   if (relative) {
     return dateTime.toRelativeString();
   }
@@ -35,6 +36,15 @@ export const formatDateTime = (dateTime, format, tz, relative = false) => {
   }
 };
 
+type Props = {
+  dateTime: string | number | Date | moment.Moment,
+  field?: string,
+  format?: string,
+  relative?: boolean,
+  render?: React.ComponentType<{ value: string, field: string | undefined }>,
+  tz?: string,
+}
+
 /**
  * Component that renders a `time` HTML element with a given date time. It is
  * capable of render date times in different formats, accepting ISO 8601
@@ -48,7 +58,7 @@ export const formatDateTime = (dateTime, format, tz, relative = false) => {
  * was used in the server.
  *
  */
-class Timestamp extends React.Component {
+class Timestamp extends React.Component<Props> {
   static propTypes = {
     /**
      * Date time to be displayed in the component. You can provide an ISO
@@ -105,7 +115,7 @@ class Timestamp extends React.Component {
     const { render: Component, dateTime, field } = this.props;
 
     return (
-      <time key={`time-${dateTime}`} dateTime={dateTime} title={dateTime}>
+      <time key={`time-${dateTime}`} dateTime={String(dateTime)} title={String(dateTime)}>
         <Component value={this._formatDateTime()} field={field} />
       </time>
     );
