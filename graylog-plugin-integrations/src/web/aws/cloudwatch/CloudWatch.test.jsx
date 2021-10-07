@@ -30,7 +30,6 @@ import Routes from 'routing/Routes';
 import CloudWatch from './CloudWatch';
 
 const mockCurrentUser = { currentUser: { fullname: 'Ada Lovelace', username: 'ada' } };
-jest.mock('injection/StoreProvider', () => ({ getStore: () => MockStore('get', 'listen') }));
 
 jest.mock('stores/users/CurrentUserStore', () => MockStore(
   ['get', () => mockCurrentUser],
