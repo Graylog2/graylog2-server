@@ -16,25 +16,37 @@
  */
 package org.graylog2.storage.versionprobe;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog2.plugin.Version;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.Null;
 
 @AutoValue
-@JsonAutoDetect
-@JsonIgnoreProperties(ignoreUnknown = true)
-public abstract class VersionResponse {
-    public abstract String number();
+public abstract class SearchVersion {
+
+    public SearchVersion major() {
+        return create(distribution(), Version.from(version().getVersion().getMajorVersion(), 0, 0));
+    }
+
     @Nullable
     public abstract String distribution();
 
-    @JsonCreator
-    public static VersionResponse create(@JsonProperty("number") String number, @JsonProperty("distribution") String distribution) {
-        return new AutoValue_VersionResponse(number, distribution);
+    public abstract Version version();
+
+    public static SearchVersion withoutDistribution(final Version version) {
+        return create(null, version);
+    }
+
+    public static SearchVersion create(@Nullable final String distribution, final Version version) {
+        return new AutoValue_SearchVersion(distribution, version);
+    }
+
+    @Override
+    public String toString() {
+        if (distribution() != null) {
+            return distribution() + ":" + version();
+        } else {
+            return version().toString();
+        }
     }
 }

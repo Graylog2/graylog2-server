@@ -17,15 +17,16 @@
 package org.graylog2.storage;
 
 import org.graylog2.plugin.Version;
+import org.graylog2.storage.versionprobe.SearchVersion;
 
 public class UnsupportedElasticsearchException extends RuntimeException {
-    private final Version elasticsearchMajorVersion;
+    private final SearchVersion elasticsearchMajorVersion;
 
-    public UnsupportedElasticsearchException(Version elasticsearchMajorVersion) {
+    public UnsupportedElasticsearchException(SearchVersion elasticsearchMajorVersion) {
         this.elasticsearchMajorVersion = elasticsearchMajorVersion;
     }
 
-    public Version getElasticsearchMajorVersion() {
+    public SearchVersion getElasticsearchMajorVersion() {
         return elasticsearchMajorVersion;
     }
 }

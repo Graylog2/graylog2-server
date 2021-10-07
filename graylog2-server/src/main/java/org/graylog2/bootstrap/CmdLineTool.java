@@ -75,6 +75,7 @@ import org.graylog2.shared.plugins.PluginLoader;
 import org.graylog2.shared.utilities.ExceptionUtils;
 import org.graylog2.storage.UnsupportedElasticsearchException;
 import org.graylog2.storage.versionprobe.ElasticsearchProbeException;
+import org.graylog2.storage.versionprobe.SearchVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -532,7 +533,7 @@ public abstract class CmdLineTool implements CliCommand {
                 LOG.error(UI.wallString("Unable to access file " + rootCause.getMessage()));
                 System.exit(-2);
             } else if (rootCause instanceof UnsupportedElasticsearchException) {
-                final Version elasticsearchVersion = ((UnsupportedElasticsearchException) rootCause).getElasticsearchMajorVersion();
+                final SearchVersion elasticsearchVersion = ((UnsupportedElasticsearchException) rootCause).getElasticsearchMajorVersion();
                 LOG.error(UI.wallString("Unsupported Elasticsearch version: " + elasticsearchVersion, DocsHelper.PAGE_ES_VERSIONS.toString()));
                 System.exit(-3);
             } else if (rootCause instanceof ElasticsearchProbeException) {

@@ -18,16 +18,17 @@ package org.graylog2.configuration.converters;
 
 import com.github.joschi.jadconfig.Converter;
 import org.graylog2.plugin.Version;
+import org.graylog2.storage.versionprobe.SearchVersion;
 
-public class MajorVersionConverter implements Converter<Version> {
+public class MajorVersionConverter implements Converter<SearchVersion> {
     @Override
-    public Version convertFrom(String value) {
+    public SearchVersion convertFrom(String value) {
         final int majorVersion = Integer.parseInt(value);
-        return Version.from(majorVersion, 0, 0);
+        return SearchVersion.withoutDistribution(Version.from(majorVersion, 0, 0));
     }
 
     @Override
-    public String convertTo(Version value) {
+    public String convertTo(SearchVersion value) {
         return value.toString();
     }
 }
