@@ -26,10 +26,8 @@ import { AlertsHeaderToolbar } from 'components/alerts';
 import { CreateAlertConditionInput } from 'components/alertconditions';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
-import StoreProvider from 'injection/StoreProvider';
 import withLocation from 'routing/withLocation';
-
-const CurrentUserStore = StoreProvider.getStore('CurrentUser');
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 
 const NewAlertConditionPage = createReactClass({
   displayName: 'NewAlertConditionPage',

@@ -21,7 +21,6 @@ import { useStore } from 'stores/connect';
 import withParams from 'routing/withParams';
 import { LinkContainer } from 'components/common/router';
 import { ButtonToolbar, Col, Row, Button } from 'components/bootstrap';
-import CombinedProvider from 'injection/CombinedProvider';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
@@ -30,9 +29,8 @@ import DocumentationLink from 'components/support/DocumentationLink';
 import { isPermitted } from 'util/PermissionsMixin';
 import history from 'util/History';
 import EventDefinitionSummary from 'components/event-definitions/event-definition-form/EventDefinitionSummary';
-
-const { EventDefinitionsActions } = CombinedProvider.get('EventDefinitions');
-const { EventNotificationsStore, EventNotificationsActions } = CombinedProvider.get('EventNotifications');
+import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitionsStore';
+import { EventNotificationsActions, EventNotificationsStore } from 'stores/event-notifications/EventNotificationsStore';
 
 type Props = {
   params: {

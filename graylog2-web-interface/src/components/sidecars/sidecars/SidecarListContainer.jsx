@@ -19,11 +19,9 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
 import { Spinner } from 'components/common';
-import CombinedProvider from 'injection/CombinedProvider';
+import { SidecarsActions, SidecarsStore } from 'stores/sidecars/SidecarsStore';
 
 import SidecarList from './SidecarList';
-
-const { SidecarsStore, SidecarsActions } = CombinedProvider.get('Sidecars');
 
 const SidecarListContainer = createReactClass({
   displayName: 'SidecarListContainer',

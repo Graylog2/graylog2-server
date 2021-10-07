@@ -23,9 +23,7 @@ import { JSONValueInput } from 'components/common';
 import ObjectUtils from 'util/ObjectUtils';
 import * as FormsUtils from 'util/FormsUtils';
 import { CachesContainer, CachePicker, DataAdaptersContainer, DataAdapterPicker } from 'components/lookup-tables';
-import CombinedProvider from 'injection/CombinedProvider';
-
-const { LookupTablesActions } = CombinedProvider.get('LookupTables');
+import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
 
 class LookupTableForm extends React.Component {
   static propTypes = {

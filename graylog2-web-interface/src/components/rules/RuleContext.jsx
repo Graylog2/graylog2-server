@@ -17,9 +17,8 @@
 import React, { createContext, useEffect, useRef, useCallback, useState } from 'react';
 import PropTypes from 'prop-types';
 
-import CombinedProvider from 'injection/CombinedProvider';
+import { RulesActions } from 'stores/rules/RulesStore';
 
-const { RulesActions } = CombinedProvider.get('Rules');
 let VALIDATE_TIMEOUT;
 
 export const PipelineRulesContext = createContext();

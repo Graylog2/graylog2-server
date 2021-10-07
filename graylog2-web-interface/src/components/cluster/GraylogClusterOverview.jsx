@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 /* eslint-disable react/no-find-dom-node */
-/* global window */
 import React from 'react';
 import PropTypes from 'prop-types';
 import createReactClass from 'create-react-class';
@@ -25,16 +24,12 @@ import _ from 'lodash';
 
 import { Col, Row } from 'components/bootstrap';
 import { Spinner } from 'components/common';
-import StoreProvider from 'injection/StoreProvider';
-import ActionsProvider from 'injection/ActionsProvider';
 import NumberUtils from 'util/NumberUtils';
 import EventHandlersThrottler from 'util/EventHandlersThrottler';
+import { ClusterTrafficActions, ClusterTrafficStore } from 'stores/cluster/ClusterTrafficStore';
+import { NodesStore } from 'stores/nodes/NodesStore';
 
 import TrafficGraph from './TrafficGraph';
-
-const ClusterTrafficStore = StoreProvider.getStore('ClusterTraffic');
-const ClusterTrafficActions = ActionsProvider.getActions('ClusterTraffic');
-const NodesStore = StoreProvider.getStore('Nodes');
 
 const GraylogClusterOverview = createReactClass({
   displayName: 'GraylogClusterOverview',

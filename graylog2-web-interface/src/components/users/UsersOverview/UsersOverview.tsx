@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useEffect, useContext, useState } from 'react';
 import styled, { css } from 'styled-components';
 
-import type { PaginatedUsers } from 'actions/users/UsersActions';
+import type { PaginatedUsers } from 'stores/users/UsersStore';
 import UsersDomain from 'domainActions/users/UsersDomain';
 import { UsersActions } from 'stores/users/UsersStore';
 import CurrentUserContext from 'contexts/CurrentUserContext';

@@ -20,9 +20,7 @@ import styled from 'styled-components';
 
 import { ProgressBar, LinkToNode, Timestamp, Icon } from 'components/common';
 import { Button } from 'components/bootstrap';
-import ActionsProvider from 'injection/ActionsProvider';
-
-const SystemJobsActions = ActionsProvider.getActions('SystemJobs');
+import { SystemJobsActions } from 'stores/systemjobs/SystemJobsStore';
 
 const StyledProgressBar = styled(ProgressBar)`
   margin-top: 2px;

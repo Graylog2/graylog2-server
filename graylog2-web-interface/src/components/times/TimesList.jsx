@@ -22,10 +22,8 @@ import moment from 'moment';
 import { Col, Row } from 'components/bootstrap';
 import { Spinner, Timestamp } from 'components/common';
 import DateTime from 'logic/datetimes/DateTime';
-import StoreProvider from 'injection/StoreProvider';
-
-const CurrentUserStore = StoreProvider.getStore('CurrentUser');
-const SystemStore = StoreProvider.getStore('System');
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
+import { SystemStore } from 'stores/system/SystemStore';
 
 const TimesList = createReactClass({
   displayName: 'TimesList',

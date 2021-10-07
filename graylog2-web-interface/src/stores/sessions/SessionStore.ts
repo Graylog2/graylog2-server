@@ -20,112 +20,125 @@ import Store from 'logic/local-storage/Store';
 import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import { Builder } from 'logic/rest/FetchProvider';
-import ActionsProvider from 'injection/ActionsProvider';
+import { singletonStore, singletonActions } from 'logic/singleton';
 
-const SessionActions = ActionsProvider.getActions('Session');
+type SessionActionsType = {
+  login: (username: string, password: string, host: string) => Promise<unknown>,
+  logout: (sessionId: string) => Promise<unknown>,
+  validate: () => Promise<unknown>,
+}
+export const SessionActions = singletonActions(
+  'core.Session',
+  () => Reflux.createActions<SessionActionsType>({
+    login: { asyncResult: true },
+    logout: { asyncResult: true },
+    validate: { asyncResult: true },
+  }),
+);
 
 export type SessionStoreState = { sessionId: string, username: string, validatingSession: boolean };
 
-const SessionStore = Reflux.createStore<SessionStoreState>({
-  listenables: [SessionActions],
-  sourceUrl: '/system/sessions',
-  sessionId: undefined,
-  username: undefined,
-  validatingSession: false,
+export const SessionStore = singletonStore(
+  'core.Session',
+  () => Reflux.createStore<SessionStoreState>({
+    listenables: [SessionActions],
+    sourceUrl: '/system/sessions',
+    sessionId: undefined,
+    username: undefined,
+    validatingSession: false,
 
-  init() {
-    this.validate();
-  },
-  getInitialState() {
-    return this.getSessionInfo();
-  },
+    init() {
+      this.validate();
+    },
+    getInitialState() {
+      return this.getSessionInfo();
+    },
 
-  login(username, password, host) {
-    const builder = new Builder('POST', qualifyUrl(this.sourceUrl))
-      .json({ username: username, password: password, host: host });
-    const promise = builder.build()
-      .then((sessionInfo) => {
-        return { sessionId: sessionInfo.session_id, username: sessionInfo.username };
-      });
+    login(username, password, host) {
+      const builder = new Builder('POST', qualifyUrl(this.sourceUrl))
+        .json({ username: username, password: password, host: host });
+      const promise = builder.build()
+        .then((sessionInfo) => {
+          return { sessionId: sessionInfo.session_id, username: sessionInfo.username };
+        });
 
-    SessionActions.login.promise(promise);
-  },
-  logout(sessionId) {
-    const promise = new Builder('DELETE', qualifyUrl(`${this.sourceUrl}/${sessionId}`))
-      .authenticated()
-      .build()
-      .then((resp) => {
-        if (resp.ok || resp.status === 401) {
-          this._removeSession();
-        }
-      }, this._removeSession);
+      SessionActions.login.promise(promise);
+    },
+    logout(sessionId) {
+      const promise = new Builder('DELETE', qualifyUrl(`${this.sourceUrl}/${sessionId}`))
+        .authenticated()
+        .build()
+        .then((resp) => {
+          if (resp.ok || resp.status === 401) {
+            this._removeSession();
+          }
+        }, this._removeSession);
 
-    SessionActions.logout.promise(promise);
-  },
+      SessionActions.logout.promise(promise);
+    },
 
-  validate() {
-    const sessionId = Store.get('sessionId');
-    const username = Store.get('username');
+    validate() {
+      const sessionId = Store.get('sessionId');
+      const username = Store.get('username');
 
-    this.validatingSession = true;
-    this._propagateState();
-    const promise = this._validateSession(sessionId)
-      .then((response) => {
-        if (response.is_valid) {
-          return SessionActions.login.completed({
-            sessionId: sessionId || response.session_id,
-            username: username || response.username,
-          });
-        }
+      this.validatingSession = true;
+      this._propagateState();
+      const promise = this._validateSession(sessionId)
+        .then((response) => {
+          if (response.is_valid) {
+            return SessionActions.login.completed({
+              sessionId: sessionId || response.session_id,
+              username: username || response.username,
+            });
+          }
 
-        if (sessionId && username) {
-          this._removeSession();
-        }
+          if (sessionId && username) {
+            this._removeSession();
+          }
 
-        return response;
-      })
-      .finally(() => {
-        this.validatingSession = false;
-        this._propagateState();
-      });
+          return response;
+        })
+        .finally(() => {
+          this.validatingSession = false;
+          this._propagateState();
+        });
 
-    SessionActions.validate.promise(promise);
-  },
-  _validateSession(sessionId) {
-    return new Builder('GET', qualifyUrl(ApiRoutes.SessionsApiController.validate().url))
-      .session(sessionId)
-      .json()
-      .build();
-  },
+      SessionActions.validate.promise(promise);
+    },
+    _validateSession(sessionId) {
+      return new Builder('GET', qualifyUrl(ApiRoutes.SessionsApiController.validate().url))
+        .session(sessionId)
+        .json()
+        .build();
+    },
 
-  _removeSession() {
-    Store.delete('sessionId');
-    Store.delete('username');
-    this.sessionId = undefined;
-    this.username = undefined;
-    this._propagateState();
-  },
+    _removeSession() {
+      Store.delete('sessionId');
+      Store.delete('username');
+      this.sessionId = undefined;
+      this.username = undefined;
+      this._propagateState();
+    },
 
-  _propagateState() {
-    this.trigger(this.getSessionInfo());
-  },
+    _propagateState() {
+      this.trigger(this.getSessionInfo());
+    },
 
-  loginCompleted(sessionInfo) {
-    Store.set('sessionId', sessionInfo.sessionId);
-    Store.set('username', sessionInfo.username);
-    this.sessionId = sessionInfo.sessionId;
-    this.username = sessionInfo.username;
-    this._propagateState();
-  },
-  isLoggedIn() {
-    return this.sessionId !== undefined && this.sessionId !== null;
-  },
-  getSessionId() {
-    return this.sessionId;
-  },
-  getSessionInfo() {
-    return { sessionId: this.sessionId, username: this.username, validatingSession: this.validatingSession };
-  },
-});
-
-export default SessionStore;
+    loginCompleted(sessionInfo) {
+      Store.set('sessionId', sessionInfo.sessionId);
+      Store.set('username', sessionInfo.username);
+      this.sessionId = sessionInfo.sessionId;
+      this.username = sessionInfo.username;
+      this._propagateState();
+    },
+    isLoggedIn() {
+      return this.sessionId !== undefined && this.sessionId !== null;
+    },
+    getSessionId() {
+      return this.sessionId;
+    },
+    getSessionInfo() {
+      return { sessionId: this.sessionId, username: this.username, validatingSession: this.validatingSession };
+    },
+  }),
+);

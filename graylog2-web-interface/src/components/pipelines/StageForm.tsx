@@ -23,10 +23,8 @@ import { SelectableList } from 'components/common';
 import { Button, ControlLabel, FormGroup, BootstrapModalForm, Input } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
 import Routes from 'routing/Routes';
-import CombinedProvider from 'injection/CombinedProvider';
 import { PipelineType, StageType } from 'stores/pipelines/PipelinesStore';
-
-const { RulesStore } = CombinedProvider.get('Rules');
+import { RulesStore } from 'stores/rules/RulesStore';
 
 type Props = {
   pipeline: PipelineType,

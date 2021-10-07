@@ -29,7 +29,7 @@ import Search from 'views/logic/search/Search';
 import ViewState from 'views/logic/views/ViewState';
 import Query from 'views/logic/queries/Query';
 import SearchActions from 'views/actions/SearchActions';
-import { singletonActions, singletonStore } from 'views/logic/singleton';
+import { singletonActions, singletonStore } from 'logic/singleton';
 import type { QueryId } from 'views/logic/queries/Query';
 
 import { ViewManagementActions } from './ViewManagementStore';

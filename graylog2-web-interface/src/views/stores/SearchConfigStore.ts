@@ -16,12 +16,10 @@
  */
 import Reflux from 'reflux';
 
-import CombinedProvider from 'injection/CombinedProvider';
-import { singletonActions, singletonStore } from 'views/logic/singleton';
+import { singletonActions, singletonStore } from 'logic/singleton';
 import { Store } from 'stores/StoreTypes';
 import { SearchesConfig } from 'components/search/SearchConfig';
-
-const { ConfigurationActions } = CombinedProvider.get('Configuration');
+import { ConfigurationsActions } from 'stores/configurations/ConfigurationsStore';
 
 type SearchConfigActionsType = {
   refresh: () => Promise<void>;
@@ -53,7 +51,7 @@ export const SearchConfigStore: Store<SearchConfigStoreState> = singletonStore(
     },
 
     refresh() {
-      ConfigurationActions.listSearchesClusterConfig().then((response) => {
+      ConfigurationsActions.listSearchesClusterConfig().then((response) => {
         this.searchesClusterConfig = response;
         this._trigger();
       });

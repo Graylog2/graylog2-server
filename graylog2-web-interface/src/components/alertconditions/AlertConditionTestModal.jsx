@@ -19,11 +19,9 @@ import PropTypes from 'prop-types';
 
 import { BootstrapModalWrapper, Alert, Modal, Button } from 'components/bootstrap';
 import { Spinner, Icon } from 'components/common';
-import CombinedProvider from 'injection/CombinedProvider';
+import { AlertConditionsActions } from 'stores/alertconditions/AlertConditionsStore';
 
 import style from './AlertConditionTestModal.css';
-
-const { AlertConditionsActions } = CombinedProvider.get('AlertConditions');
 
 class AlertConditionTestModal extends React.Component {
   static propTypes = {

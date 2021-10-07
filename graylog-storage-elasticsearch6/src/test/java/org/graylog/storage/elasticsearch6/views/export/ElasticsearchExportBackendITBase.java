@@ -82,7 +82,7 @@ public abstract class ElasticsearchExportBackendITBase extends ElasticsearchBase
         importFixture("messages.json");
 
         ExportMessagesCommand command = commandBuilderWithAllStreams()
-                .queryString(ElasticsearchQueryString.builder().queryString("Ha Ho").build())
+                .queryString(ElasticsearchQueryString.of("Ha Ho"))
                 .build();
 
         runWithExpectedResultIgnoringSort(command, "timestamp,source,message",
@@ -135,7 +135,7 @@ public abstract class ElasticsearchExportBackendITBase extends ElasticsearchBase
     public void failsWithLeadingHighlightQueryIfDisallowed() {
         importFixture("messages.json");
 
-        ExportMessagesCommand command = commandBuilderWithAllStreams().queryString(ElasticsearchQueryString.builder().queryString("*a").build()).build();
+        ExportMessagesCommand command = commandBuilderWithAllStreams().queryString(ElasticsearchQueryString.of("*a")).build();
 
         assertThatExceptionOfType(ExportException.class)
                 .isThrownBy(() -> sut.run(command, chunk -> {}))

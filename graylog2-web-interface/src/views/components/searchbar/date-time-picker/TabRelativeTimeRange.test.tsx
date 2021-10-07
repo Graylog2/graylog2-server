@@ -18,11 +18,15 @@ import React from 'react';
 import { fireEvent, render, screen } from 'wrappedTestingLibrary';
 import { Formik, Form } from 'formik';
 import MockStore from 'helpers/mocking/StoreMock';
+import MockAction from 'helpers/mocking/MockAction';
 
 import TabRelativeTimeRange from './TabRelativeTimeRange';
 
 jest.mock('stores/configurations/ConfigurationsStore', () => ({
   ConfigurationsStore: MockStore(),
+  ConfigurationsActions: {
+    listSearchesClusterConfig: MockAction(),
+  },
 }));
 
 const defaultProps = {

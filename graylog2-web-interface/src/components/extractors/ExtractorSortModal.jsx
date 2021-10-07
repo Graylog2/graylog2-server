@@ -19,9 +19,7 @@ import React from 'react';
 
 import { Row, Col, Modal, Button, BootstrapModalWrapper } from 'components/bootstrap';
 import SortableList from 'components/common/SortableList';
-import ActionsProvider from 'injection/ActionsProvider';
-
-const ExtractorsActions = ActionsProvider.getActions('Extractors');
+import { ExtractorsActions } from 'stores/extractors/ExtractorsStore';
 
 class ExtractorSortModal extends React.Component {
   static propTypes = {

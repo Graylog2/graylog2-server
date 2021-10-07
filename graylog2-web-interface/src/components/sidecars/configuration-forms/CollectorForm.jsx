@@ -24,10 +24,8 @@ import { Select, SourceCodeEditor } from 'components/common';
 import { Button, ButtonToolbar, Col, ControlLabel, FormGroup, HelpBlock, Row, Input } from 'components/bootstrap';
 import history from 'util/History';
 import Routes from 'routing/Routes';
-import CombinedProvider from 'injection/CombinedProvider';
-
-const { CollectorsStore, CollectorsActions } = CombinedProvider.get('Collectors');
-const { CollectorConfigurationsActions } = CombinedProvider.get('CollectorConfigurations');
+import { CollectorConfigurationsActions } from 'stores/sidecars/CollectorConfigurationsStore';
+import { CollectorsActions, CollectorsStore } from 'stores/sidecars/CollectorsStore';
 
 const CollectorForm = createReactClass({
   displayName: 'CollectorForm',

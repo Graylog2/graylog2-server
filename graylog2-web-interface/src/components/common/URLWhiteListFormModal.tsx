@@ -22,16 +22,13 @@ import connect from 'stores/connect';
 import { Button } from 'components/bootstrap';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import UrlWhiteListForm from 'components/configurations/UrlWhiteListForm';
-import CombinedProvider from 'injection/CombinedProvider';
 import type { ConfigurationsStoreState, WhiteListConfig } from 'stores/configurations/ConfigurationsStore';
 // Explicit import to fix eslint import/no-cycle
 import IfPermitted from 'components/common/IfPermitted';
 import { isPermitted } from 'util/PermissionsMixin';
 import { Store } from 'stores/StoreTypes';
-import { CurrentUserStoreState } from 'stores/users/CurrentUserStore';
-
-const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
-const { ConfigurationsActions, ConfigurationsStore } = CombinedProvider.get('Configurations');
+import { CurrentUserStoreState, CurrentUserStore } from 'stores/users/CurrentUserStore';
+import { ConfigurationsActions, ConfigurationsStore } from 'stores/configurations/ConfigurationsStore';
 
 const URL_WHITELIST_CONFIG = 'org.graylog2.system.urlwhitelist.UrlWhitelist';
 
@@ -101,7 +98,7 @@ class URLWhiteListFormModal extends React.Component<Props, State> {
     }
   }
 
-  _setDefaultWhiteListState =(urlwhitelistConfig) => {
+  _setDefaultWhiteListState = (urlwhitelistConfig) => {
     const { newUrlEntry, urlType } = this.props;
     const { isValid } = this.state;
     const config = { entries: [...urlwhitelistConfig.entries, { id: uuid(), title: '', value: newUrlEntry, type: urlType || 'literal' }], disabled: urlwhitelistConfig.disabled };

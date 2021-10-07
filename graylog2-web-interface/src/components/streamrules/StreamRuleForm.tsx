@@ -21,14 +21,12 @@ import { Icon, TypeAheadFieldInput } from 'components/common';
 import { Col, Well, BootstrapModalForm, Input } from 'components/bootstrap';
 import { DocumentationLink } from 'components/support';
 import HumanReadableStreamRule from 'components/streamrules//HumanReadableStreamRule';
-import CombinedProvider from 'injection/CombinedProvider';
 import connect from 'stores/connect';
 import DocsHelper from 'util/DocsHelper';
 import Version from 'util/Version';
 import * as FormsUtils from 'util/FormsUtils';
 import { Store } from 'stores/StoreTypes';
-
-const { InputsStore, InputsActions } = CombinedProvider.get('Inputs');
+import { InputsActions, InputsStore } from 'stores/inputs/InputsStore';
 
 type StreamRule = {
   type: number,

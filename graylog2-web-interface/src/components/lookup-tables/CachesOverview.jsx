@@ -19,14 +19,12 @@ import React from 'react';
 
 import { LinkContainer } from 'components/common/router';
 import Routes from 'routing/Routes';
-import CombinedProvider from 'injection/CombinedProvider';
 import { OverlayTrigger, PaginatedList, SearchForm, Spinner, Icon } from 'components/common';
 import { Row, Col, Table, Popover, Button } from 'components/bootstrap';
 import CacheTableEntry from 'components/lookup-tables/CacheTableEntry';
+import { LookupTableCachesActions } from 'stores/lookup-tables/LookupTableCachesStore';
 
 import Styles from './Overview.css';
-
-const { LookupTableCachesActions } = CombinedProvider.get('LookupTableCaches');
 
 class CachesOverview extends React.Component {
   static propTypes = {

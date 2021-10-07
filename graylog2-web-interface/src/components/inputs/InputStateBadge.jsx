@@ -22,11 +22,9 @@ import Reflux from 'reflux';
 
 import { OverlayTrigger, LinkToNode, Spinner } from 'components/common';
 import { Label, Popover } from 'components/bootstrap';
-import StoreProvider from 'injection/StoreProvider';
 import InputStateComparator from 'logic/inputs/InputStateComparator';
-
-const InputStatesStore = StoreProvider.getStore('InputStates');
-const NodesStore = StoreProvider.getStore('Nodes');
+import { InputStatesStore } from 'stores/inputs/InputStatesStore';
+import { NodesStore } from 'stores/nodes/NodesStore';
 
 const InputStateBadge = createReactClass({
   displayName: 'InputStateBadge',

@@ -26,14 +26,12 @@ import { Alert, Button } from 'components/bootstrap';
 import LoginForm from 'components/login/LoginForm';
 import LoginBox from 'components/login/LoginBox';
 import authStyles from 'theme/styles/authStyles';
-import CombinedProvider from 'injection/CombinedProvider';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 import AppConfig from 'util/AppConfig';
 import { LOGIN_INITIALIZING_STATE, LOGIN_INITIALIZED_STATE } from 'logic/authentication/constants';
+import { SessionActions } from 'stores/sessions/SessionStore';
 
 import LoadingPage from './LoadingPage';
-
-const { SessionActions } = CombinedProvider.get('Session');
 
 const LoginPageStyles = createGlobalStyle`
   ${authStyles}

@@ -18,23 +18,29 @@ import Reflux from 'reflux';
 
 import * as URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
-import ActionsProvider from 'injection/ActionsProvider';
+import { singletonStore, singletonActions } from 'logic/singleton';
 
-const ClusterTrafficActions = ActionsProvider.getActions('ClusterTraffic');
+export const ClusterTrafficActions = singletonActions(
+  'core.ClusterTraffic',
+  () => Reflux.createActions({
+    traffic: { asyncResult: true },
+  }),
+);
 
-const ClusterTrafficStore = Reflux.createStore({
-  listenables: ClusterTrafficActions,
+export const ClusterTrafficStore = singletonStore(
+  'core.ClusterTraffic',
+  () => Reflux.createStore({
+    listenables: ClusterTrafficActions,
 
-  traffic() {
-    const promise = fetch('GET', URLUtils.qualifyUrl('/system/cluster/traffic'));
+    traffic() {
+      const promise = fetch('GET', URLUtils.qualifyUrl('/system/cluster/traffic'));
 
-    promise.then((response) => {
-      this.trigger(response);
-    });
+      promise.then((response) => {
+        this.trigger(response);
+      });
 
-    return promise;
-  },
+      return promise;
+    },
 
-});
-
-export default ClusterTrafficStore;
+  }),
+);

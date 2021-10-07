@@ -18,7 +18,7 @@ import * as React from 'react';
 
 import type User from 'logic/users/User';
 
-import { singleton } from '../views/logic/singleton';
+import { singleton } from '../logic/singleton';
 
 const CurrentUserContext = React.createContext<User | undefined>(undefined);
 

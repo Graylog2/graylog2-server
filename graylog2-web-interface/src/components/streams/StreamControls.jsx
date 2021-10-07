@@ -23,12 +23,10 @@ import Routes from 'routing/Routes';
 import { DropdownButton, MenuItem } from 'components/bootstrap';
 import { IfPermitted } from 'components/common';
 import PermissionsMixin from 'util/PermissionsMixin';
-import StoreProvider from 'injection/StoreProvider';
 import HideOnCloud from 'util/conditional/HideOnCloud';
+import { StartpageStore } from 'stores/users/StartpageStore';
 
 import StreamForm from './StreamForm';
-
-const StartpageStore = StoreProvider.getStore('Startpage');
 
 const StreamControls = createReactClass({
   displayName: 'StreamControls',

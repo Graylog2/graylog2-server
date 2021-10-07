@@ -20,15 +20,12 @@ import React from 'react';
 import { Col, Button } from 'components/bootstrap';
 import { EntityListItem, Spinner } from 'components/common';
 import { MetricContainer, CounterRate } from 'components/metrics';
-import CombinedProvider from 'injection/CombinedProvider';
 import { PipelineType, StageType } from 'stores/pipelines/PipelinesStore';
 import { useStore } from 'stores/connect';
-import { RuleType } from 'stores/rules/RulesStore';
+import { RulesStore } from 'stores/rules/RulesStore';
 
 import StageForm from './StageForm';
 import StageRules from './StageRules';
-
-const { RulesStore } = CombinedProvider.get('Rules');
 
 type Props = {
   stage: StageType,
@@ -39,7 +36,7 @@ type Props = {
 };
 
 const Stage = ({ stage, pipeline, isLastStage, onUpdate, onDelete }: Props) => {
-  const { rules: allRules }: { rules: RuleType[] } = useStore(RulesStore);
+  const { rules: allRules } = useStore(RulesStore);
 
   const suffix = `Contains ${(stage.rules.length === 1 ? '1 rule' : `${stage.rules.length} rules`)}`;
 

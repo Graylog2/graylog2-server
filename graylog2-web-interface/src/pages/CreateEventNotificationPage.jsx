@@ -23,13 +23,11 @@ import { DocumentTitle, IfPermitted, PageHeader } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
-import CombinedProvider from 'injection/CombinedProvider';
 import connect from 'stores/connect';
 import PermissionsMixin from 'util/PermissionsMixin';
 import history from 'util/History';
 import EventNotificationFormContainer from 'components/event-notifications/event-notification-form/EventNotificationFormContainer';
-
-const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 
 const CreateEventDefinitionPage = ({ currentUser }) => {
   if (!PermissionsMixin.isPermitted(currentUser.permissions, 'eventnotifications:create')) {

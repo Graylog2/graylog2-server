@@ -16,7 +16,7 @@
  */
 import Reflux from 'reflux';
 
-import { singletonActions, singletonStore } from 'views/logic/singleton';
+import { singletonActions, singletonStore } from 'logic/singleton';
 
 import { SearchActions } from './SearchStore';
 

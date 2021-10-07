@@ -22,14 +22,12 @@ import { ButtonToolbar, Button } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import DocumentationLink from 'components/support/DocumentationLink';
-import CombinedProvider from 'injection/CombinedProvider';
 import Routes from 'routing/Routes';
 import history from 'util/History';
 import SidecarStatus from 'components/sidecars/sidecars/SidecarStatus';
 import withParams from 'routing/withParams';
-
-const { SidecarsActions } = CombinedProvider.get('Sidecars');
-const { CollectorsActions } = CombinedProvider.get('Collectors');
+import { CollectorsActions } from 'stores/sidecars/CollectorsStore';
+import { SidecarsActions } from 'stores/sidecars/SidecarsStore';
 
 class SidecarStatusPage extends React.Component {
   static propTypes = {

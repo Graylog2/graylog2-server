@@ -21,6 +21,7 @@ import { simpleFields, simpleQueryFields } from 'fixtures/fields';
 import { render } from 'wrappedTestingLibrary';
 import asMock from 'helpers/mocking/AsMock';
 import MockStore from 'helpers/mocking/StoreMock';
+import MockAction from 'helpers/mocking/MockAction';
 
 import { SearchLoadingStateStore } from 'views/stores/SearchLoadingStateStore';
 import SearchResult from 'views/components/SearchResult';
@@ -60,6 +61,9 @@ jest.mock('views/stores/SearchLoadingStateStore', () => ({
 
 jest.mock('stores/configurations/ConfigurationsStore', () => ({
   ConfigurationsStore: MockStore(),
+  ConfigurationsActions: {
+    listSearchesClusterConfig: MockAction(),
+  },
 }));
 
 describe('SearchResult', () => {

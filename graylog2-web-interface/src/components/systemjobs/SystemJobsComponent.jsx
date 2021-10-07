@@ -20,10 +20,8 @@ import PropTypes from 'prop-types';
 import { Col, Row } from 'components/bootstrap';
 import { Spinner } from 'components/common';
 import connect from 'stores/connect';
-import CombinedProvider from 'injection/CombinedProvider';
 import { SystemJobsList } from 'components/systemjobs';
-
-const { SystemJobsStore, SystemJobsActions } = CombinedProvider.get('SystemJobs');
+import { SystemJobsActions, SystemJobsStore } from 'stores/systemjobs/SystemJobsStore';
 
 const SystemJobsComponent = ({ jobs }) => {
   useEffect(() => {

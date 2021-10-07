@@ -20,11 +20,7 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
 import { Spinner } from 'components/common';
-import CombinedProvider from 'injection/CombinedProvider';
-
-const { LookupTableDataAdaptersActions, LookupTableDataAdaptersStore } = CombinedProvider.get(
-  'LookupTableDataAdapters',
-);
+import { LookupTableDataAdaptersActions, LookupTableDataAdaptersStore } from 'stores/lookup-tables/LookupTableDataAdaptersStore';
 
 const DataAdaptersContainer = createReactClass({
   displayName: 'DataAdaptersContainer',

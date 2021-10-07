@@ -22,9 +22,7 @@ import { Select, Spinner } from 'components/common';
 import { Row, Col, Input } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import FormUtils from 'util/FormsUtils';
-import CombinedProvider from 'injection/CombinedProvider';
-
-const { LookupTablesActions } = CombinedProvider.get('LookupTables');
+import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
 
 class LookupTableConverterConfiguration extends React.Component {
   static propTypes = {

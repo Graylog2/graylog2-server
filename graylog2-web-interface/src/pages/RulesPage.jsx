@@ -25,9 +25,7 @@ import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
 import RulesComponent from 'components/rules/RulesComponent';
 import Routes from 'routing/Routes';
-import CombinedProvider from 'injection/CombinedProvider';
-
-const { RulesStore, RulesActions } = CombinedProvider.get('Rules');
+import { RulesActions, RulesStore } from 'stores/rules/RulesStore';
 
 const RulesPage = createReactClass({
   displayName: 'RulesPage',

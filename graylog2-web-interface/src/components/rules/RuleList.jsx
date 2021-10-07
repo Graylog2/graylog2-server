@@ -23,11 +23,9 @@ import { Button, ButtonToolbar } from 'components/bootstrap';
 import { DataTable, Timestamp } from 'components/common';
 import { MetricContainer, CounterRate } from 'components/metrics';
 import Routes from 'routing/Routes';
-import CombinedProvider from 'injection/CombinedProvider';
+import { RulesActions, RulesStore } from 'stores/rules/RulesStore';
 
 import RuleMetricsConfigContainer from './RuleMetricsConfigContainer';
-
-const { RulesActions, RulesStore } = CombinedProvider.get('Rules');
 
 class RuleList extends React.Component {
   static propTypes = {

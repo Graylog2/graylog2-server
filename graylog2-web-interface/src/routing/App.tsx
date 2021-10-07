@@ -21,13 +21,12 @@ import chroma from 'chroma-js';
 
 import { ScratchpadProvider } from 'contexts/ScratchpadProvider';
 import { Icon, Spinner } from 'components/common';
-import Scratchpad from 'components/scratchpad';
+import Scratchpad from 'components/scratchpad/Scratchpad';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import Navigation from 'components/navigation/Navigation';
 import ReportedErrorBoundary from 'components/errors/ReportedErrorBoundary';
 import RuntimeErrorBoundary from 'components/errors/RuntimeErrorBoundary';
 
-import GlobalContextProviders from './GlobalContextProviders';
 import 'stylesheets/typeahead.less';
 
 const AppLayout = styled.div`
@@ -67,24 +66,22 @@ const App = ({ children }) => (
       }
 
       return (
-        <GlobalContextProviders>
-          <ScratchpadProvider loginName={currentUser.username}>
-            <AppLayout>
-              <Navigation />
-              <ScrollToHint id="scroll-to-hint">
-                <Icon name="arrow-up" />
-              </ScrollToHint>
-              <Scratchpad />
-              <ReportedErrorBoundary>
-                <RuntimeErrorBoundary>
-                  <PageContent>
-                    {children}
-                  </PageContent>
-                </RuntimeErrorBoundary>
-              </ReportedErrorBoundary>
-            </AppLayout>
-          </ScratchpadProvider>
-        </GlobalContextProviders>
+        <ScratchpadProvider loginName={currentUser.username}>
+          <AppLayout>
+            <Navigation />
+            <ScrollToHint id="scroll-to-hint">
+              <Icon name="arrow-up" />
+            </ScrollToHint>
+            <Scratchpad />
+            <ReportedErrorBoundary>
+              <RuntimeErrorBoundary>
+                <PageContent>
+                  {children}
+                </PageContent>
+              </RuntimeErrorBoundary>
+            </ReportedErrorBoundary>
+          </AppLayout>
+        </ScratchpadProvider>
       );
     }}
   </CurrentUserContext.Consumer>

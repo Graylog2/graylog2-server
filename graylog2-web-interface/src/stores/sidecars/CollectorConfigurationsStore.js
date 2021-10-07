@@ -21,279 +21,296 @@ import lodash from 'lodash';
 import * as URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
-import CombinedProvider from 'injection/CombinedProvider';
+import { singletonStore, singletonActions } from 'logic/singleton';
 
-const { CollectorConfigurationsActions } = CombinedProvider.get('CollectorConfigurations');
+export const CollectorConfigurationsActions = singletonActions(
+  'core.CollectorConfigurations',
+  () => Reflux.createActions({
+    all: { asyncResult: true },
+    list: { asyncResult: true },
+    listUploads: { asyncResult: true },
+    getConfiguration: { asyncResult: true },
+    getConfigurationSidecars: { asyncResult: true },
+    getUploads: { asyncResult: true },
+    createConfiguration: { asyncResult: true },
+    updateConfiguration: { asyncResult: true },
+    renderPreview: { asyncResult: true },
+    copyConfiguration: { asyncResult: true },
+    delete: { asyncResult: true },
+    validate: { asyncResult: true },
+  }),
+);
 
-const CollectorConfigurationsStore = Reflux.createStore({
-  listenables: [CollectorConfigurationsActions],
-  sourceUrl: '/sidecar',
-  configurations: undefined,
-  pagination: {
-    page: undefined,
-    pageSize: undefined,
+export const CollectorConfigurationsStore = singletonStore(
+  'core.CollectorConfigurations',
+  () => Reflux.createStore({
+    listenables: [CollectorConfigurationsActions],
+    sourceUrl: '/sidecar',
+    configurations: undefined,
+    pagination: {
+      page: undefined,
+      pageSize: undefined,
+      total: undefined,
+    },
     total: undefined,
-  },
-  total: undefined,
-  paginatedConfigurations: undefined,
-  query: undefined,
+    paginatedConfigurations: undefined,
+    query: undefined,
 
-  propagateChanges() {
-    this.trigger({
-      configurations: this.configurations,
-      query: this.query,
-      total: this.total,
-      pagination: this.pagination,
-      paginatedConfigurations: this.paginatedConfigurations,
-    });
-  },
+    propagateChanges() {
+      this.trigger({
+        configurations: this.configurations,
+        query: this.query,
+        total: this.total,
+        pagination: this.pagination,
+        paginatedConfigurations: this.paginatedConfigurations,
+      });
+    },
 
-  _fetchConfigurations({ query, page, pageSize }) {
-    const baseUrl = `${this.sourceUrl}/configurations`;
-    const search = {
-      query: query,
-      page: page,
-      per_page: pageSize,
-    };
+    _fetchConfigurations({ query, page, pageSize }) {
+      const baseUrl = `${this.sourceUrl}/configurations`;
+      const search = {
+        query: query,
+        page: page,
+        per_page: pageSize,
+      };
 
-    const uri = URI(baseUrl).search(search).toString();
+      const uri = URI(baseUrl).search(search).toString();
 
-    return fetch('GET', URLUtils.qualifyUrl(uri));
-  },
+      return fetch('GET', URLUtils.qualifyUrl(uri));
+    },
 
-  _fetchUploads({ page }) {
-    const baseUrl = `${this.sourceUrl}/configurations/uploads`;
-    const search = {
-      page: page,
-    };
+    _fetchUploads({ page }) {
+      const baseUrl = `${this.sourceUrl}/configurations/uploads`;
+      const search = {
+        page: page,
+      };
 
-    const uri = URI(baseUrl).search(search).toString();
+      const uri = URI(baseUrl).search(search).toString();
 
-    return fetch('GET', URLUtils.qualifyUrl(uri));
-  },
+      return fetch('GET', URLUtils.qualifyUrl(uri));
+    },
 
-  all() {
-    const promise = this._fetchConfigurations({ pageSize: 0 });
+    all() {
+      const promise = this._fetchConfigurations({ pageSize: 0 });
 
-    promise
-      .then(
-        (response) => {
-          this.configurations = response.configurations;
-          this.propagateChanges();
+      promise
+        .then(
+          (response) => {
+            this.configurations = response.configurations;
+            this.propagateChanges();
 
-          return response.configurations;
-        },
-        (error) => {
-          UserNotification.error(`Fetching collector configurations failed with status: ${error}`,
-            'Could not retrieve configurations');
-        },
-      );
+            return response.configurations;
+          },
+          (error) => {
+            UserNotification.error(`Fetching collector configurations failed with status: ${error}`,
+              'Could not retrieve configurations');
+          },
+        );
 
-    CollectorConfigurationsActions.all.promise(promise);
-  },
+      CollectorConfigurationsActions.all.promise(promise);
+    },
 
-  list({ query = '', page = 1, pageSize = 10 }) {
-    const promise = this._fetchConfigurations({ query: query, page: page, pageSize: pageSize });
+    list({ query = '', page = 1, pageSize = 10 }) {
+      const promise = this._fetchConfigurations({ query: query, page: page, pageSize: pageSize });
 
-    promise
-      .then(
-        (response) => {
-          this.query = response.query;
+      promise
+        .then(
+          (response) => {
+            this.query = response.query;
 
-          this.pagination = {
-            page: response.pagination.page,
-            pageSize: response.pagination.per_page,
-            total: response.pagination.total,
-          };
+            this.pagination = {
+              page: response.pagination.page,
+              pageSize: response.pagination.per_page,
+              total: response.pagination.total,
+            };
 
-          this.total = response.total;
-          this.paginatedConfigurations = response.configurations;
-          this.propagateChanges();
+            this.total = response.total;
+            this.paginatedConfigurations = response.configurations;
+            this.propagateChanges();
 
-          return response.configurations;
-        },
-        (error) => {
-          UserNotification.error(`Fetching collector configurations failed with status: ${error}`,
-            'Could not retrieve configurations');
-        },
-      );
+            return response.configurations;
+          },
+          (error) => {
+            UserNotification.error(`Fetching collector configurations failed with status: ${error}`,
+              'Could not retrieve configurations');
+          },
+        );
 
-    CollectorConfigurationsActions.list.promise(promise);
-  },
+      CollectorConfigurationsActions.list.promise(promise);
+    },
 
-  listUploads({ page = 1 }) {
-    const promise = this._fetchUploads({ page: page });
+    listUploads({ page = 1 }) {
+      const promise = this._fetchUploads({ page: page });
 
-    promise
-      .catch(
-        (error) => {
-          UserNotification.error(`Fetching configuration uploads failed with status: ${error}`,
-            'Could not retrieve configurations');
-        },
-      );
+      promise
+        .catch(
+          (error) => {
+            UserNotification.error(`Fetching configuration uploads failed with status: ${error}`,
+              'Could not retrieve configurations');
+          },
+        );
 
-    CollectorConfigurationsActions.listUploads.promise(promise);
-  },
+      CollectorConfigurationsActions.listUploads.promise(promise);
+    },
 
-  refreshList() {
-    this.list({ query: this.query, page: this.page, pageSize: this.pageSize });
-  },
+    refreshList() {
+      this.list({ query: this.query, page: this.page, pageSize: this.pageSize });
+    },
 
-  getConfiguration(configurationId) {
-    const promise = fetch('GET', URLUtils.qualifyUrl(`${this.sourceUrl}/configurations/${configurationId}`));
+    getConfiguration(configurationId) {
+      const promise = fetch('GET', URLUtils.qualifyUrl(`${this.sourceUrl}/configurations/${configurationId}`));
 
-    promise.catch((error) => {
-      let errorMessage = `Fetching Configuration failed with status: ${error}`;
+      promise.catch((error) => {
+        let errorMessage = `Fetching Configuration failed with status: ${error}`;
 
-      if (error.status === 404) {
-        errorMessage = `Unable to find a Configuration with ID <${configurationId}>, please ensure it was not deleted.`;
-      }
+        if (error.status === 404) {
+          errorMessage = `Unable to find a Configuration with ID <${configurationId}>, please ensure it was not deleted.`;
+        }
 
-      UserNotification.error(errorMessage, 'Could not retrieve Configuration');
-    });
-
-    CollectorConfigurationsActions.getConfiguration.promise(promise);
-  },
-
-  getConfigurationSidecars(configurationId) {
-    const promise = fetch('GET', URLUtils.qualifyUrl(`${this.sourceUrl}/configurations/${configurationId}/sidecars`));
-
-    promise.catch((error) => {
-      let errorMessage = `Fetching Configuration failed with status: ${error}`;
-
-      if (error.status === 404) {
-        errorMessage = `Unable to find a Configuration with ID <${configurationId}>, please ensure it was not deleted.`;
-      }
-
-      UserNotification.error(errorMessage, 'Could not retrieve Configuration');
-    });
-
-    CollectorConfigurationsActions.getConfigurationSidecars.promise(promise);
-  },
-
-  renderPreview(template) {
-    const requestTemplate = {
-      template: template,
-    };
-
-    const promise = fetch(
-      'POST',
-      URLUtils.qualifyUrl(`${this.sourceUrl}/configurations/render/preview`),
-      requestTemplate,
-    );
-
-    promise
-      .catch(
-        (error) => {
-          UserNotification.error(`Fetching configuration preview failed with status: ${error}`,
-            'Could not retrieve preview');
-        },
-      );
-
-    CollectorConfigurationsActions.renderPreview.promise(promise);
-  },
-
-  createConfiguration(configuration) {
-    const url = URLUtils.qualifyUrl(`${this.sourceUrl}/configurations`);
-    const method = 'POST';
-
-    const promise = fetch(method, url, configuration);
-
-    promise
-      .then((response) => {
-        UserNotification.success('', 'Configuration successfully created');
-
-        return response;
-      }, (error) => {
-        UserNotification.error(error.status === 400 ? error.responseMessage : `Creating configuration failed with status: ${error.message}`,
-          'Could not save configuration');
+        UserNotification.error(errorMessage, 'Could not retrieve Configuration');
       });
 
-    CollectorConfigurationsActions.createConfiguration.promise(promise);
-  },
+      CollectorConfigurationsActions.getConfiguration.promise(promise);
+    },
 
-  updateConfiguration(configuration) {
-    const url = URLUtils.qualifyUrl(`${this.sourceUrl}/configurations/${configuration.id}`);
+    getConfigurationSidecars(configurationId) {
+      const promise = fetch('GET', URLUtils.qualifyUrl(`${this.sourceUrl}/configurations/${configurationId}/sidecars`));
 
-    const promise = fetch('PUT', url, configuration);
+      promise.catch((error) => {
+        let errorMessage = `Fetching Configuration failed with status: ${error}`;
 
-    promise
-      .then((response) => {
-        UserNotification.success('', 'Configuration successfully updated');
-        this.refreshList();
+        if (error.status === 404) {
+          errorMessage = `Unable to find a Configuration with ID <${configurationId}>, please ensure it was not deleted.`;
+        }
 
-        return response;
-      }, (error) => {
-        UserNotification.error(`Updating Configuration failed: ${error.status === 400 ? error.responseMessage : error.message}`,
-          `Could not update Configuration ${configuration.name}`);
+        UserNotification.error(errorMessage, 'Could not retrieve Configuration');
       });
 
-    CollectorConfigurationsActions.updateConfiguration.promise(promise);
-  },
+      CollectorConfigurationsActions.getConfigurationSidecars.promise(promise);
+    },
 
-  copyConfiguration(configurationId, name) {
-    const url = URLUtils.qualifyUrl(`${this.sourceUrl}/configurations/${configurationId}/${name}`);
-    const method = 'POST';
+    renderPreview(template) {
+      const requestTemplate = {
+        template: template,
+      };
 
-    const promise = fetch(method, url);
+      const promise = fetch(
+        'POST',
+        URLUtils.qualifyUrl(`${this.sourceUrl}/configurations/render/preview`),
+        requestTemplate,
+      );
 
-    promise
-      .then((response) => {
-        UserNotification.success('', `Configuration "${name}" successfully copied`);
-        this.refreshList();
+      promise
+        .catch(
+          (error) => {
+            UserNotification.error(`Fetching configuration preview failed with status: ${error}`,
+              'Could not retrieve preview');
+          },
+        );
 
-        return response;
-      }, (error) => {
-        UserNotification.error(`Saving configuration "${name}" failed with status: ${error.message}`,
-          'Could not save Configuration');
-      });
+      CollectorConfigurationsActions.renderPreview.promise(promise);
+    },
 
-    CollectorConfigurationsActions.copyConfiguration.promise(promise);
-  },
+    createConfiguration(configuration) {
+      const url = URLUtils.qualifyUrl(`${this.sourceUrl}/configurations`);
+      const method = 'POST';
 
-  delete(configuration) {
-    const url = URLUtils.qualifyUrl(`${this.sourceUrl}/configurations/${configuration.id}`);
-    const promise = fetch('DELETE', url);
+      const promise = fetch(method, url, configuration);
 
-    promise
-      .then((response) => {
-        UserNotification.success('', `Configuration "${configuration.name}" successfully deleted`);
-        this.refreshList();
+      promise
+        .then((response) => {
+          UserNotification.success('', 'Configuration successfully created');
 
-        return response;
-      }, (error) => {
-        UserNotification.error(`Deleting Configuration failed: ${error.status === 400 ? error.responseMessage : error.message}`,
-          `Could not delete Configuration ${configuration.name}`);
-      });
+          return response;
+        }, (error) => {
+          UserNotification.error(error.status === 400 ? error.responseMessage : `Creating configuration failed with status: ${error.message}`,
+            'Could not save configuration');
+        });
 
-    CollectorConfigurationsActions.delete.promise(promise);
-  },
+      CollectorConfigurationsActions.createConfiguration.promise(promise);
+    },
 
-  validate(configuration) {
+    updateConfiguration(configuration) {
+      const url = URLUtils.qualifyUrl(`${this.sourceUrl}/configurations/${configuration.id}`);
+
+      const promise = fetch('PUT', url, configuration);
+
+      promise
+        .then((response) => {
+          UserNotification.success('', 'Configuration successfully updated');
+          this.refreshList();
+
+          return response;
+        }, (error) => {
+          UserNotification.error(`Updating Configuration failed: ${error.status === 400 ? error.responseMessage : error.message}`,
+            `Could not update Configuration ${configuration.name}`);
+        });
+
+      CollectorConfigurationsActions.updateConfiguration.promise(promise);
+    },
+
+    copyConfiguration(configurationId, name) {
+      const url = URLUtils.qualifyUrl(`${this.sourceUrl}/configurations/${configurationId}/${name}`);
+      const method = 'POST';
+
+      const promise = fetch(method, url);
+
+      promise
+        .then((response) => {
+          UserNotification.success('', `Configuration "${name}" successfully copied`);
+          this.refreshList();
+
+          return response;
+        }, (error) => {
+          UserNotification.error(`Saving configuration "${name}" failed with status: ${error.message}`,
+            'Could not save Configuration');
+        });
+
+      CollectorConfigurationsActions.copyConfiguration.promise(promise);
+    },
+
+    delete(configuration) {
+      const url = URLUtils.qualifyUrl(`${this.sourceUrl}/configurations/${configuration.id}`);
+      const promise = fetch('DELETE', url);
+
+      promise
+        .then((response) => {
+          UserNotification.success('', `Configuration "${configuration.name}" successfully deleted`);
+          this.refreshList();
+
+          return response;
+        }, (error) => {
+          UserNotification.error(`Deleting Configuration failed: ${error.status === 400 ? error.responseMessage : error.message}`,
+            `Could not delete Configuration ${configuration.name}`);
+        });
+
+      CollectorConfigurationsActions.delete.promise(promise);
+    },
+
+    validate(configuration) {
     // set minimum api defaults for faster validation feedback
-    const payload = {
-      name: ' ',
-      collector_id: ' ',
-      color: ' ',
-      template: ' ',
-    };
+      const payload = {
+        name: ' ',
+        collector_id: ' ',
+        color: ' ',
+        template: ' ',
+      };
 
-    lodash.merge(payload, configuration);
+      lodash.merge(payload, configuration);
 
-    const promise = fetch('POST', URLUtils.qualifyUrl(`${this.sourceUrl}/configurations/validate`), payload);
+      const promise = fetch('POST', URLUtils.qualifyUrl(`${this.sourceUrl}/configurations/validate`), payload);
 
-    promise
-      .then(
-        (response) => response,
-        (error) => (
-          UserNotification.error(`Validating configuration "${payload.name}" failed with status: ${error.message}`,
-            'Could not validate configuration')
-        ),
-      );
+      promise
+        .then(
+          (response) => response,
+          (error) => (
+            UserNotification.error(`Validating configuration "${payload.name}" failed with status: ${error.message}`,
+              'Could not validate configuration')
+          ),
+        );
 
-    CollectorConfigurationsActions.validate.promise(promise);
-  },
+      CollectorConfigurationsActions.validate.promise(promise);
+    },
 
-});
-
-export default CollectorConfigurationsStore;
+  }),
+);

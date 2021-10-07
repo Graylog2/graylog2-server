@@ -17,7 +17,7 @@
 import Reflux from 'reflux';
 
 import { RefluxActions } from 'stores/StoreTypes';
-import { singletonActions } from 'views/logic/singleton';
+import { singletonActions } from 'logic/singleton';
 import HTTPHeaderAuthConfig, { HTTPHeaderAuthConfigJSON } from 'logic/authentication/HTTPHeaderAuthConfig';
 
 export type ActionsType = {

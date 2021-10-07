@@ -20,12 +20,10 @@ import Reflux from 'reflux';
 
 import { Spinner } from 'components/common';
 import { Row, Col } from 'components/bootstrap';
-import StoreProvider from 'injection/StoreProvider';
 import { DocumentationLink, SmallSupportLink } from 'components/support';
 import DocsHelper from 'util/DocsHelper';
 import { IndexerClusterHealthSummary } from 'components/indexers';
-
-const IndexerClusterStore = StoreProvider.getStore('IndexerCluster');
+import { IndexerClusterStore } from 'stores/indexers/IndexerClusterStore';
 
 const IndexerClusterHealth = createReactClass({
   displayName: 'IndexerClusterHealth',

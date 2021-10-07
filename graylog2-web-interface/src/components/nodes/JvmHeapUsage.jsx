@@ -25,11 +25,7 @@ import ProgressBar, { Bar } from 'components/common/ProgressBar';
 import { Spinner } from 'components/common';
 import NumberUtils from 'util/NumberUtils';
 import MetricsExtractor from 'logic/metrics/MetricsExtractor';
-import StoreProvider from 'injection/StoreProvider';
-import ActionsProvider from 'injection/ActionsProvider';
-
-const MetricsStore = StoreProvider.getStore('Metrics');
-const MetricsActions = ActionsProvider.getActions('Metrics');
+import { MetricsActions, MetricsStore } from 'stores/metrics/MetricsStore';
 
 const NodeHeap = styled.div`
   margin-top: 10px;

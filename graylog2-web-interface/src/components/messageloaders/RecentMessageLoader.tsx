@@ -23,13 +23,11 @@ import { Row, Col, Input } from 'components/bootstrap';
 import AppConfig from 'util/AppConfig';
 import InputDropdown from 'components/inputs/InputDropdown';
 import UserNotification from 'util/UserNotification';
-import StoreProvider from 'injection/StoreProvider';
 import type { Message } from 'views/components/messagelist/Types';
 import useForwarderMessageLoaders from 'components/messageloaders/useForwarderMessageLoaders';
+import { UniversalSearchStore } from 'stores/search/UniversalSearchStore';
 
 import type { Input as InputType } from './Types';
-
-const UniversalSearchStore = StoreProvider.getStore('UniversalSearch');
 
 const LoaderContainer = styled.div`
   margin-top: 5px;

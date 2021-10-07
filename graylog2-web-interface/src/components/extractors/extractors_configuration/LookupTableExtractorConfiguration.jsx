@@ -23,10 +23,8 @@ import { Row, Col, Button, Input } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import UserNotification from 'util/UserNotification';
 import FormUtils from 'util/FormsUtils';
-import CombinedProvider from 'injection/CombinedProvider';
 import ToolsStore from 'stores/tools/ToolsStore';
-
-const { LookupTablesActions } = CombinedProvider.get('LookupTables');
+import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
 
 class LookupTableExtractorConfiguration extends React.Component {
   static propTypes = {

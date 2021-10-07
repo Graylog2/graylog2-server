@@ -20,7 +20,7 @@ import * as Immutable from 'immutable';
 import type { RefluxActions, Store } from 'stores/StoreTypes';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import ParameterBinding from 'views/logic/parameters/ParameterBinding';
-import { singletonActions, singletonStore } from 'views/logic/singleton';
+import { singletonActions, singletonStore } from 'logic/singleton';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
 
 import { ViewActions } from './ViewStore';

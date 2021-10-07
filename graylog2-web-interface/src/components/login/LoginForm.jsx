@@ -19,9 +19,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import { Button, FormGroup, Input } from 'components/bootstrap';
-import CombinedProvider from 'injection/CombinedProvider';
-
-const { SessionActions } = CombinedProvider.get('Session');
+import { SessionActions } from 'stores/sessions/SessionStore';
 
 const StyledFormGroup = styled(FormGroup)`
   margin-bottom: 0;

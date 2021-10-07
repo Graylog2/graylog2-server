@@ -20,10 +20,8 @@ import React from 'react';
 import { Button, Alert, Modal, Tooltip } from 'components/bootstrap';
 import { OverlayTrigger, PaginatedList, Spinner, Timestamp, Icon } from 'components/common';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
-import CombinedProvider from 'injection/CombinedProvider';
 import UserNotification from 'util/UserNotification';
-
-const { CollectorConfigurationsActions } = CombinedProvider.get('CollectorConfigurations');
+import { CollectorConfigurationsActions } from 'stores/sidecars/CollectorConfigurationsStore';
 
 class ImportsViewModal extends React.Component {
   static propTypes = {

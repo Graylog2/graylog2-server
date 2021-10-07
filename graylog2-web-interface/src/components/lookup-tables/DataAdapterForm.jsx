@@ -23,9 +23,7 @@ import { TimeUnitInput } from 'components/common';
 import { Col, Row, Button, Input } from 'components/bootstrap';
 import ObjectUtils from 'util/ObjectUtils';
 import { getValueFromInput } from 'util/FormsUtils';
-import CombinedProvider from 'injection/CombinedProvider';
-
-const { LookupTableDataAdaptersActions } = CombinedProvider.get('LookupTableDataAdapters');
+import { LookupTableDataAdaptersActions } from 'stores/lookup-tables/LookupTableDataAdaptersStore';
 
 class DataAdapterForm extends React.Component {
   validationCheckTimer = undefined;

@@ -20,10 +20,8 @@ import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
-import ActionsProvider from 'injection/ActionsProvider';
-import { singletonStore } from 'views/logic/singleton';
-
-const CustomizationActions = ActionsProvider.getActions('Customizations');
+import { singletonStore } from 'logic/singleton';
+import CustomizationActions from 'actions/customizations/CustomizationActions';
 
 const urlPrefix = ApiRoutes.ClusterConfigResource.config().url;
 
@@ -31,7 +29,7 @@ export type CustomizationsStoreState = {
   customization: {},
 };
 
-const CustomizationStore = singletonStore('customization.store', () => Reflux.createStore({
+const CustomizationStore = singletonStore('customization.store', () => Reflux.createStore<CustomizationsStoreState>({
   listenables: [CustomizationActions],
 
   customization: {},

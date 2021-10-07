@@ -24,15 +24,13 @@ import { Row, Col, Button } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { IndexSetConfigurationForm } from 'components/indices';
 import { DocumentationLink } from 'components/support';
-import CombinedProvider from 'injection/CombinedProvider';
 import DocsHelper from 'util/DocsHelper';
 import history from 'util/History';
 import Routes from 'routing/Routes';
 import withParams from 'routing/withParams';
 import withLocation from 'routing/withLocation';
-
-const { IndexSetsStore, IndexSetsActions } = CombinedProvider.get('IndexSets');
-const { IndicesConfigurationStore, IndicesConfigurationActions } = CombinedProvider.get('IndicesConfiguration');
+import { IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore';
+import { IndicesConfigurationActions, IndicesConfigurationStore } from 'stores/indices/IndicesConfigurationStore';
 
 const IndexSetConfigurationPage = createReactClass({
   displayName: 'IndexSetConfigurationPage',

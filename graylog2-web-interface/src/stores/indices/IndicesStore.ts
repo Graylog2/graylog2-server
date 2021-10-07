@@ -19,7 +19,7 @@ import Reflux from 'reflux';
 import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
-import ActionsProvider from 'injection/ActionsProvider';
+import { singletonStore, singletonActions } from 'logic/singleton';
 
 export type IndexTimeAndTotalStats = {
   total: number,
@@ -86,90 +86,112 @@ type IndicesListResponse = {
   },
 };
 
-const IndicesActions = ActionsProvider.getActions('Indices');
+type IndicesActionsType = {
+  list: (indexSetId: string) => Promise<unknown>,
+  listAll: () => Promise<unknown>,
+  close: (indexName: string) => Promise<unknown>,
+  delete: (indexName: string) => Promise<unknown>,
+  multiple: () => Promise<unknown>,
+  reopen: () => Promise<unknown>,
+  subscribe: (indexName: string) => Promise<unknown>,
+  unsubscribe: (indexName: string) => Promise<unknown>,
+}
+export const IndicesActions = singletonActions(
+  'core.Indices',
+  () => Reflux.createActions<IndicesActionsType>({
+    list: { asyncResult: true },
+    listAll: { asyncResult: true },
+    close: { asyncResult: true },
+    delete: { asyncResult: true },
+    multiple: { asyncResult: true },
+    reopen: { asyncResult: true },
+    subscribe: { asyncResult: false },
+    unsubscribe: { asyncResult: false },
+  }),
+);
+export const IndicesStore = singletonStore(
+  'core.Indices',
+  () => Reflux.createStore({
+    listenables: [IndicesActions],
+    indices: undefined,
+    closedIndices: undefined,
+    registrations: {},
 
-const IndicesStore = Reflux.createStore({
-  listenables: [IndicesActions],
-  indices: undefined,
-  closedIndices: undefined,
-  registrations: {},
-
-  getInitialState() {
-    return { indices: this.indices, closedIndices: this.closedIndices };
-  },
-
-  list(indexSetId: string) {
-    const urlList = qualifyUrl(ApiRoutes.IndicesApiController.list(indexSetId).url);
-    const promise = fetch('GET', urlList).then((response: IndicesListResponse) => {
-      this.indices = response.all.indices;
-      this.closedIndices = response.closed.indices;
-      this.trigger({ indices: this.indices, closedIndices: this.closedIndices });
-
+    getInitialState() {
       return { indices: this.indices, closedIndices: this.closedIndices };
-    });
+    },
 
-    IndicesActions.list.promise(promise);
-  },
+    list(indexSetId: string) {
+      const urlList = qualifyUrl(ApiRoutes.IndicesApiController.list(indexSetId).url);
+      const promise = fetch('GET', urlList).then((response: IndicesListResponse) => {
+        this.indices = response.all.indices;
+        this.closedIndices = response.closed.indices;
+        this.trigger({ indices: this.indices, closedIndices: this.closedIndices });
 
-  listAll() {
-    const urlList = qualifyUrl(ApiRoutes.IndicesApiController.listAll().url);
-    const promise = fetch('GET', urlList).then((response: IndicesListResponse) => {
-      this.indices = response.all.indices;
-      this.closedIndices = response.closed.indices;
-      this.trigger({ indices: this.indices, closedIndices: this.closedIndices });
+        return { indices: this.indices, closedIndices: this.closedIndices };
+      });
 
-      return { indices: this.indices, closedIndices: this.closedIndices };
-    });
+      IndicesActions.list.promise(promise);
+    },
 
-    IndicesActions.listAll.promise(promise);
-  },
+    listAll() {
+      const urlList = qualifyUrl(ApiRoutes.IndicesApiController.listAll().url);
+      const promise = fetch('GET', urlList).then((response: IndicesListResponse) => {
+        this.indices = response.all.indices;
+        this.closedIndices = response.closed.indices;
+        this.trigger({ indices: this.indices, closedIndices: this.closedIndices });
 
-  multiple() {
-    const indexNames = Object.keys(this.registrations);
+        return { indices: this.indices, closedIndices: this.closedIndices };
+      });
 
-    if (indexNames.length <= 0) {
-      return;
-    }
+      IndicesActions.listAll.promise(promise);
+    },
 
-    const urlList = qualifyUrl(ApiRoutes.IndicesApiController.multiple().url);
-    const request = { indices: indexNames };
-    const promise = fetch('POST', urlList, request).then((response: Indices) => {
-      this.indices = { ...this.indices, ...response };
-      this.trigger({ indices: this.indices, closedIndices: this.closedIndices });
+    multiple() {
+      const indexNames = Object.keys(this.registrations);
 
-      return { indices: this.indices, closedIndices: this.closedIndices };
-    });
+      if (indexNames.length <= 0) {
+        return;
+      }
 
-    IndicesActions.multiple.promise(promise);
-  },
-  close(indexName: string) {
-    const url = qualifyUrl(ApiRoutes.IndicesApiController.close(indexName).url);
-    const promise = fetch('POST', url);
+      const urlList = qualifyUrl(ApiRoutes.IndicesApiController.multiple().url);
+      const request = { indices: indexNames };
+      const promise = fetch('POST', urlList, request).then((response: Indices) => {
+        this.indices = { ...this.indices, ...response };
+        this.trigger({ indices: this.indices, closedIndices: this.closedIndices });
 
-    IndicesActions.close.promise(promise);
-  },
-  delete(indexName: string) {
-    const url = qualifyUrl(ApiRoutes.IndicesApiController.delete(indexName).url);
-    const promise = fetch('DELETE', url);
+        return { indices: this.indices, closedIndices: this.closedIndices };
+      });
 
-    IndicesActions.delete.promise(promise);
-  },
-  reopen(indexName: string) {
-    const url = qualifyUrl(ApiRoutes.IndicesApiController.reopen(indexName).url);
-    const promise = fetch('POST', url);
+      IndicesActions.multiple.promise(promise);
+    },
+    close(indexName: string) {
+      const url = qualifyUrl(ApiRoutes.IndicesApiController.close(indexName).url);
+      const promise = fetch('POST', url);
 
-    IndicesActions.reopen.promise(promise);
-  },
-  subscribe(indexName: string) {
-    this.registrations[indexName] = this.registrations[indexName] ? this.registrations[indexName] + 1 : 1;
-  },
-  unsubscribe(indexName: string) {
-    this.registrations[indexName] = this.registrations[indexName] > 0 ? this.registrations[indexName] - 1 : 0;
+      IndicesActions.close.promise(promise);
+    },
+    delete(indexName: string) {
+      const url = qualifyUrl(ApiRoutes.IndicesApiController.delete(indexName).url);
+      const promise = fetch('DELETE', url);
 
-    if (this.registrations[indexName] === 0) {
-      delete this.registrations[indexName];
-    }
-  },
-});
+      IndicesActions.delete.promise(promise);
+    },
+    reopen(indexName: string) {
+      const url = qualifyUrl(ApiRoutes.IndicesApiController.reopen(indexName).url);
+      const promise = fetch('POST', url);
 
-export default IndicesStore;
+      IndicesActions.reopen.promise(promise);
+    },
+    subscribe(indexName: string) {
+      this.registrations[indexName] = this.registrations[indexName] ? this.registrations[indexName] + 1 : 1;
+    },
+    unsubscribe(indexName: string) {
+      this.registrations[indexName] = this.registrations[indexName] > 0 ? this.registrations[indexName] - 1 : 0;
+
+      if (this.registrations[indexName] === 0) {
+        delete this.registrations[indexName];
+      }
+    },
+  }),
+);

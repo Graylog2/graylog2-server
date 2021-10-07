@@ -21,13 +21,11 @@ import { LinkContainer } from 'components/common/router';
 import { ButtonToolbar, Button } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import Routes from 'routing/Routes';
-import CombinedProvider from 'injection/CombinedProvider';
 import { StreamAlertsOverviewContainer } from 'components/alerts';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
 import withParams from 'routing/withParams';
-
-const { StreamsStore } = CombinedProvider.get('Streams');
+import { StreamsStore } from 'stores/streams/StreamsStore';
 
 class StreamAlertsOverviewPage extends React.Component {
   static propTypes = {

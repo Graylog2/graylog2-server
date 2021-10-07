@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { List, Map } from 'immutable';
 
-import { singleton } from 'views/logic/singleton';
+import { singleton } from 'logic/singleton';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 
 type FieldTypeMappingsList = List<FieldTypeMapping>;

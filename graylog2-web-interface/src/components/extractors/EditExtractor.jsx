@@ -18,16 +18,14 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { Col, ControlLabel, FormControl, FormGroup, Row, Button, Input } from 'components/bootstrap';
-import ActionsProvider from 'injection/ActionsProvider';
 import ExtractorUtils from 'util/ExtractorUtils';
 import FormUtils from 'util/FormsUtils';
 import ToolsStore from 'stores/tools/ToolsStore';
+import { ExtractorsActions } from 'stores/extractors/ExtractorsStore';
 
 import EditExtractorConverters from './EditExtractorConverters';
 import EditExtractorConfiguration from './EditExtractorConfiguration';
 import ExtractorExampleMessage from './ExtractorExampleMessage';
-
-const ExtractorsActions = ActionsProvider.getActions('Extractors');
 
 class EditExtractor extends React.Component {
   static propTypes = {

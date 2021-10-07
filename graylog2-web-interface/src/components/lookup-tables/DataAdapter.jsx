@@ -22,11 +22,9 @@ import { LinkContainer } from 'components/common/router';
 import { Row, Col, Button, Input } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
 import Routes from 'routing/Routes';
-import CombinedProvider from 'injection/CombinedProvider';
+import { LookupTableDataAdaptersActions } from 'stores/lookup-tables/LookupTableDataAdaptersStore';
 
 import ConfigSummaryDefinitionListWrapper from './ConfigSummaryDefinitionListWrapper';
-
-const { LookupTableDataAdaptersActions } = CombinedProvider.get('LookupTableDataAdapters');
 
 class DataAdapter extends React.Component {
   static propTypes = {

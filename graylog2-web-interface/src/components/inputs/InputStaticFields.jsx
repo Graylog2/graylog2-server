@@ -19,9 +19,7 @@ import React from 'react';
 
 import { Button } from 'components/bootstrap';
 import { Icon } from 'components/common';
-import StoreProvider from 'injection/StoreProvider';
-
-const InputStaticFieldsStore = StoreProvider.getStore('InputStaticFields');
+import { InputStaticFieldsStore } from 'stores/inputs/InputStaticFieldsStore';
 
 class InputStaticFields extends React.Component {
   static propTypes = {

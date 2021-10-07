@@ -21,11 +21,9 @@ import { Button, Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
 import ProcessorSimulator from 'components/simulator/ProcessorSimulator';
-import StoreProvider from 'injection/StoreProvider';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
-
-const StreamsStore = StoreProvider.getStore('Streams');
+import StreamsStore from 'stores/streams/StreamsStore';
 
 class SimulatorPage extends React.Component {
   constructor(props) {

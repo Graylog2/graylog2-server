@@ -26,14 +26,12 @@ import { AlertDetails } from 'components/alerts';
 import DateTime from 'logic/datetimes/DateTime';
 import UserNotification from 'util/UserNotification';
 import Routes from 'routing/Routes';
-import CombinedProvider from 'injection/CombinedProvider';
 import withParams from 'routing/withParams';
+import { AlertsStore, AlertsActions } from 'stores/alerts/AlertsStore';
+import { AlertConditionsStore, AlertConditionsActions } from 'stores/alertconditions/AlertConditionsStore';
+import { StreamsStore } from 'stores/streams/StreamsStore';
 
 import style from './ShowAlertPage.css';
-
-const { AlertsStore, AlertsActions } = CombinedProvider.get('Alerts');
-const { AlertConditionsStore, AlertConditionsActions } = CombinedProvider.get('AlertConditions');
-const { StreamsStore } = CombinedProvider.get('Streams');
 
 const ShowAlertPage = createReactClass({
   displayName: 'ShowAlertPage',

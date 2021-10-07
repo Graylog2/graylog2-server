@@ -17,7 +17,7 @@
 import Reflux from 'reflux';
 
 import SearchActions from 'views/actions/SearchActions';
-import { singletonActions, singletonStore } from 'views/logic/singleton';
+import { singletonActions, singletonStore } from 'logic/singleton';
 
 type RefreshActionsType = {
   enable: () => void,

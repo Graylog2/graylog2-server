@@ -29,14 +29,10 @@ import { Row, Col, Alert } from 'components/bootstrap';
 import { Spinner, Timestamp, Icon } from 'components/common';
 import ProgressBar, { Bar } from 'components/common/ProgressBar';
 import MetricsExtractor from 'logic/metrics/MetricsExtractor';
-import ActionsProvider from 'injection/ActionsProvider';
-import StoreProvider from 'injection/StoreProvider';
 import NumberUtils from 'util/NumberUtils';
 import Routes from 'routing/Routes';
-
-const MetricsActions = ActionsProvider.getActions('Metrics');
-const MetricsStore = StoreProvider.getStore('Metrics');
-const JournalStore = StoreProvider.getStore('Journal');
+import { JournalStore } from 'stores/journal/JournalStore';
+import { MetricsActions, MetricsStore } from 'stores/metrics/MetricsStore';
 
 const JournalUsageProgressBar = styled(ProgressBar)`
   margin-bottom: 5px;
