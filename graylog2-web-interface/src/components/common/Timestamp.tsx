@@ -16,28 +16,31 @@
  */
 import PropTypes from 'prop-types';
 import * as React from 'react';
-import moment from 'moment';
+import { useMemo } from 'react';
+import type { Moment } from 'moment';
 
 import DateTime from 'logic/datetimes/DateTime';
 
 export const formatDateTime = (dateTime, format, tz, relative = false): string => {
+  const _dateTime = new DateTime(dateTime);
+
   if (relative) {
-    return dateTime.toRelativeString();
+    return _dateTime.toRelativeString();
   }
 
   switch (tz) {
     case null:
     case undefined:
-      return dateTime.toString(format);
+      return _dateTime.toString(format);
     case 'browser':
-      return dateTime.toBrowserLocalTime().toString(format);
+      return _dateTime.toBrowserLocalTime().toString(format);
     default:
-      return dateTime.toTimeZone(tz).toString(format);
+      return _dateTime.toTimeZone(tz).toString(format);
   }
 };
 
 type Props = {
-  dateTime: string | number | Date | moment.Moment,
+  dateTime: string | number | Date | Moment,
   field?: string,
   format?: string,
   relative?: boolean,
@@ -58,68 +61,62 @@ type Props = {
  * was used in the server.
  *
  */
-class Timestamp extends React.Component<Props> {
-  static propTypes = {
-    /**
-     * Date time to be displayed in the component. You can provide an ISO
-     * 8601 string, a JS native `Date` object, a moment `Date` object, or
-     * a number containing seconds after UNIX epoch.
-     */
-    dateTime: PropTypes.oneOfType([PropTypes.string, PropTypes.object, PropTypes.number]).isRequired,
-    /**
-     * Format to use to represent the date time. It supports any format
-     * supported by momentjs http://momentjs.com/docs/#/displaying/format/.
-     * We also provide a list of default formats in 'logic/datetimes/DateTime':
-     *
-     *  - DATE: `YYYY-MM-DD`
-     *  - DATETIME: `YYYY-MM-DD HH:mm:ss`, local times when decimal second precision is not important
-     *  - DATETIME_TZ: `YYYY-MM-DD HH:mm:ss Z`, when decimal second precision is not important, but TZ is
-     *  - TIMESTAMP: `YYYY-MM-DD HH:mm:ss.SSS`, local times when decimal second precision is important (e.g. search results)
-     *  - TIMESTAMP_TZ: `YYYY-MM-DD HH:mm:ss.SSS Z`, when decimal second precision is important, in a different TZ
-     *  - COMPLETE: `dddd D MMMM YYYY, HH:mm ZZ`, easy to read date time
-     *  - ISO_8601: `YYYY-MM-DDTHH:mm:ss.SSSZ`
-     */
-    format: PropTypes.string,
-    /** Provides field prop for the render function.  */
-    field: PropTypes.string,
-    /** Specifies if the component should display relative time or not. */
-    relative: PropTypes.bool,
-    /**
-     * Specifies the timezone to convert `dateTime`. Use `browser` to
-     * convert the date time to the browser's local time, or one of the
-     * time zones supported by moment timezone.
-     */
-    tz: PropTypes.string,
-    /**
-     * Override render default function to add a decorator.
-     */
-    render: PropTypes.func,
-  };
+const Timestamp = ({ dateTime, field, format, relative, render: Component, tz }: Props) => {
+  const formattedDateTime = useMemo(
+    () => formatDateTime(dateTime, format, tz, relative),
+    [dateTime, format, tz, relative],
+  );
 
-  static defaultProps = {
-    field: undefined,
-    format: DateTime.Formats.TIMESTAMP,
-    relative: false,
-    render: ({ value }) => value,
-    tz: undefined,
-  };
+  return (
+    <time key={`time-${dateTime}`} dateTime={String(dateTime)} title={String(dateTime)}>
+      <Component value={formattedDateTime} field={field} />
+    </time>
+  );
+};
 
-  _formatDateTime = () => {
-    const { relative, dateTime: dateTime1, tz, format } = this.props;
-    const dateTime = new DateTime(dateTime1);
+Timestamp.propTypes = {
+  /**
+   * Date time to be displayed in the component. You can provide an ISO
+   * 8601 string, a JS native `Date` object, a moment `Date` object, or
+   * a number containing seconds after UNIX epoch.
+   */
+  dateTime: PropTypes.oneOfType([PropTypes.string, PropTypes.object, PropTypes.number]).isRequired,
+  /**
+   * Format to use to represent the date time. It supports any format
+   * supported by momentjs http://momentjs.com/docs/#/displaying/format/.
+   * We also provide a list of default formats in 'logic/datetimes/DateTime':
+   *
+   *  - DATE: `YYYY-MM-DD`
+   *  - DATETIME: `YYYY-MM-DD HH:mm:ss`, local times when decimal second precision is not important
+   *  - DATETIME_TZ: `YYYY-MM-DD HH:mm:ss Z`, when decimal second precision is not important, but TZ is
+   *  - TIMESTAMP: `YYYY-MM-DD HH:mm:ss.SSS`, local times when decimal second precision is important (e.g. search results)
+   *  - TIMESTAMP_TZ: `YYYY-MM-DD HH:mm:ss.SSS Z`, when decimal second precision is important, in a different TZ
+   *  - COMPLETE: `dddd D MMMM YYYY, HH:mm ZZ`, easy to read date time
+   *  - ISO_8601: `YYYY-MM-DDTHH:mm:ss.SSSZ`
+   */
+  format: PropTypes.string,
+  /** Provides field prop for the render function.  */
+  field: PropTypes.string,
+  /** Specifies if the component should display relative time or not. */
+  relative: PropTypes.bool,
+  /**
+   * Specifies the timezone to convert `dateTime`. Use `browser` to
+   * convert the date time to the browser's local time, or one of the
+   * time zones supported by moment timezone.
+   */
+  tz: PropTypes.string,
+  /**
+   * Override render default function to add a decorator.
+   */
+  render: PropTypes.func,
+};
 
-    return formatDateTime(dateTime, format, tz, relative);
-  };
-
-  render() {
-    const { render: Component, dateTime, field } = this.props;
-
-    return (
-      <time key={`time-${dateTime}`} dateTime={String(dateTime)} title={String(dateTime)}>
-        <Component value={this._formatDateTime()} field={field} />
-      </time>
-    );
-  }
-}
+Timestamp.defaultProps = {
+  field: undefined,
+  format: DateTime.Formats.TIMESTAMP,
+  relative: false,
+  render: ({ value }) => value,
+  tz: undefined,
+};
 
 export default Timestamp;
