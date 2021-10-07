@@ -20,10 +20,8 @@ import { chunk } from 'lodash';
 import { SystemConfiguration } from 'views/types';
 
 import ConfigletContainer from 'pages/configurations/ConfigletContainer';
-import CombinedProvider from 'injection/CombinedProvider';
 import ConfigletRow from 'pages/configurations/ConfigletRow';
-
-const { ConfigurationsActions } = CombinedProvider.get('Configurations');
+import { ConfigurationsActions } from 'stores/configurations/ConfigurationsStore';
 
 const _onUpdate = (configType: string) => (config) => ConfigurationsActions.update(configType, config);
 

@@ -24,17 +24,14 @@ import { Button } from 'components/graylog';
 import { DataTable, Spinner, PaginatedList, SearchForm, QueryHelper } from 'components/common';
 import { MetricContainer, CounterRate } from 'components/metrics';
 import Routes from 'routing/Routes';
-import CombinedProvider from 'injection/CombinedProvider';
 import { useStore } from 'stores/connect';
 import StreamsStore, { Stream } from 'stores/streams/StreamsStore';
-import { PaginatedPipelines } from 'stores/pipelines/PipelinesStore';
-import { DEFAULT_PAGINATION } from 'stores/PaginationTypes';
+import { PaginatedPipelines, PipelinesActions } from 'stores/pipelines/PipelinesStore';
+import { DEFAULT_PAGINATION, Pagination } from 'stores/PaginationTypes';
 import useLocationSearchPagination from 'hooks/useLocationSearchPagination';
+import { PipelineConnectionsStore, PipelineConnectionsActions } from 'stores/pipelines/PipelineConnectionsStore';
 
 import PipelineConnectionsList from './PipelineConnectionsList';
-
-const { PipelinesActions } = CombinedProvider.get('Pipelines');
-const { PipelineConnectionsStore, PipelineConnectionsActions } = CombinedProvider.get('PipelineConnections');
 
 const StyledPaginatedList = styled(PaginatedList)`
   .pagination {
@@ -90,7 +87,7 @@ const _formatConnectedStreams = (streams) => {
   return streams.map((s) => s.title).join(', ');
 };
 
-const _loadPipelines = (pagination, setLoading, setPaginatedPipelines) => {
+const _loadPipelines = (pagination: Pagination, setLoading: (loading: boolean) => void, setPaginatedPipelines: (pipelines: PaginatedPipelines) => void) => {
   setLoading(true);
 
   PipelinesActions.listPaginated(pagination).then((paginatedPipelines) => {

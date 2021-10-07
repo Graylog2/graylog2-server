@@ -19,10 +19,8 @@ import React, { useCallback, useState, useEffect } from 'react';
 
 import { useStore } from 'stores/connect';
 import { Input } from 'components/bootstrap';
-import StoreProvider from 'injection/StoreProvider';
 import { Spinner } from 'components/common';
-
-const NodesStore = StoreProvider.getStore('Nodes');
+import { NodesStore } from 'stores/nodes/NodesStore';
 
 type Props = {
   global: boolean,

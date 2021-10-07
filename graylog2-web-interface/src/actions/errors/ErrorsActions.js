@@ -16,7 +16,7 @@
  */
 import Reflux from 'reflux';
 
-import { singletonActions } from 'views/logic/singleton';
+import { singletonActions } from 'logic/singleton';
 
 const ErrorsActions = singletonActions(
   'Errors',

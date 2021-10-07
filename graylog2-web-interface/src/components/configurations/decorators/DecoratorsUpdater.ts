@@ -16,10 +16,8 @@
  */
 import { difference, isEqual } from 'lodash';
 
-import CombinedProvider from 'injection/CombinedProvider';
+import { DecoratorsActions } from 'stores/decorators/DecoratorsStore';
 import type { Decorator } from 'views/components/messagelist/decorators/Types';
-
-const { DecoratorsActions } = CombinedProvider.get('Decorators');
 
 const DecoratorsUpdater = (newDecorators: Array<Decorator>, oldDecorators: Array<Decorator>) => {
   const newDecoratorIds: Array<string> = newDecorators.filter(({ id }) => id !== undefined).map(({ id }) => id).sort();

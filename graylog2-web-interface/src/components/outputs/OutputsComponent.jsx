@@ -18,17 +18,15 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 
 import { Row, Col } from 'components/graylog';
-import StoreProvider from 'injection/StoreProvider';
 import UserNotification from 'util/UserNotification';
 import PermissionsMixin from 'util/PermissionsMixin';
 import Spinner from 'components/common/Spinner';
+import StreamsStore from 'stores/streams/StreamsStore';
+import { OutputsStore } from 'stores/outputs/OutputsStore';
 
 import OutputList from './OutputList';
 import CreateOutputDropdown from './CreateOutputDropdown';
 import AssignOutputDropdown from './AssignOutputDropdown';
-
-const OutputsStore = StoreProvider.getStore('Outputs');
-const StreamsStore = StoreProvider.getStore('Streams');
 
 const OutputsComponent = createReactClass({
   displayName: 'OutputsComponent',

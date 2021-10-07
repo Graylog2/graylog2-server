@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 
-import { singleton } from 'views/logic/singleton';
+import { singleton } from 'logic/singleton';
 
 const RegeneratableThemeContext = React.createContext<{regenerateTheme:() => void} | undefined>(undefined);
 

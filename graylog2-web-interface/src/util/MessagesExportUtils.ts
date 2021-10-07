@@ -20,7 +20,7 @@ import UserNotification from 'util/UserNotification';
 import ApiRoutes from 'routing/ApiRoutes';
 import { QueryString, TimeRange } from 'views/logic/queries/Query';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
-import StoreProvider from 'injection/StoreProvider';
+import { SessionStore } from 'stores/sessions/SessionStore';
 
 export type ExportPayload = {
   timerange?: TimeRange | undefined | null,
@@ -32,7 +32,6 @@ export type ExportPayload = {
 };
 
 const downloadFile = (exportJobId: string, filename: string) => {
-  const SessionStore = StoreProvider.getStore('Session');
   const link = document.createElement('a');
   link.download = filename;
   link.href = qualifyUrlWithSessionCredentials(ApiRoutes.MessagesController.jobResults(exportJobId, filename).url, SessionStore.getSessionId());

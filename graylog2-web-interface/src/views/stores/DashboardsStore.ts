@@ -17,7 +17,7 @@
 import Reflux from 'reflux';
 
 import { qualifyUrl } from 'util/URLUtils';
-import { singletonActions, singletonStore } from 'views/logic/singleton';
+import { singletonActions, singletonStore } from 'logic/singleton';
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 import type { RefluxActions, Store } from 'stores/StoreTypes';

@@ -28,14 +28,12 @@ import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import { SearchActions } from 'views/stores/SearchStore';
 import { RefreshActions } from 'views/stores/RefreshStore';
 import * as messageList from 'views/components/messagelist';
-import InputsStore from 'stores/inputs/InputsStore';
+import { InputsActions, InputsStore } from 'stores/inputs/InputsStore';
 import { SearchExecutionResult } from 'views/actions/SearchActions';
 import { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 
 import MessageList, { MessageListResult } from './MessageList';
 import RenderCompletionCallback, { TRenderCompletionCallback } from './RenderCompletionCallback';
-
-import InputsActions from '../../../actions/inputs/InputsActions';
 
 const MessageTableEntry = () => (
   <AdditionalContext.Consumer>
@@ -62,8 +60,10 @@ jest.mock('views/stores/ViewStore', () => ({
   ),
 }));
 
-jest.mock('stores/inputs/InputsStore', () => MockStore('listen', 'getInitialState'));
-jest.mock('actions/inputs/InputsActions', () => ({ list: jest.fn(() => Promise.resolve()) }));
+jest.mock('stores/inputs/InputsStore', () => ({
+  InputsStore: MockStore('listen', 'getInitialState'),
+  InputsActions: { list: jest.fn(() => Promise.resolve()) },
+}));
 
 jest.mock('views/stores/SearchConfigStore', () => ({
   SearchConfigStore: MockStore('listSearchesClusterConfig', 'configurations', 'listen'),

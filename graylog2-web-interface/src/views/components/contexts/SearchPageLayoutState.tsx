@@ -21,10 +21,8 @@ import View, { ViewType } from 'views/logic/views/View';
 import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 import UserPreferencesContext from 'contexts/UserPreferencesContext';
 import CurrentUserContext from 'contexts/CurrentUserContext';
-import CombinedProvider from 'injection/CombinedProvider';
 import Store from 'logic/local-storage/Store';
-
-const { PreferencesActions } = CombinedProvider.get('Preferences');
+import { PreferencesActions } from 'stores/users/PreferencesStore';
 
 type Props = {
   children: (layoutConsumer: {

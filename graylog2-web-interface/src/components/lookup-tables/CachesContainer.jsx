@@ -20,11 +20,7 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
 import { Spinner } from 'components/common';
-import CombinedProvider from 'injection/CombinedProvider';
-
-const { LookupTableCachesActions, LookupTableCachesStore } = CombinedProvider.get(
-  'LookupTableCaches',
-);
+import { LookupTableCachesActions, LookupTableCachesStore } from 'stores/lookup-tables/LookupTableCachesStore';
 
 const CachesContainer = createReactClass({
   displayName: 'CachesContainer',

@@ -19,13 +19,11 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
 import { Row, Col } from 'components/graylog';
-import StoreProvider from 'injection/StoreProvider';
 import { Spinner } from 'components/common';
 import { DocumentationLink, SmallSupportLink } from 'components/support';
 import DocsHelper from 'util/DocsHelper';
 import { IndexerClusterHealthSummary } from 'components/indexers';
-
-const IndexerClusterStore = StoreProvider.getStore('IndexerCluster');
+import { IndexerClusterStore } from 'stores/indexers/IndexerClusterStore';
 
 const IndexerClusterHealth = createReactClass({
   displayName: 'IndexerClusterHealth',

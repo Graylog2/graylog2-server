@@ -24,9 +24,7 @@ import DocumentationLink from 'components/support/DocumentationLink';
 import { DocumentTitle, PageHeader } from 'components/common';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
-import StoreProvider from 'injection/StoreProvider';
-
-const CurrentUserStore = StoreProvider.getStore('CurrentUser');
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 
 const AlertsPage = createReactClass({
   displayName: 'AlertsPage',

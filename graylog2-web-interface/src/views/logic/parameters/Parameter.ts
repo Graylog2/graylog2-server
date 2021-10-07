@@ -21,7 +21,7 @@ import ParameterBinding from 'views/logic/parameters/ParameterBinding';
 
 import type { ParameterBindingJsonRepresentation } from './ParameterBinding';
 
-import { singleton } from '../singleton';
+import { singleton } from '../../../logic/singleton';
 
 type InternalState = {
   type: string,

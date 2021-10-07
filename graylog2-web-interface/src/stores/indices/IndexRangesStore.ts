@@ -20,7 +20,7 @@ import UserNotification from 'util/UserNotification';
 import * as URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
-import ActionsProvider from 'injection/ActionsProvider';
+import { singletonStore, singletonActions } from 'logic/singleton';
 
 export type IndexRange = {
   index_name: string,
@@ -30,54 +30,67 @@ export type IndexRange = {
   took_ms: number,
 };
 
-const IndexRangesActions = ActionsProvider.getActions('IndexRanges');
+type IndexRangesActionsType = {
+  list: () => Promise<unknown>,
+  recalculate: (indexSetId: string) => Promise<unknown>,
+  recalculateIndex: (indexName: string) => Promise<unknown>,
+}
+export const IndexRangesActions = singletonActions(
+  'core.IndexRanges',
+  () => Reflux.createActions<IndexRangesActionsType>({
+    list: { asyncResult: true },
+    recalculate: { asyncResult: true },
+    recalculateIndex: { asyncResult: true },
+  }),
+);
 
-const IndexRangesStore = Reflux.createStore({
-  listenables: [IndexRangesActions],
-  indexRanges: undefined,
+export const IndexRangesStore = singletonStore(
+  'core.IndexRanges',
+  () => Reflux.createStore({
+    listenables: [IndexRangesActions],
+    indexRanges: undefined,
 
-  getInitialState() {
-    return { indexRanges: this.indexRanges };
-  },
-  init() {
-    IndexRangesActions.list();
-  },
-  list() {
-    const url = URLUtils.qualifyUrl(ApiRoutes.IndexRangesApiController.list().url);
-    const promise = fetch('GET', url).then((response) => {
-      this.indexRanges = response.ranges;
+    getInitialState() {
+      return { indexRanges: this.indexRanges };
+    },
+    init() {
+      IndexRangesActions.list();
+    },
+    list() {
+      const url = URLUtils.qualifyUrl(ApiRoutes.IndexRangesApiController.list().url);
+      const promise = fetch('GET', url).then((response) => {
+        this.indexRanges = response.ranges;
 
-      this.trigger(this.getInitialState());
-    });
-
-    IndexRangesActions.list.promise(promise);
-  },
-  recalculate(indexSetId) {
-    const url = URLUtils.qualifyUrl(ApiRoutes.IndexRangesApiController.rebuild(indexSetId).url);
-    const promise = fetch('POST', url);
-
-    promise
-      .then(UserNotification.success('Index ranges will be recalculated shortly'))
-      .catch((error) => {
-        UserNotification.error(`Could not create a job to start index ranges recalculation, reason: ${error}`,
-          'Error starting index ranges recalculation');
+        this.trigger(this.getInitialState());
       });
 
-    IndexRangesActions.recalculate.promise(promise);
-  },
-  recalculateIndex(indexName) {
-    const url = URLUtils.qualifyUrl(ApiRoutes.IndexRangesApiController.rebuildSingle(indexName).url);
-    const promise = fetch('POST', url);
+      IndexRangesActions.list.promise(promise);
+    },
+    recalculate(indexSetId) {
+      const url = URLUtils.qualifyUrl(ApiRoutes.IndexRangesApiController.rebuild(indexSetId).url);
+      const promise = fetch('POST', url);
 
-    promise
-      .then(UserNotification.success(`Index ranges for ${indexName} will be recalculated shortly`))
-      .catch((error) => {
-        UserNotification.error(`Could not create a job to start index ranges recalculation for ${indexName}, reason: ${error}`,
-          `Error starting index ranges recalculation for ${indexName}`);
-      });
+      promise
+        .then(UserNotification.success('Index ranges will be recalculated shortly'))
+        .catch((error) => {
+          UserNotification.error(`Could not create a job to start index ranges recalculation, reason: ${error}`,
+            'Error starting index ranges recalculation');
+        });
 
-    IndexRangesActions.recalculateIndex.promise(promise);
-  },
-});
+      IndexRangesActions.recalculate.promise(promise);
+    },
+    recalculateIndex(indexName) {
+      const url = URLUtils.qualifyUrl(ApiRoutes.IndexRangesApiController.rebuildSingle(indexName).url);
+      const promise = fetch('POST', url);
 
-export default IndexRangesStore;
+      promise
+        .then(UserNotification.success(`Index ranges for ${indexName} will be recalculated shortly`))
+        .catch((error) => {
+          UserNotification.error(`Could not create a job to start index ranges recalculation for ${indexName}, reason: ${error}`,
+            `Error starting index ranges recalculation for ${indexName}`);
+        });
+
+      IndexRangesActions.recalculateIndex.promise(promise);
+    },
+  }),
+);

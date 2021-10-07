@@ -27,16 +27,14 @@ import { DocumentTitle, IfPermitted, PageHeader, Spinner } from 'components/comm
 import DocumentationLink from 'components/support/DocumentationLink';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
-import CombinedProvider from 'injection/CombinedProvider';
 import { isPermitted } from 'util/PermissionsMixin';
 import history from 'util/History';
 import withParams from 'routing/withParams';
 import EventNotificationDetails from 'components/event-notifications/event-notification-details/EventNotificationDetails';
 import EventNotificationActionLinks from 'components/event-notifications/event-notification-details/EventNotificationActionLinks';
+import { EventNotificationsActions } from 'stores/event-notifications/EventNotificationsStore';
 
 import {} from 'components/event-notifications/event-notification-types';
-
-const { EventNotificationsActions } = CombinedProvider.get('EventNotifications');
 
 const ShowEventDefinitionPage = ({ params: { notificationId } }) => {
   const currentUser = useContext(CurrentUserContext) || {};

@@ -21,15 +21,11 @@ import styled, { css } from 'styled-components';
 
 import { LinkContainer } from 'components/graylog/router';
 import { Button, ProgressBar } from 'components/graylog';
-import StoreProvider from 'injection/StoreProvider';
-import ActionsProvider from 'injection/ActionsProvider';
 import Routes from 'routing/Routes';
 import NumberUtils from 'util/NumberUtils';
 import { Spinner } from 'components/common';
 import { useStore } from 'stores/connect';
-
-const MetricsStore = StoreProvider.getStore('Metrics');
-const MetricsActions = ActionsProvider.getActions('Metrics');
+import { MetricsActions, MetricsStore, GaugeMetric } from 'stores/metrics/MetricsStore';
 
 const NodeBufferUsage = styled.div(({ theme }) => css`
   margin-top: ${theme.spacings.sm};
@@ -72,9 +68,9 @@ const BufferUsage = ({ nodeId, bufferType, title }: Props) => {
 
   const prefix = _metricPrefix(bufferType);
 
-  const usageMetric = metrics[nodeId][`${prefix}.usage`];
+  const usageMetric = metrics[nodeId][`${prefix}.usage`] as GaugeMetric;
   const usage = usageMetric ? usageMetric.metric.value : NaN;
-  const sizeMetric = metrics[nodeId][`${prefix}.size`];
+  const sizeMetric = metrics[nodeId][`${prefix}.size`] as GaugeMetric;
   const size = sizeMetric ? sizeMetric.metric.value : NaN;
   // eslint-disable-next-line no-restricted-globals
   const usagePercentage = ((!isNaN(usage) && !isNaN(size)) ? usage / size : 0);

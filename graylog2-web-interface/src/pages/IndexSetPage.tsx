@@ -26,17 +26,15 @@ import { IndicesMaintenanceDropdown, IndicesOverview, IndexSetDetails } from 'co
 import { IndexerClusterHealthSummary } from 'components/indexers';
 import { DocumentationLink } from 'components/support';
 import DocsHelper from 'util/DocsHelper';
-import CombinedProvider from 'injection/CombinedProvider';
 import Routes from 'routing/Routes';
 import withParams from 'routing/withParams';
 import connect from 'stores/connect';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import type { IndexerOverview } from 'stores/indexers/IndexerOverviewStore';
 import type { Indices } from 'stores/indices/IndicesStore';
-
-const { IndexSetsStore, IndexSetsActions } = CombinedProvider.get('IndexSets');
-const { IndicesStore, IndicesActions } = CombinedProvider.get('Indices');
-const { IndexerOverviewStore, IndexerOverviewActions } = CombinedProvider.get('IndexerOverview');
+import { IndexerOverviewActions, IndexerOverviewStore } from 'stores/indexers/IndexerOverviewStore';
+import { IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore';
+import { IndicesActions, IndicesStore } from 'stores/indices/IndicesStore';
 
 const REFRESH_INTERVAL = 2000;
 

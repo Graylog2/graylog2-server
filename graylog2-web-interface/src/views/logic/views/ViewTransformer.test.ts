@@ -28,16 +28,12 @@ import ViewState from './ViewState';
 import ViewStateGenerator from './ViewStateGenerator';
 import viewTransformer from './ViewTransformer';
 
-const mockList = jest.fn((...args) => Promise.resolve([]));
+const mockList = jest.fn(() => Promise.resolve([]));
 
-jest.mock('injection/CombinedProvider', () => ({
-  get: (type) => ({
-    Decorators: {
-      DecoratorsActions: {
-        list: (...args) => mockList(...args),
-      },
-    },
-  })[type],
+jest.mock('stores/decorators/DecoratorsStore', () => ({
+  DecoratorsActions: {
+    list: () => mockList(),
+  },
 }));
 
 const cwd = dirname(__filename);

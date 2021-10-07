@@ -28,9 +28,7 @@ import UserNotification from 'util/UserNotification';
 import { DocumentTitle, PageHeader } from 'components/common';
 import ContentPacksList from 'components/content-packs/ContentPacksList';
 import ContentPackUploadControls from 'components/content-packs/ContentPackUploadControls';
-import CombinedProvider from 'injection/CombinedProvider';
-
-const { ContentPacksActions, ContentPacksStore } = CombinedProvider.get('ContentPacks');
+import { ContentPacksActions, ContentPacksStore } from 'stores/content-packs/ContentPacksStore';
 
 const ConfigurationBundles = styled.div(({ theme }) => css`
   font-size: ${theme.fonts.size.body};
