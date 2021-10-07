@@ -70,7 +70,9 @@ TypeSpecificValue.propTypes = {
 };
 
 TypeSpecificValue.defaultProps = {
+  truncate: false,
   render: defaultComponent,
+  type: undefined,
   value: undefined,
 };
 
