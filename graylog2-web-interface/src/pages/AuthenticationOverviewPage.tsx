@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 
-import AuthenticationAction from 'actions/authentication/AuthenticationActions';
+import { AuthenticationActions } from 'stores/authentication/AuthenticationStore';
 import {} from 'components/authentication/bindings'; // Bind all authentication plugins
 import { Alert, Row, Col } from 'components/graylog';
 import { DocumentTitle, PageHeader, Icon } from 'components/common';
@@ -28,7 +28,7 @@ import BackendActionLinks from 'components/authentication/BackendActionLinks';
 import useActiveBackend from 'components/authentication/useActiveBackend';
 
 const AuthenticationOverviewPage = () => {
-  const { finishedLoading, activeBackend, backendsTotal } = useActiveBackend([AuthenticationAction.setActiveBackend]);
+  const { finishedLoading, activeBackend, backendsTotal } = useActiveBackend([AuthenticationActions.setActiveBackend]);
 
   return (
     <DocumentTitle title="All Authentication Services">

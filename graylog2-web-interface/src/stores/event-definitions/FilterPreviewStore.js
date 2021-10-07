@@ -22,122 +22,130 @@ import Bluebird from 'bluebird';
 import * as URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
-import CombinedProvider from 'injection/CombinedProvider';
 import Search from 'views/logic/search/Search';
 import SearchResult from 'views/logic/SearchResult';
+import { singletonStore, singletonActions } from 'logic/singleton';
 
-const { FilterPreviewActions } = CombinedProvider.get('FilterPreview');
+export const FilterPreviewActions = singletonActions(
+  'core.FilterPreview',
+  () => Reflux.createActions({
+    create: { asyncResult: true },
+    execute: { asyncResult: true },
+    search: { asyncResult: true },
+  }),
+);
 
-const FilterPreviewStore = Reflux.createStore({
-  listenables: [FilterPreviewActions],
-  sourceUrl: '/views/search',
-  searchJob: undefined,
-  result: undefined,
+export const FilterPreviewStore = singletonStore(
+  'core.FilterPreview',
+  () => Reflux.createStore({
+    listenables: [FilterPreviewActions],
+    sourceUrl: '/views/search',
+    searchJob: undefined,
+    result: undefined,
 
-  getInitialState() {
-    return this.getState();
-  },
+    getInitialState() {
+      return this.getState();
+    },
 
-  propagateChanges() {
-    this.trigger(this.getState());
-  },
+    propagateChanges() {
+      this.trigger(this.getState());
+    },
 
-  getState() {
-    return {
-      searchJob: this.searchJob,
-      result: this.result,
-    };
-  },
+    getState() {
+      return {
+        searchJob: this.searchJob,
+        result: this.result,
+      };
+    },
 
-  resourceUrl({ segments = [], query = {} }) {
-    const uri = new URI(this.sourceUrl);
-    const nextSegments = lodash.concat(uri.segment(), segments);
+    resourceUrl({ segments = [], query = {} }) {
+      const uri = new URI(this.sourceUrl);
+      const nextSegments = lodash.concat(uri.segment(), segments);
 
-    uri.segmentCoded(nextSegments);
-    uri.query(query);
+      uri.segmentCoded(nextSegments);
+      uri.query(query);
 
-    return URLUtils.qualifyUrl(uri.resource());
-  },
+      return URLUtils.qualifyUrl(uri.resource());
+    },
 
-  /**
+    /**
    * Method that creates a search query in the backend. This method does not execute the search, please call
    * `execute()` once the response of `create()` is resolved to execute the search.
    */
-  create(searchRequest) {
-    const newSearch = searchRequest.toBuilder()
-      .newId()
-      .build();
-    const promise = fetch('POST', this.resourceUrl({}), JSON.stringify(newSearch));
+    create(searchRequest) {
+      const newSearch = searchRequest.toBuilder()
+        .newId()
+        .build();
+      const promise = fetch('POST', this.resourceUrl({}), JSON.stringify(newSearch));
 
-    promise.then((response) => {
-      this.searchJob = Search.fromJSON(response);
-      this.result = undefined;
-      this.propagateChanges();
+      promise.then((response) => {
+        this.searchJob = Search.fromJSON(response);
+        this.result = undefined;
+        this.propagateChanges();
 
-      return response;
-    });
+        return response;
+      });
 
-    FilterPreviewActions.create.promise(promise);
-  },
+      FilterPreviewActions.create.promise(promise);
+    },
 
-  trackJobStatus(job, search) {
-    return new Bluebird((resolve) => {
-      if (job && job.execution.done) {
-        return resolve(new SearchResult(job));
-      }
+    trackJobStatus(job, search) {
+      return new Bluebird((resolve) => {
+        if (job && job.execution.done) {
+          return resolve(new SearchResult(job));
+        }
 
-      return resolve(Bluebird.delay(250)
-        .then(() => this.jobStatus(job.id))
-        .then((jobStatus) => this.trackJobStatus(jobStatus, search)));
-    });
-  },
+        return resolve(Bluebird.delay(250)
+          .then(() => this.jobStatus(job.id))
+          .then((jobStatus) => this.trackJobStatus(jobStatus, search)));
+      });
+    },
 
-  run(search, executionState) {
-    return fetch('POST', this.resourceUrl({ segments: [search.id, 'execute'] }), JSON.stringify(executionState));
-  },
+    run(search, executionState) {
+      return fetch('POST', this.resourceUrl({ segments: [search.id, 'execute'] }), JSON.stringify(executionState));
+    },
 
-  jobStatus(jobId) {
-    return fetch('GET', this.resourceUrl({ segments: ['status', jobId] }));
-  },
+    jobStatus(jobId) {
+      return fetch('GET', this.resourceUrl({ segments: ['status', jobId] }));
+    },
 
-  trackJob(search, executionState) {
-    return this.run(search, executionState).then((job) => this.trackJobStatus(job, search));
-  },
+    trackJob(search, executionState) {
+      return this.run(search, executionState).then((job) => this.trackJobStatus(job, search));
+    },
 
-  /**
+    /**
    * Method that executes a search in the backend and wait until its results are ready.
    * Take into account that you need to create the search before you execute it.
    */
-  execute(executionState) {
-    if (this.executePromise) {
-      this.executePromise.cancel();
-    }
+    execute(executionState) {
+      if (this.executePromise) {
+        this.executePromise.cancel();
+      }
 
-    if (this.searchJob) {
-      this.executePromise = this.trackJob(this.searchJob, executionState)
-        .then(
-          (result) => {
-            this.result = result;
-            this.executePromise = undefined;
-            this.propagateChanges();
+      if (this.searchJob) {
+        this.executePromise = this.trackJob(this.searchJob, executionState)
+          .then(
+            (result) => {
+              this.result = result;
+              this.executePromise = undefined;
+              this.propagateChanges();
 
-            return result;
-          },
-          () => UserNotification.error('Could not execute search'),
-        );
+              return result;
+            },
+            () => UserNotification.error('Could not execute search'),
+          );
 
-      FilterPreviewActions.execute.promise(this.executePromise);
+        FilterPreviewActions.execute.promise(this.executePromise);
 
-      return this.executePromise;
-    }
+        return this.executePromise;
+      }
 
-    throw new Error('Unable to execute search if no search was created before!');
-  },
+      throw new Error('Unable to execute search if no search was created before!');
+    },
 
-  search(searchRequest, executionState) {
-    FilterPreviewActions.create(searchRequest)
-      .then(() => FilterPreviewActions.execute(executionState));
-  },
-});
-
-export default FilterPreviewStore;
+    search(searchRequest, executionState) {
+      FilterPreviewActions.create(searchRequest)
+        .then(() => FilterPreviewActions.execute(executionState));
+    },
+  }),
+);

@@ -19,10 +19,8 @@ import PropTypes from 'prop-types';
 
 import { getFullVersion } from 'util/Version';
 import connect from 'stores/connect';
-import StoreProvider from 'injection/StoreProvider';
 import { Store } from 'stores/StoreTypes';
-
-const SystemStore = StoreProvider.getStore('System');
+import { SystemStore } from 'stores/system/SystemStore';
 
 type SystemStoreState = {
   system: {

@@ -20,10 +20,8 @@ import React from 'react';
 import { Button } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import UserNotification from 'util/UserNotification';
-import StoreProvider from 'injection/StoreProvider';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
-
-const GrokPatternsStore = StoreProvider.getStore('GrokPatterns');
+import { GrokPatternsStore } from 'stores/grok-patterns/GrokPatternsStore';
 
 class BulkLoadPatternModal extends React.Component {
   static propTypes = {

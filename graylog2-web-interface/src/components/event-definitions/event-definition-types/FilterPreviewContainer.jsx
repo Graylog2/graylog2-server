@@ -21,14 +21,12 @@ import uuid from 'uuid/v4';
 
 import Query from 'views/logic/queries/Query';
 import Search from 'views/logic/search/Search';
-import CombinedProvider from 'injection/CombinedProvider';
 import connect from 'stores/connect';
 import PermissionsMixin from 'util/PermissionsMixin';
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
+import { FilterPreviewStore, FilterPreviewActions } from 'stores/event-definitions/FilterPreviewStore';
 
 import FilterPreview from './FilterPreview';
-
-const { FilterPreviewStore, FilterPreviewActions } = CombinedProvider.get('FilterPreview');
-const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 
 class FilterPreviewContainer extends React.Component {
   state = {

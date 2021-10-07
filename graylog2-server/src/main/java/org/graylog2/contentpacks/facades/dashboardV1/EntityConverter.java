@@ -128,7 +128,7 @@ public class EntityConverter {
                 .id(queryId)
                 .searchTypes(searchTypes)
                 .timerange(RelativeRange.create(300))
-                .query(ElasticsearchQueryString.builder().queryString("").build())
+                .query(ElasticsearchQueryString.of(""))
                 .build();
         return SearchEntity.builder()
                 .requires(ImmutableMap.of())

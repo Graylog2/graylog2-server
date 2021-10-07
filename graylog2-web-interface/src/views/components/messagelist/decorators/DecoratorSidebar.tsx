@@ -17,7 +17,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import CombinedProvider from 'injection/CombinedProvider';
+import { DecoratorsActions, DecoratorsStore } from 'stores/decorators/DecoratorsStore';
 import connect from 'stores/connect';
 import { Spinner } from 'components/common';
 import { Decorator } from 'views/logic/widgets/MessagesWidgetConfig';
@@ -29,8 +29,6 @@ import DecoratorList from './DecoratorList';
 
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import DecoratorStyles from '!style!css!./decoratorStyles.css';
-
-const { DecoratorsActions, DecoratorsStore } = CombinedProvider.get('Decorators');
 
 type Props = {
   decorators: Array<Decorator>,

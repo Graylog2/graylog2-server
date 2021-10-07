@@ -20,13 +20,11 @@ import PropTypes from 'prop-types';
 import { Col, Row } from 'components/graylog';
 import { Spinner } from 'components/common';
 import connect from 'stores/connect';
-import CombinedProvider from 'injection/CombinedProvider';
 import { FieldTypesStore } from 'views/stores/FieldTypesStore';
 import PermissionsMixin from 'util/PermissionsMixin';
+import { LookupTablesActions, LookupTablesStore } from 'stores/lookup-tables/LookupTablesStore';
 
 import LookupTableFieldValueProviderForm from './LookupTableFieldValueProviderForm';
-
-const { LookupTablesStore, LookupTablesActions } = CombinedProvider.get('LookupTables');
 
 const LOOKUP_PERMISSIONS = [
   'lookuptables:read',

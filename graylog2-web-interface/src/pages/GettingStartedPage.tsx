@@ -23,11 +23,9 @@ import { Row } from 'components/graylog';
 import GettingStarted from 'components/gettingstarted/GettingStarted';
 import Routes from 'routing/Routes';
 import history from 'util/History';
-import StoreProvider from 'injection/StoreProvider';
 import withLocation from 'routing/withLocation';
 import type { Location } from 'routing/withLocation';
-
-const SystemStore = StoreProvider.getStore('System');
+import { SystemStore } from 'stores/system/SystemStore';
 
 const GETTING_STARTED_URL = 'https://gettingstarted.graylog.org/';
 

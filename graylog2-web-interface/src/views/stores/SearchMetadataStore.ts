@@ -19,7 +19,7 @@ import Reflux from 'reflux';
 import fetch from 'logic/rest/FetchProvider';
 import * as URLUtils from 'util/URLUtils';
 import SearchMetadata from 'views/logic/search/SearchMetadata';
-import { singletonActions, singletonStore } from 'views/logic/singleton';
+import { singletonActions, singletonStore } from 'logic/singleton';
 import type { RefluxActions, Store } from 'stores/StoreTypes';
 
 const parseSearchUrl = URLUtils.qualifyUrl('/views/search/metadata');

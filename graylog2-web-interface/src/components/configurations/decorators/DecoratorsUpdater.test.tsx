@@ -20,16 +20,12 @@ const mockCreate = jest.fn((...args: any[]) => Promise.resolve(args));
 const mockUpdate = jest.fn((...args: any[]) => Promise.resolve(args));
 const mockRemove = jest.fn((...args: any[]) => Promise.resolve(args));
 
-jest.mock('injection/CombinedProvider', () => ({
-  get: (type) => ({
-    Decorators: {
-      DecoratorsActions: {
-        create: (...args) => mockCreate(...args),
-        update: (...args) => mockUpdate(...args),
-        remove: (...args) => mockRemove(...args),
-      },
-    },
-  })[type],
+jest.mock('stores/decorators/DecoratorsStore', () => ({
+  DecoratorsActions: {
+    create: (...args) => mockCreate(...args),
+    update: (...args) => mockUpdate(...args),
+    remove: (...args) => mockRemove(...args),
+  },
 }));
 
 const decorator = (id, type = 'dummy') => ({ id, type, order: 0, stream: 'dummystream' });

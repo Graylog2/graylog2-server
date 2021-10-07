@@ -19,12 +19,8 @@ import PropTypes from 'prop-types';
 
 import Routes from 'routing/Routes';
 import { Icon } from 'components/common';
-import CombinedProvider from 'injection/CombinedProvider';
 import { useStore } from 'stores/connect';
-import { NodesStoreState } from 'stores/nodes/NodesStore';
-import { Store } from 'stores/StoreTypes';
-
-const { NodesStore }: { NodesStore: Store<NodesStoreState> } = CombinedProvider.get('Nodes');
+import { NodesStore } from 'stores/nodes/NodesStore';
 
 type NodeId = string;
 type Props = {

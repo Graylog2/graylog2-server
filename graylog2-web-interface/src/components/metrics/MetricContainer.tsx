@@ -18,13 +18,11 @@ import PropTypes from 'prop-types';
 import * as React from 'react';
 
 import TimeHelper from 'util/TimeHelper';
-import CombinedProvider from 'injection/CombinedProvider';
 import connect from 'stores/connect';
 import MetricsExtractor from 'logic/metrics/MetricsExtractor';
 import type { ClusterMetric } from 'stores/metrics/MetricsStore';
 import { Store } from 'stores/StoreTypes';
-
-const { MetricsStore, MetricsActions } = CombinedProvider.get('Metrics');
+import { MetricsActions, MetricsStore } from 'stores/metrics/MetricsStore';
 
 type Props = {
   metrics: ClusterMetric,

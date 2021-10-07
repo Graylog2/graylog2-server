@@ -16,7 +16,7 @@
  */
 import * as Reflux from 'reflux';
 
-import { singletonActions } from 'views/logic/singleton';
+import { singletonActions } from 'logic/singleton';
 import type { RefluxActions } from 'stores/StoreTypes';
 
 type CustomizationActionsType = RefluxActions<{

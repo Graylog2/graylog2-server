@@ -22,38 +22,43 @@ import MessageFormatter from 'logic/message/MessageFormatter';
 import * as URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
+import { singletonStore } from 'logic/singleton';
 
 import { MESSAGE_FIELD, SOURCE_FIELD } from '../../views/Constants';
 
-const UniversalSearchStore = Reflux.createStore({
-  DEFAULT_LIMIT: 150,
-  listenables: [],
+// eslint-disable-next-line import/prefer-default-export
+export const UniversalSearchStore = singletonStore(
+  'core.UniversalSearch',
+  () => Reflux.createStore({
+    DEFAULT_LIMIT: 150,
+    listenables: [],
 
-  search(type, query, timerange, streamId, limit, page, sortField, sortOrder, decorate) {
-    const timerangeParams = UniversalSearchStore.extractTimeRange(type, timerange);
-    const effectiveLimit = limit || this.DEFAULT_LIMIT;
-    const offset = (page - 1) * effectiveLimit;
+    search(type, query, timerange, streamId, limit, page, sortField, sortOrder, decorate) {
+      const timerangeParams = UniversalSearchStore.extractTimeRange(type, timerange);
+      const effectiveLimit = limit || this.DEFAULT_LIMIT;
+      const offset = (page - 1) * effectiveLimit;
 
-    const url = URLUtils.qualifyUrl(ApiRoutes.UniversalSearchApiController.search(type, query,
-      timerangeParams, streamId, effectiveLimit, offset, sortField, sortOrder, decorate).url);
+      const url = URLUtils.qualifyUrl(ApiRoutes.UniversalSearchApiController.search(type, query,
+        timerangeParams, streamId, effectiveLimit, offset, sortField, sortOrder, decorate).url);
 
-    return fetch('GET', url).then((response) => {
-      const result = jQuery.extend({}, response);
+      return fetch('GET', url).then((response) => {
+        const result = jQuery.extend({}, response);
 
-      result.fields = response.fields.map((field) => {
-        return {
-          hash: md5(field),
-          name: field,
-          standard_selected: (field === MESSAGE_FIELD || field === SOURCE_FIELD),
-        };
+        result.fields = response.fields.map((field) => {
+          return {
+            hash: md5(field),
+            name: field,
+            standard_selected: (field === MESSAGE_FIELD || field === SOURCE_FIELD),
+          };
+        });
+
+        result.messages = result.messages.map((message) => MessageFormatter.formatMessageSummary(message));
+
+        return result;
       });
-
-      result.messages = result.messages.map((message) => MessageFormatter.formatMessageSummary(message));
-
-      return result;
-    });
-  },
-});
+    },
+  }),
+);
 
 UniversalSearchStore.extractTimeRange = (type, timerange) => {
   // The server API uses the `range` parameter instead of `relative` for indicating a relative time range.
@@ -63,5 +68,3 @@ UniversalSearchStore.extractTimeRange = (type, timerange) => {
 
   return timerange;
 };
-
-export default UniversalSearchStore;

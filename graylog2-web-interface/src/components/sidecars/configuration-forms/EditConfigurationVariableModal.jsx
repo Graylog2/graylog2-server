@@ -20,11 +20,9 @@ import React from 'react';
 
 import { Button } from 'components/graylog';
 import { BootstrapModalForm, Input } from 'components/bootstrap';
-import CombinedProvider from 'injection/CombinedProvider';
+import { ConfigurationVariableActions } from 'stores/sidecars/ConfigurationVariableStore';
 
 import ConfigurationHelperStyle from './ConfigurationHelper.css';
-
-const { ConfigurationVariableActions } = CombinedProvider.get('ConfigurationVariable');
 
 class EditConfigurationVariableModal extends React.Component {
   static propTypes = {

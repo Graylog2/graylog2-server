@@ -27,7 +27,12 @@ jest.mock('components/common', () => ({
   Icon: ({ children }) => (<div>{children}</div>),
 }));
 
-jest.mock('stores/inputs/InputsStore', () => MockStore(['getInitialState', () => ({ inputs: [] })]));
+jest.mock('stores/inputs/InputsStore', () => ({
+  InputsActions: {
+    list: jest.fn(),
+  },
+  InputsStore: MockStore(['getInitialState', () => ({ inputs: [] })]),
+}));
 
 describe('StreamRuleForm', () => {
   afterEach(() => {

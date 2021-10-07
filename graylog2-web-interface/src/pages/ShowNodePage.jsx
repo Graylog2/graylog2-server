@@ -19,16 +19,15 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
-import StoreProvider from 'injection/StoreProvider';
 import { NodeMaintenanceDropdown, NodeOverview } from 'components/nodes';
 import { DocumentTitle, PageErrorOverview, PageHeader, Spinner } from 'components/common';
 import withParams from 'routing/withParams';
+import { ClusterOverviewStore } from 'stores/cluster/ClusterOverviewStore';
+import { InputStatesStore } from 'stores/inputs/InputStatesStore';
+import { InputTypesStore } from 'stores/inputs/InputTypesStore';
+import { NodesStore } from 'stores/nodes/NodesStore';
 
-const NodesStore = StoreProvider.getStore('Nodes');
-const ClusterOverviewStore = StoreProvider.getStore('ClusterOverview');
-const PluginsStore = StoreProvider.getStore('Plugins');
-const InputStatesStore = StoreProvider.getStore('InputStates');
-const InputTypesStore = StoreProvider.getStore('InputTypes');
+import { PluginsStore } from '../stores/plugins/PluginsStore';
 
 function nodeFilter(state) {
   return state.nodes ? state.nodes[this.props.params.nodeId] : state.nodes;

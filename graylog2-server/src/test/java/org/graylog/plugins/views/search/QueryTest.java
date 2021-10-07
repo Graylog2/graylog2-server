@@ -46,6 +46,7 @@ import org.joda.time.Period;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -96,7 +97,7 @@ public class QueryTest {
         Query query = Query.builder()
                 .id("abc123")
                 .timerange(RelativeRange.create(600))
-                .query(ElasticsearchQueryString.builder().queryString("*").build())
+                .query(ElasticsearchQueryString.of("*"))
                 .searchTypes(ImmutableSet.of(MessageList.builder().id(messageListId).build()))
                 .build();
         Map<String, Object> executionState = of(
@@ -137,7 +138,7 @@ public class QueryTest {
         Query sut = validQueryBuilder().build();
         Query query = sut.applyExecutionState(objectMapper, objectMapper.convertValue(executionState, JsonNode.class));
         assertThat(query.globalOverride()).hasValueSatisfying(go ->
-                assertThat(go.query()).contains(ElasticsearchQueryString.builder().queryString("NACKEN").build()));
+                assertThat(go.query()).contains(ElasticsearchQueryString.of("NACKEN")));
     }
     @Test
     public void appliesExecutionStateTimeRangeAndQueryToGlobalOverrideIfBothArePresent() {
@@ -149,7 +150,7 @@ public class QueryTest {
         Query query = sut.applyExecutionState(objectMapper, objectMapper.convertValue(executionState, JsonNode.class));
         assertThat(query.globalOverride()).hasValueSatisfying(go -> {
             assertThat(go.timerange()).contains(relativeRange(60));
-            assertThat(go.query()).contains(ElasticsearchQueryString.builder().queryString("NACKEN").build());
+            assertThat(go.query()).contains(ElasticsearchQueryString.of("NACKEN"));
         });
     }
     @Test
@@ -167,7 +168,7 @@ public class QueryTest {
 
     @Test
     public void builderGeneratesQueryId() {
-        final Query build = Query.builder().timerange(mock(TimeRange.class)).query(new BackendQuery.Fallback()).build();
+        final Query build = Query.builder().timerange(mock(TimeRange.class)).query(ElasticsearchQueryString.empty()).build();
         assertThat(build.id()).isNotNull();
     }
 
@@ -187,6 +188,26 @@ public class QueryTest {
         }
     }
     private Query.Builder validQueryBuilder() {
-        return Query.builder().id(UUID.randomUUID().toString()).timerange(mock(TimeRange.class)).query(new BackendQuery.Fallback());
+        return Query.builder().id(UUID.randomUUID().toString()).timerange(mock(TimeRange.class)).query(ElasticsearchQueryString.empty());
+    }
+
+    /**
+     * Test that json parser recognizes full query with its type and query string value as an object (backwards compatibility)
+     */
+    @Test
+    public void testFullQueryWithType() throws IOException {
+        final Query query = objectMapper.readValue(getClass().getResourceAsStream("/org/graylog/plugins/views/search/query/full-query.json"), Query.class);
+        final ElasticsearchQueryString queryString = (ElasticsearchQueryString) query.query();
+        assertThat(queryString.queryString()).isEqualTo("some-full-query");
+    }
+
+    /**
+     * Test that json parser recognizes query that's just a string, not object
+     */
+    @Test
+    public void testSimpleQuery() throws IOException {
+        final Query query = objectMapper.readValue(getClass().getResourceAsStream("/org/graylog/plugins/views/search/query/simple-query.json"), Query.class);
+        final ElasticsearchQueryString queryString = (ElasticsearchQueryString) query.query();
+        assertThat(queryString.queryString()).isEqualTo("some-simple-query");
     }
 }
