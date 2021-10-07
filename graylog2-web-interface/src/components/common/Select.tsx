@@ -445,7 +445,7 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
   _formatInputValue = (value: OptionValue): Array<Option> => {
     const { options, displayKey, valueKey, delimiter, allowCreate } = this.props;
 
-    if (value === undefined || value === null) {
+    if (value === undefined || value === null || (typeof value === 'string' && value === '')) {
       return undefined;
     }
 
