@@ -53,7 +53,7 @@ type Props = {
   type: 'field' | 'value',
 }
 
-const StyledHoverForHelp = styled(HoverForHelp)`
+const StyledHoverForHelp = styled((props) => <HoverForHelp {...props} />)`
   margin-left: 5px;
 `;
 

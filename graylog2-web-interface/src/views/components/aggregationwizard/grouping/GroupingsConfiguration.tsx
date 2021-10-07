@@ -39,7 +39,7 @@ const RollupColumnsLabel = styled.div`
   align-items: center;
 `;
 
-const RollupHoverForHelp = styled(HoverForHelp)`
+const RollupHoverForHelp = styled((props) => <HoverForHelp {...props} />)`
   margin-left: 5px;
 `;
 

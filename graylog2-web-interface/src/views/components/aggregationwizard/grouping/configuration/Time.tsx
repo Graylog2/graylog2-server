@@ -42,7 +42,7 @@ const IntervalCheckboxDescWithHelp = styled.div`
   align-items: center;
 `;
 
-const IntervalHoverForHelp = styled(HoverForHelp)`
+const IntervalHoverForHelp = styled((props) => <HoverForHelp {...props} />)`
   margin-left: 5px;
 `;
 

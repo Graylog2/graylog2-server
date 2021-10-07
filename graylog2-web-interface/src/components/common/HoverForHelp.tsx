@@ -16,13 +16,13 @@
  */
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { OverlayTrigger } from 'components/common';
 import { Popover } from 'components/bootstrap';
 import Icon from 'components/common/Icon';
 
-const StyledPopover = styled(Popover)(({ theme }) => `
+const StyledPopover = styled(Popover)(({ theme }) => css`
   ul {
     padding-left: 0;
   }
@@ -81,4 +81,5 @@ HoverForHelp.defaultProps = {
   testId: undefined,
 };
 
+/** @component */
 export default HoverForHelp;
