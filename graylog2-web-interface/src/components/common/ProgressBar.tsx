@@ -20,18 +20,15 @@ import styled, { css, keyframes } from 'styled-components';
 import chroma from 'chroma-js';
 
 type StyledBarProps = {
-  animated: boolean,
-  bsStyle: string,
-  striped: boolean,
+  animated?: boolean,
+  bsStyle?: string,
+  striped?: boolean,
   value: number,
-};
-
-type BarProps = StyledBarProps & {
-  label: string,
+  label?: string,
 };
 
 type ProgressBarProps = {
-  bars: Array<BarProps>,
+  bars: Array<StyledBarProps>,
   className?: string,
 };
 
