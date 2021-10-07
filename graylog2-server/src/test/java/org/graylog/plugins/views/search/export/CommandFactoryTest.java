@@ -110,7 +110,7 @@ class CommandFactoryTest {
     void takesRequestParamsFromSearch() {
         Query query = validQueryBuilder()
                 .filter(streamFilter("stream-1", "stream-2"))
-                .query(ElasticsearchQueryString.builder().queryString("huhu").build())
+                .query(ElasticsearchQueryString.of("huhu"))
                 .build();
         Search s = searchWithQueries(query);
 
@@ -180,7 +180,7 @@ class CommandFactoryTest {
     @Test
     void takesQueryStringFromMessageListIfOnlySpecifiedThere() {
         MessageList ml = MessageList.builder().id("ml-id")
-                .query(ElasticsearchQueryString.builder().queryString("nacken").build())
+                .query(ElasticsearchQueryString.of("nacken"))
                 .build();
         Query q = validQueryBuilderWith(ml).build();
 
@@ -197,7 +197,7 @@ class CommandFactoryTest {
         MessageList ml = MessageList.builder().id("ml-id")
                 .build();
         Query q = validQueryBuilderWith(ml)
-                .query(ElasticsearchQueryString.builder().queryString("nacken").build())
+                .query(ElasticsearchQueryString.of("nacken"))
                 .build();
 
         Search s = searchWithQueries(q);
@@ -210,18 +210,17 @@ class CommandFactoryTest {
     @Test
     void combinesQueryStringIfSpecifiedOnMessageListAndQuery() {
         MessageList ml = MessageList.builder().id("ml-id")
-                .query(ElasticsearchQueryString.builder().queryString("from-messagelist").build())
+                .query(ElasticsearchQueryString.of("from-messagelist"))
                 .build();
         Query q = validQueryBuilderWith(ml)
-                .query(ElasticsearchQueryString.builder().queryString("from-query").build())
+                .query(ElasticsearchQueryString.of("from-query"))
                 .build();
 
         Search s = searchWithQueries(q);
 
         ExportMessagesCommand command = buildFrom(s, ml.id());
 
-        ElasticsearchQueryString combined = ElasticsearchQueryString.builder()
-                .queryString("from-query AND from-messagelist").build();
+        ElasticsearchQueryString combined = ElasticsearchQueryString.of("from-query AND from-messagelist");
 
         assertThat(command.queryString())
                 .isEqualTo(combined);
@@ -298,14 +297,14 @@ class CommandFactoryTest {
 
     @Test
     void appliesQueryDecorators() {
-        Query q = validQueryBuilder().query(ElasticsearchQueryString.builder().queryString("undecorated").build()).build();
+        Query q = validQueryBuilder().query(ElasticsearchQueryString.of("undecorated")).build();
         Search s = searchWithQueries(q);
 
         when(queryStringDecorator.decorateQueryString("undecorated", s, q)).thenReturn("decorated");
 
         ExportMessagesCommand command = buildFrom(s);
 
-        assertThat(command.queryString()).isEqualTo(ElasticsearchQueryString.builder().queryString("decorated").build());
+        assertThat(command.queryString()).isEqualTo(ElasticsearchQueryString.of("decorated"));
     }
 
     private ExportMessagesCommand buildFrom(Search s) {

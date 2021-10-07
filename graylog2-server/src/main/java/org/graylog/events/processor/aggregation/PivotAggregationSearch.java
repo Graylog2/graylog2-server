@@ -374,7 +374,7 @@ public class PivotAggregationSearch implements AggregationSearch {
         final Query.Builder queryBuilder = Query.builder()
             .id(STREAMS_QUERY_ID)
             .searchTypes(searchTypes)
-            .query(ElasticsearchQueryString.builder().queryString(config.query()).build())
+            .query(ElasticsearchQueryString.of(config.query()))
             .timerange(parameters.timerange());
 
         final Set<String> streams = getStreams(parameters);
@@ -450,7 +450,7 @@ public class PivotAggregationSearch implements AggregationSearch {
         final Query.Builder queryBuilder = Query.builder()
                 .id(QUERY_ID)
                 .searchTypes(searchTypes)
-                .query(ElasticsearchQueryString.builder().queryString(config.query()).build())
+                .query(ElasticsearchQueryString.of(config.query()))
                 .timerange(parameters.timerange());
 
         final Set<String> streams = getStreams(parameters);

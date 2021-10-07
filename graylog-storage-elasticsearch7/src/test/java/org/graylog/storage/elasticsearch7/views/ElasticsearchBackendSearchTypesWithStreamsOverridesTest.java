@@ -122,7 +122,7 @@ public class ElasticsearchBackendSearchTypesWithStreamsOverridesTest extends Ela
     private Query queryFor(SearchType... searchTypes) {
         return Query.builder()
                 .id("query1")
-                .query(ElasticsearchQueryString.builder().queryString("*").build())
+                .query(ElasticsearchQueryString.of("*"))
                 .timerange(timeRangeForTest())
                 .filter(StreamFilter.ofId(stream1Id))
                 .searchTypes(Arrays.stream(searchTypes).collect(Collectors.toSet()))

@@ -70,7 +70,7 @@ public class ElasticsearchBackendMultiSearchTest extends ElasticsearchBackendGen
         this.query = Query.builder()
                 .id("query1")
                 .searchTypes(searchTypes)
-                .query(ElasticsearchQueryString.builder().queryString("*").build())
+                .query(ElasticsearchQueryString.of("*"))
                 .timerange(timeRangeForTest())
                 .build();
 
