@@ -17,12 +17,12 @@
 package org.graylog.testing.containermatrix;
 
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
-import org.graylog.testing.containermatrix.descriptors.ContainerMatrixEngineDescriptor;
 import org.graylog.testing.containermatrix.descriptors.ContainerMatrixTestClassDescriptor;
 import org.graylog.testing.containermatrix.descriptors.ContainerMatrixTestsDescriptor;
 import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.junit.jupiter.api.extension.ConditionEvaluationResult;
+import org.junit.jupiter.engine.descriptor.ContainerMatrixEngineDescriptor;
 import org.junit.platform.commons.support.AnnotationSupport;
 import org.junit.platform.commons.support.ReflectionSupport;
 import org.junit.platform.commons.util.Preconditions;
@@ -54,6 +54,11 @@ public class ContainerMatrixTestEngine implements TestEngine {
     private static final Logger LOG = LoggerFactory.getLogger(ContainerMatrixTestEngine.class);
 
     private static final String ENGINE_ID = "graylog-container-matrix-tests";
+
+    @Override
+    public String getId() {
+        return ENGINE_ID;
+    }
 
     public static ConditionEvaluationResult evaluate(DisabledIfEnvironmentVariable annotation) {
         String name = annotation.named().trim();
@@ -131,13 +136,8 @@ public class ContainerMatrixTestEngine implements TestEngine {
     };
 
     @Override
-    public String getId() {
-        return ENGINE_ID;
-    }
-
-    @Override
     public TestDescriptor discover(final EngineDiscoveryRequest request, final UniqueId uniqueId) {
-        final ContainerMatrixEngineDescriptor engineDescriptor = new ContainerMatrixEngineDescriptor(uniqueId, "Graylog Container Matrix Tests");
+        final ContainerMatrixEngineDescriptor engineDescriptor = new ContainerMatrixEngineDescriptor(uniqueId, "Graylog Container Matrix Tests", null);
 
         // ClasspathRootSelector used by IntelliJ when starting tests via the GUI
         request.getSelectorsByType(ClasspathRootSelector.class).forEach(selector -> appendTestsInClasspath(request, selector, engineDescriptor));
