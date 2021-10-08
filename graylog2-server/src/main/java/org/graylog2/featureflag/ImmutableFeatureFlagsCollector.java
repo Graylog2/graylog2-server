@@ -95,7 +95,7 @@ class ImmutableFeatureFlagsCollector {
         try {
             addFlags(resources.customProperties(file), "custom properties file");
         } catch (IOException e) {
-            LOG.info("Unable to read custom feature flags file {}! Skipping...", file);
+            LOG.debug("Unable to read custom feature flags file {}! Skipping...", file);
         }
     }
 
