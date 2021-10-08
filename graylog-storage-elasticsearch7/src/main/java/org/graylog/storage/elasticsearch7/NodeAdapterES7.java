@@ -16,9 +16,12 @@
  */
 package org.graylog.storage.elasticsearch7;
 
+import com.github.zafarkhaja.semver.Version;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestHighLevelClient;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.core.MainResponse;
+import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.cluster.NodeAdapter;
+import org.graylog2.storage.versionprobe.SearchVersion;
 
 import javax.inject.Inject;
 import java.util.Optional;
@@ -32,9 +35,20 @@ public class NodeAdapterES7 implements NodeAdapter {
     }
 
     @Override
-    public Optional<String> version() {
+    public Optional<SearchVersion> version() {
         final MainResponse result = client.execute(RestHighLevelClient::info,
                 "Unable to retrieve Elasticsearch version from node");
-        return Optional.of(result.getVersion().getNumber());
+
+        // Caution, the native ES client doesn't allow to extract the distribution information!
+        // the following line is a fragile HACK!
+        final boolean isOpenSearch = result.getTagline().contains("OpenSearch") || result.getVersion().getNumber().startsWith("1.");
+
+        final SearchVersion.Distribution distribution = isOpenSearch ? SearchVersion.Distribution.OPENSEARCH : SearchVersion.Distribution.ELASTICSEARCH;
+
+        return Optional.of(result.getVersion().getNumber())
+                .map(this::parseVersion)
+                .map(v -> SearchVersion.create(distribution, v));
     }
+
+
 }

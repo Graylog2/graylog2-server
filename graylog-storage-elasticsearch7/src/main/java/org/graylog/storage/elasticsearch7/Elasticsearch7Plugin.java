@@ -27,6 +27,7 @@ import java.util.Collection;
 
 public class Elasticsearch7Plugin implements Plugin {
     public static final SearchVersion SUPPORTED_ES_VERSION = SearchVersion.elasticsearch(Version.from(7, 0, 0));
+    public static final SearchVersion SUPPORTED_OPENSEARCH_VERSION = SearchVersion.create(SearchVersion.Distribution.OPENSEARCH, Version.from(1, 0, 0));
 
     @Override
     public PluginMetaData metadata() {
@@ -36,8 +37,10 @@ public class Elasticsearch7Plugin implements Plugin {
     @Override
     public Collection<PluginModule> modules() {
         return ImmutableSet.of(
-                new Elasticsearch7Module(),
-                new ViewsESBackendModule()
+                new Elasticsearch7Module(SUPPORTED_ES_VERSION),
+                new ViewsESBackendModule(SUPPORTED_ES_VERSION),
+                new Elasticsearch7Module(SUPPORTED_OPENSEARCH_VERSION),
+                new ViewsESBackendModule(SUPPORTED_OPENSEARCH_VERSION)
         );
     }
 }

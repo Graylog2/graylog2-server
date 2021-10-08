@@ -16,7 +16,6 @@
  */
 package org.graylog2.storage;
 
-import org.graylog2.plugin.Version;
 import org.graylog2.storage.versionprobe.SearchVersion;
 
 import javax.inject.Inject;
@@ -37,7 +36,7 @@ public class VersionAwareProvider<T> implements Provider<T> {
     public T get() {
         final Provider<T> provider = this.pluginBindings.get(elasticsearchMajorVersion);
         if (provider == null) {
-            throw new UnsupportedElasticsearchException(elasticsearchMajorVersion);
+            throw new UnsupportedSearchException(elasticsearchMajorVersion, this.getClass().getName());
         }
         return provider.get();
     }

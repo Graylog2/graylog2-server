@@ -17,6 +17,7 @@
 package org.graylog2.storage.versionprobe;
 
 import com.google.auto.value.AutoValue;
+import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.plugin.Version;
 
 import javax.annotation.Nullable;
@@ -27,20 +28,49 @@ import java.util.Optional;
 public abstract class SearchVersion {
 
     public enum Distribution {
-        ELASTICSEARCH,
-        OPENSEARCH
+        ELASTICSEARCH("Elasticsearch"),
+        OPENSEARCH("OpenSearch");
+
+        private final String printName;
+
+        Distribution(String printName) {
+            this.printName = printName;
+        }
+
+
+        @Override
+        public String toString() {
+            return this.printName;
+        }
     }
 
     public SearchVersion major() {
         return create(distribution(), Version.from(version().getVersion().getMajorVersion(), 0, 0));
     }
 
+    public boolean satisfies(Distribution distribution, String expression) {
+        return this.distribution().equals(distribution) && version().getVersion().satisfies(expression);
+    }
+
     public abstract Distribution distribution();
 
     public abstract Version version();
 
+
+    public static SearchVersion create(Distribution distribution, com.github.zafarkhaja.semver.Version v) {
+        return create(distribution, new Version(v));
+    }
+
+    public static SearchVersion elasticsearch(final String version) {
+        return elasticsearch(parseVersion(version));
+    }
+
     public static SearchVersion elasticsearch(final Version version) {
         return create(Distribution.ELASTICSEARCH, version);
+    }
+
+    public static SearchVersion elasticsearch(com.github.zafarkhaja.semver.Version version) {
+        return elasticsearch(new Version(version));
     }
 
     /**
@@ -56,11 +86,22 @@ public abstract class SearchVersion {
     }
 
     public static SearchVersion create(final Distribution distribution, final Version version) {
+        if (Distribution.OPENSEARCH.equals(distribution) && !version.getVersion().satisfies("^1.0.0")) {
+            throw new IllegalArgumentException("Invalid OpenSearch version!");
+        }
         return new AutoValue_SearchVersion(distribution, version);
+    }
+
+    private static com.github.zafarkhaja.semver.Version parseVersion(String version) {
+        try {
+            return com.github.zafarkhaja.semver.Version.valueOf(version);
+        } catch (Exception e) {
+            throw new ElasticsearchException("Unable to parse Elasticsearch version: " + version, e);
+        }
     }
 
     @Override
     public String toString() {
-        return distribution().name() + ":" + version();
+        return distribution() + ":" + version();
     }
 }

@@ -18,6 +18,7 @@ package org.graylog2.indexer.cluster;
 
 import com.github.zafarkhaja.semver.Version;
 import org.graylog2.indexer.ElasticsearchException;
+import org.graylog2.storage.versionprobe.SearchVersion;
 
 import javax.inject.Inject;
 import java.util.Optional;
@@ -30,16 +31,9 @@ public class Node {
         this.nodeAdapter = nodeAdapter;
     }
 
-    public Optional<Version> getVersion() {
-        return nodeAdapter.version()
-            .map(this::parseVersion);
+    public Optional<SearchVersion> getVersion() {
+        return nodeAdapter.version();
     }
 
-    private Version parseVersion(String version) {
-        try {
-            return Version.valueOf(version);
-        } catch (Exception e) {
-            throw new ElasticsearchException("Unable to parse Elasticsearch version: " + version, e);
-        }
-    }
+
 }

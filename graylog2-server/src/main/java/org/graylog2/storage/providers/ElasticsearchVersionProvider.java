@@ -67,7 +67,7 @@ public class ElasticsearchVersionProvider implements Provider<SearchVersion> {
         try {
             return this.cachedVersion.get(() -> {
                 final Optional<SearchVersion> probedVersion = this.versionProbe.probe(this.elasticsearchHosts);
-                probedVersion.ifPresent(version -> LOG.info("Elasticsearch cluster is running v" + version));
+                probedVersion.ifPresent(version -> LOG.info("Elasticsearch cluster is running " + version));
                 return probedVersion;
             })
                     .orElseThrow(() -> new ElasticsearchProbeException(NO_HOST_REACHABLE_ERROR + "!"));

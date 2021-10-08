@@ -69,15 +69,20 @@ import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.series.ESStdDe
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.series.ESSumHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.series.ESSumOfSquaresHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.series.ESVarianceHandler;
-
-import static org.graylog.storage.elasticsearch7.Elasticsearch7Plugin.SUPPORTED_ES_VERSION;
+import org.graylog2.storage.versionprobe.SearchVersion;
 
 public class ViewsESBackendModule extends ViewsModule {
+    private final SearchVersion supportedSearchVersion;
+
+    public ViewsESBackendModule(SearchVersion supportedSearchVersion) {
+        this.supportedSearchVersion = supportedSearchVersion;
+    }
+
     @Override
     protected void configure() {
         install(new FactoryModuleBuilder().build(ESGeneratedQueryContext.Factory.class));
 
-        bindForVersion(SUPPORTED_ES_VERSION, new TypeLiteral<QueryBackend<? extends GeneratedQueryContext>>() {})
+        bindForVersion(supportedSearchVersion, new TypeLiteral<QueryBackend<? extends GeneratedQueryContext>>() {})
                 .to(ElasticsearchBackend.class);
 
         registerESSearchTypeHandler(MessageList.NAME, ESMessageList.class);
@@ -108,7 +113,7 @@ public class ViewsESBackendModule extends ViewsModule {
     }
 
     private LinkedBindingBuilder<ExportBackend> bindExportBackend() {
-        return bindExportBackend(SUPPORTED_ES_VERSION);
+        return bindExportBackend(supportedSearchVersion);
     }
 
     private MapBinder<String, ESPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation>> pivotBucketHandlerBinder() {
