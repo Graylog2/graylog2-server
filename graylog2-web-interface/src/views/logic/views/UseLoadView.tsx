@@ -28,7 +28,7 @@ const LoadViewError = ({ error }: { error: Error }) => (
   <ErrorPage title="Something went wrong"
              description={<p>An unknown error has occurred. Please have a look at the following message and the graylog server log for more information.</p>}>
     <pre>
-      {JSON.stringify(error)}
+      {error?.message}
     </pre>
   </ErrorPage>
 );
