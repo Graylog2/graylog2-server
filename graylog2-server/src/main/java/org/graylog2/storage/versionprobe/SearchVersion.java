@@ -20,6 +20,7 @@ import com.google.auto.value.AutoValue;
 import org.graylog2.plugin.Version;
 
 import javax.annotation.Nullable;
+import java.util.Locale;
 import java.util.Optional;
 
 @AutoValue
@@ -48,7 +49,7 @@ public abstract class SearchVersion {
     public static SearchVersion create(@Nullable final String distribution, final Version version) {
         final Distribution dst = Optional.ofNullable(distribution)
                 .map(String::trim)
-                .map(String::toUpperCase)
+                .map(d -> d.toUpperCase(Locale.ROOT))
                 .map(Distribution::valueOf)
                 .orElse(Distribution.ELASTICSEARCH);
         return new AutoValue_SearchVersion(dst, version);
