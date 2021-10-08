@@ -15,19 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import isAllMessagesRange from 'views/logic/queries/IsAllMessagesRange';
-import { RELATIVE_ALL_TIME } from 'views/Constants';
+export type RangeClassified = {
+  value: number,
+  unit: 'minutes' | 'seconds' | 'hours' | 'days',
+  isAllTime: boolean,
+}
 
-import { TimeRange, NoTimeRangeOverride } from './Query';
-
-/* eslint-disable import/prefer-default-export */
-export const normalizeIfAllMessagesRange = (timeRange: TimeRange | NoTimeRangeOverride) => {
-  if ('type' in timeRange && isAllMessagesRange(timeRange)) {
-    return {
-      type: timeRange.type,
-      range: RELATIVE_ALL_TIME,
-    };
-  }
-
-  return timeRange;
-};
+export type RelativeTimeRangeClassified = {
+  type: 'relative',
+  from: RangeClassified,
+  to: RangeClassified,
+}
