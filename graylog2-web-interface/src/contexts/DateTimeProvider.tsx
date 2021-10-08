@@ -38,8 +38,19 @@ export const ACCEPTED_FORMATS = {
   ISO_8601: 'YYYY-MM-DDTHH:mm:ss.SSSZ', // Standard, but not really nice to read. Mostly used for machine communication
 };
 
+const getBrowserTimezone = () => {
+  return moment.tz.guess();
+};
+
 const getUserTimezone = (userTimezone) => {
-  return userTimezone ?? moment.tz.guess() ?? AppConfig.rootTimeZone() ?? 'UTC';
+  return userTimezone ?? getBrowserTimezone() ?? AppConfig.rootTimeZone() ?? 'UTC';
+};
+
+export const FORMATS = {
+  short: 'YYYY-MM-DD HH:mm:ss',
+  default: 'YYYY-MM-DD HH:mm:ss',
+  withTz: 'YYYY-MM-DD HH:mm:ss Z',
+  readable: 'dddd D MMMM YYYY, HH:mm ZZ',
 };
 
 /**
@@ -50,14 +61,24 @@ const DateTimeProvider = ({ children }: Props) => {
   const currentUser = useContext(CurrentUserContext);
   const userTimezone = useMemo(() => getUserTimezone(currentUser?.timezone), [currentUser?.timezone]);
 
-  const unifyTime = useCallback((time) => {
-    const dateTime = moment.tz(time.trim(), Object.values(ACCEPTED_FORMATS), true, userTimezone);
-
-    return dateTime.format(ACCEPTED_FORMATS.TIMESTAMP);
+  const unifiedTimeAsDate = useCallback((time, tz = userTimezone) => {
+    return moment.tz(time.trim(), Object.values(ACCEPTED_FORMATS), true, tz);
   }, [userTimezone]);
 
+  const unifiedTime = useCallback((time, tz = userTimezone, format = FORMATS.default) => {
+    return unifiedTimeAsDate(time, tz).format(FORMATS[format]);
+  }, [unifiedTimeAsDate, userTimezone]);
+
+  const unifiedBrowserTime = (time, format) => {
+    return unifiedTime(time, getBrowserTimezone(), format);
+  };
+
+  const relativeDifference = (time, tz) => {
+    return unifiedTimeAsDate(time, tz).fromNow();
+  };
+
   return (
-    <DateTimeContext.Provider value={{ unifyTime, userTimezone }}>
+    <DateTimeContext.Provider value={{ unifiedTime, unifiedTimeAsDate, userTimezone, unifiedBrowserTime, relativeDifference }}>
       {children}
     </DateTimeContext.Provider>
   );

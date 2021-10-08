@@ -16,27 +16,22 @@
  */
 import PropTypes from 'prop-types';
 import * as React from 'react';
-import { useMemo } from 'react';
+import { useMemo, useContext } from 'react';
 import type { Moment } from 'moment';
 
 import DateTime from 'logic/datetimes/DateTime';
+import DateTimeContext from 'contexts/DateTimeContext';
 
-export const formatDateTime = (dateTime, format, tz, relative = false): string => {
-  const _dateTime = new DateTime(dateTime);
-
+const formatDateTime = (dateTime, format, tz, relative = false, unifiedTime, unifiedBrowserTime, relativeDifference): string => {
   if (relative) {
-    return _dateTime.toRelativeString();
+    return relativeDifference(dateTime, tz);
   }
 
-  switch (tz) {
-    case null:
-    case undefined:
-      return _dateTime.toString(format);
-    case 'browser':
-      return _dateTime.toBrowserLocalTime().toString(format);
-    default:
-      return _dateTime.toTimeZone(tz).toString(format);
+  if (tz === 'browser') {
+    return unifiedBrowserTime(dateTime, format);
   }
+
+  return unifiedTime(dateTime, tz, format);
 };
 
 type Props = {
@@ -62,9 +57,10 @@ type Props = {
  *
  */
 const Timestamp = ({ dateTime, field, format, relative, render: Component, tz }: Props) => {
+  const { unifiedTime, unifiedBrowserTime, relativeDifference } = useContext(DateTimeContext);
   const formattedDateTime = useMemo(
-    () => formatDateTime(dateTime, format, tz, relative),
-    [dateTime, format, tz, relative],
+    () => formatDateTime(dateTime, format, tz, relative, unifiedTime, unifiedBrowserTime, relativeDifference),
+    [dateTime, format, tz, relative, unifiedTime, unifiedBrowserTime, relativeDifference],
   );
 
   return (

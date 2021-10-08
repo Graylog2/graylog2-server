@@ -15,12 +15,22 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import type { Moment } from 'moment';
 
 import { singleton } from 'logic/singleton';
 
+import { FORMATS } from './DateTimeProvider';
+
+type Formats = keyof typeof FORMATS;
+
+export type DateTime = string | number | Moment | Date;
+
 export type DateTimeContextType = {
-  unifyTime: (string) => string,
   userTimezone: string,
+  unifiedTimeAsDate: (time: DateTime, tz?: string, format?: Formats) => Moment,
+  unifiedTime: (time: DateTime, tz?: string, format?: Formats) => string
+  unifiedBrowserTime: (time: DateTime, format?: Formats) => string,
+  relativeDifference: (time: DateTime, tz?: string) => string
 };
 
 const DateTimeContext = React.createContext<DateTimeContextType | undefined>(undefined);
