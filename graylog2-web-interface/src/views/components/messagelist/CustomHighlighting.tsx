@@ -18,14 +18,11 @@ import * as React from 'react';
 import { useContext } from 'react';
 import PropTypes from 'prop-types';
 
-import AppConfig from 'util/AppConfig';
-import DateTime from 'logic/datetimes/DateTime';
 import DecoratorContext from 'views/components/messagelist/decoration/DecoratorContext';
 import HighlightingRulesContext from 'views/components/contexts/HighlightingRulesContext';
-import CurrentUserContext from 'contexts/CurrentUserContext';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
-import { formatDateTime } from 'components/common/Timestamp';
 import FieldType from 'views/logic/fieldtypes/FieldType';
+import DateTimeContext from 'contexts/DateTimeContext';
 
 import PossiblyHighlight from './PossiblyHighlight';
 import Highlight from './Highlight';
@@ -39,8 +36,7 @@ type Props = {
 const CustomHighlighting = ({ children, field: fieldName, value: fieldValue }: Props) => {
   const decorators = [];
   const highlightingRules = useContext(HighlightingRulesContext) ?? [];
-  const currentUser = useContext(CurrentUserContext);
-  const timezone = currentUser?.timezone ?? AppConfig.rootTimeZone();
+  const { unifiedTime } = useContext(DateTimeContext);
   const fieldTypes = useContext(FieldTypesContext);
   let type;
 
@@ -51,7 +47,7 @@ const CustomHighlighting = ({ children, field: fieldName, value: fieldValue }: P
 
   const highlightingRulesMap = highlightingRules.reduce((prev, cur) => ({ ...prev, [cur.field]: prev[cur.field] ? [...prev[cur.field], cur] : [cur] }), {});
   const rules = highlightingRulesMap[fieldName] ?? [];
-  const formattedValue = type === 'date' ? formatDateTime(fieldValue, DateTime.Formats.TIMESTAMP_TZ, timezone) : fieldValue;
+  const formattedValue = type === 'date' ? unifiedTime(fieldValue) : fieldValue;
 
   rules.forEach((rule) => {
     const ranges = [];
