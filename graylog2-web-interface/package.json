@@ -152,7 +152,7 @@
     "copy-webpack-plugin": "^6.1.0",
     "cors": "^2.8.5",
     "cross-env": "^7.0.2",
-    "css-loader": "^5.0.1",
+    "css-loader": "^6.3.0",
     "enzyme": "3.11.0",
     "enzyme-adapter-react-16": "^1.15.2",
     "eslint-config-graylog": "file:packages/eslint-config-graylog",
