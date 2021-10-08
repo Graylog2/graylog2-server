@@ -28,14 +28,14 @@ interface AlertProps {
 }
 
 interface Props {
-  bsStyle: ColorVariants,
+  bsStyle?: ColorVariants,
   children: React.ReactNode,
-  onDismiss: () => void,
+  onDismiss?: () => void,
 }
 
 const StyledAlert = styled(BootstrapAlert).attrs(({ bsStyle }: { bsStyle: ColorVariants }) => ({
   bsStyle: null,
-  $bsStyle: bsStyle || 'default',
+  $bsStyle: bsStyle,
 }))(({ $bsStyle, theme }: AlertProps) => {
   const borderColor = theme.colors.variant.lighter[$bsStyle];
   const backgroundColor = theme.colors.variant.lightest[$bsStyle];
@@ -72,6 +72,11 @@ const StyledAlert = styled(BootstrapAlert).attrs(({ bsStyle }: { bsStyle: ColorV
 
 const Alert = ({ bsStyle, ...rest }: Props) => {
   return <StyledAlert bsStyle={bsStyle} {...rest} />;
+};
+
+Alert.defaultProps = {
+  bsStyle: 'default',
+  onDismiss: undefined,
 };
 
 export default Alert;

@@ -17,6 +17,7 @@
 /* This file contains configuration for React Styleguidist https://react-styleguidist.js.org/ */
 const path = require('path');
 
+const propsParser = require('react-docgen-typescript').parse;
 const requireIt = require('react-styleguidist/lib/loaders/utils/requireIt').default;
 
 const webpackConfig = require('./webpack.config.js');
@@ -37,7 +38,7 @@ module.exports = {
     'stylesheets/typeahead.less',
     'injection/builtins.js',
   ],
-  // propsParser: require('react-docgen-typescript').parse,
+  propsParser,
   sections: [
     {
       name: 'Introduction',
