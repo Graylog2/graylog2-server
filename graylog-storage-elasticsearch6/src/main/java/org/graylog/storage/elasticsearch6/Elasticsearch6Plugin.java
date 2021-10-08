@@ -26,7 +26,7 @@ import org.graylog2.storage.versionprobe.SearchVersion;
 import java.util.Collection;
 
 public class Elasticsearch6Plugin implements Plugin {
-    public static final SearchVersion SUPPORTED_ES_VERSION = SearchVersion.withoutDistribution(Version.from(6, 0, 0));
+    public static final SearchVersion SUPPORTED_ES_VERSION = SearchVersion.elasticsearch(Version.from(6, 0, 0));
 
     @Override
     public PluginMetaData metadata() {

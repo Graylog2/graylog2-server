@@ -20,33 +20,46 @@ import com.google.auto.value.AutoValue;
 import org.graylog2.plugin.Version;
 
 import javax.annotation.Nullable;
+import java.util.Optional;
 
 @AutoValue
 public abstract class SearchVersion {
+
+    public enum Distribution {
+        ELASTICSEARCH,
+        OPENSEARCH
+    }
 
     public SearchVersion major() {
         return create(distribution(), Version.from(version().getVersion().getMajorVersion(), 0, 0));
     }
 
-    @Nullable
-    public abstract String distribution();
+    public abstract Distribution distribution();
 
     public abstract Version version();
 
-    public static SearchVersion withoutDistribution(final Version version) {
-        return create(null, version);
+    public static SearchVersion elasticsearch(final Version version) {
+        return create(Distribution.ELASTICSEARCH, version);
     }
 
+    /**
+     * @param distribution Assumes ELASTICSEARCH by default when no distribution is provided
+     */
     public static SearchVersion create(@Nullable final String distribution, final Version version) {
+        final Distribution dst = Optional.ofNullable(distribution)
+                .map(String::trim)
+                .map(String::toUpperCase)
+                .map(Distribution::valueOf)
+                .orElse(Distribution.ELASTICSEARCH);
+        return new AutoValue_SearchVersion(dst, version);
+    }
+
+    public static SearchVersion create(final Distribution distribution, final Version version) {
         return new AutoValue_SearchVersion(distribution, version);
     }
 
     @Override
     public String toString() {
-        if (distribution() != null) {
-            return distribution() + ":" + version();
-        } else {
-            return version().toString();
-        }
+        return distribution().name() + ":" + version();
     }
 }

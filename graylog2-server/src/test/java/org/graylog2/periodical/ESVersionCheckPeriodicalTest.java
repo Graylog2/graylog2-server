@@ -53,7 +53,7 @@ class ESVersionCheckPeriodicalTest {
 
     @Test
     void doesNotRunIfVersionOverrideIsSet() {
-        createPeriodical(SearchVersion.withoutDistribution(Version.from(8, 0, 0)), SearchVersion.withoutDistribution(Version.from(7, 0, 0))).doRun();
+        createPeriodical(SearchVersion.elasticsearch(Version.from(8, 0, 0)), SearchVersion.elasticsearch(Version.from(7, 0, 0))).doRun();
 
         verifyNoInteractions(notificationService);
     }
@@ -61,7 +61,7 @@ class ESVersionCheckPeriodicalTest {
     @Test
     void doesNotDoAnythingIfVersionWasNotProbed() {
         returnProbedVersion(null);
-        createPeriodical(SearchVersion.withoutDistribution(Version.from(8, 0, 0))).doRun();
+        createPeriodical(SearchVersion.elasticsearch(Version.from(8, 0, 0))).doRun();
         verifyNoInteractions(notificationService);
     }
 
@@ -69,7 +69,7 @@ class ESVersionCheckPeriodicalTest {
     void createsNotificationIfCurrentVersionIsIncompatibleWithInitialOne() {
         returnProbedVersion(Version.from(9, 2, 3));
 
-        createPeriodical(SearchVersion.withoutDistribution(Version.from(8, 1, 2))).doRun();
+        createPeriodical(SearchVersion.elasticsearch(Version.from(8, 1, 2))).doRun();
 
         assertNotificationWasRaised();
     }
@@ -78,7 +78,7 @@ class ESVersionCheckPeriodicalTest {
     void createsNotificationIfCurrentVersionIncompatiblyOlderThanInitialOne() {
         returnProbedVersion(Version.from(6, 8, 1));
 
-        createPeriodical(SearchVersion.withoutDistribution(Version.from(8, 1, 2))).doRun();
+        createPeriodical(SearchVersion.elasticsearch(Version.from(8, 1, 2))).doRun();
 
         assertNotificationWasRaised();
     }
@@ -87,7 +87,7 @@ class ESVersionCheckPeriodicalTest {
     void fixesNotificationIfCurrentVersionIsIncompatibleWithInitialOne() {
         returnProbedVersion(Version.from(8, 2, 3));
 
-        createPeriodical(SearchVersion.withoutDistribution(Version.from(8, 1, 2))).doRun();
+        createPeriodical(SearchVersion.elasticsearch(Version.from(8, 1, 2))).doRun();
 
         assertNotificationWasFixed();
     }
@@ -107,7 +107,7 @@ class ESVersionCheckPeriodicalTest {
     }
 
     private void returnProbedVersion(@Nullable Version probedVersion) {
-        when(versionProbe.probe(anyCollection())).thenReturn(Optional.ofNullable(probedVersion).map(SearchVersion::withoutDistribution));
+        when(versionProbe.probe(anyCollection())).thenReturn(Optional.ofNullable(probedVersion).map(SearchVersion::elasticsearch));
     }
 
     private Periodical createPeriodical(SearchVersion initialVersion) {

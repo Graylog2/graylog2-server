@@ -24,7 +24,7 @@ public class MajorVersionConverter implements Converter<SearchVersion> {
     @Override
     public SearchVersion convertFrom(String value) {
         final int majorVersion = Integer.parseInt(value);
-        return SearchVersion.withoutDistribution(Version.from(majorVersion, 0, 0));
+        return SearchVersion.elasticsearch(Version.from(majorVersion, 0, 0));
     }
 
     @Override
