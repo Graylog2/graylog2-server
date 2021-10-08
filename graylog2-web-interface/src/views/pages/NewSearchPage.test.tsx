@@ -43,7 +43,6 @@ jest.mock('routing/withLocation', () => (x) => x);
 jest.mock('views/components/Search', () => jest.fn(() => <div>Extended search page</div>));
 jest.mock('components/common/PublicNotifications', () => mockComponent('PublicNotifications'));
 jest.mock('views/stores/SearchStore');
-jest.mock('views/logic/usePluginEntities');
 
 jest.mock('views/stores/ViewStatesStore', () => ({
   ViewStatesStore: {
@@ -128,7 +127,7 @@ describe('NewSearchPage', () => {
     });
 
     it('should display errors which occur when processing hooks', async () => {
-      asMock(processHooks).mockImplementation(() => Promise.reject(new Error('The Error')));
+      asMock(processHooks).mockImplementationOnce(() => Promise.reject(new Error('The Error')));
 
       render(<SimpleNewSearchPage location={mockLocation} />);
 
