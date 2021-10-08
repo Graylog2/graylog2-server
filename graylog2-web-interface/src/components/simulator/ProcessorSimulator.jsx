@@ -18,8 +18,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import naturalSort from 'javascript-natural-sort';
 
-import { Link } from 'components/graylog/router';
-import { Col, ControlLabel, FormGroup, HelpBlock, Panel, Row } from 'components/graylog';
+import { Link } from 'components/common/router';
+import { Col, ControlLabel, FormGroup, HelpBlock, Panel, Row } from 'components/bootstrap';
 import { Select } from 'components/common';
 import RawMessageLoader from 'components/messageloaders/RawMessageLoader';
 import Routes from 'routing/Routes';

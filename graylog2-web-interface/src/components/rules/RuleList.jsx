@@ -17,9 +17,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { LinkContainer, Link } from 'components/graylog/router';
+import { LinkContainer, Link } from 'components/common/router';
 import connect from 'stores/connect';
-import { Button, ButtonToolbar } from 'components/graylog';
+import { Button, ButtonToolbar } from 'components/bootstrap';
 import { DataTable, Timestamp } from 'components/common';
 import { MetricContainer, CounterRate } from 'components/metrics';
 import Routes from 'routing/Routes';

@@ -22,7 +22,7 @@ import { SizeMe } from 'react-sizeme';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import { OrderedSet } from 'immutable';
 
-import { Col, Row } from 'components/graylog';
+import { Col, Row } from 'components/bootstrap';
 import Query, { QueryId } from 'views/logic/queries/Query';
 import type { TitlesMap } from 'views/stores/TitleTypes';
 import ViewState from 'views/logic/views/ViewState';

@@ -17,7 +17,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Button } from 'components/graylog';
+import { Button } from 'components/bootstrap';
 import { Icon } from 'components/common';
 import { InputStaticFieldsStore } from 'stores/inputs/InputStaticFieldsStore';
 

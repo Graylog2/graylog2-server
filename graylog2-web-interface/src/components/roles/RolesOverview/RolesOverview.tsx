@@ -22,7 +22,7 @@ import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import type { PaginatedRoles } from 'actions/roles/AuthzRolesActions';
 import { AuthzRolesActions } from 'stores/roles/AuthzRolesStore';
 import { DataTable, Spinner, PaginatedList, EmptyResult } from 'components/common';
-import { Col, Row } from 'components/graylog';
+import { Col, Row } from 'components/bootstrap';
 
 import RolesOverviewItem from './RolesOverviewItem';
 import RolesFilter from './RolesFilter';

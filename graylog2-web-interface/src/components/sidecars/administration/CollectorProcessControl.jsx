@@ -19,9 +19,8 @@ import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 
-import { Button, Panel } from 'components/graylog';
+import { Button, Panel, BootstrapModalConfirm } from 'components/bootstrap';
 import { Pluralize, SelectPopover } from 'components/common';
-import { BootstrapModalConfirm } from 'components/bootstrap';
 
 const PROCESS_ACTIONS = ['start', 'restart', 'stop'];
 

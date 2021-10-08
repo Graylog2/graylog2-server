@@ -18,9 +18,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import { LinkContainer } from 'components/graylog/router';
-import { Row, Col, Button } from 'components/graylog';
-import { Input } from 'components/bootstrap';
+import { LinkContainer } from 'components/common/router';
+import { Row, Col, Button, Input } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
 import Routes from 'routing/Routes';
 import { LookupTableDataAdaptersActions } from 'stores/lookup-tables/LookupTableDataAdaptersStore';

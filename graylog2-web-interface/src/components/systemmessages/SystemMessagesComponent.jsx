@@ -16,7 +16,7 @@
  */
 import React from 'react';
 
-import { Col, Row } from 'components/graylog';
+import { Col, Row } from 'components/bootstrap';
 import { Pagination, Spinner } from 'components/common';
 import { SystemMessagesList } from 'components/systemmessages';
 import { SystemMessagesStore } from 'stores/systemmessages/SystemMessagesStore';

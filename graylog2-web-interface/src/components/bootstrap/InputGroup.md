@@ -1,5 +1,5 @@
 ```js
-import { FormControl, FormGroup, InputGroup, Button, DropdownButton, MenuItem } from 'components/graylog';
+import { FormControl, FormGroup, InputGroup, Button, DropdownButton, MenuItem } from 'components/bootstrap';
 import Icon from 'components/common/Icon';
 
 class FormExample extends React.Component {

@@ -18,10 +18,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import connect from 'stores/connect';
+import { RulesActions, RulesStore } from 'stores/rules/RulesStore';
 
 import RuleMetricsConfig from './RuleMetricsConfig';
-
-import { RulesActions, RulesStore } from 'stores/rules/RulesStore';
 
 class RuleMetricsConfigContainer extends React.Component {
   static propTypes = {

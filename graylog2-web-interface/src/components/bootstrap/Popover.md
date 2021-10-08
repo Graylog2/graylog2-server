@@ -13,7 +13,8 @@
 ```
 
 ```js
-import { ButtonToolbar, OverlayTrigger, Button, Popover } from 'components/graylog';
+import { ButtonToolbar, Button, Popover } from 'components/bootstrap';
+import { OverlayTrigger } from 'components/common';
 
 const popoverLeft = (
   <Popover id="popover-positioned-left" title="Popover left">

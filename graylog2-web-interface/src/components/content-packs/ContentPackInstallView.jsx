@@ -17,8 +17,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Row, Col } from 'components/graylog';
 import { Timestamp } from 'components/common';
+import { Row, Col } from 'components/bootstrap';
 import DateTime from 'logic/datetimes/DateTime';
 
 import 'components/content-packs/ContentPackDetails.css';

@@ -20,7 +20,7 @@ import PropTypes from 'prop-types';
 import { PublicNotificationsHooks } from 'theme/types';
 
 import usePluginEntities from 'views/logic/usePluginEntities';
-import { Alert, Button } from 'components/graylog';
+import { Alert, Button } from 'components/bootstrap';
 import AppConfig from 'util/AppConfig';
 
 interface Props {

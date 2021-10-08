@@ -19,7 +19,7 @@ import PropTypes from 'prop-types';
 import { Portal } from 'react-portal';
 import { Position } from 'react-overlays';
 
-import { Popover } from 'components/graylog';
+import { Popover } from 'components/bootstrap';
 
 import CustomPropTypes from '../CustomPropTypes';
 

@@ -17,7 +17,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Label } from 'components/graylog';
+import { Label } from 'components/bootstrap';
 
 class StreamStateBadge extends React.Component {
   static propTypes = {

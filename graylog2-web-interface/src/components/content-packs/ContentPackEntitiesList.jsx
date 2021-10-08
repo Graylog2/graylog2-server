@@ -17,7 +17,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Button, Modal, ButtonToolbar } from 'components/graylog';
+import { Button, Modal, ButtonToolbar } from 'components/bootstrap';
 import { SearchForm, DataTable, Icon } from 'components/common';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 

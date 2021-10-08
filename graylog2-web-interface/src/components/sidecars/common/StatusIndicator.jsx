@@ -18,8 +18,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 
-import { OverlayTrigger, Popover } from 'components/graylog';
-import { Icon } from 'components/common';
+import { Popover } from 'components/bootstrap';
+import { OverlayTrigger, Icon } from 'components/common';
 import SidecarStatusEnum from 'logic/sidecar/SidecarStatusEnum';
 import DateTime from 'logic/datetimes/DateTime';
 

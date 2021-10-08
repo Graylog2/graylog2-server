@@ -18,8 +18,8 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
-import { LinkContainer } from 'components/graylog/router';
-import { Row, Col, Button } from 'components/graylog';
+import { LinkContainer } from 'components/common/router';
+import { Row, Col, Button } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';

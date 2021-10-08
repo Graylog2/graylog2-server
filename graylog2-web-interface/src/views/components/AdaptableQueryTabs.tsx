@@ -20,10 +20,10 @@ import { useEffect, useMemo, useState, ReactNode } from 'react';
 import styled, { css } from 'styled-components';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 
+import { ModifiedNavDropdown as NavDropdown } from 'components/bootstrap/NavDropdown';
 import { QueryId } from 'views/logic/queries/Query';
 import QueryTitleEditModal from 'views/components/queries/QueryTitleEditModal';
-import { Nav, NavItem, MenuItem } from 'components/graylog';
-import { ModifiedNavDropdown as NavDropdown } from 'components/graylog/NavDropdown';
+import { Nav, NavItem, MenuItem } from 'components/bootstrap';
 import { Icon } from 'components/common';
 import QueryTitle from 'views/components/queries/QueryTitle';
 

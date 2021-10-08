@@ -18,7 +18,7 @@ import * as React from 'react';
 
 import UserOverview from 'logic/users/UserOverview';
 import { DataTable } from 'components/common';
-import { Col, Row } from 'components/graylog';
+import { Col, Row } from 'components/bootstrap';
 
 type Props = {
   adminUser: UserOverview,

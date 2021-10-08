@@ -18,10 +18,9 @@ import PropTypes from 'prop-types';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 
 import { useStore } from 'stores/connect';
-import { Link } from 'components/graylog/router';
-import { Button, ControlLabel, FormGroup } from 'components/graylog';
+import { Link } from 'components/common/router';
 import { SelectableList } from 'components/common';
-import { BootstrapModalForm, Input } from 'components/bootstrap';
+import { Button, ControlLabel, FormGroup, BootstrapModalForm, Input } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
 import Routes from 'routing/Routes';
 import { PipelineType, StageType } from 'stores/pipelines/PipelinesStore';

@@ -1,6 +1,6 @@
 ```js
 import createReactClass from 'create-react-class';
-import { Button } from 'components/graylog';
+import { Button } from 'components/bootstrap';
 
 const items = [
   'Black',
@@ -49,7 +49,7 @@ const SelectPopoverExample = createReactClass({
 
 ```js
 import createReactClass from 'create-react-class';
-import { Button, Badge } from 'components/graylog';
+import { Button, Badge } from 'components/bootstrap';
 import { Icon } from 'components/common';
 
 const items = [

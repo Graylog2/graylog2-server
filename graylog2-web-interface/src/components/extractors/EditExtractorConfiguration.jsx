@@ -17,7 +17,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Col, Panel } from 'components/graylog';
+import { Col, Panel } from 'components/bootstrap';
 import {
   CopyInputExtractorConfiguration,
   GrokExtractorConfiguration,

@@ -17,7 +17,7 @@
 /* eslint-disable react/no-unescaped-entities, no-template-curly-in-string */
 import React from 'react';
 
-import { Alert, Col, Row } from 'components/graylog';
+import { Alert, Col, Row } from 'components/bootstrap';
 
 const HTTPJSONPathAdapterDocumentation = () => {
   const exampleJSON = `{

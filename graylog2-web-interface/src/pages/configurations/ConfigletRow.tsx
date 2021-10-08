@@ -17,7 +17,7 @@
 
 import styled from 'styled-components';
 
-import { Row } from 'components/graylog';
+import { Row } from 'components/bootstrap';
 
 const ConfigletRow = styled(Row)`
   .deflist {

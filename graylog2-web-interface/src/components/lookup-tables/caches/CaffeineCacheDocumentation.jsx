@@ -17,7 +17,7 @@
 /* eslint-disable react/no-unescaped-entities */
 import React from 'react';
 
-import { Alert } from 'components/graylog';
+import { Alert } from 'components/bootstrap';
 
 class CaffeineCacheDocumentation extends React.Component {
   render() {

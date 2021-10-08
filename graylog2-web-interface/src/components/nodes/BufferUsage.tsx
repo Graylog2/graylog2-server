@@ -19,13 +19,14 @@ import * as React from 'react';
 import { useEffect } from 'react';
 import styled, { css } from 'styled-components';
 
-import { LinkContainer } from 'components/graylog/router';
-import { Button, ProgressBar } from 'components/graylog';
 import Routes from 'routing/Routes';
 import NumberUtils from 'util/NumberUtils';
-import { Spinner } from 'components/common';
 import { useStore } from 'stores/connect';
 import { MetricsActions, MetricsStore, GaugeMetric } from 'stores/metrics/MetricsStore';
+
+import { Button } from '../bootstrap';
+import { ProgressBar, Spinner } from '../common';
+import { LinkContainer } from '../common/router';
 
 const NodeBufferUsage = styled.div(({ theme }) => css`
   margin-top: ${theme.spacings.sm};

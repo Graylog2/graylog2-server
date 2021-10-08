@@ -22,7 +22,7 @@ import moment from 'moment';
 import {} from 'moment-duration-format';
 import naturalSort from 'javascript-natural-sort';
 
-import { Alert, Col, Row } from 'components/graylog';
+import { Alert, Col, Row } from 'components/bootstrap';
 import { isPermitted } from 'util/PermissionsMixin';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 

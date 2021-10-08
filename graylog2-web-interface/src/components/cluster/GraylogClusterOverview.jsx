@@ -22,7 +22,7 @@ import ReactDOM from 'react-dom';
 import Reflux from 'reflux';
 import _ from 'lodash';
 
-import { Col, Row } from 'components/graylog';
+import { Col, Row } from 'components/bootstrap';
 import { Spinner } from 'components/common';
 import NumberUtils from 'util/NumberUtils';
 import EventHandlersThrottler from 'util/EventHandlersThrottler';

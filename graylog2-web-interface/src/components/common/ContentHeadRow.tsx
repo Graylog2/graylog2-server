@@ -19,7 +19,7 @@ import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import classNames from 'classnames';
 
-import { Row } from 'components/graylog';
+import { Row } from 'components/bootstrap';
 
 const StyledRow = styled(Row)(({ theme }) => css`
   padding-bottom: 0;
