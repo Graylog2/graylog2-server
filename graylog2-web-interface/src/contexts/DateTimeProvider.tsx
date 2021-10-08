@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useContext } from 'react';
+import { useCallback, useMemo, useContext } from 'react';
 import moment from 'moment-timezone';
 
 import DateTimeContext, { DateTimeContextType } from 'contexts/DateTimeContext';
@@ -38,29 +38,26 @@ export const ACCEPTED_FORMATS = {
   ISO_8601: 'YYYY-MM-DDTHH:mm:ss.SSSZ', // Standard, but not really nice to read. Mostly used for machine communication
 };
 
+const getUserTimezone = (userTimezone) => {
+  return userTimezone ?? moment.tz.guess() ?? AppConfig.rootTimeZone() ?? 'UTC';
+};
+
 /**
  * Provides a function to convert a ACCEPTED_FORMAT of a timestamp into a timestamp converted to the users timezone.
  * @param children React components.
  */
 const DateTimeProvider = ({ children }: Props) => {
   const currentUser = useContext(CurrentUserContext);
-
-  const getUserTimezone = useCallback(() => {
-    if (currentUser?.timezone) {
-      return currentUser.timezone;
-    }
-
-    return moment.tz.guess() || AppConfig.rootTimeZone() || 'UTC';
-  }, [currentUser.timezone]);
+  const userTimezone = useMemo(() => getUserTimezone(currentUser?.timezone), [currentUser?.timezone]);
 
   const unifyTime = useCallback((time) => {
-    const dateTime = moment.tz(time.trim(), Object.values(ACCEPTED_FORMATS), true, getUserTimezone());
+    const dateTime = moment.tz(time.trim(), Object.values(ACCEPTED_FORMATS), true, userTimezone);
 
-    return dateTime.format(ACCEPTED_FORMATS.TIMESTAMP_TZ);
-  }, [getUserTimezone]);
+    return dateTime.format(ACCEPTED_FORMATS.TIMESTAMP);
+  }, [userTimezone]);
 
   return (
-    <DateTimeContext.Provider value={{ unifyTime }}>
+    <DateTimeContext.Provider value={{ unifyTime, userTimezone }}>
       {children}
     </DateTimeContext.Provider>
   );

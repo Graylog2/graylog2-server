@@ -70,7 +70,7 @@ describe('TimerangeInfo', () => {
   const widget = Widget.empty();
 
   const SUT = (props) => (
-    <DateTimeContext.Provider value={{ unifyTime: (str) => str }}>
+    <DateTimeContext.Provider value={{ unifyTime: (str) => str, userTimezone: 'UTC' }}>
       <TimerangeInfo {...props} />
     </DateTimeContext.Provider>
   );

@@ -20,6 +20,7 @@ import { singleton } from 'logic/singleton';
 
 export type DateTimeContextType = {
   unifyTime: (string) => string,
+  userTimezone: string,
 };
 
 const DateTimeContext = React.createContext<DateTimeContextType | undefined>(undefined);
