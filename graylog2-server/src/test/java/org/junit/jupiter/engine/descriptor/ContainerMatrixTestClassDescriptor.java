@@ -26,7 +26,7 @@ public class ContainerMatrixTestClassDescriptor extends ClassBasedTestDescriptor
 
     public ContainerMatrixTestClassDescriptor(TestDescriptor parent, Class<?> testClass, JupiterConfiguration configuration, String esVersion, String mongoVersion) {
         super(
-                parent.getUniqueId().append("class", testClass.getName() + "_" + esVersion + "_" + mongoVersion),
+                parent.getUniqueId().append(SEGMENT_TYPE, testClass.getName() + "_" + esVersion + "_" + mongoVersion),
                 testClass,
                 determineDisplayName(testClass, esVersion, mongoVersion),
                 configuration
@@ -60,5 +60,18 @@ public class ContainerMatrixTestClassDescriptor extends ClassBasedTestDescriptor
                                                  ExtensionRegistry registry, ExtensionRegistrar registrar, ExtensionContext extensionContext,
                                                  ThrowableCollector throwableCollector) {
         return instantiateTestClass(Optional.empty(), registry, extensionContext);
+    }
+
+    @Override
+    public JupiterEngineExecutionContext prepare(JupiterEngineExecutionContext context) {
+        return super.prepare(context);
+    }
+
+    public String getEsVersion() {
+        return esVersion;
+    }
+
+    public String getMongoVersion() {
+        return mongoVersion;
     }
 }

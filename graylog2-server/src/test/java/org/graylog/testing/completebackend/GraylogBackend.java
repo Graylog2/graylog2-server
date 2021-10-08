@@ -34,7 +34,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-public class GraylogBackend {
+public class GraylogBackend implements AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(GraylogBackend.class);
     private final Network network;
     private final ElasticsearchInstance es;
@@ -155,6 +155,11 @@ public class GraylogBackend {
         return this.network;
     }
 
+    public MongoDBInstance mongoDB() {
+        return mongodb;
+    }
+
+    @Override
     public void close() {
         node.close();
         mongodb.close();

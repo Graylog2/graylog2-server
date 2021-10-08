@@ -1,29 +1,31 @@
 package org.junit.jupiter.engine.discovery;
 
-import org.graylog.testing.containermatrix.descriptors.ContainerMatrixTestsDescriptor;
 import org.graylog.testing.containermatrix.discovery.IsContainerMatrixTestClass;
 import org.junit.jupiter.engine.descriptor.ContainerMatrixEngineDescriptor;
+import org.junit.jupiter.engine.descriptor.ContainerMatrixTestsDescriptor;
 import org.junit.platform.engine.EngineDiscoveryRequest;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.support.discovery.EngineDiscoveryRequestResolver;
 
 public class ContainerMatrixTestsDiscoverySelectorResolver {
+    private final ContainerMatrixEngineDescriptor engineDescriptor;
 
-    // @formatter:off
-    private static final EngineDiscoveryRequestResolver<ContainerMatrixTestsDescriptor> resolver = EngineDiscoveryRequestResolver.<ContainerMatrixTestsDescriptor>builder()
-            .addClassContainerSelectorResolver(new IsContainerMatrixTestClass())
-            .addSelectorResolver(context -> new ContainerMatrixClassSelectorResolver(context.getClassNameFilter(), context.getEngineDescriptor().getConfiguration()))
-            .addSelectorResolver(context -> new ContainerMatrixMethodSelectorResolver(context.getEngineDescriptor().getConfiguration()))
-            .addTestDescriptorVisitor(context -> new MethodOrderingVisitor(context.getEngineDescriptor().getConfiguration()))
-            .addTestDescriptorVisitor(context -> TestDescriptor::prune)
-            .build();
-    // @formatter:on
+    public ContainerMatrixTestsDiscoverySelectorResolver(ContainerMatrixEngineDescriptor engineDescriptor) {
+        this.engineDescriptor = engineDescriptor;
+    }
 
-    public void resolveSelectors(EngineDiscoveryRequest request, ContainerMatrixEngineDescriptor engineDescriptor) {
-        // ToDo: find all Annotations for VM Lifecycle
-        // for every combination, resolve
-        // add to engineDescriptor
-        resolver.resolve(request, engineDescriptor);
-        engineDescriptor.addChild();
+    // add all Tests to the intermediate ContainerMatrixTestsDescriptor container
+    public void resolveSelectors(final EngineDiscoveryRequest request, final ContainerMatrixTestsDescriptor testsDescriptor) {
+        // @formatter:off
+        final EngineDiscoveryRequestResolver<ContainerMatrixTestsDescriptor> resolver = EngineDiscoveryRequestResolver.<ContainerMatrixTestsDescriptor>builder()
+                .addClassContainerSelectorResolver(new IsContainerMatrixTestClass(testsDescriptor))
+                .addSelectorResolver(context -> new ContainerMatrixClassSelectorResolver(context.getClassNameFilter(), engineDescriptor.getConfiguration(), testsDescriptor))
+                .addSelectorResolver(context -> new ContainerMatrixMethodSelectorResolver(engineDescriptor.getConfiguration(), testsDescriptor))
+                .addTestDescriptorVisitor(context -> new MethodOrderingVisitor(engineDescriptor.getConfiguration()))
+                .addTestDescriptorVisitor(context -> TestDescriptor::prune)
+                .build();
+        // @formatter:on
+
+        resolver.resolve(request, testsDescriptor);
     }
 }

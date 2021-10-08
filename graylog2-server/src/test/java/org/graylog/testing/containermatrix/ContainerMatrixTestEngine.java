@@ -1,58 +1,33 @@
-/*
- * Copyright (C) 2020 Graylog, Inc.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the Server Side Public License, version 1,
- * as published by MongoDB, Inc.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * Server Side Public License for more details.
- *
- * You should have received a copy of the Server Side Public License
- * along with this program. If not, see
- * <http://www.mongodb.com/licensing/server-side-public-license>.
- */
 package org.graylog.testing.containermatrix;
 
+import org.graylog.testing.completebackend.Lifecycle;
+import org.graylog.testing.completebackend.MavenProjectDirProvider;
+import org.graylog.testing.completebackend.PluginJarsProvider;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
-import org.graylog.testing.containermatrix.descriptors.ContainerMatrixTestClassDescriptor;
-import org.graylog.testing.containermatrix.descriptors.ContainerMatrixTestsDescriptor;
-import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
-import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
-import org.junit.jupiter.api.extension.ConditionEvaluationResult;
+import org.junit.jupiter.engine.config.CachingJupiterConfiguration;
+import org.junit.jupiter.engine.config.DefaultJupiterConfiguration;
+import org.junit.jupiter.engine.config.JupiterConfiguration;
 import org.junit.jupiter.engine.descriptor.ContainerMatrixEngineDescriptor;
+import org.junit.jupiter.engine.descriptor.ContainerMatrixTestsDescriptor;
+import org.junit.jupiter.engine.discovery.ContainerMatrixTestsDiscoverySelectorResolver;
+import org.junit.jupiter.engine.execution.JupiterEngineExecutionContext;
+import org.junit.jupiter.engine.support.JupiterThrowableCollectorFactory;
 import org.junit.platform.commons.support.AnnotationSupport;
-import org.junit.platform.commons.support.ReflectionSupport;
-import org.junit.platform.commons.util.Preconditions;
-import org.junit.platform.commons.util.ReflectionUtils;
 import org.junit.platform.engine.EngineDiscoveryRequest;
 import org.junit.platform.engine.ExecutionRequest;
 import org.junit.platform.engine.TestDescriptor;
-import org.junit.platform.engine.TestEngine;
 import org.junit.platform.engine.UniqueId;
-import org.junit.platform.engine.discovery.ClassNameFilter;
-import org.junit.platform.engine.discovery.ClassSelector;
-import org.junit.platform.engine.discovery.ClasspathRootSelector;
-import org.junit.platform.engine.discovery.PackageSelector;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.junit.platform.engine.support.hierarchical.ContainerMatrixHierarchicalTestEngine;
+import org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutorService;
+import org.junit.platform.engine.support.hierarchical.ThrowableCollector;
+import org.reflections.Reflections;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedHashSet;
-import java.util.List;
+import java.util.Optional;
 import java.util.Set;
-import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
-import static org.graylog2.shared.utilities.StringUtils.f;
-import static org.junit.jupiter.api.extension.ConditionEvaluationResult.disabled;
-import static org.junit.jupiter.api.extension.ConditionEvaluationResult.enabled;
-
-public class ContainerMatrixTestEngine implements TestEngine {
-    private static final Logger LOG = LoggerFactory.getLogger(ContainerMatrixTestEngine.class);
-
+public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEngine<JupiterEngineExecutionContext> {
     private static final String ENGINE_ID = "graylog-container-matrix-tests";
 
     @Override
@@ -60,150 +35,135 @@ public class ContainerMatrixTestEngine implements TestEngine {
         return ENGINE_ID;
     }
 
-    public static ConditionEvaluationResult evaluate(DisabledIfEnvironmentVariable annotation) {
-        String name = annotation.named().trim();
-        String regex = annotation.matches();
-        Preconditions.notBlank(name, () -> "The 'named' attribute must not be blank in " + annotation);
-        Preconditions.notBlank(regex, () -> "The 'matches' attribute must not be blank in " + annotation);
-        String actual = getEnvironmentVariable(name);
-
-        // Nothing to match against?
-        if (actual == null) {
-            return enabled(f("Environment variable [%s] does not exist", name));
-        }
-
-        if (actual.matches(regex)) {
-            return disabled(f("Environment variable [%s] with value [%s] matches regular expression [%s]", name,
-                    actual, regex), annotation.disabledReason());
-        }
-        // else
-        return enabled(f("Environment variable [%s] with value [%s] does not match regular expression [%s]", name,
-                actual, regex));
+    private Set<Class<? extends MavenProjectDirProvider>> getMavenProjectDirProvider(Set<Class<?>> annotatedClasses) {
+        return annotatedClasses
+                .stream()
+                .map(aClass -> AnnotationSupport.findAnnotation(aClass, ContainerMatrixTestsConfiguration.class))
+                .filter(Optional::isPresent)
+                .flatMap(annotation -> Arrays.asList(annotation.get().mavenProjectDirProvider()).stream())
+                .collect(Collectors.toSet());
     }
 
-    public static ConditionEvaluationResult evaluate(EnabledIfEnvironmentVariable annotation) {
-
-        String name = annotation.named().trim();
-        String regex = annotation.matches();
-        Preconditions.notBlank(name, () -> "The 'named' attribute must not be blank in " + annotation);
-        Preconditions.notBlank(regex, () -> "The 'matches' attribute must not be blank in " + annotation);
-        String actual = getEnvironmentVariable(name);
-
-        // Nothing to match against?
-        if (actual == null) {
-            return disabled(f("Environment variable [%s] does not exist", name), annotation.disabledReason());
-        }
-        if (actual.matches(regex)) {
-            return enabled(f("Environment variable [%s] with value [%s] matches regular expression [%s]", name,
-                    actual, regex));
-        }
-        return disabled(f("Environment variable [%s] with value [%s] does not match regular expression [%s]", name,
-                actual, regex), annotation.disabledReason());
+    private Set<Class<? extends PluginJarsProvider>> getPluginJarsProvider(Set<Class<?>> annotatedClasses) {
+        return annotatedClasses
+                .stream()
+                .map(aClass -> AnnotationSupport.findAnnotation(aClass, ContainerMatrixTestsConfiguration.class))
+                .filter(Optional::isPresent)
+                .flatMap(annotation -> Arrays.asList(annotation.get().pluginJarsProvider()).stream())
+                .collect(Collectors.toSet());
     }
 
-    /**
-     * Get the value of the named environment variable.
-     *
-     * <p>The default implementation simply delegates to
-     * {@link System#getenv(String)}. Can be overridden in a subclass for
-     * testing purposes.
-     */
-    protected static String getEnvironmentVariable(String name) {
-        return System.getenv(name);
+
+    private Set<String> getEsVersions(Set<Class<?>> annotatedClasses) {
+        return annotatedClasses
+                .stream()
+                .map(aClass -> AnnotationSupport.findAnnotation(aClass, ContainerMatrixTestsConfiguration.class))
+                .filter(Optional::isPresent)
+                .flatMap(annotation -> Arrays.asList(annotation.get().esVersions()).stream())
+                .collect(Collectors.toSet());
     }
 
-    private static final Predicate<Class<?>> IS_CANDIDATE = classCandidate -> {
-        if (ReflectionUtils.isAbstract(classCandidate)) {
-            return false;
+    private Set<String> getMongoVersions(Set<Class<?>> annotatedClasses) {
+        return annotatedClasses
+                .stream()
+                .map(aClass -> AnnotationSupport.findAnnotation(aClass, ContainerMatrixTestsConfiguration.class))
+                .filter(Optional::isPresent)
+                .flatMap(annotation -> Arrays.asList(annotation.get().mongoVersions()).stream())
+                .collect(Collectors.toSet());
+    }
+
+    private Set<Integer> getExtraPorts(Set<Class<?>> annotatedClasses) {
+        return annotatedClasses
+                .stream()
+                .map(aClass -> AnnotationSupport.findAnnotation(aClass, ContainerMatrixTestsConfiguration.class))
+                .filter(Optional::isPresent)
+                .flatMap(annotation -> Arrays.stream(annotation.get().extraPorts()).boxed())
+                .collect(Collectors.toSet());
+    }
+
+    private <T> T instantiateFactory(Class<? extends T> providerClass) {
+        try {
+            return providerClass.newInstance();
+        } catch (InstantiationException | IllegalAccessException e) {
+            throw new RuntimeException("Unable to construct instance of " + providerClass.getSimpleName() + ": ", e);
         }
-        if (ReflectionUtils.isPrivate(classCandidate)) {
-            return false;
-        }
-        if (AnnotationSupport.isAnnotated(classCandidate, ContainerMatrixTestsConfiguration.class)) {
-            if (AnnotationSupport.isAnnotated(classCandidate, EnabledIfEnvironmentVariable.class)) {
-                return AnnotationSupport
-                        .findAnnotation(classCandidate, EnabledIfEnvironmentVariable.class).map(a -> !evaluate(a).isDisabled())
-                        .orElseThrow(() -> new RuntimeException("Annotation should exist - it has been checked for the given class before..."));
-            }
-            if (AnnotationSupport.isAnnotated(classCandidate, DisabledIfEnvironmentVariable.class)) {
-                return AnnotationSupport
-                        .findAnnotation(classCandidate, DisabledIfEnvironmentVariable.class).map(a -> !evaluate(a).isDisabled())
-                        .orElseThrow(() -> new RuntimeException("Annotation should exist - it has been checked for the given class before..."));
-            }
-            return true;
-        }
-        return false;
-    };
+    }
 
     @Override
-    public TestDescriptor discover(final EngineDiscoveryRequest request, final UniqueId uniqueId) {
-        final ContainerMatrixEngineDescriptor engineDescriptor = new ContainerMatrixEngineDescriptor(uniqueId, "Graylog Container Matrix Tests", null);
+    public TestDescriptor discover(EngineDiscoveryRequest discoveryRequest, UniqueId uniqueId) {
+        JupiterConfiguration configuration = new CachingJupiterConfiguration(
+                new DefaultJupiterConfiguration(discoveryRequest.getConfigurationParameters()));
+        final ContainerMatrixEngineDescriptor engineDescriptor = new ContainerMatrixEngineDescriptor(uniqueId, "Graylog Container Matrix Tests", configuration);
 
-        // ClasspathRootSelector used by IntelliJ when starting tests via the GUI
-        request.getSelectorsByType(ClasspathRootSelector.class).forEach(selector -> appendTestsInClasspath(request, selector, engineDescriptor));
-        // PackageSelector not used by IntelliJ, but left in because it was in the example that I used to bootstrap this code
-        request.getSelectorsByType(PackageSelector.class).forEach(selector -> appendTestsInPackage(selector.getPackageName(), engineDescriptor));
-        // ClassSelector used by IntelliJ when starting tests via the GUI
-        request.getSelectorsByType(ClassSelector.class).forEach(selector -> appendTestsInClass(selector.getJavaClass(), engineDescriptor));
+        Reflections reflections = new Reflections("org.graylog", "org.graylog2");
+        final Set<Class<?>> annotated = reflections.getTypesAnnotatedWith(ContainerMatrixTestsConfiguration.class);
+        final Set<Integer> extraPorts = getExtraPorts(annotated);
+
+        // create all combinations of tests, first differentiate for maven builds
+        getMavenProjectDirProvider(annotated)
+                .forEach(mavenProjectDirProvider -> getPluginJarsProvider(annotated)
+                        .forEach(pluginJarsProvider -> {
+                                    MavenProjectDirProvider mpdp = instantiateFactory(mavenProjectDirProvider);
+                                    PluginJarsProvider pjp = instantiateFactory(pluginJarsProvider);
+                                    // now add all grouped tests for Lifecycle.VM
+                                    getEsVersions(annotated)
+                                            .forEach(esVersion -> getMongoVersions(annotated)
+                                                    .forEach(mongoVersion -> {
+                                                        ContainerMatrixTestsDescriptor testsDescriptor = new ContainerMatrixTestsDescriptor(engineDescriptor,
+                                                                Lifecycle.VM,
+                                                                mavenProjectDirProvider,
+                                                                mpdp.getUniqueId(),
+                                                                pluginJarsProvider,
+                                                                pjp.getUniqueId(),
+                                                                esVersion,
+                                                                mongoVersion,
+                                                                extraPorts);
+                                                        new ContainerMatrixTestsDiscoverySelectorResolver(engineDescriptor).resolveSelectors(discoveryRequest, testsDescriptor);
+                                                        engineDescriptor.addChild(testsDescriptor);
+                                                    })
+                                            );
+                                    // add separate test classes (Lifecycle.CLASS)
+                                    getEsVersions(annotated)
+                                            .forEach(esVersion -> getMongoVersions(annotated)
+                                                    .forEach(mongoVersion -> {
+                                                        ContainerMatrixTestsDescriptor testsDescriptor = new ContainerMatrixTestsDescriptor(engineDescriptor,
+                                                                Lifecycle.CLASS,
+                                                                mavenProjectDirProvider,
+                                                                mpdp.getUniqueId(),
+                                                                pluginJarsProvider,
+                                                                pjp.getUniqueId(),
+                                                                esVersion,
+                                                                mongoVersion,
+                                                                extraPorts);
+                                                        new ContainerMatrixTestsDiscoverySelectorResolver(engineDescriptor).resolveSelectors(discoveryRequest, testsDescriptor);
+                                                        engineDescriptor.addChild(testsDescriptor);
+                                                    })
+                                            );
+                                }
+                        )
+                );
 
         return engineDescriptor;
     }
 
-    private void appendTestsInClasspath(final EngineDiscoveryRequest request, final ClasspathRootSelector classpathRootSelector, final ContainerMatrixEngineDescriptor engineDescriptor) {
-        final List<Predicate<String>> allPredicates = new ArrayList<>();
-        // only ClassNameFilter is used by IntelliJ, maybe PackageNameFilter is used by other IDEs? The following line is only left in as an example
-        // request.getFiltersByType(PackageNameFilter.class).forEach(filter -> allPredicates.add(filter.toPredicate()));
-        request.getFiltersByType(ClassNameFilter.class).forEach(filter -> allPredicates.add(filter.toPredicate()));
-        Predicate<String> combined = allPredicates.stream().reduce(x -> true, Predicate::and);
-
-        ReflectionSupport.findAllClassesInClasspathRoot(classpathRootSelector.getClasspathRoot(), IS_CANDIDATE, combined)
-                .forEach(aClass -> appendTestsInClass(aClass, engineDescriptor));
-    }
-
-    private void appendTestsInPackage(final String packageName, final ContainerMatrixEngineDescriptor engineDescriptor) {
-        ReflectionSupport.findAllClassesInPackage(packageName, IS_CANDIDATE, name -> true)
-                .forEach(aClass -> appendTestsInClass(aClass, engineDescriptor));
-    }
-
-    private void appendTestsInClass(final Class<?> javaClass, final ContainerMatrixEngineDescriptor engineDescriptor) {
-        if (IS_CANDIDATE.test(javaClass)) {
-            // Annotation must exist here -> IS_CANDIDATE predicate checks this
-            ContainerMatrixTestsConfiguration configuration = AnnotationSupport
-                    .findAnnotation(javaClass, ContainerMatrixTestsConfiguration.class)
-                    .orElseThrow(() -> new RuntimeException("Annotation should exist - it has been checked for the given class before..."));
-            // convert to set to make sure that versions are unique and not listed multiple times, use LinkedHashSet to preserve order
-            Set<String> esVersions = new LinkedHashSet<>(Arrays.asList(configuration.esVersions()));
-            Set<String> mongoVersions = new LinkedHashSet<>(Arrays.asList(configuration.mongoVersions()));
-
-            ContainerMatrixTestsDescriptor containerMatrixTestsDescriptor = findOrCreateDescriptor(engineDescriptor, configuration);
-            containerMatrixTestsDescriptor.addExtraPorts(configuration.extraPorts());
-            esVersions.forEach(esVersion -> mongoVersions.forEach(mongoVersion ->
-                    containerMatrixTestsDescriptor.addChild(new ContainerMatrixTestClassDescriptor(javaClass, engineDescriptor, esVersion, mongoVersion))
-            ));
-        }
-    }
-
-    private ContainerMatrixTestsDescriptor createNewDescriptor(ContainerMatrixEngineDescriptor engineDescriptor, ContainerMatrixTestsConfiguration configuration) {
-        ContainerMatrixTestsDescriptor containerMatrixTestsDescriptor = new ContainerMatrixTestsDescriptor(engineDescriptor, configuration.serverLifecycle(), configuration.mavenProjectDirProvider(), configuration.pluginJarsProvider());
-        engineDescriptor.addChild(containerMatrixTestsDescriptor);
-        return containerMatrixTestsDescriptor;
-    }
-
-    private ContainerMatrixTestsDescriptor findOrCreateDescriptor(final ContainerMatrixEngineDescriptor engineDescriptor, final ContainerMatrixTestsConfiguration configuration) {
-        // for the given configuration, reuse/add to an existing descriptor
-        return (ContainerMatrixTestsDescriptor) engineDescriptor
-                .getChildren()
-                .stream()
-                .filter(child -> child instanceof ContainerMatrixTestsDescriptor)
-                .map(child -> (ContainerMatrixTestsDescriptor) child)
-                .filter(child -> child.is(configuration))
-                .findFirst()
-                .orElse(createNewDescriptor(engineDescriptor, configuration));
+    @Override
+    protected HierarchicalTestExecutorService createExecutorService(ExecutionRequest request) {
+        return super.createExecutorService(request);
     }
 
     @Override
-    public void execute(ExecutionRequest request) {
-        TestDescriptor root = request.getRootTestDescriptor();
-        new ContainerMatrixTestExecutor().execute(request, root);
+    protected JupiterEngineExecutionContext createExecutionContext(ExecutionRequest request) {
+        return new JupiterEngineExecutionContext(request.getEngineExecutionListener(),
+                getJupiterConfiguration(request));
+    }
+
+    @Override
+    protected ThrowableCollector.Factory createThrowableCollectorFactory(ExecutionRequest request) {
+        return JupiterThrowableCollectorFactory::createThrowableCollector;
+    }
+
+    private JupiterConfiguration getJupiterConfiguration(ExecutionRequest request) {
+        ContainerMatrixEngineDescriptor engineDescriptor = (ContainerMatrixEngineDescriptor) request.getRootTestDescriptor();
+        return engineDescriptor.getConfiguration();
     }
 }

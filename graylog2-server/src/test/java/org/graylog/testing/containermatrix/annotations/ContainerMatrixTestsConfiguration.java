@@ -19,10 +19,12 @@ package org.graylog.testing.containermatrix.annotations;
 
 import org.graylog.testing.completebackend.DefaultMavenProjectDirProvider;
 import org.graylog.testing.completebackend.DefaultPluginJarsProvider;
+import org.graylog.testing.completebackend.GraylogBackendExtension;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.MavenProjectDirProvider;
 import org.graylog.testing.completebackend.PluginJarsProvider;
 import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.platform.commons.annotation.Testable;
 
 import java.lang.annotation.Retention;
@@ -39,6 +41,7 @@ import static org.graylog.testing.containermatrix.ContainerVersions.DEFAULT_MONG
 @Target({TYPE})
 @Retention(RUNTIME)
 @Tag("integration")
+@ExtendWith(GraylogBackendExtension.class)
 @Testable
 public @interface ContainerMatrixTestsConfiguration {
     // combination rule

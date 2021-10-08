@@ -3,6 +3,7 @@ package org.junit.jupiter.engine.discovery;
 import org.graylog.testing.containermatrix.discovery.IsContainerMatrixTestClass;
 import org.junit.jupiter.engine.config.JupiterConfiguration;
 import org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor;
+import org.junit.jupiter.engine.descriptor.ContainerMatrixTestsDescriptor;
 import org.junit.jupiter.engine.descriptor.Filterable;
 import org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor;
 import org.junit.jupiter.engine.discovery.predicates.IsContainerMatrixTest;
@@ -41,13 +42,13 @@ public class ContainerMatrixMethodSelectorResolver implements SelectorResolver {
 
     private static final Logger logger = LoggerFactory.getLogger(MethodSelectorResolver.class);
     private static final MethodFinder methodFinder = new MethodFinder();
-    private static final Predicate<Class<?>> testClassPredicate = new IsContainerMatrixTestClass().or(
-            new IsNestedTestClass());
+    private final Predicate<Class<?>> testClassPredicate;
 
     protected final JupiterConfiguration configuration;
 
-    ContainerMatrixMethodSelectorResolver(JupiterConfiguration configuration) {
+    ContainerMatrixMethodSelectorResolver(JupiterConfiguration configuration, final ContainerMatrixTestsDescriptor testsDescriptor) {
         this.configuration = configuration;
+        this.testClassPredicate = new IsContainerMatrixTestClass(testsDescriptor).or(new IsNestedTestClass());
     }
 
     @Override

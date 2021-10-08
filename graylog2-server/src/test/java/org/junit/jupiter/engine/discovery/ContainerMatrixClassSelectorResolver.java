@@ -1,16 +1,13 @@
 package org.junit.jupiter.engine.discovery;
 
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
-import org.graylog.testing.containermatrix.descriptors.ContainerMatrixTestsDescriptor;
 import org.graylog.testing.containermatrix.discovery.IsContainerMatrixTestClass;
 import org.junit.jupiter.engine.config.JupiterConfiguration;
 import org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor;
-import org.junit.jupiter.engine.descriptor.ContainerMatrixEngineDescriptor;
 import org.junit.jupiter.engine.descriptor.ContainerMatrixTestClassDescriptor;
+import org.junit.jupiter.engine.descriptor.ContainerMatrixTestsDescriptor;
 import org.junit.jupiter.engine.descriptor.NestedClassTestDescriptor;
 import org.junit.jupiter.engine.discovery.predicates.IsNestedTestClass;
 import org.junit.jupiter.engine.discovery.predicates.IsTestClassWithTests;
-import org.junit.platform.commons.support.AnnotationSupport;
 import org.junit.platform.commons.util.ReflectionUtils;
 import org.junit.platform.engine.DiscoverySelector;
 import org.junit.platform.engine.TestDescriptor;
@@ -23,7 +20,6 @@ import org.junit.platform.engine.support.discovery.SelectorResolver;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
@@ -43,15 +39,16 @@ import static org.junit.platform.engine.support.discovery.SelectorResolver.Resol
 
 public class ContainerMatrixClassSelectorResolver implements SelectorResolver {
 
-    private static final IsTestClassWithTests isTestClassWithTests = new IsContainerMatrixTestClass();
+    private final IsTestClassWithTests isTestClassWithTests;
     private static final IsNestedTestClass isNestedTestClass = new IsNestedTestClass();
 
     private final Predicate<String> classNameFilter;
     private final JupiterConfiguration configuration;
 
-    ContainerMatrixClassSelectorResolver(Predicate<String> classNameFilter, JupiterConfiguration configuration) {
+    ContainerMatrixClassSelectorResolver(Predicate<String> classNameFilter, JupiterConfiguration configuration, final ContainerMatrixTestsDescriptor testsDescriptor) {
         this.classNameFilter = classNameFilter;
         this.configuration = configuration;
+        this.isTestClassWithTests = new IsContainerMatrixTestClass(testsDescriptor);
     }
 
     @Override
@@ -106,51 +103,35 @@ public class ContainerMatrixClassSelectorResolver implements SelectorResolver {
         return unresolved();
     }
 
-    private ContainerMatrixTestsDescriptor createNewDescriptor(ContainerMatrixEngineDescriptor engineDescriptor, ContainerMatrixTestsConfiguration configuration) {
-        ContainerMatrixTestsDescriptor containerMatrixTestsDescriptor = new ContainerMatrixTestsDescriptor(engineDescriptor, configuration.serverLifecycle(), configuration.mavenProjectDirProvider(), configuration.pluginJarsProvider());
-        engineDescriptor.addChild(containerMatrixTestsDescriptor);
-        return containerMatrixTestsDescriptor;
-    }
-
-    private ContainerMatrixTestsDescriptor findOrCreateDescriptor(final TestDescriptor engineDescriptor, final ContainerMatrixTestsConfiguration configuration) {
-        // for the given configuration, reuse/add to an existing descriptor
-        return ((ContainerMatrixEngineDescriptor) engineDescriptor)
-                .getChildren()
-                .stream()
-                .filter(child -> child instanceof ContainerMatrixTestsDescriptor)
-                .map(child -> (ContainerMatrixTestsDescriptor) child)
-                .filter(child -> child.is(configuration))
-                .findFirst()
-                .orElse(createNewDescriptor((ContainerMatrixEngineDescriptor) engineDescriptor, configuration));
-    }
-
-    private TestDescriptor getRoot(TestDescriptor descriptor) {
-        if (descriptor.isRoot()) {
-            return descriptor;
+    private Optional<ContainerMatrixTestsDescriptor> findContainerMatrixTestsDescriptor(TestDescriptor parent) {
+        if (parent instanceof ContainerMatrixTestsDescriptor) {
+            return Optional.of((ContainerMatrixTestsDescriptor) parent);
         }
-        return getRoot(descriptor.getParent().get());
+
+        if (parent.getParent().isPresent()) {
+            return findContainerMatrixTestsDescriptor(parent.getParent().get());
+        }
+
+        return Optional.empty();
     }
 
-    private TestDescriptor newClassTestDescriptor(TestDescriptor parent, Class<?> testClass) {
-        // find Annotation
-        ContainerMatrixTestsConfiguration annotation = AnnotationSupport
-                .findAnnotation(testClass, ContainerMatrixTestsConfiguration.class)
-                .orElseThrow(() -> new RuntimeException("Annotation should exist - it has been checked for the given class before..."));
-        // convert to set to make sure that versions are unique and not listed multiple times, use LinkedHashSet to preserve order
-        Set<String> esVersions = new LinkedHashSet<>(Arrays.asList(annotation.esVersions()));
-        Set<String> mongoVersions = new LinkedHashSet<>(Arrays.asList(annotation.mongoVersions()));
+    private ClassBasedTestDescriptor newClassTestDescriptor(TestDescriptor parent, Class<?> testClass) {
+        Optional<ContainerMatrixTestsDescriptor> containerMatrixTestsDescriptor = findContainerMatrixTestsDescriptor(parent);
+        if (containerMatrixTestsDescriptor.isPresent()) {
+            final String esVersion = containerMatrixTestsDescriptor.get().getEsVersion();
+            final String mongoVersion = containerMatrixTestsDescriptor.get().getMongoVersion();
 
+            return new ContainerMatrixTestClassDescriptor(
+                    parent,
+                    testClass,
+                    configuration, esVersion, mongoVersion);
+        } else {
+            return new ContainerMatrixTestClassDescriptor(
+                    parent,
+                    testClass,
+                    configuration, "UNKNOWN", "UNKNOWN");
 
-        // find/create new parent
-        // TODO: maintain old hierarchy instead of flattening
-        ContainerMatrixTestsDescriptor containerMatrixTestsDescriptor = findOrCreateDescriptor(getRoot(parent), annotation);
-        containerMatrixTestsDescriptor.addExtraPorts(annotation.extraPorts());
-        esVersions.forEach(esVersion -> mongoVersions.forEach(mongoVersion ->
-                containerMatrixTestsDescriptor.addChild(new ContainerMatrixTestClassDescriptor(parent, testClass, configuration, esVersion, mongoVersion))
-        ));
-
-        // TODO: fix this
-        return containerMatrixTestsDescriptor;
+        }
     }
 
     private NestedClassTestDescriptor newNestedClassTestDescriptor(TestDescriptor parent, Class<?> testClass) {

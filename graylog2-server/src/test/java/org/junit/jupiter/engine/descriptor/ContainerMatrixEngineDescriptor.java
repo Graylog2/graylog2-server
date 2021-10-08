@@ -21,11 +21,14 @@ import org.junit.jupiter.engine.config.JupiterConfiguration;
 import org.junit.jupiter.engine.execution.JupiterEngineExecutionContext;
 import org.junit.jupiter.engine.extension.MutableExtensionRegistry;
 import org.junit.platform.engine.EngineExecutionListener;
+import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 import org.junit.platform.engine.support.hierarchical.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Collection;
 
 import static org.junit.jupiter.engine.descriptor.JupiterTestDescriptor.toExecutionMode;
 
@@ -67,5 +70,13 @@ public class ContainerMatrixEngineDescriptor extends EngineDescriptor implements
     @Override
     public void cleanUp(JupiterEngineExecutionContext context) throws Exception {
         context.close();
+    }
+
+    public void clearChildren() {
+        this.children.clear();
+    }
+
+    public void addChildren(Collection<? extends TestDescriptor> children) {
+        this.children.addAll(children);
     }
 }
