@@ -37,10 +37,14 @@ class DataAdapterCreate extends React.Component {
     validationErrors: {},
   };
 
-  state = {
-    dataAdapter: undefined,
-    type: undefined,
-  };
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      dataAdapter: undefined,
+      type: undefined,
+    };
+  }
 
   _onTypeSelect = (adapterType) => {
     const { types } = this.props;
