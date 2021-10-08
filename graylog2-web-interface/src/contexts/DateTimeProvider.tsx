@@ -18,12 +18,12 @@ import * as React from 'react';
 import { useCallback, useContext } from 'react';
 import moment from 'moment-timezone';
 
-import TimeLocalizeContext, { TimeLocalizeContextType } from 'contexts/TimeLocalizeContext';
+import DateTimeContext, { DateTimeContextType } from 'contexts/DateTimeContext';
 import AppConfig from 'util/AppConfig';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 
 type Props = {
-  children: React.ReactChildren | React.ReactChild | ((timeLocalize: TimeLocalizeContextType) => Element),
+  children: React.ReactChildren | React.ReactChild | ((timeLocalize: DateTimeContextType) => Element),
 };
 
 export const ACCEPTED_FORMATS = {
@@ -42,7 +42,7 @@ export const ACCEPTED_FORMATS = {
  * Provides a function to convert a ACCEPTED_FORMAT of a timestamp into a timestamp converted to the users timezone.
  * @param children React components.
  */
-const TimeLocalizeProvider = ({ children }: Props) => {
+const DateTimeProvider = ({ children }: Props) => {
   const currentUser = useContext(CurrentUserContext);
 
   const getUserTimezone = useCallback(() => {
@@ -53,17 +53,17 @@ const TimeLocalizeProvider = ({ children }: Props) => {
     return moment.tz.guess() || AppConfig.rootTimeZone() || 'UTC';
   }, [currentUser.timezone]);
 
-  const localizeTime = useCallback((time) => {
+  const unifyTime = useCallback((time) => {
     const dateTime = moment.tz(time.trim(), Object.values(ACCEPTED_FORMATS), true, getUserTimezone());
 
     return dateTime.format(ACCEPTED_FORMATS.TIMESTAMP_TZ);
   }, [getUserTimezone]);
 
   return (
-    <TimeLocalizeContext.Provider value={{ localizeTime }}>
+    <DateTimeContext.Provider value={{ unifyTime }}>
       {children}
-    </TimeLocalizeContext.Provider>
+    </DateTimeContext.Provider>
   );
 };
 
-export default TimeLocalizeProvider;
+export default DateTimeProvider;

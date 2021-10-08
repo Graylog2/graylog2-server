@@ -18,28 +18,28 @@ import * as React from 'react';
 import { useContext } from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import moment from 'moment-timezone';
-
 import { alice } from 'fixtures/users';
-import TimeLocalizeProvider, { ACCEPTED_FORMATS } from 'contexts/TimeLocalizeProvider';
-import TimeLocalizeContext from 'contexts/TimeLocalizeContext';
+
+import DateTimeProvider, { ACCEPTED_FORMATS } from 'contexts/DateTimeProvider';
+import DateTimeContext from 'contexts/DateTimeContext';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import User from 'logic/users/User';
 
 const TestTimestamp = ({ timestamp }: { timestamp: string }) => {
-  const { localizeTime } = useContext(TimeLocalizeContext);
+  const { unifyTime } = useContext(DateTimeContext);
 
-  return (<div>{localizeTime(timestamp)}</div>);
+  return (<div>{unifyTime(timestamp)}</div>);
 };
 
 const SUT = ({ timestamp, currentUser: user }: { timestamp: string, currentUser: User }) => (
   <CurrentUserContext.Provider value={user}>
-    <TimeLocalizeProvider>
+    <DateTimeProvider>
       <TestTimestamp timestamp={timestamp} />
-    </TimeLocalizeProvider>,
+    </DateTimeProvider>,
   </CurrentUserContext.Provider>
 );
 
-describe('TimeLocalizeProvider', () => {
+describe('DateTimeProvider', () => {
   it('should provide a function which converts a date time string to local time of user', () => {
     const user = alice.toBuilder().timezone('Asia/Tokyo').build();
 

@@ -22,7 +22,7 @@ import { MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
 import Search from 'views/logic/search/Search';
 import Widget from 'views/logic/widgets/Widget';
-import TimeLocalizeContext from 'contexts/TimeLocalizeContext';
+import DateTimeContext from 'contexts/DateTimeContext';
 import { GlobalOverrideStore, GlobalOverrideStoreState } from 'views/stores/GlobalOverrideStore';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
 import { SearchStore, SearchStoreState } from 'views/stores/SearchStore';
@@ -70,9 +70,9 @@ describe('TimerangeInfo', () => {
   const widget = Widget.empty();
 
   const SUT = (props) => (
-    <TimeLocalizeContext.Provider value={{ localizeTime: (str) => str }}>
+    <DateTimeContext.Provider value={{ unifyTime: (str) => str }}>
       <TimerangeInfo {...props} />
-    </TimeLocalizeContext.Provider>
+    </DateTimeContext.Provider>
   );
 
   beforeEach(() => {

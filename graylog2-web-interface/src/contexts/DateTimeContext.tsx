@@ -18,10 +18,10 @@ import * as React from 'react';
 
 import { singleton } from 'logic/singleton';
 
-export type TimeLocalizeContextType = {
-  localizeTime: (string) => string,
+export type DateTimeContextType = {
+  unifyTime: (string) => string,
 };
 
-const TimeLocalizeContext = React.createContext<TimeLocalizeContextType | undefined>(undefined);
+const DateTimeContext = React.createContext<DateTimeContextType | undefined>(undefined);
 
-export default singleton('contexts.TimeLocalizeContext', () => TimeLocalizeContext);
+export default singleton('contexts.TimeLocalizeContext', () => DateTimeContext);
