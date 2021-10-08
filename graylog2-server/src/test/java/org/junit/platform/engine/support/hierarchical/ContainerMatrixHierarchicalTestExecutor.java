@@ -1,13 +1,19 @@
 /*
- * Copyright 2015-2020 the original author or authors.
+ * Copyright (C) 2020 Graylog, Inc.
  *
- * All rights reserved. This program and the accompanying materials are
- * made available under the terms of the Eclipse Public License v2.0 which
- * accompanies this distribution and is available at
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
  *
- * https://www.eclipse.org/legal/epl-v20.html
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-
 package org.junit.platform.engine.support.hierarchical;
 
 import io.restassured.specification.RequestSpecification;

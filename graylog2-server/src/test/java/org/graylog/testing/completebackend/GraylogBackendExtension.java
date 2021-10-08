@@ -61,7 +61,6 @@ public class GraylogBackendExtension implements BeforeAllCallback, ParameterReso
         });
         ContainerMatrixHierarchicalTestExecutor.requestSpecification.ifPresent(rs -> context.getStore(NAMESPACE).put("requestSpecification", rs));
 
-        // TODO: run Fixtures only once
         ContainerMatrixHierarchicalTestExecutor.graylogBackend.ifPresent(gb -> {
             gb.mongoDB().importFixtures(getMongoDBFixtures(context));
         });

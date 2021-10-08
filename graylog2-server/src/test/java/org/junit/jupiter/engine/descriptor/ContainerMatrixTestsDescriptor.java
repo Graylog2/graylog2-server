@@ -48,7 +48,7 @@ public class ContainerMatrixTestsDescriptor extends AbstractTestDescriptor {
                                           Set<Integer> extraPorts) {
         super(parent.getUniqueId().append(SEGMENT_TYPE,
                         createKey(lifecycle, mavenProjectDirProviderId, pluginJarsProviderId, esVersion, mongoVersion)),
-                "ContainerMatrixTestsDescriptor: " + createKey(lifecycle, mavenProjectDirProviderId, pluginJarsProviderId, esVersion, mongoVersion));
+                createKey(lifecycle, mavenProjectDirProviderId, pluginJarsProviderId, esVersion, mongoVersion));
         setParent(parent);
         this.lifecycle = lifecycle;
         this.mavenProjectDirProvider = mavenProjectDirProvider;
@@ -59,7 +59,7 @@ public class ContainerMatrixTestsDescriptor extends AbstractTestDescriptor {
     }
 
     private static String createKey(Lifecycle lifecycle, String mavenProjectDirProvider, String pluginJarsProvider, String esVersion, String mongoVersion) {
-        return lifecycle.name() + "_" + mavenProjectDirProvider + "_" + pluginJarsProvider + "_" + esVersion + "_" + mongoVersion;
+        return "Lifecyle: " + lifecycle.name() + ", MavenProjectDirProvider: " + mavenProjectDirProvider + ", PluginJarsProvider: " + pluginJarsProvider + ", Elasticsearch: " + esVersion + ", MongoDB: " + mongoVersion;
     }
 
     public Class<? extends MavenProjectDirProvider> getMavenProjectDirProvider() {

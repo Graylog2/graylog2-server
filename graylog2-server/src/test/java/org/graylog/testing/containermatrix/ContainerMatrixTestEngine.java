@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 package org.graylog.testing.containermatrix;
 
 import org.graylog.testing.completebackend.Lifecycle;
@@ -25,7 +41,9 @@ import org.reflections.Reflections;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEngine<JupiterEngineExecutionContext> {
     private static final String ENGINE_ID = "graylog-container-matrix-tests";
@@ -35,50 +53,34 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
         return ENGINE_ID;
     }
 
-    private Set<Class<? extends MavenProjectDirProvider>> getMavenProjectDirProvider(Set<Class<?>> annotatedClasses) {
+    private <T> Set<T> get(Set<Class<?>> annotatedClasses, Function<ContainerMatrixTestsConfiguration, Stream<T>> mapTo) {
         return annotatedClasses
                 .stream()
                 .map(aClass -> AnnotationSupport.findAnnotation(aClass, ContainerMatrixTestsConfiguration.class))
                 .filter(Optional::isPresent)
-                .flatMap(annotation -> Arrays.asList(annotation.get().mavenProjectDirProvider()).stream())
+                .map(Optional::get)
+                .flatMap(mapTo)
                 .collect(Collectors.toSet());
+    }
+
+    private Set<Class> getMavenProjectDirProvider(Set<Class<?>> annotatedClasses) {
+        return get(annotatedClasses, (ContainerMatrixTestsConfiguration annotation) -> Stream.of(annotation.mavenProjectDirProvider()));
     }
 
     private Set<Class<? extends PluginJarsProvider>> getPluginJarsProvider(Set<Class<?>> annotatedClasses) {
-        return annotatedClasses
-                .stream()
-                .map(aClass -> AnnotationSupport.findAnnotation(aClass, ContainerMatrixTestsConfiguration.class))
-                .filter(Optional::isPresent)
-                .flatMap(annotation -> Arrays.asList(annotation.get().pluginJarsProvider()).stream())
-                .collect(Collectors.toSet());
+        return get(annotatedClasses, (ContainerMatrixTestsConfiguration annotation) -> Stream.of(annotation.pluginJarsProvider()));
     }
 
-
     private Set<String> getEsVersions(Set<Class<?>> annotatedClasses) {
-        return annotatedClasses
-                .stream()
-                .map(aClass -> AnnotationSupport.findAnnotation(aClass, ContainerMatrixTestsConfiguration.class))
-                .filter(Optional::isPresent)
-                .flatMap(annotation -> Arrays.asList(annotation.get().esVersions()).stream())
-                .collect(Collectors.toSet());
+        return get(annotatedClasses, (ContainerMatrixTestsConfiguration annotation) -> Stream.of(annotation.esVersions()));
     }
 
     private Set<String> getMongoVersions(Set<Class<?>> annotatedClasses) {
-        return annotatedClasses
-                .stream()
-                .map(aClass -> AnnotationSupport.findAnnotation(aClass, ContainerMatrixTestsConfiguration.class))
-                .filter(Optional::isPresent)
-                .flatMap(annotation -> Arrays.asList(annotation.get().mongoVersions()).stream())
-                .collect(Collectors.toSet());
+        return get(annotatedClasses, (ContainerMatrixTestsConfiguration annotation) -> Stream.of(annotation.mongoVersions()));
     }
 
     private Set<Integer> getExtraPorts(Set<Class<?>> annotatedClasses) {
-        return annotatedClasses
-                .stream()
-                .map(aClass -> AnnotationSupport.findAnnotation(aClass, ContainerMatrixTestsConfiguration.class))
-                .filter(Optional::isPresent)
-                .flatMap(annotation -> Arrays.stream(annotation.get().extraPorts()).boxed())
-                .collect(Collectors.toSet());
+        return get(annotatedClasses, (ContainerMatrixTestsConfiguration annotation) -> Arrays.stream(annotation.extraPorts()).boxed());
     }
 
     private <T> T instantiateFactory(Class<? extends T> providerClass) {
@@ -103,28 +105,28 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
         getMavenProjectDirProvider(annotated)
                 .forEach(mavenProjectDirProvider -> getPluginJarsProvider(annotated)
                         .forEach(pluginJarsProvider -> {
-                                    MavenProjectDirProvider mpdp = instantiateFactory(mavenProjectDirProvider);
-                                    PluginJarsProvider pjp = instantiateFactory(pluginJarsProvider);
-                                    // now add all grouped tests for Lifecycle.VM
-                                    getEsVersions(annotated)
-                                            .forEach(esVersion -> getMongoVersions(annotated)
-                                                    .forEach(mongoVersion -> {
-                                                        ContainerMatrixTestsDescriptor testsDescriptor = new ContainerMatrixTestsDescriptor(engineDescriptor,
-                                                                Lifecycle.VM,
-                                                                mavenProjectDirProvider,
-                                                                mpdp.getUniqueId(),
-                                                                pluginJarsProvider,
-                                                                pjp.getUniqueId(),
-                                                                esVersion,
-                                                                mongoVersion,
-                                                                extraPorts);
-                                                        new ContainerMatrixTestsDiscoverySelectorResolver(engineDescriptor).resolveSelectors(discoveryRequest, testsDescriptor);
-                                                        engineDescriptor.addChild(testsDescriptor);
-                                                    })
-                                            );
-                                    // add separate test classes (Lifecycle.CLASS)
-                                    getEsVersions(annotated)
-                                            .forEach(esVersion -> getMongoVersions(annotated)
+                            MavenProjectDirProvider mpdp = (MavenProjectDirProvider) instantiateFactory(mavenProjectDirProvider);
+                            PluginJarsProvider pjp = (PluginJarsProvider) instantiateFactory(pluginJarsProvider);
+                            // now add all grouped tests for Lifecycle.VM
+                            getEsVersions(annotated)
+                                    .forEach(esVersion -> getMongoVersions(annotated)
+                                            .forEach(mongoVersion -> {
+                                                ContainerMatrixTestsDescriptor testsDescriptor = new ContainerMatrixTestsDescriptor(engineDescriptor,
+                                                        Lifecycle.VM,
+                                                        mavenProjectDirProvider,
+                                                        mpdp.getUniqueId(),
+                                                        pluginJarsProvider,
+                                                        pjp.getUniqueId(),
+                                                        esVersion,
+                                                        mongoVersion,
+                                                        extraPorts);
+                                                new ContainerMatrixTestsDiscoverySelectorResolver(engineDescriptor).resolveSelectors(discoveryRequest, testsDescriptor);
+                                                engineDescriptor.addChild(testsDescriptor);
+                                            })
+                                    );
+                            // add separate test classes (Lifecycle.CLASS)
+                            getEsVersions(annotated)
+                                    .forEach(esVersion -> getMongoVersions(annotated)
                                                     .forEach(mongoVersion -> {
                                                         ContainerMatrixTestsDescriptor testsDescriptor = new ContainerMatrixTestsDescriptor(engineDescriptor,
                                                                 Lifecycle.CLASS,
