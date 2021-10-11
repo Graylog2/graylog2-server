@@ -18,10 +18,9 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
+import { Row, Col } from 'components/graylog';
 
-import { Row, Col } from 'components/bootstrap';
-import { DocumentTitle, PageHeader, Spinner } from 'components/common';
-import DateTime from 'logic/datetimes/DateTime';
+import { DocumentTitle, PageHeader, Spinner, Timestamp } from 'components/common';
 import withParams from 'routing/withParams';
 import { ClusterOverviewStore } from 'stores/cluster/ClusterOverviewStore';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
@@ -62,7 +61,7 @@ const ProcessBufferDumpPage = createReactClass({
       <span>
         Process-buffer dump of node {node.short_node_id} / {node.hostname}
         &nbsp;
-        <small>Taken at {DateTime.now().toString(DateTime.Formats.COMPLETE)}</small>
+        <small>Taken at <Timestamp dateTime={new Date()} relative /></small>
       </span>
     );
 
