@@ -31,7 +31,7 @@ const rangeLimitError = 'Range is outside limit duration.';
 const dateLimitError = 'Date is outside limit duration.';
 const timeRangeError = 'The "Until" date must come after the "From" date.';
 
-const exceedsDuration = (timeRange, limitDuration) => {
+const exceedsDuration = (timeRange, limitDuration, unifyTime) => {
   if (limitDuration === 0) {
     return false;
   }
@@ -40,7 +40,7 @@ const exceedsDuration = (timeRange, limitDuration) => {
     case 'absolute':
     case 'keyword': { // eslint-disable-line no-fallthrough, padding-line-between-statements
       const durationFrom = timeRange.from;
-      const durationLimit = DateTime.now().subtract(Number(limitDuration), 'seconds').format(DateTime.Formats.TIMESTAMP);
+      const durationLimit = unifyTime(new Date()).subtract(Number(limitDuration), 'seconds').format(DateTime.Formats.TIMESTAMP);
 
       return moment(durationFrom).isBefore(durationLimit);
     }
@@ -103,21 +103,21 @@ const validateRelativeTimeRangeWithEnd = (timeRange: RelativeTimeRangeWithEnd, l
   return errors;
 };
 
-const validateKeywordTimeRange = (timeRange: KeywordTimeRange, limitDuration: number) => {
+const validateKeywordTimeRange = (timeRange: KeywordTimeRange, limitDuration: number, unifyTime) => {
   let errors: { keyword?: string } = {};
 
-  if (exceedsDuration(timeRange, limitDuration)) {
+  if (exceedsDuration(timeRange, limitDuration, unifyTime)) {
     errors = { keyword: rangeLimitError };
   }
 
   return errors;
 };
 
-const validateTimeRange = (timeRange: TimeRange | NoTimeRangeOverride, limitDuration: number) => {
+const validateTimeRange = (timeRange: TimeRange | NoTimeRangeOverride, limitDuration: number, unifyTime) => {
   let errors = {};
 
   if (isTypeKeyword(timeRange)) {
-    errors = { ...errors, ...validateKeywordTimeRange(timeRange, limitDuration) };
+    errors = { ...errors, ...validateKeywordTimeRange(timeRange, limitDuration, unifyTime) };
   }
 
   if (isTypeRelativeWithEnd(timeRange)) {

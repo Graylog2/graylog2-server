@@ -29,11 +29,12 @@ const validate = async <T extends FormValues>(
   limitDuration: number,
   setFieldWarning: (fieldName: string, warning: unknown) => void,
   validateQueryString: (values: T) => Promise<QueryValidationState>,
+  unifyTime,
 ) => {
   const { timerange: nextTimeRange } = values;
   let errors = {};
 
-  const timeRangeErrors = validateTimeRange(nextTimeRange, limitDuration);
+  const timeRangeErrors = validateTimeRange(nextTimeRange, limitDuration, unifyTime);
 
   if (!isEmpty(timeRangeErrors)) {
     errors = { ...errors, timerange: timeRangeErrors };

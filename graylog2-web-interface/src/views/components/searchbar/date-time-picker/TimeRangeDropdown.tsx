@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useContext } from 'react';
 import { Form, Formik } from 'formik';
 import styled, { css } from 'styled-components';
 import moment from 'moment';
@@ -30,6 +30,7 @@ import { isTypeRelative } from 'views/typeGuards/timeRange';
 import { normalizeIfAllMessagesRange } from 'views/logic/queries/NormalizeTimeRange';
 import { RelativeTimeRangeClassified } from 'views/components/searchbar/date-time-picker/types';
 import validateTimeRange from 'views/components/TimeRangeValidation';
+import DateTimeContext from 'contexts/DateTimeContext';
 
 import migrateTimeRangeToNewType from './migrateTimeRangeToNewType';
 import TabAbsoluteTimeRange from './TabAbsoluteTimeRange';
@@ -157,10 +158,10 @@ const timeRangeTypeTabs = ({ activeTab, limitDuration, setValidatingKeyword, tab
     );
   });
 
-const dateTimeValidate = (nextTimeRange, limitDuration) => {
+const dateTimeValidate = (nextTimeRange, limitDuration, unifyTime) => {
   let errors = {};
   const timeRange = normalizeIfClassifiedRelativeTimeRange(nextTimeRange);
-  const timeRangeErrors = validateTimeRange(timeRange, limitDuration);
+  const timeRangeErrors = validateTimeRange(timeRange, limitDuration, unifyTime);
 
   if (Object.keys(timeRangeErrors).length !== 0) {
     errors = { ...errors, nextTimeRange: timeRangeErrors };
@@ -186,6 +187,7 @@ const TimeRangeDropdown = ({
   position,
   limitDuration,
 }: TimeRangeDropdownProps) => {
+  const { unifyTime } = useContext(DateTimeContext);
   const [validatingKeyword, setValidatingKeyword] = useState(false);
   const [activeTab, setActiveTab] = useState('type' in currentTimeRange ? currentTimeRange.type : undefined);
 
@@ -228,7 +230,7 @@ const TimeRangeDropdown = ({
                    arrowOffsetLeft={positionIsBottom ? 34 : -11}
                    title={title}>
       <Formik<TimeRangeDropDownFormValues> initialValues={{ nextTimeRange: onInitializingNextTimeRange(currentTimeRange) }}
-                                           validate={({ nextTimeRange }) => dateTimeValidate(nextTimeRange, limitDuration)}
+                                           validate={({ nextTimeRange }) => dateTimeValidate(nextTimeRange, limitDuration, unifyTime)}
                                            onSubmit={handleSubmit}
                                            validateOnMount>
         {(({ values: { nextTimeRange }, isValid, setFieldValue, submitForm }) => {

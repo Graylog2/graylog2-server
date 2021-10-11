@@ -27,6 +27,7 @@ import type { SearchBarFormValues } from 'views/Constants';
 import FormWarningsContext from 'contexts/FormWarningsContext';
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 import validate from 'views/components/searchbar/validate';
+import DateTimeContext from 'contexts/DateTimeContext';
 
 type Props = {
   children: ((props: FormikProps<SearchBarFormValues>) => React.ReactNode) | React.ReactNode,
@@ -55,6 +56,7 @@ export const normalizeSearchBarFormValues = ({ timerange, streams, queryString }
 };
 
 const SearchBarForm = ({ initialValues, limitDuration, onSubmit, children, validateOnMount, formRef, validateQueryString }: Props) => {
+  const { unifyTime } = useContext(DateTimeContext);
   const _onSubmit = useCallback(({ timerange, streams, queryString }: SearchBarFormValues) => {
     return onSubmit(normalizeSearchBarFormValues({ timerange, streams, queryString }));
   }, [onSubmit]);
@@ -67,7 +69,7 @@ const SearchBarForm = ({ initialValues, limitDuration, onSubmit, children, valid
   };
 
   const { setFieldWarning } = useContext(FormWarningsContext);
-  const _validate = useCallback((values: SearchBarFormValues) => validate(values, limitDuration, setFieldWarning, validateQueryString),
+  const _validate = useCallback((values: SearchBarFormValues) => validate(values, limitDuration, setFieldWarning, validateQueryString, unifyTime),
     [limitDuration, setFieldWarning, validateQueryString]);
 
   return (
