@@ -14,52 +14,50 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import Version from 'util/Version';
 
 class DocsHelper {
   PAGES = {
-    ALERTS: 'streams/alerts.html',
-    AUTHENTICATORS: 'users_and_roles/external_auth.html',
-    CLUSTER_STATUS_EXPLAINED: 'configuration/elasticsearch.html#cluster-status-explained',
-    COLLECTOR: 'collector.html',
-    COLLECTOR_SIDECAR: 'sidecar.html',
-    COLLECTOR_STATUS: 'sidecar.html#sidecar-status',
-    CONFIGURING_ES: 'configuration/elasticsearch.html',
-    DASHBOARDS: 'dashboards.html',
-    DECORATORS: 'queries.html#decorators',
-    ENTERPRISE_SETUP: 'enterprise/setup.html',
-    ES_CLUSTER_STATUS_RED: 'configuration/elasticsearch.html#cluster-status-explained',
-    ES_CLUSTER_UNAVAILABLE: 'configuration/elasticsearch.html#configuration',
-    ES_OPEN_FILE_LIMITS: 'configuration/elasticsearch.html#open-file-limits',
-    EXTRACTORS: 'extractors.html',
-    INDEXER_FAILURES: 'indexer_failures.html',
-    INDEX_MODEL: 'configuration/index_model.html',
-    LOAD_BALANCERS: 'configuration/load_balancers.html',
-    LOOKUPTABLES: 'lookuptables.html',
-    PAGE_FLEXIBLE_DATE_CONVERTER: 'extractors.html#the-flexible-date-converter',
-    PAGE_STANDARD_DATE_CONVERTER: 'extractors.html#the-standard-date-converter',
-    PERMISSIONS: 'users_and_roles/permission_system.html',
-    PIPELINE_FUNCTIONS: 'pipelines/functions.html',
-    PIPELINE_RULES: 'pipelines/rules.html',
-    PIPELINES: 'pipelines.html',
-    REPORTING: 'reporting.html',
-    ROLLING_ES_UPGRADE: 'upgrade/rolling_es_upgrade.html',
-    SEARCH_QUERY_LANGUAGE: 'queries.html',
-    STREAMS: 'streams.html',
-    STREAM_PROCESSING_RUNTIME_LIMITS: 'streams.html#stream-processing-runtime-limits',
-    TIME_FRAME_SELECTOR: 'time_frame_selector.html',
-    UPGRADE_GUIDE: 'upgrade/graylog-%%version%%.html',
-    USERS_ROLES: 'users_and_roles.html',
+    ALERTS: 'alerts',
+    AUTHENTICATORS: 'permission-management#authentication',
+    CLUSTER_STATUS_EXPLAINED: 'elasticsearch#cluster-status-explained',
+    COLLECTOR: 'sidecar',
+    COLLECTOR_SIDECAR: 'sidecar',
+    COLLECTOR_STATUS: 'sidecar#sidecar-status',
+    CONFIGURING_ES: 'elasticsearch',
+    DASHBOARDS: 'dashboards',
+    DECORATORS: 'decorators',
+    ENTERPRISE_SETUP: 'setup',
+    ES_CLUSTER_STATUS_RED: 'elasticsearch#cluster-status-explained',
+    ES_CLUSTER_UNAVAILABLE: 'elasticsearch#configuration',
+    ES_OPEN_FILE_LIMITS: 'elasticsearch#open-file-limits',
+    EXTRACTORS: 'extractors',
+    INDEXER_FAILURES: 'indexer-failures',
+    INDEX_MODEL: 'index-model',
+    LOAD_BALANCERS: 'load-balancers',
+    LOOKUPTABLES: 'lookuptables',
+    PAGE_FLEXIBLE_DATE_CONVERTER: 'extractors#the-flexible-date-converter',
+    PAGE_STANDARD_DATE_CONVERTER: 'extractors#the-standard-date-converter',
+    PERMISSIONS: 'permission-management',
+    PIPELINE_FUNCTIONS: 'functions',
+    PIPELINE_RULES: 'rules',
+    PIPELINES: 'processing-pipelines',
+    REPORTING: 'reporting',
+    ROLLING_ES_UPGRADE: 'rolling-es-upgrade',
+    SEARCH_QUERY_LANGUAGE: 'queries',
+    STREAMS: 'streams',
+    STREAM_PROCESSING_RUNTIME_LIMITS: 'streams#stream-processing-runtime-limits',
+    TIME_FRAME_SELECTOR: 'time-frame-selector',
+    UPGRADE_GUIDE: 'upgrading-graylog',
+    USERS_ROLES: 'permission-management',
     WELCOME: '', // Welcome page to the documentation
   };
 
-  DOCS_URL = 'https://docs.graylog.org/en/';
+  DOCS_URL = 'https://docs.graylog.org/docs/';
 
   toString(path) {
-    const version = Version.getMajorAndMinorVersion();
-    const baseUrl = this.DOCS_URL + version;
+    const baseUrl = this.DOCS_URL;
 
-    return path === '' ? baseUrl : `${baseUrl}/pages/${path.replace('%%version%%', version)}`;
+    return path === '' ? baseUrl : `${baseUrl}/${path}`;
   }
 
   toLink(path, title) {
