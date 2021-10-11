@@ -19,7 +19,6 @@ import React from 'react';
 
 import { Label } from 'components/bootstrap';
 import { Timestamp, Icon } from 'components/common';
-import DateTime from 'logic/datetimes/DateTime';
 import { IndexSizeSummary } from 'components/indices';
 
 class IndexSummary extends React.Component {
@@ -53,7 +52,7 @@ class IndexSummary extends React.Component {
 
   _formatIndexRange = () => {
     if (this.props.isDeflector) {
-      return <span>Contains messages up to <Timestamp dateTime={new DateTime().toISOString()} relative /></span>;
+      return <span>Contains messages up to <Timestamp dateTime={new Date()} relative /></span>;
     }
 
     const sizes = this.props.index.size;
