@@ -89,7 +89,7 @@ public abstract class SearchVersion {
         return new AutoValue_SearchVersion(distribution, version);
     }
 
-    private static com.github.zafarkhaja.semver.Version parseVersion(final String version) {
+    protected static com.github.zafarkhaja.semver.Version parseVersion(final String version) {
         try {
             return com.github.zafarkhaja.semver.Version.valueOf(version);
         } catch (Exception e) {
