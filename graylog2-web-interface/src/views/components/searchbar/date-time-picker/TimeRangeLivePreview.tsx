@@ -19,10 +19,8 @@ import { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 import PropTypes from 'prop-types';
 import { useFormikContext } from 'formik';
-import moment from 'moment';
-import 'moment-duration-format';
-import 'moment-precise-range-plugin';
 
+import { readableRange } from 'views/logic/queries/TimeRangeToString';
 import { isTypeRelative, isTypeRelativeWithEnd, isTypeRelativeWithStartOnly } from 'views/typeGuards/timeRange';
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import { Icon } from 'components/common';
@@ -70,19 +68,6 @@ const MiddleIcon = styled.span(({ theme }) => css`
   color: ${theme.colors.variant.default};
   padding: 0 15px;
 `);
-
-const readableRange = (timerange: TimeRange, fieldName: 'range' | 'from' | 'to', placeholder = 'All Time'): string => {
-  const rangeAsSeconds = timerange?.[fieldName];
-
-  if (!rangeAsSeconds) {
-    return placeholder;
-  }
-
-  const dateAgo = moment().subtract(rangeAsSeconds, 'seconds');
-  const rangeTimespan = moment.preciseDiff(moment(), dateAgo);
-
-  return `${rangeTimespan} ago`;
-};
 
 const dateOutput = (timerange: TimeRange | NoTimeRangeOverride) => {
   let from = EMPTY_RANGE;
