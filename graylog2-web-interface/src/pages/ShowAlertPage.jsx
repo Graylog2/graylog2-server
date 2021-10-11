@@ -23,7 +23,6 @@ import { LinkContainer } from 'components/common/router';
 import { ButtonToolbar, Label, Tooltip, Button } from 'components/bootstrap';
 import { DocumentTitle, OverlayElement, PageHeader, Spinner, Timestamp } from 'components/common';
 import { AlertDetails } from 'components/alerts';
-import DateTime from 'logic/datetimes/DateTime';
 import UserNotification from 'util/UserNotification';
 import Routes from 'routing/Routes';
 import withParams from 'routing/withParams';

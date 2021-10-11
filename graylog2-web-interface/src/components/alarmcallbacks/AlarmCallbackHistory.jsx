@@ -20,7 +20,6 @@ import React from 'react';
 import { Alert, Col, Label } from 'components/bootstrap';
 import { EntityListItem, Timestamp } from 'components/common';
 import { ConfigurationWell } from 'components/configurationforms';
-import DateTime from 'logic/datetimes/DateTime';
 
 class AlarmCallbackHistory extends React.Component {
   static propTypes = {

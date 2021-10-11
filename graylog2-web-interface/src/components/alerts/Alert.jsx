@@ -21,7 +21,6 @@ import { Link } from 'components/common/router';
 import { Col, Label } from 'components/bootstrap';
 import { EntityListItem, Timestamp } from 'components/common';
 import Routes from 'routing/Routes';
-import DateTime from 'logic/datetimes/DateTime';
 
 import styles from './Alert.css';
 
