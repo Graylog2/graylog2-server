@@ -48,7 +48,7 @@ public abstract class SearchVersion {
         return create(distribution(), Version.from(version().getVersion().getMajorVersion(), 0, 0));
     }
 
-    public boolean satisfies(Distribution distribution, String expression) {
+    public boolean satisfies(final Distribution distribution, final String expression) {
         return this.distribution().equals(distribution) && version().getVersion().satisfies(expression);
     }
 
@@ -86,13 +86,10 @@ public abstract class SearchVersion {
     }
 
     public static SearchVersion create(final Distribution distribution, final Version version) {
-        if (Distribution.OPENSEARCH.equals(distribution) && !version.getVersion().satisfies("^1.0.0")) {
-            throw new IllegalArgumentException("Invalid OpenSearch version!");
-        }
         return new AutoValue_SearchVersion(distribution, version);
     }
 
-    private static com.github.zafarkhaja.semver.Version parseVersion(String version) {
+    private static com.github.zafarkhaja.semver.Version parseVersion(final String version) {
         try {
             return com.github.zafarkhaja.semver.Version.valueOf(version);
         } catch (Exception e) {
