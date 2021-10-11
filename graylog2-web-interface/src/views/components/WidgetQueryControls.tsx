@@ -39,6 +39,7 @@ import WidgetContext from 'views/components/contexts/WidgetContext';
 import { GlobalOverrideStore, GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
 import { SearchActions } from 'views/stores/SearchStore';
 import { PropagateValidationState } from 'views/components/aggregationwizard';
+import DateTimeContext from 'contexts/DateTimeContext';
 import QueryValidation from 'views/components/searchbar/queryvalidation/QueryValidation';
 import FormWarningsContext from 'contexts/FormWarningsContext';
 import FormWarningsProvider from 'contexts/FormWarningsProvider';
@@ -92,6 +93,7 @@ const _resetQueryOverride = () => GlobalOverrideActions.resetQuery().then(Search
 
 const useBindApplySearchControlsChanges = (formRef) => {
   const { bindApplySearchControlsChanges } = useContext(WidgetEditApplyAllChangesContext);
+  const { unifyTimeAsDate } = useContext(DateTimeContext);
 
   useEffect(() => {
     bindApplySearchControlsChanges((newWidget: Widget) => {
@@ -99,7 +101,7 @@ const useBindApplySearchControlsChanges = (formRef) => {
         const { dirty, values, isValid } = formRef.current;
 
         if (dirty && isValid) {
-          const normalizedFormValues = normalizeSearchBarFormValues(values);
+          const normalizedFormValues = normalizeSearchBarFormValues(values, unifyTimeAsDate);
 
           return updateWidgetSearchControls(newWidget, normalizedFormValues);
         }

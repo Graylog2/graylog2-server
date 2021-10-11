@@ -45,8 +45,8 @@ const StyledForm = styled(Form)`
 
 const _isFunction = (children: Props['children']): children is (props: FormikProps<SearchBarFormValues>) => React.ReactElement => isFunction(children);
 
-export const normalizeSearchBarFormValues = ({ timerange, streams, queryString }) => {
-  const newTimeRange = onSubmittingTimerange(timerange);
+export const normalizeSearchBarFormValues = ({ timerange, streams, queryString }, unifyTimeAsDate) => {
+  const newTimeRange = onSubmittingTimerange(timerange, unifyTimeAsDate);
 
   return {
     timerange: newTimeRange,
@@ -56,12 +56,12 @@ export const normalizeSearchBarFormValues = ({ timerange, streams, queryString }
 };
 
 const SearchBarForm = ({ initialValues, limitDuration, onSubmit, children, validateOnMount, formRef, validateQueryString }: Props) => {
-  const { unifyTime } = useContext(DateTimeContext);
+  const { unifyTime, unifyTimeAsDate } = useContext(DateTimeContext);
   const _onSubmit = useCallback(({ timerange, streams, queryString }: SearchBarFormValues) => {
-    return onSubmit(normalizeSearchBarFormValues({ timerange, streams, queryString }));
-  }, [onSubmit]);
+    return onSubmit(normalizeSearchBarFormValues({ timerange, streams, queryString }, unifyTimeAsDate));
+  }, [onSubmit, unifyTimeAsDate]);
   const { timerange, streams, queryString } = initialValues;
-  const initialTimeRange = onInitializingTimerange(timerange);
+  const initialTimeRange = onInitializingTimerange(timerange, unifyTime);
   const _initialValues = {
     queryString,
     streams,

@@ -19,9 +19,9 @@ import type { Moment } from 'moment';
 
 import { singleton } from 'logic/singleton';
 
-import { FORMATS } from './DateTimeProvider';
+import { DATE_TIME_FORMATS } from './DateTimeProvider';
 
-export type DateTimeFormats = keyof typeof FORMATS;
+export type DateTimeFormats = keyof typeof DATE_TIME_FORMATS;
 
 export type DateTime = string | number | Moment | Date;
 

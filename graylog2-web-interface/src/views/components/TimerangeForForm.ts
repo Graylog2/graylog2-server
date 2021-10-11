@@ -14,23 +14,25 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import type { Moment } from 'moment';
+
 import { RELATIVE_ALL_TIME } from 'views/Constants';
-import DateTime from 'logic/datetimes/DateTime';
 import type { TimeRange } from 'views/logic/queries/Query';
 import type { SearchBarFormValues } from 'views/Constants';
 import { isTypeRelativeWithStartOnly, isTypeRelativeWithEnd } from 'views/typeGuards/timeRange';
+import { DATE_TIME_FORMATS } from 'contexts/DateTimeProvider';
 
-const formatDatetime = (datetime) => datetime.toString(DateTime.Formats.TIMESTAMP);
+const formatDatetime = (dateTime, unifyTime) => unifyTime(dateTime, DATE_TIME_FORMATS.complete);
 
-export const onSubmittingTimerange = (timerange: TimeRange): TimeRange => {
+export const onSubmittingTimerange = (timerange: TimeRange, unifyTimeAsDate: (time: string) => Moment): TimeRange => {
   const { type } = timerange;
 
   switch (timerange.type) {
     case 'absolute':
       return {
         type: timerange.type,
-        from: DateTime.parseFromString(timerange.from).toISOString(),
-        to: DateTime.parseFromString(timerange.to).toISOString(),
+        from: unifyTimeAsDate(timerange.from).toISOString(),
+        to: unifyTimeAsDate(timerange.to).toISOString(),
       };
     case 'relative':
       if (isTypeRelativeWithStartOnly(timerange)) {
@@ -62,15 +64,15 @@ export const onSubmittingTimerange = (timerange: TimeRange): TimeRange => {
   }
 };
 
-export const onInitializingTimerange = (timerange: TimeRange): SearchBarFormValues['timerange'] => {
+export const onInitializingTimerange = (timerange: TimeRange, unifyTime: (time: Moment) => string): SearchBarFormValues['timerange'] => {
   const { type } = timerange;
 
   switch (timerange.type) {
     case 'absolute':
       return {
         type: timerange.type,
-        from: formatDatetime(DateTime.parseFromString(timerange.from)),
-        to: formatDatetime(DateTime.parseFromString(timerange.to)),
+        from: formatDatetime(timerange.from, unifyTime),
+        to: formatDatetime(timerange.to, unifyTime),
       };
     case 'relative':
       if (isTypeRelativeWithStartOnly(timerange)) {

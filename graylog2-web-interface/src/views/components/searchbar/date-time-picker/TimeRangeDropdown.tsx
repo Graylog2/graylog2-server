@@ -236,7 +236,7 @@ const TimeRangeDropdown = ({
         {(({ values: { nextTimeRange }, isValid, setFieldValue, submitForm }) => {
           const handleActiveTab = (nextTab) => {
             if ('type' in nextTimeRange) {
-              setFieldValue('nextTimeRange', migrateTimeRangeToNewType(nextTimeRange as TimeRange, nextTab));
+              setFieldValue('nextTimeRange', migrateTimeRangeToNewType(nextTimeRange as TimeRange, nextTab, unifyTime));
             } else {
               setFieldValue('nextTimeRange', DEFAULT_RANGES[nextTab]);
             }
