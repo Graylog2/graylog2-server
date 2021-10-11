@@ -19,10 +19,8 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 import { Input } from 'components/bootstrap';
-import StoreProvider from 'injection/StoreProvider';
 import UserNotification from 'util/UserNotification';
-
-const StreamsStore = StoreProvider.getStore('Streams');
+import StreamsStore from 'stores/streams/StreamsStore';
 
 const StreamRuleConnector = styled.div(({ theme }) => css`
   margin-top: 10px;

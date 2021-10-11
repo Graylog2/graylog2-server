@@ -19,15 +19,18 @@ import Reflux from 'reflux';
 import * as URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import { fetchPeriodically } from 'logic/rest/FetchProvider';
+import { singletonStore } from 'logic/singleton';
 
-const SystemMessagesStore = Reflux.createStore({
-  listenables: [],
+// eslint-disable-next-line import/prefer-default-export
+export const SystemMessagesStore = singletonStore(
+  'core.SystemMessages',
+  () => Reflux.createStore({
+    listenables: [],
 
-  all(page) {
-    const url = URLUtils.qualifyUrl(ApiRoutes.SystemMessagesApiController.all(page).url);
+    all(page) {
+      const url = URLUtils.qualifyUrl(ApiRoutes.SystemMessagesApiController.all(page).url);
 
-    return fetchPeriodically('GET', url);
-  },
-});
-
-export default SystemMessagesStore;
+      return fetchPeriodically('GET', url);
+    },
+  }),
+);

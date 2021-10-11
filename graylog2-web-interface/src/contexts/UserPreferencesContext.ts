@@ -18,7 +18,7 @@ import * as React from 'react';
 
 import { DEFAULT_THEME_MODE, PREFERENCES_THEME_MODE, ThemeMode } from 'theme/constants';
 
-import { singleton } from '../views/logic/singleton';
+import { singleton } from '../logic/singleton';
 
 export type UserPreferences = {
   enableSmartSearch: boolean,

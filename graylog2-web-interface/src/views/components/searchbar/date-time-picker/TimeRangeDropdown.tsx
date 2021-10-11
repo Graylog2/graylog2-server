@@ -23,31 +23,26 @@ import moment from 'moment';
 import { Button, Col, Tabs, Tab, Row, Popover } from 'components/graylog';
 import { Icon, KeyCapture } from 'components/common';
 import { availableTimeRangeTypes } from 'views/Constants';
-import { migrateTimeRangeToNewType } from 'views/components/TimerangeForForm';
 import DateTime from 'logic/datetimes/DateTime';
-import type { RelativeTimeRangeWithEnd, AbsoluteTimeRange, KeywordTimeRange, NoTimeRangeOverride, TimeRange } from 'views/logic/queries/Query';
+import type { AbsoluteTimeRange, KeywordTimeRange, NoTimeRangeOverride, TimeRange } from 'views/logic/queries/Query';
 import type { SearchBarFormValues } from 'views/Constants';
-import { isTypeRelativeWithStartOnly } from 'views/typeGuards/timeRange';
+import { isTypeRelative } from 'views/typeGuards/timeRange';
 import { normalizeIfAllMessagesRange } from 'views/logic/queries/NormalizeTimeRange';
+import { RelativeTimeRangeClassified } from 'views/components/searchbar/date-time-picker/types';
+import validateTimeRange from 'views/components/TimeRangeValidation';
 
+import migrateTimeRangeToNewType from './migrateTimeRangeToNewType';
 import TabAbsoluteTimeRange from './TabAbsoluteTimeRange';
 import TabKeywordTimeRange from './TabKeywordTimeRange';
 import TabRelativeTimeRange from './TabRelativeTimeRange';
 import TabDisabledTimeRange from './TabDisabledTimeRange';
 import TimeRangeLivePreview from './TimeRangeLivePreview';
 import { DateTimeContext } from './DateTimeProvider';
+import { classifyRelativeTimeRange, normalizeIfClassifiedRelativeTimeRange, RELATIVE_CLASSIFIED_ALL_TIME_RANGE } from './RelativeTimeRangeClassifiedHelper';
 
 export type TimeRangeDropDownFormValues = {
-  nextTimeRange: RelativeTimeRangeWithEnd | AbsoluteTimeRange | KeywordTimeRange | NoTimeRangeOverride,
+  nextTimeRange: RelativeTimeRangeClassified | AbsoluteTimeRange | KeywordTimeRange | NoTimeRangeOverride,
 };
-
-const timeRangeTypes = {
-  absolute: TabAbsoluteTimeRange,
-  relative: TabRelativeTimeRange,
-  keyword: TabKeywordTimeRange,
-};
-
-const allTimeRangeTypes = Object.keys(timeRangeTypes) as Array<TimeRangeType>;
 
 export type TimeRangeDropdownProps = {
   currentTimeRange: SearchBarFormValues['timerange'] | NoTimeRangeOverride,
@@ -66,6 +61,36 @@ type TimeRangeTabsArguments = {
   setValidatingKeyword: (status: boolean) => void,
   tabs: Array<TimeRangeType>,
 }
+
+const DEFAULT_RANGES = {
+  absolute: {
+    type: 'absolute',
+    from: DateTime.now().subtract(300, 'seconds').format(DateTime.Formats.TIMESTAMP),
+    to: DateTime.now().format(DateTime.Formats.TIMESTAMP),
+  },
+  relative: {
+    type: 'relative',
+    from: {
+      value: 5,
+      unit: 'minutes',
+      isAllTime: false,
+    },
+    to: RELATIVE_CLASSIFIED_ALL_TIME_RANGE,
+  },
+  keyword: {
+    type: 'keyword',
+    keyword: 'Last five minutes',
+  },
+  disabled: undefined,
+};
+
+const timeRangeTypes = {
+  absolute: TabAbsoluteTimeRange,
+  relative: TabRelativeTimeRange,
+  keyword: TabKeywordTimeRange,
+};
+
+const allTimeRangeTypes = Object.keys(timeRangeTypes) as Array<TimeRangeType>;
 
 const StyledPopover = styled(Popover)(({ theme }) => css`
   min-width: 750px;
@@ -114,23 +139,6 @@ const CancelButton = styled(Button)`
   margin-right: 6px;
 `;
 
-const DEFAULT_RANGES = {
-  absolute: {
-    type: 'absolute',
-    from: DateTime.now().subtract(300, 'seconds').format(DateTime.Formats.TIMESTAMP),
-    to: DateTime.now().format(DateTime.Formats.TIMESTAMP),
-  },
-  relative: {
-    type: 'relative',
-    from: 300,
-  },
-  keyword: {
-    type: 'keyword',
-    keyword: 'Last five minutes',
-  },
-  disabled: undefined,
-};
-
 const timeRangeTypeTabs = ({ activeTab, limitDuration, setValidatingKeyword, tabs }: TimeRangeTabsArguments) => availableTimeRangeTypes
   .filter(({ type }) => tabs.includes(type))
   .map(({ type, name }) => {
@@ -141,103 +149,29 @@ const timeRangeTypeTabs = ({ activeTab, limitDuration, setValidatingKeyword, tab
            key={`time-range-type-selector-${type}`}
            eventKey={type}>
         {type === activeTab && (
-        <TimeRangeTypeTab disabled={false}
-                          limitDuration={limitDuration}
-                          setValidatingKeyword={type === 'keyword' ? setValidatingKeyword : undefined} />
+          <TimeRangeTypeTab disabled={false}
+                            limitDuration={limitDuration}
+                            setValidatingKeyword={type === 'keyword' ? setValidatingKeyword : undefined} />
         )}
       </Tab>
     );
   });
 
-const exceedsDuration = (timerange, limitDuration) => {
-  if (limitDuration === 0) {
-    return false;
-  }
+const dateTimeValidate = (nextTimeRange, limitDuration) => {
+  let errors = {};
+  const timeRange = normalizeIfClassifiedRelativeTimeRange(nextTimeRange);
+  const timeRangeErrors = validateTimeRange(timeRange, limitDuration);
 
-  switch (timerange?.type) {
-    case 'absolute':
-    case 'keyword': { // eslint-disable-line no-fallthrough, padding-line-between-statements
-      const durationFrom = timerange.from;
-      const durationLimit = DateTime.now().subtract(Number(limitDuration), 'seconds').format(DateTime.Formats.TIMESTAMP);
-
-      return moment(durationFrom).isBefore(durationLimit);
-    }
-
-    default:
-      return false;
-  }
-};
-
-export const dateTimeValidate = (nextTimeRange, limitDuration) => {
-  const errors: { nextTimeRange?: {
-    from?: string,
-    to?: string,
-    range?: string,
-    keyword?: string,
-  } } = {};
-
-  const invalidDateFormatError = 'Format must be: YYYY-MM-DD [HH:mm:ss[.SSS]].';
-  const rangeLimitError = 'Range is outside limit duration.';
-  const dateLimitError = 'Date is outside limit duration.';
-  const timeRangeError = 'The "Until" date must come after the "From" date.';
-
-  if (nextTimeRange?.type === 'absolute') {
-    if (!DateTime.isValidDateString(nextTimeRange.from)) {
-      errors.nextTimeRange = { ...errors.nextTimeRange, from: invalidDateFormatError };
-    }
-
-    if (!DateTime.isValidDateString(nextTimeRange.to)) {
-      errors.nextTimeRange = { ...errors.nextTimeRange, to: invalidDateFormatError };
-    }
-
-    if (nextTimeRange.from >= nextTimeRange.to) {
-      errors.nextTimeRange = { ...errors.nextTimeRange, to: timeRangeError };
-    }
-
-    if (exceedsDuration(nextTimeRange, limitDuration)) {
-      errors.nextTimeRange = { ...errors.nextTimeRange, from: dateLimitError };
-    }
-  }
-
-  if (nextTimeRange?.type === 'relative') {
-    if (limitDuration > 0) {
-      if (nextTimeRange.from > limitDuration || !nextTimeRange.from) {
-        errors.nextTimeRange = { ...errors.nextTimeRange, from: rangeLimitError };
-      }
-
-      if (nextTimeRange.to > limitDuration) {
-        errors.nextTimeRange = { ...errors.nextTimeRange, to: rangeLimitError };
-      }
-    }
-
-    if (nextTimeRange.from === null) {
-      errors.nextTimeRange = { ...errors.nextTimeRange, from: 'Cannot be empty.' };
-    }
-
-    if (nextTimeRange.from && nextTimeRange.to === null) {
-      errors.nextTimeRange = { ...errors.nextTimeRange, to: 'Cannot be empty.' };
-    }
-
-    if (nextTimeRange.from && nextTimeRange.from <= nextTimeRange.to) {
-      errors.nextTimeRange = { ...errors.nextTimeRange, to: timeRangeError };
-    }
-  }
-
-  if (nextTimeRange?.type === 'keyword') {
-    if (exceedsDuration(nextTimeRange, limitDuration)) {
-      errors.nextTimeRange = { keyword: rangeLimitError };
-    }
+  if (Object.keys(timeRangeErrors).length !== 0) {
+    errors = { ...errors, nextTimeRange: timeRangeErrors };
   }
 
   return errors;
 };
 
 const onInitializingNextTimeRange = (currentTimeRange: SearchBarFormValues['timerange'] | NoTimeRangeOverride) => {
-  if (isTypeRelativeWithStartOnly(currentTimeRange)) {
-    return {
-      type: currentTimeRange.type,
-      from: currentTimeRange.range,
-    };
+  if (isTypeRelative(currentTimeRange)) {
+    return classifyRelativeTimeRange(currentTimeRange);
   }
 
   return currentTimeRange;
@@ -266,8 +200,9 @@ const TimeRangeDropdown = ({
     toggleDropdownShow();
   }, [toggleDropdownShow]);
 
-  const handleSubmit = ({ nextTimeRange }) => {
-    setCurrentTimeRange(normalizeIfAllMessagesRange(nextTimeRange));
+  const handleSubmit = ({ nextTimeRange }: { nextTimeRange: TimeRangeDropDownFormValues['nextTimeRange'] }) => {
+    setCurrentTimeRange(normalizeIfAllMessagesRange(normalizeIfClassifiedRelativeTimeRange(nextTimeRange)));
+
     toggleDropdownShow();
   };
 
@@ -292,10 +227,10 @@ const TimeRangeDropdown = ({
                    arrowOffsetTop={positionIsBottom ? undefined : 25}
                    arrowOffsetLeft={positionIsBottom ? 34 : -11}
                    title={title}>
-      <Formik initialValues={{ nextTimeRange: onInitializingNextTimeRange(currentTimeRange) }}
-              validate={({ nextTimeRange }) => dateTimeValidate(nextTimeRange, limitDuration)}
-              onSubmit={handleSubmit}
-              validateOnMount>
+      <Formik<TimeRangeDropDownFormValues> initialValues={{ nextTimeRange: onInitializingNextTimeRange(currentTimeRange) }}
+                                           validate={({ nextTimeRange }) => dateTimeValidate(nextTimeRange, limitDuration)}
+                                           onSubmit={handleSubmit}
+                                           validateOnMount>
         {(({ values: { nextTimeRange }, isValid, setFieldValue, submitForm }) => {
           const handleActiveTab = (nextTab) => {
             if ('type' in nextTimeRange) {
@@ -312,7 +247,7 @@ const TimeRangeDropdown = ({
               <Form>
                 <Row>
                   <Col md={12}>
-                    <TimeRangeLivePreview timerange={nextTimeRange} />
+                    <TimeRangeLivePreview timerange={normalizeIfClassifiedRelativeTimeRange(nextTimeRange)} />
 
                     <StyledTabs id="dateTimeTypes"
                                 defaultActiveKey={availableTimeRangeTypes[0].type}

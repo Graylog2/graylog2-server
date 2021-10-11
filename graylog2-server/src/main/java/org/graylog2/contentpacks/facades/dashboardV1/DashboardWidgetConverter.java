@@ -129,7 +129,7 @@ public class DashboardWidgetConverter {
         final WidgetEntity.Builder widgetEntityBuilder = aggregationWidgetBuilder()
                 .config(widgetConfigDTO);
         final Optional<String> query = config.getOptionalString("query");
-        query.ifPresent(s -> widgetEntityBuilder.query(ElasticsearchQueryString.builder().queryString(s).build()));
+        query.ifPresent(s -> widgetEntityBuilder.query(ElasticsearchQueryString.of(s)));
 
 
         return ImmutableList.of(widgetEntityBuilder.build());
@@ -193,7 +193,7 @@ public class DashboardWidgetConverter {
                 ));
 
         final WidgetEntity.Builder widgetEntityBuilder = aggregationWidgetBuilder();
-        widgetEntityBuilder.query(ElasticsearchQueryString.builder().queryString(query).build());
+        widgetEntityBuilder.query(ElasticsearchQueryString.of(query));
         return widgetEntityBuilder
                 .config(createVisualizationConfig().map(configBuilder::visualizationConfig).orElse(configBuilder).build())
                 .build();
@@ -243,7 +243,7 @@ public class DashboardWidgetConverter {
         final WidgetEntity.Builder widgetEntityBuilder = aggregationWidgetBuilder()
                 .config(widgetConfig);
         final Optional<String> query = config.getOptionalString("query");
-        query.ifPresent(s -> widgetEntityBuilder.query(ElasticsearchQueryString.builder().queryString(s).build()));
+        query.ifPresent(s -> widgetEntityBuilder.query(ElasticsearchQueryString.of(s)));
 
         return ImmutableList.of(widgetEntityBuilder.build());
     }
@@ -274,7 +274,7 @@ public class DashboardWidgetConverter {
                 .sort(ImmutableList.of(PivotSortConfig.create(field, dir)));
 
         final Optional<String> query = config.getOptionalString("query");
-        query.ifPresent(s -> widgetEntityBuilder.query(ElasticsearchQueryString.builder().queryString(s).build()));
+        query.ifPresent(s -> widgetEntityBuilder.query(ElasticsearchQueryString.of(s)));
         if (showChart) {
             result.add(widgetEntityBuilder
                     .config(aggregationConfigBuilder
@@ -341,7 +341,7 @@ public class DashboardWidgetConverter {
                 .sort(ImmutableList.of(PivotSortConfig.create(field, dir)));
 
         final Optional<String> query = config.getOptionalString("query");
-        query.ifPresent(s -> widgetEntityBuilder.query(ElasticsearchQueryString.builder().queryString(s).build()));
+        query.ifPresent(s -> widgetEntityBuilder.query(ElasticsearchQueryString.of(s)));
 
         result.add(widgetEntityBuilder.config(
                 aggregationConfigBuilder.visualization("bar")
@@ -381,7 +381,7 @@ public class DashboardWidgetConverter {
                 .config(widgetConfig);
 
         final Optional<String> query = config.getOptionalString("query");
-        query.ifPresent(s -> widgetEntityBuilder.query(ElasticsearchQueryString.builder().queryString(s).build()));
+        query.ifPresent(s -> widgetEntityBuilder.query(ElasticsearchQueryString.of(s)));
 
         return ImmutableList.of(widgetEntityBuilder.build());
     }

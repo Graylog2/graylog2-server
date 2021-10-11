@@ -19,13 +19,11 @@ import PropTypes from 'prop-types';
 
 import { Spinner } from 'components/common';
 import connect from 'stores/connect';
-import CombinedProvider from 'injection/CombinedProvider';
+import { EventDefinitionsActions, EventDefinitionsStore } from 'stores/event-definitions/EventDefinitionsStore';
 
 import {} from 'components/event-definitions/event-definition-types';
 
 import EventDefinitions from './EventDefinitions';
-
-const { EventDefinitionsStore, EventDefinitionsActions } = CombinedProvider.get('EventDefinitions');
 
 class EventDefinitionsContainer extends React.Component {
   static propTypes = {

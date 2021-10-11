@@ -20,7 +20,8 @@ import styled, { css } from 'styled-components';
 import chroma from 'chroma-js';
 
 import { ScratchpadProvider } from 'contexts/ScratchpadProvider';
-import { Scratchpad, Icon, Spinner } from 'components/common';
+import { Icon, Spinner } from 'components/common';
+import Scratchpad from 'components/scratchpad/Scratchpad';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import Navigation from 'components/navigation/Navigation';
 import ReportedErrorBoundary from 'components/errors/ReportedErrorBoundary';

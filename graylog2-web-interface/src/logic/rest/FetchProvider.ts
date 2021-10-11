@@ -16,17 +16,13 @@
  */
 import FetchError from 'logic/errors/FetchError';
 import ErrorsActions from 'actions/errors/ErrorsActions';
-import StoreProvider from 'injection/StoreProvider';
-import ActionsProvider from 'injection/ActionsProvider';
-// eslint-disable-next-line import/no-cycle
 import { createFromFetchError } from 'logic/errors/ReportedErrors';
 import Routes from 'routing/Routes';
 import history from 'util/History';
 import CancellablePromise from 'logic/rest/CancellablePromise';
 
 const reportServerSuccess = () => {
-  const ServerAvailabilityActions = ActionsProvider.getActions('ServerAvailability');
-
+  const { ServerAvailabilityActions } = require('stores/sessions/ServerAvailabilityStore');
   ServerAvailabilityActions.reportSuccess();
 };
 
@@ -37,12 +33,10 @@ const emptyToUndefined = (s: any) => (s && s !== '' ? s : undefined);
 const onServerError = async (error: Response | undefined, onUnauthorized = defaultOnUnauthorizedError) => {
   const contentType = error.headers?.get('Content-Type');
   const response = await (contentType?.startsWith('application/json') ? error.json().then((body) => body) : error?.text?.());
-  const SessionStore = StoreProvider.getStore('Session');
+  const { SessionStore, SessionActions } = require('stores/sessions/SessionStore');
   const fetchError = new FetchError(error.statusText, error.status, emptyToUndefined(response));
 
   if (SessionStore.isLoggedIn() && error.status === 401) {
-    const SessionActions = ActionsProvider.getActions('Session');
-
     SessionActions.logout(SessionStore.getSessionId());
   }
 
@@ -52,8 +46,7 @@ const onServerError = async (error: Response | undefined, onUnauthorized = defau
   }
 
   if (error && !error.status) {
-    const ServerAvailabilityActions = ActionsProvider.getActions('ServerAvailability');
-
+    const { ServerAvailabilityActions } = require('stores/sessions/ServerAvailabilityStore');
     ServerAvailabilityActions.reportError(fetchError);
   }
 
@@ -110,7 +103,7 @@ export class Builder {
   }
 
   authenticated() {
-    const SessionStore = StoreProvider.getStore('Session');
+    const { SessionStore } = require('stores/sessions/SessionStore');
     const token = SessionStore.getSessionId();
 
     return this.session(token);
@@ -218,12 +211,10 @@ export class Builder {
 }
 
 function queuePromiseIfNotLoggedin(promise) {
-  const SessionStore = StoreProvider.getStore('Session');
+  const { SessionStore, SessionActions } = require('stores/sessions/SessionStore');
 
   if (!SessionStore.isLoggedIn()) {
     return () => CancellablePromise.of(new Promise((resolve, reject) => {
-      const SessionActions = ActionsProvider.getActions('Session');
-
       SessionActions.login.completed.listen(() => {
         promise().then(resolve, reject);
       });

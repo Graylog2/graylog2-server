@@ -20,15 +20,12 @@ import React from 'react';
 import { Col, Button } from 'components/graylog';
 import { EntityListItem, Spinner } from 'components/common';
 import { MetricContainer, CounterRate } from 'components/metrics';
-import CombinedProvider from 'injection/CombinedProvider';
-import type { PipelineType, StageType } from 'stores/pipelines/PipelinesStore';
+import { PipelineType, StageType } from 'stores/pipelines/PipelinesStore';
 import { useStore } from 'stores/connect';
+import { RulesStore } from 'stores/rules/RulesStore';
 import type { RuleType } from 'stores/rules/RulesStore';
-
 import StageForm from './StageForm';
 import StageRules from './StageRules';
-
-const { RulesStore } = CombinedProvider.get('Rules');
 
 type Props = {
   stage: StageType,

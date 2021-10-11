@@ -21,7 +21,7 @@ import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import type { RefluxActions, Store } from 'stores/StoreTypes';
 import FieldTypeMapping, { FieldTypeMappingJSON } from 'views/logic/fieldtypes/FieldTypeMapping';
-import { singletonActions, singletonStore } from 'views/logic/singleton';
+import { singletonActions, singletonStore } from 'logic/singleton';
 import { CurrentQueryStore } from 'views/stores/CurrentQueryStore';
 import Query, { TimeRange } from 'views/logic/queries/Query';
 import { GlobalOverrideStore, GlobalOverrideStoreState } from 'views/stores/GlobalOverrideStore';

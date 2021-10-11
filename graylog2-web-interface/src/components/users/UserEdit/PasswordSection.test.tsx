@@ -97,6 +97,6 @@ describe('<PasswordSection />', () => {
     fireEvent.change(newPasswordRepeatInput, { target: { value: 'notthepassword' } });
     fireEvent.blur(newPasswordRepeatInput);
 
-    await waitFor(() => expect(screen.getByText('Passwords do not match')).toBeInTheDocument());
+    await screen.findByText('Passwords do not match');
   });
 });

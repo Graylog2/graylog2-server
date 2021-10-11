@@ -31,7 +31,7 @@ import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import Query, { RelativeTimeRange } from 'views/logic/queries/Query';
 import { QueriesActions } from 'views/stores/QueriesStore';
 import { SearchActions } from 'views/stores/SearchStore';
-import CurrentUserStore from 'stores/users/CurrentUserStore';
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 
 jest.mock('views/stores/CurrentViewStateStore', () => ({
   CurrentViewStateStore: MockStore(
@@ -45,8 +45,7 @@ jest.mock('views/stores/CurrentViewStateStore', () => ({
 }));
 
 jest.mock('stores/users/CurrentUserStore', () => ({
-  get: jest.fn(),
-  listen: jest.fn(),
+  CurrentUserStore: MockStore('get'),
 }));
 
 jest.mock('views/stores/SearchStore', () => ({

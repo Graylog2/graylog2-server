@@ -19,6 +19,7 @@ package org.graylog.plugins.views.search.export;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchType;
+import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
@@ -41,7 +42,7 @@ public class TestData {
     public static Query.Builder validQueryBuilder() {
         return Query.builder().id(UUID.randomUUID().toString())
                 .timerange(defaultTimeRange())
-                .query(new BackendQuery.Fallback());
+                .query(ElasticsearchQueryString.empty());
     }
 
     public static SimpleMessageChunk simpleMessageChunk(String fieldNames, Object[]... messageValues) {

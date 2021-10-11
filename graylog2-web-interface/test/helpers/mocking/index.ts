@@ -14,10 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-export { default as CombinedProviderMock } from './CombinedProviderMock';
-export { default as MockCombinedProvider } from './CombinedProviderMock';
 export { default as StoreMock } from './StoreMock';
 export { default as MockStore } from './StoreMock';
-export { default as StoreProviderMock } from './StoreProviderMock';
-export { default as MockStoreProvider } from './StoreProviderMock';
 export { default as asMock } from './AsMock';

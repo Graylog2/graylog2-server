@@ -17,15 +17,13 @@
 import moment from 'moment-timezone';
 
 import AppConfig from 'util/AppConfig';
-import CombinedProvider from 'injection/CombinedProvider';
 import { QueriesActions } from 'views/stores/QueriesStore';
 import Query from 'views/logic/queries/Query';
 import type { ViewType } from 'views/logic/views/View';
 import View from 'views/logic/views/View';
 import { GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
 import SearchActions from 'views/actions/SearchActions';
-
-const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 
 const onZoom = (currentQuery: Query, from: string, to: string, viewType: ViewType | undefined | null) => {
   const currentUser = CurrentUserStore.get();

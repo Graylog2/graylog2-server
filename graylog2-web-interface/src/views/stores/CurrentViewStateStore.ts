@@ -21,7 +21,7 @@ import { isEqual } from 'lodash';
 import type { RefluxActions, Store } from 'stores/StoreTypes';
 import FormattingSettings from 'views/logic/views/formatting/FormattingSettings';
 import Widget from 'views/logic/widgets/Widget';
-import { singletonActions, singletonStore } from 'views/logic/singleton';
+import { singletonActions, singletonStore } from 'logic/singleton';
 import GenerateNextPosition from 'views/logic/views/GenerateNextPosition';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 

@@ -19,72 +19,73 @@ import Reflux from 'reflux';
 import * as URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
-import StoreProvider from 'injection/StoreProvider';
+import { singletonStore } from 'logic/singleton';
+import { NodesStore } from 'stores/nodes/NodesStore';
+import { SystemLoadBalancerStore } from 'stores/load-balancer/SystemLoadBalancerStore';
+import { SystemProcessingStore } from 'stores/system-processing/SystemProcessingStore';
 
-const NodesStore = StoreProvider.getStore('Nodes');
-const SystemProcessingStore = StoreProvider.getStore('SystemProcessing');
-const SystemLoadBalancerStore = StoreProvider.getStore('SystemLoadBalancer');
+// eslint-disable-next-line import/prefer-default-export
+export const ClusterOverviewStore = singletonStore(
+  'core.ClusterOverview',
+  () => Reflux.createStore({
+    sourceUrl: '/cluster',
+    clusterOverview: undefined,
 
-const ClusterOverviewStore = Reflux.createStore({
-  sourceUrl: '/cluster',
-  clusterOverview: undefined,
+    init() {
+      this.cluster();
+      this.listenTo(SystemProcessingStore, this.cluster);
+      this.listenTo(SystemLoadBalancerStore, this.cluster);
+      this.listenTo(NodesStore, this.cluster);
+    },
 
-  init() {
-    this.cluster();
-    this.listenTo(SystemProcessingStore, this.cluster);
-    this.listenTo(SystemLoadBalancerStore, this.cluster);
-    this.listenTo(NodesStore, this.cluster);
-  },
+    getInitialState() {
+      return { clusterOverview: this.clusterOverview };
+    },
 
-  getInitialState() {
-    return { clusterOverview: this.clusterOverview };
-  },
+    cluster() {
+      const promise = fetch('GET', URLUtils.qualifyUrl(this.sourceUrl));
 
-  cluster() {
-    const promise = fetch('GET', URLUtils.qualifyUrl(this.sourceUrl));
-
-    promise.then(
-      (response) => {
-        this.clusterOverview = response;
-        this.trigger({ clusterOverview: this.clusterOverview });
-      },
-      (error) => UserNotification.error(`Getting cluster overview failed: ${error}`, 'Could not get cluster overview'),
-    );
-
-    return promise;
-  },
-
-  threadDump(nodeId) {
-    const promise = fetch('GET', URLUtils.qualifyUrl(`${this.sourceUrl}/${nodeId}/threaddump`))
-      .then(
+      promise.then(
         (response) => {
-          return response.threaddump;
+          this.clusterOverview = response;
+          this.trigger({ clusterOverview: this.clusterOverview });
         },
-        (error) => UserNotification.error(`Getting thread dump for node '${nodeId}' failed: ${error}`, 'Could not get thread dump'),
+        (error) => UserNotification.error(`Getting cluster overview failed: ${error}`, 'Could not get cluster overview'),
       );
 
-    return promise;
-  },
+      return promise;
+    },
 
-  processbufferDump(nodeId) {
-    const promise = fetch('GET', URLUtils.qualifyUrl(`${this.sourceUrl}/${nodeId}/processbufferdump`))
-      .then(
-        (response) => {
-          return response.processbuffer_dump;
-        },
-        (error) => UserNotification.error(`Getting process buffer dump for node '${nodeId}' failed: ${error}`, 'Could not get process buffer dump'),
-      );
+    threadDump(nodeId) {
+      const promise = fetch('GET', URLUtils.qualifyUrl(`${this.sourceUrl}/${nodeId}/threaddump`))
+        .then(
+          (response) => {
+            return response.threaddump;
+          },
+          (error) => UserNotification.error(`Getting thread dump for node '${nodeId}' failed: ${error}`, 'Could not get thread dump'),
+        );
 
-    return promise;
-  },
+      return promise;
+    },
 
-  jvm(nodeId) {
-    const promise = fetch('GET', URLUtils.qualifyUrl(`${this.sourceUrl}/${nodeId}/jvm`));
+    processbufferDump(nodeId) {
+      const promise = fetch('GET', URLUtils.qualifyUrl(`${this.sourceUrl}/${nodeId}/processbufferdump`))
+        .then(
+          (response) => {
+            return response.processbuffer_dump;
+          },
+          (error) => UserNotification.error(`Getting process buffer dump for node '${nodeId}' failed: ${error}`, 'Could not get process buffer dump'),
+        );
 
-    promise.catch((error) => UserNotification.error(`Getting JVM information for node '${nodeId}' failed: ${error}`, 'Could not get JVM information'));
+      return promise;
+    },
 
-    return promise;
-  },
-});
+    jvm(nodeId) {
+      const promise = fetch('GET', URLUtils.qualifyUrl(`${this.sourceUrl}/${nodeId}/jvm`));
 
-export default ClusterOverviewStore;
+      promise.catch((error) => UserNotification.error(`Getting JVM information for node '${nodeId}' failed: ${error}`, 'Could not get JVM information'));
+
+      return promise;
+    },
+  }),
+);

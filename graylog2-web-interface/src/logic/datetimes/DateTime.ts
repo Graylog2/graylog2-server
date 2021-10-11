@@ -17,7 +17,7 @@
 import moment from 'moment-timezone';
 
 import AppConfig from 'util/AppConfig';
-import StoreProvider from 'injection/StoreProvider';
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 
 class DateTime {
   private dateTime: moment.Moment | undefined;
@@ -94,8 +94,6 @@ class DateTime {
 
   static getCurrentUser() {
     if (!this.currentUserStoreUnsub) {
-      const CurrentUserStore = StoreProvider.getStore('CurrentUser');
-
       this._currentUser = CurrentUserStore.get();
 
       this.currentUserStoreUnsub = CurrentUserStore.listen((state) => { this._currentUser = state.currentUser; });

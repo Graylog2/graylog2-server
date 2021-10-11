@@ -33,23 +33,23 @@ const mockListNodes = jest.fn();
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const mockListStreams = jest.fn((...args) => Promise.resolve([]));
 
-jest.mock('injection/CombinedProvider', () => ({
-  get: jest.fn((type) => ({
-    Inputs: { InputsActions: { get: (...args) => mockGetInput(...args) }, InputsStore: {} },
-    Nodes: {
-      NodesActions: { list: (...args) => mockListNodes(...args) },
-      NodesStore: MockStore(['listen', () => () => {}], ['getInitialState', () => ({ nodes: {} })]),
-    },
-    Messages: { MessagesActions: { loadMessage: (...args) => mockLoadMessage(...args) } },
-    Streams: { StreamsStore: { listStreams: (...args) => mockListStreams(...args) } },
-    CurrentUser: {
-      CurrentUserStore: MockStore(),
-    },
-    Preferences: {
-      PreferencesStore: MockStore(),
-    },
-  }[type])),
+jest.mock('stores/nodes/NodesStore', () => ({
+  NodesActions: { list: (...args) => mockListNodes(...args) },
+  NodesStore: MockStore(['listen', () => () => {}], ['getInitialState', () => ({ nodes: {} })]),
 }));
+
+jest.mock('stores/messages/MessagesStore', () => ({
+  MessagesActions: { loadMessage: (...args) => mockLoadMessage(...args) },
+}));
+
+jest.mock('stores/inputs/InputsStore', () => ({
+  InputsActions: {
+    get: jest.fn((...args) => mockGetInput(...args)),
+  },
+  InputsStore: MockStore(),
+}));
+
+jest.mock('stores/streams/StreamsStore', () => ({ listStreams: (...args) => mockListStreams(...args) }));
 
 jest.mock('views/logic/fieldtypes/useFieldTypes');
 jest.mock('routing/withParams', () => (x) => x);

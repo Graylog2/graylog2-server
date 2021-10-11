@@ -24,12 +24,10 @@ import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
 import RuleList from 'components/rules/RuleList';
 import Routes from 'routing/Routes';
-import CombinedProvider from 'injection/CombinedProvider';
 import { Pagination, DEFAULT_PAGINATION } from 'stores/PaginationTypes';
 import type { PaginatedRules, RuleType } from 'stores/rules/RulesStore';
+import { RulesActions } from 'stores/rules/RulesStore';
 import useLocationSearchPagination from 'hooks/useLocationSearchPagination';
-
-const { RulesActions } = CombinedProvider.get('Rules');
 
 const Flex = styled.div`
   display: flex;

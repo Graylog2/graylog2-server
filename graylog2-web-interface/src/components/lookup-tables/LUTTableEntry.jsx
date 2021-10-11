@@ -18,12 +18,10 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { LinkContainer, Link } from 'components/graylog/router';
-import CombinedProvider from 'injection/CombinedProvider';
 import Routes from 'routing/Routes';
 import { Button } from 'components/graylog';
 import { ErrorPopover } from 'components/lookup-tables';
-
-const { LookupTablesActions } = CombinedProvider.get('LookupTables');
+import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
 
 class LUTTableEntry extends React.Component {
   static propTypes = {

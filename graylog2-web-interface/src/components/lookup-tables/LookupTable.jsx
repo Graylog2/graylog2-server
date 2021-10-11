@@ -22,9 +22,7 @@ import { ButtonToolbar, Row, Col, Button } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import * as FormsUtils from 'util/FormsUtils';
-import CombinedProvider from 'injection/CombinedProvider';
-
-const { LookupTablesActions } = CombinedProvider.get('LookupTables');
+import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
 
 class LookupTable extends React.Component {
   static propTypes = {

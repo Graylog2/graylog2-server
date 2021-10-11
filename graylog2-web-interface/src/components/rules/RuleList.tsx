@@ -23,13 +23,11 @@ import { Button, ButtonToolbar } from 'components/graylog';
 import { DataTable, Timestamp } from 'components/common';
 import { MetricContainer, CounterRate } from 'components/metrics';
 import Routes from 'routing/Routes';
-import CombinedProvider from 'injection/CombinedProvider';
+import { RulesActions, RulesStore } from 'stores/rules/RulesStore';
 import type { RuleType, MetricsConfigType, RulesStoreState } from 'stores/rules/RulesStore';
 import { Store } from 'stores/StoreTypes';
 
 import RuleMetricsConfigContainer from './RuleMetricsConfigContainer';
-
-const { RulesActions, RulesStore } = CombinedProvider.get('Rules');
 
 type Props = {
   rules: Array<RuleType>,

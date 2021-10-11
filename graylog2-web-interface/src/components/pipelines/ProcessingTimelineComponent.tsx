@@ -24,17 +24,15 @@ import { Button } from 'components/graylog';
 import { DataTable, Spinner, PaginatedList, SearchForm, QueryHelper } from 'components/common';
 import { MetricContainer, CounterRate } from 'components/metrics';
 import Routes from 'routing/Routes';
-import CombinedProvider from 'injection/CombinedProvider';
 import { useStore } from 'stores/connect';
 import StreamsStore, { Stream } from 'stores/streams/StreamsStore';
 import type { PaginatedPipelines } from 'stores/pipelines/PipelinesStore';
+import { PipelinesActions } from 'stores/pipelines/PipelinesStore';
 import { DEFAULT_PAGINATION } from 'stores/PaginationTypes';
 import useLocationSearchPagination from 'hooks/useLocationSearchPagination';
+import { PipelineConnectionsStore, PipelineConnectionsActions } from 'stores/pipelines/PipelineConnectionsStore';
 
 import PipelineConnectionsList from './PipelineConnectionsList';
-
-const { PipelinesActions } = CombinedProvider.get('Pipelines');
-const { PipelineConnectionsStore, PipelineConnectionsActions } = CombinedProvider.get('PipelineConnections');
 
 const StyledPaginatedList = styled(PaginatedList)`
   .pagination {

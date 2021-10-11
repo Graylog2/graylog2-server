@@ -60,7 +60,7 @@ type Props = {
 const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: Props) => {
   const [nextRangeProps, , nextRangeHelpers] = useField('nextTimeRange');
   const mounted = useRef(true);
-  const keywordRef = useRef();
+  const keywordRef = useRef<string>();
   const [keywordPreview, setKeywordPreview] = useState({ from: '', to: '', timezone: '' });
 
   const _setSuccessfullPreview = useCallback((response: { from: string, to: string, timezone: string }) => {
@@ -76,21 +76,27 @@ const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: P
     return 'Unable to parse keyword.';
   }, [setKeywordPreview]);
 
-  const _validateKeyword = (keyword: string): Promise<string | void> | undefined | null => {
+  const _validateKeyword = useCallback((keyword: string) => {
     if (keyword === undefined) {
       return undefined;
     }
 
-    setValidatingKeyword(true);
+    if (keywordRef.current !== keyword) {
+      keywordRef.current = keyword;
 
-    return trim(keyword) === ''
-      ? Promise.resolve('Keyword must not be empty!')
-      : ToolsStore.testNaturalDate(keyword)
-        .then((response) => {
-          if (mounted.current) _setSuccessfullPreview(response);
-        })
-        .catch(_setFailedPreview);
-  };
+      setValidatingKeyword(true);
+
+      return trim(keyword) === ''
+        ? Promise.resolve('Keyword must not be empty!')
+        : ToolsStore.testNaturalDate(keyword)
+          .then((response) => {
+            if (mounted.current) _setSuccessfullPreview(response);
+          })
+          .catch(_setFailedPreview);
+    }
+
+    return undefined;
+  }, [_setFailedPreview, _setSuccessfullPreview, setValidatingKeyword]);
 
   useEffect(() => {
     return () => {
@@ -99,12 +105,8 @@ const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: P
   }, []);
 
   useEffect(() => {
-    if (keywordRef.current !== nextRangeProps?.value?.keyword) {
-      keywordRef.current = nextRangeProps.value.keyword;
-
-      _validateKeyword(keywordRef.current);
-    }
-  });
+    _validateKeyword(keywordRef.current);
+  }, [_validateKeyword]);
 
   useEffect(() => {
     if (nextRangeProps?.value) {

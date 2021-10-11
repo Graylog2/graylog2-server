@@ -70,7 +70,7 @@ public class SearchDriver {
         MessageList messageList = MessageList.builder().id(messageListId).build();
         Query q = Query.builder()
                 .id(queryId)
-                .query(ElasticsearchQueryString.builder().queryString("").build())
+                .query(ElasticsearchQueryString.of(""))
                 .timerange(timeRange)
                 .searchTypes(ImmutableSet.of(messageList))
                 .build();

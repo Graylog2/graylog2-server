@@ -34,14 +34,15 @@ jest.mock('stores/decorators/DecoratorsStore', () => ({
   DecoratorsStore: MockStore(),
 }));
 
-jest.mock('stores/configurations/ConfigurationsStore', () => MockStore(['getInitialState', () => ({
-  configuration: mockConfiguration,
-})]));
-
-jest.mock('actions/configurations/ConfigurationActions', () => ({
-  listWhiteListConfig: jest.fn(() => Promise.resolve()),
-  list: jest.fn(() => Promise.resolve()),
-  listMessageProcessorsConfig: jest.fn(() => Promise.resolve()),
+jest.mock('stores/configurations/ConfigurationsStore', () => ({
+  ConfigurationsStore: MockStore(['getInitialState', () => ({
+    configuration: mockConfiguration,
+  })]),
+  ConfigurationsActions: {
+    listWhiteListConfig: jest.fn(() => Promise.resolve()),
+    list: jest.fn(() => Promise.resolve()),
+    listMessageProcessorsConfig: jest.fn(() => Promise.resolve()),
+  },
 }));
 
 jest.mock('stores/streams/StreamsStore', () => ({

@@ -21,9 +21,7 @@ import styled, { css } from 'styled-components';
 import { Alert, Button } from 'components/graylog';
 import { Timestamp, Icon } from 'components/common';
 import NotificationsFactory from 'logic/notifications/NotificationsFactory';
-import ActionsProvider from 'injection/ActionsProvider';
-
-const NotificationsActions = ActionsProvider.getActions('Notifications');
+import { NotificationsActions } from 'stores/notifications/NotificationsStore';
 
 const StyledButton = styled(Button)`
   float: right;

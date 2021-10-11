@@ -19,12 +19,24 @@ import Promise from 'bluebird';
 
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
-import ActionsProvider from 'injection/ActionsProvider';
 import ExtractorUtils from 'util/ExtractorUtils';
 import * as URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
+import { singletonStore, singletonActions } from 'logic/singleton';
 
-const ExtractorsActions = ActionsProvider.getActions('Extractors');
+export const ExtractorsActions = singletonActions(
+  'core.Extractors',
+  () => Reflux.createActions({
+    list: { asyncResult: true },
+    get: { asyncResult: true },
+    create: { asyncResult: true },
+    save: { asyncResult: true },
+    update: { asyncResult: true },
+    delete: { asyncResult: true },
+    order: { asyncResult: true },
+    import: {},
+  }),
+);
 
 function getExtractorDTO(extractor) {
   const converters = {};
@@ -49,189 +61,190 @@ function getExtractorDTO(extractor) {
   };
 }
 
-const ExtractorsStore = Reflux.createStore({
-  listenables: [ExtractorsActions],
-  sourceUrl: '/system/inputs/',
-  extractors: undefined,
-  extractor: undefined,
+export const ExtractorsStore = singletonStore(
+  'core.Extractors',
+  () => Reflux.createStore({
+    listenables: [ExtractorsActions],
+    sourceUrl: '/system/inputs/',
+    extractors: undefined,
+    extractor: undefined,
 
-  init() {
-    this.trigger({ extractors: this.extractors, extractor: this.extractor });
-  },
+    init() {
+      this.trigger({ extractors: this.extractors, extractor: this.extractor });
+    },
 
-  list(inputId) {
-    const promise = fetch('GET', URLUtils.qualifyUrl(URLUtils.concatURLPath(this.sourceUrl, inputId, 'extractors')));
+    list(inputId) {
+      const promise = fetch('GET', URLUtils.qualifyUrl(URLUtils.concatURLPath(this.sourceUrl, inputId, 'extractors')));
 
-    promise.then((response) => {
-      this.extractors = response.extractors;
-      this.trigger({ extractors: this.extractors });
-    });
-
-    ExtractorsActions.list.promise(promise);
-  },
-
-  // Creates an basic extractor object that we can use to create new extractors.
-  new(type, field) {
-    if (ExtractorUtils.EXTRACTOR_TYPES.indexOf(type) === -1) {
-      throw new Error(`Invalid extractor type provided: ${type}`);
-    }
-
-    return {
-      type: type,
-      source_field: field,
-      converters: [],
-      extractor_config: {},
-      target_field: '',
-    };
-  },
-
-  get(inputId, extractorId) {
-    const promise = fetch('GET', URLUtils.qualifyUrl(URLUtils.concatURLPath(this.sourceUrl, inputId, 'extractors', extractorId)));
-
-    promise.then((response) => {
-      this.extractor = response;
-      this.trigger({ extractor: this.extractor });
-    });
-
-    ExtractorsActions.get.promise(promise);
-  },
-
-  save(inputId, extractor) {
-    let promise;
-
-    if (extractor.id) {
-      promise = this.update(inputId, extractor, true);
-    } else {
-      promise = this.create(inputId, extractor, true);
-    }
-
-    ExtractorsActions.save.promise(promise);
-  },
-
-  _silentExtractorCreate(inputId, extractor) {
-    const url = URLUtils.qualifyUrl(ApiRoutes.ExtractorsController.create(inputId).url);
-
-    return fetch('POST', url, getExtractorDTO(extractor));
-  },
-
-  create(inputId, extractor, calledFromMethod) {
-    const promise = this._silentExtractorCreate(inputId, extractor);
-
-    promise
-      .then(() => {
-        UserNotification.success(`Extractor ${extractor.title} created successfully`);
-
-        if (this.extractor) {
-          ExtractorsActions.get.triggerPromise(inputId, extractor.id);
-        }
-      })
-      .catch((error) => {
-        UserNotification.error(`Creating extractor failed: ${error}`,
-          'Could not create extractor');
+      promise.then((response) => {
+        this.extractors = response.extractors;
+        this.trigger({ extractors: this.extractors });
       });
 
-    if (!calledFromMethod) {
-      ExtractorsActions.create.promise(promise);
-    }
+      ExtractorsActions.list.promise(promise);
+    },
 
-    return promise;
-  },
+    // Creates an basic extractor object that we can use to create new extractors.
+    new(type, field) {
+      if (ExtractorUtils.EXTRACTOR_TYPES.indexOf(type) === -1) {
+        throw new Error(`Invalid extractor type provided: ${type}`);
+      }
 
-  update(inputId, extractor, calledFromMethod) {
-    const url = URLUtils.qualifyUrl(ApiRoutes.ExtractorsController.update(inputId, extractor.id).url);
+      return {
+        type: type,
+        source_field: field,
+        converters: [],
+        extractor_config: {},
+        target_field: '',
+      };
+    },
 
-    const promise = fetch('PUT', url, getExtractorDTO(extractor));
+    get(inputId, extractorId) {
+      const promise = fetch('GET', URLUtils.qualifyUrl(URLUtils.concatURLPath(this.sourceUrl, inputId, 'extractors', extractorId)));
 
-    promise
-      .then(() => {
-        UserNotification.success(`Extractor "${extractor.title}" updated successfully`);
-
-        if (this.extractor) {
-          ExtractorsActions.get.triggerPromise(inputId, extractor.id);
-        }
-      })
-      .catch((error) => {
-        UserNotification.error(`Updating extractor failed: ${error}`,
-          'Could not update extractor');
+      promise.then((response) => {
+        this.extractor = response;
+        this.trigger({ extractor: this.extractor });
       });
 
-    if (!calledFromMethod) {
-      ExtractorsActions.update.promise(promise);
-    }
+      ExtractorsActions.get.promise(promise);
+    },
 
-    return promise;
-  },
+    save(inputId, extractor) {
+      let promise;
 
-  delete(inputId, extractor) {
-    const url = URLUtils.qualifyUrl(ApiRoutes.ExtractorsController.delete(inputId, extractor.id).url);
+      if (extractor.id) {
+        promise = this.update(inputId, extractor, true);
+      } else {
+        promise = this.create(inputId, extractor, true);
+      }
 
-    const promise = fetch('DELETE', url);
+      ExtractorsActions.save.promise(promise);
+    },
 
-    promise
-      .then(() => {
-        UserNotification.success(`Extractor "${extractor.title}" deleted successfully`);
+    _silentExtractorCreate(inputId, extractor) {
+      const url = URLUtils.qualifyUrl(ApiRoutes.ExtractorsController.create(inputId).url);
+
+      return fetch('POST', url, getExtractorDTO(extractor));
+    },
+
+    create(inputId, extractor, calledFromMethod) {
+      const promise = this._silentExtractorCreate(inputId, extractor);
+
+      promise
+        .then(() => {
+          UserNotification.success(`Extractor ${extractor.title} created successfully`);
+
+          if (this.extractor) {
+            ExtractorsActions.get.triggerPromise(inputId, extractor.id);
+          }
+        })
+        .catch((error) => {
+          UserNotification.error(`Creating extractor failed: ${error}`,
+            'Could not create extractor');
+        });
+
+      if (!calledFromMethod) {
+        ExtractorsActions.create.promise(promise);
+      }
+
+      return promise;
+    },
+
+    update(inputId, extractor, calledFromMethod) {
+      const url = URLUtils.qualifyUrl(ApiRoutes.ExtractorsController.update(inputId, extractor.id).url);
+
+      const promise = fetch('PUT', url, getExtractorDTO(extractor));
+
+      promise
+        .then(() => {
+          UserNotification.success(`Extractor "${extractor.title}" updated successfully`);
+
+          if (this.extractor) {
+            ExtractorsActions.get.triggerPromise(inputId, extractor.id);
+          }
+        })
+        .catch((error) => {
+          UserNotification.error(`Updating extractor failed: ${error}`,
+            'Could not update extractor');
+        });
+
+      if (!calledFromMethod) {
+        ExtractorsActions.update.promise(promise);
+      }
+
+      return promise;
+    },
+
+    delete(inputId, extractor) {
+      const url = URLUtils.qualifyUrl(ApiRoutes.ExtractorsController.delete(inputId, extractor.id).url);
+
+      const promise = fetch('DELETE', url);
+
+      promise
+        .then(() => {
+          UserNotification.success(`Extractor "${extractor.title}" deleted successfully`);
+
+          if (this.extractors) {
+            ExtractorsActions.list.triggerPromise(inputId);
+          }
+        })
+        .catch((error) => {
+          UserNotification.error(`Deleting extractor failed: ${error}`,
+            `Could not delete extractor ${extractor.title}`);
+        });
+
+      ExtractorsActions.delete.promise(promise);
+    },
+
+    order(inputId, orderedExtractors) {
+      const url = URLUtils.qualifyUrl(ApiRoutes.ExtractorsController.order(inputId).url);
+      const orderedExtractorsMap = {};
+
+      orderedExtractors.forEach((extractor, idx) => orderedExtractorsMap[idx] = extractor.id);
+
+      const promise = fetch('POST', url, { order: orderedExtractorsMap });
+
+      promise.then(() => {
+        UserNotification.success('Extractor positions updated successfully');
 
         if (this.extractors) {
           ExtractorsActions.list.triggerPromise(inputId);
         }
-      })
-      .catch((error) => {
-        UserNotification.error(`Deleting extractor failed: ${error}`,
-          `Could not delete extractor ${extractor.title}`);
       });
 
-    ExtractorsActions.delete.promise(promise);
-  },
+      promise.catch((error) => {
+        UserNotification.error(`Changing extractor positions failed: ${error}`,
+          'Could not update extractor positions');
+      });
 
-  order(inputId, orderedExtractors) {
-    const url = URLUtils.qualifyUrl(ApiRoutes.ExtractorsController.order(inputId).url);
-    const orderedExtractorsMap = {};
+      ExtractorsActions.order.promise(promise);
+    },
 
-    orderedExtractors.forEach((extractor, idx) => orderedExtractorsMap[idx] = extractor.id);
+    import(inputId, extractors) {
+      let successfulImports = 0;
+      let failedImports = 0;
+      const promises = [];
 
-    const promise = fetch('POST', url, { order: orderedExtractorsMap });
+      extractors.forEach((extractor) => {
+        const promise = this._silentExtractorCreate(inputId, extractor);
 
-    promise.then(() => {
-      UserNotification.success('Extractor positions updated successfully');
+        promise
+          .then(() => successfulImports++)
+          .catch(() => failedImports++);
 
-      if (this.extractors) {
-        ExtractorsActions.list.triggerPromise(inputId);
-      }
-    });
+        promises.push(promise);
+      });
 
-    promise.catch((error) => {
-      UserNotification.error(`Changing extractor positions failed: ${error}`,
-        'Could not update extractor positions');
-    });
-
-    ExtractorsActions.order.promise(promise);
-  },
-
-  import(inputId, extractors) {
-    let successfulImports = 0;
-    let failedImports = 0;
-    const promises = [];
-
-    extractors.forEach((extractor) => {
-      const promise = this._silentExtractorCreate(inputId, extractor);
-
-      promise
-        .then(() => successfulImports++)
-        .catch(() => failedImports++);
-
-      promises.push(promise);
-    });
-
-    Promise.settle(promises).then(() => {
-      if (failedImports === 0) {
-        UserNotification.success(`Import results: ${successfulImports} extractor(s) imported.`,
-          'Import operation successful');
-      } else {
-        UserNotification.warning(`Import results: ${successfulImports} extractor(s) imported, ${failedImports} error(s).`,
-          'Import operation completed');
-      }
-    });
-  },
-});
-
-export default ExtractorsStore;
+      Promise.settle(promises).then(() => {
+        if (failedImports === 0) {
+          UserNotification.success(`Import results: ${successfulImports} extractor(s) imported.`,
+            'Import operation successful');
+        } else {
+          UserNotification.warning(`Import results: ${successfulImports} extractor(s) imported, ${failedImports} error(s).`,
+            'Import operation completed');
+        }
+      });
+    },
+  }),
+);
