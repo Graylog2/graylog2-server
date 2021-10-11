@@ -20,7 +20,6 @@ import moment from 'moment';
 import styled from 'styled-components';
 
 import { Timestamp } from 'components/common';
-import DateTime from 'logic/datetimes/DateTime';
 
 const _getInitialState = () => {
   return { time: moment() };
