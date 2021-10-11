@@ -61,24 +61,24 @@ const DateTimeProvider = ({ children }: Props) => {
   const currentUser = useContext(CurrentUserContext);
   const userTimezone = useMemo(() => getUserTimezone(currentUser?.timezone), [currentUser?.timezone]);
 
-  const unifiedTimeAsDate = useCallback((time, tz = userTimezone) => {
+  const unifyTimeAsDate = useCallback((time, tz = userTimezone) => {
     return moment.tz(time.trim(), Object.values(ACCEPTED_FORMATS), true, tz);
   }, [userTimezone]);
 
-  const unifiedTime = useCallback((time, tz = userTimezone, format = FORMATS.default) => {
-    return unifiedTimeAsDate(time, tz).format(FORMATS[format]);
-  }, [unifiedTimeAsDate, userTimezone]);
+  const unifyTime = useCallback((time, tz = userTimezone, format = FORMATS.default) => {
+    return unifyTimeAsDate(time, tz).format(FORMATS[format]);
+  }, [unifyTimeAsDate, userTimezone]);
 
-  const unifiedBrowserTime = (time, format) => {
-    return unifiedTime(time, getBrowserTimezone(), format);
+  const unifyAsBrowserTime = (time, format) => {
+    return unifyTime(time, getBrowserTimezone(), format);
   };
 
   const relativeDifference = (time, tz) => {
-    return unifiedTimeAsDate(time, tz).fromNow();
+    return unifyTimeAsDate(time, tz).fromNow();
   };
 
   return (
-    <DateTimeContext.Provider value={{ unifiedTime, unifiedTimeAsDate, userTimezone, unifiedBrowserTime, relativeDifference }}>
+    <DateTimeContext.Provider value={{ unifyTime, unifyTimeAsDate, userTimezone, unifyAsBrowserTime, relativeDifference }}>
       {children}
     </DateTimeContext.Provider>
   );

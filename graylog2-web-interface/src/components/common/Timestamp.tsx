@@ -21,16 +21,16 @@ import type { Moment } from 'moment';
 
 import DateTimeContext, { DateTimeFormats } from 'contexts/DateTimeContext';
 
-const formatDateTime = (dateTime, format, tz, relative = false, unifiedTime, unifiedBrowserTime, relativeDifference): string => {
+const formatDateTime = (dateTime, format, tz, relative = false, unifyTime, unifyAsBrowserTime, relativeDifference): string => {
   if (relative) {
     return relativeDifference(dateTime, tz);
   }
 
   if (tz === 'browser') {
-    return unifiedBrowserTime(dateTime, format);
+    return unifyAsBrowserTime(dateTime, format);
   }
 
-  return unifiedTime(dateTime, tz, format);
+  return unifyTime(dateTime, tz, format);
 };
 
 type Props = {
@@ -56,10 +56,10 @@ type Props = {
  *
  */
 const Timestamp = ({ dateTime, field, format, relative, render: Component, tz }: Props) => {
-  const { unifiedTime, unifiedBrowserTime, relativeDifference } = useContext(DateTimeContext);
+  const { unifyTime, unifyAsBrowserTime, relativeDifference } = useContext(DateTimeContext);
   const formattedDateTime = useMemo(
-    () => formatDateTime(dateTime, format, tz, relative, unifiedTime, unifiedBrowserTime, relativeDifference),
-    [dateTime, format, tz, relative, unifiedTime, unifiedBrowserTime, relativeDifference],
+    () => formatDateTime(dateTime, format, tz, relative, unifyTime, unifyAsBrowserTime, relativeDifference),
+    [dateTime, format, tz, relative, unifyTime, unifyAsBrowserTime, relativeDifference],
   );
 
   return (

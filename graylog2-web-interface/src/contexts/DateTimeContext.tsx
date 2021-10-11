@@ -26,11 +26,11 @@ export type DateTimeFormats = keyof typeof FORMATS;
 export type DateTime = string | number | Moment | Date;
 
 export type DateTimeContextType = {
-  userTimezone: string,
-  unifiedTimeAsDate: (time: DateTime, tz?: string, format?: DateTimeFormats) => Moment,
-  unifiedTime: (time: DateTime, tz?: string, format?: DateTimeFormats) => string
-  unifiedBrowserTime: (time: DateTime, format?: DateTimeFormats) => string,
   relativeDifference: (time: DateTime, tz?: string) => string
+  unifyAsBrowserTime: (time: DateTime, format?: DateTimeFormats) => string,
+  unifyTime: (time: DateTime, tz?: string, format?: DateTimeFormats) => string
+  unifyTimeAsDate: (time: DateTime, tz?: string, format?: DateTimeFormats) => Moment,
+  userTimezone: string,
 };
 
 const DateTimeContext = React.createContext<DateTimeContextType | undefined>(undefined);
