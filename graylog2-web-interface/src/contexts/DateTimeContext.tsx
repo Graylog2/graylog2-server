@@ -21,15 +21,15 @@ import { singleton } from 'logic/singleton';
 
 import { FORMATS } from './DateTimeProvider';
 
-type Formats = keyof typeof FORMATS;
+export type DateTimeFormats = keyof typeof FORMATS;
 
 export type DateTime = string | number | Moment | Date;
 
 export type DateTimeContextType = {
   userTimezone: string,
-  unifiedTimeAsDate: (time: DateTime, tz?: string, format?: Formats) => Moment,
-  unifiedTime: (time: DateTime, tz?: string, format?: Formats) => string
-  unifiedBrowserTime: (time: DateTime, format?: Formats) => string,
+  unifiedTimeAsDate: (time: DateTime, tz?: string, format?: DateTimeFormats) => Moment,
+  unifiedTime: (time: DateTime, tz?: string, format?: DateTimeFormats) => string
+  unifiedBrowserTime: (time: DateTime, format?: DateTimeFormats) => string,
   relativeDifference: (time: DateTime, tz?: string) => string
 };
 

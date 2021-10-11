@@ -47,8 +47,8 @@ const getUserTimezone = (userTimezone) => {
 };
 
 export const FORMATS = {
-  short: 'YYYY-MM-DD HH:mm:ss',
   default: 'YYYY-MM-DD HH:mm:ss',
+  complete: 'YYYY-MM-DD HH:mm:ss.SSS',
   withTz: 'YYYY-MM-DD HH:mm:ss Z',
   readable: 'dddd D MMMM YYYY, HH:mm ZZ',
 };

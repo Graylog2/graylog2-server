@@ -35,7 +35,7 @@ const SearchResultOverview = ({ results: { timestamp, duration } }: Props) => {
 
   return (
     <span>
-      Query executed in {numeral(duration).format('0,0')}ms at <Timestamp dateTime={timestamp} format={DateTime.Formats.DATETIME} />.
+      Query executed in {numeral(duration).format('0,0')}ms at <Timestamp dateTime={timestamp} />.
     </span>
   );
 };

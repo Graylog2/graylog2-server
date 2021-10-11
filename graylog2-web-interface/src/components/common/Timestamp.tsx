@@ -19,8 +19,7 @@ import * as React from 'react';
 import { useMemo, useContext } from 'react';
 import type { Moment } from 'moment';
 
-import DateTime from 'logic/datetimes/DateTime';
-import DateTimeContext from 'contexts/DateTimeContext';
+import DateTimeContext, { DateTimeFormats } from 'contexts/DateTimeContext';
 
 const formatDateTime = (dateTime, format, tz, relative = false, unifiedTime, unifiedBrowserTime, relativeDifference): string => {
   if (relative) {
@@ -37,7 +36,7 @@ const formatDateTime = (dateTime, format, tz, relative = false, unifiedTime, uni
 type Props = {
   dateTime: string | number | Date | Moment,
   field?: string,
-  format?: string,
+  format?: DateTimeFormats,
   relative?: boolean,
   render?: React.ComponentType<{ value: string, field: string | undefined }>,
   tz?: string,
@@ -78,20 +77,10 @@ Timestamp.propTypes = {
    */
   dateTime: PropTypes.oneOfType([PropTypes.string, PropTypes.object, PropTypes.number]).isRequired,
   /**
-   * Format to use to represent the date time. It supports any format
-   * supported by momentjs http://momentjs.com/docs/#/displaying/format/.
-   * We also provide a list of default formats in 'logic/datetimes/DateTime':
-   *
-   *  - DATE: `YYYY-MM-DD`
-   *  - DATETIME: `YYYY-MM-DD HH:mm:ss`, local times when decimal second precision is not important
-   *  - DATETIME_TZ: `YYYY-MM-DD HH:mm:ss Z`, when decimal second precision is not important, but TZ is
-   *  - TIMESTAMP: `YYYY-MM-DD HH:mm:ss.SSS`, local times when decimal second precision is important (e.g. search results)
-   *  - TIMESTAMP_TZ: `YYYY-MM-DD HH:mm:ss.SSS Z`, when decimal second precision is important, in a different TZ
-   *  - COMPLETE: `dddd D MMMM YYYY, HH:mm ZZ`, easy to read date time
-   *  - ISO_8601: `YYYY-MM-DDTHH:mm:ss.SSSZ`
+   * Format to use to represent the date time.
    */
   format: PropTypes.string,
-  /** Provides field prop for the render function.  */
+  /** Provides field prop for the render function. */
   field: PropTypes.string,
   /** Specifies if the component should display relative time or not. */
   relative: PropTypes.bool,
@@ -109,7 +98,7 @@ Timestamp.propTypes = {
 
 Timestamp.defaultProps = {
   field: undefined,
-  format: DateTime.Formats.TIMESTAMP,
+  format: 'default',
   relative: false,
   render: ({ value }) => value,
   tz: undefined,

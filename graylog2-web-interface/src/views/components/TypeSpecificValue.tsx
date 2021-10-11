@@ -57,7 +57,7 @@ const TypeSpecificValue = ({ field, value, render = defaultComponent, type = Fie
   }
 
   switch (type.type) {
-    case 'date': return <Timestamp dateTime={value} render={render} field={field} />;
+    case 'date': return <Timestamp dateTime={value} render={render} field={field} format="complete" />;
     case 'boolean': return <Component value={String(value)} field={field} />;
     default: return _formatValue(field, value, truncate, render, type);
   }

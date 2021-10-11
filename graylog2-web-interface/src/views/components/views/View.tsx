@@ -46,7 +46,7 @@ OwnerTag.propTypes = {
 const Description = ({ description, owner, createdAt }) => (
   <>
     <div>{description || <i>No description given.</i>}</div>
-    <div style={{ color: 'darkgray' }}><OwnerTag owner={owner} /> at <Timestamp dateTime={createdAt} /></div>
+    <div style={{ color: 'darkgray' }}><OwnerTag owner={owner} /> at <Timestamp dateTime={createdAt} format="complete" /></div>
   </>
 );
 

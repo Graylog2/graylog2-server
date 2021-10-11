@@ -13,7 +13,7 @@ const yesterday = moment().subtract(1, 'day');
 Formatted time:
 ```js
 const DateTime = require('logic/datetimes/DateTime');
-<Timestamp dateTime={new Date().toISOString()} format={DateTime.Formats.COMPLETE} />
+<Timestamp dateTime={new Date().toISOString()} format="readable" />
 ```
 
 Showing date/time of Unix Timestamp (in millis):

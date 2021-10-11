@@ -47,7 +47,7 @@ const TimesList = createReactClass({
     }
 
     const { time } = this.state;
-    const timeFormat = DateTime.Formats.DATETIME_TZ;
+    const timeFormat = 'withTz';
     const { currentUser } = this.state;
     const serverTimezone = this.state.system.timezone;
 
