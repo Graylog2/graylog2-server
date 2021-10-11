@@ -24,6 +24,7 @@ import { PipelineType, StageType } from 'stores/pipelines/PipelinesStore';
 import { useStore } from 'stores/connect';
 import { RulesStore } from 'stores/rules/RulesStore';
 import type { RuleType } from 'stores/rules/RulesStore';
+
 import StageForm from './StageForm';
 import StageRules from './StageRules';
 
