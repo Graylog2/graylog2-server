@@ -19,7 +19,6 @@ import PropTypes from 'prop-types';
 import numeral from 'numeral';
 
 import { Timestamp } from 'components/common';
-import DateTime from 'logic/datetimes/DateTime';
 
 type Props = {
   results: {
