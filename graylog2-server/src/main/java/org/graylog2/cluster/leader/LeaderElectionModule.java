@@ -44,6 +44,10 @@ public class LeaderElectionModule extends PluginModule {
                 bind(LeaderElectionService.class).to(LockBasedLeaderElectionService.class).in(Scopes.SINGLETON);
                 serviceBinder().addBinding().to(LockBasedLeaderElectionService.class).in(Scopes.SINGLETON);
                 break;
+            case "atomix":
+                bind(LeaderElectionService.class).to(AtomixLeaderElectionService.class).in(Scopes.SINGLETON);
+                serviceBinder().addBinding().to(AtomixLeaderElectionService.class).in(Scopes.SINGLETON);
+                break;
             default:
                 throw new IllegalArgumentException("Unknown leader election mode \"" + leaderElectionMode + "\".");
         }

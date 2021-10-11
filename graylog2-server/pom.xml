@@ -540,12 +540,20 @@
         </dependency>
 
         <dependency>
-        <groupId>net.javacrumbs.shedlock</groupId>
-        <artifactId>shedlock-core</artifactId>
+            <groupId>net.javacrumbs.shedlock</groupId>
+            <artifactId>shedlock-core</artifactId>
         </dependency>
         <dependency>
             <groupId>net.javacrumbs.shedlock</groupId>
             <artifactId>shedlock-provider-mongo</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.atomix</groupId>
+            <artifactId>atomix</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.atomix</groupId>
+            <artifactId>atomix-raft</artifactId>
         </dependency>
 
         <dependency>

@@ -581,6 +581,16 @@
                 <artifactId>shedlock-provider-mongo</artifactId>
                 <version>${shedlock.version}</version>
             </dependency>
+            <dependency>
+                <groupId>io.atomix</groupId>
+                <artifactId>atomix</artifactId>
+                <version>${atomix.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.atomix</groupId>
+                <artifactId>atomix-raft</artifactId>
+                <version>${atomix.version}</version>
+            </dependency>
 
             <!-- Test dependencies -->
             <dependency>

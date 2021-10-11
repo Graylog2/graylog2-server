@@ -91,6 +91,7 @@
         <antlr.version>4.8-1</antlr.version>
         <apache-directory-version>1.0.3</apache-directory-version>
         <apache-httpclient.version>4.5.13</apache-httpclient.version>
+        <atomix.version>3.0.6</atomix.version>
         <auto-value.version>1.7.4</auto-value.version>
         <auto-value-javabean.version>2.5.2</auto-value-javabean.version>
         <bouncycastle.version>1.69</bouncycastle.version>
