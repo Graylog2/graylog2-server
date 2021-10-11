@@ -62,10 +62,10 @@ const DateTimeProvider = ({ children }: Props) => {
   const userTimezone = useMemo(() => getUserTimezone(currentUser?.timezone), [currentUser?.timezone]);
 
   const unifyTimeAsDate = useCallback((time, tz = userTimezone) => {
-    return moment.tz(time.trim(), Object.values(ACCEPTED_FORMATS), true, tz);
+    return moment.tz(time, tz);
   }, [userTimezone]);
 
-  const unifyTime = useCallback((time, tz = userTimezone, format = FORMATS.default) => {
+  const unifyTime = useCallback((time, tz = userTimezone, format = 'default') => {
     return unifyTimeAsDate(time, tz).format(FORMATS[format]);
   }, [unifyTimeAsDate, userTimezone]);
 
