@@ -28,6 +28,7 @@ import GlobalOverride from 'views/logic/search/GlobalOverride';
 import { SearchStore, SearchStoreState } from 'views/stores/SearchStore';
 
 import TimerangeInfo from './TimerangeInfo';
+import moment from 'moment';
 
 jest.mock('views/stores/GlobalOverrideStore', () => ({
   GlobalOverrideStore: MockStore(
@@ -70,7 +71,13 @@ describe('TimerangeInfo', () => {
   const widget = Widget.empty();
 
   const SUT = (props) => (
-    <DateTimeContext.Provider value={{ unifyTime: (str) => str, userTimezone: 'UTC' }}>
+    <DateTimeContext.Provider value={{
+      unifyTime: () => '',
+      userTimezone: 'UTC',
+      relativeDifference: () => '',
+      unifyAsBrowserTime: () => '',
+      unifyTimeAsDate: () => moment(),
+    }}>
       <TimerangeInfo {...props} />
     </DateTimeContext.Provider>
   );
