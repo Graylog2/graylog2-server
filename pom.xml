@@ -364,10 +364,58 @@
                     <artifactId>license-maven-plugin</artifactId>
                     <version>${license-maven.version}</version>
                 </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <version>3.0.0</version>
+                </plugin>
             </plugins>
         </pluginManagement>
 
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>enforce-versions</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <fail>true</fail>
+                            <failFast>false</failFast>
+                            <rules>
+                                <bannedDependencies>
+                                    <searchTransitive>true</searchTransitive>
+                                    <excludes>
+                                        <!-- We use log4j-over-slf4j, so we need to make sure we don't pull in
+                                             the actual log4j 1.x dependency to avoid conflicts. -->
+                                        <exclude>log4j:log4j</exclude>
+                                        <!-- This dependency also pulls in log4j 1.x -->
+                                        <exclude>org.apache.log4j.wso2:log4j</exclude>
+                                        <!-- Make sure we don't pull in vulnerable log4j2 versions (CVE-2021-45046, CVE-2021-44228) -->
+                                        <exclude>org.apache.logging.log4j:*:(,2.16)</exclude>
+                                    </excludes>
+                                </bannedDependencies>
+                                <!-- TODO: Enable once all duplicate dependency declarations have been fixed
+                                <banDuplicatePomDependencyVersions/>
+                                -->
+                                <requireMavenVersion>
+                                    <version>3.6.3</version>
+                                </requireMavenVersion>
+                                <requireJavaVersion>
+                                    <version>1.8</version>
+                                </requireJavaVersion>
+                                <requireOS>
+                                    <family>unix</family>
+                                </requireOS>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
