@@ -17,13 +17,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
+import styled from 'styled-components';
 
 import { Popover } from 'components/bootstrap';
 import { OverlayTrigger, Icon } from 'components/common';
 import SidecarStatusEnum from 'logic/sidecar/SidecarStatusEnum';
 import DateTime from 'logic/datetimes/DateTime';
 
-import style from './StatusIndicator.css';
+const Indicator = styled.span`
+  white-space: nowrap;
+`;
 
 type Props = {
   id?: string,
@@ -68,17 +71,17 @@ const StatusIndicator = ({ message, id, lastSeen, status }: Props) => {
 
     return (
       <OverlayTrigger placement="top" overlay={popover} rootClose trigger="hover">
-        <span className={`${className} ${style.indicator}`}>
+        <Indicator className={className}>
           <Icon name={icon} fixedWidth /> {text}
-        </span>
+        </Indicator>
       </OverlayTrigger>
     );
   }
 
   return (
-    <span className={`${className} ${style.indicator}`}>
+    <Indicator className={className}>
       <Icon name={icon} fixedWidth /> {text}
-    </span>
+    </Indicator>
   );
 };
 
