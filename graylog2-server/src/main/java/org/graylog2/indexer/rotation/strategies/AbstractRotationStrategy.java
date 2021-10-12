@@ -19,14 +19,23 @@ package org.graylog2.indexer.rotation.strategies;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
+import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.NoTargetIndexException;
+import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indices.Indices;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 import org.graylog2.plugin.system.NodeId;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
+import java.text.MessageFormat;
+import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static java.util.Objects.requireNonNull;
 import static org.graylog2.audit.AuditEventTypes.ES_INDEX_ROTATION_COMPLETE;
@@ -36,15 +45,26 @@ public abstract class AbstractRotationStrategy implements RotationStrategy {
 
     public interface Result {
         String getDescription();
+
         boolean shouldRotate();
     }
 
     private final AuditEventSender auditEventSender;
     private final NodeId nodeId;
+    protected final ElasticsearchConfiguration elasticsearchConfiguration;
+    protected Indices indices;
+    protected Map<String, DateTime> lastRotation;
 
-    public AbstractRotationStrategy(AuditEventSender auditEventSender, NodeId nodeId) {
+    public AbstractRotationStrategy(
+            Indices indices,
+            AuditEventSender auditEventSender,
+            NodeId nodeId,
+            ElasticsearchConfiguration elasticsearchConfiguration) {
         this.auditEventSender = requireNonNull(auditEventSender);
         this.nodeId = nodeId;
+        this.indices = indices;
+        this.lastRotation = new ConcurrentHashMap<>();
+        this.elasticsearchConfiguration = elasticsearchConfiguration;
     }
 
     @Nullable
@@ -53,7 +73,9 @@ public abstract class AbstractRotationStrategy implements RotationStrategy {
     @Override
     public void rotate(IndexSet indexSet) {
         requireNonNull(indexSet, "indexSet must not be null");
+        final IndexSetConfig indexSetConfig = requireNonNull(indexSet.getConfig(), "Index set configuration must not be null");
         final String indexSetTitle = requireNonNull(indexSet.getConfig(), "Index set configuration must not be null").title();
+        final String indexSetId = indexSetConfig.id();
         final String strategyName = this.getClass().getCanonicalName();
         final String indexName;
         try {
@@ -71,6 +93,7 @@ public abstract class AbstractRotationStrategy implements RotationStrategy {
         LOG.debug("Rotation strategy result: {}", rotate.getDescription());
         if (rotate.shouldRotate()) {
             LOG.info("Deflector index <{}> (index set <{}>) should be rotated, Pointing deflector to new index now!", indexSetTitle, indexName);
+            lastRotation.put(indexSetId, Tools.nowUTC());
             indexSet.cycle();
             auditEventSender.success(AuditActor.system(nodeId), ES_INDEX_ROTATION_COMPLETE, ImmutableMap.of(
                     "index_name", indexName,
@@ -79,5 +102,51 @@ public abstract class AbstractRotationStrategy implements RotationStrategy {
         } else {
             LOG.debug("Deflector index <{}> should not be rotated. Not doing anything.", indexName);
         }
+    }
+
+    static class SimpleResult implements AbstractRotationStrategy.Result {
+        private final String message;
+        private final boolean rotate;
+
+        SimpleResult(boolean rotate, String message) {
+            this.message = message;
+            this.rotate = rotate;
+            LOG.debug("{} because of: {}", rotate ? "Rotating" : "Not rotating", message);
+        }
+
+        @Override
+        public String getDescription() {
+            return message;
+        }
+
+        @Override
+        public boolean shouldRotate() {
+            return rotate;
+        }
+    }
+
+    // Honor global max rotation time setting
+    protected Result exceededMaxGlobalRotationTime(final String index, IndexSet indexSet, String indexSetId) {
+        // When first started, we might not know the last rotation time, look up the creation time of the index instead.
+        if (!lastRotation.containsKey(indexSetId)) {
+            indices.indexCreationDate(index).ifPresent(creationDate -> {
+                lastRotation.put(indexSetId, creationDate);
+            });
+            // still not able to figure out the last rotation time, we'll rotate forcibly
+            if (!lastRotation.containsKey(indexSetId)) {
+                return new SimpleResult(true, "No known previous rotation time, forcing index rotation now.");
+            }
+        }
+
+        final DateTime now = Tools.nowUTC();
+        final DateTime currentAnchor = lastRotation.get(indexSetId);
+        final DateTime nextRotation = currentAnchor.plus(elasticsearchConfiguration.getMaxRotationTimeGlobal());
+        if (nextRotation.isBefore(now)) {
+            final String message = new MessageFormat("Exceeded max global rotation period {0} - forcing rotation now", Locale.ENGLISH)
+                    .format(new Object[]{elasticsearchConfiguration.getMaxRotationTimeGlobal()});
+            return new SimpleResult(true, message);
+        }
+
+        return new SimpleResult(false, "Time-based rotation not required");
     }
 }

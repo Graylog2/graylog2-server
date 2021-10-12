@@ -17,8 +17,10 @@
 package org.graylog2.indexer.rotation.strategies;
 
 import org.graylog2.audit.AuditEventSender;
+import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 import org.graylog2.plugin.system.NodeId;
@@ -30,16 +32,16 @@ import javax.inject.Inject;
 import java.text.MessageFormat;
 import java.util.Locale;
 
+import static java.util.Objects.requireNonNull;
+
 public class MessageCountRotationStrategy extends AbstractRotationStrategy {
     private static final Logger log = LoggerFactory.getLogger(MessageCountRotationStrategy.class);
 
-    private final Indices indices;
-
     @Inject
     public MessageCountRotationStrategy(Indices indices, NodeId nodeId,
-                                        AuditEventSender auditEventSender) {
-        super(auditEventSender, nodeId);
-        this.indices = indices;
+                                        AuditEventSender auditEventSender,
+                                        ElasticsearchConfiguration elasticsearchConfiguration) {
+        super(indices, auditEventSender, nodeId, elasticsearchConfiguration);
     }
 
     @Override
@@ -55,25 +57,36 @@ public class MessageCountRotationStrategy extends AbstractRotationStrategy {
     @Nullable
     @Override
     protected Result shouldRotate(String index, IndexSet indexSet) {
-        if (!(indexSet.getConfig().rotationStrategy() instanceof MessageCountRotationStrategyConfig)) {
-            throw new IllegalStateException("Invalid rotation strategy config <" + indexSet.getConfig().rotationStrategy().getClass().getCanonicalName() + "> for index set <" + indexSet.getConfig().id() + ">");
+        final IndexSetConfig indexSetConfig = requireNonNull(indexSet.getConfig(), "Index set configuration must not be null");
+        final String indexSetId = indexSetConfig.id();
+
+        if (!(indexSetConfig.rotationStrategy() instanceof MessageCountRotationStrategyConfig)) {
+            throw new IllegalStateException("Invalid rotation strategy config <"
+                    + indexSetConfig.rotationStrategy().getClass().getCanonicalName()
+                    + "> for index set <" + indexSetId + ">");
         }
 
         final MessageCountRotationStrategyConfig config = (MessageCountRotationStrategyConfig) indexSet.getConfig().rotationStrategy();
 
+        // Honor global max rotation time setting
+        Result result = exceededMaxGlobalRotationTime(index, indexSet, indexSetId);
+        if (result.shouldRotate()) {
+            return result;
+        }
+
         try {
             final long numberOfMessages = indices.numberOfMessages(index);
-            return new Result(index,
-                              numberOfMessages,
-                              config.maxDocsPerIndex(),
-                              numberOfMessages > config.maxDocsPerIndex());
+            return new MessageCountRotationResult(index,
+                    numberOfMessages,
+                    config.maxDocsPerIndex(),
+                    numberOfMessages > config.maxDocsPerIndex());
         } catch (IndexNotFoundException e) {
             log.error("Unknown index, cannot perform rotation", e);
             return null;
         }
     }
 
-    private static class Result implements AbstractRotationStrategy.Result {
+    private static class MessageCountRotationResult implements Result {
 
         public static final MessageFormat ROTATE_FORMAT = new MessageFormat(
                 "Number of messages in <{0}> ({1}) is higher than the limit ({2}). Pointing deflector to new index now!",
@@ -86,7 +99,7 @@ public class MessageCountRotationStrategy extends AbstractRotationStrategy {
         private final long maxDocs;
         private final boolean shouldRotate;
 
-        public Result(String index, long actualCount, long maxDocs, boolean shouldRotate) {
+        public MessageCountRotationResult(String index, long actualCount, long maxDocs, boolean shouldRotate) {
             this.index = index;
             this.actualCount = actualCount;
             this.maxDocs = maxDocs;

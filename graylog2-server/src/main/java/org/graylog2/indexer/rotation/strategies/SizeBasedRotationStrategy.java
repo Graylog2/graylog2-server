@@ -17,7 +17,9 @@
 package org.graylog2.indexer.rotation.strategies;
 
 import org.graylog2.audit.AuditEventSender;
+import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 import org.graylog2.plugin.system.NodeId;
@@ -28,15 +30,16 @@ import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.Optional;
 
+import static java.util.Objects.requireNonNull;
+
 public class SizeBasedRotationStrategy extends AbstractRotationStrategy {
-    private final Indices indices;
 
     @Inject
     public SizeBasedRotationStrategy(Indices indices,
                                      NodeId nodeId,
-                                     AuditEventSender auditEventSender) {
-        super(auditEventSender, nodeId);
-        this.indices = indices;
+                                     AuditEventSender auditEventSender,
+                                     ElasticsearchConfiguration elasticsearchConfiguration) {
+        super(indices, auditEventSender, nodeId, elasticsearchConfiguration);
     }
 
     @Override
@@ -52,11 +55,21 @@ public class SizeBasedRotationStrategy extends AbstractRotationStrategy {
     @Nullable
     @Override
     protected Result shouldRotate(final String index, IndexSet indexSet) {
-        if (!(indexSet.getConfig().rotationStrategy() instanceof SizeBasedRotationStrategyConfig)) {
-            throw new IllegalStateException("Invalid rotation strategy config <" + indexSet.getConfig().rotationStrategy().getClass().getCanonicalName() + "> for index set <" + indexSet.getConfig().id() + ">");
-        }
+        final IndexSetConfig indexSetConfig = requireNonNull(indexSet.getConfig(), "Index set configuration must not be null");
+        final String indexSetId = indexSetConfig.id();
 
-        final SizeBasedRotationStrategyConfig config = (SizeBasedRotationStrategyConfig) indexSet.getConfig().rotationStrategy();
+        if (!(indexSetConfig.rotationStrategy() instanceof SizeBasedRotationStrategyConfig)) {
+            throw new IllegalStateException("Invalid rotation strategy config <"
+                    + indexSetConfig.rotationStrategy().getClass().getCanonicalName()
+                    + "> for index set <" + indexSetId + ">");
+        }
+        final SizeBasedRotationStrategyConfig config = (SizeBasedRotationStrategyConfig) indexSetConfig.rotationStrategy();
+
+        // Honor global max rotation time setting
+        Result result = exceededMaxGlobalRotationTime(index, indexSet, indexSetId);
+        if (result.shouldRotate()) {
+            return result;
+        }
 
         final Optional<Long> storeSizeInBytes = indices.getStoreSizeInBytes(index);
         if (!storeSizeInBytes.isPresent()) {

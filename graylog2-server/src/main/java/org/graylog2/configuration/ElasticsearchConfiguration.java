@@ -72,6 +72,9 @@ public class ElasticsearchConfiguration {
     @Parameter(value = "no_retention")
     private boolean noRetention = false;
 
+    @Parameter(value = "elasticsearch_max_rotation_time_global")
+    private Period maxRotationTimeGlobal = Period.days(99);
+
     @Deprecated // Should be removed in Graylog 3.0
     @Parameter(value = "retention_strategy", required = true)
     private String retentionStrategy = "delete";
@@ -155,6 +158,10 @@ public class ElasticsearchConfiguration {
     @Deprecated // Should be removed in Graylog 3.0
     public String getRotationStrategy() {
         return rotationStrategy;
+    }
+
+    public Period getMaxRotationTimeGlobal() {
+        return maxRotationTimeGlobal;
     }
 
     public boolean performRetention() {
