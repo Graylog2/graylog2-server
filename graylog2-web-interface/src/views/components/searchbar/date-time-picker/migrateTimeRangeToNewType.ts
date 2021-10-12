@@ -15,12 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import moment from 'moment';
+import moment, { Moment } from 'moment';
 
 import { AbsoluteTimeRange, KeywordTimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import { DEFAULT_RELATIVE_FROM } from 'views/Constants';
-import DateTime from 'logic/datetimes/DateTime';
+import { DATE_TIME_FORMATS } from 'contexts/DateTimeProvider';
 import { RelativeTimeRangeClassified } from 'views/components/searchbar/date-time-picker/types';
+import type { TimeRange } from 'views/logic/queries/Query';
 
 import {
   classifyFromRange,
@@ -28,7 +29,7 @@ import {
   normalizeClassifiedRange, RELATIVE_CLASSIFIED_ALL_TIME_RANGE,
 } from './RelativeTimeRangeClassifiedHelper';
 
-const formatDatetime = (datetime) => datetime.toString(DateTime.Formats.TIMESTAMP);
+const formatDatetime = (datdatetimeeTime, unifyTime) => unifyTime(dateTime, DATE_TIME_FORMATS.complete);
 
 const getDefaultAbsoluteFromRange = (oldTimeRange: RelativeTimeRangeClassified | AbsoluteTimeRange | KeywordTimeRange | NoTimeRangeOverride | undefined | null) => {
   if (isTypeRelativeClassified(oldTimeRange)) {
@@ -47,17 +48,21 @@ const getDefaultAbsoluteToRange = (oldTimeRange: RelativeTimeRangeClassified | A
 };
 
 const migrationStrategies = {
-  absolute: (oldTimeRange: RelativeTimeRangeClassified | AbsoluteTimeRange | KeywordTimeRange | NoTimeRangeOverride | undefined | null) => ({
+  absolute: (oldTimeRange: RelativeTimeRangeClassified | AbsoluteTimeRange | KeywordTimeRange | NoTimeRangeOverride | undefined | null, unifyTime) => ({
     type: 'absolute',
-    from: formatDatetime(new DateTime(moment().subtract(getDefaultAbsoluteFromRange(oldTimeRange), 'seconds'))),
-    to: formatDatetime(new DateTime(moment().subtract(getDefaultAbsoluteToRange(oldTimeRange), 'seconds'))),
+    from: formatDatetime(moment().subtract(getDefaultAbsoluteFromRange(oldTimeRange), 'seconds'), unifyTime),
+    to: formatDatetime(moment().subtract(getDefaultAbsoluteToRange(oldTimeRange), 'seconds'), unifyTime),
   }),
   relative: () => ({ type: 'relative', from: classifyFromRange(DEFAULT_RELATIVE_FROM), to: RELATIVE_CLASSIFIED_ALL_TIME_RANGE }),
   keyword: () => ({ type: 'keyword', keyword: 'Last five minutes' }),
   disabled: () => undefined,
 };
 
-const migrateTimeRangeToNewType = (oldTimeRange: RelativeTimeRangeClassified | AbsoluteTimeRange | KeywordTimeRange | NoTimeRangeOverride | undefined | null, type: string): RelativeTimeRangeClassified | AbsoluteTimeRange | KeywordTimeRange | NoTimeRangeOverride | undefined | null => {
+export const migrateTimeRangeToNewType = (
+  oldTimeRange: TimeRange | undefined | null,
+  type: string,
+  unifyTime: (time: string | Moment) => string,
+): TimeRange | undefined | null => {
   const oldType = oldTimeRange && 'type' in oldTimeRange ? oldTimeRange.type : 'disabled';
 
   if (type === oldType) {
@@ -68,7 +73,7 @@ const migrateTimeRangeToNewType = (oldTimeRange: RelativeTimeRangeClassified | A
     throw new Error(`Invalid time range type: ${type}`);
   }
 
-  return migrationStrategies[type](oldTimeRange);
+  return migrationStrategies[type](oldTimeRange, unifyTime);
 };
 
 export default migrateTimeRangeToNewType;

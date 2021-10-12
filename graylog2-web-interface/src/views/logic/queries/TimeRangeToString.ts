@@ -15,36 +15,29 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import moment from 'moment';
 import 'moment-duration-format';
 import 'moment-precise-range-plugin';
+import type { Moment } from 'moment';
 
 import { AbsoluteTimeRange, KeywordTimeRange, RelativeTimeRange, TimeRange } from 'views/logic/queries/Query';
 import { isTypeRelativeWithStartOnly } from 'views/typeGuards/timeRange';
 
-export const readableRange = (timerange: TimeRange, fieldName: 'range' | 'from' | 'to', placeholder = 'All Time') => {
-  const rangeAsSeconds = timerange?.[fieldName];
-
-  if (!rangeAsSeconds) {
-    return placeholder;
-  }
-
-  const dateAgo = moment().subtract(rangeAsSeconds, 'seconds');
-  const rangeTimespan = moment.preciseDiff(moment(), dateAgo);
-
-  return `${rangeTimespan} ago`;
+export const readableRange = (timerange: TimeRange, fieldName: 'range' | 'from' | 'to', unifyAsDate: (time: Date) => Moment, placeholder: string | undefined = 'All Time') => {
+  return !timerange[fieldName] ? placeholder : unifyAsDate(new Date())
+    .subtract(timerange[fieldName] * 1000)
+    .fromNow();
 };
 
-const relativeTimeRangeToString = (timerange: RelativeTimeRange): string => {
+const relativeTimeRangeToString = (timerange: RelativeTimeRange, unifyAsDate: (time: Date) => Moment): string => {
   if (isTypeRelativeWithStartOnly(timerange)) {
     if (timerange.range === 0) {
       return 'All Time';
     }
 
-    return `${readableRange(timerange, 'range')} - Now`;
+    return `${readableRange(timerange, 'range', unifyAsDate)} - Now`;
   }
 
-  return `${readableRange(timerange, 'from')} - ${readableRange(timerange, 'to', 'Now')}`;
+  return `${readableRange(timerange, 'from', unifyAsDate)} - ${readableRange(timerange, 'to', unifyAsDate, 'Now')}`;
 };
 
 const absoluteTimeRangeToString = (timerange: AbsoluteTimeRange, localizer = (str) => str): string => {
@@ -57,11 +50,11 @@ const keywordTimeRangeToString = (timerange: KeywordTimeRange): string => {
   return timerange.keyword;
 };
 
-const TimeRangeToString = (timerange?: TimeRange, localizer?: (string) => string): string => {
+const TimeRangeToString = (timerange: TimeRange, unifyAsDate: (time: Date) => Moment, localizer?: (string) => string): string => {
   const { type } = timerange || {};
 
   switch (type) {
-    case 'relative': return relativeTimeRangeToString(timerange as RelativeTimeRange);
+    case 'relative': return relativeTimeRangeToString(timerange as RelativeTimeRange, unifyAsDate);
     case 'absolute': return absoluteTimeRangeToString(timerange as AbsoluteTimeRange, localizer);
     case 'keyword': return keywordTimeRangeToString(timerange as KeywordTimeRange);
 

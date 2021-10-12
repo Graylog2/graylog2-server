@@ -15,14 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useRef } from 'react';
+import { useRef, useContext } from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import moment from 'moment';
+import { Button, FormGroup, InputGroup, FormControl } from 'components/graylog';
 
+import { DATE_TIME_FORMATS } from 'contexts/DateTimeProvider';
 import { Icon } from 'components/common';
-import { Button, FormGroup, InputGroup, FormControl } from 'components/bootstrap';
-import DateTime from 'logic/datetimes/DateTime';
+import DateTimeContext from 'contexts/DateTimeContext';
 
 const TIME_ICON_BOD = 'hourglass-start';
 const TIME_ICON_MID = 'hourglass-half';
@@ -162,18 +163,18 @@ const fieldUpdate = (value) => {
       [timeType]: timeValue,
     });
 
-    return newTime.format(DateTime.Formats.DATETIME);
+    return newTime.format(DATE_TIME_FORMATS.default);
   };
 
-  const handleClickTimeNow = () => {
-    const newTime = DateTime.now().toObject();
+  const handleClickTimeNow = (unifyTimeAsDate) => {
+    const newTime = unifyTimeAsDate(new Date()).toObject();
 
     return moment({
       ...initialDateTime,
       hours: newTime.hours,
       minutes: newTime.minutes,
       seconds: newTime.seconds,
-    }).format(DateTime.Formats.DATETIME);
+    }).format(DATE_TIME_FORMATS.default);
   };
 
   const handleTimeToggle = (eod = false) => {
@@ -182,7 +183,7 @@ const fieldUpdate = (value) => {
       hours: eod ? 23 : 0,
       minutes: eod ? 59 : 0,
       seconds: eod ? 59 : 0,
-    }).format(DateTime.Formats.DATETIME);
+    }).format(DATE_TIME_FORMATS.default);
   };
 
   return {
@@ -194,6 +195,7 @@ const fieldUpdate = (value) => {
 };
 
 const AbsoluteTimeInput = ({ dateTime, range, onChange }) => {
+  const { unifyTimeAsDate } = useContext(DateTimeContext);
   const hourIcon = useRef(TIME_ICON_MID);
 
   const {
@@ -224,7 +226,7 @@ const AbsoluteTimeInput = ({ dateTime, range, onChange }) => {
   const _onClickTimeNow = () => {
     hourIcon.current = TIME_ICON_MID;
 
-    onChange(handleClickTimeNow());
+    onChange(handleClickTimeNow(unifyTimeAsDate));
   };
 
   return (

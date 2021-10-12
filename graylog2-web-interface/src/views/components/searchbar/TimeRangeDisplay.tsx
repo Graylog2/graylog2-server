@@ -15,13 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useContext } from 'react';
 import styled, { css } from 'styled-components';
+import type { Moment } from 'moment';
 
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import { isTypeKeyword, isTypeRelativeWithStartOnly, isTypeRelativeWithEnd } from 'views/typeGuards/timeRange';
 import { readableRange } from 'views/logic/queries/TimeRangeToString';
 import ToolsStore from 'stores/tools/ToolsStore';
+import DateTimeContext from 'contexts/DateTimeContext';
 
 type Props = {
   timerange: TimeRange | NoTimeRangeOverride | null | undefined,
@@ -52,7 +54,7 @@ const TimeRangeWrapper = styled.p(({ theme }) => css`
   }
 `);
 
-const dateOutput = (timerange: TimeRange) => {
+const dateOutput = (timerange: TimeRange, unifyTimeAsDate: (time: Date) => Moment) => {
   let from = EMPTY_RANGE;
   let to = EMPTY_RANGE;
 
@@ -64,14 +66,14 @@ const dateOutput = (timerange: TimeRange) => {
     case 'relative':
 
       if (isTypeRelativeWithStartOnly(timerange)) {
-        from = readableRange(timerange, 'range');
+        from = readableRange(timerange, 'range', unifyTimeAsDate);
       }
 
       if (isTypeRelativeWithEnd(timerange)) {
-        from = readableRange(timerange, 'from');
+        from = readableRange(timerange, 'from', unifyTimeAsDate);
       }
 
-      to = readableRange(timerange, 'to', 'Now');
+      to = readableRange(timerange, 'to', unifyTimeAsDate, 'Now');
 
       return {
         from,
@@ -89,6 +91,7 @@ const dateOutput = (timerange: TimeRange) => {
 const TimeRangeDisplay = ({ timerange, toggleDropdownShow }: Props) => {
   const [{ from, until }, setTimeOutput] = useState(EMPTY_OUTPUT);
   const dateTested = useRef(false);
+  const { unifyTimeAsDate } = useContext(DateTimeContext);
 
   useEffect(() => {
     if (isTypeKeyword(timerange) && !timerange.from) {
@@ -106,9 +109,9 @@ const TimeRangeDisplay = ({ timerange, toggleDropdownShow }: Props) => {
           });
       }
     } else if (timerange && 'type' in timerange) {
-      setTimeOutput(dateOutput(timerange));
+      setTimeOutput(dateOutput(timerange, unifyTimeAsDate));
     }
-  }, [dateTested, timerange]);
+  }, [dateTested, timerange, unifyTimeAsDate]);
 
   return (
     <TimeRangeWrapper aria-label="Search Time Range, Opens Time Range Selector On Click" role="button" onClick={toggleDropdownShow}>

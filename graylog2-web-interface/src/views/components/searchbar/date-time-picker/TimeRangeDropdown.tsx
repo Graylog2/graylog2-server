@@ -23,7 +23,6 @@ import moment from 'moment';
 import { Button, Col, Tabs, Tab, Row, Popover } from 'components/bootstrap';
 import { Icon, KeyCapture } from 'components/common';
 import { availableTimeRangeTypes } from 'views/Constants';
-import DateTime from 'logic/datetimes/DateTime';
 import type { AbsoluteTimeRange, KeywordTimeRange, NoTimeRangeOverride, TimeRange } from 'views/logic/queries/Query';
 import type { SearchBarFormValues } from 'views/Constants';
 import { isTypeRelative } from 'views/typeGuards/timeRange';
@@ -62,28 +61,6 @@ type TimeRangeTabsArguments = {
   setValidatingKeyword: (status: boolean) => void,
   tabs: Array<TimeRangeType>,
 }
-
-const DEFAULT_RANGES = {
-  absolute: {
-    type: 'absolute',
-    from: DateTime.now().subtract(300, 'seconds').format(DateTime.Formats.TIMESTAMP),
-    to: DateTime.now().format(DateTime.Formats.TIMESTAMP),
-  },
-  relative: {
-    type: 'relative',
-    from: {
-      value: 5,
-      unit: 'minutes',
-      isAllTime: false,
-    },
-    to: RELATIVE_CLASSIFIED_ALL_TIME_RANGE,
-  },
-  keyword: {
-    type: 'keyword',
-    keyword: 'Last five minutes',
-  },
-  disabled: undefined,
-};
 
 const timeRangeTypes = {
   absolute: TabAbsoluteTimeRange,
@@ -140,6 +117,28 @@ const CancelButton = styled(Button)`
   margin-right: 6px;
 `;
 
+const defaultRanges = (unifyTime) => ({
+  absolute: {
+    type: 'absolute',
+    from: unifyTime(moment().subtract(300, 'seconds')),
+    to: unifyTime(new Date(), undefined, 'complete'),
+  },
+  relative: {
+    type: 'relative',
+    from: {
+      value: 5,
+      unit: 'minutes',
+      isAllTime: false,
+    },
+    to: RELATIVE_CLASSIFIED_ALL_TIME_RANGE,
+  },
+  keyword: {
+    type: 'keyword',
+    keyword: 'Last five minutes',
+  },
+  disabled: undefined,
+});
+
 const timeRangeTypeTabs = ({ activeTab, limitDuration, setValidatingKeyword, tabs }: TimeRangeTabsArguments) => availableTimeRangeTypes
   .filter(({ type }) => tabs.includes(type))
   .map(({ type, name }) => {
@@ -187,9 +186,11 @@ const TimeRangeDropdown = ({
   position,
   limitDuration,
 }: TimeRangeDropdownProps) => {
-  const { unifyTime } = useContext(DateTimeContext);
+  const { unifyTime, userTimezone } = useContext(DateTimeContext);
   const [validatingKeyword, setValidatingKeyword] = useState(false);
   const [activeTab, setActiveTab] = useState('type' in currentTimeRange ? currentTimeRange.type : undefined);
+
+  const _defaultRanges = defaultRanges(unifyTime);
 
   const positionIsBottom = position === 'bottom';
 
@@ -238,7 +239,7 @@ const TimeRangeDropdown = ({
             if ('type' in nextTimeRange) {
               setFieldValue('nextTimeRange', migrateTimeRangeToNewType(nextTimeRange as TimeRange, nextTab, unifyTime));
             } else {
-              setFieldValue('nextTimeRange', DEFAULT_RANGES[nextTab]);
+              setFieldValue('nextTimeRange', _defaultRanges);
             }
 
             setActiveTab(nextTab);
@@ -271,7 +272,7 @@ const TimeRangeDropdown = ({
 
                 <Row className="row-sm">
                   <Col md={6}>
-                    <Timezone>All timezones using: <b>{DateTime.getUserTimezone()}</b></Timezone>
+                    <Timezone>All timezones using: <b>{userTimezone}</b></Timezone>
                   </Col>
                   <Col md={6}>
                     <div className="pull-right">
