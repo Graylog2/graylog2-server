@@ -25,7 +25,14 @@ import DateTime from 'logic/datetimes/DateTime';
 
 import style from './StatusIndicator.css';
 
-const StatusIndicator = ({ message, id, lastSeen, status }) => {
+type Props = {
+  id?: string,
+  lastSeen?: string,
+  message?: string,
+  status?: number,
+}
+
+const StatusIndicator = ({ message, id, lastSeen, status }: Props) => {
   const text = lodash.upperFirst(SidecarStatusEnum.toString(status));
   const lastSeenDateTime = new DateTime(lastSeen);
 
@@ -33,7 +40,7 @@ const StatusIndicator = ({ message, id, lastSeen, status }) => {
   let className;
   let messageString = message;
 
-  switch (this.props.status) {
+  switch (status) {
     case SidecarStatusEnum.RUNNING:
       className = 'text-success';
       icon = 'play';
