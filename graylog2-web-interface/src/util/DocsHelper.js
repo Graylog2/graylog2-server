@@ -29,7 +29,7 @@ class DocsHelper {
     ENTERPRISE_SETUP: 'setup',
     ES_CLUSTER_STATUS_RED: 'elasticsearch#cluster-status-explained',
     ES_CLUSTER_UNAVAILABLE: 'elasticsearch#configuration',
-    ES_OPEN_FILE_LIMITS: 'elasticsearch#open-file-limits',
+    ES_OPEN_FILE_LIMITS: 'elasticsearch#configuration',
     EXTRACTORS: 'extractors',
     INDEXER_FAILURES: 'indexer-failures',
     INDEX_MODEL: 'index-model',
