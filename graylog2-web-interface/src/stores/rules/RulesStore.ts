@@ -121,6 +121,7 @@ export const RulesStore = singletonStore(
       const promise = fetch('GET', url);
 
       promise.then(this._updateRulesState, failCallback);
+      RulesActions.get.promise(promise);
 
       return promise;
     },
