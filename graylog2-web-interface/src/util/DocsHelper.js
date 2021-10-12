@@ -52,7 +52,7 @@ class DocsHelper {
     WELCOME: '', // Welcome page to the documentation
   };
 
-  DOCS_URL = 'https://docs.graylog.org/docs/';
+  DOCS_URL = 'https://docs.graylog.org/docs';
 
   toString(path) {
     const baseUrl = this.DOCS_URL;
