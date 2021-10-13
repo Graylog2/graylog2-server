@@ -17,6 +17,7 @@
 package org.graylog.plugins.views.search;
 
 import com.codahale.metrics.json.MetricsModule;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -209,5 +210,11 @@ public class QueryTest {
         final Query query = objectMapper.readValue(getClass().getResourceAsStream("/org/graylog/plugins/views/search/query/simple-query.json"), Query.class);
         final ElasticsearchQueryString queryString = (ElasticsearchQueryString) query.query();
         assertThat(queryString.queryString()).isEqualTo("some-simple-query");
+    }
+
+    @Test
+    public void testSerializeQuery() throws JsonProcessingException {
+        final String value = objectMapper.writeValueAsString(ElasticsearchQueryString.of("foo:bar"));
+        assertThat(value).isEqualTo("{\"type\":\"elasticsearch\",\"query_string\":\"foo:bar\"}");
     }
 }

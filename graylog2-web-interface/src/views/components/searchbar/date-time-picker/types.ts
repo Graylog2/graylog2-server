@@ -14,28 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.plugin;
 
-public enum DocsHelper {
-    PAGE_SENDING_JSONPATH("json"),
-    PAGE_SENDING_IPFIXPATH("ipfix-input"),
-    PAGE_ES_CONFIGURATION("elasticsearch"),
-    PAGE_ES_VERSIONS("elasticsearch#elasticsearch-versions");
+export type RangeClassified = {
+  value: number,
+  unit: 'minutes' | 'seconds' | 'hours' | 'days',
+  isAllTime: boolean,
+}
 
-    private static final String DOCS_URL = "https://docs.graylog.org/docs/";
-
-    private final String path;
-
-    DocsHelper(String path) {
-        this.path = path;
-    }
-
-    @Override
-    public String toString() {
-        return DOCS_URL + path;
-    }
-
-    public String toLink(String title) {
-        return "<a href=\"" + toString() + "\" target=\"_blank\">" + title + "</a>";
-    }
+export type RelativeTimeRangeClassified = {
+  type: 'relative',
+  from: RangeClassified,
+  to: RangeClassified,
 }

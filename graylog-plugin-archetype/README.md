@@ -1,7 +1,7 @@
 Graylog Plugin Maven Archetype
 ==============================
 
-See our latest documentation on [writing plugins](http://docs.graylog.org/en/latest/pages/plugins.html).
+See our latest documentation on [writing plugins](https://docs.graylog.org/docs/plugins).
 
 ## Creating a new plugin project
 
