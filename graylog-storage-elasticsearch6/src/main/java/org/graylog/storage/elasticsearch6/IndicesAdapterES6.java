@@ -197,7 +197,7 @@ public class IndicesAdapterES6 implements IndicesAdapter {
     }
 
     @Override
-    public void create(String indexName, IndexSettings indexSettings, String templateName, Map<String, Object> template) {
+    public void create(String indexName, IndexSettings indexSettings) {
         final Map<String, Object> settings = new HashMap<>();
         settings.put("number_of_shards", indexSettings.shards());
         settings.put("number_of_replicas", indexSettings.replicas());

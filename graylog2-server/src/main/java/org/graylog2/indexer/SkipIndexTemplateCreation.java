@@ -16,14 +16,9 @@
  */
 package org.graylog2.indexer;
 
-import com.github.zafarkhaja.semver.Version;
-import org.graylog2.indexer.indexset.IndexSetConfig;
+public class SkipIndexTemplateCreation extends RuntimeException {
 
-import javax.annotation.Nonnull;
-
-public interface IndexTemplateProvider {
-
-    @Nonnull
-    IndexMappingTemplate create(@Nonnull Version elasticsearchVersion, @Nonnull IndexSetConfig indexSetConfig)
-            throws SkipIndexTemplateCreation;
+    public SkipIndexTemplateCreation(String reason) {
+        super(reason);
+    }
 }

@@ -142,7 +142,7 @@ public class IndicesAdapterES7 implements IndicesAdapter {
     }
 
     @Override
-    public void create(String index, IndexSettings indexSettings, String templateName, Map<String, Object> template) {
+    public void create(String index, IndexSettings indexSettings) {
         final Map<String, Object> settings = new HashMap<>();
         settings.put("number_of_shards", indexSettings.shards());
         settings.put("number_of_replicas", indexSettings.replicas());

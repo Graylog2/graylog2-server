@@ -27,6 +27,7 @@ import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.IndexMappingFactory;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.SkipIndexTemplateCreation;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.events.IndicesClosedEvent;
 import org.graylog2.indexer.indices.events.IndicesDeletedEvent;
@@ -157,12 +158,15 @@ public class Indices {
     public void ensureIndexTemplate(IndexSet indexSet) {
         final IndexSetConfig indexSetConfig = indexSet.getConfig();
         final String templateName = indexSetConfig.indexTemplateName();
-        final Map<String, Object> template = buildTemplate(indexSet, indexSetConfig);
-
-        final boolean result = indicesAdapter.ensureIndexTemplate(templateName, template);
-
-        if (result) {
-            LOG.info("Successfully created index template {}", templateName);
+        try {
+            final Map<String, Object> template = buildTemplate(indexSet, indexSetConfig);
+            if (indicesAdapter.ensureIndexTemplate(templateName, template)) {
+                LOG.info("Successfully created index template {}", templateName);
+            } else {
+                LOG.warn("Failed to create index template {}", templateName);
+            }
+        } catch (SkipIndexTemplateCreation e) {
+            LOG.warn("Index template creation has been skipped! Reason: {}", e.getMessage());
         }
     }
 
@@ -186,14 +190,10 @@ public class Indices {
                 indexSet.getConfig().replicas()
         );
 
-        final IndexSetConfig indexSetConfig = indexSet.getConfig();
-        final String templateName = indexSetConfig.indexTemplateName();
-        final Map<String, Object> template = buildTemplate(indexSet, indexSetConfig);
-
         try {
             // Make sure our index template exists before creating an index!
-            indicesAdapter.ensureIndexTemplate(templateName, template);
-            indicesAdapter.create(indexName, indexSettings, templateName, template);
+            ensureIndexTemplate(indexSet);
+            indicesAdapter.create(indexName, indexSettings);
         } catch (Exception e) {
             LOG.warn("Couldn't create index {}. Error: {}", indexName, e.getMessage(), e);
             auditEventSender.failure(AuditActor.system(nodeId), ES_INDEX_CREATE, ImmutableMap.of("indexName", indexName));
@@ -204,7 +204,7 @@ public class Indices {
         return true;
     }
 
-    private Map<String, Object> buildTemplate(IndexSet indexSet, IndexSetConfig indexSetConfig) {
+    private Map<String, Object> buildTemplate(IndexSet indexSet, IndexSetConfig indexSetConfig) throws SkipIndexTemplateCreation {
         return indexMappingFactory.createIndexMapping(indexSetConfig)
                 .toTemplate(indexSetConfig, indexSet.getIndexWildcard(), -1);
     }

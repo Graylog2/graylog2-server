@@ -38,7 +38,7 @@ public interface IndicesAdapter {
 
     Set<String> resolveAlias(String alias);
 
-    void create(String indexName, IndexSettings indexSettings, String templateName, Map<String, Object> template);
+    void create(String indexName, IndexSettings indexSettings);
 
     /**
      * Add fields to an existing index or to change search only settings of existing fields
