@@ -171,7 +171,7 @@
     "node-fetch": "^2.6.1",
     "puppeteer": "^2.1.1",
     "react-docgen-typescript": "^2.1.0",
-    "react-styleguidist": "^11.1.7",
+    "react-styleguidist": "11.1.7",
     "style-loader": "2.0.0",
     "stylelint-config-graylog": "file:packages/stylelint-config-graylog",
     "url-loader": "^4.0.0",

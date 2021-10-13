@@ -15,19 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 /* This file contains configuration for React Styleguidist https://react-styleguidist.js.org/ */
+const fs = require('fs');
 const path = require('path');
 
 const propsParser = require('react-docgen-typescript').parse;
 const requireIt = require('react-styleguidist/lib/loaders/utils/requireIt').default;
 
 const webpackConfig = require('./webpack.config.js');
-
-const defaultComponentIgnore = [
-  '**/__tests__/**',
-  '**/*.test.{js,jsx,ts,tsx}',
-  '**/*.spec.{js,jsx,ts,tsx}',
-  '**/*.d.ts',
-];
 
 module.exports = {
   require: [
@@ -36,7 +30,6 @@ module.exports = {
     'bootstrap/less/bootstrap.less',
     'toastr/toastr.less',
     'stylesheets/typeahead.less',
-    'injection/builtins.js',
   ],
   propsParser,
   sections: [
@@ -91,30 +84,15 @@ module.exports = {
       sections: [
         {
           name: 'Bootstrap',
-          components: 'src/components/bootstrap/[A-Z]*.{jsx,tsx}',
+          components: 'src/components/bootstrap/[A-Z]!(*.example)*.{jsx,tsx}',
         },
         {
           name: 'Common',
           components: 'src/components/common/[A-Z]*.{jsx,tsx}',
-          ignore: [
-            ...defaultComponentIgnore,
-            'src/components/common/URLWhiteListFormModal.tsx',
-            'src/components/common/FlatContentRow.tsx',
-            'src/components/common/Wizard.tsx',
-            'src/components/common/PublicNotifications.tsx',
-            'src/components/common/KeyCapture.tsx',
-            'src/components/common/MessageDetailsDefinitionList.jsx',
-            'src/components/common/Button.jsx',
-            'src/components/common/Accordion.tsx',
-          ],
         },
         {
           name: 'Configuration Forms',
           components: 'src/components/configurationforms/[A-Z]*.{jsx,tsx}',
-          ignore: [
-            ...defaultComponentIgnore,
-            'src/components/configurationforms/ListField.tsx',
-          ],
         },
       ],
     },
@@ -126,14 +104,30 @@ module.exports = {
   styleguideDir: 'docs/styleguide',
   title: 'Graylog UI documentation',
   getExampleFilename(componentPath) {
-    return componentPath.replace(/\.tsx?$/, '.example.tsx');
+    if (componentPath.match(/\.tsx?$/)) {
+      const tsxPath = componentPath.replace(/\.tsx?$/, '.example.tsx');
+
+      if (fs.existsSync(tsxPath)) {
+        return tsxPath;
+      }
+
+      return componentPath.replace(/\.jsx?$/, '.md');
+    }
+
+    return componentPath.replace(/\.jsx?$/, '.md');
   },
   updateDocs(docs) {
-    const loader = path.join(__dirname, 'webpack/examples-loader.js');
-    const requirePath = docs.examples.require.replace(/^!!([^!]*)!/, `!!${loader}!`);
-    docs.examples = requireIt(requirePath);
+    if (!docs.filePath) {
+      return docs;
+    }
 
-    return docs;
+    const updatedDocs = JSON.parse(JSON.stringify(docs));
+
+    const loader = path.join(__dirname, 'webpack/examples-loader.js');
+    const requirePath = updatedDocs.examples.require.replace(/^!!([^!]*)!/, `!!${loader}!`);
+    updatedDocs.examples = requireIt(requirePath);
+
+    return updatedDocs;
   },
   webpackConfig: {
     module: webpackConfig.module,

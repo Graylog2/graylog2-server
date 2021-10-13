@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// Borrowed wholesale from https://urmaul.com/blog/react-styleguidist/
+// Borrowed wholesale from https://urmaul.com/blog/react-styleguidist/ and updated to work with react-styleguidist v11.1.7
 
 const fs = require('fs');
 
