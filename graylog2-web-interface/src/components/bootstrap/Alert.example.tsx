@@ -16,14 +16,11 @@
  */
 import * as React from 'react';
 
-import { ColorVariants } from 'theme/colors';
 import { Icon } from 'components/common';
 
 import Alert from './Alert';
 
-// eslint-disable-next-line import/prefer-default-export
 export const DefaultExample = () => {
-  // ### Default
   return (
     <>
       <Alert>
@@ -34,21 +31,28 @@ export const DefaultExample = () => {
   );
 };
 
-export const VariantExamples = () => {
-  // ### Variants
-
-  const styles: Array<ColorVariants> = ['danger', 'info', 'success', 'warning'];
-
+export const VariantsExample = () => {
   return (
     <>
-      {styles.map((style) => {
-        return (
-          <Alert bsStyle={style} key={`button-${style}`}>
-            <Icon name="exclamation-triangle" fixedWidth bsSize="lg" />{' '}
-            <strong>{style}</strong> Lorem ipsum dolor sit amet consectetur <a href="#lorem">adipisicing elit</a>.
-          </Alert>
-        );
-      })}
+      <Alert bsStyle="danger">
+        <Icon name="bomb" fixedWidth bsSize="lg" />{' '}
+        <strong>danger</strong> Lorem ipsum dolor sit amet consectetur <a href="#lorem">adipisicing elit</a>.
+      </Alert>
+
+      <Alert bsStyle="info">
+        <Icon name="info-circle" fixedWidth bsSize="lg" />{' '}
+        <strong>info</strong> Lorem ipsum dolor sit amet consectetur <a href="#lorem">adipisicing elit</a>.
+      </Alert>
+
+      <Alert bsStyle="success">
+        <Icon name="check-circle" fixedWidth bsSize="lg" />{' '}
+        <strong>success</strong> Lorem ipsum dolor sit amet consectetur <a href="#lorem">adipisicing elit</a>.
+      </Alert>
+
+      <Alert bsStyle="warning">
+        <Icon name="exclamation-triangle" fixedWidth bsSize="lg" />{' '}
+        <strong>warning</strong> Lorem ipsum dolor sit amet consectetur <a href="#lorem">adipisicing elit</a>.
+      </Alert>
     </>
   );
 };

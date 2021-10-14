@@ -18,7 +18,6 @@
 const fs = require('fs');
 const path = require('path');
 
-const propsParser = require('react-docgen-typescript').parse;
 const requireIt = require('react-styleguidist/lib/loaders/utils/requireIt').default;
 
 const webpackConfig = require('./webpack.config.js');
@@ -31,54 +30,64 @@ module.exports = {
     'toastr/toastr.less',
     'stylesheets/typeahead.less',
   ],
-  propsParser,
+  propsParser: (filePath, source, resolver, handlers) => {
+    const { ext } = path.parse(filePath);
+
+    return ext === '.tsx'
+      // eslint-disable-next-line global-require
+      ? require('react-docgen-typescript')
+        .withCustomConfig(`${process.cwd()}/tsconfig.json`)
+        .parse(filePath, source, resolver, handlers)
+      // eslint-disable-next-line global-require
+      : require('react-docgen').parse(source, resolver, handlers);
+  },
   sections: [
-    {
-      name: 'Introduction',
-      content: 'docs/introduction.md',
-    },
-    {
-      name: 'Style Guide',
-      content: 'docs/styleguide.md',
-    },
-    {
-      name: 'Documentation',
-      content: 'docs/documentation.md',
-    },
-    {
-      name: 'Tests',
-      content: 'docs/tests.md',
-    },
-    {
-      name: 'Util Objects',
-      content: 'docs/util-objects.md',
-    },
-    {
-      name: 'Theming Details',
-      content: 'src/theme/docs/Details.md',
-      sections: [
-        {
-          name: 'ThemeProvider & Usage',
-          content: 'src/theme/docs/ThemeProvider.md',
-        },
-        {
-          name: 'Fonts',
-          content: 'src/theme/docs/Fonts.md',
-        },
-        {
-          name: 'Colors',
-          content: 'src/theme/docs/Colors.md',
-        },
-        {
-          name: 'Color Utilities',
-          content: 'src/theme/docs/Utilities.md',
-        },
-        {
-          name: 'Spacings',
-          content: 'src/theme/docs/Spacings.md',
-        },
-      ],
-    },
+    // {
+    //   name: 'Introduction',
+    //   content: 'docs/introduction.md',
+    // },
+    // {
+    //   name: 'Style Guide',
+    //   content: 'docs/styleguide.md',
+    // },
+    // {
+    //   name: 'Documentation',
+    //   content: 'docs/documentation.md',
+    // },
+    // {
+    //   name: 'Tests',
+    //   content: 'docs/tests.md',
+    // },
+    // {
+    //   name: 'Util Objects',
+    //   content: 'docs/util-objects.md',
+    // },
+    // {
+    //   name: 'Theming Details',
+    //   content: 'src/theme/docs/Details.md',
+    //   sections: [
+    //     {
+    //       name: 'ThemeProvider & Usage',
+    //       content: 'src/theme/docs/ThemeProvider.md',
+    //     },
+    //     {
+    //       name: 'Fonts',
+    //       content: 'src/theme/docs/Fonts.md',
+    //     },
+    //     {
+    //       name: 'Colors',
+    //       content: 'src/theme/docs/Colors.md',
+    //     },
+    //     {
+    //       name: 'Color Utilities',
+    //       content: 'src/theme/docs/Utilities.md',
+    //     },
+    //     {
+    //       name: 'Spacings',
+    //       content: 'src/theme/docs/Spacings.md',
+    //     },
+    //   ],
+    // },
     {
       name: 'Shared Components',
       sections: [
@@ -86,14 +95,14 @@ module.exports = {
           name: 'Bootstrap',
           components: 'src/components/bootstrap/[A-Z]!(*.example)*.{jsx,tsx}',
         },
-        {
-          name: 'Common',
-          components: 'src/components/common/[A-Z]*.{jsx,tsx}',
-        },
-        {
-          name: 'Configuration Forms',
-          components: 'src/components/configurationforms/[A-Z]*.{jsx,tsx}',
-        },
+        // {
+        //   name: 'Common',
+        //   components: 'src/components/common/[A-Z]*.{jsx,tsx}',
+        // },
+        // {
+        //   name: 'Configuration Forms',
+        //   components: 'src/components/configurationforms/[A-Z]*.{jsx,tsx}',
+        // },
       ],
     },
   ],

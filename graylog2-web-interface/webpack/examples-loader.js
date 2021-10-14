@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// Borrowed wholesale from https://urmaul.com/blog/react-styleguidist/ and updated to work with react-styleguidist v11.1.7
+// Borrowed from https://urmaul.com/blog/react-styleguidist/ and updated to work with react-styleguidist v11.1.7
 
 const fs = require('fs');
 
@@ -27,20 +27,30 @@ function getMarkdown(source, resourcePath) {
     return fs.readFileSync(mdPath, 'utf8');
   }
 
-  // Parsed vars
-  // Code inside React.Fragment tags (<>...</>) => pasted as code
-  // Comments starting with '### ' => as is (h3 headers)
-  // Exported consts with "Example" word in name => code with import
-  const codes = (
-    source.match(
-      /(<>(.*?)<\/>|### (.*?)\n|export const ([A-Za-z0-9]*Example[A-Za-z0-9]*))/gs,
-    ) || []
-  )
-    .map((s) => s.replace(
-      /^export const ([A-Za-z0-9]*)$/s,
-      `\`\`\`js\nconst $1 = require('${resourcePath}').$1;\n<$1 />\n\`\`\`\n`,
-    ))
-    .map((s) => s.replace(/^<>(.*)<\/>$/s, '```js\n$1\n```'));
+  const stage1 = source.match(
+    /(<>(.*?)<\/>|export const ([A-Za-z0-9]*Example[A-Za-z0-9]*))/gs,
+  ) || [];
+
+  const codes = stage1
+    .map((s) => {
+      // Create Header w/ example name
+      return s.replace(
+        /^export const ([A-Za-z0-9]*)Example[A-Za-z0-9]*$/s,
+        '### $1',
+      );
+    })
+    // Add the example implementation code
+    // Code inside React.Fragment tags (<>...</>) => pasted as code
+    .map((s) => s.replace(/^<>(.*)<\/>$/s, '```js static $1\n```'));
+
+  codes.forEach((s, i) => {
+    const exampleName = s.match(/^### ([A-Za-z0-9]*)$/s);
+
+    // Inject example component to render
+    if (exampleName) {
+      codes.splice(i + 1, 0, `\`\`\`js noeditor\nconst ${exampleName[1]}Example = require('${resourcePath}').${exampleName[1]}Example;\n<${exampleName[1]}Example />\n\`\`\`\n`);
+    }
+  });
 
   return codes.join('\n\n');
 }
