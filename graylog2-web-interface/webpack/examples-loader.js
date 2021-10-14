@@ -54,7 +54,6 @@ function getMarkdown(source, resourcePath) {
       }
 
       return s;
-      // return s.replace(/^<>(.*)<\/>$/s, '```js static $1\n```');
     });
 
   codes.forEach((s, i) => {
