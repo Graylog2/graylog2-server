@@ -41,7 +41,21 @@ function getMarkdown(source, resourcePath) {
     })
     // Add the example implementation code
     // Code inside React.Fragment tags (<>...</>) => pasted as code
-    .map((s) => s.replace(/^<>(.*)<\/>$/s, '```js static $1\n```'));
+    .map((s) => {
+      const code = s.match(/^<>(.*)<\/>$/s);
+
+      if (code) {
+        // count leading spaces at beginning of file
+        const spaceCount = code[1].search(/\S|$/) - 1;
+        // strip empty spaces from beginning of each line
+        const codeLines = code[1].split('\n').map((line) => line.slice(spaceCount)).join('\n');
+
+        return s.replace(/^<>(.*)<\/>$/s, `\`\`\`js static ${codeLines}\n\`\`\``);
+      }
+
+      return s;
+      // return s.replace(/^<>(.*)<\/>$/s, '```js static $1\n```');
+    });
 
   codes.forEach((s, i) => {
     const exampleName = s.match(/^### ([A-Za-z0-9]*)$/s);
