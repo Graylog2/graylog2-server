@@ -17,13 +17,26 @@
 import styled, { css } from 'styled-components';
 // eslint-disable-next-line no-restricted-imports
 import { ControlLabel as BootstrapControlLabel } from 'react-bootstrap';
+import PropTypes from 'prop-types';
+import * as React from 'react';
 
-const ControlLabel = styled(BootstrapControlLabel)(({ theme }) => css`
+const StyledControlLabel = styled(BootstrapControlLabel)(({ theme }) => css`
   color: ${theme.colors.global.textDefault};
   font-weight: bold;
   margin-bottom: 5px;
   display: inline-block;
 `);
 
-/** @component */
+const ControlLabel = ({ children, ...restProps }) => {
+  return <StyledControlLabel {...restProps}>{children}</StyledControlLabel>;
+};
+
+ControlLabel.propTypes = {
+  children: PropTypes.node,
+};
+
+ControlLabel.defaultProps = {
+  children: undefined,
+};
+
 export default ControlLabel;

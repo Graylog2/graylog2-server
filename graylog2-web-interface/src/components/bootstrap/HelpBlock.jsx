@@ -17,13 +17,26 @@
 // eslint-disable-next-line no-restricted-imports
 import { HelpBlock as BootstrapHelpBlock } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
+import PropTypes from 'prop-types';
+import * as React from 'react';
 
-const HelpBlock = styled(BootstrapHelpBlock)(({ theme }) => css`
+const StyledHelpBlock = styled(BootstrapHelpBlock)(({ theme }) => css`
   display: block;
   margin-top: 5px;
   margin-bottom: 10px;
   color: ${theme.colors.gray[50]};
 `);
 
-/** @component */
+const HelpBlock = ({ children, ...restProps }) => {
+  return <StyledHelpBlock {...restProps}>{children}</StyledHelpBlock>;
+};
+
+HelpBlock.propTypes = {
+  children: PropTypes.node,
+};
+
+HelpBlock.defaultProps = {
+  children: undefined,
+};
+
 export default HelpBlock;

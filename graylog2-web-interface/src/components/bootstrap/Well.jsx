@@ -17,12 +17,25 @@
 // eslint-disable-next-line no-restricted-imports
 import { Well as BootstrapWell } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
+import PropTypes from 'prop-types';
+import * as React from 'react';
 
-const Well = styled(BootstrapWell)(({ theme }) => css`
+const StyledWell = styled(BootstrapWell)(({ theme }) => css`
   background-color: ${theme.colors.variant.lightest.default};
   border-color: ${theme.colors.variant.light.default};
   color: ${theme.colors.variant.darker.default};
 `);
 
-/** @component */
+const Well = ({ children, ...restProps }) => {
+  return <StyledWell {...restProps}>{children}</StyledWell>;
+};
+
+Well.propTypes = {
+  children: PropTypes.node,
+};
+
+Well.defaultProps = {
+  children: undefined,
+};
+
 export default Well;

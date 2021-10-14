@@ -37,5 +37,20 @@ module.exports = {
         '@babel/plugin-transform-runtime',
       ],
     },
+    docs: {
+      presets: [
+        ['@babel/env', {
+          modules: false,
+          useBuiltIns: 'entry',
+          corejs: '3.9',
+        }],
+        '@babel/react',
+      ],
+      plugins: [
+        '@babel/plugin-syntax-dynamic-import',
+        '@babel/plugin-proposal-class-properties',
+        'babel-plugin-styled-components',
+      ],
+    },
   },
 };

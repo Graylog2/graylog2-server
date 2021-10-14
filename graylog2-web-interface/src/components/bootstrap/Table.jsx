@@ -17,6 +17,8 @@
 // eslint-disable-next-line no-restricted-imports
 import { Table as BootstrapTable } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
+import PropTypes from 'prop-types';
+import * as React from 'react';
 
 const variantRowStyles = css(({ theme }) => {
   const { table } = theme.colors;
@@ -131,11 +133,22 @@ const tableCss = css(({ theme }) => css`
   ${variantRowStyles}
 `);
 
-const Table = styled(BootstrapTable)`
+const StyledTable = styled(BootstrapTable)`
   ${tableCss}
 `;
 
-/** @component */
+const Table = ({ children, ...restProps }) => {
+  return <StyledTable {...restProps}>{children}</StyledTable>;
+};
+
+Table.propTypes = {
+  children: PropTypes.node,
+};
+
+Table.defaultProps = {
+  children: undefined,
+};
+
 export default Table;
 
 export { tableCss };

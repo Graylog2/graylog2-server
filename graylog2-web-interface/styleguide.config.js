@@ -19,6 +19,10 @@ const fs = require('fs');
 const path = require('path');
 
 const requireIt = require('react-styleguidist/lib/loaders/utils/requireIt').default;
+const docGenTSParse = require('react-docgen-typescript')
+  .withCustomConfig(`${process.cwd()}/tsconfig.json`, {})
+  .parse;
+const docGenParse = require('react-docgen').parse;
 
 const webpackConfig = require('./webpack.config.js');
 
@@ -31,63 +35,57 @@ module.exports = {
     'stylesheets/typeahead.less',
   ],
   propsParser: (filePath, source, resolver, handlers) => {
-    const { ext } = path.parse(filePath);
-
-    return ext === '.tsx'
-      // eslint-disable-next-line global-require
-      ? require('react-docgen-typescript')
-        .withCustomConfig(`${process.cwd()}/tsconfig.json`)
-        .parse(filePath, source, resolver, handlers)
-      // eslint-disable-next-line global-require
-      : require('react-docgen').parse(source, resolver, handlers);
+    return path.parse(filePath).ext === '.tsx'
+      ? docGenTSParse(filePath)
+      : docGenParse(source, resolver, handlers, { envName: 'docs', filename: filePath });
   },
   sections: [
-    // {
-    //   name: 'Introduction',
-    //   content: 'docs/introduction.md',
-    // },
-    // {
-    //   name: 'Style Guide',
-    //   content: 'docs/styleguide.md',
-    // },
-    // {
-    //   name: 'Documentation',
-    //   content: 'docs/documentation.md',
-    // },
-    // {
-    //   name: 'Tests',
-    //   content: 'docs/tests.md',
-    // },
-    // {
-    //   name: 'Util Objects',
-    //   content: 'docs/util-objects.md',
-    // },
-    // {
-    //   name: 'Theming Details',
-    //   content: 'src/theme/docs/Details.md',
-    //   sections: [
-    //     {
-    //       name: 'ThemeProvider & Usage',
-    //       content: 'src/theme/docs/ThemeProvider.md',
-    //     },
-    //     {
-    //       name: 'Fonts',
-    //       content: 'src/theme/docs/Fonts.md',
-    //     },
-    //     {
-    //       name: 'Colors',
-    //       content: 'src/theme/docs/Colors.md',
-    //     },
-    //     {
-    //       name: 'Color Utilities',
-    //       content: 'src/theme/docs/Utilities.md',
-    //     },
-    //     {
-    //       name: 'Spacings',
-    //       content: 'src/theme/docs/Spacings.md',
-    //     },
-    //   ],
-    // },
+    {
+      name: 'Introduction',
+      content: 'docs/introduction.md',
+    },
+    {
+      name: 'Style Guide',
+      content: 'docs/styleguide.md',
+    },
+    {
+      name: 'Documentation',
+      content: 'docs/documentation.md',
+    },
+    {
+      name: 'Tests',
+      content: 'docs/tests.md',
+    },
+    {
+      name: 'Util Objects',
+      content: 'docs/util-objects.md',
+    },
+    {
+      name: 'Theming Details',
+      content: 'src/theme/docs/Details.md',
+      sections: [
+        {
+          name: 'ThemeProvider & Usage',
+          content: 'src/theme/docs/ThemeProvider.md',
+        },
+        {
+          name: 'Fonts',
+          content: 'src/theme/docs/Fonts.md',
+        },
+        {
+          name: 'Colors',
+          content: 'src/theme/docs/Colors.md',
+        },
+        {
+          name: 'Color Utilities',
+          content: 'src/theme/docs/Utilities.md',
+        },
+        {
+          name: 'Spacings',
+          content: 'src/theme/docs/Spacings.md',
+        },
+      ],
+    },
     {
       name: 'Shared Components',
       sections: [
@@ -95,14 +93,14 @@ module.exports = {
           name: 'Bootstrap',
           components: 'src/components/bootstrap/[A-Z]!(*.example)*.{jsx,tsx}',
         },
-        // {
-        //   name: 'Common',
-        //   components: 'src/components/common/[A-Z]*.{jsx,tsx}',
-        // },
-        // {
-        //   name: 'Configuration Forms',
-        //   components: 'src/components/configurationforms/[A-Z]*.{jsx,tsx}',
-        // },
+        {
+          name: 'Common',
+          components: 'src/components/common/[A-Z]*.jsx',
+        },
+        {
+          name: 'Configuration Forms',
+          components: 'src/components/configurationforms/[A-Z]*.{jsx,tsx}',
+        },
       ],
     },
   ],
@@ -113,17 +111,28 @@ module.exports = {
   styleguideDir: 'docs/styleguide',
   title: 'Graylog UI documentation',
   getExampleFilename(componentPath) {
-    if (componentPath.match(/\.tsx?$/)) {
-      const tsxPath = componentPath.replace(/\.tsx?$/, '.example.tsx');
+    const pathMatch = componentPath.match(/\.[t|j]sx?$/);
 
-      if (fs.existsSync(tsxPath)) {
-        return tsxPath;
+    if (pathMatch) {
+      if (pathMatch[0] === '.tsx') {
+        const tsxPath = componentPath.replace(/\.tsx?$/, '.example.tsx');
+        const mdPath = componentPath.replace(/\.tsx?$/, '.md');
+
+        if (fs.existsSync(tsxPath)) {
+          return tsxPath;
+        }
+
+        if (fs.existsSync(mdPath)) {
+          return mdPath;
+        }
+
+        return componentPath;
       }
 
       return componentPath.replace(/\.jsx?$/, '.md');
     }
 
-    return componentPath.replace(/\.jsx?$/, '.md');
+    return componentPath;
   },
   updateDocs(docs) {
     if (!docs.filePath) {

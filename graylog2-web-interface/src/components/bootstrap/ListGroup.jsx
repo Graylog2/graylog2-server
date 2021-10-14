@@ -31,5 +31,4 @@ ListGroup.defaultProps = {
   className: undefined,
 };
 
-/** @component */
 export default ListGroup;

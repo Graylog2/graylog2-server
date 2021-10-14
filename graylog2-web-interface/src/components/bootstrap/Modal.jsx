@@ -17,6 +17,8 @@
 // eslint-disable-next-line no-restricted-imports
 import { Modal as BootstrapModal } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
+import PropTypes from 'prop-types';
+import * as React from 'react';
 
 const Dialog = css`
   margin-top: 55px;
@@ -50,7 +52,7 @@ const Body = css`
   }
 `;
 
-const Modal = styled(BootstrapModal)`
+const StyledModal = styled(BootstrapModal)`
   .modal-backdrop {
     height: 100000%;  /* yes, really. this fixes the backdrop being cut off when the page is scrolled. */
     z-index: 1030;
@@ -81,25 +83,36 @@ const Modal = styled(BootstrapModal)`
   }
 `;
 
-Modal.Dialog = styled(BootstrapModal.Dialog)`
+const Modal = ({ children, ...restProps }) => {
+  return <StyledModal {...restProps}>{children}</StyledModal>;
+};
+
+Modal.propTypes = {
+  children: PropTypes.node,
+};
+
+Modal.defaultProps = {
+  children: undefined,
+};
+
+Modal.Dialog = styled(StyledModal.Dialog)`
   ${Dialog}
 `;
 
-Modal.Header = styled(BootstrapModal.Header)`
+Modal.Header = styled(StyledModal.Header)`
   ${Header}
 `;
 
-Modal.Title = styled(BootstrapModal.Title)`
+Modal.Title = styled(StyledModal.Title)`
   ${Title}
 `;
 
-Modal.Body = styled(BootstrapModal.Body)`
+Modal.Body = styled(StyledModal.Body)`
   ${Body}
 `;
 
-Modal.Footer = styled(BootstrapModal.Footer)`
+Modal.Footer = styled(StyledModal.Footer)`
   ${Footer}
 `;
 
-/** @component */
 export default Modal;

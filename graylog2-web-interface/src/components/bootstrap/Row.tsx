@@ -17,6 +17,8 @@
 // eslint-disable-next-line no-restricted-imports
 import { Row as BootstrapRow } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
+import PropTypes from 'prop-types';
+import * as React from 'react';
 
 export const RowContentStyles = css(({ theme }) => css`
   background-color: ${theme.colors.global.contentBackground};
@@ -25,11 +27,22 @@ export const RowContentStyles = css(({ theme }) => css`
   border-radius: 4px;
 `);
 
-const Row = styled(BootstrapRow)`
+const StyledRow = styled(BootstrapRow)`
   &.content {
     ${RowContentStyles}
   }
 `;
 
-/** @component */
+const Row = ({ children, ...restProps }) => {
+  return <StyledRow {...restProps}>{children}</StyledRow>;
+};
+
+Row.propTypes = {
+  children: PropTypes.node,
+};
+
+Row.defaultProps = {
+  children: undefined,
+};
+
 export default Row;

@@ -14,13 +14,26 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import * as React from 'react';
+import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 // eslint-disable-next-line no-restricted-imports
 import { Button as BootstrapButton } from 'react-bootstrap';
 
-const Button = styled(BootstrapButton)(({ theme }) => css`
+const StyledButton = styled(BootstrapButton)(({ theme }) => css`
   ${theme.components.button}
 `);
 
-/** @component */
+const Button = ({ children, ...restProps }) => {
+  return <StyledButton {...restProps}>{children}</StyledButton>;
+};
+
+Button.propTypes = {
+  children: PropTypes.node,
+};
+
+Button.defaultProps = {
+  children: undefined,
+};
+
 export default Button;

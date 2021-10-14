@@ -84,5 +84,4 @@ IfPermitted.defaultProps = {
   anyPermissions: false,
 };
 
-/** @component */
 export default IfPermitted;

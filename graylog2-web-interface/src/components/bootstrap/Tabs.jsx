@@ -17,12 +17,25 @@
 // eslint-disable-next-line no-restricted-imports
 import { Tabs as BootstrapTabs } from 'react-bootstrap';
 import styled from 'styled-components';
+import PropTypes from 'prop-types';
+import * as React from 'react';
 
 import navTabsStyles from './styles/nav-tabs';
 
-const Tabs = styled(BootstrapTabs)`
+const StyledTabs = styled(BootstrapTabs)`
   ${navTabsStyles}
 `;
 
-/** @component */
+const Tabs = ({ children, ...restProps }) => {
+  return <StyledTabs {...restProps}>{children}</StyledTabs>;
+};
+
+Tabs.propTypes = {
+  children: PropTypes.node,
+};
+
+Tabs.defaultProps = {
+  children: undefined,
+};
+
 export default Tabs;

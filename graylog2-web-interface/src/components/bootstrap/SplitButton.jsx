@@ -14,13 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import PropTypes from 'prop-types';
+import * as React from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { SplitButton as BootstrapSplitButton } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
 
 import menuItemStyles from './styles/menuItem';
 
-const SplitButton = styled(BootstrapSplitButton)(({ theme }) => css`
+const StyledSplitButton = styled(BootstrapSplitButton)(({ theme }) => css`
   ${theme.components.button}
   ~ .btn.dropdown-toggle {
     ${theme.components.button}
@@ -30,5 +32,16 @@ const SplitButton = styled(BootstrapSplitButton)(({ theme }) => css`
   }
 `);
 
-/** @component */
+const SplitButton = ({ children, ...restProps }) => {
+  return <StyledSplitButton {...restProps}>{children}</StyledSplitButton>;
+};
+
+SplitButton.propTypes = {
+  children: PropTypes.node,
+};
+
+SplitButton.defaultProps = {
+  children: undefined,
+};
+
 export default SplitButton;

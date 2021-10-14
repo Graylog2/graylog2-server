@@ -138,5 +138,4 @@ Tooltip.defaultProps = {
   show: true,
 };
 
-/** @component */
 export default Tooltip;

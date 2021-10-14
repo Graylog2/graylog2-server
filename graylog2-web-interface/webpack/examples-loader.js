@@ -27,11 +27,11 @@ function getMarkdown(source, resourcePath) {
     return fs.readFileSync(mdPath, 'utf8');
   }
 
-  const stage1 = source.match(
+  const sourceCode = source.match(
     /(<>(.*?)<\/>|export const ([A-Za-z0-9]*Example[A-Za-z0-9]*))/gs,
   ) || [];
 
-  const codes = stage1
+  const codes = sourceCode
     .map((s) => {
       // Create Header w/ example name
       return s.replace(

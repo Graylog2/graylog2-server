@@ -274,5 +274,4 @@ Panel.Heading = PanelHeading;
 Panel.Title = BootstrapPanel.Title;
 Panel.Toggle = BootstrapPanel.Toggle;
 
-/** @component */
 export default Panel;

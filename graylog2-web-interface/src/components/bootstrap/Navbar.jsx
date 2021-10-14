@@ -18,8 +18,10 @@
 import { Navbar as BootstrapNavbar } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
 import chroma from 'chroma-js';
+import PropTypes from 'prop-types';
+import * as React from 'react';
 
-const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
+const StyledNavbar = styled(BootstrapNavbar)(({ theme }) => css`
   position: relative;
   min-height: auto;
   background-color: ${theme.colors.global.navigationBackground};
@@ -230,5 +232,16 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
   }
 `);
 
-/** @component */
+const Navbar = ({ children, ...restProps }) => {
+  return <StyledNavbar {...restProps}>{children}</StyledNavbar>;
+};
+
+Navbar.propTypes = {
+  children: PropTypes.node,
+};
+
+Navbar.defaultProps = {
+  children: undefined,
+};
+
 export default Navbar;

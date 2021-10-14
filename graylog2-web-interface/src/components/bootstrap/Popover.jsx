@@ -17,8 +17,10 @@
 // eslint-disable-next-line no-restricted-imports
 import { Popover as BootstrapPopover } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
+import PropTypes from 'prop-types';
+import * as React from 'react';
 
-const Popover = styled(BootstrapPopover)(({ theme }) => {
+const StyledPopover = styled(BootstrapPopover)(({ theme }) => {
   const borderColor = theme.colors.variant.light.default;
   const arrowColor = theme.colors.variant.lightest.default;
   const backgroundColor = theme.colors.global.contentBackground;
@@ -77,5 +79,16 @@ const Popover = styled(BootstrapPopover)(({ theme }) => {
   `;
 });
 
-/** @component */
+const Popover = ({ children, ...restProps }) => {
+  return <StyledPopover {...restProps}>{children}</StyledPopover>;
+};
+
+Popover.propTypes = {
+  children: PropTypes.node,
+};
+
+Popover.defaultProps = {
+  children: undefined,
+};
+
 export default Popover;

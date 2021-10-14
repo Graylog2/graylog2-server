@@ -17,10 +17,12 @@
 // eslint-disable-next-line no-restricted-imports
 import { Nav as BootstrapNav } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
+import PropTypes from 'prop-types';
+import * as React from 'react';
 
 import navTabsStyles from './styles/nav-tabs';
 
-const Nav = styled(BootstrapNav)(({ theme }) => css`
+const StyledNav = styled(BootstrapNav)(({ theme }) => css`
   &.nav {
     > li {
       > a {
@@ -68,5 +70,16 @@ const Nav = styled(BootstrapNav)(({ theme }) => css`
   }
 `);
 
-/** @component */
+const Nav = ({ children, ...restProps }) => {
+  return <StyledNav {...restProps}>{children}</StyledNav>;
+};
+
+Nav.propTypes = {
+  children: PropTypes.node,
+};
+
+Nav.defaultProps = {
+  children: undefined,
+};
+
 export default Nav;

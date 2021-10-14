@@ -17,8 +17,10 @@
 // eslint-disable-next-line no-restricted-imports
 import { Tab as BootstrapTab } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
+import PropTypes from 'prop-types';
+import * as React from 'react';
 
-const Tab = styled(BootstrapTab)(({ theme }) => css`
+const StyledTab = styled(BootstrapTab)(({ theme }) => css`
   background-color: ${theme.colors.global.contentBackground};
   border: 1px solid ${theme.colors.variant.default};
   border-top: 0;
@@ -26,5 +28,16 @@ const Tab = styled(BootstrapTab)(({ theme }) => css`
   padding: 9px;
 `);
 
-/** @component */
+const Tab = ({ children, ...restProps }) => {
+  return <StyledTab {...restProps}>{children}</StyledTab>;
+};
+
+Tab.propTypes = {
+  children: PropTypes.node,
+};
+
+Tab.defaultProps = {
+  children: undefined,
+};
+
 export default Tab;

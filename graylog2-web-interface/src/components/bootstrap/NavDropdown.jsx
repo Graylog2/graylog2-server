@@ -18,6 +18,8 @@
 // eslint-disable-next-line no-restricted-imports
 import { NavDropdown as BootstrapNavDropdown } from 'react-bootstrap';
 import styled from 'styled-components';
+import PropTypes from 'prop-types';
+import * as React from 'react';
 
 import menuItemStyles from './styles/menuItem';
 
@@ -41,14 +43,37 @@ class ModifiedBootstrapNavDropdown extends BootstrapNavDropdown {
   }
 }
 
-const NavDropdown = styled(BootstrapNavDropdown)`
+const StyledNavDropdown = styled(BootstrapNavDropdown)`
   ${menuItemStyles}
 `;
 
-const ModifiedNavDropdown = styled(ModifiedBootstrapNavDropdown)`
+const StyledModifiedNavDropdown = styled(ModifiedBootstrapNavDropdown)`
   ${menuItemStyles}
 `;
 
-/** @component */
+const NavDropdown = ({ children, ...restProps }) => {
+  return <StyledNavDropdown {...restProps}>{children}</StyledNavDropdown>;
+};
+
+const ModifiedNavDropdown = ({ children, ...restProps }) => {
+  return <StyledModifiedNavDropdown {...restProps}>{children}</StyledModifiedNavDropdown>;
+};
+
+NavDropdown.propTypes = {
+  children: PropTypes.node,
+};
+
+NavDropdown.defaultProps = {
+  children: undefined,
+};
+
+ModifiedNavDropdown.propTypes = {
+  children: PropTypes.node,
+};
+
+ModifiedNavDropdown.defaultProps = {
+  children: undefined,
+};
+
 export default NavDropdown;
 export { ModifiedNavDropdown };
