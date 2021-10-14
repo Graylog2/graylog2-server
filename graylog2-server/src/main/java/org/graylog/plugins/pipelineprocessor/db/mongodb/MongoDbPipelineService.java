@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.pipelineprocessor.db.mongodb;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.mongodb.BasicDBObject;
 import com.mongodb.MongoException;
@@ -38,6 +39,10 @@ import javax.inject.Inject;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
+import java.util.regex.Pattern;
+
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class MongoDbPipelineService implements PipelineService {
     private static final Logger log = LoggerFactory.getLogger(MongoDbPipelineService.class);
@@ -87,6 +92,17 @@ public class MongoDbPipelineService implements PipelineService {
             throw new NotFoundException("No pipeline with name " + name);
         }
         return pipeline;
+    }
+
+    @Override
+    public List<PipelineDao> loadByRule(String ruleName) {
+        final DBQuery.Query query = DBQuery.regex("source", Pattern.compile(f("rule \"%s\"", ruleName)));
+        try (DBCursor<PipelineDao> daos = dbCollection.find(query)) {
+            return ImmutableList.copyOf((Iterator<PipelineDao>) daos);
+        } catch (MongoException e) {
+            log.error("Unable to load pipelines", e);
+            return Collections.emptyList();
+        }
     }
 
     @Override

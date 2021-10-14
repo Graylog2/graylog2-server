@@ -19,6 +19,7 @@ package org.graylog.plugins.pipelineprocessor.db;
 import org.graylog2.database.NotFoundException;
 
 import java.util.Collection;
+import java.util.List;
 
 public interface PipelineService {
     PipelineDao save(PipelineDao pipeline);
@@ -26,6 +27,8 @@ public interface PipelineService {
     PipelineDao load(String id) throws NotFoundException;
 
     PipelineDao loadByName(String name) throws NotFoundException;
+
+    List<PipelineDao> loadByRule(String ruleName);
 
     Collection<PipelineDao> loadAll();
 

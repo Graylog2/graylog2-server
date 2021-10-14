@@ -24,6 +24,8 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.audit.PipelineProcessorAuditEventTypes;
+import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
+import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleMetricsConfigDto;
 import org.graylog.plugins.pipelineprocessor.db.RuleMetricsConfigService;
@@ -67,16 +69,19 @@ public class RuleResource extends RestResource implements PluginRestResource {
     private static final Logger log = LoggerFactory.getLogger(RuleResource.class);
 
     private final RuleService ruleService;
+    private final PipelineService pipelineService;
     private final RuleMetricsConfigService ruleMetricsConfigService;
     private final PipelineRuleParser pipelineRuleParser;
     private final FunctionRegistry functionRegistry;
 
     @Inject
     public RuleResource(RuleService ruleService,
+                        PipelineService pipelineService,
                         RuleMetricsConfigService ruleMetricsConfigService,
                         PipelineRuleParser pipelineRuleParser,
                         FunctionRegistry functionRegistry) {
         this.ruleService = ruleService;
+        this.pipelineService = pipelineService;
         this.ruleMetricsConfigService = ruleMetricsConfigService;
         this.pipelineRuleParser = pipelineRuleParser;
         this.functionRegistry = functionRegistry;
@@ -105,7 +110,16 @@ public class RuleResource extends RestResource implements PluginRestResource {
         final RuleDao save = ruleService.save(newRuleSource);
 
         log.debug("Created new rule {}", save);
-        return RuleSource.fromDao(pipelineRuleParser, save);
+        return ruleSourceFromDao(save);
+    }
+
+    private RuleSource ruleSourceFromDao(RuleDao ruleDao) {
+        return RuleSource.fromDao(pipelineRuleParser, ruleDao,
+                pipelineService.loadByRule(ruleDao.title())
+                        .stream()
+                        .map(PipelineDao::title)
+                        .collect(Collectors.toList())
+        );
     }
 
     @ApiOperation(value = "Parse a processing rule without saving it", notes = "")
@@ -136,7 +150,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
     public Collection<RuleSource> getAll() {
         final Collection<RuleDao> ruleDaos = ruleService.loadAll();
         return ruleDaos.stream()
-                .map(ruleDao -> RuleSource.fromDao(pipelineRuleParser, ruleDao))
+                .map(this::ruleSourceFromDao)
                 .collect(Collectors.toList());
     }
 
@@ -145,7 +159,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
     @GET
     public RuleSource get(@ApiParam(name = "id") @PathParam("id") String id) throws NotFoundException {
         checkPermission(PipelineRestPermissions.PIPELINE_RULE_READ, id);
-        return RuleSource.fromDao(pipelineRuleParser, ruleService.load(id));
+        return ruleSourceFromDao(ruleService.load(id));
     }
 
     @ApiOperation("Retrieve the named processing rules in bulk")
@@ -156,7 +170,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
         Collection<RuleDao> ruleDaos = ruleService.loadNamed(rules.rules());
 
         return ruleDaos.stream()
-                .map(ruleDao -> RuleSource.fromDao(pipelineRuleParser, ruleDao))
+                .map(this::ruleSourceFromDao)
                 .filter(rule -> isPermitted(PipelineRestPermissions.PIPELINE_RULE_READ, rule.id()))
                 .collect(Collectors.toList());
     }
@@ -184,7 +198,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
                 .build();
         final RuleDao savedRule = ruleService.save(toSave);
 
-        return RuleSource.fromDao(pipelineRuleParser, savedRule);
+        return ruleSourceFromDao(savedRule);
     }
 
     @ApiOperation(value = "Delete a processing rule", notes = "It can take up to a second until the change is applied")

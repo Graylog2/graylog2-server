@@ -25,9 +25,13 @@ import org.graylog2.events.ClusterEventBus;
 
 import javax.inject.Inject;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
+
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 /**
  * A PipelineService that does not persist any data, but simply keeps it in memory.
@@ -82,6 +86,13 @@ public class InMemoryPipelineService implements PipelineService {
             throw new NotFoundException("No pipeline with name " + name);
         }
         return load(id);
+    }
+
+    @Override
+    public List<PipelineDao> loadByRule(String ruleName) {
+        return store.values().stream()
+                .filter(p -> p.source().contains(f("rule \"%s\"", ruleName)))
+                .collect(Collectors.toList());
     }
 
     @Override
