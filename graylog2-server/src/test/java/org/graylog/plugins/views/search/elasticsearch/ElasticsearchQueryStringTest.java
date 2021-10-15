@@ -24,7 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class ElasticsearchQueryStringTest {
     private ElasticsearchQueryString create(String queryString) {
-        return ElasticsearchQueryString.builder().queryString(queryString).build();
+        return ElasticsearchQueryString.of(queryString);
     }
 
     @Test
@@ -56,7 +56,7 @@ class ElasticsearchQueryStringTest {
             " *"
     })
     void detectsIfItsEmpty(String queryString) {
-        ElasticsearchQueryString sut = ElasticsearchQueryString.builder().queryString(queryString).build();
+        ElasticsearchQueryString sut = ElasticsearchQueryString.of(queryString);
 
         assertThat(sut.isEmpty()).isTrue();
     }

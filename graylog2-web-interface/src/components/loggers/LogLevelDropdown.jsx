@@ -21,9 +21,7 @@ import Reflux from 'reflux';
 import lodash from 'lodash';
 
 import { DropdownButton, MenuItem } from 'components/graylog';
-import CombinedProvider from 'injection/CombinedProvider';
-
-const { LoggersStore, LoggersActions } = CombinedProvider.get('Loggers');
+import { LoggersActions, LoggersStore } from 'stores/system/LoggersStore';
 
 const LogLevelDropdown = createReactClass({
   displayName: 'LogLevelDropdown',

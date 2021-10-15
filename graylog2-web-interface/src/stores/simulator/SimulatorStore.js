@@ -21,33 +21,39 @@ import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import MessageFormatter from 'logic/message/MessageFormatter';
 import ObjectUtils from 'util/ObjectUtils';
-import CombinedProvider from 'injection/CombinedProvider';
+import { singletonStore, singletonActions } from 'logic/singleton';
 
-const { SimulatorActions } = CombinedProvider.get('Simulator');
+export const SimulatorActions = singletonActions(
+  'core.Simulator',
+  () => Reflux.createActions({
+    simulate: { asyncResult: true },
+  }),
+);
 
-const SimulatorStore = Reflux.createStore({
-  listenables: [SimulatorActions],
+export const SimulatorStore = singletonStore(
+  'core.Simulator',
+  () => Reflux.createStore({
+    listenables: [SimulatorActions],
 
-  simulate(stream, messageFields, inputId) {
-    const url = URLUtils.qualifyUrl(ApiRoutes.SimulatorController.simulate().url);
-    const simulation = {
-      stream_id: stream.id,
-      message: messageFields,
-      input_id: inputId,
-    };
+    simulate(stream, messageFields, inputId) {
+      const url = URLUtils.qualifyUrl(ApiRoutes.SimulatorController.simulate().url);
+      const simulation = {
+        stream_id: stream.id,
+        message: messageFields,
+        input_id: inputId,
+      };
 
-    let promise = fetch('POST', url, simulation);
+      let promise = fetch('POST', url, simulation);
 
-    promise = promise.then((response) => {
-      const formattedResponse = ObjectUtils.clone(response);
+      promise = promise.then((response) => {
+        const formattedResponse = ObjectUtils.clone(response);
 
-      formattedResponse.messages = response.messages.map((msg) => MessageFormatter.formatMessageSummary(msg));
+        formattedResponse.messages = response.messages.map((msg) => MessageFormatter.formatMessageSummary(msg));
 
-      return formattedResponse;
-    });
+        return formattedResponse;
+      });
 
-    SimulatorActions.simulate.promise(promise);
-  },
-});
-
-export default SimulatorStore;
+      SimulatorActions.simulate.promise(promise);
+    },
+  }),
+);

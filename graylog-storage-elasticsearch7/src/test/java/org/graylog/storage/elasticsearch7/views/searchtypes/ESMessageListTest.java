@@ -121,9 +121,7 @@ public class ESMessageListTest {
     private Query someQuery() {
         return Query.builder()
                 .id("deadbeef")
-                .query(ElasticsearchQueryString.builder()
-                        .queryString("Something else")
-                        .build())
+                .query(ElasticsearchQueryString.of("Something else"))
                 .timerange(someTimeRange())
                 .searchTypes(Collections.emptySet())
                 .build();

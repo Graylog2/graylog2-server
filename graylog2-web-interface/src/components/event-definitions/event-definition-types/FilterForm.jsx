@@ -29,15 +29,13 @@ import { MultiSelect, TimeUnitInput } from 'components/common';
 import { Input } from 'components/bootstrap';
 import { naturalSortIgnoreCase } from 'util/SortUtils';
 import * as FormsUtils from 'util/FormsUtils';
-import CombinedProvider from 'injection/CombinedProvider';
 import { SearchMetadataActions } from 'views/stores/SearchMetadataStore';
 import { isPermitted } from 'util/PermissionsMixin';
 import LookupTableParameter from 'views/logic/parameters/LookupTableParameter';
+import { LookupTablesActions, LookupTablesStore } from 'stores/lookup-tables/LookupTablesStore';
 
 import EditQueryParameterModal from '../event-definition-form/EditQueryParameterModal';
 import commonStyles from '../common/commonStyles.css';
-
-const { LookupTablesStore, LookupTablesActions } = CombinedProvider.get('LookupTables');
 
 export const TIME_UNITS = ['HOURS', 'MINUTES', 'SECONDS'];
 

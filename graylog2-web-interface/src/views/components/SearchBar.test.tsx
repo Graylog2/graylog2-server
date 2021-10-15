@@ -30,10 +30,12 @@ import SearchBar from './SearchBar';
 
 const mockCurrentUser = { currentUser: { fullname: 'Ada Lovelace', username: 'ada' } };
 
-jest.mock('stores/users/CurrentUserStore', () => MockStore(
-  ['get', () => mockCurrentUser],
-  ['getInitialState', () => mockCurrentUser],
-));
+jest.mock('stores/users/CurrentUserStore', () => ({
+  CurrentUserStore: MockStore(
+    ['get', () => mockCurrentUser],
+    ['getInitialState', () => mockCurrentUser],
+  ),
+}));
 
 jest.mock('stores/streams/StreamsStore', () => MockStore(
   'listen',

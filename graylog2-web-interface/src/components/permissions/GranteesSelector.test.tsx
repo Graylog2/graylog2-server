@@ -15,14 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, fireEvent, waitFor } from 'wrappedTestingLibrary';
+import { render, fireEvent } from 'wrappedTestingLibrary';
 import mockEntityShareState, { availableGrantees, availableCapabilities } from 'fixtures/entityShareState';
 
 import GranteesSelector from './GranteesSelector';
 
 describe('GranteesSelector', () => {
   it('shows validation error', async () => {
-    const { getByText } = render(
+    const { getByText, findByText } = render(
       <GranteesSelector availableGrantees={availableGrantees}
                         availableCapabilities={availableCapabilities}
                         onSubmit={() => Promise.resolve(mockEntityShareState)} />,
@@ -32,6 +32,6 @@ describe('GranteesSelector', () => {
 
     fireEvent.click(submitButton);
 
-    await waitFor(() => expect(getByText('The grantee is required.')).not.toBeNull());
+    await findByText('The grantee is required.');
   });
 });

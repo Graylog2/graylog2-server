@@ -19,7 +19,7 @@ import * as Immutable from 'immutable';
 
 import Role from 'logic/roles/Role';
 import UserOverview from 'logic/users/UserOverview';
-import { singletonActions } from 'views/logic/singleton';
+import { singletonActions } from 'logic/singleton';
 import type { PaginatedList, Pagination } from 'stores/PaginationTypes';
 
 export type UserContext = {

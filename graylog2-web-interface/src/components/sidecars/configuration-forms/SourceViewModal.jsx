@@ -20,9 +20,7 @@ import lodash from 'lodash';
 
 import { Modal, Button } from 'components/graylog';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
-import CombinedProvider from 'injection/CombinedProvider';
-
-const { CollectorConfigurationsActions } = CombinedProvider.get('CollectorConfigurations');
+import { CollectorConfigurationsActions } from 'stores/sidecars/CollectorConfigurationsStore';
 
 class SourceViewModal extends React.Component {
   static propTypes = {

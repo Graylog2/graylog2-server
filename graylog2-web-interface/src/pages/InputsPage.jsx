@@ -18,12 +18,10 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
-import StoreProvider from 'injection/StoreProvider';
 import { DocumentTitle, PageHeader } from 'components/common';
 import { InputsList } from 'components/inputs';
-
-const CurrentUserStore = StoreProvider.getStore('CurrentUser');
-const InputStatesStore = StoreProvider.getStore('InputStates');
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
+import { InputStatesStore } from 'stores/inputs/InputStatesStore';
 
 const InputsPage = createReactClass({
   displayName: 'InputsPage',

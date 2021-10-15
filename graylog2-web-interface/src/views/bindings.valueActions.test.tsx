@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import MockStore from 'helpers/mocking/StoreMock';
+import MockAction from 'helpers/mocking/MockAction';
 
 import FieldType, { FieldTypes, Properties } from 'views/logic/fieldtypes/FieldType';
 import { ActionDefinition } from 'views/components/actions/ActionHandler';
@@ -27,6 +28,9 @@ jest.mock('views/stores/FieldTypesStore', () => ({
 
 jest.mock('stores/configurations/ConfigurationsStore', () => ({
   ConfigurationsStore: MockStore(),
+  ConfigurationsActions: {
+    listSearchesClusterConfig: MockAction(),
+  },
 }));
 
 jest.mock('stores/decorators/DecoratorsStore', () => ({

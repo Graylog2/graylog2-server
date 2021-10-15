@@ -21,12 +21,8 @@ import Reflux from 'reflux';
 
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import ExportExtractors from 'components/extractors/ExportExtractors';
-import ActionsProvider from 'injection/ActionsProvider';
-import StoreProvider from 'injection/StoreProvider';
 import withParams from 'routing/withParams';
-
-const InputsActions = ActionsProvider.getActions('Inputs');
-const InputsStore = StoreProvider.getStore('Inputs');
+import { InputsActions, InputsStore } from 'stores/inputs/InputsStore';
 
 const ExportExtractorsPage = createReactClass({
   displayName: 'ExportExtractorsPage',

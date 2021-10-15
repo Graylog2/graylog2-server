@@ -25,9 +25,7 @@ import { Spinner } from 'components/common';
 import { StreamAlerts } from 'components/alerts';
 import { StreamAlertConditions } from 'components/alertconditions';
 import { StreamAlertNotifications } from 'components/alertnotifications';
-import CombinedProvider from 'injection/CombinedProvider';
-
-const { AlertConditionsStore, AlertConditionsActions } = CombinedProvider.get('AlertConditions');
+import { AlertConditionsStore, AlertConditionsActions } from 'stores/alertconditions/AlertConditionsStore';
 
 const StreamAlertsOverviewContainer = createReactClass({
   propTypes: {

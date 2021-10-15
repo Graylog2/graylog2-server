@@ -24,10 +24,8 @@ import { DocumentTitle, PageHeader } from 'components/common';
 import { AlertsHeaderToolbar } from 'components/alerts';
 import { CreateAlertNotificationInput } from 'components/alertnotifications';
 import Routes from 'routing/Routes';
-import StoreProvider from 'injection/StoreProvider';
 import withLocation from 'routing/withLocation';
-
-const CurrentUserStore = StoreProvider.getStore('CurrentUser');
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 
 const NewAlertNotificationPage = createReactClass({
   displayName: 'NewAlertNotificationPage',

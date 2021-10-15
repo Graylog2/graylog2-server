@@ -19,11 +19,9 @@ import React, { useEffect, useState } from 'react';
 
 import { Spinner } from 'components/common';
 import usePluginEntities from 'views/logic/usePluginEntities';
-import CombinedProvider from 'injection/CombinedProvider';
+import { EnterpriseActions } from 'stores/enterprise/EnterpriseStore';
 
 import IndexerFailuresComponent from './IndexerFailuresComponent';
-
-const { EnterpriseActions } = CombinedProvider.get('Enterprise');
 
 const IndexerSystemOverviewComponent = () => {
   const [loadIndexerFailuresComponent, setLoadIndexerFailuresComponent] = useState(<Spinner text="Looking for Index Failures..." />);

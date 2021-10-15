@@ -23,9 +23,7 @@ import { Button, Col, Row } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import ObjectUtils from 'util/ObjectUtils';
 import * as FormsUtils from 'util/FormsUtils';
-import CombinedProvider from 'injection/CombinedProvider';
-
-const { LookupTableCachesActions } = CombinedProvider.get('LookupTableCaches');
+import { LookupTableCachesActions } from 'stores/lookup-tables/LookupTableCachesStore';
 
 class CacheForm extends React.Component {
   validationCheckTimer = undefined;

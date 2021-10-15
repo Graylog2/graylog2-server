@@ -14,9 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import moment from 'moment';
-
-import { DEFAULT_RELATIVE_FROM, RELATIVE_ALL_TIME } from 'views/Constants';
+import { RELATIVE_ALL_TIME } from 'views/Constants';
 import DateTime from 'logic/datetimes/DateTime';
 import type { TimeRange } from 'views/logic/queries/Query';
 import type { SearchBarFormValues } from 'views/Constants';
@@ -109,49 +107,4 @@ export const onInitializingTimerange = (timerange: TimeRange): SearchBarFormValu
       return timerange;
     default: throw new Error(`Invalid time range type: ${type}`);
   }
-};
-
-const getDefaultAbsoluteFromRange = (oldTimeRange: TimeRange | undefined | null) => {
-  if (isTypeRelativeWithStartOnly(oldTimeRange)) {
-    return oldTimeRange.range;
-  }
-
-  if (isTypeRelativeWithEnd(oldTimeRange)) {
-    return oldTimeRange.from;
-  }
-
-  return DEFAULT_RELATIVE_FROM;
-};
-
-const getDefaultAbsoluteToRange = (oldTimeRange: TimeRange | undefined | null) => {
-  if (isTypeRelativeWithEnd(oldTimeRange) && oldTimeRange.to) {
-    return oldTimeRange.to;
-  }
-
-  return 0;
-};
-
-const migrationStrategies = {
-  absolute: (oldTimeRange: TimeRange | undefined | null) => ({
-    type: 'absolute',
-    from: formatDatetime(new DateTime(moment().subtract(getDefaultAbsoluteFromRange(oldTimeRange), 'seconds'))),
-    to: formatDatetime(new DateTime(moment().subtract(getDefaultAbsoluteToRange(oldTimeRange), 'seconds'))),
-  }),
-  relative: () => ({ type: 'relative', from: 300 }),
-  keyword: () => ({ type: 'keyword', keyword: 'Last five minutes' }),
-  disabled: () => undefined,
-};
-
-export const migrateTimeRangeToNewType = (oldTimeRange: TimeRange | undefined | null, type: string): TimeRange | undefined | null => {
-  const oldType = oldTimeRange && 'type' in oldTimeRange ? oldTimeRange.type : 'disabled';
-
-  if (type === oldType) {
-    return oldTimeRange;
-  }
-
-  if (!migrationStrategies[type]) {
-    throw new Error(`Invalid time range type: ${type}`);
-  }
-
-  return migrationStrategies[type](oldTimeRange);
 };

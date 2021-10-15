@@ -18,31 +18,37 @@ import Reflux from 'reflux';
 
 import * as URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
-import CombinedProvider from 'injection/CombinedProvider';
+import { singletonStore, singletonActions } from 'logic/singleton';
 
-const { AvailableEventDefinitionTypesActions } = CombinedProvider.get('AvailableEventDefinitionTypes');
+export const AvailableEventDefinitionTypesActions = singletonActions(
+  'core.AvailableEventDefinitionTypes',
+  () => Reflux.createActions({
+    get: { asyncResult: true },
+  }),
+);
 
-const AvailableEventDefinitionTypesStore = Reflux.createStore({
-  listenables: [AvailableEventDefinitionTypesActions],
-  sourceUrl: '/events/entity_types',
-  entityTypes: undefined,
+export const AvailableEventDefinitionTypesStore = singletonStore(
+  'core.AvailableEventDefinitionTypes',
+  () => Reflux.createStore({
+    listenables: [AvailableEventDefinitionTypesActions],
+    sourceUrl: '/events/entity_types',
+    entityTypes: undefined,
 
-  init() {
-    this.get();
-  },
+    init() {
+      this.get();
+    },
 
-  getInitialState() {
-    return this.entityTypes;
-  },
+    getInitialState() {
+      return this.entityTypes;
+    },
 
-  get() {
-    const promise = fetch('GET', URLUtils.qualifyUrl(this.sourceUrl));
+    get() {
+      const promise = fetch('GET', URLUtils.qualifyUrl(this.sourceUrl));
 
-    promise.then((response) => {
-      this.entityTypes = response;
-      this.trigger(this.entityTypes);
-    });
-  },
-});
-
-export default AvailableEventDefinitionTypesStore;
+      promise.then((response) => {
+        this.entityTypes = response;
+        this.trigger(this.entityTypes);
+      });
+    },
+  }),
+);

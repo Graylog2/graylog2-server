@@ -20,7 +20,7 @@ import { groupBy } from 'lodash';
 import { IfPermitted } from 'components/common';
 import { Button } from 'components/graylog';
 import Spinner from 'components/common/Spinner';
-import CombinedProvider from 'injection/CombinedProvider';
+import { DecoratorsActions } from 'stores/decorators/DecoratorsStore';
 import { StreamsActions, Stream } from 'stores/streams/StreamsStore';
 import UserNotification from 'util/UserNotification';
 import DecoratorList from 'views/components/messagelist/decorators/DecoratorList';
@@ -32,8 +32,6 @@ import DecoratorsUpdater from './decorators/DecoratorsUpdater';
 import formatDecorator from './decorators/FormatDecorator';
 
 import BootstrapModalWrapper from '../bootstrap/BootstrapModalWrapper';
-
-const { DecoratorsActions } = CombinedProvider.get('Decorators');
 
 const DecoratorsConfig = () => {
   const [streams, setStreams] = useState<Array<Stream> | undefined>();
