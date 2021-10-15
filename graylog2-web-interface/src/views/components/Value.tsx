@@ -49,7 +49,7 @@ const Value = ({ children, field, value, queryId, render = defaultRenderer, type
       {(interactive) => ((interactive && queryId)
         ? (
           <ValueActions element={children || element} field={field} queryId={queryId} type={type} value={value}>
-            <ValueActionTitle>
+            <ValueActionTitle data-testid="value-actions-title">
               {field} = <TypeSpecificValue field={field} value={value} type={type} truncate />
             </ValueActionTitle>
           </ValueActions>
