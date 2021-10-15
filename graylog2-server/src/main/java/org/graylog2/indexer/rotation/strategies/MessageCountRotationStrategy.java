@@ -32,6 +32,7 @@ import javax.inject.Inject;
 import java.text.MessageFormat;
 import java.util.Locale;
 
+import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
 
 public class MessageCountRotationStrategy extends AbstractRotationStrategy {
@@ -60,12 +61,10 @@ public class MessageCountRotationStrategy extends AbstractRotationStrategy {
         final IndexSetConfig indexSetConfig = requireNonNull(indexSet.getConfig(), "Index set configuration must not be null");
         final String indexSetId = indexSetConfig.id();
 
-        if (!(indexSetConfig.rotationStrategy() instanceof MessageCountRotationStrategyConfig)) {
-            throw new IllegalStateException("Invalid rotation strategy config <"
-                    + indexSetConfig.rotationStrategy().getClass().getCanonicalName()
-                    + "> for index set <" + indexSetId + ">");
-        }
-
+        checkState(indexSetConfig.rotationStrategy() instanceof MessageCountRotationStrategyConfig,
+                "Invalid rotation strategy config <%s> for index set <%s>",
+                indexSetConfig.rotationStrategy().getClass().getCanonicalName(),
+                indexSetId);
         final MessageCountRotationStrategyConfig config = (MessageCountRotationStrategyConfig) indexSet.getConfig().rotationStrategy();
 
         // Honor global max rotation time setting

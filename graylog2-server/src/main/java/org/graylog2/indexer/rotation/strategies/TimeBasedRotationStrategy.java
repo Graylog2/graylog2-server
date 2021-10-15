@@ -175,7 +175,9 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
         checkState(!isNullOrEmpty(index), "Index name must not be null or empty");
         checkState(!isNullOrEmpty(indexSetId), "Index set ID must not be null or empty");
         checkState(indexSetConfig.rotationStrategy() instanceof TimeBasedRotationStrategyConfig,
-                "Invalid rotation strategy config <" + indexSetConfig.rotationStrategy().getClass().getCanonicalName() + "> for index set <" + indexSetId + ">");
+                "Invalid rotation strategy config <%s> for index set <%s>",
+                indexSetConfig.rotationStrategy().getClass().getCanonicalName(),
+                indexSetId);
 
         final TimeBasedRotationStrategyConfig config = (TimeBasedRotationStrategyConfig) indexSetConfig.rotationStrategy();
         Period rotationPeriod = config.rotationPeriod();

@@ -125,7 +125,7 @@ public abstract class AbstractRotationStrategy implements RotationStrategy {
         }
     }
 
-    // Honor global max rotation time setting
+    // Honor global max rotation time setting (by default it is set to a very large sentry value).
     protected Result exceededMaxGlobalRotationTime(final String index, IndexSet indexSet, String indexSetId) {
         // When first started, we might not know the last rotation time, look up the creation time of the index instead.
         if (!lastRotation.containsKey(indexSetId)) {

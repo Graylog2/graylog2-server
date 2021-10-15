@@ -30,6 +30,7 @@ import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.Optional;
 
+import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
 
 public class SizeBasedRotationStrategy extends AbstractRotationStrategy {
@@ -58,11 +59,10 @@ public class SizeBasedRotationStrategy extends AbstractRotationStrategy {
         final IndexSetConfig indexSetConfig = requireNonNull(indexSet.getConfig(), "Index set configuration must not be null");
         final String indexSetId = indexSetConfig.id();
 
-        if (!(indexSetConfig.rotationStrategy() instanceof SizeBasedRotationStrategyConfig)) {
-            throw new IllegalStateException("Invalid rotation strategy config <"
-                    + indexSetConfig.rotationStrategy().getClass().getCanonicalName()
-                    + "> for index set <" + indexSetId + ">");
-        }
+        checkState(indexSetConfig.rotationStrategy() instanceof SizeBasedRotationStrategyConfig,
+                "Invalid rotation strategy config <%s> for index set <%s>",
+                indexSetConfig.rotationStrategy().getClass().getCanonicalName(),
+                indexSetId);
         final SizeBasedRotationStrategyConfig config = (SizeBasedRotationStrategyConfig) indexSetConfig.rotationStrategy();
 
         // Honor global max rotation time setting
