@@ -53,6 +53,7 @@ app.use('/api', proxy(apiUrl, {
     // to make sure we hit the "/api" resources on the server.
     return `/api${req.url}`;
   },
+  parseReqBody: false,
 }));
 
 app.use(compress()); // Enables compression middleware
