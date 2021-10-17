@@ -52,7 +52,7 @@ const ProfileSection = ({
       <ReadOnlyFormGroup label="E-Mail Address" value={email} />
       <ReadOnlyFormGroup label="Client Address" value={clientAddress} />
       <ReadOnlyFormGroup label="Last Activity" value={lastActivity} />
-      <ReadOnlyFormGroup label="Logged In" value={<LoggedInIcon active={sessionActive} />} />
+      <ReadOnlyFormGroup label="Logged In" value={<LoggedInIcon active={sessionActive} showReadableSuffix />} />
       <ReadOnlyFormGroup label="Enabled" value={accountStatus === 'enabled'} />
     </SectionComponent>
   );

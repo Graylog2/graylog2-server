@@ -15,18 +15,37 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import { Icon } from 'components/common';
 
+type Props = {
+  active: boolean,
+  showReadableSuffix?: boolean,
+};
+
 const Wrapper = styled.div<{ active: boolean }>(({ theme, active }) => `
   color: ${active ? theme.colors.variant.success : theme.colors.variant.default};
+  display: inline-block;
 `);
 
-const LoggedInIcon = ({ active, ...rest }: { active: boolean }) => (
-  <Wrapper active={active}>
-    <Icon {...rest} name={active ? 'check-circle' : 'times-circle'} />
-  </Wrapper>
+const LoggedInIcon = ({ active, showReadableSuffix, ...rest }: Props) => (
+  <>
+    <Wrapper active={active}>
+      <Icon {...rest} name={active ? 'check-circle' : 'times-circle'} />
+    </Wrapper>
+    {showReadableSuffix && (active ? ' yes' : ' no')}
+  </>
 );
+
+LoggedInIcon.propTypes = {
+  active: PropTypes.bool.isRequired,
+  showReadableSuffix: PropTypes.bool,
+};
+
+LoggedInIcon.defaultProps = {
+  showReadableSuffix: false,
+};
 
 export default LoggedInIcon;
