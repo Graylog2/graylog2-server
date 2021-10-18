@@ -23,11 +23,15 @@ import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.plugin.system.NodeId;
+import org.joda.time.DateTime;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+
+import java.util.Optional;
 
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
@@ -55,7 +59,16 @@ public class MessageCountRotationStrategyTest {
     @Mock
     private AuditEventSender auditEventSender;
 
+    private MessageCountRotationStrategy rotationStrategy;
     private ElasticsearchConfiguration configuration = new ElasticsearchConfiguration();
+
+    @Before
+    public void setUp() {
+        when(indexSetConfig.id()).thenReturn("index-set-id");
+        when(indexSetConfig.title()).thenReturn("index-set-title");
+        configuration = new ElasticsearchConfiguration();
+        rotationStrategy = new MessageCountRotationStrategy(indices, nodeId, auditEventSender, configuration);
+    }
 
     @Test
     public void testRotate() throws Exception {
@@ -77,6 +90,7 @@ public class MessageCountRotationStrategyTest {
         when(indexSet.getNewestIndex()).thenReturn("name");
         when(indexSet.getConfig()).thenReturn(indexSetConfig);
         when(indexSetConfig.rotationStrategy()).thenReturn(MessageCountRotationStrategyConfig.create(5));
+        when(indices.indexCreationDate("name")).thenReturn(Optional.of(DateTime.now()));
 
         final MessageCountRotationStrategy strategy = new MessageCountRotationStrategy(indices, nodeId, auditEventSender, configuration);
 

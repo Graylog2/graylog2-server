@@ -183,7 +183,7 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
         Period rotationPeriod = config.rotationPeriod();
         Period maxPeriod = elasticsearchConfiguration.getMaxRotationTimeGlobal();
         if (isLonger(rotationPeriod, maxPeriod)) {
-            log.warn("Max rotation limit " + maxPeriod + " overrides configured period " + rotationPeriod);
+            log.warn("Max rotation limit {} overrides configured period {}", maxPeriod, rotationPeriod);
             rotationPeriod = maxPeriod;
         }
         final Period normalizedPeriod = rotationPeriod.normalizedStandard();
