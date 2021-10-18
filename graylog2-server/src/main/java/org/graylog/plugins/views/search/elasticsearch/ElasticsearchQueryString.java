@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Strings;
 import org.graylog.plugins.views.search.engine.BackendQuery;
@@ -28,6 +29,7 @@ import javax.annotation.Nullable;
 
 @AutoValue
 @JsonAutoDetect
+@JsonTypeName(ElasticsearchQueryString.NAME)
 public abstract class ElasticsearchQueryString implements BackendQuery {
 
     public static final String NAME = "elasticsearch";
