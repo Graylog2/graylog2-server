@@ -22,7 +22,7 @@ import styled from 'styled-components';
 import { Row, Col, Button } from 'components/graylog';
 import { BootstrapModalForm, Input } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
-import { PipelineType } from 'stores/pipelines/PipelinesStore';
+import type { PipelineType } from 'stores/pipelines/PipelinesStore';
 
 const SaveButton = styled(Button)`
   margin-right: 10px;

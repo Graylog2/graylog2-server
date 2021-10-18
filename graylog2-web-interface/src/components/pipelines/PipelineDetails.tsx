@@ -21,7 +21,7 @@ import styled from 'styled-components';
 import { Row, Col } from 'components/graylog';
 import { Timestamp } from 'components/common';
 import { MetricContainer, CounterRate } from 'components/metrics';
-import { PipelineType } from 'stores/pipelines/PipelinesStore';
+import type { PipelineType } from 'stores/pipelines/PipelinesStore';
 
 import PipelineForm from './PipelineForm';
 

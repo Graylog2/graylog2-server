@@ -23,9 +23,9 @@ import { ControlLabel, FormGroup, HelpBlock, Button } from 'components/graylog';
 import { SelectableList } from 'components/common';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import Routes from 'routing/Routes';
-import { PipelineType } from 'stores/pipelines/PipelinesStore';
+import type { PipelineType } from 'stores/pipelines/PipelinesStore';
 import { Stream } from 'stores/streams/StreamsStore';
-import { PipelineConnectionsType } from 'stores/pipelines/PipelineConnectionsStore';
+import type { PipelineConnectionsType } from 'stores/pipelines/PipelineConnectionsStore';
 
 type Props = {
   pipeline: PipelineType,

@@ -22,8 +22,8 @@ import { DataTable, Icon } from 'components/common';
 import { Link } from 'components/graylog/router';
 import Routes from 'routing/Routes';
 import { MetricContainer, CounterRate } from 'components/metrics';
-import { PipelineType, StageType } from 'stores/pipelines/PipelinesStore';
-import { RuleType } from 'stores/rules/RulesStore';
+import type { PipelineType, StageType } from 'stores/pipelines/PipelinesStore';
+import type { RuleType } from 'stores/rules/RulesStore';
 
 const TitleTd = styled.td`
   width: 400px;

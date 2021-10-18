@@ -1849,10 +1849,10 @@
     source-map "^0.6.1"
     write-file-atomic "^3.0.0"
 
-"@jest/types@27.1.1":
-  version "27.1.1"
-  resolved "https://registry.yarnpkg.com/@jest/types/-/types-27.1.1.tgz#77a3fc014f906c65752d12123a0134359707c0ad"
-  integrity sha512-yqJPDDseb0mXgKqmNqypCsb85C22K1aY5+LUxh7syIM9n/b0AsaltxNy+o6tt29VcfGDpYEve175bm3uOhcehA==
+"@jest/types@27.2.4":
+  version "27.2.4"
+  resolved "https://registry.yarnpkg.com/@jest/types/-/types-27.2.4.tgz#2430042a66e00dc5b140c3636f4474d464c21ee8"
+  integrity sha512-IDO2ezTxeMvQAHxzG/ZvEyA47q0aVfzT95rGFl7bZs/Go0aIucvfDbS2rmnoEdXxlLQhcolmoG/wvL/uKx4tKA==
   dependencies:
     "@types/istanbul-lib-coverage" "^2.0.0"
     "@types/istanbul-reports" "^3.0.0"
@@ -2156,10 +2156,10 @@
     "@types/react-test-renderer" ">=16.9.0"
     react-error-boundary "^3.1.0"
 
-"@testing-library/react@12.1.0":
-  version "12.1.0"
-  resolved "https://registry.yarnpkg.com/@testing-library/react/-/react-12.1.0.tgz#3e9a4002b0b8f986a738a2f88fc458b5af319f35"
-  integrity sha512-Ge3Ht3qXE82Yv9lyPpQ7ZWgzo/HgOcHu569Y4ZGWcZME38iOFiOg87qnu6hTEa8jTJVL7zYovnvD3GE2nsNIoQ==
+"@testing-library/react@12.1.2":
+  version "12.1.2"
+  resolved "https://registry.yarnpkg.com/@testing-library/react/-/react-12.1.2.tgz#f1bc9a45943461fa2a598bb4597df1ae044cfc76"
+  integrity sha512-ihQiEOklNyHIpo2Y8FREkyD1QAea054U0MVbwH1m8N9TxeFz+KoJ9LkqoKqJlzx2JDm56DVwaJ1r36JYxZM05g==
   dependencies:
     "@babel/runtime" "^7.12.5"
     "@testing-library/dom" "^8.0.0"
@@ -6650,11 +6650,11 @@ eslint-config-airbnb@18.2.1:
     eslint-import-resolver-webpack "0.13.1"
     eslint-plugin-compat "3.12.0"
     eslint-plugin-import "2.24.0"
-    eslint-plugin-jest "24.4.2"
+    eslint-plugin-jest "24.5.2"
     eslint-plugin-jest-dom "3.9.2"
     eslint-plugin-jest-formatting "2.0.1"
     eslint-plugin-jsx-a11y "6.4.1"
-    eslint-plugin-react "7.26.0"
+    eslint-plugin-react "7.26.1"
     eslint-plugin-react-hooks "4.2.0"
     eslint-plugin-testing-library "4.12.3"
 
@@ -6740,10 +6740,10 @@ eslint-plugin-jest-formatting@2.0.1:
   resolved "https://registry.yarnpkg.com/eslint-plugin-jest-formatting/-/eslint-plugin-jest-formatting-2.0.1.tgz#8f4297bf5b6c2cdd9b2c20a57892f0302b52c20a"
   integrity sha512-t6oc6GcXqzQ4lwatnVoKxGTLqo8kFIdA5kpaS3mrkwnTNxhsgFo9reMFdrtNtllx72ohNUsXsay7RJR/LLLk3Q==
 
-eslint-plugin-jest@24.4.2:
-  version "24.4.2"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-jest/-/eslint-plugin-jest-24.4.2.tgz#9e8cf05ee6a0e3025e6149df2f36950abfa8d5bf"
-  integrity sha512-jNMnqwX75z0RXRMXkxwb/+9ylKJYJLJ8nT8nBT0XFM5qx4IQGxP4edMawa0qGkSbHae0BDPBmi8I2QF0/F04XQ==
+eslint-plugin-jest@24.5.2:
+  version "24.5.2"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-jest/-/eslint-plugin-jest-24.5.2.tgz#f71f98f27fd18b50f55246ca090f36d1730e36a6"
+  integrity sha512-lrI3sGAyZi513RRmP08sIW241Ti/zMnn/6wbE4ZBhb3M2pJ9ztaZMnSKSKKBUfotVdwqU8W1KtD8ao2/FR8DIg==
   dependencies:
     "@typescript-eslint/experimental-utils" "^4.0.1"
 
@@ -6769,10 +6769,10 @@ eslint-plugin-react-hooks@4.2.0:
   resolved "https://registry.yarnpkg.com/eslint-plugin-react-hooks/-/eslint-plugin-react-hooks-4.2.0.tgz#8c229c268d468956334c943bb45fc860280f5556"
   integrity sha512-623WEiZJqxR7VdxFCKLI6d6LLpwJkGPYKODnkH3D7WpOG5KM8yWueBd8TLsNAetEJNF5iJmolaAKO3F8yzyVBQ==
 
-eslint-plugin-react@7.26.0:
-  version "7.26.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-react/-/eslint-plugin-react-7.26.0.tgz#3ae019a35d542b98e5af9e2f96b89c232c74b55b"
-  integrity sha512-dceliS5itjk4EZdQYtLMz6GulcsasguIs+VTXuiC7Q5IPIdGTkyfXVdmsQOqEhlD9MciofH4cMcT1bw1WWNxCQ==
+eslint-plugin-react@7.26.1:
+  version "7.26.1"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-react/-/eslint-plugin-react-7.26.1.tgz#41bcfe3e39e6a5ac040971c1af94437c80daa40e"
+  integrity sha512-Lug0+NOFXeOE+ORZ5pbsh6mSKjBKXDXItUD2sQoT+5Yl0eoT82DqnXeTMfUare4QVCn9QwXbfzO/dBLjLXwVjQ==
   dependencies:
     array-includes "^3.1.3"
     array.prototype.flatmap "^1.2.4"
@@ -8509,11 +8509,11 @@ graceful-fs@^4.2.4:
     "@babel/preset-env" "7.13.10"
     "@babel/preset-typescript" "7.13.0"
     create-react-class "15.7.0"
-    eslint-config-graylog "file:packages/eslint-config-graylog"
+    eslint-config-graylog "file:../../../../../../../Users/ousmanesamba/Library/Caches/Yarn/v6/npm-graylog-web-plugin-4.3.0-SNAPSHOT-713cf1de-99cd-49f2-8589-10eeb2fad5b9-1633940953856/node_modules/eslint-config-graylog"
     formik "2.2.9"
     html-webpack-plugin "^4.2.0"
     javascript-natural-sort "0.7.1"
-    jest-preset-graylog "file:packages/jest-preset-graylog"
+    jest-preset-graylog "file:../../../../../../../Users/ousmanesamba/Library/Caches/Yarn/v6/npm-graylog-web-plugin-4.3.0-SNAPSHOT-713cf1de-99cd-49f2-8589-10eeb2fad5b9-1633940953856/node_modules/jest-preset-graylog"
     jquery "3.5.1"
     moment "2.29.1"
     moment-timezone "0.5.31"
@@ -8527,7 +8527,7 @@ graceful-fs@^4.2.4:
     react-router-dom "5.3.0"
     reflux "0.2.13"
     styled-components "5.3.1"
-    stylelint-config-graylog "file:packages/stylelint-config-graylog"
+    stylelint-config-graylog "file:../../../../../../../Users/ousmanesamba/Library/Caches/Yarn/v6/npm-graylog-web-plugin-4.3.0-SNAPSHOT-713cf1de-99cd-49f2-8589-10eeb2fad5b9-1633940953856/node_modules/stylelint-config-graylog"
     typescript "4.4.3"
     webpack "4.44.2"
     webpack-cleanup-plugin "0.5.1"
@@ -10137,10 +10137,10 @@ jest-pnp-resolver@^1.2.2:
 "jest-preset-graylog@file:packages/jest-preset-graylog":
   version "1.0.0"
   dependencies:
-    "@jest/types" "27.1.1"
+    "@jest/types" "27.2.4"
     "@testing-library/dom" "8.5.0"
     "@testing-library/jest-dom" "5.14.1"
-    "@testing-library/react" "12.1.0"
+    "@testing-library/react" "12.1.2"
     "@testing-library/react-hooks" "^7.0.1"
     "@types/enzyme" "3.10.9"
     babel-jest "^27.0.2"
