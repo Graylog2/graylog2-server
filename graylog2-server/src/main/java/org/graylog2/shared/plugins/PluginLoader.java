@@ -49,7 +49,7 @@ import static java.util.Objects.requireNonNull;
 
 public class PluginLoader {
     private static final Logger LOG = LoggerFactory.getLogger(PluginLoader.class);
-    private static final String[] PLUGIN_FILE_EXTENSIONS = {"jar"};
+    private static final String[] PLUGIN_FILE_EXTENSIONS = {"jar", "JAR"};
 
     private final File pluginDir;
     private final ChainingClassLoader classLoader;
