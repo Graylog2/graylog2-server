@@ -16,36 +16,38 @@
  */
 package org.graylog.storage.elasticsearch7;
 
-import com.github.zafarkhaja.semver.Version;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestHighLevelClient;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.core.MainResponse;
-import org.graylog2.indexer.ElasticsearchException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Request;
 import org.graylog2.indexer.cluster.NodeAdapter;
 import org.graylog2.storage.versionprobe.SearchVersion;
 
 import javax.inject.Inject;
+import java.util.Locale;
 import java.util.Optional;
 
 public class NodeAdapterES7 implements NodeAdapter {
-    private final ElasticsearchClient client;
+    private final PlainJsonApi jsonApi;
 
     @Inject
-    public NodeAdapterES7(ElasticsearchClient client) {
-        this.client = client;
+    public NodeAdapterES7(ElasticsearchClient client, ObjectMapper objectMapper) {
+        this.jsonApi = new PlainJsonApi(objectMapper, client);
     }
 
     @Override
     public Optional<SearchVersion> version() {
-        final MainResponse result = client.execute(RestHighLevelClient::info,
-                "Unable to retrieve Elasticsearch version from node");
 
-        // Caution, the native ES client doesn't allow to extract the distribution information!
-        // the following line is a fragile HACK!
-        final boolean isOpenSearch = result.getTagline().contains("OpenSearch") || result.getVersion().getNumber().startsWith("1.");
+        final Request request = new Request("GET", "/");
+        final Optional<JsonNode> resp = Optional.of(jsonApi.perform(request, "Unable to retrieve cluster information"));
 
-        final SearchVersion.Distribution distribution = isOpenSearch ? SearchVersion.Distribution.OPENSEARCH : SearchVersion.Distribution.ELASTICSEARCH;
+        final Optional<String> version = resp.map(r -> r.path("version")).map(r -> r.path("number")).map(JsonNode::textValue);
 
-        return Optional.of(result.getVersion().getNumber())
+        final SearchVersion.Distribution distribution  = resp.map(r -> r.path("version")).map(r -> r.path("distribution")).map(JsonNode::textValue)
+                .map(d -> d.toUpperCase(Locale.ROOT))
+                .map(SearchVersion.Distribution::valueOf)
+                .orElse(SearchVersion.Distribution.ELASTICSEARCH);
+
+        return version
                 .map(this::parseVersion)
                 .map(v -> SearchVersion.create(distribution, v));
     }
