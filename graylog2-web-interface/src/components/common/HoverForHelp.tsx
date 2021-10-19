@@ -81,4 +81,5 @@ HoverForHelp.defaultProps = {
   testId: undefined,
 };
 
+/** @component */
 export default HoverForHelp;
