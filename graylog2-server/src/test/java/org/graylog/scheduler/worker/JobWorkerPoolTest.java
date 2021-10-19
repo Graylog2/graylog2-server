@@ -72,10 +72,10 @@ public class JobWorkerPoolTest {
         // Wait for the second task to finish
         task2Latch.countDown();
         assertThat(latch2.await(60, TimeUnit.SECONDS)).isTrue();
-        assertThat(pool.anySlotsUsed()).isFalse();
 
         pool.shutdown();
         pool.awaitTermination(30, TimeUnit.SECONDS);
+        assertThat(pool.anySlotsUsed()).isFalse();
     }
 
     @Test
