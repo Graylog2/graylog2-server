@@ -21,7 +21,7 @@ import styled from 'styled-components';
 
 import { Row, Col, Button, BootstrapModalForm, Input } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
-import { PipelineType } from 'stores/pipelines/PipelinesStore';
+import type { PipelineType } from 'stores/pipelines/PipelinesStore';
 
 const SaveButton = styled(Button)`
   margin-right: 10px;
