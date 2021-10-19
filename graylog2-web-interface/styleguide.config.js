@@ -95,11 +95,11 @@ module.exports = {
         },
         {
           name: 'Common',
-          components: 'src/components/common/[A-Z]*.jsx',
+          components: 'src/components/common/[A-Z]!(*.example)*.{jsx,tsx}',
         },
         {
           name: 'Configuration Forms',
-          components: 'src/components/configurationforms/[A-Z]*.{jsx,tsx}',
+          components: 'src/components/configurationforms/[A-Z]!(*.example)*.{jsx,tsx}',
         },
       ],
     },
@@ -126,7 +126,7 @@ module.exports = {
           return mdPath;
         }
 
-        return componentPath;
+        return null;
       }
 
       return componentPath.replace(/\.jsx?$/, '.md');
@@ -135,7 +135,7 @@ module.exports = {
     return componentPath;
   },
   updateDocs(docs) {
-    if (!docs.filePath) {
+    if (!docs.filePath || !docs.examples) {
       return docs;
     }
 
