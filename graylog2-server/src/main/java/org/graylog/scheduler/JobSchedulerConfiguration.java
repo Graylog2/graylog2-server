@@ -28,7 +28,7 @@ import org.graylog2.plugin.PluginConfigBean;
 @SuppressWarnings({"FieldCanBeLocal", "unused", "WeakerAccess"})
 public class JobSchedulerConfiguration implements PluginConfigBean {
     public static final String LOOP_SLEEP_DURATION = "job_scheduler_loop_sleep_duration";
-    public static final String LOCK_EXPIRATION_TIME_MINUTES = "job_lock_expiration_time_minutes";
+    public static final String LOCK_EXPIRATION_TIME_MINUTES = "job_scheduler_lock_expiration_time_minutes";
 
     @Parameter(value = LOOP_SLEEP_DURATION, validators = PositiveDurationValidator.class)
     private Duration loopSleepDuration = Duration.seconds(1);
