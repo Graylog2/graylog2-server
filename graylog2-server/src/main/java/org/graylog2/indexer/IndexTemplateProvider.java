@@ -25,5 +25,5 @@ public interface IndexTemplateProvider {
 
     @Nonnull
     IndexMappingTemplate create(@Nonnull Version elasticsearchVersion, @Nonnull IndexSetConfig indexSetConfig)
-            throws SkipIndexTemplateCreation;
+            throws IgnoreIndexTemplate;
 }

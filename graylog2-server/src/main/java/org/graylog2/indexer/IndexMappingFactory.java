@@ -39,7 +39,7 @@ public class IndexMappingFactory {
     }
 
     @Nonnull
-    public IndexMappingTemplate createIndexMapping(@Nonnull IndexSetConfig indexSetConfig) throws SkipIndexTemplateCreation {
+    public IndexMappingTemplate createIndexMapping(@Nonnull IndexSetConfig indexSetConfig) throws IgnoreIndexTemplate {
         final Version elasticsearchVersion = node.getVersion()
                 .orElseThrow(() -> new ElasticsearchException("Unable to retrieve Elasticsearch version."));
 

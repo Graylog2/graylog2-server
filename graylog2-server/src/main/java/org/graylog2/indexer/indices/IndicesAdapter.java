@@ -50,6 +50,8 @@ public interface IndicesAdapter {
 
     boolean ensureIndexTemplate(String templateName, Map<String, Object> template);
 
+    boolean indexTemplateExists(String templateName);
+
     Optional<DateTime> indexCreationDate(String index);
 
     void openIndex(String index);

@@ -57,6 +57,7 @@ import io.searchbox.indices.mapping.PutMapping;
 import io.searchbox.indices.settings.GetSettings;
 import io.searchbox.indices.settings.UpdateSettings;
 import io.searchbox.indices.template.DeleteTemplate;
+import io.searchbox.indices.template.GetTemplate;
 import io.searchbox.indices.template.PutTemplate;
 import io.searchbox.params.Parameters;
 import io.searchbox.params.SearchType;
@@ -251,6 +252,13 @@ public class IndicesAdapterES6 implements IndicesAdapter {
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public boolean indexTemplateExists(String templateName) {
+        final GetTemplate request = new GetTemplate.Builder(uncheckedURLEncode(templateName)).build();
+        final JestResult jestResult = JestUtils.execute(jestClient, request, () -> "Unable to get index template " + templateName);
+        return jestResult.isSucceeded();
     }
 
     @Override

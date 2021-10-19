@@ -27,7 +27,7 @@ import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.IndexMappingFactory;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.IndexSet;
-import org.graylog2.indexer.SkipIndexTemplateCreation;
+import org.graylog2.indexer.IgnoreIndexTemplate;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.events.IndicesClosedEvent;
 import org.graylog2.indexer.indices.events.IndicesDeletedEvent;
@@ -54,6 +54,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.graylog2.audit.AuditEventTypes.ES_INDEX_CREATE;
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 @Singleton
 public class Indices {
@@ -165,8 +166,11 @@ public class Indices {
             } else {
                 LOG.warn("Failed to create index template {}", templateName);
             }
-        } catch (SkipIndexTemplateCreation e) {
-            LOG.warn("Index template creation has been skipped! Reason: {}", e.getMessage());
+        } catch (IgnoreIndexTemplate e) {
+            LOG.warn(e.getMessage());
+            if (e.isFailOnMissingTemplate() && !indicesAdapter.indexTemplateExists(e.getIndexTemplateName())) {
+                throw new ElasticsearchException(f("No index template with name '%s' found in Elasticsearch", e.getIndexTemplateName()));
+            }
         }
     }
 
@@ -204,7 +208,7 @@ public class Indices {
         return true;
     }
 
-    private Map<String, Object> buildTemplate(IndexSet indexSet, IndexSetConfig indexSetConfig) throws SkipIndexTemplateCreation {
+    private Map<String, Object> buildTemplate(IndexSet indexSet, IndexSetConfig indexSetConfig) throws IgnoreIndexTemplate {
         return indexMappingFactory.createIndexMapping(indexSetConfig)
                 .toTemplate(indexSetConfig, indexSet.getIndexWildcard(), -1);
     }
