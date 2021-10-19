@@ -25,11 +25,14 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.BooleanField;
+import org.graylog2.plugin.configuration.fields.ConfigurationField;
+import org.graylog2.plugin.configuration.fields.DropdownField;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.inputs.codecs.Codec;
 import org.graylog2.plugin.inputs.codecs.CodecAggregator;
 import org.graylog2.plugin.journal.RawMessage;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,16 +54,22 @@ public class PaloAlto9xCodec implements Codec {
     private static final Logger LOG = LoggerFactory.getLogger(PaloAlto9xCodec.class);
 
     static final String CK_STORE_FULL_MESSAGE = "store_full_message";
+    static final String CK_TIMEZONE = "timezone";
 
     public static final String NAME = "PaloAlto9x";
 
     private final Configuration configuration;
     private final PaloAltoParser rawMessageParser;
     private final PaloAlto9xParser fieldProducer;
+    private final DateTimeZone timezone;
 
     @AssistedInject
     public PaloAlto9xCodec(@Assisted Configuration configuration, PaloAltoParser rawMessageParser, PaloAlto9xParser fieldProducer) {
         this.configuration = configuration;
+        String timezoneID = configuration.getString(CK_TIMEZONE);
+        // previously existing PA inputs after updating will not have a Time Zone configured, default to UTC
+        this.timezone = timezoneID != null ? DateTimeZone.forID(timezoneID) : DateTimeZone.UTC;
+        LOG.trace("Configured with time zone: {}", timezone);
         this.rawMessageParser = rawMessageParser;
         this.fieldProducer = fieldProducer;
     }
@@ -71,8 +80,7 @@ public class PaloAlto9xCodec implements Codec {
         String s = new String(rawMessage.getPayload());
         LOG.trace("Received raw message: {}", s);
 
-        PaloAltoMessageBase p = rawMessageParser.parse(s);
-
+        PaloAltoMessageBase p = rawMessageParser.parse(s, timezone);
         // Return when error occurs parsing syslog header.
         if (p == null) {
             return null;
@@ -82,35 +90,35 @@ public class PaloAlto9xCodec implements Codec {
 
         switch (p.panType()) {
             case "THREAT":
-                message.addFields(fieldProducer.parseFields(THREAT, p.fields()));
+                message.addFields(fieldProducer.parseFields(THREAT, p.fields(), timezone));
                 break;
             case "SYSTEM":
-                message.addFields(fieldProducer.parseFields(SYSTEM, p.fields()));
+                message.addFields(fieldProducer.parseFields(SYSTEM, p.fields(), timezone));
                 break;
             case "TRAFFIC":
-                message.addFields(fieldProducer.parseFields(TRAFFIC, p.fields()));
+                message.addFields(fieldProducer.parseFields(TRAFFIC, p.fields(), timezone));
                 break;
             case "CONFIG":
-                message.addFields(fieldProducer.parseFields(CONFIG, p.fields()));
+                message.addFields(fieldProducer.parseFields(CONFIG, p.fields(), timezone));
                 break;
             case "HIP-MATCH":
             case "HIPMATCH":
-                message.addFields(fieldProducer.parseFields(HIP, p.fields()));
+                message.addFields(fieldProducer.parseFields(HIP, p.fields(), timezone));
                 break;
             case "CORRELATION":
-                message.addFields(fieldProducer.parseFields(CORRELATION, p.fields()));
+                message.addFields(fieldProducer.parseFields(CORRELATION, p.fields(), timezone));
                 break;
             case "GLOBALPROTECT":
                 // For PAN v9.1.3 and later, Global Protect has type in the expected position
-                message.addFields(fieldProducer.parseFields(GLOBAL_PROTECT_9_1_3, p.fields()));
+                message.addFields(fieldProducer.parseFields(GLOBAL_PROTECT_9_1_3, p.fields(), timezone));
                 break;
             case "USERID":
-                message.addFields(fieldProducer.parseFields(USERID, p.fields()));
+                message.addFields(fieldProducer.parseFields(USERID, p.fields(), timezone));
                 break;
             default:
                 //For PAN v9.1.2 and earlier, Global Protect has type in position 5 rather than position 3
                 if (p.fields().get(5).equals("GLOBALPROTECT")) {
-                    message.addFields(fieldProducer.parseFields(GLOBAL_PROTECT_PRE_9_1_3, p.fields()));
+                    message.addFields(fieldProducer.parseFields(GLOBAL_PROTECT_PRE_9_1_3, p.fields(), timezone));
                     break;
                 } else {
                     LOG.info("Received log for unsupported PAN type [{}]. Will not parse.", p.panType());
@@ -154,6 +162,14 @@ public class PaloAlto9xCodec implements Codec {
         @Override
         public ConfigurationRequest getRequestedConfiguration() {
             final ConfigurationRequest r = new ConfigurationRequest();
+
+            r.addField(new DropdownField(
+                    CK_TIMEZONE,
+                    "Time Zone",
+                    DateTimeZone.UTC.getID(),
+                    DropdownField.ValueTemplates.timeZones(),
+                    "Time zone of the Palo Alto device",
+                    ConfigurationField.Optional.OPTIONAL));
 
             r.addField(
                     new BooleanField(

@@ -38,7 +38,7 @@ import static org.graylog.integrations.inputs.paloalto.PaloAltoFieldType.TIMESTA
 public class PaloAltoTypeParser {
 
     private static final Logger LOG = LoggerFactory.getLogger(PaloAltoTypeParser.class);
-    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormat.forPattern("yyyy/MM/dd HH:mm:ssZZ");
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormat.forPattern("yyyy/MM/dd HH:mm:ss ZZZ");
 
     private final PaloAltoMessageTemplate messageTemplate;
 
@@ -46,7 +46,7 @@ public class PaloAltoTypeParser {
         this.messageTemplate = messageTemplate;
     }
 
-    public ImmutableMap<String, Object> parseFields(List<String> fields) {
+    public ImmutableMap<String, Object> parseFields(List<String> fields, DateTimeZone timezone) {
         Map<String, Object> fieldMap = Maps.newHashMap();
         List<PaloAltoFieldTemplate> templateFields = Lists.newArrayList(messageTemplate.getFields());
 
@@ -83,7 +83,9 @@ public class PaloAltoTypeParser {
                     }
                     if (!Strings.isNullOrEmpty(stringValue)) {
                         try {
-                            value = DateTime.parse(stringValue + "Z", DATE_TIME_FORMATTER).withZone(DateTimeZone.UTC);
+                            LOG.trace("Parsing timestamp {} with timezone {}", stringValue, timezone);
+                            value = DateTime.parse(stringValue + " " + timezone, DATE_TIME_FORMATTER).withZone(timezone);
+                            LOG.trace("Timestamp after parsing {}", value);
                         } catch (Exception e) {
                             LOG.debug("Error parsing field {}, {} is not a valid timestamp value", template.field(), stringValue, e);
                         }

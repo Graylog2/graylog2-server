@@ -23,8 +23,10 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,10 +64,11 @@ public class PaloAltoParser {
     private static final String DOUBLE_SPACE = "\\s{2}";
 
     @Nullable
-    public PaloAltoMessageBase parse(@NotNull String raw) {
+    public PaloAltoMessageBase parse(@NotNull String raw, DateTimeZone timezone) {
 
         /* The message might arrive in one of the following formats:
          *  1) Panorama format: "<14>1 2018-09-19T11:50:33-05:00 Panorama--1 - - - -
+         *  1b) Panorama format with no timezone: "<14>1 2018-09-19T11:50:33 Panorama--1 - - - -
          *  2) Syslog:           <14>Aug 22 11:21:04 hq-lx-net-7.dart.org
          *
          *  Note the ' - - - - ' delimiter for panorama.
@@ -82,7 +85,15 @@ public class PaloAltoParser {
                 String source = matcher.group(2);
                 String fieldsString = matcher.group(3);
 
-                DateTime timestamp = DateTime.parse(timestampString);
+                DateTime timestamp;
+                // can't guarantee timestamp format, but the last 6 characters should contain either a Z or +/- if the
+                // timestamp has a timezone included. If it doesn't have a timezone, parse it with the input's
+                // configured timezone
+                if (timestampString.substring(timestampString.length() - 6).matches(".*[Z+-].*")) {
+                    timestamp = DateTime.parse(timestampString);
+                } else {
+                    timestamp = DateTime.parse(timestampString, ISODateTimeFormat.dateTimeParser().withZone(timezone));
+                }
 
                 return buildPaloAltoMessageBase(timestamp, fieldsString, source);
             } else {
@@ -101,7 +112,7 @@ public class PaloAltoParser {
                     // Remove two spaces in one digit day number "Apr  8 01:47:32"
                     // This solution feels terrible. Sorry.
                     String dateWithoutYear = matcher.group(1).replaceFirst(DOUBLE_SPACE, SINGLE_SPACE);
-                    DateTime timestamp = SYSLOG_TIMESTAMP_FORMATTER.parseDateTime(dateWithoutYear + SINGLE_SPACE + DateTime.now().getYear());
+                    DateTime timestamp = SYSLOG_TIMESTAMP_FORMATTER.withZone(timezone).parseDateTime(dateWithoutYear + SINGLE_SPACE + DateTime.now().getYear());
                     String source = matcher.group(2);
                     String panData = matcher.group(3);
 
@@ -118,7 +129,7 @@ public class PaloAltoParser {
                     // Attempt to parse date in format: Aug 22 11:21:04
                     // TODO This needs work.
                     String dateWithoutYear = matcher.group(1).replaceFirst(DOUBLE_SPACE, SINGLE_SPACE);
-                    DateTime timestamp = SYSLOG_TIMESTAMP_FORMATTER.parseDateTime(dateWithoutYear + SINGLE_SPACE + DateTime.now().getYear());
+                    DateTime timestamp = SYSLOG_TIMESTAMP_FORMATTER.parseDateTime(dateWithoutYear + SINGLE_SPACE + DateTime.now().getYear()).withZone(timezone);
                     String panData = matcher.group(2);
 
                     // No source is supplied, so use a blank one

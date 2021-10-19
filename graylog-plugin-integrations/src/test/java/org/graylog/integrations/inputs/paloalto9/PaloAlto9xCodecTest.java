@@ -25,6 +25,7 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.journal.RawMessage;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -32,10 +33,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -212,13 +213,13 @@ public class PaloAlto9xCodecTest {
     }
 
     private void givenRawParserReturnsNull() {
-        given(mockRawParser.parse(anyString())).willReturn(null);
+        given(mockRawParser.parse(anyString(), any(DateTimeZone.class))).willReturn(null);
     }
 
     private void givenPaloMessageType(String panType) {
         PaloAltoMessageBase foo = PaloAltoMessageBase.create(TEST_SOURCE, TEST_DATE_TIME, TEST_RAW_MESSAGE, panType,
                 TEST_FIELD_LIST);
-        given(mockRawParser.parse(anyString())).willReturn(foo);
+        given(mockRawParser.parse(anyString(), any(DateTimeZone.class))).willReturn(foo);
     }
 
     private void givenStoreFullMessage(boolean storeFullMessage) {
@@ -226,7 +227,7 @@ public class PaloAlto9xCodecTest {
     }
 
     private void givenGoodFieldProducer() {
-        given(mockPaloParser.parseFields(any(PaloAltoMessageType.class), anyList())).willReturn(TEST_FIELD_MAP);
+        given(mockPaloParser.parseFields(any(PaloAltoMessageType.class), anyList(), any(DateTimeZone.class))).willReturn(TEST_FIELD_MAP);
     }
 
     // WHENs
@@ -238,8 +239,9 @@ public class PaloAlto9xCodecTest {
     private void thenPaloParserCalledWithPaloMessageType(PaloAltoMessageType type) {
         ArgumentCaptor<PaloAltoMessageType> typeCaptor = ArgumentCaptor.forClass(PaloAltoMessageType.class);
         ArgumentCaptor<ImmutableList<String>> fieldsCaptor = ArgumentCaptor.forClass(ImmutableList.class);
+        ArgumentCaptor<DateTimeZone> timezone = ArgumentCaptor.forClass(DateTimeZone.class);
 
-        verify(mockPaloParser, times(1)).parseFields(typeCaptor.capture(), fieldsCaptor.capture());
+        verify(mockPaloParser, times(1)).parseFields(typeCaptor.capture(), fieldsCaptor.capture(), timezone.capture());
 
         assertThat(typeCaptor.getValue(), is(type));
         assertThat(fieldsCaptor.getValue(), is(TEST_FIELD_LIST));

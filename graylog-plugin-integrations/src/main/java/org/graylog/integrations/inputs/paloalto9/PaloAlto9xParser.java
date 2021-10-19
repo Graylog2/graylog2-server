@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import org.graylog.integrations.inputs.paloalto.PaloAltoMessageType;
 import org.graylog.integrations.inputs.paloalto.PaloAltoTypeParser;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,10 +67,10 @@ public class PaloAlto9xParser {
         parsers.put(PaloAltoMessageType.USERID, userIdParser);
     }
 
-    public ImmutableMap<String, Object> parseFields(PaloAltoMessageType type, List<String> fields) {
+    public ImmutableMap<String, Object> parseFields(PaloAltoMessageType type, List<String> fields, DateTimeZone timezone) {
         if (parsers.containsKey(type)) {
             PaloAltoTypeParser parser = parsers.get(type);
-            return parser.parseFields(fields);
+            return parser.parseFields(fields, timezone);
         }
         LOG.info("Received log for unsupported PAN type [{}]. Will not parse.", type);
         return ImmutableMap.of();

@@ -39,14 +39,12 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.journal.RawMessage;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
 
-import static org.graylog.integrations.inputs.paloalto.PaloAltoFieldTemplate.create;
-import static org.graylog.integrations.inputs.paloalto.PaloAltoFieldType.LONG;
-import static org.graylog.integrations.inputs.paloalto.PaloAltoFieldType.STRING;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -55,13 +53,16 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 public class PaloAlto9xTemplatesTest {
     private static final String SYSLOG_PREFIX = "<14>1 2020-06-02T14:01:00.000Z PYTHON_TEST_SENDER - - - - ";
-    
+    // this is UTC-5
+    private static final String TIMEZONE_STRING = "America/Phoenix";
+    private static final DateTimeZone TIMEZONE = DateTimeZone.forID(TIMEZONE_STRING);
     // Code Under Test
     PaloAlto9xCodec cut;
 
     @Before
     public void setUp() {
-        Configuration config = new Configuration(ImmutableMap.of(PaloAlto9xCodec.CK_STORE_FULL_MESSAGE, true));
+        Configuration config = new Configuration(ImmutableMap.of(PaloAlto9xCodec.CK_STORE_FULL_MESSAGE, true,
+                PaloAlto9xCodec.CK_TIMEZONE, TIMEZONE_STRING));
         PaloAltoParser rawParser = new PaloAltoParser();
         PaloAlto9xParser palo9xParser = new PaloAlto9xParser();
         cut = new PaloAlto9xCodec(config, rawParser, palo9xParser);
@@ -79,12 +80,11 @@ public class PaloAlto9xTemplatesTest {
         assertThat(out.getField(Message.FIELD_FULL_MESSAGE), is(rawMessage));
         assertThat(out.getField(Message.FIELD_MESSAGE), is(log));
         assertThat(out.getField(EventFields.EVENT_SOURCE_PRODUCT), is("PAN"));
-        
-        assertThat(out.getField(EventFields.EVENT_CREATED), is("2020/05/26 04:11:09"));
+        assertThat(out.getField(EventFields.EVENT_CREATED), is(DateTime.parse("2020-05-26T04:11:09-07:00").withZone(TIMEZONE)));
         assertThat(out.getField(HostFields.HOST_ID), is("007000000018919"));
         assertThat(out.getField(EventFields.EVENT_LOG_NAME), is("CONFIG"));
         assertThat(out.getField(PaloAlto9xFields.PAN_LOG_SUBTYPE), is("0"));
-        assertThat(out.getField(Message.FIELD_TIMESTAMP), is(DateTime.parse("2020-05-26T04:11:09Z")));
+        assertThat(out.getField(Message.FIELD_TIMESTAMP), is(DateTime.parse("2020-05-26T04:11:09-07:00").withZone(TIMEZONE)));
         assertThat(out.getField(SourceFields.SOURCE_REFERENCE), is("86.181.133.251"));
         assertThat(out.getField(HostFields.HOST_VIRTFW_ID), nullValue());
         assertThat(out.getField(UserFields.USER_COMMAND), is("multi-clone"));
@@ -117,11 +117,11 @@ public class PaloAlto9xTemplatesTest {
         assertThat(out.getField(Message.FIELD_MESSAGE), is(log));
         assertThat(out.getField(EventFields.EVENT_SOURCE_PRODUCT), is("PAN"));
 
-        assertThat(out.getField(EventFields.EVENT_CREATED), is("2020/05/31 17:19:44"));
+        assertThat(out.getField(EventFields.EVENT_CREATED), is(DateTime.parse("2020-05-31T17:19:44-07:00").withZone(TIMEZONE)));
         assertThat(out.getField(HostFields.HOST_ID), is("0007SE00209"));
         assertThat(out.getField(EventFields.EVENT_LOG_NAME), is("CORRELATION"));
         assertThat(out.getField(PaloAlto9xFields.PAN_LOG_SUBTYPE), nullValue());
-        assertThat(out.getField(Message.FIELD_TIMESTAMP), is(DateTime.parse("2020-05-31T17:19:44Z")));
+        assertThat(out.getField(Message.FIELD_TIMESTAMP), is(DateTime.parse("2020-05-31T17:19:44-07:00").withZone(TIMEZONE)));
         assertThat(out.getField(SourceFields.SOURCE_IP), is("10.154.8.125"));
         assertThat(out.getField(UserFields.USER_NAME), is("pancademo\\david.mccoy"));
         assertThat(out.getField(HostFields.HOST_VIRTFW_ID), nullValue());
@@ -152,12 +152,12 @@ public class PaloAlto9xTemplatesTest {
         assertThat(out.getField(Message.FIELD_MESSAGE), is(log));
         assertThat(out.getField(EventFields.EVENT_SOURCE_PRODUCT), is("PAN"));
 
-        assertThat(out.getField(EventFields.EVENT_RECEIVED_TIME), is("2020/04/01 10:49:35"));
+        assertThat(out.getField(EventFields.EVENT_RECEIVED_TIME), is(DateTime.parse("2020-04-01T10:49:35-07:00").withZone(TIMEZONE)));
         assertThat(out.getField(HostFields.HOST_ID), is("015351000040055"));
         assertThat(out.getField(EventFields.EVENT_UID), is("11"));
         assertThat(out.getField(PaloAlto9xFields.PAN_LOG_PANORAMA), is("0x0"));
         assertThat(out.getField(EventFields.EVENT_LOG_NAME), is("GLOBALPROTECT"));
-        assertThat(out.getField(Message.FIELD_TIMESTAMP), is(DateTime.parse("2020-04-01T10:49:35Z")));
+        assertThat(out.getField(Message.FIELD_TIMESTAMP), is(DateTime.parse("2020-04-01T10:49:35-07:00").withZone(TIMEZONE)));
         assertThat(out.getField(HostFields.HOST_VIRTFW_ID), is("vsys1"));
         assertThat(out.getField(PaloAlto9xFields.PAN_EVENT_NAME), is("portal-prelogin"));
         assertThat(out.getField(PaloAlto9xFields.PAN_TUNNEL_STAGE), is("before-login"));
@@ -199,10 +199,10 @@ public class PaloAlto9xTemplatesTest {
         assertThat(out.getField(Message.FIELD_MESSAGE), is(log));
         assertThat(out.getField(EventFields.EVENT_SOURCE_PRODUCT), is("PAN"));
 
-        assertThat(out.getField(EventFields.EVENT_RECEIVED_TIME), is("2020/04/01 10:49:35"));
+        assertThat(out.getField(EventFields.EVENT_RECEIVED_TIME), is(DateTime.parse("2020-04-01T10:49:35-07:00").withZone(TIMEZONE)));
         assertThat(out.getField(HostFields.HOST_ID), is("015351000040055"));
         assertThat(out.getField(EventFields.EVENT_LOG_NAME), is("GLOBALPROTECT"));
-        assertThat(out.getField(Message.FIELD_TIMESTAMP), is(DateTime.parse("2020-04-01T10:49:35Z")));
+        assertThat(out.getField(Message.FIELD_TIMESTAMP), is(DateTime.parse("2020-04-01T10:49:35-07:00").withZone(TIMEZONE)));
         assertThat(out.getField(HostFields.HOST_VIRTFW_ID), is("vsys1"));
         assertThat(out.getField(PaloAlto9xFields.PAN_EVENT_NAME), is("portal-prelogin"));
         assertThat(out.getField(PaloAlto9xFields.PAN_TUNNEL_STAGE), is("before-login"));
@@ -252,11 +252,11 @@ public class PaloAlto9xTemplatesTest {
         assertThat(out.getField(Message.FIELD_MESSAGE), is(log));
         assertThat(out.getField(EventFields.EVENT_SOURCE_PRODUCT), is("PAN"));
 
-        assertThat(out.getField(EventFields.EVENT_CREATED), is("2020/03/18 04:03:19"));
+        assertThat(out.getField(EventFields.EVENT_CREATED), is(DateTime.parse("2020-03-18T04:03:19-07:00").withZone(TIMEZONE)));
         assertThat(out.getField(EventFields.EVENT_OBSERVER_UID), nullValue());
         assertThat(out.getField(EventFields.EVENT_LOG_NAME), is("HIPMATCH"));
         assertThat(out.getField(PaloAlto9xFields.PAN_LOG_SUBTYPE), is("0"));
-        assertThat(out.getField(Message.FIELD_TIMESTAMP), is(DateTime.parse("2020-03-18T04:02:55Z")));
+        assertThat(out.getField(Message.FIELD_TIMESTAMP), is(DateTime.parse("2020-03-18T04:02:55-07:00").withZone(TIMEZONE)));
         assertThat(out.getField(UserFields.USER_NAME), is("user1@prismaissase.com"));
         assertThat(out.getField(HostFields.HOST_VIRTFW_ID), is("vsys1"));
         assertThat(out.getField(HostFields.HOST_HOSTNAME), is("DFWMACW12KG8WL"));
@@ -293,12 +293,12 @@ public class PaloAlto9xTemplatesTest {
         assertThat(out.getField(Message.FIELD_FULL_MESSAGE), is(rawMessage));
         assertThat(out.getField(Message.FIELD_MESSAGE), is(log));
         assertThat(out.getField(EventFields.EVENT_SOURCE_PRODUCT), is("PAN"));
-        
-        assertThat(out.getField(EventFields.EVENT_CREATED), is("2020/03/19 10:12:57"));
+
+        assertThat(out.getField(EventFields.EVENT_CREATED), is(DateTime.parse("2020-03-19T10:12:57-07:00").withZone(TIMEZONE)));
         assertThat(out.getField(HostFields.HOST_ID), is("007000016479"));
         assertThat(out.getField(EventFields.EVENT_LOG_NAME), is("SYSTEM"));
         assertThat(out.getField(PaloAlto9xFields.PAN_LOG_SUBTYPE), is("general"));
-        assertThat(out.getField(Message.FIELD_TIMESTAMP), is(DateTime.parse("2020-03-19T10:12:57Z")));
+        assertThat(out.getField(Message.FIELD_TIMESTAMP), is(DateTime.parse("2020-03-19T10:12:57-07:00").withZone(TIMEZONE)));
         assertThat(out.getField(HostFields.HOST_VIRTFW_ID), nullValue());
         assertThat(out.getField(PaloAlto9xFields.PAN_EVENT_NAME), is("general"));
         assertThat(out.getField(PaloAlto9xFields.PAN_EVENT_OBJECT), nullValue());
@@ -330,13 +330,13 @@ public class PaloAlto9xTemplatesTest {
         assertThat(out.getField(EventFields.EVENT_SOURCE_PRODUCT), is("PAN"));
 
         // Field 0 is FUTURE USE
-        assertThat(out.getField(EventFields.EVENT_RECEIVED_TIME), is("2020/05/19 07:37:27"));
+        assertThat(out.getField(EventFields.EVENT_RECEIVED_TIME), is(DateTime.parse("2020-05-19T07:37:27-07:00").withZone(TIMEZONE)));
         assertThat(out.getField(EventFields.EVENT_OBSERVER_ID), is("007200002536"));
         assertThat(out.getField(EventFields.EVENT_LOG_NAME), is("THREAT"));
         assertThat(out.getField(PaloAlto9xFields.PAN_LOG_SUBTYPE), is("spyware"));
 
         // Field 5 is FUTURE USE
-        assertThat(out.getField(Message.FIELD_TIMESTAMP), is(DateTime.parse("2020-05-19T07:37:27Z")));
+        assertThat(out.getField(Message.FIELD_TIMESTAMP), is(DateTime.parse("2020-05-19T07:37:27-07:00").withZone(TIMEZONE)));
         assertThat(out.getField(SourceFields.SOURCE_IP), is("10.154.229.167"));
         assertThat(out.getField(DestinationFields.DESTINATION_IP), is("190.253.254.254"));
         assertThat(out.getField(SourceFields.SOURCE_NAT_IP), nullValue());
@@ -517,13 +517,13 @@ public class PaloAlto9xTemplatesTest {
         assertThat(out.getField(EventFields.EVENT_SOURCE_PRODUCT), is("PAN"));
 
         // Field 0 is FUTURE USE
-        assertThat(out.getField(EventFields.EVENT_RECEIVED_TIME), is("2020/05/19 07:34:54"));
+        assertThat(out.getField(EventFields.EVENT_RECEIVED_TIME), is(DateTime.parse("2020-05-19T07:34:54-07:00").withZone(TIMEZONE)));
         assertThat(out.getField(EventFields.EVENT_OBSERVER_ID), is("007200002536"));
         assertThat(out.getField(EventFields.EVENT_LOG_NAME), is("TRAFFIC"));
         assertThat(out.getField(PaloAlto9xFields.PAN_LOG_SUBTYPE), is("end"));
 
         // Field 5 is FUTURE USE
-        assertThat(out.getField(Message.FIELD_TIMESTAMP), is(DateTime.parse("2020-05-19T07:34:54Z")));
+        assertThat(out.getField(Message.FIELD_TIMESTAMP), is(DateTime.parse("2020-05-19T07:34:54-07:00").withZone(TIMEZONE)));
         assertThat(out.getField(SourceFields.SOURCE_IP), is("10.154.172.134"));
         assertThat(out.getField(DestinationFields.DESTINATION_IP), is("151.151.88.132"));
         assertThat(out.getField(SourceFields.SOURCE_NAT_IP), nullValue());
@@ -558,7 +558,7 @@ public class PaloAlto9xTemplatesTest {
         assertThat(out.getField(DestinationFields.DESTINATION_BYTES_SENT), is(2926L));
         assertThat(out.getField(NetworkFields.NETWORK_PACKETS), is(26L));
 
-        assertThat(out.getField(EventFields.EVENT_START), is("2020/05/19 07:32:48"));
+        assertThat(out.getField(EventFields.EVENT_START), is(DateTime.parse("2020-05-19T07:32:48-07:00").withZone(TIMEZONE)));
         assertThat(out.getField(EventFields.EVENT_DURATION), is(97L));
         assertThat(out.getField(HttpFields.HTTP_URI_CATEGORY), is("financial-services"));
         // Field 38 is FUTURE USE
@@ -656,14 +656,14 @@ public class PaloAlto9xTemplatesTest {
         assertThat(out.getField(Message.FIELD_MESSAGE), is(log));
         assertThat(out.getField(EventFields.EVENT_SOURCE_PRODUCT), is("PAN"));
 
-        assertThat(out.getField(EventFields.EVENT_CREATED), is("2021/01/20 08:55:02"));
+        assertThat(out.getField(EventFields.EVENT_CREATED), is(DateTime.parse("2021-01-20T08:55:02-07:00").withZone(TIMEZONE)));
         assertThat(out.getField(EventFields.EVENT_OBSERVER_UID), is("012801190281"));
         assertThat(out.getField(EventFields.EVENT_LOG_NAME), is("USERID"));
 
         assertThat(out.getField(PaloAlto9xFields.PAN_LOG_SUBTYPE), is("login"));
 
         // Field 5 is FUTURE USE - 2304
-        assertThat(out.getField(Message.FIELD_TIMESTAMP), is(DateTime.parse("2021-01-20T08:55:02Z")));
+        assertThat(out.getField(Message.FIELD_TIMESTAMP), is(DateTime.parse("2021-01-20T08:55:02-07:00").withZone(TIMEZONE)));
         assertThat(out.getField(HostFields.HOST_VIRTFW_ID), is("vsys1"));
         assertThat(out.getField(SourceFields.SOURCE_IP), is("172.16.100.1"));
         assertThat(out.getField(SourceFields.SOURCE_USER), is("graylog-user1"));
@@ -689,7 +689,7 @@ public class PaloAlto9xTemplatesTest {
         assertThat(out.getField(EventFields.EVENT_OBSERVER_HOSTNAME), is("PA-220"));
         assertThat(out.getField(HostFields.HOST_VIRTFW_UID), is("1"));
         assertThat(out.getField(PaloAlto9xFields.PAN_FACTOR_TYPE), nullValue());
-        assertThat(out.getField(PaloAlto9xFields.PAN_FACTOR_COMPLETION_TIME), is("2021/01/20 08:55:02"));
+        assertThat(out.getField(PaloAlto9xFields.PAN_FACTOR_COMPLETION_TIME), is(DateTime.parse("2021-01-20T08:55:02-07:00").withZone(TIMEZONE)));
         assertThat(out.getField(PaloAlto9xFields.PAN_FACTOR_NUMBER), is(1L));
 
         // Field 30 is FUTURE USE - 0x0

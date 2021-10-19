@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.graylog.integrations.inputs.paloalto.PaloAltoMessageType;
 import org.graylog.integrations.inputs.paloalto.PaloAltoTypeParser;
+import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,6 +33,7 @@ import java.util.List;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
@@ -209,26 +211,27 @@ public class PaloAlto9xParserTest {
     }
 
     private void givenGoodParsers() {
-        given(mockConfigParser.parseFields(anyList())).willReturn(TEST_FIELD_MAP);
-        given(mockCorrelationParser.parseFields(anyList())).willReturn(TEST_FIELD_MAP);
-        given(mockGlobalProtectPre913Parser.parseFields(anyList())).willReturn(TEST_FIELD_MAP);
-        given(mockGlobalProtect913Parser.parseFields(anyList())).willReturn(TEST_FIELD_MAP);
-        given(mockHipParser.parseFields(anyList())).willReturn(TEST_FIELD_MAP);
-        given(mockSystemParser.parseFields(anyList())).willReturn(TEST_FIELD_MAP);
-        given(mockThreatParser.parseFields(anyList())).willReturn(TEST_FIELD_MAP);
-        given(mockTrafficParser.parseFields(anyList())).willReturn(TEST_FIELD_MAP);
-        given(mockUserIdParser.parseFields(anyList())).willReturn(TEST_FIELD_MAP);
+        given(mockConfigParser.parseFields(anyList(), any(DateTimeZone.class))).willReturn(TEST_FIELD_MAP);
+        given(mockCorrelationParser.parseFields(anyList(), any(DateTimeZone.class))).willReturn(TEST_FIELD_MAP);
+        given(mockGlobalProtectPre913Parser.parseFields(anyList(), any(DateTimeZone.class))).willReturn(TEST_FIELD_MAP);
+        given(mockGlobalProtect913Parser.parseFields(anyList(), any(DateTimeZone.class))).willReturn(TEST_FIELD_MAP);
+        given(mockHipParser.parseFields(anyList(), any(DateTimeZone.class))).willReturn(TEST_FIELD_MAP);
+        given(mockSystemParser.parseFields(anyList(), any(DateTimeZone.class))).willReturn(TEST_FIELD_MAP);
+        given(mockThreatParser.parseFields(anyList(), any(DateTimeZone.class))).willReturn(TEST_FIELD_MAP);
+        given(mockTrafficParser.parseFields(anyList(), any(DateTimeZone.class))).willReturn(TEST_FIELD_MAP);
+        given(mockUserIdParser.parseFields(anyList(), any(DateTimeZone.class))).willReturn(TEST_FIELD_MAP);
     }
 
     // WHENs
     private void whenParseFieldsIsCalled() {
-        outputFields = cut.parseFields(inputMessageType, inputFields);
+        outputFields = cut.parseFields(inputMessageType, inputFields, DateTimeZone.UTC);
     }
 
     // THENs
     private void thenConfigParserIsUsed() {
         ArgumentCaptor<List<String>> fieldsCaptor = ArgumentCaptor.forClass(List.class);
-        verify(mockConfigParser, times(1)).parseFields(fieldsCaptor.capture());
+        ArgumentCaptor<DateTimeZone> timezoneCaptor = ArgumentCaptor.forClass(DateTimeZone.class);
+        verify(mockConfigParser, times(1)).parseFields(fieldsCaptor.capture(), timezoneCaptor.capture());
         verifyNoMoreInteractions(mockCorrelationParser);
         verifyNoMoreInteractions(mockGlobalProtectPre913Parser);
         verifyNoMoreInteractions(mockHipParser);
@@ -240,7 +243,8 @@ public class PaloAlto9xParserTest {
 
     private void thenCorrelationParserIsUsed() {
         ArgumentCaptor<List<String>> fieldsCaptor = ArgumentCaptor.forClass(List.class);
-        verify(mockCorrelationParser, times(1)).parseFields(fieldsCaptor.capture());
+        ArgumentCaptor<DateTimeZone> timezoneCaptor = ArgumentCaptor.forClass(DateTimeZone.class);
+        verify(mockCorrelationParser, times(1)).parseFields(fieldsCaptor.capture(), timezoneCaptor.capture());
         verifyNoMoreInteractions(mockConfigParser);
         verifyNoMoreInteractions(mockGlobalProtectPre913Parser);
         verifyNoMoreInteractions(mockHipParser);
@@ -252,7 +256,8 @@ public class PaloAlto9xParserTest {
 
     private void thenPre913GlobalProtectParserIsUsed() {
         ArgumentCaptor<List<String>> fieldsCaptor = ArgumentCaptor.forClass(List.class);
-        verify(mockGlobalProtectPre913Parser, times(1)).parseFields(fieldsCaptor.capture());
+        ArgumentCaptor<DateTimeZone> timezoneCaptor = ArgumentCaptor.forClass(DateTimeZone.class);
+        verify(mockGlobalProtectPre913Parser, times(1)).parseFields(fieldsCaptor.capture(), timezoneCaptor.capture());
         verifyNoMoreInteractions(mockConfigParser);
         verifyNoMoreInteractions(mockCorrelationParser);
         verifyNoMoreInteractions(mockHipParser);
@@ -264,7 +269,8 @@ public class PaloAlto9xParserTest {
 
     private void then913GlobalProtectParserIsUsed() {
         ArgumentCaptor<List<String>> fieldsCaptor = ArgumentCaptor.forClass(List.class);
-        verify(mockGlobalProtect913Parser, times(1)).parseFields(fieldsCaptor.capture());
+        ArgumentCaptor<DateTimeZone> timezoneCaptor = ArgumentCaptor.forClass(DateTimeZone.class);
+        verify(mockGlobalProtect913Parser, times(1)).parseFields(fieldsCaptor.capture(), timezoneCaptor.capture());
         verifyNoMoreInteractions(mockConfigParser);
         verifyNoMoreInteractions(mockCorrelationParser);
         verifyNoMoreInteractions(mockHipParser);
@@ -276,7 +282,8 @@ public class PaloAlto9xParserTest {
 
     private void thenHipParserIsUsed() {
         ArgumentCaptor<List<String>> fieldsCaptor = ArgumentCaptor.forClass(List.class);
-        verify(mockHipParser, times(1)).parseFields(fieldsCaptor.capture());
+        ArgumentCaptor<DateTimeZone> timezoneCaptor = ArgumentCaptor.forClass(DateTimeZone.class);
+        verify(mockHipParser, times(1)).parseFields(fieldsCaptor.capture(), timezoneCaptor.capture());
         verifyNoMoreInteractions(mockConfigParser);
         verifyNoMoreInteractions(mockCorrelationParser);
         verifyNoMoreInteractions(mockGlobalProtectPre913Parser);
@@ -288,7 +295,8 @@ public class PaloAlto9xParserTest {
 
     private void thenSystemParserIsUsed() {
         ArgumentCaptor<List<String>> fieldsCaptor = ArgumentCaptor.forClass(List.class);
-        verify(mockSystemParser, times(1)).parseFields(fieldsCaptor.capture());
+        ArgumentCaptor<DateTimeZone> timezoneCaptor = ArgumentCaptor.forClass(DateTimeZone.class);
+        verify(mockSystemParser, times(1)).parseFields(fieldsCaptor.capture(), timezoneCaptor.capture());
         verifyNoMoreInteractions(mockConfigParser);
         verifyNoMoreInteractions(mockCorrelationParser);
         verifyNoMoreInteractions(mockGlobalProtectPre913Parser);
@@ -300,7 +308,8 @@ public class PaloAlto9xParserTest {
 
     private void thenThreatParserIsUsed() {
         ArgumentCaptor<List<String>> fieldsCaptor = ArgumentCaptor.forClass(List.class);
-        verify(mockThreatParser, times(1)).parseFields(fieldsCaptor.capture());
+        ArgumentCaptor<DateTimeZone> timezoneCaptor = ArgumentCaptor.forClass(DateTimeZone.class);
+        verify(mockThreatParser, times(1)).parseFields(fieldsCaptor.capture(), timezoneCaptor.capture());
         verifyNoMoreInteractions(mockConfigParser);
         verifyNoMoreInteractions(mockCorrelationParser);
         verifyNoMoreInteractions(mockGlobalProtectPre913Parser);
@@ -312,7 +321,8 @@ public class PaloAlto9xParserTest {
 
     private void thenTrafficParserIsUsed() {
         ArgumentCaptor<List<String>> fieldsCaptor = ArgumentCaptor.forClass(List.class);
-        verify(mockTrafficParser, times(1)).parseFields(fieldsCaptor.capture());
+        ArgumentCaptor<DateTimeZone> timezoneCaptor = ArgumentCaptor.forClass(DateTimeZone.class);
+        verify(mockTrafficParser, times(1)).parseFields(fieldsCaptor.capture(), timezoneCaptor.capture());
         verifyNoMoreInteractions(mockConfigParser);
         verifyNoMoreInteractions(mockCorrelationParser);
         verifyNoMoreInteractions(mockGlobalProtectPre913Parser);
@@ -324,7 +334,8 @@ public class PaloAlto9xParserTest {
 
     private void thenUserIdParserIsUsed() {
         ArgumentCaptor<List<String>> fieldsCaptor = ArgumentCaptor.forClass(List.class);
-        verify(mockUserIdParser, times(1)).parseFields(fieldsCaptor.capture());
+        ArgumentCaptor<DateTimeZone> timezoneCaptor = ArgumentCaptor.forClass(DateTimeZone.class);
+        verify(mockUserIdParser, times(1)).parseFields(fieldsCaptor.capture(), timezoneCaptor.capture());
         verifyNoMoreInteractions(mockConfigParser);
         verifyNoMoreInteractions(mockCorrelationParser);
         verifyNoMoreInteractions(mockGlobalProtectPre913Parser);
