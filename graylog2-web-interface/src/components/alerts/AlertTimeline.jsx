@@ -20,13 +20,11 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
 import { Spinner, Timestamp } from 'components/common';
-import CombinedProvider from 'injection/CombinedProvider';
 import { sortByDate } from 'util/SortUtils';
+import { AlarmCallbackHistoryStore } from 'stores/alarmcallbacks/AlarmCallbackHistoryStore';
+import { AlertNotificationsStore } from 'stores/alertnotifications/AlertNotificationsStore';
 
 import style from './AlertTimeline.css';
-
-const { AlarmCallbackHistoryStore } = CombinedProvider.get('AlarmCallbackHistory');
-const { AlertNotificationsStore } = CombinedProvider.get('AlertNotifications');
 
 const AlertTimeline = createReactClass({
   displayName: 'AlertTimeline',

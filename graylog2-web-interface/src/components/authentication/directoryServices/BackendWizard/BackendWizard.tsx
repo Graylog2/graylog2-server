@@ -31,7 +31,7 @@ import { WizardSubmitPayload } from 'logic/authentication/directoryServices/type
 import { Row, Col, Alert } from 'components/graylog';
 import Wizard, { Step, StepKey } from 'components/common/Wizard';
 import FetchError from 'logic/errors/FetchError';
-import { LoadResponse as LoadBackendResponse } from 'actions/authentication/AuthenticationActions';
+import { LoadResponse as LoadBackendResponse } from 'stores/authentication/AuthenticationStore';
 import { PaginatedRoles } from 'actions/roles/AuthzRolesActions';
 
 import BackendWizardContext, { WizardStepsState, WizardFormValues, AuthBackendMeta } from './BackendWizardContext';

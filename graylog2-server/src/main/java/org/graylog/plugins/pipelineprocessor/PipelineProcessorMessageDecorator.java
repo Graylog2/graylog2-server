@@ -86,7 +86,7 @@ public class PipelineProcessorMessageDecorator implements SearchResponseDecorato
 
     public static class Descriptor extends SearchResponseDecorator.Descriptor {
         public Descriptor() {
-            super("Pipeline Processor Decorator", "http://docs.graylog.org/en/2.0/pages/pipelines.html", "Pipeline Processor Decorator");
+            super("Pipeline Processor Decorator", "https://docs.graylog.org/docs/processing-pipelines", "Pipeline Processor Decorator");
         }
     }
 

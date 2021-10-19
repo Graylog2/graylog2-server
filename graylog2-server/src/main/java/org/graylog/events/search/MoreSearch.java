@@ -176,7 +176,7 @@ public class MoreSearch {
         Query dummyQuery = Query.builder()
                 .id("123")
                 .timerange(timeRange)
-                .query(ElasticsearchQueryString.builder().queryString(queryString).build())
+                .query(ElasticsearchQueryString.of(queryString))
                 .build();
         return esQueryDecorators.decorate(queryString, searchJob, dummyQuery, ImmutableSet.of());
     }

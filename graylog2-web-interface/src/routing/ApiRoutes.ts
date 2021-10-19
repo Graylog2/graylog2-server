@@ -285,7 +285,7 @@ const ApiRoutes = {
   ToolsApiController: {
     grokTest: () => { return { url: '/tools/grok_tester' }; },
     jsonTest: () => { return { url: '/tools/json_tester' }; },
-    naturalDateTest: (text: string) => { return { url: `/tools/natural_date_tester?string=${text}` }; },
+    naturalDateTest: (string, timezone) => { return { url: `/tools/natural_date_tester?string=${string}&timezone=${timezone}` }; },
     regexTest: () => { return { url: '/tools/regex_tester' }; },
     regexValidate: (regex: string) => { return { url: `/tools/regex_tester/validate?regex=${regex}` }; },
     regexReplaceTest: () => { return { url: '/tools/regex_replace_tester' }; },
@@ -397,6 +397,7 @@ const ApiRoutes = {
   },
   PipelinesController: {
     list: () => { return { url: '/system/pipelines/pipeline' }; },
+    paginatedList: () => { return { url: '/system/pipelines/pipeline/paginated' }; },
     create: () => { return { url: '/system/pipelines/pipeline' }; },
     get: (pipelineId: string) => { return { url: `/system/pipelines/pipeline/${pipelineId}` }; },
     update: (pipelineId: string) => { return { url: `/system/pipelines/pipeline/${pipelineId}` }; },
@@ -405,6 +406,7 @@ const ApiRoutes = {
   },
   RulesController: {
     list: () => { return { url: '/system/pipelines/rule' }; },
+    paginatedList: () => { return { url: '/system/pipelines/rule/paginated' }; },
     create: () => { return { url: '/system/pipelines/rule' }; },
     get: (ruleId: string) => { return { url: `/system/pipelines/rule/${ruleId}` }; },
     update: (ruleId: string) => { return { url: `/system/pipelines/rule/${ruleId}` }; },

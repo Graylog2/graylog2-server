@@ -23,9 +23,7 @@ import numeral from 'numeral';
 
 import { Col } from 'components/graylog';
 import { Spinner } from 'components/common';
-import CombinedProvider from 'injection/CombinedProvider';
-
-const { MetricsStore, MetricsActions } = CombinedProvider.get('Metrics');
+import { MetricsActions, MetricsStore } from 'stores/metrics/MetricsStore';
 
 const LogLevelMetrics = createReactClass({
   displayName: 'LogLevelMetrics',

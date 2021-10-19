@@ -18,12 +18,10 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
-import CombinedProvider from 'injection/CombinedProvider';
+import { CollectorsActions, CollectorsStore } from 'stores/sidecars/CollectorsStore';
 import { Spinner } from 'components/common';
 
 import CollectorList from './CollectorList';
-
-const { CollectorsStore, CollectorsActions } = CombinedProvider.get('Collectors');
 
 const CollectorListContainer = createReactClass({
   mixins: [Reflux.connect(CollectorsStore, 'collectors')],

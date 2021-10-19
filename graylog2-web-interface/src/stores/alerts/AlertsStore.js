@@ -20,90 +20,101 @@ import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import * as URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
-import ActionsProvider from 'injection/ActionsProvider';
 
-const AlertsActions = ActionsProvider.getActions('Alerts');
+import { singletonActions, singletonStore } from '../../logic/singleton';
 
-const AlertsStore = Reflux.createStore({
-  listenables: [AlertsActions],
+export const AlertsActions = singletonActions(
+  'core.Alerts',
+  Reflux.createActions({
+    get: { asyncResult: true },
+    list: { asyncResult: true },
+    listPaginated: { asyncResult: true },
+    listAllPaginated: { asyncResult: true },
+    listAllStreams: { asyncResult: true },
+  }),
+);
 
-  list(stream, since) {
-    const url = URLUtils.qualifyUrl(ApiRoutes.AlertsApiController.list(stream.id, since).url);
-    const promise = fetch('GET', url);
+export const AlertsStore = singletonStore(
+  'core.Alerts',
+  Reflux.createStore({
+    listenables: [AlertsActions],
 
-    promise
-      .then(
-        (response) => this.trigger({ alerts: response }),
-        (error) => {
-          UserNotification.error(`Fetching alerts for stream "${stream.title}" failed with status: ${error.message}`,
-            `Could not retrieve alerts for stream "${stream.title}".`);
-        },
-      );
+    list(stream, since) {
+      const url = URLUtils.qualifyUrl(ApiRoutes.AlertsApiController.list(stream.id, since).url);
+      const promise = fetch('GET', url);
 
-    AlertsActions.list.promise(promise);
-  },
+      promise
+        .then(
+          (response) => this.trigger({ alerts: response }),
+          (error) => {
+            UserNotification.error(`Fetching alerts for stream "${stream.title}" failed with status: ${error.message}`,
+              `Could not retrieve alerts for stream "${stream.title}".`);
+          },
+        );
 
-  listPaginated(streamId, skip, limit, state = 'any') {
-    const url = URLUtils.qualifyUrl(ApiRoutes.AlertsApiController.listPaginated(streamId, skip, limit, state).url);
-    const promise = fetch('GET', url);
+      AlertsActions.list.promise(promise);
+    },
 
-    promise
-      .then(
-        (response) => this.trigger({ alerts: response }),
-        (error) => {
-          UserNotification.error(`Fetching alerts failed with status: ${error.message}`, 'Could not retrieve alerts.');
-        },
-      );
+    listPaginated(streamId, skip, limit, state = 'any') {
+      const url = URLUtils.qualifyUrl(ApiRoutes.AlertsApiController.listPaginated(streamId, skip, limit, state).url);
+      const promise = fetch('GET', url);
 
-    AlertsActions.listPaginated.promise(promise);
-  },
+      promise
+        .then(
+          (response) => this.trigger({ alerts: response }),
+          (error) => {
+            UserNotification.error(`Fetching alerts failed with status: ${error.message}`, 'Could not retrieve alerts.');
+          },
+        );
 
-  listAllPaginated(skip, limit, state) {
-    const url = URLUtils.qualifyUrl(ApiRoutes.AlertsApiController.listAllPaginated(skip, limit, state).url);
-    const promise = fetch('GET', url);
+      AlertsActions.listPaginated.promise(promise);
+    },
 
-    promise.then(
-      (response) => this.trigger({ alerts: response }),
-      (error) => {
-        UserNotification.error(`Fetching alerts failed with status: ${error.message}`, 'Could not retrieve alerts.');
-      },
-    );
+    listAllPaginated(skip, limit, state) {
+      const url = URLUtils.qualifyUrl(ApiRoutes.AlertsApiController.listAllPaginated(skip, limit, state).url);
+      const promise = fetch('GET', url);
 
-    AlertsActions.listAllPaginated.promise(promise);
-  },
-
-  listAllStreams(since) {
-    const url = URLUtils.qualifyUrl(ApiRoutes.AlertsApiController.listAllStreams(since).url);
-    const promise = fetch('GET', url);
-
-    promise
-      .then(
+      promise.then(
         (response) => this.trigger({ alerts: response }),
         (error) => {
           UserNotification.error(`Fetching alerts failed with status: ${error.message}`, 'Could not retrieve alerts.');
         },
       );
 
-    AlertsActions.listAllStreams.promise(promise);
-  },
+      AlertsActions.listAllPaginated.promise(promise);
+    },
 
-  get(alertId) {
-    const url = URLUtils.qualifyUrl(ApiRoutes.AlertsApiController.get(alertId).url);
-    const promise = fetch('GET', url);
+    listAllStreams(since) {
+      const url = URLUtils.qualifyUrl(ApiRoutes.AlertsApiController.listAllStreams(since).url);
+      const promise = fetch('GET', url);
 
-    promise.then(
-      (response) => {
-        this.trigger({ alert: response });
+      promise
+        .then(
+          (response) => this.trigger({ alerts: response }),
+          (error) => {
+            UserNotification.error(`Fetching alerts failed with status: ${error.message}`, 'Could not retrieve alerts.');
+          },
+        );
 
-        return response;
-      },
-      (error) => {
-        UserNotification.error(`Fetching alert '${alertId}' failed with status: ${error.message}`, 'Could not retrieve alert.');
-      },
-    );
+      AlertsActions.listAllStreams.promise(promise);
+    },
 
-    AlertsActions.get.promise(promise);
-  },
-});
+    get(alertId) {
+      const url = URLUtils.qualifyUrl(ApiRoutes.AlertsApiController.get(alertId).url);
+      const promise = fetch('GET', url);
 
-export default AlertsStore;
+      promise.then(
+        (response) => {
+          this.trigger({ alert: response });
+
+          return response;
+        },
+        (error) => {
+          UserNotification.error(`Fetching alert '${alertId}' failed with status: ${error.message}`, 'Could not retrieve alert.');
+        },
+      );
+
+      AlertsActions.get.promise(promise);
+    },
+  }),
+);

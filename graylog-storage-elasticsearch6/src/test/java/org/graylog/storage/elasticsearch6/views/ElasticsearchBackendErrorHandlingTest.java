@@ -99,7 +99,7 @@ public class ElasticsearchBackendErrorHandlingTest extends ElasticsearchBackendT
         this.query = Query.builder()
                 .id("query1")
                 .timerange(RelativeRange.create(300))
-                .query(ElasticsearchQueryString.builder().queryString("*").build())
+                .query(ElasticsearchQueryString.of("*"))
                 .searchTypes(searchTypes)
                 .build();
         final Search search = Search.builder()

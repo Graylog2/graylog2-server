@@ -67,6 +67,7 @@ import java.util.SortedSet;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog2.indexer.EventIndexTemplateProvider.EVENT_TEMPLATE_TYPE;
 import static org.graylog2.indexer.searches.ScrollCommand.NO_BATCHSIZE;
 import static org.joda.time.DateTimeZone.UTC;
 import static org.mockito.ArgumentMatchers.any;
@@ -290,7 +291,7 @@ public abstract class SearchesIT extends ElasticsearchBaseTest {
         when(indexRangeService.find(any(DateTime.class), any(DateTime.class))).thenReturn(indices);
 
         final TimeRange absoluteRange = AbsoluteRange.create(now.minusDays(1), now.plusDays(1));
-        final TimeRange keywordRange = KeywordRange.create("1 day ago");
+        final TimeRange keywordRange = KeywordRange.create("1 day ago", "Etc/UTC");
         final TimeRange relativeRange = RelativeRange.create(3600);
 
         assertThat(searches.determineAffectedIndicesWithRanges(absoluteRange, null))
@@ -314,7 +315,7 @@ public abstract class SearchesIT extends ElasticsearchBaseTest {
         when(indexRangeService.find(any(DateTime.class), any(DateTime.class))).thenReturn(indices);
 
         final TimeRange absoluteRange = AbsoluteRange.create(now.minusDays(1), now.plusDays(1));
-        final TimeRange keywordRange = KeywordRange.create("1 day ago");
+        final TimeRange keywordRange = KeywordRange.create("1 day ago", "Etc/UTC");
         final TimeRange relativeRange = RelativeRange.create(3600);
 
         assertThat(searches.determineAffectedIndicesWithRanges(absoluteRange, null))
@@ -330,7 +331,7 @@ public abstract class SearchesIT extends ElasticsearchBaseTest {
         final Set<IndexSet> eventIndexSets = Arrays.asList("gl-events", "gl-system-events").stream().
                 map(prefix -> new TestIndexSet(indexSet.getConfig().toBuilder()
                         .indexPrefix(prefix)
-                        .indexTemplateType(IndexSetConfig.TemplateType.EVENTS)
+                        .indexTemplateType(EVENT_TEMPLATE_TYPE)
                         .build())).collect(Collectors.toSet());
         when(indexSetRegistry.getForIndices(anyCollection())).thenReturn(eventIndexSets);
         final DateTime now = DateTime.now(DateTimeZone.UTC);
@@ -366,7 +367,7 @@ public abstract class SearchesIT extends ElasticsearchBaseTest {
         when(indexRangeService.find(any(DateTime.class), any(DateTime.class))).thenReturn(indices);
 
         final TimeRange absoluteRange = AbsoluteRange.create(now.minusDays(1), now.plusDays(1));
-        final TimeRange keywordRange = KeywordRange.create("1 day ago");
+        final TimeRange keywordRange = KeywordRange.create("1 day ago", "Etc/UTC");
         final TimeRange relativeRange = RelativeRange.create(3600);
 
         assertThat(searches.determineAffectedIndices(absoluteRange, null))
@@ -390,7 +391,7 @@ public abstract class SearchesIT extends ElasticsearchBaseTest {
         when(indexRangeService.find(any(DateTime.class), any(DateTime.class))).thenReturn(indices);
 
         final TimeRange absoluteRange = AbsoluteRange.create(now.minusDays(1), now.plusDays(1));
-        final TimeRange keywordRange = KeywordRange.create("1 day ago");
+        final TimeRange keywordRange = KeywordRange.create("1 day ago", "Etc/UTC");
         final TimeRange relativeRange = RelativeRange.create(3600);
 
         assertThat(searches.determineAffectedIndices(absoluteRange, null))

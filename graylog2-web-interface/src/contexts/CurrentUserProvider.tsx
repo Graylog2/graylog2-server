@@ -20,11 +20,9 @@ import { get } from 'lodash';
 
 import { useStore } from 'stores/connect';
 import User from 'logic/users/User';
-import CombinedProvider from 'injection/CombinedProvider';
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 
 import CurrentUserContext from './CurrentUserContext';
-
-const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 
 const CurrentUserProvider = ({ children }) => {
   const currentUserJSON = useStore(CurrentUserStore, (state) => get(state, 'currentUser'));

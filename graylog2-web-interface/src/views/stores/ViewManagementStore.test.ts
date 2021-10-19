@@ -14,24 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import StoreProvider from 'injection/StoreProvider';
+import { MockStore } from 'helpers/mocking';
+
 import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 
 import { ViewManagementActions } from './ViewManagementStore';
 
-jest.mock('injection/StoreProvider', () => ({ getStore: jest.fn() }));
+jest.mock('stores/users/CurrentUserStore', () => ({ CurrentUserStore: MockStore('reload') }));
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
 
 describe('ViewManagementStore', () => {
   it('refreshes user after creating a view', () => {
     const search = Search.create();
     const view = View.builder().newId().search(search).build();
-    const CurrentUserStore = {
-      reload: jest.fn(),
-    };
-
-    StoreProvider.getStore.mockReturnValue(CurrentUserStore);
 
     return ViewManagementActions.create(view).then(() => {
       expect(CurrentUserStore.reload).toHaveBeenCalled();

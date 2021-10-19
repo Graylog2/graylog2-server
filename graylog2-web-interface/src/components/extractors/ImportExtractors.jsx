@@ -19,10 +19,8 @@ import React from 'react';
 
 import { Row, Col, Button } from 'components/graylog';
 import { Input } from 'components/bootstrap';
-import ActionsProvider from 'injection/ActionsProvider';
 import UserNotification from 'util/UserNotification';
-
-const ExtractorsActions = ActionsProvider.getActions('Extractors');
+import { ExtractorsActions } from 'stores/extractors/ExtractorsStore';
 
 class ImportExtractors extends React.Component {
   static propTypes = {

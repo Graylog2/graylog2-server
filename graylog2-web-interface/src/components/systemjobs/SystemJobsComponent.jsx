@@ -19,11 +19,9 @@ import PropTypes from 'prop-types';
 
 import { Col, Row } from 'components/graylog';
 import connect from 'stores/connect';
-import CombinedProvider from 'injection/CombinedProvider';
 import { Spinner } from 'components/common';
 import { SystemJobsList } from 'components/systemjobs';
-
-const { SystemJobsStore, SystemJobsActions } = CombinedProvider.get('SystemJobs');
+import { SystemJobsActions, SystemJobsStore } from 'stores/systemjobs/SystemJobsStore';
 
 const SystemJobsComponent = ({ jobs }) => {
   useEffect(() => {

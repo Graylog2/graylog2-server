@@ -20,10 +20,8 @@ import React from 'react';
 import { Col, Row } from 'components/graylog';
 import { AlertMessages, AlertTimeline } from 'components/alerts';
 import { AlarmCallbackHistoryOverview } from 'components/alarmcallbacks';
-import CombinedProvider from 'injection/CombinedProvider';
-
-const { AlarmCallbackHistoryActions } = CombinedProvider.get('AlarmCallbackHistory');
-const { AlertNotificationsActions } = CombinedProvider.get('AlertNotifications');
+import { AlarmCallbackHistoryActions } from 'stores/alarmcallbacks/AlarmCallbackHistoryStore';
+import { AlertNotificationsActions } from 'stores/alertnotifications/AlertNotificationsStore';
 
 class AlertDetails extends React.Component {
   static propTypes = {

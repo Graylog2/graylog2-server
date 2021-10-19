@@ -23,21 +23,19 @@ import { Input } from 'components/bootstrap';
 import { FormikFormGroup, ReadOnlyFormGroup } from 'components/common';
 import SectionComponent from 'components/common/Section/SectionComponent';
 import User from 'logic/users/User';
-import CombinedProvider from 'injection/CombinedProvider';
-
-const { PreferencesActions } = CombinedProvider.get('Preferences');
+import { PreferencesActions, PreferencesUpdateMap } from 'stores/users/PreferencesStore';
 
 type Props = {
   user: User,
 };
 
 const PreferencesSection = ({ user }: Props) => {
-  const onSubmit = (data) => PreferencesActions.saveUserPreferences(user.username, data);
+  const onSubmit = (data: PreferencesUpdateMap) => PreferencesActions.saveUserPreferences(user.username, data);
 
   return (
     <SectionComponent title="Preferences">
-      <Formik onSubmit={onSubmit}
-              initialValues={user.preferences}>
+      <Formik<PreferencesUpdateMap> onSubmit={onSubmit}
+                                    initialValues={user.preferences}>
         {({ isSubmitting, isValid }) => (
           <Form className="form form-horizontal">
             <Input id="timeout-controls"

@@ -25,10 +25,9 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog.testing.graylognode.NodeContainerConfig.GELF_HTTP_PORT;
 
 abstract class ElasticsearchE2E {
-
-    static final int GELF_HTTP_PORT = 12201;
 
     private final GraylogBackend sut;
     private final RequestSpecification requestSpec;

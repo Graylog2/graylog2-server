@@ -20,10 +20,9 @@ import lodash from 'lodash';
 import styled from 'styled-components';
 
 import { CounterDetails, GaugeDetails, HistogramDetails, MeterDetails, TimerDetails } from 'components/metrics';
-import CombinedProvider from 'injection/CombinedProvider';
 import connect from 'stores/connect';
+import { MetricsActions, MetricsStore } from 'stores/metrics/MetricsStore';
 
-const { MetricsStore, MetricsActions } = CombinedProvider.get('Metrics');
 const StyledMetricDetail = styled.div`
   dl {
     > dt {

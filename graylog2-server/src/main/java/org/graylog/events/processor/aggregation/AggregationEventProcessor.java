@@ -19,6 +19,7 @@ package org.graylog.events.processor.aggregation;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -170,7 +171,7 @@ public class AggregationEventProcessor implements EventProcessor {
                 messageConsumer.accept(summaries);
             };
 
-            ElasticsearchQueryString scrollQueryString = ElasticsearchQueryString.builder().queryString(config.query()).build();
+            ElasticsearchQueryString scrollQueryString = ElasticsearchQueryString.of(config.query());
             scrollQueryString = scrollQueryString.concatenate(groupByQueryString(event));
             LOG.debug("scrollQueryString: {}", scrollQueryString);
 
@@ -187,7 +188,7 @@ public class AggregationEventProcessor implements EventProcessor {
             for (String key : event.getGroupByFields().keySet()) {
                 String value = event.getGroupByFields().get(key);
                 String query = new StringBuilder(key).append(":\"").append(luceneEscape(value)).append("\"").toString();
-                result = result.concatenate(ElasticsearchQueryString.builder().queryString(query).build());
+                result = result.concatenate(ElasticsearchQueryString.of(query));
             }
         }
         return result;
@@ -216,10 +217,9 @@ public class AggregationEventProcessor implements EventProcessor {
                 final Event event = eventFactory.createEvent(eventDefinition, msg.getTimestamp(), eventDefinition.title());
                 event.setOriginContext(EventOriginContext.elasticsearchMessage(resultMessage.getIndex(), msg.getId()));
 
-                // We don't want source streams in the event which are unrelated to the event definition
-                msg.getStreamIds().stream()
-                    .filter(stream -> getStreams(parameters).contains(stream))
-                    .forEach(event::addSourceStream);
+                // Ensure the event has values in the "source_streams" field for permission checks to work
+                buildEventSourceStreams(getStreams(parameters), ImmutableSet.copyOf(msg.getStreamIds()))
+                        .forEach(event::addSourceStream);
 
                 eventsWithContext.add(EventWithContext.create(event, msg));
             }
@@ -267,7 +267,7 @@ public class AggregationEventProcessor implements EventProcessor {
     @VisibleForTesting
     ImmutableList<EventWithContext> eventsFromAggregationResult(EventFactory eventFactory, AggregationEventProcessorParameters parameters, AggregationResult result) {
         final ImmutableList.Builder<EventWithContext> eventsWithContext = ImmutableList.builder();
-        final Set<String> sourceStreams = getSourceStreams(getStreams(parameters), result);
+        final Set<String> sourceStreams = buildEventSourceStreams(getStreams(parameters), result.sourceStreams());
 
         for (final AggregationKeyResult keyResult : result.keyResults()) {
             if (!satisfiesConditions(keyResult)) {
@@ -342,10 +342,10 @@ public class AggregationEventProcessor implements EventProcessor {
         return eventsWithContext.build();
     }
 
-    // Determine event source streams based on given search and aggregation
-    private Set<String> getSourceStreams(Set<String> searchStreams, AggregationResult result) {
+    // Determine event source streams based on given search and result streams
+    private Set<String> buildEventSourceStreams(Set<String> searchStreams, Set<String> resultSourceStreams) {
         Set<String> sourceStreams;
-        if (searchStreams.isEmpty() && result.sourceStreams().isEmpty()) {
+        if (searchStreams.isEmpty() && resultSourceStreams.isEmpty()) {
             // This can happen if the user didn't select any stream in the event definition and an event should be
             // created based on the absence of a search result. (e.g. count() < 1)
             // When the source streams field of an event is empty, every user can see it. That's why we need to add
@@ -357,13 +357,13 @@ public class AggregationEventProcessor implements EventProcessor {
                     .collect(Collectors.toSet());
         } else if (searchStreams.isEmpty()) {
             // If the search streams is empty, we search in all streams and so we include all source streams from the result.
-            sourceStreams = result.sourceStreams();
-        } else if (result.sourceStreams().isEmpty()) {
+            sourceStreams = resultSourceStreams;
+        } else if (resultSourceStreams.isEmpty()) {
             // With an empty result we just include all streams from the event definition.
             sourceStreams = searchStreams;
         } else {
             // We don't want source streams in the event which are unrelated to the event definition.
-            sourceStreams = Sets.intersection(searchStreams, result.sourceStreams());
+            sourceStreams = Sets.intersection(searchStreams, resultSourceStreams);
         }
         return sourceStreams;
     }

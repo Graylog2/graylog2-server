@@ -23,8 +23,8 @@ import OnZoom from './OnZoom';
 
 const mockGetTimezone = jest.fn(() => ({ timezone: 'UTC' }));
 
-jest.mock('injection/CombinedProvider', () => ({
-  get: () => ({ CurrentUserStore: { get: () => mockGetTimezone() } }),
+jest.mock('stores/users/CurrentUserStore', () => ({
+  CurrentUserStore: { get: () => mockGetTimezone() },
 }));
 
 jest.mock('views/stores/QueriesStore', () => ({

@@ -22,6 +22,7 @@ import mockAction from 'helpers/mocking/MockAction';
 import { PluginRegistration, PluginStore } from 'graylog-web-plugin/plugin';
 import MockStore from 'helpers/mocking/StoreMock';
 import { createSearch } from 'fixtures/searches';
+import asMock from 'helpers/mocking/AsMock';
 
 import WidgetModel from 'views/logic/widgets/Widget';
 import { WidgetActions, Widgets } from 'views/stores/WidgetStore';
@@ -30,6 +31,8 @@ import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import { ViewStore } from 'views/stores/ViewStore';
 import type { ViewStoreState } from 'views/stores/ViewStore';
 import { TitlesMap } from 'views/stores/TitleTypes';
+import useWidgetResults from 'views/components/useWidgetResults';
+import SearchError from 'views/logic/SearchError';
 
 import Widget from './Widget';
 import type { Props as WidgetComponentProps } from './Widget';
@@ -40,6 +43,7 @@ import WidgetFocusContext, { WidgetFocusContextType } from '../contexts/WidgetFo
 jest.mock('../searchbar/QueryInput', () => mockComponent('QueryInput'));
 jest.mock('./WidgetHeader', () => 'widget-header');
 jest.mock('./WidgetColorContext', () => ({ children }) => children);
+jest.mock('views/components/useWidgetResults');
 
 jest.mock('views/stores/WidgetStore', () => ({
   WidgetStore: MockStore(),
@@ -75,13 +79,9 @@ const pluginManifest: PluginRegistration = {
 };
 
 describe('<Widget />', () => {
-  beforeAll(() => {
-    PluginStore.register(pluginManifest);
-  });
+  beforeAll(() => PluginStore.register(pluginManifest));
 
-  afterAll(() => {
-    PluginStore.unregister(pluginManifest);
-  });
+  afterAll(() => PluginStore.unregister(pluginManifest));
 
   const widget = WidgetModel.builder().newId()
     .type('dummy')
@@ -97,11 +97,6 @@ describe('<Widget />', () => {
 
   beforeEach(() => {
     ViewStore.getInitialState = jest.fn(() => viewStoreState);
-  });
-
-  afterEach(() => {
-    jest.clearAllMocks();
-    jest.resetModules();
   });
 
   type DummyWidgetProps = Partial<WidgetComponentProps> & {
@@ -135,50 +130,53 @@ describe('<Widget />', () => {
     </WidgetFocusContext.Provider>
   );
 
-  it('should render with empty props', () => {
+  it('should render with empty props', async () => {
+    asMock(useWidgetResults).mockReturnValue({ widgetData: undefined, error: undefined });
     render(<DummyWidget />);
 
-    expect(screen.getByTitle('Widget Title')).toBeInTheDocument();
+    await screen.findByTitle('Widget Title');
   });
 
-  it('should render loading widget for widget without data', () => {
+  it('should render loading widget for widget without data', async () => {
+    asMock(useWidgetResults).mockReturnValue({ widgetData: undefined, error: undefined });
     render(<DummyWidget />);
 
-    expect(screen.queryAllByTestId('loading-widget')).toHaveLength(1);
+    await screen.findByTestId('loading-widget');
   });
 
-  it('should render error widget for widget with one error', () => {
-    render(<DummyWidget errors={[{ description: 'The widget has failed: the dungeon collapsed, you die!' }]} />);
-    const errorWidgets = screen.queryAllByText('The widget has failed: the dungeon collapsed, you die!');
+  it('should render error widget for widget with one error', async () => {
+    asMock(useWidgetResults).mockReturnValue({ error: [{ description: 'The widget has failed: the dungeon collapsed, you die!' } as SearchError], widgetData: undefined });
+    render(<DummyWidget />);
 
-    expect(errorWidgets).toHaveLength(1);
+    await screen.findByText('The widget has failed: the dungeon collapsed, you die!');
   });
 
-  it('should render error widget including all error messages for widget with multiple errors', () => {
-    render((
-      <DummyWidget errors={[
-        { description: 'Something is wrong' },
-        { description: 'Very wrong' },
-      ]} />
-    ));
+  it('should render error widget including all error messages for widget with multiple errors', async () => {
+    asMock(useWidgetResults).mockReturnValue({
+      error: [
+        { description: 'Something is wrong' } as SearchError,
+        { description: 'Very wrong' } as SearchError,
+      ],
+      widgetData: undefined,
+    });
 
-    const errorWidgets1 = screen.queryAllByText('Something is wrong');
+    render(<DummyWidget />);
 
-    expect(errorWidgets1).toHaveLength(1);
-
-    const errorWidgets2 = screen.queryAllByText('Very wrong');
-
-    expect(errorWidgets2).toHaveLength(1);
+    await screen.findByText('Something is wrong');
+    await screen.findByText('Very wrong');
   });
 
-  it('should render correct widget visualization for widget with data', () => {
-    render(<DummyWidget data={{}} />);
+  it('should render correct widget visualization for widget with data', async () => {
+    asMock(useWidgetResults).mockReturnValue({ widgetData: {}, error: [] });
+    render(<DummyWidget />);
+
+    await screen.findByTitle('Widget Title');
 
     expect(screen.queryAllByTestId('loading-widget')).toHaveLength(0);
-    expect(screen.queryAllByTitle('Widget Title')).toHaveLength(1);
   });
 
   it('renders placeholder if widget type is unknown', async () => {
+    asMock(useWidgetResults).mockReturnValue({ widgetData: {}, error: [] });
     const unknownWidget = WidgetModel.builder()
       .id('widgetId')
       .type('i-dont-know-this-widget-type')
@@ -248,20 +246,18 @@ describe('<Widget />', () => {
     await waitFor(() => expect(TitlesActions.set).toHaveBeenCalledWith(TitleTypes.Widget, 'duplicatedWidgetId', 'Dummy Widget (copy)'));
   });
 
-  it('adds cancel action to widget in edit mode', () => {
+  it('adds cancel action to widget in edit mode', async () => {
     render(<DummyWidget editing />);
-    const cancel = screen.queryAllByText('Cancel');
-
-    expect(cancel).toHaveLength(1);
+    await screen.findByText('Cancel');
   });
 
-  it('updates focus mode, on widget edit cancel', () => {
+  it('updates focus mode, on widget edit cancel', async () => {
     const mockUnsetWidgetEditing = jest.fn();
     render(<DummyWidget editing unsetWidgetEditing={mockUnsetWidgetEditing} />);
-    const cancel = screen.getByText('Cancel');
+    const cancel = await screen.findByText('Cancel');
     fireEvent.click(cancel);
 
-    expect(mockUnsetWidgetEditing).toHaveBeenCalledTimes(1);
+    await waitFor(() => { expect(mockUnsetWidgetEditing).toHaveBeenCalledTimes(1); });
   });
 
   it('updates focus mode, on widget edit save', async () => {

@@ -44,7 +44,18 @@ import View from 'views/logic/views/View';
 import User from 'logic/users/User';
 import { Message } from 'views/components/messagelist/Types';
 import { ValuePath } from 'views/logic/valueactions/ValueActionHandler';
+import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
+
+type BackendWidgetPosition = {
+  id: string,
+  col: number,
+  row: number,
+  height: number,
+  width: number,
+};
+
+type WidgetPositions = { [widgetId: string]: WidgetPosition };
 
 interface EditWidgetComponentProps<Config extends WidgetConfig = WidgetConfig> {
   children: React.ReactNode,
@@ -205,10 +216,13 @@ export type MessagePreviewOption = {
   sort: number,
 }
 
-export type MessageSummaryProps = {
-  messageFields: { [key: string]: any },
-  renderMessageRow: () => React.ReactNode;
-  config: MessagesWidgetConfig,
+type MessageAugmentation = {
+  id: string,
+  component: React.ComponentType<{ message: Message }>,
+}
+
+type MessageDetailContextProviderProps = {
+  message: Message,
 }
 
 declare module 'graylog-web-plugin/plugin' {
@@ -217,12 +231,14 @@ declare module 'graylog-web-plugin/plugin' {
     enterpriseWidgets?: Array<WidgetExport>;
     externalValueActions?: Array<ActionDefinition>;
     fieldActions?: Array<ActionDefinition>;
+    messageAugmentations?: Array<MessageAugmentation>;
     searchTypes?: Array<SearchType>;
     systemConfigurations?: Array<SystemConfiguration>;
     valueActions?: Array<ActionDefinition>;
     'views.completers'?: Array<Completer>;
     'views.components.widgets.messageTable.previewOptions'?: Array<MessagePreviewOption>;
     'views.components.widgets.messageTable.messageRowOverride'?: Array<React.ComponentType<MessageRowOverrideProps>>;
+    'views.components.widgets.messageDetails.contextProviders'?: Array<React.ComponentType<MessageDetailContextProviderProps>>,
     'views.elements.header'?: Array<React.ComponentType>;
     'views.elements.queryBar'?: Array<React.ComponentType>;
     'views.export.formats'?: Array<ExportFormat>;

@@ -21,12 +21,10 @@ import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
-import CombinedProvider from 'injection/CombinedProvider';
 import PaginationURL from 'util/PaginationURL';
 import StreamsActions from 'actions/streams/StreamsActions';
-import { singletonStore } from 'views/logic/singleton';
-
-const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
+import { singletonStore } from 'logic/singleton';
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 
 export type Stream = {
   id: string,

@@ -44,12 +44,16 @@ jest.mock('views/stores/ViewStatesStore', () => ({
   },
 }));
 
+const emptyLocation = {
+  pathname: '',
+  search: '',
+  hash: '',
+  state: undefined,
+};
+
 describe('DashboardPageContextProvider', () => {
   beforeEach(() => {
-    asMock(useLocation).mockReturnValue({
-      pathname: '',
-      search: '',
-    });
+    asMock(useLocation).mockReturnValue(emptyLocation);
   });
 
   const renderSUT = (consume) => render(
@@ -76,7 +80,7 @@ describe('DashboardPageContextProvider', () => {
 
   it('should update url on page change', () => {
     asMock(useLocation).mockReturnValueOnce({
-      pathname: '',
+      ...emptyLocation,
       search: '?page=page2-id',
     });
 
@@ -95,7 +99,7 @@ describe('DashboardPageContextProvider', () => {
 
   it('should unset a page from url', () => {
     asMock(useLocation).mockReturnValueOnce({
-      pathname: '',
+      ...emptyLocation,
       search: '?page=page-id',
     });
 
@@ -114,7 +118,7 @@ describe('DashboardPageContextProvider', () => {
 
   it('should not set to an unknown page', () => {
     asMock(useLocation).mockReturnValueOnce({
-      pathname: '',
+      ...emptyLocation,
       search: '?page=page-id',
     });
 

@@ -19,9 +19,19 @@ import Reflux from 'reflux';
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
-import ActionsProvider from 'injection/ActionsProvider';
+import { singletonStore, singletonActions } from 'logic/singleton';
 
-const InputTypesActions = ActionsProvider.getActions('InputTypes');
+type InputTypesActionsType = {
+  list: () => Promise<unknown>,
+  get: (inputTypeId: string) => Promise<unknown>,
+}
+export const InputTypesActions = singletonActions(
+  'core.InputTypes',
+  () => Reflux.createActions<InputTypesActionsType>({
+    list: { asyncResult: true },
+    get: { asyncResult: true },
+  }),
+);
 
 export type InputTypes = {
   [type: string]: string,
@@ -53,52 +63,53 @@ export type InputDescriptions = {
   [type: string]: InputDescription,
 };
 
-const InputTypesStore = Reflux.createStore({
-  listenables: [InputTypesActions],
-  sourceUrl: '/system/inputs/types',
-  inputTypes: undefined,
-  inputDescriptions: undefined,
+export const InputTypesStore = singletonStore(
+  'core.InputTypes',
+  () => Reflux.createStore({
+    listenables: [InputTypesActions],
+    sourceUrl: '/system/inputs/types',
+    inputTypes: undefined,
+    inputDescriptions: undefined,
 
-  init() {
-    this.list();
-  },
+    init() {
+      this.list();
+    },
 
-  getInitialState(): { inputTypes: InputTypes, inputDescriptions: InputDescriptions } {
-    return { inputTypes: this.inputTypes, inputDescriptions: this.inputDescriptions };
-  },
+    getInitialState(): { inputTypes: InputTypes, inputDescriptions: InputDescriptions } {
+      return { inputTypes: this.inputTypes, inputDescriptions: this.inputDescriptions };
+    },
 
-  list() {
-    const promiseTypes = fetch('GET', qualifyUrl(this.sourceUrl));
-    const promiseDescriptions = fetch('GET', qualifyUrl(`${this.sourceUrl}/all`));
-    const promise: Promise<[{ types: InputTypes }, InputDescriptions]> = Promise.all([promiseTypes, promiseDescriptions]);
+    list() {
+      const promiseTypes = fetch('GET', qualifyUrl(this.sourceUrl));
+      const promiseDescriptions = fetch('GET', qualifyUrl(`${this.sourceUrl}/all`));
+      const promise: Promise<[{ types: InputTypes }, InputDescriptions]> = Promise.all([promiseTypes, promiseDescriptions]);
 
-    promise
-      .then(
-        ([typesResponse, descriptionsResponse]) => {
-          this.inputTypes = typesResponse.types;
-          this.inputDescriptions = descriptionsResponse;
-          this.trigger(this.getInitialState());
-        },
-        (error) => {
-          UserNotification.error(`Fetching Input Types failed with status: ${error}`,
-            'Could not retrieve Inputs');
-        },
-      );
+      promise
+        .then(
+          ([typesResponse, descriptionsResponse]) => {
+            this.inputTypes = typesResponse.types;
+            this.inputDescriptions = descriptionsResponse;
+            this.trigger(this.getInitialState());
+          },
+          (error) => {
+            UserNotification.error(`Fetching Input Types failed with status: ${error}`,
+              'Could not retrieve Inputs');
+          },
+        );
 
-    InputTypesActions.list.promise(promise);
-  },
+      InputTypesActions.list.promise(promise);
+    },
 
-  get(inputTypeId: string) {
-    const promise = fetch('GET', qualifyUrl(`${this.sourceUrl}/${inputTypeId}`));
+    get(inputTypeId: string) {
+      const promise = fetch('GET', qualifyUrl(`${this.sourceUrl}/${inputTypeId}`));
 
-    promise
-      .catch((error) => {
-        UserNotification.error(`Fetching input ${inputTypeId} failed with status: ${error}`,
-          'Could not retrieve input');
-      });
+      promise
+        .catch((error) => {
+          UserNotification.error(`Fetching input ${inputTypeId} failed with status: ${error}`,
+            'Could not retrieve input');
+        });
 
-    InputTypesActions.get.promise(promise);
-  },
-});
-
-export default InputTypesStore;
+      InputTypesActions.get.promise(promise);
+    },
+  }),
+);

@@ -19,9 +19,17 @@ import Reflux from 'reflux';
 import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
-import ActionsProvider from 'injection/ActionsProvider';
+import { singletonStore, singletonActions } from 'logic/singleton';
 
-const IndexerOverviewActions = ActionsProvider.getActions('IndexerOverview');
+type IndexerOverviewActionsType = {
+  list: (indexSetId: string) => Promise<unknown>,
+}
+export const IndexerOverviewActions = singletonActions(
+  'core.IndexerOverview',
+  () => Reflux.createActions<IndexerOverviewActionsType>({
+    list: { asyncResult: true },
+  }),
+);
 
 export type IndexSummary = {
   size: {
@@ -66,41 +74,42 @@ export type IndexerOverview = {
   },
 };
 
-const IndexerOverviewStore = Reflux.createStore({
-  listenables: [IndexerOverviewActions],
-  indexerOverview: undefined,
-  indexerOverviewError: undefined,
+export const IndexerOverviewStore = singletonStore(
+  'core.IndexerOverview',
+  () => Reflux.createStore({
+    listenables: [IndexerOverviewActions],
+    indexerOverview: undefined,
+    indexerOverviewError: undefined,
 
-  getInitialState() {
-    return {
-      indexerOverview: this.indexerOverview,
-      indexerOverviewError: this.indexerOverviewError,
-    };
-  },
+    getInitialState() {
+      return {
+        indexerOverview: this.indexerOverview,
+        indexerOverviewError: this.indexerOverviewError,
+      };
+    },
 
-  list(indexSetId: string) {
-    const url = qualifyUrl(ApiRoutes.IndexerOverviewApiResource.list(indexSetId).url);
-    const promise = fetch('GET', url);
+    list(indexSetId: string) {
+      const url = qualifyUrl(ApiRoutes.IndexerOverviewApiResource.list(indexSetId).url);
+      const promise = fetch('GET', url);
 
-    promise.then(
-      (response: IndexerOverview) => {
-        this.trigger({ indexerOverview: response, indexerOverviewError: undefined });
-      },
-      (error) => {
-        if (error.additional && error.additional.status === 503) {
-          const errorMessage = (error.additional.body && error.additional.body.message
-            ? error.additional.body.message
-            : 'Elasticsearch is unavailable. Check your configuration and logs for more information.');
+      promise.then(
+        (response: IndexerOverview) => {
+          this.trigger({ indexerOverview: response, indexerOverviewError: undefined });
+        },
+        (error) => {
+          if (error.additional && error.additional.status === 503) {
+            const errorMessage = (error.additional.body && error.additional.body.message
+              ? error.additional.body.message
+              : 'Elasticsearch is unavailable. Check your configuration and logs for more information.');
 
-          this.trigger({ indexerOverviewError: errorMessage });
-        }
-      },
-    );
+            this.trigger({ indexerOverviewError: errorMessage });
+          }
+        },
+      );
 
-    IndexerOverviewActions.list.promise(promise);
+      IndexerOverviewActions.list.promise(promise);
 
-    return promise;
-  },
-});
-
-export default IndexerOverviewStore;
+      return promise;
+    },
+  }),
+);

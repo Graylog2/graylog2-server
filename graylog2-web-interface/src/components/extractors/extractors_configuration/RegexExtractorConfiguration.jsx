@@ -24,9 +24,7 @@ import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
 import UserNotification from 'util/UserNotification';
 import FormUtils from 'util/FormsUtils';
-import StoreProvider from 'injection/StoreProvider';
-
-const ToolsStore = StoreProvider.getStore('Tools');
+import ToolsStore from 'stores/tools/ToolsStore';
 
 class RegexExtractorConfiguration extends React.Component {
   static propTypes = {

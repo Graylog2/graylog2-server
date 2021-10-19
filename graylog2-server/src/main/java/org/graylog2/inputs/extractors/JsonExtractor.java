@@ -17,7 +17,6 @@
 package org.graylog2.inputs.extractors;
 
 import com.codahale.metrics.MetricRegistry;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Joiner;
@@ -94,7 +93,12 @@ public class JsonExtractor extends Extractor {
 
     @Override
     protected Result[] run(String value) {
-        final Map<String, Object> extractedJson = extractJson(value);
+        final Map<String, Object> extractedJson;
+        try {
+            extractedJson = extractJson(value);
+        } catch (IOException e) {
+            throw new ExtractorException(e);
+        }
         final List<Result> results = new ArrayList<>(extractedJson.size());
         for (Map.Entry<String, Object> entry : extractedJson.entrySet()) {
             results.add(new Result(entry.getValue(), entry.getKey(), -1, -1));
@@ -103,17 +107,13 @@ public class JsonExtractor extends Extractor {
         return results.toArray(new Result[results.size()]);
     }
 
-    public Map<String, Object> extractJson(String value) {
+    public Map<String, Object> extractJson(String value) throws IOException {
         if (isNullOrEmpty(value)) {
             return Collections.emptyMap();
         }
 
         final Map<String, Object> json;
-        try {
-            json = mapper.readValue(value, TypeReferences.MAP_STRING_OBJECT);
-        } catch (IOException e) {
-            return Collections.emptyMap();
-        }
+        json = mapper.readValue(value, TypeReferences.MAP_STRING_OBJECT);
 
         final Map<String, Object> results = new HashMap<>(json.size());
         for (Map.Entry<String, Object> mapEntry : json.entrySet()) {

@@ -24,6 +24,8 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import org.graylog.failure.FailureCause;
+import org.graylog.failure.ProcessingFailureCause;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.SuppressForbidden;
@@ -41,6 +43,7 @@ import org.mockito.junit.MockitoRule;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Month;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -55,6 +58,8 @@ import java.util.regex.Pattern;
 
 import static com.google.common.collect.Sets.symmetricDifference;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_EVENT_CATEGORY;
 import static org.graylog2.plugin.streams.Stream.DEFAULT_STREAM_ID;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -472,6 +477,21 @@ public class MessageTest {
     }
 
     @Test
+    public void testMessageSizeIgnoresIlluminateFields() {
+        final Message message = new Message("1234567890", "12345", Tools.nowUTC());
+        assertThat(message.getSize()).isEqualTo(45);
+
+        // this field should not be counted into the overall message size
+        message.addField(FIELD_ILLUMINATE_EVENT_CATEGORY, "foobar");
+        // the size should stay exactly same as before adding the field
+        assertThat(message.getSize()).isEqualTo(45);
+
+        // this field should increase message size
+        message.addField("http_url", "https//www.wikipedia.org");
+        assertThat(message.getSize()).isEqualTo(77);
+    }
+
+    @Test
     public void testIsComplete() throws Exception {
         Message message = new Message("message", "source", Tools.nowUTC());
         assertTrue(message.isComplete());
@@ -668,5 +688,131 @@ public class MessageTest {
         message.setMetadata("stateKey", 10L);
         assertThat(message.getMetadataValue("badKey", "default")).isEqualTo("default");
         assertThat(message.getMetadataValue("stateKey", "default")).isEqualTo(10L);
+    }
+
+    @Test
+    public void addProcessingError_appendsWithEachCall() {
+        final Message msg = new Message(new org.testcontainers.shaded.com.google.common.collect.ImmutableMap.Builder<String, Object>()
+                .put(Message.FIELD_ID, "msg-id")
+                .put(Message.FIELD_TIMESTAMP, Tools.buildElasticSearchTimeFormat(Tools.nowUTC()))
+                .build());
+
+        final FailureCause cause1 = () -> "Cause 1";
+        final FailureCause cause2 = () -> "Cause 2";
+
+        msg.addProcessingError(new Message.ProcessingError(cause1, "Failure Message #1", "Failure Details #1"));
+
+        assertThat(msg.processingErrors())
+                .containsExactly(new Message.ProcessingError(cause1, "Failure Message #1", "Failure Details #1"));
+
+        msg.addProcessingError(new Message.ProcessingError(cause2, "Failure Message #2", "Failure Details #2"));
+
+        assertThat(msg.processingErrors())
+                .containsExactly(
+                        new Message.ProcessingError(cause1, "Failure Message #1", "Failure Details #1"),
+                        new Message.ProcessingError(cause2, "Failure Message #2", "Failure Details #2"));
+    }
+
+    @Test
+    public void processingErrors_returnImmutableList() {
+        final Message msg = new Message(new org.testcontainers.shaded.com.google.common.collect.ImmutableMap.Builder<String, Object>()
+                .put(Message.FIELD_ID, "msg-id")
+                .put(Message.FIELD_TIMESTAMP, Tools.buildElasticSearchTimeFormat(Tools.nowUTC()))
+                .build());
+
+        msg.addProcessingError(new Message.ProcessingError(() -> "Cause", "Failure Message #1", "Failure Details #1"));
+
+        assertThat(msg.processingErrors()).hasSize(1);
+
+        assertThatCode(() -> msg.processingErrors().add(new Message.ProcessingError(() -> "Cause 2", "Failure Message #2", "Failure Details #2")))
+                .isInstanceOf(Exception.class);
+
+        assertThat(msg.processingErrors()).hasSize(1);
+    }
+
+    @Test
+    public void toElasticSearchObject_processingErrorDetailsAreJoinedInOneStringAndReturnedInProcessingErrorField() {
+        // given
+        final Message msg = new Message(new org.testcontainers.shaded.com.google.common.collect.ImmutableMap.Builder<String, Object>()
+                .put(Message.FIELD_ID, "msg-id")
+                .put(Message.FIELD_TIMESTAMP, Tools.buildElasticSearchTimeFormat(Tools.nowUTC()))
+                .build());
+
+        msg.addProcessingError(new Message.ProcessingError(
+                () -> "Cause 1", "Failure Message #1", "Failure Details #1"
+        ));
+
+        msg.addProcessingError(new Message.ProcessingError(
+                () -> "Cause 2", "Failure Message #2", "Failure Details #2"
+        ));
+
+        // when
+        final Map<String, Object> esObject = msg.toElasticSearchObject(new ObjectMapperProvider().get(), new Meter());
+
+        // then
+        assertThat(esObject.get(Message.FIELD_GL2_PROCESSING_ERROR))
+                .isEqualTo("Failure Details #1, Failure Details #2");
+    }
+
+    @Test
+    public void testTimestampConversionWithWrongDate() {
+        // Do not use fixed time from setUp() in this test
+        DateTimeUtils.setCurrentMillisSystem();
+
+        final Message message = new Message("message", "source", Tools.nowUTC().minusMinutes(2));
+        final DateTime previousTimestamp = message.getTimestamp();
+
+        message.addField(Message.FIELD_TIMESTAMP, 1234);
+
+        assertThat(message.getTimestamp()).isInstanceOf(DateTime.class);
+        // got replaced by a current timestamp
+        assertThat(message.getTimestamp()).isNotEqualTo(previousTimestamp);
+
+        assertThat(message.processingErrors()).satisfies(e -> {
+            assertThat(e).hasSize(1);
+            assertThat(e.get(0).getCause()).isEqualTo(ProcessingFailureCause.InvalidTimestampException);
+            assertThat(e.get(0).getMessage()).startsWith("Replaced invalid timestamp value in message <");
+            assertThat(e.get(0).getDetails()).startsWith("Value <1234> caused exception: Value of invalid type <Integer> provided");
+        });
+    }
+
+    @Test
+    public void testTimestampConversionWithNullDate() {
+        // Do not use fixed time from setUp() in this test
+        DateTimeUtils.setCurrentMillisSystem();
+
+        final Message message = new Message("message", "source", Tools.nowUTC().minusMinutes(2));
+        final DateTime previousTimestamp = message.getTimestamp();
+
+        message.addField(Message.FIELD_TIMESTAMP, null);
+
+        assertThat(message.getTimestamp()).isInstanceOf(DateTime.class);
+        // got replaced by a current timestamp
+        assertThat(message.getTimestamp()).isNotEqualTo(previousTimestamp);
+
+        assertThat(message.processingErrors()).satisfies(e -> {
+            assertThat(e).hasSize(1);
+            assertThat(e.get(0).getCause()).isEqualTo(ProcessingFailureCause.InvalidTimestampException);
+            assertThat(e.get(0).getMessage()).startsWith("Replaced invalid timestamp value in message <");
+            assertThat(e.get(0).getDetails()).startsWith("<null> value provided");
+        });
+    }
+
+    @Test
+    public void testTimestampConversionWithLocalDateTime() {
+        // Do not use fixed time from setUp() in this test
+        DateTimeUtils.setCurrentMillisSystem();
+
+        final Message message = new Message("message", "source", Tools.nowUTC().minusMinutes(2));
+        final LocalDateTime localDate = LocalDateTime.of(2021, Month.AUGUST, 19, 12, 0);
+        final ZonedDateTime zonedDateTime = ZonedDateTime.of(localDate, ZoneOffset.UTC);
+
+        message.addField(Message.FIELD_TIMESTAMP, zonedDateTime);
+        assertThat(message.getTimestamp()).isInstanceOf(DateTime.class);
+
+        final DateTime expectedLocalDateEquivalent = new DateTime(2021, 8, 19, 12, 0, DateTimeZone.UTC);
+        assertThat(message.getTimestamp()).isEqualTo(expectedLocalDateEquivalent);
+
+        assertThat(message.processingErrors()).isEmpty();
     }
 }

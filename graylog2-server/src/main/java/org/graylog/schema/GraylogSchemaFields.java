@@ -31,4 +31,12 @@ public class GraylogSchemaFields {
     public static final String FIELD_ILLUMINATE_EVENT_TYPE = "gl2_event_type";
     public static final String FIELD_ILLUMINATE_EVENT_TYPE_CODE = "gl2_event_type_code";
     public static final String FIELD_ILLUMINATE_TAGS = "gl2_tags";
+
+    public static final String FIELD_ILLUMINATE_GIM_EVENT_CLASS = "gim_event_class";
+    public static final String FIELD_ILLUMINATE_GIM_EVENT_CATEGORY = "gim_event_category";
+    public static final String FIELD_ILLUMINATE_GIM_EVENT_TYPE = "gim_event_type";
+    public static final String FIELD_ILLUMINATE_GIM_EVENT_TYPE_CODE = "gim_event_type_code";
+    public static final String FIELD_ILLUMINATE_GIM_TAGS = "gim_tags";
+    public static final String FIELD_ILLUMINATE_GIM_VERSION = "gim_version";
+
 }

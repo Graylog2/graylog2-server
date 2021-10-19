@@ -21,9 +21,7 @@ import { isEmpty, get } from 'lodash';
 import { WidgetComponentProps } from 'views/types';
 
 import connect from 'stores/connect';
-import CombinedProvider from 'injection/CombinedProvider';
 import { Messages } from 'views/Constants';
-import { SelectedFieldsStore, SelectedFieldsStoreState } from 'views/stores/SelectedFieldsStore';
 import { ViewStore } from 'views/stores/ViewStore';
 import { SearchActions, SearchStore, SearchStoreState } from 'views/stores/SearchStore';
 import { RefreshActions } from 'views/stores/RefreshStore';
@@ -37,10 +35,10 @@ import ErrorWidget from 'views/components/widgets/ErrorWidget';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import { BackendMessage } from 'views/components/messagelist/Types';
 import Widget from 'views/logic/widgets/Widget';
+import WindowDimensionsContextProvider from 'contexts/WindowDimensionsContextProvider';
+import { InputsActions } from 'stores/inputs/InputsStore';
 
 import RenderCompletionCallback from './RenderCompletionCallback';
-
-const { InputsActions } = CombinedProvider.get('Inputs');
 
 const Wrapper = styled.div`
   display: flex;
@@ -70,14 +68,12 @@ type Props = WidgetComponentProps<MessagesWidgetConfig, MessageListResult> & {
   currentView: ViewStoreState,
   pageSize?: number,
   searchTypes: { [searchTypeId: string]: SearchType },
-  selectedFields: Immutable.Set<string> | undefined,
 };
 
 class MessageList extends React.Component<Props, State> {
   static defaultProps = {
     onConfigChange: () => Promise.resolve(Immutable.OrderedMap<string, Widget>()),
     pageSize: Messages.DEFAULT_LIMIT,
-    selectedFields: Immutable.Set<string>(),
   };
 
   static contextType = RenderCompletionCallback;
@@ -162,7 +158,6 @@ class MessageList extends React.Component<Props, State> {
       data: { messages, total: totalMessages },
       fields,
       pageSize,
-      selectedFields,
       setLoadingState,
     } = this.props;
     const { currentPage, errors } = this.state;
@@ -170,40 +165,38 @@ class MessageList extends React.Component<Props, State> {
     const listKey = this._getListKey();
 
     return (
-      <Wrapper>
-        <PaginatedList onChange={this._handlePageChange}
-                       activePage={Number(currentPage)}
-                       showPageSizeSelect={false}
-                       totalItems={totalMessages}
-                       pageSize={pageSize}>
-          {!hasError ? (
-            <MessageTable activeQueryId={activeQueryId}
-                          config={config}
-                          fields={fields}
-                          key={listKey}
-                          onSortChange={this._onSortChange}
-                          selectedFields={selectedFields}
-                          setLoadingState={setLoadingState}
-                          messages={messages} />
-          ) : <ErrorWidget errors={errors} />}
-        </PaginatedList>
-      </Wrapper>
+      <WindowDimensionsContextProvider>
+        <Wrapper>
+          <PaginatedList onChange={this._handlePageChange}
+                         activePage={Number(currentPage)}
+                         showPageSizeSelect={false}
+                         totalItems={totalMessages}
+                         pageSize={pageSize}>
+            {!hasError ? (
+              <MessageTable activeQueryId={activeQueryId}
+                            config={config}
+                            fields={fields}
+                            key={listKey}
+                            onSortChange={this._onSortChange}
+                            setLoadingState={setLoadingState}
+                            messages={messages} />
+            ) : <ErrorWidget errors={errors} />}
+          </PaginatedList>
+        </Wrapper>
+      </WindowDimensionsContextProvider>
     );
   }
 }
 
 const mapProps = (props: {
-  selectedFields: SelectedFieldsStoreState,
   currentView: ViewStoreState,
   searches: SearchStoreState,
 }) => ({
-  selectedFields: props.selectedFields,
   currentView: props.currentView,
   searchTypes: get(props, ['searches', 'result', 'results', props.currentView.activeQuery, 'searchTypes']) as { [searchTypeId: string]: SearchType },
 });
 
 export default connect(MessageList, {
-  selectedFields: SelectedFieldsStore,
   currentView: ViewStore,
   searches: SearchStore,
 }, mapProps);

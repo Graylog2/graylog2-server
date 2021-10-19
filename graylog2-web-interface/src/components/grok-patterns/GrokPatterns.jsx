@@ -28,11 +28,9 @@ import {
 import { Button, Col, Row, OverlayTrigger } from 'components/graylog';
 import EditPatternModal from 'components/grok-patterns/EditPatternModal';
 import BulkLoadPatternModal from 'components/grok-patterns/BulkLoadPatternModal';
-import StoreProvider from 'injection/StoreProvider';
+import { GrokPatternsStore } from 'stores/grok-patterns/GrokPatternsStore';
 
 import GrokPatternQueryHelper from './GrokPatternQueryHelper';
-
-const GrokPatternsStore = StoreProvider.getStore('GrokPatterns');
 
 const GrokPatternsList = styled(DataTable)`
   th.name {

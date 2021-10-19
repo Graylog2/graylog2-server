@@ -28,6 +28,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RequestOptions
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestHighLevelClient;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.InvalidWriteTargetException;
+import org.graylog2.indexer.MasterNotDiscoveredException;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -125,6 +126,9 @@ public class ElasticsearchClient {
             if (isIndexNotFoundException(elasticsearchException)) {
                 throw IndexNotFoundException.create(errorMessage + elasticsearchException.getResourceId(), elasticsearchException.getIndex().getName());
             }
+            if (isMasterNotDiscoveredException(elasticsearchException)) {
+                throw new MasterNotDiscoveredException();
+            }
             if (isInvalidWriteTargetException(elasticsearchException)) {
                 final Matcher matcher = invalidWriteTarget.matcher(elasticsearchException.getMessage());
                 if (matcher.find()) {
@@ -140,6 +144,16 @@ public class ElasticsearchClient {
         try {
             final ParsedElasticsearchException parsedException = ParsedElasticsearchException.from(elasticsearchException.getMessage());
             return parsedException.reason().startsWith("no write index is defined for alias");
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private boolean isMasterNotDiscoveredException(ElasticsearchException elasticsearchException) {
+        try {
+            final ParsedElasticsearchException parsedException = ParsedElasticsearchException.from(elasticsearchException.getMessage());
+            return parsedException.type().equals("master_not_discovered_exception")
+                    || (parsedException.type().equals("cluster_block_exception") && parsedException.reason().contains("no master"));
         } catch (Exception e) {
             return false;
         }

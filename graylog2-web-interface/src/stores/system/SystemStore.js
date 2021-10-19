@@ -21,51 +21,55 @@ import * as URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 
-const SystemStore = Reflux.createStore({
-  system: undefined,
-  locales: undefined,
-  init() {
-    this.info().then((response) => {
-      this.trigger({ system: response });
-      this.system = response;
-    });
+import { singletonStore } from '../../logic/singleton';
 
-    this.systemLocales().then((response) => {
-      this.trigger({ locales: response });
-      this.locales = response.locales;
-    });
-  },
-  getInitialState() {
-    return { system: this.system, locales: this.locales };
-  },
-  info() {
-    const url = URLUtils.qualifyUrl(ApiRoutes.SystemApiController.info().url);
+// eslint-disable-next-line import/prefer-default-export
+export const SystemStore = singletonStore(
+  'core.System',
+  () => Reflux.createStore({
+    system: undefined,
+    locales: undefined,
+    init() {
+      this.info().then((response) => {
+        this.trigger({ system: response });
+        this.system = response;
+      });
 
-    return fetch('GET', url);
-  },
-  jvm() {
-    const url = URLUtils.qualifyUrl(ApiRoutes.SystemApiController.jvm().url);
+      this.systemLocales().then((response) => {
+        this.trigger({ locales: response });
+        this.locales = response.locales;
+      });
+    },
+    getInitialState() {
+      return { system: this.system, locales: this.locales };
+    },
+    info() {
+      const url = URLUtils.qualifyUrl(ApiRoutes.SystemApiController.info().url);
 
-    return fetch('GET', url);
-  },
-  systemLocales() {
-    const url = URLUtils.qualifyUrl(ApiRoutes.SystemApiController.locales().url);
+      return fetch('GET', url);
+    },
+    jvm() {
+      const url = URLUtils.qualifyUrl(ApiRoutes.SystemApiController.jvm().url);
 
-    return fetch('GET', url);
-  },
-  elasticsearchVersion() {
-    const url = URLUtils.qualifyUrl(ApiRoutes.ClusterApiResource.elasticsearchStats().url);
+      return fetch('GET', url);
+    },
+    systemLocales() {
+      const url = URLUtils.qualifyUrl(ApiRoutes.SystemApiController.locales().url);
 
-    const promise = new Promise((resolve, reject) => {
-      fetch('GET', url).then((response) => {
-        const splitVersion = response.cluster_version.split('.');
+      return fetch('GET', url);
+    },
+    elasticsearchVersion() {
+      const url = URLUtils.qualifyUrl(ApiRoutes.ClusterApiResource.elasticsearchStats().url);
 
-        resolve({ major: splitVersion[0], minor: splitVersion[1], patch: splitVersion[2] });
-      }).catch(reject);
-    });
+      const promise = new Promise((resolve, reject) => {
+        fetch('GET', url).then((response) => {
+          const splitVersion = response.cluster_version.split('.');
 
-    return promise;
-  },
-});
+          resolve({ major: splitVersion[0], minor: splitVersion[1], patch: splitVersion[2] });
+        }).catch(reject);
+      });
 
-export default SystemStore;
+      return promise;
+    },
+  }),
+);

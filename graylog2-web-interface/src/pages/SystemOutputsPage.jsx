@@ -18,11 +18,9 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
-import StoreProvider from 'injection/StoreProvider';
 import { DocumentTitle, PageHeader } from 'components/common';
 import OutputsComponent from 'components/outputs/OutputsComponent';
-
-const CurrentUserStore = StoreProvider.getStore('CurrentUser');
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 
 const SystemOutputsPage = createReactClass({
   displayName: 'SystemOutputsPage',

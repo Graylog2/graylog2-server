@@ -97,7 +97,7 @@ public class ElasticsearchBackendUsingCorrectIndicesTest extends ElasticsearchBa
         this.query = Query.builder()
                 .id("query1")
                 .timerange(RelativeRange.create(600))
-                .query(ElasticsearchQueryString.builder().queryString("*").build())
+                .query(ElasticsearchQueryString.of("*"))
                 .searchTypes(ImmutableSet.of(MessageList.builder().id("1").build()))
                 .build();
         final Search search = Search.builder()
@@ -145,7 +145,7 @@ public class ElasticsearchBackendUsingCorrectIndicesTest extends ElasticsearchBa
         return Query.builder()
                 .id("query1")
                 .timerange(timeRange)
-                .query(ElasticsearchQueryString.builder().queryString("*").build())
+                .query(ElasticsearchQueryString.of("*"))
                 .searchTypes(ImmutableSet.of(MessageList.builder().id("1").build()))
                 .build();
     }

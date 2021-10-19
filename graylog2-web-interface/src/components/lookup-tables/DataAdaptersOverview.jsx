@@ -22,11 +22,9 @@ import { Row, Col, Table, Popover, OverlayTrigger, Button } from 'components/gra
 import { PaginatedList, SearchForm, Spinner, Icon } from 'components/common';
 import DataAdapterTableEntry from 'components/lookup-tables/DataAdapterTableEntry';
 import Routes from 'routing/Routes';
-import CombinedProvider from 'injection/CombinedProvider';
+import { LookupTableDataAdaptersActions } from 'stores/lookup-tables/LookupTableDataAdaptersStore';
 
 import Styles from './Overview.css';
-
-const { LookupTableDataAdaptersActions } = CombinedProvider.get('LookupTableDataAdapters');
 
 class DataAdaptersOverview extends React.Component {
   static propTypes = {

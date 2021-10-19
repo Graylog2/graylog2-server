@@ -27,9 +27,6 @@ import org.joda.time.DateTime;
 @AutoValue
 @JsonTypeName(KeywordRange.KEYWORD)
 public abstract class KeywordRange extends TimeRange {
-
-    private static final NaturalDateParser DATE_PARSER = new NaturalDateParser();
-
     public static final String KEYWORD = "keyword";
 
     @JsonProperty
@@ -39,21 +36,28 @@ public abstract class KeywordRange extends TimeRange {
     @JsonProperty
     public abstract String keyword();
 
-    private static NaturalDateParser.Result parseResult(String keyword) throws InvalidRangeParametersException {
+    @JsonProperty
+    public abstract String timezone();
+
+    private static NaturalDateParser.Result parseResult(String timezone, String keyword) throws InvalidRangeParametersException {
         try {
-            return DATE_PARSER.parse(keyword);
+            return new NaturalDateParser(timezone).parse(keyword);
         } catch (NaturalDateParser.DateNotParsableException e) {
             throw new InvalidRangeParametersException("Could not parse from natural date: " + keyword);
         }
     }
 
     @JsonCreator
-    public static KeywordRange create(@JsonProperty("type") String type, @JsonProperty("keyword") String keyword) throws InvalidRangeParametersException {
-        return builder().type(type).keyword(keyword).build();
+    public static KeywordRange create(@JsonProperty("type") final String type, @JsonProperty("keyword") final String keyword, @JsonProperty("timezone") String timezone) throws InvalidRangeParametersException {
+        // add default if there is no TZ in the db
+        if (timezone == null) {
+            timezone = "Etc/UTC";
+        }
+        return builder().timezone(timezone).type(type).keyword(keyword).build();
     }
 
-    public static KeywordRange create(String keyword) throws InvalidRangeParametersException {
-        return create(KEYWORD, keyword);
+    public static KeywordRange create(String keyword, String timezone) throws InvalidRangeParametersException {
+        return create(KEYWORD, keyword, timezone);
     }
 
     private static Builder builder() {
@@ -68,7 +72,7 @@ public abstract class KeywordRange extends TimeRange {
     @Override
     public DateTime getFrom() {
         try {
-            return parseResult(keyword()).getFrom();
+            return parseResult(timezone(), keyword()).getFrom();
         } catch (InvalidRangeParametersException e) {
             return null;
         }
@@ -78,7 +82,7 @@ public abstract class KeywordRange extends TimeRange {
     @Override
     public DateTime getTo() {
         try {
-            return parseResult(keyword()).getTo();
+            return parseResult(timezone(), keyword()).getTo();
         } catch (InvalidRangeParametersException e) {
             return null;
         }
@@ -90,12 +94,16 @@ public abstract class KeywordRange extends TimeRange {
 
         public abstract Builder keyword(String keyword);
 
+        public abstract Builder timezone(String timezone);
+
         abstract String keyword();
+
+        abstract String timezone();
 
         abstract KeywordRange autoBuild();
 
         public KeywordRange build() throws InvalidRangeParametersException {
-            parseResult(keyword());
+            parseResult(timezone(), keyword());
             return autoBuild();
         }
     }

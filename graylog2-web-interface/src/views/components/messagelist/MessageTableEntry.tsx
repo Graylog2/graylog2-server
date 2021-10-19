@@ -20,13 +20,13 @@ import * as Immutable from 'immutable';
 import styled from 'styled-components';
 
 import { useStore } from 'stores/connect';
-import CombinedProvider from 'injection/CombinedProvider';
 import { StreamsStore, Stream } from 'views/stores/StreamsStore';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import { Input } from 'components/messageloaders/Types';
 import { MESSAGE_FIELD } from 'views/Constants';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
+import { InputsStore } from 'stores/inputs/InputsStore';
 
 import CustomHighlighting from './CustomHighlighting';
 import MessageDetail from './MessageDetail';
@@ -35,8 +35,6 @@ import MessagePreview from './MessagePreview';
 import type { Message } from './Types';
 
 import TypeSpecificValue from '../TypeSpecificValue';
-
-const { InputsStore } = CombinedProvider.get('Inputs');
 
 export const TableBody = styled.tbody<{ expanded?: boolean, highlighted?: boolean }>(({ expanded, highlighted, theme }) => `
   && {

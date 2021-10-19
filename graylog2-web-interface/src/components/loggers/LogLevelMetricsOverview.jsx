@@ -19,10 +19,8 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
-import StoreProvider from 'injection/StoreProvider';
 import { LogLevelMetrics } from 'components/loggers';
-
-const LoggersStore = StoreProvider.getStore('Loggers');
+import { LoggersStore } from 'stores/system/LoggersStore';
 
 const LogLevelMetricsOverview = createReactClass({
   displayName: 'LogLevelMetricsOverview',

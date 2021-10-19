@@ -28,7 +28,7 @@ import CustomHighlighting from 'views/components/messagelist/CustomHighlighting'
 import RenderCompletionCallback from 'views/components/widgets/RenderCompletionCallback';
 import NumberVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
-import { makeVisualization } from 'views/components/aggregationbuilder/AggregationBuilder';
+import { makeVisualization, retrieveChartData } from 'views/components/aggregationbuilder/AggregationBuilder';
 
 import Trend from './Trend';
 import AutoFontSizer from './AutoFontSizer';
@@ -38,7 +38,7 @@ import type { CurrentViewType } from '../../CustomPropTypes';
 const GridContainer = styled.div`
   display: grid;
   grid-template-columns: 1fr;
-  grid-template-rows: 4fr 1fr;
+  grid-template-rows: 1fr auto;
   grid-column-gap: 0;
   grid-row-gap: 0;
   height: 100%;
@@ -89,7 +89,7 @@ const _extractValueAndField = (rows: Rows) => {
 };
 
 type Props = {
-  currentView: CurrentViewType,
+  currentView: CurrentViewType;
 } & VisualizationComponentProps;
 
 const _extractFirstSeriesName = (config) => {
@@ -109,7 +109,7 @@ const NumberVisualization = ({ config, currentView, fields, data }: Props) => {
 
   useEffect(onRenderComplete, [onRenderComplete]);
   const { activeQuery } = currentView;
-  const chartRows = (data.chart ?? Object.values(data)[0]) as Rows;
+  const chartRows = retrieveChartData(data);
   const trendRows = data.trend;
   const { value } = _extractValueAndField(chartRows);
   const { value: previousValue } = _extractValueAndField(trendRows || []);

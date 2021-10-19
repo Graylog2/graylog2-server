@@ -20,11 +20,9 @@ import React from 'react';
 import { LinkContainer, Link } from 'components/graylog/router';
 import { Button } from 'components/graylog';
 import Routes from 'routing/Routes';
-import CombinedProvider from 'injection/CombinedProvider';
 import { MetricsMapper, MetricContainer, CounterRate } from 'components/metrics';
 import NumberUtils from 'util/NumberUtils';
-
-const { LookupTableCachesActions } = CombinedProvider.get('LookupTableCaches');
+import { LookupTableCachesActions } from 'stores/lookup-tables/LookupTableCachesStore';
 
 class LUTTableEntry extends React.Component {
   static propTypes = {

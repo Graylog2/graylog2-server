@@ -28,6 +28,7 @@ import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.Set;
 
@@ -72,12 +73,19 @@ public abstract class ClusterEvent {
 
     public static ClusterEvent create(@NotEmpty String producer,
                                       @NotEmpty String eventClass,
+                                      @NotNull Set<String> excludedNodeIds,
                                       @NotEmpty Object payload) {
         return create(null,
                 DateTime.now(DateTimeZone.UTC).getMillis(),
                 producer,
-                Collections.<String>emptySet(),
+                excludedNodeIds,
                 eventClass,
                 payload);
+    }
+
+    public static ClusterEvent create(@NotEmpty String producer,
+                                      @NotEmpty String eventClass,
+                                      @NotEmpty Object payload) {
+        return create(producer, eventClass, Collections.emptySet(), payload);
     }
 }

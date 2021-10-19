@@ -25,7 +25,8 @@
       "index_analyzer": "standard",
       "index_template_name": "test_1",
       "index_optimization_max_num_segments": 1,
-      "index_optimization_disabled": false
+      "index_optimization_disabled": false,
+      "regular": true,
     },
     {
       "_id": {
@@ -51,7 +52,8 @@
       "index_analyzer": "standard",
       "index_template_name": "test_2",
       "index_optimization_max_num_segments": 1,
-      "index_optimization_disabled": false
+      "index_optimization_disabled": false,
+      "regular": false
     },
     {
       "_id": {

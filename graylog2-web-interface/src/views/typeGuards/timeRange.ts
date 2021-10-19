@@ -22,7 +22,12 @@ import {
   RelativeTimeRangeWithEnd,
   KeywordTimeRange,
   RelativeTimeRange,
+  AbsoluteTimeRange,
 } from 'views/logic/queries/Query';
+
+export const isTypeAbsolute = (timeRange: TimeRange | NoTimeRangeOverride): timeRange is AbsoluteTimeRange => {
+  return 'type' in timeRange && timeRange.type === 'absolute';
+};
 
 export const isTypeRelative = (timeRange: TimeRange | NoTimeRangeOverride): timeRange is RelativeTimeRange => {
   return 'type' in timeRange && timeRange.type === 'relative';

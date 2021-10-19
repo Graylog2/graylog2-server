@@ -99,11 +99,11 @@ public class ContentPackResourceTest {
     @Test
     public void uploadContentPack() throws Exception {
         final ContentPack contentPack = objectMapper.readValue(CONTENT_PACK, ContentPack.class);
-        when(contentPackPersistenceService.insert(contentPack)).thenReturn(Optional.ofNullable(contentPack));
+        when(contentPackPersistenceService.filterMissingResourcesAndInsert(contentPack)).thenReturn(Optional.ofNullable(contentPack));
 
         final Response response = contentPackResource.createContentPack(contentPack);
 
-        verify(contentPackPersistenceService, times(1)).insert(contentPack);
+        verify(contentPackPersistenceService, times(1)).filterMissingResourcesAndInsert(contentPack);
         assertThat(response.getStatusInfo()).isEqualTo(Response.Status.CREATED);
     }
 

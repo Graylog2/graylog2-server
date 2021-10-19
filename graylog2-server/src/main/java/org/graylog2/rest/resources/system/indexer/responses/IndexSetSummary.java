@@ -106,7 +106,7 @@ public abstract class IndexSetSummary {
     public abstract Duration fieldTypeRefreshInterval();
 
     @JsonProperty("index_template_type")
-    public abstract Optional<IndexSetConfig.TemplateType> templateType();
+    public abstract Optional<String> templateType();
 
     @JsonCreator
     public static IndexSetSummary create(@JsonProperty("id") @Nullable String id,
@@ -114,6 +114,7 @@ public abstract class IndexSetSummary {
                                          @JsonProperty("description") @Nullable String description,
                                          @JsonProperty("default") boolean isDefault,
                                          @JsonProperty("writable") boolean isWritable,
+                                         @JsonProperty("can_be_default") boolean canBeDefault,
                                          @JsonProperty("index_prefix") @Pattern(regexp = IndexSetConfig.INDEX_PREFIX_REGEX) String indexPrefix,
                                          @JsonProperty("shards") @Min(1) int shards,
                                          @JsonProperty("replicas") @Min(0) int replicas,
@@ -126,8 +127,8 @@ public abstract class IndexSetSummary {
                                          @JsonProperty("index_optimization_max_num_segments") @Min(1L) int indexOptimizationMaxNumSegments,
                                          @JsonProperty("index_optimization_disabled") boolean indexOptimizationDisabled,
                                          @JsonProperty("field_type_refresh_interval") Duration fieldTypeRefreshInterval,
-                                         @JsonProperty("index_template_type") @Nullable IndexSetConfig.TemplateType templateType) {
-        return new AutoValue_IndexSetSummary(id, title, description, isDefault, IndexSetConfig.isRegularIndex(templateType, isWritable),
+                                         @JsonProperty("index_template_type") @Nullable String templateType) {
+        return new AutoValue_IndexSetSummary(id, title, description, isDefault, canBeDefault,
                 isWritable, indexPrefix, shards, replicas,
                 rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy, creationDate,
                 indexAnalyzer, indexOptimizationMaxNumSegments, indexOptimizationDisabled, fieldTypeRefreshInterval,
@@ -141,6 +142,7 @@ public abstract class IndexSetSummary {
                 indexSet.description(),
                 isDefault,
                 indexSet.isWritable(),
+                indexSet.isRegularIndex(),
                 indexSet.indexPrefix(),
                 indexSet.shards(),
                 indexSet.replicas(),
@@ -157,12 +159,13 @@ public abstract class IndexSetSummary {
 
     }
 
-    public IndexSetConfig toIndexSetConfig() {
+    public IndexSetConfig toIndexSetConfig(boolean isRegular) {
         final IndexSetConfig.Builder builder = IndexSetConfig.builder()
                 .id(id())
                 .title(title())
                 .description(description())
                 .isWritable(isWritable())
+                .isRegular(isRegular)
                 .indexPrefix(indexPrefix())
                 .shards(shards())
                 .replicas(replicas())

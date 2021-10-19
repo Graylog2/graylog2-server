@@ -18,6 +18,7 @@ import loadAsync from 'routing/loadAsync';
 
 const SourceCodeEditor = loadAsync(() => import('./SourceCodeEditor'));
 
+export { default as Center } from './Center';
 export { default as ClipboardButton } from './ClipboardButton';
 export { default as ColorPicker } from './ColorPicker';
 export { default as ColorPickerPopover } from './ColorPickerPopover';
@@ -70,7 +71,6 @@ export { default as Pluralize } from './Pluralize';
 export { default as ReactGridContainer } from './ReactGridContainer';
 export { default as ReadOnlyFormGroup } from './ReadOnlyFormGroup';
 export { default as QueryHelper } from './QueryHelper';
-export { default as Scratchpad } from './Scratchpad';
 export { default as ScrollButton } from './ScrollButton';
 export { default as SearchForm } from './SearchForm';
 export { default as Select } from './Select';
@@ -80,7 +80,6 @@ export { default as SortableList } from './SortableList';
 export { default as ShareButton } from './ShareButton';
 export { SourceCodeEditor };
 export { default as Spinner } from './Spinner';
-export { default as TableList } from './TableList';
 export { default as TextOverflowEllipsis } from './TextOverflowEllipsis';
 export { default as Timestamp } from './Timestamp';
 export { default as TimezoneSelect } from './TimezoneSelect';

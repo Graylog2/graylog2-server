@@ -22,8 +22,11 @@ import com.codahale.metrics.Timer;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.graylog.failure.ProcessingFailureCause;
+import org.graylog2.inputs.extractors.ExtractorException;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.database.EmbeddedPersistable;
+import org.graylog2.shared.utilities.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -126,6 +129,13 @@ public abstract class Extractor implements EmbeddedPersistable {
     private final String converterTimerName;
     private final String completeTimerName;
 
+    /**
+     * Performs the extractor run.
+     *
+     * @param field the field to extract
+     * @return the extraction result
+     * @throws ExtractorException if the extraction hit an error
+     */
     protected abstract Result[] run(String field);
 
     public Extractor(MetricRegistry metricRegistry,
@@ -211,7 +221,16 @@ public abstract class Extractor implements EmbeddedPersistable {
             }
 
             try (final Timer.Context ignored2 = executionTimer.time()) {
-                final Result[] results = run(field);
+                Result[] results;
+                try {
+                    results = run(field);
+                } catch (ExtractorException e) {
+                    final String error = "Could not apply extractor <" + getTitle() + " (" + getId() + ")>";
+                    msg.addProcessingError(new Message.ProcessingError(
+                            ProcessingFailureCause.ExtractorException, error, ExceptionUtils.getRootCauseMessage(e)));
+                    return;
+                }
+
                 if (results == null || results.length == 0 || Arrays.stream(results).anyMatch(result -> result.getValue() == null)) {
                     return;
                 } else if (results.length == 1 && results[0].target == null) {
@@ -281,7 +300,14 @@ public abstract class Extractor implements EmbeddedPersistable {
                     }
                 } catch (Exception e) {
                     this.converterExceptions.incrementAndGet();
-                    LOG.error("Could not apply converter [" + converter.getType() + "] of extractor [" + getId() + "].", e);
+                    final String error = "Could not apply converter [" + converter.getType() + "] of extractor <" + getTitle() + " (" + getId() + ")>";
+                    if (LOG.isDebugEnabled()) {
+                        LOG.error(error, e);
+                    } else {
+                        LOG.error("{}:\n{}", error, ExceptionUtils.getShortenedStackTrace(e));
+                    }
+                    msg.addProcessingError(new Message.ProcessingError(ProcessingFailureCause.ExtractorException,
+                            error, ExceptionUtils.getRootCauseMessage(e)));
                 }
             }
         }
@@ -449,8 +475,12 @@ public abstract class Extractor implements EmbeddedPersistable {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             Result result = (Result) o;
             return Objects.equals(beginIndex, result.beginIndex) &&
                     Objects.equals(endIndex, result.endIndex) &&

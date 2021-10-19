@@ -23,10 +23,9 @@ import Reflux from 'reflux';
 import numeral from 'numeral';
 import styled, { css } from 'styled-components';
 
-import StoreProvider from 'injection/StoreProvider';
-import ActionsProvider from 'injection/ActionsProvider';
 import NumberUtils from 'util/NumberUtils';
 import { Icon, LinkToNode, Spinner } from 'components/common';
+import { MetricsActions, MetricsStore } from 'stores/metrics/MetricsStore';
 
 const InputIO = styled.span(({ theme }) => css`
   .total {
@@ -56,9 +55,6 @@ const InputIO = styled.span(({ theme }) => css`
     top: -1px;
   }
 `);
-
-const MetricsStore = StoreProvider.getStore('Metrics');
-const MetricsActions = ActionsProvider.getActions('Metrics');
 
 const InputThroughput = createReactClass({
   displayName: 'InputThroughput',

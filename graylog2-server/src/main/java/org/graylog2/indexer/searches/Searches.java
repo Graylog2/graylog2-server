@@ -25,7 +25,6 @@ import com.google.common.collect.ImmutableSortedSet;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
-import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
@@ -54,6 +53,8 @@ import java.util.stream.Collectors;
 import static com.codahale.metrics.MetricRegistry.name;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Objects.requireNonNull;
+import static org.graylog2.indexer.EventIndexTemplateProvider.EVENT_TEMPLATE_TYPE;
+import static org.graylog2.indexer.MessageIndexTemplateProvider.MESSAGE_TEMPLATE_TYPE;
 
 @Singleton
 public class Searches {
@@ -252,7 +253,7 @@ public class Searches {
         final SortedSet<IndexRange> indexRanges = indexRangeService.find(range.getFrom(), range.getTo());
         final Set<String> affectedIndexNames = indexRanges.stream().map(IndexRange::indexName).collect(Collectors.toSet());
         final Set<IndexSet> eventIndexSets = indexSetRegistry.getForIndices(affectedIndexNames).stream()
-                .filter(indexSet1 -> IndexSetConfig.TemplateType.EVENTS.equals(indexSet1.getConfig().indexTemplateType().orElse(IndexSetConfig.TemplateType.MESSAGES)))
+                .filter(indexSet1 -> EVENT_TEMPLATE_TYPE.equals(indexSet1.getConfig().indexTemplateType().orElse(MESSAGE_TEMPLATE_TYPE)))
                 .collect(Collectors.toSet());
         for (IndexRange indexRange : indexRanges) {
             // if we aren't in a stream search, we look at all the ranges matching the time range.

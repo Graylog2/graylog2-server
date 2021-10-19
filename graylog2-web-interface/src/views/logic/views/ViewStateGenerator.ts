@@ -16,7 +16,7 @@
  */
 import * as Immutable from 'immutable';
 
-import CombinedProvider from 'injection/CombinedProvider';
+import { DecoratorsActions } from 'stores/decorators/DecoratorsStore';
 
 import View from './View';
 import ViewState from './ViewState';
@@ -37,7 +37,6 @@ type DefaultWidgets = Record<ViewType, ViewCreator>;
 
 const _defaultWidgets: DefaultWidgets = {
   [View.Type.Search]: async (streamId: string | undefined | null) => {
-    const { DecoratorsActions } = CombinedProvider.get('Decorators');
     const decorators = await DecoratorsActions.list();
     const streamDecorators = decorators ? decorators.filter((decorator) => decorator.stream === streamId) : [];
     const histogram = resultHistogram();

@@ -17,7 +17,9 @@
 import * as React from 'react';
 import type { ActionContexts } from 'views/types';
 
-const ActionContext = React.createContext<ActionContexts>({} as ActionContexts);
+import { singleton } from 'logic/singleton';
+
+const ActionContext = singleton('contexts.ActionContext', () => React.createContext<ActionContexts>({} as ActionContexts));
 
 type Props = {
   children: React.ReactNode,

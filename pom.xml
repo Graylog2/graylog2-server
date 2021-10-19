@@ -30,7 +30,7 @@
 
     <groupId>org.graylog</groupId>
     <artifactId>graylog-parent</artifactId>
-    <version>4.2.0-SNAPSHOT</version>
+    <version>4.3.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Graylog Parent POM</name>
@@ -176,7 +176,7 @@
         <nosqlunit.version>1.0.0-rc.5</nosqlunit.version>
         <restassured.version>4.3.1</restassured.version>
         <system-rules.version>1.19.0</system-rules.version>
-        <testcontainers.version>1.15.2</testcontainers.version>
+        <testcontainers.version>1.16.0</testcontainers.version>
 
         <!-- Nodejs dependencies -->
         <nodejs.version>v14.15.4</nodejs.version>
@@ -305,7 +305,7 @@
                 <plugin>
                     <groupId>de.thetaphi</groupId>
                     <artifactId>forbiddenapis</artifactId>
-                    <version>2.5</version>
+                    <version>3.1</version>
                 </plugin>
                 <plugin>
                     <groupId>com.github.eirslett</groupId>

@@ -20,11 +20,9 @@ import React from 'react';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import { Input } from 'components/bootstrap';
 import { Select, Spinner } from 'components/common';
-import CombinedProvider from 'injection/CombinedProvider';
 import * as FormsUtils from 'util/FormsUtils';
 import AppConfig from 'util/AppConfig';
-
-const { IndexSetsActions } = CombinedProvider.get('IndexSets');
+import { IndexSetsActions } from 'stores/indices/IndexSetsStore';
 
 class StreamForm extends React.Component {
   static propTypes = {
