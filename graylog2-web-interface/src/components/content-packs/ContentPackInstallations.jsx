@@ -18,8 +18,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { DataTable } from 'components/common';
-import { Button, ButtonToolbar, Modal } from 'components/graylog';
-import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
+import { BootstrapModalWrapper, Button, ButtonToolbar, Modal } from 'components/bootstrap';
 import Spinner from 'components/common/Spinner';
 import ContentPackInstallationView from 'components/content-packs/ContentPackInstallView';
 

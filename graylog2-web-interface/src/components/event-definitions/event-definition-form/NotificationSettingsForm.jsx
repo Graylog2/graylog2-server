@@ -19,7 +19,7 @@ import PropTypes from 'prop-types';
 import lodash from 'lodash';
 import moment from 'moment';
 
-import { ControlLabel, FormControl, FormGroup, HelpBlock, InputGroup } from 'components/graylog';
+import { ControlLabel, FormControl, FormGroup, HelpBlock, InputGroup } from 'components/bootstrap';
 import { TimeUnitInput } from 'components/common';
 import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
 import * as FormsUtils from 'util/FormsUtils';

@@ -19,8 +19,8 @@ import styled from 'styled-components';
 import { $PropertyType } from 'utility-types';
 
 import UserOverview from 'logic/users/UserOverview';
-import { OverlayTrigger, Popover } from 'components/graylog';
-import { Timestamp } from 'components/common';
+import { OverlayTrigger, Timestamp } from 'components/common';
+import { Popover } from 'components/bootstrap';
 
 import LoggedInIcon from '../../LoggedInIcon';
 

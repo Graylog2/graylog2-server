@@ -18,7 +18,7 @@ import * as React from 'react';
 import styled, { css } from 'styled-components';
 
 import DocsHelper from 'util/DocsHelper';
-import { Jumbotron } from 'components/graylog';
+import { Jumbotron } from 'components/bootstrap';
 import DocumentationLink from 'components/support/DocumentationLink';
 import IfDashboard from 'views/components/dashboard/IfDashboard';
 import IfSearch from 'views/components/search/IfSearch';

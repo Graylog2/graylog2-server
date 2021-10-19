@@ -19,7 +19,7 @@ import { useState, useEffect } from 'react';
 
 import AuthenticationOverviewLinks from 'components/authentication/AuthenticationOverviewLinks';
 import withParams from 'routing/withParams';
-import { LinkContainer } from 'components/graylog/router';
+import { LinkContainer } from 'components/common/router';
 import {} from 'components/authentication/bindings'; // Bind all authentication plugins
 import DocsHelper from 'util/DocsHelper';
 import StringUtils from 'util/StringUtils';
@@ -28,7 +28,7 @@ import { Spinner, PageHeader, DocumentTitle } from 'components/common';
 import BackendDetails from 'components/authentication/BackendDetails';
 import DocumentationLink from 'components/support/DocumentationLink';
 import Routes from 'routing/Routes';
-import { Button } from 'components/graylog';
+import { Button } from 'components/bootstrap';
 import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
 
 type Props = {

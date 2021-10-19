@@ -20,7 +20,7 @@ import { DefaultTheme, withTheme } from 'styled-components';
 import { merge } from 'lodash';
 import { Overlay, RootCloseWrapper } from 'react-overlays';
 
-import { Popover } from 'components/graylog';
+import { Popover } from 'components/bootstrap';
 import ColorPicker from 'components/common/ColorPicker';
 import Plot from 'views/components/visualizations/plotly/AsyncPlot';
 import { colors as defaultColors } from 'views/components/visualizations/Colors';

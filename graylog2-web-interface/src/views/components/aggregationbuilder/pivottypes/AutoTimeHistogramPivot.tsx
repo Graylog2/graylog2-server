@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 
-import { FormControl, HelpBlock } from 'components/graylog';
+import { FormControl, HelpBlock } from 'components/bootstrap';
 import { Icon } from 'components/common';
 import * as FormsUtils from 'util/FormsUtils';
 

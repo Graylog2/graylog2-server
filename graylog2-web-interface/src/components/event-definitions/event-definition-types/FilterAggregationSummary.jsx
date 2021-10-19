@@ -18,10 +18,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 
-import { Link } from 'components/graylog/router';
-import { Alert } from 'components/graylog';
-import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
+import { Link } from 'components/common/router';
+import { Alert } from 'components/bootstrap';
 import { Icon } from 'components/common';
+import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
 import { isPermitted } from 'util/PermissionsMixin';
 import { naturalSortIgnoreCase } from 'util/SortUtils';
 import Routes from 'routing/Routes';

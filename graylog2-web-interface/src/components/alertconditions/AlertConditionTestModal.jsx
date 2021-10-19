@@ -17,9 +17,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { BootstrapModalWrapper } from 'components/bootstrap';
+import { BootstrapModalWrapper, Alert, Modal, Button } from 'components/bootstrap';
 import { Spinner, Icon } from 'components/common';
-import { Alert, Modal, Button } from 'components/graylog';
 import { AlertConditionsActions } from 'stores/alertconditions/AlertConditionsStore';
 
 import style from './AlertConditionTestModal.css';

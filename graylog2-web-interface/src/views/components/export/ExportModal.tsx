@@ -27,7 +27,7 @@ import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStor
 import View from 'views/logic/views/View';
 import Widget from 'views/logic/widgets/Widget';
 import { Icon, Spinner } from 'components/common';
-import { Modal, Button } from 'components/graylog';
+import { Modal, Button } from 'components/bootstrap';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import ExportWidgetSelection from 'views/components/export/ExportWidgetSelection';
 import { MESSAGE_FIELD, SOURCE_FIELD, TIMESTAMP_FIELD } from 'views/Constants';

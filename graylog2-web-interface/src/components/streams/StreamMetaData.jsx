@@ -20,7 +20,7 @@ import styled from 'styled-components';
 
 import CollapsibleStreamRuleList from 'components/streamrules/CollapsibleStreamRuleList';
 import { Pluralize } from 'components/common';
-import { Button } from 'components/graylog';
+import { Button } from 'components/bootstrap';
 
 import StreamThroughput from './StreamThroughput';
 

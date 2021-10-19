@@ -17,8 +17,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { LinkContainer, Link } from 'components/graylog/router';
-import { Button } from 'components/graylog';
+import { LinkContainer, Link } from 'components/common/router';
+import { Button } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import { MetricsMapper, MetricContainer, CounterRate } from 'components/metrics';
 import NumberUtils from 'util/NumberUtils';

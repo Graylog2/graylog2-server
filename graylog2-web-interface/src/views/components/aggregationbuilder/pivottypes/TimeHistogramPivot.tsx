@@ -17,7 +17,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 
-import { Checkbox, ControlLabel, FormGroup } from 'components/graylog';
+import { Checkbox, ControlLabel, FormGroup } from 'components/bootstrap';
 
 import TypeSpecificTimeHistogramConfiguration from './TypeSpecificTimeHistogramConfiguration';
 import styles from './TimeHistogramPivot.css';

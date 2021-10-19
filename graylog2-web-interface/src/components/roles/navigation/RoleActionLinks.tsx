@@ -17,10 +17,10 @@
 import * as React from 'react';
 import { $PropertyType } from 'utility-types';
 
-import { LinkContainer } from 'components/graylog/router';
+import { LinkContainer } from 'components/common/router';
 import Role from 'logic/roles/Role';
 import Routes from 'routing/Routes';
-import { ButtonToolbar, Button } from 'components/graylog';
+import { ButtonToolbar, Button } from 'components/bootstrap';
 
 type Props = {
   roleId: $PropertyType<Role, 'id'>,

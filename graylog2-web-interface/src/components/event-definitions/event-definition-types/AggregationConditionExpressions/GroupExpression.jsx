@@ -19,7 +19,7 @@ import PropTypes from 'prop-types';
 import { cloneDeep } from 'lodash';
 import styled from 'styled-components';
 
-import { Clearfix } from 'components/graylog';
+import { Clearfix } from 'components/bootstrap';
 import { internalNodePropType } from 'logic/alerts/AggregationExpressionTypes';
 import { replaceBooleanExpressionOperatorInGroup } from 'logic/alerts/AggregationExpressionConfig';
 

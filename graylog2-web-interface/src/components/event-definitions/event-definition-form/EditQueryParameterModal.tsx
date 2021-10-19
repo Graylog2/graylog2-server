@@ -19,8 +19,7 @@ import lodash from 'lodash';
 import React from 'react';
 
 import LookupTableParameterEdit from 'components/lookup-table-parameters/LookupTableParameterEdit';
-import { Button } from 'components/graylog';
-import { BootstrapModalForm } from 'components/bootstrap';
+import { Button, BootstrapModalForm } from 'components/bootstrap';
 import type { LookupTable } from 'logic/lookup-tables/types';
 import LookupTableParameter, { LookupTableParameterJson } from 'views/logic/parameters/LookupTableParameter';
 

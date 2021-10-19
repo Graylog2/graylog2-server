@@ -18,7 +18,7 @@ import PropTypes from 'prop-types';
 import React, { useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 
-import { Row, Col, Alert } from 'components/graylog';
+import { Row, Col, Alert } from 'components/bootstrap';
 import { EntityList, Pluralize } from 'components/common';
 import type { PipelineType, StageType } from 'stores/pipelines/PipelinesStore';
 import { Stream } from 'stores/streams/StreamsStore';

@@ -16,10 +16,10 @@
  */
 import * as React from 'react';
 
-import { LinkContainer } from 'components/graylog/router';
+import { LinkContainer } from 'components/common/router';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
-import { Button } from 'components/graylog';
+import { Button } from 'components/bootstrap';
 import { PageHeader, DocumentTitle } from 'components/common';
 import UsersOverview from 'components/users/UsersOverview';
 import UserOverviewLinks from 'components/users/navigation/UserOverviewLinks';

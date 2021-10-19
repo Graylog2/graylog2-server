@@ -17,7 +17,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Alert, Col, DropdownButton, MenuItem } from 'components/graylog';
+import { Alert, Col, DropdownButton, MenuItem } from 'components/bootstrap';
 import { EntityListItem } from 'components/common';
 
 class UnknownAlertNotification extends React.Component {

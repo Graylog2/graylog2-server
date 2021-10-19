@@ -20,7 +20,7 @@ import { withTheme, DefaultTheme } from 'styled-components';
 
 import connect from 'stores/connect';
 import { isPermitted } from 'util/PermissionsMixin';
-import { Button, ButtonGroup, DropdownButton, MenuItem } from 'components/graylog';
+import { Button, ButtonGroup, DropdownButton, MenuItem } from 'components/bootstrap';
 import { Icon, ShareButton } from 'components/common';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import UserNotification from 'util/UserNotification';

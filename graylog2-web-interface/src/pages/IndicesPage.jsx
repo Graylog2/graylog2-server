@@ -16,9 +16,9 @@
  */
 import React from 'react';
 
-import { LinkContainer } from 'components/graylog/router';
+import { LinkContainer } from 'components/common/router';
 import Routes from 'routing/Routes';
-import { Col, Row, Button } from 'components/graylog';
+import { Col, Row, Button } from 'components/bootstrap';
 import DocsHelper from 'util/DocsHelper';
 import { DocumentTitle, PageHeader } from 'components/common';
 import { DocumentationLink } from 'components/support';

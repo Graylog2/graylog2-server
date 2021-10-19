@@ -20,7 +20,7 @@ import PropTypes from 'prop-types';
 
 import { MessagesActions } from 'stores/messages/MessagesStore';
 
-import { Button } from '../graylog';
+import { Button } from '../bootstrap';
 
 type LoadMessageFormProps = {
   loadMessage: (e: React.FormEvent) => void,

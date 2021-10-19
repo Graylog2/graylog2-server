@@ -18,7 +18,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import naturalSort from 'javascript-natural-sort';
 
-import { Col, Row } from 'components/graylog';
+import { Col, Row } from 'components/bootstrap';
 import { ClosedIndexDetails, IndexDetails, IndexSummary } from 'components/indices';
 
 class IndicesOverview extends React.Component {

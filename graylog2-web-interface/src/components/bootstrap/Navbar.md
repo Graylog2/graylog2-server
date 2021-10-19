@@ -1,7 +1,7 @@
 ### Default
 
 ```js
-import {Nav, NavItem, NavDropdown, MenuItem} from 'components/graylog';
+import {Nav, NavItem, NavDropdown, MenuItem} from 'components/bootstrap';
 
 <Navbar>
   <Nav activeKey={1}>
@@ -28,7 +28,7 @@ import {Nav, NavItem, NavDropdown, MenuItem} from 'components/graylog';
 ### Inversed
 
 ```js
-import {Nav, NavItem, NavDropdown, MenuItem} from 'components/graylog';
+import {Nav, NavItem, NavDropdown, MenuItem} from 'components/bootstrap';
 
 <Navbar inverse>
   <Nav activeKey={1}>

@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { mount } from 'wrappedEnzyme';
 
-import { MenuItem } from 'components/graylog';
+import { MenuItem } from 'components/bootstrap';
 
 import ActionDropdown from './ActionDropdown';
 

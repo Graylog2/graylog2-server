@@ -20,8 +20,7 @@ import styled from 'styled-components';
 
 import DateTime from 'logic/datetimes/DateTime';
 import { Icon } from 'components/common';
-import { Button } from 'components/graylog';
-import { Input } from 'components/bootstrap';
+import { Button, Input } from 'components/bootstrap';
 
 const Wrapper = styled.div`
   margin: 9px 6px;

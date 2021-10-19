@@ -33,7 +33,7 @@ import Search from 'views/logic/search/Search';
 import CopyWidgetToDashboard from 'views/logic/views/CopyWidgetToDashboard';
 import type { ViewStoreState } from 'views/stores/ViewStore';
 import IfSearch from 'views/components/search/IfSearch';
-import { MenuItem } from 'components/graylog';
+import { MenuItem } from 'components/bootstrap';
 import { WidgetActions } from 'views/stores/WidgetStore';
 import { useStore } from 'stores/connect';
 

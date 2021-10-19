@@ -18,7 +18,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import { Alert } from 'components/graylog';
+import { Alert } from 'components/bootstrap';
 import Spinner from 'components/common/Spinner';
 
 import Delayed from './Delayed';

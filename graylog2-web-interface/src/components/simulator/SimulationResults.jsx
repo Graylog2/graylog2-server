@@ -17,7 +17,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 
-import { Alert, Col, DropdownButton, MenuItem, Row } from 'components/graylog';
+import { Alert, Col, DropdownButton, MenuItem, Row } from 'components/bootstrap';
 import { Spinner } from 'components/common';
 import MessageShow from 'components/search/MessageShow';
 import NumberUtils from 'util/NumberUtils';

@@ -16,8 +16,8 @@
  */
 import * as React from 'react';
 
-import { OverlayTrigger, Popover, Table, Button } from 'components/graylog';
-import { Icon } from 'components/common';
+import { Popover, Table, Button } from 'components/bootstrap';
+import { OverlayTrigger, Icon } from 'components/common';
 
 const sharedEntitiesQueryHelperPopover = (
   <Popover id="shared-entities-search-query-help" title="Search Syntax Help">

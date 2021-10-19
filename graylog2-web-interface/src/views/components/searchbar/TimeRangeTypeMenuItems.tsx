@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 
-import { MenuItem } from 'components/graylog';
+import { MenuItem } from 'components/bootstrap';
 import { availableTimeRangeTypes } from 'views/Constants';
 
 type ResultType = React.ReactElement<MenuItem>;

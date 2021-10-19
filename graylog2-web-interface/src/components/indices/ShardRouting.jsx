@@ -18,7 +18,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import classNames from 'classnames';
 
-import { OverlayTrigger, Tooltip } from 'components/graylog';
+import { OverlayTrigger } from 'components/common';
+import { Tooltip } from 'components/bootstrap';
 
 class ShardRouting extends React.Component {
   static propTypes = {

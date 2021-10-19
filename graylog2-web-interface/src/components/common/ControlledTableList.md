@@ -1,7 +1,7 @@
 ```js
 import createReactClass from 'create-react-class';
 import Immutable from 'immutable';
-import { Col, Row } from 'components/graylog';
+import { Col, Row } from 'components/bootstrap';
 
 const ControlledTableListExample = createReactClass({
   getInitialState() {

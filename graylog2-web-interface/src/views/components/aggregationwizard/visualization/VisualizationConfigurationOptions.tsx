@@ -36,7 +36,7 @@ const TitleLabelWithHelp = styled.div`
   align-items: center;
 `;
 
-const TitleHoverForHelp = styled(HoverForHelp)`
+const TitleHoverForHelp = styled((props) => <HoverForHelp {...props} />)`
   margin-left: 5px;
 `;
 

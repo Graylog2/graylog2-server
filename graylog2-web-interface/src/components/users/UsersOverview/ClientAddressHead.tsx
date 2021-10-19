@@ -17,8 +17,8 @@
 import * as React from 'react';
 import styled from 'styled-components';
 
-import { OverlayTrigger, Popover, Button } from 'components/graylog';
-import { Icon } from 'components/common';
+import { OverlayTrigger, Icon } from 'components/common';
+import { Popover, Button } from 'components/bootstrap';
 
 type Props = {
   title: string,

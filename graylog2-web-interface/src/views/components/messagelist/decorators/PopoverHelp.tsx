@@ -16,7 +16,8 @@
  */
 import * as React from 'react';
 
-import { Button, OverlayTrigger, Popover } from 'components/graylog';
+import { Button, Popover } from 'components/bootstrap';
+import { OverlayTrigger } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
 
