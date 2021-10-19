@@ -19,7 +19,7 @@ import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 
 import { ReadOnlyFormGroup, Spinner } from 'components/common';
-import { Alert, Well } from 'components/graylog';
+import { Alert, Well } from 'components/bootstrap';
 import { EventNotificationsActions } from 'stores/event-notifications/EventNotificationsStore';
 
 import emailStyles from '../event-notification-types/EmailNotificationSummary.css';

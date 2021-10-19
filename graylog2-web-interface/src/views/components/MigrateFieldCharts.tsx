@@ -32,7 +32,7 @@ import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import LineVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/LineVisualizationConfig';
 import AreaVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/AreaVisualizationConfig';
 import type { InterpolationMode } from 'views/logic/aggregationbuilder/visualizations/Interpolation';
-import { Alert, Button, Row, Col } from 'components/graylog';
+import { Alert, Button, Row, Col } from 'components/bootstrap';
 import Spinner from 'components/common/Spinner';
 import { TIMESTAMP_FIELD } from 'views/Constants';
 

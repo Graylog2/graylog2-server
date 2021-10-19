@@ -17,7 +17,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Row, Col } from 'components/graylog';
+import { Row, Col } from 'components/bootstrap';
 import history from 'util/History';
 import Routes from 'routing/Routes';
 import type { PipelineType } from 'stores/pipelines/PipelinesStore';

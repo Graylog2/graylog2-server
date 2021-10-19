@@ -19,7 +19,7 @@ import React from 'react';
 import { isEqual } from 'lodash';
 import styled from 'styled-components';
 
-import { tableCss } from 'components/graylog/Table';
+import { tableCss } from 'components/bootstrap/Table';
 
 import Filter from './Filter';
 import DataTableElement from './DataTableElement';

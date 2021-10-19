@@ -17,7 +17,7 @@
 import * as React from 'react';
 import styled, { css, DefaultTheme } from 'styled-components';
 
-import { Col, Row, HelpBlock } from 'components/graylog';
+import { Col, Row, HelpBlock } from 'components/bootstrap';
 import Icon from 'components/common/Icon';
 
 type Props = {

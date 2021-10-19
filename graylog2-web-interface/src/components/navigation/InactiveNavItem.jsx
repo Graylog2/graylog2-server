@@ -18,7 +18,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import { NavItem } from 'components/graylog';
+import { NavItem } from 'components/bootstrap';
 
 const StyledInactiveNav = styled(NavItem)`
   .navbar-default .navbar-nav > & > a {

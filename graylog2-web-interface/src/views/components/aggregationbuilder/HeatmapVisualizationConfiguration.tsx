@@ -17,8 +17,7 @@
 import React, { useCallback, useState } from 'react';
 import styled from 'styled-components';
 
-import { Checkbox } from 'components/graylog';
-import { Input } from 'components/bootstrap';
+import { Checkbox, Input } from 'components/bootstrap';
 import HeatmapVisualizationConfig, { COLORSCALES, Builder as HeatmapConfigBuilder } from 'views/logic/aggregationbuilder/visualizations/HeatmapVisualizationConfig';
 
 import Select from '../Select';

@@ -19,8 +19,8 @@ import PropTypes from 'prop-types';
 import lodash from 'lodash';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import { Link } from 'components/graylog/router';
-import { Col, Row } from 'components/graylog';
+import { Link } from 'components/common/router';
+import { Col, Row } from 'components/bootstrap';
 import { Timestamp } from 'components/common';
 import Routes from 'routing/Routes';
 import PermissionsMixin from 'util/PermissionsMixin';

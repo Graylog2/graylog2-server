@@ -19,7 +19,7 @@ import styled from 'styled-components';
 
 import connect from 'stores/connect';
 import { DocumentTitle, Spinner } from 'components/common';
-import { Row } from 'components/graylog';
+import { Row } from 'components/bootstrap';
 import GettingStarted from 'components/gettingstarted/GettingStarted';
 import Routes from 'routing/Routes';
 import history from 'util/History';

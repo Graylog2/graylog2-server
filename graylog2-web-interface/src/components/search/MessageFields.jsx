@@ -18,7 +18,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { MessageField } from 'components/search';
-import { MessageDetailsDefinitionList } from 'components/graylog';
+import { MessageDetailsDefinitionList } from 'components/common';
 
 class MessageFields extends React.Component {
   static propTypes = {

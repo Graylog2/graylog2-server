@@ -19,7 +19,7 @@ import styled from 'styled-components';
 
 import StringUtils from 'util/StringUtils';
 import { MissingDependencies, GranteesList } from 'logic/permissions/EntityShareState';
-import { Alert } from 'components/graylog';
+import { Alert } from 'components/bootstrap';
 
 type Props = {
   missingDependencies: MissingDependencies,

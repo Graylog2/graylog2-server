@@ -18,7 +18,7 @@ import PropTypes from 'prop-types';
 import * as React from 'react';
 import styled from 'styled-components';
 
-import { Alert } from 'components/graylog';
+import { Alert } from 'components/bootstrap';
 import { Icon, SortableList } from 'components/common';
 
 // eslint-disable-next-line import/no-webpack-loader-syntax

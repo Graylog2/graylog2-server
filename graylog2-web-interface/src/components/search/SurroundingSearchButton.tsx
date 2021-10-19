@@ -20,7 +20,7 @@ import PropTypes from 'prop-types';
 import moment from 'moment';
 import naturalSort from 'javascript-natural-sort';
 
-import { DropdownButton, MenuItem } from 'components/graylog';
+import { DropdownButton, MenuItem } from 'components/bootstrap';
 import DrilldownContext from 'views/components/contexts/DrilldownContext';
 
 import type { SearchesConfig } from './SearchConfig';

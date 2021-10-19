@@ -18,8 +18,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
-import { MenuItem } from 'components/graylog';
-import { BootstrapModalForm, Input } from 'components/bootstrap';
+import { MenuItem, BootstrapModalForm, Input } from 'components/bootstrap';
 
 const StyledMenuItem = styled(MenuItem)(({ theme }) => css`
   /**

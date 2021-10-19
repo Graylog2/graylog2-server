@@ -19,8 +19,8 @@ import { useState, useEffect, useContext } from 'react';
 
 import { useStore } from 'stores/connect';
 import withParams from 'routing/withParams';
-import { LinkContainer } from 'components/graylog/router';
-import { ButtonToolbar, Col, Row, Button } from 'components/graylog';
+import { LinkContainer } from 'components/common/router';
+import { ButtonToolbar, Col, Row, Button } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';

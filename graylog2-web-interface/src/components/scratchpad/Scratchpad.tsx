@@ -20,9 +20,9 @@ import chroma from 'chroma-js';
 import ClipboardJS from 'clipboard';
 import debounce from 'lodash/debounce';
 
+import { OverlayTrigger } from 'components/common';
+import { Alert, Button, ButtonGroup, Tooltip, BootstrapModalConfirm } from 'components/bootstrap';
 import { ScratchpadContext } from 'contexts/ScratchpadProvider';
-import { Alert, Button, ButtonGroup, OverlayTrigger, Tooltip } from 'components/graylog';
-import { BootstrapModalConfirm } from 'components/bootstrap';
 import InteractableModal from 'components/common/InteractableModal';
 import Icon from 'components/common/Icon';
 import Store from 'logic/local-storage/Store';

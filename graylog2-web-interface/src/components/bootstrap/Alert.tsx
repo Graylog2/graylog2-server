@@ -27,6 +27,12 @@ interface AlertProps {
   theme: DefaultTheme
 }
 
+interface Props {
+  bsStyle: ColorVariants,
+  children: React.ReactNode,
+  onDismiss: () => void,
+}
+
 const StyledAlert = styled(BootstrapAlert).attrs(({ bsStyle }: { bsStyle: ColorVariants }) => ({
   bsStyle: null,
   $bsStyle: bsStyle || 'default',
@@ -64,7 +70,7 @@ const StyledAlert = styled(BootstrapAlert).attrs(({ bsStyle }: { bsStyle: ColorV
   `;
 });
 
-const Alert = ({ bsStyle, ...rest }: {bsStyle: ColorVariants}) => {
+const Alert = ({ bsStyle, ...rest }: Props) => {
   return <StyledAlert bsStyle={bsStyle} {...rest} />;
 };
 

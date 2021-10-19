@@ -1,5 +1,5 @@
 ```js
-import { Nav, NavDropdown, MenuItem } from 'components/graylog';
+import { Nav, NavDropdown, MenuItem } from 'components/bootstrap';
 
 <Nav activeKey="1.1">
   <NavDropdown eventKey="1" title="Dropdown" id="nav-dropdown">

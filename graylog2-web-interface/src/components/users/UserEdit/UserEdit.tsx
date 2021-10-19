@@ -20,8 +20,8 @@ import { useContext } from 'react';
 import UsersDomain from 'domainActions/users/UsersDomain';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import { Spinner, IfPermitted } from 'components/common';
+import { Alert } from 'components/bootstrap';
 import SectionComponent from 'components/common/Section/SectionComponent';
-import { Alert } from 'components/graylog';
 import User from 'logic/users/User';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 

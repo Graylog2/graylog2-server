@@ -1,5 +1,5 @@
 ```js
-import { FormGroup, ControlLabel, HelpBlock } from 'components/graylog';
+import { FormGroup, ControlLabel, HelpBlock } from 'components/bootstrap';
 
 class FormExample extends React.Component {
   constructor(props, context) {

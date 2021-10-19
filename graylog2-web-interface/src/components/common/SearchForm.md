@@ -1,7 +1,7 @@
 Search form with uncontrolled query string:
 ```js
 import createReactClass from 'create-react-class';
-import { Button } from 'components/graylog';
+import { Button } from 'components/bootstrap';
 
 const SearchFormExample = createReactClass({
   getInitialState() {
@@ -44,7 +44,7 @@ Search form with controlled query string and help:
 
 ```js
 import createReactClass from 'create-react-class';
-import { Button } from 'components/graylog';
+import { Button } from 'components/bootstrap';
 import { Icon } from 'components/common';
 
 const SearchFormExample = createReactClass({

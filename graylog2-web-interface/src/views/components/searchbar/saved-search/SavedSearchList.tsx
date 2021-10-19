@@ -21,7 +21,7 @@ import styled from 'styled-components';
 
 import type { PaginatedViews } from 'views/stores/ViewManagementStore';
 import { SavedSearchesActions } from 'views/stores/SavedSearchesStore';
-import { Alert, Modal, ListGroup, ListGroupItem, Button } from 'components/graylog';
+import { Alert, Modal, ListGroup, ListGroupItem, Button } from 'components/bootstrap';
 import { Icon, PaginatedList, SearchForm, Spinner } from 'components/common';
 import View from 'views/logic/views/View';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';

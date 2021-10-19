@@ -18,7 +18,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
-import { ListGroupItem } from 'components/graylog';
+import { ListGroupItem } from 'components/bootstrap';
 
 const StyledListGroupItem = styled(ListGroupItem)(({ theme }) => css`
   background-color: ${theme.colors.variant.lightest.default};

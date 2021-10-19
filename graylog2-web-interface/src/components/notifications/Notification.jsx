@@ -18,7 +18,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import { Alert, Button } from 'components/graylog';
+import { Alert, Button } from 'components/bootstrap';
 import { Timestamp, Icon } from 'components/common';
 import NotificationsFactory from 'logic/notifications/NotificationsFactory';
 import { NotificationsActions } from 'stores/notifications/NotificationsStore';

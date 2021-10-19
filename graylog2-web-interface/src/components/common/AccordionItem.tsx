@@ -18,7 +18,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import Panel from './Panel';
+import Panel from '../bootstrap/Panel';
 
 type Props = {
   children: React.ReactNode,
