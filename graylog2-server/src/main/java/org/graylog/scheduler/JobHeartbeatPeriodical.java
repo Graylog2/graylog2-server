@@ -70,7 +70,7 @@ public class JobHeartbeatPeriodical extends Periodical {
 
     @Override
     public int getPeriodSeconds() {
-        return 55;
+        return 15;
     }
 
     @Override
