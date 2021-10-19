@@ -19,7 +19,8 @@ import { useRef } from 'react';
 import styled, { css } from 'styled-components';
 
 import { ClipboardButton, Icon } from 'components/common';
-import { Alert, FormGroup, InputGroup, FormControl } from 'components/bootstrap';
+import { Alert, FormGroup, InputGroup } from 'components/bootstrap';
+import { StyledFormControl as FormControl } from 'components/bootstrap/FormControl';
 import { getShowRouteFromGRN } from 'logic/permissions/GRN';
 
 const Container = styled(Alert)`

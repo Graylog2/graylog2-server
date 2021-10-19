@@ -21,7 +21,8 @@ import styled, { css } from 'styled-components';
 import moment from 'moment';
 
 import { Icon } from 'components/common';
-import { Button, FormGroup, InputGroup, FormControl } from 'components/bootstrap';
+import { Button, FormGroup, InputGroup } from 'components/bootstrap';
+import { StyledFormControl as FormControl } from 'components/bootstrap/FormControl';
 import DateTime from 'logic/datetimes/DateTime';
 
 const TIME_ICON_BOD = 'hourglass-start';

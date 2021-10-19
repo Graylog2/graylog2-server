@@ -23,7 +23,7 @@ import chroma from 'chroma-js';
 
 import { CONTROL_CLASS as COMMON_SELECT_CONTROL_CLASS } from 'components/common/Select.tsx';
 
-import FormControl from './FormControl';
+import { StyledFormControl } from './FormControl';
 import { StyledAddon } from './InputGroup';
 
 const StyledFormGroup = styled(BootstrapFormGroup)(({ theme, validationState }) => {
@@ -52,7 +52,7 @@ const StyledFormGroup = styled(BootstrapFormGroup)(({ theme, validationState }) 
         color: ${text};
       }
 
-      ${FormControl}, .${COMMON_SELECT_CONTROL_CLASS} {
+      ${StyledFormControl}, .${COMMON_SELECT_CONTROL_CLASS} {
         border-color: ${border};
 
         &:focus {

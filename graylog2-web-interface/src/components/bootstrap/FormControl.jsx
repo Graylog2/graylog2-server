@@ -17,7 +17,6 @@
 // eslint-disable-next-line no-restricted-imports
 import { FormControl as BootstrapFormControl } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
-import PropTypes from 'prop-types';
 import * as React from 'react';
 
 const StyledFormControl = styled(BootstrapFormControl)(({ theme }) => css`
@@ -51,16 +50,13 @@ const StyledFormControl = styled(BootstrapFormControl)(({ theme }) => css`
 StyledFormControl.Static = BootstrapFormControl.Static;
 StyledFormControl.Feedback = BootstrapFormControl.Feedback;
 
-const FormControl = ({ children, ...restProps }) => {
-  return <StyledFormControl {...restProps}>{children}</StyledFormControl>;
-};
+const FormControl = (props) => <StyledFormControl {...props} />;
 
-FormControl.propTypes = {
-  children: PropTypes.node,
-};
+FormControl.Static = BootstrapFormControl.Static;
+FormControl.Feedback = BootstrapFormControl.Feedback;
 
-FormControl.defaultProps = {
-  children: undefined,
-};
+FormControl.propTypes = {};
+FormControl.defaultProps = {};
 
 export default FormControl;
+export { StyledFormControl };
