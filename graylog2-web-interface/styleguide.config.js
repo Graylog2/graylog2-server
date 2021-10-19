@@ -33,7 +33,6 @@ module.exports = {
     'bootstrap/less/bootstrap.less',
     'toastr/toastr.less',
     'stylesheets/typeahead.less',
-    'injection/builtins.js',
   ],
   propsParser: (filePath, source, resolver, handlers) => {
     return path.parse(filePath).ext === '.tsx'
