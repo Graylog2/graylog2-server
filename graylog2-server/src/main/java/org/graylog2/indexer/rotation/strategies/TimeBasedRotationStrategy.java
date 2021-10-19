@@ -54,6 +54,7 @@ import static org.joda.time.DateTimeFieldType.year;
 @Singleton
 public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
     private static final Logger log = LoggerFactory.getLogger(TimeBasedRotationStrategy.class);
+    public static final String strategyName = "time";
 
     private final Indices indices;
     private Map<String, DateTime> lastRotation;
@@ -108,13 +109,27 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
 
         // find the largest non-zero stride in the period. that's our anchor type. statement order matters here!
         DateTimeFieldType largestStrideType = null;
-        if (seconds > 0) largestStrideType = secondOfMinute();
-        if (minutes > 0) largestStrideType = minuteOfHour();
-        if (hours > 0) largestStrideType = hourOfDay();
-        if (days > 0) largestStrideType = dayOfMonth();
-        if (weeks > 0) largestStrideType = weekOfWeekyear();
-        if (months > 0) largestStrideType = monthOfYear();
-        if (years > 0) largestStrideType = year();
+        if (seconds > 0) {
+            largestStrideType = secondOfMinute();
+        }
+        if (minutes > 0) {
+            largestStrideType = minuteOfHour();
+        }
+        if (hours > 0) {
+            largestStrideType = hourOfDay();
+        }
+        if (days > 0) {
+            largestStrideType = dayOfMonth();
+        }
+        if (weeks > 0) {
+            largestStrideType = weekOfWeekyear();
+        }
+        if (months > 0) {
+            largestStrideType = monthOfYear();
+        }
+        if (years > 0) {
+            largestStrideType = year();
+        }
         if (largestStrideType == null) {
             throw new IllegalArgumentException("Could not determine rotation stride length.");
         }

@@ -29,6 +29,8 @@ import java.util.Locale;
 import java.util.Optional;
 
 public class SizeBasedRotationStrategy extends AbstractRotationStrategy {
+    public static final String strategyName = "size";
+
     private final Indices indices;
 
     @Inject

@@ -32,6 +32,7 @@ import java.util.Locale;
 
 public class MessageCountRotationStrategy extends AbstractRotationStrategy {
     private static final Logger log = LoggerFactory.getLogger(MessageCountRotationStrategy.class);
+    public static final String strategyName = "count";
 
     private final Indices indices;
 
