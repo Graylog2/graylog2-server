@@ -19,10 +19,8 @@ import PropTypes from 'prop-types';
 import cloneDeep from 'lodash/cloneDeep';
 import get from 'lodash/get';
 import camelCase from 'lodash/camelCase';
-
 import { getValueFromInput } from 'util/FormsUtils';
-import { Input } from 'components/bootstrap';
-import { Button, ControlLabel, FormControl, FormGroup, HelpBlock, InputGroup } from 'components/graylog';
+import { Input, Button, ControlLabel, FormControl, FormGroup, HelpBlock, InputGroup } from 'components/bootstrap';
 import { ColorPickerPopover } from 'components/common';
 import ColorLabel from 'components/sidecars/common/ColorLabel';
 

@@ -17,8 +17,8 @@
 import React, { useContext, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import { Button } from 'components/bootstrap';
 
-import { Button } from 'components/graylog';
 import ValidatedInput from 'aws/common/ValidatedInput';
 import FormWrap from 'aws/common/FormWrap';
 import { ApiRoutes } from 'aws/common/Routes';

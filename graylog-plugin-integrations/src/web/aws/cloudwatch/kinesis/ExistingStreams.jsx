@@ -17,8 +17,9 @@
 import React, { useContext, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import { Button, Modal, Panel } from 'components/bootstrap';
+import DocumentationLink from 'components/support/DocumentationLink';
 
-import { Button, Modal, Panel } from 'components/graylog';
 import { FormDataContext } from 'aws/context/FormData';
 import { ApiContext } from 'aws/context/Api';
 import { SidebarContext } from 'aws/context/Sidebar';
@@ -28,7 +29,6 @@ import ValidatedInput from 'aws/common/ValidatedInput';
 import { ApiRoutes, DocsRoutes } from 'aws/common/Routes';
 import { renderOptions } from 'aws/common/Options';
 import formValidation from 'aws/utils/formValidation';
-import DocumentationLink from 'components/support/DocumentationLink';
 
 import FormAdvancedOptions from '../FormAdvancedOptions';
 

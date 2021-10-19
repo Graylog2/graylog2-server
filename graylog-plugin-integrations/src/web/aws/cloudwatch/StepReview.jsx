@@ -17,11 +17,11 @@
 import React, { useContext, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-
-import { Link } from 'components/graylog/router';
+import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import { Input } from 'components/bootstrap';
 import { Icon } from 'components/common';
+
 import { FormDataContext } from 'aws/context/FormData';
 import { ApiContext } from 'aws/context/Api';
 import useFetch from 'aws/common/hooks/useFetch';

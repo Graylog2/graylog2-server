@@ -16,9 +16,9 @@
  */
 import React from 'react';
 import styled from 'styled-components';
-
-import { Table } from 'components/graylog';
+import { Table } from 'components/bootstrap';
 import { Icon } from 'components/common';
+
 import { SectionTitle, SectionNote } from 'aws/common/sharedStyles';
 
 const StyledTable = styled(Table)`

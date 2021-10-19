@@ -17,9 +17,8 @@
 import React, { useContext, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import { Button, Panel, Input } from 'components/bootstrap';
 
-import { Button, Panel } from 'components/graylog';
-import { Input } from 'components/bootstrap';
 import FormWrap from 'aws/common/FormWrap';
 import SkipHealthCheck from 'aws/common/SkipHealthCheck';
 import useFetch from 'aws/common/hooks/useFetch';

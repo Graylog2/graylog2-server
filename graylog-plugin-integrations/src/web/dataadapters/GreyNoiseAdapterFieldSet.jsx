@@ -16,9 +16,7 @@
  */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-
-import { Button } from 'components/graylog';
-import { Input } from 'components/bootstrap';
+import { Button, Input } from 'components/bootstrap';
 
 const GreyNoiseAdapterFieldSet = ({ config, updateConfig, validationMessage, validationState }) => {
   const isCreate = useRef(!config.api_token?.is_set);
@@ -61,33 +59,33 @@ const GreyNoiseAdapterFieldSet = ({ config, updateConfig, validationMessage, val
   };
 
   return (
-      <fieldset>
-        {showResetPasswordButton ? (
-            <Input id="api_token"
-                   label="User Password"
-                   labelClassName="col-sm-3"
-                   wrapperClassName="col-sm-9">
-              <Button onClick={toggleUserPasswordReset}>Reset token</Button>
-            </Input>
-        ) : (
-            <Input type="password"
-                   id="api_token"
-                   name="api_token"
-                   label="API Token"
-                   buttonAfter={!isCreate.current ? (
-                       <Button type="button" onClick={toggleUserPasswordReset}>
-                         Undo Reset
-                       </Button>
-                   ) : undefined}
-                   onChange={handleUserPasswordChange}
-                   help={validationMessage('api_token', 'The API Token.')}
-                   bsStyle={validationState('api_token')}
-                   value={config.api_token?.set_value || ''}
-                   labelClassName="col-sm-3"
-                   wrapperClassName="col-sm-9"
-                   required />
-        )}
-      </fieldset>
+    <fieldset>
+      {showResetPasswordButton ? (
+        <Input id="api_token"
+               label="User Password"
+               labelClassName="col-sm-3"
+               wrapperClassName="col-sm-9">
+          <Button onClick={toggleUserPasswordReset}>Reset token</Button>
+        </Input>
+      ) : (
+        <Input type="password"
+               id="api_token"
+               name="api_token"
+               label="API Token"
+               buttonAfter={!isCreate.current ? (
+                 <Button type="button" onClick={toggleUserPasswordReset}>
+                   Undo Reset
+                 </Button>
+               ) : undefined}
+               onChange={handleUserPasswordChange}
+               help={validationMessage('api_token', 'The API Token.')}
+               bsStyle={validationState('api_token')}
+               value={config.api_token?.set_value || ''}
+               labelClassName="col-sm-3"
+               wrapperClassName="col-sm-9"
+               required />
+      )}
+    </fieldset>
   );
 };
 

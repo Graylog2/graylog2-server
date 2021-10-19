@@ -17,9 +17,8 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
-
 import { ReadOnlyFormGroup } from 'components/common';
-import { Well } from 'components/graylog';
+import { Well } from 'components/bootstrap';
 
 const NewExampleWell = styled(Well)(({ theme }) => css`
   margin-bottom: 5px;

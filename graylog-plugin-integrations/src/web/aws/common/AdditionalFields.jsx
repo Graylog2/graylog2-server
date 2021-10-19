@@ -17,9 +17,8 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
-
 import { Icon } from 'components/common';
-import { Button } from 'components/graylog';
+import { Button } from 'components/bootstrap';
 
 const AdditionalFields = ({ children, className, onToggle, title, visible }) => {
   const [fieldsVisible, setFieldsVisible] = useState(visible);
