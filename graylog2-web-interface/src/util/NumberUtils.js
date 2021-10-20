@@ -71,7 +71,7 @@ const NumberUtils = {
     return formattedNumber;
   },
   isNumber(possibleNumber) {
-    return possibleNumber !== '' && !isNaN(possibleNumber);
+    return possibleNumber !== '' && !Number.isNaN(Number(possibleNumber));
   },
 };
 
