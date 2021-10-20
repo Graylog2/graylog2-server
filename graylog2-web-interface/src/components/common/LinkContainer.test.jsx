@@ -18,8 +18,8 @@ import * as React from 'react';
 import { render, waitFor } from 'wrappedTestingLibrary';
 import { fireEvent } from '@testing-library/react';
 
-import { Button } from 'components/graylog';
 import history from 'util/History';
+import { Button } from 'components/bootstrap';
 
 import { LinkContainer } from './router';
 

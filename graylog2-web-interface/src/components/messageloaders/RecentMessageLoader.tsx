@@ -19,12 +19,11 @@ import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import styled from 'styled-components';
 
-import { Row, Col } from 'components/graylog';
+import { Row, Col, Input } from 'components/bootstrap';
 import AppConfig from 'util/AppConfig';
 import InputDropdown from 'components/inputs/InputDropdown';
 import UserNotification from 'util/UserNotification';
 import type { Message } from 'views/components/messagelist/Types';
-import { Input } from 'components/bootstrap';
 import useForwarderMessageLoaders from 'components/messageloaders/useForwarderMessageLoaders';
 import { UniversalSearchStore } from 'stores/search/UniversalSearchStore';
 

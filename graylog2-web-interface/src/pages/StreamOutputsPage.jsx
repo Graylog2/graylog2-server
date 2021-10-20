@@ -19,8 +19,8 @@ import PropTypes from 'prop-types';
 import Reflux from 'reflux';
 import createReactClass from 'create-react-class';
 
-import { Link } from 'components/graylog/router';
-import { Col } from 'components/graylog';
+import { Link } from 'components/common/router';
+import { Col } from 'components/bootstrap';
 import { ContentHeadRow, DocumentTitle, Spinner } from 'components/common';
 import OutputsComponent from 'components/outputs/OutputsComponent';
 import SupportLink from 'components/support/SupportLink';

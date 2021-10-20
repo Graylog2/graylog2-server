@@ -20,7 +20,7 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import styled from 'styled-components';
 import { sortBy, isEmpty } from 'lodash';
 
-import { Button } from 'components/graylog';
+import { Button } from 'components/bootstrap';
 import { ViewStore } from 'views/stores/ViewStore';
 import View from 'views/logic/views/View';
 

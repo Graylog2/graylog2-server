@@ -17,8 +17,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Row, Col } from 'components/graylog';
-import { Input } from 'components/bootstrap';
+import { Row, Col, Input } from 'components/bootstrap';
 import FormUtils from 'util/FormsUtils';
 
 class CSVConverterConfiguration extends React.Component {

@@ -14,29 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
-import React from 'react';
 
-import { Spinner } from 'components/common';
-
-import RuleList from './RuleList';
-
-class RulesComponent extends React.Component {
-  static propTypes = {
-    rules: PropTypes.array,
-  };
-
-  render() {
-    if (!this.props.rules) {
-      return <Spinner />;
-    }
-
-    return (
-      <div>
-        <RuleList rules={this.props.rules} />
-      </div>
-    );
-  }
-}
-
-export default RulesComponent;
+// eslint-disable-next-line no-restricted-imports
+export {
+  /* 👇 no custom theme colors needed 👇 */
+  ButtonGroup,
+  ButtonToolbar,
+  Checkbox, // NOTE: do we want custom or keep OS styles
+  Clearfix,
+  Col,
+  Collapse,
+  Dropdown,
+  Form,
+  Grid,
+  MenuItem,
+  NavItem,
+  Pager,
+  PanelGroup,
+  Radio, // NOTE: do we want custom or keep OS styles
+  /* 👆 no custom theme colors needed 👆 */
+} from 'react-bootstrap';

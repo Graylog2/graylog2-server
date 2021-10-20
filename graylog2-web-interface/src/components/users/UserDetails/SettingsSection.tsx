@@ -19,7 +19,7 @@ import { useState, useEffect } from 'react';
 import { upperFirst } from 'lodash';
 
 import Routes from 'routing/Routes';
-import { Link } from 'components/graylog/router';
+import { Link } from 'components/common/router';
 import { ReadOnlyFormGroup } from 'components/common';
 import User from 'logic/users/User';
 import SectionComponent from 'components/common/Section/SectionComponent';

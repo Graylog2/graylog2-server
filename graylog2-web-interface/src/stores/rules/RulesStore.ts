@@ -19,12 +19,42 @@ import naturalSort from 'javascript-natural-sort';
 
 import UserNotification from 'util/UserNotification';
 import { qualifyUrl } from 'util/URLUtils';
+import PaginationURL from 'util/PaginationURL';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
+import { Pagination, PaginatedListJSON, ListPagination } from 'stores/PaginationTypes';
+
+export type RuleType = {
+  id?: string,
+  source: string,
+  title: string,
+  description: string,
+  created_at: string,
+  modified_at: string,
+  errors?: [],
+};
+export type MetricsConfigType = {
+  metrics_enabled: boolean,
+};
+
+export type PaginatedRulesResponse = PaginatedListJSON & {
+  rules: Array<RuleType>,
+};
+
+export type PaginatedRules = {
+  list: Array<RuleType>,
+  pagination: ListPagination,
+};
+
+export type RulesStoreState = {
+  rules: Array<RuleType>,
+  functionDescriptors: any,
+  metricsConfig: MetricsConfigType | undefined,
+};
 
 type RulesActionsType = {
-  delete: () => Promise<unknown>,
+  delete: (rule: RuleType) => Promise<unknown>,
   list: () => Promise<unknown>,
   get: () => Promise<unknown>,
   save: () => Promise<unknown>,
@@ -34,7 +64,9 @@ type RulesActionsType = {
   loadFunctions: () => Promise<unknown>,
   loadMetricsConfig: () => Promise<unknown>,
   updateMetricsConfig: () => Promise<unknown>,
-}
+  listPaginated: (pagination: Pagination) => Promise<unknown>,
+};
+
 export const RulesActions = singletonActions(
   'core.Rules',
   () => Reflux.createActions<RulesActionsType>({
@@ -48,18 +80,9 @@ export const RulesActions = singletonActions(
     loadFunctions: { asyncResult: true },
     loadMetricsConfig: { asyncResult: true },
     updateMetricsConfig: { asyncResult: true },
+    listPaginated: { asyncResult: true },
   }),
 );
-
-export type RuleType = {
-  id?: string,
-  source: string,
-  title: string,
-  description: string,
-  created_at: string,
-  modified_at: string,
-  errors?: [],
-};
 
 export const RulesStore = singletonStore(
   'core.Rules',
@@ -70,7 +93,11 @@ export const RulesStore = singletonStore(
     metricsConfig: undefined,
 
     getInitialState() {
-      return { rules: this.rules, functionDescriptors: this.functionDescriptors, metricsConfig: this.metricsConfig };
+      return {
+        rules: this.rules,
+        functionDescriptors: this.functionDescriptors,
+        metricsConfig: this.metricsConfig,
+      };
     },
 
     _updateRulesState(rule) {
@@ -109,6 +136,30 @@ export const RulesStore = singletonStore(
         this.rules = response;
         this.trigger({ rules: response, functionDescriptors: this.functionDescriptors });
       }, failCallback);
+    },
+
+    listPaginated({ page, perPage, query }: Pagination): Promise<PaginatedRules> {
+      const url = PaginationURL(ApiRoutes.RulesController.paginatedList().url, page, perPage, query);
+      const promise = fetch('GET', qualifyUrl(url))
+        .then((response: PaginatedRulesResponse) => ({
+          list: response.rules,
+          pagination: {
+            count: response.count,
+            total: response.total,
+            page: response.page,
+            perPage: response.per_page,
+            query: response.query,
+          },
+        }),
+        (error) => {
+          if (!error.additional || error.additional.status !== 404) {
+            UserNotification.error(`Loading rules list failed with status: ${error}`, 'Could not load rules.');
+          }
+        });
+
+      RulesActions.listPaginated.promise(promise);
+
+      return promise;
     },
 
     get(ruleId) {
@@ -185,11 +236,15 @@ export const RulesStore = singletonStore(
 
       const url = qualifyUrl(ApiRoutes.RulesController.delete(rule.id).url);
 
-      return fetch('DELETE', url).then(() => {
+      const promise = fetch('DELETE', url).then(() => {
         this.rules = this.rules.filter((el) => el.id !== rule.id);
         this.trigger({ rules: this.rules, functionDescriptors: this.functionDescriptors });
         UserNotification.success(`Rule "${rule.title}" was deleted successfully`);
       }, failCallback);
+
+      RulesActions.delete.promise(promise);
+
+      return promise;
     },
     parse(ruleSource, callback) {
       const url = qualifyUrl(ApiRoutes.RulesController.parse().url);
@@ -237,7 +292,7 @@ export const RulesStore = singletonStore(
       const promise = fetch('GET', url);
 
       promise.then(
-        (response) => {
+        (response: MetricsConfigType) => {
           this.metricsConfig = response;
           this.trigger({ rules: this.rules, functionDescriptors: this.functionDescriptors, metricsConfig: this.metricsConfig });
         },

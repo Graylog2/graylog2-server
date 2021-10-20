@@ -19,18 +19,16 @@ import React from 'react';
 // eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-
-import { Link } from 'components/graylog/router';
-
 import numeral from 'numeral';
 import moment from 'moment';
 import {} from 'moment-duration-format';
 import styled from 'styled-components';
 
-import { Row, Col, Alert } from 'components/graylog';
-import ProgressBar, { Bar } from 'components/graylog/ProgressBar';
-import MetricsExtractor from 'logic/metrics/MetricsExtractor';
+import { Link } from 'components/common/router';
+import { Row, Col, Alert } from 'components/bootstrap';
 import { Spinner, Timestamp, Icon } from 'components/common';
+import ProgressBar, { Bar } from 'components/common/ProgressBar';
+import MetricsExtractor from 'logic/metrics/MetricsExtractor';
 import NumberUtils from 'util/NumberUtils';
 import Routes from 'routing/Routes';
 import { JournalStore } from 'stores/journal/JournalStore';

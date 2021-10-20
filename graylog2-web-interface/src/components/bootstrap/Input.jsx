@@ -17,9 +17,13 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Checkbox, ControlLabel, FormControl, FormGroup, InputGroup, Radio } from 'components/graylog';
 import InputDescription from 'components/common/InputDescription';
 
+import { Checkbox, Radio } from './imports';
+import ControlLabel from './ControlLabel';
+import FormControl from './FormControl';
+import FormGroup from './FormGroup';
+import InputGroup from './InputGroup';
 import InputWrapper from './InputWrapper';
 
 /*

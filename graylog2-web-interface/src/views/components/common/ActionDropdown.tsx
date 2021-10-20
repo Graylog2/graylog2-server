@@ -19,7 +19,8 @@ import { SyntheticEvent } from 'react';
 import PropTypes from 'prop-types';
 import { Overlay } from 'react-overlays';
 
-import { DropdownMenu, MenuItem } from 'components/graylog';
+import { DropdownMenu } from 'components/common';
+import { MenuItem } from 'components/bootstrap';
 
 import StopPropagation from './StopPropagation';
 

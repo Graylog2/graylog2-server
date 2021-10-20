@@ -24,7 +24,7 @@ type Props = {
   description?: string,
 };
 
-const StyledHoverForHelp = styled(HoverForHelp)`
+const StyledHoverForHelp = styled((props) => <HoverForHelp {...props} />)`
   margin-left: 8px;
 `;
 

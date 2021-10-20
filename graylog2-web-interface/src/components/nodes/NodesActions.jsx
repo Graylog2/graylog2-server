@@ -18,9 +18,9 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import URI from 'urijs';
 
-import { LinkContainer } from 'components/graylog/router';
-import { Button, DropdownButton, DropdownSubmenu, MenuItem } from 'components/graylog';
-import { ExternalLinkButton, IfPermitted } from 'components/common';
+import { LinkContainer } from 'components/common/router';
+import { DropdownSubmenu, ExternalLinkButton, IfPermitted } from 'components/common';
+import { Button, DropdownButton, MenuItem } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import { SystemLoadBalancerStore } from 'stores/load-balancer/SystemLoadBalancerStore';

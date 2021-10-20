@@ -24,9 +24,7 @@ jest.mock('components/common', () => ({
   Select: mockComponent('SelectMock'),
 }));
 
-jest.mock('components/bootstrap', () => ({
-  Input: mockComponent('InputMock'),
-}));
+jest.mock('components/bootstrap/Input', () => mockComponent('InputMock'));
 
 jest.mock('components/lookup-tables', () => ({
   DataAdapterForm: mockComponent('DataAdapterFormMock'),

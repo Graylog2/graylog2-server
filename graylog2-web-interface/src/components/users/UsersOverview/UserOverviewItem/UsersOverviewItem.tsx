@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 
-import { Link } from 'components/graylog/router';
+import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import UserOverview from 'logic/users/UserOverview';
 import RolesCell from 'components/permissions/RolesCell';

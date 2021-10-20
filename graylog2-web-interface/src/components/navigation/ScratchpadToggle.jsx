@@ -18,8 +18,8 @@ import React, { useContext } from 'react';
 import styled from 'styled-components';
 
 import { ScratchpadContext } from 'contexts/ScratchpadProvider';
-import { Button } from 'components/graylog';
 import { Icon } from 'components/common';
+import { Button } from 'components/bootstrap';
 
 const Toggle = styled(Button)`
   padding-left: 6px;

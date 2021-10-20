@@ -1,7 +1,7 @@
 ```js
 import createReactClass from 'create-react-class';
 import Immutable from 'immutable';
-import { Button } from 'components/graylog';
+import { Button } from 'components/bootstrap';
 
 const TableListExample = createReactClass({
   getInitialState() {
@@ -60,7 +60,7 @@ const TableListExample = createReactClass({
 ```js
 import createReactClass from 'create-react-class';
 import Immutable from 'immutable';
-import { Button } from 'components/graylog';
+import { Button } from 'components/bootstrap';
 
 const TableListExampleNoBulkActions = createReactClass({
   getInitialState() {

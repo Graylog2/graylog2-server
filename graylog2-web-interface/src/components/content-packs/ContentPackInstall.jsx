@@ -18,8 +18,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import ContentPack from 'logic/content-packs/ContentPack';
-import { Row, Col } from 'components/graylog';
-import { Input } from 'components/bootstrap';
+import { Row, Col, Input } from 'components/bootstrap';
 import ValueRefHelper from 'util/ValueRefHelper';
 
 import ContentPackUtils from './ContentPackUtils';

@@ -30,7 +30,7 @@ import UsersOverview from './UsersOverview';
 // The usage of OverlayTrigger in the StatusCell of the users overview
 // often results in a timeout when executing the 'should search users' test.
 // We need to mock OverlayTrigger until we fix the root problem.
-jest.mock('components/graylog/OverlayTrigger', () => 'overlay-trigger');
+jest.mock('components/common/OverlayTrigger', () => 'overlay-trigger');
 
 const mockLoadUsersPaginatedPromise = Promise.resolve(paginatedUsers);
 
