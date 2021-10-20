@@ -17,9 +17,9 @@
 import * as React from 'react';
 
 import { useStore } from 'stores/connect';
-import { LinkContainer } from 'components/graylog/router';
+import { LinkContainer } from 'components/common/router';
 import Routes from 'routing/Routes';
-import { Col, Row, Button } from 'components/graylog';
+import { Col, Row, Button } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
 import { ViewManagementStore, ViewManagementActions } from 'views/stores/ViewManagementStore';
 import ViewList from 'views/components/views/ViewList';

@@ -22,15 +22,13 @@ import Reflux from 'reflux';
 import styled, { css } from 'styled-components';
 
 import { DocumentTitle, IfPermitted, PageHeader, Spinner } from 'components/common';
-import { Alert, Col, Row } from 'components/graylog';
+import { Alert, Col, Row } from 'components/bootstrap';
 import { GraylogClusterOverview } from 'components/cluster';
 import DocumentationLink from 'components/support/DocumentationLink';
 import EnterpriseFreeLicenseForm from 'components/enterprise/EnterpriseFreeLicenseForm';
 import PluginList from 'components/enterprise/PluginList';
-import CombinedProvider from 'injection/CombinedProvider';
 import HideOnCloud from 'util/conditional/HideOnCloud';
-
-const { EnterpriseActions, EnterpriseStore } = CombinedProvider.get('Enterprise');
+import { EnterpriseActions, EnterpriseStore } from 'stores/enterprise/EnterpriseStore';
 
 const EnterpriseProductLink = ({ children }) => {
   return (

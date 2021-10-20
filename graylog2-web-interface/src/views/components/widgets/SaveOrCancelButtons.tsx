@@ -20,7 +20,7 @@ import { useContext } from 'react';
 
 import WidgetEditApplyAllChangesContext from 'views/components/contexts/WidgetEditApplyAllChangesContext';
 import { Spinner } from 'components/common';
-import { Button, ButtonToolbar } from 'components/graylog';
+import { Button, ButtonToolbar } from 'components/bootstrap';
 
 const StyledButtonToolbar = styled(ButtonToolbar)`
   margin-top: 6px;

@@ -17,21 +17,17 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { LinkContainer } from 'components/graylog/router';
+import { LinkContainer } from 'components/common/router';
 import connect from 'stores/connect';
 import Routes from 'routing/Routes';
 import history from 'util/History';
-import { ButtonToolbar, Col, Row, Button } from 'components/graylog';
+import { ButtonToolbar, Col, Row, Button } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { DataAdapter, DataAdapterCreate, DataAdapterForm, DataAdaptersOverview } from 'components/lookup-tables';
-import CombinedProvider from 'injection/CombinedProvider';
 import withParams from 'routing/withParams';
 import withLocation from 'routing/withLocation';
-
-const { LookupTableDataAdaptersStore, LookupTableDataAdaptersActions } = CombinedProvider.get(
-  'LookupTableDataAdapters',
-);
-const { LookupTablesStore, LookupTablesActions } = CombinedProvider.get('LookupTables');
+import { LookupTablesActions, LookupTablesStore } from 'stores/lookup-tables/LookupTablesStore';
+import { LookupTableDataAdaptersActions, LookupTableDataAdaptersStore } from 'stores/lookup-tables/LookupTableDataAdaptersStore';
 
 class LUTDataAdaptersPage extends React.Component {
   errorStatesTimer = undefined;

@@ -16,6 +16,6 @@
  */
 package org.graylog2.indexer;
 
-class Constants {
-    static final String ES_DATE_FORMAT = "8yyyy-MM-dd HH:mm:ss.SSS";
+public class Constants {
+    public static final String ES_DATE_FORMAT = "8yyyy-MM-dd HH:mm:ss.SSS";
 }

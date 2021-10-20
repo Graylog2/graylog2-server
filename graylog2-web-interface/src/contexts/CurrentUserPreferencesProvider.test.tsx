@@ -17,17 +17,16 @@
 import * as React from 'react';
 import { render } from 'wrappedTestingLibrary';
 import asMock from 'helpers/mocking/AsMock';
-import { MockCombinedProvider, MockStore } from 'helpers/mocking';
+import { MockStore } from 'helpers/mocking';
 
-import CombinedProvider from 'injection/CombinedProvider';
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
+import { UserJSON } from 'logic/users/User';
 
 import UserPreferencesContext, { defaultUserPreferences, UserPreferences } from './UserPreferencesContext';
 import CurrentUserProvider from './CurrentUserProvider';
 import CurrentUserPreferencesProvider from './CurrentUserPreferencesProvider';
 
-const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
-
-jest.mock('injection/CombinedProvider', () => new MockCombinedProvider({ CurrentUser: { CurrentUserStore: MockStore() } }));
+jest.mock('stores/users/CurrentUserStore', () => ({ CurrentUserStore: MockStore(['getInitialState', jest.fn(() => ({}))]) }));
 
 describe('CurrentUserPreferencesProvider', () => {
   const SimpleCurrentUserPreferencesProvider = ({ children }) => (
@@ -67,7 +66,7 @@ describe('CurrentUserPreferencesProvider', () => {
   });
 
   it('provides default user preferences if the user has none', () => {
-    asMock(CurrentUserStore.getInitialState).mockReturnValue({ currentUser: {} });
+    asMock(CurrentUserStore.getInitialState).mockReturnValue({ currentUser: {} as UserJSON });
 
     const consume = renderSUT();
 
@@ -75,7 +74,7 @@ describe('CurrentUserPreferencesProvider', () => {
   });
 
   it('provides empty user preferences of current user', () => {
-    asMock(CurrentUserStore.getInitialState).mockReturnValue({ currentUser: { preferences: {} } });
+    asMock(CurrentUserStore.getInitialState).mockReturnValue({ currentUser: { preferences: {} } as UserJSON });
 
     const consume = renderSUT();
 
@@ -89,7 +88,7 @@ describe('CurrentUserPreferencesProvider', () => {
           enableSmartSearch: false,
           updateUnfocussed: true,
         },
-      },
+      } as UserJSON,
     });
 
     const consume = renderSUT();

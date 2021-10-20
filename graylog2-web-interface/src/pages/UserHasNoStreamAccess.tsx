@@ -17,7 +17,7 @@
 import * as React from 'react';
 
 import { DocumentTitle, Icon } from 'components/common';
-import { Alert, Row, Col } from 'components/graylog';
+import { Alert, Row, Col } from 'components/bootstrap';
 import PageHeader from 'components/common/PageHeader';
 import PageContentLayout from 'components/layout/PageContentLayout';
 

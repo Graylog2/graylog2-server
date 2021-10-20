@@ -18,7 +18,7 @@ import Reflux from 'reflux';
 import { isEqual } from 'lodash';
 
 import type { Store } from 'stores/StoreTypes';
-import { singletonStore } from 'views/logic/singleton';
+import { singletonStore } from 'logic/singleton';
 import { QueryId } from 'views/logic/queries/Query';
 
 import { ViewStore } from './ViewStore';

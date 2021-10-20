@@ -18,7 +18,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import ClipboardJS from 'clipboard';
 
-import { Tooltip, OverlayTrigger, Button } from 'components/graylog';
+import OverlayTrigger from 'components/common/OverlayTrigger';
+import { Tooltip, Button } from 'components/bootstrap';
 
 /**
  * Component that renders a button to copy some text in the clipboard when pressed.
@@ -82,7 +83,7 @@ class ClipboardButton extends React.Component {
       options.container = container;
     }
 
-    this.clipboard = new ClipboardJS('[data-clipboard-button]', options);
+    this.clipboard = new ClipboardJS('[data-gl-clipboard-button]', options);
     this.clipboard.on('success', this._onSuccess);
     this.clipboard.on('error', this._onError);
   }
@@ -130,7 +131,7 @@ class ClipboardButton extends React.Component {
 
     return (
       <OverlayTrigger placement="top" trigger="click" overlay={tooltip} rootClose>
-        <Button data-clipboard-button data-clipboard-action={action} {...filteredProps}>
+        <Button data-gl-clipboard-button data-clipboard-action={action} {...filteredProps}>
           {title}
         </Button>
       </OverlayTrigger>

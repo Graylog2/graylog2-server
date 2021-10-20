@@ -20,22 +20,12 @@ import styled, { css } from 'styled-components';
 
 import Spinner from 'components/common/Spinner';
 import Query from 'views/components/Query';
-import connect, { useStore } from 'stores/connect';
-import { SearchStore } from 'views/stores/SearchStore';
-import { CurrentViewStateStore } from 'views/stores/CurrentViewStateStore';
-import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
-import { WidgetStore } from 'views/stores/WidgetStore';
+import { useStore } from 'stores/connect';
 import { SearchLoadingStateStore } from 'views/stores/SearchLoadingStateStore';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import LoadingIndicator from 'components/common/LoadingIndicator';
-import { Row, Col } from 'components/graylog';
+import { Row, Col } from 'components/bootstrap';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
-
-type IndicatorProps = {
-  searchLoadingState: {
-    isLoading: boolean;
-  };
-};
 
 const StyledRow = styled(Row)(({ $hasFocusedWidget }: { $hasFocusedWidget: boolean }) => css`
   height: ${$hasFocusedWidget ? '100%' : 'auto'};
@@ -46,12 +36,11 @@ const StyledCol = styled(Col)`
   height: 100%;
 `;
 
-const SearchLoadingIndicator = connect(
-  ({ searchLoadingState }: IndicatorProps) => (searchLoadingState.isLoading && <LoadingIndicator text="Updating search results..." />),
-  { searchLoadingState: SearchLoadingStateStore },
-);
+const SearchLoadingIndicator = () => {
+  const searchLoadingState = useStore(SearchLoadingStateStore);
 
-const QueryWithWidgets = connect(Query, { widgets: WidgetStore });
+  return (searchLoadingState.isLoading && <LoadingIndicator text="Updating search results..." />);
+};
 
 type Props = {
   hasErrors: boolean,
@@ -60,29 +49,14 @@ type Props = {
 const SearchResult = React.memo(({ hasErrors }: Props) => {
   const fieldTypes = useContext(FieldTypesContext);
   const { focusedWidget } = useContext(WidgetFocusContext);
-  const searches = useStore(SearchStore, ({ result, widgetMapping }) => ({ result, widgetMapping }));
-  const queryId = useStore(ViewMetadataStore, (viewMetadataStore) => viewMetadataStore.activeQuery);
-  const viewState = useStore(CurrentViewStateStore);
 
   if (!fieldTypes) {
     return <Spinner />;
   }
 
-  const results = searches && searches.result;
-  const widgetMapping = searches && searches.widgetMapping;
-
   const hasFocusedWidget = !!focusedWidget?.id;
 
-  const currentResults = results ? results.forId(queryId) : undefined;
-  const queryFields = fieldTypes.queryFields.get(queryId, fieldTypes.all);
-  const positions = viewState.state && viewState.state.widgetPositions;
-  const content = currentResults ? (
-    <QueryWithWidgets fields={queryFields}
-                      queryId={queryId}
-                      results={currentResults}
-                      positions={positions}
-                      widgetMapping={widgetMapping} />
-  ) : hasErrors ? null : <Spinner />;
+  const content = hasErrors ? null : <Query />;
 
   return (
     <StyledRow $hasFocusedWidget={hasFocusedWidget}>
@@ -93,5 +67,7 @@ const SearchResult = React.memo(({ hasErrors }: Props) => {
     </StyledRow>
   );
 });
+
+SearchResult.displayName = 'SearchResult';
 
 export default SearchResult;

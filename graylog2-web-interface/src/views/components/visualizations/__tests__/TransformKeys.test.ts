@@ -15,13 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
-import CurrentUserStore from 'stores/users/CurrentUserStore';
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 
 import * as fixtures from './TransformKeys.fixtures';
 
 import transformKeys from '../TransformKeys';
 
-jest.mock('stores/users/CurrentUserStore', () => ({ get: jest.fn() }));
+jest.mock('stores/users/CurrentUserStore', () => ({ CurrentUserStore: { get: jest.fn() } }));
 jest.mock('util/AppConfig', () => ({ rootTimeZone: jest.fn(() => 'America/Chicago') }));
 
 // eslint-disable-next-line global-require

@@ -20,18 +20,14 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import naturalSort from 'javascript-natural-sort';
 
-import { Row, Col, Button } from 'components/graylog';
+import { Row, Col, Button } from 'components/bootstrap';
 import Spinner from 'components/common/Spinner';
 import AddExtractorWizard from 'components/extractors/AddExtractorWizard';
 import EntityList from 'components/common/EntityList';
-import ActionsProvider from 'injection/ActionsProvider';
-import StoreProvider from 'injection/StoreProvider';
+import { ExtractorsActions, ExtractorsStore } from 'stores/extractors/ExtractorsStore';
 
 import ExtractorsListItem from './ExtractorsListItem';
 import ExtractorsSortModal from './ExtractorSortModal';
-
-const ExtractorsActions = ActionsProvider.getActions('Extractors');
-const ExtractorsStore = StoreProvider.getStore('Extractors');
 
 const ExtractorsList = createReactClass({
   displayName: 'ExtractorsList',

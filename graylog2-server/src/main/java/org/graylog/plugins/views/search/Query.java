@@ -28,6 +28,7 @@ import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.graph.Traverser;
+import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.engine.EmptyTimeRange;
 import org.graylog.plugins.views.search.filter.AndFilter;
@@ -36,6 +37,8 @@ import org.graylog2.contentpacks.ContentPackable;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.QueryEntity;
+import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
+import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +50,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -61,6 +65,7 @@ import static java.util.stream.Collectors.toSet;
 public abstract class Query implements ContentPackable<QueryEntity> {
     private static final Logger LOG = LoggerFactory.getLogger(Query.class);
 
+    @Nullable
     @JsonProperty
     public abstract String id();
 
@@ -176,7 +181,7 @@ public abstract class Query implements ContentPackable<QueryEntity> {
         return Query.builder()
                 .id("")
                 .timerange(EmptyTimeRange.emptyTimeRange())
-                .query(new BackendQuery.Fallback())
+                .query(ElasticsearchQueryString.empty())
                 .filter(null)
                 .build();
     }
@@ -224,6 +229,8 @@ public abstract class Query implements ContentPackable<QueryEntity> {
         @JsonProperty
         public abstract Builder id(String id);
 
+        public abstract String id();
+
         @JsonProperty
         public abstract Builder timerange(TimeRange timerange);
 
@@ -242,10 +249,20 @@ public abstract class Query implements ContentPackable<QueryEntity> {
 
         @JsonCreator
         static Builder createWithDefaults() {
-            return new AutoValue_Query.Builder().searchTypes(of());
+            try {
+                return new AutoValue_Query.Builder()
+                        .searchTypes(of())
+                        .query(ElasticsearchQueryString.empty())
+                        .timerange(RelativeRange.create(300));
+            } catch (InvalidRangeParametersException e) {
+                throw new RuntimeException("Unable to create relative timerange - this should not happen!");
+            }
         }
 
         public Query build() {
+            if (id() == null) {
+                id(UUID.randomUUID().toString());
+            }
             return autoBuild();
         }
     }

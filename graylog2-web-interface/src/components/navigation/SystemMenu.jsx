@@ -20,7 +20,7 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import naturalSort from 'javascript-natural-sort';
 
 import withLocation from 'routing/withLocation';
-import { NavDropdown } from 'components/graylog';
+import { NavDropdown } from 'components/bootstrap';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import IfPermitted from 'components/common/IfPermitted';
 import Routes from 'routing/Routes';

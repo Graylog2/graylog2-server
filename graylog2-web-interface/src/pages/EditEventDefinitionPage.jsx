@@ -17,24 +17,22 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { LinkContainer } from 'components/graylog/router';
-import { ButtonToolbar, Col, Row, Button } from 'components/graylog';
+import { LinkContainer } from 'components/common/router';
+import { ButtonToolbar, Col, Row, Button } from 'components/bootstrap';
 import { DocumentTitle, IfPermitted, PageHeader, Spinner } from 'components/common';
 import EventDefinitionFormContainer
   from 'components/event-definitions/event-definition-form/EventDefinitionFormContainer';
 import DocumentationLink from 'components/support/DocumentationLink';
 import connect from 'stores/connect';
-import CombinedProvider from 'injection/CombinedProvider';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 import { isPermitted } from 'util/PermissionsMixin';
 import history from 'util/History';
 import withParams from 'routing/withParams';
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
+import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitionsStore';
 
 import StreamPermissionErrorPage from './StreamPermissionErrorPage';
-
-const { EventDefinitionsActions } = CombinedProvider.get('EventDefinitions');
-const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 
 class EditEventDefinitionPage extends React.Component {
   static propTypes = {

@@ -18,15 +18,12 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import _ from 'lodash';
 
-import { Col, Row, Button } from 'components/graylog';
-import { Input } from 'components/bootstrap';
+import { Col, Row, Button, Input } from 'components/bootstrap';
+import { JSONValueInput } from 'components/common';
 import ObjectUtils from 'util/ObjectUtils';
 import * as FormsUtils from 'util/FormsUtils';
-import { JSONValueInput } from 'components/common';
 import { CachesContainer, CachePicker, DataAdaptersContainer, DataAdapterPicker } from 'components/lookup-tables';
-import CombinedProvider from 'injection/CombinedProvider';
-
-const { LookupTablesActions } = CombinedProvider.get('LookupTables');
+import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
 
 class LookupTableForm extends React.Component {
   static propTypes = {

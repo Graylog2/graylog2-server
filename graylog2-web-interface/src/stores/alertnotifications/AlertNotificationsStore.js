@@ -16,87 +16,96 @@
  */
 import Reflux from 'reflux';
 
-import ActionsProvider from 'injection/ActionsProvider';
 import UserNotification from 'util/UserNotification';
 import * as URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 
-const AlertNotificationsActions = ActionsProvider.getActions('AlertNotifications');
+import { singletonActions, singletonStore } from '../../logic/singleton';
 
-const AlertNotificationsStore = Reflux.createStore({
-  listenables: [AlertNotificationsActions],
-  availableNotifications: undefined,
-  allNotifications: undefined,
+export const AlertNotificationsActions = singletonActions(
+  'core.AlertNotifications',
+  Reflux.createActions({
+    available: { asyncResult: true },
+    listAll: { asyncResult: true },
+    testAlert: { asyncResult: true },
+  }),
+);
 
-  getInitialState() {
-    return {
-      availableNotifications: this.availableNotifications,
-      allNotifications: this.allNotifications,
-    };
-  },
+export const AlertNotificationsStore = singletonStore(
+  'core.AlertNotifications',
+  Reflux.createStore({
+    listenables: [AlertNotificationsActions],
+    availableNotifications: undefined,
+    allNotifications: undefined,
 
-  available() {
-    const url = URLUtils.qualifyUrl(ApiRoutes.AlarmCallbacksApiController.available().url);
-    const promise = fetch('GET', url);
+    getInitialState() {
+      return {
+        availableNotifications: this.availableNotifications,
+        allNotifications: this.allNotifications,
+      };
+    },
 
-    promise
-      .then(
+    available() {
+      const url = URLUtils.qualifyUrl(ApiRoutes.AlarmCallbacksApiController.available().url);
+      const promise = fetch('GET', url);
+
+      promise
+        .then(
+          (response) => {
+            this.availableNotifications = response.types;
+            this.trigger({ availableNotifications: this.availableNotifications });
+
+            return this.availableNotifications;
+          },
+          (error) => {
+            UserNotification.error(`Fetching available alert notification types failed with status: ${error.message}`,
+              'Could not retrieve available alert notifications');
+          },
+        );
+
+      AlertNotificationsActions.available.promise(promise);
+    },
+
+    listAll() {
+      const url = URLUtils.qualifyUrl(ApiRoutes.AlarmCallbacksApiController.listAll().url);
+      const promise = fetch('GET', url);
+
+      promise.then(
         (response) => {
-          this.availableNotifications = response.types;
-          this.trigger({ availableNotifications: this.availableNotifications });
+          this.allNotifications = response.alarmcallbacks;
+          this.trigger({ allNotifications: this.allNotifications });
 
-          return this.availableNotifications;
+          return this.allNotifications;
         },
         (error) => {
-          UserNotification.error(`Fetching available alert notification types failed with status: ${error.message}`,
-            'Could not retrieve available alert notifications');
+          UserNotification.error(`Fetching alert notifications failed with status: ${error.message}`,
+            'Could not retrieve alert notifications');
         },
       );
 
-    AlertNotificationsActions.available.promise(promise);
-  },
+      AlertNotificationsActions.listAll.promise(promise);
+    },
 
-  listAll() {
-    const url = URLUtils.qualifyUrl(ApiRoutes.AlarmCallbacksApiController.listAll().url);
-    const promise = fetch('GET', url);
+    testAlert(alarmCallbackId) {
+      const url = URLUtils.qualifyUrl(ApiRoutes.AlarmCallbacksApiController.testAlert(alarmCallbackId).url);
 
-    promise.then(
-      (response) => {
-        this.allNotifications = response.alarmcallbacks;
-        this.trigger({ allNotifications: this.allNotifications });
+      const promise = fetch('POST', url);
 
-        return this.allNotifications;
-      },
-      (error) => {
-        UserNotification.error(`Fetching alert notifications failed with status: ${error.message}`,
-          'Could not retrieve alert notifications');
-      },
-    );
+      promise.then(
+        () => UserNotification.success('Test notification was sent successfully'),
+        (error) => {
+          const message = (error.additional && error.additional.body && error.additional.body.message ? error.additional.body.message : error.message);
 
-    AlertNotificationsActions.listAll.promise(promise);
-  },
+          UserNotification.error(`Sending test alert notification failed with message: ${message}`,
+            'Could not send test alert notification');
+        },
+      );
 
-  testAlert(alarmCallbackId) {
-    const url = URLUtils.qualifyUrl(ApiRoutes.AlarmCallbacksApiController.testAlert(alarmCallbackId).url);
+      AlertNotificationsActions.testAlert.promise(promise);
 
-    const promise = fetch('POST', url);
-
-    promise.then(
-      () => UserNotification.success('Test notification was sent successfully'),
-      (error) => {
-        const message = (error.additional && error.additional.body && error.additional.body.message ? error.additional.body.message : error.message);
-
-        UserNotification.error(`Sending test alert notification failed with message: ${message}`,
-          'Could not send test alert notification');
-      },
-    );
-
-    AlertNotificationsActions.testAlert.promise(promise);
-
-    // Need to do this to handle possible concurrent calls to this method
-    return promise;
-  },
-});
-
-export default AlertNotificationsStore;
+      // Need to do this to handle possible concurrent calls to this method
+      return promise;
+    },
+  }),
+);

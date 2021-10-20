@@ -17,15 +17,13 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Row, Col, Alert, Button } from 'components/graylog';
+import { Row, Col, Alert, Button } from 'components/bootstrap';
 import { IfPermitted, Icon } from 'components/common';
 import { DocumentationLink } from 'components/support';
 import NodeThroughput from 'components/throughput/NodeThroughput';
 import DocsHelper from 'util/DocsHelper';
 import StringUtils from 'util/StringUtils';
-import StoreProvider from 'injection/StoreProvider';
-
-const SystemProcessingStore = StoreProvider.getStore('SystemProcessing');
+import { SystemProcessingStore } from 'stores/system-processing/SystemProcessingStore';
 
 class SystemOverviewDetails extends React.Component {
   static propTypes = {

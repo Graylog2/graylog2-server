@@ -19,11 +19,9 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
-import { ControlLabel, FormControl, FormGroup } from 'components/graylog';
+import { ControlLabel, FormControl, FormGroup } from 'components/bootstrap';
 import { ConfigurationForm } from 'components/configurationforms';
-import CombinedProvider from 'injection/CombinedProvider';
-
-const { AlertConditionsStore } = CombinedProvider.get('AlertConditions');
+import { AlertConditionsStore } from 'stores/alertconditions/AlertConditionsStore';
 
 const AlertConditionForm = createReactClass({
   displayName: 'AlertConditionForm',

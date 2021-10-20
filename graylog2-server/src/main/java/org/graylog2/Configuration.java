@@ -162,6 +162,12 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "enabled_tls_protocols", converter = StringSetConverter.class)
     private Set<String> enabledTlsProtocols = null;
 
+    @Parameter(value = "failure_handling_queue_capacity", validators = {PositiveIntegerValidator.class})
+    private int failureHandlingQueueCapacity = 1000;
+
+    @Parameter(value = "failure_handling_shutdown_await", validators = {PositiveDurationValidator.class})
+    private Duration failureHandlingShutdownAwait = Duration.milliseconds(3000);
+
     @Parameter(value = "is_cloud")
     private boolean isCloud = false;
 
@@ -322,6 +328,15 @@ public class Configuration extends BaseConfiguration {
 
     public Set<String> getDeactivatedBuiltinAuthenticationProviders() {
         return deactivatedBuiltinAuthenticationProviders;
+    }
+
+    public int getFailureHandlingQueueCapacity() {
+        return failureHandlingQueueCapacity;
+    }
+
+
+    public Duration getFailureHandlingShutdownAwait() {
+        return failureHandlingShutdownAwait;
     }
 
     /**

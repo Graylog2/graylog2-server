@@ -111,8 +111,8 @@ const URLUtils = {
 
     return isValid;
   },
-
   hasAcceptedProtocol(string: string, acceptedProtocols = ACCEPTED_PROTOCOLS) {
+    // eslint-disable-next-line compat/compat
     const url = new URL(string);
 
     return acceptedProtocols.includes(url.protocol);

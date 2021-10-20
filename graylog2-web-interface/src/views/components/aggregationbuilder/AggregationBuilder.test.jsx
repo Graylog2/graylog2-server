@@ -24,6 +24,7 @@ import AggregationBuilder from './AggregationBuilder';
 import EmptyAggregationContent from './EmptyAggregationContent';
 
 import EmptyResultWidget from '../widgets/EmptyResultWidget';
+import OnVisualizationConfigChangeContext from '../aggregationwizard/OnVisualizationConfigChangeContext';
 
 const mockDummyVisualization = () => 'dummy-visualization';
 
@@ -68,10 +69,13 @@ describe('AggregationBuilder', () => {
 
   it('passes through onVisualizationConfigChange to visualization', () => {
     const onVisualizationConfigChange = jest.fn();
-    const wrapper = mount(<AggregationBuilder config={AggregationWidgetConfig.builder().rowPivots([rowPivot]).visualization('dummy').build()}
-                                              fields={{}}
-                                              onVisualizationConfigChange={onVisualizationConfigChange}
-                                              data={{ total: 42, rows: [{ value: 3.1415926 }] }} />);
+    const wrapper = mount((
+      <OnVisualizationConfigChangeContext.Provider value={onVisualizationConfigChange}>
+        <AggregationBuilder config={AggregationWidgetConfig.builder().rowPivots([rowPivot]).visualization('dummy').build()}
+                            fields={{}}
+                            data={{ total: 42, rows: [{ value: 3.1415926 }] }} />
+      </OnVisualizationConfigChangeContext.Provider>
+    ));
 
     expect(wrapper.find(EmptyAggregationContent)).toHaveLength(0);
 

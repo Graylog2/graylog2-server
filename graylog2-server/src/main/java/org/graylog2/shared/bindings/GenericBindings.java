@@ -18,15 +18,26 @@ package org.graylog2.shared.bindings;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.ServiceManager;
-import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
+import com.google.inject.multibindings.MapBinder;
+import com.google.inject.multibindings.Multibinder;
+import com.google.inject.multibindings.OptionalBinder;
 import com.google.inject.name.Names;
 import okhttp3.OkHttpClient;
+import org.graylog.failure.DefaultFailureHandler;
+import org.graylog.failure.DefaultFailureHandlingConfiguration;
+import org.graylog.failure.FailureHandler;
+import org.graylog.failure.FailureHandlingConfiguration;
+import org.graylog.failure.FailureHandlingService;
+import org.graylog2.indexer.EventIndexTemplateProvider;
+import org.graylog2.indexer.IndexTemplateProvider;
+import org.graylog2.indexer.MessageIndexTemplateProvider;
 import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.buffers.InputBuffer;
+import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
 import org.graylog2.plugin.system.NodeId;
@@ -44,7 +55,7 @@ import javax.activation.MimetypesFileTypeMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Semaphore;
 
-public class GenericBindings extends AbstractModule {
+public class GenericBindings extends Graylog2Module {
 
     @Override
     protected void configure() {
@@ -73,5 +84,25 @@ public class GenericBindings extends AbstractModule {
         bind(MimetypesFileTypeMap.class).toInstance(new MimetypesFileTypeMap());
 
         bind(ExecutorService.class).annotatedWith(Names.named("proxiedRequestsExecutorService")).toProvider(ProxiedRequestsExecutorService.class).asEagerSingleton();
+
+        bind(FailureHandler.class).annotatedWith(Names.named("fallbackFailureHandler"))
+                .to(DefaultFailureHandler.class).asEagerSingleton();
+
+        Multibinder.newSetBinder(binder(), FailureHandler.class);
+
+        OptionalBinder.newOptionalBinder(binder(), FailureHandlingConfiguration.class)
+                .setDefault()
+                .to(DefaultFailureHandlingConfiguration.class);
+
+        final MapBinder<String, IndexTemplateProvider> indexTemplateProviderBinder
+                = MapBinder.newMapBinder(binder(), String.class, IndexTemplateProvider.class);
+
+        indexTemplateProviderBinder.addBinding(MessageIndexTemplateProvider.MESSAGE_TEMPLATE_TYPE)
+                .to(MessageIndexTemplateProvider.class);
+        indexTemplateProviderBinder.addBinding(EventIndexTemplateProvider.EVENT_TEMPLATE_TYPE)
+                .to(EventIndexTemplateProvider.class);
+
+        serviceBinder().addBinding().to(FailureHandlingService.class).in(Scopes.SINGLETON);
     }
+
 }

@@ -18,15 +18,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import { LinkContainer } from 'components/graylog/router';
-import { Badge, Nav } from 'components/graylog';
-import CombinedProvider from 'injection/CombinedProvider';
+import { LinkContainer } from 'components/common/router';
+import { Badge, Nav } from 'components/bootstrap';
 import connect from 'stores/connect';
 import Routes from 'routing/Routes';
+import { NotificationsActions, NotificationsStore } from 'stores/notifications/NotificationsStore';
 
 import InactiveNavItem from './InactiveNavItem';
-
-const { NotificationsActions, NotificationsStore } = CombinedProvider.get('Notifications');
 
 const StyledInactiveNavItem = styled(InactiveNavItem)`
   a:hover {

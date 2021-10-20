@@ -24,7 +24,7 @@ import Search from 'views/logic/search/Search';
 import { QueriesActions } from 'views/actions/QueriesActions';
 import type { QueryId, TimeRange, TimeRangeTypes } from 'views/logic/queries/Query';
 import Query from 'views/logic/queries/Query';
-import { singletonStore } from 'views/logic/singleton';
+import { singletonStore } from 'logic/singleton';
 
 import { ViewActions, ViewStore } from './ViewStore';
 import { ViewStatesActions } from './ViewStatesStore';

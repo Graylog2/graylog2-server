@@ -20,23 +20,21 @@ import PropTypes from 'prop-types';
 
 import ErrorsActions from 'actions/errors/ErrorsActions';
 import CurrentUserContext from 'contexts/CurrentUserContext';
-import { LinkContainer } from 'components/graylog/router';
-import { ButtonToolbar, Button } from 'components/graylog';
+import { LinkContainer } from 'components/common/router';
+import { ButtonToolbar, Button } from 'components/bootstrap';
 import { createFromFetchError } from 'logic/errors/ReportedErrors';
 import { DocumentTitle, IfPermitted, PageHeader, Spinner } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
-import CombinedProvider from 'injection/CombinedProvider';
 import { isPermitted } from 'util/PermissionsMixin';
 import history from 'util/History';
 import withParams from 'routing/withParams';
 import EventNotificationDetails from 'components/event-notifications/event-notification-details/EventNotificationDetails';
 import EventNotificationActionLinks from 'components/event-notifications/event-notification-details/EventNotificationActionLinks';
+import { EventNotificationsActions } from 'stores/event-notifications/EventNotificationsStore';
 
 import {} from 'components/event-notifications/event-notification-types';
-
-const { EventNotificationsActions } = CombinedProvider.get('EventNotifications');
 
 const ShowEventDefinitionPage = ({ params: { notificationId } }) => {
   const currentUser = useContext(CurrentUserContext) || {};

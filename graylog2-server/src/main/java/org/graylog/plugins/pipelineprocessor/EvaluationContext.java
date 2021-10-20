@@ -18,6 +18,8 @@ package org.graylog.plugins.pipelineprocessor;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.graylog.plugins.pipelineprocessor.ast.exceptions.FunctionEvaluationException;
+import org.graylog.plugins.pipelineprocessor.ast.expressions.Expression;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog2.plugin.EmptyMessages;
 import org.graylog2.plugin.Message;
@@ -30,6 +32,8 @@ import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
+import static org.graylog2.shared.utilities.ExceptionUtils.getRootCause;
 
 public class EvaluationContext {
 
@@ -111,12 +115,34 @@ public class EvaluationContext {
         evalErrors.add(new EvalError(line, charPositionInLine, descriptor, e));
     }
 
+    public void onEvaluationException(Exception exception, Expression expression) {
+        if (exception instanceof FunctionEvaluationException) {
+            final FunctionEvaluationException fee = (FunctionEvaluationException) exception;
+            addEvaluationError(fee.getStartToken().getLine(),
+                    fee.getStartToken().getCharPositionInLine(),
+                    fee.getFunctionExpression().getFunction().descriptor(),
+                    getRootCause(fee));
+        } else {
+            addEvaluationError(
+                    expression.getStartToken().getLine(),
+                    expression.getStartToken().getCharPositionInLine(),
+                    null,
+                    getRootCause(exception));
+        }
+    }
+
     public boolean hasEvaluationErrors() {
         return evalErrors != null;
     }
 
     public List<EvalError> evaluationErrors() {
         return evalErrors == null ? Collections.emptyList() : Collections.unmodifiableList(evalErrors);
+    }
+
+    @Nullable
+    public EvalError lastEvaluationError() {
+        return evalErrors == null || evalErrors.isEmpty() ? null
+                : evalErrors.get(evalErrors.size() - 1);
     }
 
     public static class TypedValue {

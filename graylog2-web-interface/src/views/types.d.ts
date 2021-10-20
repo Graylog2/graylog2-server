@@ -44,8 +44,18 @@ import View from 'views/logic/views/View';
 import User from 'logic/users/User';
 import { Message } from 'views/components/messagelist/Types';
 import { ValuePath } from 'views/logic/valueactions/ValueActionHandler';
+import WidgetPosition from 'views/logic/widgets/WidgetPosition';
+import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 
-import type { MessageEventTypes } from './types/messageEventTypes';
+type BackendWidgetPosition = {
+  id: string,
+  col: number,
+  row: number,
+  height: number,
+  width: number,
+};
+
+type WidgetPositions = { [widgetId: string]: WidgetPosition };
 
 interface EditWidgetComponentProps<Config extends WidgetConfig = WidgetConfig> {
   children: React.ReactNode,
@@ -197,22 +207,43 @@ export interface ActionContexts {
 
 export type SearchTypeResults = { [id: string]: SearchTypeResultTypes[keyof SearchTypeResultTypes] };
 
+export type MessagePreviewOption = {
+  title: string,
+  isChecked: (config: MessagesWidgetConfig) => boolean,
+  isDisabled: (config: MessagesWidgetConfig) => boolean,
+  help?: string,
+  onChange: (config: MessagesWidgetConfig, onConfigChange: (config: MessagesWidgetConfig) => void) => void
+  sort: number,
+}
+
+type MessageAugmentation = {
+  id: string,
+  component: React.ComponentType<{ message: Message }>,
+}
+
+type MessageDetailContextProviderProps = {
+  message: Message,
+}
+
 declare module 'graylog-web-plugin/plugin' {
   export interface PluginExports {
     creators?: Array<Creator>;
     enterpriseWidgets?: Array<WidgetExport>;
     externalValueActions?: Array<ActionDefinition>;
     fieldActions?: Array<ActionDefinition>;
-    messageEventTypes?: Array<MessageEventTypes>;
+    messageAugmentations?: Array<MessageAugmentation>;
     searchTypes?: Array<SearchType>;
     systemConfigurations?: Array<SystemConfiguration>;
     valueActions?: Array<ActionDefinition>;
     'views.completers'?: Array<Completer>;
+    'views.components.widgets.messageTable.previewOptions'?: Array<MessagePreviewOption>;
+    'views.components.widgets.messageTable.messageRowOverride'?: Array<React.ComponentType<MessageRowOverrideProps>>;
+    'views.components.widgets.messageDetails.contextProviders'?: Array<React.ComponentType<MessageDetailContextProviderProps>>,
     'views.elements.header'?: Array<React.ComponentType>;
     'views.elements.queryBar'?: Array<React.ComponentType>;
     'views.export.formats'?: Array<ExportFormat>;
-    'views.hooks.executingView'?: Array<ViewHook>,
-    'views.hooks.loadingView'?: Array<ViewHook>,
+    'views.hooks.executingView'?: Array<ViewHook>;
+    'views.hooks.loadingView'?: Array<ViewHook>;
     'views.hooks.searchRefresh'?: Array<SearchRefreshCondition>;
     'views.hooks.copyWidgetToDashboard'?: Array<CopyWidgetToDashboardHook>;
     'views.overrides.widgetEdit'?: Array<React.ComponentType<OverrideProps>>;

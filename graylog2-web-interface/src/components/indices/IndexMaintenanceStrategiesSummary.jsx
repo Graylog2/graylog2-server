@@ -17,7 +17,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Alert } from 'components/graylog';
+import { Alert } from 'components/bootstrap';
 import Spinner from 'components/common/Spinner';
 
 class IndexMaintenanceStrategiesSummary extends React.Component {

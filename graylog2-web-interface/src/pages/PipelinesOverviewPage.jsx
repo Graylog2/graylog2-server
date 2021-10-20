@@ -16,18 +16,21 @@
  */
 import React from 'react';
 
-import { LinkContainer } from 'components/graylog/router';
-import { Row, Col, Button } from 'components/graylog';
+import { LinkContainer } from 'components/common/router';
+import { Row, Col, Button } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
 import ProcessingTimelineComponent from 'components/pipelines/ProcessingTimelineComponent';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 
+import CreatePipelineButton from '../components/pipelines/CreatePipelineButton';
+
 const PipelinesOverviewPage = () => (
   <DocumentTitle title="Pipelines">
     <div>
-      <PageHeader title="Pipelines overview">
+      <PageHeader title="Pipelines overview"
+                  subactions={(<CreatePipelineButton />)}>
         <span>
           Pipelines let you transform and process messages coming from streams. Pipelines consist of stages where
           rules are evaluated and applied. Messages can go through one or more stages.

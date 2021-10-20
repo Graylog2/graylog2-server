@@ -22,6 +22,7 @@ import { Icon } from 'components/common';
 
 type Props = {
   children: React.ReactNode,
+  className?: string,
 };
 
 const Description = styled.div`
@@ -48,9 +49,9 @@ const Content = styled.p`
   margin: 0;
 `;
 
-const SmallSupportLink = ({ children }: Props) => {
+const SmallSupportLink = ({ children, className }: Props) => {
   return (
-    <Description className="description-tooltips">
+    <Description className={`${className} description-tooltips`}>
       <IconStack className="fa-stack">
         <Icon name="circle" className="fa-stack-2x" />
         <Icon name="lightbulb" className="fa-stack-1x" type="regular" />
@@ -65,6 +66,11 @@ const SmallSupportLink = ({ children }: Props) => {
 
 SmallSupportLink.propTypes = {
   children: PropTypes.node.isRequired,
+  className: PropTypes.string,
+};
+
+SmallSupportLink.defaultProps = {
+  className: undefined,
 };
 
 export default SmallSupportLink;

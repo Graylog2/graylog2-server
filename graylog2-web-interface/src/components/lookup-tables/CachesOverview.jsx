@@ -17,16 +17,14 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { LinkContainer } from 'components/graylog/router';
+import { LinkContainer } from 'components/common/router';
 import Routes from 'routing/Routes';
-import CombinedProvider from 'injection/CombinedProvider';
-import { Row, Col, Table, Popover, OverlayTrigger, Button } from 'components/graylog';
-import { PaginatedList, SearchForm, Spinner, Icon } from 'components/common';
+import { OverlayTrigger, PaginatedList, SearchForm, Spinner, Icon } from 'components/common';
+import { Row, Col, Table, Popover, Button } from 'components/bootstrap';
 import CacheTableEntry from 'components/lookup-tables/CacheTableEntry';
+import { LookupTableCachesActions } from 'stores/lookup-tables/LookupTableCachesStore';
 
 import Styles from './Overview.css';
-
-const { LookupTableCachesActions } = CombinedProvider.get('LookupTableCaches');
 
 class CachesOverview extends React.Component {
   static propTypes = {

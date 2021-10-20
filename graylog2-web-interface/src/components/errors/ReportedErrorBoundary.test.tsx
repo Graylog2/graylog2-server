@@ -91,7 +91,7 @@ describe('ReportedErrorBoundary', () => {
   });
 
   it('resets error when navigation changes', async () => {
-    const { getByText } = render(<ReportedErrorBoundary>Hello World!</ReportedErrorBoundary>);
+    const { getByText, findByText } = render(<ReportedErrorBoundary>Hello World!</ReportedErrorBoundary>);
     const response = { status: 403, body: { message: 'The request error message' } };
 
     expect(getByText('Hello World!')).not.toBeNull();
@@ -100,10 +100,10 @@ describe('ReportedErrorBoundary', () => {
       ErrorsActions.report(createUnauthorizedError(new FetchError('The request error message', response.status, response)));
     });
 
-    await waitFor(() => expect(getByText('Missing Permissions')).not.toBeNull());
+    await findByText('Missing Permissions');
 
     act(() => history.push('/'));
 
-    await waitFor(() => expect(getByText('Hello World!')).not.toBeNull());
+    await findByText('Hello World!');
   });
 });

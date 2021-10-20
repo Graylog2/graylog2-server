@@ -18,9 +18,7 @@ import moment from 'moment-timezone';
 import { groupBy } from 'lodash';
 
 import type { ChartDefinition } from 'views/components/visualizations/ChartData';
-import CombinedProvider from 'injection/CombinedProvider';
-
-const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 
 export type Event = {
   id: string,

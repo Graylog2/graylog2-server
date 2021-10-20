@@ -16,12 +16,10 @@
  */
 import React from 'react';
 
-import { Col, Row } from 'components/graylog';
-import StoreProvider from 'injection/StoreProvider';
+import { Col, Row } from 'components/bootstrap';
 import { Pagination, Spinner } from 'components/common';
 import { SystemMessagesList } from 'components/systemmessages';
-
-const SystemMessagesStore = StoreProvider.getStore('SystemMessages');
+import { SystemMessagesStore } from 'stores/systemmessages/SystemMessagesStore';
 
 class SystemMessagesComponent extends React.Component {
   PER_PAGE = 30;

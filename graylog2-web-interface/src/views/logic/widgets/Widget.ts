@@ -18,8 +18,7 @@ import { Map } from 'immutable';
 import uuid from 'uuid/v4';
 
 import { QueryString, TimeRange } from 'views/logic/queries/Query';
-
-import { singleton } from '../singleton';
+import { singleton } from 'logic/singleton';
 
 export type WidgetState = {
   id: string;

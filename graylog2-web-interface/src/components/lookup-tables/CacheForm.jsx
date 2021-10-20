@@ -19,13 +19,10 @@ import React from 'react';
 import _ from 'lodash';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import { Button, Col, Row } from 'components/graylog';
-import { Input } from 'components/bootstrap';
+import { Button, Col, Row, Input } from 'components/bootstrap';
 import ObjectUtils from 'util/ObjectUtils';
 import * as FormsUtils from 'util/FormsUtils';
-import CombinedProvider from 'injection/CombinedProvider';
-
-const { LookupTableCachesActions } = CombinedProvider.get('LookupTableCaches');
+import { LookupTableCachesActions } from 'stores/lookup-tables/LookupTableCachesStore';
 
 class CacheForm extends React.Component {
   validationCheckTimer = undefined;

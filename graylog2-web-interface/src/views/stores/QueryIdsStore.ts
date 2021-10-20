@@ -18,7 +18,7 @@ import Reflux from 'reflux';
 import { isEqual } from 'lodash';
 import { OrderedSet } from 'immutable';
 
-import { singletonStore } from 'views/logic/singleton';
+import { singletonStore } from 'logic/singleton';
 
 import { ViewStore, ViewStoreState } from './ViewStore';
 

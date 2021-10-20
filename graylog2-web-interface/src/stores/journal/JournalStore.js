@@ -19,19 +19,22 @@ import Reflux from 'reflux';
 import * as URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
+import { singletonStore } from 'logic/singleton';
 
-const JournalStore = Reflux.createStore({
-  sourceUrl: (nodeId) => `/cluster/${nodeId}/journal`,
+// eslint-disable-next-line import/prefer-default-export
+export const JournalStore = singletonStore(
+  'core.Journal',
+  () => Reflux.createStore({
+    sourceUrl: (nodeId) => `/cluster/${nodeId}/journal`,
 
-  get(nodeId) {
-    const promise = fetch('GET', URLUtils.qualifyUrl(this.sourceUrl(nodeId)));
+    get(nodeId) {
+      const promise = fetch('GET', URLUtils.qualifyUrl(this.sourceUrl(nodeId)));
 
-    promise.catch((error) => {
-      UserNotification.error(`Getting journal information on node ${nodeId} failed: ${error}`, 'Could not get journal information');
-    });
+      promise.catch((error) => {
+        UserNotification.error(`Getting journal information on node ${nodeId} failed: ${error}`, 'Could not get journal information');
+      });
 
-    return promise;
-  },
-});
-
-export default JournalStore;
+      return promise;
+    },
+  }),
+);

@@ -18,13 +18,13 @@ import PropTypes from 'prop-types';
 import React, { useEffect } from 'react';
 
 import HideOnCloud from 'util/conditional/HideOnCloud';
-import { Col, Row, Button } from 'components/graylog';
+import { Col, Row, Button } from 'components/bootstrap';
 import { Spinner } from 'components/common';
-import StoreProvider from 'injection/StoreProvider'; // To make IndexRangesActions work.
 import { IndexRangeSummary, ShardMeter, ShardRoutingOverview } from 'components/indices';
 import type { IndexInfo } from 'stores/indices/IndicesStore';
 import type { IndexRange } from 'stores/indices/IndexRangesStore';
-import CombinedProvider from 'injection/CombinedProvider';
+import { IndexRangesActions } from 'stores/indices/IndexRangesStore';
+import { IndicesActions } from 'stores/indices/IndicesStore';
 
 type Props = {
   index: IndexInfo,
@@ -33,11 +33,6 @@ type Props = {
   indexSetId: string,
   isDeflector: boolean,
 };
-
-const { IndicesActions } = CombinedProvider.get('Indices');
-const { IndexRangesActions } = CombinedProvider.get('IndexRanges');
-
-StoreProvider.getStore('IndexRanges');
 
 const IndexDetails = ({ index, indexName, indexRange, indexSetId, isDeflector }: Props) => {
   useEffect(() => {

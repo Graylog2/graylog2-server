@@ -20,8 +20,7 @@ import { Field } from 'formik';
 
 import { Icon, HoverForHelp } from 'components/common';
 import { TimeUnits } from 'views/Constants';
-import { FormControl, Checkbox, DropdownButton, MenuItem, InputGroup } from 'components/graylog';
-import { Input } from 'components/bootstrap';
+import { FormControl, Checkbox, DropdownButton, MenuItem, InputGroup, Input } from 'components/bootstrap';
 
 const RangeSelect = styled.div`
   display: flex;
@@ -43,7 +42,7 @@ const IntervalCheckboxDescWithHelp = styled.div`
   align-items: center;
 `;
 
-const IntervalHoverForHelp = styled(HoverForHelp)`
+const IntervalHoverForHelp = styled((props) => <HoverForHelp {...props} />)`
   margin-left: 5px;
 `;
 
@@ -70,15 +69,20 @@ const IntervalCheckboxDesc = () => (
   </IntervalCheckboxDescWithHelp>
 );
 
-const Time = ({ index }: Props) => {
-  const toggleIntervalType = (name, currentType, onChange) => {
-    if (currentType === 'auto') {
-      onChange({ target: { name, value: { type: 'timeunit', value: 1, unit: 'minutes' } } });
-    } else {
-      onChange({ target: { name, value: { type: 'auto', scaling: 1.0 } } });
-    }
-  };
+const toggleIntervalType = (name, currentType, onChange) => {
+  if (currentType === 'auto') {
+    onChange({ target: { name, value: { type: 'timeunit', value: 1, unit: 'minutes' } } });
+  } else {
+    onChange({ target: { name, value: { type: 'auto', scaling: 1.0 } } });
+  }
+};
 
+const StyledFormControl = styled(FormControl)`
+  padding: 0;
+  border: 0;
+`;
+
+const Time = ({ index }: Props) => {
   return (
     <Field name={`groupBy.groupings.${index}.interval`}>
       {({ field: { name, value, onChange }, meta: { error } }) => (
@@ -98,13 +102,12 @@ const Time = ({ index }: Props) => {
             <>
               <RangeSelect>
                 <Icon name="search-minus" size="lg" style={{ paddingRight: '0.5rem' }} />
-                <FormControl type="range"
-                             style={{ padding: 0, border: 0 }}
-                             min={0.5}
-                             max={10}
-                             step={0.5}
-                             value={value.scaling ? (1 / value.scaling) : 1.0}
-                             onChange={(e) => onChange({ target: { name, value: { ...value, scaling: 1 / parseFloat(e.target.value) } } })} />
+                <StyledFormControl type="range"
+                                   min={0.5}
+                                   max={10}
+                                   step={0.5}
+                                   value={value.scaling ? (1 / value.scaling) : 1.0}
+                                   onChange={(e) => onChange({ target: { name, value: { ...value, scaling: 1 / parseFloat(e.target.value) } } })} />
                 <Icon name="search-plus" size="lg" style={{ paddingLeft: '0.5rem' }} />
                 <CurrentScale>
                   {value.scaling ? (1 / value.scaling) : 1.0}x

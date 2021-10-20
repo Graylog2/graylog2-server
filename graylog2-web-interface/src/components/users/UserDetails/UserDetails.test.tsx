@@ -98,25 +98,25 @@ describe('<UserDetails />', () => {
         const test = user.toBuilder().sessionTimeoutMs(10000).build();
         render(<SutComponent user={test} />);
 
-        await waitFor(() => expect(screen.getByText('10 Seconds')).toBeInTheDocument());
+        await screen.findByText('10 Seconds');
       });
 
       it('for minutes', async () => {
         render(<SutComponent user={user.toBuilder().sessionTimeoutMs(600000).build()} />);
 
-        await waitFor(() => expect(screen.getByText('10 Minutes')).toBeInTheDocument());
+        await screen.findByText('10 Minutes');
       });
 
       it('for hours', async () => {
         render(<SutComponent user={user.toBuilder().sessionTimeoutMs(36000000).build()} />);
 
-        await waitFor(() => expect(screen.getByText('10 Hours')).toBeInTheDocument());
+        await screen.findByText('10 Hours');
       });
 
       it('for days', async () => {
         render(<SutComponent user={user.toBuilder().sessionTimeoutMs(864000000).build()} />);
 
-        await waitFor(() => expect(screen.getByText('10 Days')).toBeInTheDocument());
+        await screen.findByText('10 Days');
       });
     });
   });
@@ -125,7 +125,7 @@ describe('<UserDetails />', () => {
     it('should display assigned roles', async () => {
       render(<SutComponent user={user} />);
 
-      await waitFor(() => expect(screen.getByText(assignedRole.name)).toBeInTheDocument());
+      await screen.findByText(assignedRole.name);
     });
   });
 
@@ -133,7 +133,7 @@ describe('<UserDetails />', () => {
     it('should display info if license is not present', async () => {
       render(<SutComponent user={user} />);
 
-      await waitFor(() => expect(screen.getByText(/Enterprise Feature/)).toBeInTheDocument());
+      await screen.findByText(/Enterprise Feature/);
     });
   });
 });

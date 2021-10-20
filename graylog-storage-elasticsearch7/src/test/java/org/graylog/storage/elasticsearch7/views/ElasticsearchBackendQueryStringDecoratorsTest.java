@@ -94,7 +94,7 @@ class ElasticsearchBackendQueryStringDecoratorsTest {
         final SearchType searchType = basicSearchType();
         final SearchJob searchJob = basicSearchJob(query, searchType);
 
-        when(query.query()).thenReturn(ElasticsearchQueryString.builder().queryString("*").build());
+        when(query.query()).thenReturn(ElasticsearchQueryString.of("*"));
 
         return searchJob;
     }
@@ -103,8 +103,8 @@ class ElasticsearchBackendQueryStringDecoratorsTest {
         final SearchType searchType = basicSearchType();
         final SearchJob searchJob = basicSearchJob(query, searchType);
 
-        when(query.query()).thenReturn(ElasticsearchQueryString.builder().queryString("*").build());
-        when(searchType.query()).thenReturn(Optional.of(ElasticsearchQueryString.builder().queryString("Should never show up").build()));
+        when(query.query()).thenReturn(ElasticsearchQueryString.of("*"));
+        when(searchType.query()).thenReturn(Optional.of(ElasticsearchQueryString.of("Should never show up")));
 
         return searchJob;
     }

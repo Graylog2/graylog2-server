@@ -17,10 +17,9 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 
-import { Col, Row } from 'components/graylog';
+import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { useStore } from 'stores/connect';
-import CombinedProvider from 'injection/CombinedProvider';
 import { isPermitted } from 'util/PermissionsMixin';
 import SearchesConfig from 'components/configurations/SearchesConfig';
 import MessageProcessorsConfig from 'components/configurations/MessageProcessorsConfig';
@@ -31,14 +30,13 @@ import 'components/maps/configurations';
 import { Store } from 'stores/StoreTypes';
 import usePluginEntities from 'views/logic/usePluginEntities';
 import ConfigletRow from 'pages/configurations/ConfigletRow';
+import { ConfigurationsActions, ConfigurationsStore } from 'stores/configurations/ConfigurationsStore';
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 
 import ConfigletContainer from './configurations/ConfigletContainer';
 import PluginConfigRows from './configurations/PluginConfigRows';
 
 import DecoratorsConfig from '../components/configurations/DecoratorsConfig';
-
-const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
-const { ConfigurationsActions, ConfigurationsStore } = CombinedProvider.get('Configurations');
 
 const SEARCHES_CLUSTER_CONFIG = 'org.graylog2.indexer.searches.SearchesClusterConfig';
 const MESSAGE_PROCESSORS_CONFIG = 'org.graylog2.messageprocessors.MessageProcessorsConfig';

@@ -26,7 +26,7 @@ const SearchActions = {
 // eslint-disable-next-line global-require
 const loadSUT = () => require('./SearchLoadingStateStore');
 
-jest.mock('views/logic/singleton', () => ({
+jest.mock('logic/singleton', () => ({
   singletonActions: (key, target) => target(),
   singletonStore: (key, target) => target(),
 }));

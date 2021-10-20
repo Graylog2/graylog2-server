@@ -18,7 +18,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import AppConfig from 'util/AppConfig';
-import { Badge } from 'components/graylog';
+import { Badge } from 'components/bootstrap';
 
 type Props = {
   smallScreen: boolean,

@@ -16,14 +16,14 @@
  */
 import * as React from 'react';
 
-import { DropdownButton, FormControl, HelpBlock, InputGroup, MenuItem } from 'components/graylog';
+import { DropdownButton, FormControl, HelpBlock, InputGroup, MenuItem } from 'components/bootstrap';
 import * as FormsUtils from 'util/FormsUtils';
 import { TimeUnits } from 'views/Constants';
 
 import type { Interval, TimeUnitInterval } from './Interval';
 import styles from './TimeUnitTimeHistogramPivot.css';
 
-type OnChange = (Interval) => void;
+type OnChange = (interval: Interval) => void;
 
 type Props = {
   interval: TimeUnitInterval,

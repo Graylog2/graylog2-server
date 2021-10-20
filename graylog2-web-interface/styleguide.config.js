@@ -19,12 +19,20 @@ const path = require('path');
 
 const webpackConfig = require('./webpack.config.js');
 
+const defaultComponentIgnore = [
+  '**/__tests__/**',
+  '**/*.test.{js,jsx,ts,tsx}',
+  '**/*.spec.{js,jsx,ts,tsx}',
+  '**/*.d.ts',
+];
+
 module.exports = {
   require: [
+    'core-js/stable',
+    'regenerator-runtime/runtime',
     'bootstrap/less/bootstrap.less',
     'toastr/toastr.less',
     'stylesheets/typeahead.less',
-    'injection/builtins.js',
   ],
   sections: [
     {
@@ -46,27 +54,6 @@ module.exports = {
     {
       name: 'Util Objects',
       content: 'docs/util-objects.md',
-    },
-    {
-      name: 'Shared Components',
-      sections: [
-        {
-          name: 'Bootstrap',
-          components: 'src/components/bootstrap/[A-Z]*.{jsx,tsx}',
-        },
-        {
-          name: 'Common',
-          components: 'src/components/common/[A-Z]*.{jsx,tsx}',
-        },
-        {
-          name: 'Themeable',
-          components: 'src/components/graylog/[A-Z]*.{jsx,tsx}',
-        },
-        {
-          name: 'Configuration Forms',
-          components: 'src/components/configurationforms/[A-Z]*.{jsx,tsx}',
-        },
-      ],
     },
     {
       name: 'Theming Details',
@@ -91,6 +78,38 @@ module.exports = {
         {
           name: 'Spacings',
           content: 'src/theme/docs/Spacings.md',
+        },
+      ],
+    },
+    {
+      name: 'Shared Components',
+      sections: [
+        {
+          name: 'Bootstrap',
+          components: 'src/components/bootstrap/[A-Z]*.{jsx,tsx}',
+        },
+        {
+          name: 'Common',
+          components: 'src/components/common/[A-Z]*.{jsx,tsx}',
+          ignore: [
+            ...defaultComponentIgnore,
+            'src/components/common/URLWhiteListFormModal.tsx',
+            'src/components/common/FlatContentRow.tsx',
+            'src/components/common/Wizard.tsx',
+            'src/components/common/PublicNotifications.tsx',
+            'src/components/common/KeyCapture.tsx',
+            'src/components/common/MessageDetailsDefinitionList.jsx',
+            'src/components/common/Button.jsx',
+            'src/components/common/Accordion.tsx',
+          ],
+        },
+        {
+          name: 'Configuration Forms',
+          components: 'src/components/configurationforms/[A-Z]*.{jsx,tsx}',
+          ignore: [
+            ...defaultComponentIgnore,
+            'src/components/configurationforms/ListField.tsx',
+          ],
         },
       ],
     },

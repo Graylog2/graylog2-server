@@ -20,16 +20,14 @@ import React from 'react';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import { Input } from 'components/bootstrap';
 import { Select, Spinner } from 'components/common';
-import CombinedProvider from 'injection/CombinedProvider';
 import * as FormsUtils from 'util/FormsUtils';
 import AppConfig from 'util/AppConfig';
-
-const { IndexSetsActions } = CombinedProvider.get('IndexSets');
+import { IndexSetsActions } from 'stores/indices/IndexSetsStore';
 
 class StreamForm extends React.Component {
   static propTypes = {
     onSubmit: PropTypes.func.isRequired,
-    stream: PropTypes.object.isRequired,
+    stream: PropTypes.object,
     title: PropTypes.string.isRequired,
     indexSets: PropTypes.array.isRequired,
   };
@@ -42,7 +40,12 @@ class StreamForm extends React.Component {
     },
   };
 
-  modal = undefined;
+  constructor(props) {
+    super(props);
+
+    this.state = this._getValuesFromProps(props);
+    this.modal = undefined;
+  }
 
   _resetValues = () => {
     this.setState(this._getValuesFromProps(this.props));
@@ -68,12 +71,15 @@ class StreamForm extends React.Component {
   };
 
   _onSubmit = () => {
-    this.props.onSubmit(this.props.stream.id,
+    const { title, description, removeMatchesFromDefaultStream, indexSetId } = this.state;
+    const { onSubmit, stream } = this.props;
+
+    onSubmit(stream.id,
       {
-        title: this.state.title,
-        description: this.state.description,
-        remove_matches_from_default_stream: this.state.removeMatchesFromDefaultStream,
-        index_set_id: this.state.indexSetId,
+        title,
+        description,
+        remove_matches_from_default_stream: removeMatchesFromDefaultStream,
+        index_set_id: indexSetId,
       });
 
     this.modal.close();
@@ -90,7 +96,9 @@ class StreamForm extends React.Component {
   };
 
   _formatSelectOptions = () => {
-    return this.props.indexSets.filter((indexSet) => indexSet.writable).map((indexSet) => {
+    const { indexSets } = this.props;
+
+    return indexSets.filter((indexSet) => indexSet.can_be_default).map((indexSet) => {
       return { value: indexSet.id, label: indexSet.title };
     });
   };
@@ -108,12 +116,13 @@ class StreamForm extends React.Component {
 
   _indexSetSelect = () => {
     const { indexSetId } = this.state;
+    const { indexSets } = this.props;
 
     if (AppConfig.isCloud()) {
       return null;
     }
 
-    if (this.props.indexSets) {
+    if (indexSets) {
       return (
         <Input id="index-set-selector"
                label="Index Set"
@@ -131,14 +140,13 @@ class StreamForm extends React.Component {
     return <Spinner>Loading index sets...</Spinner>;
   };
 
-  state = this._getValuesFromProps(this.props);
-
   render() {
     const { title, description, removeMatchesFromDefaultStream } = this.state;
+    const { title: propTitle } = this.props;
 
     return (
       <BootstrapModalForm ref={(c) => { this.modal = c; }}
-                          title={this.props.title}
+                          title={propTitle}
                           onSubmitForm={this._onSubmit}
                           submitButtonText="Save">
         <Input id="Title"

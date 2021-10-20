@@ -20,10 +20,32 @@ import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
 import UserNotification from 'util/UserNotification';
-import ActionsProvider from 'injection/ActionsProvider';
 import { SearchesConfig } from 'components/search/SearchConfig';
+import { singletonStore, singletonActions } from 'logic/singleton';
 
-const ConfigurationActions = ActionsProvider.getActions('Configuration');
+type ConfigurationsActionsType = {
+  list: (configType: any) => Promise<unknown>,
+  listSearchesClusterConfig: () => Promise<unknown>,
+  listMessageProcessorsConfig: (configType: any) => Promise<unknown>,
+  listEventsClusterConfig: () => Promise<unknown>,
+  listWhiteListConfig: (configType: any) => Promise<unknown>,
+  update: (configType: any, config: any) => Promise<void>,
+  updateWhitelist: (configType: any, config: any) => Promise<void>,
+  updateMessageProcessorsConfig: (configType: any, config: any) => Promise<void>,
+}
+export const ConfigurationsActions = singletonActions(
+  'core.Configuration',
+  () => Reflux.createActions<ConfigurationsActionsType>({
+    list: { asyncResult: true },
+    listSearchesClusterConfig: { asyncResult: true },
+    listMessageProcessorsConfig: { asyncResult: true },
+    listEventsClusterConfig: { asyncResult: true },
+    listWhiteListConfig: { asyncResult: true },
+    update: { asyncResult: true },
+    updateWhitelist: { asyncResult: true },
+    updateMessageProcessorsConfig: { asyncResult: true },
+  }),
+);
 
 const urlPrefix = ApiRoutes.ClusterConfigResource.config().url;
 export type Url = {
@@ -44,145 +66,146 @@ export type ConfigurationsStoreState = {
   eventsClusterConfig: {},
 };
 
-const ConfigurationsStore = Reflux.createStore<ConfigurationsStoreState>({
-  listenables: [ConfigurationActions],
+export const ConfigurationsStore = singletonStore(
+  'core.Configuration',
+  () => Reflux.createStore<ConfigurationsStoreState>({
+    listenables: [ConfigurationsActions],
 
-  configuration: {},
-  searchesClusterConfig: {},
-  eventsClusterConfig: {},
-  getInitialState() {
-    return this.getState();
-  },
+    configuration: {},
+    searchesClusterConfig: {},
+    eventsClusterConfig: {},
+    getInitialState() {
+      return this.getState();
+    },
 
-  getState() {
-    return {
-      configuration: this.configuration,
-      searchesClusterConfig: this.searchesClusterConfig,
-      eventsClusterConfig: this.eventsClusterConfig,
-    };
-  },
+    getState() {
+      return {
+        configuration: this.configuration,
+        searchesClusterConfig: this.searchesClusterConfig,
+        eventsClusterConfig: this.eventsClusterConfig,
+      };
+    },
 
-  propagateChanges() {
-    this.trigger(this.getState());
-  },
+    propagateChanges() {
+      this.trigger(this.getState());
+    },
 
-  _url(path) {
-    return qualifyUrl(urlPrefix + path);
-  },
+    _url(path) {
+      return qualifyUrl(urlPrefix + path);
+    },
 
-  list(configType) {
-    const promise = fetch('GET', this._url(`/${configType}`));
+    list(configType) {
+      const promise = fetch('GET', this._url(`/${configType}`));
 
-    promise.then((response) => {
-      this.configuration = { ...this.configuration, [configType]: response };
-      this.propagateChanges();
-
-      return response;
-    });
-
-    ConfigurationActions.list.promise(promise);
-  },
-
-  listSearchesClusterConfig() {
-    const promise = fetch('GET', this._url('/org.graylog2.indexer.searches.SearchesClusterConfig')).then((response) => {
-      this.searchesClusterConfig = response;
-      this.propagateChanges();
-
-      return response;
-    });
-
-    ConfigurationActions.listSearchesClusterConfig.promise(promise);
-  },
-
-  listMessageProcessorsConfig(configType) {
-    const promise = fetch('GET', qualifyUrl('/system/messageprocessors/config')).then((response) => {
-      this.configuration = { ...this.configuration, [configType]: response };
-      this.propagateChanges();
-
-      return response;
-    });
-
-    ConfigurationActions.listMessageProcessorsConfig.promise(promise);
-  },
-
-  listWhiteListConfig(configType) {
-    const promise = fetch('GET', qualifyUrl('/system/urlwhitelist')).then((response) => {
-      this.configuration = { ...this.configuration, [configType]: response };
-      this.propagateChanges();
-
-      return response;
-    });
-
-    ConfigurationActions.listWhiteListConfig.promise(promise);
-  },
-
-  listEventsClusterConfig() {
-    const promise = fetch('GET', this._url('/org.graylog.events.configuration.EventsConfiguration')).then((response) => {
-      this.eventsClusterConfig = response;
-      this.propagateChanges();
-
-      return response;
-    });
-
-    ConfigurationActions.listEventsClusterConfig.promise(promise);
-  },
-
-  update(configType, config) {
-    const promise = fetch('PUT', this._url(`/${configType}`), config);
-
-    promise.then(
-      (response) => {
+      promise.then((response) => {
         this.configuration = { ...this.configuration, [configType]: response };
         this.propagateChanges();
-        UserNotification.success('Configuration updated successfully');
 
         return response;
-      },
-      (error) => {
-        UserNotification.error(`Search config update failed: ${error}`, `Could not update search config: ${configType}`);
-      },
-    );
+      });
 
-    ConfigurationActions.update.promise(promise);
-  },
+      ConfigurationsActions.list.promise(promise);
+    },
 
-  updateWhitelist(configType, config) {
-    const promise = fetch('PUT', qualifyUrl('/system/urlwhitelist'), config);
-
-    promise.then(
-      () => {
-        this.configuration = { ...this.configuration, [configType]: config };
+    listSearchesClusterConfig() {
+      const promise = fetch('GET', this._url('/org.graylog2.indexer.searches.SearchesClusterConfig')).then((response) => {
+        this.searchesClusterConfig = response;
         this.propagateChanges();
-        UserNotification.success('Url Whitelist Configuration updated successfully');
 
-        return config;
-      },
-      (error) => {
-        UserNotification.error(`Url Whitelist config update failed: ${error}`, `Could not update Url Whitelist: ${configType}`);
-      },
-    );
+        return response;
+      });
 
-    ConfigurationActions.updateWhitelist.promise(promise);
-  },
+      ConfigurationsActions.listSearchesClusterConfig.promise(promise);
+    },
 
-  updateMessageProcessorsConfig(configType, config) {
-    const promise = fetch('PUT', qualifyUrl('/system/messageprocessors/config'), config);
-
-    promise.then(
-      (response) => {
+    listMessageProcessorsConfig(configType) {
+      const promise = fetch('GET', qualifyUrl('/system/messageprocessors/config')).then((response) => {
         this.configuration = { ...this.configuration, [configType]: response };
         this.propagateChanges();
-        UserNotification.success('Configuration updated successfully');
 
         return response;
-      },
-      (error) => {
-        UserNotification.error(`Message processors config update failed: ${error}`, `Could not update config: ${configType}`);
-      },
-    );
+      });
 
-    ConfigurationActions.updateMessageProcessorsConfig.promise(promise);
-  },
-});
+      ConfigurationsActions.listMessageProcessorsConfig.promise(promise);
+    },
 
-export default ConfigurationsStore;
+    listWhiteListConfig(configType) {
+      const promise = fetch('GET', qualifyUrl('/system/urlwhitelist')).then((response) => {
+        this.configuration = { ...this.configuration, [configType]: response };
+        this.propagateChanges();
+
+        return response;
+      });
+
+      ConfigurationsActions.listWhiteListConfig.promise(promise);
+    },
+
+    listEventsClusterConfig() {
+      const promise = fetch('GET', this._url('/org.graylog.events.configuration.EventsConfiguration')).then((response) => {
+        this.eventsClusterConfig = response;
+        this.propagateChanges();
+
+        return response;
+      });
+
+      ConfigurationsActions.listEventsClusterConfig.promise(promise);
+    },
+
+    update(configType, config) {
+      const promise = fetch('PUT', this._url(`/${configType}`), config);
+
+      promise.then(
+        (response) => {
+          this.configuration = { ...this.configuration, [configType]: response };
+          this.propagateChanges();
+          UserNotification.success('Configuration updated successfully');
+
+          return response;
+        },
+        (error) => {
+          UserNotification.error(`Search config update failed: ${error}`, `Could not update search config: ${configType}`);
+        },
+      );
+
+      ConfigurationsActions.update.promise(promise);
+    },
+
+    updateWhitelist(configType, config) {
+      const promise = fetch('PUT', qualifyUrl('/system/urlwhitelist'), config);
+
+      promise.then(
+        () => {
+          this.configuration = { ...this.configuration, [configType]: config };
+          this.propagateChanges();
+          UserNotification.success('Url Whitelist Configuration updated successfully');
+
+          return config;
+        },
+        (error) => {
+          UserNotification.error(`Url Whitelist config update failed: ${error}`, `Could not update Url Whitelist: ${configType}`);
+        },
+      );
+
+      ConfigurationsActions.updateWhitelist.promise(promise);
+    },
+
+    updateMessageProcessorsConfig(configType, config) {
+      const promise = fetch('PUT', qualifyUrl('/system/messageprocessors/config'), config);
+
+      promise.then(
+        (response) => {
+          this.configuration = { ...this.configuration, [configType]: response };
+          this.propagateChanges();
+          UserNotification.success('Configuration updated successfully');
+
+          return response;
+        },
+        (error) => {
+          UserNotification.error(`Message processors config update failed: ${error}`, `Could not update config: ${configType}`);
+        },
+      );
+
+      ConfigurationsActions.updateMessageProcessorsConfig.promise(promise);
+    },
+  }),
+);

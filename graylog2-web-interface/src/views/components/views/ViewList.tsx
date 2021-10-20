@@ -17,7 +17,7 @@
 import React, { useEffect, useReducer, useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
 
-import { ButtonToolbar, DropdownButton, MenuItem } from 'components/graylog';
+import { ButtonToolbar, DropdownButton, MenuItem } from 'components/bootstrap';
 import { IfPermitted, PaginatedList, SearchForm, Spinner, EntityList, ShareButton } from 'components/common';
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import QueryHelper from 'components/common/QueryHelper';

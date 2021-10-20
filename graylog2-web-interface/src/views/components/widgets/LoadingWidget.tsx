@@ -16,14 +16,13 @@
  */
 import * as React from 'react';
 
-import { Icon } from 'components/common';
-
-import styles from './MessageWidgets.css';
+import { Center } from 'components/common';
+import Spinner from 'components/common/Spinner';
 
 const LoadingWidget = () => (
-  <div className={styles.spinnerContainer}>
-    <Icon data-testid="loading-widget" name="sync" size="3x" className="spinner" />
-  </div>
+  <Center>
+    <Spinner data-testid="loading-widget" />
+  </Center>
 );
 
 LoadingWidget.propTypes = {};

@@ -19,15 +19,13 @@ import PropTypes from 'prop-types';
 
 import ObjectUtils from 'util/ObjectUtils';
 import connect from 'stores/connect';
-import { Row, Col, Panel, Table, Tabs, Tab } from 'components/graylog';
 import { Icon, PaginatedList, Spinner, SearchForm } from 'components/common';
+import { Row, Col, Panel, Table, Tabs, Tab } from 'components/bootstrap';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
-import CombinedProvider from 'injection/CombinedProvider';
+import { RulesActions, RulesStore } from 'stores/rules/RulesStore';
 
 import RuleHelperStyle from './RuleHelper.css';
-
-const { RulesStore, RulesActions } = CombinedProvider.get('Rules');
 
 const ruleTemplate = `rule "function howto"
 when

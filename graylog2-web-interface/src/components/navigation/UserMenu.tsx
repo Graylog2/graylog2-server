@@ -17,18 +17,14 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { LinkContainer } from 'components/graylog/router';
-import StoreProvider from 'injection/StoreProvider';
-import ActionsProvider from 'injection/ActionsProvider';
-import { NavDropdown, MenuItem } from 'components/graylog';
+import { LinkContainer } from 'components/common/router';
+import { NavDropdown, MenuItem } from 'components/bootstrap';
 import { Icon } from 'components/common';
 import Routes from 'routing/Routes';
 import history from 'util/History';
+import { SessionActions, SessionStore } from 'stores/sessions/SessionStore';
 
 import ThemeModeToggle from './ThemeModeToggle';
-
-const SessionStore = StoreProvider.getStore('Session');
-const SessionActions = ActionsProvider.getActions('Session');
 
 type Props = {
   fullName: string,

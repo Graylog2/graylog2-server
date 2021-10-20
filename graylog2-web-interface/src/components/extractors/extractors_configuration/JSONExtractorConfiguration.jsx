@@ -18,14 +18,11 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 
-import { Col, Row, Button } from 'components/graylog';
 import { Icon } from 'components/common';
-import { Input } from 'components/bootstrap';
-import StoreProvider from 'injection/StoreProvider';
+import { Col, Row, Button, Input } from 'components/bootstrap';
 import ExtractorUtils from 'util/ExtractorUtils';
 import FormUtils from 'util/FormsUtils';
-
-const ToolsStore = StoreProvider.getStore('Tools');
+import ToolsStore from 'stores/tools/ToolsStore';
 
 const JSONExtractorConfiguration = createReactClass({
   displayName: 'JSONExtractorConfiguration',

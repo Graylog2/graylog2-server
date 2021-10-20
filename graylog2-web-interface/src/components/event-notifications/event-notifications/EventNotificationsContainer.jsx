@@ -19,14 +19,12 @@ import PropTypes from 'prop-types';
 
 import { Spinner } from 'components/common';
 import connect from 'stores/connect';
-import CombinedProvider from 'injection/CombinedProvider';
+import { EventNotificationsActions, EventNotificationsStore } from 'stores/event-notifications/EventNotificationsStore';
 
 import EventNotifications from './EventNotifications';
-
 // Import built-in Event Notification Types
-import {} from '../event-notification-types';
 
-const { EventNotificationsStore, EventNotificationsActions } = CombinedProvider.get('EventNotifications');
+import {} from '../event-notification-types';
 
 class EventNotificationsContainer extends React.Component {
   static propTypes = {

@@ -17,15 +17,13 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { LinkContainer } from 'components/graylog/router';
-import { Alert, Button } from 'components/graylog';
+import { LinkContainer } from 'components/common/router';
+import { Alert, Button } from 'components/bootstrap';
 import { PaginatedList, Spinner, Timestamp } from 'components/common';
-import CombinedProvider from 'injection/CombinedProvider';
 import Routes from 'routing/Routes';
 import DateTime from 'logic/datetimes/DateTime';
 import UserNotification from 'util/UserNotification';
-
-const { UniversalSearchStore } = CombinedProvider.get('UniversalSearch');
+import { UniversalSearchStore } from 'stores/search/UniversalSearchStore';
 
 class AlertMessages extends React.Component {
   static propTypes = {

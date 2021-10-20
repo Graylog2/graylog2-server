@@ -20,36 +20,42 @@ import * as URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 import ApiRoutes from 'routing/ApiRoutes';
-import ActionsProvider from 'injection/ActionsProvider';
+import { singletonActions, singletonStore } from 'logic/singleton';
 
-const AlarmCallbackHistoryActions = ActionsProvider.getActions('AlarmCallbackHistory');
+export const AlarmCallbackHistoryActions = singletonActions(
+  'AlarmCallbackHistory',
+  Reflux.createActions({
+    list: { asyncResult: true },
+  }),
+);
 
-const AlarmCallbackHistoryStore = Reflux.createStore({
-  listenables: [AlarmCallbackHistoryActions],
-  histories: undefined,
+export const AlarmCallbackHistoryStore = singletonStore(
+  'AlarmCallbackHistory',
+  Reflux.createStore({
+    listenables: [AlarmCallbackHistoryActions],
+    histories: undefined,
 
-  getInitialState() {
-    return { histories: this.histories };
-  },
+    getInitialState() {
+      return { histories: this.histories };
+    },
 
-  list(streamId, alertId) {
-    const url = URLUtils.qualifyUrl(ApiRoutes.AlarmCallbackHistoryApiController.list(streamId, alertId).url);
-    const promise = fetch('GET', url)
-      .then(
-        (response) => {
-          this.histories = response.histories;
-          this.trigger({ histories: this.histories });
+    list(streamId, alertId) {
+      const url = URLUtils.qualifyUrl(ApiRoutes.AlarmCallbackHistoryApiController.list(streamId, alertId).url);
+      const promise = fetch('GET', url)
+        .then(
+          (response) => {
+            this.histories = response.histories;
+            this.trigger({ histories: this.histories });
 
-          return this.histories;
-        },
-        (error) => {
-          UserNotification.error(`Fetching notification history for alert '${alertId}' failed with status: ${error}`,
-            'Could not retrieve notification history.');
-        },
-      );
+            return this.histories;
+          },
+          (error) => {
+            UserNotification.error(`Fetching notification history for alert '${alertId}' failed with status: ${error}`,
+              'Could not retrieve notification history.');
+          },
+        );
 
-    AlarmCallbackHistoryActions.list.promise(promise);
-  },
-});
-
-export default AlarmCallbackHistoryStore;
+      AlarmCallbackHistoryActions.list.promise(promise);
+    },
+  }),
+);

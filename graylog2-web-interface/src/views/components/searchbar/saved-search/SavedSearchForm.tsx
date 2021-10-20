@@ -19,7 +19,7 @@ import { Portal } from 'react-portal';
 import { Position } from 'react-overlays';
 import styled from 'styled-components';
 
-import { Button, ControlLabel, FormControl, FormGroup, Popover } from 'components/graylog';
+import { Button, ControlLabel, FormControl, FormGroup, Popover } from 'components/bootstrap';
 
 import styles from './SavedSearchForm.css';
 

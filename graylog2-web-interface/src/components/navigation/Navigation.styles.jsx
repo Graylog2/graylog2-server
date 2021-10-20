@@ -16,7 +16,7 @@
  */
 import styled, { css } from 'styled-components';
 
-import { Navbar } from 'components/graylog';
+import { Navbar } from 'components/bootstrap';
 
 const StyledNavbar = styled(Navbar)(({ theme }) => css`
   .dev-badge-wrap > a {

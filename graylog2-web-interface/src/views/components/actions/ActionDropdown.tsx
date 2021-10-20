@@ -16,11 +16,10 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
-import { useContext } from 'react';
 
-import { MenuItem } from 'components/graylog';
+import usePluginEntities from 'views/logic/usePluginEntities';
+import { MenuItem } from 'components/bootstrap';
 import ActionMenuItem from 'views/components/actions/ActionMenuItem';
-import FieldAndValueActionsContext from 'views/components/contexts/FieldAndValueActionsContext';
 import { ActionDefinition, ActionHandlerArguments } from 'views/components/actions/ActionHandler';
 
 const DropdownHeader = styled.span`
@@ -37,7 +36,7 @@ const StyledListItem = styled.li`
 `;
 
 const filterVisibleActions = (actions: Array<ActionDefinition> | undefined = [], handlerArgs: Props['handlerArgs']) => {
-  return actions?.filter((action: ActionDefinition) => {
+  return actions.filter((action: ActionDefinition) => {
     const { isHidden = () => false } = action;
 
     return !isHidden(handlerArgs);
@@ -45,27 +44,28 @@ const filterVisibleActions = (actions: Array<ActionDefinition> | undefined = [],
 };
 
 const useInternalActions = (type: Props['type'], handlerArgs: Props['handlerArgs']) => {
-  const fieldAndValueActions = useContext(FieldAndValueActionsContext);
+  const valueActions = usePluginEntities('valueActions');
+  const fieldActions = usePluginEntities('fieldActions');
 
-  if (type === 'value' && fieldAndValueActions) {
-    return filterVisibleActions(fieldAndValueActions.valueActions.internal, handlerArgs);
+  if (type === 'value') {
+    return filterVisibleActions(valueActions, handlerArgs);
   }
 
-  if (type === 'field' && fieldAndValueActions) {
-    return filterVisibleActions(fieldAndValueActions.fieldActions.internal, handlerArgs);
+  if (type === 'field') {
+    return filterVisibleActions(fieldActions, handlerArgs);
   }
 
   return [];
 };
 
 const useExternalActions = (type: Props['type'], handlerArgs: Props['handlerArgs']) => {
-  const fieldAndValueActions = useContext(FieldAndValueActionsContext);
+  const valueActions = usePluginEntities('externalValueActions');
 
-  if (type !== 'value' || !fieldAndValueActions) {
+  if (type !== 'value') {
     return [];
   }
 
-  return filterVisibleActions(fieldAndValueActions.valueActions.external, handlerArgs);
+  return filterVisibleActions(valueActions, handlerArgs);
 };
 
 type Props = {

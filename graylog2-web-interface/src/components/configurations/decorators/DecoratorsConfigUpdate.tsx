@@ -18,7 +18,7 @@ import React, { useCallback, useState } from 'react';
 import { cloneDeep } from 'lodash';
 
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
-import { Button, Modal } from 'components/graylog';
+import { Button, Modal } from 'components/bootstrap';
 import { IfPermitted } from 'components/common';
 import type { Stream } from 'stores/streams/StreamsStore';
 import DecoratorList from 'views/components/messagelist/decorators/DecoratorList';

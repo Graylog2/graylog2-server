@@ -19,7 +19,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import WithGlobalAppNotifications from 'components/notifications/WithGlobalAppNotifications';
-import { Grid } from 'components/graylog';
+import { Grid } from 'components/bootstrap';
 import Footer from 'components/layout/Footer';
 
 type Props = {

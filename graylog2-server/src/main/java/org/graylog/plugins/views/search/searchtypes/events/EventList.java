@@ -36,6 +36,7 @@ import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import static org.graylog2.plugin.streams.Stream.DEFAULT_EVENTS_STREAM_ID;
 import static org.graylog2.plugin.streams.Stream.DEFAULT_SYSTEM_EVENTS_STREAM_ID;
@@ -91,6 +92,8 @@ public abstract class EventList implements SearchType {
         @JsonProperty
         public abstract Builder id(String id);
 
+        abstract String id();
+
         @JsonProperty
         public abstract Builder name(@Nullable String name);
 
@@ -106,7 +109,14 @@ public abstract class EventList implements SearchType {
         @JsonProperty
         public abstract Builder streams(Set<String> streams);
 
-        public abstract EventList build();
+        abstract EventList autoBuild();
+
+        public EventList build() {
+            if(id() == null) {
+                id(UUID.randomUUID().toString());
+            }
+            return autoBuild();
+        }
     }
 
     @AutoValue

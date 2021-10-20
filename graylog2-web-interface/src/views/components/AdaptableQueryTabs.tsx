@@ -20,10 +20,10 @@ import { useEffect, useMemo, useState, ReactNode } from 'react';
 import styled, { css } from 'styled-components';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 
+import { ModifiedNavDropdown as NavDropdown } from 'components/bootstrap/NavDropdown';
 import { QueryId } from 'views/logic/queries/Query';
 import QueryTitleEditModal from 'views/components/queries/QueryTitleEditModal';
-import { Nav, NavItem, MenuItem } from 'components/graylog';
-import { ModifiedNavDropdown as NavDropdown } from 'components/graylog/NavDropdown';
+import { Nav, NavItem, MenuItem } from 'components/bootstrap';
 import { Icon } from 'components/common';
 import QueryTitle from 'views/components/queries/QueryTitle';
 
@@ -160,7 +160,7 @@ const adjustTabsVisibility = (maxWidth, lockedTab, setLockedTab) => {
   }
 };
 
-const AdaptableQueryTabs = ({ maxWidth, queries, titles, selectedQueryId, onRemove, onSelect, queryTitleEditModal, onTitleChange }: Props) => {
+const AdaptableQueryTabs = ({ maxWidth, queries, titles, selectedQueryId, onRemove, onSelect, queryTitleEditModal }: Props) => {
   const [openedMore, setOpenedMore] = useState<boolean>(false);
   const [lockedTab, setLockedTab] = useState<QueryId>();
 
@@ -169,18 +169,14 @@ const AdaptableQueryTabs = ({ maxWidth, queries, titles, selectedQueryId, onRemo
     const menuItems = [];
     const lockedItems = [];
 
-    queries.forEach((id) => {
+    queries.keySeq().forEach((id, idx) => {
       const openTitleEditModal = (activeQueryTitle: string) => {
         if (queryTitleEditModal) {
           queryTitleEditModal.current.open(activeQueryTitle);
         }
       };
 
-      if (!titles.has(id) && lockedTab !== id && selectedQueryId === id) {
-        onTitleChange(id, `Page#${queries.size}`).then(() => setLockedTab(id));
-      }
-
-      const title = titles.get(id, `Page#${queries.size}`);
+      const title = titles.get(id, `Page#${idx + 1}`);
       const tabTitle = (
         <QueryTitle active={id === selectedQueryId}
                     id={id}
@@ -225,7 +221,7 @@ const AdaptableQueryTabs = ({ maxWidth, queries, titles, selectedQueryId, onRemo
     });
 
     return { navItems, menuItems, lockedItems };
-  }, [lockedTab, onRemove, onSelect, onTitleChange, queries, queryTitleEditModal, selectedQueryId, titles]);
+  }, [lockedTab, onRemove, onSelect, queries, queryTitleEditModal, selectedQueryId, titles]);
 
   useEffect(() => {
     adjustTabsVisibility(maxWidth, lockedTab, setLockedTab);
@@ -272,7 +268,6 @@ AdaptableQueryTabs.propTypes = {
     PropTypes.func,
     PropTypes.shape({ current: PropTypes.object }),
   ]).isRequired,
-  onTitleChange: PropTypes.func.isRequired,
 };
 
 export default AdaptableQueryTabs;

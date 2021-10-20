@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import Immutable from 'immutable';
-import { render, waitFor, screen } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
 import { StoreMock as MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
 import mockComponent from 'helpers/mocking/MockComponent';
@@ -144,7 +144,7 @@ describe('Dashboard Search', () => {
   it('should list tabs for dashboard pages', async () => {
     render(<SimpleSearch />);
 
-    await waitFor(() => expect(screen.getByRole('button', { name: 'First dashboard page' })).toBeInTheDocument());
+    await screen.findByRole('button', { name: 'First dashboard page' });
 
     expect(screen.getByRole('button', { name: 'Second dashboard page' })).toBeInTheDocument();
   });
@@ -153,7 +153,7 @@ describe('Dashboard Search', () => {
     mockWidgetEditing();
     render(<SimpleSearch />);
 
-    await waitFor(() => expect(screen.getByText('Mocked search results')).toBeInTheDocument());
+    await screen.findByText('Mocked search results');
 
     expect(screen.queryByText('First dashboard page')).not.toBeInTheDocument();
     expect(screen.queryByText('Second dashboard page')).not.toBeInTheDocument();
@@ -162,14 +162,14 @@ describe('Dashboard Search', () => {
   it('should display dashboard search bar', async () => {
     render(<SimpleSearch />);
 
-    await waitFor(() => expect(screen.getByText('Mocked dashboard search bar')).toBeInTheDocument());
+    await screen.findByText('Mocked dashboard search bar');
   });
 
   it('should not display dashboard search bar on widget edit', async () => {
     mockWidgetEditing();
     render(<SimpleSearch />);
 
-    await waitFor(() => expect(screen.getByText('Mocked search results')).toBeInTheDocument());
+    await screen.findByText('Mocked search results');
 
     expect(screen.queryByText('Mocked dashboard search bar')).not.toBeInTheDocument();
   });

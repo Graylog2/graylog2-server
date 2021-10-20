@@ -52,6 +52,7 @@ import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog2.indexer.EventIndexTemplateProvider.EVENT_TEMPLATE_TYPE;
 import static org.mockito.Mockito.when;
 
 public class MongoIndexSetServiceTest {
@@ -92,7 +93,7 @@ public class MongoIndexSetServiceTest {
                                 "57f3d721a43c2d59cb750001",
                                 "Test 1",
                                 "This is the index set configuration for Test 1",
-                                true,
+                                true, true,
                                 "test_1",
                                 4,
                                 1,
@@ -121,7 +122,7 @@ public class MongoIndexSetServiceTest {
                                 "57f3d721a43c2d59cb750001",
                                 "Test 1",
                                 "This is the index set configuration for Test 1",
-                                true,
+                                true, true,
                                 "test_1",
                                 4,
                                 1,
@@ -186,7 +187,7 @@ public class MongoIndexSetServiceTest {
                                 "57f3d721a43c2d59cb750001",
                                 "Test 1",
                                 "This is the index set configuration for Test 1",
-                                true,
+                                true, true,
                                 "test_1",
                                 4,
                                 1,
@@ -205,7 +206,7 @@ public class MongoIndexSetServiceTest {
                                 "57f3d721a43c2d59cb750002",
                                 "Test 2",
                                 null,
-                                true,
+                                true, false,
                                 "test_2",
                                 1,
                                 0,
@@ -224,7 +225,7 @@ public class MongoIndexSetServiceTest {
                                 "57f3d721a43c2d59cb750003",
                                 "Test 3",
                                 "This is the index set configuration for Test 3 - with an index set index template",
-                                true,
+                                true, null,
                                 "test_3",
                                 1,
                                 0,
@@ -235,7 +236,7 @@ public class MongoIndexSetServiceTest {
                                 ZonedDateTime.of(2016, 10, 4, 18, 0, 0, 0, ZoneOffset.UTC),
                                 "standard",
                                 "test_3",
-                                IndexSetConfig.TemplateType.EVENTS,
+                                EVENT_TEMPLATE_TYPE,
                                 1,
                                 false
                         )
@@ -249,7 +250,7 @@ public class MongoIndexSetServiceTest {
         final IndexSetConfig indexSetConfig = IndexSetConfig.create(
                 "Test 3",
                 null,
-                true,
+                true, true,
                 "test_3",
                 10,
                 0,
@@ -260,7 +261,7 @@ public class MongoIndexSetServiceTest {
                 ZonedDateTime.of(2016, 10, 4, 12, 0, 0, 0, ZoneOffset.UTC),
                 "standard",
                 "index-template",
-                IndexSetConfig.TemplateType.EVENTS,
+                EVENT_TEMPLATE_TYPE,
                 1,
                 false
         );

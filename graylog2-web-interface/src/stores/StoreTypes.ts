@@ -19,8 +19,10 @@ type ExtractResultType<R extends PromiseProvider> = ExtractTypeFromPromise<Retur
 type ExtractTypeFromPromise<P> = P extends Promise<infer R> ? R : P;
 
 export type ListenableAction<R extends PromiseProvider> = R & {
+  triggerPromise: R;
   listen: (cb: (result: ExtractResultType<R>) => any) => () => void;
   completed: {
+    (result: ExtractResultType<R>): void;
     listen: (cb: (result: ExtractResultType<R>) => any) => () => void;
   };
   promise: (promise: ReturnType<R>) => void;
@@ -32,3 +34,5 @@ export type Store<State> = {
   listen: (cb: (state: State) => unknown) => () => void;
   getInitialState: () => State;
 };
+
+export type StoreState<R> = R extends Store<infer T> ? T : never;

@@ -18,11 +18,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 
-import { Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/graylog';
+import { MultiSelect } from 'components/common';
+import { Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/bootstrap';
 
 // TODO: This should be moved to a general place outside of `views`
 import { defaultCompare } from 'views/logic/DefaultCompare';
-import { MultiSelect } from 'components/common';
 
 import AggregationConditionsForm from './AggregationConditionsForm';
 

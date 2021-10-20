@@ -18,7 +18,7 @@ import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 import styled, { createGlobalStyle } from 'styled-components';
 
-import { Button, Modal, Well } from 'components/graylog';
+import { Button, Modal, Well } from 'components/bootstrap';
 import { Icon } from 'components/common';
 import DocumentTitle from 'components/common/DocumentTitle';
 import authStyles from 'theme/styles/authStyles';

@@ -17,18 +17,16 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Col, Button } from 'components/graylog';
+import { Col, Button } from 'components/bootstrap';
 import { EntityListItem, Spinner } from 'components/common';
 import { MetricContainer, CounterRate } from 'components/metrics';
-import CombinedProvider from 'injection/CombinedProvider';
 import { PipelineType, StageType } from 'stores/pipelines/PipelinesStore';
 import { useStore } from 'stores/connect';
-import { RuleType } from 'stores/rules/RulesStore';
+import { RulesStore } from 'stores/rules/RulesStore';
+import type { RuleType } from 'stores/rules/RulesStore';
 
 import StageForm from './StageForm';
 import StageRules from './StageRules';
-
-const { RulesStore } = CombinedProvider.get('Rules');
 
 type Props = {
   stage: StageType,

@@ -22,11 +22,7 @@ import numeral from 'numeral';
 
 import { Pluralize, Spinner } from 'components/common';
 import MetricsExtractor from 'logic/metrics/MetricsExtractor';
-import StoreProvider from 'injection/StoreProvider';
-import ActionsProvider from 'injection/ActionsProvider';
-
-const MetricsStore = StoreProvider.getStore('Metrics');
-const MetricsActions = ActionsProvider.getActions('Metrics');
+import { MetricsActions, MetricsStore } from 'stores/metrics/MetricsStore';
 
 const JournalState = createReactClass({
   displayName: 'JournalState',

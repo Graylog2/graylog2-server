@@ -15,9 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import styled from 'styled-components';
 
-import { OverlayTrigger, Popover, Table, Button } from 'components/graylog';
-import { Icon } from 'components/common';
+import { OverlayTrigger, Icon } from 'components/common';
+import { Popover, Table, Button } from 'components/bootstrap';
 
 const COMMON_FIELD_MAP = {
   id: (entityName) => `Id of the ${entityName}, which is a unique reference.`,
@@ -35,6 +36,14 @@ type Props = {
   example?: string,
   entityName?: string,
 };
+
+const WidePopover = styled(Popover)`
+  max-width: 500px;
+`;
+
+const QueryHelpButton = styled(Button)`
+  padding: 6px 8px;
+`;
 
 const row = (field, description) => (
   <tr key={`row-field-${field}`}>
@@ -57,7 +66,7 @@ const defaultExample = (
 );
 
 const queryHelpPopover = (commonFields, fieldMap, example, entityName) => (
-  <Popover id="team-search-query-help" title="Search Syntax Help">
+  <WidePopover id="team-search-query-help" title="Search Syntax Help">
     <p><strong>Available search fields</strong></p>
     <Table condensed>
       <thead>
@@ -73,12 +82,12 @@ const queryHelpPopover = (commonFields, fieldMap, example, entityName) => (
     </Table>
     <p><strong>Examples</strong></p>
     {example || defaultExample}
-  </Popover>
+  </WidePopover>
 );
 
 const QueryHelper = ({ commonFields, fieldMap, example, entityName }: Props) => (
   <OverlayTrigger trigger="click" rootClose placement="right" overlay={queryHelpPopover(commonFields, fieldMap, example, entityName)}>
-    <Button bsStyle="link"><Icon name="question-circle" /></Button>
+    <QueryHelpButton bsStyle="link"><Icon name="question-circle" /></QueryHelpButton>
   </OverlayTrigger>
 );
 

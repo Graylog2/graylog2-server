@@ -21,7 +21,9 @@ import com.eaio.uuid.UUID;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
+import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -29,9 +31,14 @@ import com.google.common.collect.Iterators;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.net.InetAddresses;
+import org.apache.commons.lang3.StringUtils;
+import org.graylog.failure.FailureCause;
+import org.graylog.failure.ProcessingFailureCause;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.messages.Indexable;
 import org.graylog2.plugin.streams.Stream;
+import org.graylog2.plugin.utilities.date.DateTimeConverter;
+import org.graylog2.shared.utilities.ExceptionUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,18 +47,12 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 import java.net.InetAddress;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.time.temporal.Temporal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
@@ -60,6 +61,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Predicates.equalTo;
 import static com.google.common.base.Predicates.not;
@@ -67,8 +69,13 @@ import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_EVENT_CATE
 import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_EVENT_SUBCATEGORY;
 import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_EVENT_TYPE;
 import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_EVENT_TYPE_CODE;
+import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_GIM_EVENT_CATEGORY;
+import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_GIM_EVENT_CLASS;
+import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_GIM_EVENT_TYPE;
+import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_GIM_EVENT_TYPE_CODE;
+import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_GIM_TAGS;
+import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_GIM_VERSION;
 import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_TAGS;
-import static org.graylog2.plugin.Tools.ES_DATE_FORMAT_FORMATTER;
 import static org.graylog2.plugin.Tools.buildElasticSearchTimeFormat;
 import static org.joda.time.DateTimeZone.UTC;
 
@@ -117,11 +124,6 @@ public class Message implements Messages, Indexable {
      * See: https://github.com/Graylog2/graylog2-server/issues/5994
      */
     public static final String FIELD_GL2_MESSAGE_ID = "gl2_message_id";
-
-    /**
-     * Can be set when a message timestamp gets modified to preserve the original timestamp. (e.g. "clone_message" pipeline function)
-     */
-    public static final String FIELD_GL2_ORIGINAL_TIMESTAMP = "gl2_original_timestamp";
 
     /**
      * Can be set to indicate a message processing error. (e.g. set by the pipeline interpreter when an error occurs)
@@ -195,7 +197,6 @@ public class Message implements Messages, Indexable {
 
     private static final ImmutableSet<String> GRAYLOG_FIELDS = ImmutableSet.of(
         FIELD_GL2_ACCOUNTED_MESSAGE_SIZE,
-        FIELD_GL2_ORIGINAL_TIMESTAMP,
         FIELD_GL2_PROCESSING_ERROR,
         FIELD_GL2_PROCESSING_TIMESTAMP,
         FIELD_GL2_RECEIVE_TIMESTAMP,
@@ -216,7 +217,13 @@ public class Message implements Messages, Indexable {
             FIELD_ILLUMINATE_EVENT_SUBCATEGORY,
             FIELD_ILLUMINATE_EVENT_TYPE,
             FIELD_ILLUMINATE_EVENT_TYPE_CODE,
-            FIELD_ILLUMINATE_TAGS
+            FIELD_ILLUMINATE_TAGS,
+            FIELD_ILLUMINATE_GIM_EVENT_CLASS,
+            FIELD_ILLUMINATE_GIM_EVENT_CATEGORY,
+            FIELD_ILLUMINATE_GIM_EVENT_TYPE,
+            FIELD_ILLUMINATE_GIM_EVENT_TYPE_CODE,
+            FIELD_ILLUMINATE_GIM_TAGS,
+            FIELD_ILLUMINATE_GIM_VERSION
     );
 
     private static final ImmutableSet<String> CORE_MESSAGE_FIELDS = ImmutableSet.of(
@@ -278,9 +285,19 @@ public class Message implements Messages, Indexable {
 
     private ArrayList<Recording> recordings;
 
+    /**
+     * A metadata map for storing custom-defined attributes that need to accompany the message throughout the
+     * processing lifecycle. The value is intentionally not initialized by default, to avoid allocating unneeded
+     * memory for messages that don't need to use metadata.
+     */
+    private Map<String, Object> metadata;
+
     private com.codahale.metrics.Counter sizeCounter = new com.codahale.metrics.Counter();
 
+    private List<ProcessingError> processingErrors;
+
     private static final IdentityHashMap<Class<?>, Integer> classSizes = Maps.newIdentityHashMap();
+
     static {
         classSizes.put(byte.class, 1);
         classSizes.put(Byte.class, 1);
@@ -363,6 +380,11 @@ public class Message implements Messages, Indexable {
     }
 
     @Override
+    public String getMessageId() {
+        return getFieldAs(String.class, FIELD_GL2_MESSAGE_ID);
+    }
+
+    @Override
     public DateTime getTimestamp() {
         return getFieldAs(DateTime.class, FIELD_TIMESTAMP).withZone(UTC);
     }
@@ -412,32 +434,42 @@ public class Message implements Messages, Indexable {
         obj.put(FIELD_GL2_ACCOUNTED_MESSAGE_SIZE, getSize());
 
         final Object timestampValue = getField(FIELD_TIMESTAMP);
-        DateTime dateTime;
-        if (timestampValue instanceof Date) {
-            dateTime = new DateTime(timestampValue);
-        } else if (timestampValue instanceof DateTime) {
-            dateTime = (DateTime) timestampValue;
-        } else if (timestampValue instanceof String) {
-            // if the timestamp value is a string, we try to parse it in the correct format.
-            // we fall back to "now", this avoids losing messages which happen to have the wrong timestamp format
-            try {
-                dateTime = ES_DATE_FORMAT_FORMATTER.parseDateTime((String) timestampValue);
-            } catch (IllegalArgumentException e) {
-                LOG.trace("Invalid format for field timestamp '{}' in message {}, forcing to current time.", timestampValue, getId());
+        DateTime dateTime = timestampValue == null ? fallbackForNullTimestamp() : convertToDateTime(timestampValue);
+        obj.put(FIELD_TIMESTAMP, buildElasticSearchTimeFormat(dateTime.withZone(UTC)));
+
+        if (processingErrors != null && !processingErrors.isEmpty()) {
+            if (processingErrors.stream().anyMatch(processingError -> processingError.getCause().equals(ProcessingFailureCause.InvalidTimestampException))) {
                 invalidTimestampMeter.mark();
-                dateTime = Tools.nowUTC();
             }
-        } else {
-            // don't allow any other types for timestamp, force to "now"
-            LOG.trace("Invalid type for field timestamp '{}' in message {}, forcing to current time.", timestampValue.getClass().getSimpleName(), getId());
-            invalidTimestampMeter.mark();
-            dateTime = Tools.nowUTC();
-        }
-        if (dateTime != null) {
-            obj.put(FIELD_TIMESTAMP, buildElasticSearchTimeFormat(dateTime.withZone(UTC)));
+            obj.put(FIELD_GL2_PROCESSING_ERROR,
+                    processingErrors.stream()
+                            .map(ProcessingError::getDetails)
+                            .collect(Collectors.joining(", ")));
         }
 
         return obj;
+    }
+
+    private DateTime convertToDateTime(@Nonnull Object value) {
+        try {
+            return DateTimeConverter.convertToDateTime(value);
+        } catch (IllegalArgumentException e) {
+            final String error = "Invalid value for field timestamp in message <" + getId() + ">, forcing to current time.";
+            LOG.trace("{}: {}", error, e);
+            addProcessingError(new ProcessingError(ProcessingFailureCause.InvalidTimestampException,
+                    "Replaced invalid timestamp value in message <" + getId() + "> with current time"
+                    , "Value <" + value + "> caused exception: " + ExceptionUtils.getRootCauseMessage(e)));
+            return Tools.nowUTC();
+        }
+    }
+
+    private DateTime fallbackForNullTimestamp() {
+        final String error = "<null> value for field timestamp in message <" + getId() + ">, forcing to current time";
+        LOG.trace(error);
+        addProcessingError(new ProcessingError(ProcessingFailureCause.InvalidTimestampException,
+                "Replaced invalid timestamp value in message <" + getId() + "> with current time",
+                "<null> value provided"));
+        return Tools.nowUTC();
     }
 
     // estimate the byte/char length for a field and its value
@@ -513,39 +545,10 @@ public class Message implements Messages, Indexable {
         }
 
         final boolean isTimestamp = FIELD_TIMESTAMP.equals(trimmedKey);
-        if (isTimestamp && value instanceof Date) {
-            final DateTime timestamp = new DateTime(value);
-            final Object previousValue = fields.put(FIELD_TIMESTAMP, timestamp);
-            updateSize(trimmedKey, timestamp, previousValue);
-        } else if (isTimestamp && value instanceof Temporal) {
-            final Date date;
-            if (value instanceof ZonedDateTime) {
-                date = Date.from(((ZonedDateTime) value).toInstant());
-            } else if (value instanceof OffsetDateTime) {
-                date = Date.from(((OffsetDateTime) value).toInstant());
-            } else if (value instanceof LocalDateTime) {
-                final LocalDateTime localDateTime = (LocalDateTime) value;
-                final ZoneId defaultZoneId = ZoneId.systemDefault();
-                final ZoneOffset offset = defaultZoneId.getRules().getOffset(localDateTime);
-                date = Date.from(localDateTime.toInstant(offset));
-            } else if (value instanceof LocalDate) {
-                final LocalDate localDate = (LocalDate) value;
-                final LocalDateTime localDateTime = localDate.atStartOfDay();
-                final ZoneId defaultZoneId = ZoneId.systemDefault();
-                final ZoneOffset offset = defaultZoneId.getRules().getOffset(localDateTime);
-                date = Date.from(localDateTime.toInstant(offset));
-            } else if (value instanceof Instant) {
-                date = Date.from((Instant) value);
-            } else {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Unsupported temporal type {}. Using current date and time in message {}.", value.getClass(), getId());
-                }
-                date = new Date();
-            }
-
-            final DateTime timestamp = new DateTime(date);
-            final Object previousValue = fields.put(FIELD_TIMESTAMP, timestamp);
-            updateSize(trimmedKey, timestamp, previousValue);
+        if (isTimestamp) {
+            final DateTime timeStamp = value == null ? fallbackForNullTimestamp() : convertToDateTime(value);
+            final Object previousValue = fields.put(FIELD_TIMESTAMP, timeStamp);
+            updateSize(trimmedKey, timeStamp, previousValue);
         } else if (value instanceof String) {
             final String str = ((String) value).trim();
 
@@ -896,6 +899,29 @@ public class Message implements Messages, Indexable {
         return !serverStatus.getDetailedMessageRecordingStrategy().shouldRecord(this);
     }
 
+    /**
+     * Appends another processing error.
+     *
+     * @param processingError another processing error to be appended.
+     *                        Must not be null.
+     */
+    public void addProcessingError(@Nonnull ProcessingError processingError) {
+        if (processingErrors == null) {
+            processingErrors = new ArrayList<>();
+        }
+        processingErrors.add(processingError);
+    }
+
+    /**
+     * Returns a list of submitted processing errors
+     */
+    public List<ProcessingError> processingErrors() {
+        if (processingErrors == null) {
+            return ImmutableList.of();
+        }
+        return ImmutableList.copyOf(processingErrors);
+    }
+
     @Override
     @Nonnull
     public Iterator<Message> iterator() {
@@ -903,6 +929,11 @@ public class Message implements Messages, Indexable {
             return Collections.emptyIterator();
         }
         return Iterators.singletonIterator(this);
+    }
+
+    @Override
+    public boolean supportsFailureHandling() {
+        return true;
     }
 
     public static abstract class Recording {
@@ -951,6 +982,108 @@ public class Message implements Messages, Indexable {
         @Override
         public String apply(final Message input) {
             return input.getId();
+        }
+    }
+
+    /**
+     * Store the specified metadata value within the message's internal metadata map.
+     *
+     * @param key   A globally unique string key identifier for the metadata value.
+     * @param value The metadata object value.
+     */
+    public void setMetadata(String key, Object value) {
+        Preconditions.checkArgument(StringUtils.isNotEmpty(key), "A non-empty key is required.");
+        Preconditions.checkNotNull(value);
+        if (metadata == null) {
+            metadata = new HashMap<>();
+        }
+        metadata.put(key, value);
+    }
+
+    /**
+     * Get the metadata value for the specified key.
+     *
+     * @param key The string key for the metadata entry.
+     */
+    @Nullable
+    public Object getMetadataValue(String key) {
+        if (metadata == null) {
+            return null;
+        }
+        return metadata.get(key);
+    }
+
+    /**
+     * Get the metadata value for the specified key. If not present, then return the default value.
+     *
+     * @param key The string key for the metadata entry.
+     */
+    @Nullable
+    public Object getMetadataValue(String key, Object defaultValue) {
+        if (metadata == null) {
+            return defaultValue;
+        }
+        final Object value = metadata.get(key);
+        return value != null ? value : defaultValue;
+    }
+
+    /**
+     * Remove the metadata value for the specified key.
+     *
+     * @param key The string key for the metadata entry.
+     */
+    public void removeMetadata(String key) {
+        Preconditions.checkArgument(StringUtils.isNotEmpty(key), "A non-empty key is required.");
+        if (metadata == null) {
+            return;
+        }
+        metadata.remove(key);
+    }
+
+    public static class ProcessingError {
+
+        private final FailureCause cause;
+        private final String message;
+        private final String details;
+
+        public ProcessingError(@Nonnull FailureCause cause,
+                               @Nonnull String message,
+                               @Nonnull String details) {
+            this.cause = cause;
+            this.message = message;
+            this.details = details;
+        }
+
+        @Nonnull
+        public FailureCause getCause() {
+            return cause;
+        }
+
+        @Nonnull
+        public String getMessage() {
+            return message;
+        }
+
+        @Nonnull
+        public String getDetails() {
+            return details;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            final ProcessingError that = (ProcessingError) o;
+            return Objects.equal(cause, that.cause) && Objects.equal(message, that.message) && Objects.equal(details, that.details);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(cause, message, details);
         }
     }
 }

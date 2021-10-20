@@ -16,7 +16,7 @@
  */
 import React from 'react';
 
-import { Link } from 'components/graylog/router';
+import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 import DocumentationLink from 'components/support/DocumentationLink';

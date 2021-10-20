@@ -18,10 +18,10 @@ import Reflux from 'reflux';
 import * as Immutable from 'immutable';
 import { get, isEqualWith } from 'lodash';
 
-import type { RefluxActions, Store } from 'stores/StoreTypes';
+import type { RefluxActions } from 'stores/StoreTypes';
 import type { QueryId } from 'views/logic/queries/Query';
 import ViewState from 'views/logic/views/ViewState';
-import { singletonActions, singletonStore } from 'views/logic/singleton';
+import { singletonActions, singletonStore } from 'logic/singleton';
 
 import { ViewActions, ViewStore } from './ViewStore';
 
@@ -43,11 +43,10 @@ export const ViewStatesActions: ViewStatesActionsTypes = singletonActions(
 );
 
 export type ViewStatesStoreState = Immutable.Map<string, ViewState>;
-export type ViewStatesStoreType = Store<ViewStatesStoreState>;
 
-export const ViewStatesStore: ViewStatesStoreType = singletonStore(
+export const ViewStatesStore = singletonStore(
   'views.ViewStates',
-  () => Reflux.createStore({
+  () => Reflux.createStore<ViewStatesStoreState>({
     listenables: [ViewStatesActions],
     states: Immutable.Map(),
 

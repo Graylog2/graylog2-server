@@ -18,9 +18,15 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import {
-  InputGroup, FormGroup, ControlLabel, FormControl, HelpBlock, DropdownButton, MenuItem,
-} from 'components/graylog';
-import { InputWrapper } from 'components/bootstrap';
+  ControlLabel,
+  DropdownButton,
+  FormControl,
+  FormGroup,
+  HelpBlock,
+  InputGroup,
+  InputWrapper,
+  MenuItem,
+} from 'components/bootstrap';
 
 const OPTIONS = [
   { value: 'STRING', label: 'string' },

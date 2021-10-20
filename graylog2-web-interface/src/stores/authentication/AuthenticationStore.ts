@@ -19,28 +19,115 @@ import * as Immutable from 'immutable';
 import { $PropertyType } from 'utility-types/dist/utility-types';
 
 import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
-import type { Store } from 'stores/StoreTypes';
 import { qualifyUrl } from 'util/URLUtils';
 import fetch, { Builder } from 'logic/rest/FetchProvider';
-import { singletonStore } from 'views/logic/singleton';
-import AuthenticationActions from 'actions/authentication/AuthenticationActions';
+import { singletonStore, singletonActions } from 'logic/singleton';
 import PaginationURL from 'util/PaginationURL';
-import type {
-  AuthenticationBackendCreate,
-  AuthenticationBackendUpdate,
-  ConnectionTestPayload,
-  ConnectionTestResult,
-  LoadActiveResponse,
-  LoadResponse,
-  LoginTestPayload,
-  LoginTestResult,
-  PaginatedBackends,
-} from 'actions/authentication/AuthenticationActions';
-import type { PaginatedUsers } from 'actions/users/UsersActions';
+import type { PaginatedUsers } from 'stores/users/UsersStore';
 import type { PaginatedResponseType, Pagination } from 'stores/PaginationTypes';
 import type { AuthenticationBackendJSON } from 'logic/authentication/AuthenticationBackend';
 import ApiRoutes from 'routing/ApiRoutes';
 import UserOverview, { UserOverviewJSON } from 'logic/users/UserOverview';
+import { PaginatedList } from 'stores/PaginationTypes';
+
+export type AuthenticationBackendCreate = {
+  title: $PropertyType<AuthenticationBackendJSON, 'title'>,
+  description: $PropertyType<AuthenticationBackendJSON, 'description'>,
+  config: {
+    type: string,
+  },
+};
+
+export type AuthenticationBackendUpdate = {
+  id: $PropertyType<AuthenticationBackendJSON, 'id'>,
+  title: $PropertyType<AuthenticationBackendJSON, 'title'>,
+  description: $PropertyType<AuthenticationBackendJSON, 'description'>,
+  config: {
+    type: string,
+  },
+};
+
+export type PaginatedBackends = PaginatedList<AuthenticationBackend> & {
+  context: {
+    activeBackend: AuthenticationBackend | undefined | null,
+  },
+};
+
+export type ConnectionTestPayload = {
+  backend_configuration: AuthenticationBackendCreate,
+  backend_id: string | undefined | null,
+};
+export type ConnectionTestResult = {
+  success: boolean,
+  message: string,
+  errors: Array<string>,
+};
+export type LoginTestPayload = {
+  backend_id: string | undefined | null,
+  backend_configuration: AuthenticationBackendCreate,
+  user_login: {
+    username: string,
+    password: string,
+  },
+};
+
+export type LoginTestResult = {
+  success: boolean,
+  message: string,
+  errors: Array<string>,
+  result: {
+    user_exists: boolean,
+    login_success: boolean,
+    user_details: {
+      dn: string,
+      entryUUID: string,
+      uid: string,
+      cn: string,
+      email: string,
+    },
+  },
+};
+
+export type LoadResponse = {
+  backend: AuthenticationBackend | undefined | null,
+};
+
+export type LoadActiveResponse = LoadResponse & {
+  context: {
+    backendsTotal: number,
+  },
+};
+
+export type ActionsType = {
+  create: (AuthenticationBackendCreate) => Promise<LoadResponse>,
+  delete: (authBackendId: $PropertyType<AuthenticationBackend, 'id'> | undefined | null, authBackendTitle: $PropertyType<AuthenticationBackend, 'title'>) => Promise<void>,
+  load: (id: string) => Promise<LoadResponse>,
+  loadActive: () => Promise<LoadActiveResponse>,
+  loadBackendsPaginated: (pagination: Pagination) => Promise<PaginatedBackends>,
+  loadUsersPaginated: (authBackendId: string, pagination: Pagination) => Promise<PaginatedUsers>,
+  loadActiveBackendType: () => Promise<string | undefined>,
+  setActiveBackend: (authBackendId: $PropertyType<AuthenticationBackend, 'id'> | undefined | null, authBackendTitle: $PropertyType<AuthenticationBackend, 'title'>) => Promise<void>,
+  testConnection: (payload: ConnectionTestPayload) => Promise<ConnectionTestResult>,
+  testLogin: (payload: LoginTestPayload) => Promise<LoginTestResult>,
+  update: (id: string, AuthenticationBackendUpdate) => Promise<LoadResponse>,
+};
+
+export const AuthenticationActions = singletonActions(
+  'Authentication',
+  () => Reflux.createActions<ActionsType>({
+    create: { asyncResult: true },
+    delete: { asyncResult: true },
+    load: { asyncResult: true },
+    loadActive: { asyncResult: true },
+    loadBackendsPaginated: { asyncResult: true },
+    loadUsersPaginated: { asyncResult: true },
+    loadActiveBackendType: { asyncResult: true },
+    setActiveBackend: { asyncResult: true },
+    testConnection: { asyncResult: true },
+    testLogin: { asyncResult: true },
+    update: { asyncResult: true },
+  }),
+);
 
 type PaginatedBackendsResponse = PaginatedResponseType & {
   context: {
@@ -53,9 +140,9 @@ type PaginatedUsersResponse = PaginatedResponseType & {
   users: Array<UserOverviewJSON>,
 };
 
-const AuthenticationStore: Store<{ authenticators: any }> = singletonStore(
+export const AuthenticationStore = singletonStore(
   'Authentication',
-  () => Reflux.createStore({
+  () => Reflux.createStore<{ authenticators: any }>({
     listenables: [AuthenticationActions],
 
     getInitialState() {
@@ -199,7 +286,3 @@ const AuthenticationStore: Store<{ authenticators: any }> = singletonStore(
     },
   }),
 );
-
-export { AuthenticationActions, AuthenticationStore };
-
-export default AuthenticationStore;

@@ -47,25 +47,39 @@ export type ActionHandlerArguments<Contexts = ActionContexts> = {
 export type ActionHandler<Contexts> = (args: ActionHandlerArguments<Contexts>) => Promise<unknown>;
 export type ActionHandlerCondition<Contexts> = (args: ActionHandlerArguments<Contexts>) => boolean;
 
-export type ActionHandlerConditions<Contexts> = {
+export type ActionConditions<Contexts> = {
   isEnabled?: ActionHandlerCondition<Contexts>,
   isHidden?: ActionHandlerCondition<Contexts>,
 };
 
-export type HandlerAction<Contexts> = {
+type ActionDefinitionBase<Contexts> = {
   type: string,
   title: string,
-  component?: ActionComponentType,
-  handler?: ActionHandler<Contexts>,
   resetFocus: boolean,
-  linkTarget?: (args: ActionHandlerArguments<Contexts>) => string,
+  help?: (args: ActionHandlerArguments<Contexts>) => { title: string, description: React.ReactNode } | undefined,
 };
 
-export type ActionDefinition<Contexts = ActionContexts> = HandlerAction<Contexts> & ActionHandlerConditions<Contexts>;
+type FunctionHandlerAction<Contexts> = {
+  handler: ActionHandler<Contexts>,
+};
+type ComponentsHandlerAction = {
+  component: ActionComponentType,
+};
 
-// eslint-disable-next-line import/prefer-default-export
-export function createHandlerFor<T>(action: ActionDefinition<T>, setActionComponents: SetActionComponents): ActionHandler<T> {
-  if (action.handler) {
+export type HandlerAction<Contexts> = (FunctionHandlerAction<Contexts> | ComponentsHandlerAction) & ActionDefinitionBase<Contexts>;
+
+export type ExternalLinkAction<Contexts> = {
+  linkTarget: (args: ActionHandlerArguments<Contexts>) => string,
+} & ActionDefinitionBase<Contexts>;
+
+export type ActionDefinition<Contexts = ActionContexts> = (HandlerAction<Contexts> | ExternalLinkAction<Contexts>) & ActionConditions<Contexts>;
+
+export function isExternalLinkAction<T>(action: ActionDefinition<T>): action is ExternalLinkAction<T> {
+  return 'linkTarget' in action;
+}
+
+export function createHandlerFor<T>(action: ActionDefinitionBase<T> & HandlerAction<T>, setActionComponents: SetActionComponents): ActionHandler<T> {
+  if ('handler' in action) {
     return action.handler;
   }
 
@@ -91,9 +105,5 @@ export function createHandlerFor<T>(action: ActionDefinition<T>, setActionCompon
     };
   }
 
-  if (action.linkTarget) {
-    return () => Promise.resolve();
-  }
-
-  throw new Error(`Invalid binding for action: ${String(action)} - has neither 'handler' nor 'component' nor 'linkTarget'.`);
+  throw new Error(`Invalid binding for action: ${String(action)} - has neither 'handler' nor 'component'.`);
 }

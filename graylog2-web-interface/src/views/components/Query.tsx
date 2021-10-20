@@ -15,23 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
-import Immutable from 'immutable';
 import styled, { css } from 'styled-components';
 
 import DocsHelper from 'util/DocsHelper';
-import { Jumbotron } from 'components/graylog';
-import { CurrentViewStateActions } from 'views/stores/CurrentViewStateStore';
-import { Spinner } from 'components/common';
-import { widgetDefinition } from 'views/logic/Widgets';
+import { Jumbotron } from 'components/bootstrap';
 import DocumentationLink from 'components/support/DocumentationLink';
 import IfDashboard from 'views/components/dashboard/IfDashboard';
 import IfSearch from 'views/components/search/IfSearch';
 import WidgetGrid from 'views/components/WidgetGrid';
-import WidgetPosition from 'views/logic/widgets/WidgetPosition';
-
-import { PositionsMap, ImmutableWidgetsMap } from './widgets/WidgetPropTypes';
-import InteractiveContext from './contexts/InteractiveContext';
+import { useStore } from 'stores/connect';
+import { WidgetStore } from 'views/stores/WidgetStore';
 
 const StyledJumbotron = styled(Jumbotron)(({ theme }) => css`
   .container-fluid & {
@@ -42,73 +35,7 @@ const StyledJumbotron = styled(Jumbotron)(({ theme }) => css`
   }
 `);
 
-const MAXIMUM_GRID_SIZE = 12;
-
-const _onPositionsChange = (positions) => {
-  const newPositions: Record<string, WidgetPosition> = Immutable.Map<string, WidgetPosition>(
-    positions.map(({ col, height, row, width, id }) => [id, new WidgetPosition(col, row, height, width >= MAXIMUM_GRID_SIZE ? Infinity : width)]),
-  ).toJS();
-
-  CurrentViewStateActions.widgetPositions(newPositions);
-};
-
-const _getDataAndErrors = (widget, widgetMapping, results) => {
-  const { searchTypes } = results;
-  const widgetType = widgetDefinition(widget.type);
-  const dataTransformer = widgetType.searchResultTransformer || ((x) => x);
-  const searchTypeIds = (widgetMapping[widget.id] || []);
-  const widgetData = searchTypeIds.map((searchTypeId) => searchTypes[searchTypeId]).filter((result) => result);
-  const widgetErrors = results.errors.filter((e) => searchTypeIds.includes(e.searchTypeId));
-  let error;
-
-  const data = dataTransformer(widgetData, widget);
-
-  if (widgetErrors && widgetErrors.length > 0) {
-    error = widgetErrors;
-  }
-
-  if (!widgetData || widgetData.length === 0) {
-    const queryErrors = results.errors.filter((e) => e.type === 'query');
-
-    if (queryErrors.length > 0) {
-      error = error ? [].concat(error, queryErrors) : queryErrors;
-    }
-  }
-
-  return { widgetData: data, error };
-};
-
-const _renderWidgetGrid = (widgetDefs, widgetMapping, results, positions, queryId, fields) => {
-  const widgets = {};
-  const data = {};
-  const errors = {};
-
-  // eslint-disable-next-line react/destructuring-assignment
-  widgetDefs.forEach((widget) => {
-    widgets[widget.id] = widget;
-
-    const { widgetData, error } = _getDataAndErrors(widget, widgetMapping, results);
-
-    data[widget.id] = widgetData;
-    errors[widget.id] = error;
-  });
-
-  return (
-    <InteractiveContext.Consumer>
-      {(interactive) => (
-        <WidgetGrid data={data}
-                    errors={errors}
-                    fields={fields}
-                    locked={!interactive}
-                    onPositionsChange={(p) => _onPositionsChange(p)}
-                    positions={positions}
-                    widgets={widgets} />
-      )}
-    </InteractiveContext.Consumer>
-  );
-};
-
-const EmptyDashboardInfo = () => (
+const NoWidgetsInfo = () => (
   <StyledJumbotron>
     <h2>
       <IfDashboard>
@@ -139,31 +66,17 @@ const EmptyDashboardInfo = () => (
   </StyledJumbotron>
 );
 
-const Query = ({ fields, results, positions, widgetMapping, widgets, queryId }) => {
-  if (!widgets || widgets.isEmpty()) {
-    return <EmptyDashboardInfo />;
-  }
+const useHasWidgets = () => useStore(WidgetStore, (widgets) => widgets?.size > 0);
 
-  if (results) {
-    const widgetGrid = _renderWidgetGrid(widgets, widgetMapping.toJS(), results, positions, queryId, fields);
+const Query = () => {
+  const hasWidgets = useHasWidgets();
 
-    return (<>{widgetGrid}</>);
-  }
-
-  return <Spinner />;
+  return hasWidgets
+    ? <WidgetGrid />
+    : <NoWidgetsInfo />;
 };
 
-Query.propTypes = {
-  fields: PropTypes.object.isRequired,
-  positions: PositionsMap,
-  queryId: PropTypes.string.isRequired,
-  results: PropTypes.object.isRequired,
-  widgetMapping: PropTypes.object.isRequired,
-  widgets: ImmutableWidgetsMap.isRequired,
-};
+const memoizedQuery = React.memo(Query);
+memoizedQuery.displayName = 'Query';
 
-Query.defaultProps = {
-  positions: {},
-};
-
-export default Query;
+export default memoizedQuery;

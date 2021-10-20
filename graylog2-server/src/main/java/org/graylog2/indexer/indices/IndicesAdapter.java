@@ -22,6 +22,7 @@ import org.graylog2.indexer.indices.stats.IndexStatistics;
 import org.graylog2.indexer.searches.IndexRangeStats;
 import org.joda.time.DateTime;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
@@ -38,6 +39,14 @@ public interface IndicesAdapter {
     Set<String> resolveAlias(String alias);
 
     void create(String indexName, IndexSettings indexSettings, String templateName, Map<String, Object> template);
+
+    /**
+     * Add fields to an existing index or to change search only settings of existing fields
+     * @param indexName existing index name
+     * @param mappingType target mapping type (e.g. message). Not relevant for ES7+ (will be simply ignored).
+     * @param mapping field mappings
+     */
+    void updateIndexMapping(@Nonnull String indexName, @Nonnull String mappingType, @Nonnull Map<String, Object> mapping);
 
     boolean ensureIndexTemplate(String templateName, Map<String, Object> template);
 

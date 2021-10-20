@@ -18,14 +18,17 @@ import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
 import MockStore from 'helpers/mocking/StoreMock';
-import { createSimpleMessageEventType } from 'fixtures/messageEventTypes';
+import MockAction from 'helpers/mocking/MockAction';
 
-import MessageEventTypesContext from 'views/components/contexts/MessageEventTypesContext';
+import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 
 import MessageTableEntry from './MessageTableEntry';
 
 jest.mock('stores/configurations/ConfigurationsStore', () => ({
   ConfigurationsStore: MockStore(),
+  ConfigurationsActions: {
+    listSearchesClusterConfig: MockAction(),
+  },
 }));
 
 describe('MessageTableEntry', () => {
@@ -44,47 +47,12 @@ describe('MessageTableEntry', () => {
                            toggleDetail={() => {}}
                            fields={Immutable.List()}
                            message={message}
+                           config={MessagesWidgetConfig.builder().build()}
                            selectedFields={Immutable.OrderedSet(['message', 'notexisting'])}
                            expanded={false} />
       </table>,
     );
 
     expect(screen.getByText('Something happened!')).toBeInTheDocument();
-  });
-
-  it('displays message summary', () => {
-    const simpleEventType = createSimpleMessageEventType(1, { summaryTemplate: '{field1} - {field2}', gl2EventTypeCode: 'event-type-code' });
-
-    const messageEventsContextValue = {
-      eventTypes: { [simpleEventType.gl2EventTypeCode]: simpleEventType },
-    };
-
-    const message = {
-      id: 'deadbeef',
-      index: 'test_0',
-      fields: {
-        gl2_event_type_code: 'event-type-code',
-        message: 'Something happened!',
-        field1: 'Value for field 1',
-        field2: 'Value for field 2',
-      },
-    };
-
-    render(
-      <MessageEventTypesContext.Provider value={messageEventsContextValue}>
-        <table>
-          <MessageTableEntry expandAllRenderAsync
-                             toggleDetail={() => {}}
-                             fields={Immutable.List()}
-                             message={message}
-                             showSummaryRow
-                             selectedFields={Immutable.OrderedSet(['message'])}
-                             expanded={false} />
-        </table>,
-      </MessageEventTypesContext.Provider>,
-    );
-
-    expect(screen.getByText('Value for field 1 - Value for field 2')).toBeInTheDocument();
-    expect(screen.getByText('Value for field 1 - Value for field 2')).toHaveStyle('color: #00752c');
   });
 });

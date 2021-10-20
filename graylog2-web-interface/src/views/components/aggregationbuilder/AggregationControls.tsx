@@ -22,7 +22,7 @@ import styled from 'styled-components';
 import { $PropertyType } from 'utility-types';
 import { EditWidgetComponentProps } from 'views/types';
 
-import { Col, Row } from 'components/graylog';
+import { Col, Row } from 'components/bootstrap';
 import { defaultCompare } from 'views/logic/DefaultCompare';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import CustomPropTypes from 'views/components/CustomPropTypes';

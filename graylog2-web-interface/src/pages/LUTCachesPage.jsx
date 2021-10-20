@@ -17,20 +17,16 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { LinkContainer } from 'components/graylog/router';
+import { LinkContainer } from 'components/common/router';
 import connect from 'stores/connect';
-import { ButtonToolbar, Col, Row, Button } from 'components/graylog';
+import { ButtonToolbar, Col, Row, Button } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import history from 'util/History';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { Cache, CacheCreate, CacheForm, CachesOverview } from 'components/lookup-tables';
-import CombinedProvider from 'injection/CombinedProvider';
 import withParams from 'routing/withParams';
 import withLocation from 'routing/withLocation';
-
-const { LookupTableCachesStore, LookupTableCachesActions } = CombinedProvider.get(
-  'LookupTableCaches',
-);
+import { LookupTableCachesActions, LookupTableCachesStore } from 'stores/lookup-tables/LookupTableCachesStore';
 
 class LUTCachesPage extends React.Component {
   componentDidMount() {

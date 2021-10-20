@@ -36,7 +36,7 @@ import styles from './DataTable.css';
 
 import RenderCompletionCallback from '../widgets/RenderCompletionCallback';
 import type { VisualizationComponentProps } from '../aggregationbuilder/AggregationBuilder';
-import { makeVisualization } from '../aggregationbuilder/AggregationBuilder';
+import { makeVisualization, retrieveChartData } from '../aggregationbuilder/AggregationBuilder';
 
 type Props = VisualizationComponentProps & {
   config: AggregationWidgetConfig,
@@ -94,7 +94,7 @@ const DataTable = ({ config, currentView, data, fields }: Props) => {
   useEffect(onRenderComplete, [onRenderComplete]);
 
   const { columnPivots, rowPivots, series, rollup } = config;
-  const rows = data.chart || Object.values(data)[0] || [];
+  const rows = retrieveChartData(data) ?? [];
 
   const rowFieldNames = rowPivots.map<string>((pivot) => pivot.field);
   const columnFieldNames = columnPivots.map((pivot) => pivot.field);
@@ -103,7 +103,7 @@ const DataTable = ({ config, currentView, data, fields }: Props) => {
   const effectiveFields = Immutable.OrderedSet(rowFieldNames.map((field) => ({ field, source: field })))
     .merge(seriesToMerge.map((s) => ({ field: s.effectiveName, source: s.function })));
 
-  const expandedRows = expandRows(rowFieldNames.slice(), columnFieldNames.slice(), rows.filter((r) => r.source === 'leaf') as Array<Leaf>);
+  const expandedRows = expandRows(rowFieldNames.slice(), columnFieldNames.slice(), rows.filter((r): r is Leaf => r.source === 'leaf'));
 
   const actualColumnPivotFields = _extractColumnPivotValues(rows);
 

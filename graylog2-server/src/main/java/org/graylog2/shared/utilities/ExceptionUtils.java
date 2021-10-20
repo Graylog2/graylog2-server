@@ -16,9 +16,13 @@
  */
 package org.graylog2.shared.utilities;
 
+import com.google.common.base.Throwables;
 import org.apache.commons.lang3.StringUtils;
 
 import java.net.UnknownHostException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class ExceptionUtils {
 
@@ -65,8 +69,49 @@ public class ExceptionUtils {
     public static String getRootCauseMessage(Throwable t) {
         return formatMessageCause(getRootCause(t));
     }
+
     public static String getRootCauseOrMessage(Throwable t) {
         final Throwable rootCause = getRootCause(t, true);
         return formatMessageCause(rootCause != null ? rootCause : t);
+    }
+
+    public static boolean hasCauseOf(Throwable t, Class<? extends Throwable> causeType) {
+        return Throwables.getCausalChain(t)
+                .stream()
+                .anyMatch(c -> causeType.isAssignableFrom(c.getClass()));
+    }
+
+    public static String getShortenedStackTrace(Throwable t) {
+        StringBuilder trace = new StringBuilder();
+
+        final List<Throwable> causalChain = Throwables.getCausalChain(t)
+                .stream()
+                .filter(c -> StringUtils.isNotBlank(c.getMessage()))
+                .collect(Collectors.toList());
+
+        int position = 0;
+        for (Throwable c : causalChain) {
+            if (position > 0) {
+                trace.append("Caused by: ");
+            }
+            appendWithNewline(trace, c);
+            Arrays.stream(c.getStackTrace()).findFirst().ifPresent(firstStackElement -> {
+                trace.append("\tat ");
+                appendWithNewline(trace, firstStackElement);
+                final int more = c.getStackTrace().length - 1;
+                if (more > 0) {
+                    trace.append("\t... ").append(more);
+                    appendWithNewline(trace, " more");
+                }
+            });
+
+            position++;
+        }
+
+        return trace.toString();
+    }
+
+    private static StringBuilder appendWithNewline(StringBuilder stringBuilder, Object append) {
+        return stringBuilder.append(append).append(System.lineSeparator());
     }
 }

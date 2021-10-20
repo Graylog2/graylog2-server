@@ -18,7 +18,7 @@ import Reflux from 'reflux';
 import Immutable from 'immutable';
 import { isEqual } from 'lodash';
 
-import { singletonActions, singletonStore } from 'views/logic/singleton';
+import { singletonActions, singletonStore } from 'logic/singleton';
 import Query, { filtersForQuery, FilterType, QueryId } from 'views/logic/queries/Query';
 import { RefluxActions } from 'stores/StoreTypes';
 import { QueriesList } from 'views/actions/QueriesActions';

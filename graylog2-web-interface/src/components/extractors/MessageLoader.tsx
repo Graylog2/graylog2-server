@@ -18,11 +18,9 @@ import * as React from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 
-import ActionsProvider from 'injection/ActionsProvider';
+import { MessagesActions } from 'stores/messages/MessagesStore';
 
-import { Button } from '../graylog';
-
-const MessagesActions = ActionsProvider.getActions('Messages');
+import { Button } from '../bootstrap';
 
 type LoadMessageFormProps = {
   loadMessage: (e: React.FormEvent) => void,

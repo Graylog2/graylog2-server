@@ -19,7 +19,8 @@ import PropTypes from 'prop-types';
 import lodash from 'lodash';
 import styled, { css } from 'styled-components';
 
-import { Col, Label, OverlayTrigger, Tooltip } from 'components/graylog';
+import { Col, Label, Tooltip } from 'components/bootstrap';
+import { OverlayTrigger } from 'components/common';
 import ContentHeadRow from 'components/common/ContentHeadRow';
 import SupportLink from 'components/support/SupportLink';
 

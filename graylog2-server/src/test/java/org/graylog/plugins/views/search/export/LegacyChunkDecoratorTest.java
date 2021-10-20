@@ -67,7 +67,7 @@ class LegacyChunkDecoratorTest {
     void setsPlausibleAdditionalValuesOnLegacySearchResponse() {
         SimpleMessageChunk undecoratedChunk = SimpleMessageChunk.from(linkedHashSetOf("field-1", "field-2"));
 
-        ExportMessagesCommand command = validCommand(ElasticsearchQueryString.builder().queryString("hase").build());
+        ExportMessagesCommand command = validCommand(ElasticsearchQueryString.of("hase"));
 
         SearchResponse builtLegacyResponse = captureLegacyResponse(undecoratedChunk, command);
 

@@ -49,7 +49,8 @@ public abstract class DatabaseStats {
     public abstract long storageSize();
 
     @JsonProperty
-    public abstract long numExtents();
+    @Nullable
+    public abstract Long numExtents();
 
     @JsonProperty
     public abstract long indexes();
@@ -79,7 +80,7 @@ public abstract class DatabaseStats {
                                        double avgObjSize,
                                        long dataSize,
                                        long storageSize,
-                                       long numExtents,
+                                       @Nullable Long numExtents,
                                        long indexes,
                                        long indexSize,
                                        @Nullable Long fileSize,

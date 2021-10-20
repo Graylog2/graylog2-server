@@ -20,7 +20,7 @@ import { withTheme, DefaultTheme } from 'styled-components';
 
 import connect from 'stores/connect';
 import { isPermitted } from 'util/PermissionsMixin';
-import { Button, ButtonGroup, DropdownButton, MenuItem } from 'components/graylog';
+import { Button, ButtonGroup, DropdownButton, MenuItem } from 'components/bootstrap';
 import { Icon, ShareButton } from 'components/common';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import UserNotification from 'util/UserNotification';
@@ -38,6 +38,7 @@ import * as ViewsPermissions from 'views/Permissions';
 import User from 'logic/users/User';
 import ViewPropertiesModal from 'views/components/views/ViewPropertiesModal';
 import { loadAsDashboard, loadNewSearch } from 'views/logic/views/Actions';
+import IfPermitted from 'components/common/IfPermitted';
 
 import SavedSearchForm from './SavedSearchForm';
 import SavedSearchList from './SavedSearchList';
@@ -261,13 +262,15 @@ class SavedSearchControls extends React.Component<Props, State> {
                                onClick={this.toggleShareSearch}
                                bsStyle="default"
                                disabledInfo={!view.id && 'Only saved searches can be shared.'} />
-                  <DropdownButton title={<Icon name="ellipsis-h" />} id="search-actions-dropdown" pullRight noCaret>
+                  <DropdownButton title={<Icon name="ellipsis-h" />} aria-label="Open search actions dropdown" id="search-actions-dropdown" pullRight noCaret>
                     <MenuItem onSelect={this.toggleMetadataEdit} disabled={!isAllowedToEdit}>
                       <Icon name="edit" /> Edit metadata
                     </MenuItem>
-                    <MenuItem onSelect={this._loadAsDashboard}><Icon name="tachometer-alt" /> Export to dashboard</MenuItem>
+                    <IfPermitted permissions="dashboards:create">
+                      <MenuItem onSelect={this._loadAsDashboard}><Icon name="tachometer-alt" /> Export to dashboard</MenuItem>
+                    </IfPermitted>
                     <MenuItem onSelect={this.toggleExport}><Icon name="cloud-download-alt" /> Export</MenuItem>
-                    <MenuItem disabled={disableReset} onSelect={() => loadNewView()} data-testid="reset-search">
+                    <MenuItem disabled={disableReset} onSelect={() => loadNewView()}>
                       <Icon name="eraser" /> Reset search
                     </MenuItem>
                     <MenuItem divider />

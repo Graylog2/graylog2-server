@@ -17,7 +17,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { Button } from 'components/graylog';
+import { Button } from 'components/bootstrap';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 
 import TimeHistogramPivot from './pivottypes/TimeHistogramPivot';

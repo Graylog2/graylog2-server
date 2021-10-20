@@ -251,12 +251,10 @@ public class LookupTableService extends AbstractIdleService {
     @Subscribe
     public void handleAdapterUpdate(DataAdaptersUpdated updated) {
         scheduler.schedule(() -> {
-            // when a data adapter is updated, the lookup tables that use it need to be updated as well
             // first we create the new adapter instance and start it
             // then we retrieve the old one so we can safely stop it later
             // then we build a new lookup table instance with the new adapter instance
             // last we can remove the old lookup table instance and stop the original adapter
-            final Collection<LookupTableDto> tablesToUpdate = configService.findTablesForDataAdapterIds(updated.ids());
 
             // collect old adapter instances
             final ImmutableSet.Builder<LookupDataAdapter> existingAdapters = ImmutableSet.builder();
@@ -273,6 +271,8 @@ public class LookupTableService extends AbstractIdleService {
             // wait until everything is either running or failed before starting the
             awaitUninterruptibly(runningLatch);
 
+            // when a data adapter is updated, the lookup tables that use it need to be updated as well
+            final Collection<LookupTableDto> tablesToUpdate = configService.findTablesForDataAdapterIds(updated.ids());
             tablesToUpdate.forEach(this::createLookupTable);
 
             // stop old adapters
@@ -295,12 +295,10 @@ public class LookupTableService extends AbstractIdleService {
     @Subscribe
     public void handleCacheUpdate(CachesUpdated updated) {
         scheduler.schedule(() -> {
-            // when a cache is updated, the lookup tables that use it need to be updated as well
             // first we create the new cache instance and start it
             // then we retrieve the old one so we can safely stop it later
             // then we build a new lookup table instance with the new cache instance
             // last we can remove the old lookup table instance and stop the original cache
-            final Collection<LookupTableDto> tablesToUpdate = configService.findTablesForCacheIds(updated.ids());
 
             // collect old cache instances
             final ImmutableSet.Builder<LookupCache> existingCaches = ImmutableSet.builder();
@@ -316,6 +314,8 @@ public class LookupTableService extends AbstractIdleService {
             // wait until everything is either running or failed before starting the
             awaitUninterruptibly(runningLatch);
 
+            // when a cache is updated, the lookup tables that use it need to be updated as well
+            final Collection<LookupTableDto> tablesToUpdate = configService.findTablesForCacheIds(updated.ids());
             tablesToUpdate.forEach(this::createLookupTable);
 
             // stop old caches

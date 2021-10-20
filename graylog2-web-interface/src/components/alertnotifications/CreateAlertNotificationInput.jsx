@@ -20,18 +20,15 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import naturalSort from 'javascript-natural-sort';
 
-import { Col, Row, Button } from 'components/graylog';
-import { Input } from 'components/bootstrap';
 import { ExternalLinkButton, Select, Spinner } from 'components/common';
+import { Col, Row, Button, Input } from 'components/bootstrap';
 import { ConfigurationForm } from 'components/configurationforms';
 import Routes from 'routing/Routes';
 import UserNotification from 'util/UserNotification';
 import history from 'util/History';
-import CombinedProvider from 'injection/CombinedProvider';
-
-const { AlertNotificationsStore, AlertNotificationsActions } = CombinedProvider.get('AlertNotifications');
-const { AlarmCallbacksActions } = CombinedProvider.get('AlarmCallbacks');
-const { StreamsStore } = CombinedProvider.get('Streams');
+import { AlarmCallbacksActions } from 'stores/alarmcallbacks/AlarmCallbacksStore';
+import { AlertNotificationsStore, AlertNotificationsActions } from 'stores/alertnotifications/AlertNotificationsStore';
+import { StreamsStore } from 'stores/streams/StreamsStore';
 
 const CreateAlertNotificationInput = createReactClass({
   displayName: 'CreateAlertNotificationInput',

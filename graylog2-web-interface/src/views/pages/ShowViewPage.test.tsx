@@ -144,7 +144,7 @@ describe('ShowViewPage', () => {
 
     render(<SimpleShowViewPage />);
 
-    await waitFor(() => expect(ViewDeserializer).toHaveBeenCalledWith(viewJson));
+    await waitFor(() => expect(ViewDeserializer).toHaveBeenCalledWith(viewJson, {}));
   });
 
   it('calls ViewLoader upon mount', () => {

@@ -16,11 +16,11 @@
  */
 import * as React from 'react';
 
-import { LinkContainer } from 'components/graylog/router';
+import { LinkContainer } from 'components/common/router';
 import RolesOverview from 'components/roles/RolesOverview';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
-import { Button, Row, Col, Alert } from 'components/graylog';
+import { Button, Row, Col, Alert } from 'components/bootstrap';
 import { PageHeader, DocumentTitle, Icon } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
 

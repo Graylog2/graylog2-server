@@ -21,8 +21,7 @@ import { Formik, Form, Field, FormikProps } from 'formik';
 
 import { validateField, formHasErrors } from 'util/FormsUtils';
 import { FormikFormGroup, FormikInput, InputOptionalInfo as Opt } from 'components/common';
-import { Button, ButtonToolbar } from 'components/graylog';
-import { Input } from 'components/bootstrap';
+import { Input, Button, ButtonToolbar } from 'components/bootstrap';
 
 import BackendWizardContext, { WizardFormValues } from './BackendWizardContext';
 

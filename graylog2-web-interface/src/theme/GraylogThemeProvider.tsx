@@ -19,8 +19,8 @@ import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { ThemeProvider, DefaultTheme } from 'styled-components';
 
-import buttonStyles from 'components/graylog/styles/buttonStyles';
-import aceEditorStyles from 'components/graylog/styles/aceEditorStyles';
+import buttonStyles from 'components/bootstrap/styles/buttonStyles';
+import aceEditorStyles from 'components/bootstrap/styles/aceEditorStyles';
 import usePluginEntities from 'views/logic/usePluginEntities';
 
 import { breakpoints, colors, fonts, utils, spacings } from './index';

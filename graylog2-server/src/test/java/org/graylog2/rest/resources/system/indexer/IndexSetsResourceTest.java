@@ -118,7 +118,7 @@ public class IndexSetsResourceTest {
                 "id",
                 "title",
                 "description",
-                true,
+                true, true,
                 "prefix",
                 1,
                 0,
@@ -153,7 +153,7 @@ public class IndexSetsResourceTest {
                 "id",
                 "title",
                 "description",
-                true,
+                true, true,
                 "prefix",
                 1,
                 0,
@@ -200,7 +200,7 @@ public class IndexSetsResourceTest {
                 "id",
                 "title",
                 "description",
-                true,
+                true, true,
                 "prefix",
                 1,
                 0,
@@ -300,7 +300,7 @@ public class IndexSetsResourceTest {
         final IndexSetConfig indexSetConfig = IndexSetConfig.create(
                 "title",
                 "description",
-                true,
+                true, true,
                 "prefix",
                 1,
                 0,
@@ -326,7 +326,7 @@ public class IndexSetsResourceTest {
         verify(indexSetService, times(1)).save(indexSetConfig);
         verify(indexSetService, times(1)).getDefault();
         verifyNoMoreInteractions(indexSetService);
-        assertThat(summary.toIndexSetConfig()).isEqualTo(savedIndexSetConfig);
+        assertThat(summary.toIndexSetConfig(true)).isEqualTo(savedIndexSetConfig);
     }
 
     @Test
@@ -337,7 +337,7 @@ public class IndexSetsResourceTest {
         final IndexSetConfig indexSetConfig = IndexSetConfig.create(
                 "title",
                 "description",
-                true,
+                true, true,
                 "prefix",
                 1,
                 0,
@@ -369,7 +369,7 @@ public class IndexSetsResourceTest {
                 "id",
                 "new title",
                 "description",
-                true,
+                true, false,
                 "prefix",
                 1,
                 0,
@@ -399,7 +399,7 @@ public class IndexSetsResourceTest {
         verifyNoMoreInteractions(indexSetService);
 
         // The real update wouldn't replace the index template name…
-        final IndexSetConfig actual = summary.toIndexSetConfig().toBuilder()
+        final IndexSetConfig actual = summary.toIndexSetConfig(false).toBuilder()
                 .indexTemplateName("index-template")
                 .build();
         assertThat(actual).isEqualTo(updatedIndexSetConfig);
@@ -412,7 +412,7 @@ public class IndexSetsResourceTest {
                 "id",
                 "title",
                 "description",
-                true,
+                true, true,
                 "prefix",
                 1,
                 0,
@@ -445,7 +445,7 @@ public class IndexSetsResourceTest {
             defaultIndexSetId,
             "title",
             "description",
-            true,
+            true, true,
             "prefix",
             1,
             0,
@@ -631,7 +631,7 @@ public class IndexSetsResourceTest {
             indexSetId,
             "title",
             "description",
-            true,
+            true, true,
             "prefix",
             1,
             0,
@@ -699,7 +699,7 @@ public class IndexSetsResourceTest {
             readOnlyIndexSetId,
             "title",
             "description",
-            false,
+            false, true,
             "prefix",
             1,
             0,
@@ -719,7 +719,44 @@ public class IndexSetsResourceTest {
         when(indexSetService.get(readOnlyIndexSetId)).thenReturn(Optional.of(readOnlyIndexSetConfig));
 
         expectedException.expect(ClientErrorException.class);
-        expectedException.expectMessage("Default index set must be writable.");
+        expectedException.expectMessage("Index set not eligible as default");
+
+        try {
+            indexSetsResource.setDefault(readOnlyIndexSetId);
+        } finally {
+            verifyZeroInteractions(clusterConfigService);
+        }
+    }
+
+    @Test
+    public void setDefaultDoesNotDoAnythingIfIndexSetIsNotElegibleAsDefault() throws Exception {
+        final String readOnlyIndexSetId = "newDefaultIndexSetId";
+        final IndexSet readOnlyIndexSet = mock(IndexSet.class);
+        final IndexSetConfig readOnlyIndexSetConfig = IndexSetConfig.create(
+                readOnlyIndexSetId,
+                "title",
+                "description",
+                true, false,
+                "prefix",
+                1,
+                0,
+                MessageCountRotationStrategy.class.getCanonicalName(),
+                MessageCountRotationStrategyConfig.create(1000),
+                NoopRetentionStrategy.class.getCanonicalName(),
+                NoopRetentionStrategyConfig.create(1),
+                ZonedDateTime.of(2016, 10, 10, 12, 0, 0, 0, ZoneOffset.UTC),
+                "standard",
+                "index-template",
+                "failures",
+                1,
+                false
+        );
+
+        when(readOnlyIndexSet.getConfig()).thenReturn(readOnlyIndexSetConfig);
+        when(indexSetService.get(readOnlyIndexSetId)).thenReturn(Optional.of(readOnlyIndexSetConfig));
+
+        expectedException.expect(ClientErrorException.class);
+        expectedException.expectMessage("Index set not eligible as default");
 
         try {
             indexSetsResource.setDefault(readOnlyIndexSetId);
