@@ -23,6 +23,8 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog2.audit.NullAuditEventSender;
+import org.graylog2.indexer.ElasticsearchException;
+import org.graylog2.indexer.IgnoreIndexTemplate;
 import org.graylog2.indexer.IndexMappingFactory;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.IndexSet;
@@ -61,6 +63,8 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -312,6 +316,58 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
         assertThat(listener.indicesReopenedEvents).containsOnly(IndicesReopenedEvent.create(index));
         assertThat(listener.indicesClosedEvents).isEmpty();
         assertThat(listener.indicesDeletedEvents).isEmpty();
+    }
+
+    @Test
+    public void ensureIndexTemplateDoesntThrowOnIgnoreIndexTemplateAndExistingTemplate() {
+        final String templateName = indexSetConfig.indexTemplateName();
+
+        indices.ensureIndexTemplate(indexSet);
+
+        assertThat(client().templateExists(templateName)).isTrue();
+
+        indices = new Indices(
+                createThrowingIndexMappingFactory(indexSetConfig),
+                mock(NodeId.class),
+                new NullAuditEventSender(),
+                eventBus,
+                indicesAdapter());
+
+        assertThatCode(() -> indices.ensureIndexTemplate(indexSet)).doesNotThrowAnyException();
+
+        assertThat(client().templateExists(templateName)).isTrue();
+    }
+
+    private IndexMappingFactory createThrowingIndexMappingFactory(IndexSetConfig indexSetConfig) {
+        final IndexMappingFactory indexMappingFactory = mock(IndexMappingFactory.class);
+        when(indexMappingFactory.createIndexMapping(any()))
+                .thenThrow(new IgnoreIndexTemplate(true, "Reason",
+                        indexSetConfig.indexPrefix(), indexSetConfig.indexTemplateName(),
+                        indexSetConfig.indexTemplateType().orElse(null)));
+        return indexMappingFactory;
+    }
+
+    @Test
+    public void ensureIndexTemplateThrowsOnIgnoreIndexTemplateAndNonExistingTemplate() {
+        final String templateName = indexSetConfig.indexTemplateName();
+
+        try {
+            indices.deleteIndexTemplate(indexSet);
+        } catch (Exception e) {
+        }
+
+        assertThat(client().templateExists(templateName)).isFalse();
+
+        indices = new Indices(
+                createThrowingIndexMappingFactory(indexSetConfig),
+                mock(NodeId.class),
+                new NullAuditEventSender(),
+                eventBus,
+                indicesAdapter());
+
+        assertThatCode(() -> indices.ensureIndexTemplate(indexSet))
+                .isExactlyInstanceOf(ElasticsearchException.class)
+                .hasMessage("No index template with name 'template-1' (type - 'null') found in Elasticsearch");
     }
 
     @SuppressWarnings("UnstableApiUsage")

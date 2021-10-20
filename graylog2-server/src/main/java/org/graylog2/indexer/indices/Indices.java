@@ -162,14 +162,15 @@ public class Indices {
         try {
             final Map<String, Object> template = buildTemplate(indexSet, indexSetConfig);
             if (indicesAdapter.ensureIndexTemplate(templateName, template)) {
-                LOG.info("Successfully created index template {}", templateName);
+                LOG.info("Successfully ensured index template {}", templateName);
             } else {
                 LOG.warn("Failed to create index template {}", templateName);
             }
         } catch (IgnoreIndexTemplate e) {
             LOG.warn(e.getMessage());
-            if (e.isFailOnMissingTemplate() && !indicesAdapter.indexTemplateExists(e.getIndexTemplateName())) {
-                throw new ElasticsearchException(f("No index template with name '%s' found in Elasticsearch", e.getIndexTemplateName()));
+            if (e.isFailOnMissingTemplate() && !indicesAdapter.indexTemplateExists(templateName)) {
+                throw new ElasticsearchException(f("No index template with name '%s' (type - '%s') found in Elasticsearch",
+                        templateName, indexSetConfig.indexTemplateType().orElse(null)));
             }
         }
     }

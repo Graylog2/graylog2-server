@@ -257,8 +257,12 @@ public class IndicesAdapterES6 implements IndicesAdapter {
     @Override
     public boolean indexTemplateExists(String templateName) {
         final GetTemplate request = new GetTemplate.Builder(uncheckedURLEncode(templateName)).build();
-        final JestResult jestResult = JestUtils.execute(jestClient, request, () -> "Unable to get index template " + templateName);
-        return jestResult.isSucceeded();
+        try {
+            final JestResult jestResult = JestUtils.execute(jestClient, request, () -> "Unable to get index template " + templateName);
+            return jestResult.isSucceeded();
+        } catch (ElasticsearchException e) {
+            return false;
+        }
     }
 
     @Override
