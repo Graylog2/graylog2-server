@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Iterables;
 import com.google.inject.Injector;
+import org.apache.commons.io.FileUtils;
 import org.graylog2.plugin.Plugin;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.PluginModule;
@@ -34,7 +35,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -49,6 +49,7 @@ import static java.util.Objects.requireNonNull;
 
 public class PluginLoader {
     private static final Logger LOG = LoggerFactory.getLogger(PluginLoader.class);
+    private static final String[] PLUGIN_FILE_EXTENSIONS = {"jar", "JAR"};
 
     private final File pluginDir;
     private final ChainingClassLoader classLoader;
@@ -84,14 +85,11 @@ public class PluginLoader {
         }
 
         LOG.debug("Scanning directory <{}> for plugins...", pluginDir.getAbsolutePath());
-        final File[] files = pluginDir.listFiles();
-        if (files == null) {
-            LOG.warn("Could not list files in {}, cannot load plugins.", pluginDir);
-            return Collections.emptySet();
-        }
 
-        LOG.debug("Loading [{}] plugins", files.length);
-        final List<URL> urls = Arrays.stream(files)
+        Collection<File> files = FileUtils.listFiles(pluginDir, PLUGIN_FILE_EXTENSIONS, false);
+
+        LOG.debug("Loading [{}] plugins", files.size());
+        final List<URL> urls = files.stream()
                 .filter(File::isFile)
                 .map(jar -> {
                     try {
@@ -124,7 +122,7 @@ public class PluginLoader {
         // Only create the shared class loader if any plugin requests to be shared.
         if (!sharedClassLoaderUrls.isEmpty()) {
             LOG.debug("Creating shared class loader for {} plugins: {}", sharedClassLoaderUrls.size(), sharedClassLoaderUrls);
-            classLoader.addClassLoader(URLClassLoader.newInstance(sharedClassLoaderUrls.toArray(new URL[sharedClassLoaderUrls.size()])));
+            classLoader.addClassLoader(URLClassLoader.newInstance(sharedClassLoaderUrls.toArray(new URL[0])));
         }
 
         final ServiceLoader<Plugin> pluginServiceLoader = ServiceLoader.load(Plugin.class, classLoader);
