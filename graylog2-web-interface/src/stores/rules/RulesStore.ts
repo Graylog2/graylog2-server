@@ -59,6 +59,7 @@ export type RuleType = {
   created_at: string,
   modified_at: string,
   errors?: [],
+  using_pipelines: Array<string>;
 };
 
 export const RulesStore = singletonStore(

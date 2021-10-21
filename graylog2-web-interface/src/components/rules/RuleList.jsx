@@ -26,6 +26,7 @@ import Routes from 'routing/Routes';
 import { RulesActions, RulesStore } from 'stores/rules/RulesStore';
 
 import RuleMetricsConfigContainer from './RuleMetricsConfigContainer';
+import RuleListEntry from './RuleListEntry';
 
 class RuleList extends React.Component {
   static propTypes = {
@@ -58,39 +59,7 @@ class RuleList extends React.Component {
   };
 
   _ruleInfoFormatter = (rule) => {
-    const actions = [
-      <Button key="delete" bsStyle="primary" bsSize="xsmall" onClick={this._delete(rule)} title="Delete rule">
-        Delete
-      </Button>,
-      <span key="space">&nbsp;</span>,
-      <LinkContainer key="edit" to={Routes.SYSTEM.PIPELINES.RULE(rule.id)}>
-        <Button bsStyle="info" bsSize="xsmall">Edit</Button>
-      </LinkContainer>,
-    ];
-
-    return (
-      <tr key={rule.title}>
-        <td>
-          <Link to={Routes.SYSTEM.PIPELINES.RULE(rule.id)}>
-            {rule.title}
-          </Link>
-        </td>
-        <td className="limited">{rule.description}</td>
-        <td className="limited"><Timestamp dateTime={rule.created_at} relative /></td>
-        <td className="limited"><Timestamp dateTime={rule.modified_at} relative /></td>
-        <td>
-          <MetricContainer name={`org.graylog.plugins.pipelineprocessor.ast.Rule.${rule.id}.executed`} zeroOnMissing>
-            <CounterRate suffix="msg/s" />
-          </MetricContainer>
-        </td>
-        <td>
-          <MetricContainer name={`org.graylog.plugins.pipelineprocessor.ast.Rule.${rule.id}.failed`}>
-            <CounterRate showTotal suffix="errors/s" hideOnMissing />
-          </MetricContainer>
-        </td>
-        <td className="actions">{actions}</td>
-      </tr>
-    );
+    return <RuleListEntry rule={rule} onDelete={this._delete} />;
   };
 
   toggleMetricsConfig = () => {
@@ -110,7 +79,7 @@ class RuleList extends React.Component {
   render() {
     const { rules, metricsConfig } = this.props;
     const filterKeys = ['title', 'description'];
-    const headers = ['Title', 'Description', 'Created', 'Last modified', 'Throughput', 'Errors', 'Actions'];
+    const headers = ['Title', 'Description', 'Created', 'Last modified', 'Throughput', 'Errors', 'Pipelines', 'Actions'];
     const { openMetricsConfig } = this.state;
 
     return (
