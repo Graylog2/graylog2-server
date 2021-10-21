@@ -52,6 +52,8 @@ public class MongoLeaderElectionService extends AbstractExecutionThreadService i
 
         while (isRunning()) {
             final boolean wasLeader = isLeader;
+
+            // TODO: failure handling
             isLeader = lockService.lock(RESOURCE_NAME).isPresent();
 
             if (wasLeader != isLeader) {
@@ -59,6 +61,7 @@ public class MongoLeaderElectionService extends AbstractExecutionThreadService i
                 eventBus.post(new LeaderChangedEvent());
             }
 
+            // TODO: make configurable. Handle interruption on shutdown.
             Uninterruptibles.sleepUninterruptibly(2, SECONDS);
         }
     }
