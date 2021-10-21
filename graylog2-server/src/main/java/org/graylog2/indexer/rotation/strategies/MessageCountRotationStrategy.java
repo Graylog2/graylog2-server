@@ -17,6 +17,7 @@
 package org.graylog2.indexer.rotation.strategies;
 
 import org.graylog2.audit.AuditEventSender;
+import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indices.Indices;
@@ -38,8 +39,9 @@ public class MessageCountRotationStrategy extends AbstractRotationStrategy {
 
     @Inject
     public MessageCountRotationStrategy(Indices indices, NodeId nodeId,
-                                        AuditEventSender auditEventSender) {
-        super(auditEventSender, nodeId);
+                                        AuditEventSender auditEventSender,
+                                        ElasticsearchConfiguration elasticsearchConfiguration) {
+        super(auditEventSender, nodeId, elasticsearchConfiguration);
         this.indices = indices;
     }
 

@@ -15,6 +15,9 @@ public class RotationStrategyValidator implements Validator<Set<String>> {
             MessageCountRotationStrategy.strategyName, SizeBasedRotationStrategy.strategyName, TimeBasedRotationStrategy.strategyName);
 
     @Override
+    // The set of valid rotation strategies must
+    // - contain only names of supported strategies
+    // - not be empty
     public void validate(String parameter, Set<String> value) throws ValidationException {
         if (value == null || value.isEmpty()) {
             throw new ValidationException("Parameter " + parameter + " should be non-empty list");

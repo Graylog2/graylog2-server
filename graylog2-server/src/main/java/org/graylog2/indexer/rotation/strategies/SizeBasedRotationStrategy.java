@@ -17,6 +17,7 @@
 package org.graylog2.indexer.rotation.strategies;
 
 import org.graylog2.audit.AuditEventSender;
+import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
@@ -36,8 +37,9 @@ public class SizeBasedRotationStrategy extends AbstractRotationStrategy {
     @Inject
     public SizeBasedRotationStrategy(Indices indices,
                                      NodeId nodeId,
-                                     AuditEventSender auditEventSender) {
-        super(auditEventSender, nodeId);
+                                     AuditEventSender auditEventSender,
+                                     ElasticsearchConfiguration elasticsearchConfiguration) {
+        super(auditEventSender, nodeId, elasticsearchConfiguration);
         this.indices = indices;
     }
 

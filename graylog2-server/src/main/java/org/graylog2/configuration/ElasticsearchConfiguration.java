@@ -92,7 +92,7 @@ public class ElasticsearchConfiguration {
 
     @Deprecated // Should be removed in Graylog 3.0
     @Parameter(value = "rotation_strategy")
-    private String rotationStrategy = "count";
+    private String rotationStrategy = MessageCountRotationStrategy.strategyName;
 
     @Deprecated // Should be removed in Graylog 3.0
     @Parameter(value = "disable_index_optimization")

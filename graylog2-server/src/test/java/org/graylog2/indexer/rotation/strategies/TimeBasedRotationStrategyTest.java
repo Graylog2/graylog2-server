@@ -17,6 +17,7 @@
 package org.graylog2.indexer.rotation.strategies;
 
 import org.graylog2.audit.AuditEventSender;
+import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.Indices;
@@ -71,13 +72,14 @@ public class TimeBasedRotationStrategyTest {
     @Mock
     private AuditEventSender auditEventSender;
 
+    private ElasticsearchConfiguration configuration = new ElasticsearchConfiguration();
     private TimeBasedRotationStrategy rotationStrategy;
 
     @Before
     public void setUp() {
         when(indexSetConfig.id()).thenReturn("index-set-id");
         when(indexSetConfig.title()).thenReturn("index-set-title");
-        rotationStrategy = new TimeBasedRotationStrategy(indices, nodeId, auditEventSender);
+        rotationStrategy = new TimeBasedRotationStrategy(indices, nodeId, auditEventSender, configuration);
     }
 
     @After
