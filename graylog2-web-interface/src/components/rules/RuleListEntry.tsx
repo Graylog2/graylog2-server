@@ -37,7 +37,6 @@ const Pipeline = styled(Label)`
   line-height: 15px;
 `;
 
-
 const RuleListEntry = ({ rule, onDelete }: Props) => {
   const [viewUsingPipelines, setViewUsingPipelines] = useState(false);
   const { id, title, description, created_at, modified_at, using_pipelines } = rule;
@@ -51,18 +50,20 @@ const RuleListEntry = ({ rule, onDelete }: Props) => {
     </LinkContainer>,
   ];
   const _togglePipelinesDetails = () => setViewUsingPipelines(!viewUsingPipelines);
+
   const _showPipelines = (usingPipelines: Array<string>) => {
     return usingPipelines.map((pipelineName) => {
       const tooltip = <Tooltip id={StringUtils.replaceSpaces(pipelineName)} show>{pipelineName}</Tooltip>;
+
       return (
         <OverlayTrigger key={pipelineName} placement="top" trigger="hover" overlay={tooltip} rootClose>
-          <Pipeline  bsStyle="default">{StringUtils.truncateWithEllipses(pipelineName, 30)}</Pipeline>
+          <Pipeline bsStyle="default">{StringUtils.truncateWithEllipses(pipelineName, 30)}</Pipeline>
         </OverlayTrigger>
-      )
+      );
     });
   };
 
-  return(
+  return (
     <tr key={title} onClick={_togglePipelinesDetails}>
       <td>
         <Link to={Routes.SYSTEM.PIPELINES.RULE(id)}>
