@@ -23,12 +23,12 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog2.audit.NullAuditEventSender;
-import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.IgnoreIndexTemplate;
 import org.graylog2.indexer.IndexMappingFactory;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetStatsCreator;
+import org.graylog2.indexer.IndexTemplateNotFoundException;
 import org.graylog2.indexer.MessageIndexTemplateProvider;
 import org.graylog2.indexer.TestIndexSet;
 import org.graylog2.indexer.cluster.Node;
@@ -366,7 +366,7 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
                 indicesAdapter());
 
         assertThatCode(() -> indices.ensureIndexTemplate(indexSet))
-                .isExactlyInstanceOf(ElasticsearchException.class)
+                .isExactlyInstanceOf(IndexTemplateNotFoundException.class)
                 .hasMessage("No index template with name 'template-1' (type - 'null') found in Elasticsearch");
     }
 

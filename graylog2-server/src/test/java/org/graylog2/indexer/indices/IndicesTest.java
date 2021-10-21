@@ -18,9 +18,9 @@ package org.graylog2.indexer.indices;
 
 import com.google.common.eventbus.EventBus;
 import org.graylog2.audit.AuditEventSender;
-import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.IgnoreIndexTemplate;
 import org.graylog2.indexer.IndexMappingFactory;
+import org.graylog2.indexer.IndexTemplateNotFoundException;
 import org.graylog2.indexer.TestIndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
@@ -94,7 +94,7 @@ class IndicesTest {
 
         assertThatCode(() -> underTest.ensureIndexTemplate(indexSetConfig("test",
                 "test-template", "custom")))
-                .isExactlyInstanceOf(ElasticsearchException.class)
+                .isExactlyInstanceOf(IndexTemplateNotFoundException.class)
                 .hasMessage("No index template with name 'test-template' (type - 'custom') found in Elasticsearch");
     }
 

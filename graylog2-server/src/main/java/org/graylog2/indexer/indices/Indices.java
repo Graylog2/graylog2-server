@@ -28,6 +28,7 @@ import org.graylog2.indexer.IndexMappingFactory;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IgnoreIndexTemplate;
+import org.graylog2.indexer.IndexTemplateNotFoundException;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.events.IndicesClosedEvent;
 import org.graylog2.indexer.indices.events.IndicesDeletedEvent;
@@ -169,7 +170,7 @@ public class Indices {
         } catch (IgnoreIndexTemplate e) {
             LOG.warn(e.getMessage());
             if (e.isFailOnMissingTemplate() && !indicesAdapter.indexTemplateExists(templateName)) {
-                throw new ElasticsearchException(f("No index template with name '%s' (type - '%s') found in Elasticsearch",
+                throw new IndexTemplateNotFoundException(f("No index template with name '%s' (type - '%s') found in Elasticsearch",
                         templateName, indexSetConfig.indexTemplateType().orElse(null)));
             }
         }
