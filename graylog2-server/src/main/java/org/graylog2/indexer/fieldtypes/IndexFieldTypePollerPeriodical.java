@@ -20,6 +20,8 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.primitives.Ints;
+import org.graylog2.cluster.NodeNotFoundException;
+import org.graylog2.cluster.NodeService;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.MongoIndexSet;
 import org.graylog2.indexer.cluster.Cluster;
@@ -33,6 +35,7 @@ import org.graylog2.indexer.indices.events.IndicesDeletedEvent;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.periodical.Periodical;
+import org.graylog2.plugin.system.NodeId;
 import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,6 +65,8 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
     private final MongoIndexSet.Factory mongoIndexSetFactory;
     private final Cluster cluster;
     private final ServerStatus serverStatus;
+    private final NodeService nodeService;
+    private final NodeId nodeId;
     private final com.github.joschi.jadconfig.util.Duration periodicalInterval;
     private final ScheduledExecutorService scheduler;
     private final ConcurrentMap<String, ScheduledFuture<?>> futures = new ConcurrentHashMap<>();
@@ -76,6 +81,8 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
                                           final Cluster cluster,
                                           final EventBus eventBus,
                                           final ServerStatus serverStatus,
+                                          final NodeService nodeService,
+                                          final NodeId nodeId,
                                           @Named("index_field_type_periodical_interval") final com.github.joschi.jadconfig.util.Duration periodicalInterval,
                                           @Named("daemonScheduler") final ScheduledExecutorService scheduler) {
         this.poller = poller;
@@ -85,6 +92,8 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
         this.mongoIndexSetFactory = mongoIndexSetFactory;
         this.cluster = cluster;
         this.serverStatus = serverStatus;
+        this.nodeService = nodeService;
+        this.nodeId = nodeId;
         this.periodicalInterval = periodicalInterval;
         this.scheduler = scheduler;
 
@@ -143,12 +152,27 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
         return skippedLifecycles.contains(currentLifecycle);
     }
 
+    private boolean isNotLeader() {
+        try {
+            return !nodeService.byNodeId(nodeId).isMaster();
+        } catch (NodeNotFoundException e) {
+            LOG.warn("Couldn't find node for ID <{}>", nodeId);
+            return true;
+        }
+    }
+
     /**
      * Creates a new field type polling job for the newly created index set.
+     *
      * @param event index set creation event
      */
+    @SuppressWarnings("unused")
     @Subscribe
     public void handleIndexSetCreation(final IndexSetCreatedEvent event) {
+        if (isNotLeader()) {
+            LOG.debug("Skipping index set creation event on non-leader node. [event={}]", event);
+            return;
+        }
         final String indexSetId = event.indexSet().id();
         // We are NOT using IndexSetRegistry#get(String) here because of this: https://github.com/Graylog2/graylog2-server/issues/4625
         final Optional<IndexSetConfig> optionalIndexSet = indexSetService.get(indexSetId);
@@ -164,8 +188,13 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
      * Removes the field type polling job for the now deleted index set.
      * @param event index set deletion event
      */
+    @SuppressWarnings("unused")
     @Subscribe
     public void handleIndexSetDeletion(final IndexSetDeletedEvent event) {
+        if (isNotLeader()) {
+            LOG.debug("Skipping index set deletion event on non-leader node. [event={}]", event);
+            return;
+        }
         final String indexSetId = event.id();
 
         LOG.debug("Disable field type updating for index set <{}>", indexSetId);
@@ -176,8 +205,13 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
      * Removes the index field type data for the deleted index.
      * @param event index deletion event
      */
+    @SuppressWarnings("unused")
     @Subscribe
     public void handleIndexDeletion(final IndicesDeletedEvent event) {
+        if (isNotLeader()) {
+            LOG.debug("Skipping index deletion event on non-leader node. [event={}]", event);
+            return;
+        }
         event.indices().forEach(indexName -> {
             LOG.debug("Removing field type information for deleted index <{}>", indexName);
             dbService.delete(indexName);
@@ -186,6 +220,7 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
 
     /**
      * Creates a new polling job for the given index set to keep the active write index information up to date.
+     *
      * @param indexSet index set
      */
     private void schedule(final IndexSet indexSet) {
