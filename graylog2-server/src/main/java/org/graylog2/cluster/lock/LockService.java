@@ -14,6 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.cluster.leader;
+package org.graylog2.cluster.lock;
 
-public class LeaderChangedEvent {}
+import javax.annotation.Nonnull;
+import java.util.Optional;
+
+public interface LockService {
+    Optional<Lock> lock(@Nonnull String resourceName);
+
+    Optional<Lock> unlock(@Nonnull String resourceName);
+}

@@ -44,6 +44,10 @@ public class LeaderElectionModule extends PluginModule {
                 bind(LeaderElectionService.class).to(LockBasedLeaderElectionService.class).in(Scopes.SINGLETON);
                 serviceBinder().addBinding().to(LockBasedLeaderElectionService.class).in(Scopes.SINGLETON);
                 break;
+            case "mongodb":
+                bind(LeaderElectionService.class).to(MongoLeaderElectionService.class).in(Scopes.SINGLETON);
+                serviceBinder().addBinding().to(MongoLeaderElectionService.class).in(Scopes.SINGLETON);
+                break;
             default:
                 throw new IllegalArgumentException("Unknown leader election mode \"" + leaderElectionMode + "\".");
         }

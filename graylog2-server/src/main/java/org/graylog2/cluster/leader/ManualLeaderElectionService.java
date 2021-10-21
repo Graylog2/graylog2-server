@@ -96,7 +96,7 @@ public class ManualLeaderElectionService extends AbstractIdleService implements 
             // Ensure the nodes collection is up to date before we publish the event
             nodePingThread.doRun();
 
-            eventBus.post(LeaderChangedEvent.create(leader.nodeId()));
+            eventBus.post(new LeaderChangedEvent());
         }
     }
 
