@@ -200,7 +200,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
         final PaginatedList<RuleDao> result = paginatedRuleService
                 .findPaginated(searchQuery, page, perPage, sort, order);
         final List<RuleSource> ruleSourceList = result.stream()
-                .map(dao -> RuleSource.fromDao(pipelineRuleParser, dao))
+                .map(this::ruleSourceFromDao)
                 .collect(Collectors.toList());
         final PaginatedList<RuleSource> rules = new PaginatedList<>(ruleSourceList,
                 result.pagination().total(), result.pagination().page(), result.pagination().perPage());
