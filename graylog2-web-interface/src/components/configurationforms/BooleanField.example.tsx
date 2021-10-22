@@ -14,3 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+
+import * as React from 'react';
+
+const DefaultExample = () => {
+  return (<></>);
+};
+
+export default DefaultExample;
