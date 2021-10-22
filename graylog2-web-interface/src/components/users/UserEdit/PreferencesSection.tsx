@@ -18,8 +18,7 @@ import * as React from 'react';
 import { Formik, Form } from 'formik';
 
 import { PREFERENCES_THEME_MODE } from 'theme/constants';
-import { Button, Row, Col } from 'components/graylog';
-import { Input } from 'components/bootstrap';
+import { Button, Row, Col, Input } from 'components/bootstrap';
 import { FormikFormGroup, ReadOnlyFormGroup } from 'components/common';
 import SectionComponent from 'components/common/Section/SectionComponent';
 import User from 'logic/users/User';

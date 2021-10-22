@@ -16,7 +16,7 @@
  */
 import React, { useEffect, useState, useCallback } from 'react';
 
-import { Modal, Button, ListGroup, ListGroupItem } from 'components/graylog';
+import { Modal, Button, ListGroup, ListGroupItem } from 'components/bootstrap';
 import type { DashboardsStoreState } from 'views/stores/DashboardsStore';
 import connect from 'stores/connect';
 import { PaginatedList, SearchForm } from 'components/common';

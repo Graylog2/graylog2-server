@@ -19,7 +19,7 @@ import styled, { css } from 'styled-components';
 
 import { useStore } from 'stores/connect';
 import NumberUtils from 'util/NumberUtils';
-import { NavItem } from 'components/graylog';
+import { NavItem } from 'components/bootstrap';
 import { Spinner } from 'components/common';
 import { GlobalThroughputStore } from 'stores/metrics/GlobalThroughputStore';
 

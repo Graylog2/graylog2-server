@@ -17,7 +17,7 @@
 import * as React from 'react';
 
 import { validate } from 'legacy/validations';
-import { Button } from 'components/graylog/index';
+import { Button } from 'components/bootstrap';
 
 type Props = {
   children: React.ReactElement,

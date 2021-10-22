@@ -19,8 +19,7 @@ import { useCallback, useMemo } from 'react';
 import { Field, useFormikContext } from 'formik';
 import styled from 'styled-components';
 
-import { Input } from 'components/bootstrap';
-import { Checkbox } from 'components/graylog';
+import { Input, Checkbox } from 'components/bootstrap';
 import Select from 'components/common/Select';
 import usePluginEntities from 'views/logic/usePluginEntities';
 import { defaultCompare } from 'views/logic/DefaultCompare';

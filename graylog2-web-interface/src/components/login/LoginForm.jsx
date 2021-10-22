@@ -18,8 +18,7 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import { Button, FormGroup } from 'components/graylog';
-import { Input } from 'components/bootstrap';
+import { Button, FormGroup, Input } from 'components/bootstrap';
 import { SessionActions } from 'stores/sessions/SessionStore';
 
 const StyledFormGroup = styled(FormGroup)`

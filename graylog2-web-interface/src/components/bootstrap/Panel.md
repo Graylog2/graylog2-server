@@ -78,7 +78,7 @@ styles.map((style, i) => {
 ### Collapsible Panel
 
 ```js
-import { Button } from 'components/graylog';
+import { Button } from 'components/bootstrap';
 
 const PanelCollapseExample = () => {
   const [expanded, setExpanded] = React.useState(false);
@@ -208,7 +208,7 @@ styles.map((style, i) => {
 ### Deprecated Collapsible Panel
 
 ```js
-import { Button } from 'components/graylog';
+import { Button } from 'components/bootstrap';
 
 const DeprecatedPanelCollapseExample = () => {
    const [expanded, setExpanded] = React.useState(false);

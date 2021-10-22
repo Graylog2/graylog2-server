@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { $PropertyType } from 'utility-types';
 
-import { Alert, Col, Row } from 'components/graylog';
+import { Alert, Col, Row } from 'components/bootstrap';
 import User from 'logic/users/User';
 
 type Props = {

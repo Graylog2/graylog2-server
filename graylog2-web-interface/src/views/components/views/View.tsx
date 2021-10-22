@@ -17,7 +17,7 @@
 import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 
-import { Link } from 'components/graylog/router';
+import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import { EntityListItem } from 'components/common';
 import CurrentUserContext from 'contexts/CurrentUserContext';

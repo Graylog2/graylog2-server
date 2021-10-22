@@ -19,9 +19,9 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import moment from 'moment';
 
-import { Col, Row } from 'components/graylog';
-import DateTime from 'logic/datetimes/DateTime';
+import { Col, Row } from 'components/bootstrap';
 import { Spinner, Timestamp } from 'components/common';
+import DateTime from 'logic/datetimes/DateTime';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import { SystemStore } from 'stores/system/SystemStore';
 

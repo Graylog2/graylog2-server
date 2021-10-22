@@ -17,9 +17,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Button, Alert, Modal, OverlayTrigger, Tooltip } from 'components/graylog';
+import { Button, Alert, Modal, Tooltip } from 'components/bootstrap';
+import { OverlayTrigger, PaginatedList, Spinner, Timestamp, Icon } from 'components/common';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
-import { PaginatedList, Spinner, Timestamp, Icon } from 'components/common';
 import UserNotification from 'util/UserNotification';
 import { CollectorConfigurationsActions } from 'stores/sidecars/CollectorConfigurationsStore';
 

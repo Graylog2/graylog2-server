@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.pipelineprocessor.rest;
 
+import com.google.common.collect.ImmutableMap;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -26,6 +27,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.audit.PipelineProcessorAuditEventTypes;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
+import org.graylog.plugins.pipelineprocessor.db.PaginatedRuleService;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleMetricsConfigDto;
 import org.graylog.plugins.pipelineprocessor.db.RuleMetricsConfigService;
@@ -36,7 +38,12 @@ import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.rest.models.PaginatedResponse;
+import org.graylog2.search.SearchQuery;
+import org.graylog2.search.SearchQueryField;
+import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -48,15 +55,18 @@ import javax.validation.constraints.NotNull;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Api(value = "Pipelines/Rules", description = "Rules for the pipeline message processor")
@@ -68,23 +78,34 @@ public class RuleResource extends RestResource implements PluginRestResource {
 
     private static final Logger log = LoggerFactory.getLogger(RuleResource.class);
 
+    private static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
+            .put(RuleDao.FIELD_TITLE, SearchQueryField.create(RuleDao.FIELD_TITLE))
+            .put(RuleDao.FIELD_DESCRIPTION, SearchQueryField.create(RuleDao.FIELD_DESCRIPTION))
+            .build();
+
     private final RuleService ruleService;
     private final PipelineService pipelineService;
     private final RuleMetricsConfigService ruleMetricsConfigService;
     private final PipelineRuleParser pipelineRuleParser;
     private final FunctionRegistry functionRegistry;
+    private final PaginatedRuleService paginatedRuleService;
+    private final SearchQueryParser searchQueryParser;
 
     @Inject
     public RuleResource(RuleService ruleService,
                         PipelineService pipelineService,
                         RuleMetricsConfigService ruleMetricsConfigService,
                         PipelineRuleParser pipelineRuleParser,
+                        PaginatedRuleService paginatedRuleService,
                         FunctionRegistry functionRegistry) {
         this.ruleService = ruleService;
         this.pipelineService = pipelineService;
         this.ruleMetricsConfigService = ruleMetricsConfigService;
         this.pipelineRuleParser = pipelineRuleParser;
         this.functionRegistry = functionRegistry;
+        this.paginatedRuleService = paginatedRuleService;
+
+        this.searchQueryParser = new SearchQueryParser(RuleDao.FIELD_TITLE, SEARCH_FIELD_MAPPING);
     }
 
 
@@ -152,6 +173,38 @@ public class RuleResource extends RestResource implements PluginRestResource {
         return ruleDaos.stream()
                 .map(this::ruleSourceFromDao)
                 .collect(Collectors.toList());
+    }
+
+    @GET
+    @Path("/paginated")
+    @ApiOperation(value = "Get a paginated list of pipeline rules")
+    @Produces(MediaType.APPLICATION_JSON)
+    @RequiresPermissions(PipelineRestPermissions.PIPELINE_RULE_READ)
+    public PaginatedResponse<RuleSource> getPage(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+                                                 @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+                                                 @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
+                                                 @ApiParam(name = "sort",
+                                                           value = "The field to sort the result on",
+                                                           required = true,
+                                                           allowableValues = "title,description,id")
+                                                 @DefaultValue(RuleDao.FIELD_TITLE) @QueryParam("sort") String sort,
+                                                 @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
+                                                 @DefaultValue("asc") @QueryParam("order") String order) {
+        SearchQuery searchQuery;
+        try {
+            searchQuery = searchQueryParser.parse(query);
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException("Invalid argument in search query: " + e.getMessage());
+        }
+
+        final PaginatedList<RuleDao> result = paginatedRuleService
+                .findPaginated(searchQuery, page, perPage, sort, order);
+        final List<RuleSource> ruleSourceList = result.stream()
+                .map(dao -> RuleSource.fromDao(pipelineRuleParser, dao))
+                .collect(Collectors.toList());
+        final PaginatedList<RuleSource> rules = new PaginatedList<>(ruleSourceList,
+                result.pagination().total(), result.pagination().page(), result.pagination().perPage());
+        return PaginatedResponse.create("rules", rules);
     }
 
     @ApiOperation(value = "Get a processing rule", notes = "It can take up to a second until the change is applied")

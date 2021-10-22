@@ -20,9 +20,8 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import naturalSort from 'javascript-natural-sort';
 
-import { Col, Row, Button } from 'components/graylog';
-import { Input } from 'components/bootstrap';
 import { ExternalLinkButton, Select, Spinner } from 'components/common';
+import { Col, Row, Button, Input } from 'components/bootstrap';
 import { ConfigurationForm } from 'components/configurationforms';
 import Routes from 'routing/Routes';
 import UserNotification from 'util/UserNotification';

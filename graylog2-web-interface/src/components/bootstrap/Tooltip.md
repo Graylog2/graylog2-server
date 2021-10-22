@@ -33,7 +33,8 @@ const styles = { position: 'relative', display: 'inline-block' };
 ### Hover
 
 ```js
-import { ButtonToolbar, Button, OverlayTrigger } from 'components/graylog';
+import { ButtonToolbar, Button } from 'components/bootstrap';
+import { OverlayTrigger } from 'components/common';
 
 const TooltipExample = () => {
   const tooltip = (

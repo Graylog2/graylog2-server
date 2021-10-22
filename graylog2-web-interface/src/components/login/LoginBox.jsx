@@ -18,7 +18,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
-import { Col, Row } from 'components/graylog';
+import { Col, Row } from 'components/bootstrap';
 
 import PublicNotifications from '../common/PublicNotifications';
 

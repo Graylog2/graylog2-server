@@ -1,5 +1,5 @@
 ```js
-import { MenuItem } from 'components/graylog';
+import { MenuItem } from 'components/bootstrap';
 
 const styles = ['Primary', 'Danger', 'Warning', 'Success', 'Info', 'Link', 'Default'];
 

@@ -19,7 +19,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { Overlay, Transition } from 'react-overlays';
 
-import { DropdownMenu } from 'components/graylog';
+import { DropdownMenu } from 'components/common';
 
 const ToggleDropdown = styled.span`
   cursor: pointer;

@@ -18,7 +18,7 @@ import PropTypes from 'prop-types';
 import React, { useEffect } from 'react';
 
 import HideOnCloud from 'util/conditional/HideOnCloud';
-import { Col, Row, Button } from 'components/graylog';
+import { Col, Row, Button } from 'components/bootstrap';
 import { Spinner } from 'components/common';
 import { IndexRangeSummary, ShardMeter, ShardRoutingOverview } from 'components/indices';
 import type { IndexInfo } from 'stores/indices/IndicesStore';

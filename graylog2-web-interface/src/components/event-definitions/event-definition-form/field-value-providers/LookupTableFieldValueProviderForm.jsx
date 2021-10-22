@@ -18,7 +18,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 
-import { Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/graylog';
+import { Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/bootstrap';
 import { Select } from 'components/common';
 import * as FormsUtils from 'util/FormsUtils';
 import { naturalSortIgnoreCase } from 'util/SortUtils';

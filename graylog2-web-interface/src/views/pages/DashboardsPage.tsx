@@ -16,10 +16,10 @@
  */
 import React, { useEffect } from 'react';
 
-import { LinkContainer } from 'components/graylog/router';
-import { Col, Row, Button } from 'components/graylog';
+import { LinkContainer } from 'components/common/router';
+import { Col, Row, Button } from 'components/bootstrap';
 import connect from 'stores/connect';
-import { DocumentTitle, PageHeader, IfPermitted } from 'components/common/index';
+import { DocumentTitle, PageHeader, IfPermitted } from 'components/common';
 import Routes from 'routing/Routes';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';

@@ -17,7 +17,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { FormControl } from 'components/graylog';
+import { FormControl } from 'components/bootstrap';
 
 class MetricsFilterInput extends React.Component {
   static propTypes = {

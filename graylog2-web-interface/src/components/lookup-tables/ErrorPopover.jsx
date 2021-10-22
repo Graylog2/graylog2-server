@@ -17,8 +17,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { OverlayTrigger, Popover } from 'components/graylog';
-import { Icon } from 'components/common';
+import { OverlayTrigger, Icon } from 'components/common';
+import { Popover } from 'components/bootstrap';
 
 import Styles from './ErrorPopover.css';
 

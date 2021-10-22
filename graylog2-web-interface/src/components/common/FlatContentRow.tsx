@@ -16,13 +16,14 @@
  */
 import styled from 'styled-components';
 
-import { RowContentStyles } from 'components/graylog/Row';
+import { RowContentStyles } from 'components/bootstrap/Row';
 
 /*
  * Component with the same styling like the bootstrap `Row` but with a smaller padding.
  */
 const FlatContentRow = styled.div`
-  ${RowContentStyles}
+  ${RowContentStyles};
+  
   padding: 9px;
   margin-left: -15px;
   margin-right: -15px;

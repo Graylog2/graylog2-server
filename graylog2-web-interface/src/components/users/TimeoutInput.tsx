@@ -18,8 +18,7 @@ import * as React from 'react';
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 
-import { Row, Col, HelpBlock } from 'components/graylog';
-import { Input } from 'components/bootstrap';
+import { Row, Col, HelpBlock, Input } from 'components/bootstrap';
 import TimeoutUnitSelect from 'components/users/TimeoutUnitSelect';
 
 import { MS_DAY, MS_HOUR, MS_MINUTE, MS_SECOND } from './timeoutConstants';

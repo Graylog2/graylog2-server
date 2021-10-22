@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 
-import { Col, Row } from 'components/graylog';
+import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { useStore } from 'stores/connect';
 import { isPermitted } from 'util/PermissionsMixin';

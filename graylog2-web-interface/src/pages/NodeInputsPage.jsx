@@ -19,7 +19,7 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
-import { Link } from 'components/graylog/router';
+import { Link } from 'components/common/router';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { InputsList } from 'components/inputs';
 import Routes from 'routing/Routes';

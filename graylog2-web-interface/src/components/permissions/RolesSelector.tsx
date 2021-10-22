@@ -24,7 +24,7 @@ import styled from 'styled-components';
 import type { PaginatedRoles } from 'actions/roles/AuthzRolesActions';
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import Role from 'logic/roles/Role';
-import { Button } from 'components/graylog';
+import { Button } from 'components/bootstrap';
 import { Select, Spinner, ErrorAlert } from 'components/common';
 
 type Props = {

@@ -24,5 +24,6 @@ import javax.annotation.Nonnull;
 public interface IndexTemplateProvider {
 
     @Nonnull
-    IndexMappingTemplate create(@Nonnull Version elasticsearchVersion, @Nonnull IndexSetConfig indexSetConfig);
+    IndexMappingTemplate create(@Nonnull Version elasticsearchVersion, @Nonnull IndexSetConfig indexSetConfig)
+            throws IgnoreIndexTemplate;
 }

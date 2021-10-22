@@ -18,8 +18,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import lodash from 'lodash';
 
-import { Modal, Button } from 'components/graylog';
-import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
+import { Modal, Button, BootstrapModalWrapper } from 'components/bootstrap';
 import { CollectorConfigurationsActions } from 'stores/sidecars/CollectorConfigurationsStore';
 
 class SourceViewModal extends React.Component {

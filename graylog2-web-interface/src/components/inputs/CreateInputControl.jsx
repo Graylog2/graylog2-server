@@ -20,7 +20,7 @@ import Reflux from 'reflux';
 import styled from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import { Col, Row, Button } from 'components/graylog';
+import { Col, Row, Button } from 'components/bootstrap';
 import { ExternalLinkButton, Select } from 'components/common';
 import { InputForm } from 'components/inputs';
 import { InputsActions } from 'stores/inputs/InputsStore';

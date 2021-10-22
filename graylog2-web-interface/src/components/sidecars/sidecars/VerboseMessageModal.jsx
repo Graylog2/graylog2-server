@@ -17,7 +17,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Modal, Button } from 'components/graylog';
+import { Modal, Button } from 'components/bootstrap';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 
 class VerboseMessageModal extends React.Component {

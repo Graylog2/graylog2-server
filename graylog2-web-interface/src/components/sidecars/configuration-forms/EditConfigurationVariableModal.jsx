@@ -18,8 +18,7 @@ import PropTypes from 'prop-types';
 import { debounce, cloneDeep } from 'lodash';
 import React from 'react';
 
-import { Button } from 'components/graylog';
-import { BootstrapModalForm, Input } from 'components/bootstrap';
+import { Button, BootstrapModalForm, Input } from 'components/bootstrap';
 import { ConfigurationVariableActions } from 'stores/sidecars/ConfigurationVariableStore';
 
 import ConfigurationHelperStyle from './ConfigurationHelper.css';

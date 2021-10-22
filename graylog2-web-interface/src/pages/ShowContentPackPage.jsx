@@ -19,10 +19,9 @@ import Reflux from 'reflux';
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 
-import { LinkContainer } from 'components/graylog/router';
-import { Row, Col, Button, ButtonToolbar } from 'components/graylog';
+import { LinkContainer } from 'components/common/router';
+import { Row, Col, Button, ButtonToolbar, BootstrapModalConfirm } from 'components/bootstrap';
 import Spinner from 'components/common/Spinner';
-import { BootstrapModalConfirm } from 'components/bootstrap';
 import history from 'util/History';
 import Routes from 'routing/Routes';
 import UserNotification from 'util/UserNotification';

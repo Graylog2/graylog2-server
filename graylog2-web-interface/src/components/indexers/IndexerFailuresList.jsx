@@ -17,7 +17,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Alert, Table } from 'components/graylog';
+import { Alert, Table } from 'components/bootstrap';
 import { Icon } from 'components/common';
 import { IndexerFailure } from 'components/indexers';
 

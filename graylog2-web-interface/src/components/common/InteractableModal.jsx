@@ -20,7 +20,7 @@ import { Rnd } from 'react-rnd';
 import styled, { css } from 'styled-components';
 import debounce from 'lodash/debounce';
 
-import { Button } from 'components/graylog';
+import { Button } from 'components/bootstrap';
 import Icon from 'components/common/Icon';
 
 const DEFAULT_SIZE = { width: 450, height: 400 };
