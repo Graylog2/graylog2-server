@@ -16,8 +16,8 @@
  */
 import React from 'react';
 
-import { LinkContainer } from 'components/graylog/router';
-import { Row, Col, Button } from 'components/graylog';
+import { LinkContainer } from 'components/common/router';
+import { Row, Col, Button } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
 import ProcessingTimelineComponent from 'components/pipelines/ProcessingTimelineComponent';

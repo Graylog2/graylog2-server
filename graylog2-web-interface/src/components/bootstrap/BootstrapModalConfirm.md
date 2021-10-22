@@ -1,6 +1,6 @@
 ```js
 import createReactClass from 'create-react-class';
-import { Button } from 'components/graylog';
+import { Button } from 'components/bootstrap';
 
 const BootstrapModalConfirmExample = createReactClass({
   getInitialState() {

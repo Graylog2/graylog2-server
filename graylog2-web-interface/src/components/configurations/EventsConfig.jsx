@@ -20,8 +20,7 @@ import createReactClass from 'create-react-class';
 import lodash from 'lodash';
 import moment from 'moment';
 
-import { Button, FormGroup, HelpBlock } from 'components/graylog';
-import { BootstrapModalForm } from 'components/bootstrap';
+import { Button, FormGroup, HelpBlock, BootstrapModalForm } from 'components/bootstrap';
 import { IfPermitted, TimeUnitInput } from 'components/common';
 import FormUtils from 'util/FormsUtils';
 import Input from 'components/bootstrap/Input';

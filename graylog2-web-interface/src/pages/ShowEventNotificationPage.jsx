@@ -20,8 +20,8 @@ import PropTypes from 'prop-types';
 
 import ErrorsActions from 'actions/errors/ErrorsActions';
 import CurrentUserContext from 'contexts/CurrentUserContext';
-import { LinkContainer } from 'components/graylog/router';
-import { ButtonToolbar, Button } from 'components/graylog';
+import { LinkContainer } from 'components/common/router';
+import { ButtonToolbar, Button } from 'components/bootstrap';
 import { createFromFetchError } from 'logic/errors/ReportedErrors';
 import { DocumentTitle, IfPermitted, PageHeader, Spinner } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';

@@ -17,7 +17,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { Alert, Col, Row } from 'components/graylog';
+import { Alert, Col, Row } from 'components/bootstrap';
 
 import commonStyles from '../common/commonStyles.css';
 

@@ -1,5 +1,5 @@
 ```js
-import { Button } from 'components/graylog';
+import { Button } from 'components/bootstrap';
 
 const ModalExample = () => {
   const [show, setShow] = React.useState(false);

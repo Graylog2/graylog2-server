@@ -18,7 +18,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import { Button, Alert, Col, Row, Table } from 'components/graylog';
+import { Button, Alert, Col, Row, Table } from 'components/bootstrap';
 import { Icon, PaginatedList } from 'components/common';
 import SidecarSearchForm from 'components/sidecars/common/SidecarSearchForm';
 

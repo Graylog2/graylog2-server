@@ -19,7 +19,7 @@ import PropTypes from 'prop-types';
 import uuid from 'uuid/v4';
 
 import connect from 'stores/connect';
-import { Button } from 'components/graylog';
+import { Button } from 'components/bootstrap';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import UrlWhiteListForm from 'components/configurations/UrlWhiteListForm';
 import type { ConfigurationsStoreState, WhiteListConfig } from 'stores/configurations/ConfigurationsStore';

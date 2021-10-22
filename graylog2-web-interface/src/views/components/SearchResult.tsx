@@ -24,7 +24,7 @@ import { useStore } from 'stores/connect';
 import { SearchLoadingStateStore } from 'views/stores/SearchLoadingStateStore';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import LoadingIndicator from 'components/common/LoadingIndicator';
-import { Row, Col } from 'components/graylog';
+import { Row, Col } from 'components/bootstrap';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 
 const StyledRow = styled(Row)(({ $hasFocusedWidget }: { $hasFocusedWidget: boolean }) => css`

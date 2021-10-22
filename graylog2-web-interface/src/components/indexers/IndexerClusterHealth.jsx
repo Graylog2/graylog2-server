@@ -18,8 +18,8 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
-import { Row, Col } from 'components/graylog';
 import { Spinner } from 'components/common';
+import { Row, Col } from 'components/bootstrap';
 import { DocumentationLink, SmallSupportLink } from 'components/support';
 import DocsHelper from 'util/DocsHelper';
 import { IndexerClusterHealthSummary } from 'components/indexers';

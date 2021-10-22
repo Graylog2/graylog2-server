@@ -16,9 +16,9 @@
  */
 import React from 'react';
 
-import { LinkContainer } from 'components/graylog/router';
-import { Button, ButtonToolbar, Col, Row } from 'components/graylog';
-import { DocumentTitle, IfPermitted, PageHeader } from 'components/common';
+import { LinkContainer } from 'components/common/router';
+import { Button, ButtonToolbar, Col, Row } from 'components/bootstrap';
+import { DocumentTitle, PageHeader } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
 import EventDefinitionsContainer from 'components/event-definitions/event-definitions/EventDefinitionsContainer';
 import Routes from 'routing/Routes';

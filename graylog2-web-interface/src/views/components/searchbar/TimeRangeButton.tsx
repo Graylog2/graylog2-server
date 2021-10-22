@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { SyntheticEvent } from 'react';
 
-import { Button } from 'components/graylog';
+import { Button } from 'components/bootstrap';
 import { Icon } from 'components/common';
 
 type Props = {

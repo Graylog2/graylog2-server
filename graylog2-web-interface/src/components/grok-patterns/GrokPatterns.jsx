@@ -24,8 +24,9 @@ import {
   PageHeader,
   PaginatedList,
   SearchForm,
+  OverlayTrigger,
 } from 'components/common';
-import { Button, Col, Row, OverlayTrigger } from 'components/graylog';
+import { Button, Col, Row } from 'components/bootstrap';
 import EditPatternModal from 'components/grok-patterns/EditPatternModal';
 import BulkLoadPatternModal from 'components/grok-patterns/BulkLoadPatternModal';
 import { GrokPatternsStore } from 'stores/grok-patterns/GrokPatternsStore';

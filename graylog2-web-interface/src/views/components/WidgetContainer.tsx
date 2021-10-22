@@ -18,7 +18,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 
-import { RowContentStyles } from 'components/graylog/Row';
+import { RowContentStyles } from 'components/bootstrap/Row';
 
 const Container = styled.div`
   z-index: auto;

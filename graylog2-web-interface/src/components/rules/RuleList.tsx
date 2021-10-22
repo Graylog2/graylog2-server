@@ -17,41 +17,54 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { LinkContainer } from 'components/graylog/router';
+import { LinkContainer, Link } from 'components/common/router';
 import connect from 'stores/connect';
-import { Button, ButtonToolbar } from 'components/graylog';
+import { Button, ButtonToolbar } from 'components/bootstrap';
 import { DataTable } from 'components/common';
 import Routes from 'routing/Routes';
 import { RulesActions, RulesStore } from 'stores/rules/RulesStore';
+import type { RuleType, MetricsConfigType, RulesStoreState } from 'stores/rules/RulesStore';
+import { Store } from 'stores/StoreTypes';
 
 import RuleMetricsConfigContainer from './RuleMetricsConfigContainer';
 import RuleListEntry from './RuleListEntry';
 
-class RuleList extends React.Component {
+type Props = {
+  rules: Array<RuleType>,
+  metricsConfig?: MetricsConfigType,
+  onDelete: (RuleType) => void,
+  searchFilter: React.ReactNode,
+};
+
+type State = {
+  openMetricsConfig: boolean,
+};
+
+class RuleList extends React.Component<Props, State> {
   static propTypes = {
     rules: PropTypes.array.isRequired,
-    metricsConfig: PropTypes.object,
+    metricsConfig: PropTypes.exact({
+      metrics_enabled: PropTypes.bool.isRequired,
+    }),
+    onDelete: PropTypes.func.isRequired,
+    searchFilter: PropTypes.node.isRequired,
   };
 
   static defaultProps = {
     metricsConfig: undefined,
   };
 
-  state = {
-    openMetricsConfig: false,
-  };
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      openMetricsConfig: false,
+    };
+  }
 
   componentDidMount() {
     RulesActions.loadMetricsConfig();
   }
-
-  _delete = (rule) => {
-    return () => {
-      if (window.confirm(`Do you really want to delete rule "${rule.title}"?`)) {
-        RulesActions.delete(rule);
-      }
-    };
-  };
 
   _headerCellFormatter = (header) => {
     return <th>{header}</th>;
@@ -76,9 +89,8 @@ class RuleList extends React.Component {
   };
 
   render() {
-    const { rules, metricsConfig } = this.props;
-    const filterKeys = ['title', 'description'];
-    const headers = ['Title', 'Description', 'Created', 'Last modified', 'Throughput', 'Errors', 'Pipelines', 'Actions'];
+    const { rules, metricsConfig, searchFilter } = this.props;
+    const headers = ['Title', 'Description', 'Created', 'Last modified', 'Throughput', 'Errors', 'Actions'];
     const { openMetricsConfig } = this.state;
 
     return (
@@ -89,10 +101,9 @@ class RuleList extends React.Component {
                    headerCellFormatter={this._headerCellFormatter}
                    sortByKey="title"
                    rows={rules}
-                   filterBy="Title"
+                   customFilter={searchFilter}
                    dataRowFormatter={this._ruleInfoFormatter}
-                   filterLabel="Filter Rules"
-                   filterKeys={filterKeys}>
+                   filterKeys={[]}>
           <ButtonToolbar className="pull-right">
             <LinkContainer to={Routes.SYSTEM.PIPELINES.RULE('new')}>
               <Button bsStyle="success">Create Rule</Button>
@@ -106,6 +117,6 @@ class RuleList extends React.Component {
   }
 }
 
-export default connect(RuleList, { rules: RulesStore }, ({ rules }) => {
-  return { metricsConfig: rules ? rules.metricsConfig : rules };
+export default connect(RuleList, { rules: RulesStore as Store<RulesStoreState> }, ({ rules }) => {
+  return { metricsConfig: rules.metricsConfig };
 });

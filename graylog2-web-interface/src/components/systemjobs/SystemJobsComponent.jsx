@@ -17,9 +17,9 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 
-import { Col, Row } from 'components/graylog';
-import connect from 'stores/connect';
+import { Col, Row } from 'components/bootstrap';
 import { Spinner } from 'components/common';
+import connect from 'stores/connect';
 import { SystemJobsList } from 'components/systemjobs';
 import { SystemJobsActions, SystemJobsStore } from 'stores/systemjobs/SystemJobsStore';
 

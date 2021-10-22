@@ -18,7 +18,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import { Button, Panel } from 'components/graylog';
+import { Button, Panel } from 'components/bootstrap';
 import { Icon } from 'components/common';
 
 import AggregationConditionSummary from './AggregationConditionSummary';

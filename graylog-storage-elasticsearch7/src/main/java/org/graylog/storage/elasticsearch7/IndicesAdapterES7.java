@@ -41,6 +41,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.GetAliasesResp
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.CloseIndexRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.CreateIndexRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.DeleteAliasRequest;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.IndexTemplatesExistRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.PutIndexTemplateRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.PutMappingRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.cluster.metadata.AliasMetadata;
@@ -142,7 +143,7 @@ public class IndicesAdapterES7 implements IndicesAdapter {
     }
 
     @Override
-    public void create(String index, IndexSettings indexSettings, String templateName, Map<String, Object> template) {
+    public void create(String index, IndexSettings indexSettings) {
         final Map<String, Object> settings = new HashMap<>();
         settings.put("number_of_shards", indexSettings.shards());
         settings.put("number_of_replicas", indexSettings.replicas());
@@ -175,6 +176,12 @@ public class IndicesAdapterES7 implements IndicesAdapter {
                 "Unable to create index template " + templateName);
 
         return result.isAcknowledged();
+    }
+
+    @Override
+    public boolean indexTemplateExists(String templateName) {
+        return client.execute((c, requestOptions) -> c.indices().existsTemplate(new IndexTemplatesExistRequest(templateName),
+                requestOptions), "Unable to verify index template existence " + templateName);
     }
 
     @Override

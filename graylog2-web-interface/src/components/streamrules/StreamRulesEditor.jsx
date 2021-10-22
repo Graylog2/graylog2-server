@@ -18,9 +18,9 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import { LinkContainer } from 'components/graylog/router';
+import { LinkContainer } from 'components/common/router';
 import Routes from 'routing/Routes';
-import { Button, Col, Panel, Row } from 'components/graylog';
+import { Button, Col, Panel, Row } from 'components/bootstrap';
 import { Icon } from 'components/common';
 import LoaderTabs from 'components/messageloaders/LoaderTabs';
 import MatchingTypeSwitcher from 'components/streams/MatchingTypeSwitcher';

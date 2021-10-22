@@ -17,8 +17,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { LinkContainer } from 'components/graylog/router';
-import { ButtonToolbar, Button } from 'components/graylog';
+import { LinkContainer } from 'components/common/router';
+import { ButtonToolbar, Button } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 
 class AlertsHeaderToolbar extends React.Component {

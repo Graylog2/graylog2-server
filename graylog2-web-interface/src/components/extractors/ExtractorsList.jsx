@@ -20,7 +20,7 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import naturalSort from 'javascript-natural-sort';
 
-import { Row, Col, Button } from 'components/graylog';
+import { Row, Col, Button } from 'components/bootstrap';
 import Spinner from 'components/common/Spinner';
 import AddExtractorWizard from 'components/extractors/AddExtractorWizard';
 import EntityList from 'components/common/EntityList';

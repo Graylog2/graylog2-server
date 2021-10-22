@@ -20,7 +20,7 @@ import { Form, Formik } from 'formik';
 import styled, { css } from 'styled-components';
 import moment from 'moment';
 
-import { Button, Col, Tabs, Tab, Row, Popover } from 'components/graylog';
+import { Button, Col, Tabs, Tab, Row, Popover } from 'components/bootstrap';
 import { Icon, KeyCapture } from 'components/common';
 import { availableTimeRangeTypes } from 'views/Constants';
 import DateTime from 'logic/datetimes/DateTime';

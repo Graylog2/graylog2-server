@@ -17,12 +17,13 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Col, Button } from 'components/graylog';
+import { Col, Button } from 'components/bootstrap';
 import { EntityListItem, Spinner } from 'components/common';
 import { MetricContainer, CounterRate } from 'components/metrics';
 import { PipelineType, StageType } from 'stores/pipelines/PipelinesStore';
 import { useStore } from 'stores/connect';
 import { RulesStore } from 'stores/rules/RulesStore';
+import type { RuleType } from 'stores/rules/RulesStore';
 
 import StageForm from './StageForm';
 import StageRules from './StageRules';
@@ -36,7 +37,7 @@ type Props = {
 };
 
 const Stage = ({ stage, pipeline, isLastStage, onUpdate, onDelete }: Props) => {
-  const { rules: allRules } = useStore(RulesStore);
+  const { rules: allRules }: { rules: RuleType[] } = useStore(RulesStore);
 
   const suffix = `Contains ${(stage.rules.length === 1 ? '1 rule' : `${stage.rules.length} rules`)}`;
 

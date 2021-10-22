@@ -19,7 +19,7 @@ import URI from 'urijs';
 
 import history from 'util/History';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
-import { Checkbox, ControlLabel, FormGroup, HelpBlock, MenuItem } from 'components/graylog';
+import { Checkbox, ControlLabel, FormGroup, HelpBlock, MenuItem } from 'components/bootstrap';
 import Input from 'components/bootstrap/Input';
 import { Icon } from 'components/common';
 import Routes from 'routing/Routes';

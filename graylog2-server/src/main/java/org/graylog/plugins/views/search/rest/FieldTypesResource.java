@@ -38,7 +38,7 @@ import javax.ws.rs.core.MediaType;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Api(value = "Field Types")
+@Api(value = "FieldTypes")
 @Path("/views/fields")
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication

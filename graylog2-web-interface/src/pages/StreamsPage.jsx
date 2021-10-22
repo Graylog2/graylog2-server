@@ -18,7 +18,7 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
-import { Row, Col } from 'components/graylog';
+import { Row, Col } from 'components/bootstrap';
 import CreateStreamButton from 'components/streams/CreateStreamButton';
 import StreamComponent from 'components/streams/StreamComponent';
 import DocumentationLink from 'components/support/DocumentationLink';

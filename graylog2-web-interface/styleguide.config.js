@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 /* This file contains configuration for React Styleguidist https://react-styleguidist.js.org/ */
-
 const path = require('path');
 
 const webpackConfig = require('./webpack.config.js');
@@ -51,6 +50,10 @@ module.exports = {
     {
       name: 'Tests',
       content: 'docs/tests.md',
+    },
+    {
+      name: 'Util Objects',
+      content: 'docs/util-objects.md',
     },
     {
       name: 'Theming Details',
@@ -95,16 +98,9 @@ module.exports = {
             'src/components/common/Wizard.tsx',
             'src/components/common/PublicNotifications.tsx',
             'src/components/common/KeyCapture.tsx',
-          ],
-        },
-        {
-          name: 'Themeable',
-          components: 'src/components/graylog/[A-Z]*.{jsx,tsx}',
-          ignore: [
-            ...defaultComponentIgnore,
-            'src/components/graylog/MessageDetailsDefinitionList.jsx',
-            'src/components/graylog/Button.jsx',
-            'src/components/graylog/Accordion.tsx',
+            'src/components/common/MessageDetailsDefinitionList.jsx',
+            'src/components/common/Button.jsx',
+            'src/components/common/Accordion.tsx',
           ],
         },
         {

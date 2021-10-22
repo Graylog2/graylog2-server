@@ -19,7 +19,7 @@ import PropTypes from 'prop-types';
 import styled, { css, DefaultTheme } from 'styled-components';
 import chroma from 'chroma-js';
 
-import { Table } from 'components/graylog';
+import { Table } from 'components/bootstrap';
 
 const MessagesContainer = styled.div`
   width: 100%;

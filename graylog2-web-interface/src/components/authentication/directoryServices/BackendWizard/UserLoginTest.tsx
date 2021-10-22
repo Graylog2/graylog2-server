@@ -21,7 +21,7 @@ import { Formik, Form } from 'formik';
 import { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 import { FormikInput, Spinner } from 'components/common';
-import { Button, Row, Col } from 'components/graylog';
+import { Button, Row, Col } from 'components/bootstrap';
 import { LoginTestResult } from 'stores/authentication/AuthenticationStore';
 
 import ConnectionErrors, { NotificationContainer } from './ConnectionErrors';

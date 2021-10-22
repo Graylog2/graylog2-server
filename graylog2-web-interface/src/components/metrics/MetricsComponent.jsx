@@ -18,7 +18,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import styled from 'styled-components';
 
-import { Alert, Col, Row } from 'components/graylog';
+import { Alert, Col, Row } from 'components/bootstrap';
 import { Icon } from 'components/common';
 import { MetricsFilterInput, MetricsList } from 'components/metrics';
 

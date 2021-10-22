@@ -20,8 +20,8 @@ import { useState } from 'react';
 import Immutable from 'immutable';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 
-import { Link } from 'components/graylog/router';
-import { Col, Label, Row } from 'components/graylog';
+import { Link } from 'components/common/router';
+import { Col, Label, Row } from 'components/bootstrap';
 import StreamLink from 'components/streams/StreamLink';
 import { MessageFields } from 'views/components/messagelist';
 import MessageDetailsTitle from 'components/search/MessageDetailsTitle';

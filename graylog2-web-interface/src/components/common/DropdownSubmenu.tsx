@@ -18,7 +18,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css, DefaultTheme } from 'styled-components';
 
-import { Dropdown } from './bootstrap-import';
+import { Dropdown } from 'components/bootstrap';
 
 type Props = {
   children: React.ReactNode,

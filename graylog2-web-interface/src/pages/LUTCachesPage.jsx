@@ -17,9 +17,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { LinkContainer } from 'components/graylog/router';
+import { LinkContainer } from 'components/common/router';
 import connect from 'stores/connect';
-import { ButtonToolbar, Col, Row, Button } from 'components/graylog';
+import { ButtonToolbar, Col, Row, Button } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import history from 'util/History';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';

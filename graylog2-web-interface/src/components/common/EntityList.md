@@ -8,7 +8,7 @@
 
 `EntityList` with two elements:
 ```js
-import { Button, Col, DropdownButton, MenuItem } from 'components/graylog';
+import { Button, Col, DropdownButton, MenuItem } from 'components/bootstrap';
 import { EntityListItem } from 'components/common';
 
 const entities = [

@@ -18,11 +18,11 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import styled from 'styled-components';
 
-import { LinkContainer, Link } from 'components/graylog/router';
+import { LinkContainer, Link } from 'components/common/router';
 import Role from 'logic/roles/Role';
 import Routes from 'routing/Routes';
 import UserOverview from 'logic/users/UserOverview';
-import { Button, ButtonToolbar } from 'components/graylog';
+import { Button, ButtonToolbar } from 'components/bootstrap';
 import RolesCell from 'components/permissions/RolesCell';
 
 type Props = {

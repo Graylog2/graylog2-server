@@ -17,7 +17,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 
-import { Link } from 'components/graylog/router';
+import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import { IfPermitted, CountBadge } from 'components/common';
 import type { UserContext } from 'actions/roles/AuthzRolesActions';

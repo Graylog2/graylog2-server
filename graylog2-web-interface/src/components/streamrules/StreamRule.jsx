@@ -21,7 +21,7 @@ import styled from 'styled-components';
 
 import { useStore } from 'stores/connect';
 import { Icon } from 'components/common';
-import { Button, ListGroupItem } from 'components/graylog';
+import { Button, ListGroupItem } from 'components/bootstrap';
 import { isPermitted } from 'util/PermissionsMixin';
 import StreamRuleForm from 'components/streamrules/StreamRuleForm';
 import HumanReadableStreamRule from 'components/streamrules/HumanReadableStreamRule';

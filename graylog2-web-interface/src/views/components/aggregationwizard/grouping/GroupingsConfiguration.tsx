@@ -20,7 +20,7 @@ import { useFormikContext, FieldArray, Field } from 'formik';
 import styled from 'styled-components';
 
 import { HoverForHelp, SortableList } from 'components/common';
-import { Checkbox } from 'components/graylog';
+import { Checkbox } from 'components/bootstrap';
 
 import GroupingConfiguration from './GroupingConfiguration';
 import GroupingElement from './GroupingElement';
@@ -39,7 +39,7 @@ const RollupColumnsLabel = styled.div`
   align-items: center;
 `;
 
-const RollupHoverForHelp = styled(HoverForHelp)`
+const RollupHoverForHelp = styled((props) => <HoverForHelp {...props} />)`
   margin-left: 5px;
 `;
 

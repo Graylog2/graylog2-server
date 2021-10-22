@@ -17,7 +17,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Row, Col } from 'components/graylog';
+import { Row, Col } from 'components/bootstrap';
 import { LookupTableForm } from 'components/lookup-tables';
 
 class LookupTableCreate extends React.Component {
