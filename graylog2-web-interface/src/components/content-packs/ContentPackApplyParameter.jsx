@@ -19,8 +19,7 @@ import PropTypes from 'prop-types';
 import { findIndex } from 'lodash';
 import naturalSort from 'javascript-natural-sort';
 
-import { Row, Col, Button } from 'components/graylog';
-import { Input } from 'components/bootstrap';
+import { Row, Col, Button, Input } from 'components/bootstrap';
 import DataTable from 'components/common/DataTable';
 import ValueReferenceData from 'util/ValueReferenceData';
 

@@ -18,7 +18,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 
 import usePluginEntities from 'views/logic/usePluginEntities';
-import { MenuItem } from 'components/graylog';
+import { MenuItem } from 'components/bootstrap';
 import ActionMenuItem from 'views/components/actions/ActionMenuItem';
 import { ActionDefinition, ActionHandlerArguments } from 'views/components/actions/ActionHandler';
 

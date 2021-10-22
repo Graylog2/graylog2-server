@@ -18,7 +18,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 
-import { Col, Tab, Tabs } from 'components/graylog';
+import { Col, Tab, Tabs } from 'components/bootstrap';
 import connect from 'stores/connect';
 import MessageShow from 'components/search/MessageShow';
 import MessageLoader from 'components/extractors/MessageLoader';

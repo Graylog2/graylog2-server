@@ -19,8 +19,8 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import naturalSort from 'javascript-natural-sort';
 
-import { LinkContainer } from 'components/graylog/router';
-import { Button } from 'components/graylog';
+import { LinkContainer } from 'components/common/router';
+import { Button } from 'components/bootstrap';
 import { Spinner } from 'components/common';
 import { AlertNotificationsList } from 'components/alertnotifications';
 import Routes from 'routing/Routes';

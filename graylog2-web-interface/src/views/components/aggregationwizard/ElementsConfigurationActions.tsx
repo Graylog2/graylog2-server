@@ -19,9 +19,9 @@ import { useEffect, useState } from 'react';
 import { useFormikContext } from 'formik';
 import styled, { css } from 'styled-components';
 
+import Button from 'components/bootstrap/Button';
 import { Spinner } from 'components/common';
-import { ButtonToolbar } from 'components/graylog';
-import Button from 'components/graylog/Button';
+import { ButtonToolbar } from 'components/bootstrap';
 import AggregationElementSelect from 'views/components/aggregationwizard/AggregationElementSelect';
 
 import aggregationElements from './aggregationElementDefinitions';

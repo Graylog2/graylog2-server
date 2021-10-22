@@ -17,10 +17,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Link } from 'components/graylog/router';
-import { Row, Col } from 'components/graylog';
-import { Input } from 'components/bootstrap';
+import { Link } from 'components/common/router';
 import { Select, Spinner } from 'components/common';
+import { Row, Col, Input } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import FormUtils from 'util/FormsUtils';
 import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';

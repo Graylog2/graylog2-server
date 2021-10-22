@@ -17,8 +17,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Col, ControlLabel, FormControl, FormGroup, Row, Button } from 'components/graylog';
-import { Input } from 'components/bootstrap';
+import { Col, ControlLabel, FormControl, FormGroup, Row, Button, Input } from 'components/bootstrap';
 import ExtractorUtils from 'util/ExtractorUtils';
 import FormUtils from 'util/FormsUtils';
 import ToolsStore from 'stores/tools/ToolsStore';

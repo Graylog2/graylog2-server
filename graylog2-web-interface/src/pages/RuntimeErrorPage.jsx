@@ -20,7 +20,7 @@ import styled from 'styled-components';
 
 import AppConfig from 'util/AppConfig';
 import { Icon } from 'components/common';
-import { Button } from 'components/graylog';
+import { Button } from 'components/bootstrap';
 import ErrorPage from 'components/errors/ErrorPage';
 import SupportSources from 'components/support/SupportSources';
 import ClipboardButton from 'components/common/ClipboardButton';

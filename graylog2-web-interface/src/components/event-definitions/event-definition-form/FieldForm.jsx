@@ -20,6 +20,11 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import lodash from 'lodash';
 
 import {
+  OverlayTrigger,
+  Icon,
+  Select,
+} from 'components/common';
+import {
   Button,
   ButtonToolbar,
   Col,
@@ -28,11 +33,9 @@ import {
   FormGroup,
   HelpBlock,
   InputGroup,
-  OverlayTrigger,
+  Input,
   Row,
-} from 'components/graylog';
-import { Input } from 'components/bootstrap';
-import { Icon, Select } from 'components/common';
+} from 'components/bootstrap';
 import EventKeyHelpPopover from 'components/event-definitions/common/EventKeyHelpPopover';
 import * as FormsUtils from 'util/FormsUtils';
 

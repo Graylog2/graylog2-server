@@ -20,6 +20,7 @@ import com.floreysoft.jmte.Engine;
 import com.google.inject.Scopes;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.Multibinder;
+import com.google.inject.multibindings.OptionalBinder;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.glassfish.grizzly.http.server.ErrorPageGenerator;
 import org.graylog2.Configuration;
@@ -52,6 +53,8 @@ import org.graylog2.inputs.InputStateListener;
 import org.graylog2.inputs.PersistedInputsImpl;
 import org.graylog2.lookup.LookupModule;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.plugin.cluster.ClusterIdFactory;
+import org.graylog2.plugin.cluster.RandomUUIDClusterIdFactory;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.rest.ValidationFailureExceptionMapper;
 import org.graylog2.plugin.streams.DefaultStream;
@@ -168,6 +171,7 @@ public class ServerBindings extends Graylog2Module {
         bind(PersistedInputs.class).to(PersistedInputsImpl.class);
 
         bind(RoleService.class).to(RoleServiceImpl.class).in(Scopes.SINGLETON);
+        OptionalBinder.newOptionalBinder(binder(), ClusterIdFactory.class).setDefault().to(RandomUUIDClusterIdFactory.class);
     }
 
     private void bindDynamicFeatures() {

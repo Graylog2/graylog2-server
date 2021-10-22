@@ -19,11 +19,10 @@ import React from 'react';
 import _ from 'lodash';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import { Col, Row, Button } from 'components/graylog';
-import { Input } from 'components/bootstrap';
+import { TimeUnitInput } from 'components/common';
+import { Col, Row, Button, Input } from 'components/bootstrap';
 import ObjectUtils from 'util/ObjectUtils';
 import { getValueFromInput } from 'util/FormsUtils';
-import { TimeUnitInput } from 'components/common';
 import { LookupTableDataAdaptersActions } from 'stores/lookup-tables/LookupTableDataAdaptersStore';
 
 class DataAdapterForm extends React.Component {

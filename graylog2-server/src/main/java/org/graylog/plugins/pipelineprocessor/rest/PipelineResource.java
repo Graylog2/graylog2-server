@@ -188,7 +188,6 @@ public class PipelineResource extends RestResource implements PluginRestResource
 
         final PaginatedList<PipelineDao> result = paginatedPipelineService
                 .findPaginated(searchQuery, filter, page, perPage, sort, order);
-        final long total = paginatedPipelineService.count();
         final List<PipelineSource> pipelineList = result.stream()
                 .map(dao -> PipelineSource.fromDao(pipelineRuleParser, dao))
                 .collect(Collectors.toList());

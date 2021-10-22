@@ -18,8 +18,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 
-import { Input } from 'components/bootstrap';
-import { Col } from 'components/graylog';
+import { Input, Col } from 'components/bootstrap';
 import * as FormsUtils from 'util/FormsUtils';
 import { numberExpressionNodePropType } from 'logic/alerts/AggregationExpressionTypes';
 

@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 
-import { Col } from 'components/graylog';
+import { Col } from 'components/bootstrap';
 
 type ErrorFallbackProps = {
   error: {

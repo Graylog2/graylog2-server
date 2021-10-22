@@ -23,7 +23,7 @@ import { AuthenticationActions, PaginatedBackends } from 'stores/authentication/
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import { DataTable, PaginatedList, Spinner } from 'components/common';
-import { Col, Row } from 'components/graylog';
+import { Col, Row } from 'components/bootstrap';
 
 import BackendsFilter from './BackendsFilter';
 import BackendsOverviewItem from './BackendsOverviewItem';

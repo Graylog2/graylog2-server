@@ -18,8 +18,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import URI from 'urijs';
 
-import { LinkContainer } from 'components/graylog/router';
-import { ButtonGroup, DropdownButton, MenuItem } from 'components/graylog';
+import { LinkContainer } from 'components/common/router';
+import { ButtonGroup, DropdownButton, MenuItem } from 'components/bootstrap';
 import { ExternalLink, IfPermitted } from 'components/common';
 import Routes from 'routing/Routes';
 import HideOnCloud from 'util/conditional/HideOnCloud';

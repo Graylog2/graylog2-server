@@ -1,5 +1,5 @@
 ```js { "props": { "className": "container" } }
-import { Button } from 'components/graylog';
+import { Button } from 'components/bootstrap';
 
 <Jumbotron>
   <h1>Hello, world!</h1>

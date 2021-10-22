@@ -17,8 +17,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Row, Col, Button } from 'components/graylog';
-import { Input } from 'components/bootstrap';
+import { Row, Col, Button, Input } from 'components/bootstrap';
 import UserNotification from 'util/UserNotification';
 import { ExtractorsActions } from 'stores/extractors/ExtractorsStore';
 

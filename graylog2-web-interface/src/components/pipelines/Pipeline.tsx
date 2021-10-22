@@ -18,11 +18,11 @@ import PropTypes from 'prop-types';
 import React, { useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 
-import { Row, Col, Alert } from 'components/graylog';
+import { Row, Col, Alert } from 'components/bootstrap';
 import { EntityList, Pluralize } from 'components/common';
-import { PipelineType, StageType } from 'stores/pipelines/PipelinesStore';
+import type { PipelineType, StageType } from 'stores/pipelines/PipelinesStore';
 import { Stream } from 'stores/streams/StreamsStore';
-import { PipelineConnectionsType } from 'stores/pipelines/PipelineConnectionsStore';
+import type { PipelineConnectionsType } from 'stores/pipelines/PipelineConnectionsStore';
 
 import Stage from './Stage';
 import StageForm from './StageForm';
@@ -93,14 +93,15 @@ const Pipeline = ({ pipeline, connections, streams, onConnectionsChange, onStage
     };
   }, [pipeline, onStagesChange]);
 
-  const _formatConnectedStreams = (connectedStreams) => {
+  const _formatConnectedStreams = (connectedStreams: Stream[]) => {
+    // eslint-disable-next-line react/destructuring-assignment
     const formattedStreams = connectedStreams.map((s) => `"${s.title}"`);
-    const streamList = connectedStreams.length > 1 ? [formattedStreams.slice(0, -1).join(', '), formattedStreams.slice(-1)].join(' and ') : formattedStreams[0];
+    const streamList = formattedStreams.length > 1 ? [formattedStreams.slice(0, -1).join(', '), formattedStreams.slice(-1)].join(' and ') : formattedStreams[0];
 
     return (
       <span>
         This pipeline is processing messages from the{' '}
-        <Pluralize singular="stream" plural="streams" value={connectedStreams.length} />{' '}
+        <Pluralize singular="stream" plural="streams" value={formattedStreams.length} />{' '}
         {streamList}.
       </span>
     );

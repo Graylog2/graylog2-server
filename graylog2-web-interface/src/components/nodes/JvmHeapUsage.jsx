@@ -21,7 +21,7 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import styled, { css } from 'styled-components';
 
-import ProgressBar, { Bar } from 'components/graylog/ProgressBar';
+import ProgressBar, { Bar } from 'components/common/ProgressBar';
 import { Spinner } from 'components/common';
 import NumberUtils from 'util/NumberUtils';
 import MetricsExtractor from 'logic/metrics/MetricsExtractor';

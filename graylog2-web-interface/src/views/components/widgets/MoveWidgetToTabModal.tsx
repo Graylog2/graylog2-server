@@ -16,7 +16,7 @@
  */
 import React, { useState, useCallback } from 'react';
 
-import { ListGroup, ListGroupItem } from 'components/graylog';
+import { ListGroup, ListGroupItem } from 'components/bootstrap';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import Input from 'components/bootstrap/Input';
 import { useStore } from 'stores/connect';

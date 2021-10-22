@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 
-import Button from 'components/graylog/Button';
+import Button from 'components/bootstrap/Button';
 import SharingDisabledPopover from 'components/permissions/SharingDisabledPopover';
 import HasOwnership from 'components/common/HasOwnership';
 import Icon from 'components/common/Icon';

@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 
-import { Popover, Table } from 'components/graylog';
+import { Popover, Table } from 'components/bootstrap';
 
 const GrokPatternQueryHelper = () => (
   <Popover id="search-query-help" className="popover-wide" title="Search Syntax Help">

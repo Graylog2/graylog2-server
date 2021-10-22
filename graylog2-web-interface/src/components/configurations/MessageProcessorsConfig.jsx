@@ -20,9 +20,9 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import naturalSort from 'javascript-natural-sort';
 
-import { Button, Alert, Table } from 'components/graylog';
-import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
+import { Button, Alert, Table } from 'components/bootstrap';
 import { IfPermitted, SortableList } from 'components/common';
+import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import ObjectUtils from 'util/ObjectUtils';
 
 const MessageProcessorsConfig = createReactClass({

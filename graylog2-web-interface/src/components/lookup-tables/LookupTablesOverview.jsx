@@ -17,10 +17,10 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { LinkContainer } from 'components/graylog/router';
+import { LinkContainer } from 'components/common/router';
 import Routes from 'routing/Routes';
-import { Row, Col, Table, Popover, OverlayTrigger, Button } from 'components/graylog';
-import { PaginatedList, SearchForm, Icon } from 'components/common';
+import { Row, Col, Table, Popover, Button } from 'components/bootstrap';
+import { OverlayTrigger, PaginatedList, SearchForm, Icon } from 'components/common';
 import LUTTableEntry from 'components/lookup-tables/LUTTableEntry';
 import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
 

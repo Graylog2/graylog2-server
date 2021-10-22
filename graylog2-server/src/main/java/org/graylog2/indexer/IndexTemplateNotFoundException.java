@@ -14,29 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
-import React from 'react';
+package org.graylog2.indexer;
 
-import { Spinner } from 'components/common';
+public class IndexTemplateNotFoundException extends ElasticsearchException {
 
-import RuleList from './RuleList';
-
-class RulesComponent extends React.Component {
-  static propTypes = {
-    rules: PropTypes.array,
-  };
-
-  render() {
-    if (!this.props.rules) {
-      return <Spinner />;
+    public IndexTemplateNotFoundException(String message) {
+        super(message);
     }
 
-    return (
-      <div>
-        <RuleList rules={this.props.rules} />
-      </div>
-    );
-  }
 }
-
-export default RulesComponent;

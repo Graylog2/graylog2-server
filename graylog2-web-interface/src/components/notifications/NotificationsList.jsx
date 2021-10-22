@@ -18,7 +18,7 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
-import { Alert, Row, Col } from 'components/graylog';
+import { Alert, Row, Col } from 'components/bootstrap';
 import { Icon, Spinner } from 'components/common';
 import Notification from 'components/notifications/Notification';
 import { NotificationsStore } from 'stores/notifications/NotificationsStore';

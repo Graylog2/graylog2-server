@@ -20,8 +20,8 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
-import { Label, OverlayTrigger, Popover } from 'components/graylog';
-import { LinkToNode, Spinner } from 'components/common';
+import { OverlayTrigger, LinkToNode, Spinner } from 'components/common';
+import { Label, Popover } from 'components/bootstrap';
 import InputStateComparator from 'logic/inputs/InputStateComparator';
 import { InputStatesStore } from 'stores/inputs/InputStatesStore';
 import { NodesStore } from 'stores/nodes/NodesStore';

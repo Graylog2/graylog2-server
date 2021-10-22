@@ -17,8 +17,8 @@
 import * as React from 'react';
 import styled from 'styled-components';
 
-import { OverlayTrigger, Popover, Table, Button } from 'components/graylog';
-import { Icon } from 'components/common';
+import { OverlayTrigger, Icon } from 'components/common';
+import { Popover, Table, Button } from 'components/bootstrap';
 
 const COMMON_FIELD_MAP = {
   id: (entityName) => `Id of the ${entityName}, which is a unique reference.`,
