@@ -18,21 +18,23 @@ package org.graylog2.periodical;
 
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.cluster.ClusterId;
+import org.graylog2.plugin.cluster.ClusterIdFactory;
 import org.graylog2.plugin.periodical.Periodical;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.util.UUID;
 
 public class ClusterIdGeneratorPeriodical extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(ClusterIdGeneratorPeriodical.class);
 
     private final ClusterConfigService clusterConfigService;
+    private final ClusterIdFactory clusterIdFactory;
 
     @Inject
-    public ClusterIdGeneratorPeriodical(ClusterConfigService clusterConfigService) {
+    public ClusterIdGeneratorPeriodical(ClusterConfigService clusterConfigService, ClusterIdFactory clusterIdFactory) {
         this.clusterConfigService = clusterConfigService;
+        this.clusterIdFactory = clusterIdFactory;
     }
 
     @Override
@@ -78,7 +80,7 @@ public class ClusterIdGeneratorPeriodical extends Periodical {
     @Override
     public void doRun() {
         if(clusterConfigService.get(ClusterId.class) == null) {
-            ClusterId clusterId = ClusterId.create(UUID.randomUUID().toString());
+            ClusterId clusterId = clusterIdFactory.create();
             clusterConfigService.write(clusterId);
 
             LOG.debug("Generated cluster ID {}", clusterId.clusterId());
