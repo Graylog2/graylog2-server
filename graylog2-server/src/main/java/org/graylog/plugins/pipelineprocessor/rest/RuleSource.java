@@ -29,7 +29,6 @@ import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
-import java.util.List;
 import java.util.Set;
 
 @AutoValue
@@ -65,10 +64,6 @@ public abstract class RuleSource {
     @Nullable
     public abstract Set<ParseError> errors();
 
-    @JsonProperty
-    @Nullable
-    public abstract List<String> usingPipelines();
-
     public static Builder builder() {
         return new AutoValue_RuleSource.Builder();
     }
@@ -81,8 +76,7 @@ public abstract class RuleSource {
                                     @JsonProperty("description") @Nullable String description,
                                     @JsonProperty("source") String source,
                                     @JsonProperty("created_at") @Nullable DateTime createdAt,
-                                    @JsonProperty("modified_at") @Nullable DateTime modifiedAt,
-                                    @JsonProperty("using_pipelines") @Nullable List<String> usingPipelines) {
+                                    @JsonProperty("modified_at") @Nullable DateTime modifiedAt) {
         return builder()
                 .id(id)
                 .source(source)
@@ -90,13 +84,10 @@ public abstract class RuleSource {
                 .description(description)
                 .createdAt(createdAt)
                 .modifiedAt(modifiedAt)
-                .usingPipelines(usingPipelines)
                 .build();
     }
 
-    public static RuleSource fromDao(PipelineRuleParser parser,
-                                     RuleDao dao,
-                                     List<String> usingPipelines) {
+    public static RuleSource fromDao(PipelineRuleParser parser, RuleDao dao) {
         Set<ParseError> errors = null;
         try {
             parser.parseRule(dao.id(), dao.source(), false);
@@ -113,7 +104,6 @@ public abstract class RuleSource {
                 .createdAt(dao.createdAt())
                 .modifiedAt(dao.modifiedAt())
                 .errors(errors)
-                .usingPipelines(usingPipelines)
                 .build();
     }
 
@@ -134,7 +124,5 @@ public abstract class RuleSource {
         public abstract Builder modifiedAt(DateTime modifiedAt);
 
         public abstract Builder errors(Set<ParseError> errors);
-
-        public abstract Builder usingPipelines(List<String> usingPipelines);
     }
 }

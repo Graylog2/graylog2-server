@@ -25,9 +25,8 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.audit.PipelineProcessorAuditEventTypes;
-import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
-import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PaginatedRuleService;
+import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleMetricsConfigDto;
 import org.graylog.plugins.pipelineprocessor.db.RuleMetricsConfigService;
@@ -66,7 +65,9 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Api(value = "Pipelines/Rules", description = "Rules for the pipeline message processor")
@@ -131,16 +132,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
         final RuleDao save = ruleService.save(newRuleSource);
 
         log.debug("Created new rule {}", save);
-        return ruleSourceFromDao(save);
-    }
-
-    private RuleSource ruleSourceFromDao(RuleDao ruleDao) {
-        return RuleSource.fromDao(pipelineRuleParser, ruleDao,
-                pipelineService.loadByRule(ruleDao.title())
-                        .stream()
-                        .map(PipelineDao::title)
-                        .collect(Collectors.toList())
-        );
+        return RuleSource.fromDao(pipelineRuleParser, save);
     }
 
     @ApiOperation(value = "Parse a processing rule without saving it", notes = "")
@@ -171,7 +163,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
     public Collection<RuleSource> getAll() {
         final Collection<RuleDao> ruleDaos = ruleService.loadAll();
         return ruleDaos.stream()
-                .map(this::ruleSourceFromDao)
+                .map(ruleDao -> RuleSource.fromDao(pipelineRuleParser, ruleDao))
                 .collect(Collectors.toList());
     }
 
@@ -200,19 +192,36 @@ public class RuleResource extends RestResource implements PluginRestResource {
         final PaginatedList<RuleDao> result = paginatedRuleService
                 .findPaginated(searchQuery, page, perPage, sort, order);
         final List<RuleSource> ruleSourceList = result.stream()
-                .map(this::ruleSourceFromDao)
+                .map(dao -> RuleSource.fromDao(pipelineRuleParser, dao))
                 .collect(Collectors.toList());
         final PaginatedList<RuleSource> rules = new PaginatedList<>(ruleSourceList,
                 result.pagination().total(), result.pagination().page(), result.pagination().perPage());
-        return PaginatedResponse.create("rules", rules);
+        return PaginatedResponse.create("rules", rules,
+                prepareContextForPaginatedResponse(result.delegate()));
     }
+
+    private Map<String, Object> prepareContextForPaginatedResponse(List<RuleDao> rules) {
+        final Map<String, List<PipelineCompactSource>> usedInPipelines = new HashMap<>();
+        rules.forEach(r -> {
+            usedInPipelines.put(r.id(), pipelineService.loadByRule(r.title())
+                    .stream()
+                    .map(p -> PipelineCompactSource.builder()
+                            .id(p.id())
+                            .title(p.title())
+                            .build())
+                    .collect(Collectors.toList()));
+        });
+        return ImmutableMap.of("used_in_pipelines", usedInPipelines);
+    }
+
+
 
     @ApiOperation(value = "Get a processing rule", notes = "It can take up to a second until the change is applied")
     @Path("/{id}")
     @GET
     public RuleSource get(@ApiParam(name = "id") @PathParam("id") String id) throws NotFoundException {
         checkPermission(PipelineRestPermissions.PIPELINE_RULE_READ, id);
-        return ruleSourceFromDao(ruleService.load(id));
+        return RuleSource.fromDao(pipelineRuleParser, ruleService.load(id));
     }
 
     @ApiOperation("Retrieve the named processing rules in bulk")
@@ -223,7 +232,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
         Collection<RuleDao> ruleDaos = ruleService.loadNamed(rules.rules());
 
         return ruleDaos.stream()
-                .map(this::ruleSourceFromDao)
+                .map(ruleDao -> RuleSource.fromDao(pipelineRuleParser, ruleDao))
                 .filter(rule -> isPermitted(PipelineRestPermissions.PIPELINE_RULE_READ, rule.id()))
                 .collect(Collectors.toList());
     }
@@ -251,7 +260,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
                 .build();
         final RuleDao savedRule = ruleService.save(toSave);
 
-        return ruleSourceFromDao(savedRule);
+        return RuleSource.fromDao(pipelineRuleParser, savedRule);
     }
 
     @ApiOperation(value = "Delete a processing rule", notes = "It can take up to a second until the change is applied")
