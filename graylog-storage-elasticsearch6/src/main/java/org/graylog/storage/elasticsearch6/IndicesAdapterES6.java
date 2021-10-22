@@ -57,6 +57,7 @@ import io.searchbox.indices.mapping.PutMapping;
 import io.searchbox.indices.settings.GetSettings;
 import io.searchbox.indices.settings.UpdateSettings;
 import io.searchbox.indices.template.DeleteTemplate;
+import io.searchbox.indices.template.GetTemplate;
 import io.searchbox.indices.template.PutTemplate;
 import io.searchbox.params.Parameters;
 import io.searchbox.params.SearchType;
@@ -197,7 +198,7 @@ public class IndicesAdapterES6 implements IndicesAdapter {
     }
 
     @Override
-    public void create(String indexName, IndexSettings indexSettings, String templateName, Map<String, Object> template) {
+    public void create(String indexName, IndexSettings indexSettings) {
         final Map<String, Object> settings = new HashMap<>();
         settings.put("number_of_shards", indexSettings.shards());
         settings.put("number_of_replicas", indexSettings.replicas());
@@ -250,6 +251,17 @@ public class IndicesAdapterES6 implements IndicesAdapter {
             return URLEncoder.encode(templateName, StandardCharsets.UTF_8.toString());
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public boolean indexTemplateExists(String templateName) {
+        final GetTemplate request = new GetTemplate.Builder(uncheckedURLEncode(templateName)).build();
+        try {
+            final JestResult jestResult = JestUtils.execute(jestClient, request, () -> "Unable to get index template " + templateName);
+            return jestResult.isSucceeded();
+        } catch (ElasticsearchException e) {
+            return false;
         }
     }
 
