@@ -18,6 +18,8 @@ package org.graylog2.cluster.leader;
 
 import com.google.inject.Scopes;
 import org.graylog2.Configuration;
+import org.graylog2.cluster.lock.LockService;
+import org.graylog2.cluster.lock.MongoLockService;
 import org.graylog2.plugin.PluginModule;
 
 public class LeaderElectionModule extends PluginModule {
@@ -43,6 +45,11 @@ public class LeaderElectionModule extends PluginModule {
             case "lock-based":
                 bind(LeaderElectionService.class).to(LockBasedLeaderElectionService.class).in(Scopes.SINGLETON);
                 serviceBinder().addBinding().to(LockBasedLeaderElectionService.class).in(Scopes.SINGLETON);
+                break;
+            case "mongodb":
+                bind(LeaderElectionService.class).to(MongoLeaderElectionService.class).in(Scopes.SINGLETON);
+                serviceBinder().addBinding().to(MongoLeaderElectionService.class).in(Scopes.SINGLETON);
+                bind(LockService.class).to(MongoLockService.class).in(Scopes.SINGLETON);
                 break;
             default:
                 throw new IllegalArgumentException("Unknown leader election mode \"" + leaderElectionMode + "\".");
