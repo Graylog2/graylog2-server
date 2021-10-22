@@ -17,10 +17,9 @@
 import * as React from 'react';
 import { useContext } from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
-import moment from 'moment-timezone';
 import { alice } from 'fixtures/users';
 
-import DateTimeProvider, { ACCEPTED_FORMATS } from 'contexts/DateTimeProvider';
+import DateTimeProvider from 'contexts/DateTimeProvider';
 import DateTimeContext from 'contexts/DateTimeContext';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import User from 'logic/users/User';
@@ -46,17 +45,5 @@ describe('DateTimeProvider', () => {
     render(<SUT timestamp="2021-03-27T14:32:31.894Z" currentUser={user} />);
 
     expect(screen.getByText('2021-03-27 23:32:31.894 +09:00')).toBeInTheDocument();
-  });
-
-  it('should provide a function which converts a date time string to local time of user without timezone', () => {
-    const user = alice.toBuilder().timezone(undefined).build();
-
-    render(<SUT timestamp="2021-03-27T14:32:31.894Z" currentUser={user} />);
-
-    const browserTz = moment.tz.guess();
-    const result = moment.tz('2021-03-27T14:32:31.894Z', ACCEPTED_FORMATS.ISO_8601, true, browserTz)
-      .format(ACCEPTED_FORMATS.TIMESTAMP_TZ);
-
-    expect(screen.getByText(result)).toBeInTheDocument();
   });
 });

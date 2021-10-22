@@ -50,7 +50,7 @@ const exceedsDuration = (timeRange, limitDuration, unifyTime) => {
   }
 };
 
-const validateAbsoluteTimeRange = (timeRange: AbsoluteTimeRange, limitDuration: number) => {
+const validateAbsoluteTimeRange = (timeRange: AbsoluteTimeRange, limitDuration: number, unifyTime) => {
   let errors: {
     from?: string,
     to?: string,
@@ -68,7 +68,7 @@ const validateAbsoluteTimeRange = (timeRange: AbsoluteTimeRange, limitDuration: 
     errors = { ...errors, to: timeRangeError };
   }
 
-  if (exceedsDuration(timeRange, limitDuration)) {
+  if (exceedsDuration(timeRange, limitDuration, unifyTime)) {
     errors = { ...errors, from: dateLimitError };
   }
 
@@ -125,7 +125,7 @@ const validateTimeRange = (timeRange: TimeRange | NoTimeRangeOverride, limitDura
   }
 
   if (isTypeAbsolute(timeRange)) {
-    errors = { ...errors, ...validateAbsoluteTimeRange(timeRange, limitDuration) };
+    errors = { ...errors, ...validateAbsoluteTimeRange(timeRange, limitDuration, unifyTime) };
   }
 
   return errors;

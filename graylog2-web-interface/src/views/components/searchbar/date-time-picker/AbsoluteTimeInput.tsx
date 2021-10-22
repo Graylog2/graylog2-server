@@ -19,8 +19,8 @@ import { useRef, useContext } from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import moment from 'moment';
-import { Button, FormGroup, InputGroup, FormControl } from 'components/graylog';
 
+import { Button, FormGroup, InputGroup, FormControl } from 'components/bootstrap';
 import { DATE_TIME_FORMATS } from 'contexts/DateTimeProvider';
 import { Icon } from 'components/common';
 import DateTimeContext from 'contexts/DateTimeContext';

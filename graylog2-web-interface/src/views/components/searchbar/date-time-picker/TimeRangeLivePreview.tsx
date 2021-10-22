@@ -15,10 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import styled, { css } from 'styled-components';
 import PropTypes from 'prop-types';
 import { useFormikContext } from 'formik';
+import { Moment } from 'moment';
 
 import { readableRange } from 'views/logic/queries/TimeRangeToString';
 import { isTypeRelative, isTypeRelativeWithEnd, isTypeRelativeWithStartOnly } from 'views/typeGuards/timeRange';
@@ -26,6 +27,7 @@ import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import { Icon } from 'components/common';
 import { DATE_TIME_FORMATS } from 'contexts/DateTimeProvider';
 import { SearchBarFormValues } from 'views/Constants';
+import DateTimeContext from 'contexts/DateTimeContext';
 
 import { EMPTY_OUTPUT, EMPTY_RANGE } from '../TimeRangeDisplay';
 
@@ -69,7 +71,7 @@ const MiddleIcon = styled.span(({ theme }) => css`
   padding: 0 15px;
 `);
 
-const dateOutput = (timerange: TimeRange | NoTimeRangeOverride) => {
+const dateOutput = (timerange: TimeRange | NoTimeRangeOverride, unifyTimeAsDate: (time: Date) => Moment) => {
   let from = EMPTY_RANGE;
   let to = EMPTY_RANGE;
 
@@ -79,14 +81,14 @@ const dateOutput = (timerange: TimeRange | NoTimeRangeOverride) => {
 
   if (isTypeRelative(timerange)) {
     if (isTypeRelativeWithStartOnly(timerange)) {
-      from = readableRange(timerange, 'range');
+      from = readableRange(timerange, 'range', unifyTimeAsDate);
     }
 
     if (isTypeRelativeWithEnd(timerange)) {
-      from = readableRange(timerange, 'from');
+      from = readableRange(timerange, 'from', unifyTimeAsDate);
     }
 
-    to = readableRange(timerange, 'to', 'Now');
+    to = readableRange(timerange, 'to', unifyTimeAsDate, 'Now');
 
     return {
       from,
@@ -101,6 +103,7 @@ const dateOutput = (timerange: TimeRange | NoTimeRangeOverride) => {
 };
 
 const TimeRangeLivePreview = ({ timerange }: Props) => {
+  const { unifyTimeAsDate } = useContext(DateTimeContext);
   const { isValid } = useFormikContext<SearchBarFormValues>();
   const [{ from, until }, setTimeOutput] = useState(EMPTY_OUTPUT);
 
@@ -108,7 +111,7 @@ const TimeRangeLivePreview = ({ timerange }: Props) => {
     let output = EMPTY_OUTPUT;
 
     if (isValid) {
-      output = dateOutput(timerange);
+      output = dateOutput(timerange, unifyTimeAsDate);
     }
 
     setTimeOutput(output);

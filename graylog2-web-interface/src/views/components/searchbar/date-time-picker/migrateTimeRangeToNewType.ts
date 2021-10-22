@@ -29,7 +29,7 @@ import {
   normalizeClassifiedRange, RELATIVE_CLASSIFIED_ALL_TIME_RANGE,
 } from './RelativeTimeRangeClassifiedHelper';
 
-const formatDatetime = (datdatetimeeTime, unifyTime) => unifyTime(dateTime, DATE_TIME_FORMATS.complete);
+const formatDatetime = (dateTime, unifyTime) => unifyTime(dateTime, DATE_TIME_FORMATS.complete);
 
 const getDefaultAbsoluteFromRange = (oldTimeRange: RelativeTimeRangeClassified | AbsoluteTimeRange | KeywordTimeRange | NoTimeRangeOverride | undefined | null) => {
   if (isTypeRelativeClassified(oldTimeRange)) {

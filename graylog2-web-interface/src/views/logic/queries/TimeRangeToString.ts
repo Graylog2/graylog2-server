@@ -22,8 +22,8 @@ import type { Moment } from 'moment';
 import { AbsoluteTimeRange, KeywordTimeRange, RelativeTimeRange, TimeRange } from 'views/logic/queries/Query';
 import { isTypeRelativeWithStartOnly } from 'views/typeGuards/timeRange';
 
-export const readableRange = (timerange: TimeRange, fieldName: 'range' | 'from' | 'to', unifyAsDate: (time: Date) => Moment, placeholder: string | undefined = 'All Time') => {
-  return !timerange[fieldName] ? placeholder : unifyAsDate(new Date())
+export const readableRange = (timerange: TimeRange, fieldName: 'range' | 'from' | 'to', unifyTimeAsDate: (time: Date) => Moment, placeholder: string | undefined = 'All Time') => {
+  return !timerange[fieldName] ? placeholder : unifyTimeAsDate(new Date())
     .subtract(timerange[fieldName] * 1000)
     .fromNow();
 };
