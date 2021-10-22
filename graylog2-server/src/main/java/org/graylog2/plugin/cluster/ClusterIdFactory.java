@@ -14,16 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.indexer;
+package org.graylog2.plugin.cluster;
 
-import com.github.zafarkhaja.semver.Version;
-import org.graylog2.indexer.indexset.IndexSetConfig;
-
-import javax.annotation.Nonnull;
-
-public interface IndexTemplateProvider {
-
-    @Nonnull
-    IndexMappingTemplate create(@Nonnull Version elasticsearchVersion, @Nonnull IndexSetConfig indexSetConfig)
-            throws IgnoreIndexTemplate;
+public interface ClusterIdFactory {
+    ClusterId create();
 }
