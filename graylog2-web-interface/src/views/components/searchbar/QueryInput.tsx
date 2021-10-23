@@ -70,11 +70,16 @@ const QueryInput = ({
     const editor = node && node.editor;
 
     if (editor) {
-      editor.commands.addCommand({
+      editor.commands.addCommands([{
         name: 'Execute',
         bindKey: { win: 'Enter', mac: 'Enter' },
         exec: _onExecute,
-      });
+      },
+      {
+        name: 'SuppressShiftEnter',
+        bindKey: 'Shift-Enter',
+        exec: () => {},
+      }]);
 
       editor.commands.removeCommands(['find', 'indent', 'outdent']);
       editor.completers = [completer];
