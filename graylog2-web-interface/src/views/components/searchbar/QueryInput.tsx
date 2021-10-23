@@ -76,7 +76,7 @@ const QueryInput = ({
         exec: _onExecute,
       });
 
-      editor.commands.removeCommands(['indent', 'outdent']);
+      editor.commands.removeCommands(['find', 'indent', 'outdent']);
       editor.completers = [completer];
     }
   }, [completer, _onExecute]);
