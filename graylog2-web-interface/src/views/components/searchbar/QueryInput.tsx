@@ -72,7 +72,7 @@ const QueryInput = ({
     if (editor) {
       editor.commands.addCommands([{
         name: 'Execute',
-        bindKey: { win: 'Enter', mac: 'Enter' },
+        bindKey: 'Enter',
         exec: _onExecute,
       },
       {
