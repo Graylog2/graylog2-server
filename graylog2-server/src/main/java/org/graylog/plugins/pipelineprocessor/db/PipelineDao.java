@@ -25,6 +25,8 @@ import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
 
+import static org.graylog2.shared.utilities.StringUtils.f;
+
 @AutoValue
 public abstract class PipelineDao {
     public static final String FIELD_ID = "id";
@@ -57,6 +59,10 @@ public abstract class PipelineDao {
     @JsonProperty
     @Nullable
     public abstract DateTime modifiedAt();
+
+    public boolean usesRule(String ruleTitle) {
+        return source().contains(f("rule \"%s\"", ruleTitle));
+    }
 
     public static Builder builder() {
         return new AutoValue_PipelineDao.Builder();

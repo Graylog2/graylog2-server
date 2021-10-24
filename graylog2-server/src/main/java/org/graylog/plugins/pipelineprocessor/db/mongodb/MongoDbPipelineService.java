@@ -40,7 +40,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
 
@@ -95,13 +97,19 @@ public class MongoDbPipelineService implements PipelineService {
     }
 
     @Override
-    public List<PipelineDao> loadByRule(String ruleName) {
-        final DBQuery.Query query = DBQuery.regex("source", Pattern.compile(f("rule \"%s\"", ruleName)));
-        try (DBCursor<PipelineDao> daos = dbCollection.find(query)) {
+    public List<PipelineDao> loadByRules(Set<String> ruleNames) {
+        if (ruleNames.isEmpty()) {
+            return ImmutableList.of();
+        }
+        final DBQuery.Query query = DBQuery.or(
+                ruleNames
+                        .stream()
+                        .map(rn -> DBQuery.regex("source", Pattern.compile(f("rule \"%s\"", rn))))
+                        .collect(Collectors.toList())
+                        .toArray(new DBQuery.Query[ruleNames.size()])
+        );
+        try (final DBCursor<PipelineDao> daos = dbCollection.find(query)) {
             return ImmutableList.copyOf((Iterator<PipelineDao>) daos);
-        } catch (MongoException e) {
-            log.error("Unable to load pipelines", e);
-            return Collections.emptyList();
         }
     }
 

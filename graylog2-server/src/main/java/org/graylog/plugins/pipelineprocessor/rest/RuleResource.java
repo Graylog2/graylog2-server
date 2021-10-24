@@ -26,6 +26,7 @@ import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.audit.PipelineProcessorAuditEventTypes;
 import org.graylog.plugins.pipelineprocessor.db.PaginatedRuleService;
+import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleMetricsConfigDto;
@@ -68,6 +69,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Api(value = "Pipelines/Rules", description = "Rules for the pipeline message processor")
@@ -201,17 +203,29 @@ public class RuleResource extends RestResource implements PluginRestResource {
     }
 
     private Map<String, Object> prepareContextForPaginatedResponse(List<RuleDao> rules) {
-        final Map<String, List<PipelineCompactSource>> usedInPipelines = new HashMap<>();
+        final long started = System.currentTimeMillis();
+        final Set<String> ruleTitles = rules
+                .stream()
+                .map(RuleDao::title)
+                .collect(Collectors.toSet());
+        final List<PipelineDao> usedInPipelines = pipelineService.loadByRules(ruleTitles);
+
+        final Map<String, List<PipelineCompactSource>> usedInPipelinesMap = new HashMap<>();
         rules.forEach(r -> {
-            usedInPipelines.put(r.id(), pipelineService.loadByRule(r.title())
+            usedInPipelinesMap.put(r.id(), usedInPipelines
                     .stream()
+                    .filter(p -> p.usesRule(r.title()))
                     .map(p -> PipelineCompactSource.builder()
                             .id(p.id())
                             .title(p.title())
                             .build())
                     .collect(Collectors.toList()));
         });
-        return ImmutableMap.of("used_in_pipelines", usedInPipelines);
+        final long took = System.currentTimeMillis() - started;
+        if (took > 500) {
+            log.warn("It takes longer than 500ms to assemble pipeline rule paginated response's context!");
+        }
+        return ImmutableMap.of("used_in_pipelines", usedInPipelinesMap);
     }
 
 

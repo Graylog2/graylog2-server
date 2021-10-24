@@ -20,6 +20,7 @@ import org.graylog2.database.NotFoundException;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 public interface PipelineService {
     PipelineDao save(PipelineDao pipeline);
@@ -28,7 +29,11 @@ public interface PipelineService {
 
     PipelineDao loadByName(String name) throws NotFoundException;
 
-    List<PipelineDao> loadByRule(String ruleName);
+    /**
+     * Returns a list of pipelines. Each pipeline uses at least one
+     * rule from the provided set.
+     */
+    List<PipelineDao> loadByRules(Set<String> ruleNames);
 
     Collection<PipelineDao> loadAll();
 
