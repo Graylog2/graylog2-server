@@ -1,4 +1,6 @@
 :local(.filterPreview) .panel-body {
+    max-height: 400px;
+    overflow-y: auto;
     padding: 20px 10px;
 }
 
