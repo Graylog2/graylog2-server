@@ -20,6 +20,7 @@ package org.graylog.plugins.pipelineprocessor.db.memory;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog2.events.ClusterEventBus;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.Test;
 import org.testcontainers.shaded.com.google.common.collect.ImmutableSet;
 
@@ -67,8 +68,8 @@ public class InMemoryPipelineServiceTest {
         underTest.save(PipelineDao.builder()
                 .title(title)
                 .description("Description")
-                .createdAt(DateTime.now())
-                .modifiedAt(DateTime.now())
+                .createdAt(DateTime.now(DateTimeZone.UTC))
+                .modifiedAt(DateTime.now(DateTimeZone.UTC))
                 .source(source)
                 .build());
     }

@@ -22,6 +22,7 @@ import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -80,8 +81,8 @@ public class MongoDbPipelineServiceTest {
         underTest.save(PipelineDao.builder()
                 .title(title)
                 .description("Description")
-                .createdAt(DateTime.now())
-                .modifiedAt(DateTime.now())
+                .createdAt(DateTime.now(DateTimeZone.UTC))
+                .modifiedAt(DateTime.now(DateTimeZone.UTC))
                 .source(source)
                 .build());
     }
