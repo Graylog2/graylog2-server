@@ -20,8 +20,6 @@ import { ReadOnlyFormGroup } from 'components/common';
 import User from 'logic/users/User';
 import SectionComponent from 'components/common/Section/SectionComponent';
 
-import LoggedInIcon from '../LoggedInIcon';
-
 type Props = {
   user: User,
 };
