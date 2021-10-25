@@ -90,7 +90,9 @@
         <amqp-client.version>5.8.0</amqp-client.version>
         <antlr.version>4.8-1</antlr.version>
         <apache-directory-version>1.0.3</apache-directory-version>
+        <apache-httpasyncclient.version>4.1.4</apache-httpasyncclient.version>
         <apache-httpclient.version>4.5.13</apache-httpclient.version>
+        <apache-httpcore.version>4.4.14</apache-httpcore.version>
         <auto-value.version>1.7.4</auto-value.version>
         <auto-value-javabean.version>2.5.2</auto-value-javabean.version>
         <bouncycastle.version>1.69</bouncycastle.version>
@@ -213,6 +215,37 @@
             </snapshots>
         </repository>
     </repositories>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- Ensure consistent httpclient/httpcore versions across dependencies and transitive dependencies -->
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpclient</artifactId>
+                <version>${apache-httpclient.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpmime</artifactId>
+                <version>${apache-httpclient.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpasyncclient</artifactId>
+                <version>${apache-httpasyncclient.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpcore</artifactId>
+                <version>${apache-httpcore.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpcore-nio</artifactId>
+                <version>${apache-httpcore.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <build>
         <pluginManagement>
