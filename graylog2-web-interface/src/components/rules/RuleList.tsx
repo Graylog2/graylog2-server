@@ -17,13 +17,13 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { LinkContainer, Link } from 'components/common/router';
+import { LinkContainer } from 'components/common/router';
 import connect from 'stores/connect';
 import { Button, ButtonToolbar } from 'components/bootstrap';
 import { DataTable } from 'components/common';
 import Routes from 'routing/Routes';
 import { RulesActions, RulesStore } from 'stores/rules/RulesStore';
-import type { RuleType, MetricsConfigType, RulesStoreState } from 'stores/rules/RulesStore';
+import type { RuleType, MetricsConfigType, RulesContext, RulesStoreState } from 'stores/rules/RulesStore';
 import { Store } from 'stores/StoreTypes';
 
 import RuleMetricsConfigContainer from './RuleMetricsConfigContainer';
@@ -32,6 +32,7 @@ import RuleListEntry from './RuleListEntry';
 type Props = {
   rules: Array<RuleType>,
   metricsConfig?: MetricsConfigType,
+  rulesContext?: RulesContext,
   onDelete: (RuleType) => void,
   searchFilter: React.ReactNode,
 };
@@ -46,12 +47,16 @@ class RuleList extends React.Component<Props, State> {
     metricsConfig: PropTypes.exact({
       metrics_enabled: PropTypes.bool.isRequired,
     }),
+    rulesContext: PropTypes.exact({
+      used_in_pipelines: PropTypes.objectOf(PropTypes.any),
+    }),
     onDelete: PropTypes.func.isRequired,
     searchFilter: PropTypes.node.isRequired,
   };
 
   static defaultProps = {
     metricsConfig: undefined,
+    rulesContext: undefined,
   };
 
   constructor(props) {
@@ -71,7 +76,9 @@ class RuleList extends React.Component<Props, State> {
   };
 
   _ruleInfoFormatter = (rule) => {
-    return <RuleListEntry rule={rule} onDelete={this._delete} />;
+    const { onDelete, rulesContext: { used_in_pipelines: usingPipelines } = {} } = this.props;
+
+    return <RuleListEntry rule={rule} usingPipelines={usingPipelines[rule.id]} onDelete={onDelete} />;
   };
 
   toggleMetricsConfig = () => {

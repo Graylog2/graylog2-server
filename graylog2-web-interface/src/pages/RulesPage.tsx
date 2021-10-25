@@ -59,7 +59,7 @@ const RulesPage = () => {
   const [isDataLoading, setIsDataLoading] = useState<boolean>(false);
   const { isInitialized: isPaginationReady, pagination, setPagination } = useLocationSearchPagination(DEFAULT_PAGINATION);
   const [paginatedRules, setPaginatedRules] = useState<PaginatedRules | undefined>();
-  const { list: rules, pagination: { total = 0, count = 0 } = {} } = paginatedRules ?? {};
+  const { list: rules, pagination: { total = 0, count = 0 } = {}, context: rulesContext } = paginatedRules ?? {};
   const { page, perPage, query } = pagination;
 
   useEffect(() => {
@@ -146,7 +146,7 @@ const RulesPage = () => {
               <Row>
                 <Col md={12}>
                   <PaginatedList onChange={handlePageChange} totalItems={total} activePage={page} pageSize={perPage}>
-                    <RuleList rules={rules} onDelete={handleDelete} searchFilter={searchFilter} />
+                    <RuleList rules={rules} rulesContext={rulesContext} onDelete={handleDelete} searchFilter={searchFilter} />
                   </PaginatedList>
                 </Col>
               </Row>

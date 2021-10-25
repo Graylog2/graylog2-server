@@ -18,16 +18,17 @@ import * as React from 'react';
 import { useState } from 'react';
 import styled from 'styled-components';
 
-import { LinkContainer, Link } from 'components/graylog/router';
+import { LinkContainer, Link } from 'components/common/router';
 import { MetricContainer, CounterRate } from 'components/metrics';
-import { Timestamp } from 'components/common';
-import { Button, Label, Tooltip, OverlayTrigger } from 'components/graylog';
+import { Timestamp, OverlayTrigger } from 'components/common';
+import { Button, Label, Tooltip } from 'components/bootstrap';
 import Routes from 'routing/Routes';
-import type { RuleType } from 'stores/rules/RulesStore';
+import type { RuleType, UsingPipeline } from 'stores/rules/RulesStore';
 import StringUtils from 'util/StringUtils';
 
 type Props = {
   rule: RuleType,
+  usingPipelines: Array<UsingPipeline>
   onDelete: (rule: RuleType) => void,
 }
 const Pipeline = styled(Label)`
@@ -37,9 +38,9 @@ const Pipeline = styled(Label)`
   line-height: 15px;
 `;
 
-const RuleListEntry = ({ rule, onDelete }: Props) => {
+const RuleListEntry = ({ rule, onDelete, usingPipelines }: Props) => {
   const [viewUsingPipelines, setViewUsingPipelines] = useState(false);
-  const { id, title, description, created_at, modified_at, using_pipelines } = rule;
+  const { id, title, description, created_at, modified_at } = rule;
   const actions = [
     <Button key="delete" bsStyle="primary" bsSize="xsmall" onClick={onDelete(rule)} title="Delete rule">
       Delete
@@ -51,13 +52,15 @@ const RuleListEntry = ({ rule, onDelete }: Props) => {
   ];
   const _togglePipelinesDetails = () => setViewUsingPipelines(!viewUsingPipelines);
 
-  const _showPipelines = (usingPipelines: Array<string>) => {
-    return usingPipelines.map((pipelineName) => {
-      const tooltip = <Tooltip id={StringUtils.replaceSpaces(pipelineName)} show>{pipelineName}</Tooltip>;
+  const _showPipelines = (pipelines: Array<UsingPipeline>) => {
+    return pipelines.map(({ id: pipelineId, title: pipelineTitle }) => {
+      const tooltip = <Tooltip id={StringUtils.replaceSpaces(pipelineTitle)} show>{pipelineTitle}</Tooltip>;
 
       return (
-        <OverlayTrigger key={pipelineName} placement="top" trigger="hover" overlay={tooltip} rootClose>
-          <Pipeline bsStyle="default">{StringUtils.truncateWithEllipses(pipelineName, 30)}</Pipeline>
+        <OverlayTrigger key={pipelineId} placement="top" trigger="hover" overlay={tooltip} rootClose>
+          <LinkContainer key="view" to={Routes.SYSTEM.PIPELINES.PIPELINE(pipelineId)}>
+            <Pipeline bsStyle="default">{StringUtils.truncateWithEllipses(pipelineTitle, 30)}</Pipeline>
+          </LinkContainer>
         </OverlayTrigger>
       );
     });
@@ -83,7 +86,7 @@ const RuleListEntry = ({ rule, onDelete }: Props) => {
           <CounterRate showTotal suffix="errors/s" hideOnMissing />
         </MetricContainer>
       </td>
-      <td className="limited">{_showPipelines(using_pipelines)}</td>
+      <td className="limited">{_showPipelines(usingPipelines)}</td>
       <td className="actions">{actions}</td>
     </tr>
   );
