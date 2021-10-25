@@ -26,7 +26,7 @@ import type { ConfigurationsStoreState } from 'stores/configurations/Configurati
 // Explicit import to fix eslint import/no-cycle
 import IfPermitted from 'components/common/IfPermitted';
 import { isPermitted } from 'util/PermissionsMixin';
-import { ConfigurationsActions, ConfigurationsStore } from 'stores/configurations/ConfigurationsStore';
+import { ConfigurationsActions, ConfigurationsStore, WhiteListConfig } from 'stores/configurations/ConfigurationsStore';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 
 const URL_WHITELIST_CONFIG = 'org.graylog2.system.urlwhitelist.UrlWhitelist';
@@ -40,7 +40,7 @@ type Props = {
 const URLWhiteListFormModal = ({ newUrlEntry, urlType, onUpdate }: Props) => {
   const configModal = useRef<BootstrapModalForm>();
   const prevNewUrlEntry = useRef<string>();
-  const [config, setConfig] = useState({ entries: [], disabled: false });
+  const [config, setConfig] = useState<WhiteListConfig>({ entries: [], disabled: false });
   const [isValid, setIsValid] = useState<boolean>(false);
 
   const { configuration } = useStore<ConfigurationsStoreState>(ConfigurationsStore);
