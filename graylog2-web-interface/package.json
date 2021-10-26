@@ -65,7 +65,7 @@
     "interactjs": "^1.4.0-rc.13",
     "intersection-observer": "^0.12.0",
     "javascript-natural-sort": "^0.7.1",
-    "jquery-ui": "1.12.x",
+    "jquery-ui": "1.13.x",
     "leaflet": "^1.5.1",
     "loadable-components": "^2.2.3",
     "lodash": "^4.17.4",
