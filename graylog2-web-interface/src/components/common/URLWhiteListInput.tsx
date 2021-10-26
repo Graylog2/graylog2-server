@@ -19,10 +19,10 @@ import PropTypes from 'prop-types';
 
 import { Input } from 'components/bootstrap';
 import { isValidURL } from 'util/URLUtils';
-import * as FormsUtils from 'util/FormsUtils';
 // Explicit import to fix eslint import/no-cycle
 import URLWhiteListFormModal from 'components/common/URLWhiteListFormModal';
 import ToolsStore from 'stores/tools/ToolsStore';
+import { triggerInput } from 'util/FormsUtils';
 
 type Props = {
   label: string,
@@ -49,7 +49,7 @@ const URLWhiteListInput = ({ label, onChange, validationMessage, validationState
 
   const [suggestedUrl, setSuggestedUrl] = useState(url);
   const isWhitelistError = () => currentValidationState === 'error' && isValidURL(url);
-  const ref = useRef();
+  const urlInputRef = useRef<Input>();
 
   const checkIsWhitelisted = () => {
     if (url) {
@@ -72,7 +72,7 @@ const URLWhiteListInput = ({ label, onChange, validationMessage, validationState
   };
 
   const onUpdate = () => {
-    FormsUtils.triggerInput(ref.current);
+    triggerInput(urlInputRef.current.getInputDOMNode());
     checkIsWhitelisted();
   };
 
@@ -111,7 +111,7 @@ const URLWhiteListInput = ({ label, onChange, validationMessage, validationState
            id="url"
            name="url"
            label={label}
-           ref={ref}
+           ref={urlInputRef}
            autoFocus
            required
            onChange={onChange}
