@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useRef, useState, useEffect, SyntheticEvent } from 'react';
+import React, { useCallback, useRef, useState, useEffect, SyntheticEvent } from 'react';
 import PropTypes from 'prop-types';
 
 import { Input } from 'components/bootstrap';
@@ -51,7 +51,7 @@ const URLWhiteListInput = ({ label, onChange, validationMessage, validationState
   const isWhitelistError = () => currentValidationState === 'error' && isValidURL(url);
   const urlInputRef = useRef<Input>();
 
-  const checkIsWhitelisted = () => {
+  const checkIsWhitelisted = useCallback(() => {
     if (url) {
       const promise = ToolsStore.urlWhiteListCheck(url);
 
@@ -69,7 +69,7 @@ const URLWhiteListInput = ({ label, onChange, validationMessage, validationState
         setIsWhitelisted(result.is_whitelisted);
       });
     }
-  };
+  }, [url, validationMessage, validationState]);
 
   const onUpdate = () => {
     triggerInput(urlInputRef.current.getInputDOMNode());
@@ -94,13 +94,13 @@ const URLWhiteListInput = ({ label, onChange, validationMessage, validationState
     const timer = setTimeout(() => checkSuggestion(), 250);
 
     return () => clearTimeout(timer);
-  }, [url]);
+  }, [url, urlType]);
 
   useEffect(() => {
     const timer = setTimeout(() => checkIsWhitelisted(), 250);
 
     return () => clearTimeout(timer);
-  }, [url, validationState]);
+  }, [url, validationState, checkIsWhitelisted]);
 
   const addButton = isWhitelistError() && !isWhitelisted ? <URLWhiteListFormModal newUrlEntry={suggestedUrl} onUpdate={onUpdate} urlType={urlType} /> : '';
   const helpMessage = <>{validationState === null ? ownValidationMessage : validationMessage} {addButton}</>;
