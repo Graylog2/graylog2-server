@@ -173,7 +173,7 @@ public class Configuration extends BaseConfiguration {
     private boolean isCloud = false;
 
     @Parameter(value = "leader_election_mode")
-    private String leaderElectionMode = "legacy";
+    private String leaderElectionMode = "static";
 
     /**
      * @deprecated Try not to rely on a leader, or use {@link LeaderElectionService#isLeader()} instead.
