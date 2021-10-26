@@ -87,6 +87,7 @@ public class HttpTransport extends AbstractTcpTransport {
     protected LinkedHashMap<String, Callable<? extends ChannelHandler>> getCustomChildChannelHandlers(MessageInput input) {
         final LinkedHashMap<String, Callable<? extends ChannelHandler>> handlers = new LinkedHashMap<>();
         addBaseHandlers(handlers);
+        handlers.put("http-handler", () -> new HttpHandler(enableCors));
         handlers.putAll(super.getCustomChildChannelHandlers(input));
         return handlers;
     }
@@ -103,7 +104,6 @@ public class HttpTransport extends AbstractTcpTransport {
         handlers.put("decompressor", HttpContentDecompressor::new);
         handlers.put("encoder", HttpResponseEncoder::new);
         handlers.put("aggregator", () -> new HttpObjectAggregator(maxChunkSize));
-        handlers.put("http-handler", () -> new HttpHandler(enableCors));
     }
 
     @FactoryClass

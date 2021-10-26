@@ -55,7 +55,7 @@ public class HttpBulkTransport extends HttpTransport {
     protected LinkedHashMap<String, Callable<? extends ChannelHandler>> getCustomChildChannelHandlers(MessageInput input) {
         final LinkedHashMap<String, Callable<? extends ChannelHandler>> handlers = new LinkedHashMap<>();
         addBaseHandlers(handlers);
-        handlers.put("http-handler", () -> new HttpHandler(enableCors, "/gelf/bulk"));
+        handlers.put("http-bulk-handler", () -> new HttpHandler(enableCors, "/gelf/bulk"));
         handlers.put("http-bulk-newline-decoder",
                 () -> new LenientDelimiterBasedFrameDecoder(maxChunkSize, Delimiters.lineDelimiter()));
         return handlers;
