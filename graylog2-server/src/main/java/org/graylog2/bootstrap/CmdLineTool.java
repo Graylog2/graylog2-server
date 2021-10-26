@@ -52,10 +52,11 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.graylog2.Configuration;
+import org.graylog2.bootstrap.commands.MigrateCmd;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.featureflag.FeatureFlagsFactory;
-import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.DocsHelper;
 import org.graylog2.plugin.Plugin;
 import org.graylog2.plugin.PluginLoaderConfig;
@@ -109,7 +110,7 @@ public abstract class CmdLineTool implements CliCommand {
     protected static final String TMPDIR = System.getProperty("java.io.tmpdir", "/tmp");
 
     protected final JadConfig jadConfig;
-    protected final BaseConfiguration configuration;
+    protected final Configuration configuration;
     protected final ChainingClassLoader chainingClassLoader;
 
     @Option(name = "--dump-config", description = "Show the effective Graylog configuration and exit")
@@ -133,11 +134,11 @@ public abstract class CmdLineTool implements CliCommand {
     protected Injector coreConfigInjector;
     protected FeatureFlags featureFlags;
 
-    protected CmdLineTool(BaseConfiguration configuration) {
+    protected CmdLineTool(Configuration configuration) {
         this(null, configuration);
     }
 
-    protected CmdLineTool(String commandName, BaseConfiguration configuration) {
+    protected CmdLineTool(String commandName, Configuration configuration) {
         jadConfig = new JadConfig();
         jadConfig.addConverterFactory(new GuavaConverterFactory());
         jadConfig.addConverterFactory(new JodaTimeConverterFactory());
@@ -180,6 +181,10 @@ public abstract class CmdLineTool implements CliCommand {
     protected abstract List<Module> getCommandBindings();
 
     protected abstract List<Object> getCommandConfigurationBeans();
+
+    public boolean isMigrationCommand() {
+        return commandName.equals(MigrateCmd.MIGRATION_COMMAND);
+    }
 
     /**
      * Things that have to run before the {@link #startCommand()} method is being called.
