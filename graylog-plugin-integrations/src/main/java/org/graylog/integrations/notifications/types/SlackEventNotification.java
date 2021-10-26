@@ -117,12 +117,14 @@ public class SlackEventNotification implements EventNotification {
             customMessage = buildCustomMessage(ctx, config, template);
         }
 
+        String templatedChannel = buildTemplatedChannel(ctx, config, config.channel());
+
         return new SlackMessage(
                 config.color(),
                 config.iconEmoji(),
                 config.iconUrl(),
                 config.userName(),
-                config.channel(),
+                templatedChannel,
                 linkNames,
                 message,
                 customMessage
@@ -143,11 +145,24 @@ public class SlackEventNotification implements EventNotification {
         return "_" + eventDefinitionName + "_";
     }
 
+    String buildTemplatedChannel(EventNotificationContext ctx, SlackEventNotificationConfig config, String template) throws PermanentEventNotificationException {
+        final List<MessageSummary> backlog = getMessageBacklog(ctx, config);
+        Map<String, Object> model = getCustomMessageModel(ctx, config.type(), backlog);
+        try {
+            LOG.debug("channel: template = {} model = {}", template, model);
+            return templateEngine.transform(template, model);
+        } catch (Exception e) {
+            String error = "Invalid channel template.";
+            LOG.error(error + "[{}]", e.toString());
+            throw new PermanentEventNotificationException(error + e.toString(), e.getCause());
+        }
+    }
+
     String buildCustomMessage(EventNotificationContext ctx, SlackEventNotificationConfig config, String template) throws PermanentEventNotificationException {
         final List<MessageSummary> backlog = getMessageBacklog(ctx, config);
         Map<String, Object> model = getCustomMessageModel(ctx, config.type(), backlog);
         try {
-            LOG.debug("template = {} model = {}", template, model);
+            LOG.debug("customMessage: template = {} model = {}", template, model);
             return templateEngine.transform(template, model);
         } catch (Exception e) {
             String error = "Invalid Custom Message template.";
