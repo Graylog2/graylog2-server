@@ -20,6 +20,7 @@ import com.google.inject.multibindings.MapBinder;
 import org.graylog.plugins.beats.BeatsInputPluginModule;
 import org.graylog2.inputs.codecs.CodecsModule;
 import org.graylog2.inputs.gelf.amqp.GELFAMQPInput;
+import org.graylog2.inputs.gelf.http.GELFHttpBulkInput;
 import org.graylog2.inputs.gelf.http.GELFHttpInput;
 import org.graylog2.inputs.gelf.kafka.GELFKafkaInput;
 import org.graylog2.inputs.gelf.tcp.GELFTCPInput;
@@ -57,6 +58,7 @@ public class MessageInputBindings extends Graylog2Module {
         installInput(inputMapBinder, FakeHttpMessageInput.class, FakeHttpMessageInput.Factory.class);
         installInput(inputMapBinder, GELFTCPInput.class, GELFTCPInput.Factory.class);
         installInput(inputMapBinder, GELFHttpInput.class, GELFHttpInput.Factory.class);
+        installInput(inputMapBinder, GELFHttpBulkInput.class, GELFHttpBulkInput.Factory.class);
         installInput(inputMapBinder, GELFUDPInput.class, GELFUDPInput.Factory.class);
         installInput(inputMapBinder, GELFAMQPInput.class, GELFAMQPInput.Factory.class);
         installInput(inputMapBinder, GELFKafkaInput.class, GELFKafkaInput.Factory.class);

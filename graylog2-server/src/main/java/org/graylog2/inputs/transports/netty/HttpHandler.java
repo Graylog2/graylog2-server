@@ -34,10 +34,18 @@ import io.netty.handler.codec.http.HttpUtil;
 import io.netty.handler.codec.http.HttpVersion;
 
 public class HttpHandler extends SimpleChannelInboundHandler<HttpRequest> {
+    public static final String DEFAULT_GELF_PATH = "/gelf";
     private final boolean enableCors;
+    private final String path;
 
     public HttpHandler(boolean enableCors) {
         this.enableCors = enableCors;
+        this.path = DEFAULT_GELF_PATH;
+    }
+
+    public HttpHandler(boolean enableCors, String path) {
+        this.enableCors = enableCors;
+        this.path = path;
     }
 
     @Override
@@ -56,7 +64,7 @@ public class HttpHandler extends SimpleChannelInboundHandler<HttpRequest> {
             return;
         }
 
-        final boolean correctPath = "/gelf".equals(request.uri());
+        final boolean correctPath = path.equals(request.uri());
         if (correctPath && request instanceof FullHttpRequest) {
             final FullHttpRequest fullHttpRequest = (FullHttpRequest) request;
             final ByteBuf buffer = fullHttpRequest.content();

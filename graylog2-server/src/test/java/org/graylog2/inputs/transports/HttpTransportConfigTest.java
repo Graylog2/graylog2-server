@@ -26,8 +26,15 @@ import static org.junit.Assert.assertTrue;
 public class HttpTransportConfigTest {
     @Test
     public void testGetRequestedConfiguration() {
-        HttpTransport.Config config = new HttpTransport.Config();
+        testConfig(new HttpTransport.Config());
+    }
 
+    @Test
+    public void testBulkGetRequestedConfiguration() {
+        testConfig(new HttpBulkTransport.Config());
+    }
+
+    private void testConfig(HttpTransport.Config config) {
         final ConfigurationRequest requestedConfiguration = config.getRequestedConfiguration();
         assertTrue(requestedConfiguration.containsField(HttpTransport.CK_ENABLE_CORS));
         assertEquals(ConfigurationField.Optional.OPTIONAL, requestedConfiguration.getField(HttpTransport.CK_ENABLE_CORS).isOptional());

@@ -56,8 +56,8 @@ public class HttpTransport extends AbstractTcpTransport {
     static final String CK_MAX_CHUNK_SIZE = "max_chunk_size";
     static final String CK_IDLE_WRITER_TIMEOUT = "idle_writer_timeout";
 
-    private final boolean enableCors;
-    private final int maxChunkSize;
+    protected final boolean enableCors;
+    protected final int maxChunkSize;
     private final int idleWriterTimeout;
 
     @AssistedInject
@@ -86,7 +86,12 @@ public class HttpTransport extends AbstractTcpTransport {
     @Override
     protected LinkedHashMap<String, Callable<? extends ChannelHandler>> getCustomChildChannelHandlers(MessageInput input) {
         final LinkedHashMap<String, Callable<? extends ChannelHandler>> handlers = new LinkedHashMap<>();
+        addBaseHandlers(handlers);
+        handlers.putAll(super.getCustomChildChannelHandlers(input));
+        return handlers;
+    }
 
+    protected void addBaseHandlers(LinkedHashMap<String, Callable<? extends ChannelHandler>> handlers) {
         if (idleWriterTimeout > 0) {
             // Install read timeout handler to close idle connections after a timeout.
             // This avoids dangling HTTP connections when the HTTP client does not close the connection properly.
@@ -99,9 +104,6 @@ public class HttpTransport extends AbstractTcpTransport {
         handlers.put("encoder", HttpResponseEncoder::new);
         handlers.put("aggregator", () -> new HttpObjectAggregator(maxChunkSize));
         handlers.put("http-handler", () -> new HttpHandler(enableCors));
-        handlers.putAll(super.getCustomChildChannelHandlers(input));
-
-        return handlers;
     }
 
     @FactoryClass
@@ -136,5 +138,4 @@ public class HttpTransport extends AbstractTcpTransport {
             return r;
         }
     }
-
 }
