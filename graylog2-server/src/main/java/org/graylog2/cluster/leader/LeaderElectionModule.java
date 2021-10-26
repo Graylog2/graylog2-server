@@ -42,10 +42,6 @@ public class LeaderElectionModule extends PluginModule {
                 bind(LeaderElectionService.class).to(ManualLeaderElectionService.class).in(Scopes.SINGLETON);
                 serviceBinder().addBinding().to(ManualLeaderElectionService.class).in(Scopes.SINGLETON);
                 break;
-            case "lock-based":
-                bind(LeaderElectionService.class).to(LockBasedLeaderElectionService.class).in(Scopes.SINGLETON);
-                serviceBinder().addBinding().to(LockBasedLeaderElectionService.class).in(Scopes.SINGLETON);
-                break;
             case "mongodb":
                 bind(LeaderElectionService.class).to(MongoLeaderElectionService.class).in(Scopes.SINGLETON);
                 serviceBinder().addBinding().to(MongoLeaderElectionService.class).in(Scopes.SINGLETON);
