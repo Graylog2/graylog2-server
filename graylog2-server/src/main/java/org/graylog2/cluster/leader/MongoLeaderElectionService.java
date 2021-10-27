@@ -62,7 +62,13 @@ public class MongoLeaderElectionService extends AbstractExecutionThreadService i
             isLeader = lockService.lock(RESOURCE_NAME).isPresent();
 
             if (wasLeader != isLeader) {
-                log.info("Leader changed. This node is {}.", isLeader ? "now the leader" : "not the leader anymore");
+                if (isLeader) {
+                    log.info("Leader changed. This node is now the leader.");
+                } else {
+                    log.error("Leader changed. This node lost the leader role. This should not happen. The node will" +
+                            "attempt to gracefully transition to assuming a follower role.");
+                }
+
                 // Ensure the nodes collection is up to date before we publish the event
                 nodePingThread.doRun();
                 eventBus.post(new LeaderChangedEvent());

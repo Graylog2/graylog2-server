@@ -25,9 +25,11 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -105,7 +107,14 @@ public class Periodicals {
     }
 
     /**
-     *
+     * All periodicals which are currently running, i.e. they have been scheduled for periodic execution and ar not just
+     * one-off periodicals.
+     */
+    public Set<Periodical> getAllRunning() {
+        return futures.keySet().stream().filter(p -> !p.runsForever()).collect(Collectors.toSet());
+    }
+
+    /**
      * @return a copy of the map of all executor futures
      */
     public Map<Periodical, ScheduledFuture> getFutures() {

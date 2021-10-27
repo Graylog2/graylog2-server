@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -86,11 +87,15 @@ public class PeriodicalsService extends AbstractIdleService {
 
     @Subscribe
     public void leaderChanged(LeaderChangedEvent leaderChangedEvent) {
-        if (!leaderElectionService.isLeader()) {
-            return;
+        if (leaderElectionService.isLeader()) {
+            LOG.info("Starting {} periodicals ...", leaderOnlyPeriodicals.size());
+            startPeriodicals(leaderOnlyPeriodicals);
+        } else {
+            final Set<Periodical> runningLeaderOnlyPeriodicals =
+                    Sets.intersection(leaderOnlyPeriodicals, periodicals.getAllRunning());
+            LOG.info("Stopping {} periodicals ...", runningLeaderOnlyPeriodicals);
+            stopPeriodicals(runningLeaderOnlyPeriodicals);
         }
-        LOG.info("Starting {} periodicals ...", leaderOnlyPeriodicals.size());
-        startPeriodicals(leaderOnlyPeriodicals);
     }
 
     private synchronized void startPeriodicals(Set<Periodical> periodicalsToStart) {
@@ -128,8 +133,11 @@ public class PeriodicalsService extends AbstractIdleService {
     @Override
     protected void shutDown() throws Exception {
         eventBus.unregister(this);
+        stopPeriodicals(periodicals.getAllStoppedOnGracefulShutdown());
+    }
 
-        for (Periodical periodical : periodicals.getAllStoppedOnGracefulShutdown()) {
+    private void stopPeriodicals(Collection<Periodical> periodicalsToStop) {
+        for (Periodical periodical : periodicalsToStop) {
             LOG.info("Shutting down periodical [{}].", periodical.getClass().getCanonicalName());
             Stopwatch s = Stopwatch.createStarted();
 
