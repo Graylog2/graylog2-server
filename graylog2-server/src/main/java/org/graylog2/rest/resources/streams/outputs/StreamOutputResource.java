@@ -59,7 +59,7 @@ import java.util.Set;
 
 @RequiresAuthentication
 @Api(value = "StreamOutputs", description = "Manage stream outputs for a given stream")
-@Path("/streams/{streamid}/outputs")
+@Path("/streams")
 public class StreamOutputResource extends RestResource {
     private final OutputService outputService;
     private final StreamService streamService;
@@ -75,6 +75,7 @@ public class StreamOutputResource extends RestResource {
     }
 
     @GET
+    @Path("/{streamid}/outputs")
     @Timed
     @ApiOperation(value = "Get a list of all outputs for a stream")
     @Produces(MediaType.APPLICATION_JSON)
@@ -104,7 +105,7 @@ public class StreamOutputResource extends RestResource {
     }
 
     @GET
-    @Path("/{outputId}")
+    @Path("/{streamid}/outputs/{outputId}")
     @Timed
     @ApiOperation(value = "Get specific output of a stream")
     @Produces(MediaType.APPLICATION_JSON)
@@ -124,6 +125,7 @@ public class StreamOutputResource extends RestResource {
     }
 
     @POST
+    @Path("/{streamid}/outputs")
     @Timed
     @ApiOperation(value = "Associate outputs with a stream")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -159,7 +161,7 @@ public class StreamOutputResource extends RestResource {
     }
 
     @DELETE
-    @Path("/{outputId}")
+    @Path("/{streamid}/outputs/{outputId}")
     @Timed
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Delete output of a stream")
@@ -178,6 +180,24 @@ public class StreamOutputResource extends RestResource {
         final Output output = outputService.load(outputId);
 
         streamService.removeOutput(stream, output);
+        outputRegistry.removeOutput(output);
+    }
+    
+    @DELETE
+    @Path("/outputs/{outputId}")
+    @Timed
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Delete output of all streams")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "No such output on this node.")
+    })
+    @AuditEvent(type = AuditEventTypes.STREAM_OUTPUT_ASSIGNMENT_DELETE)
+    public void removeOutputs(@ApiParam(name = "outputId", value = "The id of the output that should be deleted", required = true)
+                              @PathParam("outputId") String outputId) throws NotFoundException {
+        checkPermission(RestPermissions.STREAM_OUTPUTS_DELETE, outputId);
+
+        final Output output = outputService.load(outputId);
+        streamService.removeOutputFromAllStreams(output);
         outputRegistry.removeOutput(output);
     }
 
