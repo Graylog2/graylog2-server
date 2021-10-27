@@ -17,6 +17,8 @@
 import numeral from 'numeral';
 
 const NumberUtils = {
+  JAVA_INTEGER_MIN_VALUE: (2 ** 31) * -1,
+  JAVA_INTEGER_MAX_VALUE: (2 ** 31) - 1,
   normalizeNumber(number) {
     switch (number) {
       case 'NaN':
@@ -69,7 +71,7 @@ const NumberUtils = {
     return formattedNumber;
   },
   isNumber(possibleNumber) {
-    return possibleNumber !== '' && !isNaN(possibleNumber);
+    return possibleNumber !== '' && !Number.isNaN(Number(possibleNumber));
   },
 };
 
