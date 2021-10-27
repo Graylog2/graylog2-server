@@ -161,7 +161,7 @@ public class TimeBasedRotationStrategyTest {
         DateTimeUtils.setCurrentMillisProvider(clock);
 
         when(indexSet.getConfig()).thenReturn(indexSetConfig);
-        when(indexSetConfig.rotationStrategy()).thenReturn(TimeBasedRotationStrategyConfig.create(period));
+        when(indexSetConfig.rotationStrategy()).thenReturn(TimeBasedRotationStrategyConfig.create(period, null));
         when(indices.indexCreationDate(anyString())).thenReturn(Optional.of(initialTime.minus(minutes(5))));
 
         // Should not rotate the first index.
@@ -175,7 +175,7 @@ public class TimeBasedRotationStrategyTest {
         // Crossed rotation period.
         when(indexSet.getNewestIndex()).thenReturn("ignored");
         when(indexSet.getConfig()).thenReturn(indexSetConfig);
-        when(indexSetConfig.rotationStrategy()).thenReturn(TimeBasedRotationStrategyConfig.create(period));
+        when(indexSetConfig.rotationStrategy()).thenReturn(TimeBasedRotationStrategyConfig.create(period, null));
         rotationStrategy.rotate(indexSet);
         verify(indexSet, times(1)).cycle();
         reset(indexSet);
@@ -185,7 +185,7 @@ public class TimeBasedRotationStrategyTest {
         // Did not cross rotation period.
         when(indexSet.getNewestIndex()).thenReturn("ignored");
         when(indexSet.getConfig()).thenReturn(indexSetConfig);
-        when(indexSetConfig.rotationStrategy()).thenReturn(TimeBasedRotationStrategyConfig.create(period));
+        when(indexSetConfig.rotationStrategy()).thenReturn(TimeBasedRotationStrategyConfig.create(period, null));
         rotationStrategy.rotate(indexSet);
         verify(indexSet, never()).cycle();
         reset(indexSet);
@@ -200,14 +200,14 @@ public class TimeBasedRotationStrategyTest {
         final InstantMillisProvider clock = new InstantMillisProvider(initialTime);
         DateTimeUtils.setCurrentMillisProvider(clock);
         when(indexSet.getConfig()).thenReturn(indexSetConfig);
-        when(indexSetConfig.rotationStrategy()).thenReturn(TimeBasedRotationStrategyConfig.create(period));
+        when(indexSetConfig.rotationStrategy()).thenReturn(TimeBasedRotationStrategyConfig.create(period, null));
         when(indices.indexCreationDate(anyString())).thenReturn(Optional.of(initialTime.minus(minutes(11))));
 
         // Should rotate the first index.
         // time is 01:55:00, index was created at 01:44:00, so we missed one period, and should rotate
         when(indexSet.getNewestIndex()).thenReturn("ignored");
         when(indexSet.getConfig()).thenReturn(indexSetConfig);
-        when(indexSetConfig.rotationStrategy()).thenReturn(TimeBasedRotationStrategyConfig.create(period));
+        when(indexSetConfig.rotationStrategy()).thenReturn(TimeBasedRotationStrategyConfig.create(period, null));
         rotationStrategy.rotate(indexSet);
         verify(indexSet, times(1)).cycle();
         reset(indexSet);
@@ -218,7 +218,7 @@ public class TimeBasedRotationStrategyTest {
         // Did not cross rotation period.
         when(indexSet.getNewestIndex()).thenReturn("ignored");
         when(indexSet.getConfig()).thenReturn(indexSetConfig);
-        when(indexSetConfig.rotationStrategy()).thenReturn(TimeBasedRotationStrategyConfig.create(period));
+        when(indexSetConfig.rotationStrategy()).thenReturn(TimeBasedRotationStrategyConfig.create(period, null));
         rotationStrategy.rotate(indexSet);
         verify(indexSet, never()).cycle();
         reset(indexSet);
@@ -229,7 +229,7 @@ public class TimeBasedRotationStrategyTest {
         // Crossed rotation period.
         when(indexSet.getNewestIndex()).thenReturn("ignored");
         when(indexSet.getConfig()).thenReturn(indexSetConfig);
-        when(indexSetConfig.rotationStrategy()).thenReturn(TimeBasedRotationStrategyConfig.create(period));
+        when(indexSetConfig.rotationStrategy()).thenReturn(TimeBasedRotationStrategyConfig.create(period, null));
         rotationStrategy.rotate(indexSet);
         verify(indexSet, times(1)).cycle();
         reset(indexSet);
@@ -241,7 +241,7 @@ public class TimeBasedRotationStrategyTest {
         // Crossed multiple rotation periods.
         when(indexSet.getNewestIndex()).thenReturn("ignored");
         when(indexSet.getConfig()).thenReturn(indexSetConfig);
-        when(indexSetConfig.rotationStrategy()).thenReturn(TimeBasedRotationStrategyConfig.create(period));
+        when(indexSetConfig.rotationStrategy()).thenReturn(TimeBasedRotationStrategyConfig.create(period, null));
         rotationStrategy.rotate(indexSet);
         verify(indexSet, times(1)).cycle();
         reset(indexSet);
@@ -251,7 +251,7 @@ public class TimeBasedRotationStrategyTest {
         clock.tick(minutes(1));
         when(indexSet.getNewestIndex()).thenReturn("ignored");
         when(indexSet.getConfig()).thenReturn(indexSetConfig);
-        when(indexSetConfig.rotationStrategy()).thenReturn(TimeBasedRotationStrategyConfig.create(period));
+        when(indexSetConfig.rotationStrategy()).thenReturn(TimeBasedRotationStrategyConfig.create(period, null));
         rotationStrategy.rotate(indexSet);
         verify(indexSet, never()).cycle();
         reset(indexSet);
@@ -345,8 +345,8 @@ public class TimeBasedRotationStrategyTest {
         when(indexSet1.getConfig()).thenReturn(indexSetConfig1);
         when(indexSet2.getConfig()).thenReturn(indexSetConfig2);
 
-        when(indexSetConfig1.rotationStrategy()).thenReturn(TimeBasedRotationStrategyConfig.create(period));
-        when(indexSetConfig2.rotationStrategy()).thenReturn(TimeBasedRotationStrategyConfig.create(period));
+        when(indexSetConfig1.rotationStrategy()).thenReturn(TimeBasedRotationStrategyConfig.create(period, null));
+        when(indexSetConfig2.rotationStrategy()).thenReturn(TimeBasedRotationStrategyConfig.create(period, null));
 
         when(indices.indexCreationDate(anyString())).thenReturn(Optional.of(initialTime.minus(minutes(5))));
 
@@ -366,14 +366,14 @@ public class TimeBasedRotationStrategyTest {
         // Crossed rotation period.
         when(indexSet1.getNewestIndex()).thenReturn("index1");
         when(indexSet1.getConfig()).thenReturn(indexSetConfig1);
-        when(indexSetConfig1.rotationStrategy()).thenReturn(TimeBasedRotationStrategyConfig.create(period));
+        when(indexSetConfig1.rotationStrategy()).thenReturn(TimeBasedRotationStrategyConfig.create(period, null));
         rotationStrategy.rotate(indexSet1);
         verify(indexSet1, times(1)).cycle();
         reset(indexSet1);
 
         when(indexSet2.getNewestIndex()).thenReturn("index2");
         when(indexSet2.getConfig()).thenReturn(indexSetConfig2);
-        when(indexSetConfig2.rotationStrategy()).thenReturn(TimeBasedRotationStrategyConfig.create(period));
+        when(indexSetConfig2.rotationStrategy()).thenReturn(TimeBasedRotationStrategyConfig.create(period, null));
         rotationStrategy.rotate(indexSet2);
         verify(indexSet2, times(1)).cycle();
         reset(indexSet2);
@@ -383,14 +383,14 @@ public class TimeBasedRotationStrategyTest {
         // Did not cross rotation period.
         when(indexSet1.getNewestIndex()).thenReturn("index1");
         when(indexSet1.getConfig()).thenReturn(indexSetConfig1);
-        when(indexSetConfig1.rotationStrategy()).thenReturn(TimeBasedRotationStrategyConfig.create(period));
+        when(indexSetConfig1.rotationStrategy()).thenReturn(TimeBasedRotationStrategyConfig.create(period, null));
         rotationStrategy.rotate(indexSet1);
         verify(indexSet1, never()).cycle();
         reset(indexSet1);
 
         when(indexSet2.getNewestIndex()).thenReturn("index2");
         when(indexSet2.getConfig()).thenReturn(indexSetConfig2);
-        when(indexSetConfig2.rotationStrategy()).thenReturn(TimeBasedRotationStrategyConfig.create(period));
+        when(indexSetConfig2.rotationStrategy()).thenReturn(TimeBasedRotationStrategyConfig.create(period, null));
         rotationStrategy.rotate(indexSet2);
         verify(indexSet2, never()).cycle();
         reset(indexSet2);

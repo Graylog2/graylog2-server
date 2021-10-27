@@ -24,6 +24,7 @@ import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 import org.joda.time.Period;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
 @JsonAutoDetect
@@ -35,18 +36,24 @@ public abstract class TimeBasedRotationStrategyConfig implements RotationStrateg
     @JsonProperty("rotation_period")
     public abstract Period rotationPeriod();
 
+    @JsonProperty("elasticsearch_max_write_index_age")
+    @Nullable
+    public abstract Period maxWriteIndexAge();
+
     @JsonCreator
     public static TimeBasedRotationStrategyConfig create(@JsonProperty(TYPE_FIELD) String type,
-                                                         @JsonProperty("rotation_period") @NotNull Period maxTimePerIndex) {
-        return new AutoValue_TimeBasedRotationStrategyConfig(type, maxTimePerIndex);
+                                                         @JsonProperty("rotation_period") @NotNull Period maxTimePerIndex,
+                                                         @JsonProperty("elasticsearch_max_write_index_age") Period maxWriteIndexAge) {
+        return new AutoValue_TimeBasedRotationStrategyConfig(type, maxTimePerIndex, maxWriteIndexAge);
     }
 
     @JsonCreator
-    public static TimeBasedRotationStrategyConfig create(@JsonProperty("rotation_period") @NotNull Period maxTimePerIndex) {
-        return create(TimeBasedRotationStrategyConfig.class.getCanonicalName(), maxTimePerIndex);
+    public static TimeBasedRotationStrategyConfig create(@JsonProperty("rotation_period") @NotNull Period maxTimePerIndex,
+                                                         @JsonProperty("elasticsearch_max_write_index_age") Period maxWriteIndexAge) {
+        return create(TimeBasedRotationStrategyConfig.class.getCanonicalName(), maxTimePerIndex, maxWriteIndexAge);
     }
 
-    public static TimeBasedRotationStrategyConfig createDefault() {
-        return create(DEFAULT_DAYS);
+    public static TimeBasedRotationStrategyConfig createDefault(Period maxWriteIndexAge) {
+        return create(DEFAULT_DAYS, maxWriteIndexAge);
     }
 }

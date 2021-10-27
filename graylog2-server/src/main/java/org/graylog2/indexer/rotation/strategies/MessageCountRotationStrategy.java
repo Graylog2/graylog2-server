@@ -67,9 +67,9 @@ public class MessageCountRotationStrategy extends AbstractRotationStrategy {
         try {
             final long numberOfMessages = indices.numberOfMessages(index);
             return new Result(index,
-                              numberOfMessages,
-                              config.maxDocsPerIndex(),
-                              numberOfMessages > config.maxDocsPerIndex());
+                    numberOfMessages,
+                    config.maxDocsPerIndex(),
+                    numberOfMessages > config.maxDocsPerIndex());
         } catch (IndexNotFoundException e) {
             log.error("Unknown index, cannot perform rotation", e);
             return null;
@@ -106,5 +106,10 @@ public class MessageCountRotationStrategy extends AbstractRotationStrategy {
         public boolean shouldRotate() {
             return shouldRotate;
         }
+    }
+
+    @Override
+    public String getStrategyName() {
+        return strategyName;
     }
 }

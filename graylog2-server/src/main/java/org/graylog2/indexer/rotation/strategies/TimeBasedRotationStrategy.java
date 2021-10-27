@@ -80,7 +80,7 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
 
     @Override
     public RotationStrategyConfig defaultConfiguration() {
-        return TimeBasedRotationStrategyConfig.createDefault();
+        return TimeBasedRotationStrategyConfig.createDefault(elasticsearchConfiguration.getMaxWriteIndexAge());
     }
 
     /**
@@ -249,5 +249,10 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
         public boolean shouldRotate() {
             return rotate;
         }
+    }
+
+    @Override
+    public String getStrategyName() {
+        return strategyName;
     }
 }

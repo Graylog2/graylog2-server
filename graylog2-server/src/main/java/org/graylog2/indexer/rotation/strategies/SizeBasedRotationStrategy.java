@@ -90,4 +90,9 @@ public class SizeBasedRotationStrategy extends AbstractRotationStrategy {
             }
         };
     }
+
+    @Override
+    public String getStrategyName() {
+        return strategyName;
+    }
 }

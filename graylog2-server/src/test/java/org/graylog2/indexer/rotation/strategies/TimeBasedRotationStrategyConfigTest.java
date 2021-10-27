@@ -32,13 +32,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class TimeBasedRotationStrategyConfigTest {
     @Test
     public void testCreate() throws Exception {
-        final TimeBasedRotationStrategyConfig config = TimeBasedRotationStrategyConfig.create(Period.days(1));
+        final TimeBasedRotationStrategyConfig config = TimeBasedRotationStrategyConfig.create(Period.days(1), null);
         assertThat(config.rotationPeriod()).isEqualTo(Period.days(1));
     }
 
     @Test
     public void testSerialization() throws JsonProcessingException {
-        final RotationStrategyConfig config = TimeBasedRotationStrategyConfig.create(Period.days(1));
+        final RotationStrategyConfig config = TimeBasedRotationStrategyConfig.create(Period.days(1), null);
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
         final String json = objectMapper.writeValueAsString(config);
 
