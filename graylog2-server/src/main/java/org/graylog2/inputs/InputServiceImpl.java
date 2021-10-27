@@ -133,8 +133,17 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
 
     @Override
     public <T extends Persisted> String save(T model) throws ValidationException {
+        return save(model, true);
+    }
+
+    @Override
+    public <T extends Persisted> String saveNoEvents(T model) throws ValidationException {
+        return save(model, false);
+    }
+
+    private <T extends Persisted> String save(T model, boolean fireEvents) throws ValidationException {
         final String resultId = super.save(model);
-        if (resultId != null && !resultId.isEmpty()) {
+        if (resultId != null && !resultId.isEmpty() && fireEvents) {
             publishChange(InputCreated.create(resultId));
         }
         return resultId;

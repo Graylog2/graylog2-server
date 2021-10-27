@@ -30,6 +30,8 @@ public interface PersistedService {
 
     <T extends Persisted> String save(T model) throws ValidationException;
 
+    <T extends Persisted> String saveNoEvents(T model) throws ValidationException;
+
     @Nullable
     <T extends Persisted> String saveWithoutValidation(T model);
 
