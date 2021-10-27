@@ -25,6 +25,7 @@ import org.graylog2.streams.StreamService;
 
 import javax.inject.Inject;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -88,12 +89,14 @@ public class MappedFieldTypesService {
                     final String compoundFieldType = distinctTypes.size() > 1
                             ? distinctTypes.stream().collect(Collectors.joining(",", "compound(", ")"))
                             : distinctTypes.stream().findFirst().orElse("unknown");
-                    final ImmutableSet<String> commonProperties = fieldTypes.stream()
+                    final Set<String> commonProperties = fieldTypes.stream()
                             .map(mappedFieldTypeDTO -> mappedFieldTypeDTO.type().properties())
                             .reduce((s1, s2) -> Sets.intersection(s1, s2).immutableCopy())
                             .orElse(ImmutableSet.of());
 
-                    final ImmutableSet<String> properties = ImmutableSet.<String>builder().addAll(commonProperties).add(PROP_COMPOUND_TYPE).build();
+                    final Set<String> properties = distinctTypes.size() > 1
+                            ? Sets.union(commonProperties, Collections.singleton(PROP_COMPOUND_TYPE))
+                            : commonProperties;
                     return MappedFieldTypeDTO.create(fieldName, createType(compoundFieldType, properties));
 
                 })
