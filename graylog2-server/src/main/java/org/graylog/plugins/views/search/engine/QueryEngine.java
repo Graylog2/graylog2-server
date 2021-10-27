@@ -179,6 +179,10 @@ public class QueryEngine {
         return result;
     }
 
+    public ValidationResponse validate(final ValidationRequest request) {
+        return elasticsearchBackend.validate(request);
+    }
+
     private QueryBackend<? extends GeneratedQueryContext> getQueryBackend(Query query) {
         return elasticsearchBackend;
     }

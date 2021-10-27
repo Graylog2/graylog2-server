@@ -57,6 +57,7 @@ import org.graylog.plugins.views.search.rest.MessageExportFormatFilter;
 import org.graylog.plugins.views.search.rest.MessagesResource;
 import org.graylog.plugins.views.search.rest.PivotSeriesFunctionsResource;
 import org.graylog.plugins.views.search.rest.QualifyingViewsResource;
+import org.graylog.plugins.views.search.rest.QueryValidationResource;
 import org.graylog.plugins.views.search.rest.SavedSearchesResource;
 import org.graylog.plugins.views.search.rest.SearchMetadataResource;
 import org.graylog.plugins.views.search.rest.SearchResource;
@@ -127,6 +128,7 @@ public class ViewsBindings extends ViewsModule {
         addSystemRestResource(SearchResource.class);
         addSystemRestResource(SearchMetadataResource.class);
         addSystemRestResource(ViewsResource.class);
+         addSystemRestResource(QueryValidationResource.class);
 
         addPermissions(ViewsRestPermissions.class);
 

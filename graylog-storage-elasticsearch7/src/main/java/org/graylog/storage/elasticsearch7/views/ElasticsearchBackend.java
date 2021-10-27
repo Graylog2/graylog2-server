@@ -29,6 +29,9 @@ import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.engine.QueryBackend;
 import org.graylog.plugins.views.search.engine.SearchConfig;
+import org.graylog.plugins.views.search.engine.ValidationExplanation;
+import org.graylog.plugins.views.search.engine.ValidationRequest;
+import org.graylog.plugins.views.search.engine.ValidationResponse;
 import org.graylog.plugins.views.search.errors.SearchTypeError;
 import org.graylog.plugins.views.search.errors.SearchTypeErrorParser;
 import org.graylog.plugins.views.search.filter.AndFilter;
@@ -36,6 +39,8 @@ import org.graylog.plugins.views.search.filter.OrFilter;
 import org.graylog.plugins.views.search.filter.QueryStringFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.ShardOperationFailedException;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.validate.query.ValidateQueryRequest;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.validate.query.ValidateQueryResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.MultiSearchResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
@@ -43,13 +48,13 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.support.Indice
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.BoolQueryBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.storage.elasticsearch7.ElasticsearchClient;
 import org.graylog.storage.elasticsearch7.TimeRangeQueryFactory;
 import org.graylog.storage.elasticsearch7.views.searchtypes.ESSearchTypeHandler;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.FieldTypeException;
-import org.graylog2.indexer.searches.SearchesClusterConfig;
 import org.graylog2.plugin.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -296,6 +301,26 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                 .searchTypes(resultsMap)
                 .errors(new HashSet<>(queryContext.errors()))
                 .build();
+    }
+
+    @Override
+    public ValidationResponse validate(ValidationRequest req) {
+        final Set<String> affectedIndices = Optional.ofNullable(req.streams()).map(s -> indexLookup.indexNamesForStreamsInTimeRange(s, req.timerange())).orElse(Collections.emptySet());
+        final ValidateQueryRequest esReq = new ValidateQueryRequest();
+        final ElasticsearchQueryString backendQuery = (ElasticsearchQueryString) req.query();
+        final QueryStringQueryBuilder queryStringQueryBuilder = new QueryStringQueryBuilder(backendQuery.queryString())
+                .lenient(false);
+        esReq.query(queryStringQueryBuilder);
+        esReq.indices(affectedIndices.toArray(new String[0]));
+        esReq.explain(true);
+        esReq.rewrite(true);
+        esReq.allShards(false); // random one shard per index
+
+        final ValidateQueryResponse response = client.execute((restHighLevelClient, requestOptions) -> restHighLevelClient.indices().validateQuery(esReq, requestOptions));
+        final List<ValidationExplanation> explanations = response.getQueryExplanation().stream()
+                .map(e -> new ValidationExplanation(e.getIndex(), e.getShard(), e.isValid(), e.getExplanation(), e.getError()))
+                .collect(Collectors.toList());
+        return new ValidationResponse(response.isValid(), explanations);
     }
 
     private Optional<ElasticsearchException> checkForFailedShards(MultiSearchResponse.Item multiSearchResponse) {

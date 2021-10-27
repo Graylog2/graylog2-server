@@ -26,7 +26,6 @@ import org.graylog.plugins.views.search.errors.IllegalTimeRangeException;
 import org.graylog.plugins.views.search.errors.QueryError;
 import org.graylog.plugins.views.search.errors.SearchTypeError;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
-import org.graylog2.indexer.searches.SearchesClusterConfig;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
@@ -150,4 +149,6 @@ public interface QueryBackend<T extends GeneratedQueryContext> {
                     throw new IllegalTimeRangeException("Search out of allowed time range limit");
                 });
     }
+
+    ValidationResponse validate(ValidationRequest request);
 }

@@ -33,6 +33,8 @@ import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.engine.QueryBackend;
 import org.graylog.plugins.views.search.engine.SearchConfig;
+import org.graylog.plugins.views.search.engine.ValidationRequest;
+import org.graylog.plugins.views.search.engine.ValidationResponse;
 import org.graylog.plugins.views.search.errors.SearchTypeError;
 import org.graylog.plugins.views.search.errors.SearchTypeErrorParser;
 import org.graylog.plugins.views.search.filter.AndFilter;
@@ -48,7 +50,6 @@ import org.graylog.storage.elasticsearch6.jest.JestUtils;
 import org.graylog.storage.elasticsearch6.views.searchtypes.ESSearchTypeHandler;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.IndexMapping;
-import org.graylog2.indexer.searches.SearchesClusterConfig;
 import org.graylog2.plugin.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -291,5 +292,12 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                 .searchTypes(resultsMap)
                 .errors(new HashSet<>(queryContext.errors()))
                 .build();
+    }
+
+    @Override
+    public ValidationResponse validate(ValidationRequest query) {
+        // final Validate.Builder builder = new Validate.Builder(query.query());
+        // final JestResult result = JestUtils.execute(jestClient, builder.build(), () -> "Unable to perform search query: ");
+        throw new UnsupportedOperationException("Not implemented yet");
     }
 }
