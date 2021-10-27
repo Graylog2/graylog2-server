@@ -16,6 +16,7 @@
  */
 package org.graylog2.periodical;
 
+import com.google.common.base.Stopwatch;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.graylog2.plugin.Tools;
@@ -82,8 +83,27 @@ public class Periodicals {
         periodicals.add(periodical);
     }
 
+    public synchronized void unregisterAndStop(Periodical periodical) {
+        if (isPeriodic(periodical)) {
+            LOG.info("Shutting down periodical [{}].", periodical.getClass().getCanonicalName());
+            Stopwatch s = Stopwatch.createStarted();
+
+            // Cancel future executions.
+            if (futures.containsKey(periodical)) {
+                futures.remove(periodical).cancel(false);
+                periodicals.remove(periodical);
+                s.stop();
+                LOG.info("Shutdown of periodical [{}] complete, took <{}ms>.",
+                        periodical.getClass().getCanonicalName(), s.elapsed(TimeUnit.MILLISECONDS));
+            } else {
+                LOG.error("Could not find periodical [{}] in futures list. Not stopping execution.",
+                        periodical.getClass().getCanonicalName());
+            }
+
+        }
+    }
+
     /**
-     *
      * @return a copy of the list of all registered periodicals.
      */
     public List<Periodical> getAll() {
@@ -111,7 +131,7 @@ public class Periodicals {
      * one-off periodicals.
      */
     public Set<Periodical> getAllRunning() {
-        return futures.keySet().stream().filter(p -> !p.runsForever()).collect(Collectors.toSet());
+        return periodicals.stream().filter(this::isPeriodic).collect(Collectors.toSet());
     }
 
     /**
@@ -119,6 +139,10 @@ public class Periodicals {
      */
     public Map<Periodical, ScheduledFuture> getFutures() {
         return Maps.newHashMap(futures);
+    }
+
+    private boolean isPeriodic(Periodical periodical) {
+        return !periodical.runsForever();
     }
 
 }
