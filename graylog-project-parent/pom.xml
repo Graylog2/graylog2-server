@@ -571,16 +571,6 @@
                 <artifactId>httpclient</artifactId>
                 <version>${apache-httpclient.version}</version>
             </dependency>
-            <dependency>
-                <groupId>net.javacrumbs.shedlock</groupId>
-                <artifactId>shedlock-core</artifactId>
-                <version>${shedlock.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>net.javacrumbs.shedlock</groupId>
-                <artifactId>shedlock-provider-mongo</artifactId>
-                <version>${shedlock.version}</version>
-            </dependency>
 
             <!-- Test dependencies -->
             <dependency>

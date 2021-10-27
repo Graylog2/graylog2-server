@@ -23,7 +23,6 @@ import org.graylog2.cluster.lock.MongoLockService;
 import org.graylog2.plugin.PluginModule;
 
 public class LeaderElectionModule extends PluginModule {
-
     private final Configuration configuration;
 
     public LeaderElectionModule(Configuration configuration) {
@@ -32,27 +31,23 @@ public class LeaderElectionModule extends PluginModule {
 
     @Override
     protected void configure() {
-        final String leaderElectionMode = configuration.getLeaderElectionMode();
+        final LeaderElectionMode mode = configuration.getLeaderElectionMode();
 
-        switch (leaderElectionMode) {
-            case "legacy":
-                bind(LeaderElectionService.class).to(LegacyLeaderElectionService.class).in(Scopes.SINGLETON);
+        switch (mode) {
+            case STATIC:
+                bind(LeaderElectionService.class).to(StaticLeaderElectionService.class).in(Scopes.SINGLETON);
                 break;
-            case "manual":
+            case MANUAL:
                 bind(LeaderElectionService.class).to(ManualLeaderElectionService.class).in(Scopes.SINGLETON);
                 serviceBinder().addBinding().to(ManualLeaderElectionService.class).in(Scopes.SINGLETON);
                 break;
-            case "lock-based":
-                bind(LeaderElectionService.class).to(LockBasedLeaderElectionService.class).in(Scopes.SINGLETON);
-                serviceBinder().addBinding().to(LockBasedLeaderElectionService.class).in(Scopes.SINGLETON);
-                break;
-            case "mongodb":
+            case AUTOMATIC:
                 bind(LeaderElectionService.class).to(MongoLeaderElectionService.class).in(Scopes.SINGLETON);
                 serviceBinder().addBinding().to(MongoLeaderElectionService.class).in(Scopes.SINGLETON);
                 bind(LockService.class).to(MongoLockService.class).in(Scopes.SINGLETON);
                 break;
             default:
-                throw new IllegalArgumentException("Unknown leader election mode \"" + leaderElectionMode + "\".");
+                throw new IllegalArgumentException("Unknown leader election mode \"" + mode + "\".");
         }
     }
 }
