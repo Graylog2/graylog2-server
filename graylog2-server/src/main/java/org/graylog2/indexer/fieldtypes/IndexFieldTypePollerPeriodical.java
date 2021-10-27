@@ -208,10 +208,8 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
     @SuppressWarnings("unused")
     @Subscribe
     public void handleIndexDeletion(final IndicesDeletedEvent event) {
-        if (isNotLeader()) {
-            LOG.debug("Skipping index deletion event on non-leader node. [event={}]", event);
-            return;
-        }
+        // This is not a cluster event and should be allowed to be executed on non-leader nodes to ensure
+        // a timely cleanup
         event.indices().forEach(indexName -> {
             LOG.debug("Removing field type information for deleted index <{}>", indexName);
             dbService.delete(indexName);
