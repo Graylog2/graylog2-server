@@ -25,6 +25,7 @@ import org.graylog.plugins.views.search.engine.QueryEngine;
 import org.graylog.plugins.views.search.engine.ValidationExplanation;
 import org.graylog.plugins.views.search.engine.ValidationRequest;
 import org.graylog.plugins.views.search.engine.ValidationResponse;
+import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.rest.PluginRestResource;
@@ -58,6 +59,7 @@ public class QueryValidationResource extends RestResource implements PluginRestR
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation("Validate a search query")
+    @NoAuditEvent("Only validating query structure, not changing any data")
     public ValidationResponseDTO validateQuery(@ApiParam(name = "validationRequest") ValidationRequestDTO validationRequest) {
 
         final ValidationRequest q = ValidationRequest.Builder.builder()
