@@ -141,7 +141,6 @@ public class InputEventListener {
         }
     }
 
-    // TODO consider moving this into separate class
     @Subscribe
     public void leaderChanged(LeaderChangedEvent event) {
         if (leaderElectionService.isLeader()) {
@@ -152,8 +151,14 @@ public class InputEventListener {
                     startMessageInput(input);
                 }
             }
-
+        } else {
+            inputRegistry.getRunningInputs().stream()
+                    .map(IOState::getStoppable)
+                    .filter(input -> input.isGlobal() && input.onlyOnePerCluster())
+                    .forEach(input -> {
+                        LOG.info("Lost leader role. Stopping input <{}/{}>", input.getName(), input.getId());
+                        inputDeleted(InputDeleted.create(input.getId()));
+                    });
         }
     }
-
 }

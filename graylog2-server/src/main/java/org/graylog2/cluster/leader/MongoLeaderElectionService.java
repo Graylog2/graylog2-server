@@ -65,7 +65,7 @@ public class MongoLeaderElectionService extends AbstractExecutionThreadService i
                 if (isLeader) {
                     log.info("Leader changed. This node is now the leader.");
                 } else {
-                    log.error("Leader changed. This node lost the leader role. This should not happen. The node will" +
+                    log.error("Leader changed. This node lost the leader role. This should not happen. The node will " +
                             "attempt to gracefully transition to assuming a follower role.");
                 }
 
