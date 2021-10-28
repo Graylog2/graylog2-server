@@ -22,7 +22,9 @@ import org.graylog2.cluster.leader.LeaderChangedEvent;
 import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.IOState;
+import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.rest.models.system.inputs.responses.InputCreated;
 import org.graylog2.rest.models.system.inputs.responses.InputDeleted;
@@ -44,6 +46,7 @@ public class InputEventListener {
     private final NodeId nodeId;
     private final LeaderElectionService leaderElectionService;
     private final PersistedInputs persistedInputs;
+    private final ServerStatus serverStatus;
 
     @Inject
     public InputEventListener(EventBus eventBus,
@@ -52,13 +55,15 @@ public class InputEventListener {
                               InputService inputService,
                               NodeId nodeId,
                               LeaderElectionService leaderElectionService,
-                              PersistedInputs persistedInputs) {
+                              PersistedInputs persistedInputs,
+                              ServerStatus serverStatus) {
         this.inputLauncher = inputLauncher;
         this.inputRegistry = inputRegistry;
         this.inputService = inputService;
         this.nodeId = nodeId;
         this.leaderElectionService = leaderElectionService;
         this.persistedInputs = persistedInputs;
+        this.serverStatus = serverStatus;
         eventBus.register(this);
     }
 
@@ -144,9 +149,13 @@ public class InputEventListener {
     @Subscribe
     public void leaderChanged(LeaderChangedEvent event) {
         if (leaderElectionService.isLeader()) {
+            if (serverStatus.getLifecycle() == Lifecycle.STARTING) {
+                LOG.debug("Ignoring LeaderChangedEvent during server startup.");
+                return;
+            }
             for (MessageInput input : persistedInputs) {
                 final IOState<MessageInput> inputState = inputRegistry.getInputState(input.getId());
-                if (inputState == null || inputState.canBeStarted()) {
+                if (input.onlyOnePerCluster() && inputState == null || inputState.canBeStarted()) {
                     LOG.info("Got leader role. Starting input <{}/{}>", input.getName(), input.getId());
                     startMessageInput(input);
                 }
