@@ -27,13 +27,23 @@ class TimeBasedRotationStrategyConfiguration extends React.Component {
     updateConfig: PropTypes.func.isRequired,
   };
 
-  state = {
-    rotation_period: this.props.config.rotation_period,
-  };
-
   inputs = {};
 
+  constructor(props) {
+    super(props);
+    const { config: { rotation_period: rotationPeriod } } = this.props;
+
+    const { config: { elasticsearch_max_write_index_age: rotationLimit } } = this.props;
+
+    this.state = {
+      rotation_period: rotationPeriod,
+      rotationLimit,
+    };
+  }
+
   _onPeriodUpdate = (field) => {
+    const { updateConfig } = this.props;
+
     return () => {
       const update = {};
       let period = this.inputs[field].getValue().toUpperCase();
@@ -48,15 +58,23 @@ class TimeBasedRotationStrategyConfiguration extends React.Component {
 
       if (this._isValidPeriod(update[field])) {
         // Only propagate state if the config is valid.
-        this.props.updateConfig(update);
+        updateConfig(update);
       }
     };
   };
 
-  _isValidPeriod = (duration) => {
-    const check = duration || this.state.rotation_period;
+  _validationLimit = (durationInMilliseconds, rotationLimit) => {
+    return durationInMilliseconds <= moment.duration(rotationLimit).asMilliseconds();
+  }
 
-    return moment.duration(check).asMilliseconds() >= 3600000;
+  _isValidPeriod = (duration) => {
+    const { rotation_period: rotationPeriod, rotationLimit } = this.state;
+    const check = duration || rotationPeriod;
+    const checkInMilliseconds = moment.duration(check).asMilliseconds();
+
+    return checkInMilliseconds >= 3600000 && (
+      rotationLimit ? this._validationLimit(checkInMilliseconds, rotationLimit) : true
+    );
   };
 
   _validationState = () => {
@@ -68,7 +86,10 @@ class TimeBasedRotationStrategyConfiguration extends React.Component {
   };
 
   _formatDuration = () => {
-    return this._isValidPeriod() ? moment.duration(this.state.rotation_period).humanize() : 'invalid (min 1 hour)';
+    const { rotation_period: rotationPeriod, rotationLimit } = this.state;
+    const maxErrorMessage = rotationLimit && ` and max ${moment.duration(rotationLimit).humanize()}`;
+
+    return this._isValidPeriod() ? moment.duration(rotationPeriod).humanize() : `invalid (min 1 hour${maxErrorMessage})`;
   };
 
   render() {
