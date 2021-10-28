@@ -39,7 +39,6 @@ class IndexMaintenanceStrategiesConfiguration extends React.Component {
       activeStrategy: strategy,
       activeConfig: config,
       newStrategy: strategy,
-      newConfig: config,
     };
   }
 
@@ -80,7 +79,7 @@ class IndexMaintenanceStrategiesConfiguration extends React.Component {
 
     const newConfig = this._getStrategyConfig(newStrategy);
 
-    this.setState({ newStrategy: newStrategy, newConfig: newConfig });
+    this.setState({ newStrategy: newStrategy });
     updateState(newStrategy, newConfig);
   };
 
@@ -102,7 +101,6 @@ class IndexMaintenanceStrategiesConfiguration extends React.Component {
     const { updateState } = this.props;
     const config = this._addConfigType(newStrategy, newConfig);
 
-    this.setState({ newConfig: config });
     updateState(newStrategy, config);
   };
 
