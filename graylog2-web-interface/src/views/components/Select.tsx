@@ -17,10 +17,11 @@
 import React, { useRef, useMemo } from 'react';
 import type { ComponentType } from 'react';
 import PropTypes from 'prop-types';
-import ReactSelect, { components as Components, Creatable as CreatableSelect } from 'react-select';
+import type { Theme as DefaultSelectTheme } from 'react-select';
+import ReactSelect, { components as Components, createFilter } from 'react-select';
+import CreatableSelect from 'react-select/creatable';
 import { Overlay } from 'react-overlays';
 import { useTheme } from 'styled-components';
-import { createFilter } from 'react-select/lib/filters';
 
 export type Option = { [key: string]: any };
 
@@ -143,13 +144,13 @@ type Props = {
   isSearchable?: boolean,
   isMulti?: boolean,
   menuShouldScrollIntoView: boolean,
-  onChange: (value: any, actionType: string) => void,
+  onChange: (value: any, actionType: any) => void,
   onMenuClose: () => void,
   placeholder: string,
   value?: Object | Array<Object> | null | undefined,
 };
 
-const ValueWithTitle = (props: { data: { label: string } }) => {
+const ValueWithTitle = (props: React.ComponentProps<typeof Components.MultiValue>) => {
   const { data: { label } } = props;
 
   return <Components.MultiValue {...props} innerProps={{ title: label }} />;
@@ -185,7 +186,6 @@ const Select = ({
 }: Props) => {
   const theme = useTheme();
   const selectRef = useRef(null);
-  const Component = allowOptionCreation ? CreatableSelect : ReactSelect;
   const Menu = useMemo(() => MenuOverlay(selectRef), [selectRef]);
   const menuStyle = useMemo(() => menu(selectRef, allowOptionCreation), [selectRef, allowOptionCreation]);
   const _components = {
@@ -209,7 +209,7 @@ const Select = ({
   };
   const filterOption = createFilter({ ignoreCase, ignoreAccents });
 
-  const selectTheme = (defaultTheme: {[key: string]: any}) => {
+  const selectTheme = (defaultTheme: DefaultSelectTheme) => {
     return {
       ...defaultTheme,
       colors: {
@@ -235,14 +235,22 @@ const Select = ({
     };
   };
 
+  const selectProps: React.ComponentProps<typeof ReactSelect> | React.ComponentProps<typeof CreatableSelect> = {
+    ...rest,
+    components: _components,
+    filterOption,
+    styles: _styles,
+    tabSelectsValue: false,
+    theme: selectTheme,
+    ref: selectRef,
+  };
+
+  if (allowOptionCreation) {
+    return <CreatableSelect {...selectProps} />;
+  }
+
   return (
-    <Component {...rest}
-               components={_components}
-               filterOption={filterOption}
-               styles={_styles}
-               tabSelectsValue={false}
-               theme={selectTheme}
-               ref={selectRef} />
+    <ReactSelect {...selectProps} />
   );
 };
 

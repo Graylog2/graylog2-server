@@ -18,7 +18,27 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
-import { Col, Row } from 'components/graylog';
+import { Col, Row } from 'components/bootstrap';
+
+import PublicNotifications from '../common/PublicNotifications';
+
+const Wrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 25vh;
+  flex-direction: column;
+  height: 100%;
+  
+  .row {
+    width: 100%;
+  }
+  
+  &::before,
+  &::after {
+    content: none;
+  }
+`;
 
 const LoginCol = styled(Col)(({ theme }) => css`
   padding: 15px;
@@ -26,7 +46,6 @@ const LoginCol = styled(Col)(({ theme }) => css`
   border: 1px solid ${theme.colors.variant.light.default};
   border-radius: 4px;
   box-shadow: 0 0 21px ${theme.colors.global.navigationBoxShadow};
-  margin-top: 120px;
   
   legend {
     color: ${theme.colors.variant.darker.default};
@@ -36,13 +55,18 @@ const LoginCol = styled(Col)(({ theme }) => css`
 
 const LoginBox = ({ children }) => {
   return (
-    <div className="container">
+    <Wrapper className="container">
+      <Row>
+        <Col md={8} mdOffset={2}>
+          <PublicNotifications readFromConfig />
+        </Col>
+      </Row>
       <Row>
         <LoginCol md={4} mdOffset={4} xs={6} xsOffset={3}>
           {children}
         </LoginCol>
       </Row>
-    </div>
+    </Wrapper>
   );
 };
 

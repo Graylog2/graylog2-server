@@ -21,10 +21,8 @@ import View, { ViewType } from 'views/logic/views/View';
 import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 import UserPreferencesContext from 'contexts/UserPreferencesContext';
 import CurrentUserContext from 'contexts/CurrentUserContext';
-import CombinedProvider from 'injection/CombinedProvider';
 import Store from 'logic/local-storage/Store';
-
-const { PreferencesActions } = CombinedProvider.get('Preferences');
+import { PreferencesActions } from 'stores/users/PreferencesStore';
 
 type Props = {
   children: (layoutConsumer: {
@@ -52,7 +50,7 @@ const _getPinningPreferenceKey = (viewType: ViewType | undefined): PinningPrefer
 const _userSidebarPinningPref = (currentUser, userPreferences, viewType) => {
   const sidebarPinningPrefKey = _getPinningPreferenceKey(viewType);
 
-  if (currentUser?.read_only) {
+  if (currentUser?.readOnly) {
     return Store.get(sidebarPinningPrefKey);
   }
 
@@ -62,7 +60,7 @@ const _userSidebarPinningPref = (currentUser, userPreferences, viewType) => {
 const _updateUserSidebarPinningPref = (currentUser, userPreferences, viewType, newIsPinned) => {
   const sidebarPinningPrefKey: string = _getPinningPreferenceKey(viewType);
 
-  if (currentUser?.read_only) {
+  if (currentUser?.readOnly) {
     Store.set(sidebarPinningPrefKey, newIsPinned);
   } else {
     const newUserPreferences = {

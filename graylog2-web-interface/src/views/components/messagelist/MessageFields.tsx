@@ -17,7 +17,7 @@
 import * as React from 'react';
 import styled, { css, DefaultTheme } from 'styled-components';
 
-import { MessageDetailsDefinitionList } from 'components/graylog';
+import { MessageDetailsDefinitionList } from 'components/common';
 import MessageField from 'views/components/messagelist/MessageField';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
@@ -35,8 +35,6 @@ const MessageDetailsDL = styled(MessageDetailsDefinitionList)(({ theme }: { them
   color: ${theme.colors.gray[40]};
 
   dd {
-    font-family: ${theme.fonts.family.monospace};
-
     &:not(:last-child) {
       border-bottom: 1px solid  ${theme.colors.gray[90]};
     }

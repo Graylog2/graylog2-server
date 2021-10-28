@@ -23,7 +23,7 @@ import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import Parameter from 'views/logic/parameters/Parameter';
 import View from 'views/logic/views/View';
 import type { SearchJson } from 'views/logic/search/Search';
-import { singletonActions } from 'views/logic/singleton';
+import { singletonActions } from 'logic/singleton';
 import type { RefluxActions } from 'stores/StoreTypes';
 import type { TimeRange } from 'views/logic/queries/Query';
 import type { WidgetMapping } from 'views/logic/views/types';

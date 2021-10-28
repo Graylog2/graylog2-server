@@ -19,7 +19,7 @@ import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import chroma from 'chroma-js';
 
-import { Col, Jumbotron, Row } from 'components/graylog';
+import { Col, Jumbotron, Row } from 'components/bootstrap';
 
 const H1 = styled.h1(({ theme }) => css`
   font-size: ${theme.fonts.size.huge};

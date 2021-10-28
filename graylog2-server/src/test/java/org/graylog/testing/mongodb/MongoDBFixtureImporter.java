@@ -91,6 +91,10 @@ class MongoDBFixtureImporter {
         this.resources = buildFixtureResources(fixtureResources, contextClass);
     }
 
+    MongoDBFixtureImporter(List<URL> fixtureResources) {
+        this.resources = fixtureResources;
+    }
+
     void importResources(MongoDatabase database) {
         resources.forEach(resource -> importResource(resource, database));
     }

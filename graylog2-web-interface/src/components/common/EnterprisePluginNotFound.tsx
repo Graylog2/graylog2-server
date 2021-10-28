@@ -20,7 +20,7 @@ import styled from 'styled-components';
 
 import DocsHelper from 'util/DocsHelper';
 import DocumentationLink from 'components/support/DocumentationLink';
-import Panel from 'components/graylog/Panel';
+import Panel from 'components/bootstrap/Panel';
 
 import Icon from './Icon';
 

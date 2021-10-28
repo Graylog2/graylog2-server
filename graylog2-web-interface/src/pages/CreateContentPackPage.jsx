@@ -18,19 +18,17 @@ import React from 'react';
 import Reflux from 'reflux';
 import createReactClass from 'create-react-class';
 
-import { LinkContainer } from 'components/graylog/router';
+import { LinkContainer } from 'components/common/router';
 import Routes from 'routing/Routes';
-import { Button } from 'components/graylog';
+import { Button } from 'components/bootstrap';
 import history from 'util/History';
 import UserNotification from 'util/UserNotification';
 import { DocumentTitle, PageHeader } from 'components/common';
-import CombinedProvider from 'injection/CombinedProvider';
 import ContentPackEdit from 'components/content-packs/ContentPackEdit';
 import ContentPack from 'logic/content-packs/ContentPack';
 import Entity from 'logic/content-packs/Entity';
-
-const { ContentPacksActions } = CombinedProvider.get('ContentPacks');
-const { CatalogActions, CatalogStore } = CombinedProvider.get('Catalog');
+import { CatalogStore, CatalogActions } from 'stores/content-packs/CatalogStore';
+import { ContentPacksActions } from 'stores/content-packs/ContentPacksStore';
 
 const CreateContentPackPage = createReactClass({
   displayName: 'CreateContentPackPage',

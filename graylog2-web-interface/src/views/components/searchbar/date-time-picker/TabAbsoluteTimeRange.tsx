@@ -21,8 +21,7 @@ import styled from 'styled-components';
 import moment from 'moment';
 import { useFormikContext } from 'formik';
 
-import { Icon } from 'components/common';
-import { Accordion, AccordionItem } from 'components/graylog';
+import { Icon, Accordion, AccordionItem } from 'components/common';
 import { AbsoluteTimeRange } from 'views/logic/queries/Query';
 import DateTime from 'logic/datetimes/DateTime';
 
@@ -96,8 +95,7 @@ const TabAbsoluteTimeRange = ({ disabled, limitDuration }: Props) => {
 
         <AccordionItem name="Calendar">
           <RangeWrapper>
-            <AbsoluteCalendar disabled={disabled}
-                              startDate={fromStartDate}
+            <AbsoluteCalendar startDate={fromStartDate}
                               nextTimeRange={nextTimeRange}
                               range="from" />
 
@@ -108,8 +106,7 @@ const TabAbsoluteTimeRange = ({ disabled, limitDuration }: Props) => {
           </IconWrap>
 
           <RangeWrapper>
-            <AbsoluteCalendar disabled={disabled}
-                              startDate={toStartDate}
+            <AbsoluteCalendar startDate={toStartDate}
                               nextTimeRange={nextTimeRange}
                               range="to" />
           </RangeWrapper>

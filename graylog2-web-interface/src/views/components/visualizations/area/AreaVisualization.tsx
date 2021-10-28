@@ -22,7 +22,7 @@ import toPlotly from 'views/logic/aggregationbuilder/visualizations/Interpolatio
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import AreaVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/AreaVisualizationConfig';
-import { makeVisualization } from 'views/components/aggregationbuilder/AggregationBuilder';
+import { makeVisualization, retrieveChartData } from 'views/components/aggregationbuilder/AggregationBuilder';
 
 import type { ChartDefinition } from '../ChartData';
 import XYPlot from '../XYPlot';
@@ -54,11 +54,13 @@ const AreaVisualization = makeVisualization(({ config, data, effectiveTimerange,
     line: { shape: toPlotly(interpolation) },
   }), [interpolation]);
 
-  const chartDataResult = chartData(config, data.chart || Object.values(data)[0], 'scatter', chartGenerator);
+  const rows = retrieveChartData(data);
+
+  const chartDataResult = chartData(config, rows, 'scatter', chartGenerator);
   const layout: { shapes?: Shapes } = {};
 
   if (config.eventAnnotation && data.events) {
-    const { eventChartData, shapes } = EventHandler.toVisualizationData(data.events, config.formattingSettings);
+    const { eventChartData, shapes } = EventHandler.toVisualizationData(data.events);
 
     chartDataResult.push(eventChartData);
     layout.shapes = shapes;

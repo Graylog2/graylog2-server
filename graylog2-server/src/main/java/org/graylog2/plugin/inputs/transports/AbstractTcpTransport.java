@@ -18,6 +18,7 @@ package org.graylog2.plugin.inputs.transports;
 
 import com.codahale.metrics.Gauge;
 import com.google.common.base.Strings;
+import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableMap;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.ByteBufAllocator;
@@ -33,6 +34,7 @@ import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.channel.socket.ServerSocketChannelConfig;
 import io.netty.handler.ssl.ClientAuth;
+import io.netty.handler.ssl.OpenSsl;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.SslHandler;
 import io.netty.handler.ssl.SslProvider;
@@ -40,6 +42,7 @@ import io.netty.handler.ssl.util.SelfSignedCertificate;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.pkcs.PKCSException;
+import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.inputs.transports.NettyTransportConfiguration;
 import org.graylog2.inputs.transports.netty.ByteBufMessageAggregationHandler;
 import org.graylog2.inputs.transports.netty.ChannelRegistrationHandler;
@@ -80,10 +83,13 @@ import java.security.cert.X509Certificate;
 import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.Locale;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkState;
 
@@ -106,6 +112,8 @@ public abstract class AbstractTcpTransport extends NettyTransport {
             TLS_CLIENT_AUTH_OPTIONAL, TLS_CLIENT_AUTH_OPTIONAL,
             TLS_CLIENT_AUTH_REQUIRED, TLS_CLIENT_AUTH_REQUIRED);
 
+    private static final Supplier<Set<String>> secureDefaultCiphers = Suppliers.memoize(AbstractTcpTransport::getSecureCipherSuites);
+
     private final ConnectionCounter connectionCounter;
     private final AtomicInteger connections;
     private final AtomicLong totalConnections;
@@ -113,7 +121,7 @@ public abstract class AbstractTcpTransport extends NettyTransport {
     protected final Configuration configuration;
     protected final EventLoopGroup parentEventLoopGroup;
     private final NettyTransportConfiguration nettyTransportConfiguration;
-    private final org.graylog2.Configuration graylogConfiguration;
+    private final Set<String> enabledTLSProtocols;
     private final AtomicReference<Channel> channelReference;
 
     private final boolean tlsEnable;
@@ -128,6 +136,7 @@ public abstract class AbstractTcpTransport extends NettyTransport {
     protected EventLoopGroup childEventLoopGroup;
     private ServerBootstrap bootstrap;
 
+    @Deprecated
     public AbstractTcpTransport(
             Configuration configuration,
             ThroughputCounter throughputCounter,
@@ -136,11 +145,23 @@ public abstract class AbstractTcpTransport extends NettyTransport {
             EventLoopGroupFactory eventLoopGroupFactory,
             NettyTransportConfiguration nettyTransportConfiguration,
             org.graylog2.Configuration graylogConfiguration) {
+            this(configuration, throughputCounter, localRegistry, parentEventLoopGroup, eventLoopGroupFactory,
+                    nettyTransportConfiguration, new TLSProtocolsConfiguration(graylogConfiguration.getEnabledTlsProtocols()));
+    }
+
+    public AbstractTcpTransport(
+            Configuration configuration,
+            ThroughputCounter throughputCounter,
+            LocalMetricRegistry localRegistry,
+            EventLoopGroup parentEventLoopGroup,
+            EventLoopGroupFactory eventLoopGroupFactory,
+            NettyTransportConfiguration nettyTransportConfiguration,
+            TLSProtocolsConfiguration tlsConfiguration) {
         super(configuration, eventLoopGroupFactory, throughputCounter, localRegistry);
         this.configuration = configuration;
         this.parentEventLoopGroup = parentEventLoopGroup;
         this.nettyTransportConfiguration = nettyTransportConfiguration;
-        this.graylogConfiguration = graylogConfiguration;
+        this.enabledTLSProtocols = tlsConfiguration.getEnabledTlsProtocols();
         this.channelReference = new AtomicReference<>();
         this.childChannels = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 
@@ -342,14 +363,24 @@ public abstract class AbstractTcpTransport extends NettyTransport {
                         .sslProvider(tlsProvider)
                         .clientAuth(clientAuth)
                         .trustManager(clientAuthCerts);
-                if (!graylogConfiguration.getEnabledTlsProtocols().isEmpty()) {
-                    sslContext.protocols(graylogConfiguration.getEnabledTlsProtocols());
+                sslContext.protocols(enabledTLSProtocols);
+                if (tlsProvider.equals(SslProvider.OPENSSL)) {
+                    if (!enabledTLSProtocols.contains("TLSv1") && !enabledTLSProtocols.contains("TLSv1.1")) {
+                        // Netty tcnative does not adhere jdk.tls.disabledAlgorithms: https://github.com/netty/netty-tcnative/issues/530
+                        // We need to build our own cipher list
+                        sslContext.ciphers(secureDefaultCiphers.get());
+                    }
                 }
 
                 // TODO: Use byte buffer allocator of channel
                 return sslContext.build().newEngine(ByteBufAllocator.DEFAULT);
             }
         };
+    }
+
+    private static Set<String> getSecureCipherSuites() {
+        final Set<String> openSslCipherSuites = OpenSsl.availableOpenSslCipherSuites();
+        return openSslCipherSuites.stream().filter(s -> !(s.contains("CBC") || s.contains("AES128-SHA") || s.contains("AES256-SHA") )).collect(Collectors.toSet());
     }
 
     @ConfigClass
@@ -445,8 +476,8 @@ public abstract class AbstractTcpTransport extends NettyTransport {
 
                 final ServerSocketChannelConfig channelConfig = (ServerSocketChannelConfig) channel.config();
                 final int receiveBufferSize = channelConfig.getReceiveBufferSize();
-                if (receiveBufferSize != expectedRecvBufferSize) {
-                    LOG.warn("receiveBufferSize (SO_RCVBUF) for input {} (channel {}) should be {} but is {}.",
+                if (receiveBufferSize < expectedRecvBufferSize) {
+                    LOG.warn("receiveBufferSize (SO_RCVBUF) for input {} (channel {}) should be >= {} but is {}.",
                             input, channel, expectedRecvBufferSize, receiveBufferSize);
                 }
             } else {

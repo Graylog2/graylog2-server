@@ -48,6 +48,12 @@ public class ElasticsearchClientConfiguration {
     @Parameter(value = "elasticsearch_idle_timeout")
     Duration elasticsearchIdleTimeout = Duration.seconds(-1L);
 
+    @Parameter(value = "elasticsearch_version_probe_attempts", validators = {PositiveIntegerValidator.class})
+    int elasticsearchVersionProbeAttempts = 0;
+
+    @Parameter(value = "elasticsearch_version_probe_delay", validators = {PositiveDurationValidator.class})
+    Duration elasticsearchVersionProbeDelay = Duration.seconds(5L);
+
     @Parameter(value = "elasticsearch_max_total_connections", validators = {PositiveIntegerValidator.class})
     int elasticsearchMaxTotalConnections = 200;
 
@@ -80,4 +86,7 @@ public class ElasticsearchClientConfiguration {
 
     @Parameter(value = "elasticsearch_use_expect_continue")
     boolean useExpectContinue = true;
+
+    @Parameter(value = "elasticsearch_mute_deprecation_warnings")
+    private boolean muteDeprecationWarnings = false;
 }

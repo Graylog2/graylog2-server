@@ -18,12 +18,10 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 import { useStore } from 'stores/connect';
-import StoreProvider from 'injection/StoreProvider';
 import NumberUtils from 'util/NumberUtils';
-import { NavItem } from 'components/graylog';
+import { NavItem } from 'components/bootstrap';
 import { Spinner } from 'components/common';
-
-const GlobalThroughputStore = StoreProvider.getStore('GlobalThroughput');
+import { GlobalThroughputStore } from 'stores/metrics/GlobalThroughputStore';
 
 const ThroughputNavItem = styled(NavItem)`
   > a {

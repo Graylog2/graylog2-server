@@ -20,84 +20,91 @@ import lodash from 'lodash';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
-import CombinedProvider from 'injection/CombinedProvider';
+import { singletonStore, singletonActions } from 'logic/singleton';
 
-const { EnterpriseActions } = CombinedProvider.get('Enterprise');
+export const EnterpriseActions = singletonActions(
+  'core.Enterprise',
+  () => Reflux.createActions({
+    requestFreeEnterpriseLicense: { asyncResult: true },
+    getLicenseInfo: { asyncResult: true },
+  }),
+);
 
-const EnterpriseStore = Reflux.createStore({
-  listenables: [EnterpriseActions],
-  sourceUrl: '/free-enterprise',
-  licenseStatus: undefined,
+export const EnterpriseStore = singletonStore(
+  'core.Enterprise',
+  () => Reflux.createStore({
+    listenables: [EnterpriseActions],
+    sourceUrl: '/free-enterprise',
+    licenseStatus: undefined,
 
-  getInitialState() {
-    return this.getState();
-  },
+    getInitialState() {
+      return this.getState();
+    },
 
-  propagateChanges() {
-    this.trigger(this.getState());
-  },
+    propagateChanges() {
+      this.trigger(this.getState());
+    },
 
-  getState() {
-    return {
-      licenseStatus: this.licenseStatus,
-    };
-  },
+    getState() {
+      return {
+        licenseStatus: this.licenseStatus,
+      };
+    },
 
-  enterpriseUrl(path = '') {
-    return qualifyUrl(`${this.sourceUrl}/${path}`);
-  },
+    enterpriseUrl(path = '') {
+      return qualifyUrl(`${this.sourceUrl}/${path}`);
+    },
 
-  refresh() {
-    this.getLicenseInfo();
-  },
+    refresh() {
+      this.getLicenseInfo();
+    },
 
-  getLicenseInfo() {
-    const promise = fetch('GET', this.enterpriseUrl('license/info'));
+    getLicenseInfo() {
+      const promise = fetch('GET', this.enterpriseUrl('license/info'));
 
-    promise.then(
-      (response) => {
-        this.licenseStatus = response.free_license_info.license_status;
-        this.propagateChanges();
+      promise.then(
+        (response) => {
+          this.licenseStatus = response.free_license_info.license_status;
+          this.propagateChanges();
 
-        return response;
-      },
-      (error) => {
-        const errorMessage = lodash.get(error, 'additional.body.message', error.message);
+          return response;
+        },
+        (error) => {
+          const errorMessage = lodash.get(error, 'additional.body.message', error.message);
 
-        UserNotification.error(`Couldn't load license information: ${errorMessage}`, 'Error');
-      },
-    );
+          UserNotification.error(`Couldn't load license information: ${errorMessage}`, 'Error');
+        },
+      );
 
-    EnterpriseActions.getLicenseInfo.promise(promise);
-  },
+      EnterpriseActions.getLicenseInfo.promise(promise);
+    },
 
-  requestFreeEnterpriseLicense(formValues) {
-    const requestBody = {
-      first_name: formValues.firstName,
-      last_name: formValues.lastName,
-      company: formValues.company,
-      email: formValues.email,
-      phone: formValues.phone,
-    };
+    requestFreeEnterpriseLicense(formValues) {
+      const requestBody = {
+        first_name: formValues.firstName,
+        last_name: formValues.lastName,
+        company: formValues.company,
+        email: formValues.email,
+        phone: formValues.phone,
+      };
 
-    const promise = fetch('POST', this.enterpriseUrl('license'), requestBody);
+      const promise = fetch('POST', this.enterpriseUrl('license'), requestBody);
 
-    promise.then(
-      (response) => {
-        UserNotification.success('Your free Graylog Enterprise license should be on the way.', 'Success!');
-        this.refresh();
+      promise.then(
+        (response) => {
+          UserNotification.success('Your free Graylog Enterprise license should be on the way.', 'Success!');
+          this.refresh();
 
-        return response;
-      },
-      (error) => {
-        const errorMessage = lodash.get(error, 'additional.body.message', error.message);
+          return response;
+        },
+        (error) => {
+          const errorMessage = lodash.get(error, 'additional.body.message', error.message);
 
-        UserNotification.error(`Requesting a free Graylog Enterprise license failed: ${errorMessage}`, 'Error');
-      },
-    );
+          UserNotification.error(`Requesting a free Graylog Enterprise license failed: ${errorMessage}`, 'Error');
+        },
+      );
 
-    EnterpriseActions.requestFreeEnterpriseLicense.promise(promise);
-  },
-});
-
-export default EnterpriseStore;
+      EnterpriseActions.requestFreeEnterpriseLicense.promise(promise);
+    },
+  }),
+);

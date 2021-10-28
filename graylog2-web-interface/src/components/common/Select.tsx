@@ -15,19 +15,23 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import lodash from 'lodash';
 import PropTypes from 'prop-types';
+import type { Theme as SelectTheme } from 'react-select';
+import { isEqual } from 'lodash';
 import { DefaultTheme, withTheme } from 'styled-components';
-import ReactSelect, { components as Components, Creatable, createFilter } from 'react-select';
+import ReactSelect, { components as Components, createFilter } from 'react-select';
+import CreatableSelect from 'react-select/creatable';
 
 import { themePropTypes } from 'theme';
 
 import Icon from './Icon';
 
-type Option = { [key: string]: any };
+export const CONTROL_CLASS = 'common-select-control';
 
-const MultiValueRemove = (props) => (
-  <Components.MultiValueRemove {...props} />
+type Option = { [key: string]: any }
+
+const MultiValueRemove = ({ children, ...props }: React.ComponentProps<typeof Components.MultiValueRemove>) => (
+  <Components.MultiValueRemove {...props}>{children}</Components.MultiValueRemove>
 );
 
 const IndicatorSeparator = () => null;
@@ -50,25 +54,28 @@ const DropdownIndicator = (props) => {
   );
 };
 
-type CustomOptionProps = {
-  data: any,
-};
+const Control = ({ children, ...props }: React.ComponentProps<typeof Components.Control>) => (
+  <Components.Control {...props} className={CONTROL_CLASS}>{children}</Components.Control>
+);
+
 /* eslint-disable react/prop-types */
 const CustomOption = (optionRenderer: (Option) => React.ReactElement) => (
-  (props: CustomOptionProps): React.ReactElement => {
-    const { data, ...rest } = props;
+  (props: React.ComponentProps<typeof Components.Option>): React.ReactElement => {
+    const { data } = props;
 
     return (
-      <Components.Option {...rest}>
+      <Components.Option {...props}>
         {optionRenderer(data)}
       </Components.Option>
     );
   }
 );
 
-const CustomSingleValue = (valueRenderer: (option: Option) => React.ReactElement) => (
-  ({ data, ...rest }) => <Components.SingleValue {...rest}>{valueRenderer(data)}</Components.SingleValue>
-);
+const CustomSingleValue = (valueRenderer: (option: Option) => React.ReactElement) => (props: React.ComponentProps<typeof Components.SingleValue>) => {
+  const { data } = props;
+
+  return <Components.SingleValue {...props}>{valueRenderer(data)}</Components.SingleValue>;
+};
 /* eslint-enable react/prop-types */
 
 const CustomInput = (inputProps: { [key: string]: any }) => (
@@ -121,6 +128,11 @@ const menu = (base) => ({
   zIndex: 5,
 });
 
+const menuPortal = (base) => ({
+  ...base,
+  zIndex: 'auto',
+});
+
 const singleValueAndPlaceholder = ({ theme }) => (base) => ({
   ...base,
   lineHeight: '28px',
@@ -168,12 +180,14 @@ type OverriddenComponents = {
   DropdownIndicator: React.ComponentType<any>;
   MultiValueRemove: React.ComponentType<any>;
   IndicatorSeparator: React.ComponentType<any>;
+  Control: React.ComponentType<any>;
 };
 
 const _components: OverriddenComponents = {
   DropdownIndicator,
   MultiValueRemove,
   IndicatorSeparator,
+  Control,
 };
 
 const _styles = ({ size, theme }) => ({
@@ -183,6 +197,7 @@ const _styles = ({ size, theme }) => ({
   multiValueLabel: multiValueLabel({ theme }),
   multiValueRemove: multiValueRemove({ theme }),
   menu,
+  menuPortal,
   singleValue: singleValueAndPlaceholder({ theme }),
   placeholder: placeholder({ theme }),
   control: controlFocus({ size, theme }),
@@ -191,9 +206,10 @@ const _styles = ({ size, theme }) => ({
 
 type ComponentsProp = {
   MultiValueLabel?: React.ComponentType<any>,
+  SelectContainer?: React.ComponentType<any>,
 };
 
-type Props = {
+export type Props<OptionValue> = {
   addLabelText?: string,
   allowCreate?: boolean,
   autoFocus?: boolean,
@@ -208,9 +224,10 @@ type Props = {
   inputProps?: { [key: string]: any },
   matchProp?: 'any' | 'label' | 'value',
   multi?: boolean,
+  menuPortalTarget?: HTMLElement,
   name?: string,
   onBlur?: (event: React.FocusEvent<HTMLInputElement>) => void,
-  onChange: (string) => void,
+  onChange: (value: OptionValue) => void,
   onReactSelectChange?: (option: Option | Option[]) => void,
   optionRenderer?: (option: Option) => React.ReactElement,
   options: Array<Option>,
@@ -218,7 +235,8 @@ type Props = {
   ref?: React.Ref<React.ComponentType>,
   size?: 'normal' | 'small',
   theme: DefaultTheme,
-  value?: Object | Array<Object> | null | undefined,
+  required?: boolean,
+  value?: OptionValue,
   valueKey: string,
   valueRenderer?: (option: Option) => React.ReactElement,
 };
@@ -234,7 +252,7 @@ type State = {
   value: any,
 };
 
-class Select extends React.Component<Props, State> {
+class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
   static propTypes = {
     /** Specifies if the user can create new entries in `multi` Selects. */
     allowCreate: PropTypes.bool,
@@ -285,6 +303,8 @@ class Select extends React.Component<Props, State> {
     options: PropTypes.array.isRequired,
     /** Custom function to render the options in the menu. */
     optionRenderer: PropTypes.func,
+    /** required attribute for input element */
+    required: PropTypes.bool,
     /** Size of the select input. */
     size: PropTypes.oneOf(['normal', 'small']),
     /** @ignore */
@@ -337,15 +357,16 @@ class Select extends React.Component<Props, State> {
     onReactSelectChange: undefined,
     optionRenderer: undefined,
     placeholder: undefined,
+    required: false,
     size: 'normal',
     value: undefined,
     valueKey: 'value',
     valueRenderer: undefined,
-    menuPlacement: 'bottom',
+    menuPlacement: 'auto',
     maxMenuHeight: 300,
   };
 
-  constructor(props: Props) {
+  constructor(props: Props<OptionValue>) {
     super(props);
     const { inputProps, optionRenderer, value, valueRenderer } = props;
 
@@ -355,14 +376,14 @@ class Select extends React.Component<Props, State> {
     };
   }
 
-  UNSAFE_componentWillReceiveProps = (nextProps: Props) => {
+  UNSAFE_componentWillReceiveProps = (nextProps: Props<OptionValue>) => {
     const { inputProps, optionRenderer, value, valueRenderer } = this.props;
 
     if (value !== nextProps.value) {
       this.setState({ value: nextProps.value });
     }
 
-    if (inputProps !== nextProps.inputProps
+    if (!isEqual(inputProps, nextProps.inputProps)
       || optionRenderer !== nextProps.optionRenderer
       || valueRenderer !== nextProps.valueRenderer) {
       this.setState({ customComponents: this.getCustomComponents(inputProps, optionRenderer, valueRenderer) });
@@ -398,11 +419,11 @@ class Select extends React.Component<Props, State> {
     this.setState({ value: undefined });
   };
 
-  _extractOptionValue = (option: Option) => {
+  _extractOptionValue = (onChangeValue: Option | Array<Option>) => {
     const { multi, valueKey, delimiter } = this.props;
 
-    if (option) {
-      return multi ? option.map((i) => i[valueKey]).join(delimiter) : option[valueKey || ''];
+    if (onChangeValue) {
+      return multi && Array.isArray(onChangeValue) ? onChangeValue.map((i) => i[valueKey]).join(delimiter) : onChangeValue[valueKey || ''];
     }
 
     return '';
@@ -421,21 +442,28 @@ class Select extends React.Component<Props, State> {
 
   // Using ReactSelect.Creatable now needs to get values as objects or they are not display
   // This method takes care of formatting a string value into options react-select supports.
-  _formatInputValue = (value: string): Array<Option> => {
-    const { options, displayKey, valueKey, delimiter } = this.props;
+  _formatInputValue = (value: OptionValue): Array<Option> => {
+    const { options, displayKey, valueKey, delimiter, allowCreate } = this.props;
 
-    return value.split(delimiter).map((v: string) => {
-      const predicate: Option = {
-        [valueKey]: v,
-        [displayKey]: v,
-      };
-      const option = lodash.find(options, predicate);
+    if (allowCreate && value && typeof value === 'string') {
+      return value.split(delimiter).map((optionValue: string) => {
+        const predicate = {
+          [valueKey]: optionValue,
+          [displayKey]: optionValue,
+        };
+        const option = options.find((o) => o[valueKey] === optionValue);
 
-      return option || predicate;
-    });
+        return option || predicate;
+      });
+    }
+
+    return (typeof value === 'string'
+      ? (value ?? '').split(delimiter)
+      : [value])
+      .map((v) => options.find((option) => option[valueKey || ''] === v));
   };
 
-  _selectTheme = (defaultTheme: {[key: string]: any}) => {
+  _selectTheme = (defaultTheme: SelectTheme) => {
     const { theme } = this.props;
 
     return {
@@ -473,26 +501,16 @@ class Select extends React.Component<Props, State> {
   render() {
     const {
       allowCreate = false,
-      delimiter,
       displayKey,
       components,
-      options,
       valueKey,
       onReactSelectChange,
+      size,
+      theme,
     } = this.props;
     const { customComponents, value } = this.state;
-    const SelectComponent = allowCreate ? Creatable : ReactSelect;
 
-    let formattedValue = value;
-
-    if (formattedValue && allowCreate) {
-      formattedValue = this._formatInputValue(value);
-    } else {
-      formattedValue = (typeof value === 'string'
-        ? (value ?? '').split(delimiter)
-        : [value])
-        .map((v) => options.find((option) => option[valueKey || ''] === v));
-    }
+    const formattedValue = this._formatInputValue(value);
 
     const {
       multi: isMulti,
@@ -505,6 +523,7 @@ class Select extends React.Component<Props, State> {
       optionRenderer, // Do not pass down prop
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       valueRenderer, // Do not pass down prop
+      menuPortalTarget,
       ...rest
     } = this.props;
 
@@ -517,23 +536,28 @@ class Select extends React.Component<Props, State> {
       ...customComponents,
     };
 
-    return (
-      <SelectComponent {...rest}
-                       onChange={onReactSelectChange || this._onChange}
-                       isMulti={isMulti}
-                       isDisabled={isDisabled}
-                       isClearable={isClearable}
-                       getOptionLabel={(option) => option[displayKey]}
-                       getOptionValue={(option) => option[valueKey]}
-                       filterOption={customFilter}
-                       components={mergedComponents}
-                       isOptionDisabled={(option) => !!option.disabled}
-                       /* eslint-disable-next-line @typescript-eslint/ban-ts-comment */
-                       // @ts-ignore TODO: Fix props assignment for _styles
-                       styles={_styles(this.props)}
-                       theme={this._selectTheme}
-                       value={formattedValue} />
-    );
+    const selectProps: React.ComponentProps<typeof ReactSelect> | React.ComponentProps<typeof CreatableSelect> = {
+      ...rest,
+      onChange: onReactSelectChange || this._onChange,
+      isMulti,
+      isDisabled,
+      isClearable,
+      getOptionLabel: (option) => option[displayKey] || option.label,
+      getOptionValue: (option) => option[valueKey],
+      filterOption: customFilter,
+      components: mergedComponents,
+      menuPortalTarget: menuPortalTarget,
+      isOptionDisabled: (option) => !!option.disabled,
+      styles: _styles({ size, theme }),
+      theme: this._selectTheme,
+      value: formattedValue,
+    };
+
+    if (allowCreate) {
+      return <CreatableSelect {...selectProps} />;
+    }
+
+    return <ReactSelect {...selectProps} />;
   }
 }
 

@@ -51,6 +51,8 @@ public abstract class UserDetails {
      */
     public abstract Optional<String> fullName();
 
+    public abstract boolean isExternal();
+
     public abstract Set<String> defaultRoles();
 
     public UserDetails withDatabaseId(String id) {
@@ -89,7 +91,15 @@ public abstract class UserDetails {
 
         public abstract Builder lastName(@Nullable String lastName);
 
+        /**
+         * Starting in Graylog 4.1, use of this method is deprecated.
+         * Prefer use of the {@link #firstName()} and {@link #lastName()} methods instead when possible. This way,
+         * both individual first and last names will be available when needed.
+         */
+        @Deprecated
         public abstract Builder fullName(@Nullable String fullName);
+
+        public abstract Builder isExternal(boolean isExternal);
 
         public abstract Builder defaultRoles(Set<String> defaultRoles);
 

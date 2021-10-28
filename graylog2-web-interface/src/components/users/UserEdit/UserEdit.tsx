@@ -20,10 +20,10 @@ import { useContext } from 'react';
 import UsersDomain from 'domainActions/users/UsersDomain';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import { Spinner, IfPermitted } from 'components/common';
+import { Alert } from 'components/bootstrap';
 import SectionComponent from 'components/common/Section/SectionComponent';
-import { Alert } from 'components/graylog';
 import User from 'logic/users/User';
-import CombinedProvider from 'injection/CombinedProvider';
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 
 import ReadOnlyWarning from './ReadOnlyWarning';
 import SettingsSection from './SettingsSection';
@@ -35,8 +35,6 @@ import TeamsSection from './TeamsSection';
 
 import PermissionsUpdateInfo from '../PermissionsUpdateInfo';
 import SectionGrid from '../../common/Section/SectionGrid';
-
-const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 
 type Props = {
   user: User,
@@ -65,22 +63,22 @@ const UserEdit = ({ user }: Props) => {
     <SectionGrid>
       <IfPermitted permissions={`users:edit:${user.username}`}>
         <div>
-          { user.external && (
+          {user.external && (
             <SectionComponent title="External User">
               <Alert bsStyle="warning">
                 This user was synced from an external server, therefore neither
                 the profile nor the password can be changed. Please contact your administrator for more information.
               </Alert>
             </SectionComponent>
-          ) }
-          { !user.external && (
+          )}
+          {!user.external && (
           <ProfileSection user={user}
                           onSubmit={(data) => _updateUser(data, currentUser, user.id, user.fullName)} />
-          ) }
+          )}
           <SettingsSection user={user}
                            onSubmit={(data) => _updateUser(data, currentUser, user.id, user.fullName)} />
           <IfPermitted permissions={`users:passwordchange:${user.username}`}>
-            { !user.external && <PasswordSection user={user} /> }
+            {!user.external && <PasswordSection user={user} />}
           </IfPermitted>
           <PreferencesSection user={user} />
         </div>

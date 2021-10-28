@@ -16,6 +16,7 @@
  */
 import * as Immutable from 'immutable';
 import mockAction from 'helpers/mocking/MockAction';
+import { MockStore } from 'helpers/mocking';
 
 import ViewState from 'views/logic/views/ViewState';
 import SearchActions from 'views/actions/SearchActions';
@@ -37,6 +38,7 @@ jest.mock('views/logic/Widgets', () => ({
   allMessagesTable: () => ({}),
 }));
 
+jest.mock('stores/users/CurrentUserStore', () => ({ CurrentUserStore: MockStore() }));
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
 
 describe('ViewStore', () => {
@@ -44,7 +46,15 @@ describe('ViewStore', () => {
     firstQueryId: ViewState.builder().build(),
     secondQueryId: ViewState.builder().build(),
   });
-  const dummyView = View.builder().state(dummyState).build();
+  const dummySearch = Search.builder()
+    .queries([
+      Query.builder().id('firstQueryId').build(),
+      Query.builder().id('secondQueryId').build(),
+    ]).build();
+  const dummyView = View.builder()
+    .state(dummyState)
+    .search(dummySearch)
+    .build();
 
   it('.load should select first query if activeQuery is not set', () => ViewActions.load(dummyView)
     .then((state) => expect(state.activeQuery).toBe('firstQueryId')));

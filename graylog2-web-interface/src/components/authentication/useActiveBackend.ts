@@ -17,7 +17,7 @@
 /* eslint-disable import/prefer-default-export */
 import { useState, useEffect } from 'react';
 
-import { LoadActiveResponse } from 'actions/authentication/AuthenticationActions';
+import { LoadActiveResponse } from 'stores/authentication/AuthenticationStore';
 import { ListenableAction, PromiseProvider } from 'stores/StoreTypes';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 

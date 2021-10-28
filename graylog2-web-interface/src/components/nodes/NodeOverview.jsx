@@ -17,9 +17,10 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { LinkContainer } from 'components/graylog/router';
-import { Row, Col, Button } from 'components/graylog';
+import { LinkContainer } from 'components/common/router';
+import { Row, Col, Button } from 'components/bootstrap';
 import Routes from 'routing/Routes';
+import HideOnCloud from 'util/conditional/HideOnCloud';
 
 import BufferUsage from './BufferUsage';
 import SystemOverviewDetails from './SystemOverviewDetails';
@@ -128,11 +129,13 @@ class NodeOverview extends React.Component {
 
         <Row className="content">
           <Col md={12}>
-            <span className="pull-right">
-              <LinkContainer to={Routes.node_inputs(node.node_id)}>
-                <Button bsStyle="success" bsSize="small">Manage inputs</Button>
-              </LinkContainer>
-            </span>
+            <HideOnCloud>
+              <span className="pull-right">
+                <LinkContainer to={Routes.node_inputs(node.node_id)}>
+                  <Button bsStyle="success" bsSize="small">Manage inputs</Button>
+                </LinkContainer>
+              </span>
+            </HideOnCloud>
             <h2 style={{ marginBottom: 15 }}>Available input types <small>{inputCount}</small></h2>
             <InputTypesDataTable inputDescriptions={this.props.inputDescriptions} />
           </Col>

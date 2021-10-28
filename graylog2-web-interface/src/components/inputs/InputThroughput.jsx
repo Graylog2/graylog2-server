@@ -23,10 +23,9 @@ import Reflux from 'reflux';
 import numeral from 'numeral';
 import styled, { css } from 'styled-components';
 
-import StoreProvider from 'injection/StoreProvider';
-import ActionsProvider from 'injection/ActionsProvider';
 import NumberUtils from 'util/NumberUtils';
 import { Icon, LinkToNode, Spinner } from 'components/common';
+import { MetricsActions, MetricsStore } from 'stores/metrics/MetricsStore';
 
 const InputIO = styled.span(({ theme }) => css`
   .total {
@@ -56,9 +55,6 @@ const InputIO = styled.span(({ theme }) => css`
     top: -1px;
   }
 `);
-
-const MetricsStore = StoreProvider.getStore('Metrics');
-const MetricsActions = ActionsProvider.getActions('Metrics');
 
 const InputThroughput = createReactClass({
   displayName: 'InputThroughput',
@@ -249,7 +245,7 @@ const InputThroughput = createReactClass({
           {!isNaN(writtenBytes1Sec) && this._formatNetworkStats(writtenBytes1Sec, writtenBytesTotal, readBytes1Sec, readBytesTotal)}
           {!isNaN(openConnections) && this._formatConnections(openConnections, totalConnections)}
           {!isNaN(emptyMessages) && <span>Empty messages discarded: {this._formatCount(emptyMessages)}<br /></span>}
-          { /* eslint-disable-next-line jsx-a11y/anchor-is-valid */ }
+          {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
           {!isNaN(writtenBytes1Sec) && input.global && <a href="" onClick={this._toggleShowDetails}>{showDetails ? 'Hide' : 'Show'} details</a>}
           {!isNaN(writtenBytes1Sec) && showDetails && this._formatAllNodeDetails(metrics)}
         </span>

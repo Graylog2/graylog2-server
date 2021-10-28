@@ -44,7 +44,7 @@ describe('WidgetOverrideElements', () => {
   });
 
   it('propagates thrown errors', async () => {
-    suppressConsole(async () => {
+    await suppressConsole(() => {
       const throwElement = () => {
         throw new Error('The dungeon collapses, you die!');
       };
@@ -61,7 +61,7 @@ describe('WidgetOverrideElements', () => {
     const Component = () => <span>I was thrown!</span>;
 
     const OverridingElement = ({ override }) => {
-      useEffect(() => override(Component), []);
+      useEffect(() => override(Component), [override]);
 
       return null;
     };

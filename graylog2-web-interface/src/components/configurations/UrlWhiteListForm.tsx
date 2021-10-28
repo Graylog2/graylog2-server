@@ -24,12 +24,10 @@ import Input from 'components/bootstrap/Input';
 // Explicit import to fix eslint import/no-cycle
 import Select from 'components/common/Select';
 import Icon from 'components/common/Icon';
-import { Button, Table } from 'components/graylog';
-import FormUtils from 'util/FormsUtils';
+import { Button, Table } from 'components/bootstrap';
+import { getValueFromInput } from 'util/FormsUtils';
 import type { Url, WhiteListConfig } from 'stores/configurations/ConfigurationsStore';
-import StoreProvider from 'injection/StoreProvider';
-
-const ToolsStore = StoreProvider.getStore('Tools');
+import ToolsStore from 'stores/tools/ToolsStore';
 
 type Props = {
   urls: Array<Url>,
@@ -71,6 +69,7 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
     let isValid = true;
 
     try {
+      // @ts-ignore
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const test = new URL(str);
     } catch (e) {
@@ -146,9 +145,9 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
 
   const _onInputChange = (event: React.ChangeEvent<HTMLInputElement>, idx: number, type: string) => {
     if (type === regex) {
-      debouncedValidate(event.target.name, idx, type, FormUtils.getValueFromInput(event.target));
+      debouncedValidate(event.target.name, idx, type, getValueFromInput(event.target));
     } else {
-      _validate(event.target.name, idx, type, FormUtils.getValueFromInput(event.target));
+      _validate(event.target.name, idx, type, getValueFromInput(event.target));
     }
   };
 
@@ -197,7 +196,7 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
                       options={options}
                       matchProp="label"
                       placeholder="Select url type"
-                      onChange={(option) => _onUpdateType(idx, option)}
+                      onChange={(option: string) => _onUpdateType(idx, option)}
                       value={url.type} />
             </Input>
           </td>

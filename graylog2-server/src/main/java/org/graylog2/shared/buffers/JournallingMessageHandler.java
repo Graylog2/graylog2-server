@@ -67,11 +67,14 @@ public class JournallingMessageHandler implements EventHandler<RawMessageEvent> 
             // call the update on the recorder service for every message. (less contention)
             processingStatusRecorder.updateIngestReceiveTime(metricsFilter.getLatestReceiveTime());
 
-            // Clear the batch list after transforming it with the Converter because the fields of the RawMessageEvent
-            // objects in there have been set to null and cannot be used anymore.
-            batch.clear();
-
             messageQueueWriter.write(entries);
+
+            // Release objects for GC
+            batch.stream()
+                    .filter(Objects::nonNull)
+                    .forEach(RawMessageEvent::clear);
+
+            batch.clear();
         }
     }
 

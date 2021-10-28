@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSortedSet;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Stage;
+import org.graylog.plugins.pipelineprocessor.db.PaginatedPipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
@@ -55,11 +56,14 @@ public class PipelineResourceTest {
     @Mock
     private PipelineService pipelineService;
 
+    @Mock
+    private PaginatedPipelineService paginatedPipelineService;
+
     private PipelineResource pipelineResource;
 
     @Before
     public void setup() {
-        pipelineResource = new PipelineResource(pipelineService, pipelineRuleParser);
+        pipelineResource = new PipelineResource(pipelineService, paginatedPipelineService, pipelineRuleParser);
     }
 
     @Test
@@ -74,11 +78,11 @@ public class PipelineResourceTest {
                 Stage.builder()
                         .stage(0)
                         .ruleReferences(ImmutableList.of("geo loc of dev", "open source dev"))
-                        .matchAll(false)
+                        .match(Stage.Match.EITHER)
                         .build()
         );
         final List<StageSource> expectedStages = ImmutableList.of(
-                StageSource.create(0, false, ImmutableList.of(
+                StageSource.create(0, Stage.Match.EITHER, ImmutableList.of(
                         "geo loc of dev", "open source dev"
                 ))
         );

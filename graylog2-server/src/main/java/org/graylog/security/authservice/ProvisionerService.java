@@ -47,6 +47,7 @@ public class ProvisionerService {
 
     public UserDetails.Builder newDetails(AuthServiceBackend backend) {
         return UserDetails.builder()
+                .isExternal(true)
                 .authServiceId(backend.backendId())
                 .authServiceType(backend.backendType());
     }
@@ -110,7 +111,7 @@ public class ProvisionerService {
                 .orElse(createUser(userDetails));
 
         // Only set fields that are okay to override by the authentication service here!
-        user.setExternal(true);
+        user.setExternal(userDetails.isExternal());
         user.setAccountStatus(userDetails.accountIsEnabled() ? User.AccountStatus.ENABLED : User.AccountStatus.DISABLED);
         user.setAuthServiceId(userDetails.authServiceId());
         user.setAuthServiceUid(userDetails.base64AuthServiceUid());

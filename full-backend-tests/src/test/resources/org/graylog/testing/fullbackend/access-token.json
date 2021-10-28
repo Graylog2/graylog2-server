@@ -1,0 +1,15 @@
+{
+  "access_tokens": [
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0001"
+      },
+      "last_access": {
+        "$date": "2020-02-26T21:50:12.454Z"
+      },
+      "token": "1f56ccn5hpokf9f8d91pn0j7tqlv7552f92jt6i4lnb3u7b5osjq",
+      "username": "admin",
+      "NAME": "test"
+    }
+  ]
+}

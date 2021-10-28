@@ -18,7 +18,7 @@ import Reflux from 'reflux';
 
 import * as URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
-import { singletonStore } from 'views/logic/singleton';
+import { singletonStore } from 'logic/singleton';
 import { Store } from 'stores/StoreTypes';
 
 const functionsUrl = URLUtils.qualifyUrl('/views/functions');

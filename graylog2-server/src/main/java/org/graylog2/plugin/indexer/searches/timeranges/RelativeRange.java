@@ -90,6 +90,14 @@ public abstract class RelativeRange extends TimeRange {
                 .build();
     }
 
+    public static RelativeRange allTime() {
+        try {
+            return create(0);
+        } catch (InvalidRangeParametersException e) {
+            throw new RuntimeException("Unable to create relative timerange for all messages - this should not happen!");
+        }
+    }
+
     @AutoValue.Builder
     public abstract static class Builder {
         abstract RelativeRange autoBuild();

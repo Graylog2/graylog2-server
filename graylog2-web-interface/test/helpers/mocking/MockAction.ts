@@ -21,11 +21,10 @@ const listenable = () => ({ listen: jest.fn(() => jest.fn()) });
 
 const noop: PromiseProvider = jest.fn(() => Promise.resolve());
 
-function mockAction(): ListenableAction<typeof noop>;
-function mockAction<R extends PromiseProvider>(fn: R): ListenableAction<R>;
-function mockAction(fn = noop) {
+function mockAction<R extends PromiseProvider>(fn: R = noop as R): ListenableAction<R> {
   return Object.assign(fn, listenable(), {
-    completed: listenable(),
+    triggerPromise: fn,
+    completed: Object.assign(fn, listenable()),
     promise: jest.fn(),
   });
 }

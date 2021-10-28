@@ -19,16 +19,14 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
-import { Link } from 'components/graylog/router';
-import StoreProvider from 'injection/StoreProvider';
+import { Link } from 'components/common/router';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { InputsList } from 'components/inputs';
 import Routes from 'routing/Routes';
 import withParams from 'routing/withParams';
-
-const NodesStore = StoreProvider.getStore('Nodes');
-const CurrentUserStore = StoreProvider.getStore('CurrentUser');
-const InputStatesStore = StoreProvider.getStore('InputStates');
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
+import { InputStatesStore } from 'stores/inputs/InputStatesStore';
+import { NodesStore } from 'stores/nodes/NodesStore';
 
 function nodeFilter(state) {
   return state.nodes ? state.nodes[this.props.params.nodeId] : state.nodes;

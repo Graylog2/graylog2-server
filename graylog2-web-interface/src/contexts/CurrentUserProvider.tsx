@@ -19,14 +19,14 @@ import PropTypes from 'prop-types';
 import { get } from 'lodash';
 
 import { useStore } from 'stores/connect';
-import CombinedProvider from 'injection/CombinedProvider';
+import User from 'logic/users/User';
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 
 import CurrentUserContext from './CurrentUserContext';
 
-const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
-
 const CurrentUserProvider = ({ children }) => {
-  const currentUser = useStore(CurrentUserStore, (state) => get(state, 'currentUser'));
+  const currentUserJSON = useStore(CurrentUserStore, (state) => get(state, 'currentUser'));
+  const currentUser = currentUserJSON ? User.fromJSON(currentUserJSON) : undefined;
 
   return currentUser
     ? (

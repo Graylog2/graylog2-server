@@ -20,20 +20,18 @@ import Reflux from 'reflux';
 import createReactClass from 'create-react-class';
 import { cloneDeep, groupBy } from 'lodash';
 
-import { LinkContainer } from 'components/graylog/router';
+import { LinkContainer } from 'components/common/router';
 import Routes from 'routing/Routes';
-import { Button } from 'components/graylog';
+import { Button } from 'components/bootstrap';
 import history from 'util/History';
 import UserNotification from 'util/UserNotification';
 import { DocumentTitle, PageHeader } from 'components/common';
-import CombinedProvider from 'injection/CombinedProvider';
 import ValueReferenceData from 'util/ValueReferenceData';
 import ContentPackEdit from 'components/content-packs/ContentPackEdit';
 import Entity from 'logic/content-packs/Entity';
 import withParams from 'routing/withParams';
-
-const { CatalogActions, CatalogStore } = CombinedProvider.get('Catalog');
-const { ContentPacksActions, ContentPacksStore } = CombinedProvider.get('ContentPacks');
+import { CatalogActions, CatalogStore } from 'stores/content-packs/CatalogStore';
+import { ContentPacksActions, ContentPacksStore } from 'stores/content-packs/ContentPacksStore';
 
 const EditContentPackPage = createReactClass({
   displayName: 'EditContentPackPage',

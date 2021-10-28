@@ -14,9 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
+import * as Immutable from 'immutable';
 import { render, screen, fireEvent } from 'wrappedTestingLibrary';
-import { viewsManager } from 'fixtures/users';
+import { alice } from 'fixtures/users';
 
 import { createGRN } from 'logic/permissions/GRN';
 import CurrentUserContext from 'contexts/CurrentUserContext';
@@ -26,11 +27,16 @@ import ShareButton from './ShareButton';
 const entityType = 'dashboard';
 const entityId = 'dashboard-id';
 const entityGRN = createGRN(entityType, entityId);
-const SimpleShareButton = ({ onClick, grnPermissions, ...rest }: { onClick: () => void, grnPermissions: Array<string>, disabledInfo?: string | undefined }) => (
-  <CurrentUserContext.Provider value={{ ...viewsManager, grn_permissions: grnPermissions }}>
-    <ShareButton {...rest} onClick={onClick} entityType={entityType} entityId={entityId} />
-  </CurrentUserContext.Provider>
-);
+
+const SimpleShareButton = ({ onClick, grnPermissions, ...rest }: { onClick: () => void, grnPermissions: Array<string>, disabledInfo?: string | undefined }) => {
+  const currentUser = alice.toBuilder().grnPermissions(Immutable.List(grnPermissions)).build();
+
+  return (
+    <CurrentUserContext.Provider value={currentUser}>
+      <ShareButton {...rest} onClick={onClick} entityType={entityType} entityId={entityId} />
+    </CurrentUserContext.Provider>
+  );
+};
 
 SimpleShareButton.defaultProps = { disabledInfo: undefined };
 

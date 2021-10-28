@@ -16,30 +16,23 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
-import { LinkContainer } from 'components/graylog/router';
-import { Button, Col, Row } from 'components/graylog';
+import { LinkContainer } from 'components/common/router';
+import { Button, Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import Pipeline from 'components/pipelines/Pipeline';
 import NewPipeline from 'components/pipelines/NewPipeline';
 import SourceGenerator from 'logic/pipelines/SourceGenerator';
 import ObjectUtils from 'util/ObjectUtils';
 import Routes from 'routing/Routes';
-import CombinedProvider from 'injection/CombinedProvider';
 import withParams from 'routing/withParams';
-
-const { PipelinesStore, PipelinesActions } = CombinedProvider.get('Pipelines');
-const { RulesStore } = CombinedProvider.get('Rules');
-const { PipelineConnectionsStore, PipelineConnectionsActions } = CombinedProvider.get('PipelineConnections');
-const { StreamsStore } = CombinedProvider.get('Streams');
-
-// Events do not work on Pipelines yet, hide Events and System Events Streams.
-const HIDDEN_STREAMS = [
-  '000000000000000000000002',
-  '000000000000000000000003',
-];
+import { StreamsStore } from 'stores/streams/StreamsStore';
+import { PipelineConnectionsStore, PipelineConnectionsActions } from 'stores/pipelines/PipelineConnectionsStore';
+import { PipelinesStore, PipelinesActions } from 'stores/pipelines/PipelinesStore';
+import { RulesStore } from 'stores/rules/RulesStore';
 
 function filterPipeline(state) {
   return state.pipelines ? state.pipelines.filter((p) => p.id === this.props.params.pipelineId)[0] : undefined;
@@ -73,7 +66,7 @@ const PipelineDetailsPage = createReactClass({
     PipelineConnectionsActions.list();
 
     StreamsStore.listStreams().then((streams) => {
-      const filteredStreams = streams.filter((s) => !HIDDEN_STREAMS.includes(s.id));
+      const filteredStreams = streams.filter((s) => s.is_editable);
 
       this.setState({ streams: filteredStreams });
     });
@@ -95,9 +88,7 @@ const PipelineDetailsPage = createReactClass({
     const newPipeline = ObjectUtils.clone(pipeline);
 
     newPipeline.stages = newStages;
-    const pipelineSource = SourceGenerator.generatePipeline(newPipeline);
-
-    newPipeline.source = pipelineSource;
+    newPipeline.source = SourceGenerator.generatePipeline(newPipeline);
     PipelinesActions.update(newPipeline);
 
     if (typeof callback === 'function') {

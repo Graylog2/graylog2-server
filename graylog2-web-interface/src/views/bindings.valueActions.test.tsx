@@ -14,9 +14,28 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import MockStore from 'helpers/mocking/StoreMock';
+import MockAction from 'helpers/mocking/MockAction';
+
 import FieldType, { FieldTypes, Properties } from 'views/logic/fieldtypes/FieldType';
+import { ActionDefinition } from 'views/components/actions/ActionHandler';
 
 import bindings from './bindings';
+
+jest.mock('views/stores/FieldTypesStore', () => ({
+  FieldTypesStore: MockStore(['getInitialState', () => ({ all: {}, queryFields: {} })]),
+}));
+
+jest.mock('stores/configurations/ConfigurationsStore', () => ({
+  ConfigurationsStore: MockStore(),
+  ConfigurationsActions: {
+    listSearchesClusterConfig: MockAction(),
+  },
+}));
+
+jest.mock('stores/decorators/DecoratorsStore', () => ({
+  DecoratorsStore: MockStore(),
+}));
 
 describe('Views bindings value actions', () => {
   const { valueActions } = bindings;
@@ -27,7 +46,7 @@ describe('Views bindings value actions', () => {
     },
     type: FieldType.Unknown,
   };
-  const findAction = (type) => valueActions.find((binding) => binding.type === type);
+  const findAction = (type): ActionDefinition<{}> => valueActions.find((binding) => binding.type === type);
 
   describe('CreateExtractor', () => {
     const action = findAction('create-extractor');

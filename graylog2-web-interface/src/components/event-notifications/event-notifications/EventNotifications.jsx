@@ -18,9 +18,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import { LinkContainer, Link } from 'components/graylog/router';
+import { LinkContainer, Link } from 'components/common/router';
 import EntityShareModal from 'components/permissions/EntityShareModal';
-import { Col, DropdownButton, MenuItem, Row, Button } from 'components/graylog';
 import {
   EmptyEntity,
   EntityList,
@@ -31,7 +30,9 @@ import {
   SearchForm,
   Spinner,
   Icon,
+  QueryHelper,
 } from 'components/common';
+import { Col, DropdownButton, MenuItem, Row, Button } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 
 import styles from './EventNotifications.css';
@@ -172,6 +173,7 @@ class EventNotifications extends React.Component {
                         searchButtonLabel="Find"
                         placeholder="Find Notifications"
                         wrapperClass={styles.inline}
+                        queryHelpComponent={<QueryHelper entityName="notification" />}
                         queryWidth={200}
                         topMargin={0}
                         useLoadingState>

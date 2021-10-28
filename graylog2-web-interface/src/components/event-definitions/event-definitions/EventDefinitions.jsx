@@ -17,9 +17,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { LinkContainer } from 'components/graylog/router';
-import { Button, Col, Row } from 'components/graylog';
-import Routes from 'routing/Routes';
+import { LinkContainer } from 'components/common/router';
 import {
   EmptyEntity,
   EntityList,
@@ -27,6 +25,9 @@ import {
   PaginatedList,
   SearchForm,
 } from 'components/common';
+import { Button, Col, Row } from 'components/bootstrap';
+import Routes from 'routing/Routes';
+import QueryHelper from 'components/common/QueryHelper';
 
 import styles from './EventDefinitions.css';
 import EventDefinitionEntry from './EventDefinitionEntry';
@@ -92,6 +93,7 @@ class EventDefinitions extends React.Component {
                       searchButtonLabel="Find"
                       placeholder="Find Event Definitions"
                       wrapperClass={styles.inline}
+                      queryHelpComponent={<QueryHelper entityName="event definition" />}
                       queryWidth={200}
                       topMargin={0}
                       useLoadingState>

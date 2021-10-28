@@ -288,9 +288,9 @@ public class ViewFacadeTest {
     private EntityV1 createViewEntity() throws Exception {
         final QueryEntity query = QueryEntity.builder()
                 .id("dead-beef")
-                .timerange(KeywordRange.create("last 5 minutes"))
+                .timerange(KeywordRange.create("last 5 minutes", "Etc/UTC"))
                 .filter(OrFilter.or(StreamFilter.ofId(newStreamId)))
-                .query(ElasticsearchQueryString.builder().queryString("author: Mara Jade").build())
+                .query(ElasticsearchQueryString.of("author: Mara Jade"))
                 .build();
         final SearchEntity searchEntity = SearchEntity.builder()
                 .queries(ImmutableSet.of(query))

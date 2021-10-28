@@ -26,6 +26,7 @@ import org.graylog2.rest.resources.cluster.ClusterInputStatesResource;
 import org.graylog2.rest.resources.cluster.ClusterJournalResource;
 import org.graylog2.rest.resources.cluster.ClusterLoadBalancerStatusResource;
 import org.graylog2.rest.resources.cluster.ClusterLoggersResource;
+import org.graylog2.rest.resources.cluster.ClusterLookupTableResource;
 import org.graylog2.rest.resources.cluster.ClusterMetricsResource;
 import org.graylog2.rest.resources.cluster.ClusterNodeMetricsResource;
 import org.graylog2.rest.resources.cluster.ClusterSystemJobResource;
@@ -160,6 +161,7 @@ public class RestResourcesModule extends Graylog2Module {
         addSystemRestResource(ClusterSystemProcessingResource.class);
         addSystemRestResource(ClusterSystemResource.class);
         addSystemRestResource(ClusterSystemShutdownResource.class);
+        addSystemRestResource(ClusterLookupTableResource.class);
     }
 
     private void addContentPackResources() {

@@ -19,15 +19,13 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import naturalSort from 'javascript-natural-sort';
 
-import { LinkContainer } from 'components/graylog/router';
-import { Button } from 'components/graylog';
+import { LinkContainer } from 'components/common/router';
+import { Button } from 'components/bootstrap';
 import { Spinner } from 'components/common';
 import { AlertNotificationsList } from 'components/alertnotifications';
 import Routes from 'routing/Routes';
-import CombinedProvider from 'injection/CombinedProvider';
-
-const { AlertNotificationsStore, AlertNotificationsActions } = CombinedProvider.get('AlertNotifications');
-const { StreamsStore } = CombinedProvider.get('Streams');
+import { AlertNotificationsStore, AlertNotificationsActions } from 'stores/alertnotifications/AlertNotificationsStore';
+import { StreamsStore } from 'stores/streams/StreamsStore';
 
 const AlertNotificationsComponent = createReactClass({
   displayName: 'AlertNotificationsComponent',

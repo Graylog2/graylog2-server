@@ -41,7 +41,7 @@ const defaultRenderer: ValueRenderer = ({ value }: ValueRendererProps) => value;
 
 const Value = ({ children, field, value, queryId, render = defaultRenderer, type = FieldType.Unknown }: Props) => {
   const RenderComponent: ValueRenderer = render || ((props: ValueRendererProps) => props.value);
-  const Component = (v) => <RenderComponent field={field} value={v.value} type={type} />;
+  const Component = ({ value: componentValue }) => <RenderComponent field={field} value={componentValue} />;
   const element = <TypeSpecificValue field={field} value={value} type={type} render={Component} />;
 
   return (
@@ -49,7 +49,7 @@ const Value = ({ children, field, value, queryId, render = defaultRenderer, type
       {(interactive) => ((interactive && queryId)
         ? (
           <ValueActions element={children || element} field={field} queryId={queryId} type={type} value={value}>
-            <ValueActionTitle>
+            <ValueActionTitle data-testid="value-actions-title">
               {field} = <TypeSpecificValue field={field} value={value} type={type} truncate />
             </ValueActionTitle>
           </ValueActions>

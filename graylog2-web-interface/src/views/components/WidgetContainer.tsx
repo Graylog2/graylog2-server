@@ -16,8 +16,9 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
+import PropTypes from 'prop-types';
 
-import { RowContentStyles } from 'components/graylog/Row';
+import { RowContentStyles } from 'components/bootstrap/Row';
 
 const Container = styled.div`
   z-index: auto;
@@ -32,7 +33,7 @@ type Props = {
   style?: React.CSSProperties,
 }
 
-const WidgetContainer = ({ children, className, isFocused, style, ...rest }: Props) => {
+const WidgetContainer = React.forwardRef<HTMLDivElement, Props>(({ children, className, isFocused, style, ...rest }, ref) => {
   let containerStyle = {
     ...style,
     transition: 'none',
@@ -43,22 +44,29 @@ const WidgetContainer = ({ children, className, isFocused, style, ...rest }: Pro
       ...containerStyle,
       height: '100%',
       width: '100%',
-      zIndex: 5,
+      zIndex: 2,
       top: 0,
       left: 0,
     };
   }
 
   return (
-    <Container className={className} style={containerStyle} {...rest}>
+    <Container className={className} style={containerStyle} ref={ref} {...rest}>
       {children}
     </Container>
   );
-};
+});
 
 WidgetContainer.defaultProps = {
   className: undefined,
   style: {},
+};
+
+WidgetContainer.propTypes = {
+  children: PropTypes.node.isRequired,
+  className: PropTypes.string,
+  isFocused: PropTypes.bool.isRequired,
+  style: PropTypes.object,
 };
 
 export default WidgetContainer;

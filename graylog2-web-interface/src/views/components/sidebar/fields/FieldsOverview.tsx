@@ -25,7 +25,7 @@ import type { ViewMetaData as ViewMetadata } from 'views/stores/ViewMetadataStor
 import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
-import { Button } from 'components/graylog';
+import { Button } from 'components/bootstrap';
 
 import List from './List';
 import FieldGroup from './FieldGroup';
@@ -108,8 +108,8 @@ const FieldsOverview = ({ allFields, activeQueryFields, viewMetadata }: Props) =
           List fields of{' '}
           <FieldGroup selected={currentGroup === 'current'}
                       group="current"
-                      text="current streams"
-                      title="This shows fields which are (prospectively) included in the streams you have selected."
+                      text="current query"
+                      title="This shows fields which occur in your current query."
                       onSelect={setCurrentGroup} />
           {', '}
           <FieldGroup selected={currentGroup === 'all'}

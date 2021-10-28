@@ -14,12 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-
 window.appConfig = {
   gl2ServerUrl: '/api',
   gl2AppPathPrefix: '',
   rootTimeZone: 'UTC',
   pluginUISettings: {
     'org.graylog.plugins.customization.theme': {},
+    'org.graylog.plugins.customization.notifications': {},
   },
+  isCloud: false,
 };

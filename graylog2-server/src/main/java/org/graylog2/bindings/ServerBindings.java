@@ -20,6 +20,7 @@ import com.floreysoft.jmte.Engine;
 import com.google.inject.Scopes;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.Multibinder;
+import com.google.inject.multibindings.OptionalBinder;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.glassfish.grizzly.http.server.ErrorPageGenerator;
 import org.graylog2.Configuration;
@@ -51,6 +52,8 @@ import org.graylog2.inputs.InputStateListener;
 import org.graylog2.inputs.PersistedInputsImpl;
 import org.graylog2.lookup.LookupModule;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.plugin.cluster.ClusterIdFactory;
+import org.graylog2.plugin.cluster.RandomUUIDClusterIdFactory;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.rest.ValidationFailureExceptionMapper;
 import org.graylog2.plugin.streams.DefaultStream;
@@ -80,6 +83,7 @@ import org.graylog2.system.jobs.SystemJobFactory;
 import org.graylog2.system.jobs.SystemJobManager;
 import org.graylog2.system.shutdown.GracefulShutdown;
 import org.graylog2.system.stats.ClusterStatsModule;
+import org.graylog2.users.GrantsCleanupListener;
 import org.graylog2.users.RoleService;
 import org.graylog2.users.RoleServiceImpl;
 import org.graylog2.users.StartPageCleanupListener;
@@ -111,7 +115,7 @@ public class ServerBindings extends Graylog2Module {
         install(new AuthorizationOnlyRealmModule());
         bindSearchResponseDecorators();
         install(new GrokModule());
-        install(new LookupModule());
+        install(new LookupModule(configuration));
         install(new FieldTypesModule());
 
         // Just to create the binders so they are present in the injector. Prevents a server startup error when no
@@ -165,6 +169,7 @@ public class ServerBindings extends Graylog2Module {
         bind(PersistedInputs.class).to(PersistedInputsImpl.class);
 
         bind(RoleService.class).to(RoleServiceImpl.class).in(Scopes.SINGLETON);
+        OptionalBinder.newOptionalBinder(binder(), ClusterIdFactory.class).setDefault().to(RandomUUIDClusterIdFactory.class);
     }
 
     private void bindDynamicFeatures() {
@@ -193,6 +198,7 @@ public class ServerBindings extends Graylog2Module {
         bind(LocalDebugEventListener.class).asEagerSingleton();
         bind(ClusterDebugEventListener.class).asEagerSingleton();
         bind(StartPageCleanupListener.class).asEagerSingleton();
+        bind(GrantsCleanupListener.class).asEagerSingleton();
     }
 
     private void bindSearchResponseDecorators() {

@@ -20,7 +20,7 @@ import { List } from 'immutable';
 import Widget from 'views/logic/widgets/Widget';
 import View from 'views/logic/views/View';
 import { defaultCompare } from 'views/logic/DefaultCompare';
-import { Row, Alert } from 'components/graylog';
+import { Row, Alert } from 'components/bootstrap';
 import IfDashboard from 'views/components/dashboard/IfDashboard';
 import IfSearch from 'views/components/search/IfSearch';
 import Select from 'views/components/Select';

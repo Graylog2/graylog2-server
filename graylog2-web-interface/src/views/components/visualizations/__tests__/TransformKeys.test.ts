@@ -15,13 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
-import CurrentUserStore from 'stores/users/CurrentUserStore';
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 
 import * as fixtures from './TransformKeys.fixtures';
 
 import transformKeys from '../TransformKeys';
 
-jest.mock('stores/users/CurrentUserStore', () => ({ get: jest.fn() }));
+jest.mock('stores/users/CurrentUserStore', () => ({ CurrentUserStore: { get: jest.fn() } }));
 jest.mock('util/AppConfig', () => ({ rootTimeZone: jest.fn(() => 'America/Chicago') }));
 
 // eslint-disable-next-line global-require
@@ -144,14 +144,14 @@ describe('TransformKeys', () => {
   it('transforms complete results using current user\'s timezone', () => {
     CurrentUserStore.get.mockReturnValueOnce({ timezone: 'America/New_York' });
     const { rowPivots, columnPivots, input, output } = fixtures.singleRowPivot;
-    const result = transformKeys(rowPivots, columnPivots)(input);
+    const result = transformKeys(rowPivots as Pivot[], columnPivots)(input);
 
     expect(result).toEqual(output);
   });
 
   it('does not transform complete results without time pivots', () => {
     const { rowPivots, columnPivots, input, output } = fixtures.noTimePivots;
-    const result = transformKeys(rowPivots, columnPivots)(input);
+    const result = transformKeys(rowPivots as Pivot[], columnPivots as Pivot[])(input);
 
     expect(result).toEqual(output);
   });

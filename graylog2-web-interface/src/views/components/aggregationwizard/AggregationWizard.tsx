@@ -22,7 +22,8 @@ import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationW
 
 import WidgetConfigForm, { WidgetConfigFormValues } from './WidgetConfigForm';
 import ElementsConfiguration from './ElementsConfiguration';
-import aggregationElements from './aggregationElements';
+import aggregationElements from './aggregationElementDefinitions';
+import VisualizationContainer from './VisualizationContainer';
 
 const aggregationElementsByKey = Object.fromEntries(aggregationElements.map((element) => ([element.key, element])));
 
@@ -40,11 +41,6 @@ const Controls = styled.div`
   flex: 1.2;
   padding-right: 15px;
   overflow-y: auto;
-`;
-
-const Visualization = styled.div`
-  height: 100%;
-  flex: 3;
 `;
 
 const Section = styled.div`
@@ -75,7 +71,7 @@ const onCreateElement = (
   }
 };
 
-const _onSubmit = (formValues: WidgetConfigFormValues, onConfigChange: (newConfig: AggregationWidgetConfig) => void) => {
+export const updateWidgetAggregationElements = (formValues: WidgetConfigFormValues, oldConfig = AggregationWidgetConfig.builder().build()) => {
   const toConfigByKey = Object.fromEntries(aggregationElements.map(({ key, toConfig }) => [key, toConfig]));
 
   const newConfig = Object.keys(formValues).map((key) => {
@@ -86,9 +82,15 @@ const _onSubmit = (formValues: WidgetConfigFormValues, onConfigChange: (newConfi
     }
 
     return toConfig;
-  }).reduce((prevConfig, toConfig) => toConfig(formValues, prevConfig), AggregationWidgetConfig.builder());
+  }).reduce((prevConfig, toConfig) => toConfig(formValues, prevConfig), oldConfig.toBuilder());
 
-  onConfigChange(newConfig.build());
+  return newConfig.build();
+};
+
+const _onSubmit = (formValues: WidgetConfigFormValues, onConfigChange: (newConfig: AggregationWidgetConfig) => void, oldConfig: AggregationWidgetConfig) => {
+  const newConfig = updateWidgetAggregationElements(formValues, oldConfig);
+
+  return onConfigChange(newConfig);
 };
 
 const validateForm = (formValues: WidgetConfigFormValues) => {
@@ -99,31 +101,28 @@ const validateForm = (formValues: WidgetConfigFormValues) => {
   return elementValidationResults.reduce((prev, cur) => ({ ...prev, ...cur }), {});
 };
 
-const AggregationWizard = ({ onChange, config, children }: EditWidgetComponentProps<AggregationWidgetConfig>) => {
+const AggregationWizard = ({ onChange, config, children }: EditWidgetComponentProps<AggregationWidgetConfig> & { children: React.ReactElement }) => {
   const initialFormValues = _initialFormValues(config);
 
   return (
-    <>
-      <Controls>
-        <WidgetConfigForm onSubmit={(formValues: WidgetConfigFormValues) => _onSubmit(formValues, onChange)}
-                          initialValues={initialFormValues}
-                          validate={validateForm}>
-          {() => (
-            <>
-              <Section data-testid="configure-elements-section">
-                <ElementsConfiguration aggregationElementsByKey={aggregationElementsByKey}
-                                       config={config}
-                                       onCreate={onCreateElement}
-                                       onConfigChange={onChange} />
-              </Section>
-            </>
-          )}
-        </WidgetConfigForm>
-      </Controls>
-      <Visualization>
-        {children}
-      </Visualization>
-    </>
+    <WidgetConfigForm onSubmit={(formValues: WidgetConfigFormValues) => _onSubmit(formValues, onChange, config)}
+                      initialValues={initialFormValues}
+                      config={config}
+                      validate={validateForm}>
+      <>
+        <Controls>
+          <Section data-testid="configure-elements-section">
+            <ElementsConfiguration aggregationElementsByKey={aggregationElementsByKey}
+                                   config={config}
+                                   onCreate={onCreateElement}
+                                   onConfigChange={onChange} />
+          </Section>
+        </Controls>
+        <VisualizationContainer>
+          {children}
+        </VisualizationContainer>
+      </>
+    </WidgetConfigForm>
   );
 };
 

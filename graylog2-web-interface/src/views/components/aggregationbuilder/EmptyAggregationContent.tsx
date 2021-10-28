@@ -15,8 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useContext, useEffect } from 'react';
+import styled, { css } from 'styled-components';
 
-import { Jumbotron, Button } from 'components/graylog';
+import { Button } from 'components/bootstrap';
 import RenderCompletionCallback from 'views/components/widgets/RenderCompletionCallback';
 
 import InteractiveContext from '../contexts/InteractiveContext';
@@ -25,6 +26,18 @@ type Props = {
   toggleEdit: () => void,
   editing: boolean,
 };
+
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: inherit;
+`;
+
+const SpacedHeading = styled.h2(({ theme }) => css`
+  margin-bottom: ${theme.spacings.sm};
+`);
 
 const EmptyAggregationContent = ({ toggleEdit, editing = false }: Props) => {
   const onRenderComplete = useContext(RenderCompletionCallback);
@@ -46,11 +59,13 @@ const EmptyAggregationContent = ({ toggleEdit, editing = false }: Props) => {
     : (<p>Please {interactive ? <Button bsStyle="info" onClick={toggleEdit}>Edit</Button> : 'edit'} the widget to see results here.</p>);
 
   return (
-    <Jumbotron>
-      <h2>Empty Aggregation</h2>
-      <br />
-      {text}
-    </Jumbotron>
+    <Container>
+      <div>
+        <SpacedHeading>Empty Aggregation</SpacedHeading>
+
+        {text}
+      </div>
+    </Container>
   );
 };
 

@@ -17,6 +17,7 @@
 package org.graylog.plugins.views.search.rest;
 
 import org.graylog.plugins.views.search.export.ExportFormat;
+import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.rest.MoreMediaTypes;
 
 import javax.inject.Inject;
@@ -33,23 +34,27 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @PreMatching
 public class MessageExportFormatFilter implements ContainerRequestFilter {
+    private static final Pattern PATTERN = Pattern.compile("^/");
+
     private final Map<MediaType, ExportFormat> supportedFormats;
     private final String targetPath;
 
     @Inject
     public MessageExportFormatFilter(Set<ExportFormat> supportedFormats) {
         this.supportedFormats = supportedFormats.stream()
-            .collect(Collectors.toMap(ExportFormat::mimeType, Function.identity()));
-        targetPath = MessagesResource.class.getAnnotation(Path.class).value();
+                .collect(Collectors.toMap(ExportFormat::mimeType, Function.identity()));
+        targetPath = HttpConfiguration.PATH_API + PATTERN.matcher(MessagesResource.class.getAnnotation(Path.class).value())
+                .replaceFirst(""); // Remove leading "/" because PATH_API already includes it
     }
 
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
-        if (!requestContext.getUriInfo().getPath().contains(targetPath)) {
+        if (!requestContext.getUriInfo().getPath().endsWith(targetPath)) {
             return;
         }
         final List<MediaType> acceptedFormats = requestContext.getAcceptableMediaTypes();

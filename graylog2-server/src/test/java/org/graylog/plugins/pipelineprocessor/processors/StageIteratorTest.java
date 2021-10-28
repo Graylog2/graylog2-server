@@ -53,8 +53,8 @@ public class StageIteratorTest {
                 ImmutableSet.of(Pipeline.builder()
                                         .name("hallo")
                                         .stages(of(Stage.builder()
-                                                           .stage(0)
-                                                           .matchAll(true)
+                                                .stage(0)
+                                                .match(Stage.Match.ALL)
                                                            .ruleReferences(Collections.emptyList())
                                                            .build()))
                                         .build());
@@ -73,15 +73,15 @@ public class StageIteratorTest {
                 ImmutableSet.of(Pipeline.builder()
                                         .name("hallo")
                                         .stages(of(Stage.builder()
-                                                           .stage(0)
-                                                           .matchAll(true)
-                                                           .ruleReferences(Collections.emptyList())
-                                                           .build(),
-                                                   Stage.builder()
-                                                           .stage(10)
-                                                           .matchAll(true)
-                                                           .ruleReferences(Collections.emptyList())
-                                                           .build()
+                                                        .stage(0)
+                                                        .match(Stage.Match.ALL)
+                                                        .ruleReferences(Collections.emptyList())
+                                                        .build(),
+                                                Stage.builder()
+                                                        .stage(10)
+                                                        .match(Stage.Match.ALL)
+                                                        .ruleReferences(Collections.emptyList())
+                                                        .build()
                                         )).build());
         final StageIterator iterator = new StageIterator(input);
         //noinspection unchecked
@@ -99,37 +99,37 @@ public class StageIteratorTest {
     public void multiplePipelines() {
         final ImmutableSortedSet<Stage> stages1 =
                 of(Stage.builder()
-                           .stage(0)
-                           .matchAll(true)
-                           .ruleReferences(Collections.emptyList())
-                           .build(),
-                   Stage.builder()
-                           .stage(10)
-                           .matchAll(true)
-                           .ruleReferences(Collections.emptyList())
-                           .build()
+                                .stage(0)
+                                .match(Stage.Match.ALL)
+                                .ruleReferences(Collections.emptyList())
+                                .build(),
+                        Stage.builder()
+                                .stage(10)
+                                .match(Stage.Match.ALL)
+                                .ruleReferences(Collections.emptyList())
+                                .build()
                 );
         final ImmutableSortedSet<Stage> stages2 =
                 of(Stage.builder()
-                           .stage(-1)
-                           .matchAll(true)
-                           .ruleReferences(Collections.emptyList())
-                           .build(),
-                   Stage.builder()
-                           .stage(4)
-                           .matchAll(true)
-                           .ruleReferences(Collections.emptyList())
-                           .build(),
-                   Stage.builder()
-                           .stage(11)
-                           .matchAll(true)
-                           .ruleReferences(Collections.emptyList())
-                           .build()
+                                .stage(-1)
+                                .match(Stage.Match.ALL)
+                                .ruleReferences(Collections.emptyList())
+                                .build(),
+                        Stage.builder()
+                                .stage(4)
+                                .match(Stage.Match.ALL)
+                                .ruleReferences(Collections.emptyList())
+                                .build(),
+                        Stage.builder()
+                                .stage(11)
+                                .match(Stage.Match.ALL)
+                                .ruleReferences(Collections.emptyList())
+                                .build()
                 );
         final ImmutableSortedSet<Stage> stages3 =
                 of(Stage.builder()
-                           .stage(0)
-                           .matchAll(true)
+                        .stage(0)
+                        .match(Stage.Match.ALL)
                            .ruleReferences(Collections.emptyList())
                            .build());
 

@@ -18,7 +18,7 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import styled from 'styled-components';
 
-import { Link } from 'components/graylog/router';
+import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import Role from 'logic/roles/Role';
 import { TextOverflowEllipsis } from 'components/common';

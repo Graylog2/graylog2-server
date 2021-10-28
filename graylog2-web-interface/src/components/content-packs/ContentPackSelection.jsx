@@ -19,9 +19,8 @@ import React from 'react';
 import naturalSort from 'javascript-natural-sort';
 import { cloneDeep } from 'lodash';
 
-import { Col, HelpBlock, Panel, Row } from 'components/graylog';
-import { Input } from 'components/bootstrap';
 import { ExpandableList, ExpandableListItem, Icon, SearchForm } from 'components/common';
+import { Col, HelpBlock, Panel, Row, Input } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
 import Entity from 'logic/content-packs/Entity';
 import { hasAcceptedProtocol } from 'util/URLUtils';
@@ -142,9 +141,17 @@ class ContentPackSelection extends React.Component {
 
   _updateSelectionGroup = (type) => {
     const { selectedEntities, entities, onStateChange } = this.props;
+    const { isFiltered, filteredEntities } = this.state;
+
     const newSelection = cloneDeep(selectedEntities);
 
-    if (this._isGroupSelected(type)) {
+    if (isFiltered) {
+      if (newSelection[type]) {
+        newSelection[type] = [...newSelection[type], ...filteredEntities[type]];
+      } else {
+        newSelection[type] = filteredEntities[type];
+      }
+    } else if (this._isGroupSelected(type)) {
       newSelection[type] = [];
     } else {
       newSelection[type] = entities[type];
@@ -348,7 +355,7 @@ class ContentPackSelection extends React.Component {
         </Row>
         <Row>
           <Col smOffset={1} sm={8} lg={8}>
-            {errors.selection && <Panel bsStyle="danger">{errors.selection}</Panel> }
+            {errors.selection && <Panel bsStyle="danger">{errors.selection}</Panel>}
             <ExpandableList>
               {entitiesComponent}
             </ExpandableList>

@@ -19,7 +19,7 @@ import * as Immutable from 'immutable';
 import { get, isEqual } from 'lodash';
 
 import type { RefluxActions } from 'stores/StoreTypes';
-import { singletonActions, singletonStore } from 'views/logic/singleton';
+import { singletonActions, singletonStore } from 'logic/singleton';
 
 import { CurrentViewStateActions, CurrentViewStateStore } from './CurrentViewStateStore';
 import type { TitlesMap, TitleType } from './TitleTypes';
@@ -37,9 +37,11 @@ export const TitlesActions: TitlesActionsTypes = singletonActions(
 
 export { default as TitleTypes } from './TitleTypes';
 
+type TitlesStoreState = Immutable.Map<TitleType, Immutable.Map<string, string>>;
+
 export const TitlesStore = singletonStore(
   'views.Titles',
-  () => Reflux.createStore({
+  () => Reflux.createStore<TitlesStoreState>({
     listenables: [TitlesActions],
 
     titles: Immutable.Map<TitleType, Immutable.Map<string, string>>(),

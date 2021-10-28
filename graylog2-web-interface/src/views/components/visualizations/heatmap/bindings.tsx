@@ -19,7 +19,7 @@ import type { VisualizationType } from 'views/types';
 import HeatmapVisualization from 'views/components/visualizations/heatmap/HeatmapVisualization';
 import HeatmapVisualizationConfig, { COLORSCALES } from 'views/logic/aggregationbuilder/visualizations/HeatmapVisualizationConfig';
 import { defaultCompare } from 'views/logic/DefaultCompare';
-import { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
+import { WidgetConfigFormValues } from 'views/components/aggregationwizard';
 import {
   areAtLeastNGroupingsConfigured,
   areAtLeastNMetricsConfigured,
@@ -62,11 +62,15 @@ const heatmap: VisualizationType<HeatmapVisualizationConfig, HeatMapVisualizatio
   displayName: 'Heatmap',
   component: HeatmapVisualization,
   config: {
-    fromConfig: ({ autoScale, colorScale, reverseScale, defaultValue, useSmallestAsDefault, zMax, zMin }: HeatmapVisualizationConfig) => ({
+    fromConfig: ({ autoScale, colorScale, reverseScale, defaultValue, useSmallestAsDefault, zMax, zMin }: HeatmapVisualizationConfig = HeatmapVisualizationConfig.empty()) => ({
       autoScale, colorScale, reverseScale, defaultValue, useSmallestAsDefault, zMax, zMin,
     }),
-    toConfig: ({ autoScale = false, colorScale, reverseScale = false, useSmallestAsDefault, zMax, zMin, defaultValue }: HeatMapVisualizationConfigFormValues) => HeatmapVisualizationConfig
-      .create(colorScale, reverseScale, autoScale, zMin, zMax, useSmallestAsDefault, defaultValue),
+    toConfig: ({ autoScale = false, colorScale, reverseScale = false, useSmallestAsDefault, zMax, zMin, defaultValue }: HeatMapVisualizationConfigFormValues) => {
+      const [finalZMin, finalZMax] = autoScale ? [undefined, undefined] : [zMin, zMax];
+
+      return HeatmapVisualizationConfig
+        .create(colorScale, reverseScale, autoScale, finalZMin, finalZMax, useSmallestAsDefault, defaultValue);
+    },
     createConfig: () => ({ colorScale: 'Viridis', autoScale: true }),
     fields: [{
       name: 'colorScale',
@@ -103,7 +107,7 @@ const heatmap: VisualizationType<HeatmapVisualizationConfig, HeatMapVisualizatio
       type: 'numeric',
       title: 'Default Value',
       isShown: (values: HeatMapVisualizationConfigFormValues) => !values?.useSmallestAsDefault,
-      required: true,
+      required: false,
     }],
   },
   validate,

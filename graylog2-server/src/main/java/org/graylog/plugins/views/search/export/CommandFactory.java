@@ -108,7 +108,7 @@ public class CommandFactory {
         requestBuilder.fieldsInOrder(resultFormat.fieldsInOrder());
 
         if (resultFormat.limit().isPresent()) {
-            requestBuilder.limit(resultFormat.limit().getAsInt());
+            requestBuilder.limit(resultFormat.limit().orElseThrow(() -> new IllegalStateException("No value present!")));
         }
 
         return requestBuilder;
@@ -162,7 +162,7 @@ public class CommandFactory {
     private ElasticsearchQueryString decorateQueryString(Search search, Query query, ElasticsearchQueryString undecorated) {
         String queryString = undecorated.queryString();
         String decorated = queryStringDecorator.decorateQueryString(queryString, search, query);
-        return ElasticsearchQueryString.builder().queryString(decorated).build();
+        return ElasticsearchQueryString.of(decorated);
     }
 
     private Set<String> streamsFrom(Query query, SearchType searchType) {

@@ -16,12 +16,13 @@
  */
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
-import { Popover, OverlayTrigger } from 'components/graylog';
+import { OverlayTrigger } from 'components/common';
+import { Popover } from 'components/bootstrap';
 import Icon from 'components/common/Icon';
 
-const StyledPopover = styled(Popover)(({ theme }) => `
+const StyledPopover = styled(Popover)(({ theme }) => css`
   ul {
     padding-left: 0;
   }
@@ -41,21 +42,23 @@ const StyledPopover = styled(Popover)(({ theme }) => `
 
 type Props = {
   children: React.ReactNode,
-  className: string,
+  className?: string,
   id?: string,
-  placement: 'top' | 'right' | 'bottom' | 'left',
-  pullRight: boolean,
+  placement?: 'top' | 'right' | 'bottom' | 'left',
+  pullRight?: boolean,
   title: string,
+  testId?: string,
 };
 
-const HoverForHelp = ({ children, className, title, id, pullRight, placement }: Props) => (
+const HoverForHelp = ({ children, className, title, id, pullRight, placement, testId }: Props) => (
   <OverlayTrigger trigger={['hover', 'focus']}
                   placement={placement}
                   overlay={(
                     <StyledPopover title={title} id={id}>
                       {children}
                     </StyledPopover>
-                  )}>
+                  )}
+                  testId={testId}>
     <Icon className={`${className} ${pullRight ? 'pull-right' : ''}`} name="question-circle" />
   </OverlayTrigger>
 );
@@ -67,6 +70,7 @@ HoverForHelp.propTypes = {
   placement: PropTypes.oneOf(['top', 'right', 'bottom', 'left']),
   pullRight: PropTypes.bool,
   title: PropTypes.string.isRequired,
+  testId: PropTypes.string,
 };
 
 HoverForHelp.defaultProps = {
@@ -74,6 +78,8 @@ HoverForHelp.defaultProps = {
   className: '',
   pullRight: true,
   placement: 'bottom',
+  testId: undefined,
 };
 
+/** @component */
 export default HoverForHelp;

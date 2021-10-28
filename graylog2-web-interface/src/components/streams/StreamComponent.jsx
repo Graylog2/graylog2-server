@@ -17,16 +17,15 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Alert } from 'components/graylog';
+import { Alert } from 'components/bootstrap';
 import { Icon, IfPermitted, PaginatedList, SearchForm } from 'components/common';
-import StoreProvider from 'injection/StoreProvider';
 import Spinner from 'components/common/Spinner';
+import QueryHelper from 'components/common/QueryHelper';
+import StreamsStore from 'stores/streams/StreamsStore';
+import { StreamRulesStore } from 'stores/streams/StreamRulesStore';
 
 import StreamList from './StreamList';
 import CreateStreamButton from './CreateStreamButton';
-
-const StreamsStore = StoreProvider.getStore('Streams');
-const StreamRulesStore = StoreProvider.getStore('StreamRules');
 
 class StreamComponent extends React.Component {
   static propTypes = {
@@ -101,14 +100,14 @@ class StreamComponent extends React.Component {
 
   _onSearch = (query, resetLoadingCallback) => {
     const { pagination } = this.state;
-    const newPagination = Object.assign(pagination, { query: query });
+    const newPagination = { ...pagination, query: query, page: 1 };
 
     this.setState({ pagination: newPagination }, () => this.loadData(resetLoadingCallback));
   };
 
   _onReset = () => {
     const { pagination } = this.state;
-    const newPagination = Object.assign(pagination, { query: '' });
+    const newPagination = { ...pagination, query: '', page: 1 };
 
     this.setState({ pagination: newPagination }, this.loadData);
   };
@@ -158,9 +157,13 @@ class StreamComponent extends React.Component {
     return (
       <div>
         <PaginatedList onChange={this._onPageChange}
+                       activePage={pagination.page}
                        totalItems={pagination.total}>
           <div style={{ marginBottom: 15 }}>
-            <SearchForm onSearch={this._onSearch} onReset={this._onReset} useLoadingState />
+            <SearchForm onSearch={this._onSearch}
+                        onReset={this._onReset}
+                        queryHelpComponent={<QueryHelper entityName="stream" />}
+                        useLoadingState />
           </div>
           <div>{streamListComp}</div>
         </PaginatedList>

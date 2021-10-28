@@ -16,7 +16,8 @@
  */
 import * as React from 'react';
 
-import { Button, OverlayTrigger, Popover } from 'components/graylog';
+import { Button, Popover } from 'components/bootstrap';
+import { OverlayTrigger } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
 
@@ -39,11 +40,9 @@ const PopoverHelp = () => {
   );
 
   return (
-    <div className={DecoratorStyles.helpLinkContainer}>
-      <OverlayTrigger trigger="click" rootClose placement="right" overlay={popoverHelp}>
-        <Button bsStyle="link" className={DecoratorStyles.helpLink}>What are message decorators?</Button>
-      </OverlayTrigger>
-    </div>
+    <OverlayTrigger trigger="click" rootClose placement="right" overlay={popoverHelp}>
+      <Button bsStyle="link" className={DecoratorStyles.helpLink}>What are message decorators?</Button>
+    </OverlayTrigger>
   );
 };
 

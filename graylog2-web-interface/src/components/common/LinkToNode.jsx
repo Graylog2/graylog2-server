@@ -19,14 +19,13 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
-import { Link } from 'components/graylog/router';
-import StoreProvider from 'injection/StoreProvider';
+import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
+import AppConfig from 'util/AppConfig';
+import { NodesStore } from 'stores/nodes/NodesStore';
 
 import Icon from './Icon';
 import Spinner from './Spinner';
-
-const NodesStore = StoreProvider.getStore('Nodes');
 
 /**
  * Component that creates a link to a Graylog node. The information in the link includes:
@@ -58,12 +57,20 @@ const LinkToNode = createReactClass({
       const iconClass = node.is_master ? 'master-node' : '';
       const iconTitle = node.is_master ? 'This is the master node in the cluster' : '';
 
-      return (
-        <Link to={Routes.SYSTEM.NODES.SHOW(this.props.nodeId)}>
+      const content = (
+        <>
           <Icon name={iconName} className={iconClass} title={iconTitle} />
           {' '}
           {node.short_node_id} / {node.hostname}
-        </Link>
+        </>
+      );
+
+      if (AppConfig.isCloud()) {
+        return content;
+      }
+
+      return (
+        <Link to={Routes.SYSTEM.NODES.SHOW(this.props.nodeId)}>{content}</Link>
       );
     }
 

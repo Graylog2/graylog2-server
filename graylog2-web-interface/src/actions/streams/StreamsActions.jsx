@@ -16,7 +16,7 @@
  */
 import Reflux from 'reflux';
 
-import { singletonActions } from 'views/logic/singleton';
+import { singletonActions } from 'logic/singleton';
 
 const StreamsActions = singletonActions('Streams', () => Reflux.createActions({
   searchPaginated: { asyncResult: true },

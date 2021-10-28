@@ -18,17 +18,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import { LinkContainer } from 'components/graylog/router';
-import { Row, Col, Button } from 'components/graylog';
-import { Input } from 'components/bootstrap';
-import { ContentPackMarker } from 'components/common';
+import { LinkContainer } from 'components/common/router';
+import { Row, Col, Button, Input } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
 import Routes from 'routing/Routes';
-import CombinedProvider from 'injection/CombinedProvider';
+import { LookupTableDataAdaptersActions } from 'stores/lookup-tables/LookupTableDataAdaptersStore';
 
 import ConfigSummaryDefinitionListWrapper from './ConfigSummaryDefinitionListWrapper';
-
-const { LookupTableDataAdaptersActions } = CombinedProvider.get('LookupTableDataAdapters');
 
 class DataAdapter extends React.Component {
   static propTypes = {
@@ -81,7 +77,6 @@ class DataAdapter extends React.Component {
         <Col md={6}>
           <h2>
             {dataAdapter.title}
-            <ContentPackMarker contentPack={dataAdapter.content_pack} marginLeft={5} />
             {' '}
             <small>({plugin.displayName})</small>
           </h2>
@@ -115,7 +110,7 @@ class DataAdapter extends React.Component {
               <Button type="submit" bsStyle="success">Look up</Button>
             </fieldset>
           </form>
-          { lookupResult && (
+          {lookupResult && (
             <div>
               <h4>Lookup result</h4>
               <pre>{JSON.stringify(lookupResult, null, 2)}</pre>

@@ -28,6 +28,8 @@ import org.graylog.events.EventsModule;
 import org.graylog.freeenterprise.FreeEnterpriseConfiguration;
 import org.graylog.freeenterprise.FreeEnterpriseModule;
 import org.graylog.grn.GRNTypesModule;
+import org.graylog.metrics.prometheus.PrometheusExporterConfiguration;
+import org.graylog.metrics.prometheus.PrometheusMetricsModule;
 import org.graylog.plugins.cef.CEFInputModule;
 import org.graylog.plugins.map.MapWidgetModule;
 import org.graylog.plugins.netflow.NetFlowPluginModule;
@@ -61,6 +63,7 @@ import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.configuration.EmailConfiguration;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.configuration.MongoDbConfiguration;
+import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.configuration.VersionCheckConfiguration;
 import org.graylog2.contentpacks.ContentPacksModule;
 import org.graylog2.decorators.DecoratorBindings;
@@ -80,6 +83,7 @@ import org.graylog2.shared.UI;
 import org.graylog2.shared.bindings.MessageInputBindings;
 import org.graylog2.shared.bindings.ObjectMapperModule;
 import org.graylog2.shared.bindings.RestApiBindings;
+import org.graylog2.shared.journal.Journal;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.graylog2.storage.VersionAwareStorageModule;
@@ -116,6 +120,8 @@ public class Server extends ServerBootstrap {
     private final ProcessingStatusConfig processingStatusConfig = new ProcessingStatusConfig();
     private final JobSchedulerConfiguration jobSchedulerConfiguration = new JobSchedulerConfiguration();
     private final FreeEnterpriseConfiguration freeEnterpriseConfiguration = new FreeEnterpriseConfiguration();
+    private final PrometheusExporterConfiguration prometheusExporterConfiguration = new PrometheusExporterConfiguration();
+    private final TLSProtocolsConfiguration tlsConfiguration = new TLSProtocolsConfiguration();
 
     public Server() {
         super("server", configuration);
@@ -164,7 +170,8 @@ public class Server extends ServerBootstrap {
                 new EventsModule(),
                 new FreeEnterpriseModule(),
                 new GRNTypesModule(),
-                new SecurityModule()
+                new SecurityModule(),
+                new PrometheusMetricsModule()
         );
 
         return modules.build();
@@ -185,7 +192,9 @@ public class Server extends ServerBootstrap {
                 viewsConfiguration,
                 processingStatusConfig,
                 jobSchedulerConfiguration,
-                freeEnterpriseConfiguration);
+                freeEnterpriseConfiguration,
+                prometheusExporterConfiguration,
+                tlsConfiguration);
     }
 
     @Override
@@ -233,15 +242,21 @@ public class Server extends ServerBootstrap {
         private final NodeId nodeId;
         private final GracefulShutdown gracefulShutdown;
         private final AuditEventSender auditEventSender;
+        private final Journal journal;
 
         @Inject
-        public ShutdownHook(ActivityWriter activityWriter, ServiceManager serviceManager, NodeId nodeId,
-                            GracefulShutdown gracefulShutdown, AuditEventSender auditEventSender) {
+        public ShutdownHook(ActivityWriter activityWriter,
+                            ServiceManager serviceManager,
+                            NodeId nodeId,
+                            GracefulShutdown gracefulShutdown,
+                            AuditEventSender auditEventSender,
+                            Journal journal) {
             this.activityWriter = activityWriter;
             this.serviceManager = serviceManager;
             this.nodeId = nodeId;
             this.gracefulShutdown = gracefulShutdown;
             this.auditEventSender = auditEventSender;
+            this.journal = journal;
         }
 
         @Override
@@ -254,6 +269,13 @@ public class Server extends ServerBootstrap {
 
             gracefulShutdown.runWithoutExit();
             serviceManager.stopAsync().awaitStopped();
+
+            // Some services might continue performing processing
+            // after the Journal service being down. Therefore it's
+            // important to flush the most actual journal offset value
+            // right before shutting down to avoid repetitive processing
+            // and duplicates.
+            journal.flush();
         }
     }
 

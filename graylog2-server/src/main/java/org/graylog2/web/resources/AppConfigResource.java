@@ -23,6 +23,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Resources;
 import org.graylog2.Configuration;
 import org.graylog2.configuration.HttpConfiguration;
+import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.rest.MoreMediaTypes;
 import org.graylog2.rest.RestTools;
 import org.graylog2.web.PluginUISettingsProvider;
@@ -49,18 +50,21 @@ public class AppConfigResource {
     private final Engine templateEngine;
     private final Map<String, PluginUISettingsProvider> settingsProviders;
     private final ObjectMapper objectMapper;
+    private final FeatureFlags featureFlags;
 
     @Inject
     public AppConfigResource(Configuration configuration,
                              HttpConfiguration httpConfiguration,
                              Engine templateEngine,
                              Map<String, PluginUISettingsProvider> settingsProviders,
-                             ObjectMapper objectMapper) {
+                             ObjectMapper objectMapper,
+                             FeatureFlags featureFlags) {
         this.configuration = requireNonNull(configuration, "configuration");
         this.httpConfiguration = requireNonNull(httpConfiguration, "httpConfiguration");
         this.templateEngine = requireNonNull(templateEngine, "templateEngine");
         this.settingsProviders = requireNonNull(settingsProviders);
         this.objectMapper = objectMapper;
+        this.featureFlags = featureFlags;
     }
 
     @GET
@@ -74,12 +78,15 @@ public class AppConfigResource {
             throw new RuntimeException("Unable to read AppConfig template while generating web interface configuration: ", e);
         }
 
-        final URI baseUri = RestTools.buildExternalUri(headers.getRequestHeaders(), httpConfiguration.getHttpExternalUri());
-        final Map<String, Object> model = ImmutableMap.of(
-            "rootTimeZone", configuration.getRootTimeZone(),
-            "serverUri", baseUri.resolve(HttpConfiguration.PATH_API),
-            "appPathPrefix", baseUri.getPath(),
-            "pluginUISettings", buildPluginUISettings());
+        final URI baseUri = RestTools.buildRelativeExternalUri(headers.getRequestHeaders(), httpConfiguration.getHttpExternalUri());
+        final Map<String, Object> model = ImmutableMap.<String, Object>builder()
+                .put("rootTimeZone", configuration.getRootTimeZone())
+                .put("serverUri", baseUri.resolve(HttpConfiguration.PATH_API))
+                .put("appPathPrefix", baseUri.getPath())
+                .put("isCloud", configuration.isCloud())
+                .put("pluginUISettings", buildPluginUISettings())
+                .put("featureFlags", toPrettyJsonString(featureFlags.getAll()))
+                .build();
         return templateEngine.transform(template, model);
     }
 
@@ -87,6 +94,10 @@ public class AppConfigResource {
         Map<String, Object> pluginUISettings = settingsProviders.entrySet().stream().collect(Collectors.toMap(
                 Map.Entry::getKey,
                 entry -> entry.getValue().pluginSettings()));
+        return toPrettyJsonString(pluginUISettings);
+    }
+
+    private String toPrettyJsonString(Map<String, ?> pluginUISettings) {
         try {
             return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(pluginUISettings);
         } catch (JsonProcessingException ex) {

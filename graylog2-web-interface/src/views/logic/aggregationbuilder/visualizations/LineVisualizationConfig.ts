@@ -31,6 +31,8 @@ export type LineVisualizationConfigJSON = {
 export default class LineVisualizationConfig extends VisualizationConfig {
   private readonly _value: InternalState;
 
+  static readonly DEFAULT_INTERPOLATION: InterpolationMode = 'linear';
+
   constructor(interpolation: $PropertyType<InternalState, 'interpolation'>) {
     super();
     this._value = { interpolation };
@@ -50,7 +52,7 @@ export default class LineVisualizationConfig extends VisualizationConfig {
   }
 
   static empty() {
-    return new LineVisualizationConfig('linear');
+    return new LineVisualizationConfig(this.DEFAULT_INTERPOLATION);
   }
 
   toJSON() {
@@ -59,10 +61,8 @@ export default class LineVisualizationConfig extends VisualizationConfig {
     return { interpolation };
   }
 
-  static fromJSON(type: string, value: LineVisualizationConfigJSON = { interpolation: 'linear' }) {
-    const { interpolation = 'linear' } = value;
-
-    return LineVisualizationConfig.create(interpolation);
+  static fromJSON(type: string, value: LineVisualizationConfigJSON) {
+    return LineVisualizationConfig.create(value?.interpolation ?? this.DEFAULT_INTERPOLATION);
   }
 }
 

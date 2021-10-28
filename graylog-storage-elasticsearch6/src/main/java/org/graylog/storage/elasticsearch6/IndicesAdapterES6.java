@@ -53,9 +53,11 @@ import io.searchbox.indices.aliases.AliasMapping;
 import io.searchbox.indices.aliases.GetAliases;
 import io.searchbox.indices.aliases.ModifyAliases;
 import io.searchbox.indices.aliases.RemoveAliasMapping;
+import io.searchbox.indices.mapping.PutMapping;
 import io.searchbox.indices.settings.GetSettings;
 import io.searchbox.indices.settings.UpdateSettings;
 import io.searchbox.indices.template.DeleteTemplate;
+import io.searchbox.indices.template.GetTemplate;
 import io.searchbox.indices.template.PutTemplate;
 import io.searchbox.params.Parameters;
 import io.searchbox.params.SearchType;
@@ -66,6 +68,7 @@ import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.aggregations.b
 import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.sort.FieldSortBuilder;
 import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.sort.SortBuilders;
+import org.graylog.storage.elasticsearch6.indices.GetSingleAlias;
 import org.graylog.storage.elasticsearch6.jest.JestUtils;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.IndexMapping;
@@ -84,6 +87,7 @@ import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -91,6 +95,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -176,32 +181,24 @@ public class IndicesAdapterES6 implements IndicesAdapter {
 
     @Override
     public Set<String> resolveAlias(String alias) {
-        // TODO: This is basically getting all indices and later we filter out the alias we want to check for.
-        //       This can be done in a more efficient way by either using the /_cat/aliases/<alias-name> API or
-        //       the regular /_alias/<alias-name> API.
-        final GetAliases request = new GetAliases.Builder().build();
-        final JestResult jestResult = JestUtils.execute(jestClient, request, () -> "Couldn't collect indices for alias " + alias);
+        final GetSingleAlias request = new GetSingleAlias.Builder()
+                .alias(uncheckedURLEncode(alias))
+                .build();
+        try {
+            final JestResult jestResult = JestUtils.execute(jestClient, request, () -> "Couldn't collect indices for alias " + alias);
 
-        // The ES return value of this has an awkward format: The first key of the hash is the target index. Thanks.
-        final ImmutableSet.Builder<String> indicesBuilder = ImmutableSet.builder();
-        final Iterator<Map.Entry<String, JsonNode>> it = jestResult.getJsonObject().fields();
-        while (it.hasNext()) {
-            Map.Entry<String, JsonNode> entry = it.next();
-            final String indexName = entry.getKey();
-            Optional.of(entry.getValue())
-                    .map(json -> json.path("aliases"))
-                    .map(JsonNode::fields)
-                    .map(ImmutableList::copyOf)
-                    .filter(aliases -> !aliases.isEmpty())
-                    .filter(aliases -> aliases.stream().anyMatch(aliasEntry -> aliasEntry.getKey().equals(alias)))
-                    .ifPresent(x -> indicesBuilder.add(indexName));
+            // The ES return value of this has an awkward format: The first key of the hash is the target index. Thanks.
+            return ImmutableSet.copyOf(jestResult.getJsonObject().fieldNames());
+        } catch (ElasticsearchException e) {
+            if (e.getMessage().startsWith("Couldn't collect indices for alias ")) {
+                return Collections.emptySet();
+            }
+            throw e;
         }
-
-        return indicesBuilder.build();
     }
 
     @Override
-    public void create(String indexName, IndexSettings indexSettings, String templateName, Map<String, Object> template) {
+    public void create(String indexName, IndexSettings indexSettings) {
         final Map<String, Object> settings = new HashMap<>();
         settings.put("number_of_shards", indexSettings.shards());
         settings.put("number_of_replicas", indexSettings.replicas());
@@ -210,14 +207,30 @@ public class IndicesAdapterES6 implements IndicesAdapter {
                 .settings(settings)
                 .build();
 
-        // Make sure our index template exists before creating an index!
-        ensureIndexTemplate(templateName, template);
-
         final JestResult jestResult;
         try {
             jestResult = jestClient.execute(request);
         } catch (IOException e) {
             throw new ElasticsearchException("Couldn't create index " + indexName, e);
+        }
+
+        if (!jestResult.isSucceeded()){
+            throw new ElasticsearchException(jestResult.getErrorMessage());
+        }
+    }
+
+    @Override
+    public void updateIndexMapping(@Nonnull String indexName,
+                                   @Nonnull String mappingType,
+                                   @Nonnull Map<String, Object> mapping) {
+
+        final PutMapping request = new PutMapping.Builder(indexName, mappingType, mapping).build();
+
+        final JestResult jestResult;
+        try {
+            jestResult = jestClient.execute(request);
+        } catch (IOException e) {
+            throw new ElasticsearchException("Couldn't update index mapping " + indexName + "/" + mappingType, e);
         }
 
         if (!jestResult.isSucceeded()){
@@ -238,6 +251,17 @@ public class IndicesAdapterES6 implements IndicesAdapter {
             return URLEncoder.encode(templateName, StandardCharsets.UTF_8.toString());
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public boolean indexTemplateExists(String templateName) {
+        final GetTemplate request = new GetTemplate.Builder(uncheckedURLEncode(templateName)).build();
+        try {
+            final JestResult jestResult = JestUtils.execute(jestClient, request, () -> "Unable to get index template " + templateName);
+            return jestResult.isSucceeded();
+        } catch (ElasticsearchException e) {
+            return false;
         }
     }
 

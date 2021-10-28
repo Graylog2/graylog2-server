@@ -19,7 +19,7 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
-import { Col, Row } from 'components/graylog';
+import { Col, Row } from 'components/bootstrap';
 import DocumentationLink from 'components/support/DocumentationLink';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { AlertsHeaderToolbar } from 'components/alerts';
@@ -28,12 +28,10 @@ import { StreamAlertNotifications } from 'components/alertnotifications';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 import history from 'util/History';
-import CombinedProvider from 'injection/CombinedProvider';
 import withParams from 'routing/withParams';
-
-const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
-const { StreamsStore } = CombinedProvider.get('Streams');
-const { AlertConditionsStore, AlertConditionsActions } = CombinedProvider.get('AlertConditions');
+import { AlertConditionsStore, AlertConditionsActions } from 'stores/alertconditions/AlertConditionsStore';
+import { StreamsStore } from 'stores/streams/StreamsStore';
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 
 const EditAlertConditionPage = createReactClass({
   displayName: 'EditAlertConditionPage',

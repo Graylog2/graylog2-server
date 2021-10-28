@@ -17,15 +17,11 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { LinkContainer, Link } from 'components/graylog/router';
-import { ButtonToolbar, Row, Col, Button } from 'components/graylog';
-import { Input } from 'components/bootstrap';
+import { LinkContainer, Link } from 'components/common/router';
+import { ButtonToolbar, Row, Col, Button, Input } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import * as FormsUtils from 'util/FormsUtils';
-import { ContentPackMarker } from 'components/common';
-import CombinedProvider from 'injection/CombinedProvider';
-
-const { LookupTablesActions } = CombinedProvider.get('LookupTables');
+import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
 
 class LookupTable extends React.Component {
   static propTypes = {
@@ -75,7 +71,6 @@ class LookupTable extends React.Component {
         <Col md={6}>
           <h2>
             {this.props.table.title}
-            <ContentPackMarker contentPack={this.props.table.content_pack} marginLeft={5} />
           </h2>
           <p>{this.props.table.description}</p>
           <dl>
@@ -136,7 +131,7 @@ class LookupTable extends React.Component {
               <Button type="submit" bsStyle="success">Look up</Button>
             </fieldset>
           </form>
-          { this.state.lookupResult && (
+          {this.state.lookupResult && (
             <div>
               <h4>Lookup result</h4>
               <pre>{JSON.stringify(this.state.lookupResult, null, 2)}</pre>

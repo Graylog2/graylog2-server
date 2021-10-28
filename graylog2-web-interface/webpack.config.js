@@ -15,9 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 const fs = require('fs');
+const path = require('path');
 
 const webpack = require('webpack');
-const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const merge = require('webpack-merge');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
@@ -72,14 +72,6 @@ const chunksSortMode = (c1, c2) => {
     return 1;
   }
 
-  if (c1 === 'builtins') {
-    return -1;
-  }
-
-  if (c2 === 'builtins') {
-    return 1;
-  }
-
   if (c1 === 'app') {
     return 1;
   }
@@ -96,7 +88,6 @@ const webpackConfig = {
   dependencies: ['vendor'],
   entry: {
     app: APP_PATH,
-    builtins: [path.resolve(APP_PATH, 'injection', 'builtins.js')],
     polyfill: [path.resolve(APP_PATH, 'polyfill.js')],
   },
   output: {
@@ -230,6 +221,7 @@ if (TARGET === 'start') {
         DEVELOPMENT: true,
         // Keep old env to avoid breaking developer setups
         GRAYLOG_API_URL: JSON.stringify(process.env.GRAYLOG_API_URL || process.env.GRAYLOG_HTTP_PUBLISH_URI),
+        IS_CLOUD: process.env.IS_CLOUD,
       }),
       new CopyWebpackPlugin({ patterns: [{ from: 'config.js' }] }),
       new webpack.HotModuleReplacementPlugin(),

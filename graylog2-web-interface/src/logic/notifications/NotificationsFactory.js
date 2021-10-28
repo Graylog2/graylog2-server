@@ -16,10 +16,11 @@
  */
 import React from 'react';
 
-import { Link } from 'components/graylog/router';
+import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 import DocumentationLink from 'components/support/DocumentationLink';
+import HideOnCloud from 'util/conditional/HideOnCloud';
 
 class NotificationsFactory {
   static getForNotification(notification) {
@@ -139,8 +140,10 @@ class NotificationsFactory {
             <span>
               Input {notification.details.input_id} has failed to start on node {notification.node_id} for this reason:
               »{notification.details.reason}«. This means that you are unable to receive any messages from this input.
-              This is mostly an indication for a misconfiguration or an error. You can click {' '}
-              <Link to={Routes.SYSTEM.INPUTS}>here</Link> to solve this.
+              This is mostly an indication for a misconfiguration or an error.
+              <HideOnCloud>
+                You can click <Link to={Routes.SYSTEM.INPUTS}>here</Link> to solve this.
+              </HideOnCloud>
             </span>
           ),
         };
@@ -197,7 +200,9 @@ class NotificationsFactory {
             <span>
               There is a node without any running inputs. This means that you are not receiving any messages from this
               node at this point in time. This is most probably an indication of an error or misconfiguration.
-              You can click <Link to={Routes.SYSTEM.INPUTS}>here</Link> to solve this.
+              <HideOnCloud>
+                You can click <Link to={Routes.SYSTEM.INPUTS}>here</Link> to solve this.
+              </HideOnCloud>
             </span>
           ),
         };
@@ -220,7 +225,7 @@ class NotificationsFactory {
           description: (
             <span>
               The most recent stable Graylog version is <em>{notification.details.current_version}</em>.
-              Get it from <a href="https://www.graylog.org/" target="_blank">https://www.graylog.org/</a>.
+              Get it from <a href="https://www.graylog.org/" target="_blank" rel="noreferrer">https://www.graylog.org/</a>.
             </span>
           ),
         };
@@ -270,7 +275,7 @@ class NotificationsFactory {
               There are Elasticsearch nodes in the cluster running out of disk space, their disk usage is above the low watermark.{' '}
               For this reason Elasticsearch will not allocate new shards to the affected nodes.{' '}
               The affected nodes are: [{notification.details.nodes}]{' '}
-              Check <a href="https://www.elastic.co/guide/en/elasticsearch/reference/master/disk-allocator.html" target="_blank">https://www.elastic.co/guide/en/elasticsearch/reference/master/disk-allocator.html</a>{' '}
+              Check <a href="https://www.elastic.co/guide/en/elasticsearch/reference/master/disk-allocator.html" target="_blank" rel="noreferrer">https://www.elastic.co/guide/en/elasticsearch/reference/master/disk-allocator.html</a>{' '}
               for more details.
             </span>
           ),
@@ -283,7 +288,7 @@ class NotificationsFactory {
               There are Elasticsearch nodes in the cluster with almost no free disk, their disk usage is above the high watermark.{' '}
               For this reason Elasticsearch will attempt to relocate shards away from the affected nodes.{' '}
               The affected nodes are: [{notification.details.nodes}]{' '}
-              Check <a href="https://www.elastic.co/guide/en/elasticsearch/reference/master/disk-allocator.html" target="_blank">https://www.elastic.co/guide/en/elasticsearch/reference/master/disk-allocator.html</a>{' '}
+              Check <a href="https://www.elastic.co/guide/en/elasticsearch/reference/master/disk-allocator.html" target="_blank" rel="noreferrer">https://www.elastic.co/guide/en/elasticsearch/reference/master/disk-allocator.html</a>{' '}
               for more details.
             </span>
           ),
@@ -296,7 +301,7 @@ class NotificationsFactory {
               There are Elasticsearch nodes in the cluster without free disk, their disk usage is above the flood stage watermark.{' '}
               For this reason Elasticsearch enforces a read-only index block on all indexes having any of their shards in any of the{' '}
               affected nodes. The affected nodes are: [{notification.details.nodes}]{' '}
-              Check <a href="https://www.elastic.co/guide/en/elasticsearch/reference/master/disk-allocator.html" target="_blank">https://www.elastic.co/guide/en/elasticsearch/reference/master/disk-allocator.html</a>{' '}
+              Check <a href="https://www.elastic.co/guide/en/elasticsearch/reference/master/disk-allocator.html" target="_blank" rel="noreferrer">https://www.elastic.co/guide/en/elasticsearch/reference/master/disk-allocator.html</a>{' '}
               for more details.
             </span>
           ),

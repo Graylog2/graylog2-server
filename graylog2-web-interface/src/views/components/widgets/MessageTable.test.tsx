@@ -18,6 +18,8 @@ import * as React from 'react';
 import { mount } from 'wrappedEnzyme';
 import * as Immutable from 'immutable';
 import suppressConsole from 'helpers/suppressConsole';
+import { MockStore } from 'helpers/mocking';
+import MockAction from 'helpers/mocking/MockAction';
 
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldType from 'views/logic/fieldtypes/FieldType';
@@ -25,8 +27,16 @@ import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 
 import MessageTable from './MessageTable';
 
+import { TableBody } from '../messagelist/MessageTableEntry';
 import InteractiveContext from '../contexts/InteractiveContext';
 import HighlightMessageContext from '../contexts/HighlightMessageContext';
+
+jest.mock('stores/configurations/ConfigurationsStore', () => ({
+  ConfigurationsStore: MockStore(),
+  ConfigurationsActions: {
+    listSearchesClusterConfig: MockAction(),
+  },
+}));
 
 const messages = [
   {
@@ -71,14 +81,13 @@ describe('MessageTable', () => {
     expect(td.text()).toContain('frank.txt');
   });
 
-  it('renders a table entry for messages, even if fields are `undefined`', () => {
+  it('renders a table entry for messages, even if fields are `undefined`', async () => {
     // Suppressing console to disable props warning because of `fields` being `undefined`.
-    suppressConsole(() => {
-      const wrapper = mount(<SimpleMessageTable fields={undefined} />);
-      const messageTableEntry = wrapper.find('MessageTableEntry');
+    const wrapper = await suppressConsole(() => mount(<SimpleMessageTable fields={undefined} />));
 
-      expect(messageTableEntry).not.toBeEmptyRender();
-    });
+    const messageTableEntry = wrapper.find('MessageTableEntry');
+
+    expect(messageTableEntry).not.toBeEmptyRender();
   });
 
   it('renders config fields in table head with correct order', () => {
@@ -105,16 +114,16 @@ describe('MessageTable', () => {
     expect(tableHeadFields).toEqual(configFields);
   });
 
-  it('highlights messsage with id passed in `HighlightMessageContext`', () => {
+  it('highlights message with id passed in `HighlightMessageContext`', () => {
     const wrapper = mount((
       <HighlightMessageContext.Provider value="message-id-1">
         <SimpleMessageTable />
       </HighlightMessageContext.Provider>
     ));
 
-    const highlightedMessage = wrapper.find('.message-highlight');
+    const highlightedMessage = wrapper.find(TableBody);
 
-    expect(highlightedMessage).toExist();
+    expect(highlightedMessage).toHaveProp('highlighted', true);
   });
 
   it('does not highlight non-existing message id', () => {
@@ -124,9 +133,9 @@ describe('MessageTable', () => {
       </HighlightMessageContext.Provider>
     ));
 
-    const highlightedMessage = wrapper.find('.message-highlight');
+    const highlightedMessage = wrapper.find(TableBody);
 
-    expect(highlightedMessage).not.toExist();
+    expect(highlightedMessage).toHaveProp('highlighted', false);
   });
 
   it('shows sort icons next to table headers', () => {

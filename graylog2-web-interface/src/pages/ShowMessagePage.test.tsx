@@ -15,8 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, waitFor } from 'wrappedTestingLibrary';
-import { StoreMock as MockStore } from 'helpers/mocking';
+import { render, waitFor, screen } from 'wrappedTestingLibrary';
+import { StoreMock as MockStore, asMock } from 'helpers/mocking';
+
+import DefaultQueryClientProvider from 'contexts/DefaultQueryClientProvider';
+import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
 
 import ShowMessagePage from './ShowMessagePage';
 import { message, event, input } from './ShowMessagePage.fixtures';
@@ -30,42 +33,60 @@ const mockListNodes = jest.fn();
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const mockListStreams = jest.fn((...args) => Promise.resolve([]));
 
-jest.mock('injection/CombinedProvider', () => ({
-  get: jest.fn((type) => ({
-    Inputs: { InputsActions: { get: (...args) => mockGetInput(...args) }, InputsStore: {} },
-    Nodes: {
-      NodesActions: { list: (...args) => mockListNodes(...args) },
-      NodesStore: MockStore(['listen', () => () => {}], ['getInitialState', () => ({ nodes: {} })]),
-    },
-    Messages: { MessagesActions: { loadMessage: (...args) => mockLoadMessage(...args) } },
-    Streams: { StreamsStore: { listStreams: (...args) => mockListStreams(...args) } },
-    CurrentUser: {
-      CurrentUserStore: MockStore(),
-    },
-    Preferences: {
-      PreferencesStore: MockStore(),
-    },
-  }[type])),
+jest.mock('stores/nodes/NodesStore', () => ({
+  NodesActions: { list: (...args) => mockListNodes(...args) },
+  NodesStore: MockStore(['listen', () => () => {}], ['getInitialState', () => ({ nodes: {} })]),
 }));
 
+jest.mock('stores/messages/MessagesStore', () => ({
+  MessagesActions: { loadMessage: (...args) => mockLoadMessage(...args) },
+}));
+
+jest.mock('stores/inputs/InputsStore', () => ({
+  InputsActions: {
+    get: jest.fn((...args) => mockGetInput(...args)),
+  },
+  InputsStore: MockStore(),
+}));
+
+jest.mock('stores/streams/StreamsStore', () => ({ listStreams: (...args) => mockListStreams(...args) }));
+
+jest.mock('views/logic/fieldtypes/useFieldTypes');
 jest.mock('routing/withParams', () => (x) => x);
 
+type SimpleShowMessagePageProps = {
+  index: string,
+  messageId: string,
+};
+
+const SimpleShowMessagePage = ({ index, messageId }: SimpleShowMessagePageProps) => (
+  <DefaultQueryClientProvider>
+    {/* @ts-expect-error */}
+    <ShowMessagePage params={{ index, messageId }} />
+  </DefaultQueryClientProvider>
+);
+
 describe('ShowMessagePage', () => {
+  beforeEach(() => {
+    asMock(useFieldTypes).mockReturnValue({ data: [] });
+  });
+
   it('triggers a node list refresh on mount', async () => {
     mockLoadMessage.mockImplementation(() => Promise.resolve(message));
     mockGetInput.mockImplementation(() => Promise.resolve(input));
-    // @ts-ignore
-    render(<ShowMessagePage params={{ index: 'graylog_5', messageId: '20f683d2-a874-11e9-8a11-0242ac130004' }} />);
+
+    render(<SimpleShowMessagePage index="graylog_5" messageId="20f683d2-a874-11e9-8a11-0242ac130004" />);
+
     await waitFor(() => expect(mockListNodes).toHaveBeenCalled());
   });
 
   it('renders for generic message', async () => {
     mockLoadMessage.mockImplementation(() => Promise.resolve(message));
     mockGetInput.mockImplementation(() => Promise.resolve(input));
-    // @ts-ignore
-    const { container, queryByTestId } = render(<ShowMessagePage params={{ index: 'graylog_5', messageId: '20f683d2-a874-11e9-8a11-0242ac130004' }} />);
 
-    await waitFor(() => expect(queryByTestId('spinner')).toBeNull());
+    const { container } = render(<SimpleShowMessagePage index="graylog_5" messageId="20f683d2-a874-11e9-8a11-0242ac130004" />);
+
+    await screen.findByText(/Deprecated field/);
 
     expect(container).toMatchSnapshot();
   });
@@ -73,10 +94,10 @@ describe('ShowMessagePage', () => {
   it('renders for generic event', async () => {
     mockLoadMessage.mockImplementation(() => Promise.resolve(event));
     mockGetInput.mockImplementation(() => Promise.resolve());
-    // @ts-ignore
-    const { container, queryByTestId } = render(<ShowMessagePage params={{ index: 'gl-events_0', messageId: '01DFZQ64CMGV30NT7DW2P7HQX2' }} />);
 
-    await waitFor(() => expect(queryByTestId('spinner')).toBeNull());
+    const { container } = render(<SimpleShowMessagePage index="gl-events_0" messageId="01DFZQ64CMGV30NT7DW2P7HQX2" />);
+
+    await screen.findByText(/SSH Brute Force/);
 
     expect(container).toMatchSnapshot();
   });

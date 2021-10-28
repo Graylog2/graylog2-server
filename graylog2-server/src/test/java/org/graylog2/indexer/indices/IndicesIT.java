@@ -23,10 +23,13 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog2.audit.NullAuditEventSender;
+import org.graylog2.indexer.IgnoreIndexTemplate;
 import org.graylog2.indexer.IndexMappingFactory;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetStatsCreator;
+import org.graylog2.indexer.IndexTemplateNotFoundException;
+import org.graylog2.indexer.MessageIndexTemplateProvider;
 import org.graylog2.indexer.TestIndexSet;
 import org.graylog2.indexer.cluster.Node;
 import org.graylog2.indexer.cluster.NodeAdapter;
@@ -60,6 +63,8 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -99,7 +104,8 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
         //noinspection UnstableApiUsage
         eventBus = new EventBus("indices-test");
         final Node node = new Node(createNodeAdapter());
-        final IndexMappingFactory indexMappingFactory = new IndexMappingFactory(node);
+        final IndexMappingFactory indexMappingFactory = new IndexMappingFactory(node,
+                ImmutableMap.of(MessageIndexTemplateProvider.MESSAGE_TEMPLATE_TYPE, new MessageIndexTemplateProvider()));
         indices = new Indices(
                 indexMappingFactory,
                 mock(NodeId.class),
@@ -312,6 +318,58 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
         assertThat(listener.indicesDeletedEvents).isEmpty();
     }
 
+    @Test
+    public void ensureIndexTemplateDoesntThrowOnIgnoreIndexTemplateAndExistingTemplate() {
+        final String templateName = indexSetConfig.indexTemplateName();
+
+        indices.ensureIndexTemplate(indexSet);
+
+        assertThat(client().templateExists(templateName)).isTrue();
+
+        indices = new Indices(
+                createThrowingIndexMappingFactory(indexSetConfig),
+                mock(NodeId.class),
+                new NullAuditEventSender(),
+                eventBus,
+                indicesAdapter());
+
+        assertThatCode(() -> indices.ensureIndexTemplate(indexSet)).doesNotThrowAnyException();
+
+        assertThat(client().templateExists(templateName)).isTrue();
+    }
+
+    private IndexMappingFactory createThrowingIndexMappingFactory(IndexSetConfig indexSetConfig) {
+        final IndexMappingFactory indexMappingFactory = mock(IndexMappingFactory.class);
+        when(indexMappingFactory.createIndexMapping(any()))
+                .thenThrow(new IgnoreIndexTemplate(true, "Reason",
+                        indexSetConfig.indexPrefix(), indexSetConfig.indexTemplateName(),
+                        indexSetConfig.indexTemplateType().orElse(null)));
+        return indexMappingFactory;
+    }
+
+    @Test
+    public void ensureIndexTemplateThrowsOnIgnoreIndexTemplateAndNonExistingTemplate() {
+        final String templateName = indexSetConfig.indexTemplateName();
+
+        try {
+            indices.deleteIndexTemplate(indexSet);
+        } catch (Exception e) {
+        }
+
+        assertThat(client().templateExists(templateName)).isFalse();
+
+        indices = new Indices(
+                createThrowingIndexMappingFactory(indexSetConfig),
+                mock(NodeId.class),
+                new NullAuditEventSender(),
+                eventBus,
+                indicesAdapter());
+
+        assertThatCode(() -> indices.ensureIndexTemplate(indexSet))
+                .isExactlyInstanceOf(IndexTemplateNotFoundException.class)
+                .hasMessage("No index template with name 'template-1' (type - 'null') found in Elasticsearch");
+    }
+
     @SuppressWarnings("UnstableApiUsage")
     public static final class IndicesEventListener {
         final List<IndicesClosedEvent> indicesClosedEvents = Collections.synchronizedList(new ArrayList<>());
@@ -455,5 +513,28 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
         importFixture("org/graylog2/indexer/indices/IndicesIT.json");
 
         indices.optimizeIndex("graylog_0", 1, Duration.minutes(1));
+    }
+
+    @Test
+    public void aliasTargetReturnsListOfTargetsGivenAliasIsPointingToWithWildcards() {
+        final String index = client().createRandomIndex("indices_it_");
+        final String alias = "graylog_alias_target";
+        assertThat(indices.aliasTarget(alias)).isEmpty();
+
+        client().addAliasMapping(index, alias);
+
+        assertThat(indices.aliasTarget("graylog_alias_*")).contains(index);
+    }
+
+    @Test
+    public void aliasTargetSupportsIndicesWithPlusInName() {
+        final String prefixWithPlus = "index+set_";
+        final String index = client().createRandomIndex(prefixWithPlus);
+        final String alias = prefixWithPlus + "deflector";
+        assertThat(indices.aliasTarget(alias)).isEmpty();
+
+        client().addAliasMapping(index, alias);
+
+        assertThat(indices.aliasTarget(prefixWithPlus + "*")).contains(index);
     }
 }

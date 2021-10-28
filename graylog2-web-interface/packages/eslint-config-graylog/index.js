@@ -49,11 +49,12 @@ module.exports = {
       extends: [
         'plugin:jest/recommended',
         'plugin:testing-library/react',
-        'plugin:testing-library/recommended',
       ],
       rules: {
         'jest/expect-expect': ['error', { assertFunctionNames: ['expect*', '(screen.)?find(All)?By*'] }],
         'testing-library/no-debug': 'warn',
+        'testing-library/prefer-screen-queries': 'off',
+        'testing-library/render-result-naming-convention': 'off',
       },
     },
   ],
@@ -91,7 +92,7 @@ module.exports = {
     'no-restricted-imports': ['error', {
       paths: [{
         name: 'react-bootstrap',
-        message: 'Please use `components/graylog` instead.',
+        message: 'Please use `components/bootstrap` instead.',
       }, {
         name: 'create-react-class',
         message: 'Please use an ES6 or functional component instead.',
@@ -105,6 +106,7 @@ module.exports = {
     'object-shorthand': ['error', 'methods'],
     'react/forbid-prop-types': 'off',
     'react/jsx-closing-bracket-location': ['warn', 'after-props'],
+    'react/jsx-curly-spacing': ['warn', { when: 'never', children: true }],
     'react/jsx-filename-extension': [1, { extensions: ['.jsx', '.tsx'] }],
     'react/jsx-first-prop-new-line': ['warn', 'never'],
     'react/jsx-indent-props': ['error', 'first'],
@@ -153,8 +155,9 @@ module.exports = {
       },
     },
     polyfills: [
-      'Promise',
       'fetch',
+      'IntersectionObserver',
+      'Promise',
     ],
   },
 };

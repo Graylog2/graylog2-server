@@ -27,7 +27,14 @@ import javax.annotation.Nullable;
 
 @AutoValue
 public abstract class PipelineDao {
-    @JsonProperty("id")
+    public static final String FIELD_ID = "id";
+    public static final String FIELD_TITLE = "title";
+    public static final String FIELD_DESCRIPTION = "description";
+    public static final String FIELD_SOURCE = "source";
+    public static final String FIELD_CREATED_AT = "created_at";
+    public static final String FIELD_MODIFIED_AT = "modified_at";
+
+    @JsonProperty(FIELD_ID)
     @Nullable
     @Id
     @ObjectId
@@ -59,11 +66,11 @@ public abstract class PipelineDao {
 
     @JsonCreator
     public static PipelineDao create(@Id @ObjectId @JsonProperty("_id") @Nullable String id,
-                                        @JsonProperty("title")  String title,
-                                        @JsonProperty("description") @Nullable String description,
-                                        @JsonProperty("source") String source,
-                                        @Nullable @JsonProperty("created_at") DateTime createdAt,
-                                        @Nullable @JsonProperty("modified_at") DateTime modifiedAt) {
+                                        @JsonProperty(FIELD_TITLE)  String title,
+                                        @JsonProperty(FIELD_DESCRIPTION) @Nullable String description,
+                                        @JsonProperty(FIELD_SOURCE) String source,
+                                        @Nullable @JsonProperty(FIELD_CREATED_AT) DateTime createdAt,
+                                        @Nullable @JsonProperty(FIELD_MODIFIED_AT) DateTime modifiedAt) {
         return builder()
                 .id(id)
                 .title(title)

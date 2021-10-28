@@ -30,6 +30,11 @@ import org.graylog2.system.jobs.SystemJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.EnumSet;
+
+import static org.graylog2.buffers.Buffers.Type.OUTPUT;
+import static org.graylog2.buffers.Buffers.Type.PROCESS;
+
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
@@ -92,7 +97,7 @@ public class FixDeflectorByDeleteJob extends SystemJob {
         serverStatus.pauseMessageProcessing();
         progress = 10;
 
-        bufferSynchronizer.waitForEmptyBuffers();
+        bufferSynchronizer.waitForEmptyBuffers(EnumSet.of(PROCESS, OUTPUT));
         progress = 25;
 
         // Delete deflector index.

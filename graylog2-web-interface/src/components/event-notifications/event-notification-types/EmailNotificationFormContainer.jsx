@@ -21,12 +21,10 @@ import PropTypes from 'prop-types';
 import UsersDomain from 'domainActions/users/UsersDomain';
 import { Spinner } from 'components/common';
 import { isPermitted } from 'util/PermissionsMixin';
-import CombinedProvider from 'injection/CombinedProvider';
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import connect from 'stores/connect';
 
 import EmailNotificationForm from './EmailNotificationForm';
-
-const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 
 class EmailNotificationFormContainer extends React.Component {
   static propTypes = {

@@ -17,7 +17,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 
-import { MessageDetailsDefinitionList } from 'components/graylog';
+import { MessageDetailsDefinitionList } from 'components/common';
 
 type Props = {
   timestamp: string,

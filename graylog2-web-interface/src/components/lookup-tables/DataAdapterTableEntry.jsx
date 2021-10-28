@@ -17,15 +17,12 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { LinkContainer, Link } from 'components/graylog/router';
+import { LinkContainer, Link } from 'components/common/router';
 import Routes from 'routing/Routes';
-import CombinedProvider from 'injection/CombinedProvider';
-import { Button } from 'components/graylog';
+import { Button } from 'components/bootstrap';
 import { ErrorPopover } from 'components/lookup-tables';
-import { ContentPackMarker } from 'components/common';
 import { MetricContainer, CounterRate } from 'components/metrics';
-
-const { LookupTableDataAdaptersActions } = CombinedProvider.get('LookupTableDataAdapters');
+import { LookupTableDataAdaptersActions } from 'stores/lookup-tables/LookupTableDataAdaptersStore';
 
 class DataAdapterTableEntry extends React.Component {
   static propTypes = {
@@ -55,7 +52,6 @@ class DataAdapterTableEntry extends React.Component {
           <td>
             {error && <ErrorPopover errorText={error} title="Lookup table problem" placement="right" />}
             <Link to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.show(adapter.name)}>{adapter.title}</Link>
-            <ContentPackMarker contentPack={adapter.content_pack} marginLeft={5} />
           </td>
           <td>{adapter.description}</td>
           <td>{adapter.name}</td>

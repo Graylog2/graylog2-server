@@ -26,8 +26,8 @@ import com.google.inject.assistedinject.AssistedInject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.Permission;
 import org.apache.shiro.authz.permission.AllPermission;
-import org.apache.shiro.authz.permission.WildcardPermission;
 import org.bson.types.ObjectId;
+import org.graylog.security.permissions.CaseSensitiveWildcardPermission;
 import org.graylog2.Configuration;
 import org.graylog2.database.CollectionName;
 import org.graylog2.database.ObjectIdStringFunction;
@@ -122,10 +122,10 @@ public class UserImpl extends PersistedImpl implements User {
     }
 
     @AssistedInject
-    protected UserImpl(PasswordAlgorithmFactory passwordAlgorithmFactory,
-                       Permissions permissions,
-                       @Assisted final ObjectId id,
-                       @Assisted final Map<String, Object> fields) {
+    public UserImpl(PasswordAlgorithmFactory passwordAlgorithmFactory,
+                    Permissions permissions,
+                    @Assisted final ObjectId id,
+                    @Assisted final Map<String, Object> fields) {
         super(id, fields);
         this.passwordAlgorithmFactory = passwordAlgorithmFactory;
         this.permissions = permissions;
@@ -241,7 +241,7 @@ public class UserImpl extends PersistedImpl implements User {
             if (p.equals("*")) {
                 return new AllPermission();
             } else {
-                return new WildcardPermission(p);
+                return new CaseSensitiveWildcardPermission(p);
             }
 
         }).collect(Collectors.toSet());

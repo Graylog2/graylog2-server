@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 
-import { Alert } from 'components/graylog';
+import { Alert } from 'components/bootstrap';
 import { Icon } from 'components/common';
 
 const ProfileUpdateInfo = () => (

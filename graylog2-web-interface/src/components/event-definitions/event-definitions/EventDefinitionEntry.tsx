@@ -20,19 +20,19 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import Routes from 'routing/Routes';
-import { Link, LinkContainer } from 'components/graylog/router';
-import {
-  Button,
-  DropdownButton,
-  Label,
-  MenuItem,
-} from 'components/graylog';
+import { Link, LinkContainer } from 'components/common/router';
 import {
   EntityListItem,
   IfPermitted,
   Icon,
   ShareButton,
 } from 'components/common';
+import {
+  Button,
+  DropdownButton,
+  Label,
+  MenuItem,
+} from 'components/bootstrap';
 
 import EventDefinitionDescription from './EventDefinitionDescription';
 
@@ -116,9 +116,8 @@ const EventDefinitionEntry = ({
                       title={linkTitle}
                       titleSuffix={titleSuffix}
                       description={renderDescription(eventDefinition, context)}
-                      noItemsText="Could not find any items with the given filter."
                       actions={actions} />
-      { showEntityShareModal && (
+      {showEntityShareModal && (
         <EntityShareModal entityId={eventDefinition.id}
                           entityType="event_definition"
                           entityTypeTitle="event definition"

@@ -32,6 +32,7 @@ import org.glassfish.grizzly.http.server.NetworkListener;
 import org.glassfish.grizzly.ssl.SSLContextConfigurator;
 import org.glassfish.grizzly.ssl.SSLEngineConfigurator;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.server.model.Resource;
@@ -40,9 +41,11 @@ import org.graylog2.Configuration;
 import org.graylog2.audit.PluginAuditEventTypes;
 import org.graylog2.audit.jersey.AuditEventModelProcessor;
 import org.graylog2.configuration.HttpConfiguration;
+import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.jersey.PrefixAddingModelProcessor;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.rest.MoreMediaTypes;
 import org.graylog2.rest.filter.WebAppNotFoundResponseFilter;
 import org.graylog2.shared.rest.CORSFilter;
 import org.graylog2.shared.rest.NodeIdResponseFilter;
@@ -71,6 +74,7 @@ import javax.inject.Named;
 import javax.net.ssl.SSLContext;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.container.DynamicFeature;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.ExceptionMapper;
 import java.io.IOException;
@@ -112,6 +116,7 @@ public class JerseyService extends AbstractIdleService {
     private final ObjectMapper objectMapper;
     private final MetricRegistry metricRegistry;
     private final ErrorPageGenerator errorPageGenerator;
+    private final TLSProtocolsConfiguration tlsConfiguration;
 
     private HttpServer apiHttpServer = null;
 
@@ -126,7 +131,8 @@ public class JerseyService extends AbstractIdleService {
                          Set<PluginAuditEventTypes> pluginAuditEventTypes,
                          ObjectMapper objectMapper,
                          MetricRegistry metricRegistry,
-                         ErrorPageGenerator errorPageGenerator) {
+                         ErrorPageGenerator errorPageGenerator,
+                         TLSProtocolsConfiguration tlsConfiguration) {
         this.configuration = requireNonNull(configuration, "configuration");
         this.graylogConfiguration = graylogConfiguration;
         this.dynamicFeatures = requireNonNull(dynamicFeatures, "dynamicFeatures");
@@ -139,6 +145,7 @@ public class JerseyService extends AbstractIdleService {
         this.objectMapper = requireNonNull(objectMapper, "objectMapper");
         this.metricRegistry = requireNonNull(metricRegistry, "metricRegistry");
         this.errorPageGenerator = requireNonNull(errorPageGenerator, "errorPageGenerator");
+        this.tlsConfiguration = requireNonNull(tlsConfiguration);
     }
 
     @Override
@@ -233,7 +240,8 @@ public class JerseyService extends AbstractIdleService {
         final ResourceConfig rc = new ResourceConfig()
                 .property(ServerProperties.BV_SEND_ERROR_IN_RESPONSE, true)
                 .property(ServerProperties.WADL_FEATURE_DISABLE, true)
-                .register(new PrefixAddingModelProcessor(packagePrefixes))
+                .property(ServerProperties.MEDIA_TYPE_MAPPINGS, mediaTypeMappings())
+                .register(new PrefixAddingModelProcessor(packagePrefixes, graylogConfiguration))
                 .register(new AuditEventModelProcessor(pluginAuditEventTypes))
                 .registerClasses(
                         ShiroSecurityContextFilter.class,
@@ -253,6 +261,7 @@ public class JerseyService extends AbstractIdleService {
                         XHRFilter.class,
                         NotAuthorizedResponseFilter.class,
                         WebAppNotFoundResponseFilter.class)
+                // Replacing this with a lambda leads to missing subtypes - https://github.com/Graylog2/graylog2-server/pull/10617#discussion_r630236360
                 .register(new ContextResolver<ObjectMapper>() {
                     @Override
                     public ObjectMapper getContext(Class<?> type) {
@@ -260,6 +269,7 @@ public class JerseyService extends AbstractIdleService {
                     }
                 })
                 .register(new UserContextBinder())
+                .register(MultiPartFeature.class)
                 .registerClasses(systemRestResources)
                 .registerResources(additionalResources);
 
@@ -278,6 +288,15 @@ public class JerseyService extends AbstractIdleService {
         }
 
         return rc;
+    }
+
+    private Map<String, MediaType> mediaTypeMappings() {
+        return ImmutableMap.of(
+            "json", MediaType.APPLICATION_JSON_TYPE,
+            "ndjson", MoreMediaTypes.APPLICATION_NDJSON_TYPE,
+            "csv", MoreMediaTypes.TEXT_CSV_TYPE,
+            "log", MoreMediaTypes.TEXT_PLAIN_TYPE
+        );
     }
 
     private HttpServer setUp(URI listenUri,
@@ -339,9 +358,7 @@ public class JerseyService extends AbstractIdleService {
 
         final SSLContext sslContext = sslContextConfigurator.createSSLContext(true);
         final SSLEngineConfigurator sslEngineConfigurator = new SSLEngineConfigurator(sslContext, false, false, false);
-        if (!graylogConfiguration.getEnabledTlsProtocols().isEmpty()) {
-            sslEngineConfigurator.setEnabledProtocols(graylogConfiguration.getEnabledTlsProtocols().toArray(new String[0]));
-        }
+        sslEngineConfigurator.setEnabledProtocols(tlsConfiguration.getEnabledTlsProtocols().toArray(new String[0]));
         return sslEngineConfigurator;
     }
 

@@ -221,7 +221,7 @@ public class IndexSetsResource extends RestResource {
     public IndexSetSummary save(@ApiParam(name = "Index set configuration", required = true)
                                 @Valid @NotNull IndexSetSummary indexSet) {
         try {
-            final IndexSetConfig indexSetConfig = indexSet.toIndexSetConfig();
+            final IndexSetConfig indexSetConfig = indexSet.toIndexSetConfig(true);
 
             final Optional<IndexSetValidator.Violation> violation = indexSetValidator.validate(indexSetConfig);
             if (violation.isPresent()) {
@@ -281,8 +281,8 @@ public class IndexSetsResource extends RestResource {
         final IndexSetConfig indexSet = indexSetService.get(id)
                 .orElseThrow(() -> new NotFoundException("Index set <" + id + "> does not exist"));
 
-        if (!indexSet.isWritable()) {
-            throw new ClientErrorException("Default index set must be writable.", Response.Status.CONFLICT);
+        if (!indexSet.isRegularIndex()) {
+            throw new ClientErrorException("Index set not eligible as default", Response.Status.CONFLICT);
         }
 
         clusterConfigService.write(DefaultIndexSetConfig.create(indexSet.id()));

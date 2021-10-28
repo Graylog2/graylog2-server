@@ -19,15 +19,13 @@ import styled from 'styled-components';
 
 import connect from 'stores/connect';
 import { DocumentTitle, Spinner } from 'components/common';
-import { Row } from 'components/graylog';
+import { Row } from 'components/bootstrap';
 import GettingStarted from 'components/gettingstarted/GettingStarted';
 import Routes from 'routing/Routes';
 import history from 'util/History';
-import StoreProvider from 'injection/StoreProvider';
 import withLocation from 'routing/withLocation';
 import type { Location } from 'routing/withLocation';
-
-const SystemStore = StoreProvider.getStore('System');
+import { SystemStore } from 'stores/system/SystemStore';
 
 const GETTING_STARTED_URL = 'https://gettingstarted.graylog.org/';
 

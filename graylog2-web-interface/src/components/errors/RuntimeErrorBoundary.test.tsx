@@ -48,23 +48,23 @@ describe('RuntimeErrorBoundary', () => {
     expect(getByText('Hello World!')).not.toBe(null);
   });
 
-  it('calls display error action after catching', () => {
-    suppressConsole(() => {
+  it('calls display error action after catching', async () => {
+    await suppressConsole(() => {
       render(
         <RuntimeErrorBoundary>
           <ErroneusComponent />
         </RuntimeErrorBoundary>,
       );
-
-      expect(ErrorsActions.report).toHaveBeenCalledTimes(1);
-
-      expect(ErrorsActions.report.mock.calls[0][0].error).toStrictEqual({
-        message: 'Oh no, a banana peel fell on the party gorilla\'s head!',
-        stack: 'This the stack trace.',
-      });
-
-      expect(ErrorsActions.report.mock.calls[0][0].type).toEqual(ReactErrorType);
-      expect(ErrorsActions.report.mock.calls[0][0].componentStack).not.toBeNull();
     });
+
+    expect(ErrorsActions.report).toHaveBeenCalledTimes(1);
+
+    expect(ErrorsActions.report.mock.calls[0][0].error).toStrictEqual({
+      message: 'Oh no, a banana peel fell on the party gorilla\'s head!',
+      stack: 'This the stack trace.',
+    });
+
+    expect(ErrorsActions.report.mock.calls[0][0].type).toEqual(ReactErrorType);
+    expect(ErrorsActions.report.mock.calls[0][0].componentStack).not.toBeNull();
   });
 });

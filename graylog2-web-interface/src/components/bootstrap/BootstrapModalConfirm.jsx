@@ -17,8 +17,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { Modal, Button } from 'components/graylog';
-import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
+import Modal from './Modal';
+import BootstrapModalWrapper from './BootstrapModalWrapper';
+import Button from './Button';
 
 /**
  * Component that displays a confirmation dialog box that the user can
@@ -113,7 +114,8 @@ class BootstrapModalConfirm extends React.Component {
                              showModal={showModal}
                              onOpen={onModalOpen}
                              onClose={onModalClose}
-                             onHide={this.onCancel}>
+                             onHide={this.onCancel}
+                             role="alertdialog">
         <Modal.Header closeButton>
           <Modal.Title>{title}</Modal.Title>
         </Modal.Header>

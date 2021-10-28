@@ -18,23 +18,49 @@ import * as React from 'react';
 import { useRef } from 'react';
 import { Overlay } from 'react-overlays';
 import styled from 'styled-components';
+import { useFormikContext } from 'formik';
 
-import { Button } from 'components/graylog';
-import { Icon } from 'components/common';
+import { TimeRange, NoTimeRangeOverride, RelativeTimeRangeWithEnd } from 'views/logic/queries/Query';
+import { ButtonGroup } from 'components/bootstrap';
+import { normalizeIfAllMessagesRange } from 'views/logic/queries/NormalizeTimeRange';
+
+import RangePresetDropdown from './RangePresetDropdown';
+import TimeRangeButton from './TimeRangeButton';
 
 type Props = {
   children: React.ReactNode,
   disabled?: boolean,
   hasErrorOnMount?: boolean,
+  onPresetSelectOpen: () => void,
+  setCurrentTimeRange: (nextTimeRange: TimeRange | NoTimeRangeOverride) => void,
   show?: boolean,
   toggleShow: () => void,
+  showPresetDropdown?: boolean,
 };
+
+const StyledRangePresetDropdown = styled(RangePresetDropdown)`
+  padding: 6px;
+`;
 
 const RelativePosition = styled.div`
   position: relative;
 `;
 
-const TimeRangeDropdownButton = ({ children, disabled, hasErrorOnMount, show, toggleShow }: Props) => {
+const StyledButtonGroup = styled(ButtonGroup)`
+  display: flex;
+`;
+
+const TimeRangeDropdownButton = ({
+  children,
+  disabled,
+  hasErrorOnMount,
+  onPresetSelectOpen,
+  setCurrentTimeRange,
+  show,
+  showPresetDropdown = true,
+  toggleShow,
+}: Props) => {
+  const { submitForm } = useFormikContext();
   const containerRef = useRef();
 
   const _onClick = (e) => {
@@ -42,15 +68,41 @@ const TimeRangeDropdownButton = ({ children, disabled, hasErrorOnMount, show, to
     toggleShow();
   };
 
+  const selectRelativeTimeRangePreset = (from) => {
+    const nextTimeRange: RelativeTimeRangeWithEnd = {
+      type: 'relative',
+      from,
+    };
+    setCurrentTimeRange(normalizeIfAllMessagesRange(nextTimeRange));
+
+    submitForm();
+  };
+
+  const _onPresetSelectToggle = (open: boolean) => {
+    if (open) {
+      onPresetSelectOpen();
+    }
+  };
+
+  const dropdown = showPresetDropdown
+    ? (
+      <StyledRangePresetDropdown disabled={disabled}
+                                 displayTitle={false}
+                                 onChange={selectRelativeTimeRangePreset}
+                                 onToggle={_onPresetSelectToggle}
+                                 header="From (Until Now)"
+                                 bsSize={null} />
+    )
+    : null;
+
   return (
     <RelativePosition ref={containerRef}>
-      <Button bsStyle={hasErrorOnMount ? 'danger' : 'info'}
-              disabled={disabled}
-              onClick={_onClick}
-              aria-label="Open Time Range Selector">
-        <Icon name={hasErrorOnMount ? 'exclamation-triangle' : 'clock'} />
-      </Button>
-
+      <StyledButtonGroup>
+        <TimeRangeButton hasError={hasErrorOnMount}
+                         disabled={disabled}
+                         onClick={_onClick} />
+        {dropdown}
+      </StyledButtonGroup>
       <Overlay show={show}
                trigger="click"
                placement="bottom"
@@ -66,6 +118,7 @@ TimeRangeDropdownButton.defaultProps = {
   hasErrorOnMount: false,
   disabled: false,
   show: false,
+  showPresetDropdown: true,
 };
 
 export default TimeRangeDropdownButton;

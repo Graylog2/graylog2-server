@@ -18,7 +18,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 
-import { Col, ControlLabel, FormGroup, Radio, Row } from 'components/graylog';
+import { Col, ControlLabel, FormGroup, Radio, Row } from 'components/bootstrap';
 import * as FormsUtils from 'util/FormsUtils';
 
 import FilterForm from './FilterForm';
@@ -53,6 +53,11 @@ class FilterAggregationForm extends React.Component {
     streams: PropTypes.array.isRequired,
     onChange: PropTypes.func.isRequired,
     currentUser: PropTypes.object.isRequired,
+  };
+
+  static defaultConfig = {
+    ...initialFilterConfig,
+    ...initialAggregationConfig,
   };
 
   constructor(props) {
@@ -117,11 +122,6 @@ class FilterAggregationForm extends React.Component {
     this.propagateChange(name, FormsUtils.getValueFromInput(event.target));
   };
 
-  static defaultConfig = {
-    ...initialFilterConfig,
-    ...initialAggregationConfig,
-  };
-
   render() {
     const { conditionType } = this.state;
     const { allFieldTypes, entityTypes, eventDefinition, streams, validation, currentUser } = this.props;
@@ -132,7 +132,7 @@ class FilterAggregationForm extends React.Component {
           <Col md={7} lg={6}>
             <FilterForm eventDefinition={eventDefinition}
                         validation={validation}
-                        streams={streams}
+                        streams={streams.filter((s) => s.is_editable)}
                         currentUser={currentUser}
                         onChange={this.propagateChange} />
 

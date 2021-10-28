@@ -17,7 +17,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 
-import { Button, Table } from 'components/graylog';
+import { Button, Table } from 'components/bootstrap';
 import { IfPermitted } from 'components/common';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import UrlWhiteListForm from 'components/configurations/UrlWhiteListForm';
@@ -35,8 +35,6 @@ type Props = {
 
 class UrlWhiteListConfig extends React.Component<Props, State> {
   private configModal: BootstrapModalForm | undefined | null;
-
-  private inputs = {};
 
   static propTypes = {
     config: PropTypes.object.isRequired,
@@ -111,7 +109,7 @@ class UrlWhiteListConfig extends React.Component<Props, State> {
 
     return (
       <div>
-        <h2>URL Whitelist Configuration  {disabled ? <small>(Disabled)</small> : <small>(Enabled)</small> }</h2>
+        <h2>URL Whitelist Configuration  {disabled ? <small>(Disabled)</small> : <small>(Enabled)</small>}</h2>
         <p>
           When enabled, outgoing HTTP requests from Graylog servers, such as event notifications or HTTP-based data adapter requests, are validated against the whitelists configured here.
           Because the HTTP requests are made from the Graylog servers, they might be able to reach more sensitive systems than an external user would have access to, including AWS EC2 metadata, which can contain keys and other secrets, Elasticsearch and others.

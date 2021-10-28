@@ -26,12 +26,15 @@ import TimeRangeDropdown, { TimeRangeType } from './date-time-picker/TimeRangeDr
 import TimeRangeDisplay from './TimeRangeDisplay';
 
 type Props = {
-  value: TimeRange | NoTimeRangeOverride,
+  className?: string,
   disabled?: boolean,
-  noOverride?: boolean,
   hasErrorOnMount?: boolean,
+  noOverride?: boolean,
   onChange: (nextTimeRange: TimeRange | NoTimeRangeOverride) => void,
+  position?: 'bottom'|'right',
+  showPresetDropdown?: boolean,
   validTypes?: Array<TimeRangeType>,
+  value: TimeRange | NoTimeRangeOverride,
 };
 
 const FlexContainer = styled.span`
@@ -40,7 +43,7 @@ const FlexContainer = styled.span`
   justify-content: space-between;
 `;
 
-const TimeRangeInput = ({ disabled, hasErrorOnMount, noOverride, value = {}, onChange, validTypes }: Props) => {
+const TimeRangeInput = ({ disabled, hasErrorOnMount, noOverride, value = {}, onChange, validTypes, position, className, showPresetDropdown = true }: Props) => {
   const [show, setShow] = useState(false);
 
   if (validTypes && value && 'type' in value && !validTypes.includes(value?.type)) {
@@ -48,18 +51,23 @@ const TimeRangeInput = ({ disabled, hasErrorOnMount, noOverride, value = {}, onC
   }
 
   const toggleShow = () => setShow(!show);
+  const hideTimeRangeDropDown = () => show && toggleShow();
 
   return (
-    <FlexContainer>
+    <FlexContainer className={className}>
       <TimeRangeDropdownButton disabled={disabled}
                                show={show}
                                toggleShow={toggleShow}
+                               onPresetSelectOpen={hideTimeRangeDropDown}
+                               setCurrentTimeRange={onChange}
+                               showPresetDropdown={showPresetDropdown}
                                hasErrorOnMount={hasErrorOnMount}>
         <TimeRangeDropdown currentTimeRange={value}
                            noOverride={noOverride}
                            setCurrentTimeRange={onChange}
                            toggleDropdownShow={toggleShow}
-                           validTypes={validTypes} />
+                           validTypes={validTypes}
+                           position={position} />
       </TimeRangeDropdownButton>
       <TimeRangeDisplay timerange={value} toggleDropdownShow={toggleShow} />
     </FlexContainer>
@@ -67,6 +75,7 @@ const TimeRangeInput = ({ disabled, hasErrorOnMount, noOverride, value = {}, onC
 };
 
 TimeRangeInput.propTypes = {
+  className: PropTypes.string,
   disabled: PropTypes.bool,
   hasErrorOnMount: PropTypes.bool,
   noOverride: PropTypes.bool,
@@ -74,10 +83,13 @@ TimeRangeInput.propTypes = {
 };
 
 TimeRangeInput.defaultProps = {
+  className: undefined,
   disabled: false,
   hasErrorOnMount: false,
   noOverride: false,
   validTypes: undefined,
+  position: 'bottom',
+  showPresetDropdown: true,
 };
 
 export default TimeRangeInput;

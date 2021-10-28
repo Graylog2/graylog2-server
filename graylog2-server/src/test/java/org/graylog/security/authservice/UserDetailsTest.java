@@ -56,6 +56,7 @@ public class UserDetailsTest {
                           .base64AuthServiceUid("id")
                           .username("username")
                           .accountIsEnabled(true)
+                          .isExternal(true)
                           .email("email@graylog.com")
                           .defaultRoles(new HashSet<>());
     }

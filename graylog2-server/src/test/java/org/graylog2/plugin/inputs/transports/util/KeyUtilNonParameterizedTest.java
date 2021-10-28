@@ -62,6 +62,12 @@ public class KeyUtilNonParameterizedTest {
     }
 
     @Test
+    public void testPrivateKeyFromPKCS1() throws URISyntaxException, IOException, OperatorCreationException, PKCSException {
+        final PrivateKey privateKey = fileToKey(resourceToFile("server.key.unprotected.pkcs1"), null);
+        assertThat(privateKey).isNotNull();
+    }
+
+    @Test
     public void testGeneratePKSC8PrivateKey() throws GeneralSecurityException, IOException, OperatorCreationException, PKCSException, URISyntaxException {
         final PrivateKey privateKey = fileToKey(resourceToFile("server.key.pem.pkcs8.unprotected"), null);
         final String tmpPassword = "dummypassword";

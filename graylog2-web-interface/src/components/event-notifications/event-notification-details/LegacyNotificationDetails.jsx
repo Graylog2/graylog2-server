@@ -18,14 +18,12 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 
-import CombinedProvider from 'injection/CombinedProvider';
 import { ReadOnlyFormGroup, Spinner } from 'components/common';
-import { Alert, Well } from 'components/graylog';
+import { Alert, Well } from 'components/bootstrap';
+import { EventNotificationsActions } from 'stores/event-notifications/EventNotificationsStore';
 
 import emailStyles from '../event-notification-types/EmailNotificationSummary.css';
 import notificationStyles from '../event-notification-types/LegacyNotificationCommonStyles.css';
-
-const { EventNotificationsActions } = CombinedProvider.get('EventNotifications');
 
 const LegacyNotificationDetails = ({ notification }) => {
   const [legacyTypes, setLegacyTypes] = useState();

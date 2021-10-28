@@ -14,12 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-
-type Body = {
-  message: string;
-  type: string;
-  streams?: string[];
-}
+import { isString } from 'lodash';
 
 type Res = {
   text?: string;
@@ -27,33 +22,29 @@ type Res = {
 
 type Additional = {
   status: number;
-  body?: Body;
+  body?: any;
   res?: Res;
 }
 
 export default class FetchError extends Error {
+  name: 'FetchError';
+
   responseMessage: string;
 
   additional: Additional;
 
   status: Additional['status'];
 
-  constructor(message, additional) {
+  constructor(message: string, status: number, additional: any) {
     super(message);
-    this.message = message ?? additional?.message ?? 'Undefined error.';
+    this.name = 'FetchError';
 
-    /* eslint-disable no-console */
-    try {
-      this.responseMessage = additional.body ? additional.body.message : undefined;
+    const details = isString(additional) ? additional : (additional?.message ?? 'Not available');
+    this.message = `There was an error fetching a resource: ${message}. Additional information: ${details}`;
 
-      console.error(`There was an error fetching a resource: ${this.message}.`,
-        `Additional information: ${additional.body && additional.body.message ? additional.body.message : 'Not available'}`);
-    } catch (e) {
-      console.error(`There was an error fetching a resource: ${this.message}. No additional information available.`);
-    }
-    /* eslint-enable no-console */
+    this.responseMessage = additional?.message ?? undefined;
 
-    this.additional = additional;
-    this.status = additional?.status; // Shortcut, as this is often used
+    this.additional = { body: additional, status, res: { text: isString(additional) && additional } };
+    this.status = status; // Shortcut, as this is often used
   }
 }

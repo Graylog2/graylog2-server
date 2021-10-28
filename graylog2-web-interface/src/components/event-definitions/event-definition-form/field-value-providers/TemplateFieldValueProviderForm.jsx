@@ -18,9 +18,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 
-import { Checkbox, Col, FormGroup, HelpBlock, Row } from 'components/graylog';
-import { Input } from 'components/bootstrap';
 import { ExternalLink } from 'components/common';
+import { Checkbox, Col, FormGroup, HelpBlock, Row, Input } from 'components/bootstrap';
 import * as FormsUtils from 'util/FormsUtils';
 
 import TemplateFieldValueProviderPreview from './TemplateFieldValueProviderPreview';

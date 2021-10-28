@@ -19,7 +19,7 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import styled from 'styled-components';
 
-import { Alert } from 'components/graylog';
+import { Alert } from 'components/bootstrap';
 import { Icon } from 'components/common';
 import PermissionsMixin from 'util/PermissionsMixin';
 
@@ -58,13 +58,9 @@ const StreamList = createReactClass({
     );
   },
 
-  _sortByTitle(stream1, stream2) {
-    return stream1.title.localeCompare(stream2.title);
-  },
-
   render() {
     if (this.props.streams.length > 0) {
-      const streamList = this.props.streams.sort(this._sortByTitle).map(this._formatStream);
+      const streamList = this.props.streams.map(this._formatStream);
 
       return (
         <StreamsList>

@@ -133,11 +133,16 @@ public class GelfCodec extends AbstractCodec {
             }
         } catch (final Exception e) {
             log.error("Could not parse JSON, first 400 characters: " +
-                              StringUtils.abbreviate(json, 403), e);
+                    StringUtils.abbreviate(json, 403), e);
             throw new IllegalStateException("JSON is null/could not be parsed (invalid JSON)", e);
         }
 
-        validateGELFMessage(node, rawMessage.getId(), rawMessage.getRemoteAddress());
+        try {
+            validateGELFMessage(node, rawMessage.getId(), rawMessage.getRemoteAddress());
+        } catch (IllegalArgumentException e) {
+            log.trace("Invalid GELF message <{}>", node);
+            throw e;
+        }
 
         // Timestamp.
         final double messageTimestamp = timestampValue(node);

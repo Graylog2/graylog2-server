@@ -24,10 +24,10 @@ import {
   FormGroup,
   ListGroup,
   ListGroupItem,
-  OverlayTrigger,
   Popover,
-} from 'components/graylog';
+} from 'components/bootstrap';
 import Icon from 'components/common/Icon';
+import OverlayTrigger from 'components/common/OverlayTrigger';
 
 import style from './SelectPopover.css';
 

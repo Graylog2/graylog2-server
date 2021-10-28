@@ -17,7 +17,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Modal } from 'components/graylog';
+import Modal from './Modal';
 
 /**
  * Encapsulates a react-bootstrap modal, hiding the state handling for the modal
@@ -36,6 +36,7 @@ class BootstrapModalWrapper extends React.Component {
       'large', 'lg', 'small', 'sm',
     ]),
     backdrop: PropTypes.oneOf(['static', true, false]),
+    role: PropTypes.string,
   };
 
   static defaultProps = {
@@ -45,12 +46,16 @@ class BootstrapModalWrapper extends React.Component {
     onHide: () => {},
     bsSize: undefined,
     backdrop: 'static',
+    role: 'dialog',
   };
 
-  state = {
-    // eslint-disable-next-line react/destructuring-assignment
-    showModal: this.props.showModal || false,
-  };
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      showModal: props.showModal || false,
+    };
+  }
 
   open = () => {
     const { onOpen } = this.props;
@@ -72,13 +77,14 @@ class BootstrapModalWrapper extends React.Component {
 
   render() {
     const { showModal } = this.state;
-    const { children, bsSize, backdrop } = this.props;
+    const { children, bsSize, backdrop, role } = this.props;
 
     return (
       <Modal show={showModal}
              onHide={this.hide}
              bsSize={bsSize}
-             backdrop={backdrop}>
+             backdrop={backdrop}
+             role={role}>
         {children}
       </Modal>
     );

@@ -19,9 +19,8 @@ import React from 'react';
 import naturalSort from 'javascript-natural-sort';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import { Row, Col } from 'components/graylog';
-import { Input } from 'components/bootstrap';
 import { Select } from 'components/common';
+import { Row, Col, Input } from 'components/bootstrap';
 import { DataAdapterForm } from 'components/lookup-tables';
 import ObjectUtils from 'util/ObjectUtils';
 
@@ -38,10 +37,14 @@ class DataAdapterCreate extends React.Component {
     validationErrors: {},
   };
 
-  state = {
-    dataAdapter: undefined,
-    type: undefined,
-  };
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      dataAdapter: undefined,
+      type: undefined,
+    };
+  }
 
   _onTypeSelect = (adapterType) => {
     const { types } = this.props;

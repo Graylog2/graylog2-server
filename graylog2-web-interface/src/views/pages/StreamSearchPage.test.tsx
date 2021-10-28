@@ -18,6 +18,7 @@ import * as React from 'react';
 import { render, waitFor, fireEvent } from 'wrappedTestingLibrary';
 import { act } from 'react-dom/test-utils';
 import asMock from 'helpers/mocking/AsMock';
+import { MockStore } from 'helpers/mocking';
 
 import StreamsContext from 'contexts/StreamsContext';
 import { processHooks } from 'views/logic/views/ViewLoader';
@@ -40,10 +41,18 @@ const mockView = View.create()
 jest.mock('views/components/Search', () => jest.fn(() => <div>Extended search page</div>));
 jest.mock('views/stores/SearchStore', () => ({ SearchActions: {} }));
 
+jest.mock('views/stores/ViewStatesStore', () => ({
+  ViewStatesStore: {
+    listen: jest.fn(),
+    getInitialState: jest.fn(() => ({ has: jest.fn(() => false) })),
+  },
+}));
+
 jest.mock('views/stores/ViewStore', () => ({
   ViewActions: {
     create: jest.fn(() => Promise.resolve({ view: mockView })),
   },
+  ViewStore: MockStore(['getInitialState', () => ({ view: mockView })]),
 }));
 
 jest.mock('routing/withLocation', () => (x) => x);
@@ -91,13 +100,14 @@ describe('StreamSearchPage', () => {
   afterEach(() => {
     jest.clearAllMocks();
     jest.resetModules();
+    jest.useRealTimers();
   });
 
   it('shows loading spinner before rendering page', async () => {
-    const { findByText, getByText } = render(<SimpleStreamSearchPage />);
+    const { findByText } = render(<SimpleStreamSearchPage />);
     act(() => { jest.advanceTimersByTime(200); });
 
-    expect(getByText('Loading...')).not.toBeNull();
+    expect(await findByText('Loading...')).toBeInTheDocument();
 
     await findByText('Extended search page');
   });

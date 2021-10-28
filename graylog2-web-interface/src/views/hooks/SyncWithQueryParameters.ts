@@ -81,7 +81,7 @@ export const syncWithQueryParameters = (query: string, action: (string) => unkno
         .removeQuery('keyword')
         .removeQuery('relative');
       const uriWithTimerange = extractTimerangeParams(timerange)
-        .reduce((prev, [key, value]) => prev.setSearch(key, value), baseUri);
+        .reduce((prev, [key, value]) => prev.setSearch(key, String(value)), baseUri);
       const currentStreams = filtersToStreamSet(filter);
       const uri = currentStreams.isEmpty()
         ? uriWithTimerange.removeSearch('streams').toString()

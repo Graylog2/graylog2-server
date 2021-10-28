@@ -17,13 +17,14 @@
 import * as React from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import { WidgetComponentProps } from 'views/types';
+import { useContext } from 'react';
 
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import type { Events } from 'views/logic/searchtypes/events/EventHandler';
 import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
-import type VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
+import OnVisualizationConfigChangeContext, { OnVisualizationConfigChange } from 'views/components/aggregationwizard/OnVisualizationConfigChangeContext';
 
 import EmptyAggregationContent from './EmptyAggregationContent';
 import FullSizeContainer from './FullSizeContainer';
@@ -43,9 +44,11 @@ type EventResult = {
   name: 'events',
 };
 
+type VisualizationResult = { [key: string]: Rows } & { events?: Events };
+
 export type VisualizationComponentProps = {
   config: AggregationWidgetConfig,
-  data: { [key: string]: Rows } & { events?: Events },
+  data: VisualizationResult,
   editing?: boolean,
   effectiveTimerange: AbsoluteTimeRange,
   fields: FieldTypeMappingsList,
@@ -58,6 +61,8 @@ export type VisualizationComponentProps = {
 export type VisualizationComponent<T extends string> =
   { type: T, propTypes?: any }
   & React.ComponentType<VisualizationComponentProps>;
+
+export const retrieveChartData = (data: VisualizationResult): Rows => data.chart ?? data[Object.keys(data).filter((name) => name !== 'events')[0]];
 
 export const makeVisualization = <T extends string>(component: React.ComponentType<VisualizationComponentProps>, type: T): VisualizationComponent<T> => {
   const visualizationComponent = component as VisualizationComponent<T>;
@@ -86,13 +91,9 @@ const getResult = (value: RowResult | EventResult): Rows | Events => {
   return value.rows;
 };
 
-type OnVisualizationConfigChange = (newConfig: VisualizationConfig) => void;
+const AggregationBuilder = ({ config, data, editing = false, fields, toggleEdit }: WidgetComponentProps<AggregationWidgetConfig>) => {
+  const onVisualizationConfigChange = useContext(OnVisualizationConfigChangeContext);
 
-type AggregationBuilderProps = WidgetComponentProps<AggregationWidgetConfig> & {
-  onVisualizationConfigChange: OnVisualizationConfigChange,
-};
-
-const AggregationBuilder = ({ config, data, editing = false, fields, onVisualizationConfigChange = () => {}, toggleEdit }: AggregationBuilderProps) => {
   if (!config || config.isEmpty) {
     return <EmptyAggregationContent toggleEdit={toggleEdit} editing={editing} />;
   }

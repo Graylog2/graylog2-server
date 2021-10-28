@@ -20,39 +20,46 @@ import lodash from 'lodash';
 import * as URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
-import ActionsProvider from 'injection/ActionsProvider';
 import EntityIndex from 'logic/content-packs/EntityIndex';
+import { singletonStore, singletonActions } from 'logic/singleton';
 
-const CatalogActions = ActionsProvider.getActions('Catalog');
+export const CatalogActions = singletonActions(
+  'core.Catalog',
+  () => Reflux.createActions({
+    showEntityIndex: { asyncResult: true },
+    getSelectedEntities: { asyncResult: true },
+  }),
+);
 
-const CatalogStore = Reflux.createStore({
-  listenables: [CatalogActions],
+export const CatalogStore = singletonStore(
+  'core.Catalog',
+  () => Reflux.createStore({
+    listenables: [CatalogActions],
 
-  showEntityIndex() {
-    const url = URLUtils.qualifyUrl(ApiRoutes.CatalogsController.showEntityIndex().url);
-    const promise = fetch('GET', url)
-      .then((result) => {
-        const entityIndex = lodash.groupBy(result.entities.map((e) => EntityIndex.fromJSON(e)), 'type.name');
+    showEntityIndex() {
+      const url = URLUtils.qualifyUrl(ApiRoutes.CatalogsController.showEntityIndex().url);
+      const promise = fetch('GET', url)
+        .then((result) => {
+          const entityIndex = lodash.groupBy(result.entities.map((e) => EntityIndex.fromJSON(e)), 'type.name');
 
-        this.trigger({ entityIndex: entityIndex });
+          this.trigger({ entityIndex: entityIndex });
 
-        return result;
-      });
+          return result;
+        });
 
-    CatalogActions.showEntityIndex.promise(promise);
-  },
+      CatalogActions.showEntityIndex.promise(promise);
+    },
 
-  getSelectedEntities(requestedEntities) {
-    const payload = Object.keys(requestedEntities).reduce((result, key) => {
-      return result.concat(requestedEntities[key]
-        .filter((entitiy) => entitiy instanceof EntityIndex)
-        .map((entity) => entity.toJSON()));
-    }, []);
-    const url = URLUtils.qualifyUrl(ApiRoutes.CatalogsController.queryEntities().url);
-    const promise = fetch('POST', url, { entities: payload });
+    getSelectedEntities(requestedEntities) {
+      const payload = Object.keys(requestedEntities).reduce((result, key) => {
+        return result.concat(requestedEntities[key]
+          .filter((entitiy) => entitiy instanceof EntityIndex)
+          .map((entity) => entity.toJSON()));
+      }, []);
+      const url = URLUtils.qualifyUrl(ApiRoutes.CatalogsController.queryEntities().url);
+      const promise = fetch('POST', url, { entities: payload });
 
-    CatalogActions.getSelectedEntities.promise(promise);
-  },
-});
-
-export default CatalogStore;
+      CatalogActions.getSelectedEntities.promise(promise);
+    },
+  }),
+);

@@ -79,14 +79,14 @@ public class ElasticsearchBackendSearchTypeOverridesTest extends ElasticsearchBa
                             .id("pivot2")
                             .series(Collections.singletonList(Max.builder().field("field2").build()))
                             .rollup(true)
-                            .query(ElasticsearchQueryString.builder().queryString("source:babbage").build())
+                            .query(ElasticsearchQueryString.of("source:babbage"))
                             .build()
             );
         }};
         this.query = Query.builder()
                 .id("query1")
                 .searchTypes(searchTypes)
-                .query(ElasticsearchQueryString.builder().queryString("production:true").build())
+                .query(ElasticsearchQueryString.of("production:true"))
                 .filter(StreamFilter.ofId("stream1"))
                 .timerange(timeRangeForTest())
                 .build();

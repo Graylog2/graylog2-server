@@ -17,8 +17,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { BootstrapModalForm, Input } from 'components/bootstrap';
-import { Panel, Button } from 'components/graylog';
+import { BootstrapModalForm, Input, Panel, Button } from 'components/bootstrap';
 
 import GrokPatternInput from './GrokPatternInput';
 
@@ -175,7 +174,7 @@ class EditPatternModal extends React.Component {
             <GrokPatternInput onPatternChange={this._onPatternChange}
                               pattern={pattern}
                               patterns={patterns} />
-            { testError
+            {testError
               && (
               <Panel bsStyle="danger" header="Grok Error">
                 <code style={{ display: 'block', whiteSpace: 'pre-wrap' }}>{testError}</code>

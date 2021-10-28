@@ -19,7 +19,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import WithGlobalAppNotifications from 'components/notifications/WithGlobalAppNotifications';
-import { Grid } from 'components/graylog';
+import { Grid } from 'components/bootstrap';
 import Footer from 'components/layout/Footer';
 
 type Props = {
@@ -27,7 +27,7 @@ type Props = {
   className?: string
 };
 
-const Container = styled.div`
+const Container = styled.div(({ theme }) => `
   display: flex;
   flex-direction: column;
   overflow: auto;
@@ -35,8 +35,8 @@ const Container = styled.div`
   width: 100%;
 
   /* Bottom gap is defined by the footer */
-  padding: 15px 15px 0 15px;
-`;
+  padding: ${theme.spacings.sm} ${theme.spacings.sm} 0 ${theme.spacings.sm};
+`);
 
 const StyledGrid = styled(Grid)`
   width: 100%;

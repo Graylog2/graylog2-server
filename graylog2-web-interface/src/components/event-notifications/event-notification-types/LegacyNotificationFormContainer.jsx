@@ -18,12 +18,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { Spinner } from 'components/common';
-import CombinedProvider from 'injection/CombinedProvider';
 import connect from 'stores/connect';
+import { EventNotificationsActions, EventNotificationsStore } from 'stores/event-notifications/EventNotificationsStore';
 
 import LegacyNotificationForm from './LegacyNotificationForm';
-
-const { EventNotificationsStore, EventNotificationsActions } = CombinedProvider.get('EventNotifications');
 
 class LegacyNotificationFormContainer extends React.Component {
   static propTypes = {

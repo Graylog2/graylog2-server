@@ -16,9 +16,9 @@
  */
 import * as React from 'react';
 import uuid from 'uuid/v4';
+import { ActionContexts } from 'views/types';
 
 import type { FieldName, FieldValue } from 'views/logic/fieldtypes/FieldType';
-import type { ActionContexts } from 'views/logic/ActionContext';
 import type { QueryId } from 'views/logic/queries/Query';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 
@@ -36,35 +36,50 @@ export type ActionComponents = { [key: string]: React.ReactElement<ActionCompone
 
 export type SetActionComponents = (fn: (component: ActionComponents) => ActionComponents) => void;
 
-export type ActionHandlerArguments = {
+export type ActionHandlerArguments<Contexts = ActionContexts> = {
   queryId: QueryId,
   field: FieldName,
   value?: FieldValue,
   type: FieldType,
-  contexts: ActionContexts,
+  contexts: Contexts,
 };
 
-export type ActionHandler = (args: ActionHandlerArguments) => Promise<unknown>;
-export type ActionHandlerCondition = (args: ActionHandlerArguments) => boolean;
+export type ActionHandler<Contexts> = (args: ActionHandlerArguments<Contexts>) => Promise<unknown>;
+export type ActionHandlerCondition<Contexts> = (args: ActionHandlerArguments<Contexts>) => boolean;
 
-export type ActionHandlerConditions = {
-  isEnabled?: ActionHandlerCondition,
-  isHidden?: ActionHandlerCondition,
+export type ActionConditions<Contexts> = {
+  isEnabled?: ActionHandlerCondition<Contexts>,
+  isHidden?: ActionHandlerCondition<Contexts>,
 };
 
-export type HandlerAction = {
+type ActionDefinitionBase<Contexts> = {
   type: string,
   title: string,
-  component?: ActionComponentType,
-  handler?: ActionHandler,
   resetFocus: boolean,
+  help?: (args: ActionHandlerArguments<Contexts>) => { title: string, description: React.ReactNode } | undefined,
 };
 
-export type ActionDefinition = HandlerAction & ActionHandlerConditions;
+type FunctionHandlerAction<Contexts> = {
+  handler: ActionHandler<Contexts>,
+};
+type ComponentsHandlerAction = {
+  component: ActionComponentType,
+};
 
-// eslint-disable-next-line import/prefer-default-export
-export function createHandlerFor(action: ActionDefinition, setActionComponents: SetActionComponents): ActionHandler {
-  if (action.handler) {
+export type HandlerAction<Contexts> = (FunctionHandlerAction<Contexts> | ComponentsHandlerAction) & ActionDefinitionBase<Contexts>;
+
+export type ExternalLinkAction<Contexts> = {
+  linkTarget: (args: ActionHandlerArguments<Contexts>) => string,
+} & ActionDefinitionBase<Contexts>;
+
+export type ActionDefinition<Contexts = ActionContexts> = (HandlerAction<Contexts> | ExternalLinkAction<Contexts>) & ActionConditions<Contexts>;
+
+export function isExternalLinkAction<T>(action: ActionDefinition<T>): action is ExternalLinkAction<T> {
+  return 'linkTarget' in action;
+}
+
+export function createHandlerFor<T>(action: ActionDefinitionBase<T> & HandlerAction<T>, setActionComponents: SetActionComponents): ActionHandler<T> {
+  if ('handler' in action) {
     return action.handler;
   }
 

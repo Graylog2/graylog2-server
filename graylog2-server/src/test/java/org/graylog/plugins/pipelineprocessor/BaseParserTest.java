@@ -23,9 +23,6 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.statements.Statement;
-import org.graylog.plugins.pipelineprocessor.codegen.CodeGenerator;
-import org.graylog.plugins.pipelineprocessor.codegen.GeneratedRule;
-import org.graylog.plugins.pipelineprocessor.codegen.compiler.JavaCompiler;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog2.plugin.Message;
@@ -92,23 +89,16 @@ public class BaseParserTest {
 
     @Before
     public void setup() {
-        parser = new PipelineRuleParser(functionRegistry, new CodeGenerator(JavaCompiler::new));
+        parser = new PipelineRuleParser(functionRegistry);
         // initialize before every test!
         actionsTriggered.set(false);
     }
 
     protected EvaluationContext contextForRuleEval(Rule rule, Message message) {
         final EvaluationContext context = new EvaluationContext(message);
-        final GeneratedRule generatedRule = rule.generatedRule();
-        if (generatedRule != null) {
-            if (generatedRule.when(context)) {
-                generatedRule.then(context);
-            }
-        } else {
-            if (rule.when().evaluateBool(context)) {
-                for (Statement statement : rule.then()) {
-                    statement.evaluate(context);
-                }
+        if (rule.when().evaluateBool(context)) {
+            for (Statement statement : rule.then()) {
+                statement.evaluate(context);
             }
         }
         return context;
@@ -116,15 +106,6 @@ public class BaseParserTest {
 
     protected Message evaluateRule(Rule rule, Message message) {
         final EvaluationContext context = new EvaluationContext(message);
-        final GeneratedRule generatedRule = rule.generatedRule();
-        if (generatedRule != null) {
-            if (generatedRule.when(context)) {
-                generatedRule.then(context);
-                return context.currentMessage();
-            } else {
-                return null;
-            }
-        }
         if (rule.when().evaluateBool(context)) {
 
             for (Statement statement : rule.then()) {

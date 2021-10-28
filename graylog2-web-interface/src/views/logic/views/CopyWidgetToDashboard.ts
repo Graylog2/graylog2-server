@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { List, Map } from 'immutable';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import Widget from 'views/logic/widgets/Widget';
 import View from 'views/logic/views/View';
@@ -27,6 +28,8 @@ import UpdateSearchForWidgets from './UpdateSearchForWidgets';
 import FindWidgetAndQueryIdInView from './FindWidgetAndQueryIdInView';
 
 type QueryId = string;
+
+export type CopyWidgetToDashboardHook = (widgetId: string, search: View, dashboard: View) => View;
 
 const _newPositionsMap = (oldPosition, widgetPositions, widget, widgets) => {
   const widgetPositionsMap = oldPosition ? {
@@ -49,7 +52,7 @@ const _newTitlesMap = (titlesMap, widget, title) => {
 };
 
 const _addWidgetToDashboard = (widget: Widget, dashboard: View, oldPosition: WidgetPosition, title: string | undefined | null): View => {
-  const dashboardQueryId = dashboard.state.keySeq().first();
+  const dashboardQueryId = dashboard.search.queries.first().id;
   const viewState = dashboard.state.get(dashboardQueryId);
   const widgets = viewState.widgets.push(widget);
 
@@ -75,6 +78,8 @@ const CopyWidgetToDashboard = (widgetId: string, search: View, dashboard: View):
     return undefined;
   }
 
+  const copyHooks = PluginStore.exports('views.hooks.copyWidgetToDashboard') || [];
+
   const queryMap: Map<QueryId, Query> = Map(search.search.queries.map((q) => [q.id, q]));
   const match: [Widget, QueryId] | undefined | null = FindWidgetAndQueryIdInView(widgetId, search);
 
@@ -98,7 +103,9 @@ const CopyWidgetToDashboard = (widgetId: string, search: View, dashboard: View):
       .streams(streams)
       .build();
 
-    return UpdateSearchForWidgets(_addWidgetToDashboard(dashboardWidget, dashboard, oldPositions, title));
+    const updatedView = UpdateSearchForWidgets(_addWidgetToDashboard(dashboardWidget, dashboard, oldPositions, title));
+
+    return copyHooks.reduce((previousDashboard, copyHook) => copyHook(widgetId, search, previousDashboard), updatedView);
   }
 
   return undefined;

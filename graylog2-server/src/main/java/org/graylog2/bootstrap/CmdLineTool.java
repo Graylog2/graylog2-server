@@ -34,6 +34,7 @@ import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.inject.Binder;
@@ -46,9 +47,14 @@ import com.google.inject.name.Names;
 import com.google.inject.spi.Message;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import io.netty.util.internal.logging.Slf4JLoggerFactory;
+import joptsimple.internal.Strings;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.graylog2.configuration.TLSProtocolsConfiguration;
+import org.graylog2.featureflag.FeatureFlags;
+import org.graylog2.featureflag.FeatureFlagsFactory;
 import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.DocsHelper;
 import org.graylog2.plugin.Plugin;
@@ -61,6 +67,7 @@ import org.graylog2.plugin.system.NodeIdPersistenceException;
 import org.graylog2.shared.UI;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.graylog2.shared.bindings.PluginBindings;
+import org.graylog2.shared.metrics.MetricRegistryFactory;
 import org.graylog2.shared.plugins.ChainingClassLoader;
 import org.graylog2.shared.plugins.PluginLoader;
 import org.graylog2.shared.utilities.ExceptionUtils;
@@ -72,6 +79,7 @@ import org.slf4j.LoggerFactory;
 import java.lang.management.ManagementFactory;
 import java.nio.file.AccessDeniedException;
 import java.nio.file.Path;
+import java.security.Security;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -79,10 +87,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.google.common.base.Strings.nullToEmpty;
 
 public abstract class CmdLineTool implements CliCommand {
+
+    public static final String GRAYLOG_ENVIRONMENT_VAR_PREFIX = "GRAYLOG_";
+    public static final String GRAYLOG_SYSTEM_PROP_PREFIX = "graylog.";
+
     static {
         // Set up JDK Logging adapter, https://logging.apache.org/log4j/2.x/log4j-jul/index.html
         System.setProperty("java.util.logging.manager", "org.apache.logging.log4j.jul.LogManager");
@@ -110,10 +124,14 @@ public abstract class CmdLineTool implements CliCommand {
     @Option(name = {"-f", "--configfile"}, description = "Configuration file for Graylog")
     private String configFile = "/etc/graylog/server/server.conf";
 
+    @Option(name = {"-ff", "--featureflagfile"}, description = "Configuration file for Graylog feature flags")
+    private String customFeatureFlagFile = "/etc/graylog/server/feature-flag.conf";
+
     protected String commandName = "command";
 
     protected Injector injector;
     protected Injector coreConfigInjector;
+    protected FeatureFlags featureFlags;
 
     protected CmdLineTool(BaseConfiguration configuration) {
         this(null, configuration);
@@ -166,7 +184,51 @@ public abstract class CmdLineTool implements CliCommand {
     /**
      * Things that have to run before the {@link #startCommand()} method is being called.
      */
-    protected void beforeStart() {}
+    protected void beforeStart() {
+    }
+
+    protected void beforeStart(TLSProtocolsConfiguration configuration) {
+    }
+
+    protected static void applySecuritySettings(TLSProtocolsConfiguration configuration) {
+        // Disable insecure TLS parameters and ciphers by default.
+        // Prevent attacks like LOGJAM, LUCKY13, et al.
+        setSystemPropertyIfEmpty("jdk.tls.ephemeralDHKeySize", "2048");
+        setSystemPropertyIfEmpty("jdk.tls.rejectClientInitiatedRenegotiation", "true");
+
+        final Set<String> tlsProtocols = configuration.getConfiguredTlsProtocols();
+        final List<String> disabledAlgorithms = Stream.of(Security.getProperty("jdk.tls.disabledAlgorithms").split(",")).map(String::trim).collect(Collectors.toList());
+
+        // Only restrict ciphers if insecure TLS protocols are explicitly enabled.
+        // c.f. https://github.com/Graylog2/graylog2-server/issues/10944
+        if (tlsProtocols == null || !(tlsProtocols.isEmpty() || tlsProtocols.contains("TLSv1") || tlsProtocols.contains("TLSv1.1"))) {
+            disabledAlgorithms.addAll(ImmutableSet.of("CBC", "3DES"));
+            Security.setProperty("jdk.tls.disabledAlgorithms", Strings.join(disabledAlgorithms, ", "));
+        } else {
+            // Remove explicitly enabled legacy TLS protocols from the disabledAlgorithms filter
+            Set<String> reEnabledTLSProtocols;
+            if (tlsProtocols.isEmpty()) {
+                reEnabledTLSProtocols = ImmutableSet.of("TLSv1", "TLSv1.1");
+            } else {
+                reEnabledTLSProtocols = tlsProtocols;
+            }
+            final List<String> updatedProperties = disabledAlgorithms.stream()
+                    .filter(p -> !reEnabledTLSProtocols.contains(p))
+                    .collect(Collectors.toList());
+
+            Security.setProperty("jdk.tls.disabledAlgorithms", Strings.join(updatedProperties, ", "));
+        }
+
+        // Explicitly register Bouncy Castle as security provider.
+        // This allows us to use more key formats than with JCE
+        Security.addProvider(new BouncyCastleProvider());
+    }
+
+    private static void setSystemPropertyIfEmpty(String key, String value) {
+        if (System.getProperty(key) == null) {
+            System.setProperty(key, value);
+        }
+    }
 
     @Override
     public void run() {
@@ -175,9 +237,16 @@ public abstract class CmdLineTool implements CliCommand {
         if (isDumpDefaultConfig()) {
             dumpDefaultConfigAndExit();
         }
+        // This is holding all our metrics.
+        MetricRegistry metricRegistry = MetricRegistryFactory.create();
+        featureFlags = getFeatureFlags(metricRegistry);
 
         installConfigRepositories();
         installCommandConfig();
+
+        beforeStart();
+        beforeStart(parseAndGetTLSConfiguration());
+
         processConfiguration(jadConfig);
 
         coreConfigInjector = setupCoreConfigInjector();
@@ -196,14 +265,15 @@ public abstract class CmdLineTool implements CliCommand {
             System.exit(1);
         }
 
-        beforeStart();
 
         final List<String> arguments = ManagementFactory.getRuntimeMXBean().getInputArguments();
         LOG.info("Running with JVM arguments: {}", Joiner.on(' ').join(arguments));
 
-        injector = setupInjector(new NamedConfigParametersModule(jadConfig.getConfigurationBeans()),
+        injector = setupInjector(
+                new NamedConfigParametersModule(jadConfig.getConfigurationBeans()),
                 new PluginBindings(plugins),
-                binder -> binder.bind(ChainingClassLoader.class).toInstance(chainingClassLoader));
+                binder -> binder.bind(MetricRegistry.class).toInstance(metricRegistry)
+        );
 
         if (injector == null) {
             LOG.error("Injector could not be created, exiting! (Please include the previous error messages in bug " +
@@ -211,16 +281,24 @@ public abstract class CmdLineTool implements CliCommand {
             System.exit(1);
         }
 
-        // This is holding all our metrics.
-        final MetricRegistry metrics = injector.getInstance(MetricRegistry.class);
-
-        addInstrumentedAppender(metrics, logLevel);
-
+        addInstrumentedAppender(metricRegistry, logLevel);
         // Report metrics via JMX.
-        final JmxReporter reporter = JmxReporter.forRegistry(metrics).build();
+        final JmxReporter reporter = JmxReporter.forRegistry(metricRegistry).build();
         reporter.start();
 
         startCommand();
+    }
+
+    // Parse only the TLSConfiguration bean
+    // to avoid triggering anything that might initialize the default SSLContext
+    private TLSProtocolsConfiguration parseAndGetTLSConfiguration() {
+        final JadConfig jadConfig = new JadConfig();
+        jadConfig.setRepositories(getConfigRepositories(configFile));
+        final TLSProtocolsConfiguration tlsConfiguration = new TLSProtocolsConfiguration();
+        jadConfig.addConfigurationBean(tlsConfiguration);
+        processConfiguration(jadConfig);
+
+        return tlsConfiguration;
     }
 
     private void installCommandConfig() {
@@ -298,6 +376,10 @@ public abstract class CmdLineTool implements CliCommand {
         return pluginLoaderConfig.getPluginDir();
     }
 
+    private FeatureFlags getFeatureFlags(MetricRegistry metricRegistry) {
+        return new FeatureFlagsFactory().createImmutableFeatureFlags(customFeatureFlagFile, metricRegistry);
+    }
+
     protected Set<Plugin> loadPlugins(Path pluginPath, ChainingClassLoader chainingClassLoader) {
         final Set<Plugin> plugins = new HashSet<>();
 
@@ -324,8 +406,8 @@ public abstract class CmdLineTool implements CliCommand {
 
     protected Collection<Repository> getConfigRepositories(String configFile) {
         return Arrays.asList(
-                new EnvironmentRepository("GRAYLOG_"),
-                new SystemPropertiesRepository("graylog."),
+                new EnvironmentRepository(GRAYLOG_ENVIRONMENT_VAR_PREFIX),
+                new SystemPropertiesRepository(GRAYLOG_SYSTEM_PROP_PREFIX),
                 // Legacy prefixes
                 new EnvironmentRepository("GRAYLOG2_"),
                 new SystemPropertiesRepository("graylog2."),
@@ -365,21 +447,18 @@ public abstract class CmdLineTool implements CliCommand {
         return Lists.newArrayList();
     }
 
-    protected Injector setupInjector(NamedConfigParametersModule configModule, Module... otherModules) {
+    protected Injector setupInjector(Module... modules) {
         try {
-            final ImmutableList.Builder<Module> modules = ImmutableList.builder();
-            modules.add(configModule);
-            modules.addAll(getSharedBindingsModules());
-            modules.addAll(getCommandBindings());
-            modules.addAll(Arrays.asList(otherModules));
-            modules.add(new Module() {
-                @Override
-                public void configure(Binder binder) {
-                    binder.bind(String.class).annotatedWith(Names.named("BootstrapCommand")).toInstance(commandName);
-                }
+            final ImmutableList.Builder<Module> builder = ImmutableList.builder();
+            builder.addAll(getSharedBindingsModules());
+            builder.addAll(getCommandBindings());
+            builder.addAll(Arrays.asList(modules));
+            builder.add(binder -> {
+                binder.bind(ChainingClassLoader.class).toInstance(chainingClassLoader);
+                featureFlagsBinding(binder);
+                binder.bind(String.class).annotatedWith(Names.named("BootstrapCommand")).toInstance(commandName);
             });
-
-            return GuiceInjectorHolder.createInjector(modules.build());
+            return GuiceInjectorHolder.createInjector(builder.build());
         } catch (CreationException e) {
             annotateInjectorCreationException(e);
             return null;
@@ -400,7 +479,7 @@ public abstract class CmdLineTool implements CliCommand {
         Injector coreConfigInjector = null;
         try {
             coreConfigInjector = Guice.createInjector(Stage.PRODUCTION, ImmutableList.of(configModule,
-                    (Module) Binder::requireExplicitBindings));
+                    (Module) Binder::requireExplicitBindings, this::featureFlagsBinding));
         } catch (CreationException e) {
             annotateInjectorCreationException(e);
         } catch (Exception e) {
@@ -413,6 +492,10 @@ public abstract class CmdLineTool implements CliCommand {
             System.exit(1);
         }
         return coreConfigInjector;
+    }
+
+    private void featureFlagsBinding(Binder binder) {
+        binder.bind(FeatureFlags.class).toInstance(featureFlags);
     }
 
     protected void annotateInjectorCreationException(CreationException e) {

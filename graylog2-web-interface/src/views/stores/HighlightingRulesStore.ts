@@ -23,7 +23,7 @@ import ViewState from 'views/logic/views/ViewState';
 import FormattingSettings from 'views/logic/views/formatting/FormattingSettings';
 import HighlightingRule, { Condition } from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import type { Value } from 'views/logic/views/formatting/highlighting/HighlightingRule';
-import { singletonActions, singletonStore } from 'views/logic/singleton';
+import { singletonActions, singletonStore } from 'logic/singleton';
 import HighlightingColor from 'views/logic/views/formatting/highlighting/HighlightingColor';
 
 import { CurrentViewStateActions, CurrentViewStateStore } from './CurrentViewStateStore';

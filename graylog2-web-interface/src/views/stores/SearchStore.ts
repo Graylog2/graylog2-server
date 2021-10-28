@@ -23,7 +23,7 @@ import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
 import { SearchMetadataActions } from 'views/stores/SearchMetadataStore';
-import { SearchJobActions } from 'views/stores/SearchJobStore';
+import { runSearchJob, searchJobStatus } from 'views/stores/SearchJobs';
 import { ViewStore, ViewActions } from 'views/stores/ViewStore';
 import SearchResult from 'views/logic/SearchResult';
 import SearchActions, { WidgetsToSearch } from 'views/actions/SearchActions';
@@ -36,7 +36,8 @@ import View from 'views/logic/views/View';
 import Parameter from 'views/logic/parameters/Parameter';
 import type { WidgetMapping } from 'views/logic/views/types';
 import type { TimeRange } from 'views/logic/queries/Query';
-import { singletonStore } from 'views/logic/singleton';
+import { singletonStore } from 'logic/singleton';
+import { SearchErrorResponse } from 'views/logic/SearchError';
 
 const createSearchUrl = qualifyUrl('/views/search');
 
@@ -56,6 +57,22 @@ export type SearchStoreState = {
   result: SearchResult,
   widgetMapping: WidgetMapping,
   widgetsToSearch: WidgetsToSearch | null;
+};
+
+type SearchJobId = string;
+type SearchExecution = {
+  cancelled: boolean,
+  completed_exceptionally: boolean,
+  done: boolean,
+};
+
+export type SearchJobResult = {
+  execution: SearchExecution,
+  id: SearchJobId,
+  owner: string,
+  results: { [id: string]: any },
+  search_id: SearchId,
+  errors: Array<SearchErrorResponse>,
 };
 
 export const SearchStore: Store<SearchStoreState> = singletonStore(
@@ -87,11 +104,11 @@ export const SearchStore: Store<SearchStoreState> = singletonStore(
         this._trigger();
       }
     },
-    onSearchExecutionStateUpdate(executionState) {
+    onSearchExecutionStateUpdate(executionState: SearchExecutionState) {
       this.executionState = executionState;
     },
 
-    onUpdate(search) {
+    onUpdate(search: Search) {
       const { queries } = search;
 
       if (queries && queries.size > 0) {
@@ -121,25 +138,25 @@ export const SearchStore: Store<SearchStoreState> = singletonStore(
       return promise;
     },
 
-    trackJobStatus(job, search: Search) {
+    trackJobStatus(job: SearchJobResult, search: Search) {
       return new Bluebird((resolve) => {
         if (job && job.execution.done) {
           return resolve(new SearchResult(job));
         }
 
         return resolve(Bluebird.delay(250)
-          .then(() => SearchJobActions.jobStatus(job.id))
+          .then(() => searchJobStatus(job.id))
           .then((jobStatus) => this.trackJobStatus(jobStatus, search)));
       });
     },
 
     trackJob(search: Search, executionState: SearchExecutionState): Promise<SearchResult> {
-      return SearchJobActions.run(search, executionState).then((job) => this.trackJobStatus(job, search));
+      return runSearchJob(search, executionState).then((job) => this.trackJobStatus(job, search));
     },
 
     execute(executionState: SearchExecutionState): Promise<SearchExecutionResult> {
       const handleSearchResult = (searchResult: SearchResult) => searchResult;
-      const startActionPromise = (executePromise) => SearchActions.execute.promise(executePromise);
+      const startActionPromise = (executePromise: Promise<SearchExecutionResult>) => SearchActions.execute.promise(executePromise);
 
       return this._executePromise(executionState, startActionPromise, handleSearchResult);
     },
@@ -191,10 +208,12 @@ export const SearchStore: Store<SearchStoreState> = singletonStore(
       return promise;
     },
 
-    _executePromise(executionStateParam: SearchExecutionState, startActionPromise: (promise: Promise<SearchResult>) => void, handleSearchResult: (result: SearchResult) => SearchResult): Promise<SearchExecutionResult> {
+    _executePromise(executionStateParam: SearchExecutionState,
+      startActionPromise: (promise: Promise<SearchResult>) => void,
+      handleSearchResult: (result: SearchResult) => SearchResult): Promise<SearchExecutionResult> {
       const { widgetsToSearch } = this._state();
 
-      if (this.executePromise && this.executePromise.cancel) {
+      if (this.executePromise?.cancel) {
         this.executePromise.cancel();
       }
 

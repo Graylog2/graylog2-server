@@ -55,42 +55,6 @@ describe('SeriesSelect', () => {
     expect(values.at(1)).toIncludeText('avg(took_ms)');
   });
 
-  it('opens menu when focussed, returning no results without suggester', () => {
-    const wrapper = mount(<SeriesSelect series={[]} onChange={() => true} />);
-    const input = wrapper.find('input');
-
-    expect(wrapper).not.toIncludeText('0 results available.');
-
-    input.simulate('focus');
-
-    expect(wrapper).toIncludeText('0 results available.');
-  });
-
-  it('opens menu when focussed, returning no results for empty suggester defaults', () => {
-    const wrapper = mount(<SeriesSelect series={[]} suggester={suggester} onChange={() => true} />);
-    const input = wrapper.find('input');
-
-    expect(wrapper).not.toIncludeText('0 results available.');
-
-    input.simulate('focus');
-
-    expect(wrapper).toIncludeText('0 results available.');
-  });
-
-  it('opens menu when focussed, returning suggester defaults', () => {
-    suggester.defaults = [{ label: 'Something', value: 'Something' }, { label: 'Anything', value: 'Anything' }];
-    const wrapper = mount(<SeriesSelect series={[]} suggester={suggester} onChange={() => true} />);
-    const input = wrapper.find('input');
-
-    expect(wrapper).not.toIncludeText('Something');
-    expect(wrapper).not.toIncludeText('Anything');
-
-    input.simulate('focus');
-
-    expect(wrapper).not.toIncludeText('0 results available.');
-    expect(wrapper).toIncludeText('2 results available.');
-  });
-
   it('shows next suggestions when selecting incomplete suggestion', () => {
     suggester.defaults = [
       { value: 'func1', incomplete: true, label: 'func1', parameterNeeded: false },

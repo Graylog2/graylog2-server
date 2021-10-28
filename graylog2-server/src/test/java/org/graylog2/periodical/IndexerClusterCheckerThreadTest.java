@@ -21,6 +21,7 @@ import org.graylog2.indexer.cluster.health.AbsoluteValueWatermarkSettings;
 import org.graylog2.indexer.cluster.health.ByteSize;
 import org.graylog2.indexer.cluster.health.ClusterAllocationDiskSettings;
 import org.graylog2.indexer.cluster.health.NodeDiskUsageStats;
+import org.graylog2.indexer.cluster.health.NodeRole;
 import org.graylog2.indexer.cluster.health.PercentageWatermarkSettings;
 import org.graylog2.indexer.cluster.health.SIUnitParser;
 import org.graylog2.indexer.cluster.health.WatermarkSettings;
@@ -35,10 +36,15 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog2.indexer.cluster.health.NodeRole.DATA;
+import static org.graylog2.indexer.cluster.health.NodeRole.MASTER_ELIGIBLE;
+import static org.graylog2.indexer.cluster.health.NodeRole.TRANSFORM;
+import static org.graylog2.notifications.Notification.Type.ES_NODE_DISK_WATERMARK_LOW;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -102,7 +108,7 @@ public class IndexerClusterCheckerThreadTest {
         verify(notificationService, never()).publishIfFirst(any());
         verify(notificationService, times(1)).fixed(Notification.Type.ES_NODE_DISK_WATERMARK_FLOOD_STAGE);
         verify(notificationService, times(1)).fixed(Notification.Type.ES_NODE_DISK_WATERMARK_HIGH);
-        verify(notificationService, times(1)).fixed(Notification.Type.ES_NODE_DISK_WATERMARK_LOW);
+        verify(notificationService, times(1)).fixed(ES_NODE_DISK_WATERMARK_LOW);
     }
 
     @Test
@@ -116,17 +122,17 @@ public class IndexerClusterCheckerThreadTest {
         verify(notificationService, never()).publishIfFirst(any());
         verify(notificationService, times(1)).fixed(Notification.Type.ES_NODE_DISK_WATERMARK_FLOOD_STAGE);
         verify(notificationService, times(1)).fixed(Notification.Type.ES_NODE_DISK_WATERMARK_HIGH);
-        verify(notificationService, times(1)).fixed(Notification.Type.ES_NODE_DISK_WATERMARK_LOW);
+        verify(notificationService, times(1)).fixed(ES_NODE_DISK_WATERMARK_LOW);
     }
 
     @Test
     public void notificationCreatesWhenLowThresholdTriggeredAbsolute() throws Exception {
-        notificationCreated(Notification.Type.ES_NODE_DISK_WATERMARK_LOW, WatermarkSettings.SettingsType.ABSOLUTE);
+        notificationCreated(ES_NODE_DISK_WATERMARK_LOW, WatermarkSettings.SettingsType.ABSOLUTE);
     }
 
     @Test
     public void notificationCreatesWhenLowThresholdTriggeredPercentage() throws Exception {
-        notificationCreated(Notification.Type.ES_NODE_DISK_WATERMARK_LOW, WatermarkSettings.SettingsType.PERCENTAGE);
+        notificationCreated(ES_NODE_DISK_WATERMARK_LOW, WatermarkSettings.SettingsType.PERCENTAGE);
     }
 
     @Test
@@ -147,6 +153,24 @@ public class IndexerClusterCheckerThreadTest {
     @Test
     public void notificationCreatesWhenFloodStageThresholdTriggeredPercentage() throws Exception {
         notificationCreated(Notification.Type.ES_NODE_DISK_WATERMARK_FLOOD_STAGE, WatermarkSettings.SettingsType.PERCENTAGE);
+    }
+
+    @Test
+    public void ignoresNonDataNodes() throws Exception {
+        final Set<NodeDiskUsageStats> nodeDiskUsageStats =
+                mockNodeDiskUsageStats(EnumSet.of(MASTER_ELIGIBLE, TRANSFORM));
+        when(cluster.getDiskUsageStats()).thenReturn(nodeDiskUsageStats);
+        when(cluster.getClusterAllocationDiskSettings()).thenReturn(
+                buildThresholdTriggeredClusterAllocationDiskSettings(ES_NODE_DISK_WATERMARK_LOW,
+                        WatermarkSettings.SettingsType.ABSOLUTE));
+
+        Notification notification = new NotificationImpl();
+        when(notificationService.buildNow()).thenReturn(notification);
+        when(notificationService.isFirst(ES_NODE_DISK_WATERMARK_LOW)).thenReturn(true);
+
+        indexerClusterCheckerThread.checkDiskUsage();
+
+        verify(notificationService, never()).publishIfFirst(any());
     }
 
     private void notificationCreated(Notification.Type notificationType, WatermarkSettings.SettingsType watermarkSettingsType) throws Exception {
@@ -171,6 +195,10 @@ public class IndexerClusterCheckerThreadTest {
     }
 
     private Set<NodeDiskUsageStats> mockNodeDiskUsageStats() {
+        return mockNodeDiskUsageStats(EnumSet.of(MASTER_ELIGIBLE, DATA));
+    }
+
+    private Set<NodeDiskUsageStats> mockNodeDiskUsageStats(EnumSet<NodeRole> roles) {
         Set<NodeDiskUsageStats> nodesDiskUsageStats = new HashSet<>();
         NodeDiskUsageStats nodeDiskUsageStats = mock(NodeDiskUsageStats.class);
 
@@ -179,6 +207,7 @@ public class IndexerClusterCheckerThreadTest {
         when(nodeDiskUsageStats.diskUsed()).thenReturn(SIUnitParser.parseBytesSizeValue("70GB"));
         when(nodeDiskUsageStats.diskAvailable()).thenReturn(SIUnitParser.parseBytesSizeValue("30GB"));
         when(nodeDiskUsageStats.diskUsedPercent()).thenReturn(70D);
+        when(nodeDiskUsageStats.roles()).thenReturn(roles);
 
         nodesDiskUsageStats.add(nodeDiskUsageStats);
         return nodesDiskUsageStats;
@@ -214,7 +243,7 @@ public class IndexerClusterCheckerThreadTest {
         ByteSize low;
         ByteSize high;
         ByteSize floodStage;
-        if (expectedNotificationType == Notification.Type.ES_NODE_DISK_WATERMARK_LOW) {
+        if (expectedNotificationType == ES_NODE_DISK_WATERMARK_LOW) {
             low = SIUnitParser.parseBytesSizeValue("35GB");
             high = SIUnitParser.parseBytesSizeValue("10GB");
             floodStage = SIUnitParser.parseBytesSizeValue("5GB");
@@ -238,7 +267,7 @@ public class IndexerClusterCheckerThreadTest {
         double low;
         double high;
         double floodStage;
-        if (expectedNotificationType == Notification.Type.ES_NODE_DISK_WATERMARK_LOW) {
+        if (expectedNotificationType == ES_NODE_DISK_WATERMARK_LOW) {
             low = 25D;
             high = 90D;
             floodStage = 95D;

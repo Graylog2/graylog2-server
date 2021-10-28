@@ -16,10 +16,10 @@
  */
 import * as React from 'react';
 
-import type { UserJSON } from 'logic/users/User';
+import type User from 'logic/users/User';
 
-import { singleton } from '../views/logic/singleton';
+import { singleton } from '../logic/singleton';
 
-const CurrentUserContext = React.createContext<UserJSON | undefined>(undefined);
+const CurrentUserContext = React.createContext<User | undefined>(undefined);
 
 export default singleton('contexts.CurrentUserContext', () => CurrentUserContext);

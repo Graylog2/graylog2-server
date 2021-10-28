@@ -20,8 +20,9 @@ import styled from 'styled-components';
 import { $PropertyType } from 'utility-types';
 import { EditWidgetComponentProps } from 'views/types';
 
+import usePluginEntities from 'views/logic/usePluginEntities';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
-import { Row, Col, Checkbox } from 'components/graylog';
+import { Row, Col, Checkbox } from 'components/bootstrap';
 import FieldSelect from 'views/components/widgets/FieldSelect';
 import CustomPropTypes from 'views/components/CustomPropTypes';
 import FieldSortSelect from 'views/components/widgets/FieldSortSelect';
@@ -30,6 +31,8 @@ import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationW
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import DescriptionBox from 'views/components/aggregationbuilder/DescriptionBox';
 import DecoratorSidebar from 'views/components/messagelist/decorators/DecoratorSidebar';
+import { HoverForHelp } from 'components/common';
+import { defaultCompare } from 'views/logic/DefaultCompare';
 
 const FullHeightRow = styled(Row)`
   height: 100%;
@@ -43,15 +46,16 @@ const FullHeightCol = styled(Col)`
   overflow: auto;
 `;
 
+const PreviewOptionCheckbox = styled(Checkbox)`
+  label {
+    display: flex;
+    justify-content: space-between;
+  }
+`;
+
 const _onFieldSelectionChanged = (fields, config, onChange) => {
   const newFields = fields.map(({ value }) => value);
   const newConfig = config.toBuilder().fields(newFields).build();
-
-  return onChange(newConfig);
-};
-
-const _onShowMessageRowChanged = (config, onChange) => {
-  const newConfig = config.toBuilder().showMessageRow(!config.showMessageRow).build();
 
   return onChange(newConfig);
 };
@@ -72,8 +76,10 @@ const EditMessageList = ({ children, config, fields, onChange }: EditWidgetCompo
   const { sort } = config;
   const [sortDirection] = (sort || []).map((s) => s.direction);
   const selectedFieldsForSelect = config.fields.map((fieldName) => ({ field: fieldName }));
-
   const onDecoratorsChange = (newDecorators) => onChange(config.toBuilder().decorators(newDecorators).build());
+
+  const messagePreviewOptions = usePluginEntities('views.components.widgets.messageTable.previewOptions');
+  const sortedMessagePreviewOptions = messagePreviewOptions.sort((o1, o2) => defaultCompare(o1.sort, o2.sort));
 
   return (
     <FullHeightRow>
@@ -82,9 +88,18 @@ const EditMessageList = ({ children, config, fields, onChange }: EditWidgetCompo
           <FieldSelect fields={fields}
                        onChange={(newFields) => _onFieldSelectionChanged(newFields, config, onChange)}
                        value={selectedFieldsForSelect} />
-          <Checkbox checked={config.showMessageRow} onChange={() => _onShowMessageRowChanged(config, onChange)}>
-            Show message in new row
-          </Checkbox>
+        </DescriptionBox>
+        <DescriptionBox description="Message Preview">
+          {sortedMessagePreviewOptions.map((option) => (
+            <PreviewOptionCheckbox key={option.title} checked={option.isChecked(config)} onChange={() => option.onChange(config, onChange)} disabled={option.isDisabled(config)}>
+              {option.title}
+              {option.help && (
+                <HoverForHelp title={option.title}>
+                  {option.help}
+                </HoverForHelp>
+              )}
+            </PreviewOptionCheckbox>
+          ))}
         </DescriptionBox>
         <DescriptionBox description="Sorting">
           <FieldSortSelect fields={fields} sort={sort} onChange={(data) => _onSortChange(data, config, onChange)} />
@@ -95,9 +110,7 @@ const EditMessageList = ({ children, config, fields, onChange }: EditWidgetCompo
                                onChange={(data) => _onSortDirectionChange(data, config, onChange)} />
         </DescriptionBox>
         <DescriptionBox description="Decorators">
-          <DecoratorSidebar stream="000000000000000000000001"
-                            decorators={config.decorators}
-                            maximumHeight={600}
+          <DecoratorSidebar decorators={config.decorators}
                             onChange={onDecoratorsChange} />
         </DescriptionBox>
       </FullHeightCol>

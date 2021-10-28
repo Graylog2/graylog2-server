@@ -15,13 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useEffect, useState, useCallback, useContext } from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
-import { MenuItem } from 'components/graylog';
+import { MenuItem } from 'components/bootstrap';
 import { QueriesActions } from 'views/stores/QueriesStore';
 import type { QueryId } from 'views/logic/queries/Query';
 import ViewState from 'views/logic/views/ViewState';
+import { QueriesList } from 'views/actions/QueriesActions';
+import DashboardPageContext from 'views/components/contexts/DashboardPageContext';
 
 import QueryActionDropdown from './QueryActionDropdown';
 
@@ -31,70 +34,52 @@ const TitleWrap = styled.span<{ active: boolean }>(({ active }) => css`
 
 type Props = {
   active: boolean,
+  allowsClosing?: boolean,
   id: QueryId,
   onClose: () => Promise<void> | Promise<ViewState>,
   openEditModal: (string) => void,
   title: string,
 };
 
-type State = {
-  editing: boolean,
-  title: string,
+const QueryTitle = ({ active, allowsClosing, id, onClose, openEditModal, title }: Props) => {
+  const [titleValue, setTitleValue] = useState(title);
+  const { setDashboardPage } = useContext(DashboardPageContext);
+
+  useEffect(() => {
+    setTitleValue(title);
+  }, [title]);
+
+  const _onDuplicate = useCallback(() => QueriesActions.duplicate(id).then(
+    (queryList: QueriesList) => setDashboardPage(queryList.keySeq().last()),
+  ), [id, setDashboardPage]);
+
+  return (
+    <>
+      <TitleWrap aria-label={titleValue} active={active}>
+        {titleValue}
+      </TitleWrap>
+
+      {active && (
+        <QueryActionDropdown>
+          <MenuItem onSelect={() => _onDuplicate()}>Duplicate</MenuItem>
+          <MenuItem onSelect={() => openEditModal(titleValue)}>Edit Title</MenuItem>
+          <MenuItem divider />
+          <MenuItem onSelect={onClose} disabled={!allowsClosing}>Close</MenuItem>
+        </QueryActionDropdown>
+      )}
+    </>
+  );
 };
 
-class QueryTitle extends React.Component<Props, State> {
-  static propTypes = {
-    onClose: PropTypes.func.isRequired,
-    title: PropTypes.string.isRequired,
-    openEditModal: PropTypes.func.isRequired,
-  };
+QueryTitle.propTypes = {
+  allowsClosing: PropTypes.bool,
+  onClose: PropTypes.func.isRequired,
+  title: PropTypes.string.isRequired,
+  openEditModal: PropTypes.func.isRequired,
+};
 
-  constructor(props: Props) {
-    super(props);
-
-    this.state = {
-      editing: false,
-      title: props.title,
-    };
-  }
-
-  UNSAFE_componentWillReceiveProps(nextProps: Props) {
-    /** TODO: Replace componentWillReceiveProps
-     * https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html#anti-pattern-unconditionally-copying-props-to-state
-     */
-    this.setState({ title: nextProps.title });
-  }
-
-  _onClose = () => {
-    const { onClose } = this.props;
-
-    onClose();
-  };
-
-  _onDuplicate = (id: QueryId) => QueriesActions.duplicate(id);
-
-  render() {
-    const { editing, title } = this.state;
-    const { active, id, openEditModal } = this.props;
-    const isActive = !editing && active;
-
-    return (
-      <>
-        <TitleWrap aria-label={title} active={isActive}>
-          {title}
-        </TitleWrap>
-
-        {isActive && (
-          <QueryActionDropdown>
-            <MenuItem onSelect={() => this._onDuplicate(id)}>Duplicate</MenuItem>
-            <MenuItem onSelect={() => openEditModal(title)}>Edit Title</MenuItem>
-            <MenuItem divider />
-            <MenuItem onSelect={this._onClose}>Close</MenuItem>
-          </QueryActionDropdown>
-        )}
-      </>
-    );
-  }
-}
+QueryTitle.defaultProps = {
+  allowsClosing: true,
+};
 
 export default QueryTitle;

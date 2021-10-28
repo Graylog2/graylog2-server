@@ -19,7 +19,7 @@ import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 
-import { Col, Row, Button } from 'components/graylog';
+import { Col, Row, Button } from 'components/bootstrap';
 import { Icon } from 'components/common';
 import SidecarStatusEnum from 'logic/sidecar/SidecarStatusEnum';
 import commonStyles from 'components/sidecars/common/CommonSidecarStyles.css';
@@ -51,7 +51,7 @@ const SidecarStatus = createReactClass({
         <dt>Operating System</dt>
         <dd>{lodash.defaultTo(details.operating_system, 'Not available')}</dd>
         <dt>CPU Idle</dt>
-        <dd>{lodash.isNumber(metrics.cpu_idle) ? `${metrics.cpu_idle}%` : 'Not available' }</dd>
+        <dd>{lodash.isNumber(metrics.cpu_idle) ? `${metrics.cpu_idle}%` : 'Not available'}</dd>
         <dt>Load</dt>
         <dd>{lodash.defaultTo(metrics.load_1, 'Not available')}</dd>
         <dt>Volumes &gt; 75% full</dt>
@@ -172,7 +172,7 @@ const SidecarStatus = createReactClass({
         </Row>
         <VerboseMessageModal ref={(c) => { this.modal = c; }}
                              collectorName={this.state.collectorName}
-                             collectorVerbose={this.state.collectorVerbose} />,
+                             collectorVerbose={this.state.collectorVerbose} />
       </div>
     );
   },

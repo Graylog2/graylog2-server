@@ -18,7 +18,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
-import { Col, FormControl, FormGroup } from 'components/graylog';
+import { Col, FormControl, FormGroup } from 'components/bootstrap';
 import { Select } from 'components/common';
 
 const OperatorSelector = styled.div(({ theme }) => css`

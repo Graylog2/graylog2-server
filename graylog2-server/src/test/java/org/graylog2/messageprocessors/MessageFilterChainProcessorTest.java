@@ -19,6 +19,7 @@ package org.graylog2.messageprocessors;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
+import org.graylog.failure.ProcessingFailureCause;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Messages;
 import org.graylog2.plugin.ServerStatus;
@@ -53,7 +54,7 @@ public class MessageFilterChainProcessorTest {
 
     @Before
     public void setUp() throws Exception {
-        Mockito.when(serverStatus.getDetailedMessageRecordingStrategy()).thenReturn(ServerStatus.MessageDetailRecordingStrategy.NEVER);
+        Mockito.lenient().when(serverStatus.getDetailedMessageRecordingStrategy()).thenReturn(ServerStatus.MessageDetailRecordingStrategy.NEVER);
     }
 
     @Test
@@ -162,6 +163,28 @@ public class MessageFilterChainProcessorTest {
         assertThat(result).isEmpty();
     }
 
+    @Test
+    public void testMessagesRecordProcessingFailures() {
+        final MessageFilter first = new ExceptingMessageFilter();
+        final Set<MessageFilter> filters = ImmutableSet.of(first);
+        final MessageFilterChainProcessor processor = new MessageFilterChainProcessor(new MetricRegistry(),
+                filters,
+                acknowledger,
+                serverStatus);
+
+        final Message message = new Message("message", "source", new DateTime(2016, 1, 1, 0, 0, DateTimeZone.UTC));
+        final Messages result = processor.process(message);
+
+        assertThat(result).hasSize(1);
+        // passed message is mutated, so we can assert on that
+        assertThat(message.processingErrors()).hasSize(1);
+        assertThat(message.processingErrors().get(0)).satisfies(pe -> {
+            assertThat(pe.getCause()).isEqualTo(ProcessingFailureCause.MessageFilterException);
+            assertThat(pe.getMessage()).startsWith("Could not apply filter [Excepting filter] on message <");
+            assertThat(pe.getDetails()).isEqualTo("BOOM!");
+        });
+    }
+
     private static class DummyFilter implements MessageFilter {
         private final int prio;
 
@@ -195,6 +218,23 @@ public class MessageFilterChainProcessorTest {
         @Override
         public String getName() {
             return "Removing filter";
+        }
+
+        @Override
+        public int getPriority() {
+            return Integer.MAX_VALUE;
+        }
+    }
+
+    private static class ExceptingMessageFilter implements MessageFilter {
+        @Override
+        public boolean filter(Message msg) {
+            throw new IllegalArgumentException("BOOM!");
+        }
+
+        @Override
+        public String getName() {
+            return "Excepting filter";
         }
 
         @Override

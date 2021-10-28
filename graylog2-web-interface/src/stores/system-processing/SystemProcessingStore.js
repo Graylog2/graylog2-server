@@ -20,36 +20,40 @@ import * as URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 
-const SystemProcessingStore = Reflux.createStore({
-  sourceUrl: (nodeId) => `/cluster/${nodeId}/processing`,
+import { singletonStore } from '../../logic/singleton';
 
-  pause(nodeId) {
-    return fetch('POST', URLUtils.qualifyUrl(`${this.sourceUrl(nodeId)}/pause`))
-      .then(
-        () => {
-          this.trigger({});
-          UserNotification.success(`Message processing paused successfully in '${nodeId}'`);
-        },
-        (error) => {
-          UserNotification.error(`Pausing message processing in '${nodeId}' failed: ${error}`,
-            `Could not pause message processing in node '${nodeId}'`);
-        },
-      );
-  },
+// eslint-disable-next-line import/prefer-default-export
+export const SystemProcessingStore = singletonStore(
+  'core.SystemProcessing',
+  () => Reflux.createStore({
+    sourceUrl: (nodeId) => `/cluster/${nodeId}/processing`,
 
-  resume(nodeId) {
-    return fetch('POST', URLUtils.qualifyUrl(`${this.sourceUrl(nodeId)}/resume`))
-      .then(
-        () => {
-          this.trigger({});
-          UserNotification.success(`Message processing resumed successfully in '${nodeId}'`);
-        },
-        (error) => {
-          UserNotification.error(`Resuming message processing in '${nodeId}' failed: ${error}`,
-            `Could not resume message processing in node '${nodeId}'`);
-        },
-      );
-  },
-});
+    pause(nodeId) {
+      return fetch('POST', URLUtils.qualifyUrl(`${this.sourceUrl(nodeId)}/pause`))
+        .then(
+          () => {
+            this.trigger({});
+            UserNotification.success(`Message processing paused successfully in '${nodeId}'`);
+          },
+          (error) => {
+            UserNotification.error(`Pausing message processing in '${nodeId}' failed: ${error}`,
+              `Could not pause message processing in node '${nodeId}'`);
+          },
+        );
+    },
 
-export default SystemProcessingStore;
+    resume(nodeId) {
+      return fetch('POST', URLUtils.qualifyUrl(`${this.sourceUrl(nodeId)}/resume`))
+        .then(
+          () => {
+            this.trigger({});
+            UserNotification.success(`Message processing resumed successfully in '${nodeId}'`);
+          },
+          (error) => {
+            UserNotification.error(`Resuming message processing in '${nodeId}' failed: ${error}`,
+              `Could not resume message processing in node '${nodeId}'`);
+          },
+        );
+    },
+  }),
+);

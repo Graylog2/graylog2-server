@@ -17,7 +17,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 
-import { Alert, Col, DropdownButton, MenuItem, Row } from 'components/graylog';
+import { Alert, Col, DropdownButton, MenuItem, Row } from 'components/bootstrap';
 import { Spinner } from 'components/common';
 import MessageShow from 'components/search/MessageShow';
 import NumberUtils from 'util/NumberUtils';
@@ -160,7 +160,7 @@ class SimulationResults extends React.Component {
           <p>
             {isLoading
               ? 'Simulating message processing, please wait a moment.'
-              : `These are the results of processing the loaded message. Processing took ${NumberUtils.formatNumber(simulationResults.took_microseconds)} µs.`}
+              : `These are the results of processing the loaded message. Processing took ${NumberUtils.formatNumber(simulationResults?.took_microseconds)} µs.`}
           </p>
           {errorMessage}
           {this._getViewComponent(streams)}
@@ -172,13 +172,14 @@ class SimulationResults extends React.Component {
 
 SimulationResults.propTypes = {
   stream: PropTypes.object.isRequired,
-  originalMessage: PropTypes.object.isRequired,
+  originalMessage: PropTypes.object,
   simulationResults: PropTypes.object,
   isLoading: PropTypes.bool,
   error: PropTypes.object,
 };
 
 SimulationResults.defaultProps = {
+  originalMessage: undefined,
   simulationResults: undefined,
   isLoading: false,
   error: undefined,

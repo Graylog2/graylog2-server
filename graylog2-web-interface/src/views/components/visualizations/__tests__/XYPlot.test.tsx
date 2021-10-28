@@ -18,12 +18,12 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import { mount } from 'wrappedEnzyme';
 import mockComponent from 'helpers/mocking/MockComponent';
-import { viewsManager } from 'fixtures/users';
+import { alice as currentUser } from 'fixtures/users';
 import asMock from 'helpers/mocking/AsMock';
 import { $PropertyType } from 'utility-types';
 import { StoreMock as MockStore } from 'helpers/mocking';
 
-import type { UserJSON } from 'logic/users/User';
+import User from 'logic/users/User';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import XYPlot, { Props as XYPlotProps } from 'views/components/visualizations/XYPlot';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
@@ -31,7 +31,7 @@ import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import Query, { RelativeTimeRange } from 'views/logic/queries/Query';
 import { QueriesActions } from 'views/stores/QueriesStore';
 import { SearchActions } from 'views/stores/SearchStore';
-import CurrentUserStore from 'stores/users/CurrentUserStore';
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 
 jest.mock('views/stores/CurrentViewStateStore', () => ({
   CurrentViewStateStore: MockStore(
@@ -45,8 +45,7 @@ jest.mock('views/stores/CurrentViewStateStore', () => ({
 }));
 
 jest.mock('stores/users/CurrentUserStore', () => ({
-  get: jest.fn(),
-  listen: jest.fn(),
+  CurrentUserStore: MockStore('get'),
 }));
 
 jest.mock('views/stores/SearchStore', () => ({
@@ -68,7 +67,7 @@ describe('XYPlot', () => {
   const setChartColor = () => ({});
   const chartData = [{ y: [23, 42], name: 'count()' }];
   type SimpleXYPlotProps = {
-    currentUser?: UserJSON,
+    currentUser?: User,
     config?: $PropertyType<XYPlotProps, 'chartData'>,
     chartData?: $PropertyType<XYPlotProps, 'chartData'>,
     currentQuery?: $PropertyType<XYPlotProps, 'currentQuery'>,
@@ -80,8 +79,8 @@ describe('XYPlot', () => {
     onZoom?: $PropertyType<XYPlotProps, 'onZoom'>,
   };
 
-  const SimpleXYPlot = ({ currentUser, ...props }: SimpleXYPlotProps) => (
-    <CurrentUserContext.Provider value={currentUser}>
+  const SimpleXYPlot = ({ currentUser: user, ...props }: SimpleXYPlotProps) => (
+    <CurrentUserContext.Provider value={user}>
       <XYPlot chartData={chartData}
               config={config}
               getChartColor={getChartColor}
@@ -92,7 +91,7 @@ describe('XYPlot', () => {
   );
 
   SimpleXYPlot.defaultProps = {
-    currentUser: viewsManager,
+    currentUser,
     config: config,
     chartData: chartData,
     currentQuery: currentQuery,
@@ -130,7 +129,8 @@ describe('XYPlot', () => {
   it('adds zoom handler for timeline plot', () => {
     CurrentUserStore.get.mockReturnValue({ timezone: 'UTC' });
     const timerange = { from: '2018-10-12T02:04:21.723Z', to: '2018-10-12T10:04:21.723Z', type: 'absolute' };
-    const wrapper = mount(<SimpleXYPlot effectiveTimerange={timerange} currentUser={{ ...viewsManager, timezone: 'UTC' }} />);
+    const user = currentUser.toBuilder().timezone('UTC').build();
+    const wrapper = mount(<SimpleXYPlot effectiveTimerange={timerange} currentUser={user} />);
     const genericPlot = wrapper.find('GenericPlot');
 
     expect(genericPlot).toHaveProp('layout', expect.objectContaining({
@@ -152,7 +152,8 @@ describe('XYPlot', () => {
     const timerange = { from: '2018-10-12T02:04:21.723Z', to: '2018-10-12T10:04:21.723Z', type: 'absolute' };
     const allMessages: RelativeTimeRange = { type: 'relative', range: 0 };
     const currentQueryForAllMessages = currentQuery.toBuilder().timerange(allMessages).build();
-    const wrapper = mount(<SimpleXYPlot effectiveTimerange={timerange} currentQuery={currentQueryForAllMessages} currentUser={{ ...viewsManager, timezone: 'UTC' }} />);
+    const user = currentUser.toBuilder().timezone('UTC').build();
+    const wrapper = mount(<SimpleXYPlot effectiveTimerange={timerange} currentQuery={currentQueryForAllMessages} currentUser={user} />);
     const genericPlot = wrapper.find('GenericPlot');
 
     expect(genericPlot).toHaveProp('layout', expect.objectContaining({

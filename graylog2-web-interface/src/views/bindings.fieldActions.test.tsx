@@ -14,9 +14,28 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import MockStore from 'helpers/mocking/StoreMock';
+import MockAction from 'helpers/mocking/MockAction';
+
 import FieldType, { FieldTypes, Properties } from 'views/logic/fieldtypes/FieldType';
+import { ActionDefinition } from 'views/components/actions/ActionHandler';
 
 import bindings from './bindings';
+
+jest.mock('views/stores/FieldTypesStore', () => ({
+  FieldTypesStore: MockStore(['getInitialState', () => ({ all: {}, queryFields: {} })]),
+}));
+
+jest.mock('stores/configurations/ConfigurationsStore', () => ({
+  ConfigurationsStore: MockStore(),
+  ConfigurationsActions: {
+    listSearchesClusterConfig: MockAction(),
+  },
+}));
+
+jest.mock('stores/decorators/DecoratorsStore', () => ({
+  DecoratorsStore: MockStore(),
+}));
 
 describe('Views bindings field actions', () => {
   const { fieldActions } = bindings;
@@ -25,7 +44,7 @@ describe('Views bindings field actions', () => {
     contexts: {},
     type: FieldType.Unknown,
   };
-  const findAction = (type: string) => fieldActions.find((binding) => binding.type === type);
+  const findAction = (type: string): ActionDefinition<{ analysisDisabledFields?: Array<string> }> => fieldActions.find((binding) => binding.type === type);
 
   describe('Aggregate', () => {
     const action = findAction('aggregate');
@@ -211,7 +230,7 @@ describe('Views bindings field actions', () => {
         .toEqual(false);
     });
 
-    it('should be enabled when field analisys is disabled', () => {
+    it('should be enabled when field analysis is disabled', () => {
       expect(isEnabled({
         ...defaultArguments,
         field: 'something',

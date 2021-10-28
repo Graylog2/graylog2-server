@@ -20,14 +20,13 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 
 import Routes from 'routing/Routes';
-import { DropdownButton, MenuItem } from 'components/graylog';
+import { DropdownButton, MenuItem } from 'components/bootstrap';
 import { IfPermitted } from 'components/common';
 import PermissionsMixin from 'util/PermissionsMixin';
-import StoreProvider from 'injection/StoreProvider';
+import HideOnCloud from 'util/conditional/HideOnCloud';
+import { StartpageStore } from 'stores/users/StartpageStore';
 
 import StreamForm from './StreamForm';
-
-const StartpageStore = StoreProvider.getStore('Startpage');
 
 const StreamControls = createReactClass({
   displayName: 'StreamControls',
@@ -41,12 +40,14 @@ const StreamControls = createReactClass({
     onQuickAdd: PropTypes.func.isRequired,
     onUpdate: PropTypes.func.isRequired,
     isDefaultStream: PropTypes.bool,
+    disabled: PropTypes.bool,
   },
 
   mixins: [PermissionsMixin],
 
   getDefaultProps() {
     return {
+      disabled: false,
       isDefaultStream: false,
     };
   },
@@ -80,13 +81,14 @@ const StreamControls = createReactClass({
   },
 
   render() {
-    const { stream, isDefaultStream, user, onUpdate, indexSets } = this.props;
+    const { stream, disabled, isDefaultStream, user, onUpdate, indexSets } = this.props;
 
     return (
       <span>
         <DropdownButton title="More Actions"
                         pullRight
-                        id={`more-actions-dropdown-${stream.id}`}>
+                        id={`more-actions-dropdown-${stream.id}`}
+                        disabled={disabled}>
           <IfPermitted permissions={`streams:edit:${stream.id}`}>
             <MenuItem key={`editStreams-${stream.id}`} onSelect={this._onEdit} disabled={isDefaultStream}>
               Edit stream
@@ -102,11 +104,13 @@ const StreamControls = createReactClass({
               Clone this stream
             </MenuItem>
           </IfPermitted>
-          <IfPermitted permissions="stream_outputs:read">
-            <MenuItem key={`manageOutputs-${stream.id}`} href={Routes.stream_outputs(stream.id)}>
-              Manage Outputs
-            </MenuItem>
-          </IfPermitted>
+          <HideOnCloud>
+            <IfPermitted permissions="stream_outputs:read">
+              <MenuItem key={`manageOutputs-${stream.id}`} href={Routes.stream_outputs(stream.id)}>
+                Manage Outputs
+              </MenuItem>
+            </IfPermitted>
+          </HideOnCloud>
           <MenuItem key={`setAsStartpage-${stream.id}`} onSelect={this._setStartpage} disabled={user.read_only}>
             Set as startpage
           </MenuItem>

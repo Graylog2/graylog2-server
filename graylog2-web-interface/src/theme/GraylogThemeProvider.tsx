@@ -19,11 +19,11 @@ import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { ThemeProvider, DefaultTheme } from 'styled-components';
 
-import buttonStyles from 'components/graylog/styles/buttonStyles';
-import aceEditorStyles from 'components/graylog/styles/aceEditorStyles';
+import buttonStyles from 'components/bootstrap/styles/buttonStyles';
+import aceEditorStyles from 'components/bootstrap/styles/aceEditorStyles';
 import usePluginEntities from 'views/logic/usePluginEntities';
 
-import { breakpoints, colors, fonts, utils } from './index';
+import { breakpoints, colors, fonts, utils, spacings } from './index';
 import RegeneratableThemeContext from './RegeneratableThemeContext';
 import { Colors } from './colors';
 import { THEME_MODES, ThemeMode } from './constants';
@@ -55,6 +55,7 @@ function buildTheme(currentThemeColors, changeMode, mode): DefaultTheme {
     breakpoints,
     colors: currentThemeColors,
     fonts,
+    spacings,
     components: {
       button: buttonStyles({ colors: currentThemeColors, utils: formattedUtils }),
       aceEditor: aceEditorStyles({ colors: currentThemeColors }),

@@ -16,6 +16,12 @@
  */
 import { List, Map } from 'immutable';
 
+import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import NumberVisualization from 'views/components/visualizations/number/NumberVisualization';
+import NumberVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
+import BarVisualization from 'views/components/visualizations/bar/BarVisualization';
+import BarVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
+
 type MixedMapsAndObjects = { [key: string]: Map<string, { [key: string]: Map<string, number> }> };
 
 export const mapWithObject = (): Map<string, { [key: string]: number }> => Map({ foo: { bar: 42 } });
@@ -43,3 +49,21 @@ export class NonValueClass {
     this.value = value;
   }
 }
+
+export const numericVisualizationWithTrend = () => AggregationWidgetConfig.builder()
+  .visualization(NumberVisualization.type)
+  .visualizationConfig(NumberVisualizationConfig.create(true))
+  .build();
+export const numericVisualizationWithoutTrend = () => AggregationWidgetConfig.builder()
+  .visualization(NumberVisualization.type)
+  .visualizationConfig(NumberVisualizationConfig.create())
+  .build();
+
+export const barChartWithGrouping = () => AggregationWidgetConfig.builder()
+  .visualization(BarVisualization.type)
+  .visualizationConfig(BarVisualizationConfig.create('group'))
+  .build();
+export const barChartWithStacking = () => AggregationWidgetConfig.builder()
+  .visualization(BarVisualization.type)
+  .visualizationConfig(BarVisualizationConfig.create('stack'))
+  .build();

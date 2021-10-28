@@ -26,14 +26,14 @@ import com.github.rholder.retry.WaitStrategies;
 import com.github.rholder.retry.WaitStrategy;
 import com.google.auto.value.AutoValue;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
-import org.graylog2.indexer.IndexFailure;
-import org.graylog2.indexer.IndexFailureImpl;
+import org.graylog.failure.FailureSubmissionService;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.InvalidWriteTargetException;
+import org.graylog2.indexer.MasterNotDiscoveredException;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.plugin.Message;
+import org.graylog2.shared.utilities.ExceptionUtils;
 import org.graylog2.system.processing.ProcessingStatusRecorder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,8 +49,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Singleton
@@ -78,7 +76,9 @@ public class Messages {
     @SuppressWarnings("UnstableApiUsage")
     private RetryerBuilder<List<IndexingError>> createBulkRequestRetryerBuilder() {
         return RetryerBuilder.<List<IndexingError>>newBuilder()
-                .retryIfException(t -> t instanceof IOException || t instanceof InvalidWriteTargetException)
+                .retryIfException(t -> ExceptionUtils.hasCauseOf(t, IOException.class)
+                        || t instanceof InvalidWriteTargetException
+                        || t instanceof MasterNotDiscoveredException)
                 .withWaitStrategy(WaitStrategies.exponentialWait(MAX_WAIT_TIME.getQuantity(), MAX_WAIT_TIME.getUnit()))
                 .withRetryListener(new RetryListener() {
                     @Override
@@ -92,7 +92,7 @@ public class Messages {
                 });
     }
 
-    private final LinkedBlockingQueue<List<IndexFailure>> indexFailureQueue;
+    private final FailureSubmissionService failureSubmissionService;
     private final MessagesAdapter messagesAdapter;
     private final ProcessingStatusRecorder processingStatusRecorder;
     private final TrafficAccounting trafficAccounting;
@@ -100,13 +100,12 @@ public class Messages {
     @Inject
     public Messages(TrafficAccounting trafficAccounting,
                     MessagesAdapter messagesAdapter,
-                    ProcessingStatusRecorder processingStatusRecorder) {
+                    ProcessingStatusRecorder processingStatusRecorder,
+                    FailureSubmissionService failureSubmissionService) {
         this.trafficAccounting = trafficAccounting;
         this.messagesAdapter = messagesAdapter;
         this.processingStatusRecorder = processingStatusRecorder;
-
-        // TODO: Magic number
-        this.indexFailureQueue = new LinkedBlockingQueue<>(1000);
+        this.failureSubmissionService = failureSubmissionService;
     }
 
     public ResultMessage get(String messageId, String index) throws DocumentNotFoundException, IOException {
@@ -274,24 +273,11 @@ public class Messages {
             return Collections.emptyList();
         }
 
-        final List<IndexFailure> indexFailures = indexingErrors.stream()
-                .map(IndexingError::toIndexFailure)
+        failureSubmissionService.submitIndexingErrors(indexingErrors);
+
+        return indexingErrors.stream()
+                .map(IndexingError::message).map(Indexable::getId)
                 .collect(Collectors.toList());
-
-        try {
-            // TODO: Magic number
-            indexFailureQueue.offer(indexFailures, 25, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException e) {
-            LOG.warn("Couldn't save index failures.", e);
-        }
-
-        return indexFailures.stream()
-                .map(IndexFailure::letterId)
-                .collect(Collectors.toList());
-    }
-
-    public LinkedBlockingQueue<List<IndexFailure>> getIndexFailureQueue() {
-        return indexFailureQueue;
     }
 
     @AutoValue
@@ -312,19 +298,6 @@ public class Messages {
 
         public static IndexingError create(Indexable message, String index) {
             return create(message, index, ErrorType.Unknown, "");
-        }
-
-        public IndexFailure toIndexFailure() {
-            final Indexable message = this.message();
-            final Map<String, Object> doc = ImmutableMap.<String, Object>builder()
-                    .put("letter_id", message.getId())
-                    .put("index", this.index())
-                    .put("type", this.errorType().toString())
-                    .put("message", this.errorMessage())
-                    .put("timestamp", message.getTimestamp())
-                    .build();
-
-            return new IndexFailureImpl(doc);
         }
     }
 }

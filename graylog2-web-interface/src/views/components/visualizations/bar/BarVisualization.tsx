@@ -21,7 +21,7 @@ import { AggregationType, AggregationResult } from 'views/components/aggregation
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import EventHandler, { Shapes } from 'views/logic/searchtypes/events/EventHandler';
 import { DateType } from 'views/logic/aggregationbuilder/Pivot';
-import { makeVisualization } from 'views/components/aggregationbuilder/AggregationBuilder';
+import { makeVisualization, retrieveChartData } from 'views/components/aggregationbuilder/AggregationBuilder';
 import BarVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
 
 import { chartData } from '../ChartData';
@@ -91,11 +91,11 @@ const BarVisualization = makeVisualization(({ config, data, effectiveTimerange, 
 
   const _seriesGenerator = (type, name, labels, values): ChartDefinition => ({ type, name, x: labels, y: values, opacity });
 
-  const rows = data.chart || Object.values(data)[0];
+  const rows = retrieveChartData(data);
   const chartDataResult = chartData(config, rows, 'bar', _seriesGenerator);
 
   if (config.eventAnnotation && data.events) {
-    const { eventChartData, shapes } = EventHandler.toVisualizationData(data.events, config.formattingSettings);
+    const { eventChartData, shapes } = EventHandler.toVisualizationData(data.events);
 
     chartDataResult.push(eventChartData);
     layout.shapes = shapes;

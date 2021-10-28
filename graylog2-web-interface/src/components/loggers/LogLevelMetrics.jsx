@@ -21,11 +21,9 @@ import Reflux from 'reflux';
 import lodash from 'lodash';
 import numeral from 'numeral';
 
-import { Col } from 'components/graylog';
+import { Col } from 'components/bootstrap';
 import { Spinner } from 'components/common';
-import CombinedProvider from 'injection/CombinedProvider';
-
-const { MetricsStore, MetricsActions } = CombinedProvider.get('Metrics');
+import { MetricsActions, MetricsStore } from 'stores/metrics/MetricsStore';
 
 const LogLevelMetrics = createReactClass({
   displayName: 'LogLevelMetrics',

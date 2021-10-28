@@ -17,8 +17,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { LinkContainer } from 'components/graylog/router';
-import { DropdownButton, MenuItem } from 'components/graylog';
+import { LinkContainer } from 'components/common/router';
+import { DropdownButton, MenuItem } from 'components/bootstrap';
 import ExtractorUtils from 'util/ExtractorUtils';
 
 class MessageFieldExtractorActions extends React.Component {

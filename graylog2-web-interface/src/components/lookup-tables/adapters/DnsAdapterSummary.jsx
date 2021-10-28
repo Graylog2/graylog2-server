@@ -34,17 +34,17 @@ const DnsAdapterSummary = ({ dataAdapter }) => {
   return (
     <dl>
       <dt>DNS Lookup Type</dt>
-      <dd>{ lookupType[config.lookup_type] }</dd>
+      <dd>{lookupType[config.lookup_type]}</dd>
 
       <dt>DNS Server IP Address</dt>
-      <dd>{ config.server_ips || 'n/a' }</dd>
+      <dd>{config.server_ips || 'n/a'}</dd>
 
       <dt>DNS Request Timeout</dt>
-      <dd>{ config.request_timeout } ms</dd>
+      <dd>{config.request_timeout} ms</dd>
 
       <dt>Cache TTL Override</dt>
       <dd>
-        { !config.cache_ttl_override_enabled ? 'n/a' : <TimeUnit value={config.cache_ttl_override} unit={config.cache_ttl_override_unit} /> }
+        {!config.cache_ttl_override_enabled ? 'n/a' : <TimeUnit value={config.cache_ttl_override} unit={config.cache_ttl_override_unit} />}
       </dd>
     </dl>
   );

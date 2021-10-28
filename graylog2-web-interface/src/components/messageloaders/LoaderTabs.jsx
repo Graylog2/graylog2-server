@@ -18,19 +18,15 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 
-import { Col, Tab, Tabs } from 'components/graylog';
+import { Col, Tab, Tabs } from 'components/bootstrap';
 import connect from 'stores/connect';
-import StoreProvider from 'injection/StoreProvider';
-import ActionsProvider from 'injection/ActionsProvider';
 import MessageShow from 'components/search/MessageShow';
 import MessageLoader from 'components/extractors/MessageLoader';
+import StreamsStore from 'stores/streams/StreamsStore';
+import { InputsActions, InputsStore } from 'stores/inputs/InputsStore';
 
 import RawMessageLoader from './RawMessageLoader';
 import RecentMessageLoader from './RecentMessageLoader';
-
-const InputsStore = StoreProvider.getStore('Inputs');
-const StreamsStore = StoreProvider.getStore('Streams');
-const InputsActions = ActionsProvider.getActions('Inputs');
 
 class LoaderTabs extends React.Component {
   TAB_KEYS = {
@@ -50,11 +46,6 @@ class LoaderTabs extends React.Component {
 
   componentDidMount() {
     this.loadData();
-    const { messageId, index } = this.props;
-
-    if (messageId && index) {
-      this.messageLoader.submit(messageId, index);
-    }
   }
 
   onMessageLoaded = (message) => {
@@ -134,13 +125,18 @@ class LoaderTabs extends React.Component {
     }
 
     if (this._isTabVisible('messageId')) {
+      const { messageId, index } = this.props;
+
       messageLoaders.push(
         <Tab key="messageId" eventKey={this.TAB_KEYS.messageId} title="Message ID" style={{ marginBottom: 10 }}>
           <div style={{ marginTop: 5, marginBottom: 15 }}>
             Please provide the id and index of the message that you want to load in this form:
           </div>
-
-          <MessageLoader ref={(messageLoader) => { this.messageLoader = messageLoader; }} onMessageLoaded={this.onMessageLoaded} hidden={false} hideText />
+          <MessageLoader messageId={messageId}
+                         index={index}
+                         onMessageLoaded={this.onMessageLoaded}
+                         hidden={false}
+                         hideText />
         </Tab>,
       );
     }

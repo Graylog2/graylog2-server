@@ -20,6 +20,7 @@ public class EventFields {
     public static final String EVENT_CODE = "event_code";
     public static final String EVENT_CREATED = "event_created";
     public static final String EVENT_DURATION = "event_duration";
+    public static final String EVENT_END = "event_end";
     public static final String EVENT_ERROR_CODE = "event_error_code";
     public static final String EVENT_ERROR_DESCRIPTION = "event_error_description";
     public static final String EVENT_LOG_NAME = "event_log_name";

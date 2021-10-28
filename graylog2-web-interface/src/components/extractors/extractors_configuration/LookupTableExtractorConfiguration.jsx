@@ -17,18 +17,14 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Link } from 'components/graylog/router';
-import { Row, Col, Button } from 'components/graylog';
-import { Input } from 'components/bootstrap';
+import { Link } from 'components/common/router';
 import { Select, Spinner, Icon } from 'components/common';
+import { Row, Col, Button, Input } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import UserNotification from 'util/UserNotification';
 import FormUtils from 'util/FormsUtils';
-import StoreProvider from 'injection/StoreProvider';
-import CombinedProvider from 'injection/CombinedProvider';
-
-const ToolsStore = StoreProvider.getStore('Tools');
-const { LookupTablesActions } = CombinedProvider.get('LookupTables');
+import ToolsStore from 'stores/tools/ToolsStore';
+import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
 
 class LookupTableExtractorConfiguration extends React.Component {
   static propTypes = {

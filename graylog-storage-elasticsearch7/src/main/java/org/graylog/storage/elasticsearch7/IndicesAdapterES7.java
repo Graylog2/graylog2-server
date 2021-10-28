@@ -41,7 +41,9 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.GetAliasesResp
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.CloseIndexRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.CreateIndexRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.DeleteAliasRequest;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.IndexTemplatesExistRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.PutIndexTemplateRequest;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.PutMappingRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.cluster.metadata.AliasMetadata;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.unit.TimeValue;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders;
@@ -72,6 +74,7 @@ import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import java.util.Arrays;
 import java.util.Collection;
@@ -140,7 +143,7 @@ public class IndicesAdapterES7 implements IndicesAdapter {
     }
 
     @Override
-    public void create(String index, IndexSettings indexSettings, String templateName, Map<String, Object> template) {
+    public void create(String index, IndexSettings indexSettings) {
         final Map<String, Object> settings = new HashMap<>();
         settings.put("number_of_shards", indexSettings.shards());
         settings.put("number_of_replicas", indexSettings.replicas());
@@ -153,6 +156,18 @@ public class IndicesAdapterES7 implements IndicesAdapter {
     }
 
     @Override
+    public void updateIndexMapping(@Nonnull String indexName,
+                                   @Nonnull String mappingType,
+                                   @Nonnull Map<String, Object> mapping) {
+
+        final PutMappingRequest request = new PutMappingRequest(indexName)
+                .source(mapping);
+
+        client.execute((c, requestOptions) -> c.indices().putMapping(request, requestOptions),
+                "Unable to update index mapping " + indexName);
+    }
+
+    @Override
     public boolean ensureIndexTemplate(String templateName, Map<String, Object> template) {
         final PutIndexTemplateRequest request = new PutIndexTemplateRequest(templateName)
                 .source(template);
@@ -161,6 +176,12 @@ public class IndicesAdapterES7 implements IndicesAdapter {
                 "Unable to create index template " + templateName);
 
         return result.isAcknowledged();
+    }
+
+    @Override
+    public boolean indexTemplateExists(String templateName) {
+        return client.execute((c, requestOptions) -> c.indices().existsTemplate(new IndexTemplatesExistRequest(templateName),
+                requestOptions), "Unable to verify index template existence " + templateName);
     }
 
     @Override

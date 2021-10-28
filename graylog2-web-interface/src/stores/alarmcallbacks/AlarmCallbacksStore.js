@@ -16,79 +16,89 @@
  */
 import Reflux from 'reflux';
 
-import ActionsProvider from 'injection/ActionsProvider';
 import UserNotification from 'util/UserNotification';
 import * as URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 
-const AlarmCallbacksActions = ActionsProvider.getActions('AlarmCallbacks');
+import { singletonActions, singletonStore } from '../../logic/singleton';
 
-const AlarmCallbacksStore = Reflux.createStore({
-  listenables: [AlarmCallbacksActions],
+export const AlarmCallbacksActions = singletonActions(
+  'core.AlarmCallbacks',
+  Reflux.createActions({
+    delete: { asyncResult: true },
+    list: { asyncResult: true },
+    save: { asyncResult: true },
+    update: { asyncResult: true },
+  }),
+);
 
-  list(streamId) {
-    const failCallback = (error) => UserNotification.error(`Fetching alert notifications failed with status: ${error.message}`,
-      'Could not retrieve alert notification');
+export const AlarmCallbacksStore = singletonStore(
+  'core.AlarmCallbacks',
+  Reflux.createStore({
+    listenables: [AlarmCallbacksActions],
 
-    const url = URLUtils.qualifyUrl(ApiRoutes.AlarmCallbacksApiController.list(streamId).url);
-    const promise = fetch('GET', url).then((response) => response.alarmcallbacks, failCallback);
+    list(streamId) {
+      const failCallback = (error) => UserNotification.error(`Fetching alert notifications failed with status: ${error.message}`,
+        'Could not retrieve alert notification');
 
-    AlarmCallbacksActions.list.promise(promise);
-  },
-  save(streamId, alarmCallback) {
-    const failCallback = (error) => {
-      const errorMessage = (error.additional && error.additional.status === 400 ? error.additional.body.message : error.message);
+      const url = URLUtils.qualifyUrl(ApiRoutes.AlarmCallbacksApiController.list(streamId).url);
+      const promise = fetch('GET', url).then((response) => response.alarmcallbacks, failCallback);
 
-      UserNotification.error(`Saving alert notification failed with status: ${errorMessage}`,
-        'Could not save alert notification');
-    };
+      AlarmCallbacksActions.list.promise(promise);
+    },
+    save(streamId, alarmCallback) {
+      const failCallback = (error) => {
+        const errorMessage = (error.additional && error.additional.status === 400 ? error.additional.body.message : error.message);
 
-    const url = URLUtils.qualifyUrl(ApiRoutes.AlarmCallbacksApiController.create(streamId).url);
+        UserNotification.error(`Saving alert notification failed with status: ${errorMessage}`,
+          'Could not save alert notification');
+      };
 
-    const promise = fetch('POST', url, alarmCallback);
+      const url = URLUtils.qualifyUrl(ApiRoutes.AlarmCallbacksApiController.create(streamId).url);
 
-    promise.then(
-      () => UserNotification.success('Alert notification saved successfully'),
-      failCallback,
-    );
+      const promise = fetch('POST', url, alarmCallback);
 
-    AlarmCallbacksActions.save.promise(promise);
-  },
-  delete(streamId, alarmCallbackId) {
-    const failCallback = (error) => UserNotification.error(`Removing alert notification failed with status: ${error.message}`,
-      'Could not remove alert notification');
+      promise.then(
+        () => UserNotification.success('Alert notification saved successfully'),
+        failCallback,
+      );
 
-    const url = URLUtils.qualifyUrl(ApiRoutes.AlarmCallbacksApiController.delete(streamId, alarmCallbackId).url);
+      AlarmCallbacksActions.save.promise(promise);
+    },
+    delete(streamId, alarmCallbackId) {
+      const failCallback = (error) => UserNotification.error(`Removing alert notification failed with status: ${error.message}`,
+        'Could not remove alert notification');
 
-    const promise = fetch('DELETE', url);
+      const url = URLUtils.qualifyUrl(ApiRoutes.AlarmCallbacksApiController.delete(streamId, alarmCallbackId).url);
 
-    promise.then(
-      () => UserNotification.success('Alert notification deleted successfully'),
-      failCallback,
-    );
+      const promise = fetch('DELETE', url);
 
-    AlarmCallbacksActions.delete.promise(promise);
-  },
-  update(streamId, alarmCallbackId, deltas) {
-    const failCallback = (error) => {
-      const errorMessage = (error.additional && error.additional.status === 400 ? error.additional.body.message : error.message);
+      promise.then(
+        () => UserNotification.success('Alert notification deleted successfully'),
+        failCallback,
+      );
 
-      UserNotification.error(`Updating alert notification '${alarmCallbackId}' failed with status: ${errorMessage}`,
-        'Could not update alert notification');
-    };
+      AlarmCallbacksActions.delete.promise(promise);
+    },
+    update(streamId, alarmCallbackId, deltas) {
+      const failCallback = (error) => {
+        const errorMessage = (error.additional && error.additional.status === 400 ? error.additional.body.message : error.message);
 
-    const url = URLUtils.qualifyUrl(ApiRoutes.AlarmCallbacksApiController.update(streamId, alarmCallbackId).url);
+        UserNotification.error(`Updating alert notification '${alarmCallbackId}' failed with status: ${errorMessage}`,
+          'Could not update alert notification');
+      };
 
-    const promise = fetch('PUT', url, deltas);
+      const url = URLUtils.qualifyUrl(ApiRoutes.AlarmCallbacksApiController.update(streamId, alarmCallbackId).url);
 
-    promise.then(
-      () => UserNotification.success('Alert notification updated successfully'),
-      failCallback,
-    );
+      const promise = fetch('PUT', url, deltas);
 
-    AlarmCallbacksActions.update.promise(promise);
-  },
-});
+      promise.then(
+        () => UserNotification.success('Alert notification updated successfully'),
+        failCallback,
+      );
 
-export default AlarmCallbacksStore;
+      AlarmCallbacksActions.update.promise(promise);
+    },
+  }),
+);

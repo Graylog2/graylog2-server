@@ -34,10 +34,12 @@ jest.mock('stores/authentication/HTTPHeaderAuthConfigStore', () => ({
   },
 }));
 
-jest.useFakeTimers();
-
 describe('<HTTPHeaderAuthConfigSection />', () => {
+  afterEach(() => jest.useRealTimers());
+
   it('should display loading indicator while loading', async () => {
+    jest.useFakeTimers();
+
     render(<HTTPHeaderAuthConfigSection />);
 
     act(() => {

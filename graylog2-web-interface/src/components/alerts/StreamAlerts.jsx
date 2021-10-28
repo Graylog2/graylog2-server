@@ -19,11 +19,9 @@ import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 import Reflux from 'reflux';
 
+import { AlertsStore, AlertsActions } from 'stores/alerts/AlertsStore';
 import { Alert } from 'components/alerts';
 import { EntityList, PaginatedList, Spinner } from 'components/common';
-import CombinedProvider from 'injection/CombinedProvider';
-
-const { AlertsStore, AlertsActions } = CombinedProvider.get('Alerts');
 
 const ALERTS_REFRESH_INTERVAL = 10000;
 

@@ -20,12 +20,12 @@ import PropTypes from 'prop-types';
 import connect from 'stores/connect';
 import { DocumentTitle, Spinner } from 'components/common';
 import Rule from 'components/rules/Rule';
-import CombinedProvider from 'injection/CombinedProvider';
+import Routes from 'routing/Routes';
 import { PipelineRulesProvider } from 'components/rules/RuleContext';
 import withParams from 'routing/withParams';
-
-const { RulesStore, RulesActions } = CombinedProvider.get('Rules');
-const { PipelinesStore, PipelinesActions } = CombinedProvider.get('Pipelines');
+import { PipelinesStore, PipelinesActions } from 'stores/pipelines/PipelinesStore';
+import { RulesActions, RulesStore } from 'stores/rules/RulesStore';
+import history from 'util/History';
 
 function filterRules(rule, ruleId) {
   return rule?.rules?.filter((r) => r.id === ruleId)[0];
@@ -56,10 +56,16 @@ const RuleDetailsPage = ({ params, rule, pipelines }) => {
       setIsLoading(false);
     } else {
       PipelinesActions.list();
-      RulesActions.get(params.ruleId);
+
+      RulesActions.get(params.ruleId).then(() => {}, (error) => {
+        if (error.status === 404) {
+          history.push(Routes.SYSTEM.PIPELINES.RULES);
+        }
+      });
+
       setIsLoading(!(filteredRule && pipelines));
     }
-  }, [filteredRule]);
+  }, [filteredRule, isNewRule, params.ruleId, pipelines]);
 
   if (isLoading) {
     return <Spinner text="Loading Rule Details..." />;

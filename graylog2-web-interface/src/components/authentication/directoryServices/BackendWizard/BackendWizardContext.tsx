@@ -19,7 +19,7 @@ import * as Immutable from 'immutable';
 import { $PropertyType } from 'utility-types';
 
 import { Step, StepKey } from 'components/common/Wizard';
-import { singleton } from 'views/logic/singleton';
+import { singleton } from 'logic/singleton';
 
 export type WizardFormValues = {
   title?: string,
@@ -44,6 +44,7 @@ export type WizardFormValues = {
   userSearchBase?: string,
   userSearchPattern?: string,
   verifyCertificates?: boolean,
+  oktaApiToken?: string,
 };
 
 export type AuthBackendMeta = {

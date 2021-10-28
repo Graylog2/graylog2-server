@@ -18,14 +18,13 @@ import * as React from 'react';
 import { useEffect, useContext, useState } from 'react';
 import styled, { css } from 'styled-components';
 
-import type { PaginatedUsers } from 'actions/users/UsersActions';
+import type { PaginatedUsers } from 'stores/users/UsersStore';
 import UsersDomain from 'domainActions/users/UsersDomain';
 import { UsersActions } from 'stores/users/UsersStore';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import { DataTable, Spinner, PaginatedList, EmptyResult } from 'components/common';
-import { Col, Row } from 'components/graylog';
+import { Col, Row } from 'components/bootstrap';
 import UserOverview from 'logic/users/UserOverview';
-import { UserJSON } from 'logic/users/User';
 
 import UserOverviewItem from './UserOverviewItem';
 import UsersFilter from './UsersFilter';
@@ -86,7 +85,7 @@ const _updateListOnUserDelete = (perPage, query, setPagination) => UsersActions.
 const _updateListOnUserSetStatus = (pagination, setLoading, setPaginatedUsers) => UsersActions.setStatus.completed.listen(() => _loadUsers(pagination, setLoading, setPaginatedUsers));
 
 const UsersOverview = () => {
-  const currentUser = useContext<UserJSON | undefined>(CurrentUserContext);
+  const currentUser = useContext(CurrentUserContext);
   const [paginatedUsers, setPaginatedUsers] = useState<PaginatedUsers | undefined>();
   const [loading, setLoading] = useState(false);
   const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
@@ -102,7 +101,12 @@ const UsersOverview = () => {
   }
 
   const searchFilter = <UsersFilter onSearch={(newQuery) => setPagination({ ...pagination, query: newQuery, page: DEFAULT_PAGINATION.page })} />;
-  const _usersOverviewItem = (user: UserOverview) => <UserOverviewItem user={user} isActive={(currentUser?.id === user.id)} />;
+
+  const _usersOverviewItem = (user: UserOverview) => {
+    const { id: userId } = user;
+
+    return <UserOverviewItem user={user} isActive={(currentUser?.id === userId)} />;
+  };
 
   return (
     <Container>

@@ -17,16 +17,13 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Col, Row, Button } from 'components/graylog';
 import { Icon } from 'components/common';
-import { Input } from 'components/bootstrap';
+import { Col, Row, Button, Input } from 'components/bootstrap';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
 import UserNotification from 'util/UserNotification';
 import FormUtils from 'util/FormsUtils';
-import StoreProvider from 'injection/StoreProvider';
-
-const ToolsStore = StoreProvider.getStore('Tools');
+import ToolsStore from 'stores/tools/ToolsStore';
 
 class RegexReplaceExtractorConfiguration extends React.Component {
   static propTypes = {
@@ -93,7 +90,8 @@ class RegexReplaceExtractorConfiguration extends React.Component {
     const replacementHelpMessage = (
       <span>The replacement used for the matching text. Please refer to the{' '}
         <a target="_blank"
-           href="https://docs.oracle.com/javase/7/docs/api/java/util/regex/Matcher.html#replaceAll(java.lang.String)">Matcher
+           href="https://docs.oracle.com/javase/7/docs/api/java/util/regex/Matcher.html#replaceAll(java.lang.String)"
+           rel="noreferrer">Matcher
         </a>{' '}
         API documentation for the possible options.
       </span>

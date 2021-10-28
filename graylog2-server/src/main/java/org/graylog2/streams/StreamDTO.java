@@ -19,23 +19,22 @@ package org.graylog2.streams;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.bson.types.ObjectId;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.rest.models.alarmcallbacks.requests.AlertReceivers;
 import org.graylog2.rest.models.streams.alerts.AlertConditionSummary;
-import org.graylog2.rest.models.system.outputs.responses.OutputSummary;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
-import java.util.Collections;
-
-import static com.google.common.base.MoreObjects.firstNonNull;
 
 @AutoValue
 @WithBeanGetter
 @JsonAutoDetect
+@JsonDeserialize(builder = StreamDTO.Builder.class)
 public abstract class StreamDTO {
     public static final String FIELD_ID = "_id";
     public static final String FIELD_TITLE = "title";
@@ -52,6 +51,7 @@ public abstract class StreamDTO {
     public static final String FIELD_REMOVE_MATCHES_FROM_DEFAULT_STREAM = "remove_matches_from_default_stream";
     public static final String FIELD_INDEX_SET_ID = "index_set_id";
     public static final String EMBEDDED_ALERT_CONDITIONS = "alert_conditions";
+    public static final String FIELD_IS_EDITABLE = "is_editable";
 
     @JsonProperty("id")
     public abstract String id();
@@ -106,47 +106,24 @@ public abstract class StreamDTO {
     @JsonProperty(FIELD_INDEX_SET_ID)
     public abstract String indexSetId();
 
+    @JsonProperty(FIELD_IS_EDITABLE)
+    public abstract boolean isEditable();
+
     public abstract Builder toBuilder();
 
-    @JsonCreator
-    public static StreamDTO create(@JsonProperty(FIELD_ID) String id,
-                                   @JsonProperty(FIELD_CREATOR_USER_ID) String creatorUserId,
-                                   @JsonProperty(FIELD_OUTPUTS) @Nullable Collection<ObjectId> outputs,
-                                   @JsonProperty(FIELD_MATCHING_TYPE) String matchingType,
-                                   @JsonProperty(FIELD_DESCRIPTION) @Nullable String description,
-                                   @JsonProperty(FIELD_CREATED_AT) String createdAt,
-                                   @JsonProperty(FIELD_DISABLED) boolean disabled,
-                                   @JsonProperty(FIELD_RULES) @Nullable Collection<StreamRule> rules,
-                                   @JsonProperty(EMBEDDED_ALERT_CONDITIONS) @Nullable Collection<AlertConditionSummary> alertConditions,
-                                   @JsonProperty(FIELD_ALERT_RECEIVERS) @Nullable AlertReceivers alertReceivers,
-                                   @JsonProperty(FIELD_TITLE) String title,
-                                   @JsonProperty(FIELD_CONTENT_PACK) @Nullable String contentPack,
-                                   @JsonProperty(FIELD_DEFAULT_STREAM) @Nullable Boolean isDefault,
-                                   @JsonProperty(FIELD_REMOVE_MATCHES_FROM_DEFAULT_STREAM) @Nullable Boolean removeMatchesFromDefaultStream,
-                                   @JsonProperty(FIELD_INDEX_SET_ID) String indexSetId) {
-        return new AutoValue_StreamDTO(
-                id,
-                creatorUserId,
-                outputs,
-                matchingType,
-                description,
-                createdAt,
-                rules,
-                disabled,
-                alertConditions,
-                alertReceivers,
-                title,
-                contentPack,
-                firstNonNull(isDefault, false),
-                firstNonNull(removeMatchesFromDefaultStream, false),
-                indexSetId);
+    static Builder builder() {
+        return Builder.create();
     }
 
     @AutoValue.Builder
     public abstract static class Builder {
         @JsonCreator
         public static Builder create() {
-            return new AutoValue_StreamDTO.Builder();
+            return new AutoValue_StreamDTO.Builder()
+                    .matchingType(Stream.MatchingType.AND.toString())
+                    .isDefault(false)
+                    .isEditable(false)
+                    .removeMatchesFromDefaultStream(false);
         }
 
         @JsonProperty(FIELD_ID)
@@ -194,6 +171,16 @@ public abstract class StreamDTO {
         @JsonProperty(FIELD_INDEX_SET_ID)
         public abstract Builder indexSetId(String indexSetId);
 
-        public abstract StreamDTO build();
+        @JsonProperty(FIELD_IS_EDITABLE)
+        public abstract Builder isEditable(boolean isEditable);
+
+        public abstract String id();
+
+        public abstract StreamDTO autoBuild();
+
+        public StreamDTO build() {
+            isEditable(Stream.streamIsEditable(id()));
+            return autoBuild();
+        }
     }
 }

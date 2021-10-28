@@ -19,13 +19,12 @@ import { useContext } from 'react';
 import styled from 'styled-components';
 
 import CurrentUserContext from 'contexts/CurrentUserContext';
-import { LinkContainer } from 'components/graylog/router';
+import { LinkContainer } from 'components/common/router';
 import UserOverview from 'logic/users/UserOverview';
 import UsersDomain from 'domainActions/users/UsersDomain';
 import Routes from 'routing/Routes';
-import { Button, OverlayTrigger, Tooltip, DropdownButton, MenuItem } from 'components/graylog';
-import { IfPermitted } from 'components/common';
-import { UserJSON } from 'logic/users/User';
+import { Button, Tooltip, DropdownButton, MenuItem } from 'components/bootstrap';
+import { OverlayTrigger, IfPermitted } from 'components/common';
 
 type Props = {
   user: UserOverview,
@@ -68,7 +67,7 @@ const ReadOnlyActions = ({ user }: { user: UserOverview }) => {
 };
 
 const EditActions = ({ user, user: { username, id, fullName, accountStatus, external, readOnly } }: { user: UserOverview }) => {
-  const currentUser = useContext<UserJSON>(CurrentUserContext);
+  const currentUser = useContext(CurrentUserContext);
 
   const _toggleStatus = () => {
     if (accountStatus === 'enabled') {
@@ -105,13 +104,13 @@ const EditActions = ({ user, user: { username, id, fullName, accountStatus, exte
       <DropdownButton bsSize="xs" title="More actions" pullRight id={`delete-user-${id}`}>
         <EditTokensAction user={user} wrapperComponent={MenuItem} />
         <IfPermitted permissions={[`users:edit:${username}`]}>
-          { showEnableDisable && (
+          {showEnableDisable && (
             <MenuItem id={`set-status-user-${id}`}
                       onClick={_toggleStatus}
                       title={`Set new account status for ${fullName}`}>
               {accountStatus === 'enabled' ? 'Disable' : 'Enable'}
             </MenuItem>
-          ) }
+          )}
           <MenuItem id={`delete-user-${id}`}
                     bsStyle="primary"
                     bsSize="xs"

@@ -19,8 +19,8 @@ import PropTypes from 'prop-types';
 import lodash from 'lodash';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import { Link } from 'components/graylog/router';
-import { Col, Row } from 'components/graylog';
+import { Link } from 'components/common/router';
+import { Col, Row } from 'components/bootstrap';
 import { Timestamp } from 'components/common';
 import Routes from 'routing/Routes';
 import PermissionsMixin from 'util/PermissionsMixin';
@@ -114,6 +114,10 @@ class EventDetails extends React.Component {
             {lodash.isEmpty(event.fields)
               ? <dd>No additional Fields added to this Event.</dd>
               : this.renderEventFields(event.fields)}
+            <dt>Group-By Fields</dt>
+            {lodash.isEmpty(event.group_by_fields)
+              ? <dd>No group-by fields on this Event.</dd>
+              : this.renderEventFields(event.group_by_fields)}
           </dl>
         </Col>
       </Row>

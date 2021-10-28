@@ -25,6 +25,7 @@ import { useStore } from 'stores/connect';
 import useQuery from 'routing/useQuery';
 import { WidgetStore } from 'views/stores/WidgetStore';
 import { SearchActions } from 'views/stores/SearchStore';
+import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 
 import WidgetFocusContext, { FocusContextState } from './WidgetFocusContext';
 
@@ -57,11 +58,11 @@ const _updateQueryParams = (
     }
 
     if (newQueryParams.focusing) {
-      baseUri = baseUri.setSearch('focusing', true);
+      baseUri = baseUri.setSearch('focusing', String(true));
     }
 
     if (newQueryParams.editing) {
-      baseUri = baseUri.setSearch('editing', true);
+      baseUri = baseUri.setSearch('editing', String(true));
     }
   }
 
@@ -85,7 +86,7 @@ const useSyncStateWithQueryParams = ({ focusedWidget, focusUriParams, setFocused
       const filter = nextFocusedWidget?.id ? [nextFocusedWidget.id] : null;
       SearchActions.setWidgetsToSearch(filter);
 
-      if (filter === null) {
+      if (focusedWidget?.focusing && filter === null) {
         SearchActions.executeWithCurrentState();
       }
     }
@@ -94,7 +95,7 @@ const useSyncStateWithQueryParams = ({ focusedWidget, focusUriParams, setFocused
 
 const useCleanupQueryParams = ({ focusUriParams, widgets, query, history }) => {
   useEffect(() => {
-    if ((focusUriParams?.id && !widgets.has(focusUriParams.id)) || (focusUriParams?.id === undefined)) {
+    if ((focusUriParams?.id && !widgets.has(focusUriParams.id) && focusUriParams.isPageShown) || (focusUriParams?.id === undefined)) {
       const baseURI = _clearURI(query);
 
       history.replace(baseURI.toString());
@@ -108,12 +109,14 @@ const WidgetFocusProvider = ({ children }: { children: React.ReactNode }): React
   const history = useHistory();
   const [focusedWidget, setFocusedWidget] = useState<FocusContextState | undefined>();
   const widgets = useStore(WidgetStore);
+  const { activeQuery } = useStore(ViewMetadataStore);
   const params = useQuery();
   const focusUriParams = useMemo(() => ({
     editing: params.editing === 'true',
     focusing: params.focusing === 'true',
     id: params.focusedId,
-  }), [params.editing, params.focusing, params.focusedId]);
+    isPageShown: !params.page || params.page === activeQuery,
+  }), [params.editing, params.focusing, params.focusedId, params.page, activeQuery]);
 
   useSyncStateWithQueryParams({ focusedWidget, setFocusedWidget, widgets, focusUriParams });
 

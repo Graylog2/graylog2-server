@@ -19,26 +19,38 @@ import * as React from 'react';
 import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
 import {
   DirectoryServiceBackend,
-  DirectoryServiceBackendConfig, DirectoryServiceBackendConfigJson,
+  DirectoryServiceBackendConfig,
+  DirectoryServiceBackendConfigJson,
   WizardSubmitPayload,
 } from 'logic/authentication/directoryServices/types';
+import { OktaBackend, OktaBackendConfig, OktaBackendConfigJson } from 'logic/authentication/okta/types';
 import Role from 'logic/roles/Role';
 import { WizardFormValues } from 'components/authentication/directoryServices/BackendWizard/BackendWizardContext';
 
-interface AuthenticationService {
+export interface DirectoryServiceAuthenticationService {
   name: string;
   displayName: string;
   createComponent: React.ComponentType<{}>;
   editComponent: React.ComponentType<{
-    authenticationBackend: DirectoryServiceBackend,
+    authenticationBackend: (typeof DirectoryServiceBackend | typeof OktaBackendConfig),
     initialStepKey: string | null | undefined
   }>;
   configDetailsComponent: React.ComponentType<{
-    authenticationBackend: AuthenticationBackend,
-    roles: Immutable.List<Role>,
+    authenticationBackend:(typeof AuthenticationBackend | typeof OktaBackend),
+    roles?: Immutable.List<Role>,
   }>;
   configToJson: (config: {}) => DirectoryServiceBackendConfigJson;
   configFromJson: (json: {}) => DirectoryServiceBackendConfig;
+}
+
+interface OktaAuthenticationService {
+  name: 'okta';
+  displayName: string;
+  createComponent: React.ComponentType;
+  editComponent: React.ComponentType;
+  configDetailsComponent: React.ComponentType;
+  configToJson: (config: {}) => OktaBackendConfigJson;
+  configFromJson: (json: {}) => OktaBackendConfig;
 }
 
 interface GroupSyncSectionProps {
@@ -95,7 +107,7 @@ interface AuthenticationPlugin {
 
 declare module 'graylog-web-plugin/plugin' {
   interface PluginExports {
-    'authentication.services'?: Array<AuthenticationService>;
+    'authentication.services'?: Array<DirectoryServiceAuthenticationService | OktaAuthenticationService>;
     'authentication.enterprise.directoryServices.groupSync'?: Array<DirectoryServicesGroupSync>;
     'authentication.enterprise'?: Array<AuthenticationPlugin>;
   }

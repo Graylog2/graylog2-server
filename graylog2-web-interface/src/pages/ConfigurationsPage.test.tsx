@@ -18,6 +18,8 @@ import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import asMock from 'helpers/mocking/AsMock';
 import suppressConsole from 'helpers/suppressConsole';
+import MockStore from 'helpers/mocking/StoreMock';
+import { configuration as mockConfiguration } from 'fixtures/configurations';
 
 import ConfigurationsPage from 'pages/ConfigurationsPage';
 import usePluginEntities from 'views/logic/usePluginEntities';
@@ -28,8 +30,27 @@ jest.mock('components/configurations/SearchesConfig', () => () => <span>Search C
 jest.mock('components/configurations/MessageProcessorsConfig', () => () => <span>Message Processors Configuration</span>);
 jest.mock('components/configurations/SidecarConfig');
 
+jest.mock('stores/decorators/DecoratorsStore', () => ({
+  DecoratorsStore: MockStore(),
+}));
+
+jest.mock('stores/configurations/ConfigurationsStore', () => ({
+  ConfigurationsStore: MockStore(['getInitialState', () => ({
+    configuration: mockConfiguration,
+  })]),
+  ConfigurationsActions: {
+    listWhiteListConfig: jest.fn(() => Promise.resolve()),
+    list: jest.fn(() => Promise.resolve()),
+    listMessageProcessorsConfig: jest.fn(() => Promise.resolve()),
+  },
+}));
+
+jest.mock('stores/streams/StreamsStore', () => ({
+  StreamsActions: { listStreams: () => Promise.resolve() },
+}));
+
 const ComponentThrowingError = () => {
-  throw Error('Boom!');
+  throw new Error('Boom!');
 };
 
 const ComponentWorkingFine = () => (
@@ -37,17 +58,21 @@ const ComponentWorkingFine = () => (
 );
 
 describe('ConfigurationsPage', () => {
+  afterEach(() => {
+    jest.resetAllMocks();
+  });
+
   it('wraps core configuration elements with error boundary', async () => {
     asMock(usePluginEntities).mockReturnValue([]);
-
     asMock(SidecarConfig).mockImplementation(ComponentThrowingError);
 
     await suppressConsole(async () => {
       render(<ConfigurationsPage />);
 
-      await screen.findByText('Message Processors Configuration');
-      await screen.findByText('Boom!');
+      return screen.findByText('Boom!');
     });
+
+    await screen.findByText('Message Processors Configuration');
   });
 
   it('wraps plugin configuration elements with error boundary', async () => {
@@ -56,11 +81,12 @@ describe('ConfigurationsPage', () => {
       { configType: 'bar', component: ComponentWorkingFine },
     ]);
 
-    suppressConsole(() => {
+    await suppressConsole(() => {
       render(<ConfigurationsPage />);
+
+      return screen.findByText('Boom!');
     });
 
     await screen.findByText('It is all good!');
-    await screen.findByText('Boom!');
   });
 });

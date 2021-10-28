@@ -41,6 +41,7 @@ import {
   viewWithoutWidget,
 } from 'views/components/export/Fixtures';
 import { createWidget } from 'views/logic/WidgetTestHelpers';
+import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 
 import ExportModal, { Props as ExportModalProps } from './ExportModal';
 
@@ -95,9 +96,11 @@ describe('ExportModal', () => {
   } & Optional<ExportModalProps>;
 
   const SimpleExportModal = ({ viewType = View.Type.Search, ...props }: SimpleExportModalProps) => (
-    <ViewTypeContext.Provider value={viewType}>
-      <ExportModal view={viewWithoutWidget(viewType)} {...props as ExportModalProps} />
-    </ViewTypeContext.Provider>
+    <FieldTypesContext.Provider value={{ all: Immutable.List(), queryFields: Immutable.Map() }}>
+      <ViewTypeContext.Provider value={viewType}>
+        <ExportModal view={viewWithoutWidget(viewType)} {...props as ExportModalProps} />
+      </ViewTypeContext.Provider>
+    </FieldTypesContext.Provider>
   );
 
   SimpleExportModal.defaultProps = {
@@ -165,7 +168,7 @@ describe('ExportModal', () => {
   });
 
   it('initial fields should not contain the message field if message list config showMessageRow is false', async () => {
-    const widgetConfig = new MessagesWidgetConfig(['level', 'http_method'], false, [], []);
+    const widgetConfig = new MessagesWidgetConfig(['level', 'http_method'], false, false, [], []);
     const widgetWithoutMessageRow = messagesWidget().toBuilder().config(widgetConfig).build();
     const viewStateMap: ViewStateMap = Immutable.Map({
       'query-id-1': stateWithOneWidget(messagesWidget()).toBuilder()

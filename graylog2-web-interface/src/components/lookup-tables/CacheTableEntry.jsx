@@ -17,15 +17,12 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { LinkContainer, Link } from 'components/graylog/router';
-import { Button } from 'components/graylog';
+import { LinkContainer, Link } from 'components/common/router';
+import { Button } from 'components/bootstrap';
 import Routes from 'routing/Routes';
-import CombinedProvider from 'injection/CombinedProvider';
-import { ContentPackMarker } from 'components/common';
 import { MetricsMapper, MetricContainer, CounterRate } from 'components/metrics';
 import NumberUtils from 'util/NumberUtils';
-
-const { LookupTableCachesActions } = CombinedProvider.get('LookupTableCaches');
+import { LookupTableCachesActions } from 'stores/lookup-tables/LookupTableCachesStore';
 
 class LUTTableEntry extends React.Component {
   static propTypes = {
@@ -88,7 +85,6 @@ class LUTTableEntry extends React.Component {
         <tr>
           <td>
             <Link to={Routes.SYSTEM.LOOKUPTABLES.CACHES.show(cache.name)}>{cache.title}</Link>
-            <ContentPackMarker contentPack={cache.content_pack} marginLeft={5} />
           </td>
           <td>{cache.description}</td>
           <td>{cache.name}</td>

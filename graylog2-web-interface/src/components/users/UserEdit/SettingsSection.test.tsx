@@ -69,7 +69,7 @@ describe('<SettingsSection />', () => {
     const onSubmitStub = jest.fn();
 
     render(
-      <CurrentUserContext.Provider value={adminUser.toJSON()}>
+      <CurrentUserContext.Provider value={adminUser}>
         <SettingsSection user={exampleUser} onSubmit={(data) => onSubmitStub(data)} />
       </CurrentUserContext.Provider>,
     );

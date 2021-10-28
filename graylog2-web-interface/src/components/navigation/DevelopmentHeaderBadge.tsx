@@ -18,7 +18,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import AppConfig from 'util/AppConfig';
-import { Badge } from 'components/graylog';
+import { Badge } from 'components/bootstrap';
 
 type Props = {
   smallScreen: boolean,
@@ -27,7 +27,7 @@ type Props = {
 const DevelopmentHeaderBadge = ({ smallScreen }: Props) => {
   const smallScreenClass = smallScreen ? 'small-scrn-badge' : '';
 
-  return AppConfig.gl2DevMode() ? <Badge className={`${smallScreenClass} dev-badge`} bsStyle="danger">DEV</Badge> : null;
+  return AppConfig.gl2DevMode() ? <Badge className={`${smallScreenClass} dev-badge`} bsStyle="danger">{AppConfig.isCloud() ? String.fromCharCode(0x26C8) : ''} DEV</Badge> : null;
 };
 
 DevelopmentHeaderBadge.propTypes = {

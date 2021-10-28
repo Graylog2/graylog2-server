@@ -17,10 +17,10 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 
-import { LinkContainer } from 'components/graylog/router';
+import { LinkContainer } from 'components/common/router';
 import Routes from 'routing/Routes';
 import { ClipboardButton } from 'components/common';
-import { Button, ButtonGroup, DropdownButton, MenuItem } from 'components/graylog';
+import { Button, ButtonGroup, DropdownButton, MenuItem } from 'components/bootstrap';
 import SurroundingSearchButton from 'components/search/SurroundingSearchButton';
 import type { SearchesConfig } from 'components/search/SearchConfig';
 
@@ -28,7 +28,6 @@ type Props = {
   index: string,
   id: string,
   fields: {
-    timestamp: string,
     [key: string]: unknown,
   },
   decorationStats: any,
@@ -41,7 +40,8 @@ type Props = {
   searchConfig: SearchesConfig,
 };
 
-const _getTestAgainstStreamButton = (streams, index, id) => {
+const _getTestAgainstStreamButton = (streams: Immutable.List<any>, index: string, id: string) => {
+  // eslint-disable-next-line react/destructuring-assignment
   const streamList = streams.map((stream) => {
     if (stream.is_default) {
       return <MenuItem key={stream.id} disabled title="Cannot test against the default stream">{stream.title}</MenuItem>;
@@ -76,7 +76,7 @@ const MessageActions = ({ index, id, fields, decorationStats, disabled, disableS
 
   const surroundingSearchButton = disableSurroundingSearch || (
     <SurroundingSearchButton id={id}
-                             timestamp={timestamp}
+                             timestamp={timestamp as string}
                              searchConfig={searchConfig}
                              messageFields={remainingFields} />
   );
@@ -88,7 +88,7 @@ const MessageActions = ({ index, id, fields, decorationStats, disabled, disableS
       {showChanges}
       <Button href={messageUrl}>Permalink</Button>
 
-      <ClipboardButton title="Copy ID" text={id} />
+      <ClipboardButton title="Copy ID" text={id} bsSize="small" />
       {surroundingSearchButton}
       {disableTestAgainstStream ? null : _getTestAgainstStreamButton(streams, index, id)}
     </ButtonGroup>

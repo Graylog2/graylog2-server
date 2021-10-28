@@ -30,7 +30,7 @@ import type { Decorator } from './widgets/MessagesWidgetConfig';
 
 const widgetsKey = 'enterpriseWidgets' as const;
 
-const _findWidgetDefinition = (type) => PluginStore.exports(widgetsKey)
+const _findWidgetDefinition = (type: string) => PluginStore.exports(widgetsKey)
   .find((widget) => widget.type.toLocaleUpperCase() === type.toLocaleUpperCase());
 
 export function widgetDefinition(type: string) {
@@ -72,6 +72,7 @@ export const allMessagesTable = (id: string = uuid(), decorators: Array<Decorato
   .config(MessageWidgetConfig.builder()
     .fields(DEFAULT_MESSAGE_FIELDS)
     .showMessageRow(true)
+    .showSummary(true)
     .decorators(decorators)
     .build())
   .build();

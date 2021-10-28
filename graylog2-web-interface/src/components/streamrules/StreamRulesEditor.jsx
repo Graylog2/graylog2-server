@@ -18,19 +18,17 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import { LinkContainer } from 'components/graylog/router';
+import { LinkContainer } from 'components/common/router';
 import Routes from 'routing/Routes';
-import { Button, Col, Panel, Row } from 'components/graylog';
+import { Button, Col, Panel, Row } from 'components/bootstrap';
 import { Icon } from 'components/common';
 import LoaderTabs from 'components/messageloaders/LoaderTabs';
 import MatchingTypeSwitcher from 'components/streams/MatchingTypeSwitcher';
 import StreamRuleList from 'components/streamrules/StreamRuleList';
 import StreamRuleForm from 'components/streamrules/StreamRuleForm';
 import Spinner from 'components/common/Spinner';
-import StoreProvider from 'injection/StoreProvider';
-
-const StreamsStore = StoreProvider.getStore('Streams');
-const StreamRulesStore = StoreProvider.getStore('StreamRules');
+import StreamsStore from 'stores/streams/StreamsStore';
+import { StreamRulesStore } from 'stores/streams/StreamRulesStore';
 
 const StreamAlertHeader = styled(Panel.Heading)`
   font-weight: bold;
@@ -180,12 +178,12 @@ class StreamRulesEditor extends React.Component {
                       onClick={this._onAddStreamRule}>
                 Add stream rule
               </Button>
-              { showStreamRuleForm && (
+              {showStreamRuleForm && (
                 <StreamRuleForm title="New Stream Rule"
                                 onClose={() => this.setState({ showStreamRuleForm: false })}
                                 streamRuleTypes={streamRuleTypes}
                                 onSubmit={this._onStreamRuleFormSubmit} />
-              ) }
+              )}
             </div>
 
             <h2>2. Manage stream rules</h2>

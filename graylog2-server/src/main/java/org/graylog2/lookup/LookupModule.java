@@ -17,17 +17,24 @@
 package org.graylog2.lookup;
 
 import com.google.inject.Scopes;
+import org.graylog2.Configuration;
 import org.graylog2.lookup.adapters.CSVFileDataAdapter;
 import org.graylog2.lookup.adapters.DSVHTTPDataAdapter;
 import org.graylog2.lookup.adapters.DnsLookupDataAdapter;
 import org.graylog2.lookup.adapters.HTTPJSONPathDataAdapter;
 import org.graylog2.lookup.caches.CaffeineLookupCache;
 import org.graylog2.lookup.caches.NullCache;
+import org.graylog2.lookup.db.DBLookupTableConfigService;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.system.urlwhitelist.UrlWhitelistNotificationService;
 import org.graylog2.system.urlwhitelist.UrlWhitelistService;
 
 public class LookupModule extends Graylog2Module {
+    private final Configuration configuration;
+
+    public LookupModule(Configuration configuration) {
+        this.configuration = configuration;
+    }
 
     @Override
     protected void configure() {
@@ -35,6 +42,7 @@ public class LookupModule extends Graylog2Module {
         binder().bind(UrlWhitelistNotificationService.class).in(Scopes.SINGLETON);
         binder().bind(AllowedAuxiliaryPathChecker.class).in(Scopes.SINGLETON);
 
+        bind(LookupTableConfigService.class).to(DBLookupTableConfigService.class).asEagerSingleton();
         serviceBinder().addBinding().to(LookupTableService.class).asEagerSingleton();
 
         installLookupCache(NullCache.NAME,
@@ -53,9 +61,9 @@ public class LookupModule extends Graylog2Module {
                 CSVFileDataAdapter.Config.class);
 
         installLookupDataAdapter2(DnsLookupDataAdapter.NAME,
-                                 DnsLookupDataAdapter.class,
-                                 DnsLookupDataAdapter.Factory.class,
-                                 DnsLookupDataAdapter.Config.class);
+                DnsLookupDataAdapter.class,
+                DnsLookupDataAdapter.Factory.class,
+                DnsLookupDataAdapter.Config.class);
 
         installLookupDataAdapter2(HTTPJSONPathDataAdapter.NAME,
                 HTTPJSONPathDataAdapter.class,

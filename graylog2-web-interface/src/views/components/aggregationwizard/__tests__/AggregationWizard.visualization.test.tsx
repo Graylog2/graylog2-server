@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useContext } from 'react';
 import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
 import { PluginRegistration, PluginStore } from 'graylog-web-plugin/plugin';
@@ -25,6 +26,7 @@ import AggregationWizard from 'views/components/aggregationwizard/AggregationWiz
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import { makeVisualization } from 'views/components/aggregationbuilder/AggregationBuilder';
 import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
+import OnVisualizationConfigChangeContext from 'views/components/aggregationwizard/OnVisualizationConfigChangeContext';
 
 const widgetConfig = AggregationWidgetConfig
   .builder()
@@ -36,6 +38,7 @@ const SimpleAggregationWizard = (props) => (
 );
 
 const dataTableVisualization = makeVisualization(() => <span>This is the chart.</span>, 'table');
+const mapVisualization = makeVisualization(() => <span>This is the map.</span>, 'map');
 
 interface ExtraConfigSettings {
   mode: 'onemode' | 'anothermode' | 'thirdmode',
@@ -56,6 +59,15 @@ const visualizationPlugin: PluginRegistration = {
       type: 'table',
       component: dataTableVisualization,
       displayName: 'Data Table',
+    }, {
+      type: 'map',
+      displayName: 'World Map',
+      component: mapVisualization,
+      config: {
+        fromConfig,
+        toConfig,
+        fields: [],
+      },
     }, {
       type: 'visualizationWithConfig',
       displayName: 'Extra Config Required',
@@ -95,8 +107,11 @@ const visualizationPlugin: PluginRegistration = {
   },
 };
 
+const selectEventConfig = { container: document.body };
+const findWidgetConfigSubmitButton = () => screen.findByRole('button', { name: 'Update Preview' });
+
 const expectSubmitButtonToBeDisabled = async () => {
-  const submitButton = await screen.findByRole('button', { name: 'Apply Changes' });
+  const submitButton = await findWidgetConfigSubmitButton();
 
   expect(submitButton).toBeDisabled();
 };
@@ -104,7 +119,7 @@ const expectSubmitButtonToBeDisabled = async () => {
 const selectOption = async (ariaLabel: string, option: string) => {
   const select = await screen.findByLabelText(ariaLabel);
   await selectEvent.openMenu(select);
-  await selectEvent.select(select, option);
+  await selectEvent.select(select, option, selectEventConfig);
 };
 
 describe('AggregationWizard/Visualizations', () => {
@@ -126,9 +141,9 @@ describe('AggregationWizard/Visualizations', () => {
     const visualizationSelect = await screen.findByLabelText('Select visualization type');
 
     await selectEvent.openMenu(visualizationSelect);
-    await selectEvent.select(visualizationSelect, 'Without Config');
+    await selectEvent.select(visualizationSelect, 'Without Config', selectEventConfig);
 
-    userEvent.click(await screen.findByRole('button', { name: 'Apply Changes' }));
+    userEvent.click(await findWidgetConfigSubmitButton());
 
     await waitFor(() => expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ visualization: 'withoutConfig', visualizationConfig: undefined })));
   });
@@ -145,7 +160,7 @@ describe('AggregationWizard/Visualizations', () => {
 
     fireEvent.change(factorInput, { target: { value: '10' } });
 
-    expect(await screen.findByRole('button', { name: 'Apply Changes' })).not.toBeDisabled();
+    expect(await findWidgetConfigSubmitButton()).not.toBeDisabled();
 
     await selectOption('Select Mode', 'anothermode');
 
@@ -153,7 +168,7 @@ describe('AggregationWizard/Visualizations', () => {
 
     await selectOption('Select Favorite Color', 'Yellow');
 
-    const submitButton = await screen.findByRole('button', { name: 'Apply Changes' });
+    const submitButton = await findWidgetConfigSubmitButton();
 
     expect(submitButton).not.toBeDisabled();
 
@@ -165,6 +180,43 @@ describe('AggregationWizard/Visualizations', () => {
         color: 'green',
         factor: 10,
         mode: 'anothermode',
+      },
+    })));
+  });
+
+  it('should update visualization config when changing config inside visualization', async () => {
+    const worldMapConfig = widgetConfig.toBuilder().visualization('map').build();
+    const onChange = jest.fn();
+
+    const WorldMap = () => {
+      const onVisualizationConfigChange = useContext(OnVisualizationConfigChangeContext);
+
+      return (
+        <button type="button" onClick={() => onVisualizationConfigChange({ zoom: 2, centerX: 40, centerY: 50 })}>Change
+          Viewport
+        </button>
+      );
+    };
+
+    WorldMap.defaultProps = { onVisualizationConfigChange: undefined };
+
+    render((
+      <SimpleAggregationWizard onChange={onChange} config={worldMapConfig}>
+        <WorldMap />
+      </SimpleAggregationWizard>
+    ));
+
+    const updateViewportButton = await screen.findByRole('button', { name: 'Change Viewport' });
+    userEvent.click(updateViewportButton);
+    const submitButton = await findWidgetConfigSubmitButton();
+    userEvent.click(submitButton);
+
+    await waitFor(() => expect(onChange).toHaveBeenCalledWith(expect.objectContaining({
+      visualization: 'map',
+      visualizationConfig: {
+        zoom: 2,
+        centerX: 40,
+        centerY: 50,
       },
     })));
   });

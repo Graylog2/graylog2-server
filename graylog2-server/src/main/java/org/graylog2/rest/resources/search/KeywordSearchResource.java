@@ -79,6 +79,7 @@ public class KeywordSearchResource extends SearchResource {
             @QueryParam("query") @NotEmpty String query,
             @ApiParam(name = "keyword", value = "Range keyword", required = true)
             @QueryParam("keyword") @NotEmpty String keyword,
+            @QueryParam("timezone") @NotEmpty String timezone,
             @ApiParam(name = "limit", value = "Maximum number of messages to return.", required = false) @QueryParam("limit") int limit,
             @ApiParam(name = "offset", value = "Offset", required = false) @QueryParam("offset") int offset,
             @ApiParam(name = "filter", value = "Filter", required = false) @QueryParam("filter") String filter,
@@ -89,7 +90,7 @@ public class KeywordSearchResource extends SearchResource {
 
         final List<String> fieldList = parseOptionalFields(fields);
         final Sorting sorting = buildSorting(sort);
-        final TimeRange timeRange = buildKeywordTimeRange(keyword);
+        final TimeRange timeRange = buildKeywordTimeRange(keyword, timezone);
         final SearchesConfig searchesConfig = SearchesConfig.builder()
                 .query(query)
                 .filter(filter)
@@ -118,6 +119,7 @@ public class KeywordSearchResource extends SearchResource {
             @QueryParam("query") @NotEmpty String query,
             @ApiParam(name = "keyword", value = "Range keyword", required = true)
             @QueryParam("keyword") @NotEmpty String keyword,
+            @QueryParam("timezone") @NotEmpty String timezone,
             @ApiParam(name = "limit", value = "Maximum number of messages to return.", required = false) @QueryParam("limit") int limit,
             @ApiParam(name = "offset", value = "Offset", required = false) @QueryParam("offset") int offset,
             @ApiParam(name = "batch_size", value = "Batch size for the backend storage export request.", required = false) @QueryParam("batch_size") @DefaultValue(DEFAULT_SCROLL_BATCH_SIZE) int batchSize,
@@ -127,7 +129,7 @@ public class KeywordSearchResource extends SearchResource {
         checkSearchPermission(filter, RestPermissions.SEARCHES_KEYWORD);
 
         final List<String> fieldList = parseFields(fields);
-        final TimeRange timeRange = buildKeywordTimeRange(keyword);
+        final TimeRange timeRange = buildKeywordTimeRange(keyword, timezone);
 
         final ScrollResult scroll = searches
                 .scroll(query, timeRange, limit, offset, fieldList, filter, batchSize);
@@ -148,6 +150,7 @@ public class KeywordSearchResource extends SearchResource {
             @QueryParam("query") @NotEmpty String query,
             @ApiParam(name = "keyword", value = "Range keyword", required = true)
             @QueryParam("keyword") @NotEmpty String keyword,
+            @QueryParam("timezone") @NotEmpty String timezone,
             @ApiParam(name = "limit", value = "Maximum number of messages to return.", required = false) @QueryParam("limit") int limit,
             @ApiParam(name = "offset", value = "Offset", required = false) @QueryParam("offset") int offset,
             @ApiParam(name = "batch_size", value = "Batch size for the backend storage export request.", required = false) @QueryParam("batch_size") @DefaultValue(DEFAULT_SCROLL_BATCH_SIZE) int batchSize,
@@ -157,14 +160,14 @@ public class KeywordSearchResource extends SearchResource {
         checkSearchPermission(filter, RestPermissions.SEARCHES_KEYWORD);
         final String filename = "graylog-search-result-keyword-" + keyword + ".csv";
         return Response
-            .ok(searchKeywordChunked(query, keyword, limit, offset, batchSize, filter, fields))
+                .ok(searchKeywordChunked(query, keyword, timezone, limit, offset, batchSize, filter, fields))
             .header("Content-Disposition", "attachment; filename=" + filename)
             .build();
     }
 
-    private TimeRange buildKeywordTimeRange(String keyword) {
+    private TimeRange buildKeywordTimeRange(String keyword, String timezone) {
         try {
-            return restrictTimeRange(KeywordRange.create(keyword));
+            return restrictTimeRange(KeywordRange.create(keyword, timezone));
         } catch (InvalidRangeParametersException e) {
             LOG.warn("Invalid timerange parameters provided. Returning HTTP 400.");
             throw new BadRequestException("Invalid timerange parameters provided", e);
