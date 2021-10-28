@@ -97,7 +97,7 @@ class RuleList extends React.Component<Props, State> {
 
   render() {
     const { rules, metricsConfig, searchFilter } = this.props;
-    const headers = ['Title', 'Description', 'Created', 'Last modified', 'Throughput', 'Errors', 'Actions'];
+    const headers = ['Title', 'Description', 'Created', 'Last modified', 'Throughput', 'Errors', 'Pipelines', 'Actions'];
     const { openMetricsConfig } = this.state;
 
     return (

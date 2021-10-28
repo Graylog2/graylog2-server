@@ -15,59 +15,60 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState } from 'react';
 import styled from 'styled-components';
 
 import { LinkContainer, Link } from 'components/common/router';
 import { MetricContainer, CounterRate } from 'components/metrics';
-import { Timestamp, OverlayTrigger } from 'components/common';
-import { Button, Label, Tooltip } from 'components/bootstrap';
+import { Timestamp, OverlayTrigger, CountBadge } from 'components/common';
+import { Button, ButtonToolbar, Tooltip } from 'components/bootstrap';
 import Routes from 'routing/Routes';
-import type { RuleType, UsingPipeline } from 'stores/rules/RulesStore';
+import type { RuleType, PipelineSummary } from 'stores/rules/RulesStore';
 import StringUtils from 'util/StringUtils';
 
 type Props = {
   rule: RuleType,
-  usingPipelines: Array<UsingPipeline>
+  usingPipelines: Array<PipelineSummary>
   onDelete: (rule: RuleType) => void,
 }
-const Pipeline = styled(Label)`
+
+const StyledLink = styled(Link)`
   margin-right: 5px;
   margin-bottom: 5px;
-  display: inline-block;
-  line-height: 15px;
 `;
 
 const RuleListEntry = ({ rule, onDelete, usingPipelines }: Props) => {
-  const [viewUsingPipelines, setViewUsingPipelines] = useState(false);
   const { id, title, description, created_at, modified_at } = rule;
+  const pipelinesLength = usingPipelines.length;
   const actions = [
-    <Button key="delete" bsStyle="primary" bsSize="xsmall" onClick={onDelete(rule)} title="Delete rule">
-      Delete
-    </Button>,
-    <span key="space">&nbsp;</span>,
-    <LinkContainer key="edit" to={Routes.SYSTEM.PIPELINES.RULE(id)}>
-      <Button bsStyle="info" bsSize="xsmall">Edit</Button>
-    </LinkContainer>,
+    <ButtonToolbar>
+      <Button key="delete" bsStyle="primary" bsSize="xsmall" onClick={onDelete(rule)} title="Delete rule">
+        Delete
+      </Button>
+      <LinkContainer key="edit" to={Routes.SYSTEM.PIPELINES.RULE(id)}>
+        <Button bsStyle="info" bsSize="xsmall">Edit</Button>
+      </LinkContainer>
+    </ButtonToolbar>,
   ];
-  const _togglePipelinesDetails = () => setViewUsingPipelines(!viewUsingPipelines);
 
-  const _showPipelines = (pipelines: Array<UsingPipeline>) => {
-    return pipelines.map(({ id: pipelineId, title: pipelineTitle }) => {
-      const tooltip = <Tooltip id={StringUtils.replaceSpaces(pipelineTitle)} show>{pipelineTitle}</Tooltip>;
+  const _showPipelines = (pipelines: Array<PipelineSummary>) => {
+    return pipelines.map(({ id: pipelineId, title: pipelineTitle }, index) => {
+      const tooltip = <Tooltip id={`${id}${pipelineId}`} show>{pipelineTitle}</Tooltip>;
 
       return (
-        <OverlayTrigger key={pipelineId} placement="top" trigger="hover" overlay={tooltip} rootClose>
-          <LinkContainer key="view" to={Routes.SYSTEM.PIPELINES.PIPELINE(pipelineId)}>
-            <Pipeline bsStyle="default">{StringUtils.truncateWithEllipses(pipelineTitle, 30)}</Pipeline>
-          </LinkContainer>
-        </OverlayTrigger>
+        <>
+          <OverlayTrigger key={pipelineId} placement="top" trigger="hover" overlay={tooltip} rootClose>
+            <StyledLink to={Routes.SYSTEM.PIPELINES.PIPELINE(pipelineId)}>
+              {StringUtils.truncateWithEllipses(pipelineTitle, 30)}
+            </StyledLink>
+          </OverlayTrigger>
+          {index < (pipelinesLength - 1) && ',  '}
+        </>
       );
     });
   };
 
   return (
-    <tr key={title} onClick={_togglePipelinesDetails}>
+    <tr key={title}>
       <td>
         <Link to={Routes.SYSTEM.PIPELINES.RULE(id)}>
           {title}
@@ -86,7 +87,11 @@ const RuleListEntry = ({ rule, onDelete, usingPipelines }: Props) => {
           <CounterRate showTotal suffix="errors/s" hideOnMissing />
         </MetricContainer>
       </td>
-      <td className="limited">{_showPipelines(usingPipelines)}</td>
+      <td className="limited">
+        <CountBadge>{pipelinesLength}</CountBadge>
+        {' '}
+        {_showPipelines(usingPipelines)}
+      </td>
       <td className="actions">{actions}</td>
     </tr>
   );

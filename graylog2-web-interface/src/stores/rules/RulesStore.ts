@@ -37,13 +37,13 @@ export type RuleType = {
 export type MetricsConfigType = {
   metrics_enabled: boolean,
 };
-export type UsingPipeline = {
+export type PipelineSummary = {
   id: string,
   title: string,
 };
 export type RulesContext = {
   used_in_pipelines: {
-    [id: string]: Array<UsingPipeline>,
+    [id: string]: Array<PipelineSummary>,
   }
 };
 export type PaginatedRulesResponse = PaginatedListJSON & {
