@@ -16,7 +16,6 @@
  */
 package org.graylog2.shared.initializers;
 
-import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
@@ -25,47 +24,41 @@ import com.google.common.util.concurrent.AbstractIdleService;
 import org.graylog2.cluster.leader.LeaderChangedEvent;
 import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.periodical.Periodicals;
-import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.periodical.Periodical;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.Collection;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 
 @Singleton
 public class PeriodicalsService extends AbstractIdleService {
     private static final Logger LOG = LoggerFactory.getLogger(PeriodicalsService.class);
 
     private final Periodicals periodicals;
-    private final ServerStatus serverStatus;
-    private final Set<Periodical> periodicalSet;
+    private final Set<Periodical> allPeriodicals;
     private final EventBus eventBus;
     private final LeaderElectionService leaderElectionService;
 
-    private final Set<Periodical> leaderOnlyPeriodicals = new HashSet<>();
-    private final Set<Periodical> allNodePeriodicals = new HashSet<>();
+    private final Set<Periodical> leaderNodePeriodicals = new HashSet<>();
+    private final Set<Periodical> anyNodePeriodicals = new HashSet<>();
 
     @Inject
-    public PeriodicalsService(Periodicals periodicals,
-                              ServerStatus serverStatus,
-                              Set<Periodical> periodicalSet, EventBus eventBus, LeaderElectionService leaderElectionService) {
+    public PeriodicalsService(Periodicals periodicals, Set<Periodical> allPeriodicals, EventBus eventBus,
+                              LeaderElectionService leaderElectionService) {
         this.periodicals = periodicals;
-        this.serverStatus = serverStatus;
-        this.periodicalSet = periodicalSet;
+        this.allPeriodicals = allPeriodicals;
         this.eventBus = eventBus;
         this.leaderElectionService = leaderElectionService;
 
-        periodicalSet.forEach(p -> {
+        allPeriodicals.forEach(p -> {
             if (p.masterOnly()) {
-                leaderOnlyPeriodicals.add(p);
+                leaderNodePeriodicals.add(p);
             } else {
-                allNodePeriodicals.add(p);
+                anyNodePeriodicals.add(p);
             }
         });
     }
@@ -75,35 +68,39 @@ public class PeriodicalsService extends AbstractIdleService {
         eventBus.register(this);
 
         if (leaderElectionService.isLeader()) {
-            LOG.info("Starting {} periodicals ...", periodicalSet.size());
-            startPeriodicals(periodicalSet);
+            LOG.info("Starting {} periodicals ...", allPeriodicals.size());
+            startPeriodicals(allPeriodicals);
         } else {
-            LOG.info("Starting {} periodicals ...", allNodePeriodicals.size());
-            LOG.info("Delaying start of {} periodicals until this node becomes leader ...", leaderOnlyPeriodicals.size());
-            startPeriodicals(allNodePeriodicals);
+            LOG.info("Starting {} periodicals ...", anyNodePeriodicals.size());
+            LOG.info("Delaying start of {} periodicals until this node becomes leader ...", leaderNodePeriodicals.size());
+            startPeriodicals(anyNodePeriodicals);
         }
     }
 
     @Subscribe
     public void leaderChanged(LeaderChangedEvent leaderChangedEvent) {
-        if (!leaderElectionService.isLeader()) {
-            return;
+        if (leaderElectionService.isLeader()) {
+            LOG.info("Starting {} periodicals ...", leaderNodePeriodicals.size());
+            startPeriodicals(leaderNodePeriodicals);
+        } else {
+            final Set<Periodical> runningLeaderNodePeriodicals =
+                    Sets.intersection(leaderNodePeriodicals, periodicals.getAllRunning());
+            LOG.info("Stopping {} periodicals ...", runningLeaderNodePeriodicals);
+            stopPeriodicals(runningLeaderNodePeriodicals);
         }
-        LOG.info("Starting {} periodicals ...", leaderOnlyPeriodicals.size());
-        startPeriodicals(leaderOnlyPeriodicals);
     }
 
     private synchronized void startPeriodicals(Set<Periodical> periodicalsToStart) {
-        final Sets.SetView<Periodical> notYetRunningPeriodicals =
+        final Sets.SetView<Periodical> notYetStartedPeriodicals =
                 Sets.difference(periodicalsToStart, ImmutableSet.copyOf(periodicals.getAll()));
 
-        int numOfPeriodicalsToSkip = periodicalsToStart.size() - notYetRunningPeriodicals.size();
+        int numOfPeriodicalsToSkip = periodicalsToStart.size() - notYetStartedPeriodicals.size();
 
         if (numOfPeriodicalsToSkip > 0) {
             LOG.warn("Skipping start of {} periodicals which have already been started.", numOfPeriodicalsToSkip);
         }
 
-        for (Periodical periodical : notYetRunningPeriodicals) {
+        for (Periodical periodical : notYetStartedPeriodicals) {
             try {
                 periodical.initialize();
 
@@ -125,26 +122,13 @@ public class PeriodicalsService extends AbstractIdleService {
         }
     }
 
+    private synchronized void stopPeriodicals(Collection<Periodical> periodicalsToStop) {
+        periodicalsToStop.forEach(periodicals::unregisterAndStop);
+    }
+
     @Override
     protected void shutDown() throws Exception {
         eventBus.unregister(this);
-
-        for (Periodical periodical : periodicals.getAllStoppedOnGracefulShutdown()) {
-            LOG.info("Shutting down periodical [{}].", periodical.getClass().getCanonicalName());
-            Stopwatch s = Stopwatch.createStarted();
-
-            // Cancel future executions.
-            Map<Periodical, ScheduledFuture> futures = periodicals.getFutures();
-            if (futures.containsKey(periodical)) {
-                futures.get(periodical).cancel(false);
-
-                s.stop();
-                LOG.info("Shutdown of periodical [{}] complete, took <{}ms>.",
-                        periodical.getClass().getCanonicalName(), s.elapsed(TimeUnit.MILLISECONDS));
-            } else {
-                LOG.error("Could not find periodical [{}] in futures list. Not stopping execution.",
-                        periodical.getClass().getCanonicalName());
-            }
-        }
+        stopPeriodicals(periodicals.getAllStoppedOnGracefulShutdown());
     }
 }
