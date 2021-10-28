@@ -86,13 +86,13 @@ public class ElasticsearchConfiguration {
     @Parameter(value = "retention_strategy", required = true)
     private String retentionStrategy = "delete";
 
-    @Parameter(value = "valid_rotation_strategies", converter = StringSetConverter.class, validators = RotationStrategyValidator.class)
-    private Set<String> validRotationStrategies = Sets.newHashSet(
-            MessageCountRotationStrategy.strategyName, SizeBasedRotationStrategy.strategyName, TimeBasedRotationStrategy.strategyName);
+    @Parameter(value = "enabled_index_rotation_strategies", converter = StringSetConverter.class, validators = RotationStrategyValidator.class)
+    private Set<String> enabledRotationStrategies = Sets.newHashSet(
+            MessageCountRotationStrategy.NAME, SizeBasedRotationStrategy.NAME, TimeBasedRotationStrategy.NAME);
 
     @Deprecated // Should be removed in Graylog 3.0
     @Parameter(value = "rotation_strategy")
-    private String rotationStrategy = MessageCountRotationStrategy.strategyName;
+    private String rotationStrategy = MessageCountRotationStrategy.NAME;
 
     @Deprecated // Should be removed in Graylog 3.0
     @Parameter(value = "disable_index_optimization")
@@ -170,8 +170,8 @@ public class ElasticsearchConfiguration {
         return templateName;
     }
 
-    public Set<String> getValidRotationStrategies() {
-        return validRotationStrategies;
+    public Set<String> getEnabledRotationStrategies() {
+        return enabledRotationStrategies;
     }
 
     @Deprecated // Should be removed in Graylog 3.0

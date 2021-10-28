@@ -31,15 +31,15 @@ public class RotationStrategyBindings extends PluginModule {
 
     @Override
     protected void configure() {
-        for (String strategy : elasticsearchConfiguration.getValidRotationStrategies()) {
+        for (String strategy : elasticsearchConfiguration.getEnabledRotationStrategies()) {
             switch (strategy) {
-                case MessageCountRotationStrategy.strategyName:
+                case MessageCountRotationStrategy.NAME:
                     addRotationStrategy(MessageCountRotationStrategy.class);
                     break;
-                case SizeBasedRotationStrategy.strategyName:
+                case SizeBasedRotationStrategy.NAME:
                     addRotationStrategy(SizeBasedRotationStrategy.class);
                     break;
-                case TimeBasedRotationStrategy.strategyName:
+                case TimeBasedRotationStrategy.NAME:
                     addRotationStrategy(TimeBasedRotationStrategy.class);
                     break;
             }

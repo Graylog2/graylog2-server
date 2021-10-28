@@ -77,7 +77,7 @@ public class RotationStrategyResource extends RestResource {
     public RotationStrategies list() {
         final Set<RotationStrategyDescription> strategies = rotationStrategies.keySet()
                 .stream()
-                .filter(this::isValidRotationStrategy)
+                .filter(this::isEnabledRotationStrategy)
                 .map(this::getRotationStrategyDescription)
                 .collect(Collectors.toSet());
 
@@ -94,14 +94,14 @@ public class RotationStrategyResource extends RestResource {
         return getRotationStrategyDescription(strategyName);
     }
 
-    // Limit available rotation strategies to those specified by configuration parameter valid_rotation_strategies
-    private boolean isValidRotationStrategy(String strategyName) {
+    // Limit available rotation strategies to those specified by configuration parameter enabled_index_rotation_strategies
+    private boolean isEnabledRotationStrategy(String strategyName) {
         final Provider<RotationStrategy> provider = rotationStrategies.get(strategyName);
         if (provider == null) {
             throw new NotFoundException("Couldn't find rotation strategy for given type " + strategyName);
         }
         final RotationStrategy rotationStrategy = provider.get();
-        return elasticsearchConfiguration.getValidRotationStrategies().contains(rotationStrategy.getStrategyName());
+        return elasticsearchConfiguration.getEnabledRotationStrategies().contains(rotationStrategy.getStrategyName());
     }
 
     private RotationStrategyDescription getRotationStrategyDescription(String strategyName) {

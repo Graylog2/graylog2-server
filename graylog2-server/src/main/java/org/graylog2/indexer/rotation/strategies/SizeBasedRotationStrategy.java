@@ -30,7 +30,7 @@ import java.util.Locale;
 import java.util.Optional;
 
 public class SizeBasedRotationStrategy extends AbstractRotationStrategy {
-    public static final String strategyName = "size";
+    public static final String NAME = "size";
 
     private final Indices indices;
 
@@ -93,6 +93,6 @@ public class SizeBasedRotationStrategy extends AbstractRotationStrategy {
 
     @Override
     public String getStrategyName() {
-        return strategyName;
+        return NAME;
     }
 }

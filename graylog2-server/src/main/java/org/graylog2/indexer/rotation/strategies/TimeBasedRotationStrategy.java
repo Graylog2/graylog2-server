@@ -57,7 +57,7 @@ import static org.joda.time.DateTimeFieldType.year;
 @Singleton
 public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
     private static final Logger log = LoggerFactory.getLogger(TimeBasedRotationStrategy.class);
-    public static final String strategyName = "time";
+    public static final String NAME = "time";
 
     private final Indices indices;
     private Map<String, DateTime> lastRotation;
@@ -253,6 +253,6 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
 
     @Override
     public String getStrategyName() {
-        return strategyName;
+        return NAME;
     }
 }
