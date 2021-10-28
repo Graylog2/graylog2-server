@@ -93,7 +93,7 @@ public class ESPivotTest {
 
     private ESPivot esPivot;
     private Map<String, ESPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation>> bucketHandlers;
-    private Map<String, ESPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>> seriesHandlers;
+    private Map<String, ESPivotSeriesSpecHandler<? extends SeriesSpec, ?>> seriesHandlers;
 
     @Before
     public void setUp() throws Exception {

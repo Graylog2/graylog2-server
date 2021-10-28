@@ -85,7 +85,7 @@ public class ElasticsearchBackendGeneratedRequestTestBase extends ElasticsearchB
     public void setUpSUT() {
         this.elasticSearchTypeHandlers = new HashMap<>();
         final Map<String, ESPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation>> bucketHandlers = Collections.emptyMap();
-        final Map<String, ESPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>> seriesHandlers = new HashMap<>();
+        final Map<String, ESPivotSeriesSpecHandler<? extends SeriesSpec, ?>> seriesHandlers = new HashMap<>();
         seriesHandlers.put(Average.NAME, new ESAverageHandler());
         seriesHandlers.put(Max.NAME, new ESMaxHandler());
         elasticSearchTypeHandlers.put(Pivot.NAME, () -> new ESPivot(bucketHandlers, seriesHandlers));
