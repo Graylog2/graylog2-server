@@ -18,7 +18,6 @@ package org.graylog2.bindings;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
-import org.graylog.scheduler.JobHeartbeatPeriodical;
 import org.graylog.scheduler.periodicals.ScheduleTriggerCleanUp;
 import org.graylog2.events.ClusterEventCleanupPeriodical;
 import org.graylog2.events.ClusterEventPeriodical;
@@ -69,6 +68,5 @@ public class PeriodicalBindings extends AbstractModule {
         periodicalBinder.addBinding().to(IndexFieldTypePollerPeriodical.class);
         periodicalBinder.addBinding().to(ScheduleTriggerCleanUp.class);
         periodicalBinder.addBinding().to(ESVersionCheckPeriodical.class);
-        periodicalBinder.addBinding().to(JobHeartbeatPeriodical.class);
     }
 }
