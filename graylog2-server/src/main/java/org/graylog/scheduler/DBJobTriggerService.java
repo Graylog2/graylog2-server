@@ -25,7 +25,6 @@ import org.bson.types.ObjectId;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog.scheduler.schedule.OnceJobSchedule;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.cluster.NodeService;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.system.NodeId;
 import org.joda.time.DateTime;
@@ -71,7 +70,6 @@ public class DBJobTriggerService {
     private final String nodeId;
     private final JacksonDBCollection<JobTriggerDto, ObjectId> db;
     private final JobSchedulerClock clock;
-    private final NodeService nodeService;
     private final Duration lockExpirationDuration;
 
     @Inject
@@ -79,11 +77,9 @@ public class DBJobTriggerService {
                                MongoJackObjectMapperProvider mapper,
                                NodeId nodeId,
                                JobSchedulerClock clock,
-                               NodeService nodeService,
                                @Named(LOCK_EXPIRATION_DURATION) Duration lockExpirationDuration) {
         this.nodeId = nodeId.toString();
         this.clock = clock;
-        this.nodeService = nodeService;
         this.lockExpirationDuration = lockExpirationDuration;
         this.db = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection(COLLECTION_NAME),
                 JobTriggerDto.class,
@@ -315,7 +311,7 @@ public class DBJobTriggerService {
                         DBQuery.lessThanEquals(FIELD_NEXT_TIME, now)
                 ), DBQuery.and(
                 DBQuery.notEquals(FIELD_LOCK_OWNER, null),
-                DBQuery.notIn(FIELD_LOCK_OWNER, nodeService.allActive().keySet()),
+                DBQuery.notEquals(FIELD_LOCK_OWNER, nodeId),
                 DBQuery.is(FIELD_STATUS, JobTriggerStatus.RUNNING),
                 DBQuery.lessThan(FIELD_LAST_LOCK_TIME, now.minus(lockExpirationDuration.toMilliseconds())))
         );
