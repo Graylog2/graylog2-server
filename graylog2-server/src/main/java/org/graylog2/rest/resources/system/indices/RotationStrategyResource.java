@@ -94,6 +94,7 @@ public class RotationStrategyResource extends RestResource {
         return getRotationStrategyDescription(strategyName);
     }
 
+    // Limit available rotation strategies to those specified by configuration parameter valid_rotation_strategies
     private boolean isValidRotationStrategy(String strategyName) {
         final Provider<RotationStrategy> provider = rotationStrategies.get(strategyName);
         if (provider == null) {
