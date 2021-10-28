@@ -54,7 +54,7 @@ ValueActions.propTypes = {
   menuContainer: PropTypes.object,
   queryId: PropTypes.string.isRequired,
   type: CustomPropTypes.FieldType,
-  value: PropTypes.node.isRequired,
+  value: PropTypes.oneOfType([PropTypes.node, PropTypes.object]).isRequired,
 };
 
 ValueActions.defaultProps = {
