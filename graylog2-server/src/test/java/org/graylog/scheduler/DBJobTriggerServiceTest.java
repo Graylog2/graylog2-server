@@ -18,6 +18,7 @@ package org.graylog.scheduler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
+import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -57,6 +58,7 @@ import static org.mockito.Mockito.when;
 
 public class DBJobTriggerServiceTest {
     private static final String NODE_ID = "node-1";
+    private static final Duration EXPIRATION_DURATION = Duration.minutes(5);
 
     @Rule
     public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
@@ -87,7 +89,7 @@ public class DBJobTriggerServiceTest {
         objectMapper.registerSubtypes(new NamedType(TestJobTriggerData.class, TestJobTriggerData.TYPE_NAME));
 
         mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
-        this.dbJobTriggerService = new DBJobTriggerService(mongodb.mongoConnection(), mapperProvider, nodeId, clock, nodeService, 5);
+        this.dbJobTriggerService = new DBJobTriggerService(mongodb.mongoConnection(), mapperProvider, nodeId, clock, nodeService, EXPIRATION_DURATION);
     }
 
     @Test
@@ -194,12 +196,11 @@ public class DBJobTriggerServiceTest {
                 .hasMessageContaining("jobDefinitionId");
 
 
-        assertThat(dbJobTriggerService.getForJob("54e3deadbeefdeadbeefaff4")).hasSize(1).satisfies(triggers -> {
-            assertThat(triggers.get(0)).satisfies(trigger -> {
-                assertThat(trigger.id()).isEqualTo("54e3deadbeefdeadbeef0002");
-                assertThat(trigger.jobDefinitionId()).isEqualTo("54e3deadbeefdeadbeefaff4");
-            });
-        });
+        assertThat(dbJobTriggerService.getForJob("54e3deadbeefdeadbeefaff4")).hasSize(1).satisfies(triggers ->
+                assertThat(triggers.get(0)).satisfies(trigger -> {
+                    assertThat(trigger.id()).isEqualTo("54e3deadbeefdeadbeef0002");
+                    assertThat(trigger.jobDefinitionId()).isEqualTo("54e3deadbeefdeadbeefaff4");
+                }));
 
         assertThat(dbJobTriggerService.getForJob("doesntexist")).isEmpty();
 
@@ -512,7 +513,7 @@ public class DBJobTriggerServiceTest {
     public void nextRunnableTriggerWithEndTime() {
         // Set clock to base date used in the fixture file
         final JobSchedulerTestClock clock = new JobSchedulerTestClock(DateTime.parse("2019-01-01T00:00:00.000Z"));
-        final DBJobTriggerService service = new DBJobTriggerService(mongodb.mongoConnection(), mapperProvider, nodeId, clock, nodeService, 5);
+        final DBJobTriggerService service = new DBJobTriggerService(mongodb.mongoConnection(), mapperProvider, nodeId, clock, nodeService, EXPIRATION_DURATION);
 
         // No triggers yet because 54e3deadbeefdeadbeef0002 is already locked and RUNNING
         assertThat(service.nextRunnableTrigger()).isEmpty();
@@ -753,7 +754,7 @@ public class DBJobTriggerServiceTest {
     @MongoDBFixtures("stale-job-triggers-with-expired-lock.json")
     public void nextStaleTrigger() {
         final JobSchedulerTestClock clock = new JobSchedulerTestClock(DateTime.parse("2019-01-01T02:00:00.000Z"));
-        final DBJobTriggerService service = new DBJobTriggerService(mongodb.mongoConnection(), mapperProvider, nodeId, clock, nodeService, 5);
+        final DBJobTriggerService service = new DBJobTriggerService(mongodb.mongoConnection(), mapperProvider, nodeId, clock, nodeService, EXPIRATION_DURATION);
 
         assertThat(service.nextRunnableTrigger())
                 .isNotEmpty()
@@ -766,7 +767,7 @@ public class DBJobTriggerServiceTest {
     public void updateLockedJobTriggers() {
         DateTime newLockTime = DateTime.parse("2019-01-01T02:00:00.000Z");
         final JobSchedulerTestClock clock = new JobSchedulerTestClock(newLockTime);
-        final DBJobTriggerService service = new DBJobTriggerService(mongodb.mongoConnection(), mapperProvider, nodeId, clock, nodeService, 5);
+        final DBJobTriggerService service = new DBJobTriggerService(mongodb.mongoConnection(), mapperProvider, nodeId, clock, nodeService, EXPIRATION_DURATION);
 
         service.updateLockedJobTriggers();
 

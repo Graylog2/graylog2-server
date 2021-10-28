@@ -16,6 +16,7 @@
  */
 package org.graylog.scheduler;
 
+import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import com.mongodb.BasicDBObject;
@@ -48,7 +49,7 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Objects.requireNonNull;
-import static org.graylog.scheduler.JobSchedulerConfiguration.LOCK_EXPIRATION_TIME_MINUTES;
+import static org.graylog.scheduler.JobSchedulerConfiguration.LOCK_EXPIRATION_DURATION;
 
 // This class does NOT use PaginatedDbService because we use the triggers collection for locking and need to handle
 // updates very carefully.
@@ -71,7 +72,7 @@ public class DBJobTriggerService {
     private final JacksonDBCollection<JobTriggerDto, ObjectId> db;
     private final JobSchedulerClock clock;
     private final NodeService nodeService;
-    private final int lockExpirationTimeMinutes;
+    private final Duration lockExpirationDuration;
 
     @Inject
     public DBJobTriggerService(MongoConnection mongoConnection,
@@ -79,11 +80,11 @@ public class DBJobTriggerService {
                                NodeId nodeId,
                                JobSchedulerClock clock,
                                NodeService nodeService,
-                               @Named(LOCK_EXPIRATION_TIME_MINUTES) int lockExpirationTimeMinutes) {
+                               @Named(LOCK_EXPIRATION_DURATION) Duration lockExpirationDuration) {
         this.nodeId = nodeId.toString();
         this.clock = clock;
         this.nodeService = nodeService;
-        this.lockExpirationTimeMinutes = lockExpirationTimeMinutes;
+        this.lockExpirationDuration = lockExpirationDuration;
         this.db = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection(COLLECTION_NAME),
                 JobTriggerDto.class,
                 ObjectId.class,
@@ -313,10 +314,10 @@ public class DBJobTriggerService {
                         //       The scheduler should not lock any new triggers if it detects that its clock is wrong
                         DBQuery.lessThanEquals(FIELD_NEXT_TIME, now)
                 ), DBQuery.and(
-                        DBQuery.notEquals(FIELD_LOCK_OWNER, null),
-                        DBQuery.notIn(FIELD_LOCK_OWNER, nodeService.allActive().keySet()),
-                        DBQuery.is(FIELD_STATUS, JobTriggerStatus.RUNNING),
-                        DBQuery.lessThan(FIELD_LAST_LOCK_TIME, now.minusMinutes(lockExpirationTimeMinutes)))
+                DBQuery.notEquals(FIELD_LOCK_OWNER, null),
+                DBQuery.notIn(FIELD_LOCK_OWNER, nodeService.allActive().keySet()),
+                DBQuery.is(FIELD_STATUS, JobTriggerStatus.RUNNING),
+                DBQuery.lessThan(FIELD_LAST_LOCK_TIME, now.minus(lockExpirationDuration.toMilliseconds())))
         );
         // We want to lock the trigger with the oldest next time
         final DBSort.SortBuilder sort = DBSort.asc(FIELD_NEXT_TIME);
