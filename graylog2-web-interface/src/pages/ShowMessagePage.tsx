@@ -101,6 +101,11 @@ const FieldTypesProvider = ({ streams, timestamp, children }: FieldTypesProvider
   );
 };
 
+type MessageFields = {
+  streams: Array<string>,
+  timestamp: string,
+};
+
 const ShowMessagePage = ({ params: { index, messageId } }: Props) => {
   if (!index || !messageId) {
     throw new Error('index and messageId need to be specified!');
@@ -117,14 +122,15 @@ const ShowMessagePage = ({ params: { index, messageId } }: Props) => {
     && allStreams !== undefined), [message, streams, inputs, allStreams]);
 
   if (isLoaded) {
-    const { streams: messageStreams, timestamp } = message.fields;
+    const { streams: messageStreams, timestamp } = message.fields as MessageFields;
+    const fieldTypesStreams = messageStreams.filter((streamId) => streams.has(streamId));
 
     return (
       <DocumentTitle title={`Message ${messageId} on ${index}`}>
         <Row className="content" id="sticky-augmentations-container">
           <Col md={12}>
             <WindowDimensionsContextProvider>
-              <FieldTypesProvider streams={messageStreams as Array<string>} timestamp={timestamp as string}>
+              <FieldTypesProvider streams={fieldTypesStreams} timestamp={timestamp}>
                 <InteractiveContext.Provider value={false}>
                   <MessageDetail fields={Immutable.List()}
                                  streams={streams}
