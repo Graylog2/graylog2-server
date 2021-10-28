@@ -18,6 +18,7 @@ package org.graylog2.bootstrap;
 
 import com.github.rvesse.airline.annotations.Option;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.util.concurrent.ServiceManager;
 import com.google.inject.Injector;
 import com.google.inject.Key;
@@ -211,7 +212,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
 
         LOG.info("Running {} migrations...", migrations.size());
 
-        migrations.forEach(m -> {
+        ImmutableSortedSet.copyOf(migrations).forEach(m -> {
             LOG.info("Running migration <{}>", m.getClass().getCanonicalName());
             m.upgrade();
         });
