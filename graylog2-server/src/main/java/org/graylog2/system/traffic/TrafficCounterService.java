@@ -96,8 +96,11 @@ public class TrafficCounterService {
         final ImmutableMap.Builder<DateTime, Long> inputBuilder = ImmutableMap.builder();
         final ImmutableMap.Builder<DateTime, Long> outputBuilder = ImmutableMap.builder();
         final ImmutableMap.Builder<DateTime, Long> decodedBuilder = ImmutableMap.builder();
-        final DateTime to = getDayBucket(Tools.nowUTC());
-        final DateTime from = to.minus(duration);
+
+        // Include traffic up until the current timestamp
+        final DateTime to = Tools.nowUTC();
+        // Make sure to include the full first day
+        final DateTime from = getDayBucket(to).minus(duration);
 
         final DBQuery.Query query = DBQuery.and(
                 DBQuery.lessThanEquals(BUCKET, to),
