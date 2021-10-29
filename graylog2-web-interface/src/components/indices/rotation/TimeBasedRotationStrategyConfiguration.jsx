@@ -23,7 +23,6 @@ import { Input } from 'components/bootstrap';
 class TimeBasedRotationStrategyConfiguration extends React.Component {
   static propTypes = {
     config: PropTypes.object.isRequired,
-    jsonSchema: PropTypes.object.isRequired,
     updateConfig: PropTypes.func.isRequired,
   };
 
@@ -93,14 +92,16 @@ class TimeBasedRotationStrategyConfiguration extends React.Component {
   };
 
   render() {
+    const { rotation_period: rotationPeriod } = this.state;
+
     return (
       <div>
         <Input id="rotation-period"
                type="text"
-               ref={(rotationPeriod) => { this.inputs.rotation_period = rotationPeriod; }}
+               ref={(rotationPeriodRef) => { this.inputs.rotation_period = rotationPeriodRef; }}
                label="Rotation period (ISO8601 Duration)"
                onChange={this._onPeriodUpdate('rotation_period')}
-               value={this.state.rotation_period}
+               value={rotationPeriod}
                help={'How long an index gets written to before it is rotated. (i.e. "P1D" for 1 day, "PT6H" for 6 hours)'}
                addonAfter={this._formatDuration()}
                bsStyle={this._validationState()}
