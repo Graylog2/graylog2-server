@@ -19,6 +19,8 @@ package org.graylog2.indexer.fieldtypes;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import org.graylog2.cluster.Node;
+import org.graylog2.cluster.NodeService;
 import org.graylog2.indexer.MongoIndexSet;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.indexset.IndexSetConfig;
@@ -27,6 +29,7 @@ import org.graylog2.indexer.indexset.events.IndexSetCreatedEvent;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.lifecycles.Lifecycle;
+import org.graylog2.plugin.system.NodeId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -34,6 +37,7 @@ import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -49,12 +53,17 @@ class IndexFieldTypePollerPeriodicalTest {
     @SuppressWarnings("UnstableApiUsage")
     private final EventBus eventBus = mock(EventBus.class);
     private final ServerStatus serverStatus = mock(ServerStatus.class);
+    private final NodeService nodeService = mock(NodeService.class);
+    private final NodeId nodeId = mock(NodeId.class);
+    private final Node node = mock(Node.class);
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(
             new ThreadFactoryBuilder().setNameFormat("index-field-type-poller-periodical-test-%d").build()
     );
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws Exception {
+        when(node.isMaster()).thenReturn(true);
+        when(nodeService.byNodeId(any(NodeId.class))).thenReturn(node);
         this.periodical = new IndexFieldTypePollerPeriodical(indexFieldTypePoller,
                 indexFieldTypesService,
                 indexSetService,
@@ -63,6 +72,8 @@ class IndexFieldTypePollerPeriodicalTest {
                 cluster,
                 eventBus,
                 serverStatus,
+                nodeService,
+                nodeId,
                 Duration.seconds(30),
                 scheduler);
     }
