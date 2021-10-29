@@ -186,9 +186,11 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
 
         Period rotationPeriod = config.rotationPeriod();
         Period maxPeriod = elasticsearchConfiguration.getMaxWriteIndexAge();
+        boolean overriding = false;
         if (maxPeriod != null && isLonger(rotationPeriod, maxPeriod)) {
-            log.warn("Max rotation limit {} overrides configured period {}", maxPeriod, rotationPeriod);
+            log.debug("Max rotation limit {} overrides configured period {}", maxPeriod, rotationPeriod);
             rotationPeriod = maxPeriod;
+            overriding = true;
         }
         final Period normalizedPeriod = rotationPeriod.normalizedStandard();
 
@@ -210,8 +212,9 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
         final DateTime currentAnchor = anchor.get(indexSetId);
         final DateTime nextRotation = currentAnchor.plus(normalizedPeriod);
         if (nextRotation.isAfter(now)) {
-            final String message = new MessageFormat("Next rotation at {0}", Locale.ENGLISH)
-                    .format(new Object[]{nextRotation});
+            final String message = new MessageFormat("Next rotation at {0} {1}", Locale.ENGLISH)
+                    .format(new Object[]{nextRotation,
+                            overriding ? "(elasticsearch_max_write_index_age overrides configured period)" : ""});
             return new SimpleResult(false, message);
         }
 
@@ -225,8 +228,10 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
         final DateTime nextAnchor = currentAnchor.withPeriodAdded(normalizedPeriod, multiplicator - 1);
         anchor.put(indexSetId, nextAnchor);
         lastRotation.put(indexSetId, now);
-        final String message = new MessageFormat("Rotation period {0} elapsed, next rotation at {1}", Locale.ENGLISH)
-                .format(new Object[]{now, nextAnchor});
+        final String message = new MessageFormat("Rotation period {0} elapsed, next rotation at {1} {2}", Locale.ENGLISH)
+                .format(new Object[]{now,
+                        nextAnchor,
+                        overriding ? "(elasticsearch_max_write_index_age overrides configured period)" : ""});
         return new SimpleResult(true, message);
     }
 
