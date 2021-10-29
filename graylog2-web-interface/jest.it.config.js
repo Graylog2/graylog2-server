@@ -18,7 +18,7 @@ const config = {
   preset: 'jest-preset-graylog',
   setupFiles: [
     '<rootDir>/test/setup-jest.js',
-    'trace-unhandled/register'
+    'trace-unhandled/register',
   ],
   setupFilesAfterEnv: [
     'jest-enzyme',
