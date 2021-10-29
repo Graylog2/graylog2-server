@@ -155,7 +155,7 @@ public class InputEventListener {
             }
             for (MessageInput input : persistedInputs) {
                 final IOState<MessageInput> inputState = inputRegistry.getInputState(input.getId());
-                if (input.onlyOnePerCluster() && inputState == null || inputState.canBeStarted()) {
+                if (input.onlyOnePerCluster() && (inputState == null || inputState.canBeStarted())) {
                     LOG.info("Got leader role. Starting input <{}/{}>", input.getName(), input.getId());
                     startMessageInput(input);
                 }
