@@ -88,7 +88,7 @@ const RuleListEntry = ({ rule, onDelete, usingPipelines }: Props) => {
           <CounterRate showTotal suffix="errors/s" hideOnMissing />
         </MetricContainer>
       </td>
-      <td className="limited">
+      <td>
         <CountBadge>{pipelinesLength}</CountBadge>
         {' '}
         {_showPipelines(usingPipelines)}
