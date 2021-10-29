@@ -84,6 +84,9 @@ class TrafficCounterServiceTest {
                     TrafficCounterService.Interval.DAILY
             );
 
+            assertThat(trafficHistogram.from()).isEqualTo(getDayBucket(now).minusDays(30));
+            assertThat(trafficHistogram.to()).isEqualTo(now);
+
             // We should have 31 entries, 30 days history and the current day
             assertThat(trafficHistogram.input()).hasSize(31);
             assertThat(trafficHistogram.decoded()).hasSize(31);
@@ -139,6 +142,9 @@ class TrafficCounterServiceTest {
                     Duration.standardDays(30),
                     TrafficCounterService.Interval.HOURLY
             );
+
+            assertThat(trafficHistogram.from()).isEqualTo(getDayBucket(now).minusDays(30));
+            assertThat(trafficHistogram.to()).isEqualTo(now);
 
             // We should have 729 entries, one for each hour in the 30 days (30x24) history and the current day (9 hours)
             assertThat(trafficHistogram.input()).hasSize(729);
