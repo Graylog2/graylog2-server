@@ -154,6 +154,7 @@ module.exports = {
         config: './webpack.config.js',
       },
     },
+    'import/internal-regex': '^(actions|components|contexts|domainActions|helpers|hooks|logic|routing|stores|util|theme|views)',
     polyfills: [
       'fetch',
       'IntersectionObserver',
