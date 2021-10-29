@@ -33,7 +33,7 @@ type Props = {
   rules: Array<RuleType>,
   metricsConfig?: MetricsConfigType,
   rulesContext?: RulesContext,
-  onDelete: (RuleType) => void,
+  onDelete: (RuleType) => () => void,
   searchFilter: React.ReactNode,
 };
 
@@ -78,7 +78,7 @@ class RuleList extends React.Component<Props, State> {
   _ruleInfoFormatter = (rule) => {
     const { onDelete, rulesContext: { used_in_pipelines: usingPipelines } = {} } = this.props;
 
-    return <RuleListEntry rule={rule} usingPipelines={usingPipelines[rule.id]} onDelete={onDelete} />;
+    return <RuleListEntry key={rule.id} rule={rule} usingPipelines={usingPipelines[rule.id]} onDelete={onDelete} />;
   };
 
   toggleMetricsConfig = () => {

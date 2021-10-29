@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled from 'styled-components';
 
 import { LinkContainer, Link } from 'components/common/router';
 import { MetricContainer, CounterRate } from 'components/metrics';
@@ -28,41 +27,43 @@ import StringUtils from 'util/StringUtils';
 type Props = {
   rule: RuleType,
   usingPipelines: Array<PipelineSummary>
-  onDelete: (rule: RuleType) => void,
+  onDelete: (rule: RuleType) => () => void,
 }
-
-const StyledLink = styled(Link)`
-  margin-right: 5px;
-  margin-bottom: 5px;
-`;
+const STRING_SIZE_LIMIT = 30;
 
 const RuleListEntry = ({ rule, onDelete, usingPipelines }: Props) => {
   const { id, title, description, created_at, modified_at } = rule;
   const pipelinesLength = usingPipelines.length;
-  const actions = [
+  const actions = (
     <ButtonToolbar>
-      <Button key="delete" bsStyle="primary" bsSize="xsmall" onClick={onDelete(rule)} title="Delete rule">
+      <Button bsStyle="primary" bsSize="xsmall" onClick={onDelete(rule)} title="Delete rule">
         Delete
       </Button>
-      <LinkContainer key="edit" to={Routes.SYSTEM.PIPELINES.RULE(id)}>
+      <LinkContainer to={Routes.SYSTEM.PIPELINES.RULE(id)}>
         <Button bsStyle="info" bsSize="xsmall">Edit</Button>
       </LinkContainer>
-    </ButtonToolbar>,
-  ];
+    </ButtonToolbar>
+  );
 
   const _showPipelines = (pipelines: Array<PipelineSummary>) => {
     return pipelines.map(({ id: pipelineId, title: pipelineTitle }, index) => {
       const tooltip = <Tooltip id={`${id}${pipelineId}`} show>{pipelineTitle}</Tooltip>;
 
       return (
-        <>
-          <OverlayTrigger key={pipelineId} placement="top" trigger="hover" overlay={tooltip} rootClose>
-            <StyledLink to={Routes.SYSTEM.PIPELINES.PIPELINE(pipelineId)}>
-              {StringUtils.truncateWithEllipses(pipelineTitle, 30)}
-            </StyledLink>
-          </OverlayTrigger>
+        <React.Fragment key={pipelineId}>
+          {pipelineTitle.length > STRING_SIZE_LIMIT ? (
+            <OverlayTrigger placement="top" trigger="hover" overlay={tooltip} rootClose>
+              <Link to={Routes.SYSTEM.PIPELINES.PIPELINE(pipelineId)}>
+                {StringUtils.truncateWithEllipses(pipelineTitle, STRING_SIZE_LIMIT)}
+              </Link>
+            </OverlayTrigger>
+          ) : (
+            <Link to={Routes.SYSTEM.PIPELINES.PIPELINE(pipelineId)}>
+              {pipelineTitle}
+            </Link>
+          )}
           {index < (pipelinesLength - 1) && ',  '}
-        </>
+        </React.Fragment>
       );
     });
   };
