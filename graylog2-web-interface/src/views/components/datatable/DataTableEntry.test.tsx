@@ -17,7 +17,6 @@
 import * as React from 'react';
 import { List, OrderedSet } from 'immutable';
 import { mount } from 'wrappedEnzyme';
-import mockComponent from 'helpers/mocking/MockComponent';
 
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import { FieldTypes } from 'views/logic/fieldtypes/FieldType';
@@ -27,8 +26,6 @@ import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';
 import DataTableEntry from './DataTableEntry';
 
 import EmptyValue from '../EmptyValue';
-
-jest.mock('views/components/common/UserTimezoneTimestamp', () => mockComponent('UserTimezoneTimestamp'));
 
 const f = (source: string, field: string = source): { field: string, source: string } => ({ field, source });
 const createFields = (fields: Array<string>) => OrderedSet(fields.map((field) => f(field)));
