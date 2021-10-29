@@ -18,7 +18,7 @@ package org.graylog.plugins.views.search.engine;
 
 public class ValidationExplanation {
     private final String index;
-    private int shard = -1;
+    private final int shard;
     private final boolean valid;
     private final String explanation;
     private final String error;

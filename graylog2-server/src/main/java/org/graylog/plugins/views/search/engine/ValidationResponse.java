@@ -20,8 +20,8 @@ import java.util.List;
 
 public class ValidationResponse {
 
-    private boolean valid;
-    private List<ValidationExplanation> explanations;
+    private final boolean valid;
+    private final List<ValidationExplanation> explanations;
 
     public ValidationResponse(boolean valid, List<ValidationExplanation> explanations) {
         this.valid = valid;
