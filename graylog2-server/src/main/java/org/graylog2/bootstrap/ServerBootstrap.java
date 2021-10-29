@@ -138,9 +138,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
         LOG.info("Arch: {}", os.getArch());
 
         try {
-            // TODO not on cloud.
-            // TODO isMaster will be obsolete
-            if (configuration.isMaster()) {
+            if (configuration.isMaster() && configuration.runMigrations()) {
                 runMigrations();
             }
         } catch (Exception e) {
