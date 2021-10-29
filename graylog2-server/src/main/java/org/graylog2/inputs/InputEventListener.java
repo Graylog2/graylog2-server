@@ -148,11 +148,11 @@ public class InputEventListener {
 
     @Subscribe
     public void leaderChanged(LeaderChangedEvent event) {
+        if (serverStatus.getLifecycle() == Lifecycle.STARTING) {
+            LOG.debug("Ignoring LeaderChangedEvent during server startup.");
+            return;
+        }
         if (leaderElectionService.isLeader()) {
-            if (serverStatus.getLifecycle() == Lifecycle.STARTING) {
-                LOG.debug("Ignoring LeaderChangedEvent during server startup.");
-                return;
-            }
             for (MessageInput input : persistedInputs) {
                 final IOState<MessageInput> inputState = inputRegistry.getInputState(input.getId());
                 if (input.onlyOnePerCluster() && (inputState == null || inputState.canBeStarted())) {
