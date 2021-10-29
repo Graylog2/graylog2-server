@@ -16,8 +16,8 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
-import { EditWidgetComponentProps } from 'views/types';
 
+import { EditWidgetComponentProps } from 'views/types';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 
 import WidgetConfigForm, { WidgetConfigFormValues } from './WidgetConfigForm';

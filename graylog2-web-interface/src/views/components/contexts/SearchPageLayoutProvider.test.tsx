@@ -16,9 +16,9 @@
  */
 import * as React from 'react';
 import { render, fireEvent } from 'wrappedTestingLibrary';
+
 import asMock from 'helpers/mocking/AsMock';
 import { MockStore } from 'helpers/mocking';
-
 import CurrentUserProvider from 'contexts/CurrentUserProvider';
 import CurrentUserPreferencesProvider from 'contexts/CurrentUserPreferencesProvider';
 import Store from 'logic/local-storage/Store';

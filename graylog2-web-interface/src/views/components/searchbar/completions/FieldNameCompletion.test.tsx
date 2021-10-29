@@ -14,10 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { StoreMock as MockStore } from 'helpers/mocking';
-import asMock from 'helpers/mocking/AsMock';
 import * as Immutable from 'immutable';
 
+import { StoreMock as MockStore } from 'helpers/mocking';
+import asMock from 'helpers/mocking/AsMock';
 import { ViewMetaData, ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import { FieldTypeMappingsList, FieldTypesStore, FieldTypesStoreState } from 'views/stores/FieldTypesStore';
 

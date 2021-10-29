@@ -16,8 +16,8 @@
  */
 import * as React from 'react';
 import { render, fireEvent } from 'wrappedTestingLibrary';
-import mockAction from 'helpers/mocking/MockAction';
 
+import mockAction from 'helpers/mocking/MockAction';
 import { DashboardsActions, DashboardsStoreState } from 'views/stores/DashboardsStore';
 import View from 'views/logic/views/View';
 

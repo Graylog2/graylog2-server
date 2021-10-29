@@ -16,8 +16,8 @@
  */
 import * as React from 'react';
 import { render, waitFor, screen } from 'wrappedTestingLibrary';
-import { StoreMock as MockStore, asMock } from 'helpers/mocking';
 
+import { StoreMock as MockStore, asMock } from 'helpers/mocking';
 import DefaultQueryClientProvider from 'contexts/DefaultQueryClientProvider';
 import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
 

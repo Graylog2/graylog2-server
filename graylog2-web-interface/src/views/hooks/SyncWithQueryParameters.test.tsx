@@ -17,9 +17,9 @@
 import * as React from 'react';
 import { render } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
+
 import asMock from 'helpers/mocking/AsMock';
 import mockAction from 'helpers/mocking/MockAction';
-
 import history from 'util/History';
 import { ViewStore, ViewStoreState } from 'views/stores/ViewStore';
 import View from 'views/logic/views/View';

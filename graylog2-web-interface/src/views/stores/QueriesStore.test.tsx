@@ -16,8 +16,8 @@
  */
 import moment from 'moment';
 import * as Immutable from 'immutable';
-import asMock from 'helpers/mocking/AsMock';
 
+import asMock from 'helpers/mocking/AsMock';
 import View from 'views/logic/views/View';
 
 import { QueriesActions, QueriesStore } from './QueriesStore';

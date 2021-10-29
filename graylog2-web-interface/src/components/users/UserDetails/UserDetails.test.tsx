@@ -17,10 +17,10 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
+
 import { paginatedShares } from 'fixtures/sharedEntities';
 import { reader as assignedRole } from 'fixtures/roles';
 import { alice } from 'fixtures/users';
-
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import User from 'logic/users/User';
 

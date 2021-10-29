@@ -16,8 +16,8 @@
  */
 import * as Immutable from 'immutable';
 import { $PropertyType } from 'utility-types';
-import { DirectoryServiceAuthenticationService } from 'components/authentication/types';
 
+import { DirectoryServiceAuthenticationService } from 'components/authentication/types';
 import { getAuthServicePlugin } from 'util/AuthenticationService';
 import { DirectoryServiceBackendConfig } from 'logic/authentication/directoryServices/types';
 import { OktaBackendConfig } from 'logic/authentication/okta/types';
