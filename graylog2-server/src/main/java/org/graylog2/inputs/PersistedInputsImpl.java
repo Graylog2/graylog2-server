@@ -131,7 +131,7 @@ public class PersistedInputsImpl implements PersistedInputs {
             if (fireEvents) {
                 inputService.save(mongoInput);
             } else {
-                inputService.saveNoEvents(mongoInput);
+                inputService.saveWithoutEvents(mongoInput);
             }
 
             for (Map.Entry<String, String> entry : staticFields.entrySet()) {

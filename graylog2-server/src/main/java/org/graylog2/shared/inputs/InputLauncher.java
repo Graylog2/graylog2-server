@@ -118,7 +118,7 @@ public class InputLauncher {
     public void launchAllPersisted() {
         for (MessageInput input : persistedInputs) {
             if (configuration.getAutoRestartInputs() || input.getDesiredState().equals(IOState.Type.RUNNING.toString())) {
-                LOG.debug("Launching input {} {} - desired state is {}",
+                LOG.info("Launching input {} {} - desired state is {}",
                         input.getTitle(), input.getName(), input.getDesiredState());
                 input.initialize();
                 launch(input);
