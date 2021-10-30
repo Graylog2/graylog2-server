@@ -134,7 +134,7 @@ class SearchesConfig extends React.Component {
     if (relativeTimeRangeOptionsUpdate) {
       update.relative_timerange_options = {};
 
-      relativeTimeRangeOptionsUpdate.forEach((entry) => {
+      relativeTimeRangeOptionsUpdate.sort((a, b) => moment.duration(a.period) - moment.duration(b.period)).forEach((entry) => {
         update.relative_timerange_options[entry.period] = entry.description;
       });
 
@@ -144,7 +144,7 @@ class SearchesConfig extends React.Component {
     if (surroundingTimeRangeOptionsUpdate) {
       update.surrounding_timerange_options = {};
 
-      surroundingTimeRangeOptionsUpdate.forEach((entry) => {
+      surroundingTimeRangeOptionsUpdate.sort((a, b) => moment.duration(a.period) - moment.duration(b.period)).forEach((entry) => {
         update.surrounding_timerange_options[entry.period] = entry.description;
       });
 
