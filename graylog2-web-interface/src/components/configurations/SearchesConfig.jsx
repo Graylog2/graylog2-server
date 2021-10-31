@@ -163,6 +163,7 @@ class SearchesConfig extends React.Component {
     }
 
     updateConfig(update).then(() => {
+      this.defaultState = { ...this.state, config: update };
       this._closeModal();
     });
   }
