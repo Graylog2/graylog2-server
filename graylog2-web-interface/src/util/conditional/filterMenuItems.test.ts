@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import asMock from 'helpers/mocking/AsMock';
-
 import AppConfig from 'util/AppConfig';
 
 import filterMenuItems, { filterCloudMenuItems } from './filterMenuItems';

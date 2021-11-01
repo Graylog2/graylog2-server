@@ -17,11 +17,11 @@
 import * as React from 'react';
 import { render, fireEvent, waitFor } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
-import asMock from 'helpers/mocking/AsMock';
 import selectEvent from 'react-select-event';
 import { Optional } from 'utility-types';
 import { PluginRegistration, PluginStore } from 'graylog-web-plugin/plugin';
 
+import asMock from 'helpers/mocking/AsMock';
 import { TitleType } from 'views/stores/TitleTypes';
 import { exportSearchMessages, exportSearchTypeMessages } from 'util/MessagesExportUtils';
 import type { ViewStateMap } from 'views/logic/views/View';

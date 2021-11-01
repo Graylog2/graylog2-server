@@ -17,9 +17,9 @@
 import * as React from 'react';
 import { useRef, useEffect, useContext } from 'react';
 import { Form, Formik, FormikProps } from 'formik';
-import { ConfigurationField } from 'views/types';
 import styled from 'styled-components';
 
+import { ConfigurationField } from 'views/types';
 import WidgetEditApplyAllChangesContext from 'views/components/contexts/WidgetEditApplyAllChangesContext';
 import PropagateValidationState from 'views/components/aggregationwizard/PropagateValidationState';
 import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';

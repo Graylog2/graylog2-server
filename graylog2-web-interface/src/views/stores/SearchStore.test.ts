@@ -16,7 +16,6 @@
  */
 import asMock from 'helpers/mocking/AsMock';
 import { MockStore } from 'helpers/mocking';
-
 import fetch from 'logic/rest/FetchProvider';
 import Search from 'views/logic/search/Search';
 

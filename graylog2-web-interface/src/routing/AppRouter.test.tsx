@@ -16,11 +16,11 @@
  */
 import * as React from 'react';
 import { render } from 'wrappedTestingLibrary';
+
 import mockComponent from 'helpers/mocking/MockComponent';
 import { StoreMock as MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
 import { adminUser as currentUser } from 'fixtures/users';
-
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import usePluginEntities from 'views/logic/usePluginEntities';
 import history from 'util/History';

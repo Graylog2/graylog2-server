@@ -17,8 +17,8 @@
 import React from 'react';
 import { render, waitFor } from 'wrappedTestingLibrary';
 import { act } from 'react-dom/test-utils';
-import suppressConsole from 'helpers/suppressConsole';
 
+import suppressConsole from 'helpers/suppressConsole';
 import history from 'util/History';
 import ErrorsActions from 'actions/errors/ErrorsActions';
 import { createReactError, createUnauthorizedError, createNotFoundError } from 'logic/errors/ReportedErrors';

@@ -18,8 +18,8 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { $PropertyType } from 'utility-types';
-import { EditWidgetComponentProps } from 'views/types';
 
+import { EditWidgetComponentProps } from 'views/types';
 import usePluginEntities from 'views/logic/usePluginEntities';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import { Row, Col, Checkbox } from 'components/bootstrap';

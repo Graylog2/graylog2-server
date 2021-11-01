@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { mapValues } from 'lodash';
-import { MessageResult, SearchTypeResults } from 'views/types';
 
+import { MessageResult, SearchTypeResults } from 'views/types';
 import searchTypeDefinition from 'views/logic/SearchType';
 import { TimeRange } from 'views/logic/queries/Query';
 

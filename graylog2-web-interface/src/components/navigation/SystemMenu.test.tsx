@@ -16,9 +16,9 @@
  */
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { alice } from 'fixtures/users';
 import { mount } from 'wrappedEnzyme';
 
+import { alice } from 'fixtures/users';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 
 import AppConfig from '../../util/AppConfig';

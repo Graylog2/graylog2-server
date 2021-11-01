@@ -17,8 +17,8 @@
 import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
-import { BackendWidgetPosition } from 'views/types';
 
+import { BackendWidgetPosition } from 'views/types';
 import { AdditionalContext } from 'views/logic/ActionContext';
 import WidgetContext from 'views/components/contexts/WidgetContext';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
