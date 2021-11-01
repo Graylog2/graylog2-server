@@ -70,13 +70,4 @@ class IndexFieldTypePollerPeriodicalTest {
 
         verifyNoInteractions(cluster);
     }
-
-    @Test
-    void initialize() {
-        when(serverStatus.getLifecycle()).thenReturn(Lifecycle.HALTING);
-
-        periodical.doRun();
-
-        verifyNoInteractions(cluster);
-    }
 }
