@@ -37,18 +37,29 @@ export type RuleType = {
 export type MetricsConfigType = {
   metrics_enabled: boolean,
 };
-
+export type PipelineSummary = {
+  id: string,
+  title: string,
+};
+export type RulesContext = {
+  used_in_pipelines: {
+    [id: string]: Array<PipelineSummary>,
+  }
+};
 export type PaginatedRulesResponse = PaginatedListJSON & {
   rules: Array<RuleType>,
+  context: RulesContext,
 };
 
 export type PaginatedRules = {
   list: Array<RuleType>,
+  context: RulesContext,
   pagination: ListPagination,
 };
 
 export type RulesStoreState = {
   rules: Array<RuleType>,
+  rulesContext: RulesContext,
   functionDescriptors: any,
   metricsConfig: MetricsConfigType | undefined,
 };
@@ -89,12 +100,14 @@ export const RulesStore = singletonStore(
   () => Reflux.createStore<{ rules: RuleType[] }>({
     listenables: [RulesActions],
     rules: undefined,
+    rulesContext: undefined,
     functionDescriptors: undefined,
     metricsConfig: undefined,
 
     getInitialState() {
       return {
         rules: this.rules,
+        rulesContext: this.rulesContext,
         functionDescriptors: this.functionDescriptors,
         metricsConfig: this.metricsConfig,
       };
@@ -143,6 +156,7 @@ export const RulesStore = singletonStore(
       const promise = fetch('GET', qualifyUrl(url))
         .then((response: PaginatedRulesResponse) => ({
           list: response.rules,
+          context: response.context,
           pagination: {
             count: response.count,
             total: response.total,
