@@ -104,7 +104,7 @@ public class MongoDbPipelineService implements PipelineService {
         final DBQuery.Query query = DBQuery.or(
                 ruleNames
                         .stream()
-                        .map(rn -> DBQuery.regex("source", Pattern.compile(f("rule \"%s\"", rn))))
+                        .map(rn -> DBQuery.regex("source", Pattern.compile(f("rule\\s*\\\"%s\\\"", rn))))
                         .collect(Collectors.toList())
                         .toArray(new DBQuery.Query[ruleNames.size()])
         );

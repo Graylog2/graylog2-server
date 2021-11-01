@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.pipelineprocessor.rest;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -202,8 +203,8 @@ public class RuleResource extends RestResource implements PluginRestResource {
                 prepareContextForPaginatedResponse(result.delegate()));
     }
 
-    private Map<String, Object> prepareContextForPaginatedResponse(List<RuleDao> rules) {
-        final long started = System.currentTimeMillis();
+    @VisibleForTesting
+    Map<String, Object> prepareContextForPaginatedResponse(List<RuleDao> rules) {
         final Set<String> ruleTitles = rules
                 .stream()
                 .map(RuleDao::title)
@@ -211,20 +212,14 @@ public class RuleResource extends RestResource implements PluginRestResource {
         final List<PipelineDao> usedInPipelines = pipelineService.loadByRules(ruleTitles);
 
         final Map<String, List<PipelineCompactSource>> usedInPipelinesMap = new HashMap<>();
-        rules.forEach(r -> {
-            usedInPipelinesMap.put(r.id(), usedInPipelines
-                    .stream()
-                    .filter(p -> p.usesRule(r.title()))
-                    .map(p -> PipelineCompactSource.builder()
-                            .id(p.id())
-                            .title(p.title())
-                            .build())
-                    .collect(Collectors.toList()));
-        });
-        final long took = System.currentTimeMillis() - started;
-        if (took > 500) {
-            log.warn("It takes longer than 500ms to assemble pipeline rule paginated response's context!");
-        }
+        rules.forEach(r -> usedInPipelinesMap.put(r.id(), usedInPipelines
+                .stream()
+                .filter(p -> p.usesRule(r.title()))
+                .map(p -> PipelineCompactSource.builder()
+                        .id(p.id())
+                        .title(p.title())
+                        .build())
+                .collect(Collectors.toList())));
         return ImmutableMap.of("used_in_pipelines", usedInPipelinesMap);
     }
 

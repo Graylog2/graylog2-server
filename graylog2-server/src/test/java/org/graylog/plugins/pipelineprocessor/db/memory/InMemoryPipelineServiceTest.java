@@ -39,7 +39,7 @@ public class InMemoryPipelineServiceTest {
         saveNewPipelineDao("Pipeline 1", "pipeline \"Pipeline 1\"\n" +
                 "stage 0 match either\n" +
                 "rule \"debug#1\"\n" +
-                "rule \"debug#2\"\n" +
+                "rule\"debug#2\"\n" +
                 "end");
 
         saveNewPipelineDao("Pipeline 2", "pipeline \"Pipeline 2\"\n" +
@@ -48,13 +48,13 @@ public class InMemoryPipelineServiceTest {
 
         saveNewPipelineDao("Pipeline 3", "pipeline \"Pipeline 3\"\n" +
                 "stage 0 match either\n" +
-                "rule \"debug#2\"\n" +
-                "rule \"debug#3\"\n" +
+                "rule   \"debug#2\"\n" +
+                "rule  \"debug#3\"\n" +
                 "end");
 
         saveNewPipelineDao("Pipeline 4", "pipeline \"Pipeline 4\"\n" +
                 "stage 0 match either\n" +
-                "rule \"debug#3\"\n" +
+                "rule     \"debug#3\"\n" +
                 "end");
 
         // when + then

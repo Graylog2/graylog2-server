@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.pipelineprocessor.db.memory;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
@@ -89,6 +90,9 @@ public class InMemoryPipelineService implements PipelineService {
 
     @Override
     public List<PipelineDao> loadByRules(Set<String> ruleNames) {
+        if (ruleNames.isEmpty()) {
+            return ImmutableList.of();
+        }
         return store.values().stream()
                 .filter(pipelineDao -> ruleNames.stream().anyMatch(pipelineDao::usesRule))
                 .collect(Collectors.toList());

@@ -24,6 +24,7 @@ import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
+import java.util.regex.Pattern;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
 
@@ -61,7 +62,8 @@ public abstract class PipelineDao {
     public abstract DateTime modifiedAt();
 
     public boolean usesRule(String ruleTitle) {
-        return source().contains(f("rule \"%s\"", ruleTitle));
+        final Pattern p = Pattern.compile(f(".*rule\\s*\\\"%s\\\".*", ruleTitle), Pattern.DOTALL);
+        return p.matcher(source()).matches();
     }
 
     public static Builder builder() {
