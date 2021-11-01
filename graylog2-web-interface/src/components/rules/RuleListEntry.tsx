@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import styled, { css, DefaultTheme } from 'styled-components';
 
 import { LinkContainer, Link } from 'components/common/router';
 import { MetricContainer, CounterRate } from 'components/metrics';
@@ -30,6 +31,14 @@ type Props = {
   onDelete: (rule: RuleType) => () => void,
 }
 const STRING_SIZE_LIMIT = 30;
+const LimitedTd = styled.td(({ theme }: {theme: DefaultTheme}) => css`
+  max-width: 250px;
+  min-width: 250px;
+  
+  @media screen and (max-width: ${theme.breakpoints.max.md}) {
+    white-space: normal !important;
+  }
+`);
 
 const RuleListEntry = ({ rule, onDelete, usingPipelines }: Props) => {
   const { id, title, description, created_at, modified_at } = rule;
@@ -88,11 +97,11 @@ const RuleListEntry = ({ rule, onDelete, usingPipelines }: Props) => {
           <CounterRate showTotal suffix="errors/s" hideOnMissing />
         </MetricContainer>
       </td>
-      <td>
+      <LimitedTd>
         <CountBadge>{pipelinesLength}</CountBadge>
         {' '}
         {_showPipelines(usingPipelines)}
-      </td>
+      </LimitedTd>
       <td className="actions">{actions}</td>
     </tr>
   );
