@@ -157,7 +157,7 @@ public class Messages {
                 .collect(Collectors.toList());
 
         recordTimestamp(successfulRequests);
-        accountTotalMessageSizes(indexingRequestList, isSystemTraffic);
+        accountTotalMessageSizes(successfulRequests, isSystemTraffic);
 
         return propagateFailure(remainingErrors);
     }
