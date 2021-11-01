@@ -19,8 +19,6 @@ package org.graylog2.indexer.fieldtypes;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import org.graylog2.cluster.NodeNotFoundException;
-import org.graylog2.cluster.NodeService;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.MongoIndexSet;
 import org.graylog2.indexer.cluster.Cluster;
@@ -34,7 +32,6 @@ import org.graylog2.indexer.indices.events.IndicesDeletedEvent;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.periodical.Periodical;
-import org.graylog2.plugin.system.NodeId;
 import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,12 +39,14 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.time.Instant;
-import java.util.List;
-import java.util.Optional;
+import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 /**
  * {@link Periodical} that creates and maintains index field type information in the database.
@@ -62,12 +61,11 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
     private final MongoIndexSet.Factory mongoIndexSetFactory;
     private final Cluster cluster;
     private final ServerStatus serverStatus;
-    private final NodeService nodeService;
-    private final NodeId nodeId;
     private final ScheduledExecutorService scheduler;
 
+    private final AtomicBoolean isInitialized = new AtomicBoolean(false);
+    private volatile Set<IndexSetConfig> allIndexSetConfigs;
     private final ConcurrentHashMap<String, Instant> lastPoll = new ConcurrentHashMap<>();
-    private volatile List<IndexSetConfig> allIndexSetConfigs;
 
     @Inject
     public IndexFieldTypePollerPeriodical(final IndexFieldTypePoller poller,
@@ -79,8 +77,6 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
                                           final Cluster cluster,
                                           final EventBus eventBus,
                                           final ServerStatus serverStatus,
-                                          final NodeService nodeService,
-                                          final NodeId nodeId,
                                           @Named("daemonScheduler") final ScheduledExecutorService scheduler) {
         this.poller = poller;
         this.dbService = dbService;
@@ -89,8 +85,6 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
         this.mongoIndexSetFactory = mongoIndexSetFactory;
         this.cluster = cluster;
         this.serverStatus = serverStatus;
-        this.nodeService = nodeService;
-        this.nodeId = nodeId;
         this.scheduler = scheduler;
 
         eventBus.register(this);
@@ -122,22 +116,26 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
             }
         }
 
-        final List<IndexSetConfig> allConfigs = allIndexSetConfigs;
-        if (allConfigs != null) {
-            poll(allConfigs);
+        Set<IndexSetConfig> allConfigs = allIndexSetConfigs;
+        if (allConfigs == null) {
+            // We are NOT using IndexSetRegistry#getAll() here because of this: https://github.com/Graylog2/graylog2-server/issues/4625
+            allConfigs = allIndexSetConfigs = new LinkedHashSet<>(indexSetService.findAll());
+            lastPoll.keySet().retainAll(allConfigs.stream().map(IndexSetConfig::id).collect(Collectors.toSet()));
+        }
+
+        if (!isInitialized.getAndSet(true)) {
+            initializeFieldTypes(allConfigs);
         } else {
-            allIndexSetConfigs = initializeFieldTypes();
+            poll(allConfigs);
         }
     }
 
-    private List<IndexSetConfig> initializeFieldTypes() {
-        // We are NOT using IndexSetRegistry#getAll() here because of this: https://github.com/Graylog2/graylog2-server/issues/4625
-        final List<IndexSetConfig> allConfigs = indexSetService.findAll();
+    private void initializeFieldTypes(Collection<IndexSetConfig> indexSetConfigs) {
 
-        LOG.debug("Initializing index field types for {} index sets.", allConfigs.size());
+        LOG.debug("Initializing index field types for {} index sets.", indexSetConfigs.size());
 
         // this is the first time we run, or the index sets have changed, so we re-initialize the field types
-        allConfigs.forEach(indexSetConfig -> {
+        indexSetConfigs.forEach(indexSetConfig -> {
             final String indexSetId = indexSetConfig.id();
             final String indexSetTitle = indexSetConfig.title();
 
@@ -158,28 +156,11 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
                 lastPoll.put(indexSetId, Instant.now());
             }
         });
-
-        return allConfigs;
     }
 
     private boolean serverIsNotRunning() {
         final Lifecycle currentLifecycle = serverStatus.getLifecycle();
         return skippedLifecycles.contains(currentLifecycle);
-    }
-
-    private boolean isNotLeader() {
-        try {
-            return !nodeService.byNodeId(nodeId).isMaster();
-        } catch (NodeNotFoundException e) {
-            LOG.warn("Couldn't find node for ID <{}>", nodeId);
-            return true;
-        }
-    }
-
-    private void reset() {
-        LOG.debug("Resetting field type polling.");
-        lastPoll.clear();
-        allIndexSetConfigs = null;
     }
 
     /**
@@ -190,19 +171,10 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
     @SuppressWarnings("unused")
     @Subscribe
     public void handleIndexSetCreation(final IndexSetCreatedEvent event) {
-        if (isNotLeader()) {
-            LOG.debug("Skipping index set creation event on non-leader node. [event={}]", event);
-            return;
-        }
         final String indexSetId = event.indexSet().id();
-        // We are NOT using IndexSetRegistry#get(String) here because of this: https://github.com/Graylog2/graylog2-server/issues/4625
-        final Optional<IndexSetConfig> optionalIndexSet = indexSetService.get(indexSetId);
 
-        if (optionalIndexSet.isPresent()) {
-            reset();
-        } else {
-            LOG.warn("Couldn't find newly created index set <{}>", indexSetId);
-        }
+        LOG.debug("Resetting field type polling after creation of index set <{}>", indexSetId);
+        allIndexSetConfigs = null;
     }
 
     /**
@@ -212,11 +184,10 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
     @SuppressWarnings("unused")
     @Subscribe
     public void handleIndexSetDeletion(final IndexSetDeletedEvent event) {
-        if (isNotLeader()) {
-            LOG.debug("Skipping index set deletion event on non-leader node. [event={}]", event);
-            return;
-        }
-        reset();
+        final String indexSetId = event.id();
+
+        LOG.debug("Resetting field type polling after deletion of index set <{}>", indexSetId);
+        allIndexSetConfigs = null;
     }
 
     /**
@@ -237,7 +208,7 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
     /**
      * Creates a new polling job for the given index set to keep the active write index information up to date.
      */
-    private void poll(List<IndexSetConfig> indexSetConfigs) {
+    private void poll(Collection<IndexSetConfig> indexSetConfigs) {
         indexSetConfigs.stream()
                 .filter(config -> !config.fieldTypeRefreshInterval().equals(Duration.ZERO))
                 .filter(IndexSetConfig::isWritable)
