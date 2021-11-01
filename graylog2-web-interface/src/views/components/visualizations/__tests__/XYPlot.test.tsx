@@ -17,12 +17,12 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { mount } from 'wrappedEnzyme';
+import { $PropertyType } from 'utility-types';
+
 import mockComponent from 'helpers/mocking/MockComponent';
 import { alice as currentUser } from 'fixtures/users';
 import asMock from 'helpers/mocking/AsMock';
-import { $PropertyType } from 'utility-types';
 import { StoreMock as MockStore } from 'helpers/mocking';
-
 import User from 'logic/users/User';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import XYPlot, { Props as XYPlotProps } from 'views/components/visualizations/XYPlot';

@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { VisualizationType } from 'views/types';
-
 import DataTable from 'views/components/datatable/DataTable';
 
 const dataTable: VisualizationType = {

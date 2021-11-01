@@ -17,10 +17,10 @@
 import * as React from 'react';
 import { render, fireEvent } from 'wrappedTestingLibrary';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
-import { asMock, StoreMock as MockStore } from 'helpers/mocking';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
-import mockAction from 'helpers/mocking/MockAction';
 
+import { asMock, StoreMock as MockStore } from 'helpers/mocking';
+import mockAction from 'helpers/mocking/MockAction';
 import history from 'util/History';
 import Routes from 'routing/Routes';
 import AppRouter from 'routing/AppRouter';

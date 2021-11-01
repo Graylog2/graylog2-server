@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type { VisualizationType } from 'views/types';
 
+import type { VisualizationType } from 'views/types';
 import NumberVisualization from 'views/components/visualizations/number/NumberVisualization';
 import NumberVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
 
