@@ -105,8 +105,8 @@ const normalizeTimeRange = (query: Partial<RawTimeRange> = {}) => {
         timezone: range.timezone,
       } as KeywordTimeRange : undefined;
     default:
-      // @ts-ignore
-      throw new Error(`Unsupported range type ${range.rangetype}`);
+      // @ts-expect-error
+      throw new Error(`Unsupported range type ${range.rangetype} in range: ${JSON.stringify(range)}`);
   }
 };
 
