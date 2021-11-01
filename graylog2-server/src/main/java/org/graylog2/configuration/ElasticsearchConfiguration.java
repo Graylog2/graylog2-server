@@ -18,7 +18,6 @@ package org.graylog2.configuration;
 
 import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.util.Duration;
-import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.PositiveLongValidator;
 import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
@@ -93,9 +92,6 @@ public class ElasticsearchConfiguration {
 
     @Parameter(value = "elasticsearch_index_optimization_jobs", validator = PositiveIntegerValidator.class)
     private int indexOptimizationJobs = 20;
-
-    @Parameter(value = "index_field_type_periodical_interval", validator = PositiveDurationValidator.class)
-    private Duration indexFieldTypePeriodicalInterval = Duration.hours(1L);
 
     @Parameter(value = DEFAULT_EVENTS_INDEX_PREFIX, validators = StringNotBlankValidator.class)
     private String defaultEventsIndexPrefix = "gl-events";
@@ -182,10 +178,6 @@ public class ElasticsearchConfiguration {
 
     public int getIndexOptimizationJobs() {
         return indexOptimizationJobs;
-    }
-
-    public Duration getIndexFieldTypePeriodicalInterval() {
-        return indexFieldTypePeriodicalInterval;
     }
 
     public String getDefaultEventsIndexPrefix() {
