@@ -95,7 +95,7 @@ public class ElasticsearchBackendGeneratedRequestTestBase extends ElasticsearchB
                 indexLookup,
                 new QueryStringDecorators.Fake(),
                 (elasticsearchBackend, ssb, job, query, results) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, results, fieldTypesLookup),
-                false);
+                false, objectMapper);
     }
 
     SearchJob searchJobForQuery(Query query) {

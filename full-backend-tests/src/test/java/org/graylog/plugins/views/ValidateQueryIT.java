@@ -39,7 +39,7 @@ public class ValidateQueryIT {
 
     private final RequestSpecification requestSpec;
 
-    public ValidateQueryIT(GraylogBackend sut, RequestSpecification requestSpec) {
+    public ValidateQueryIT(RequestSpecification requestSpec) {
         this.requestSpec = requestSpec;
     }
 
@@ -50,7 +50,7 @@ public class ValidateQueryIT {
                 .spec(requestSpec)
                 .when()
                 .body("{\"query\":\"foo:bar\"}")
-                .post("/search/validation")
+                .post("/search/validate")
                 .then()
                 .statusCode(200);
         validatableResponse.assertThat().body("valid", equalTo(true));
@@ -62,7 +62,7 @@ public class ValidateQueryIT {
                 .spec(requestSpec)
                 .when()
                 .body("{\"query\":\"foo:\"}")
-                .post("/search/validation")
+                .post("/search/validate")
                 .then()
                 .statusCode(200);
         validatableResponse.assertThat().body("valid", equalTo(false));

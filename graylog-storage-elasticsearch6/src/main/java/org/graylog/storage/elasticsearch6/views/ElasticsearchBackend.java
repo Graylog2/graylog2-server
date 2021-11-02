@@ -16,12 +16,15 @@
  */
 package org.graylog.storage.elasticsearch6.views;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import com.google.inject.name.Named;
 import io.searchbox.client.JestClient;
+import io.searchbox.client.JestResult;
 import io.searchbox.core.MultiSearch;
 import io.searchbox.core.MultiSearchResult;
 import io.searchbox.core.Search;
+import io.searchbox.core.Validate;
 import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.GlobalOverride;
 import org.graylog.plugins.views.search.Query;
@@ -32,6 +35,7 @@ import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.engine.QueryBackend;
+import org.graylog.plugins.views.search.engine.ValidationExplanation;
 import org.graylog.plugins.views.search.engine.SearchConfig;
 import org.graylog.plugins.views.search.engine.ValidationRequest;
 import org.graylog.plugins.views.search.engine.ValidationResponse;
@@ -48,6 +52,8 @@ import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.builder.Search
 import org.graylog.storage.elasticsearch6.TimeRangeQueryFactory;
 import org.graylog.storage.elasticsearch6.jest.JestUtils;
 import org.graylog.storage.elasticsearch6.views.searchtypes.ESSearchTypeHandler;
+import org.graylog.storage.elasticsearch6.views.validate.ValidatePayload;
+import org.graylog.storage.elasticsearch6.views.validate.ValidationResult;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.plugin.Message;
@@ -78,6 +84,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
     private final QueryStringDecorators queryStringDecorators;
     private final ESGeneratedQueryContext.Factory queryContextFactory;
     private final boolean allowLeadingWildcard;
+    private final ObjectMapper objectMapper;
 
     @Inject
     public ElasticsearchBackend(Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> elasticsearchSearchTypeHandlers,
@@ -85,7 +92,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                                 IndexLookup indexLookup,
                                 QueryStringDecorators queryStringDecorators,
                                 ESGeneratedQueryContext.Factory queryContextFactory,
-                                @Named("allow_leading_wildcard_searches") boolean allowLeadingWildcard) {
+                                @Named("allow_leading_wildcard_searches") boolean allowLeadingWildcard, ObjectMapper objectMapper) {
         this.elasticsearchSearchTypeHandlers = elasticsearchSearchTypeHandlers;
         this.jestClient = jestClient;
         this.indexLookup = indexLookup;
@@ -93,6 +100,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
         this.queryStringDecorators = queryStringDecorators;
         this.queryContextFactory = queryContextFactory;
         this.allowLeadingWildcard = allowLeadingWildcard;
+        this.objectMapper = objectMapper;
     }
 
     private QueryBuilder normalizeQueryString(String queryString) {
@@ -295,9 +303,22 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
     }
 
     @Override
-    public ValidationResponse validate(ValidationRequest query) {
-        // final Validate.Builder builder = new Validate.Builder(query.query());
-        // final JestResult result = JestUtils.execute(jestClient, builder.build(), () -> "Unable to perform search query: ");
-        throw new UnsupportedOperationException("Not implemented yet");
+    public ValidationResponse validate(ValidationRequest req) {
+
+        final Set<String> affectedIndices = Optional.ofNullable(req.streams()).map(s -> indexLookup.indexNamesForStreamsInTimeRange(s, req.timerange())).orElse(Collections.emptySet());
+
+        final String queryString = ((ElasticsearchQueryString) req.query()).queryString();
+        final Validate.Builder builder = new Validate.Builder(new ValidatePayload(queryString, false))
+                .setParameter("explain", true)
+                .setParameter("rewrite", true);
+        final JestResult result = JestUtils.execute(jestClient, builder.build(), () -> "Unable to perform validation: ");
+        final ValidationResult response = objectMapper.convertValue(result.getJsonObject(), ValidationResult.class);
+
+        final List<ValidationExplanation> explanations = response.getExplanations().stream()
+                .filter(e -> affectedIndices.contains(e.getIndex())) // TODO: fix this!
+                .map(e -> new ValidationExplanation(e.getIndex(), -1, e.isValid(), e.getExplanation(), e.getError()))
+                .collect(Collectors.toList());
+
+        return new ValidationResponse(response.isValid(), explanations);
     }
 }

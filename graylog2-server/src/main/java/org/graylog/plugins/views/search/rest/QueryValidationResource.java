@@ -44,7 +44,7 @@ import java.util.stream.Collectors;
 
 @RequiresAuthentication
 @Api(value = "Search/Validation")
-@Path("/search/validation")
+@Path("/search/validate")
 public class QueryValidationResource extends RestResource implements PluginRestResource {
 
     private final QueryEngine queryEngine;
