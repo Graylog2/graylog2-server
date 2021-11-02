@@ -16,6 +16,12 @@
  */
 import Reflux from 'reflux';
 
+import {
+  IndicesConfigurationActionsType,
+  IndicesConfigurationStoreState,
+  RetentionStrategyResponse,
+  RotationStrategyResponse,
+} from 'components/indices/Types';
 import UserNotification from 'util/UserNotification';
 import * as URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
@@ -23,7 +29,7 @@ import { singletonStore, singletonActions } from 'logic/singleton';
 
 export const IndicesConfigurationActions = singletonActions(
   'core.IndicesConfiguration',
-  () => Reflux.createActions({
+  () => Reflux.createActions<IndicesConfigurationActionsType>({
     loadRotationStrategies: { asyncResult: true },
     loadRetentionStrategies: { asyncResult: true },
   }),
@@ -33,7 +39,7 @@ const urlPrefix = '/system/indices';
 
 export const IndicesConfigurationStore = singletonStore(
   'core.IndicesConfiguration',
-  () => Reflux.createStore({
+  () => Reflux.createStore<IndicesConfigurationStoreState>({
     listenables: [IndicesConfigurationActions],
 
     rotationStrategies: undefined,
@@ -63,7 +69,7 @@ export const IndicesConfigurationStore = singletonStore(
       const promise = fetch('GET', this._url('/rotation/strategies'));
 
       promise.then(
-        (response) => {
+        (response: RotationStrategyResponse) => {
           this.rotationStrategies = response.strategies;
           this.trigger(this.getState());
         },
@@ -79,7 +85,7 @@ export const IndicesConfigurationStore = singletonStore(
       const promise = fetch('GET', this._url('/retention/strategies'));
 
       promise.then(
-        (response) => {
+        (response: RetentionStrategyResponse) => {
           this.retentionStrategies = response.strategies;
           this.trigger(this.getState());
         },

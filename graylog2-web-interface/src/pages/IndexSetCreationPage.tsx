@@ -27,16 +27,25 @@ import history from 'util/History';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
 import connect from 'stores/connect';
-import { IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore';
+import { IndexSetPropType, IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore';
+import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import { IndicesConfigurationActions, IndicesConfigurationStore } from 'stores/indices/IndicesConfigurationStore';
+import {  RetentionStrategyPropType, RotationStrategyPropType } from 'components/indices/Types';
+import type { RetentionStrategy, RotationStrategy } from 'components/indices/Types';
 
-const IndexSetCreationPage = ({ retentionStrategies, rotationStrategies, indexSet }) => {
+type Props = {
+  indexSet: Partial<IndexSet> | null | undefined,
+  retentionStrategies?: Array<RetentionStrategy>  | null | undefined,
+  rotationStrategies?: Array<RotationStrategy> | null | undefined,
+}
+
+const IndexSetCreationPage = ({ retentionStrategies, rotationStrategies, indexSet }: Props) => {
   useEffect(() => {
     IndicesConfigurationActions.loadRotationStrategies();
     IndicesConfigurationActions.loadRetentionStrategies();
   }, []);
 
-  const _saveConfiguration = (indexSetItem) => {
+  const _saveConfiguration = (indexSetItem: IndexSet) => {
     const copy = indexSetItem;
 
     copy.creation_date = DateTime.now().toISOString();
@@ -89,19 +98,20 @@ const IndexSetCreationPage = ({ retentionStrategies, rotationStrategies, indexSe
 };
 
 IndexSetCreationPage.propTypes = {
-  retentionStrategies: PropTypes.object,
-  rotationStrategies: PropTypes.object,
-  indexSet: PropTypes.object,
+  retentionStrategies: PropTypes.arrayOf(RetentionStrategyPropType),
+  rotationStrategies: PropTypes.arrayOf(RotationStrategyPropType),
+  indexSet: IndexSetPropType,
 };
 
 IndexSetCreationPage.defaultProps = {
   retentionStrategies: undefined,
   rotationStrategies: undefined,
   indexSet: {
-    title: '',
+    title: 'test',
     description: '',
     index_prefix: '',
     writable: true,
+    can_be_default: true,
     shards: 4,
     replicas: 0,
     retention_strategy_class: 'org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy',
