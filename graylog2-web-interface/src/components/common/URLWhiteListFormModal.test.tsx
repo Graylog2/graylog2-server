@@ -17,11 +17,11 @@
 
 import React from 'react';
 import { screen, render } from 'wrappedTestingLibrary';
+
 import { adminUser, alice } from 'fixtures/users';
 import MockAction from 'helpers/mocking/MockAction';
 import MockStore from 'helpers/mocking/StoreMock';
 import { asMock } from 'helpers/mocking';
-
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import { ConfigurationsStore } from 'stores/configurations/ConfigurationsStore';
 
