@@ -86,7 +86,7 @@ public class MappedFieldTypesService {
                             .map(mappedFieldTypeDTO -> mappedFieldTypeDTO.type().type())
                             .sorted()
                             .collect(Collectors.toCollection(LinkedHashSet::new));
-                    final String compoundFieldType = distinctTypes.size() > 1
+                    final String resultingFieldType = distinctTypes.size() > 1
                             ? distinctTypes.stream().collect(Collectors.joining(",", "compound(", ")"))
                             : distinctTypes.stream().findFirst().orElse("unknown");
                     final Set<String> commonProperties = fieldTypes.stream()
@@ -97,7 +97,7 @@ public class MappedFieldTypesService {
                     final Set<String> properties = distinctTypes.size() > 1
                             ? Sets.union(commonProperties, Collections.singleton(PROP_COMPOUND_TYPE))
                             : commonProperties;
-                    return MappedFieldTypeDTO.create(fieldName, createType(compoundFieldType, properties));
+                    return MappedFieldTypeDTO.create(fieldName, createType(resultingFieldType, properties));
 
                 })
                 .collect(Collectors.toSet());
