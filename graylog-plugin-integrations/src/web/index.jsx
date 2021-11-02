@@ -67,7 +67,7 @@ const manifest = new PluginManifest(packageJson, {
   lookupTableAdapters: [
     {
       type: 'GreyNoise',
-      displayName: 'GreyNoise',
+      displayName: 'GreyNoise Quick IP Lookup',
       formComponent: GreyNoiseAdapterFieldSet,
       summaryComponent: GreyNoiseAdapterSummary,
       documentationComponent: GreyNoiseAdapterDocumentation,

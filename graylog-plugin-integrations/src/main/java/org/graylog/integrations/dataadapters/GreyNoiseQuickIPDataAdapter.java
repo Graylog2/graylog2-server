@@ -32,6 +32,7 @@ import com.unboundid.util.json.JSONObject;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.graylog2.plugin.Version;
 import org.graylog2.plugin.lookup.LookupCachePurge;
 import org.graylog2.plugin.lookup.LookupDataAdapter;
 import org.graylog2.plugin.lookup.LookupDataAdapterConfiguration;
@@ -48,8 +49,8 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
 
-public class GreyNoiseDataAdapter extends LookupDataAdapter {
-    private static final Logger LOG = LoggerFactory.getLogger(GreyNoiseDataAdapter.class);
+public class GreyNoiseQuickIPDataAdapter extends LookupDataAdapter {
+    private static final Logger LOG = LoggerFactory.getLogger(GreyNoiseQuickIPDataAdapter.class);
     public static final String NAME = "GreyNoise";
     static final String GREYNOISE_IPQC_ENDPOINT = "https://api.greynoise.io/v2/noise/quick/";
 
@@ -58,12 +59,12 @@ public class GreyNoiseDataAdapter extends LookupDataAdapter {
     private final OkHttpClient okHttpClient;
 
     @Inject
-    public GreyNoiseDataAdapter(@Assisted("id") String id,
-                                @Assisted("name") String name,
-                                @Assisted LookupDataAdapterConfiguration config,
-                                MetricRegistry metricRegistry,
-                                EncryptedValueService encryptedValueService,
-                                OkHttpClient okHttpClient) {
+    public GreyNoiseQuickIPDataAdapter(@Assisted("id") String id,
+                                       @Assisted("name") String name,
+                                       @Assisted LookupDataAdapterConfiguration config,
+                                       MetricRegistry metricRegistry,
+                                       EncryptedValueService encryptedValueService,
+                                       OkHttpClient okHttpClient) {
         super(id, name, config, metricRegistry);
         this.config = (Config) config;
         this.encryptedValueService = encryptedValueService;
@@ -92,11 +93,13 @@ public class GreyNoiseDataAdapter extends LookupDataAdapter {
 
     @Override
     protected LookupResult doGet(Object keyObject) {
+        String userAgent = String.format("Graylog/%s", Version.CURRENT_CLASSPATH);
         Request request = new Request.Builder()
                 .url(GREYNOISE_IPQC_ENDPOINT + keyObject.toString())
                 .method("GET", null)
                 .addHeader("Accept", "application/json")
                 .addHeader("key", encryptedValueService.decrypt(config.apiToken()))
+                .addHeader("User-Agent", userAgent)
                 .build();
         try (Response response = okHttpClient.newCall(request).execute()) {
             return parseResponse(response);
@@ -120,22 +123,22 @@ public class GreyNoiseDataAdapter extends LookupDataAdapter {
             } catch (JSONException | IOException e) {
                 LOG.error("An error occurred while parsing Lookup result [{}]", e.toString());
             }
-            return LookupResult.withoutTTL().multiValue(map)
-                               .build();
-        } else
+            return LookupResult.withoutTTL().multiValue(map).build();
+        } else {
             return LookupResult.empty();
+        }
     }
 
     @Override
     public void set(Object key, Object value) {
     }
 
-    public interface Factory extends LookupDataAdapter.Factory<GreyNoiseDataAdapter> {
+    public interface Factory extends LookupDataAdapter.Factory<GreyNoiseQuickIPDataAdapter> {
 
         @Override
-        GreyNoiseDataAdapter create(@Assisted("id") String id,
-                                    @Assisted("name") String name,
-                                    LookupDataAdapterConfiguration configuration);
+        GreyNoiseQuickIPDataAdapter create(@Assisted("id") String id,
+                                           @Assisted("name") String name,
+                                           LookupDataAdapterConfiguration configuration);
 
         @Override
         Descriptor getDescriptor();
@@ -160,7 +163,7 @@ public class GreyNoiseDataAdapter extends LookupDataAdapter {
 
     @AutoValue
     @JsonAutoDetect
-    @JsonDeserialize(builder = GreyNoiseDataAdapter.Config.Builder.class)
+    @JsonDeserialize(builder = GreyNoiseQuickIPDataAdapter.Config.Builder.class)
     @JsonTypeName(NAME)
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     public static abstract class Config implements LookupDataAdapterConfiguration {
@@ -174,7 +177,7 @@ public class GreyNoiseDataAdapter extends LookupDataAdapter {
         public abstract EncryptedValue apiToken();
 
         public static Builder builder() {
-            return new AutoValue_GreyNoiseDataAdapter_Config.Builder();
+            return new AutoValue_GreyNoiseQuickIPDataAdapter_Config.Builder();
         }
 
         @AutoValue.Builder

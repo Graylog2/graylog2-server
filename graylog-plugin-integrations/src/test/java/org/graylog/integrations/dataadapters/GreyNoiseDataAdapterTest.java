@@ -59,7 +59,7 @@ public class GreyNoiseDataAdapterTest {
     public void parseBodyWithMultiValue(){
         getvalidResponse();
 
-        final LookupResult result = GreyNoiseDataAdapter.parseResponse(mockResponse);
+        final LookupResult result = GreyNoiseQuickIPDataAdapter.parseResponse(mockResponse);
         assertThat(result, notNullValue());
         Assertions.assertThat(result.isEmpty()).isFalse();
         Assertions.assertThat(result.hasError()).isFalse();
