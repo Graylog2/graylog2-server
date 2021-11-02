@@ -92,13 +92,6 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
 
     private static final Set<Lifecycle> skippedLifecycles = ImmutableSet.of(Lifecycle.STARTING, Lifecycle.HALTING, Lifecycle.PAUSED, Lifecycle.FAILED, Lifecycle.UNINITIALIZED);
 
-    /**
-     * This creates index field type information for each index in each index set and schedules polling jobs to
-     * keep the data for active write indices up to date. It also removes index field type data for indices that
-     * don't exist anymore.
-     * <p>
-     * Since we create polling jobs for the active write indices, this periodical doesn't need to be run very often.
-     */
     @Override
     public void doRun() {
         if (serverIsNotRunning()) {
@@ -117,9 +110,13 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
         }
 
         Set<IndexSetConfig> allConfigs = allIndexSetConfigs;
+
+        // We just reset the list of index set configs whenever we experience an event which would affect it
         if (allConfigs == null) {
             // We are NOT using IndexSetRegistry#getAll() here because of this: https://github.com/Graylog2/graylog2-server/issues/4625
             allConfigs = allIndexSetConfigs = new LinkedHashSet<>(indexSetService.findAll());
+
+            // Only maintain the previous polling time for index sets which actually exist
             lastPoll.keySet().retainAll(allConfigs.stream().map(IndexSetConfig::id).collect(Collectors.toSet()));
         }
 
@@ -152,6 +149,46 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
                 dbService.findForIndexSet(indexSetId).stream()
                         .filter(types -> !indices.exists(types.indexName()))
                         .forEach(types -> dbService.delete(types.id()));
+            } finally {
+                lastPoll.put(indexSetId, Instant.now());
+            }
+        });
+    }
+
+    private void poll(Collection<IndexSetConfig> indexSetConfigs) {
+        indexSetConfigs.stream()
+                .filter(config -> !config.fieldTypeRefreshInterval().equals(Duration.ZERO))
+                .filter(IndexSetConfig::isWritable)
+                .filter(config -> {
+                    final Instant previousPoll = lastPoll.getOrDefault(config.id(), Instant.MIN);
+                    final Instant nextPoll = previousPoll.plusSeconds(
+                            config.fieldTypeRefreshInterval().getStandardSeconds());
+                    return !Instant.now().isBefore(nextPoll);
+                })
+                .forEach(this::poll);
+    }
+
+    private void poll(IndexSetConfig indexSetConfig) {
+        final String indexSetTitle = indexSetConfig.title();
+        final String indexSetId = indexSetConfig.id();
+
+        scheduler.submit(() -> {
+            try {
+                final MongoIndexSet indexSet = mongoIndexSetFactory.create(indexSetConfig);
+                // Only check the active write index on a regular basis, the others don't change anymore
+                final String activeWriteIndex = indexSet.getActiveWriteIndex();
+                if (activeWriteIndex != null) {
+                    LOG.debug("Updating index field types for active write index <{}> in index set <{}/{}>",
+                            activeWriteIndex, indexSetTitle, indexSetId);
+                    poller.pollIndex(activeWriteIndex, indexSetId).ifPresent(dbService::upsert);
+                } else {
+                    LOG.warn("Active write index for index set \"{}\" ({}) doesn't exist yet",
+                            indexSetTitle, indexSetId);
+                }
+            } catch (TooManyAliasesException e) {
+                LOG.error("Couldn't get active write index", e);
+            } catch (Exception e) {
+                LOG.error("Couldn't update field types for index set <{}/{}>", indexSetTitle, indexSetId, e);
             } finally {
                 lastPoll.put(indexSetId, Instant.now());
             }
@@ -202,49 +239,6 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
         event.indices().forEach(indexName -> {
             LOG.debug("Removing field type information for deleted index <{}>", indexName);
             dbService.delete(indexName);
-        });
-    }
-
-    /**
-     * Creates a new polling job for the given index set to keep the active write index information up to date.
-     */
-    private void poll(Collection<IndexSetConfig> indexSetConfigs) {
-        indexSetConfigs.stream()
-                .filter(config -> !config.fieldTypeRefreshInterval().equals(Duration.ZERO))
-                .filter(IndexSetConfig::isWritable)
-                .filter(config -> {
-                    final Instant previousPoll = lastPoll.getOrDefault(config.id(), Instant.MIN);
-                    final Instant nextPoll = previousPoll.plusSeconds(
-                            config.fieldTypeRefreshInterval().getStandardSeconds());
-                    return !Instant.now().isBefore(nextPoll);
-                })
-                .forEach(this::poll);
-    }
-
-    private void poll(IndexSetConfig indexSetConfig) {
-        final String indexSetTitle = indexSetConfig.title();
-        final String indexSetId = indexSetConfig.id();
-
-        scheduler.submit(() -> {
-            try {
-                final MongoIndexSet indexSet = mongoIndexSetFactory.create(indexSetConfig);
-                // Only check the active write index on a regular basis, the others don't change anymore
-                final String activeWriteIndex = indexSet.getActiveWriteIndex();
-                if (activeWriteIndex != null) {
-                    LOG.debug("Updating index field types for active write index <{}> in index set <{}/{}>",
-                            activeWriteIndex, indexSetTitle, indexSetId);
-                    poller.pollIndex(activeWriteIndex, indexSetId).ifPresent(dbService::upsert);
-                } else {
-                    LOG.warn("Active write index for index set \"{}\" ({}) doesn't exist yet",
-                            indexSetTitle, indexSetId);
-                }
-            } catch (TooManyAliasesException e) {
-                LOG.error("Couldn't get active write index", e);
-            } catch (Exception e) {
-                LOG.error("Couldn't update field types for index set <{}/{}>", indexSetTitle, indexSetId, e);
-            } finally {
-                lastPoll.put(indexSetId, Instant.now());
-            }
         });
     }
 
