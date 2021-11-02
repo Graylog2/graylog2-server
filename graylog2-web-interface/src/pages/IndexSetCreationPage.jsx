@@ -14,9 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import createReactClass from 'create-react-class';
-import Reflux from 'reflux';
+import React, { useEffect } from 'react';
+import PropTypes from 'prop-types';
 
 import { LinkContainer } from 'components/common/router';
 import { Row, Col, Button } from 'components/bootstrap';
@@ -27,99 +26,110 @@ import DateTime from 'logic/datetimes/DateTime';
 import history from 'util/History';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
+import connect from 'stores/connect';
 import { IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore';
 import { IndicesConfigurationActions, IndicesConfigurationStore } from 'stores/indices/IndicesConfigurationStore';
 
-const IndexSetCreationPage = createReactClass({
-  displayName: 'IndexSetCreationPage',
-  mixins: [Reflux.connect(IndexSetsStore), Reflux.connect(IndicesConfigurationStore)],
-
-  getInitialState() {
-    return {
-      indexSet: {
-        title: '',
-        description: '',
-        index_prefix: '',
-        writable: true,
-        shards: 4,
-        replicas: 0,
-        retention_strategy_class: 'org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy',
-        retention_strategy: {
-          max_number_of_indices: 20,
-          type: 'org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig',
-        },
-        rotation_strategy_class: 'org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy',
-        rotation_strategy: {
-          max_docs_per_index: 20000000,
-          type: 'org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig',
-        },
-        index_analyzer: 'standard',
-        index_optimization_max_num_segments: 1,
-        index_optimization_disabled: false,
-        field_type_refresh_interval: 5 * 1000, // 5 seconds
-      },
-    };
-  },
-
-  componentDidMount() {
+const IndexSetCreationPage = ({ retentionStrategies, rotationStrategies, indexSet }) => {
+  useEffect(() => {
     IndicesConfigurationActions.loadRotationStrategies();
     IndicesConfigurationActions.loadRetentionStrategies();
-  },
+  }, []);
 
-  _saveConfiguration(indexSet) {
-    const copy = indexSet;
+  const _saveConfiguration = (indexSetItem) => {
+    const copy = indexSetItem;
 
     copy.creation_date = DateTime.now().toISOString();
 
     IndexSetsActions.create(copy).then(() => {
       history.push(Routes.SYSTEM.INDICES.LIST);
     });
+  };
+
+  const _isLoading = () => {
+    return !rotationStrategies || !retentionStrategies;
+  };
+
+  if (_isLoading()) {
+    return <Spinner />;
+  }
+
+  return (
+    <DocumentTitle title="Create Index Set">
+      <div>
+        <PageHeader title="Create Index Set">
+          <span>
+            Create a new index set that will let you configure the retention, sharding, and replication of messages
+            coming from one or more streams.
+          </span>
+          <span>
+            You can learn more about the index model in the{' '}
+            <DocumentationLink page={DocsHelper.PAGES.INDEX_MODEL} text="documentation" />
+          </span>
+          <span>
+            <LinkContainer to={Routes.SYSTEM.INDICES.LIST}>
+              <Button bsStyle="info">Index sets overview</Button>
+            </LinkContainer>
+          </span>
+        </PageHeader>
+
+        <Row className="content">
+          <Col md={12}>
+            <IndexSetConfigurationForm indexSet={indexSet}
+                                       rotationStrategies={rotationStrategies}
+                                       retentionStrategies={retentionStrategies}
+                                       create
+                                       cancelLink={Routes.SYSTEM.INDICES.LIST}
+                                       onUpdate={_saveConfiguration} />
+          </Col>
+        </Row>
+      </div>
+    </DocumentTitle>
+  );
+};
+
+IndexSetCreationPage.propTypes = {
+  retentionStrategies: PropTypes.object,
+  rotationStrategies: PropTypes.object,
+  indexSet: PropTypes.object,
+};
+
+IndexSetCreationPage.defaultProps = {
+  retentionStrategies: undefined,
+  rotationStrategies: undefined,
+  indexSet: {
+    title: '',
+    description: '',
+    index_prefix: '',
+    writable: true,
+    shards: 4,
+    replicas: 0,
+    retention_strategy_class: 'org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy',
+    retention_strategy: {
+      max_number_of_indices: 20,
+      type: 'org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig',
+    },
+    rotation_strategy_class: 'org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy',
+    rotation_strategy: {
+      max_docs_per_index: 20000000,
+      type: 'org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig',
+    },
+    index_analyzer: 'standard',
+    index_optimization_max_num_segments: 1,
+    index_optimization_disabled: false,
+    field_type_refresh_interval: 5 * 1000, // 5 seconds
   },
+};
 
-  _isLoading() {
-    return !this.state.rotationStrategies || !this.state.retentionStrategies;
+export default connect(
+  IndexSetCreationPage,
+  {
+    indexSets: IndexSetsStore,
+    indicesConfigurations: IndicesConfigurationStore,
   },
-
-  render() {
-    if (this._isLoading()) {
-      return <Spinner />;
-    }
-
-    const { indexSet } = this.state;
-
-    return (
-      <DocumentTitle title="Create Index Set">
-        <div>
-          <PageHeader title="Create Index Set">
-            <span>
-              Create a new index set that will let you configure the retention, sharding, and replication of messages
-              coming from one or more streams.
-            </span>
-            <span>
-              You can learn more about the index model in the{' '}
-              <DocumentationLink page={DocsHelper.PAGES.INDEX_MODEL} text="documentation" />
-            </span>
-            <span>
-              <LinkContainer to={Routes.SYSTEM.INDICES.LIST}>
-                <Button bsStyle="info">Index sets overview</Button>
-              </LinkContainer>
-            </span>
-          </PageHeader>
-
-          <Row className="content">
-            <Col md={12}>
-              <IndexSetConfigurationForm indexSet={indexSet}
-                                         rotationStrategies={this.state.rotationStrategies}
-                                         retentionStrategies={this.state.retentionStrategies}
-                                         create
-                                         cancelLink={Routes.SYSTEM.INDICES.LIST}
-                                         onUpdate={this._saveConfiguration} />
-            </Col>
-          </Row>
-        </div>
-      </DocumentTitle>
-    );
-  },
-});
-
-export default IndexSetCreationPage;
+  ({ indexSets, indicesConfigurations }) => ({
+    indexSet: indexSets.indexSet,
+    rotationStrategies: indicesConfigurations.rotationStrategies,
+    retentionStrategies: indicesConfigurations.retentionStrategies,
+  }),
+);

@@ -47,7 +47,14 @@ export const IndicesConfigurationStore = singletonStore(
         retentionStrategies: undefined,
       };
     },
-
+    getState() {
+      return {
+        activeRotationConfig: this.activeRotationConfig,
+        rotationStrategies: this.rotationStrategies,
+        activeRetentionConfig: this.activeRetentionConfig,
+        retentionStrategies: this.retentionStrategies,
+      };
+    },
     _url(path) {
       return URLUtils.qualifyUrl(urlPrefix + path);
     },
@@ -58,7 +65,7 @@ export const IndicesConfigurationStore = singletonStore(
       promise.then(
         (response) => {
           this.rotationStrategies = response.strategies;
-          this.trigger({ rotationStrategies: response.strategies });
+          this.trigger(this.getState());
         },
         (error) => {
           UserNotification.error(`Fetching rotation strategies failed: ${error}`, 'Could not retrieve rotation strategies');
@@ -74,7 +81,7 @@ export const IndicesConfigurationStore = singletonStore(
       promise.then(
         (response) => {
           this.retentionStrategies = response.strategies;
-          this.trigger({ retentionStrategies: response.strategies });
+          this.trigger(this.getState());
         },
         (error) => {
           UserNotification.error(`Fetching retention strategies failed: ${error}`, 'Could not retrieve retention strategies');
