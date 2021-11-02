@@ -76,14 +76,12 @@ public class MappedFieldTypesServiceTest {
                 createIndexTypes(
                         "deadbeef",
                         "testIndex",
-                        FieldTypeDTO.create("field1", "keyword"),
-                        FieldTypeDTO.create("field2", "long")
+                        FieldTypeDTO.create("field1", "keyword")
                 ),
                 createIndexTypes(
                         "affeaffe",
                         "testIndex2",
-                        FieldTypeDTO.create("field1", "text"),
-                        FieldTypeDTO.create("field2", "long")
+                        FieldTypeDTO.create("field1", "text")
                 )
         );
         when(indexFieldTypesService.findForIndexSets(Collections.singleton("indexSetId"))).thenReturn(fieldTypes);
@@ -91,8 +89,7 @@ public class MappedFieldTypesServiceTest {
 
         final Set<MappedFieldTypeDTO> result = this.mappedFieldTypesService.fieldTypesByStreamIds(Collections.singleton("stream1"), RelativeRange.allTime());
         assertThat(result).containsExactlyInAnyOrder(
-                MappedFieldTypeDTO.create("field2", FieldTypes.Type.createType("long", ImmutableSet.of("numeric", "enumerable"))),
-                MappedFieldTypeDTO.create("field1", FieldTypes.Type.createType("string", ImmutableSet.of("compound")))
+                MappedFieldTypeDTO.create("field1", FieldTypes.Type.createType("string", ImmutableSet.of()))
         );
     }
 
