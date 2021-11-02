@@ -49,27 +49,27 @@ const DateTimeProvider = ({ children }: Props) => {
   const currentUser = useContext(CurrentUserContext);
   const userTimezone = useMemo(() => getUserTimezone(currentUser?.timezone), [currentUser?.timezone]);
 
-  const unifyTimeAsDate = useCallback((time, tz = userTimezone) => {
+  const adjustTimezone = useCallback((time, tz = userTimezone) => {
     return moment.tz(time, tz);
   }, [userTimezone]);
 
-  const unifyTime = useCallback((time, tz = userTimezone, format = 'default') => {
-    return unifyTimeAsDate(time, tz).format(DATE_TIME_FORMATS[format]);
-  }, [unifyTimeAsDate, userTimezone]);
+  const formatTime = useCallback((time, tz = userTimezone, format = 'default') => {
+    return adjustTimezone(time, tz).format(DATE_TIME_FORMATS[format]);
+  }, [adjustTimezone, userTimezone]);
 
-  const unifyAsBrowserTime = (time, format) => {
-    return unifyTime(time, getBrowserTimezone(), format);
+  const formatAsBrowserTime = (time, format) => {
+    return formatTime(time, getBrowserTimezone(), format);
   };
 
   const relativeDifference = (time, tz) => {
-    return unifyTimeAsDate(time, tz).fromNow();
+    return adjustTimezone(time, tz).fromNow();
   };
 
   const contextValue = {
-    unifyTime,
-    unifyTimeAsDate,
+    formatTime,
+    adjustTimezone,
     userTimezone,
-    unifyAsBrowserTime,
+    formatAsBrowserTime,
     relativeDifference,
   };
 

@@ -36,7 +36,7 @@ type Props = {
 const CustomHighlighting = ({ children, field: fieldName, value: fieldValue }: Props) => {
   const decorators = [];
   const highlightingRules = useContext(HighlightingRulesContext) ?? [];
-  const { unifyTime } = useContext(DateTimeContext);
+  const { formatTime } = useContext(DateTimeContext);
   const fieldTypes = useContext(FieldTypesContext);
   let type;
 
@@ -47,7 +47,7 @@ const CustomHighlighting = ({ children, field: fieldName, value: fieldValue }: P
 
   const highlightingRulesMap = highlightingRules.reduce((prev, cur) => ({ ...prev, [cur.field]: prev[cur.field] ? [...prev[cur.field], cur] : [cur] }), {});
   const rules = highlightingRulesMap[fieldName] ?? [];
-  const formattedValue = type === 'date' ? unifyTime(fieldValue) : fieldValue;
+  const formattedValue = type === 'date' ? formatTime(fieldValue) : fieldValue;
 
   rules.forEach((rule) => {
     const ranges = [];

@@ -17,9 +17,10 @@
 import React from 'react';
 import Immutable from 'immutable';
 import { render, screen } from 'wrappedTestingLibrary';
-
 import { MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
+import moment from 'moment';
+
 import Search from 'views/logic/search/Search';
 import Widget from 'views/logic/widgets/Widget';
 import DateTimeContext from 'contexts/DateTimeContext';
@@ -28,7 +29,6 @@ import GlobalOverride from 'views/logic/search/GlobalOverride';
 import { SearchStore, SearchStoreState } from 'views/stores/SearchStore';
 
 import TimerangeInfo from './TimerangeInfo';
-import moment from 'moment';
 
 jest.mock('views/stores/GlobalOverrideStore', () => ({
   GlobalOverrideStore: MockStore(
@@ -72,11 +72,11 @@ describe('TimerangeInfo', () => {
 
   const SUT = (props) => (
     <DateTimeContext.Provider value={{
-      unifyTime: () => '',
+      formatTime: () => '',
       userTimezone: 'UTC',
       relativeDifference: () => '',
-      unifyAsBrowserTime: () => '',
-      unifyTimeAsDate: () => moment(),
+      formatAsBrowserTime: () => '',
+      adjustTimezone: () => moment(),
     }}>
       <TimerangeInfo {...props} />
     </DateTimeContext.Provider>

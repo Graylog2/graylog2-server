@@ -71,7 +71,7 @@ const MiddleIcon = styled.span(({ theme }) => css`
   padding: 0 15px;
 `);
 
-const dateOutput = (timerange: TimeRange | NoTimeRangeOverride, unifyTimeAsDate: (time: Date) => Moment) => {
+const dateOutput = (timerange: TimeRange | NoTimeRangeOverride, adjustTimezone: (time: Date) => Moment) => {
   let from = EMPTY_RANGE;
   let to = EMPTY_RANGE;
 
@@ -81,14 +81,14 @@ const dateOutput = (timerange: TimeRange | NoTimeRangeOverride, unifyTimeAsDate:
 
   if (isTypeRelative(timerange)) {
     if (isTypeRelativeWithStartOnly(timerange)) {
-      from = readableRange(timerange, 'range', unifyTimeAsDate);
+      from = readableRange(timerange, 'range', adjustTimezone);
     }
 
     if (isTypeRelativeWithEnd(timerange)) {
-      from = readableRange(timerange, 'from', unifyTimeAsDate);
+      from = readableRange(timerange, 'from', adjustTimezone);
     }
 
-    to = readableRange(timerange, 'to', unifyTimeAsDate, 'Now');
+    to = readableRange(timerange, 'to', adjustTimezone, 'Now');
 
     return {
       from,
@@ -103,7 +103,7 @@ const dateOutput = (timerange: TimeRange | NoTimeRangeOverride, unifyTimeAsDate:
 };
 
 const TimeRangeLivePreview = ({ timerange }: Props) => {
-  const { unifyTimeAsDate } = useContext(DateTimeContext);
+  const { adjustTimezone } = useContext(DateTimeContext);
   const { isValid } = useFormikContext<SearchBarFormValues>();
   const [{ from, until }, setTimeOutput] = useState(EMPTY_OUTPUT);
 
@@ -111,7 +111,7 @@ const TimeRangeLivePreview = ({ timerange }: Props) => {
     let output = EMPTY_OUTPUT;
 
     if (isValid) {
-      output = dateOutput(timerange, unifyTimeAsDate);
+      output = dateOutput(timerange, adjustTimezone);
     }
 
     setTimeOutput(output);

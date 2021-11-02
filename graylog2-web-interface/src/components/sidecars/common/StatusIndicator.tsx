@@ -36,9 +36,9 @@ type Props = {
 }
 
 const StatusIndicator = ({ message, id, lastSeen, status }: Props) => {
-  const { unifyTimeAsDate, relativeDifference } = useContext(DateTimeContext);
+  const { adjustTimezone, relativeDifference } = useContext(DateTimeContext);
   const text = lodash.upperFirst(SidecarStatusEnum.toString(status));
-  const lastSeenDateTime = unifyTimeAsDate(lastSeen);
+  const lastSeenDateTime = adjustTimezone(lastSeen);
 
   let icon;
   let className;

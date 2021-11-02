@@ -29,7 +29,7 @@ import {
   normalizeClassifiedRange, RELATIVE_CLASSIFIED_ALL_TIME_RANGE,
 } from './RelativeTimeRangeClassifiedHelper';
 
-const formatDatetime = (dateTime, unifyTime) => unifyTime(dateTime, DATE_TIME_FORMATS.complete);
+const formatDatetime = (dateTime, formatTime) => formatTime(dateTime, DATE_TIME_FORMATS.complete);
 
 const getDefaultAbsoluteFromRange = (oldTimeRange: RelativeTimeRangeClassified | AbsoluteTimeRange | KeywordTimeRange | NoTimeRangeOverride | undefined | null) => {
   if (isTypeRelativeClassified(oldTimeRange)) {
@@ -48,10 +48,10 @@ const getDefaultAbsoluteToRange = (oldTimeRange: RelativeTimeRangeClassified | A
 };
 
 const migrationStrategies = {
-  absolute: (oldTimeRange: RelativeTimeRangeClassified | AbsoluteTimeRange | KeywordTimeRange | NoTimeRangeOverride | undefined | null, unifyTime) => ({
+  absolute: (oldTimeRange: RelativeTimeRangeClassified | AbsoluteTimeRange | KeywordTimeRange | NoTimeRangeOverride | undefined | null, formatTime) => ({
     type: 'absolute',
-    from: formatDatetime(moment().subtract(getDefaultAbsoluteFromRange(oldTimeRange), 'seconds'), unifyTime),
-    to: formatDatetime(moment().subtract(getDefaultAbsoluteToRange(oldTimeRange), 'seconds'), unifyTime),
+    from: formatDatetime(moment().subtract(getDefaultAbsoluteFromRange(oldTimeRange), 'seconds'), formatTime),
+    to: formatDatetime(moment().subtract(getDefaultAbsoluteToRange(oldTimeRange), 'seconds'), formatTime),
   }),
   relative: () => ({ type: 'relative', from: classifyFromRange(DEFAULT_RELATIVE_FROM), to: RELATIVE_CLASSIFIED_ALL_TIME_RANGE }),
   keyword: () => ({ type: 'keyword', keyword: 'Last five minutes' }),
@@ -61,7 +61,7 @@ const migrationStrategies = {
 export const migrateTimeRangeToNewType = (
   oldTimeRange: TimeRange | undefined | null,
   type: string,
-  unifyTime: (time: string | Moment) => string,
+  formatTime: (time: string | Moment) => string,
 ): TimeRange | undefined | null => {
   const oldType = oldTimeRange && 'type' in oldTimeRange ? oldTimeRange.type : 'disabled';
 
@@ -73,7 +73,7 @@ export const migrateTimeRangeToNewType = (
     throw new Error(`Invalid time range type: ${type}`);
   }
 
-  return migrationStrategies[type](oldTimeRange, unifyTime);
+  return migrationStrategies[type](oldTimeRange, formatTime);
 };
 
 export default migrateTimeRangeToNewType;

@@ -54,7 +54,7 @@ const TimeRangeWrapper = styled.p(({ theme }) => css`
   }
 `);
 
-const dateOutput = (timerange: TimeRange, unifyTimeAsDate: (time: Date) => Moment) => {
+const dateOutput = (timerange: TimeRange, adjustTimezone: (time: Date) => Moment) => {
   let from = EMPTY_RANGE;
   let to = EMPTY_RANGE;
 
@@ -66,14 +66,14 @@ const dateOutput = (timerange: TimeRange, unifyTimeAsDate: (time: Date) => Momen
     case 'relative':
 
       if (isTypeRelativeWithStartOnly(timerange)) {
-        from = readableRange(timerange, 'range', unifyTimeAsDate);
+        from = readableRange(timerange, 'range', adjustTimezone);
       }
 
       if (isTypeRelativeWithEnd(timerange)) {
-        from = readableRange(timerange, 'from', unifyTimeAsDate);
+        from = readableRange(timerange, 'from', adjustTimezone);
       }
 
-      to = readableRange(timerange, 'to', unifyTimeAsDate, 'Now');
+      to = readableRange(timerange, 'to', adjustTimezone, 'Now');
 
       return {
         from,
@@ -91,7 +91,7 @@ const dateOutput = (timerange: TimeRange, unifyTimeAsDate: (time: Date) => Momen
 const TimeRangeDisplay = ({ timerange, toggleDropdownShow }: Props) => {
   const [{ from, until }, setTimeOutput] = useState(EMPTY_OUTPUT);
   const dateTested = useRef(false);
-  const { unifyTimeAsDate } = useContext(DateTimeContext);
+  const { adjustTimezone } = useContext(DateTimeContext);
 
   useEffect(() => {
     if (isTypeKeyword(timerange) && !timerange.from) {
@@ -109,9 +109,9 @@ const TimeRangeDisplay = ({ timerange, toggleDropdownShow }: Props) => {
           });
       }
     } else if (timerange && 'type' in timerange) {
-      setTimeOutput(dateOutput(timerange, unifyTimeAsDate));
+      setTimeOutput(dateOutput(timerange, adjustTimezone));
     }
-  }, [dateTested, timerange, unifyTimeAsDate]);
+  }, [dateTested, timerange, adjustTimezone]);
 
   return (
     <TimeRangeWrapper aria-label="Search Time Range, Opens Time Range Selector On Click" role="button" onClick={toggleDropdownShow}>

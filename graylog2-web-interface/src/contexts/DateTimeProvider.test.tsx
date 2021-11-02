@@ -25,9 +25,9 @@ import CurrentUserContext from 'contexts/CurrentUserContext';
 import User from 'logic/users/User';
 
 const TestTimestamp = ({ timestamp }: { timestamp: string }) => {
-  const { unifyTime } = useContext(DateTimeContext);
+  const { formatTime } = useContext(DateTimeContext);
 
-  return (<div>{unifyTime(timestamp)}</div>);
+  return (<div>{formatTime(timestamp)}</div>);
 };
 
 const SUT = ({ timestamp, currentUser: user }: { timestamp: string, currentUser: User }) => (

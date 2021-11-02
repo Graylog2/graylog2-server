@@ -166,8 +166,8 @@ const fieldUpdate = (value) => {
     return newTime.format(DATE_TIME_FORMATS.default);
   };
 
-  const handleClickTimeNow = (unifyTimeAsDate) => {
-    const newTime = unifyTimeAsDate(new Date()).toObject();
+  const handleClickTimeNow = (adjustTimezone) => {
+    const newTime = adjustTimezone(new Date()).toObject();
 
     return moment({
       ...initialDateTime,
@@ -195,7 +195,7 @@ const fieldUpdate = (value) => {
 };
 
 const AbsoluteTimeInput = ({ dateTime, range, onChange }) => {
-  const { unifyTimeAsDate } = useContext(DateTimeContext);
+  const { adjustTimezone } = useContext(DateTimeContext);
   const hourIcon = useRef(TIME_ICON_MID);
 
   const {
@@ -226,7 +226,7 @@ const AbsoluteTimeInput = ({ dateTime, range, onChange }) => {
   const _onClickTimeNow = () => {
     hourIcon.current = TIME_ICON_MID;
 
-    onChange(handleClickTimeNow(unifyTimeAsDate));
+    onChange(handleClickTimeNow(adjustTimezone));
   };
 
   return (

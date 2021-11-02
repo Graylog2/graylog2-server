@@ -34,8 +34,8 @@ const Wrapper = styled.div`
 `;
 
 const AbsoluteDateInput = ({ name, disabled, onChange, value, hasError }) => {
-  const { unifyTime } = useContext(DateTimeContext);
-  const _onSetTimeToNow = () => onChange(unifyTime(new Date(), undefined, 'complete'));
+  const { formatTime } = useContext(DateTimeContext);
+  const _onSetTimeToNow = () => onChange(formatTime(new Date(), undefined, 'complete'));
   const _onChange = (event) => onChange(event.target.value);
 
   return (

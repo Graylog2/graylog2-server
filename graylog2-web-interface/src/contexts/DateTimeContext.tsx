@@ -27,9 +27,9 @@ export type DateTime = string | number | Moment | Date;
 
 export type DateTimeContextType = {
   relativeDifference: (time: DateTime, tz?: string) => string
-  unifyAsBrowserTime: (time: DateTime, format?: DateTimeFormats) => string,
-  unifyTime: (time: DateTime, tz?: string, format?: DateTimeFormats) => string
-  unifyTimeAsDate: (time: DateTime, tz?: string, format?: DateTimeFormats) => Moment,
+  formatAsBrowserTime: (time: DateTime, format?: DateTimeFormats) => string,
+  formatTime: (time: DateTime, tz?: string, format?: DateTimeFormats) => string
+  adjustTimezone: (time: DateTime, tz?: string, format?: DateTimeFormats) => Moment,
   userTimezone: string,
 };
 

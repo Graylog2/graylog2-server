@@ -22,17 +22,17 @@ import type { SearchBarFormValues } from 'views/Constants';
 import { isTypeRelativeWithStartOnly, isTypeRelativeWithEnd } from 'views/typeGuards/timeRange';
 import { DATE_TIME_FORMATS } from 'contexts/DateTimeProvider';
 
-const formatDatetime = (dateTime, unifyTime) => unifyTime(dateTime, DATE_TIME_FORMATS.complete);
+const formatDatetime = (dateTime, formatTime) => formatTime(dateTime, DATE_TIME_FORMATS.complete);
 
-export const onSubmittingTimerange = (timerange: TimeRange, unifyTimeAsDate: (time: string) => Moment): TimeRange => {
+export const onSubmittingTimerange = (timerange: TimeRange, adjustTimezone: (time: string) => Moment): TimeRange => {
   const { type } = timerange;
 
   switch (timerange.type) {
     case 'absolute':
       return {
         type: timerange.type,
-        from: unifyTimeAsDate(timerange.from).toISOString(),
-        to: unifyTimeAsDate(timerange.to).toISOString(),
+        from: adjustTimezone(timerange.from).toISOString(),
+        to: adjustTimezone(timerange.to).toISOString(),
       };
     case 'relative':
       if (isTypeRelativeWithStartOnly(timerange)) {
@@ -64,15 +64,15 @@ export const onSubmittingTimerange = (timerange: TimeRange, unifyTimeAsDate: (ti
   }
 };
 
-export const onInitializingTimerange = (timerange: TimeRange, unifyTime: (time: Moment) => string): SearchBarFormValues['timerange'] => {
+export const onInitializingTimerange = (timerange: TimeRange, formatTime: (time: Moment) => string): SearchBarFormValues['timerange'] => {
   const { type } = timerange;
 
   switch (timerange.type) {
     case 'absolute':
       return {
         type: timerange.type,
-        from: formatDatetime(timerange.from, unifyTime),
-        to: formatDatetime(timerange.to, unifyTime),
+        from: formatDatetime(timerange.from, formatTime),
+        to: formatDatetime(timerange.to, formatTime),
       };
     case 'relative':
       if (isTypeRelativeWithStartOnly(timerange)) {

@@ -31,7 +31,7 @@ const rangeLimitError = 'Range is outside limit duration.';
 const dateLimitError = 'Date is outside limit duration.';
 const timeRangeError = 'The "Until" date must come after the "From" date.';
 
-const exceedsDuration = (timeRange, limitDuration, unifyTime) => {
+const exceedsDuration = (timeRange, limitDuration, formatTime) => {
   if (limitDuration === 0) {
     return false;
   }
@@ -40,7 +40,7 @@ const exceedsDuration = (timeRange, limitDuration, unifyTime) => {
     case 'absolute':
     case 'keyword': { // eslint-disable-line no-fallthrough, padding-line-between-statements
       const durationFrom = timeRange.from;
-      const durationLimit = unifyTime(new Date()).subtract(Number(limitDuration), 'seconds').format(DateTime.Formats.TIMESTAMP);
+      const durationLimit = formatTime(new Date()).subtract(Number(limitDuration), 'seconds').format(DateTime.Formats.TIMESTAMP);
 
       return moment(durationFrom).isBefore(durationLimit);
     }
@@ -50,7 +50,7 @@ const exceedsDuration = (timeRange, limitDuration, unifyTime) => {
   }
 };
 
-const validateAbsoluteTimeRange = (timeRange: AbsoluteTimeRange, limitDuration: number, unifyTime) => {
+const validateAbsoluteTimeRange = (timeRange: AbsoluteTimeRange, limitDuration: number, formatTime) => {
   let errors: {
     from?: string,
     to?: string,
@@ -68,7 +68,7 @@ const validateAbsoluteTimeRange = (timeRange: AbsoluteTimeRange, limitDuration: 
     errors = { ...errors, to: timeRangeError };
   }
 
-  if (exceedsDuration(timeRange, limitDuration, unifyTime)) {
+  if (exceedsDuration(timeRange, limitDuration, formatTime)) {
     errors = { ...errors, from: dateLimitError };
   }
 
@@ -103,21 +103,21 @@ const validateRelativeTimeRangeWithEnd = (timeRange: RelativeTimeRangeWithEnd, l
   return errors;
 };
 
-const validateKeywordTimeRange = (timeRange: KeywordTimeRange, limitDuration: number, unifyTime) => {
+const validateKeywordTimeRange = (timeRange: KeywordTimeRange, limitDuration: number, formatTime) => {
   let errors: { keyword?: string } = {};
 
-  if (exceedsDuration(timeRange, limitDuration, unifyTime)) {
+  if (exceedsDuration(timeRange, limitDuration, formatTime)) {
     errors = { keyword: rangeLimitError };
   }
 
   return errors;
 };
 
-const validateTimeRange = (timeRange: TimeRange | NoTimeRangeOverride, limitDuration: number, unifyTime) => {
+const validateTimeRange = (timeRange: TimeRange | NoTimeRangeOverride, limitDuration: number, formatTime) => {
   let errors = {};
 
   if (isTypeKeyword(timeRange)) {
-    errors = { ...errors, ...validateKeywordTimeRange(timeRange, limitDuration, unifyTime) };
+    errors = { ...errors, ...validateKeywordTimeRange(timeRange, limitDuration, formatTime) };
   }
 
   if (isTypeRelativeWithEnd(timeRange)) {
@@ -125,7 +125,7 @@ const validateTimeRange = (timeRange: TimeRange | NoTimeRangeOverride, limitDura
   }
 
   if (isTypeAbsolute(timeRange)) {
-    errors = { ...errors, ...validateAbsoluteTimeRange(timeRange, limitDuration, unifyTime) };
+    errors = { ...errors, ...validateAbsoluteTimeRange(timeRange, limitDuration, formatTime) };
   }
 
   return errors;

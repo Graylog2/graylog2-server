@@ -117,11 +117,11 @@ const CancelButton = styled(Button)`
   margin-right: 6px;
 `;
 
-const defaultRanges = (unifyTime) => ({
+const defaultRanges = (formatTime) => ({
   absolute: {
     type: 'absolute',
-    from: unifyTime(moment().subtract(300, 'seconds')),
-    to: unifyTime(new Date(), undefined, 'complete'),
+    from: formatTime(moment().subtract(300, 'seconds')),
+    to: formatTime(new Date(), undefined, 'complete'),
   },
   relative: {
     type: 'relative',
@@ -157,10 +157,10 @@ const timeRangeTypeTabs = ({ activeTab, limitDuration, setValidatingKeyword, tab
     );
   });
 
-const dateTimeValidate = (nextTimeRange, limitDuration, unifyTime) => {
+const dateTimeValidate = (nextTimeRange, limitDuration, formatTime) => {
   let errors = {};
   const timeRange = normalizeIfClassifiedRelativeTimeRange(nextTimeRange);
-  const timeRangeErrors = validateTimeRange(timeRange, limitDuration, unifyTime);
+  const timeRangeErrors = validateTimeRange(timeRange, limitDuration, formatTime);
 
   if (Object.keys(timeRangeErrors).length !== 0) {
     errors = { ...errors, nextTimeRange: timeRangeErrors };
@@ -186,11 +186,11 @@ const TimeRangeDropdown = ({
   position,
   limitDuration,
 }: TimeRangeDropdownProps) => {
-  const { unifyTime, userTimezone } = useContext(DateTimeContext);
+  const { formatTime, userTimezone } = useContext(DateTimeContext);
   const [validatingKeyword, setValidatingKeyword] = useState(false);
   const [activeTab, setActiveTab] = useState('type' in currentTimeRange ? currentTimeRange.type : undefined);
 
-  const _defaultRanges = defaultRanges(unifyTime);
+  const _defaultRanges = defaultRanges(formatTime);
 
   const positionIsBottom = position === 'bottom';
 
@@ -231,13 +231,13 @@ const TimeRangeDropdown = ({
                    arrowOffsetLeft={positionIsBottom ? 34 : -11}
                    title={title}>
       <Formik<TimeRangeDropDownFormValues> initialValues={{ nextTimeRange: onInitializingNextTimeRange(currentTimeRange) }}
-                                           validate={({ nextTimeRange }) => dateTimeValidate(nextTimeRange, limitDuration, unifyTime)}
+                                           validate={({ nextTimeRange }) => dateTimeValidate(nextTimeRange, limitDuration, formatTime)}
                                            onSubmit={handleSubmit}
                                            validateOnMount>
         {(({ values: { nextTimeRange }, isValid, setFieldValue, submitForm }) => {
           const handleActiveTab = (nextTab) => {
             if ('type' in nextTimeRange) {
-              setFieldValue('nextTimeRange', migrateTimeRangeToNewType(nextTimeRange as TimeRange, nextTab, unifyTime));
+              setFieldValue('nextTimeRange', migrateTimeRangeToNewType(nextTimeRange as TimeRange, nextTab, formatTime));
             } else {
               setFieldValue('nextTimeRange', _defaultRanges);
             }

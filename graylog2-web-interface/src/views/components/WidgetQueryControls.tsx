@@ -93,7 +93,7 @@ const _resetQueryOverride = () => GlobalOverrideActions.resetQuery().then(Search
 
 const useBindApplySearchControlsChanges = (formRef) => {
   const { bindApplySearchControlsChanges } = useContext(WidgetEditApplyAllChangesContext);
-  const { unifyTimeAsDate } = useContext(DateTimeContext);
+  const { adjustTimezone } = useContext(DateTimeContext);
 
   useEffect(() => {
     bindApplySearchControlsChanges((newWidget: Widget) => {
@@ -101,7 +101,7 @@ const useBindApplySearchControlsChanges = (formRef) => {
         const { dirty, values, isValid } = formRef.current;
 
         if (dirty && isValid) {
-          const normalizedFormValues = normalizeSearchBarFormValues(values, unifyTimeAsDate);
+          const normalizedFormValues = normalizeSearchBarFormValues(values, adjustTimezone);
 
           return updateWidgetSearchControls(newWidget, normalizedFormValues);
         }

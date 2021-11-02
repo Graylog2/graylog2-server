@@ -45,8 +45,8 @@ const StyledForm = styled(Form)`
 
 const _isFunction = (children: Props['children']): children is (props: FormikProps<SearchBarFormValues>) => React.ReactElement => isFunction(children);
 
-export const normalizeSearchBarFormValues = ({ timerange, streams, queryString }, unifyTimeAsDate) => {
-  const newTimeRange = onSubmittingTimerange(timerange, unifyTimeAsDate);
+export const normalizeSearchBarFormValues = ({ timerange, streams, queryString }, adjustTimezone) => {
+  const newTimeRange = onSubmittingTimerange(timerange, adjustTimezone);
 
   return {
     timerange: newTimeRange,
@@ -56,12 +56,12 @@ export const normalizeSearchBarFormValues = ({ timerange, streams, queryString }
 };
 
 const SearchBarForm = ({ initialValues, limitDuration, onSubmit, children, validateOnMount, formRef, validateQueryString }: Props) => {
-  const { unifyTime, unifyTimeAsDate } = useContext(DateTimeContext);
+  const { formatTime, adjustTimezone } = useContext(DateTimeContext);
   const _onSubmit = useCallback(({ timerange, streams, queryString }: SearchBarFormValues) => {
-    return onSubmit(normalizeSearchBarFormValues({ timerange, streams, queryString }, unifyTimeAsDate));
-  }, [onSubmit, unifyTimeAsDate]);
+    return onSubmit(normalizeSearchBarFormValues({ timerange, streams, queryString }, adjustTimezone));
+  }, [onSubmit, adjustTimezone]);
   const { timerange, streams, queryString } = initialValues;
-  const initialTimeRange = onInitializingTimerange(timerange, unifyTime);
+  const initialTimeRange = onInitializingTimerange(timerange, formatTime);
   const _initialValues = {
     queryString,
     streams,
@@ -69,8 +69,8 @@ const SearchBarForm = ({ initialValues, limitDuration, onSubmit, children, valid
   };
 
   const { setFieldWarning } = useContext(FormWarningsContext);
-  const _validate = useCallback((values: SearchBarFormValues) => validate(values, limitDuration, setFieldWarning, validateQueryString, unifyTime),
-    [limitDuration, setFieldWarning, validateQueryString]);
+  const _validate = useCallback((values: SearchBarFormValues) => validate(values, limitDuration, setFieldWarning, validateQueryString, formatTime),
+    [limitDuration, setFieldWarning, validateQueryString, formatTime]);
 
   return (
     <Formik<SearchBarFormValues> initialValues={_initialValues}

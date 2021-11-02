@@ -65,13 +65,13 @@ type Props = {
 };
 
 const WidgetTimeRangeOverride = ({ value, onReset }: Props) => {
-  const { unifyTimeAsDate } = useContext(DateTimeContext);
+  const { adjustTimezone } = useContext(DateTimeContext);
 
   return (
     <Wrapper>
       <TimeRangeButton disabled />
       <TimeRangeInfo>
-        <TimeRangeString>{timerangeToString(value, unifyTimeAsDate)}</TimeRangeString>
+        <TimeRangeString>{timerangeToString(value, adjustTimezone)}</TimeRangeString>
         <ResetButton bsSize="xs" bsStyle="primary" onClick={onReset} data-testid="reset-global-time-range">
           Reset Global Override
         </ResetButton>
