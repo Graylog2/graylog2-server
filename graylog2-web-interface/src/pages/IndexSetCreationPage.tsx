@@ -30,12 +30,12 @@ import connect from 'stores/connect';
 import { IndexSetPropType, IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import { IndicesConfigurationActions, IndicesConfigurationStore } from 'stores/indices/IndicesConfigurationStore';
-import {  RetentionStrategyPropType, RotationStrategyPropType } from 'components/indices/Types';
+import { RetentionStrategyPropType, RotationStrategyPropType } from 'components/indices/Types';
 import type { RetentionStrategy, RotationStrategy } from 'components/indices/Types';
 
 type Props = {
   indexSet: Partial<IndexSet> | null | undefined,
-  retentionStrategies?: Array<RetentionStrategy>  | null | undefined,
+  retentionStrategies?: Array<RetentionStrategy> | null | undefined,
   rotationStrategies?: Array<RotationStrategy> | null | undefined,
 }
 
