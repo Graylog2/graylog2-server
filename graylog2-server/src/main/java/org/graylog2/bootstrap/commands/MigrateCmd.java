@@ -19,7 +19,6 @@ package org.graylog2.bootstrap.commands;
 import com.github.rvesse.airline.annotations.Command;
 import org.graylog2.Configuration;
 import org.graylog2.commands.Server;
-import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.Version;
 import org.jsoftbiz.utils.OS;
@@ -37,10 +36,6 @@ public class MigrateCmd extends Server {
 
     public MigrateCmd() {
         super(MIGRATION_COMMAND);
-    }
-
-    @Override
-    protected void beforeStart(TLSProtocolsConfiguration configuration) {
     }
 
     @Override

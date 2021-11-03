@@ -29,6 +29,7 @@ import com.google.inject.util.Types;
 import org.graylog2.Configuration;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
+import org.graylog2.configuration.PathConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.migrations.Migration;
 import org.graylog2.plugin.ServerStatus;
@@ -91,8 +92,8 @@ public abstract class ServerBootstrap extends CmdLineTool {
     }
 
     @Override
-    protected void beforeStart(TLSProtocolsConfiguration configuration) {
-        super.beforeStart(configuration);
+    protected void beforeStart(TLSProtocolsConfiguration tlsProtocolsConfiguration, PathConfiguration pathConfiguration) {
+        super.beforeStart(tlsProtocolsConfiguration, pathConfiguration);
 
         // Do not use a PID file if the user requested not to
         if (!isNoPidFile()) {
@@ -100,16 +101,16 @@ public abstract class ServerBootstrap extends CmdLineTool {
         }
         // This needs to run before the first SSLContext is instantiated,
         // because it sets up the default SSLAlgorithmConstraints
-        applySecuritySettings(configuration);
+        applySecuritySettings(tlsProtocolsConfiguration);
 
         // Set these early in the startup because netty's NativeLibraryUtil uses a static initializer
-        setNettyNativeDefaults();
+        setNettyNativeDefaults(pathConfiguration);
     }
 
-    private void setNettyNativeDefaults() {
+    private void setNettyNativeDefaults(PathConfiguration pathConfiguration) {
         // Give netty a better spot than /tmp to unpack its tcnative libraries
         if (System.getProperty("io.netty.native.workdir") == null) {
-            System.setProperty("io.netty.native.workdir", configuration.getNativeLibDir().toAbsolutePath().toString());
+            System.setProperty("io.netty.native.workdir", pathConfiguration.getNativeLibDir().toAbsolutePath().toString());
         }
         // Don't delete the native lib after unpacking, as this confuses needrestart(1) on some distributions
         if (System.getProperty("io.netty.native.deleteLibAfterLoading") == null) {
