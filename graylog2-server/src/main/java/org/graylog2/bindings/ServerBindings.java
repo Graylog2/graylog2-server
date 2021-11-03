@@ -94,23 +94,35 @@ import javax.ws.rs.ext.ExceptionMapper;
 
 public class ServerBindings extends Graylog2Module {
     private final Configuration configuration;
+    private final boolean isMigrationCommand;
 
-    public ServerBindings(Configuration configuration) {
+    public ServerBindings(Configuration configuration, boolean isMigrationCommand) {
 
         this.configuration = configuration;
+        this.isMigrationCommand = isMigrationCommand;
     }
 
     @Override
     protected void configure() {
         bindInterfaces();
         bindSingletons();
-        install(new MessageQueueModule(configuration));
+
+        if (isMigrationCommand) {
+            // If we are only running migrations, disable the journal
+            final Configuration noopConfig = new Configuration();
+            noopConfig.setMessageJournalEnabled(false);
+            install(new MessageQueueModule(noopConfig));
+        } else {
+            install(new MessageQueueModule(configuration));
+        }
         bindProviders();
         bindFactoryModules();
         bindDynamicFeatures();
         bindExceptionMappers();
         bindAdditionalJerseyComponents();
-        bindEventBusListeners();
+        if (!isMigrationCommand) {
+            bindEventBusListeners();
+        }
         install(new AuthenticatingRealmModule(configuration));
         install(new AuthorizationOnlyRealmModule());
         bindSearchResponseDecorators();

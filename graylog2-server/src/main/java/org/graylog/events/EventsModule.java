@@ -53,11 +53,8 @@ import org.graylog.events.rest.AvailableEntityTypesResource;
 import org.graylog.events.rest.EventDefinitionsResource;
 import org.graylog.events.rest.EventNotificationsResource;
 import org.graylog.events.rest.EventsResource;
-import org.graylog.scheduler.JobExecutionEngine;
-import org.graylog.scheduler.JobTriggerUpdates;
 import org.graylog.scheduler.schedule.IntervalJobSchedule;
 import org.graylog.scheduler.schedule.OnceJobSchedule;
-import org.graylog.scheduler.worker.JobWorkerPool;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.plugin.PluginConfigBean;
 import org.graylog2.plugin.PluginModule;
@@ -80,10 +77,6 @@ public class EventsModule extends PluginModule {
         bind(NotificationGracePeriodService.class).asEagerSingleton();
         bind(EventProcessorExecutionMetrics.class).asEagerSingleton();
         bind(EventNotificationExecutionMetrics.class).asEagerSingleton();
-
-        install(new FactoryModuleBuilder().build(JobExecutionEngine.Factory.class));
-        install(new FactoryModuleBuilder().build(JobWorkerPool.Factory.class));
-        install(new FactoryModuleBuilder().build(JobTriggerUpdates.Factory.class));
 
         addSystemRestResource(AvailableEntityTypesResource.class);
         addSystemRestResource(EventDefinitionsResource.class);

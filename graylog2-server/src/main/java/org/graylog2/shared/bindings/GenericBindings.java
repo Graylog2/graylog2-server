@@ -47,6 +47,7 @@ import org.graylog2.shared.bindings.providers.OkHttpClientProvider;
 import org.graylog2.shared.bindings.providers.ProxiedRequestsExecutorService;
 import org.graylog2.shared.bindings.providers.ServiceManagerProvider;
 import org.graylog2.shared.buffers.InputBufferImpl;
+import org.graylog2.shared.buffers.NoopInputBuffer;
 import org.graylog2.shared.buffers.ProcessBuffer;
 import org.graylog2.shared.buffers.processors.DecodingProcessor;
 import org.graylog2.shared.inputs.InputRegistry;
@@ -56,6 +57,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Semaphore;
 
 public class GenericBindings extends Graylog2Module {
+    private final boolean isMigrationCommand;
+
+    public GenericBindings(boolean isMigrationCommand) {
+        this.isMigrationCommand = isMigrationCommand;
+    }
 
     @Override
     protected void configure() {
@@ -64,10 +70,16 @@ public class GenericBindings extends Graylog2Module {
         install(new FactoryModuleBuilder().build(DecodingProcessor.Factory.class));
 
         bind(ProcessBuffer.class).asEagerSingleton();
-        bind(InputBuffer.class).to(InputBufferImpl.class);
+        if (isMigrationCommand) {
+            bind(InputBuffer.class).to(NoopInputBuffer.class);
+        } else {
+            bind(InputBuffer.class).to(InputBufferImpl.class);
+        }
         bind(NodeId.class).toProvider(NodeIdProvider.class);
 
-        bind(ServiceManager.class).toProvider(ServiceManagerProvider.class).asEagerSingleton();
+        if (!isMigrationCommand) {
+            bind(ServiceManager.class).toProvider(ServiceManagerProvider.class).asEagerSingleton();
+        }
 
         bind(ThroughputCounter.class);
 
@@ -75,7 +87,7 @@ public class GenericBindings extends Graylog2Module {
 
         bind(Semaphore.class).annotatedWith(Names.named("JournalSignal")).toInstance(new Semaphore(0));
 
-        install(new FactoryModuleBuilder().build(new TypeLiteral<IOState.Factory<MessageInput>>(){}));
+        install(new FactoryModuleBuilder().build(new TypeLiteral<IOState.Factory<MessageInput>>() {}));
 
         bind(InputRegistry.class).asEagerSingleton();
 
