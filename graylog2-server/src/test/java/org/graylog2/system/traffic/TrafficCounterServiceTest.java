@@ -49,7 +49,7 @@ class TrafficCounterServiceTest {
 
     @BeforeEach
     void setUp(MongoDBTestService mongodb, MongoJackObjectMapperProvider objectMapperProvider) {
-        lenient().when(nodeId.toEscapedString()).thenReturn("node-1");
+        lenient().when(nodeId.toString()).thenReturn("node-1");
 
         service = new TrafficCounterService(mongodb.mongoConnection(), objectMapperProvider);
     }
