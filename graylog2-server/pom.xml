@@ -971,7 +971,7 @@
                         <executions>
                             <execution>
                                 <id>install node and yarn</id>
-                                <phase>package</phase>
+                                <phase>compile</phase>
                                 <goals>
                                     <goal>install-node-and-yarn</goal>
                                 </goals>
@@ -979,7 +979,7 @@
 
                             <execution>
                                 <id>yarn install</id>
-                                <phase>package</phase>
+                                <phase>compile</phase>
                                 <goals>
                                     <goal>yarn</goal>
                                 </goals>
@@ -1036,7 +1036,7 @@
                                 <goals>
                                     <goal>yarn</goal>
                                 </goals>
-                                <phase>test</phase>
+                                <phase>compile</phase>
                                 <configuration>
                                     <arguments>tsc</arguments>
                                 </configuration>
