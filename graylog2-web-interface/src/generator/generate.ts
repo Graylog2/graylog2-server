@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-#!/usr/bin/env ts-node-script
 import fs from 'fs';
 import { dirname } from 'path';
 
