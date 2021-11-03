@@ -20,18 +20,11 @@ import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 import org.graylog.storage.elasticsearch7.ElasticsearchInstanceES7Factory;
 import org.graylog.testing.completebackend.ApiIntegrationTest;
-import org.graylog.testing.completebackend.GraylogBackend;
-import org.graylog.testing.utils.GelfInputUtils;
-import org.graylog.testing.utils.SearchUtils;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-
 import static io.restassured.RestAssured.given;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.testing.completebackend.Lifecycle.CLASS;
 import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.core.IsEqual.equalTo;
 
 @ApiIntegrationTest(serverLifecycle = CLASS, elasticsearchFactory = ElasticsearchInstanceES7Factory.class)
