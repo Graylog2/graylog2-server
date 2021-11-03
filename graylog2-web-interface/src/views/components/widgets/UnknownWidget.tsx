@@ -16,8 +16,8 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
-import { EditWidgetComponentProps, WidgetComponentProps } from 'views/types';
 
+import { EditWidgetComponentProps, WidgetComponentProps } from 'views/types';
 import { Icon } from 'components/common';
 import ClipboardButton from 'components/common/ClipboardButton';
 

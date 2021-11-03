@@ -17,10 +17,10 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
-import { adminUser, alice as currentUser } from 'fixtures/users';
-import mockAction from 'helpers/mocking/MockAction';
 import userEvent from '@testing-library/user-event';
 
+import { adminUser, alice as currentUser } from 'fixtures/users';
+import mockAction from 'helpers/mocking/MockAction';
 import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
 import ViewLoaderContext, { ViewLoaderContextType } from 'views/logic/ViewLoaderContext';

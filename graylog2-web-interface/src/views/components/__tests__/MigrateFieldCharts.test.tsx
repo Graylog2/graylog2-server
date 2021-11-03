@@ -16,9 +16,9 @@
  */
 import React from 'react';
 import { render, fireEvent, waitFor } from 'wrappedTestingLibrary';
+
 import { StoreMock as MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
-
 import LineVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/LineVisualizationConfig';
 import AreaVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/AreaVisualizationConfig';
 import Series from 'views/logic/aggregationbuilder/Series';

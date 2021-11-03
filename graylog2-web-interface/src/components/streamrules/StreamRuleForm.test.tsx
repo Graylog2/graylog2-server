@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { cleanup, render, fireEvent } from 'wrappedTestingLibrary';
+
 import { MockStore } from 'helpers/mocking';
 
 import StreamRuleForm from './StreamRuleForm';

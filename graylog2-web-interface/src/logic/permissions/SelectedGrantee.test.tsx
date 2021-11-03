@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as Immutable from 'immutable';
-import { alice, bob, manager, owner } from 'fixtures/entityShareState';
 
+import { alice, bob, manager, owner } from 'fixtures/entityShareState';
 import ActiveShare from 'logic/permissions/ActiveShare';
 
 import SelectedGrantee from './SelectedGrantee';

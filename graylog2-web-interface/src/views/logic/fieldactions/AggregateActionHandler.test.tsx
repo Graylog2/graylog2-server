@@ -16,7 +16,6 @@
  */
 import asMock from 'helpers/mocking/AsMock';
 import mockAction from 'helpers/mocking/MockAction';
-
 import { WidgetActions } from 'views/stores/WidgetStore';
 
 import AggregateActionHandler from './AggregateActionHandler';

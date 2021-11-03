@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { Map } from 'immutable';
-import mockAction from 'helpers/mocking/MockAction';
 
+import mockAction from 'helpers/mocking/MockAction';
 import Widget from 'views/logic/widgets/Widget';
 import AddToAllTablesActionHandler from 'views/logic/fieldactions/AddToAllTablesActionHandler';
 import { FieldTypes } from 'views/logic/fieldtypes/FieldType';

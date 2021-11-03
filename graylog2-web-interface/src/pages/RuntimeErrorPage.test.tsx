@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import { render, fireEvent } from 'wrappedTestingLibrary';
+
 import mockComponent from 'helpers/mocking/MockComponent';
 
 import RuntimeErrorPage from './RuntimeErrorPage';

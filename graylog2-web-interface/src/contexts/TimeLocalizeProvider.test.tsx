@@ -18,8 +18,8 @@ import * as React from 'react';
 import { useContext } from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import moment from 'moment-timezone';
-import { alice } from 'fixtures/users';
 
+import { alice } from 'fixtures/users';
 import TimeLocalizeProvider, { ACCEPTED_FORMATS } from 'contexts/TimeLocalizeProvider';
 import TimeLocalizeContext from 'contexts/TimeLocalizeContext';
 import CurrentUserContext from 'contexts/CurrentUserContext';

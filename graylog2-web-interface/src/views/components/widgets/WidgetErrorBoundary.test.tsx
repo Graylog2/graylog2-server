@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { render } from 'wrappedTestingLibrary';
+
 import asMock from 'helpers/mocking/AsMock';
 
 import WidgetErrorBoundary from './WidgetErrorBoundary';

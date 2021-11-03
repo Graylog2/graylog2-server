@@ -16,8 +16,9 @@
  */
 import React from 'react';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
-import { StoreMock as MockStore } from 'helpers/mocking';
 import userEvent from '@testing-library/user-event';
+
+import { StoreMock as MockStore } from 'helpers/mocking';
 import mockSearchClusterConfig from 'fixtures/searchClusterConfig';
 
 import { DateTimeContext } from './DateTimeProvider';
