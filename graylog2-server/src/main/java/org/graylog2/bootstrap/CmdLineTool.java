@@ -52,6 +52,7 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.graylog2.configuration.PathConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.featureflag.FeatureFlagsFactory;
@@ -183,11 +184,16 @@ public abstract class CmdLineTool implements CliCommand {
 
     /**
      * Things that have to run before the {@link #startCommand()} method is being called.
+     * Please note that this happens *before* the configuration file has been parsed.
      */
     protected void beforeStart() {
     }
 
-    protected void beforeStart(TLSProtocolsConfiguration configuration) {
+    /**
+     * Things that have to run before the {@link #startCommand()} method is being called.
+     * Please note that this happens *before* the configuration file has been parsed.
+     */
+    protected void beforeStart(TLSProtocolsConfiguration configuration, PathConfiguration pathConfiguration) {
     }
 
     protected static void applySecuritySettings(TLSProtocolsConfiguration configuration) {
@@ -245,7 +251,7 @@ public abstract class CmdLineTool implements CliCommand {
         installCommandConfig();
 
         beforeStart();
-        beforeStart(parseAndGetTLSConfiguration());
+        beforeStart(parseAndGetTLSConfiguration(), parseAndGetPathConfiguration(configFile));
 
         processConfiguration(jadConfig);
 
@@ -299,6 +305,12 @@ public abstract class CmdLineTool implements CliCommand {
         processConfiguration(jadConfig);
 
         return tlsConfiguration;
+    }
+
+    private PathConfiguration parseAndGetPathConfiguration(String configFile) {
+        final PathConfiguration pathConfiguration = new PathConfiguration();
+        processConfiguration(new JadConfig(getConfigRepositories(configFile), pathConfiguration));
+        return pathConfiguration;
     }
 
     private void installCommandConfig() {
