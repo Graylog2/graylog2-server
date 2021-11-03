@@ -28,6 +28,7 @@ import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.engine.QueryBackend;
+import org.graylog.plugins.views.search.engine.SearchConfig;
 import org.graylog.plugins.views.search.errors.SearchTypeError;
 import org.graylog.plugins.views.search.errors.SearchTypeErrorParser;
 import org.graylog.plugins.views.search.filter.AndFilter;
@@ -100,10 +101,10 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
     }
 
     @Override
-    public ESGeneratedQueryContext generate(SearchJob job, Query query, Set<QueryResult> results, SearchesClusterConfig searchesClusterConfig) {
+    public ESGeneratedQueryContext generate(SearchJob job, Query query, Set<QueryResult> results, SearchConfig searchConfig) {
         final ElasticsearchQueryString backendQuery = (ElasticsearchQueryString) query.query();
 
-        validateQueryTimeRange(query, searchesClusterConfig);
+        validateQueryTimeRange(query, searchConfig);
 
         final Set<SearchType> searchTypes = query.searchTypes();
 
@@ -126,7 +127,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
         final ESGeneratedQueryContext queryContext = queryContextFactory.create(this, searchSourceBuilder, job, query, results);
         for (SearchType searchType : searchTypes) {
 
-            final Optional<SearchTypeError> searchTypeError = validateSearchType(query, searchType, searchesClusterConfig);
+            final Optional<SearchTypeError> searchTypeError = validateSearchType(query, searchType, searchConfig);
             if(searchTypeError.isPresent()) {
                 LOG.error("Invalid search type {} for elasticsearch backend, cannot generate query part. Skipping this search type.", searchType.type());
                 queryContext.addError(searchTypeError.get());

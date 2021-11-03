@@ -19,6 +19,7 @@ package org.graylog.plugins.views.search;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.engine.BackendQuery;
+import org.graylog.plugins.views.search.engine.SearchConfig;
 import org.graylog.plugins.views.search.errors.IllegalTimeRangeException;
 import org.graylog.plugins.views.search.errors.MissingCapabilitiesException;
 import org.graylog.plugins.views.search.filter.OrFilter;
@@ -60,12 +61,6 @@ public class SearchExecutionGuardTest {
 
         providedCapabilities = new HashMap<>();
         providedCapabilities.put("my only capability", mock(PluginMetaData.class));
-
-        final ClusterConfigService clusterConfig = mock(ClusterConfigService.class);
-        final SearchesClusterConfig searchesConfig = mock(SearchesClusterConfig.class);
-        when(searchesConfig.queryTimeRangeLimit()).thenReturn(Period.minutes(10));
-        when(clusterConfig.get(SearchesClusterConfig.class)).thenReturn(searchesConfig);
-
         sut = new SearchExecutionGuard(providedCapabilities);
     }
 

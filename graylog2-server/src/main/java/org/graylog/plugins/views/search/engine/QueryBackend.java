@@ -51,10 +51,10 @@ public interface QueryBackend<T extends GeneratedQueryContext> {
      * @param job                currently executing job
      * @param query              the graylog query structure
      * @param predecessorResults the query result of the preceding queries
-     * @param searchesClusterConfig
+     * @param searchConfig       additional cluster-wide search configuration like query time-range limit
      * @return a backend specific generated query
      */
-    T generate(SearchJob job, Query query, Set<QueryResult> predecessorResults, SearchesClusterConfig searchesClusterConfig);
+    T generate(SearchJob job, Query query, Set<QueryResult> predecessorResults, SearchConfig searchConfig);
 
     default boolean isAllMessages(TimeRange timeRange) {
         return timeRange instanceof RelativeRange && ((RelativeRange)timeRange).isAllMessages();
@@ -111,17 +111,15 @@ public interface QueryBackend<T extends GeneratedQueryContext> {
      *
      * @param job                currently executing job
      * @param query              the individual query to run from the current job
-     * @param queryContext       the generated query by {@link #generate(SearchJob, Query, Set, SearchesClusterConfig)}
+     * @param queryContext       the generated query by {@link #generate(SearchJob, Query, Set, SearchConfig)}
      * @param predecessorResults the query result of the preceding queries
      * @return the result for the query
      * @throws RuntimeException if the query could not be executed for some reason
      */
     QueryResult doRun(SearchJob job, Query query, T queryContext, Set<QueryResult> predecessorResults);
 
-    default Optional<SearchTypeError> validateSearchType(Query query, SearchType searchType, SearchesClusterConfig searchesClusterConfig) {
-        return Optional.ofNullable(searchesClusterConfig) // we have a config
-                .map(config -> searchesClusterConfig.queryTimeRangeLimit()) // the config has a limit
-                .filter(timeLimit -> Period.ZERO != timeLimit) // and the limit is valid, limiting
+    default Optional<SearchTypeError> validateSearchType(Query query, SearchType searchType, SearchConfig searchConfig) {
+        return searchConfig.getQueryTimeRangeLimit()
                 .flatMap(configuredTimeLimit -> searchType.timerange() // TODO: what if there is no timerange for the type but there is a global limit?
                         .map(tr -> tr.effectiveTimeRange(query, searchType))
                         .filter(tr -> isOutOfLimit(tr, configuredTimeLimit))
@@ -143,10 +141,8 @@ public interface QueryBackend<T extends GeneratedQueryContext> {
                 .anyMatch(id -> Objects.equals(id, searchTypeId));
     }
 
-    default void validateQueryTimeRange(Query query, SearchesClusterConfig config) {
-        Optional.ofNullable(config)
-                .map(SearchesClusterConfig::queryTimeRangeLimit)
-                .filter(limit -> !Period.ZERO.equals(limit))
+    default void validateQueryTimeRange(Query query, SearchConfig config) {
+        config.getQueryTimeRangeLimit()
                 .flatMap(timeRangeLimit -> Optional.ofNullable(query.timerange())
                         .filter(tr -> tr.getFrom() != null && tr.getTo() != null) // TODO: is this check necessary?
                         .filter(tr -> isOutOfLimit(tr, timeRangeLimit)))

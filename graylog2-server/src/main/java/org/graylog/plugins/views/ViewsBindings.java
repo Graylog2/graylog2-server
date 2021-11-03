@@ -38,6 +38,8 @@ import org.graylog.plugins.views.search.db.InMemorySearchJobService;
 import org.graylog.plugins.views.search.db.SearchJobService;
 import org.graylog.plugins.views.search.db.SearchesCleanUpJob;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
+import org.graylog.plugins.views.search.engine.SearchConfig;
+import org.graylog.plugins.views.search.engine.SearchConfigProvider;
 import org.graylog.plugins.views.search.export.ChunkDecorator;
 import org.graylog.plugins.views.search.export.DecoratingMessagesExporter;
 import org.graylog.plugins.views.search.export.ExportBackend;
@@ -202,6 +204,8 @@ public class ViewsBindings extends ViewsModule {
 
         jerseyAdditionalComponentsBinder().addBinding().toInstance(SimpleMessageChunkCsvWriter.class);
         jerseyAdditionalComponentsBinder().addBinding().toInstance(MessageExportFormatFilter.class);
+
+        bind(SearchConfig.class).toProvider(SearchConfigProvider.class);
     }
 
     private void registerExportBackendProvider() {

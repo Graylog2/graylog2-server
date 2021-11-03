@@ -22,6 +22,7 @@ import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
+import org.graylog.plugins.views.search.engine.SearchConfig;
 import org.graylog.plugins.views.search.errors.SearchTypeError;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
@@ -31,6 +32,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.MultiSe
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchRequest;
 import org.graylog.storage.elasticsearch7.testing.TestMultisearchResponse;
 import org.graylog2.indexer.searches.SearchesClusterConfig;
+import org.joda.time.Period;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -87,7 +89,7 @@ public class ElasticsearchBackendMultiSearchTest extends ElasticsearchBackendGen
 
     @Test
     public void everySearchTypeGeneratesASearchSourceBuilder() {
-        final ESGeneratedQueryContext queryContext = this.elasticsearchBackend.generate(searchJob, query, Collections.emptySet(), mock(SearchesClusterConfig.class));
+        final ESGeneratedQueryContext queryContext = this.elasticsearchBackend.generate(searchJob, query, Collections.emptySet(), new SearchConfig(Period.ZERO));
 
         assertThat(queryContext.searchTypeQueries())
                 .hasSize(2)
@@ -101,7 +103,7 @@ public class ElasticsearchBackendMultiSearchTest extends ElasticsearchBackendGen
                 .collect(Collectors.toList());
         when(client.msearch(any(), any())).thenReturn(items);
 
-        final ESGeneratedQueryContext queryContext = this.elasticsearchBackend.generate(searchJob, query, Collections.emptySet(), mock(SearchesClusterConfig.class));
+        final ESGeneratedQueryContext queryContext = this.elasticsearchBackend.generate(searchJob, query, Collections.emptySet(), new SearchConfig(Period.ZERO));
         final List<SearchRequest> generatedRequest = run(searchJob, query, queryContext, Collections.emptySet());
 
         assertThat(generatedRequest).hasSize(2);
@@ -114,7 +116,7 @@ public class ElasticsearchBackendMultiSearchTest extends ElasticsearchBackendGen
                 .collect(Collectors.toList());
         when(client.msearch(any(), any())).thenReturn(items);
 
-        final ESGeneratedQueryContext queryContext = this.elasticsearchBackend.generate(searchJob, query, Collections.emptySet(), mock(SearchesClusterConfig.class));
+        final ESGeneratedQueryContext queryContext = this.elasticsearchBackend.generate(searchJob, query, Collections.emptySet(), new SearchConfig(Period.ZERO));
         final QueryResult queryResult = this.elasticsearchBackend.doRun(searchJob, query, queryContext, Collections.emptySet());
 
         assertThat(queryResult.searchTypes()).containsOnlyKeys("pivot1", "pivot2");
@@ -136,7 +138,7 @@ public class ElasticsearchBackendMultiSearchTest extends ElasticsearchBackendGen
 
     @Test
     public void oneFailingSearchTypeReturnsPartialResults() throws Exception {
-        final ESGeneratedQueryContext queryContext = this.elasticsearchBackend.generate(searchJob, query, Collections.emptySet(), mock(SearchesClusterConfig.class));
+        final ESGeneratedQueryContext queryContext = this.elasticsearchBackend.generate(searchJob, query, Collections.emptySet(), new SearchConfig(Period.ZERO));
 
         final MultiSearchResponse response = TestMultisearchResponse.fromFixture("partiallySuccessfulMultiSearchResponse.json");
         final List<MultiSearchResponse.Item> items = Arrays.stream(response.getResponses())
