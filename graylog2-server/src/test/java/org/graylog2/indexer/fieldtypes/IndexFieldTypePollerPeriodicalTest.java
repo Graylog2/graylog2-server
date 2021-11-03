@@ -16,6 +16,7 @@
  */
 package org.graylog2.indexer.fieldtypes;
 
+import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog2.indexer.MongoIndexSet;
@@ -59,6 +60,7 @@ class IndexFieldTypePollerPeriodicalTest {
                 cluster,
                 eventBus,
                 serverStatus,
+                Duration.minutes(5),
                 scheduler);
     }
 

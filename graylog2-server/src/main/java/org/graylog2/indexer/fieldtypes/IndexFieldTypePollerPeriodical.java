@@ -45,7 +45,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 /**
@@ -61,10 +60,11 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
     private final MongoIndexSet.Factory mongoIndexSetFactory;
     private final Cluster cluster;
     private final ServerStatus serverStatus;
+    private final com.github.joschi.jadconfig.util.Duration fullRefreshInterval;
     private final ScheduledExecutorService scheduler;
 
-    private final AtomicBoolean isInitialized = new AtomicBoolean(false);
     private volatile Set<IndexSetConfig> allIndexSetConfigs;
+    private volatile Instant lastFullRefresh = Instant.MIN;
     private final ConcurrentHashMap<String, Instant> lastPoll = new ConcurrentHashMap<>();
 
     @Inject
@@ -77,6 +77,7 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
                                           final Cluster cluster,
                                           final EventBus eventBus,
                                           final ServerStatus serverStatus,
+                                          @Named("index_field_type_periodical_full_refresh_interval") final com.github.joschi.jadconfig.util.Duration fullRefreshInterval,
                                           @Named("daemonScheduler") final ScheduledExecutorService scheduler) {
         this.poller = poller;
         this.dbService = dbService;
@@ -85,6 +86,7 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
         this.mongoIndexSetFactory = mongoIndexSetFactory;
         this.cluster = cluster;
         this.serverStatus = serverStatus;
+        this.fullRefreshInterval = fullRefreshInterval;
         this.scheduler = scheduler;
 
         eventBus.register(this);
@@ -120,16 +122,19 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
             lastPoll.keySet().retainAll(allConfigs.stream().map(IndexSetConfig::id).collect(Collectors.toSet()));
         }
 
-        if (!isInitialized.getAndSet(true)) {
-            initializeFieldTypes(allConfigs);
+        if (needsFullRefresh()) {
+            try {
+                refreshFieldTypes(allConfigs);
+            } finally {
+                lastFullRefresh = Instant.now();
+            }
         } else {
             poll(allConfigs);
         }
     }
 
-    private void initializeFieldTypes(Collection<IndexSetConfig> indexSetConfigs) {
-
-        LOG.debug("Initializing index field types for {} index sets.", indexSetConfigs.size());
+    private void refreshFieldTypes(Collection<IndexSetConfig> indexSetConfigs) {
+        LOG.debug("Refreshing index field types for {} index sets.", indexSetConfigs.size());
 
         // this is the first time we run, or the index sets have changed, so we re-initialize the field types
         indexSetConfigs.forEach(indexSetConfig -> {
@@ -142,7 +147,7 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
                 final IndexSet indexSet = mongoIndexSetFactory.create(indexSetConfig);
 
                 // We check that we have the field types for all existing indices
-                LOG.debug("Initializing index field types for index set <{}/{}>", indexSetTitle, indexSetId);
+                LOG.debug("Refreshing index field types for index set <{}/{}>", indexSetTitle, indexSetId);
                 poller.poll(indexSet, existingIndexTypes).forEach(dbService::upsert);
 
                 // Cleanup orphaned field type entries that haven't been removed by the event handler
@@ -193,6 +198,11 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
                 lastPoll.put(indexSetId, Instant.now());
             }
         });
+    }
+
+    private boolean needsFullRefresh() {
+        Instant nextFullRefresh = lastFullRefresh.plusSeconds(fullRefreshInterval.toSeconds());
+        return !Instant.now().isBefore(nextFullRefresh);
     }
 
     private boolean serverIsNotRunning() {
