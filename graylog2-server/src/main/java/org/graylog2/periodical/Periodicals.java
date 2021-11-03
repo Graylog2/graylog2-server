@@ -16,7 +16,6 @@
  */
 package org.graylog2.periodical;
 
-import com.google.common.base.Stopwatch;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.graylog2.plugin.Tools;
@@ -86,20 +85,16 @@ public class Periodicals {
     public synchronized void unregisterAndStop(Periodical periodical) {
         if (isPeriodic(periodical)) {
             LOG.info("Shutting down periodical [{}].", periodical.getClass().getCanonicalName());
-            Stopwatch s = Stopwatch.createStarted();
 
             // Cancel future executions.
             if (futures.containsKey(periodical)) {
                 futures.remove(periodical).cancel(false);
                 periodicals.remove(periodical);
-                s.stop();
-                LOG.info("Shutdown of periodical [{}] complete, took <{}ms>.",
-                        periodical.getClass().getCanonicalName(), s.elapsed(TimeUnit.MILLISECONDS));
+                LOG.debug("Shutdown of periodical [{}] complete.", periodical.getClass().getCanonicalName());
             } else {
                 LOG.error("Could not find periodical [{}] in futures list. Not stopping execution.",
                         periodical.getClass().getCanonicalName());
             }
-
         }
     }
 
