@@ -319,6 +319,6 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                 .map(e -> new ValidationExplanation(e.getIndex(), -1, e.isValid(), e.getExplanation(), e.getError()))
                 .collect(Collectors.toList());
 
-        return new ValidationResponse(response.isValid(), explanations);
+        return new ValidationResponse(response.isValid(), explanations, Collections.emptySet());
     }
 }

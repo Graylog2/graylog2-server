@@ -38,6 +38,8 @@ import org.graylog.plugins.views.search.filter.AndFilter;
 import org.graylog.plugins.views.search.filter.OrFilter;
 import org.graylog.plugins.views.search.filter.QueryStringFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
+import org.graylog.plugins.views.search.rest.MappedFieldTypeDTO;
+import org.graylog.shaded.elasticsearch7.org.apache.lucene.queryparser.classic.ParseException;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.ShardOperationFailedException;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.validate.query.ValidateQueryRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.validate.query.ValidateQueryResponse;
@@ -52,9 +54,11 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryStri
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.storage.elasticsearch7.ElasticsearchClient;
 import org.graylog.storage.elasticsearch7.TimeRangeQueryFactory;
+import org.graylog.plugins.views.search.elasticsearch.parser.LuceneQueryParser;
 import org.graylog.storage.elasticsearch7.views.searchtypes.ESSearchTypeHandler;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.FieldTypeException;
+import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
 import org.graylog2.plugin.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,6 +86,8 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
     private final QueryStringDecorators queryStringDecorators;
     private final ESGeneratedQueryContext.Factory queryContextFactory;
     private final boolean allowLeadingWildcard;
+    private final MappedFieldTypesService mappedFieldTypesService;
+    private final LuceneQueryParser luceneQueryParser;
 
     @Inject
     public ElasticsearchBackend(Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> elasticsearchSearchTypeHandlers,
@@ -89,7 +95,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                                 IndexLookup indexLookup,
                                 QueryStringDecorators queryStringDecorators,
                                 ESGeneratedQueryContext.Factory queryContextFactory,
-                                @Named("allow_leading_wildcard_searches") boolean allowLeadingWildcard) {
+                                @Named("allow_leading_wildcard_searches") boolean allowLeadingWildcard, MappedFieldTypesService mappedFieldTypesService) {
         this.elasticsearchSearchTypeHandlers = elasticsearchSearchTypeHandlers;
         this.client = client;
         this.indexLookup = indexLookup;
@@ -97,6 +103,8 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
         this.queryStringDecorators = queryStringDecorators;
         this.queryContextFactory = queryContextFactory;
         this.allowLeadingWildcard = allowLeadingWildcard;
+        this.mappedFieldTypesService = mappedFieldTypesService;
+        this.luceneQueryParser = new LuceneQueryParser();
     }
 
     private QueryBuilder normalizeQueryString(String queryString) {
@@ -320,7 +328,23 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
         final List<ValidationExplanation> explanations = response.getQueryExplanation().stream()
                 .map(e -> new ValidationExplanation(e.getIndex(), e.getShard(), e.isValid(), e.getExplanation(), e.getError()))
                 .collect(Collectors.toList());
-        return new ValidationResponse(response.isValid(), explanations);
+
+        final Set<String> unknownFields = new HashSet<>();
+        if(response.isValid()) {
+            try {
+                final Set<String> detectedFields = luceneQueryParser.getFieldNames(backendQuery.queryString());
+                final Set<String> availableFields = mappedFieldTypesService.fieldTypesByStreamIds(req.streams(), req.timerange())
+                        .stream()
+                        .map(MappedFieldTypeDTO::name)
+                        .collect(Collectors.toSet());
+
+                detectedFields.stream().filter(f -> !availableFields.contains(f)).forEach(unknownFields::add);
+            } catch (ParseException e) {
+                LOG.warn("Failed to parse lucene query", e);
+            }
+        }
+
+        return new ValidationResponse(response.isValid(), explanations, unknownFields);
     }
 
     private Optional<ElasticsearchException> checkForFailedShards(MultiSearchResponse.Item multiSearchResponse) {

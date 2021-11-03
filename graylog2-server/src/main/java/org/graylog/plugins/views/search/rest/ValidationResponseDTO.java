@@ -17,14 +17,17 @@
 package org.graylog.plugins.views.search.rest;
 
 import java.util.List;
+import java.util.Set;
 
 public class ValidationResponseDTO {
     private final boolean valid;
     private final List<ValidationExplanationDTO> explanations;
+    private final Set<String> unknownFields;
 
-    public ValidationResponseDTO(boolean valid, List<ValidationExplanationDTO> explanations) {
+    public ValidationResponseDTO(boolean valid, List<ValidationExplanationDTO> explanations, Set<String> unknownFields) {
         this.valid = valid;
         this.explanations = explanations;
+        this.unknownFields = unknownFields;
     }
 
     public boolean isValid() {
@@ -33,5 +36,9 @@ public class ValidationResponseDTO {
 
     public List<ValidationExplanationDTO> getExplanations() {
         return explanations;
+    }
+
+    public Set<String> getUnknownFields() {
+        return unknownFields;
     }
 }

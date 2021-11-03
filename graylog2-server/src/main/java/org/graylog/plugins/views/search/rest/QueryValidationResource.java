@@ -70,7 +70,7 @@ public class QueryValidationResource extends RestResource implements PluginRestR
 
         final ValidationResponse response = queryEngine.validate(q);
 
-        return new ValidationResponseDTO(response.isValid(), toExplanations(response.getExplanations()));
+        return new ValidationResponseDTO(response.isValid(), toExplanations(response.getExplanations()), response.getUnknownFields());
     }
 
     private List<ValidationExplanationDTO> toExplanations(List<ValidationExplanation> explanations) {

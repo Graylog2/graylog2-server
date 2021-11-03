@@ -30,12 +30,13 @@ import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.engine.QueryStringDecorator;
 import org.graylog.plugins.views.search.engine.SearchConfig;
 import org.graylog.storage.elasticsearch7.ElasticsearchClient;
-import org.graylog2.indexer.searches.SearchesClusterConfig;
+import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.joda.time.Period;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import javax.annotation.Nonnull;
 import java.util.Collections;
@@ -62,8 +63,8 @@ class ElasticsearchBackendQueryStringDecoratorsTest {
                 mock(IndexLookup.class),
                 new QueryStringDecorators(decorators),
                 (elasticsearchBackend, ssb, job, query, results) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, results, fieldTypesLookup),
-                true
-        );
+                true,
+                Mockito.mock(MappedFieldTypesService.class));
     }
 
     @Test
