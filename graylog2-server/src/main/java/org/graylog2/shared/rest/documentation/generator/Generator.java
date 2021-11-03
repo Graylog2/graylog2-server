@@ -547,66 +547,7 @@ public class Generator {
     }
 
     private Map<String, Object> schemaForType(Type valueType) {
-        final SchemaFactoryWrapper schemaFactoryWrapper = new SchemaFactoryWrapper() {
-            @Override
-            public JsonAnyFormatVisitor expectAnyFormat(JavaType convertedType) {
-                /*final ObjectSchema s = schemaProvider.objectSchema();
-                s.putProperty("anyType", schemaProvider.stringSchema());
-                this.schema = s;
-                return visitorFactory.anyFormatVisitor(new AnySchema());*/
-                return super.expectAnyFormat(convertedType);
-            }
-
-            @Override
-            public JsonObjectFormatVisitor expectObjectFormat(JavaType convertedType) {
-                return super.expectObjectFormat(convertedType);
-            }
-
-            @Override
-            public JsonStringFormatVisitor expectStringFormat(JavaType convertedType) {
-                return super.expectStringFormat(convertedType);
-            }
-
-            @Override
-            public JsonArrayFormatVisitor expectArrayFormat(JavaType convertedType) {
-                return super.expectArrayFormat(convertedType);
-            }
-
-            @Override
-            public JsonBooleanFormatVisitor expectBooleanFormat(JavaType convertedType) {
-                return super.expectBooleanFormat(convertedType);
-            }
-
-            @Override
-            public JsonIntegerFormatVisitor expectIntegerFormat(JavaType convertedType) {
-                return super.expectIntegerFormat(convertedType);
-            }
-
-            @Override
-            public JsonNullFormatVisitor expectNullFormat(JavaType convertedType) {
-                return super.expectNullFormat(convertedType);
-            }
-
-            @Override
-            public JsonNumberFormatVisitor expectNumberFormat(JavaType convertedType) {
-                return super.expectNumberFormat(convertedType);
-            }
-
-            @Override
-            public JsonMapFormatVisitor expectMapFormat(JavaType type) throws JsonMappingException {
-                return super.expectMapFormat(type);
-            }
-
-            @Override
-            public SchemaFactoryWrapper setVisitorContext(VisitorContext rvc) {
-                return super.setVisitorContext(rvc);
-            }
-
-            @Override
-            public JsonSchema finalSchema() {
-                return super.finalSchema();
-            }
-        };
+        final SchemaFactoryWrapper schemaFactoryWrapper = new SchemaFactoryWrapper() {};
         final JsonSchemaGenerator schemaGenerator = new JsonSchemaGenerator(mapper, schemaFactoryWrapper);
         try {
             final JsonSchema schema = schemaGenerator.generateSchema(mapper.getTypeFactory().constructType(valueType));
