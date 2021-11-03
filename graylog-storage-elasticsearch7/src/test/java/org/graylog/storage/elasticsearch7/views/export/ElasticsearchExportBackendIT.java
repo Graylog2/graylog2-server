@@ -110,7 +110,7 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
         importFixture("messages.json");
 
         ExportMessagesCommand command = commandBuilderWithAllStreams()
-                .timeRange(timerange("2015-01-01T00:00:00.000Z", "2015-01-01T02:00:00.000Z"))
+                .timeRange(timerange("2015-01-01T00:00:00.000Z", "2015-01-01T02:00:00.001Z"))
                 .build();
 
         runWithExpectedResultIgnoringSort(command, "timestamp,source,message",
