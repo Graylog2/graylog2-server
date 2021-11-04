@@ -67,11 +67,11 @@ public class NaturalDateParser {
     }
 
     Date alignToStartOf(final Date dateToConvert, final String string) {
-        if ("last year" .equals(string.trim())) {
+        if ("last year".equals(string.trim()) || "this year".equals(string.trim())) {
             return alignToStartOfYear(dateToConvert);
-        } else if ("last month" .equals(string.trim())) {
+        } else if ("last month".equals(string.trim()) || "this month".equals(string.trim())) {
             return alignToStartOfMonth(dateToConvert);
-        } else if ("last week" .equals(string.trim())) {
+        } else if ("last week".equals(string.trim()) || "this week".equals(string.trim())) {
             return alignToStartOfWeek(dateToConvert);
         } else {
             return alignToStartOfDay(dateToConvert);
@@ -79,11 +79,11 @@ public class NaturalDateParser {
     }
 
     Date alignToEndOf(final Date dateToConvert, final String string) {
-        if ("last year" .equals(string.trim())) {
+        if ("last year".equals(string.trim()) || "this year".equals(string.trim())) {
             return alignToEndOfYear(dateToConvert);
-        } else if ("last month" .equals(string.trim())) {
+        } else if ("last month".equals(string.trim()) || "this month".equals(string.trim())) {
             return alignToEndOfMonth(dateToConvert);
-        } else if ("last week" .equals(string.trim())) {
+        } else if ("last week".equals(string.trim()) || "this week".equals(string.trim())) {
             return alignToEndOfWeek(dateToConvert);
         } else {
             return alignToEndOfDay(dateToConvert);
