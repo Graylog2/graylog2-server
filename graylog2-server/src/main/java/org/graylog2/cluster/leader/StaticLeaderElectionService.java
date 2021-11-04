@@ -43,4 +43,9 @@ public class StaticLeaderElectionService implements LeaderElectionService {
         //noinspection deprecation
         return configuration.isMaster();
     }
+
+    @Override
+    public void giveUpLeader() {
+        // Nothing we can do here
+    }
 }

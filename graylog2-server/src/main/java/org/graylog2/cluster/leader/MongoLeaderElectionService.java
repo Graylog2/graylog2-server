@@ -78,4 +78,9 @@ public class MongoLeaderElectionService extends AbstractExecutionThreadService i
             Uninterruptibles.sleepUninterruptibly(2, SECONDS);
         }
     }
+
+    @Override
+    public void giveUpLeader() {
+        lockService.unlock(RESOURCE_NAME).ifPresent(l -> log.info("Gave up leader lock on shutdown"));
+    }
 }

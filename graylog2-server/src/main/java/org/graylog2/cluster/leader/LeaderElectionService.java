@@ -18,4 +18,6 @@ package org.graylog2.cluster.leader;
 
 public interface LeaderElectionService {
     boolean isLeader();
+
+    void giveUpLeader();
 }
