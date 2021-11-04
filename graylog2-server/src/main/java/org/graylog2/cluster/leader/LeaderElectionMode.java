@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
 
 public enum LeaderElectionMode {
     STATIC,
-    MANUAL,
     AUTOMATIC;
 
     @Override
