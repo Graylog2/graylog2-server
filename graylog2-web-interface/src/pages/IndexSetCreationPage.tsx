@@ -63,6 +63,12 @@ const IndexSetCreationPage = ({ retentionStrategies, rotationStrategies, indexSe
     return <Spinner />;
   }
 
+  const defaultIndexSet = {
+    ...indexSet,
+    rotation_strategy_class: rotationStrategies[0].type,
+    rotation_strategy: rotationStrategies[0].default_config,
+  };
+
   return (
     <DocumentTitle title="Create Index Set">
       <div>
@@ -84,7 +90,7 @@ const IndexSetCreationPage = ({ retentionStrategies, rotationStrategies, indexSe
 
         <Row className="content">
           <Col md={12}>
-            <IndexSetConfigurationForm indexSet={indexSet}
+            <IndexSetConfigurationForm indexSet={defaultIndexSet}
                                        rotationStrategies={rotationStrategies}
                                        retentionStrategies={retentionStrategies}
                                        create
@@ -118,11 +124,6 @@ IndexSetCreationPage.defaultProps = {
     retention_strategy: {
       max_number_of_indices: 20,
       type: 'org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig',
-    },
-    rotation_strategy_class: 'org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy',
-    rotation_strategy: {
-      max_docs_per_index: 20000000,
-      type: 'org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig',
     },
     index_analyzer: 'standard',
     index_optimization_max_num_segments: 1,
