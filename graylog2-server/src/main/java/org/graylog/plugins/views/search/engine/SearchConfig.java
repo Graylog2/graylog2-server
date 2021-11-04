@@ -34,7 +34,7 @@ public class SearchConfig {
      */
     public Optional<Period> getQueryTimeRangeLimit() {
         return Optional.of(queryTimeRangeLimit)
-                .filter(timeLimit -> Period.ZERO != timeLimit);
+                .filter(timeLimit -> !Period.ZERO.equals(timeLimit));
 
     }
 }
