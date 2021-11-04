@@ -1,0 +1,18 @@
+{
+  "global_override": {
+    "timerange": {
+      "type": "relative",
+      "from": 180
+    },
+    "query": {
+      "type": "elasticsearch",
+      "query_string": "http_method:$http_method$"
+    }
+  },
+  "parameter_bindings": {
+    "http_method": {
+      "type": "value",
+      "value": "GET"
+    }
+  }
+}

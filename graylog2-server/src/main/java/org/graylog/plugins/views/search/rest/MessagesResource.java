@@ -207,7 +207,7 @@ public class MessagesResource extends RestResource implements PluginRestResource
         return format == null ? ResultFormat.empty() : format;
     }
 
-    private Search loadSearch(String searchId, Map<String, Object> executionState) {
+    private Search loadSearch(String searchId, ExecutionState executionState) {
         Search search = searchDomain.getForUser(searchId, getCurrentUser(), this::hasViewReadPermission)
                 .orElseThrow(() -> new NotFoundException("Search with id " + searchId + " does not exist"));
 

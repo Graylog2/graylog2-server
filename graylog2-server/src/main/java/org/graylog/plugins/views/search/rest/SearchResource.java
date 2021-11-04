@@ -174,14 +174,14 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @Path("{id}/execute")
     @NoAuditEvent("Creating audit event manually in method body.")
     public Response executeQuery(@ApiParam(name = "id") @PathParam("id") String id,
-                                 @ApiParam Map<String, Object> executionState) {
+                                 @ApiParam ExecutionState executionState) {
         Search search = getSearch(id);
 
         search = search.addStreamsToQueriesWithoutStreams(this::loadAllAllowedStreamsForUser);
 
         guard(search);
 
-        search = search.applyExecutionState(objectMapper, firstNonNull(executionState, Collections.emptyMap()));
+        search = search.applyExecutionState(objectMapper, firstNonNull(executionState, ExecutionState.empty()));
 
         final SearchJob searchJob = searchJobService.create(search, username());
 

@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import org.graylog.plugins.views.search.rest.ExecutionState;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 
 import javax.annotation.Nullable;
@@ -51,7 +52,7 @@ public abstract class ResultFormat {
     public abstract Optional<Integer> limit();
 
     @JsonProperty
-    public abstract Map<String, Object> executionState();
+    public abstract ExecutionState executionState();
 
     @JsonProperty
     public abstract Optional<String> filename();
@@ -77,7 +78,7 @@ public abstract class ResultFormat {
         public abstract Builder limit(@Positive @Nullable Integer limit);
 
         @JsonProperty
-        public abstract Builder executionState(Map<String, Object> executionState);
+        public abstract Builder executionState(ExecutionState executionState);
 
         @JsonProperty
         public abstract Builder timerange(@Nullable AbsoluteRange timeRange);
@@ -91,7 +92,7 @@ public abstract class ResultFormat {
         public static ResultFormat.Builder create() {
             return new AutoValue_ResultFormat.Builder()
                     .fieldsInOrder(DEFAULT_FIELDS)
-                    .executionState(Collections.emptyMap());
+                    .executionState(ExecutionState.empty());
         }
     }
 }
