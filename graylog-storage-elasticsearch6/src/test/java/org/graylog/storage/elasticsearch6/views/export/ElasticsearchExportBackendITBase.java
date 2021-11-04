@@ -91,8 +91,9 @@ public abstract class ElasticsearchExportBackendITBase extends ElasticsearchBase
         );
     }
 
+    // This method tests, that with LT (the upper interval excluded) instead of LTE the message with a TS 1 ms lower than the upper interval is still included
     @Test
-    public void usesTimeRange() {
+    public void usesTimeRangeTestLt() {
         importFixture("messages.json");
 
         ExportMessagesCommand command = commandBuilderWithAllStreams()
@@ -103,6 +104,20 @@ public abstract class ElasticsearchExportBackendITBase extends ElasticsearchBase
                 "graylog_1, 2015-01-01T01:59:59.999Z, source-2, He",
                 "graylog_0, 2015-01-01T01:00:00.000Z, source-1, Ha"
         );
+    }
+
+    // This method tests, that with LT (the upper interval excluded) instead of LTE the message with a TS same as the upper interval is excluded
+    @Test
+    public void usesTimeRangeTestLtEqualToTimestampofLastEntry() {
+        importFixture("messages.json");
+
+        ExportMessagesCommand command = commandBuilderWithAllStreams()
+                .timeRange(timerange("2015-01-01T00:00:00.000Z", "2015-01-01T01:59:59.999Z"))
+                .build();
+
+        SimpleMessageChunk totalResult = collectTotalResult(command);
+        assertThat(totalResult.messages().stream().map(msg -> msg.fields().get("timestamp")).anyMatch("2015-01-01T01:00:00.000Z"::equals)).isTrue();
+        assertThat(totalResult.messages().stream().map(msg -> msg.fields().get("timestamp")).anyMatch("2015-01-01T01:59:59.999Z"::equals)).isFalse();
     }
 
     @Test
