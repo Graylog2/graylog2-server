@@ -21,6 +21,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.ViewSummaryDTO;
@@ -81,7 +82,7 @@ public class SavedSearchesResource extends RestResource {
             final PaginatedList<ViewSummaryDTO> result = dbService.searchSummariesPaginatedByType(
                     ViewDTO.Type.SEARCH,
                     searchQuery,
-                    view -> isPermitted(ViewsRestPermissions.VIEW_READ, view.id()),
+                    searchUser()::hasViewReadPermission,
                     order,
                     sortField,
                     page,
@@ -91,5 +92,9 @@ public class SavedSearchesResource extends RestResource {
         } catch (IllegalArgumentException e) {
             throw new BadRequestException(e.getMessage(), e);
         }
+    }
+
+    private SearchUser searchUser() {
+        return new SearchUser(getCurrentUser(), this::isPermitted, this::isPermitted);
     }
 }

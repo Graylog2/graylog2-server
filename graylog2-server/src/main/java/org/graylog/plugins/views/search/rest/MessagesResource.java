@@ -41,12 +41,11 @@ import org.graylog.plugins.views.search.export.ResultFormat;
 import org.graylog.plugins.views.search.export.SearchExportJob;
 import org.graylog.plugins.views.search.export.SearchTypeExportJob;
 import org.graylog.plugins.views.search.export.SimpleMessageChunk;
-import org.graylog.plugins.views.search.views.ViewDTO;
+import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.rest.MoreMediaTypes;
 import org.graylog2.shared.rest.resources.RestResource;
-import org.graylog2.shared.security.RestPermissions;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -57,7 +56,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import java.io.UnsupportedEncodingException;
-import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -107,7 +105,7 @@ public class MessagesResource extends RestResource implements PluginRestResource
     public ChunkedOutput<SimpleMessageChunk> retrieve(@ApiParam @Valid MessagesRequest rawrequest) {
         final MessagesRequest request = fillInIfNecessary(rawrequest);
 
-        executionGuard.checkUserIsPermittedToSeeStreams(request.streams(), this::hasStreamReadPermission);
+        executionGuard.checkUserIsPermittedToSeeStreams(request.streams(), searchUser()::hasStreamReadPermission);
 
         ExportMessagesCommand command = commandFactory.buildFromRequest(request);
 
@@ -208,27 +206,24 @@ public class MessagesResource extends RestResource implements PluginRestResource
     }
 
     private Search loadSearch(String searchId, ExecutionState executionState) {
-        Search search = searchDomain.getForUser(searchId, getCurrentUser(), this::hasViewReadPermission)
+        Search search = searchDomain.getForUser(searchId, searchUser())
                 .orElseThrow(() -> new NotFoundException("Search with id " + searchId + " does not exist"));
 
         search = search.addStreamsToQueriesWithoutStreams(this::loadAllAllowedStreamsForUser);
 
         search = search.applyExecutionState(objectMapper, executionState);
 
-        executionGuard.check(search, this::hasStreamReadPermission);
+        executionGuard.check(search, searchUser()::hasStreamReadPermission);
 
         return search;
     }
 
-    private boolean hasViewReadPermission(ViewDTO view) {
-        return isPermitted(ViewsRestPermissions.VIEW_READ, view.id());
+    private SearchUser searchUser() {
+        return new SearchUser(getCurrentUser(), this::isPermitted, this::isPermitted);
     }
 
     private ImmutableSet<String> loadAllAllowedStreamsForUser() {
-        return permittedStreams.load(this::hasStreamReadPermission);
-    }
-
-    private boolean hasStreamReadPermission(String streamId) {
-        return isPermitted(RestPermissions.STREAMS_READ, streamId);
+        final SearchUser searchUser = searchUser();
+        return permittedStreams.load(searchUser::hasStreamReadPermission);
     }
 }

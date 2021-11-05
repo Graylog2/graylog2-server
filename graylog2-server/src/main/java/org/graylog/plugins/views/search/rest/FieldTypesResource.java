@@ -19,6 +19,7 @@ package org.graylog.plugins.views.search.rest;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
@@ -57,25 +58,21 @@ public class FieldTypesResource extends RestResource implements PluginRestResour
     @GET
     @ApiOperation(value = "Retrieve the list of all fields present in the system")
     public Set<MappedFieldTypeDTO> allFieldTypes() {
-        return mappedFieldTypesService.fieldTypesByStreamIds(permittedStreams.load(this::allowedToReadStream), RelativeRange.allTime());
-    }
-
-    private boolean allowedToReadStream(String streamId) {
-        return isPermitted(RestPermissions.STREAMS_READ, streamId);
+        return mappedFieldTypesService.fieldTypesByStreamIds(permittedStreams.load(searchUser()::hasStreamReadPermission), RelativeRange.allTime());
     }
 
     @POST
     @ApiOperation(value = "Retrieve the field list of a given set of streams")
     @NoAuditEvent("This is not changing any data")
     public Set<MappedFieldTypeDTO> byStreams(FieldTypesForStreamsRequest request) {
-        final Set<String> streams = request.streams().orElse(permittedStreams.load(this::allowedToReadStream));
+        final Set<String> streams = request.streams().orElse(permittedStreams.load(searchUser()::hasStreamReadPermission));
         checkStreamPermission(streams);
 
         return mappedFieldTypesService.fieldTypesByStreamIds(streams, request.timerange().orElse(RelativeRange.allTime()));
     }
 
     private void checkStreamPermission(Set<String> streamIds) {
-        Set<String> notPermittedStreams = streamIds.stream().filter(s -> !isPermitted(RestPermissions.STREAMS_READ, s))
+        Set<String> notPermittedStreams = streamIds.stream().filter(searchUser()::hasStreamReadPermission)
                 .collect(Collectors.toSet());
         if (!notPermittedStreams.isEmpty()) {
             LOG.info("Not authorized to access resource id <{}>. User <{}> is missing permission <{}:{}>",
@@ -83,5 +80,9 @@ public class FieldTypesResource extends RestResource implements PluginRestResour
             throw new MissingStreamPermissionException("Not authorized to access streams.",
                     streamIds);
         }
+    }
+
+    private SearchUser searchUser() {
+        return new SearchUser(getCurrentUser(), this::isPermitted, this::isPermitted);
     }
 }

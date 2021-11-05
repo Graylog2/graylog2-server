@@ -118,7 +118,7 @@ public class ViewsResourceTest {
         when(subject.isPermitted("dashboards:create")).thenReturn(true);
         final Search search = mock(Search.class, RETURNS_DEEP_STUBS);
         when(search.queries()).thenReturn(ImmutableSet.of());
-        when(searchDomain.getForUser(eq("6141d457d3a6b9d73c8ac55a"), Mockito.any(), any())).thenReturn(Optional.of(search));
+        when(searchDomain.getForUser(eq("6141d457d3a6b9d73c8ac55a"), any())).thenReturn(Optional.of(search));
     }
 
     @Test

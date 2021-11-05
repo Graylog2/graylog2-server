@@ -19,6 +19,7 @@ package org.graylog.plugins.views.search.rest;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.views.QualifyingViewsService;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewParameterSummaryDTO;
@@ -53,8 +54,11 @@ public class QualifyingViewsResource extends RestResource implements PluginRestR
     public Collection<ViewParameterSummaryDTO> forParameter() {
         return qualifyingViewsService.forValue()
                 .stream()
-                .filter(view -> isPermitted(ViewsRestPermissions.VIEW_READ, view.id())
-                        || (view.type().equals(ViewDTO.Type.DASHBOARD) && isPermitted(RestPermissions.DASHBOARDS_READ, view.id())))
+                .filter(searchUser()::hasViewReadPermission)
                 .collect(Collectors.toSet());
+    }
+
+    private SearchUser searchUser() {
+        return new SearchUser(getCurrentUser(), this::isPermitted, this::isPermitted);
     }
 }

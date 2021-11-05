@@ -26,7 +26,7 @@ import java.util.Collection;
 
 @AutoValue
 @JsonAutoDetect
-public abstract class ViewParameterSummaryDTO {
+public abstract class ViewParameterSummaryDTO implements ViewLike {
     public static final String FIELD_ID = "id";
     public static final String FIELD_TYPE = "type";
     public static final String FIELD_TITLE = "title";

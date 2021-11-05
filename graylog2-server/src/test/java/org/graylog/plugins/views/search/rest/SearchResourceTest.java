@@ -158,7 +158,7 @@ public class SearchResourceTest {
 
     @Test
     public void getSearchThrowsNotFoundIfSearchDoesntExist() {
-        when(searchDomain.getForUser(any(), any(), any())).thenReturn(Optional.empty());
+        when(searchDomain.getForUser(any(), any())).thenReturn(Optional.empty());
 
         assertThatExceptionOfType(NotFoundException.class)
                 .isThrownBy(() -> this.searchResource.getSearch("god"))
@@ -361,7 +361,7 @@ public class SearchResourceTest {
         when(search.id()).thenReturn(searchId);
 
         when(search.applyExecutionState(any(), any())).thenReturn(search);
-        when(searchDomain.getForUser(eq(search.id()), any(), any())).thenReturn(Optional.of(search));
+        when(searchDomain.getForUser(eq(search.id()), any())).thenReturn(Optional.of(search));
 
         final SearchJob searchJob = mock(SearchJob.class);
         when(searchJob.getResultFuture()).thenReturn(CompletableFuture.completedFuture(null));

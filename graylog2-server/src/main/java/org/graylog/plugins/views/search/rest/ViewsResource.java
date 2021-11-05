@@ -22,11 +22,13 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchDomain;
 import org.graylog.plugins.views.search.SearchType;
+import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.WidgetDTO;
@@ -75,7 +77,6 @@ import static java.util.Locale.ENGLISH;
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
 public class ViewsResource extends RestResource implements PluginRestResource {
-    private static final Logger LOG = LoggerFactory.getLogger(ViewsResource.class);
     private static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
             .put("id", SearchQueryField.create(ViewDTO.FIELD_ID))
             .put("title", SearchQueryField.create(ViewDTO.FIELD_TITLE))
@@ -115,8 +116,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
             final SearchQuery searchQuery = searchQueryParser.parse(query);
             final PaginatedList<ViewDTO> result = dbService.searchPaginated(
                     searchQuery,
-                    view -> isPermitted(ViewsRestPermissions.VIEW_READ, view.id())
-                            || (view.type().equals(ViewDTO.Type.DASHBOARD) && isPermitted(RestPermissions.DASHBOARDS_READ, view.id())),
+                    searchUser()::hasViewReadPermission,
                     order,
                     sortField,
                     page,
@@ -132,16 +132,16 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     @Path("{id}")
     @ApiOperation("Get a single view")
     public ViewDTO get(@ApiParam(name = "id") @PathParam("id") @NotEmpty String id) {
+        final SearchUser searchUser = searchUser();
         if ("default".equals(id)) {
             // If the user is not permitted to access the default view, return a 404
             return dbService.getDefault()
-                    .filter(dto -> isPermitted(ViewsRestPermissions.VIEW_READ, dto.id()))
+                    .filter(searchUser::hasViewReadPermission)
                     .orElseThrow(() -> new NotFoundException("Default view doesn't exist"));
         }
 
         final ViewDTO view = loadView(id);
-        if (isPermitted(ViewsRestPermissions.VIEW_READ, id)
-                || (view.type().equals(ViewDTO.Type.DASHBOARD) && isPermitted(RestPermissions.DASHBOARDS_READ, view.id()))) {
+        if (searchUser.hasViewReadPermission(view)) {
             return view;
         }
 
@@ -159,12 +159,11 @@ public class ViewsResource extends RestResource implements PluginRestResource {
         validateIntegrity(dto);
 
         final User user = userContext.getUser();
-        final ViewDTO savedDto = dbService.saveWithOwner(dto.toBuilder().owner(user.getName()).build(), user);
-        return savedDto;
+        return dbService.saveWithOwner(dto.toBuilder().owner(user.getName()).build(), user);
     }
 
     private void validateIntegrity(ViewDTO dto) {
-        final Search search = searchDomain.getForUser(dto.searchId(), getCurrentUser(), this::hasViewReadPermission)
+        final Search search = searchDomain.getForUser(dto.searchId(), searchUser())
                 .orElseThrow(() -> new BadRequestException("Search " + dto.searchId() + " not available"));
 
         final Set<String> searchQueries = search.queries().stream()
@@ -208,10 +207,8 @@ public class ViewsResource extends RestResource implements PluginRestResource {
         }
     }
 
-    private boolean hasViewReadPermission(ViewDTO view) {
-        final String viewId = view.id();
-        return isPermitted(ViewsRestPermissions.VIEW_READ, viewId)
-                || (view.type().equals(ViewDTO.Type.DASHBOARD) && isPermitted(RestPermissions.DASHBOARDS_READ, viewId));
+    private SearchUser searchUser() {
+        return new SearchUser(getCurrentUser(), this::isPermitted, this::isPermitted);
     }
 
     @PUT
