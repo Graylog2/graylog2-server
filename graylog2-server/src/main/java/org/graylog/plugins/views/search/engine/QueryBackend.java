@@ -149,4 +149,6 @@ public interface QueryBackend<T extends GeneratedQueryContext> {
                     throw new IllegalTimeRangeException("Search out of allowed time range limit");
                 });
     }
+
+    SuggestionResponse suggest(SuggestRequest req);
 }
