@@ -77,6 +77,7 @@ public class SearchDomainTest {
 
         final Search search = mockSearchWithOwner(userName);
         final SearchUser searchUser = mock(SearchUser.class);
+        when(searchUser.owns(search)).thenReturn(true);
 
         final Optional<Search> result = sut.getForUser(search.id(), searchUser);
 
@@ -90,6 +91,7 @@ public class SearchDomainTest {
 
         final ViewDTO viewDTO = mock(ViewDTO.class);
         when(viewService.forSearch(anyString())).thenReturn(ImmutableList.of(viewDTO));
+        when(searchUser.hasViewReadPermission(viewDTO)).thenReturn(true);
 
         final Optional<Search> result = sut.getForUser(search.id(), searchUser);
 
@@ -98,7 +100,6 @@ public class SearchDomainTest {
 
     @Test
     public void throwsPermissionExceptionIfNeitherOwnedNorPermittedFromViews() {
-        final String userName ="someone";
         final Search search = mockSearchWithOwner("someone else");
         final SearchUser searchUser = mock(SearchUser.class);
 
@@ -115,6 +116,7 @@ public class SearchDomainTest {
         final Search ownedSearch = mockSearchWithOwner(userName);
         mockSearchWithOwner("someone else");
         final SearchUser searchUser = mock(SearchUser.class);
+        when(searchUser.owns(ownedSearch)).thenReturn(true);
 
         List<Search> result = sut.getAllForUser(searchUser, searchUser::hasViewReadPermission);
 
@@ -123,20 +125,13 @@ public class SearchDomainTest {
 
     @Test
     public void includesSearchesPermittedViaViewsInList() {
-        final String userName = "someone";
-
         final Search permittedSearch = mockSearchWithOwner("someone else");
         mockSearchWithOwner("someone else");
         final SearchUser searchUser = mock(SearchUser.class);
 
         final ViewDTO viewDTO = mock(ViewDTO.class);
-        when(viewService.forSearch(anyString())).thenAnswer(invocation -> {
-            if (invocation.getArgument(0).equals(permittedSearch.id())) {
-                return ImmutableList.of(viewDTO);
-            } else {
-                return ImmutableList.of();
-            }
-        });
+        when(viewService.forSearch(permittedSearch.id())).thenReturn(ImmutableList.of(viewDTO));
+        when(searchUser.hasViewReadPermission(viewDTO)).thenReturn(true);
 
         List<Search> result = sut.getAllForUser(searchUser, searchUser::hasViewReadPermission);
 

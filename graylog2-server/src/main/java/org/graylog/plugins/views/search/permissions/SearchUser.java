@@ -46,7 +46,7 @@ public class SearchUser implements SearchPermissions, StreamPermissions, ViewPer
     }
 
     public boolean owns(Search search) {
-        return search.owner().map(o -> o.equals(username())).orElse(false);
+        return search.owner().map(o -> o.equals(username())).orElse(true);
     }
 
     public boolean isAdmin() {

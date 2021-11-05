@@ -46,6 +46,6 @@ class SearchUserTest {
 
         final SearchUser searchUser = searchUser(username);
 
-        assertThat(searchUser.owns(search)).isTrue();
+        assertThat(searchUser.owns(search)).isFalse();
     }
 }

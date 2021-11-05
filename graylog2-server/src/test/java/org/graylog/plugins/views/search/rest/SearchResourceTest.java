@@ -99,12 +99,32 @@ public class SearchResourceTest {
 
     private SearchResource searchResource;
 
+    class SearchTestResource extends SearchResource {
+        private final Subject subject;
+
+        SearchTestResource(Subject subject, QueryEngine queryEngine, SearchDbService searchDbService, SearchJobService searchJobService, ObjectMapper objectMapper, PermittedStreams streamLoader) {
+            super(queryEngine, searchDbService, searchJobService, objectMapper, streamLoader, executionGuard, searchDomain, eventBus);
+            this.subject = subject;
+        }
+
+        @Override
+        protected Subject getSubject() {
+            return this.subject;
+        }
+
+        @Nullable
+        @Override
+        protected User getCurrentUser() {
+            return currentUser;
+        }
+    }
+
     @Before
     public void setUp() throws Exception {
         GuiceInjectorHolder.createInjector(Collections.emptyList());
 
         when(searchDbService.get(null)).thenThrow(NullPointerException.class);
-        this.searchResource = new SearchResource(queryEngine, searchDbService, searchJobService, objectMapperProvider.get(), permittedStreams, executionGuard, searchDomain, eventBus);
+        this.searchResource = new SearchTestResource(subject, queryEngine, searchDbService, searchJobService, objectMapperProvider.get(), permittedStreams);
 
         when(currentUser.getName()).thenReturn("admin");
     }
@@ -314,6 +334,7 @@ public class SearchResourceTest {
 
     private void mockCurrentUserName(String name) {
         when(currentUser.getName()).thenReturn(name);
+        when(searchUser.username()).thenReturn(name);
     }
 
     private void throwGuardExceptionFor(Search search) {
