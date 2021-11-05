@@ -28,6 +28,7 @@ import org.graylog.plugins.views.search.export.ExportJobService;
 import org.graylog.plugins.views.search.export.ExportMessagesCommand;
 import org.graylog.plugins.views.search.export.MessagesExporter;
 import org.graylog.plugins.views.search.export.MessagesRequest;
+import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.junit.jupiter.api.BeforeEach;
@@ -51,20 +52,19 @@ public class MessagesResourceTest {
 
     private MessagesResource sut;
     private User currentUser;
-    private MessagesExporter exporter;
     private PermittedStreams permittedStreams;
     private SearchExecutionGuard executionGuard;
     private CommandFactory commandFactory;
     @SuppressWarnings("UnstableApiUsage")
     private final EventBus eventBus = mock(EventBus.class);
-    private SearchDomain searchDomain;
+    private SearchUser searchUser;
 
     @BeforeEach
     void setUp() {
         GuiceInjectorHolder.createInjector(Collections.emptyList());
         currentUser = mock(User.class);
         when(currentUser.getName()).thenReturn("peterchen");
-        exporter = mock(MessagesExporter.class);
+        MessagesExporter exporter = mock(MessagesExporter.class);
         commandFactory = mock(CommandFactory.class);
         when(commandFactory.buildFromRequest(any())).thenReturn(ExportMessagesCommand.withDefaults());
         when(commandFactory.buildWithSearchOnly(any(), any())).thenReturn(ExportMessagesCommand.withDefaults());
@@ -72,7 +72,9 @@ public class MessagesResourceTest {
         permittedStreams = mock(PermittedStreams.class);
         when(permittedStreams.load(any())).thenReturn(ImmutableSet.of("a-default-stream"));
         executionGuard = mock(SearchExecutionGuard.class);
-        searchDomain = mock(SearchDomain.class);
+        SearchDomain searchDomain = mock(SearchDomain.class);
+        searchUser = mock(SearchUser.class);
+
         sut = new MessagesTestResource(exporter, commandFactory, searchDomain, executionGuard, permittedStreams, mock(ObjectMapper.class), eventBus);
 
         sut.asyncRunner = c -> {
@@ -104,7 +106,7 @@ public class MessagesResourceTest {
 
         when(commandFactory.buildFromRequest(captor.capture())).thenReturn(ExportMessagesCommand.withDefaults());
 
-        sut.retrieve(request);
+        sut.retrieve(request, searchUser);
 
         MessagesRequest value = captor.getValue();
         assertThat(value.streams())
@@ -119,7 +121,7 @@ public class MessagesResourceTest {
         doThrow(exception).when(executionGuard)
                 .checkUserIsPermittedToSeeStreams(eq(ImmutableSet.of("stream-1")), any());
 
-        assertThatExceptionOfType(PermissionException.class).isThrownBy(() -> sut.retrieve(request))
+        assertThatExceptionOfType(PermissionException.class).isThrownBy(() -> sut.retrieve(request, searchUser))
                 .withMessageContaining(exception.getMessage());
     }
 
@@ -127,7 +129,7 @@ public class MessagesResourceTest {
     void passesOnlyUserNameToAuditingExporterIfExportBasedOnRequest() {
         AtomicReference<AuditContext> context = captureAuditContext();
 
-        sut.retrieve(validRequest());
+        sut.retrieve(validRequest(), searchUser);
 
         assertAll(
                 () -> assertThat(context.get().userName()).isEqualTo(currentUser.getName()),

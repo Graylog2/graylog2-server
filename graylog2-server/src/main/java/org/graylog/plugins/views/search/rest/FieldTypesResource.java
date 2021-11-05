@@ -35,6 +35,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -57,22 +58,23 @@ public class FieldTypesResource extends RestResource implements PluginRestResour
 
     @GET
     @ApiOperation(value = "Retrieve the list of all fields present in the system")
-    public Set<MappedFieldTypeDTO> allFieldTypes() {
-        return mappedFieldTypesService.fieldTypesByStreamIds(permittedStreams.load(searchUser()::hasStreamReadPermission), RelativeRange.allTime());
+    public Set<MappedFieldTypeDTO> allFieldTypes(@Context SearchUser searchUser) {
+        return mappedFieldTypesService.fieldTypesByStreamIds(permittedStreams.load(searchUser::hasStreamReadPermission), RelativeRange.allTime());
     }
 
     @POST
     @ApiOperation(value = "Retrieve the field list of a given set of streams")
     @NoAuditEvent("This is not changing any data")
-    public Set<MappedFieldTypeDTO> byStreams(FieldTypesForStreamsRequest request) {
-        final Set<String> streams = request.streams().orElse(permittedStreams.load(searchUser()::hasStreamReadPermission));
-        checkStreamPermission(streams);
+    public Set<MappedFieldTypeDTO> byStreams(FieldTypesForStreamsRequest request, @Context SearchUser searchUser) {
+        final Set<String> streams = request.streams().orElse(permittedStreams.load(searchUser::hasStreamReadPermission));
+        checkStreamPermission(streams, searchUser);
 
         return mappedFieldTypesService.fieldTypesByStreamIds(streams, request.timerange().orElse(RelativeRange.allTime()));
     }
 
-    private void checkStreamPermission(Set<String> streamIds) {
-        Set<String> notPermittedStreams = streamIds.stream().filter(searchUser()::hasStreamReadPermission)
+    private void checkStreamPermission(Set<String> streamIds, SearchUser searchUser) {
+        final Set<String> notPermittedStreams = streamIds.stream()
+                .filter(streamId -> !searchUser.hasStreamReadPermission(streamId))
                 .collect(Collectors.toSet());
         if (!notPermittedStreams.isEmpty()) {
             LOG.info("Not authorized to access resource id <{}>. User <{}> is missing permission <{}:{}>",
@@ -80,9 +82,5 @@ public class FieldTypesResource extends RestResource implements PluginRestResour
             throw new MissingStreamPermissionException("Not authorized to access streams.",
                     streamIds);
         }
-    }
-
-    private SearchUser searchUser() {
-        return new SearchUser(getCurrentUser(), this::isPermitted, this::isPermitted);
     }
 }

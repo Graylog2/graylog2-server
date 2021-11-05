@@ -22,6 +22,7 @@ import org.apache.shiro.subject.Subject;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchDomain;
 import org.graylog.plugins.views.search.db.SearchDbService;
+import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.security.UserContext;
@@ -78,6 +79,9 @@ public class ViewsResourceTest {
     private User currentUser;
 
     @Mock
+    private SearchUser searchUser;
+
+    @Mock
     private ViewService viewService;
 
     @Mock
@@ -118,7 +122,7 @@ public class ViewsResourceTest {
         when(subject.isPermitted("dashboards:create")).thenReturn(true);
         final Search search = mock(Search.class, RETURNS_DEEP_STUBS);
         when(search.queries()).thenReturn(ImmutableSet.of());
-        when(searchDomain.getForUser(eq("6141d457d3a6b9d73c8ac55a"), any())).thenReturn(Optional.of(search));
+        when(searchDomain.getForUser(eq("6141d457d3a6b9d73c8ac55a"), eq(searchUser))).thenReturn(Optional.of(search));
     }
 
     @Test
@@ -136,10 +140,10 @@ public class ViewsResourceTest {
         final UserContext userContext = mock(UserContext.class);
         when(userContext.getUser()).thenReturn(testUser);
         when(userContext.getUserId()).thenReturn("testuser");
-        when(currentUser.getName()).thenReturn("testuser");
         when(currentUser.isLocalAdmin()).thenReturn(true);
+        when(searchUser.username()).thenReturn("testuser");
 
-        this.viewsResource.create(view, userContext);
+        this.viewsResource.create(view, userContext, searchUser);
 
         final ArgumentCaptor<String> ownerCaptor = ArgumentCaptor.forClass(String.class);
         verify(builder, times(1)).owner(ownerCaptor.capture());
@@ -152,14 +156,14 @@ public class ViewsResourceTest {
 
         when(subject.isPermitted("dashboards:create")).thenReturn(false);
 
-        assertThatThrownBy(() -> this.viewsResource.create(view, null))
+        assertThatThrownBy(() -> this.viewsResource.create(view, null, searchUser))
                 .isInstanceOf(ForbiddenException.class);
     }
 
     @Test
     public void invalidObjectIdReturnsViewNotFoundException() {
         expectedException.expect(NotFoundException.class);
-        this.viewsResource.get("invalid");
+        this.viewsResource.get("invalid", searchUser);
     }
 
     @Test

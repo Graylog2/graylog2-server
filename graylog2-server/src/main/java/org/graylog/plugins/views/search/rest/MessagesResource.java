@@ -55,6 +55,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import java.io.UnsupportedEncodingException;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -102,21 +103,22 @@ public class MessagesResource extends RestResource implements PluginRestResource
     @POST
     @Produces(MoreMediaTypes.TEXT_CSV)
     @NoAuditEvent("Has custom audit events")
-    public ChunkedOutput<SimpleMessageChunk> retrieve(@ApiParam @Valid MessagesRequest rawrequest) {
-        final MessagesRequest request = fillInIfNecessary(rawrequest);
+    public ChunkedOutput<SimpleMessageChunk> retrieve(@ApiParam @Valid MessagesRequest rawrequest,
+                                                      @Context SearchUser searchUser) {
+        final MessagesRequest request = fillInIfNecessary(rawrequest, searchUser);
 
-        executionGuard.checkUserIsPermittedToSeeStreams(request.streams(), searchUser()::hasStreamReadPermission);
+        executionGuard.checkUserIsPermittedToSeeStreams(request.streams(), searchUser::hasStreamReadPermission);
 
         ExportMessagesCommand command = commandFactory.buildFromRequest(request);
 
         return asyncRunner.apply(chunkConsumer -> exporter().export(command, chunkConsumer));
     }
 
-    private MessagesRequest fillInIfNecessary(MessagesRequest requestFromClient) {
+    private MessagesRequest fillInIfNecessary(MessagesRequest requestFromClient, SearchUser searchUser) {
         MessagesRequest request = requestFromClient != null ? requestFromClient : MessagesRequest.withDefaults();
 
         if (request.streams().isEmpty()) {
-            request = request.toBuilder().streams(loadAllAllowedStreamsForUser()).build();
+            request = request.toBuilder().streams(loadAllAllowedStreamsForUser(searchUser)).build();
         }
         return request;
     }
@@ -128,10 +130,11 @@ public class MessagesResource extends RestResource implements PluginRestResource
     @NoAuditEvent("Has custom audit events")
     public ChunkedOutput<SimpleMessageChunk> retrieveForSearch(
             @ApiParam(value = "ID of an existing Search", name = "searchId") @PathParam("searchId") String searchId,
-            @ApiParam(value = "Optional overrides") @Valid ResultFormat formatFromClient) {
+            @ApiParam(value = "Optional overrides") @Valid ResultFormat formatFromClient,
+            @Context SearchUser searchUser) {
         ResultFormat format = emptyIfNull(formatFromClient);
 
-        Search search = loadSearch(searchId, format.executionState());
+        Search search = loadSearch(searchId, format.executionState(), searchUser);
 
         ExportMessagesCommand command = commandFactory.buildWithSearchOnly(search, format);
 
@@ -145,10 +148,11 @@ public class MessagesResource extends RestResource implements PluginRestResource
     public ChunkedOutput<SimpleMessageChunk> retrieveForSearchType(
             @ApiParam(value = "ID of an existing Search", name = "searchId") @PathParam("searchId") String searchId,
             @ApiParam(value = "ID of a Message Table contained in the Search", name = "searchTypeId") @PathParam("searchTypeId") String searchTypeId,
-            @ApiParam(value = "Optional overrides") @Valid ResultFormat formatFromClient) {
+            @ApiParam(value = "Optional overrides") @Valid ResultFormat formatFromClient,
+            @Context SearchUser searchUser) {
         ResultFormat format = emptyIfNull(formatFromClient);
 
-        Search search = loadSearch(searchId, format.executionState());
+        Search search = loadSearch(searchId, format.executionState(), searchUser);
 
         ExportMessagesCommand command = commandFactory.buildWithMessageList(search, searchTypeId, format);
 
@@ -159,27 +163,28 @@ public class MessagesResource extends RestResource implements PluginRestResource
     @GET
     @Path("job/{exportJobId}/{filename:.*}")
     public ChunkedOutput<SimpleMessageChunk> retrieveForExportJob(@ApiParam(value = "ID of an existing export job", name = "exportJobId")
-                                         @PathParam("exportJobId") String exportJobId) throws UnsupportedEncodingException {
+                                                                  @PathParam("exportJobId") String exportJobId,
+                                                                  @Context SearchUser searchUser) throws UnsupportedEncodingException {
         final ExportJob exportJob = exportJobService.get(exportJobId)
                 .orElseThrow(() -> new NotFoundException("Unable to find export job with id <" + exportJobId + ">!"));
 
-        return outputFor(exportJob);
+        return outputFor(exportJob, searchUser);
     }
 
-    private ChunkedOutput<SimpleMessageChunk> outputFor(ExportJob exportJob) {
+    private ChunkedOutput<SimpleMessageChunk> outputFor(ExportJob exportJob, SearchUser searchUser) {
         if (exportJob instanceof MessagesRequestExportJob) {
             final MessagesRequest messagesRequest = ((MessagesRequestExportJob) exportJob).messagesRequest();
-            return this.retrieve(messagesRequest);
+            return this.retrieve(messagesRequest, searchUser);
         }
 
         if (exportJob instanceof SearchExportJob) {
             final SearchExportJob searchExportJob = (SearchExportJob) exportJob;
-            return this.retrieveForSearch(searchExportJob.searchId(), searchExportJob.resultFormat());
+            return this.retrieveForSearch(searchExportJob.searchId(), searchExportJob.resultFormat(), searchUser);
         }
 
         if (exportJob instanceof SearchTypeExportJob) {
             final SearchTypeExportJob searchTypeExportJob = (SearchTypeExportJob)exportJob;
-            return this.retrieveForSearchType(searchTypeExportJob.searchId(), searchTypeExportJob.searchTypeId(), searchTypeExportJob.resultFormat());
+            return this.retrieveForSearchType(searchTypeExportJob.searchId(), searchTypeExportJob.searchTypeId(), searchTypeExportJob.resultFormat(), searchUser);
         }
 
         throw new IllegalStateException("Invalid type of export job: " + exportJob.getClass());
@@ -205,25 +210,20 @@ public class MessagesResource extends RestResource implements PluginRestResource
         return format == null ? ResultFormat.empty() : format;
     }
 
-    private Search loadSearch(String searchId, ExecutionState executionState) {
-        Search search = searchDomain.getForUser(searchId, searchUser())
+    private Search loadSearch(String searchId, ExecutionState executionState, SearchUser searchUser) {
+        Search search = searchDomain.getForUser(searchId, searchUser)
                 .orElseThrow(() -> new NotFoundException("Search with id " + searchId + " does not exist"));
 
-        search = search.addStreamsToQueriesWithoutStreams(this::loadAllAllowedStreamsForUser);
+        search = search.addStreamsToQueriesWithoutStreams(() -> loadAllAllowedStreamsForUser(searchUser));
 
         search = search.applyExecutionState(objectMapper, executionState);
 
-        executionGuard.check(search, searchUser()::hasStreamReadPermission);
+        executionGuard.check(search, searchUser::hasStreamReadPermission);
 
         return search;
     }
 
-    private SearchUser searchUser() {
-        return new SearchUser(getCurrentUser(), this::isPermitted, this::isPermitted);
-    }
-
-    private ImmutableSet<String> loadAllAllowedStreamsForUser() {
-        final SearchUser searchUser = searchUser();
+    private ImmutableSet<String> loadAllAllowedStreamsForUser(SearchUser searchUser) {
         return permittedStreams.load(searchUser::hasStreamReadPermission);
     }
 }

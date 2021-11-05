@@ -22,7 +22,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
@@ -46,8 +45,6 @@ import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -106,7 +103,8 @@ public class ViewsResource extends RestResource implements PluginRestResource {
                                                       required = true,
                                                       allowableValues = "id,title,created_at") @DefaultValue(ViewDTO.FIELD_TITLE) @QueryParam("sort") String sortField,
                                             @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc") @DefaultValue("asc") @QueryParam("order") String order,
-                                            @ApiParam(name = "query") @QueryParam("query") String query) {
+                                            @ApiParam(name = "query") @QueryParam("query") String query,
+                                            @Context SearchUser searchUser) {
 
         if (!ViewDTO.SORT_FIELDS.contains(sortField.toLowerCase(ENGLISH))) {
             sortField = ViewDTO.FIELD_TITLE;
@@ -116,7 +114,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
             final SearchQuery searchQuery = searchQueryParser.parse(query);
             final PaginatedList<ViewDTO> result = dbService.searchPaginated(
                     searchQuery,
-                    searchUser()::hasViewReadPermission,
+                    searchUser::hasViewReadPermission,
                     order,
                     sortField,
                     page,
@@ -131,8 +129,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     @GET
     @Path("{id}")
     @ApiOperation("Get a single view")
-    public ViewDTO get(@ApiParam(name = "id") @PathParam("id") @NotEmpty String id) {
-        final SearchUser searchUser = searchUser();
+    public ViewDTO get(@ApiParam(name = "id") @PathParam("id") @NotEmpty String id, @Context SearchUser searchUser) {
         if ("default".equals(id)) {
             // If the user is not permitted to access the default view, return a 404
             return dbService.getDefault()
@@ -151,19 +148,21 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     @POST
     @ApiOperation("Create a new view")
     @AuditEvent(type = ViewsAuditEventTypes.VIEW_CREATE)
-    public ViewDTO create(@ApiParam @Valid  @NotNull(message = "View is mandatory") ViewDTO dto, @Context UserContext userContext) throws ValidationException {
+    public ViewDTO create(@ApiParam @Valid  @NotNull(message = "View is mandatory") ViewDTO dto,
+                          @Context UserContext userContext,
+                          @Context SearchUser searchUser) throws ValidationException {
         if (dto.type().equals(ViewDTO.Type.DASHBOARD)) {
             checkPermission(RestPermissions.DASHBOARDS_CREATE);
         }
 
-        validateIntegrity(dto);
+        validateIntegrity(dto, searchUser);
 
         final User user = userContext.getUser();
-        return dbService.saveWithOwner(dto.toBuilder().owner(user.getName()).build(), user);
+        return dbService.saveWithOwner(dto.toBuilder().owner(searchUser.username()).build(), user);
     }
 
-    private void validateIntegrity(ViewDTO dto) {
-        final Search search = searchDomain.getForUser(dto.searchId(), searchUser())
+    private void validateIntegrity(ViewDTO dto, SearchUser searchUser) {
+        final Search search = searchDomain.getForUser(dto.searchId(), searchUser)
                 .orElseThrow(() -> new BadRequestException("Search " + dto.searchId() + " not available"));
 
         final Set<String> searchQueries = search.queries().stream()
@@ -207,16 +206,13 @@ public class ViewsResource extends RestResource implements PluginRestResource {
         }
     }
 
-    private SearchUser searchUser() {
-        return new SearchUser(getCurrentUser(), this::isPermitted, this::isPermitted);
-    }
-
     @PUT
     @Path("{id}")
     @ApiOperation("Update view")
     @AuditEvent(type = ViewsAuditEventTypes.VIEW_UPDATE)
     public ViewDTO update(@ApiParam(name = "id") @PathParam("id") @NotEmpty String id,
-                          @ApiParam @Valid ViewDTO dto) {
+                          @ApiParam @Valid ViewDTO dto,
+                          @Context SearchUser searchUser) {
         if (dto.type().equals(ViewDTO.Type.DASHBOARD)) {
             checkAnyPermission(new String[]{
                     ViewsRestPermissions.VIEW_EDIT,
@@ -226,7 +222,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
             checkPermission(ViewsRestPermissions.VIEW_EDIT, id);
         }
 
-        validateIntegrity(dto);
+        validateIntegrity(dto, searchUser);
 
         return dbService.update(dto.toBuilder().id(id).build());
     }
