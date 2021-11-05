@@ -18,7 +18,6 @@ package org.graylog2.cluster.leader;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.AbstractExecutionThreadService;
-import com.google.common.util.concurrent.Uninterruptibles;
 import org.graylog2.cluster.lock.LockService;
 import org.graylog2.periodical.NodePingThread;
 import org.slf4j.Logger;
@@ -26,13 +25,15 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-
-import static java.util.concurrent.TimeUnit.SECONDS;
+import java.time.Duration;
 
 @Singleton
 public class MongoLeaderElectionService extends AbstractExecutionThreadService implements LeaderElectionService {
     private static final String RESOURCE_NAME = "cluster-leader";
     private static final Logger log = LoggerFactory.getLogger(MongoLeaderElectionService.class);
+
+    private static final Duration POLLING_INTERVAL = Duration.ofSeconds(2);
+    private static final Duration LOCK_TTL = Duration.ofMinutes(1);
 
     private final LockService lockService;
     private final EventBus eventBus;
@@ -54,12 +55,24 @@ public class MongoLeaderElectionService extends AbstractExecutionThreadService i
 
     @Override
     protected void run() throws Exception {
+        long lastSuccess = 0;
 
         while (isRunning()) {
             final boolean wasLeader = isLeader;
 
-            // TODO: failure handling
-            isLeader = lockService.lock(RESOURCE_NAME).isPresent();
+            try {
+                isLeader = lockService.lock(RESOURCE_NAME).isPresent();
+                lastSuccess = System.nanoTime();
+            } catch (Exception e) {
+                log.error("Unable to acquire/renew leader lock.", e);
+
+                final Duration timeSinceLastSuccess = Duration.ofNanos(System.nanoTime() - lastSuccess);
+                if (wasLeader && timeSinceLastSuccess.compareTo(LOCK_TTL) >= 0) {
+                    log.error("Failed for {} to renew leader lock. Forcing fallback to follower role.",
+                            timeSinceLastSuccess);
+                    isLeader = false;
+                }
+            }
 
             if (wasLeader != isLeader) {
                 if (isLeader) {
@@ -74,8 +87,17 @@ public class MongoLeaderElectionService extends AbstractExecutionThreadService i
                 eventBus.post(new LeaderChangedEvent());
             }
 
-            // TODO: make configurable. Handle interruption on shutdown.
-            Uninterruptibles.sleepUninterruptibly(2, SECONDS);
+            try {
+                if (wasLeader && !isLeader) {
+                    log.info("Pausing leader-lock acquisition attempts for {} after downgrade from leader.", LOCK_TTL);
+                    Thread.sleep(LOCK_TTL.toMillis());
+                    log.info("Resuming leader-lock acquisition attempts every {}.", POLLING_INTERVAL);
+                } else {
+                    Thread.sleep(POLLING_INTERVAL.toMillis());
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
         }
     }
 }
