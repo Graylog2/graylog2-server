@@ -22,3 +22,10 @@ The following API endpoints have been removed in 4.3.
 | Endpoint                                    | Description                 |
 | ------------------------------------------- | --------------------------- |
 | `PUT /example/placeholder`                  | TODO placeholder comment    |
+
+## Configuration File Changes
+
+The following configuration option as been removed: `index_field_type_periodical_interval`.
+
+It has been replaced with a new configuration option which allows users to tweak the default full refresh interval for
+index field type information: `index_field_type_periodical_full_refresh_interval`.

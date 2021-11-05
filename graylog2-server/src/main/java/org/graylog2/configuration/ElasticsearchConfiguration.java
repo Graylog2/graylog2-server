@@ -94,8 +94,8 @@ public class ElasticsearchConfiguration {
     @Parameter(value = "elasticsearch_index_optimization_jobs", validator = PositiveIntegerValidator.class)
     private int indexOptimizationJobs = 20;
 
-    @Parameter(value = "index_field_type_periodical_interval", validator = PositiveDurationValidator.class)
-    private Duration indexFieldTypePeriodicalInterval = Duration.hours(1L);
+    @Parameter(value = "index_field_type_periodical_full_refresh_interval", validators = {PositiveDurationValidator.class})
+    private Duration indexFieldTypePeriodicalFullRefreshInterval = Duration.minutes(5);
 
     @Parameter(value = DEFAULT_EVENTS_INDEX_PREFIX, validators = StringNotBlankValidator.class)
     private String defaultEventsIndexPrefix = "gl-events";
@@ -182,10 +182,6 @@ public class ElasticsearchConfiguration {
 
     public int getIndexOptimizationJobs() {
         return indexOptimizationJobs;
-    }
-
-    public Duration getIndexFieldTypePeriodicalInterval() {
-        return indexFieldTypePeriodicalInterval;
     }
 
     public String getDefaultEventsIndexPrefix() {
