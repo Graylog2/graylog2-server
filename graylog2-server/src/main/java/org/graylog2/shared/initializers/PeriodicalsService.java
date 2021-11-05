@@ -104,11 +104,6 @@ public class PeriodicalsService extends AbstractIdleService {
             try {
                 periodical.initialize();
 
-                if (periodical.masterOnly() && !leaderElectionService.isLeader()) {
-                    LOG.error("Not starting [{}] periodical. Periodical requires node to be leader.", periodical.getClass().getCanonicalName());
-                    continue;
-                }
-
                 if (!periodical.startOnThisNode()) {
                     LOG.info("Not starting [{}] periodical. Not configured to run on this node.", periodical.getClass().getCanonicalName());
                     continue;

@@ -21,7 +21,7 @@ import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import { EntityListItem } from 'components/common';
 import CurrentUserContext from 'contexts/CurrentUserContext';
-import UserTimezoneTimestamp from 'views/components/common/UserTimezoneTimestamp';
+import Timestamp from 'components/common/Timestamp';
 import withPluginEntities from 'views/logic/withPluginEntities';
 
 const formatTitle = (title, id, disabled = false) => (disabled
@@ -46,7 +46,7 @@ OwnerTag.propTypes = {
 const Description = ({ description, owner, createdAt }) => (
   <>
     <div>{description || <i>No description given.</i>}</div>
-    <div style={{ color: 'darkgray' }}><OwnerTag owner={owner} /> at <UserTimezoneTimestamp dateTime={createdAt} /></div>
+    <div style={{ color: 'darkgray' }}><OwnerTag owner={owner} /> at <Timestamp dateTime={createdAt} /></div>
   </>
 );
 

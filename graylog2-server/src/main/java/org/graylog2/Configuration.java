@@ -173,6 +173,9 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "is_cloud")
     private boolean isCloud = false;
 
+    @Parameter(value = "run_migrations")
+    private boolean runMigrations = true;
+
     @Parameter(value = "leader_election_mode", converter = LeaderElectionMode.Converter.class)
     private LeaderElectionMode leaderElectionMode = LeaderElectionMode.STATIC;
 
@@ -222,6 +225,10 @@ public class Configuration extends BaseConfiguration {
 
     public boolean isCloud() {
         return isCloud;
+    }
+
+    public boolean runMigrations() {
+        return runMigrations;
     }
 
     @Override

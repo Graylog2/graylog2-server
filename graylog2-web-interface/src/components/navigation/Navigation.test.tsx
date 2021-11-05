@@ -18,11 +18,11 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import { mount } from 'wrappedEnzyme';
 import { PluginStore } from 'graylog-web-plugin/plugin';
+import { Route, MemoryRouter } from 'react-router-dom';
+
 import mockComponent from 'helpers/mocking/MockComponent';
 import { alice as currentUser } from 'fixtures/users';
 import { asMock } from 'helpers/mocking';
-import { Route, MemoryRouter } from 'react-router-dom';
-
 import Routes from 'routing/Routes';
 import AppConfig from 'util/AppConfig';
 import CurrentUserContext from 'contexts/CurrentUserContext';

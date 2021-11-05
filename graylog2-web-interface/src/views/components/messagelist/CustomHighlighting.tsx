@@ -51,7 +51,7 @@ const CustomHighlighting = ({ children, field: fieldName, value: fieldValue }: P
 
   const highlightingRulesMap = highlightingRules.reduce((prev, cur) => ({ ...prev, [cur.field]: prev[cur.field] ? [...prev[cur.field], cur] : [cur] }), {});
   const rules = highlightingRulesMap[fieldName] ?? [];
-  const formattedValue = type === 'date' ? formatDateTime(new DateTime(fieldValue), DateTime.Formats.TIMESTAMP_TZ, timezone) : fieldValue;
+  const formattedValue = type === 'date' ? formatDateTime(fieldValue, DateTime.Formats.TIMESTAMP_TZ, timezone) : fieldValue;
 
   rules.forEach((rule) => {
     const ranges = [];

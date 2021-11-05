@@ -17,8 +17,8 @@
 import * as React from 'react';
 import { render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
 import WrappingContainer from 'WrappingContainer';
-import MockStore from 'helpers/mocking/StoreMock';
 
+import MockStore from 'helpers/mocking/StoreMock';
 import { GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
 import SearchActions from 'views/actions/SearchActions';
 import GlobalOverride from 'views/logic/search/GlobalOverride';

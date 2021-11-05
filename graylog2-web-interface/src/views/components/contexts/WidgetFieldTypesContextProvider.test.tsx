@@ -16,8 +16,8 @@
  */
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
-import asMock from 'helpers/mocking/AsMock';
 
+import asMock from 'helpers/mocking/AsMock';
 import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
 import WidgetFieldTypesContextProvider from 'views/components/contexts/WidgetFieldTypesContextProvider';
 import WidgetContext from 'views/components/contexts/WidgetContext';

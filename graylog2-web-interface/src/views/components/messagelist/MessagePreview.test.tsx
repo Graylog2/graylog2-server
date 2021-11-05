@@ -16,8 +16,8 @@
  */
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
-import { asMock } from 'helpers/mocking';
 
+import { asMock } from 'helpers/mocking';
 import usePluginEntities from 'views/logic/usePluginEntities';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';

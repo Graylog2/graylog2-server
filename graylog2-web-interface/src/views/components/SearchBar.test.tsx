@@ -16,9 +16,9 @@
  */
 import * as React from 'react';
 import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
+
 import { StoreMock as MockStore } from 'helpers/mocking';
 import mockAction from 'helpers/mocking/MockAction';
-
 import { SearchActions } from 'views/stores/SearchStore';
 // eslint-disable-next-line import/no-named-default
 import { default as MockQuery } from 'views/logic/queries/Query';

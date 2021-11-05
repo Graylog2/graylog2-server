@@ -17,10 +17,11 @@
 package org.graylog.plugins.views.search;
 
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
-import org.graylog.plugins.views.search.errors.PermissionException;
 import org.graylog.plugins.views.search.filter.StreamFilter;
+import org.graylog.plugins.views.search.rest.ExecutionState;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.rest.exceptions.MissingStreamPermissionException;
@@ -28,9 +29,7 @@ import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -111,7 +110,7 @@ public class SearchTest {
     public void keepsSingleSearchTypeWhenOverridden() {
         Search before = Search.builder().queries(queriesWithSearchTypes("oans,zwoa")).build();
 
-        Map<String, Object> executionState = partialResultsMapWithSearchTypes("oans");
+        ExecutionState executionState = partialResultsMapWithSearchTypes("oans");
 
         Search after = before.applyExecutionState(objectMapperProvider.get(), executionState);
 
@@ -122,7 +121,7 @@ public class SearchTest {
     public void keepsMultipleSearchTypesWhenOverridden() {
         Search before = Search.builder().queries(queriesWithSearchTypes("oans,zwoa", "gsuffa")).build();
 
-        Map<String, Object> executionState = partialResultsMapWithSearchTypes("oans", "gsuffa");
+        ExecutionState executionState = partialResultsMapWithSearchTypes("oans", "gsuffa");
 
         Search after = before.applyExecutionState(objectMapperProvider.get(), executionState);
 
@@ -147,15 +146,14 @@ public class SearchTest {
         return q.searchTypes().stream().map(SearchType::id).anyMatch(id -> id.equals(searchTypeId));
     }
 
-    private Map<String, Object> partialResultsMapWithSearchTypes(String... searchTypeIds) {
-        Multimap<String, String> searchTypes = HashMultimap.create();
-        for (String id : searchTypeIds)
+    private ExecutionState partialResultsMapWithSearchTypes(String... searchTypeIds) {
+        Multimap<String, Object> searchTypes = HashMultimap.create();
+        for (String id : searchTypeIds) {
             searchTypes.put("keep_search_types", id);
-
-        Map<String, Object> executionState = new HashMap<>();
-        executionState.put("global_override", searchTypes);
-
-        return executionState;
+        }
+        return ExecutionState.builder()
+                .setGlobalOverride(ImmutableMap.copyOf(searchTypes.asMap()))
+                .build();
     }
 
     private MessageList messageList(String id) {

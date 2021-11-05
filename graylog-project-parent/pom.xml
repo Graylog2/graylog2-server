@@ -566,11 +566,6 @@
                 <artifactId>unboundid-ldapsdk</artifactId>
                 <version>${unboundid-ldap.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.apache.httpcomponents</groupId>
-                <artifactId>httpclient</artifactId>
-                <version>${apache-httpclient.version}</version>
-            </dependency>
 
             <!-- Test dependencies -->
             <dependency>

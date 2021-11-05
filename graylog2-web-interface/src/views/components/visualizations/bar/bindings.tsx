@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type { VisualizationType } from 'views/types';
 
+import type { VisualizationType } from 'views/types';
 import BarVisualization from 'views/components/visualizations/bar/BarVisualization';
 import BarVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
 import { hasAtLeastOneMetric } from 'views/components/visualizations/validations';
