@@ -46,6 +46,7 @@ public class StaticLeaderElectionService implements LeaderElectionService {
 
     @Override
     public void giveUpLeader() {
-        // Nothing we can do here
+        // This has likely no effect in the server shutdown phase
+        configuration.setIsMaster(false);
     }
 }
