@@ -16,8 +16,8 @@
  */
 import * as React from 'react';
 import uuid from 'uuid/v4';
-import { ActionContexts } from 'views/types';
 
+import { ActionContexts } from 'views/types';
 import type { FieldName, FieldValue } from 'views/logic/fieldtypes/FieldType';
 import type { QueryId } from 'views/logic/queries/Query';
 import FieldType from 'views/logic/fieldtypes/FieldType';

@@ -20,8 +20,8 @@ import * as Immutable from 'immutable';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import styled from 'styled-components';
 import { $PropertyType } from 'utility-types';
-import { EditWidgetComponentProps } from 'views/types';
 
+import { EditWidgetComponentProps } from 'views/types';
 import { Col, Row } from 'components/bootstrap';
 import { defaultCompare } from 'views/logic/DefaultCompare';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';

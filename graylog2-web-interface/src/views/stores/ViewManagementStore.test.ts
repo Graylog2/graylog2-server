@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { MockStore } from 'helpers/mocking';
-
 import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';

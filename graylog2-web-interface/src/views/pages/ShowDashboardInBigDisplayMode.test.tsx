@@ -16,8 +16,8 @@
  */
 import * as React from 'react';
 import { render, waitFor } from 'wrappedTestingLibrary';
-import { StoreMock as MockStore } from 'helpers/mocking';
 
+import { StoreMock as MockStore } from 'helpers/mocking';
 import { RefreshActions } from 'views/stores/RefreshStore';
 import View from 'views/logic/views/View';
 import _ShowDashboardInBigDisplayMode from 'views/pages/ShowDashboardInBigDisplayMode';

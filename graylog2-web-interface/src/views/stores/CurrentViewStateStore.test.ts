@@ -16,9 +16,9 @@
  */
 import * as Immutable from 'immutable';
 import { PluginExports, PluginStore } from 'graylog-web-plugin/plugin';
+
 import mockAction from 'helpers/mocking/MockAction';
 import { WidgetExport } from 'views/types';
-
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import ViewState from 'views/logic/views/ViewState';

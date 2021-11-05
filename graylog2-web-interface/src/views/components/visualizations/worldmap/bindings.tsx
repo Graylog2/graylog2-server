@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type { VisualizationType } from 'views/types';
-
 import Viewport from 'views/logic/aggregationbuilder/visualizations/Viewport';
 import WorldMapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/WorldMapVisualizationConfig';
 import WorldMapVisualization from 'views/components/visualizations/worldmap/WorldMapVisualization';

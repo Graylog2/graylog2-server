@@ -17,13 +17,13 @@
 import React from 'react';
 import * as Immutable from 'immutable';
 import { render, waitFor, fireEvent, screen } from 'wrappedTestingLibrary';
+import { PluginRegistration, PluginStore } from 'graylog-web-plugin/plugin';
+
 import mockComponent from 'helpers/mocking/MockComponent';
 import mockAction from 'helpers/mocking/MockAction';
-import { PluginRegistration, PluginStore } from 'graylog-web-plugin/plugin';
 import MockStore from 'helpers/mocking/StoreMock';
 import { createSearch } from 'fixtures/searches';
 import asMock from 'helpers/mocking/AsMock';
-
 import WidgetModel from 'views/logic/widgets/Widget';
 import { WidgetActions, Widgets } from 'views/stores/WidgetStore';
 import { TitlesActions, TitleTypes } from 'views/stores/TitlesStore';

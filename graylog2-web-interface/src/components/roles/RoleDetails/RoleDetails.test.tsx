@@ -17,6 +17,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { render, act, screen } from 'wrappedTestingLibrary';
+
 import { alertsManager as exampleRole } from 'fixtures/roles';
 import { alice as assignedUser } from 'fixtures/userOverviews';
 
