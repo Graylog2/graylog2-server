@@ -32,20 +32,31 @@ public class MongoLeaderElectionService extends AbstractExecutionThreadService i
     private static final String RESOURCE_NAME = "cluster-leader";
     private static final Logger log = LoggerFactory.getLogger(MongoLeaderElectionService.class);
 
-    private static final Duration POLLING_INTERVAL = Duration.ofSeconds(2);
-    private static final Duration LOCK_TTL = Duration.ofMinutes(1);
+    public static final Duration POLLING_INTERVAL = Duration.ofSeconds(2);
+    public static final Duration LOCK_TTL = Duration.ofMinutes(1);
 
     private final LockService lockService;
     private final EventBus eventBus;
     private final NodePingThread nodePingThread;
 
     private volatile boolean isLeader = false;
+    private volatile Thread executionThread;
 
     @Inject
     public MongoLeaderElectionService(LockService lockService, EventBus eventBus, NodePingThread nodePingThread) {
         this.lockService = lockService;
         this.eventBus = eventBus;
         this.nodePingThread = nodePingThread;
+    }
+
+    @Override
+    protected void startUp() throws Exception {
+        this.executionThread = Thread.currentThread();
+    }
+
+    @Override
+    protected void triggerShutdown() {
+        executionThread.interrupt();
     }
 
     @Override
