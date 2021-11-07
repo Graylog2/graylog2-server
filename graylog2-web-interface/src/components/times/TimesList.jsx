@@ -20,8 +20,7 @@ import Reflux from 'reflux';
 import moment from 'moment';
 
 import { Col, Row } from 'components/bootstrap';
-import { Spinner, Timestamp } from 'components/common';
-import DateTime from 'logic/datetimes/DateTime';
+import { Spinner, Timestamp, BrowserTime } from 'components/common';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import { SystemStore } from 'stores/system/SystemStore';
 
@@ -65,7 +64,7 @@ const TimesList = createReactClass({
             <dt>User <em>{currentUser.username}</em>:</dt>
             <dd><Timestamp dateTime={time} format={timeFormat} /></dd>
             <dt>Your web browser:</dt>
-            <dd><Timestamp dateTime={time} format={timeFormat} tz="browser" /></dd>
+            <dd><BrowserTime dateTime={time} format={timeFormat} /></dd>
             <dt>Graylog server:</dt>
             <dd><Timestamp dateTime={time} format={timeFormat} tz={serverTimezone} /></dd>
           </dl>

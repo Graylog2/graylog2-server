@@ -16,18 +16,10 @@
  */
 import PropTypes from 'prop-types';
 import * as React from 'react';
-import { useMemo, useContext } from 'react';
+import { useContext } from 'react';
 import type { Moment } from 'moment';
 
 import DateTimeContext, { DateTimeFormats } from 'contexts/DateTimeContext';
-
-const formatDateTime = (dateTime, format, tz, formatTime, formatAsBrowserTime): string => {
-  if (tz === 'browser') {
-    return formatAsBrowserTime(dateTime, format);
-  }
-
-  return formatTime(dateTime, tz, format);
-};
 
 type Props = {
   dateTime: string | number | Date | Moment,
@@ -51,14 +43,11 @@ type Props = {
  *
  */
 const Timestamp = ({ dateTime, field, format, render: Component, tz }: Props) => {
-  const { formatTime, formatAsBrowserTime } = useContext(DateTimeContext);
-  const formattedDateTime = useMemo(
-    () => formatDateTime(dateTime, format, tz, formatTime, formatAsBrowserTime),
-    [dateTime, format, tz, formatTime, formatAsBrowserTime],
-  );
+  const { formatTime } = useContext(DateTimeContext);
+  const formattedDateTime = formatTime(dateTime, tz, format);
 
   return (
-    <time key={`time-${dateTime}`} dateTime={String(dateTime)} title={String(dateTime)}>
+    <time dateTime={String(dateTime)} title={String(dateTime)}>
       <Component value={formattedDateTime} field={field} />
     </time>
   );
@@ -78,9 +67,7 @@ Timestamp.propTypes = {
   /** Provides field prop for the render function. */
   field: PropTypes.string,
   /**
-   * Specifies the timezone to convert `dateTime`. Use `browser` to
-   * convert the date time to the browser's local time, or one of the
-   * time zones supported by moment timezone.
+   * Specifies the timezone to convert `dateTime`.
    */
   tz: PropTypes.string,
   /**
