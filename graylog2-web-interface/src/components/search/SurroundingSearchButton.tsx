@@ -18,16 +18,12 @@ import * as React from 'react';
 import { useContext } from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
-import naturalSort from 'javascript-natural-sort';
 
 import { DropdownButton, MenuItem } from 'components/bootstrap';
 import DrilldownContext from 'views/components/contexts/DrilldownContext';
 
 import type { SearchesConfig } from './SearchConfig';
 import SearchLink from './SearchLink';
-
-const buildTimeRangeOptions = ({ surrounding_timerange_options: surroundingTimerangeOptions = {} }) => Object.entries(surroundingTimerangeOptions)
-  .reduce((prev, [key, value]) => ({ ...prev, [moment.duration(key).asSeconds()]: value }), {});
 
 const buildFilterFields = (messageFields, searchConfig) => {
   const { surrounding_filter_fields: surroundingFilterFields = [] } = searchConfig;
@@ -44,8 +40,9 @@ const buildSearchLink = (id, from, to, fields, filterFields, streams) => SearchL
   .toURL();
 
 const searchLink = (range, timestamp, id, messageFields, searchConfig, streams) => {
-  const fromTime = moment(timestamp).subtract(Number(range), 'seconds').toISOString();
-  const toTime = moment(timestamp).add(Number(range), 'seconds').toISOString();
+  const rangeSeconds = Number(moment.duration(range).asSeconds());
+  const fromTime = moment(timestamp).subtract(rangeSeconds, 'seconds').toISOString();
+  const toTime = moment(timestamp).add(rangeSeconds, 'seconds').toISOString();
   const filterFields = buildFilterFields(messageFields, searchConfig);
 
   return buildSearchLink(id, fromTime, toTime, [], filterFields, streams);
@@ -60,12 +57,11 @@ type Props = {
 
 const SurroundingSearchButton = ({ searchConfig, timestamp, id, messageFields }: Props) => {
   const { streams } = useContext(DrilldownContext);
-  const timeRangeOptions = buildTimeRangeOptions(searchConfig);
-  const menuItems = Object.keys(timeRangeOptions)
-    .sort((a, b) => naturalSort(a, b))
+  const { surrounding_timerange_options: surroundingTimerangeOptions } = searchConfig;
+  const menuItems = Object.keys(surroundingTimerangeOptions)
     .map((range) => (
       <MenuItem key={range} href={searchLink(range, timestamp, id, messageFields, searchConfig, streams)} target="_blank" rel="noopener noreferrer">
-        {timeRangeOptions[range]}
+        {surroundingTimerangeOptions[range]}
       </MenuItem>
     ));
 
