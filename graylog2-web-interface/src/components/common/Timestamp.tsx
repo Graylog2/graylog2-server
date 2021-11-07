@@ -21,11 +21,7 @@ import type { Moment } from 'moment';
 
 import DateTimeContext, { DateTimeFormats } from 'contexts/DateTimeContext';
 
-const formatDateTime = (dateTime, format, tz, relative = false, formatTime, formatAsBrowserTime, relativeDifference): string => {
-  if (relative) {
-    return relativeDifference(dateTime, tz);
-  }
-
+const formatDateTime = (dateTime, format, tz, formatTime, formatAsBrowserTime): string => {
   if (tz === 'browser') {
     return formatAsBrowserTime(dateTime, format);
   }
@@ -37,7 +33,6 @@ type Props = {
   dateTime: string | number | Date | Moment,
   field?: string,
   format?: DateTimeFormats,
-  relative?: boolean,
   render?: React.ComponentType<{ value: string, field: string | undefined }>,
   tz?: string,
 }
@@ -55,11 +50,11 @@ type Props = {
  * was used in the server.
  *
  */
-const Timestamp = ({ dateTime, field, format, relative, render: Component, tz }: Props) => {
-  const { formatTime, formatAsBrowserTime, relativeDifference } = useContext(DateTimeContext);
+const Timestamp = ({ dateTime, field, format, render: Component, tz }: Props) => {
+  const { formatTime, formatAsBrowserTime } = useContext(DateTimeContext);
   const formattedDateTime = useMemo(
-    () => formatDateTime(dateTime, format, tz, relative, formatTime, formatAsBrowserTime, relativeDifference),
-    [dateTime, format, tz, relative, formatTime, formatAsBrowserTime, relativeDifference],
+    () => formatDateTime(dateTime, format, tz, formatTime, formatAsBrowserTime),
+    [dateTime, format, tz, formatTime, formatAsBrowserTime],
   );
 
   return (
@@ -82,8 +77,6 @@ Timestamp.propTypes = {
   format: PropTypes.string,
   /** Provides field prop for the render function. */
   field: PropTypes.string,
-  /** Specifies if the component should display relative time or not. */
-  relative: PropTypes.bool,
   /**
    * Specifies the timezone to convert `dateTime`. Use `browser` to
    * convert the date time to the browser's local time, or one of the
@@ -99,7 +92,6 @@ Timestamp.propTypes = {
 Timestamp.defaultProps = {
   field: undefined,
   format: 'default',
-  relative: false,
   render: ({ value }) => value,
   tz: undefined,
 };

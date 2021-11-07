@@ -20,7 +20,7 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
 import { Row, Col } from 'components/bootstrap';
-import { DocumentTitle, PageHeader, Spinner, Timestamp } from 'components/common';
+import { DocumentTitle, PageHeader, Spinner, RelativeTime } from 'components/common';
 import withParams from 'routing/withParams';
 import { ClusterOverviewStore } from 'stores/cluster/ClusterOverviewStore';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
@@ -61,7 +61,7 @@ const ProcessBufferDumpPage = createReactClass({
       <span>
         Process-buffer dump of node {node.short_node_id} / {node.hostname}
         &nbsp;
-        <small>Taken at <Timestamp dateTime={new Date()} relative /></small>
+        <small>Taken at <RelativeTime dateTime={new Date()} /></small>
       </span>
     );
 

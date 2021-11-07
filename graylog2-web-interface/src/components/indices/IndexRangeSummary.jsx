@@ -17,7 +17,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Timestamp } from 'components/common';
+import { RelativeTime } from 'components/common';
 
 class IndexRangeSummary extends React.Component {
   static propTypes = {
@@ -33,7 +33,7 @@ class IndexRangeSummary extends React.Component {
 
     return (
       <span>Range re-calculated{' '}
-        <span title={indexRange.calculated_at}><Timestamp dateTime={indexRange.calculated_at} relative /></span>{' '}
+        <span title={indexRange.calculated_at}><RelativeTime dateTime={indexRange.calculated_at} /></span>{' '}
         in {indexRange.took_ms}ms.
       </span>
     );
