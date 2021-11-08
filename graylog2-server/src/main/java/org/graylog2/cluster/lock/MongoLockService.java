@@ -84,7 +84,10 @@ public class MongoLockService implements LockService {
         for (Document document : collection.listIndexes()) {
             final Set<String> keySet = document.get("key", Document.class).keySet();
             if (keySet.contains(FIELD_UPDATED_AT)) {
-                if (Objects.equals(document.getLong("expireAfterSeconds"), indexOptions.getExpireAfter(TimeUnit.SECONDS))) {
+                final Object obj = document.get("expireAfterSeconds");
+                // Since MongoDB 5.0 this is an Integer. Used to be a Long ¯\_(ツ)_/¯
+                final long expireAfterSeconds = obj instanceof Integer ? ((Integer) obj).longValue() : ((Long) obj);
+                if (Objects.equals(expireAfterSeconds, indexOptions.getExpireAfter(TimeUnit.SECONDS))) {
                     return;
                 }
                 collection.dropIndex(updatedAtKey);
