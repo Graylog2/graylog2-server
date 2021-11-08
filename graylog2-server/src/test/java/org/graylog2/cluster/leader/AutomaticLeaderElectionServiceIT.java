@@ -63,7 +63,7 @@ class AutomaticLeaderElectionServiceIT {
     @BeforeEach
     void setUp() {
         when(configuration.getLeaderElectionLockPollingInterval()).thenReturn(Duration.ofMillis(100));
-        when(configuration.getLeaderElectionLockTTL()).thenReturn(Duration.ofSeconds(10));
+        when(configuration.getLeaderElectionLockTTL()).thenReturn(Duration.ofSeconds(1));
         leaderElectionService = new AutomaticLeaderElectionService(configuration, lockService, eventBus, nodePingThread);
     }
 
@@ -138,5 +138,31 @@ class AutomaticLeaderElectionServiceIT {
         lockCount = lockInvocations.get();
         Uninterruptibles.sleepUninterruptibly(configuration.getLeaderElectionLockPollingInterval().multipliedBy(2));
         assertThat(lockInvocations.get()).isEqualTo(lockCount);
+    }
+
+    @Test
+    void ignoresSingleFailure() {
+        Lock lock = mock(Lock.class);
+        when(lockService.lock(any()))
+                .thenReturn(Optional.of(lock))
+                .thenThrow(new RuntimeException("ouch"))
+                .thenReturn(Optional.of(lock));
+
+        leaderElectionService.startAsync().awaitRunning();
+        verify(lockService, timeout(10_000).atLeast(3)).lock(any());
+        verify(eventBus).post(any(LeaderChangedEvent.class));
+        assertThat(leaderElectionService.isLeader()).isTrue();
+    }
+
+    @Test
+    void handlesConsistentFailure() {
+        Lock lock = mock(Lock.class);
+        when(lockService.lock(any()))
+                .thenReturn(Optional.of(lock))
+                .thenThrow(new RuntimeException("ouch"));
+
+        leaderElectionService.startAsync().awaitRunning();
+        verify(eventBus, timeout(10_000).times(2)).post(any(LeaderChangedEvent.class));
+        assertThat(leaderElectionService.isLeader()).isFalse();
     }
 }
