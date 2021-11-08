@@ -22,7 +22,6 @@ import org.graylog.plugins.views.search.permissions.SearchPermissions;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewService;
-import org.graylog2.plugin.database.users.User;
 
 import javax.inject.Inject;
 import java.util.Collection;
@@ -50,7 +49,7 @@ public class SearchDomain {
     }
 
     private void checkPermission(String userName, SearchUser searchUser, Search search) {
-        if (!hasReadPermissionFor(searchUser, searchUser::hasViewReadPermission, search))
+        if (!hasReadPermissionFor(searchUser, searchUser::canRead, search))
             throw new PermissionException("User " + userName + " does not have permission to load search " + search.id());
     }
 

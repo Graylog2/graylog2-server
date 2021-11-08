@@ -17,7 +17,6 @@
 package org.graylog.plugins.views.search.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.eventbus.EventBus;
@@ -145,7 +144,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @ApiOperation(value = "Get all searches which the user may see")
     public List<Search> getAllSearches(@Context SearchUser searchUser) {
         // TODO should be paginated
-        return searchDomain.getAllForUser(searchUser, searchUser::hasViewReadPermission);
+        return searchDomain.getAllForUser(searchUser, searchUser::canRead);
     }
 
     @POST

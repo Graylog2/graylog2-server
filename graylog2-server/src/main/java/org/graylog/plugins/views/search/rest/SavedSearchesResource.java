@@ -84,7 +84,7 @@ public class SavedSearchesResource extends RestResource {
             final PaginatedList<ViewSummaryDTO> result = dbService.searchSummariesPaginatedByType(
                     ViewDTO.Type.SEARCH,
                     searchQuery,
-                    searchUser::hasViewReadPermission,
+                    searchUser::canRead,
                     order,
                     sortField,
                     page,

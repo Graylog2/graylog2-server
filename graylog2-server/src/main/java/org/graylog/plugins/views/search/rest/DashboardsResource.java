@@ -87,7 +87,7 @@ public class DashboardsResource extends RestResource {
             final PaginatedList<ViewSummaryDTO> result = dbService.searchSummariesPaginatedByType(
                     ViewDTO.Type.DASHBOARD,
                     searchQuery,
-                    searchUser::hasViewReadPermission,
+                    searchUser::canRead,
                     order,
                     sortField,
                     page,

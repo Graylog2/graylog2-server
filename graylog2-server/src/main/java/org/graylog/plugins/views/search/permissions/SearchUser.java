@@ -5,7 +5,6 @@ import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.rest.ViewsRestPermissions;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewLike;
-import org.graylog.plugins.views.search.views.ViewSummaryDTO;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.security.RestPermissions;
 
@@ -27,10 +26,27 @@ public class SearchUser implements SearchPermissions, StreamPermissions, ViewPer
         return this.currentUser.getName();
     }
 
-    public boolean hasViewReadPermission(ViewLike view) {
+    public boolean canRead(ViewLike view) {
         final String viewId = view.id();
         return isPermitted(ViewsRestPermissions.VIEW_READ, viewId)
                 || (view.type().equals(ViewDTO.Type.DASHBOARD) && isPermitted(RestPermissions.DASHBOARDS_READ, viewId));
+    }
+
+    @Override
+    public boolean canCreateDashboards() {
+        return isPermitted(RestPermissions.DASHBOARDS_CREATE);
+    }
+
+    @Override
+    public boolean canUpdate(ViewLike view) {
+        return view.type().equals(ViewDTO.Type.DASHBOARD)
+                ? isPermitted(ViewsRestPermissions.VIEW_EDIT, view.id()) || isPermitted(RestPermissions.DASHBOARDS_EDIT, view.id())
+                : isPermitted(ViewsRestPermissions.VIEW_EDIT, view.id());
+    }
+
+    @Override
+    public boolean canDelete(ViewLike view) {
+        return isPermitted(ViewsRestPermissions.VIEW_DELETE, view.id());
     }
 
     public boolean hasStreamReadPermission(String streamId) {

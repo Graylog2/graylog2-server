@@ -21,12 +21,10 @@ import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.views.QualifyingViewsService;
-import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewParameterSummaryDTO;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.rest.resources.RestResource;
-import org.graylog2.shared.security.RestPermissions;
 
 import javax.inject.Inject;
 import javax.ws.rs.POST;
@@ -55,7 +53,7 @@ public class QualifyingViewsResource extends RestResource implements PluginRestR
     public Collection<ViewParameterSummaryDTO> forParameter(@Context SearchUser searchUser) {
         return qualifyingViewsService.forValue()
                 .stream()
-                .filter(searchUser::hasViewReadPermission)
+                .filter(searchUser::canRead)
                 .collect(Collectors.toSet());
     }
 }

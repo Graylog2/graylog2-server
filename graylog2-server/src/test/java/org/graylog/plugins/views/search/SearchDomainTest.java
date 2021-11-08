@@ -91,7 +91,7 @@ public class SearchDomainTest {
 
         final ViewDTO viewDTO = mock(ViewDTO.class);
         when(viewService.forSearch(anyString())).thenReturn(ImmutableList.of(viewDTO));
-        when(searchUser.hasViewReadPermission(viewDTO)).thenReturn(true);
+        when(searchUser.canRead(viewDTO)).thenReturn(true);
 
         final Optional<Search> result = sut.getForUser(search.id(), searchUser);
 
@@ -118,7 +118,7 @@ public class SearchDomainTest {
         final SearchUser searchUser = mock(SearchUser.class);
         when(searchUser.owns(ownedSearch)).thenReturn(true);
 
-        List<Search> result = sut.getAllForUser(searchUser, searchUser::hasViewReadPermission);
+        List<Search> result = sut.getAllForUser(searchUser, searchUser::canRead);
 
         assertThat(result).containsExactly(ownedSearch);
     }
@@ -131,9 +131,9 @@ public class SearchDomainTest {
 
         final ViewDTO viewDTO = mock(ViewDTO.class);
         when(viewService.forSearch(permittedSearch.id())).thenReturn(ImmutableList.of(viewDTO));
-        when(searchUser.hasViewReadPermission(viewDTO)).thenReturn(true);
+        when(searchUser.canRead(viewDTO)).thenReturn(true);
 
-        List<Search> result = sut.getAllForUser(searchUser, searchUser::hasViewReadPermission);
+        List<Search> result = sut.getAllForUser(searchUser, searchUser::canRead);
 
         assertThat(result).containsExactly(permittedSearch);
     }
@@ -144,7 +144,7 @@ public class SearchDomainTest {
         mockSearchWithOwner("someone else");
         final SearchUser searchUser = mock(SearchUser.class);
 
-        List<Search> result = sut.getAllForUser(searchUser, searchUser::hasViewReadPermission);
+        List<Search> result = sut.getAllForUser(searchUser, searchUser::canRead);
 
         assertThat(result).isEmpty();
     }
