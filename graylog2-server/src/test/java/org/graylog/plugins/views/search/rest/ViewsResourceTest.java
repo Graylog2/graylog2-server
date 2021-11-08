@@ -119,7 +119,7 @@ public class ViewsResourceTest {
     @Before
     public void setUp() throws Exception {
         this.viewsResource = new ViewsTestResource(viewService, clusterEventBus, userService, searchDomain);
-        when(subject.isPermitted("dashboards:create")).thenReturn(true);
+        when(searchUser.canCreateDashboards()).thenReturn(true);
         final Search search = mock(Search.class, RETURNS_DEEP_STUBS);
         when(search.queries()).thenReturn(ImmutableSet.of());
         when(searchDomain.getForUser(eq("6141d457d3a6b9d73c8ac55a"), eq(searchUser))).thenReturn(Optional.of(search));
@@ -154,7 +154,7 @@ public class ViewsResourceTest {
     public void shouldNotCreateADashboardWithoutPermission() {
         when(view.type()).thenReturn(ViewDTO.Type.DASHBOARD);
 
-        when(subject.isPermitted("dashboards:create")).thenReturn(false);
+        when(searchUser.canCreateDashboards()).thenReturn(false);
 
         assertThatThrownBy(() -> this.viewsResource.create(view, null, searchUser))
                 .isInstanceOf(ForbiddenException.class);
@@ -169,13 +169,13 @@ public class ViewsResourceTest {
     @Test
     public void deletingDashboardTriggersEvent() {
         final String viewId = "foobar";
-        when(subject.isPermitted(ViewsRestPermissions.VIEW_DELETE + ":" + viewId)).thenReturn(true);
+        when(searchUser.canDeleteView(view)).thenReturn(true);
         when(view.type()).thenReturn(ViewDTO.Type.DASHBOARD);
         when(view.id()).thenReturn(viewId);
         when(viewService.get(viewId)).thenReturn(Optional.of(view));
         when(userService.loadAll()).thenReturn(Collections.emptyList());
 
-        this.viewsResource.delete(viewId);
+        this.viewsResource.delete(viewId, searchUser);
 
         final ArgumentCaptor<DashboardDeletedEvent> eventCaptor = ArgumentCaptor.forClass(DashboardDeletedEvent.class);
         verify(clusterEventBus, times(1)).post(eventCaptor.capture());
