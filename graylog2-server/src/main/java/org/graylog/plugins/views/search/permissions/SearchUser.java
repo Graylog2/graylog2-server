@@ -49,7 +49,7 @@ public class SearchUser implements SearchPermissions, StreamPermissions, ViewPer
         return isPermitted(ViewsRestPermissions.VIEW_DELETE, view.id());
     }
 
-    public boolean hasStreamReadPermission(String streamId) {
+    public boolean canReadStream(String streamId) {
         return isPermitted(RestPermissions.STREAMS_READ, streamId);
     }
 

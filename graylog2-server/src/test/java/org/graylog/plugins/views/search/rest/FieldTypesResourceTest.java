@@ -91,8 +91,8 @@ public class FieldTypesResourceTest {
 
     @Test
     public void allFieldTypesChecksPermissionsForStream() {
-        when(searchUser.hasStreamReadPermission(eq("2323"))).thenReturn(false);
-        when(searchUser.hasStreamReadPermission(eq("4242"))).thenReturn(true);
+        when(searchUser.canReadStream(eq("2323"))).thenReturn(false);
+        when(searchUser.canReadStream(eq("4242"))).thenReturn(true);
 
         when(permittedStreams.load(isPermittedCaptor.capture())).thenReturn(ImmutableSet.of());
 
@@ -118,8 +118,8 @@ public class FieldTypesResourceTest {
 
     @Test
     public void passesRequestedTimeRangeToMappedFieldTypesService() throws Exception {
-        when(searchUser.hasStreamReadPermission(eq("2323"))).thenReturn(true);
-        when(searchUser.hasStreamReadPermission(eq("4242"))).thenReturn(true);
+        when(searchUser.canReadStream(eq("2323"))).thenReturn(true);
+        when(searchUser.canReadStream(eq("4242"))).thenReturn(true);
 
         final FieldTypesForStreamsRequest request = FieldTypesForStreamsRequest.Builder.builder()
                 .streams(ImmutableSet.of("2323", "4242"))
@@ -135,8 +135,8 @@ public class FieldTypesResourceTest {
 
     @Test
     public void byStreamChecksPermissionsForStream() {
-        when(searchUser.hasStreamReadPermission(eq("2323"))).thenReturn(true);
-        when(searchUser.hasStreamReadPermission(eq("4242"))).thenReturn(true);
+        when(searchUser.canReadStream(eq("2323"))).thenReturn(true);
+        when(searchUser.canReadStream(eq("4242"))).thenReturn(true);
 
         this.fieldTypesResource.byStreams(
                 FieldTypesForStreamsRequest.Builder.builder()
@@ -147,15 +147,15 @@ public class FieldTypesResourceTest {
 
         final ArgumentCaptor<String> streamIdCaptor = ArgumentCaptor.forClass(String.class);
 
-        verify(searchUser, times(2)).hasStreamReadPermission(streamIdCaptor.capture());
+        verify(searchUser, times(2)).canReadStream(streamIdCaptor.capture());
 
         assertThat(streamIdCaptor.getAllValues()).containsExactlyInAnyOrder("2323", "4242");
     }
 
     @Test
     public void byStreamReturnsTypesFromMappedFieldTypesService() {
-        when(searchUser.hasStreamReadPermission(eq("2323"))).thenReturn(true);
-        when(searchUser.hasStreamReadPermission(eq("4242"))).thenReturn(true);
+        when(searchUser.canReadStream(eq("2323"))).thenReturn(true);
+        when(searchUser.canReadStream(eq("4242"))).thenReturn(true);
 
         final Set<MappedFieldTypeDTO> fieldTypes = Collections.singleton(MappedFieldTypeDTO.create("foobar",
                 FieldTypes.Type.createType("long", ImmutableSet.of("numeric", "enumerable"))));

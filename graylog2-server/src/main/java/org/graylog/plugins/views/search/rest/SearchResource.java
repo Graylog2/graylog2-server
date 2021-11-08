@@ -180,11 +180,11 @@ public class SearchResource extends RestResource implements PluginRestResource {
     }
 
     private ImmutableSet<String> loadAllAllowedStreamsForUser(SearchUser searchUser) {
-        return permittedStreams.load(searchUser::hasStreamReadPermission);
+        return permittedStreams.load(searchUser::canReadStream);
     }
 
     private void guard(Search search, SearchUser searchUser) {
-        this.executionGuard.check(search, searchUser::hasStreamReadPermission);
+        this.executionGuard.check(search, searchUser::canReadStream);
     }
 
     @POST

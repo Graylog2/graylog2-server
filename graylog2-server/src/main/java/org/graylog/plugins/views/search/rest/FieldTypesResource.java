@@ -59,14 +59,14 @@ public class FieldTypesResource extends RestResource implements PluginRestResour
     @GET
     @ApiOperation(value = "Retrieve the list of all fields present in the system")
     public Set<MappedFieldTypeDTO> allFieldTypes(@Context SearchUser searchUser) {
-        return mappedFieldTypesService.fieldTypesByStreamIds(permittedStreams.load(searchUser::hasStreamReadPermission), RelativeRange.allTime());
+        return mappedFieldTypesService.fieldTypesByStreamIds(permittedStreams.load(searchUser::canReadStream), RelativeRange.allTime());
     }
 
     @POST
     @ApiOperation(value = "Retrieve the field list of a given set of streams")
     @NoAuditEvent("This is not changing any data")
     public Set<MappedFieldTypeDTO> byStreams(FieldTypesForStreamsRequest request, @Context SearchUser searchUser) {
-        final Set<String> streams = request.streams().orElse(permittedStreams.load(searchUser::hasStreamReadPermission));
+        final Set<String> streams = request.streams().orElse(permittedStreams.load(searchUser::canReadStream));
         checkStreamPermission(streams, searchUser);
 
         return mappedFieldTypesService.fieldTypesByStreamIds(streams, request.timerange().orElse(RelativeRange.allTime()));
@@ -74,7 +74,7 @@ public class FieldTypesResource extends RestResource implements PluginRestResour
 
     private void checkStreamPermission(Set<String> streamIds, SearchUser searchUser) {
         final Set<String> notPermittedStreams = streamIds.stream()
-                .filter(streamId -> !searchUser.hasStreamReadPermission(streamId))
+                .filter(streamId -> !searchUser.canReadStream(streamId))
                 .collect(Collectors.toSet());
         if (!notPermittedStreams.isEmpty()) {
             LOG.info("Not authorized to access resource id <{}>. User <{}> is missing permission <{}:{}>",

@@ -107,7 +107,7 @@ public class MessagesResource extends RestResource implements PluginRestResource
                                                       @Context SearchUser searchUser) {
         final MessagesRequest request = fillInIfNecessary(rawrequest, searchUser);
 
-        executionGuard.checkUserIsPermittedToSeeStreams(request.streams(), searchUser::hasStreamReadPermission);
+        executionGuard.checkUserIsPermittedToSeeStreams(request.streams(), searchUser::canReadStream);
 
         ExportMessagesCommand command = commandFactory.buildFromRequest(request);
 
@@ -218,12 +218,12 @@ public class MessagesResource extends RestResource implements PluginRestResource
 
         search = search.applyExecutionState(objectMapper, executionState);
 
-        executionGuard.check(search, searchUser::hasStreamReadPermission);
+        executionGuard.check(search, searchUser::canReadStream);
 
         return search;
     }
 
     private ImmutableSet<String> loadAllAllowedStreamsForUser(SearchUser searchUser) {
-        return permittedStreams.load(searchUser::hasStreamReadPermission);
+        return permittedStreams.load(searchUser::canReadStream);
     }
 }
