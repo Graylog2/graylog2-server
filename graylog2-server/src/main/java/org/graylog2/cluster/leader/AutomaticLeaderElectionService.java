@@ -84,7 +84,7 @@ public class AutomaticLeaderElectionService extends AbstractExecutionThreadServi
         }
     }
 
-    private void runIteration() throws InterruptedException {
+    private void runIteration() {
         final boolean wasLeader = isLeader;
 
         try {
