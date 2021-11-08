@@ -42,7 +42,7 @@ public class SearchUser implements SearchPermissions, StreamPermissions, ViewPer
         return this.currentUser.getName();
     }
 
-    public boolean canRead(ViewLike view) {
+    public boolean canReadView(ViewLike view) {
         final String viewId = view.id();
         return isPermitted(ViewsRestPermissions.VIEW_READ, viewId)
                 || (view.type().equals(ViewDTO.Type.DASHBOARD) && isPermitted(RestPermissions.DASHBOARDS_READ, viewId));
@@ -54,14 +54,14 @@ public class SearchUser implements SearchPermissions, StreamPermissions, ViewPer
     }
 
     @Override
-    public boolean canUpdate(ViewLike view) {
+    public boolean canUpdateView(ViewLike view) {
         return view.type().equals(ViewDTO.Type.DASHBOARD)
                 ? isPermitted(ViewsRestPermissions.VIEW_EDIT, view.id()) || isPermitted(RestPermissions.DASHBOARDS_EDIT, view.id())
                 : isPermitted(ViewsRestPermissions.VIEW_EDIT, view.id());
     }
 
     @Override
-    public boolean canDelete(ViewLike view) {
+    public boolean canDeleteView(ViewLike view) {
         return isPermitted(ViewsRestPermissions.VIEW_DELETE, view.id());
     }
 

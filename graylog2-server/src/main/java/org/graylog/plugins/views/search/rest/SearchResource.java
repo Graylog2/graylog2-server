@@ -144,7 +144,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @ApiOperation(value = "Get all searches which the user may see")
     public List<Search> getAllSearches(@Context SearchUser searchUser) {
         // TODO should be paginated
-        return searchDomain.getAllForUser(searchUser, searchUser::canRead);
+        return searchDomain.getAllForUser(searchUser, searchUser::canReadView);
     }
 
     @POST

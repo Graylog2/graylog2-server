@@ -49,7 +49,7 @@ public class SearchDomain {
     }
 
     private void checkPermission(String userName, SearchUser searchUser, Search search) {
-        if (!hasReadPermissionFor(searchUser, searchUser::canRead, search))
+        if (!hasReadPermissionFor(searchUser, searchUser::canReadView, search))
             throw new PermissionException("User " + userName + " does not have permission to load search " + search.id());
     }
 

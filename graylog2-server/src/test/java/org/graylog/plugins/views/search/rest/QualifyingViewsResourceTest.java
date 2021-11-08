@@ -67,11 +67,11 @@ public class QualifyingViewsResourceTest {
         final ViewParameterSummaryDTO view1 = mock(ViewParameterSummaryDTO.class);
         when(view1.id()).thenReturn("view1");
         when(view1.type()).thenReturn(ViewDTO.Type.SEARCH);
-        when(searchUser.canRead(eq(view1))).thenReturn(false);
+        when(searchUser.canReadView(eq(view1))).thenReturn(false);
         final ViewParameterSummaryDTO view2 = mock(ViewParameterSummaryDTO.class);
         when(view2.id()).thenReturn("view2");
         when(view2.type()).thenReturn(ViewDTO.Type.SEARCH);
-        when(searchUser.canRead(eq(view2))).thenReturn(false);
+        when(searchUser.canReadView(eq(view2))).thenReturn(false);
         when(qualifyingViewsService.forValue()).thenReturn(ImmutableList.of(view1, view2));
 
         final Collection<ViewParameterSummaryDTO> result = this.qualifyingViewsResource.forParameter(searchUser);
@@ -84,11 +84,11 @@ public class QualifyingViewsResourceTest {
         final ViewParameterSummaryDTO view1 = mock(ViewParameterSummaryDTO.class);
         when(view1.id()).thenReturn("view1");
         when(view1.type()).thenReturn(ViewDTO.Type.SEARCH);
-        when(searchUser.canRead(eq(view1))).thenReturn(false);
+        when(searchUser.canReadView(eq(view1))).thenReturn(false);
         final ViewParameterSummaryDTO view2 = mock(ViewParameterSummaryDTO.class);
         when(view2.id()).thenReturn("view2");
         when(view2.type()).thenReturn(ViewDTO.Type.SEARCH);
-        when(searchUser.canRead(eq(view2))).thenReturn(true);
+        when(searchUser.canReadView(eq(view2))).thenReturn(true);
         when(qualifyingViewsService.forValue()).thenReturn(ImmutableList.of(view1, view2));
 
         final Collection<ViewParameterSummaryDTO> result = this.qualifyingViewsResource.forParameter(searchUser);
@@ -100,10 +100,10 @@ public class QualifyingViewsResourceTest {
     public void returnsAllViewsIfAllArePermitted() {
         final ViewParameterSummaryDTO view1 = mock(ViewParameterSummaryDTO.class);
         when(view1.id()).thenReturn("view1");
-        when(searchUser.canRead(eq(view1))).thenReturn(true);
+        when(searchUser.canReadView(eq(view1))).thenReturn(true);
         final ViewParameterSummaryDTO view2 = mock(ViewParameterSummaryDTO.class);
         when(view2.id()).thenReturn("view2");
-        when(searchUser.canRead(eq(view2))).thenReturn(true);
+        when(searchUser.canReadView(eq(view2))).thenReturn(true);
         when(qualifyingViewsService.forValue()).thenReturn(ImmutableList.of(view1, view2));
 
         final Collection<ViewParameterSummaryDTO> result = this.qualifyingViewsResource.forParameter(searchUser);

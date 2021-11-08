@@ -53,7 +53,7 @@ public class QualifyingViewsResource extends RestResource implements PluginRestR
     public Collection<ViewParameterSummaryDTO> forParameter(@Context SearchUser searchUser) {
         return qualifyingViewsService.forValue()
                 .stream()
-                .filter(searchUser::canRead)
+                .filter(searchUser::canReadView)
                 .collect(Collectors.toSet());
     }
 }

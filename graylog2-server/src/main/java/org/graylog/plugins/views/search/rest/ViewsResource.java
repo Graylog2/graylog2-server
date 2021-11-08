@@ -115,7 +115,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
             final SearchQuery searchQuery = searchQueryParser.parse(query);
             final PaginatedList<ViewDTO> result = dbService.searchPaginated(
                     searchQuery,
-                    searchUser::canRead,
+                    searchUser::canReadView,
                     order,
                     sortField,
                     page,
@@ -134,12 +134,12 @@ public class ViewsResource extends RestResource implements PluginRestResource {
         if ("default".equals(id)) {
             // If the user is not permitted to access the default view, return a 404
             return dbService.getDefault()
-                    .filter(searchUser::canRead)
+                    .filter(searchUser::canReadView)
                     .orElseThrow(() -> new NotFoundException("Default view doesn't exist"));
         }
 
         final ViewDTO view = loadView(id);
-        if (searchUser.canRead(view)) {
+        if (searchUser.canReadView(view)) {
             return view;
         }
 
@@ -215,7 +215,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
                           @ApiParam @Valid ViewDTO dto,
                           @Context SearchUser searchUser) {
         final ViewDTO updatedDTO = dto.toBuilder().id(id).build();
-        if (!searchUser.canUpdate(updatedDTO)) {
+        if (!searchUser.canUpdateView(updatedDTO)) {
             throw new ForbiddenException("Not allowed to edit " + summarize(updatedDTO) + ".");
         }
 
@@ -241,7 +241,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     public ViewDTO delete(@ApiParam(name = "id") @PathParam("id") @NotEmpty String id,
                           @Context SearchUser searchUser) {
         final ViewDTO view = loadView(id);
-        if (!searchUser.canDelete(view)) {
+        if (!searchUser.canDeleteView(view)) {
             throw new ForbiddenException("Unable to delete " + summarize(view) + ".");
         }
 
