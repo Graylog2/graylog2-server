@@ -253,7 +253,9 @@ public class Generator {
                         operation.put("produces", produces.value());
                     }
                     // skip Response.class because we can't reliably infer any schema information from its payload anyway.
-                    final TypeSchema responseType = extractResponseType(method);
+                    final TypeSchema responseType = apiOperation.response().equals(Void.class)
+                            ? extractResponseType(method)
+                            : typeSchema(TypeToken.of(apiOperation.response()).getType());
                     if (responseType != null) {
                         models.putAll(responseType.models());
                         if (responseType.name() != null && isObjectSchema(responseType.type())) {
