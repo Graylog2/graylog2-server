@@ -120,8 +120,7 @@ public class MongoLockServiceTest {
         for (Document doc : indices) {
             final Set<String> keySet = doc.get("key", Document.class).keySet();
             if (keySet.contains(FIELD_UPDATED_AT)) {
-                final Object obj = doc.get("expireAfterSeconds");
-                final long expireAfterSeconds = obj instanceof Integer ? ((Integer) obj).longValue() : ((Long) obj);
+                final long expireAfterSeconds = doc.get("expireAfterSeconds", Number.class).longValue();
                 if (Objects.equals(expireAfterSeconds, Duration.ofSeconds(72).getSeconds())) {
                     found = true;
                 }
