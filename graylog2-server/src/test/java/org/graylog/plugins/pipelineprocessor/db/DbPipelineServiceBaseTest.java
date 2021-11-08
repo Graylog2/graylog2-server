@@ -84,7 +84,7 @@ public abstract class DbPipelineServiceBaseTest {
         });
 
         final long started = System.currentTimeMillis();
-        assertThat(underTest.loadByRules(ImmutableSet.of("debug#2", "debug#3"))).hasSize(1000);
+        assertThat(underTest.loadByRules(ImmutableSet.of("debug#2", "debug#3"))).hasSize(500);
         final long took = System.currentTimeMillis() - started;
         assertThat(took).isLessThan(1000);
     }
