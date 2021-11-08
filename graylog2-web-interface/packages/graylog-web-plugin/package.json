@@ -55,7 +55,7 @@
     "react-query": "3.31.0",
     "react-router": "5.2.1",
     "react-router-bootstrap": "0.25.0",
-    "react-router-dom": "5.3.0",
+    "react-router-dom": "6.0.1",
     "reflux": "0.2.13",
     "styled-components": "5.3.3",
     "stylelint-config-graylog": "file:../stylelint-config-graylog",
