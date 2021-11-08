@@ -35,13 +35,11 @@ public class AutomaticLeaderElectionService extends AbstractExecutionThreadServi
 
     public static final java.time.Duration DEFAULT_POLLING_INTERVAL = Duration.ofSeconds(2);
 
-    public static final Duration POLLING_INTERVAL = Duration.ofSeconds(2);
-    public static final Duration LOCK_TTL = Duration.ofMinutes(1);
-
     private final LockService lockService;
     private final EventBus eventBus;
     private final NodePingThread nodePingThread;
-    private final Duration leaderElectionLockPollingInterval;
+    private final Duration pollingInterval;
+    private final Duration lockTTL;
 
     private volatile boolean isLeader = false;
     private Thread executionThread;
@@ -51,7 +49,8 @@ public class AutomaticLeaderElectionService extends AbstractExecutionThreadServi
                                           LockService lockService,
                                           EventBus eventBus,
                                           NodePingThread nodePingThread) {
-        this.leaderElectionLockPollingInterval = configuration.getLeaderElectionLockPollingInterval();
+        this.pollingInterval = configuration.getLeaderElectionLockPollingInterval();
+        this.lockTTL = configuration.getLeaderElectionLockTTL();
         this.lockService = lockService;
         this.eventBus = eventBus;
         this.nodePingThread = nodePingThread;
@@ -87,7 +86,7 @@ public class AutomaticLeaderElectionService extends AbstractExecutionThreadServi
                 log.error("Unable to acquire/renew leader lock.", e);
 
                 final Duration timeSinceLastSuccess = Duration.ofNanos(System.nanoTime() - lastSuccess);
-                if (wasLeader && timeSinceLastSuccess.compareTo(LOCK_TTL) >= 0) {
+                if (wasLeader && timeSinceLastSuccess.compareTo(lockTTL) >= 0) {
                     log.error("Failed for {} to renew leader lock. Forcing fallback to follower role.",
                             timeSinceLastSuccess);
                     isLeader = false;
@@ -109,15 +108,16 @@ public class AutomaticLeaderElectionService extends AbstractExecutionThreadServi
 
             try {
                 if (wasLeader && !isLeader) {
-                    log.info("Pausing leader-lock acquisition attempts for {} after downgrade from leader.", LOCK_TTL);
+                    log.info("Pausing leader-lock acquisition attempts for {} after downgrade from leader.", lockTTL);
                     //noinspection BusyWait
-                    Thread.sleep(LOCK_TTL.toMillis());
-                    log.info("Resuming leader-lock acquisition attempts every {}.", POLLING_INTERVAL);
+                    Thread.sleep(lockTTL.toMillis());
+                    log.info("Resuming leader-lock acquisition attempts every {}.", pollingInterval);
                 } else {
                     //noinspection BusyWait
-                    Thread.sleep(POLLING_INTERVAL.toMillis());
+                    Thread.sleep(pollingInterval.toMillis());
                 }
             } catch (InterruptedException e) {
+                // OK, we are shutting down.
                 Thread.currentThread().interrupt();
             }
         }

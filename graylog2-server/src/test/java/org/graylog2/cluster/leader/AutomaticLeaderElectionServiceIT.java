@@ -18,17 +18,19 @@ package org.graylog2.cluster.leader;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.Uninterruptibles;
+import org.graylog2.Configuration;
 import org.graylog2.cluster.lock.Lock;
 import org.graylog2.cluster.lock.LockService;
 import org.graylog2.periodical.NodePingThread;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.Duration;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -43,7 +45,7 @@ import static org.mockito.Mockito.when;
 
 @Timeout(value = 30)
 @ExtendWith(MockitoExtension.class)
-class MongoLeaderElectionServiceIT {
+class AutomaticLeaderElectionServiceIT {
     @Mock
     LockService lockService;
 
@@ -53,8 +55,17 @@ class MongoLeaderElectionServiceIT {
     @Mock
     NodePingThread nodePingThread;
 
-    @InjectMocks
-    MongoLeaderElectionService leaderElectionService;
+    @Mock
+    Configuration configuration;
+
+    AutomaticLeaderElectionService leaderElectionService;
+
+    @BeforeEach
+    void setUp() {
+        when(configuration.getLeaderElectionLockPollingInterval()).thenReturn(Duration.ofMillis(100));
+        when(configuration.getLeaderElectionLockTTL()).thenReturn(Duration.ofSeconds(10));
+        leaderElectionService = new AutomaticLeaderElectionService(configuration, lockService, eventBus, nodePingThread);
+    }
 
     @AfterEach
     void tearDown() {
@@ -117,7 +128,7 @@ class MongoLeaderElectionServiceIT {
 
         // polling should continue
         int lockCount = lockInvocations.get();
-        Uninterruptibles.sleepUninterruptibly(MongoLeaderElectionService.POLLING_INTERVAL.multipliedBy(2));
+        Uninterruptibles.sleepUninterruptibly(configuration.getLeaderElectionLockPollingInterval().multipliedBy(2));
         assertThat(lockInvocations.get()).isGreaterThan(lockCount);
 
         lock.set(null);
@@ -125,7 +136,7 @@ class MongoLeaderElectionServiceIT {
 
         // polling should have been paused
         lockCount = lockInvocations.get();
-        Uninterruptibles.sleepUninterruptibly(MongoLeaderElectionService.POLLING_INTERVAL.multipliedBy(2));
+        Uninterruptibles.sleepUninterruptibly(configuration.getLeaderElectionLockPollingInterval().multipliedBy(2));
         assertThat(lockInvocations.get()).isEqualTo(lockCount);
     }
 }
