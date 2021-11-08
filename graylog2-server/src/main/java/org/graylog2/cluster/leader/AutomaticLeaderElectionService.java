@@ -101,4 +101,8 @@ public class AutomaticLeaderElectionService extends AbstractExecutionThreadServi
         executionThread.interrupt();
     }
 
+    @Override
+    public void giveUpLeader() {
+        lockService.unlock(RESOURCE_NAME).ifPresent(l -> log.info("Gave up leader lock on shutdown"));
+    }
 }
