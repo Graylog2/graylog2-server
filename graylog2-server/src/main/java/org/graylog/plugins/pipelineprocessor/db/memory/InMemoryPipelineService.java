@@ -16,10 +16,10 @@
  */
 package org.graylog.plugins.pipelineprocessor.db.memory;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
+import org.graylog.plugins.pipelineprocessor.db.PipelineServiceHelper;
 import org.graylog.plugins.pipelineprocessor.events.PipelinesChangedEvent;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
@@ -31,7 +31,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Collectors;
 
 /**
  * A PipelineService that does not persist any data, but simply keeps it in memory.
@@ -43,10 +42,12 @@ public class InMemoryPipelineService implements PipelineService {
     private final Map<String, PipelineDao> store = new ConcurrentHashMap<>();
     private final Map<String, String> titleToId = new ConcurrentHashMap<>();
 
+    private final PipelineServiceHelper pipelineServiceHelper;
     private final ClusterEventBus clusterBus;
 
     @Inject
-    public InMemoryPipelineService(ClusterEventBus clusterBus) {
+    public InMemoryPipelineService(PipelineServiceHelper pipelineServiceHelper, ClusterEventBus clusterBus) {
+        this.pipelineServiceHelper = pipelineServiceHelper;
         this.clusterBus = clusterBus;
     }
 
@@ -90,12 +91,7 @@ public class InMemoryPipelineService implements PipelineService {
 
     @Override
     public List<PipelineDao> loadByRules(Set<String> ruleNames) {
-        if (ruleNames.isEmpty()) {
-            return ImmutableList.of();
-        }
-        return store.values().stream()
-                .filter(pipelineDao -> ruleNames.stream().anyMatch(pipelineDao::usesRule))
-                .collect(Collectors.toList());
+        return pipelineServiceHelper.filterByRuleName(this::loadAll, ruleNames);
     }
 
     @Override

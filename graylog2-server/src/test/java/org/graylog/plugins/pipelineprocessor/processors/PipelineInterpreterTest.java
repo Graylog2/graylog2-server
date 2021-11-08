@@ -362,7 +362,7 @@ public class PipelineInterpreterTest {
                 null)
         );
 
-        final PipelineService pipelineService = new InMemoryPipelineService(new ClusterEventBus());
+        final PipelineService pipelineService = new InMemoryPipelineService(null, new ClusterEventBus());
         pipelineService.save(PipelineDao.create("cde", "title", "description",
                 "pipeline \"pipeline\"\n" +
                         "stage 0 match all\n" +

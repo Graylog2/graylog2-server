@@ -16,12 +16,12 @@
  */
 package org.graylog.plugins.pipelineprocessor.db.mongodb;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.mongodb.BasicDBObject;
 import com.mongodb.MongoException;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
+import org.graylog.plugins.pipelineprocessor.db.PipelineServiceHelper;
 import org.graylog.plugins.pipelineprocessor.events.PipelinesChangedEvent;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
@@ -41,10 +41,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
-import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class MongoDbPipelineService implements PipelineService {
     private static final Logger log = LoggerFactory.getLogger(MongoDbPipelineService.class);
@@ -52,17 +48,20 @@ public class MongoDbPipelineService implements PipelineService {
     private static final String COLLECTION = "pipeline_processor_pipelines";
 
     private final JacksonDBCollection<PipelineDao, String> dbCollection;
+    private final PipelineServiceHelper pipelineServiceHelper;
     private final ClusterEventBus clusterBus;
 
     @Inject
     public MongoDbPipelineService(MongoConnection mongoConnection,
                                   MongoJackObjectMapperProvider mapper,
+                                  PipelineServiceHelper pipelineServiceHelper,
                                   ClusterEventBus clusterBus) {
         this.dbCollection = JacksonDBCollection.wrap(
                 mongoConnection.getDatabase().getCollection(COLLECTION),
                 PipelineDao.class,
                 String.class,
                 mapper.get());
+        this.pipelineServiceHelper = pipelineServiceHelper;
         this.clusterBus = clusterBus;
         dbCollection.createIndex(DBSort.asc("title"), new BasicDBObject("unique", true));
     }
@@ -98,19 +97,7 @@ public class MongoDbPipelineService implements PipelineService {
 
     @Override
     public List<PipelineDao> loadByRules(Set<String> ruleNames) {
-        if (ruleNames.isEmpty()) {
-            return ImmutableList.of();
-        }
-        final DBQuery.Query query = DBQuery.or(
-                ruleNames
-                        .stream()
-                        .map(rn -> DBQuery.regex("source", Pattern.compile(f("rule\\s*\\\"%s\\\"", rn))))
-                        .collect(Collectors.toList())
-                        .toArray(new DBQuery.Query[ruleNames.size()])
-        );
-        try (final DBCursor<PipelineDao> daos = dbCollection.find(query)) {
-            return ImmutableList.copyOf((Iterator<PipelineDao>) daos);
-        }
+        return pipelineServiceHelper.filterByRuleName(this::loadAll, ruleNames);
     }
 
     @Override
