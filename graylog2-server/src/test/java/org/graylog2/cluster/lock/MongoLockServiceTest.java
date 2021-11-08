@@ -18,12 +18,10 @@ package org.graylog2.cluster.lock;
 
 import com.mongodb.client.ListIndexesIterable;
 import org.bson.Document;
-import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.plugin.system.NodeId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -39,8 +37,7 @@ import static org.graylog2.cluster.lock.Lock.FIELD_UPDATED_AT;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(MongoDBExtension.class)
-public class MongoLockServiceTest {
+public abstract class MongoLockServiceTest {
 
     private LockService lockService;
 
