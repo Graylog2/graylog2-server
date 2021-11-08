@@ -38,8 +38,8 @@ public class LeaderElectionModule extends PluginModule {
                 bind(LeaderElectionService.class).to(StaticLeaderElectionService.class).in(Scopes.SINGLETON);
                 break;
             case AUTOMATIC:
-                bind(LeaderElectionService.class).to(MongoLeaderElectionService.class).in(Scopes.SINGLETON);
-                serviceBinder().addBinding().to(MongoLeaderElectionService.class).in(Scopes.SINGLETON);
+                bind(LeaderElectionService.class).to(AutomaticLeaderElectionService.class).in(Scopes.SINGLETON);
+                serviceBinder().addBinding().to(AutomaticLeaderElectionService.class).in(Scopes.SINGLETON);
                 bind(LockService.class).to(MongoLockService.class).in(Scopes.SINGLETON);
                 break;
             default:

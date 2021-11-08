@@ -25,11 +25,13 @@ import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.ReturnDocument;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.system.NodeId;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 import java.time.Duration;
 import java.time.Instant;
@@ -37,6 +39,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static com.mongodb.client.model.Filters.and;
@@ -54,20 +57,43 @@ import static org.graylog2.cluster.lock.Lock.FIELD_UPDATED_AT;
  */
 @Singleton
 public class MongoLockService implements LockService {
-    private static final Duration LOCK_TTL = Duration.ofSeconds(60);
 
-    private static final String COLLECTION_NAME = "cluster_locks";
+    public static final String COLLECTION_NAME = "cluster_locks";
+    public static final java.time.Duration MIN_LOCK_TTL = Duration.ofSeconds(60);
 
     private final NodeId nodeId;
     private final MongoCollection<Document> collection;
 
     @Inject
-    public MongoLockService(NodeId nodeId, MongoConnection mongoConnection) {
+    public MongoLockService(NodeId nodeId,
+                            MongoConnection mongoConnection,
+                            @Named("leader_election_lock_ttl") Duration leaderElectionLockTTL) {
         this.nodeId = nodeId;
 
         collection = mongoConnection.getMongoDatabase().getCollection(COLLECTION_NAME);
+
         collection.createIndex(Indexes.ascending(FIELD_RESOURCE_NAME), new IndexOptions().unique(true));
-        collection.createIndex(Indexes.ascending(FIELD_UPDATED_AT), new IndexOptions().expireAfter(LOCK_TTL.getSeconds(), TimeUnit.SECONDS));
+
+        final Bson updatedAtKey = Indexes.ascending(FIELD_UPDATED_AT);
+        final IndexOptions indexOptions = new IndexOptions().expireAfter(leaderElectionLockTTL.getSeconds(), TimeUnit.SECONDS);
+        ensureTTLIndex(collection, updatedAtKey, indexOptions);
+    }
+
+    // MongoDB Indexes cannot be altered once created. If the leaderElectionLockTTL has changed, replace the index
+    private void ensureTTLIndex(MongoCollection<Document> collection, Bson updatedAtKey, IndexOptions indexOptions) {
+        for (Document document : collection.listIndexes()) {
+            final Set<String> keySet = document.get("key", Document.class).keySet();
+            if (keySet.contains(FIELD_UPDATED_AT)) {
+                // Since MongoDB 5.0 this is an Integer. Used to be a Long ¯\_(ツ)_/¯
+                final long expireAfterSeconds = document.get("expireAfterSeconds", Number.class).longValue();
+                if (Objects.equals(expireAfterSeconds, indexOptions.getExpireAfter(TimeUnit.SECONDS))) {
+                    return;
+                }
+                collection.dropIndex(updatedAtKey);
+            }
+        }
+        // not found or dropped, creating new index
+        collection.createIndex(updatedAtKey, indexOptions);
     }
 
     /**

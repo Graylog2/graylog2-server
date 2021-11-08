@@ -18,7 +18,7 @@ package org.graylog2.cluster.leader;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.AbstractExecutionThreadService;
-import com.google.common.util.concurrent.Uninterruptibles;
+import org.graylog2.Configuration;
 import org.graylog2.cluster.lock.LockService;
 import org.graylog2.periodical.NodePingThread;
 import org.slf4j.Logger;
@@ -26,22 +26,29 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-
-import static java.util.concurrent.TimeUnit.SECONDS;
+import java.time.Duration;
 
 @Singleton
-public class MongoLeaderElectionService extends AbstractExecutionThreadService implements LeaderElectionService {
+public class AutomaticLeaderElectionService extends AbstractExecutionThreadService implements LeaderElectionService {
     private static final String RESOURCE_NAME = "cluster-leader";
-    private static final Logger log = LoggerFactory.getLogger(MongoLeaderElectionService.class);
+    private static final Logger log = LoggerFactory.getLogger(AutomaticLeaderElectionService.class);
+
+    public static final java.time.Duration DEFAULT_POLLING_INTERVAL = Duration.ofSeconds(2);
 
     private final LockService lockService;
     private final EventBus eventBus;
     private final NodePingThread nodePingThread;
+    private final Duration leaderElectionLockPollingInterval;
 
     private volatile boolean isLeader = false;
+    private Thread executionThread;
 
     @Inject
-    public MongoLeaderElectionService(LockService lockService, EventBus eventBus, NodePingThread nodePingThread) {
+    public AutomaticLeaderElectionService(Configuration configuration,
+                                          LockService lockService,
+                                          EventBus eventBus,
+                                          NodePingThread nodePingThread) {
+        this.leaderElectionLockPollingInterval = configuration.getLeaderElectionLockPollingInterval();
         this.lockService = lockService;
         this.eventBus = eventBus;
         this.nodePingThread = nodePingThread;
@@ -50,6 +57,12 @@ public class MongoLeaderElectionService extends AbstractExecutionThreadService i
     @Override
     public boolean isLeader() {
         return isLeader;
+    }
+
+    @Override
+    protected void startUp() throws Exception {
+        super.startUp();
+        executionThread = Thread.currentThread();
     }
 
     @Override
@@ -74,9 +87,18 @@ public class MongoLeaderElectionService extends AbstractExecutionThreadService i
                 eventBus.post(new LeaderChangedEvent());
             }
 
-            // TODO: make configurable. Handle interruption on shutdown.
-            Uninterruptibles.sleepUninterruptibly(2, SECONDS);
+            try {
+                //noinspection BusyWait
+                Thread.sleep(leaderElectionLockPollingInterval.toMillis());
+            } catch (InterruptedException e) {
+                break;
+            }
         }
+    }
+
+    @Override
+    public void triggerShutdown() {
+        executionThread.interrupt();
     }
 
     @Override
