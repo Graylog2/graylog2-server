@@ -43,9 +43,9 @@ import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@Timeout(value = 30)
+@Timeout(value = 10)
 @ExtendWith(MockitoExtension.class)
-class AutomaticLeaderElectionServiceIT {
+class AutomaticLeaderElectionServiceTest {
     @Mock
     LockService lockService;
 
@@ -63,7 +63,7 @@ class AutomaticLeaderElectionServiceIT {
     @BeforeEach
     void setUp() {
         when(configuration.getLeaderElectionLockPollingInterval()).thenReturn(Duration.ofMillis(100));
-        when(configuration.getLeaderElectionLockTTL()).thenReturn(Duration.ofSeconds(1));
+        when(configuration.getLeaderElectionLockTTL()).thenReturn(Duration.ofMillis(500));
         leaderElectionService = new AutomaticLeaderElectionService(configuration, lockService, eventBus, nodePingThread);
     }
 
