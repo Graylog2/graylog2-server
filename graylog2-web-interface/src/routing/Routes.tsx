@@ -306,7 +306,7 @@ const pluginRoute = (routeKey, throwError = true) => {
   PluginStore.exports('routes').forEach((route) => {
     const uri = new URI(route.path);
     const segments = uri.segment();
-    const key = segments.map((segment) => segment.replace(':', '')).join('_').toUpperCase();
+    const key = segments.map((segment) => segment.replace(':', '')).join('_').toLocaleUpperCase('en');
     const paramNames = segments.filter((segment) => segment.startsWith(':'));
 
     if (paramNames.length > 0) {

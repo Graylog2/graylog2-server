@@ -30,7 +30,7 @@ class InputStateComparator {
   }
 
   compare(state1, state2) {
-    return this.mapping[state1.toUpperCase()] - this.mapping[state2.toUpperCase()];
+    return this.mapping[state1.toLocaleUpperCase('en')] - this.mapping[state2.toLocaleUpperCase('en')];
   }
 }
 

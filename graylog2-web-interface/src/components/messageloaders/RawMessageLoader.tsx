@@ -56,7 +56,7 @@ const ServerInputSelect = ({ inputs, selectedInputId, onInputSelect }: Subtract<
     const formattedInputs = [];
 
     inputs
-      .sort((inputA, inputB) => inputA.title.toLowerCase().localeCompare(inputB.title.toLowerCase()))
+      .sort((inputA, inputB) => inputA.title.toLocaleLowerCase('en').localeCompare(inputB.title.toLocaleLowerCase('en')))
       .forEach((input, id) => {
         const label = `${id} / ${input.title} / ${input.name}`;
 
@@ -211,7 +211,7 @@ const RawMessageLoader = ({ onMessageLoaded, inputIdSelector, codecTypes, inputs
         // Add id as label on codecs not having a descriptor name
         return { value: id, label: name === '' ? id : name };
       })
-      .sort((codecA, codecB) => codecA.label.toLowerCase().localeCompare(codecB.label.toLowerCase()));
+      .sort((codecA, codecB) => codecA.label.toLocaleLowerCase('en').localeCompare(codecB.label.toLocaleLowerCase('en')));
   };
 
   const _onCodecSelect = (selectedCodec: string) => {

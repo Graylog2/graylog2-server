@@ -69,13 +69,13 @@ export const InputStatesStore = singletonStore(
       const failedNodes = nodes.filter((nodeId) => response[nodeId] === null);
 
       if (failedNodes.length === 0) {
-        UserNotification.success(`Request to ${action.toLowerCase()} input '${input.title}' was sent successfully.`,
+        UserNotification.success(`Request to ${action.toLocaleLowerCase('en')} input '${input.title}' was sent successfully.`,
           `Input '${input.title}' will be ${action === 'START' ? 'started' : 'stopped'} shortly`);
       } else if (failedNodes.length === nodes.length) {
-        UserNotification.error(`Request to ${action.toLowerCase()} input '${input.title}' failed. Check your Graylog logs for more information.`,
+        UserNotification.error(`Request to ${action.toLocaleLowerCase('en')} input '${input.title}' failed. Check your Graylog logs for more information.`,
           `Input '${input.title}' could not be ${action === 'START' ? 'started' : 'stopped'}`);
       } else {
-        UserNotification.warning(`Request to ${action.toLowerCase()} input '${input.title}' failed in some nodes. Check your Graylog logs for more information.`,
+        UserNotification.warning(`Request to ${action.toLocaleLowerCase('en')} input '${input.title}' failed in some nodes. Check your Graylog logs for more information.`,
           `Input '${input.title}' could not be ${action === 'START' ? 'started' : 'stopped'} in all nodes`);
       }
     },

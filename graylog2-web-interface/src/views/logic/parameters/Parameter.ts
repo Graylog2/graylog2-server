@@ -97,7 +97,7 @@ class Parameter {
 
   static fromJSON(value: ParameterJson): Parameter {
     const { type = 'value-parameter-v1' } = value; // default to ValueParameter in case type is empty
-    const implementingClass = Parameter.__registrations[type.toLocaleLowerCase()];
+    const implementingClass = Parameter.__registrations[type.toLocaleLowerCase('en')];
 
     if (implementingClass) {
       return implementingClass.fromJSON(value);
@@ -107,7 +107,7 @@ class Parameter {
   }
 
   static registerSubtype(type: string, implementingClass: ParameterSubClass) {
-    this.__registrations[type.toLocaleLowerCase()] = implementingClass;
+    this.__registrations[type.toLocaleLowerCase('en')] = implementingClass;
   }
 }
 

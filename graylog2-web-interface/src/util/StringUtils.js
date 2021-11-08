@@ -17,7 +17,7 @@
 const StringUtils = {
   tempDocument: document.createElement('textarea'),
   capitalizeFirstLetter(text) {
-    return text.charAt(0).toUpperCase() + text.slice(1);
+    return text.charAt(0).toLocaleUpperCase('en') + text.slice(1);
   },
   escapeHTML(text) {
     this.tempDocument.textContent = text;

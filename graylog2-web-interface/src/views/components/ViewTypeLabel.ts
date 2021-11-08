@@ -29,7 +29,7 @@ const ViewTypeLabel = ({ type, capitalize }: Props) => {
     return '';
   }
 
-  const typeLabel = type.toLowerCase();
+  const typeLabel = type.toLocaleLowerCase('en');
 
   return capitalize ? StringUtils.capitalizeFirstLetter(typeLabel) : typeLabel;
 };

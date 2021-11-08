@@ -33,7 +33,7 @@ const StyledPanelGroup = styled(PanelGroup)`
 `;
 
 const Accordion = ({ activeKey, children, id, onSelect, ...restProps }:Props) => {
-  const cleanActiveKey = activeKey?.replace(/[^0-9a-zA-Z-]/g, '-').toLowerCase();
+  const cleanActiveKey = activeKey?.replace(/[^0-9a-zA-Z-]/g, '-').toLocaleLowerCase('en');
 
   return (
     <StyledPanelGroup {...restProps}

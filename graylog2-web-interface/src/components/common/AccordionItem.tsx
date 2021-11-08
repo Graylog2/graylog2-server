@@ -60,7 +60,7 @@ const PanelBody = styled(Panel.Body)(({ theme }) => css`
 `);
 
 const AccordionItem = ({ children, name, id, ...restProps }: Props) => {
-  const eventKey = id ?? name.replace(/[^0-9a-zA-Z]/g, '-').toLowerCase();
+  const eventKey = id ?? name.replace(/[^0-9a-zA-Z]/g, '-').toLocaleLowerCase('en');
 
   return (
     <StyledPanel {...restProps} id={id} eventKey={eventKey}>

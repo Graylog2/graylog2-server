@@ -130,7 +130,7 @@ var Docs = {
 			$('.resource ul.endpoints').slideDown();
 			return;
 		}
-		
+
 		$('li#resource_' + resource).addClass('active');
 
 		var elem = $('li#resource_' + resource + ' ul.endpoints');
@@ -149,7 +149,7 @@ var Docs = {
 	expandOperationsForResource: function(resource) {
 		// Make sure the resource container is open..
 		Docs.expandEndpointListForResource(resource);
-		
+
 		if (resource == '') {
 			$('.resource ul.endpoints li.operation div.content').slideDown();
 			return;
@@ -190,7 +190,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   var buffer = "", stack1, functionType="function", self=this;
 
 function program1(depth0,data) {
-  
+
   var buffer = "", stack1;
   buffer += "\n  ";
   stack1 = helpers.each.call(depth0, depth0.produces, {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data});
@@ -199,7 +199,7 @@ function program1(depth0,data) {
   return buffer;
   }
 function program2(depth0,data) {
-  
+
   var buffer = "", stack1;
   buffer += "\n	<option value=\"";
   stack1 = (typeof depth0 === functionType ? depth0.apply(depth0) : depth0);
@@ -212,8 +212,8 @@ function program2(depth0,data) {
   }
 
 function program4(depth0,data) {
-  
-  
+
+
   return "\n  <option value=\"application/json\">application/json</option>\n";
   }
 
@@ -233,7 +233,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   var buffer = "", stack1, functionType="function", escapeExpression=this.escapeExpression, self=this;
 
 function program1(depth0,data) {
-  
+
   var buffer = "", stack1, stack2;
   buffer += "\n    <div class=\"info_title\">"
     + escapeExpression(((stack1 = ((stack1 = depth0.info),stack1 == null || stack1 === false ? stack1 : stack1.title)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
@@ -253,7 +253,7 @@ function program1(depth0,data) {
   return buffer;
   }
 function program2(depth0,data) {
-  
+
   var buffer = "", stack1;
   buffer += "<div class=\"info_tos\"><a href=\""
     + escapeExpression(((stack1 = ((stack1 = depth0.info),stack1 == null || stack1 === false ? stack1 : stack1.termsOfServiceUrl)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
@@ -262,7 +262,7 @@ function program2(depth0,data) {
   }
 
 function program4(depth0,data) {
-  
+
   var buffer = "", stack1;
   buffer += "<div class='info_contact'><a href=\"mailto:"
     + escapeExpression(((stack1 = ((stack1 = depth0.info),stack1 == null || stack1 === false ? stack1 : stack1.contact)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
@@ -271,7 +271,7 @@ function program4(depth0,data) {
   }
 
 function program6(depth0,data) {
-  
+
   var buffer = "", stack1;
   buffer += "<div class='info_license'><a href='"
     + escapeExpression(((stack1 = ((stack1 = depth0.info),stack1 == null || stack1 === false ? stack1 : stack1.licenseUrl)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
@@ -282,7 +282,7 @@ function program6(depth0,data) {
   }
 
 function program8(depth0,data) {
-  
+
   var buffer = "", stack1;
   buffer += "\n        , <span style=\"font-variant: small-caps\">api version</span>: ";
   if (stack1 = helpers.apiVersion) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
@@ -315,7 +315,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   var buffer = "", stack1, functionType="function", escapeExpression=this.escapeExpression, self=this;
 
 function program1(depth0,data) {
-  
+
   var buffer = "", stack1;
   buffer += "\n        <h4>Implementation Notes</h4>\n        <p>";
   if (stack1 = helpers.notes) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
@@ -326,32 +326,32 @@ function program1(depth0,data) {
   }
 
 function program3(depth0,data) {
-  
-  
+
+
   return "\n          <h4>Response Class</h4>\n          <p><span class=\"model-signature\" /></p>\n          <br/>\n          <div class=\"response-content-type\" />\n        ";
   }
 
 function program5(depth0,data) {
-  
-  
+
+
   return "\n          <h4>Parameters</h4>\n          <table class='fullwidth'>\n          <thead>\n            <tr>\n            <th style=\"width: 100px; max-width: 100px\">Parameter</th>\n            <th style=\"width: 310px; max-width: 310px\">Value</th>\n            <th style=\"width: 200px; max-width: 200px\">Description</th>\n            <th style=\"width: 100px; max-width: 100px\">Parameter Type</th>\n            <th style=\"width: 220px; max-width: 230px\">Data Type</th>\n            </tr>\n          </thead>\n          <tbody class=\"operation-params\">\n\n          </tbody>\n          </table>\n          ";
   }
 
 function program7(depth0,data) {
-  
-  
+
+
   return "\n          <div style='margin:0;padding:0;display:inline'></div>\n          <h4>Error Status Codes</h4>\n          <table class='fullwidth'>\n            <thead>\n            <tr>\n              <th>HTTP Status Code</th>\n              <th>Reason</th>\n            </tr>\n            </thead>\n            <tbody class=\"operation-status\">\n            \n            </tbody>\n          </table>\n          ";
   }
 
 function program9(depth0,data) {
-  
-  
+
+
   return "\n          ";
   }
 
 function program11(depth0,data) {
-  
-  
+
+
   return "\n          <div class='sandbox_header'>\n            <input class='submit' name='commit' type='button' value='Try it out!' />\n            <a href='#' class='response_hider' style='display:none'>Hide Response</a>\n            <img alt='Throbber' class='response_throbber' src='images/throbber.gif' style='display:none' />\n          </div>\n          ";
   }
 
@@ -479,7 +479,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   var buffer = "", stack1, functionType="function", escapeExpression=this.escapeExpression, self=this;
 
 function program1(depth0,data) {
-  
+
   var buffer = "", stack1;
   buffer += "\n		";
   stack1 = helpers['if'].call(depth0, depth0.isFile, {hash:{},inverse:self.program(4, program4, data),fn:self.program(2, program2, data),data:data});
@@ -488,7 +488,7 @@ function program1(depth0,data) {
   return buffer;
   }
 function program2(depth0,data) {
-  
+
   var buffer = "", stack1;
   buffer += "\n			<input type=\"file\" name='";
   if (stack1 = helpers.name) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
@@ -499,7 +499,7 @@ function program2(depth0,data) {
   }
 
 function program4(depth0,data) {
-  
+
   var buffer = "", stack1;
   buffer += "\n			";
   stack1 = helpers['if'].call(depth0, depth0.defaultValue, {hash:{},inverse:self.program(7, program7, data),fn:self.program(5, program5, data),data:data});
@@ -508,7 +508,7 @@ function program4(depth0,data) {
   return buffer;
   }
 function program5(depth0,data) {
-  
+
   var buffer = "", stack1;
   buffer += "\n				<textarea class='body-textarea' name='";
   if (stack1 = helpers.name) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
@@ -523,7 +523,7 @@ function program5(depth0,data) {
   }
 
 function program7(depth0,data) {
-  
+
   var buffer = "", stack1;
   buffer += "\n				<textarea class='body-textarea' name='";
   if (stack1 = helpers.name) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
@@ -534,7 +534,7 @@ function program7(depth0,data) {
   }
 
 function program9(depth0,data) {
-  
+
   var buffer = "", stack1;
   buffer += "\n		";
   stack1 = helpers['if'].call(depth0, depth0.defaultValue, {hash:{},inverse:self.program(12, program12, data),fn:self.program(10, program10, data),data:data});
@@ -543,7 +543,7 @@ function program9(depth0,data) {
   return buffer;
   }
 function program10(depth0,data) {
-  
+
   var buffer = "", stack1;
   buffer += "\n			<input class='parameter' minlength='0' name='";
   if (stack1 = helpers.name) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
@@ -558,7 +558,7 @@ function program10(depth0,data) {
   }
 
 function program12(depth0,data) {
-  
+
   var buffer = "", stack1;
   buffer += "\n			<input class='parameter' minlength='0' name='";
   if (stack1 = helpers.name) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
@@ -596,19 +596,19 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   var buffer = "", stack1, stack2, self=this, functionType="function", escapeExpression=this.escapeExpression;
 
 function program1(depth0,data) {
-  
-  
+
+
   return " multiple='multiple'";
   }
 
 function program3(depth0,data) {
-  
-  
+
+
   return "\n    ";
   }
 
 function program5(depth0,data) {
-  
+
   var buffer = "", stack1;
   buffer += "\n      ";
   stack1 = helpers['if'].call(depth0, depth0.defaultValue, {hash:{},inverse:self.program(8, program8, data),fn:self.program(6, program6, data),data:data});
@@ -617,13 +617,13 @@ function program5(depth0,data) {
   return buffer;
   }
 function program6(depth0,data) {
-  
-  
+
+
   return "\n      ";
   }
 
 function program8(depth0,data) {
-  
+
   var buffer = "", stack1;
   buffer += "\n        ";
   stack1 = helpers['if'].call(depth0, depth0.allowMultiple, {hash:{},inverse:self.program(11, program11, data),fn:self.program(9, program9, data),data:data});
@@ -632,19 +632,19 @@ function program8(depth0,data) {
   return buffer;
   }
 function program9(depth0,data) {
-  
-  
+
+
   return "\n         ";
   }
 
 function program11(depth0,data) {
-  
-  
+
+
   return "\n          <option selected=\"\" value=''></option>\n         ";
   }
 
 function program13(depth0,data) {
-  
+
   var buffer = "", stack1;
   buffer += "\n      ";
   stack1 = helpers['if'].call(depth0, depth0.isDefault, {hash:{},inverse:self.program(16, program16, data),fn:self.program(14, program14, data),data:data});
@@ -653,7 +653,7 @@ function program13(depth0,data) {
   return buffer;
   }
 function program14(depth0,data) {
-  
+
   var buffer = "", stack1;
   buffer += "\n        <option selected=\"\" value='";
   if (stack1 = helpers.value) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
@@ -668,7 +668,7 @@ function program14(depth0,data) {
   }
 
 function program16(depth0,data) {
-  
+
   var buffer = "", stack1;
   buffer += "\n        <option value='";
   if (stack1 = helpers.value) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
@@ -720,7 +720,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   var buffer = "", stack1, functionType="function", escapeExpression=this.escapeExpression, self=this;
 
 function program1(depth0,data) {
-  
+
   var buffer = "", stack1;
   buffer += "\n        <textarea class='body-textarea' readonly='readonly' name='";
   if (stack1 = helpers.name) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
@@ -735,7 +735,7 @@ function program1(depth0,data) {
   }
 
 function program3(depth0,data) {
-  
+
   var buffer = "", stack1;
   buffer += "\n        ";
   stack1 = helpers['if'].call(depth0, depth0.defaultValue, {hash:{},inverse:self.program(6, program6, data),fn:self.program(4, program4, data),data:data});
@@ -744,7 +744,7 @@ function program3(depth0,data) {
   return buffer;
   }
 function program4(depth0,data) {
-  
+
   var buffer = "", stack1;
   buffer += "\n            ";
   if (stack1 = helpers.defaultValue) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
@@ -755,8 +755,8 @@ function program4(depth0,data) {
   }
 
 function program6(depth0,data) {
-  
-  
+
+
   return "\n            (empty)\n        ";
   }
 
@@ -788,7 +788,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   var buffer = "", stack1, functionType="function", escapeExpression=this.escapeExpression, self=this;
 
 function program1(depth0,data) {
-  
+
   var buffer = "", stack1;
   buffer += "\n        <textarea class='body-textarea'  readonly='readonly' placeholder='(required)' name='";
   if (stack1 = helpers.name) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
@@ -803,7 +803,7 @@ function program1(depth0,data) {
   }
 
 function program3(depth0,data) {
-  
+
   var buffer = "", stack1;
   buffer += "\n        ";
   stack1 = helpers['if'].call(depth0, depth0.defaultValue, {hash:{},inverse:self.program(6, program6, data),fn:self.program(4, program4, data),data:data});
@@ -812,7 +812,7 @@ function program3(depth0,data) {
   return buffer;
   }
 function program4(depth0,data) {
-  
+
   var buffer = "", stack1;
   buffer += "\n            ";
   if (stack1 = helpers.defaultValue) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
@@ -823,8 +823,8 @@ function program4(depth0,data) {
   }
 
 function program6(depth0,data) {
-  
-  
+
+
   return "\n            (empty)\n        ";
   }
 
@@ -856,7 +856,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   var buffer = "", stack1, functionType="function", escapeExpression=this.escapeExpression, self=this;
 
 function program1(depth0,data) {
-  
+
   var buffer = "", stack1;
   buffer += "\n		";
   stack1 = helpers['if'].call(depth0, depth0.isFile, {hash:{},inverse:self.program(4, program4, data),fn:self.program(2, program2, data),data:data});
@@ -865,7 +865,7 @@ function program1(depth0,data) {
   return buffer;
   }
 function program2(depth0,data) {
-  
+
   var buffer = "", stack1;
   buffer += "\n			<input type=\"file\" name='";
   if (stack1 = helpers.name) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
@@ -876,7 +876,7 @@ function program2(depth0,data) {
   }
 
 function program4(depth0,data) {
-  
+
   var buffer = "", stack1;
   buffer += "\n			";
   stack1 = helpers['if'].call(depth0, depth0.defaultValue, {hash:{},inverse:self.program(7, program7, data),fn:self.program(5, program5, data),data:data});
@@ -885,7 +885,7 @@ function program4(depth0,data) {
   return buffer;
   }
 function program5(depth0,data) {
-  
+
   var buffer = "", stack1;
   buffer += "\n				<textarea class='body-textarea' placeholder='(required)' name='";
   if (stack1 = helpers.name) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
@@ -900,7 +900,7 @@ function program5(depth0,data) {
   }
 
 function program7(depth0,data) {
-  
+
   var buffer = "", stack1;
   buffer += "\n				<textarea class='body-textarea' placeholder='(required)' name='";
   if (stack1 = helpers.name) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
@@ -911,7 +911,7 @@ function program7(depth0,data) {
   }
 
 function program9(depth0,data) {
-  
+
   var buffer = "", stack1;
   buffer += "\n		";
   stack1 = helpers['if'].call(depth0, depth0.isFile, {hash:{},inverse:self.program(12, program12, data),fn:self.program(10, program10, data),data:data});
@@ -920,7 +920,7 @@ function program9(depth0,data) {
   return buffer;
   }
 function program10(depth0,data) {
-  
+
   var buffer = "", stack1;
   buffer += "\n			<input class='parameter' class='required' type='file' name='";
   if (stack1 = helpers.name) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
@@ -931,7 +931,7 @@ function program10(depth0,data) {
   }
 
 function program12(depth0,data) {
-  
+
   var buffer = "", stack1;
   buffer += "\n			";
   stack1 = helpers['if'].call(depth0, depth0.defaultValue, {hash:{},inverse:self.program(15, program15, data),fn:self.program(13, program13, data),data:data});
@@ -940,7 +940,7 @@ function program12(depth0,data) {
   return buffer;
   }
 function program13(depth0,data) {
-  
+
   var buffer = "", stack1;
   buffer += "\n				<input class='parameter required' minlength='1' name='";
   if (stack1 = helpers.name) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
@@ -955,7 +955,7 @@ function program13(depth0,data) {
   }
 
 function program15(depth0,data) {
-  
+
   var buffer = "", stack1;
   buffer += "\n				<input class='parameter required' minlength='1' name='";
   if (stack1 = helpers.name) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
@@ -993,7 +993,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   var buffer = "", stack1, functionType="function", self=this;
 
 function program1(depth0,data) {
-  
+
   var buffer = "", stack1;
   buffer += "\n  ";
   stack1 = helpers.each.call(depth0, depth0.consumes, {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data});
@@ -1002,7 +1002,7 @@ function program1(depth0,data) {
   return buffer;
   }
 function program2(depth0,data) {
-  
+
   var buffer = "", stack1;
   buffer += "\n  <option value=\"";
   stack1 = (typeof depth0 === functionType ? depth0.apply(depth0) : depth0);
@@ -1015,8 +1015,8 @@ function program2(depth0,data) {
   }
 
 function program4(depth0,data) {
-  
-  
+
+
   return "\n  <option value=\"application/json\">application/json</option>\n";
   }
 
@@ -1036,8 +1036,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   var buffer = "", stack1, options, functionType="function", escapeExpression=this.escapeExpression, self=this, blockHelperMissing=helpers.blockHelperMissing;
 
 function program1(depth0,data) {
-  
-  
+
+
   return " : ";
   }
 
@@ -1103,7 +1103,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   var buffer = "", stack1, functionType="function", self=this;
 
 function program1(depth0,data) {
-  
+
   var buffer = "", stack1;
   buffer += "\n  ";
   stack1 = helpers.each.call(depth0, depth0.produces, {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data});
@@ -1112,7 +1112,7 @@ function program1(depth0,data) {
   return buffer;
   }
 function program2(depth0,data) {
-  
+
   var buffer = "", stack1;
   buffer += "\n  <option value=\"";
   stack1 = (typeof depth0 === functionType ? depth0.apply(depth0) : depth0);
@@ -1125,8 +1125,8 @@ function program2(depth0,data) {
   }
 
 function program4(depth0,data) {
-  
-  
+
+
   return "\n  <option value=\"application/json\">application/json</option>\n";
   }
 
@@ -1508,7 +1508,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
       for (_i = 0, _len = _ref5.length; _i < _len; _i++) {
         param = _ref5[_i];
         type = param.type || param.dataType;
-        if (type.toLowerCase() === 'file') {
+        if (type.toLocaleLowerCase('en') === 'file') {
           if (!contentTypeModel.consumes) {
             console.log("set content type ");
             contentTypeModel.consumes = 'multipart/form-data';
@@ -1813,7 +1813,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
       if (this.model.paramType === 'body') {
         this.model.isBody = true;
       }
-      if (type.toLowerCase() === 'file') {
+      if (type.toLocaleLowerCase('en') === 'file') {
         this.model.isFile = true;
       }
       template = this.template();

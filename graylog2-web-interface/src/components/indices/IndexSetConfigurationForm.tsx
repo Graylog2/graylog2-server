@@ -103,7 +103,7 @@ class IndexSetConfigurationForm extends React.Component<Props, State> {
         nextValidationErrors[event.target.name] = 'Invalid index prefix: cannot be empty';
       } else if (value.indexOf('_') === 0 || value.indexOf('-') === 0 || value.indexOf('+') === 0) {
         nextValidationErrors[event.target.name] = 'Invalid index prefix: must start with a letter or number';
-      } else if (value.toLowerCase() !== value) {
+      } else if (value.toLocaleLowerCase('en') !== value) {
         nextValidationErrors[event.target.name] = 'Invalid index prefix: must be lower case';
       } else {
         nextValidationErrors[event.target.name] = 'Invalid index prefix: must only contain letters, numbers, \'_\', \'-\' and \'+\'';
@@ -307,7 +307,7 @@ class IndexSetConfigurationForm extends React.Component<Props, State> {
                                label="Field type refresh interval"
                                help="How often the field type information for the active write index will be updated."
                                value={moment.duration(indexSet.field_type_refresh_interval, 'milliseconds').as(fieldTypeRefreshIntervalUnit)}
-                               unit={fieldTypeRefreshIntervalUnit.toUpperCase()}
+                               unit={fieldTypeRefreshIntervalUnit.toLocaleUpperCase('en')}
                                units={['SECONDS', 'MINUTES']}
                                required
                                update={this._onFieldTypeRefreshIntervalChange} />

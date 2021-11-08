@@ -22,5 +22,5 @@ export type SearchTypeId = string;
 
 export default function searchTypeDefinition(type: string) {
   return PluginStore.exports(searchTypesKey)
-    .find((s) => s.type.toLocaleUpperCase() === type.toLocaleUpperCase());
+    .find((s) => s.type.toLocaleUpperCase('en') === type.toLocaleUpperCase('en'));
 }

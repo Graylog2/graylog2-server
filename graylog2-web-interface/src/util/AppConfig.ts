@@ -44,7 +44,7 @@ const appConfig = (): AppConfigs => {
 
 const getEnabledFeatures = () => {
   return Immutable.Map(appConfig().featureFlags)
-    .filter((value) => value.trim().toLowerCase() === 'on')
+    .filter((value) => value.trim().toLocaleLowerCase('en') === 'on')
     .keySeq().toList()
     .filter((s) => typeof s === 'string');
 };
@@ -73,8 +73,8 @@ const AppConfig = {
 
   isFeatureEnabled(feature: string) {
     return this.features && this.features
-      .map((s) => s.trim().toLowerCase())
-      .includes(feature.toLowerCase());
+      .map((s) => s.trim().toLocaleLowerCase('en'))
+      .includes(feature.toLocaleLowerCase('en'));
   },
 
   rootTimeZone() {
