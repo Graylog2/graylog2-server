@@ -14,10 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.cluster.leader;
+package org.graylog2.cluster.lock;
 
-public interface LeaderElectionService {
-    boolean isLeader();
+import org.graylog.testing.mongodb.MongoDBExtension;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-    void giveUpLeader();
+public class MongoLockServiceTest5 extends MongoLockServiceTest {
+    @RegisterExtension
+    static MongoDBExtension mongodbExtension = MongoDBExtension.create("5.0");
 }

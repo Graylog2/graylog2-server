@@ -27,8 +27,11 @@ import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.PositiveLongValidator;
 import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
+import org.graylog2.cluster.leader.AutomaticLeaderElectionService;
 import org.graylog2.cluster.leader.LeaderElectionMode;
 import org.graylog2.cluster.leader.LeaderElectionService;
+import org.graylog2.cluster.lock.MongoLockService;
+import org.graylog2.configuration.converters.JavaDurationConverter;
 import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.security.realm.RootAccountRealm;
 import org.graylog2.utilities.IPSubnetConverter;
@@ -179,6 +182,12 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "leader_election_mode", converter = LeaderElectionMode.Converter.class)
     private LeaderElectionMode leaderElectionMode = LeaderElectionMode.STATIC;
 
+    @Parameter(value = "leader_election_lock_ttl", converter = JavaDurationConverter.class)
+    private java.time.Duration leaderElectionLockTTL = MongoLockService.MIN_LOCK_TTL;
+
+    @Parameter(value = "leader_election_lock_polling_interval", converter = JavaDurationConverter.class)
+    private java.time.Duration leaderElectionLockPollingInterval = AutomaticLeaderElectionService.DEFAULT_POLLING_INTERVAL;
+
     /**
      * @deprecated Try not to rely on a leader, or use {@link LeaderElectionService#isLeader()} instead.
      */
@@ -193,6 +202,14 @@ public class Configuration extends BaseConfiguration {
 
     public LeaderElectionMode getLeaderElectionMode() {
         return leaderElectionMode;
+    }
+
+    public java.time.Duration getLeaderElectionLockTTL() {
+        return leaderElectionLockTTL;
+    }
+
+    public java.time.Duration getLeaderElectionLockPollingInterval() {
+        return leaderElectionLockPollingInterval;
     }
 
     public String getPasswordSecret() {
@@ -381,6 +398,22 @@ public class Configuration extends BaseConfiguration {
     public void validateRootUser() throws ValidationException {
         if (getRootPasswordSha2() == null && !isRootUserDisabled()) {
             throw new ValidationException("Required parameter \"root_password_sha2\" not found.");
+        }
+    }
+
+    @ValidatorMethod
+    public void validateLeaderElectionTimeouts() throws ValidationException {
+        if (leaderElectionMode != LeaderElectionMode.AUTOMATIC) {
+            return;
+        }
+        if (leaderElectionLockTTL.compareTo(MongoLockService.MIN_LOCK_TTL) < 0) {
+            throw new ValidationException("The minimum valid \"leader_election_lock_ttl\" is 60 seconds");
+        }
+        if (leaderElectionLockPollingInterval.compareTo(java.time.Duration.ofSeconds(1)) < 0) {
+            throw new ValidationException("The minimum valid \"leader_election_lock_polling_interval\" is 1 second");
+        }
+        if (leaderElectionLockTTL.compareTo(leaderElectionLockPollingInterval) < 1) {
+            throw new ValidationException("The \"leader_election_lock_polling_interval\" needs to be greater than the \"leader_election_lock_ttl\"!");
         }
     }
 

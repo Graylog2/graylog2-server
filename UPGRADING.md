@@ -22,3 +22,7 @@ The following API endpoints have been removed in 4.3.
 | Endpoint                                    | Description                 |
 | ------------------------------------------- | --------------------------- |
 | `PUT /example/placeholder`                  | TODO placeholder comment    |
+
+## Removed Migrations
+
+Removed two migrations that convert pre-1.2 user permissions and index ranges to newer formats.
