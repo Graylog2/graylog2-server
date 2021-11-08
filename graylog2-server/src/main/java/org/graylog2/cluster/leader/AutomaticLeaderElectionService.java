@@ -43,6 +43,7 @@ public class AutomaticLeaderElectionService extends AbstractExecutionThreadServi
 
     private volatile boolean isLeader = false;
     private Thread executionThread;
+    private long lastSuccess = 0;
 
     @Inject
     public AutomaticLeaderElectionService(Configuration configuration,
@@ -74,53 +75,69 @@ public class AutomaticLeaderElectionService extends AbstractExecutionThreadServi
 
     @Override
     protected void run() throws Exception {
-        long lastSuccess = 0;
-
         while (isRunning()) {
-            final boolean wasLeader = isLeader;
-
             try {
-                isLeader = lockService.lock(RESOURCE_NAME).isPresent();
-                lastSuccess = System.nanoTime();
-            } catch (Exception e) {
-                log.error("Unable to acquire/renew leader lock.", e);
-
-                final Duration timeSinceLastSuccess = Duration.ofNanos(System.nanoTime() - lastSuccess);
-                if (wasLeader && timeSinceLastSuccess.compareTo(lockTTL) >= 0) {
-                    log.error("Failed for {} to renew leader lock. Forcing fallback to follower role.",
-                            timeSinceLastSuccess);
-                    isLeader = false;
-                }
-            }
-
-            if (wasLeader != isLeader) {
-                if (isLeader) {
-                    log.info("Leader changed. This node is now the leader.");
-                } else {
-                    log.error("Leader changed. This node lost the leader role. This should not happen. The node will " +
-                            "attempt to gracefully transition to assuming a follower role.");
-                }
-
-                // Ensure the nodes collection is up to date before we publish the event
-                nodePingThread.doRun();
-                eventBus.post(new LeaderChangedEvent());
-            }
-
-            try {
-                if (wasLeader && !isLeader) {
-                    log.info("Pausing leader-lock acquisition attempts for {} after downgrade from leader.", lockTTL);
-                    //noinspection BusyWait
-                    Thread.sleep(lockTTL.toMillis());
-                    log.info("Resuming leader-lock acquisition attempts every {}.", pollingInterval);
-                } else {
-                    //noinspection BusyWait
-                    Thread.sleep(pollingInterval.toMillis());
-                }
-            } catch (InterruptedException e) {
-                // OK, we are shutting down.
-                Thread.currentThread().interrupt();
+                runIteration();
+            } catch (Throwable t) {
+                log.error("Exception while acquiring/renewing leader lock.", t);
             }
         }
+    }
+
+    private void runIteration() throws InterruptedException {
+        final boolean wasLeader = isLeader;
+
+        try {
+            isLeader = lockService.lock(RESOURCE_NAME).isPresent();
+            lastSuccess = System.nanoTime();
+        } catch (Exception e) {
+            log.error("Unable to acquire/renew leader lock.", e);
+
+            final Duration timeSinceLastSuccess = Duration.ofNanos(System.nanoTime() - lastSuccess);
+            if (wasLeader && timeSinceLastSuccess.compareTo(lockTTL) >= 0) {
+                log.error("Failed for {} to renew leader lock. Forcing fallback to follower role.",
+                        timeSinceLastSuccess);
+                isLeader = false;
+            }
+        }
+
+        if (wasLeader != isLeader) {
+            handleLeaderChange(isLeader);
+        }
+
+        pauseBeforeNextIteration(wasLeader && !isLeader);
+    }
+
+    private void pauseBeforeNextIteration(boolean isDowngrade) {
+        try {
+            if (isDowngrade) {
+                log.info("Pausing leader-lock acquisition attempts for {} after downgrade from leader.", lockTTL);
+                Thread.sleep(lockTTL.toMillis());
+                log.info("Resuming leader-lock acquisition attempts every {}.", pollingInterval);
+            } else {
+                Thread.sleep(pollingInterval.toMillis());
+            }
+        } catch (InterruptedException e) {
+            // OK, we are shutting down.
+            Thread.currentThread().interrupt();
+        }
+    }
+
+    private void handleLeaderChange(boolean isLeader) {
+        if (isLeader) {
+            log.info("Leader changed. This node is now the leader.");
+        } else {
+            log.error("Leader changed. This node lost the leader role. This should not happen. The node will " +
+                    "attempt to gracefully transition to assuming a follower role.");
+        }
+
+        // Ensure the nodes collection is up to date before we publish the event
+        try {
+            nodePingThread.doRun();
+        } catch (Exception e) {
+            log.error("Unable to trigger update of nodes collection.");
+        }
+        eventBus.post(new LeaderChangedEvent());
     }
 
     @Override

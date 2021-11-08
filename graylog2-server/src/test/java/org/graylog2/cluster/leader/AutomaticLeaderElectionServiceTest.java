@@ -38,6 +38,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
@@ -164,5 +165,16 @@ class AutomaticLeaderElectionServiceTest {
         leaderElectionService.startAsync().awaitRunning();
         verify(eventBus, timeout(10_000).times(2)).post(any(LeaderChangedEvent.class));
         assertThat(leaderElectionService.isLeader()).isFalse();
+    }
+
+    @Test
+    void doesNotTerminateOnExceptionInMainLoop() {
+        doThrow(new RuntimeException("ouch")).when(eventBus).post(any(LeaderChangedEvent.class));
+        when(lockService.lock(any())).thenReturn(Optional.of(mock(Lock.class)));
+        leaderElectionService.startAsync().awaitRunning();
+
+        // if the main loop would not handle the exception, we wouldn't last two iterations
+        verify(lockService, timeout(10_000).atLeast(2)).lock(any());
+        verify(eventBus).post(any(LeaderChangedEvent.class));
     }
 }
