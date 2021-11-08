@@ -17,14 +17,14 @@
 import React from 'react';
 import * as Immutable from 'immutable';
 import { render, waitFor, fireEvent, screen, within } from 'wrappedTestingLibrary';
-import mockAction from 'helpers/mocking/MockAction';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
-import MockStore from 'helpers/mocking/StoreMock';
 import selectEvent from 'react-select-event';
 import userEvent from '@testing-library/user-event';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
-import { createSearch } from 'fixtures/searches';
 
+import MockStore from 'helpers/mocking/StoreMock';
+import mockAction from 'helpers/mocking/MockAction';
+import { createSearch } from 'fixtures/searches';
 import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';
 import Series from 'views/logic/aggregationbuilder/Series';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';

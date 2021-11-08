@@ -16,7 +16,6 @@
  */
 import MockStore from 'helpers/mocking/StoreMock';
 import MockAction from 'helpers/mocking/MockAction';
-
 import FieldType, { FieldTypes, Properties } from 'views/logic/fieldtypes/FieldType';
 import { ActionDefinition } from 'views/components/actions/ActionHandler';
 

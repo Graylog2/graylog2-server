@@ -16,8 +16,8 @@
  */
 import { isEmpty } from 'lodash';
 import { PluginStore } from 'graylog-web-plugin/plugin';
-import { VisualizationType } from 'views/types';
 
+import { VisualizationType } from 'views/types';
 import AggregationWidgetConfig, { AggregationWidgetConfigBuilder } from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 

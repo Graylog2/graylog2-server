@@ -15,9 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as Immutable from 'immutable';
+
 import asMock from 'helpers/mocking/AsMock';
 import mockAction from 'helpers/mocking/MockAction';
-
 import { GlobalOverrideActions, GlobalOverrideStore, GlobalOverrideStoreState } from 'views/stores/GlobalOverrideStore';
 import { QueriesActions, QueriesStore } from 'views/stores/QueriesStore';
 import SearchActions from 'views/actions/SearchActions';

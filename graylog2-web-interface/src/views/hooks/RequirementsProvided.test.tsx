@@ -17,8 +17,8 @@
 import * as React from 'react';
 import { mount } from 'wrappedEnzyme';
 import { PluginStore } from 'graylog-web-plugin/plugin';
-import asMock from 'helpers/mocking/AsMock';
 
+import asMock from 'helpers/mocking/AsMock';
 import type { PluginMetadata } from 'views/logic/views/View';
 import View from 'views/logic/views/View';
 

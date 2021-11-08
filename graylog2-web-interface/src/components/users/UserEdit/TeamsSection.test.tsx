@@ -16,8 +16,9 @@
  */
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
-import { alice as exampleUser } from 'fixtures/users';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
+
+import { alice as exampleUser } from 'fixtures/users';
 
 import TeamsSection from './TeamsSection';
 

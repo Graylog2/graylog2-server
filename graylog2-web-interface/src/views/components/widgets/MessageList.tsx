@@ -18,8 +18,8 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import styled from 'styled-components';
 import { isEmpty, get } from 'lodash';
-import { WidgetComponentProps } from 'views/types';
 
+import { WidgetComponentProps } from 'views/types';
 import connect from 'stores/connect';
 import { Messages } from 'views/Constants';
 import { ViewStore } from 'views/stores/ViewStore';

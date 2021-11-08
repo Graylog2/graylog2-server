@@ -16,10 +16,10 @@
  */
 import * as React from 'react';
 import { fireEvent, render, screen, waitFor, within } from 'wrappedTestingLibrary';
-import MockStore from 'helpers/mocking/StoreMock';
 import { Formik } from 'formik';
-import MockAction from 'helpers/mocking/MockAction';
 
+import MockStore from 'helpers/mocking/StoreMock';
+import MockAction from 'helpers/mocking/MockAction';
 import TimeRangeInput from 'views/components/searchbar/TimeRangeInput';
 
 jest.mock('stores/configurations/ConfigurationsStore', () => ({

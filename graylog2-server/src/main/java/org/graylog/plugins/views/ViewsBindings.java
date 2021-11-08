@@ -38,6 +38,8 @@ import org.graylog.plugins.views.search.db.InMemorySearchJobService;
 import org.graylog.plugins.views.search.db.SearchJobService;
 import org.graylog.plugins.views.search.db.SearchesCleanUpJob;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
+import org.graylog.plugins.views.search.engine.SearchConfig;
+import org.graylog.plugins.views.search.engine.SearchConfigProvider;
 import org.graylog.plugins.views.search.export.ChunkDecorator;
 import org.graylog.plugins.views.search.export.DecoratingMessagesExporter;
 import org.graylog.plugins.views.search.export.ExportBackend;
@@ -59,6 +61,7 @@ import org.graylog.plugins.views.search.rest.SavedSearchesResource;
 import org.graylog.plugins.views.search.rest.SearchResource;
 import org.graylog.plugins.views.search.rest.ViewsResource;
 import org.graylog.plugins.views.search.rest.ViewsRestPermissions;
+import org.graylog.plugins.views.search.rest.exceptionmappers.IllegalTimeRangeExceptionMapper;
 import org.graylog.plugins.views.search.rest.exceptionmappers.MissingCapabilitiesExceptionMapper;
 import org.graylog.plugins.views.search.rest.exceptionmappers.PermissionExceptionMapper;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
@@ -201,6 +204,8 @@ public class ViewsBindings extends ViewsModule {
 
         jerseyAdditionalComponentsBinder().addBinding().toInstance(SimpleMessageChunkCsvWriter.class);
         jerseyAdditionalComponentsBinder().addBinding().toInstance(MessageExportFormatFilter.class);
+
+        bind(SearchConfig.class).toProvider(SearchConfigProvider.class);
     }
 
     private void registerExportBackendProvider() {
@@ -238,5 +243,6 @@ public class ViewsBindings extends ViewsModule {
     private void registerExceptionMappers() {
         addJerseyExceptionMapper(MissingCapabilitiesExceptionMapper.class);
         addJerseyExceptionMapper(PermissionExceptionMapper.class);
+        addJerseyExceptionMapper(IllegalTimeRangeExceptionMapper.class);
     }
 }

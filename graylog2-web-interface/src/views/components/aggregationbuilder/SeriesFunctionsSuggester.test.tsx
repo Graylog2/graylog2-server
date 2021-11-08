@@ -16,7 +16,6 @@
  */
 
 import { asMock } from 'helpers/mocking';
-
 import SeriesFunctionsSuggester from 'views/components/aggregationbuilder/SeriesFunctionsSuggester';
 import AggregationFunctionsStore from 'views/stores/AggregationFunctionsStore';
 
