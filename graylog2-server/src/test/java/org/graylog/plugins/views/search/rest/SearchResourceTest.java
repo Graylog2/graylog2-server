@@ -19,7 +19,6 @@ package org.graylog.plugins.views.search.rest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
-import org.apache.shiro.subject.Subject;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchDomain;
@@ -33,7 +32,6 @@ import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.graylog2.shared.security.RestPermissions;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -86,9 +84,6 @@ public class SearchResourceTest {
     private SearchDomain searchDomain;
 
     @Mock
-    private Subject subject;
-
-    @Mock
     private User currentUser;
 
     @Mock
@@ -100,16 +95,8 @@ public class SearchResourceTest {
     private SearchResource searchResource;
 
     class SearchTestResource extends SearchResource {
-        private final Subject subject;
-
-        SearchTestResource(Subject subject, QueryEngine queryEngine, SearchDbService searchDbService, SearchJobService searchJobService, ObjectMapper objectMapper, PermittedStreams streamLoader) {
+        SearchTestResource(QueryEngine queryEngine, SearchDbService searchDbService, SearchJobService searchJobService, ObjectMapper objectMapper, PermittedStreams streamLoader) {
             super(queryEngine, searchDbService, searchJobService, objectMapper, streamLoader, executionGuard, searchDomain, eventBus);
-            this.subject = subject;
-        }
-
-        @Override
-        protected Subject getSubject() {
-            return this.subject;
         }
 
         @Nullable
@@ -124,7 +111,7 @@ public class SearchResourceTest {
         GuiceInjectorHolder.createInjector(Collections.emptyList());
 
         when(searchDbService.get(null)).thenThrow(NullPointerException.class);
-        this.searchResource = new SearchTestResource(subject, queryEngine, searchDbService, searchJobService, objectMapperProvider.get(), permittedStreams);
+        this.searchResource = new SearchTestResource(queryEngine, searchDbService, searchJobService, objectMapperProvider.get(), permittedStreams);
 
         when(currentUser.getName()).thenReturn("admin");
     }
@@ -347,7 +334,6 @@ public class SearchResourceTest {
         when(search.addStreamsToQueriesWithoutStreams(any())).thenReturn(search);
 
         final String streamId = "streamId";
-        when(subject.isPermitted(RestPermissions.STREAMS_READ + ":" + streamId)).thenReturn(true);
 
         final Query query = mock(Query.class);
         when(query.usedStreamIds()).thenReturn(ImmutableSet.of(streamId));
