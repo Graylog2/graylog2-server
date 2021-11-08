@@ -77,7 +77,7 @@ public abstract class DbPipelineServiceBaseTest {
     @Test
     public void performanceTest() {
         // given
-        IntStream.range(0, 1000).forEach(i -> {
+        IntStream.range(0, 500).forEach(i -> {
             saveNewPipelineDao("Pipeline " + i, pipelineSource(Integer.toString(i),
                     StringUtils.repeat(ruleReference("debug#1"), 50),
                     StringUtils.repeat(ruleReference("debug#2"), 50)));
