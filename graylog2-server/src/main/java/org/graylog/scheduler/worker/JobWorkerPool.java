@@ -138,8 +138,9 @@ public class JobWorkerPool implements GracefulShutdownHook {
         executor.shutdown();
         if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {
             LOG.warn("Timeout shutting down worker pool after 60 seconds");
+        } else {
+            shutdownCallback.run();
         }
-        shutdownCallback.run();
     }
 
     private static ExecutorService buildExecutor(String name, int poolSize, MetricRegistry metricRegistry) {
