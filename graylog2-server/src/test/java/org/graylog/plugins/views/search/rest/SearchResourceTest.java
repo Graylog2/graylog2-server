@@ -47,12 +47,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class SearchResourceTest {
-    private static final ObjectMapperProvider objectMapperProvider = new ObjectMapperProvider();
-
     @Rule
     public MockitoRule rule = MockitoJUnit.rule();
 
@@ -72,9 +71,6 @@ public class SearchResourceTest {
     private EventBus eventBus;
 
     @Mock
-    private QueryEngine queryEngine;
-
-    @Mock
     private SearchExecutor searchExecutor;
 
     private SearchResource searchResource;
@@ -88,11 +84,22 @@ public class SearchResourceTest {
     @Test
     public void saveAddsOwnerToSearch() {
         when(searchUser.username()).thenReturn("eberhard");
-        final Search search = Search.builder().build();
+        final SearchDTO search = mockSearchDTO();
 
         this.searchResource.createSearch(search, searchUser);
 
         verify(searchDomain).saveForUser(any(), eq(searchUser));
+    }
+
+    private SearchDTO mockSearchDTO() {
+        return mockSearchDTO(null);
+    }
+    private SearchDTO mockSearchDTO(Search search) {
+        final SearchDTO searchDTO = mock(SearchDTO.class);
+
+        when(searchDTO.toSearch()).thenReturn(search);
+
+        return searchDTO;
     }
 
     @Test
@@ -122,7 +129,7 @@ public class SearchResourceTest {
 
     @Test
     public void allowCreatingNewSearchWithoutId() {
-        final Search search = Search.builder().id(null).build();
+        final SearchDTO search = SearchDTO.Builder.create().id(null).build();
 
         this.searchResource.createSearch(search, searchUser);
     }

@@ -41,6 +41,7 @@ import org.mockito.junit.MockitoRule;
 import javax.annotation.Nullable;
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.core.Response;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -163,7 +164,12 @@ public class SearchResourceExecutionTest {
     public void executeSyncJobTriggersEvent() {
         mockCurrentUserName("peterchen");
 
-        final Search search = mockExistingSearch();
+        final SearchDTO search = mockSearchDTO();
+
+        final SearchJob searchJob = mock(SearchJob.class);
+        when(searchJob.getResultFuture()).thenReturn(CompletableFuture.completedFuture(null));
+
+        when(queryEngine.execute(any())).thenReturn(searchJob);
 
         final Response response = this.searchResource.executeSyncJob(search, 100, searchUser);
 
@@ -179,8 +185,8 @@ public class SearchResourceExecutionTest {
     public void guardExceptionDuringSyncExecutionPreventsTriggeringEvent() {
         mockCurrentUserName("basti");
 
-        final Search search = mockExistingSearch();
-        throwGuardExceptionFor(search);
+        final SearchDTO search = mockSearchDTO();
+        doThrow(new ForbiddenException()).when(executionGuard).check(any(), any());
 
         try {
             this.searchResource.executeSyncJob(search, 100, searchUser);
@@ -193,12 +199,17 @@ public class SearchResourceExecutionTest {
     public void executeSyncJobAddsCurrentUserAsOwner() {
         mockCurrentUserName("peterchen");
 
-        final Search search = mockExistingSearch();
+        final SearchDTO search = mockSearchDTO();
+
+        final SearchJob searchJob = mock(SearchJob.class);
+        when(searchJob.getResultFuture()).thenReturn(CompletableFuture.completedFuture(null));
+
+        when(queryEngine.execute(any())).thenReturn(searchJob);
 
         this.searchResource.executeSyncJob(search, 100, searchUser);
 
         final ArgumentCaptor<String> usernameCaptor = ArgumentCaptor.forClass(String.class);
-        verify(searchJobService, times(1)).create(eq(search), usernameCaptor.capture());
+        verify(searchJobService, times(1)).create(any(), usernameCaptor.capture());
 
         assertThat(usernameCaptor.getValue()).isEqualTo("peterchen");
     }
@@ -235,9 +246,9 @@ public class SearchResourceExecutionTest {
 
     @Test
     public void guardExceptionInSynchronousExecutionLeadsTo403() {
-        final Search search = mockExistingSearch();
+        final SearchDTO search = mockSearchDTO();
 
-        throwGuardExceptionFor(search);
+        throwGuardException();
 
         assertThatExceptionOfType(ForbiddenException.class)
                 .isThrownBy(() -> this.searchResource.executeSyncJob(search, 0, searchUser));
@@ -255,16 +266,22 @@ public class SearchResourceExecutionTest {
 
     @Test
     public void failureToAddDefaultStreamsInSynchronousSearchLeadsTo403() {
+        final SearchDTO searchDTO = mock(SearchDTO.class);
         final Search search = mockExistingSearch();
+        when(searchDTO.toSearch()).thenReturn(search);
 
         doThrow(new ForbiddenException()).when(search).addStreamsToQueriesWithoutStreams(any());
 
         assertThatExceptionOfType(ForbiddenException.class)
-                .isThrownBy(() -> this.searchResource.executeSyncJob(search, 0, searchUser));
+                .isThrownBy(() -> this.searchResource.executeSyncJob(searchDTO, 0, searchUser));
     }
 
     private void throwGuardExceptionFor(Search search) {
         doThrow(new ForbiddenException()).when(executionGuard).check(eq(search), any());
+    }
+
+    private void throwGuardException() {
+        doThrow(new ForbiddenException()).when(executionGuard).check(any(), any());
     }
 
     private void mockCurrentUserName(String name) {
@@ -303,5 +320,12 @@ public class SearchResourceExecutionTest {
         when(queryEngine.execute(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
         return search;
+    }
+
+    private SearchDTO mockSearchDTO() {
+        return SearchDTO.Builder
+                .create()
+                .queries(ImmutableSet.of())
+                .build();
     }
 }

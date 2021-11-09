@@ -87,7 +87,9 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @POST
     @ApiOperation(value = "Create a search query", response = Search.class, code = 201)
     @AuditEvent(type = ViewsAuditEventTypes.SEARCH_CREATE)
-    public Response createSearch(@ApiParam Search search, @Context SearchUser searchUser) {
+    public Response createSearch(@ApiParam SearchDTO searchRequest, @Context SearchUser searchUser) {
+        final Search search = searchRequest.toSearch();
+
         final Search saved = searchDomain.saveForUser(search, searchUser);
         if (saved == null || saved.id() == null) {
             return Response.serverError().build();
@@ -133,10 +135,11 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @ApiOperation(value = "Execute a new synchronous search", notes = "Executes a new search and waits for its result", response = SearchJob.class)
     @Path("sync")
     @NoAuditEvent("Creating audit event manually in method body.")
-    public Response executeSyncJob(@ApiParam @NotNull(message = "Search body is mandatory") Search search,
+    public Response executeSyncJob(@ApiParam @NotNull(message = "Search body is mandatory") SearchDTO searchRequest,
                                    @ApiParam(name = "timeout", defaultValue = "60000")
                                    @QueryParam("timeout") @DefaultValue("60000") long timeout,
                                    @Context SearchUser searchUser) {
+        final Search search = searchRequest.toSearch();
         final SearchJob searchJob = searchExecutor.execute(search, searchUser, ExecutionState.empty());
 
         postAuditEvent(searchJob);
