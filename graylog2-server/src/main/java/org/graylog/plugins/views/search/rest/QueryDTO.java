@@ -27,18 +27,12 @@ import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchType;
-import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.engine.BackendQuery;
-import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
-import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Set;
-import java.util.UUID;
-
-import static com.google.common.collect.ImmutableSortedSet.of;
 
 @AutoValue
 @JsonAutoDetect
@@ -49,6 +43,7 @@ public abstract class QueryDTO {
     @JsonProperty
     public abstract String id();
 
+    @Nullable
     @JsonProperty
     public abstract TimeRange timerange();
 
@@ -56,7 +51,7 @@ public abstract class QueryDTO {
     @JsonProperty
     public abstract Filter filter();
 
-    @Nonnull
+    @Nullable
     @JsonProperty
     public abstract BackendQuery query();
 
@@ -70,8 +65,6 @@ public abstract class QueryDTO {
         @JsonProperty
         public abstract Builder id(String id);
 
-        public abstract String id();
-
         @JsonProperty
         public abstract Builder timerange(TimeRange timerange);
 
@@ -82,27 +75,13 @@ public abstract class QueryDTO {
         public abstract Builder query(BackendQuery query);
 
         @JsonProperty("search_types")
-        public abstract Builder searchTypes(@Nullable Set<SearchType> searchTypes);
+        public abstract Builder searchTypes(@Nonnull Set<SearchType> searchTypes);
 
-        abstract QueryDTO autoBuild();
+        public abstract QueryDTO build();
 
         @JsonCreator
-        static Builder createWithDefaults() {
-            try {
-                return new AutoValue_QueryDTO.Builder()
-                        .searchTypes(of())
-                        .query(ElasticsearchQueryString.empty())
-                        .timerange(RelativeRange.create(300));
-            } catch (InvalidRangeParametersException e) {
-                throw new RuntimeException("Unable to create relative timerange - this should not happen!");
-            }
-        }
-
-        public QueryDTO build() {
-            if (id() == null) {
-                id(UUID.randomUUID().toString());
-            }
-            return autoBuild();
+        static Builder create() {
+            return new AutoValue_QueryDTO.Builder();
         }
     }
 
