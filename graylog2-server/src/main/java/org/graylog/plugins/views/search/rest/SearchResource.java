@@ -16,8 +16,6 @@
  */
 package org.graylog.plugins.views.search.rest;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.Uninterruptibles;
 import io.swagger.annotations.Api;
@@ -30,7 +28,6 @@ import org.graylog.plugins.views.search.SearchDomain;
 import org.graylog.plugins.views.search.SearchExecutionGuard;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.db.SearchJobService;
-import org.graylog.plugins.views.search.engine.QueryEngine;
 import org.graylog.plugins.views.search.events.SearchJobExecutionEvent;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.audit.jersey.AuditEvent;
