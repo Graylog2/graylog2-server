@@ -78,7 +78,7 @@ const IndexSetConfigurationPage = createReactClass({
     }
 
     const { indexSet } = this.state;
-    
+
     return (
       <DocumentTitle title="Configure Index Set">
         <div>
