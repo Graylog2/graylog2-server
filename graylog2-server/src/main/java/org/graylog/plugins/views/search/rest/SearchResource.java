@@ -47,7 +47,6 @@ import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
-import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -63,8 +62,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import static com.google.common.base.MoreObjects.firstNonNull;
-
 @Api(value = "Search")
 @Path("/views/search")
 @Produces(MediaType.APPLICATION_JSON)
@@ -76,26 +73,23 @@ public class SearchResource extends RestResource implements PluginRestResource {
 
     private final SearchExecutionGuard executionGuard;
     private final SearchDomain searchDomain;
+    private final SearchExecutor searchExecutor;
     private final SearchJobService searchJobService;
-    private final ObjectMapper objectMapper;
     private final PermittedStreams permittedStreams;
-    private final QueryEngine queryEngine;
     private final EventBus serverEventBus;
 
     @Inject
     public SearchResource(SearchExecutionGuard executionGuard,
                           SearchDomain searchDomain,
+                          SearchExecutor searchExecutor,
                           SearchJobService searchJobService,
-                          ObjectMapper objectMapper,
                           PermittedStreams permittedStreams,
-                          QueryEngine queryEngine,
                           EventBus serverEventBus) {
         this.executionGuard = executionGuard;
         this.searchDomain = searchDomain;
+        this.searchExecutor = searchExecutor;
         this.searchJobService = searchJobService;
-        this.objectMapper = objectMapper;
         this.permittedStreams = permittedStreams;
-        this.queryEngine = queryEngine;
         this.serverEventBus = serverEventBus;
     }
 
@@ -130,61 +124,33 @@ public class SearchResource extends RestResource implements PluginRestResource {
 
     @POST
     @ApiOperation(value = "Execute the referenced search query asynchronously",
-                  notes = "Starts a new search, irrespective whether or not another is already running")
+                  notes = "Starts a new search, irrespective whether or not another is already running",
+                  response = SearchJob.class)
     @Path("{id}/execute")
     @NoAuditEvent("Creating audit event manually in method body.")
     public Response executeQuery(@ApiParam(name = "id") @PathParam("id") String id,
                                  @ApiParam ExecutionState executionState,
                                  @Context SearchUser searchUser) {
-        Search search = searchDomain.getForUser(id, searchUser)
-                .orElseThrow(() -> new NotFoundException("Search with id " + id + " does not exist"));
-
-        search = search.addStreamsToQueriesWithoutStreams(() -> loadAllAllowedStreamsForUser(searchUser));
-
-        guard(search, searchUser);
-
-        search = search.applyExecutionState(objectMapper, firstNonNull(executionState, ExecutionState.empty()));
-
-        final SearchJob searchJob = searchJobService.create(search, searchUser.username());
+        final SearchJob searchJob = searchExecutor.execute(id, searchUser, executionState);
 
         postAuditEvent(searchJob);
 
-        final SearchJob runningSearchJob = queryEngine.execute(searchJob);
-
-        return Response.created(URI.create(BASE_PATH + "/status/" + runningSearchJob.getId()))
-                .entity(runningSearchJob)
+        return Response.created(URI.create(BASE_PATH + "/status/" + searchJob.getId()))
+                .entity(searchJob)
                 .build();
     }
 
     @POST
-    @ApiOperation(value = "Execute a new synchronous search", notes = "Executes a new search and waits for its result")
+    @ApiOperation(value = "Execute a new synchronous search", notes = "Executes a new search and waits for its result", response = SearchJob.class)
     @Path("sync")
     @NoAuditEvent("Creating audit event manually in method body.")
     public Response executeSyncJob(@ApiParam @NotNull(message = "Search body is mandatory") Search search,
                                    @ApiParam(name = "timeout", defaultValue = "60000")
                                    @QueryParam("timeout") @DefaultValue("60000") long timeout,
                                    @Context SearchUser searchUser) {
-        final String username = searchUser.username();
-
-        search = search.addStreamsToQueriesWithoutStreams(() -> loadAllAllowedStreamsForUser(searchUser));
-
-        guard(search, searchUser);
-
-        final SearchJob searchJob = queryEngine.execute(searchJobService.create(search, username));
+        final SearchJob searchJob = searchExecutor.execute(search, searchUser, ExecutionState.empty());
 
         postAuditEvent(searchJob);
-
-        try {
-            Uninterruptibles.getUninterruptibly(searchJob.getResultFuture(), timeout, TimeUnit.MILLISECONDS);
-        } catch (ExecutionException e) {
-            LOG.error("Error executing search job <{}>", searchJob.getId(), e);
-            throw new InternalServerErrorException("Error executing search job: " + e.getMessage());
-        } catch (TimeoutException e) {
-            throw new InternalServerErrorException("Timeout while executing search job");
-        } catch (Exception e) {
-            LOG.error("Other error", e);
-            throw e;
-        }
 
         return Response.ok(searchJob).build();
     }

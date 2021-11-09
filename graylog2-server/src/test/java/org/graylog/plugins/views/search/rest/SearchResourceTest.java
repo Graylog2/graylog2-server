@@ -77,12 +77,15 @@ public class SearchResourceTest {
     @Mock
     private QueryEngine queryEngine;
 
+    @Mock
+    private SearchExecutor searchExecutor;
+
     private SearchResource searchResource;
 
     @Before
     public void setUp() throws Exception {
         GuiceInjectorHolder.createInjector(Collections.emptyList());
-        this.searchResource = new SearchResource(executionGuard, searchDomain, searchJobService, objectMapperProvider.get(), permittedStreams, queryEngine, eventBus);
+        this.searchResource = new SearchResource(executionGuard, searchDomain, searchExecutor, searchJobService, permittedStreams, eventBus);
     }
 
     @Test
