@@ -73,8 +73,8 @@ const AppConfig = {
 
   isFeatureEnabled(feature: string) {
     return this.features && this.features
-      .map((s) => s.trim().toLocaleLowerCase('en'))
-      .includes(feature.toLocaleLowerCase('en'));
+      .map((s) => s.trim().toLowerCase())
+      .includes(feature.toLowerCase());
   },
 
   rootTimeZone() {

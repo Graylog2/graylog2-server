@@ -57,7 +57,7 @@ const PipelineConnectionsForm = ({ pipeline, connections, streams, save }: Props
   const [connectedStreams, setConnectedStreams] = useState<FormattedStream[]>(formatStreams(initialStreamConnections));
 
   const notConnectedStreams = useMemo(() => {
-    return streams.filter((s) => !connectedStreams.some((cs) => cs.value.toLocaleLowerCase('en') === s.id.toLocaleLowerCase('en')));
+    return streams.filter((s) => !connectedStreams.some((cs) => cs.value.toLowerCase() === s.id.toLowerCase()));
   }, [streams, connectedStreams]);
 
   const _openModal = () => {

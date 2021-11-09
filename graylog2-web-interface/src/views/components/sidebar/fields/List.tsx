@@ -61,11 +61,11 @@ const List = ({ viewMetadata: { activeQuery }, filter, activeQueryFields, allFie
     return <span>No field information available.</span>;
   }
 
-  const fieldFilter = filter ? ((field) => field.name.toLocaleUpperCase('en').includes(filter.toLocaleUpperCase('en'))) : () => true;
+  const fieldFilter = filter ? ((field) => field.name.toLocaleUpperCase().includes(filter.toLocaleUpperCase())) : () => true;
   const fieldsToShow = _fieldsToShow(activeQueryFields, allFields, currentGroup);
   const fieldList = fieldsToShow
     .filter(fieldFilter)
-    .sortBy((field) => field.name.toLocaleUpperCase('en'));
+    .sortBy((field) => field.name.toLocaleUpperCase());
 
   if (fieldList.isEmpty()) {
     return <i>No fields to show. Try changing your filter term or select a different field set above.</i>;

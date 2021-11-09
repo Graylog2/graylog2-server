@@ -33,5 +33,5 @@ export function sortByDate(d1, d2, sortOrder) {
 export function naturalSortIgnoreCase(s1, s2, sortOrder) {
   const effectiveSortOrder = sortOrder || 'asc';
 
-  return (effectiveSortOrder === 'asc' ? naturalSort(s1.toLocaleLowerCase('en'), s2.toLocaleLowerCase('en')) : naturalSort(s2.toLocaleLowerCase('en'), s1.toLocaleLowerCase('en')));
+  return (effectiveSortOrder === 'asc' ? naturalSort(s1.toLowerCase(), s2.toLowerCase()) : naturalSort(s2.toLowerCase(), s1.toLowerCase()));
 }

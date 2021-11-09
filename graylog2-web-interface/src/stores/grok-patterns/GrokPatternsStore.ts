@@ -63,8 +63,8 @@ export const GrokPatternsStore = singletonStore(
             const { patterns } = resp;
 
             patterns.sort((pattern1: GrokPattern, pattern2: GrokPattern) => {
-              return pattern1.name.toLocaleLowerCase('en')
-                .localeCompare(pattern2.name.toLocaleLowerCase('en'));
+              return pattern1.name.toLowerCase()
+                .localeCompare(pattern2.name.toLowerCase());
             });
 
             callback(patterns);
