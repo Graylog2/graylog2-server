@@ -40,6 +40,7 @@ import org.joda.time.DateTimeZone;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.Map;
@@ -84,6 +85,10 @@ public abstract class Search implements ContentPackable<SearchEntity> {
 
     @JsonProperty(FIELD_OWNER)
     public abstract Optional<String> owner();
+
+    public Search withOwner(@Nonnull String owner) {
+        return toBuilder().owner(owner).build();
+    }
 
     @JsonProperty(FIELD_CREATED_AT)
     public abstract DateTime createdAt();

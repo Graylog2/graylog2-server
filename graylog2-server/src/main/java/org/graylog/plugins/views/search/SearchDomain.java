@@ -59,6 +59,15 @@ public class SearchDomain {
                 .collect(Collectors.toList());
     }
 
+    public Search saveForUser(Search search, SearchUser searchUser) {
+        final Optional<Search> previous = Optional.ofNullable(search.id()).flatMap(dbService::get);
+        if (!searchUser.isAdmin() && !previous.map(searchUser::owns).orElse(true)) {
+            throw new PermissionException("Unable to update search with id <" + search.id() + ">, already exists and user is not permitted to overwrite it.");
+        }
+
+        return dbService.save(search.withOwner(searchUser.username()));
+    }
+
     private boolean hasReadPermissionFor(SearchPermissions searchPermissions, Predicate<ViewDTO> viewReadPermission, Search search) {
         if (searchPermissions.owns(search)) {
             return true;
