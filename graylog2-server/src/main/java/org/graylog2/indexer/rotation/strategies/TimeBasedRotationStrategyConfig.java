@@ -36,24 +36,24 @@ public abstract class TimeBasedRotationStrategyConfig implements RotationStrateg
     @JsonProperty("rotation_period")
     public abstract Period rotationPeriod();
 
-    @JsonProperty("elasticsearch_max_write_index_age")
+    @JsonProperty("max_rotation_period")
     @Nullable
-    public abstract Period maxWriteIndexAge();
+    public abstract Period maxRotationPeriod();
 
     @JsonCreator
     public static TimeBasedRotationStrategyConfig create(@JsonProperty(TYPE_FIELD) String type,
                                                          @JsonProperty("rotation_period") @NotNull Period maxTimePerIndex,
-                                                         @JsonProperty("elasticsearch_max_write_index_age") Period maxWriteIndexAge) {
-        return new AutoValue_TimeBasedRotationStrategyConfig(type, maxTimePerIndex, maxWriteIndexAge);
+                                                         @JsonProperty("max_rotation_period") Period maxRotationPeriod) {
+        return new AutoValue_TimeBasedRotationStrategyConfig(type, maxTimePerIndex, maxRotationPeriod);
     }
 
     @JsonCreator
     public static TimeBasedRotationStrategyConfig create(@JsonProperty("rotation_period") @NotNull Period maxTimePerIndex,
-                                                         @JsonProperty("elasticsearch_max_write_index_age") Period maxWriteIndexAge) {
-        return create(TimeBasedRotationStrategyConfig.class.getCanonicalName(), maxTimePerIndex, maxWriteIndexAge);
+                                                         @JsonProperty("max_rotation_period") Period maxRotationPeriod) {
+        return create(TimeBasedRotationStrategyConfig.class.getCanonicalName(), maxTimePerIndex, maxRotationPeriod);
     }
 
-    public static TimeBasedRotationStrategyConfig createDefault(Period maxWriteIndexAge) {
-        return create(DEFAULT_DAYS, maxWriteIndexAge);
+    public static TimeBasedRotationStrategyConfig createDefault(Period maxRotationPeriod) {
+        return create(DEFAULT_DAYS, maxRotationPeriod);
     }
 }
