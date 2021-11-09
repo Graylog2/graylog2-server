@@ -20,18 +20,14 @@ import { isEmpty } from 'lodash';
 import styled from 'styled-components';
 
 import { useStore } from 'stores/connect';
-import CombinedProvider from 'injection/CombinedProvider';
 import { Icon } from 'components/common';
-import { Button, ListGroupItem } from 'components/graylog';
+import { Button, ListGroupItem } from 'components/bootstrap';
 import { isPermitted } from 'util/PermissionsMixin';
 import StreamRuleForm from 'components/streamrules/StreamRuleForm';
 import HumanReadableStreamRule from 'components/streamrules/HumanReadableStreamRule';
-import StoreProvider from 'injection/StoreProvider';
 import UserNotification from 'util/UserNotification';
-
-const { InputsStore, InputsActions } = CombinedProvider.get('Inputs');
-
-const StreamRulesStore = StoreProvider.getStore('StreamRules');
+import { InputsActions, InputsStore } from 'stores/inputs/InputsStore';
+import { StreamRulesStore } from 'stores/streams/StreamRulesStore';
 
 const ActionButtonsWrap = styled.span`
   margin-right: 6px;

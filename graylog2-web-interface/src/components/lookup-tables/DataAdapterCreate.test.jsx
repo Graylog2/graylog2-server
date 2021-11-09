@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import { mount } from 'wrappedEnzyme';
+
 import mockComponent from 'helpers/mocking/MockComponent';
 
 import DataAdapterCreate from './DataAdapterCreate';
@@ -24,9 +25,7 @@ jest.mock('components/common', () => ({
   Select: mockComponent('SelectMock'),
 }));
 
-jest.mock('components/bootstrap', () => ({
-  Input: mockComponent('InputMock'),
-}));
+jest.mock('components/bootstrap/Input', () => mockComponent('InputMock'));
 
 jest.mock('components/lookup-tables', () => ({
   DataAdapterForm: mockComponent('DataAdapterFormMock'),

@@ -18,7 +18,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { trim } from 'lodash';
 
-import { Button, ControlLabel, FormControl, FormGroup, HelpBlock } from 'components/graylog';
+import { Button, ControlLabel, FormControl, FormGroup, HelpBlock } from 'components/bootstrap';
 import Series from 'views/logic/aggregationbuilder/Series';
 
 export default class SeriesConfiguration extends React.Component {

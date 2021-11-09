@@ -21,21 +21,19 @@ import * as Immutable from 'immutable';
 import { Subtract } from 'utility-types';
 
 import { getValueFromInput } from 'util/FormsUtils';
-import { Col, Row, Button } from 'components/graylog';
-import { Input } from 'components/bootstrap';
 import { Select } from 'components/common';
+import { Col, Row, Button, Input } from 'components/bootstrap';
 import { BooleanField, DropdownField, NumberField, TextField } from 'components/configurationforms';
-import CombinedProvider from 'injection/CombinedProvider';
 import connect from 'stores/connect';
 import type { Message } from 'views/components/messagelist/Types';
 import useForwarderMessageLoaders from 'components/messageloaders/useForwarderMessageLoaders';
 import AppConfig from 'util/AppConfig';
+import { CodecTypesStore, CodecTypesActions } from 'stores/codecs/CodecTypesStore';
+import { InputsActions, InputsStore } from 'stores/inputs/InputsStore';
+import { MessagesActions } from 'stores/messages/MessagesStore';
 
 import type { Input as InputType, CodecTypes } from './Types';
 
-const { MessagesActions } = CombinedProvider.get('Messages');
-const { CodecTypesActions, CodecTypesStore } = CombinedProvider.get('CodecTypes');
-const { InputsActions, InputsStore } = CombinedProvider.get('Inputs');
 const DEFAULT_REMOTE_ADDRESS = '127.0.0.1';
 
 type InputSelectProps = {

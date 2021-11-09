@@ -18,40 +18,46 @@ import Reflux from 'reflux';
 
 import * as URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
-import ActionsProvider from 'injection/ActionsProvider';
+import { singletonStore, singletonActions } from 'logic/singleton';
 
-const SingleNodeActions = ActionsProvider.getActions('SingleNode');
+export const SingleNodeActions = singletonActions(
+  'core.SingleNode',
+  () => Reflux.createActions({
+    get: { asyncResult: true },
+  }),
+);
 
-const SingleNodeStore = Reflux.createStore({
-  listenables: [SingleNodeActions],
-  sourceUrl: '/system/cluster/node',
-  node: undefined,
+export const SingleNodeStore = singletonStore(
+  'core.SingleNode',
+  () => Reflux.createStore({
+    listenables: [SingleNodeActions],
+    sourceUrl: '/system/cluster/node',
+    node: undefined,
 
-  init() {
-    this._propagateState();
-  },
+    init() {
+      this._propagateState();
+    },
 
-  getInitialState() {
-    return this._getNodeInfo();
-  },
+    getInitialState() {
+      return this._getNodeInfo();
+    },
 
-  _getNodeInfo() {
-    return { node: this.node };
-  },
+    _getNodeInfo() {
+      return { node: this.node };
+    },
 
-  _propagateState() {
-    this.trigger(this._getNodeInfo());
-  },
+    _propagateState() {
+      this.trigger(this._getNodeInfo());
+    },
 
-  get(nodeId) {
-    const promise = fetch('GET', URLUtils.qualifyUrl(nodeId ? URLUtils.concatURLPath(this.sourceUrl, nodeId) : this.sourceUrl))
-      .then((response) => {
-        this.node = response;
-        this._propagateState();
-      });
+    get(nodeId) {
+      const promise = fetch('GET', URLUtils.qualifyUrl(nodeId ? URLUtils.concatURLPath(this.sourceUrl, nodeId) : this.sourceUrl))
+        .then((response) => {
+          this.node = response;
+          this._propagateState();
+        });
 
-    SingleNodeActions.get.promise(promise);
-  },
-});
-
-export default SingleNodeStore;
+      SingleNodeActions.get.promise(promise);
+    },
+  }),
+);

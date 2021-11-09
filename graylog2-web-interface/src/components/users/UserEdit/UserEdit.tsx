@@ -20,10 +20,10 @@ import { useContext } from 'react';
 import UsersDomain from 'domainActions/users/UsersDomain';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import { Spinner, IfPermitted } from 'components/common';
+import { Alert } from 'components/bootstrap';
 import SectionComponent from 'components/common/Section/SectionComponent';
-import { Alert } from 'components/graylog';
 import User from 'logic/users/User';
-import CombinedProvider from 'injection/CombinedProvider';
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 
 import ReadOnlyWarning from './ReadOnlyWarning';
 import SettingsSection from './SettingsSection';
@@ -35,8 +35,6 @@ import TeamsSection from './TeamsSection';
 
 import PermissionsUpdateInfo from '../PermissionsUpdateInfo';
 import SectionGrid from '../../common/Section/SectionGrid';
-
-const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 
 type Props = {
   user: User,

@@ -19,14 +19,12 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import Promise from 'bluebird';
 
-import { Button } from 'components/graylog';
-import { Alert } from 'components/alerts';
+import { Button } from 'components/bootstrap';
 import { EntityList, PaginatedList, Spinner } from 'components/common';
-import CombinedProvider from 'injection/CombinedProvider';
-
-const { AlertsStore, AlertsActions } = CombinedProvider.get('Alerts');
-const { AlertConditionsStore, AlertConditionsActions } = CombinedProvider.get('AlertConditions');
-const { StreamsStore } = CombinedProvider.get('Streams');
+import { Alert } from 'components/alerts';
+import { AlertsStore, AlertsActions } from 'stores/alerts/AlertsStore';
+import { AlertConditionsStore, AlertConditionsActions } from 'stores/alertconditions/AlertConditionsStore';
+import { StreamsStore } from 'stores/streams/StreamsStore';
 
 const ALERTS_REFRESH_INTERVAL = 10000;
 

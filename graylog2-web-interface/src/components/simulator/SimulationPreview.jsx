@@ -17,7 +17,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Alert } from 'components/graylog';
+import { Alert } from 'components/bootstrap';
 import MessageShow from 'components/search/MessageShow';
 
 const SimulationPreview = ({ simulationResults, streams }) => {

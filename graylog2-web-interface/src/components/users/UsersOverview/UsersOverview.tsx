@@ -18,12 +18,12 @@ import * as React from 'react';
 import { useEffect, useContext, useState } from 'react';
 import styled, { css } from 'styled-components';
 
-import type { PaginatedUsers } from 'actions/users/UsersActions';
+import type { PaginatedUsers } from 'stores/users/UsersStore';
 import UsersDomain from 'domainActions/users/UsersDomain';
 import { UsersActions } from 'stores/users/UsersStore';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import { DataTable, Spinner, PaginatedList, EmptyResult } from 'components/common';
-import { Col, Row } from 'components/graylog';
+import { Col, Row } from 'components/bootstrap';
 import UserOverview from 'logic/users/UserOverview';
 
 import UserOverviewItem from './UserOverviewItem';

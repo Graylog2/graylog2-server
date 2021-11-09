@@ -171,7 +171,7 @@ public class AggregationEventProcessor implements EventProcessor {
                 messageConsumer.accept(summaries);
             };
 
-            ElasticsearchQueryString scrollQueryString = ElasticsearchQueryString.builder().queryString(config.query()).build();
+            ElasticsearchQueryString scrollQueryString = ElasticsearchQueryString.of(config.query());
             scrollQueryString = scrollQueryString.concatenate(groupByQueryString(event));
             LOG.debug("scrollQueryString: {}", scrollQueryString);
 
@@ -188,7 +188,7 @@ public class AggregationEventProcessor implements EventProcessor {
             for (String key : event.getGroupByFields().keySet()) {
                 String value = event.getGroupByFields().get(key);
                 String query = new StringBuilder(key).append(":\"").append(luceneEscape(value)).append("\"").toString();
-                result = result.concatenate(ElasticsearchQueryString.builder().queryString(query).build());
+                result = result.concatenate(ElasticsearchQueryString.of(query));
             }
         }
         return result;

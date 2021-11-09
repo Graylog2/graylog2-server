@@ -26,6 +26,7 @@ import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
+import org.graylog.plugins.views.search.engine.SearchConfig;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
@@ -34,9 +35,11 @@ import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.MultiSearchResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchRequest;
 import org.graylog.storage.elasticsearch7.testing.TestMultisearchResponse;
+import org.graylog2.indexer.searches.SearchesClusterConfig;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.joda.time.Period;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -54,6 +57,7 @@ import java.util.stream.Collectors;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.storage.elasticsearch7.views.ViewsUtils.indicesOf;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class ElasticsearchBackendSearchTypeOverridesTest extends ElasticsearchBackendGeneratedRequestTestBase {
@@ -79,14 +83,14 @@ public class ElasticsearchBackendSearchTypeOverridesTest extends ElasticsearchBa
                             .id("pivot2")
                             .series(Collections.singletonList(Max.builder().field("field2").build()))
                             .rollup(true)
-                            .query(ElasticsearchQueryString.builder().queryString("source:babbage").build())
+                            .query(ElasticsearchQueryString.of("source:babbage"))
                             .build()
             );
         }};
         this.query = Query.builder()
                 .id("query1")
                 .searchTypes(searchTypes)
-                .query(ElasticsearchQueryString.builder().queryString("production:true").build())
+                .query(ElasticsearchQueryString.of("production:true"))
                 .filter(StreamFilter.ofId("stream1"))
                 .timerange(timeRangeForTest())
                 .build();
@@ -96,7 +100,7 @@ public class ElasticsearchBackendSearchTypeOverridesTest extends ElasticsearchBa
 
     @Test
     public void overridesInSearchTypeAreIncorporatedIntoGeneratedQueries() throws IOException {
-        final ESGeneratedQueryContext queryContext = this.elasticsearchBackend.generate(searchJob, query, Collections.emptySet());
+        final ESGeneratedQueryContext queryContext = this.elasticsearchBackend.generate(searchJob, query, Collections.emptySet(), new SearchConfig(Period.ZERO));
         final MultiSearchResponse response = TestMultisearchResponse.fromFixture("successfulMultiSearchResponse.json");
         final List<MultiSearchResponse.Item> items = Arrays.stream(response.getResponses())
                 .collect(Collectors.toList());
@@ -151,7 +155,7 @@ public class ElasticsearchBackendSearchTypeOverridesTest extends ElasticsearchBa
         when(indexLookup.indexNamesForStreamsInTimeRange(ImmutableSet.of("stream1"), tr))
                 .thenReturn(ImmutableSet.of("searchTypeIndex"));
 
-        final ESGeneratedQueryContext queryContext = this.elasticsearchBackend.generate(searchJob, query, Collections.emptySet());
+        final ESGeneratedQueryContext queryContext = this.elasticsearchBackend.generate(searchJob, query, Collections.emptySet(), new SearchConfig(Period.ZERO));
         final MultiSearchResponse response = TestMultisearchResponse.fromFixture("successfulMultiSearchResponse.json");
         final List<MultiSearchResponse.Item> items = Arrays.stream(response.getResponses())
                 .collect(Collectors.toList());

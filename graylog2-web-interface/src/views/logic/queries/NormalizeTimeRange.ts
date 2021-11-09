@@ -18,11 +18,11 @@
 import isAllMessagesRange from 'views/logic/queries/IsAllMessagesRange';
 import { RELATIVE_ALL_TIME } from 'views/Constants';
 
-import { TimeRange } from './Query';
+import { TimeRange, NoTimeRangeOverride } from './Query';
 
 /* eslint-disable import/prefer-default-export */
-export const normalizeIfAllMessagesRange = (timeRange: TimeRange) => {
-  if (isAllMessagesRange(timeRange)) {
+export const normalizeIfAllMessagesRange = (timeRange: TimeRange | NoTimeRangeOverride) => {
+  if ('type' in timeRange && isAllMessagesRange(timeRange)) {
     return {
       type: timeRange.type,
       range: RELATIVE_ALL_TIME,

@@ -19,7 +19,7 @@ import { useEffect, useState, useCallback, useContext } from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
-import { MenuItem } from 'components/graylog';
+import { MenuItem } from 'components/bootstrap';
 import { QueriesActions } from 'views/stores/QueriesStore';
 import type { QueryId } from 'views/logic/queries/Query';
 import ViewState from 'views/logic/views/ViewState';

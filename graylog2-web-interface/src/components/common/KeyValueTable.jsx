@@ -17,8 +17,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Button } from 'components/graylog';
-import { Input } from 'components/bootstrap';
+import { Button, Input } from 'components/bootstrap';
 import ObjectUtils from 'util/ObjectUtils';
 
 // eslint-disable-next-line no-unused-vars

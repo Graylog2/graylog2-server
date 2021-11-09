@@ -19,45 +19,52 @@ import Reflux from 'reflux';
 import * as URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
-import ActionsProvider from 'injection/ActionsProvider';
+import { singletonStore, singletonActions } from 'logic/singleton';
 
-const IndexerClusterActions = ActionsProvider.getActions('IndexerCluster');
+export const IndexerClusterActions = singletonActions(
+  'core.IndexerCluster',
+  () => Reflux.createActions({
+    health: { asyncResult: true },
+    name: { asyncResult: true },
+  }),
+);
 
-const IndexerClusterStore = Reflux.createStore({
-  listenables: [IndexerClusterActions],
-  state: {},
-  init() {
-    this.update();
-  },
-  update() {
-    Promise.all([
-      this.health().then((health) => {
-        this.state.health = health;
-      }),
-      this.name().then((response) => {
-        this.state.name = response.name;
-      }),
-    ]).then(() => this.trigger(this.state));
-  },
-  getInitialState() {
-    return this.state;
-  },
-  health() {
-    const url = URLUtils.qualifyUrl(ApiRoutes.IndexerClusterApiController.health().url);
-    const promise = fetch('GET', url);
+export const IndexerClusterStore = singletonStore(
+  'core.IndexerCluster',
+  () => Reflux.createStore({
+    listenables: [IndexerClusterActions],
+    state: {},
+    init() {
+      this.update();
+    },
+    update() {
+      Promise.all([
+        this.health().then((health) => {
+          this.state.health = health;
+        }),
+        this.name().then((response) => {
+          this.state.name = response.name;
+        }),
+      ]).then(() => this.trigger(this.state));
+    },
+    getInitialState() {
+      return this.state;
+    },
+    health() {
+      const url = URLUtils.qualifyUrl(ApiRoutes.IndexerClusterApiController.health().url);
+      const promise = fetch('GET', url);
 
-    IndexerClusterActions.health.promise(promise);
+      IndexerClusterActions.health.promise(promise);
 
-    return promise;
-  },
-  name() {
-    const url = URLUtils.qualifyUrl(ApiRoutes.IndexerClusterApiController.name().url);
-    const promise = fetch('GET', url);
+      return promise;
+    },
+    name() {
+      const url = URLUtils.qualifyUrl(ApiRoutes.IndexerClusterApiController.name().url);
+      const promise = fetch('GET', url);
 
-    IndexerClusterActions.name.promise(promise);
+      IndexerClusterActions.name.promise(promise);
 
-    return promise;
-  },
-});
-
-export default IndexerClusterStore;
+      return promise;
+    },
+  }),
+);

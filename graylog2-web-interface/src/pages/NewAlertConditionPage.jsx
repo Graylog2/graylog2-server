@@ -19,17 +19,15 @@ import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 import Reflux from 'reflux';
 
-import { Col, Row } from 'components/graylog';
+import { Col, Row } from 'components/bootstrap';
 import DocumentationLink from 'components/support/DocumentationLink';
 import { DocumentTitle, PageHeader } from 'components/common';
 import { AlertsHeaderToolbar } from 'components/alerts';
 import { CreateAlertConditionInput } from 'components/alertconditions';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
-import StoreProvider from 'injection/StoreProvider';
 import withLocation from 'routing/withLocation';
-
-const CurrentUserStore = StoreProvider.getStore('CurrentUser');
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 
 const NewAlertConditionPage = createReactClass({
   displayName: 'NewAlertConditionPage',

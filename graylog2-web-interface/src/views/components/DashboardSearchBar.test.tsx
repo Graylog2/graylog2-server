@@ -15,10 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { act, render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
+import { act, render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
-import MockStore from 'helpers/mocking/StoreMock';
 
+import MockStore from 'helpers/mocking/StoreMock';
 import { GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
 import { SearchActions } from 'views/stores/SearchStore';
 import WidgetFocusContext, {
@@ -83,7 +83,7 @@ describe('DashboardSearchBar', () => {
 
     const searchButton = screen.getByTitle('Perform search');
 
-    fireEvent.click(searchButton);
+    userEvent.click(searchButton);
 
     await waitFor(() => expect(SearchActions.refresh).toHaveBeenCalledTimes(1));
   });
@@ -102,7 +102,7 @@ describe('DashboardSearchBar', () => {
 
     const searchButton = await screen.findByTitle('Perform search (changes were made after last search execution)');
 
-    fireEvent.click(searchButton);
+    userEvent.click(searchButton);
 
     await waitFor(() => expect(GlobalOverrideActions.set).toHaveBeenCalledWith({ type: 'relative', from: 300 }, ''));
   });

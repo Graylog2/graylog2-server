@@ -19,15 +19,10 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
-import { Row, Col } from 'components/graylog';
-import { Input } from 'components/bootstrap';
 import { ClipboardButton, Spinner } from 'components/common';
+import { Row, Col, Input } from 'components/bootstrap';
 import Version from 'util/Version';
-import ActionsProvider from 'injection/ActionsProvider';
-import StoreProvider from 'injection/StoreProvider';
-
-const ExtractorsActions = ActionsProvider.getActions('Extractors');
-const ExtractorsStore = StoreProvider.getStore('Extractors');
+import { ExtractorsActions, ExtractorsStore } from 'stores/extractors/ExtractorsStore';
 
 const ExportExtractors = createReactClass({
   displayName: 'ExportExtractors',

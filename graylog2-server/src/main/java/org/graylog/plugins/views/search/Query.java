@@ -181,7 +181,7 @@ public abstract class Query implements ContentPackable<QueryEntity> {
         return Query.builder()
                 .id("")
                 .timerange(EmptyTimeRange.emptyTimeRange())
-                .query(new BackendQuery.Fallback())
+                .query(ElasticsearchQueryString.empty())
                 .filter(null)
                 .build();
     }

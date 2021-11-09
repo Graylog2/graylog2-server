@@ -20,7 +20,7 @@ import moment from 'moment';
 import styled, { css } from 'styled-components';
 
 import { Icon, IfPermitted } from 'components/common';
-import { DropdownButton, MenuItem } from 'components/graylog';
+import { DropdownButton, MenuItem } from 'components/bootstrap';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 
 type Props = {

@@ -19,17 +19,15 @@ import PropTypes from 'prop-types';
 import Reflux from 'reflux';
 import createReactClass from 'create-react-class';
 
-import { Link } from 'components/graylog/router';
-import { Col } from 'components/graylog';
+import { Link } from 'components/common/router';
+import { Col } from 'components/bootstrap';
 import { ContentHeadRow, DocumentTitle, Spinner } from 'components/common';
 import OutputsComponent from 'components/outputs/OutputsComponent';
 import SupportLink from 'components/support/SupportLink';
-import StoreProvider from 'injection/StoreProvider';
 import Routes from 'routing/Routes';
 import withParams from 'routing/withParams';
-
-const CurrentUserStore = StoreProvider.getStore('CurrentUser');
-const StreamsStore = StoreProvider.getStore('Streams');
+import StreamsStore from 'stores/streams/StreamsStore';
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 
 const StreamOutputsPage = createReactClass({
   displayName: 'StreamOutputsPage',

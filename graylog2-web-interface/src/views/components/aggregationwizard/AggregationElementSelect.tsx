@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 
-import { DropdownButton, MenuItem } from 'components/graylog';
+import { DropdownButton, MenuItem } from 'components/bootstrap';
 
 import type { AggregationElement } from './AggregationElementType';
 import type { WidgetConfigFormValues } from './WidgetConfigForm';

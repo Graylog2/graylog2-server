@@ -171,6 +171,9 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "is_cloud")
     private boolean isCloud = false;
 
+    @Parameter(value = "run_migrations")
+    private boolean runMigrations = true;
+
     public boolean isMaster() {
         return isMaster;
     }
@@ -209,6 +212,10 @@ public class Configuration extends BaseConfiguration {
 
     public boolean isCloud() {
         return isCloud;
+    }
+
+    public boolean runMigrations() {
+        return runMigrations;
     }
 
     @Override

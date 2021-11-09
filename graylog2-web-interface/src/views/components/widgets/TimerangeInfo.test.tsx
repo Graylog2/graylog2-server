@@ -17,9 +17,9 @@
 import React from 'react';
 import Immutable from 'immutable';
 import { render, screen } from 'wrappedTestingLibrary';
+
 import { MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
-
 import Search from 'views/logic/search/Search';
 import Widget from 'views/logic/widgets/Widget';
 import TimeLocalizeContext from 'contexts/TimeLocalizeContext';
@@ -90,14 +90,14 @@ describe('TimerangeInfo', () => {
     const relativeWidget = widget.toBuilder().timerange({ type: 'relative', range: 3000 }).build();
     render(<SUT widget={relativeWidget} />);
 
-    expect(screen.getByText('an hour ago - Now')).toBeInTheDocument();
+    expect(screen.getByText('50 minutes ago - Now')).toBeInTheDocument();
   });
 
   it('should display a relative timerange with from and to', () => {
     const relativeWidget = widget.toBuilder().timerange({ type: 'relative', from: 3000, to: 2000 }).build();
     render(<SUT widget={relativeWidget} />);
 
-    expect(screen.getByText('an hour ago - 33 minutes ago')).toBeInTheDocument();
+    expect(screen.getByText('50 minutes ago - 33 minutes 20 seconds ago')).toBeInTheDocument();
   });
 
   it('should display a All Time', () => {
@@ -135,7 +135,7 @@ describe('TimerangeInfo', () => {
 
     render(<SUT widget={keywordWidget} />);
 
-    expect(screen.getByText('Global Override: an hour ago - Now')).toBeInTheDocument();
+    expect(screen.getByText('Global Override: 50 minutes ago - Now')).toBeInTheDocument();
   });
 
   it('should not throw error when related search type is empty', () => {
@@ -153,7 +153,7 @@ describe('TimerangeInfo', () => {
 
     render(<SUT widget={relativeWidget} activeQuery="active-query-id" widgetId="widget-id" />);
 
-    expect(screen.getByText('an hour ago - Now')).toBeInTheDocument();
+    expect(screen.getByText('50 minutes ago - Now')).toBeInTheDocument();
   });
 
   it('should not throw error and display default time range when widget id does not exist in search widget mapping', () => {

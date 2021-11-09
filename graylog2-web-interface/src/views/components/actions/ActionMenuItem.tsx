@@ -17,10 +17,10 @@
 import * as React from 'react';
 import { useContext } from 'react';
 import styled from 'styled-components';
-import { ActionContexts } from 'views/types';
 
+import { ActionContexts } from 'views/types';
 import Icon from 'components/common/Icon';
-import { MenuItem } from 'components/graylog';
+import { MenuItem } from 'components/bootstrap';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import {
   ActionDefinition,
@@ -53,7 +53,7 @@ type Props = {
   type: 'field' | 'value',
 }
 
-const StyledHoverForHelp = styled(HoverForHelp)`
+const StyledHoverForHelp = styled((props) => <HoverForHelp {...props} />)`
   margin-left: 5px;
 `;
 

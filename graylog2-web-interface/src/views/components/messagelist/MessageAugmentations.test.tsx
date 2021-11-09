@@ -16,9 +16,9 @@
  */
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
+
 import asMock from 'helpers/mocking/AsMock';
 import { simpleMessage as message } from 'fixtures/messages';
-
 import usePluginEntities from 'views/logic/usePluginEntities';
 import WindowDimensionsContext from 'contexts/WindowDimensionsContext';
 

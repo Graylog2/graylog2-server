@@ -16,8 +16,8 @@
  */
 import React from 'react';
 import { screen, render, act } from 'wrappedTestingLibrary';
-import { adminUser, bob } from 'fixtures/users';
 
+import { adminUser, bob } from 'fixtures/users';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 
 import UserEdit from './UserEdit';

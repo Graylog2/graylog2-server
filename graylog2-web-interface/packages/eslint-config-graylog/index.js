@@ -92,7 +92,7 @@ module.exports = {
     'no-restricted-imports': ['error', {
       paths: [{
         name: 'react-bootstrap',
-        message: 'Please use `components/graylog` instead.',
+        message: 'Please use `components/bootstrap` instead.',
       }, {
         name: 'create-react-class',
         message: 'Please use an ES6 or functional component instead.',
@@ -154,6 +154,7 @@ module.exports = {
         config: './webpack.config.js',
       },
     },
+    'import/internal-regex': '^(actions|components|contexts|domainActions|fixtures|helpers|hooks|logic|routing|stores|util|theme|views)/',
     polyfills: [
       'fetch',
       'IntersectionObserver',

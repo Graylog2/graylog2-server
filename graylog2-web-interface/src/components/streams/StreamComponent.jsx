@@ -17,17 +17,15 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Alert } from 'components/graylog';
+import { Alert } from 'components/bootstrap';
 import { Icon, IfPermitted, PaginatedList, SearchForm } from 'components/common';
-import StoreProvider from 'injection/StoreProvider';
 import Spinner from 'components/common/Spinner';
 import QueryHelper from 'components/common/QueryHelper';
+import StreamsStore from 'stores/streams/StreamsStore';
+import { StreamRulesStore } from 'stores/streams/StreamRulesStore';
 
 import StreamList from './StreamList';
 import CreateStreamButton from './CreateStreamButton';
-
-const StreamsStore = StoreProvider.getStore('Streams');
-const StreamRulesStore = StoreProvider.getStore('StreamRules');
 
 class StreamComponent extends React.Component {
   static propTypes = {

@@ -29,8 +29,10 @@ import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.engine.QueryStringDecorator;
+import org.graylog.plugins.views.search.engine.SearchConfig;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
+import org.joda.time.Period;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -74,7 +76,7 @@ class ElasticsearchBackendQueryStringDecoratorsTest {
     }
 
     private DocumentContext generateJsonRequest(Query query, SearchJob searchJob) {
-        final ESGeneratedQueryContext context = this.backend.generate(searchJob, query, Collections.emptySet());
+        final ESGeneratedQueryContext context = this.backend.generate(searchJob, query, Collections.emptySet(), new SearchConfig(Period.ZERO));
 
         final String request = context.searchTypeQueries().get("testSearchtype").toString();
         return JsonPath.parse(request);
@@ -94,7 +96,7 @@ class ElasticsearchBackendQueryStringDecoratorsTest {
         final SearchType searchType = basicSearchType();
         final SearchJob searchJob = basicSearchJob(query, searchType);
 
-        when(query.query()).thenReturn(ElasticsearchQueryString.builder().queryString("*").build());
+        when(query.query()).thenReturn(ElasticsearchQueryString.of("*"));
 
         return searchJob;
     }
@@ -103,8 +105,8 @@ class ElasticsearchBackendQueryStringDecoratorsTest {
         final SearchType searchType = basicSearchType();
         final SearchJob searchJob = basicSearchJob(query, searchType);
 
-        when(query.query()).thenReturn(ElasticsearchQueryString.builder().queryString("*").build());
-        when(searchType.query()).thenReturn(Optional.of(ElasticsearchQueryString.builder().queryString("Should never show up").build()));
+        when(query.query()).thenReturn(ElasticsearchQueryString.of("*"));
+        when(searchType.query()).thenReturn(Optional.of(ElasticsearchQueryString.of("Should never show up")));
 
         return searchJob;
     }

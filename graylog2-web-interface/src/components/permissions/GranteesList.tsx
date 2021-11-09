@@ -20,8 +20,8 @@ import styled from 'styled-components';
 import { $PropertyType } from 'utility-types';
 
 import SharedEntity from 'logic/permissions/SharedEntity';
+import { Alert } from 'components/bootstrap';
 import { Pagination, PageSizeSelect } from 'components/common';
-import { Alert } from 'components/graylog';
 import EntityShareState, { ActiveShares, CapabilitiesList, SelectedGrantees } from 'logic/permissions/EntityShareState';
 import Grantee from 'logic/permissions/Grantee';
 import Capability from 'logic/permissions/Capability';

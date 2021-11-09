@@ -21,8 +21,8 @@ import { mount } from 'wrappedEnzyme';
 import Reflux from 'reflux';
 import PropTypes from 'prop-types';
 import { Map, List } from 'immutable';
-import { asMock } from 'helpers/mocking/index';
 
+import { asMock } from 'helpers/mocking/index';
 import type { Store } from 'stores/StoreTypes';
 
 import {

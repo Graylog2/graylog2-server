@@ -20,7 +20,7 @@ import { Set } from 'immutable';
 import styled from 'styled-components';
 
 import { DataTable, Icon } from 'components/common';
-import { Badge } from 'components/graylog';
+import { Badge } from 'components/bootstrap';
 
 const StyledBadge = styled(({ isFulfilled, theme, ...rest }) => <Badge {...rest} />)`
   background-color: ${({ isFulfilled, theme }) => (isFulfilled ? theme.colors.variant.success : theme.colors.variant.danger)};

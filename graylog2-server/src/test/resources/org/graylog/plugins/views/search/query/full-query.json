@@ -1,0 +1,16 @@
+{
+  "id": "5d1a3e5a-4892-4689-86fe-5af187fc9282",
+  "query": {
+    "type": "elasticsearch",
+    "query_string": "some-full-query"
+  },
+  "timerange": {
+    "type": "relative",
+    "from": 300
+  },
+  "search_types": [
+    {
+      "type": "messages"
+    }
+  ]
+}

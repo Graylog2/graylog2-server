@@ -127,6 +127,10 @@ public class Server extends ServerBootstrap {
         super("server", configuration);
     }
 
+    public Server(String commandName) {
+        super(commandName, configuration);
+    }
+
     @Option(name = {"-l", "--local"}, description = "Run Graylog in local mode. Only interesting for Graylog developers.")
     private boolean local = false;
 
@@ -140,7 +144,7 @@ public class Server extends ServerBootstrap {
         modules.add(
                 new VersionAwareStorageModule(),
                 new ConfigurationModule(configuration),
-                new ServerBindings(configuration),
+                new ServerBindings(configuration, isMigrationCommand()),
                 new ElasticsearchModule(),
                 new PersistenceServicesBindings(),
                 new MessageFilterBindings(),
@@ -162,7 +166,6 @@ public class Server extends ServerBootstrap {
                 new MigrationsModule(),
                 new NetFlowPluginModule(),
                 new CEFInputModule(),
-                new MapWidgetModule(),
                 new SidecarModule(),
                 new ContentPacksModule(),
                 new ViewsBindings(),
@@ -173,6 +176,12 @@ public class Server extends ServerBootstrap {
                 new SecurityModule(),
                 new PrometheusMetricsModule()
         );
+
+        if (!isMigrationCommand()) {
+            modules.add(
+                    new MapWidgetModule()
+            );
+        }
 
         return modules.build();
     }

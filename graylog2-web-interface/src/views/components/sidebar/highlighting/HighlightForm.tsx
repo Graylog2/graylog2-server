@@ -21,8 +21,7 @@ import * as Immutable from 'immutable';
 import { Formik, Form, Field } from 'formik';
 
 import { defaultCompare } from 'views/logic/DefaultCompare';
-import { Input, BootstrapModalWrapper } from 'components/bootstrap';
-import { Button, Modal } from 'components/graylog';
+import { Input, BootstrapModalWrapper, Button, Modal } from 'components/bootstrap';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import Select from 'components/common/Select';

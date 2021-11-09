@@ -19,21 +19,17 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import Reflux from 'reflux';
 
-import { LinkContainer } from 'components/graylog/router';
+import { LinkContainer } from 'components/common/router';
 import { DocumentTitle, Spinner } from 'components/common';
 import PageHeader from 'components/common/PageHeader';
 import ExtractorsList from 'components/extractors/ExtractorsList';
 import DocumentationLink from 'components/support/DocumentationLink';
-import ActionsProvider from 'injection/ActionsProvider';
-import StoreProvider from 'injection/StoreProvider';
-import { DropdownButton, MenuItem } from 'components/graylog';
+import { DropdownButton, MenuItem } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 import withParams from 'routing/withParams';
-
-const NodesActions = ActionsProvider.getActions('Nodes');
-const InputsActions = ActionsProvider.getActions('Inputs');
-const NodesStore = StoreProvider.getStore('Nodes');
+import { InputsActions } from 'stores/inputs/InputsStore';
+import { NodesActions, NodesStore } from 'stores/nodes/NodesStore';
 
 const ExtractorsPage = createReactClass({
   displayName: 'ExtractorsPage',

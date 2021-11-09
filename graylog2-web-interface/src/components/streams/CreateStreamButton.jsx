@@ -17,7 +17,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Button } from 'components/graylog';
+import { Button } from 'components/bootstrap';
 import StreamForm from 'components/streams/StreamForm';
 
 class CreateStreamButton extends React.Component {

@@ -1,0 +1,41 @@
+{
+  "id": "6141d45bd3a6b9d73c8ac55b",
+  "type": "DASHBOARD",
+  "title": "test",
+  "search_id": "6141d457d3a6b9d73c8ac55a",
+  "state": {
+    "278992f6-8930-43f5-9dd7-11bbc4e3b797": {
+      "titles": {},
+      "widgets": [
+        {
+          "id": "34316a67-3dca-4994-a061-2fc6a9bf7f0b",
+          "type": "logs",
+          "config": {
+            "fields": [
+              "timestamp",
+              "source",
+              "message"
+            ],
+            "size": 100,
+            "sort": "DESC"
+          },
+          "streams": []
+        }
+      ],
+      "widget_mapping": {
+        "34316a67-3dca-4994-a061-2fc6a9bf7f0b": [
+          "967d2217-fd99-48a6-b829-5acdab906808"
+        ]
+      },
+      "positions": {
+        "34316a67-3dca-4994-a061-2fc6a9bf7f0b": {
+          "col": 1,
+          "row": 1,
+          "height": 4,
+          "width": 12
+        }
+      }
+    }
+  },
+  "created_at": "2021-09-15T11:08:42.248Z"
+}

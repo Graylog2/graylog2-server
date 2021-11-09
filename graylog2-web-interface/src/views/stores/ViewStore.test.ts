@@ -15,8 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as Immutable from 'immutable';
-import mockAction from 'helpers/mocking/MockAction';
 
+import mockAction from 'helpers/mocking/MockAction';
+import { MockStore } from 'helpers/mocking';
 import ViewState from 'views/logic/views/ViewState';
 import SearchActions from 'views/actions/SearchActions';
 import Search from 'views/logic/search/Search';
@@ -37,6 +38,7 @@ jest.mock('views/logic/Widgets', () => ({
   allMessagesTable: () => ({}),
 }));
 
+jest.mock('stores/users/CurrentUserStore', () => ({ CurrentUserStore: MockStore() }));
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
 
 describe('ViewStore', () => {

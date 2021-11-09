@@ -17,10 +17,11 @@
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 import PropTypes from 'prop-types';
-import { PublicNotificationsHooks } from 'theme/types';
 
+import { PublicNotificationsHooks } from 'theme/types';
 import usePluginEntities from 'views/logic/usePluginEntities';
-import { Alert, Button } from 'components/graylog';
+import Alert from 'components/bootstrap/Alert';
+import Button from 'components/bootstrap/Button';
 import AppConfig from 'util/AppConfig';
 
 interface Props {

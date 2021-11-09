@@ -25,7 +25,7 @@ import type { ViewMetaData as ViewMetadata } from 'views/stores/ViewMetadataStor
 import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
-import { Button } from 'components/graylog';
+import { Button } from 'components/bootstrap';
 
 import List from './List';
 import FieldGroup from './FieldGroup';

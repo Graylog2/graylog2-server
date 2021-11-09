@@ -25,7 +25,7 @@ import { useStore } from 'stores/connect';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import ChartColorContext from 'views/components/visualizations/ChartColorContext';
 import { CurrentViewStateStore } from 'views/stores/CurrentViewStateStore';
-import { Popover } from 'components/graylog';
+import { Popover } from 'components/bootstrap';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import { colors as defaultColors } from 'views/components/visualizations/Colors';
 import { EVENT_COLOR, eventsDisplayName } from 'views/logic/searchtypes/events/EventHandler';

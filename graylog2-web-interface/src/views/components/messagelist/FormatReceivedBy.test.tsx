@@ -17,18 +17,18 @@
 import * as React from 'react';
 import { render, screen, within } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
-import { MockCombinedProvider, MockStore } from 'helpers/mocking';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import { MockStore } from 'helpers/mocking';
 import { Input } from 'components/messageloaders/Types';
 
 import FormatReceivedBy from './FormatReceivedBy';
 
-jest.mock('injection/CombinedProvider', () => new MockCombinedProvider({
-  Nodes: {
-    NodesStore: MockStore(['getInitialState', () => ({ nodes: { existingNode: { short_node_id: 'foobar', hostname: 'existing.node' } } })]),
-  },
+jest.mock('stores/nodes/NodesStore', () => ({
+  NodesStore: MockStore(['getInitialState', () => ({ nodes: { existingNode: { short_node_id: 'foobar', hostname: 'existing.node' } } })]),
 }));
+
+jest.mock('stores/users/CurrentUserStore', () => ({ CurrentUserStore: MockStore() }));
 
 type ForwarderReceivedByProps = {
   inputId: string,

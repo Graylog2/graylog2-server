@@ -18,16 +18,14 @@ import PropTypes from 'prop-types';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 
 import { useStore } from 'stores/connect';
-import { Link } from 'components/graylog/router';
-import { Button, ControlLabel, FormGroup } from 'components/graylog';
+import { Link } from 'components/common/router';
 import { SelectableList } from 'components/common';
-import { BootstrapModalForm, Input } from 'components/bootstrap';
+import { Button, ControlLabel, FormGroup, BootstrapModalForm, Input } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
+import NumberUtils from 'util/NumberUtils';
 import Routes from 'routing/Routes';
-import CombinedProvider from 'injection/CombinedProvider';
-import { PipelineType, StageType } from 'stores/pipelines/PipelinesStore';
-
-const { RulesStore } = CombinedProvider.get('Rules');
+import type { PipelineType, StageType } from 'stores/pipelines/PipelinesStore';
+import { RulesStore } from 'stores/rules/RulesStore';
 
 type Props = {
   pipeline: PipelineType,
@@ -117,6 +115,8 @@ const StageForm = ({ pipeline, stage, create, save }: Props) => {
                  name="stage"
                  label="Stage"
                  autoFocus
+                 min={NumberUtils.JAVA_INTEGER_MIN_VALUE + 1}
+                 max={NumberUtils.JAVA_INTEGER_MAX_VALUE}
                  onChange={_onChange}
                  bsStyle={isOverridingStage ? 'error' : null}
                  help={isOverridingStage

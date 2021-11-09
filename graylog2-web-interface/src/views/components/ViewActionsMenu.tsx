@@ -21,7 +21,7 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 import connect from 'stores/connect';
 import { isPermitted } from 'util/PermissionsMixin';
 import AppConfig from 'util/AppConfig';
-import { DropdownButton, MenuItem, Button, ButtonGroup } from 'components/graylog';
+import { DropdownButton, MenuItem, Button, ButtonGroup } from 'components/bootstrap';
 import { Icon, ShareButton } from 'components/common';
 import ExportModal from 'views/components/export/ExportModal';
 import DebugOverlay from 'views/components/DebugOverlay';

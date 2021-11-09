@@ -17,8 +17,8 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
 
-import { LinkContainer } from 'components/graylog/router';
-import { ButtonToolbar, Col, Row, Button } from 'components/graylog';
+import { LinkContainer } from 'components/common/router';
+import { ButtonToolbar, Col, Row, Button } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
 import Routes from 'routing/Routes';
 import CollectorForm from 'components/sidecars/configuration-forms/CollectorForm';

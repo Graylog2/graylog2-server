@@ -25,7 +25,7 @@ import connect from 'stores/connect';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
 import { Spinner, Icon, FlatContentRow } from 'components/common';
-import { Row, Col } from 'components/graylog';
+import { Row, Col } from 'components/bootstrap';
 import BottomRow from 'views/components/searchbar/BottomRow';
 import ViewActionsWrapper from 'views/components/searchbar/ViewActionsWrapper';
 import SearchButton from 'views/components/searchbar/SearchButton';

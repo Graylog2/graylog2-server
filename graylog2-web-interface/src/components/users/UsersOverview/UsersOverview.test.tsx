@@ -17,11 +17,11 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { render, waitFor, fireEvent, screen } from 'wrappedTestingLibrary';
+
 import { adminUser as currentUser } from 'fixtures/users';
 import { paginatedUsers, alice, bob, admin as adminOverview } from 'fixtures/userOverviews';
 import asMock from 'helpers/mocking/AsMock';
 import mockAction from 'helpers/mocking/MockAction';
-
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import { UsersActions } from 'stores/users/UsersStore';
 
@@ -30,7 +30,7 @@ import UsersOverview from './UsersOverview';
 // The usage of OverlayTrigger in the StatusCell of the users overview
 // often results in a timeout when executing the 'should search users' test.
 // We need to mock OverlayTrigger until we fix the root problem.
-jest.mock('components/graylog/OverlayTrigger', () => 'overlay-trigger');
+jest.mock('components/common/OverlayTrigger', () => 'overlay-trigger');
 
 const mockLoadUsersPaginatedPromise = Promise.resolve(paginatedUsers);
 

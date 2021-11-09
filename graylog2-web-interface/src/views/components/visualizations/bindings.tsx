@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type { VisualizationType } from 'views/types';
-
 import dataTable from 'views/components/datatable/bindings';
 
 import areaChart from './area/bindings';

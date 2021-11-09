@@ -17,8 +17,8 @@
 import * as React from 'react';
 import { useState, useContext, useCallback } from 'react';
 import styled from 'styled-components';
-import { BackendWidgetPosition } from 'views/types';
 
+import { BackendWidgetPosition } from 'views/types';
 import ExportModal from 'views/components/export/ExportModal';
 import MoveWidgetToTab from 'views/logic/views/MoveWidgetToTab';
 import { loadDashboard } from 'views/logic/views/Actions';
@@ -33,7 +33,7 @@ import Search from 'views/logic/search/Search';
 import CopyWidgetToDashboard from 'views/logic/views/CopyWidgetToDashboard';
 import type { ViewStoreState } from 'views/stores/ViewStore';
 import IfSearch from 'views/components/search/IfSearch';
-import { MenuItem } from 'components/graylog';
+import { MenuItem } from 'components/bootstrap';
 import { WidgetActions } from 'views/stores/WidgetStore';
 import { useStore } from 'stores/connect';
 

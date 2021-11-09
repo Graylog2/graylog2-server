@@ -19,7 +19,7 @@ import React from 'react';
 import Immutable from 'immutable';
 import styled, { css } from 'styled-components';
 
-import { Alert } from 'components/graylog';
+import { Alert } from 'components/bootstrap';
 import { FULL_MESSAGE_FIELD, MESSAGE_FIELD } from 'views/Constants';
 
 const MessageTerms = styled.span(({ theme }) => css`

@@ -17,11 +17,12 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { act } from 'react-dom/test-utils';
-import { simpleFields, simpleQueryFields } from 'fixtures/fields';
 import { render } from 'wrappedTestingLibrary';
+
+import { simpleFields, simpleQueryFields } from 'fixtures/fields';
 import asMock from 'helpers/mocking/AsMock';
 import MockStore from 'helpers/mocking/StoreMock';
-
+import MockAction from 'helpers/mocking/MockAction';
 import { SearchLoadingStateStore } from 'views/stores/SearchLoadingStateStore';
 import SearchResult from 'views/components/SearchResult';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
@@ -60,6 +61,9 @@ jest.mock('views/stores/SearchLoadingStateStore', () => ({
 
 jest.mock('stores/configurations/ConfigurationsStore', () => ({
   ConfigurationsStore: MockStore(),
+  ConfigurationsActions: {
+    listSearchesClusterConfig: MockAction(),
+  },
 }));
 
 describe('SearchResult', () => {

@@ -17,9 +17,9 @@
 import * as React from 'react';
 import { act } from 'react-dom/test-utils';
 import { render, waitFor, fireEvent } from 'wrappedTestingLibrary';
+
 import asMock from 'helpers/mocking/AsMock';
 import { MockStore } from 'helpers/mocking';
-
 import { processHooks } from 'views/logic/views/ViewLoader';
 import { ViewActions } from 'views/stores/ViewStore';
 import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';

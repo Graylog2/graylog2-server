@@ -16,9 +16,9 @@
  */
 import * as React from 'react';
 import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
+
 import { StoreMock as MockStore } from 'helpers/mocking';
 import mockAction from 'helpers/mocking/MockAction';
-
 import { SearchActions } from 'views/stores/SearchStore';
 // eslint-disable-next-line import/no-named-default
 import { default as MockQuery } from 'views/logic/queries/Query';
@@ -30,10 +30,12 @@ import SearchBar from './SearchBar';
 
 const mockCurrentUser = { currentUser: { fullname: 'Ada Lovelace', username: 'ada' } };
 
-jest.mock('stores/users/CurrentUserStore', () => MockStore(
-  ['get', () => mockCurrentUser],
-  ['getInitialState', () => mockCurrentUser],
-));
+jest.mock('stores/users/CurrentUserStore', () => ({
+  CurrentUserStore: MockStore(
+    ['get', () => mockCurrentUser],
+    ['getInitialState', () => mockCurrentUser],
+  ),
+}));
 
 jest.mock('stores/streams/StreamsStore', () => MockStore(
   'listen',

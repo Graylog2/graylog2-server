@@ -19,33 +19,40 @@ import Reflux from 'reflux';
 import * as URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
-import ActionsProvider from 'injection/ActionsProvider';
+import { singletonStore, singletonActions } from 'logic/singleton';
 
-const DeflectorActions = ActionsProvider.getActions('Deflector');
+export const DeflectorActions = singletonActions(
+  'core.Deflector',
+  () => Reflux.createActions({
+    cycle: { asyncResult: true },
+    list: { asyncResult: true },
+  }),
+);
 
-const DeflectorStore = Reflux.createStore({
-  listenables: [DeflectorActions],
-  deflector: {
-    info: undefined,
-  },
-  getInitialState() {
-    return { deflector: this.deflector };
-  },
-  cycle(indexSetId) {
-    const url = URLUtils.qualifyUrl(ApiRoutes.DeflectorApiController.cycle(indexSetId).url);
-    const promise = fetch('POST', url);
+export const DeflectorStore = singletonStore(
+  'core.Deflector',
+  () => Reflux.createStore({
+    listenables: [DeflectorActions],
+    deflector: {
+      info: undefined,
+    },
+    getInitialState() {
+      return { deflector: this.deflector };
+    },
+    cycle(indexSetId) {
+      const url = URLUtils.qualifyUrl(ApiRoutes.DeflectorApiController.cycle(indexSetId).url);
+      const promise = fetch('POST', url);
 
-    DeflectorActions.cycle.promise(promise);
-  },
-  list(indexSetId) {
-    const url = URLUtils.qualifyUrl(ApiRoutes.DeflectorApiController.list(indexSetId).url);
-    const promise = fetch('GET', url).then((info) => {
-      this.deflector.info = info;
-      this.trigger({ deflector: this.deflector });
-    });
+      DeflectorActions.cycle.promise(promise);
+    },
+    list(indexSetId) {
+      const url = URLUtils.qualifyUrl(ApiRoutes.DeflectorApiController.list(indexSetId).url);
+      const promise = fetch('GET', url).then((info) => {
+        this.deflector.info = info;
+        this.trigger({ deflector: this.deflector });
+      });
 
-    DeflectorActions.list.promise(promise);
-  },
-});
-
-export default DeflectorStore;
+      DeflectorActions.list.promise(promise);
+    },
+  }),
+);

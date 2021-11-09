@@ -16,18 +16,16 @@
  */
 import * as React from 'react';
 import { render } from 'wrappedTestingLibrary';
+
 import asMock from 'helpers/mocking/AsMock';
 import { alice } from 'fixtures/users';
-import { CombinedProviderMock as MockCombinedProvider, StoreMock as MockStore } from 'helpers/mocking';
-
-import CombinedProvider from 'injection/CombinedProvider';
+import { StoreMock as MockStore } from 'helpers/mocking';
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 
 import CurrentUserContext from './CurrentUserContext';
 import CurrentUserProvider from './CurrentUserProvider';
 
-const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
-
-jest.mock('injection/CombinedProvider', () => new MockCombinedProvider({ CurrentUser: { CurrentUserStore: MockStore() } }));
+jest.mock('stores/users/CurrentUserStore', () => ({ CurrentUserStore: MockStore(['getInitialState', jest.fn(() => ({}))]) }));
 
 describe('CurrentUserProvider', () => {
   const renderSUT = () => {

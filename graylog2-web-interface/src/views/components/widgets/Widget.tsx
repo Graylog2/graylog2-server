@@ -19,8 +19,8 @@ import { useCallback, useContext, useMemo, useState } from 'react';
 import * as Immutable from 'immutable';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { BackendWidgetPosition, WidgetResults } from 'views/types';
 
+import { BackendWidgetPosition, WidgetResults } from 'views/types';
 import { useStore } from 'stores/connect';
 import { widgetDefinition } from 'views/logic/Widgets';
 import { WidgetActions, Widgets } from 'views/stores/WidgetStore';

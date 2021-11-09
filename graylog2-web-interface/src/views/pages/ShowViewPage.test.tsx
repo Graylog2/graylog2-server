@@ -17,9 +17,9 @@
 import * as React from 'react';
 import { List } from 'immutable';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
+
 import mockAction from 'helpers/mocking/MockAction';
 import asMock from 'helpers/mocking/AsMock';
-
 import StreamsContext from 'contexts/StreamsContext';
 import { NotFoundErrorType } from 'logic/errors/ReportedErrors';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';

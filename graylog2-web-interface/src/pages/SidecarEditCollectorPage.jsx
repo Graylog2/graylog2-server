@@ -18,16 +18,14 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 
-import { LinkContainer } from 'components/graylog/router';
-import { ButtonToolbar, Col, Row, Button } from 'components/graylog';
+import { LinkContainer } from 'components/common/router';
+import { ButtonToolbar, Col, Row, Button } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import Routes from 'routing/Routes';
 import history from 'util/History';
-import CombinedProvider from 'injection/CombinedProvider';
+import { CollectorsActions } from 'stores/sidecars/CollectorsStore';
 import CollectorForm from 'components/sidecars/configuration-forms/CollectorForm';
 import withParams from 'routing/withParams';
-
-const { CollectorsActions } = CombinedProvider.get('Collectors');
 
 const SidecarEditCollectorPage = createReactClass({
   displayName: 'SidecarEditCollectorPage',

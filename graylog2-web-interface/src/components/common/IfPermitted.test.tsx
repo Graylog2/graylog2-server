@@ -17,15 +17,14 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { render, screen } from 'wrappedTestingLibrary';
-import { alice } from 'fixtures/users';
 
+import { alice } from 'fixtures/users';
 import User from 'logic/users/User';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 
 import IfPermitted from './IfPermitted';
 
 jest.mock('stores/connect', () => (x) => x);
-jest.mock('injection/StoreProvider', () => ({ getStore: () => {} }));
 
 describe('IfPermitted', () => {
   type SUTProps = Partial<React.ComponentProps<typeof IfPermitted>> & {

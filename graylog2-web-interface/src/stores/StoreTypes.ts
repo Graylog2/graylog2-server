@@ -19,8 +19,10 @@ type ExtractResultType<R extends PromiseProvider> = ExtractTypeFromPromise<Retur
 type ExtractTypeFromPromise<P> = P extends Promise<infer R> ? R : P;
 
 export type ListenableAction<R extends PromiseProvider> = R & {
+  triggerPromise: R;
   listen: (cb: (result: ExtractResultType<R>) => any) => () => void;
   completed: {
+    (result: ExtractResultType<R>): void;
     listen: (cb: (result: ExtractResultType<R>) => any) => () => void;
   };
   promise: (promise: ReturnType<R>) => void;

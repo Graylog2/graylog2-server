@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { cleanup, render, fireEvent } from 'wrappedTestingLibrary';
+
 import { MockStore } from 'helpers/mocking';
 
 import StreamRuleForm from './StreamRuleForm';
@@ -27,7 +28,12 @@ jest.mock('components/common', () => ({
   Icon: ({ children }) => (<div>{children}</div>),
 }));
 
-jest.mock('stores/inputs/InputsStore', () => MockStore(['getInitialState', () => ({ inputs: [] })]));
+jest.mock('stores/inputs/InputsStore', () => ({
+  InputsActions: {
+    list: jest.fn(),
+  },
+  InputsStore: MockStore(['getInitialState', () => ({ inputs: [] })]),
+}));
 
 describe('StreamRuleForm', () => {
   afterEach(() => {

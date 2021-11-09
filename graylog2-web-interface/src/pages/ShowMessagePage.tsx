@@ -18,11 +18,9 @@ import PropTypes from 'prop-types';
 import React, { useEffect, useMemo, useState } from 'react';
 import * as Immutable from 'immutable';
 
-import ActionsProvider from 'injection/ActionsProvider';
-import StoreProvider from 'injection/StoreProvider';
 import DocumentTitle from 'components/common/DocumentTitle';
 import Spinner from 'components/common/Spinner';
-import { Col, Row } from 'components/graylog';
+import { Col, Row } from 'components/bootstrap';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
 import MessageDetail from 'views/components/messagelist/MessageDetail';
 import withParams from 'routing/withParams';
@@ -32,11 +30,10 @@ import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
 import { Message } from 'views/components/messagelist/Types';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import WindowDimensionsContextProvider from 'contexts/WindowDimensionsContextProvider';
-
-const NodesActions = ActionsProvider.getActions('Nodes');
-const InputsActions = ActionsProvider.getActions('Inputs');
-const MessagesActions = ActionsProvider.getActions('Messages');
-const StreamsStore = StoreProvider.getStore('Streams');
+import StreamsStore from 'stores/streams/StreamsStore';
+import { InputsActions } from 'stores/inputs/InputsStore';
+import { MessagesActions } from 'stores/messages/MessagesStore';
+import { NodesActions } from 'stores/nodes/NodesStore';
 
 type Props = {
   params: {
@@ -104,6 +101,11 @@ const FieldTypesProvider = ({ streams, timestamp, children }: FieldTypesProvider
   );
 };
 
+type MessageFields = {
+  streams: Array<string>,
+  timestamp: string,
+};
+
 const ShowMessagePage = ({ params: { index, messageId } }: Props) => {
   if (!index || !messageId) {
     throw new Error('index and messageId need to be specified!');
@@ -120,14 +122,15 @@ const ShowMessagePage = ({ params: { index, messageId } }: Props) => {
     && allStreams !== undefined), [message, streams, inputs, allStreams]);
 
   if (isLoaded) {
-    const { streams: messageStreams, timestamp } = message.fields;
+    const { streams: messageStreams, timestamp } = message.fields as MessageFields;
+    const fieldTypesStreams = messageStreams.filter((streamId) => streams.has(streamId));
 
     return (
       <DocumentTitle title={`Message ${messageId} on ${index}`}>
         <Row className="content" id="sticky-augmentations-container">
           <Col md={12}>
             <WindowDimensionsContextProvider>
-              <FieldTypesProvider streams={messageStreams as Array<string>} timestamp={timestamp as string}>
+              <FieldTypesProvider streams={fieldTypesStreams} timestamp={timestamp}>
                 <InteractiveContext.Provider value={false}>
                   <MessageDetail fields={Immutable.List()}
                                  streams={streams}

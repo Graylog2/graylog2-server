@@ -16,10 +16,10 @@
  */
 import * as React from 'react';
 import { render, fireEvent, waitFor, screen, act } from 'wrappedTestingLibrary';
-import { alice, adminUser } from 'fixtures/users';
 import selectEvent from 'react-select-event';
 import { List } from 'immutable';
 
+import { alice, adminUser } from 'fixtures/users';
 import SharedEntity from 'logic/permissions/SharedEntity';
 import Grantee from 'logic/permissions/Grantee';
 import CurrentUserContext from 'contexts/CurrentUserContext';

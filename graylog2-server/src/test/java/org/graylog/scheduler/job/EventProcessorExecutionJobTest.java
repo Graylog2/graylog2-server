@@ -127,7 +127,7 @@ public class EventProcessorExecutionJobTest {
         assertThat(triggerUpdate.nextTime()).isPresent().get().isEqualTo(triggerNextTime.plusSeconds(scheduleIntervalSeconds));
 
         assertThat(triggerUpdate.data()).isPresent().get().isEqualTo(EventProcessorExecutionJob.Data.builder()
-                .timerangeFrom(to.plusMillis(1))
+                .timerangeFrom(to)
                 .timerangeTo(to.plus(processingWindowSize))
                 .build());
 
@@ -194,7 +194,7 @@ public class EventProcessorExecutionJobTest {
         assertThat(triggerUpdate.nextTime()).isPresent().get().isEqualTo(triggerNextTime.plusSeconds(scheduleIntervalSeconds));
 
         assertThat(triggerUpdate.data()).isPresent().get().isEqualTo(EventProcessorExecutionJob.Data.builder()
-                .timerangeFrom(to.plusMillis(1))
+                .timerangeFrom(to)
                 .timerangeTo(to.plus(processingWindowSize))
                 .build());
 
@@ -264,7 +264,7 @@ public class EventProcessorExecutionJobTest {
 
         // The next timerange in the trigger update also needs to be based on the timerange from the trigger
         assertThat(triggerUpdate.data()).isPresent().get().isEqualTo(EventProcessorExecutionJob.Data.builder()
-                .timerangeFrom(triggerTo.plusMillis(1))
+                .timerangeFrom(triggerTo)
                 .timerangeTo(triggerTo.plus(processingWindowSize))
                 .build());
 
@@ -538,7 +538,7 @@ public class EventProcessorExecutionJobTest {
             // The new nextFrom should ignore the processingHopSize and start 1ms after the last `To` Range
             // The nextTo will be one window of the processingCatchUpWindowSize
             assertThat(triggerUpdate.data()).isPresent().get().isEqualTo(EventProcessorExecutionJob.Data.builder()
-                    .timerangeFrom(to.plus(processingHopSize).minus(processingWindowSize).plusMillis(1))
+                    .timerangeFrom(to.plus(processingHopSize).minus(processingWindowSize))
                     .timerangeTo(to.plus(processingCatchUpWindowSize))
                     .build());
         } else {
@@ -546,7 +546,7 @@ public class EventProcessorExecutionJobTest {
             // With a hopping window the "to" is calculated by adding the hopSize and the "from" is based on the next "to"
             // minus the windowSize + 1 millisecond.
             assertThat(triggerUpdate.data()).isPresent().get().isEqualTo(EventProcessorExecutionJob.Data.builder()
-                    .timerangeFrom(to.plus(processingHopSize).minus(processingWindowSize).plusMillis(1))
+                    .timerangeFrom(to.plus(processingHopSize).minus(processingWindowSize))
                     .timerangeTo(to.plus(processingHopSize))
                     .build());
         }
@@ -619,7 +619,7 @@ public class EventProcessorExecutionJobTest {
         // With a hopping window the "to" is calculated by adding the hopSize and the "from" is based on the next "to"
         // minus the windowSize + 1 millisecond.
         assertThat(triggerUpdate.data()).isPresent().get().isEqualTo(EventProcessorExecutionJob.Data.builder()
-                .timerangeFrom(to.plus(processingHopSize).minus(processingWindowSize).plusMillis(1))
+                .timerangeFrom(to.plus(processingHopSize).minus(processingWindowSize))
                 .timerangeTo(to.plus(processingHopSize))
                 .build());
 

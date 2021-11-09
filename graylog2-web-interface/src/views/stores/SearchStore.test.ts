@@ -15,13 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import asMock from 'helpers/mocking/AsMock';
-
+import { MockStore } from 'helpers/mocking';
 import fetch from 'logic/rest/FetchProvider';
 import Search from 'views/logic/search/Search';
 
 import { SearchActions } from './SearchStore';
 
 jest.mock('logic/rest/FetchProvider', () => jest.fn());
+jest.mock('stores/users/CurrentUserStore', () => ({ CurrentUserStore: MockStore() }));
 
 describe('SearchStore', () => {
   it('assigns a new search id when creating a search', () => {

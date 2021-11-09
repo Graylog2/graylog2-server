@@ -19,12 +19,12 @@ import { useContext } from 'react';
 import styled from 'styled-components';
 
 import CurrentUserContext from 'contexts/CurrentUserContext';
-import { LinkContainer } from 'components/graylog/router';
+import { LinkContainer } from 'components/common/router';
 import UserOverview from 'logic/users/UserOverview';
 import UsersDomain from 'domainActions/users/UsersDomain';
 import Routes from 'routing/Routes';
-import { Button, OverlayTrigger, Tooltip, DropdownButton, MenuItem } from 'components/graylog';
-import { IfPermitted } from 'components/common';
+import { Button, Tooltip, DropdownButton, MenuItem } from 'components/bootstrap';
+import { OverlayTrigger, IfPermitted } from 'components/common';
 
 type Props = {
   user: UserOverview,

@@ -19,13 +19,11 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
-import { Row, Col } from 'components/graylog';
+import { Row, Col } from 'components/bootstrap';
 import { Spinner, EntityList, Pluralize } from 'components/common';
-import StoreProvider from 'injection/StoreProvider';
+import { ClusterOverviewStore } from 'stores/cluster/ClusterOverviewStore';
 
 import NodeListItem from './NodeListItem';
-
-const ClusterOverviewStore = StoreProvider.getStore('ClusterOverview');
 
 const NodesList = createReactClass({
   displayName: 'NodesList',

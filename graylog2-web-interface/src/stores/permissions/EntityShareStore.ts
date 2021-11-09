@@ -24,7 +24,7 @@ import fetch from 'logic/rest/FetchProvider';
 import EntityShareState, { EntityShareStateJson } from 'logic/permissions/EntityShareState';
 import EntityShareActions, { EntitySharePayload, PaginatedEntityShares } from 'actions/permissions/EntityShareActions';
 import { qualifyUrl } from 'util/URLUtils';
-import { singletonStore } from 'views/logic/singleton';
+import { singletonStore } from 'logic/singleton';
 import type { Store } from 'stores/StoreTypes';
 import type { GRN } from 'logic/permissions/types';
 import PaginationURL from 'util/PaginationURL';

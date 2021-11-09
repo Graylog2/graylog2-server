@@ -21,7 +21,7 @@ import type { Store } from 'stores/StoreTypes';
 import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
 import { qualifyUrl } from 'util/URLUtils';
-import { singletonStore } from 'views/logic/singleton';
+import { singletonStore } from 'logic/singleton';
 import HTTPHeaderAuthConfig, { HTTPHeaderAuthConfigJSON } from 'logic/authentication/HTTPHeaderAuthConfig';
 
 const HTTPHeaderAuthConfigStore: Store<{}> = singletonStore(

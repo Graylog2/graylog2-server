@@ -17,12 +17,12 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { mount } from 'wrappedEnzyme';
+import { $PropertyType } from 'utility-types';
+
 import mockComponent from 'helpers/mocking/MockComponent';
 import { alice as currentUser } from 'fixtures/users';
 import asMock from 'helpers/mocking/AsMock';
-import { $PropertyType } from 'utility-types';
 import { StoreMock as MockStore } from 'helpers/mocking';
-
 import User from 'logic/users/User';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import XYPlot, { Props as XYPlotProps } from 'views/components/visualizations/XYPlot';
@@ -31,7 +31,7 @@ import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import Query, { RelativeTimeRange } from 'views/logic/queries/Query';
 import { QueriesActions } from 'views/stores/QueriesStore';
 import { SearchActions } from 'views/stores/SearchStore';
-import CurrentUserStore from 'stores/users/CurrentUserStore';
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 
 jest.mock('views/stores/CurrentViewStateStore', () => ({
   CurrentViewStateStore: MockStore(
@@ -45,8 +45,7 @@ jest.mock('views/stores/CurrentViewStateStore', () => ({
 }));
 
 jest.mock('stores/users/CurrentUserStore', () => ({
-  get: jest.fn(),
-  listen: jest.fn(),
+  CurrentUserStore: MockStore('get'),
 }));
 
 jest.mock('views/stores/SearchStore', () => ({

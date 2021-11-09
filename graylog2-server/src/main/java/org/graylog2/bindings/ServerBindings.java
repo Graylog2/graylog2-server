@@ -20,6 +20,7 @@ import com.floreysoft.jmte.Engine;
 import com.google.inject.Scopes;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.Multibinder;
+import com.google.inject.multibindings.OptionalBinder;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.glassfish.grizzly.http.server.ErrorPageGenerator;
 import org.graylog2.Configuration;
@@ -51,6 +52,8 @@ import org.graylog2.inputs.InputStateListener;
 import org.graylog2.inputs.PersistedInputsImpl;
 import org.graylog2.lookup.LookupModule;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.plugin.cluster.ClusterIdFactory;
+import org.graylog2.plugin.cluster.RandomUUIDClusterIdFactory;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.rest.ValidationFailureExceptionMapper;
 import org.graylog2.plugin.streams.DefaultStream;
@@ -91,23 +94,35 @@ import javax.ws.rs.ext.ExceptionMapper;
 
 public class ServerBindings extends Graylog2Module {
     private final Configuration configuration;
+    private final boolean isMigrationCommand;
 
-    public ServerBindings(Configuration configuration) {
+    public ServerBindings(Configuration configuration, boolean isMigrationCommand) {
 
         this.configuration = configuration;
+        this.isMigrationCommand = isMigrationCommand;
     }
 
     @Override
     protected void configure() {
         bindInterfaces();
         bindSingletons();
-        install(new MessageQueueModule(configuration));
+
+        if (isMigrationCommand) {
+            // If we are only running migrations, disable the journal
+            final Configuration noopConfig = new Configuration();
+            noopConfig.setMessageJournalEnabled(false);
+            install(new MessageQueueModule(noopConfig));
+        } else {
+            install(new MessageQueueModule(configuration));
+        }
         bindProviders();
         bindFactoryModules();
         bindDynamicFeatures();
         bindExceptionMappers();
         bindAdditionalJerseyComponents();
-        bindEventBusListeners();
+        if (!isMigrationCommand) {
+            bindEventBusListeners();
+        }
         install(new AuthenticatingRealmModule(configuration));
         install(new AuthorizationOnlyRealmModule());
         bindSearchResponseDecorators();
@@ -166,6 +181,7 @@ public class ServerBindings extends Graylog2Module {
         bind(PersistedInputs.class).to(PersistedInputsImpl.class);
 
         bind(RoleService.class).to(RoleServiceImpl.class).in(Scopes.SINGLETON);
+        OptionalBinder.newOptionalBinder(binder(), ClusterIdFactory.class).setDefault().to(RandomUUIDClusterIdFactory.class);
     }
 
     private void bindDynamicFeatures() {

@@ -19,22 +19,20 @@ import styled, { css } from 'styled-components';
 import naturalSort from 'javascript-natural-sort';
 import Immutable from 'immutable';
 
-import { LinkContainer, Link } from 'components/graylog/router';
-import { Button } from 'components/graylog';
+import { LinkContainer, Link } from 'components/common/router';
+import { Button } from 'components/bootstrap';
 import { DataTable, Spinner, PaginatedList, SearchForm, QueryHelper } from 'components/common';
 import { MetricContainer, CounterRate } from 'components/metrics';
 import Routes from 'routing/Routes';
-import CombinedProvider from 'injection/CombinedProvider';
 import { useStore } from 'stores/connect';
 import StreamsStore, { Stream } from 'stores/streams/StreamsStore';
-import { PaginatedPipelines } from 'stores/pipelines/PipelinesStore';
+import type { PaginatedPipelines } from 'stores/pipelines/PipelinesStore';
+import { PipelinesActions } from 'stores/pipelines/PipelinesStore';
 import { DEFAULT_PAGINATION } from 'stores/PaginationTypes';
 import useLocationSearchPagination from 'hooks/useLocationSearchPagination';
+import { PipelineConnectionsStore, PipelineConnectionsActions } from 'stores/pipelines/PipelineConnectionsStore';
 
 import PipelineConnectionsList from './PipelineConnectionsList';
-
-const { PipelinesActions } = CombinedProvider.get('Pipelines');
-const { PipelineConnectionsStore, PipelineConnectionsActions } = CombinedProvider.get('PipelineConnections');
 
 const StyledPaginatedList = styled(PaginatedList)`
   .pagination {
@@ -42,9 +40,9 @@ const StyledPaginatedList = styled(PaginatedList)`
   }
 `;
 
-const LoadingSpinner = styled(Spinner)(({ theme }) => css`
-  margin-left: 10px;
+const SpinnerWrapper = styled.div(({ theme }) => css`
   font-size: ${theme.fonts.size.h3};
+  padding: ${theme.spacings.xxs} ${theme.spacings.sm};
 `);
 
 const Header = styled.div`
@@ -80,7 +78,7 @@ const PipelineFilter = ({ query, onSearch }: { query: string, onSearch: (query: 
   <SearchForm query={query}
               onSearch={onSearch}
               queryWidth={400}
-              queryHelpComponent={<QueryHelper entityName="pipelines" />}
+              queryHelpComponent={<QueryHelper entityName="Pipeline" />}
               wrapperClass="has-bm"
               onReset={() => onSearch('')}
               topMargin={0} />
@@ -129,7 +127,7 @@ const ProcessingTimelineComponent = () => {
   const searchFilter = (
     <Header>
       <PipelineFilter query={query} onSearch={(newQuery) => handlePaginationChange({ ...pagination, query: newQuery, page: DEFAULT_PAGINATION.page })} />
-      {loading && <LoadingSpinner text="" delay={0} />}
+      {loading && <SpinnerWrapper><Spinner text="" delay={0} /></SpinnerWrapper>}
     </Header>
   );
 

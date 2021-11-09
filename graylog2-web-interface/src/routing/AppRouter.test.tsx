@@ -16,11 +16,11 @@
  */
 import * as React from 'react';
 import { render } from 'wrappedTestingLibrary';
+
 import mockComponent from 'helpers/mocking/MockComponent';
-import { CombinedProviderMock as MockCombinedProvider, StoreMock as MockStore } from 'helpers/mocking';
+import { StoreMock as MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
 import { adminUser as currentUser } from 'fixtures/users';
-
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import usePluginEntities from 'views/logic/usePluginEntities';
 import history from 'util/History';
@@ -30,17 +30,14 @@ import AppRouter from './AppRouter';
 jest.mock('components/throughput/GlobalThroughput', () => mockComponent('GlobalThroughput'));
 jest.mock('components/layout/Footer', () => mockComponent('Footer'));
 
-jest.mock('injection/CombinedProvider', () => {
-  return new MockCombinedProvider({
-    Notifications: { NotificationsActions: { list: jest.fn() }, NotificationsStore: MockStore() },
-  });
-});
+jest.mock('stores/nodes/NodesStore', () => ({ NodesStore: MockStore() }));
 
 // To prevent exceptions from getting swallowed
 jest.mock('components/errors/RouterErrorBoundary', () => mockComponent('RouterErrorBoundary'));
 
 jest.mock('pages/StartPage', () => () => <>This is the start page</>);
 jest.mock('views/logic/usePluginEntities');
+jest.mock('stores/users/CurrentUserStore', () => ({ CurrentUserStore: MockStore() }));
 
 describe('AppRouter', () => {
   beforeEach(() => {

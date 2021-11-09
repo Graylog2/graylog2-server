@@ -17,9 +17,10 @@
 import * as React from 'react';
 import { render, fireEvent } from 'wrappedTestingLibrary';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
-import { asMock, StoreMock as MockStore } from 'helpers/mocking';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 
+import { asMock, StoreMock as MockStore } from 'helpers/mocking';
+import mockAction from 'helpers/mocking/MockAction';
 import history from 'util/History';
 import Routes from 'routing/Routes';
 import AppRouter from 'routing/AppRouter';
@@ -46,18 +47,20 @@ jest.mock('views/stores/DashboardsStore', () => ({
   ),
 }));
 
-jest.mock('stores/users/CurrentUserStore', () => MockStore(
-  ['listen', () => jest.fn()],
-  'get',
-  ['getInitialState', () => ({
-    currentUser: {
-      id: 'user-betty-id',
-      full_name: 'Betty Holberton',
-      username: 'betty',
-      permissions: ['dashboards:create'],
-    },
-  })],
-));
+jest.mock('stores/users/CurrentUserStore', () => ({
+  CurrentUserStore: MockStore(
+    ['listen', () => jest.fn()],
+    'get',
+    ['getInitialState', () => ({
+      currentUser: {
+        id: 'user-betty-id',
+        full_name: 'Betty Holberton',
+        username: 'betty',
+        permissions: ['dashboards:create'],
+      },
+    })],
+  ),
+}));
 
 jest.mock('views/stores/SearchMetadataStore', () => ({
   SearchMetadataActions: {
@@ -83,8 +86,13 @@ jest.mock('util/AppConfig', () => ({
 }));
 
 jest.mock('stores/sessions/SessionStore', () => ({
-  isLoggedIn: jest.fn(() => true),
-  getSessionId: jest.fn(() => 'foobar'),
+  SessionActions: {
+    logout: mockAction(),
+  },
+  SessionStore: {
+    isLoggedIn: jest.fn(() => true),
+    getSessionId: jest.fn(() => 'foobar'),
+  },
 }));
 
 jest.mock('views/components/searchbar/QueryInput', () => () => <span>Query Editor</span>);

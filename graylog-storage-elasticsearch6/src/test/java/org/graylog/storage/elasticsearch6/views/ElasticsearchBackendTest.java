@@ -28,10 +28,13 @@ import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringParser;
+import org.graylog.plugins.views.search.engine.SearchConfig;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.storage.elasticsearch6.views.searchtypes.ESMessageList;
 import org.graylog.storage.elasticsearch6.views.searchtypes.ESSearchTypeHandler;
+import org.graylog2.indexer.searches.SearchesClusterConfig;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
+import org.joda.time.Period;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -65,20 +68,20 @@ public class ElasticsearchBackendTest {
     public void generatesSearchForEmptySearchTypes() throws Exception {
         final Query query = Query.builder()
                 .id("query1")
-                .query(ElasticsearchQueryString.builder().queryString("").build())
+                .query(ElasticsearchQueryString.of(""))
                 .timerange(RelativeRange.create(300))
                 .build();
         final Search search = Search.builder().queries(ImmutableSet.of(query)).build();
         final SearchJob job = new SearchJob("deadbeef", search, "admin");
 
-        backend.generate(job, query, Collections.emptySet());
+        backend.generate(job, query, Collections.emptySet(), new SearchConfig(Period.ZERO));
     }
 
     @Test
     public void executesSearchForEmptySearchTypes() throws Exception {
         final Query query = Query.builder()
                 .id("query1")
-                .query(ElasticsearchQueryString.builder().queryString("").build())
+                .query(ElasticsearchQueryString.of(""))
                 .timerange(RelativeRange.create(300))
                 .build();
         final Search search = Search.builder().queries(ImmutableSet.of(query)).build();

@@ -19,10 +19,8 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
-import { Button } from 'components/graylog';
-import StoreProvider from 'injection/StoreProvider';
-
-const InputStatesStore = StoreProvider.getStore('InputStates');
+import { Button } from 'components/bootstrap';
+import { InputStatesStore } from 'stores/inputs/InputStatesStore';
 
 function inputStateFilter(state) {
   return state.inputStates ? state.inputStates[this.props.input.id] : undefined;

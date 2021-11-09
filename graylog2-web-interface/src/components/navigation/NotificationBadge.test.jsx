@@ -16,33 +16,22 @@
  */
 import React from 'react';
 import { mount } from 'wrappedEnzyme';
-import { CombinedProviderMock, StoreMock } from 'helpers/mocking';
+
+import { MockStore } from 'helpers/mocking';
+
+import NotificationBadge from './NotificationBadge';
+
+import { NotificationsActions } from '../../stores/notifications/NotificationsStore';
 
 jest.mock('stores/connect', () => (x) => x);
 
+jest.mock('stores/notifications/NotificationsStore', () => ({
+  NotificationsActions: { list: jest.fn() },
+  NotificationsStore: MockStore(),
+}));
+
 describe('NotificationBadge', () => {
-  let notifications;
-  let NotificationBadge;
-
-  beforeEach(() => {
-    notifications = {
-      NotificationsActions: { list: jest.fn() },
-      NotificationsStore: StoreMock('listen'),
-    };
-
-    const combinedProviderMock = new CombinedProviderMock({
-      Notifications: notifications,
-    });
-
-    jest.doMock('injection/CombinedProvider', () => combinedProviderMock);
-
-    // eslint-disable-next-line global-require
-    NotificationBadge = require('./NotificationBadge').default;
-  });
-
   it('triggers update of notifications', () => {
-    const { NotificationsActions } = notifications;
-
     mount(<NotificationBadge />);
 
     expect(NotificationsActions.list).toHaveBeenCalled();

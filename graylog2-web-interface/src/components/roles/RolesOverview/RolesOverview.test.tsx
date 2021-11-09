@@ -17,9 +17,9 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { render, waitFor, fireEvent, screen } from 'wrappedTestingLibrary';
+
 import mockAction from 'helpers/mocking/MockAction';
 import { rolesList as mockRoles } from 'fixtures/roles';
-
 import { AuthzRolesActions } from 'stores/roles/AuthzRolesStore';
 
 import RolesOverview from './RolesOverview';

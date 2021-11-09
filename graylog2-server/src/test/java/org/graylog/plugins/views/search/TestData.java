@@ -16,7 +16,7 @@
  */
 package org.graylog.plugins.views.search;
 
-import org.graylog.plugins.views.search.engine.BackendQuery;
+import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.views.PluginMetadataSummary;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
@@ -38,6 +38,6 @@ public class TestData {
     }
 
     public static Query.Builder validQueryBuilder() {
-        return Query.builder().id(UUID.randomUUID().toString()).timerange(mock(TimeRange.class)).query(new BackendQuery.Fallback());
+        return Query.builder().id(UUID.randomUUID().toString()).timerange(mock(TimeRange.class)).query(ElasticsearchQueryString.empty());
     }
 }

@@ -17,13 +17,10 @@
 import React from 'react';
 
 import UserNotification from 'util/UserNotification';
-import { BootstrapModalForm, Input } from 'components/bootstrap';
-import { Button } from 'components/graylog';
-import CombinedProvider from 'injection/CombinedProvider';
+import { BootstrapModalForm, Input, Button } from 'components/bootstrap';
+import { ContentPacksActions } from 'stores/content-packs/ContentPacksStore';
 
 import style from './ContentPackUploadControls.css';
-
-const { ContentPacksActions } = CombinedProvider.get('ContentPacks');
 
 class ContentPackUploadControls extends React.Component {
   constructor(props) {

@@ -17,6 +17,7 @@
 package org.graylog.testing.backenddriver;
 
 import com.google.common.collect.ImmutableSet;
+import io.restassured.path.json.JsonPath;
 import io.restassured.specification.RequestSpecification;
 import org.bson.types.ObjectId;
 import org.graylog.plugins.views.search.Query;
@@ -26,6 +27,8 @@ import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.testing.utils.JsonUtils;
 import org.graylog.testing.utils.RangeUtils;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -41,6 +44,8 @@ import static io.restassured.RestAssured.given;
  */
 public class SearchDriver {
 
+    private static final Logger LOG = LoggerFactory.getLogger(SearchDriver.class);
+
     /**
      * @param requestSpec @see io.restassured.specification.RequestSpecification
      * @return all messages' "message" field as List<String>
@@ -55,22 +60,28 @@ public class SearchDriver {
 
         String body = allMessagesJson(queryId, messageListId, timeRange);
 
-        return given()
+        final JsonPath response = given()
                 .spec(requestSpec)
                 .when()
                 .body(body)
                 .post("/views/search/sync")
                 .then()
                 .statusCode(200)
-                .extract()
-                .jsonPath().getList(allMessagesJsonPath(queryId, messageListId), String.class);
+                .extract().body().jsonPath();
+
+        if(response.get("execution.completed_exceptionally")) {
+            final Object errors = response.getString("errors");
+            LOG.warn("Failed to obtain messages: {}", errors);
+        }
+
+        return response.getList(allMessagesJsonPath(queryId, messageListId), String.class);
     }
 
     private static String allMessagesJson(String queryId, String messageListId, TimeRange timeRange) {
         MessageList messageList = MessageList.builder().id(messageListId).build();
         Query q = Query.builder()
                 .id(queryId)
-                .query(ElasticsearchQueryString.builder().queryString("").build())
+                .query(ElasticsearchQueryString.of(""))
                 .timerange(timeRange)
                 .searchTypes(ImmutableSet.of(messageList))
                 .build();

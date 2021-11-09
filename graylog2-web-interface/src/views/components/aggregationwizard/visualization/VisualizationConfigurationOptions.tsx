@@ -16,9 +16,9 @@
  */
 import * as React from 'react';
 import { Field, getIn, useFormikContext } from 'formik';
-import { ConfigurationField } from 'views/types';
 import styled from 'styled-components';
 
+import { ConfigurationField } from 'views/types';
 import { VisualizationConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
 import { HoverForHelp } from 'components/common';
 
@@ -36,7 +36,7 @@ const TitleLabelWithHelp = styled.div`
   align-items: center;
 `;
 
-const TitleHoverForHelp = styled(HoverForHelp)`
+const TitleHoverForHelp = styled((props) => <HoverForHelp {...props} />)`
   margin-left: 5px;
 `;
 

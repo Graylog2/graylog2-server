@@ -20,8 +20,7 @@ import * as PropTypes from 'prop-types';
 import styled from 'styled-components';
 import * as Immutable from 'immutable';
 
-import { Button } from 'components/graylog';
-import { Input } from 'components/bootstrap';
+import { Button, Input } from 'components/bootstrap';
 import Spinner from 'components/common/Spinner';
 
 const LoaderContainer = styled.div`

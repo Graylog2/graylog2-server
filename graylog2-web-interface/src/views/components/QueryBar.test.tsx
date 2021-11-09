@@ -17,8 +17,8 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { fireEvent, render, screen, waitFor, within } from 'wrappedTestingLibrary';
-import { MockStore } from 'helpers/mocking';
 
+import { MockStore } from 'helpers/mocking';
 import QueryBar from 'views/components/QueryBar';
 import { ViewActions } from 'views/stores/ViewStore';
 import DashboardPageContext from 'views/components/contexts/DashboardPageContext';

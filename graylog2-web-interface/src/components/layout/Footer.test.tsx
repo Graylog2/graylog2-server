@@ -16,19 +16,20 @@
  */
 import * as React from 'react';
 import { render } from 'wrappedTestingLibrary';
-import { asMock } from 'helpers/mocking';
 import { PluginStore } from 'graylog-web-plugin/plugin';
+
+import { asMock, MockStore } from 'helpers/mocking';
 
 import Footer from './Footer';
 
-jest.mock('injection/StoreProvider', () => ({
-  getStore: () => ({
-    getInitialState: () => ({
+jest.mock('stores/system/SystemStore', () => ({
+  SystemStore: MockStore(
+    ['getInitialState', () => ({
       system: { version: '23.42.0-SNAPSHOT+SPECIALFEATURE', hostname: 'hopper.local' },
-    }),
-    jvm: jest.fn(() => Promise.resolve({ info: 'SomeJDK v12.0.0' })),
-    listen: jest.fn(() => () => {}),
-  }),
+    })],
+    ['jvm', jest.fn(() => Promise.resolve({ info: 'SomeJDK v12.0.0' }))],
+    ['listen', jest.fn(() => () => {})],
+  ),
 }));
 
 jest.mock('graylog-web-plugin/plugin', () => ({

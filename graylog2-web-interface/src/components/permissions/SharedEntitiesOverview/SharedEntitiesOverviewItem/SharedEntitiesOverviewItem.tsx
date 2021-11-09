@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 
-import { Link } from 'components/graylog/router';
+import { Link } from 'components/common/router';
 import SharedEntity from 'logic/permissions/SharedEntity';
 import { getShowRouteFromGRN } from 'logic/permissions/GRN';
 

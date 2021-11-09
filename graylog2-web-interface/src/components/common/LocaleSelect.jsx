@@ -20,9 +20,7 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
 import Select from 'components/common/Select';
-import StoreProvider from 'injection/StoreProvider';
-
-const SystemStore = StoreProvider.getStore('System');
+import { SystemStore } from 'stores/system/SystemStore';
 
 /**
  * Component that renders a form input with all available locale settings. It also makes easy to filter

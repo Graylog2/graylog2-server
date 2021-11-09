@@ -16,8 +16,8 @@
  */
 import * as React from 'react';
 import { render, waitFor, screen } from 'wrappedTestingLibrary';
-import { StoreMock as MockStore, asMock } from 'helpers/mocking';
 
+import { StoreMock as MockStore, asMock } from 'helpers/mocking';
 import DefaultQueryClientProvider from 'contexts/DefaultQueryClientProvider';
 import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
 
@@ -33,23 +33,23 @@ const mockListNodes = jest.fn();
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const mockListStreams = jest.fn((...args) => Promise.resolve([]));
 
-jest.mock('injection/CombinedProvider', () => ({
-  get: jest.fn((type) => ({
-    Inputs: { InputsActions: { get: (...args) => mockGetInput(...args) }, InputsStore: {} },
-    Nodes: {
-      NodesActions: { list: (...args) => mockListNodes(...args) },
-      NodesStore: MockStore(['listen', () => () => {}], ['getInitialState', () => ({ nodes: {} })]),
-    },
-    Messages: { MessagesActions: { loadMessage: (...args) => mockLoadMessage(...args) } },
-    Streams: { StreamsStore: { listStreams: (...args) => mockListStreams(...args) } },
-    CurrentUser: {
-      CurrentUserStore: MockStore(),
-    },
-    Preferences: {
-      PreferencesStore: MockStore(),
-    },
-  }[type])),
+jest.mock('stores/nodes/NodesStore', () => ({
+  NodesActions: { list: (...args) => mockListNodes(...args) },
+  NodesStore: MockStore(['listen', () => () => {}], ['getInitialState', () => ({ nodes: {} })]),
 }));
+
+jest.mock('stores/messages/MessagesStore', () => ({
+  MessagesActions: { loadMessage: (...args) => mockLoadMessage(...args) },
+}));
+
+jest.mock('stores/inputs/InputsStore', () => ({
+  InputsActions: {
+    get: jest.fn((...args) => mockGetInput(...args)),
+  },
+  InputsStore: MockStore(),
+}));
+
+jest.mock('stores/streams/StreamsStore', () => ({ listStreams: (...args) => mockListStreams(...args) }));
 
 jest.mock('views/logic/fieldtypes/useFieldTypes');
 jest.mock('routing/withParams', () => (x) => x);
@@ -68,6 +68,7 @@ const SimpleShowMessagePage = ({ index, messageId }: SimpleShowMessagePageProps)
 
 describe('ShowMessagePage', () => {
   beforeEach(() => {
+    asMock(useFieldTypes).mockClear();
     asMock(useFieldTypes).mockReturnValue({ data: [] });
   });
 
@@ -91,9 +92,24 @@ describe('ShowMessagePage', () => {
     expect(container).toMatchSnapshot();
   });
 
+  it('retrieves field types only for user-accessible streams', async () => {
+    const messageWithMultipleStreams = { ...message };
+    messageWithMultipleStreams.fields.streams = ['000000000000000000000001', 'deadbeef'];
+    mockLoadMessage.mockImplementation(() => Promise.resolve(messageWithMultipleStreams));
+    mockListStreams.mockImplementation(() => Promise.resolve([{ id: 'deadbeef' }]));
+    mockGetInput.mockImplementation(() => Promise.resolve(input));
+
+    render(<SimpleShowMessagePage index="graylog_5" messageId="20f683d2-a874-11e9-8a11-0242ac130004" />);
+
+    await screen.findByText(/Deprecated field/);
+
+    expect(useFieldTypes).toHaveBeenCalledWith(['deadbeef'], { from: '2019-07-17T11:20:33.000Z', to: '2019-07-17T11:20:33.000Z', type: 'absolute' });
+  });
+
   it('renders for generic event', async () => {
     mockLoadMessage.mockImplementation(() => Promise.resolve(event));
     mockGetInput.mockImplementation(() => Promise.resolve());
+    mockListStreams.mockImplementation(() => Promise.resolve([]));
 
     const { container } = render(<SimpleShowMessagePage index="gl-events_0" messageId="01DFZQ64CMGV30NT7DW2P7HQX2" />);
 

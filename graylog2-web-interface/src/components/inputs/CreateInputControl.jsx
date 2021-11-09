@@ -20,15 +20,11 @@ import Reflux from 'reflux';
 import styled from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import { Col, Row, Button } from 'components/graylog';
+import { Col, Row, Button } from 'components/bootstrap';
 import { ExternalLinkButton, Select } from 'components/common';
-import ActionsProvider from 'injection/ActionsProvider';
-import StoreProvider from 'injection/StoreProvider';
 import { InputForm } from 'components/inputs';
-
-const InputTypesActions = ActionsProvider.getActions('InputTypes');
-const InputsActions = ActionsProvider.getActions('Inputs');
-const InputTypesStore = StoreProvider.getStore('InputTypes');
+import { InputsActions } from 'stores/inputs/InputsStore';
+import { InputTypesActions, InputTypesStore } from 'stores/inputs/InputTypesStore';
 
 const NewInputRow = styled(Row)`
   margin-bottom: 8px;

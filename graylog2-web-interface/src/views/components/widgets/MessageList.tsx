@@ -18,10 +18,9 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import styled from 'styled-components';
 import { isEmpty, get } from 'lodash';
-import { WidgetComponentProps } from 'views/types';
 
+import { WidgetComponentProps } from 'views/types';
 import connect from 'stores/connect';
-import CombinedProvider from 'injection/CombinedProvider';
 import { Messages } from 'views/Constants';
 import { ViewStore } from 'views/stores/ViewStore';
 import { SearchActions, SearchStore, SearchStoreState } from 'views/stores/SearchStore';
@@ -37,10 +36,9 @@ import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import { BackendMessage } from 'views/components/messagelist/Types';
 import Widget from 'views/logic/widgets/Widget';
 import WindowDimensionsContextProvider from 'contexts/WindowDimensionsContextProvider';
+import { InputsActions } from 'stores/inputs/InputsStore';
 
 import RenderCompletionCallback from './RenderCompletionCallback';
-
-const { InputsActions } = CombinedProvider.get('Inputs');
 
 const Wrapper = styled.div`
   display: flex;

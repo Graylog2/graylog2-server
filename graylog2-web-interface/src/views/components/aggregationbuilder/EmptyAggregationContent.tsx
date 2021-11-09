@@ -17,7 +17,7 @@
 import React, { useContext, useEffect } from 'react';
 import styled, { css } from 'styled-components';
 
-import { Button } from 'components/graylog';
+import { Button } from 'components/bootstrap';
 import RenderCompletionCallback from 'views/components/widgets/RenderCompletionCallback';
 
 import InteractiveContext from '../contexts/InteractiveContext';

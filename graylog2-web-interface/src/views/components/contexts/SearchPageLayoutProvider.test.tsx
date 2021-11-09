@@ -16,33 +16,31 @@
  */
 import * as React from 'react';
 import { render, fireEvent } from 'wrappedTestingLibrary';
-import asMock from 'helpers/mocking/AsMock';
-import { MockCombinedProvider, MockStore } from 'helpers/mocking';
 
+import asMock from 'helpers/mocking/AsMock';
+import { MockStore } from 'helpers/mocking';
 import CurrentUserProvider from 'contexts/CurrentUserProvider';
-import CombinedProvider from 'injection/CombinedProvider';
 import CurrentUserPreferencesProvider from 'contexts/CurrentUserPreferencesProvider';
 import Store from 'logic/local-storage/Store';
 import View from 'views/logic/views/View';
 import CurrentViewTypeProvider from 'views/components/views/CurrentViewTypeProvider';
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
+import { UserJSON } from 'logic/users/User';
+import { PreferencesActions } from 'stores/users/PreferencesStore';
 
 import SearchPageLayoutContext from './SearchPageLayoutContext';
 import SearchPageLayoutProvider from './SearchPageLayoutProvider';
 
-const { PreferencesActions } = CombinedProvider.get('Preferences');
-const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
+jest.mock('stores/users/CurrentUserStore', () => ({
+  CurrentUserStore: MockStore(),
+}));
 
-jest.mock('injection/CombinedProvider', () => new MockCombinedProvider({
-  CurrentUser: {
-    CurrentUserStore: MockStore(),
+jest.mock('stores/users/PreferencesStore', () => ({
+  PreferencesActions: {
+    list: jest.fn(),
+    saveUserPreferences: jest.fn(),
   },
-  Preferences: {
-    PreferencesActions: {
-      list: jest.fn(),
-      saveUserPreferences: jest.fn(),
-    },
-    PreferencesStore: MockStore(),
-  },
+  PreferencesStore: MockStore(),
 }));
 
 jest.mock('logic/local-storage/Store', () => ({
@@ -95,7 +93,7 @@ describe('SearchPageLayoutProvider', () => {
   });
 
   it('provides default search page layout if user does not exists', () => {
-    asMock(CurrentUserStore.getInitialState).mockReturnValue({ currentUser: {} });
+    asMock(CurrentUserStore.getInitialState).mockReturnValue({ currentUser: {} as UserJSON });
 
     const consume = renderSUT();
 
@@ -103,7 +101,7 @@ describe('SearchPageLayoutProvider', () => {
   });
 
   it('provides default search page layout if user has no preferences', () => {
-    asMock(CurrentUserStore.getInitialState).mockReturnValue({ currentUser: { preferences: {} } });
+    asMock(CurrentUserStore.getInitialState).mockReturnValue({ currentUser: { preferences: {} } as UserJSON });
 
     const consume = renderSUT();
 
@@ -116,7 +114,7 @@ describe('SearchPageLayoutProvider', () => {
         preferences: {
           searchSidebarIsPinned: true,
         },
-      },
+      } as UserJSON,
     });
 
     const consume = renderSUT();
@@ -136,7 +134,7 @@ describe('SearchPageLayoutProvider', () => {
         id: 'local:admin',
         username: 'admin',
         read_only: true,
-      },
+      } as UserJSON,
     });
 
     const consume = renderSUT();
@@ -148,7 +146,7 @@ describe('SearchPageLayoutProvider', () => {
     asMock(CurrentUserStore.getInitialState).mockReturnValue({
       currentUser: {
         username: 'alice',
-      },
+      } as UserJSON,
     });
 
     const { getByText } = render(<ProviderWithToggleButton />);
@@ -177,7 +175,7 @@ describe('SearchPageLayoutProvider', () => {
         id: 'local:admin',
         username: 'admin',
         read_only: true,
-      },
+      } as UserJSON,
     });
 
     const { getByText } = render(<ProviderWithToggleButton />);

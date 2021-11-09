@@ -18,14 +18,12 @@ import React from 'react';
 import numeral from 'numeral';
 import moment from 'moment';
 
-import { Col, Row } from 'components/graylog';
-import StoreProvider from 'injection/StoreProvider';
+import { Col, Row } from 'components/bootstrap';
 import DocsHelper from 'util/DocsHelper';
 import { DocumentTitle, Spinner, PageHeader, PaginatedList } from 'components/common';
 import { DocumentationLink } from 'components/support';
 import { IndexerFailuresList } from 'components/indexers';
-
-const IndexerFailuresStore = StoreProvider.getStore('IndexerFailures');
+import { IndexerFailuresStore } from 'stores/indexers/IndexerFailuresStore';
 
 class IndexerFailuresPage extends React.Component {
   state = {};

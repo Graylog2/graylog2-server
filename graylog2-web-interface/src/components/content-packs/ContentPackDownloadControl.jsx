@@ -19,13 +19,11 @@ import React from 'react';
 
 import { qualifyUrlWithSessionCredentials } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
-import { Modal, Button } from 'components/graylog';
+import { Modal, Button } from 'components/bootstrap';
 import { Icon } from 'components/common';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import * as URLUtils from 'util/URLUtils';
-import StoreProvider from 'injection/StoreProvider';
-
-const SessionStore = StoreProvider.getStore('Session');
+import { SessionStore } from 'stores/sessions/SessionStore';
 
 class ContentPackDownloadControl extends React.Component {
   static propTypes = {

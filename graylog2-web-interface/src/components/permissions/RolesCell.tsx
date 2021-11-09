@@ -18,7 +18,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 import * as Immutable from 'immutable';
 
-import { Label } from 'components/graylog';
+import { Label } from 'components/bootstrap';
 
 const Td = styled.td`
   max-width: 300px;
