@@ -21,18 +21,14 @@ import java.util.Set;
 
 public class ValidationResponse {
 
-    private final boolean valid;
+    private final ValidationStatus status;
     private final List<ValidationExplanation> explanations;
     private Set<String> unknownFields;
 
-    public ValidationResponse(boolean valid, List<ValidationExplanation> explanations, Set<String> unknownFields) {
-        this.valid = valid;
+    public ValidationResponse(ValidationStatus status, List<ValidationExplanation> explanations, Set<String> unknownFields) {
+        this.status = status;
         this.explanations = explanations;
         this.unknownFields = unknownFields;
-    }
-
-    public boolean isValid() {
-        return valid;
     }
 
     public List<ValidationExplanation> getExplanations() {
@@ -41,5 +37,9 @@ public class ValidationResponse {
 
     public Set<String> getUnknownFields() {
         return unknownFields;
+    }
+
+    public ValidationStatus getStatus() {
+        return status;
     }
 }

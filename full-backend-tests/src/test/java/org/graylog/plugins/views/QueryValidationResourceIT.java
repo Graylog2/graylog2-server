@@ -28,11 +28,11 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.core.IsEqual.equalTo;
 
 @ApiIntegrationTest(serverLifecycle = CLASS, elasticsearchFactory = ElasticsearchInstanceES7Factory.class)
-public class ValidateQueryIT {
+public class QueryValidationResourceIT {
 
     private final RequestSpecification requestSpec;
 
-    public ValidateQueryIT(RequestSpecification requestSpec) {
+    public QueryValidationResourceIT(RequestSpecification requestSpec) {
         this.requestSpec = requestSpec;
     }
 
@@ -46,7 +46,7 @@ public class ValidateQueryIT {
                 .post("/search/validate")
                 .then()
                 .statusCode(200);
-        validatableResponse.assertThat().body("valid", equalTo(true));
+        validatableResponse.assertThat().body("validation_status", equalTo("WARNING"));
     }
 
     @Test
@@ -58,7 +58,7 @@ public class ValidateQueryIT {
                 .post("/search/validate")
                 .then()
                 .statusCode(200);
-        validatableResponse.assertThat().body("valid", equalTo(false));
+        validatableResponse.assertThat().body("validation_status", equalTo("ERROR"));
         validatableResponse.assertThat().body("explanations.error[0]", containsString("Failed to parse query"));
     }
 }

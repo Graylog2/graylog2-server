@@ -39,6 +39,7 @@ import org.graylog.plugins.views.search.engine.ValidationExplanation;
 import org.graylog.plugins.views.search.engine.SearchConfig;
 import org.graylog.plugins.views.search.engine.ValidationRequest;
 import org.graylog.plugins.views.search.engine.ValidationResponse;
+import org.graylog.plugins.views.search.engine.ValidationStatus;
 import org.graylog.plugins.views.search.errors.SearchTypeError;
 import org.graylog.plugins.views.search.errors.SearchTypeErrorParser;
 import org.graylog.plugins.views.search.filter.AndFilter;
@@ -319,6 +320,8 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                 .map(e -> new ValidationExplanation(e.getIndex(), -1, e.isValid(), e.getExplanation(), e.getError()))
                 .collect(Collectors.toList());
 
-        return new ValidationResponse(response.isValid(), explanations, Collections.emptySet());
+        final ValidationStatus status = response.isValid() ? ValidationStatus.OK : ValidationStatus.ERROR;
+
+        return new ValidationResponse(status, explanations, Collections.emptySet());
     }
 }

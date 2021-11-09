@@ -32,6 +32,7 @@ import org.graylog.plugins.views.search.engine.SearchConfig;
 import org.graylog.plugins.views.search.engine.ValidationExplanation;
 import org.graylog.plugins.views.search.engine.ValidationRequest;
 import org.graylog.plugins.views.search.engine.ValidationResponse;
+import org.graylog.plugins.views.search.engine.ValidationStatus;
 import org.graylog.plugins.views.search.errors.SearchTypeError;
 import org.graylog.plugins.views.search.errors.SearchTypeErrorParser;
 import org.graylog.plugins.views.search.filter.AndFilter;
@@ -344,7 +345,17 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
             }
         }
 
-        return new ValidationResponse(response.isValid(), explanations, unknownFields);
+        final ValidationStatus status;
+        if(response.isValid()) {
+            if(unknownFields.isEmpty()) {
+                status = ValidationStatus.OK;
+            } else {
+                status = ValidationStatus.WARNING;
+            }
+        } else {
+            status = ValidationStatus.ERROR;
+        }
+        return new ValidationResponse(status, explanations, unknownFields);
     }
 
     private Optional<ElasticsearchException> checkForFailedShards(MultiSearchResponse.Item multiSearchResponse) {

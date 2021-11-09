@@ -20,18 +20,14 @@ import java.util.List;
 import java.util.Set;
 
 public class ValidationResponseDTO {
-    private final boolean valid;
     private final List<ValidationExplanationDTO> explanations;
     private final Set<String> unknownFields;
+    private final ValidationStatusDTO validationStatus;
 
-    public ValidationResponseDTO(boolean valid, List<ValidationExplanationDTO> explanations, Set<String> unknownFields) {
-        this.valid = valid;
+    public ValidationResponseDTO(List<ValidationExplanationDTO> explanations, Set<String> unknownFields, ValidationStatusDTO validationStatus) {
         this.explanations = explanations;
         this.unknownFields = unknownFields;
-    }
-
-    public boolean isValid() {
-        return valid;
+        this.validationStatus = validationStatus;
     }
 
     public List<ValidationExplanationDTO> getExplanations() {
@@ -40,5 +36,9 @@ public class ValidationResponseDTO {
 
     public Set<String> getUnknownFields() {
         return unknownFields;
+    }
+
+    public ValidationStatusDTO getValidationStatus() {
+        return validationStatus;
     }
 }
