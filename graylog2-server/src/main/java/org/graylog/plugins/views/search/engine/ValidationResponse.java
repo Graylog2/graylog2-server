@@ -23,7 +23,7 @@ public class ValidationResponse {
 
     private final ValidationStatus status;
     private final List<ValidationExplanation> explanations;
-    private Set<String> unknownFields;
+    private final Set<String> unknownFields;
 
     public ValidationResponse(ValidationStatus status, List<ValidationExplanation> explanations, Set<String> unknownFields) {
         this.status = status;
