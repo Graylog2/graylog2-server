@@ -113,7 +113,7 @@ IndexSetCreationPage.defaultProps = {
   retentionStrategies: undefined,
   rotationStrategies: undefined,
   indexSet: {
-    title: 'test',
+    title: '',
     description: '',
     index_prefix: '',
     writable: true,

@@ -32,7 +32,7 @@ class TimeBasedRotationStrategyConfiguration extends React.Component {
     super(props);
     const { config: { rotation_period: rotationPeriod } } = this.props;
 
-    const { config: { elasticsearch_max_write_index_age: rotationLimit } } = this.props;
+    const { config: { max_rotation_period: rotationLimit } } = this.props;
 
     this.state = {
       rotation_period: rotationPeriod,
@@ -86,13 +86,14 @@ class TimeBasedRotationStrategyConfiguration extends React.Component {
 
   _formatDuration = () => {
     const { rotation_period: rotationPeriod, rotationLimit } = this.state;
-    const maxErrorMessage = rotationLimit && ` and max ${moment.duration(rotationLimit).humanize()}`;
+    const maxRotationPeriodErrorMessage = rotationLimit ? ` and max ${moment.duration(rotationLimit).humanize()}` : '';
 
-    return this._isValidPeriod() ? moment.duration(rotationPeriod).humanize() : `invalid (min 1 hour${maxErrorMessage})`;
+    return this._isValidPeriod() ? moment.duration(rotationPeriod).humanize() : `invalid (min 1 hour${maxRotationPeriodErrorMessage})`;
   };
 
   render() {
-    const { rotation_period: rotationPeriod } = this.state;
+    const { rotation_period: rotationPeriod, rotationLimit } = this.state;
+    const maxRotationPeriodHelpText = rotationLimit ? ` The max rotation period is set to ${moment.duration(rotationLimit).humanize()} by Administrator.` : '';
 
     return (
       <div>
@@ -102,7 +103,7 @@ class TimeBasedRotationStrategyConfiguration extends React.Component {
                label="Rotation period (ISO8601 Duration)"
                onChange={this._onPeriodUpdate('rotation_period')}
                value={rotationPeriod}
-               help={'How long an index gets written to before it is rotated. (i.e. "P1D" for 1 day, "PT6H" for 6 hours)'}
+               help={`How long an index gets written to before it is rotated. (i.e. "P1D" for 1 day, "PT6H" for 6 hours).${maxRotationPeriodHelpText}`}
                addonAfter={this._formatDuration()}
                bsStyle={this._validationState()}
                required />

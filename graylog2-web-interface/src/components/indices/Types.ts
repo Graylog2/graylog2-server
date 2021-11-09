@@ -37,7 +37,7 @@ export type MessageCountRotationStrategyConfig = {
 export type TimeBasedRotationStrategyConfig = {
   type: string,
   rotation_period: string,
-  elasticsearch_max_write_index_age: string,
+  max_rotation_period: string,
 }
 export type RotationStrategyConfig = SizeBasedRotationStrategyConfig | MessageCountRotationStrategyConfig| TimeBasedRotationStrategyConfig;
 export type RetentionStrategyConfig = {
@@ -54,7 +54,7 @@ export interface JsonSchemaIndexActionPropertyType {
 }
 export interface RotationProperties {
   rotation_period?: JsonSchemaStringPropertyType,
-  elasticsearch_max_write_index_age?: JsonSchemaStringPropertyType,
+  max_rotation_period?: JsonSchemaStringPropertyType,
   type: JsonSchemaStringPropertyType,
   max_size?: JsonSchemaStringPropertyType,
 }
@@ -103,7 +103,7 @@ export const MessageCountRotationStrategyConfigPropType = PropTypes.exact({
 export const TimeBasedRotationStrategyConfigPropType = PropTypes.exact({
   type: PropTypes.string.isRequired,
   rotation_period: PropTypes.string.isRequired,
-  elasticsearch_max_write_index_age: PropTypes.string,
+  max_rotation_period: PropTypes.string,
 });
 
 export const RotationStrategyConfigPropType = PropTypes.oneOfType([
@@ -128,7 +128,7 @@ export const JsonSchemaIndexActionPropertyTypePropType = PropTypes.exact({
 });
 export const RotationPropertiesPropType = PropTypes.exact({
   rotation_period: JsonSchemaStringPropertyTypePropType,
-  elasticsearch_max_write_index_age: JsonSchemaStringPropertyTypePropType,
+  max_rotation_period: JsonSchemaStringPropertyTypePropType,
   type: JsonSchemaStringPropertyTypePropType.isRequired,
   max_size: JsonSchemaStringPropertyTypePropType,
 });

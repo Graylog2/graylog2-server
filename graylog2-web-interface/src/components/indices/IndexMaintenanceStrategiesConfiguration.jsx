@@ -62,7 +62,7 @@ class IndexMaintenanceStrategiesConfiguration extends React.Component {
     const { activeConfig } = this.state;
     const timeBasedStrategy = this._getDefaultStrategyConfig(TIME_BASED_ROTATION_STRATEGY);
 
-    return { ...activeConfig, elasticsearch_max_write_index_age: timeBasedStrategy?.elasticsearch_max_write_index_age };
+    return { ...activeConfig, max_rotation_period: timeBasedStrategy?.max_rotation_period };
   }
 
   _getStrategyConfig = (selectedStrategy) => {
