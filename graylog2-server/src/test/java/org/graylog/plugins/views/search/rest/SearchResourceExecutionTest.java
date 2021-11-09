@@ -76,8 +76,7 @@ public class SearchResourceExecutionTest {
 
     class SearchTestResource extends SearchResource {
         public SearchTestResource() {
-            super(executionGuard,
-                    searchDomain,
+            super(searchDomain,
                     new SearchExecutor(searchDomain,
                             searchJobService,
                             queryEngine,
@@ -85,7 +84,6 @@ public class SearchResourceExecutionTest {
                             permittedStreams,
                             objectMapperProvider.get()),
                     searchJobService,
-                    permittedStreams,
                     eventBus);
         }
 

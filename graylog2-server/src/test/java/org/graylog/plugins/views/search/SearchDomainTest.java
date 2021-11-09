@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableList;
 import org.graylog.plugins.views.search.db.SearchDbService;
 import org.graylog.plugins.views.search.errors.PermissionException;
 import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog.plugins.views.search.rest.SearchDTO;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewService;
 import org.junit.Before;
@@ -29,6 +30,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
+import javax.ws.rs.ForbiddenException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -36,7 +38,10 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -49,6 +54,9 @@ public class SearchDomainTest {
     @Mock
     private SearchDbService dbService;
 
+    @Mock
+    private SearchExecutionGuard executionGuard;
+
     private final List<Search> allSearchesInDb = new ArrayList<>();
 
     @Mock
@@ -58,7 +66,7 @@ public class SearchDomainTest {
     public void setUp() throws Exception {
         allSearchesInDb.clear();
         when(dbService.streamAll()).thenReturn(allSearchesInDb.stream());
-        sut = new SearchDomain(dbService, viewService);
+        sut = new SearchDomain(dbService, executionGuard, viewService);
     }
 
     @Test
@@ -147,6 +155,21 @@ public class SearchDomainTest {
         List<Search> result = sut.getAllForUser(searchUser, searchUser::canReadView);
 
         assertThat(result).isEmpty();
+    }
+
+    @Test
+    public void guardExceptionOnPostLeadsTo403() {
+        final Search search = mockSearchWithOwner("someone");
+        final SearchUser searchUser = mock(SearchUser.class);
+
+        throwGuardExceptionFor(search);
+
+        assertThatExceptionOfType(ForbiddenException.class)
+                .isThrownBy(() -> sut.saveForUser(search, searchUser));
+    }
+
+    private void throwGuardExceptionFor(Search search) {
+        doThrow(new ForbiddenException()).when(executionGuard).check(eq(search), any());
     }
 
     private Search mockSearchWithOwner(String owner) {

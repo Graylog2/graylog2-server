@@ -68,19 +68,16 @@ public class SearchResource extends RestResource implements PluginRestResource {
     private static final Logger LOG = LoggerFactory.getLogger(SearchResource.class);
     private static final String BASE_PATH = "views/search";
 
-    private final SearchExecutionGuard executionGuard;
     private final SearchDomain searchDomain;
     private final SearchExecutor searchExecutor;
     private final SearchJobService searchJobService;
     private final EventBus serverEventBus;
 
     @Inject
-    public SearchResource(SearchExecutionGuard executionGuard,
-                          SearchDomain searchDomain,
+    public SearchResource(SearchDomain searchDomain,
                           SearchExecutor searchExecutor,
                           SearchJobService searchJobService,
                           EventBus serverEventBus) {
-        this.executionGuard = executionGuard;
         this.searchDomain = searchDomain;
         this.searchExecutor = searchExecutor;
         this.searchJobService = searchJobService;

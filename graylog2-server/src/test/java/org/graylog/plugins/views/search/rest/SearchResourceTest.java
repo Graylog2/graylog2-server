@@ -69,9 +69,6 @@ public class SearchResourceTest {
     private SearchUser searchUser;
 
     @Mock
-    private PermittedStreams permittedStreams;
-
-    @Mock
     private EventBus eventBus;
 
     @Mock
@@ -85,7 +82,7 @@ public class SearchResourceTest {
     @Before
     public void setUp() throws Exception {
         GuiceInjectorHolder.createInjector(Collections.emptyList());
-        this.searchResource = new SearchResource(executionGuard, searchDomain, searchExecutor, searchJobService, permittedStreams, eventBus);
+        this.searchResource = new SearchResource(searchDomain, searchExecutor, searchJobService, eventBus);
     }
 
     @Test
@@ -124,24 +121,10 @@ public class SearchResourceTest {
     }
 
     @Test
-    public void guardExceptionOnPostLeadsTo403() {
-        final Search search = mockNewSearch();
-
-        throwGuardExceptionFor(search);
-
-        assertThatExceptionOfType(ForbiddenException.class)
-                .isThrownBy(() -> searchResource.createSearch(search, searchUser));
-    }
-
-    @Test
     public void allowCreatingNewSearchWithoutId() {
         final Search search = Search.builder().id(null).build();
 
         this.searchResource.createSearch(search, searchUser);
-    }
-
-    private void throwGuardExceptionFor(Search search) {
-        doThrow(new ForbiddenException()).when(executionGuard).check(eq(search), any());
     }
 
     private Search mockNewSearch() {
