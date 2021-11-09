@@ -94,8 +94,6 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @ApiOperation(value = "Create a search query", response = Search.class, code = 201)
     @AuditEvent(type = ViewsAuditEventTypes.SEARCH_CREATE)
     public Response createSearch(@ApiParam Search search, @Context SearchUser searchUser) {
-        guard(search, searchUser);
-
         final Search saved = searchDomain.saveForUser(search, searchUser);
         if (saved == null || saved.id() == null) {
             return Response.serverError().build();
@@ -163,10 +161,6 @@ public class SearchResource extends RestResource implements PluginRestResource {
         } catch (ExecutionException | TimeoutException ignore) {
         }
         return searchJob;
-    }
-
-    private void guard(Search search, SearchUser searchUser) {
-        this.executionGuard.check(search, searchUser::canReadStream);
     }
 
     private void postAuditEvent(SearchJob searchJob) {
