@@ -50,6 +50,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
+import static org.graylog2.shared.utilities.StringUtils.f;
 import static org.junit.platform.engine.discovery.DiscoverySelectors.selectUniqueId;
 import static org.junit.platform.engine.support.discovery.SelectorResolver.Resolution.matches;
 import static org.junit.platform.engine.support.discovery.SelectorResolver.Resolution.unresolved;
@@ -94,7 +95,7 @@ public class ContainerMatrixMethodSelectorResolver implements SelectorResolver {
         if (matches.size() > 1) {
             logger.warn(() -> {
                 Stream<TestDescriptor> testDescriptors = matches.stream().map(Match::getTestDescriptor);
-                return String.format(
+                return f(
                         "Possible configuration error: method [%s] resulted in multiple TestDescriptors %s. "
                                 + "This is typically the result of annotating a method with multiple competing annotations "
                                 + "such as @Test, @RepeatedTest, @ParameterizedTest, @TestFactory, etc.",
@@ -215,7 +216,7 @@ public class ContainerMatrixMethodSelectorResolver implements SelectorResolver {
         }
 
         private UniqueId createUniqueId(Method method, TestDescriptor parent) {
-            String methodId = String.format("%s(%s)", method.getName(),
+            String methodId = f("%s(%s)", method.getName(),
                     ClassUtils.nullSafeToString(method.getParameterTypes()));
             return parent.getUniqueId().append(segmentType, methodId);
         }
