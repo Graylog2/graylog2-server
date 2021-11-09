@@ -75,7 +75,6 @@ public class SearchResource extends RestResource implements PluginRestResource {
     private final SearchDomain searchDomain;
     private final SearchExecutor searchExecutor;
     private final SearchJobService searchJobService;
-    private final PermittedStreams permittedStreams;
     private final EventBus serverEventBus;
 
     @Inject
@@ -83,13 +82,11 @@ public class SearchResource extends RestResource implements PluginRestResource {
                           SearchDomain searchDomain,
                           SearchExecutor searchExecutor,
                           SearchJobService searchJobService,
-                         PermittedStreams permittedStreams,
                           EventBus serverEventBus) {
         this.executionGuard = executionGuard;
         this.searchDomain = searchDomain;
         this.searchExecutor = searchExecutor;
         this.searchJobService = searchJobService;
-        this.permittedStreams = permittedStreams;
         this.serverEventBus = serverEventBus;
     }
 
