@@ -83,7 +83,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
                           SearchDomain searchDomain,
                           SearchExecutor searchExecutor,
                           SearchJobService searchJobService,
-                          PermittedStreams permittedStreams,
+                         PermittedStreams permittedStreams,
                           EventBus serverEventBus) {
         this.executionGuard = executionGuard;
         this.searchDomain = searchDomain;
@@ -175,9 +175,5 @@ public class SearchResource extends RestResource implements PluginRestResource {
     private void postAuditEvent(SearchJob searchJob) {
         final SearchJobExecutionEvent searchJobExecutionEvent = SearchJobExecutionEvent.create(getCurrentUser(), searchJob, DateTime.now(DateTimeZone.UTC));
         this.serverEventBus.post(searchJobExecutionEvent);
-    }
-
-    private ImmutableSet<String> loadAllAllowedStreamsForUser(SearchUser searchUser) {
-        return permittedStreams.load(searchUser::canReadStream);
     }
 }
