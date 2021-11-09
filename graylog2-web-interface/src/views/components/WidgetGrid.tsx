@@ -18,8 +18,8 @@ import * as React from 'react';
 import { useState, useContext, useMemo } from 'react';
 import styled, { css } from 'styled-components';
 import { SizeMe } from 'react-sizeme';
-import { WidgetPositions, BackendWidgetPosition } from 'views/types';
 
+import { WidgetPositions, BackendWidgetPosition } from 'views/types';
 import ReactGridContainer from 'components/common/ReactGridContainer';
 import { widgetDefinition } from 'views/logic/Widgets';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';

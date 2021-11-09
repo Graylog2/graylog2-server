@@ -445,7 +445,11 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
   _formatInputValue = (value: OptionValue): Array<Option> => {
     const { options, displayKey, valueKey, delimiter, allowCreate } = this.props;
 
-    if (allowCreate && value && typeof value === 'string') {
+    if (value === undefined || value === null || (typeof value === 'string' && value === '')) {
+      return undefined;
+    }
+
+    if (allowCreate && typeof value === 'string') {
       return value.split(delimiter).map((optionValue: string) => {
         const predicate = {
           [valueKey]: optionValue,
@@ -460,7 +464,11 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
     return (typeof value === 'string'
       ? (value ?? '').split(delimiter)
       : [value])
-      .map((v) => options.find((option) => option[valueKey || ''] === v));
+      .map((v) => {
+        const availableOption = options.find((option) => option[valueKey || ''] === v);
+
+        return availableOption ?? { [displayKey]: String(value), [valueKey]: value };
+      });
   };
 
   _selectTheme = (defaultTheme: SelectTheme) => {

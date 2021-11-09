@@ -17,8 +17,8 @@
 import * as React from 'react';
 import type { HTMLAttributes } from 'enzyme';
 import { mount } from 'wrappedEnzyme';
-import mockAction from 'helpers/mocking/MockAction';
 
+import mockAction from 'helpers/mocking/MockAction';
 import Rule from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import { HighlightingRulesActions } from 'views/stores/HighlightingRulesStore';
 import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';

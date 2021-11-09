@@ -18,14 +18,20 @@ package org.graylog2.bootstrap;
 
 import com.github.rvesse.airline.annotations.Option;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.util.concurrent.ServiceManager;
 import com.google.inject.Injector;
+import com.google.inject.Key;
 import com.google.inject.Module;
 import com.google.inject.ProvisionException;
+import com.google.inject.TypeLiteral;
+import com.google.inject.util.Types;
+import org.graylog2.Configuration;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
+import org.graylog2.configuration.PathConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
-import org.graylog2.plugin.BaseConfiguration;
+import org.graylog2.migrations.Migration;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.inputs.MessageInput;
@@ -53,6 +59,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -63,7 +70,7 @@ import static org.graylog2.audit.AuditEventTypes.NODE_STARTUP_INITIATE;
 public abstract class ServerBootstrap extends CmdLineTool {
     private static final Logger LOG = LoggerFactory.getLogger(ServerBootstrap.class);
 
-    public ServerBootstrap(String commandName, BaseConfiguration configuration) {
+    public ServerBootstrap(String commandName, Configuration configuration) {
         super(commandName, configuration);
         this.commandName = commandName;
     }
@@ -85,8 +92,8 @@ public abstract class ServerBootstrap extends CmdLineTool {
     }
 
     @Override
-    protected void beforeStart(TLSProtocolsConfiguration configuration) {
-        super.beforeStart(configuration);
+    protected void beforeStart(TLSProtocolsConfiguration tlsProtocolsConfiguration, PathConfiguration pathConfiguration) {
+        super.beforeStart(tlsProtocolsConfiguration, pathConfiguration);
 
         // Do not use a PID file if the user requested not to
         if (!isNoPidFile()) {
@@ -94,16 +101,16 @@ public abstract class ServerBootstrap extends CmdLineTool {
         }
         // This needs to run before the first SSLContext is instantiated,
         // because it sets up the default SSLAlgorithmConstraints
-        applySecuritySettings(configuration);
+        applySecuritySettings(tlsProtocolsConfiguration);
 
         // Set these early in the startup because netty's NativeLibraryUtil uses a static initializer
-        setNettyNativeDefaults();
+        setNettyNativeDefaults(pathConfiguration);
     }
 
-    private void setNettyNativeDefaults() {
+    private void setNettyNativeDefaults(PathConfiguration pathConfiguration) {
         // Give netty a better spot than /tmp to unpack its tcnative libraries
         if (System.getProperty("io.netty.native.workdir") == null) {
-            System.setProperty("io.netty.native.workdir", configuration.getNativeLibDir().toAbsolutePath().toString());
+            System.setProperty("io.netty.native.workdir", pathConfiguration.getNativeLibDir().toAbsolutePath().toString());
         }
         // Don't delete the native lib after unpacking, as this confuses needrestart(1) on some distributions
         if (System.getProperty("io.netty.native.deleteLibAfterLoading") == null) {
@@ -130,6 +137,15 @@ public abstract class ServerBootstrap extends CmdLineTool {
         LOG.info("Deployment: {}", configuration.getInstallationSource());
         LOG.info("OS: {}", os.getPlatformName());
         LOG.info("Arch: {}", os.getArch());
+
+        try {
+            if (configuration.isMaster() && configuration.runMigrations()) {
+                runMigrations();
+            }
+        } catch (Exception e) {
+            LOG.warn("Exception while running migrations", e);
+            System.exit(1);
+        }
 
         final ServerStatus serverStatus = injector.getInstance(ServerStatus.class);
         serverStatus.initialize();
@@ -188,6 +204,19 @@ public abstract class ServerBootstrap extends CmdLineTool {
         }
     }
 
+    public void runMigrations() {
+        //noinspection unchecked
+        final TypeLiteral<Set<Migration>> typeLiteral = (TypeLiteral<Set<Migration>>) TypeLiteral.get(Types.setOf(Migration.class));
+        Set<Migration> migrations = injector.getInstance(Key.get(typeLiteral));
+
+        LOG.info("Running {} migrations...", migrations.size());
+
+        ImmutableSortedSet.copyOf(migrations).forEach(m -> {
+            LOG.info("Running migration <{}>", m.getClass().getCanonicalName());
+            m.upgrade();
+        });
+    }
+
     protected void savePidFile(final String pidFile) {
         final String pid = Tools.getPID();
         final Path pidFilePath = Paths.get(pidFile);
@@ -209,7 +238,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
     protected List<Module> getSharedBindingsModules() {
         final List<Module> result = super.getSharedBindingsModules();
 
-        result.add(new GenericBindings());
+        result.add(new GenericBindings(isMigrationCommand()));
         result.add(new SecurityBindings());
         result.add(new ServerStatusBindings(capabilities()));
         result.add(new ValidatorModule());

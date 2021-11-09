@@ -16,8 +16,8 @@
  */
 import React from 'react';
 import { render, fireEvent, screen, waitFor } from 'wrappedTestingLibrary';
-import asMock from 'helpers/mocking/AsMock';
 
+import asMock from 'helpers/mocking/AsMock';
 import View from 'views/logic/views/View';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import { SavedSearchesActions } from 'views/stores/SavedSearchesStore';

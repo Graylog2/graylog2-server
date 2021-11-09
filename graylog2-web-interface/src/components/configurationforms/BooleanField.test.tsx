@@ -17,8 +17,9 @@
 
 import React from 'react';
 import { screen, render, waitFor } from 'wrappedTestingLibrary';
-import { booleanField } from 'fixtures/configurationforms';
 import userEvent from '@testing-library/user-event';
+
+import { booleanField } from 'fixtures/configurationforms';
 
 import BooleanField from './BooleanField';
 

@@ -17,8 +17,8 @@
 import React from 'react';
 import { mount } from 'wrappedEnzyme';
 import * as Immutable from 'immutable';
-import mockComponent from 'helpers/mocking/MockComponent';
 
+import mockComponent from 'helpers/mocking/MockComponent';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import Series from 'views/logic/aggregationbuilder/Series';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';

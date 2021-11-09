@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { asMock } from 'helpers/mocking';
-
 import { qualifyUrl, qualifyUrlWithSessionCredentials } from 'util/URLUtils';
 import AppConfig from 'util/AppConfig';
 

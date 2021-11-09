@@ -21,16 +21,13 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog2.indexer.MongoIndexSet;
 import org.graylog2.indexer.cluster.Cluster;
-import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
-import org.graylog2.indexer.indexset.events.IndexSetCreatedEvent;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -54,7 +51,7 @@ class IndexFieldTypePollerPeriodicalTest {
     );
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws Exception {
         this.periodical = new IndexFieldTypePollerPeriodical(indexFieldTypePoller,
                 indexFieldTypesService,
                 indexSetService,
@@ -63,40 +60,16 @@ class IndexFieldTypePollerPeriodicalTest {
                 cluster,
                 eventBus,
                 serverStatus,
-                Duration.seconds(30),
+                Duration.minutes(5),
                 scheduler);
     }
 
     @Test
     void scheduledExecutionIsSkippedWhenServerIsNotRunning() throws InterruptedException {
         when(serverStatus.getLifecycle()).thenReturn(Lifecycle.HALTING);
-        final IndexSetConfig indexSetConfig = mockIndexSetConfig();
-        final IndexSetCreatedEvent indexSetCreatedEvent = IndexSetCreatedEvent.create(indexSetConfig);
 
-        when(indexSetService.get("foo")).thenReturn(Optional.of(indexSetConfig));
+        periodical.doRun();
 
-        final MongoIndexSet mongoIndexSet = mockMongoIndexSet(indexSetConfig);
-        when(mongoIndexSetFactory.create(indexSetConfig)).thenReturn(mongoIndexSet);
-
-        this.periodical.handleIndexSetCreation(indexSetCreatedEvent);
-
-        Thread.sleep(100);
-
-        verifyNoInteractions(indexFieldTypePoller);
-    }
-
-    private MongoIndexSet mockMongoIndexSet(IndexSetConfig indexSetConfig) {
-        final MongoIndexSet mongoIndexSet = mock(MongoIndexSet.class);
-        when(mongoIndexSet.getConfig()).thenReturn(indexSetConfig);
-        when(mongoIndexSet.getActiveWriteIndex()).thenReturn("foo-0");
-        return mongoIndexSet;
-    }
-
-    private IndexSetConfig mockIndexSetConfig() {
-        final IndexSetConfig indexSetConfig = mock(IndexSetConfig.class);
-        when(indexSetConfig.id()).thenReturn("foo");
-        when(indexSetConfig.fieldTypeRefreshInterval()).thenReturn(new org.joda.time.Duration(1L));
-        when(indexSetConfig.isWritable()).thenReturn(true);
-        return indexSetConfig;
+        verifyNoInteractions(cluster);
     }
 }

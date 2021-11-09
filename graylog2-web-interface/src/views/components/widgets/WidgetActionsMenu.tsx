@@ -17,8 +17,8 @@
 import * as React from 'react';
 import { useState, useContext, useCallback } from 'react';
 import styled from 'styled-components';
-import { BackendWidgetPosition } from 'views/types';
 
+import { BackendWidgetPosition } from 'views/types';
 import ExportModal from 'views/components/export/ExportModal';
 import MoveWidgetToTab from 'views/logic/views/MoveWidgetToTab';
 import { loadDashboard } from 'views/logic/views/Actions';

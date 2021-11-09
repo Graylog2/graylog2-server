@@ -18,7 +18,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import { isString, trim, truncate as trunc } from 'lodash';
 
-import UserTimezoneTimestamp from 'views/components/common/UserTimezoneTimestamp';
+import Timestamp from 'components/common/Timestamp';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 
 import EmptyValue from './EmptyValue';
@@ -57,7 +57,7 @@ const TypeSpecificValue = ({ field, value, render = defaultComponent, type = Fie
   }
 
   switch (type.type) {
-    case 'date': return <UserTimezoneTimestamp dateTime={value} render={render} field={field} />;
+    case 'date': return <Timestamp dateTime={value} render={render} field={field} />;
     case 'boolean': return <Component value={String(value)} field={field} />;
     default: return _formatValue(field, value, truncate, render, type);
   }
@@ -70,7 +70,9 @@ TypeSpecificValue.propTypes = {
 };
 
 TypeSpecificValue.defaultProps = {
+  truncate: false,
   render: defaultComponent,
+  type: undefined,
   value: undefined,
 };
 
