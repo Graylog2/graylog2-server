@@ -34,7 +34,7 @@ class OutputList extends React.Component {
   };
 
   _sortByTitle = (output1, output2) => {
-    return naturalSort(output1.title.toLowerCase(), output2.title.toLowerCase());
+    return naturalSort(output1.title.toLocaleLowerCase(), output2.title.toLocaleLowerCase());
   };
 
   _formatOutput = (output) => {

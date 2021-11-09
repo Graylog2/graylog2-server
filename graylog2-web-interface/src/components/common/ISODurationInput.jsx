@@ -63,7 +63,7 @@ class ISODurationInput extends React.Component {
   };
 
   _onUpdate = () => {
-    let duration = this.isoDuration.getValue().toUpperCase();
+    let duration = this.isoDuration.getValue().toLocaleUpperCase('en');
 
     if (!duration.startsWith('P')) {
       duration = `P${duration}`;

@@ -54,7 +54,7 @@ class NodeOverview extends React.Component {
     let inputCount;
 
     if (this.props.inputStates) {
-      const runningInputs = this.props.inputStates.filter((inputState) => inputState.state.toUpperCase() === 'RUNNING');
+      const runningInputs = this.props.inputStates.filter((inputState) => inputState.state.toLocaleUpperCase('en') === 'RUNNING');
 
       inputCount = `${runningInputs.length} inputs running on this node`;
     }

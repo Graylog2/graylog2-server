@@ -74,7 +74,7 @@ class TimeRangeOptionsForm extends React.Component {
           let { value } = e.target;
 
           if (field === 'period') {
-            value = value.toUpperCase();
+            value = value.toLocaleUpperCase('en');
 
             if (!value.startsWith('P')) {
               value = `P${value}`;

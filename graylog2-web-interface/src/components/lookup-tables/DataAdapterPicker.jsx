@@ -45,7 +45,7 @@ class DataAdapterPicker extends React.Component {
 
     const sortedAdapters = this.props.dataAdapters.map((adapter) => {
       return { value: adapter.id, label: `${adapter.title} (${adapter.name})` };
-    }).sort((a, b) => naturalSort(a.label.toLowerCase(), b.label.toLowerCase()));
+    }).sort((a, b) => naturalSort(a.label.toLocaleLowerCase(), b.label.toLocaleLowerCase()));
 
     return (
       <fieldset>

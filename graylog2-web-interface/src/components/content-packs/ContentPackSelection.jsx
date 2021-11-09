@@ -46,7 +46,7 @@ class ContentPackSelection extends React.Component {
   static _toDisplayTitle(title) {
     const newTitle = title.split('_').join(' ');
 
-    return newTitle[0].toUpperCase() + newTitle.substr(1);
+    return newTitle[0].toLocaleUpperCase('en') + newTitle.substr(1);
   }
 
   constructor(props) {

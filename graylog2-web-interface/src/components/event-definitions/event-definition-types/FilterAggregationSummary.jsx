@@ -134,9 +134,9 @@ class FilterAggregationSummary extends React.Component {
         <dt>Streams</dt>
         <dd className={styles.streamList}>{this.renderStreams(effectiveStreamIds, streamIdsWithMissingPermission)}</dd>
         <dt>Search within</dt>
-        <dd>{searchWithin.duration} {searchWithin.unit.toLowerCase()}</dd>
+        <dd>{searchWithin.duration} {searchWithin.unit.toLocaleLowerCase('en')}</dd>
         <dt>Execute search every</dt>
-        <dd>{executeEvery.duration} {executeEvery.unit.toLowerCase()}</dd>
+        <dd>{executeEvery.duration} {executeEvery.unit.toLocaleLowerCase('en')}</dd>
         <dt>Enable scheduling</dt>
         <dd>{isScheduled ? 'yes' : 'no'}</dd>
         {conditionType === 'aggregation' && (

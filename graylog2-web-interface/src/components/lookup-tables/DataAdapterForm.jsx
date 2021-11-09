@@ -223,7 +223,7 @@ class DataAdapterForm extends React.Component {
   };
 
   _sanitizeTitle = (title) => {
-    return title.trim().replace(/\W+/g, '-').toLowerCase();
+    return title.trim().replace(/\W+/g, '-').toLocaleLowerCase();
   };
 
   _validationState = (fieldName) => {

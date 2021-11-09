@@ -86,7 +86,7 @@ class DataAdapterCreate extends React.Component {
       }
 
       return { value: typeItem.type, label: adapterPlugins[typeItem.type].displayName };
-    }).sort((a, b) => naturalSort(a.label.toLowerCase(), b.label.toLowerCase()));
+    }).sort((a, b) => naturalSort(a.label.toLocaleLowerCase(), b.label.toLocaleLowerCase()));
 
     return (
       <div>

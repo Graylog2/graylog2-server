@@ -53,7 +53,7 @@ const CreateInputControl = createReactClass({
         return { value: id, label: inputTypes[id] };
       });
 
-      options.sort((inputTypeA, inputTypeB) => inputTypeA.label.toLowerCase().localeCompare(inputTypeB.label.toLowerCase()));
+      options.sort((inputTypeA, inputTypeB) => inputTypeA.label.toLocaleLowerCase().localeCompare(inputTypeB.label.toLocaleLowerCase()));
     } else {
       options.push({ value: 'none', label: 'No inputs available', disabled: true });
     }

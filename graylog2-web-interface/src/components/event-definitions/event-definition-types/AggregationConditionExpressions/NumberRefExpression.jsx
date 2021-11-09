@@ -26,7 +26,7 @@ import { numberRefNodePropType } from 'logic/alerts/AggregationExpressionTypes';
 const formatFunctions = (functions) => {
   return functions
     .sort(naturalSort)
-    .map((fn) => ({ label: `${fn.toLowerCase()}()`, value: fn }));
+    .map((fn) => ({ label: `${fn.toLocaleLowerCase('en')}()`, value: fn }));
 };
 
 const NumberRefExpression = ({

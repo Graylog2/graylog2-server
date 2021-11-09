@@ -65,10 +65,10 @@ const AlertNotificationsComponent = createReactClass({
     const { allNotifications, streams } = this.state;
 
     const notifications = allNotifications.sort((a1, a2) => {
-      const t1 = a1.title || 'Untitled';
-      const t2 = a2.title || 'Untitled';
+      const t1 = a1.title?.toLocaleLowerCase() || 'untitled';
+      const t2 = a2.title?.toLocaleLowerCase() || 'untitled';
 
-      return naturalSort(t1.toLowerCase(), t2.toLowerCase());
+      return naturalSort(t1, t2);
     });
 
     return (

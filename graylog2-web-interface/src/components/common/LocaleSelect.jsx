@@ -46,8 +46,8 @@ const LocaleSelect = createReactClass({
         return { value: locale.language_tag, label: locale.display_name };
       })
       .sort((a, b) => {
-        const nameA = a.label.toUpperCase();
-        const nameB = b.label.toUpperCase();
+        const nameA = a.label.toLocaleUpperCase();
+        const nameB = b.label.toLocaleUpperCase();
 
         if (nameA < nameB) {
           return -1;
