@@ -18,9 +18,9 @@ package org.graylog.storage.elasticsearch6.views.searchtypes.pivot.series;
 
 import io.searchbox.core.SearchResult;
 import io.searchbox.core.search.aggregation.MaxAggregation;
-import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.aggregations.AggregationBuilder;
-import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.aggregations.AggregationBuilders;
-import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.aggregations.metrics.max.MaxAggregationBuilder;
+import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.aggregations.AggregationBuilder;
+import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.aggregations.metrics.max.MaxAggregationBuilder;
 import org.graylog.storage.elasticsearch6.views.ESGeneratedQueryContext;
 import org.graylog.storage.elasticsearch6.views.searchtypes.pivot.ESPivot;
 import org.graylog.storage.elasticsearch6.views.searchtypes.pivot.ESPivotSeriesSpecHandler;
