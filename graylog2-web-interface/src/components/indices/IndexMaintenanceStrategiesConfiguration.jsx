@@ -20,6 +20,8 @@ import React from 'react';
 import { Input } from 'components/bootstrap';
 import { Select } from 'components/common';
 
+const TIME_BASED_ROTATION_STRATEGY = 'org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategy';
+
 class IndexMaintenanceStrategiesConfiguration extends React.Component {
   static propTypes = {
     title: PropTypes.string.isRequired,
@@ -56,12 +58,19 @@ class IndexMaintenanceStrategiesConfiguration extends React.Component {
     return result ? result.json_schema : undefined;
   };
 
+  _getTimeBaseStrategyWithElasticLimit = () => {
+    const { activeConfig } = this.state;
+    const timeBasedStrategy = this._getDefaultStrategyConfig(TIME_BASED_ROTATION_STRATEGY);
+
+    return { ...activeConfig, elasticsearch_max_write_index_age: timeBasedStrategy?.elasticsearch_max_write_index_age };
+  }
+
   _getStrategyConfig = (selectedStrategy) => {
     const { activeStrategy, activeConfig } = this.state;
 
     if (activeStrategy === selectedStrategy) {
       // If the newly selected strategy is the current active strategy, we use the active configuration.
-      return activeConfig;
+      return activeStrategy === TIME_BASED_ROTATION_STRATEGY ? this._getTimeBaseStrategyWithElasticLimit() : activeConfig;
     }
 
     // If the newly selected strategy is not the current active strategy, we use the selected strategy's default config.
