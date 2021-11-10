@@ -25,6 +25,8 @@ import { QueriesActions } from 'views/actions/QueriesActions';
 import type { QueryId, TimeRange, TimeRangeTypes } from 'views/logic/queries/Query';
 import Query from 'views/logic/queries/Query';
 import { singletonStore } from 'logic/singleton';
+import fetch from 'logic/rest/FetchProvider';
+import { qualifyUrl } from 'util/URLUtils';
 
 import { ViewActions, ViewStore } from './ViewStore';
 import { ViewStatesActions } from './ViewStatesStore';
@@ -181,6 +183,23 @@ export const QueriesStore: QueriesStoreType = singletonStore(
       }) as Promise<QueriesList>;
 
       QueriesActions.rangeType.promise(promise);
+
+      return promise;
+    },
+
+    validateQueryString(query: string) {
+      const promise = fetch('POST', qualifyUrl('/search/validate'), { query }).then((result) => {
+        if (result) {
+          return {
+            status: result.validation_status,
+            explanations: result.explanations,
+          };
+        }
+
+        return undefined;
+      });
+
+      QueriesActions.validateQueryString.promise(promise);
 
       return promise;
     },

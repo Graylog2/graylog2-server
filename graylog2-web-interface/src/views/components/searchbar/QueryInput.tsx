@@ -15,14 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { withTheme, DefaultTheme } from 'styled-components';
 import PropTypes from 'prop-types';
+import { debounce } from 'lodash';
 
 import { themePropTypes } from 'theme';
 import withPluginEntities from 'views/logic/withPluginEntities';
+import { QueriesActions } from 'views/stores/QueriesStore';
 import UserPreferencesContext from 'contexts/UserPreferencesContext';
 
+import ValidationError from './queryinput/ValidationError';
 import type { AutoCompleter, Editor } from './ace-types';
 import StyledAceEditor from './queryinput/StyledAceEditor';
 import SearchBarAutoCompletions from './SearchBarAutocompletions';
@@ -44,6 +47,12 @@ type Props = {
 
 const defaultCompleterFactory = (completers) => new SearchBarAutoCompletions(completers);
 
+const validateQuery = debounce((value, setValidationState) => {
+  QueriesActions.validateQueryString(value).then((result) => {
+    setValidationState(result);
+  });
+}, 500);
+
 const QueryInput = ({
   className,
   completerFactory = defaultCompleterFactory,
@@ -58,6 +67,7 @@ const QueryInput = ({
   value,
 }: Props) => {
   const completer = useMemo(() => completerFactory(completers), [completerFactory, completers]);
+  const [validationState, setValidationState] = useState();
   const _onExecute = useCallback((editor: Editor) => {
     if (editor.completer && editor.completer.popup) {
       editor.completer.popup.hide();
@@ -86,6 +96,11 @@ const QueryInput = ({
     }
   }, [completer, _onExecute]);
 
+  const _onChange = (newValue) => {
+    onChange(newValue);
+    validateQuery(newValue, setValidationState);
+  };
+
   return (
     <div className={`query ${className}`} style={{ display: 'flex' }} data-testid="query-input">
       <UserPreferencesContext.Consumer>
@@ -96,7 +111,7 @@ const QueryInput = ({
                            ref={editorRef}
                            readOnly={disabled}
                            onBlur={onBlur}
-                           onChange={onChange}
+                           onChange={_onChange}
                            value={value}
                            name="QueryEditor"
                            showGutter={false}
@@ -115,6 +130,7 @@ const QueryInput = ({
                            $height={height} />
         )}
       </UserPreferencesContext.Consumer>
+      <ValidationError validationState={validationState} />
     </div>
   );
 };
