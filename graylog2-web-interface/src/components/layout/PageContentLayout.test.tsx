@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
+
 import { MockStore } from 'helpers/mocking';
 
 import PageContentLayout from './PageContentLayout';

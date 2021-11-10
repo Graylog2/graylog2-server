@@ -17,9 +17,9 @@
 import * as React from 'react';
 import { render } from 'wrappedTestingLibrary';
 import { Map, List } from 'immutable';
+
 import asMock from 'helpers/mocking/AsMock';
 import { simpleFields, simpleQueryFields } from 'fixtures/fields';
-
 import { FieldTypesStore } from 'views/stores/FieldTypesStore';
 
 import FieldTypesContext from './FieldTypesContext';

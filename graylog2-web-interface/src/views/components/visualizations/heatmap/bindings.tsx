@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type { VisualizationType } from 'views/types';
-
 import HeatmapVisualization from 'views/components/visualizations/heatmap/HeatmapVisualization';
 import HeatmapVisualizationConfig, { COLORSCALES } from 'views/logic/aggregationbuilder/visualizations/HeatmapVisualizationConfig';
 import { defaultCompare } from 'views/logic/DefaultCompare';

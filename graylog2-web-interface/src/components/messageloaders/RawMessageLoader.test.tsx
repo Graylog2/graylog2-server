@@ -17,11 +17,11 @@
 
 import React from 'react';
 import { screen, render } from 'wrappedTestingLibrary';
-import { StoreMock as MockStore } from 'helpers/mocking';
-import asMock from 'helpers/mocking/AsMock';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import userEvent from '@testing-library/user-event';
 
+import { StoreMock as MockStore } from 'helpers/mocking';
+import asMock from 'helpers/mocking/AsMock';
 import AppConfig from 'util/AppConfig';
 import { inputs } from 'components/messageloaders/MessageLoaders.fixtures';
 

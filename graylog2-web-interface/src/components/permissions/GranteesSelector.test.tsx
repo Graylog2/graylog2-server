@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { render, fireEvent } from 'wrappedTestingLibrary';
+
 import mockEntityShareState, { availableGrantees, availableCapabilities } from 'fixtures/entityShareState';
 
 import GranteesSelector from './GranteesSelector';

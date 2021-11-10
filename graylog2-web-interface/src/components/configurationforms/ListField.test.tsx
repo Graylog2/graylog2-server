@@ -17,6 +17,7 @@
 import React from 'react';
 import { screen, render, waitFor } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
+
 import { creatableListField, listField } from 'fixtures/configurationforms';
 
 import ListField from './ListField';

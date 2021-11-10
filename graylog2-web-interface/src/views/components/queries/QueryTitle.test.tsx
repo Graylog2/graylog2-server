@@ -17,8 +17,8 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { mount } from 'wrappedEnzyme';
-import mockAction from 'helpers/mocking/MockAction';
 
+import mockAction from 'helpers/mocking/MockAction';
 import { QueriesActions } from 'views/stores/QueriesStore';
 import { ViewActions } from 'views/stores/ViewStore';
 

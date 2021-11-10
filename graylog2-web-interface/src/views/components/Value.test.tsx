@@ -15,122 +15,131 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { mount } from 'wrappedEnzyme';
-import mockComponent from 'helpers/mocking/MockComponent';
+import { render, screen } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import FieldType from 'views/logic/fieldtypes/FieldType';
 
 import Value from './Value';
-import EmptyValue from './EmptyValue';
 import InteractiveContext from './contexts/InteractiveContext';
 
-jest.mock('./actions/ValueActions', () => mockComponent('ValueActions'));
-jest.mock('views/components/common/UserTimezoneTimestamp', () => mockComponent('UserTimezoneTimestamp'));
-
 describe('Value', () => {
-  describe('shows value actions menu', () => {
+  const openActionsMenu = (value) => {
+    userEvent.click(screen.getByText(value));
+  };
+
+  describe('actions menu title', () => {
     const Component = (props) => <Value {...props} />;
 
-    it('render without type information but no children', () => {
-      const wrapper = mount(<Component field="foo" queryId="someQueryId" value={42} />);
-      const valueActions = wrapper.find('ValueActions');
+    it('renders without type information but no children', async () => {
+      render(<Value field="foo" queryId="someQueryId" value={42} type={FieldType.Unknown} />);
 
-      expect(valueActions).toIncludeText('foo = 42');
+      openActionsMenu('42');
+
+      await screen.findByText('foo = 42');
     });
 
-    it('renders timestamps with a custom component', () => {
-      const wrapper = mount(<Component field="foo"
-                                       queryId="someQueryId"
-                                       value="2018-10-02T14:45:40Z"
-                                       type={new FieldType('date', [], [])} />);
-      const userTimestamp = wrapper.find('UserTimezoneTimestamp');
+    it('renders timestamps with a custom component', async () => {
+      render(<Component field="foo"
+                        queryId="someQueryId"
+                        value="2018-10-02T14:45:40Z"
+                        render={({ value }) => `The date ${value}`}
+                        type={new FieldType('date', [], [])} />);
 
-      expect(userTimestamp).toExist();
+      openActionsMenu('The date 2018-10-02 09:45:40.000');
+      const title = await screen.findByTestId('value-actions-title');
+
+      expect(title).toHaveTextContent('foo = 2018-10-02 09:45:40.000');
     });
 
-    it('renders numeric timestamps with a custom component', () => {
-      const wrapper = mount(<Component field="foo"
-                                       queryId="someQueryId"
-                                       value={1571302317}
-                                       type={new FieldType('date', [], [])} />);
-      const userTimeStamp = wrapper.find('UserTimezoneTimestamp');
+    it('renders numeric timestamps with a custom component', async () => {
+      render(<Component field="foo"
+                        queryId="someQueryId"
+                        value={1571302317}
+                        render={({ value }) => `The number ${value}`}
+                        type={new FieldType('numeric', [], [])} />);
 
-      expect(userTimeStamp).toExist();
+      await screen.findByText('The number 1571302317');
     });
 
-    it('renders booleans as strings', () => {
-      const wrapper = mount(<Component field="foo"
-                                       queryId="someQueryId"
-                                       value={false}
-                                       type={new FieldType('boolean', [], [])} />);
-      const valueActions = wrapper.find('ValueActions');
+    it('renders booleans as strings', async () => {
+      render(<Component field="foo"
+                        queryId="someQueryId"
+                        value={false}
+                        type={new FieldType('boolean', [], [])} />);
 
-      expect(valueActions).toIncludeText('foo = false');
+      openActionsMenu('false');
+
+      await screen.findByText('foo = false');
     });
 
-    it('renders booleans as strings even if field type is unknown', () => {
-      const wrapper = mount(<Component field="foo" queryId="someQueryId" value={false} type={FieldType.Unknown} />);
-      const valueActions = wrapper.find('ValueActions');
+    it('renders booleans as strings even if field type is unknown', async () => {
+      render(<Component field="foo" queryId="someQueryId" value={false} type={FieldType.Unknown} />);
 
-      expect(valueActions).toIncludeText('foo = false');
+      openActionsMenu('false');
+
+      await screen.findByText('foo = false');
     });
 
-    it('renders arrays as strings', () => {
-      const wrapper = mount(<Component field="foo"
-                                       queryId="someQueryId"
-                                       value={[23, 'foo']}
-                                       type={FieldType.Unknown} />);
-      const valueActions = wrapper.find('ValueActions');
+    it('renders arrays as strings', async () => {
+      render(<Component field="foo"
+                        queryId="someQueryId"
+                        value={[23, 'foo']}
+                        type={FieldType.Unknown} />);
 
-      expect(valueActions).toIncludeText('foo = [23,"foo"]');
+      openActionsMenu('[23,"foo"]');
+
+      await screen.findByText('foo = [23,"foo"]');
     });
 
-    it('renders objects as strings', () => {
-      const wrapper = mount(<Component field="foo"
-                                       queryId="someQueryId"
-                                       value={{ foo: 23 }}
-                                       type={FieldType.Unknown} />);
-      const valueActions = wrapper.find('ValueActions');
+    it('renders objects as strings', async () => {
+      render(<Component field="foo"
+                        queryId="someQueryId"
+                        value={{ foo: 23 }}
+                        type={FieldType.Unknown} />);
 
-      expect(valueActions).toIncludeText('foo = {"foo":23}');
+      openActionsMenu('{"foo":23}');
+
+      await screen.findByText('foo = {"foo":23}');
     });
 
-    it('truncates values longer than 30 characters', () => {
-      const wrapper = mount(<Component field="message"
-                                       queryId="someQueryId"
-                                       value="sophon unbound: [84785:0] error: outgoing tcp: connect: Address already in use for 1.0.0.1"
-                                       type={new FieldType('string', [], [])} />);
-      const valueActions = wrapper.find('ValueActions');
+    it('truncates values longer than 30 characters', async () => {
+      render(<Component field="message"
+                        queryId="someQueryId"
+                        value="sophon unbound: [84785:0] error: outgoing tcp: connect: Address already in use for 1.0.0.1"
+                        type={new FieldType('string', [], [])} />);
 
-      expect(valueActions).toIncludeText('message = sophon unbound: [84785:0] e...');
+      openActionsMenu('sophon unbound: [84785:0] error: outgoing tcp: connect: Address already in use for 1.0.0.1');
+
+      await screen.findByText('message = sophon unbound: [84785:0] e...');
     });
   });
 
   it.each`
-     interactive | value                     | type                                
-     ${true}     | ${42}                     | ${undefined}                        
-     ${true}     | ${'2018-10-02T14:45:40Z'} | ${new FieldType('date', [], [])}    
-     ${true}     | ${false}                  | ${new FieldType('boolean', [], [])} 
-     ${true}     | ${[23, 'foo']}            | ${FieldType.Unknown}                
-     ${true}     | ${{ foo: 23 }}            | ${FieldType.Unknown}                
-     ${false}    | ${42}                     | ${undefined}                        
-     ${false}    | ${'2018-10-02T14:45:40Z'} | ${new FieldType('date', [], [])}    
-     ${false}    | ${false}                  | ${new FieldType('boolean', [], [])} 
-     ${false}    | ${[23, 'foo']}            | ${FieldType.Unknown}                
-     ${false}    | ${{ foo: 23 }}            | ${FieldType.Unknown}                
-  `('verifying that value $value is rendered correctly when interactive=$interactive', ({ interactive, value, type }) => {
+     interactive | value                     | type                                                         | result
+     ${true}     | ${42}                     | ${undefined}                                                 | ${'42'}
+     ${true}     | ${'2018-10-02T14:45:40Z'} | ${new FieldType('date', [], [])}    | ${'2018-10-02 09:45:40.000'}
+     ${true}     | ${false}                  | ${new FieldType('boolean', [], [])} | ${'false'}
+     ${true}     | ${[23, 'foo']}            | ${FieldType.Unknown}                                         | ${'[23,"foo"]'}                
+     ${true}     | ${{ foo: 23 }}            | ${FieldType.Unknown}                                         | ${'{"foo":23}'}
+     ${false}    | ${42}                     | ${undefined}                                                 | ${'42'}
+     ${false}    | ${'2018-10-02T14:45:40Z'} | ${new FieldType('date', [], [])}    | ${'2018-10-02 09:45:40.000'}
+     ${false}    | ${false}                  | ${new FieldType('boolean', [], [])} | ${'false'}
+     ${false}    | ${[23, 'foo']}            | ${FieldType.Unknown}                                         | ${'[23,"foo"]'}
+     ${false}    | ${{ foo: 23 }}            | ${FieldType.Unknown}                                         | ${'{"foo":23}'}
+  `('verifying that value $value is rendered correctly when interactive=$interactive', async ({ interactive, value, result, type }) => {
     const Component = (props) => (
       <InteractiveContext.Provider value={interactive}>
         <Value {...props} />
       </InteractiveContext.Provider>
     );
-    const wrapper = mount(<Component field="foo"
-                                     queryId="someQueryId"
-                                     value={value}
-                                     type={type} />);
-    const typeSpecificValue = wrapper.find('TypeSpecificValue');
 
-    expect(typeSpecificValue).toHaveValue(value);
+    render(<Component field="foo"
+                      queryId="someQueryId"
+                      value={value}
+                      type={type} />);
+
+    await screen.findByText(result);
   });
 
   describe('handles value action menu depending on interactive context', () => {
@@ -140,43 +149,37 @@ describe('Value', () => {
       </InteractiveContext.Provider>
     );
 
-    it('does not show value actions if interactive context is `false`', () => {
+    it('does not show value actions if interactive context is `false`', async () => {
       const NoninteractiveComponent = component(false);
-      const wrapper = mount(<NoninteractiveComponent field="foo"
-                                                     queryId="someQueryId"
-                                                     value={{ foo: 23 }}
-                                                     type={FieldType.Unknown} />);
-      const valueActions = wrapper.find('ValueActions');
 
-      expect(valueActions).not.toExist();
+      render(<NoninteractiveComponent field="foo"
+                                      queryId="someQueryId"
+                                      value={{ foo: 23 }}
+                                      type={FieldType.Unknown} />);
 
-      const typeSpecificValue = wrapper.find('TypeSpecificValue');
+      openActionsMenu('{"foo":23}');
 
-      expect(typeSpecificValue).toHaveProp('value', { foo: 23 });
+      expect(screen.queryByText('foo = {"foo":23}')).not.toBeInTheDocument();
     });
 
-    it('shows value actions if interactive context is `true`', () => {
+    it('shows value actions if interactive context is `true`', async () => {
       const InteractiveComponent = component(true);
-      const wrapper = mount(<InteractiveComponent field="foo"
-                                                  queryId="someQueryId"
-                                                  value={{ foo: 23 }}
-                                                  type={FieldType.Unknown} />);
-      const valueActions = wrapper.find('ValueActions');
 
-      expect(valueActions).toExist();
+      render(<InteractiveComponent field="foo"
+                                   queryId="someQueryId"
+                                   value={{ foo: 23 }}
+                                   type={FieldType.Unknown} />);
 
-      const typeSpecificValue = wrapper.find('TypeSpecificValue');
+      openActionsMenu('{"foo":23}');
 
-      expect(typeSpecificValue).toHaveProp('value', { foo: 23 });
+      await screen.findByText('foo = {"foo":23}');
     });
   });
 
-  const verifyReplacementOfEmptyValues = ({ value }) => {
-    const wrapper = mount(<Value type={FieldType.Unknown} field="foo" queryId="someQueryId" value={value} />);
-    const valueActions = wrapper.find('ValueActions');
+  const verifyReplacementOfEmptyValues = async ({ value }) => {
+    render(<Value type={FieldType.Unknown} field="foo" queryId="someQueryId" value={value} />);
 
-    expect(valueActions).toIncludeText('foo = <Empty Value>');
-    expect(valueActions).toContainReact(<EmptyValue />);
+    await screen.findByText(/Empty Value/);
   };
 
   it.each`

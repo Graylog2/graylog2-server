@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type { VisualizationType } from 'views/types';
-
 import LineVisualization from 'views/components/visualizations/line/LineVisualization';
 import LineVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/LineVisualizationConfig';
 import { hasAtLeastOneMetric } from 'views/components/visualizations/validations';

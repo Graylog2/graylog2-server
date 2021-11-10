@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import MockStore from 'helpers/mocking/StoreMock';
-
 import { StreamSearchPage } from 'views/pages';
 
 import bindings from './bindings';

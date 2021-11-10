@@ -31,8 +31,7 @@ export const getValueFromInput = (input) => {
   }
 };
 
-export const triggerInput = (urlInput) => {
-  const { input } = urlInput;
+export const triggerInput = (input) => {
   const tracker = input._valueTracker;
   const event = createEvent('change');
 
