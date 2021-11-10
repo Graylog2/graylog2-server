@@ -25,7 +25,8 @@ import java.util.function.Consumer;
 
 public final class SearchUtils {
 
-    private SearchUtils() {}
+    private SearchUtils() {
+    }
 
     public static List<String> searchForAllMessages(RequestSpecification requestSpecification) {
         List<String> messages = new ArrayList<>();
@@ -33,6 +34,15 @@ public final class SearchUtils {
         WaitUtils.waitFor(() -> captureMessages(messages::addAll, requestSpecification), "Timed out waiting for messages to be present");
 
         return messages;
+    }
+
+    public static boolean searchForMessage(RequestSpecification requestSpecification, String message) {
+        WaitUtils.waitFor(() -> captureMessage(requestSpecification, message), "Timed out waiting for message to be present");
+        return true;
+    }
+
+    private static boolean captureMessage(RequestSpecification requestSpecification, String message) {
+        return SearchDriver.searchAllMessages(requestSpecification).contains(message);
     }
 
     private static boolean captureMessages(Consumer<List<String>> messagesCaptor,

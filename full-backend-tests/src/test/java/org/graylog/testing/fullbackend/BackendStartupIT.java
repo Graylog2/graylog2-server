@@ -20,12 +20,12 @@ import io.restassured.specification.RequestSpecification;
 import org.graylog.testing.completebackend.GraylogBackend;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.utils.SearchUtils;
 
 import java.util.List;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.graylog.testing.backenddriver.SearchDriver.searchAllMessages;
 import static org.graylog.testing.completebackend.Lifecycle.CLASS;
 import static org.graylog.testing.containermatrix.ContainerVersions.ES6;
 
@@ -69,10 +69,11 @@ class BackendStartupIT {
 
     @ContainerMatrixTest
     void importsElasticsearchFixtures() {
+        List<String> messages = SearchUtils.searchForAllMessages(requestSpec);
+        assertThat(messages).doesNotContain("hello from es fixture");
+
         sut.importElasticsearchFixture("one-message.json", getClass());
 
-        List<String> allMessages = searchAllMessages(requestSpec);
-
-        assertThat(allMessages).containsExactly("hello from es fixture");
+        assertThat(SearchUtils.searchForMessage(requestSpec, "hello from es fixture")).isTrue();
     }
 }

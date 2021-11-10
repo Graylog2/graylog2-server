@@ -22,6 +22,8 @@ import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.graylog.testing.utils.GelfInputUtils;
 import org.graylog.testing.utils.SearchUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -35,6 +37,7 @@ import static org.graylog.testing.graylognode.NodeContainerConfig.GELF_HTTP_PORT
 
 @ContainerMatrixTestsConfiguration(serverLifecycle = VM, esVersions = {ES6, ES7}, mongoVersions = {MONGO3, MONGO4})
 public class ElasticsearchE2E {
+    private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchE2E.class);
 
     private final GraylogBackend sut;
     private final RequestSpecification requestSpec;
@@ -44,6 +47,12 @@ public class ElasticsearchE2E {
         this.requestSpec = requestSpec;
     }
 
+    //    @BeforeEach
+    void cleanUp() {
+        LOG.info("cleanup()");
+        sut.purgeESData();
+    }
+
     @ContainerMatrixTest
     void inputMessageCanBeSearched() {
         int mappedPort = sut.mappedPortFor(GELF_HTTP_PORT);
@@ -51,11 +60,16 @@ public class ElasticsearchE2E {
         GelfInputUtils.createGelfHttpInput(mappedPort, GELF_HTTP_PORT, requestSpec);
 
         GelfInputUtils.postMessage(mappedPort,
-                "{\"short_message\":\"Hello there\", \"host\":\"example.org\", \"facility\":\"test\"}",
+                "{\"short_message\":\"kram\", \"host\":\"example.org\", \"facility\":\"test\"}",
                 requestSpec);
 
         List<String> messages = SearchUtils.searchForAllMessages(requestSpec);
+        assertThat(messages).doesNotContain("Hello there");
 
-        assertThat(messages).containsExactly("Hello there");
+        GelfInputUtils.postMessage(mappedPort,
+                "{\"short_message\":\"Hello there\", \"host\":\"example.org\", \"facility\":\"test\"}",
+                requestSpec);
+
+        assertThat(SearchUtils.searchForMessage(requestSpec, "Hello there")).isTrue();
     }
 }

@@ -24,7 +24,7 @@ public final class WaitUtils {
 
     private WaitUtils() {}
 
-    public static  void waitFor(Producer<Boolean> predicate, String timeoutErrorMessage) {
+    public static void waitFor(Producer<Boolean> predicate, String timeoutErrorMessage) {
         int timeOutMs = 5000;
         int msPassed = 0;
         int waitMs = 500;
@@ -38,7 +38,7 @@ public final class WaitUtils {
         fail(timeoutErrorMessage);
     }
 
-    private static  void wait(int waitMs) {
+    private static void wait(int waitMs) {
         try {
             Thread.sleep(waitMs);
         } catch (InterruptedException e) {
