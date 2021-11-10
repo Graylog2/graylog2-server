@@ -25,7 +25,7 @@ public final class WaitUtils {
     private WaitUtils() {}
 
     public static void waitFor(Producer<Boolean> predicate, String timeoutErrorMessage) {
-        int timeOutMs = 5000;
+        int timeOutMs = 10000;
         int msPassed = 0;
         int waitMs = 500;
         while (msPassed <= timeOutMs) {
