@@ -84,6 +84,10 @@ public class ESMessageList implements ESSearchTypeHandler<MessageList> {
                 ? query.usedStreamIds()
                 : messageList.effectiveStreams();
 
+        if (!messageList.fields().isEmpty()) {
+            searchSourceBuilder.fetchSource(messageList.fields().toArray(new String[0]), new String[0]);
+        }
+
         final List<Sort> sorts = firstNonNull(messageList.sort(), Collections.singletonList(Sort.create(Message.FIELD_TIMESTAMP, Sort.Order.DESC)));
         sorts.forEach(sort -> {
             final FieldSortBuilder fieldSort = SortBuilders.fieldSort(sort.field())
