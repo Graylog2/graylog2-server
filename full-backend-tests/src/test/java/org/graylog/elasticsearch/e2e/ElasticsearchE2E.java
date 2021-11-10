@@ -47,12 +47,6 @@ public class ElasticsearchE2E {
         this.requestSpec = requestSpec;
     }
 
-    //    @BeforeEach
-    void cleanUp() {
-        LOG.info("cleanup()");
-        sut.purgeESData();
-    }
-
     @ContainerMatrixTest
     void inputMessageCanBeSearched() {
         int mappedPort = sut.mappedPortFor(GELF_HTTP_PORT);
