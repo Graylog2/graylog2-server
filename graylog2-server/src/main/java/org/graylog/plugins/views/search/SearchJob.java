@@ -36,9 +36,6 @@ import java.util.concurrent.CompletableFuture;
 // execution must come before results, as it signals the overall "done" state
 @JsonPropertyOrder({"execution", "results"})
 public class SearchJob {
-    private static final Logger LOG = LoggerFactory.getLogger(SearchJob.class);
-    static final String FIELD_OWNER = "owner";
-
     @JsonProperty
     private final String id;
 
@@ -51,7 +48,7 @@ public class SearchJob {
     @JsonIgnore
     private CompletableFuture<Void> resultFuture;
 
-    private Map<String, CompletableFuture<QueryResult>> queryResults = Maps.newHashMap();
+    final private Map<String, CompletableFuture<QueryResult>> queryResults = Maps.newHashMap();
 
     @JsonProperty("errors")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)

@@ -38,8 +38,6 @@ import static com.google.common.collect.ImmutableSet.of;
 @JsonAutoDetect
 @JsonDeserialize(builder = SearchDTO.Builder.class)
 public abstract class SearchDTO {
-    public static final String FIELD_OWNER = "owner";
-
     @Nullable
     @JsonProperty
     public abstract String id();
@@ -51,7 +49,6 @@ public abstract class SearchDTO {
     public abstract Set<Parameter> parameters();
 
     @AutoValue.Builder
-    @JsonPOJOBuilder(withPrefix = "")
     public abstract static class Builder {
         @Id
         @JsonProperty

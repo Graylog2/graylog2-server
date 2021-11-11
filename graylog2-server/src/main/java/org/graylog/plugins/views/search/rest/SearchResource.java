@@ -25,7 +25,6 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchDomain;
-import org.graylog.plugins.views.search.SearchExecutionGuard;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.db.SearchJobService;
 import org.graylog.plugins.views.search.events.SearchJobExecutionEvent;
