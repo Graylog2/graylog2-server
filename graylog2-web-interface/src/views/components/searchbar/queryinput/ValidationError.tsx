@@ -55,7 +55,7 @@ const ValidationError = ({ validationState }: Props) => {
                           {JSON.stringify(explanations)}
                         </Popover>
                       )}>
-        <ErrorIcon $status={status} name={status === 'ERROR' ? 'times-circle' : 'triangle-exclamation'} />
+        <ErrorIcon $status={status} name={status === 'ERROR' ? 'times-circle' : 'exclamation-triangle'} />
       </OverlayTrigger>
     </Container>
   );

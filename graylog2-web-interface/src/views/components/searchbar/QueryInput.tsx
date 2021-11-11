@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, useEffect } from 'react';
 import { withTheme, DefaultTheme } from 'styled-components';
 import PropTypes from 'prop-types';
 import { debounce } from 'lodash';
@@ -51,7 +51,7 @@ const validateQuery = debounce((value, setValidationState) => {
   QueriesActions.validateQueryString(value).then((result) => {
     setValidationState(result);
   });
-}, 500);
+}, 350);
 
 const QueryInput = ({
   className,
@@ -96,10 +96,17 @@ const QueryInput = ({
     }
   }, [completer, _onExecute]);
 
-  const _onChange = (newValue) => {
-    onChange(newValue);
-    validateQuery(newValue, setValidationState);
-  };
+  useEffect(() => {
+    if (value) {
+      validateQuery(value, setValidationState);
+    }
+  }, [value]);
+
+  useEffect(() => {
+    if (!value && validationState) {
+      setValidationState(undefined);
+    }
+  }, [value, validationState]);
 
   return (
     <div className={`query ${className}`} style={{ display: 'flex' }} data-testid="query-input">
@@ -111,7 +118,7 @@ const QueryInput = ({
                            ref={editorRef}
                            readOnly={disabled}
                            onBlur={onBlur}
-                           onChange={_onChange}
+                           onChange={onChange}
                            value={value}
                            name="QueryEditor"
                            showGutter={false}
