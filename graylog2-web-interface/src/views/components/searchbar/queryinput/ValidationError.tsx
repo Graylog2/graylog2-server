@@ -24,7 +24,8 @@ const Container = styled.div`
   display: flex;
   align-items: center;
   padding-top: 3px;
-  margin-right: 10px;
+  margin-right: 5px;
+  margin-left: 5px;
 `;
 
 const ErrorIcon = styled(Icon)(({ theme, $status }: { theme: DefaultTheme, $status: string}) => `
@@ -55,7 +56,7 @@ const ValidationError = ({ validationState }: Props) => {
                           {JSON.stringify(explanations)}
                         </Popover>
                       )}>
-        <ErrorIcon $status={status} name={status === 'ERROR' ? 'times-circle' : 'exclamation-triangle'} />
+        <ErrorIcon $status={status} name="exclamation-circle" />
       </OverlayTrigger>
     </Container>
   );

@@ -47,11 +47,57 @@ type Props = {
 
 const defaultCompleterFactory = (completers) => new SearchBarAutoCompletions(completers);
 
+const handleExecution = (editor, onExecute, value) => {
+  if (editor.completer && editor.completer.popup) {
+    editor.completer.popup.hide();
+  }
+
+  onExecute(value);
+};
+
+const configureEditor = (node, completer, onExecute) => {
+  const editor = node && node.editor;
+
+  if (editor) {
+    editor.commands.addCommands([{
+      name: 'Execute',
+      bindKey: 'Enter',
+      exec: onExecute,
+    },
+    {
+      name: 'SuppressShiftEnter',
+      bindKey: 'Shift-Enter',
+      exec: () => {},
+    }]);
+
+    editor.commands.removeCommands(['find', 'indent', 'outdent']);
+    editor.completers = [completer];
+  }
+};
+
 const validateQuery = debounce((value, setValidationState) => {
   QueriesActions.validateQueryString(value).then((result) => {
     setValidationState(result);
   });
 }, 350);
+
+const useValidateQuery = (value) => {
+  const [validationState, setValidationState] = useState();
+
+  useEffect(() => {
+    if (value) {
+      validateQuery(value, setValidationState);
+    }
+  }, [value]);
+
+  useEffect(() => {
+    if (!value && validationState) {
+      setValidationState(undefined);
+    }
+  }, [value, validationState]);
+
+  return validationState;
+};
 
 const QueryInput = ({
   className,
@@ -67,46 +113,9 @@ const QueryInput = ({
   value,
 }: Props) => {
   const completer = useMemo(() => completerFactory(completers), [completerFactory, completers]);
-  const [validationState, setValidationState] = useState();
-  const _onExecute = useCallback((editor: Editor) => {
-    if (editor.completer && editor.completer.popup) {
-      editor.completer.popup.hide();
-    }
-
-    onExecute(value);
-  }, [onExecute, value]);
-
-  const editorRef = useCallback((node) => {
-    const editor = node && node.editor;
-
-    if (editor) {
-      editor.commands.addCommands([{
-        name: 'Execute',
-        bindKey: 'Enter',
-        exec: _onExecute,
-      },
-      {
-        name: 'SuppressShiftEnter',
-        bindKey: 'Shift-Enter',
-        exec: () => {},
-      }]);
-
-      editor.commands.removeCommands(['find', 'indent', 'outdent']);
-      editor.completers = [completer];
-    }
-  }, [completer, _onExecute]);
-
-  useEffect(() => {
-    if (value) {
-      validateQuery(value, setValidationState);
-    }
-  }, [value]);
-
-  useEffect(() => {
-    if (!value && validationState) {
-      setValidationState(undefined);
-    }
-  }, [value, validationState]);
+  const _onExecute = useCallback((editor: Editor) => handleExecution(editor, onExecute, value), [onExecute, value]);
+  const editorRef = useCallback((node) => configureEditor(node, completer, _onExecute), [completer, _onExecute]);
+  const validationState = useValidateQuery(value);
 
   return (
     <div className={`query ${className}`} style={{ display: 'flex' }} data-testid="query-input">
