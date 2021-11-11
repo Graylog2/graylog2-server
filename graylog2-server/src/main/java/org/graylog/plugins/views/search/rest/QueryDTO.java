@@ -32,6 +32,7 @@ import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Optional;
 import java.util.Set;
 
 @AutoValue
@@ -39,28 +40,23 @@ import java.util.Set;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonDeserialize(builder = QueryDTO.Builder.class)
 public abstract class QueryDTO {
-    @Nullable
     @JsonProperty
-    public abstract String id();
+    public abstract Optional<String> id();
 
-    @Nullable
     @JsonProperty
-    public abstract TimeRange timerange();
+    public abstract Optional<TimeRange> timerange();
 
-    @Nullable
     @JsonProperty
-    public abstract Filter filter();
+    public abstract Optional<Filter> filter();
 
-    @Nullable
     @JsonProperty
-    public abstract BackendQuery query();
+    public abstract Optional<BackendQuery> query();
 
     @Nonnull
     @JsonProperty("search_types")
     public abstract Set<SearchType> searchTypes();
 
     @AutoValue.Builder
-    @JsonPOJOBuilder(withPrefix = "")
     public abstract static class Builder {
         @JsonProperty
         public abstract Builder id(String id);
@@ -86,11 +82,13 @@ public abstract class QueryDTO {
     }
 
     public Query toQuery() {
-        return Query.builder()
-                .id(id())
-                .timerange(timerange())
-                .filter(filter())
-                .query(query())
+        Query.Builder queryBuilder = Query.builder();
+        queryBuilder = id().map(queryBuilder::id).orElse(queryBuilder);
+        queryBuilder = timerange().map(queryBuilder::timerange).orElse(queryBuilder);
+        queryBuilder = filter().map(queryBuilder::filter).orElse(queryBuilder);
+        queryBuilder = query().map(queryBuilder::query).orElse(queryBuilder);
+
+        return queryBuilder
                 .searchTypes(ImmutableSet.copyOf(searchTypes()))
                 .build();
     }
