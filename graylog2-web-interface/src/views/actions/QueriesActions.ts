@@ -34,7 +34,7 @@ type QueriesActionsType = RefluxActions<{
   remove: (queryId: QueryId) => Promise<QueriesList>,
   timerange: (queryId: QueryId, newTimeRange: TimeRange) => Promise<QueriesList>,
   update: (queryId: QueryId, query: Query) => Promise<QueriesList>,
-  validateQueryString: (query: string) => Promise<boolean>
+  validateQueryString: (query: string) => Promise<any>
 }>;
 
 // eslint-disable-next-line import/prefer-default-export

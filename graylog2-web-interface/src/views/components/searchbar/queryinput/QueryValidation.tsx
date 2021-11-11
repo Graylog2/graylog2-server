@@ -21,15 +21,18 @@ import { useState, useEffect } from 'react';
 
 import { Popover } from 'components/bootstrap';
 import { OverlayTrigger, Icon } from 'components/common';
-import { QueriesActions } from 'views/actions/QueriesActions';
+import { QueriesActions } from 'views/stores/QueriesStore';
 
 const Container = styled.div`
-  display: flex;
-  align-items: center;
-  padding-top: 2px;
   margin-right: 5px;
   margin-left: 5px;
   width: 25px;
+`;
+
+const ErrorIconContainer = styled.div`
+  min-height: 35px;
+  display: flex;
+  align-items: center;
 `;
 
 const ErrorIcon = styled(Icon)(({ theme, $status }: { theme: DefaultTheme, $status: string}) => `
@@ -83,7 +86,9 @@ const QueryValidation = ({ query }: Props) => {
                           {JSON.stringify(explanations)}
                         </Popover>
                       )}>
-        <ErrorIcon $status={status} name="exclamation-circle" />
+        <ErrorIconContainer title="Toggle validation error explanation">
+          <ErrorIcon $status={status} name="exclamation-circle" />
+        </ErrorIconContainer>
       </OverlayTrigger>
     </Container>
   );

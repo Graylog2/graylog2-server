@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useMemo, useRef } from 'react';
+import { useCallback, useMemo } from 'react';
 import { withTheme, DefaultTheme } from 'styled-components';
 import PropTypes from 'prop-types';
 
@@ -53,7 +53,7 @@ const handleExecution = (editor, onExecute, value) => {
   onExecute(value);
 };
 
-const _configureEditor = (node, editorRef, completer, onExecute) => {
+const _configureEditor = (node, completer, onExecute) => {
   const editor = node && node.editor;
 
   if (editor) {
