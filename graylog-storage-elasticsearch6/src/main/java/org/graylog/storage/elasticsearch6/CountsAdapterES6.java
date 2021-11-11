@@ -20,8 +20,8 @@ import io.searchbox.client.JestClient;
 import io.searchbox.core.MultiSearch;
 import io.searchbox.core.MultiSearchResult;
 import io.searchbox.core.Search;
-import org.graylog.shaded.elasticsearch5.org.elasticsearch.index.query.QueryBuilders;
-import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.graylog.shaded.elasticsearch6.org.elasticsearch.index.query.QueryBuilders;
+import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.storage.elasticsearch6.jest.JestUtils;
 import org.graylog2.indexer.counts.CountsAdapter;
 

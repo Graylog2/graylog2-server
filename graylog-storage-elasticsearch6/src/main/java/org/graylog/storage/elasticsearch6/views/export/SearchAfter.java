@@ -21,7 +21,7 @@ import com.google.common.collect.Sets;
 import io.searchbox.core.Search;
 import io.searchbox.core.SearchResult;
 import io.searchbox.core.search.sort.Sort;
-import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.plugins.views.search.export.ExportMessagesCommand;
 import org.graylog2.plugin.Message;
 import org.slf4j.Logger;
