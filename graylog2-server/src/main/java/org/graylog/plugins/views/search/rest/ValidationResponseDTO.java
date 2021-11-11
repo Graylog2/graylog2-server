@@ -27,7 +27,7 @@ import java.util.Set;
 public abstract class ValidationResponseDTO {
 
     @JsonProperty
-    public abstract ValidationStatusDTO validationStatus();
+    public abstract ValidationStatusDTO status();
 
     @JsonProperty
     @JsonInclude(JsonInclude.Include.NON_EMPTY)

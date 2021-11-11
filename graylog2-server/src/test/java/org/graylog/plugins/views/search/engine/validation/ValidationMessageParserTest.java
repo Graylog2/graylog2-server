@@ -49,7 +49,7 @@ class ValidationMessageParserTest {
     void testWithoutStructure() {
         // query is foo*:test
         final ValidationMessage error = ValidationMessageParser.getHumanReadableMessage("org.elasticsearch.index.query.QueryShardException: Can only use prefix queries on keyword, text and wildcard fields - not on [winlogbeat_event_code] which is of type [long]");
-        assertThat(error.errorType()).isEqualTo("org.elasticsearch.index.query.QueryShardException");
+        assertThat(error.errorType()).isEqualTo("QueryShardException");
         assertThat(error.errorMessage()).isEqualTo("Can only use prefix queries on keyword, text and wildcard fields - not on [winlogbeat_event_code] which is of type [long]");
     }
 

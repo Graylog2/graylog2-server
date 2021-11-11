@@ -46,7 +46,14 @@ public class ValidationMessageParser {
         } else {
             final Matcher simpleMatcher = regexSimple.matcher(input);
             if(simpleMatcher.find()) {
-                errorBuilder.errorType(simpleMatcher.group(1));
+                final String fullyQualifiedName = simpleMatcher.group(1);
+                final String[] parts = fullyQualifiedName.split("\\.");
+
+                if(parts.length > 0) {
+                    errorBuilder.errorType(parts[parts.length - 1]);
+                } else {
+                    errorBuilder.errorType(fullyQualifiedName);
+                }
                 errorBuilder.errorMessage(simpleMatcher.group(2));
             }
 
