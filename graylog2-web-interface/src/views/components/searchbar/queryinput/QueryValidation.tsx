@@ -16,31 +16,57 @@
  */
 import * as React from 'react';
 import styled, { DefaultTheme } from 'styled-components';
+import { debounce } from 'lodash';
+import { useState, useEffect } from 'react';
 
 import { Popover } from 'components/bootstrap';
 import { OverlayTrigger, Icon } from 'components/common';
+import { QueriesActions } from 'views/actions/QueriesActions';
 
 const Container = styled.div`
   display: flex;
   align-items: center;
-  padding-top: 3px;
+  padding-top: 2px;
   margin-right: 5px;
   margin-left: 5px;
 `;
 
 const ErrorIcon = styled(Icon)(({ theme, $status }: { theme: DefaultTheme, $status: string}) => `
   color: ${$status === 'ERROR' ? theme.colors.variant.danger : theme.colors.variant.warning};
-  font-size: 24px;
+  font-size: 22px;
 `);
 
+const validateQuery = debounce((value, setValidationState) => {
+  QueriesActions.validateQueryString(value).then((result) => {
+    setValidationState(result);
+  });
+}, 350);
+
+const useValidateQuery = (value) => {
+  const [validationState, setValidationState] = useState(undefined);
+
+  useEffect(() => {
+    if (value) {
+      validateQuery(value, setValidationState);
+    }
+  }, [value]);
+
+  useEffect(() => {
+    if (!value && validationState) {
+      setValidationState(undefined);
+    }
+  }, [value, validationState]);
+
+  return validationState;
+};
+
 type Props = {
-  validationState: {
-    status: 'WARNING' | 'ERROR' | 'OK',
-    explanations: any
-  } | undefined
+  query: string | undefined,
 }
 
-const ValidationError = ({ validationState }: Props) => {
+const QueryValidation = ({ query }: Props) => {
+  const validationState = useValidateQuery(query);
+
   if (!validationState || validationState.status === 'OK') {
     return null;
   }
@@ -62,4 +88,4 @@ const ValidationError = ({ validationState }: Props) => {
   );
 };
 
-export default ValidationError;
+export default QueryValidation;

@@ -15,17 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useMemo, useState, useEffect } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 import { withTheme, DefaultTheme } from 'styled-components';
 import PropTypes from 'prop-types';
-import { debounce } from 'lodash';
 
 import { themePropTypes } from 'theme';
 import withPluginEntities from 'views/logic/withPluginEntities';
-import { QueriesActions } from 'views/stores/QueriesStore';
 import UserPreferencesContext from 'contexts/UserPreferencesContext';
 
-import ValidationError from './queryinput/ValidationError';
+import QueryValidation from './queryinput/QueryValidation';
 import type { AutoCompleter, Editor } from './ace-types';
 import StyledAceEditor from './queryinput/StyledAceEditor';
 import SearchBarAutoCompletions from './SearchBarAutocompletions';
@@ -55,7 +53,7 @@ const handleExecution = (editor, onExecute, value) => {
   onExecute(value);
 };
 
-const configureEditor = (node, completer, onExecute) => {
+const _configureEditor = (node, editorRef, completer, onExecute) => {
   const editor = node && node.editor;
 
   if (editor) {
@@ -75,30 +73,6 @@ const configureEditor = (node, completer, onExecute) => {
   }
 };
 
-const validateQuery = debounce((value, setValidationState) => {
-  QueriesActions.validateQueryString(value).then((result) => {
-    setValidationState(result);
-  });
-}, 350);
-
-const useValidateQuery = (value) => {
-  const [validationState, setValidationState] = useState();
-
-  useEffect(() => {
-    if (value) {
-      validateQuery(value, setValidationState);
-    }
-  }, [value]);
-
-  useEffect(() => {
-    if (!value && validationState) {
-      setValidationState(undefined);
-    }
-  }, [value, validationState]);
-
-  return validationState;
-};
-
 const QueryInput = ({
   className,
   completerFactory = defaultCompleterFactory,
@@ -114,8 +88,7 @@ const QueryInput = ({
 }: Props) => {
   const completer = useMemo(() => completerFactory(completers), [completerFactory, completers]);
   const _onExecute = useCallback((editor: Editor) => handleExecution(editor, onExecute, value), [onExecute, value]);
-  const editorRef = useCallback((node) => configureEditor(node, completer, _onExecute), [completer, _onExecute]);
-  const validationState = useValidateQuery(value);
+  const configureEditor = useCallback((node) => _configureEditor(node, completer, _onExecute), [completer, _onExecute]);
 
   return (
     <div className={`query ${className}`} style={{ display: 'flex' }} data-testid="query-input">
@@ -124,7 +97,7 @@ const QueryInput = ({
           <StyledAceEditor mode="lucene"
                            disabled={disabled}
                            aceTheme="ace-queryinput" // NOTE: is usually just `theme` but we need that prop for styled-components
-                           ref={editorRef}
+                           ref={configureEditor}
                            readOnly={disabled}
                            onBlur={onBlur}
                            onChange={onChange}
@@ -146,7 +119,7 @@ const QueryInput = ({
                            $height={height} />
         )}
       </UserPreferencesContext.Consumer>
-      <ValidationError validationState={validationState} />
+      <QueryValidation query={value} />
     </div>
   );
 };
