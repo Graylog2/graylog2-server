@@ -26,6 +26,7 @@ import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
+import org.graylog.plugins.views.search.elasticsearch.parser.LuceneQueryParserES7;
 import org.graylog.plugins.views.search.engine.SearchConfig;
 import org.graylog.plugins.views.search.filter.AndFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
@@ -102,7 +103,7 @@ public class ElasticsearchBackendUsingCorrectIndicesTest {
                 indexLookup,
                 new QueryStringDecorators.Fake(),
                 (elasticsearchBackend, ssb, job, query, results) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, results, fieldTypesLookup),
-                false, Mockito.mock(MappedFieldTypesService.class));
+                false, Mockito.mock(MappedFieldTypesService.class), new LuceneQueryParserES7());
     }
 
     @Before

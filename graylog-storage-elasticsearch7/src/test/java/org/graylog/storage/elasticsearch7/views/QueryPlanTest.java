@@ -27,6 +27,7 @@ import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringParser;
+import org.graylog.plugins.views.search.elasticsearch.parser.LuceneQueryParserES7;
 import org.graylog.plugins.views.search.engine.QueryEngine;
 import org.graylog.plugins.views.search.engine.QueryParser;
 import org.graylog.plugins.views.search.engine.QueryPlan;
@@ -66,7 +67,7 @@ public class QueryPlanTest {
                 mock(IndexLookup.class),
                 new QueryStringDecorators.Fake(),
                 (elasticsearchBackend, ssb, job, query, results) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, results, fieldTypesLookup),
-                false, Mockito.mock(MappedFieldTypesService.class));
+                false, Mockito.mock(MappedFieldTypesService.class), new LuceneQueryParserES7());
         queryEngine = new QueryEngine(backend, Collections.emptySet(), new QueryParser(queryStringParser), () -> new SearchConfig(Period.ZERO));
     }
 

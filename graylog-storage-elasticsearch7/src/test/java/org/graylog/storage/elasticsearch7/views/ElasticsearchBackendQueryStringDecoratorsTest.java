@@ -27,6 +27,7 @@ import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
+import org.graylog.plugins.views.search.elasticsearch.parser.LuceneQueryParserES7;
 import org.graylog.plugins.views.search.engine.QueryStringDecorator;
 import org.graylog.plugins.views.search.engine.SearchConfig;
 import org.graylog.storage.elasticsearch7.ElasticsearchClient;
@@ -64,7 +65,7 @@ class ElasticsearchBackendQueryStringDecoratorsTest {
                 new QueryStringDecorators(decorators),
                 (elasticsearchBackend, ssb, job, query, results) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, results, fieldTypesLookup),
                 true,
-                Mockito.mock(MappedFieldTypesService.class));
+                Mockito.mock(MappedFieldTypesService.class), new LuceneQueryParserES7());
     }
 
     @Test

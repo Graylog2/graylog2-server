@@ -27,6 +27,7 @@ import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
+import org.graylog.plugins.views.search.engine.LuceneQueryParsingException;
 import org.graylog.plugins.views.search.engine.QueryBackend;
 import org.graylog.plugins.views.search.engine.SearchConfig;
 import org.graylog.plugins.views.search.engine.ValidationExplanation;
@@ -40,7 +41,6 @@ import org.graylog.plugins.views.search.filter.OrFilter;
 import org.graylog.plugins.views.search.filter.QueryStringFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.rest.MappedFieldTypeDTO;
-import org.graylog.shaded.elasticsearch7.org.apache.lucene.queryparser.classic.ParseException;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.ShardOperationFailedException;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.validate.query.ValidateQueryRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.validate.query.ValidateQueryResponse;
@@ -55,7 +55,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryStri
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.storage.elasticsearch7.ElasticsearchClient;
 import org.graylog.storage.elasticsearch7.TimeRangeQueryFactory;
-import org.graylog.plugins.views.search.elasticsearch.parser.LuceneQueryParser;
+import org.graylog.plugins.views.search.elasticsearch.parser.LuceneQueryParserES7;
 import org.graylog.storage.elasticsearch7.views.searchtypes.ESSearchTypeHandler;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.FieldTypeException;
@@ -88,7 +88,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
     private final ESGeneratedQueryContext.Factory queryContextFactory;
     private final boolean allowLeadingWildcard;
     private final MappedFieldTypesService mappedFieldTypesService;
-    private final LuceneQueryParser luceneQueryParser;
+    private final LuceneQueryParserES7 luceneQueryParser;
 
     @Inject
     public ElasticsearchBackend(Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> elasticsearchSearchTypeHandlers,
@@ -96,7 +96,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                                 IndexLookup indexLookup,
                                 QueryStringDecorators queryStringDecorators,
                                 ESGeneratedQueryContext.Factory queryContextFactory,
-                                @Named("allow_leading_wildcard_searches") boolean allowLeadingWildcard, MappedFieldTypesService mappedFieldTypesService) {
+                                @Named("allow_leading_wildcard_searches") boolean allowLeadingWildcard, MappedFieldTypesService mappedFieldTypesService, LuceneQueryParserES7 luceneQueryParser) {
         this.elasticsearchSearchTypeHandlers = elasticsearchSearchTypeHandlers;
         this.client = client;
         this.indexLookup = indexLookup;
@@ -105,7 +105,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
         this.queryContextFactory = queryContextFactory;
         this.allowLeadingWildcard = allowLeadingWildcard;
         this.mappedFieldTypesService = mappedFieldTypesService;
-        this.luceneQueryParser = new LuceneQueryParser();
+        this.luceneQueryParser = luceneQueryParser;
     }
 
     private QueryBuilder normalizeQueryString(String queryString) {
@@ -340,7 +340,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                         .collect(Collectors.toSet());
 
                 detectedFields.stream().filter(f -> !availableFields.contains(f)).forEach(unknownFields::add);
-            } catch (ParseException e) {
+            } catch (LuceneQueryParsingException e) {
                 LOG.warn("Failed to parse lucene query", e);
             }
         }

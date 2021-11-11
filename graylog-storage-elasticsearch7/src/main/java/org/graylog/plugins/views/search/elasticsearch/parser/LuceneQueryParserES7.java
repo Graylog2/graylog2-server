@@ -16,6 +16,8 @@
  */
 package org.graylog.plugins.views.search.elasticsearch.parser;
 
+import org.graylog.plugins.views.search.engine.LuceneQueryParser;
+import org.graylog.plugins.views.search.engine.LuceneQueryParsingException;
 import org.graylog.shaded.elasticsearch7.org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.graylog.shaded.elasticsearch7.org.apache.lucene.index.Term;
 import org.graylog.shaded.elasticsearch7.org.apache.lucene.queryparser.classic.ParseException;
@@ -28,16 +30,22 @@ import org.graylog.shaded.elasticsearch7.org.apache.lucene.search.QueryVisitor;
 import java.util.HashSet;
 import java.util.Set;
 
-public class LuceneQueryParser {
+public class LuceneQueryParserES7 implements LuceneQueryParser {
 
     private final QueryParser parser;
 
-    public LuceneQueryParser() {
+    public LuceneQueryParserES7() {
         this.parser = new QueryParser("f", new StandardAnalyzer());
     }
 
-    public Set<String> getFieldNames(final String query) throws ParseException {
-        final Query parsed = parser.parse(query);
+
+    public Set<String> getFieldNames(final String query) throws LuceneQueryParsingException {
+        final Query parsed;
+        try {
+            parsed = parser.parse(query);
+        } catch (ParseException e) {
+            throw new LuceneQueryParsingException(e);
+        }
         final Set<String> fields = new HashSet<>();
         parsed.visit(new QueryVisitor() {
             @Override
