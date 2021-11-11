@@ -43,14 +43,14 @@ public class SearchDomain {
     public Optional<Search> getForUser(String id, SearchUser searchUser) {
         final Optional<Search> search = dbService.get(id);
 
-        search.ifPresent(s -> checkPermission(searchUser.username(), searchUser, s));
+        search.ifPresent(s -> checkPermission(searchUser, s));
 
         return search;
     }
 
-    private void checkPermission(String userName, SearchUser searchUser, Search search) {
+    private void checkPermission(SearchUser searchUser, Search search) {
         if (!hasReadPermissionFor(searchUser, searchUser::canReadView, search))
-            throw new PermissionException("User " + userName + " does not have permission to load search " + search.id());
+            throw new PermissionException("User " + searchUser.username() + " does not have permission to load search " + search.id());
     }
 
     public List<Search> getAllForUser(SearchPermissions searchPermissions, Predicate<ViewDTO> viewReadPermission) {
