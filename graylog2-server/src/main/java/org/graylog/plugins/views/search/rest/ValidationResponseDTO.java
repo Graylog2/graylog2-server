@@ -16,29 +16,28 @@
  */
 package org.graylog.plugins.views.search.rest;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
+
 import java.util.List;
 import java.util.Set;
 
-public class ValidationResponseDTO {
-    private final List<ValidationExplanationDTO> explanations;
-    private final Set<String> unknownFields;
-    private final ValidationStatusDTO validationStatus;
+@AutoValue
+public abstract class ValidationResponseDTO {
 
-    public ValidationResponseDTO(List<ValidationExplanationDTO> explanations, Set<String> unknownFields, ValidationStatusDTO validationStatus) {
-        this.explanations = explanations;
-        this.unknownFields = unknownFields;
-        this.validationStatus = validationStatus;
-    }
+    @JsonProperty
+    public abstract ValidationStatusDTO validationStatus();
 
-    public List<ValidationExplanationDTO> getExplanations() {
-        return explanations;
-    }
+    @JsonProperty
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    public abstract List<ValidationExplanationDTO> explanations();
 
-    public Set<String> getUnknownFields() {
-        return unknownFields;
-    }
+    @JsonProperty
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    public abstract Set<String> unknownFields();
 
-    public ValidationStatusDTO getValidationStatus() {
-        return validationStatus;
+    public static ValidationResponseDTO create(final ValidationStatusDTO status, final List<ValidationExplanationDTO> explanations, final Set<String> unknownFields) {
+        return new AutoValue_ValidationResponseDTO(status, explanations, unknownFields);
     }
 }

@@ -85,7 +85,7 @@ public class QueryValidationResource extends RestResource implements PluginRestR
                 statusDTO = ValidationStatusDTO.OK;
         }
 
-        return new ValidationResponseDTO(toExplanations(response.getExplanations()), response.getUnknownFields(), statusDTO);
+        return ValidationResponseDTO.create(statusDTO, toExplanations(response.getExplanations()), response.getUnknownFields());
     }
 
     private List<ValidationExplanationDTO> toExplanations(List<ValidationExplanation> explanations) {
