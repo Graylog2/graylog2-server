@@ -29,6 +29,7 @@ const Container = styled.div`
   padding-top: 2px;
   margin-right: 5px;
   margin-left: 5px;
+  width: 25px;
 `;
 
 const ErrorIcon = styled(Icon)(({ theme, $status }: { theme: DefaultTheme, $status: string}) => `
@@ -68,7 +69,7 @@ const QueryValidation = ({ query }: Props) => {
   const validationState = useValidateQuery(query);
 
   if (!validationState || validationState.status === 'OK') {
-    return null;
+    return <Container />;
   }
 
   const { status, explanations } = validationState;
