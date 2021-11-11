@@ -25,6 +25,7 @@ import org.graylog.plugins.views.search.engine.QueryEngine;
 import org.graylog.plugins.views.search.engine.ValidationExplanation;
 import org.graylog.plugins.views.search.engine.ValidationRequest;
 import org.graylog.plugins.views.search.engine.ValidationResponse;
+import org.graylog.plugins.views.search.engine.validation.ValidationMessageParser;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
@@ -41,6 +42,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static com.google.common.base.MoreObjects.firstNonNull;
 
 @RequiresAuthentication
 @Api(value = "Search/Validation")
@@ -87,7 +90,7 @@ public class QueryValidationResource extends RestResource implements PluginRestR
 
     private List<ValidationExplanationDTO> toExplanations(List<ValidationExplanation> explanations) {
         return explanations.stream()
-                .map(e -> new ValidationExplanationDTO(e.getIndex(), e.isValid(), e.getExplanation(), e.getError()))
+                .map(e -> ValidationExplanationDTO.create(e.getIndex(), e.isValid(), ValidationMessageParser.getHumanReadableMessage(firstNonNull(e.getExplanation(), e.getError()))))
                 .collect(Collectors.toList());
     }
 

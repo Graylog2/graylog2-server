@@ -16,32 +16,23 @@
  */
 package org.graylog.plugins.views.search.rest;
 
-public class ValidationExplanationDTO {
-    private final String index;
-    private final boolean valid;
-    private final String explanation;
-    private final String error;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
+import org.graylog.plugins.views.search.engine.validation.ValidationMessage;
 
-    public ValidationExplanationDTO(String index, boolean valid, String explanation, String error) {
-        this.index = index;
-        this.valid = valid;
-        this.explanation = explanation;
-        this.error = error;
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@AutoValue
+public abstract class ValidationExplanationDTO {
+    @JsonProperty
+    public abstract String index();
+    @JsonProperty
+    public abstract boolean valid();
+    @JsonProperty
+    public abstract ValidationMessage message();
+
+    public static ValidationExplanationDTO create(final String index, final boolean valid, final ValidationMessage message) {
+        return new AutoValue_ValidationExplanationDTO(index, valid, message);
     }
 
-    public String getIndex() {
-        return index;
-    }
-
-    public boolean isValid() {
-        return valid;
-    }
-
-    public String getExplanation() {
-        return explanation;
-    }
-
-    public String getError() {
-        return error;
-    }
 }
