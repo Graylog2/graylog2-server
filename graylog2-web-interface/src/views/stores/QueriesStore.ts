@@ -198,7 +198,7 @@ export const QueriesStore: QueriesStoreType = singletonStore(
       return promise;
     },
 
-    validateQueryString(queryString: string, timeRange: TimeRange | undefined, streams: Array<string> | undefined): Promise<QueryValidationState> {
+    validateQuery(queryString: string, timeRange: TimeRange | undefined, streams: Array<string> | undefined): Promise<QueryValidationState> {
       const promise = fetch('POST', qualifyUrl('/search/validate'), { query: queryString, timerange: timeRange, streams }).then((result) => {
         if (result) {
           return ({
@@ -216,7 +216,7 @@ export const QueriesStore: QueriesStoreType = singletonStore(
         return undefined;
       });
 
-      QueriesActions.validateQueryString.promise(promise);
+      QueriesActions.validateQuery.promise(promise);
 
       return promise;
     },

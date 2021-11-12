@@ -47,7 +47,7 @@ const ErrorIcon = styled(Icon)(({ theme, $status }: { theme: DefaultTheme, $stat
 const validateQuery = debounce((queryString, timeRange, streams, setValidationState) => {
   const cleanTimeRange = isEmpty(timeRange) ? undefined : timeRange;
 
-  QueriesActions.validateQueryString(queryString, cleanTimeRange, streams).then((result) => {
+  QueriesActions.validateQuery(queryString, cleanTimeRange, streams).then((result) => {
     setValidationState(result);
   });
 }, 350);

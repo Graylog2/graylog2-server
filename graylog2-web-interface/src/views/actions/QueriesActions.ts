@@ -36,7 +36,7 @@ type QueriesActionsType = RefluxActions<{
   remove: (queryId: QueryId) => Promise<QueriesList>,
   timerange: (queryId: QueryId, newTimeRange: TimeRange) => Promise<QueriesList>,
   update: (queryId: QueryId, query: Query) => Promise<QueriesList>,
-  validateQueryString: (queryString: string, timeRange: TimeRange | undefined, streams: Array<string> | undefined) => Promise<QueryValidationState>
+  validateQuery: (queryString: string, timeRange: TimeRange | undefined, streams: Array<string> | undefined) => Promise<QueryValidationState>
 }>;
 
 // eslint-disable-next-line import/prefer-default-export
@@ -51,6 +51,6 @@ export const QueriesActions: QueriesActionsType = singletonActions(
     remove: { asyncResult: true },
     timerange: { asyncResult: true },
     update: { asyncResult: true },
-    validateQueryString: { asyncResult: true },
+    validateQuery: { asyncResult: true },
   }),
 );

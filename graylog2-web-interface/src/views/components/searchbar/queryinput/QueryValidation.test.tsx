@@ -25,7 +25,7 @@ import QueryValidation from './QueryValidation';
 
 jest.mock('views/stores/QueriesStore', () => ({
   QueriesActions: {
-    validateQueryString: jest.fn(() => Promise.resolve()),
+    validateQuery: jest.fn(() => Promise.resolve()),
   },
 }));
 
@@ -51,44 +51,44 @@ describe('QueryValidation', () => {
   it('should validate query on mount', async () => {
     render(<QueryValidation queryString="source:" timeRange={{ type: 'relative', from: 300 }} streams={['stream-id']} />);
 
-    await waitFor(() => expect(QueriesActions.validateQueryString).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(QueriesActions.validateQuery).toHaveBeenCalledTimes(1));
 
-    expect(QueriesActions.validateQueryString).toHaveBeenCalledWith('source:', { type: 'relative', from: 300 }, ['stream-id']);
+    expect(QueriesActions.validateQuery).toHaveBeenCalledWith('source:', { type: 'relative', from: 300 }, ['stream-id']);
   });
 
   it('should validate query on change', async () => {
     const { rerender } = render(<QueryValidation queryString="source:" timeRange={undefined} />);
 
-    await waitFor(() => expect(QueriesActions.validateQueryString).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(QueriesActions.validateQuery).toHaveBeenCalledTimes(1));
 
     rerender(<QueryValidation queryString="updated query" timeRange={undefined} />);
 
-    await waitFor(() => expect(QueriesActions.validateQueryString).toHaveBeenCalledTimes(2));
+    await waitFor(() => expect(QueriesActions.validateQuery).toHaveBeenCalledTimes(2));
 
-    expect(QueriesActions.validateQueryString).toHaveBeenCalledWith('updated query', undefined, undefined);
+    expect(QueriesActions.validateQuery).toHaveBeenCalledWith('updated query', undefined, undefined);
   });
 
   it('should display validation error icon when there is a validation error', async () => {
-    asMock(QueriesActions.validateQueryString).mockReturnValue(Promise.resolve(queryValidationError));
+    asMock(QueriesActions.validateQuery).mockReturnValue(Promise.resolve(queryValidationError));
     render(<QueryValidation queryString="source:" timeRange={undefined} />);
 
     await screen.findByTitle(validationErrorIconTitle);
   });
 
   it('should not display validation error icon when there is no validation error', async () => {
-    asMock(QueriesActions.validateQueryString).mockReturnValue(Promise.resolve(queryValidationError));
+    asMock(QueriesActions.validateQuery).mockReturnValue(Promise.resolve(queryValidationError));
 
     const { rerender } = render(<QueryValidation queryString="source:" timeRange={undefined} />);
     await screen.findByTitle(validationErrorIconTitle);
 
-    asMock(QueriesActions.validateQueryString).mockReturnValue(Promise.resolve(queryValidationSuccess));
+    asMock(QueriesActions.validateQuery).mockReturnValue(Promise.resolve(queryValidationSuccess));
     rerender(<QueryValidation queryString="source:example.org" timeRange={undefined} />);
 
     await waitFor(() => expect(screen.queryByTitle(validationErrorIconTitle)).not.toBeInTheDocument());
   });
 
   it('should display validation error explanation', async () => {
-    asMock(QueriesActions.validateQueryString).mockReturnValue(Promise.resolve(queryValidationError));
+    asMock(QueriesActions.validateQuery).mockReturnValue(Promise.resolve(queryValidationError));
     render(<QueryValidation queryString="source:" timeRange={undefined} />);
 
     const validationExplanationTrigger = await screen.findByTitle(validationErrorIconTitle);
