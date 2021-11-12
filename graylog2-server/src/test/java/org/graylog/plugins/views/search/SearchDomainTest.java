@@ -19,9 +19,9 @@ package org.graylog.plugins.views.search;
 import com.google.common.collect.ImmutableList;
 import org.graylog.plugins.views.search.db.SearchDbService;
 import org.graylog.plugins.views.search.errors.PermissionException;
+import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewService;
-import org.graylog2.plugin.database.users.User;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -49,7 +49,7 @@ public class SearchDomainTest {
     @Mock
     private SearchDbService dbService;
 
-    private List<Search> allSearchesInDb = new ArrayList<>();
+    private final List<Search> allSearchesInDb = new ArrayList<>();
 
     @Mock
     private ViewService viewService;
@@ -64,97 +64,89 @@ public class SearchDomainTest {
     @Test
     public void returnsEmptyOptionalWhenIdDoesntExist() {
         when(dbService.get("some-id")).thenReturn(Optional.empty());
+        final SearchUser searchUser = mock(SearchUser.class);
 
-        final Optional<Search> result = sut.getForUser("some-id", mock(User.class), id -> true);
+        final Optional<Search> result = sut.getForUser("some-id", searchUser);
 
         assertThat(result).isEqualTo(Optional.empty());
     }
 
     @Test
     public void loadsSearchIfUserIsOwner() {
-        final User user = user("boeser-willi");
+        final String userName = "boeser-willi";
 
-        final Search search = mockSearchWithOwner(user.getName());
+        final Search search = mockSearchWithOwner(userName);
+        final SearchUser searchUser = mock(SearchUser.class);
+        when(searchUser.owns(search)).thenReturn(true);
 
-        final Optional<Search> result = sut.getForUser(search.id(), user, id -> true);
+        final Optional<Search> result = sut.getForUser(search.id(), searchUser);
 
         assertThat(result).isEqualTo(Optional.of(search));
     }
 
     @Test
     public void loadsSearchIfSearchIsPermittedViaViews() {
-        final User user = user("someone");
         final Search search = mockSearchWithOwner("someone else");
-
+        final SearchUser searchUser = mock(SearchUser.class);
 
         final ViewDTO viewDTO = mock(ViewDTO.class);
         when(viewService.forSearch(anyString())).thenReturn(ImmutableList.of(viewDTO));
+        when(searchUser.canReadView(viewDTO)).thenReturn(true);
 
-        final Optional<Search> result = sut.getForUser(search.id(), user, id -> true);
+        final Optional<Search> result = sut.getForUser(search.id(), searchUser);
 
         assertThat(result).isEqualTo(Optional.of(search));
     }
 
     @Test
     public void throwsPermissionExceptionIfNeitherOwnedNorPermittedFromViews() {
-        final User user = user("someone");
         final Search search = mockSearchWithOwner("someone else");
+        final SearchUser searchUser = mock(SearchUser.class);
 
         when(viewService.forSearch(anyString())).thenReturn(ImmutableList.of());
 
         assertThatExceptionOfType(PermissionException.class)
-                .isThrownBy(() -> sut.getForUser(search.id(), user, id -> true));
+                .isThrownBy(() -> sut.getForUser(search.id(), searchUser));
     }
 
     @Test
     public void includesOwnedSearchesInList() {
-        final User user = user("boeser-willi");
+        final String userName = "boeser-willi";
 
-        final Search ownedSearch = mockSearchWithOwner(user.getName());
+        final Search ownedSearch = mockSearchWithOwner(userName);
         mockSearchWithOwner("someone else");
+        final SearchUser searchUser = mock(SearchUser.class);
+        when(searchUser.owns(ownedSearch)).thenReturn(true);
 
-        List<Search> result = sut.getAllForUser(user, id -> true);
+        List<Search> result = sut.getAllForUser(searchUser, searchUser::canReadView);
 
         assertThat(result).containsExactly(ownedSearch);
     }
 
     @Test
     public void includesSearchesPermittedViaViewsInList() {
-        final User user = user("someone");
-
         final Search permittedSearch = mockSearchWithOwner("someone else");
         mockSearchWithOwner("someone else");
+        final SearchUser searchUser = mock(SearchUser.class);
 
         final ViewDTO viewDTO = mock(ViewDTO.class);
-        when(viewService.forSearch(anyString())).thenAnswer(invocation -> {
-            if (invocation.getArgument(0).equals(permittedSearch.id())) {
-                return ImmutableList.of(viewDTO);
-            } else {
-                return ImmutableList.of();
-            }
-        });
+        when(viewService.forSearch(permittedSearch.id())).thenReturn(ImmutableList.of(viewDTO));
+        when(searchUser.canReadView(viewDTO)).thenReturn(true);
 
-        List<Search> result = sut.getAllForUser(user, view -> true);
+        List<Search> result = sut.getAllForUser(searchUser, searchUser::canReadView);
 
         assertThat(result).containsExactly(permittedSearch);
     }
 
     @Test
     public void listIsEmptyIfNoSearchesPermitted() {
-        final User user = user("someone");
-
         mockSearchWithOwner("someone else");
         mockSearchWithOwner("someone else");
+        final SearchUser searchUser = mock(SearchUser.class);
 
-        List<Search> result = sut.getAllForUser(user, id -> true);
+        List<Search> result = sut.getAllForUser(searchUser, searchUser::canReadView);
 
         assertThat(result).isEmpty();
-    }
-
-    private User user(String name) {
-        final User user = mock(User.class);
-        when(user.getName()).thenReturn(name);
-        return user;
     }
 
     private Search mockSearchWithOwner(String owner) {
