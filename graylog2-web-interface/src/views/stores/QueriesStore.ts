@@ -40,7 +40,6 @@ export type QueryValidationState = {
   explanations: Array<{
     index: string,
     message: {
-      index: string,
       errorType: string,
       errorMessage: string,
     }

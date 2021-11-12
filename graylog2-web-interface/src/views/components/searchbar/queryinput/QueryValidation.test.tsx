@@ -16,8 +16,9 @@
  */
 import * as React from 'react';
 import { render, waitFor, screen } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
-import { QueriesActions } from 'views/stores/QueriesStore';
+import { QueriesActions, QueryValidationState } from 'views/stores/QueriesStore';
 import { asMock } from 'helpers/mocking';
 
 import QueryValidation from './QueryValidation';
@@ -29,16 +30,34 @@ jest.mock('views/stores/QueriesStore', () => ({
 }));
 
 describe('QueryValidation', () => {
+  const queryValidationError: QueryValidationState = {
+    status: 'ERROR',
+    explanations: [{
+      index: 'example_index',
+      message: {
+        errorType: 'ParseException',
+        errorMessage: "Cannot parse 'source: '",
+      },
+    }],
+  };
+
+  const queryValidationSuccess: QueryValidationState = {
+    status: 'OK',
+    explanations: undefined,
+  };
+
+  const validationErrorIconTitle = 'Toggle validation error explanation';
+
   it('should validate query on mount', async () => {
-    render(<QueryValidation query="initial query" />);
+    render(<QueryValidation query="source:" />);
 
     await waitFor(() => expect(QueriesActions.validateQueryString).toHaveBeenCalledTimes(1));
 
-    expect(QueriesActions.validateQueryString).toHaveBeenCalledWith('initial query');
+    expect(QueriesActions.validateQueryString).toHaveBeenCalledWith('source:');
   });
 
   it('should validate query on change', async () => {
-    const { rerender } = render(<QueryValidation query="initial query" />);
+    const { rerender } = render(<QueryValidation query="source:" />);
 
     await waitFor(() => expect(QueriesActions.validateQueryString).toHaveBeenCalledTimes(1));
 
@@ -49,10 +68,33 @@ describe('QueryValidation', () => {
     expect(QueriesActions.validateQueryString).toHaveBeenCalledWith('updated query');
   });
 
-  it('should display validation error icon', async () => {
-    asMock(QueriesActions.validateQueryString).mockReturnValue(Promise.resolve({ status: 'ERROR', explanations: ['test'] }));
-    render(<QueryValidation query="initial query" />);
+  it('should display validation error icon when there is a validation error', async () => {
+    asMock(QueriesActions.validateQueryString).mockReturnValue(Promise.resolve(queryValidationError));
+    render(<QueryValidation query="source:" />);
 
-    await screen.findByTitle('Toggle validation error explanation');
+    await screen.findByTitle(validationErrorIconTitle);
+  });
+
+  it('should not display validation error icon when there is no validation error', async () => {
+    asMock(QueriesActions.validateQueryString).mockReturnValue(Promise.resolve(queryValidationError));
+
+    const { rerender } = render(<QueryValidation query="source:" />);
+    await screen.findByTitle(validationErrorIconTitle);
+
+    asMock(QueriesActions.validateQueryString).mockReturnValue(Promise.resolve(queryValidationSuccess));
+    rerender(<QueryValidation query="source:example.org" />);
+
+    await waitFor(() => expect(screen.queryByTitle(validationErrorIconTitle)).not.toBeInTheDocument());
+  });
+
+  it('should display validation error explanation', async () => {
+    asMock(QueriesActions.validateQueryString).mockReturnValue(Promise.resolve(queryValidationError));
+    render(<QueryValidation query="source:" />);
+
+    const validationExplanationTrigger = await screen.findByTitle(validationErrorIconTitle);
+    userEvent.click(validationExplanationTrigger);
+
+    await screen.findByText('Error (ParseException)');
+    await screen.findByText("Cannot parse 'source: '");
   });
 });

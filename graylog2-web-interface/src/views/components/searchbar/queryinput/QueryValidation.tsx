@@ -79,7 +79,6 @@ type Props = {
 }
 
 const QueryValidation = ({ query }: Props) => {
-  // Maintain showExplanation state outside of OverlayTrigger to ensure explanation stays visible.
   const [showExplanation, setShowExplanation] = useState(false);
   const containerRef = useRef(null);
   const explanationTriggerRef = useRef(null);
