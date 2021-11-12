@@ -16,40 +16,42 @@
  */
 package org.graylog.plugins.views.search.engine.validation;
 
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ValidationMessageParser {
 
-    private static final Pattern regexForNested = Pattern.compile("(\\w+)\\[(.*)]",  Pattern.MULTILINE | Pattern.DOTALL);
-    private static final Pattern regexSimple = Pattern.compile("([\\w.]+):\\s+(.*)",  Pattern.MULTILINE | Pattern.DOTALL);
-    private static final Pattern regexPosition = Pattern.compile(".*at line (\\d+), column (\\d+).",  Pattern.MULTILINE | Pattern.DOTALL);
-    private static final Pattern regexForExplanation = Pattern.compile("(\\w+)\\(\"(.+)\"\\)",  Pattern.MULTILINE | Pattern.DOTALL);
+    private static final Pattern regexForNested = Pattern.compile("(\\w+)\\[(.*)]", Pattern.MULTILINE | Pattern.DOTALL);
+    private static final Pattern regexSimple = Pattern.compile("([\\w.]+):\\s+(.*)", Pattern.MULTILINE | Pattern.DOTALL);
+    private static final Pattern regexPosition = Pattern.compile(".*at line (\\d+), column (\\d+).", Pattern.MULTILINE | Pattern.DOTALL);
+    private static final Pattern regexForExplanation = Pattern.compile("(\\w+)\\(\"(.+)\"\\)", Pattern.MULTILINE | Pattern.DOTALL);
 
 
-    public static ValidationMessage getHumanReadableMessage(final String input) {
+    public static Optional<ValidationMessage> getHumanReadableMessage(final String input) {
 
-        if (input == null) {
-            return ValidationMessage.builder().build();
+        if (StringUtils.isBlank(input)) {
+            return Optional.empty();
         }
 
         final ValidationMessage.Builder errorBuilder = ValidationMessage.builder();
 
-        if(input.contains("; nested:")) {
+        if (input.contains("; nested:")) {
             final String[] stack = input.split("; nested:");
             final String actualProblem = stack[1];
             final Matcher matcher = regexForNested.matcher(actualProblem);
-            if(matcher.find()) {
+            if (matcher.find()) {
                 errorBuilder.errorType(matcher.group(1));
                 errorBuilder.errorMessage(matcher.group(2));
             }
         } else {
             final Matcher simpleMatcher = regexSimple.matcher(input);
-            if(simpleMatcher.find()) {
+            if (simpleMatcher.find()) {
                 final String fullyQualifiedName = simpleMatcher.group(1);
                 final String[] parts = fullyQualifiedName.split("\\.");
-
-                if(parts.length > 0) {
+                if (parts.length > 0) {
                     errorBuilder.errorType(parts[parts.length - 1]);
                 } else {
                     errorBuilder.errorType(fullyQualifiedName);
@@ -58,7 +60,7 @@ public class ValidationMessageParser {
             }
 
             final Matcher explanationMatcher = regexForExplanation.matcher(input);
-            if(explanationMatcher.find()) {
+            if (explanationMatcher.find()) {
                 errorBuilder.errorType(explanationMatcher.group(1));
                 errorBuilder.errorMessage(explanationMatcher.group(2));
             }
@@ -70,6 +72,11 @@ public class ValidationMessageParser {
             errorBuilder.column(Integer.parseInt(positionMatcher.group(2)));
         }
 
-        return errorBuilder.build();
+        // Fallback, all parsing failed
+        if (!errorBuilder.errorMessage() .isPresent()) {
+            errorBuilder.errorMessage(input);
+        }
+
+        return Optional.ofNullable(errorBuilder.build());
     }
 }

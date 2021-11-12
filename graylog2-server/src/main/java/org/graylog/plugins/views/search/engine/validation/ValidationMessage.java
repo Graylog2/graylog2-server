@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
 import javax.annotation.Nullable;
+import java.util.Optional;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @AutoValue
@@ -29,12 +30,15 @@ public abstract class ValidationMessage {
     @JsonProperty
     @Nullable
     public abstract Integer line();
+
     @JsonProperty
     @Nullable
     public abstract Integer column();
+
     @JsonProperty
     @Nullable
     public abstract String errorType();
+
     @JsonProperty
     public abstract String errorMessage();
 
@@ -46,9 +50,14 @@ public abstract class ValidationMessage {
     public abstract static class Builder {
 
         public abstract Builder line(int line);
+
         public abstract Builder column(int column);
+
         public abstract Builder errorType(@Nullable String errorType);
+
         public abstract Builder errorMessage(String errorMessage);
+
+        public abstract Optional<String> errorMessage();
 
         public abstract ValidationMessage build();
     }

@@ -21,18 +21,30 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.plugins.views.search.engine.validation.ValidationMessage;
 
+import javax.annotation.Nullable;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @AutoValue
 public abstract class ValidationExplanationDTO {
     @JsonProperty
     public abstract String index();
+
     @JsonProperty
     public abstract boolean valid();
+
+    @Nullable
     @JsonProperty
     public abstract ValidationMessage message();
 
-    public static ValidationExplanationDTO create(final String index, final boolean valid, final ValidationMessage message) {
-        return new AutoValue_ValidationExplanationDTO(index, valid, message);
+    public static Builder builder() {
+        return new AutoValue_ValidationExplanationDTO.Builder();
     }
 
+    @AutoValue.Builder
+    public abstract static class Builder {
+        public abstract Builder index(final String index);
+        public abstract Builder valid(final boolean valid);
+        public abstract Builder message(final ValidationMessage message);
+        public abstract ValidationExplanationDTO build();
+    }
 }

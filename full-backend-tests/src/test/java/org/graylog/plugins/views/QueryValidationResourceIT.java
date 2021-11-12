@@ -46,7 +46,7 @@ public class QueryValidationResourceIT {
                 .post("/search/validate")
                 .then()
                 .statusCode(200);
-        validatableResponse.assertThat().body("validation_status", equalTo("WARNING"));
+        validatableResponse.assertThat().body("status", equalTo("WARNING"));
     }
 
     @Test
@@ -58,7 +58,7 @@ public class QueryValidationResourceIT {
                 .post("/search/validate")
                 .then()
                 .statusCode(200);
-        validatableResponse.assertThat().body("validation_status", equalTo("ERROR"));
-        validatableResponse.assertThat().body("explanations.error[0]", containsString("Failed to parse query"));
+        validatableResponse.assertThat().body("status", equalTo("ERROR"));
+        validatableResponse.assertThat().body("explanations.message.error_message[0]", containsString("Cannot parse 'foo:': Encountered \"<EOF>\" at line 1, column 4."));
     }
 }
