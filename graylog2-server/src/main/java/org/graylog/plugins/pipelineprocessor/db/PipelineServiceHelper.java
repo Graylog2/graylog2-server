@@ -23,9 +23,9 @@ import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -47,8 +47,8 @@ public class PipelineServiceHelper {
         this.pipelineParser = pipelineRuleParser;
     }
 
-    @NotNull
-    public Map<String, List<PipelineDao>> groupByRuleName(@NotNull Supplier<Collection<PipelineDao>> pipelines, @NotNull Set<String> ruleNames) {
+    @Nonnull
+    public Map<String, List<PipelineDao>> groupByRuleName(@Nonnull Supplier<Collection<PipelineDao>> pipelines, @Nonnull Set<String> ruleNames) {
         if (ruleNames.isEmpty()) {
             return ImmutableMap.of();
         }
@@ -82,7 +82,7 @@ public class PipelineServiceHelper {
         private final PipelineDao source;
         private final Pipeline parsed;
 
-        ParsedPipelineWithSource(PipelineDao source, Pipeline parsed) {
+        ParsedPipelineWithSource(@Nonnull PipelineDao source, @Nonnull Pipeline parsed) {
             this.source = source;
             this.parsed = parsed;
         }

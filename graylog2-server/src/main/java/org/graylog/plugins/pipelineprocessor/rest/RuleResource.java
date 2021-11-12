@@ -51,6 +51,7 @@ import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.BadRequestException;
@@ -66,7 +67,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -205,26 +208,30 @@ public class RuleResource extends RestResource implements PluginRestResource {
     }
 
     @VisibleForTesting
-    Map<String, Object> prepareContextForPaginatedResponse(List<RuleDao> rules) {
+    @Nonnull
+    Map<String, Object> prepareContextForPaginatedResponse(@Nonnull List<RuleDao> rules) {
         final Map<String, RuleDao> ruleTitleMap = rules
                 .stream()
                 .collect(Collectors.toMap(RuleDao::title, dao -> dao));
 
-        final Map<String, List<PipelineCompactSource>> usedInPipelinesMap = pipelineServiceHelper.groupByRuleName(
-                        pipelineService::loadAll, ruleTitleMap.keySet())
-                .entrySet()
-                .stream()
-                .collect(Collectors.toMap(
-                        e -> ruleTitleMap.get(e.getKey()).id(),
-                        e -> e.getValue()
-                                .stream()
-                                .map(dao -> PipelineCompactSource.builder()
-                                        .id(dao.id())
-                                        .title(dao.title())
-                                        .build())
-                                .collect(Collectors.toList())));
+        final Map<String, List<PipelineCompactSource>> result = new HashMap<>();
+        rules.forEach(r -> result.put(r.id(), new ArrayList<>()));
 
-        return ImmutableMap.of("used_in_pipelines", usedInPipelinesMap);
+        pipelineServiceHelper.groupByRuleName(
+                        pipelineService::loadAll, ruleTitleMap.keySet())
+                .forEach((ruleTitle, pipelineDaos) -> {
+                    result.put(
+                            ruleTitleMap.get(ruleTitle).id(),
+                            pipelineDaos.stream()
+                                    .map(dao -> PipelineCompactSource.builder()
+                                            .id(dao.id())
+                                            .title(dao.title())
+                                            .build())
+                                    .collect(Collectors.toList())
+                    );
+                });
+
+        return ImmutableMap.of("used_in_pipelines", result);
     }
 
 
