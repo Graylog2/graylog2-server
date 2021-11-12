@@ -32,6 +32,7 @@ function PluginWebpackConfig(defaultRootPath, fqcn, _options, additionalConfig) 
   };
 
   const options = merge(defaultOptions, _options);
+  // eslint-disable-next-line global-require,import/no-dynamic-require
   const VENDOR_MANIFEST = require(path.resolve(_options.web_src_path, 'manifests', 'vendor-manifest.json'));
 
   const plugins = [
@@ -40,6 +41,7 @@ function PluginWebpackConfig(defaultRootPath, fqcn, _options, additionalConfig) 
   ];
 
   const config = merge.smart(
+    // eslint-disable-next-line global-require,import/no-dynamic-require
     require(path.resolve(_options.web_src_path, 'webpack.config.js')),
     {
       output: {

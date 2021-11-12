@@ -27,6 +27,7 @@ type Props = {
 
 const ErrorComponent: React.FC<Props> = ({ error }: Props) => {
   useEffect(() => {
+    // eslint-disable-next-line no-console
     console.error(error);
   }, [error]);
 
