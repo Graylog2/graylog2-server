@@ -16,8 +16,8 @@
  */
 package org.graylog.plugins.views.search.elasticsearch.parser;
 
+import org.graylog.plugins.views.search.engine.LuceneQueryParser;
 import org.graylog.plugins.views.search.engine.LuceneQueryParsingException;
-import org.graylog.shaded.elasticsearch7.org.apache.lucene.queryparser.classic.ParseException;
 import org.junit.jupiter.api.Test;
 
 import java.util.Set;
@@ -26,7 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class LuceneQueryParserTest {
 
-    private final LuceneQueryParserES7 parser = new LuceneQueryParserES7();
+    private final LuceneQueryParser parser = new LuceneQueryParser();
 
     @Test
     void getFieldNamesSimple() throws LuceneQueryParsingException {

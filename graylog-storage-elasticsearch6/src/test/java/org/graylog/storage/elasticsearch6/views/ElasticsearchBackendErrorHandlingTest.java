@@ -30,15 +30,18 @@ import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
+import org.graylog.plugins.views.search.engine.LuceneQueryParser;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.storage.elasticsearch6.views.searchtypes.ESSearchTypeHandler;
 import org.graylog2.indexer.ElasticsearchException;
+import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
@@ -85,7 +88,7 @@ public class ElasticsearchBackendErrorHandlingTest extends ElasticsearchBackendT
                 new QueryStringDecorators(Collections.emptySet()),
                 (elasticsearchBackend, ssb, job, query, results) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, results, fieldTypesLookup),
                 false,
-                objectMapper);
+                objectMapper, Mockito.mock(MappedFieldTypesService.class), new LuceneQueryParser());
         when(indexLookup.indexNamesForStreamsInTimeRange(any(), any())).thenReturn(Collections.emptySet());
 
         final SearchType searchType1 = mock(SearchType.class);

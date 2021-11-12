@@ -27,6 +27,7 @@ import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringParser;
+import org.graylog.plugins.views.search.engine.LuceneQueryParser;
 import org.graylog.plugins.views.search.engine.QueryEngine;
 import org.graylog.plugins.views.search.engine.QueryParser;
 import org.graylog.plugins.views.search.engine.QueryPlan;
@@ -34,12 +35,13 @@ import org.graylog.plugins.views.search.engine.SearchConfig;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.storage.elasticsearch6.views.searchtypes.ESMessageList;
 import org.graylog.storage.elasticsearch6.views.searchtypes.ESSearchTypeHandler;
-import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
-import org.joda.time.Period;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.joda.time.Period;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import javax.inject.Provider;
 import java.util.Collections;
@@ -65,7 +67,7 @@ public class QueryPlanTest {
                 mock(IndexLookup.class),
                 new QueryStringDecorators.Fake(),
                 (elasticsearchBackend, ssb, job, query, results) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, results, fieldTypesLookup),
-                false, new ObjectMapperProvider().get());
+                false, new ObjectMapperProvider().get(), Mockito.mock(MappedFieldTypesService.class), new LuceneQueryParser());
         queryEngine = new QueryEngine(backend, Collections.emptySet(), new QueryParser(new QueryStringParser()), () -> new SearchConfig(Period.ZERO));
     }
 

@@ -34,9 +34,11 @@ import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
+import org.graylog.plugins.views.search.engine.LuceneQueryParser;
+import org.graylog.plugins.views.search.engine.LuceneQueryParsingException;
 import org.graylog.plugins.views.search.engine.QueryBackend;
-import org.graylog.plugins.views.search.engine.ValidationExplanation;
 import org.graylog.plugins.views.search.engine.SearchConfig;
+import org.graylog.plugins.views.search.engine.ValidationExplanation;
 import org.graylog.plugins.views.search.engine.ValidationRequest;
 import org.graylog.plugins.views.search.engine.ValidationResponse;
 import org.graylog.plugins.views.search.engine.ValidationStatus;
@@ -46,6 +48,7 @@ import org.graylog.plugins.views.search.filter.AndFilter;
 import org.graylog.plugins.views.search.filter.OrFilter;
 import org.graylog.plugins.views.search.filter.QueryStringFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
+import org.graylog.plugins.views.search.rest.MappedFieldTypeDTO;
 import org.graylog.shaded.elasticsearch6.org.elasticsearch.index.query.BoolQueryBuilder;
 import org.graylog.shaded.elasticsearch6.org.elasticsearch.index.query.QueryBuilder;
 import org.graylog.shaded.elasticsearch6.org.elasticsearch.index.query.QueryBuilders;
@@ -57,6 +60,7 @@ import org.graylog.storage.elasticsearch6.views.validate.ValidatePayload;
 import org.graylog.storage.elasticsearch6.views.validate.ValidationResult;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.IndexMapping;
+import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
 import org.graylog2.plugin.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,6 +90,8 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
     private final ESGeneratedQueryContext.Factory queryContextFactory;
     private final boolean allowLeadingWildcard;
     private final ObjectMapper objectMapper;
+    private final MappedFieldTypesService mappedFieldTypesService;
+    private final LuceneQueryParser luceneQueryParser;
 
     @Inject
     public ElasticsearchBackend(Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> elasticsearchSearchTypeHandlers,
@@ -93,7 +99,10 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                                 IndexLookup indexLookup,
                                 QueryStringDecorators queryStringDecorators,
                                 ESGeneratedQueryContext.Factory queryContextFactory,
-                                @Named("allow_leading_wildcard_searches") boolean allowLeadingWildcard, ObjectMapper objectMapper) {
+                                @Named("allow_leading_wildcard_searches") boolean allowLeadingWildcard,
+                                ObjectMapper objectMapper,
+                                MappedFieldTypesService mappedFieldTypesService,
+                                LuceneQueryParser luceneQueryParser) {
         this.elasticsearchSearchTypeHandlers = elasticsearchSearchTypeHandlers;
         this.jestClient = jestClient;
         this.indexLookup = indexLookup;
@@ -102,6 +111,8 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
         this.queryContextFactory = queryContextFactory;
         this.allowLeadingWildcard = allowLeadingWildcard;
         this.objectMapper = objectMapper;
+        this.mappedFieldTypesService = mappedFieldTypesService;
+        this.luceneQueryParser = luceneQueryParser;
     }
 
     private QueryBuilder normalizeQueryString(String queryString) {
@@ -305,10 +316,10 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
 
     @Override
     public ValidationResponse validate(ValidationRequest req) {
-
         final Set<String> affectedIndices = Optional.ofNullable(req.streams()).map(s -> indexLookup.indexNamesForStreamsInTimeRange(s, req.timerange())).orElse(Collections.emptySet());
 
         final String queryString = ((ElasticsearchQueryString) req.query()).queryString();
+        final ElasticsearchQueryString backendQuery = (ElasticsearchQueryString) req.query();
         final Validate.Builder builder = new Validate.Builder(new ValidatePayload(queryString, false))
                 .setParameter("explain", true)
                 .setParameter("rewrite", true);
@@ -320,8 +331,31 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                 .map(e -> new ValidationExplanation(e.getIndex(), -1, e.isValid(), e.getExplanation(), e.getError()))
                 .collect(Collectors.toList());
 
-        final ValidationStatus status = response.isValid() ? ValidationStatus.OK : ValidationStatus.ERROR;
+        final Set<String> unknownFields = new HashSet<>();
+        if (response.isValid()) {
+            try {
+                final Set<String> detectedFields = luceneQueryParser.getFieldNames(backendQuery.queryString());
+                final Set<String> availableFields = mappedFieldTypesService.fieldTypesByStreamIds(req.streams(), req.timerange())
+                        .stream()
+                        .map(MappedFieldTypeDTO::name)
+                        .collect(Collectors.toSet());
 
-        return new ValidationResponse(status, explanations, Collections.emptySet());
+                detectedFields.stream().filter(f -> !availableFields.contains(f)).forEach(unknownFields::add);
+            } catch (LuceneQueryParsingException e) {
+                LOG.warn("Failed to parse lucene query", e);
+            }
+        }
+
+        final ValidationStatus status;
+        if (response.isValid()) {
+            if (unknownFields.isEmpty()) {
+                status = ValidationStatus.OK;
+            } else {
+                status = ValidationStatus.WARNING;
+            }
+        } else {
+            status = ValidationStatus.ERROR;
+        }
+        return new ValidationResponse(status, explanations, unknownFields);
     }
 }

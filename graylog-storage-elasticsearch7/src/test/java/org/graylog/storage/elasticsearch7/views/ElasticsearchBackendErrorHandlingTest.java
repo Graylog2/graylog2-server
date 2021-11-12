@@ -27,7 +27,7 @@ import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
-import org.graylog.plugins.views.search.elasticsearch.parser.LuceneQueryParserES7;
+import org.graylog.plugins.views.search.engine.LuceneQueryParser;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.MultiSearchResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -86,7 +86,7 @@ public class ElasticsearchBackendErrorHandlingTest {
                 new QueryStringDecorators(Collections.emptySet()),
                 (elasticsearchBackend, ssb, job, query, results) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, results, fieldTypesLookup),
                 false,
-                Mockito.mock(MappedFieldTypesService.class), new LuceneQueryParserES7());
+                Mockito.mock(MappedFieldTypesService.class), new LuceneQueryParser());
         when(indexLookup.indexNamesForStreamsInTimeRange(any(), any())).thenReturn(Collections.emptySet());
 
         final SearchType searchType1 = mock(SearchType.class);

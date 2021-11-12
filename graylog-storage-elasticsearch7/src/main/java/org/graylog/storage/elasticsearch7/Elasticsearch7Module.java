@@ -20,7 +20,6 @@ import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.binder.LinkedBindingBuilder;
 import org.graylog.events.search.MoreSearchAdapter;
 import org.graylog.plugins.views.migrations.V20200730000000_AddGl2MessageIdFieldAliasForEvents;
-import org.graylog.plugins.views.search.elasticsearch.parser.LuceneQueryParserES7;
 import org.graylog.plugins.views.search.engine.LuceneQueryParser;
 import org.graylog.shaded.elasticsearch7.org.apache.http.client.CredentialsProvider;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestHighLevelClient;
@@ -62,7 +61,7 @@ public class Elasticsearch7Module extends VersionAwareModule {
                 .to(V20170607164210_MigrateReopenedIndicesToAliasesClusterStateES7.class);
         bindForSupportedVersion(V20200730000000_AddGl2MessageIdFieldAliasForEvents.ElasticsearchAdapter.class)
                 .to(V20200730000000_AddGl2MessageIdFieldAliasForEventsES7.class);
-        bindForSupportedVersion(LuceneQueryParser.class).to(LuceneQueryParserES7.class);
+        bindForSupportedVersion(LuceneQueryParser.class).to(LuceneQueryParser.class);
 
         install(new FactoryModuleBuilder().build(ScrollResultES7.Factory.class));
 
