@@ -14,9 +14,9 @@ type Props = {
   updateConfig: (config: PermissionsConfigType) => Promise<void>,
 };
 
-const StyledDefList = styled.dl.attrs({
+const StyledDefList = styled.dl.attrs(() => ({
   className: 'deflist',
-})(({ theme }: { theme: DefaultTheme }) => css`
+}))(({ theme }: { theme: DefaultTheme }) => css`
   &&.deflist {
     dd {
       padding-left: ${theme.spacings.md};
@@ -52,9 +52,9 @@ const PermissionsConfig = ({ config, updateConfig }: Props) => {
         <>
           <StyledDefList>
             <dt>Share with everyone:</dt>
-            <dd>{config.allow_sharing_with_everyone ? 'Enabled' : 'Disabled'}</dd>
+            <dd>{config.sharing_with_everyone ? 'Enabled' : 'Disabled'}</dd>
             <dt>Share with users:</dt>
-            <dd>{config.allow_sharing_with_users ? 'Enabled' : 'Disabled'}</dd>
+            <dd>{config.sharing_with_users ? 'Enabled' : 'Disabled'}</dd>
           </StyledDefList>
 
           <p>
@@ -82,16 +82,16 @@ const PermissionsConfig = ({ config, updateConfig }: Props) => {
                         <Row>
                           <Col sm={12}>
                             <FormikInput type="checkbox"
-                                         name="allow_sharing_with_everyone"
+                                         name="sharing_with_everyone"
                                          id="shareWithEveryone"
                                          label={(
-                                           <LabelSpan>Share with everyone</LabelSpan>
+                                           <LabelSpan>PERMISSIONS_CONFIGShare with everyone</LabelSpan>
                                          )} />
                             <InputDescription help={<>Share with everyone option will be available</>} />
                           </Col>
                           <Col sm={12}>
                             <FormikInput type="checkbox"
-                                         name="allow_sharing_with_users"
+                                         name="sharing_with_users"
                                          id="shareWithUsers"
                                          label={(
                                            <LabelSpan>Share with users</LabelSpan>
@@ -110,7 +110,7 @@ const PermissionsConfig = ({ config, updateConfig }: Props) => {
                   </Form>
                 );
               }}
-
+              PERMISSIONS_CONFIG
             </Formik>
           </Modal>
         </>
@@ -120,3 +120,4 @@ const PermissionsConfig = ({ config, updateConfig }: Props) => {
 };
 
 export default PermissionsConfig;
+PERMISSIONS_CONFIGPERMISSIONS_CONFIGPERMISSIONS_CONFIG;
