@@ -23,6 +23,8 @@ import Query from 'views/logic/queries/Query';
 import ViewState from 'views/logic/views/ViewState';
 import { singletonActions } from 'logic/singleton';
 
+import type { QueryValidationState } from '../stores/QueriesStore';
+
 export type QueriesList = Immutable.OrderedMap<QueryId, Query>;
 
 type QueriesActionsType = RefluxActions<{
@@ -34,7 +36,7 @@ type QueriesActionsType = RefluxActions<{
   remove: (queryId: QueryId) => Promise<QueriesList>,
   timerange: (queryId: QueryId, newTimeRange: TimeRange) => Promise<QueriesList>,
   update: (queryId: QueryId, query: Query) => Promise<QueriesList>,
-  validateQueryString: (query: string) => Promise<any>
+  validateQueryString: (query: string) => Promise<QueryValidationState>
 }>;
 
 // eslint-disable-next-line import/prefer-default-export

@@ -35,6 +35,18 @@ import type { QueriesList } from '../actions/QueriesActions';
 
 export { QueriesActions } from 'views/actions/QueriesActions';
 
+export type QueryValidationState = {
+  status: 'OK' | 'ERROR' | 'WARNING',
+  explanations: Array<{
+    index: string,
+    message: {
+      index: string,
+      errorType: string,
+      errorMessage: string,
+    }
+  }> | undefined
+}
+
 type QueriesStoreState = Immutable.OrderedMap<QueryId, Query>;
 
 type QueriesStoreType = Store<QueriesStoreState>;
@@ -187,13 +199,19 @@ export const QueriesStore: QueriesStoreType = singletonStore(
       return promise;
     },
 
-    validateQueryString(query: string) {
+    validateQueryString(query: string): Promise<QueryValidationState> {
       const promise = fetch('POST', qualifyUrl('/search/validate'), { query }).then((result) => {
         if (result) {
-          return {
-            status: result.validation_status,
-            explanations: result.explanations,
-          };
+          return ({
+            status: result.status,
+            explanations: result.explanations?.map((explanation) => ({
+              index: explanation.index,
+              message: {
+                errorMessage: explanation.message.error_message,
+                errorType: explanation.message.error_type,
+              },
+            })),
+          });
         }
 
         return undefined;

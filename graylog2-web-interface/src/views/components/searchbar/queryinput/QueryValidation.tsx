@@ -21,7 +21,8 @@ import { useState, useEffect } from 'react';
 
 import { Popover } from 'components/bootstrap';
 import { OverlayTrigger, Icon } from 'components/common';
-import { QueriesActions } from 'views/stores/QueriesStore';
+import { QueriesActions, QueryValidationState } from 'views/stores/QueriesStore';
+import StringUtils from 'util/StringUtils';
 
 const Container = styled.div`
   margin-right: 5px;
@@ -46,7 +47,7 @@ const validateQuery = debounce((value, setValidationState) => {
   });
 }, 350);
 
-const useValidateQuery = (value) => {
+const useValidateQuery = (value: string): QueryValidationState | undefined => {
   const [validationState, setValidationState] = useState(undefined);
 
   useEffect(() => {
@@ -64,8 +65,15 @@ const useValidateQuery = (value) => {
   return validationState;
 };
 
+const getExplanationTitle = (status, explanations) => {
+  const baseTitle = StringUtils.capitalizeFirstLetter(status.toLocaleLowerCase());
+  const errorTitles = explanations.map(({ message: { errorType } }) => errorType).join(', ');
+
+  return `${baseTitle} (${errorTitles})`;
+};
+
 type Props = {
-  query: string | undefined,
+  query: string,
 }
 
 const QueryValidation = ({ query }: Props) => {
@@ -82,8 +90,8 @@ const QueryValidation = ({ query }: Props) => {
       <OverlayTrigger trigger={['click']}
                       placement="bottom"
                       overlay={(
-                        <Popover id="query-validation-error-explanation" title={status === 'ERROR' ? 'Error' : 'Warning'}>
-                          {JSON.stringify(explanations)}
+                        <Popover id="query-validation-error-explanation" title={getExplanationTitle(status, explanations)}>
+                          {explanations.map(({ message: { errorMessage } }) => errorMessage).join('. ')}
                         </Popover>
                       )}>
         <ErrorIconContainer title="Toggle validation error explanation">
