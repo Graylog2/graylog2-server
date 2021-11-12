@@ -17,8 +17,8 @@
 import * as React from 'react';
 import { useContext } from 'react';
 import styled from 'styled-components';
-
 import { ActionContexts } from 'views/types';
+
 import Icon from 'components/common/Icon';
 import { MenuItem } from 'components/bootstrap';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
