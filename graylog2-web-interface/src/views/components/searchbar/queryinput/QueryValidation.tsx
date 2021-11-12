@@ -77,6 +77,9 @@ type Props = {
 }
 
 const QueryValidation = ({ query }: Props) => {
+  // Maintain showExplanation state outside of OverlayTrigger to ensure explanation stays visible.
+  const [showExplanation, setShowExplanation] = useState(false);
+  const toggleShow = () => setShowExplanation((prevShow) => !prevShow);
   const validationState = useValidateQuery(query);
 
   if (!validationState || validationState.status === 'OK') {
@@ -86,9 +89,9 @@ const QueryValidation = ({ query }: Props) => {
   const { status, explanations } = validationState;
 
   return (
-    <Container>
-      <OverlayTrigger trigger={['click']}
-                      placement="bottom"
+    <Container onClick={toggleShow}>
+      <OverlayTrigger placement="bottom"
+                      show={showExplanation}
                       overlay={(
                         <Popover id="query-validation-error-explanation" title={getExplanationTitle(status, explanations)}>
                           {explanations.map(({ message: { errorMessage } }) => errorMessage).join('. ')}
