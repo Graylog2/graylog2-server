@@ -45,6 +45,7 @@ import type { FilterType, QueryId } from 'views/logic/queries/Query';
 import type { SearchesConfig } from 'components/search/SearchConfig';
 import type { SearchBarFormValues } from 'views/Constants';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
+import QueryValidation from 'views/components/searchbar/queryinput/QueryValidation';
 
 import SearchBarForm from './searchbar/SearchBarForm';
 
@@ -173,6 +174,8 @@ const SearchBar = ({
                                             onExecute={handleSubmit as () => void} />
                         )}
                       </Field>
+
+                      <QueryValidation queryString={values?.queryString} timeRange={values?.timerange} streams={values?.streams} />
 
                       <div className="search-help">
                         <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}

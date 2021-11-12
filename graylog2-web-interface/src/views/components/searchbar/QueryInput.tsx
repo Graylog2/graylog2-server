@@ -23,7 +23,6 @@ import { themePropTypes } from 'theme';
 import withPluginEntities from 'views/logic/withPluginEntities';
 import UserPreferencesContext from 'contexts/UserPreferencesContext';
 
-import QueryValidation from './queryinput/QueryValidation';
 import type { AutoCompleter, Editor } from './ace-types';
 import StyledAceEditor from './queryinput/StyledAceEditor';
 import SearchBarAutoCompletions from './SearchBarAutocompletions';
@@ -119,7 +118,6 @@ const QueryInput = ({
                            $height={height} />
         )}
       </UserPreferencesContext.Consumer>
-      <QueryValidation query={value} />
     </div>
   );
 };
