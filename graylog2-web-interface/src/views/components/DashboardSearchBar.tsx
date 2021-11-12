@@ -36,6 +36,7 @@ import BottomRow from 'views/components/searchbar/BottomRow';
 import ViewActionsWrapper from 'views/components/searchbar/ViewActionsWrapper';
 import { SearchesConfig } from 'components/search/SearchConfig';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
+import QueryValidation from 'views/components/searchbar/queryinput/QueryValidation';
 
 import DashboardSearchForm from './DashboardSearchBarForm';
 import TimeRangeInput from './searchbar/TimeRangeInput';
@@ -139,6 +140,9 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
                                             onExecute={handleSubmit as () => void} />
                         )}
                       </Field>
+
+                      <QueryValidation queryString={values?.queryString} timeRange={values?.timerange} />
+
                       <div className="search-help">
                         <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
                                            title="Search query syntax documentation"

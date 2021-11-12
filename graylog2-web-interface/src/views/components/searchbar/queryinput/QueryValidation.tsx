@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import styled, { DefaultTheme } from 'styled-components';
-import { debounce } from 'lodash';
+import { debounce, isEmpty } from 'lodash';
 import { useState, useEffect, useRef } from 'react';
 import { Overlay, Transition } from 'react-overlays';
 
@@ -24,7 +24,7 @@ import { Popover } from 'components/bootstrap';
 import { Icon } from 'components/common';
 import { QueriesActions, QueryValidationState } from 'views/stores/QueriesStore';
 import StringUtils from 'util/StringUtils';
-import { TimeRange } from 'views/logic/queries/Query';
+import { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 
 const Container = styled.div`
   margin-right: 5px;
@@ -45,7 +45,9 @@ const ErrorIcon = styled(Icon)(({ theme, $status }: { theme: DefaultTheme, $stat
 `);
 
 const validateQuery = debounce((queryString, timeRange, streams, setValidationState) => {
-  QueriesActions.validateQueryString(queryString, timeRange, streams).then((result) => {
+  const cleanTimeRange = isEmpty(timeRange) ? undefined : timeRange;
+
+  QueriesActions.validateQueryString(queryString, cleanTimeRange, streams).then((result) => {
     setValidationState(result);
   });
 }, 350);
@@ -77,8 +79,8 @@ const getExplanationTitle = (status, explanations) => {
 
 type Props = {
   queryString: string | undefined,
-  timeRange: TimeRange | undefined,
-  streams: Array<string> | undefined
+  timeRange: TimeRange | NoTimeRangeOverride | undefined,
+  streams?: Array<string>
 }
 
 const QueryValidation = ({ queryString, timeRange, streams }: Props) => {
@@ -120,6 +122,10 @@ const QueryValidation = ({ queryString, timeRange, streams }: Props) => {
       )}
     </Container>
   );
+};
+
+QueryValidation.defaultProps = {
+  streams: undefined,
 };
 
 export default QueryValidation;
