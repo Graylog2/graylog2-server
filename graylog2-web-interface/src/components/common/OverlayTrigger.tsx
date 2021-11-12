@@ -22,14 +22,13 @@ import styled from 'styled-components';
 type Triggers = 'click' | 'focus' | 'hover';
 
 type Props = {
+  testId?: string,
   children: React.ReactElement,
-  container?: React.ReactElement,
   overlay: React.ReactElement,
   placement: 'top' | 'right' | 'bottom' | 'left',
-  rootClose?: boolean,
-  show?: boolean,
-  testId?: string,
   trigger?: Triggers | Array<Triggers>,
+  container?: React.ReactElement,
+  rootClose?: boolean,
 }
 
 type State = {
@@ -54,14 +53,13 @@ class OverlayTrigger extends React.Component<Props, State> {
     rootClose: false,
     container: null,
     testId: undefined,
-    show: false,
   }
 
   constructor(props) {
     super(props);
 
     this.state = {
-      show: props.show,
+      show: false,
     };
   }
 

@@ -17,10 +17,11 @@
 import * as React from 'react';
 import styled, { DefaultTheme } from 'styled-components';
 import { debounce } from 'lodash';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { Overlay, Transition } from 'react-overlays';
 
 import { Popover } from 'components/bootstrap';
-import { OverlayTrigger, Icon } from 'components/common';
+import { Icon } from 'components/common';
 import { QueriesActions, QueryValidationState } from 'views/stores/QueriesStore';
 import StringUtils from 'util/StringUtils';
 
@@ -30,11 +31,12 @@ const Container = styled.div`
   width: 25px;
 `;
 
-const ErrorIconContainer = styled.div`
-  min-height: 35px;
+const ExplanationTrigger = styled.div<{ $clickable?: boolean }>(({ $clickable }) => `
   display: flex;
   align-items: center;
-`;
+  min-height: 35px;
+  cursor: ${$clickable ? 'pointer' : 'default'};
+`);
 
 const ErrorIcon = styled(Icon)(({ theme, $status }: { theme: DefaultTheme, $status: string}) => `
   color: ${$status === 'ERROR' ? theme.colors.variant.danger : theme.colors.variant.warning};
@@ -79,28 +81,41 @@ type Props = {
 const QueryValidation = ({ query }: Props) => {
   // Maintain showExplanation state outside of OverlayTrigger to ensure explanation stays visible.
   const [showExplanation, setShowExplanation] = useState(false);
+  const containerRef = useRef(null);
+  const explanationTriggerRef = useRef(null);
   const toggleShow = () => setShowExplanation((prevShow) => !prevShow);
   const validationState = useValidateQuery(query);
 
+  // We need to always display the container to avoid query inout resizing problems
+  // we need to always display the overlay trigger to avoid overlay placement problems
   if (!validationState || validationState.status === 'OK') {
-    return <Container />;
+    return (
+      <Container ref={() => containerRef}>
+        <ExplanationTrigger ref={explanationTriggerRef} />
+      </Container>
+    );
   }
 
   const { status, explanations } = validationState;
 
   return (
-    <Container onClick={toggleShow}>
-      <OverlayTrigger placement="bottom"
-                      show={showExplanation}
-                      overlay={(
-                        <Popover id="query-validation-error-explanation" title={getExplanationTitle(status, explanations)}>
-                          {explanations.map(({ message: { errorMessage } }) => errorMessage).join('. ')}
-                        </Popover>
-                      )}>
-        <ErrorIconContainer title="Toggle validation error explanation">
-          <ErrorIcon $status={status} name="exclamation-circle" />
-        </ErrorIconContainer>
-      </OverlayTrigger>
+    <Container ref={() => containerRef}>
+      <ExplanationTrigger title="Toggle validation error explanation" ref={explanationTriggerRef} onClick={toggleShow} $clickable>
+        <ErrorIcon $status={status} name="exclamation-circle" />
+      </ExplanationTrigger>
+
+      {showExplanation && (
+        <Overlay show
+                 container={containerRef.current}
+                 containerPadding={10}
+                 placement="bottom"
+                 target={explanationTriggerRef.current}
+                 transition={Transition}>
+          <Popover id="query-validation-error-explanation" title={getExplanationTitle(status, explanations)}>
+            {explanations.map(({ message: { errorMessage } }) => errorMessage).join('. ')}
+          </Popover>
+        </Overlay>
+      )}
     </Container>
   );
 };
