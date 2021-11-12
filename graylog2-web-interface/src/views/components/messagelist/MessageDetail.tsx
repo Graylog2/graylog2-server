@@ -16,10 +16,11 @@
  */
 import PropTypes from 'prop-types';
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Immutable from 'immutable';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 
+import { AdditionalContext } from 'views/logic/ActionContext';
 import { Link } from 'components/common/router';
 import { Col, Label, Row } from 'components/bootstrap';
 import StreamLink from 'components/streams/StreamLink';
@@ -35,6 +36,7 @@ import { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import { useStore } from 'stores/connect';
 import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 import FormatReceivedBy from 'views/components/messagelist/FormatReceivedBy';
+import usePluginEntities from 'views/logic/usePluginEntities';
 
 import MessageDetailProviders from './MessageDetailProviders';
 import MessageActions from './MessageActions';
@@ -79,11 +81,24 @@ const MessageDetail = ({
   const { searchesClusterConfig } = useStore(SearchConfigStore);
   const [showOriginal, setShowOriginal] = useState(false);
 
+  const [isLocalNode, setIsLocalNode] = useState<boolean | undefined>();
+  const forwarderPlugin = usePluginEntities('forwarder');
+  const _isLocalNode = forwarderPlugin?.[0]?.isLocalNode;
+
+  const { fields, index, id, decoration_stats: decorationStats } = message;
+  const { gl2_source_node, gl2_source_input } = fields;
+
+  useEffect(() => {
+    if (gl2_source_node && _isLocalNode) {
+      _isLocalNode(gl2_source_node).then(setIsLocalNode, () => setIsLocalNode(true));
+    } else {
+      setIsLocalNode(true);
+    }
+  }, [gl2_source_node, _isLocalNode]);
+
   const _toggleShowOriginal = () => {
     setShowOriginal(!showOriginal);
   };
-
-  const { fields, index, id, decoration_stats: decorationStats } = message;
 
   // Short circuit when all messages are being expanded at the same time
   if (expandAllRenderAsync) {
@@ -118,48 +133,49 @@ const MessageDetail = ({
     timestamp.push(<dd key={`dd-${rawTimestamp}`}><Timestamp dateTime={rawTimestamp} /></dd>);
   }
 
-  const { gl2_source_node, gl2_source_input } = fields;
-
   const messageTitle = _formatMessageTitle(index, id);
+  console.log(isLocalNode);
 
   return (
-    <MessageDetailProviders message={message}>
-      <>
-        <Row className="row-sm">
-          <Col md={12}>
-            <MessageActions index={index}
-                            id={id}
-                            fields={fields}
-                            decorationStats={decorationStats}
-                            disabled={disableMessageActions}
-                            disableSurroundingSearch={disableSurroundingSearch}
-                            disableTestAgainstStream={disableTestAgainstStream}
-                            showOriginal={showOriginal}
-                            toggleShowOriginal={_toggleShowOriginal}
-                            searchConfig={searchesClusterConfig}
-                            streams={allStreams} />
-            <MessageDetailsTitle>
-              <Icon name="envelope" />
+    <AdditionalContext.Provider value={{ isLocalNode }}>
+      <MessageDetailProviders message={message}>
+        <>
+          <Row className="row-sm">
+            <Col md={12}>
+              <MessageActions index={index}
+                              id={id}
+                              fields={fields}
+                              decorationStats={decorationStats}
+                              disabled={disableMessageActions}
+                              disableSurroundingSearch={disableSurroundingSearch}
+                              disableTestAgainstStream={disableTestAgainstStream}
+                              showOriginal={showOriginal}
+                              toggleShowOriginal={_toggleShowOriginal}
+                              searchConfig={searchesClusterConfig}
+                              streams={allStreams} />
+              <MessageDetailsTitle>
+                <Icon name="envelope" />
               &nbsp;
-              {messageTitle}
-            </MessageDetailsTitle>
-          </Col>
-        </Row>
-        <Row id={`sticky-augmentations-boundary-${message.id}`}>
-          <Col md={3}>
-            <MessageMetadata timestamp={timestamp}
-                             index={index}
-                             receivedBy={<FormatReceivedBy inputs={inputs} sourceNodeId={gl2_source_node} sourceInputId={gl2_source_input} />}
-                             streams={streamsListItems} />
-            <MessageAugmentations message={message} />
-          </Col>
-          <Col md={9}>
-            <MessageFields message={message}
-                           fields={messageFields} />
-          </Col>
-        </Row>
-      </>
-    </MessageDetailProviders>
+                {messageTitle}
+              </MessageDetailsTitle>
+            </Col>
+          </Row>
+          <Row id={`sticky-augmentations-boundary-${message.id}`}>
+            <Col md={3}>
+              <MessageMetadata timestamp={timestamp}
+                               index={index}
+                               receivedBy={<FormatReceivedBy inputs={inputs} sourceNodeId={gl2_source_node} sourceInputId={gl2_source_input} />}
+                               streams={streamsListItems} />
+              <MessageAugmentations message={message} />
+            </Col>
+            <Col md={9}>
+              <MessageFields message={message}
+                             fields={messageFields} />
+            </Col>
+          </Row>
+        </>
+      </MessageDetailProviders>
+    </AdditionalContext.Provider>
   );
 };
 
