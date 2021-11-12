@@ -176,7 +176,7 @@
         <junit-jupiter.version>5.7.0</junit-jupiter.version>
         <mockito.version>3.4.4</mockito.version>
         <nosqlunit.version>1.0.0-rc.5</nosqlunit.version>
-        <restassured.version>4.3.1</restassured.version>
+        <restassured.version>4.3.2</restassured.version>
         <system-rules.version>1.19.0</system-rules.version>
         <testcontainers.version>1.16.0</testcontainers.version>
 
@@ -328,7 +328,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>versions-maven-plugin</artifactId>
-                    <version>2.7</version>
+                    <version>2.8.1</version>
                 </plugin>
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>
