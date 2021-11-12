@@ -127,7 +127,7 @@
         <jdot.version>1.0</jdot.version>
         <jersey.version>2.32</jersey.version>
         <jmte.version>5.0.0</jmte.version>
-        <joda-time.version>2.10.6</joda-time.version>
+        <joda-time.version>2.10.13</joda-time.version>
         <jool.version>0.9.14</jool.version>
         <json-path.version>2.4.0</json-path.version>
         <kafka.version>2.7.0</kafka.version>
@@ -176,7 +176,7 @@
         <junit-jupiter.version>5.7.0</junit-jupiter.version>
         <mockito.version>3.4.4</mockito.version>
         <nosqlunit.version>1.0.0-rc.5</nosqlunit.version>
-        <restassured.version>4.3.1</restassured.version>
+        <restassured.version>4.3.2</restassured.version>
         <system-rules.version>1.19.0</system-rules.version>
         <testcontainers.version>1.16.0</testcontainers.version>
 
