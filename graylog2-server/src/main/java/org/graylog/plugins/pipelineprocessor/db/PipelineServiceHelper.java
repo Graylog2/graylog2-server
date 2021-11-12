@@ -18,7 +18,10 @@ package org.graylog.plugins.pipelineprocessor.db;
 
 import com.google.common.collect.ImmutableList;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
+import org.graylog.plugins.pipelineprocessor.parser.ParseException;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -32,6 +35,8 @@ import java.util.stream.Stream;
 
 @Singleton
 public class PipelineServiceHelper {
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final PipelineRuleParser pipelineParser;
 
@@ -47,7 +52,15 @@ public class PipelineServiceHelper {
         }
 
         return pipelines.get().stream()
-                .map(pipelineDao -> new ParsedPipeline(pipelineDao, pipelineParser.parsePipeline(pipelineDao.id(), pipelineDao.source())))
+                .flatMap(pipelineDao -> {
+                    try {
+                        final Pipeline parsedPipeline = pipelineParser.parsePipeline(pipelineDao.id(), pipelineDao.source());
+                        return Stream.of(new ParsedPipeline(pipelineDao, parsedPipeline));
+                    } catch (ParseException e) {
+                        logger.warn("Ignoring non-parseable pipeline <{}/{}> with errors <{}>", pipelineDao.title(), pipelineDao.id(), e.getErrors());
+                        return Stream.empty();
+                    }
+                })
                 .filter(wrapper -> wrapper.parsed
                         .stages()
                         .stream()

@@ -67,6 +67,10 @@ public abstract class DbPipelineServiceBaseTest {
                 "rule     \"debug#3\"\n",
                 ""));
 
+        saveNewPipelineDao("Broken Pipeline", pipelineSource("Pipeline 4",
+                "ruleadasd     \"XXX\"\n",
+                "aaaaa"));
+
         // when + then
         assertThat(underTest.loadByRules(ImmutableSet.of("debug#3"))).satisfies(containsPipelines("Pipeline 3", "Pipeline 4"));
         assertThat(underTest.loadByRules(ImmutableSet.of("debug#2", "debug#3"))).satisfies(containsPipelines("Pipeline 1", "Pipeline 3", "Pipeline 4"));
