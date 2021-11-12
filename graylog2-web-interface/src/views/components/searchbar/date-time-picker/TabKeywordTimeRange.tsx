@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, useContext } from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import trim from 'lodash/trim';
@@ -23,10 +23,10 @@ import isEqual from 'lodash/isEqual';
 import { Field, useField } from 'formik';
 
 import { Col, FormControl, FormGroup, Panel, Row } from 'components/bootstrap';
-import DateTime from 'logic/datetimes/DateTime';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
 import ToolsStore from 'stores/tools/ToolsStore';
+import DateTimeContext from 'contexts/DateTimeContext';
 
 import { EMPTY_RANGE } from '../TimeRangeDisplay';
 
@@ -43,12 +43,10 @@ const ErrorMessage = styled.span(({ theme }) => css`
   display: block;
 `);
 
-const _parseKeywordPreview = (data) => {
-  const { timezone } = data;
-  const from = DateTime.fromDateTimeAndTZ(data.from, timezone).toString();
-  const to = DateTime.fromDateTimeAndTZ(data.to, timezone).toString();
+const _parseKeywordPreview = (data, formatTime) => {
+  const { from, to } = data;
 
-  return { from, to, timezone };
+  return { from: formatTime(from), to: formatTime(to) };
 };
 
 type Props = {
@@ -58,20 +56,21 @@ type Props = {
 };
 
 const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: Props) => {
+  const { formatTime } = useContext(DateTimeContext);
   const [nextRangeProps, , nextRangeHelpers] = useField('nextTimeRange');
   const mounted = useRef(true);
   const keywordRef = useRef<string>();
-  const [keywordPreview, setKeywordPreview] = useState({ from: '', to: '', timezone: '' });
+  const [keywordPreview, setKeywordPreview] = useState({ from: '', to: '' });
 
-  const _setSuccessfullPreview = useCallback((response: { from: string, to: string, timezone: string }) => {
+  const _setSuccessfullPreview = useCallback((response: { from: string, to: string }) => {
     setValidatingKeyword(false);
 
-    return setKeywordPreview(_parseKeywordPreview(response));
+    return setKeywordPreview(_parseKeywordPreview(response, formatTime));
   },
-  [setValidatingKeyword]);
+  [setValidatingKeyword, formatTime]);
 
   const _setFailedPreview = useCallback(() => {
-    setKeywordPreview({ from: EMPTY_RANGE, to: EMPTY_RANGE, timezone: DateTime.getUserTimezone() });
+    setKeywordPreview({ from: EMPTY_RANGE, to: EMPTY_RANGE });
 
     return 'Unable to parse keyword.';
   }, [setKeywordPreview]);
