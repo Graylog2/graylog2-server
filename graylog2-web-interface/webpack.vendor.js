@@ -94,7 +94,6 @@ if (TARGET.startsWith('build')) {
     mode: 'production',
     optimization: {
       minimizer: [new TerserPlugin({
-        sourceMap: true,
         terserOptions: {
           compress: {
             warnings: false,

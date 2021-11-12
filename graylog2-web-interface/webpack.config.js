@@ -244,7 +244,6 @@ if (TARGET.startsWith('build')) {
     optimization: {
       moduleIds: 'deterministic',
       minimizer: [new TerserPlugin({
-        sourceMap: true,
         terserOptions: {
           compress: {
             warnings: false,
