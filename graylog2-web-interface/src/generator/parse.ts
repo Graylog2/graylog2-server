@@ -14,6 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+/* eslint-disable no-console */
 import fs from 'fs';
 
 import { Model, Api, Route, Operation, Parameter, Type } from 'generator/Api';
