@@ -16,7 +16,7 @@
  */
 package org.graylog.plugins.pipelineprocessor.db;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
@@ -26,11 +26,13 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Singleton
@@ -46,35 +48,41 @@ public class PipelineServiceHelper {
     }
 
     @NotNull
-    public List<PipelineDao> filterByRuleName(@NotNull Supplier<Collection<PipelineDao>> pipelines, @NotNull Set<String> ruleNames) {
+    public Map<String, List<PipelineDao>> groupByRuleName(@NotNull Supplier<Collection<PipelineDao>> pipelines, @NotNull Set<String> ruleNames) {
         if (ruleNames.isEmpty()) {
-            return ImmutableList.of();
+            return ImmutableMap.of();
         }
 
-        return pipelines.get().stream()
+        final Map<String, List<PipelineDao>> result = new HashMap<>();
+
+        pipelines.get().stream()
                 .flatMap(pipelineDao -> {
                     try {
                         final Pipeline parsedPipeline = pipelineParser.parsePipeline(pipelineDao.id(), pipelineDao.source());
-                        return Stream.of(new ParsedPipeline(pipelineDao, parsedPipeline));
+                        return Stream.of(new ParsedPipelineWithSource(pipelineDao, parsedPipeline));
                     } catch (ParseException e) {
                         logger.warn("Ignoring non-parseable pipeline <{}/{}> with errors <{}>", pipelineDao.title(), pipelineDao.id(), e.getErrors());
                         return Stream.empty();
                     }
-                })
-                .filter(wrapper -> wrapper.parsed
-                        .stages()
-                        .stream()
-                        .flatMap(stage -> stage.ruleReferences() == null ? Stream.empty() : stage.ruleReferences().stream())
-                        .anyMatch(ruleNames::contains))
-                .map(wrapper -> wrapper.source)
-                .collect(Collectors.toList());
+                }).forEach(pp -> {
+                    for (String ruleName : ruleNames) {
+                        if (!result.containsKey(ruleName)) {
+                            result.put(ruleName, new ArrayList<>());
+                        }
+                        if (pp.parsed.containsRule(ruleName)) {
+                            result.get(ruleName).add(pp.source);
+                        }
+                    }
+                });
+
+        return ImmutableMap.copyOf(result);
     }
 
-    private static class ParsedPipeline {
+    static final class ParsedPipelineWithSource {
         private final PipelineDao source;
         private final Pipeline parsed;
 
-        public ParsedPipeline(PipelineDao source, Pipeline parsed) {
+        ParsedPipelineWithSource(PipelineDao source, Pipeline parsed) {
             this.source = source;
             this.parsed = parsed;
         }

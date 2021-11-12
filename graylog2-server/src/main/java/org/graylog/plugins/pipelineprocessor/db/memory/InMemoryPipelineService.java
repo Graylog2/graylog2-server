@@ -19,16 +19,13 @@ package org.graylog.plugins.pipelineprocessor.db.memory;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
-import org.graylog.plugins.pipelineprocessor.db.PipelineServiceHelper;
 import org.graylog.plugins.pipelineprocessor.events.PipelinesChangedEvent;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
 
 import javax.inject.Inject;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -42,12 +39,10 @@ public class InMemoryPipelineService implements PipelineService {
     private final Map<String, PipelineDao> store = new ConcurrentHashMap<>();
     private final Map<String, String> titleToId = new ConcurrentHashMap<>();
 
-    private final PipelineServiceHelper pipelineServiceHelper;
     private final ClusterEventBus clusterBus;
 
     @Inject
-    public InMemoryPipelineService(PipelineServiceHelper pipelineServiceHelper, ClusterEventBus clusterBus) {
-        this.pipelineServiceHelper = pipelineServiceHelper;
+    public InMemoryPipelineService(ClusterEventBus clusterBus) {
         this.clusterBus = clusterBus;
     }
 
@@ -87,11 +82,6 @@ public class InMemoryPipelineService implements PipelineService {
             throw new NotFoundException("No pipeline with name " + name);
         }
         return load(id);
-    }
-
-    @Override
-    public List<PipelineDao> loadByRules(Set<String> ruleNames) {
-        return pipelineServiceHelper.filterByRuleName(this::loadAll, ruleNames);
     }
 
     @Override

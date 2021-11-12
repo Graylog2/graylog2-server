@@ -17,7 +17,6 @@
 package org.graylog.plugins.pipelineprocessor.db;
 
 import com.google.common.collect.ImmutableMap;
-import org.apache.commons.lang3.StringUtils;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
@@ -27,32 +26,30 @@ import org.junit.Before;
 import org.junit.Test;
 import org.testcontainers.shaded.com.google.common.collect.ImmutableSet;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
-import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
-public abstract class DbPipelineServiceBaseTest {
+public class PipelineServiceHelperTest {
 
 
-    private PipelineService underTest;
+    private PipelineServiceHelper underTest;
+
+    private final List<PipelineDao> pipelines = new ArrayList<>();
 
     @Before
     public void setup() {
         final Map<String, Function<?>> functions = ImmutableMap.of();
         final PipelineRuleParser pipelineRuleParser = new PipelineRuleParser(new FunctionRegistry(functions));
-        final PipelineServiceHelper pipelineServiceHelper = new PipelineServiceHelper(pipelineRuleParser);
-
-        underTest = createPipelineService(pipelineServiceHelper);
+        underTest = new PipelineServiceHelper(pipelineRuleParser);
     }
 
-    abstract protected PipelineService createPipelineService(PipelineServiceHelper pipelineServiceHelper);
-
     @Test
-    public void loadByRules_returnsAllPipelinesUsingProvidedRules() {
+    public void groupByRuleName_returnsAllPipelinesUsingProvidedRules() {
         // given
         saveNewPipelineDao("Pipeline 1", pipelineSource("Pipeline 1",
                 "rule \"debug#1\"\n" + "rule\"debug#2\"\n", ""));
@@ -72,25 +69,18 @@ public abstract class DbPipelineServiceBaseTest {
                 "aaaaa"));
 
         // when + then
-        assertThat(underTest.loadByRules(ImmutableSet.of("debug#3"))).satisfies(containsPipelines("Pipeline 3", "Pipeline 4"));
-        assertThat(underTest.loadByRules(ImmutableSet.of("debug#2", "debug#3"))).satisfies(containsPipelines("Pipeline 1", "Pipeline 3", "Pipeline 4"));
-        assertThat(underTest.loadByRules(ImmutableSet.of())).satisfies(containsPipelines());
-        assertThat(underTest.loadByRules(ImmutableSet.of("debug#4"))).satisfies(containsPipelines());
-    }
-
-    @Test
-    public void performanceTest() {
-        // given
-        IntStream.range(0, 500).forEach(i -> {
-            saveNewPipelineDao("Pipeline " + i, pipelineSource(Integer.toString(i),
-                    StringUtils.repeat(ruleReference("debug#1"), 50),
-                    StringUtils.repeat(ruleReference("debug#2"), 50)));
+        assertThat(underTest.groupByRuleName(() -> pipelines, ImmutableSet.of("debug#3"))).satisfies(map -> {
+            assertThat(map.get("debug#3")).satisfies(containsPipelines("Pipeline 3", "Pipeline 4"));
         });
-
-        final long started = System.currentTimeMillis();
-        assertThat(underTest.loadByRules(ImmutableSet.of("debug#2", "debug#3"))).hasSize(500);
-        final long took = System.currentTimeMillis() - started;
-        assertThat(took).isLessThan(1000);
+        assertThat(underTest.groupByRuleName(() -> pipelines, ImmutableSet.of("debug#2", "debug#3", "debug#4"))).satisfies(map -> {
+            assertThat(map.get("debug#2")).satisfies(containsPipelines("Pipeline 1", "Pipeline 3"));
+            assertThat(map.get("debug#3")).satisfies(containsPipelines("Pipeline 3", "Pipeline 4"));
+            assertThat(map.get("debug#4")).isEmpty();
+        });
+        assertThat(underTest.groupByRuleName(() -> pipelines, ImmutableSet.of())).isEmpty();
+        assertThat(underTest.groupByRuleName(() -> pipelines, ImmutableSet.of("debug#4"))).satisfies(map -> {
+            assertThat(map.get("debug#4")).isEmpty();
+        });
     }
 
     private String pipelineSource(String name, String stage0Rules, String stage1Rules) {
@@ -106,12 +96,8 @@ public abstract class DbPipelineServiceBaseTest {
         );
     }
 
-    private String ruleReference(String ruleName) {
-        return f("rule \"%s\"\n", ruleName);
-    }
-
     private void saveNewPipelineDao(String title, String source) {
-        underTest.save(PipelineDao.builder()
+        pipelines.add(PipelineDao.builder()
                 .title(title)
                 .description("Description")
                 .createdAt(DateTime.now(DateTimeZone.UTC))

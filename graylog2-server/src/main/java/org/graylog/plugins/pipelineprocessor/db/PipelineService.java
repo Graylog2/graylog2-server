@@ -18,10 +18,7 @@ package org.graylog.plugins.pipelineprocessor.db;
 
 import org.graylog2.database.NotFoundException;
 
-import javax.validation.constraints.NotNull;
 import java.util.Collection;
-import java.util.List;
-import java.util.Set;
 
 public interface PipelineService {
     PipelineDao save(PipelineDao pipeline);
@@ -29,13 +26,6 @@ public interface PipelineService {
     PipelineDao load(String id) throws NotFoundException;
 
     PipelineDao loadByName(String name) throws NotFoundException;
-
-    /**
-     * Returns a list of pipelines. Each pipeline uses at least one
-     * rule from the provided set.
-     */
-    @NotNull
-    List<PipelineDao> loadByRules(@NotNull Set<String> ruleNames);
 
     Collection<PipelineDao> loadAll();
 

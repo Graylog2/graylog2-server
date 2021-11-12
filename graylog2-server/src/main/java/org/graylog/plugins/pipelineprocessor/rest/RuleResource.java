@@ -27,8 +27,8 @@ import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.audit.PipelineProcessorAuditEventTypes;
 import org.graylog.plugins.pipelineprocessor.db.PaginatedRuleService;
-import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
+import org.graylog.plugins.pipelineprocessor.db.PipelineServiceHelper;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleMetricsConfigDto;
 import org.graylog.plugins.pipelineprocessor.db.RuleMetricsConfigService;
@@ -67,10 +67,8 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Api(value = "Pipelines/Rules", description = "Rules for the pipeline message processor")
@@ -94,6 +92,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
     private final FunctionRegistry functionRegistry;
     private final PaginatedRuleService paginatedRuleService;
     private final SearchQueryParser searchQueryParser;
+    private final PipelineServiceHelper pipelineServiceHelper;
 
     @Inject
     public RuleResource(RuleService ruleService,
@@ -101,13 +100,15 @@ public class RuleResource extends RestResource implements PluginRestResource {
                         RuleMetricsConfigService ruleMetricsConfigService,
                         PipelineRuleParser pipelineRuleParser,
                         PaginatedRuleService paginatedRuleService,
-                        FunctionRegistry functionRegistry) {
+                        FunctionRegistry functionRegistry,
+                        PipelineServiceHelper pipelineServiceHelper) {
         this.ruleService = ruleService;
         this.pipelineService = pipelineService;
         this.ruleMetricsConfigService = ruleMetricsConfigService;
         this.pipelineRuleParser = pipelineRuleParser;
         this.functionRegistry = functionRegistry;
         this.paginatedRuleService = paginatedRuleService;
+        this.pipelineServiceHelper = pipelineServiceHelper;
 
         this.searchQueryParser = new SearchQueryParser(RuleDao.FIELD_TITLE, SEARCH_FIELD_MAPPING);
     }
@@ -205,21 +206,24 @@ public class RuleResource extends RestResource implements PluginRestResource {
 
     @VisibleForTesting
     Map<String, Object> prepareContextForPaginatedResponse(List<RuleDao> rules) {
-        final Set<String> ruleTitles = rules
+        final Map<String, RuleDao> ruleTitleMap = rules
                 .stream()
-                .map(RuleDao::title)
-                .collect(Collectors.toSet());
-        final List<PipelineDao> usedInPipelines = pipelineService.loadByRules(ruleTitles);
+                .collect(Collectors.toMap(RuleDao::title, dao -> dao));
 
-        final Map<String, List<PipelineCompactSource>> usedInPipelinesMap = new HashMap<>();
-        rules.forEach(r -> usedInPipelinesMap.put(r.id(), usedInPipelines
+        final Map<String, List<PipelineCompactSource>> usedInPipelinesMap = pipelineServiceHelper.groupByRuleName(
+                        pipelineService::loadAll, ruleTitleMap.keySet())
+                .entrySet()
                 .stream()
-                .filter(p -> p.usesRule(r.title()))
-                .map(p -> PipelineCompactSource.builder()
-                        .id(p.id())
-                        .title(p.title())
-                        .build())
-                .collect(Collectors.toList())));
+                .collect(Collectors.toMap(
+                        e -> ruleTitleMap.get(e.getKey()).id(),
+                        e -> e.getValue()
+                                .stream()
+                                .map(dao -> PipelineCompactSource.builder()
+                                        .id(dao.id())
+                                        .title(dao.title())
+                                        .build())
+                                .collect(Collectors.toList())));
+
         return ImmutableMap.of("used_in_pipelines", usedInPipelinesMap);
     }
 

@@ -362,7 +362,7 @@ public class PipelineInterpreterTest {
                 null)
         );
 
-        final PipelineService pipelineService = new InMemoryPipelineService(null, new ClusterEventBus());
+        final PipelineService pipelineService = new InMemoryPipelineService(new ClusterEventBus());
         pipelineService.save(PipelineDao.create("cde", "title", "description",
                 "pipeline \"pipeline\"\n" +
                         "stage 0 match all\n" +
@@ -514,7 +514,7 @@ public class PipelineInterpreterTest {
                 SetField.NAME, new SetField(),
                 DoubleConversion.NAME, new DoubleConversion(),
                 HasField.NAME, new HasField()
-                ));
+        ));
 
         // when
         final List<Message> processed = extractMessagesFromMessageCollection(interpreter.process(messageWithNumField(new Long(1))));

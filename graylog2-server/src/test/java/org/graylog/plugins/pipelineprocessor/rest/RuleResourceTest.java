@@ -16,9 +16,11 @@
  */
 package org.graylog.plugins.pipelineprocessor.rest;
 
+import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.pipelineprocessor.db.PaginatedRuleService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
+import org.graylog.plugins.pipelineprocessor.db.PipelineServiceHelper;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleMetricsConfigService;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
@@ -33,12 +35,13 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.testcontainers.shaded.com.google.common.collect.ImmutableList;
 import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
-import org.testcontainers.shaded.com.google.common.collect.ImmutableSet;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.shared.utilities.StringUtils.f;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 
@@ -63,12 +66,15 @@ public class RuleResourceTest {
     @Mock
     FunctionRegistry functionRegistry;
 
+    @Mock
+    PipelineServiceHelper pipelineServiceHelper;
+
     RuleResource underTest;
 
     @Before
     public void setup() {
         underTest = new RuleResource(ruleService, pipelineService, ruleMetricsConfigService,
-                pipelineRuleParser, paginatedRuleService, functionRegistry);
+                pipelineRuleParser, paginatedRuleService, functionRegistry, pipelineServiceHelper);
     }
 
     @Test
@@ -100,25 +106,16 @@ public class RuleResourceTest {
                 ruleDao("rule-4", "Rule 4")
         );
 
-        when(pipelineService.loadByRules(ImmutableSet.of("Rule 1", "Rule 2", "Rule 3", "Rule 4")))
-                .thenReturn(ImmutableList.of(
-                        pipelineDao("pipeline-1", "Pipeline 1",
-                                "pipeline \"Pipeline 1\"\n" +
-                                        "stage 0 match either\n" +
-                                        "rule     \"Rule 1\"\n" +
-                                        "rule  \"Rule 3\"\n" +
-                                        "end"),
-                        pipelineDao("pipeline-2", "Pipeline 2",
-                                "pipeline \"Pipeline 2\"\n" +
-                                        "stage 0 match either\n" +
-                                        "rule\"Rule 2\"\n" +
-                                        "rule  \"Rule 3\"\n" +
-                                        "end"),
-                        pipelineDao("pipeline-3", "Pipeline 3",
-                                "pipeline \"Pipeline 3\"\n" +
-                                        "stage 0 match either\n" +
-                                        "rule \"Rule 3\"\n" +
-                                        "end")
+        when(pipelineServiceHelper.groupByRuleName(any(), eq(ImmutableSet.of("Rule 1", "Rule 2", "Rule 3", "Rule 4"))))
+                .thenReturn(ImmutableMap.of(
+                        "Rule 1", ImmutableList.of(pipelineDao("pipeline-1", "Pipeline 1")),
+                        "Rule 2", ImmutableList.of(pipelineDao("pipeline-2", "Pipeline 2")),
+                        "Rule 3", ImmutableList.of(
+                                pipelineDao("pipeline-1", "Pipeline 1"),
+                                pipelineDao("pipeline-2", "Pipeline 2"),
+                                pipelineDao("pipeline-3", "Pipeline 3")
+                        ),
+                        "Rule 4", ImmutableList.of()
                 ));
 
         assertThat(underTest.prepareContextForPaginatedResponse(rules))
@@ -142,14 +139,14 @@ public class RuleResourceTest {
                 "end", title), null, null);
     }
 
-    private PipelineDao pipelineDao(String id, String title, String source) {
+    private PipelineDao pipelineDao(String id, String title) {
         return PipelineDao.builder()
                 .id(id)
                 .title(title)
                 .description("Description")
                 .createdAt(DateTime.now(DateTimeZone.UTC))
                 .modifiedAt(DateTime.now(DateTimeZone.UTC))
-                .source(source)
+                .source("Source")
                 .build();
     }
 }

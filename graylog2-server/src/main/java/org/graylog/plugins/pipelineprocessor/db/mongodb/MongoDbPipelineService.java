@@ -21,7 +21,6 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.MongoException;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
-import org.graylog.plugins.pipelineprocessor.db.PipelineServiceHelper;
 import org.graylog.plugins.pipelineprocessor.events.PipelinesChangedEvent;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
@@ -39,8 +38,6 @@ import javax.inject.Inject;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
 
 public class MongoDbPipelineService implements PipelineService {
     private static final Logger log = LoggerFactory.getLogger(MongoDbPipelineService.class);
@@ -48,20 +45,17 @@ public class MongoDbPipelineService implements PipelineService {
     private static final String COLLECTION = "pipeline_processor_pipelines";
 
     private final JacksonDBCollection<PipelineDao, String> dbCollection;
-    private final PipelineServiceHelper pipelineServiceHelper;
     private final ClusterEventBus clusterBus;
 
     @Inject
     public MongoDbPipelineService(MongoConnection mongoConnection,
                                   MongoJackObjectMapperProvider mapper,
-                                  PipelineServiceHelper pipelineServiceHelper,
                                   ClusterEventBus clusterBus) {
         this.dbCollection = JacksonDBCollection.wrap(
                 mongoConnection.getDatabase().getCollection(COLLECTION),
                 PipelineDao.class,
                 String.class,
                 mapper.get());
-        this.pipelineServiceHelper = pipelineServiceHelper;
         this.clusterBus = clusterBus;
         dbCollection.createIndex(DBSort.asc("title"), new BasicDBObject("unique", true));
     }
@@ -93,11 +87,6 @@ public class MongoDbPipelineService implements PipelineService {
             throw new NotFoundException("No pipeline with name " + name);
         }
         return pipeline;
-    }
-
-    @Override
-    public List<PipelineDao> loadByRules(Set<String> ruleNames) {
-        return pipelineServiceHelper.filterByRuleName(this::loadAll, ruleNames);
     }
 
     @Override
