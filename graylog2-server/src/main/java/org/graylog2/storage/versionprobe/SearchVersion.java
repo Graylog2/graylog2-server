@@ -17,6 +17,7 @@
 package org.graylog2.storage.versionprobe;
 
 import com.google.auto.value.AutoValue;
+import org.graylog2.configuration.validators.SearchVersionRange;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.plugin.Version;
 
@@ -50,6 +51,10 @@ public abstract class SearchVersion {
 
     public boolean satisfies(final Distribution distribution, final String expression) {
         return this.distribution().equals(distribution) && version().getVersion().satisfies(expression);
+    }
+
+    public boolean satisfies(SearchVersionRange range) {
+        return satisfies(range.distribution(), range.expression());
     }
 
     public abstract Distribution distribution();

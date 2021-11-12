@@ -18,27 +18,32 @@ package org.graylog2.configuration.validators;
 
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.Validator;
-import com.google.common.collect.ImmutableList;
+import org.graylog2.plugin.Version;
 import org.graylog2.storage.versionprobe.SearchVersion;
+import org.junit.jupiter.api.Test;
 
-import java.util.List;
-
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.storage.versionprobe.SearchVersion.Distribution.ELASTICSEARCH;
 import static org.graylog2.storage.versionprobe.SearchVersion.Distribution.OPENSEARCH;
+import static org.junit.jupiter.api.Assertions.*;
 
-public class ElasticsearchVersionValidator implements Validator<SearchVersion> {
-    private static final List<SearchVersionRange> SUPPORTED_ES_VERSIONS = ImmutableList.of(
-            SearchVersionRange.of(OPENSEARCH, "^1.0.0"),
-            SearchVersionRange.of(ELASTICSEARCH, "^6.0.0"),
-            SearchVersionRange.of(ELASTICSEARCH, "^7.0.0")
-    );
+class ElasticsearchVersionValidatorTest {
 
+    private final Validator<SearchVersion> validator = new ElasticsearchVersionValidator();
 
-    @Override
-    public void validate(String name, SearchVersion value) throws ValidationException {
-        if (SUPPORTED_ES_VERSIONS.stream().noneMatch(value::satisfies)) {
-            throw new ValidationException("Invalid Search version specified in " + name + ": " + value
-                    + ". Supported versions: " + SUPPORTED_ES_VERSIONS);
-        }
+    @Test
+    void validateMajorVersion() {
+        assertDoesNotThrow(() -> validator.validate("OS1", SearchVersion.create(OPENSEARCH, Version.from(1, 0, 0))));
+        assertDoesNotThrow(() -> validator.validate("ES7", SearchVersion.create(ELASTICSEARCH, Version.from(7, 0, 0))));
+    }
+
+    @Test
+    void testPatchVersion() {
+        assertDoesNotThrow(() -> validator.validate("ES7", SearchVersion.create(ELASTICSEARCH, Version.from(7, 10, 2))));
+    }
+
+    @Test
+    void testInvalidCombination() {
+        assertThrows(ValidationException.class, () -> validator.validate("ES5", SearchVersion.create(ELASTICSEARCH, Version.from(5, 0, 0))));
     }
 }
