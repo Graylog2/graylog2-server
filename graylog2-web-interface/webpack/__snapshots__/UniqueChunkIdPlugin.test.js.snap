@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`UniqueChunkIdPlugin adds random identifier as a prefix for any given chunk 1`] = `
-Array [
+Set {
   Object {
     "id": "dead-0",
     "ids": Array [
@@ -15,11 +15,11 @@ Array [
       "dead-42",
     ],
   },
-]
+}
 `;
 
 exports[`UniqueChunkIdPlugin adds random identifier as a prefix for chunks with string ids 1`] = `
-Array [
+Set {
   Object {
     "id": "dead-foo",
     "ids": Array [
@@ -33,11 +33,11 @@ Array [
       "dead-bar",
     ],
   },
-]
+}
 `;
 
 exports[`UniqueChunkIdPlugin does not add random identifier if already present 1`] = `
-Array [
+Set {
   Object {
     "id": "dead-0",
     "ids": Array [
@@ -51,5 +51,5 @@ Array [
       "dead-42",
     ],
   },
-]
+}
 `;
