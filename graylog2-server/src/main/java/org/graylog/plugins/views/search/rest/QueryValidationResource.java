@@ -20,13 +20,12 @@ import com.google.common.collect.ImmutableSet;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.plugins.views.search.engine.QueryEngine;
 import org.graylog.plugins.views.search.engine.ValidationExplanation;
 import org.graylog.plugins.views.search.engine.ValidationRequest;
 import org.graylog.plugins.views.search.engine.ValidationResponse;
-import org.graylog.plugins.views.search.engine.validation.ValidationMessage;
+import org.graylog.plugins.views.search.engine.ValidationStatus;
 import org.graylog.plugins.views.search.engine.validation.ValidationMessageParser;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
@@ -40,11 +39,11 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 
@@ -88,11 +87,14 @@ public class QueryValidationResource extends RestResource implements PluginRestR
                 statusDTO = ValidationStatusDTO.OK;
         }
 
-        return ValidationResponseDTO.create(statusDTO, toExplanations(response.getExplanations()), response.getUnknownFields());
+        return ValidationResponseDTO.create(statusDTO, toExplanations(response), response.getUnknownFields());
     }
 
-    private List<ValidationExplanationDTO> toExplanations(List<ValidationExplanation> explanations) {
-        return explanations.stream()
+    private List<ValidationExplanationDTO> toExplanations(ValidationResponse response) {
+        if (ValidationStatus.OK.equals(response.getStatus())) {
+            return Collections.emptyList();
+        }
+        return response.getExplanations().stream()
                 .map(this::toExplanation)
                 .collect(Collectors.toList());
     }
