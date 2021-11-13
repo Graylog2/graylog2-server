@@ -14,47 +14,54 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.rest;
+package org.graylog.plugins.views.search.permissions;
 
 import org.graylog.plugins.views.search.Search;
-import org.junit.Test;
+import org.graylog2.plugin.database.users.User;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class SearchResourcePermissionsTest {
-    private SearchResource resourceToTestIsOwnerOfSearch() {
-        final SearchResource resource = mock(SearchResource.class);
-        when(resource.isOwnerOfSearch(any(), any())).thenCallRealMethod();
-        return resource;
+class SearchUserTest {
+    private User mockUser(String username) {
+        final User user = mock(User.class);
+        when(user.getName()).thenReturn(username);
+        return user;
+    }
+
+    private SearchUser searchUser(String username) {
+        return new SearchUser(mockUser(username), (perm) -> true, (perm, id) -> true);
     }
 
     @Test
     public void exactUserOfSearchIsOwner() {
-        final SearchResource resource = resourceToTestIsOwnerOfSearch();
         final String username = "karl";
         final Search search = Search.builder().owner(username).build();
 
-        assertThat(resource.isOwnerOfSearch(search, username)).isTrue();
+        final SearchUser searchUser = searchUser(username);
+
+        assertThat(searchUser.owns(search)).isTrue();
     }
 
     @Test
     public void anyUserIsOwnerOfLegacySearchesWithoutOwner() {
-        final SearchResource resource = resourceToTestIsOwnerOfSearch();
         final String username = "karl";
         final Search search = Search.builder().build();
 
-        assertThat(resource.isOwnerOfSearch(search, username)).isTrue();
+        final SearchUser searchUser = searchUser(username);
+
+        assertThat(searchUser.owns(search)).isTrue();
     }
 
     @Test
     public void usernameNotMatchingIsNotOwner() {
-        final SearchResource resource = resourceToTestIsOwnerOfSearch();
         final String username = "karl";
         final Search search = Search.builder().owner("friedrich").build();
 
-        assertThat(resource.isOwnerOfSearch(search, username)).isFalse();
+        final SearchUser searchUser = searchUser(username);
+
+        assertThat(searchUser.owns(search)).isFalse();
     }
 }

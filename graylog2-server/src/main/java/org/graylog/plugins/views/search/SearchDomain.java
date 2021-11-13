@@ -18,9 +18,10 @@ package org.graylog.plugins.views.search;
 
 import org.graylog.plugins.views.search.db.SearchDbService;
 import org.graylog.plugins.views.search.errors.PermissionException;
+import org.graylog.plugins.views.search.permissions.SearchPermissions;
+import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewService;
-import org.graylog2.plugin.database.users.User;
 
 import javax.inject.Inject;
 import java.util.Collection;
@@ -39,27 +40,27 @@ public class SearchDomain {
         this.viewService = viewService;
     }
 
-    public Optional<Search> getForUser(String id, User user, Predicate<ViewDTO> viewReadPermission) {
+    public Optional<Search> getForUser(String id, SearchUser searchUser) {
         final Optional<Search> search = dbService.get(id);
 
-        search.ifPresent(s -> checkPermission(user, viewReadPermission, s));
+        search.ifPresent(s -> checkPermission(searchUser, s));
 
         return search;
     }
 
-    private void checkPermission(User user, Predicate<ViewDTO> viewReadPermission, Search s) {
-        if (!hasReadPermissionFor(user, viewReadPermission, s))
-            throw new PermissionException("User " + user.getName() + " does not have permission to load search " + s.id());
+    private void checkPermission(SearchUser searchUser, Search search) {
+        if (!hasReadPermissionFor(searchUser, searchUser::canReadView, search))
+            throw new PermissionException("User " + searchUser.username() + " does not have permission to load search " + search.id());
     }
 
-    public List<Search> getAllForUser(User user, Predicate<ViewDTO> viewReadPermission) {
+    public List<Search> getAllForUser(SearchPermissions searchPermissions, Predicate<ViewDTO> viewReadPermission) {
         return dbService.streamAll()
-                .filter(s -> hasReadPermissionFor(user, viewReadPermission, s))
+                .filter(s -> hasReadPermissionFor(searchPermissions, viewReadPermission, s))
                 .collect(Collectors.toList());
     }
 
-    private boolean hasReadPermissionFor(User user, Predicate<ViewDTO> viewReadPermission, Search search) {
-        if (isOwned(search, user)) {
+    private boolean hasReadPermissionFor(SearchPermissions searchPermissions, Predicate<ViewDTO> viewReadPermission, Search search) {
+        if (searchPermissions.owns(search)) {
             return true;
         }
         // Allowed if permissions exist for a referencing view
@@ -68,9 +69,5 @@ public class SearchDomain {
             return false;
 
         return views.stream().anyMatch(viewReadPermission);
-    }
-
-    private boolean isOwned(Search search, User user) {
-        return search.owner().map(o -> o.equals(user.getName())).orElse(false);
     }
 }

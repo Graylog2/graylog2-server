@@ -14,7 +14,7 @@
   "license": "SSPL-1.0",
   "dependencies": {
     "@babel/eslint-parser": "7.13.14",
-    "@typescript-eslint/parser": "4.33.0",
+    "@typescript-eslint/parser": "4.29.1",
     "@typescript-eslint/eslint-plugin": "4.33.0",
     "eslint": "7.32.0",
     "eslint-config-airbnb": "18.2.1",
@@ -24,8 +24,8 @@
     "eslint-plugin-jest": "24.5.2",
     "eslint-plugin-jest-formatting": "2.0.1",
     "eslint-plugin-jsx-a11y": "6.4.1",
-    "eslint-plugin-react": "7.26.1",
-    "eslint-plugin-react-hooks": "4.2.0",
+    "eslint-plugin-react": "7.27.0",
+    "eslint-plugin-react-hooks": "4.3.0",
     "eslint-plugin-testing-library": "4.12.3",
     "eslint-plugin-jest-dom": "3.9.2"
   }

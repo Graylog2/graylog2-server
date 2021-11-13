@@ -27,6 +27,7 @@ import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchDomain;
 import org.graylog.plugins.views.search.SearchType;
+import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.WidgetDTO;
@@ -43,9 +44,6 @@ import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.resources.RestResource;
-import org.graylog2.shared.security.RestPermissions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -54,6 +52,7 @@ import javax.validation.constraints.NotNull;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
+import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
@@ -65,6 +64,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.util.Collection;
+import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -75,7 +75,6 @@ import static java.util.Locale.ENGLISH;
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
 public class ViewsResource extends RestResource implements PluginRestResource {
-    private static final Logger LOG = LoggerFactory.getLogger(ViewsResource.class);
     private static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
             .put("id", SearchQueryField.create(ViewDTO.FIELD_ID))
             .put("title", SearchQueryField.create(ViewDTO.FIELD_TITLE))
@@ -105,7 +104,8 @@ public class ViewsResource extends RestResource implements PluginRestResource {
                                                       required = true,
                                                       allowableValues = "id,title,created_at") @DefaultValue(ViewDTO.FIELD_TITLE) @QueryParam("sort") String sortField,
                                             @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc") @DefaultValue("asc") @QueryParam("order") String order,
-                                            @ApiParam(name = "query") @QueryParam("query") String query) {
+                                            @ApiParam(name = "query") @QueryParam("query") String query,
+                                            @Context SearchUser searchUser) {
 
         if (!ViewDTO.SORT_FIELDS.contains(sortField.toLowerCase(ENGLISH))) {
             sortField = ViewDTO.FIELD_TITLE;
@@ -115,8 +115,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
             final SearchQuery searchQuery = searchQueryParser.parse(query);
             final PaginatedList<ViewDTO> result = dbService.searchPaginated(
                     searchQuery,
-                    view -> isPermitted(ViewsRestPermissions.VIEW_READ, view.id())
-                            || (view.type().equals(ViewDTO.Type.DASHBOARD) && isPermitted(RestPermissions.DASHBOARDS_READ, view.id())),
+                    searchUser::canReadView,
                     order,
                     sortField,
                     page,
@@ -131,17 +130,16 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     @GET
     @Path("{id}")
     @ApiOperation("Get a single view")
-    public ViewDTO get(@ApiParam(name = "id") @PathParam("id") @NotEmpty String id) {
+    public ViewDTO get(@ApiParam(name = "id") @PathParam("id") @NotEmpty String id, @Context SearchUser searchUser) {
         if ("default".equals(id)) {
             // If the user is not permitted to access the default view, return a 404
             return dbService.getDefault()
-                    .filter(dto -> isPermitted(ViewsRestPermissions.VIEW_READ, dto.id()))
+                    .filter(searchUser::canReadView)
                     .orElseThrow(() -> new NotFoundException("Default view doesn't exist"));
         }
 
         final ViewDTO view = loadView(id);
-        if (isPermitted(ViewsRestPermissions.VIEW_READ, id)
-                || (view.type().equals(ViewDTO.Type.DASHBOARD) && isPermitted(RestPermissions.DASHBOARDS_READ, view.id()))) {
+        if (searchUser.canReadView(view)) {
             return view;
         }
 
@@ -151,20 +149,21 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     @POST
     @ApiOperation("Create a new view")
     @AuditEvent(type = ViewsAuditEventTypes.VIEW_CREATE)
-    public ViewDTO create(@ApiParam @Valid  @NotNull(message = "View is mandatory") ViewDTO dto, @Context UserContext userContext) throws ValidationException {
-        if (dto.type().equals(ViewDTO.Type.DASHBOARD)) {
-            checkPermission(RestPermissions.DASHBOARDS_CREATE);
+    public ViewDTO create(@ApiParam @Valid  @NotNull(message = "View is mandatory") ViewDTO dto,
+                          @Context UserContext userContext,
+                          @Context SearchUser searchUser) throws ValidationException {
+        if (dto.type().equals(ViewDTO.Type.DASHBOARD) && !searchUser.canCreateDashboards()) {
+            throw new ForbiddenException("User is not allowed to create new dashboards.");
         }
 
-        validateIntegrity(dto);
+        validateIntegrity(dto, searchUser);
 
         final User user = userContext.getUser();
-        final ViewDTO savedDto = dbService.saveWithOwner(dto.toBuilder().owner(user.getName()).build(), user);
-        return savedDto;
+        return dbService.saveWithOwner(dto.toBuilder().owner(searchUser.username()).build(), user);
     }
 
-    private void validateIntegrity(ViewDTO dto) {
-        final Search search = searchDomain.getForUser(dto.searchId(), getCurrentUser(), this::hasViewReadPermission)
+    private void validateIntegrity(ViewDTO dto, SearchUser searchUser) {
+        final Search search = searchDomain.getForUser(dto.searchId(), searchUser)
                 .orElseThrow(() -> new BadRequestException("Search " + dto.searchId() + " not available"));
 
         final Set<String> searchQueries = search.queries().stream()
@@ -208,30 +207,21 @@ public class ViewsResource extends RestResource implements PluginRestResource {
         }
     }
 
-    private boolean hasViewReadPermission(ViewDTO view) {
-        final String viewId = view.id();
-        return isPermitted(ViewsRestPermissions.VIEW_READ, viewId)
-                || (view.type().equals(ViewDTO.Type.DASHBOARD) && isPermitted(RestPermissions.DASHBOARDS_READ, viewId));
-    }
-
     @PUT
     @Path("{id}")
     @ApiOperation("Update view")
     @AuditEvent(type = ViewsAuditEventTypes.VIEW_UPDATE)
     public ViewDTO update(@ApiParam(name = "id") @PathParam("id") @NotEmpty String id,
-                          @ApiParam @Valid ViewDTO dto) {
-        if (dto.type().equals(ViewDTO.Type.DASHBOARD)) {
-            checkAnyPermission(new String[]{
-                    ViewsRestPermissions.VIEW_EDIT,
-                    RestPermissions.DASHBOARDS_EDIT
-            }, id);
-        } else {
-            checkPermission(ViewsRestPermissions.VIEW_EDIT, id);
+                          @ApiParam @Valid ViewDTO dto,
+                          @Context SearchUser searchUser) {
+        final ViewDTO updatedDTO = dto.toBuilder().id(id).build();
+        if (!searchUser.canUpdateView(updatedDTO)) {
+            throw new ForbiddenException("Not allowed to edit " + summarize(updatedDTO) + ".");
         }
 
-        validateIntegrity(dto);
+        validateIntegrity(updatedDTO, searchUser);
 
-        return dbService.update(dto.toBuilder().id(id).build());
+        return dbService.update(updatedDTO);
     }
 
     @PUT
@@ -248,12 +238,20 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     @Path("{id}")
     @ApiOperation("Delete view")
     @AuditEvent(type = ViewsAuditEventTypes.VIEW_DELETE)
-    public ViewDTO delete(@ApiParam(name = "id") @PathParam("id") @NotEmpty String id) {
-        checkPermission(ViewsRestPermissions.VIEW_DELETE, id);
-        final ViewDTO dto = loadView(id);
+    public ViewDTO delete(@ApiParam(name = "id") @PathParam("id") @NotEmpty String id,
+                          @Context SearchUser searchUser) {
+        final ViewDTO view = loadView(id);
+        if (!searchUser.canDeleteView(view)) {
+            throw new ForbiddenException("Unable to delete " + summarize(view) + ".");
+        }
+
         dbService.delete(id);
-        triggerDeletedEvent(dto);
-        return dto;
+        triggerDeletedEvent(view);
+        return view;
+    }
+
+    private String summarize(ViewDTO view) {
+        return view.type().toString().toLowerCase(Locale.ROOT) + " <" + view.id() + ">";
     }
 
     private void triggerDeletedEvent(ViewDTO dto) {

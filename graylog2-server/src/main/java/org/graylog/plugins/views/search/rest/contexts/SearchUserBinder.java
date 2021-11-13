@@ -14,15 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.elasticsearch6;
+package org.graylog.plugins.views.search.rest.contexts;
 
-import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.sort.SortOrder;
-import org.graylog2.indexer.searches.Sorting;
+import org.glassfish.hk2.utilities.binding.AbstractBinder;
+import org.glassfish.jersey.process.internal.RequestScoped;
+import org.graylog.plugins.views.search.permissions.SearchUser;
 
-import java.util.Locale;
-
-public class SortOrderMapper {
-    public SortOrder fromSorting(Sorting sorting) {
-        return SortOrder.valueOf(sorting.getDirection().toString().toUpperCase(Locale.ENGLISH));
+public class SearchUserBinder extends AbstractBinder {
+    @Override
+    protected void configure() {
+        bindFactory(SearchUserFactory.class)
+                .to(SearchUser.class)
+                .in(RequestScoped.class);
     }
 }
