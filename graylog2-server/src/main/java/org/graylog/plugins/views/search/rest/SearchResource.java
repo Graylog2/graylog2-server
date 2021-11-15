@@ -17,7 +17,6 @@
 package org.graylog.plugins.views.search.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.eventbus.EventBus;
@@ -40,12 +39,11 @@ import org.graylog.plugins.views.search.db.SearchDbService;
 import org.graylog.plugins.views.search.db.SearchJobService;
 import org.graylog.plugins.views.search.engine.QueryEngine;
 import org.graylog.plugins.views.search.events.SearchJobExecutionEvent;
-import org.graylog.plugins.views.search.views.ViewDTO;
+import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.rest.resources.RestResource;
-import org.graylog2.shared.security.RestPermissions;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -63,10 +61,10 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -115,27 +113,18 @@ public class SearchResource extends RestResource implements PluginRestResource {
         this.serverEventBus = serverEventBus;
     }
 
-    @VisibleForTesting
-    boolean isOwnerOfSearch(Search search, String username) {
-        return search.owner()
-                .map(owner -> owner.equals(username))
-                .orElse(true);
-    }
-
     @POST
     @ApiOperation(value = "Create a search query", response = Search.class, code = 201)
     @AuditEvent(type = ViewsAuditEventTypes.SEARCH_CREATE)
-    public Response createSearch(@ApiParam Search search) {
-        final String username = username();
-        final boolean isAdmin = getCurrentUser() != null && (getCurrentUser().isLocalAdmin() || isPermitted("*"));
+    public Response createSearch(@ApiParam Search search, @Context SearchUser searchUser) {
         final Optional<Search> previous = Optional.ofNullable(search.id()).flatMap(searchDbService::get);
-        if (!isAdmin && !previous.map(existingSearch -> isOwnerOfSearch(existingSearch, username)).orElse(true)) {
+        if (!searchUser.isAdmin() && !previous.map(searchUser::owns).orElse(true)) {
             throw new ForbiddenException("Unable to update search with id <" + search.id() + ">, already exists and user is not permitted to overwrite it.");
         }
 
-        guard(search);
+        guard(search, searchUser);
 
-        final Search saved = searchDbService.save(search.toBuilder().owner(username).build());
+        final Search saved = searchDbService.save(search.toBuilder().owner(searchUser.username()).build());
         if (saved == null || saved.id() == null) {
             return Response.serverError().build();
         }
@@ -143,29 +132,19 @@ public class SearchResource extends RestResource implements PluginRestResource {
         return Response.created(URI.create(Objects.requireNonNull(saved.id()))).entity(saved).build();
     }
 
-    private String username() {
-        return getCurrentUser() != null ? getCurrentUser().getName() : null;
-    }
-
     @GET
     @ApiOperation(value = "Retrieve a search query")
     @Path("{id}")
-    public Search getSearch(@ApiParam(name = "id") @PathParam("id") String searchId) {
-        return searchDomain.getForUser(searchId, getCurrentUser(), this::hasViewReadPermission)
+    public Search getSearch(@ApiParam(name = "id") @PathParam("id") String searchId, @Context SearchUser searchUser) {
+        return searchDomain.getForUser(searchId, searchUser)
                 .orElseThrow(() -> new NotFoundException("Search with id " + searchId + " does not exist"));
-    }
-
-    private boolean hasViewReadPermission(ViewDTO view) {
-        final String viewId = view.id();
-        return isPermitted(ViewsRestPermissions.VIEW_READ, viewId)
-                || (view.type().equals(ViewDTO.Type.DASHBOARD) && isPermitted(RestPermissions.DASHBOARDS_READ, viewId));
     }
 
     @GET
     @ApiOperation(value = "Get all searches which the user may see")
-    public List<Search> getAllSearches() {
+    public List<Search> getAllSearches(@Context SearchUser searchUser) {
         // TODO should be paginated
-        return searchDomain.getAllForUser(getCurrentUser(), this::hasViewReadPermission);
+        return searchDomain.getAllForUser(searchUser, searchUser::canReadView);
     }
 
     @POST
@@ -174,16 +153,17 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @Path("{id}/execute")
     @NoAuditEvent("Creating audit event manually in method body.")
     public Response executeQuery(@ApiParam(name = "id") @PathParam("id") String id,
-                                 @ApiParam ExecutionState executionState) {
-        Search search = getSearch(id);
+                                 @ApiParam ExecutionState executionState,
+                                 @Context SearchUser searchUser) {
+        Search search = getSearch(id, searchUser);
 
-        search = search.addStreamsToQueriesWithoutStreams(this::loadAllAllowedStreamsForUser);
+        search = search.addStreamsToQueriesWithoutStreams(() -> loadAllAllowedStreamsForUser(searchUser));
 
-        guard(search);
+        guard(search, searchUser);
 
         search = search.applyExecutionState(objectMapper, firstNonNull(executionState, ExecutionState.empty()));
 
-        final SearchJob searchJob = searchJobService.create(search, username());
+        final SearchJob searchJob = searchJobService.create(search, searchUser.username());
 
         postAuditEvent(searchJob);
 
@@ -199,16 +179,12 @@ public class SearchResource extends RestResource implements PluginRestResource {
         this.serverEventBus.post(searchJobExecutionEvent);
     }
 
-    private ImmutableSet<String> loadAllAllowedStreamsForUser() {
-        return permittedStreams.load(this::hasStreamReadPermission);
+    private ImmutableSet<String> loadAllAllowedStreamsForUser(SearchUser searchUser) {
+        return permittedStreams.load(searchUser::canReadStream);
     }
 
-    private boolean hasStreamReadPermission(String streamId) {
-        return isPermitted(RestPermissions.STREAMS_READ, streamId);
-    }
-
-    private void guard(Search search) {
-        this.executionGuard.check(search, this::hasStreamReadPermission);
+    private void guard(Search search, SearchUser searchUser) {
+        this.executionGuard.check(search, searchUser::canReadStream);
     }
 
     @POST
@@ -217,19 +193,19 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @NoAuditEvent("Creating audit event manually in method body.")
     public Response executeSyncJob(@ApiParam @NotNull(message = "Search body is mandatory") Search search,
                                    @ApiParam(name = "timeout", defaultValue = "60000")
-                                   @QueryParam("timeout") @DefaultValue("60000") long timeout) {
-        final String username = username();
+                                   @QueryParam("timeout") @DefaultValue("60000") long timeout,
+                                   @Context SearchUser searchUser) {
+        final String username = searchUser.username();
 
-        search = search.addStreamsToQueriesWithoutStreams(this::loadAllAllowedStreamsForUser);
+        search = search.addStreamsToQueriesWithoutStreams(() -> loadAllAllowedStreamsForUser(searchUser));
 
-        guard(search);
+        guard(search, searchUser);
 
         final SearchJob searchJob = queryEngine.execute(searchJobService.create(search, username));
 
         postAuditEvent(searchJob);
 
         try {
-            //noinspection UnstableApiUsage
             Uninterruptibles.getUninterruptibly(searchJob.getResultFuture(), timeout, TimeUnit.MILLISECONDS);
         } catch (ExecutionException e) {
             LOG.error("Error executing search job <{}>", searchJob.getId(), e);
@@ -244,15 +220,13 @@ public class SearchResource extends RestResource implements PluginRestResource {
         return Response.ok(searchJob).build();
     }
 
-
     @GET
     @ApiOperation(value = "Retrieve the status of an executed query")
     @Path("status/{jobId}")
-    public SearchJob jobStatus(@ApiParam(name = "jobId") @PathParam("jobId") String jobId) {
-        final SearchJob searchJob = searchJobService.load(jobId, username()).orElseThrow(NotFoundException::new);
+    public SearchJob jobStatus(@ApiParam(name = "jobId") @PathParam("jobId") String jobId, @Context SearchUser searchUser) {
+        final SearchJob searchJob = searchJobService.load(jobId, searchUser.username()).orElseThrow(NotFoundException::new);
         try {
             // force a "conditional join", to catch fast responses without having to poll
-            //noinspection UnstableApiUsage
             Uninterruptibles.getUninterruptibly(searchJob.getResultFuture(), 5, TimeUnit.MILLISECONDS);
         } catch (ExecutionException | TimeoutException ignore) {
         }
@@ -262,8 +236,8 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @GET
     @ApiOperation(value = "Metadata for the given Search object", notes = "Used for already persisted search objects")
     @Path("metadata/{searchId}")
-    public SearchMetadata metadata(@ApiParam("searchId") @PathParam("searchId") String searchId) {
-        final Search search = getSearch(searchId);
+    public SearchMetadata metadata(@ApiParam("searchId") @PathParam("searchId") String searchId, @Context SearchUser searchUser) {
+        final Search search = getSearch(searchId, searchUser);
         return metadataForObject(search);
     }
 
