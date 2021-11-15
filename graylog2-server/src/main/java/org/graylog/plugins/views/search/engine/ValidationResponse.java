@@ -25,10 +25,22 @@ public class ValidationResponse {
     private final List<ValidationExplanation> explanations;
     private final Set<String> unknownFields;
 
-    public ValidationResponse(ValidationStatus status, List<ValidationExplanation> explanations, Set<String> unknownFields) {
-        this.status = status;
+    public ValidationResponse(boolean isValid, List<ValidationExplanation> explanations, Set<String> unknownFields) {
+        this.status = getStatus(isValid, unknownFields);
         this.explanations = explanations;
         this.unknownFields = unknownFields;
+    }
+
+    private static ValidationStatus getStatus(boolean isValid, Set<String> unknownFields) {
+        if (isValid) {
+            if (unknownFields.isEmpty()) {
+                return ValidationStatus.OK;
+            } else {
+                return ValidationStatus.WARNING;
+            }
+        } else {
+            return ValidationStatus.ERROR;
+        }
     }
 
     public List<ValidationExplanation> getExplanations() {

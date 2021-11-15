@@ -327,11 +327,14 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
         final ValidationResult response = objectMapper.convertValue(result.getJsonObject(), ValidationResult.class);
 
         final List<ValidationExplanation> explanations = response.getExplanations().stream()
-                .filter(e -> affectedIndices.contains(e.getIndex())) // TODO: fix this!
+                .filter(e -> affectedIndices.contains(e.getIndex())) // TODO: is there a better way to get only results for our indices?
                 .map(e -> new ValidationExplanation(e.getIndex(), -1, e.isValid(), e.getExplanation(), e.getError()))
                 .collect(Collectors.toList());
 
-        final Set<String> unknownFields = new HashSet<>();
+        return new ValidationResponse(response.isValid(), explanations, getUnknownFields(req, backendQuery, response));
+    }
+
+    private Set<String> getUnknownFields(ValidationRequest req, ElasticsearchQueryString backendQuery, ValidationResult response) {
         if (response.isValid()) {
             try {
                 final Set<String> detectedFields = luceneQueryParser.getFieldNames(backendQuery.queryString());
@@ -339,23 +342,11 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                         .stream()
                         .map(MappedFieldTypeDTO::name)
                         .collect(Collectors.toSet());
-
-                detectedFields.stream().filter(f -> !availableFields.contains(f)).forEach(unknownFields::add);
+                return detectedFields.stream().filter(f -> !availableFields.contains(f)).collect(Collectors.toSet());
             } catch (LuceneQueryParsingException e) {
                 LOG.warn("Failed to parse lucene query", e);
             }
         }
-
-        final ValidationStatus status;
-        if (response.isValid()) {
-            if (unknownFields.isEmpty()) {
-                status = ValidationStatus.OK;
-            } else {
-                status = ValidationStatus.WARNING;
-            }
-        } else {
-            status = ValidationStatus.ERROR;
-        }
-        return new ValidationResponse(status, explanations, unknownFields);
+        return Collections.emptySet();
     }
 }

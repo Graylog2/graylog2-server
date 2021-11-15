@@ -332,32 +332,24 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                 .map(e -> new ValidationExplanation(e.getIndex(), e.getShard(), e.isValid(), e.getExplanation(), e.getError()))
                 .collect(Collectors.toList());
 
-        final Set<String> unknownFields = new HashSet<>();
-        if(response.isValid()) {
+        final Set<String> unknownFields = getUnknownFields(req, backendQuery, response);
+        return new ValidationResponse(response.isValid(), explanations, unknownFields);
+    }
+
+    private Set<String> getUnknownFields(ValidationRequest req, ElasticsearchQueryString backendQuery, ValidateQueryResponse response) {
+        if (response.isValid()) {
             try {
                 final Set<String> detectedFields = luceneQueryParser.getFieldNames(backendQuery.queryString());
                 final Set<String> availableFields = mappedFieldTypesService.fieldTypesByStreamIds(req.streams(), req.timerange())
                         .stream()
                         .map(MappedFieldTypeDTO::name)
                         .collect(Collectors.toSet());
-
-                detectedFields.stream().filter(f -> !availableFields.contains(f)).forEach(unknownFields::add);
+                return detectedFields.stream().filter(f -> !availableFields.contains(f)).collect(Collectors.toSet());
             } catch (LuceneQueryParsingException e) {
                 LOG.warn("Failed to parse lucene query", e);
             }
         }
-
-        final ValidationStatus status;
-        if(response.isValid()) {
-            if(unknownFields.isEmpty()) {
-                status = ValidationStatus.OK;
-            } else {
-                status = ValidationStatus.WARNING;
-            }
-        } else {
-            status = ValidationStatus.ERROR;
-        }
-        return new ValidationResponse(status, explanations, unknownFields);
+        return Collections.emptySet();
     }
 
     private Optional<ElasticsearchException> checkForFailedShards(MultiSearchResponse.Item multiSearchResponse) {
