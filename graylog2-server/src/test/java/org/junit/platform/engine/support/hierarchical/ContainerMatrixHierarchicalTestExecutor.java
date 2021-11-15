@@ -23,6 +23,7 @@ import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.ExecutionRequest;
 import org.junit.platform.engine.TestDescriptor;
 
+import java.util.Collection;
 import java.util.Optional;
 import java.util.concurrent.Future;
 
@@ -32,18 +33,18 @@ public class ContainerMatrixHierarchicalTestExecutor<C extends EngineExecutionCo
     private final C rootContext;
     private final HierarchicalTestExecutorService executorService;
     private final ThrowableCollector.Factory throwableCollectorFactory;
-    private final TestDescriptor testDescriptor;
+    private final Collection<? extends TestDescriptor> testDescriptors;
     public static Optional<GraylogBackend> graylogBackend = Optional.empty();
     public static Optional<RequestSpecification> requestSpecification = Optional.empty();
 
     ContainerMatrixHierarchicalTestExecutor(ExecutionRequest request, C rootContext, HierarchicalTestExecutorService executorService,
-                                            ThrowableCollector.Factory throwableCollectorFactory, TestDescriptor testDescriptor, GraylogBackend backend,
+                                            ThrowableCollector.Factory throwableCollectorFactory, Collection<? extends TestDescriptor> testDescriptors, GraylogBackend backend,
                                             RequestSpecification spec) {
         this.request = request;
         this.rootContext = rootContext;
         this.executorService = executorService;
         this.throwableCollectorFactory = throwableCollectorFactory;
-        this.testDescriptor = testDescriptor;
+        this.testDescriptors = testDescriptors;
         graylogBackend = Optional.of(backend);
         requestSpecification = Optional.of(spec);
     }
@@ -52,7 +53,7 @@ public class ContainerMatrixHierarchicalTestExecutor<C extends EngineExecutionCo
         ContainerMatrixEngineDescriptor rd = (ContainerMatrixEngineDescriptor) request.getRootTestDescriptor();
         ContainerMatrixEngineDescriptor rootTestDescriptor = new ContainerMatrixEngineDescriptor(rd.getUniqueId(),
                 rd.getDisplayName(), rd.getConfiguration());
-        rootTestDescriptor.addChildren(testDescriptor.getChildren());
+        rootTestDescriptor.addChildren(testDescriptors);
 
         EngineExecutionListener executionListener = this.request.getEngineExecutionListener();
         NodeExecutionAdvisor executionAdvisor = new NodeTreeWalker().walk(rootTestDescriptor);
