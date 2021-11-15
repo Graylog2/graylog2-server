@@ -169,7 +169,7 @@ public class InputStatesResource extends AbstractInputsResource {
         final MessageInput messageInput = persistedInputs.get(id);
         if (messageInput != null) {
             messageInput.setDesiredState(desiredState);
-            persistedInputs.updateNoEvents(id, messageInput);
+            persistedInputs.saveWithoutEvents(id, messageInput);
         }
     }
 }

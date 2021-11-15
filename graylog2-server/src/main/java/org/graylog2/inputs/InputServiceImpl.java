@@ -136,7 +136,6 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
         return save(model, true);
     }
 
-    @Override
     public <T extends Persisted> String saveWithoutEvents(T model) throws ValidationException {
         return save(model, false);
     }

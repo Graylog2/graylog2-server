@@ -24,5 +24,5 @@ public interface PersistedInputs extends Iterable<MessageInput> {
     boolean remove(Object o);
     boolean update(String id, MessageInput newInput);
 
-    boolean updateNoEvents(String id, MessageInput newInput);
+    boolean saveWithoutEvents(String id, MessageInput newInput);
 }

@@ -195,11 +195,6 @@ public class PersistedServiceImpl implements PersistedService {
     }
 
     @Override
-    public <T extends Persisted> String saveWithoutEvents(T model) throws ValidationException {
-        return save(model);
-    }
-
-    @Override
     public <T extends Persisted> String saveWithoutValidation(T model) {
         try {
             return save(model);

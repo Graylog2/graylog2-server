@@ -115,7 +115,7 @@ public class PersistedInputsImpl implements PersistedInputs {
     }
 
     @Override
-    public boolean updateNoEvents(String id, MessageInput newInput) {
+    public boolean saveWithoutEvents(String id, MessageInput newInput) {
         return update(id, newInput, false);
     }
 
