@@ -21,11 +21,14 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import com.google.common.collect.ImmutableMap;
+import org.graylog.plugins.views.search.Parameter;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.engine.ValidationRequest;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import javax.annotation.Nullable;
+import java.util.Map;
 import java.util.Set;
 
 @AutoValue
@@ -47,6 +50,9 @@ public abstract class ValidationRequestDTO {
     @JsonProperty(FIELD_STREAMS)
     public abstract Set<String> streams();
 
+    @JsonProperty
+    public abstract ImmutableMap<String,  Parameter.Binding> parameterBindings();
+
     @AutoValue.Builder
     public abstract static class Builder {
 
@@ -59,6 +65,15 @@ public abstract class ValidationRequestDTO {
 
         @JsonProperty(FIELD_TIMERANGE)
         public abstract ValidationRequestDTO.Builder timerange(@Nullable TimeRange timerange);
+
+        public abstract ImmutableMap.Builder<String,  Parameter.Binding> parameterBindingsBuilder();
+
+        @JsonProperty("parameter_bindings")
+        public Builder withParameterBindings(Map<String,  Parameter.Binding> values) {
+            values.forEach((s, o) -> parameterBindingsBuilder().put(s, o));
+            return this;
+        }
+
 
         public abstract ValidationRequestDTO build();
 
