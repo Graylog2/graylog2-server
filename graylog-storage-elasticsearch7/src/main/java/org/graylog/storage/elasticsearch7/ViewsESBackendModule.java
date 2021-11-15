@@ -38,6 +38,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Cardinality;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Latest;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Max;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Min;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Percentile;
@@ -62,6 +63,7 @@ import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.buckets.ESValu
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.series.ESAverageHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.series.ESCardinalityHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.series.ESCountHandler;
+import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.series.ESLatestHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.series.ESMaxHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.series.ESMinHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.series.ESPercentilesHandler;
@@ -94,6 +96,7 @@ public class ViewsESBackendModule extends ViewsModule {
         registerPivotSeriesHandler(SumOfSquares.NAME, ESSumOfSquaresHandler.class);
         registerPivotSeriesHandler(Variance.NAME, ESVarianceHandler.class);
         registerPivotSeriesHandler(Percentile.NAME, ESPercentilesHandler.class);
+        registerPivotSeriesHandler(Latest.NAME, ESLatestHandler.class);
 
         registerPivotBucketHandler(Values.NAME, ESValuesHandler.class);
         registerPivotBucketHandler(Time.NAME, ESTimeHandler.class);

@@ -77,6 +77,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Cardinality;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Latest;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Max;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Min;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Percentile;
@@ -157,6 +158,7 @@ public class ViewsBindings extends ViewsModule {
         registerPivotAggregationFunction(SumOfSquares.NAME, "Sum of Squares", SumOfSquares.class);
         registerPivotAggregationFunction(Variance.NAME, "Variance", Variance.class);
         registerPivotAggregationFunction(Percentile.NAME, "Percentile", Percentile.class);
+        registerPivotAggregationFunction(Latest.NAME, "Latest Value", Latest.class);
 
         registerJacksonSubtype(TimeUnitInterval.class);
         registerJacksonSubtype(TimeUnitIntervalDTO.class);
