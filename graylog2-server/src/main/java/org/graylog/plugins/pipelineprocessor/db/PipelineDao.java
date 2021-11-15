@@ -24,9 +24,6 @@ import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
-import java.util.regex.Pattern;
-
-import static org.graylog2.shared.utilities.StringUtils.f;
 
 @AutoValue
 public abstract class PipelineDao {
@@ -60,11 +57,6 @@ public abstract class PipelineDao {
     @JsonProperty
     @Nullable
     public abstract DateTime modifiedAt();
-
-    public boolean usesRule(String ruleTitle) {
-        final Pattern p = Pattern.compile(f(".*rule\\s*\\\"%s\\\".*", ruleTitle), Pattern.DOTALL);
-        return p.matcher(source()).matches();
-    }
 
     public static Builder builder() {
         return new AutoValue_PipelineDao.Builder();
