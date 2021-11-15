@@ -16,6 +16,7 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
+import moment from 'moment';
 
 import { LinkContainer } from 'components/common/router';
 import { Alert, Button } from 'components/bootstrap';
@@ -43,9 +44,7 @@ class AlertMessages extends React.Component {
   PAGE_SIZE = 20;
 
   _getFrom = () => {
-    const momentFrom = DateTime.parseFromString(this.props.alert.triggered_at).toMoment();
-
-    return momentFrom.subtract(1, 'minute').toISOString();
+    return moment(this.props.alert.triggered_at).subtract(1, 'minute').toISOString();
   };
 
   _getTo = () => {
