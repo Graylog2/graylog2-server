@@ -35,10 +35,11 @@ const getUserTimezone = (userTimezone) => {
 };
 
 export const DATE_TIME_FORMATS = {
-  default: 'YYYY-MM-DD HH:mm:ss',
-  complete: 'YYYY-MM-DD HH:mm:ss.SSS',
-  withTz: 'YYYY-MM-DD HH:mm:ss Z',
-  readable: 'dddd D MMMM YYYY, HH:mm ZZ',
+  default: 'YYYY-MM-DD HH:mm:ss', // default format when displaying date times
+  complete: 'YYYY-MM-DD HH:mm:ss.SSS', // includes ms, useful were precise time is important
+  withTz: 'YYYY-MM-DD HH:mm:ss Z', // includes the time zone
+  readable: 'dddd D MMMM YYYY, HH:mm ZZ', // easy to read
+  internal: 'YYYY-MM-DDTHH:mm:ss.SSSZ', // ISO 8601, internal default, not really nice to read. Mostly used communication with the API.
 };
 
 /**
