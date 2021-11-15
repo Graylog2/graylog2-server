@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import styled, { DefaultTheme } from 'styled-components';
-import { debounce, isEmpty } from 'lodash';
+import { debounce, isEmpty, uniq } from 'lodash';
 import { useState, useEffect, useRef } from 'react';
 import { Overlay, Transition } from 'react-overlays';
 
@@ -72,9 +72,16 @@ const useValidateQuery = (queryString, timeRange, streams): QueryValidationState
 
 const getExplanationTitle = (status, explanations) => {
   const baseTitle = StringUtils.capitalizeFirstLetter(status.toLocaleLowerCase());
-  const errorTitles = explanations.map(({ message: { errorType } }) => errorType).join(', ');
+  const errorTitles = explanations.map(({ message: { errorType } }) => errorType);
+  const uniqErrorTitles = uniq(errorTitles).join(', ');
 
-  return `${baseTitle} (${errorTitles})`;
+  return `${baseTitle} (${uniqErrorTitles})`;
+};
+
+const uniqErrorMessages = (explanations) => {
+  const errorMessages = explanations.map(({ message: { errorMessage } }) => errorMessage);
+
+  return uniq(errorMessages).join('. ');
 };
 
 type Props = {
@@ -101,6 +108,7 @@ const QueryValidation = ({ queryString, timeRange, streams }: Props) => {
   }
 
   const { status, explanations } = validationState;
+  const errorMessages = uniqErrorMessages(explanations);
 
   return (
     <Container ref={() => containerRef}>
@@ -116,7 +124,7 @@ const QueryValidation = ({ queryString, timeRange, streams }: Props) => {
                  target={explanationTriggerRef.current}
                  transition={Transition}>
           <Popover id="query-validation-error-explanation" title={getExplanationTitle(status, explanations)}>
-            {explanations.map(({ message: { errorMessage } }) => errorMessage).join('. ')}
+            {errorMessages}
           </Popover>
         </Overlay>
       )}
