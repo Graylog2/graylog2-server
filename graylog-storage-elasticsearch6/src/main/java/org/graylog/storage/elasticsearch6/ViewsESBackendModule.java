@@ -133,16 +133,16 @@ public class ViewsESBackendModule extends ViewsModule {
         return pivotBucketHandlerBinder().addBinding(name).to(implementation);
     }
 
-    protected MapBinder<String, ESPivotSeriesSpecHandler<? extends SeriesSpec, ?>> pivotSeriesHandlerBinder() {
+    protected MapBinder<String, ESPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>> pivotSeriesHandlerBinder() {
         return MapBinder.newMapBinder(binder(),
                 TypeLiteral.get(String.class),
-                new TypeLiteral<ESPivotSeriesSpecHandler<? extends SeriesSpec, ?>>() {});
+                new TypeLiteral<ESPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>>() {});
 
     }
 
     private ScopedBindingBuilder registerPivotSeriesHandler(
             String name,
-            Class<? extends ESPivotSeriesSpecHandler<? extends SeriesSpec, ?>> implementation
+            Class<? extends ESPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>> implementation
     ) {
         return pivotSeriesHandlerBinder().addBinding(name).to(implementation);
     }

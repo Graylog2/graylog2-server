@@ -60,7 +60,7 @@ import java.util.stream.Stream;
 public class ESPivot implements ESSearchTypeHandler<Pivot> {
     private static final Logger LOG = LoggerFactory.getLogger(ESPivot.class);
     private final Map<String, ESPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation>> bucketHandlers;
-    private final Map<String, ESPivotSeriesSpecHandler<? extends SeriesSpec, ?>> seriesHandlers;
+    private final Map<String, ESPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>> seriesHandlers;
     private static final TimeRange ALL_MESSAGES_TIMERANGE = allMessagesTimeRange();
 
     private static TimeRange allMessagesTimeRange() {
@@ -74,7 +74,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
 
     @Inject
     public ESPivot(Map<String, ESPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation>> bucketHandlers,
-                   Map<String, ESPivotSeriesSpecHandler<? extends SeriesSpec, ?>> seriesHandlers) {
+                   Map<String, ESPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>> seriesHandlers) {
         this.bucketHandlers = bucketHandlers;
         this.seriesHandlers = seriesHandlers;
     }
@@ -171,7 +171,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
                 .mapKeyValue((integer, seriesSpec) -> {
                     final String seriesName = queryContext.seriesName(seriesSpec, pivot);
                     LOG.debug("Adding {} series '{}' with name '{}'", reason, seriesSpec.type(), seriesName);
-                    final ESPivotSeriesSpecHandler<? extends SeriesSpec, ?> esPivotSeriesSpecHandler = seriesHandlers.get(seriesSpec.type());
+                    final ESPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation> esPivotSeriesSpecHandler = seriesHandlers.get(seriesSpec.type());
                     if (esPivotSeriesSpecHandler == null) {
                         throw new IllegalArgumentException("No series handler registered for: " + seriesSpec.type());
                     }
@@ -335,7 +335,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
                                boolean rollup,
                                String source) {
         pivot.series().forEach(seriesSpec -> {
-            final ESPivotSeriesSpecHandler<? extends SeriesSpec, ?> seriesHandler = seriesHandlers.get(seriesSpec.type());
+            final ESPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation> seriesHandler = seriesHandlers.get(seriesSpec.type());
             final Aggregation series = seriesHandler.extractAggregationFromResult(pivot, seriesSpec, aggregation, queryContext);
             seriesHandler.handleResult(pivot, seriesSpec, searchResult, series, this, queryContext)
                     .map(value -> {
