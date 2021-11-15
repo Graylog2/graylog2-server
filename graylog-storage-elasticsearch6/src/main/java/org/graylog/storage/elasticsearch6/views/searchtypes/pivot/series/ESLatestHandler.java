@@ -17,6 +17,7 @@
 package org.graylog.storage.elasticsearch6.views.searchtypes.pivot.series;
 
 import io.searchbox.core.SearchResult;
+import io.searchbox.core.search.aggregation.Aggregation;
 import io.searchbox.core.search.aggregation.MaxAggregation;
 import io.searchbox.core.search.aggregation.TopHitsAggregation;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
@@ -35,12 +36,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-public class ESLatestHandler extends ESPivotSeriesSpecHandler<Latest, TopHitsAggregation> {
+public class ESLatestHandler extends ESPivotSeriesSpecHandler<Latest, LatestValueAggregation> {
     @Nonnull
     @Override
     public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, Latest latestSpec, ESPivot searchTypeHandler, ESGeneratedQueryContext queryContext) {
         final TopHitsAggregationBuilder latest = AggregationBuilders.topHits(name).size(1).sort(SortBuilders.fieldSort("timestamp").order(SortOrder.DESC));
-        record(queryContext, pivot, latestSpec, name, MaxAggregation.class);
+        record(queryContext, pivot, latestSpec, name, LatestValueAggregation.class);
         return Optional.of(latest);
     }
 
@@ -48,12 +49,10 @@ public class ESLatestHandler extends ESPivotSeriesSpecHandler<Latest, TopHitsAgg
     public Stream<Value> doHandleResult(Pivot pivot,
                                         Latest pivotSpec,
                                         SearchResult searchResult,
-                                        TopHitsAggregation latestAggregation,
+                                        LatestValueAggregation latestAggregation,
                                         ESPivot searchTypeHandler,
                                         ESGeneratedQueryContext esGeneratedQueryContext) {
-        final Optional<Value> latestValue = Optional.ofNullable(latestAggregation.getFirstHit(Map.class))
-                .flatMap(hit -> Optional.ofNullable(hit.source)
-                        .map(source -> source.get(pivotSpec.field())))
+        final Optional<Value> latestValue = latestAggregation.getField(pivotSpec.field())
                 .map(value -> Value.create(pivotSpec.id(), Latest.NAME, value));
         return latestValue.map(Stream::of).orElse(Stream.empty());
     }
