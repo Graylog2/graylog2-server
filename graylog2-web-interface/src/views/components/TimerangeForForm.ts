@@ -20,9 +20,8 @@ import { RELATIVE_ALL_TIME } from 'views/Constants';
 import type { TimeRange } from 'views/logic/queries/Query';
 import type { SearchBarFormValues } from 'views/Constants';
 import { isTypeRelativeWithStartOnly, isTypeRelativeWithEnd } from 'views/typeGuards/timeRange';
-import { DATE_TIME_FORMATS } from 'contexts/DateTimeProvider';
 
-const formatDatetime = (dateTime, formatTime) => formatTime(dateTime, DATE_TIME_FORMATS.complete);
+const formatDatetime = (dateTime, formatTime) => formatTime(dateTime, undefined, 'complete');
 
 export const onSubmittingTimerange = (timerange: TimeRange, adjustTimezone: (time: string) => Moment): TimeRange => {
   const { type } = timerange;

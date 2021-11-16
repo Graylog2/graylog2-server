@@ -71,7 +71,7 @@ const MiddleIcon = styled.span(({ theme }) => css`
   padding: 0 15px;
 `);
 
-const dateOutput = (timerange: TimeRange | NoTimeRangeOverride, adjustTimezone: (time: Date) => Moment) => {
+const dateOutput = (timerange: TimeRange | NoTimeRangeOverride, adjustTimezone: (time: Date) => Moment, formatTime) => {
   let from = EMPTY_RANGE;
   let to = EMPTY_RANGE;
 
@@ -97,13 +97,13 @@ const dateOutput = (timerange: TimeRange | NoTimeRangeOverride, adjustTimezone: 
   }
 
   return {
-    from: 'from' in timerange ? timerange.from : from,
-    until: 'to' in timerange ? timerange.to : to,
+    from: 'from' in timerange ? formatTime(timerange.from, undefined, 'complete') : from,
+    until: 'to' in timerange ? formatTime(timerange.to, undefined, 'complete') : to,
   };
 };
 
 const TimeRangeLivePreview = ({ timerange }: Props) => {
-  const { adjustTimezone } = useContext(DateTimeContext);
+  const { adjustTimezone, formatTime } = useContext(DateTimeContext);
   const { isValid } = useFormikContext<SearchBarFormValues>();
   const [{ from, until }, setTimeOutput] = useState(EMPTY_OUTPUT);
 
@@ -111,7 +111,7 @@ const TimeRangeLivePreview = ({ timerange }: Props) => {
     let output = EMPTY_OUTPUT;
 
     if (isValid) {
-      output = dateOutput(timerange, adjustTimezone);
+      output = dateOutput(timerange, adjustTimezone, formatTime);
     }
 
     setTimeOutput(output);

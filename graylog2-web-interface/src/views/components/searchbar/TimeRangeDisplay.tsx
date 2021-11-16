@@ -54,7 +54,7 @@ const TimeRangeWrapper = styled.p(({ theme }) => css`
   }
 `);
 
-const dateOutput = (timerange: TimeRange, adjustTimezone: (time: Date) => Moment) => {
+const dateOutput = (timerange: TimeRange, adjustTimezone: (time: Date) => Moment, formatTime) => {
   let from = EMPTY_RANGE;
   let to = EMPTY_RANGE;
 
@@ -82,7 +82,7 @@ const dateOutput = (timerange: TimeRange, adjustTimezone: (time: Date) => Moment
 
     case 'absolute':
     case 'keyword':
-      return { from: timerange.from, until: timerange.to };
+      return { from: formatTime(timerange.from, undefined, 'complete'), until: formatTime(timerange.to, undefined, 'complete') };
     default:
       throw new Error('Invalid Timerange Type');
   }
@@ -91,27 +91,27 @@ const dateOutput = (timerange: TimeRange, adjustTimezone: (time: Date) => Moment
 const TimeRangeDisplay = ({ timerange, toggleDropdownShow }: Props) => {
   const [{ from, until }, setTimeOutput] = useState(EMPTY_OUTPUT);
   const dateTested = useRef(false);
-  const { adjustTimezone } = useContext(DateTimeContext);
+  const { adjustTimezone, userTimezone, formatTime } = useContext(DateTimeContext);
 
   useEffect(() => {
     if (isTypeKeyword(timerange) && !timerange.from) {
       if (!dateTested.current) {
-        ToolsStore.testNaturalDate(timerange.keyword)
+        ToolsStore.testNaturalDate(timerange.keyword, userTimezone)
           .then((response) => {
             dateTested.current = true;
 
             setTimeOutput({
-              from: response.from,
-              until: response.to,
+              from: formatTime(response.from, undefined, 'complete'),
+              until: formatTime(response.to, undefined, 'complete'),
             });
           }, () => {
             setTimeOutput(EMPTY_OUTPUT);
           });
       }
     } else if (timerange && 'type' in timerange) {
-      setTimeOutput(dateOutput(timerange, adjustTimezone));
+      setTimeOutput(dateOutput(timerange, adjustTimezone, formatTime));
     }
-  }, [dateTested, timerange, adjustTimezone]);
+  }, [dateTested, timerange, adjustTimezone, formatTime, userTimezone]);
 
   return (
     <TimeRangeWrapper aria-label="Search Time Range, Opens Time Range Selector On Click" role="button" onClick={toggleDropdownShow}>
