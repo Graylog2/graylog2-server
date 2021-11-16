@@ -31,6 +31,7 @@ import { ViewStore } from 'views/stores/ViewStore';
 import { FieldTypesActions } from 'views/stores/FieldTypesStore';
 import { SearchMetadataStore } from 'views/stores/SearchMetadataStore';
 import View from 'views/logic/views/View';
+import { SearchExecutionResult } from 'views/actions/SearchActions';
 
 import Search from './Search';
 import WidgetFocusProvider from './contexts/WidgetFocusProvider';
@@ -106,8 +107,7 @@ describe('Dashboard Search', () => {
   beforeEach(() => {
     WidgetStore.listen = jest.fn(() => jest.fn());
     QueryFiltersStore.listen = jest.fn(() => jest.fn());
-    // @ts-ignore
-    SearchActions.execute = jest.fn(() => jest.fn());
+    SearchActions.execute = mockAction(jest.fn(() => Promise.resolve({} as SearchExecutionResult)));
     StreamsActions.refresh = mockAction(jest.fn());
     SearchConfigActions.refresh = mockAction(jest.fn());
 
