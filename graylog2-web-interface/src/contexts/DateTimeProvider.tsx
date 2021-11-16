@@ -62,8 +62,8 @@ const DateTimeProvider = ({ children }: Props) => {
     return formatTime(time, getBrowserTimezone(), format);
   };
 
-  const relativeDifference = (time, tz) => {
-    return adjustTimezone(time, tz).fromNow();
+  const relativeDifference = (time) => {
+    return moment(time).fromNow();
   };
 
   const contextValue = {

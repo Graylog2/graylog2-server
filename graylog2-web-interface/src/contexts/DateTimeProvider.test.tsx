@@ -19,10 +19,16 @@ import { render } from 'wrappedTestingLibrary';
 import moment from 'moment';
 
 import { alice } from 'fixtures/users';
-import DateTimeProvider from 'contexts/DateTimeProvider';
+import DateTimeProvider, { DATE_TIME_FORMATS } from 'contexts/DateTimeProvider';
 import DateTimeContext from 'contexts/DateTimeContext';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import User from 'logic/users/User';
+
+const mockedUnixTime = 1577836800000; // 2020-01-01 00:00:00.000
+
+jest.useFakeTimers()
+  // @ts-expect-error
+  .setSystemTime(mockedUnixTime);
 
 describe('DateTimeProvider', () => {
   const user = alice.toBuilder().timezone('Europe/Berlin').build();
@@ -46,6 +52,12 @@ describe('DateTimeProvider', () => {
 
     return contextValue;
   };
+
+  it('should provider user timezone', () => {
+    const { userTimezone } = renderSUT();
+
+    expect(userTimezone).toBe('Europe/Berlin');
+  });
 
   describe('formatTime method should', () => {
     describe('convert time to time zone', () => {
@@ -118,6 +130,70 @@ describe('DateTimeProvider', () => {
 
         expect(formatTime('2021-03-27T14:32:31.894Z', undefined, 'internal')).toBe('2021-03-27T14:32:31.894Z');
       });
+    });
+
+    describe('adjustTimezone method should', () => {
+      const format = (dateTime) => dateTime.format(DATE_TIME_FORMATS.complete);
+
+      describe('convert time to time zone', () => {
+        it('user time zone by default', () => {
+          const { adjustTimezone } = renderSUT();
+
+          expect(format(adjustTimezone('2021-03-27T14:32:31.894Z'))).toBe('2021-03-27 15:32:31.894');
+        });
+
+        it('specified time zone', () => {
+          const { adjustTimezone } = renderSUT();
+
+          expect(format(adjustTimezone('2021-03-27T14:32:31.894Z', 'US/Alaska'))).toBe('2021-03-27 06:32:31.894');
+        });
+      });
+
+      describe('converts different types of date times', () => {
+        it('date time string', () => {
+          const { adjustTimezone } = renderSUT();
+
+          expect(format(adjustTimezone('2021-03-27T14:32:31.894Z'))).toBe('2021-03-27 15:32:31.894');
+        });
+
+        it('JS date', () => {
+          const { adjustTimezone } = renderSUT();
+
+          expect(format(adjustTimezone(new Date('2021-03-27T14:32:31.894Z')))).toBe('2021-03-27 15:32:31.894');
+        });
+
+        it('unix timestamp', () => {
+          const { adjustTimezone } = renderSUT();
+
+          expect(format(adjustTimezone(1616855551894))).toBe('2021-03-27 15:32:31.894');
+        });
+
+        it('moment object', () => {
+          const { adjustTimezone } = renderSUT();
+
+          expect(format(adjustTimezone(moment('2021-03-27T14:32:31.894Z')))).toBe('2021-03-27 15:32:31.894');
+        });
+      });
+    });
+
+    describe('formatAsBrowserTime method should', () => {
+      it('format date time to browser timezone', () => {
+        const { formatAsBrowserTime } = renderSUT();
+
+        expect(formatAsBrowserTime('2021-03-27T14:32:31.894Z')).toBe('2021-03-27 09:32:31"');
+      });
+
+      it('format date time to browser timezone with specific format', () => {
+        const { formatAsBrowserTime } = renderSUT();
+
+        expect(formatAsBrowserTime('2021-03-27T14:32:31.894Z', 'complete')).toBe('2021-03-27 09:32:31.894');
+      });
+    });
+
+    it('relativeDifference method should return relative time difference for date', () => {
+      const { relativeDifference } = renderSUT();
+
+      expect(relativeDifference('2020-01-01T10:00:00.000Z')).toBe('in 10 hours');
     });
   });
 });
