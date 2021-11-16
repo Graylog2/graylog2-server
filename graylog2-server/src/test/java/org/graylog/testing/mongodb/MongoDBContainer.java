@@ -30,7 +30,9 @@ import static java.util.Objects.requireNonNull;
  */
 public class MongoDBContainer extends GenericContainer<MongoDBContainer> {
     public static final String DEFAULT_IMAGE = "mongo";
-    public static final String DEFAULT_VERSION = "4.4";
+
+    // Run tests againtst the oldest supported MongoDB version
+    public static final String DEFAULT_VERSION = "4.0";
     public static final int MONGODB_PORT = 27017;
     public static final String NETWORK_ALIAS = "mongodb";
 
