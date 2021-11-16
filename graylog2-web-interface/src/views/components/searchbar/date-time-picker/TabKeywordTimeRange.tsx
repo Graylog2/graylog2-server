@@ -56,7 +56,7 @@ type Props = {
 };
 
 const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: Props) => {
-  const { formatTime } = useContext(DateTimeContext);
+  const { formatTime, userTimezone } = useContext(DateTimeContext);
   const [nextRangeProps, , nextRangeHelpers] = useField('nextTimeRange');
   const mounted = useRef(true);
   const keywordRef = useRef<string>();
@@ -87,7 +87,7 @@ const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: P
 
       return trim(keyword) === ''
         ? Promise.resolve('Keyword must not be empty!')
-        : ToolsStore.testNaturalDate(keyword)
+        : ToolsStore.testNaturalDate(keyword, userTimezone)
           .then((response) => {
             if (mounted.current) _setSuccessfullPreview(response);
           })
@@ -95,7 +95,7 @@ const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: P
     }
 
     return undefined;
-  }, [_setFailedPreview, _setSuccessfullPreview, setValidatingKeyword]);
+  }, [_setFailedPreview, _setSuccessfullPreview, setValidatingKeyword, userTimezone]);
 
   useEffect(() => {
     return () => {
