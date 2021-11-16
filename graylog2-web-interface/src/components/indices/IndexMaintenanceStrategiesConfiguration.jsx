@@ -20,6 +20,8 @@ import React from 'react';
 import { Input } from 'components/bootstrap';
 import { Select } from 'components/common';
 
+const TIME_BASED_ROTATION_STRATEGY = 'org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategy';
+
 class IndexMaintenanceStrategiesConfiguration extends React.Component {
   static propTypes = {
     title: PropTypes.string.isRequired,
@@ -31,29 +33,44 @@ class IndexMaintenanceStrategiesConfiguration extends React.Component {
     updateState: PropTypes.func.isRequired,
   };
 
-  state = {
-    activeStrategy: this.props.activeConfig.strategy,
-    activeConfig: this.props.activeConfig.config,
-    newStrategy: this.props.activeConfig.strategy,
-    newConfig: this.props.activeConfig.config,
-  };
+  constructor(props) {
+    super(props);
+    const { activeConfig: { strategy, config } } = this.props;
+
+    this.state = {
+      activeStrategy: strategy,
+      activeConfig: config,
+      newStrategy: strategy,
+    };
+  }
 
   _getDefaultStrategyConfig = (selectedStrategy) => {
-    const result = this.props.strategies.filter((strategy) => strategy.type === selectedStrategy)[0];
+    const { strategies } = this.props;
+    const result = strategies.filter((strategy) => strategy.type === selectedStrategy)[0];
 
     return result ? result.default_config : undefined;
   };
 
   _getStrategyJsonSchema = (selectedStrategy) => {
-    const result = this.props.strategies.filter((strategy) => strategy.type === selectedStrategy)[0];
+    const { strategies } = this.props;
+    const result = strategies.filter((strategy) => strategy.type === selectedStrategy)[0];
 
     return result ? result.json_schema : undefined;
   };
 
+  _getTimeBaseStrategyWithElasticLimit = () => {
+    const { activeConfig } = this.state;
+    const timeBasedStrategy = this._getDefaultStrategyConfig(TIME_BASED_ROTATION_STRATEGY);
+
+    return { ...activeConfig, max_rotation_period: timeBasedStrategy?.max_rotation_period };
+  }
+
   _getStrategyConfig = (selectedStrategy) => {
-    if (this.state.activeStrategy === selectedStrategy) {
+    const { activeStrategy, activeConfig } = this.state;
+
+    if (activeStrategy === selectedStrategy) {
       // If the newly selected strategy is the current active strategy, we use the active configuration.
-      return this.state.activeConfig;
+      return activeStrategy === TIME_BASED_ROTATION_STRATEGY ? this._getTimeBaseStrategyWithElasticLimit() : activeConfig;
     }
 
     // If the newly selected strategy is not the current active strategy, we use the selected strategy's default config.
@@ -61,6 +78,8 @@ class IndexMaintenanceStrategiesConfiguration extends React.Component {
   };
 
   _onSelect = (newStrategy) => {
+    const { updateState } = this.props;
+
     if (!newStrategy || newStrategy.length < 1) {
       this.setState({ newStrategy: undefined });
 
@@ -69,13 +88,14 @@ class IndexMaintenanceStrategiesConfiguration extends React.Component {
 
     const newConfig = this._getStrategyConfig(newStrategy);
 
-    this.setState({ newStrategy: newStrategy, newConfig: newConfig });
-    this.props.updateState(newStrategy, newConfig);
+    this.setState({ newStrategy: newStrategy });
+    updateState(newStrategy, newConfig);
   };
 
   _addConfigType = (strategy, data) => {
+    const { strategies } = this.props;
     // The config object needs to have the "type" field set to the "default_config.type" to make the REST call work.
-    const result = this.props.strategies.filter((s) => s.type === strategy)[0];
+    const result = strategies.filter((s) => s.type === strategy)[0];
     const copy = data;
 
     if (result) {
@@ -86,24 +106,31 @@ class IndexMaintenanceStrategiesConfiguration extends React.Component {
   };
 
   _onConfigUpdate = (newConfig) => {
-    const config = this._addConfigType(this.state.newStrategy, newConfig);
+    const { newStrategy } = this.state;
+    const { updateState } = this.props;
+    const config = this._addConfigType(newStrategy, newConfig);
 
-    this.setState({ newConfig: config });
-    this.props.updateState(this.state.newStrategy, config);
+    updateState(newStrategy, config);
   };
 
   _availableSelectOptions = () => {
-    return this.props.pluginExports.map((config) => {
-      return { value: config.type, label: config.displayName };
-    });
+    const { pluginExports, strategies } = this.props;
+
+    return pluginExports
+      .filter((config) => strategies.find(({ type }) => type === config.type))
+      .map((config) => {
+        return { value: config.type, label: config.displayName };
+      });
   };
 
   _getConfigurationComponent = (selectedStrategy) => {
+    const { pluginExports } = this.props;
+
     if (!selectedStrategy || selectedStrategy.length < 1) {
       return null;
     }
 
-    const strategy = this.props.pluginExports.filter((exportedStrategy) => exportedStrategy.type === selectedStrategy)[0];
+    const strategy = pluginExports.filter((exportedStrategy) => exportedStrategy.type === selectedStrategy)[0];
 
     if (!strategy) {
       return null;
@@ -120,16 +147,20 @@ class IndexMaintenanceStrategiesConfiguration extends React.Component {
   };
 
   _activeSelection = () => {
-    return this.state.newStrategy;
+    const { newStrategy } = this.state;
+
+    return newStrategy;
   };
 
   render() {
+    const { title, description, selectPlaceholder } = this.props;
+
     return (
       <span>
-        <h3>{this.props.title}</h3>
-        <p className="description">{this.props.description}</p>
-        <Input id="strategy-select" label={this.props.selectPlaceholder}>
-          <Select placeholder={this.props.selectPlaceholder}
+        <h3>{title}</h3>
+        <p className="description">{description}</p>
+        <Input id="strategy-select" label={selectPlaceholder}>
+          <Select placeholder={selectPlaceholder}
                   options={this._availableSelectOptions()}
                   matchProp="label"
                   value={this._activeSelection()}

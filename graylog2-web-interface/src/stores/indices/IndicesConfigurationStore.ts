@@ -16,6 +16,12 @@
  */
 import Reflux from 'reflux';
 
+import {
+  IndicesConfigurationActionsType,
+  IndicesConfigurationStoreState,
+  RetentionStrategyResponse,
+  RotationStrategyResponse,
+} from 'components/indices/Types';
 import UserNotification from 'util/UserNotification';
 import * as URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
@@ -23,7 +29,7 @@ import { singletonStore, singletonActions } from 'logic/singleton';
 
 export const IndicesConfigurationActions = singletonActions(
   'core.IndicesConfiguration',
-  () => Reflux.createActions({
+  () => Reflux.createActions<IndicesConfigurationActionsType>({
     loadRotationStrategies: { asyncResult: true },
     loadRetentionStrategies: { asyncResult: true },
   }),
@@ -33,7 +39,7 @@ const urlPrefix = '/system/indices';
 
 export const IndicesConfigurationStore = singletonStore(
   'core.IndicesConfiguration',
-  () => Reflux.createStore({
+  () => Reflux.createStore<IndicesConfigurationStoreState>({
     listenables: [IndicesConfigurationActions],
 
     rotationStrategies: undefined,
@@ -47,7 +53,14 @@ export const IndicesConfigurationStore = singletonStore(
         retentionStrategies: undefined,
       };
     },
-
+    getState() {
+      return {
+        activeRotationConfig: this.activeRotationConfig,
+        rotationStrategies: this.rotationStrategies,
+        activeRetentionConfig: this.activeRetentionConfig,
+        retentionStrategies: this.retentionStrategies,
+      };
+    },
     _url(path) {
       return URLUtils.qualifyUrl(urlPrefix + path);
     },
@@ -56,9 +69,9 @@ export const IndicesConfigurationStore = singletonStore(
       const promise = fetch('GET', this._url('/rotation/strategies'));
 
       promise.then(
-        (response) => {
+        (response: RotationStrategyResponse) => {
           this.rotationStrategies = response.strategies;
-          this.trigger({ rotationStrategies: response.strategies });
+          this.trigger(this.getState());
         },
         (error) => {
           UserNotification.error(`Fetching rotation strategies failed: ${error}`, 'Could not retrieve rotation strategies');
@@ -72,9 +85,9 @@ export const IndicesConfigurationStore = singletonStore(
       const promise = fetch('GET', this._url('/retention/strategies'));
 
       promise.then(
-        (response) => {
+        (response: RetentionStrategyResponse) => {
           this.retentionStrategies = response.strategies;
-          this.trigger({ retentionStrategies: response.strategies });
+          this.trigger(this.getState());
         },
         (error) => {
           UserNotification.error(`Fetching retention strategies failed: ${error}`, 'Could not retrieve retention strategies');
