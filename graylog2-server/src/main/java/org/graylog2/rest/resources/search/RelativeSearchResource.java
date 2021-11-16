@@ -24,13 +24,11 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.glassfish.jersey.server.ChunkedOutput;
-import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.ExecutionState;
 import org.graylog.plugins.views.search.rest.SearchExecutor;
-import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.Sort;
 import org.graylog2.decorators.DecoratorProcessor;
 import org.graylog2.indexer.results.ScrollResult;
@@ -66,15 +64,13 @@ import java.util.Optional;
 public class RelativeSearchResource extends SearchResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(RelativeSearchResource.class);
-    private final SearchExecutor searchExecutor;
 
     @Inject
     public RelativeSearchResource(Searches searches,
                                   ClusterConfigService clusterConfigService,
                                   DecoratorProcessor decoratorProcessor,
                                   SearchExecutor searchExecutor) {
-        super(searches, clusterConfigService, decoratorProcessor);
-        this.searchExecutor = searchExecutor;
+        super(searches, clusterConfigService, decoratorProcessor, searchExecutor);
     }
 
     @GET
@@ -105,13 +101,7 @@ public class RelativeSearchResource extends SearchResource {
 
         final TimeRange timeRange = buildRelativeTimeRange(range);
 
-        final Search search = createSearch(query, limit, filter, fieldList, sorting, timeRange);
-
-        final Optional<String> streamId = Searches.extractStreamId(filter);
-
-        final SearchJob searchJob = searchExecutor.execute(search, searchUser, ExecutionState.empty());
-
-        return extractSearchResponse(searchJob, query, decorate, fieldList, timeRange, streamId);
+        return search(query, limit, filter, decorate, searchUser, fieldList, sorting, timeRange);
     }
 
     @GET

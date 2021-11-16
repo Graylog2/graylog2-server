@@ -69,7 +69,7 @@ public class AbsoluteSearchResource extends SearchResource {
                                   SearchExecutor searchExecutor,
                                   ClusterConfigService clusterConfigService,
                                   DecoratorProcessor decoratorProcessor) {
-        super(searches, clusterConfigService, decoratorProcessor);
+        super(searches, clusterConfigService, decoratorProcessor, searchExecutor);
         this.searchExecutor = searchExecutor;
     }
 
@@ -103,13 +103,7 @@ public class AbsoluteSearchResource extends SearchResource {
 
         final TimeRange timeRange = buildAbsoluteTimeRange(from, to);
 
-        final Search search = createSearch(query, limit, filter, fieldList, sorting, timeRange);
-
-        final Optional<String> streamId = Searches.extractStreamId(filter);
-
-        final SearchJob searchJob = searchExecutor.execute(search, searchUser, ExecutionState.empty());
-
-        return extractSearchResponse(searchJob, query, decorate, fieldList, timeRange, streamId);
+        return search(query, limit, filter, decorate, searchUser, fieldList, sorting, timeRange);
     }
 
     @GET

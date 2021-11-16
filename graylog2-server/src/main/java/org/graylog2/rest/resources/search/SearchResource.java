@@ -29,6 +29,9 @@ import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.filter.QueryStringFilter;
+import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog.plugins.views.search.rest.ExecutionState;
+import org.graylog.plugins.views.search.rest.SearchExecutor;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.Sort;
 import org.graylog2.decorators.DecoratorProcessor;
@@ -75,13 +78,26 @@ public abstract class SearchResource extends RestResource {
     protected final Searches searches;
     private final ClusterConfigService clusterConfigService;
     private final DecoratorProcessor decoratorProcessor;
+    private final SearchExecutor searchExecutor;
 
     public SearchResource(Searches searches,
                           ClusterConfigService clusterConfigService,
-                          DecoratorProcessor decoratorProcessor) {
+                          DecoratorProcessor decoratorProcessor,
+                          SearchExecutor searchExecutor) {
         this.searches = searches;
         this.clusterConfigService = clusterConfigService;
         this.decoratorProcessor = decoratorProcessor;
+        this.searchExecutor = searchExecutor;
+    }
+
+    protected SearchResponse search(String query, int limit, String filter, boolean decorate, SearchUser searchUser, List<String> fieldList, Sort sorting, TimeRange timeRange) {
+        final Search search = createSearch(query, limit, filter, fieldList, sorting, timeRange);
+
+        final Optional<String> streamId = Searches.extractStreamId(filter);
+
+        final SearchJob searchJob = searchExecutor.execute(search, searchUser, ExecutionState.empty());
+
+        return extractSearchResponse(searchJob, query, decorate, fieldList, timeRange, streamId);
     }
 
     protected List<String> parseFields(String fields) {
