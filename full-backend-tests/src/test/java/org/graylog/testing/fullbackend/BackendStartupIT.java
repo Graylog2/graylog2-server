@@ -69,11 +69,7 @@ class BackendStartupIT {
 
     @ContainerMatrixTest
     void importsElasticsearchFixtures() {
-        List<String> messages = SearchUtils.searchForAllMessages(requestSpec);
-        assertThat(messages).doesNotContain("hello from es fixture");
-
         sut.importElasticsearchFixture("one-message.json", getClass());
-
         assertThat(SearchUtils.searchForMessage(requestSpec, "hello from es fixture")).isTrue();
     }
 }
