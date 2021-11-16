@@ -16,10 +16,11 @@
  */
 import PropTypes from 'prop-types';
 import * as React from 'react';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Immutable from 'immutable';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 
+import useIsLocalNode from 'hooks/useIsLocalNode';
 import { AdditionalContext } from 'views/logic/ActionContext';
 import { Link } from 'components/common/router';
 import { Col, Label, Row } from 'components/bootstrap';
@@ -36,7 +37,6 @@ import { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import { useStore } from 'stores/connect';
 import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 import FormatReceivedBy from 'views/components/messagelist/FormatReceivedBy';
-import usePluginEntities from 'views/logic/usePluginEntities';
 
 import MessageDetailProviders from './MessageDetailProviders';
 import MessageActions from './MessageActions';
@@ -80,21 +80,9 @@ const MessageDetail = ({
 }: Props) => {
   const { searchesClusterConfig } = useStore(SearchConfigStore);
   const [showOriginal, setShowOriginal] = useState(false);
-
-  const [isLocalNode, setIsLocalNode] = useState<boolean | undefined>();
-  const forwarderPlugin = usePluginEntities('forwarder');
-  const _isLocalNode = forwarderPlugin?.[0]?.isLocalNode;
-
   const { fields, index, id, decoration_stats: decorationStats } = message;
   const { gl2_source_node, gl2_source_input } = fields;
-
-  useEffect(() => {
-    if (gl2_source_node && _isLocalNode) {
-      _isLocalNode(gl2_source_node).then(setIsLocalNode, () => setIsLocalNode(true));
-    } else {
-      setIsLocalNode(true);
-    }
-  }, [gl2_source_node, _isLocalNode]);
+  const { isLocalNode } = useIsLocalNode(message);
 
   const _toggleShowOriginal = () => {
     setShowOriginal(!showOriginal);
@@ -134,7 +122,6 @@ const MessageDetail = ({
   }
 
   const messageTitle = _formatMessageTitle(index, id);
-  console.log(isLocalNode);
 
   return (
     <AdditionalContext.Provider value={{ isLocalNode }}>
@@ -164,7 +151,7 @@ const MessageDetail = ({
             <Col md={3}>
               <MessageMetadata timestamp={timestamp}
                                index={index}
-                               receivedBy={<FormatReceivedBy inputs={inputs} sourceNodeId={gl2_source_node} sourceInputId={gl2_source_input} />}
+                               receivedBy={<FormatReceivedBy isLocalNode={isLocalNode} inputs={inputs} sourceNodeId={gl2_source_node} sourceInputId={gl2_source_input} />}
                                streams={streamsListItems} />
               <MessageAugmentations message={message} />
             </Col>
