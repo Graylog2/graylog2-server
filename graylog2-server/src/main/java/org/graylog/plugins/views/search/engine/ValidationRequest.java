@@ -19,6 +19,10 @@ package org.graylog.plugins.views.search.engine;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import org.graylog.plugins.views.search.Parameter;
+import org.graylog.plugins.views.search.rest.FieldTypesForStreamsRequest;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import javax.validation.constraints.NotNull;
@@ -36,6 +40,9 @@ public abstract class ValidationRequest {
     @NotNull
     public abstract Set<String> streams();
 
+    @NotNull
+    public abstract ImmutableSet<Parameter> parameters();
+
     @AutoValue.Builder
     public abstract static class Builder {
 
@@ -45,6 +52,8 @@ public abstract class ValidationRequest {
         public abstract Builder streams(@NotNull Set<String> streams);
 
         public abstract Builder timerange(@NotNull TimeRange timerange);
+
+        public abstract Builder parameters(@NotNull ImmutableSet<Parameter> parameters);
 
         public abstract ValidationRequest build();
 

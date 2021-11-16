@@ -27,6 +27,7 @@ import io.searchbox.core.Search;
 import io.searchbox.core.Validate;
 import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.GlobalOverride;
+import org.graylog.plugins.views.search.ParameterProvider;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.SearchJob;
@@ -317,8 +318,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
     @Override
     public ValidationResponse validate(ValidationRequest req) {
         final Set<String> affectedIndices = Optional.ofNullable(req.streams()).map(s -> indexLookup.indexNamesForStreamsInTimeRange(s, req.timerange())).orElse(Collections.emptySet());
-
-        final String queryString = ((ElasticsearchQueryString) req.query()).queryString();
+        final String queryString = decoratedQuery(req);
         final ElasticsearchQueryString backendQuery = (ElasticsearchQueryString) req.query();
         final Validate.Builder builder = new Validate.Builder(new ValidatePayload(queryString, false))
                 .setParameter("explain", true)
@@ -332,6 +332,13 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                 .collect(Collectors.toList());
 
         return new ValidationResponse(response.isValid(), explanations, getUnknownFields(req, backendQuery, response));
+    }
+
+    private String decoratedQuery(ValidationRequest req) {
+        final ElasticsearchQueryString esQuery = (ElasticsearchQueryString) req.query();
+        ParameterProvider parameterProvider = (name) -> req.parameters().stream().filter(p -> Objects.equals(p.name(), name)).findFirst();
+        final Query query = Query.builder().query(req.query()).timerange(req.timerange()).build();
+        return this.queryStringDecorators.decorate(esQuery.queryString(), parameterProvider, query, Collections.emptySet());
     }
 
     private Set<String> getUnknownFields(ValidationRequest req, ElasticsearchQueryString backendQuery, ValidationResult response) {

@@ -14,15 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.engine;
+package org.graylog.plugins.views.search;
 
-import org.graylog.plugins.views.search.ParameterProvider;
-import org.graylog.plugins.views.search.Query;
-import org.graylog.plugins.views.search.QueryResult;
-import org.graylog.plugins.views.search.SearchJob;
+import java.util.Optional;
 
-import java.util.Set;
-
-public interface QueryStringDecorator {
-    String decorate(String queryString, ParameterProvider parameterProvider, Query query, Set<QueryResult> results);
+public interface ParameterProvider {
+    Optional<Parameter> getParameter(final String name);
 }

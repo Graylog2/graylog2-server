@@ -20,8 +20,10 @@ import com.google.common.collect.Maps;
 import com.google.inject.name.Named;
 import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.GlobalOverride;
+import org.graylog.plugins.views.search.ParameterProvider;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryResult;
+import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
@@ -34,7 +36,6 @@ import org.graylog.plugins.views.search.engine.SearchConfig;
 import org.graylog.plugins.views.search.engine.ValidationExplanation;
 import org.graylog.plugins.views.search.engine.ValidationRequest;
 import org.graylog.plugins.views.search.engine.ValidationResponse;
-import org.graylog.plugins.views.search.engine.ValidationStatus;
 import org.graylog.plugins.views.search.errors.SearchTypeError;
 import org.graylog.plugins.views.search.errors.SearchTypeErrorParser;
 import org.graylog.plugins.views.search.filter.AndFilter;
@@ -316,10 +317,11 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
 
     @Override
     public ValidationResponse validate(ValidationRequest req) {
+        final String queryString = decoratedQuery(req);
         final Set<String> affectedIndices = Optional.ofNullable(req.streams()).map(s -> indexLookup.indexNamesForStreamsInTimeRange(s, req.timerange())).orElse(Collections.emptySet());
         final ValidateQueryRequest esReq = new ValidateQueryRequest();
         final ElasticsearchQueryString backendQuery = (ElasticsearchQueryString) req.query();
-        final QueryStringQueryBuilder queryStringQueryBuilder = new QueryStringQueryBuilder(backendQuery.queryString())
+        final QueryStringQueryBuilder queryStringQueryBuilder = new QueryStringQueryBuilder(queryString)
                 .lenient(false);
         esReq.query(queryStringQueryBuilder);
         esReq.indices(affectedIndices.toArray(new String[0]));
@@ -334,6 +336,13 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
 
         final Set<String> unknownFields = getUnknownFields(req, backendQuery, response);
         return new ValidationResponse(response.isValid(), explanations, unknownFields);
+    }
+
+    private String decoratedQuery(ValidationRequest req) {
+        final ElasticsearchQueryString esQuery = (ElasticsearchQueryString) req.query();
+        ParameterProvider parameterProvider = (name) -> req.parameters().stream().filter(p -> Objects.equals(p.name(), name)).findFirst();
+        final Query query = Query.builder().query(req.query()).timerange(req.timerange()).build();
+        return this.queryStringDecorators.decorate(esQuery.queryString(), parameterProvider, query, Collections.emptySet());
     }
 
     private Set<String> getUnknownFields(ValidationRequest req, ElasticsearchQueryString backendQuery, ValidateQueryResponse response) {

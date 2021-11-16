@@ -22,9 +22,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.Parameter;
+import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.engine.BackendQuery;
-import org.graylog.plugins.views.search.engine.ValidationRequest;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import javax.annotation.Nullable;
@@ -51,20 +52,22 @@ public abstract class ValidationRequestDTO {
     public abstract Set<String> streams();
 
     @JsonProperty
+    public abstract ImmutableSet<Parameter> parameters();
+
+    @JsonProperty
     public abstract ImmutableMap<String,  Parameter.Binding> parameterBindings();
 
     @AutoValue.Builder
     public abstract static class Builder {
 
         @JsonProperty
-        public abstract ValidationRequestDTO.Builder query(BackendQuery query);
-
+        public abstract Builder query(BackendQuery query);
 
         @JsonProperty(FIELD_STREAMS)
-        public abstract ValidationRequestDTO.Builder streams(@Nullable Set<String> streams);
+        public abstract Builder streams(@Nullable Set<String> streams);
 
         @JsonProperty(FIELD_TIMERANGE)
-        public abstract ValidationRequestDTO.Builder timerange(@Nullable TimeRange timerange);
+        public abstract Builder timerange(@Nullable TimeRange timerange);
 
         public abstract ImmutableMap.Builder<String,  Parameter.Binding> parameterBindingsBuilder();
 
@@ -74,11 +77,13 @@ public abstract class ValidationRequestDTO {
             return this;
         }
 
+        @JsonProperty
+        public abstract Builder parameters(ImmutableSet<Parameter> parameters);
 
         public abstract ValidationRequestDTO build();
 
         @JsonCreator
-        public static ValidationRequestDTO.Builder builder() {
+        public static Builder builder() {
             return new AutoValue_ValidationRequestDTO.Builder();
         }
     }

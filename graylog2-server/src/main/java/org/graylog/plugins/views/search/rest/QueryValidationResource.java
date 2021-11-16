@@ -16,11 +16,15 @@
  */
 package org.graylog.plugins.views.search.rest;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog.plugins.views.search.Parameter;
 import org.graylog.plugins.views.search.engine.QueryEngine;
 import org.graylog.plugins.views.search.engine.ValidationExplanation;
 import org.graylog.plugins.views.search.engine.ValidationRequest;
@@ -46,6 +50,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
+import static com.google.common.collect.ImmutableSet.toImmutableSet;
 
 @RequiresAuthentication
 @Api(value = "Search/Validation")
@@ -54,11 +59,13 @@ public class QueryValidationResource extends RestResource implements PluginRestR
 
     private final QueryEngine queryEngine;
     private final PermittedStreams permittedStreams;
+    private final ObjectMapper objectMapper;
 
     @Inject
-    public QueryValidationResource(QueryEngine queryEngine, PermittedStreams permittedStreams) {
+    public QueryValidationResource(QueryEngine queryEngine, PermittedStreams permittedStreams, ObjectMapper objectMapper) {
         this.queryEngine = queryEngine;
         this.permittedStreams = permittedStreams;
+        this.objectMapper = objectMapper;
     }
 
     @POST
@@ -71,12 +78,22 @@ public class QueryValidationResource extends RestResource implements PluginRestR
                 .query(validationRequest.query())
                 .timerange(Optional.ofNullable(validationRequest.timerange()).orElse(defaultTimeRange()))
                 .streams(adaptStreams(validationRequest.streams()))
+                .parameters(resolveParameters(validationRequest))
                 .build();
 
         final ValidationResponse response = queryEngine.validate(q);
+        return ValidationResponseDTO.create(toStatus(response.getStatus()), toExplanations(response), response.getUnknownFields());
+    }
 
+    private ImmutableSet<Parameter> resolveParameters(ValidationRequestDTO validationRequest) {
+        return validationRequest.parameters().stream()
+                .map(param -> param.applyExecutionState(objectMapper, objectMapper.convertValue(validationRequest.parameterBindings(), JsonNode.class)))
+                .collect(toImmutableSet());
+    }
+
+    private ValidationStatusDTO toStatus(ValidationStatus status) {
         final ValidationStatusDTO statusDTO;
-        switch (response.getStatus()) {
+        switch (status) {
             case WARNING:
                 statusDTO = ValidationStatusDTO.WARNING;
                 break;
@@ -86,8 +103,7 @@ public class QueryValidationResource extends RestResource implements PluginRestR
             default:
                 statusDTO = ValidationStatusDTO.OK;
         }
-
-        return ValidationResponseDTO.create(statusDTO, toExplanations(response), response.getUnknownFields());
+        return statusDTO;
     }
 
     private List<ValidationExplanationDTO> toExplanations(ValidationResponse response) {
