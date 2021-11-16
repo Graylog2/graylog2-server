@@ -20,6 +20,7 @@ import org.graylog2.migrations.V20170607164210_MigrateReopenedIndicesToAliases;
 import org.graylog2.plugin.Version;
 import org.graylog2.storage.ElasticsearchVersion;
 import org.graylog2.storage.VersionAwareProvider;
+import org.graylog2.storage.versionprobe.SearchVersion;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -27,7 +28,7 @@ import java.util.Map;
 
 public class V20170607164210_MigrateReopenedIndicesToAliasesClusterStateAdapterProvider extends VersionAwareProvider<V20170607164210_MigrateReopenedIndicesToAliases.ClusterState> {
     @Inject
-    public V20170607164210_MigrateReopenedIndicesToAliasesClusterStateAdapterProvider(@ElasticsearchVersion Version version, Map<Version, Provider<V20170607164210_MigrateReopenedIndicesToAliases.ClusterState>> pluginBindings) {
+    public V20170607164210_MigrateReopenedIndicesToAliasesClusterStateAdapterProvider(@ElasticsearchVersion SearchVersion version, Map<SearchVersion, Provider<V20170607164210_MigrateReopenedIndicesToAliases.ClusterState>> pluginBindings) {
         super(version, pluginBindings);
     }
 }

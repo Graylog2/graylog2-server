@@ -20,6 +20,7 @@ import org.graylog2.indexer.cluster.NodeAdapter;
 import org.graylog2.plugin.Version;
 import org.graylog2.storage.ElasticsearchVersion;
 import org.graylog2.storage.VersionAwareProvider;
+import org.graylog2.storage.versionprobe.SearchVersion;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -27,7 +28,7 @@ import java.util.Map;
 
 public class NodeAdapterProvider extends VersionAwareProvider<NodeAdapter> {
     @Inject
-    public NodeAdapterProvider(@ElasticsearchVersion Version version, Map<Version, Provider<NodeAdapter>> pluginBindings) {
+    public NodeAdapterProvider(@ElasticsearchVersion SearchVersion version, Map<SearchVersion, Provider<NodeAdapter>> pluginBindings) {
         super(version, pluginBindings);
     }
 }

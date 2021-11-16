@@ -14,21 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.storage.providers;
+package org.graylog2.configuration.validators;
 
-import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerAdapter;
-import org.graylog2.plugin.Version;
-import org.graylog2.storage.ElasticsearchVersion;
-import org.graylog2.storage.VersionAwareProvider;
+import com.google.auto.value.AutoValue;
 import org.graylog2.storage.versionprobe.SearchVersion;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-import java.util.Map;
+@AutoValue
+public abstract class SearchVersionRange {
+    public abstract SearchVersion.Distribution distribution();
 
-public class IndexFieldTypePollerAdapterProvider extends VersionAwareProvider<IndexFieldTypePollerAdapter> {
-    @Inject
-    public IndexFieldTypePollerAdapterProvider(@ElasticsearchVersion SearchVersion version, Map<SearchVersion, Provider<IndexFieldTypePollerAdapter>> pluginBindings) {
-        super(version, pluginBindings);
+    /**
+     * Semver expression
+     */
+    public abstract String expression();
+
+    public static SearchVersionRange of(final SearchVersion.Distribution distribution, final String expression) {
+        return new AutoValue_SearchVersionRange(distribution, expression);
     }
 }
