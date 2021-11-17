@@ -43,7 +43,7 @@ const PanelHeading = styled(Panel.Heading)(({ theme }) => css`
 const PanelTitle = styled(Panel.Title)(({ theme }) => css`
   font-size: ${theme.fonts.size.small};
   color: ${theme.colors.global.link};
-
+  
   > a {
     padding: 3px 9px;
     display: block;
