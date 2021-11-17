@@ -16,9 +16,9 @@
  */
 import * as React from 'react';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
-import mockAction from 'helpers/mocking/MockAction';
 import userEvent from '@testing-library/user-event';
 
+import mockAction from 'helpers/mocking/MockAction';
 import Rule from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import { HighlightingRulesActions } from 'views/stores/HighlightingRulesStore';
 import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
