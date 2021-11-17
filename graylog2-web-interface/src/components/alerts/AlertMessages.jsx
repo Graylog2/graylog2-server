@@ -18,16 +18,17 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import moment from 'moment';
 
+import DateTimeContext from 'contexts/DateTimeContext';
 import { LinkContainer } from 'components/common/router';
 import { Alert, Button } from 'components/bootstrap';
 import { PaginatedList, Spinner, Timestamp } from 'components/common';
 import Routes from 'routing/Routes';
-import DateTime from 'logic/datetimes/DateTime';
 import UserNotification from 'util/UserNotification';
 import { UniversalSearchStore } from 'stores/search/UniversalSearchStore';
 
 class AlertMessages extends React.Component {
   static propTypes = {
+    adjustTimezone: PropTypes.func.isRequired,
     alert: PropTypes.object.isRequired,
     stream: PropTypes.object.isRequired,
   };
@@ -48,13 +49,13 @@ class AlertMessages extends React.Component {
   };
 
   _getTo = () => {
-    const { alert } = this.props;
+    const { alert, adjustTimezone } = this.props;
     let momentTo;
 
     if (alert.is_interval) {
-      momentTo = (alert.resolved_at ? DateTime.parseFromString(alert.resolved_at).toMoment().add(1, 'minute') : DateTime.now());
+      momentTo = (alert.resolved_at ? adjustTimezone(alert.resolved_at).toMoment().add(1, 'minute') : adjustTimezone(new Date()));
     } else {
-      momentTo = DateTime.parseFromString(alert.triggered_at).toMoment().add(1, 'minute');
+      momentTo = adjustTimezone(alert.triggered_at).add(1, 'minute');
     }
 
     return momentTo.toISOString();
@@ -182,4 +183,10 @@ class AlertMessages extends React.Component {
   }
 }
 
-export default AlertMessages;
+export default (props) => (
+  <DateTimeContext.Consumer>
+    {({ adjustTimezone }) => (
+      <AlertMessages adjustTimezone={adjustTimezone} {...props} />
+    )}
+  </DateTimeContext.Consumer>
+);
