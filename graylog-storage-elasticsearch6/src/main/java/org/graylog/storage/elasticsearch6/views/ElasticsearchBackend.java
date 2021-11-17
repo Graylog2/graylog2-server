@@ -23,6 +23,8 @@ import io.searchbox.client.JestClient;
 import io.searchbox.core.MultiSearch;
 import io.searchbox.core.MultiSearchResult;
 import io.searchbox.core.Search;
+import io.searchbox.core.SearchResult;
+import io.searchbox.core.search.aggregation.TermsAggregation;
 import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.GlobalOverride;
 import org.graylog.plugins.views.search.Query;
@@ -35,6 +37,7 @@ import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.engine.QueryBackend;
 import org.graylog.plugins.views.search.engine.SearchConfig;
 import org.graylog.plugins.views.search.engine.SuggestRequest;
+import org.graylog.plugins.views.search.engine.SuggestionEntry;
 import org.graylog.plugins.views.search.engine.SuggestionResponse;
 import org.graylog.plugins.views.search.errors.SearchTypeError;
 import org.graylog.plugins.views.search.errors.SearchTypeErrorParser;
@@ -45,6 +48,7 @@ import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.shaded.elasticsearch6.org.elasticsearch.index.query.BoolQueryBuilder;
 import org.graylog.shaded.elasticsearch6.org.elasticsearch.index.query.QueryBuilder;
 import org.graylog.shaded.elasticsearch6.org.elasticsearch.index.query.QueryBuilders;
+import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.storage.elasticsearch6.TimeRangeQueryFactory;
 import org.graylog.storage.elasticsearch6.jest.JestUtils;
@@ -297,6 +301,22 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
 
     @Override
     public SuggestionResponse suggest(SuggestRequest req) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        final Set<String> affectedIndices = indexLookup.indexNamesForStreamsInTimeRange(req.streams(), req.timerange());
+        final SearchSourceBuilder search = new SearchSourceBuilder()
+                .query(QueryBuilders.prefixQuery(req.field(), req.input()))
+                .size(0)
+                .aggregation(AggregationBuilders.terms("fieldvalues").field(req.field()).size(10));
+
+        final Search.Builder searchBuilder = new Search.Builder(search.toString())
+                .addType(IndexMapping.TYPE_MESSAGE)
+                .addIndex(affectedIndices.isEmpty() ? Collections.singleton("") : affectedIndices)
+                .allowNoIndices(false)
+                .ignoreUnavailable(false);
+
+        final SearchResult result = JestUtils.execute(jestClient, searchBuilder.build(), () -> "Unable to perform aggregation: ");
+
+        final TermsAggregation aggregation = result.getAggregations().getTermsAggregation("fieldvalues");
+        final List<SuggestionEntry> entries = aggregation.getBuckets().stream().map(b -> new SuggestionEntry(b.getKeyAsString(), b.getCount())).collect(Collectors.toList());
+        return new SuggestionResponse(req.field(), req.input(), entries);
     }
 }
