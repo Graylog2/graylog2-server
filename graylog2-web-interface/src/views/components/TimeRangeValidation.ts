@@ -56,11 +56,11 @@ const validateAbsoluteTimeRange = (timeRange: AbsoluteTimeRange, limitDuration: 
     to?: string,
   } = {};
 
-  if (!moment(timeRange.from, DATE_TIME_FORMATS.complete, true).isValid()) {
+  if (!moment(timeRange.from, [DATE_TIME_FORMATS.complete, DATE_TIME_FORMATS.default], true).isValid()) {
     errors = { ...errors, from: invalidDateFormatError };
   }
 
-  if (!moment(timeRange.to, DATE_TIME_FORMATS.complete, true).isValid()) {
+  if (!moment(timeRange.to, [DATE_TIME_FORMATS.complete, DATE_TIME_FORMATS.default], true).isValid()) {
     errors = { ...errors, to: invalidDateFormatError };
   }
 
