@@ -25,8 +25,6 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import one.util.streamex.EntryStream;
 import org.graylog.plugins.views.search.errors.SearchError;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.Set;
@@ -75,6 +73,10 @@ public class SearchJob {
 
     public String getOwner() {
         return owner;
+    }
+
+    public Set<SearchError> getErrors() {
+        return errors;
     }
 
     public CompletableFuture<Void> getResultFuture() {

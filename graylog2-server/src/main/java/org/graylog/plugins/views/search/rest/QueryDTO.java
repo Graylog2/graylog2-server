@@ -21,7 +21,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.Filter;
@@ -59,6 +58,7 @@ abstract class QueryDTO {
     static QueryDTO fromQuery(Query query) {
         return QueryDTO.Builder.create()
                 .id(query.id())
+                .query(query.query())
                 .filter(query.filter())
                 .searchTypes(query.searchTypes())
                 .timerange(query.timerange())

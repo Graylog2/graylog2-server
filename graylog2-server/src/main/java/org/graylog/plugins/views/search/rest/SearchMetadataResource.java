@@ -65,7 +65,8 @@ public class SearchMetadataResource extends RestResource implements PluginRestRe
     @ApiOperation(value = "Metadata for the given Search object", notes = "Used for already persisted search objects")
     @Path("{searchId}")
     public SearchMetadata metadata(@ApiParam("searchId") @PathParam("searchId") String searchId, @Context SearchUser searchUser) {
-        final Search search = searchDomain.getForUser(searchId, searchUser)
+        final SearchDTO search = searchDomain.getForUser(searchId, searchUser)
+                .map(SearchDTO::fromSearch)
                 .orElseThrow(() -> new NotFoundException("Search with id " + searchId + " does not exist"));
         return metadataForObject(search);
     }
@@ -73,10 +74,11 @@ public class SearchMetadataResource extends RestResource implements PluginRestRe
     @POST
     @ApiOperation(value = "Metadata for the posted Search object", notes = "Intended for search objects that aren't yet persisted (e.g. for validation or interactive purposes)")
     @NoAuditEvent("Only returning metadata for given search, not changing any data")
-    public SearchMetadata metadataForObject(@ApiParam @NotNull(message = "Search body is mandatory") Search search) {
-        if (search == null) {
+    public SearchMetadata metadataForObject(@ApiParam @NotNull(message = "Search body is mandatory") SearchDTO searchDTO) {
+        if (searchDTO == null) {
             throw new IllegalArgumentException("Search must not be null.");
         }
+        final Search search = searchDTO.toSearch();
         final Map<String, QueryMetadata> queryMetadatas = StreamEx.of(search.queries()).toMap(Query::id, query -> queryEngine.parse(search, query));
         return SearchMetadata.create(queryMetadatas, Maps.uniqueIndex(search.parameters(), Parameter::name));
     }
