@@ -46,7 +46,6 @@ public abstract class ValidationRequest {
     @AutoValue.Builder
     public abstract static class Builder {
 
-        @JsonProperty
         public abstract Builder query(@NotNull BackendQuery query);
 
         public abstract Builder streams(@NotNull Set<String> streams);
@@ -57,7 +56,6 @@ public abstract class ValidationRequest {
 
         public abstract ValidationRequest build();
 
-        @JsonCreator
         public static Builder builder() {
             return new AutoValue_ValidationRequest.Builder();
         }
