@@ -39,7 +39,7 @@ import java.util.Set;
 @JsonAutoDetect
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonDeserialize(builder = QueryDTO.Builder.class)
-public abstract class QueryDTO {
+abstract class QueryDTO {
     @JsonProperty
     public abstract Optional<String> id();
 
@@ -56,19 +56,28 @@ public abstract class QueryDTO {
     @JsonProperty("search_types")
     public abstract Set<SearchType> searchTypes();
 
+    static QueryDTO fromQuery(Query query) {
+        return QueryDTO.Builder.create()
+                .id(query.id())
+                .filter(query.filter())
+                .searchTypes(query.searchTypes())
+                .timerange(query.timerange())
+                .build();
+    }
+
     @AutoValue.Builder
-    public abstract static class Builder {
+    abstract static class Builder {
         @JsonProperty
-        public abstract Builder id(String id);
+        public abstract Builder id(@Nullable String id);
 
         @JsonProperty
-        public abstract Builder timerange(TimeRange timerange);
+        public abstract Builder timerange(@Nullable TimeRange timerange);
 
         @JsonProperty
-        public abstract Builder filter(Filter filter);
+        public abstract Builder filter(@Nullable Filter filter);
 
         @JsonProperty
-        public abstract Builder query(BackendQuery query);
+        public abstract Builder query(@Nullable BackendQuery query);
 
         @JsonProperty("search_types")
         public abstract Builder searchTypes(@Nonnull Set<SearchType> searchTypes);
@@ -81,7 +90,7 @@ public abstract class QueryDTO {
         }
     }
 
-    public Query toQuery() {
+    Query toQuery() {
         Query.Builder queryBuilder = Query.builder();
         queryBuilder = id().map(queryBuilder::id).orElse(queryBuilder);
         queryBuilder = timerange().map(queryBuilder::timerange).orElse(queryBuilder);

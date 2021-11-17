@@ -57,6 +57,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
 
 @Api(value = "Search")
 @Path("/views/search")
@@ -66,6 +67,7 @@ import java.util.concurrent.TimeoutException;
 public class SearchResource extends RestResource implements PluginRestResource {
     private static final Logger LOG = LoggerFactory.getLogger(SearchResource.class);
     private static final String BASE_PATH = "views/search";
+    private static final String SEARCH_FORMAT_V1 = "application/vnd.graylog.search.v1+json";
 
     private final SearchDomain searchDomain;
     private final SearchExecutor searchExecutor;
@@ -84,32 +86,41 @@ public class SearchResource extends RestResource implements PluginRestResource {
     }
 
     @POST
-    @ApiOperation(value = "Create a search query", response = Search.class, code = 201)
+    @ApiOperation(value = "Create a search query", response = SearchDTO.class, code = 201)
     @AuditEvent(type = ViewsAuditEventTypes.SEARCH_CREATE)
+    @Consumes({ MediaType.APPLICATION_JSON, SEARCH_FORMAT_V1 })
+    @Produces(SEARCH_FORMAT_V1)
     public Response createSearch(@ApiParam SearchDTO searchRequest, @Context SearchUser searchUser) {
         final Search search = searchRequest.toSearch();
 
         final Search saved = searchDomain.saveForUser(search, searchUser);
-        if (saved == null || saved.id() == null) {
+        final SearchDTO result = SearchDTO.fromSearch(saved);
+        if (result == null || result.id() == null) {
             return Response.serverError().build();
         }
-        LOG.debug("Created new search object {}", saved.id());
-        return Response.created(URI.create(saved.id())).entity(saved).build();
+        LOG.debug("Created new search object {}", result.id());
+        return Response.created(URI.create(result.id())).entity(result).build();
     }
 
     @GET
     @ApiOperation(value = "Retrieve a search query")
     @Path("{id}")
-    public Search getSearch(@ApiParam(name = "id") @PathParam("id") String searchId, @Context SearchUser searchUser) {
-        return searchDomain.getForUser(searchId, searchUser)
+    @Produces(SEARCH_FORMAT_V1)
+    public SearchDTO getSearch(@ApiParam(name = "id") @PathParam("id") String searchId, @Context SearchUser searchUser) {
+        final Search search = searchDomain.getForUser(searchId, searchUser)
                 .orElseThrow(() -> new NotFoundException("Search with id " + searchId + " does not exist"));
+        return SearchDTO.fromSearch(search);
     }
 
     @GET
     @ApiOperation(value = "Get all searches which the user may see")
-    public List<Search> getAllSearches(@Context SearchUser searchUser) {
+    @Produces(SEARCH_FORMAT_V1)
+    public List<SearchDTO> getAllSearches(@Context SearchUser searchUser) {
         // TODO should be paginated
-        return searchDomain.getAllForUser(searchUser, searchUser::canReadView);
+        final List<Search> searches = searchDomain.getAllForUser(searchUser, searchUser::canReadView);
+        return searches.stream()
+                .map(SearchDTO::fromSearch)
+                .collect(Collectors.toList());
     }
 
     @POST
@@ -118,6 +129,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
                   response = SearchJob.class)
     @Path("{id}/execute")
     @NoAuditEvent("Creating audit event manually in method body.")
+    @Produces(SEARCH_FORMAT_V1)
     public Response executeQuery(@ApiParam(name = "id") @PathParam("id") String id,
                                  @ApiParam ExecutionState executionState,
                                  @Context SearchUser searchUser) {
@@ -134,6 +146,8 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @ApiOperation(value = "Execute a new synchronous search", notes = "Executes a new search and waits for its result", response = SearchJob.class)
     @Path("sync")
     @NoAuditEvent("Creating audit event manually in method body.")
+    @Consumes({ MediaType.APPLICATION_JSON, SEARCH_FORMAT_V1 })
+    @Produces(SEARCH_FORMAT_V1)
     public Response executeSyncJob(@ApiParam @NotNull(message = "Search body is mandatory") SearchDTO searchRequest,
                                    @ApiParam(name = "timeout", defaultValue = "60000")
                                    @QueryParam("timeout") @DefaultValue("60000") long timeout,
@@ -149,6 +163,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @GET
     @ApiOperation(value = "Retrieve the status of an executed query")
     @Path("status/{jobId}")
+    @Produces(SEARCH_FORMAT_V1)
     public SearchJob jobStatus(@ApiParam(name = "jobId") @PathParam("jobId") String jobId, @Context SearchUser searchUser) {
         final SearchJob searchJob = searchJobService.load(jobId, searchUser.username()).orElseThrow(NotFoundException::new);
         try {

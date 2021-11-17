@@ -113,9 +113,9 @@ public class SearchResourceTest {
     public void getSearchLoadsSearch() {
         final Search search = mockExistingSearch();
 
-        final Search returnedSearch = this.searchResource.getSearch(search.id(), searchUser);
+        final SearchDTO returnedSearch = this.searchResource.getSearch(search.id(), searchUser);
 
-        assertThat(returnedSearch).isEqualTo(search);
+        assertThat(returnedSearch.id()).isEqualTo(search.id());
     }
 
     @Test
@@ -142,7 +142,9 @@ public class SearchResourceTest {
         final String streamId = "streamId";
 
         final Query query = mock(Query.class);
+        when(query.id()).thenReturn("queryId");
         when(query.usedStreamIds()).thenReturn(ImmutableSet.of(streamId));
+        when(query.searchTypes()).thenReturn(ImmutableSet.of());
         when(search.queries()).thenReturn(ImmutableSet.of(query));
 
         return search;
@@ -154,6 +156,7 @@ public class SearchResourceTest {
 
         final String searchId = "deadbeef";
         when(search.id()).thenReturn(searchId);
+        when(search.parameters()).thenReturn(ImmutableSet.of());
 
         when(search.applyExecutionState(any(), any())).thenReturn(search);
         when(searchDomain.getForUser(eq(search.id()), any())).thenReturn(Optional.of(search));

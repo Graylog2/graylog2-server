@@ -30,6 +30,7 @@ import org.mongojack.Id;
 
 import javax.annotation.Nullable;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.google.common.collect.ImmutableSet.of;
@@ -37,7 +38,7 @@ import static com.google.common.collect.ImmutableSet.of;
 @AutoValue
 @JsonAutoDetect
 @JsonDeserialize(builder = SearchDTO.Builder.class)
-public abstract class SearchDTO {
+abstract class SearchDTO {
     @Nullable
     @JsonProperty
     public abstract String id();
@@ -48,8 +49,19 @@ public abstract class SearchDTO {
     @JsonProperty
     public abstract Set<Parameter> parameters();
 
+    static SearchDTO fromSearch(Search search) {
+        return SearchDTO.Builder.create()
+                .id(search.id())
+                .parameters(search.parameters())
+                .queries(search.queries()
+                        .stream()
+                        .map(QueryDTO::fromQuery)
+                        .collect(Collectors.toSet()))
+                .build();
+    }
+
     @AutoValue.Builder
-    public abstract static class Builder {
+    abstract static class Builder {
         @Id
         @JsonProperty
         public abstract Builder id(String id);
@@ -65,14 +77,14 @@ public abstract class SearchDTO {
         public abstract SearchDTO build();
 
         @JsonCreator
-        public static Builder create() {
+        static Builder create() {
             return new AutoValue_SearchDTO.Builder()
                     .queries(ImmutableSet.of())
                     .parameters(of());
         }
     }
 
-    public Search toSearch() {
+    Search toSearch() {
         final ImmutableSet<Query> queries = queries().stream()
                 .map(QueryDTO::toQuery)
                 .collect(ImmutableSet.toImmutableSet());
