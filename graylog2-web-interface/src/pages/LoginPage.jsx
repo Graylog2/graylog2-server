@@ -172,7 +172,7 @@ const LoginPage = () => {
         {renderLoginForm()}
         {shouldDisplayFallbackLink && (
         <StyledButton as="a" onClick={() => setUseFallback(!useFallback)}>
-          {`Login with ${useFallback ? loginComponent.type.replace(/^\w/, (c) => c.toLocaleUpperCase('en')) : 'default method'}`}
+          {`Login with ${useFallback ? loginComponent.type.replace(/^\w/, (c) => c.toUpperCase()) : 'default method'}`}
         </StyledButton>
         )}
       </LoginBox>

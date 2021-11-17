@@ -45,7 +45,7 @@ class TimeBasedRotationStrategyConfiguration extends React.Component {
 
     return () => {
       const update = {};
-      let period = this.inputs[field].getValue().toLocaleUpperCase('en');
+      let period = this.inputs[field].getValue().toUpperCase();
 
       if (!period.startsWith('P')) {
         period = `P${period}`;

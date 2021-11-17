@@ -1508,7 +1508,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
       for (_i = 0, _len = _ref5.length; _i < _len; _i++) {
         param = _ref5[_i];
         type = param.type || param.dataType;
-        if (type.toLocaleLowerCase('en') === 'file') {
+        if (type.toLowerCase() === 'file') {
           if (!contentTypeModel.consumes) {
             console.log("set content type ");
             contentTypeModel.consumes = 'multipart/form-data';
@@ -1813,7 +1813,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
       if (this.model.paramType === 'body') {
         this.model.isBody = true;
       }
-      if (type.toLocaleLowerCase('en') === 'file') {
+      if (type.toLowerCase() === 'file') {
         this.model.isFile = true;
       }
       template = this.template();

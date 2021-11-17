@@ -98,7 +98,7 @@ const _systemTitle = (pathname) => {
 
 const SystemMenu = ({ location }) => {
   const pluginSystemNavigations = PluginStore.exports('systemnavigation')
-    .sort((route1, route2) => naturalSort(route1.description.toLocaleLowerCase('en'), route2.description.toLocaleLowerCase('en')))
+    .sort((route1, route2) => naturalSort(route1.description.toLowerCase(), route2.description.toLowerCase()))
     .map(({ description, path, permissions }) => {
       const prefixedPath = appPrefixed(path);
       const link = <NavigationLink description={description} path={prefixedPath} />;

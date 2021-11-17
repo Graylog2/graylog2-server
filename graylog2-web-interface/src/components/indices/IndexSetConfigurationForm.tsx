@@ -307,7 +307,7 @@ class IndexSetConfigurationForm extends React.Component<Props, State> {
                                label="Field type refresh interval"
                                help="How often the field type information for the active write index will be updated."
                                value={moment.duration(indexSet.field_type_refresh_interval, 'milliseconds').as(fieldTypeRefreshIntervalUnit)}
-                               unit={fieldTypeRefreshIntervalUnit.toLocaleUpperCase('en')}
+                               unit={fieldTypeRefreshIntervalUnit.toUpperCase()}
                                units={['SECONDS', 'MINUTES']}
                                required
                                update={this._onFieldTypeRefreshIntervalChange} />

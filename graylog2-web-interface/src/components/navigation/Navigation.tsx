@@ -85,7 +85,7 @@ const Navigation = React.memo(({ pathname }: Props) => {
 
   const pluginExports = PluginStore.exports('navigation');
 
-  const enterpriseMenuIsMissing = !pluginExports.find((value) => value.description.toLocaleLowerCase('en') === 'enterprise');
+  const enterpriseMenuIsMissing = !pluginExports.find((value) => value.description.toLowerCase() === 'enterprise');
   const isPermittedToEnterprise = isPermitted(permissions, ['licenseinfos:read']);
 
   if (enterpriseMenuIsMissing && isPermittedToEnterprise) {
@@ -97,7 +97,7 @@ const Navigation = React.memo(({ pathname }: Props) => {
   }
 
   const pluginNavigations = pluginExports
-    .sort((route1, route2) => naturalSort(route1.description.toLocaleLowerCase('en'), route2.description.toLocaleLowerCase('en')))
+    .sort((route1, route2) => naturalSort(route1.description.toLowerCase(), route2.description.toLowerCase()))
     .map((pluginRoute) => formatPluginRoute(pluginRoute, permissions, pathname));
   const pluginItems = PluginStore.exports('navigationItems');
 

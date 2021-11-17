@@ -34,7 +34,7 @@ class IndexerClusterHealthSummary extends React.Component {
   };
 
   _formatHealthStatus = ({ status }) => {
-    return status.toLocaleLowerCase('en');
+    return status.toLowerCase();
   };
 
   _alertClassForHealth = (health) => {

@@ -29,7 +29,7 @@ type Results = {
 const _findMessages = (results: Results): (MessageResult | undefined) => {
   return Object.keys(results.searchTypes)
     .map((id) => results.searchTypes[id])
-    .find((searchType) => searchType.type.toLocaleLowerCase('en') === 'messages') as MessageResult;
+    .find((searchType) => searchType.type.toLowerCase() === 'messages') as MessageResult;
 };
 
 const _searchTypePlugin = (type: string) => {

@@ -90,7 +90,7 @@ const BufferUsage = ({ nodeId, bufferType, title }: Props) => {
           label: percentLabel,
         }]} />
       </NodeBufferUsage>
-      <span><strong>{usage} messages</strong> in {title.toLocaleLowerCase('en')}, {percentLabel} utilized.</span>
+      <span><strong>{usage} messages</strong> in {title.toLowerCase()}, {percentLabel} utilized.</span>
     </div>
   );
 };

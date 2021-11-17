@@ -164,7 +164,7 @@ const TimeUnitInput = createReactClass({
   _getUnitOptions(units) {
     return unitValues
       .filter((value) => units.includes(value))
-      .map((value) => ({ value: value, label: value.toLocaleLowerCase('en') }));
+      .map((value) => ({ value: value, label: value.toLowerCase() }));
   },
 
   _isChecked() {

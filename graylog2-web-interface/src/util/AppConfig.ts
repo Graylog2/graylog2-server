@@ -44,7 +44,7 @@ const appConfig = (): AppConfigs => {
 
 const getEnabledFeatures = () => {
   return Immutable.Map(appConfig().featureFlags)
-    .filter((value) => value.trim().toLocaleLowerCase('en') === 'on')
+    .filter((value) => value.trim().toLowerCase() === 'on')
     .keySeq().toList()
     .filter((s) => typeof s === 'string');
 };

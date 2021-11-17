@@ -20,7 +20,7 @@ import type { FieldActionHandler } from 'views/logic/fieldactions/FieldActionHan
 const RemoveFromAllTablesActionHandler: FieldActionHandler<{}> = ({ field }) => {
   const widgets = WidgetStore.getInitialState();
   const newWidgets = widgets.map((widget) => {
-    if (widget.type.toLocaleUpperCase('en') === 'MESSAGES') {
+    if (widget.type.toUpperCase() === 'MESSAGES') {
       const newFields = widget.config.fields.filter((f) => (f !== field));
       const newConfig = widget.config.toBuilder()
         .fields(newFields)

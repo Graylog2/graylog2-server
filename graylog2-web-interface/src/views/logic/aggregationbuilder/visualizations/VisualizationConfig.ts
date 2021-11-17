@@ -25,7 +25,7 @@ type DeserializesVisualizationConfig = {
 
 export default class VisualizationConfig {
   static fromJSON(type: string, value: any): VisualizationConfig {
-    const implementingClass = VisualizationConfig.__registrations[type.toLocaleLowerCase('en')];
+    const implementingClass = VisualizationConfig.__registrations[type.toLowerCase()];
 
     if (implementingClass) {
       return implementingClass.fromJSON(type, value);
@@ -47,6 +47,6 @@ export default class VisualizationConfig {
   static __registrations: { [key: string]: DeserializesVisualizationConfig } = {};
 
   static registerSubtype(type: string, implementingClass: DeserializesVisualizationConfig) {
-    this.__registrations[type.toLocaleLowerCase('en')] = implementingClass;
+    this.__registrations[type.toLowerCase()] = implementingClass;
   }
 }

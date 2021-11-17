@@ -106,7 +106,7 @@ type Props = {
   setLoadingState: (loading: boolean) => void,
 };
 
-const _columnStyle = (fieldName: string) => (fieldName.toLocaleLowerCase('en') === SOURCE_FIELD
+const _columnStyle = (fieldName: string) => (fieldName.toLowerCase() === SOURCE_FIELD
   ? { width: 180 }
   : {});
 

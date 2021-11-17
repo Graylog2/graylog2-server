@@ -34,7 +34,7 @@ const NodeState = styled.dl`
 `;
 
 export const SystemOverviewSummary = ({ information }) => {
-  const lbStatus = information.lb_status.toLocaleUpperCase('en');
+  const lbStatus = information.lb_status.toUpperCase();
 
   return (
     <NodeState>

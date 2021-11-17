@@ -83,7 +83,7 @@ export default class SortConfig {
   static __registrations: { [key: string]: typeof SortConfig } = {};
 
   static registerSubtype(type: string, implementingClass: typeof SortConfig) {
-    this.__registrations[type.toLocaleLowerCase('en')] = implementingClass;
+    this.__registrations[type.toLowerCase()] = implementingClass;
   }
 
   static fromPivot(pivot: Pivot) {

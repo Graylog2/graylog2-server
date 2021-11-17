@@ -43,7 +43,7 @@ class SystemOverviewDetails extends React.Component {
 
   render() {
     const { information } = this.props;
-    const lbStatus = information.lb_status.toLocaleUpperCase('en');
+    const lbStatus = information.lb_status.toUpperCase();
     let processingStatus;
 
     if (information.is_processing) {

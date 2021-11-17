@@ -19,7 +19,7 @@ const SourceGenerator = {
     let source = `pipeline "${pipeline.title}"\n`;
 
     pipeline.stages.forEach((stage) => {
-      source += `stage ${stage.stage} match ${stage.match?.toLocaleLowerCase('en') || 'either'}\n`;
+      source += `stage ${stage.stage} match ${stage.match?.toLowerCase() || 'either'}\n`;
 
       stage.rules.forEach((rule) => {
         source += `rule "${rule}"\n`;

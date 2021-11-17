@@ -57,7 +57,7 @@ const StyledPaginatedList = styled(PaginatedList)`
 `;
 
 const _headerCellFormatter = (header) => {
-  switch (header.toLocaleLowerCase('en')) {
+  switch (header.toLowerCase()) {
     case 'actions':
       return <th className="actions text-right">{header}</th>;
     default:
