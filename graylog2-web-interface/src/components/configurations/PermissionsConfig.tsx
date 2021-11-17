@@ -62,15 +62,15 @@ const PermissionsConfig = ({ config, updateConfig }: Props) => {
   return (
     <div>
       <h2>Permissions Config</h2>
-      <p>Configuration for Permissions</p>
+      <p>These settings can be used to control which entity sharing options are available</p>
 
       {!config ? <Spinner /> : (
         <>
           <StyledDefList>
             <dt>Share with everyone:</dt>
-            <dd>{config.sharing_with_everyone ? 'Enabled' : 'Disabled'}</dd>
+            <dd>{config.allow_sharing_with_everyone ? 'Enabled' : 'Disabled'}</dd>
             <dt>Share with users:</dt>
-            <dd>{config.sharing_with_users ? 'Enabled' : 'Disabled'}</dd>
+            <dd>{config.allow_sharing_with_users ? 'Enabled' : 'Disabled'}</dd>
           </StyledDefList>
 
           <p>
@@ -98,7 +98,7 @@ const PermissionsConfig = ({ config, updateConfig }: Props) => {
                         <Row>
                           <Col sm={12}>
                             <FormikInput type="checkbox"
-                                         name="sharing_with_everyone"
+                                         name="allow_sharing_with_everyone"
                                          id="shareWithEveryone"
                                          label={(
                                            <LabelSpan>Share with everyone</LabelSpan>
@@ -107,7 +107,7 @@ const PermissionsConfig = ({ config, updateConfig }: Props) => {
                           </Col>
                           <Col sm={12}>
                             <FormikInput type="checkbox"
-                                         name="sharing_with_users"
+                                         name="allow_sharing_with_users"
                                          id="shareWithUsers"
                                          label={(
                                            <LabelSpan>Share with users</LabelSpan>

@@ -26,10 +26,12 @@ import org.graylog.autovalue.WithBeanGetter;
 @AutoValue
 @WithBeanGetter
 public abstract class UserAndTeamsConfig {
-    @JsonProperty
+    public static final UserAndTeamsConfig DEFAULT_VALUES = create(true, true);
+
+    @JsonProperty("allow_sharing_with_everyone")
     public abstract boolean sharingWithEveryone();
 
-    @JsonProperty
+    @JsonProperty("allow_sharing_with_users")
     public abstract boolean sharingWithUsers();
 
     @JsonCreator

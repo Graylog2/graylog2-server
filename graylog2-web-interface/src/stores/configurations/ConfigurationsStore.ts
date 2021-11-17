@@ -62,8 +62,8 @@ export type WhiteListConfig = {
   disabled: boolean,
 };
 export type PermissionsConfigType = {
-  sharing_with_everyone: boolean,
-  sharing_with_users: boolean,
+  allow_sharing_with_everyone: boolean,
+  allow_sharing_with_users: boolean,
 }
 export type ConfigurationsStoreState = {
   configuration: Record<string, any>,
@@ -150,8 +150,8 @@ export const ConfigurationsStore = singletonStore(
         this.configuration = {
           ...this.configuration,
           [configType]: response || {
-            sharing_with_everyone: true,
-            sharing_with_users: true,
+            allow_sharing_with_everyone: true,
+            allow_sharing_with_users: true,
           },
         };
 

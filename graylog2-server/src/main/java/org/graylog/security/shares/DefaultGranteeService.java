@@ -29,7 +29,6 @@ import org.graylog2.users.UserAndTeamsConfig;
 
 import javax.inject.Inject;
 import java.util.Collections;
-import java.util.Optional;
 import java.util.Set;
 
 public class DefaultGranteeService implements GranteeService {
@@ -76,8 +75,8 @@ public class DefaultGranteeService implements GranteeService {
     }
 
     private ImmutableSet<AvailableGrantee> getAvailableUserGrantees(User sharingUser) {
-        final Optional<UserAndTeamsConfig> config = Optional.ofNullable(clusterConfigService.get(UserAndTeamsConfig.class));
-        if (config.isPresent() && !config.get().sharingWithUsers()) {
+        final UserAndTeamsConfig config = clusterConfigService.getOrDefault(UserAndTeamsConfig.class, UserAndTeamsConfig.DEFAULT_VALUES);
+        if (!config.sharingWithUsers()) {
             return ImmutableSet.of();
         }
 
@@ -95,8 +94,8 @@ public class DefaultGranteeService implements GranteeService {
 
     private ImmutableSet<AvailableGrantee> getGlobalGrantees() {
         final ImmutableSet.Builder<AvailableGrantee> builder = ImmutableSet.<AvailableGrantee>builder();
-        final Optional<UserAndTeamsConfig> config = Optional.ofNullable(clusterConfigService.get(UserAndTeamsConfig.class));
-        if (config.isPresent() && config.get().sharingWithEveryone()) {
+        final UserAndTeamsConfig config = clusterConfigService.getOrDefault(UserAndTeamsConfig.class, UserAndTeamsConfig.DEFAULT_VALUES);
+        if (config.sharingWithEveryone()) {
             builder.add(getGlobalGrantee());
         }
         return builder.build();
