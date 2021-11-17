@@ -514,7 +514,7 @@ public class PipelineInterpreterTest {
                 SetField.NAME, new SetField(),
                 DoubleConversion.NAME, new DoubleConversion(),
                 HasField.NAME, new HasField()
-                ));
+        ));
 
         // when
         final List<Message> processed = extractMessagesFromMessageCollection(interpreter.process(messageWithNumField(new Long(1))));
