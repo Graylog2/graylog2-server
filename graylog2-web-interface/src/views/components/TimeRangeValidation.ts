@@ -23,8 +23,8 @@ import {
   RelativeTimeRangeWithEnd,
   AbsoluteTimeRange,
 } from 'views/logic/queries/Query';
-import DateTime from 'logic/datetimes/DateTime';
 import { isTypeAbsolute, isTypeRelativeWithEnd, isTypeKeyword } from 'views/typeGuards/timeRange';
+import { DATE_TIME_FORMATS } from 'contexts/DateTimeProvider';
 
 const invalidDateFormatError = 'Format must be: YYYY-MM-DD [HH:mm:ss[.SSS]].';
 const rangeLimitError = 'Range is outside limit duration.';
@@ -40,7 +40,7 @@ const exceedsDuration = (timeRange, limitDuration, formatTime) => {
     case 'absolute':
     case 'keyword': { // eslint-disable-line no-fallthrough, padding-line-between-statements
       const durationFrom = timeRange.from;
-      const durationLimit = formatTime(new Date()).subtract(Number(limitDuration), 'seconds').format(DateTime.Formats.TIMESTAMP);
+      const durationLimit = formatTime(moment().subtract(Number(limitDuration), 'seconds'), undefined, 'complete');
 
       return moment(durationFrom).isBefore(durationLimit);
     }
@@ -56,11 +56,11 @@ const validateAbsoluteTimeRange = (timeRange: AbsoluteTimeRange, limitDuration: 
     to?: string,
   } = {};
 
-  if (!DateTime.isValidDateString(timeRange.from)) {
+  if (!moment(timeRange.from, DATE_TIME_FORMATS.complete, true).isValid()) {
     errors = { ...errors, from: invalidDateFormatError };
   }
 
-  if (!DateTime.isValidDateString(timeRange.to)) {
+  if (!moment(timeRange.to, DATE_TIME_FORMATS.complete, true).isValid()) {
     errors = { ...errors, to: invalidDateFormatError };
   }
 
