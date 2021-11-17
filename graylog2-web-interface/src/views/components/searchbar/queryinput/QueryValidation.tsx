@@ -25,6 +25,8 @@ import { Icon } from 'components/common';
 import { QueriesActions, QueryValidationState } from 'views/stores/QueriesStore';
 import StringUtils from 'util/StringUtils';
 import { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
+import { useStore } from 'stores/connect';
+import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
 
 const Container = styled.div`
   margin-right: 5px;
@@ -44,22 +46,22 @@ const ErrorIcon = styled(Icon)(({ theme, $status }: { theme: DefaultTheme, $stat
   font-size: 22px;
 `);
 
-const validateQuery = debounce((queryString, timeRange, streams, setValidationState) => {
+const validateQuery = debounce((queryString, timeRange, streams, setValidationState, parameters, parameterBindings) => {
   const cleanTimeRange = isEmpty(timeRange) ? undefined : timeRange;
 
-  QueriesActions.validateQuery(queryString, cleanTimeRange, streams).then((result) => {
+  QueriesActions.validateQuery(queryString, cleanTimeRange, streams, parameters, parameterBindings).then((result) => {
     setValidationState(result);
   });
 }, 350);
 
-const useValidateQuery = (queryString, timeRange, streams): QueryValidationState | undefined => {
+const useValidateQuery = (queryString, timeRange, streams, parameters, parameterBindings): QueryValidationState | undefined => {
   const [validationState, setValidationState] = useState(undefined);
 
   useEffect(() => {
     if (queryString) {
-      validateQuery(queryString, timeRange, streams, setValidationState);
+      validateQuery(queryString, timeRange, streams, setValidationState, parameters, parameterBindings);
     }
-  }, [queryString, timeRange, streams]);
+  }, [queryString, timeRange, streams, parameterBindings, parameters]);
 
   useEffect(() => {
     if (!queryString && validationState) {
@@ -91,11 +93,12 @@ type Props = {
 }
 
 const QueryValidation = ({ queryString, timeRange, streams }: Props) => {
+  const { parameterBindings } = useStore(SearchExecutionStateStore, (test2) => test2);
   const [showExplanation, setShowExplanation] = useState(false);
   const containerRef = useRef(null);
   const explanationTriggerRef = useRef(null);
   const toggleShow = () => setShowExplanation((prevShow) => !prevShow);
-  const validationState = useValidateQuery(queryString, timeRange, streams);
+  const validationState = useValidateQuery(queryString, timeRange, streams, [], parameterBindings);
 
   // We need to always display the container to avoid query inout resizing problems
   // we need to always display the overlay trigger to avoid overlay placement problems

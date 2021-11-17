@@ -198,8 +198,21 @@ export const QueriesStore: QueriesStoreType = singletonStore(
       return promise;
     },
 
-    validateQuery(queryString: string, timeRange: TimeRange | undefined, streams: Array<string> | undefined): Promise<QueryValidationState> {
-      const promise = fetch('POST', qualifyUrl('/search/validate'), { query: queryString, timerange: timeRange, streams }).then((result) => {
+    validateQuery(
+      queryString: string,
+      timeRange: TimeRange | undefined,
+      streams: Array<string> | undefined,
+      parameters: any = [],
+      parameterBindings: any = {},
+    ): Promise<QueryValidationState> {
+      const payload = {
+        query: queryString,
+        timerange: timeRange,
+        streams,
+        parameters,
+        parameter_bindings: parameterBindings,
+      };
+      const promise = fetch('POST', qualifyUrl('/search/validate'), payload).then((result) => {
         if (result) {
           return ({
             status: result.status,
