@@ -19,8 +19,6 @@ package org.graylog.plugins.views.containermatrixtests;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import org.graylog.testing.completebackend.GraylogBackend;
-import org.graylog.testing.containermatrix.annotations.AfterVersion;
-import org.graylog.testing.containermatrix.annotations.BeforeVersion;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.junit.jupiter.api.AfterAll;
@@ -56,11 +54,6 @@ class MessagesResourceMultipleESVersionsIT1_CLASS_D_D {
         LOG.info("ignored");
     }
 
-    @BeforeVersion
-    public void beforeVersion() {
-        LOG.info("beforeVersion");
-    }
-
     @BeforeAll
     public static void beforeAll() {
         LOG.info("beforeAll");
@@ -79,11 +72,6 @@ class MessagesResourceMultipleESVersionsIT1_CLASS_D_D {
     @AfterEach
     public void afterEach() {
         LOG.info("afterEach");
-    }
-
-    @AfterVersion
-    public void afterVersion() {
-        LOG.info("afterVersion");
     }
 
     @ContainerMatrixTest
