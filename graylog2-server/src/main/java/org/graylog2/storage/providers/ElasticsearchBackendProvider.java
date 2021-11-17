@@ -21,6 +21,7 @@ import org.graylog.plugins.views.search.engine.QueryBackend;
 import org.graylog2.plugin.Version;
 import org.graylog2.storage.ElasticsearchVersion;
 import org.graylog2.storage.VersionAwareProvider;
+import org.graylog2.storage.versionprobe.SearchVersion;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -28,8 +29,8 @@ import java.util.Map;
 
 public class ElasticsearchBackendProvider extends VersionAwareProvider<QueryBackend<? extends GeneratedQueryContext>> {
     @Inject
-    public ElasticsearchBackendProvider(@ElasticsearchVersion Version version,
-                                        Map<Version, Provider<QueryBackend<? extends GeneratedQueryContext>>> pluginBindings) {
+    public ElasticsearchBackendProvider(@ElasticsearchVersion SearchVersion version,
+                                        Map<SearchVersion, Provider<QueryBackend<? extends GeneratedQueryContext>>> pluginBindings) {
         super(version, pluginBindings);
     }
 }

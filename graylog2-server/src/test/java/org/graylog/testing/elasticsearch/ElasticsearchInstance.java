@@ -18,6 +18,7 @@ package org.graylog.testing.elasticsearch;
 
 import com.github.zafarkhaja.semver.Version;
 import com.google.common.io.Resources;
+import org.graylog2.storage.versionprobe.SearchVersion;
 import org.junit.rules.ExternalResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,7 +53,7 @@ public abstract class ElasticsearchInstance extends ExternalResource implements 
     private static final int ES_PORT = 9200;
     private static final String NETWORK_ALIAS = "elasticsearch";
 
-    private final Version version;
+    private final SearchVersion version;
     protected final ElasticsearchContainer container;
 
     protected abstract Client client();
@@ -64,8 +65,7 @@ public abstract class ElasticsearchInstance extends ExternalResource implements 
     }
 
     protected ElasticsearchInstance(String image, Version version, Network network) {
-        this.version = version;
-
+        this.version = SearchVersion.elasticsearch(new org.graylog2.plugin.Version(version));
         this.container = createContainer(image, version, network);
     }
 
@@ -114,7 +114,7 @@ public abstract class ElasticsearchInstance extends ExternalResource implements 
         return String.format(Locale.US, "http://%s:%d", NETWORK_ALIAS, ES_PORT);
     }
 
-    public Version version() {
+    public SearchVersion version() {
         return version;
     }
 

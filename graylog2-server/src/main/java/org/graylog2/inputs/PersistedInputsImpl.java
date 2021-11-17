@@ -94,8 +94,9 @@ public class PersistedInputsImpl implements PersistedInputs {
     public boolean remove(Object o) {
         if (o instanceof MessageInput) {
             final MessageInput messageInput = (MessageInput) o;
-            if (isNullOrEmpty(messageInput.getId()))
+            if (isNullOrEmpty(messageInput.getId())) {
                 return false;
+            }
             try {
                 final Input input = inputService.find(messageInput.getId());
                 inputService.destroy(input);
@@ -110,6 +111,15 @@ public class PersistedInputsImpl implements PersistedInputs {
 
     @Override
     public boolean update(String id, MessageInput newInput) {
+        return update(id, newInput, true);
+    }
+
+    @Override
+    public boolean saveWithoutEvents(String id, MessageInput newInput) {
+        return update(id, newInput, false);
+    }
+
+    private boolean update(String id, MessageInput newInput, boolean fireEvents) {
         try {
             final Input oldInput = inputService.find(id);
             newInput.setPersistId(id);
@@ -118,13 +128,19 @@ public class PersistedInputsImpl implements PersistedInputs {
             final List<Extractor> extractors = inputService.getExtractors(oldInput);
             final Map<String, String> staticFields = oldInput.getStaticFields();
 
-            inputService.save(mongoInput);
+            if (fireEvents) {
+                inputService.save(mongoInput);
+            } else {
+                inputService.saveWithoutEvents(mongoInput);
+            }
 
-            for (Map.Entry<String, String> entry : staticFields.entrySet())
+            for (Map.Entry<String, String> entry : staticFields.entrySet()) {
                 inputService.addStaticField(mongoInput, entry.getKey(), entry.getValue());
+            }
 
-            for (Extractor extractor : extractors)
+            for (Extractor extractor : extractors) {
                 inputService.addExtractor(mongoInput, extractor);
+            }
 
             return true;
         } catch (NotFoundException | ValidationException e) {
@@ -132,16 +148,18 @@ public class PersistedInputsImpl implements PersistedInputs {
         }
     }
 
+
     private Input getInput(MessageInput input) throws ValidationException {
         // Build MongoDB data
         final Map<String, Object> inputData = input.asMap();
 
         // ... and check if it would pass validation. We don't need to go on if it doesn't.
         final Input mongoInput;
-        if (input.getId() != null)
+        if (input.getId() != null) {
             mongoInput = inputService.create(input.getId(), inputData);
-        else
+        } else {
             mongoInput = inputService.create(inputData);
+        }
 
         return mongoInput;
     }

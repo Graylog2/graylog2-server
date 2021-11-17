@@ -23,17 +23,26 @@ import { Input } from 'components/bootstrap';
 class TimeBasedRotationStrategyConfiguration extends React.Component {
   static propTypes = {
     config: PropTypes.object.isRequired,
-    jsonSchema: PropTypes.object.isRequired,
     updateConfig: PropTypes.func.isRequired,
-  };
-
-  state = {
-    rotation_period: this.props.config.rotation_period,
   };
 
   inputs = {};
 
+  constructor(props) {
+    super(props);
+    const { config: { rotation_period: rotationPeriod } } = this.props;
+
+    const { config: { max_rotation_period: rotationLimit } } = this.props;
+
+    this.state = {
+      rotation_period: rotationPeriod,
+      rotationLimit,
+    };
+  }
+
   _onPeriodUpdate = (field) => {
+    const { updateConfig } = this.props;
+
     return () => {
       const update = {};
       let period = this.inputs[field].getValue().toUpperCase();
@@ -48,15 +57,23 @@ class TimeBasedRotationStrategyConfiguration extends React.Component {
 
       if (this._isValidPeriod(update[field])) {
         // Only propagate state if the config is valid.
-        this.props.updateConfig(update);
+        updateConfig(update);
       }
     };
   };
 
-  _isValidPeriod = (duration) => {
-    const check = duration || this.state.rotation_period;
+  _validationLimit = (durationInMilliseconds, rotationLimit) => {
+    return durationInMilliseconds <= moment.duration(rotationLimit).asMilliseconds();
+  }
 
-    return moment.duration(check).asMilliseconds() >= 3600000;
+  _isValidPeriod = (duration) => {
+    const { rotation_period: rotationPeriod, rotationLimit } = this.state;
+    const check = duration || rotationPeriod;
+    const checkInMilliseconds = moment.duration(check).asMilliseconds();
+
+    return checkInMilliseconds >= 3600000 && (
+      rotationLimit ? this._validationLimit(checkInMilliseconds, rotationLimit) : true
+    );
   };
 
   _validationState = () => {
@@ -68,19 +85,25 @@ class TimeBasedRotationStrategyConfiguration extends React.Component {
   };
 
   _formatDuration = () => {
-    return this._isValidPeriod() ? moment.duration(this.state.rotation_period).humanize() : 'invalid (min 1 hour)';
+    const { rotation_period: rotationPeriod, rotationLimit } = this.state;
+    const maxRotationPeriodErrorMessage = rotationLimit ? ` and max ${moment.duration(rotationLimit).humanize()}` : '';
+
+    return this._isValidPeriod() ? moment.duration(rotationPeriod).humanize() : `invalid (min 1 hour${maxRotationPeriodErrorMessage})`;
   };
 
   render() {
+    const { rotation_period: rotationPeriod, rotationLimit } = this.state;
+    const maxRotationPeriodHelpText = rotationLimit ? ` The max rotation period is set to ${moment.duration(rotationLimit).humanize()} by Administrator.` : '';
+
     return (
       <div>
         <Input id="rotation-period"
                type="text"
-               ref={(rotationPeriod) => { this.inputs.rotation_period = rotationPeriod; }}
+               ref={(rotationPeriodRef) => { this.inputs.rotation_period = rotationPeriodRef; }}
                label="Rotation period (ISO8601 Duration)"
                onChange={this._onPeriodUpdate('rotation_period')}
-               value={this.state.rotation_period}
-               help={'How long an index gets written to before it is rotated. (i.e. "P1D" for 1 day, "PT6H" for 6 hours)'}
+               value={rotationPeriod}
+               help={`How long an index gets written to before it is rotated. (i.e. "P1D" for 1 day, "PT6H" for 6 hours).${maxRotationPeriodHelpText}`}
                addonAfter={this._formatDuration()}
                bsStyle={this._validationState()}
                required />
