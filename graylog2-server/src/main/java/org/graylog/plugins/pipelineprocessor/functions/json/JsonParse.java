@@ -50,7 +50,7 @@ public class JsonParse extends AbstractFunction<JsonNode> {
     @Override
     public JsonNode evaluate(FunctionArgs args, EvaluationContext context) {
         final String value = valueParam.required(args, context);
-        final Long depth = depthParam.optional(args, context).orElse(Long.valueOf(0));
+        final long depth = depthParam.optional(args, context).orElse(0L);
         try {
             final JsonNode node = objectMapper.readTree(value);
             if (depth > 0) {
