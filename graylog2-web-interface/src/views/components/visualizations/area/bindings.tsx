@@ -34,7 +34,7 @@ const areaChart: VisualizationType<AreaVisualizationConfig, AreaVisualizationCon
   component: AreaVisualization,
   config: {
     createConfig: () => ({ interpolation: DEFAULT_INTERPOLATION }),
-    fromConfig: (config: AreaVisualizationConfig) => ({ interpolation: config.interpolation }),
+    fromConfig: (config: AreaVisualizationConfig) => ({ interpolation: config?.interpolation }),
     toConfig: (formValues: AreaVisualizationConfigFormValues) => AreaVisualizationConfig.create(formValues.interpolation),
     fields: [{
       name: 'interpolation',
