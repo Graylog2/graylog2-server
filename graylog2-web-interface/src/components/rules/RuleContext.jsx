@@ -133,10 +133,23 @@ PipelineRulesProvider.propTypes = {
   }),
 };
 
+const DEFAULT_RULE_SOURCE = `rule "New Rule"
+when
+  true // an expression that evaluates to true or false
+then
+  // Do something awesome!
+  // set_field("is_awesome", true);
+  // set_field("confirmed_awesome_timestamp", now());
+  //
+  // let x = capitalize("hello");
+  // let y = to_string(first_non_null([$message.nonexistent_field, "world"]));
+  // set_field("special_message", join(elements: [x,y], delimiter: " ") + "!");
+end`;
+
 PipelineRulesProvider.defaultProps = {
   usedInPipelines: [],
   rule: {
     description: '',
-    source: '',
+    source: DEFAULT_RULE_SOURCE,
   },
 };
