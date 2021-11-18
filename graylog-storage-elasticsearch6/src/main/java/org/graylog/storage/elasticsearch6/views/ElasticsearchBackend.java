@@ -335,10 +335,9 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
     }
 
     private String decoratedQuery(ValidationRequest req) {
-        final ElasticsearchQueryString esQuery = (ElasticsearchQueryString) req.query();
         ParameterProvider parameterProvider = (name) -> req.parameters().stream().filter(p -> Objects.equals(p.name(), name)).findFirst();
         final Query query = Query.builder().query(req.query()).timerange(req.timerange()).build();
-        return this.queryStringDecorators.decorate(esQuery.queryString(), parameterProvider, query, Collections.emptySet());
+        return this.queryStringDecorators.decorate(req.getCombinedQueryWithFilter(), parameterProvider, query, Collections.emptySet());
     }
 
     private Set<String> getUnknownFields(ValidationRequest req, ElasticsearchQueryString backendQuery, ValidationResult response) {

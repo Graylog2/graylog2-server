@@ -72,15 +72,15 @@ public class QueryValidationResource extends RestResource implements PluginRestR
     @NoAuditEvent("Only validating query structure, not changing any data")
     public ValidationResponseDTO validateQuery(@ApiParam(name = "validationRequest") ValidationRequestDTO validationRequest) {
 
-        final ValidationRequest q = ValidationRequest.Builder.builder()
+        final ValidationRequest.Builder q = ValidationRequest.Builder.builder()
                 .query(validationRequest.query())
-                .filter(validationRequest.filter())
                 .timerange(Optional.ofNullable(validationRequest.timerange()).orElse(defaultTimeRange()))
                 .streams(adaptStreams(validationRequest.streams()))
-                .parameters(resolveParameters(validationRequest))
-                .build();
+                .parameters(resolveParameters(validationRequest));
 
-        final ValidationResponse response = queryEngine.validate(q);
+        validationRequest.filter().ifPresent(q::filter);
+
+        final ValidationResponse response = queryEngine.validate(q.build());
         return ValidationResponseDTO.create(toStatus(response.getStatus()), toExplanations(response), response.getUnknownFields());
     }
 

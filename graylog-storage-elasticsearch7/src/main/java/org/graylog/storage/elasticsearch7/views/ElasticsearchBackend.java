@@ -319,10 +319,6 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
         final String queryString = decoratedQuery(req);
         final Set<String> affectedIndices = Optional.ofNullable(req.streams()).map(s -> indexLookup.indexNamesForStreamsInTimeRange(s, req.timerange())).orElse(Collections.emptySet());
         final ValidateQueryRequest esReq = new ValidateQueryRequest();
-
-        final ElasticsearchQueryString backendQuery =
-                req.filter().isPresent() ? ((ElasticsearchQueryString) req.query()).concatenate((ElasticsearchQueryString) req.filter().get()) : (ElasticsearchQueryString) req.query();
-
         final QueryStringQueryBuilder queryStringQueryBuilder = new QueryStringQueryBuilder(queryString)
                 .lenient(false);
         esReq.query(queryStringQueryBuilder);
@@ -336,21 +332,20 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                 .map(e -> new ValidationExplanation(e.getIndex(), e.getShard(), e.isValid(), e.getExplanation(), e.getError()))
                 .collect(Collectors.toList());
 
-        final Set<String> unknownFields = getUnknownFields(req, backendQuery, response);
+        final Set<String> unknownFields = getUnknownFields(req, queryString, response);
         return new ValidationResponse(response.isValid(), explanations, unknownFields);
     }
 
     private String decoratedQuery(ValidationRequest req) {
-        final ElasticsearchQueryString esQuery = (ElasticsearchQueryString) req.query();
         ParameterProvider parameterProvider = (name) -> req.parameters().stream().filter(p -> Objects.equals(p.name(), name)).findFirst();
         final Query query = Query.builder().query(req.query()).timerange(req.timerange()).build();
-        return this.queryStringDecorators.decorate(esQuery.queryString(), parameterProvider, query, Collections.emptySet());
+        return this.queryStringDecorators.decorate(req.getCombinedQueryWithFilter(), parameterProvider, query, Collections.emptySet());
     }
 
-    private Set<String> getUnknownFields(ValidationRequest req, ElasticsearchQueryString backendQuery, ValidateQueryResponse response) {
+    private Set<String> getUnknownFields(ValidationRequest req, String query, ValidateQueryResponse response) {
         if (response.isValid()) {
             try {
-                final Set<String> detectedFields = luceneQueryParser.getFieldNames(backendQuery.queryString());
+                final Set<String> detectedFields = luceneQueryParser.getFieldNames(query);
                 final Set<String> availableFields = mappedFieldTypesService.fieldTypesByStreamIds(req.streams(), req.timerange())
                         .stream()
                         .map(MappedFieldTypeDTO::name)

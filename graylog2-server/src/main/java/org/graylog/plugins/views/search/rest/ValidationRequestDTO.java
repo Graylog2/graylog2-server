@@ -74,7 +74,7 @@ public abstract class ValidationRequestDTO {
         public abstract Builder query(BackendQuery query);
 
         @JsonProperty
-        public abstract Builder filter(Optional<BackendQuery> filter);
+        public abstract Builder filter(@Nullable BackendQuery filter);
 
         @JsonProperty(FIELD_STREAMS)
         public abstract Builder streams(@Nullable Set<String> streams);
