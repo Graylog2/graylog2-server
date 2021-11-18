@@ -68,15 +68,15 @@ const ExplanationTitle = ({ title }: { title: string }) => (
   </Title>
 );
 
-const validateQuery = debounce(({ queryString, timeRange, streams, setValidationState, parameters, parameterBindings }, loadPrevPromiseRef: React.MutableRefObject<BluebirdPromise>) => {
+const validateQuery = debounce(({ queryString, timeRange, streams, setValidationState, parameters, parameterBindings }, validationPromise: React.MutableRefObject<BluebirdPromise>) => {
   const formattedTimeRange = isEmpty(timeRange) ? undefined : timeRange;
 
-  if (loadPrevPromiseRef.current) {
-    loadPrevPromiseRef.current.cancel();
+  if (validationPromise.current) {
+    validationPromise.current.cancel();
   }
 
   // eslint-disable-next-line no-param-reassign
-  loadPrevPromiseRef.current = QueriesActions.validateQuery({
+  validationPromise.current = QueriesActions.validateQuery({
     queryString,
     timeRange:
     formattedTimeRange,
@@ -87,7 +87,7 @@ const validateQuery = debounce(({ queryString, timeRange, streams, setValidation
     setValidationState(result);
   }).finally(() => {
     // eslint-disable-next-line no-param-reassign
-    loadPrevPromiseRef.current = undefined;
+    validationPromise.current = undefined;
   });
 }, 350);
 
