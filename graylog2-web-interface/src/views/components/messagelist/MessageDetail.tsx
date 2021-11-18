@@ -20,7 +20,6 @@ import { useState } from 'react';
 import Immutable from 'immutable';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 
-import useIsLocalNode from 'hooks/useIsLocalNode';
 import { AdditionalContext } from 'views/logic/ActionContext';
 import { Link } from 'components/common/router';
 import { Col, Label, Row } from 'components/bootstrap';
@@ -37,6 +36,7 @@ import { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import { useStore } from 'stores/connect';
 import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 import FormatReceivedBy from 'views/components/messagelist/FormatReceivedBy';
+import useIsLocalNode from 'views/hooks/useIsLocalNode';
 
 import MessageDetailProviders from './MessageDetailProviders';
 import MessageActions from './MessageActions';
@@ -82,7 +82,7 @@ const MessageDetail = ({
   const [showOriginal, setShowOriginal] = useState(false);
   const { fields, index, id, decoration_stats: decorationStats } = message;
   const { gl2_source_node, gl2_source_input } = fields;
-  const { isLocalNode } = useIsLocalNode(message);
+  const { isLocalNode } = useIsLocalNode(gl2_source_node);
 
   const _toggleShowOriginal = () => {
     setShowOriginal(!showOriginal);

@@ -16,22 +16,20 @@
  */
 import { useState, useEffect } from 'react';
 
-import { Message } from 'views/components/messagelist/Types';
 import usePluginEntities from 'views/logic/usePluginEntities';
 
-const useIsLocalNode = (message: Message) => {
+const useIsLocalNode = (nodeId: string) => {
   const forwarderPlugin = usePluginEntities('forwarder');
   const _isLocalNode = forwarderPlugin?.[0]?.isLocalNode;
   const [isLocalNode, setIsLocalNode] = useState<boolean | undefined>();
-  const { fields: { gl2_source_node } } = message;
 
   useEffect(() => {
-    if (gl2_source_node && _isLocalNode) {
-      _isLocalNode(gl2_source_node).then(setIsLocalNode, () => setIsLocalNode(true));
+    if (nodeId && _isLocalNode) {
+      _isLocalNode(nodeId).then(setIsLocalNode, () => setIsLocalNode(true));
     } else {
       setIsLocalNode(true);
     }
-  }, [gl2_source_node, _isLocalNode]);
+  }, [nodeId, _isLocalNode]);
 
   return { isLocalNode };
 };
