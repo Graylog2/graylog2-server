@@ -45,7 +45,7 @@ class CachePicker extends React.Component {
 
     const sortedCaches = this.props.caches.map((cache) => {
       return { value: cache.id, label: `${cache.title} (${cache.name})` };
-    }).sort((a, b) => naturalSort(a.label.toLocaleLowerCase(), b.label.toLocaleLowerCase()));
+    }).sort((a, b) => naturalSort(a.label.toLowerCase(), b.label.toLowerCase()));
 
     return (
       <fieldset>

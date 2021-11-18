@@ -145,7 +145,7 @@ const CreateAlertNotificationInput = createReactClass({
     });
     const formattedStreams = streams
       .map((stream) => this._formatOption(stream.title, stream.id))
-      .sort((s1, s2) => naturalSort(s1.label.toLocaleLowerCase(), s2.label.toLocaleLowerCase()));
+      .sort((s1, s2) => naturalSort(s1.label.toLowerCase(), s2.label.toLowerCase()));
 
     const notificationTypeHelp = (
       <span>

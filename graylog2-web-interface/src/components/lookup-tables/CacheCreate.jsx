@@ -75,7 +75,7 @@ class CacheCreate extends React.Component {
       const typeItem = types[key];
 
       return { value: typeItem.type, label: cachePlugins[typeItem.type].displayName };
-    }).sort((a, b) => naturalSort(a.label.toLocaleLowerCase(), b.label.toLocaleLowerCase()));
+    }).sort((a, b) => naturalSort(a.label.toLowerCase(), b.label.toLowerCase()));
 
     return (
       <div>
