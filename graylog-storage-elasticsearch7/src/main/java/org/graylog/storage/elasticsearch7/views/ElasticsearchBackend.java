@@ -23,7 +23,6 @@ import org.graylog.plugins.views.search.GlobalOverride;
 import org.graylog.plugins.views.search.ParameterProvider;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryResult;
-import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
@@ -320,7 +319,10 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
         final String queryString = decoratedQuery(req);
         final Set<String> affectedIndices = Optional.ofNullable(req.streams()).map(s -> indexLookup.indexNamesForStreamsInTimeRange(s, req.timerange())).orElse(Collections.emptySet());
         final ValidateQueryRequest esReq = new ValidateQueryRequest();
-        final ElasticsearchQueryString backendQuery = (ElasticsearchQueryString) req.query();
+
+        final ElasticsearchQueryString backendQuery =
+                req.filter().isPresent() ? ((ElasticsearchQueryString) req.query()).concatenate((ElasticsearchQueryString) req.filter().get()) : (ElasticsearchQueryString) req.query();
+
         final QueryStringQueryBuilder queryStringQueryBuilder = new QueryStringQueryBuilder(queryString)
                 .lenient(false);
         esReq.query(queryStringQueryBuilder);

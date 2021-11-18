@@ -19,13 +19,12 @@ package org.graylog.plugins.views.search.engine;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.Parameter;
-import org.graylog.plugins.views.search.rest.FieldTypesForStreamsRequest;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import javax.validation.constraints.NotNull;
+import java.util.Optional;
 import java.util.Set;
 
 @AutoValue
@@ -33,6 +32,14 @@ public abstract class ValidationRequest {
 
     @NotNull
     public abstract BackendQuery query();
+
+    /**
+     * For validation, we assume that the filter ist another query-string. This is a different approach
+     * than the one used in the Search!
+     *
+     * @return
+     */
+    public abstract Optional<BackendQuery> filter();
 
     @NotNull
     public abstract TimeRange timerange();
@@ -47,6 +54,8 @@ public abstract class ValidationRequest {
     public abstract static class Builder {
 
         public abstract Builder query(@NotNull BackendQuery query);
+
+        public abstract Builder filter(@NotNull Optional<BackendQuery> filter);
 
         public abstract Builder streams(@NotNull Set<String> streams);
 

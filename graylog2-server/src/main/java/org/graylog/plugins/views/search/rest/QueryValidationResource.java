@@ -74,6 +74,7 @@ public class QueryValidationResource extends RestResource implements PluginRestR
 
         final ValidationRequest q = ValidationRequest.Builder.builder()
                 .query(validationRequest.query())
+                .filter(validationRequest.filter())
                 .timerange(Optional.ofNullable(validationRequest.timerange()).orElse(defaultTimeRange()))
                 .streams(adaptStreams(validationRequest.streams()))
                 .parameters(resolveParameters(validationRequest))
@@ -149,6 +150,7 @@ public class QueryValidationResource extends RestResource implements PluginRestR
         return isPermitted(RestPermissions.STREAMS_READ, streamId);
     }
 
+    @Override
     protected boolean isPermitted(String permission, String instanceId) {
         return getSubject().isPermitted(permission + ":" + instanceId);
     }

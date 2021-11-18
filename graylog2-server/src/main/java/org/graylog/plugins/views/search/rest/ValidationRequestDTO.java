@@ -24,12 +24,12 @@ import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.Parameter;
-import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import javax.annotation.Nullable;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 @AutoValue
@@ -42,6 +42,15 @@ public abstract class ValidationRequestDTO {
 
     @JsonProperty
     public abstract BackendQuery query();
+
+    /**
+     * For validation, we assume that the filter ist another query-string. This is a different approach
+     * than the one used in the Search!
+     *
+     * @return
+     */
+    @JsonProperty
+    public abstract Optional<BackendQuery> filter();
 
     @Nullable
     @JsonProperty(FIELD_TIMERANGE)
@@ -63,13 +72,16 @@ public abstract class ValidationRequestDTO {
         @JsonProperty
         public abstract Builder query(BackendQuery query);
 
+        @JsonProperty
+        public abstract Builder filter(Optional<BackendQuery> filter);
+
         @JsonProperty(FIELD_STREAMS)
         public abstract Builder streams(@Nullable Set<String> streams);
 
         @JsonProperty(FIELD_TIMERANGE)
         public abstract Builder timerange(@Nullable TimeRange timerange);
 
-        public abstract ImmutableMap.Builder<String,  Parameter.Binding> parameterBindingsBuilder();
+        public abstract ImmutableMap.Builder<String, Parameter.Binding> parameterBindingsBuilder();
 
         @JsonProperty("parameter_bindings")
         public Builder withParameterBindings(Map<String,  Parameter.Binding> values) {
