@@ -16,6 +16,7 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
@@ -24,15 +25,13 @@ import { Row, Col, Button } from 'components/graylog';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { IndexSetConfigurationForm } from 'components/indices';
 import { DocumentationLink } from 'components/support';
-import CombinedProvider from 'injection/CombinedProvider';
 import DocsHelper from 'util/DocsHelper';
 import history from 'util/History';
 import Routes from 'routing/Routes';
 import withParams from 'routing/withParams';
 import withLocation from 'routing/withLocation';
-
-const { IndexSetsStore, IndexSetsActions } = CombinedProvider.get('IndexSets');
-const { IndicesConfigurationStore, IndicesConfigurationActions } = CombinedProvider.get('IndicesConfiguration');
+import { IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore';
+import { IndicesConfigurationActions, IndicesConfigurationStore } from 'stores/indices/IndicesConfigurationStore';
 
 const IndexSetConfigurationPage = createReactClass({
   displayName: 'IndexSetConfigurationPage',
@@ -51,14 +50,18 @@ const IndexSetConfigurationPage = createReactClass({
   },
 
   componentDidMount() {
-    IndexSetsActions.get(this.props.params.indexSetId);
+    const { params: { indexSetId } } = this.props;
+    IndexSetsActions.get(indexSetId);
     IndicesConfigurationActions.loadRotationStrategies();
     IndicesConfigurationActions.loadRetentionStrategies();
   },
 
   _formCancelLink() {
-    if (this.props.location.query.from === 'details') {
-      return Routes.SYSTEM.INDEX_SETS.SHOW(this.state.indexSet.id);
+    const { location } = this.props;
+    const { indexSet } = this.state;
+
+    if (location.query.from === 'details') {
+      return Routes.SYSTEM.INDEX_SETS.SHOW(indexSet.id);
     }
 
     return Routes.SYSTEM.INDICES.LIST;
@@ -71,7 +74,9 @@ const IndexSetConfigurationPage = createReactClass({
   },
 
   _isLoading() {
-    return !this.state.indexSet || !this.state.rotationStrategies || !this.state.retentionStrategies;
+    const { indexSet, rotationStrategies, retentionStrategies } = this.state;
+
+    return !indexSet || !rotationStrategies || !retentionStrategies;
   },
 
   render() {
@@ -79,7 +84,7 @@ const IndexSetConfigurationPage = createReactClass({
       return <Spinner />;
     }
 
-    const { indexSet } = this.state;
+    const { indexSet, rotationStrategies, retentionStrategies } = this.state;
 
     return (
       <DocumentTitle title="Configure Index Set">
@@ -103,8 +108,8 @@ const IndexSetConfigurationPage = createReactClass({
           <Row className="content">
             <Col md={12}>
               <IndexSetConfigurationForm indexSet={indexSet}
-                                         rotationStrategies={this.state.rotationStrategies}
-                                         retentionStrategies={this.state.retentionStrategies}
+                                         rotationStrategies={rotationStrategies}
+                                         retentionStrategies={retentionStrategies}
                                          cancelLink={this._formCancelLink()}
                                          onUpdate={this._saveConfiguration} />
             </Col>
