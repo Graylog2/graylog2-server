@@ -106,7 +106,7 @@ import static org.graylog2.audit.AuditEventTypes.NODE_SHUTDOWN_INITIATE;
 public class Server extends ServerBootstrap {
     private static final Logger LOG = LoggerFactory.getLogger(Server.class);
 
-    private static final Configuration configuration = new Configuration();
+    protected static final Configuration configuration = new Configuration();
     private final HttpConfiguration httpConfiguration = new HttpConfiguration();
     private final ElasticsearchConfiguration elasticsearchConfiguration = new ElasticsearchConfiguration();
     private final ElasticsearchClientConfiguration elasticsearchClientConfiguration = new ElasticsearchClientConfiguration();

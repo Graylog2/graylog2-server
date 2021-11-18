@@ -109,12 +109,9 @@ public class ServerBindings extends Graylog2Module {
 
         if (isMigrationCommand) {
             // If we are only running migrations, disable the journal
-            final Configuration noopConfig = new Configuration();
-            noopConfig.setMessageJournalEnabled(false);
-            install(new MessageQueueModule(noopConfig));
-        } else {
-            install(new MessageQueueModule(configuration));
+            configuration.setMessageJournalEnabled(false);
         }
+        install(new MessageQueueModule(configuration));
         bindProviders();
         bindFactoryModules();
         bindDynamicFeatures();
