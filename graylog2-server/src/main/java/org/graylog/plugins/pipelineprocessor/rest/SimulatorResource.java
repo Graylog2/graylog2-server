@@ -30,6 +30,7 @@ import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.plugin.streams.Stream;
+import org.graylog2.rest.models.messages.responses.DecorationStats;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
@@ -43,7 +44,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Api(value = "Pipelines/Simulator", description = "Simulate pipeline message processor")
 @Path("/system/pipelines/simulate")
@@ -72,6 +75,8 @@ public class SimulatorResource extends RestResource implements PluginRestResourc
         checkPermission(RestPermissions.STREAMS_READ, request.streamId());
 
         final Message message = new Message(request.message());
+        // Save off the original message fields to compare post pipeline processing
+        Map<String, Object> originalFields = new HashMap<>(message.getFields());
         final Stream stream = streamService.load(request.streamId());
         message.addStream(stream);
 
@@ -83,14 +88,17 @@ public class SimulatorResource extends RestResource implements PluginRestResourc
         final PipelineInterpreterTracer pipelineInterpreterTracer = new PipelineInterpreterTracer();
 
         org.graylog2.plugin.Messages processedMessages = pipelineInterpreter.process(message,
-                                                                                     pipelineInterpreterTracer.getSimulatorInterpreterListener(),
-                                                                                     pipelineStateUpdater.getLatestState());
+                pipelineInterpreterTracer.getSimulatorInterpreterListener(),
+                pipelineStateUpdater.getLatestState());
         for (Message processedMessage : processedMessages) {
-            simulationResults.add(ResultMessageSummary.create(null, processedMessage.getFields(), ""));
+            ResultMessageSummary summary = ResultMessageSummary.create(null, processedMessage.getFields(), "");
+            // generate the DecorationStats and add it to the summary
+            DecorationStats decorationStats = DecorationStats.create(originalFields, processedMessage.getFields());
+            simulationResults.add(summary.toBuilder().decorationStats(decorationStats).build());
         }
 
         return SimulationResponse.create(simulationResults,
-                                         pipelineInterpreterTracer.getExecutionTrace(),
-                                         pipelineInterpreterTracer.took());
+                pipelineInterpreterTracer.getExecutionTrace(),
+                pipelineInterpreterTracer.took());
     }
 }

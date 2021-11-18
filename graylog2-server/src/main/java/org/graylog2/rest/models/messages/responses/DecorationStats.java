@@ -53,9 +53,9 @@ public abstract class DecorationStats {
     @JsonProperty(FIELD_CHANGED_FIELDS)
     public Map<String, Object> changedFields() {
         return Sets.intersection(originalMessage().keySet(), decoratedMessage().keySet())
-            .stream()
-            .filter(key -> !originalMessage().get(key).equals(decoratedMessage().get(key)))
-            .collect(Collectors.toMap(Function.identity(), key -> originalMessage().get(key)));
+                .stream()
+                .filter(key -> !originalMessage().get(key).equals(decoratedMessage().get(key)))
+                .collect(Collectors.toMap(Function.identity(), key -> decoratedMessage().get(key)));
     }
 
     @SuppressWarnings("unused")
