@@ -171,7 +171,7 @@ const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
 
               <QueryValidation queryString={values?.queryString}
                                timeRange={!isEmpty(globalOverride?.timerange) ? globalOverride.timerange : values?.timerange}
-                               filter={globalOverride?.query ? globalOverride.query.query_string : undefined} />
+                               filter={globalOverride?.query ? globalOverride.query : undefined} />
 
               <div className="pull-right search-help">
                 <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}

@@ -25,7 +25,7 @@ import { Popover } from 'components/bootstrap';
 import { Icon } from 'components/common';
 import { QueriesActions, QueryValidationState } from 'views/stores/QueriesStore';
 import StringUtils from 'util/StringUtils';
-import { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
+import { TimeRange, NoTimeRangeOverride, ElasticsearchQueryString } from 'views/logic/queries/Query';
 import { useStore } from 'stores/connect';
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
 import { SearchStore } from 'views/stores/SearchStore';
@@ -89,18 +89,22 @@ const validateQuery = debounce(({ queryString, timeRange, streams, setValidation
   });
 }, 350);
 
+const queryExists = (query: string | ElasticsearchQueryString) => {
+  return typeof query === 'object' ? !!query.query_string : !!query;
+};
+
 const useValidateQuery = ({ queryString, timeRange, streams, parameterBindings, parameters, filter }): QueryValidationState | undefined => {
   const validationPromise = useRef<BluebirdPromise>(undefined);
   const [validationState, setValidationState] = useState(undefined);
 
   useEffect(() => {
-    if (queryString || filter) {
+    if (queryExists(queryString) || queryExists(filter)) {
       validateQuery({ queryString, timeRange, streams, setValidationState, parameters, parameterBindings, filter }, validationPromise);
     }
   }, [filter, queryString, timeRange, streams, parameterBindings, parameters, validationPromise]);
 
   useEffect(() => {
-    if (!queryString && !filter && validationState) {
+    if (!queryExists(queryString) && !queryExists(filter) && validationState) {
       setValidationState(undefined);
     }
   }, [queryString, filter, validationState]);
@@ -137,8 +141,8 @@ const useValidationPayload = (queryString, timeRange, streams, filter) => {
 };
 
 type Props = {
-  filter?: string | undefined,
-  queryString: string | undefined,
+  filter?: ElasticsearchQueryString | string,
+  queryString: ElasticsearchQueryString | string | undefined,
   streams?: Array<string>,
   timeRange: TimeRange | NoTimeRangeOverride | undefined,
 }
