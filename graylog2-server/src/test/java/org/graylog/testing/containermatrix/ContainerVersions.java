@@ -14,21 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.elasticsearch7;
+package org.graylog.testing.containermatrix;
 
-import org.graylog.storage.elasticsearch7.testing.ElasticsearchInstanceES7;
-import org.graylog.testing.completebackend.ElasticsearchInstanceFactory;
 import org.graylog.testing.elasticsearch.ElasticsearchInstance;
-import org.testcontainers.containers.Network;
+import org.graylog.testing.mongodb.MongoDBContainer;
 
-public class ElasticsearchInstanceES7Factory implements ElasticsearchInstanceFactory {
-    @Override
-    public ElasticsearchInstance create(Network network) {
-        return ElasticsearchInstanceES7.create(network);
-    }
+public interface ContainerVersions {
+    String DEFAULT_ES = ElasticsearchInstance.DEFAULT_VERSION;
+    String DEFAULT_MONGO = MongoDBContainer.DEFAULT_VERSION;
 
-    @Override
-    public String version() {
-        return "7";
-    }
+    String ES7 = DEFAULT_ES;
+    String ES6 = "6.8.4";
+
+    String MONGO3 = "3.6";
+    String MONGO4 = "4.0";
 }

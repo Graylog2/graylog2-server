@@ -16,35 +16,32 @@
  */
 package org.graylog.testing.completebackend;
 
-import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.io.Resources;
 import io.restassured.RestAssured;
-import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.specification.RequestSpecification;
-import org.junit.jupiter.api.extension.AfterEachCallback;
+import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.elasticsearch.ElasticsearchInstance;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
+import org.junit.platform.engine.support.hierarchical.ContainerMatrixHierarchicalTestExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URL;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import static io.restassured.http.ContentType.JSON;
 import static org.junit.jupiter.api.extension.ExtensionContext.Namespace;
 
 
-public class GraylogBackendExtension implements AfterEachCallback, BeforeAllCallback, ParameterResolver {
+public class GraylogBackendExtension implements BeforeAllCallback, ParameterResolver {
 
     private static final Logger LOG = LoggerFactory.getLogger(GraylogBackendExtension.class);
     private static final Namespace NAMESPACE = Namespace.create(GraylogBackendExtension.class);
@@ -54,39 +51,28 @@ public class GraylogBackendExtension implements AfterEachCallback, BeforeAllCall
 
     @Override
     public void beforeAll(ExtensionContext context) {
-
         RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
 
-        ApiIntegrationTest annotation = annotationFrom(context);
+        ContainerMatrixTestsConfiguration annotation = annotationFrom(context);
 
-        lifecycle = annotation.serverLifecycle();
+        ContainerMatrixHierarchicalTestExecutor.graylogBackend.ifPresent(gb -> {
+            context.getStore(NAMESPACE).put("graylogBackend", gb);
+            context.getStore(NAMESPACE).put("elasticInstance", gb.elasticsearchInstance());
+        });
+        ContainerMatrixHierarchicalTestExecutor.requestSpecification.ifPresent(rs -> context.getStore(NAMESPACE).put("requestSpecification", rs));
 
-        Stopwatch sw = Stopwatch.createStarted();
-
-        backend = constructBackendFrom(annotation, getMongoDBFixtures(context));
-
-        context.getStore(NAMESPACE).put(context.getRequiredTestClass().getName(), backend);
-
-        sw.stop();
-
-        LOG.info("Backend started after " + sw.elapsed(TimeUnit.SECONDS) + " seconds");
-    }
-
-    private GraylogBackend constructBackendFrom(ApiIntegrationTest annotation, List<URL> mongoDBFixtures) {
-        final ElasticsearchInstanceFactory esInstanceFactory = instantiateFactory(annotation.elasticsearchFactory());
-        final List<Path> pluginJars = instantiateFactory(annotation.pluginJarsProvider()).getJars();
-        final Path mavenProjectDir = instantiateFactory(annotation.mavenProjectDirProvider()).getProjectDir();
-        return GraylogBackend.createStarted(annotation.extraPorts(), esInstanceFactory, pluginJars, mavenProjectDir,
-                mongoDBFixtures);
+        ContainerMatrixHierarchicalTestExecutor.graylogBackend.ifPresent(gb -> {
+            gb.mongoDB().importFixtures(getMongoDBFixtures(context));
+        });
     }
 
     private static List<URL> getMongoDBFixtures(ExtensionContext context) {
         final Class<?> testClass = context.getTestClass()
                 .orElseThrow(() -> new IllegalStateException("Unable to get test class from extension context"));
 
-        final String[] fixtures = testClass.getAnnotation(ApiIntegrationTest.class).mongoDBFixtures();
+        final String[] fixtures = testClass.getAnnotation(ContainerMatrixTestsConfiguration.class).mongoDBFixtures();
         return Arrays.stream(fixtures).map(resourceName -> {
-            if (! Paths.get(resourceName).isAbsolute()) {
+            if (!Paths.get(resourceName).isAbsolute()) {
                 try {
                     return Resources.getResource(testClass, resourceName);
                 } catch (IllegalArgumentException ignored) {
@@ -96,34 +82,19 @@ public class GraylogBackendExtension implements AfterEachCallback, BeforeAllCall
         }).collect(Collectors.toList());
     }
 
-    private <T> T instantiateFactory(Class<? extends T> providerClass) {
-        try {
-            return providerClass.newInstance();
-        } catch (InstantiationException | IllegalAccessException e) {
-            throw new RuntimeException("Unable to construct instance of " + providerClass.getSimpleName() + ": ", e);
-        }
-    }
-
-    private static ApiIntegrationTest annotationFrom(ExtensionContext context) {
+    private static ContainerMatrixTestsConfiguration annotationFrom(ExtensionContext context) {
         Optional<Class<?>> testClass = context.getTestClass();
 
-        if (!testClass.isPresent())
+        if (!testClass.isPresent()) {
             throw new RuntimeException("Error determining test class from ExtensionContext");
-
-        return testClass.get().getAnnotation(ApiIntegrationTest.class);
-    }
-
-    @Override
-    public void afterEach(ExtensionContext context) {
-        if (context.getExecutionException().isPresent()) {
-            backend.printServerLog();
         }
-        lifecycle.afterEach(backend, getMongoDBFixtures(context));
+
+        return testClass.get().getAnnotation(ContainerMatrixTestsConfiguration.class);
     }
 
     @Override
     public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
-        ImmutableSet<Class<?>> supportedTypes = ImmutableSet.of(GraylogBackend.class, RequestSpecification.class);
+        ImmutableSet<Class<?>> supportedTypes = ImmutableSet.of(GraylogBackend.class, RequestSpecification.class, ElasticsearchInstance.class);
 
         return supportedTypes.contains(parameterContext.getParameter().getType());
     }
@@ -133,21 +104,12 @@ public class GraylogBackendExtension implements AfterEachCallback, BeforeAllCall
         Class<?> paramType = parameterContext.getParameter().getType();
 
         if (paramType.equals(GraylogBackend.class)) {
-            return extensionContext.getStore(NAMESPACE).get(extensionContext.getRequiredTestClass().getName());
+            return extensionContext.getStore(NAMESPACE).get("graylogBackend");
         } else if (paramType.equals(RequestSpecification.class)) {
-            return requestSpec();
+            return extensionContext.getStore(NAMESPACE).get("requestSpecification");
+        } else if (paramType.equals(ElasticsearchInstance.class)) {
+            return extensionContext.getStore(NAMESPACE).get("elasticInstance");
         }
         throw new RuntimeException("Unsupported parameter type: " + paramType);
-    }
-
-    private RequestSpecification requestSpec() {
-        return new RequestSpecBuilder().build()
-                .baseUri(backend.uri())
-                .port(backend.apiPort())
-                .basePath("/api")
-                .accept(JSON)
-                .contentType(JSON)
-                .header("X-Requested-By", "peterchen")
-                .auth().basic("admin", "admin");
     }
 }
