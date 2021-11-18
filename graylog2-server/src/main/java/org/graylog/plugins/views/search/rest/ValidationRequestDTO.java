@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.Parameter;
@@ -89,8 +90,13 @@ public abstract class ValidationRequestDTO {
             return this;
         }
 
+        public abstract ImmutableSet.Builder<Parameter> parametersBuilder();
+
         @JsonProperty
-        public abstract Builder parameters(ImmutableSet<Parameter> parameters);
+        public Builder withParameters(Set<Parameter> values) {
+            values.forEach(p -> parametersBuilder().add(p));
+            return this;
+        }
 
         public abstract ValidationRequestDTO build();
 
