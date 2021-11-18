@@ -109,7 +109,7 @@ class Widget {
       streams,
     } = this._value;
 
-    return { id, type: type.toLocaleLowerCase(), config, filter, timerange, query, streams };
+    return { id, type: type.toLowerCase(), config, filter, timerange, query, streams };
   }
 
   static fromJSON(value: WidgetState): Widget {
@@ -122,7 +122,7 @@ class Widget {
       query,
       streams,
     } = value;
-    const implementingClass = Widget.__registrations[type.toLocaleLowerCase()];
+    const implementingClass = Widget.__registrations[type.toLowerCase()];
 
     if (implementingClass) {
       return implementingClass.fromJSON(value);
@@ -145,7 +145,7 @@ class Widget {
   } = {};
 
   static registerSubtype(type: string, implementingClass: DeserializesWidgets) {
-    this.__registrations[type.toLocaleLowerCase()] = implementingClass;
+    this.__registrations[type.toLowerCase()] = implementingClass;
   }
 }
 
