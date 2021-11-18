@@ -27,6 +27,7 @@ import StringUtils from 'util/StringUtils';
 import { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import { useStore } from 'stores/connect';
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
+import { SearchStore } from 'views/stores/SearchStore';
 
 const Container = styled.div`
   margin-right: 5px;
@@ -94,11 +95,12 @@ type Props = {
 
 const QueryValidation = ({ queryString, timeRange, streams }: Props) => {
   const { parameterBindings } = useStore(SearchExecutionStateStore, (test2) => test2);
+  const { search: { parameters } } = useStore(SearchStore);
   const [showExplanation, setShowExplanation] = useState(false);
   const containerRef = useRef(null);
   const explanationTriggerRef = useRef(null);
   const toggleShow = () => setShowExplanation((prevShow) => !prevShow);
-  const validationState = useValidateQuery(queryString, timeRange, streams, [], parameterBindings);
+  const validationState = useValidateQuery(queryString, timeRange, streams, parameters, parameterBindings);
 
   // We need to always display the container to avoid query inout resizing problems
   // we need to always display the overlay trigger to avoid overlay placement problems
