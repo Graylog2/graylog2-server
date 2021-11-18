@@ -51,7 +51,7 @@ const ErrorIcon = styled(Icon)(({ theme, $status }: { theme: DefaultTheme, $stat
 `);
 
 const DocumentationIcon = styled(Icon)`
-  margin-left: 3px;
+  margin-left: 5px;
 `;
 
 const Title = styled.div`
