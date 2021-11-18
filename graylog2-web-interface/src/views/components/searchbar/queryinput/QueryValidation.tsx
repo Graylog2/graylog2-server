@@ -134,6 +134,7 @@ const QueryValidation = ({ queryString, timeRange, streams }: Props) => {
                  containerPadding={10}
                  placement="bottom"
                  target={explanationTriggerRef.current}
+                 shouldUpdatePosition
                  transition={Transition}>
           <Popover id="query-validation-error-explanation" title={getExplanationTitle(status, explanations)}>
             {errorMessages}
