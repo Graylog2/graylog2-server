@@ -28,6 +28,8 @@ import { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import { useStore } from 'stores/connect';
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
 import { SearchStore } from 'views/stores/SearchStore';
+import DocumentationLink from 'components/support/DocumentationLink';
+import DocsHelper from 'util/DocsHelper';
 
 const Container = styled.div`
   margin-right: 5px;
@@ -94,6 +96,20 @@ const uniqErrorMessages = (explanations) => {
   return uniq(errorMessages).join('. ');
 };
 
+const Title = styled.div`
+  display: flex;
+  justify-content: space-between;
+`;
+
+const ExplanationTitle = ({ title }: { title: string }) => (
+  <Title>
+    {title}
+    <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
+                       title="Search query syntax documentation"
+                       text={<Icon name="lightbulb" />} />
+  </Title>
+);
+
 type Props = {
   queryString: string | undefined,
   timeRange: TimeRange | NoTimeRangeOverride | undefined,
@@ -101,7 +117,7 @@ type Props = {
 }
 
 const QueryValidation = ({ queryString, timeRange, streams }: Props) => {
-  const { parameterBindings } = useStore(SearchExecutionStateStore, (test2) => test2);
+  const { parameterBindings } = useStore(SearchExecutionStateStore);
   const { search: { parameters } } = useStore(SearchStore);
   const [showExplanation, setShowExplanation] = useState(false);
   const containerRef = useRef(null);
@@ -136,7 +152,8 @@ const QueryValidation = ({ queryString, timeRange, streams }: Props) => {
                  target={explanationTriggerRef.current}
                  shouldUpdatePosition
                  transition={Transition}>
-          <Popover id="query-validation-error-explanation" title={getExplanationTitle(status, explanations)}>
+          <Popover id="query-validation-error-explanation"
+                   title={<ExplanationTitle title={getExplanationTitle(status, explanations)} />}>
             {errorMessages}
           </Popover>
         </Overlay>
