@@ -27,6 +27,8 @@ import Query from 'views/logic/queries/Query';
 import { singletonStore } from 'logic/singleton';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
+import type Parameter from 'views/logic/parameters/Parameter';
+import type { ParameterBindings } from 'views/logic/search/SearchExecutionState';
 
 import { ViewActions, ViewStore } from './ViewStore';
 import { ViewStatesActions } from './ViewStatesStore';
@@ -198,13 +200,19 @@ export const QueriesStore: QueriesStoreType = singletonStore(
       return promise;
     },
 
-    validateQuery(
+    validateQuery({
+      queryString,
+      timeRange,
+      streams,
+      parameters,
+      parameterBindings,
+    }: {
       queryString: string,
       timeRange: TimeRange | undefined,
-      streams: Array<string> | undefined,
-      parameters: any = [],
-      parameterBindings: any = {},
-    ): Promise<QueryValidationState> {
+      streams?: Array<string> | undefined,
+      parameters?: Array<Parameter>,
+      parameterBindings?: ParameterBindings,
+    }): Promise<QueryValidationState> {
       const payload = {
         query: queryString,
         timerange: timeRange,

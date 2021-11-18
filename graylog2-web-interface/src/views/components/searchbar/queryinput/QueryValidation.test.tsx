@@ -17,15 +17,31 @@
 import * as React from 'react';
 import { render, waitFor, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
+import * as Immutable from 'immutable';
 
 import { QueriesActions, QueryValidationState } from 'views/stores/QueriesStore';
-import { asMock } from 'helpers/mocking';
+import { asMock, StoreMock as MockStore } from 'helpers/mocking';
 
 import QueryValidation from './QueryValidation';
 
 jest.mock('views/stores/QueriesStore', () => ({
   QueriesActions: {
     validateQuery: jest.fn(() => Promise.resolve()),
+  },
+}));
+
+jest.mock('views/stores/SearchStore', () => ({
+  SearchStore: MockStore(
+    'listen',
+    ['getInitialState', () => ({
+      search: {
+        parameters: [],
+      },
+    })],
+  ),
+  SearchActions: {
+    reexecuteSearchTypes: jest.fn().mockReturnValue(Promise.resolve({ result: { errors: [] } })),
+    execute: { completed: { listen: jest.fn() } },
   },
 }));
 
@@ -53,7 +69,15 @@ describe('QueryValidation', () => {
 
     await waitFor(() => expect(QueriesActions.validateQuery).toHaveBeenCalledTimes(1));
 
-    expect(QueriesActions.validateQuery).toHaveBeenCalledWith('source:', { type: 'relative', from: 300 }, ['stream-id']);
+    const expectedPayload = {
+      queryString: 'source:',
+      timeRange: { type: 'relative', from: 300 },
+      streams: ['stream-id'],
+      parameters: [],
+      parameterBindings: Immutable.Map(),
+    };
+
+    expect(QueriesActions.validateQuery).toHaveBeenCalledWith(expectedPayload);
   });
 
   it('should validate query on change', async () => {
@@ -65,7 +89,15 @@ describe('QueryValidation', () => {
 
     await waitFor(() => expect(QueriesActions.validateQuery).toHaveBeenCalledTimes(2));
 
-    expect(QueriesActions.validateQuery).toHaveBeenCalledWith('updated query', undefined, undefined);
+    const expectedPayload = {
+      queryString: 'updated query',
+      timeRange: undefined,
+      streams: undefined,
+      parameters: [],
+      parameterBindings: Immutable.Map(),
+    };
+
+    expect(QueriesActions.validateQuery).toHaveBeenCalledWith(expectedPayload);
   });
 
   it('should display validation error icon when there is a validation error', async () => {

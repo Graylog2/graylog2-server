@@ -47,20 +47,27 @@ const ErrorIcon = styled(Icon)(({ theme, $status }: { theme: DefaultTheme, $stat
   font-size: 22px;
 `);
 
-const validateQuery = debounce((queryString, timeRange, streams, setValidationState, parameters, parameterBindings) => {
-  const cleanTimeRange = isEmpty(timeRange) ? undefined : timeRange;
+const validateQuery = debounce(({ queryString, timeRange, streams, setValidationState, parameters, parameterBindings }) => {
+  const formattedTimeRange = isEmpty(timeRange) ? undefined : timeRange;
 
-  QueriesActions.validateQuery(queryString, cleanTimeRange, streams, parameters, parameterBindings).then((result) => {
+  QueriesActions.validateQuery({
+    queryString,
+    timeRange:
+    formattedTimeRange,
+    streams,
+    parameters,
+    parameterBindings,
+  }).then((result) => {
     setValidationState(result);
   });
 }, 350);
 
-const useValidateQuery = (queryString, timeRange, streams, parameters, parameterBindings): QueryValidationState | undefined => {
+const useValidateQuery = ({ queryString, timeRange, streams, parameters, parameterBindings }): QueryValidationState | undefined => {
   const [validationState, setValidationState] = useState(undefined);
 
   useEffect(() => {
     if (queryString) {
-      validateQuery(queryString, timeRange, streams, setValidationState, parameters, parameterBindings);
+      validateQuery({ queryString, timeRange, streams, setValidationState, parameters, parameterBindings });
     }
   }, [queryString, timeRange, streams, parameterBindings, parameters]);
 
@@ -100,7 +107,7 @@ const QueryValidation = ({ queryString, timeRange, streams }: Props) => {
   const containerRef = useRef(null);
   const explanationTriggerRef = useRef(null);
   const toggleShow = () => setShowExplanation((prevShow) => !prevShow);
-  const validationState = useValidateQuery(queryString, timeRange, streams, parameters, parameterBindings);
+  const validationState = useValidateQuery({ queryString, timeRange, streams, parameters, parameterBindings });
 
   // We need to always display the container to avoid query inout resizing problems
   // we need to always display the overlay trigger to avoid overlay placement problems

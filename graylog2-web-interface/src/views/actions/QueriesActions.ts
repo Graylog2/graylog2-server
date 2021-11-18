@@ -22,8 +22,9 @@ import type { QueryId, TimeRange, TimeRangeTypes } from 'views/logic/queries/Que
 import Query from 'views/logic/queries/Query';
 import ViewState from 'views/logic/views/ViewState';
 import { singletonActions } from 'logic/singleton';
-
-import type { QueryValidationState } from '../stores/QueriesStore';
+import type Parameter from 'views/logic/parameters/Parameter';
+import type { ParameterBindings } from 'views/logic/search/SearchExecutionState';
+import type { QueryValidationState } from 'views/stores/QueriesStore';
 
 export type QueriesList = Immutable.OrderedMap<QueryId, Query>;
 
@@ -36,7 +37,19 @@ type QueriesActionsType = RefluxActions<{
   remove: (queryId: QueryId) => Promise<QueriesList>,
   timerange: (queryId: QueryId, newTimeRange: TimeRange) => Promise<QueriesList>,
   update: (queryId: QueryId, query: Query) => Promise<QueriesList>,
-  validateQuery: (queryString: string, timeRange: TimeRange | undefined, streams: Array<string> | undefined, parameters: any, parameterBindings: any) => Promise<QueryValidationState>
+  validateQuery: ({
+    queryString,
+    timeRange,
+    streams,
+    parameters,
+    parameterBindings,
+  }: {
+    queryString: string,
+    timeRange: TimeRange | undefined,
+    streams?: Array<string> | undefined,
+    parameters?: Array<Parameter>,
+    parameterBindings?: ParameterBindings,
+  }) => Promise<QueryValidationState>
 }>;
 
 // eslint-disable-next-line import/prefer-default-export
