@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useEffect, useContext, useRef } from 'react';
 import { Field } from 'formik';
+import { isEmpty } from 'lodash';
 import moment from 'moment';
 import styled from 'styled-components';
 
@@ -37,6 +38,7 @@ import WidgetContext from 'views/components/contexts/WidgetContext';
 import { GlobalOverrideStore, GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
 import { SearchActions } from 'views/stores/SearchStore';
 import { PropagateValidationState } from 'views/components/aggregationwizard';
+import QueryValidation from 'views/components/searchbar/queryinput/QueryValidation';
 
 import TimeRangeOverrideInfo from './searchbar/WidgetTimeRangeOverride';
 import TimeRangeInput from './searchbar/TimeRangeInput';
@@ -166,6 +168,10 @@ const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
                               onExecute={handleSubmit as () => void} />
                 )}
               </Field>
+
+              <QueryValidation queryString={values?.queryString}
+                               timeRange={!isEmpty(globalOverride?.timerange) ? globalOverride.timerange : values?.timerange}
+                               filter={globalOverride?.query ? globalOverride.query.query_string : undefined} />
 
               <div className="pull-right search-help">
                 <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}

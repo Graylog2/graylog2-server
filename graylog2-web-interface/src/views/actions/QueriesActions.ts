@@ -43,10 +43,12 @@ type QueriesActionsType = RefluxActions<{
     streams,
     parameters,
     parameterBindings,
+    filter,
   }: {
     queryString: string,
-    timeRange: TimeRange | undefined,
+    timeRange?: TimeRange | undefined,
     streams?: Array<string> | undefined,
+    filter?: string
     parameters?: Array<Parameter>,
     parameterBindings?: ParameterBindings,
   }) => Promise<QueryValidationState>

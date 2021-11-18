@@ -33,16 +33,8 @@ jest.mock('views/stores/QueriesStore', () => ({
 jest.mock('views/stores/SearchStore', () => ({
   SearchStore: MockStore(
     'listen',
-    ['getInitialState', () => ({
-      search: {
-        parameters: [],
-      },
-    })],
+    ['getInitialState', () => ({ search: { parameters: [] } })],
   ),
-  SearchActions: {
-    reexecuteSearchTypes: jest.fn().mockReturnValue(Promise.resolve({ result: { errors: [] } })),
-    execute: { completed: { listen: jest.fn() } },
-  },
 }));
 
 describe('QueryValidation', () => {
@@ -64,6 +56,10 @@ describe('QueryValidation', () => {
 
   const validationErrorIconTitle = 'Toggle validation error explanation';
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('should validate query on mount', async () => {
     render(<QueryValidation queryString="source:" timeRange={{ type: 'relative', from: 300 }} streams={['stream-id']} />);
 
@@ -80,7 +76,7 @@ describe('QueryValidation', () => {
     expect(QueriesActions.validateQuery).toHaveBeenCalledWith(expectedPayload);
   });
 
-  it('should validate query on change', async () => {
+  it('should validate query when changing query string', async () => {
     const { rerender } = render(<QueryValidation queryString="source:" timeRange={undefined} />);
 
     await waitFor(() => expect(QueriesActions.validateQuery).toHaveBeenCalledTimes(1));
@@ -93,6 +89,27 @@ describe('QueryValidation', () => {
       queryString: 'updated query',
       timeRange: undefined,
       streams: undefined,
+      parameters: [],
+      parameterBindings: Immutable.Map(),
+    };
+
+    expect(QueriesActions.validateQuery).toHaveBeenCalledWith(expectedPayload);
+  });
+
+  it('should validate query when changing filter', async () => {
+    const { rerender } = render(<QueryValidation queryString="source:host-1" timeRange={undefined} filter="http_method:" />);
+
+    await waitFor(() => expect(QueriesActions.validateQuery).toHaveBeenCalledTimes(1));
+
+    rerender(<QueryValidation queryString="source:host-1" timeRange={undefined} filter="http_method:GET" />);
+
+    await waitFor(() => expect(QueriesActions.validateQuery).toHaveBeenCalledTimes(2));
+
+    const expectedPayload = {
+      queryString: 'source:host-1',
+      timeRange: undefined,
+      streams: undefined,
+      filter: 'http_method:',
       parameters: [],
       parameterBindings: Immutable.Map(),
     };

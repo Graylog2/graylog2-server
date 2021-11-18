@@ -40,11 +40,7 @@ jest.mock('views/stores/GlobalOverrideStore', () => ({
 jest.mock('views/stores/SearchStore', () => ({
   SearchStore: MockStore(
     'listen',
-    ['getInitialState', () => ({
-      search: {
-        parameters: [],
-      },
-    })],
+    ['getInitialState', () => ({ search: { parameters: [] } })],
   ),
   SearchActions: {
     refresh: jest.fn(),

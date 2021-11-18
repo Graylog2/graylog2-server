@@ -33,11 +33,7 @@ const mockCurrentUser = { currentUser: { fullname: 'Ada Lovelace', username: 'ad
 jest.mock('views/stores/SearchStore', () => ({
   SearchStore: MockStore(
     'listen',
-    ['getInitialState', () => ({
-      search: {
-        parameters: [],
-      },
-    })],
+    ['getInitialState', () => ({ search: { parameters: [] } })],
   ),
   SearchActions: {
     refresh: jest.fn(),

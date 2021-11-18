@@ -204,12 +204,14 @@ export const QueriesStore: QueriesStoreType = singletonStore(
       queryString,
       timeRange,
       streams,
+      filter,
       parameters,
       parameterBindings,
     }: {
       queryString: string,
       timeRange: TimeRange | undefined,
       streams?: Array<string> | undefined,
+      filter?: string,
       parameters?: Array<Parameter>,
       parameterBindings?: ParameterBindings,
     }): Promise<QueryValidationState> {
@@ -217,6 +219,7 @@ export const QueriesStore: QueriesStoreType = singletonStore(
         query: queryString,
         timerange: timeRange,
         streams,
+        filter,
         parameters,
         parameter_bindings: parameterBindings,
       };

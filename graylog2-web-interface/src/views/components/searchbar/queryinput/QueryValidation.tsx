@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import styled, { DefaultTheme } from 'styled-components';
-import { debounce, isEmpty, uniq } from 'lodash';
+import { debounce, uniq, isEmpty } from 'lodash';
 import { useState, useEffect, useRef } from 'react';
 import { Overlay, Transition } from 'react-overlays';
 import BluebirdPromise from 'bluebird';
@@ -68,9 +68,7 @@ const ExplanationTitle = ({ title }: { title: string }) => (
   </Title>
 );
 
-const validateQuery = debounce(({ queryString, timeRange, streams, setValidationState, parameters, parameterBindings }, validationPromise: React.MutableRefObject<BluebirdPromise>) => {
-  const formattedTimeRange = isEmpty(timeRange) ? undefined : timeRange;
-
+const validateQuery = debounce(({ queryString, timeRange, streams, setValidationState, parameters, parameterBindings, filter }, validationPromise: React.MutableRefObject<BluebirdPromise>) => {
   if (validationPromise.current) {
     validationPromise.current.cancel();
   }
@@ -78,11 +76,11 @@ const validateQuery = debounce(({ queryString, timeRange, streams, setValidation
   // eslint-disable-next-line no-param-reassign
   validationPromise.current = QueriesActions.validateQuery({
     queryString,
-    timeRange:
-    formattedTimeRange,
+    timeRange,
     streams,
     parameters,
     parameterBindings,
+    filter,
   }).then((result) => {
     setValidationState(result);
   }).finally(() => {
@@ -91,20 +89,21 @@ const validateQuery = debounce(({ queryString, timeRange, streams, setValidation
   });
 }, 350);
 
-const useValidateQuery = ({ queryString, timeRange, streams, parameterBindings, parameters }, validationPromise): QueryValidationState | undefined => {
+const useValidateQuery = ({ queryString, timeRange, streams, parameterBindings, parameters, filter }): QueryValidationState | undefined => {
+  const validationPromise = useRef<BluebirdPromise>(undefined);
   const [validationState, setValidationState] = useState(undefined);
 
   useEffect(() => {
-    if (queryString) {
-      validateQuery({ queryString, timeRange, streams, setValidationState, parameters, parameterBindings }, validationPromise);
+    if (queryString || filter) {
+      validateQuery({ queryString, timeRange, streams, setValidationState, parameters, parameterBindings, filter }, validationPromise);
     }
-  }, [queryString, timeRange, streams, parameterBindings, parameters, validationPromise]);
+  }, [filter, queryString, timeRange, streams, parameterBindings, parameters, validationPromise]);
 
   useEffect(() => {
-    if (!queryString && validationState) {
+    if (!queryString && !filter && validationState) {
       setValidationState(undefined);
     }
-  }, [queryString, validationState]);
+  }, [queryString, filter, validationState]);
 
   return validationState;
 };
@@ -123,21 +122,34 @@ const uniqErrorMessages = (explanations) => {
   return uniq(errorMessages).join('. ');
 };
 
-type Props = {
-  queryString: string | undefined,
-  timeRange: TimeRange | NoTimeRangeOverride | undefined,
-  streams?: Array<string>
-}
-
-const QueryValidation = ({ queryString, timeRange, streams }: Props) => {
+const useValidationPayload = (queryString, timeRange, streams, filter) => {
   const { parameterBindings } = useStore(SearchExecutionStateStore);
   const { search: { parameters } } = useStore(SearchStore);
-  const validationPromise = useRef<BluebirdPromise>(undefined);
-  const containerRef = useRef(undefined);
-  const explanationTriggerRef = useRef(undefined);
+
+  return ({
+    timeRange: !isEmpty(timeRange) ? timeRange : undefined,
+    filter,
+    queryString,
+    streams,
+    parameters,
+    parameterBindings,
+  });
+};
+
+type Props = {
+  filter?: string | undefined,
+  queryString: string | undefined,
+  streams?: Array<string>,
+  timeRange: TimeRange | NoTimeRangeOverride | undefined,
+}
+
+const QueryValidation = ({ queryString, timeRange, streams, filter }: Props) => {
   const [showExplanation, setShowExplanation] = useState(false);
   const toggleShow = () => setShowExplanation((prevShow) => !prevShow);
-  const validationState = useValidateQuery({ queryString, timeRange, streams, parameters, parameterBindings }, validationPromise);
+  const containerRef = useRef(undefined);
+  const explanationTriggerRef = useRef(undefined);
+  const validationPayload = useValidationPayload(queryString, timeRange, streams, filter);
+  const validationState = useValidateQuery(validationPayload);
 
   // We need to always display the container to avoid query inout resizing problems
   // we need to always display the overlay trigger to avoid overlay placement problems
@@ -177,6 +189,7 @@ const QueryValidation = ({ queryString, timeRange, streams }: Props) => {
 };
 
 QueryValidation.defaultProps = {
+  filter: undefined,
   streams: undefined,
 };
 
