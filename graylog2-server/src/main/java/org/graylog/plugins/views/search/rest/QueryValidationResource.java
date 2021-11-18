@@ -16,9 +16,7 @@
  */
 package org.graylog.plugins.views.search.rest;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -87,7 +85,7 @@ public class QueryValidationResource extends RestResource implements PluginRestR
 
     private ImmutableSet<Parameter> resolveParameters(ValidationRequestDTO validationRequest) {
         return validationRequest.parameters().stream()
-                .map(param -> param.applyExecutionState(objectMapper, objectMapper.convertValue(validationRequest.parameterBindings(), JsonNode.class)))
+                .map(param -> param.applyBindings(validationRequest.parameterBindings()))
                 .collect(toImmutableSet());
     }
 
