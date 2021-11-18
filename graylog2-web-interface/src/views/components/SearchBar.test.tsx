@@ -30,6 +30,20 @@ import SearchBar from './SearchBar';
 
 const mockCurrentUser = { currentUser: { fullname: 'Ada Lovelace', username: 'ada' } };
 
+jest.mock('views/stores/SearchStore', () => ({
+  SearchStore: MockStore(
+    'listen',
+    ['getInitialState', () => ({
+      search: {
+        parameters: [],
+      },
+    })],
+  ),
+  SearchActions: {
+    refresh: jest.fn(),
+  },
+}));
+
 jest.mock('stores/users/CurrentUserStore', () => ({
   CurrentUserStore: MockStore(
     ['get', () => mockCurrentUser],
