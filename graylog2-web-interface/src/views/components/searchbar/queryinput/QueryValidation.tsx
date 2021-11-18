@@ -50,6 +50,24 @@ const ErrorIcon = styled(Icon)(({ theme, $status }: { theme: DefaultTheme, $stat
   font-size: 22px;
 `);
 
+const DocumentationIcon = styled(Icon)`
+  margin-left: 3px;
+`;
+
+const Title = styled.div`
+  display: flex;
+  justify-content: space-between;
+`;
+
+const ExplanationTitle = ({ title }: { title: string }) => (
+  <Title>
+    {title}
+    <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
+                       title="Search query syntax documentation"
+                       text={<DocumentationIcon name="lightbulb" />} />
+  </Title>
+);
+
 const validateQuery = debounce(({ queryString, timeRange, streams, setValidationState, parameters, parameterBindings }, loadPrevPromiseRef: React.MutableRefObject<BluebirdPromise>) => {
   const formattedTimeRange = isEmpty(timeRange) ? undefined : timeRange;
 
@@ -104,20 +122,6 @@ const uniqErrorMessages = (explanations) => {
 
   return uniq(errorMessages).join('. ');
 };
-
-const Title = styled.div`
-  display: flex;
-  justify-content: space-between;
-`;
-
-const ExplanationTitle = ({ title }: { title: string }) => (
-  <Title>
-    {title}
-    <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
-                       title="Search query syntax documentation"
-                       text={<Icon name="lightbulb" />} />
-  </Title>
-);
 
 type Props = {
   queryString: string | undefined,
