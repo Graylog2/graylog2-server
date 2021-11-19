@@ -19,6 +19,7 @@ package org.graylog.plugins.views.search.rest;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 import org.graylog.plugins.views.search.Query;
+import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchDomain;
 import org.graylog.plugins.views.search.SearchExecutionGuard;
@@ -41,7 +42,6 @@ import org.mockito.junit.MockitoRule;
 import javax.annotation.Nullable;
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.core.Response;
-import java.util.Collections;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -155,7 +155,8 @@ public class SearchResourceExecutionTest {
 
         try {
             this.searchResource.executeQuery(search.id(), ExecutionState.empty(), searchUser);
-        } catch (ForbiddenException ignored) {}
+        } catch (ForbiddenException ignored) {
+        }
 
         verify(this.eventBus, never()).post(any(SearchJobExecutionEvent.class));
     }
@@ -166,8 +167,9 @@ public class SearchResourceExecutionTest {
 
         final SearchDTO search = mockSearchDTO();
 
-        final SearchJob searchJob = mock(SearchJob.class);
-        when(searchJob.getResultFuture()).thenReturn(CompletableFuture.completedFuture(null));
+        final SearchJob searchJob = new SearchJob("deadbeef", search.toSearch(), "peterchen");
+        searchJob.addQueryResultFuture("query", CompletableFuture.completedFuture(QueryResult.emptyResult()));
+        searchJob.seal();
 
         when(queryEngine.execute(any())).thenReturn(searchJob);
 
@@ -178,7 +180,7 @@ public class SearchResourceExecutionTest {
 
         final SearchJobExecutionEvent searchJobExecutionEvent = eventCaptor.getValue();
         assertThat(searchJobExecutionEvent.user()).isEqualTo(currentUser);
-        assertThat(searchJobExecutionEvent.searchJob()).isEqualTo(response.getEntity());
+        assertThat(searchJobExecutionEvent.searchJob().getId()).isEqualTo("deadbeef");
     }
 
     @Test
@@ -190,7 +192,8 @@ public class SearchResourceExecutionTest {
 
         try {
             this.searchResource.executeSyncJob(search, 100, searchUser);
-        } catch (ForbiddenException ignored) {}
+        } catch (ForbiddenException ignored) {
+        }
 
         verify(this.eventBus, never()).post(any(SearchJobExecutionEvent.class));
     }
@@ -201,8 +204,7 @@ public class SearchResourceExecutionTest {
 
         final SearchDTO search = mockSearchDTO();
 
-        final SearchJob searchJob = mock(SearchJob.class);
-        when(searchJob.getResultFuture()).thenReturn(CompletableFuture.completedFuture(null));
+        final SearchJob searchJob = mocKSearchJob(search.toSearch());
 
         when(queryEngine.execute(any())).thenReturn(searchJob);
 
@@ -221,13 +223,9 @@ public class SearchResourceExecutionTest {
         final ExecutionState.Builder builder = ExecutionState.builder();
         builder.addAdditionalParameter("foo", 42);
 
-
-        when(searchDbService.get(search.id())).thenReturn(Optional.of(search));
-
         final ExecutionState executionState = builder.build();
         this.searchResource.executeQuery(search.id(), executionState, searchUser);
 
-        //noinspection unchecked
         final ArgumentCaptor<ExecutionState> executionStateCaptor = ArgumentCaptor.forClass(ExecutionState.class);
         verify(search, times(1)).applyExecutionState(any(), executionStateCaptor.capture());
 
@@ -289,7 +287,7 @@ public class SearchResourceExecutionTest {
         when(searchUser.username()).thenReturn(name);
     }
 
-   private Search mockNewSearch() {
+    private Search mockNewSearch() {
         final Search search = mock(Search.class);
 
         when(search.addStreamsToQueriesWithoutStreams(any())).thenReturn(search);
@@ -313,8 +311,7 @@ public class SearchResourceExecutionTest {
         when(search.applyExecutionState(any(), any())).thenReturn(search);
         when(searchDomain.getForUser(eq(search.id()), any())).thenReturn(Optional.of(search));
 
-        final SearchJob searchJob = mock(SearchJob.class);
-        when(searchJob.getResultFuture()).thenReturn(CompletableFuture.completedFuture(null));
+        final SearchJob searchJob = mocKSearchJob(search);
         when(searchJobService.create(any(), any())).thenReturn(searchJob);
 
         when(queryEngine.execute(any())).thenAnswer(invocation -> invocation.getArgument(0));
@@ -327,5 +324,13 @@ public class SearchResourceExecutionTest {
                 .create()
                 .queries(ImmutableSet.of())
                 .build();
+    }
+
+    private SearchJob mocKSearchJob(Search search) {
+        final SearchJob searchJob = new SearchJob("deadbeef", search, "peterchen");
+        searchJob.addQueryResultFuture("query1", CompletableFuture.completedFuture(QueryResult.emptyResult()));
+        searchJob.seal();
+
+        return searchJob;
     }
 }
