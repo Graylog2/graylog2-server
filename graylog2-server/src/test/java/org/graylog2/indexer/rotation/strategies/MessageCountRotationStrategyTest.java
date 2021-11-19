@@ -17,7 +17,6 @@
 package org.graylog2.indexer.rotation.strategies;
 
 import org.graylog2.audit.AuditEventSender;
-import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
@@ -55,8 +54,6 @@ public class MessageCountRotationStrategyTest {
     @Mock
     private AuditEventSender auditEventSender;
 
-    private ElasticsearchConfiguration configuration = new ElasticsearchConfiguration();
-
     @Test
     public void testRotate() throws Exception {
         when(indices.numberOfMessages("name")).thenReturn(10L);
@@ -64,7 +61,7 @@ public class MessageCountRotationStrategyTest {
         when(indexSet.getConfig()).thenReturn(indexSetConfig);
         when(indexSetConfig.rotationStrategy()).thenReturn(MessageCountRotationStrategyConfig.create(5));
 
-        final MessageCountRotationStrategy strategy = new MessageCountRotationStrategy(indices, nodeId, auditEventSender, configuration);
+        final MessageCountRotationStrategy strategy = new MessageCountRotationStrategy(indices, nodeId, auditEventSender);
 
         strategy.rotate(indexSet);
         verify(indexSet, times(1)).cycle();
@@ -78,7 +75,7 @@ public class MessageCountRotationStrategyTest {
         when(indexSet.getConfig()).thenReturn(indexSetConfig);
         when(indexSetConfig.rotationStrategy()).thenReturn(MessageCountRotationStrategyConfig.create(5));
 
-        final MessageCountRotationStrategy strategy = new MessageCountRotationStrategy(indices, nodeId, auditEventSender, configuration);
+        final MessageCountRotationStrategy strategy = new MessageCountRotationStrategy(indices, nodeId, auditEventSender);
 
         strategy.rotate(indexSet);
         verify(indexSet, never()).cycle();
@@ -93,7 +90,7 @@ public class MessageCountRotationStrategyTest {
         when(indexSet.getConfig()).thenReturn(indexSetConfig);
         when(indexSetConfig.rotationStrategy()).thenReturn(MessageCountRotationStrategyConfig.create(5));
 
-        final MessageCountRotationStrategy strategy = new MessageCountRotationStrategy(indices, nodeId, auditEventSender, configuration);
+        final MessageCountRotationStrategy strategy = new MessageCountRotationStrategy(indices, nodeId, auditEventSender);
 
         strategy.rotate(indexSet);
         verify(indexSet, never()).cycle();

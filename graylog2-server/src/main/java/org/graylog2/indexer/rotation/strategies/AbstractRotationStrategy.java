@@ -19,7 +19,6 @@ package org.graylog2.indexer.rotation.strategies;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
-import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.NoTargetIndexException;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
@@ -37,19 +36,15 @@ public abstract class AbstractRotationStrategy implements RotationStrategy {
 
     public interface Result {
         String getDescription();
-
         boolean shouldRotate();
     }
 
     private final AuditEventSender auditEventSender;
     private final NodeId nodeId;
-    protected final ElasticsearchConfiguration elasticsearchConfiguration;
 
-    public AbstractRotationStrategy(
-            AuditEventSender auditEventSender, NodeId nodeId, ElasticsearchConfiguration elasticsearchConfiguration) {
+    public AbstractRotationStrategy(AuditEventSender auditEventSender, NodeId nodeId) {
         this.auditEventSender = requireNonNull(auditEventSender);
         this.nodeId = nodeId;
-        this.elasticsearchConfiguration = elasticsearchConfiguration;
     }
 
     @Nullable
