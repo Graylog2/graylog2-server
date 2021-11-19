@@ -68,6 +68,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
     private static final Logger LOG = LoggerFactory.getLogger(SearchResource.class);
     private static final String BASE_PATH = "views/search";
     private static final String SEARCH_FORMAT_V1 = "application/vnd.graylog.search.v1+json";
+    private static final String SEARCH_FORMAT_V2 = "application/vnd.graylog.search.v2+json";
 
     private final SearchDomain searchDomain;
     private final SearchExecutor searchExecutor;
@@ -154,6 +155,26 @@ public class SearchResource extends RestResource implements PluginRestResource {
                                    @ApiParam(name = "timeout", defaultValue = "60000")
                                    @QueryParam("timeout") @DefaultValue("60000") long timeout,
                                    @Context SearchUser searchUser) {
+        final Search search = searchRequest.toSearch();
+        final SearchJob searchJob = searchExecutor.execute(search, searchUser, ExecutionState.empty());
+
+        postAuditEvent(searchJob);
+
+        final SearchJobDTO searchJobDTO = SearchJobDTO.fromSearchJob(searchJob);
+
+        return Response.ok(searchJobDTO).build();
+    }
+
+    @POST
+    @ApiOperation(value = "Execute a new synchronous search", notes = "Executes a new search and waits for its result", response = SearchJobDTO.class)
+    @Path("sync")
+    @NoAuditEvent("Creating audit event manually in method body.")
+    @Consumes({SEARCH_FORMAT_V2})
+    @Produces({SEARCH_FORMAT_V2})
+    public Response executeSyncJobv2(@ApiParam @NotNull(message = "Search body is mandatory") SearchDTOv2 searchRequest,
+                                     @ApiParam(name = "timeout", defaultValue = "60000")
+                                     @QueryParam("timeout") @DefaultValue("60000") long timeout,
+                                     @Context SearchUser searchUser) {
         final Search search = searchRequest.toSearch();
         final SearchJob searchJob = searchExecutor.execute(search, searchUser, ExecutionState.empty());
 

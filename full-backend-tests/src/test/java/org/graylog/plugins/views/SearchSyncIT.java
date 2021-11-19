@@ -56,8 +56,8 @@ public class SearchSyncIT {
                 .assertThat().body("message[0]", equalTo("Search body is mandatory"));
     }
 
-    @ContainerMatrixTest
-    void testMinimalisticRequest() {
+    // TODO: This should be turned into a @BeforeAll hook once we can use @TestInstance(PER_CLASS)
+    private void ingestMessage() {
         int mappedPort = sut.mappedPortFor(GELF_HTTP_PORT);
         GelfInputUtils.createGelfHttpInput(mappedPort, GELF_HTTP_PORT, requestSpec);
         GelfInputUtils.postMessage(mappedPort,
@@ -67,11 +67,52 @@ public class SearchSyncIT {
         // mainly because of the waiting logic
         final List<String> strings = SearchUtils.searchForAllMessages(requestSpec);
         assertThat(strings.size()).isEqualTo(1);
+    }
+
+    @ContainerMatrixTest
+    void testMinimalisticRequest() {
+        ingestMessage();
 
         given()
                 .spec(requestSpec)
                 .when()
                 .body(fixture("org/graylog/plugins/views/minimalistic-request.json"))
+                .post("/views/search/sync")
+                .then()
+                .statusCode(200)
+                .assertThat()
+                .body("execution.completed_exceptionally", equalTo(false))
+                .body("results*.value.search_types[0]*.value.messages.message.message[0]", hasItem("Hello there"));
+    }
+
+    @ContainerMatrixTest
+    void testMinimalisticRequestv2() {
+        ingestMessage();
+
+        given()
+                .spec(requestSpec)
+                .accept("application/vnd.graylog.search.v2+json")
+                .contentType("application/vnd.graylog.search.v2+json")
+                .when()
+                .body(fixture("org/graylog/plugins/views/minimalistic-request.json"))
+                .post("/views/search/sync")
+                .then()
+                .statusCode(200)
+                .assertThat()
+                .body("execution.completed_exceptionally", equalTo(false))
+                .body("results*.value.search_types[0]*.value.messages.message.message[0]", hasItem("Hello there"));
+    }
+
+    @ContainerMatrixTest
+    void testRequestWithStreamsv2() {
+        ingestMessage();
+
+        given()
+                .spec(requestSpec)
+                .accept("application/vnd.graylog.search.v2+json")
+                .contentType("application/vnd.graylog.search.v2+json")
+                .when()
+                .body(fixture("org/graylog/plugins/views/minimalistic-request-with-streams.json"))
                 .post("/views/search/sync")
                 .then()
                 .statusCode(200)
