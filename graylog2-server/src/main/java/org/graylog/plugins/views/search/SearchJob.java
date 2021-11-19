@@ -115,13 +115,13 @@ public class SearchJob {
         errors.add(t);
     }
 
-    private static class ExecutionInfo {
+    public static class ExecutionInfo {
         @JsonProperty("done")
-        private final boolean done;
+        public final boolean done;
         @JsonProperty("cancelled")
-        private final boolean cancelled;
+        public final boolean cancelled;
         @JsonProperty("completed_exceptionally")
-        private final boolean hasErrors;
+        public final boolean hasErrors;
 
         ExecutionInfo(boolean done, boolean cancelled, boolean hasErrors) {
             this.done = done;

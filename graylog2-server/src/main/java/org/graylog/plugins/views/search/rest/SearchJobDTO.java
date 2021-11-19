@@ -32,6 +32,9 @@ abstract class SearchJobDTO {
     @JsonProperty
     abstract Map<String, QueryResult> results();
 
+    @JsonProperty
+    abstract ExecutionInfo execution();
+
     static SearchJobDTO fromSearchJob(SearchJob searchJob) {
         return Builder.create()
                 .id(searchJob.getId())
@@ -39,6 +42,7 @@ abstract class SearchJobDTO {
                 .errors(searchJob.getErrors())
                 .results(searchJob.results())
                 .searchId(searchJob.getSearchId())
+                .execution(ExecutionInfo.fromExecutionInfo(searchJob.execution()))
                 .build();
     }
 
@@ -54,10 +58,31 @@ abstract class SearchJobDTO {
 
         abstract Builder results(Map<String, QueryResult> results);
 
+        abstract Builder execution(ExecutionInfo executionInfo);
+
         abstract SearchJobDTO build();
 
         static SearchJobDTO.Builder create() {
             return new AutoValue_SearchJobDTO.Builder();
+        }
+    }
+
+    static class ExecutionInfo {
+        @JsonProperty
+        private final boolean done;
+        @JsonProperty
+        private final boolean cancelled;
+        @JsonProperty("completed_exceptionally")
+        private final boolean hasErrors;
+
+        private ExecutionInfo(boolean done, boolean cancelled, boolean hasErrors) {
+            this.done = done;
+            this.cancelled = cancelled;
+            this.hasErrors = hasErrors;
+        }
+
+        public static ExecutionInfo fromExecutionInfo(SearchJob.ExecutionInfo execution) {
+            return new ExecutionInfo(execution.done, execution.cancelled, execution.hasErrors);
         }
     }
 }

@@ -35,7 +35,7 @@ import static com.google.common.collect.ImmutableSet.of;
 @AutoValue
 @JsonAutoDetect
 @JsonDeserialize(builder = SearchDTO.Builder.class)
-abstract class SearchDTO {
+public abstract class SearchDTO {
     @Nullable
     @JsonProperty
     public abstract String id();
@@ -57,8 +57,12 @@ abstract class SearchDTO {
                 .build();
     }
 
+    public static Builder builder() {
+        return Builder.create();
+    }
+
     @AutoValue.Builder
-    abstract static class Builder {
+    public abstract static class Builder {
         @JsonProperty
         public abstract Builder id(String id);
 

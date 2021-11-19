@@ -38,7 +38,7 @@ import java.util.Set;
 @JsonAutoDetect
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonDeserialize(builder = QueryDTO.Builder.class)
-abstract class QueryDTO {
+public abstract class QueryDTO {
     @JsonProperty
     public abstract Optional<String> id();
 
@@ -65,8 +65,12 @@ abstract class QueryDTO {
                 .build();
     }
 
+    public static Builder builder() {
+        return Builder.create();
+    }
+
     @AutoValue.Builder
-    abstract static class Builder {
+    public abstract static class Builder {
         @JsonProperty
         public abstract Builder id(@Nullable String id);
 
@@ -85,7 +89,7 @@ abstract class QueryDTO {
         public abstract QueryDTO build();
 
         @JsonCreator
-        static Builder create() {
+        public static Builder create() {
             return new AutoValue_QueryDTO.Builder();
         }
     }
