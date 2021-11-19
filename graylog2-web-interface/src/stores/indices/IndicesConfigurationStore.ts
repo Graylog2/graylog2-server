@@ -16,6 +16,11 @@
  */
 import Reflux from 'reflux';
 
+import {
+  IndicesConfigurationStoreState,
+  RetentionStrategyResponse,
+  RotationStrategyResponse,
+} from 'components/indices/Types';
 import UserNotification from 'util/UserNotification';
 import * as URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
@@ -25,7 +30,7 @@ const IndicesConfigurationActions = ActionsProvider.getActions('IndicesConfigura
 
 const urlPrefix = '/system/indices';
 
-const IndicesConfigurationStore = Reflux.createStore({
+const IndicesConfigurationStore = Reflux.createStore<IndicesConfigurationStoreState>({
   listenables: [IndicesConfigurationActions],
 
   rotationStrategies: undefined,
@@ -39,7 +44,14 @@ const IndicesConfigurationStore = Reflux.createStore({
       retentionStrategies: undefined,
     };
   },
-
+  getState() {
+    return {
+      activeRotationConfig: this.activeRotationConfig,
+      rotationStrategies: this.rotationStrategies,
+      activeRetentionConfig: this.activeRetentionConfig,
+      retentionStrategies: this.retentionStrategies,
+    };
+  },
   _url(path) {
     return URLUtils.qualifyUrl(urlPrefix + path);
   },
@@ -48,9 +60,9 @@ const IndicesConfigurationStore = Reflux.createStore({
     const promise = fetch('GET', this._url('/rotation/strategies'));
 
     promise.then(
-      (response) => {
+      (response: RotationStrategyResponse) => {
         this.rotationStrategies = response.strategies;
-        this.trigger({ rotationStrategies: response.strategies });
+        this.trigger(this.getState());
       },
       (error) => {
         UserNotification.error(`Fetching rotation strategies failed: ${error}`, 'Could not retrieve rotation strategies');
@@ -64,9 +76,9 @@ const IndicesConfigurationStore = Reflux.createStore({
     const promise = fetch('GET', this._url('/retention/strategies'));
 
     promise.then(
-      (response) => {
+      (response: RetentionStrategyResponse) => {
         this.retentionStrategies = response.strategies;
-        this.trigger({ retentionStrategies: response.strategies });
+        this.trigger(this.getState());
       },
       (error) => {
         UserNotification.error(`Fetching retention strategies failed: ${error}`, 'Could not retrieve retention strategies');
