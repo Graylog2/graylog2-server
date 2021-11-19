@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
@@ -24,54 +23,63 @@ import { Row, Col, Button } from 'components/graylog';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { IndexSetConfigurationForm } from 'components/indices';
 import { DocumentationLink } from 'components/support';
-import CombinedProvider from 'injection/CombinedProvider';
-import DocsHelper from 'util/DocsHelper';
+import DateTime from 'logic/datetimes/DateTime';
 import history from 'util/History';
+import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
-import withParams from 'routing/withParams';
-import withLocation from 'routing/withLocation';
+import CombinedProvider from 'injection/CombinedProvider';
 
 const { IndexSetsStore, IndexSetsActions } = CombinedProvider.get('IndexSets');
 const { IndicesConfigurationStore, IndicesConfigurationActions } = CombinedProvider.get('IndicesConfiguration');
 
-const IndexSetConfigurationPage = createReactClass({
-  displayName: 'IndexSetConfigurationPage',
-
-  propTypes: {
-    params: PropTypes.object.isRequired,
-    location: PropTypes.object.isRequired,
-  },
-
+const IndexSetCreationPage = createReactClass({
+  displayName: 'IndexSetCreationPage',
   mixins: [Reflux.connect(IndexSetsStore), Reflux.connect(IndicesConfigurationStore)],
 
   getInitialState() {
     return {
-      indexSet: undefined,
+      indexSet: {
+        title: '',
+        description: '',
+        index_prefix: '',
+        writable: true,
+        shards: 4,
+        replicas: 0,
+        retention_strategy_class: 'org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy',
+        retention_strategy: {
+          max_number_of_indices: 20,
+          type: 'org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig',
+        },
+        rotation_strategy_class: 'org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy',
+        rotation_strategy: {
+          max_docs_per_index: 20000000,
+          type: 'org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig',
+        },
+        index_analyzer: 'standard',
+        index_optimization_max_num_segments: 1,
+        index_optimization_disabled: false,
+        field_type_refresh_interval: 5 * 1000, // 5 seconds
+      },
     };
   },
 
   componentDidMount() {
-    IndexSetsActions.get(this.props.params.indexSetId);
     IndicesConfigurationActions.loadRotationStrategies();
     IndicesConfigurationActions.loadRetentionStrategies();
   },
 
-  _formCancelLink() {
-    if (this.props.location.query.from === 'details') {
-      return Routes.SYSTEM.INDEX_SETS.SHOW(this.state.indexSet.id);
-    }
-
-    return Routes.SYSTEM.INDICES.LIST;
-  },
-
   _saveConfiguration(indexSet) {
-    IndexSetsActions.update(indexSet).then(() => {
+    const copy = indexSet;
+
+    copy.creation_date = DateTime.now().toISOString();
+
+    IndexSetsActions.create(copy).then(() => {
       history.push(Routes.SYSTEM.INDICES.LIST);
     });
   },
 
   _isLoading() {
-    return !this.state.indexSet || !this.state.rotationStrategies || !this.state.retentionStrategies;
+    return !this.state.rotationStrategies || !this.state.retentionStrategies;
   },
 
   render() {
@@ -82,12 +90,12 @@ const IndexSetConfigurationPage = createReactClass({
     const { indexSet } = this.state;
 
     return (
-      <DocumentTitle title="Configure Index Set">
+      <DocumentTitle title="Create Index Set">
         <div>
-          <PageHeader title="Configure Index Set">
+          <PageHeader title="Create Index Set">
             <span>
-              Modify the current configuration for this index set, allowing you to customize the retention, sharding,
-              and replication of messages coming from one or more streams.
+              Create a new index set that will let you configure the retention, sharding, and replication of messages
+              coming from one or more streams.
             </span>
             <span>
               You can learn more about the index model in the{' '}
@@ -105,7 +113,8 @@ const IndexSetConfigurationPage = createReactClass({
               <IndexSetConfigurationForm indexSet={indexSet}
                                          rotationStrategies={this.state.rotationStrategies}
                                          retentionStrategies={this.state.retentionStrategies}
-                                         cancelLink={this._formCancelLink()}
+                                         create
+                                         cancelLink={Routes.SYSTEM.INDICES.LIST}
                                          onUpdate={this._saveConfiguration} />
             </Col>
           </Row>
@@ -115,4 +124,4 @@ const IndexSetConfigurationPage = createReactClass({
   },
 });
 
-export default withParams(withLocation(IndexSetConfigurationPage));
+export default IndexSetCreationPage;

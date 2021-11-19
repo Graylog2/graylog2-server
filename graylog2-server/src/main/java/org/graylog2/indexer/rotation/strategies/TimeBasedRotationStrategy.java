@@ -18,7 +18,6 @@ package org.graylog2.indexer.rotation.strategies;
 
 import com.google.common.base.MoreObjects;
 import org.graylog2.audit.AuditEventSender;
-import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.Indices;
@@ -29,8 +28,6 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeField;
 import org.joda.time.DateTimeFieldType;
 import org.joda.time.DateTimeZone;
-import org.joda.time.Duration;
-import org.joda.time.Instant;
 import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +54,6 @@ import static org.joda.time.DateTimeFieldType.year;
 @Singleton
 public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
     private static final Logger log = LoggerFactory.getLogger(TimeBasedRotationStrategy.class);
-    public static final String NAME = "time";
 
     private final Indices indices;
     private Map<String, DateTime> lastRotation;
@@ -65,9 +61,8 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
 
     @Inject
     public TimeBasedRotationStrategy(Indices indices, NodeId nodeId,
-                                     AuditEventSender auditEventSender,
-                                     ElasticsearchConfiguration elasticsearchConfiguration) {
-        super(auditEventSender, nodeId, elasticsearchConfiguration);
+                                     AuditEventSender auditEventSender) {
+        super(auditEventSender, nodeId);
         this.anchor = new ConcurrentHashMap<>();
         this.lastRotation = new ConcurrentHashMap<>();
         this.indices = requireNonNull(indices, "indices must not be null");
@@ -80,7 +75,7 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
 
     @Override
     public RotationStrategyConfig defaultConfiguration() {
-        return TimeBasedRotationStrategyConfig.createDefault(elasticsearchConfiguration.getMaxWriteIndexAge());
+        return TimeBasedRotationStrategyConfig.createDefault();
     }
 
     /**
@@ -113,27 +108,13 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
 
         // find the largest non-zero stride in the period. that's our anchor type. statement order matters here!
         DateTimeFieldType largestStrideType = null;
-        if (seconds > 0) {
-            largestStrideType = secondOfMinute();
-        }
-        if (minutes > 0) {
-            largestStrideType = minuteOfHour();
-        }
-        if (hours > 0) {
-            largestStrideType = hourOfDay();
-        }
-        if (days > 0) {
-            largestStrideType = dayOfMonth();
-        }
-        if (weeks > 0) {
-            largestStrideType = weekOfWeekyear();
-        }
-        if (months > 0) {
-            largestStrideType = monthOfYear();
-        }
-        if (years > 0) {
-            largestStrideType = year();
-        }
+        if (seconds > 0) largestStrideType = secondOfMinute();
+        if (minutes > 0) largestStrideType = minuteOfHour();
+        if (hours > 0) largestStrideType = hourOfDay();
+        if (days > 0) largestStrideType = dayOfMonth();
+        if (weeks > 0) largestStrideType = weekOfWeekyear();
+        if (months > 0) largestStrideType = monthOfYear();
+        if (years > 0) largestStrideType = year();
         if (largestStrideType == null) {
             throw new IllegalArgumentException("Could not determine rotation stride length.");
         }
@@ -163,13 +144,6 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
         return MoreObjects.firstNonNull(lastAnchor, Tools.nowUTC());
     }
 
-    private static boolean isLonger(Period p1, Period p2) {
-        Instant now = Instant.now();
-        Duration d1 = p1.toDurationTo(now);
-        Duration d2 = p2.toDurationTo(now);
-        return d1.isLongerThan(d2);
-    }
-
     @Nullable
     @Override
     protected Result shouldRotate(String index, IndexSet indexSet) {
@@ -178,26 +152,15 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
         checkState(!isNullOrEmpty(index), "Index name must not be null or empty");
         checkState(!isNullOrEmpty(indexSetId), "Index set ID must not be null or empty");
         checkState(indexSetConfig.rotationStrategy() instanceof TimeBasedRotationStrategyConfig,
-                "Invalid rotation strategy config <"
-                        + indexSetConfig.rotationStrategy().getClass().getCanonicalName()
-                        + "> for index set <" + indexSetId + ">");
+                "Invalid rotation strategy config <" + indexSetConfig.rotationStrategy().getClass().getCanonicalName() + "> for index set <" + indexSetId + ">");
 
         final TimeBasedRotationStrategyConfig config = (TimeBasedRotationStrategyConfig) indexSetConfig.rotationStrategy();
-
-        Period rotationPeriod = config.rotationPeriod();
-        Period maxPeriod = elasticsearchConfiguration.getMaxWriteIndexAge();
-        boolean overriding = false;
-        if (maxPeriod != null && isLonger(rotationPeriod, maxPeriod)) {
-            log.debug("Max rotation limit {} overrides configured period {}", maxPeriod, rotationPeriod);
-            rotationPeriod = maxPeriod;
-            overriding = true;
-        }
-        final Period normalizedPeriod = rotationPeriod.normalizedStandard();
-
+        final Period rotationPeriod = config.rotationPeriod().normalizedStandard();
+        final DateTime now = Tools.nowUTC();
         // when first started, we might not know the last rotation time, look up the creation time of the index instead.
         if (!lastRotation.containsKey(indexSetId)) {
             indices.indexCreationDate(index).ifPresent(creationDate -> {
-                final DateTime currentAnchor = determineRotationPeriodAnchor(creationDate, normalizedPeriod);
+                final DateTime currentAnchor = determineRotationPeriodAnchor(creationDate, rotationPeriod);
                 anchor.put(indexSetId, currentAnchor);
                 lastRotation.put(indexSetId, creationDate);
             });
@@ -208,13 +171,11 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
             }
         }
 
-        final DateTime now = Tools.nowUTC();
         final DateTime currentAnchor = anchor.get(indexSetId);
-        final DateTime nextRotation = currentAnchor.plus(normalizedPeriod);
+        final DateTime nextRotation = currentAnchor.plus(rotationPeriod);
         if (nextRotation.isAfter(now)) {
-            final String message = new MessageFormat("Next rotation at {0} {1}", Locale.ENGLISH)
-                    .format(new Object[]{nextRotation,
-                            overriding ? "(elasticsearch_max_write_index_age overrides configured period)" : ""});
+            final String message = new MessageFormat("Next rotation at {0}", Locale.ENGLISH)
+                    .format(new Object[]{nextRotation});
             return new SimpleResult(false, message);
         }
 
@@ -222,16 +183,14 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
         DateTime tmpAnchor;
         int multiplicator = 0;
         do {
-            tmpAnchor = currentAnchor.withPeriodAdded(normalizedPeriod, ++multiplicator);
+            tmpAnchor = currentAnchor.withPeriodAdded(rotationPeriod, ++multiplicator);
         } while (tmpAnchor.isBefore(now));
 
-        final DateTime nextAnchor = currentAnchor.withPeriodAdded(normalizedPeriod, multiplicator - 1);
+        final DateTime nextAnchor = currentAnchor.withPeriodAdded(rotationPeriod, multiplicator - 1);
         anchor.put(indexSetId, nextAnchor);
         lastRotation.put(indexSetId, now);
-        final String message = new MessageFormat("Rotation period {0} elapsed, next rotation at {1} {2}", Locale.ENGLISH)
-                .format(new Object[]{now,
-                        nextAnchor,
-                        overriding ? "(elasticsearch_max_write_index_age overrides configured period)" : ""});
+        final String message = new MessageFormat("Rotation period {0} elapsed, next rotation at {1}", Locale.ENGLISH)
+                .format(new Object[]{now, nextAnchor});
         return new SimpleResult(true, message);
     }
 
@@ -254,10 +213,5 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
         public boolean shouldRotate() {
             return rotate;
         }
-    }
-
-    @Override
-    public String getStrategyName() {
-        return NAME;
     }
 }

@@ -24,6 +24,4 @@ public interface RotationStrategy {
     Class<? extends RotationStrategyConfig> configurationClass();
 
     RotationStrategyConfig defaultConfiguration();
-
-    String getStrategyName();
 }

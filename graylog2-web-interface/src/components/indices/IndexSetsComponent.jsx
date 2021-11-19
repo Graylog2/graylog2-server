@@ -26,7 +26,9 @@ import Routes from 'routing/Routes';
 import StringUtils from 'util/StringUtils';
 import NumberUtils from 'util/NumberUtils';
 import { IndexSetDeletionForm, IndexSetDetails } from 'components/indices';
-import { IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore';
+import CombinedProvider from 'injection/CombinedProvider';
+
+const { IndexSetsStore, IndexSetsActions } = CombinedProvider.get('IndexSets');
 
 const IndexSetsComponent = createReactClass({
   displayName: 'IndexSetsComponent',
