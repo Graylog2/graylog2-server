@@ -43,22 +43,22 @@ describe('FormatReceivedBy', () => {
   });
 
   it('shows that input is deleted if it is unknown', async () => {
-    render(<FormatReceivedBy inputs={Immutable.Map()} sourceNodeId="foo" sourceInputId="bar" />);
+    render(<FormatReceivedBy isLocalNode inputs={Immutable.Map()} sourceNodeId="foo" sourceInputId="bar" />);
     await screen.findByText('deleted input');
   });
 
   it('shows that node is stopped if it is unknown', async () => {
-    render(<FormatReceivedBy inputs={Immutable.Map()} sourceNodeId="foo" sourceInputId="bar" />);
+    render(<FormatReceivedBy isLocalNode inputs={Immutable.Map()} sourceNodeId="foo" sourceInputId="bar" />);
     await screen.findByText('stopped node');
   });
 
   it('shows input information if present', async () => {
-    render(<FormatReceivedBy inputs={inputs} sourceNodeId="foo" sourceInputId="bar" />);
+    render(<FormatReceivedBy isLocalNode inputs={inputs} sourceNodeId="foo" sourceInputId="bar" />);
     await screen.findByText('My awesome input');
   });
 
   it('shows node information if present', async () => {
-    render(<FormatReceivedBy inputs={Immutable.Map()} sourceNodeId="existingNode" sourceInputId="bar" />);
+    render(<FormatReceivedBy isLocalNode inputs={Immutable.Map()} sourceNodeId="existingNode" sourceInputId="bar" />);
 
     const nodeLink = await screen.findByRole('link', { name: /existing.node/ }) as HTMLAnchorElement;
 
@@ -84,18 +84,12 @@ describe('FormatReceivedBy', () => {
     afterEach(() => PluginStore.unregister(pluginManifest));
 
     it('with correct definition', async () => {
-      render(<FormatReceivedBy inputs={inputs} sourceNodeId="foo" sourceInputId="bar" />);
+      render(<FormatReceivedBy isLocalNode={false} inputs={inputs} sourceNodeId="foo" sourceInputId="bar" />);
       await screen.findByText('Mighty plugin magic: bar/foo');
-
-      expect(isLocalNode).toHaveBeenCalledWith('foo');
     });
 
     it('but handles exception being thrown in `isLocalNode`', async () => {
-      isLocalNode.mockImplementation(() => new Promise(() => {
-        throw Error('Boom!');
-      }));
-
-      render(<FormatReceivedBy inputs={inputs} sourceNodeId="foo" sourceInputId="bar" />);
+      render(<FormatReceivedBy isLocalNode inputs={inputs} sourceNodeId="foo" sourceInputId="bar" />);
       await screen.findByText('stopped node');
     });
   });
