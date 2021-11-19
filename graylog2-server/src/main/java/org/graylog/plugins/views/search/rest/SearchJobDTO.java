@@ -67,22 +67,19 @@ abstract class SearchJobDTO {
         }
     }
 
-    static class ExecutionInfo {
+    @AutoValue
+    abstract static class ExecutionInfo {
         @JsonProperty
-        private final boolean done;
-        @JsonProperty
-        private final boolean cancelled;
-        @JsonProperty("completed_exceptionally")
-        private final boolean hasErrors;
+        abstract boolean done();
 
-        private ExecutionInfo(boolean done, boolean cancelled, boolean hasErrors) {
-            this.done = done;
-            this.cancelled = cancelled;
-            this.hasErrors = hasErrors;
-        }
+        @JsonProperty
+        abstract boolean cancelled();
+
+        @JsonProperty("completed_exceptionally")
+        abstract boolean hasErrors();
 
         public static ExecutionInfo fromExecutionInfo(SearchJob.ExecutionInfo execution) {
-            return new ExecutionInfo(execution.done, execution.cancelled, execution.hasErrors);
+            return new AutoValue_SearchJobDTO_ExecutionInfo(execution.done, execution.cancelled, execution.hasErrors);
         }
     }
 }
