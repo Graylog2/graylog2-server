@@ -16,7 +16,6 @@
  */
 package org.graylog.plugins.views;
 
-import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 import org.graylog.testing.completebackend.GraylogBackend;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
@@ -24,6 +23,7 @@ import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfi
 import org.graylog.testing.utils.GelfInputUtils;
 import org.graylog.testing.utils.SearchUtils;
 
+import java.io.InputStream;
 import java.util.List;
 
 import static io.restassured.RestAssured.given;
@@ -68,14 +68,19 @@ public class SearchSyncIT {
         final List<String> strings = SearchUtils.searchForAllMessages(requestSpec);
         assertThat(strings.size()).isEqualTo(1);
 
-        final ValidatableResponse validatableResponse = given()
+        given()
                 .spec(requestSpec)
                 .when()
-                .body(getClass().getClassLoader().getResourceAsStream("org/graylog/plugins/views/minimalistic-request.json"))
+                .body(fixture("org/graylog/plugins/views/minimalistic-request.json"))
                 .post("/views/search/sync")
                 .then()
-                .statusCode(200);
-        validatableResponse.assertThat().body("execution.completed_exceptionally", equalTo(false));
-        validatableResponse.assertThat().body("results*.value.search_types[0]*.value.messages.message.message[0]", hasItem("Hello there"));
+                .statusCode(200)
+                .assertThat()
+                .body("execution.completed_exceptionally", equalTo(false))
+                .body("results*.value.search_types[0]*.value.messages.message.message[0]", hasItem("Hello there"));
+    }
+
+    private InputStream fixture(String filename) {
+        return getClass().getClassLoader().getResourceAsStream(filename);
     }
 }
