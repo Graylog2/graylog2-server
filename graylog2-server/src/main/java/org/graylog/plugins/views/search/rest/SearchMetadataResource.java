@@ -73,7 +73,7 @@ public class SearchMetadataResource extends RestResource implements PluginRestRe
     @POST
     @ApiOperation(value = "Metadata for the posted Search object", notes = "Intended for search objects that aren't yet persisted (e.g. for validation or interactive purposes)")
     @NoAuditEvent("Only returning metadata for given search, not changing any data")
-    public SearchMetadata metadataForObject(@ApiParam @NotNull Search search) {
+    public SearchMetadata metadataForObject(@ApiParam @NotNull(message = "Search body is mandatory") Search search) {
         if (search == null) {
             throw new IllegalArgumentException("Search must not be null.");
         }
