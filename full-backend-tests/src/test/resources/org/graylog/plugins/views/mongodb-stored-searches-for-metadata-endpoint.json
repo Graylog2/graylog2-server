@@ -1,0 +1,50 @@
+{
+  "searches": [
+    {
+      "_id": {
+        "$oid": "61977043c1f17d26b45c8a0a"
+      },
+      "queries": [
+        {
+          "id": "f1446410-a082-4871-b3bf-d69aa42d0c96",
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "action:$action$"
+          },
+          "timerange": {
+            "type": "relative",
+            "from": 300
+          },
+          "search_types": [
+            {
+              "type": "messages"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "_id": {
+        "$oid": "61977428c1f17d26b45c8a0b"
+      },
+      "queries": [
+        {
+          "id": "f1446410-a082-4871-b3bf-d69aa42d0c96",
+          "query": {
+            "type": "elasticsearch",
+            "query_string": ""
+          },
+          "timerange": {
+            "type": "relative",
+            "from": 300
+          },
+          "search_types": [
+            {
+              "type": "messages"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

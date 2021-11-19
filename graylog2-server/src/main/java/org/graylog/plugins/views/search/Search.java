@@ -40,6 +40,7 @@ import org.joda.time.DateTimeZone;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.Map;
@@ -85,6 +86,10 @@ public abstract class Search implements ContentPackable<SearchEntity> {
     @JsonProperty(FIELD_OWNER)
     public abstract Optional<String> owner();
 
+    public Search withOwner(@Nonnull String owner) {
+        return toBuilder().owner(owner).build();
+    }
+
     @JsonProperty(FIELD_CREATED_AT)
     public abstract DateTime createdAt();
 
@@ -121,14 +126,14 @@ public abstract class Search implements ContentPackable<SearchEntity> {
         return builder.build();
     }
 
-    public Search addStreamsToQueriesWithoutStreams(Supplier<ImmutableSet<String>> defaultStreamsSupplier) {
+    public Search addStreamsToQueriesWithoutStreams(Supplier<Set<String>> defaultStreamsSupplier) {
         if (!hasQueriesWithoutStreams()) {
             return this;
         }
         final Set<Query> withStreams = queries().stream().filter(Query::hasStreams).collect(toSet());
         final Set<Query> withoutStreams = Sets.difference(queries(), withStreams);
 
-        final ImmutableSet<String> defaultStreams = defaultStreamsSupplier.get();
+        final Set<String> defaultStreams = defaultStreamsSupplier.get();
 
         if (defaultStreams.isEmpty()) {
             throw new MissingStreamPermissionException("User doesn't have access to any streams",

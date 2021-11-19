@@ -204,7 +204,7 @@ public abstract class Query implements ContentPackable<QueryEntity> {
         return !usedStreamIds().isEmpty();
     }
 
-    Query addStreamsToFilter(ImmutableSet<String> streamIds) {
+    Query addStreamsToFilter(Set<String> streamIds) {
         final Filter newFilter = addStreamsTo(filter(), streamIds);
         return toBuilder().filter(newFilter).build();
     }
