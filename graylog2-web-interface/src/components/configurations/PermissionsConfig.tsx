@@ -103,7 +103,7 @@ const PermissionsConfig = ({ config, updateConfig }: Props) => {
                                          label={(
                                            <LabelSpan>Share with everyone</LabelSpan>
                                          )} />
-                            <InputDescription help={<>Share with everyone option will be available</>} />
+                            <InputDescription help="Control whether it is possible to share with everyone." />
                           </Col>
                           <Col sm={12}>
                             <FormikInput type="checkbox"
@@ -112,7 +112,7 @@ const PermissionsConfig = ({ config, updateConfig }: Props) => {
                                          label={(
                                            <LabelSpan>Share with users</LabelSpan>
                                          )} />
-                            <InputDescription help={<>Share with users options will be available.</>} />
+                            <InputDescription help="Control whether it is possible to share with single users." />
                           </Col>
 
                         </Row>

@@ -74,8 +74,8 @@ const ConfigurationsPage = () => {
       ConfigurationsActions.listMessageProcessorsConfig(MESSAGE_PROCESSORS_CONFIG),
       ConfigurationsActions.list(SIDECAR_CONFIG),
       ConfigurationsActions.list(EVENTS_CONFIG),
+      ConfigurationsActions.listPermissionsConfig(PERMISSIONS_CONFIG),
     ];
-    promises.push(ConfigurationsActions.listPermissionsConfig(PERMISSIONS_CONFIG));
 
     if (isPermitted(permissions, ['urlwhitelist:read'])) {
       promises.push(ConfigurationsActions.listWhiteListConfig(URL_WHITELIST_CONFIG));

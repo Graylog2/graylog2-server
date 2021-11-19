@@ -149,10 +149,7 @@ export const ConfigurationsStore = singletonStore(
       const promise = fetch('GET', this._url(`/${configType}`)).then((response: PermissionsConfigType) => {
         this.configuration = {
           ...this.configuration,
-          [configType]: response || {
-            allow_sharing_with_everyone: true,
-            allow_sharing_with_users: true,
-          },
+          [configType]: response,
         };
 
         this.propagateChanges();
