@@ -172,7 +172,7 @@ public class MongoDBInstance extends ExternalResource implements AutoCloseable {
         }
     }
 
-    public void importFixture(Class<?> testClass, String resourceName) {
+    public void importFixture(String resourceName, Class<?> testClass) {
         if (!Paths.get(resourceName).isAbsolute()) {
             try {
                 new MongoDBFixtureImporter(Arrays.asList(Resources.getResource(testClass, resourceName))).importResources(service.mongoDatabase());

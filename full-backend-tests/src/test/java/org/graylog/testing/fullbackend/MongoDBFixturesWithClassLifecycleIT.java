@@ -41,7 +41,7 @@ class MongoDBFixturesWithClassLifecycleIT {
 
     @BeforeAll
     public void importMongoFixtures() {
-        this.sut.mongoDB().importFixture(this.getClass(), "access-token.json");
+        this.sut.importMongoDBFixture("access-token.json", MongoDBFixturesWithClassLifecycleIT.class);
     }
 
     @ContainerMatrixTest

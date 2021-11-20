@@ -135,6 +135,10 @@ public class GraylogBackend implements AutoCloseable {
         es.importFixtureResource(resourcePath, testClass);
     }
 
+    public void importMongoDBFixture(String resourcePath, Class<?> testClass) {
+        mongodb.importFixture(resourcePath, testClass);
+    }
+
     public String uri() {
         return node.uri();
     }
