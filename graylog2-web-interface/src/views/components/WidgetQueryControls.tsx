@@ -109,7 +109,7 @@ const useBindApplySearchControlsChanges = (formRef) => {
 
       return undefined;
     });
-  }, [formRef, bindApplySearchControlsChanges]);
+  }, [formRef, bindApplySearchControlsChanges, adjustTimezone]);
 };
 
 const debouncedValidateQuery = debounceWithPromise(validateQuery, 350);

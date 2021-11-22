@@ -115,7 +115,7 @@ const TimeRangeLivePreview = ({ timerange }: Props) => {
     }
 
     setTimeOutput(output);
-  }, [isValid, timerange]);
+  }, [isValid, timerange, adjustTimezone, formatTime]);
 
   return (
     <PreviewWrapper data-testid="time-range-live-preview">

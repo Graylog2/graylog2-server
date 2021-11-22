@@ -16,7 +16,6 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
-import moment from 'moment';
 
 import DateTimeContext from 'contexts/DateTimeContext';
 import { LinkContainer } from 'components/common/router';
@@ -55,7 +54,7 @@ class AlertMessages extends React.Component {
     let momentTo;
 
     if (alert.is_interval) {
-      momentTo = (alert.resolved_at ? adjustTimezone(alert.resolved_at).toMoment().add(1, 'minute') : adjustTimezone(new Date()));
+      momentTo = (alert.resolved_at ? adjustTimezone(alert.resolved_at).add(1, 'minute') : adjustTimezone(new Date()));
     } else {
       momentTo = adjustTimezone(alert.triggered_at).add(1, 'minute');
     }
