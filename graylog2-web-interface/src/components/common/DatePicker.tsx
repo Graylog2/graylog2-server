@@ -15,13 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useContext } from 'react';
 import DayPicker, { DayModifiers } from 'react-day-picker';
 import styled, { css } from 'styled-components';
 
-import DateTime from 'logic/datetimes/DateTime';
-
 import 'react-day-picker/lib/style.css';
+import DateTimeContext from 'contexts/DateTimeContext';
 
 const StyledDayPicker = styled(DayPicker)(({ theme }) => css`
   width: 100%;
@@ -66,11 +65,13 @@ type Props = {
 };
 
 const DatePicker = ({ date, fromDate, onChange, showOutsideDays }: Props) => {
+  const { adjustTimezone, formatTime } = useContext(DateTimeContext);
+
   let selectedDate;
 
   if (date) {
     try {
-      selectedDate = DateTime.parseFromString(date);
+      selectedDate = adjustTimezone(date);
     } catch (e) {
       // don't do anything
     }
@@ -82,9 +83,7 @@ const DatePicker = ({ date, fromDate, onChange, showOutsideDays }: Props) => {
         return false;
       }
 
-      const dateTime = DateTime.ignoreTZ(moddedDate);
-
-      return (selectedDate.toString(DateTime.Formats.DATE) === dateTime.toString(DateTime.Formats.DATE));
+      return formatTime(moddedDate, 'UTC', 'date') === formatTime(selectedDate, undefined, 'date');
     },
     disabled: {
       before: new Date(fromDate),
