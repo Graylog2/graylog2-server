@@ -36,9 +36,8 @@ type Props = {
 }
 
 const StatusIndicator = ({ message, id, lastSeen, status }: Props) => {
-  const { adjustTimezone, relativeDifference } = useContext(DateTimeContext);
+  const { relativeDifference } = useContext(DateTimeContext);
   const text = lodash.upperFirst(SidecarStatusEnum.toString(status));
-  const lastSeenDateTime = adjustTimezone(lastSeen);
 
   let icon;
   let className;
@@ -60,7 +59,7 @@ const StatusIndicator = ({ message, id, lastSeen, status }: Props) => {
     default:
       className = 'text-info';
       icon = 'question-circle';
-      messageString += ` (${relativeDifference(lastSeenDateTime)})`;
+      messageString += ` (${relativeDifference(lastSeen)})`;
   }
 
   if (messageString && id) {
