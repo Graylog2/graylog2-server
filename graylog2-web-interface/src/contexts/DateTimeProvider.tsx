@@ -40,6 +40,7 @@ export const DATE_TIME_FORMATS = {
   withTz: 'YYYY-MM-DD HH:mm:ss Z', // includes the time zone
   readable: 'dddd D MMMM YYYY, HH:mm ZZ', // easy to read
   internal: 'YYYY-MM-DDTHH:mm:ss.SSSZ', // ISO 8601, internal default, not really nice to read. Mostly used communication with the API.
+  date: 'YYYY-MM-DD',
 };
 
 /**
