@@ -28,16 +28,16 @@ export const readableRange = (timerange: TimeRange, fieldName: 'range' | 'from' 
     .fromNow();
 };
 
-const relativeTimeRangeToString = (timerange: RelativeTimeRange, unifyAsDate: (time: Date) => Moment): string => {
+const relativeTimeRangeToString = (timerange: RelativeTimeRange, adjustTimezone: (time: Date) => Moment): string => {
   if (isTypeRelativeWithStartOnly(timerange)) {
     if (timerange.range === 0) {
       return 'All Time';
     }
 
-    return `${readableRange(timerange, 'range', unifyAsDate)} - Now`;
+    return `${readableRange(timerange, 'range', adjustTimezone)} - Now`;
   }
 
-  return `${readableRange(timerange, 'from', unifyAsDate)} - ${readableRange(timerange, 'to', unifyAsDate, 'Now')}`;
+  return `${readableRange(timerange, 'from', adjustTimezone)} - ${readableRange(timerange, 'to', adjustTimezone, 'Now')}`;
 };
 
 const absoluteTimeRangeToString = (timerange: AbsoluteTimeRange, localizer = (str) => str): string => {
@@ -50,11 +50,11 @@ const keywordTimeRangeToString = (timerange: KeywordTimeRange): string => {
   return timerange.keyword;
 };
 
-const TimeRangeToString = (timerange: TimeRange, unifyAsDate: (time: Date) => Moment, localizer?: (string) => string): string => {
+const TimeRangeToString = (timerange: TimeRange, adjustTimezone: (time: Date) => Moment, localizer?: (string) => string): string => {
   const { type } = timerange || {};
 
   switch (type) {
-    case 'relative': return relativeTimeRangeToString(timerange as RelativeTimeRange, unifyAsDate);
+    case 'relative': return relativeTimeRangeToString(timerange as RelativeTimeRange, adjustTimezone);
     case 'absolute': return absoluteTimeRangeToString(timerange as AbsoluteTimeRange, localizer);
     case 'keyword': return keywordTimeRangeToString(timerange as KeywordTimeRange);
 
