@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect } from 'react';
+import React, { useEffect, useContext } from 'react';
 import PropTypes from 'prop-types';
 
 import { LinkContainer } from 'components/common/router';
@@ -22,7 +22,6 @@ import { Row, Col, Button } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { IndexSetConfigurationForm } from 'components/indices';
 import { DocumentationLink } from 'components/support';
-import DateTime from 'logic/datetimes/DateTime';
 import history from 'util/History';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
@@ -32,6 +31,7 @@ import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import { IndicesConfigurationActions, IndicesConfigurationStore } from 'stores/indices/IndicesConfigurationStore';
 import { RetentionStrategyPropType, RotationStrategyPropType } from 'components/indices/Types';
 import type { RetentionStrategy, RotationStrategy } from 'components/indices/Types';
+import DateTimeContext from 'contexts/DateTimeContext';
 
 type Props = {
   indexSet: Partial<IndexSet> | null | undefined,
@@ -40,6 +40,8 @@ type Props = {
 }
 
 const IndexSetCreationPage = ({ retentionStrategies, rotationStrategies, indexSet }: Props) => {
+  const { adjustTimeZone } = useContext(DateTimeContext);
+
   useEffect(() => {
     IndicesConfigurationActions.loadRotationStrategies();
     IndicesConfigurationActions.loadRetentionStrategies();
@@ -48,7 +50,7 @@ const IndexSetCreationPage = ({ retentionStrategies, rotationStrategies, indexSe
   const _saveConfiguration = (indexSetItem: IndexSet) => {
     const copy = indexSetItem;
 
-    copy.creation_date = DateTime.now().toISOString();
+    copy.creation_date = adjustTimeZone(new Date()).toISOString();
 
     IndexSetsActions.create(copy).then(() => {
       history.push(Routes.SYSTEM.INDICES.LIST);
