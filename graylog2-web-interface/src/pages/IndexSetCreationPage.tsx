@@ -40,7 +40,7 @@ type Props = {
 }
 
 const IndexSetCreationPage = ({ retentionStrategies, rotationStrategies, indexSet }: Props) => {
-  const { adjustTimeZone } = useContext(DateTimeContext);
+  const { adjustTimezone } = useContext(DateTimeContext);
 
   useEffect(() => {
     IndicesConfigurationActions.loadRotationStrategies();
@@ -50,7 +50,7 @@ const IndexSetCreationPage = ({ retentionStrategies, rotationStrategies, indexSe
   const _saveConfiguration = (indexSetItem: IndexSet) => {
     const copy = indexSetItem;
 
-    copy.creation_date = adjustTimeZone(new Date()).toISOString();
+    copy.creation_date = adjustTimezone(new Date()).toISOString();
 
     IndexSetsActions.create(copy).then(() => {
       history.push(Routes.SYSTEM.INDICES.LIST);
