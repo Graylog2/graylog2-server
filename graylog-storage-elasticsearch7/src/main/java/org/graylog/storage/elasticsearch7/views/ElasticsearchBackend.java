@@ -20,7 +20,6 @@ import com.google.common.collect.Maps;
 import com.google.inject.name.Named;
 import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.GlobalOverride;
-import org.graylog.plugins.views.search.ParameterProvider;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.SearchJob;
@@ -28,23 +27,16 @@ import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
-import org.graylog.plugins.views.search.engine.LuceneQueryParser;
-import org.graylog.plugins.views.search.engine.LuceneQueryParsingException;
 import org.graylog.plugins.views.search.engine.QueryBackend;
 import org.graylog.plugins.views.search.engine.SearchConfig;
-import org.graylog.plugins.views.search.engine.ValidationExplanation;
-import org.graylog.plugins.views.search.engine.ValidationRequest;
-import org.graylog.plugins.views.search.engine.ValidationResponse;
 import org.graylog.plugins.views.search.errors.SearchTypeError;
 import org.graylog.plugins.views.search.errors.SearchTypeErrorParser;
 import org.graylog.plugins.views.search.filter.AndFilter;
 import org.graylog.plugins.views.search.filter.OrFilter;
 import org.graylog.plugins.views.search.filter.QueryStringFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
-import org.graylog.plugins.views.search.rest.MappedFieldTypeDTO;
+import org.graylog.plugins.views.search.validation.LuceneQueryParser;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.ShardOperationFailedException;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.validate.query.ValidateQueryRequest;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.validate.query.ValidateQueryResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.MultiSearchResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
@@ -52,7 +44,6 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.support.Indice
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.BoolQueryBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.storage.elasticsearch7.ElasticsearchClient;
 import org.graylog.storage.elasticsearch7.TimeRangeQueryFactory;
@@ -87,8 +78,6 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
     private final QueryStringDecorators queryStringDecorators;
     private final ESGeneratedQueryContext.Factory queryContextFactory;
     private final boolean allowLeadingWildcard;
-    private final MappedFieldTypesService mappedFieldTypesService;
-    private final LuceneQueryParser luceneQueryParser;
 
     @Inject
     public ElasticsearchBackend(Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> elasticsearchSearchTypeHandlers,
@@ -106,8 +95,6 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
         this.queryStringDecorators = queryStringDecorators;
         this.queryContextFactory = queryContextFactory;
         this.allowLeadingWildcard = allowLeadingWildcard;
-        this.mappedFieldTypesService = mappedFieldTypesService;
-        this.luceneQueryParser = luceneQueryParser;
     }
 
     private QueryBuilder normalizeQueryString(String queryString) {
@@ -312,50 +299,6 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                 .searchTypes(resultsMap)
                 .errors(new HashSet<>(queryContext.errors()))
                 .build();
-    }
-
-    @Override
-    public ValidationResponse validate(ValidationRequest req) {
-        final String queryString = decoratedQuery(req);
-        final Set<String> affectedIndices = Optional.ofNullable(req.streams()).map(s -> indexLookup.indexNamesForStreamsInTimeRange(s, req.timerange())).orElse(Collections.emptySet());
-        final ValidateQueryRequest esReq = new ValidateQueryRequest();
-        final QueryStringQueryBuilder queryStringQueryBuilder = new QueryStringQueryBuilder(queryString)
-                .lenient(false);
-        esReq.query(queryStringQueryBuilder);
-        esReq.indices(affectedIndices.toArray(new String[0]));
-        esReq.explain(true);
-        esReq.rewrite(true);
-        esReq.allShards(false); // random one shard per index
-
-        final ValidateQueryResponse response = client.execute((restHighLevelClient, requestOptions) -> restHighLevelClient.indices().validateQuery(esReq, requestOptions));
-        final List<ValidationExplanation> explanations = response.getQueryExplanation().stream()
-                .map(e -> new ValidationExplanation(e.getIndex(), e.getShard(), e.isValid(), e.getExplanation(), e.getError()))
-                .collect(Collectors.toList());
-
-        final Set<String> unknownFields = getUnknownFields(req, queryString, response);
-        return new ValidationResponse(response.isValid(), explanations, unknownFields);
-    }
-
-    private String decoratedQuery(ValidationRequest req) {
-        ParameterProvider parameterProvider = (name) -> req.parameters().stream().filter(p -> Objects.equals(p.name(), name)).findFirst();
-        final Query query = Query.builder().query(req.query()).timerange(req.timerange()).build();
-        return this.queryStringDecorators.decorate(req.getCombinedQueryWithFilter(), parameterProvider, query, Collections.emptySet());
-    }
-
-    private Set<String> getUnknownFields(ValidationRequest req, String query, ValidateQueryResponse response) {
-        if (response.isValid()) {
-            try {
-                final Set<String> detectedFields = luceneQueryParser.getFieldNames(query);
-                final Set<String> availableFields = mappedFieldTypesService.fieldTypesByStreamIds(req.streams(), req.timerange())
-                        .stream()
-                        .map(MappedFieldTypeDTO::name)
-                        .collect(Collectors.toSet());
-                return detectedFields.stream().filter(f -> !availableFields.contains(f)).collect(Collectors.toSet());
-            } catch (LuceneQueryParsingException e) {
-                LOG.warn("Failed to parse lucene query", e);
-            }
-        }
-        return Collections.emptySet();
     }
 
     private Optional<ElasticsearchException> checkForFailedShards(MultiSearchResponse.Item multiSearchResponse) {

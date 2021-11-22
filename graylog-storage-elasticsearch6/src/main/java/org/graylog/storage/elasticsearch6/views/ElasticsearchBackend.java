@@ -20,14 +20,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import com.google.inject.name.Named;
 import io.searchbox.client.JestClient;
-import io.searchbox.client.JestResult;
 import io.searchbox.core.MultiSearch;
 import io.searchbox.core.MultiSearchResult;
 import io.searchbox.core.Search;
-import io.searchbox.core.Validate;
 import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.GlobalOverride;
-import org.graylog.plugins.views.search.ParameterProvider;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.SearchJob;
@@ -35,21 +32,15 @@ import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
-import org.graylog.plugins.views.search.engine.LuceneQueryParser;
-import org.graylog.plugins.views.search.engine.LuceneQueryParsingException;
+import org.graylog.plugins.views.search.validation.LuceneQueryParser;
 import org.graylog.plugins.views.search.engine.QueryBackend;
 import org.graylog.plugins.views.search.engine.SearchConfig;
-import org.graylog.plugins.views.search.engine.ValidationExplanation;
-import org.graylog.plugins.views.search.engine.ValidationRequest;
-import org.graylog.plugins.views.search.engine.ValidationResponse;
-import org.graylog.plugins.views.search.engine.ValidationStatus;
 import org.graylog.plugins.views.search.errors.SearchTypeError;
 import org.graylog.plugins.views.search.errors.SearchTypeErrorParser;
 import org.graylog.plugins.views.search.filter.AndFilter;
 import org.graylog.plugins.views.search.filter.OrFilter;
 import org.graylog.plugins.views.search.filter.QueryStringFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
-import org.graylog.plugins.views.search.rest.MappedFieldTypeDTO;
 import org.graylog.shaded.elasticsearch6.org.elasticsearch.index.query.BoolQueryBuilder;
 import org.graylog.shaded.elasticsearch6.org.elasticsearch.index.query.QueryBuilder;
 import org.graylog.shaded.elasticsearch6.org.elasticsearch.index.query.QueryBuilders;
@@ -57,8 +48,6 @@ import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.builder.Search
 import org.graylog.storage.elasticsearch6.TimeRangeQueryFactory;
 import org.graylog.storage.elasticsearch6.jest.JestUtils;
 import org.graylog.storage.elasticsearch6.views.searchtypes.ESSearchTypeHandler;
-import org.graylog.storage.elasticsearch6.views.validate.ValidatePayload;
-import org.graylog.storage.elasticsearch6.views.validate.ValidationResult;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
@@ -90,9 +79,6 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
     private final QueryStringDecorators queryStringDecorators;
     private final ESGeneratedQueryContext.Factory queryContextFactory;
     private final boolean allowLeadingWildcard;
-    private final ObjectMapper objectMapper;
-    private final MappedFieldTypesService mappedFieldTypesService;
-    private final LuceneQueryParser luceneQueryParser;
 
     @Inject
     public ElasticsearchBackend(Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> elasticsearchSearchTypeHandlers,
@@ -111,9 +97,6 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
         this.queryStringDecorators = queryStringDecorators;
         this.queryContextFactory = queryContextFactory;
         this.allowLeadingWildcard = allowLeadingWildcard;
-        this.objectMapper = objectMapper;
-        this.mappedFieldTypesService = mappedFieldTypesService;
-        this.luceneQueryParser = luceneQueryParser;
     }
 
     private QueryBuilder normalizeQueryString(String queryString) {
@@ -315,44 +298,5 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                 .build();
     }
 
-    @Override
-    public ValidationResponse validate(ValidationRequest req) {
-        final Set<String> affectedIndices = Optional.ofNullable(req.streams()).map(s -> indexLookup.indexNamesForStreamsInTimeRange(s, req.timerange())).orElse(Collections.emptySet());
-        final String queryString = decoratedQuery(req);
-        final ElasticsearchQueryString backendQuery = (ElasticsearchQueryString) req.query();
-        final Validate.Builder builder = new Validate.Builder(new ValidatePayload(queryString, false))
-                .setParameter("explain", true)
-                .setParameter("rewrite", true);
-        final JestResult result = JestUtils.execute(jestClient, builder.build(), () -> "Unable to perform validation: ");
-        final ValidationResult response = objectMapper.convertValue(result.getJsonObject(), ValidationResult.class);
 
-        final List<ValidationExplanation> explanations = response.getExplanations().stream()
-                .filter(e -> affectedIndices.contains(e.getIndex())) // TODO: is there a better way to get only results for our indices?
-                .map(e -> new ValidationExplanation(e.getIndex(), -1, e.isValid(), e.getExplanation(), e.getError()))
-                .collect(Collectors.toList());
-
-        return new ValidationResponse(response.isValid(), explanations, getUnknownFields(req, backendQuery, response));
-    }
-
-    private String decoratedQuery(ValidationRequest req) {
-        ParameterProvider parameterProvider = (name) -> req.parameters().stream().filter(p -> Objects.equals(p.name(), name)).findFirst();
-        final Query query = Query.builder().query(req.query()).timerange(req.timerange()).build();
-        return this.queryStringDecorators.decorate(req.getCombinedQueryWithFilter(), parameterProvider, query, Collections.emptySet());
-    }
-
-    private Set<String> getUnknownFields(ValidationRequest req, ElasticsearchQueryString backendQuery, ValidationResult response) {
-        if (response.isValid()) {
-            try {
-                final Set<String> detectedFields = luceneQueryParser.getFieldNames(backendQuery.queryString());
-                final Set<String> availableFields = mappedFieldTypesService.fieldTypesByStreamIds(req.streams(), req.timerange())
-                        .stream()
-                        .map(MappedFieldTypeDTO::name)
-                        .collect(Collectors.toSet());
-                return detectedFields.stream().filter(f -> !availableFields.contains(f)).collect(Collectors.toSet());
-            } catch (LuceneQueryParsingException e) {
-                LOG.warn("Failed to parse lucene query", e);
-            }
-        }
-        return Collections.emptySet();
-    }
 }

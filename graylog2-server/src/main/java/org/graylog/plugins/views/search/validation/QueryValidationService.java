@@ -14,15 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.elasticsearch6.views.validate;
+package org.graylog.plugins.views.search.validation;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-public class ValidateQuery {
-    @JsonProperty("query_string")
-    private final ValidateQueryString validateQueryString;
-
-    public ValidateQuery(String query, boolean lenient) {
-        this.validateQueryString = new ValidateQueryString(query, lenient);
-    }
+public interface QueryValidationService {
+    ValidationResponse validate(final ValidationRequest request);
 }

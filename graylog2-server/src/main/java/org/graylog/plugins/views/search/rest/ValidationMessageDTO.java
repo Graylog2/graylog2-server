@@ -14,18 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.engine.validation;
+package org.graylog.plugins.views.search.rest;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
 import javax.annotation.Nullable;
-import java.util.Optional;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @AutoValue
-public abstract class ValidationMessage {
+public abstract class ValidationMessageDTO {
 
     @JsonProperty
     @Nullable
@@ -42,24 +41,8 @@ public abstract class ValidationMessage {
     @JsonProperty
     public abstract String errorMessage();
 
-    public static Builder builder() {
-        return new AutoValue_ValidationMessage.Builder();
+
+    public static ValidationMessageDTO create(Integer line, Integer column, String errorType, String errorMessage) {
+        return new AutoValue_ValidationMessageDTO(line, column, errorType, errorMessage);
     }
-
-    @AutoValue.Builder
-    public abstract static class Builder {
-
-        public abstract Builder line(int line);
-
-        public abstract Builder column(int column);
-
-        public abstract Builder errorType(@Nullable String errorType);
-
-        public abstract Builder errorMessage(String errorMessage);
-
-        public abstract Optional<String> errorMessage();
-
-        public abstract ValidationMessage build();
-    }
-
 }

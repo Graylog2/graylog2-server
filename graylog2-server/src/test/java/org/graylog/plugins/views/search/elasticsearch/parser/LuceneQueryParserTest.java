@@ -16,8 +16,10 @@
  */
 package org.graylog.plugins.views.search.elasticsearch.parser;
 
-import org.graylog.plugins.views.search.engine.LuceneQueryParser;
-import org.graylog.plugins.views.search.engine.LuceneQueryParsingException;
+import org.apache.lucene.queryparser.classic.ParseException;
+import org.graylog.plugins.views.search.validation.LuceneQueryParser;
+import org.graylog.plugins.views.search.validation.ParsedQuery;
+import org.graylog.plugins.views.search.validation.ParsedTerm;
 import org.junit.jupiter.api.Test;
 
 import java.util.Set;
@@ -29,26 +31,33 @@ class LuceneQueryParserTest {
     private final LuceneQueryParser parser = new LuceneQueryParser();
 
     @Test
-    void getFieldNamesSimple() throws LuceneQueryParsingException {
-        final Set<String> fields = parser.getFieldNames("foo:bar AND lorem:ipsum");
-        assertThat(fields).contains("foo", "lorem");
+    void getFieldNamesSimple() throws ParseException {
+        final ParsedQuery fields = parser.parse("foo:bar AND lorem:ipsum");
+        assertThat(fields.allFieldNames()).contains("foo", "lorem");
     }
 
     @Test
-    void getFieldNamesExist() throws LuceneQueryParsingException {
-        final Set<String> fields = parser.getFieldNames("foo:bar AND _exists_:lorem");
-        assertThat(fields).contains("foo", "lorem");
+    void getFieldNamesExist() throws ParseException {
+        final ParsedQuery fields = parser.parse("foo:bar AND _exists_:lorem");
+        assertThat(fields.allFieldNames()).contains("foo", "lorem");
     }
 
     @Test
-    void getFieldNamesComplex() throws LuceneQueryParsingException {
-        final Set<String> fields = parser.getFieldNames("type :( ssh OR login )");
-        assertThat(fields).contains("type");
+    void getFieldNamesComplex() throws ParseException {
+        final ParsedQuery fields = parser.parse("type :( ssh OR login )");
+        assertThat(fields.allFieldNames()).contains("type");
     }
 
     @Test
-    void getFieldNamesNot() throws LuceneQueryParsingException {
-        final Set<String> fields = parser.getFieldNames("NOT _exists_ : type");
-        assertThat(fields).contains("type");
+    void getFieldNamesNot() throws ParseException {
+        final ParsedQuery fields = parser.parse("NOT _exists_ : type");
+        assertThat(fields.allFieldNames()).contains("type");
+    }
+
+    @Test
+    void unknownTerm() throws ParseException {
+        final ParsedQuery fields = parser.parse("foo:bar and");
+        assertThat(fields.allFieldNames()).contains("foo");
+        assertThat(fields.unknownTokens()).contains("and");
     }
 }

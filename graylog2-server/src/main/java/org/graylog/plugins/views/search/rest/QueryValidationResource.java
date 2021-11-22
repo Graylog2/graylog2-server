@@ -16,19 +16,17 @@
  */
 package org.graylog.plugins.views.search.rest;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSet;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.plugins.views.search.Parameter;
-import org.graylog.plugins.views.search.engine.QueryEngine;
-import org.graylog.plugins.views.search.engine.ValidationExplanation;
-import org.graylog.plugins.views.search.engine.ValidationRequest;
-import org.graylog.plugins.views.search.engine.ValidationResponse;
-import org.graylog.plugins.views.search.engine.ValidationStatus;
-import org.graylog.plugins.views.search.engine.validation.ValidationMessageParser;
+import org.graylog.plugins.views.search.validation.QueryValidationService;
+import org.graylog.plugins.views.search.validation.ValidationMessage;
+import org.graylog.plugins.views.search.validation.ValidationRequest;
+import org.graylog.plugins.views.search.validation.ValidationResponse;
+import org.graylog.plugins.views.search.validation.ValidationStatus;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
@@ -47,7 +45,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 
 @RequiresAuthentication
@@ -55,15 +52,13 @@ import static com.google.common.collect.ImmutableSet.toImmutableSet;
 @Path("/search/validate")
 public class QueryValidationResource extends RestResource implements PluginRestResource {
 
-    private final QueryEngine queryEngine;
+    private final QueryValidationService queryValidationService;
     private final PermittedStreams permittedStreams;
-    private final ObjectMapper objectMapper;
 
     @Inject
-    public QueryValidationResource(QueryEngine queryEngine, PermittedStreams permittedStreams, ObjectMapper objectMapper) {
-        this.queryEngine = queryEngine;
+    public QueryValidationResource(QueryValidationService queryValidationService, PermittedStreams permittedStreams) {
+        this.queryValidationService = queryValidationService;
         this.permittedStreams = permittedStreams;
-        this.objectMapper = objectMapper;
     }
 
     @POST
@@ -80,8 +75,8 @@ public class QueryValidationResource extends RestResource implements PluginRestR
 
         validationRequest.filter().ifPresent(q::filter);
 
-        final ValidationResponse response = queryEngine.validate(q.build());
-        return ValidationResponseDTO.create(toStatus(response.getStatus()), toExplanations(response), response.getUnknownFields());
+        final ValidationResponse response = queryValidationService.validate(q.build());
+        return ValidationResponseDTO.create(toStatus(response.status()), toExplanations(response), response.unknownFields(), response.unknownTokens());
     }
 
     private ImmutableSet<Parameter> resolveParameters(ValidationRequestDTO validationRequest) {
@@ -105,24 +100,17 @@ public class QueryValidationResource extends RestResource implements PluginRestR
         return statusDTO;
     }
 
-    private List<ValidationExplanationDTO> toExplanations(ValidationResponse response) {
-        if (ValidationStatus.OK.equals(response.getStatus())) {
+    private List<ValidationMessageDTO> toExplanations(ValidationResponse response) {
+        if (ValidationStatus.OK.equals(response.status())) {
             return Collections.emptyList();
         }
-        return response.getExplanations().stream()
+        return response.explanations().stream()
                 .map(this::toExplanation)
                 .collect(Collectors.toList());
     }
 
-    private ValidationExplanationDTO toExplanation(ValidationExplanation e) {
-        final ValidationExplanationDTO.Builder explanation = ValidationExplanationDTO.builder()
-                .index(e.getIndex())
-                .valid(e.isValid());
-
-        ValidationMessageParser.getHumanReadableMessage(firstNonNull(e.getExplanation(), e.getError()))
-                .ifPresent(explanation::message);
-
-        return explanation.build();
+    private ValidationMessageDTO toExplanation(ValidationMessage message) {
+        return ValidationMessageDTO.create(message.line(), message.column(), message.errorType(), message.errorMessage());
     }
 
     private Set<String> adaptStreams(Set<String> streams) {

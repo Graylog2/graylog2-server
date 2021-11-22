@@ -19,6 +19,7 @@ package org.graylog.plugins.views.search.rest;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog.plugins.views.search.validation.ValidationMessage;
 
 import java.util.List;
 import java.util.Set;
@@ -31,13 +32,17 @@ public abstract class ValidationResponseDTO {
 
     @JsonProperty
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    public abstract List<ValidationExplanationDTO> explanations();
+    public abstract List<ValidationMessageDTO> explanations();
 
     @JsonProperty
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     public abstract Set<String> unknownFields();
 
-    public static ValidationResponseDTO create(final ValidationStatusDTO status, final List<ValidationExplanationDTO> explanations, final Set<String> unknownFields) {
-        return new AutoValue_ValidationResponseDTO(status, explanations, unknownFields);
+    @JsonProperty
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    public abstract Set<String> unknownTokens();
+
+    public static ValidationResponseDTO create(final ValidationStatusDTO status, final List<ValidationMessageDTO> explanations, final Set<String> unknownFields, Set<String> unknownTokens) {
+        return new AutoValue_ValidationResponseDTO(status, explanations, unknownFields, unknownTokens);
     }
 }

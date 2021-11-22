@@ -19,6 +19,7 @@ package org.graylog.plugins.views.search.engine;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.Parameter;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
+import org.graylog.plugins.views.search.validation.ValidationRequest;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.junit.jupiter.api.Test;

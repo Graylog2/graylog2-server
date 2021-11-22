@@ -14,45 +14,42 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.engine;
+package org.graylog.plugins.views.search.validation;
 
+import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.queryparser.classic.QueryParserTokenManager;
 import org.apache.lucene.search.AutomatonQuery;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.QueryVisitor;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class LuceneQueryParser {
     private final org.apache.lucene.queryparser.classic.QueryParser parser;
 
     public LuceneQueryParser() {
-        this.parser = new org.apache.lucene.queryparser.classic.QueryParser("f", new StandardAnalyzer());
+        this.parser = new org.apache.lucene.queryparser.classic.QueryParser(ParsedTerm.UNKNOWN_TERM, new StandardAnalyzer());
     }
 
-    public Set<String> getFieldNames(final String query) throws LuceneQueryParsingException {
-        final Query parsed;
-        try {
-            parsed = parser.parse(query);
-        } catch (ParseException e) {
-            throw new LuceneQueryParsingException(e);
-        }
-        final Set<String> fields = new HashSet<>();
+    public ParsedQuery parse(final String query) throws ParseException {
+        final Query parsed = parser.parse(query);
+        final ParsedQuery.Builder builder = ParsedQuery.builder().query(query);
+
         parsed.visit(new QueryVisitor() {
             @Override
             public void consumeTerms(Query query, Term... terms) {
                 super.consumeTerms(query, terms);
                 for (Term t : terms) {
                     final String field = t.field();
-                    if (field.equals("_exists_")) {
-                        fields.add(t.text());
-                    } else {
-                        fields.add(field);
-                    }
+                    builder.termsBuilder().add(ParsedTerm.create(field, t.text()));
                 }
             }
 
@@ -60,7 +57,7 @@ public class LuceneQueryParser {
             public void visitLeaf(Query query) {
                 if (query instanceof AutomatonQuery) {
                     final String field = ((AutomatonQuery) query).getField();
-                    fields.add(field);
+                    builder.termsBuilder().add(ParsedTerm.create(ParsedTerm.EXISTS, field));
                 }
             }
 
@@ -70,6 +67,6 @@ public class LuceneQueryParser {
                 return this;
             }
         });
-        return fields;
+        return builder.build();
     }
 }

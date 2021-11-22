@@ -25,16 +25,9 @@ import org.graylog.plugins.views.search.QueryMetadataDecorator;
 import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchJob;
-import org.graylog.plugins.views.search.errors.IllegalTimeRangeException;
 import org.graylog.plugins.views.search.errors.QueryError;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.plugins.views.search.errors.SearchException;
-import org.graylog.plugins.views.search.errors.SearchTypeError;
-import org.graylog2.indexer.searches.SearchesClusterConfig;
-import org.graylog2.plugin.cluster.ClusterConfigService;
-import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
-import org.joda.time.DateTime;
-import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -177,10 +170,6 @@ public class QueryEngine {
             generatedQueryContext.errors().forEach(searchJob::addError);
         }
         return result;
-    }
-
-    public ValidationResponse validate(final ValidationRequest request) {
-        return elasticsearchBackend.validate(request);
     }
 
     private QueryBackend<? extends GeneratedQueryContext> getQueryBackend(Query query) {

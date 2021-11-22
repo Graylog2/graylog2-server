@@ -14,22 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.elasticsearch6.views.validate;
+package org.graylog.plugins.views.search.validation;
 
-public class ValidationResultShards {
-    private int total;
-    private int successful;
-    private int failed;
-
-    public int getTotal() {
-        return total;
-    }
-
-    public int getSuccessful() {
-        return successful;
-    }
-
-    public int getFailed() {
-        return failed;
-    }
+public enum ValidationStatus {
+    OK,
+    WARNING,
+    ERROR
 }
