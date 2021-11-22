@@ -62,7 +62,7 @@ const PermissionsConfig = ({ config, updateConfig }: Props) => {
   return (
     <div>
       <h2>Permissions Config</h2>
-      <p>These settings can be used to control which entity sharing options are available</p>
+      <p>These settings can be used to control which entity sharing options are available.</p>
 
       {!config ? <Spinner /> : (
         <>
