@@ -286,7 +286,7 @@ const exports: PluginExports = {
     {
       type: 'create-extractor',
       title: 'Create extractor',
-      isEnabled: ({ type, contexts }) => (!!contexts.message && !type.isDecorated()),
+      isEnabled: ({ type, contexts }) => (!!contexts.message && !type.isDecorated() && !!contexts.isLocalNode),
       component: SelectExtractorType,
       resetFocus: false,
     },

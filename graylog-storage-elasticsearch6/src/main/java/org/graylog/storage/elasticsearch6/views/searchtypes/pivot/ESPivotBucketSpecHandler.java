@@ -19,7 +19,7 @@ package org.graylog.storage.elasticsearch6.views.searchtypes.pivot;
 import io.searchbox.core.SearchResult;
 import io.searchbox.core.search.aggregation.Aggregation;
 import io.searchbox.core.search.aggregation.MetricAggregation;
-import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.aggregations.AggregationBuilder;
+import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.graylog.storage.elasticsearch6.views.ESGeneratedQueryContext;
 import org.graylog.plugins.views.search.engine.GeneratedQueryContext;
 import org.graylog.plugins.views.search.engine.SearchTypeHandler;

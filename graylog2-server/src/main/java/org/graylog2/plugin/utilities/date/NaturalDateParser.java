@@ -66,12 +66,16 @@ public class NaturalDateParser {
         return Arrays.stream(TimeZone.getAvailableIDs()).anyMatch(id -> id.equals(timeZone));
     }
 
+    boolean matches(String string, String other) {
+        return string.equalsIgnoreCase(other.replaceAll("\\s", ""));
+    }
+
     Date alignToStartOf(final Date dateToConvert, final String string) {
-        if ("last year" .equals(string.trim())) {
+        if (matches("lastyear", string) || matches("thisyear", string)) {
             return alignToStartOfYear(dateToConvert);
-        } else if ("last month" .equals(string.trim())) {
+        } else if (matches("lastmonth", string) || matches("thismonth", string)) {
             return alignToStartOfMonth(dateToConvert);
-        } else if ("last week" .equals(string.trim())) {
+        } else if (matches("lastweek", string) || matches("thisweek", string)) {
             return alignToStartOfWeek(dateToConvert);
         } else {
             return alignToStartOfDay(dateToConvert);
@@ -79,11 +83,11 @@ public class NaturalDateParser {
     }
 
     Date alignToEndOf(final Date dateToConvert, final String string) {
-        if ("last year" .equals(string.trim())) {
+        if (matches("lastyear", string) || matches("thisyear", string)) {
             return alignToEndOfYear(dateToConvert);
-        } else if ("last month" .equals(string.trim())) {
+        } else if (matches("lastmonth", string) || matches("thismonth", string)) {
             return alignToEndOfMonth(dateToConvert);
-        } else if ("last week" .equals(string.trim())) {
+        } else if (matches("lastweek", string) || matches("thisweek", string)) {
             return alignToEndOfWeek(dateToConvert);
         } else {
             return alignToEndOfDay(dateToConvert);

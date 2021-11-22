@@ -18,8 +18,18 @@ import { useMemo } from 'react';
 
 import { ViewActions } from 'views/stores/ViewStore';
 import View from 'views/logic/views/View';
+import type { ElasticsearchQueryString, TimeRange } from 'views/logic/queries/Query';
 
-const useCreateSavedSearch = (streamId?: string) => useMemo(() => ViewActions.create(View.Type.Search, streamId)
-  .then(({ view: v }) => v), [streamId]);
+const useCreateSavedSearch = (
+  streamId?: string,
+  timeRange?: TimeRange,
+  queryString?: ElasticsearchQueryString,
+) => {
+  return useMemo(
+    () => ViewActions.create(View.Type.Search, streamId, timeRange, queryString).then(({ view: v }) => v),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [streamId],
+  );
+};
 
 export default useCreateSavedSearch;

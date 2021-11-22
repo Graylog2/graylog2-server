@@ -27,6 +27,8 @@ import org.graylog.plugins.views.search.db.SearchDbService;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.ViewStateDTO;
+import org.graylog.plugins.views.search.views.ViewSummaryDTO;
+import org.graylog.plugins.views.search.views.ViewSummaryService;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
@@ -56,22 +58,25 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public abstract class ViewFacade implements EntityFacade<ViewDTO> {
+public abstract class ViewFacade implements EntityWithExcerptFacade<ViewDTO, ViewSummaryDTO> {
     private static final Logger LOG = LoggerFactory.getLogger(ViewFacade.class);
 
     private final ObjectMapper objectMapper;
     private final ViewService viewService;
     private final SearchDbService searchDbService;
+    private final ViewSummaryService viewSummaryService;
     protected final UserService userService;
 
     @Inject
     public ViewFacade(ObjectMapper objectMapper,
                       SearchDbService searchDbService,
                       ViewService viewService,
+                      ViewSummaryService viewSummaryService,
                       UserService userService) {
         this.objectMapper = objectMapper;
         this.searchDbService = searchDbService;
         this.viewService = viewService;
+        this.viewSummaryService = viewSummaryService;
         this.userService = userService;
     }
 
@@ -157,12 +162,12 @@ public abstract class ViewFacade implements EntityFacade<ViewDTO> {
         return getNativeViews().map(this::createExcerpt).collect(Collectors.toSet());
     }
 
-    protected Stream<ViewDTO> getNativeViews() {
-        return viewService.streamAll().filter(v -> v.type().equals(this.getDTOType()));
+    protected Stream<ViewSummaryDTO> getNativeViews() {
+        return viewSummaryService.streamAll().filter(v -> v.type().equals(this.getDTOType()));
     }
 
-        @Override
-    public EntityExcerpt createExcerpt(ViewDTO nativeEntity) {
+    @Override
+    public EntityExcerpt createExcerpt(ViewSummaryDTO nativeEntity) {
         return EntityExcerpt.builder()
                 .id(ModelId.of(nativeEntity.id()))
                 .type(getModelType())
@@ -179,10 +184,10 @@ public abstract class ViewFacade implements EntityFacade<ViewDTO> {
         mutableGraph.addNode(entityDescriptor);
 
         final ModelId modelId = entityDescriptor.id();
-        final ViewDTO viewDTO = viewService.get(modelId.id()).
+        final ViewSummaryDTO viewSummaryDTO = viewSummaryService.get(modelId.id()).
                 orElseThrow(() -> new NoSuchElementException("Could not find view with id " + modelId.id()));
-        final Search search = searchDbService.get(viewDTO.searchId()).
-                orElseThrow(() -> new NoSuchElementException("Could not find search with id " + viewDTO.searchId()));
+        final Search search = searchDbService.get(viewSummaryDTO.searchId()).
+                orElseThrow(() -> new NoSuchElementException("Could not find search with id " + viewSummaryDTO.searchId()));
         search.usedStreamIds().stream().map(s -> EntityDescriptor.create(s, ModelTypes.STREAM_V1))
                 .forEach(streamDescriptor -> mutableGraph.putEdge(entityDescriptor, streamDescriptor));
         return ImmutableGraph.copyOf(mutableGraph);

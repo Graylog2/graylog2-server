@@ -17,22 +17,23 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { LinkContainer, Link } from 'components/common/router';
+import { LinkContainer } from 'components/common/router';
 import connect from 'stores/connect';
 import { Button, ButtonToolbar } from 'components/bootstrap';
-import { DataTable, Timestamp } from 'components/common';
-import { MetricContainer, CounterRate } from 'components/metrics';
+import { DataTable } from 'components/common';
 import Routes from 'routing/Routes';
 import { RulesActions, RulesStore } from 'stores/rules/RulesStore';
-import type { RuleType, MetricsConfigType, RulesStoreState } from 'stores/rules/RulesStore';
+import type { RuleType, MetricsConfigType, RulesContext, RulesStoreState } from 'stores/rules/RulesStore';
 import { Store } from 'stores/StoreTypes';
 
 import RuleMetricsConfigContainer from './RuleMetricsConfigContainer';
+import RuleListEntry from './RuleListEntry';
 
 type Props = {
   rules: Array<RuleType>,
   metricsConfig?: MetricsConfigType,
-  onDelete: (RuleType) => void,
+  rulesContext?: RulesContext,
+  onDelete: (RuleType) => () => void,
   searchFilter: React.ReactNode,
 };
 
@@ -46,12 +47,16 @@ class RuleList extends React.Component<Props, State> {
     metricsConfig: PropTypes.exact({
       metrics_enabled: PropTypes.bool.isRequired,
     }),
+    rulesContext: PropTypes.exact({
+      used_in_pipelines: PropTypes.objectOf(PropTypes.any),
+    }),
     onDelete: PropTypes.func.isRequired,
     searchFilter: PropTypes.node.isRequired,
   };
 
   static defaultProps = {
     metricsConfig: undefined,
+    rulesContext: undefined,
   };
 
   constructor(props) {
@@ -71,41 +76,9 @@ class RuleList extends React.Component<Props, State> {
   };
 
   _ruleInfoFormatter = (rule) => {
-    const { onDelete } = this.props;
+    const { onDelete, rulesContext: { used_in_pipelines: usingPipelines } = {} } = this.props;
 
-    const actions = [
-      <Button key="delete" bsStyle="primary" bsSize="xsmall" onClick={onDelete(rule)} title="Delete rule">
-        Delete
-      </Button>,
-      <span key="space">&nbsp;</span>,
-      <LinkContainer key="edit" to={Routes.SYSTEM.PIPELINES.RULE(rule.id)}>
-        <Button bsStyle="info" bsSize="xsmall">Edit</Button>
-      </LinkContainer>,
-    ];
-
-    return (
-      <tr key={rule.title}>
-        <td>
-          <Link to={Routes.SYSTEM.PIPELINES.RULE(rule.id)}>
-            {rule.title}
-          </Link>
-        </td>
-        <td className="limited">{rule.description}</td>
-        <td className="limited"><Timestamp dateTime={rule.created_at} relative /></td>
-        <td className="limited"><Timestamp dateTime={rule.modified_at} relative /></td>
-        <td>
-          <MetricContainer name={`org.graylog.plugins.pipelineprocessor.ast.Rule.${rule.id}.executed`} zeroOnMissing>
-            <CounterRate suffix="msg/s" />
-          </MetricContainer>
-        </td>
-        <td>
-          <MetricContainer name={`org.graylog.plugins.pipelineprocessor.ast.Rule.${rule.id}.failed`}>
-            <CounterRate showTotal suffix="errors/s" hideOnMissing />
-          </MetricContainer>
-        </td>
-        <td className="actions">{actions}</td>
-      </tr>
-    );
+    return <RuleListEntry key={rule.id} rule={rule} usingPipelines={usingPipelines[rule.id]} onDelete={onDelete} />;
   };
 
   toggleMetricsConfig = () => {
@@ -124,7 +97,7 @@ class RuleList extends React.Component<Props, State> {
 
   render() {
     const { rules, metricsConfig, searchFilter } = this.props;
-    const headers = ['Title', 'Description', 'Created', 'Last modified', 'Throughput', 'Errors', 'Actions'];
+    const headers = ['Title', 'Description', 'Created', 'Last modified', 'Throughput', 'Errors', 'Pipelines', 'Actions'];
     const { openMetricsConfig } = this.state;
 
     return (

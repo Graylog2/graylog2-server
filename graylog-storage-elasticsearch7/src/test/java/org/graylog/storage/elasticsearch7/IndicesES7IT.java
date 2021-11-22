@@ -64,7 +64,8 @@ public class IndicesES7IT extends IndicesIT {
 
     @Override
     protected NodeAdapter createNodeAdapter() {
-        return new NodeAdapterES7(elasticsearch.elasticsearchClient());
+        final ObjectMapper objectMapper = new ObjectMapperProvider().get();
+        return new NodeAdapterES7(elasticsearch.elasticsearchClient(), objectMapper);
     }
 
     @Override

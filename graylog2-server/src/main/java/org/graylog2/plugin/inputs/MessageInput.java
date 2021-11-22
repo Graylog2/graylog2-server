@@ -25,6 +25,7 @@ import com.google.common.base.MoreObjects;
 import com.google.common.collect.Maps;
 import org.graylog2.plugin.AbstractDescriptor;
 import org.graylog2.plugin.GlobalMetricNames;
+import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Stoppable;
@@ -58,6 +59,7 @@ public abstract class MessageInput implements Stoppable {
     public static final String FIELD_ATTRIBUTES = "attributes";
     public static final String FIELD_STATIC_FIELDS = "static_fields";
     public static final String FIELD_GLOBAL = "global";
+    public static final String FIELD_DESIRED_STATE = "desired_state";
     public static final String FIELD_CONTENT_PACK = "content_pack";
 
     @SuppressWarnings("StaticNonFinalField")
@@ -88,6 +90,7 @@ public abstract class MessageInput implements Stoppable {
     protected String persistId;
     protected DateTime createdAt;
     protected Boolean global = false;
+    protected String desiredState = IOState.Type.RUNNING.toString();
     protected String contentPack;
 
     protected final Configuration configuration;
@@ -251,6 +254,19 @@ public abstract class MessageInput implements Stoppable {
         this.global = global;
     }
 
+    public String getDesiredState() {
+        return desiredState;
+    }
+
+    public void setDesiredState(String newDesiredState) {
+        if (newDesiredState.equals(IOState.Type.RUNNING.toString())
+                || newDesiredState.equals(IOState.Type.STOPPED.toString())) {
+            desiredState = newDesiredState;
+        } else {
+            LOG.error("Ignoring unexpected desired state " + newDesiredState + " for input " + title);
+        }
+    }
+
     public String getContentPack() {
         return contentPack;
     }
@@ -281,6 +297,7 @@ public abstract class MessageInput implements Stoppable {
         map.put(FIELD_TITLE, getTitle());
         map.put(FIELD_CREATOR_USER_ID, getCreatorUserId());
         map.put(FIELD_GLOBAL, isGlobal());
+        map.put(FIELD_DESIRED_STATE, getDesiredState());
         map.put(FIELD_CONTENT_PACK, getContentPack());
         map.put(FIELD_CONFIGURATION, getConfiguration().getSource());
 

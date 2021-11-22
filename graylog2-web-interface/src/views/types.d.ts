@@ -203,6 +203,7 @@ export interface ActionContexts {
   widget: Widget,
   message: Message,
   valuePath: ValuePath,
+  isLocalNode: boolean,
 }
 
 export type SearchTypeResults = { [id: string]: SearchTypeResultTypes[keyof SearchTypeResultTypes] };

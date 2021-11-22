@@ -91,7 +91,7 @@
       },
       "status": "running",
       "lock": {
-        "owner": "node-a",
+        "owner": "node-1",
         "last_lock_time": {
           "$date": "2019-01-01T01:00:00.000Z"
         },

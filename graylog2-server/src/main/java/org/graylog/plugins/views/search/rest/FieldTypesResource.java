@@ -19,6 +19,7 @@ package org.graylog.plugins.views.search.rest;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
@@ -34,6 +35,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -56,26 +58,23 @@ public class FieldTypesResource extends RestResource implements PluginRestResour
 
     @GET
     @ApiOperation(value = "Retrieve the list of all fields present in the system")
-    public Set<MappedFieldTypeDTO> allFieldTypes() {
-        return mappedFieldTypesService.fieldTypesByStreamIds(permittedStreams.load(this::allowedToReadStream), RelativeRange.allTime());
-    }
-
-    private boolean allowedToReadStream(String streamId) {
-        return isPermitted(RestPermissions.STREAMS_READ, streamId);
+    public Set<MappedFieldTypeDTO> allFieldTypes(@Context SearchUser searchUser) {
+        return mappedFieldTypesService.fieldTypesByStreamIds(permittedStreams.load(searchUser::canReadStream), RelativeRange.allTime());
     }
 
     @POST
     @ApiOperation(value = "Retrieve the field list of a given set of streams")
     @NoAuditEvent("This is not changing any data")
-    public Set<MappedFieldTypeDTO> byStreams(FieldTypesForStreamsRequest request) {
-        final Set<String> streams = request.streams().orElse(permittedStreams.load(this::allowedToReadStream));
-        checkStreamPermission(streams);
+    public Set<MappedFieldTypeDTO> byStreams(FieldTypesForStreamsRequest request, @Context SearchUser searchUser) {
+        final Set<String> streams = request.streams().orElse(permittedStreams.load(searchUser::canReadStream));
+        checkStreamPermission(streams, searchUser);
 
         return mappedFieldTypesService.fieldTypesByStreamIds(streams, request.timerange().orElse(RelativeRange.allTime()));
     }
 
-    private void checkStreamPermission(Set<String> streamIds) {
-        Set<String> notPermittedStreams = streamIds.stream().filter(s -> !isPermitted(RestPermissions.STREAMS_READ, s))
+    private void checkStreamPermission(Set<String> streamIds, SearchUser searchUser) {
+        final Set<String> notPermittedStreams = streamIds.stream()
+                .filter(streamId -> !searchUser.canReadStream(streamId))
                 .collect(Collectors.toSet());
         if (!notPermittedStreams.isEmpty()) {
             LOG.info("Not authorized to access resource id <{}>. User <{}> is missing permission <{}:{}>",

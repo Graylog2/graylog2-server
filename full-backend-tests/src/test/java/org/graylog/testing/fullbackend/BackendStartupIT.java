@@ -17,20 +17,19 @@
 package org.graylog.testing.fullbackend;
 
 import io.restassured.specification.RequestSpecification;
-import org.graylog.storage.elasticsearch6.ElasticsearchInstanceES6Factory;
-import org.graylog.testing.completebackend.ApiIntegrationTest;
 import org.graylog.testing.completebackend.GraylogBackend;
-import org.junit.jupiter.api.Test;
+import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
+import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.utils.SearchUtils;
 
 import java.util.List;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.graylog.testing.backenddriver.SearchDriver.searchAllMessages;
 import static org.graylog.testing.completebackend.Lifecycle.CLASS;
+import static org.graylog.testing.containermatrix.ContainerVersions.ES6;
 
-
-@ApiIntegrationTest(serverLifecycle = CLASS, elasticsearchFactory = ElasticsearchInstanceES6Factory.class)
+@ContainerMatrixTestsConfiguration(serverLifecycle = CLASS, esVersions = {ES6})
 class BackendStartupIT {
 
     private final GraylogBackend sut;
@@ -41,7 +40,7 @@ class BackendStartupIT {
         this.requestSpec = requestSpec;
     }
 
-    @Test
+    @ContainerMatrixTest
     void canReachApi() {
         given()
                 .spec(requestSpec)
@@ -51,7 +50,7 @@ class BackendStartupIT {
                 .statusCode(200);
     }
 
-    @Test
+    @ContainerMatrixTest
     void loadsDefaultPlugins() {
         List<Object> pluginNames =
                 given()
@@ -68,12 +67,9 @@ class BackendStartupIT {
                 "Elasticsearch 7 Support");
     }
 
-    @Test
+    @ContainerMatrixTest
     void importsElasticsearchFixtures() {
         sut.importElasticsearchFixture("one-message.json", getClass());
-
-        List<String> allMessages = searchAllMessages(requestSpec);
-
-        assertThat(allMessages).containsExactly("hello from es fixture");
+        assertThat(SearchUtils.searchForMessage(requestSpec, "hello from es fixture")).isTrue();
     }
 }

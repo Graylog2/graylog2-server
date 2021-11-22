@@ -16,10 +16,12 @@
  */
 package org.graylog.storage.elasticsearch7;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog.storage.elasticsearch7.testing.ElasticsearchInstanceES7;
 import org.graylog.testing.elasticsearch.ElasticsearchInstance;
 import org.graylog2.indexer.cluster.NodeAdapter;
 import org.graylog2.indexer.cluster.NodeIT;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Rule;
 
 public class NodeES7IT extends NodeIT {
@@ -33,6 +35,7 @@ public class NodeES7IT extends NodeIT {
 
     @Override
     protected NodeAdapter nodeAdapter() {
-        return new NodeAdapterES7(elasticsearch.elasticsearchClient());
+        final ObjectMapper objectMapper = new ObjectMapperProvider().get();
+        return new NodeAdapterES7(elasticsearch.elasticsearchClient(), objectMapper);
     }
 }

@@ -21,6 +21,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.ViewSummaryDTO;
@@ -38,6 +39,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 import static java.util.Locale.ENGLISH;
@@ -70,7 +72,8 @@ public class SavedSearchesResource extends RestResource {
                                                       required = true,
                                                       allowableValues = "id,title,created_at") @DefaultValue(ViewDTO.FIELD_TITLE) @QueryParam("sort") String sortField,
                                                    @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc") @DefaultValue("asc") @QueryParam("order") String order,
-                                                   @ApiParam(name = "query") @QueryParam("query") String query) {
+                                                   @ApiParam(name = "query") @QueryParam("query") String query,
+                                                   @Context SearchUser searchUser) {
 
         if (!ViewDTO.SORT_FIELDS.contains(sortField.toLowerCase(ENGLISH))) {
             sortField = ViewDTO.FIELD_TITLE;
@@ -81,7 +84,7 @@ public class SavedSearchesResource extends RestResource {
             final PaginatedList<ViewSummaryDTO> result = dbService.searchSummariesPaginatedByType(
                     ViewDTO.Type.SEARCH,
                     searchQuery,
-                    view -> isPermitted(ViewsRestPermissions.VIEW_READ, view.id()),
+                    searchUser::canReadView,
                     order,
                     sortField,
                     page,
