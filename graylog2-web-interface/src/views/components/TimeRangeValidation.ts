@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import moment from 'moment';
+import moment, { Moment } from 'moment';
 
 import {
   TimeRange,
@@ -50,7 +50,7 @@ const exceedsDuration = (timeRange, limitDuration, formatTime) => {
   }
 };
 
-const validateAbsoluteTimeRange = (timeRange: AbsoluteTimeRange, limitDuration: number, formatTime) => {
+const validateAbsoluteTimeRange = (timeRange: AbsoluteTimeRange, limitDuration: number, formatTime: (time: Moment) => string) => {
   let errors: {
     from?: string,
     to?: string,

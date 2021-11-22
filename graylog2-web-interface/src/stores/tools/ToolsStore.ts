@@ -28,7 +28,7 @@ type NaturalDateResponse = {
 };
 
 const ToolsStore = {
-  testNaturalDate(keyword: string, userTz): Promise<NaturalDateResponse> {
+  testNaturalDate(keyword: string, userTz: string): Promise<NaturalDateResponse> {
     const { url } = ApiRoutes.ToolsApiController.naturalDateTest(encodeURIComponent(keyword), encodeURIComponent(userTz));
     const promise = fetch('GET', qualifyUrl(url));
 
