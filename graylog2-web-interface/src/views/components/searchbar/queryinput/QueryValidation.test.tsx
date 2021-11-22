@@ -41,11 +41,8 @@ describe('QueryValidation', () => {
   const queryValidationError: QueryValidationState = {
     status: 'ERROR',
     explanations: [{
-      index: 'example_index',
-      message: {
-        errorType: 'ParseException',
-        errorMessage: "Cannot parse 'source: '",
-      },
+      errorType: 'ParseException',
+      errorMessage: "Cannot parse 'source: '",
     }],
   };
 

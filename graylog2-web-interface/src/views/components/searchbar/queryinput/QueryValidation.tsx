@@ -93,9 +93,38 @@ const queryExists = (query: string | ElasticsearchQueryString) => {
   return typeof query === 'object' ? !!query.query_string : !!query;
 };
 
-const useValidateQuery = ({ queryString, timeRange, streams, parameterBindings, parameters, filter }): QueryValidationState | undefined => {
+const getExplanationTitle = (status, explanations) => {
+  const baseTitle = StringUtils.capitalizeFirstLetter(status.toLocaleLowerCase());
+  const errorTitles = explanations.map(({ errorType }) => errorType);
+  const uniqErrorTitles = uniq(errorTitles).join(', ');
+
+  return `${baseTitle} (${uniqErrorTitles})`;
+};
+
+const uniqErrorMessages = (explanations) => {
+  const errorMessages = explanations.map(({ errorMessage }) => errorMessage);
+
+  return uniq(errorMessages).join('. ');
+};
+
+const useValidationPayload = ({ queryString, timeRange, streams, filter }) => {
+  const { parameterBindings } = useStore(SearchExecutionStateStore);
+  const { search: { parameters } } = useStore(SearchStore);
+
+  return ({
+    timeRange: !isEmpty(timeRange) ? timeRange : undefined,
+    filter,
+    queryString,
+    streams,
+    parameters,
+    parameterBindings,
+  });
+};
+
+const useValidateQuery = (queryData): QueryValidationState | undefined => {
   const validationPromise = useRef<BluebirdPromise>(undefined);
   const [validationState, setValidationState] = useState(undefined);
+  const { queryString, timeRange, streams, filter, parameterBindings, parameters } = useValidationPayload(queryData);
 
   useEffect(() => {
     if (queryExists(queryString) || queryExists(filter)) {
@@ -112,34 +141,6 @@ const useValidateQuery = ({ queryString, timeRange, streams, parameterBindings, 
   return validationState;
 };
 
-const getExplanationTitle = (status, explanations) => {
-  const baseTitle = StringUtils.capitalizeFirstLetter(status.toLocaleLowerCase());
-  const errorTitles = explanations.map(({ message: { errorType } }) => errorType);
-  const uniqErrorTitles = uniq(errorTitles).join(', ');
-
-  return `${baseTitle} (${uniqErrorTitles})`;
-};
-
-const uniqErrorMessages = (explanations) => {
-  const errorMessages = explanations.map(({ message: { errorMessage } }) => errorMessage);
-
-  return uniq(errorMessages).join('. ');
-};
-
-const useValidationPayload = (queryString, timeRange, streams, filter) => {
-  const { parameterBindings } = useStore(SearchExecutionStateStore);
-  const { search: { parameters } } = useStore(SearchStore);
-
-  return ({
-    timeRange: !isEmpty(timeRange) ? timeRange : undefined,
-    filter,
-    queryString,
-    streams,
-    parameters,
-    parameterBindings,
-  });
-};
-
 type Props = {
   filter?: ElasticsearchQueryString | string,
   queryString: ElasticsearchQueryString | string | undefined,
@@ -152,8 +153,7 @@ const QueryValidation = ({ queryString, timeRange, streams, filter }: Props) => 
   const toggleShow = () => setShowExplanation((prevShow) => !prevShow);
   const containerRef = useRef(undefined);
   const explanationTriggerRef = useRef(undefined);
-  const validationPayload = useValidationPayload(queryString, timeRange, streams, filter);
-  const validationState = useValidateQuery(validationPayload);
+  const validationState = useValidateQuery({ queryString, timeRange, streams, filter });
 
   // We need to always display the container to avoid query inout resizing problems
   // we need to always display the overlay trigger to avoid overlay placement problems

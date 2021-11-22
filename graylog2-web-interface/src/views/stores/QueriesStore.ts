@@ -40,11 +40,8 @@ export { QueriesActions } from 'views/actions/QueriesActions';
 export type QueryValidationState = {
   status: 'OK' | 'ERROR' | 'WARNING',
   explanations: Array<{
-    index: string,
-    message: {
-      errorType: string,
-      errorMessage: string,
-    }
+    errorType: string,
+    errorMessage: string,
   }> | undefined
 }
 
@@ -214,7 +211,7 @@ export const QueriesStore: QueriesStoreType = singletonStore(
       filter?: string,
       parameters?: Array<Parameter>,
       parameterBindings?: ParameterBindings,
-    }): Promise<QueryValidationState> {
+    }): Promise<QueryValidationState | undefined> {
       const payload = {
         query: queryString,
         timerange: timeRange,
@@ -227,12 +224,9 @@ export const QueriesStore: QueriesStoreType = singletonStore(
         if (result) {
           return ({
             status: result.status,
-            explanations: result.explanations?.map((explanation) => ({
-              index: explanation.index,
-              message: {
-                errorMessage: explanation.message.error_message,
-                errorType: explanation.message.error_type,
-              },
+            explanations: result.explanations?.map(({ error_type: errorType, error_message: errorMessage }) => ({
+              errorMessage,
+              errorType,
             })),
           });
         }
