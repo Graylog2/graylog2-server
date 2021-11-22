@@ -45,7 +45,9 @@ class AlertMessages extends React.Component {
   PAGE_SIZE = 20;
 
   _getFrom = () => {
-    return moment(this.props.alert.triggered_at).subtract(1, 'minute').toISOString();
+    const { adjustTimezone } = this.props;
+
+    return adjustTimezone(this.props.alert.triggered_at).subtract(1, 'minute').toISOString();
   };
 
   _getTo = () => {
