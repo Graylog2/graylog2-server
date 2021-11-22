@@ -46,7 +46,6 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -108,7 +107,7 @@ public abstract class Search implements ContentPackable<SearchEntity> {
 
         if (!executionState.parameterBindings().isEmpty()) {
             final ImmutableSet<Parameter> parameters = parameters().stream()
-                    .map(param -> param.applyExecutionState(objectMapper, objectMapper.convertValue(executionState.parameterBindings(), JsonNode.class)))
+                    .map(param -> param.applyBindings(executionState.parameterBindings()))
                     .collect(toImmutableSet());
             builder.parameters(parameters);
         }
