@@ -175,7 +175,9 @@ const SearchBar = ({
                         )}
                       </Field>
 
-                      <QueryValidation queryString={values?.queryString} timeRange={values?.timerange} streams={values?.streams} />
+                      <QueryValidation queryString={values?.queryString}
+                                       timeRange={values?.timerange}
+                                       streams={values?.streams} />
 
                       <div className="search-help">
                         <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}

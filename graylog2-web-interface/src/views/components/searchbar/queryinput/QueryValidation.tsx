@@ -20,6 +20,7 @@ import { debounce, uniq, isEmpty } from 'lodash';
 import { useState, useEffect, useRef } from 'react';
 import { Overlay, Transition } from 'react-overlays';
 import BluebirdPromise from 'bluebird';
+import { useFormikContext } from 'formik';
 
 import { Popover } from 'components/bootstrap';
 import { Icon } from 'components/common';
@@ -141,6 +142,18 @@ const useValidateQuery = (queryData): QueryValidationState | undefined => {
   return validationState;
 };
 
+const useSyncSearchBarFormErrors = ({ queryString, filter, validationStatus }) => {
+  const { errors, setFieldError } = useFormikContext<{ queryString: string }>();
+
+  useEffect(() => {
+    if ((queryString || filter) && !errors.queryString && validationStatus === 'ERROR') {
+      setFieldError('queryString', 'query validation error');
+    } else if (errors.queryString && ((!queryString && !filter) || (!validationStatus || validationStatus === 'OK'))) {
+      setFieldError('queryString', undefined);
+    }
+  }, [queryString, filter, errors, validationStatus, setFieldError]);
+};
+
 type Props = {
   filter?: ElasticsearchQueryString | string,
   queryString: ElasticsearchQueryString | string | undefined,
@@ -154,6 +167,7 @@ const QueryValidation = ({ queryString, timeRange, streams, filter }: Props) => 
   const containerRef = useRef(undefined);
   const explanationTriggerRef = useRef(undefined);
   const validationState = useValidateQuery({ queryString, timeRange, streams, filter });
+  useSyncSearchBarFormErrors({ queryString, filter, validationStatus: validationState?.status });
 
   // We need to always display the container to avoid query inout resizing problems
   // we need to always display the overlay trigger to avoid overlay placement problems
