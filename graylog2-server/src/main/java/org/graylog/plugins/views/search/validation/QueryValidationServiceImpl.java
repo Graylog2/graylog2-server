@@ -62,12 +62,12 @@ public class QueryValidationServiceImpl implements QueryValidationService {
                     .build();
 
         } catch (ParseException e) {
-            return  ValidationResponse.builder(ValidationStatus.ERROR).explanations(toExplanation(e)).build();
+            return  ValidationResponse.builder(ValidationStatus.ERROR).explanations(toExplanation(query, e)).build();
         }
     }
 
-    private List<ValidationMessage> toExplanation(ParseException parseException) {
-        return Collections.singletonList(ValidationMessage.fromException(parseException));
+    private List<ValidationMessage> toExplanation(final String query, final ParseException parseException) {
+        return Collections.singletonList(ValidationMessage.fromException(query, parseException));
     }
 
     private List<ValidationMessage> getExplanations(List<ParsedTerm> unknownFields, List<ParsedTerm> unknownTokens) {

@@ -57,7 +57,7 @@ public abstract class ValidationMessage {
     @JsonProperty
     public abstract String errorMessage();
 
-    public static ValidationMessage fromException(final Exception exception) {
+    public static ValidationMessage fromException(final String query, final Exception exception) {
 
         final String input = exception.toString();
 
@@ -86,6 +86,8 @@ public abstract class ValidationMessage {
         if (positionMatcher.find()) {
             errorBuilder.beginLine(Integer.parseInt(positionMatcher.group(1)));
             errorBuilder.beginColumn(Integer.parseInt(positionMatcher.group(2)));
+            errorBuilder.endColumn(query.length());
+            errorBuilder.endLine(countLines(query));
         }
 
         // Fallback, all parsing failed
@@ -95,6 +97,12 @@ public abstract class ValidationMessage {
 
         return errorBuilder.build();
     }
+
+    private static int countLines(String str){
+        String[] lines = str.split("\r\n|\r|\n");
+        return  lines.length;
+    }
+
 
     public static Builder builder() {
         return new AutoValue_ValidationMessage.Builder();
