@@ -18,6 +18,7 @@ package org.graylog2.inputs;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import org.graylog2.Configuration;
 import org.graylog2.cluster.leader.LeaderChangedEvent;
 import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.database.NotFoundException;
@@ -47,6 +48,7 @@ public class InputEventListener {
     private final LeaderElectionService leaderElectionService;
     private final PersistedInputs persistedInputs;
     private final ServerStatus serverStatus;
+    private final Configuration configuration;
 
     @Inject
     public InputEventListener(EventBus eventBus,
@@ -56,7 +58,7 @@ public class InputEventListener {
                               NodeId nodeId,
                               LeaderElectionService leaderElectionService,
                               PersistedInputs persistedInputs,
-                              ServerStatus serverStatus) {
+                              ServerStatus serverStatus, Configuration configuration) {
         this.inputLauncher = inputLauncher;
         this.inputRegistry = inputRegistry;
         this.inputService = inputService;
@@ -64,6 +66,7 @@ public class InputEventListener {
         this.leaderElectionService = leaderElectionService;
         this.persistedInputs = persistedInputs;
         this.serverStatus = serverStatus;
+        this.configuration = configuration;
         eventBus.register(this);
     }
 
@@ -155,7 +158,8 @@ public class InputEventListener {
         if (leaderElectionService.isLeader()) {
             for (MessageInput input : persistedInputs) {
                 final IOState<MessageInput> inputState = inputRegistry.getInputState(input.getId());
-                if (input.onlyOnePerCluster() && (inputState == null || inputState.canBeStarted())) {
+                if (input.onlyOnePerCluster() && (inputState == null || inputState.canBeStarted())
+                        && shouldStartAutomatically(input)) {
                     LOG.info("Got leader role. Starting input <{}/{}>", input.getName(), input.getId());
                     startMessageInput(input);
                 }
@@ -169,5 +173,9 @@ public class InputEventListener {
                         inputDeleted(InputDeleted.create(input.getId()));
                     });
         }
+    }
+
+    private boolean shouldStartAutomatically(MessageInput input) {
+        return configuration.getAutoRestartInputs() || input.getDesiredState().equals(IOState.Type.RUNNING.toString());
     }
 }
