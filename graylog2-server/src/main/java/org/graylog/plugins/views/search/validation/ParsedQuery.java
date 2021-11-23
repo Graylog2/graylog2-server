@@ -17,9 +17,12 @@
 package org.graylog.plugins.views.search.validation;
 
 import com.google.auto.value.AutoValue;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import org.apache.lucene.queryparser.classic.Token;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -28,6 +31,7 @@ public abstract class ParsedQuery {
     public abstract String query();
 
     public abstract ImmutableSet<ParsedTerm> terms();
+    public abstract ImmutableList<Token> tokens();
 
     public static ParsedQuery.Builder builder() {
         return new AutoValue_ParsedQuery.Builder();
@@ -41,11 +45,10 @@ public abstract class ParsedQuery {
                 .collect(Collectors.toSet());
     }
 
-    public Set<String> unknownTokens() {
+    public List<ParsedTerm> unknownTokens() {
         return terms().stream()
                 .filter(ParsedTerm::isUnknownToken)
-                .map(ParsedTerm::value)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
     }
 
     @AutoValue.Builder
@@ -53,6 +56,8 @@ public abstract class ParsedQuery {
         public abstract Builder query(@NotNull String query);
 
         public abstract ImmutableSet.Builder<ParsedTerm> termsBuilder();
+
+        public abstract ImmutableList.Builder<Token> tokensBuilder();
 
         public abstract ParsedQuery build();
     }

@@ -16,32 +16,32 @@
  */
 package org.graylog.plugins.views.search.validation;
 
-import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.ParseException;
-import org.apache.lucene.queryparser.classic.QueryParserTokenManager;
+import org.apache.lucene.queryparser.classic.QueryParserConstants;
+import org.apache.lucene.queryparser.classic.Token;
 import org.apache.lucene.search.AutomatonQuery;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.QueryVisitor;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.List;
+import java.util.Optional;
 
 public class LuceneQueryParser {
-    private final org.apache.lucene.queryparser.classic.QueryParser parser;
+    private final TermCollectingQueryParser parser;
 
     public LuceneQueryParser() {
-        this.parser = new org.apache.lucene.queryparser.classic.QueryParser(ParsedTerm.UNKNOWN_TERM, new StandardAnalyzer());
+        this.parser = new TermCollectingQueryParser(ParsedTerm.UNKNOWN_TERM, new StandardAnalyzer());
     }
 
     public ParsedQuery parse(final String query) throws ParseException {
         final Query parsed = parser.parse(query);
         final ParsedQuery.Builder builder = ParsedQuery.builder().query(query);
+
+        final List<Token> tokens = this.parser.getTokens();
+        builder.tokensBuilder().addAll(tokens);
 
         parsed.visit(new QueryVisitor() {
             @Override
@@ -49,7 +49,29 @@ public class LuceneQueryParser {
                 super.consumeTerms(query, terms);
                 for (Term t : terms) {
                     final String field = t.field();
-                    builder.termsBuilder().add(ParsedTerm.create(field, t.text()));
+
+                    final ParsedTerm.Builder termBuilder = ParsedTerm.builder()
+                            .field(field)
+                            .value(t.text());
+
+                    if (field.equals(ParsedTerm.UNKNOWN_TERM)) {
+                        tokens.stream()
+                                .filter(token -> token.kind == QueryParserConstants.TERM)
+                                .filter(token -> token.image.equals(t.text()))
+                                .findFirst()
+                                .ifPresent(token -> {
+                                    termBuilder.tokensBuilder().add(token);
+                                });
+                    } else {
+                        tokens.stream()
+                                .filter(token -> token.kind == QueryParserConstants.TERM)
+                                .filter(token -> token.image.equals(field))
+                                .findFirst()
+                                .ifPresent(token -> {
+                                    termBuilder.tokensBuilder().add(token);
+                                });
+                    }
+                    builder.termsBuilder().add(termBuilder.build());
                 }
             }
 

@@ -110,7 +110,7 @@ public class QueryValidationResource extends RestResource implements PluginRestR
     }
 
     private ValidationMessageDTO toExplanation(ValidationMessage message) {
-        return ValidationMessageDTO.create(message.line(), message.column(), message.errorType(), message.errorMessage());
+        return ValidationMessageDTO.create(message.beginLine(), message.beginColumn(), message.endLine(), message.endColumn(), message.errorType(), message.errorMessage());
     }
 
     private Set<String> adaptStreams(Set<String> streams) {

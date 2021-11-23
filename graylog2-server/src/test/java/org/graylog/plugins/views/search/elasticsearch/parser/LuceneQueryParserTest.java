@@ -17,12 +17,14 @@
 package org.graylog.plugins.views.search.elasticsearch.parser;
 
 import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.queryparser.classic.Token;
 import org.graylog.plugins.views.search.validation.LuceneQueryParser;
 import org.graylog.plugins.views.search.validation.ParsedQuery;
 import org.graylog.plugins.views.search.validation.ParsedTerm;
 import org.junit.jupiter.api.Test;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -50,14 +52,25 @@ class LuceneQueryParserTest {
 
     @Test
     void getFieldNamesNot() throws ParseException {
-        final ParsedQuery fields = parser.parse("NOT _exists_ : type");
-        assertThat(fields.allFieldNames()).contains("type");
+        final ParsedQuery parsedQuery = parser.parse("NOT _exists_ : type");
+        assertThat(parsedQuery.allFieldNames()).contains("type");
     }
 
     @Test
     void unknownTerm() throws ParseException {
-        final ParsedQuery fields = parser.parse("foo:bar and");
-        assertThat(fields.allFieldNames()).contains("foo");
-        assertThat(fields.unknownTokens()).contains("and");
+        final ParsedQuery query = parser.parse("foo:bar and");
+        assertThat(query.allFieldNames()).contains("foo");
+        assertThat(query.unknownTokens().stream().map(ParsedTerm::value).collect(Collectors.toSet())).contains("and");
+
+        final ParsedTerm term = query.unknownTokens().iterator().next();
+        final Token token = term.tokens().iterator().next();
+        assertThat(token).isNotNull();
+
+        assertThat(token.beginColumn).isEqualTo(8);
+        assertThat(token.beginLine).isEqualTo(1);
+        assertThat(token.endColumn).isEqualTo(11);
+        assertThat(token.endLine).isEqualTo(1);
+
+
     }
 }

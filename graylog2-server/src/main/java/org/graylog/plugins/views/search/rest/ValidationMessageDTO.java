@@ -28,11 +28,21 @@ public abstract class ValidationMessageDTO {
 
     @JsonProperty
     @Nullable
-    public abstract Integer line();
+    public abstract Integer beginLine();
 
     @JsonProperty
     @Nullable
-    public abstract Integer column();
+    public abstract Integer beginColumn();
+
+
+    @JsonProperty
+    @Nullable
+    public abstract Integer endLine();
+
+    @JsonProperty
+    @Nullable
+    public abstract Integer endColumn();
+
 
     @JsonProperty
     @Nullable
@@ -42,7 +52,7 @@ public abstract class ValidationMessageDTO {
     public abstract String errorMessage();
 
 
-    public static ValidationMessageDTO create(Integer line, Integer column, String errorType, String errorMessage) {
-        return new AutoValue_ValidationMessageDTO(line, column, errorType, errorMessage);
+    public static ValidationMessageDTO create(Integer beginLine, Integer beginColumn, Integer endLine, Integer endColumn, String errorType, String errorMessage) {
+        return new AutoValue_ValidationMessageDTO(beginLine, beginColumn, endLine, endColumn, errorType, errorMessage);
     }
 }

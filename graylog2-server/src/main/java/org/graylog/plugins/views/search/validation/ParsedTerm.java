@@ -17,6 +17,11 @@
 package org.graylog.plugins.views.search.validation;
 
 import com.google.auto.value.AutoValue;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import org.apache.lucene.queryparser.classic.Token;
+
+import javax.validation.constraints.NotNull;
 
 @AutoValue
 public abstract class ParsedTerm {
@@ -28,14 +33,15 @@ public abstract class ParsedTerm {
 
     public abstract String value();
 
+    public abstract ImmutableList<Token> tokens();
+
     public static ParsedTerm create(final String field, final String value) {
-        return new AutoValue_ParsedTerm(field, value);
+        return builder().field(field).value(value).build();
     }
 
     public static ParsedTerm unknown(final String term) {
-        return new AutoValue_ParsedTerm(UNKNOWN_TERM, term);
+        return builder().field(UNKNOWN_TERM).value(term).build();
     }
-
 
     public boolean isExistsField() {
         return field().equals(EXISTS);
@@ -51,5 +57,17 @@ public abstract class ParsedTerm {
         } else {
             return field();
         }
+    }
+
+    public static Builder builder() {
+        return new AutoValue_ParsedTerm.Builder();
+    }
+
+    @AutoValue.Builder
+    public abstract static class Builder {
+        public abstract Builder field(@NotNull String field);
+        public abstract Builder value(@NotNull String value);
+        public abstract ImmutableList.Builder<Token> tokensBuilder();
+        public abstract ParsedTerm build();
     }
 }

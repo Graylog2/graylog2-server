@@ -26,7 +26,6 @@ import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -52,14 +51,14 @@ public class QueryValidationServiceImpl implements QueryValidationService {
         final String query = decoratedQuery(req);
         try {
             final ParsedQuery parsedQuery = luceneQueryParser.parse(query);
-            final Set<String> unknownFields = getUnknownFields(req, parsedQuery);
-            final Set<String> unknownTokens = parsedQuery.unknownTokens();
+            final List<ParsedTerm> unknownFields = getUnknownFields(req, parsedQuery);
+            final List<ParsedTerm> unknownTokens = parsedQuery.unknownTokens();
             final List<ValidationMessage> explanations = getExplanations(unknownFields, unknownTokens);
             final ValidationStatus status = explanations.isEmpty() ? ValidationStatus.OK : ValidationStatus.WARNING;
             return ValidationResponse.builder(status)
                     .explanations(explanations)
-                    .unknownFields(unknownFields)
-                    .unknownTokens(unknownTokens)
+                    .unknownFields(unknownFields.stream().map(ParsedTerm::getRealFieldName).collect(Collectors.toSet()))
+                    .unknownTokens(unknownTokens.stream().map(ParsedTerm::value).collect(Collectors.toSet()))
                     .build();
 
         } catch (ParseException e) {
@@ -71,35 +70,52 @@ public class QueryValidationServiceImpl implements QueryValidationService {
         return Collections.singletonList(ValidationMessage.fromException(parseException));
     }
 
-    private List<ValidationMessage> getExplanations(Set<String> unknownFields, Set<String> unknownTokens) {
+    private List<ValidationMessage> getExplanations(List<ParsedTerm> unknownFields, List<ParsedTerm> unknownTokens) {
         List<ValidationMessage> messages = new ArrayList<>();
-        if(!unknownFields.isEmpty()) {
-            messages.add(ValidationMessage.builder()
-                    .errorType("Unknown fields")
-                    .errorMessage("Query contains unknown fields: " + String.join(", ", unknownFields))
-                    .build()
-            );
-        }
-        if(!unknownTokens.isEmpty()) {
-            messages.add(ValidationMessage.builder()
-                    .errorType("Unknown tokens")
-                    .errorMessage("Query contains unrecognized tokens: " + String.join(", ", unknownTokens))
-                    .build()
-            );
-        }
 
+        unknownFields.stream().map(f -> {
+            final ValidationMessage.Builder message = ValidationMessage.builder()
+                    .errorType("Unknown field")
+                    .errorMessage("Query contains unknown field: " + f.getRealFieldName());
+
+            f.tokens().stream().findFirst().ifPresent(t -> {
+                message.beginLine(t.beginLine);
+                message.beginColumn(t.beginColumn);
+                message.endLine(t.endLine);
+                message.endColumn(t.endColumn);
+            });
+
+            return message.build();
+
+        }).forEach(messages::add);
+
+        unknownTokens.stream()
+                .map(token -> {
+                    final ValidationMessage.Builder message = ValidationMessage.builder()
+                            .errorType("Unknown token")
+                            .errorMessage("Query contains unrecognized token: " + token.value());
+                    token.tokens().stream().findFirst().ifPresent(t -> {
+                        message.beginLine(t.beginLine);
+                        message.beginColumn(t.beginColumn);
+                        message.endLine(t.endLine);
+                        message.endColumn(t.endColumn);
+                    });
+                    return message.build();
+                })
+                .forEach(messages::add);
         return messages;
     }
 
-    private Set<String> getUnknownFields(ValidationRequest req, ParsedQuery detectedFields) {
+    private List<ParsedTerm> getUnknownFields(ValidationRequest req, ParsedQuery query) {
         final Set<String> availableFields = mappedFieldTypesService.fieldTypesByStreamIds(req.streams(), req.timerange())
                 .stream()
                 .map(MappedFieldTypeDTO::name)
                 .collect(Collectors.toSet());
-        return detectedFields.allFieldNames()
-                .stream()
-                .filter(f -> !availableFields.contains(f))
-                .collect(Collectors.toSet());
+
+        return query.terms().stream()
+                .filter(t -> !t.isUnknownToken())
+                .filter(term -> !availableFields.contains(term.getRealFieldName()))
+                .collect(Collectors.toList());
     }
 
     private String decoratedQuery(ValidationRequest req) {

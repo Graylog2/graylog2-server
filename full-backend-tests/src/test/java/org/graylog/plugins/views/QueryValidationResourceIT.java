@@ -18,8 +18,7 @@ package org.graylog.plugins.views;
 
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
-import org.graylog.storage.elasticsearch7.ElasticsearchInstanceES7Factory;
-import org.graylog.testing.completebackend.ApiIntegrationTest;
+import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.junit.jupiter.api.Test;
 
 import static io.restassured.RestAssured.given;
@@ -27,7 +26,7 @@ import static org.graylog.testing.completebackend.Lifecycle.CLASS;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.core.IsEqual.equalTo;
 
-@ApiIntegrationTest(serverLifecycle = CLASS, elasticsearchFactory = ElasticsearchInstanceES7Factory.class)
+@ContainerMatrixTestsConfiguration(serverLifecycle = CLASS)
 public class QueryValidationResourceIT {
 
     private final RequestSpecification requestSpec;

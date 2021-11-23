@@ -35,11 +35,20 @@ public abstract class ValidationMessage {
 
     @JsonProperty
     @Nullable
-    public abstract Integer line();
+    public abstract Integer beginLine();
 
     @JsonProperty
     @Nullable
-    public abstract Integer column();
+    public abstract Integer beginColumn();
+
+
+    @JsonProperty
+    @Nullable
+    public abstract Integer endLine();
+
+    @JsonProperty
+    @Nullable
+    public abstract Integer endColumn();
 
     @JsonProperty
     @Nullable
@@ -75,8 +84,8 @@ public abstract class ValidationMessage {
 
         final Matcher positionMatcher = regexPosition.matcher(input);
         if (positionMatcher.find()) {
-            errorBuilder.line(Integer.parseInt(positionMatcher.group(1)));
-            errorBuilder.column(Integer.parseInt(positionMatcher.group(2)));
+            errorBuilder.beginLine(Integer.parseInt(positionMatcher.group(1)));
+            errorBuilder.beginColumn(Integer.parseInt(positionMatcher.group(2)));
         }
 
         // Fallback, all parsing failed
@@ -95,9 +104,13 @@ public abstract class ValidationMessage {
     @AutoValue.Builder
     public abstract static class Builder {
 
-        public abstract Builder line(int line);
+        public abstract Builder beginLine(int line);
 
-        public abstract Builder column(int column);
+        public abstract Builder beginColumn(int column);
+
+        public abstract Builder endLine(int line);
+
+        public abstract Builder endColumn(int column);
 
         public abstract Builder errorType(@Nullable String errorType);
 
