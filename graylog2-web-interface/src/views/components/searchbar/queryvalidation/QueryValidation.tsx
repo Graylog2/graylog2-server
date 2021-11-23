@@ -16,22 +16,20 @@
  */
 import * as React from 'react';
 import styled, { DefaultTheme, css, keyframes } from 'styled-components';
-import { debounce, uniq, isEmpty, delay } from 'lodash';
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { uniq } from 'lodash';
+import { useState, useRef } from 'react';
 import { Overlay, Transition } from 'react-overlays';
-import BluebirdPromise from 'bluebird';
-import { useFormikContext } from 'formik';
 
 import { Popover } from 'components/bootstrap';
 import { Icon } from 'components/common';
-import { QueriesActions, QueryValidationState } from 'views/stores/QueriesStore';
 import StringUtils from 'util/StringUtils';
 import { TimeRange, NoTimeRangeOverride, ElasticsearchQueryString } from 'views/logic/queries/Query';
-import { useStore } from 'stores/connect';
-import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
-import { SearchStore } from 'views/stores/SearchStore';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
+
+import useToggleOnSearchExecutionAttempt from './hooks/useToggleOnSearchExecutionAttempt';
+import useSyncSearchBarFormErrors from './hooks/useSyncSearchBarFormErrors';
+import useValidateQuery from './hooks/useValidateQuery';
 
 const Container = styled.div`
   margin-right: 5px;
@@ -97,31 +95,6 @@ const ExplanationTitle = ({ title }: { title: string }) => (
   </Title>
 );
 
-const validateQuery = debounce(({ queryString, timeRange, streams, setValidationState, parameters, parameterBindings, filter }, validationPromise: React.MutableRefObject<BluebirdPromise>) => {
-  if (validationPromise.current) {
-    validationPromise.current.cancel();
-  }
-
-  // eslint-disable-next-line no-param-reassign
-  validationPromise.current = QueriesActions.validateQuery({
-    queryString,
-    timeRange,
-    streams,
-    parameters,
-    parameterBindings,
-    filter,
-  }).then((result) => {
-    setValidationState(result);
-  }).finally(() => {
-    // eslint-disable-next-line no-param-reassign
-    validationPromise.current = undefined;
-  });
-}, 350);
-
-const queryExists = (query: string | ElasticsearchQueryString) => {
-  return typeof query === 'object' ? !!query.query_string : !!query;
-};
-
 const getExplanationTitle = (status, explanations) => {
   const baseTitle = StringUtils.capitalizeFirstLetter(status.toLocaleLowerCase());
   const errorTitles = explanations.map(({ errorType }) => errorType);
@@ -134,52 +107,6 @@ const uniqErrorMessages = (explanations) => {
   const errorMessages = explanations.map(({ errorMessage }) => errorMessage);
 
   return uniq(errorMessages).join('. ');
-};
-
-const useValidationPayload = ({ queryString, timeRange, streams, filter }) => {
-  const { parameterBindings } = useStore(SearchExecutionStateStore);
-  const { search: { parameters } } = useStore(SearchStore);
-
-  return ({
-    timeRange: !isEmpty(timeRange) ? timeRange : undefined,
-    filter,
-    queryString,
-    streams,
-    parameters,
-    parameterBindings,
-  });
-};
-
-const useValidateQuery = (queryData): QueryValidationState | undefined => {
-  const validationPromise = useRef<BluebirdPromise>(undefined);
-  const [validationState, setValidationState] = useState(undefined);
-  const { queryString, timeRange, streams, filter, parameterBindings, parameters } = useValidationPayload(queryData);
-
-  useEffect(() => {
-    if (queryExists(queryString) || queryExists(filter)) {
-      validateQuery({ queryString, timeRange, streams, setValidationState, parameters, parameterBindings, filter }, validationPromise);
-    }
-  }, [filter, queryString, timeRange, streams, parameterBindings, parameters, validationPromise]);
-
-  useEffect(() => {
-    if (!queryExists(queryString) && !queryExists(filter) && validationState) {
-      setValidationState(undefined);
-    }
-  }, [queryString, filter, validationState]);
-
-  return validationState;
-};
-
-const useSyncSearchBarFormErrors = ({ queryString, filter, validationStatus }) => {
-  const { errors, setFieldError } = useFormikContext<{ queryString: string }>();
-
-  useEffect(() => {
-    if ((queryString || filter) && !errors.queryString && validationStatus === 'ERROR') {
-      setFieldError('queryString', 'query validation error');
-    } else if (errors.queryString && ((!queryString && !filter) || (!validationStatus || validationStatus === 'OK'))) {
-      setFieldError('queryString', undefined);
-    }
-  }, [queryString, filter, errors, validationStatus, setFieldError]);
 };
 
 type Props = {
@@ -195,31 +122,9 @@ const QueryValidation = ({ queryString, timeRange, streams, filter }: Props) => 
   const containerRef = useRef(undefined);
   const explanationTriggerRef = useRef(undefined);
   const validationState = useValidateQuery({ queryString, timeRange, streams, filter });
+  const shakingPopover = useToggleOnSearchExecutionAttempt(showExplanation, setShowExplanation);
+
   useSyncSearchBarFormErrors({ queryString, filter, validationStatus: validationState?.status });
-  const [shakingPopover, setShakingPopover] = useState(false);
-
-  const shakePopover = useCallback(() => {
-    if (!shakingPopover) {
-      setShakingPopover(true);
-      delay(() => setShakingPopover(false), 820);
-    }
-  }, [shakingPopover]);
-
-  useEffect(() => {
-    const unsubscribe = QueriesActions.displayValidationErrors.completed.listen(() => {
-      if (!showExplanation) {
-        setShowExplanation(true);
-      }
-
-      if (showExplanation) {
-        shakePopover();
-      }
-    });
-
-    return () => {
-      unsubscribe();
-    };
-  }, [showExplanation, shakingPopover, shakePopover]);
 
   // We need to always display the container to avoid query inout resizing problems
   // we need to always display the overlay trigger to avoid overlay placement problems

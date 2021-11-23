@@ -38,7 +38,7 @@ import WidgetContext from 'views/components/contexts/WidgetContext';
 import { GlobalOverrideStore, GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
 import { SearchActions } from 'views/stores/SearchStore';
 import { PropagateValidationState } from 'views/components/aggregationwizard';
-import QueryValidation from 'views/components/searchbar/QueryValidation';
+import QueryValidation from 'views/components/searchbar/queryvalidation/QueryValidation';
 
 import TimeRangeOverrideInfo from './searchbar/WidgetTimeRangeOverride';
 import TimeRangeInput from './searchbar/TimeRangeInput';
