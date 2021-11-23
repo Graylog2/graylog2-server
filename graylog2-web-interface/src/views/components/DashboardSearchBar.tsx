@@ -108,7 +108,7 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
             <DashboardSearchForm initialValues={{ timerange, queryString }}
                                  limitDuration={limitDuration}
                                  onSubmit={submitForm}>
-              {({ dirty, errros, isSubmitting, isValid, handleSubmit, values, setFieldValue }) => (
+              {({ dirty, errors, isSubmitting, isValid, handleSubmit, values, setFieldValue }) => (
                 <>
                   <TopRow>
                     <StyledTimeRangeInput disabled={disableSearch}
