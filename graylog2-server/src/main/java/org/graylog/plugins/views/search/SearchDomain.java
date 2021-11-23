@@ -32,11 +32,15 @@ import java.util.stream.Collectors;
 
 public class SearchDomain {
     private final SearchDbService dbService;
+    private final SearchExecutionGuard executionGuard;
     private final ViewService viewService;
 
     @Inject
-    public SearchDomain(SearchDbService dbService, ViewService viewService) {
+    public SearchDomain(SearchDbService dbService,
+                        SearchExecutionGuard executionGuard,
+                        ViewService viewService) {
         this.dbService = dbService;
+        this.executionGuard = executionGuard;
         this.viewService = viewService;
     }
 
@@ -57,6 +61,17 @@ public class SearchDomain {
         return dbService.streamAll()
                 .filter(s -> hasReadPermissionFor(searchPermissions, viewReadPermission, s))
                 .collect(Collectors.toList());
+    }
+
+    public Search saveForUser(Search search, SearchUser searchUser) {
+        this.executionGuard.check(search, searchUser::canReadStream);
+
+        final Optional<Search> previous = Optional.ofNullable(search.id()).flatMap(dbService::get);
+        if (!searchUser.isAdmin() && !previous.map(searchUser::owns).orElse(true)) {
+            throw new PermissionException("Unable to update search with id <" + search.id() + ">, already exists and user is not permitted to overwrite it.");
+        }
+
+        return dbService.save(search.withOwner(searchUser.username()));
     }
 
     private boolean hasReadPermissionFor(SearchPermissions searchPermissions, Predicate<ViewDTO> viewReadPermission, Search search) {

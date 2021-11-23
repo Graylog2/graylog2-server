@@ -14,18 +14,24 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views;
+import { useState, useEffect } from 'react';
 
-import io.restassured.specification.RequestSpecification;
-import org.graylog.storage.elasticsearch7.ElasticsearchInstanceES7Factory;
-import org.graylog.testing.completebackend.ApiIntegrationTest;
-import org.graylog.testing.completebackend.GraylogBackend;
+import usePluginEntities from 'views/logic/usePluginEntities';
 
-import static org.graylog.testing.completebackend.Lifecycle.CLASS;
+const useIsLocalNode = (nodeId: string) => {
+  const forwarderPlugin = usePluginEntities('forwarder');
+  const _isLocalNode = forwarderPlugin?.[0]?.isLocalNode;
+  const [isLocalNode, setIsLocalNode] = useState<boolean | undefined>();
 
-@ApiIntegrationTest(serverLifecycle = CLASS, elasticsearchFactory = ElasticsearchInstanceES7Factory.class)
-class MessagesResourceES7IT extends MessagesResourceIT {
-    public MessagesResourceES7IT(GraylogBackend sut, RequestSpecification requestSpec) {
-        super(sut, requestSpec);
+  useEffect(() => {
+    if (nodeId && _isLocalNode) {
+      _isLocalNode(nodeId).then(setIsLocalNode, () => setIsLocalNode(true));
+    } else {
+      setIsLocalNode(true);
     }
-}
+  }, [nodeId, _isLocalNode]);
+
+  return { isLocalNode };
+};
+
+export default useIsLocalNode;

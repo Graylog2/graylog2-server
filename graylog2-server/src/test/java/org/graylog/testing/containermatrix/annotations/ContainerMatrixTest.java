@@ -14,21 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.elasticsearch6;
+package org.graylog.testing.containermatrix.annotations;
 
-import org.graylog.storage.elasticsearch6.testing.ElasticsearchInstanceES6;
-import org.graylog.testing.completebackend.ElasticsearchInstanceFactory;
-import org.graylog.testing.elasticsearch.ElasticsearchInstance;
-import org.testcontainers.containers.Network;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-public class ElasticsearchInstanceES6Factory implements ElasticsearchInstanceFactory {
-    @Override
-    public ElasticsearchInstance create(Network network) {
-        return ElasticsearchInstanceES6.create(network);
-    }
-
-    @Override
-    public String version() {
-        return "6";
-    }
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface ContainerMatrixTest {
 }

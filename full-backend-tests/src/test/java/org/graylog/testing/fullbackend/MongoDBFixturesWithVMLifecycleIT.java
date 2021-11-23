@@ -17,35 +17,33 @@
 package org.graylog.testing.fullbackend;
 
 import io.restassured.specification.RequestSpecification;
-import org.graylog.storage.elasticsearch6.ElasticsearchInstanceES6Factory;
-import org.graylog.testing.completebackend.ApiIntegrationTest;
 import org.graylog.testing.completebackend.GraylogBackend;
-import org.graylog.testing.completebackend.Lifecycle;
-import org.junit.jupiter.api.Test;
+import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
+import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 
 import java.util.List;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog.testing.completebackend.Lifecycle.VM;
+import static org.graylog.testing.containermatrix.ContainerVersions.ES6;
 
-
-@ApiIntegrationTest(serverLifecycle = Lifecycle.METHOD, elasticsearchFactory = ElasticsearchInstanceES6Factory.class,
-        mongoDBFixtures = "access-token.json")
-class MongoDBFixturesWithMethodLifecycleIT {
+@ContainerMatrixTestsConfiguration(serverLifecycle = VM, esVersions = {ES6}, mongoDBFixtures = "access-token.json")
+class MongoDBFixturesWithVMLifecycleIT {
     private final GraylogBackend sut;
     private final RequestSpecification requestSpec;
 
-    public MongoDBFixturesWithMethodLifecycleIT(GraylogBackend sut, RequestSpecification requestSpec) {
+    public MongoDBFixturesWithVMLifecycleIT(GraylogBackend sut, RequestSpecification requestSpec) {
         this.sut = sut;
         this.requestSpec = requestSpec;
     }
 
-    @Test
+    @ContainerMatrixTest
     void oneTokenPresentWithTestMethodA() {
         assertTokenPresent();
     }
 
-    @Test
+    @ContainerMatrixTest
     void oneTokenPresentWithTestMethodB() {
         assertTokenPresent();
     }

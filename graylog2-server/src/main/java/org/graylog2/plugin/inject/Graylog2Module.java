@@ -34,6 +34,7 @@ import org.graylog2.audit.PluginAuditEventTypes;
 import org.graylog2.audit.formatter.AuditEventFormatter;
 import org.graylog2.contentpacks.constraints.ConstraintChecker;
 import org.graylog2.contentpacks.facades.EntityFacade;
+import org.graylog2.contentpacks.facades.EntityWithExcerptFacade;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.migrations.Migration;
 import org.graylog2.plugin.alarms.AlertCondition;
@@ -461,8 +462,8 @@ public abstract class Graylog2Module extends AbstractModule {
         return Multibinder.newSetBinder(binder(), Migration.class);
     }
 
-    protected MapBinder<ModelType, EntityFacade<?>> entityFacadeBinder() {
-        return MapBinder.newMapBinder(binder(), new TypeLiteral<ModelType>() {}, new TypeLiteral<EntityFacade<?>>() {});
+    protected MapBinder<ModelType, EntityWithExcerptFacade<?, ?>> entityFacadeBinder() {
+        return MapBinder.newMapBinder(binder(), new TypeLiteral<ModelType>() {}, new TypeLiteral<EntityWithExcerptFacade<?, ?>>() {});
     }
 
     protected Multibinder<ConstraintChecker> constraintCheckerBinder() {

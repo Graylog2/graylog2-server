@@ -73,7 +73,7 @@ public interface Parameter {
     @JsonProperty
     Binding binding();
 
-    Parameter applyExecutionState(ObjectMapper objectMapper, JsonNode jsonNode);
+    Parameter applyBindings(Map<String,  Parameter.Binding> bindings);
 
     interface Builder<SELF> {
         @JsonProperty(TYPE_FIELD)

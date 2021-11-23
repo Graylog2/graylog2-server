@@ -146,7 +146,7 @@
         <pkts.version>3.0.5</pkts.version>
         <prometheus-client.version>0.11.0</prometheus-client.version>
         <protobuf.version>3.11.4</protobuf.version>
-        <reflections.version>0.9.12</reflections.version>
+        <reflections.version>0.10.2</reflections.version>
         <retrofit.version>2.9.0</retrofit.version>
         <scala.version>2.13.4</scala.version>
         <semver4j.version>2.2.0-graylog.1</semver4j.version>

@@ -20,6 +20,8 @@ import com.github.zafarkhaja.semver.Version;
 import com.google.common.io.Resources;
 import org.graylog2.storage.versionprobe.SearchVersion;
 import org.junit.rules.ExternalResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.elasticsearch.ElasticsearchContainer;
@@ -29,8 +31,10 @@ import java.io.Closeable;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
 
@@ -38,6 +42,10 @@ import static java.util.Objects.isNull;
  * This rule starts an Elasticsearch instance and provides a configured {@link Client}.
  */
 public abstract class ElasticsearchInstance extends ExternalResource implements Closeable {
+    public static final String DEFAULT_VERSION = "7.10.2";
+
+    private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchInstance.class);
+
     private static final Map<Version, ElasticsearchContainer> containersByVersion = new HashMap<>();
 
     private static final String DEFAULT_IMAGE_OSS = "docker.elastic.co/elasticsearch/elasticsearch-oss";
@@ -92,6 +100,16 @@ public abstract class ElasticsearchInstance extends ExternalResource implements 
         client().cleanUp();
     }
 
+    @Override
+    public void close() {
+        container.close();
+        final List<Version> version = containersByVersion.keySet().stream().filter(k -> container == containersByVersion.get(k)).collect(Collectors.toList());
+        version.forEach(v -> {
+            containersByVersion.remove(v);
+        });
+
+    }
+
     public static String internalUri() {
         return String.format(Locale.US, "http://%s:%d", NETWORK_ALIAS, ES_PORT);
     }
@@ -112,10 +130,5 @@ public abstract class ElasticsearchInstance extends ExternalResource implements 
 
         // Make sure the data we just imported is visible
         client().refreshNode();
-    }
-
-    @Override
-    public void close() {
-        container.stop();
     }
 }

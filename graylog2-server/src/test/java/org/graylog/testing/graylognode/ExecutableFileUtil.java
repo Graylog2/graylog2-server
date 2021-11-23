@@ -26,7 +26,7 @@ import java.util.Locale;
 public class ExecutableFileUtil {
     private static final Logger LOG = LoggerFactory.getLogger(ExecutableFileUtil.class);
 
-    static void makeSureExecutableIsFound(String executableName) {
+    public static void makeSureExecutableIsFound(String executableName) {
         String path = System.getenv("PATH");
 
         File executableFile = Arrays.stream(path.split(File.pathSeparator))

@@ -14,18 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.elasticsearch.e2e;
+package org.junit.jupiter.engine.discovery.predicates;
 
-import io.restassured.specification.RequestSpecification;
-import org.graylog.storage.elasticsearch6.ElasticsearchInstanceES6Factory;
-import org.graylog.testing.completebackend.ApiIntegrationTest;
-import org.graylog.testing.completebackend.GraylogBackend;
+import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 
-import static org.graylog.testing.completebackend.Lifecycle.CLASS;
-
-@ApiIntegrationTest(serverLifecycle = CLASS, elasticsearchFactory = ElasticsearchInstanceES6Factory.class)
-public class ElasticsearchE2EES6 extends ElasticsearchE2E {
-    public ElasticsearchE2EES6(GraylogBackend sut, RequestSpecification requestSpec) {
-        super(sut, requestSpec);
+public class IsContainerMatrixTest extends IsTestableMethod {
+    public IsContainerMatrixTest() {
+        super(ContainerMatrixTest.class, true);
     }
 }

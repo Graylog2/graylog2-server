@@ -40,6 +40,7 @@ import org.graylog.plugins.views.search.views.Titles;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewRequirements;
 import org.graylog.plugins.views.search.views.ViewService;
+import org.graylog.plugins.views.search.views.ViewSummaryDTO;
 import org.graylog.plugins.views.search.views.ViewSummaryService;
 import org.graylog.plugins.views.search.views.widgets.aggregation.AggregationConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.AutoIntervalDTO;
@@ -114,8 +115,16 @@ public class ViewFacadeTest {
         }
     }
 
+    public static class TestViewSummaryService extends ViewSummaryService {
+        protected TestViewSummaryService(MongoConnection mongoConnection,
+                                         MongoJackObjectMapperProvider mapper) {
+            super(mongoConnection, mapper);
+        }
+    }
+
     private ViewFacade facade;
     private TestViewService viewService;
+    private TestViewSummaryService viewSummaryService;
     private TestSearchDBService searchDbService;
     private final String viewId = "5def958063303ae5f68eccae"; /* stored in database */
     private final String newViewId = "5def958063303ae5f68edead";
@@ -139,12 +148,14 @@ public class ViewFacadeTest {
         objectMapper.registerSubtypes(MessageList.class);
         objectMapper.registerSubtypes(Pivot.class);
         objectMapper.registerSubtypes(EventList.class);
-        searchDbService = new TestSearchDBService(mongodb.mongoConnection(),
-                new MongoJackObjectMapperProvider(objectMapper));
-        viewService = new TestViewService(mongodb.mongoConnection(),
-                new MongoJackObjectMapperProvider(objectMapper), null);
+        final MongoConnection mongoConnection = mongodb.mongoConnection();
+        final MongoJackObjectMapperProvider mapper = new MongoJackObjectMapperProvider(objectMapper);
+        searchDbService = new TestSearchDBService(mongoConnection, mapper);
+        viewService = new TestViewService(mongoConnection, mapper, null);
+        viewSummaryService = new TestViewSummaryService(mongoConnection, mapper);
         userService = mock(UserService.class);
-        facade = new SearchFacade(objectMapper, searchDbService, viewService, userService);
+
+        facade = new SearchFacade(objectMapper, searchDbService, viewService, viewSummaryService, userService);
     }
 
     @Test
@@ -179,13 +190,13 @@ public class ViewFacadeTest {
     @Test
     @MongoDBFixtures("ViewFacadeTest.json")
     public void itShouldCreateAEntityExcerpt() {
-        final ViewDTO viewDTO = viewService.get(viewId)
+        final ViewSummaryDTO viewSummaryDTO = viewSummaryService.get(viewId)
                 .orElseThrow(() -> new NotFoundException("Missing view with id: " + viewId));
-        final EntityExcerpt entityExcerpt = facade.createExcerpt(viewDTO);
+        final EntityExcerpt entityExcerpt = facade.createExcerpt(viewSummaryDTO);
 
         assertThat(entityExcerpt.id().id()).isEqualTo(viewId);
         assertThat(entityExcerpt.type()).isEqualTo(ModelTypes.SEARCH_V1);
-        assertThat(entityExcerpt.title()).isEqualTo(viewDTO.title());
+        assertThat(entityExcerpt.title()).isEqualTo(viewSummaryDTO.title());
 
     }
 

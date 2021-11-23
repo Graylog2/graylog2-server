@@ -49,6 +49,7 @@ describe('ActionMenuItem', () => {
         fields: [],
       },
       valuePath: [],
+      isLocalNode: true,
     },
   };
 
