@@ -122,7 +122,7 @@ const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
                      formRef={formRef}
                      onSubmit={(values) => _onSubmit(values, widget)}
                      validateOnMount={false}>
-        {({ dirty, isValid, isSubmitting, handleSubmit, values, setFieldValue }) => (
+        {({ dirty, errors, isValid, isSubmitting, handleSubmit, values, setFieldValue }) => (
           <>
             <PropagateValidationState formKey="widget-query-controls" />
             <WidgetTopRow>
@@ -131,7 +131,7 @@ const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
                   <TimeRangeInput disabled={hasTimeRangeOverride}
                                   onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
                                   value={values?.timerange}
-                                  hasErrorOnMount={!isValid}
+                                  hasErrorOnMount={!!errors.timerange}
                                   position="right" />
                 )}
                 {hasTimeRangeOverride && (
