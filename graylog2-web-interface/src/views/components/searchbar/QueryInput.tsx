@@ -22,6 +22,7 @@ import PropTypes from 'prop-types';
 import { themePropTypes } from 'theme';
 import withPluginEntities from 'views/logic/withPluginEntities';
 import UserPreferencesContext from 'contexts/UserPreferencesContext';
+import { QueriesActions } from 'views/stores/QueriesStore';
 
 import type { AutoCompleter, Editor } from './ace-types';
 import StyledAceEditor from './queryinput/StyledAceEditor';
@@ -33,6 +34,7 @@ type Props = {
   completerFactory: (completers: Array<Completer>) => AutoCompleter,
   completers: Array<Completer>,
   disabled?: boolean,
+  error: string,
   height?: number,
   onBlur?: (query: string) => void,
   onChange: (query: string) => Promise<string>,
@@ -44,9 +46,15 @@ type Props = {
 
 const defaultCompleterFactory = (completers) => new SearchBarAutoCompletions(completers);
 
-const handleExecution = (editor, onExecute, value) => {
+const handleExecution = (editor, onExecute, value, error) => {
   if (editor.completer && editor.completer.popup) {
     editor.completer.popup.hide();
+  }
+
+  if (error) {
+    QueriesActions.displayValidationErrors();
+
+    return;
   }
 
   onExecute(value);
@@ -77,6 +85,7 @@ const QueryInput = ({
   completerFactory = defaultCompleterFactory,
   completers,
   disabled,
+  error,
   height,
   onBlur,
   onChange,
@@ -86,7 +95,7 @@ const QueryInput = ({
   value,
 }: Props) => {
   const completer = useMemo(() => completerFactory(completers), [completerFactory, completers]);
-  const _onExecute = useCallback((editor: Editor) => handleExecution(editor, onExecute, value), [onExecute, value]);
+  const _onExecute = useCallback((editor: Editor) => handleExecution(editor, onExecute, value, error), [onExecute, value, error]);
   const configureEditor = useCallback((node) => _configureEditor(node, completer, _onExecute), [completer, _onExecute]);
 
   return (
@@ -127,6 +136,7 @@ QueryInput.propTypes = {
   completerFactory: PropTypes.func,
   completers: PropTypes.array,
   disabled: PropTypes.bool,
+  error: PropTypes.object,
   height: PropTypes.number,
   onBlur: PropTypes.func,
   onChange: PropTypes.func.isRequired,
@@ -141,6 +151,7 @@ QueryInput.defaultProps = {
   completerFactory: defaultCompleterFactory,
   completers: [],
   disabled: false,
+  error: undefined,
   height: undefined,
   onBlur: () => {},
   placeholder: '',

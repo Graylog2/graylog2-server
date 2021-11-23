@@ -239,6 +239,13 @@ export const QueriesStore: QueriesStoreType = singletonStore(
       return promise;
     },
 
+    displayValidationErrors() {
+      const promise = Promise.resolve();
+      QueriesActions.displayValidationErrors.promise(promise);
+
+      return promise;
+    },
+
     _propagateQueryChange(newQueries: QueriesList) {
       const newSearch = this.search.toBuilder()
         .queries(newQueries.valueSeq().toList())

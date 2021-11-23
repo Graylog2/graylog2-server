@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled, { DefaultTheme } from 'styled-components';
-import { debounce, uniq, isEmpty } from 'lodash';
+import styled, { DefaultTheme, css, keyframes } from 'styled-components';
+import { debounce, uniq, isEmpty, delay } from 'lodash';
 import { useState, useEffect, useRef } from 'react';
 import { Overlay, Transition } from 'react-overlays';
 import BluebirdPromise from 'bluebird';
@@ -59,6 +59,34 @@ const Title = styled.div`
   display: flex;
   justify-content: space-between;
 `;
+
+const shakeAnimation = keyframes`
+  10%, 90% {
+    transform: translate3d(-1px, 0, 0);
+  }
+  
+  20%, 80% {
+    transform: translate3d(2px, 0, 0);
+  }
+
+  30%, 50%, 70% {
+    transform: translate3d(-4px, 0, 0);
+  }
+
+  40%, 60% {
+    transform: translate3d(4px, 0, 0);
+  }
+`;
+
+const StyledPopover = styled(Popover)(({ $shaking }) => {
+  if ($shaking) {
+    return css`
+      animation: ${shakeAnimation} 0.82s cubic-bezier(.36,.07,.19,.97) both;
+    `;
+  }
+
+  return '';
+});
 
 const ExplanationTitle = ({ title }: { title: string }) => (
   <Title>
@@ -168,6 +196,30 @@ const QueryValidation = ({ queryString, timeRange, streams, filter }: Props) => 
   const explanationTriggerRef = useRef(undefined);
   const validationState = useValidateQuery({ queryString, timeRange, streams, filter });
   useSyncSearchBarFormErrors({ queryString, filter, validationStatus: validationState?.status });
+  const [shakingPopover, setShakingPopover] = useState(false);
+
+  const shakePopover = () => {
+    if (!shakingPopover) {
+      setShakingPopover(true);
+      delay(() => setShakingPopover(false), 820);
+    }
+  };
+
+  useEffect(() => {
+    const unsubscribe = QueriesActions.displayValidationErrors.completed.listen(() => {
+      if (!showExplanation) {
+        setShowExplanation(true);
+      }
+
+      if (showExplanation) {
+        shakePopover();
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [showExplanation]);
 
   // We need to always display the container to avoid query inout resizing problems
   // we need to always display the overlay trigger to avoid overlay placement problems
@@ -196,10 +248,11 @@ const QueryValidation = ({ queryString, timeRange, streams, filter }: Props) => 
                  target={explanationTriggerRef.current}
                  shouldUpdatePosition
                  transition={Transition}>
-          <Popover id="query-validation-error-explanation"
-                   title={<ExplanationTitle title={getExplanationTitle(status, explanations)} />}>
+          <StyledPopover id="query-validation-error-explanation"
+                         title={<ExplanationTitle title={getExplanationTitle(status, explanations)} />}
+                         $shaking={shakingPopover}>
             {errorMessages}
-          </Popover>
+          </StyledPopover>
         </Overlay>
       )}
     </Container>

@@ -21,6 +21,7 @@ import styled, { css } from 'styled-components';
 import { Button } from 'components/bootstrap';
 import { Icon } from 'components/common';
 import { SearchActions } from 'views/stores/SearchStore';
+import { QueriesActions } from 'views/stores/QueriesStore';
 
 const StyledButton = styled(Button)`
   margin-right: 7px;
@@ -67,7 +68,23 @@ const CleanSearchButton = ({ disabled, glyph }: { disabled: boolean, glyph: stri
   </StyledButton>
 );
 
-const SearchButton = ({ dirty, ...rest }: Props) => (dirty ? <DirtySearchButton {...rest} /> : <CleanSearchButton {...rest} />);
+const displayValidationErrors = () => {
+  QueriesActions.displayValidationErrors();
+};
+
+const SearchButton = ({ dirty, ...rest }: Props) => {
+  const button = dirty ? <DirtySearchButton {...rest} /> : <CleanSearchButton {...rest} />;
+
+  if (rest.disabled) {
+    return (
+      <div onClick={displayValidationErrors}>
+        {button}
+      </div>
+    );
+  }
+
+  return button;
+};
 
 SearchButton.defaultProps = {
   disabled: false,

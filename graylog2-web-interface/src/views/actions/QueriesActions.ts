@@ -30,6 +30,7 @@ export type QueriesList = Immutable.OrderedMap<QueryId, Query>;
 
 type QueriesActionsType = RefluxActions<{
   create: (query: Query, viewState: ViewState) => Promise<QueriesList>,
+  displayValidationErrors: () => Promise<void>,
   duplicate: (queryId: QueryId) => Promise<QueriesList>,
   query: (queryId: QueryId, newQueryString: string) => Promise<QueriesList>,
   rangeType: (queryId: QueryId, rangeType: TimeRangeTypes) => Promise<QueriesList>,
@@ -59,6 +60,7 @@ export const QueriesActions: QueriesActionsType = singletonActions(
   'views.Queries',
   () => Reflux.createActions({
     create: { asyncResult: true },
+    displayValidationErrors: { asyncResult: true },
     duplicate: { asyncResult: true },
     query: { asyncResult: true },
     rangeType: { asyncResult: true },
