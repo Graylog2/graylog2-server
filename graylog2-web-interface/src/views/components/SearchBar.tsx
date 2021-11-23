@@ -127,14 +127,14 @@ const SearchBar = ({
             <SearchBarForm initialValues={{ timerange, streams, queryString }}
                            limitDuration={limitDuration}
                            onSubmit={_onSubmit}>
-              {({ dirty, isSubmitting, isValid, handleSubmit, values, setFieldValue }) => (
+              {({ dirty, errors, isSubmitting, isValid, handleSubmit, values, setFieldValue }) => (
                 <>
                   <TopRow>
                     <Col md={5}>
                       <TimeRangeInput disabled={disableSearch}
                                       onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
                                       value={values?.timerange}
-                                      hasErrorOnMount={!isValid} />
+                                      hasErrorOnMount={!!errors.timerange} />
                     </Col>
 
                     <Col mdHidden lgHidden>

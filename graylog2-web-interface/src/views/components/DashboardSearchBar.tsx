@@ -108,13 +108,13 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
             <DashboardSearchForm initialValues={{ timerange, queryString }}
                                  limitDuration={limitDuration}
                                  onSubmit={submitForm}>
-              {({ dirty, isSubmitting, isValid, handleSubmit, values, setFieldValue }) => (
+              {({ dirty, errros, isSubmitting, isValid, handleSubmit, values, setFieldValue }) => (
                 <>
                   <TopRow>
                     <StyledTimeRangeInput disabled={disableSearch}
                                           onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
                                           value={values?.timerange}
-                                          hasErrorOnMount={!isValid}
+                                          hasErrorOnMount={!!errors.timerange}
                                           noOverride />
                     <RefreshControlsWrapper>
                       <RefreshControls />

@@ -19,7 +19,7 @@ import { useCallback } from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import { Form, Formik } from 'formik';
-import { isFunction } from 'lodash';
+import { isFunction, isEmpty } from 'lodash';
 import type { FormikProps } from 'formik';
 
 import { onInitializingTimerange, onSubmittingTimerange } from 'views/components/TimerangeForForm';
@@ -53,6 +53,18 @@ export const normalizeSearchBarFormValues = ({ timerange, streams, queryString }
   };
 };
 
+const validate = (nextTimeRange, limitDuration) => {
+  let errors = {};
+
+  const timeRangeErrors = validateTimeRange(nextTimeRange, limitDuration);
+
+  if (!isEmpty(timeRangeErrors)) {
+    errors = { ...errors, timerange: timeRangeErrors };
+  }
+
+  return errors;
+};
+
 const SearchBarForm = ({ initialValues, limitDuration, onSubmit, children, validateOnMount, formRef }: Props) => {
   const _onSubmit = useCallback(({ timerange, streams, queryString }) => {
     return onSubmit(normalizeSearchBarFormValues({ timerange, streams, queryString }));
@@ -70,7 +82,7 @@ const SearchBarForm = ({ initialValues, limitDuration, onSubmit, children, valid
             enableReinitialize
             onSubmit={_onSubmit}
             innerRef={formRef}
-            validate={({ timerange: nextTimeRange }) => validateTimeRange(nextTimeRange, limitDuration)}
+            validate={({ timerange: nextTimeRange }) => validate(nextTimeRange, limitDuration)}
             validateOnMount={validateOnMount}>
       {(...args) => (
         <DateTimeProvider limitDuration={limitDuration}>
