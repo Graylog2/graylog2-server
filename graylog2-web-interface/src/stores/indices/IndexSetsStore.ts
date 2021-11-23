@@ -21,51 +21,15 @@ import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import ActionsProvider from 'injection/ActionsProvider';
-
-export type IndexSet = {
-  can_be_default: boolean,
-  id: string,
-  title: string,
-  description: string,
-  index_prefix: string,
-  shards: number,
-  replicas: number,
-  rotation_strategy_class: string,
-  rotation_strategy: {
-    type: string,
-    max_docs_per_index: number,
-  },
-  retention_strategy_class: string,
-  retention_strategy: {
-    type: string,
-    max_docs_per_index: number,
-    index_action: string,
-  },
-  creation_date: string,
-  index_analyzer: string,
-  index_optimization_max_num_segments: number,
-  index_optimization_disabled: boolean,
-  field_type_refresh_interval: number,
-  index_template_type: string,
-  writable: boolean,
-  default: boolean,
-};
-
-type IndexSetsResponseType = {
-  total: number,
-  index_sets: Array<IndexSet>,
-  stats: {
-    [key: string]: {
-      documents: number,
-      indices: number,
-      size: number,
-    },
-  },
-};
+import {
+  IndexSet,
+  IndexSetsResponseType,
+  IndexSetsStoreState,
+} from 'components/indices/Types';
 
 const IndexSetsActions = ActionsProvider.getActions('IndexSets');
 
-const IndexSetsStore = Reflux.createStore({
+const IndexSetsStore = Reflux.createStore<IndexSetsStoreState>({
   listenables: [IndexSetsActions],
   indexSetsCount: undefined,
   indexSets: undefined,
@@ -78,6 +42,7 @@ const IndexSetsStore = Reflux.createStore({
       indexSetStats: this.indexSetStats,
     };
   },
+
   list(stats: boolean) {
     const url = qualifyUrl(ApiRoutes.IndexSetsApiController.list(stats).url);
     const promise = fetch('GET', url);

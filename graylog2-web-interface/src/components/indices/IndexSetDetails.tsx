@@ -20,9 +20,9 @@ import React from 'react';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import { Col } from 'components/graylog';
 import { IndicesConfiguration } from 'components/indices';
-import type { IndexSet } from 'stores/indices/IndexSetsStore';
 
 import StyledIndexSetDetailsRow from './StyledIndexSetDetailsRow';
+import { IndexSet } from './Types';
 
 type Props = {
   indexSet: IndexSet,
