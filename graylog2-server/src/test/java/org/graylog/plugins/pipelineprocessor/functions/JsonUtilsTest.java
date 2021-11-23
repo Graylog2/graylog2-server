@@ -26,6 +26,42 @@ import java.io.IOException;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 public class JsonUtilsTest {
+    private ObjectMapper mapper = new ObjectMapper();
+
+    @Test
+    public void extractArrays() throws IOException {
+        String jsonString = "{\"k0\":\"v0\",\"arr1\":[\"a1\",[\"a21\",\"a22\"],[],\"a2\"]}";
+
+        // delete all arrays
+        String expected = "{k0:v0}";
+        String result = JsonUtils.extractJson(jsonString, mapper, false, false, true);
+        assertThat(result).isEqualTo(expected);
+
+        // serialize arrays
+        expected = "{k0:v0,arr1:[\"a1\",[\"a21\",\"a22\"],[],\"a2\"]}";
+        result = JsonUtils.extractJson(jsonString, mapper, false, true, false);
+        assertThat(result).isEqualTo(expected);
+
+        // flatten arrays using element index
+        expected = "{k0:v0,arr1_0:a1,arr1_1_0:a21,arr1_1_1:a22,arr1_3:a2}";
+        result = JsonUtils.extractJson(jsonString, mapper, false, false, false);
+        assertThat(result).isEqualTo(expected);
+    }
+
+    @Test
+    public void extractObjects() throws IOException {
+        String jsonString = "{\"k0\":\"v0\",\"obj1\":{\"k1\":\"v1\",\"obj11\":{\"k11\":\"v11\",\"obj111\":{\"k111\":\"v111\"}}}}";
+
+        // flatten arrays by concatenating keys
+        String expected = "{k0:v0,obj1_k1:v1,obj1_obj11_k11:v11,obj1_obj11_obj111_k111:v111}";
+        String result = JsonUtils.extractJson(jsonString, mapper, true, false, true);
+        assertThat(result).isEqualTo(expected);
+
+        expected = "{k0:v0,obj1:k1:v1,obj11:{k11=v11, obj111={k111=v111}}}";
+        result = JsonUtils.extractJson(jsonString, mapper, false, false, true);
+        assertThat(result).isEqualTo(expected);
+    }
+
     @Test
     public void deleteLevel1Object() throws IOException {
         String jsonString = "{\"k0\":\"v0\",\"obj1\":{\"k1\":\"v1\"}}";
