@@ -17,7 +17,7 @@
 import * as React from 'react';
 import styled, { DefaultTheme, css, keyframes } from 'styled-components';
 import { debounce, uniq, isEmpty, delay } from 'lodash';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Overlay, Transition } from 'react-overlays';
 import BluebirdPromise from 'bluebird';
 import { useFormikContext } from 'formik';
@@ -198,12 +198,12 @@ const QueryValidation = ({ queryString, timeRange, streams, filter }: Props) => 
   useSyncSearchBarFormErrors({ queryString, filter, validationStatus: validationState?.status });
   const [shakingPopover, setShakingPopover] = useState(false);
 
-  const shakePopover = () => {
+  const shakePopover = useCallback(() => {
     if (!shakingPopover) {
       setShakingPopover(true);
       delay(() => setShakingPopover(false), 820);
     }
-  };
+  }, [shakingPopover]);
 
   useEffect(() => {
     const unsubscribe = QueriesActions.displayValidationErrors.completed.listen(() => {
@@ -219,7 +219,7 @@ const QueryValidation = ({ queryString, timeRange, streams, filter }: Props) => 
     return () => {
       unsubscribe();
     };
-  }, [showExplanation]);
+  }, [showExplanation, shakingPopover, shakePopover]);
 
   // We need to always display the container to avoid query inout resizing problems
   // we need to always display the overlay trigger to avoid overlay placement problems
