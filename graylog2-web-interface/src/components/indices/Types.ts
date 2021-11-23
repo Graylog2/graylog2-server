@@ -157,3 +157,64 @@ export const RetentionStrategyPropType = PropTypes.exact({
   default_config: RetentionStrategyConfigPropType.isRequired,
   json_schema: RetentionJsonSchemaPropType.isRequired,
 });
+export const IndexSetPropType = PropTypes.shape({
+  can_be_default: PropTypes.bool,
+  id: PropTypes.string,
+  title: PropTypes.string,
+  description: PropTypes.string.isRequired,
+  index_prefix: PropTypes.string.isRequired,
+  shards: PropTypes.number.isRequired,
+  replicas: PropTypes.number.isRequired,
+  rotation_strategy_class: PropTypes.string.isRequired,
+  rotation_strategy: RotationStrategyConfigPropType.isRequired,
+  retention_strategy_class: PropTypes.string.isRequired,
+  retention_strategy: RetentionStrategyConfigPropType.isRequired,
+  creation_date: PropTypes.string,
+  index_analyzer: PropTypes.string.isRequired,
+  index_optimization_max_num_segments: PropTypes.number.isRequired,
+  index_optimization_disabled: PropTypes.bool.isRequired,
+  field_type_refresh_interval: PropTypes.number.isRequired,
+  index_template_type: PropTypes.string,
+  writable: PropTypes.bool.isRequired,
+  default: PropTypes.bool,
+});
+export type IndexSet = {
+  can_be_default?: boolean,
+  id?: string,
+  title: string,
+  description: string,
+  index_prefix: string,
+  shards: number,
+  replicas: number,
+  rotation_strategy_class: string,
+  rotation_strategy: RotationStrategyConfig,
+  retention_strategy_class: string,
+  retention_strategy: RetentionStrategyConfig
+  creation_date?: string,
+  index_analyzer: string,
+  index_optimization_max_num_segments: number,
+  index_optimization_disabled: boolean,
+  field_type_refresh_interval: number,
+  index_template_type?: string,
+  writable: boolean,
+  default?: boolean,
+};
+
+export type IndexSetStats = {
+  [key: string]: {
+    documents: number,
+    indices: number,
+    size: number,
+  },
+}
+export type IndexSetsResponseType = {
+  total: number,
+  index_sets: Array<IndexSet>,
+  stats: IndexSetStats,
+};
+export type IndexSetsStoreState = {
+  indexSetsCount: number,
+  indexSets: Array<IndexSet>,
+  indexSetStats: IndexSetStats,
+  indexSet: IndexSet,
+}

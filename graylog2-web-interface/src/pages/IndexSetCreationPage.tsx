@@ -28,10 +28,16 @@ import CombinedProvider from 'injection/CombinedProvider';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
 import connect from 'stores/connect';
-import { IndexSetPropType, IndexSetsStoreState } from 'stores/indices/IndexSetsStore';
-import type { IndexSet } from 'stores/indices/IndexSetsStore';
-import { IndicesConfigurationStoreState, RetentionStrategyPropType, RotationStrategyPropType } from 'components/indices/Types';
-import type { RetentionStrategy, RotationStrategy } from 'components/indices/Types';
+import {
+  IndexSet,
+  RetentionStrategy,
+  RotationStrategy,
+  IndicesConfigurationStoreState,
+  RetentionStrategyPropType,
+  RotationStrategyPropType,
+  IndexSetsStoreState,
+  IndexSetPropType,
+} from 'components/indices/Types';
 import { Store } from 'stores/StoreTypes';
 
 const { IndexSetsActions, IndexSetsStore } = CombinedProvider.get('IndexSets');
@@ -127,6 +133,11 @@ IndexSetCreationPage.defaultProps = {
     retention_strategy: {
       max_number_of_indices: 20,
       type: 'org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig',
+    },
+    rotation_strategy_class: 'org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig',
+    rotation_strategy: {
+      max_docs_per_index: 20000000,
+      type: 'org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig',
     },
     index_analyzer: 'standard',
     index_optimization_max_num_segments: 1,

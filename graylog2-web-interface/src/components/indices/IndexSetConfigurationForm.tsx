@@ -28,7 +28,7 @@ import { Spinner, TimeUnitInput } from 'components/common';
 import IndexMaintenanceStrategiesConfiguration from 'components/indices/IndexMaintenanceStrategiesConfiguration';
 import 'components/indices/rotation';
 import 'components/indices/retention';
-import type { IndexSet } from 'stores/indices/IndexSetsStore';
+import type { IndexSet } from 'components/indices/Types';
 
 type Props = {
   indexSet: IndexSet,

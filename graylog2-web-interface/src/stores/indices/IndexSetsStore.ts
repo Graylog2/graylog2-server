@@ -15,76 +15,18 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import Reflux from 'reflux';
-import PropTypes from 'prop-types';
 
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import ActionsProvider from 'injection/ActionsProvider';
-import { RetentionStrategyConfig, RetentionStrategyConfigPropType, RotationStrategyConfig, RotationStrategyConfigPropType } from 'components/indices/Types';
+import {
+  IndexSet,
+  IndexSetsResponseType,
+  IndexSetsStoreState,
+} from 'components/indices/Types';
 
-export const IndexSetPropType = PropTypes.shape({
-  can_be_default: PropTypes.bool,
-  id: PropTypes.string,
-  title: PropTypes.string,
-  description: PropTypes.string.isRequired,
-  index_prefix: PropTypes.string.isRequired,
-  shards: PropTypes.number.isRequired,
-  replicas: PropTypes.number.isRequired,
-  rotation_strategy_class: PropTypes.string.isRequired,
-  rotation_strategy: RotationStrategyConfigPropType.isRequired,
-  retention_strategy_class: PropTypes.string.isRequired,
-  retention_strategy: RetentionStrategyConfigPropType.isRequired,
-  creation_date: PropTypes.string,
-  index_analyzer: PropTypes.string.isRequired,
-  index_optimization_max_num_segments: PropTypes.number.isRequired,
-  index_optimization_disabled: PropTypes.bool.isRequired,
-  field_type_refresh_interval: PropTypes.number.isRequired,
-  index_template_type: PropTypes.string,
-  writable: PropTypes.bool.isRequired,
-  default: PropTypes.bool.isRequired,
-});
-export type IndexSet = {
-  can_be_default?: boolean,
-  id?: string,
-  title: string,
-  description: string,
-  index_prefix: string,
-  shards: number,
-  replicas: number,
-  rotation_strategy_class: string,
-  rotation_strategy: RotationStrategyConfig,
-  retention_strategy_class: string,
-  retention_strategy: RetentionStrategyConfig
-  creation_date?: string,
-  index_analyzer: string,
-  index_optimization_max_num_segments: number,
-  index_optimization_disabled: boolean,
-  field_type_refresh_interval: number,
-  index_template_type?: string,
-  writable: boolean,
-  default?: boolean,
-};
-
-type IndexSetStats = {
-  [key: string]: {
-    documents: number,
-    indices: number,
-    size: number,
-  },
-}
-type IndexSetsResponseType = {
-  total: number,
-  index_sets: Array<IndexSet>,
-  stats: IndexSetStats,
-};
-export type IndexSetsStoreState = {
-  indexSetsCount: number,
-  indexSets: Array<IndexSet>,
-  indexSetStats: IndexSetStats,
-  indexSet: IndexSet,
-}
 const IndexSetsActions = ActionsProvider.getActions('IndexSets');
 
 const IndexSetsStore = Reflux.createStore<IndexSetsStoreState>({
@@ -100,6 +42,7 @@ const IndexSetsStore = Reflux.createStore<IndexSetsStoreState>({
       indexSetStats: this.indexSetStats,
     };
   },
+
   list(stats: boolean) {
     const url = qualifyUrl(ApiRoutes.IndexSetsApiController.list(stats).url);
     const promise = fetch('GET', url);

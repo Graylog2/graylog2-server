@@ -30,9 +30,9 @@ import CombinedProvider from 'injection/CombinedProvider';
 import Routes from 'routing/Routes';
 import withParams from 'routing/withParams';
 import connect from 'stores/connect';
-import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import type { IndexerOverview } from 'stores/indexers/IndexerOverviewStore';
 import type { Indices } from 'stores/indices/IndicesStore';
+import { IndexSet } from 'components/indices/Types';
 
 const { IndexSetsStore, IndexSetsActions } = CombinedProvider.get('IndexSets');
 const { IndicesStore, IndicesActions } = CombinedProvider.get('Indices');
@@ -123,7 +123,7 @@ class IndexSetPage extends React.Component<Props, State> {
                 We could not get the indices overview information. This usually means there was a problem
                 connecting to Elasticsearch, and <strong>you should ensure Elasticsearch is up and reachable from
                   Graylog
-                                                 </strong>.
+                </strong>.
               </p>
               <p>
                 Graylog will continue storing your messages in its journal, but you will not be able to search on them
