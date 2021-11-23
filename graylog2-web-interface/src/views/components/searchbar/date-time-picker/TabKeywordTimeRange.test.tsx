@@ -38,12 +38,6 @@ const TabKeywordTimeRange = ({ defaultValue, ...props }: { defaultValue: string 
   </Formik>
 );
 
-jest.mock('logic/datetimes/DateTime', () => ({
-  fromUTCDateTime: (date) => date,
-  getUserTimezone: () => 'Europe/Berlin',
-  fromDateTimeAndTZ: (date) => date,
-}));
-
 describe('TabKeywordTimeRange', () => {
   beforeEach(() => {
     asMock(ToolsStore.testNaturalDate).mockImplementation(() => Promise.resolve({
