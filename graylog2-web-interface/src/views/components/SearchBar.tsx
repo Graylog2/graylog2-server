@@ -45,7 +45,7 @@ import type { FilterType, QueryId } from 'views/logic/queries/Query';
 import type { SearchesConfig } from 'components/search/SearchConfig';
 import type { SearchBarFormValues } from 'views/Constants';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
-import QueryValidation from 'views/components/searchbar/queryinput/QueryValidation';
+import QueryValidation from 'views/components/searchbar/QueryValidation';
 
 import SearchBarForm from './searchbar/SearchBarForm';
 

@@ -36,7 +36,7 @@ import BottomRow from 'views/components/searchbar/BottomRow';
 import ViewActionsWrapper from 'views/components/searchbar/ViewActionsWrapper';
 import { SearchesConfig } from 'components/search/SearchConfig';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
-import QueryValidation from 'views/components/searchbar/queryinput/QueryValidation';
+import QueryValidation from 'views/components/searchbar/QueryValidation';
 
 import DashboardSearchForm from './DashboardSearchBarForm';
 import TimeRangeInput from './searchbar/TimeRangeInput';
