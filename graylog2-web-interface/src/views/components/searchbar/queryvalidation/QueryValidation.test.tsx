@@ -43,6 +43,10 @@ describe('QueryValidation', () => {
     explanations: [{
       errorType: 'ParseException',
       errorMessage: "Cannot parse 'source: '",
+      beginLine: 1,
+      endLine: 1,
+      beginColumn: 1,
+      endColumn: 5,
     }],
   };
 

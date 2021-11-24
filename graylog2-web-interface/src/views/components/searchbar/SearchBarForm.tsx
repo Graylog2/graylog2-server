@@ -22,6 +22,7 @@ import { Form, Formik } from 'formik';
 import { isFunction, isEmpty } from 'lodash';
 import type { FormikProps } from 'formik';
 
+import FormWarningsProvider from 'contexts/FormWarningsProvider';
 import { onInitializingTimerange, onSubmittingTimerange } from 'views/components/TimerangeForForm';
 import type { SearchBarFormValues } from 'views/Constants';
 import validateTimeRange from 'views/components/TimeRangeValidation';
@@ -85,11 +86,13 @@ const SearchBarForm = ({ initialValues, limitDuration, onSubmit, children, valid
             validate={({ timerange: nextTimeRange }) => validate(nextTimeRange, limitDuration)}
             validateOnMount={validateOnMount}>
       {(...args) => (
-        <DateTimeProvider limitDuration={limitDuration}>
-          <StyledForm>
-            {_isFunction(children) ? children(...args) : children}
-          </StyledForm>
-        </DateTimeProvider>
+        <FormWarningsProvider>
+          <DateTimeProvider limitDuration={limitDuration}>
+            <StyledForm>
+              {_isFunction(children) ? children(...args) : children}
+            </StyledForm>
+          </DateTimeProvider>
+        </FormWarningsProvider>
       )}
     </Formik>
   );

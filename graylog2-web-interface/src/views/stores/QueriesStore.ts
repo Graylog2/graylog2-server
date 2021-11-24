@@ -42,6 +42,10 @@ export type QueryValidationState = {
   explanations: Array<{
     errorType: string,
     errorMessage: string,
+    beginLine: number,
+    endLine: number,
+    beginColumn: number,
+    endColumn: number,
   }> | undefined
 }
 
@@ -224,9 +228,20 @@ export const QueriesStore: QueriesStoreType = singletonStore(
         if (result) {
           return ({
             status: result.status,
-            explanations: result.explanations?.map(({ error_type: errorType, error_message: errorMessage }) => ({
+            explanations: result.explanations?.map(({
+              error_type: errorType,
+              error_message: errorMessage,
+              begin_line: beginLine,
+              end_line: endLine,
+              begin_column: beginColumn,
+              end_column: endColumn,
+            }) => ({
               errorMessage,
               errorType,
+              beginLine,
+              endLine,
+              beginColumn,
+              endColumn,
             })),
           });
         }

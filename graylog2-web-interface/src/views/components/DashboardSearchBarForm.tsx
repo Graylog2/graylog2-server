@@ -23,6 +23,7 @@ import type { FormikProps } from 'formik';
 
 import type { TimeRange } from 'views/logic/queries/Query';
 import validateTimeRange from 'views/components/TimeRangeValidation';
+import FormWarningsProvider from 'contexts/FormWarningsProvider';
 
 import DateTimeProvider from './searchbar/date-time-picker/DateTimeProvider';
 import { onInitializingTimerange, onSubmittingTimerange } from './TimerangeForForm';
@@ -75,11 +76,13 @@ const DashboardSearchForm = ({ initialValues, limitDuration, onSubmit, children 
             validate={({ timerange: nextTimeRange }) => validate(nextTimeRange, limitDuration)}
             validateOnMount>
       {(...args) => (
-        <DateTimeProvider limitDuration={limitDuration}>
-          <Form>
-            {_isFunction(children) ? children(...args) : children}
-          </Form>
-        </DateTimeProvider>
+        <FormWarningsProvider>
+          <DateTimeProvider limitDuration={limitDuration}>
+            <Form>
+              {_isFunction(children) ? children(...args) : children}
+            </Form>
+          </DateTimeProvider>
+        </FormWarningsProvider>
       )}
     </Formik>
   );

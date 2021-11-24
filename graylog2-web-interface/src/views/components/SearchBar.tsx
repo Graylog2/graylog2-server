@@ -36,7 +36,7 @@ import StreamsFilter from 'views/components/searchbar/StreamsFilter';
 import RefreshControls from 'views/components/searchbar/RefreshControls';
 import ScrollToHint from 'views/components/common/ScrollToHint';
 import HorizontalSpacer from 'views/components/horizontalspacer/HorizontalSpacer';
-import { QueriesActions } from 'views/stores/QueriesStore';
+import { QueriesActions, QueryValidationState } from 'views/stores/QueriesStore';
 import { CurrentQueryStore } from 'views/stores/CurrentQueryStore';
 import { StreamsStore } from 'views/stores/StreamsStore';
 import { QueryFiltersStore } from 'views/stores/QueryFiltersStore';
@@ -46,6 +46,7 @@ import type { SearchesConfig } from 'components/search/SearchConfig';
 import type { SearchBarFormValues } from 'views/Constants';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import QueryValidation from 'views/components/searchbar/queryvalidation/QueryValidation';
+import FormWarningsContext from 'contexts/FormWarningsContext';
 
 import SearchBarForm from './searchbar/SearchBarForm';
 
@@ -129,71 +130,76 @@ const SearchBar = ({
                            limitDuration={limitDuration}
                            onSubmit={_onSubmit}>
               {({ dirty, errors, isSubmitting, isValid, handleSubmit, values, setFieldValue }) => (
-                <>
-                  <TopRow>
-                    <Col md={5}>
-                      <TimeRangeInput disabled={disableSearch}
-                                      onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
-                                      value={values?.timerange}
-                                      hasErrorOnMount={!!errors.timerange} />
-                    </Col>
+                <FormWarningsContext.Consumer>
+                  {({ warnings }) => (
+                    <>
+                      <TopRow>
+                        <Col md={5}>
+                          <TimeRangeInput disabled={disableSearch}
+                                          onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
+                                          value={values?.timerange}
+                                          hasErrorOnMount={!!errors.timerange} />
+                        </Col>
 
-                    <Col mdHidden lgHidden>
-                      <HorizontalSpacer />
-                    </Col>
+                        <Col mdHidden lgHidden>
+                          <HorizontalSpacer />
+                        </Col>
 
-                    <FlexCol md={7}>
-                      <StreamWrap>
-                        <Field name="streams">
-                          {({ field: { name, value, onChange } }) => (
-                            <StreamsFilter value={value}
-                                           streams={availableStreams}
-                                           onChange={(newStreams) => onChange({ target: { value: newStreams, name } })} />
-                          )}
-                        </Field>
-                      </StreamWrap>
+                        <FlexCol md={7}>
+                          <StreamWrap>
+                            <Field name="streams">
+                              {({ field: { name, value, onChange } }) => (
+                                <StreamsFilter value={value}
+                                               streams={availableStreams}
+                                               onChange={(newStreams) => onChange({ target: { value: newStreams, name } })} />
+                              )}
+                            </Field>
+                          </StreamWrap>
 
-                      <RefreshControls />
-                    </FlexCol>
-                  </TopRow>
+                          <RefreshControls />
+                        </FlexCol>
+                      </TopRow>
 
-                  <BottomRow>
-                    <SearchButtonAndQuery>
-                      <SearchButton disabled={disableSearch || isSubmitting || !isValid}
-                                    dirty={dirty} />
+                      <BottomRow>
+                        <SearchButtonAndQuery>
+                          <SearchButton disabled={disableSearch || isSubmitting || !isValid}
+                                        dirty={dirty} />
 
-                      <Field name="queryString">
-                        {({ field: { name, value, onChange }, meta: { error } }) => (
-                          <StyledQueryInput value={value}
-                                            placeholder='Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'
-                                            error={error}
-                                            onChange={(newQuery) => {
-                                              onChange({ target: { value: newQuery, name } });
+                          <Field name="queryString">
+                            {({ field: { name, value, onChange }, meta: { error } }) => (
+                              <StyledQueryInput value={value}
+                                                placeholder='Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'
+                                                error={error}
+                                                warning={warnings.queryString as QueryValidationState}
+                                                onChange={(newQuery) => {
+                                                  onChange({ target: { value: newQuery, name } });
 
-                                              return Promise.resolve(newQuery);
-                                            }}
-                                            onExecute={handleSubmit as () => void} />
+                                                  return Promise.resolve(newQuery);
+                                                }}
+                                                onExecute={handleSubmit as () => void} />
+                            )}
+                          </Field>
+
+                          <QueryValidation queryString={values?.queryString}
+                                           timeRange={values?.timerange}
+                                           streams={values?.streams} />
+
+                          <div className="search-help">
+                            <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
+                                               title="Search query syntax documentation"
+                                               text={<Icon name="lightbulb" />} />
+                          </div>
+                        </SearchButtonAndQuery>
+
+                        {!editing && (
+                          <ViewActionsWrapper>
+                            <SavedSearchControls />
+                          </ViewActionsWrapper>
                         )}
-                      </Field>
-
-                      <QueryValidation queryString={values?.queryString}
-                                       timeRange={values?.timerange}
-                                       streams={values?.streams} />
-
-                      <div className="search-help">
-                        <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
-                                           title="Search query syntax documentation"
-                                           text={<Icon name="lightbulb" />} />
-                      </div>
-                    </SearchButtonAndQuery>
-
-                    {!editing && (
-                      <ViewActionsWrapper>
-                        <SavedSearchControls />
-                      </ViewActionsWrapper>
-                    )}
-                  </BottomRow>
-                </>
+                      </BottomRow>
+                    </>
+                  )}
+                </FormWarningsContext.Consumer>
               )}
             </SearchBarForm>
           </FlatContentRow>

@@ -22,7 +22,7 @@ import PropTypes from 'prop-types';
 import { themePropTypes } from 'theme';
 import withPluginEntities from 'views/logic/withPluginEntities';
 import UserPreferencesContext from 'contexts/UserPreferencesContext';
-import { QueriesActions } from 'views/stores/QueriesStore';
+import { QueriesActions, QueryValidationState } from 'views/stores/QueriesStore';
 
 import type { AutoCompleter, Editor } from './ace-types';
 import StyledAceEditor from './queryinput/StyledAceEditor';
@@ -34,7 +34,7 @@ type Props = {
   completerFactory: (completers: Array<Completer>) => AutoCompleter,
   completers: Array<Completer>,
   disabled?: boolean,
-  error: string,
+  error?: QueryValidationState,
   height?: number,
   onBlur?: (query: string) => void,
   onChange: (query: string) => Promise<string>,
@@ -42,6 +42,7 @@ type Props = {
   placeholder?: string,
   theme: DefaultTheme,
   value: string,
+  warning?: QueryValidationState,
 };
 
 const defaultCompleterFactory = (completers) => new SearchBarAutoCompletions(completers);
@@ -80,6 +81,28 @@ const _configureEditor = (node, completer, onExecute) => {
   }
 };
 
+const getMarkers = (errors: QueryValidationState | undefined, warnings: QueryValidationState | undefined) => {
+  const markerClassName = 'ace_marker';
+  const createMarkers = (explanations = [], className) => explanations.map(({
+    beginLine,
+    beginColumn,
+    endLine,
+    endColumn,
+  }) => ({
+    startRow: beginLine ? beginLine - 1 : 0,
+    startCol: beginColumn,
+    endRow: endLine ? endLine - 1 : 0,
+    endCol: endColumn,
+    type: 'background',
+    className,
+  }));
+
+  return [
+    ...createMarkers(errors?.explanations, `${markerClassName} ace_validation_error`),
+    ...createMarkers(warnings?.explanations, `${markerClassName} ace_validation_warning`),
+  ];
+};
+
 const QueryInput = ({
   className,
   completerFactory = defaultCompleterFactory,
@@ -93,10 +116,12 @@ const QueryInput = ({
   placeholder,
   theme,
   value,
+  warning,
 }: Props) => {
   const completer = useMemo(() => completerFactory(completers), [completerFactory, completers]);
   const _onExecute = useCallback((editor: Editor) => handleExecution(editor, onExecute, value, error), [onExecute, value, error]);
   const configureEditor = useCallback((node) => _configureEditor(node, completer, _onExecute), [completer, _onExecute]);
+  const markers = useMemo(() => getMarkers(error, warning), [error, warning]);
 
   return (
     <div className={`query ${className}`} style={{ display: 'flex' }} data-testid="query-input">
@@ -124,7 +149,8 @@ const QueryInput = ({
                            }}
                            fontSize={theme.fonts.size.large}
                            placeholder={placeholder}
-                           $height={height} />
+                           $height={height}
+                           markers={markers} />
         )}
       </UserPreferencesContext.Consumer>
     </div>
@@ -144,6 +170,7 @@ QueryInput.propTypes = {
   placeholder: PropTypes.string,
   theme: themePropTypes.isRequired,
   value: PropTypes.string,
+  warning: PropTypes.object,
 };
 
 QueryInput.defaultProps = {
@@ -156,6 +183,7 @@ QueryInput.defaultProps = {
   onBlur: () => {},
   placeholder: '',
   value: '',
+  warning: undefined,
 };
 
 export default withPluginEntities(withTheme(QueryInput), { completers: 'views.completers' });

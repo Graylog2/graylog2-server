@@ -28,7 +28,7 @@ import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
 
 import useToggleOnSearchExecutionAttempt from './hooks/useToggleOnSearchExecutionAttempt';
-import useSyncSearchBarFormErrors from './hooks/useSyncSearchBarFormErrors';
+import { useSyncFormErrors, useSyncFormWarnings } from './hooks/useSyncFormValidationState';
 import useValidateQuery from './hooks/useValidateQuery';
 
 const Container = styled.div`
@@ -124,7 +124,8 @@ const QueryValidation = ({ queryString, timeRange, streams, filter }: Props) => 
   const validationState = useValidateQuery({ queryString, timeRange, streams, filter });
   const shakingPopover = useToggleOnSearchExecutionAttempt(showExplanation, setShowExplanation);
 
-  useSyncSearchBarFormErrors({ queryString, filter, validationStatus: validationState?.status });
+  useSyncFormErrors(validationState);
+  useSyncFormWarnings(validationState);
 
   // We need to always display the container to avoid query inout resizing problems
   // we need to always display the overlay trigger to avoid overlay placement problems

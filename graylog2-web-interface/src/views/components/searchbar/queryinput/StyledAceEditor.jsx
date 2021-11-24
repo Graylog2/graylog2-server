@@ -161,6 +161,21 @@ const StyledAceEditor = styled(AceEditor).attrs(({ aceTheme, theme }) => ({
       font-family: inherit !important;
       z-index: auto !important;
     }
+    
+    .ace_marker {  
+      border-bottom: 2px dashed;
+      position: absolute;
+      border-radius: 0;
+      margin-top: 1px;
+    }
+     
+    .ace_marker.ace_validation_error {
+      border-color: ${$scTheme.colors.variant.danger};
+    }
+    
+    .ace_marker.ace_validation_warning {
+      border-color: ${$scTheme.colors.variant.dark.warning};  
+    }
   }
 `);
 
