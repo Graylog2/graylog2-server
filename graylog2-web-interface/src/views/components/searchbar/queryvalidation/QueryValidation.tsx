@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import styled, { DefaultTheme, css, keyframes } from 'styled-components';
-import { uniq } from 'lodash';
 import { useState, useRef } from 'react';
 import { Overlay, Transition } from 'react-overlays';
 
@@ -95,20 +94,6 @@ const ExplanationTitle = ({ title }: { title: string }) => (
   </Title>
 );
 
-const getExplanationTitle = (status, explanations) => {
-  const baseTitle = StringUtils.capitalizeFirstLetter(status.toLocaleLowerCase());
-  const errorTitles = explanations.map(({ errorType }) => errorType);
-  const uniqErrorTitles = uniq(errorTitles).join(', ');
-
-  return `${baseTitle} (${uniqErrorTitles})`;
-};
-
-const uniqErrorMessages = (explanations) => {
-  const errorMessages = explanations.map(({ errorMessage }) => errorMessage);
-
-  return uniq(errorMessages).join('. ');
-};
-
 type Props = {
   filter?: ElasticsearchQueryString | string,
   queryString: ElasticsearchQueryString | string | undefined,
@@ -138,7 +123,6 @@ const QueryValidation = ({ queryString, timeRange, streams, filter }: Props) => 
   }
 
   const { status, explanations } = validationState;
-  const errorMessages = uniqErrorMessages(explanations);
 
   return (
     <Container ref={() => containerRef}>
@@ -155,9 +139,13 @@ const QueryValidation = ({ queryString, timeRange, streams, filter }: Props) => 
                  shouldUpdatePosition
                  transition={Transition}>
           <StyledPopover id="query-validation-error-explanation"
-                         title={<ExplanationTitle title={getExplanationTitle(status, explanations)} />}
+                         title={<ExplanationTitle title={StringUtils.capitalizeFirstLetter(status.toLocaleLowerCase())} />}
                          $shaking={shakingPopover}>
-            {errorMessages}
+            {explanations.map(({ errorType, errorMessage }) => (
+              <p>
+                <b>{errorType}</b>: {errorMessage}
+              </p>
+            ))}
           </StyledPopover>
         </Overlay>
       )}
