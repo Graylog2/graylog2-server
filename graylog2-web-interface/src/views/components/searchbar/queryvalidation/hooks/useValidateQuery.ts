@@ -1,17 +1,17 @@
 /*
- * copyright (c) 2020 graylog, inc.
+ * Copyright (C) 2020 Graylog, Inc.
  *
- * this program is free software: you can redistribute it and/or modify
- * it under the terms of the server side public license, version 1,
- * as published by mongodb, inc.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
  *
- * this program is distributed in the hope that it will be useful,
- * but without any warranty; without even the implied warranty of
- * merchantability or fitness for a particular purpose. see the
- * server side public license for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
  *
- * you should have received a copy of the server side public license
- * along with this program. if not, see
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { isEmpty, debounce } from 'lodash';
