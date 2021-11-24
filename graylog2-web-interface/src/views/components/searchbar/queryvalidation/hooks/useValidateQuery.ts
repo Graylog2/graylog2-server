@@ -1,3 +1,19 @@
+/*
+ * copyright (c) 2020 graylog, inc.
+ *
+ * this program is free software: you can redistribute it and/or modify
+ * it under the terms of the server side public license, version 1,
+ * as published by mongodb, inc.
+ *
+ * this program is distributed in the hope that it will be useful,
+ * but without any warranty; without even the implied warranty of
+ * merchantability or fitness for a particular purpose. see the
+ * server side public license for more details.
+ *
+ * you should have received a copy of the server side public license
+ * along with this program. if not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 import { isEmpty, debounce } from 'lodash';
 import { useRef, useState, useEffect } from 'react';
 import * as React from 'react';
