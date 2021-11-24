@@ -22,7 +22,8 @@ import PropTypes from 'prop-types';
 import { themePropTypes } from 'theme';
 import withPluginEntities from 'views/logic/withPluginEntities';
 import UserPreferencesContext from 'contexts/UserPreferencesContext';
-import { QueriesActions, QueryValidationState } from 'views/stores/QueriesStore';
+import { QueryValidationState } from 'views/stores/QueriesStore';
+import { SearchActions } from 'views/stores/SearchStore';
 
 import type { AutoCompleter, Editor } from './ace-types';
 import StyledAceEditor from './queryinput/StyledAceEditor';
@@ -53,7 +54,7 @@ const handleExecution = (editor, onExecute, value, error) => {
   }
 
   if (error) {
-    QueriesActions.displayValidationErrors();
+    SearchActions.triggerExecutionAttempt();
 
     return;
   }

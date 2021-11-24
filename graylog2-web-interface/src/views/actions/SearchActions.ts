@@ -54,6 +54,7 @@ type SearchActionsType = RefluxActions<{
   get: (searchId: SearchId) => Promise<SearchJson>,
   parameters: (parameters: (Array<Parameter> | Immutable.List<Parameter>)) => Promise<View>,
   setWidgetsToSearch: (filter: WidgetsToSearch) => Promise<void>,
+  triggerExecutionAttempt: () => Promise<void>,
 }>;
 
 const SearchActions: SearchActionsType = singletonActions(
@@ -82,6 +83,9 @@ const SearchActions: SearchActionsType = singletonActions(
     },
     setWidgetsToSearch: {
       asyncResult: false,
+    },
+    triggerExecutionAttempt: {
+      asyncResult: true,
     },
   }),
 );

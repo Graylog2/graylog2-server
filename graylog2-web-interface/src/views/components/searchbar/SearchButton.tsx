@@ -21,7 +21,6 @@ import styled, { css } from 'styled-components';
 import { Button } from 'components/bootstrap';
 import { Icon } from 'components/common';
 import { SearchActions } from 'views/stores/SearchStore';
-import { QueriesActions } from 'views/stores/QueriesStore';
 
 const StyledButton = styled(Button)`
   margin-right: 7px;
@@ -48,42 +47,42 @@ type Props = {
   dirty: boolean,
 };
 
-const DirtySearchButton = ({ disabled, glyph }: { disabled: boolean, glyph: string }) => (
+const onButtonClick = (e: MouseEvent, disabled: Boolean, onClick?: () => void) => {
+  if (disabled) {
+    e.preventDefault();
+    SearchActions.triggerExecutionAttempt();
+
+    return;
+  }
+
+  if (typeof onClick === 'function') {
+    onClick();
+  }
+};
+
+const DirtySearchButton = ({ glyph, className, disabled }: { disabled: boolean, glyph: string, className: string }) => (
   <DirtyButton type="submit"
                bsStyle="success"
-               disabled={disabled}
+               onClick={(e) => onButtonClick(e, disabled)}
                title="Perform search (changes were made after last search execution)"
-               className="pull-left">
+               className={className}>
     <Icon name={glyph} />
   </DirtyButton>
 );
 
-const CleanSearchButton = ({ disabled, glyph }: { disabled: boolean, glyph: string }) => (
+const CleanSearchButton = ({ disabled, glyph, className }: { disabled: boolean, glyph: string, className: string }) => (
   <StyledButton bsStyle="success"
-                onClick={() => SearchActions.refresh()}
-                disabled={disabled}
+                onClick={(e) => onButtonClick(e, disabled, SearchActions.refresh)}
                 title="Perform search"
-                className="pull-left">
+                className={className}>
     <Icon name={glyph} />
   </StyledButton>
 );
 
-const displayValidationErrors = () => {
-  QueriesActions.displayValidationErrors();
-};
+const SearchButton = ({ dirty, disabled, ...rest }: Props) => {
+  const className = disabled ? 'disabled' : '';
 
-const SearchButton = ({ dirty, ...rest }: Props) => {
-  const button = dirty ? <DirtySearchButton {...rest} /> : <CleanSearchButton {...rest} />;
-
-  if (rest.disabled) {
-    return (
-      <div onClick={displayValidationErrors}>
-        {button}
-      </div>
-    );
-  }
-
-  return button;
+  return dirty ? <DirtySearchButton className={className} disabled={disabled} {...rest} /> : <CleanSearchButton className={className} disabled={disabled} {...rest} />;
 };
 
 SearchButton.defaultProps = {

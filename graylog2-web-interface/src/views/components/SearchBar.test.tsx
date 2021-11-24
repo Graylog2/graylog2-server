@@ -37,6 +37,7 @@ jest.mock('views/stores/SearchStore', () => ({
   ),
   SearchActions: {
     refresh: jest.fn(),
+    triggerExecutionAttempt: { completed: { listen: () => () => {} } },
   },
 }));
 
@@ -112,15 +113,15 @@ describe('SearchBar', () => {
     await waitFor(() => expect(SearchActions.refresh).toHaveBeenCalledTimes(1));
   });
 
-  // it('date exceeding limitDuration should render with error Icon & search button disabled', async () => {
-  //   render(<SearchBar config={{ ...config, query_time_range_limit: 'PT1M' }} />);
+  it('date exceeding limitDuration should render with error Icon & search button disabled', async () => {
+    render(<SearchBar config={{ ...config, query_time_range_limit: 'PT1M' }} />);
 
-  //   const timeRangeButton = screen.getByLabelText('Open Time Range Selector');
-  //   const searchButton = screen.getByTitle('Perform search');
+    const timeRangeButton = screen.getByLabelText('Open Time Range Selector');
+    const searchButton = screen.getByTitle('Perform search');
 
-  //   await waitFor(() => expect(searchButton).toHaveAttribute('disabled'));
-  //   await waitFor(() => expect(timeRangeButton.firstChild).toHaveClass('fa-exclamation-triangle'));
-  // });
+    await waitFor(() => expect(searchButton).toHaveClass('disabled'));
+    await waitFor(() => expect(timeRangeButton.firstChild).toHaveClass('fa-exclamation-triangle'));
+  });
 
   it('should hide the save load controls if editing the widget', async () => {
     const focusedWidget: WidgetEditingState = { id: 'foo', editing: true, focusing: true };
