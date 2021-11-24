@@ -37,6 +37,9 @@ jest.mock('views/stores/SearchStore', () => ({
     'listen',
     ['getInitialState', () => ({ search: { parameters: [] } })],
   ),
+  SearchActions: {
+    triggerExecutionAttempt: { completed: { listen: () => () => {} } },
+  },
 }));
 
 describe('QueryValidation', () => {

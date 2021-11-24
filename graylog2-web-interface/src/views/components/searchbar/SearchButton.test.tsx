@@ -23,6 +23,7 @@ import SearchButton from 'views/components/searchbar/SearchButton';
 jest.mock('views/stores/SearchStore', () => ({
   SearchActions: {
     refresh: jest.fn(),
+    triggerExecutionAttempt: jest.fn(),
   },
 }));
 

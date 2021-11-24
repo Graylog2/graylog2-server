@@ -126,7 +126,12 @@ const QueryValidation = ({ queryString, timeRange, streams, filter }: Props) => 
 
   return (
     <Container ref={() => containerRef}>
-      <ExplanationTrigger title="Toggle validation error explanation" ref={explanationTriggerRef} onClick={toggleShow} $clickable tabIndex={0}>
+      <ExplanationTrigger title="Toggle validation error explanation"
+                          ref={explanationTriggerRef}
+                          onClick={toggleShow}
+                          $clickable
+                          tabIndex={0}
+                          type="button">
         <ErrorIcon $status={status} name="exclamation-circle" />
       </ExplanationTrigger>
 
