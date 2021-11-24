@@ -46,8 +46,13 @@ public abstract class ParsedTerm {
         return field().equals(EXISTS);
     }
 
-    public boolean isIllegalOperator() {
-        return field().equals(DEFAULT_FIELD) && ("and".equals(value()) || "or".equals(value()));
+
+    public boolean isDefaultField() {
+        return field().equals(DEFAULT_FIELD);
+    }
+
+    public boolean isInvalidOperator() {
+        return isDefaultField() && ("and".equals(value()) || "or".equals(value()));
     }
 
     public String getRealFieldName() {

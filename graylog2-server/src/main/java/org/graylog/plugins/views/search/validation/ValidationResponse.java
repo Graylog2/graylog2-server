@@ -29,22 +29,16 @@ public abstract class ValidationResponse {
     @NotNull
     public abstract ValidationStatus status();
     public abstract List<ValidationMessage> explanations();
-    public abstract Set<String> unknownFields();
-    public abstract Set<String> unknownTokens();
 
     public static ValidationResponse.Builder builder(ValidationStatus status) {
         return new AutoValue_ValidationResponse.Builder()
-                .status(status)
-                .unknownTokens(Collections.emptySet())
-                .unknownFields(Collections.emptySet());
+                .status(status);
     }
 
     @AutoValue.Builder
     public abstract static class Builder {
         public abstract Builder status(ValidationStatus status);
         public abstract Builder explanations(List<ValidationMessage> explanations);
-        public abstract Builder unknownFields(Set<String> unknownFields);
-        public abstract Builder unknownTokens(Set<String> unknownTokens);
         public abstract ValidationResponse build();
 
     }

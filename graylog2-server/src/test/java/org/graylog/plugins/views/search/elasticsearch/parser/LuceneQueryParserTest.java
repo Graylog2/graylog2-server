@@ -59,9 +59,9 @@ class LuceneQueryParserTest {
     void unknownTerm() throws ParseException {
         final ParsedQuery query = parser.parse("foo:bar and");
         assertThat(query.allFieldNames()).contains("foo");
-        assertThat(query.illegalOperators().stream().map(ParsedTerm::value).collect(Collectors.toSet())).contains("and");
+        assertThat(query.invalidOperators().stream().map(ParsedTerm::value).collect(Collectors.toSet())).contains("and");
 
-        final ParsedTerm term = query.illegalOperators().iterator().next();
+        final ParsedTerm term = query.invalidOperators().iterator().next();
         final Token token = term.tokens().iterator().next();
         assertThat(token).isNotNull();
 
@@ -72,24 +72,24 @@ class LuceneQueryParserTest {
     }
 
     @Test
-    void testIllegalOperators() throws ParseException {
+    void testInvalidOperators() throws ParseException {
         {
             final ParsedQuery query = parser.parse("foo:bar baz");
-            assertThat(query.illegalOperators()).isEmpty();
+            assertThat(query.invalidOperators()).isEmpty();
         }
 
         {
             final ParsedQuery queryWithAnd = parser.parse("foo:bar and");
-            assertThat(queryWithAnd.illegalOperators()).isNotEmpty();
-            final ParsedTerm illegalOperator = queryWithAnd.illegalOperators().iterator().next();
-            assertThat(illegalOperator.value()).isEqualTo("and");
+            assertThat(queryWithAnd.invalidOperators()).isNotEmpty();
+            final ParsedTerm invalidOperator = queryWithAnd.invalidOperators().iterator().next();
+            assertThat(invalidOperator.value()).isEqualTo("and");
         }
 
         {
             final ParsedQuery queryWithOr = parser.parse("foo:bar or");
-            assertThat(queryWithOr.illegalOperators()).isNotEmpty();
-            final ParsedTerm illegalOperator = queryWithOr.illegalOperators().iterator().next();
-            assertThat(illegalOperator.value()).isEqualTo("or");
+            assertThat(queryWithOr.invalidOperators()).isNotEmpty();
+            final ParsedTerm invalidOperator = queryWithOr.invalidOperators().iterator().next();
+            assertThat(invalidOperator.value()).isEqualTo("or");
         }
     }
 }

@@ -76,7 +76,7 @@ public class QueryValidationResource extends RestResource implements PluginRestR
         validationRequest.filter().ifPresent(q::filter);
 
         final ValidationResponse response = queryValidationService.validate(q.build());
-        return ValidationResponseDTO.create(toStatus(response.status()), toExplanations(response), response.unknownFields(), response.unknownTokens());
+        return ValidationResponseDTO.create(toStatus(response.status()), toExplanations(response));
     }
 
     private ImmutableSet<Parameter> resolveParameters(ValidationRequestDTO validationRequest) {

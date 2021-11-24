@@ -34,15 +34,7 @@ public abstract class ValidationResponseDTO {
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     public abstract List<ValidationMessageDTO> explanations();
 
-    @JsonProperty
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    public abstract Set<String> unknownFields();
-
-    @JsonProperty
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    public abstract Set<String> unknownTokens();
-
-    public static ValidationResponseDTO create(final ValidationStatusDTO status, final List<ValidationMessageDTO> explanations, final Set<String> unknownFields, Set<String> unknownTokens) {
-        return new AutoValue_ValidationResponseDTO(status, explanations, unknownFields, unknownTokens);
+    public static ValidationResponseDTO create(final ValidationStatusDTO status, final List<ValidationMessageDTO> explanations) {
+        return new AutoValue_ValidationResponseDTO(status, explanations);
     }
 }

@@ -84,8 +84,10 @@ public abstract class ValidationMessage {
 
         final Matcher positionMatcher = regexPosition.matcher(input);
         if (positionMatcher.find()) {
-            errorBuilder.beginLine(Integer.parseInt(positionMatcher.group(1)));
-            errorBuilder.beginColumn(Integer.parseInt(positionMatcher.group(2)));
+            errorBuilder.beginLine(1);
+            errorBuilder.beginColumn(0);
+            // errorBuilder.beginLine(Integer.parseInt(positionMatcher.group(1)));
+            // errorBuilder.beginColumn(Integer.parseInt(positionMatcher.group(2)));
             errorBuilder.endColumn(query.length());
             errorBuilder.endLine(countLines(query));
         }

@@ -28,6 +28,7 @@ import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -51,18 +52,16 @@ public class QueryValidationServiceImpl implements QueryValidationService {
         final String query = decoratedQuery(req);
         try {
             final ParsedQuery parsedQuery = luceneQueryParser.parse(query);
-            final List<ParsedTerm> unknownFields = getIllegalOperators(req, parsedQuery);
-            final List<ParsedTerm> unknownTokens = parsedQuery.illegalOperators();
-            final List<ValidationMessage> explanations = getExplanations(unknownFields, unknownTokens);
+            final List<ParsedTerm> unknownFields = getUnknownFields(req, parsedQuery);
+            final List<ParsedTerm> invalidOperators = parsedQuery.invalidOperators();
+            final List<ValidationMessage> explanations = getExplanations(unknownFields, invalidOperators);
             final ValidationStatus status = explanations.isEmpty() ? ValidationStatus.OK : ValidationStatus.WARNING;
             return ValidationResponse.builder(status)
                     .explanations(explanations)
-                    .unknownFields(unknownFields.stream().map(ParsedTerm::getRealFieldName).collect(Collectors.toSet()))
-                    .unknownTokens(unknownTokens.stream().map(ParsedTerm::value).collect(Collectors.toSet()))
                     .build();
 
         } catch (ParseException e) {
-            return  ValidationResponse.builder(ValidationStatus.ERROR).explanations(toExplanation(query, e)).build();
+            return ValidationResponse.builder(ValidationStatus.ERROR).explanations(toExplanation(query, e)).build();
         }
     }
 
@@ -70,7 +69,7 @@ public class QueryValidationServiceImpl implements QueryValidationService {
         return Collections.singletonList(ValidationMessage.fromException(query, parseException));
     }
 
-    private List<ValidationMessage> getExplanations(List<ParsedTerm> unknownFields, List<ParsedTerm> unknownTokens) {
+    private List<ValidationMessage> getExplanations(List<ParsedTerm> unknownFields, List<ParsedTerm> invalidOperators) {
         List<ValidationMessage> messages = new ArrayList<>();
 
         unknownFields.stream().map(f -> {
@@ -89,11 +88,12 @@ public class QueryValidationServiceImpl implements QueryValidationService {
 
         }).forEach(messages::add);
 
-        unknownTokens.stream()
+        invalidOperators.stream()
                 .map(token -> {
+                    final String errorMessage = String.format(Locale.ROOT, "Query contains invalid operator \"%s\". Both AND / OR operators have to be written uppercase", token.value());
                     final ValidationMessage.Builder message = ValidationMessage.builder()
-                            .errorType("Unknown token")
-                            .errorMessage("Query contains unrecognized token: " + token.value());
+                            .errorType("Invalid operator")
+                            .errorMessage(errorMessage);
                     token.tokens().stream().findFirst().ifPresent(t -> {
                         message.beginLine(t.beginLine);
                         message.beginColumn(t.beginColumn);
@@ -106,14 +106,14 @@ public class QueryValidationServiceImpl implements QueryValidationService {
         return messages;
     }
 
-    private List<ParsedTerm> getIllegalOperators(ValidationRequest req, ParsedQuery query) {
+    private List<ParsedTerm> getUnknownFields(ValidationRequest req, ParsedQuery query) {
         final Set<String> availableFields = mappedFieldTypesService.fieldTypesByStreamIds(req.streams(), req.timerange())
                 .stream()
                 .map(MappedFieldTypeDTO::name)
                 .collect(Collectors.toSet());
 
         return query.terms().stream()
-                .filter(t -> !t.isIllegalOperator())
+                .filter(t -> !t.isDefaultField())
                 .filter(term -> !availableFields.contains(term.getRealFieldName()))
                 .collect(Collectors.toList());
     }

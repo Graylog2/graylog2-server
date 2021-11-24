@@ -40,14 +40,14 @@ public abstract class ParsedQuery {
 
     public Set<String> allFieldNames() {
         return terms().stream()
-                .filter(t -> !t.isIllegalOperator())
+                .filter(t -> !t.isInvalidOperator())
                 .map(ParsedTerm::getRealFieldName)
                 .collect(Collectors.toSet());
     }
 
-    public List<ParsedTerm> illegalOperators() {
+    public List<ParsedTerm> invalidOperators() {
         return terms().stream()
-                .filter(ParsedTerm::isIllegalOperator)
+                .filter(ParsedTerm::isInvalidOperator)
                 .collect(Collectors.toList());
     }
 
