@@ -36,7 +36,10 @@ const Container = styled.div`
   width: 25px;
 `;
 
-const ExplanationTrigger = styled.div<{ $clickable?: boolean }>(({ $clickable }) => `
+const ExplanationTrigger = styled.button<{ $clickable?: boolean }>(({ $clickable }) => `
+  padding: 0;
+  background: transparent;
+  border: 0;
   display: flex;
   align-items: center;
   min-height: 35px;
@@ -113,12 +116,9 @@ const QueryValidation = ({ queryString, timeRange, streams, filter }: Props) => 
   useSyncFormWarnings(validationState);
 
   // We need to always display the container to avoid query inout resizing problems
-  // we need to always display the overlay trigger to avoid overlay placement problems
   if (!validationState || validationState.status === 'OK') {
     return (
-      <Container ref={() => containerRef}>
-        <ExplanationTrigger ref={explanationTriggerRef} />
-      </Container>
+      <Container ref={() => containerRef} />
     );
   }
 
@@ -126,7 +126,7 @@ const QueryValidation = ({ queryString, timeRange, streams, filter }: Props) => 
 
   return (
     <Container ref={() => containerRef}>
-      <ExplanationTrigger title="Toggle validation error explanation" ref={explanationTriggerRef} onClick={toggleShow} $clickable>
+      <ExplanationTrigger title="Toggle validation error explanation" ref={explanationTriggerRef} onClick={toggleShow} $clickable tabIndex={0}>
         <ErrorIcon $status={status} name="exclamation-circle" />
       </ExplanationTrigger>
 
