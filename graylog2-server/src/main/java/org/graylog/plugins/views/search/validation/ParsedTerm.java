@@ -18,7 +18,6 @@ package org.graylog.plugins.views.search.validation;
 
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 import org.apache.lucene.queryparser.classic.Token;
 
 import javax.validation.constraints.NotNull;
@@ -26,7 +25,7 @@ import javax.validation.constraints.NotNull;
 @AutoValue
 public abstract class ParsedTerm {
 
-    public static final String UNKNOWN_TERM = "_unknown_";
+    public static final String DEFAULT_FIELD = "_default_";
     public static final String EXISTS = "_exists_";
 
     public abstract String field();
@@ -40,15 +39,15 @@ public abstract class ParsedTerm {
     }
 
     public static ParsedTerm unknown(final String term) {
-        return builder().field(UNKNOWN_TERM).value(term).build();
+        return builder().field(DEFAULT_FIELD).value(term).build();
     }
 
     public boolean isExistsField() {
         return field().equals(EXISTS);
     }
 
-    public boolean isUnknownToken() {
-        return field().equals(UNKNOWN_TERM);
+    public boolean isIllegalOperator() {
+        return field().equals(DEFAULT_FIELD) && ("and".equals(value()) || "or".equals(value()));
     }
 
     public String getRealFieldName() {

@@ -23,7 +23,6 @@ import org.graylog.plugins.views.search.validation.ParsedQuery;
 import org.graylog.plugins.views.search.validation.ParsedTerm;
 import org.junit.jupiter.api.Test;
 
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -60,9 +59,9 @@ class LuceneQueryParserTest {
     void unknownTerm() throws ParseException {
         final ParsedQuery query = parser.parse("foo:bar and");
         assertThat(query.allFieldNames()).contains("foo");
-        assertThat(query.unknownTokens().stream().map(ParsedTerm::value).collect(Collectors.toSet())).contains("and");
+        assertThat(query.illegalOperators().stream().map(ParsedTerm::value).collect(Collectors.toSet())).contains("and");
 
-        final ParsedTerm term = query.unknownTokens().iterator().next();
+        final ParsedTerm term = query.illegalOperators().iterator().next();
         final Token token = term.tokens().iterator().next();
         assertThat(token).isNotNull();
 
@@ -70,7 +69,27 @@ class LuceneQueryParserTest {
         assertThat(token.beginLine).isEqualTo(1);
         assertThat(token.endColumn).isEqualTo(11);
         assertThat(token.endLine).isEqualTo(1);
+    }
 
+    @Test
+    void testIllegalOperators() throws ParseException {
+        {
+            final ParsedQuery query = parser.parse("foo:bar baz");
+            assertThat(query.illegalOperators()).isEmpty();
+        }
 
+        {
+            final ParsedQuery queryWithAnd = parser.parse("foo:bar and");
+            assertThat(queryWithAnd.illegalOperators()).isNotEmpty();
+            final ParsedTerm illegalOperator = queryWithAnd.illegalOperators().iterator().next();
+            assertThat(illegalOperator.value()).isEqualTo("and");
+        }
+
+        {
+            final ParsedQuery queryWithOr = parser.parse("foo:bar or");
+            assertThat(queryWithOr.illegalOperators()).isNotEmpty();
+            final ParsedTerm illegalOperator = queryWithOr.illegalOperators().iterator().next();
+            assertThat(illegalOperator.value()).isEqualTo("or");
+        }
     }
 }

@@ -40,14 +40,14 @@ public abstract class ParsedQuery {
 
     public Set<String> allFieldNames() {
         return terms().stream()
-                .filter(t -> !t.isUnknownToken())
+                .filter(t -> !t.isIllegalOperator())
                 .map(ParsedTerm::getRealFieldName)
                 .collect(Collectors.toSet());
     }
 
-    public List<ParsedTerm> unknownTokens() {
+    public List<ParsedTerm> illegalOperators() {
         return terms().stream()
-                .filter(ParsedTerm::isUnknownToken)
+                .filter(ParsedTerm::isIllegalOperator)
                 .collect(Collectors.toList());
     }
 

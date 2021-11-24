@@ -51,8 +51,8 @@ public class QueryValidationServiceImpl implements QueryValidationService {
         final String query = decoratedQuery(req);
         try {
             final ParsedQuery parsedQuery = luceneQueryParser.parse(query);
-            final List<ParsedTerm> unknownFields = getUnknownFields(req, parsedQuery);
-            final List<ParsedTerm> unknownTokens = parsedQuery.unknownTokens();
+            final List<ParsedTerm> unknownFields = getIllegalOperators(req, parsedQuery);
+            final List<ParsedTerm> unknownTokens = parsedQuery.illegalOperators();
             final List<ValidationMessage> explanations = getExplanations(unknownFields, unknownTokens);
             final ValidationStatus status = explanations.isEmpty() ? ValidationStatus.OK : ValidationStatus.WARNING;
             return ValidationResponse.builder(status)
@@ -106,14 +106,14 @@ public class QueryValidationServiceImpl implements QueryValidationService {
         return messages;
     }
 
-    private List<ParsedTerm> getUnknownFields(ValidationRequest req, ParsedQuery query) {
+    private List<ParsedTerm> getIllegalOperators(ValidationRequest req, ParsedQuery query) {
         final Set<String> availableFields = mappedFieldTypesService.fieldTypesByStreamIds(req.streams(), req.timerange())
                 .stream()
                 .map(MappedFieldTypeDTO::name)
                 .collect(Collectors.toSet());
 
         return query.terms().stream()
-                .filter(t -> !t.isUnknownToken())
+                .filter(t -> !t.isIllegalOperator())
                 .filter(term -> !availableFields.contains(term.getRealFieldName()))
                 .collect(Collectors.toList());
     }

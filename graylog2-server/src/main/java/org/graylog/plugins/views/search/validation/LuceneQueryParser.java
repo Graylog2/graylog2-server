@@ -27,13 +27,12 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.QueryVisitor;
 
 import java.util.List;
-import java.util.Optional;
 
 public class LuceneQueryParser {
     private final TermCollectingQueryParser parser;
 
     public LuceneQueryParser() {
-        this.parser = new TermCollectingQueryParser(ParsedTerm.UNKNOWN_TERM, new StandardAnalyzer());
+        this.parser = new TermCollectingQueryParser(ParsedTerm.DEFAULT_FIELD, new StandardAnalyzer());
     }
 
     public ParsedQuery parse(final String query) throws ParseException {
@@ -54,7 +53,7 @@ public class LuceneQueryParser {
                             .field(field)
                             .value(t.text());
 
-                    if (field.equals(ParsedTerm.UNKNOWN_TERM)) {
+                    if (field.equals(ParsedTerm.DEFAULT_FIELD)) {
                         tokens.stream()
                                 .filter(token -> token.kind == QueryParserConstants.TERM)
                                 .filter(token -> token.image.equals(t.text()))
