@@ -22,6 +22,7 @@ const ConfigurationActions = Reflux.createActions({
   listMessageProcessorsConfig: { asyncResult: true },
   listEventsClusterConfig: { asyncResult: true },
   listWhiteListConfig: { asyncResult: true },
+  listPermissionsConfig: { asyncResult: true },
   update: { asyncResult: true },
   updateWhitelist: { asyncResult: true },
   updateMessageProcessorsConfig: { asyncResult: true },

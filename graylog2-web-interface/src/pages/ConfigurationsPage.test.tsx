@@ -42,6 +42,7 @@ jest.mock('actions/configurations/ConfigurationActions', () => ({
   listWhiteListConfig: jest.fn(() => Promise.resolve()),
   list: jest.fn(() => Promise.resolve()),
   listMessageProcessorsConfig: jest.fn(() => Promise.resolve()),
+  listPermissionsConfig: jest.fn(() => Promise.resolve()),
 }));
 
 jest.mock('stores/streams/StreamsStore', () => ({
