@@ -141,11 +141,13 @@ const QueryValidation = ({ queryString, timeRange, streams, filter }: Props) => 
           <StyledPopover id="query-validation-error-explanation"
                          title={<ExplanationTitle title={StringUtils.capitalizeFirstLetter(status.toLocaleLowerCase())} />}
                          $shaking={shakingPopover}>
-            {explanations.map(({ errorType, errorMessage }) => (
-              <p>
-                <b>{errorType}</b>: {errorMessage}
-              </p>
-            ))}
+            <div role="alert">
+              {explanations.map(({ errorType, errorMessage }) => (
+                <p key={errorMessage}>
+                  <b>{errorType}</b>: {errorMessage}
+                </p>
+              ))}
+            </div>
           </StyledPopover>
         </Overlay>
       )}

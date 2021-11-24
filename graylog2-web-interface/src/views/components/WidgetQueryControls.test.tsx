@@ -67,7 +67,7 @@ jest.mock('moment', () => {
   return Object.assign(() => mockMoment('2019-10-10T12:26:31.146Z'), mockMoment);
 });
 
-jest.mock('views/components/searchbar/queryinput/QueryValidation', () => mockComponent('QueryValidation'));
+jest.mock('views/components/searchbar/queryvalidation/QueryValidation', () => mockComponent('QueryValidation'));
 jest.mock('views/components/searchbar/QueryInput', () => ({ value = '' }: { value: string }) => <span>{value}</span>);
 
 jest.mock('views/stores/SearchConfigStore', () => ({
