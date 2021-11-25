@@ -21,9 +21,11 @@ import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.security.GranteeAuthorizer;
 import org.graylog.security.shares.EntityShareResponse.AvailableGrantee;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.UserService;
+import org.graylog2.users.UserAndTeamsConfig;
 
 import javax.inject.Inject;
 import java.util.Collections;
@@ -33,19 +35,24 @@ public class DefaultGranteeService implements GranteeService {
     protected final UserService userService;
     protected final GRNRegistry grnRegistry;
     protected final GranteeAuthorizer.Factory granteeAuthorizerFactory;
+    protected final ClusterConfigService clusterConfigService;
 
     @Inject
-    public DefaultGranteeService(UserService userService, GRNRegistry grnRegistry, GranteeAuthorizer.Factory granteeAuthorizerFactory) {
+    public DefaultGranteeService(UserService userService,
+                                 GRNRegistry grnRegistry,
+                                 GranteeAuthorizer.Factory granteeAuthorizerFactory,
+                                 ClusterConfigService clusterConfigService) {
         this.userService = userService;
         this.grnRegistry = grnRegistry;
         this.granteeAuthorizerFactory = granteeAuthorizerFactory;
+        this.clusterConfigService = clusterConfigService;
     }
 
     @Override
     public ImmutableSet<AvailableGrantee> getAvailableGrantees(User sharingUser) {
         return ImmutableSet.<AvailableGrantee>builder()
                 .addAll(getAvailableUserGrantees(sharingUser))
-                .add(getGlobalGrantee())
+                .addAll(getGlobalGrantees())
                 .build();
     }
 
@@ -68,6 +75,11 @@ public class DefaultGranteeService implements GranteeService {
     }
 
     private ImmutableSet<AvailableGrantee> getAvailableUserGrantees(User sharingUser) {
+        final UserAndTeamsConfig config = clusterConfigService.getOrDefault(UserAndTeamsConfig.class, UserAndTeamsConfig.DEFAULT_VALUES);
+        if (!config.sharingWithUsers()) {
+            return ImmutableSet.of();
+        }
+
         return getVisibleUsers(sharingUser).stream()
                 // Don't return the sharing user in available grantees until we want to support that sharing users
                 // can remove themselves from an entity.
@@ -80,6 +92,15 @@ public class DefaultGranteeService implements GranteeService {
                 .collect(ImmutableSet.toImmutableSet());
     }
 
+    private ImmutableSet<AvailableGrantee> getGlobalGrantees() {
+        final ImmutableSet.Builder<AvailableGrantee> builder = ImmutableSet.<AvailableGrantee>builder();
+        final UserAndTeamsConfig config = clusterConfigService.getOrDefault(UserAndTeamsConfig.class, UserAndTeamsConfig.DEFAULT_VALUES);
+        if (config.sharingWithEveryone()) {
+            builder.add(getGlobalGrantee());
+        }
+        return builder.build();
+    }
+
     private AvailableGrantee getGlobalGrantee() {
         return AvailableGrantee.create(
                 GRNRegistry.GLOBAL_USER_GRN,
@@ -87,5 +108,4 @@ public class DefaultGranteeService implements GranteeService {
                 "Everyone"
         );
     }
-
 }
