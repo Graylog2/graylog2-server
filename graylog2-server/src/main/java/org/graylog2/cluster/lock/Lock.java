@@ -22,11 +22,11 @@ import java.time.ZonedDateTime;
 
 @AutoValue
 public abstract class Lock {
-    static final String FIELD_RESOURCE_NAME = "resource";
+    static final String FIELD_RESOURCE = "resource";
     static final String FIELD_LOCKED_BY = "locked_by";
     static final String FIELD_UPDATED_AT = "updated_at";
 
-    public abstract String resourceName();
+    public abstract String resource();
 
     public abstract String lockedBy();
 
@@ -40,7 +40,7 @@ public abstract class Lock {
 
     @AutoValue.Builder
     public abstract static class Builder {
-        public abstract Builder resourceName(String resourceName);
+        public abstract Builder resource(String resource);
 
         public abstract Builder lockedBy(String lockedBy);
 

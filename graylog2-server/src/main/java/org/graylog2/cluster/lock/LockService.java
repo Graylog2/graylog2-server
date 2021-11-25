@@ -20,7 +20,7 @@ import javax.annotation.Nonnull;
 import java.util.Optional;
 
 public interface LockService {
-    Optional<Lock> lock(@Nonnull String resourceName);
+    Optional<Lock> lock(@Nonnull String resource);
 
-    Optional<Lock> unlock(@Nonnull String resourceName);
+    Optional<Lock> unlock(@Nonnull String resource);
 }

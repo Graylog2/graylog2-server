@@ -53,7 +53,7 @@ public abstract class MongoLockServiceTest {
         final Optional<Lock> lock = lockService.lock("test-resource");
 
         assertThat(lock).hasValueSatisfying(l -> {
-            assertThat(l.resourceName()).isEqualTo("test-resource");
+            assertThat(l.resource()).isEqualTo("test-resource");
             assertThat(l.lockedBy()).isEqualTo("some-node-id");
             assertThat(l.createdAt()).isCloseTo(now, within(10, SECONDS));
             assertThat(l.updatedAt()).isCloseTo(now, within(10, SECONDS));
@@ -68,7 +68,7 @@ public abstract class MongoLockServiceTest {
         final Optional<Lock> lock = lockService.lock("test-resource");
 
         assertThat(lock).hasValueSatisfying(l -> {
-            assertThat(l.resourceName()).isEqualTo(orig.resourceName());
+            assertThat(l.resource()).isEqualTo(orig.resource());
             assertThat(l.lockedBy()).isEqualTo(orig.lockedBy());
             assertThat(l.createdAt()).isEqualTo(orig.createdAt());
             assertThat(l.updatedAt()).isAfter(orig.updatedAt());
@@ -96,7 +96,7 @@ public abstract class MongoLockServiceTest {
 
         final Optional<Lock> deletedLock = otherNodesLockService.unlock("test-resource");
         assertThat(deletedLock).hasValueSatisfying(l -> {
-            assertThat(l.resourceName()).isEqualTo(orig.resourceName());
+            assertThat(l.resource()).isEqualTo(orig.resource());
             assertThat(l.lockedBy()).isEqualTo(orig.lockedBy());
         });
 
