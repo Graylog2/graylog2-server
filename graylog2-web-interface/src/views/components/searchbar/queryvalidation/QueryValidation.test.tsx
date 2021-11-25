@@ -21,7 +21,7 @@ import * as Immutable from 'immutable';
 import { Form, Formik } from 'formik';
 
 import QueryValidation, { QueryValidationState } from 'views/components/searchbar/queryvalidation/QueryValidation';
-import { asMock, StoreMock as MockStore } from 'helpers/mocking';
+import { asMock } from 'helpers/mocking';
 import FormWarningsProvider from 'contexts/FormWarningsProvider';
 import fetch from 'logic/rest/FetchProvider';
 import DefaultQueryClientProvider from 'contexts/DefaultQueryClientProvider';
@@ -34,10 +34,10 @@ jest.mock('views/stores/QueriesStore', () => ({
 }));
 
 jest.mock('views/stores/SearchStore', () => ({
-  SearchStore: MockStore(
-    'listen',
-    ['getInitialState', () => ({ search: { parameters: [] } })],
-  ),
+  SearchStore: {
+    listen: jest.fn(),
+    getInitialState: jest.fn(() => ({ search: { parameters: [] } })),
+  },
   SearchActions: {
     triggerExecutionAttempt: { completed: { listen: () => () => {} } },
   },
