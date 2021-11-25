@@ -37,7 +37,10 @@ export type WhiteListConfig = {
   entries: Array<Url>,
   disabled: boolean,
 };
-
+export type PermissionsConfigType = {
+  allow_sharing_with_everyone: boolean,
+  allow_sharing_with_users: boolean,
+}
 export type ConfigurationsStoreState = {
   configuration: Record<string, any>,
   searchesClusterConfig: SearchesConfig,
@@ -114,6 +117,25 @@ const ConfigurationsStore = Reflux.createStore<ConfigurationsStoreState>({
     });
 
     ConfigurationActions.listWhiteListConfig.promise(promise);
+  },
+
+  listPermissionsConfig(configType) {
+    const promise = fetch('GET', this._url(`/${configType}`)).then((response: PermissionsConfigType) => {
+      this.configuration = {
+        ...this.configuration,
+        // default values bellow should be the same in backend.
+        [configType]: response || {
+          allow_sharing_with_everyone: true,
+          allow_sharing_with_users: true,
+        },
+      };
+
+      this.propagateChanges();
+
+      return response;
+    });
+
+    ConfigurationActions.listPermissionsConfig.promise(promise);
   },
 
   listEventsClusterConfig() {
