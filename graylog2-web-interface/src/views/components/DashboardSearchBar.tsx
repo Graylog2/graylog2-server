@@ -20,6 +20,7 @@ import PropTypes from 'prop-types';
 import { Field } from 'formik';
 import moment from 'moment';
 import styled, { css } from 'styled-components';
+import { useIsFetching } from 'react-query';
 
 import connect from 'stores/connect';
 import DocumentationLink from 'components/support/DocumentationLink';
@@ -92,6 +93,7 @@ const StyledQueryInput = styled(QueryInput)`
 `;
 
 const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onExecute: performSearch }: Props) => {
+  const isValidatingQuery = !!useIsFetching('validateSearchQuery');
   const submitForm = useCallback(({ timerange, queryString }) => GlobalOverrideActions.set(timerange, queryString)
     .then(() => performSearch()), [performSearch]);
 
@@ -127,7 +129,7 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
 
                       <BottomRow>
                         <SearchButtonAndQuery>
-                          <SearchButton disabled={disableSearch || isSubmitting || !isValid}
+                          <SearchButton disabled={disableSearch || isSubmitting || isValidatingQuery || !isValid}
                                         glyph="filter"
                                         dirty={dirty} />
 

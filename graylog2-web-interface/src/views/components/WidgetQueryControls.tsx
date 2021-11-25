@@ -20,6 +20,7 @@ import { Field } from 'formik';
 import { isEmpty } from 'lodash';
 import moment from 'moment';
 import styled from 'styled-components';
+import { useIsFetching } from 'react-query';
 
 import WidgetEditApplyAllChangesContext from 'views/components/contexts/WidgetEditApplyAllChangesContext';
 import { StreamsStore } from 'views/stores/StreamsStore';
@@ -38,9 +39,8 @@ import WidgetContext from 'views/components/contexts/WidgetContext';
 import { GlobalOverrideStore, GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
 import { SearchActions } from 'views/stores/SearchStore';
 import { PropagateValidationState } from 'views/components/aggregationwizard';
-import QueryValidation from 'views/components/searchbar/queryvalidation/QueryValidation';
+import QueryValidation, { QueryValidationState } from 'views/components/searchbar/queryvalidation/QueryValidation';
 import FormWarningsContext from 'contexts/FormWarningsContext';
-import { QueryValidationState } from 'views/stores/QueriesStore';
 
 import TimeRangeOverrideInfo from './searchbar/WidgetTimeRangeOverride';
 import TimeRangeInput from './searchbar/TimeRangeInput';
@@ -109,6 +109,7 @@ const useBindApplySearchControlsChanges = (formRef) => {
 const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
   const widget = useContext(WidgetContext);
   const config = useStore(SearchConfigStore, ({ searchesClusterConfig }) => searchesClusterConfig);
+  const isValidatingQuery = !!useIsFetching('validateSearchQuery');
   const limitDuration = moment.duration(config?.query_time_range_limit).asSeconds() ?? 0;
   const { streams } = widget;
   const timerange = widget.timerange ?? DEFAULT_TIMERANGE;
@@ -157,7 +158,7 @@ const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
                 </WidgetTopRow>
 
                 <SecondRow>
-                  <SearchButton disabled={isSubmitting || !isValid}
+                  <SearchButton disabled={isSubmitting || isValidatingQuery || !isValid}
                                 dirty={dirty} />
 
                   <Field name="queryString">

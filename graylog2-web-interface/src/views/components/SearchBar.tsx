@@ -20,6 +20,7 @@ import * as Immutable from 'immutable';
 import { Field } from 'formik';
 import styled from 'styled-components';
 import moment from 'moment';
+import { useIsFetching } from 'react-query';
 
 import connect from 'stores/connect';
 import DocumentationLink from 'components/support/DocumentationLink';
@@ -109,6 +110,8 @@ const SearchBar = ({
   queryFilters,
   onSubmit = defaultProps.onSubmit,
 }: Props) => {
+  const isValidatingQuery = !!useIsFetching('validateSearchQuery');
+
   if (!currentQuery || !config) {
     return <Spinner />;
   }
@@ -162,7 +165,7 @@ const SearchBar = ({
 
                       <BottomRow>
                         <SearchButtonAndQuery>
-                          <SearchButton disabled={disableSearch || isSubmitting || !isValid}
+                          <SearchButton disabled={disableSearch || isSubmitting || isValidatingQuery || !isValid}
                                         dirty={dirty} />
 
                           <Field name="queryString">
