@@ -15,42 +15,69 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { isEmpty, debounce } from 'lodash';
-import { useRef, useState, useEffect } from 'react';
-import * as React from 'react';
-import BluebirdPromise from 'bluebird';
+import { useEffect } from 'react';
+import { useQuery } from 'react-query';
 
 import { useStore } from 'stores/connect';
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
 import { SearchStore } from 'views/stores/SearchStore';
-import { QueryValidationState, QueriesActions } from 'views/stores/QueriesStore';
-import { ElasticsearchQueryString } from 'views/logic/queries/Query';
+import { QueryValidationState } from 'views/stores/QueriesStore';
+import type { ElasticsearchQueryString, TimeRange } from 'views/logic/queries/Query';
+import fetch from 'logic/rest/FetchProvider';
+import { qualifyUrl } from 'util/URLUtils';
+import { NoTimeRangeOverride } from 'views/logic/queries/Query';
 
-const validateQuery = debounce(({ queryString, timeRange, streams, setValidationState, parameters, parameterBindings, filter }, validationPromise: React.MutableRefObject<BluebirdPromise>) => {
-  if (validationPromise.current) {
-    validationPromise.current.cancel();
-  }
-
-  // eslint-disable-next-line no-param-reassign
-  validationPromise.current = QueriesActions.validateQuery({
-    queryString,
-    timeRange,
+const validateQuery = ({ queryString, timeRange, streams, parameters, parameterBindings, filter }) => {
+  const payload = {
+    query: queryString,
+    timerange: timeRange,
     streams,
-    parameters,
-    parameterBindings,
     filter,
-  }).then((result) => {
-    setValidationState(result);
-  }).finally(() => {
-    // eslint-disable-next-line no-param-reassign
-    validationPromise.current = undefined;
+    parameters,
+    parameter_bindings: parameterBindings,
+  };
+
+  return fetch('POST', qualifyUrl('/search/validate'), payload).then((result) => {
+    if (result) {
+      return ({
+        status: result.status,
+        explanations: result.explanations?.map(({
+          error_type: errorType,
+          error_message: errorMessage,
+          begin_line: beginLine,
+          end_line: endLine,
+          begin_column: beginColumn,
+          end_column: endColumn,
+        }) => ({
+          errorMessage,
+          errorType,
+          beginLine,
+          endLine,
+          beginColumn,
+          endColumn,
+        })),
+      });
+    }
+
+    return undefined;
   });
-}, 350);
+};
 
 const queryExists = (query: string | ElasticsearchQueryString) => {
   return typeof query === 'object' ? !!query.query_string : !!query;
 };
 
-const useValidationPayload = ({ queryString, timeRange, streams, filter }) => {
+const useValidationPayload = ({
+  queryString,
+  timeRange,
+  streams,
+  filter,
+}: {
+  queryString: string | ElasticsearchQueryString | undefined,
+  timeRange?: TimeRange | NoTimeRangeOverride | undefined,
+  streams?: Array<string>,
+  filter?: string | ElasticsearchQueryString
+}) => {
   const { parameterBindings } = useStore(SearchExecutionStateStore);
   const { search: { parameters } } = useStore(SearchStore);
 
@@ -64,22 +91,35 @@ const useValidationPayload = ({ queryString, timeRange, streams, filter }) => {
   });
 };
 
-const useValidateQuery = (queryData): QueryValidationState | undefined => {
-  const validationPromise = useRef<BluebirdPromise>(undefined);
-  const [validationState, setValidationState] = useState(undefined);
+const debouncedRefetch = debounce((refetch) => {
+  refetch({ cancelRefetch: true });
+}, 350);
+
+const useValidateQuery = (queryData: {
+  queryString: string | ElasticsearchQueryString | undefined,
+  timeRange?: TimeRange | NoTimeRangeOverride | undefined,
+  streams?: Array<string>,
+  filter?: string | ElasticsearchQueryString
+}): QueryValidationState | undefined => {
   const { queryString, timeRange, streams, filter, parameterBindings, parameters } = useValidationPayload(queryData);
+
+  const { data: validationState, refetch, remove } = useQuery(
+    'validateSearchQuery',
+    () => validateQuery({ queryString, timeRange, streams, parameters, parameterBindings, filter }),
+    { enabled: false },
+  );
 
   useEffect(() => {
     if (queryExists(queryString) || queryExists(filter)) {
-      validateQuery({ queryString, timeRange, streams, setValidationState, parameters, parameterBindings, filter }, validationPromise);
+      debouncedRefetch(refetch);
     }
-  }, [filter, queryString, timeRange, streams, parameterBindings, parameters, validationPromise]);
+  }, [filter, queryString, refetch]);
 
   useEffect(() => {
     if (!queryExists(queryString) && !queryExists(filter) && validationState) {
-      setValidationState(undefined);
+      remove();
     }
-  }, [queryString, filter, validationState]);
+  }, [queryString, filter, validationState, remove]);
 
   return validationState;
 };

@@ -26,6 +26,8 @@ import buttonStyles from 'components/bootstrap/styles/buttonStyles';
 import aceEditorStyles from 'components/bootstrap/styles/aceEditorStyles';
 import DefaultQueryClientProvider from 'contexts/DefaultQueryClientProvider';
 
+import DefaultQueryClientProvider from '../src/contexts/DefaultQueryClientProvider';
+
 const WrappingContainer = ({ children }) => {
   const themeColors = colors[THEME_MODE_LIGHT];
   const formattedUtils = {

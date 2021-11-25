@@ -20,7 +20,7 @@ import { useState, useRef } from 'react';
 import { Overlay, Transition } from 'react-overlays';
 
 import { Popover } from 'components/bootstrap';
-import { Icon } from 'components/common';
+import Icon from 'components/common/Icon';
 import StringUtils from 'util/StringUtils';
 import { TimeRange, NoTimeRangeOverride, ElasticsearchQueryString } from 'views/logic/queries/Query';
 import DocumentationLink from 'components/support/DocumentationLink';

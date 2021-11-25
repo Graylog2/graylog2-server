@@ -25,10 +25,6 @@ import { QueriesActions } from 'views/actions/QueriesActions';
 import type { QueryId, TimeRange, TimeRangeTypes } from 'views/logic/queries/Query';
 import Query from 'views/logic/queries/Query';
 import { singletonStore } from 'logic/singleton';
-import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
-import type Parameter from 'views/logic/parameters/Parameter';
-import type { ParameterBindings } from 'views/logic/search/SearchExecutionState';
 
 import { ViewActions, ViewStore } from './ViewStore';
 import { ViewStatesActions } from './ViewStatesStore';
@@ -197,59 +193,6 @@ export const QueriesStore: QueriesStoreType = singletonStore(
       }) as Promise<QueriesList>;
 
       QueriesActions.rangeType.promise(promise);
-
-      return promise;
-    },
-
-    validateQuery({
-      queryString,
-      timeRange,
-      streams,
-      filter,
-      parameters,
-      parameterBindings,
-    }: {
-      queryString: string,
-      timeRange: TimeRange | undefined,
-      streams?: Array<string> | undefined,
-      filter?: string,
-      parameters?: Array<Parameter>,
-      parameterBindings?: ParameterBindings,
-    }): Promise<QueryValidationState | undefined> {
-      const payload = {
-        query: queryString,
-        timerange: timeRange,
-        streams,
-        filter,
-        parameters,
-        parameter_bindings: parameterBindings,
-      };
-      const promise = fetch('POST', qualifyUrl('/search/validate'), payload).then((result) => {
-        if (result) {
-          return ({
-            status: result.status,
-            explanations: result.explanations?.map(({
-              error_type: errorType,
-              error_message: errorMessage,
-              begin_line: beginLine,
-              end_line: endLine,
-              begin_column: beginColumn,
-              end_column: endColumn,
-            }) => ({
-              errorMessage,
-              errorType,
-              beginLine,
-              endLine,
-              beginColumn,
-              endColumn,
-            })),
-          });
-        }
-
-        return undefined;
-      });
-
-      QueriesActions.validateQuery.promise(promise);
 
       return promise;
     },
