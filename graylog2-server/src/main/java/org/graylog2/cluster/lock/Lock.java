@@ -18,7 +18,7 @@ package org.graylog2.cluster.lock;
 
 import com.google.auto.value.AutoValue;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @AutoValue
 public abstract class Lock {
@@ -30,9 +30,9 @@ public abstract class Lock {
 
     public abstract String lockedBy();
 
-    public abstract LocalDateTime createdAt();
+    public abstract ZonedDateTime createdAt();
 
-    public abstract LocalDateTime updatedAt();
+    public abstract ZonedDateTime updatedAt();
 
     public static Builder builder() {
         return new AutoValue_Lock.Builder();
@@ -44,9 +44,9 @@ public abstract class Lock {
 
         public abstract Builder lockedBy(String lockedBy);
 
-        public abstract Builder createdAt(LocalDateTime createdAt);
+        public abstract Builder createdAt(ZonedDateTime createdAt);
 
-        public abstract Builder updatedAt(LocalDateTime updatedAt);
+        public abstract Builder updatedAt(ZonedDateTime updatedAt);
 
         public abstract Lock build();
     }

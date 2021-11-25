@@ -35,8 +35,8 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -138,14 +138,12 @@ public class MongoLockService implements LockService {
     }
 
     private Lock toLock(Document doc) {
-        final LocalDateTime createdAt =
+        final ZonedDateTime createdAt =
                 Instant.ofEpochSecond(doc.getObjectId("_id").getTimestamp())
-                        .atZone(ZoneId.systemDefault())
-                        .toLocalDateTime();
+                        .atZone(ZoneOffset.UTC);
 
-        final LocalDateTime updatedAt = doc.getDate(FIELD_UPDATED_AT).toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDateTime();
+        final ZonedDateTime updatedAt = doc.getDate(FIELD_UPDATED_AT).toInstant()
+                .atZone(ZoneOffset.UTC);
 
         return Lock.builder()
                 .resourceName(doc.getString(FIELD_RESOURCE_NAME))

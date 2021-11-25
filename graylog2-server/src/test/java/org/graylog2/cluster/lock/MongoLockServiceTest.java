@@ -24,8 +24,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -48,7 +48,7 @@ public abstract class MongoLockServiceTest {
 
     @Test
     void newLock() {
-        LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
+        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
 
         final Optional<Lock> lock = lockService.lock("test-resource");
 
