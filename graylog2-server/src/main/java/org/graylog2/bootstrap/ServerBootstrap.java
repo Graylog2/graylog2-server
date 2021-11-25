@@ -212,7 +212,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
         LOG.info("Running {} migrations...", migrations.size());
 
         ImmutableSortedSet.copyOf(migrations).forEach(m -> {
-            LOG.info("Running migration <{}>", m.getClass().getCanonicalName());
+            LOG.debug("Running migration <{}>", m.getClass().getCanonicalName());
             m.upgrade();
         });
     }
