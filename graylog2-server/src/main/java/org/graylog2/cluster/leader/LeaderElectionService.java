@@ -17,7 +17,18 @@
 package org.graylog2.cluster.leader;
 
 public interface LeaderElectionService {
+    /**
+     * Check if the current node is the leader of the cluster.
+     * <p>
+     * <em>This method might be called frequently. Implementations should be performant and resource-friendly.</em>
+     * </p>
+     *
+     * @return true if the current node is the leader, false if it is not
+     */
     boolean isLeader();
 
+    /**
+     * Releases leadership claim of the current node.
+     */
     void giveUpLeader();
 }
