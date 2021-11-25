@@ -52,8 +52,8 @@ const validateQuery = ({ queryString, timeRange, streams, parameters, parameterB
         }) => ({
           errorMessage,
           errorType,
-          beginLine,
-          endLine,
+          beginLine: beginLine ? beginLine - 1 : 0,
+          endLine: endLine ? endLine - 1 : 0,
           beginColumn,
           endColumn,
         })),
@@ -103,6 +103,7 @@ const useValidateQuery = (queryData: {
   filter?: string | ElasticsearchQueryString
 }): QueryValidationState | undefined => {
   const { queryString, timeRange, streams, filter, parameterBindings, parameters } = useValidationPayload(queryData);
+  const hasQueryString = queryExists(queryString) || queryExists(filter);
 
   const { data: validationState, refetch, remove } = useQuery(
     'validateSearchQuery',
@@ -111,16 +112,16 @@ const useValidateQuery = (queryData: {
   );
 
   useEffect(() => {
-    if (queryExists(queryString) || queryExists(filter)) {
+    if (hasQueryString) {
       debouncedRefetch(refetch);
     }
-  }, [filter, queryString, refetch]);
+  }, [hasQueryString, refetch]);
 
   useEffect(() => {
-    if (!queryExists(queryString) && !queryExists(filter) && validationState) {
+    if (!hasQueryString && validationState) {
       remove();
     }
-  }, [queryString, filter, validationState, remove]);
+  }, [hasQueryString, validationState, remove]);
 
   return validationState;
 };

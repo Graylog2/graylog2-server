@@ -90,9 +90,9 @@ const getMarkers = (errors: QueryValidationState | undefined, warnings: QueryVal
     endLine,
     endColumn,
   }) => ({
-    startRow: beginLine ? beginLine - 1 : 0,
+    startRow: beginLine,
     startCol: beginColumn,
-    endRow: endLine ? endLine - 1 : 0,
+    endRow: endLine,
     endCol: endColumn,
     type: 'background',
     className,
