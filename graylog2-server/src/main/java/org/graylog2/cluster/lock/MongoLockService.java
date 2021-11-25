@@ -97,7 +97,7 @@ public class MongoLockService implements LockService {
     }
 
     /**
-     * Request a lock. If a lock already exists, the lock expiry time will be
+     * Request a lock. If a lock already exists, the lock expiry time will be extended.
      *
      * @param resource Unique identifier for the resource that should be guarded by this lock.
      * @return A {@link Lock} object, if a lock was obtained. An empty {@link Optional}, if no lock could be acquired.
