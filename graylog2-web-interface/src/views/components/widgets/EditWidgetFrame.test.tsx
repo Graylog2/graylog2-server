@@ -22,6 +22,7 @@ import MockStore from 'helpers/mocking/StoreMock';
 import { WidgetActions } from 'views/stores/WidgetStore';
 import { SearchActions } from 'views/stores/SearchStore';
 import Widget from 'views/logic/widgets/Widget';
+import DefaultQueryClientProvider from 'contexts/DefaultQueryClientProvider';
 
 import EditWidgetFrame from './EditWidgetFrame';
 
@@ -80,14 +81,16 @@ describe('EditWidgetFrame', () => {
       .config({})
       .build();
     const renderSUT = () => render((
-      <ViewTypeContext.Provider value="DASHBOARD">
-        <WidgetContext.Provider value={widget}>
-          <EditWidgetFrame onCancel={() => {}} onFinish={() => {}}>
-            <>Hello World!</>
-            <>These are some buttons!</>
-          </EditWidgetFrame>
-        </WidgetContext.Provider>
-      </ViewTypeContext.Provider>
+      <DefaultQueryClientProvider>
+        <ViewTypeContext.Provider value="DASHBOARD">
+          <WidgetContext.Provider value={widget}>
+            <EditWidgetFrame onCancel={() => {}} onFinish={() => {}}>
+              <>Hello World!</>
+              <>These are some buttons!</>
+            </EditWidgetFrame>
+          </WidgetContext.Provider>
+        </ViewTypeContext.Provider>
+      </DefaultQueryClientProvider>
     ));
 
     it('performs search when clicking on search button', async () => {

@@ -25,6 +25,7 @@ import WidgetFocusContext, {
   WidgetEditingState,
   WidgetFocusingState,
 } from 'views/components/contexts/WidgetFocusContext';
+import DefaultQueryClientProvider from 'contexts/DefaultQueryClientProvider';
 
 import DashboardSearchBar from './DashboardSearchBar';
 
@@ -68,8 +69,14 @@ const config = {
 describe('DashboardSearchBar', () => {
   const onExecute = jest.fn();
 
+  const SUT = (props) => (
+    <DefaultQueryClientProvider>
+      <DashboardSearchBar {...props} />
+    </DefaultQueryClientProvider>
+  );
+
   it('should render the DashboardSearchBar', async () => {
-    render(<DashboardSearchBar onExecute={onExecute} config={config} />);
+    render(<SUT onExecute={onExecute} config={config} />);
 
     await screen.findByLabelText('Open Time Range Selector');
     await screen.findByLabelText('Search Time Range, Opens Time Range Selector On Click');
@@ -78,13 +85,13 @@ describe('DashboardSearchBar', () => {
   });
 
   it('defaults to no override being selected', async () => {
-    render(<DashboardSearchBar onExecute={onExecute} config={config} />);
+    render(<SUT onExecute={onExecute} config={config} />);
 
     await screen.findByText('No Override');
   });
 
   it('should refresh search when button is clicked', async () => {
-    render(<DashboardSearchBar onExecute={onExecute} config={config} />);
+    render(<SUT onExecute={onExecute} config={config} />);
 
     const searchButton = screen.getByTitle('Perform search');
 
@@ -94,7 +101,7 @@ describe('DashboardSearchBar', () => {
   });
 
   it('should call onExecute and set global override when search is performed', async () => {
-    render(<DashboardSearchBar onExecute={onExecute} config={config} />);
+    render(<SUT onExecute={onExecute} config={config} />);
 
     const timeRangeInput = await screen.findByText(/no override/i);
 
@@ -124,7 +131,7 @@ describe('DashboardSearchBar', () => {
 
     render(
       <WidgetFocusContext.Provider value={widgetFocusContext}>
-        <DashboardSearchBar onExecute={onExecute} config={config} />
+        <SUT onExecute={onExecute} config={config} />
       </WidgetFocusContext.Provider>,
     );
 
@@ -147,7 +154,7 @@ describe('DashboardSearchBar', () => {
 
     render(
       <WidgetFocusContext.Provider value={widgetFocusContext}>
-        <DashboardSearchBar onExecute={onExecute} config={config} />
+        <SUT onExecute={onExecute} config={config} />
       </WidgetFocusContext.Provider>,
     );
 

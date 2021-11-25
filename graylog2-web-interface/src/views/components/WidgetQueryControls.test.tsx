@@ -24,6 +24,7 @@ import { SearchActions } from 'views/stores/SearchStore';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
 import Widget from 'views/logic/widgets/Widget';
 import mockComponent from 'helpers/mocking/MockComponent';
+import DefaultQueryClientProvider from 'contexts/DefaultQueryClientProvider';
 
 import WidgetQueryControls from './WidgetQueryControls';
 import WidgetContext from './contexts/WidgetContext';
@@ -106,11 +107,13 @@ describe('WidgetQueryControls', () => {
     .build();
 
   const Wrapper = ({ children }: { children: React.ReactNode }) => (
-    <WrappingContainer>
-      <WidgetContext.Provider value={widget}>
-        {children}
-      </WidgetContext.Provider>
-    </WrappingContainer>
+    <DefaultQueryClientProvider>
+      <WrappingContainer>
+        <WidgetContext.Provider value={widget}>
+          {children}
+        </WidgetContext.Provider>
+      </WrappingContainer>
+    </DefaultQueryClientProvider>
   );
 
   const renderSUT = (props = {}) => render(

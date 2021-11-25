@@ -25,6 +25,7 @@ import { default as MockQuery } from 'views/logic/queries/Query';
 import WidgetFocusContext, {
   WidgetEditingState, WidgetFocusingState,
 } from 'views/components/contexts/WidgetFocusContext';
+import DefaultQueryClientProvider from 'contexts/DefaultQueryClientProvider';
 
 import SearchBar from './SearchBar';
 
@@ -85,8 +86,14 @@ describe('SearchBar', () => {
     SearchActions.refresh = mockAction(jest.fn());
   });
 
+  const SUT = (props) => (
+    <DefaultQueryClientProvider>
+      <SearchBar {...props} />
+    </DefaultQueryClientProvider>
+  );
+
   it('should render the SearchBar', async () => {
-    render(<SearchBar config={config} />);
+    render(<SUT config={config} />);
 
     const timeRangeButton = await screen.findByLabelText('Open Time Range Selector');
     const timeRangeDisplay = screen.getByLabelText('Search Time Range, Opens Time Range Selector On Click');
@@ -104,7 +111,7 @@ describe('SearchBar', () => {
   });
 
   it('should update query when search is performed', async () => {
-    render(<SearchBar config={config} />);
+    render(<SUT config={config} />);
 
     const searchButton = await screen.findByTitle('Perform search');
 
@@ -114,7 +121,7 @@ describe('SearchBar', () => {
   });
 
   it('date exceeding limitDuration should render with error Icon & search button disabled', async () => {
-    render(<SearchBar config={{ ...config, query_time_range_limit: 'PT1M' }} />);
+    render(<SUT config={{ ...config, query_time_range_limit: 'PT1M' }} />);
 
     const timeRangeButton = screen.getByLabelText('Open Time Range Selector');
     const searchButton = screen.getByTitle('Perform search');
@@ -135,7 +142,7 @@ describe('SearchBar', () => {
 
     render(
       <WidgetFocusContext.Provider value={widgetFocusContext}>
-        <SearchBar config={config} />
+        <SUT config={config} />
       </WidgetFocusContext.Provider>,
     );
 
@@ -157,7 +164,7 @@ describe('SearchBar', () => {
 
     render(
       <WidgetFocusContext.Provider value={widgetFocusContext}>
-        <SearchBar config={config} />
+        <SUT config={config} />
       </WidgetFocusContext.Provider>,
     );
 
