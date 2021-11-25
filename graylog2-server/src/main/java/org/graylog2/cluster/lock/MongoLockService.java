@@ -24,6 +24,7 @@ import com.mongodb.client.model.FindOneAndUpdateOptions;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.ReturnDocument;
+import com.mongodb.client.model.Updates;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.graylog2.database.MongoConnection;
@@ -45,6 +46,7 @@ import java.util.concurrent.TimeUnit;
 import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Updates.currentDate;
+import static com.mongodb.client.model.Updates.setOnInsert;
 import static org.graylog2.cluster.lock.Lock.FIELD_LOCKED_BY;
 import static org.graylog2.cluster.lock.Lock.FIELD_RESOURCE;
 import static org.graylog2.cluster.lock.Lock.FIELD_UPDATED_AT;
@@ -109,7 +111,11 @@ public class MongoLockService implements LockService {
         try {
             final Document doc = collection.findOneAndUpdate(
                     and(eq(FIELD_RESOURCE, resource), eq(FIELD_LOCKED_BY, nodeId.toString())),
-                    currentDate(FIELD_UPDATED_AT),
+                    Updates.combine(
+                            currentDate(FIELD_UPDATED_AT),
+                            setOnInsert(FIELD_RESOURCE, resource), // not necessary, but added for clarify
+                            setOnInsert(FIELD_LOCKED_BY, nodeId.toString()) // not necessary, but added for clarify
+                    ),
                     new FindOneAndUpdateOptions().upsert(true).returnDocument(ReturnDocument.AFTER));
 
             return Optional.of(toLock(Objects.requireNonNull(doc)));
