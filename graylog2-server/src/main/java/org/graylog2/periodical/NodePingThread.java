@@ -61,6 +61,7 @@ public class NodePingThread extends Periodical {
     }
 
     @Override
+    // This method is "synchronized" because we are also calling it directly in AutomaticLeaderElectionService
     public synchronized void doRun() {
         final boolean isMaster = leaderElectionService.isLeader();
         try {
