@@ -22,8 +22,8 @@ import PropTypes from 'prop-types';
 import { themePropTypes } from 'theme';
 import withPluginEntities from 'views/logic/withPluginEntities';
 import UserPreferencesContext from 'contexts/UserPreferencesContext';
-import { QueryValidationState } from 'views/stores/QueriesStore';
 import { SearchActions } from 'views/stores/SearchStore';
+import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/QueryValidation';
 
 import type { AutoCompleter, Editor } from './ace-types';
 import StyledAceEditor from './queryinput/StyledAceEditor';

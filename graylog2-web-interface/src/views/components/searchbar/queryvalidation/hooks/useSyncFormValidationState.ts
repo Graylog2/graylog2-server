@@ -19,7 +19,7 @@ import { useFormikContext } from 'formik';
 import { isEqual } from 'lodash';
 
 import FormWarningsContext from 'contexts/FormWarningsContext';
-import { QueryValidationState } from 'views/stores/QueriesStore';
+import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/QueryValidation';
 
 const useSyncState = ({
   statusType,

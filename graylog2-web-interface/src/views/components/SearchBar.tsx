@@ -36,7 +36,8 @@ import StreamsFilter from 'views/components/searchbar/StreamsFilter';
 import RefreshControls from 'views/components/searchbar/RefreshControls';
 import ScrollToHint from 'views/components/common/ScrollToHint';
 import HorizontalSpacer from 'views/components/horizontalspacer/HorizontalSpacer';
-import { QueriesActions, QueryValidationState } from 'views/stores/QueriesStore';
+import { QueriesActions } from 'views/stores/QueriesStore';
+import QueryValidation, { QueryValidationState } from 'views/components/searchbar/queryvalidation/QueryValidation';
 import { CurrentQueryStore } from 'views/stores/CurrentQueryStore';
 import { StreamsStore } from 'views/stores/StreamsStore';
 import { QueryFiltersStore } from 'views/stores/QueryFiltersStore';
@@ -45,7 +46,6 @@ import type { FilterType, QueryId } from 'views/logic/queries/Query';
 import type { SearchesConfig } from 'components/search/SearchConfig';
 import type { SearchBarFormValues } from 'views/Constants';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
-import QueryValidation from 'views/components/searchbar/queryvalidation/QueryValidation';
 import FormWarningsContext from 'contexts/FormWarningsContext';
 
 import SearchBarForm from './searchbar/SearchBarForm';

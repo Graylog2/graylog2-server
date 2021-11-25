@@ -30,6 +30,18 @@ import useToggleOnSearchExecutionAttempt from './hooks/useToggleOnSearchExecutio
 import { useSyncFormErrors, useSyncFormWarnings } from './hooks/useSyncFormValidationState';
 import useValidateQuery from './hooks/useValidateQuery';
 
+export type QueryValidationState = {
+  status: 'OK' | 'ERROR' | 'WARNING',
+  explanations: Array<{
+    errorType: string,
+    errorMessage: string,
+    beginLine: number,
+    endLine: number,
+    beginColumn: number,
+    endColumn: number,
+  }> | undefined
+}
+
 const Container = styled.div`
   margin-right: 5px;
   margin-left: 5px;

@@ -21,11 +21,12 @@ import { useQuery } from 'react-query';
 import { useStore } from 'stores/connect';
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
 import { SearchStore } from 'views/stores/SearchStore';
-import { QueryValidationState } from 'views/stores/QueriesStore';
 import type { ElasticsearchQueryString, TimeRange } from 'views/logic/queries/Query';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import { NoTimeRangeOverride } from 'views/logic/queries/Query';
+
+import { QueryValidationState } from '../QueryValidation';
 
 const validateQuery = ({ queryString, timeRange, streams, parameters, parameterBindings, filter }) => {
   const payload = {

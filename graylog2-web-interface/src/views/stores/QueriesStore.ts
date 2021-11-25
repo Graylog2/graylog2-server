@@ -33,18 +33,6 @@ import type { QueriesList } from '../actions/QueriesActions';
 
 export { QueriesActions } from 'views/actions/QueriesActions';
 
-export type QueryValidationState = {
-  status: 'OK' | 'ERROR' | 'WARNING',
-  explanations: Array<{
-    errorType: string,
-    errorMessage: string,
-    beginLine: number,
-    endLine: number,
-    beginColumn: number,
-    endColumn: number,
-  }> | undefined
-}
-
 type QueriesStoreState = Immutable.OrderedMap<QueryId, Query>;
 
 type QueriesStoreType = Store<QueriesStoreState>;
