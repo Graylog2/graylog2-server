@@ -75,6 +75,7 @@ import org.graylog.plugins.pipelineprocessor.functions.ips.CidrMatch;
 import org.graylog.plugins.pipelineprocessor.functions.ips.IpAddressConversion;
 import org.graylog.plugins.pipelineprocessor.functions.ips.IsIp;
 import org.graylog.plugins.pipelineprocessor.functions.json.IsJson;
+import org.graylog.plugins.pipelineprocessor.functions.json.JsonFlatten;
 import org.graylog.plugins.pipelineprocessor.functions.json.JsonParse;
 import org.graylog.plugins.pipelineprocessor.functions.json.SelectJsonPath;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.Lookup;
@@ -199,6 +200,7 @@ public class ProcessorFunctionsModule extends PluginModule {
 
         // json
         addMessageProcessorFunction(JsonParse.NAME, JsonParse.class);
+        addMessageProcessorFunction(JsonFlatten.NAME, JsonFlatten.class);
         addMessageProcessorFunction(SelectJsonPath.NAME, SelectJsonPath.class);
 
         // dates

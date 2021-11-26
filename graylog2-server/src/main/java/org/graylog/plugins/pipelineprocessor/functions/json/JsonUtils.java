@@ -19,6 +19,7 @@ package org.graylog.plugins.pipelineprocessor.functions.json;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
@@ -33,7 +34,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +47,7 @@ public class JsonUtils {
     private static final String LIST_SEPARATOR = ",";
     private static final RemoveNullPredicate REMOVE_NULL_PREDICATE = new RemoveNullPredicate();
 
-    public static String extractJson(
+    public static JsonNode extractJson(
             String value, ObjectMapper mapper, boolean flattenObjects, boolean escapeArrays, boolean deleteArrays)
             throws IOException {
         if (isNullOrEmpty(value)) {
@@ -55,16 +55,32 @@ public class JsonUtils {
         }
         final Map<String, Object> json = mapper.readValue(value, TypeReferences.MAP_STRING_OBJECT);
 
-        final Map<String, Object> results = new HashMap<>(json.size());
+        ObjectNode resultRoot = mapper.createObjectNode();
         for (Map.Entry<String, Object> mapEntry : json.entrySet()) {
             for (Entry entry : parseValue(mapEntry.getKey(), mapEntry.getValue(), mapper, flattenObjects, escapeArrays, deleteArrays)) {
-                results.put(entry.key(), entry.value());
+                resultRoot.put(entry.key(), entry.value().toString());
             }
         }
-        // TODO: sort the joined list for predictable results, since MapJoiner does not guarantee any ordering
-        final Joiner.MapJoiner joiner = Joiner.on(LIST_SEPARATOR).withKeyValueSeparator(KEY_VALUE_SEPARATOR);
-        return "{" + joiner.join(results) + "}";
+        return resultRoot;
     }
+
+//    public static String extractJson(
+//            String value, ObjectMapper mapper, boolean flattenObjects, boolean escapeArrays, boolean deleteArrays)
+//            throws IOException {
+//        if (isNullOrEmpty(value)) {
+//            throw new IOException("null result");
+//        }
+//        final Map<String, Object> json = mapper.readValue(value, TypeReferences.MAP_STRING_OBJECT);
+//
+//        final Map<String, Object> results = new TreeMap<>();
+//        for (Map.Entry<String, Object> mapEntry : json.entrySet()) {
+//            for (Entry entry : parseValue(mapEntry.getKey(), mapEntry.getValue(), mapper, flattenObjects, escapeArrays, deleteArrays)) {
+//                results.put(entry.key(), entry.value());
+//            }
+//        }
+//        final Joiner.MapJoiner joiner = Joiner.on(LIST_SEPARATOR).withKeyValueSeparator(KEY_VALUE_SEPARATOR);
+//        return "{" + joiner.join(results) + "}";
+//    }
 
     private static Collection<Entry> parseValue(
             String key, Object value, ObjectMapper mapper, boolean flattenObjects, boolean escapeArrays, boolean deleteArrays)

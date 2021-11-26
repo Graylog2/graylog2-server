@@ -1,5 +1,6 @@
 package org.graylog.plugins.pipelineprocessor.functions.json;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
@@ -14,10 +15,10 @@ import java.io.IOException;
 
 import static com.google.common.collect.ImmutableList.of;
 
-public class JsonFlatten extends AbstractFunction<String> {
+public class JsonFlatten extends AbstractFunction<JsonNode> {
     private static final Logger LOG = LoggerFactory.getLogger(JsonFlatten.class);
     public static final String NAME = "flatten_json";
-    private static final String OPTION_JSON = "json_string";
+    private static final String OPTION_JSON = "json";
     private static final String OPTION_FLATTEN = "flatten";
     private static final String OPTION_IGNORE = "ignore";
 
@@ -33,7 +34,7 @@ public class JsonFlatten extends AbstractFunction<String> {
     }
 
     @Override
-    public String evaluate(FunctionArgs args, EvaluationContext context) {
+    public JsonNode evaluate(FunctionArgs args, EvaluationContext context) {
         final String value = valueParam.required(args, context);
         final String arrayHandler = arrayHandlerParam.required(args, context);
 
@@ -55,10 +56,10 @@ public class JsonFlatten extends AbstractFunction<String> {
     }
 
     @Override
-    public FunctionDescriptor<String> descriptor() {
-        return FunctionDescriptor.<String>builder()
+    public FunctionDescriptor<JsonNode> descriptor() {
+        return FunctionDescriptor.<JsonNode>builder()
                 .name(NAME)
-                .returnType(String.class)
+                .returnType(JsonNode.class)
                 .params(of(
                         valueParam, arrayHandlerParam
                 ))

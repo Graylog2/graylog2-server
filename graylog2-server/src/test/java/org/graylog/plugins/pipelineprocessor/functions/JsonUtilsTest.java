@@ -32,34 +32,50 @@ public class JsonUtilsTest {
     public void extractArrays() throws IOException {
         String jsonString = "{\"k0\":\"v0\",\"arr1\":[\"a1\",[\"a21\",\"a22\"],[],\"a2\"]}";
 
-        // delete all arrays
+        // delete all top-level arrays
         String expected = "{k0:v0}";
-        String result = JsonUtils.extractJson(jsonString, mapper, false, false, true);
-        assertThat(result).isEqualTo(expected);
+        JsonNode result = JsonUtils.extractJson(jsonString, mapper, false, false, true);
+        assertThat(mapper.writeValueAsString(result)).isEqualTo(expected);
 
-        // serialize arrays
-        expected = "{k0:v0,arr1:[\"a1\",[\"a21\",\"a22\"],[],\"a2\"]}";
+        // serialize arrays into valid JSON with escaping
+        expected = "{arr1:[\"a1\",[\"a21\",\"a22\"],[],\"a2\"],k0:v0}";
         result = JsonUtils.extractJson(jsonString, mapper, false, true, false);
-        assertThat(result).isEqualTo(expected);
+        assertThat(mapper.writeValueAsString(result)).isEqualTo(expected);
 
         // flatten arrays using element index
-        expected = "{k0:v0,arr1_0:a1,arr1_1_0:a21,arr1_1_1:a22,arr1_3:a2}";
+        expected = "{arr1_0:a1,arr1_1_0:a21,arr1_1_1:a22,arr1_3:a2,k0:v0}";
         result = JsonUtils.extractJson(jsonString, mapper, false, false, false);
-        assertThat(result).isEqualTo(expected);
+        assertThat(mapper.writeValueAsString(result)).isEqualTo(expected);
     }
 
     @Test
     public void extractObjects() throws IOException {
         String jsonString = "{\"k0\":\"v0\",\"obj1\":{\"k1\":\"v1\",\"obj11\":{\"k11\":\"v11\",\"obj111\":{\"k111\":\"v111\"}}}}";
 
-        // flatten arrays by concatenating keys
+        // flatten objects by concatenating keys
         String expected = "{k0:v0,obj1_k1:v1,obj1_obj11_k11:v11,obj1_obj11_obj111_k111:v111}";
-        String result = JsonUtils.extractJson(jsonString, mapper, true, false, true);
-        assertThat(result).isEqualTo(expected);
+        JsonNode result = JsonUtils.extractJson(jsonString, mapper, true, false, true);
+        assertThat(mapper.writeValueAsString(result)).isEqualTo(expected);
 
+        // not flattened: collate content of each top level object into a big string
         expected = "{k0:v0,obj1:k1:v1,obj11:{k11=v11, obj111={k111=v111}}}";
         result = JsonUtils.extractJson(jsonString, mapper, false, false, true);
-        assertThat(result).isEqualTo(expected);
+        assertThat(mapper.writeValueAsString(result)).isEqualTo(expected);
+    }
+
+    @Test
+    public void extractArrayOfObjects() throws IOException {
+        String jsonString = "{\"k0\":\"v0\",\"arr1\":[{\"k11\":\"v11\",\"k12\":\"v12\"},{\"k21\":\"v21\"}]}";
+
+        // flatten objects by concatenating keys
+        String expected = "{arr1_0_k11:v11,arr1_0_k12:v12,arr1_1_k21:v21,k0:v0}";
+        JsonNode result = JsonUtils.extractJson(jsonString, mapper, true, false, false);
+        assertThat(mapper.writeValueAsString(result)).isEqualTo(expected);
+
+        // objects as collated strings
+        expected = "{arr1_0:k11:v11,k12:v12,arr1_1:k21:v21,k0:v0}";
+        result = JsonUtils.extractJson(jsonString, mapper, false, false, false);
+        assertThat(mapper.writeValueAsString(result)).isEqualTo(expected);
     }
 
     @Test
