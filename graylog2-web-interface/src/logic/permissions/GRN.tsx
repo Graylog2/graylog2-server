@@ -21,11 +21,17 @@ const _convertEmptyString = (value: string) => (value === '' ? undefined : value
 
 export const createGRN = (type: string, id: string) => `grn::::${type}:${id}`;
 
+type GRNType = 'user' | 'team' | 'dashboard' | 'event_definition' | 'notification' | 'search' | 'stream';
+
 export const getValuesFromGRN = (grn: string) => {
   const grnValues = grn.split(':');
   const [resourceNameType, cluster, tenent, scope, type, id] = grnValues.map(_convertEmptyString);
 
-  return { resourceNameType, cluster, tenent, scope, type, id };
+  return { resourceNameType, cluster, tenent, scope, type: type as GRNType, id };
+};
+
+const assertUnreachable = (grn: string, type: never): never => {
+  throw new Error(`Can't find route for grn ${grn} of type: ${type ?? '(undefined)'}`);
 };
 
 export const getShowRouteFromGRN = (grn: string) => {
@@ -47,6 +53,6 @@ export const getShowRouteFromGRN = (grn: string) => {
     case 'stream':
       return Routes.stream_search(id);
     default:
-      throw new Error(`Can't find route for grn ${grn} of type: ${type ?? '(undefined)'}`);
+      assertUnreachable(grn, type);
   }
 };
