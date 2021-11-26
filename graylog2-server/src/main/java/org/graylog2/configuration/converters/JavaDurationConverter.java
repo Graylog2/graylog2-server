@@ -17,10 +17,11 @@
 package org.graylog2.configuration.converters;
 
 import com.github.joschi.jadconfig.Converter;
-import com.github.joschi.jadconfig.jodatime.converters.DurationConverter;
 import org.joda.time.Period;
 
 import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+import java.util.concurrent.TimeUnit;
 
 public class JavaDurationConverter implements Converter<Duration> {
     @Override
@@ -31,8 +32,9 @@ public class JavaDurationConverter implements Converter<Duration> {
             return Duration.parse(period.toString());
         }
         // number + unit formats
-        final org.joda.time.Duration jodaDuration = new DurationConverter().convertFrom(value);
-        return Duration.parse(jodaDuration.toString());
+        final com.github.joschi.jadconfig.util.Duration jadDuration = com.github.joschi.jadconfig.util.Duration.parse(value);
+        final ChronoUnit chronoUnit = toChronoUnit(jadDuration.getUnit());
+        return Duration.of(jadDuration.getQuantity(), chronoUnit);
     }
 
     @Override
@@ -40,5 +42,26 @@ public class JavaDurationConverter implements Converter<Duration> {
         // Durations will always be converted to ISO8601 formatted Strings
         // There is no meaningful way to convert them back to a simple jadconfig 'number+unit' format.
         return value.toString();
+    }
+
+    public static ChronoUnit toChronoUnit(TimeUnit timeUnit) {
+        switch (timeUnit) {
+            case NANOSECONDS:
+                return ChronoUnit.NANOS;
+            case MICROSECONDS:
+                return ChronoUnit.MICROS;
+            case MILLISECONDS:
+                return ChronoUnit.MILLIS;
+            case SECONDS:
+                return ChronoUnit.SECONDS;
+            case MINUTES:
+                return ChronoUnit.MINUTES;
+            case HOURS:
+                return ChronoUnit.HOURS;
+            case DAYS:
+                return ChronoUnit.DAYS;
+            default:
+                throw new AssertionError();
+        }
     }
 }
