@@ -16,7 +16,6 @@
  */
 package org.graylog.plugins.views;
 
-import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 import org.graylog.testing.completebackend.GraylogBackend;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
@@ -24,6 +23,7 @@ import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfi
 import org.graylog.testing.utils.GelfInputUtils;
 import org.graylog.testing.utils.SearchUtils;
 
+import java.io.InputStream;
 import java.util.List;
 
 import static io.restassured.RestAssured.given;
@@ -56,8 +56,8 @@ public class SearchSyncIT {
                 .assertThat().body("message[0]", equalTo("Search body is mandatory"));
     }
 
-    @ContainerMatrixTest
-    void testMinimalisticRequest() {
+    // TODO: This should be turned into a @BeforeAll hook once we can use @TestInstance(PER_CLASS)
+    private void ingestMessage() {
         int mappedPort = sut.mappedPortFor(GELF_HTTP_PORT);
         GelfInputUtils.createGelfHttpInput(mappedPort, GELF_HTTP_PORT, requestSpec);
         GelfInputUtils.postMessage(mappedPort,
@@ -67,15 +67,61 @@ public class SearchSyncIT {
         // mainly because of the waiting logic
         final List<String> strings = SearchUtils.searchForAllMessages(requestSpec);
         assertThat(strings.size()).isEqualTo(1);
+    }
 
-        final ValidatableResponse validatableResponse = given()
+    @ContainerMatrixTest
+    void testMinimalisticRequest() {
+        ingestMessage();
+
+        given()
                 .spec(requestSpec)
                 .when()
-                .body(getClass().getClassLoader().getResourceAsStream("org/graylog/plugins/views/minimalistic-request.json"))
+                .body(fixture("org/graylog/plugins/views/minimalistic-request.json"))
                 .post("/views/search/sync")
                 .then()
-                .statusCode(200);
-        validatableResponse.assertThat().body("execution.completed_exceptionally", equalTo(false));
-        validatableResponse.assertThat().body("results*.value.search_types[0]*.value.messages.message.message[0]", hasItem("Hello there"));
+                .statusCode(200)
+                .assertThat()
+                .body("execution.completed_exceptionally", equalTo(false))
+                .body("results*.value.search_types[0]*.value.messages.message.message[0]", hasItem("Hello there"));
+    }
+
+    @ContainerMatrixTest
+    void testMinimalisticRequestv2() {
+        ingestMessage();
+
+        given()
+                .spec(requestSpec)
+                .accept("application/vnd.graylog.search.v2+json")
+                .contentType("application/vnd.graylog.search.v2+json")
+                .when()
+                .body(fixture("org/graylog/plugins/views/minimalistic-request.json"))
+                .post("/views/search/sync")
+                .then()
+                .statusCode(200)
+                .assertThat()
+                .body("execution.completed_exceptionally", equalTo(false))
+                .body("results*.value.search_types[0]*.value.messages.message.message[0]", hasItem("Hello there"));
+    }
+
+    @ContainerMatrixTest
+    void testRequestWithStreamsv2() {
+        ingestMessage();
+
+        given()
+                .spec(requestSpec)
+                .accept("application/vnd.graylog.search.v2+json")
+                .contentType("application/vnd.graylog.search.v2+json")
+                .when()
+                .body(fixture("org/graylog/plugins/views/minimalistic-request-with-streams.json"))
+                .post("/views/search/sync")
+                .then()
+                .statusCode(200)
+                .assertThat()
+                .body("execution.completed_exceptionally", equalTo(false))
+                .body("results*.value.search_types[0]*.value.messages.message.message[0]", hasItem("Hello there"));
+    }
+
+    private InputStream fixture(String filename) {
+        return getClass().getClassLoader().getResourceAsStream(filename);
     }
 }

@@ -25,8 +25,6 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import one.util.streamex.EntryStream;
 import org.graylog.plugins.views.search.errors.SearchError;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.Set;
@@ -36,9 +34,6 @@ import java.util.concurrent.CompletableFuture;
 // execution must come before results, as it signals the overall "done" state
 @JsonPropertyOrder({"execution", "results"})
 public class SearchJob {
-    private static final Logger LOG = LoggerFactory.getLogger(SearchJob.class);
-    static final String FIELD_OWNER = "owner";
-
     @JsonProperty
     private final String id;
 
@@ -51,7 +46,7 @@ public class SearchJob {
     @JsonIgnore
     private CompletableFuture<Void> resultFuture;
 
-    private Map<String, CompletableFuture<QueryResult>> queryResults = Maps.newHashMap();
+    private final Map<String, CompletableFuture<QueryResult>> queryResults = Maps.newHashMap();
 
     @JsonProperty("errors")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
@@ -78,6 +73,10 @@ public class SearchJob {
 
     public String getOwner() {
         return owner;
+    }
+
+    public Set<SearchError> getErrors() {
+        return errors;
     }
 
     public CompletableFuture<Void> getResultFuture() {
@@ -116,13 +115,13 @@ public class SearchJob {
         errors.add(t);
     }
 
-    private static class ExecutionInfo {
+    public static class ExecutionInfo {
         @JsonProperty("done")
-        private final boolean done;
+        public final boolean done;
         @JsonProperty("cancelled")
-        private final boolean cancelled;
+        public final boolean cancelled;
         @JsonProperty("completed_exceptionally")
-        private final boolean hasErrors;
+        public final boolean hasErrors;
 
         ExecutionInfo(boolean done, boolean cancelled, boolean hasErrors) {
             this.done = done;

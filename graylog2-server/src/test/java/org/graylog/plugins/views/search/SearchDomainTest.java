@@ -25,6 +25,7 @@ import org.graylog.plugins.views.search.views.ViewService;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
@@ -42,6 +43,8 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class SearchDomainTest {
@@ -165,6 +168,23 @@ public class SearchDomainTest {
 
         assertThatExceptionOfType(ForbiddenException.class)
                 .isThrownBy(() -> sut.saveForUser(search, searchUser));
+    }
+
+    @Test
+    public void saveAddsOwnerToSearch() {
+        final Search search = mockSearchWithOwner(null);
+        final SearchUser searchUser = mock(SearchUser.class);
+        when(searchUser.username()).thenReturn("eberhard");
+        when(searchUser.isAdmin()).thenReturn(true);
+
+        sut.saveForUser(search, searchUser);
+
+        final ArgumentCaptor<Search> savedCaptor = ArgumentCaptor.forClass(Search.class);
+        verify(dbService, times(1)).save(savedCaptor.capture());
+
+        final Search result = savedCaptor.getValue();
+
+        assertThat(result.owner()).contains("eberhard");
     }
 
     private void throwGuardExceptionFor(Search search) {
