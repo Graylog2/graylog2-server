@@ -32,12 +32,15 @@ class JavaDurationConverterTest {
 
     @Test
     public void convertFrom() {
+        assertThat(converter.convertFrom("10ms")).isEqualTo(Duration.ofMillis(10));
         assertThat(converter.convertFrom("10s")).isEqualTo(Duration.ofSeconds(10));
+        assertThat(converter.convertFrom("PT0.01S")).isEqualTo(Duration.ofMillis(10));
         assertThat(converter.convertFrom("PT10S")).isEqualTo(Duration.ofSeconds(10));
     }
 
     @Test
     public void convertTo() {
+        assertThat(converter.convertTo(Duration.ofMillis(10))).isEqualTo("PT0.01S");
         assertThat(converter.convertTo(Duration.ofSeconds(10))).isEqualTo("PT10S");
         assertThat(converter.convertTo(Duration.ofSeconds(70))).isEqualTo("PT1M10S");
     }
