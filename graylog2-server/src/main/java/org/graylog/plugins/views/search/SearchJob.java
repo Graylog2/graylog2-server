@@ -46,7 +46,7 @@ public class SearchJob {
     @JsonIgnore
     private CompletableFuture<Void> resultFuture;
 
-    final private Map<String, CompletableFuture<QueryResult>> queryResults = Maps.newHashMap();
+    private final Map<String, CompletableFuture<QueryResult>> queryResults = Maps.newHashMap();
 
     @JsonProperty("errors")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
