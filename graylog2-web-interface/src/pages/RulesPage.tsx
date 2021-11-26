@@ -18,14 +18,15 @@ import React, { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { LinkContainer } from 'components/common/router';
-import { Row, Col, Button } from 'components/bootstrap';
+import { Row, Col, Button, ButtonToolbar } from 'components/bootstrap';
 import { SearchForm, PaginatedList, DocumentTitle, PageHeader, Spinner, QueryHelper } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
 import RuleList from 'components/rules/RuleList';
+import RuleMetricsConfigContainer from 'components/rules/RuleMetricsConfigContainer';
 import Routes from 'routing/Routes';
 import { Pagination, DEFAULT_PAGINATION } from 'stores/PaginationTypes';
-import type { PaginatedRules, RuleType } from 'stores/rules/RulesStore';
+import type { MetricsConfigType, PaginatedRules, RuleType } from 'stores/rules/RulesStore';
 import { RulesActions } from 'stores/rules/RulesStore';
 import useLocationSearchPagination from 'hooks/useLocationSearchPagination';
 
@@ -38,14 +39,6 @@ const SpinnerWrapper = styled.div(({ theme }) => css`
   padding: ${theme.spacings.xxs} ${theme.spacings.sm};
 `);
 
-const CreateRuleButton = () => (
-  <div className="pull-right">
-    <LinkContainer to={Routes.SYSTEM.PIPELINES.RULE('new')}>
-      <Button bsStyle="success">Create Rule</Button>
-    </LinkContainer>
-  </div>
-);
-
 const _loadData = (pagination: Pagination, setIsLoading, setPaginatedRules) => {
   setIsLoading(true);
 
@@ -55,8 +48,20 @@ const _loadData = (pagination: Pagination, setIsLoading, setPaginatedRules) => {
   });
 };
 
+const _loadRuleMetricData = (setIsloading, setMetricsConfig) => {
+  setIsloading(true);
+
+  RulesActions.loadMetricsConfig().then((metricsConfig: MetricsConfigType) => {
+    setMetricsConfig(metricsConfig);
+    setIsloading(false);
+  });
+};
+
 const RulesPage = () => {
   const [isDataLoading, setIsDataLoading] = useState<boolean>(false);
+  const [openMetricsConfig, toggleMetricsConfig] = useState<boolean>(false);
+  const [metricsConfig, setMetricsConfig] = useState<MetricsConfigType>();
+  const [isMetricDataLoading, setIsMetricDataLoading] = useState<boolean>(false);
   const { isInitialized: isPaginationReady, pagination, setPagination } = useLocationSearchPagination(DEFAULT_PAGINATION);
   const [paginatedRules, setPaginatedRules] = useState<PaginatedRules | undefined>();
   const { list: rules, pagination: { total = 0, count = 0 } = {}, context: rulesContext } = paginatedRules ?? {};
@@ -67,6 +72,10 @@ const RulesPage = () => {
       _loadData(pagination, setIsDataLoading, setPaginatedRules);
     }
   }, [isPaginationReady, pagination]);
+
+  useEffect(() => {
+    _loadRuleMetricData(setIsMetricDataLoading, setMetricsConfig);
+  }, []);
 
   const handlePageChange = (newPage, newPerPage) => {
     setPagination({ ...pagination, page: newPage, perPage: newPerPage });
@@ -94,6 +103,23 @@ const RulesPage = () => {
     };
   };
 
+  const renderDebugMetricsButton = () => {
+    if (metricsConfig && metricsConfig.metrics_enabled) {
+      return <Button bsStyle="warning" onClick={toggleMetricsConfig}>Debug Metrics: ON</Button>;
+    }
+
+    return <Button onClick={toggleMetricsConfig}>Debug Metrics</Button>;
+  };
+
+  const RulesButtonToolbar = () => (
+    <ButtonToolbar className="pull-right">
+      <LinkContainer to={Routes.SYSTEM.PIPELINES.RULE('new')}>
+        <Button bsStyle="success">Create Rule</Button>
+      </LinkContainer>
+      {!isMetricDataLoading && renderDebugMetricsButton()}
+    </ButtonToolbar>
+  );
+
   const isLoading = !rules;
 
   const searchFilter = (
@@ -112,7 +138,7 @@ const RulesPage = () => {
   return (
     <DocumentTitle title="Pipeline rules">
       <span>
-        <PageHeader title="Pipeline Rules" subactions={<CreateRuleButton />}>
+        <PageHeader title="Pipeline Rules" subactions={<RulesButtonToolbar />}>
           <span>
             Rules are a way of applying changes to messages in Graylog. A rule consists of a condition and a list of actions.
             Graylog evaluates the condition against a message and executes the actions if the condition is satisfied.
@@ -147,6 +173,7 @@ const RulesPage = () => {
                 <Col md={12}>
                   <PaginatedList onChange={handlePageChange} totalItems={total} activePage={page} pageSize={perPage}>
                     <RuleList rules={rules} rulesContext={rulesContext} onDelete={handleDelete} searchFilter={searchFilter} />
+                    {openMetricsConfig && <RuleMetricsConfigContainer onClose={toggleMetricsConfig} />}
                   </PaginatedList>
                 </Col>
               </Row>
