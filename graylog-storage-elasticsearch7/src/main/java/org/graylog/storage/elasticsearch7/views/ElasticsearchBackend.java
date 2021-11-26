@@ -29,9 +29,9 @@ import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.engine.QueryBackend;
 import org.graylog.plugins.views.search.engine.SearchConfig;
+import org.graylog.plugins.views.search.engine.suggestions.SuggestionEntry;
 import org.graylog.plugins.views.search.engine.suggestions.SuggestionError;
 import org.graylog.plugins.views.search.engine.suggestions.SuggestionRequest;
-import org.graylog.plugins.views.search.engine.suggestions.SuggestionEntry;
 import org.graylog.plugins.views.search.engine.suggestions.SuggestionResponse;
 import org.graylog.plugins.views.search.errors.SearchTypeError;
 import org.graylog.plugins.views.search.errors.SearchTypeErrorParser;
@@ -53,6 +53,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.Search
 import org.graylog.storage.elasticsearch7.ElasticsearchClient;
 import org.graylog.storage.elasticsearch7.ParsedElasticsearchException;
 import org.graylog.storage.elasticsearch7.TimeRangeQueryFactory;
+import org.graylog.storage.elasticsearch7.errors.ResponseError;
 import org.graylog.storage.elasticsearch7.views.searchtypes.ESSearchTypeHandler;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.FieldTypeException;
@@ -348,10 +349,27 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
             final List<SuggestionEntry> entries = fieldValues.getBuckets().stream().map(b -> new SuggestionEntry(b.getKeyAsString(), b.getDocCount())).collect(Collectors.toList());
             return SuggestionResponse.builder(req.field(), req.input()).suggestions(entries).build();
         } catch (org.graylog.shaded.elasticsearch7.org.elasticsearch.ElasticsearchException exception) {
+            final SuggestionError err = tryResponseException(exception)
+                    .orElseGet(() -> parseException(exception));
+            return SuggestionResponse.builder(req.field(), req.input()).suggestionError(err).build();
 
-            final Throwable cause = getCause(exception);
+        }
+    }
+
+    private Optional<SuggestionError> tryResponseException(org.graylog.shaded.elasticsearch7.org.elasticsearch.ElasticsearchException exception) {
+        return client.parseResponseException(exception)
+                .map(ResponseError::error)
+                .flatMap(e -> e.rootCause().stream().findFirst())
+                .map(e -> SuggestionError.create(e.type(), e.reason()));
+    }
+
+    private SuggestionError parseException(org.graylog.shaded.elasticsearch7.org.elasticsearch.ElasticsearchException exception) {
+        final Throwable cause = getCause(exception);
+        try {
             final ParsedElasticsearchException parsed = ParsedElasticsearchException.from(cause.toString());
-            return SuggestionResponse.builder(req.field(), req.input()).suggestionError(SuggestionError.create(parsed.type(), parsed.reason())).build();
+            return SuggestionError.create(parsed.type(), parsed.reason());
+        } catch (final IllegalArgumentException iae) {
+            return SuggestionError.create("Aggregation error", cause.getMessage());
         }
     }
 
