@@ -21,6 +21,7 @@ import io.restassured.specification.RequestSpecification;
 import org.graylog.storage.elasticsearch7.ElasticsearchInstanceES7Factory;
 import org.graylog.testing.completebackend.ApiIntegrationTest;
 import org.graylog.testing.completebackend.GraylogBackend;
+import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.graylog.testing.utils.GelfInputUtils;
 import org.graylog.testing.utils.SearchUtils;
 import org.junit.jupiter.api.Test;
@@ -33,7 +34,7 @@ import static org.graylog.testing.completebackend.Lifecycle.CLASS;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.core.IsEqual.equalTo;
 
-@ApiIntegrationTest(serverLifecycle = CLASS, elasticsearchFactory = ElasticsearchInstanceES7Factory.class, extraPorts = {SuggestionsIT.GELF_HTTP_PORT})
+@ContainerMatrixTestsConfiguration(serverLifecycle = CLASS)
 public class SuggestionsIT {
 
     static final int GELF_HTTP_PORT = 12201;
