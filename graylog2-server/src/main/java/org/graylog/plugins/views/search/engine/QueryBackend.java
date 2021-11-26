@@ -22,6 +22,8 @@ import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
+import org.graylog.plugins.views.search.engine.suggestions.SuggestionRequest;
+import org.graylog.plugins.views.search.engine.suggestions.SuggestionResponse;
 import org.graylog.plugins.views.search.errors.IllegalTimeRangeException;
 import org.graylog.plugins.views.search.errors.QueryError;
 import org.graylog.plugins.views.search.errors.SearchTypeError;
@@ -150,5 +152,5 @@ public interface QueryBackend<T extends GeneratedQueryContext> {
                 });
     }
 
-    SuggestionResponse suggest(SuggestRequest req);
+    SuggestionResponse suggest(SuggestionRequest req);
 }

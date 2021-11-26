@@ -28,10 +28,11 @@ import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.engine.QueryBackend;
-import org.graylog.plugins.views.search.engine.SuggestRequest;
-import org.graylog.plugins.views.search.engine.SuggestionEntry;
-import org.graylog.plugins.views.search.engine.SuggestionResponse;
 import org.graylog.plugins.views.search.engine.SearchConfig;
+import org.graylog.plugins.views.search.engine.suggestions.SuggestionError;
+import org.graylog.plugins.views.search.engine.suggestions.SuggestionRequest;
+import org.graylog.plugins.views.search.engine.suggestions.SuggestionEntry;
+import org.graylog.plugins.views.search.engine.suggestions.SuggestionResponse;
 import org.graylog.plugins.views.search.errors.SearchTypeError;
 import org.graylog.plugins.views.search.errors.SearchTypeErrorParser;
 import org.graylog.plugins.views.search.filter.AndFilter;
@@ -46,11 +47,11 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.support.Indice
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.BoolQueryBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.Aggregation;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.terms.ParsedStringTerms;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.storage.elasticsearch7.ElasticsearchClient;
+import org.graylog.storage.elasticsearch7.ParsedElasticsearchException;
 import org.graylog.storage.elasticsearch7.TimeRangeQueryFactory;
 import org.graylog.storage.elasticsearch7.views.searchtypes.ESSearchTypeHandler;
 import org.graylog2.indexer.ElasticsearchException;
@@ -334,18 +335,31 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
     }
 
     @Override
-    public SuggestionResponse suggest(SuggestRequest req) {
-
-
+    public SuggestionResponse suggest(SuggestionRequest req) {
         final Set<String> affectedIndices = indexLookup.indexNamesForStreamsInTimeRange(req.streams(), req.timerange());
         final SearchSourceBuilder search = new SearchSourceBuilder()
                 .query(QueryBuilders.prefixQuery(req.field(), req.input()))
                 .size(0)
                 .aggregation(AggregationBuilders.terms("fieldvalues").field(req.field()).size(10));
 
-        final SearchResponse result = client.singleSearch(new SearchRequest(affectedIndices.toArray(new String[]{})).source(search), "Failed to execute aggregation");
-        final ParsedStringTerms fieldValues = result.getAggregations().get("fieldvalues");
-        final List<SuggestionEntry> entries = fieldValues.getBuckets().stream().map(b -> new SuggestionEntry(b.getKeyAsString(), b.getDocCount())).collect(Collectors.toList());
-        return new SuggestionResponse(req.field(), req.input(), entries);
+        try {
+            final SearchResponse result = client.singleSearch(new SearchRequest(affectedIndices.toArray(new String[]{})).source(search), "Failed to execute aggregation");
+            final ParsedStringTerms fieldValues = result.getAggregations().get("fieldvalues");
+            final List<SuggestionEntry> entries = fieldValues.getBuckets().stream().map(b -> new SuggestionEntry(b.getKeyAsString(), b.getDocCount())).collect(Collectors.toList());
+            return SuggestionResponse.builder(req.field(), req.input()).suggestions(entries).build();
+        } catch (org.graylog.shaded.elasticsearch7.org.elasticsearch.ElasticsearchException exception) {
+
+            final Throwable cause = getCause(exception);
+            final ParsedElasticsearchException parsed = ParsedElasticsearchException.from(cause.toString());
+            return SuggestionResponse.builder(req.field(), req.input()).suggestionError(SuggestionError.create(parsed.type(), parsed.reason())).build();
+        }
+    }
+
+    private Throwable getCause(Throwable exception) {
+        if (exception.getCause() != null) {
+            return getCause(exception.getCause());
+        } else {
+            return exception;
+        }
     }
 }
