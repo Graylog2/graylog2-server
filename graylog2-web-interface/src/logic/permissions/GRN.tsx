@@ -16,14 +16,13 @@
  */
 // eslint-disable-next-line import/prefer-default-export
 import Routes from 'routing/Routes';
+import { GRN, GRNType } from 'logic/permissions/types';
 
 const _convertEmptyString = (value: string) => (value === '' ? undefined : value);
 
 export const createGRN = (type: string, id: string) => `grn::::${type}:${id}`;
 
-type GRNType = 'user' | 'team' | 'dashboard' | 'event_definition' | 'notification' | 'search' | 'stream';
-
-export const getValuesFromGRN = (grn: string) => {
+export const getValuesFromGRN = (grn: GRN) => {
   const grnValues = grn.split(':');
   const [resourceNameType, cluster, tenent, scope, type, id] = grnValues.map(_convertEmptyString);
 

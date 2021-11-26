@@ -20,6 +20,16 @@ import SharedEntity from 'logic/permissions/SharedEntity';
 
 export type GRN = string;
 
+export type GRNType =
+  'user'
+  | 'team'
+  | 'dashboard'
+  | 'event_definition'
+  | 'notification'
+  | 'search'
+  | 'stream'
+  | 'builtin-team';
+
 export type CapabilityType = {
   id: GRN,
   title: 'Viewer' | 'Manager' | 'Owner',
