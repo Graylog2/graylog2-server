@@ -22,8 +22,12 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.plugins.views.search.engine.QueryEngine;
-import org.graylog.plugins.views.search.engine.SuggestRequest;
-import org.graylog.plugins.views.search.engine.SuggestionResponse;
+import org.graylog.plugins.views.search.engine.suggestions.SuggestionRequest;
+import org.graylog.plugins.views.search.engine.suggestions.SuggestionResponse;
+import org.graylog.plugins.views.search.rest.suggestions.SuggestionEntryDTO;
+import org.graylog.plugins.views.search.rest.suggestions.SuggestionsDTO;
+import org.graylog.plugins.views.search.rest.suggestions.SuggestionsErrorDTO;
+import org.graylog.plugins.views.search.rest.suggestions.SuggestionsRequestDTO;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
@@ -61,7 +65,7 @@ public class SuggestionsResource extends RestResource implements PluginRestResou
     @NoAuditEvent("Only validating query structure, not changing any data")
     public SuggestionsDTO validateQuery(@ApiParam(name = "validationRequest") SuggestionsRequestDTO suggestionsRequest) {
 
-        final SuggestRequest req = SuggestRequest.builder()
+        final SuggestionRequest req = SuggestionRequest.builder()
                 .field(suggestionsRequest.field())
                 .input(suggestionsRequest.input())
                 .streams(adaptStreams(suggestionsRequest.streams()))
@@ -69,8 +73,14 @@ public class SuggestionsResource extends RestResource implements PluginRestResou
                 .build();
 
         SuggestionResponse res = queryEngine.suggest(req);
-        final List<SuggestionEntryDTO> suggestions = res.getSuggestions().stream().map(s -> new SuggestionEntryDTO(s.getValue(), s.getOccurrence())).collect(Collectors.toList());
-        return new SuggestionsDTO(res.getField(), res.getInput(), suggestions);
+        final List<SuggestionEntryDTO> suggestions = res.suggestions().stream().map(s -> SuggestionEntryDTO.create(s.getValue(), s.getOccurrence())).collect(Collectors.toList());
+        final SuggestionsDTO.Builder suggestionsBuilder = SuggestionsDTO.builder(res.field(), res.input()).suggestions(suggestions);
+
+        res.suggestionError()
+                .map(e -> SuggestionsErrorDTO.create(e.type(), e.reason()))
+                .ifPresent(suggestionsBuilder::error);
+
+        return suggestionsBuilder.build();
     }
 
     private Set<String> adaptStreams(Set<String> streams) {

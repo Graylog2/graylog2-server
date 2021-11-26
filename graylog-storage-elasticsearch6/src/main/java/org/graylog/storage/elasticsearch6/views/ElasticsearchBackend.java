@@ -36,9 +36,9 @@ import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.engine.QueryBackend;
 import org.graylog.plugins.views.search.engine.SearchConfig;
-import org.graylog.plugins.views.search.engine.SuggestRequest;
-import org.graylog.plugins.views.search.engine.SuggestionEntry;
-import org.graylog.plugins.views.search.engine.SuggestionResponse;
+import org.graylog.plugins.views.search.engine.suggestions.SuggestionRequest;
+import org.graylog.plugins.views.search.engine.suggestions.SuggestionEntry;
+import org.graylog.plugins.views.search.engine.suggestions.SuggestionResponse;
 import org.graylog.plugins.views.search.errors.SearchTypeError;
 import org.graylog.plugins.views.search.errors.SearchTypeErrorParser;
 import org.graylog.plugins.views.search.filter.AndFilter;
@@ -300,7 +300,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
     }
 
     @Override
-    public SuggestionResponse suggest(SuggestRequest req) {
+    public SuggestionResponse suggest(SuggestionRequest req) {
         final Set<String> affectedIndices = indexLookup.indexNamesForStreamsInTimeRange(req.streams(), req.timerange());
         final SearchSourceBuilder search = new SearchSourceBuilder()
                 .query(QueryBuilders.prefixQuery(req.field(), req.input()))
@@ -317,6 +317,6 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
 
         final TermsAggregation aggregation = result.getAggregations().getTermsAggregation("fieldvalues");
         final List<SuggestionEntry> entries = aggregation.getBuckets().stream().map(b -> new SuggestionEntry(b.getKeyAsString(), b.getCount())).collect(Collectors.toList());
-        return new SuggestionResponse(req.field(), req.input(), entries);
+        return SuggestionResponse.builder(req.field(), req.input()).suggestions(entries).build();
     }
 }

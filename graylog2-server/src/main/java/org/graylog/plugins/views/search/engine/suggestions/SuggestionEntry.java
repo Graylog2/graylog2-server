@@ -14,31 +14,22 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.rest;
+package org.graylog.plugins.views.search.engine.suggestions;
 
-import java.util.List;
+public class SuggestionEntry {
+    private final String value;
+    private final long occurrence;
 
-public class SuggestionsDTO {
-
-    private final String field;
-    private final String input;
-    private final List<SuggestionEntryDTO> suggestions;
-
-    public SuggestionsDTO(String field, String input, List<SuggestionEntryDTO> suggestions) {
-        this.field = field;
-        this.input = input;
-        this.suggestions = suggestions;
+    public SuggestionEntry(String value, long occurence) {
+        this.value = value;
+        this.occurrence = occurence;
     }
 
-    public String getField() {
-        return field;
+    public String getValue() {
+        return value;
     }
 
-    public String getInput() {
-        return input;
-    }
-
-    public List<SuggestionEntryDTO> getSuggestions() {
-        return suggestions;
+    public long getOccurrence() {
+        return occurrence;
     }
 }

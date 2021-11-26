@@ -25,6 +25,8 @@ import org.graylog.plugins.views.search.QueryMetadataDecorator;
 import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchJob;
+import org.graylog.plugins.views.search.engine.suggestions.SuggestionRequest;
+import org.graylog.plugins.views.search.engine.suggestions.SuggestionResponse;
 import org.graylog.plugins.views.search.errors.QueryError;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.plugins.views.search.errors.SearchException;
@@ -176,7 +178,7 @@ public class QueryEngine {
         return elasticsearchBackend;
     }
 
-    public SuggestionResponse suggest(SuggestRequest req) {
+    public SuggestionResponse suggest(SuggestionRequest req) {
         return elasticsearchBackend.suggest(req);
     }
 }

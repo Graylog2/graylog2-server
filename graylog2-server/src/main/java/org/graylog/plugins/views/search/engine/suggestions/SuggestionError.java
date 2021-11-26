@@ -14,30 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.engine;
+package org.graylog.plugins.views.search.engine.suggestions;
 
-import java.util.List;
+import com.google.auto.value.AutoValue;
 
-public class SuggestionResponse {
-    private final String field;
-    private final String input;
-    private final List<SuggestionEntry> suggestions;
+@AutoValue
+public abstract class SuggestionError {
+    public abstract String type();
+    public abstract String reason();
 
-    public SuggestionResponse(String field, String input, List<SuggestionEntry> suggestions) {
-        this.field = field;
-        this.input = input;
-        this.suggestions = suggestions;
-    }
-
-    public String getField() {
-        return field;
-    }
-
-    public String getInput() {
-        return input;
-    }
-
-    public List<SuggestionEntry> getSuggestions() {
-        return suggestions;
+    public static SuggestionError create(final String type, final String reason) {
+        return new AutoValue_SuggestionError(type, reason);
     }
 }

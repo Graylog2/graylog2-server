@@ -14,22 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.rest;
+package org.graylog.plugins.views.search.rest.suggestions;
 
-public class SuggestionEntryDTO {
-    private final String value;
-    private final long occurrence;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
 
-    public SuggestionEntryDTO(String value, long occurrence) {
-        this.value = value;
-        this.occurrence = occurrence;
-    }
+@AutoValue
+public abstract class SuggestionsErrorDTO {
+    @JsonProperty
+    public abstract String type();
+    @JsonProperty
+    public abstract String reason();
 
-    public String getValue() {
-        return value;
-    }
-
-    public long getOccurrence() {
-        return occurrence;
+    public static SuggestionsErrorDTO create(final String type, final String reason) {
+        return new AutoValue_SuggestionsErrorDTO(type, reason);
     }
 }

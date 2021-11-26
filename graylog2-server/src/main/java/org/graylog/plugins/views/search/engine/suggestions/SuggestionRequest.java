@@ -14,16 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.engine;
+package org.graylog.plugins.views.search.engine.suggestions;
 
 import com.google.auto.value.AutoValue;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
-import java.util.ArrayList;
 import java.util.Set;
 
 @AutoValue
-public abstract class SuggestRequest {
+public abstract class SuggestionRequest {
 
     public abstract String field();
     public abstract String input();
@@ -31,22 +30,22 @@ public abstract class SuggestRequest {
     public abstract Set<String> streams();
 
     public static Builder builder() {
-        return new AutoValue_SuggestRequest.Builder();
+        return new AutoValue_SuggestionRequest.Builder();
     }
 
 
     @AutoValue.Builder
     public abstract static class Builder {
 
-        public abstract SuggestRequest.Builder field(String field);
-        public abstract SuggestRequest.Builder input(String input);
-        public abstract SuggestRequest.Builder streams(Set<String> streams);
-        public abstract SuggestRequest.Builder timerange(TimeRange timerange);
+        public abstract SuggestionRequest.Builder field(String field);
+        public abstract SuggestionRequest.Builder input(String input);
+        public abstract SuggestionRequest.Builder streams(Set<String> streams);
+        public abstract SuggestionRequest.Builder timerange(TimeRange timerange);
 
-        public abstract SuggestRequest build();
+        public abstract SuggestionRequest build();
 
-        public static SuggestRequest.Builder builder() {
-            return new AutoValue_SuggestRequest.Builder();
+        public static SuggestionRequest.Builder builder() {
+            return new AutoValue_SuggestionRequest.Builder();
         }
     }
 }
