@@ -28,7 +28,7 @@ export type GRNType =
   | 'notification'
   | 'search'
   | 'stream'
-  | 'builtin-team';
+  | 'global';
 
 export type CapabilityType = {
   id: GRN,

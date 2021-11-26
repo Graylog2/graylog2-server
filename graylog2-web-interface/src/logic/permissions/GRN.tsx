@@ -29,7 +29,7 @@ export const getValuesFromGRN = (grn: GRN) => {
   return { resourceNameType, cluster, tenent, scope, type: type as GRNType, id };
 };
 
-const assertUnreachable = (grn: string, type: never): never => {
+const assertUnreachable = (grn: string, type: 'global'): never => {
   throw new Error(`Can't find route for grn ${grn} of type: ${type ?? '(undefined)'}`);
 };
 
@@ -52,6 +52,6 @@ export const getShowRouteFromGRN = (grn: string) => {
     case 'stream':
       return Routes.stream_search(id);
     default:
-      assertUnreachable(grn, type);
+      return assertUnreachable(grn, type);
   }
 };

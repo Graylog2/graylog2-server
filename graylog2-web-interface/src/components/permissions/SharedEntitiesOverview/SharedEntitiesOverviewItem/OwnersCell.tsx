@@ -14,12 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { isPermitted } from 'util/PermissionsMixin';
+
 import * as React from 'react';
 import { useContext } from 'react';
+import { List } from 'immutable';
+import Grantee from 'src/logic/permissions/Grantee';
 
 import { Link } from 'components/common/router';
 import { defaultCompare } from 'views/logic/DefaultCompare';
-import { isPermitted } from 'util/PermissionsMixin';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import type { GranteesList } from 'logic/permissions/EntityShareState';
 import { getShowRouteFromGRN } from 'logic/permissions/GRN';
@@ -30,7 +33,11 @@ type Props = {
 
 const TitleWithLink = ({ to, title }: { to: string, title: string }) => <Link to={to}>{title}</Link>;
 
-const _getOwnerTitle = ({ type, id, title }, userPermissions) => {
+const assertUnreachable = (type: 'error'): never => {
+  throw new Error(`Owner of entity has not supported type: ${type}`);
+};
+
+const _getOwnerTitle = ({ type, id, title }: Grantee, userPermissions: List<string>) => {
   const link = getShowRouteFromGRN(id);
 
   switch (type) {
@@ -42,8 +49,10 @@ const _getOwnerTitle = ({ type, id, title }, userPermissions) => {
       if (!isPermitted(userPermissions, 'teams:list')) return title;
 
       return <TitleWithLink to={link} title={title} />;
+    case 'global':
+      return 'Everyone';
     default:
-      throw new Error(`Owner of entity has not supported type: ${type}`);
+      return assertUnreachable(type);
   }
 };
 
