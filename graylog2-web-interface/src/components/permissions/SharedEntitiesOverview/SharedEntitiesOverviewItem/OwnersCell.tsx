@@ -38,17 +38,15 @@ const assertUnreachable = (type: 'error'): never => {
 };
 
 const _getOwnerTitle = ({ type, id, title }: Grantee, userPermissions: List<string>) => {
-  const link = getShowRouteFromGRN(id);
-
   switch (type) {
     case 'user':
       if (!isPermitted(userPermissions, 'users:list')) return title;
 
-      return <TitleWithLink to={link} title={title} />;
+      return <TitleWithLink to={getShowRouteFromGRN(id)} title={title} />;
     case 'team':
       if (!isPermitted(userPermissions, 'teams:list')) return title;
 
-      return <TitleWithLink to={link} title={title} />;
+      return <TitleWithLink to={getShowRouteFromGRN(id)} title={title} />;
     case 'global':
       return 'Everyone';
     default:
