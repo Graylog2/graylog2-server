@@ -184,6 +184,10 @@ const webpackConfig = {
       Buffer: ['buffer', 'Buffer'],
     }),
     new UniqueChunkIdPlugin(),
+    new webpack.ids.HashedModuleIdsPlugin({
+      hashFunction: 'sha256',
+      hashDigestLength: 8,
+    }),
     new webpack.DllReferencePlugin({ manifest: VENDOR_MANIFEST_PATH, context: ROOT_PATH }),
     new HtmlWebpackPlugin({
       title: 'Graylog',
