@@ -120,12 +120,12 @@ const _refreshIfNotUndeclared = (searchRefreshHooks: Array<SearchRefreshConditio
 
       setHasErrors(false);
 
-      return SearchActions.execute(executionState);
+      return SearchActions.execute(executionState).then(() => {});
     }
 
     setHasErrors(true);
 
-    return Promise.reject(searchMetadata);
+    return Promise.resolve();
   });
 };
 

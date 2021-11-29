@@ -17,17 +17,22 @@
 import uuid from 'uuid/v4';
 
 import { DEFAULT_TIMERANGE } from 'views/Constants';
+import Query, { TimeRange, ElasticsearchQueryString, createElasticsearchQueryString, filtersForQuery } from 'views/logic/queries/Query';
 
-import Query, { createElasticsearchQueryString, filtersForQuery } from './Query';
 import type { QueryId } from './Query';
 
-export default (streamId?: string, id: QueryId = uuid()): Query => {
+export default (
+  streamId?: string,
+  id: QueryId | undefined = uuid(),
+  timeRange?: TimeRange,
+  queryString?: ElasticsearchQueryString,
+): Query => {
   const streamIds = streamId ? [streamId] : null;
   const streamFilter = filtersForQuery(streamIds);
   const builder = Query.builder()
     .id(id)
-    .query(createElasticsearchQueryString())
-    .timerange(DEFAULT_TIMERANGE);
+    .query(queryString ?? createElasticsearchQueryString())
+    .timerange(timeRange ?? DEFAULT_TIMERANGE);
 
   return streamFilter ? builder.filter(streamFilter).build() : builder.build();
 };

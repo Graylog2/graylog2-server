@@ -18,6 +18,7 @@ package org.graylog.plugins.views.search.rest;
 
 import com.google.common.collect.ImmutableSet;
 import org.apache.shiro.subject.Subject;
+import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.indexer.fieldtypes.FieldTypes;
 import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
@@ -58,6 +59,9 @@ public class FieldTypesResourceTest {
     @Mock
     private Subject currentSubject;
 
+    @Mock
+    private SearchUser searchUser;
+
     @Captor
     private ArgumentCaptor<Predicate<String>> isPermittedCaptor;
 
@@ -87,17 +91,17 @@ public class FieldTypesResourceTest {
 
     @Test
     public void allFieldTypesChecksPermissionsForStream() {
-        when(currentSubject.isPermitted(eq(RestPermissions.STREAMS_READ + ":2323"))).thenReturn(false);
-        when(currentSubject.isPermitted(eq(RestPermissions.STREAMS_READ + ":4242"))).thenReturn(true);
+        when(searchUser.canReadStream(eq("2323"))).thenReturn(false);
+        when(searchUser.canReadStream(eq("4242"))).thenReturn(true);
 
         when(permittedStreams.load(isPermittedCaptor.capture())).thenReturn(ImmutableSet.of());
 
-        this.fieldTypesResource.allFieldTypes();
+        this.fieldTypesResource.allFieldTypes(searchUser);
 
-        final Predicate<String> isPermitted = isPermittedCaptor.getValue();
+        final Predicate<String> hasStreamReadPermission = isPermittedCaptor.getValue();
 
-        assertThat(isPermitted.test("2323")).isFalse();
-        assertThat(isPermitted.test("4242")).isTrue();
+        assertThat(hasStreamReadPermission.test("2323")).isFalse();
+        assertThat(hasStreamReadPermission.test("4242")).isTrue();
     }
 
     @Test
@@ -107,22 +111,22 @@ public class FieldTypesResourceTest {
                 FieldTypes.Type.createType("long", ImmutableSet.of("numeric", "enumerable"))));
         when(mappedFieldTypesService.fieldTypesByStreamIds(eq(ImmutableSet.of("2323", "4242")), eq(RelativeRange.allTime()))).thenReturn(fieldTypes);
 
-        final Set<MappedFieldTypeDTO> result = this.fieldTypesResource.allFieldTypes();
+        final Set<MappedFieldTypeDTO> result = this.fieldTypesResource.allFieldTypes(searchUser);
 
         assertThat(result).isEqualTo(fieldTypes);
     }
 
     @Test
     public void passesRequestedTimeRangeToMappedFieldTypesService() throws Exception {
-        when(currentSubject.isPermitted(eq(RestPermissions.STREAMS_READ + ":2323"))).thenReturn(true);
-        when(currentSubject.isPermitted(eq(RestPermissions.STREAMS_READ + ":4242"))).thenReturn(true);
+        when(searchUser.canReadStream(eq("2323"))).thenReturn(true);
+        when(searchUser.canReadStream(eq("4242"))).thenReturn(true);
 
         final FieldTypesForStreamsRequest request = FieldTypesForStreamsRequest.Builder.builder()
                 .streams(ImmutableSet.of("2323", "4242"))
                 .timerange(RelativeRange.create(300))
                 .build();
 
-        this.fieldTypesResource.byStreams(request);
+        this.fieldTypesResource.byStreams(request, searchUser);
 
         verify(this.mappedFieldTypesService, times(1)).fieldTypesByStreamIds(streamIdCaptor.capture(), timeRangeArgumentCaptor.capture());
 
@@ -131,31 +135,38 @@ public class FieldTypesResourceTest {
 
     @Test
     public void byStreamChecksPermissionsForStream() {
-        when(currentSubject.isPermitted(eq(RestPermissions.STREAMS_READ + ":2323"))).thenReturn(true);
-        when(currentSubject.isPermitted(eq(RestPermissions.STREAMS_READ + ":4242"))).thenReturn(true);
+        when(searchUser.canReadStream(eq("2323"))).thenReturn(true);
+        when(searchUser.canReadStream(eq("4242"))).thenReturn(true);
 
-        this.fieldTypesResource.byStreams(FieldTypesForStreamsRequest.Builder.builder()
-                .streams(ImmutableSet.of("2323", "4242"))
-                .build());
+        this.fieldTypesResource.byStreams(
+                FieldTypesForStreamsRequest.Builder.builder()
+                        .streams(ImmutableSet.of("2323", "4242"))
+                        .build(),
+                searchUser
+        );
 
         final ArgumentCaptor<String> streamIdCaptor = ArgumentCaptor.forClass(String.class);
 
-        verify(currentSubject, times(2)).isPermitted(streamIdCaptor.capture());
+        verify(searchUser, times(2)).canReadStream(streamIdCaptor.capture());
 
-        assertThat(streamIdCaptor.getAllValues()).containsExactlyInAnyOrder("streams:read:2323", "streams:read:4242");
+        assertThat(streamIdCaptor.getAllValues()).containsExactlyInAnyOrder("2323", "4242");
     }
 
     @Test
     public void byStreamReturnsTypesFromMappedFieldTypesService() {
-        when(currentSubject.isPermitted(eq(RestPermissions.STREAMS_READ + ":2323"))).thenReturn(true);
-        when(currentSubject.isPermitted(eq(RestPermissions.STREAMS_READ + ":4242"))).thenReturn(true);
+        when(searchUser.canReadStream(eq("2323"))).thenReturn(true);
+        when(searchUser.canReadStream(eq("4242"))).thenReturn(true);
+
         final Set<MappedFieldTypeDTO> fieldTypes = Collections.singleton(MappedFieldTypeDTO.create("foobar",
                 FieldTypes.Type.createType("long", ImmutableSet.of("numeric", "enumerable"))));
         when(mappedFieldTypesService.fieldTypesByStreamIds(eq(ImmutableSet.of("2323", "4242")), eq(RelativeRange.allTime()))).thenReturn(fieldTypes);
 
-        final Set<MappedFieldTypeDTO> result = this.fieldTypesResource.byStreams(FieldTypesForStreamsRequest.Builder.builder()
-                .streams(ImmutableSet.of("2323", "4242"))
-                .build());
+        final Set<MappedFieldTypeDTO> result = this.fieldTypesResource.byStreams(
+                FieldTypesForStreamsRequest.Builder.builder()
+                        .streams(ImmutableSet.of("2323", "4242"))
+                        .build(),
+                searchUser
+        );
 
         verify(mappedFieldTypesService, times(1)).fieldTypesByStreamIds(streamIdCaptor.capture(), timeRangeArgumentCaptor.capture());
 
@@ -170,9 +181,12 @@ public class FieldTypesResourceTest {
         when(currentSubject.isPermitted(eq(RestPermissions.STREAMS_READ + ":4242"))).thenReturn(true);
 
         assertThatExceptionOfType(MissingStreamPermissionException.class)
-                .isThrownBy(() -> fieldTypesResource.byStreams(FieldTypesForStreamsRequest.Builder.builder()
-                        .streams(ImmutableSet.of("2323", "4242"))
-                        .build()))
+                .isThrownBy(() -> fieldTypesResource.byStreams(
+                        FieldTypesForStreamsRequest.Builder.builder()
+                                .streams(ImmutableSet.of("2323", "4242"))
+                                .build(),
+                        searchUser
+                ))
                 .satisfies(ex -> assertThat(ex.streamsWithMissingPermissions()).contains("2323"));
     }
 }

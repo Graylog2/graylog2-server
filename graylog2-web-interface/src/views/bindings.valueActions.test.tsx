@@ -42,6 +42,7 @@ describe('Views bindings value actions', () => {
     queryId: 'query1',
     contexts: {
       message: {},
+      isLocalNode: true,
     },
     type: FieldType.Unknown,
   };

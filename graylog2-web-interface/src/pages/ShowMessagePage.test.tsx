@@ -18,7 +18,6 @@ import * as React from 'react';
 import { render, waitFor, screen } from 'wrappedTestingLibrary';
 
 import { StoreMock as MockStore, asMock } from 'helpers/mocking';
-import DefaultQueryClientProvider from 'contexts/DefaultQueryClientProvider';
 import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
 
 import ShowMessagePage from './ShowMessagePage';
@@ -60,10 +59,8 @@ type SimpleShowMessagePageProps = {
 };
 
 const SimpleShowMessagePage = ({ index, messageId }: SimpleShowMessagePageProps) => (
-  <DefaultQueryClientProvider>
-    {/* @ts-expect-error */}
-    <ShowMessagePage params={{ index, messageId }} />
-  </DefaultQueryClientProvider>
+  // @ts-expect-error
+  <ShowMessagePage params={{ index, messageId }} />
 );
 
 describe('ShowMessagePage', () => {

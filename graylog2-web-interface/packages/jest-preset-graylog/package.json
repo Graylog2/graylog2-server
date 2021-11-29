@@ -18,11 +18,11 @@
   "license": "SSPL-1.0",
   "dependencies": {
     "@testing-library/dom": "8.5.0",
-    "@testing-library/jest-dom": "5.15.0",
+    "@testing-library/jest-dom": "5.15.1",
     "@testing-library/react": "12.1.2",
     "@testing-library/react-hooks": "^7.0.1",
     "@types/enzyme": "3.10.10",
-    "@jest/types": "27.2.4",
+    "@jest/types": "27.2.5",
     "babel-jest": "^27.0.2",
     "enzyme": "3.11.0",
     "enzyme-adapter-react-16": "^1.15.2",
@@ -33,8 +33,8 @@
     "jest-environment-jsdom": "^27.0.3",
     "jest-enzyme": "^7.1.2",
     "jest-localstorage-mock": "^2.4.0",
-    "jest-junit": "12.3.0",
-    "jest-styled-components": "7.0.6",
+    "jest-junit": "13.0.0",
+    "jest-styled-components": "7.0.7",
     "react-select-event": "^5.0.0"
   },
   "devDependencies": {

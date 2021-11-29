@@ -17,7 +17,6 @@
 package org.graylog2.bootstrap.commands;
 
 import com.github.rvesse.airline.annotations.Command;
-import org.graylog2.Configuration;
 import org.graylog2.commands.Server;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.Version;
@@ -31,7 +30,6 @@ public class MigrateCmd extends Server {
 
     private static final Logger LOG = LoggerFactory.getLogger(MigrateCmd.class);
 
-    protected static final Configuration configuration = new Configuration();
     private final Version version = Version.CURRENT_CLASSPATH;
 
     public MigrateCmd() {

@@ -27,7 +27,7 @@ import View from 'views/logic/views/View';
 import type { QuerySet } from 'views/logic/search/Search';
 import Search from 'views/logic/search/Search';
 import ViewState from 'views/logic/views/ViewState';
-import Query from 'views/logic/queries/Query';
+import Query, { TimeRange, ElasticsearchQueryString } from 'views/logic/queries/Query';
 import SearchActions from 'views/actions/SearchActions';
 import { singletonActions, singletonStore } from 'logic/singleton';
 import type { QueryId } from 'views/logic/queries/Query';
@@ -43,7 +43,12 @@ export type ViewStoreState = {
 };
 
 type ViewActionsType = RefluxActions<{
-  create: (type: ViewType, streamId?: string) => Promise<ViewStoreState>,
+  create: (
+    type: ViewType,
+    streamId?: string,
+    timeRange?: TimeRange,
+    queryString?: ElasticsearchQueryString,
+  ) => Promise<ViewStoreState>,
   load: (view: View, isNew?: boolean, queryId?: string) => Promise<ViewStoreState>,
   properties: (properties: Properties) => Promise<void>,
   search: (search: Search) => Promise<View>,
@@ -101,8 +106,13 @@ export const ViewStore: ViewStoreType = singletonStore(
       return this._state();
     },
 
-    create(type: ViewType, streamId: string = null) {
-      return ViewGenerator(type, streamId)
+    create(
+      type: ViewType,
+      streamId: string = null,
+      timeRange?: TimeRange,
+      queryString?: ElasticsearchQueryString,
+    ) {
+      return ViewGenerator(type, streamId, timeRange, queryString)
         .then((newView) => {
           const [view] = this._updateSearch(newView);
 

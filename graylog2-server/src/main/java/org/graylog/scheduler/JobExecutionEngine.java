@@ -129,6 +129,12 @@ public class JobExecutionEngine {
         return false;
     }
 
+    public void updateLockedJobs() {
+        if (workerPool.anySlotsUsed()) {
+            jobTriggerService.updateLockedJobTriggers();
+        }
+    }
+
     private void handleTrigger(JobTriggerDto trigger) {
         LOG.trace("Locked trigger {} (owner={})", trigger.id(), trigger.lock().owner());
 

@@ -23,11 +23,12 @@ import org.graylog2.indexer.IndexMappingFactory;
 import org.graylog2.plugin.Version;
 import org.graylog2.storage.ElasticsearchVersion;
 import org.graylog2.storage.providers.ElasticsearchVersionProvider;
+import org.graylog2.storage.versionprobe.SearchVersion;
 
 public class ElasticsearchModule extends AbstractModule {
     @Override
     protected void configure() {
-        bind(Version.class).annotatedWith(ElasticsearchVersion.class).toProvider(ElasticsearchVersionProvider.class).asEagerSingleton();
+        bind(SearchVersion.class).annotatedWith(ElasticsearchVersion.class).toProvider(ElasticsearchVersionProvider.class).asEagerSingleton();
 
         OptionalBinder.newOptionalBinder(binder(), FailureIndexMappingFactory.class);
 

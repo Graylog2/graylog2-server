@@ -23,6 +23,11 @@ The following API endpoints have been removed in 4.3.
 | ------------------------------------------- | --------------------------- |
 | `PUT /example/placeholder`                  | TODO placeholder comment    |
 
+## Removed Migrations
+
+Removed a migration that was recalculating the index ranges of the default stream's index set for
+pre 2.2 Graylog installations.
+
 ## Configuration File Changes
 
 The following configuration option as been removed: `index_field_type_periodical_interval`.

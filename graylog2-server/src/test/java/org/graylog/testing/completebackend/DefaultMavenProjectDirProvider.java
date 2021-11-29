@@ -27,6 +27,11 @@ public class DefaultMavenProjectDirProvider implements MavenProjectDirProvider {
         return getProjectReposDir().resolve("graylog2-server");
     }
 
+    @Override
+    public String getUniqueId() {
+        return "default";
+    }
+
     protected Path getProjectReposDir() {
         return new File(PropertyLoader.get("api-it-tests.properties", "project_repos_dir")).toPath().normalize();
     }

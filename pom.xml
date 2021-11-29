@@ -146,7 +146,7 @@
         <pkts.version>3.0.5</pkts.version>
         <prometheus-client.version>0.11.0</prometheus-client.version>
         <protobuf.version>3.11.4</protobuf.version>
-        <reflections.version>0.9.12</reflections.version>
+        <reflections.version>0.10.2</reflections.version>
         <retrofit.version>2.9.0</retrofit.version>
         <scala.version>2.13.4</scala.version>
         <semver4j.version>2.2.0-graylog.1</semver4j.version>
@@ -176,13 +176,13 @@
         <junit-jupiter.version>5.7.0</junit-jupiter.version>
         <mockito.version>3.4.4</mockito.version>
         <nosqlunit.version>1.0.0-rc.5</nosqlunit.version>
-        <restassured.version>4.3.1</restassured.version>
+        <restassured.version>4.3.2</restassured.version>
         <system-rules.version>1.19.0</system-rules.version>
         <testcontainers.version>1.16.0</testcontainers.version>
 
         <!-- Nodejs dependencies -->
-        <nodejs.version>v14.15.4</nodejs.version>
-        <yarn.version>v1.22.5</yarn.version>
+        <nodejs.version>v16.13.0</nodejs.version>
+        <yarn.version>v1.22.17</yarn.version>
 
         <!-- Plugin versions -->
         <license-maven.version>4.0.rc2</license-maven.version>

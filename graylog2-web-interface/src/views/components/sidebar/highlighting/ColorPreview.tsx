@@ -52,7 +52,7 @@ type ColorPreviewProps = {
 
 const ColorPreview = React.forwardRef<HTMLDivElement, ColorPreviewProps>(({ color, onClick = () => {} }, ref) => {
   if (color.type === 'static') {
-    return <StaticColorPreview ref={ref} onClick={onClick} color={(color as StaticColor).color} />;
+    return <StaticColorPreview ref={ref} data-testid="static-color-preview" onClick={onClick} color={(color as StaticColor).color} />;
   }
 
   if (color.type === 'gradient') {

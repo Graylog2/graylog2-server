@@ -112,7 +112,7 @@ describe('NewSearchPage', () => {
 
       await waitFor(() => expect(ViewActions.create).toBeCalledTimes(1));
 
-      expect(ViewActions.create).toHaveBeenCalledWith(View.Type.Search, undefined);
+      expect(ViewActions.create).toHaveBeenCalledWith(View.Type.Search, undefined, undefined, undefined);
     });
 
     it('should process hooks with provided location query', async () => {
