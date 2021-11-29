@@ -36,6 +36,7 @@ import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.engine.QueryBackend;
 import org.graylog.plugins.views.search.engine.SearchConfig;
+import org.graylog.plugins.views.search.engine.suggestions.SuggestionError;
 import org.graylog.plugins.views.search.engine.suggestions.SuggestionRequest;
 import org.graylog.plugins.views.search.engine.suggestions.SuggestionEntry;
 import org.graylog.plugins.views.search.engine.suggestions.SuggestionResponse;
@@ -313,10 +314,14 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                 .allowNoIndices(false)
                 .ignoreUnavailable(false);
 
-        final SearchResult result = JestUtils.execute(jestClient, searchBuilder.build(), () -> "Unable to perform aggregation: ");
+        try {
+            final SearchResult result = JestUtils.execute(jestClient, searchBuilder.build(), () -> "Unable to perform aggregation: ");
 
-        final TermsAggregation aggregation = result.getAggregations().getTermsAggregation("fieldvalues");
-        final List<SuggestionEntry> entries = aggregation.getBuckets().stream().map(b -> new SuggestionEntry(b.getKeyAsString(), b.getCount())).collect(Collectors.toList());
-        return SuggestionResponse.builder(req.field(), req.input()).suggestions(entries).build();
+            final TermsAggregation aggregation = result.getAggregations().getTermsAggregation("fieldvalues");
+            final List<SuggestionEntry> entries = aggregation.getBuckets().stream().map(b -> new SuggestionEntry(b.getKeyAsString(), b.getCount())).collect(Collectors.toList());
+            return SuggestionResponse.builder(req.field(), req.input()).suggestions(entries).build();
+        } catch (Exception e) {
+            return SuggestionResponse.builder(req.field(), req.input()).suggestionError(SuggestionError.create(e.getClass().getSimpleName(), e.getMessage())).build();
+        }
     }
 }
