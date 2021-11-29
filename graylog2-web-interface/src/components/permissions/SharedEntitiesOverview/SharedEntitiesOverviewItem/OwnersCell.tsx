@@ -21,7 +21,7 @@ import { List } from 'immutable';
 
 import { isPermitted } from 'util/PermissionsMixin';
 import Grantee from 'logic/permissions/Grantee';
-import { Link } from 'components/common/router';
+import { Link } from 'components/graylog/router';
 import { defaultCompare } from 'views/logic/DefaultCompare';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import type { GranteesList } from 'logic/permissions/EntityShareState';
