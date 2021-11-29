@@ -181,8 +181,8 @@
         <testcontainers.version>1.16.0</testcontainers.version>
 
         <!-- Nodejs dependencies -->
-        <nodejs.version>v14.15.4</nodejs.version>
-        <yarn.version>v1.22.5</yarn.version>
+        <nodejs.version>v16.13.0</nodejs.version>
+        <yarn.version>v1.22.17</yarn.version>
 
         <!-- Plugin versions -->
         <license-maven.version>4.0.rc2</license-maven.version>
