@@ -24,6 +24,7 @@ import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNType;
 import org.graylog.grn.GRNTypes;
 import org.graylog.security.DBGrantService;
+import org.graylog.security.shares.Grantee;
 import org.graylog2.contentpacks.ContentPackService;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
@@ -103,10 +104,17 @@ public class EntityDependencyResolver {
                 .collect(ImmutableSet.toImmutableSet());
     }
 
-    private Set<EntityDescriptor.Owner> getOwners(@Nullable Set<GRN> owners) {
+    private Set<Grantee> getOwners(@Nullable Set<GRN> owners) {
         return firstNonNull(owners, Collections.<GRN>emptySet()).stream()
                 .map(descriptorService::getDescriptor)
-                .map(descriptor -> EntityDescriptor.Owner.create(descriptor.grn(), descriptor.title()))
+                // TODO there is a duplicate in GranteeSharesService
+                .map(descriptor -> {
+                            if (descriptor.grn().equals(GRNRegistry.GLOBAL_USER_GRN)) {
+                                return Grantee.createGlobal();
+                            }
+                            return Grantee.create(descriptor.grn(), descriptor.grn().type(), descriptor.title());
+                        }
+                )
                 .collect(Collectors.toSet());
     }
 }
