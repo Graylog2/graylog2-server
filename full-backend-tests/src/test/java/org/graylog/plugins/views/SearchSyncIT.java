@@ -24,7 +24,6 @@ import org.graylog.testing.utils.GelfInputUtils;
 import org.graylog.testing.utils.SearchUtils;
 
 import java.io.InputStream;
-import java.util.List;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -61,12 +60,12 @@ public class SearchSyncIT {
         int mappedPort = sut.mappedPortFor(GELF_HTTP_PORT);
         GelfInputUtils.createGelfHttpInput(mappedPort, GELF_HTTP_PORT, requestSpec);
         GelfInputUtils.postMessage(mappedPort,
-                "{\"short_message\":\"Hello there\", \"host\":\"example.org\", \"facility\":\"test\"}",
+                "{\"short_message\":\"search-sync-test\", \"host\":\"example.org\", \"facility\":\"test\"}",
                 requestSpec);
 
         // mainly because of the waiting logic
-        final List<String> strings = SearchUtils.searchForAllMessages(requestSpec);
-        assertThat(strings.size()).isEqualTo(1);
+        final boolean isMessagePresent = SearchUtils.waitForMessage(requestSpec, "search-sync-test");
+        assertThat(isMessagePresent).isTrue();
     }
 
     @ContainerMatrixTest
@@ -82,7 +81,7 @@ public class SearchSyncIT {
                 .statusCode(200)
                 .assertThat()
                 .body("execution.completed_exceptionally", equalTo(false))
-                .body("results*.value.search_types[0]*.value.messages.message.message[0]", hasItem("Hello there"));
+                .body("results*.value.search_types[0]*.value.messages.message.message[0]", hasItem("search-sync-test"));
     }
 
     @ContainerMatrixTest
@@ -100,7 +99,7 @@ public class SearchSyncIT {
                 .statusCode(200)
                 .assertThat()
                 .body("execution.completed_exceptionally", equalTo(false))
-                .body("results*.value.search_types[0]*.value.messages.message.message[0]", hasItem("Hello there"));
+                .body("results*.value.search_types[0]*.value.messages.message.message[0]", hasItem("search-sync-test"));
     }
 
     @ContainerMatrixTest
@@ -118,7 +117,7 @@ public class SearchSyncIT {
                 .statusCode(200)
                 .assertThat()
                 .body("execution.completed_exceptionally", equalTo(false))
-                .body("results*.value.search_types[0]*.value.messages.message.message[0]", hasItem("Hello there"));
+                .body("results*.value.search_types[0]*.value.messages.message.message[0]", hasItem("search-sync-test"));
     }
 
     private InputStream fixture(String filename) {

@@ -36,7 +36,7 @@ public final class SearchUtils {
         return messages;
     }
 
-    public static boolean searchForMessage(RequestSpecification requestSpecification, String message) {
+    public static boolean waitForMessage(RequestSpecification requestSpecification, String message) {
         WaitUtils.waitFor(() -> captureMessage(requestSpecification, message), "Timed out waiting for message to be present");
         return true;
     }
