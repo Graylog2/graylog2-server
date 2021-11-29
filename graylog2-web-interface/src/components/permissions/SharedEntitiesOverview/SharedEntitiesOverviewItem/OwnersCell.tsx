@@ -19,7 +19,7 @@ import { isPermitted } from 'util/PermissionsMixin';
 import * as React from 'react';
 import { useContext } from 'react';
 import { List } from 'immutable';
-import Grantee from 'src/logic/permissions/Grantee';
+import Grantee from 'logic/permissions/Grantee';
 
 import { Link } from 'components/common/router';
 import { defaultCompare } from 'views/logic/DefaultCompare';
