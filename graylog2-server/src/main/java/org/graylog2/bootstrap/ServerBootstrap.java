@@ -16,10 +16,12 @@
  */
 package org.graylog2.bootstrap;
 
+import com.github.joschi.jadconfig.guice.NamedConfigParametersModule;
 import com.github.rvesse.airline.annotations.Option;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.util.concurrent.ServiceManager;
+import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.Module;
@@ -29,8 +31,10 @@ import com.google.inject.util.Types;
 import org.graylog2.Configuration;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
+import org.graylog2.bindings.MongoDBModule;
 import org.graylog2.configuration.PathConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
+import org.graylog2.database.MongoConnection;
 import org.graylog2.migrations.Migration;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
@@ -105,6 +109,20 @@ public abstract class ServerBootstrap extends CmdLineTool {
 
         // Set these early in the startup because netty's NativeLibraryUtil uses a static initializer
         setNettyNativeDefaults(pathConfiguration);
+
+    }
+
+    @Override
+    protected void beforeInjectorCreation() {
+        testMongoDbConnection();
+    }
+
+    // Try to create a single MongoDBConnection, so we can fail early if there is an error
+    private void testMongoDbConnection() {
+        Guice.createInjector(
+                        new NamedConfigParametersModule(jadConfig.getConfigurationBeans()),
+                        new MongoDBModule())
+                .getInstance(MongoConnection.class);
     }
 
     private void setNettyNativeDefaults(PathConfiguration pathConfiguration) {
