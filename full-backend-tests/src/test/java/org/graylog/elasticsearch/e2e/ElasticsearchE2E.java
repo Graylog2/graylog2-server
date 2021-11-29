@@ -64,6 +64,6 @@ public class ElasticsearchE2E {
                 "{\"short_message\":\"Hello there\", \"host\":\"example.org\", \"facility\":\"test\"}",
                 requestSpec);
 
-        assertThat(SearchUtils.searchForMessage(requestSpec, "Hello there")).isTrue();
+        assertThat(SearchUtils.waitForMessage(requestSpec, "Hello there")).isTrue();
     }
 }
