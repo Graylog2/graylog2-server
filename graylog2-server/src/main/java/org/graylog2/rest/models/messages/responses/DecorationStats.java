@@ -55,7 +55,8 @@ public abstract class DecorationStats {
         return Sets.intersection(originalMessage().keySet(), decoratedMessage().keySet())
                 .stream()
                 .filter(key -> !originalMessage().get(key).equals(decoratedMessage().get(key)))
-                .collect(Collectors.toMap(Function.identity(), key -> decoratedMessage().get(key)));
+                .collect(Collectors.toMap(Function.identity(), key
+                        -> ChangedField.builder().before(originalMessage().get(key)).after(decoratedMessage().get(key)).build()));
     }
 
     @SuppressWarnings("unused")

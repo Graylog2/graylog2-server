@@ -151,19 +151,19 @@ const SimulationChanges = createReactClass({
     );
   },
 
-  _formatMutatedFields(originalMessage, processedMessage) {
-    const mutatedFields = Object.keys(processedMessage.decoration_stats.changed_fields);
+  _formatMutatedFields(mutatedFields) {
+    const keys = Object.keys(mutatedFields);
 
-    if (mutatedFields.length === 0) {
+    if (keys.length === 0) {
       return null;
     }
 
     const formattedFields = [];
 
-    mutatedFields.sort().forEach((field) => {
+    keys.sort().forEach((field) => {
       formattedFields.push(this._formatFieldTitle(field));
-      formattedFields.push(this._formatFieldValue(`${field}-original`, originalMessage.fields[field], true));
-      formattedFields.push(this._formatFieldValue(field, processedMessage.fields[field]));
+      formattedFields.push(this._formatFieldValue(`${field}-original`, mutatedFields[field].before, true));
+      formattedFields.push(this._formatFieldValue(field, mutatedFields[field].after));
     });
 
     return (
@@ -188,7 +188,7 @@ const SimulationChanges = createReactClass({
 
     const formattedAddedFields = this._formatAddedFields(processedMessage.decoration_stats.added_fields);
     const formattedRemovedFields = this._formatRemovedFields(processedMessage.decoration_stats.removed_fields);
-    const formattedMutatedFields = this._formatMutatedFields(originalMessage, processedMessage);
+    const formattedMutatedFields = this._formatMutatedFields(processedMessage.decoration_stats.changed_fields);
 
     if (!formattedAddedFields && !formattedRemovedFields && !formattedMutatedFields) {
       return <p>Original message would be not be modified during processing.</p>;
