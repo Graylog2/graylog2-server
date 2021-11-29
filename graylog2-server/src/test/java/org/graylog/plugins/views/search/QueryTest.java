@@ -176,7 +176,7 @@ public class QueryTest {
     @Test
     public void builderGeneratesDefaultQueryAndRange() {
         final Query build = Query.builder().build();
-        final ElasticsearchQueryString query = (ElasticsearchQueryString) build.query();
+        final BackendQuery query = build.query();
         assertThat(query.queryString()).isEqualTo("");
         assertThat(build.timerange()).isNotNull();
     }

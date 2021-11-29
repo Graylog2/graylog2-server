@@ -53,6 +53,7 @@ public abstract class ElasticsearchQueryString implements BackendQuery {
     public abstract String type();
 
     @JsonProperty
+    @Override
     public abstract String queryString();
 
     @JsonIgnore
