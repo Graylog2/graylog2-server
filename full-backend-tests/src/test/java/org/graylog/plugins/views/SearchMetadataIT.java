@@ -47,13 +47,11 @@ public class SearchMetadataIT {
 
     @BeforeAll
     public void importMongoFixtures() {
-        LOG.error("importMongoFixtures()");
-        this.graylogBackend.importMongoDBFixture("org/graylog/plugins/views/mongodb-stored-searches-for-metadata-endpoint.json", SearchMetadataIT.class);
+        this.graylogBackend.importMongoDBFixture("mongodb-stored-searches-for-metadata-endpoint.json", SearchMetadataIT.class);
     }
 
     @ContainerMatrixTest
     void testEmptyRequest() {
-        LOG.error("testEmptyRequest()");
         given()
                 .spec(requestSpec)
                 .when()
@@ -65,7 +63,6 @@ public class SearchMetadataIT {
 
     @ContainerMatrixTest
     void testMinimalRequestWithoutParameter() {
-        LOG.error("testMinimalRequestWithoutParameter()");
         final ValidatableResponse response = given()
                 .spec(requestSpec)
                 .when()
@@ -80,7 +77,6 @@ public class SearchMetadataIT {
 
     @ContainerMatrixTest
     void testMinimalRequestWithSingleParameter() {
-        LOG.error("testMinimalRequestWithSingleParameter()");
         final ValidatableResponse response = given()
                 .spec(requestSpec)
                 .when()
@@ -93,7 +89,7 @@ public class SearchMetadataIT {
         response.assertThat().body("declared_parameters", anEmptyMap());
     }
 
-    // TODO:   @ContainerMatrixTest
+    @ContainerMatrixTest
     void testRetrievingMetadataForStoredSearchWithoutParameter() {
         LOG.error("testRetrievingMetadataForStoredSearchWithoutParameter()");
         final ValidatableResponse response = given()
@@ -107,7 +103,7 @@ public class SearchMetadataIT {
         response.assertThat().body("declared_parameters", anEmptyMap());
     }
 
-    // TODO:   @ContainerMatrixTest
+    @ContainerMatrixTest
     void testRetrievingMetadataForStoredSearchWithParameter() {
         LOG.error("testRetrievingMetadataForStoredSearchWithParameter()");
         final ValidatableResponse response = given()
