@@ -14,13 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { isPermitted } from 'util/PermissionsMixin';
 
 import * as React from 'react';
 import { useContext } from 'react';
 import { List } from 'immutable';
-import Grantee from 'logic/permissions/Grantee';
 
+import { isPermitted } from 'util/PermissionsMixin';
+import Grantee from 'logic/permissions/Grantee';
 import { Link } from 'components/common/router';
 import { defaultCompare } from 'views/logic/DefaultCompare';
 import CurrentUserContext from 'contexts/CurrentUserContext';
