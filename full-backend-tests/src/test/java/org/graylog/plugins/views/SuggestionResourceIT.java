@@ -19,10 +19,10 @@ package org.graylog.plugins.views;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 import org.graylog.testing.completebackend.GraylogBackend;
+import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.graylog.testing.utils.GelfInputUtils;
 import org.graylog.testing.utils.SearchUtils;
-import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
@@ -31,20 +31,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.testing.completebackend.Lifecycle.CLASS;
 import static org.hamcrest.core.IsEqual.equalTo;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = CLASS)
-public class SuggestionsIT {
+@ContainerMatrixTestsConfiguration(serverLifecycle = CLASS, extraPorts = SuggestionResourceIT.GELF_HTTP_PORT)
+public class SuggestionResourceIT {
 
     static final int GELF_HTTP_PORT = 12201;
 
     private final GraylogBackend sut;
     private final RequestSpecification requestSpec;
 
-    public SuggestionsIT(GraylogBackend sut, RequestSpecification requestSpec) {
+    public SuggestionResourceIT(GraylogBackend sut, RequestSpecification requestSpec) {
         this.sut = sut;
         this.requestSpec = requestSpec;
     }
 
-    @Test
+    @ContainerMatrixTest
     void testMinimalisticRequest() {
         int mappedPort = sut.mappedPortFor(GELF_HTTP_PORT);
         GelfInputUtils.createGelfHttpInput(mappedPort, GELF_HTTP_PORT, requestSpec);
