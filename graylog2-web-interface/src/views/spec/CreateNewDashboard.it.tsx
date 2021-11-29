@@ -29,7 +29,6 @@ import viewsBindings from 'views/bindings';
 import StreamsContext from 'contexts/StreamsContext';
 import SearchMetadata from 'views/logic/search/SearchMetadata';
 import { SearchMetadataActions, SearchMetadataStore } from 'views/stores/SearchMetadataStore';
-import DefaultQueryClientProvider from 'contexts/DefaultQueryClientProvider';
 
 jest.mock('views/stores/DashboardsStore', () => ({
   DashboardsActions: {
@@ -117,13 +116,11 @@ describe('Create a new dashboard', () => {
   afterAll(() => PluginStore.unregister(viewsPlugin));
 
   const SimpleAppRouter = () => (
-    <DefaultQueryClientProvider>
-      <CurrentUserProvider>
-        <StreamsContext.Provider value={[{ id: 'stream-1' }]}>
-          <AppRouter />
-        </StreamsContext.Provider>
-      </CurrentUserProvider>
-    </DefaultQueryClientProvider>
+    <CurrentUserProvider>
+      <StreamsContext.Provider value={[{ id: 'stream-1' }]}>
+        <AppRouter />
+      </StreamsContext.Provider>
+    </CurrentUserProvider>
   );
 
   it('using Dashboards Page', async () => {

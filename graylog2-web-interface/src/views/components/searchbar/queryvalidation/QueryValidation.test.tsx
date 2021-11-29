@@ -24,7 +24,6 @@ import QueryValidation, { QueryValidationState } from 'views/components/searchba
 import { asMock } from 'helpers/mocking';
 import FormWarningsProvider from 'contexts/FormWarningsProvider';
 import fetch from 'logic/rest/FetchProvider';
-import DefaultQueryClientProvider from 'contexts/DefaultQueryClientProvider';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 
 jest.mock('views/stores/QueriesStore', () => ({
@@ -76,15 +75,13 @@ describe('QueryValidation', () => {
   const validationErrorIconTitle = 'Toggle validation error explanation';
 
   const SUT = (props) => (
-    <DefaultQueryClientProvider>
-      <Formik onSubmit={() => {}} initialValues={{}}>
-        <Form>
-          <FormWarningsProvider>
-            <QueryValidation {...props} />
-          </FormWarningsProvider>
-        </Form>
-      </Formik>
-    </DefaultQueryClientProvider>
+    <Formik onSubmit={() => {}} initialValues={{}}>
+      <Form>
+        <FormWarningsProvider>
+          <QueryValidation {...props} />
+        </FormWarningsProvider>
+      </Form>
+    </Formik>
   );
 
   afterEach(() => {

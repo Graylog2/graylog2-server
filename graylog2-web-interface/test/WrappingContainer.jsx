@@ -49,11 +49,13 @@ const WrappingContainer = ({ children }) => {
   };
 
   return (
-    <Router history={history}>
-      <ThemeProvider theme={theme}>
-        {children}
-      </ThemeProvider>
-    </Router>
+    <DefaultQueryClientProvider>
+      <Router history={history}>
+        <ThemeProvider theme={theme}>
+          {children}
+        </ThemeProvider>
+      </Router>
+    </DefaultQueryClientProvider>
   );
 };
 
