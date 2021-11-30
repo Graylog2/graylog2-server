@@ -85,7 +85,7 @@ public abstract class SearchVersion {
     public static SearchVersion decode(final String searchServerIdentifier) {
         final String[] parts = searchServerIdentifier.split(":");
         if(parts.length == 2) {
-            return SearchVersion.create(Distribution.valueOf(parts[0].toUpperCase()), com.github.zafarkhaja.semver.Version.valueOf((parts[1])));
+            return SearchVersion.create(Distribution.valueOf(parts[0].toUpperCase(Locale.ROOT)), com.github.zafarkhaja.semver.Version.valueOf((parts[1])));
         } else {
             return SearchVersion.elasticsearch(searchServerIdentifier);
         }
