@@ -14,44 +14,31 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import * as React from 'react';
 import * as Immutable from 'immutable';
+import { render, screen } from 'wrappedTestingLibrary';
 
-import SharedEntity from 'logic/permissions/SharedEntity';
+import Grantee from 'logic/permissions/Grantee';
 
-export type GRN = string;
+import OwnersCell from './OwnersCell';
 
-export type GRNType =
-  'user'
-  | 'team'
-  | 'dashboard'
-  | 'event_definition'
-  | 'notification'
-  | 'search'
-  | 'stream'
-  | 'global';
+const everyone = Grantee.builder()
+  .type('global')
+  .id('grn::::global:everyone')
+  .title('grn::::global:everyone')
+  .build();
 
-export type CapabilityType = {
-  id: GRN,
-  title: 'Viewer' | 'Manager' | 'Owner',
-};
+const SUT = (props: React.ComponentProps<typeof OwnersCell>) => (
+  <table>
+    <tbody>
+      <tr><OwnersCell {...props} /></tr>
+    </tbody>
+  </table>
+);
 
-export type GranteeType = {
-  id: GRN,
-  title: string,
-  type: 'global' | 'team' | 'user' | 'error',
-};
-
-export type ActiveShareType = {
-  grant: GRN,
-  grantee: GRN,
-  capability: GRN,
-};
-
-export type SharedEntityType = {
-  id: GRN,
-  owners: Array<GranteeType>,
-  title: string,
-  type: string,
-};
-
-export type SharedEntities = Immutable.List<SharedEntity>;
+describe('OwnersCell', () => {
+  it('renders global share as Everyone', async () => {
+    render(<SUT owners={Immutable.List([everyone])} />);
+    await screen.findByText('Everyone');
+  });
+});

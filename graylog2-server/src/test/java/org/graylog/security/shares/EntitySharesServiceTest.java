@@ -104,7 +104,7 @@ public class EntitySharesServiceTest {
         // This test can also see the "invisible user"
         final Set<GRN> allGrantees = dbGrantService.getAll().stream().map(GrantDTO::grantee).collect(Collectors.toSet());
         lenient().when(granteeService.getAvailableGrantees(any())).thenReturn(
-                allGrantees.stream().map(g -> EntityShareResponse.AvailableGrantee.create(g, "user", g.entity())).collect(Collectors.toSet())
+                allGrantees.stream().map(g -> Grantee.createUser(g, g.entity())).collect(Collectors.toSet())
         );
 
         final User user = createMockUser("hans");
@@ -130,7 +130,7 @@ public class EntitySharesServiceTest {
         lenient().when(granteeService.getAvailableGrantees(any())).thenReturn(
                 allGrantees.stream()
                         .filter(g -> g.toString().equals("grn::::user:invisible"))
-                        .map(g -> EntityShareResponse.AvailableGrantee.create(g, "user", g.entity())).collect(Collectors.toSet())
+                        .map(g -> Grantee.createUser(g, g.entity())).collect(Collectors.toSet())
         );
 
         final User user = createMockUser("hans");
@@ -149,7 +149,7 @@ public class EntitySharesServiceTest {
         final EntityShareRequest shareRequest = EntityShareRequest.create(ImmutableMap.of(bob, Capability.VIEW));
 
         final User user = createMockUser("requestingUser");
-        when(granteeService.getAvailableGrantees(user)).thenReturn(ImmutableSet.of(EntityShareResponse.AvailableGrantee.create(bob, "user", "bob")));
+        when(granteeService.getAvailableGrantees(user)).thenReturn(ImmutableSet.of(Grantee.createUser(bob, "bob")));
         final Subject subject = mock(Subject.class);
         final EntityShareResponse entityShareResponse = entitySharesService.prepareShare(entity, shareRequest, user, subject);
         assertThat(entityShareResponse.validationResult()).satisfies(validationResult -> {
@@ -229,7 +229,7 @@ public class EntitySharesServiceTest {
 
         final User user = createMockUser("hans");
         final GRN janeGRN = grnRegistry.newGRN(GRNTypes.USER, "jane");
-        when(granteeService.getAvailableGrantees(user)).thenReturn(ImmutableSet.of(EntityShareResponse.AvailableGrantee.create(janeGRN, "user", "jane")));
+        when(granteeService.getAvailableGrantees(user)).thenReturn(ImmutableSet.of(Grantee.createUser(janeGRN, "jane")));
         final Subject subject = mock(Subject.class);
         final EntityShareResponse entityShareResponse = entitySharesService.prepareShare(entity, shareRequest, user, subject);
         assertThat(entityShareResponse.activeShares()).satisfies(activeShares -> {
