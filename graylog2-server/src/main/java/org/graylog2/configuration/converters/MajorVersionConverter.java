@@ -29,12 +29,13 @@ public class MajorVersionConverter implements Converter<SearchVersion> {
             return SearchVersion.elasticsearch(Version.from(majorVersion, 0, 0));
         } catch (NumberFormatException nfe) {
             // It's probably a distribution:version format
+            // caution, this format assumes full version X.Y.Z, not just major number
             return SearchVersion.decode(value);
         }
     }
 
     @Override
     public String convertTo(SearchVersion value) {
-        return value.toString();
+        return value.encode();
     }
 }
