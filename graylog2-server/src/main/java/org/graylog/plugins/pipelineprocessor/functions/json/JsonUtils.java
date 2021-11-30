@@ -45,7 +45,10 @@ public class JsonUtils {
     private static final String KEY_SEPARATOR = "_";
     private static final String KEY_VALUE_SEPARATOR = ":";
     private static final String LIST_SEPARATOR = ",";
-    private static final RemoveNullPredicate REMOVE_NULL_PREDICATE = new RemoveNullPredicate();
+    private static final RemoveNullPredicate<Map.Entry<String, Object>> REMOVE_NULL_PREDICATE = new RemoveNullPredicate<>();
+
+    private JsonUtils() {
+    }
 
     public static JsonNode extractJson(
             String value, ObjectMapper mapper, boolean flattenObjects, boolean escapeArrays, boolean deleteArrays)
@@ -64,69 +67,63 @@ public class JsonUtils {
         return resultRoot;
     }
 
-//    public static String extractJson(
-//            String value, ObjectMapper mapper, boolean flattenObjects, boolean escapeArrays, boolean deleteArrays)
-//            throws IOException {
-//        if (isNullOrEmpty(value)) {
-//            throw new IOException("null result");
-//        }
-//        final Map<String, Object> json = mapper.readValue(value, TypeReferences.MAP_STRING_OBJECT);
-//
-//        final Map<String, Object> results = new TreeMap<>();
-//        for (Map.Entry<String, Object> mapEntry : json.entrySet()) {
-//            for (Entry entry : parseValue(mapEntry.getKey(), mapEntry.getValue(), mapper, flattenObjects, escapeArrays, deleteArrays)) {
-//                results.put(entry.key(), entry.value());
-//            }
-//        }
-//        final Joiner.MapJoiner joiner = Joiner.on(LIST_SEPARATOR).withKeyValueSeparator(KEY_VALUE_SEPARATOR);
-//        return "{" + joiner.join(results) + "}";
-//    }
-
     private static Collection<Entry> parseValue(
             String key, Object value, ObjectMapper mapper, boolean flattenObjects, boolean escapeArrays, boolean deleteArrays)
             throws JsonProcessingException {
         if (value instanceof Boolean || value instanceof Number || value instanceof String) {
             return Collections.singleton(Entry.create(key, value));
         } else if (value instanceof Map) {
-            @SuppressWarnings("unchecked")
-            final Map<String, Object> map = (Map<String, Object>) value;
-            final Map<String, Object> withoutNull = Maps.filterEntries(map, REMOVE_NULL_PREDICATE);
-            if (flattenObjects) {
-                final List<Entry> result = new ArrayList<>(map.size());
-                for (Map.Entry<String, Object> entry : map.entrySet()) {
-                    result.addAll(parseValue(key + KEY_SEPARATOR + entry.getKey(), entry.getValue(),
-                            mapper, flattenObjects, escapeArrays, deleteArrays));
-                }
-                return result;
-            } else {
-                final Joiner.MapJoiner joiner = Joiner.on(LIST_SEPARATOR).withKeyValueSeparator(KEY_VALUE_SEPARATOR);
-                return Collections.singleton(Entry.create(key, joiner.join(withoutNull)));
-            }
+            return parseObject(key, value, mapper, flattenObjects, escapeArrays, deleteArrays);
         } else if (value instanceof List) {
-            if (deleteArrays) {
-                // ignore all arrays
-                return Collections.emptySet();
-            } else if (escapeArrays) {
-                // serialize, so it can be re-parsed as valid JSON
-                return Collections.singleton(Entry.create(key, mapper.writeValueAsString(value)));
-            } else {
-                // flatten array using indices for unique keys
-                int listSize = ((List<Object>) value).size();
-                final List<Entry> result = new ArrayList<>((listSize));
-                int index = 0;
-                for (Object obj : (List<Object>) value) {
-                    result.addAll(parseValue(key + KEY_SEPARATOR + index, obj,
-                            mapper, flattenObjects, escapeArrays, deleteArrays));
-                    index++;
-                }
-                return result;
-            }
+            return parseArray(key, value, mapper, flattenObjects, escapeArrays, deleteArrays);
         } else if (value == null) {
             // Ignore null values, so we don't try to create fields for that in the message.
             return Collections.emptySet();
         } else {
             LOG.debug("Unknown type \"{}\" in key \"{}\"", value.getClass(), key);
             return Collections.emptySet();
+        }
+    }
+
+    private static Collection<Entry> parseObject(
+            String key, Object value, ObjectMapper mapper, boolean flattenObjects, boolean escapeArrays, boolean deleteArrays)
+            throws JsonProcessingException {
+        @SuppressWarnings("unchecked")
+        final Map<String, Object> mapWithoutNull = Maps.filterEntries((Map<String, Object>) value, REMOVE_NULL_PREDICATE);
+        if (flattenObjects) {
+            final List<Entry> result = new ArrayList<>(mapWithoutNull.size());
+            for (Map.Entry<String, Object> entry : mapWithoutNull.entrySet()) {
+                result.addAll(parseValue(key + KEY_SEPARATOR + entry.getKey(), entry.getValue(),
+                        mapper, flattenObjects, escapeArrays, deleteArrays));
+            }
+            return result;
+        } else {
+            final Joiner.MapJoiner joiner = Joiner.on(LIST_SEPARATOR).withKeyValueSeparator(KEY_VALUE_SEPARATOR);
+            return Collections.singleton(Entry.create(key, joiner.join(mapWithoutNull)));
+        }
+    }
+
+    private static Collection<Entry> parseArray(
+            String key, Object value, ObjectMapper mapper, boolean flattenObjects, boolean escapeArrays, boolean deleteArrays)
+            throws JsonProcessingException {
+        if (deleteArrays) {
+            // ignore all arrays
+            return Collections.emptySet();
+        } else if (escapeArrays) {
+            // serialize, so it can be re-parsed as valid JSON
+            return Collections.singleton(Entry.create(key, mapper.writeValueAsString(value)));
+        } else {
+            // flatten array using indices for unique keys
+            @SuppressWarnings("unchecked")
+            int listSize = ((List<Object>) value).size();
+            final List<Entry> result = new ArrayList<>((listSize));
+            int index = 0;
+            for (Object obj : (List<Object>) value) {
+                result.addAll(parseValue(key + KEY_SEPARATOR + index, obj,
+                        mapper, flattenObjects, escapeArrays, deleteArrays));
+                index++;
+            }
+            return result;
         }
     }
 
@@ -164,7 +161,7 @@ public class JsonUtils {
         }
     }
 
-    protected final static class RemoveNullPredicate implements Predicate<Map.Entry> {
+    protected static final class RemoveNullPredicate<T extends Map.Entry> implements Predicate<T> {
         @Override
         public boolean apply(@Nullable Map.Entry input) {
             return input != null && input.getKey() != null && input.getValue() != null;
