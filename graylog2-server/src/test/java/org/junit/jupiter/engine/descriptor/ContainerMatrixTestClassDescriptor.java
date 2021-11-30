@@ -26,6 +26,7 @@ import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.TestTag;
 import org.junit.platform.engine.support.hierarchical.ThrowableCollector;
 
+import java.net.URL;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
@@ -39,8 +40,9 @@ public class ContainerMatrixTestClassDescriptor extends ClassBasedTestDescriptor
 
     private final String esVersion;
     private final String mongoVersion;
+    private final List<URL> mongoFixtures;
 
-    public ContainerMatrixTestClassDescriptor(TestDescriptor parent, Class<?> testClass, JupiterConfiguration configuration, String esVersion, String mongoVersion) {
+    public ContainerMatrixTestClassDescriptor(TestDescriptor parent, Class<?> testClass, JupiterConfiguration configuration, String esVersion, String mongoVersion, List<URL> mongoFixtures) {
         super(
                 parent.getUniqueId().append(SEGMENT_TYPE, testClass.getName() + "_" + esVersion + "_" + mongoVersion),
                 testClass,
@@ -49,6 +51,7 @@ public class ContainerMatrixTestClassDescriptor extends ClassBasedTestDescriptor
         );
         this.esVersion = esVersion;
         this.mongoVersion = mongoVersion;
+        this.mongoFixtures = mongoFixtures;
         setParent(parent);
     }
 
@@ -89,5 +92,9 @@ public class ContainerMatrixTestClassDescriptor extends ClassBasedTestDescriptor
 
     public String getMongoVersion() {
         return mongoVersion;
+    }
+
+    public List<URL> getMongoFixtures() {
+        return mongoFixtures;
     }
 }
