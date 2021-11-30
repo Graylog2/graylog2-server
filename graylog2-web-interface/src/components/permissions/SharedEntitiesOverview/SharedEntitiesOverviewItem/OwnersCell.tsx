@@ -17,7 +17,6 @@
 
 import * as React from 'react';
 import { useContext } from 'react';
-import { List } from 'immutable';
 
 import { isPermitted } from 'util/PermissionsMixin';
 import Grantee from 'logic/permissions/Grantee';
@@ -38,7 +37,7 @@ const assertUnreachable = (type: 'error'): never => {
   throw new Error(`Owner of entity has not supported type: ${type}`);
 };
 
-const _getOwnerTitle = ({ type, id, title }: Grantee, userPermissions: List<string>) => {
+const _getOwnerTitle = ({ type, id, title }: Grantee, userPermissions: Array<string>) => {
   switch (type) {
     case 'user':
       if (!isPermitted(userPermissions, 'users:list')) return title;
