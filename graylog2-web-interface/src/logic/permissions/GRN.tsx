@@ -16,16 +16,21 @@
  */
 // eslint-disable-next-line import/prefer-default-export
 import Routes from 'routing/Routes';
+import { GRN, GRNType } from 'logic/permissions/types';
 
 const _convertEmptyString = (value: string) => (value === '' ? undefined : value);
 
 export const createGRN = (type: string, id: string) => `grn::::${type}:${id}`;
 
-export const getValuesFromGRN = (grn: string) => {
+export const getValuesFromGRN = (grn: GRN) => {
   const grnValues = grn.split(':');
   const [resourceNameType, cluster, tenent, scope, type, id] = grnValues.map(_convertEmptyString);
 
-  return { resourceNameType, cluster, tenent, scope, type, id };
+  return { resourceNameType, cluster, tenent, scope, type: type as GRNType, id };
+};
+
+const assertUnreachable = (grn: string, type: 'global'): never => {
+  throw new Error(`Can't find route for grn ${grn} of type: ${type ?? '(undefined)'}`);
 };
 
 export const getShowRouteFromGRN = (grn: string) => {
@@ -47,6 +52,6 @@ export const getShowRouteFromGRN = (grn: string) => {
     case 'stream':
       return Routes.stream_search(id);
     default:
-      throw new Error(`Can't find route for grn ${grn} of type: ${type ?? '(undefined)'}`);
+      return assertUnreachable(grn, type);
   }
 };

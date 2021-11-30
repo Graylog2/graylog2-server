@@ -95,8 +95,8 @@ public class EntitySharesService {
         requireNonNull(sharingSubject, "sharingSubject cannot be null");
 
         final GRN sharingUserGRN = grnRegistry.ofUser(sharingUser);
-        final Set<EntityShareResponse.AvailableGrantee> availableGrantees = granteeService.getAvailableGrantees(sharingUser);
-        final Set<GRN> availableGranteeGRNs = availableGrantees.stream().map(EntityShareResponse.AvailableGrantee::grn).collect(Collectors.toSet());
+        final Set<Grantee> availableGrantees = granteeService.getAvailableGrantees(sharingUser);
+        final Set<GRN> availableGranteeGRNs = availableGrantees.stream().map(Grantee::grn).collect(Collectors.toSet());
         final ImmutableSet<ActiveShare> activeShares = getActiveShares(ownedEntity, sharingUser, availableGranteeGRNs);
         return EntityShareResponse.builder()
                 .entity(ownedEntity.toString())
@@ -129,8 +129,8 @@ public class EntitySharesService {
         final String userName = sharingUser.getName();
         final GRN sharingUserGRN = grnRegistry.ofUser(sharingUser);
 
-        final Set<EntityShareResponse.AvailableGrantee> availableGrantees = granteeService.getAvailableGrantees(sharingUser);
-        final Set<GRN> availableGranteeGRNs = availableGrantees.stream().map(EntityShareResponse.AvailableGrantee::grn).collect(Collectors.toSet());
+        final Set<Grantee> availableGrantees = granteeService.getAvailableGrantees(sharingUser);
+        final Set<GRN> availableGranteeGRNs = availableGrantees.stream().map(Grantee::grn).collect(Collectors.toSet());
         final List<GrantDTO> existingGrants = grantService.getForTargetExcludingGrantee(ownedEntity, sharingUserGRN);
         existingGrants.removeIf(grant -> !availableGranteeGRNs.contains(grant.grantee()));
 
@@ -139,8 +139,7 @@ public class EntitySharesService {
                 .sharingUser(sharingUserGRN)
                 .availableGrantees(availableGrantees)
                 .availableCapabilities(getAvailableCapabilities())
-                .missingPermissionsOnDependencies(checkMissingPermissionsOnDependencies(ownedEntity, sharingUserGRN, ImmutableSet.of(), request))
-                ;
+                .missingPermissionsOnDependencies(checkMissingPermissionsOnDependencies(ownedEntity, sharingUserGRN, ImmutableSet.of(), request));
 
         final EntitySharesUpdateEvent.Builder updateEventBuilder = EntitySharesUpdateEvent.builder()
                 .user(sharingUser)

@@ -42,7 +42,7 @@ public abstract class EntityShareResponse {
     public abstract GRN sharingUser();
 
     @JsonProperty("available_grantees")
-    public abstract ImmutableSet<AvailableGrantee> availableGrantees();
+    public abstract ImmutableSet<Grantee> availableGrantees();
 
     @JsonProperty("available_capabilities")
     public abstract ImmutableSet<AvailableCapability> availableCapabilities();
@@ -81,7 +81,7 @@ public abstract class EntityShareResponse {
         public abstract Builder sharingUser(GRN sharingUser);
 
         @JsonProperty("available_grantees")
-        public abstract Builder availableGrantees(Set<AvailableGrantee> availableGrantees);
+        public abstract Builder availableGrantees(Set<Grantee> availableGrantees);
 
         @JsonProperty("available_capabilities")
         public abstract Builder availableCapabilities(Set<AvailableCapability> availableCapabilities);
@@ -99,25 +99,6 @@ public abstract class EntityShareResponse {
         public abstract Builder validationResult(ValidationResult validationResult);
 
         public abstract EntityShareResponse build();
-    }
-
-    @AutoValue
-    public static abstract class AvailableGrantee {
-        @JsonProperty("id")
-        public abstract GRN grn();
-
-        @JsonProperty("type")
-        public abstract String type();
-
-        @JsonProperty("title")
-        public abstract String title();
-
-        @JsonCreator
-        public static AvailableGrantee create(@JsonProperty("id") GRN grn,
-                                              @JsonProperty("type") String type,
-                                              @JsonProperty("title") String title) {
-            return new AutoValue_EntityShareResponse_AvailableGrantee(grn, type, title);
-        }
     }
 
     @AutoValue
