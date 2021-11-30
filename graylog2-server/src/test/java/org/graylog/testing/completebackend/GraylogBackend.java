@@ -168,7 +168,7 @@ public class GraylogBackend implements AutoCloseable {
         network.close();
     }
 
-    public SearchServerInstance elasticsearchInstance() {
+    public SearchServerInstance searchServerInstance() {
         return searchServer;
     }
 }

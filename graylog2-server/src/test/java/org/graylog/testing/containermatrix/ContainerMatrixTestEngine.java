@@ -77,7 +77,7 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
         return get(annotatedClasses, (ContainerMatrixTestsConfiguration annotation) -> Stream.of(annotation.pluginJarsProvider()));
     }
 
-    private Set<SearchServer> getEsVersions(Set<Class<?>> annotatedClasses) {
+    private Set<SearchServer> getSearchServerVersions(Set<Class<?>> annotatedClasses) {
         return get(annotatedClasses, (ContainerMatrixTestsConfiguration annotation) -> {
             if (annotation.searchVersions().length == 0) {
                 return Stream.of(SearchServer.DEFAULT_VERSION);
@@ -156,7 +156,7 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
                             MavenProjectDirProvider mpdp = instantiateFactory(mavenProjectDirProvider);
                             PluginJarsProvider pjp = instantiateFactory(pluginJarsProvider);
                             // now add all grouped tests for Lifecycle.VM
-                            getEsVersions(annotated)
+                            getSearchServerVersions(annotated)
                                     .stream().map(SearchServer::getSearchVersion)
                                     .forEach(searchVersion -> getMongoVersions(annotated)
                                             .forEach(mongoVersion -> {
@@ -175,7 +175,7 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
                                             })
                                     );
                             // add separate test classes (Lifecycle.CLASS)
-                            getEsVersions(annotated)
+                            getSearchServerVersions(annotated)
                                     .stream().map(SearchServer::getSearchVersion)
                                     .forEach(esVersion -> getMongoVersions(annotated)
                                                     .forEach(mongoVersion -> {

@@ -18,12 +18,12 @@ package org.junit.platform.engine.support.hierarchical;
 
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.specification.RequestSpecification;
-import org.graylog.testing.completebackend.SearchServerInstanceFactoryByVersion;
-import org.graylog.testing.completebackend.SearchServerInstanceFactory;
 import org.graylog.testing.completebackend.GraylogBackend;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.MavenProjectDirProvider;
 import org.graylog.testing.completebackend.PluginJarsProvider;
+import org.graylog.testing.completebackend.SearchServerInstanceFactory;
+import org.graylog.testing.completebackend.SearchServerInstanceFactoryByVersion;
 import org.graylog.testing.containermatrix.ContainerMatrixTestEngine;
 import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog2.storage.versionprobe.SearchVersion;

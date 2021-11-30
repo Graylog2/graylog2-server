@@ -43,7 +43,7 @@ public class GraylogBackendExtension implements ParameterResolver {
         } else if (paramType.equals(RequestSpecification.class)) {
             return ContainerMatrixHierarchicalTestExecutor.requestSpecification.orElse(null);
         } else if (paramType.equals(SearchServerInstance.class)) {
-            return ContainerMatrixHierarchicalTestExecutor.graylogBackend.map(GraylogBackend::elasticsearchInstance).orElse(null);
+            return ContainerMatrixHierarchicalTestExecutor.graylogBackend.map(GraylogBackend::searchServerInstance).orElse(null);
         }
         throw new RuntimeException("Unsupported parameter type: " + paramType);
     }
