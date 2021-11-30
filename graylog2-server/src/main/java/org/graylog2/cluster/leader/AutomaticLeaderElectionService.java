@@ -43,7 +43,6 @@ public class AutomaticLeaderElectionService extends AbstractExecutionThreadServi
 
     private volatile boolean isLeader = false;
     private Thread executionThread;
-    private long lastSuccess = 0;
 
     @Inject
     public AutomaticLeaderElectionService(Configuration configuration,
