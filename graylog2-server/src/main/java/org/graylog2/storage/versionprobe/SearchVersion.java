@@ -104,9 +104,6 @@ public abstract class SearchVersion {
     }
 
     public static SearchVersion create(final Distribution distribution, final Version version) {
-        if(Distribution.ELASTICSEARCH.equals(distribution) && version.getVersion().getMajorVersion() == 1) {
-            throw new IllegalArgumentException("Illegal version combination");
-        }
         return new AutoValue_SearchVersion(distribution, version);
     }
 
