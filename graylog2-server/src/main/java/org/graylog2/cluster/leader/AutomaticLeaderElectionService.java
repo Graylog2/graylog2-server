@@ -89,14 +89,11 @@ public class AutomaticLeaderElectionService extends AbstractExecutionThreadServi
 
         try {
             isLeader = lockService.lock(RESOURCE_NAME).isPresent();
-            lastSuccess = System.nanoTime();
         } catch (Exception e) {
             log.error("Unable to acquire/renew leader lock.", e);
 
-            final Duration timeSinceLastSuccess = Duration.ofNanos(System.nanoTime() - lastSuccess);
-            if (wasLeader && timeSinceLastSuccess.compareTo(lockTTL) >= 0) {
-                log.error("Failed for {} to renew leader lock. Forcing fallback to follower role.",
-                        timeSinceLastSuccess);
+            if (wasLeader) {
+                log.error("Failed to renew leader lock. Forcing fallback to follower role.");
                 isLeader = false;
             }
         }
