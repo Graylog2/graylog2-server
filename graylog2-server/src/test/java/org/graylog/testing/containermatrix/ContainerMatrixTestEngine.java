@@ -77,12 +77,23 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
         return get(annotatedClasses, (ContainerMatrixTestsConfiguration annotation) -> Stream.of(annotation.pluginJarsProvider()));
     }
 
-    private Set<String> getEsVersions(Set<Class<?>> annotatedClasses) {
-        return get(annotatedClasses, (ContainerMatrixTestsConfiguration annotation) -> Stream.of(annotation.esVersions()));
+    private Set<SearchServer> getEsVersions(Set<Class<?>> annotatedClasses) {
+        return get(annotatedClasses, (ContainerMatrixTestsConfiguration annotation) -> {
+            if (annotation.searchVersions().length == 0) {
+                return Stream.of(SearchServer.DEFAULT_VERSION);
+            } else {
+                return Stream.of(annotation.searchVersions());
+            }
+        });
     }
 
-    private Set<String> getMongoVersions(Set<Class<?>> annotatedClasses) {
-        return get(annotatedClasses, (ContainerMatrixTestsConfiguration annotation) -> Stream.of(annotation.mongoVersions()));
+    private Set<MongodbServer> getMongoVersions(Set<Class<?>> annotatedClasses) {
+        return get(annotatedClasses, (ContainerMatrixTestsConfiguration annotation) -> {
+            if(annotation.mongoVersions().length == 0) {
+                return Stream.of(MongodbServer.DEFAULT_VERSION);
+            } else {
+         return Stream.of(annotation.mongoVersions());}
+        });
     }
 
     private Set<Integer> getExtraPorts(Set<Class<?>> annotatedClasses) {
@@ -146,7 +157,8 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
                             PluginJarsProvider pjp = instantiateFactory(pluginJarsProvider);
                             // now add all grouped tests for Lifecycle.VM
                             getEsVersions(annotated)
-                                    .forEach(esVersion -> getMongoVersions(annotated)
+                                    .stream().map(SearchServer::getSearchVersion)
+                                    .forEach(searchVersion -> getMongoVersions(annotated)
                                             .forEach(mongoVersion -> {
                                                 ContainerMatrixTestsDescriptor testsDescriptor = new ContainerMatrixTestsDescriptor(engineDescriptor,
                                                         Lifecycle.VM,
@@ -154,7 +166,7 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
                                                         mpdp.getUniqueId(),
                                                         pluginJarsProvider,
                                                         pjp.getUniqueId(),
-                                                        esVersion,
+                                                        searchVersion,
                                                         mongoVersion,
                                                         extraPorts,
                                                         mongoDBFixtures);
@@ -164,6 +176,7 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
                                     );
                             // add separate test classes (Lifecycle.CLASS)
                             getEsVersions(annotated)
+                                    .stream().map(SearchServer::getSearchVersion)
                                     .forEach(esVersion -> getMongoVersions(annotated)
                                                     .forEach(mongoVersion -> {
                                                         ContainerMatrixTestsDescriptor testsDescriptor = new ContainerMatrixTestsDescriptor(engineDescriptor,

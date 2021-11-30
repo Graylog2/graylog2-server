@@ -18,6 +18,7 @@ package org.graylog.plugins.views;
 
 import io.restassured.specification.RequestSpecification;
 import org.graylog.testing.completebackend.GraylogBackend;
+import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.graylog.testing.utils.GelfInputUtils;
@@ -31,7 +32,7 @@ import static org.graylog.testing.completebackend.Lifecycle.CLASS;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.core.IsEqual.equalTo;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = CLASS)
+@ContainerMatrixTestsConfiguration(serverLifecycle = CLASS, searchVersions = {SearchServer.OS1, SearchServer.ES6, SearchServer.ES7})
 public class SearchSyncIT {
 
     static final int GELF_HTTP_PORT = 12201;

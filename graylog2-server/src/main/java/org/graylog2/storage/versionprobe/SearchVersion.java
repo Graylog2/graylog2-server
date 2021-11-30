@@ -43,8 +43,8 @@ public abstract class SearchVersion {
         public String toString() {
             return this.printName;
         }
-    }
 
+    }
     public SearchVersion major() {
         return create(distribution(), Version.from(version().getVersion().getMajorVersion(), 0, 0));
     }
@@ -78,6 +78,19 @@ public abstract class SearchVersion {
         return elasticsearch(new Version(version));
     }
 
+    public String encode() {
+        return String.format(Locale.ROOT, "%s:%s", this.distribution().name().toUpperCase(Locale.ROOT), this.version().getVersion());
+    }
+
+    public static SearchVersion decode(final String searchServerIdentifier) {
+        final String[] parts = searchServerIdentifier.split(":");
+        if(parts.length == 2) {
+            return SearchVersion.create(Distribution.valueOf(parts[0].toUpperCase()), com.github.zafarkhaja.semver.Version.valueOf((parts[1])));
+        } else {
+            return SearchVersion.elasticsearch(searchServerIdentifier);
+        }
+    }
+
     /**
      * @param distribution Assumes ELASTICSEARCH by default when no distribution is provided
      */
@@ -91,6 +104,9 @@ public abstract class SearchVersion {
     }
 
     public static SearchVersion create(final Distribution distribution, final Version version) {
+        if(Distribution.ELASTICSEARCH.equals(distribution) && version.getVersion().getMajorVersion() == 1) {
+            throw new IllegalArgumentException("Illegal version combination");
+        }
         return new AutoValue_SearchVersion(distribution, version);
     }
 

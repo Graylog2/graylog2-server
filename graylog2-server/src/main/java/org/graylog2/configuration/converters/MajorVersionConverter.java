@@ -23,8 +23,14 @@ import org.graylog2.storage.versionprobe.SearchVersion;
 public class MajorVersionConverter implements Converter<SearchVersion> {
     @Override
     public SearchVersion convertFrom(String value) {
-        final int majorVersion = Integer.parseInt(value);
-        return SearchVersion.elasticsearch(Version.from(majorVersion, 0, 0));
+        try {
+            // only major version - we know it's elasticsearch
+            final int majorVersion = Integer.parseInt(value);
+            return SearchVersion.elasticsearch(Version.from(majorVersion, 0, 0));
+        } catch (NumberFormatException nfe) {
+            // It's probably a distribution:version format
+            return SearchVersion.decode(value);
+        }
     }
 
     @Override

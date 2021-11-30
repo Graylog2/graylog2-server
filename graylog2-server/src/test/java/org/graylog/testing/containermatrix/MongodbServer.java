@@ -14,15 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.testing.completebackend;
+package org.graylog.testing.containermatrix;
 
-import org.graylog.testing.elasticsearch.SearchServerInstance;
-import org.graylog2.storage.versionprobe.SearchVersion;
-import org.testcontainers.containers.Network;
+public enum MongodbServer {
+    MONGO3("3.6"),
+    MONGO4("4.0");
 
-public interface ElasticsearchInstanceFactory {
+    public static MongodbServer DEFAULT_VERSION = MONGO4;
 
-    SearchServerInstance create(Network network);
+    private final String version;
 
-    SearchVersion getVersion();
+    MongodbServer(String version) {
+        this.version = version;
+    }
+
+    public String getVersion() {
+        return version;
+    }
 }

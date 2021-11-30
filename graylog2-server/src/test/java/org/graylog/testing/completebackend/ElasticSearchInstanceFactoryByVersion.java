@@ -17,43 +17,48 @@
 package org.graylog.testing.completebackend;
 
 import org.apache.commons.lang3.NotImplementedException;
-import org.graylog.testing.elasticsearch.ElasticsearchInstance;
+import org.graylog.testing.elasticsearch.SearchServerInstance;
+import org.graylog2.storage.versionprobe.SearchVersion;
 import org.testcontainers.containers.Network;
 
 import java.lang.reflect.Method;
 
-public class ElasticSearchInstanceFactoryByVersion implements ElasticsearchInstanceFactory {
-    private String version;
+import static org.graylog2.storage.versionprobe.SearchVersion.Distribution.ELASTICSEARCH;
+import static org.graylog2.storage.versionprobe.SearchVersion.Distribution.OPENSEARCH;
 
-    @Override
-    public ElasticsearchInstance create(Network network) {
-        throw new NotImplementedException("Create without version not implemented with this factory.");
+public class ElasticSearchInstanceFactoryByVersion implements ElasticsearchInstanceFactory {
+
+    private final SearchVersion version;
+
+    public ElasticSearchInstanceFactoryByVersion(SearchVersion searchVersion) {
+        this.version = searchVersion;
     }
 
-    private ElasticsearchInstance create(final String cName, final String version, final Network network) {
+    @Override
+    public SearchServerInstance create(Network network) {
+        if (version.satisfies(ELASTICSEARCH, "^6.0.0")) {
+            return doCreate("org.graylog.storage.elasticsearch6.testing.ElasticsearchInstanceES6", version, network);
+        } else if (version.satisfies(ELASTICSEARCH, "^7.0.0")) {
+            return doCreate("org.graylog.storage.elasticsearch7.testing.ElasticsearchInstanceES7", version, network);
+        } else if (version.satisfies(OPENSEARCH, "^1.0.0")) {
+            return doCreate("org.graylog.storage.elasticsearch7.testing.OpensearchInstance", version, network);
+        } else {
+            throw new NotImplementedException("Search version " + version + " not supported.");
+        }
+    }
+
+    private SearchServerInstance doCreate(final String cName, final SearchVersion version, final Network network) {
         try {
             Class<?> clazz = Class.forName(cName);
-            Method method = clazz.getMethod("create", String.class, Network.class);
-            return (ElasticsearchInstance) method.invoke(null, version, network);
+            Method method = clazz.getMethod("create", SearchVersion.class, Network.class);
+            return (SearchServerInstance) method.invoke(null, version, network);
         } catch (Exception ex) {
-            throw new NotImplementedException("Could not create ES6 instance.");
+            throw new NotImplementedException("Could not create Search instance.", ex);
         }
     }
 
     @Override
-    public ElasticsearchInstance create(String version, Network network) {
-        this.version = version;
-        if ("6".equals(version())) {
-            return create("org.graylog.storage.elasticsearch6.testing.ElasticsearchInstanceES6", version, network);
-        } else if ("7".equals(version())) {
-            return create("org.graylog.storage.elasticsearch7.testing.ElasticsearchInstanceES7", version, network);
-        } else {
-            throw new NotImplementedException("ES version " + version + " not supported.");
-        }
-    }
-
-    @Override
-    public String version() {
-        return version.split("\\.")[0];
+    public SearchVersion getVersion() {
+        return version;
     }
 }

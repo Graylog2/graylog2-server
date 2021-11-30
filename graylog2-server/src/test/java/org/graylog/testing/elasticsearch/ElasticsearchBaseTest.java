@@ -65,7 +65,7 @@ public abstract class ElasticsearchBaseTest {
         }
     }
 
-    protected abstract ElasticsearchInstance elasticsearch();
+    protected abstract SearchServerInstance elasticsearch();
 
     /**
      * Returns a custom Elasticsearch client with a bunch of utility methods.

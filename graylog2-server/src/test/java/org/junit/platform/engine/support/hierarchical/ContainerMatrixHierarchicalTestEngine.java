@@ -25,6 +25,8 @@ import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.MavenProjectDirProvider;
 import org.graylog.testing.completebackend.PluginJarsProvider;
 import org.graylog.testing.containermatrix.ContainerMatrixTestEngine;
+import org.graylog.testing.containermatrix.MongodbServer;
+import org.graylog2.storage.versionprobe.SearchVersion;
 import org.junit.jupiter.engine.descriptor.ContainerMatrixTestClassDescriptor;
 import org.junit.jupiter.engine.descriptor.ContainerMatrixTestsDescriptor;
 import org.junit.platform.commons.JUnitException;
@@ -52,8 +54,8 @@ public abstract class ContainerMatrixHierarchicalTestEngine<C extends EngineExec
             if (descriptor instanceof ContainerMatrixTestsDescriptor) {
                 ContainerMatrixTestsDescriptor containerMatrixTestsDescriptor = (ContainerMatrixTestsDescriptor) descriptor;
 
-                String esVersion = containerMatrixTestsDescriptor.getEsVersion();
-                String mongoVersion = containerMatrixTestsDescriptor.getMongoVersion();
+                SearchVersion esVersion = containerMatrixTestsDescriptor.getEsVersion();
+                MongodbServer mongoVersion = containerMatrixTestsDescriptor.getMongoVersion();
                 int[] extraPorts = containerMatrixTestsDescriptor.getExtraPorts();
                 List<URL> mongoDBFixtures = containerMatrixTestsDescriptor.getMongoDBFixtures();
 
@@ -102,11 +104,11 @@ public abstract class ContainerMatrixHierarchicalTestEngine<C extends EngineExec
         }
     }
 
-    private GraylogBackend constructBackendFrom(String esVersion, String mongoVersion, int[] extraPorts, List<URL> mongoDBFixtures, Class<? extends PluginJarsProvider> pluginJarsProvider, Class<? extends MavenProjectDirProvider> mavenProjectDirProvider) {
-        final ElasticsearchInstanceFactory esInstanceFactory = instantiateFactory(ElasticSearchInstanceFactoryByVersion.class);
+    private GraylogBackend constructBackendFrom(SearchVersion esVersion, MongodbServer mongoVersion, int[] extraPorts, List<URL> mongoDBFixtures, Class<? extends PluginJarsProvider> pluginJarsProvider, Class<? extends MavenProjectDirProvider> mavenProjectDirProvider) {
+        final ElasticsearchInstanceFactory esInstanceFactory = new ElasticSearchInstanceFactoryByVersion(esVersion);
         final List<Path> pluginJars = instantiateFactory(pluginJarsProvider).getJars();
         final Path mavenProjectDir = instantiateFactory(mavenProjectDirProvider).getProjectDir();
-        return GraylogBackend.createStarted(extraPorts, esVersion, mongoVersion, esInstanceFactory, pluginJars, mavenProjectDir, mongoDBFixtures);
+        return GraylogBackend.createStarted(extraPorts, mongoVersion, esInstanceFactory, pluginJars, mavenProjectDir, mongoDBFixtures);
     }
 
     private <T> T instantiateFactory(Class<? extends T> providerClass) {

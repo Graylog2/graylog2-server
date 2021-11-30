@@ -43,9 +43,17 @@ class SearchVersionTest {
     }
 
     @Test
-    void testParseVersion() {
+    void testInvalidValues() {
         assertThatThrownBy(() -> SearchVersion.parseVersion("v1")).isInstanceOfAny(ElasticsearchException.class);
         assertThatThrownBy(() -> SearchVersion.parseVersion("1.2.x")).isInstanceOfAny(ElasticsearchException.class);
+    }
+
+    @Test
+    void testEncodeDecode() {
+        final SearchVersion version = SearchVersion.create(SearchVersion.Distribution.OPENSEARCH, ver("1.2.0"));
+        final String encoded = version.encode();
+        assertThat(encoded).isEqualTo("OPENSEARCH:1.2.0");
+        assertThat(SearchVersion.decode(encoded)).isEqualTo(version);
     }
 
     private Version ver(final String version) {
