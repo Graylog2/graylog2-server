@@ -18,8 +18,8 @@ package org.graylog.plugins.views;
 
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
+import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
-import org.junit.jupiter.api.Test;
 
 import static io.restassured.RestAssured.given;
 import static org.graylog.testing.completebackend.Lifecycle.CLASS;
@@ -36,7 +36,7 @@ public class QueryValidationResourceIT {
     }
 
 
-    @Test
+    @ContainerMatrixTest
     void testMinimalisticRequest() {
         final ValidatableResponse validatableResponse = given()
                 .spec(requestSpec)
@@ -48,7 +48,7 @@ public class QueryValidationResourceIT {
         validatableResponse.assertThat().body("status", equalTo("WARNING"));
     }
 
-    @Test
+    @ContainerMatrixTest
     void testInvalidQuery() {
         final ValidatableResponse validatableResponse = given()
                 .spec(requestSpec)
