@@ -101,9 +101,6 @@ public class QueryValidationResource extends RestResource implements PluginRestR
     }
 
     private List<ValidationMessageDTO> toExplanations(ValidationResponse response) {
-        if (ValidationStatus.OK.equals(response.status())) {
-            return Collections.emptyList();
-        }
         return response.explanations().stream()
                 .map(this::toExplanation)
                 .collect(Collectors.toList());

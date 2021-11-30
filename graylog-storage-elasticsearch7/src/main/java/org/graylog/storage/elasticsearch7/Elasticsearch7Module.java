@@ -61,7 +61,6 @@ public class Elasticsearch7Module extends VersionAwareModule {
                 .to(V20170607164210_MigrateReopenedIndicesToAliasesClusterStateES7.class);
         bindForSupportedVersion(V20200730000000_AddGl2MessageIdFieldAliasForEvents.ElasticsearchAdapter.class)
                 .to(V20200730000000_AddGl2MessageIdFieldAliasForEventsES7.class);
-        bindForSupportedVersion(LuceneQueryParser.class).to(LuceneQueryParser.class);
 
         install(new FactoryModuleBuilder().build(ScrollResultES7.Factory.class));
 
