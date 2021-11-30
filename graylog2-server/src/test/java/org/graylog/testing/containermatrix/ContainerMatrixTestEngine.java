@@ -153,7 +153,7 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
         getMavenProjectDirProvider(annotated)
                 .forEach(mavenProjectDirProvider -> getPluginJarsProvider(annotated)
                         .forEach(pluginJarsProvider -> {
-                            MavenProjectDirProvider mpdp = (MavenProjectDirProvider) instantiateFactory(mavenProjectDirProvider);
+                            MavenProjectDirProvider mpdp = instantiateFactory(mavenProjectDirProvider);
                             PluginJarsProvider pjp = instantiateFactory(pluginJarsProvider);
                             // now add all grouped tests for Lifecycle.VM
                             getEsVersions(annotated)

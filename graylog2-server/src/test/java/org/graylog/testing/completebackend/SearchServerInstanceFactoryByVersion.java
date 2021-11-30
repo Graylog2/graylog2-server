@@ -26,11 +26,11 @@ import java.lang.reflect.Method;
 import static org.graylog2.storage.versionprobe.SearchVersion.Distribution.ELASTICSEARCH;
 import static org.graylog2.storage.versionprobe.SearchVersion.Distribution.OPENSEARCH;
 
-public class ElasticSearchInstanceFactoryByVersion implements ElasticsearchInstanceFactory {
+public class SearchServerInstanceFactoryByVersion implements SearchServerInstanceFactory {
 
     private final SearchVersion version;
 
-    public ElasticSearchInstanceFactoryByVersion(SearchVersion searchVersion) {
+    public SearchServerInstanceFactoryByVersion(SearchVersion searchVersion) {
         this.version = searchVersion;
     }
 

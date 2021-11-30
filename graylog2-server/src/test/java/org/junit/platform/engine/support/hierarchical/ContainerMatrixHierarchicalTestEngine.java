@@ -18,8 +18,8 @@ package org.junit.platform.engine.support.hierarchical;
 
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.specification.RequestSpecification;
-import org.graylog.testing.completebackend.ElasticSearchInstanceFactoryByVersion;
-import org.graylog.testing.completebackend.ElasticsearchInstanceFactory;
+import org.graylog.testing.completebackend.SearchServerInstanceFactoryByVersion;
+import org.graylog.testing.completebackend.SearchServerInstanceFactory;
 import org.graylog.testing.completebackend.GraylogBackend;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.MavenProjectDirProvider;
@@ -104,11 +104,11 @@ public abstract class ContainerMatrixHierarchicalTestEngine<C extends EngineExec
         }
     }
 
-    private GraylogBackend constructBackendFrom(SearchVersion esVersion, MongodbServer mongoVersion, int[] extraPorts, List<URL> mongoDBFixtures, Class<? extends PluginJarsProvider> pluginJarsProvider, Class<? extends MavenProjectDirProvider> mavenProjectDirProvider) {
-        final ElasticsearchInstanceFactory esInstanceFactory = new ElasticSearchInstanceFactoryByVersion(esVersion);
+    private GraylogBackend constructBackendFrom(SearchVersion esVersion, MongodbServer mongoVersion, int[] extraPorts,List<URL> mongoDBFixtures, Class<? extends PluginJarsProvider> pluginJarsProvider, Class<? extends MavenProjectDirProvider> mavenProjectDirProvider) {
+        final SearchServerInstanceFactory searchServerInstanceFactory = new SearchServerInstanceFactoryByVersion(esVersion);
         final List<Path> pluginJars = instantiateFactory(pluginJarsProvider).getJars();
         final Path mavenProjectDir = instantiateFactory(mavenProjectDirProvider).getProjectDir();
-        return GraylogBackend.createStarted(extraPorts, mongoVersion, esInstanceFactory, pluginJars, mavenProjectDir, mongoDBFixtures);
+        return GraylogBackend.createStarted(extraPorts, mongoVersion, searchServerInstanceFactory, pluginJars, mavenProjectDir, mongoDBFixtures);
     }
 
     private <T> T instantiateFactory(Class<? extends T> providerClass) {

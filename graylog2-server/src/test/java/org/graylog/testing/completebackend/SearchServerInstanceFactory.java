@@ -20,7 +20,7 @@ import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.storage.versionprobe.SearchVersion;
 import org.testcontainers.containers.Network;
 
-public interface ElasticsearchInstanceFactory {
+public interface SearchServerInstanceFactory {
 
     SearchServerInstance create(Network network);
 

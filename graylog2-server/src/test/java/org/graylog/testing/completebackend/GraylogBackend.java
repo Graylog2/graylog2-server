@@ -26,11 +26,9 @@ import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Network;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -46,13 +44,13 @@ public class GraylogBackend implements AutoCloseable {
     private static GraylogBackend instance;
 
     public static GraylogBackend createStarted(int[] extraPorts, MongodbServer mongoVersion,
-                                               ElasticsearchInstanceFactory elasticsearchInstanceFactory, List<Path> pluginJars, Path mavenProjectDir,
+                                               SearchServerInstanceFactory searchServerInstanceFactory, List<Path> pluginJars, Path mavenProjectDir,
                                                List<URL> mongoDBFixtures) {
         // if a cached version exists, shut it down first
         if (instance != null) {
             instance.close();
         }
-        return doCreateStartedBackend(extraPorts, mongoVersion, elasticsearchInstanceFactory, pluginJars, mavenProjectDir,
+        return doCreateStartedBackend(extraPorts, mongoVersion, searchServerInstanceFactory, pluginJars, mavenProjectDir,
                 mongoDBFixtures);
     }
 
@@ -60,10 +58,10 @@ public class GraylogBackend implements AutoCloseable {
      * TODO: use or remove this method, currently is not used anywhere
      */
     public static GraylogBackend createStarted(int[] extraPorts,
-                                               ElasticsearchInstanceFactory elasticsearchInstanceFactory, List<Path> pluginJars, Path mavenProjectDir,
+                                               SearchServerInstanceFactory searchServerInstanceFactory, List<Path> pluginJars, Path mavenProjectDir,
                                                List<URL> mongoDBFixtures) {
         if (instance == null) {
-            instance = doCreateStartedBackend(extraPorts, MongodbServer.DEFAULT_VERSION, elasticsearchInstanceFactory, pluginJars, mavenProjectDir,
+            instance = doCreateStartedBackend(extraPorts, MongodbServer.DEFAULT_VERSION, searchServerInstanceFactory, pluginJars, mavenProjectDir,
                     mongoDBFixtures);
         } else {
             instance.fullReset(mongoDBFixtures);
@@ -73,14 +71,14 @@ public class GraylogBackend implements AutoCloseable {
     }
 
     // Starting ES instance in parallel thread to save time.
-    // MongoDB and the node have to be started in sequence however, because the the node might crash,
+    // MongoDB and the node have to be started in sequence however, because the node might crash,
     // if a MongoDb instance isn't already present while it's starting up.
     private static GraylogBackend doCreateStartedBackend(int[] extraPorts, @Nonnull MongodbServer mongodbVersion,
-                                                         ElasticsearchInstanceFactory elasticsearchInstanceFactory, List<Path> pluginJars, Path mavenProjectDir,
+                                                         SearchServerInstanceFactory searchServerInstanceFactory, List<Path> pluginJars, Path mavenProjectDir,
                                                          List<URL> mongoDBFixtures) {
         Network network = Network.newNetwork();
         ExecutorService executor = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("build-es-container-for-api-it").build());
-        Future<SearchServerInstance> esFuture = executor.submit(() -> elasticsearchInstanceFactory.create(network));
+        Future<SearchServerInstance> esFuture = executor.submit(() -> searchServerInstanceFactory.create(network));
         MongoDBInstance mongoDB = MongoDBInstance.createStartedWithUniqueName(network, Lifecycle.CLASS, mongodbVersion);
         mongoDB.dropDatabase();
         mongoDB.importFixtures(mongoDBFixtures);
@@ -92,7 +90,7 @@ public class GraylogBackend implements AutoCloseable {
                     network,
                     MongoDBInstance.internalUri(),
                     SearchServerInstance.internalUri(),
-                    elasticsearchInstanceFactory.getVersion(),
+                    searchServerInstanceFactory.getVersion(),
                     extraPorts,
                     pluginJars, mavenProjectDir);
             final GraylogBackend backend = new GraylogBackend(network, esInstance, mongoDB, node);
