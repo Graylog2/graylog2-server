@@ -30,6 +30,7 @@ import org.junit.platform.commons.JUnitException;
 import org.junit.platform.engine.ExecutionRequest;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.TestEngine;
+import org.junit.platform.engine.TestExecutionResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,6 +79,7 @@ public abstract class ContainerMatrixHierarchicalTestEngine<C extends EngineExec
             } else {
                 LOG.error("All children of the root should be of type 'ContainerMatrixTestsDescriptor'");
             }
+            request.getEngineExecutionListener().executionFinished(descriptor, TestExecutionResult.successful());
         });
     }
 
