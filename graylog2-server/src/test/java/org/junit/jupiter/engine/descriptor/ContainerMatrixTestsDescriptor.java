@@ -20,7 +20,7 @@ import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.MavenProjectDirProvider;
 import org.graylog.testing.completebackend.PluginJarsProvider;
 import org.graylog.testing.containermatrix.MongodbServer;
-import org.graylog2.storage.versionprobe.SearchVersion;
+import org.graylog2.storage.SearchVersion;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
 

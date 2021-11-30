@@ -26,7 +26,7 @@ import org.graylog.testing.elasticsearch.Client;
 import org.graylog.testing.elasticsearch.FixtureImporter;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.graylog2.storage.versionprobe.SearchVersion;
+import org.graylog2.storage.SearchVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Network;

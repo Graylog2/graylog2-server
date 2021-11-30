@@ -18,11 +18,10 @@ package org.graylog2.configuration.converters;
 
 import com.github.joschi.jadconfig.Converter;
 import com.github.zafarkhaja.semver.Version;
-import org.graylog2.storage.versionprobe.SearchVersion;
+import org.graylog2.storage.SearchVersion;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 class MajorVersionConverterTest {
 

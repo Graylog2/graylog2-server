@@ -19,7 +19,7 @@ package org.junit.jupiter.engine.discovery;
 import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.containermatrix.ContainerMatrixTestEngine;
 import org.graylog.testing.containermatrix.discovery.IsContainerMatrixTestClass;
-import org.graylog2.storage.versionprobe.SearchVersion;
+import org.graylog2.storage.SearchVersion;
 import org.junit.jupiter.engine.config.JupiterConfiguration;
 import org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor;
 import org.junit.jupiter.engine.descriptor.ContainerMatrixTestClassDescriptor;

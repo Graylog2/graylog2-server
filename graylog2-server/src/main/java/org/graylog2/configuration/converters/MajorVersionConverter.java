@@ -18,7 +18,7 @@ package org.graylog2.configuration.converters;
 
 import com.github.joschi.jadconfig.Converter;
 import org.graylog2.plugin.Version;
-import org.graylog2.storage.versionprobe.SearchVersion;
+import org.graylog2.storage.SearchVersion;
 
 public class MajorVersionConverter implements Converter<SearchVersion> {
     @Override

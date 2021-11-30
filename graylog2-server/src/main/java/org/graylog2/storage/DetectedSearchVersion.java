@@ -23,8 +23,12 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * @see org.graylog2.storage.providers.ElasticsearchVersionProvider
+ * @see org.graylog2.storage.versionprobe.VersionProbe
+ */
 @Target({ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 @BindingAnnotation
-public @interface ElasticsearchVersion {
+public @interface DetectedSearchVersion {
 }

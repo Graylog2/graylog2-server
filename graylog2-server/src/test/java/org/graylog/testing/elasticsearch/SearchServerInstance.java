@@ -16,9 +16,8 @@
  */
 package org.graylog.testing.elasticsearch;
 
-import com.github.zafarkhaja.semver.Version;
 import com.google.common.io.Resources;
-import org.graylog2.storage.versionprobe.SearchVersion;
+import org.graylog2.storage.SearchVersion;
 import org.junit.rules.ExternalResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

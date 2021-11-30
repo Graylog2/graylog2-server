@@ -19,15 +19,15 @@ package org.graylog2.configuration.validators;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.Validator;
 import org.graylog2.plugin.Version;
-import org.graylog2.storage.versionprobe.SearchVersion;
+import org.graylog2.storage.SearchVersion;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.graylog2.storage.versionprobe.SearchVersion.Distribution.ELASTICSEARCH;
-import static org.graylog2.storage.versionprobe.SearchVersion.Distribution.OPENSEARCH;
+import static org.graylog2.storage.SearchVersion.Distribution.ELASTICSEARCH;
+import static org.graylog2.storage.SearchVersion.Distribution.OPENSEARCH;
 import static org.junit.jupiter.api.Assertions.*;
 
-class ElasticsearchVersionValidatorTest {
+class DetectedSearchVersionValidatorTest {
 
     private final Validator<SearchVersion> validator = new ElasticsearchVersionValidator();
 

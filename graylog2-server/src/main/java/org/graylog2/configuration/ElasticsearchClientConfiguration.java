@@ -26,7 +26,7 @@ import org.graylog2.configuration.validators.ElasticsearchVersionValidator;
 import org.graylog2.configuration.validators.HttpOrHttpsSchemeValidator;
 import org.graylog2.configuration.validators.ListOfURIsWithHostAndSchemeValidator;
 import org.graylog2.configuration.validators.NonEmptyListValidator;
-import org.graylog2.storage.versionprobe.SearchVersion;
+import org.graylog2.storage.SearchVersion;
 
 import java.net.URI;
 import java.util.Collections;

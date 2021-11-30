@@ -21,7 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.zafarkhaja.semver.Version;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.graylog2.storage.versionprobe.SearchVersion;
+import org.graylog2.storage.SearchVersion;
 import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;

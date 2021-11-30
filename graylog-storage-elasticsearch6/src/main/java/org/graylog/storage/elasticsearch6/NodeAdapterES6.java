@@ -16,13 +16,12 @@
  */
 package org.graylog.storage.elasticsearch6;
 
-import com.github.zafarkhaja.semver.Version;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
 import io.searchbox.core.Ping;
 import org.graylog2.indexer.cluster.NodeAdapter;
 import org.graylog.storage.elasticsearch6.jest.JestUtils;
-import org.graylog2.storage.versionprobe.SearchVersion;
+import org.graylog2.storage.SearchVersion;
 
 import javax.inject.Inject;
 import java.util.Optional;

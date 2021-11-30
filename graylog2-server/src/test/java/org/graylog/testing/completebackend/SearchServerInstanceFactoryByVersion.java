@@ -18,13 +18,13 @@ package org.graylog.testing.completebackend;
 
 import org.apache.commons.lang3.NotImplementedException;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
-import org.graylog2.storage.versionprobe.SearchVersion;
+import org.graylog2.storage.SearchVersion;
 import org.testcontainers.containers.Network;
 
 import java.lang.reflect.Method;
 
-import static org.graylog2.storage.versionprobe.SearchVersion.Distribution.ELASTICSEARCH;
-import static org.graylog2.storage.versionprobe.SearchVersion.Distribution.OPENSEARCH;
+import static org.graylog2.storage.SearchVersion.Distribution.ELASTICSEARCH;
+import static org.graylog2.storage.SearchVersion.Distribution.OPENSEARCH;
 
 public class SearchServerInstanceFactoryByVersion implements SearchServerInstanceFactory {
 

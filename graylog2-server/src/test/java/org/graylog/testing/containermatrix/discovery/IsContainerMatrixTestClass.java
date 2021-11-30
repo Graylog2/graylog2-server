@@ -20,7 +20,7 @@ import com.google.common.collect.Sets;
 import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
-import org.graylog2.storage.versionprobe.SearchVersion;
+import org.graylog2.storage.SearchVersion;
 import org.junit.jupiter.engine.descriptor.ContainerMatrixTestsDescriptor;
 import org.junit.jupiter.engine.discovery.predicates.IsContainerMatrixTest;
 import org.junit.jupiter.engine.discovery.predicates.IsNestedTestClass;

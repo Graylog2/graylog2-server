@@ -19,7 +19,7 @@ package org.graylog2.indexer.cluster;
 import com.github.zafarkhaja.semver.ParseException;
 import com.github.zafarkhaja.semver.Version;
 import org.graylog2.indexer.ElasticsearchException;
-import org.graylog2.storage.versionprobe.SearchVersion;
+import org.graylog2.storage.SearchVersion;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;

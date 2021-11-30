@@ -17,7 +17,7 @@
 package org.graylog.testing.graylognode;
 
 import com.google.common.base.Stopwatch;
-import org.graylog2.storage.versionprobe.SearchVersion;
+import org.graylog2.storage.SearchVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;

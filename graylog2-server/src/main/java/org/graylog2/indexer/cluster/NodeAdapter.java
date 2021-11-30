@@ -18,7 +18,7 @@ package org.graylog2.indexer.cluster;
 
 import com.github.zafarkhaja.semver.Version;
 import org.graylog2.indexer.ElasticsearchException;
-import org.graylog2.storage.versionprobe.SearchVersion;
+import org.graylog2.storage.SearchVersion;
 
 import java.util.Optional;
 

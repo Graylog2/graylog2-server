@@ -14,12 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.storage.versionprobe;
+package org.graylog2.storage;
 
 import com.google.auto.value.AutoValue;
 import org.graylog2.configuration.validators.SearchVersionRange;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.plugin.Version;
+import org.graylog2.storage.AutoValue_SearchVersion;
 
 import javax.annotation.Nullable;
 import java.util.Locale;

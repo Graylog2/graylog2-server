@@ -26,7 +26,7 @@ import org.graylog.testing.completebackend.SearchServerInstanceFactory;
 import org.graylog.testing.completebackend.SearchServerInstanceFactoryByVersion;
 import org.graylog.testing.containermatrix.ContainerMatrixTestEngine;
 import org.graylog.testing.containermatrix.MongodbServer;
-import org.graylog2.storage.versionprobe.SearchVersion;
+import org.graylog2.storage.SearchVersion;
 import org.junit.jupiter.engine.descriptor.ContainerMatrixTestClassDescriptor;
 import org.junit.jupiter.engine.descriptor.ContainerMatrixTestsDescriptor;
 import org.junit.platform.commons.JUnitException;

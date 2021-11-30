@@ -17,7 +17,7 @@
 package org.junit.jupiter.engine.descriptor;
 
 import org.graylog.testing.containermatrix.MongodbServer;
-import org.graylog2.storage.versionprobe.SearchVersion;
+import org.graylog2.storage.SearchVersion;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.TestInstances;
 import org.junit.jupiter.engine.config.JupiterConfiguration;

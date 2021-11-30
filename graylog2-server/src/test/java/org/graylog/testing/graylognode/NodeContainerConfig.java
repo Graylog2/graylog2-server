@@ -17,7 +17,7 @@
 package org.graylog.testing.graylognode;
 
 import org.apache.commons.lang.ArrayUtils;
-import org.graylog2.storage.versionprobe.SearchVersion;
+import org.graylog2.storage.SearchVersion;
 import org.testcontainers.containers.Network;
 
 import java.util.Arrays;
