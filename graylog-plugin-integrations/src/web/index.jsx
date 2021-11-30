@@ -34,6 +34,8 @@ import packageJson from '../../package.json';
 import GreyNoiseAdapterFieldSet from "./dataadapters/GreyNoiseAdapterFieldSet";
 import GreyNoiseAdapterSummary from "./dataadapters/GreyNoiseAdapterSummary";
 import GreyNoiseAdapterDocumentation from "./dataadapters/GreyNoiseAdapterDocumentation";
+import GreyNoiseCommunityIpLookupAdapterDocumentation
+  from './dataadapters/GreyNoiseCommunityIpLookupAdapterDocumentation';
 
 const manifest = new PluginManifest(packageJson, {
   routes: [
@@ -71,7 +73,15 @@ const manifest = new PluginManifest(packageJson, {
       formComponent: GreyNoiseAdapterFieldSet,
       summaryComponent: GreyNoiseAdapterSummary,
       documentationComponent: GreyNoiseAdapterDocumentation,
-    }],
+    },
+    {
+      type: 'GreyNoise Community IP Lookup',
+      displayName: 'GreyNoise Community IP Lookup',
+      formComponent: GreyNoiseAdapterFieldSet,
+      summaryComponent: GreyNoiseAdapterSummary,
+      documentationComponent: GreyNoiseCommunityIpLookupAdapterDocumentation,
+    },
+  ],
 });
 
 PluginStore.register(manifest);

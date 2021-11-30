@@ -1,0 +1,6 @@
+{
+  "ip": "1.2.3.4",
+  "noise": false,
+  "riot": false,
+  "message": "IP not observed scanning the internet or contained in RIOT data set."
+}
