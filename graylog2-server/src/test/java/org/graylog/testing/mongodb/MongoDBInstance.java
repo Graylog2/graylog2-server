@@ -16,6 +16,7 @@
  */
 package org.graylog.testing.mongodb;
 
+import com.google.common.io.Resources;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog2.database.MongoConnection;
 import org.junit.rules.ExternalResource;
@@ -26,6 +27,8 @@ import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Network;
 
 import java.net.URL;
+import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -164,8 +167,16 @@ public class MongoDBInstance extends ExternalResource implements AutoCloseable {
     }
 
     public void importFixtures(List<URL> fixtureResources) {
-        if (! fixtureResources.isEmpty()) {
+        if (!fixtureResources.isEmpty()) {
             new MongoDBFixtureImporter(fixtureResources).importResources(service.mongoDatabase());
+        }
+    }
+
+    public void importFixture(String resourceName, Class<?> testClass) {
+        if (!Paths.get(resourceName).isAbsolute()) {
+            new MongoDBFixtureImporter(Arrays.asList(Resources.getResource(testClass, resourceName))).importResources(service.mongoDatabase());
+        } else {
+            new MongoDBFixtureImporter(Arrays.asList(Resources.getResource(resourceName))).importResources(service.mongoDatabase());
         }
     }
 }

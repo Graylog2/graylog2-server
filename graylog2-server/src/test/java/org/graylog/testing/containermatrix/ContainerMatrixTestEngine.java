@@ -16,6 +16,7 @@
  */
 package org.graylog.testing.containermatrix;
 
+import com.google.common.io.Resources;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.MavenProjectDirProvider;
 import org.graylog.testing.completebackend.PluginJarsProvider;
@@ -38,7 +39,12 @@ import org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutorSe
 import org.junit.platform.engine.support.hierarchical.ThrowableCollector;
 import org.reflections.Reflections;
 
+import java.net.URL;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -63,7 +69,7 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
                 .collect(Collectors.toSet());
     }
 
-    private Set<Class> getMavenProjectDirProvider(Set<Class<?>> annotatedClasses) {
+    private Set<Class<? extends MavenProjectDirProvider>> getMavenProjectDirProvider(Set<Class<?>> annotatedClasses) {
         return get(annotatedClasses, (ContainerMatrixTestsConfiguration annotation) -> Stream.of(annotation.mavenProjectDirProvider()));
     }
 
@@ -83,6 +89,36 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
         return get(annotatedClasses, (ContainerMatrixTestsConfiguration annotation) -> Arrays.stream(annotation.extraPorts()).boxed());
     }
 
+    public static List<URL> getMongoDBFixtures(Class<?> annotatedClass) {
+        final List<URL> urls = new ArrayList<>();
+        AnnotationSupport.findAnnotation(annotatedClass, ContainerMatrixTestsConfiguration.class).ifPresent(anno -> {
+            // only aggregate, if it's VM Lifecycle
+            if (anno.serverLifecycle().equals(Lifecycle.CLASS)) {
+                final String[] fixtures = anno.mongoDBFixtures();
+                Arrays.stream(fixtures).forEach(resourceName -> {
+                    if (!Paths.get(resourceName).isAbsolute()) {
+                        try {
+                            urls.add(Resources.getResource(annotatedClass, resourceName));
+                        } catch (IllegalArgumentException iae) {
+                            urls.add(Resources.getResource(resourceName));
+                        }
+                    } else {
+                        urls.add(Resources.getResource(resourceName));
+                    }
+                });
+            }
+        });
+        return urls;
+    }
+
+    private List<URL> getMongoDBFixtures(Set<Class<?>> annotatedClasses) {
+        final List<URL> urls = new LinkedList<>();
+        for (Class<?> aClass : annotatedClasses) {
+            urls.addAll(getMongoDBFixtures(aClass));
+        }
+        return urls;
+    }
+
     private <T> T instantiateFactory(Class<? extends T> providerClass) {
         try {
             return providerClass.newInstance();
@@ -100,13 +136,14 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
         Reflections reflections = new Reflections("org.graylog", "org.graylog2");
         final Set<Class<?>> annotated = reflections.getTypesAnnotatedWith(ContainerMatrixTestsConfiguration.class);
         final Set<Integer> extraPorts = getExtraPorts(annotated);
+        final List<URL> mongoDBFixtures = getMongoDBFixtures(annotated);
 
         // create all combinations of tests, first differentiate for maven builds
         getMavenProjectDirProvider(annotated)
                 .forEach(mavenProjectDirProvider -> getPluginJarsProvider(annotated)
                         .forEach(pluginJarsProvider -> {
                             MavenProjectDirProvider mpdp = (MavenProjectDirProvider) instantiateFactory(mavenProjectDirProvider);
-                            PluginJarsProvider pjp = (PluginJarsProvider) instantiateFactory(pluginJarsProvider);
+                            PluginJarsProvider pjp = instantiateFactory(pluginJarsProvider);
                             // now add all grouped tests for Lifecycle.VM
                             getEsVersions(annotated)
                                     .forEach(esVersion -> getMongoVersions(annotated)
@@ -119,7 +156,8 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
                                                         pjp.getUniqueId(),
                                                         esVersion,
                                                         mongoVersion,
-                                                        extraPorts);
+                                                        extraPorts,
+                                                        mongoDBFixtures);
                                                 new ContainerMatrixTestsDiscoverySelectorResolver(engineDescriptor).resolveSelectors(discoveryRequest, testsDescriptor);
                                                 engineDescriptor.addChild(testsDescriptor);
                                             })
@@ -136,7 +174,8 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
                                                                 pjp.getUniqueId(),
                                                                 esVersion,
                                                                 mongoVersion,
-                                                                extraPorts);
+                                                                extraPorts,
+                                                                new ArrayList<>());
                                                         new ContainerMatrixTestsDiscoverySelectorResolver(engineDescriptor).resolveSelectors(discoveryRequest, testsDescriptor);
                                                         engineDescriptor.addChild(testsDescriptor);
                                                     })

@@ -21,13 +21,10 @@ import com.google.common.eventbus.EventBus;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchDomain;
-import org.graylog.plugins.views.search.SearchExecutionGuard;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.db.SearchJobService;
-import org.graylog.plugins.views.search.engine.QueryEngine;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
-import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -35,7 +32,6 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.NotFoundException;
 import java.util.Collections;
 import java.util.Optional;
@@ -45,19 +41,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class SearchResourceTest {
-    private static final ObjectMapperProvider objectMapperProvider = new ObjectMapperProvider();
-
     @Rule
     public MockitoRule rule = MockitoJUnit.rule();
-
-    @Mock
-    private SearchExecutionGuard executionGuard;
 
     @Mock
     private SearchDomain searchDomain;
@@ -72,9 +61,6 @@ public class SearchResourceTest {
     private EventBus eventBus;
 
     @Mock
-    private QueryEngine queryEngine;
-
-    @Mock
     private SearchExecutor searchExecutor;
 
     private SearchResource searchResource;
@@ -83,16 +69,6 @@ public class SearchResourceTest {
     public void setUp() throws Exception {
         GuiceInjectorHolder.createInjector(Collections.emptyList());
         this.searchResource = new SearchResource(searchDomain, searchExecutor, searchJobService, eventBus);
-    }
-
-    @Test
-    public void saveAddsOwnerToSearch() {
-        when(searchUser.username()).thenReturn("eberhard");
-        final Search search = Search.builder().build();
-
-        this.searchResource.createSearch(search, searchUser);
-
-        verify(searchDomain).saveForUser(any(), eq(searchUser));
     }
 
     @Test
@@ -106,9 +82,9 @@ public class SearchResourceTest {
     public void getSearchLoadsSearch() {
         final Search search = mockExistingSearch();
 
-        final Search returnedSearch = this.searchResource.getSearch(search.id(), searchUser);
+        final SearchDTO returnedSearch = this.searchResource.getSearch(search.id(), searchUser);
 
-        assertThat(returnedSearch).isEqualTo(search);
+        assertThat(returnedSearch.id()).isEqualTo(search.id());
     }
 
     @Test
@@ -122,7 +98,8 @@ public class SearchResourceTest {
 
     @Test
     public void allowCreatingNewSearchWithoutId() {
-        final Search search = Search.builder().id(null).build();
+        final SearchDTO search = SearchDTO.Builder.create().id(null).build();
+        when(searchDomain.saveForUser(any(), any())).thenReturn(search.toSearch());
 
         this.searchResource.createSearch(search, searchUser);
     }
@@ -135,7 +112,9 @@ public class SearchResourceTest {
         final String streamId = "streamId";
 
         final Query query = mock(Query.class);
+        when(query.id()).thenReturn("queryId");
         when(query.usedStreamIds()).thenReturn(ImmutableSet.of(streamId));
+        when(query.searchTypes()).thenReturn(ImmutableSet.of());
         when(search.queries()).thenReturn(ImmutableSet.of(query));
 
         return search;
@@ -147,6 +126,7 @@ public class SearchResourceTest {
 
         final String searchId = "deadbeef";
         when(search.id()).thenReturn(searchId);
+        when(search.parameters()).thenReturn(ImmutableSet.of());
 
         when(search.applyExecutionState(any(), any())).thenReturn(search);
         when(searchDomain.getForUser(eq(search.id()), any())).thenReturn(Optional.of(search));

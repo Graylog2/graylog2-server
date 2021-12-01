@@ -24,6 +24,7 @@ import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.MavenProjectDirProvider;
 import org.graylog.testing.completebackend.PluginJarsProvider;
 import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.platform.commons.annotation.Testable;
 
@@ -34,6 +35,7 @@ import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.graylog.testing.containermatrix.ContainerVersions.DEFAULT_ES;
 import static org.graylog.testing.containermatrix.ContainerVersions.DEFAULT_MONGO;
+import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 
 /**
  * This annotation can be used to create tests for a matrix of ES- and Mongo-instances
@@ -42,6 +44,7 @@ import static org.graylog.testing.containermatrix.ContainerVersions.DEFAULT_MONG
 @Retention(RUNTIME)
 @Tag("integration")
 @ExtendWith(GraylogBackendExtension.class)
+@TestInstance(PER_CLASS)
 @Testable
 public @interface ContainerMatrixTestsConfiguration {
     // combination rule
@@ -62,6 +65,6 @@ public @interface ContainerMatrixTestsConfiguration {
     // additional Parameter, gets concatenated for all tests below the above rules
     int[] extraPorts() default {};
 
-    // are run depending on the test, it's configured for
+    // are run after the initialization of mongoDb, gets concatenated for all tests below the above rules
     String[] mongoDBFixtures() default {};
 }

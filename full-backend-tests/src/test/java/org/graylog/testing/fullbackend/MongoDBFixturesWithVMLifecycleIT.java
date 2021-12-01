@@ -20,6 +20,7 @@ import io.restassured.specification.RequestSpecification;
 import org.graylog.testing.completebackend.GraylogBackend;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.junit.jupiter.api.BeforeAll;
 
 import java.util.List;
 
@@ -28,14 +29,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.testing.completebackend.Lifecycle.VM;
 import static org.graylog.testing.containermatrix.ContainerVersions.ES6;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = VM, esVersions = {ES6}, mongoDBFixtures = "access-token.json")
+@ContainerMatrixTestsConfiguration(serverLifecycle = VM, esVersions = {ES6})
 class MongoDBFixturesWithVMLifecycleIT {
-    private final GraylogBackend sut;
+    private final GraylogBackend graylogBackend;
     private final RequestSpecification requestSpec;
 
-    public MongoDBFixturesWithVMLifecycleIT(GraylogBackend sut, RequestSpecification requestSpec) {
-        this.sut = sut;
+    public MongoDBFixturesWithVMLifecycleIT(GraylogBackend graylogBackend, RequestSpecification requestSpec) {
+        this.graylogBackend = graylogBackend;
         this.requestSpec = requestSpec;
+    }
+
+    @BeforeAll
+    public void importMongoFixtures() {
+        this.graylogBackend.importMongoDBFixture("access-token.json", MongoDBFixturesWithVMLifecycleIT.class);
     }
 
     @ContainerMatrixTest

@@ -172,6 +172,7 @@
     "react-styleguidist": "^11.1.7",
     "style-loader": "2.0.0",
     "stylelint-config-graylog": "file:packages/stylelint-config-graylog",
+    "trace-unhandled": "^2.0.1",
     "url-loader": "^4.0.0",
     "webpack-bundle-analyzer": "^3.5.2",
     "webpack-cli": "3.3.12",

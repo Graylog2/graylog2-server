@@ -16,6 +16,8 @@
  */
 package org.graylog.testing.containermatrix.annotations;
 
+import org.junit.platform.commons.annotation.Testable;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -23,5 +25,6 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
+@Testable
 public @interface ContainerMatrixTest {
 }
