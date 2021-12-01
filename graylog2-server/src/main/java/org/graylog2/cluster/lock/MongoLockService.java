@@ -69,7 +69,7 @@ public class MongoLockService implements LockService {
     @Inject
     public MongoLockService(NodeId nodeId,
                             MongoConnection mongoConnection,
-                            @Named("leader_election_lock_ttl") Duration leaderElectionLockTTL) {
+                            @Named("lock_service_lock_ttl") Duration leaderElectionLockTTL) {
         this.nodeId = nodeId;
 
         collection = mongoConnection.getMongoDatabase().getCollection(COLLECTION_NAME);

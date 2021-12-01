@@ -51,7 +51,7 @@ public class AutomaticLeaderElectionService extends AbstractExecutionThreadServi
                                           EventBus eventBus,
                                           NodePingThread nodePingThread) {
         this.pollingInterval = configuration.getLeaderElectionLockPollingInterval();
-        this.lockTTL = configuration.getLeaderElectionLockTTL();
+        this.lockTTL = configuration.getLockServiceLockTTL();
         this.lockService = lockService;
         this.eventBus = eventBus;
         this.nodePingThread = nodePingThread;
