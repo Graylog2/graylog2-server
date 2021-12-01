@@ -75,7 +75,7 @@ import org.graylog2.shared.plugins.PluginLoader;
 import org.graylog2.shared.utilities.ExceptionUtils;
 import org.graylog2.storage.UnsupportedSearchException;
 import org.graylog2.storage.versionprobe.ElasticsearchProbeException;
-import org.graylog2.storage.versionprobe.SearchVersion;
+import org.graylog2.storage.SearchVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

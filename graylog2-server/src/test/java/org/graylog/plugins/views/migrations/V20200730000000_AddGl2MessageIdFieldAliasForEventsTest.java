@@ -20,7 +20,7 @@ import com.google.common.collect.ImmutableSet;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.plugin.Version;
 import org.graylog2.plugin.cluster.ClusterConfigService;
-import org.graylog2.storage.versionprobe.SearchVersion;
+import org.graylog2.storage.SearchVersion;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;

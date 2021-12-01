@@ -16,12 +16,12 @@
  */
 package org.graylog.testing.elasticsearch;
 
-import com.github.zafarkhaja.semver.Version;
 import com.google.common.io.Resources;
-import org.graylog2.storage.versionprobe.SearchVersion;
+import org.graylog2.storage.SearchVersion;
 import org.junit.rules.ExternalResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.elasticsearch.ElasticsearchContainer;
@@ -41,44 +41,37 @@ import static java.util.Objects.isNull;
 /**
  * This rule starts an Elasticsearch instance and provides a configured {@link Client}.
  */
-public abstract class ElasticsearchInstance extends ExternalResource implements Closeable {
-    public static final String DEFAULT_VERSION = "7.10.2";
+public abstract class SearchServerInstance extends ExternalResource implements Closeable {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchInstance.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SearchServerInstance.class);
 
-    private static final Map<Version, ElasticsearchContainer> containersByVersion = new HashMap<>();
-
-    private static final String DEFAULT_IMAGE_OSS = "docker.elastic.co/elasticsearch/elasticsearch-oss";
+    private static final Map<SearchVersion, GenericContainer<?>> containersByVersion = new HashMap<>();
 
     private static final int ES_PORT = 9200;
     private static final String NETWORK_ALIAS = "elasticsearch";
 
     private final SearchVersion version;
-    protected final ElasticsearchContainer container;
+    protected final GenericContainer<?> container;
 
     protected abstract Client client();
 
     protected abstract FixtureImporter fixtureImporter();
 
-    protected static String imageNameFrom(Version version) {
-        return DEFAULT_IMAGE_OSS + ":" + version.toString();
-    }
-
-    protected ElasticsearchInstance(String image, Version version, Network network) {
-        this.version = SearchVersion.elasticsearch(new org.graylog2.plugin.Version(version));
+    protected SearchServerInstance(String image, SearchVersion version, Network network) {
+        this.version = version;
         this.container = createContainer(image, version, network);
     }
 
-    private ElasticsearchContainer createContainer(String image, Version version, Network network) {
+    private GenericContainer<?> createContainer(String image, SearchVersion version, Network network) {
         if (!containersByVersion.containsKey(version)) {
-            ElasticsearchContainer container = buildContainer(image, network);
+            GenericContainer<?> container = buildContainer(image, network);
             container.start();
             containersByVersion.put(version, container);
         }
         return containersByVersion.get(version);
     }
 
-    private ElasticsearchContainer buildContainer(String image, Network network) {
+    protected GenericContainer<?> buildContainer(String image, Network network) {
         return new ElasticsearchContainer(DockerImageName.parse(image).asCompatibleSubstituteFor("docker.elastic.co/elasticsearch/elasticsearch"))
                 // Avoids reuse warning on Jenkins (we don't want reuse in our CI environment)
                 .withReuse(isNull(System.getenv("BUILD_ID")))
@@ -103,11 +96,8 @@ public abstract class ElasticsearchInstance extends ExternalResource implements 
     @Override
     public void close() {
         container.close();
-        final List<Version> version = containersByVersion.keySet().stream().filter(k -> container == containersByVersion.get(k)).collect(Collectors.toList());
-        version.forEach(v -> {
-            containersByVersion.remove(v);
-        });
-
+        final List<SearchVersion> version = containersByVersion.keySet().stream().filter(k -> container == containersByVersion.get(k)).collect(Collectors.toList());
+        version.forEach(containersByVersion::remove);
     }
 
     public static String internalUri() {
@@ -131,4 +121,10 @@ public abstract class ElasticsearchInstance extends ExternalResource implements 
         // Make sure the data we just imported is visible
         client().refreshNode();
     }
+
+
+    public String getHttpHostAddress() {
+        return this.container.getHost() + ":" + this.container.getMappedPort(9200);
+    }
+
 }

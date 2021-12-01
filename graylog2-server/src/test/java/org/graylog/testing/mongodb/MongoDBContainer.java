@@ -17,6 +17,7 @@
 package org.graylog.testing.mongodb;
 
 import com.github.dockerjava.api.command.InspectContainerResponse;
+import org.graylog.testing.containermatrix.MongodbServer;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.Wait;
@@ -32,7 +33,6 @@ public class MongoDBContainer extends GenericContainer<MongoDBContainer> {
     public static final String DEFAULT_IMAGE = "mongo";
 
     // Run tests againtst the oldest supported MongoDB version
-    public static final String DEFAULT_VERSION = "4.0";
     public static final int MONGODB_PORT = 27017;
     public static final String NETWORK_ALIAS = "mongodb";
 
@@ -40,16 +40,16 @@ public class MongoDBContainer extends GenericContainer<MongoDBContainer> {
         return create(Network.newNetwork());
     }
 
-    public static MongoDBContainer create(String version) {
+    public static MongoDBContainer create(MongodbServer version) {
         return create(version, Network.newNetwork());
     }
 
     public static MongoDBContainer create(Network network) {
-        return create(DEFAULT_VERSION, network);
+        return create(MongodbServer.DEFAULT_VERSION, network);
     }
 
-    public static MongoDBContainer create(String version, Network network) {
-        return new MongoDBContainer(DEFAULT_IMAGE + ":" + version, network);
+    public static MongoDBContainer create(MongodbServer version, Network network) {
+        return new MongoDBContainer(DEFAULT_IMAGE + ":" + version.getVersion(), network);
     }
 
     private MongoDBContainer(String dockerImageName, Network network) {

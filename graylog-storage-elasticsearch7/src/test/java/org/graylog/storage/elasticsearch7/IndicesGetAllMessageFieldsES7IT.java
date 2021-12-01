@@ -21,7 +21,7 @@ import org.graylog.storage.elasticsearch7.cat.CatApi;
 import org.graylog.storage.elasticsearch7.cluster.ClusterStateApi;
 import org.graylog.storage.elasticsearch7.stats.StatsApi;
 import org.graylog.storage.elasticsearch7.testing.ElasticsearchInstanceES7;
-import org.graylog.testing.elasticsearch.ElasticsearchInstance;
+import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.indexer.indices.IndicesAdapter;
 import org.graylog2.indexer.indices.IndicesGetAllMessageFieldsIT;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -45,7 +45,7 @@ public class IndicesGetAllMessageFieldsES7IT extends IndicesGetAllMessageFieldsI
     }
 
     @Override
-    protected ElasticsearchInstance elasticsearch() {
+    protected SearchServerInstance elasticsearch() {
         return elasticsearch;
     }
 }

@@ -29,6 +29,7 @@ import okhttp3.Request;
 import okhttp3.ResponseBody;
 import org.graylog2.plugin.Version;
 import org.graylog2.shared.utilities.ExceptionUtils;
+import org.graylog2.storage.SearchVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import retrofit2.Converter;

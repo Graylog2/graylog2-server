@@ -22,7 +22,7 @@ import org.graylog.storage.elasticsearch7.cat.CatApi;
 import org.graylog.storage.elasticsearch7.cluster.ClusterStateApi;
 import org.graylog.storage.elasticsearch7.stats.StatsApi;
 import org.graylog.storage.elasticsearch7.testing.ElasticsearchInstanceES7;
-import org.graylog.testing.elasticsearch.ElasticsearchInstance;
+import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.indexer.cluster.NodeAdapter;
 import org.graylog2.indexer.indices.IndicesAdapter;
 import org.graylog2.indexer.indices.IndicesIT;
@@ -46,7 +46,7 @@ public class IndicesES7IT extends IndicesIT {
     }
 
     @Override
-    protected ElasticsearchInstance elasticsearch() {
+    protected SearchServerInstance elasticsearch() {
         return elasticsearch;
     }
 

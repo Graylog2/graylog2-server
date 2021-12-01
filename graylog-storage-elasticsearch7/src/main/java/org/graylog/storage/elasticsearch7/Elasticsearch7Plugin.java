@@ -21,7 +21,7 @@ import org.graylog2.plugin.Plugin;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.PluginModule;
 import org.graylog2.plugin.Version;
-import org.graylog2.storage.versionprobe.SearchVersion;
+import org.graylog2.storage.SearchVersion;
 
 import java.util.Collection;
 

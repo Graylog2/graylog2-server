@@ -16,8 +16,6 @@
  */
 package org.graylog2.storage;
 
-import org.graylog2.storage.versionprobe.SearchVersion;
-
 public class UnsupportedSearchException extends RuntimeException {
     private final SearchVersion elasticsearchMajorVersion;
 

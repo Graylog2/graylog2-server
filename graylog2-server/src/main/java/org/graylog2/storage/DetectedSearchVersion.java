@@ -14,24 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.indexer.cluster;
+package org.graylog2.storage;
 
-import org.graylog2.storage.SearchVersion;
+import com.google.inject.BindingAnnotation;
 
-import javax.inject.Inject;
-import java.util.Optional;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-public class Node {
-    private final NodeAdapter nodeAdapter;
-
-    @Inject
-    public Node(NodeAdapter nodeAdapter) {
-        this.nodeAdapter = nodeAdapter;
-    }
-
-    public Optional<SearchVersion> getVersion() {
-        return nodeAdapter.version();
-    }
-
-
+/**
+ * @see org.graylog2.storage.providers.ElasticsearchVersionProvider
+ * @see org.graylog2.storage.versionprobe.VersionProbe
+ */
+@Target({ElementType.PARAMETER})
+@Retention(RetentionPolicy.RUNTIME)
+@BindingAnnotation
+public @interface DetectedSearchVersion {
 }
