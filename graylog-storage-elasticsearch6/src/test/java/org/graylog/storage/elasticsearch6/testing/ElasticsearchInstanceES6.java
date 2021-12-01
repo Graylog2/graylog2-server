@@ -41,8 +41,8 @@ public class ElasticsearchInstanceES6 extends SearchServerInstance {
     private final JestClient jestClient;
     private final FixtureImporter fixtureImporter;
 
-    public ElasticsearchInstanceES6(String image, Version version, Network network) {
-        super(image, SearchVersion.elasticsearch(version), network);
+    public ElasticsearchInstanceES6(String image, SearchVersion version, Network network) {
+        super(image, version, network);
         this.jestClient = jestClientFrom();
         this.client = new ClientES6(jestClient);
         this.fixtureImporter = new FixtureImporterES6(jestClient);
@@ -75,7 +75,7 @@ public class ElasticsearchInstanceES6 extends SearchServerInstance {
 
         LOG.debug("Creating instance {}", image);
 
-        return new ElasticsearchInstanceES6(image, version.version().getVersion(), network);
+        return new ElasticsearchInstanceES6(image, version, network);
     }
 
     protected static String imageNameFrom(SearchVersion version) {
