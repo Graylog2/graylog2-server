@@ -14,17 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.storage.versionprobe;
+package org.graylog2.storage;
 
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.plugin.Version;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.Assert.assertEquals;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThat;
 
 class SearchVersionTest {
 
@@ -43,9 +40,17 @@ class SearchVersionTest {
     }
 
     @Test
-    void testParseVersion() {
+    void testInvalidValues() {
         assertThatThrownBy(() -> SearchVersion.parseVersion("v1")).isInstanceOfAny(ElasticsearchException.class);
         assertThatThrownBy(() -> SearchVersion.parseVersion("1.2.x")).isInstanceOfAny(ElasticsearchException.class);
+    }
+
+    @Test
+    void testEncodeDecode() {
+        final SearchVersion version = SearchVersion.create(SearchVersion.Distribution.OPENSEARCH, ver("1.2.0"));
+        final String encoded = version.encode();
+        assertThat(encoded).isEqualTo("OPENSEARCH:1.2.0");
+        assertThat(SearchVersion.decode(encoded)).isEqualTo(version);
     }
 
     private Version ver(final String version) {

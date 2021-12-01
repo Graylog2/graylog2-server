@@ -71,7 +71,7 @@ import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.series.ESStdDe
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.series.ESSumHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.series.ESSumOfSquaresHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.series.ESVarianceHandler;
-import org.graylog2.storage.versionprobe.SearchVersion;
+import org.graylog2.storage.SearchVersion;
 
 public class ViewsESBackendModule extends ViewsModule {
     private final SearchVersion supportedSearchVersion;

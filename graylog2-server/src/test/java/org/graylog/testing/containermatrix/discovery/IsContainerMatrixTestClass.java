@@ -17,7 +17,10 @@
 package org.graylog.testing.containermatrix.discovery;
 
 import com.google.common.collect.Sets;
+import org.graylog.testing.containermatrix.MongodbServer;
+import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog2.storage.SearchVersion;
 import org.junit.jupiter.engine.descriptor.ContainerMatrixTestsDescriptor;
 import org.junit.jupiter.engine.discovery.predicates.IsContainerMatrixTest;
 import org.junit.jupiter.engine.discovery.predicates.IsNestedTestClass;
@@ -28,7 +31,10 @@ import org.junit.platform.commons.util.ReflectionUtils;
 
 import java.lang.reflect.Method;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class IsContainerMatrixTestClass extends IsTestClassWithTests {
     private static final IsContainerMatrixTest isTestMethod = new IsContainerMatrixTest();
@@ -56,11 +62,27 @@ public class IsContainerMatrixTestClass extends IsTestClassWithTests {
             return config.serverLifecycle().equals(container.getLifecycle())
                     && config.mavenProjectDirProvider().equals(container.getMavenProjectDirProvider())
                     && config.pluginJarsProvider().equals(container.getPluginJarsProvider())
-                    && Sets.newHashSet(config.esVersions()).contains(container.getEsVersion())
-                    && Sets.newHashSet(config.mongoVersions()).contains(container.getMongoVersion());
+                    && getSearchServers(config).contains(container.getEsVersion())
+                    && getMongodbServers(config).contains(container.getMongoVersion());
         } else {
             // Annotation should be present!
             return false;
+        }
+    }
+
+    private Set<MongodbServer> getMongodbServers(ContainerMatrixTestsConfiguration config) {
+        if (config.mongoVersions().length == 0) {
+            return Sets.newHashSet(MongodbServer.DEFAULT_VERSION);
+        } else {
+            return Sets.newHashSet(config.mongoVersions());
+        }
+    }
+
+    private Set<SearchVersion> getSearchServers(ContainerMatrixTestsConfiguration config) {
+        if (config.searchVersions().length == 0) {
+            return Sets.newHashSet(SearchServer.DEFAULT_VERSION.getSearchVersion());
+        } else {
+            return Stream.of(config.searchVersions()).map(SearchServer::getSearchVersion).collect(Collectors.toSet());
         }
     }
 

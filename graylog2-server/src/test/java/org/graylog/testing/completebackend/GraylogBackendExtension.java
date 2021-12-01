@@ -18,7 +18,7 @@ package org.graylog.testing.completebackend;
 
 import com.google.common.collect.ImmutableSet;
 import io.restassured.specification.RequestSpecification;
-import org.graylog.testing.elasticsearch.ElasticsearchInstance;
+import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
@@ -29,7 +29,7 @@ import org.junit.platform.engine.support.hierarchical.ContainerMatrixHierarchica
 public class GraylogBackendExtension implements ParameterResolver {
     @Override
     public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
-        ImmutableSet<Class<?>> supportedTypes = ImmutableSet.of(GraylogBackend.class, RequestSpecification.class, ElasticsearchInstance.class);
+        ImmutableSet<Class<?>> supportedTypes = ImmutableSet.of(GraylogBackend.class, RequestSpecification.class, SearchServerInstance.class);
 
         return supportedTypes.contains(parameterContext.getParameter().getType());
     }
@@ -42,8 +42,8 @@ public class GraylogBackendExtension implements ParameterResolver {
             return ContainerMatrixHierarchicalTestExecutor.graylogBackend.orElse(null);
         } else if (paramType.equals(RequestSpecification.class)) {
             return ContainerMatrixHierarchicalTestExecutor.requestSpecification.orElse(null);
-        } else if (paramType.equals(ElasticsearchInstance.class)) {
-            return ContainerMatrixHierarchicalTestExecutor.graylogBackend.map(GraylogBackend::elasticsearchInstance).orElse(null);
+        } else if (paramType.equals(SearchServerInstance.class)) {
+            return ContainerMatrixHierarchicalTestExecutor.graylogBackend.map(GraylogBackend::searchServerInstance).orElse(null);
         }
         throw new RuntimeException("Unsupported parameter type: " + paramType);
     }

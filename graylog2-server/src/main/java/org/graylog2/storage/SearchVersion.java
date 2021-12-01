@@ -14,12 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.storage.versionprobe;
+package org.graylog2.storage;
 
 import com.google.auto.value.AutoValue;
 import org.graylog2.configuration.validators.SearchVersionRange;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.plugin.Version;
+import org.graylog2.storage.AutoValue_SearchVersion;
 
 import javax.annotation.Nullable;
 import java.util.Locale;
@@ -43,8 +44,8 @@ public abstract class SearchVersion {
         public String toString() {
             return this.printName;
         }
-    }
 
+    }
     public SearchVersion major() {
         return create(distribution(), Version.from(version().getVersion().getMajorVersion(), 0, 0));
     }
@@ -76,6 +77,19 @@ public abstract class SearchVersion {
 
     public static SearchVersion elasticsearch(com.github.zafarkhaja.semver.Version version) {
         return elasticsearch(new Version(version));
+    }
+
+    public String encode() {
+        return String.format(Locale.ROOT, "%s:%s", this.distribution().name().toUpperCase(Locale.ROOT), this.version().getVersion());
+    }
+
+    public static SearchVersion decode(final String searchServerIdentifier) {
+        final String[] parts = searchServerIdentifier.split(":");
+        if(parts.length == 2) {
+            return SearchVersion.create(Distribution.valueOf(parts[0].toUpperCase(Locale.ROOT)), com.github.zafarkhaja.semver.Version.valueOf((parts[1])));
+        } else {
+            return SearchVersion.elasticsearch(searchServerIdentifier);
+        }
     }
 
     /**

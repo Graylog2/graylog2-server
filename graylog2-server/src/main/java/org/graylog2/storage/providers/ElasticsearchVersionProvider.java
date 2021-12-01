@@ -16,9 +16,8 @@
  */
 package org.graylog2.storage.providers;
 
-import org.graylog2.plugin.Version;
 import org.graylog2.storage.versionprobe.ElasticsearchProbeException;
-import org.graylog2.storage.versionprobe.SearchVersion;
+import org.graylog2.storage.SearchVersion;
 import org.graylog2.storage.versionprobe.VersionProbe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

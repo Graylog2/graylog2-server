@@ -25,7 +25,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.core.CountRequ
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.core.CountResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.rest.RestStatus;
 import org.graylog.storage.elasticsearch7.testing.ElasticsearchInstanceES7;
-import org.graylog.testing.elasticsearch.ElasticsearchInstance;
+import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.indexer.messages.ChunkedBulkIndexer;
 import org.graylog2.indexer.messages.MessagesAdapter;
 import org.graylog2.indexer.messages.MessagesIT;
@@ -41,7 +41,7 @@ public class MessagesES7IT extends MessagesIT {
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
     @Override
-    protected ElasticsearchInstance elasticsearch() {
+    protected SearchServerInstance elasticsearch() {
         return this.elasticsearch;
     }
 

@@ -18,6 +18,7 @@ package org.graylog.testing.mongodb;
 
 import com.google.common.io.Resources;
 import org.graylog.testing.completebackend.Lifecycle;
+import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog2.database.MongoConnection;
 import org.junit.rules.ExternalResource;
 import org.junit.runner.Description;
@@ -67,26 +68,26 @@ public class MongoDBInstance extends ExternalResource implements AutoCloseable {
     }
 
     public static MongoDBInstance createWithDefaults(Network network, Lifecycle lifecycle) {
-        return new MongoDBInstance(DEFAULT_INSTANCE_NAME, lifecycle, MongoDBContainer.DEFAULT_VERSION, network);
+        return new MongoDBInstance(DEFAULT_INSTANCE_NAME, lifecycle, MongodbServer.DEFAULT_VERSION, network);
     }
 
-    private static MongoDBInstance createWithNameAndVersion(Network network, Lifecycle lifecycle, String name, String version) {
+    private static MongoDBInstance createWithNameAndVersion(Network network, Lifecycle lifecycle, String name, MongodbServer version) {
         return new MongoDBInstance(name, lifecycle, version, network);
     }
 
-    public static MongoDBInstance createStarted(Network network, Lifecycle lifecycle, String version) {
+    public static MongoDBInstance createStarted(Network network, Lifecycle lifecycle, MongodbServer version) {
         final MongoDBInstance mongoDb = createWithNameAndVersion(network, lifecycle, DEFAULT_INSTANCE_NAME, version);
         mongoDb.start();
         return mongoDb;
     }
 
-    public static MongoDBInstance createStartedWithUniqueName(Network network, Lifecycle lifecycle, String version) {
+    public static MongoDBInstance createStartedWithUniqueName(Network network, Lifecycle lifecycle, MongodbServer version) {
         final MongoDBInstance mongoDb = createWithNameAndVersion(network, lifecycle, UUID.randomUUID().toString(), version);
         mongoDb.start();
         return mongoDb;
     }
 
-    private MongoDBInstance(String instanceName, Lifecycle lifecycle, String version, Network network) {
+    private MongoDBInstance(String instanceName, Lifecycle lifecycle, MongodbServer version, Network network) {
         this.lifecycle = lifecycle;
 
         switch (lifecycle) {
@@ -101,7 +102,7 @@ public class MongoDBInstance extends ExternalResource implements AutoCloseable {
         }
     }
 
-    private MongoDBTestService createContainer(String version, Network network) {
+    private MongoDBTestService createContainer(MongodbServer version, Network network) {
         return MongoDBTestService.create(version, network);
     }
 

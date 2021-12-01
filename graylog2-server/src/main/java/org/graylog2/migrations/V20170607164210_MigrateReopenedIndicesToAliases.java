@@ -17,7 +17,6 @@
 package org.graylog2.migrations;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.github.zafarkhaja.semver.Version;
 import com.google.common.collect.ImmutableSet;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.IndexSet;
@@ -25,7 +24,7 @@ import org.graylog2.indexer.MongoIndexSet;
 import org.graylog2.indexer.cluster.Node;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.indexer.indices.Indices;
-import org.graylog2.storage.versionprobe.SearchVersion;
+import org.graylog2.storage.SearchVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,8 +37,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import static org.graylog2.storage.versionprobe.SearchVersion.Distribution.*;
-import static org.graylog2.storage.versionprobe.SearchVersion.Distribution.OPENSEARCH;
+import static org.graylog2.storage.SearchVersion.Distribution.*;
+import static org.graylog2.storage.SearchVersion.Distribution.OPENSEARCH;
 
 public class V20170607164210_MigrateReopenedIndicesToAliases extends Migration {
     private static final Logger LOG = LoggerFactory.getLogger(V20170607164210_MigrateReopenedIndicesToAliases.class);
