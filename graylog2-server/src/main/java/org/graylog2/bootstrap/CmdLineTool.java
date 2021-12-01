@@ -202,6 +202,13 @@ public abstract class CmdLineTool implements CliCommand {
     protected void beforeStart(TLSProtocolsConfiguration configuration, PathConfiguration pathConfiguration) {
     }
 
+    /**
+     * Things that have to run before the guice injector is created.
+     * This call happens *after* the configuration file has been parsed.
+     */
+    protected void beforeInjectorCreation() {
+    }
+
     protected static void applySecuritySettings(TLSProtocolsConfiguration configuration) {
         // Disable insecure TLS parameters and ciphers by default.
         // Prevent attacks like LOGJAM, LUCKY13, et al.
@@ -280,6 +287,8 @@ public abstract class CmdLineTool implements CliCommand {
 
         final List<String> arguments = ManagementFactory.getRuntimeMXBean().getInputArguments();
         LOG.info("Running with JVM arguments: {}", Joiner.on(' ').join(arguments));
+
+        beforeInjectorCreation();
 
         injector = setupInjector(
                 new NamedConfigParametersModule(jadConfig.getConfigurationBeans()),
