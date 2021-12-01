@@ -24,19 +24,14 @@ import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.graylog.testing.utils.GelfInputUtils;
 import org.graylog.testing.utils.SearchUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.graylog.testing.completebackend.Lifecycle.VM;
 import static org.graylog.testing.graylognode.NodeContainerConfig.GELF_HTTP_PORT;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = VM, searchVersions = {SearchServer.OS1, SearchServer.ES6, SearchServer.ES7}, mongoVersions = {MongodbServer.MONGO3, MongodbServer.MONGO4})
+@ContainerMatrixTestsConfiguration
 public class ElasticsearchE2E {
-    private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchE2E.class);
-
     private final GraylogBackend sut;
     private final RequestSpecification requestSpec;
 
