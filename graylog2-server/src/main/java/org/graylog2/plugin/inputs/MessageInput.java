@@ -247,7 +247,7 @@ public abstract class MessageInput implements Stoppable {
     }
 
     /**
-     * Determines if graylog should only launch a single instance of this input at a time in the cluster.
+     * Determines if Graylog should only launch a single instance of this input at a time in the cluster.
      * <p>
      * This might be useful for an input which polls data from an external source and maintains local state, i.e. a
      * cursor, to determine records have been fetched already. In that case, running a second instance of the input at
