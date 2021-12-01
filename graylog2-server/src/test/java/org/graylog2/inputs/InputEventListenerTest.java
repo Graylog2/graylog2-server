@@ -17,7 +17,6 @@
 package org.graylog2.inputs;
 
 import com.google.common.eventbus.EventBus;
-import org.graylog2.Configuration;
 import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.IOState;
@@ -64,13 +63,11 @@ public class InputEventListenerTest {
     private PersistedInputs persistedInputs;
     @Mock
     private ServerStatus serverStatus;
-    @Mock
-    private Configuration configuration;
 
     @Before
     public void setUp() throws Exception {
         final EventBus eventBus = new EventBus(this.getClass().getSimpleName());
-        listener = new InputEventListener(eventBus, inputLauncher, inputRegistry, inputService, nodeId, leaderElectionService, persistedInputs, serverStatus, configuration);
+        listener = new InputEventListener(eventBus, inputLauncher, inputRegistry, inputService, nodeId, leaderElectionService, persistedInputs, serverStatus);
     }
 
     @Test

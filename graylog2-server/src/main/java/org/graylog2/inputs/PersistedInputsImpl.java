@@ -17,7 +17,6 @@
 package org.graylog2.inputs;
 
 import com.google.common.collect.Lists;
-import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.database.ValidationException;
@@ -39,13 +38,11 @@ public class PersistedInputsImpl implements PersistedInputs {
     private static final Logger LOG = LoggerFactory.getLogger(PersistedInputsImpl.class);
     private final InputService inputService;
     private final ServerStatus serverStatus;
-    private final LeaderElectionService leaderElectionService;
 
     @Inject
-    public PersistedInputsImpl(InputService inputService, ServerStatus serverStatus, LeaderElectionService leaderElectionService) {
+    public PersistedInputsImpl(InputService inputService, ServerStatus serverStatus) {
         this.inputService = inputService;
         this.serverStatus = serverStatus;
-        this.leaderElectionService = leaderElectionService;
     }
 
     @Override
@@ -55,11 +52,7 @@ public class PersistedInputsImpl implements PersistedInputs {
         for (Input io : inputService.allOfThisNode(serverStatus.getNodeId().toString())) {
             try {
                 final MessageInput input = inputService.getMessageInput(io);
-                if (input.onlyOnePerCluster() && input.isGlobal() && !leaderElectionService.isLeader()) {
-                    LOG.info("Not starting 'onlyOnePerCluster' input <{}/{}>", input.getName(), input.getId());
-                } else {
-                    result.add(input);
-                }
+                result.add(input);
             } catch (NoSuchInputTypeException e) {
                 LOG.warn("Cannot instantiate persisted input. No such type [{}].", io.getType());
             } catch (Throwable e) {

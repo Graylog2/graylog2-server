@@ -20,6 +20,7 @@ import com.codahale.metrics.InstrumentedExecutorService;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog2.Configuration;
+import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.buffers.InputBuffer;
 import org.graylog2.plugin.inputs.MessageInput;
@@ -43,16 +44,18 @@ public class InputLauncher {
     private final InputRegistry inputRegistry;
     private final ExecutorService executor;
     private final Configuration configuration;
+    private final LeaderElectionService leaderElectionService;
 
     @Inject
     public InputLauncher(IOState.Factory<MessageInput> inputStateFactory, InputBuffer inputBuffer, PersistedInputs persistedInputs,
-                         InputRegistry inputRegistry, MetricRegistry metricRegistry, Configuration configuration) {
+                         InputRegistry inputRegistry, MetricRegistry metricRegistry, Configuration configuration, LeaderElectionService leaderElectionService) {
         this.inputStateFactory = inputStateFactory;
         this.inputBuffer = inputBuffer;
         this.persistedInputs = persistedInputs;
         this.inputRegistry = inputRegistry;
         this.executor = executorService(metricRegistry);
         this.configuration = configuration;
+        this.leaderElectionService = leaderElectionService;
     }
 
     private ExecutorService executorService(final MetricRegistry metricRegistry) {
@@ -116,7 +119,10 @@ public class InputLauncher {
 
     public void launchAllPersisted() {
         for (MessageInput input : persistedInputs) {
-            if (configuration.getAutoRestartInputs() || input.getDesiredState().equals(IOState.Type.RUNNING.toString())) {
+            if (leaderStatusInhibitsLaunch(input)) {
+                continue;
+            }
+            if (shouldStartAutomatically(input)) {
                 LOG.info("Launching input {} {} - desired state is {}",
                         input.getTitle(), input.getName(), input.getDesiredState());
                 input.initialize();
@@ -126,5 +132,18 @@ public class InputLauncher {
                         input.getTitle(), input.getName(), input.getDesiredState());
             }
         }
+    }
+
+
+    public boolean shouldStartAutomatically(MessageInput input) {
+        return configuration.getAutoRestartInputs() || input.getDesiredState().equals(IOState.Type.RUNNING.toString());
+    }
+
+    public boolean leaderStatusInhibitsLaunch(MessageInput input) {
+        if (input.onlyOnePerCluster() && input.isGlobal() && !leaderElectionService.isLeader()) {
+            LOG.info("Not starting 'onlyOnePerCluster' input <{}/{}>", input.getName(), input.getId());
+            return true;
+        }
+        return false;
     }
 }
