@@ -20,6 +20,7 @@ import com.github.joschi.jadconfig.guice.NamedConfigParametersModule;
 import com.github.rvesse.airline.annotations.Option;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.util.concurrent.Service;
 import com.google.common.util.concurrent.ServiceManager;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -27,6 +28,7 @@ import com.google.inject.Key;
 import com.google.inject.Module;
 import com.google.inject.ProvisionException;
 import com.google.inject.TypeLiteral;
+import com.google.inject.name.Names;
 import com.google.inject.util.Types;
 import org.graylog2.Configuration;
 import org.graylog2.audit.AuditActor;
@@ -172,9 +174,11 @@ public abstract class ServerBootstrap extends CmdLineTool {
 
         final ActivityWriter activityWriter;
         final ServiceManager serviceManager;
+        final Service leaderElectionService;
         try {
             activityWriter = injector.getInstance(ActivityWriter.class);
             serviceManager = injector.getInstance(ServiceManager.class);
+            leaderElectionService = injector.getInstance(Key.get(Service.class, Names.named("LeaderElectionService")));
         } catch (ProvisionException e) {
             LOG.error("Guice error", e);
             annotateProvisionException(e);
@@ -197,6 +201,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
         final ServiceManagerListener serviceManagerListener = injector.getInstance(ServiceManagerListener.class);
         serviceManager.addListener(serviceManagerListener);
         try {
+            leaderElectionService.startAsync();
             serviceManager.startAsync().awaitHealthy();
         } catch (Exception e) {
             try {

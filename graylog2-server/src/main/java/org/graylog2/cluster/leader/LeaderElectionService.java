@@ -26,9 +26,4 @@ public interface LeaderElectionService {
      * @return true if the current node is the leader, false if it is not
      */
     boolean isLeader();
-
-    /**
-     * Releases leadership claim of the current node.
-     */
-    void giveUpLeader();
 }

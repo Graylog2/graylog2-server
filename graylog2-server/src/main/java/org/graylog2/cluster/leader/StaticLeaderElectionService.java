@@ -16,6 +16,7 @@
  */
 package org.graylog2.cluster.leader;
 
+import com.google.common.util.concurrent.AbstractIdleService;
 import org.graylog2.Configuration;
 
 import javax.inject.Inject;
@@ -30,7 +31,7 @@ import javax.inject.Singleton;
  * already. In that case the value will be set to false and the node will act as a follower.
  */
 @Singleton
-public class StaticLeaderElectionService implements LeaderElectionService {
+public class StaticLeaderElectionService extends AbstractIdleService implements LeaderElectionService {
     private final Configuration configuration;
 
     @Inject
@@ -45,7 +46,11 @@ public class StaticLeaderElectionService implements LeaderElectionService {
     }
 
     @Override
-    public void giveUpLeader() {
+    protected void startUp() throws Exception {
+    }
+
+    @Override
+    protected void shutDown() throws Exception {
         // This has likely no effect in the server shutdown phase
         configuration.setIsMaster(false);
     }

@@ -69,6 +69,15 @@ public class AutomaticLeaderElectionService extends AbstractExecutionThreadServi
     }
 
     @Override
+    protected void shutDown() {
+        isLeader = false;
+        // Clear interrupted flag, so we can run unlock
+        //noinspection ResultOfMethodCallIgnored
+        Thread.interrupted();
+        lockService.unlock(RESOURCE_NAME).ifPresent(l -> log.info("Gave up leader lock on shutdown"));
+    }
+
+    @Override
     public boolean isLeader() {
         return isLeader;
     }
@@ -138,11 +147,5 @@ public class AutomaticLeaderElectionService extends AbstractExecutionThreadServi
             log.error("Unable to trigger update of nodes collection.");
         }
         eventBus.post(new LeaderChangedEvent());
-    }
-
-    @Override
-    public void giveUpLeader() {
-        isLeader = false;
-        lockService.unlock(RESOURCE_NAME).ifPresent(l -> log.info("Gave up leader lock on shutdown"));
     }
 }
