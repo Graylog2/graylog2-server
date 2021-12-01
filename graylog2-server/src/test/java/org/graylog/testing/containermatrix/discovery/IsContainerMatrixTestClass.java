@@ -62,7 +62,7 @@ public class IsContainerMatrixTestClass extends IsTestClassWithTests {
             return config.serverLifecycle().equals(container.getLifecycle())
                     && config.mavenProjectDirProvider().equals(container.getMavenProjectDirProvider())
                     && config.pluginJarsProvider().equals(container.getPluginJarsProvider())
-                    && getSearchSevers(config).contains(container.getEsVersion())
+                    && getSearchServers(config).contains(container.getEsVersion())
                     && getMongodbServers(config).contains(container.getMongoVersion());
         } else {
             // Annotation should be present!
@@ -78,7 +78,7 @@ public class IsContainerMatrixTestClass extends IsTestClassWithTests {
         }
     }
 
-    private Set<SearchVersion> getSearchSevers(ContainerMatrixTestsConfiguration config) {
+    private Set<SearchVersion> getSearchServers(ContainerMatrixTestsConfiguration config) {
         if (config.searchVersions().length == 0) {
             return Sets.newHashSet(SearchServer.DEFAULT_VERSION.getSearchVersion());
         } else {
