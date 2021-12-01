@@ -16,10 +16,11 @@
  */
 package org.graylog2.cluster.lock;
 
+import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 public class MongoLockServiceTest3 extends MongoLockServiceTest {
     @RegisterExtension
-    static MongoDBExtension mongodbExtension = MongoDBExtension.create("3.6");
+    static MongoDBExtension mongodbExtension = MongoDBExtension.create(MongodbServer.MONGO3);
 }
