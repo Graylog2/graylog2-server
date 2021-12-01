@@ -91,7 +91,6 @@ public class SearchMetadataIT {
 
     @ContainerMatrixTest
     void testRetrievingMetadataForStoredSearchWithoutParameter() {
-        LOG.error("testRetrievingMetadataForStoredSearchWithoutParameter()");
         final ValidatableResponse response = given()
                 .spec(requestSpec)
                 .when()
@@ -105,7 +104,6 @@ public class SearchMetadataIT {
 
     @ContainerMatrixTest
     void testRetrievingMetadataForStoredSearchWithParameter() {
-        LOG.error("testRetrievingMetadataForStoredSearchWithParameter()");
         final ValidatableResponse response = given()
                 .spec(requestSpec)
                 .when()
