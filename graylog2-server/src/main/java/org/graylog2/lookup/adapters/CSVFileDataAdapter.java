@@ -40,6 +40,7 @@ import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
@@ -53,6 +54,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -62,6 +64,8 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(CSVFileDataAdapter.class);
 
     public static final String NAME = "csvfile";
+    public static final String PATH_FIELD = "path";
+    public static final String PATH_OVERRIDE_FIELD = "override_path";
 
     /**
      * If the AllowedAuxiliaryPathChecker is enabled (one or more paths provided to the allowed_auxiliary_paths server
@@ -76,8 +80,10 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
     private final Config config;
     private final AllowedAuxiliaryPathChecker pathChecker;
     private final AtomicReference<Map<String, String>> lookupRef = new AtomicReference<>(ImmutableMap.of());
+    private final AtomicReference<Map<String, String>> overrideLookupRef = new AtomicReference<>(ImmutableMap.of());
 
     private FileInfo fileInfo = FileInfo.empty();
+    private FileInfo overrideFileInfo = FileInfo.empty();
 
     @Inject
     public CSVFileDataAdapter(@Assisted("id") String id,
@@ -99,13 +105,20 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
         if (!pathChecker.fileIsInAllowedPath(Paths.get(config.path()))) {
             throw new IllegalStateException(ALLOWED_PATH_ERROR);
         }
+        if (config.hasOverridePath() && !pathChecker.fileIsInAllowedPath(Paths.get(config.overridePath()))) {
+            throw new IllegalStateException(ALLOWED_PATH_ERROR);
+        }
         if (config.checkInterval() < 1) {
             throw new IllegalStateException("Check interval setting cannot be smaller than 1");
         }
 
         // Set file info before parsing the data for the first time
         fileInfo = FileInfo.forPath(Paths.get(config.path()));
-        lookupRef.set(parseCSVFile());
+        // if no override path is set just leave the file info empty
+        if (config.hasOverridePath()) {
+            overrideFileInfo = FileInfo.forPath(Paths.get(Objects.requireNonNull(config.overridePath())));
+        }
+        populateLookupRefs();
     }
 
     @Override
@@ -121,17 +134,33 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
             return;
         }
 
+        // if an override path exists, confirm it is a legal path
+        if (config.hasOverridePath() && !pathChecker.fileIsInAllowedPath(Paths.get(Objects.requireNonNull(config.overridePath())))) {
+            LOG.error(ALLOWED_PATH_ERROR);
+            setError(new IllegalStateException(ALLOWED_PATH_ERROR));
+            return;
+        }
+
         try {
             final FileInfo.Change fileChanged = fileInfo.checkForChange();
-            if (!fileChanged.isChanged() && !getError().isPresent()) {
+            final FileInfo.Change overrideFileChanged =
+                    config.hasOverridePath() ? overrideFileInfo.checkForChange() : FileInfo.Change.none();
+            if (!fileChanged.isChanged() && !overrideFileChanged.isChanged() && !getError().isPresent()) {
                 // Nothing to do, file did not change
                 return;
+            } else {
+                if (fileChanged.isChanged()) {
+                    LOG.debug("CSV file {} has changed, updating data", config.path());
+                }
+                if (overrideFileChanged.isChanged()) {
+                    LOG.debug("CSV override file {} has changed, updating data", config.overridePath());
+                }
             }
 
-            LOG.debug("CSV file {} has changed, updating data", config.path());
-            lookupRef.set(parseCSVFile());
+            populateLookupRefs();
             cachePurge.purgeAll();
             fileInfo = fileChanged.fileInfo();
+            overrideFileInfo = overrideFileChanged.fileInfo();
             clearError();
         } catch (IOException e) {
             LOG.error("Couldn't check data adapter <{}> CSV file {} for updates: {} {}", name(), config.path(), e.getClass().getCanonicalName(), e.getMessage());
@@ -139,11 +168,9 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
         }
     }
 
-    private Map<String, String> parseCSVFile() throws IOException {
-        final InputStream inputStream = Files.newInputStream(Paths.get(config.path()));
-        final InputStreamReader fileReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
-        final ImmutableMap.Builder<String, String> newLookupBuilder = ImmutableMap.builder();
+    private Map<String, String> parseCSVFile(InputStreamReader fileReader) {
 
+        final ImmutableMap.Builder<String, String> newLookupBuilder = ImmutableMap.builder();
         try (final CSVReader csvReader = new CSVReader(fileReader, config.separatorAsChar(), config.quotecharAsChar())) {
             int line = 0;
             int keyColumn = -1;
@@ -191,6 +218,23 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
         return newLookupBuilder.build();
     }
 
+    private void populateLookupRefs() throws IOException {
+
+        // populate lookup with CSV file
+        try (final InputStream inputStream = Files.newInputStream(Paths.get(config.path()));
+             final InputStreamReader fileReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
+            lookupRef.set(parseCSVFile(fileReader));
+        }
+
+        if (config.hasOverridePath()) {
+            // if this is an Illuminate CSVFileDataAdapter with an override, populate the lookup with the override data
+            try (final InputStream overrideInputStream = Files.newInputStream(Paths.get(Objects.requireNonNull(config.overridePath())));
+                 final InputStreamReader overrideFileReader = new InputStreamReader(overrideInputStream, StandardCharsets.UTF_8)) {
+                overrideLookupRef.set(parseCSVFile(overrideFileReader));
+            }
+        }
+    }
+
     @Override
     public void doStop() throws Exception {
         LOG.debug("Stopping CSV data adapter for file: {}", config.path());
@@ -199,7 +243,18 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
     @Override
     public LookupResult doGet(Object key) {
         final String stringKey = config.isCaseInsensitiveLookup() ? String.valueOf(key).toLowerCase(Locale.ENGLISH) : String.valueOf(key);
-        final String value = lookupRef.get().get(stringKey);
+
+        // if an override exists, try to get the value from the override first
+        String value = null;
+        if (config.hasOverridePath()) {
+            value = overrideLookupRef.get().get(stringKey);
+        }
+        if (value != null) {
+            return LookupResult.single(value);
+        }
+
+        // if no override exists or the key was not in the override, check the original lookup
+        value = lookupRef.get().get(stringKey);
 
         if (value == null) {
             return getEmptyResult();
@@ -254,9 +309,14 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
         @JsonProperty(TYPE_FIELD)
         public abstract String type();
 
-        @JsonProperty("path")
+        @JsonProperty(PATH_FIELD)
         @NotEmpty
         public abstract String path();
+
+        // user-provided override to Illuminate CSVFileDataAdapters
+        @JsonProperty(PATH_OVERRIDE_FIELD)
+        @Nullable
+        public abstract String overridePath();
 
         // Using String here instead of char to allow deserialization of a longer (invalid) string to get proper
         // validation error messages
@@ -311,20 +371,37 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
 
             final Path path = Paths.get(path());
             if (!context.getPathChecker().fileIsInAllowedPath(path)) {
-                errors.put("path", ALLOWED_PATH_ERROR);
-
+                errors.put(PATH_FIELD, ALLOWED_PATH_ERROR);
                 // Intentionally return here, because in the Cloud context, we should not perform the following checks
                 // to report to the user whether or not a file exists.
                 return Optional.of(errors);
             }
 
             if (!Files.exists(path)) {
-                errors.put("path", "The file does not exist.");
+                errors.put(PATH_FIELD, "The file does not exist.");
             } else if (!Files.isReadable(path)) {
-                errors.put("path", "The file cannot be read.");
+                errors.put(PATH_FIELD, "The file cannot be read.");
+            }
+
+            if (hasOverridePath()) {
+                final Path overridePath = Paths.get(Objects.requireNonNull(overridePath()));
+                if (!context.getPathChecker().fileIsInAllowedPath(overridePath)) {
+                    errors.put(PATH_OVERRIDE_FIELD, ALLOWED_PATH_ERROR);
+                }
+
+                if (!Files.exists(overridePath)) {
+                    errors.put(PATH_OVERRIDE_FIELD, "The file does not exist.");
+                } else if (!Files.isReadable(overridePath)) {
+                    errors.put(PATH_OVERRIDE_FIELD, "The file cannot be read.");
+                }
             }
 
             return errors.isEmpty() ? Optional.empty() : Optional.of(errors);
+        }
+
+        public boolean hasOverridePath() {
+
+            return overridePath() != null && !overridePath().isEmpty();
         }
 
         @AutoValue.Builder
@@ -332,8 +409,11 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
             @JsonProperty(TYPE_FIELD)
             public abstract Builder type(String type);
 
-            @JsonProperty("path")
+            @JsonProperty(PATH_FIELD)
             public abstract Builder path(String path);
+
+            @JsonProperty(PATH_OVERRIDE_FIELD)
+            public abstract Builder overridePath(String overridePath);
 
             @JsonProperty("separator")
             public abstract Builder separator(String separator);
