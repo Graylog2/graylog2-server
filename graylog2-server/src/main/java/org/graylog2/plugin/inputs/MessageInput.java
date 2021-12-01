@@ -246,6 +246,21 @@ public abstract class MessageInput implements Stoppable {
         return global;
     }
 
+    /**
+     * Determines if Graylog should only launch a single instance of this input at a time in the cluster.
+     * <p>
+     * This might be useful for an input which polls data from an external source and maintains local state, i.e. a
+     * cursor, to determine records have been fetched already. In that case, running a second instance of the input at
+     * the same time on a different node in the cluster might then lead to the same data fetched again, which would
+     * produce duplicate log messages in Graylog.
+     * <p>
+     * Returning {@code true} from this method will only really make sense if the input also {@code isGlobal}.
+     *
+     * @return {@code true} if only a single instance of the input should be launched in the cluster. It will be
+     * launched on the <em>leader</em> node.
+     * <p>
+     * {@code false} otherwise
+     */
     public boolean onlyOnePerCluster() {
         return false;
     }
