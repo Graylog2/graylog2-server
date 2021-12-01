@@ -33,7 +33,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.testing.completebackend.Lifecycle.VM;
 import static org.graylog.testing.graylognode.NodeContainerConfig.GELF_HTTP_PORT;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = VM, searchVersions = {SearchServer.ES6, SearchServer.ES7}, mongoVersions = {MongodbServer.MONGO3, MongodbServer.MONGO4})
+@ContainerMatrixTestsConfiguration(serverLifecycle = VM, searchVersions = {SearchServer.OS1, SearchServer.ES6, SearchServer.ES7}, mongoVersions = {MongodbServer.MONGO3, MongodbServer.MONGO4})
 public class ElasticsearchE2E {
     private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchE2E.class);
 

@@ -30,7 +30,6 @@ import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.testing.completebackend.Lifecycle.CLASS;
 
-// This test doesn't seem to work within github runners
 @DisabledIfEnvironmentVariable(named = "GITHUB_WORKSPACE", matches = ".+")
 @ContainerMatrixTestsConfiguration(serverLifecycle = CLASS, searchVersions = {SearchServer.ES6})
 public class SystemStatsIT {

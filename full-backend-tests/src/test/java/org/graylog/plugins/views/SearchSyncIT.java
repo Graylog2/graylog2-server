@@ -23,6 +23,7 @@ import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.graylog.testing.utils.GelfInputUtils;
 import org.graylog.testing.utils.SearchUtils;
+import org.junit.jupiter.api.BeforeAll;
 
 import java.io.InputStream;
 
@@ -45,19 +46,8 @@ public class SearchSyncIT {
         this.requestSpec = requestSpec;
     }
 
-    @ContainerMatrixTest
-    void testEmptyBody() {
-        given()
-                .spec(requestSpec)
-                .when()
-                .post("/views/search/sync")
-                .then()
-                .statusCode(400)
-                .assertThat().body("message[0]", equalTo("Search body is mandatory"));
-    }
-
-    // TODO: This should be turned into a @BeforeAll hook once we can use @TestInstance(PER_CLASS)
-    private void ingestMessage() {
+    @BeforeAll
+    public void importMongoFixtures() {
         int mappedPort = sut.mappedPortFor(GELF_HTTP_PORT);
         GelfInputUtils.createGelfHttpInput(mappedPort, GELF_HTTP_PORT, requestSpec);
         GelfInputUtils.postMessage(mappedPort,
@@ -70,9 +60,18 @@ public class SearchSyncIT {
     }
 
     @ContainerMatrixTest
-    void testMinimalisticRequest() {
-        ingestMessage();
+    void testEmptyBody() {
+        given()
+                .spec(requestSpec)
+                .when()
+                .post("/views/search/sync")
+                .then()
+                .statusCode(400)
+                .assertThat().body("message[0]", equalTo("Search body is mandatory"));
+    }
 
+    @ContainerMatrixTest
+    void testMinimalisticRequest() {
         given()
                 .spec(requestSpec)
                 .when()
@@ -87,8 +86,6 @@ public class SearchSyncIT {
 
     @ContainerMatrixTest
     void testMinimalisticRequestv2() {
-        ingestMessage();
-
         given()
                 .spec(requestSpec)
                 .accept("application/vnd.graylog.search.v2+json")
@@ -105,8 +102,6 @@ public class SearchSyncIT {
 
     @ContainerMatrixTest
     void testRequestWithStreamsv2() {
-        ingestMessage();
-
         given()
                 .spec(requestSpec)
                 .accept("application/vnd.graylog.search.v2+json")
