@@ -201,7 +201,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
         final ServiceManagerListener serviceManagerListener = injector.getInstance(ServiceManagerListener.class);
         serviceManager.addListener(serviceManagerListener);
         try {
-            leaderElectionService.startAsync();
+            leaderElectionService.startAsync().awaitRunning();
             serviceManager.startAsync().awaitHealthy();
         } catch (Exception e) {
             try {
