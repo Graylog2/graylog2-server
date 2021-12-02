@@ -14,12 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+const http = require('http');
+
 const express = require('express');
 const webpack = require('webpack');
 const compress = require('compression');
 const history = require('connect-history-api-fallback');
 const proxy = require('express-http-proxy');
-const http = require('http');
 const yargs = require('yargs');
 const webpackDevMiddleware = require('webpack-dev-middleware');
 const webpackHotMiddleware = require('webpack-hot-middleware');
@@ -61,14 +62,10 @@ app.use(history()); // Enables HTML5 History API middleware
 
 app.use(webpackDevMiddleware(vendorCompiler, {
   publicPath: appConfig.output.publicPath,
-  lazy: false,
-  noInfo: true,
 }));
 
 app.use(webpackDevMiddleware(appCompiler, {
   publicPath: appConfig.output.publicPath,
-  lazy: false,
-  noInfo: true,
 }));
 
 app.use(webpackHotMiddleware(appCompiler));
