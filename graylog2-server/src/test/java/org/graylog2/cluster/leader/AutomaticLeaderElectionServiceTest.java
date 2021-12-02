@@ -142,20 +142,6 @@ class AutomaticLeaderElectionServiceTest {
     }
 
     @Test
-    void ignoresSingleFailure() {
-        Lock lock = mock(Lock.class);
-        when(lockService.lock(any()))
-                .thenReturn(Optional.of(lock))
-                .thenThrow(new RuntimeException("ouch"))
-                .thenReturn(Optional.of(lock));
-
-        leaderElectionService.startAsync().awaitRunning();
-        verify(lockService, timeout(10_000).atLeast(3)).lock(any());
-        verify(eventBus).post(any(LeaderChangedEvent.class));
-        assertThat(leaderElectionService.isLeader()).isTrue();
-    }
-
-    @Test
     void handlesConsistentFailure() {
         Lock lock = mock(Lock.class);
         when(lockService.lock(any()))
