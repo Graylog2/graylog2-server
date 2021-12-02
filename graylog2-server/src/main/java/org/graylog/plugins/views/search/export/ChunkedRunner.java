@@ -22,6 +22,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
@@ -48,10 +51,32 @@ public class ChunkedRunner {
                 call.accept(this::write);
             } catch (Exception ex) {
                 LOG.error("Error executing runnable", ex);
+                writeExceptionAsChunk(ex);
             } finally {
-                close();
+               close();
             }
         });
+    }
+
+    private void writeExceptionAsChunk(Exception ex) {
+        // get to the underlying cause
+        Throwable cause = ex;
+        while (cause.getCause() != null) {
+            cause = cause.getCause();
+        }
+        write(createErrChunk(cause));
+    }
+
+    private SimpleMessageChunk createErrChunk(Throwable cause) {
+        final LinkedHashMap<String, Object> err = new LinkedHashMap<>();
+        err.put("err", cause.toString());
+        final LinkedHashSet<SimpleMessage> messages = new LinkedHashSet<>();
+        messages.add(SimpleMessage.builder().index("err").fields(err).build());
+        return SimpleMessageChunk.builder()
+                .fieldsInOrder(new LinkedHashSet<>(Collections.singletonList("err")))
+                .chunkOrder(SimpleMessageChunk.ChunkOrder.LAST)
+                .messages(messages)
+                .build();
     }
 
     private void close() {
