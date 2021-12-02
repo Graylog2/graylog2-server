@@ -100,11 +100,11 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
         return get(annotatedClasses, (ContainerMatrixTestsConfiguration annotation) -> Arrays.stream(annotation.extraPorts()).boxed());
     }
 
-    public static List<URL> getMongoDBFixtures(Class<?> annotatedClass) {
+    public static List<URL> getMongoDBFixtures(Lifecycle lifecycle, Class<?> annotatedClass) {
         final List<URL> urls = new ArrayList<>();
         AnnotationSupport.findAnnotation(annotatedClass, ContainerMatrixTestsConfiguration.class).ifPresent(anno -> {
             // only aggregate, if it's VM Lifecycle
-            if (anno.serverLifecycle().equals(Lifecycle.CLASS)) {
+            if (anno.serverLifecycle().equals(lifecycle)) {
                 final String[] fixtures = anno.mongoDBFixtures();
                 Arrays.stream(fixtures).forEach(resourceName -> {
                     if (!Paths.get(resourceName).isAbsolute()) {
@@ -125,7 +125,7 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
     private List<URL> getMongoDBFixtures(Set<Class<?>> annotatedClasses) {
         final List<URL> urls = new LinkedList<>();
         for (Class<?> aClass : annotatedClasses) {
-            urls.addAll(getMongoDBFixtures(aClass));
+            urls.addAll(getMongoDBFixtures(Lifecycle.VM, aClass));
         }
         return urls;
     }

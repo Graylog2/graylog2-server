@@ -16,8 +16,9 @@
  */
 package org.junit.jupiter.engine.discovery;
 
-import org.graylog.testing.containermatrix.MongodbServer;
+import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.containermatrix.ContainerMatrixTestEngine;
+import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.containermatrix.discovery.IsContainerMatrixTestClass;
 import org.graylog2.storage.SearchVersion;
 import org.junit.jupiter.engine.config.JupiterConfiguration;
@@ -144,12 +145,12 @@ public class ContainerMatrixClassSelectorResolver implements SelectorResolver {
             return new ContainerMatrixTestClassDescriptor(
                     parent,
                     testClass,
-                    configuration, esVersion, mongoVersion, ContainerMatrixTestEngine.getMongoDBFixtures(testClass));
+                    configuration, esVersion, mongoVersion, ContainerMatrixTestEngine.getMongoDBFixtures(Lifecycle.CLASS, testClass));
         } else {
             return new ContainerMatrixTestClassDescriptor(
                     parent,
                     testClass,
-                    configuration, ContainerMatrixTestEngine.getMongoDBFixtures(testClass));
+                    configuration, ContainerMatrixTestEngine.getMongoDBFixtures(Lifecycle.CLASS, testClass));
 
         }
     }

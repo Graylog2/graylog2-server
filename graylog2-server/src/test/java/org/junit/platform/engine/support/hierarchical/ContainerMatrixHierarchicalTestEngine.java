@@ -104,7 +104,7 @@ public abstract class ContainerMatrixHierarchicalTestEngine<C extends EngineExec
         }
     }
 
-    private GraylogBackend constructBackendFrom(SearchVersion esVersion, MongodbServer mongoVersion, int[] extraPorts,List<URL> mongoDBFixtures, Class<? extends PluginJarsProvider> pluginJarsProvider, Class<? extends MavenProjectDirProvider> mavenProjectDirProvider) {
+    private GraylogBackend constructBackendFrom(SearchVersion esVersion, MongodbServer mongoVersion, int[] extraPorts, List<URL> mongoDBFixtures, Class<? extends PluginJarsProvider> pluginJarsProvider, Class<? extends MavenProjectDirProvider> mavenProjectDirProvider) {
         final SearchServerInstanceFactory searchServerInstanceFactory = new SearchServerInstanceFactoryByVersion(esVersion);
         final List<Path> pluginJars = instantiateFactory(pluginJarsProvider).getJars();
         final Path mavenProjectDir = instantiateFactory(mavenProjectDirProvider).getProjectDir();
