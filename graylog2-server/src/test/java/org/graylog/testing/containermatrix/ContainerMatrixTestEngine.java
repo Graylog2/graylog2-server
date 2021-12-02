@@ -88,12 +88,7 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
     }
 
     private Set<MongodbServer> getMongoVersions(Set<Class<?>> annotatedClasses) {
-        return get(annotatedClasses, (ContainerMatrixTestsConfiguration annotation) -> {
-            if(annotation.mongoVersions().length == 0) {
-                return Stream.of(MongodbServer.DEFAULT_VERSION);
-            } else {
-         return Stream.of(annotation.mongoVersions());}
-        });
+        return get(annotatedClasses, (ContainerMatrixTestsConfiguration annotation) -> Stream.of(annotation.mongoVersions()));
     }
 
     private Set<Integer> getExtraPorts(Set<Class<?>> annotatedClasses) {
