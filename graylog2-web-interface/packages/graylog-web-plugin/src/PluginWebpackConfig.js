@@ -14,32 +14,34 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+const path = require('path');
+
 const webpack = require('webpack');
 const merge = require('webpack-merge');
-const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-
-const defaultRootPath = path.resolve(module.parent.parent.filename, '../');
-const defaultOptions = {
-  root_path: defaultRootPath,
-  entry_path: path.resolve(defaultRootPath, 'src/web/index.jsx'),
-  build_path: path.resolve(defaultRootPath, 'target/web/build'),
-};
 
 function getPluginFullName(fqcn) {
   return `plugin.${fqcn}`;
 }
 
-function PluginWebpackConfig(fqcn, _options, additionalConfig) {
+function PluginWebpackConfig(defaultRootPath, fqcn, _options, additionalConfig) {
+  const defaultOptions = {
+    root_path: defaultRootPath,
+    entry_path: path.resolve(defaultRootPath, 'src/web/index.jsx'),
+    build_path: path.resolve(defaultRootPath, 'target/web/build'),
+  };
+
   const options = merge(defaultOptions, _options);
+  // eslint-disable-next-line global-require,import/no-dynamic-require
   const VENDOR_MANIFEST = require(path.resolve(_options.web_src_path, 'manifests', 'vendor-manifest.json'));
 
   const plugins = [
     new webpack.DllReferencePlugin({ manifest: VENDOR_MANIFEST, context: options.root_path }),
-    new HtmlWebpackPlugin({ filename: getPluginFullName(fqcn) + '.module.json', inject: false, template: path.resolve(_options.web_src_path, 'templates', 'module.json.template') }),
+    new HtmlWebpackPlugin({ filename: `${getPluginFullName(fqcn)}.module.json`, inject: false, template: path.resolve(_options.web_src_path, 'templates', 'module.json.template') }),
   ];
 
   const config = merge.smart(
+    // eslint-disable-next-line global-require,import/no-dynamic-require
     require(path.resolve(_options.web_src_path, 'webpack.config.js')),
     {
       output: {
@@ -47,9 +49,9 @@ function PluginWebpackConfig(fqcn, _options, additionalConfig) {
       },
       plugins: plugins,
       resolve: {
-        modules: [ path.resolve(options.entry_path, '..') ],
+        modules: [path.resolve(options.entry_path, '..')],
       },
-    }
+    },
   );
 
   const entry = {};
