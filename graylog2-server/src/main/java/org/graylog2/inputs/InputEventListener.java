@@ -125,6 +125,9 @@ public class InputEventListener {
         }
         if (!inputLauncher.leaderStatusInhibitsLaunch(messageInput)) {
             startMessageInput(messageInput);
+        } else {
+            LOG.info("Not launching 'onlyOnePerCluster' input [{}/{}/{}] because this node is not the leader.",
+                    input.getType(), input.getTitle(), input.getId());
         }
     }
 

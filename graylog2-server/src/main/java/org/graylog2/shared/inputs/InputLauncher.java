@@ -120,6 +120,8 @@ public class InputLauncher {
     public void launchAllPersisted() {
         for (MessageInput input : persistedInputs) {
             if (leaderStatusInhibitsLaunch(input)) {
+                LOG.info("Not launching 'onlyOnePerCluster' input [{}/{}/{}] because this node is not the leader.",
+                        input.getName(), input.getTitle(), input.getId());
                 continue;
             }
             if (shouldStartAutomatically(input)) {
@@ -140,11 +142,6 @@ public class InputLauncher {
     }
 
     public boolean leaderStatusInhibitsLaunch(MessageInput input) {
-        if (input.onlyOnePerCluster() && input.isGlobal() && !leaderElectionService.isLeader()) {
-            LOG.info("Not launching 'onlyOnePerCluster' input [{}/{}/{}] because this node is not the leader.",
-                    input.getName(), input.getTitle(), input.getId());
-            return true;
-        }
-        return false;
+        return input.onlyOnePerCluster() && input.isGlobal() && !leaderElectionService.isLeader();
     }
 }
