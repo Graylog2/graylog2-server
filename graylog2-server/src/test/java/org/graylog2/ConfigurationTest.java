@@ -157,11 +157,11 @@ public class ConfigurationTest {
     @Test
     public void leaderElectionTTLTimeoutTooShort() {
         validProperties.put("leader_election_mode", "automatic");
-        validProperties.put("leader_election_lock_ttl", "3s");
+        validProperties.put("lock_service_lock_ttl", "3s");
 
         assertThatThrownBy(() -> {
             new JadConfig(new InMemoryRepository(validProperties), new Configuration()).process();
-        }).isInstanceOf(ValidationException.class).hasMessageStartingWith("The minimum valid \"leader_election_lock_ttl\" is");
+        }).isInstanceOf(ValidationException.class).hasMessageStartingWith("The minimum valid \"lock_service_lock_ttl\" is");
     }
 
     @Test
@@ -178,7 +178,7 @@ public class ConfigurationTest {
     public void leaderElectionTimeoutDiscrepancy() {
         validProperties.put("leader_election_mode", "automatic");
         validProperties.put("leader_election_lock_polling_interval", "2m");
-        validProperties.put("leader_election_lock_ttl", "1m");
+        validProperties.put("lock_service_lock_ttl", "1m");
 
         assertThatThrownBy(() -> {
             new JadConfig(new InMemoryRepository(validProperties), new Configuration()).process();

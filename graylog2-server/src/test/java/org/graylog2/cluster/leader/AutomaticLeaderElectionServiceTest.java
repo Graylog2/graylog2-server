@@ -64,7 +64,7 @@ class AutomaticLeaderElectionServiceTest {
     @BeforeEach
     void setUp() {
         when(configuration.getLeaderElectionLockPollingInterval()).thenReturn(Duration.ofMillis(100));
-        when(configuration.getLeaderElectionLockTTL()).thenReturn(Duration.ofMillis(500));
+        when(configuration.getLockServiceLockTTL()).thenReturn(Duration.ofMillis(500));
         leaderElectionService = new AutomaticLeaderElectionService(configuration, lockService, eventBus, nodePingThread);
     }
 
