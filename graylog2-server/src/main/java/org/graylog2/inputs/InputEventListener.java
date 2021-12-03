@@ -123,14 +123,12 @@ public class InputEventListener {
             LOG.warn("Input {} ({}) is of invalid type {}", input.getTitle(), input.getId(), input.getType(), e);
             return;
         }
-        startMessageInput(messageInput);
+        if (!inputLauncher.leaderStatusInhibitsLaunch(messageInput)) {
+            startMessageInput(messageInput);
+        }
     }
 
     private void startMessageInput(MessageInput messageInput) {
-        if (messageInput.isGlobal() && messageInput.onlyOnePerCluster() && !leaderElectionService.isLeader()) {
-            LOG.info("Ignoring start request for 'onlyOnePerCluster' input <{}/{}> this node is not a leader", messageInput.getName(), messageInput.getId());
-            return;
-        }
         messageInput.initialize();
 
         final IOState<MessageInput> newInputState = inputLauncher.launch(messageInput);
@@ -157,7 +155,7 @@ public class InputEventListener {
                 final IOState<MessageInput> inputState = inputRegistry.getInputState(input.getId());
                 if (input.onlyOnePerCluster() && input.isGlobal() && (inputState == null || inputState.canBeStarted())
                         && inputLauncher.shouldStartAutomatically(input)) {
-                    LOG.info("Got leader role. Starting input <{}/{}>", input.getName(), input.getId());
+                    LOG.info("Got leader role. Starting input [{}/{}/{}]", input.getName(), input.getTitle(), input.getId());
                     startMessageInput(input);
                 }
             }
@@ -166,7 +164,7 @@ public class InputEventListener {
                     .map(IOState::getStoppable)
                     .filter(input -> input.isGlobal() && input.onlyOnePerCluster())
                     .forEach(input -> {
-                        LOG.info("Lost leader role. Stopping input <{}/{}>", input.getName(), input.getId());
+                        LOG.info("Lost leader role. Stopping input [{}/{}/{}]", input.getName(), input.getTitle(), input.getId());
                         inputDeleted(InputDeleted.create(input.getId()));
                     });
         }

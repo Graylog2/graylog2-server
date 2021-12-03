@@ -123,13 +123,13 @@ public class InputLauncher {
                 continue;
             }
             if (shouldStartAutomatically(input)) {
-                LOG.info("Launching input {} {} - desired state is {}",
-                        input.getTitle(), input.getName(), input.getDesiredState());
+                LOG.info("Launching input [{}/{}/{}] - desired state is {}",
+                        input.getName(), input.getTitle(), input.getId(), input.getDesiredState());
                 input.initialize();
                 launch(input);
             } else {
-                LOG.info("Not auto-starting input {} {} - desired state is {}",
-                        input.getTitle(), input.getName(), input.getDesiredState());
+                LOG.info("Not auto-starting input [{}/{}/{}] - desired state is {}",
+                        input.getName(), input.getTitle(), input.getId(), input.getDesiredState());
             }
         }
     }
@@ -141,7 +141,8 @@ public class InputLauncher {
 
     public boolean leaderStatusInhibitsLaunch(MessageInput input) {
         if (input.onlyOnePerCluster() && input.isGlobal() && !leaderElectionService.isLeader()) {
-            LOG.info("Not starting 'onlyOnePerCluster' input <{}/{}>", input.getName(), input.getId());
+            LOG.info("Not launching 'onlyOnePerCluster' input [{}/{}/{}] because this node is not the leader.",
+                    input.getName(), input.getTitle(), input.getId());
             return true;
         }
         return false;
