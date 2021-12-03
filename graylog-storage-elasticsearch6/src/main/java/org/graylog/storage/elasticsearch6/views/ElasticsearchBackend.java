@@ -86,9 +86,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                                 QueryStringDecorators queryStringDecorators,
                                 ESGeneratedQueryContext.Factory queryContextFactory,
                                 @Named("allow_leading_wildcard_searches") boolean allowLeadingWildcard,
-                                ObjectMapper objectMapper,
-                                MappedFieldTypesService mappedFieldTypesService,
-                                LuceneQueryParser luceneQueryParser) {
+                                ObjectMapper objectMapper) {
         this.elasticsearchSearchTypeHandlers = elasticsearchSearchTypeHandlers;
         this.jestClient = jestClient;
         this.indexLookup = indexLookup;

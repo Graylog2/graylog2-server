@@ -66,7 +66,7 @@ class ElasticsearchBackendQueryStringDecoratorsTest {
                 new QueryStringDecorators(decorators),
                 (elasticsearchBackend, ssb, job, query, results) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, results, fieldTypesLookup),
                 true,
-                new ObjectMapperProvider().get(), Mockito.mock(MappedFieldTypesService.class), new LuceneQueryParser());
+                new ObjectMapperProvider().get());
     }
 
     @Test

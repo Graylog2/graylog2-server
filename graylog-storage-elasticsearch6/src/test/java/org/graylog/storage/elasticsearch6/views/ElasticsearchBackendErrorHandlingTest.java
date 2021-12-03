@@ -88,7 +88,7 @@ public class ElasticsearchBackendErrorHandlingTest extends ElasticsearchBackendT
                 new QueryStringDecorators(Collections.emptySet()),
                 (elasticsearchBackend, ssb, job, query, results) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, results, fieldTypesLookup),
                 false,
-                objectMapper, Mockito.mock(MappedFieldTypesService.class), new LuceneQueryParser());
+                objectMapper);
         when(indexLookup.indexNamesForStreamsInTimeRange(any(), any())).thenReturn(Collections.emptySet());
 
         final SearchType searchType1 = mock(SearchType.class);

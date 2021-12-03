@@ -67,7 +67,7 @@ public class QueryPlanTest {
                 mock(IndexLookup.class),
                 new QueryStringDecorators.Fake(),
                 (elasticsearchBackend, ssb, job, query, results) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, results, fieldTypesLookup),
-                false, new ObjectMapperProvider().get(), Mockito.mock(MappedFieldTypesService.class), new LuceneQueryParser());
+                false, new ObjectMapperProvider().get());
         queryEngine = new QueryEngine(backend, Collections.emptySet(), new QueryParser(new QueryStringParser()), () -> new SearchConfig(Period.ZERO));
     }
 
