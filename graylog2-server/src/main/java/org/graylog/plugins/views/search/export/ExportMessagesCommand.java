@@ -23,10 +23,13 @@ import org.graylog2.decorators.Decorator;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
+import org.joda.time.DateTimeZone;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
 
@@ -38,6 +41,7 @@ public abstract class ExportMessagesCommand {
     public static final Set<String> DEFAULT_STREAMS = ImmutableSet.of();
     public static final LinkedHashSet<String> DEFAULT_FIELDS = linkedHashSetOf("timestamp", "source", "message");
     public static final int DEFAULT_CHUNK_SIZE = 1000;
+    public static final DateTimeZone DEFAULT_TIME_ZONE = DateTimeZone.UTC;
 
     public static AbsoluteRange defaultTimeRange() {
         try {
@@ -61,6 +65,8 @@ public abstract class ExportMessagesCommand {
     public abstract int chunkSize();
 
     public abstract OptionalInt limit();
+
+    public abstract DateTimeZone timeZone();
 
     public static ExportMessagesCommand withDefaults() {
         return builder().build();
@@ -96,6 +102,8 @@ public abstract class ExportMessagesCommand {
 
         public abstract Builder limit(Integer limit);
 
+        public abstract Builder timeZone(DateTimeZone timeZone);
+
         abstract ExportMessagesCommand autoBuild();
 
         public ExportMessagesCommand build() {
@@ -109,7 +117,8 @@ public abstract class ExportMessagesCommand {
                     .queryString(DEFAULT_QUERY)
                     .fieldsInOrder(DEFAULT_FIELDS)
                     .decorators(Collections.emptyList())
-                    .chunkSize(DEFAULT_CHUNK_SIZE);
+                    .chunkSize(DEFAULT_CHUNK_SIZE)
+                    .timeZone(DEFAULT_TIME_ZONE);
         }
     }
 }

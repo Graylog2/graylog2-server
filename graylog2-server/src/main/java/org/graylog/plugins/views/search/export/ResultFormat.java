@@ -23,16 +23,16 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog.plugins.views.search.rest.ExecutionState;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
+import org.joda.time.DateTimeZone;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Positive;
-import java.util.Collections;
 import java.util.LinkedHashSet;
-import java.util.Map;
 import java.util.Optional;
 
 import static org.graylog.plugins.views.search.export.ExportMessagesCommand.DEFAULT_FIELDS;
+import static org.graylog.plugins.views.search.export.ExportMessagesCommand.DEFAULT_TIME_ZONE;
 import static org.graylog.plugins.views.search.export.LinkedHashSetUtil.linkedHashSetOf;
 
 @JsonAutoDetect
@@ -56,6 +56,9 @@ public abstract class ResultFormat {
 
     @JsonProperty
     public abstract Optional<String> filename();
+
+    @JsonProperty
+    public abstract Optional<DateTimeZone> timeZone();
 
     public static ResultFormat.Builder builder() {
         return ResultFormat.Builder.create();
@@ -86,13 +89,17 @@ public abstract class ResultFormat {
         @JsonProperty
         public abstract Builder filename(@Nullable String filename);
 
+        @JsonProperty
+        public abstract Builder timeZone(@Nullable DateTimeZone timeZone);
+
         public abstract ResultFormat build();
 
         @JsonCreator
         public static ResultFormat.Builder create() {
             return new AutoValue_ResultFormat.Builder()
                     .fieldsInOrder(DEFAULT_FIELDS)
-                    .executionState(ExecutionState.empty());
+                    .executionState(ExecutionState.empty())
+                    .timeZone(DEFAULT_TIME_ZONE);
         }
     }
 }

@@ -44,7 +44,8 @@ public class CommandFactory {
                 .queryString(request.queryString())
                 .streams(request.streams())
                 .fieldsInOrder(request.fieldsInOrder())
-                .chunkSize(request.chunkSize());
+                .chunkSize(request.chunkSize())
+                .timeZone(request.timeZone());
 
         if (request.limit().isPresent()) {
             builder.limit(request.limit().getAsInt());

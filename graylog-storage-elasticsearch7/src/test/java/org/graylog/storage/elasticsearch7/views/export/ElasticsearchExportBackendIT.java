@@ -31,6 +31,7 @@ import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
+import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -211,6 +212,21 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
                 "graylog_1, 2015-01-01T01:59:59.999Z, source-2, He",
                 "graylog_0, 2015-01-01T03:00:00.000Z, source-1, Hi",
                 "graylog_0, 2015-01-01T04:00:00.000Z, source-2, Ho");
+    }
+
+    @Test
+    public void usesProvidedTimeZone() {
+        importFixture("messages.json");
+
+        ExportMessagesCommand command = commandBuilderWithAllStreams()
+                .timeZone(DateTimeZone.forID("Europe/Vienna"))
+                .build();
+
+        runWithExpectedResult(command, "timestamp,source,message",
+                "graylog_0, 2015-01-01T02:00:00.000+01:00, source-1, Ha",
+                "graylog_1, 2015-01-01T02:59:59.999+01:00, source-2, He",
+                "graylog_0, 2015-01-01T04:00:00.000+01:00, source-1, Hi",
+                "graylog_0, 2015-01-01T05:00:00.000+01:00, source-2, Ho");
     }
 
     private Set<String> actualFieldNamesFrom(SimpleMessageChunk chunk) {
