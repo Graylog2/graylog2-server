@@ -20,6 +20,7 @@ import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 import org.graylog.testing.completebackend.GraylogBackend;
 import org.graylog.testing.containermatrix.ContainerVersions;
+import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.graylog.testing.utils.GelfInputUtils;
@@ -28,10 +29,13 @@ import org.graylog.testing.utils.SearchUtils;
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.testing.completebackend.Lifecycle.CLASS;
+import static org.graylog.testing.containermatrix.SearchServer.ES6;
+import static org.graylog.testing.containermatrix.SearchServer.ES7;
+import static org.graylog.testing.containermatrix.SearchServer.OS1;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.core.IsEqual.equalTo;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = CLASS, extraPorts = SuggestionResourceIT.GELF_HTTP_PORT, esVersions = {ContainerVersions.ES6, ContainerVersions.ES7})
+@ContainerMatrixTestsConfiguration(serverLifecycle = CLASS, extraPorts = SuggestionResourceIT.GELF_HTTP_PORT, searchVersions = {ES6, ES7, OS1})
 public class SuggestionResourceIT {
 
     static final int GELF_HTTP_PORT = 12201;
@@ -53,7 +57,7 @@ public class SuggestionResourceIT {
                 requestSpec);
 
         // mainly because of the waiting logic
-        final boolean messagePresent = SearchUtils.searchForMessage(requestSpec, "SuggestionResourceIT#testMinimalisticRequest");
+        final boolean messagePresent = SearchUtils.waitForMessage(requestSpec, "SuggestionResourceIT#testMinimalisticRequest");
         assertThat(messagePresent).isTrue();
 
         final ValidatableResponse validatableResponse = given()
@@ -76,7 +80,7 @@ public class SuggestionResourceIT {
                 requestSpec);
 
         // mainly because of the waiting logic
-        final boolean messagePresent = SearchUtils.searchForMessage(requestSpec, "SuggestionResourceIT#testInvalidField");
+        final boolean messagePresent = SearchUtils.waitForMessage(requestSpec, "SuggestionResourceIT#testInvalidField");
         assertThat(messagePresent).isTrue();
 
         final ValidatableResponse validatableResponse = given()
