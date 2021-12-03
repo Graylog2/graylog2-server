@@ -18,7 +18,6 @@ package org.graylog2.inputs;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import org.graylog2.Configuration;
 import org.graylog2.cluster.leader.LeaderChangedEvent;
 import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.database.NotFoundException;
@@ -48,7 +47,6 @@ public class InputEventListener {
     private final LeaderElectionService leaderElectionService;
     private final PersistedInputs persistedInputs;
     private final ServerStatus serverStatus;
-    private final Configuration configuration;
 
     @Inject
     public InputEventListener(EventBus eventBus,
@@ -58,7 +56,7 @@ public class InputEventListener {
                               NodeId nodeId,
                               LeaderElectionService leaderElectionService,
                               PersistedInputs persistedInputs,
-                              ServerStatus serverStatus, Configuration configuration) {
+                              ServerStatus serverStatus) {
         this.inputLauncher = inputLauncher;
         this.inputRegistry = inputRegistry;
         this.inputService = inputService;
@@ -66,7 +64,6 @@ public class InputEventListener {
         this.leaderElectionService = leaderElectionService;
         this.persistedInputs = persistedInputs;
         this.serverStatus = serverStatus;
-        this.configuration = configuration;
         eventBus.register(this);
     }
 
@@ -126,14 +123,15 @@ public class InputEventListener {
             LOG.warn("Input {} ({}) is of invalid type {}", input.getTitle(), input.getId(), input.getType(), e);
             return;
         }
-        startMessageInput(messageInput);
+        if (!inputLauncher.leaderStatusInhibitsLaunch(messageInput)) {
+            startMessageInput(messageInput);
+        } else {
+            LOG.info("Not launching 'onlyOnePerCluster' input [{}/{}/{}] because this node is not the leader.",
+                    input.getType(), input.getTitle(), input.getId());
+        }
     }
 
     private void startMessageInput(MessageInput messageInput) {
-        if (messageInput.isGlobal() && messageInput.onlyOnePerCluster() && !leaderElectionService.isLeader()) {
-            LOG.info("Ignoring start request for 'onlyOnePerCluster' input <{}/{}> this node is not a leader", messageInput.getName(), messageInput.getId());
-            return;
-        }
         messageInput.initialize();
 
         final IOState<MessageInput> newInputState = inputLauncher.launch(messageInput);
@@ -158,9 +156,9 @@ public class InputEventListener {
         if (leaderElectionService.isLeader()) {
             for (MessageInput input : persistedInputs) {
                 final IOState<MessageInput> inputState = inputRegistry.getInputState(input.getId());
-                if (input.onlyOnePerCluster() && (inputState == null || inputState.canBeStarted())
-                        && shouldStartAutomatically(input)) {
-                    LOG.info("Got leader role. Starting input <{}/{}>", input.getName(), input.getId());
+                if (input.onlyOnePerCluster() && input.isGlobal() && (inputState == null || inputState.canBeStarted())
+                        && inputLauncher.shouldStartAutomatically(input)) {
+                    LOG.info("Got leader role. Starting input [{}/{}/{}]", input.getName(), input.getTitle(), input.getId());
                     startMessageInput(input);
                 }
             }
@@ -169,13 +167,9 @@ public class InputEventListener {
                     .map(IOState::getStoppable)
                     .filter(input -> input.isGlobal() && input.onlyOnePerCluster())
                     .forEach(input -> {
-                        LOG.info("Lost leader role. Stopping input <{}/{}>", input.getName(), input.getId());
+                        LOG.info("Lost leader role. Stopping input [{}/{}/{}]", input.getName(), input.getTitle(), input.getId());
                         inputDeleted(InputDeleted.create(input.getId()));
                     });
         }
-    }
-
-    private boolean shouldStartAutomatically(MessageInput input) {
-        return configuration.getAutoRestartInputs() || input.getDesiredState().equals(IOState.Type.RUNNING.toString());
     }
 }
