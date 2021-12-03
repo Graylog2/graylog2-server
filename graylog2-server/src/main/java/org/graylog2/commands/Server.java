@@ -19,6 +19,7 @@ package org.graylog2.commands;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 import com.google.common.collect.ImmutableList;
+import com.google.common.util.concurrent.Service;
 import com.google.common.util.concurrent.ServiceManager;
 import com.google.inject.Injector;
 import com.google.inject.Module;
@@ -95,6 +96,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumSet;
@@ -256,6 +258,7 @@ public class Server extends ServerBootstrap {
         private final GracefulShutdown gracefulShutdown;
         private final AuditEventSender auditEventSender;
         private final Journal journal;
+        private Service leaderElectionService;
 
         @Inject
         public ShutdownHook(ActivityWriter activityWriter,
@@ -263,13 +266,15 @@ public class Server extends ServerBootstrap {
                             NodeId nodeId,
                             GracefulShutdown gracefulShutdown,
                             AuditEventSender auditEventSender,
-                            Journal journal) {
+                            Journal journal,
+                            @Named("LeaderElectionService") Service leaderElectionService) {
             this.activityWriter = activityWriter;
             this.serviceManager = serviceManager;
             this.nodeId = nodeId;
             this.gracefulShutdown = gracefulShutdown;
             this.auditEventSender = auditEventSender;
             this.journal = journal;
+            this.leaderElectionService = leaderElectionService;
         }
 
         @Override
@@ -282,6 +287,8 @@ public class Server extends ServerBootstrap {
 
             gracefulShutdown.runWithoutExit();
             serviceManager.stopAsync().awaitStopped();
+
+            leaderElectionService.stopAsync().awaitTerminated();
 
             // Some services might continue performing processing
             // after the Journal service being down. Therefore it's
