@@ -98,10 +98,7 @@ describe('DashboardSearchBar', () => {
 
     const timeRangeInput = await screen.findByText(/no override/i);
 
-    act(() => {
-      userEvent.click(timeRangeInput);
-    });
-
+    userEvent.click(timeRangeInput);
     userEvent.click(await screen.findByRole('tab', { name: 'Relative' }));
     userEvent.click(await screen.findByRole('button', { name: 'Apply' }));
 
