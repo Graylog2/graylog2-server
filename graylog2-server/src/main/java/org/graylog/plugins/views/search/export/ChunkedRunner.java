@@ -18,6 +18,7 @@ package org.graylog.plugins.views.search.export;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.glassfish.jersey.server.ChunkedOutput;
+import org.graylog2.shared.utilities.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,10 +61,7 @@ public class ChunkedRunner {
 
     private void writeExceptionAsChunk(Exception ex) {
         // get to the underlying cause
-        Throwable cause = ex;
-        while (cause.getCause() != null) {
-            cause = cause.getCause();
-        }
+        Throwable cause = ExceptionUtils.getRootCause(ex, true);
 
         if (cause.getSuppressed().length > 0) {
             cause = cause.getSuppressed()[0];
