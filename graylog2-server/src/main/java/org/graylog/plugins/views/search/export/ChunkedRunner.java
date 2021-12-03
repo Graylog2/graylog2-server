@@ -64,6 +64,11 @@ public class ChunkedRunner {
         while (cause.getCause() != null) {
             cause = cause.getCause();
         }
+
+        if (cause.getSuppressed().length > 0) {
+            cause = cause.getSuppressed()[0];
+        }
+
         write(createErrChunk(cause));
     }
 
