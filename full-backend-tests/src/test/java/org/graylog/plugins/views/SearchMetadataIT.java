@@ -19,24 +19,22 @@ package org.graylog.plugins.views;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 import org.graylog.testing.completebackend.GraylogBackend;
+import org.graylog.testing.containermatrix.MongodbServer;
+import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.junit.jupiter.api.BeforeAll;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
 
 import static io.restassured.RestAssured.given;
-import static org.graylog.testing.completebackend.Lifecycle.CLASS;
 import static org.hamcrest.Matchers.anEmptyMap;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.core.IsEqual.equalTo;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = CLASS)
+@ContainerMatrixTestsConfiguration
 public class SearchMetadataIT {
-    private static final Logger LOG = LoggerFactory.getLogger(SearchMetadataIT.class);
     private final RequestSpecification requestSpec;
     private final GraylogBackend graylogBackend;
 
