@@ -289,6 +289,7 @@ public class Server extends ServerBootstrap {
             serviceManager.stopAsync().awaitStopped();
 
             leaderElectionService.stopAsync().awaitTerminated();
+
             // Some services might continue performing processing
             // after the Journal service being down. Therefore it's
             // important to flush the most actual journal offset value

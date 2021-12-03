@@ -71,9 +71,6 @@ public class AutomaticLeaderElectionService extends AbstractExecutionThreadServi
     @Override
     protected void shutDown() {
         isLeader = false;
-        // Clear interrupted flag, so we can run unlock
-        //noinspection ResultOfMethodCallIgnored
-        Thread.interrupted();
         lockService.unlock(RESOURCE_NAME).ifPresent(l -> log.info("Gave up leader lock on shutdown"));
     }
 
@@ -127,8 +124,7 @@ public class AutomaticLeaderElectionService extends AbstractExecutionThreadServi
                 Thread.sleep(pollingInterval.toMillis());
             }
         } catch (InterruptedException e) {
-            // OK, we are shutting down.
-            Thread.currentThread().interrupt();
+            // OK, we are shutting down. Don't' restore interrupted flag, so we can release the lock in shutdown()
         }
     }
 
