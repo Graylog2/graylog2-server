@@ -71,19 +71,11 @@ public class IsContainerMatrixTestClass extends IsTestClassWithTests {
     }
 
     private Set<MongodbServer> getMongodbServers(ContainerMatrixTestsConfiguration config) {
-        if (config.mongoVersions().length == 0) {
-            return Sets.newHashSet(MongodbServer.DEFAULT_VERSION);
-        } else {
-            return Sets.newHashSet(config.mongoVersions());
-        }
+        return Sets.newHashSet(config.mongoVersions());
     }
 
     private Set<SearchVersion> getSearchServers(ContainerMatrixTestsConfiguration config) {
-        if (config.searchVersions().length == 0) {
-            return Sets.newHashSet(SearchServer.DEFAULT_VERSION.getSearchVersion());
-        } else {
-            return Stream.of(config.searchVersions()).map(SearchServer::getSearchVersion).collect(Collectors.toSet());
-        }
+        return Stream.of(config.searchVersions()).map(SearchServer::getSearchVersion).collect(Collectors.toSet());
     }
 
     @Override

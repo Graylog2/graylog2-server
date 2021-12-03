@@ -18,6 +18,7 @@ package org.graylog.testing.fullbackend;
 
 import io.restassured.specification.RequestSpecification;
 import org.graylog.testing.completebackend.GraylogBackend;
+import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
@@ -27,9 +28,8 @@ import java.util.List;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.graylog.testing.completebackend.Lifecycle.CLASS;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = CLASS, searchVersions = {SearchServer.ES6})
+@ContainerMatrixTestsConfiguration
 class BackendStartupIT {
 
     private final GraylogBackend sut;
