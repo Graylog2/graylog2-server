@@ -24,7 +24,7 @@ import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.builder.Search
 import org.graylog.storage.elasticsearch6.jest.JestUtils;
 import org.graylog.storage.elasticsearch6.testing.ElasticsearchInstanceES6;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
-import org.graylog.testing.elasticsearch.ElasticsearchInstance;
+import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.results.ScrollResult;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -42,10 +42,10 @@ import static org.graylog.storage.elasticsearch6.testing.TestUtils.jestClient;
 
 public class ScrollResultES6IT extends ElasticsearchBaseTest {
     @Rule
-    public final ElasticsearchInstance elasticsearch = ElasticsearchInstanceES6.create();
+    public final SearchServerInstance elasticsearch = ElasticsearchInstanceES6.create();
 
     @Override
-    protected ElasticsearchInstance elasticsearch() {
+    protected SearchServerInstance elasticsearch() {
         return this.elasticsearch;
     }
 

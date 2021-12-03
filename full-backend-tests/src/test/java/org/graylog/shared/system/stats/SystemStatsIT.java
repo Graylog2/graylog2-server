@@ -18,6 +18,8 @@ package org.graylog.shared.system.stats;
 
 import io.restassured.specification.RequestSpecification;
 import org.graylog.testing.completebackend.GraylogBackend;
+import org.graylog.testing.containermatrix.MongodbServer;
+import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
@@ -27,12 +29,9 @@ import java.util.Map;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.graylog.testing.completebackend.Lifecycle.CLASS;
-import static org.graylog.testing.containermatrix.ContainerVersions.ES6;
 
-// This test doesn't seem to work within github runners
 @DisabledIfEnvironmentVariable(named = "GITHUB_WORKSPACE", matches = ".+")
-@ContainerMatrixTestsConfiguration(serverLifecycle = CLASS, esVersions = {ES6})
+@ContainerMatrixTestsConfiguration
 public class SystemStatsIT {
     private final GraylogBackend sut;
     private final RequestSpecification requestSpec;

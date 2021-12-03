@@ -18,16 +18,17 @@ package org.graylog.plugins.views;
 
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
+import org.graylog.testing.containermatrix.MongodbServer;
+import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.junit.jupiter.api.AfterEach;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.graylog.testing.completebackend.Lifecycle.CLASS;
 import static org.hamcrest.core.IsEqual.equalTo;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = CLASS)
+@ContainerMatrixTestsConfiguration
 public class TimeLimitIT {
     private final RequestSpecification requestSpec;
 

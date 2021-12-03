@@ -25,7 +25,7 @@ import io.searchbox.client.JestResult;
 import io.searchbox.core.Ping;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.cluster.NodeAdapter;
-import org.graylog2.storage.versionprobe.SearchVersion;
+import org.graylog2.storage.SearchVersion;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;

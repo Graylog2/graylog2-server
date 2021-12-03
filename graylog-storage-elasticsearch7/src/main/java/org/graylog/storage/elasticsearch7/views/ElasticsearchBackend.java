@@ -24,9 +24,9 @@ import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
-import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
+import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.engine.QueryBackend;
 import org.graylog.plugins.views.search.engine.SearchConfig;
 import org.graylog.plugins.views.search.errors.SearchTypeError;
@@ -50,7 +50,6 @@ import org.graylog.storage.elasticsearch7.TimeRangeQueryFactory;
 import org.graylog.storage.elasticsearch7.views.searchtypes.ESSearchTypeHandler;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.FieldTypeException;
-import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
 import org.graylog2.plugin.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -105,7 +104,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
 
     @Override
     public ESGeneratedQueryContext generate(SearchJob job, Query query, Set<QueryResult> results, SearchConfig searchConfig) {
-        final ElasticsearchQueryString backendQuery = (ElasticsearchQueryString) query.query();
+        final BackendQuery backendQuery = query.query();
 
         validateQueryTimeRange(query, searchConfig);
 
@@ -155,9 +154,8 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                     )
                     .must(QueryBuilders.termsQuery(Message.FIELD_STREAMS, effectiveStreamIds));
 
-            searchType.query().ifPresent(q -> {
-                final ElasticsearchQueryString searchTypeBackendQuery = (ElasticsearchQueryString) q;
-                final String searchTypeQueryString = this.queryStringDecorators.decorate(searchTypeBackendQuery.queryString(), job, query, results);
+            searchType.query().ifPresent(searchTypeQuery -> {
+                final String searchTypeQueryString = this.queryStringDecorators.decorate(searchTypeQuery.queryString(), job, query, results);
                 final QueryBuilder normalizedSearchTypeQuery = normalizeQueryString(searchTypeQueryString);
                 searchTypeOverrides.must(normalizedSearchTypeQuery);
             });

@@ -31,9 +31,8 @@ import org.graylog.plugins.views.search.rest.SeriesDescription;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog2.plugin.PluginMetaData;
-import org.graylog2.plugin.Version;
 import org.graylog2.plugin.VersionAwareModule;
-import org.graylog2.storage.versionprobe.SearchVersion;
+import org.graylog2.storage.SearchVersion;
 
 public abstract class ViewsModule extends VersionAwareModule {
     protected LinkedBindingBuilder<ExportBackend> bindExportBackend(SearchVersion supportedVersion) {

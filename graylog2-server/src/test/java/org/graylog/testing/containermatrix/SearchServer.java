@@ -14,28 +14,27 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.indexer;
+package org.graylog.testing.containermatrix;
 
-import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.storage.SearchVersion;
-
-import javax.annotation.Nonnull;
 
 import static org.graylog2.storage.SearchVersion.Distribution.ELASTICSEARCH;
 import static org.graylog2.storage.SearchVersion.Distribution.OPENSEARCH;
 
-public class EventIndexTemplateProvider implements IndexTemplateProvider {
+public enum SearchServer {
+    ES7(ELASTICSEARCH, "7.10.2"),
+    ES6(ELASTICSEARCH, "6.8.4"),
+    OS1(OPENSEARCH, "1.2.0");
 
-    public static final String EVENT_TEMPLATE_TYPE = "events";
+    public static final SearchServer DEFAULT_VERSION = ES7;
 
-    @Override
-    public IndexMappingTemplate create(@Nonnull SearchVersion elasticsearchVersion, @Nonnull IndexSetConfig indexSetConfig) {
-        if (elasticsearchVersion.satisfies(ELASTICSEARCH, "^5.0.0 | ^6.0.0")) {
-            return new EventsIndexMapping6();
-        } else if (elasticsearchVersion.satisfies(ELASTICSEARCH, "^7.0.0") || elasticsearchVersion.satisfies(OPENSEARCH, "^1.0.0")) {
-            return new EventsIndexMapping7();
-        } else {
-            throw new ElasticsearchException("Unsupported Search version: " + elasticsearchVersion);
-        }
+    private final SearchVersion searchVersion;
+
+    SearchServer(SearchVersion.Distribution distribution, String version) {
+        this.searchVersion = SearchVersion.create(distribution, com.github.zafarkhaja.semver.Version.valueOf(version));
+    }
+
+    public SearchVersion getSearchVersion() {
+        return searchVersion;
     }
 }

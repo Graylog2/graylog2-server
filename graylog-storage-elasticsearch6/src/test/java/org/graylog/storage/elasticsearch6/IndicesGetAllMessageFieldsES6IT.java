@@ -17,7 +17,7 @@
 package org.graylog.storage.elasticsearch6;
 
 import org.graylog.storage.elasticsearch6.testing.ElasticsearchInstanceES6;
-import org.graylog.testing.elasticsearch.ElasticsearchInstance;
+import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.indexer.indices.IndicesAdapter;
 import org.graylog2.indexer.indices.IndicesGetAllMessageFieldsIT;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -27,10 +27,10 @@ import static org.graylog.storage.elasticsearch6.testing.TestUtils.jestClient;
 
 public class IndicesGetAllMessageFieldsES6IT extends IndicesGetAllMessageFieldsIT {
     @Rule
-    public final ElasticsearchInstance elasticsearch = ElasticsearchInstanceES6.create();
+    public final SearchServerInstance elasticsearch = ElasticsearchInstanceES6.create();
 
     @Override
-    protected ElasticsearchInstance elasticsearch() {
+    protected SearchServerInstance elasticsearch() {
         return this.elasticsearch;
     }
 

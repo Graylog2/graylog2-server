@@ -27,7 +27,7 @@ import org.graylog.plugins.views.search.export.SimpleMessageChunk;
 import org.graylog.plugins.views.search.export.TestData;
 import org.graylog.storage.elasticsearch7.testing.ElasticsearchInstanceES7;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
-import org.graylog.testing.elasticsearch.ElasticsearchInstance;
+import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
@@ -54,7 +54,7 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
     public final ElasticsearchInstanceES7 elasticsearch = ElasticsearchInstanceES7.create();
 
     @Override
-    protected ElasticsearchInstance elasticsearch() {
+    protected SearchServerInstance elasticsearch() {
         return this.elasticsearch;
     }
 

@@ -18,25 +18,34 @@ package org.graylog.plugins.views;
 
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
+import org.graylog.testing.completebackend.GraylogBackend;
+import org.graylog.testing.containermatrix.MongodbServer;
+import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.junit.jupiter.api.BeforeAll;
 
 import java.io.InputStream;
 
 import static io.restassured.RestAssured.given;
-import static org.graylog.testing.completebackend.Lifecycle.CLASS;
 import static org.hamcrest.Matchers.anEmptyMap;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.core.IsEqual.equalTo;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = CLASS,
-                                   mongoDBFixtures = "org/graylog/plugins/views/mongodb-stored-searches-for-metadata-endpoint.json")
+@ContainerMatrixTestsConfiguration
 public class SearchMetadataIT {
     private final RequestSpecification requestSpec;
+    private final GraylogBackend graylogBackend;
 
-    public SearchMetadataIT(RequestSpecification requestSpec) {
+    public SearchMetadataIT(GraylogBackend graylogBackend, RequestSpecification requestSpec) {
         this.requestSpec = requestSpec;
+        this.graylogBackend = graylogBackend;
+    }
+
+    @BeforeAll
+    public void importMongoFixtures() {
+        this.graylogBackend.importMongoDBFixture("mongodb-stored-searches-for-metadata-endpoint.json", SearchMetadataIT.class);
     }
 
     @ContainerMatrixTest

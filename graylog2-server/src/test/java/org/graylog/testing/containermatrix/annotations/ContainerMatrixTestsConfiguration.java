@@ -23,7 +23,10 @@ import org.graylog.testing.completebackend.GraylogBackendExtension;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.MavenProjectDirProvider;
 import org.graylog.testing.completebackend.PluginJarsProvider;
+import org.graylog.testing.containermatrix.MongodbServer;
+import org.graylog.testing.containermatrix.SearchServer;
 import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.platform.commons.annotation.Testable;
 
@@ -32,8 +35,7 @@ import java.lang.annotation.Target;
 
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.graylog.testing.containermatrix.ContainerVersions.DEFAULT_ES;
-import static org.graylog.testing.containermatrix.ContainerVersions.DEFAULT_MONGO;
+import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 
 /**
  * This annotation can be used to create tests for a matrix of ES- and Mongo-instances
@@ -42,6 +44,7 @@ import static org.graylog.testing.containermatrix.ContainerVersions.DEFAULT_MONG
 @Retention(RUNTIME)
 @Tag("integration")
 @ExtendWith(GraylogBackendExtension.class)
+@TestInstance(PER_CLASS)
 @Testable
 public @interface ContainerMatrixTestsConfiguration {
     // combination rule
@@ -53,15 +56,21 @@ public @interface ContainerMatrixTestsConfiguration {
     // combination rule
     Class<? extends PluginJarsProvider> pluginJarsProvider() default DefaultPluginJarsProvider.class;
 
-    // matrix rule
-    String[] esVersions() default {DEFAULT_ES};
+    /**
+     * matrix rule
+     * If no version is explicitly specified, then {@link SearchServer#DEFAULT_VERSION will be used by the tests}
+     */
+    SearchServer[] searchVersions() default {SearchServer.OS1, SearchServer.ES6, SearchServer.ES7};
 
-    // matrix rule
-    String[] mongoVersions() default {DEFAULT_MONGO};
+    /**
+     * matrix rule
+     * If no version is explicitly specified, then {@link MongodbServer#DEFAULT_VERSION will be used by the tests}
+     */
+    MongodbServer[] mongoVersions() default {MongodbServer.MONGO3, MongodbServer.MONGO4};
 
     // additional Parameter, gets concatenated for all tests below the above rules
     int[] extraPorts() default {};
 
-    // are run depending on the test, it's configured for
+    // are run after the initialization of mongoDb, gets concatenated for all tests below the above rules
     String[] mongoDBFixtures() default {};
 }

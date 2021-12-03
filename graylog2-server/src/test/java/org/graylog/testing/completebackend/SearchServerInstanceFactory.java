@@ -14,17 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.storage;
+package org.graylog.testing.completebackend;
 
-import com.google.inject.BindingAnnotation;
+import org.graylog.testing.elasticsearch.SearchServerInstance;
+import org.graylog2.storage.SearchVersion;
+import org.testcontainers.containers.Network;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+public interface SearchServerInstanceFactory {
 
-@Target({ElementType.PARAMETER})
-@Retention(RetentionPolicy.RUNTIME)
-@BindingAnnotation
-public @interface ElasticsearchVersion {
+    SearchServerInstance create(Network network);
+
+    SearchVersion getVersion();
 }

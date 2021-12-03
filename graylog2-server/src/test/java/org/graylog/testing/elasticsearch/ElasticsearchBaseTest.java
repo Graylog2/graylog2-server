@@ -17,7 +17,7 @@
 package org.graylog.testing.elasticsearch;
 
 import org.graylog2.indexer.MessageIndexTemplateProvider;
-import org.graylog2.storage.versionprobe.SearchVersion;
+import org.graylog2.storage.SearchVersion;
 import org.junit.Before;
 import org.junit.Rule;
 
@@ -65,7 +65,7 @@ public abstract class ElasticsearchBaseTest {
         }
     }
 
-    protected abstract ElasticsearchInstance elasticsearch();
+    protected abstract SearchServerInstance elasticsearch();
 
     /**
      * Returns a custom Elasticsearch client with a bunch of utility methods.

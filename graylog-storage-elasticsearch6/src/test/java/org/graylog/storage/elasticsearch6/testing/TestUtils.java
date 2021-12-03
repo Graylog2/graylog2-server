@@ -17,10 +17,10 @@
 package org.graylog.storage.elasticsearch6.testing;
 
 import io.searchbox.client.JestClient;
-import org.graylog.testing.elasticsearch.ElasticsearchInstance;
+import org.graylog.testing.elasticsearch.SearchServerInstance;
 
 public class TestUtils {
-    public static JestClient jestClient(ElasticsearchInstance elasticsearchInstance) {
+    public static JestClient jestClient(SearchServerInstance elasticsearchInstance) {
         if (elasticsearchInstance instanceof ElasticsearchInstanceES6) {
             return ((ElasticsearchInstanceES6) elasticsearchInstance).jestClient();
         }

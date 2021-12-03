@@ -36,7 +36,7 @@ import org.graylog2.indexer.messages.MessagesAdapter;
 import org.graylog2.indexer.searches.SearchesAdapter;
 import org.graylog2.migrations.V20170607164210_MigrateReopenedIndicesToAliases;
 import org.graylog2.plugin.VersionAwareModule;
-import org.graylog2.storage.versionprobe.SearchVersion;
+import org.graylog2.storage.SearchVersion;
 
 public class Elasticsearch7Module extends VersionAwareModule {
 

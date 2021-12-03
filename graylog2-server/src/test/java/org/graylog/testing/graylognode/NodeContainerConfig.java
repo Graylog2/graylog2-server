@@ -17,6 +17,7 @@
 package org.graylog.testing.graylognode;
 
 import org.apache.commons.lang.ArrayUtils;
+import org.graylog2.storage.SearchVersion;
 import org.testcontainers.containers.Network;
 
 import java.util.Arrays;
@@ -29,17 +30,17 @@ public class NodeContainerConfig {
 
     public final Network network;
     public final String mongoDbUri;
-    public final String elasticsearchVersion;
+    public final SearchVersion elasticsearchVersion;
     public final String elasticsearchUri;
     public final int[] extraPorts;
     public final boolean enableDebugging;
     public final boolean skipPackaging;
 
-    public static NodeContainerConfig create(Network network, String mongoDbUri, String elasticsearchUri, String elasticsearchVersion, int[] extraPorts) {
+    public static NodeContainerConfig create(Network network, String mongoDbUri, String elasticsearchUri, SearchVersion elasticsearchVersion, int[] extraPorts) {
         return new NodeContainerConfig(network, mongoDbUri, elasticsearchUri, elasticsearchVersion, extraPorts);
     }
 
-    public NodeContainerConfig(Network network, String mongoDbUri, String elasticsearchUri, String elasticsearchVersion, int[] extraPorts) {
+    public NodeContainerConfig(Network network, String mongoDbUri, String elasticsearchUri, SearchVersion elasticsearchVersion, int[] extraPorts) {
         this.network = network;
         this.mongoDbUri = mongoDbUri;
         this.elasticsearchUri = elasticsearchUri;

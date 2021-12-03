@@ -18,20 +18,22 @@ package org.graylog.plugins.views;
 
 import io.restassured.specification.RequestSpecification;
 import org.graylog.testing.completebackend.GraylogBackend;
+import org.graylog.testing.containermatrix.MongodbServer;
+import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.graylog.testing.utils.GelfInputUtils;
 import org.graylog.testing.utils.SearchUtils;
+import org.junit.jupiter.api.BeforeAll;
 
 import java.io.InputStream;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.graylog.testing.completebackend.Lifecycle.CLASS;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.core.IsEqual.equalTo;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = CLASS)
+@ContainerMatrixTestsConfiguration
 public class SearchSyncIT {
 
     static final int GELF_HTTP_PORT = 12201;
@@ -42,6 +44,19 @@ public class SearchSyncIT {
     public SearchSyncIT(GraylogBackend sut, RequestSpecification requestSpec) {
         this.sut = sut;
         this.requestSpec = requestSpec;
+    }
+
+    @BeforeAll
+    public void importMongoFixtures() {
+        int mappedPort = sut.mappedPortFor(GELF_HTTP_PORT);
+        GelfInputUtils.createGelfHttpInput(mappedPort, GELF_HTTP_PORT, requestSpec);
+        GelfInputUtils.postMessage(mappedPort,
+                "{\"short_message\":\"search-sync-test\", \"host\":\"example.org\", \"facility\":\"test\"}",
+                requestSpec);
+
+        // mainly because of the waiting logic
+        final boolean isMessagePresent = SearchUtils.waitForMessage(requestSpec, "search-sync-test");
+        assertThat(isMessagePresent).isTrue();
     }
 
     @ContainerMatrixTest
@@ -55,23 +70,8 @@ public class SearchSyncIT {
                 .assertThat().body("message[0]", equalTo("Search body is mandatory"));
     }
 
-    // TODO: This should be turned into a @BeforeAll hook once we can use @TestInstance(PER_CLASS)
-    private void ingestMessage() {
-        int mappedPort = sut.mappedPortFor(GELF_HTTP_PORT);
-        GelfInputUtils.createGelfHttpInput(mappedPort, GELF_HTTP_PORT, requestSpec);
-        GelfInputUtils.postMessage(mappedPort,
-                "{\"short_message\":\"search-sync-test\", \"host\":\"example.org\", \"facility\":\"test\"}",
-                requestSpec);
-
-        // mainly because of the waiting logic
-        final boolean isMessagePresent = SearchUtils.waitForMessage(requestSpec, "search-sync-test");
-        assertThat(isMessagePresent).isTrue();
-    }
-
     @ContainerMatrixTest
     void testMinimalisticRequest() {
-        ingestMessage();
-
         given()
                 .spec(requestSpec)
                 .when()
@@ -86,8 +86,6 @@ public class SearchSyncIT {
 
     @ContainerMatrixTest
     void testMinimalisticRequestv2() {
-        ingestMessage();
-
         given()
                 .spec(requestSpec)
                 .accept("application/vnd.graylog.search.v2+json")
@@ -104,8 +102,6 @@ public class SearchSyncIT {
 
     @ContainerMatrixTest
     void testRequestWithStreamsv2() {
-        ingestMessage();
-
         given()
                 .spec(requestSpec)
                 .accept("application/vnd.graylog.search.v2+json")
