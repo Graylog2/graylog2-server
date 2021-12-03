@@ -25,9 +25,11 @@ import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.joda.time.DateTimeZone;
 
+import javax.annotation.Nonnull;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Positive;
 import java.util.LinkedHashSet;
+import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
 
@@ -35,7 +37,6 @@ import static org.graylog.plugins.views.search.export.ExportMessagesCommand.DEFA
 import static org.graylog.plugins.views.search.export.ExportMessagesCommand.DEFAULT_FIELDS;
 import static org.graylog.plugins.views.search.export.ExportMessagesCommand.DEFAULT_QUERY;
 import static org.graylog.plugins.views.search.export.ExportMessagesCommand.DEFAULT_STREAMS;
-import static org.graylog.plugins.views.search.export.ExportMessagesCommand.DEFAULT_TIME_ZONE;
 import static org.graylog.plugins.views.search.export.ExportMessagesCommand.defaultTimeRange;
 import static org.graylog.plugins.views.search.export.LinkedHashSetUtil.linkedHashSetOf;
 
@@ -66,7 +67,7 @@ public abstract class MessagesRequest {
     public abstract int chunkSize();
 
     @JsonProperty(FIELD_TIME_ZONE)
-    public abstract DateTimeZone timeZone();
+    public abstract Optional<DateTimeZone> timeZone();
 
     @JsonProperty
     @Positive
@@ -78,6 +79,14 @@ public abstract class MessagesRequest {
 
     public static Builder builder() {
         return Builder.create();
+    }
+
+    public MessagesRequest withTimeZone(@Nonnull DateTimeZone timeZone) {
+        return toBuilder().timeZone(timeZone).build();
+    }
+
+    public MessagesRequest withStreams(@Nonnull Set<String> streams) {
+        return toBuilder().streams(streams).build();
     }
 
     public abstract Builder toBuilder();
@@ -118,8 +127,7 @@ public abstract class MessagesRequest {
                     .streams(DEFAULT_STREAMS)
                     .queryString(DEFAULT_QUERY)
                     .fieldsInOrder(DEFAULT_FIELDS)
-                    .chunkSize(DEFAULT_CHUNK_SIZE)
-                    .timeZone(DEFAULT_TIME_ZONE);
+                    .chunkSize(DEFAULT_CHUNK_SIZE);
         }
     }
 }

@@ -44,8 +44,7 @@ public class CommandFactory {
                 .queryString(request.queryString())
                 .streams(request.streams())
                 .fieldsInOrder(request.fieldsInOrder())
-                .chunkSize(request.chunkSize())
-                .timeZone(request.timeZone());
+                .chunkSize(request.chunkSize());
 
         if (request.limit().isPresent()) {
             builder.limit(request.limit().getAsInt());
@@ -104,12 +103,15 @@ public class CommandFactory {
     }
 
     private ExportMessagesCommand.Builder builderFrom(ResultFormat resultFormat) {
-        ExportMessagesCommand.Builder requestBuilder = ExportMessagesCommand.builder();
-
-        requestBuilder.fieldsInOrder(resultFormat.fieldsInOrder());
+        ExportMessagesCommand.Builder requestBuilder = ExportMessagesCommand.builder()
+                .fieldsInOrder(resultFormat.fieldsInOrder());
 
         if (resultFormat.limit().isPresent()) {
-            requestBuilder.limit(resultFormat.limit().orElseThrow(() -> new IllegalStateException("No value present!")));
+            requestBuilder = requestBuilder.limit(resultFormat.limit().orElseThrow(() -> new IllegalStateException("No value present!")));
+        }
+
+        if (resultFormat.timeZone().isPresent()) {
+            requestBuilder = requestBuilder.timeZone(resultFormat.timeZone().orElseThrow(() -> new IllegalStateException("No time zone present!")));
         }
 
         return requestBuilder;

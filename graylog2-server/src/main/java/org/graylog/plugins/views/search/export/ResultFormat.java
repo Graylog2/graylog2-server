@@ -32,7 +32,6 @@ import java.util.LinkedHashSet;
 import java.util.Optional;
 
 import static org.graylog.plugins.views.search.export.ExportMessagesCommand.DEFAULT_FIELDS;
-import static org.graylog.plugins.views.search.export.ExportMessagesCommand.DEFAULT_TIME_ZONE;
 import static org.graylog.plugins.views.search.export.LinkedHashSetUtil.linkedHashSetOf;
 
 @JsonAutoDetect
@@ -68,6 +67,12 @@ public abstract class ResultFormat {
         return ResultFormat.builder().build();
     }
 
+    public ResultFormat withTimeZone(DateTimeZone timeZone) {
+        return toBuilder().timeZone(timeZone).build();
+    }
+
+    abstract ResultFormat.Builder toBuilder();
+
     @AutoValue.Builder
     public abstract static class Builder {
         @JsonProperty(FIELD_FIELDS)
@@ -98,8 +103,7 @@ public abstract class ResultFormat {
         public static ResultFormat.Builder create() {
             return new AutoValue_ResultFormat.Builder()
                     .fieldsInOrder(DEFAULT_FIELDS)
-                    .executionState(ExecutionState.empty())
-                    .timeZone(DEFAULT_TIME_ZONE);
+                    .executionState(ExecutionState.empty());
         }
     }
 }

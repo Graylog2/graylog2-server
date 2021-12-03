@@ -25,11 +25,9 @@ import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersExc
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.joda.time.DateTimeZone;
 
-import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
 
@@ -41,7 +39,6 @@ public abstract class ExportMessagesCommand {
     public static final Set<String> DEFAULT_STREAMS = ImmutableSet.of();
     public static final LinkedHashSet<String> DEFAULT_FIELDS = linkedHashSetOf("timestamp", "source", "message");
     public static final int DEFAULT_CHUNK_SIZE = 1000;
-    public static final DateTimeZone DEFAULT_TIME_ZONE = DateTimeZone.UTC;
 
     public static AbsoluteRange defaultTimeRange() {
         try {
@@ -117,8 +114,7 @@ public abstract class ExportMessagesCommand {
                     .queryString(DEFAULT_QUERY)
                     .fieldsInOrder(DEFAULT_FIELDS)
                     .decorators(Collections.emptyList())
-                    .chunkSize(DEFAULT_CHUNK_SIZE)
-                    .timeZone(DEFAULT_TIME_ZONE);
+                    .chunkSize(DEFAULT_CHUNK_SIZE);
         }
     }
 }
