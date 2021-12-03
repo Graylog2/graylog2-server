@@ -46,6 +46,7 @@ import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.rest.MoreMediaTypes;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.joda.time.DateTimeZone;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -65,7 +66,7 @@ import java.util.function.Function;
 @Path("/views/search/messages")
 @RequiresAuthentication
 public class MessagesResource extends RestResource implements PluginRestResource {
-
+    private static final DateTimeZone FALLBACK_TIME_ZONE = DateTimeZone.UTC;
     private final CommandFactory commandFactory;
     private final SearchDomain searchDomain;
     private final SearchExecutionGuard executionGuard;
@@ -122,7 +123,7 @@ public class MessagesResource extends RestResource implements PluginRestResource
         }
 
         if (!request.timeZone().isPresent()) {
-            request = request.withTimeZone(searchUser.timeZone());
+            request = request.withTimeZone(searchUser.timeZone().orElse(FALLBACK_TIME_ZONE));
         }
 
         return request;
@@ -131,7 +132,7 @@ public class MessagesResource extends RestResource implements PluginRestResource
     private ResultFormat fillInIfNecessary(ResultFormat resultFormat, SearchUser searchUser) {
         return resultFormat.timeZone().isPresent()
                 ? resultFormat
-                : resultFormat.withTimeZone(searchUser.timeZone());
+                : resultFormat.withTimeZone(searchUser.timeZone().orElse(FALLBACK_TIME_ZONE));
     }
 
     @ApiOperation(value = "Export a search result as CSV")
