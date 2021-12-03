@@ -18,6 +18,7 @@ package org.graylog.plugins.pipelineprocessor.functions;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.graylog.plugins.pipelineprocessor.functions.json.JsonFlatten;
 import org.graylog.plugins.pipelineprocessor.functions.json.JsonUtils;
 import org.junit.Test;
 
@@ -34,17 +35,12 @@ public class JsonUtilsTest {
 
         // delete all top-level arrays
         String expected = "{\"k0\":\"v0\"}";
-        JsonNode result = JsonUtils.extractJson(jsonString, mapper, false, false, true);
+        JsonNode result = JsonUtils.extractJson(jsonString, mapper, JsonFlatten.FLAGS_IGNORE);
         assertThat(mapper.writeValueAsString(result)).isEqualTo(expected);
 
         // serialize arrays into valid JSON with escaping; retain empty arrays
         expected = "{\"k0\":\"v0\",\"arr1\":\"[\\\"a1\\\",[\\\"a21\\\",\\\"a22\\\"],[],\\\"a2\\\"]\"}";
-        result = JsonUtils.extractJson(jsonString, mapper, false, true, false);
-        assertThat(mapper.writeValueAsString(result)).isEqualTo(expected);
-
-        // flatten arrays using element index; ignore empty arrays
-        expected = "{\"k0\":\"v0\",\"arr1_0\":\"a1\",\"arr1_1_0\":\"a21\",\"arr1_1_1\":\"a22\",\"arr1_3\":\"a2\"}";
-        result = JsonUtils.extractJson(jsonString, mapper, false, false, false);
+        result = JsonUtils.extractJson(jsonString, mapper, JsonFlatten.FLAGS_JSON);
         assertThat(mapper.writeValueAsString(result)).isEqualTo(expected);
     }
 
@@ -54,27 +50,7 @@ public class JsonUtilsTest {
 
         // flatten objects by concatenating keys
         String expected = "{\"k0\":\"v0\",\"obj1_k1\":\"v1\",\"obj1_obj11_k11\":\"v11\",\"obj1_obj11_obj111_k111\":\"v111\"}";
-        JsonNode result = JsonUtils.extractJson(jsonString, mapper, true, false, true);
-        assertThat(mapper.writeValueAsString(result)).isEqualTo(expected);
-
-        // not flattened: collate content of each top level object into a big string
-        expected = "{\"k0\":\"v0\",\"obj1\":\"k1:v1,obj11:{k11=v11, obj111={k111=v111}}\"}";
-        result = JsonUtils.extractJson(jsonString, mapper, false, false, true);
-        assertThat(mapper.writeValueAsString(result)).isEqualTo(expected);
-    }
-
-    @Test
-    public void ignoreNullObjects() throws IOException {
-        String jsonString = "{\"k0\":\"v0\",\"obj1\":{\"obj11\":{}}}}";
-
-        // flatten objects, ignore null objects
-        String expected = "{\"k0\":\"v0\"}";
-        JsonNode result = JsonUtils.extractJson(jsonString, mapper, true, false, true);
-        assertThat(mapper.writeValueAsString(result)).isEqualTo(expected);
-
-        // not flattened, retain null objects
-        expected = "{\"k0\":\"v0\",\"obj1\":\"obj11:{}\"}";
-        result = JsonUtils.extractJson(jsonString, mapper, false, false, true);
+        JsonNode result = JsonUtils.extractJson(jsonString, mapper, JsonFlatten.FLAGS_IGNORE);
         assertThat(mapper.writeValueAsString(result)).isEqualTo(expected);
     }
 
@@ -84,12 +60,7 @@ public class JsonUtilsTest {
 
         // flatten objects by concatenating keys
         String expected = "{\"k0\":\"v0\",\"arr1_0_k11\":\"v11\",\"arr1_0_k12\":\"v12\",\"arr1_1_k21\":\"v21\"}";
-        JsonNode result = JsonUtils.extractJson(jsonString, mapper, true, false, false);
-        assertThat(mapper.writeValueAsString(result)).isEqualTo(expected);
-
-        // objects as collated strings
-        expected = "{\"k0\":\"v0\",\"arr1_0\":\"k11:v11,k12:v12\",\"arr1_1\":\"k21:v21\"}";
-        result = JsonUtils.extractJson(jsonString, mapper, false, false, false);
+        JsonNode result = JsonUtils.extractJson(jsonString, mapper, JsonFlatten.FLAGS_FLATTEN);
         assertThat(mapper.writeValueAsString(result)).isEqualTo(expected);
     }
 

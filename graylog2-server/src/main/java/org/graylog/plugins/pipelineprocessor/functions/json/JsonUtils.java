@@ -51,7 +51,7 @@ public class JsonUtils {
     }
 
     public static JsonNode extractJson(
-            String value, ObjectMapper mapper, boolean flattenObjects, boolean escapeArrays, boolean deleteArrays)
+            String value, ObjectMapper mapper, ExtractFlags extractFlags)
             throws IOException {
         if (isNullOrEmpty(value)) {
             throw new IOException("null result");
@@ -60,7 +60,7 @@ public class JsonUtils {
 
         ObjectNode resultRoot = mapper.createObjectNode();
         for (Map.Entry<String, Object> mapEntry : json.entrySet()) {
-            for (Entry entry : parseValue(mapEntry.getKey(), mapEntry.getValue(), mapper, flattenObjects, escapeArrays, deleteArrays)) {
+            for (Entry entry : parseValue(mapEntry.getKey(), mapEntry.getValue(), mapper, extractFlags)) {
                 resultRoot.put(entry.key(), entry.value().toString());
             }
         }
@@ -68,14 +68,14 @@ public class JsonUtils {
     }
 
     private static Collection<Entry> parseValue(
-            String key, Object value, ObjectMapper mapper, boolean flattenObjects, boolean escapeArrays, boolean deleteArrays)
+            String key, Object value, ObjectMapper mapper, ExtractFlags extractFlags)
             throws JsonProcessingException {
         if (value instanceof Boolean || value instanceof Number || value instanceof String) {
             return Collections.singleton(Entry.create(key, value));
         } else if (value instanceof Map) {
-            return parseObject(key, value, mapper, flattenObjects, escapeArrays, deleteArrays);
+            return parseObject(key, (Map<String, Object>) value, mapper, extractFlags);
         } else if (value instanceof List) {
-            return parseArray(key, value, mapper, flattenObjects, escapeArrays, deleteArrays);
+            return parseArray(key, (List<Object>) value, mapper, extractFlags);
         } else if (value == null) {
             // Ignore null values, so we don't try to create fields for that in the message.
             return Collections.emptySet();
@@ -86,15 +86,14 @@ public class JsonUtils {
     }
 
     private static Collection<Entry> parseObject(
-            String key, Object value, ObjectMapper mapper, boolean flattenObjects, boolean escapeArrays, boolean deleteArrays)
+            String key, Map<String, Object> value, ObjectMapper mapper, ExtractFlags extractFlags)
             throws JsonProcessingException {
-        @SuppressWarnings("unchecked")
-        final Map<String, Object> mapWithoutNull = Maps.filterEntries((Map<String, Object>) value, REMOVE_NULL_PREDICATE);
-        if (flattenObjects) {
+        final Map<String, Object> mapWithoutNull = Maps.filterEntries(value, REMOVE_NULL_PREDICATE);
+        if (extractFlags.flattenObjects()) {
             final List<Entry> result = new ArrayList<>(mapWithoutNull.size());
             for (Map.Entry<String, Object> entry : mapWithoutNull.entrySet()) {
                 result.addAll(parseValue(key + KEY_SEPARATOR + entry.getKey(), entry.getValue(),
-                        mapper, flattenObjects, escapeArrays, deleteArrays));
+                        mapper, extractFlags));
             }
             return result;
         } else {
@@ -104,23 +103,22 @@ public class JsonUtils {
     }
 
     private static Collection<Entry> parseArray(
-            String key, Object value, ObjectMapper mapper, boolean flattenObjects, boolean escapeArrays, boolean deleteArrays)
+            String key, List<Object> value, ObjectMapper mapper, ExtractFlags extractFlags)
             throws JsonProcessingException {
-        if (deleteArrays) {
+        if (extractFlags.deleteArrays()) {
             // ignore all arrays
             return Collections.emptySet();
-        } else if (escapeArrays) {
+        } else if (extractFlags.escapeArrays()) {
             // serialize, so it can be re-parsed as valid JSON
             return Collections.singleton(Entry.create(key, mapper.writeValueAsString(value)));
         } else {
             // flatten array using indices for unique keys
-            @SuppressWarnings("unchecked")
-            int listSize = ((List<Object>) value).size();
+            int listSize = value.size();
             final List<Entry> result = new ArrayList<>((listSize));
             int index = 0;
-            for (Object obj : (List<Object>) value) {
+            for (Object obj : value) {
                 result.addAll(parseValue(key + KEY_SEPARATOR + index, obj,
-                        mapper, flattenObjects, escapeArrays, deleteArrays));
+                        mapper, extractFlags));
                 index++;
             }
             return result;
@@ -165,6 +163,24 @@ public class JsonUtils {
         @Override
         public boolean apply(@Nullable Map.Entry input) {
             return input != null && input.getKey() != null && input.getValue() != null;
+        }
+    }
+
+    @AutoValue
+    protected abstract static class ExtractFlags {
+        public abstract boolean flattenObjects();
+        public abstract boolean escapeArrays();
+        public abstract boolean deleteArrays();
+        public static Builder builder() {
+            return new AutoValue_JsonUtils_ExtractFlags.Builder();
+        }
+
+        @AutoValue.Builder
+        public abstract static class Builder {
+            public abstract Builder flattenObjects(boolean flattenObjects);
+            public abstract Builder escapeArrays(boolean escapeArrays);
+            public abstract Builder deleteArrays(boolean deleteArrays);
+            public abstract JsonUtils.ExtractFlags build();
         }
     }
 }

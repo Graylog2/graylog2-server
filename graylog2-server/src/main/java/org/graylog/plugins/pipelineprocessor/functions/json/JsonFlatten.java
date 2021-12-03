@@ -38,6 +38,22 @@ public class JsonFlatten extends AbstractFunction<JsonNode> {
     private static final String OPTION_FLATTEN = "flatten";
     private static final String OPTION_IGNORE = "ignore";
 
+    public static final JsonUtils.ExtractFlags FLAGS_JSON = JsonUtils.ExtractFlags.builder()
+            .flattenObjects(true)
+            .escapeArrays(true)
+            .deleteArrays(false)
+            .build();
+    public static final JsonUtils.ExtractFlags FLAGS_FLATTEN = JsonUtils.ExtractFlags.builder()
+            .flattenObjects(true)
+            .escapeArrays(false)
+            .deleteArrays(false)
+            .build();
+    public static final JsonUtils.ExtractFlags FLAGS_IGNORE = JsonUtils.ExtractFlags.builder()
+            .flattenObjects(true)
+            .escapeArrays(false)
+            .deleteArrays(true)
+            .build();
+
     private final ObjectMapper objectMapper;
     private final ParameterDescriptor<String, String> valueParam;
     private final ParameterDescriptor<String, String> arrayHandlerParam;
@@ -58,13 +74,13 @@ public class JsonFlatten extends AbstractFunction<JsonNode> {
             switch (arrayHandler) {
                 case OPTION_IGNORE:
                     // ignore all top-level arrays
-                    return JsonUtils.extractJson(value, objectMapper, true, false, true);
+                    return JsonUtils.extractJson(value, objectMapper, FLAGS_IGNORE);
                 case OPTION_JSON:
                     // return top-level arrays as valid JSON strings
-                    return JsonUtils.extractJson(value, objectMapper, true, true, false);
+                    return JsonUtils.extractJson(value, objectMapper, FLAGS_JSON);
                 case OPTION_FLATTEN:
                     // explode all arrays and objects into top-level key/values
-                    return JsonUtils.extractJson(value, objectMapper, true, false, false);
+                    return JsonUtils.extractJson(value, objectMapper, FLAGS_FLATTEN);
                 default:
                     LOG.warn("Unknown parameter array_handler: {}", arrayHandler);
             }
