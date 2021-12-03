@@ -103,7 +103,7 @@ public class ElasticsearchBackendUsingCorrectIndicesTest {
                 indexLookup,
                 new QueryStringDecorators.Fake(),
                 (elasticsearchBackend, ssb, job, query, results) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, results, fieldTypesLookup),
-                false, Mockito.mock(MappedFieldTypesService.class), new LuceneQueryParser());
+                false);
     }
 
     @Before

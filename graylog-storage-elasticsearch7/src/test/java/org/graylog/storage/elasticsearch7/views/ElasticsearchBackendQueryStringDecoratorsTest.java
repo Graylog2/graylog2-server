@@ -64,8 +64,7 @@ class ElasticsearchBackendQueryStringDecoratorsTest {
                 mock(IndexLookup.class),
                 new QueryStringDecorators(decorators),
                 (elasticsearchBackend, ssb, job, query, results) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, results, fieldTypesLookup),
-                true,
-                Mockito.mock(MappedFieldTypesService.class), new LuceneQueryParser());
+                true);
     }
 
     @Test

@@ -98,7 +98,7 @@ public class ElasticsearchBackendGeneratedRequestTestBase {
                 indexLookup,
                 new QueryStringDecorators.Fake(),
                 (elasticsearchBackend, ssb, job, query, results) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, results, fieldTypesLookup),
-                false, Mockito.mock(MappedFieldTypesService.class), new LuceneQueryParser());
+                false);
     }
 
     SearchJob searchJobForQuery(Query query) {
