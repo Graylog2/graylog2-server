@@ -23,9 +23,7 @@ import { Decorator } from 'views/logic/widgets/MessagesWidgetConfig';
 import type { DecoratorType } from 'views/components/messagelist/decorators/Types';
 
 import InlineForm from './InlineForm';
-
-// eslint-disable-next-line import/no-webpack-loader-syntax
-import DecoratorStyles from '!style!css!./decoratorStyles.css';
+import DecoratorStyles from './decoratorStyles.css';
 
 type Props = {
   decorator: Decorator,

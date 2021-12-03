@@ -21,8 +21,7 @@ import styled from 'styled-components';
 import { Alert } from 'components/bootstrap';
 import { Icon, SortableList } from 'components/common';
 
-// eslint-disable-next-line import/no-webpack-loader-syntax
-import DecoratorStyles from '!style!css!./decoratorStyles.css';
+import DecoratorStyles from './decoratorStyles.css';
 
 const AlertContainer = styled.div`
   margin-bottom: 20px;
@@ -49,7 +48,8 @@ class DecoratorList extends React.Component<Props> {
 
   static defaultProps = {
     disableDragging: false,
-    onReorder: () => {},
+    onReorder: () => {
+    },
   };
 
   _onReorderWrapper = (orderedItems: ReorderedItems) => {
@@ -72,7 +72,10 @@ class DecoratorList extends React.Component<Props> {
     }
 
     return (
-      <SortableList items={decorators} onMoveItem={this._onReorderWrapper} disableDragging={disableDragging} displayOverlayInPortal />
+      <SortableList items={decorators}
+                    onMoveItem={this._onReorderWrapper}
+                    disableDragging={disableDragging}
+                    displayOverlayInPortal />
     );
   }
 }

@@ -25,12 +25,12 @@ import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class ContainerMatrixTestsDescriptor extends AbstractTestDescriptor {
     public static final String SEGMENT_TYPE = "matrix";
@@ -104,6 +104,6 @@ public class ContainerMatrixTestsDescriptor extends AbstractTestDescriptor {
     }
 
     public List<URL> getMongoDBFixtures() {
-        return mongoDBFixtures.stream().collect(Collectors.toList());
+        return new ArrayList<>(mongoDBFixtures);
     }
 }

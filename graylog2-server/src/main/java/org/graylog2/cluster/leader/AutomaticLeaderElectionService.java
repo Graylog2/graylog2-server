@@ -43,7 +43,6 @@ public class AutomaticLeaderElectionService extends AbstractExecutionThreadServi
 
     private volatile boolean isLeader = false;
     private Thread executionThread;
-    private long lastSuccess = 0;
 
     @Inject
     public AutomaticLeaderElectionService(Configuration configuration,
@@ -51,7 +50,7 @@ public class AutomaticLeaderElectionService extends AbstractExecutionThreadServi
                                           EventBus eventBus,
                                           NodePingThread nodePingThread) {
         this.pollingInterval = configuration.getLeaderElectionLockPollingInterval();
-        this.lockTTL = configuration.getLeaderElectionLockTTL();
+        this.lockTTL = configuration.getLockServiceLockTTL();
         this.lockService = lockService;
         this.eventBus = eventBus;
         this.nodePingThread = nodePingThread;
@@ -66,6 +65,12 @@ public class AutomaticLeaderElectionService extends AbstractExecutionThreadServi
     @Override
     protected void triggerShutdown() {
         executionThread.interrupt();
+    }
+
+    @Override
+    protected void shutDown() {
+        isLeader = false;
+        lockService.unlock(RESOURCE_NAME).ifPresent(l -> log.info("Gave up leader lock on shutdown"));
     }
 
     @Override
@@ -89,14 +94,11 @@ public class AutomaticLeaderElectionService extends AbstractExecutionThreadServi
 
         try {
             isLeader = lockService.lock(RESOURCE_NAME).isPresent();
-            lastSuccess = System.nanoTime();
         } catch (Exception e) {
             log.error("Unable to acquire/renew leader lock.", e);
 
-            final Duration timeSinceLastSuccess = Duration.ofNanos(System.nanoTime() - lastSuccess);
-            if (wasLeader && timeSinceLastSuccess.compareTo(lockTTL) >= 0) {
-                log.error("Failed for {} to renew leader lock. Forcing fallback to follower role.",
-                        timeSinceLastSuccess);
+            if (wasLeader) {
+                log.error("Failed to renew leader lock. Forcing fallback to follower role.");
                 isLeader = false;
             }
         }
@@ -118,8 +120,7 @@ public class AutomaticLeaderElectionService extends AbstractExecutionThreadServi
                 Thread.sleep(pollingInterval.toMillis());
             }
         } catch (InterruptedException e) {
-            // OK, we are shutting down.
-            Thread.currentThread().interrupt();
+            // OK, we are shutting down. Don't' restore interrupted flag, so we can release the lock in shutdown()
         }
     }
 
@@ -138,11 +139,5 @@ public class AutomaticLeaderElectionService extends AbstractExecutionThreadServi
             log.error("Unable to trigger update of nodes collection.");
         }
         eventBus.post(new LeaderChangedEvent());
-    }
-
-    @Override
-    public void giveUpLeader() {
-        isLeader = false;
-        lockService.unlock(RESOURCE_NAME).ifPresent(l -> log.info("Gave up leader lock on shutdown"));
     }
 }

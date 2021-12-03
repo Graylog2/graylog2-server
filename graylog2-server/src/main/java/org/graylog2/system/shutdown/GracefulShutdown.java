@@ -20,7 +20,6 @@ import com.google.common.util.concurrent.Uninterruptibles;
 import org.graylog2.Configuration;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
-import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.initializers.BufferSynchronizerService;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.shared.initializers.InputSetupService;
@@ -51,7 +50,6 @@ public class GracefulShutdown implements Runnable {
     private final JerseyService jerseyService;
     private final GracefulShutdownService gracefulShutdownService;
     private final AuditEventSender auditEventSender;
-    private final LeaderElectionService leaderElectionService;
 
     @Inject
     public GracefulShutdown(ServerStatus serverStatus,
@@ -62,8 +60,7 @@ public class GracefulShutdown implements Runnable {
                             InputSetupService inputSetupService,
                             JerseyService jerseyService,
                             GracefulShutdownService gracefulShutdownService,
-                            AuditEventSender auditEventSender,
-                            LeaderElectionService leaderElectionService) {
+                            AuditEventSender auditEventSender) {
         this.serverStatus = serverStatus;
         this.activityWriter = activityWriter;
         this.configuration = configuration;
@@ -73,7 +70,6 @@ public class GracefulShutdown implements Runnable {
         this.jerseyService = jerseyService;
         this.gracefulShutdownService = gracefulShutdownService;
         this.auditEventSender = auditEventSender;
-        this.leaderElectionService = leaderElectionService;
     }
 
     @Override
@@ -126,8 +122,6 @@ public class GracefulShutdown implements Runnable {
 
         // Wait until the shutdown service is done
         gracefulShutdownService.awaitTerminated();
-
-        leaderElectionService.giveUpLeader();
 
         auditEventSender.success(AuditActor.system(serverStatus.getNodeId()), NODE_SHUTDOWN_COMPLETE);
 

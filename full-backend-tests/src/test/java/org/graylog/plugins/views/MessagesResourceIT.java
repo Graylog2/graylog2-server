@@ -28,9 +28,8 @@ import java.util.Arrays;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.graylog.testing.completebackend.Lifecycle.CLASS;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = CLASS, searchVersions = {SearchServer.OS1, SearchServer.ES6, SearchServer.ES7}, mongoVersions = {MongodbServer.MONGO3, MongodbServer.MONGO4})
+@ContainerMatrixTestsConfiguration
 public class MessagesResourceIT {
     private final GraylogBackend sut;
     private final RequestSpecification requestSpec;

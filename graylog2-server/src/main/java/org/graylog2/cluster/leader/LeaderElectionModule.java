@@ -16,7 +16,9 @@
  */
 package org.graylog2.cluster.leader;
 
+import com.google.common.util.concurrent.Service;
 import com.google.inject.Scopes;
+import com.google.inject.name.Names;
 import org.graylog2.Configuration;
 import org.graylog2.cluster.lock.LockService;
 import org.graylog2.cluster.lock.MongoLockService;
@@ -36,10 +38,11 @@ public class LeaderElectionModule extends PluginModule {
         switch (mode) {
             case STATIC:
                 bind(LeaderElectionService.class).to(StaticLeaderElectionService.class).in(Scopes.SINGLETON);
+                bind(Service.class).annotatedWith(Names.named("LeaderElectionService")).to(StaticLeaderElectionService.class);
                 break;
             case AUTOMATIC:
                 bind(LeaderElectionService.class).to(AutomaticLeaderElectionService.class).in(Scopes.SINGLETON);
-                serviceBinder().addBinding().to(AutomaticLeaderElectionService.class).in(Scopes.SINGLETON);
+                bind(Service.class).annotatedWith(Names.named("LeaderElectionService")).to(AutomaticLeaderElectionService.class);
                 bind(LockService.class).to(MongoLockService.class).in(Scopes.SINGLETON);
                 break;
             default:
