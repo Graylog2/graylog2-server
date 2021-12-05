@@ -63,6 +63,7 @@ import BarVisualizationConfig from 'views/logic/aggregationbuilder/visualization
 import ShowDocumentsHandler from 'views/logic/valueactions/ShowDocumentsHandler';
 import HighlightValueHandler from 'views/logic/valueactions/HighlightValueHandler';
 import FieldNameCompletion from 'views/components/searchbar/completions/FieldNameCompletion';
+import FieldValueCompletion from 'views/components/searchbar/completions/FieldValueCompletion';
 import OperatorCompletion from 'views/components/searchbar/completions/OperatorCompletion';
 import requirementsProvided from 'views/hooks/RequirementsProvided';
 import bindSearchParamsFromQuery from 'views/hooks/BindSearchParamsFromQuery';
@@ -340,6 +341,7 @@ const exports: PluginExports = {
   ],
   'views.completers': [
     new FieldNameCompletion(),
+    new FieldValueCompletion(),
     new OperatorCompletion(),
   ],
   'views.hooks.loadingView': [
