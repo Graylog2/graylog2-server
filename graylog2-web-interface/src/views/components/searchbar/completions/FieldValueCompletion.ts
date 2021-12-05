@@ -15,13 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { isEmpty } from 'lodash';
+import * as Immutable from 'immutable';
 
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
+import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
+import { FieldTypesStore, FieldTypesStoreState, FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 
-import type { Token } from '../ace-types';
 import type { Completer } from '../SearchBarAutocompletions';
+import type { Token } from '../ace-types';
 
 const suggestionsUrl = qualifyUrl('/search/suggest');
 
@@ -34,6 +37,20 @@ const formatValue = (value: string, type: string) => {
 };
 
 class FieldValueCompletion implements Completer {
+  activeQuery: string;
+
+  fields: FieldTypesStoreState;
+
+  currentQueryFields: FieldTypeMappingsList;
+
+  constructor() {
+    this.onViewMetadataStoreUpdate(ViewMetadataStore.getInitialState());
+    ViewMetadataStore.listen(this.onViewMetadataStoreUpdate);
+
+    this._newFields(FieldTypesStore.getInitialState());
+    FieldTypesStore.listen((newState) => this._newFields(newState));
+  }
+
   getCompletions = (
     currentToken: Token | undefined | null,
     lastToken: Token | undefined | null,
@@ -43,18 +60,50 @@ class FieldValueCompletion implements Completer {
     timeRange?: TimeRange | NoTimeRangeOverride,
     streams?: Array<string>,
   ) => {
-    if (lastToken?.type === 'keyword' && (currentToken?.type === 'term' || currentToken?.type === 'constant.numeric')) {
-      return fetch('POST', suggestionsUrl, {
-        field: lastToken.value.slice(0, -1),
-        input: formatValue(currentToken.value, currentToken.type),
-        timerange: !isEmpty(timeRange) ? timeRange : undefined,
-        streams,
-      }).then(({ suggestions }) => {
-        return suggestions.map(({ value, occurrence }) => ({ name: value, value, score: occurrence }));
-      });
+    if (lastToken?.type !== 'keyword') {
+      return [];
     }
 
-    return Promise.resolve([]);
+    if (currentToken?.type !== 'term') {
+      return [];
+    }
+
+    const field = lastToken.value.slice(0, -1);
+    const fieldType = this.currentQueryFields.find(({ name }) => name === field);
+    const isEnumerable = fieldType.type.properties.find((property) => property === 'enumerable');
+
+    if (!isEnumerable || fieldType.type.value.get('type') === 'numeric') {
+      return [];
+    }
+
+    return fetch('POST', suggestionsUrl, {
+      field,
+      input: formatValue(currentToken.value, currentToken.type),
+      timerange: !isEmpty(timeRange) ? timeRange : undefined,
+      streams,
+    }).then(({ suggestions }) => {
+      return suggestions.map(({ value, occurrence }) => ({ name: value, value, score: occurrence }));
+    });
+  };
+
+  _newFields = (fields: FieldTypesStoreState) => {
+    this.fields = fields;
+    const { queryFields } = this.fields;
+
+    if (this.activeQuery) {
+      // const currentQueryFields: FieldTypeMappingsList = ;
+      this.currentQueryFields = queryFields.get(this.activeQuery, Immutable.List());
+    }
+  };
+
+  onViewMetadataStoreUpdate = (newState: { activeQuery: string }) => {
+    const { activeQuery } = newState;
+
+    this.activeQuery = activeQuery;
+
+    if (this.fields) {
+      this._newFields(this.fields);
+    }
   };
 }
 
