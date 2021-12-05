@@ -23,6 +23,7 @@ import PropTypes from 'prop-types';
 import { themePropTypes } from 'theme';
 import withPluginEntities from 'views/logic/withPluginEntities';
 import UserPreferencesContext from 'contexts/UserPreferencesContext';
+import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import QueryValidationActions from 'views/actions/QueryValidationActions';
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 
@@ -33,7 +34,11 @@ import type { Completer } from './SearchBarAutocompletions';
 
 type Props = {
   className?: string
-  completerFactory: (completers: Array<Completer>) => AutoCompleter,
+  completerFactory: (
+    completers: Array<Completer>,
+    timeRange: TimeRange | NoTimeRangeOverride | undefined,
+    streams: Array<string>,
+    ) => AutoCompleter,
   completers: Array<Completer>,
   disabled?: boolean,
   error?: QueryValidationState,
@@ -42,12 +47,14 @@ type Props = {
   onChange: (query: string) => Promise<string>,
   onExecute: (query: string) => void,
   placeholder?: string,
+  streams?: Array<string>,
+  timeRange?: TimeRange | NoTimeRangeOverride,
   theme: DefaultTheme,
   value: string,
   warning?: QueryValidationState,
 };
 
-const defaultCompleterFactory = (completers) => new SearchBarAutoCompletions(completers);
+const defaultCompleterFactory = (completers, timeRange, streams) => new SearchBarAutoCompletions(completers, timeRange, streams);
 
 const handleExecution = (editor, onExecute, value, error) => {
   if (editor.completer && editor.completer.popup) {
@@ -116,11 +123,13 @@ const QueryInput = ({
   onChange,
   onExecute,
   placeholder,
+  streams,
+  timeRange,
   theme,
   value,
   warning,
 }: Props) => {
-  const completer = useMemo(() => completerFactory(completers), [completerFactory, completers]);
+  const completer = useMemo(() => completerFactory(completers, timeRange, streams), [completerFactory, completers, timeRange, streams]);
   const _onExecute = useCallback((editor: Editor) => handleExecution(editor, onExecute, value, error), [onExecute, value, error]);
   const configureEditor = useCallback((node) => _configureEditor(node, completer, _onExecute), [completer, _onExecute]);
   const markers = useMemo(() => getMarkers(error, warning), [error, warning]);
@@ -170,7 +179,9 @@ QueryInput.propTypes = {
   onChange: PropTypes.func.isRequired,
   onExecute: PropTypes.func.isRequired,
   placeholder: PropTypes.string,
+  streams: PropTypes.array,
   theme: themePropTypes.isRequired,
+  timeRange: PropTypes.object,
   value: PropTypes.string,
   warning: PropTypes.object,
 };
@@ -184,6 +195,8 @@ QueryInput.defaultProps = {
   height: undefined,
   onBlur: () => {},
   placeholder: '',
+  streams: undefined,
+  timeRange: undefined,
   value: '',
   warning: undefined,
 };
