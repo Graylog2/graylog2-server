@@ -219,14 +219,14 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
         importFixture("messages.json");
 
         ExportMessagesCommand command = commandBuilderWithAllStreams()
-                .timeZone(DateTimeZone.forID("Europe/Vienna"))
+                .timeZone(DateTimeZone.forID("Australia/Adelaide")) // UTC+9:30
                 .build();
 
         runWithExpectedResult(command, "timestamp,source,message",
-                "graylog_0, 2015-01-01T02:00:00.000+01:00, source-1, Ha",
-                "graylog_1, 2015-01-01T02:59:59.999+01:00, source-2, He",
-                "graylog_0, 2015-01-01T04:00:00.000+01:00, source-1, Hi",
-                "graylog_0, 2015-01-01T05:00:00.000+01:00, source-2, Ho");
+                "graylog_0, 2015-01-01T11:30:00.000+10:30, source-1, Ha",
+                "graylog_1, 2015-01-01T12:29:59.999+10:30, source-2, He",
+                "graylog_0, 2015-01-01T13:30:00.000+10:30, source-1, Hi",
+                "graylog_0, 2015-01-01T14:30:00.000+10:30, source-2, Ho");
     }
 
     private Set<String> actualFieldNamesFrom(SimpleMessageChunk chunk) {
