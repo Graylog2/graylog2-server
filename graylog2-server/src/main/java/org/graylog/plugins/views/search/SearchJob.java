@@ -27,13 +27,14 @@ import one.util.streamex.EntryStream;
 import org.graylog.plugins.views.search.errors.SearchError;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 @JsonAutoDetect
 // execution must come before results, as it signals the overall "done" state
 @JsonPropertyOrder({"execution", "results"})
-public class SearchJob {
+public class SearchJob implements ParameterProvider {
     @JsonProperty
     private final String id;
 
@@ -113,6 +114,11 @@ public class SearchJob {
 
     public void addError(SearchError t) {
         errors.add(t);
+    }
+
+    @Override
+    public Optional<Parameter> getParameter(String name) {
+        return getSearch().getParameter(name);
     }
 
     public static class ExecutionInfo {

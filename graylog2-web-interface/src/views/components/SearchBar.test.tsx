@@ -30,6 +30,16 @@ import SearchBar from './SearchBar';
 
 const mockCurrentUser = { currentUser: { fullname: 'Ada Lovelace', username: 'ada' } };
 
+jest.mock('views/stores/SearchStore', () => ({
+  SearchStore: MockStore(
+    'listen',
+    ['getInitialState', () => ({ search: { parameters: [] } })],
+  ),
+  SearchActions: {
+    refresh: jest.fn(),
+  },
+}));
+
 jest.mock('stores/users/CurrentUserStore', () => ({
   CurrentUserStore: MockStore(
     ['get', () => mockCurrentUser],
@@ -108,10 +118,8 @@ describe('SearchBar', () => {
     const timeRangeButton = screen.getByLabelText('Open Time Range Selector');
     const searchButton = screen.getByTitle('Perform search');
 
-    await waitFor(() => {
-      expect(searchButton).toHaveAttribute('disabled');
-      expect(timeRangeButton.firstChild).toHaveClass('fa-exclamation-triangle');
-    });
+    await waitFor(() => expect(searchButton).toHaveClass('disabled'));
+    await waitFor(() => expect(timeRangeButton.firstChild).toHaveClass('fa-exclamation-triangle'));
   });
 
   it('should hide the save load controls if editing the widget', async () => {

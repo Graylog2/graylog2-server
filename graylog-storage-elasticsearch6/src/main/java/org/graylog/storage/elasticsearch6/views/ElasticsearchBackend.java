@@ -16,6 +16,7 @@
  */
 package org.graylog.storage.elasticsearch6.views;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import com.google.inject.name.Named;
 import io.searchbox.client.JestClient;
@@ -30,6 +31,7 @@ import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
+import org.graylog.plugins.views.search.validation.LuceneQueryParser;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.engine.QueryBackend;
 import org.graylog.plugins.views.search.engine.SearchConfig;
@@ -83,7 +85,8 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                                 IndexLookup indexLookup,
                                 QueryStringDecorators queryStringDecorators,
                                 ESGeneratedQueryContext.Factory queryContextFactory,
-                                @Named("allow_leading_wildcard_searches") boolean allowLeadingWildcard) {
+                                @Named("allow_leading_wildcard_searches") boolean allowLeadingWildcard,
+                                ObjectMapper objectMapper) {
         this.elasticsearchSearchTypeHandlers = elasticsearchSearchTypeHandlers;
         this.jestClient = jestClient;
         this.indexLookup = indexLookup;
@@ -290,4 +293,6 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                 .errors(new HashSet<>(queryContext.errors()))
                 .build();
     }
+
+
 }

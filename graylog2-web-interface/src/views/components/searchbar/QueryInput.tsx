@@ -22,6 +22,8 @@ import PropTypes from 'prop-types';
 import { themePropTypes } from 'theme';
 import withPluginEntities from 'views/logic/withPluginEntities';
 import UserPreferencesContext from 'contexts/UserPreferencesContext';
+import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/QueryValidation';
+import QueryValidationActions from 'views/actions/QueryValidationActions';
 
 import type { AutoCompleter, Editor } from './ace-types';
 import StyledAceEditor from './queryinput/StyledAceEditor';
@@ -33,6 +35,7 @@ type Props = {
   completerFactory: (completers: Array<Completer>) => AutoCompleter,
   completers: Array<Completer>,
   disabled?: boolean,
+  error?: QueryValidationState,
   height?: number,
   onBlur?: (query: string) => void,
   onChange: (query: string) => Promise<string>,
@@ -40,15 +43,73 @@ type Props = {
   placeholder?: string,
   theme: DefaultTheme,
   value: string,
+  warning?: QueryValidationState,
 };
 
 const defaultCompleterFactory = (completers) => new SearchBarAutoCompletions(completers);
+
+const handleExecution = (editor, onExecute, value, error) => {
+  if (editor.completer && editor.completer.popup) {
+    editor.completer.popup.hide();
+  }
+
+  if (error) {
+    QueryValidationActions.displayValidationErrors();
+
+    return;
+  }
+
+  onExecute(value);
+};
+
+const _configureEditor = (node, completer, onExecute) => {
+  const editor = node && node.editor;
+
+  if (editor) {
+    editor.commands.addCommands([{
+      name: 'Execute',
+      bindKey: 'Enter',
+      exec: onExecute,
+    },
+    {
+      name: 'SuppressShiftEnter',
+      bindKey: 'Shift-Enter',
+      exec: () => {},
+    }]);
+
+    editor.commands.removeCommands(['find', 'indent', 'outdent']);
+    editor.completers = [completer];
+  }
+};
+
+const getMarkers = (errors: QueryValidationState | undefined, warnings: QueryValidationState | undefined) => {
+  const markerClassName = 'ace_marker';
+  const createMarkers = (explanations = [], className) => explanations.map(({
+    beginLine,
+    beginColumn,
+    endLine,
+    endColumn,
+  }) => ({
+    startRow: beginLine,
+    startCol: beginColumn,
+    endRow: endLine,
+    endCol: endColumn,
+    type: 'background',
+    className,
+  }));
+
+  return [
+    ...createMarkers(errors?.explanations, `${markerClassName} ace_validation_error`),
+    ...createMarkers(warnings?.explanations, `${markerClassName} ace_validation_warning`),
+  ];
+};
 
 const QueryInput = ({
   className,
   completerFactory = defaultCompleterFactory,
   completers,
   disabled,
+  error,
   height,
   onBlur,
   onChange,
@@ -56,35 +117,12 @@ const QueryInput = ({
   placeholder,
   theme,
   value,
+  warning,
 }: Props) => {
   const completer = useMemo(() => completerFactory(completers), [completerFactory, completers]);
-  const _onExecute = useCallback((editor: Editor) => {
-    if (editor.completer && editor.completer.popup) {
-      editor.completer.popup.hide();
-    }
-
-    onExecute(value);
-  }, [onExecute, value]);
-
-  const editorRef = useCallback((node) => {
-    const editor = node && node.editor;
-
-    if (editor) {
-      editor.commands.addCommands([{
-        name: 'Execute',
-        bindKey: 'Enter',
-        exec: _onExecute,
-      },
-      {
-        name: 'SuppressShiftEnter',
-        bindKey: 'Shift-Enter',
-        exec: () => {},
-      }]);
-
-      editor.commands.removeCommands(['find', 'indent', 'outdent']);
-      editor.completers = [completer];
-    }
-  }, [completer, _onExecute]);
+  const _onExecute = useCallback((editor: Editor) => handleExecution(editor, onExecute, value, error), [onExecute, value, error]);
+  const configureEditor = useCallback((node) => _configureEditor(node, completer, _onExecute), [completer, _onExecute]);
+  const markers = useMemo(() => getMarkers(error, warning), [error, warning]);
 
   return (
     <div className={`query ${className}`} style={{ display: 'flex' }} data-testid="query-input">
@@ -93,7 +131,7 @@ const QueryInput = ({
           <StyledAceEditor mode="lucene"
                            disabled={disabled}
                            aceTheme="ace-queryinput" // NOTE: is usually just `theme` but we need that prop for styled-components
-                           ref={editorRef}
+                           ref={configureEditor}
                            readOnly={disabled}
                            onBlur={onBlur}
                            onChange={onChange}
@@ -112,7 +150,8 @@ const QueryInput = ({
                            }}
                            fontSize={theme.fonts.size.large}
                            placeholder={placeholder}
-                           $height={height} />
+                           $height={height}
+                           markers={markers} />
         )}
       </UserPreferencesContext.Consumer>
     </div>
@@ -124,6 +163,7 @@ QueryInput.propTypes = {
   completerFactory: PropTypes.func,
   completers: PropTypes.array,
   disabled: PropTypes.bool,
+  error: PropTypes.object,
   height: PropTypes.number,
   onBlur: PropTypes.func,
   onChange: PropTypes.func.isRequired,
@@ -131,6 +171,7 @@ QueryInput.propTypes = {
   placeholder: PropTypes.string,
   theme: themePropTypes.isRequired,
   value: PropTypes.string,
+  warning: PropTypes.object,
 };
 
 QueryInput.defaultProps = {
@@ -138,10 +179,12 @@ QueryInput.defaultProps = {
   completerFactory: defaultCompleterFactory,
   completers: [],
   disabled: false,
+  error: undefined,
   height: undefined,
   onBlur: () => {},
   placeholder: '',
   value: '',
+  warning: undefined,
 };
 
 export default withPluginEntities(withTheme(QueryInput), { completers: 'views.completers' });

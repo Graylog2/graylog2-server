@@ -35,6 +35,7 @@ jest.mock('views/stores/WidgetStore', () => ({
 }));
 
 jest.mock('views/stores/SearchStore', () => ({
+  SearchStore: MockStore(['getInitialState', () => ({ search: { parameters: [] } })]),
   SearchActions: {
     refresh: jest.fn(),
   },
