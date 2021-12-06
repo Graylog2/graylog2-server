@@ -21,6 +21,7 @@ import styled, { css } from 'styled-components';
 import { Button } from 'components/bootstrap';
 import { Icon } from 'components/common';
 import { SearchActions } from 'views/stores/SearchStore';
+import { QueryValidationActions } from 'views/stores/QueryValidationStore';
 
 const StyledButton = styled(Button)`
   margin-right: 7px;
@@ -50,7 +51,7 @@ type Props = {
 const onButtonClick = (e: MouseEvent, disabled: Boolean, onClick?: () => void) => {
   if (disabled) {
     e.preventDefault();
-    SearchActions.triggerExecutionAttempt();
+    QueryValidationActions.displayValidationErrors();
 
     return;
   }

@@ -37,9 +37,6 @@ jest.mock('views/stores/SearchStore', () => ({
     listen: jest.fn(),
     getInitialState: jest.fn(() => ({ search: { parameters: [] } })),
   },
-  SearchActions: {
-    triggerExecutionAttempt: { completed: { listen: () => () => {} } },
-  },
 }));
 
 const MockSearchExecutionState = new SearchExecutionState();

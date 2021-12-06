@@ -87,7 +87,6 @@ jest.mock('views/stores/SearchStore', () => ({
       listen: jest.fn(),
       completed: { listen: jest.fn() },
     },
-    triggerExecutionAttempt: { completed: { listen: () => () => {} } },
   },
 }));
 

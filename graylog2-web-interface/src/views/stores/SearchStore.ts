@@ -208,14 +208,6 @@ export const SearchStore: Store<SearchStoreState> = singletonStore(
       return promise;
     },
 
-    // Will be called when the user tries to execute a search, although the execution is disabled
-    triggerExecutionAttempt() {
-      const promise = Promise.resolve();
-      SearchActions.triggerExecutionAttempt.promise(promise);
-
-      return promise;
-    },
-
     _executePromise(executionStateParam: SearchExecutionState,
       startActionPromise: (promise: Promise<SearchResult>) => void,
       handleSearchResult: (result: SearchResult) => SearchResult): Promise<SearchExecutionResult> {
