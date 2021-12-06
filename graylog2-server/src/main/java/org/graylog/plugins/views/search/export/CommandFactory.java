@@ -106,13 +106,8 @@ public class CommandFactory {
         ExportMessagesCommand.Builder requestBuilder = ExportMessagesCommand.builder()
                 .fieldsInOrder(resultFormat.fieldsInOrder());
 
-        if (resultFormat.limit().isPresent()) {
-            requestBuilder = requestBuilder.limit(resultFormat.limit().orElseThrow(() -> new IllegalStateException("No value present!")));
-        }
-
-        if (resultFormat.timeZone().isPresent()) {
-            requestBuilder = requestBuilder.timeZone(resultFormat.timeZone().orElseThrow(() -> new IllegalStateException("No time zone present!")));
-        }
+        resultFormat.limit().ifPresent(requestBuilder::limit);
+        resultFormat.timeZone().ifPresent(requestBuilder::timeZone);
 
         return requestBuilder;
     }
