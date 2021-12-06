@@ -21,7 +21,7 @@ import styled, { css } from 'styled-components';
 import { Button } from 'components/bootstrap';
 import { Icon } from 'components/common';
 import { SearchActions } from 'views/stores/SearchStore';
-import { QueryValidationActions } from 'views/stores/QueryValidationStore';
+import QueryValidationActions from 'views/actions/QueryValidationActions';
 
 const StyledButton = styled(Button)`
   margin-right: 7px;

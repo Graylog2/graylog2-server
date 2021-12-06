@@ -17,7 +17,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { delay } from 'lodash';
 
-import { QueryValidationActions } from 'views/stores/QueryValidationStore';
+import QueryValidationActions from 'views/actions/QueryValidationActions';
 
 const useToggleOnSearchExecutionAttempt = (showExplanation, setShowExplanation) => {
   const [shakingPopover, setShakingPopover] = useState(false);
@@ -30,7 +30,7 @@ const useToggleOnSearchExecutionAttempt = (showExplanation, setShowExplanation) 
   }, [shakingPopover]);
 
   useEffect(() => {
-    const unsubscribe = QueryValidationActions.displayValidationErrors.completed.listen(() => {
+    const unsubscribe = QueryValidationActions.displayValidationErrors.listen(() => {
       if (!showExplanation) {
         setShowExplanation(true);
       }

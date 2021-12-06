@@ -16,9 +16,8 @@
  */
 import Reflux from 'reflux';
 
-import { Store } from 'stores/StoreTypes';
-import { singletonStore, singletonActions } from 'logic/singleton';
-import type { RefluxActions } from 'stores/StoreTypes';
+import { RefluxActions } from 'stores/StoreTypes';
+import { singletonActions } from 'logic/singleton';
 
 type QueryValidationActionsType = RefluxActions<{
   displayValidationErrors: () => Promise<void>,
@@ -28,26 +27,9 @@ const QueryValidationActions: QueryValidationActionsType = singletonActions(
   'views.QueryValidation',
   () => Reflux.createActions({
     displayValidationErrors: {
-      asyncResult: true,
+      asyncResult: false,
     },
   }),
 );
 
-const QueryValidationStore: Store<{}> = singletonStore(
-  'views.QueryValidation',
-  () => Reflux.createStore({
-    listenables: [QueryValidationActions],
-
-    displayValidationErrors() {
-      const promise = Promise.resolve();
-      QueryValidationActions.displayValidationErrors.promise(promise);
-
-      return promise;
-    },
-  }),
-);
-
-export {
-  QueryValidationActions,
-  QueryValidationStore,
-};
+export default QueryValidationActions;
