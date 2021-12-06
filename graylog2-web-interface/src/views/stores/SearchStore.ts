@@ -38,6 +38,7 @@ import type { WidgetMapping } from 'views/logic/views/types';
 import type { TimeRange } from 'views/logic/queries/Query';
 import { singletonStore } from 'logic/singleton';
 import { SearchErrorResponse } from 'views/logic/SearchError';
+import type CancellablePromise from 'logic/rest/CancellablePromise';
 
 const createSearchUrl = qualifyUrl('/views/search');
 
@@ -161,7 +162,7 @@ export const SearchStore: Store<SearchStoreState> = singletonStore(
       return this._executePromise(executionState, startActionPromise, handleSearchResult);
     },
 
-    reexecuteSearchTypes(searchTypes: SearchTypeOptions, effectiveTimerange?: TimeRange): Promise<SearchExecutionResult> {
+    reexecuteSearchTypes(searchTypes: SearchTypeOptions, effectiveTimerange?: TimeRange): CancellablePromise<SearchExecutionResult> {
       const { parameterBindings, globalOverride } = this.executionState;
       const searchTypeIds = Object.keys(searchTypes);
       const globalQuery = globalOverride && globalOverride.query ? globalOverride.query : undefined;
