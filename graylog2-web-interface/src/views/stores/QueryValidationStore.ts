@@ -18,7 +18,6 @@ import Reflux from 'reflux';
 
 import { Store } from 'stores/StoreTypes';
 import { singletonStore, singletonActions } from 'logic/singleton';
-import { SearchStoreState } from 'views/stores/SearchStore';
 import type { RefluxActions } from 'stores/StoreTypes';
 
 type QueryValidationActionsType = RefluxActions<{
@@ -34,7 +33,7 @@ const QueryValidationActions: QueryValidationActionsType = singletonActions(
   }),
 );
 
-const QueryValidationStore: Store<SearchStoreState> = singletonStore(
+const QueryValidationStore: Store<{}> = singletonStore(
   'views.QueryValidation',
   () => Reflux.createStore({
     listenables: [QueryValidationActions],

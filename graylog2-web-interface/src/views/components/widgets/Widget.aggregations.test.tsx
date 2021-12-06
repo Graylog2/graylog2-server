@@ -83,10 +83,7 @@ jest.mock('views/stores/StreamsStore', () => ({
 jest.mock('views/stores/SearchStore', () => ({
   SearchStore: MockStore(['getInitialState', () => ({ search: { parameters: [] } })]),
   SearchActions: {
-    execute: {
-      listen: jest.fn(),
-      completed: { listen: jest.fn() },
-    },
+    execute: mockAction(),
   },
 }));
 
