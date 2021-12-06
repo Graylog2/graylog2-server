@@ -28,6 +28,7 @@ import type { RefluxActions } from 'stores/StoreTypes';
 import type { TimeRange } from 'views/logic/queries/Query';
 import type { WidgetMapping } from 'views/logic/views/types';
 import type { SearchTypeOptions } from 'views/logic/search/GlobalOverride';
+import type CancellablePromise from 'logic/rest/CancellablePromise';
 
 export type CreateSearchResponse = {
   search: Search,
@@ -48,7 +49,7 @@ type SearchActionsType = RefluxActions<{
   reexecuteSearchTypes: (
     searchTypes: SearchTypeOptions,
     effectiveTimeRange?: TimeRange,
-  ) => Promise<SearchExecutionResult>,
+  ) => CancellablePromise<SearchExecutionResult>,
   executeWithCurrentState: () => Promise<SearchExecutionResult>,
   refresh: () => Promise<void>,
   get: (searchId: SearchId) => Promise<SearchJson>,

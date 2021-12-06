@@ -19,6 +19,7 @@ package org.graylog2.periodical;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodeService;
+import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationImpl;
@@ -32,7 +33,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
+@Singleton
 public class NodePingThread extends Periodical {
 
     private static final Logger LOG = LoggerFactory.getLogger(NodePingThread.class);
@@ -41,23 +44,26 @@ public class NodePingThread extends Periodical {
     private final ActivityWriter activityWriter;
     private final HttpConfiguration httpConfiguration;
     private final ServerStatus serverStatus;
+    private final LeaderElectionService leaderElectionService;
 
     @Inject
     public NodePingThread(NodeService nodeService,
                           NotificationService notificationService,
                           ActivityWriter activityWriter,
                           HttpConfiguration httpConfiguration,
-                          ServerStatus serverStatus) {
+                          ServerStatus serverStatus, LeaderElectionService leaderElectionService) {
         this.nodeService = nodeService;
         this.notificationService = notificationService;
         this.activityWriter = activityWriter;
         this.httpConfiguration = httpConfiguration;
         this.serverStatus = serverStatus;
+        this.leaderElectionService = leaderElectionService;
     }
 
     @Override
-    public void doRun() {
-        final boolean isMaster = serverStatus.hasCapability(ServerStatus.Capability.MASTER);
+    // This method is "synchronized" because we are also calling it directly in AutomaticLeaderElectionService
+    public synchronized void doRun() {
+        final boolean isMaster = leaderElectionService.isLeader();
         try {
             Node node = nodeService.byNodeId(serverStatus.getNodeId());
             nodeService.markAsAlive(node, isMaster, httpConfiguration.getHttpPublishUri().resolve(HttpConfiguration.PATH_API));
@@ -79,8 +85,8 @@ public class NodePingThread extends Periodical {
                 boolean removedNotification = notificationService.fixed(notification);
                 if (removedNotification) {
                     activityWriter.write(
-                        new Activity("Notification condition [" + NotificationImpl.Type.NO_MASTER + "] " +
-                                             "has been fixed.", NodePingThread.class));
+                            new Activity("Notification condition [" + NotificationImpl.Type.NO_MASTER + "] " +
+                                    "has been fixed.", NodePingThread.class));
                 }
             } else {
                 Notification notification = notificationService.buildNow()
