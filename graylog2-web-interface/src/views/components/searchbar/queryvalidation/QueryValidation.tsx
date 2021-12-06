@@ -16,8 +16,9 @@
  */
 import * as React from 'react';
 import styled, { DefaultTheme, css, keyframes } from 'styled-components';
-import { useState, useRef } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { Overlay, Transition } from 'react-overlays';
+import { delay } from 'lodash';
 
 import { Popover } from 'components/bootstrap';
 import Icon from 'components/common/Icon';
@@ -25,8 +26,8 @@ import StringUtils from 'util/StringUtils';
 import { TimeRange, NoTimeRangeOverride, ElasticsearchQueryString } from 'views/logic/queries/Query';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
+import QueryValidationActions from 'views/actions/QueryValidationActions';
 
-import useToggleOnSearchExecutionAttempt from './hooks/useToggleOnSearchExecutionAttempt';
 import { useSyncFormErrors, useSyncFormWarnings } from './hooks/useSyncFormValidationState';
 import useValidateQuery from './hooks/useValidateQuery';
 
@@ -114,6 +115,45 @@ const ExplanationTitle = ({ title }: { title: string }) => (
   </Title>
 );
 
+const useShakeIfAlreadyOpen = (showExplanation) => {
+  const [shakingPopover, setShakingPopover] = useState(false);
+
+  const shakePopover = useCallback(() => {
+    if (!shakingPopover) {
+      setShakingPopover(true);
+      delay(() => setShakingPopover(false), 820);
+    }
+  }, [shakingPopover]);
+
+  useEffect(() => {
+    const unsubscribe = QueryValidationActions.displayValidationErrors.listen(() => {
+      if (showExplanation) {
+        shakePopover();
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [showExplanation, shakingPopover, shakePopover]);
+
+  return shakingPopover;
+};
+
+const useListenToDisplayErrorsAction = (showExplanation, setShowExplanation) => {
+  useEffect(() => {
+    const unsubscribe = QueryValidationActions.displayValidationErrors.listen(() => {
+      if (!showExplanation) {
+        setShowExplanation(true);
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [showExplanation, setShowExplanation]);
+};
+
 type Props = {
   filter?: ElasticsearchQueryString | string,
   queryString: ElasticsearchQueryString | string | undefined,
@@ -127,10 +167,11 @@ const QueryValidation = ({ queryString, timeRange, streams, filter }: Props) => 
   const containerRef = useRef(undefined);
   const explanationTriggerRef = useRef(undefined);
   const validationState = useValidateQuery({ queryString, timeRange, streams, filter });
-  const shakingPopover = useToggleOnSearchExecutionAttempt(showExplanation, setShowExplanation);
+  const shakingPopover = useShakeIfAlreadyOpen(showExplanation);
 
   useSyncFormErrors(validationState);
   useSyncFormWarnings(validationState);
+  useListenToDisplayErrorsAction(showExplanation, setShowExplanation);
 
   // We need to always display the container to avoid query inout resizing problems
   if (!validationState || validationState.status === 'OK') {
