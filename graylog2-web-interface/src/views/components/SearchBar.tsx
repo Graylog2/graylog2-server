@@ -133,48 +133,48 @@ const SearchBar = ({
                            limitDuration={limitDuration}
                            onSubmit={_onSubmit}>
               {({ dirty, errors, isSubmitting, isValid, handleSubmit, values, setFieldValue }) => (
-                <FormWarningsContext.Consumer>
-                  {({ warnings }) => (
-                    <>
-                      <TopRow>
-                        <Col md={5}>
-                          <TimeRangeInput disabled={disableSearch}
-                                          onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
-                                          value={values?.timerange}
-                                          hasErrorOnMount={!!errors.timerange} />
-                        </Col>
+                <>
+                  <TopRow>
+                    <Col md={5}>
+                      <TimeRangeInput disabled={disableSearch}
+                                      onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
+                                      value={values?.timerange}
+                                      hasErrorOnMount={!!errors.timerange} />
+                    </Col>
 
-                        <Col mdHidden lgHidden>
-                          <HorizontalSpacer />
-                        </Col>
+                    <Col mdHidden lgHidden>
+                      <HorizontalSpacer />
+                    </Col>
 
-                        <FlexCol md={7}>
-                          <StreamWrap>
-                            <Field name="streams">
-                              {({ field: { name, value, onChange } }) => (
-                                <StreamsFilter value={value}
-                                               streams={availableStreams}
-                                               onChange={(newStreams) => onChange({
-                                                 target: {
-                                                   value: newStreams,
-                                                   name,
-                                                 },
-                                               })} />
-                              )}
-                            </Field>
-                          </StreamWrap>
+                    <FlexCol md={7}>
+                      <StreamWrap>
+                        <Field name="streams">
+                          {({ field: { name, value, onChange } }) => (
+                            <StreamsFilter value={value}
+                                           streams={availableStreams}
+                                           onChange={(newStreams) => onChange({
+                                             target: {
+                                               value: newStreams,
+                                               name,
+                                             },
+                                           })} />
+                          )}
+                        </Field>
+                      </StreamWrap>
 
-                          <RefreshControls />
-                        </FlexCol>
-                      </TopRow>
+                      <RefreshControls />
+                    </FlexCol>
+                  </TopRow>
 
-                      <BottomRow>
-                        <SearchButtonAndQuery>
-                          <SearchButton disabled={disableSearch || isSubmitting || isValidatingQuery || !isValid}
-                                        dirty={dirty} />
+                  <BottomRow>
+                    <SearchButtonAndQuery>
+                      <SearchButton disabled={disableSearch || isSubmitting || isValidatingQuery || !isValid}
+                                    dirty={dirty} />
 
-                          <Field name="queryString">
-                            {({ field: { name, value, onChange }, meta: { error } }) => (
+                      <Field name="queryString">
+                        {({ field: { name, value, onChange }, meta: { error } }) => (
+                          <FormWarningsContext.Consumer>
+                            {({ warnings }) => (
                               <StyledQueryInput value={value}
                                                 placeholder='Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'
                                                 error={error}
@@ -186,28 +186,28 @@ const SearchBar = ({
                                                 }}
                                                 onExecute={handleSubmit as () => void} />
                             )}
-                          </Field>
-
-                          <QueryValidation queryString={values?.queryString}
-                                           timeRange={values?.timerange}
-                                           streams={values?.streams} />
-
-                          <div className="search-help">
-                            <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
-                                               title="Search query syntax documentation"
-                                               text={<Icon name="lightbulb" />} />
-                          </div>
-                        </SearchButtonAndQuery>
-
-                        {!editing && (
-                          <ViewActionsWrapper>
-                            <SavedSearchControls />
-                          </ViewActionsWrapper>
+                          </FormWarningsContext.Consumer>
                         )}
-                      </BottomRow>
-                    </>
-                  )}
-                </FormWarningsContext.Consumer>
+                      </Field>
+
+                      <QueryValidation queryString={values?.queryString}
+                                       timeRange={values?.timerange}
+                                       streams={values?.streams} />
+
+                      <div className="search-help">
+                        <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
+                                           title="Search query syntax documentation"
+                                           text={<Icon name="lightbulb" />} />
+                      </div>
+                    </SearchButtonAndQuery>
+
+                    {!editing && (
+                      <ViewActionsWrapper>
+                        <SavedSearchControls />
+                      </ViewActionsWrapper>
+                    )}
+                  </BottomRow>
+                </>
               )}
             </SearchBarForm>
           </FlatContentRow>
