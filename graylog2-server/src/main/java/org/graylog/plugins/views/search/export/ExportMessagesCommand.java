@@ -39,6 +39,7 @@ public abstract class ExportMessagesCommand {
     public static final Set<String> DEFAULT_STREAMS = ImmutableSet.of();
     public static final LinkedHashSet<String> DEFAULT_FIELDS = linkedHashSetOf("timestamp", "source", "message");
     public static final int DEFAULT_CHUNK_SIZE = 1000;
+    public static final DateTimeZone DEFAULT_TIME_ZONE = DateTimeZone.UTC;
 
     public static AbsoluteRange defaultTimeRange() {
         try {
@@ -114,7 +115,8 @@ public abstract class ExportMessagesCommand {
                     .queryString(DEFAULT_QUERY)
                     .fieldsInOrder(DEFAULT_FIELDS)
                     .decorators(Collections.emptyList())
-                    .chunkSize(DEFAULT_CHUNK_SIZE);
+                    .chunkSize(DEFAULT_CHUNK_SIZE)
+                    .timeZone(DEFAULT_TIME_ZONE);
         }
     }
 }
