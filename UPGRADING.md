@@ -25,7 +25,8 @@ The following API endpoints have been removed in 4.3.
 
 ## Removed Migrations
 
-Removed a migration that was recalculating the index ranges of the default stream's index set for
+- Removed two migrations that convert pre-1.2 user permissions and index ranges to newer formats.
+- Removed a migration that was recalculating the index ranges of the default stream's index set for
 pre 2.2 Graylog installations.
 
 ## Configuration File Changes

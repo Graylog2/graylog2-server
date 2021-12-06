@@ -38,6 +38,7 @@ import java.util.Map;
 import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
 import static java.nio.file.StandardOpenOption.WRITE;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class ConfigurationTest {
     @Rule
@@ -153,9 +154,41 @@ public class ConfigurationTest {
         assertThat(validateWithPermissions(nonEmptyNodeIdFile, "-w-------")).isFalse();
     }
 
+    @Test
+    public void leaderElectionTTLTimeoutTooShort() {
+        validProperties.put("leader_election_mode", "automatic");
+        validProperties.put("lock_service_lock_ttl", "3s");
+
+        assertThatThrownBy(() -> {
+            new JadConfig(new InMemoryRepository(validProperties), new Configuration()).process();
+        }).isInstanceOf(ValidationException.class).hasMessageStartingWith("The minimum valid \"lock_service_lock_ttl\" is");
+    }
+
+    @Test
+    public void leaderElectionMinimumPollingInterval() {
+        validProperties.put("leader_election_mode", "automatic");
+        validProperties.put("leader_election_lock_polling_interval", "100ms");
+
+        assertThatThrownBy(() -> {
+            new JadConfig(new InMemoryRepository(validProperties), new Configuration()).process();
+        }).isInstanceOf(ValidationException.class).hasMessageStartingWith("The minimum valid \"leader_election_lock_polling_interval\" is");
+    }
+
+    @Test
+    public void leaderElectionTimeoutDiscrepancy() {
+        validProperties.put("leader_election_mode", "automatic");
+        validProperties.put("leader_election_lock_polling_interval", "2m");
+        validProperties.put("lock_service_lock_ttl", "1m");
+
+        assertThatThrownBy(() -> {
+            new JadConfig(new InMemoryRepository(validProperties), new Configuration()).process();
+        }).isInstanceOf(ValidationException.class).hasMessageContaining("needs to be greater than");
+    }
+
     /**
      * Run the NodeIDFileValidator on a file with the given permissions.
-     * @param nodeIdFile the path to the node id file, can be missing
+     *
+     * @param nodeIdFile  the path to the node id file, can be missing
      * @param permissions the posix permission to set the file to, if it exists, before running the validator
      * @return true if the validation was successful, false otherwise
      * @throws IOException if any file related problem occurred

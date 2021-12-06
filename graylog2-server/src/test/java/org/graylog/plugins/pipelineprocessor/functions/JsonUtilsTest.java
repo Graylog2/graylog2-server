@@ -18,6 +18,7 @@ package org.graylog.plugins.pipelineprocessor.functions;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.graylog.plugins.pipelineprocessor.functions.json.JsonFlatten;
 import org.graylog.plugins.pipelineprocessor.functions.json.JsonUtils;
 import org.junit.Test;
 
@@ -26,6 +27,43 @@ import java.io.IOException;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 public class JsonUtilsTest {
+    private ObjectMapper mapper = new ObjectMapper();
+
+    @Test
+    public void extractArrays() throws IOException {
+        String jsonString = "{\"k0\":\"v0\",\"arr1\":[\"a1\",[\"a21\",\"a22\"],[],\"a2\"]}";
+
+        // delete all top-level arrays
+        String expected = "{\"k0\":\"v0\"}";
+        JsonNode result = JsonUtils.extractJson(jsonString, mapper, JsonFlatten.FLAGS_IGNORE);
+        assertThat(mapper.writeValueAsString(result)).isEqualTo(expected);
+
+        // serialize arrays into valid JSON with escaping; retain empty arrays
+        expected = "{\"k0\":\"v0\",\"arr1\":\"[\\\"a1\\\",[\\\"a21\\\",\\\"a22\\\"],[],\\\"a2\\\"]\"}";
+        result = JsonUtils.extractJson(jsonString, mapper, JsonFlatten.FLAGS_JSON);
+        assertThat(mapper.writeValueAsString(result)).isEqualTo(expected);
+    }
+
+    @Test
+    public void extractObjects() throws IOException {
+        String jsonString = "{\"k0\":\"v0\",\"obj1\":{\"k1\":\"v1\",\"obj11\":{\"k11\":\"v11\",\"obj111\":{\"k111\":\"v111\"}}}}";
+
+        // flatten objects by concatenating keys
+        String expected = "{\"k0\":\"v0\",\"obj1_k1\":\"v1\",\"obj1_obj11_k11\":\"v11\",\"obj1_obj11_obj111_k111\":\"v111\"}";
+        JsonNode result = JsonUtils.extractJson(jsonString, mapper, JsonFlatten.FLAGS_IGNORE);
+        assertThat(mapper.writeValueAsString(result)).isEqualTo(expected);
+    }
+
+    @Test
+    public void extractArrayOfObjects() throws IOException {
+        String jsonString = "{\"k0\":\"v0\",\"arr1\":[{\"k11\":\"v11\",\"k12\":\"v12\"},{\"k21\":\"v21\"}]}";
+
+        // flatten objects by concatenating keys
+        String expected = "{\"k0\":\"v0\",\"arr1_0_k11\":\"v11\",\"arr1_0_k12\":\"v12\",\"arr1_1_k21\":\"v21\"}";
+        JsonNode result = JsonUtils.extractJson(jsonString, mapper, JsonFlatten.FLAGS_FLATTEN);
+        assertThat(mapper.writeValueAsString(result)).isEqualTo(expected);
+    }
+
     @Test
     public void deleteLevel1Object() throws IOException {
         String jsonString = "{\"k0\":\"v0\",\"obj1\":{\"k1\":\"v1\"}}";
