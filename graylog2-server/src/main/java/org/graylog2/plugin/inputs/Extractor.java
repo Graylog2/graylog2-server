@@ -27,6 +27,7 @@ import org.graylog2.inputs.extractors.ExtractorException;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.database.EmbeddedPersistable;
 import org.graylog2.shared.utilities.ExceptionUtils;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -265,6 +266,15 @@ public abstract class Extractor implements EmbeddedPersistable {
                 }
 
                 runConverters(msg);
+
+                // The extractor / converter might have failed to build a valid timestamp.
+                // In this case we run msg#addField() to log this error and fallback to a current date.
+                if (targetField.equals(FIELD_TIMESTAMP)) {
+                    final Object timestampValue = msg.getField(FIELD_TIMESTAMP);
+                    if (!(timestampValue instanceof DateTime)) {
+                        msg.addField(FIELD_TIMESTAMP, timestampValue);
+                    }
+                }
             }
         }
     }
