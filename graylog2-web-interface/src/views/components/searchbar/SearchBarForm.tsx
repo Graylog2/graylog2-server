@@ -18,9 +18,9 @@ import * as React from 'react';
 import { useCallback } from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
+import type { FormikProps } from 'formik';
 import { Form, Formik } from 'formik';
 import { isFunction, isEmpty } from 'lodash';
-import type { FormikProps } from 'formik';
 
 import FormWarningsProvider from 'contexts/FormWarningsProvider';
 import { onInitializingTimerange, onSubmittingTimerange } from 'views/components/TimerangeForForm';
@@ -33,7 +33,7 @@ type Props = {
   children: ((props: FormikProps<SearchBarFormValues>) => React.ReactNode) | React.ReactNode,
   initialValues: SearchBarFormValues,
   limitDuration: number,
-  onSubmit: (Values) => void | Promise<any>,
+  onSubmit: (values: SearchBarFormValues) => void | Promise<any>,
   validateOnMount?: boolean,
   formRef?: React.Ref<FormikProps<SearchBarFormValues>>,
 }
@@ -67,7 +67,7 @@ const validate = (nextTimeRange, limitDuration) => {
 };
 
 const SearchBarForm = ({ initialValues, limitDuration, onSubmit, children, validateOnMount, formRef }: Props) => {
-  const _onSubmit = useCallback(({ timerange, streams, queryString }) => {
+  const _onSubmit = useCallback(({ timerange, streams, queryString }: SearchBarFormValues) => {
     return onSubmit(normalizeSearchBarFormValues({ timerange, streams, queryString }));
   }, [onSubmit]);
   const { timerange, streams, queryString } = initialValues;
@@ -79,12 +79,12 @@ const SearchBarForm = ({ initialValues, limitDuration, onSubmit, children, valid
   };
 
   return (
-    <Formik initialValues={_initialValues}
-            enableReinitialize
-            onSubmit={_onSubmit}
-            innerRef={formRef}
-            validate={({ timerange: nextTimeRange }) => validate(nextTimeRange, limitDuration)}
-            validateOnMount={validateOnMount}>
+    <Formik<SearchBarFormValues> initialValues={_initialValues}
+                                 enableReinitialize
+                                 onSubmit={_onSubmit}
+                                 innerRef={formRef}
+                                 validate={({ timerange: nextTimeRange }) => validate(nextTimeRange, limitDuration)}
+                                 validateOnMount={validateOnMount}>
       {(...args) => (
         <FormWarningsProvider>
           <DateTimeProvider limitDuration={limitDuration}>

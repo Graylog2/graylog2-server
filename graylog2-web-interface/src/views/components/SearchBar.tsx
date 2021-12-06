@@ -38,12 +38,12 @@ import RefreshControls from 'views/components/searchbar/RefreshControls';
 import ScrollToHint from 'views/components/common/ScrollToHint';
 import HorizontalSpacer from 'views/components/horizontalspacer/HorizontalSpacer';
 import { QueriesActions } from 'views/stores/QueriesStore';
-import QueryValidation, { QueryValidationState } from 'views/components/searchbar/queryvalidation/QueryValidation';
 import { CurrentQueryStore } from 'views/stores/CurrentQueryStore';
 import { StreamsStore } from 'views/stores/StreamsStore';
 import { QueryFiltersStore } from 'views/stores/QueryFiltersStore';
-import Query, { createElasticsearchQueryString, filtersForQuery, filtersToStreamSet } from 'views/logic/queries/Query';
+import QueryValidation, { QueryValidationState } from 'views/components/searchbar/queryvalidation/QueryValidation';
 import type { FilterType, QueryId } from 'views/logic/queries/Query';
+import Query, { createElasticsearchQueryString, filtersForQuery, filtersToStreamSet } from 'views/logic/queries/Query';
 import type { SearchesConfig } from 'components/search/SearchConfig';
 import type { SearchBarFormValues } from 'views/Constants';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
@@ -122,7 +122,7 @@ const SearchBar = ({
   const streams = filtersToStreamSet(queryFilters.get(id, Immutable.Map())).toJS();
   const limitDuration = moment.duration(config.query_time_range_limit).asSeconds() ?? 0;
 
-  const _onSubmit = (values) => onSubmit(values, currentQuery);
+  const _onSubmit = (values: SearchBarFormValues) => onSubmit(values, currentQuery);
 
   return (
     <WidgetFocusContext.Consumer>
@@ -154,7 +154,12 @@ const SearchBar = ({
                               {({ field: { name, value, onChange } }) => (
                                 <StreamsFilter value={value}
                                                streams={availableStreams}
-                                               onChange={(newStreams) => onChange({ target: { value: newStreams, name } })} />
+                                               onChange={(newStreams) => onChange({
+                                                 target: {
+                                                   value: newStreams,
+                                                   name,
+                                                 },
+                                               })} />
                               )}
                             </Field>
                           </StreamWrap>
