@@ -42,6 +42,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static com.codahale.metrics.MetricRegistry.name;
+import static org.graylog2.plugin.Message.FIELD_TIMESTAMP;
 
 public abstract class Extractor implements EmbeddedPersistable {
     private static final Logger LOG = LoggerFactory.getLogger(Extractor.class);
@@ -235,10 +236,10 @@ public abstract class Extractor implements EmbeddedPersistable {
                     return;
                 } else if (results.length == 1 && results[0].target == null) {
                     // results[0].target is null if this extractor cannot produce multiple fields use targetField in that case
-                    msg.addField(targetField, results[0].getValue());
+                    addField(msg, targetField, results[0].getValue());
                 } else {
                     for (final Result result : results) {
-                        msg.addField(result.getTarget(), result.getValue());
+                        addField(msg, result.getTarget(), result.getValue());
                     }
                 }
 
@@ -265,6 +266,15 @@ public abstract class Extractor implements EmbeddedPersistable {
 
                 runConverters(msg);
             }
+        }
+    }
+
+    // Special treatment of TIMESTAMP required due to #11495
+    private void addField(Message msg, final String key, final Object value) {
+        if (targetField.trim().equals(FIELD_TIMESTAMP) && value instanceof String) {
+            msg.setTimeFieldAsString((String) value);
+        } else {
+            msg.addField(targetField, value);
         }
     }
 
