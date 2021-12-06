@@ -271,10 +271,10 @@ public abstract class Extractor implements EmbeddedPersistable {
 
     // Special treatment of TIMESTAMP required due to #11495
     private void addField(Message msg, final String key, final Object value) {
-        if (targetField.trim().equals(FIELD_TIMESTAMP) && value instanceof String) {
+        if (key.trim().equals(FIELD_TIMESTAMP) && value instanceof String) {
             msg.setTimeFieldAsString((String) value);
         } else {
-            msg.addField(targetField, value);
+            msg.addField(key, value);
         }
     }
 

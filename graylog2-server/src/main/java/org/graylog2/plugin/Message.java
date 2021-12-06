@@ -536,7 +536,7 @@ public class Message implements Messages, Indexable {
     // Band-aid fix for #11495 - we should redesign the way extractors are executed, so they don't use
     // the generic addField; because it leads to bugs when we make seemingly harmless changes to addField.
     public void setTimeFieldAsString (final String value) {
-        final String str = ((String) value).trim();
+        final String str = value.trim();
         if (!str.isEmpty()) {
             final Object previousValue = fields.put(FIELD_TIMESTAMP, str);
             updateSize(FIELD_TIMESTAMP, str, previousValue);
