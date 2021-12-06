@@ -14,25 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.scheduler;
+package org.graylog2.cluster.leader;
 
-/**
- * Used by the scheduler to configure itself.
- */
-public interface JobSchedulerConfig {
-
-    /**
-     * Determines if the scheduler can execute the next loop iteration.
-     * This method will be called at the beginning of each scheduler loop iteration so it should be fast!
-     *
-     * @return true if scheduler can execute next loop iteration
-     */
-    boolean canExecute();
-
-    /**
-     * The number of worker threads to start.
-     *
-     * @return number of worker threads
-     */
-    int numberOfWorkerThreads();
-}
+public class LeaderChangedEvent {}

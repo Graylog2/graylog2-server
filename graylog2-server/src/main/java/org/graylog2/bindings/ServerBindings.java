@@ -30,11 +30,10 @@ import org.graylog2.alerts.FormattedEmailAlertSender;
 import org.graylog2.bindings.providers.ClusterEventBusProvider;
 import org.graylog2.bindings.providers.DefaultSecurityManagerProvider;
 import org.graylog2.bindings.providers.DefaultStreamProvider;
-import org.graylog2.bindings.providers.MongoConnectionProvider;
 import org.graylog2.bindings.providers.SystemJobFactoryProvider;
 import org.graylog2.bindings.providers.SystemJobManagerProvider;
 import org.graylog2.cluster.ClusterConfigServiceImpl;
-import org.graylog2.database.MongoConnection;
+import org.graylog2.cluster.leader.LeaderElectionModule;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.grok.GrokModule;
 import org.graylog2.grok.GrokPatternRegistry;
@@ -126,6 +125,7 @@ public class ServerBindings extends Graylog2Module {
         install(new GrokModule());
         install(new LookupModule(configuration));
         install(new FieldTypesModule());
+        install(new LeaderElectionModule(configuration));
 
         // Just to create the binders so they are present in the injector. Prevents a server startup error when no
         // outputs are bound that implement MessageOutput.Factory2.
@@ -157,7 +157,6 @@ public class ServerBindings extends Graylog2Module {
     }
 
     private void bindSingletons() {
-        bind(MongoConnection.class).toProvider(MongoConnectionProvider.class);
         bind(SystemJobManager.class).toProvider(SystemJobManagerProvider.class);
         bind(DefaultSecurityManager.class).toProvider(DefaultSecurityManagerProvider.class).asEagerSingleton();
         bind(SystemJobFactory.class).toProvider(SystemJobFactoryProvider.class);

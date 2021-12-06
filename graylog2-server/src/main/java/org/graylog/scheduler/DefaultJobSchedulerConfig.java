@@ -16,42 +16,26 @@
  */
 package org.graylog.scheduler;
 
-import org.graylog2.cluster.NodeNotFoundException;
-import org.graylog2.cluster.NodeService;
-import org.graylog2.plugin.system.NodeId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.graylog2.cluster.leader.LeaderElectionService;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 /**
  * This is the default {@link JobSchedulerConfig}.
  */
+@Singleton
 public class DefaultJobSchedulerConfig implements JobSchedulerConfig {
-    private static final Logger LOG = LoggerFactory.getLogger(DefaultJobSchedulerConfig.class);
-
-    private final NodeService nodeService;
-    private final NodeId nodeId;
+    private final LeaderElectionService leaderElectionService;
 
     @Inject
-    public DefaultJobSchedulerConfig(NodeService nodeService, NodeId nodeId) {
-        this.nodeService = nodeService;
-        this.nodeId = nodeId;
-    }
-
-    @Override
-    public boolean canStart() {
-        try {
-            return nodeService.byNodeId(nodeId).isMaster();
-        } catch (NodeNotFoundException e) {
-            LOG.error("Couldn't find current node <{}> in the database", nodeId.toString(), e);
-            return false;
-        }
+    public DefaultJobSchedulerConfig(LeaderElectionService leaderElectionService) {
+        this.leaderElectionService = leaderElectionService;
     }
 
     @Override
     public boolean canExecute() {
-        return true;
+        return leaderElectionService.isLeader();
     }
 
     @Override

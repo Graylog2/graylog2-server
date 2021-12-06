@@ -16,23 +16,36 @@
  */
 package org.graylog2.shared.security;
 
+import org.graylog2.cluster.leader.LeaderElectionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Priority;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import java.io.IOException;
 
+@Singleton
 @Priority(Priorities.AUTHORIZATION)
 public class RestrictToMasterFilter implements ContainerRequestFilter {
     private static final Logger LOG = LoggerFactory.getLogger(RestrictToMasterFilter.class);
 
+    private final LeaderElectionService leaderElectionService;
+
+    @Inject
+    public RestrictToMasterFilter(LeaderElectionService leaderElectionService) {
+        this.leaderElectionService = leaderElectionService;
+    }
+
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
-        LOG.warn("Rejected request to <{}> which is only allowed against master nodes.", requestContext.getUriInfo().getPath());
-        throw new ForbiddenException("Request is only allowed against master nodes.");
+        if (!leaderElectionService.isLeader()) {
+            LOG.warn("Rejected request to <{}> which is only allowed against master nodes.", requestContext.getUriInfo().getPath());
+            throw new ForbiddenException("Request is only allowed against master nodes.");
+        }
     }
 }
