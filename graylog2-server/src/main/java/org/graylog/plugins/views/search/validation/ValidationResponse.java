@@ -19,27 +19,39 @@ package org.graylog.plugins.views.search.validation;
 import com.google.auto.value.AutoValue;
 
 import javax.validation.constraints.NotNull;
-import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 @AutoValue
 public abstract class ValidationResponse {
 
     @NotNull
     public abstract ValidationStatus status();
+
     public abstract List<ValidationMessage> explanations();
 
-    public static ValidationResponse.Builder builder(ValidationStatus status) {
+    static ValidationResponse.Builder builder(ValidationStatus status) {
         return new AutoValue_ValidationResponse.Builder()
                 .status(status);
     }
 
-    @AutoValue.Builder
-    public abstract static class Builder {
-        public abstract Builder status(ValidationStatus status);
-        public abstract Builder explanations(List<ValidationMessage> explanations);
-        public abstract ValidationResponse build();
+    public static ValidationResponse ok() {
+        return builder(ValidationStatus.OK).build();
+    }
 
+    public static ValidationResponse error(List<ValidationMessage> explanations) {
+        return ValidationResponse.builder(ValidationStatus.ERROR).explanations(explanations).build();
+    }
+
+    public static ValidationResponse warning(List<ValidationMessage> explanations) {
+        return ValidationResponse.builder(ValidationStatus.WARNING).explanations(explanations).build();
+    }
+
+    @AutoValue.Builder
+    abstract static class Builder {
+        abstract Builder status(ValidationStatus status);
+
+        abstract Builder explanations(List<ValidationMessage> explanations);
+
+        abstract ValidationResponse build();
     }
 }
