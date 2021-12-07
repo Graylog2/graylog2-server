@@ -46,6 +46,7 @@ import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.rest.MoreMediaTypes;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.joda.time.DateTimeZone;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -65,7 +66,7 @@ import java.util.function.Function;
 @Path("/views/search/messages")
 @RequiresAuthentication
 public class MessagesResource extends RestResource implements PluginRestResource {
-
+    private static final DateTimeZone FALLBACK_TIME_ZONE = DateTimeZone.UTC;
     private final CommandFactory commandFactory;
     private final SearchDomain searchDomain;
     private final SearchExecutionGuard executionGuard;
@@ -118,9 +119,20 @@ public class MessagesResource extends RestResource implements PluginRestResource
         MessagesRequest request = requestFromClient != null ? requestFromClient : MessagesRequest.withDefaults();
 
         if (request.streams().isEmpty()) {
-            request = request.toBuilder().streams(loadAllAllowedStreamsForUser(searchUser)).build();
+            request = request.withStreams(loadAllAllowedStreamsForUser(searchUser));
         }
+
+        if (!request.timeZone().isPresent()) {
+            request = request.withTimeZone(searchUser.timeZone().orElse(FALLBACK_TIME_ZONE));
+        }
+
         return request;
+    }
+
+    private ResultFormat fillInIfNecessary(ResultFormat resultFormat, SearchUser searchUser) {
+        return resultFormat.timeZone().isPresent()
+                ? resultFormat
+                : resultFormat.withTimeZone(searchUser.timeZone().orElse(FALLBACK_TIME_ZONE));
     }
 
     @ApiOperation(value = "Export a search result as CSV")
@@ -132,7 +144,7 @@ public class MessagesResource extends RestResource implements PluginRestResource
             @ApiParam(value = "ID of an existing Search", name = "searchId") @PathParam("searchId") String searchId,
             @ApiParam(value = "Optional overrides") @Valid ResultFormat formatFromClient,
             @Context SearchUser searchUser) {
-        ResultFormat format = emptyIfNull(formatFromClient);
+        ResultFormat format = fillInIfNecessary(emptyIfNull(formatFromClient), searchUser);
 
         Search search = loadSearch(searchId, format.executionState(), searchUser);
 
@@ -150,7 +162,7 @@ public class MessagesResource extends RestResource implements PluginRestResource
             @ApiParam(value = "ID of a Message Table contained in the Search", name = "searchTypeId") @PathParam("searchTypeId") String searchTypeId,
             @ApiParam(value = "Optional overrides") @Valid ResultFormat formatFromClient,
             @Context SearchUser searchUser) {
-        ResultFormat format = emptyIfNull(formatFromClient);
+        ResultFormat format = fillInIfNecessary(emptyIfNull(formatFromClient), searchUser);
 
         Search search = loadSearch(searchId, format.executionState(), searchUser);
 
@@ -183,7 +195,7 @@ public class MessagesResource extends RestResource implements PluginRestResource
         }
 
         if (exportJob instanceof SearchTypeExportJob) {
-            final SearchTypeExportJob searchTypeExportJob = (SearchTypeExportJob)exportJob;
+            final SearchTypeExportJob searchTypeExportJob = (SearchTypeExportJob) exportJob;
             return this.retrieveForSearchType(searchTypeExportJob.searchId(), searchTypeExportJob.searchTypeId(), searchTypeExportJob.resultFormat(), searchUser);
         }
 
