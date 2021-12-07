@@ -65,7 +65,7 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
 
     public static final String NAME = "csvfile";
     public static final String PATH_FIELD = "path";
-    public static final String PATH_OVERRIDE_FIELD = "override_path";
+    public static final String OVERRIDE_PATH_FIELD = "override_path";
 
     /**
      * If the AllowedAuxiliaryPathChecker is enabled (one or more paths provided to the allowed_auxiliary_paths server
@@ -319,7 +319,7 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
         public abstract String path();
 
         // user-provided override to Illuminate CSVFileDataAdapters
-        @JsonProperty(PATH_OVERRIDE_FIELD)
+        @JsonProperty(OVERRIDE_PATH_FIELD)
         @Nullable
         public abstract String overridePath();
 
@@ -391,13 +391,13 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
             if (canBeOverridden()) {
                 final Path overridePath = Paths.get(Objects.requireNonNull(overridePath()));
                 if (!context.getPathChecker().fileIsInAllowedPath(overridePath)) {
-                    errors.put(PATH_OVERRIDE_FIELD, ALLOWED_PATH_ERROR);
+                    errors.put(OVERRIDE_PATH_FIELD, ALLOWED_PATH_ERROR);
                 }
 
                 if (!Files.exists(overridePath)) {
-                    errors.put(PATH_OVERRIDE_FIELD, "The file does not exist.");
+                    errors.put(OVERRIDE_PATH_FIELD, "The file does not exist.");
                 } else if (!Files.isReadable(overridePath)) {
-                    errors.put(PATH_OVERRIDE_FIELD, "The file cannot be read.");
+                    errors.put(OVERRIDE_PATH_FIELD, "The file cannot be read.");
                 }
             }
 
@@ -417,7 +417,7 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
             @JsonProperty(PATH_FIELD)
             public abstract Builder path(String path);
 
-            @JsonProperty(PATH_OVERRIDE_FIELD)
+            @JsonProperty(OVERRIDE_PATH_FIELD)
             public abstract Builder overridePath(String overridePath);
 
             @JsonProperty("separator")
