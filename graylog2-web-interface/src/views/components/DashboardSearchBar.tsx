@@ -41,6 +41,7 @@ import FormWarningsContext from 'contexts/FormWarningsContext';
 import FormWarningsProvider from 'contexts/FormWarningsProvider';
 import useParameters from 'views/hooks/useParameters';
 import { validateQuery } from 'views/components/searchbar/queryvalidation/hooks/useValidateQuery';
+import debounceWithPromise from 'views/logic/debounceWithPromise';
 
 import TimeRangeInput from './searchbar/TimeRangeInput';
 import DashboardSearchForm, { DashboardFormValues } from './DashboardSearchBarForm';
@@ -94,6 +95,8 @@ const StyledQueryInput = styled(QueryInput)`
   flex: 1;
 `;
 
+const debouncedValidateQuery = debounceWithPromise(validateQuery, 350);
+
 const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onExecute: performSearch }: Props) => {
   const submitForm = useCallback(({ timerange, queryString }) => GlobalOverrideActions.set(timerange, queryString)
     .then(() => performSearch()), [performSearch]);
@@ -107,7 +110,7 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
       parameters,
     };
 
-    return validateQuery(request);
+    return debouncedValidateQuery(request);
   }, [parameterBindings, parameters]);
 
   if (!config) {

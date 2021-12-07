@@ -50,6 +50,10 @@ export type QueryValidationState = {
   }> | undefined
 }
 
+const queryExists = (query: string | ElasticsearchQueryString) => {
+  return typeof query === 'object' ? !!query.query_string : !!query;
+};
+
 export const validateQuery = ({
   queryString,
   timeRange,
@@ -58,6 +62,10 @@ export const validateQuery = ({
   parameterBindings,
   filter,
 }: ValidationQuery): Promise<QueryValidationState> => {
+  if (!queryExists(queryString) && !queryExists(filter)) {
+    return Promise.resolve({ status: 'OK', explanations: [] });
+  }
+
   const payload = {
     query: queryString,
     timerange: timeRange,
@@ -93,10 +101,6 @@ export const validateQuery = ({
 
     return undefined;
   });
-};
-
-const queryExists = (query: string | ElasticsearchQueryString) => {
-  return typeof query === 'object' ? !!query.query_string : !!query;
 };
 
 const useValidationPayload = ({

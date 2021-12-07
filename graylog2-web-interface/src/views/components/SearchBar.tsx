@@ -51,6 +51,7 @@ import FormWarningsContext from 'contexts/FormWarningsContext';
 import FormWarningsProvider from 'contexts/FormWarningsProvider';
 import { validateQuery } from 'views/components/searchbar/queryvalidation/hooks/useValidateQuery';
 import useParameters from 'views/hooks/useParameters';
+import debounceWithPromise from 'views/logic/debounceWithPromise';
 
 import SearchBarForm from './searchbar/SearchBarForm';
 
@@ -105,6 +106,8 @@ const defaultProps = {
   onSubmit: defaultOnSubmit,
 };
 
+const debouncedValidateQuery = debounceWithPromise(validateQuery, 350);
+
 const SearchBar = ({
   availableStreams,
   config,
@@ -123,7 +126,7 @@ const SearchBar = ({
       parameters,
     };
 
-    return validateQuery(request);
+    return debouncedValidateQuery(request);
   }, [parameterBindings, parameters]);
 
   if (!currentQuery || !config) {

@@ -44,6 +44,7 @@ import FormWarningsContext from 'contexts/FormWarningsContext';
 import FormWarningsProvider from 'contexts/FormWarningsProvider';
 import { validateQuery } from 'views/components/searchbar/queryvalidation/hooks/useValidateQuery';
 import useParameters from 'views/hooks/useParameters';
+import debounceWithPromise from 'views/logic/debounceWithPromise';
 
 import TimeRangeOverrideInfo from './searchbar/WidgetTimeRangeOverride';
 import TimeRangeInput from './searchbar/TimeRangeInput';
@@ -109,6 +110,8 @@ const useBindApplySearchControlsChanges = (formRef) => {
   }, [formRef, bindApplySearchControlsChanges]);
 };
 
+const debouncedValidateQuery = debounceWithPromise(validateQuery, 350);
+
 const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
   const widget = useContext(WidgetContext);
   const config = useStore(SearchConfigStore, ({ searchesClusterConfig }) => searchesClusterConfig);
@@ -131,7 +134,7 @@ const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
       parameterBindings,
     };
 
-    return validateQuery(request);
+    return debouncedValidateQuery(request);
   }, [globalOverride?.query, globalOverride?.timerange, parameterBindings, parameters]);
 
   useBindApplySearchControlsChanges(formRef);
