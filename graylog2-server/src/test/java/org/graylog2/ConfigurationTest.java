@@ -40,6 +40,7 @@ import static java.nio.file.StandardOpenOption.WRITE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+@SuppressWarnings("deprecation")
 public class ConfigurationTest {
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
@@ -263,6 +264,38 @@ public class ConfigurationTest {
         final Configuration configuration = processValidProperties();
         assertThat(configuration.isMaster()).isFalse();
         assertThat(configuration.isLeader()).isFalse();
+    }
+
+    @Test
+    public void defaultStaleLeaderTimeout() throws Exception {
+        final Configuration configuration = processValidProperties();
+        assertThat(configuration.getStaleMasterTimeout()).isEqualTo(2000);
+        assertThat(configuration.getStaleLeaderTimeout()).isEqualTo(2000);
+    }
+
+    @Test
+    public void staleMasterTimeoutSet() throws Exception {
+        validProperties.put("stale_master_timeout", "1000");
+        final Configuration configuration = processValidProperties();
+        assertThat(configuration.getStaleMasterTimeout()).isEqualTo(1000);
+        assertThat(configuration.getStaleLeaderTimeout()).isEqualTo(1000);
+    }
+
+    @Test
+    public void staleLeaderTimeoutSet() throws Exception {
+        validProperties.put("stale_leader_timeout", "1000");
+        final Configuration configuration = processValidProperties();
+        assertThat(configuration.getStaleMasterTimeout()).isEqualTo(1000);
+        assertThat(configuration.getStaleLeaderTimeout()).isEqualTo(1000);
+    }
+
+    @Test
+    public void staleLeaderTimeoutAndStaleMasterTimeoutSet() throws Exception {
+        validProperties.put("stale_master_timeout", "1000");
+        validProperties.put("stale_leader_timeout", "3000");
+        final Configuration configuration = processValidProperties();
+        assertThat(configuration.getStaleMasterTimeout()).isEqualTo(3000);
+        assertThat(configuration.getStaleLeaderTimeout()).isEqualTo(3000);
     }
 
     /**

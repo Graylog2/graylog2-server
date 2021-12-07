@@ -38,7 +38,7 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
     @Inject
     public NodeServiceImpl(final MongoConnection mongoConnection, final Configuration configuration) {
         super(mongoConnection);
-        this.pingTimeout = TimeUnit.MILLISECONDS.toSeconds(configuration.getStaleMasterTimeout());
+        this.pingTimeout = TimeUnit.MILLISECONDS.toSeconds(configuration.getStaleLeaderTimeout());
     }
 
     @Override
@@ -106,8 +106,9 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
     public Map<String, Node> allActive() {
         Map<String, Node> nodes = Maps.newHashMap();
 
-        for (Node.Type type : Node.Type.values())
+        for (Node.Type type : Node.Type.values()) {
             nodes.putAll(allActive(type));
+        }
 
         return nodes;
     }

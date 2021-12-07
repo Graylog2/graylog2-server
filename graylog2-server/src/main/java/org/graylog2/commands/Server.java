@@ -224,10 +224,10 @@ public class Server extends ServerBootstrap {
                 Tools.getLocalCanonicalHostname());
         serverStatus.setLocalMode(isLocal());
         if (leaderElectionService.isLeader() && !nodeService.isOnlyMaster(serverStatus.getNodeId())) {
-            LOG.warn("Detected another master in the cluster. Retrying in {} seconds to make sure it is not "
-                    + "an old stale instance.", TimeUnit.MILLISECONDS.toSeconds(configuration.getStaleMasterTimeout()));
+            LOG.warn("Detected another leader in the cluster. Retrying in {} seconds to make sure it is not "
+                    + "an old stale instance.", TimeUnit.MILLISECONDS.toSeconds(configuration.getStaleLeaderTimeout()));
             try {
-                Thread.sleep(configuration.getStaleMasterTimeout());
+                Thread.sleep(configuration.getStaleLeaderTimeout());
             } catch (InterruptedException e) { /* nope */ }
 
             if (!nodeService.isOnlyMaster(serverStatus.getNodeId())) {

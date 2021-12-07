@@ -49,11 +49,16 @@ import java.util.Set;
  */
 @SuppressWarnings("FieldMayBeFinal")
 public class Configuration extends BaseConfiguration {
+
+    /**
+     * Deprecated! Use isLeader() instead.
+     */
     @Parameter(value = "is_master")
     private boolean isMaster = true;
 
     /**
-     * Used for initializing static leader election. Don't use it for other purposes.
+     * Used for initializing static leader election. You shouldn't use this for other purposes, but if you must, don't
+     * use @{@link javax.inject.Named} injection but the getter isLeader() instead.
      **/
     @Parameter(value = "is_leader")
     private Boolean isLeader;
@@ -122,8 +127,17 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "output_fault_penalty_seconds", validators = PositiveLongValidator.class)
     private long outputFaultPenaltySeconds = 30;
 
+    /**
+     * Deprecated! Use staleLeaderTimeout instead
+     */
     @Parameter(value = "stale_master_timeout", validators = PositiveIntegerValidator.class)
     private int staleMasterTimeout = 2000;
+
+    /**
+     * Don't use @{@link javax.inject.Named} injection but the getter getStaleLeaderTimeout() instead.
+     **/
+    @Parameter(value = "stale_leader_timeout", validators = PositiveIntegerValidator.class)
+    private Integer staleLeaderTimeout;
 
     @Parameter(value = "ldap_connection_timeout", validators = PositiveIntegerValidator.class)
     private int ldapConnectionTimeout = 2000;
@@ -335,8 +349,16 @@ public class Configuration extends BaseConfiguration {
         return outputFaultPenaltySeconds;
     }
 
+    /**
+     * @deprecated Use getStaleLeaderTimeout instead
+     */
+    @Deprecated
     public int getStaleMasterTimeout() {
-        return staleMasterTimeout;
+        return getStaleLeaderTimeout();
+    }
+
+    public int getStaleLeaderTimeout() {
+        return staleLeaderTimeout != null ? staleLeaderTimeout : staleMasterTimeout;
     }
 
     public int getLdapConnectionTimeout() {
