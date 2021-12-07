@@ -101,7 +101,7 @@ const SearchBarForm = ({ initialValues, limitDuration, onSubmit, children, valid
   };
 
   const { setFieldWarning } = useContext(FormWarningsContext);
-  const _validate = useCallback((values: SearchBarFormValues) => validate(values, limitDuration, setFieldWarning), [limitDuration]);
+  const _validate = useCallback((values: SearchBarFormValues) => validate(values, limitDuration, setFieldWarning), [limitDuration, setFieldWarning]);
 
   return (
     <Formik<SearchBarFormValues> initialValues={_initialValues}
