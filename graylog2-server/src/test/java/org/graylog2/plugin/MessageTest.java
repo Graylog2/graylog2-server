@@ -751,7 +751,7 @@ public class MessageTest {
 
         // then
         assertThat(esObject.get(Message.FIELD_GL2_PROCESSING_ERROR))
-                .isEqualTo("Failure Details #1, Failure Details #2");
+                .isEqualTo("Failure Message #1 - Failure Details #1, Failure Message #2 - Failure Details #2");
     }
 
     @Test
