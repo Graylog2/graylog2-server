@@ -45,4 +45,5 @@ public interface Input extends Persisted {
         return IOState.Type.RUNNING.toString();
     }
 
+    default void setDesiredState(String desiredState){}
 }

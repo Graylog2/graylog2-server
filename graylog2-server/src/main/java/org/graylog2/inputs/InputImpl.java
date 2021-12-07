@@ -172,4 +172,9 @@ public class InputImpl extends PersistedImpl implements Input {
             return IOState.Type.RUNNING.toString();
         }
     }
+
+    @Override
+    public void setDesiredState(String desiredState) {
+        fields.put(MessageInput.FIELD_DESIRED_STATE, desiredState);
+    }
 }
