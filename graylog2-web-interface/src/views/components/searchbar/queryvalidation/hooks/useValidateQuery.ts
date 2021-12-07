@@ -14,6 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import * as Immutable from 'immutable';
 import { isEmpty, debounce } from 'lodash';
 import { useEffect } from 'react';
 import { useQuery } from 'react-query';
@@ -29,12 +30,12 @@ import Parameter from 'views/logic/parameters/Parameter';
 import { ParameterBindings } from 'views/logic/search/SearchExecutionState';
 
 type ValidationQuery = {
-  queryString: string,
-  timeRange: TimeRange,
+  queryString: ElasticsearchQueryString | string,
+  timeRange: TimeRange | NoTimeRangeOverride,
   streams: Array<string>,
-  parameters: Array<Parameter>,
+  parameters: Immutable.Set<Parameter>,
   parameterBindings: ParameterBindings,
-  filter: string,
+  filter: ElasticsearchQueryString | string,
 }
 
 export type QueryValidationState = {
