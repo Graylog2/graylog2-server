@@ -51,8 +51,6 @@ jest.mock('views/stores/SearchConfigStore', () => ({
   },
 }));
 
-jest.mock('views/components/searchbar/AsyncQueryInput', () => () => null);
-
 jest.mock('views/components/searchbar/queryvalidation/validateQuery', () => () => Promise.resolve({ status: 'OK', explanations: [] }));
 
 const config = {
