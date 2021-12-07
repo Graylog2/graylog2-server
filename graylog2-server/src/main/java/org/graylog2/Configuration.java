@@ -49,8 +49,15 @@ import java.util.Set;
  */
 @SuppressWarnings("FieldMayBeFinal")
 public class Configuration extends BaseConfiguration {
-    @Parameter(value = "is_master", required = true)
+    @Deprecated
+    @Parameter(value = "is_master")
     private boolean isMaster = true;
+
+    /**
+     * Used for initializing static leader election. Don't use it for other purposes.
+     **/
+    @Parameter(value = "is_leader")
+    private Boolean isLeader;
 
     @Parameter(value = "password_secret", required = true, validator = StringNotBlankValidator.class)
     private String passwordSecret;
@@ -192,15 +199,36 @@ public class Configuration extends BaseConfiguration {
     private java.time.Duration lockServiceLockTTL = MongoLockService.MIN_LOCK_TTL;
 
     /**
-     * @deprecated Try not to rely on a leader, or use {@link LeaderElectionService#isLeader()} instead.
+     * @deprecated Use {@link #isLeader()} instead.
      */
     @Deprecated
     public boolean isMaster() {
-        return isMaster;
+        return isLeader();
     }
 
+    /**
+     * Returns the <em>configured</em> leader status. This is only valid for static leader election. You should probably
+     * use {@link LeaderElectionService#isLeader()} instead.
+     */
+    public boolean isLeader() {
+        return isLeader != null ? isLeader : isMaster;
+    }
+
+    /**
+     * @deprecated Use {@link #setIsLeader(boolean)} instead
+     */
+    @Deprecated
     public void setIsMaster(boolean is) {
-        isMaster = is;
+        setIsLeader(is);
+    }
+
+    /**
+     * We should remove this method after refactoring {@link org.graylog2.cluster.leader.StaticLeaderElectionService}
+     * and {@link org.graylog2.commands.Server} so that they don't need this to communicate demotion from leader to
+     * follower anymore.
+     */
+    public void setIsLeader(boolean is) {
+        isLeader = isMaster = is;
     }
 
     public LeaderElectionMode getLeaderElectionMode() {
@@ -479,7 +507,7 @@ public class Configuration extends BaseConfiguration {
                 // all good
                 return;
             }
-            throw new ValidationException("Node ID file at path " + path + " isn't " + b +". Please specify the correct path or change the permissions");
+            throw new ValidationException("Node ID file at path " + path + " isn't " + b + ". Please specify the correct path or change the permissions");
         }
     }
 }

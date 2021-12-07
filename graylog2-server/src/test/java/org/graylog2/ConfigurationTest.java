@@ -66,8 +66,7 @@ public class ConfigurationTest {
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage("The minimum length for \"password_secret\" is 16 characters.");
 
-        Configuration configuration = new Configuration();
-        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
+        Configuration configuration = processValidProperties();
     }
 
     @Test
@@ -77,8 +76,7 @@ public class ConfigurationTest {
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage("Parameter password_secret should not be blank");
 
-        Configuration configuration = new Configuration();
-        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
+        Configuration configuration = processValidProperties();
     }
 
     @Test
@@ -88,16 +86,14 @@ public class ConfigurationTest {
         expectedException.expect(ParameterException.class);
         expectedException.expectMessage("Required parameter \"password_secret\" not found.");
 
-        Configuration configuration = new Configuration();
-        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
+        Configuration configuration = processValidProperties();
     }
 
     @Test
     public void testPasswordSecretIsValid() throws ValidationException, RepositoryException {
         validProperties.put("password_secret", "abcdefghijklmnopqrstuvwxyz");
 
-        Configuration configuration = new Configuration();
-        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
+        Configuration configuration = processValidProperties();
 
         assertThat(configuration.getPasswordSecret()).isEqualTo("abcdefghijklmnopqrstuvwxyz");
     }
@@ -185,6 +181,90 @@ public class ConfigurationTest {
         }).isInstanceOf(ValidationException.class).hasMessageContaining("needs to be greater than");
     }
 
+    @Test
+    public void isLeaderByDefault() throws Exception {
+        final Configuration configuration = processValidProperties();
+
+        assertThat(configuration.isMaster()).isTrue();
+        assertThat(configuration.isLeader()).isTrue();
+    }
+
+    @Test
+    public void isMasterSetToTrue() throws Exception {
+        validProperties.put("is_master", "true");
+
+        final Configuration configuration = processValidProperties();
+        assertThat(configuration.isMaster()).isTrue();
+        assertThat(configuration.isLeader()).isTrue();
+    }
+
+    @Test
+    public void isMasterSetToFalse() throws Exception {
+        validProperties.put("is_master", "false");
+
+        final Configuration configuration = processValidProperties();
+        assertThat(configuration.isMaster()).isFalse();
+        assertThat(configuration.isLeader()).isFalse();
+    }
+
+    @Test
+    public void isLeaderSetToTrue() throws Exception {
+        validProperties.put("is_leader", "true");
+
+        final Configuration configuration = processValidProperties();
+        assertThat(configuration.isMaster()).isTrue();
+        assertThat(configuration.isLeader()).isTrue();
+    }
+
+    @Test
+    public void isLeaderSetToFalse() throws Exception {
+        validProperties.put("is_leader", "false");
+
+        final Configuration configuration = processValidProperties();
+        assertThat(configuration.isMaster()).isFalse();
+        assertThat(configuration.isLeader()).isFalse();
+    }
+
+    @Test
+    public void isMasterSetToTrueAndIsLeaderSetToTrue() throws Exception {
+        validProperties.put("is_master", "true");
+        validProperties.put("is_leader", "true");
+
+        final Configuration configuration = processValidProperties();
+        assertThat(configuration.isMaster()).isTrue();
+        assertThat(configuration.isLeader()).isTrue();
+    }
+
+    @Test
+    public void isMasterSetToTrueAndIsLeaderSetToFalse() throws Exception {
+        validProperties.put("is_master", "true");
+        validProperties.put("is_leader", "false");
+
+        final Configuration configuration = processValidProperties();
+        assertThat(configuration.isMaster()).isFalse();
+        assertThat(configuration.isLeader()).isFalse();
+    }
+
+    @Test
+    public void isMasterSetToFalseAndIsLeaderSetToTrue() throws Exception {
+        validProperties.put("is_master", "false");
+        validProperties.put("is_leader", "true");
+
+        final Configuration configuration = processValidProperties();
+        assertThat(configuration.isMaster()).isTrue();
+        assertThat(configuration.isLeader()).isTrue();
+    }
+
+    @Test
+    public void isMasterSetToFalseAndIsLeaderSetToFalse() throws Exception {
+        validProperties.put("is_master", "false");
+        validProperties.put("is_leader", "false");
+
+        final Configuration configuration = processValidProperties();
+        assertThat(configuration.isMaster()).isFalse();
+        assertThat(configuration.isLeader()).isFalse();
+    }
+
     /**
      * Run the NodeIDFileValidator on a file with the given permissions.
      *
@@ -205,4 +285,11 @@ public class ConfigurationTest {
         }
         return true;
     }
+
+    private Configuration processValidProperties() throws RepositoryException, ValidationException {
+        Configuration configuration = new Configuration();
+        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
+        return configuration;
+    }
+
 }

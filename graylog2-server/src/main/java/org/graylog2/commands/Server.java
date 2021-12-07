@@ -244,7 +244,7 @@ public class Server extends ServerBootstrap {
                         .addSeverity(Notification.Severity.URGENT);
                 notificationService.publishIfFirst(notification);
 
-                configuration.setIsMaster(false);
+                configuration.setIsLeader(false);
             } else {
                 LOG.warn("Stale master has gone. Starting as master.");
             }
@@ -319,7 +319,7 @@ public class Server extends ServerBootstrap {
 
     @Override
     protected Set<ServerStatus.Capability> capabilities() {
-        if (configuration.isMaster()) {
+        if (configuration.isLeader()) {
             return EnumSet.of(ServerStatus.Capability.SERVER, ServerStatus.Capability.MASTER);
         } else {
             return EnumSet.of(ServerStatus.Capability.SERVER);

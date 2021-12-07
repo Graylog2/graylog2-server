@@ -159,7 +159,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
         LOG.info("Arch: {}", os.getArch());
 
         try {
-            if (configuration.isMaster() && configuration.runMigrations()) {
+            if (configuration.isLeader() && configuration.runMigrations()) {
                 runMigrations();
             }
         } catch (Exception e) {
