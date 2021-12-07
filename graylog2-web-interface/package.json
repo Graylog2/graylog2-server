@@ -141,7 +141,7 @@
     "@types/react-window": "^1.8.3",
     "@types/ua-parser-js": "^0.7.36",
     "@types/urijs": "^1.19.15",
-    "assets-webpack-plugin": "^5.1.2",
+    "assets-webpack-plugin": "^6.1.2",
     "babel-loader": "^8.2.2",
     "babel-plugin-add-module-exports": "^1.0.2",
     "babel-plugin-dynamic-import-node": "^2.3.0",
