@@ -18,11 +18,12 @@ import * as React from 'react';
 import { useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { Form, Formik } from 'formik';
-import { isFunction } from 'lodash';
+import { isFunction, isEmpty } from 'lodash';
 import type { FormikProps } from 'formik';
 
 import type { TimeRange } from 'views/logic/queries/Query';
 import validateTimeRange from 'views/components/TimeRangeValidation';
+import FormWarningsProvider from 'contexts/FormWarningsProvider';
 
 import DateTimeProvider from './searchbar/date-time-picker/DateTimeProvider';
 import { onInitializingTimerange, onSubmittingTimerange } from './TimerangeForForm';
@@ -40,6 +41,18 @@ type Props = {
 };
 
 const _isFunction = (children: Props['children']): children is (props: FormikProps<Values>) => React.ReactElement => isFunction(children);
+
+const validate = (nextTimeRange, limitDuration) => {
+  let errors = {};
+
+  const timeRangeErrors = validateTimeRange(nextTimeRange, limitDuration);
+
+  if (!isEmpty(timeRangeErrors)) {
+    errors = { ...errors, timerange: timeRangeErrors };
+  }
+
+  return errors;
+};
 
 const DashboardSearchForm = ({ initialValues, limitDuration, onSubmit, children }: Props) => {
   const _onSubmit = useCallback(({ timerange, queryString }) => {
@@ -60,14 +73,16 @@ const DashboardSearchForm = ({ initialValues, limitDuration, onSubmit, children 
     <Formik initialValues={_initialValues}
             enableReinitialize
             onSubmit={_onSubmit}
-            validate={({ timerange: nextTimeRange }) => validateTimeRange(nextTimeRange, limitDuration)}
+            validate={({ timerange: nextTimeRange }) => validate(nextTimeRange, limitDuration)}
             validateOnMount>
       {(...args) => (
-        <DateTimeProvider limitDuration={limitDuration}>
-          <Form>
-            {_isFunction(children) ? children(...args) : children}
-          </Form>
-        </DateTimeProvider>
+        <FormWarningsProvider>
+          <DateTimeProvider limitDuration={limitDuration}>
+            <Form>
+              {_isFunction(children) ? children(...args) : children}
+            </Form>
+          </DateTimeProvider>
+        </FormWarningsProvider>
       )}
     </Formik>
   );

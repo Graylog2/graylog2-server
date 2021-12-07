@@ -80,6 +80,13 @@ jest.mock('views/stores/StreamsStore', () => ({
   })]),
 }));
 
+jest.mock('views/stores/SearchStore', () => ({
+  SearchStore: MockStore(['getInitialState', () => ({ search: { parameters: [] } })]),
+  SearchActions: {
+    execute: mockAction(),
+  },
+}));
+
 const viewsPlugin = new PluginManifest({}, viewsBindings);
 
 const selectEventConfig = { container: document.body };

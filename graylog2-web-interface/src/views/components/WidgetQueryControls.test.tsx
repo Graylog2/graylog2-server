@@ -20,9 +20,10 @@ import WrappingContainer from 'WrappingContainer';
 
 import MockStore from 'helpers/mocking/StoreMock';
 import { GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
-import SearchActions from 'views/actions/SearchActions';
+import { SearchActions } from 'views/stores/SearchStore';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
 import Widget from 'views/logic/widgets/Widget';
+import mockComponent from 'helpers/mocking/MockComponent';
 
 import WidgetQueryControls from './WidgetQueryControls';
 import WidgetContext from './contexts/WidgetContext';
@@ -40,8 +41,14 @@ jest.mock('views/stores/GlobalOverrideStore', () => ({
   },
 }));
 
-jest.mock('views/actions/SearchActions', () => ({
-  refresh: jest.fn(() => Promise.resolve()),
+jest.mock('views/stores/SearchStore', () => ({
+  SearchStore: MockStore(
+    'listen',
+    ['getInitialState', () => ({ search: { parameters: [] } })],
+  ),
+  SearchActions: {
+    refresh: jest.fn(() => Promise.resolve()),
+  },
 }));
 
 jest.mock('stores/connect', () => {
@@ -60,6 +67,7 @@ jest.mock('moment', () => {
   return Object.assign(() => mockMoment('2019-10-10T12:26:31.146Z'), mockMoment);
 });
 
+jest.mock('views/components/searchbar/queryvalidation/QueryValidation', () => mockComponent('QueryValidation'));
 jest.mock('views/components/searchbar/QueryInput', () => ({ value = '' }: { value: string }) => <span>{value}</span>);
 
 jest.mock('views/stores/SearchConfigStore', () => ({
@@ -153,7 +161,7 @@ describe('WidgetQueryControls', () => {
       expect(GlobalOverrideActions.resetTimeRange).toHaveBeenCalled();
     });
 
-    it('triggers resetting global override when reset query filter button is clicked', async () => {
+    it('triggers resetting global override and query validation when reset query filter button is clicked', async () => {
       renderSUT({ globalOverride: globalOverrideWithQuery });
       const resetQueryFilterButton = await screen.findByRole('button', { name: resetQueryButtonTitle });
       fireEvent.click(resetQueryFilterButton);

@@ -20,6 +20,7 @@ import PropTypes from 'prop-types';
 import { Field } from 'formik';
 import moment from 'moment';
 import styled, { css } from 'styled-components';
+import { useIsFetching } from 'react-query';
 
 import connect from 'stores/connect';
 import DocumentationLink from 'components/support/DocumentationLink';
@@ -36,6 +37,8 @@ import BottomRow from 'views/components/searchbar/BottomRow';
 import ViewActionsWrapper from 'views/components/searchbar/ViewActionsWrapper';
 import { SearchesConfig } from 'components/search/SearchConfig';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
+import QueryValidation, { QueryValidationState } from 'views/components/searchbar/queryvalidation/QueryValidation';
+import FormWarningsContext from 'contexts/FormWarningsContext';
 
 import DashboardSearchForm from './DashboardSearchBarForm';
 import TimeRangeInput from './searchbar/TimeRangeInput';
@@ -90,6 +93,7 @@ const StyledQueryInput = styled(QueryInput)`
 `;
 
 const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onExecute: performSearch }: Props) => {
+  const isValidatingQuery = !!useIsFetching('validateSearchQuery');
   const submitForm = useCallback(({ timerange, queryString }) => GlobalOverrideActions.set(timerange, queryString)
     .then(() => performSearch()), [performSearch]);
 
@@ -108,51 +112,60 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
             <DashboardSearchForm initialValues={{ timerange, queryString }}
                                  limitDuration={limitDuration}
                                  onSubmit={submitForm}>
-              {({ dirty, isSubmitting, isValid, handleSubmit, values, setFieldValue }) => (
-                <>
-                  <TopRow>
-                    <StyledTimeRangeInput disabled={disableSearch}
-                                          onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
-                                          value={values?.timerange}
-                                          hasErrorOnMount={!isValid}
-                                          noOverride />
-                    <RefreshControlsWrapper>
-                      <RefreshControls />
-                    </RefreshControlsWrapper>
-                  </TopRow>
+              {({ dirty, errors, isSubmitting, isValid, handleSubmit, values, setFieldValue }) => (
+                <FormWarningsContext.Consumer>
+                  {({ warnings }) => (
+                    <>
+                      <TopRow>
+                        <StyledTimeRangeInput disabled={disableSearch}
+                                              onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
+                                              value={values?.timerange}
+                                              hasErrorOnMount={!!errors.timerange}
+                                              noOverride />
+                        <RefreshControlsWrapper>
+                          <RefreshControls />
+                        </RefreshControlsWrapper>
+                      </TopRow>
 
-                  <BottomRow>
-                    <SearchButtonAndQuery>
-                      <SearchButton disabled={disableSearch || isSubmitting || !isValid}
-                                    glyph="filter"
-                                    dirty={dirty} />
+                      <BottomRow>
+                        <SearchButtonAndQuery>
+                          <SearchButton disabled={disableSearch || isSubmitting || isValidatingQuery || !isValid}
+                                        glyph="filter"
+                                        dirty={dirty} />
 
-                      <Field name="queryString">
-                        {({ field: { name, value, onChange } }) => (
-                          <StyledQueryInput value={value}
-                                            placeholder="Apply filter to all widgets"
-                                            onChange={(newQuery) => {
-                                              onChange({ target: { value: newQuery, name } });
+                          <Field name="queryString">
+                            {({ field: { name, value, onChange }, meta: { error } }) => (
+                              <StyledQueryInput value={value}
+                                                placeholder="Apply filter to all widgets"
+                                                onChange={(newQuery) => {
+                                                  onChange({ target: { value: newQuery, name } });
 
-                                              return Promise.resolve(newQuery);
-                                            }}
-                                            onExecute={handleSubmit as () => void} />
+                                                  return Promise.resolve(newQuery);
+                                                }}
+                                                error={error}
+                                                warning={warnings.queryString as QueryValidationState}
+                                                onExecute={handleSubmit as () => void} />
+                            )}
+                          </Field>
+
+                          <QueryValidation queryString={values?.queryString} timeRange={values?.timerange} />
+
+                          <div className="search-help">
+                            <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
+                                               title="Search query syntax documentation"
+                                               text={<Icon name="lightbulb" />} />
+                          </div>
+                        </SearchButtonAndQuery>
+
+                        {!editing && (
+                        <ViewActionsWrapper>
+                          <ViewActionsMenu />
+                        </ViewActionsWrapper>
                         )}
-                      </Field>
-                      <div className="search-help">
-                        <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
-                                           title="Search query syntax documentation"
-                                           text={<Icon name="lightbulb" />} />
-                      </div>
-                    </SearchButtonAndQuery>
-
-                    {!editing && (
-                      <ViewActionsWrapper>
-                        <ViewActionsMenu />
-                      </ViewActionsWrapper>
-                    )}
-                  </BottomRow>
-                </>
+                      </BottomRow>
+                    </>
+                  )}
+                </FormWarningsContext.Consumer>
               )}
             </DashboardSearchForm>
           </FlatContentRow>

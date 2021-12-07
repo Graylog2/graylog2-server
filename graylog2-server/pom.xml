@@ -357,6 +357,11 @@
             <artifactId>bcpkix-jdk15on</artifactId>
             <version>${bouncycastle.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-queryparser</artifactId>
+            <version>${lucene.version}</version>
+        </dependency>
 
         <!-- Logging dependencies -->
         <dependency>

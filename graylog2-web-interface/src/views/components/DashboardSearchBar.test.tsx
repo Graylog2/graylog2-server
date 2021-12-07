@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { act, render, screen, waitFor } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import MockStore from 'helpers/mocking/StoreMock';
@@ -38,6 +38,7 @@ jest.mock('views/stores/GlobalOverrideStore', () => ({
 }));
 
 jest.mock('views/stores/SearchStore', () => ({
+  SearchStore: MockStore(['getInitialState', () => ({ search: { parameters: [] } })]),
   SearchActions: {
     refresh: jest.fn(),
   },
@@ -93,10 +94,7 @@ describe('DashboardSearchBar', () => {
 
     const timeRangeInput = await screen.findByText(/no override/i);
 
-    act(() => {
-      userEvent.click(timeRangeInput);
-    });
-
+    userEvent.click(timeRangeInput);
     userEvent.click(await screen.findByRole('tab', { name: 'Relative' }));
     userEvent.click(await screen.findByRole('button', { name: 'Apply' }));
 

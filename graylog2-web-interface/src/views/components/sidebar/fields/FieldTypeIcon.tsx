@@ -37,6 +37,8 @@ const iconClass = (type) => {
       return 'chart-line';
     case 'date':
       return 'calendar-alt';
+    case 'ip':
+      return 'network-wired';
     default:
       return 'question-circle';
   }
