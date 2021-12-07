@@ -102,57 +102,50 @@ const ExplanationTitle = ({ title }: { title: string }) => (
   </Title>
 );
 
-const useShakeIfAlreadyOpen = (showExplanation) => {
-  const [shakingPopover, setShakingPopover] = useState(false);
+const useShakeTemporarily = () => {
+  const [shouldShake, setShake] = useState(false);
 
-  const shakePopover = useCallback(() => {
-    if (!shakingPopover) {
-      setShakingPopover(true);
-      delay(() => setShakingPopover(false), 820);
+  const shake = useCallback(() => {
+    if (!shouldShake) {
+      setShake(true);
+      delay(() => setShake(false), 820);
     }
-  }, [shakingPopover]);
+  }, [shouldShake]);
 
-  useEffect(() => {
-    const unsubscribe = QueryValidationActions.displayValidationErrors.listen(() => {
-      if (showExplanation) {
-        shakePopover();
-      }
-    });
-
-    return () => {
-      unsubscribe();
-    };
-  }, [showExplanation, shakingPopover, shakePopover]);
-
-  return shakingPopover;
+  return [shouldShake, shake] as const;
 };
 
-const useListenToDisplayErrorsAction = (showExplanation, setShowExplanation) => {
+const useTriggerIfErrorsPersist = (trigger: () => void) => {
+  const [showExplanation, setShowExplanation] = useState(false);
+  const toggleShow = useCallback(() => setShowExplanation((prevShow) => !prevShow), []);
+
   useEffect(() => {
     const unsubscribe = QueryValidationActions.displayValidationErrors.listen(() => {
       if (!showExplanation) {
-        setShowExplanation(true);
+        toggleShow();
+      } else {
+        trigger();
       }
     });
 
     return () => {
       unsubscribe();
     };
-  }, [showExplanation, setShowExplanation]);
+  }, [trigger, showExplanation, toggleShow]);
+
+  return [showExplanation, toggleShow] as const;
 };
 
 const QueryValidation = () => {
-  const [showExplanation, setShowExplanation] = useState(false);
-  const toggleShow = () => setShowExplanation((prevShow) => !prevShow);
+  const [shakingPopover, shake] = useShakeTemporarily();
+  const [showExplanation, toggleShow] = useTriggerIfErrorsPersist(shake);
+
   const containerRef = useRef(undefined);
   const explanationTriggerRef = useRef(undefined);
-  const shakingPopover = useShakeIfAlreadyOpen(showExplanation);
   const { errors: { queryString: queryStringErrors } } = useFormikContext();
   const { warnings } = useContext(FormWarningsContext);
 
   const validationState = (queryStringErrors ?? warnings?.queryString) as QueryValidationState;
-
-  useListenToDisplayErrorsAction(showExplanation, setShowExplanation);
 
   // We need to always display the container to avoid query inout resizing problems
   if (!validationState || validationState.status === 'OK') {
