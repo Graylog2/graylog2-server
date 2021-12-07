@@ -15,33 +15,20 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useContext, useState, useRef, useCallback, useEffect } from 'react';
 import styled, { DefaultTheme, css, keyframes } from 'styled-components';
-import { useState, useRef, useCallback, useEffect } from 'react';
 import { Overlay, Transition } from 'react-overlays';
 import { delay } from 'lodash';
+import { useFormikContext } from 'formik';
 
 import { Popover } from 'components/bootstrap';
 import Icon from 'components/common/Icon';
 import StringUtils from 'util/StringUtils';
-import { TimeRange, NoTimeRangeOverride, ElasticsearchQueryString } from 'views/logic/queries/Query';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
 import QueryValidationActions from 'views/actions/QueryValidationActions';
-
-import { useSyncFormErrors, useSyncFormWarnings } from './hooks/useSyncFormValidationState';
-import useValidateQuery from './hooks/useValidateQuery';
-
-export type QueryValidationState = {
-  status: 'OK' | 'ERROR' | 'WARNING',
-  explanations: Array<{
-    errorType: string,
-    errorMessage: string,
-    beginLine: number,
-    endLine: number,
-    beginColumn: number,
-    endColumn: number,
-  }> | undefined
-}
+import FormWarningsContext from 'contexts/FormWarningsContext';
+import { QueryValidationState } from 'views/components/searchbar/queryvalidation/hooks/useValidateQuery';
 
 const Container = styled.div`
   margin-right: 5px;
@@ -59,7 +46,7 @@ const ExplanationTrigger = styled.button<{ $clickable?: boolean }>(({ $clickable
   cursor: ${$clickable ? 'pointer' : 'default'};
 `);
 
-const ErrorIcon = styled(Icon)(({ theme, $status }: { theme: DefaultTheme, $status: string}) => `
+const ErrorIcon = styled(Icon)(({ theme, $status }: { theme: DefaultTheme, $status: string }) => `
   color: ${$status === 'ERROR' ? theme.colors.variant.danger : theme.colors.variant.warning};
   font-size: 22px;
 `);
@@ -154,23 +141,17 @@ const useListenToDisplayErrorsAction = (showExplanation, setShowExplanation) => 
   }, [showExplanation, setShowExplanation]);
 };
 
-type Props = {
-  filter?: ElasticsearchQueryString | string,
-  queryString: ElasticsearchQueryString | string | undefined,
-  streams?: Array<string>,
-  timeRange: TimeRange | NoTimeRangeOverride | undefined,
-}
-
-const QueryValidation = ({ queryString, timeRange, streams, filter }: Props) => {
+const QueryValidation = () => {
   const [showExplanation, setShowExplanation] = useState(false);
   const toggleShow = () => setShowExplanation((prevShow) => !prevShow);
   const containerRef = useRef(undefined);
   const explanationTriggerRef = useRef(undefined);
-  const validationState = useValidateQuery({ queryString, timeRange, streams, filter });
   const shakingPopover = useShakeIfAlreadyOpen(showExplanation);
+  const { errors: { queryString: queryStringErrors } } = useFormikContext();
+  const { warnings } = useContext(FormWarningsContext);
 
-  useSyncFormErrors(validationState);
-  useSyncFormWarnings(validationState);
+  const validationState = (queryStringErrors ?? warnings?.queryString) as QueryValidationState;
+
   useListenToDisplayErrorsAction(showExplanation, setShowExplanation);
 
   // We need to always display the container to avoid query inout resizing problems
@@ -202,7 +183,9 @@ const QueryValidation = ({ queryString, timeRange, streams, filter }: Props) => 
                  shouldUpdatePosition
                  transition={Transition}>
           <StyledPopover id="query-validation-error-explanation"
-                         title={<ExplanationTitle title={StringUtils.capitalizeFirstLetter(status.toLocaleLowerCase())} />}
+                         title={(
+                           <ExplanationTitle title={StringUtils.capitalizeFirstLetter(status.toLocaleLowerCase())} />
+                         )}
                          $shaking={shakingPopover}>
             <div role="alert">
               {explanations.map(({ errorType, errorMessage }) => (

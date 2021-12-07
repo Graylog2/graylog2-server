@@ -15,17 +15,18 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback } from 'react';
+import { useCallback, useContext } from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import type { FormikProps } from 'formik';
 import { Form, Formik } from 'formik';
 import { isFunction, isEmpty } from 'lodash';
 
-import FormWarningsProvider from 'contexts/FormWarningsProvider';
 import { onInitializingTimerange, onSubmittingTimerange } from 'views/components/TimerangeForForm';
 import type { SearchBarFormValues } from 'views/Constants';
 import validateTimeRange from 'views/components/TimeRangeValidation';
+import FormWarningsContext from 'contexts/FormWarningsContext';
+import { validateQuery } from 'views/components/searchbar/queryvalidation/hooks/useValidateQuery';
 
 import DateTimeProvider from './date-time-picker/DateTimeProvider';
 
@@ -54,13 +55,34 @@ export const normalizeSearchBarFormValues = ({ timerange, streams, queryString }
   };
 };
 
-const validate = (nextTimeRange, limitDuration) => {
+const validate = async (values: SearchBarFormValues, limitDuration: number, setFieldWarning: (fieldName: string, warning: unknown) => void) => {
+  const { timerange: nextTimeRange } = values;
   let errors = {};
 
   const timeRangeErrors = validateTimeRange(nextTimeRange, limitDuration);
 
   if (!isEmpty(timeRangeErrors)) {
     errors = { ...errors, timerange: timeRangeErrors };
+  }
+
+  const queryValidation = await validateQuery(values);
+
+  if (queryValidation?.status === 'OK') {
+    setFieldWarning('queryString', undefined);
+
+    return errors;
+  }
+
+  if (queryValidation?.status === 'WARNING') {
+    setFieldWarning('queryString', queryValidation);
+
+    return errors;
+  }
+
+  if (queryValidation?.status === 'ERROR') {
+    setFieldWarning('queryString', undefined);
+
+    return { ...errors, queryString: queryValidation };
   }
 
   return errors;
@@ -78,21 +100,22 @@ const SearchBarForm = ({ initialValues, limitDuration, onSubmit, children, valid
     timerange: initialTimeRange,
   };
 
+  const { setFieldWarning } = useContext(FormWarningsContext);
+  const _validate = useCallback((values: SearchBarFormValues) => validate(values, limitDuration, setFieldWarning), [limitDuration]);
+
   return (
     <Formik<SearchBarFormValues> initialValues={_initialValues}
                                  enableReinitialize
                                  onSubmit={_onSubmit}
                                  innerRef={formRef}
-                                 validate={({ timerange: nextTimeRange }) => validate(nextTimeRange, limitDuration)}
+                                 validate={_validate}
                                  validateOnMount={validateOnMount}>
       {(...args) => (
-        <FormWarningsProvider>
-          <DateTimeProvider limitDuration={limitDuration}>
-            <StyledForm>
-              {_isFunction(children) ? children(...args) : children}
-            </StyledForm>
-          </DateTimeProvider>
-        </FormWarningsProvider>
+        <DateTimeProvider limitDuration={limitDuration}>
+          <StyledForm>
+            {_isFunction(children) ? children(...args) : children}
+          </StyledForm>
+        </DateTimeProvider>
       )}
     </Formik>
   );

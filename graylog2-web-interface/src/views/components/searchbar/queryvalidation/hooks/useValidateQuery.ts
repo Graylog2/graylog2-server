@@ -22,13 +22,41 @@ import { useStore } from 'stores/connect';
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
 import { SearchStore } from 'views/stores/SearchStore';
 import type { ElasticsearchQueryString, TimeRange } from 'views/logic/queries/Query';
+import { NoTimeRangeOverride } from 'views/logic/queries/Query';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
-import { NoTimeRangeOverride } from 'views/logic/queries/Query';
+import Parameter from 'views/logic/parameters/Parameter';
+import { ParameterBindings } from 'views/logic/search/SearchExecutionState';
 
-import { QueryValidationState } from '../QueryValidation';
+type ValidationQuery = {
+  queryString: string,
+  timeRange: TimeRange,
+  streams: Array<string>,
+  parameters: Array<Parameter>,
+  parameterBindings: ParameterBindings,
+  filter: string,
+}
 
-const validateQuery = ({ queryString, timeRange, streams, parameters, parameterBindings, filter }) => {
+export type QueryValidationState = {
+  status: 'OK' | 'ERROR' | 'WARNING',
+  explanations: Array<{
+    errorType: string,
+    errorMessage: string,
+    beginLine: number,
+    endLine: number,
+    beginColumn: number,
+    endColumn: number,
+  }> | undefined
+}
+
+export const validateQuery = ({
+  queryString,
+  timeRange,
+  streams,
+  parameters,
+  parameterBindings,
+  filter,
+}: ValidationQuery): Promise<QueryValidationState> => {
   const payload = {
     query: queryString,
     timerange: timeRange,
@@ -40,23 +68,25 @@ const validateQuery = ({ queryString, timeRange, streams, parameters, parameterB
 
   return fetch('POST', qualifyUrl('/search/validate'), payload).then((result) => {
     if (result) {
+      const explanations = result.explanations?.map(({
+        error_type: errorType,
+        error_message: errorMessage,
+        begin_line: beginLine,
+        end_line: endLine,
+        begin_column: beginColumn,
+        end_column: endColumn,
+      }) => ({
+        errorMessage,
+        errorType,
+        beginLine: beginLine ? beginLine - 1 : 0,
+        endLine: endLine ? endLine - 1 : 0,
+        beginColumn,
+        endColumn,
+      }));
+
       return ({
         status: result.status,
-        explanations: result.explanations?.map(({
-          error_type: errorType,
-          error_message: errorMessage,
-          begin_line: beginLine,
-          end_line: endLine,
-          begin_column: beginColumn,
-          end_column: endColumn,
-        }) => ({
-          errorMessage,
-          errorType,
-          beginLine: beginLine ? beginLine - 1 : 0,
-          endLine: endLine ? endLine - 1 : 0,
-          beginColumn,
-          endColumn,
-        })),
+        explanations,
       });
     }
 
