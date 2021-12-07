@@ -59,28 +59,28 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "is_leader")
     private Boolean isLeader;
 
-    @Parameter(value = "password_secret", required = true, validator = StringNotBlankValidator.class)
+    @Parameter(value = "password_secret", required = true, validators = StringNotBlankValidator.class)
     private String passwordSecret;
 
-    @Parameter(value = "output_batch_size", required = true, validator = PositiveIntegerValidator.class)
+    @Parameter(value = "output_batch_size", required = true, validators = PositiveIntegerValidator.class)
     private int outputBatchSize = 500;
 
-    @Parameter(value = "output_flush_interval", required = true, validator = PositiveIntegerValidator.class)
+    @Parameter(value = "output_flush_interval", required = true, validators = PositiveIntegerValidator.class)
     private int outputFlushInterval = 1;
 
-    @Parameter(value = "outputbuffer_processors", required = true, validator = PositiveIntegerValidator.class)
+    @Parameter(value = "outputbuffer_processors", required = true, validators = PositiveIntegerValidator.class)
     private int outputBufferProcessors = 3;
 
-    @Parameter(value = "outputbuffer_processor_threads_max_pool_size", required = true, validator = PositiveIntegerValidator.class)
+    @Parameter(value = "outputbuffer_processor_threads_max_pool_size", required = true, validators = PositiveIntegerValidator.class)
     private int outputBufferProcessorThreadsMaxPoolSize = 30;
 
-    @Parameter(value = "outputbuffer_processor_threads_core_pool_size", required = true, validator = PositiveIntegerValidator.class)
+    @Parameter(value = "outputbuffer_processor_threads_core_pool_size", required = true, validators = PositiveIntegerValidator.class)
     private int outputBufferProcessorThreadsCorePoolSize = 3;
 
-    @Parameter(value = "outputbuffer_processor_keep_alive_time", validator = PositiveIntegerValidator.class)
+    @Parameter(value = "outputbuffer_processor_keep_alive_time", validators = PositiveIntegerValidator.class)
     private int outputBufferProcessorKeepAliveTime = 5000;
 
-    @Parameter(value = "node_id_file", validator = NodeIdFileValidator.class)
+    @Parameter(value = "node_id_file", validators = NodeIdFileValidator.class)
     private String nodeIdFile = "/etc/graylog/server/node-id";
 
     @Parameter(value = "root_username")
@@ -102,34 +102,34 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "allow_highlighting")
     private boolean allowHighlighting = false;
 
-    @Parameter(value = "lb_recognition_period_seconds", validator = PositiveIntegerValidator.class)
+    @Parameter(value = "lb_recognition_period_seconds", validators = PositiveIntegerValidator.class)
     private int loadBalancerRecognitionPeriodSeconds = 3;
 
-    @Parameter(value = "lb_throttle_threshold_percentage", validator = PositiveIntegerValidator.class)
+    @Parameter(value = "lb_throttle_threshold_percentage", validators = PositiveIntegerValidator.class)
     private int loadBalancerThrottleThresholdPercentage = 100;
 
-    @Parameter(value = "stream_processing_timeout", validator = PositiveLongValidator.class)
+    @Parameter(value = "stream_processing_timeout", validators = PositiveLongValidator.class)
     private long streamProcessingTimeout = 2000;
 
-    @Parameter(value = "stream_processing_max_faults", validator = PositiveIntegerValidator.class)
+    @Parameter(value = "stream_processing_max_faults", validators = PositiveIntegerValidator.class)
     private int streamProcessingMaxFaults = 3;
 
-    @Parameter(value = "output_module_timeout", validator = PositiveLongValidator.class)
+    @Parameter(value = "output_module_timeout", validators = PositiveLongValidator.class)
     private long outputModuleTimeout = 10000;
 
-    @Parameter(value = "output_fault_count_threshold", validator = PositiveLongValidator.class)
+    @Parameter(value = "output_fault_count_threshold", validators = PositiveLongValidator.class)
     private long outputFaultCountThreshold = 5;
 
-    @Parameter(value = "output_fault_penalty_seconds", validator = PositiveLongValidator.class)
+    @Parameter(value = "output_fault_penalty_seconds", validators = PositiveLongValidator.class)
     private long outputFaultPenaltySeconds = 30;
 
-    @Parameter(value = "stale_master_timeout", validator = PositiveIntegerValidator.class)
+    @Parameter(value = "stale_master_timeout", validators = PositiveIntegerValidator.class)
     private int staleMasterTimeout = 2000;
 
-    @Parameter(value = "ldap_connection_timeout", validator = PositiveIntegerValidator.class)
+    @Parameter(value = "ldap_connection_timeout", validators = PositiveIntegerValidator.class)
     private int ldapConnectionTimeout = 2000;
 
-    @Parameter(value = "alert_check_interval", validator = PositiveIntegerValidator.class)
+    @Parameter(value = "alert_check_interval", validators = PositiveIntegerValidator.class)
     @Deprecated
     private int alertCheckInterval = 60;
 
@@ -143,13 +143,13 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "default_message_output_class")
     private String defaultMessageOutputClass = "";
 
-    @Parameter(value = "dashboard_widget_default_cache_time", validator = PositiveDurationValidator.class)
+    @Parameter(value = "dashboard_widget_default_cache_time", validators = PositiveDurationValidator.class)
     private Duration dashboardWidgetDefaultCacheTime = Duration.seconds(10L);
 
     @Parameter(value = "user_password_default_algorithm")
     private String userPasswordDefaultAlgorithm = "bcrypt";
 
-    @Parameter(value = "user_password_bcrypt_salt_size", validator = PositiveIntegerValidator.class)
+    @Parameter(value = "user_password_bcrypt_salt_size", validators = PositiveIntegerValidator.class)
     private int userPasswordBCryptSaltSize = 10;
 
     @Parameter(value = "content_packs_loader_enabled")
@@ -161,7 +161,7 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "content_packs_auto_install", converter = TrimmedStringSetConverter.class)
     private Set<String> contentPacksAutoInstall = Collections.emptySet();
 
-    @Parameter(value = "index_ranges_cleanup_interval", validator = PositiveDurationValidator.class)
+    @Parameter(value = "index_ranges_cleanup_interval", validators = PositiveDurationValidator.class)
     private Duration indexRangesCleanupInterval = Duration.hours(1L);
 
     @Parameter(value = "trusted_proxies", converter = IPSubnetConverter.class)
