@@ -20,8 +20,7 @@ import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
 import { StoreMock as MockStore } from 'helpers/mocking';
 import mockAction from 'helpers/mocking/MockAction';
 import { SearchActions } from 'views/stores/SearchStore';
-// eslint-disable-next-line import/no-named-default
-import { default as MockQuery } from 'views/logic/queries/Query';
+import MockQuery from 'views/logic/queries/Query';
 import WidgetFocusContext, {
   WidgetEditingState, WidgetFocusingState,
 } from 'views/components/contexts/WidgetFocusContext';
@@ -71,6 +70,8 @@ jest.mock('views/stores/CurrentQueryStore', () => ({
     .build()]),
 }));
 
+jest.mock('views/components/searchbar/queryvalidation/validateQuery', () => () => Promise.resolve({ status: 'OK', explanations: [] }));
+
 describe('SearchBar', () => {
   const config = {
     analysis_disabled_fields: ['full_message', 'message'],
@@ -107,6 +108,8 @@ describe('SearchBar', () => {
 
     const searchButton = await screen.findByTitle('Perform search');
 
+    await waitFor(() => expect(searchButton).not.toBeDisabled());
+
     fireEvent.click(searchButton);
 
     await waitFor(() => expect(SearchActions.refresh).toHaveBeenCalledTimes(1));
@@ -118,7 +121,7 @@ describe('SearchBar', () => {
     const timeRangeButton = screen.getByLabelText('Open Time Range Selector');
     const searchButton = screen.getByTitle('Perform search');
 
-    await waitFor(() => expect(searchButton).toHaveClass('disabled'));
+    await waitFor(() => expect(searchButton).toBeDisabled());
     await waitFor(() => expect(timeRangeButton.firstChild).toHaveClass('fa-exclamation-triangle'));
   });
 
