@@ -25,7 +25,7 @@ import { isFunction } from 'lodash';
 import { onInitializingTimerange, onSubmittingTimerange } from 'views/components/TimerangeForForm';
 import type { SearchBarFormValues } from 'views/Constants';
 import FormWarningsContext from 'contexts/FormWarningsContext';
-import { QueryValidationState } from 'views/components/searchbar/queryvalidation/hooks/useValidateQuery';
+import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 import validate from 'views/components/searchbar/validate';
 
 import DateTimeProvider from './date-time-picker/DateTimeProvider';

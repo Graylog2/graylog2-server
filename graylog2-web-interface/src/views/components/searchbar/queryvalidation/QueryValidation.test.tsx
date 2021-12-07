@@ -24,7 +24,8 @@ import QueryValidation from 'views/components/searchbar/queryvalidation/QueryVal
 import { asMock } from 'helpers/mocking';
 import FormWarningsProvider from 'contexts/FormWarningsProvider';
 import fetch from 'logic/rest/FetchProvider';
-import SearchExecutionState from 'views/logic/search/SearchExecutionState'; import { QueryValidationState } from 'views/components/searchbar/queryvalidation/hooks/useValidateQuery';
+import SearchExecutionState from 'views/logic/search/SearchExecutionState';
+import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 
 jest.mock('views/stores/QueriesStore', () => ({
   QueriesActions: {

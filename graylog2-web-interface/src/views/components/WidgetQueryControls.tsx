@@ -42,9 +42,9 @@ import { PropagateValidationState } from 'views/components/aggregationwizard';
 import QueryValidation from 'views/components/searchbar/queryvalidation/QueryValidation';
 import FormWarningsContext from 'contexts/FormWarningsContext';
 import FormWarningsProvider from 'contexts/FormWarningsProvider';
-import { validateQuery } from 'views/components/searchbar/queryvalidation/hooks/useValidateQuery';
 import useParameters from 'views/hooks/useParameters';
 import debounceWithPromise from 'views/logic/debounceWithPromise';
+import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
 
 import TimeRangeOverrideInfo from './searchbar/WidgetTimeRangeOverride';
 import TimeRangeInput from './searchbar/TimeRangeInput';

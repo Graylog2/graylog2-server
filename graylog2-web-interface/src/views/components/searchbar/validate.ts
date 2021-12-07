@@ -1,6 +1,6 @@
 import { isEmpty } from 'lodash';
 
-import { QueryValidationState } from 'views/components/searchbar/queryvalidation/hooks/useValidateQuery';
+import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 import validateTimeRange from 'views/components/TimeRangeValidation'; import { TimeRange } from 'views/logic/queries/Query';
 
 type FormValues = {

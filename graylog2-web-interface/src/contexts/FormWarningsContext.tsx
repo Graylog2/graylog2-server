@@ -17,7 +17,7 @@
 import * as React from 'react';
 
 import { singleton } from 'logic/singleton';
-import { QueryValidationState } from 'views/components/searchbar/queryvalidation/hooks/useValidateQuery';
+import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 
 type Warnings = {
   queryString?: QueryValidationState,

@@ -28,7 +28,7 @@ import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
 import QueryValidationActions from 'views/actions/QueryValidationActions';
 import FormWarningsContext from 'contexts/FormWarningsContext';
-import { QueryValidationState } from 'views/components/searchbar/queryvalidation/hooks/useValidateQuery';
+import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 
 const Container = styled.div`
   margin-right: 5px;

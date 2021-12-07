@@ -23,7 +23,7 @@ import type { FormikProps } from 'formik';
 
 import type { TimeRange } from 'views/logic/queries/Query';
 import FormWarningsContext from 'contexts/FormWarningsContext';
-import { QueryValidationState } from 'views/components/searchbar/queryvalidation/hooks/useValidateQuery';
+import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 import validate from 'views/components/searchbar/validate';
 
 import { onInitializingTimerange, onSubmittingTimerange } from './TimerangeForForm';

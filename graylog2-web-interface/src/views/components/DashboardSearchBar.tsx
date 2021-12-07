@@ -40,8 +40,8 @@ import QueryValidation from 'views/components/searchbar/queryvalidation/QueryVal
 import FormWarningsContext from 'contexts/FormWarningsContext';
 import FormWarningsProvider from 'contexts/FormWarningsProvider';
 import useParameters from 'views/hooks/useParameters';
-import { validateQuery } from 'views/components/searchbar/queryvalidation/hooks/useValidateQuery';
 import debounceWithPromise from 'views/logic/debounceWithPromise';
+import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
 
 import TimeRangeInput from './searchbar/TimeRangeInput';
 import DashboardSearchForm, { DashboardFormValues } from './DashboardSearchBarForm';

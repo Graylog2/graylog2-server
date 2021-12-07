@@ -49,9 +49,9 @@ import type { SearchBarFormValues } from 'views/Constants';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import FormWarningsContext from 'contexts/FormWarningsContext';
 import FormWarningsProvider from 'contexts/FormWarningsProvider';
-import { validateQuery } from 'views/components/searchbar/queryvalidation/hooks/useValidateQuery';
 import useParameters from 'views/hooks/useParameters';
 import debounceWithPromise from 'views/logic/debounceWithPromise';
+import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
 
 import SearchBarForm from './searchbar/SearchBarForm';
 
