@@ -61,9 +61,15 @@ ConfirmDialog.propTypes = {
     PropTypes.element,
   ]).isRequired,
   /** Text to use in the cancel button. */
-  btnCancelText: PropTypes.string,
-  /** Text to use in the confirmation button. */
-  btnConfirmText: PropTypes.string,
+  btnCancelText: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.element,
+  ]),
+  /** Text or element to use in the confirmation button. */
+  btnConfirmText: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.element,
+  ]),
   /** Indicates whether the cancel button should be disabled or not. */
   btnCancelDisabled: PropTypes.bool,
   /** Indicates whether the confirm button should be disabled or not. */
