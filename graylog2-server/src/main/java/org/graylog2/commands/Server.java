@@ -258,7 +258,7 @@ public class Server extends ServerBootstrap {
         private final GracefulShutdown gracefulShutdown;
         private final AuditEventSender auditEventSender;
         private final Journal journal;
-        private Service leaderElectionService;
+        private final Service leaderElectionService;
 
         @Inject
         public ShutdownHook(ActivityWriter activityWriter,
