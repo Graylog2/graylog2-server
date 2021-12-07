@@ -27,6 +27,7 @@ import org.graylog2.inputs.extractors.ExtractorException;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.database.EmbeddedPersistable;
 import org.graylog2.shared.utilities.ExceptionUtils;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -265,6 +266,15 @@ public abstract class Extractor implements EmbeddedPersistable {
                 }
 
                 runConverters(msg);
+
+                // The extractor / converter might have failed to build a valid timestamp.
+                // In this case we run msg#addField() to log this error and fallback to a current date.
+                if (targetField.equals(FIELD_TIMESTAMP)) {
+                    final Object timestampValue = msg.getField(FIELD_TIMESTAMP);
+                    if (!(timestampValue instanceof DateTime)) {
+                        msg.addField(FIELD_TIMESTAMP, timestampValue);
+                    }
+                }
             }
         }
     }
@@ -289,8 +299,11 @@ public abstract class Extractor implements EmbeddedPersistable {
                     final Object convertedValue = converter.convert((String) msg.getField(targetField));
                     if (!converter.buildsMultipleFields()) {
                         // We have arrived here if no exception was thrown and can safely replace the original field.
-                        msg.removeField(targetField);
-                        msg.addField(targetField, convertedValue);
+                        if (convertedValue == null) {
+                            msg.removeField(targetField);
+                        } else {
+                            msg.addField(targetField, convertedValue);
+                        }
                     } else if (convertedValue instanceof Map) {
                         @SuppressWarnings("unchecked")
                         final Map<String, Object> additionalFields = new HashMap<>((Map<String, Object>) convertedValue);

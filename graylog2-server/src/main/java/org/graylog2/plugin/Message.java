@@ -443,7 +443,7 @@ public class Message implements Messages, Indexable {
             }
             obj.put(FIELD_GL2_PROCESSING_ERROR,
                     processingErrors.stream()
-                            .map(ProcessingError::getDetails)
+                            .map(pe -> pe.getMessage() + " - " + pe.getDetails())
                             .collect(Collectors.joining(", ")));
         }
 
