@@ -32,10 +32,10 @@ import { ParameterBindings } from 'views/logic/search/SearchExecutionState';
 type ValidationQuery = {
   queryString: ElasticsearchQueryString | string,
   timeRange: TimeRange | NoTimeRangeOverride,
-  streams: Array<string>,
+  streams?: Array<string>,
   parameters: Immutable.Set<Parameter>,
   parameterBindings: ParameterBindings,
-  filter: ElasticsearchQueryString | string,
+  filter?: ElasticsearchQueryString | string,
 }
 
 export type QueryValidationState = {

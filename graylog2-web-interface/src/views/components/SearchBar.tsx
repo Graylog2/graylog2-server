@@ -15,12 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useCallback } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import { Field } from 'formik';
 import styled from 'styled-components';
 import moment from 'moment';
-import { useIsFetching } from 'react-query';
 
 import connect from 'stores/connect';
 import DocumentationLink from 'components/support/DocumentationLink';
@@ -49,6 +49,8 @@ import type { SearchBarFormValues } from 'views/Constants';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import FormWarningsContext from 'contexts/FormWarningsContext';
 import FormWarningsProvider from 'contexts/FormWarningsProvider';
+import { validateQuery } from 'views/components/searchbar/queryvalidation/hooks/useValidateQuery';
+import useParameters from 'views/hooks/useParameters';
 
 import SearchBarForm from './searchbar/SearchBarForm';
 
@@ -111,7 +113,18 @@ const SearchBar = ({
   queryFilters,
   onSubmit = defaultProps.onSubmit,
 }: Props) => {
-  const isValidatingQuery = !!useIsFetching('validateSearchQuery');
+  const { parameterBindings, parameters } = useParameters();
+  const _validateQueryString = useCallback((values: SearchBarFormValues) => {
+    const request = {
+      timeRange: values?.timerange,
+      streams: values?.streams,
+      queryString: values?.queryString,
+      parameterBindings,
+      parameters,
+    };
+
+    return validateQuery(request);
+  }, [parameterBindings, parameters]);
 
   if (!currentQuery || !config) {
     return <Spinner />;
@@ -133,8 +146,9 @@ const SearchBar = ({
             <FormWarningsProvider>
               <SearchBarForm initialValues={{ timerange, streams, queryString }}
                              limitDuration={limitDuration}
-                             onSubmit={_onSubmit}>
-                {({ dirty, errors, isSubmitting, isValid, handleSubmit, values, setFieldValue }) => (
+                             onSubmit={_onSubmit}
+                             validateQueryString={_validateQueryString}>
+                {({ dirty, errors, isSubmitting, isValid, isValidating, handleSubmit, values, setFieldValue }) => (
                   <>
                     <TopRow>
                       <Col md={5}>
@@ -170,7 +184,7 @@ const SearchBar = ({
 
                     <BottomRow>
                       <SearchButtonAndQuery>
-                        <SearchButton disabled={disableSearch || isSubmitting || isValidatingQuery || !isValid}
+                        <SearchButton disabled={disableSearch || isSubmitting || isValidating || !isValid}
                                       dirty={dirty} />
 
                         <Field name="queryString">

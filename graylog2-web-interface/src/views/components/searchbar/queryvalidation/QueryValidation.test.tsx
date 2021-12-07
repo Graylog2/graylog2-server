@@ -20,11 +20,11 @@ import userEvent from '@testing-library/user-event';
 import * as Immutable from 'immutable';
 import { Form, Formik } from 'formik';
 
-import QueryValidation, { QueryValidationState } from 'views/components/searchbar/queryvalidation/QueryValidation';
+import QueryValidation from 'views/components/searchbar/queryvalidation/QueryValidation';
 import { asMock } from 'helpers/mocking';
 import FormWarningsProvider from 'contexts/FormWarningsProvider';
 import fetch from 'logic/rest/FetchProvider';
-import SearchExecutionState from 'views/logic/search/SearchExecutionState';
+import SearchExecutionState from 'views/logic/search/SearchExecutionState'; import { QueryValidationState } from 'views/components/searchbar/queryvalidation/hooks/useValidateQuery';
 
 jest.mock('views/stores/QueriesStore', () => ({
   QueriesActions: {
