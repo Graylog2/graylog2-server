@@ -52,6 +52,7 @@ jest.mock('views/stores/SearchConfigStore', () => ({
 }));
 
 jest.mock('views/components/searchbar/queryvalidation/validateQuery', () => () => Promise.resolve({ status: 'OK', explanations: [] }));
+jest.mock('views/logic/debounceWithPromise', () => (fn: any) => fn);
 
 const config = {
   analysis_disabled_fields: ['full_message', 'message'],

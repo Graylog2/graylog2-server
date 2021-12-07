@@ -71,6 +71,7 @@ jest.mock('views/stores/CurrentQueryStore', () => ({
 }));
 
 jest.mock('views/components/searchbar/queryvalidation/validateQuery', () => jest.fn(() => Promise.resolve({ status: 'OK', explanations: [] })));
+jest.mock('views/logic/debounceWithPromise', () => (fn: any) => fn);
 
 describe('SearchBar', () => {
   const config = {
