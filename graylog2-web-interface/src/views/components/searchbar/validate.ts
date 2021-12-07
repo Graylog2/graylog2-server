@@ -23,7 +23,6 @@ const validate = async <T extends FormValues>(
   }
 
   const queryValidation = await validateQueryString(values);
-  console.log({ queryValidation });
 
   if (queryValidation?.status === 'OK') {
     setFieldWarning('queryString', undefined);
