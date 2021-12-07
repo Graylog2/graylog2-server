@@ -105,7 +105,7 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
         if (!pathChecker.fileIsInAllowedPath(Paths.get(config.path()))) {
             throw new IllegalStateException(ALLOWED_PATH_ERROR);
         }
-        if (config.hasOverridePath() && !pathChecker.fileIsInAllowedPath(Paths.get(config.overridePath()))) {
+        if (config.canBeOverridden() && !pathChecker.fileIsInAllowedPath(Paths.get(Objects.requireNonNull(config.overridePath())))) {
             throw new IllegalStateException(ALLOWED_PATH_ERROR);
         }
         if (config.checkInterval() < 1) {
@@ -115,7 +115,7 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
         // Set file info before parsing the data for the first time
         fileInfo = FileInfo.forPath(Paths.get(config.path()));
         // if no override path is set just leave the file info empty
-        if (config.hasOverridePath()) {
+        if (config.canBeOverridden()) {
             overrideFileInfo = FileInfo.forPath(Paths.get(Objects.requireNonNull(config.overridePath())));
         }
         populateLookupRefs();
@@ -135,7 +135,7 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
         }
 
         // if an override path exists, confirm it is a legal path
-        if (config.hasOverridePath() && !pathChecker.fileIsInAllowedPath(Paths.get(Objects.requireNonNull(config.overridePath())))) {
+        if (config.canBeOverridden() && !pathChecker.fileIsInAllowedPath(Paths.get(Objects.requireNonNull(config.overridePath())))) {
             LOG.error(ALLOWED_PATH_ERROR);
             setError(new IllegalStateException(ALLOWED_PATH_ERROR));
             return;
@@ -144,7 +144,7 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
         try {
             final FileInfo.Change fileChanged = fileInfo.checkForChange();
             final FileInfo.Change overrideFileChanged =
-                    config.hasOverridePath() ? overrideFileInfo.checkForChange() : FileInfo.Change.none();
+                    config.canBeOverridden() ? overrideFileInfo.checkForChange() : FileInfo.Change.none();
             if (!fileChanged.isChanged() && !overrideFileChanged.isChanged() && !getError().isPresent()) {
                 // Nothing to do, file did not change
                 return;
@@ -159,8 +159,13 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
 
             populateLookupRefs();
             cachePurge.purgeAll();
-            fileInfo = fileChanged.fileInfo();
-            overrideFileInfo = overrideFileChanged.fileInfo();
+            // ensure the FileInfo objects need to be updated, otherwise results in a null pointer
+            if (fileChanged.isChanged()) {
+                fileInfo = fileChanged.fileInfo();
+            }
+            if (overrideFileChanged.isChanged()) {
+                overrideFileInfo = overrideFileChanged.fileInfo();
+            }
             clearError();
         } catch (IOException e) {
             LOG.error("Couldn't check data adapter <{}> CSV file {} for updates: {} {}", name(), config.path(), e.getClass().getCanonicalName(), e.getMessage());
@@ -226,7 +231,7 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
             lookupRef.set(parseCSVFile(fileReader));
         }
 
-        if (config.hasOverridePath()) {
+        if (config.canBeOverridden()) {
             // if this is an Illuminate CSVFileDataAdapter with an override, populate the lookup with the override data
             try (final InputStream overrideInputStream = Files.newInputStream(Paths.get(Objects.requireNonNull(config.overridePath())));
                  final InputStreamReader overrideFileReader = new InputStreamReader(overrideInputStream, StandardCharsets.UTF_8)) {
@@ -246,7 +251,7 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
 
         // if an override exists, try to get the value from the override first
         String value = null;
-        if (config.hasOverridePath()) {
+        if (config.canBeOverridden()) {
             value = overrideLookupRef.get().get(stringKey);
         }
         if (value != null) {
@@ -383,7 +388,7 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
                 errors.put(PATH_FIELD, "The file cannot be read.");
             }
 
-            if (hasOverridePath()) {
+            if (canBeOverridden()) {
                 final Path overridePath = Paths.get(Objects.requireNonNull(overridePath()));
                 if (!context.getPathChecker().fileIsInAllowedPath(overridePath)) {
                     errors.put(PATH_OVERRIDE_FIELD, ALLOWED_PATH_ERROR);
@@ -399,7 +404,7 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
             return errors.isEmpty() ? Optional.empty() : Optional.of(errors);
         }
 
-        public boolean hasOverridePath() {
+        public boolean canBeOverridden() {
 
             return overridePath() != null && !overridePath().isEmpty();
         }
