@@ -117,7 +117,7 @@ public class NodePingThread extends Periodical {
     }
 
     @Override
-    public boolean masterOnly() {
+    public boolean leaderOnly() {
         return false;
     }
 

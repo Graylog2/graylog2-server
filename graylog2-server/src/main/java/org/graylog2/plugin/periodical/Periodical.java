@@ -39,12 +39,27 @@ public abstract class Periodical implements Runnable {
     /**
      * Only start this thread on master nodes?
      *
-     * @return
+     * @deprecated Use {@link #leaderOnly()} instead.
      */
-    public abstract boolean masterOnly();
+    @Deprecated
+    public boolean masterOnly() {
+        return false;
+    }
+
+    /**
+     * Determines if this periodical should run only on the leader node.
+     *
+     * @return {@code false} (default) if this periodical may run on every node. {@code true} if it may run only on the
+     * leader node
+     */
+    public boolean leaderOnly() {
+        // Defaulting to the now deprecated original method to not break existing implementations.
+        return masterOnly();
+    }
 
     /**
      * Start on this node? Useful to decide if to start the periodical based on local configuration.
+     *
      * @return
      */
     public abstract boolean startOnThisNode();
