@@ -49,7 +49,6 @@ import java.util.Set;
  */
 @SuppressWarnings("FieldMayBeFinal")
 public class Configuration extends BaseConfiguration {
-    @Deprecated
     @Parameter(value = "is_master")
     private boolean isMaster = true;
 
