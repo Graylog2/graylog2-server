@@ -26,6 +26,7 @@ import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.QueryVisitor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class LuceneQueryParser {
@@ -39,8 +40,8 @@ public class LuceneQueryParser {
         final Query parsed = parser.parse(query);
         final ParsedQuery.Builder builder = ParsedQuery.builder().query(query);
 
-        final List<Token> tokens = this.parser.getTokens();
-        builder.tokensBuilder().addAll(tokens);
+        final List<Token> availableTokens = new ArrayList<>(this.parser.getTokens());
+        builder.tokensBuilder().addAll(availableTokens);
 
         parsed.visit(new QueryVisitor() {
             @Override
@@ -54,20 +55,22 @@ public class LuceneQueryParser {
                             .value(t.text());
 
                     if (field.equals(ParsedTerm.DEFAULT_FIELD)) {
-                        tokens.stream()
+                        availableTokens.stream()
                                 .filter(token -> token.kind == QueryParserConstants.TERM)
                                 .filter(token -> token.image.equals(t.text()))
                                 .findFirst()
                                 .ifPresent(token -> {
                                     termBuilder.tokensBuilder().add(token);
+                                    availableTokens.remove(token);
                                 });
                     } else {
-                        tokens.stream()
+                        availableTokens.stream()
                                 .filter(token -> token.kind == QueryParserConstants.TERM)
                                 .filter(token -> token.image.equals(field))
                                 .findFirst()
                                 .ifPresent(token -> {
                                     termBuilder.tokensBuilder().add(token);
+                                    availableTokens.remove(token);
                                 });
                     }
                     builder.termsBuilder().add(termBuilder.build());

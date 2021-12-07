@@ -92,4 +92,10 @@ class LuceneQueryParserTest {
             assertThat(invalidOperator.value()).isEqualTo("or");
         }
     }
+
+    @Test
+    void testRepeatedInvalidTokens() throws ParseException {
+        final ParsedQuery query = parser.parse("foo:bar and lorem:ipsum and dolor:sit");
+        assertThat(query.invalidOperators().size()).isEqualTo(2);
+    }
 }
