@@ -533,9 +533,9 @@ public class Message implements Messages, Indexable {
         addField(key, value, true);
     }
 
-    // Band-aid fix for #11495 - we should redesign the way extractors are executed, so they don't use
-    // the generic addField; because it leads to bugs when we make seemingly harmless changes to addField.
-    public void setTimeFieldAsString (final String value) {
+    // Set the timestamp field without performing a conversion or fallback to the current time.
+    // This is needed by Extractors so they can use their own DateConverter. (cf #11495)
+    public void setTimeFieldAsString(final String value) {
         final String str = value.trim();
         if (!str.isEmpty()) {
             final Object previousValue = fields.put(FIELD_TIMESTAMP, str);

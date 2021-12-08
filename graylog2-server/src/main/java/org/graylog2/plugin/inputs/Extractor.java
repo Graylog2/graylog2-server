@@ -279,7 +279,8 @@ public abstract class Extractor implements EmbeddedPersistable {
         }
     }
 
-    // Special treatment of TIMESTAMP required due to #11495
+    // Don't use addField when assigning timestamps.
+    // We have to delay the conversion, because the converters expect this field as a String. (cf #11495)
     private void addField(Message msg, final String key, final Object value) {
         if (key.trim().equals(FIELD_TIMESTAMP) && value instanceof String) {
             msg.setTimeFieldAsString((String) value);
