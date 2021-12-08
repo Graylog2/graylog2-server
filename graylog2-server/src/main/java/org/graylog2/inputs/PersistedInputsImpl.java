@@ -111,15 +111,6 @@ public class PersistedInputsImpl implements PersistedInputs {
 
     @Override
     public boolean update(String id, MessageInput newInput) {
-        return update(id, newInput, true);
-    }
-
-    @Override
-    public boolean saveWithoutEvents(String id, MessageInput newInput) {
-        return update(id, newInput, false);
-    }
-
-    private boolean update(String id, MessageInput newInput, boolean fireEvents) {
         try {
             final Input oldInput = inputService.find(id);
             newInput.setPersistId(id);
@@ -128,11 +119,7 @@ public class PersistedInputsImpl implements PersistedInputs {
             final List<Extractor> extractors = inputService.getExtractors(oldInput);
             final Map<String, String> staticFields = oldInput.getStaticFields();
 
-            if (fireEvents) {
-                inputService.save(mongoInput);
-            } else {
-                inputService.saveWithoutEvents(mongoInput);
-            }
+            inputService.save(mongoInput);
 
             for (Map.Entry<String, String> entry : staticFields.entrySet()) {
                 inputService.addStaticField(mongoInput, entry.getKey(), entry.getValue());
@@ -149,7 +136,7 @@ public class PersistedInputsImpl implements PersistedInputs {
     }
 
 
-    private Input getInput(MessageInput input) throws ValidationException {
+    private Input getInput(MessageInput input) {
         // Build MongoDB data
         final Map<String, Object> inputData = input.asMap();
 

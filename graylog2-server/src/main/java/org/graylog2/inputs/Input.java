@@ -45,5 +45,6 @@ public interface Input extends Persisted {
         return IOState.Type.RUNNING.toString();
     }
 
+    // Must provide a default to avoid breaking compat to existing forwarders by modifying ForwarderInput
     default void setDesiredState(String desiredState){}
 }
