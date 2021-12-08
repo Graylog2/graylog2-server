@@ -40,6 +40,7 @@ class IntegrationEnvironment extends JSDomEnvironment {
     api.get(`${prefix}dashboards`, (req, res) => res.json([]));
     api.get(`${prefix}search/decorators/available`, (req, res) => res.json({}));
     api.get(`${prefix}search/decorators`, (req, res) => res.json([]));
+    api.get(`${prefix}search/validate`, (req, res) => res.json({ status: 'OK', explanations: [] }));
     api.get(`${prefix}streams`, (req, res) => res.json({ total: 0, streams: [] }));
     api.get(`${prefix}system`, (req, res) => res.json({}));
     api.get(`${prefix}system/gettingstarted`, (req, res) => res.json({ show: false }));
