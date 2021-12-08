@@ -29,9 +29,17 @@ public interface Node extends Persisted {
 
     @Deprecated
     /**
-     * @deprecated Try not to rely on a leader, or use {@link LeaderElectionService#isLeader()} instead.
+     * @deprecated Use {@link LeaderElectionService#isLeader()} or {@link #isLeader()} instead.
      */
-    boolean isMaster();
+    default boolean isMaster() {
+        return isLeader();
+    }
+
+    /**
+     * Returns the current leader status of the node. This is only informational and should be used with care. To
+     * determine if the current node is acting as leader, use {@link LeaderElectionService#isLeader()} instead.
+     */
+    boolean isLeader();
 
     String getTransportAddress();
 

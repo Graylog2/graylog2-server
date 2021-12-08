@@ -200,7 +200,7 @@ public abstract class ProxiedResource extends RestResource {
             Function<String, Optional<RemoteInterfaceType>> remoteInterfaceProvider
     ) throws IOException {
         final Node masterNode = nodeService.allActive().values().stream()
-                .filter(Node::isMaster)
+                .filter(Node::isLeader)
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("No active master node found"));
 

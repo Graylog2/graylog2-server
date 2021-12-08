@@ -223,14 +223,14 @@ public class Server extends ServerBootstrap {
                 httpConfiguration.getHttpPublishUri(),
                 Tools.getLocalCanonicalHostname());
         serverStatus.setLocalMode(isLocal());
-        if (leaderElectionService.isLeader() && !nodeService.isOnlyMaster(serverStatus.getNodeId())) {
+        if (leaderElectionService.isLeader() && !nodeService.isOnlyLeader(serverStatus.getNodeId())) {
             LOG.warn("Detected another leader in the cluster. Retrying in {} seconds to make sure it is not "
                     + "an old stale instance.", TimeUnit.MILLISECONDS.toSeconds(configuration.getStaleLeaderTimeout()));
             try {
                 Thread.sleep(configuration.getStaleLeaderTimeout());
             } catch (InterruptedException e) { /* nope */ }
 
-            if (!nodeService.isOnlyMaster(serverStatus.getNodeId())) {
+            if (!nodeService.isOnlyLeader(serverStatus.getNodeId())) {
                 // All devils here.
                 String what = "Detected other master node in the cluster! Starting as non-master! "
                         + "This is a mis-configuration you should fix.";

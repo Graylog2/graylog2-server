@@ -86,7 +86,7 @@ public class ClusterDeflectorResource extends ProxiedResource {
 
     private Node findMasterNode() {
         return nodeService.allActive().values().stream()
-                .filter(Node::isMaster)
+                .filter(Node::isLeader)
                 .findFirst()
                 .orElseThrow(() -> new ServiceUnavailableException("No master present."));
     }
