@@ -443,7 +443,7 @@ public class Message implements Messages, Indexable {
             }
             obj.put(FIELD_GL2_PROCESSING_ERROR,
                     processingErrors.stream()
-                            .map(ProcessingError::getDetails)
+                            .map(pe -> pe.getMessage() + " - " + pe.getDetails())
                             .collect(Collectors.joining(", ")));
         }
 
@@ -531,6 +531,16 @@ public class Message implements Messages, Indexable {
 
     private void addRequiredField(final String key, final Object value) {
         addField(key, value, true);
+    }
+
+    // Set the timestamp field without performing a conversion or fallback to the current time.
+    // This is needed by Extractors so they can use their own DateConverter. (cf #11495)
+    public void setTimeFieldAsString(final String value) {
+        final String str = value.trim();
+        if (!str.isEmpty()) {
+            final Object previousValue = fields.put(FIELD_TIMESTAMP, str);
+            updateSize(FIELD_TIMESTAMP, str, previousValue);
+        }
     }
 
     private void addField(final String key, final Object value, final boolean isRequiredField) {
