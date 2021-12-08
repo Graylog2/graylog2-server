@@ -50,7 +50,7 @@
     "@openfonts/roboto-mono_latin": "^1.44.1",
     "@react-bootstrap/pagination": "^1.0.0",
     "@types/react-color": "^3.0.5",
-    "ace-builds": "1.4.12",
+    "ace-builds": "1.4.13",
     "bluebird": "^3.4.0",
     "bootstrap": "3.4.1",
     "bson-objectid": "^1.2.5",
