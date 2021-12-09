@@ -78,10 +78,10 @@ public class QueryValidationServiceImpl implements QueryValidationService {
                     .errorMessage("Query contains unknown field: " + f.getRealFieldName());
 
             f.tokens().stream().findFirst().ifPresent(t -> {
-                message.beginLine(t.beginLine);
-                message.beginColumn(t.beginColumn);
-                message.endLine(t.endLine);
-                message.endColumn(t.endColumn);
+                message.beginLine(t.beginLine());
+                message.beginColumn(t.beginColumn());
+                message.endLine(t.endLine());
+                message.endColumn(t.endColumn());
             });
 
             return message.build();
@@ -95,10 +95,10 @@ public class QueryValidationServiceImpl implements QueryValidationService {
                             .errorType("Invalid operator")
                             .errorMessage(errorMessage);
                     token.tokens().stream().findFirst().ifPresent(t -> {
-                        message.beginLine(t.beginLine);
-                        message.beginColumn(t.beginColumn);
-                        message.endLine(t.endLine);
-                        message.endColumn(t.endColumn);
+                        message.beginLine(t.beginLine());
+                        message.beginColumn(t.beginColumn());
+                        message.endLine(t.endLine());
+                        message.endColumn(t.endColumn());
                     });
                     return message.build();
                 })

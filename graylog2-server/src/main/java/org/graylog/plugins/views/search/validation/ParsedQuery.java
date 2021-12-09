@@ -31,7 +31,7 @@ public abstract class ParsedQuery {
     public abstract String query();
 
     public abstract ImmutableList<ParsedTerm> terms();
-    public abstract ImmutableList<Token> tokens();
+    public abstract ImmutableList<ImmutableToken> tokens();
 
     public static ParsedQuery.Builder builder() {
         return new AutoValue_ParsedQuery.Builder();
@@ -57,7 +57,7 @@ public abstract class ParsedQuery {
 
         public abstract ImmutableList.Builder<ParsedTerm> termsBuilder();
 
-        public abstract ImmutableList.Builder<Token> tokensBuilder();
+        public abstract ImmutableList.Builder<ImmutableToken> tokensBuilder();
 
         public abstract ParsedQuery build();
     }

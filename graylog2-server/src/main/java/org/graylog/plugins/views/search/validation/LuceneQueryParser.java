@@ -34,13 +34,14 @@ public class LuceneQueryParser {
 
     public LuceneQueryParser() {
         this.parser = new TermCollectingQueryParser(ParsedTerm.DEFAULT_FIELD, new StandardAnalyzer());
+        this.parser.setSplitOnWhitespace(true);
     }
 
     public ParsedQuery parse(final String query) throws ParseException {
         final Query parsed = parser.parse(query);
         final ParsedQuery.Builder builder = ParsedQuery.builder().query(query);
 
-        final List<Token> availableTokens = new ArrayList<>(this.parser.getTokens());
+        final List<ImmutableToken> availableTokens = new ArrayList<>(this.parser.getTokens());
         builder.tokensBuilder().addAll(availableTokens);
 
         parsed.visit(new QueryVisitor() {
@@ -56,8 +57,7 @@ public class LuceneQueryParser {
 
                     if (field.equals(ParsedTerm.DEFAULT_FIELD)) {
                         availableTokens.stream()
-                                .filter(token -> token.kind == QueryParserConstants.TERM)
-                                .filter(token -> token.image.equals(t.text()))
+                                .filter(token -> token.matches(QueryParserConstants.TERM, t.text()))
                                 .findFirst()
                                 .ifPresent(token -> {
                                     termBuilder.tokensBuilder().add(token);
@@ -65,8 +65,8 @@ public class LuceneQueryParser {
                                 });
                     } else {
                         availableTokens.stream()
-                                .filter(token -> token.kind == QueryParserConstants.TERM)
-                                .filter(token -> token.image.equals(field))
+                                .filter(token -> token.kind() == QueryParserConstants.TERM)
+                                .filter(token -> token.image().equals(field))
                                 .findFirst()
                                 .ifPresent(token -> {
                                     termBuilder.tokensBuilder().add(token);
