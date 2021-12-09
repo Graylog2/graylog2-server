@@ -17,10 +17,11 @@
 import { isEmpty } from 'lodash';
 
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
-import validateTimeRange from 'views/components/TimeRangeValidation'; import { TimeRange } from 'views/logic/queries/Query';
+import validateTimeRange from 'views/components/TimeRangeValidation';
+import { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 
 type FormValues = {
-  timerange: TimeRange,
+  timerange: TimeRange | NoTimeRangeOverride,
 }
 
 const validate = async <T extends FormValues>(

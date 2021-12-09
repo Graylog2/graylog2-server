@@ -25,6 +25,7 @@ import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import FormWarningsContext from 'contexts/FormWarningsContext';
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 import validate from 'views/components/searchbar/validate';
+import { isNoTimeRangeOverride } from 'views/typeGuards/timeRange';
 
 import { onInitializingTimerange, onSubmittingTimerange } from './TimerangeForForm';
 import DateTimeProvider from './searchbar/date-time-picker/DateTimeProvider';
@@ -47,12 +48,12 @@ const _isFunction = (children: Props['children']): children is (props: FormikPro
 const DashboardSearchForm = ({ initialValues, limitDuration, onSubmit, validateQueryString, children }: Props) => {
   const _onSubmit = useCallback(({ timerange, queryString }: DashboardFormValues) => {
     return onSubmit({
-      timerange: Object.keys(timerange).length ? onSubmittingTimerange(timerange) : undefined,
+      timerange: isNoTimeRangeOverride(timerange) ? undefined : onSubmittingTimerange(timerange),
       queryString,
     });
   }, [onSubmit]);
   const { timerange, queryString } = initialValues;
-  const initialTimeRange = timerange ? onInitializingTimerange(timerange) : {} as TimeRange;
+  const initialTimeRange = timerange && !isNoTimeRangeOverride(timerange) ? onInitializingTimerange(timerange) : {} as TimeRange;
   const _initialValues = {
     timerange: initialTimeRange,
     nextTimeRange: initialTimeRange,
