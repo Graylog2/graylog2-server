@@ -32,7 +32,7 @@ public abstract class ParsedTerm {
 
     public abstract String value();
 
-    public abstract ImmutableList<Token> tokens();
+    public abstract ImmutableList<ImmutableToken> tokens();
 
     public static ParsedTerm create(final String field, final String value) {
         return builder().field(field).value(value).build();
@@ -71,7 +71,7 @@ public abstract class ParsedTerm {
     public abstract static class Builder {
         public abstract Builder field(@NotNull String field);
         public abstract Builder value(@NotNull String value);
-        public abstract ImmutableList.Builder<Token> tokensBuilder();
+        public abstract ImmutableList.Builder<ImmutableToken> tokensBuilder();
         public abstract ParsedTerm build();
     }
 }
