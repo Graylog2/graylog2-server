@@ -76,7 +76,7 @@ public class KeyValue extends AbstractFunction<Map<String, String>> {
         final CharMatcher kvPairsMatcher = splitParam.optional(args, context).orElse(CharMatcher.whitespace());
         final CharMatcher kvDelimMatcher = valueSplitParam.optional(args, context).orElse(CharMatcher.anyOf("="));
 
-        Splitter outerSplitter = Splitter.on(kvPairsMatcher)
+        Splitter outerSplitter = Splitter.on(DelimiterCharMatcher.withQuoteHandling(kvPairsMatcher))
                 .omitEmptyStrings()
                 .trimResults();
 
@@ -113,6 +113,35 @@ public class KeyValue extends AbstractFunction<Map<String, String>> {
                 .build();
     }
 
+    private static class DelimiterCharMatcher extends CharMatcher {
+        private final char wrapperChar;
+
+        private boolean inWrapper = false;
+
+        /**
+         * An implementation that doesn't split when the given delimiter char matcher appears in double or single quotes.
+         *
+         * @param charMatcher the char matcher
+         * @return a char matcher that can handle double and single quotes
+         */
+        static CharMatcher withQuoteHandling(CharMatcher charMatcher) {
+            return new DelimiterCharMatcher('"')
+                    .and(new DelimiterCharMatcher('\''))
+                    .and(charMatcher);
+        }
+
+        private DelimiterCharMatcher(char wrapperChar) {
+            this.wrapperChar = wrapperChar;
+        }
+
+        @Override
+        public boolean matches(char c) {
+            if (wrapperChar == c) {
+                inWrapper = !inWrapper;
+            }
+            return !inWrapper;
+        }
+    }
 
     private static class MapSplitter {
 
