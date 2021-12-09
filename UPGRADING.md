@@ -31,7 +31,14 @@ pre 2.2 Graylog installations.
 
 ## Configuration File Changes
 
-The following configuration option as been removed: `index_field_type_periodical_interval`.
+The following configuration option has been removed: `index_field_type_periodical_interval`.
 
 It has been replaced with a new configuration option which allows users to tweak the default full refresh interval for
 index field type information: `index_field_type_periodical_full_refresh_interval`.
+
+## Behaviour Changes
+
+- Pipeline function `drop_message` was modified to provide more performant and 
+predictable results: When `drop_message` is called in a rule, we complete processing of
+the current stage; following stages are skipped. Other pipelines operating on the same message will
+complete stage numbers less than or equal to the aborting stage; higher numbered stages are skipped.  
