@@ -80,7 +80,7 @@ public class FieldTypeMapper {
      */
     public Optional<FieldTypes.Type> mapType(FieldTypeDTO type) {
         return Optional.ofNullable(TYPE_MAP.get(type.physicalType()))
-                .map(mappedType -> type.properties().contains(FieldTypeDTO.Properties.FIELDATA)
+                .map(mappedType -> type.properties().contains(FieldTypeDTO.Properties.FIELDDATA)
                         ? mappedType.toBuilder().properties(new ImmutableSet.Builder<String>().addAll(mappedType.properties()).add(PROP_ENUMERABLE).build()).build()
                         : mappedType);
     }

@@ -32,7 +32,7 @@ public abstract class FieldTypeDTO {
     static final String FIELD_PROPERTIES = "properties";
 
     public enum Properties {
-        FIELDATA
+        FIELDDATA
     }
 
     @JsonProperty(FIELD_NAME)

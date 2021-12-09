@@ -86,7 +86,7 @@ public class IndexFieldTypePollerAdapterES6 implements IndexFieldTypePollerAdapt
                         .filter(field -> !field.getValue().path("type").asText().isEmpty())
                         .map(field -> {
                             final boolean fielddata = field.getValue().path("fielddata").asBoolean(false);
-                            final Set<FieldTypeDTO.Properties> fieldProperties = fielddata ? Collections.singleton(FieldTypeDTO.Properties.FIELDATA) : Collections.emptySet();
+                            final Set<FieldTypeDTO.Properties> fieldProperties = fielddata ? Collections.singleton(FieldTypeDTO.Properties.FIELDDATA) : Collections.emptySet();
                             return FieldTypeDTO.create(field.getKey(), field.getValue().path("type").asText(), fieldProperties);
                         })
                         .collect(Collectors.toSet())

@@ -117,7 +117,7 @@ public abstract class IndexFieldTypePollerIT extends ElasticsearchBaseTest {
         assertThat(dto.fields()).containsOnly(
                 FieldTypeDTO.create("message", "text"),
                 FieldTypeDTO.create("full_message", "text"),
-                FieldTypeDTO.create("source", "text", Collections.singleton(FieldTypeDTO.Properties.FIELDATA)),
+                FieldTypeDTO.create("source", "text", Collections.singleton(FieldTypeDTO.Properties.FIELDDATA)),
                 FieldTypeDTO.create("http_status", "keyword"),
                 FieldTypeDTO.create("http_response_time", "long"),
                 FieldTypeDTO.create("timestamp", "date"),
@@ -141,7 +141,7 @@ public abstract class IndexFieldTypePollerIT extends ElasticsearchBaseTest {
         assertThat(dto.fields()).containsOnly(
                 FieldTypeDTO.create("message", "text"),
                 FieldTypeDTO.create("full_message", "text"),
-                FieldTypeDTO.create("source", "text", Collections.singleton(FieldTypeDTO.Properties.FIELDATA)),
+                FieldTypeDTO.create("source", "text", Collections.singleton(FieldTypeDTO.Properties.FIELDDATA)),
                 FieldTypeDTO.create("http_status", "keyword"),
                 FieldTypeDTO.create("http_response_time", "long"),
                 FieldTypeDTO.create("timestamp", "date"),

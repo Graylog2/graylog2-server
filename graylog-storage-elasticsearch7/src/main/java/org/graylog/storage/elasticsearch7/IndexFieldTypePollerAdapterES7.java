@@ -64,7 +64,7 @@ public class IndexFieldTypePollerAdapterES7 implements IndexFieldTypePollerAdapt
                     final FieldMappingApi.FieldMapping mapping = field.getValue();
                     final Boolean fielddata = mapping.fielddata().orElse(false);
                     return FieldTypeDTO.create(field.getKey(), mapping.type(), fielddata
-                            ? Collections.singleton(FieldTypeDTO.Properties.FIELDATA)
+                            ? Collections.singleton(FieldTypeDTO.Properties.FIELDDATA)
                             : Collections.emptySet());
                 })
                 .collect(Collectors.toSet())

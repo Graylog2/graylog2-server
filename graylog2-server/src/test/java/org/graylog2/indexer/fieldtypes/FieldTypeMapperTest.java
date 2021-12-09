@@ -30,7 +30,7 @@ public class FieldTypeMapperTest {
     private static final FieldTypeDTO textWithFielddata = FieldTypeDTO.builder()
             .physicalType("text")
             .fieldName("test")
-            .properties(Collections.singleton(FieldTypeDTO.Properties.FIELDATA))
+            .properties(Collections.singleton(FieldTypeDTO.Properties.FIELDDATA))
             .build();
 
     @Before
