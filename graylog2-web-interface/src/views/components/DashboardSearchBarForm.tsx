@@ -21,7 +21,7 @@ import { Form, Formik } from 'formik';
 import { isFunction } from 'lodash';
 import type { FormikProps } from 'formik';
 
-import type { TimeRange } from 'views/logic/queries/Query';
+import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import FormWarningsContext from 'contexts/FormWarningsContext';
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 import validate from 'views/components/searchbar/validate';
@@ -30,7 +30,7 @@ import { onInitializingTimerange, onSubmittingTimerange } from './TimerangeForFo
 import DateTimeProvider from './searchbar/date-time-picker/DateTimeProvider';
 
 export type DashboardFormValues = {
-  timerange: TimeRange | undefined | null,
+  timerange: TimeRange | undefined | null | NoTimeRangeOverride,
   queryString: string | undefined | null,
 };
 

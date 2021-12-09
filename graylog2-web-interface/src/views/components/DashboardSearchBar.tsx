@@ -42,6 +42,7 @@ import FormWarningsProvider from 'contexts/FormWarningsProvider';
 import useParameters from 'views/hooks/useParameters';
 import debounceWithPromise from 'views/logic/debounceWithPromise';
 import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
+import { isNoTimeRangeOverride } from 'views/typeGuards/timeRange';
 
 import TimeRangeInput from './searchbar/TimeRangeInput';
 import DashboardSearchForm, { DashboardFormValues } from './DashboardSearchBarForm';
@@ -104,7 +105,7 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
   const { parameterBindings, parameters } = useParameters();
   const _validateQueryString = useCallback((values: DashboardFormValues) => {
     const request = {
-      timeRange: values?.timerange,
+      timeRange: isNoTimeRangeOverride(values?.timerange) ? undefined : values?.timerange,
       queryString: values?.queryString,
       parameterBindings,
       parameters,
