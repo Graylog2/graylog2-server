@@ -19,6 +19,7 @@ package org.graylog.plugins.views.search.validation;
 import com.google.auto.value.AutoValue;
 
 import javax.validation.constraints.NotNull;
+import java.util.Collections;
 import java.util.List;
 
 @AutoValue
@@ -29,29 +30,19 @@ public abstract class ValidationResponse {
 
     public abstract List<ValidationMessage> explanations();
 
-    static ValidationResponse.Builder builder(ValidationStatus status) {
-        return new AutoValue_ValidationResponse.Builder()
-                .status(status);
+    static ValidationResponse create(ValidationStatus status, List<ValidationMessage> explanations) {
+        return new AutoValue_ValidationResponse(status, explanations);
     }
 
     public static ValidationResponse ok() {
-        return builder(ValidationStatus.OK).build();
+        return create(ValidationStatus.OK, Collections.emptyList());
     }
 
     public static ValidationResponse error(List<ValidationMessage> explanations) {
-        return ValidationResponse.builder(ValidationStatus.ERROR).explanations(explanations).build();
+        return create(ValidationStatus.ERROR, explanations);
     }
 
     public static ValidationResponse warning(List<ValidationMessage> explanations) {
-        return ValidationResponse.builder(ValidationStatus.WARNING).explanations(explanations).build();
-    }
-
-    @AutoValue.Builder
-    abstract static class Builder {
-        abstract Builder status(ValidationStatus status);
-
-        abstract Builder explanations(List<ValidationMessage> explanations);
-
-        abstract ValidationResponse build();
+        return create(ValidationStatus.WARNING, explanations);
     }
 }
