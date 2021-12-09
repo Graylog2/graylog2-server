@@ -67,7 +67,7 @@ public class MappedFieldTypesService {
     }
 
     private MappedFieldTypeDTO mapPhysicalFieldType(FieldTypeDTO fieldType) {
-        final FieldTypes.Type mappedFieldType = fieldTypeMapper.mapType(fieldType.physicalType()).orElse(UNKNOWN_TYPE);
+        final FieldTypes.Type mappedFieldType = fieldTypeMapper.mapType(fieldType).orElse(UNKNOWN_TYPE);
         return MappedFieldTypeDTO.create(fieldType.fieldName(), mappedFieldType);
     }
 
