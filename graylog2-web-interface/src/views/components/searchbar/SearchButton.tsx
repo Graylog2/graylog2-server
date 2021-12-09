@@ -64,7 +64,6 @@ const onButtonClick = (e: MouseEvent, disabled: Boolean, onClick?: () => void) =
 const DirtySearchButton = ({ glyph, className, disabled }: { disabled: boolean, glyph: string, className: string }) => (
   <DirtyButton type="submit"
                bsStyle="success"
-               disabled={disabled}
                onClick={(e) => onButtonClick(e, disabled)}
                title="Perform search (changes were made after last search execution)"
                className={className}>
@@ -74,7 +73,6 @@ const DirtySearchButton = ({ glyph, className, disabled }: { disabled: boolean, 
 
 const CleanSearchButton = ({ disabled, glyph, className }: { disabled: boolean, glyph: string, className: string }) => (
   <StyledButton bsStyle="success"
-                disabled={disabled}
                 onClick={(e) => onButtonClick(e, disabled, SearchActions.refresh)}
                 title="Perform search"
                 className={className}>

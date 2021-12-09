@@ -85,7 +85,7 @@ describe('DashboardSearchBar', () => {
 
     const searchButton = await screen.findByTitle('Perform search');
 
-    await waitFor(() => expect(searchButton).not.toBeDisabled());
+    await waitFor(() => expect(searchButton.classList).not.toContain('disabled'));
 
     userEvent.click(searchButton);
 
@@ -103,7 +103,7 @@ describe('DashboardSearchBar', () => {
 
     const searchButton = await screen.findByTitle('Perform search (changes were made after last search execution)');
 
-    await waitFor(() => expect(searchButton).not.toBeDisabled());
+    await waitFor(() => expect(searchButton.classList).not.toContain('disabled'));
 
     userEvent.click(searchButton);
 

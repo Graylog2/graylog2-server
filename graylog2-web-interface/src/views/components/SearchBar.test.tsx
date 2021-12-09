@@ -109,7 +109,7 @@ describe('SearchBar', () => {
 
     const searchButton = await screen.findByTitle('Perform search');
 
-    await waitFor(() => expect(searchButton).not.toBeDisabled());
+    await waitFor(() => expect(searchButton.classList).not.toContain('disabled'));
 
     fireEvent.click(searchButton);
 
@@ -122,7 +122,7 @@ describe('SearchBar', () => {
     const timeRangeButton = screen.getByLabelText('Open Time Range Selector');
     const searchButton = screen.getByTitle('Perform search');
 
-    await waitFor(() => expect(searchButton).toBeDisabled());
+    await waitFor(() => expect(searchButton.classList).toContain('disabled'));
     await waitFor(() => expect(timeRangeButton.firstChild).toHaveClass('fa-exclamation-triangle'));
   });
 
