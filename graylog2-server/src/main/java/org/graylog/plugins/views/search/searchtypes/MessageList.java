@@ -83,6 +83,9 @@ public abstract class MessageList implements SearchType {
     public abstract List<Sort> sort();
 
     @JsonProperty
+    public abstract List<String> fields();
+
+    @JsonProperty
     public abstract List<Decorator> decorators();
 
     @Override
@@ -97,7 +100,8 @@ public abstract class MessageList implements SearchType {
                 .limit(150)
                 .offset(0)
                 .streams(Collections.emptySet())
-                .decorators(Collections.emptyList());
+                .decorators(Collections.emptyList())
+                .fields(Collections.emptyList());
     }
 
     public abstract Builder toBuilder();
@@ -140,6 +144,9 @@ public abstract class MessageList implements SearchType {
 
         @JsonProperty
         public abstract Builder filter(@Nullable Filter filter);
+
+        @JsonProperty
+        public abstract Builder fields(List<String> fields);
 
         @JsonProperty
         @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type", visible = true)
