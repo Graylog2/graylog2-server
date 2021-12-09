@@ -16,7 +16,6 @@
  */
 package org.graylog.plugins.views.search.engine;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryMetadata;
@@ -125,9 +124,9 @@ public class QueryEngine {
         // with all the results done, we can execute the current query and eventually complete our own result
         // if any of this throws an exception, the handle in #execute will convert it to an error and return a "failed" result instead
         // if the backend already returns a "failed result" then nothing special happens here
-        final GeneratedQueryContext generatedQueryContext = backend.generate(searchJob, query, Collections.emptySet(),  searchConfig.get());
+        final GeneratedQueryContext generatedQueryContext = backend.generate(searchJob, query, searchConfig.get());
         LOG.trace("[{}] Generated query {}, running it on backend {}", query.id(), generatedQueryContext, backend);
-        final QueryResult result = backend.run(searchJob, query, generatedQueryContext, Collections.emptySet());
+        final QueryResult result = backend.run(searchJob, query, generatedQueryContext);
         LOG.debug("[{}] Query returned {}", query.id(), result);
         if (!generatedQueryContext.errors().isEmpty()) {
             generatedQueryContext.errors().forEach(searchJob::addError);

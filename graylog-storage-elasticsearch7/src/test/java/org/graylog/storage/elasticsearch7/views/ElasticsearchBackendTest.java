@@ -37,7 +37,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import javax.inject.Provider;
-import java.util.Collections;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -56,7 +55,7 @@ public class ElasticsearchBackendTest {
                 null,
                 mock(IndexLookup.class),
                 new QueryStringDecorators.Fake(),
-                (elasticsearchBackend, ssb, job, query, results) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, results, fieldTypesLookup),
+                (elasticsearchBackend, ssb, job, query) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, fieldTypesLookup),
                 false);
     }
 
@@ -70,7 +69,7 @@ public class ElasticsearchBackendTest {
         final Search search = Search.builder().queries(ImmutableSet.of(query)).build();
         final SearchJob job = new SearchJob("deadbeef", search, "admin");
 
-        backend.generate(job, query, Collections.emptySet(), new SearchConfig(Period.ZERO));
+        backend.generate(job, query, new SearchConfig(Period.ZERO));
     }
 
     @Test
@@ -85,7 +84,7 @@ public class ElasticsearchBackendTest {
 
         final ESGeneratedQueryContext queryContext = mock(ESGeneratedQueryContext.class);
 
-        final QueryResult queryResult = backend.doRun(job, query, queryContext, Collections.emptySet());
+        final QueryResult queryResult = backend.doRun(job, query, queryContext);
 
         assertThat(queryResult).isNotNull();
         assertThat(queryResult.searchTypes()).isEmpty();

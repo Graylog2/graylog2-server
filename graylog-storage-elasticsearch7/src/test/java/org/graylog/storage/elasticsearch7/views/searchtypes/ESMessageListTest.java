@@ -22,7 +22,6 @@ import com.revinate.assertj.json.JsonPathAssert;
 import org.graylog.plugins.views.search.LegacyDecoratorProcessor;
 import org.graylog.plugins.views.search.ParameterProvider;
 import org.graylog.plugins.views.search.Query;
-import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
@@ -85,7 +84,7 @@ public class ESMessageListTest {
 
     @Test
     public void appliesDecoratorsToQueryStringIfHighlightingActivated() {
-        final QueryStringDecorator queryStringDecorator = (String queryString, ParameterProvider job, Query query, Set<QueryResult> results) -> "Foobar!";
+        final QueryStringDecorator queryStringDecorator = (String queryString, ParameterProvider job, Query query) -> "Foobar!";
 
         final MessageList messageList = someMessageList();
 
