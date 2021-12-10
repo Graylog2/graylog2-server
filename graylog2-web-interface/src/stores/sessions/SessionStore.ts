@@ -43,7 +43,6 @@ export const SessionStore = singletonStore(
   () => Reflux.createStore<SessionStoreState>({
     listenables: [SessionActions],
     sourceUrl: '/system/sessions',
-    sessionId: undefined,
     username: undefined,
     validatingSession: false,
 
@@ -54,12 +53,12 @@ export const SessionStore = singletonStore(
       return this.getSessionInfo();
     },
 
-    login(username, password, host) {
+    login(username: string, password: string, host: string) {
       const builder = new Builder('POST', qualifyUrl(this.sourceUrl))
-        .json({ username: username, password: password, host: host });
+        .json({ username, password, host });
       const promise = builder.build()
-        .then((sessionInfo) => {
-          return { sessionId: sessionInfo.session_id, username: sessionInfo.username };
+        .then((response) => {
+          return { username: response?.username };
         });
 
       SessionActions.login.promise(promise);
@@ -110,7 +109,6 @@ export const SessionStore = singletonStore(
 
     _removeSession() {
       Store.delete('username');
-      this.sessionId = undefined;
       this.username = undefined;
       this._propagateState();
     },
