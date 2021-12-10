@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.elasticsearch.ElasticsearchContainer;
+import org.testcontainers.utility.DockerImageName;
 
 import java.net.URI;
 import java.net.URL;
@@ -116,7 +117,7 @@ public class ElasticsearchInstance extends ExternalResource {
     }
 
     private ElasticsearchContainer buildContainer(String image, Network network) {
-        return new ElasticsearchContainer(image)
+        return new ElasticsearchContainer(DockerImageName.parse(image).asCompatibleSubstituteFor("docker.elastic.co/elasticsearch/elasticsearch"))
                 .withReuse(true)
                 .withEnv("ES_JAVA_OPTS", "-Xms512m -Xmx512m")
                 .withEnv("discovery.type", "single-node")

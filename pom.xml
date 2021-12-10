@@ -128,7 +128,7 @@
         <jool.version>0.9.14</jool.version>
         <json-path.version>2.4.0</json-path.version>
         <kafka.version>0.9.0.1</kafka.version>
-        <log4j.version>2.13.0</log4j.version>
+        <log4j.version>2.15.0</log4j.version>
         <metrics.version>4.0.3</metrics.version>
         <mongodb-driver.version>3.12.1</mongodb-driver.version>
         <mongojack.version>2.10.1</mongojack.version>
@@ -171,7 +171,7 @@
         <nosqlunit.version>1.0.0-rc.5</nosqlunit.version>
         <restassured.version>4.2.0</restassured.version>
         <system-rules.version>1.19.0</system-rules.version>
-        <testcontainers.version>1.14.3</testcontainers.version>
+        <testcontainers.version>1.15.2</testcontainers.version>
 
         <!-- Nodejs dependencies -->
         <nodejs.version>v12.13.1</nodejs.version>
