@@ -112,7 +112,7 @@ class FieldNameCompletion implements Completer {
       return [];
     }
 
-    if (currentToken && currentToken.type === 'string') {
+    if (currentToken && (currentToken.type === 'string' || (currentToken.type === 'keyword' && !prefix))) {
       return [];
     }
 
