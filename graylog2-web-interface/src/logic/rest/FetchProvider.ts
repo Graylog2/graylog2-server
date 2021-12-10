@@ -103,10 +103,11 @@ export class Builder {
   }
 
   authenticated() {
-    const { SessionStore } = require('stores/sessions/SessionStore');
+    /* const { SessionStore } = require('stores/sessions/SessionStore');
     const token = SessionStore.getSessionId();
 
-    return this.session(token);
+    return this.session(token); */
+    return this;
   }
 
   session(sessionId) {

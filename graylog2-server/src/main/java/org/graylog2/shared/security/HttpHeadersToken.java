@@ -19,18 +19,22 @@ package org.graylog2.shared.security;
 import org.apache.shiro.authc.HostAuthenticationToken;
 
 import javax.annotation.Nullable;
+import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.MultivaluedMap;
+import java.util.Map;
 
 public class HttpHeadersToken implements HostAuthenticationToken {
 
     private final MultivaluedMap<String, String> httpHeaders;
     private final String host;
     private final String remoteAddr;
+    private final Map<String, Cookie> cookies;
 
-    public HttpHeadersToken(MultivaluedMap<String, String> httpHeaders, String host, String remoteAddr) {
+    public HttpHeadersToken(MultivaluedMap<String, String> httpHeaders, String host, String remoteAddr, Map<String, Cookie> cookies) {
         this.httpHeaders = httpHeaders;
         this.host = host;
         this.remoteAddr = remoteAddr;
+        this.cookies = cookies;
     }
 
     /**
@@ -64,9 +68,14 @@ public class HttpHeadersToken implements HostAuthenticationToken {
         return httpHeaders;
     }
 
+    public Map<String, Cookie> getCookies() {
+        return cookies;
+    }
+
     /**
      * The direct remote address, if the request came through a proxy, this will be the address of last hop.
      * Typically used to verify that a client is "trusted".
+     *
      * @return the direct peer's address
      */
     public String getRemoteAddr() {

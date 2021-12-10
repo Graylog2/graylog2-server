@@ -17,6 +17,7 @@
 package org.graylog2.rest.resources.system;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.base.Strings;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -33,6 +34,7 @@ import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.rest.RestTools;
+import org.graylog2.rest.models.system.sessions.responses.SessionResponse;
 import org.graylog2.rest.models.system.sessions.responses.SessionResponseFactory;
 import org.graylog2.rest.models.system.sessions.responses.SessionValidationResponse;
 import org.graylog2.security.headerauth.HTTPHeaderAuthConfig;
@@ -67,8 +69,12 @@ import javax.ws.rs.ServiceUnavailableException;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.NewCookie;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import java.io.IOException;
+import java.net.URI;
+import java.util.Date;
 import java.util.Optional;
 import java.util.Set;
 
@@ -113,13 +119,13 @@ public class SessionsResource extends RestResource {
     @ApiOperation(value = "Create a new session", notes = "This request creates a new session for a user or " +
             "reactivates an existing session: the equivalent of logging in.")
     @NoAuditEvent("dispatches audit events in the method body")
-    public JsonNode newSession(@Context ContainerRequestContext requestContext,
-                                      @ApiParam(name = "Login request", value = "Credentials. The default " +
-                                              "implementation requires presence of two properties: 'username' and " +
-                                              "'password'. However a plugin may customize which kind of credentials " +
-                                              "are accepted and therefore expect different properties.",
-                                              required = true)
-                                      @NotNull JsonNode createRequest) {
+    public Response newSession(@Context ContainerRequestContext requestContext,
+                               @ApiParam(name = "Login request", value = "Credentials. The default " +
+                                       "implementation requires presence of two properties: 'username' and " +
+                                       "'password'. However a plugin may customize which kind of credentials " +
+                                       "are accepted and therefore expect different properties.",
+                                         required = true)
+                               @NotNull JsonNode createRequest) {
 
         final SecurityContext securityContext = requestContext.getSecurityContext();
         if (!(securityContext instanceof ShiroSecurityContext)) {
@@ -141,7 +147,11 @@ public class SessionsResource extends RestResource {
         try {
             Optional<Session> session = sessionCreator.create(sessionId, host, authToken);
             if (session.isPresent()) {
-                return sessionResponseFactory.forSession(session.get());
+                final SessionResponse token = sessionResponseFactory.forSession(session.get());
+                return Response.ok()
+                        .entity(token)
+                        .cookie(createSecureCookie(token, requestContext))
+                        .build();
             } else {
                 throw new NotAuthorizedException("Invalid credentials.", "Basic realm=\"Graylog Server session\"");
             }
@@ -150,10 +160,39 @@ public class SessionsResource extends RestResource {
         }
     }
 
+    private URI baseUriFromOriginOrRequest(ContainerRequestContext requestContext) {
+        final String origin = requestContext.getHeaderString("origin");
+
+        try {
+            return URI.create(origin);
+        } catch (IllegalArgumentException ignored) {
+            return requestContext.getUriInfo().getBaseUri();
+        }
+    }
+
+    private NewCookie createSecureCookie(SessionResponse token, ContainerRequestContext requestContext) {
+        final Date now = new Date();
+        final int maxAge = Long.valueOf((token.validUntil().getTime() - now.getTime()) / 1000).intValue();
+
+        final URI baseUri = baseUriFromOriginOrRequest(requestContext);
+        final String basePath = Optional.ofNullable(Strings.emptyToNull(baseUri.getPath())).orElse("/");
+
+        return new NewCookie("authentication",
+                token.getAuthenticationToken(),
+                basePath,
+                baseUri.getHost(),
+                1,
+                "Authentication Cookie",
+                maxAge,
+                token.validUntil(),
+                baseUri.getScheme().equalsIgnoreCase("https"),
+                true);
+    }
+
     @GET
     @ApiOperation(value = "Validate an existing session",
-        notes = "Checks the session with the given ID: returns http status 204 (No Content) if session is valid.",
-        code = 204
+                  notes = "Checks the session with the given ID: returns http status 204 (No Content) if session is valid.",
+                  code = 204
     )
     public SessionValidationResponse validateSession(@Context ContainerRequestContext requestContext) {
         try {
@@ -194,7 +233,7 @@ public class SessionsResource extends RestResource {
             ((DefaultSecurityManager) SecurityUtils.getSecurityManager()).getSubjectDAO().save(subject);
 
             return SessionValidationResponse.validWithNewSession(String.valueOf(session.getId()),
-                                                                 String.valueOf(user.getName()));
+                    String.valueOf(user.getName()));
         }
         return SessionValidationResponse.valid();
     }
