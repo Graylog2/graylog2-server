@@ -58,7 +58,7 @@ type Props = {
 const defaultCompleterFactory = (completers, timeRange, streams) => new SearchBarAutoCompletions(completers, timeRange, streams);
 
 const handleExecution = (editor, onExecute, value, error) => {
-  if (editor.completer && editor.completer.popup) {
+  if (editor?.completer && editor.completer.popup) {
     editor.completer.popup.hide();
   }
 
@@ -137,7 +137,7 @@ const QueryInput = ({
 }: Props) => {
   const completer = useMemo(() => completerFactory(completers, timeRange, streams), [completerFactory, completers, timeRange, streams]);
   const configuredListeners = useRef<boolean>(false);
-  const configureEditor = useCallback((node: ReactAce) => _configureEditor(node.editor, completer, configuredListeners), [completer]);
+  const configureEditor = useCallback((node: ReactAce) => _configureEditor(node?.editor, completer, configuredListeners), [completer]);
   const _onExecute = useCallback((editor: Editor) => handleExecution(editor, onExecute, value, error), [onExecute, value, error]);
   const markers = useMemo(() => getMarkers(error, warning), [error, warning]);
 
