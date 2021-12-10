@@ -37,7 +37,7 @@ const onServerError = async (error: Response | undefined, onUnauthorized = defau
   const fetchError = new FetchError(error.statusText, error.status, emptyToUndefined(response));
 
   if (SessionStore.isLoggedIn() && error.status === 401) {
-    SessionActions.logout(SessionStore.getSessionId());
+    SessionActions.logout();
   }
 
   // Redirect to the start page if a user is logged in but not allowed to access a certain HTTP API.
@@ -100,25 +100,6 @@ export class Builder {
 
     this.responseHandler = (response) => response;
     this.errorHandler = undefined;
-  }
-
-  authenticated() {
-    /* const { SessionStore } = require('stores/sessions/SessionStore');
-    const token = SessionStore.getSessionId();
-
-    return this.session(token); */
-    return this;
-  }
-
-  session(sessionId) {
-    const buffer = Buffer.from(`${sessionId}:session`);
-
-    this.options = {
-      ...this.options,
-      Authorization: `Basic ${buffer.toString('base64')}`,
-    };
-
-    return this;
   }
 
   setHeader(header, value) {
@@ -227,7 +208,6 @@ function queuePromiseIfNotLoggedin(promise) {
 
 export default function fetch(method, url, body?) {
   const promise = () => new Builder(method, url)
-    .authenticated()
     .json(body)
     .build();
 
@@ -236,7 +216,6 @@ export default function fetch(method, url, body?) {
 
 export function fetchPlainText(method, url, body) {
   const promise = () => new Builder(method, url)
-    .authenticated()
     .plaintext(body)
     .build();
 
@@ -245,7 +224,6 @@ export function fetchPlainText(method, url, body) {
 
 export function fetchPeriodically(method, url, body?) {
   const promise = () => new Builder(method, url)
-    .authenticated()
     .noSessionExtension()
     .json(body)
     .build();
@@ -255,7 +233,6 @@ export function fetchPeriodically(method, url, body?) {
 
 export function fetchFile(method, url, body, mimeType = 'text/csv') {
   const promise = () => new Builder(method, url)
-    .authenticated()
     .file(body, mimeType)
     .build();
 
