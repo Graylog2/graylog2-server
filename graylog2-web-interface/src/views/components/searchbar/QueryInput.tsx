@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 import type { DefaultTheme } from 'styled-components';
 import { withTheme } from 'styled-components';
 import PropTypes from 'prop-types';
@@ -27,6 +27,7 @@ import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import QueryValidationActions from 'views/actions/QueryValidationActions';
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 
+import type ReactAce from './queryinput/ace';
 import type { AutoCompleter, Editor } from './ace-types';
 import StyledAceEditor from './queryinput/StyledAceEditor';
 import SearchBarAutoCompletions from './SearchBarAutocompletions';
@@ -38,7 +39,7 @@ type Props = {
     completers: Array<Completer>,
     timeRange: TimeRange | NoTimeRangeOverride | undefined,
     streams: Array<string>,
-    ) => AutoCompleter,
+  ) => AutoCompleter,
   completers: Array<Completer>,
   disabled?: boolean,
   error?: QueryValidationState,
@@ -70,23 +71,28 @@ const handleExecution = (editor, onExecute, value, error) => {
   onExecute(value);
 };
 
-const _configureEditor = (node, completer, onExecute) => {
-  const editor = node && node.editor;
-
+const _configureEditor = (editor, completer: AutoCompleter, configuredListeners: React.MutableRefObject<boolean>) => {
   if (editor) {
-    editor.commands.addCommands([{
-      name: 'Execute',
-      bindKey: 'Enter',
-      exec: onExecute,
-    },
-    {
-      name: 'SuppressShiftEnter',
-      bindKey: 'Shift-Enter',
-      exec: () => {},
-    }]);
-
     editor.commands.removeCommands(['find', 'indent', 'outdent']);
+    // eslint-disable-next-line no-param-reassign
     editor.completers = [completer];
+
+    if (!configuredListeners.current) {
+      editor.session.on('tokenizerUpdate', (input, { bgTokenizer: { currentLine, lines } }) => {
+        const currentToken = lines[currentLine - 1].find((token) => token?.start !== undefined);
+
+        if (!currentToken) {
+          return;
+        }
+
+        if (currentToken.type === 'keyword' && currentToken.value.endsWith(':')) {
+          editor.execCommand('startAutocomplete');
+        }
+      });
+
+      // eslint-disable-next-line no-param-reassign
+      configuredListeners.current = true;
+    }
   }
 };
 
@@ -130,8 +136,9 @@ const QueryInput = ({
   warning,
 }: Props) => {
   const completer = useMemo(() => completerFactory(completers, timeRange, streams), [completerFactory, completers, timeRange, streams]);
+  const configuredListeners = useRef<boolean>(false);
+  const configureEditor = useCallback((node: ReactAce) => _configureEditor(node.editor, completer, configuredListeners), [completer]);
   const _onExecute = useCallback((editor: Editor) => handleExecution(editor, onExecute, value, error), [onExecute, value, error]);
-  const configureEditor = useCallback((node) => _configureEditor(node, completer, _onExecute), [completer, _onExecute]);
   const markers = useMemo(() => getMarkers(error, warning), [error, warning]);
 
   return (
@@ -144,6 +151,16 @@ const QueryInput = ({
                            ref={configureEditor}
                            readOnly={disabled}
                            onBlur={onBlur}
+                           commands={[{
+                             name: 'Execute',
+                             bindKey: 'Enter',
+                             exec: _onExecute,
+                           },
+                           {
+                             name: 'SuppressShiftEnter',
+                             bindKey: 'Shift-Enter',
+                             exec: () => {},
+                           }]}
                            onChange={onChange}
                            value={value}
                            name="QueryEditor"
