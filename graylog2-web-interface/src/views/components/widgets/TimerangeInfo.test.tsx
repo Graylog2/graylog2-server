@@ -16,11 +16,11 @@
  */
 import React from 'react';
 import Immutable from 'immutable';
+import moment from 'moment';
 import { render, screen } from 'wrappedTestingLibrary';
+
 import { MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
-import moment from 'moment';
-
 import Search from 'views/logic/search/Search';
 import Widget from 'views/logic/widgets/Widget';
 import DateTimeContext from 'contexts/DateTimeContext';
