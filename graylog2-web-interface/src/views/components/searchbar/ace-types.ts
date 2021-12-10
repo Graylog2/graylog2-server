@@ -79,6 +79,13 @@ export type Position = {
   column: number,
 };
 
+export type Line = {
+  type: string,
+  value: string,
+  index?: number,
+  start?: number,
+}
+
 export interface AutoCompleter {
   getCompletions(editor: Editor, session: Session, position: Position, prefix: string, callback: ResultsCallback): void;
 }

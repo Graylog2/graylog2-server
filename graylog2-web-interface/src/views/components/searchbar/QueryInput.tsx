@@ -28,7 +28,7 @@ import QueryValidationActions from 'views/actions/QueryValidationActions';
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 
 import type ReactAce from './queryinput/ace';
-import type { AutoCompleter, Editor } from './ace-types';
+import type { AutoCompleter, Editor, Line } from './ace-types';
 import StyledAceEditor from './queryinput/StyledAceEditor';
 import SearchBarAutoCompletions from './SearchBarAutocompletions';
 import type { Completer } from './SearchBarAutocompletions';
@@ -71,6 +71,18 @@ const handleExecution = (editor, onExecute, value, error) => {
   onExecute(value);
 };
 
+const displaySuggestionAfterFieldName = (editor, currentLine: number, lines: Array<Array<Line>>) => {
+  const currentToken = lines[currentLine - 1].find((token) => token?.start !== undefined);
+
+  if (!currentToken) {
+    return;
+  }
+
+  if (currentToken.type === 'keyword' && currentToken.value.endsWith(':')) {
+    editor.execCommand('startAutocomplete');
+  }
+};
+
 const _configureEditor = (editor, completer: AutoCompleter, configuredListeners: React.MutableRefObject<boolean>) => {
   if (editor) {
     editor.commands.removeCommands(['find', 'indent', 'outdent']);
@@ -79,15 +91,7 @@ const _configureEditor = (editor, completer: AutoCompleter, configuredListeners:
 
     if (!configuredListeners.current) {
       editor.session.on('tokenizerUpdate', (input, { bgTokenizer: { currentLine, lines } }) => {
-        const currentToken = lines[currentLine - 1].find((token) => token?.start !== undefined);
-
-        if (!currentToken) {
-          return;
-        }
-
-        if (currentToken.type === 'keyword' && currentToken.value.endsWith(':')) {
-          editor.execCommand('startAutocomplete');
-        }
+        displaySuggestionAfterFieldName(editor, currentLine, lines);
       });
 
       // eslint-disable-next-line no-param-reassign
