@@ -34,6 +34,7 @@ import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.HttpHeaders;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
@@ -74,7 +75,7 @@ public abstract class ProxiedResource extends RestResource {
         if (authenticationCookie != null) {
             final String sessionId = authenticationCookie.getValue();
             final String credentials = sessionId + ":session";
-            final String base64Credentials = Base64.getEncoder().encodeToString(credentials.getBytes());
+            final String base64Credentials = Base64.getEncoder().encodeToString(credentials.getBytes(StandardCharsets.UTF_8));
             return "Basic " + base64Credentials;
         }
 
