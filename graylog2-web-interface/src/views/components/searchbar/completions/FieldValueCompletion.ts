@@ -22,9 +22,16 @@ import { qualifyUrl } from 'util/URLUtils';
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import { FieldTypesStore, FieldTypesStoreState, FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
+import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 
 import type { Completer } from '../SearchBarAutocompletions';
 import type { Token } from '../ace-types';
+
+type SuggestionsResponse = {
+  field: string,
+  input: string,
+  suggestions: Array<{ value: string, occurrence: number}> | undefined,
+}
 
 const suggestionsUrl = qualifyUrl('/search/suggest');
 
@@ -36,12 +43,40 @@ const formatValue = (value: string, type: string) => {
   return value;
 };
 
+const getFieldNameAndInput = (currentToken: Token | undefined | null, lastToken: Token | undefined | null) => {
+  if (currentToken?.type === 'keyword' && currentToken?.value.endsWith(':')) {
+    return {
+      fieldName: currentToken.value.slice(0, -1),
+      input: '',
+    };
+  }
+
+  if (currentToken?.type === 'term' && lastToken?.type === 'keyword') {
+    return {
+      fieldName: lastToken.value.slice(0, -1),
+      input: formatValue(currentToken.value, currentToken.type),
+    };
+  }
+
+  return {};
+};
+
+const getFieldByName = (fields: FieldTypeMappingsList, fieldName: string) => {
+  return fields.find(({ name }) => name === fieldName);
+};
+
+const isEnumerableField = (field: FieldTypeMapping) => {
+  return field.type.properties.find((property) => property === 'enumerable');
+};
+
 class FieldValueCompletion implements Completer {
   activeQuery: string;
 
-  fields: FieldTypesStoreState;
+  allFields: FieldTypeMappingsList;
 
   currentQueryFields: FieldTypeMappingsList;
+
+  fields: FieldTypesStoreState;
 
   constructor() {
     this.onViewMetadataStoreUpdate(ViewMetadataStore.getInitialState());
@@ -51,48 +86,62 @@ class FieldValueCompletion implements Completer {
     FieldTypesStore.listen((newState) => this._newFields(newState));
   }
 
+  shouldShowSuggestions = (fieldName: string) => {
+    if (!fieldName) {
+      return false;
+    }
+
+    const queryField = getFieldByName(this.currentQueryFields, fieldName);
+
+    if (!queryField || !isEnumerableField(queryField)) {
+      const allFieldType = getFieldByName(this.allFields, fieldName);
+
+      return isEnumerableField(allFieldType);
+    }
+
+    return true;
+  }
+
   getCompletions = (
     currentToken: Token | undefined | null,
     lastToken: Token | undefined | null,
     prefix: string,
-    tokens,
-    currentTokenId,
-    timeRange?: TimeRange | NoTimeRangeOverride,
-    streams?: Array<string>,
+    tokens: Array<Token>,
+    currentTokenIdx: number,
+    timeRange: TimeRange | NoTimeRangeOverride | undefined,
+    streams: Array<string> | undefined,
   ) => {
-    if (lastToken?.type !== 'keyword') {
-      return [];
-    }
+    const { fieldName, input } = getFieldNameAndInput(currentToken, lastToken);
 
-    if (currentToken?.type !== 'term') {
-      return [];
-    }
-
-    const field = lastToken.value.slice(0, -1);
-    const fieldType = this.currentQueryFields.find(({ name }) => name === field);
-    const isEnumerable = fieldType.type.properties.find((property) => property === 'enumerable');
-
-    if (!isEnumerable || fieldType.type.value.get('type') === 'numeric') {
+    if (!this.shouldShowSuggestions(fieldName)) {
       return [];
     }
 
     return fetch('POST', suggestionsUrl, {
-      field,
-      input: formatValue(currentToken.value, currentToken.type),
+      field: fieldName,
+      input,
       timerange: !isEmpty(timeRange) ? timeRange : undefined,
       streams,
-    }).then(({ suggestions }) => {
-      return suggestions.map(({ value, occurrence }) => ({ name: value, value, score: occurrence }));
+    }).then(({ suggestions }: SuggestionsResponse) => {
+      if (!suggestions) {
+        return [];
+      }
+
+      return suggestions.map(({ value, occurrence }) => ({
+        name: value,
+        value: value,
+        score: occurrence,
+      }));
     });
   };
 
   _newFields = (fields: FieldTypesStoreState) => {
     this.fields = fields;
-    const { queryFields } = this.fields;
+    const { queryFields, all } = this.fields;
 
     if (this.activeQuery) {
-      // const currentQueryFields: FieldTypeMappingsList = ;
       this.currentQueryFields = queryFields.get(this.activeQuery, Immutable.List());
+      this.allFields = all;
     }
   };
 
