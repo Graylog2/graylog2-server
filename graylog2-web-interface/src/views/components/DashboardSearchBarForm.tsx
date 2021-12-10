@@ -62,7 +62,7 @@ const DashboardSearchForm = ({ initialValues, limitDuration, onSubmit, validateQ
   };
 
   const { setFieldWarning } = useContext(FormWarningsContext);
-  const _validate = useCallback((values: DashboardFormValues) => validate(values, limitDuration, setFieldWarning, validateQueryString, unifyTime),
+  const _validate = useCallback((values: DashboardFormValues) => validate(values, limitDuration, setFieldWarning, validateQueryString, formatTime),
     [limitDuration, setFieldWarning, validateQueryString, formatTime]);
 
   return (
