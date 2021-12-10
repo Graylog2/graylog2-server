@@ -43,7 +43,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class MappedFieldTypesServiceTest {
+public class MappedFieldTypesServiceImplTest {
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
@@ -62,11 +62,11 @@ public class MappedFieldTypesServiceTest {
     @Captor
     private ArgumentCaptor<TimeRange> timeRangeCaptor;
 
-    private MappedFieldTypesService mappedFieldTypesService;
+    private MappedFieldTypesServiceImpl mappedFieldTypesService;
 
     @Before
     public void setUp() throws Exception {
-        this.mappedFieldTypesService = new MappedFieldTypesService(streamService, indexFieldTypesService, new FieldTypeMapper(), indexLookup);
+        this.mappedFieldTypesService = new MappedFieldTypesServiceImpl(streamService, indexFieldTypesService, new FieldTypeMapper(), indexLookup);
         when(streamService.indexSetIdsByIds(Collections.singleton("stream1"))).thenReturn(Collections.singleton("indexSetId"));
     }
 

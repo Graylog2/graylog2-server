@@ -20,7 +20,7 @@ import com.google.common.collect.ImmutableSet;
 import org.apache.shiro.subject.Subject;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.indexer.fieldtypes.FieldTypes;
-import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
+import org.graylog2.indexer.fieldtypes.MappedFieldTypesServiceImpl;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.shared.rest.exceptions.MissingStreamPermissionException;
@@ -51,7 +51,7 @@ public class FieldTypesResourceTest {
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Mock
-    private MappedFieldTypesService mappedFieldTypesService;
+    private MappedFieldTypesServiceImpl mappedFieldTypesService;
 
     @Mock
     private PermittedStreams permittedStreams;
@@ -72,7 +72,7 @@ public class FieldTypesResourceTest {
     private ArgumentCaptor<TimeRange> timeRangeArgumentCaptor;
 
     class FieldTypesTestResource extends FieldTypesResource {
-        FieldTypesTestResource(MappedFieldTypesService mappedFieldTypesService, PermittedStreams permittedStreams) {
+        FieldTypesTestResource(MappedFieldTypesServiceImpl mappedFieldTypesService, PermittedStreams permittedStreams) {
             super(mappedFieldTypesService, permittedStreams);
         }
 
