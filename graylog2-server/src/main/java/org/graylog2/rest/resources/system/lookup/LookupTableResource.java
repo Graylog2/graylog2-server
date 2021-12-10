@@ -474,7 +474,7 @@ public class LookupTableResource extends RestResource {
 
         final Stream<LookupDataAdapter.Descriptor> stream1 = dataAdapterTypes.values().stream().map(LookupDataAdapter.Factory::getDescriptor);
         final Stream<LookupDataAdapter.Descriptor> stream2 = dataAdapterTypes2.values().stream().map(LookupDataAdapter.Factory2::getDescriptor);
-        return Stream.concat(stream1, stream2)
+        return Stream.concat(stream1, stream2).filter(descriptor -> !descriptor.getType().startsWith("illuminate"))
                 .collect(Collectors.toMap(LookupDataAdapter.Descriptor::getType, Function.identity()));
 
     }
