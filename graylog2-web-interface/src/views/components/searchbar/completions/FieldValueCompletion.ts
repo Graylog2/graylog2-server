@@ -66,7 +66,7 @@ const getFieldByName = (fields: FieldTypeMappingsList, fieldName: string) => {
 };
 
 const isEnumerableField = (field: FieldTypeMapping) => {
-  return field.type.properties.find((property) => property === 'enumerable');
+  return !!field?.type.properties.find((property) => property === 'enumerable');
 };
 
 class FieldValueCompletion implements Completer {
