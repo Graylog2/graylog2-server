@@ -149,7 +149,7 @@ describe('FieldNameCompletion', () => {
       expect(completion('bar')?.meta).toMatch('(not in streams)');
     });
 
-    it('scores fields of current query higher', () => {
+    it('scores fields of current query higher after selecting different query', () => {
       const completer = new FieldNameCompletion([]);
       const callback = asMock(ViewMetadataStore.listen).mock.calls[0][0];
 
