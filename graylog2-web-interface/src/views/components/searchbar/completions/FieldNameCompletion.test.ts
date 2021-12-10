@@ -112,6 +112,13 @@ describe('FieldNameCompletion', () => {
       .toEqual(['nf_version', 'nf_proto_name']);
   });
 
+  it('returns empty list when current token is a keyword and the the prefix is empty', () => {
+    const completer = new FieldNameCompletion();
+    const currentToken = { type: 'keyword', value: 'http_method:', index: 0, start: 0 };
+
+    expect(completer.getCompletions(currentToken, null, '')).toEqual([]);
+  });
+
   describe('considers current query', () => {
     const completionByName = (fieldName, completions) => completions.find(({ name }) => (name === fieldName));
 
