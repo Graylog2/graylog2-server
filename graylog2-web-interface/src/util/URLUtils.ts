@@ -119,19 +119,6 @@ const URLUtils = {
   },
 };
 
-export const qualifyUrlWithSessionCredentials = (url: string, sessionId: string) => {
-  let result = new URI(URLUtils.qualifyUrl(url));
-
-  if (URLUtils.areCredentialsInURLSupported()) {
-    const trimmedSessionId = sessionId !== undefined ? sessionId : '';
-
-    result = result.username(trimmedSessionId)
-      .password('session');
-  }
-
-  return result.toString();
-};
-
 export default URLUtils;
 
 export const {

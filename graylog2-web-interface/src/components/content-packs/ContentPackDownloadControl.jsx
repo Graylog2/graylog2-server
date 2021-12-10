@@ -17,13 +17,12 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { qualifyUrlWithSessionCredentials } from 'util/URLUtils';
+import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import { Modal, Button } from 'components/bootstrap';
 import { Icon } from 'components/common';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import * as URLUtils from 'util/URLUtils';
-import { SessionStore } from 'stores/sessions/SessionStore';
 
 class ContentPackDownloadControl extends React.Component {
   static propTypes = {
@@ -40,7 +39,7 @@ class ContentPackDownloadControl extends React.Component {
   _getDownloadUrl() {
     const { contentPackId, revision } = this.props;
 
-    return qualifyUrlWithSessionCredentials(ApiRoutes.ContentPacksController.downloadRev(contentPackId, revision).url, SessionStore.getSessionId());
+    return qualifyUrl(ApiRoutes.ContentPacksController.downloadRev(contentPackId, revision).url);
   }
 
   _closeModal() {
