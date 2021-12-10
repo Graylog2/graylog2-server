@@ -243,7 +243,16 @@ public class SessionsResource extends RestResource {
     @Path("/{sessionId}")
     @RequiresAuthentication
     @AuditEvent(type = AuditEventTypes.SESSION_DELETE)
-    public void terminateSession(@ApiParam(name = "sessionId", required = true) @PathParam("sessionId") String sessionId) {
+    public void terminateSessionWithId(@ApiParam(name = "sessionId", required = true) @PathParam("sessionId") String sessionId) {
+        final Subject subject = getSubject();
+        securityManager.logout(subject);
+    }
+
+    @DELETE
+    @ApiOperation(value = "Terminate an existing session", notes = "Destroys the session with the given ID: the equivalent of logging out.")
+    @RequiresAuthentication
+    @AuditEvent(type = AuditEventTypes.SESSION_DELETE)
+    public void terminateSession() {
         final Subject subject = getSubject();
         securityManager.logout(subject);
     }
