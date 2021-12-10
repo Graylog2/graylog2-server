@@ -196,11 +196,10 @@ const SearchBar = ({
                             <FormWarningsContext.Consumer>
                               {({ warnings }) => (
                                 <StyledQueryInput value={value}
-                                                timeRange={values.timerange}
-                                                streams={values.streams}
-                                                placeholder='Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'
-                                                error={error}
-                                                warning={warnings.queryString }
+                                                  timeRange={values.timerange}
+                                                streams={values.streams}placeholder='Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'
+                                                  error={error}
+                                                  warning={warnings.queryString}
                                                   onChange={(newQuery) => {
                                                     onChange({ target: { value: newQuery, name } });
 

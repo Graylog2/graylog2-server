@@ -156,10 +156,9 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
                             <FormWarningsContext.Consumer>
                               {({ warnings }) => (
                                 <StyledQueryInput value={value}
-                                                timeRange={values?.timerange}
-                                                placeholder="Apply filter to all widgets"
-                                                onChange={(newQuery) => {
-                                                  onChange({ target: { value: newQuery, name } });
+                                                  timeRange={values?.timerange}placeholder="Apply filter to all widgets"
+                                                  onChange={(newQuery) => {
+                                                    onChange({ target: { value: newQuery, name } });
 
                                                     return Promise.resolve(newQuery);
                                                   }}
