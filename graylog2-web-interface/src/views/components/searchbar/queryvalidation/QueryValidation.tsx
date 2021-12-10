@@ -140,45 +140,38 @@ const QueryValidation = () => {
   const [shakingPopover, shake] = useShakeTemporarily();
   const [showExplanation, toggleShow] = useTriggerIfErrorsPersist(shake);
 
-  const containerRef = useRef(undefined);
   const explanationTriggerRef = useRef(undefined);
   const { errors: { queryString: queryStringErrors } } = useFormikContext();
   const { warnings } = useContext(FormWarningsContext);
 
   const validationState = (queryStringErrors ?? warnings?.queryString) as QueryValidationState;
 
-  // We need to always display the container to avoid query inout resizing problems
-  if (!validationState || validationState.status === 'OK') {
-    return (
-      <Container ref={() => containerRef} />
-    );
-  }
-
-  const { status, explanations } = validationState;
+  const { status, explanations } = validationState ?? {};
+  const hasExplanations = validationState && validationState?.status !== 'OK';
 
   return (
-    <Container ref={() => containerRef}>
-      <ExplanationTrigger title="Toggle validation error explanation"
-                          ref={explanationTriggerRef}
-                          onClick={toggleShow}
-                          $clickable
-                          tabIndex={0}
-                          type="button">
-        <ErrorIcon $status={status} name="exclamation-circle" />
-      </ExplanationTrigger>
+    <>
+      <Container ref={explanationTriggerRef}>
+        {hasExplanations && (
+        <ExplanationTrigger title="Toggle validation error explanation"
+                            onClick={toggleShow}
+                            $clickable
+                            tabIndex={0}
+                            type="button">
+          <ErrorIcon $status={status} name="exclamation-circle" />
+        </ExplanationTrigger>
+        )}
+      </Container>
 
-      {showExplanation && (
+      {hasExplanations && showExplanation && (
         <Overlay show
-                 container={containerRef.current}
                  containerPadding={10}
                  placement="bottom"
                  target={explanationTriggerRef.current}
                  shouldUpdatePosition
                  transition={Transition}>
           <StyledPopover id="query-validation-error-explanation"
-                         title={(
-                           <ExplanationTitle title={StringUtils.capitalizeFirstLetter(status.toLocaleLowerCase())} />
-                         )}
+                         title={<ExplanationTitle title={StringUtils.capitalizeFirstLetter(status.toLocaleLowerCase())} />}
                          $shaking={shakingPopover}>
             <div role="alert">
               {explanations.map(({ errorType, errorMessage }) => (
@@ -190,7 +183,7 @@ const QueryValidation = () => {
           </StyledPopover>
         </Overlay>
       )}
-    </Container>
+    </>
   );
 };
 
