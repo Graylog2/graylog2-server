@@ -18,7 +18,7 @@ import * as Immutable from 'immutable';
 
 import { StoreMock as MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
-import { FieldTypeMappingsList, FieldTypesStore, FieldTypesStoreState } from 'views/stores/FieldTypesStore';
+import { FieldTypesStore } from 'views/stores/FieldTypesStore';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import fetch from 'logic/rest/FetchProvider';
