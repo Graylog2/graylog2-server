@@ -14,21 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import { debounce } from 'lodash';
 
-import { singleton } from 'logic/singleton';
-import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
+type PromiseReturnType<T> = T extends (...args: any[]) => Promise<infer R> ? R : never;
 
-type Warnings = {
-  queryString?: QueryValidationState,
+const debounceWithPromise = <T extends (...args: any[]) => Promise<any>>(fn: T, delay: number) => {
+  const debouncedFn = debounce((resolve: PromiseReturnType<T>, ...args: Parameters<T>) => fn(...args).then(resolve), delay);
+
+  return (...args: Parameters<T>) => new Promise<PromiseReturnType<T>>((resolve: PromiseReturnType<T>) => {
+    debouncedFn(resolve, ...args);
+  });
 };
 
-interface FormWarningsContextType {
-  warnings: Warnings,
-
-  setFieldWarning: <R extends keyof Warnings>(fieldName: R, warning: Warnings[R]) => void,
-}
-
-const FormWarningsContext = React.createContext<FormWarningsContextType | undefined>(undefined);
-
-export default singleton('contexts.FormWarningsContext', () => FormWarningsContext);
+export default debounceWithPromise;

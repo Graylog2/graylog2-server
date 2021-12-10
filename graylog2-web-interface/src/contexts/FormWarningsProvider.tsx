@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 
 import FormWarningsContext from './FormWarningsContext';
 
@@ -24,9 +24,19 @@ type Props = {
 };
 
 const FormWarningsProvider = ({ children }: Props) => {
+  const isMounted = useRef<boolean>();
+
+  useEffect(() => {
+    isMounted.current = true;
+
+    return () => { isMounted.current = false; };
+  });
+
   const [warnings, setWarnings] = useState({});
   const setFieldWarning = useCallback((fieldName, warning) => {
-    setWarnings({ ...warnings, [fieldName]: warning });
+    if (isMounted.current === true) {
+      setWarnings({ ...warnings, [fieldName]: warning });
+    }
   }, [warnings]);
 
   return (

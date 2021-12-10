@@ -14,21 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import { useStore } from 'stores/connect'; import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore'; import { SearchStore } from 'views/stores/SearchStore';
 
-import { singleton } from 'logic/singleton';
-import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
+const useParameters = () => {
+  const { parameterBindings } = useStore(SearchExecutionStateStore);
+  const { search: { parameters } } = useStore(SearchStore);
 
-type Warnings = {
-  queryString?: QueryValidationState,
+  return { parameterBindings, parameters };
 };
 
-interface FormWarningsContextType {
-  warnings: Warnings,
-
-  setFieldWarning: <R extends keyof Warnings>(fieldName: R, warning: Warnings[R]) => void,
-}
-
-const FormWarningsContext = React.createContext<FormWarningsContextType | undefined>(undefined);
-
-export default singleton('contexts.FormWarningsContext', () => FormWarningsContext);
+export default useParameters;

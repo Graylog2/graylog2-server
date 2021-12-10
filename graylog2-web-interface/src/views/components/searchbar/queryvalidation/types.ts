@@ -14,21 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-
-import { singleton } from 'logic/singleton';
-import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
-
-type Warnings = {
-  queryString?: QueryValidationState,
-};
-
-interface FormWarningsContextType {
-  warnings: Warnings,
-
-  setFieldWarning: <R extends keyof Warnings>(fieldName: R, warning: Warnings[R]) => void,
+export type QueryValidationState = {
+  status: 'OK' | 'ERROR' | 'WARNING',
+  explanations: Array<{
+    errorType: string,
+    errorMessage: string,
+    beginLine: number,
+    endLine: number,
+    beginColumn: number,
+    endColumn: number,
+  }> | undefined
 }
-
-const FormWarningsContext = React.createContext<FormWarningsContextType | undefined>(undefined);
-
-export default singleton('contexts.FormWarningsContext', () => FormWarningsContext);

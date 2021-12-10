@@ -20,11 +20,11 @@ import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
 import { StoreMock as MockStore } from 'helpers/mocking';
 import mockAction from 'helpers/mocking/MockAction';
 import { SearchActions } from 'views/stores/SearchStore';
-// eslint-disable-next-line import/no-named-default
-import { default as MockQuery } from 'views/logic/queries/Query';
+import MockQuery from 'views/logic/queries/Query';
 import WidgetFocusContext, {
   WidgetEditingState, WidgetFocusingState,
 } from 'views/components/contexts/WidgetFocusContext';
+import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
 
 import SearchBar from './SearchBar';
 
@@ -60,7 +60,6 @@ jest.mock('views/stores/SearchConfigStore', () => ({
   },
 }));
 
-jest.mock('views/components/searchbar/QueryInput', () => 'query-input');
 jest.mock('views/components/searchbar/saved-search/SavedSearchControls', () => jest.fn(() => <div>Saved Search Controls</div>));
 
 jest.mock('views/stores/CurrentQueryStore', () => ({
@@ -70,6 +69,9 @@ jest.mock('views/stores/CurrentQueryStore', () => ({
     .id('34efae1e-e78e-48ab-ab3f-e83c8611a683')
     .build()]),
 }));
+
+jest.mock('views/components/searchbar/queryvalidation/validateQuery', () => jest.fn(() => Promise.resolve({ status: 'OK', explanations: [] })));
+jest.mock('views/logic/debounceWithPromise', () => (fn: any) => fn);
 
 describe('SearchBar', () => {
   const config = {
@@ -107,6 +109,8 @@ describe('SearchBar', () => {
 
     const searchButton = await screen.findByTitle('Perform search');
 
+    await waitFor(() => expect(searchButton.classList).not.toContain('disabled'));
+
     fireEvent.click(searchButton);
 
     await waitFor(() => expect(SearchActions.refresh).toHaveBeenCalledTimes(1));
@@ -118,7 +122,7 @@ describe('SearchBar', () => {
     const timeRangeButton = screen.getByLabelText('Open Time Range Selector');
     const searchButton = screen.getByTitle('Perform search');
 
-    await waitFor(() => expect(searchButton).toHaveClass('disabled'));
+    await waitFor(() => expect(searchButton.classList).toContain('disabled'));
     await waitFor(() => expect(timeRangeButton.firstChild).toHaveClass('fa-exclamation-triangle'));
   });
 
@@ -163,5 +167,11 @@ describe('SearchBar', () => {
     const saveBtn = await screen.findByText('Saved Search Controls');
 
     expect(saveBtn).not.toBeNull();
+  });
+
+  it('should validate query on mount', async () => {
+    render(<SearchBar config={config} />);
+
+    await waitFor(() => expect(validateQuery).toHaveBeenCalled());
   });
 });

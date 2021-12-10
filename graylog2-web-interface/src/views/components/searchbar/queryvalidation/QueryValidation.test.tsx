@@ -17,14 +17,11 @@
 import * as React from 'react';
 import { render, waitFor, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
-import * as Immutable from 'immutable';
 import { Form, Formik } from 'formik';
 
-import QueryValidation, { QueryValidationState } from 'views/components/searchbar/queryvalidation/QueryValidation';
-import { asMock } from 'helpers/mocking';
-import FormWarningsProvider from 'contexts/FormWarningsProvider';
-import fetch from 'logic/rest/FetchProvider';
+import QueryValidation from 'views/components/searchbar/queryvalidation/QueryValidation';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
+import FormWarningsContext from 'contexts/FormWarningsContext'; import { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 
 jest.mock('views/stores/QueriesStore', () => ({
   QueriesActions: {
@@ -51,32 +48,34 @@ jest.mock('views/stores/SearchExecutionStateStore', () => ({
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
 jest.mock('logic/datetimes/DateTime', () => ({}));
 
+type SUTProps = {
+  // eslint-disable-next-line react/require-default-props
+  error?: QueryValidationState,
+  // eslint-disable-next-line react/require-default-props
+  warning?: QueryValidationState,
+}
+
 describe('QueryValidation', () => {
-  const errorResponse = {
+  const errorResponse: QueryValidationState = {
     status: 'ERROR',
     explanations: [{
-      error_type: 'ParseException',
-      error_message: "Cannot parse 'source: '",
-      begin_line: 1,
-      end_line: 1,
-      begin_column: 1,
-      end_column: 5,
+      errorType: 'ParseException',
+      errorMessage: "Cannot parse 'source: '",
+      beginLine: 1,
+      endLine: 1,
+      beginColumn: 1,
+      endColumn: 5,
     }],
-  };
-
-  const queryValidationSuccess: QueryValidationState = {
-    status: 'OK',
-    explanations: undefined,
   };
 
   const validationErrorIconTitle = 'Toggle validation error explanation';
 
-  const SUT = (props) => (
-    <Formik onSubmit={() => {}} initialValues={{}}>
+  const SUT = ({ error, warning }: SUTProps) => (
+    <Formik onSubmit={() => {}} initialValues={{}} initialErrors={error ? { queryString: error } : {}}>
       <Form>
-        <FormWarningsProvider>
-          <QueryValidation {...props} />
-        </FormWarningsProvider>
+        <FormWarningsContext.Provider value={{ warnings: warning ? { queryString: warning } : {}, setFieldWarning: () => {} }}>
+          <QueryValidation />
+        </FormWarningsContext.Provider>
       </Form>
     </Formik>
   );
@@ -85,89 +84,20 @@ describe('QueryValidation', () => {
     jest.clearAllMocks();
   });
 
-  it('should validate query on mount', async () => {
-    render(<SUT queryString="source:"
-                timeRange={{ type: 'relative', from: 300 }}
-                streams={['stream-id']} />);
-
-    await waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
-
-    const expectedPayload = {
-      query: 'source:',
-      filter: undefined,
-      timerange: { type: 'relative', from: 300 },
-      streams: ['stream-id'],
-      parameters: [],
-      parameter_bindings: Immutable.Map(),
-    };
-
-    expect(fetch).toHaveBeenCalledWith('POST', expect.any(String), expectedPayload);
-  });
-
-  it('should validate query when changing query string', async () => {
-    const { rerender } = render(<SUT queryString="source:" timeRange={undefined} />);
-
-    await waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
-
-    rerender(<SUT queryString="updated query" timeRange={undefined} />);
-
-    await waitFor(() => expect(fetch).toHaveBeenCalledTimes(2));
-
-    const expectedPayload = {
-      query: 'updated query',
-      filter: undefined,
-      timerange: undefined,
-      streams: undefined,
-      parameters: [],
-      parameter_bindings: Immutable.Map(),
-    };
-
-    expect(fetch).toHaveBeenCalledWith('POST', expect.any(String), expectedPayload);
-  });
-
-  it('should validate query when changing filter', async () => {
-    const { rerender } = render(<SUT queryString="source:host-1" timeRange={undefined} filter="http_method:" />);
-
-    await waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
-
-    rerender(<SUT queryString="source:host-1" timeRange={undefined} filter="http_method:GET" />);
-
-    await waitFor(() => expect(fetch).toHaveBeenCalledTimes(2));
-
-    const expectedPayload = {
-      query: 'source:host-1',
-      timerange: undefined,
-      streams: undefined,
-      filter: 'http_method:',
-      parameters: [],
-      parameter_bindings: Immutable.Map(),
-    };
-
-    expect(fetch).toHaveBeenCalledWith('POST', expect.any(String), expectedPayload);
-  });
-
   it('should display validation error icon when there is a validation error', async () => {
-    asMock(fetch).mockReturnValue(Promise.resolve(errorResponse));
-    render(<SUT queryString="source:" timeRange={undefined} />);
+    render(<SUT error={errorResponse} />);
 
     await screen.findByTitle(validationErrorIconTitle);
   });
 
   it('should not display validation error icon when there is no validation error', async () => {
-    asMock(fetch).mockReturnValue(Promise.resolve(errorResponse));
-
-    const { rerender } = render(<SUT queryString="source:" timeRange={undefined} />);
-    await screen.findByTitle(validationErrorIconTitle);
-
-    asMock(fetch).mockReturnValue(Promise.resolve(queryValidationSuccess));
-    rerender(<SUT queryString="source:example.org" timeRange={undefined} />);
+    render(<SUT />);
 
     await waitFor(() => expect(screen.queryByTitle(validationErrorIconTitle)).not.toBeInTheDocument());
   });
 
   it('should display validation error explanation', async () => {
-    asMock(fetch).mockReturnValue(Promise.resolve(errorResponse));
-    render(<SUT queryString="source:" timeRange={undefined} />);
+    render(<SUT error={errorResponse} />);
 
     const validationExplanationTrigger = await screen.findByTitle(validationErrorIconTitle);
     userEvent.click(validationExplanationTrigger);
