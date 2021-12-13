@@ -23,11 +23,14 @@ import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.graylog.testing.utils.GelfInputUtils;
 import org.graylog.testing.utils.SearchUtils;
+import org.hamcrest.Matchers;
+import org.junit.jupiter.api.BeforeAll;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.testing.completebackend.Lifecycle.VM;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.core.IsEqual.equalTo;
 
 @ContainerMatrixTestsConfiguration(serverLifecycle = VM)
@@ -43,18 +46,18 @@ public class SuggestionResourceIT {
         this.requestSpec = requestSpec;
     }
 
-    @ContainerMatrixTest
-    void testMinimalRequest() {
+    @BeforeAll
+    public void init() {
         int mappedPort = sut.mappedPortFor(GELF_HTTP_PORT);
         GelfInputUtils.createGelfHttpInput(mappedPort, GELF_HTTP_PORT, requestSpec);
         GelfInputUtils.postMessage(mappedPort,
-                "{\"short_message\":\"SuggestionResourceIT#testMinimalisticRequest\", \"host\":\"example.org\", \"facility\":\"test\"}",
+                "{\"short_message\":\"SuggestionResourceIT\", \"host\":\"example.org\", \"facility\":\"test\"}",
                 requestSpec);
+         SearchUtils.waitForMessage(requestSpec, "SuggestionResourceIT");
+    }
 
-        // mainly because of the waiting logic
-        final boolean messagePresent = SearchUtils.waitForMessage(requestSpec, "SuggestionResourceIT#testMinimalisticRequest");
-        assertThat(messagePresent).isTrue();
-
+    @ContainerMatrixTest
+    void testMinimalRequest() {
         final ValidatableResponse validatableResponse = given()
                 .spec(requestSpec)
                 .when()
@@ -63,21 +66,11 @@ public class SuggestionResourceIT {
                 .then()
                 .statusCode(200);
         validatableResponse.assertThat().body("suggestions.value[0]", equalTo("test"));
-        validatableResponse.assertThat().body("suggestions.occurrence[0]", equalTo(1));
+        validatableResponse.assertThat().body("suggestions.occurrence[0]", greaterThanOrEqualTo(1));
     }
 
     @ContainerMatrixTest
     void testInvalidField() {
-        int mappedPort = sut.mappedPortFor(GELF_HTTP_PORT);
-        GelfInputUtils.createGelfHttpInput(mappedPort, GELF_HTTP_PORT, requestSpec);
-        GelfInputUtils.postMessage(mappedPort,
-                "{\"short_message\":\"SuggestionResourceIT#testInvalidField\", \"host\":\"example.org\", \"facility\":\"test\"}",
-                requestSpec);
-
-        // mainly because of the waiting logic
-        final boolean messagePresent = SearchUtils.waitForMessage(requestSpec, "SuggestionResourceIT#testInvalidField");
-        assertThat(messagePresent).isTrue();
-
         final ValidatableResponse validatableResponse = given()
                 .spec(requestSpec)
                 .when()
