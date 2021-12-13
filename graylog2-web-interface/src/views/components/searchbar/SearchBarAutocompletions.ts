@@ -19,7 +19,7 @@ import { sortBy, uniqBy } from 'lodash';
 import type { Editor, ResultsCallback, Session, Position, CompletionResult, AutoCompleter, Token } from './ace-types';
 
 export interface Completer {
-  getCompletions(currentToken: Token | undefined | null, lastToken: Token | undefined | null, prefix: string, tokens: Array<Token>, currentTokenIdx: number): Array<CompletionResult>;
+  getCompletions(currentToken: Token | undefined | null, lastToken: Token | undefined | null, prefix: string, tokens: Array<Token>, currentTokenIdx: number): Array<CompletionResult> | Promise<Array<CompletionResult>>;
 }
 
 export default class SearchBarAutoCompletions implements AutoCompleter {
@@ -29,7 +29,7 @@ export default class SearchBarAutoCompletions implements AutoCompleter {
     this.completers = completers;
   }
 
-  getCompletions = (editor: Editor, session: Session, pos: Position, prefix: string, callback: ResultsCallback) => {
+  getCompletions = async (editor: Editor, session: Session, pos: Position, prefix: string, callback: ResultsCallback) => {
     // eslint-disable-next-line no-param-reassign
     editor.completer.autoSelect = false;
     const tokens = editor.session.getTokens(pos.row);
@@ -38,20 +38,20 @@ export default class SearchBarAutoCompletions implements AutoCompleter {
 
     const lastToken: Token | undefined | null = currentTokenIdx > 0 ? tokens[currentTokenIdx - 1] : null;
 
-    const results = this.completers
-      .map((completer) => {
-        try {
-          return completer.getCompletions(currentToken, lastToken, prefix, tokens, currentTokenIdx);
-        } catch (e) {
-          // eslint-disable-next-line no-console
-          console.warn('Exception thrown in completer: ', e);
-        }
+    const results = await Promise.all(
+      this.completers
+        .map(async (completer) => {
+          try {
+            return await completer.getCompletions(currentToken, lastToken, prefix, tokens, currentTokenIdx);
+          } catch (e) {
+            // eslint-disable-next-line no-console
+            console.warn('Exception thrown in completer: ', e);
+          }
 
-        return [];
-      })
-      .reduce((acc, cur) => [...acc, ...cur], []);
-
-    const uniqResults = uniqBy(sortBy(results, ['score', 'name']), 'name');
+          return [];
+        }),
+    );
+    const uniqResults = uniqBy(sortBy(results.flat(), ['score', 'name']), 'name');
 
     callback(null, uniqResults);
   }
