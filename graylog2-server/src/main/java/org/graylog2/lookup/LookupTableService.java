@@ -120,14 +120,6 @@ public class LookupTableService extends AbstractIdleService {
         return scheduler;
     }
 
-    public Map<String, LookupDataAdapter.Factory> getAdapterFactories() {
-        return adapterFactories;
-    }
-
-    public Map<String, LookupDataAdapter.Factory2> getAdapterFactories2() {
-        return adapterFactories2;
-    }
-
     @Override
     protected void startUp() throws Exception {
         // Start refresh service and wait until it's running so the adapters can register themselves
@@ -399,7 +391,7 @@ public class LookupTableService extends AbstractIdleService {
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
-    private LookupDataAdapter createAdapter(DataAdapterDto dto) {
+    protected LookupDataAdapter createAdapter(DataAdapterDto dto) {
         try {
             final LookupDataAdapter.Factory2 factory2 = adapterFactories2.get(dto.config().type());
             final LookupDataAdapter.Factory factory = adapterFactories.get(dto.config().type());
