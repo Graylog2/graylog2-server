@@ -216,30 +216,4 @@ describe('FieldValueCompletion', () => {
 
     expect(suggestions).toEqual([]);
   });
-
-  it('normalizes absolute time range', async () => {
-    const currentToken = createKeywordToken('http_method:');
-    const completer = new FieldValueCompletion();
-
-    await completer.getCompletions(
-      currentToken,
-      null,
-      '',
-      [currentToken],
-      0,
-      { type: 'absolute', from: '2021-01-01 12:00:00.000', to: '2021-01-01 14:00:00.000' },
-      undefined,
-    );
-
-    expect(fetch).toHaveBeenCalledWith(
-      expect.any(String),
-      expect.any(String),
-      {
-        field: 'http_method',
-        input: '',
-        streams: undefined,
-        timerange: { from: '2021-01-01T18:00:00.000Z', to: '2021-01-01T20:00:00.000Z', type: 'absolute' },
-      },
-    );
-  });
 });

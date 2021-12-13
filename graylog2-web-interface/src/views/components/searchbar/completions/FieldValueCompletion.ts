@@ -23,7 +23,7 @@ import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import { FieldTypesStore, FieldTypesStoreState, FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import { onSubmittingTimerange } from 'views/components/TimerangeForForm';
-import { isTypeTimeRange } from 'views/typeGuards/timeRange';
+import { isNoTimeRangeOverride } from 'views/typeGuards/timeRange';
 
 import type { Completer } from '../SearchBarAutocompletions';
 import type { Token } from '../ace-types';
@@ -118,10 +118,12 @@ class FieldValueCompletion implements Completer {
       return [];
     }
 
+    const normalizedTimeRange = (!timeRange || isNoTimeRangeOverride(timeRange)) ? undefined : onSubmittingTimerange(timeRange);
+
     return fetch('POST', suggestionsUrl, {
       field: fieldName,
       input,
-      timerange: isTypeTimeRange(timeRange) ? onSubmittingTimerange(timeRange) : undefined,
+      timerange: normalizedTimeRange,
       streams,
     }).then(({ suggestions }: SuggestionsResponse) => {
       if (!suggestions) {
