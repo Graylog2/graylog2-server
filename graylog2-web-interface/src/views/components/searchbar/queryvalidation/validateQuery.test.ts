@@ -26,6 +26,10 @@ jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
 jest.mock('stores/users/CurrentUserStore', () => ({ CurrentUserStore: MockStore('get') }));
 
 describe('validateQuery', () => {
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   const validationInput: ValidationQuery = {
     queryString: 'source:',
     timeRange: { type: 'relative', from: 300 } as const,
