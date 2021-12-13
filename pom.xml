@@ -134,7 +134,7 @@
         <kafka09.version>0.9.0.1-6</kafka09.version>
         <log4j.version>2.15.0</log4j.version>
         <lucene.version>8.10.1</lucene.version>
-        <metrics.version>4.1.9</metrics.version>
+        <metrics.version>4.2.5</metrics.version>
         <mongodb-driver.version>3.12.1</mongodb-driver.version>
         <mongojack.version>2.10.1</mongojack.version>
         <natty.version>0.13</natty.version>
