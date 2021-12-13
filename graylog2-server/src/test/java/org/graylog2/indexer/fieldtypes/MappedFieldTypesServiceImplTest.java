@@ -62,7 +62,7 @@ public class MappedFieldTypesServiceImplTest {
     @Captor
     private ArgumentCaptor<TimeRange> timeRangeCaptor;
 
-    private MappedFieldTypesServiceImpl mappedFieldTypesService;
+    private MappedFieldTypesService mappedFieldTypesService;
 
     @Before
     public void setUp() throws Exception {

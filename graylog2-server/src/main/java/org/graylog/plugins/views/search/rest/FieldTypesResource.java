@@ -21,7 +21,7 @@ import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.audit.jersey.NoAuditEvent;
-import org.graylog2.indexer.fieldtypes.MappedFieldTypesServiceImpl;
+import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.rest.exceptions.MissingStreamPermissionException;
@@ -46,11 +46,11 @@ import java.util.stream.Collectors;
 @RequiresAuthentication
 public class FieldTypesResource extends RestResource implements PluginRestResource {
     private static final Logger LOG = LoggerFactory.getLogger(FieldTypesResource.class);
-    private final MappedFieldTypesServiceImpl mappedFieldTypesService;
+    private final MappedFieldTypesService mappedFieldTypesService;
     private final PermittedStreams permittedStreams;
 
     @Inject
-    public FieldTypesResource(MappedFieldTypesServiceImpl mappedFieldTypesService,
+    public FieldTypesResource(MappedFieldTypesService mappedFieldTypesService,
                               PermittedStreams permittedStreams) {
         this.mappedFieldTypesService = mappedFieldTypesService;
         this.permittedStreams = permittedStreams;
