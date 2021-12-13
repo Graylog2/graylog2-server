@@ -24,6 +24,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.plugins.views.search.engine.QueryEngine;
 import org.graylog.plugins.views.search.engine.suggestions.SuggestionRequest;
 import org.graylog.plugins.views.search.engine.suggestions.SuggestionResponse;
+import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.suggestions.SuggestionEntryDTO;
 import org.graylog.plugins.views.search.rest.suggestions.SuggestionsDTO;
 import org.graylog.plugins.views.search.rest.suggestions.SuggestionsErrorDTO;
@@ -39,6 +40,7 @@ import javax.inject.Inject;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
 import java.util.Optional;
@@ -63,12 +65,13 @@ public class SuggestionsResource extends RestResource implements PluginRestResou
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation("Validate a search query")
     @NoAuditEvent("Only validating query structure, not changing any data")
-    public SuggestionsDTO validateQuery(@ApiParam(name = "validationRequest") SuggestionsRequestDTO suggestionsRequest) {
+    public SuggestionsDTO validateQuery(@ApiParam(name = "validationRequest") SuggestionsRequestDTO suggestionsRequest,
+                                        @Context SearchUser searchUser) {
 
         final SuggestionRequest req = SuggestionRequest.builder()
                 .field(suggestionsRequest.field())
                 .input(suggestionsRequest.input())
-                .streams(adaptStreams(suggestionsRequest.streams()))
+                .streams(adaptStreams(suggestionsRequest.streams(), searchUser))
                 .timerange(Optional.ofNullable(suggestionsRequest.timerange()).orElse(defaultTimeRange()))
                 .build();
 
@@ -83,12 +86,12 @@ public class SuggestionsResource extends RestResource implements PluginRestResou
         return suggestionsBuilder.build();
     }
 
-    private Set<String> adaptStreams(Set<String> streams) {
+    private Set<String> adaptStreams(Set<String> streams, SearchUser searchUser) {
         if (streams == null || streams.isEmpty()) {
-            return loadAllAllowedStreamsForUser();
+            return loadAllAllowedStreamsForUser(searchUser);
         } else {
             // TODO: is it ok to filter out a stream that's not accessible or should we throw an exception?
-            return streams.stream().filter(this::hasStreamReadPermission).collect(Collectors.toSet());
+            return streams.stream().filter(searchUser::canReadStream).collect(Collectors.toSet());
         }
     }
 
@@ -100,15 +103,7 @@ public class SuggestionsResource extends RestResource implements PluginRestResou
         }
     }
 
-    private ImmutableSet<String> loadAllAllowedStreamsForUser() {
-        return permittedStreams.load(this::hasStreamReadPermission);
-    }
-
-    private boolean hasStreamReadPermission(String streamId) {
-        return isPermitted(RestPermissions.STREAMS_READ, streamId);
-    }
-
-    protected boolean isPermitted(String permission, String instanceId) {
-        return getSubject().isPermitted(permission + ":" + instanceId);
+    private ImmutableSet<String> loadAllAllowedStreamsForUser(SearchUser searchUser) {
+        return permittedStreams.load(searchUser::canReadStream);
     }
 }

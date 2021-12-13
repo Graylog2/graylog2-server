@@ -200,7 +200,7 @@ public class ElasticsearchClient {
                         final ResponseError err = objectMapper.readValue(((ResponseException) realCause).getResponse().getEntity().getContent(), ResponseError.class);
                         return Optional.of(err);
                     } catch (IOException ioe) {
-                        //LOG.warn("Failed to parse exception", e);
+                        LOG.warn("Failed to parse exception", ioe);
                     }
                 }
             }
