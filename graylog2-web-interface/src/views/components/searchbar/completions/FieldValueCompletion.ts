@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { isEmpty } from 'lodash';
 import * as Immutable from 'immutable';
 
 import fetch from 'logic/rest/FetchProvider';
@@ -23,6 +22,8 @@ import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import { FieldTypesStore, FieldTypesStoreState, FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import { onSubmittingTimerange } from 'views/components/TimerangeForForm';
+import { isTypeTimeRange } from 'views/typeGuards/timeRange';
 
 import type { Completer } from '../SearchBarAutocompletions';
 import type { Token } from '../ace-types';
@@ -120,7 +121,7 @@ class FieldValueCompletion implements Completer {
     return fetch('POST', suggestionsUrl, {
       field: fieldName,
       input,
-      timerange: !isEmpty(timeRange) ? timeRange : undefined,
+      timerange: isTypeTimeRange(timeRange) ? onSubmittingTimerange(timeRange) : undefined,
       streams,
     }).then(({ suggestions }: SuggestionsResponse) => {
       if (!suggestions) {
