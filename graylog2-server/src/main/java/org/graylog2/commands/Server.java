@@ -232,7 +232,7 @@ public class Server extends ServerBootstrap {
 
             if (!nodeService.isOnlyLeader(serverStatus.getNodeId())) {
                 // All devils here.
-                String what = "Detected other master node in the cluster! Starting as non-master! "
+                String what = "Detected other leader node in the cluster! Starting as non-leader! "
                         + "This is a mis-configuration you should fix.";
                 LOG.warn(what);
                 activityWriter.write(new Activity(what, Server.class));
@@ -246,7 +246,7 @@ public class Server extends ServerBootstrap {
 
                 configuration.setIsLeader(false);
             } else {
-                LOG.warn("Stale master has gone. Starting as master.");
+                LOG.warn("Stale leader has gone. Starting as leader.");
             }
         }
     }
