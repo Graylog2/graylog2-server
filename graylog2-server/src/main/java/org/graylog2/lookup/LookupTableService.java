@@ -108,6 +108,26 @@ public class LookupTableService extends AbstractIdleService {
         this.adapterRefreshService = new LookupDataAdapterRefreshService(scheduler, liveTables);
     }
 
+    public LookupTableConfigService getConfigService() {
+        return configService;
+    }
+
+    public LookupDataAdapterRefreshService getAdapterRefreshService() {
+        return adapterRefreshService;
+    }
+
+    public ScheduledExecutorService getScheduler() {
+        return scheduler;
+    }
+
+    public Map<String, LookupDataAdapter.Factory> getAdapterFactories() {
+        return adapterFactories;
+    }
+
+    public Map<String, LookupDataAdapter.Factory2> getAdapterFactories2() {
+        return adapterFactories2;
+    }
+
     @Override
     protected void startUp() throws Exception {
         // Start refresh service and wait until it's running so the adapters can register themselves
@@ -160,7 +180,7 @@ public class LookupTableService extends AbstractIdleService {
         adapterRefreshService.stopAsync();
     }
 
-    private class DataAdapterListener extends Service.Listener {
+    protected class DataAdapterListener extends Service.Listener {
         private final DataAdapterDto dto;
         private final LookupDataAdapter adapter;
         private final CountDownLatch latch;
@@ -361,7 +381,7 @@ public class LookupTableService extends AbstractIdleService {
         scheduler.schedule(() -> deleted.lookupTableNames().forEach(liveTables::remove), 0, TimeUnit.SECONDS);
     }
 
-    private CountDownLatch createAndStartAdapters() {
+    protected CountDownLatch createAndStartAdapters() {
         final Map<DataAdapterDto, LookupDataAdapter> adapters = createAdapters(configService.loadAllDataAdapters());
         final CountDownLatch latch = new CountDownLatch(toIntExact(adapters.size()));
 
