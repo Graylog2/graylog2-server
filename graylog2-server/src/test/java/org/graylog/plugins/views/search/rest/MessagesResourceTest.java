@@ -78,7 +78,7 @@ public class MessagesResourceTest {
         when(permittedStreams.load(any())).thenReturn(ImmutableSet.of("a-default-stream"));
         executionGuard = mock(SearchExecutionGuard.class);
         SearchDomain searchDomain = mock(SearchDomain.class);
-        searchUser = mock(SearchUser.class);
+        searchUser = new SearchUser(currentUser, s -> true, (s, s2) -> true);
 
         final QueryValidationServiceImpl validationService = new QueryValidationServiceImpl(
                 new LuceneQueryParser(),
