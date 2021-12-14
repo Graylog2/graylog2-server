@@ -63,6 +63,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -536,5 +537,24 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
         client().addAliasMapping(index, alias);
 
         assertThat(indices.aliasTarget(prefixWithPlus + "*")).contains(index);
+    }
+
+    @Test
+    public void removeAliasesRemovesSecondTarget() {
+        final String randomIndices = "random_";
+        final String index = client().createRandomIndex(randomIndices);
+        final String index2 = client().createRandomIndex(randomIndices);
+        final String alias = randomIndices + "deflector";
+        assertThat(indices.aliasTarget(alias)).isEmpty();
+
+        client().addAliasMapping(index, alias);
+        client().addAliasMapping(index2, alias);
+
+        assertThatThrownBy(() -> indices.aliasTarget(alias))
+                .isInstanceOf(TooManyAliasesException.class);
+
+        indices.removeAliases(alias, Collections.singleton(index));
+
+        assertThat(indices.aliasTarget(alias)).contains(index2);
     }
 }
