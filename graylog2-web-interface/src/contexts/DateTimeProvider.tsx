@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useCallback, useMemo, useContext } from 'react';
 import moment from 'moment-timezone';
+import type { Moment } from 'moment';
 
 import DateTimeContext, { DateTimeContextType } from 'contexts/DateTimeContext';
 import AppConfig from 'util/AppConfig';
@@ -43,6 +44,14 @@ export const DATE_TIME_FORMATS = {
   date: 'YYYY-MM-DD',
 };
 
+const validateDateTime = (dateTime: Moment, originalDateTime) => {
+  if (!dateTime.isValid()) {
+    throw new Error(`Date time ${originalDateTime} is not valid`);
+  }
+
+  return dateTime;
+};
+
 /**
  * Provides a function to convert a ACCEPTED_FORMAT of a timestamp into a timestamp converted to the users timezone.
  * @param children React components.
@@ -52,7 +61,7 @@ const DateTimeProvider = ({ children }: Props) => {
   const userTimezone = useMemo(() => getUserTimezone(currentUser?.timezone), [currentUser?.timezone]);
 
   const adjustTimezone = useCallback((time, tz = userTimezone) => {
-    return moment.tz(time, tz);
+    return validateDateTime(moment.tz(time, tz), time);
   }, [userTimezone]);
 
   const formatTime = useCallback((time, tz = userTimezone, format = 'default') => {
@@ -64,7 +73,7 @@ const DateTimeProvider = ({ children }: Props) => {
   };
 
   const relativeDifference = (time) => {
-    return moment(time).fromNow();
+    return validateDateTime(moment(time), time).fromNow();
   };
 
   const contextValue = {
