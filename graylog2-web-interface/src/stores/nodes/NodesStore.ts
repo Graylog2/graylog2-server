@@ -38,7 +38,7 @@ export const NodesActions = singletonActions(
 export type NodeInfo = {
   cluster_id: string,
   hostname: string,
-  is_master: boolean,
+  is_leader: boolean,
   last_seen: string,
   node_id: string,
   short_node_id: string,
