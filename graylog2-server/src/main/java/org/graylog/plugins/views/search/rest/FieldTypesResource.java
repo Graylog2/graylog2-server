@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.views.search.rest;
 
+import com.google.common.collect.ImmutableSet;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
@@ -24,11 +25,7 @@ import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.rest.PluginRestResource;
-import org.graylog2.shared.rest.exceptions.MissingStreamPermissionException;
 import org.graylog2.shared.rest.resources.RestResource;
-import org.graylog2.shared.security.RestPermissions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -38,14 +35,12 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Api(value = "FieldTypes")
 @Path("/views/fields")
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
 public class FieldTypesResource extends RestResource implements PluginRestResource {
-    private static final Logger LOG = LoggerFactory.getLogger(FieldTypesResource.class);
     private final MappedFieldTypesService mappedFieldTypesService;
     private final PermittedStreams permittedStreams;
 
@@ -59,28 +54,15 @@ public class FieldTypesResource extends RestResource implements PluginRestResour
     @GET
     @ApiOperation(value = "Retrieve the list of all fields present in the system")
     public Set<MappedFieldTypeDTO> allFieldTypes(@Context SearchUser searchUser) {
-        return mappedFieldTypesService.fieldTypesByStreamIds(permittedStreams.load(searchUser::canReadStream), RelativeRange.allTime());
+        final ImmutableSet<String> streams = searchUser.streams(permittedStreams).loadAll();
+        return mappedFieldTypesService.fieldTypesByStreamIds(streams, RelativeRange.allTime());
     }
 
     @POST
     @ApiOperation(value = "Retrieve the field list of a given set of streams")
     @NoAuditEvent("This is not changing any data")
     public Set<MappedFieldTypeDTO> byStreams(FieldTypesForStreamsRequest request, @Context SearchUser searchUser) {
-        final Set<String> streams = request.streams().orElse(permittedStreams.load(searchUser::canReadStream));
-        checkStreamPermission(streams, searchUser);
-
+        final ImmutableSet<String> streams = searchUser.streams(permittedStreams).readableOrAllIfEmpty(request.streams());
         return mappedFieldTypesService.fieldTypesByStreamIds(streams, request.timerange().orElse(RelativeRange.allTime()));
-    }
-
-    private void checkStreamPermission(Set<String> streamIds, SearchUser searchUser) {
-        final Set<String> notPermittedStreams = streamIds.stream()
-                .filter(streamId -> !searchUser.canReadStream(streamId))
-                .collect(Collectors.toSet());
-        if (!notPermittedStreams.isEmpty()) {
-            LOG.info("Not authorized to access resource id <{}>. User <{}> is missing permission <{}:{}>",
-                    streamIds, getSubject().getPrincipal(), RestPermissions.STREAMS_READ, streamIds);
-            throw new MissingStreamPermissionException("Not authorized to access streams.",
-                    streamIds);
-        }
     }
 }

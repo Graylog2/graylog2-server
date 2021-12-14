@@ -17,7 +17,6 @@
 package org.graylog.plugins.views.search.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.util.concurrent.Uninterruptibles;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchDomain;
@@ -71,7 +70,7 @@ public class SearchExecutor {
     }
 
     public SearchJob execute(Search search, SearchUser searchUser, ExecutionState executionState) {
-        final Search searchWithStreams = search.addStreamsToQueriesWithoutStreams(() -> loadAllAllowedStreamsForUser(searchUser));
+        final Search searchWithStreams = search.addStreamsToQueriesWithoutStreams(() -> searchUser.streams(permittedStreams).loadAll());
 
         final Search searchWithExecutionState = searchWithStreams.applyExecutionState(objectMapper, firstNonNull(executionState, ExecutionState.empty()));
 
@@ -96,9 +95,5 @@ public class SearchExecutor {
 
     private void authorize(Search search, StreamPermissions streamPermissions) {
         this.executionGuard.check(search, streamPermissions::canReadStream);
-    }
-
-    private ImmutableSet<String> loadAllAllowedStreamsForUser(StreamPermissions streamPermissions) {
-        return permittedStreams.load(streamPermissions::canReadStream);
     }
 }

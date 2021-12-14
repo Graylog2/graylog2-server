@@ -57,6 +57,7 @@ import org.graylog.plugins.views.search.rest.ExportJobsResource;
 import org.graylog.plugins.views.search.rest.FieldTypesResource;
 import org.graylog.plugins.views.search.rest.MessageExportFormatFilter;
 import org.graylog.plugins.views.search.rest.MessagesResource;
+import org.graylog.plugins.views.search.rest.PermittedStreams;
 import org.graylog.plugins.views.search.rest.PivotSeriesFunctionsResource;
 import org.graylog.plugins.views.search.rest.QualifyingViewsResource;
 import org.graylog.plugins.views.search.rest.QueryValidationResource;
@@ -180,6 +181,7 @@ public class ViewsBindings extends ViewsModule {
         bind(SearchJobService.class).to(InMemorySearchJobService.class).in(Scopes.SINGLETON);
         bind(MappedFieldTypesService.class).to(MappedFieldTypesServiceImpl.class).in(Scopes.SINGLETON);
         bind(QueryValidationService.class).to(QueryValidationServiceImpl.class).in(Scopes.SINGLETON);
+        bind(PermittedStreams.class).to(PermittedStreams.class).in(Scopes.SINGLETON);
         bind(ChunkDecorator.class).to(LegacyChunkDecorator.class);
         bind(MessagesExporter.class).to(DecoratingMessagesExporter.class);
 

@@ -17,26 +17,25 @@
 package org.graylog.plugins.views.search.rest;
 
 import com.google.common.collect.ImmutableSet;
-import org.apache.shiro.subject.Subject;
 import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog.plugins.views.search.permissions.StreamPermissions;
 import org.graylog2.indexer.fieldtypes.FieldTypes;
 import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.shared.rest.exceptions.MissingStreamPermissionException;
-import org.graylog2.shared.security.RestPermissions;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.util.Collections;
 import java.util.Set;
-import java.util.function.Predicate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -56,57 +55,44 @@ public class FieldTypesResourceTest {
     @Mock
     private PermittedStreams permittedStreams;
 
-    @Mock
-    private Subject currentSubject;
-
-    @Mock
-    private SearchUser searchUser;
-
-    @Captor
-    private ArgumentCaptor<Predicate<String>> isPermittedCaptor;
-
     @Captor
     private ArgumentCaptor<Set<String>> streamIdCaptor;
 
     @Captor
     private ArgumentCaptor<TimeRange> timeRangeArgumentCaptor;
 
-    class FieldTypesTestResource extends FieldTypesResource {
-        FieldTypesTestResource(MappedFieldTypesService mappedFieldTypesService, PermittedStreams permittedStreams) {
-            super(mappedFieldTypesService, permittedStreams);
-        }
-
-        @Override
-        protected Subject getSubject() {
-            return currentSubject;
-        }
-    }
-
     private FieldTypesResource fieldTypesResource;
 
     @Before
     public void setUp() throws Exception {
-        this.fieldTypesResource = new FieldTypesTestResource(mappedFieldTypesService, permittedStreams);
+        this.fieldTypesResource = new FieldTypesResource(mappedFieldTypesService, permittedStreams);
     }
 
     @Test
     public void allFieldTypesChecksPermissionsForStream() {
-        when(searchUser.canReadStream(eq("2323"))).thenReturn(false);
-        when(searchUser.canReadStream(eq("4242"))).thenReturn(true);
-
-        when(permittedStreams.load(isPermittedCaptor.capture())).thenReturn(ImmutableSet.of());
+        final SearchUser searchUser = TestSearchUser.builder()
+                .denyStream("2323")
+                .allowStream("4242")
+                .build();
 
         this.fieldTypesResource.allFieldTypes(searchUser);
+        final ArgumentCaptor<StreamPermissions> userPermission = ArgumentCaptor.forClass(StreamPermissions.class);
+        Mockito.verify(permittedStreams).load(userPermission.capture());
+        final StreamPermissions userPermissionValue = userPermission.getValue();
+        assertThat(userPermissionValue.canReadStream("4242")).isTrue();
+        assertThat(userPermissionValue.canReadStream("2323")).isFalse();
 
-        final Predicate<String> hasStreamReadPermission = isPermittedCaptor.getValue();
-
-        assertThat(hasStreamReadPermission.test("2323")).isFalse();
-        assertThat(hasStreamReadPermission.test("4242")).isTrue();
     }
 
     @Test
     public void allFieldTypesReturnsResultFromMappedFieldTypesService() {
+        final SearchUser searchUser = TestSearchUser.builder()
+                .allowStream("2323")
+                .allowStream("4242")
+                .build();
+
         when(permittedStreams.load(any())).thenReturn(ImmutableSet.of("2323", "4242"));
+
         final Set<MappedFieldTypeDTO> fieldTypes = Collections.singleton(MappedFieldTypeDTO.create("foobar",
                 FieldTypes.Type.createType("long", ImmutableSet.of("numeric", "enumerable"))));
         when(mappedFieldTypesService.fieldTypesByStreamIds(eq(ImmutableSet.of("2323", "4242")), eq(RelativeRange.allTime()))).thenReturn(fieldTypes);
@@ -118,8 +104,10 @@ public class FieldTypesResourceTest {
 
     @Test
     public void passesRequestedTimeRangeToMappedFieldTypesService() throws Exception {
-        when(searchUser.canReadStream(eq("2323"))).thenReturn(true);
-        when(searchUser.canReadStream(eq("4242"))).thenReturn(true);
+        final SearchUser searchUser = TestSearchUser.builder()
+                .allowStream("2323")
+                .allowStream("4242")
+                .build();
 
         final FieldTypesForStreamsRequest request = FieldTypesForStreamsRequest.Builder.builder()
                 .streams(ImmutableSet.of("2323", "4242"))
@@ -135,8 +123,11 @@ public class FieldTypesResourceTest {
 
     @Test
     public void byStreamChecksPermissionsForStream() {
-        when(searchUser.canReadStream(eq("2323"))).thenReturn(true);
-        when(searchUser.canReadStream(eq("4242"))).thenReturn(true);
+
+        final SearchUser searchUser = Mockito.spy(TestSearchUser.builder()
+                .allowStream("2323")
+                .allowStream("4242")
+                .build());
 
         this.fieldTypesResource.byStreams(
                 FieldTypesForStreamsRequest.Builder.builder()
@@ -154,8 +145,11 @@ public class FieldTypesResourceTest {
 
     @Test
     public void byStreamReturnsTypesFromMappedFieldTypesService() {
-        when(searchUser.canReadStream(eq("2323"))).thenReturn(true);
-        when(searchUser.canReadStream(eq("4242"))).thenReturn(true);
+
+        final SearchUser searchUser = TestSearchUser.builder()
+                .allowStream("2323")
+                .allowStream("4242")
+                .build();
 
         final Set<MappedFieldTypeDTO> fieldTypes = Collections.singleton(MappedFieldTypeDTO.create("foobar",
                 FieldTypes.Type.createType("long", ImmutableSet.of("numeric", "enumerable"))));
@@ -177,8 +171,11 @@ public class FieldTypesResourceTest {
 
     @Test
     public void shouldNotAllowAccessWithoutPermission() {
-        when(currentSubject.isPermitted(eq(RestPermissions.STREAMS_READ + ":2323"))).thenReturn(false);
-        when(currentSubject.isPermitted(eq(RestPermissions.STREAMS_READ + ":4242"))).thenReturn(true);
+        final SearchUser searchUser = TestSearchUser
+                .builder()
+                .denyStream("2323")
+                .allowStream("4242")
+                .build();
 
         assertThatExceptionOfType(MissingStreamPermissionException.class)
                 .isThrownBy(() -> fieldTypesResource.byStreams(
@@ -189,4 +186,5 @@ public class FieldTypesResourceTest {
                 ))
                 .satisfies(ex -> assertThat(ex.streamsWithMissingPermissions()).contains("2323"));
     }
+
 }

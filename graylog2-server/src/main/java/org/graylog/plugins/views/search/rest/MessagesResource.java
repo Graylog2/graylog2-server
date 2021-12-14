@@ -17,7 +17,6 @@
 package org.graylog.plugins.views.search.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -140,7 +139,7 @@ public class MessagesResource extends RestResource implements PluginRestResource
         MessagesRequest request = requestFromClient != null ? requestFromClient : MessagesRequest.withDefaults();
 
         if (request.streams().isEmpty()) {
-            request = request.withStreams(loadAllAllowedStreamsForUser(searchUser));
+            request = request.withStreams(searchUser.streams(permittedStreams).loadAll());
         }
 
         if (!request.timeZone().isPresent()) {
@@ -247,16 +246,12 @@ public class MessagesResource extends RestResource implements PluginRestResource
         Search search = searchDomain.getForUser(searchId, searchUser)
                 .orElseThrow(() -> new NotFoundException("Search with id " + searchId + " does not exist"));
 
-        search = search.addStreamsToQueriesWithoutStreams(() -> loadAllAllowedStreamsForUser(searchUser));
+        search = search.addStreamsToQueriesWithoutStreams(() -> searchUser.streams(permittedStreams).loadAll());
 
         search = search.applyExecutionState(objectMapper, executionState);
 
         executionGuard.check(search, searchUser::canReadStream);
 
         return search;
-    }
-
-    private ImmutableSet<String> loadAllAllowedStreamsForUser(SearchUser searchUser) {
-        return permittedStreams.load(searchUser::canReadStream);
     }
 }
