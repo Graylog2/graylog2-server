@@ -188,25 +188,33 @@ public abstract class ProxiedResource extends RestResource {
     }
 
     /**
-     * Execute the given remote interface function on the master node.
-     * <p>
-     * This is used to forward an API request to the master node. It is useful in situations where an API call can
-     * only be executed on the master node.
-     * <p>
-     * The returned {@link MasterResponse} object is constructed from the remote response's status code and body.
+     * @deprecated Use {@link #requestOnLeader(Function, Function)} instead.
      */
     protected <RemoteInterfaceType, RemoteCallResponseType> MasterResponse<RemoteCallResponseType> requestOnMaster(
             Function<RemoteInterfaceType, Call<RemoteCallResponseType>> remoteInterfaceFunction,
             Function<String, Optional<RemoteInterfaceType>> remoteInterfaceProvider
     ) throws IOException {
-        final Node masterNode = nodeService.allActive().values().stream()
+        return MasterResponse.create(requestOnLeader(remoteInterfaceFunction, remoteInterfaceProvider));
+    }
+
+    /**
+     * Execute the given remote interface function on the leader node.
+     * <p>
+     * This is used to forward an API request to the leader node. It is useful in situations where an API call can only
+     * be executed on the leader node.
+     * <p>
+     * The returned {@link NodeResponse} object is constructed from the remote response's status code and body.
+     */
+    protected <RemoteInterfaceType, RemoteCallResponseType> NodeResponse<RemoteCallResponseType> requestOnLeader(
+            Function<RemoteInterfaceType, Call<RemoteCallResponseType>> remoteInterfaceFunction,
+            Function<String, Optional<RemoteInterfaceType>> remoteInterfaceProvider
+    ) throws IOException {
+        final Node leaderNode = nodeService.allActive().values().stream()
                 .filter(Node::isLeader)
                 .findFirst()
-                .orElseThrow(() -> new IllegalStateException("No active master node found"));
+                .orElseThrow(() -> new IllegalStateException("No active leader node found"));
 
-        return MasterResponse.create(
-                doNodeApiCall(masterNode.getNodeId(), remoteInterfaceProvider, remoteInterfaceFunction, Function.identity())
-        );
+        return doNodeApiCall(leaderNode.getNodeId(), remoteInterfaceProvider, remoteInterfaceFunction, Function.identity());
     }
 
     private  <RemoteInterfaceType, RemoteCallResponseType, FinalResponseType> NodeResponse<FinalResponseType> doNodeApiCall(
@@ -314,8 +322,7 @@ public abstract class ProxiedResource extends RestResource {
     }
 
     /**
-     * TODO: To replace by {@link NodeResponse}.
-     * Mind backward compatibility with existing plugins.
+     * @deprecated Use {@link NodeResponse} instead.
      */
     @Deprecated
     @AutoValue
