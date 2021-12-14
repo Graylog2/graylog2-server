@@ -20,12 +20,13 @@ import * as Immutable from 'immutable';
 import styled from 'styled-components';
 
 import { useStore } from 'stores/connect';
-import { StreamsStore, Stream } from 'views/stores/StreamsStore';
+import type { Stream } from 'views/stores/StreamsStore';
+import { StreamsStore } from 'views/stores/StreamsStore';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
-import { Input } from 'components/messageloaders/Types';
+import type { Input } from 'components/messageloaders/Types';
 import { MESSAGE_FIELD } from 'views/Constants';
-import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
+import type MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import { InputsStore } from 'stores/inputs/InputsStore';
 
 import CustomHighlighting from './CustomHighlighting';

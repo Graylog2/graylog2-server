@@ -23,7 +23,7 @@ import { SelectableList } from 'components/common';
 import { ControlLabel, FormGroup, HelpBlock, Button, BootstrapModalForm } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import type { PipelineType } from 'stores/pipelines/PipelinesStore';
-import { Stream } from 'stores/streams/StreamsStore';
+import type { Stream } from 'stores/streams/StreamsStore';
 import type { PipelineConnectionsType } from 'stores/pipelines/PipelineConnectionsStore';
 
 type Props = {

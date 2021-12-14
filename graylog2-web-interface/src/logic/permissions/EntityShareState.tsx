@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as Immutable from 'immutable';
-import { $PropertyType } from 'utility-types';
+import type { $PropertyType } from 'utility-types';
 
 import type {
   GranteeType,
@@ -32,7 +32,8 @@ import ActiveShare from './ActiveShare';
 import SharedEntity from './SharedEntity';
 import SelectedGrantee from './SelectedGrantee';
 import type { GranteeInterface } from './GranteeInterface';
-import ValidationResult, { ValidationResultJSON } from './ValidationResult';
+import type { ValidationResultJSON } from './ValidationResult';
+import ValidationResult from './ValidationResult';
 
 export type GranteesList = Immutable.List<Grantee>;
 export type CapabilitiesList = Immutable.List<Capability>;

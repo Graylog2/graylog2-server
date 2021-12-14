@@ -25,7 +25,8 @@ import Widget from 'views/components/widgets/Widget';
 import _Widget from 'views/logic/widgets/Widget';
 import { WidgetStore } from 'views/stores/WidgetStore';
 import { CurrentViewStateStore } from 'views/stores/CurrentViewStateStore';
-import FieldTypesContext, { FieldTypes } from 'views/components/contexts/FieldTypesContext';
+import type { FieldTypes } from 'views/components/contexts/FieldTypesContext';
+import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import ViewState from 'views/logic/views/ViewState';
 
 import WidgetGrid from './WidgetGrid';

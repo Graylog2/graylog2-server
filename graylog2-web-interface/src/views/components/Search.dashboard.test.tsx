@@ -31,7 +31,7 @@ import { ViewStore } from 'views/stores/ViewStore';
 import { FieldTypesActions } from 'views/stores/FieldTypesStore';
 import { SearchMetadataStore } from 'views/stores/SearchMetadataStore';
 import View from 'views/logic/views/View';
-import { SearchExecutionResult } from 'views/actions/SearchActions';
+import type { SearchExecutionResult } from 'views/actions/SearchActions';
 
 import Search from './Search';
 import WidgetFocusProvider from './contexts/WidgetFocusProvider';

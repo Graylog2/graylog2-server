@@ -20,7 +20,7 @@ import React from 'react';
 import { Col, Button } from 'components/bootstrap';
 import { EntityListItem, Spinner } from 'components/common';
 import { MetricContainer, CounterRate } from 'components/metrics';
-import { PipelineType, StageType } from 'stores/pipelines/PipelinesStore';
+import type { PipelineType, StageType } from 'stores/pipelines/PipelinesStore';
 import { useStore } from 'stores/connect';
 import { RulesStore } from 'stores/rules/RulesStore';
 import type { RuleType } from 'stores/rules/RulesStore';

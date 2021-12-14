@@ -22,7 +22,7 @@ import moment from 'moment';
 import { useFormikContext } from 'formik';
 
 import { Icon, Accordion, AccordionItem } from 'components/common';
-import { AbsoluteTimeRange } from 'views/logic/queries/Query';
+import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 import DateTime from 'logic/datetimes/DateTime';
 
 import type { TimeRangeDropDownFormValues } from './TimeRangeDropdown';

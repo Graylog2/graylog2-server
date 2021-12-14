@@ -16,14 +16,16 @@
  */
 
 import { DEFAULT_RANGE_TYPE } from 'views/Constants';
-import {
+import type {
   AbsoluteTimeRange,
   KeywordTimeRange,
-  filtersForQuery,
   RelativeTimeRange,
   TimeRange,
   FilterType,
   ElasticsearchQueryString,
+} from 'views/logic/queries/Query';
+import {
+  filtersForQuery,
   createElasticsearchQueryString,
 } from 'views/logic/queries/Query';
 

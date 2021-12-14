@@ -16,7 +16,8 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
-import DayPicker, { DayModifiers } from 'react-day-picker';
+import type { DayModifiers } from 'react-day-picker';
+import DayPicker from 'react-day-picker';
 import styled, { css } from 'styled-components';
 
 import DateTime from 'logic/datetimes/DateTime';

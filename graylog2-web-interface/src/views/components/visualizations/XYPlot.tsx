@@ -27,7 +27,7 @@ import { CurrentQueryStore } from 'views/stores/CurrentQueryStore';
 import Query from 'views/logic/queries/Query';
 import type { ViewType } from 'views/logic/views/View';
 import CurrentUserContext from 'contexts/CurrentUserContext';
-import ColorMapper from 'views/components/visualizations/ColorMapper';
+import type ColorMapper from 'views/components/visualizations/ColorMapper';
 import PlotLegend from 'views/components/visualizations/PlotLegend';
 
 import GenericPlot from './GenericPlot';

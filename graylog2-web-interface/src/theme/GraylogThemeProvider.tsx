@@ -17,7 +17,8 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { ThemeProvider, DefaultTheme } from 'styled-components';
+import type { DefaultTheme } from 'styled-components';
+import { ThemeProvider } from 'styled-components';
 
 import buttonStyles from 'components/bootstrap/styles/buttonStyles';
 import aceEditorStyles from 'components/bootstrap/styles/aceEditorStyles';
@@ -25,8 +26,9 @@ import usePluginEntities from 'views/logic/usePluginEntities';
 
 import { breakpoints, colors, fonts, utils, spacings } from './index';
 import RegeneratableThemeContext from './RegeneratableThemeContext';
-import { Colors } from './colors';
-import { THEME_MODES, ThemeMode } from './constants';
+import type { Colors } from './colors';
+import type { ThemeMode } from './constants';
+import { THEME_MODES } from './constants';
 import useCurrentThemeMode from './UseCurrentThemeMode';
 
 interface generateCustomThemeColorsType {

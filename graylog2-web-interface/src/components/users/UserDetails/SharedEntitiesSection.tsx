@@ -16,11 +16,11 @@
  */
 import * as React from 'react';
 import { useState, useCallback } from 'react';
-import { $PropertyType } from 'utility-types';
+import type { $PropertyType } from 'utility-types';
 
 import SharedEntitiesOverview from 'components/permissions/SharedEntitiesOverview';
 import EntityShareDomain from 'domainActions/permissions/EntityShareDomain';
-import User from 'logic/users/User';
+import type User from 'logic/users/User';
 import SectionComponent from 'components/common/Section/SectionComponent';
 
 type Props = {

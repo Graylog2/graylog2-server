@@ -20,7 +20,7 @@ import { Field, useFormikContext } from 'formik';
 import Select from 'components/common/Select';
 import { Input } from 'components/bootstrap';
 
-import {
+import type {
   GroupByFormValues,
   MetricFormValues,
   WidgetConfigFormValues,

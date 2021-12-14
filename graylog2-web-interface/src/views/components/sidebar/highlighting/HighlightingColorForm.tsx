@@ -27,7 +27,7 @@ import ColorPreview, { GradientColorPreview } from 'views/components/sidebar/hig
 import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
 import { COLORSCALES } from 'views/logic/aggregationbuilder/visualizations/HeatmapVisualizationConfig';
 import { defaultCompare } from 'views/logic/DefaultCompare';
-import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 
 type Props = {
   field: FieldTypeMapping,

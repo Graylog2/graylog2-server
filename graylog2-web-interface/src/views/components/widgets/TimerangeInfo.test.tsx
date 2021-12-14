@@ -23,9 +23,11 @@ import asMock from 'helpers/mocking/AsMock';
 import Search from 'views/logic/search/Search';
 import Widget from 'views/logic/widgets/Widget';
 import TimeLocalizeContext from 'contexts/TimeLocalizeContext';
-import { GlobalOverrideStore, GlobalOverrideStoreState } from 'views/stores/GlobalOverrideStore';
+import type { GlobalOverrideStoreState } from 'views/stores/GlobalOverrideStore';
+import { GlobalOverrideStore } from 'views/stores/GlobalOverrideStore';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
-import { SearchStore, SearchStoreState } from 'views/stores/SearchStore';
+import type { SearchStoreState } from 'views/stores/SearchStore';
+import { SearchStore } from 'views/stores/SearchStore';
 
 import TimerangeInfo from './TimerangeInfo';
 

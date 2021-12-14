@@ -18,7 +18,8 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import type { Theme as SelectTheme } from 'react-select';
 import { isEqual } from 'lodash';
-import { DefaultTheme, withTheme } from 'styled-components';
+import type { DefaultTheme } from 'styled-components';
+import { withTheme } from 'styled-components';
 import ReactSelect, { components as Components, createFilter } from 'react-select';
 import CreatableSelect from 'react-select/creatable';
 

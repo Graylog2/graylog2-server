@@ -16,11 +16,12 @@
  */
 import { mapValues } from 'lodash';
 
-import { MessageResult, SearchTypeResults } from 'views/types';
+import type { MessageResult, SearchTypeResults } from 'views/types';
 import searchTypeDefinition from 'views/logic/SearchType';
-import { TimeRange } from 'views/logic/queries/Query';
+import type { TimeRange } from 'views/logic/queries/Query';
 
-import SearchError, { SearchErrorResponse } from './SearchError';
+import type { SearchErrorResponse } from './SearchError';
+import SearchError from './SearchError';
 
 type Results = {
   searchTypes: SearchTypeResults,

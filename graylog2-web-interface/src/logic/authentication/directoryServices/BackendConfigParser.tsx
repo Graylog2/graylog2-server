@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { DirectoryServiceBackendConfigJson, DirectoryServiceBackendConfig } from './types';
+import type { DirectoryServiceBackendConfigJson, DirectoryServiceBackendConfig } from './types';
 
 const toJson = ({
   servers,

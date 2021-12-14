@@ -31,7 +31,8 @@ import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationW
 import WidgetModel from 'views/logic/widgets/Widget';
 import { WidgetActions } from 'views/stores/WidgetStore';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
-import View, { ViewType } from 'views/logic/views/View';
+import type { ViewType } from 'views/logic/views/View';
+import View from 'views/logic/views/View';
 import { ViewStore } from 'views/stores/ViewStore';
 import type { ViewStoreState } from 'views/stores/ViewStore';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';

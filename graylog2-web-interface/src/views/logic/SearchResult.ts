@@ -14,18 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { List, fromJS, Map } from 'immutable';
+import type { List, Map } from 'immutable';
+import { fromJS } from 'immutable';
 import { mapValues, compact } from 'lodash';
 
-import { QueryId } from 'views/logic/queries/Query';
-import { SearchTypeId } from 'views/logic/SearchType';
-import { SearchJobResult } from 'views/stores/SearchStore';
+import type { QueryId } from 'views/logic/queries/Query';
+import type { SearchTypeId } from 'views/logic/SearchType';
+import type { SearchJobResult } from 'views/stores/SearchStore';
 
 import QueryResult from './QueryResult';
-import SearchError, { SearchErrorResponse } from './SearchError';
+import type { SearchErrorResponse } from './SearchError';
+import SearchError from './SearchError';
+import type { ResultWindowLimitErrorResponse } from './ResultWindowLimitError';
 import ResultWindowLimitError, {
   isResultWindowLimitErrorResponse,
-  ResultWindowLimitErrorResponse,
 } from './ResultWindowLimitError';
 
 class SearchResult {

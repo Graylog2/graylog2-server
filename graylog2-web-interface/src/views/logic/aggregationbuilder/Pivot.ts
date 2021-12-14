@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { TimeUnits } from 'views/Constants';
+import type { TimeUnits } from 'views/Constants';
 
 export type AutoTimeConfig = {
   type: 'auto',

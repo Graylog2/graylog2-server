@@ -15,10 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { $PropertyType } from 'utility-types';
+import type { $PropertyType } from 'utility-types';
 
 import { Alert, Col, Row } from 'components/bootstrap';
-import User from 'logic/users/User';
+import type User from 'logic/users/User';
 
 type Props = {
   fullName: $PropertyType<User, 'fullName'>,

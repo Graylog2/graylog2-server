@@ -16,7 +16,7 @@
  */
 import URI from 'urijs';
 
-import { AppConfigs } from 'util/AppConfig';
+import type { AppConfigs } from 'util/AppConfig';
 
 let Routes;
 const prefix = '/test';

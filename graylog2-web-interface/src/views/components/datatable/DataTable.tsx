@@ -23,10 +23,10 @@ import connect from 'stores/connect';
 import expandRows from 'views/logic/ExpandRows';
 import { defaultCompare } from 'views/logic/DefaultCompare';
 import { ViewStore } from 'views/stores/ViewStore';
-import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import type { Leaf, Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
-import { Events } from 'views/logic/searchtypes/events/EventHandler';
+import type { Events } from 'views/logic/searchtypes/events/EventHandler';
 
 import DataTableEntry from './DataTableEntry';
 import MessagesTable from './MessagesTable';

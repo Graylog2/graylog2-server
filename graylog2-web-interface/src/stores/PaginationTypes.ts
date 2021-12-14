@@ -14,8 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as Immutable from 'immutable';
-import { $PropertyType } from 'utility-types';
+import type * as Immutable from 'immutable';
+import type { $PropertyType } from 'utility-types';
 
 import type { AdditionalQueries } from 'util/PaginationURL';
 

@@ -21,7 +21,7 @@ import { ButtonToolbar, DropdownButton, MenuItem } from 'components/bootstrap';
 import { IfPermitted, PaginatedList, SearchForm, Spinner, EntityList, ShareButton } from 'components/common';
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import QueryHelper from 'components/common/QueryHelper';
-import ViewClass from 'views/logic/views/View';
+import type ViewClass from 'views/logic/views/View';
 
 import View from './View';
 

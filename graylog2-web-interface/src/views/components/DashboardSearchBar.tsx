@@ -34,7 +34,7 @@ import { GlobalOverrideActions, GlobalOverrideStore } from 'views/stores/GlobalO
 import type { QueryString, TimeRange } from 'views/logic/queries/Query';
 import BottomRow from 'views/components/searchbar/BottomRow';
 import ViewActionsWrapper from 'views/components/searchbar/ViewActionsWrapper';
-import { SearchesConfig } from 'components/search/SearchConfig';
+import type { SearchesConfig } from 'components/search/SearchConfig';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import QueryValidation from 'views/components/searchbar/queryvalidation/QueryValidation';
 import FormWarningsContext from 'contexts/FormWarningsContext';
@@ -45,7 +45,8 @@ import validateQuery from 'views/components/searchbar/queryvalidation/validateQu
 import { isNoTimeRangeOverride } from 'views/typeGuards/timeRange';
 
 import TimeRangeInput from './searchbar/TimeRangeInput';
-import DashboardSearchForm, { DashboardFormValues } from './DashboardSearchBarForm';
+import type { DashboardFormValues } from './DashboardSearchBarForm';
+import DashboardSearchForm from './DashboardSearchBarForm';
 
 type Props = {
   config: SearchesConfig,

@@ -20,7 +20,7 @@ import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
 import UserNotification from 'util/UserNotification';
-import { SearchesConfig } from 'components/search/SearchConfig';
+import type { SearchesConfig } from 'components/search/SearchConfig';
 import { singletonStore, singletonActions } from 'logic/singleton';
 
 type ConfigurationsActionsType = {

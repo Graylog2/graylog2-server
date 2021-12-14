@@ -14,9 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as Immutable from 'immutable';
+import type * as Immutable from 'immutable';
 
-import SharedEntity from 'logic/permissions/SharedEntity';
+import type SharedEntity from 'logic/permissions/SharedEntity';
 
 export type GRN = string;
 

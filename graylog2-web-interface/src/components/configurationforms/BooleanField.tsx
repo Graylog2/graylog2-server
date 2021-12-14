@@ -20,7 +20,7 @@ import PropTypes from 'prop-types';
 
 import { getValueFromInput } from 'util/FormsUtils';
 import { Input } from 'components/bootstrap';
-import { BooleanField as BooleanFieldType } from 'components/configurationforms/types';
+import type { BooleanField as BooleanFieldType } from 'components/configurationforms/types';
 
 type Props = {
   autoFocus?: boolean,

@@ -22,7 +22,7 @@ import { sortBy, isEmpty } from 'lodash';
 
 import { Button } from 'components/bootstrap';
 import { ViewStore } from 'views/stores/ViewStore';
-import View from 'views/logic/views/View';
+import type View from 'views/logic/views/View';
 
 import SectionInfo from '../SectionInfo';
 import SectionSubheadline from '../SectionSubheadline';

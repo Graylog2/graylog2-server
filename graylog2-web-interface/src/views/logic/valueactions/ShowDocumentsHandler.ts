@@ -23,7 +23,7 @@ import type { ValueActionHandler, ValuePath } from './ValueActionHandler';
 
 import MessagesWidget from '../widgets/MessagesWidget';
 import MessagesWidgetConfig from '../widgets/MessagesWidgetConfig';
-import Widget from '../widgets/Widget';
+import type Widget from '../widgets/Widget';
 import { createElasticsearchQueryString } from '../queries/Query';
 import { TitlesActions } from '../../stores/TitlesStore';
 import duplicateCommonWidgetSettings from '../fieldactions/DuplicateCommonWidgetSettings';

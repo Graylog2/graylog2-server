@@ -22,7 +22,7 @@ import MetricConfiguration from './MetricConfiguration';
 import MetricElement from './MetricElement';
 
 import ElementConfigurationContainer from '../ElementConfigurationContainer';
-import { WidgetConfigFormValues } from '../WidgetConfigForm';
+import type { WidgetConfigFormValues } from '../WidgetConfigForm';
 
 const MetricsConfiguration = () => {
   const { values: { metrics }, setValues, values } = useFormikContext<WidgetConfigFormValues>();

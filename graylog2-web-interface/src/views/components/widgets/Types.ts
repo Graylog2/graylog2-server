@@ -14,10 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import type * as React from 'react';
 
-import { WidgetFocusContextType } from 'views/components/contexts/WidgetFocusContext';
-import Widget from 'views/logic/widgets/Widget';
+import type { WidgetFocusContextType } from 'views/components/contexts/WidgetFocusContext';
+import type Widget from 'views/logic/widgets/Widget';
 
 export type Contexts = {
   widgetFocusContext: WidgetFocusContextType,

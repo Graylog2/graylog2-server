@@ -15,9 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import * as Immutable from 'immutable';
+import type * as Immutable from 'immutable';
 
-import User from 'logic/users/User';
+import type User from 'logic/users/User';
 import { FormikFormGroup } from 'components/common';
 
 type Props = {

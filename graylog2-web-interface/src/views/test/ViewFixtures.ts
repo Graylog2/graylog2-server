@@ -16,7 +16,8 @@
  */
 import * as Immutable from 'immutable';
 
-import View, { ViewJson } from 'views/logic/views/View';
+import type { ViewJson } from 'views/logic/views/View';
+import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
 
 const simpleView = (): View => View.builder()

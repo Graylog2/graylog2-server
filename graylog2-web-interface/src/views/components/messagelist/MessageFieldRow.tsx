@@ -17,9 +17,9 @@
 import * as React from 'react';
 import styled from 'styled-components';
 
-import { Message } from 'views/components/messagelist/Types';
+import type { Message } from 'views/components/messagelist/Types';
 import { MESSAGE_FIELD } from 'views/Constants';
-import FieldType from 'views/logic/fieldtypes/FieldType';
+import type FieldType from 'views/logic/fieldtypes/FieldType';
 
 import CustomHighlighting from './CustomHighlighting';
 import DecoratedValue from './decoration/DecoratedValue';
