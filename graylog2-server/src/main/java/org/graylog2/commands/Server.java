@@ -237,10 +237,15 @@ public class Server extends ServerBootstrap {
                 LOG.warn(what);
                 activityWriter.write(new Activity(what, Server.class));
 
-                // Write a notification.
                 final NotificationService notificationService = injector.getInstance(NotificationService.class);
+
+                // remove legacy notification, if present
+                //noinspection deprecation
+                notificationService.fixed(notificationService.build().addType(Notification.Type.MULTI_MASTER));
+
+                // Write a notification.
                 Notification notification = notificationService.buildNow()
-                        .addType(Notification.Type.MULTI_MASTER)
+                        .addType(Notification.Type.MULTI_LEADER)
                         .addSeverity(Notification.Severity.URGENT);
                 notificationService.publishIfFirst(notification);
 
@@ -320,6 +325,7 @@ public class Server extends ServerBootstrap {
     @Override
     protected Set<ServerStatus.Capability> capabilities() {
         if (configuration.isLeader()) {
+            //noinspection deprecation
             return EnumSet.of(ServerStatus.Capability.SERVER, ServerStatus.Capability.MASTER);
         } else {
             return EnumSet.of(ServerStatus.Capability.SERVER);

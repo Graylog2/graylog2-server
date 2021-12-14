@@ -80,18 +80,15 @@ public class NodePingThread extends Periodical {
 
             // Check that we still have a leader node in the cluster, if not, warn the user.
             if (nodeService.isAnyLeaderPresent()) {
-                Notification notification = notificationService.build()
-                        .addType(Notification.Type.NO_MASTER);
-                boolean removedNotification = notificationService.fixed(notification);
-                if (removedNotification) {
+                if (fixNoLeaderNotification()) {
                     activityWriter.write(
-                            new Activity("Notification condition [" + NotificationImpl.Type.NO_MASTER + "] " +
+                            new Activity("Notification condition [" + NotificationImpl.Type.NO_LEADER + "] " +
                                     "has been fixed.", NodePingThread.class));
                 }
             } else {
                 Notification notification = notificationService.buildNow()
                         .addNode(serverStatus.getNodeId().toString())
-                        .addType(Notification.Type.NO_MASTER)
+                        .addType(Notification.Type.NO_LEADER)
                         .addSeverity(Notification.Severity.URGENT);
                 notificationService.publishIfFirst(notification);
             }
@@ -99,6 +96,13 @@ public class NodePingThread extends Periodical {
         } catch (Exception e) {
             LOG.warn("Caught exception during node ping.", e);
         }
+    }
+
+    private boolean fixNoLeaderNotification() {
+        // intentional non-short-circuit boolean operator to also remove legacy notification
+        //noinspection deprecation
+        return notificationService.fixed(notificationService.build().addType(Notification.Type.NO_MASTER)) |
+                notificationService.fixed(notificationService.build().addType(Notification.Type.NO_LEADER));
     }
 
     @Override
