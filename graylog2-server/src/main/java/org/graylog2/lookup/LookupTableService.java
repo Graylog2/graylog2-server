@@ -112,10 +112,6 @@ public class LookupTableService extends AbstractIdleService {
         return configService;
     }
 
-    public LookupDataAdapterRefreshService getAdapterRefreshService() {
-        return adapterRefreshService;
-    }
-
     public ScheduledExecutorService getScheduler() {
         return scheduler;
     }
@@ -406,18 +402,23 @@ public class LookupTableService extends AbstractIdleService {
                 // TODO system notification
                 return null;
             }
-            adapter.addListener(new LoggingServiceListener(
-                            "Data Adapter",
-                            String.format(Locale.ENGLISH, "%s/%s [@%s]", dto.name(), dto.id(), objectId(adapter)),
-                            LOG),
-                    scheduler);
-            // Each adapter needs to be added to the refresh scheduler
-            adapter.addListener(adapterRefreshService.newServiceListener(adapter), scheduler);
+            addListeners(adapter, dto);
             return adapter;
         } catch (Exception e) {
             LOG.error("Couldn't create adapter <{}/{}>", dto.name(), dto.id(), e);
             return null;
         }
+    }
+
+    protected void addListeners(LookupDataAdapter adapter, DataAdapterDto dto) {
+
+        adapter.addListener(new LoggingServiceListener(
+                        "Data Adapter",
+                        String.format(Locale.ENGLISH, "%s/%s [@%s]", dto.name(), dto.id(), objectId(adapter)),
+                        LOG),
+                scheduler);
+        // Each adapter needs to be added to the refresh scheduler
+        adapter.addListener(adapterRefreshService.newServiceListener(adapter), scheduler);
     }
 
     private CountDownLatch createAndStartCaches() {
