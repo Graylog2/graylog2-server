@@ -115,6 +115,7 @@ const useBindApplySearchControlsChanges = (formRef) => {
 const debouncedValidateQuery = debounceWithPromise(validateQuery, 350);
 
 const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
+  const { adjustTimezone } = useContext(DateTimeContext);
   const widget = useContext(WidgetContext);
   const config = useStore(SearchConfigStore, ({ searchesClusterConfig }) => searchesClusterConfig);
   const isValidatingQuery = !!useIsFetching('validateSearchQuery');
@@ -126,6 +127,7 @@ const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
   const hasQueryOverride = globalOverride?.query !== undefined;
   const formRef = useRef(null);
   const { parameters, parameterBindings } = useParameters();
+
   const _validateQueryString = useCallback((values: SearchBarFormValues) => {
     const request = {
       queryString: values?.queryString,
@@ -134,10 +136,11 @@ const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
       streams: values?.streams,
       parameters,
       parameterBindings,
+      adjustTimezone,
     };
 
     return debouncedValidateQuery(request);
-  }, [globalOverride?.query, globalOverride?.timerange, parameterBindings, parameters]);
+  }, [globalOverride?.query, globalOverride?.timerange, parameterBindings, parameters, adjustTimezone]);
 
   useBindApplySearchControlsChanges(formRef);
 

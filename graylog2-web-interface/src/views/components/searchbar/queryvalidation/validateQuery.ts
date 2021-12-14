@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as Immutable from 'immutable';
+import type { Moment } from 'moment';
 
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
@@ -31,6 +32,7 @@ export type ValidationQuery = {
   parameters: Immutable.Set<Parameter>,
   parameterBindings: ParameterBindings,
   filter?: ElasticsearchQueryString | string,
+  adjustTimezone: (time: string) => Moment
 }
 
 const queryExists = (query: string | ElasticsearchQueryString) => {
@@ -44,6 +46,7 @@ export const validateQuery = ({
   parameters,
   parameterBindings,
   filter,
+  adjustTimezone,
 }: ValidationQuery): Promise<QueryValidationState> => {
   if (!queryExists(queryString) && !queryExists(filter)) {
     return Promise.resolve({ status: 'OK', explanations: [] });
@@ -51,7 +54,7 @@ export const validateQuery = ({
 
   const payload = {
     query: queryString,
-    timerange: timeRange ? onSubmittingTimerange(timeRange) : undefined,
+    timerange: timeRange ? onSubmittingTimerange(timeRange, adjustTimezone) : undefined,
     streams,
     filter,
     parameters,

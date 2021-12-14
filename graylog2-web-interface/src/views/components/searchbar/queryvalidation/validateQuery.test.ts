@@ -16,6 +16,7 @@
  */
 import * as Immutable from 'immutable';
 import { waitFor } from 'wrappedTestingLibrary';
+import moment from 'moment';
 
 import fetch from 'logic/rest/FetchProvider';
 import { StoreMock as MockStore } from 'helpers/mocking';
@@ -36,6 +37,7 @@ describe('validateQuery', () => {
     streams: ['stream-id'],
     parameters: Immutable.Set(),
     parameterBindings: Immutable.Map(),
+    adjustTimezone: (time) => moment(time),
   };
 
   const requestPayload = {

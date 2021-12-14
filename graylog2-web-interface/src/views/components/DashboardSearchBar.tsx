@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback } from 'react';
+import { useCallback, useContext } from 'react';
 import PropTypes from 'prop-types';
 import { Field } from 'formik';
 import moment from 'moment';
@@ -43,6 +43,7 @@ import useParameters from 'views/hooks/useParameters';
 import debounceWithPromise from 'views/logic/debounceWithPromise';
 import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
 import { isNoTimeRangeOverride } from 'views/typeGuards/timeRange';
+import DateTimeContext from 'contexts/DateTimeContext';
 
 import TimeRangeInput from './searchbar/TimeRangeInput';
 import DashboardSearchForm, { DashboardFormValues } from './DashboardSearchBarForm';
@@ -99,6 +100,7 @@ const StyledQueryInput = styled(QueryInput)`
 const debouncedValidateQuery = debounceWithPromise(validateQuery, 350);
 
 const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onExecute: performSearch }: Props) => {
+  const { adjustTimezone } = useContext(DateTimeContext);
   const submitForm = useCallback(({ timerange, queryString }) => GlobalOverrideActions.set(timerange, queryString)
     .then(() => performSearch()), [performSearch]);
 
@@ -109,10 +111,11 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
       queryString: values?.queryString,
       parameterBindings,
       parameters,
+      adjustTimezone,
     };
 
     return debouncedValidateQuery(request);
-  }, [parameterBindings, parameters]);
+  }, [adjustTimezone, parameterBindings, parameters]);
 
   if (!config) {
     return <Spinner />;
