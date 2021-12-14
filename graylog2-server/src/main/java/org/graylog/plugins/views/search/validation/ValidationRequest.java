@@ -37,7 +37,6 @@ public abstract class ValidationRequest {
     /**
      * For validation, we assume that the filter ist another query-string. This is a different approach
      * than the one used in the Search!
-     *
      */
     @NotNull
     public abstract Optional<BackendQuery> filter();

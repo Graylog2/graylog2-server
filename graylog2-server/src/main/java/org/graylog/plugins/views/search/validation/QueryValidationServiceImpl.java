@@ -55,13 +55,13 @@ public class QueryValidationServiceImpl implements QueryValidationService {
             final List<ParsedTerm> unknownFields = getUnknownFields(req, parsedQuery);
             final List<ParsedTerm> invalidOperators = parsedQuery.invalidOperators();
             final List<ValidationMessage> explanations = getExplanations(unknownFields, invalidOperators);
-            final ValidationStatus status = explanations.isEmpty() ? ValidationStatus.OK : ValidationStatus.WARNING;
-            return ValidationResponse.builder(status)
-                    .explanations(explanations)
-                    .build();
+
+            return explanations.isEmpty()
+                    ? ValidationResponse.ok()
+                    : ValidationResponse.warning(explanations);
 
         } catch (ParseException e) {
-            return ValidationResponse.builder(ValidationStatus.ERROR).explanations(toExplanation(query, e)).build();
+            return ValidationResponse.error(toExplanation(query, e));
         }
     }
 
@@ -78,10 +78,10 @@ public class QueryValidationServiceImpl implements QueryValidationService {
                     .errorMessage("Query contains unknown field: " + f.getRealFieldName());
 
             f.tokens().stream().findFirst().ifPresent(t -> {
-                message.beginLine(t.beginLine);
-                message.beginColumn(t.beginColumn);
-                message.endLine(t.endLine);
-                message.endColumn(t.endColumn);
+                message.beginLine(t.beginLine());
+                message.beginColumn(t.beginColumn());
+                message.endLine(t.endLine());
+                message.endColumn(t.endColumn());
             });
 
             return message.build();
@@ -95,10 +95,10 @@ public class QueryValidationServiceImpl implements QueryValidationService {
                             .errorType("Invalid operator")
                             .errorMessage(errorMessage);
                     token.tokens().stream().findFirst().ifPresent(t -> {
-                        message.beginLine(t.beginLine);
-                        message.beginColumn(t.beginColumn);
-                        message.endLine(t.endLine);
-                        message.endColumn(t.endColumn);
+                        message.beginLine(t.beginLine());
+                        message.beginColumn(t.beginColumn());
+                        message.endLine(t.endLine());
+                        message.endColumn(t.endColumn());
                     });
                     return message.build();
                 })

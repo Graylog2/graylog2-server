@@ -14,21 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.validation;
+import { debounce } from 'lodash';
 
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.queryparser.classic.QueryParser;
+type PromiseReturnType<T> = T extends (...args: any[]) => Promise<infer R> ? R : never;
 
-import java.util.List;
+const debounceWithPromise = <T extends (...args: any[]) => Promise<any>>(fn: T, delay: number) => {
+  const debouncedFn = debounce((resolve: PromiseReturnType<T>, ...args: Parameters<T>) => fn(...args).then(resolve), delay);
 
-public class TermCollectingQueryParser extends QueryParser {
+  return (...args: Parameters<T>) => new Promise<PromiseReturnType<T>>((resolve: PromiseReturnType<T>) => {
+    debouncedFn(resolve, ...args);
+  });
+};
 
-    public TermCollectingQueryParser(String defaultFieldName, Analyzer analyzer) {
-        super(new CollectingQueryParserTokenManager(defaultFieldName, analyzer));
-        init(defaultFieldName, analyzer);
-    }
-
-    public List<ImmutableToken> getTokens() {
-        return ((CollectingQueryParserTokenManager) super.token_source).getTokens();
-    }
-}
+export default debounceWithPromise;

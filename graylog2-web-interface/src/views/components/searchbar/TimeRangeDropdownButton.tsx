@@ -60,7 +60,7 @@ const TimeRangeDropdownButton = ({
   showPresetDropdown = true,
   toggleShow,
 }: Props) => {
-  const { submitForm } = useFormikContext();
+  const { submitForm, isValid } = useFormikContext();
   const containerRef = useRef();
 
   const _onClick = (e) => {
@@ -75,7 +75,9 @@ const TimeRangeDropdownButton = ({
     };
     setCurrentTimeRange(normalizeIfAllMessagesRange(nextTimeRange));
 
-    submitForm();
+    if (isValid) {
+      submitForm();
+    }
   };
 
   const _onPresetSelectToggle = (open: boolean) => {

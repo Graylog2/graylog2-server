@@ -14,21 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.validation;
-
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.queryparser.classic.QueryParser;
-
-import java.util.List;
-
-public class TermCollectingQueryParser extends QueryParser {
-
-    public TermCollectingQueryParser(String defaultFieldName, Analyzer analyzer) {
-        super(new CollectingQueryParserTokenManager(defaultFieldName, analyzer));
-        init(defaultFieldName, analyzer);
-    }
-
-    public List<ImmutableToken> getTokens() {
-        return ((CollectingQueryParserTokenManager) super.token_source).getTokens();
-    }
+export type QueryValidationState = {
+  status: 'OK' | 'ERROR' | 'WARNING',
+  explanations: Array<{
+    errorType: string,
+    errorMessage: string,
+    beginLine: number,
+    endLine: number,
+    beginColumn: number,
+    endColumn: number,
+  }> | undefined
 }

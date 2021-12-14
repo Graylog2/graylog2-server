@@ -15,74 +15,67 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback } from 'react';
+import { useCallback, useContext } from 'react';
 import PropTypes from 'prop-types';
 import { Form, Formik } from 'formik';
-import { isFunction, isEmpty } from 'lodash';
+import { isFunction } from 'lodash';
 import type { FormikProps } from 'formik';
 
-import type { TimeRange } from 'views/logic/queries/Query';
-import validateTimeRange from 'views/components/TimeRangeValidation';
-import FormWarningsProvider from 'contexts/FormWarningsProvider';
+import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
+import FormWarningsContext from 'contexts/FormWarningsContext';
+import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
+import validate from 'views/components/searchbar/validate';
+import { isNoTimeRangeOverride } from 'views/typeGuards/timeRange';
 
-import DateTimeProvider from './searchbar/date-time-picker/DateTimeProvider';
 import { onInitializingTimerange, onSubmittingTimerange } from './TimerangeForForm';
+import DateTimeProvider from './searchbar/date-time-picker/DateTimeProvider';
 
-type Values = {
-  timerange: TimeRange | undefined | null,
+export type DashboardFormValues = {
+  timerange: TimeRange | undefined | null | NoTimeRangeOverride,
   queryString: string | undefined | null,
 };
 
 type Props = {
-  initialValues: Values,
+  initialValues: DashboardFormValues,
   limitDuration: number,
-  onSubmit: (Values) => void | Promise<any>,
-  children: ((props: FormikProps<Values>) => React.ReactElement) | React.ReactElement,
+  onSubmit: (values: DashboardFormValues) => void | Promise<any>,
+  children: ((props: FormikProps<DashboardFormValues>) => React.ReactElement) | React.ReactElement,
+  validateQueryString: (values: DashboardFormValues) => Promise<QueryValidationState>,
 };
 
-const _isFunction = (children: Props['children']): children is (props: FormikProps<Values>) => React.ReactElement => isFunction(children);
+const _isFunction = (children: Props['children']): children is (props: FormikProps<DashboardFormValues>) => React.ReactElement => isFunction(children);
 
-const validate = (nextTimeRange, limitDuration) => {
-  let errors = {};
-
-  const timeRangeErrors = validateTimeRange(nextTimeRange, limitDuration);
-
-  if (!isEmpty(timeRangeErrors)) {
-    errors = { ...errors, timerange: timeRangeErrors };
-  }
-
-  return errors;
-};
-
-const DashboardSearchForm = ({ initialValues, limitDuration, onSubmit, children }: Props) => {
-  const _onSubmit = useCallback(({ timerange, queryString }) => {
+const DashboardSearchForm = ({ initialValues, limitDuration, onSubmit, validateQueryString, children }: Props) => {
+  const _onSubmit = useCallback(({ timerange, queryString }: DashboardFormValues) => {
     return onSubmit({
-      timerange: Object.keys(timerange).length ? onSubmittingTimerange(timerange) : undefined,
+      timerange: isNoTimeRangeOverride(timerange) ? undefined : onSubmittingTimerange(timerange),
       queryString,
     });
   }, [onSubmit]);
   const { timerange, queryString } = initialValues;
-  const initialTimeRange = timerange ? onInitializingTimerange(timerange) : {};
+  const initialTimeRange = timerange && !isNoTimeRangeOverride(timerange) ? onInitializingTimerange(timerange) : {} as TimeRange;
   const _initialValues = {
     timerange: initialTimeRange,
     nextTimeRange: initialTimeRange,
     queryString,
   };
 
+  const { setFieldWarning } = useContext(FormWarningsContext);
+  const _validate = useCallback((values: DashboardFormValues) => validate(values, limitDuration, setFieldWarning, validateQueryString),
+    [limitDuration, setFieldWarning, validateQueryString]);
+
   return (
-    <Formik initialValues={_initialValues}
-            enableReinitialize
-            onSubmit={_onSubmit}
-            validate={({ timerange: nextTimeRange }) => validate(nextTimeRange, limitDuration)}
-            validateOnMount>
+    <Formik<DashboardFormValues> initialValues={_initialValues}
+                                 enableReinitialize
+                                 onSubmit={_onSubmit}
+                                 validate={_validate}
+                                 validateOnMount>
       {(...args) => (
-        <FormWarningsProvider>
-          <DateTimeProvider limitDuration={limitDuration}>
-            <Form>
-              {_isFunction(children) ? children(...args) : children}
-            </Form>
-          </DateTimeProvider>
-        </FormWarningsProvider>
+        <DateTimeProvider limitDuration={limitDuration}>
+          <Form>
+            {_isFunction(children) ? children(...args) : children}
+          </Form>
+        </DateTimeProvider>
       )}
     </Formik>
   );

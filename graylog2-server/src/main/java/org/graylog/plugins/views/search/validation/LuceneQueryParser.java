@@ -26,6 +26,7 @@ import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.QueryVisitor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class LuceneQueryParser {
@@ -33,14 +34,15 @@ public class LuceneQueryParser {
 
     public LuceneQueryParser() {
         this.parser = new TermCollectingQueryParser(ParsedTerm.DEFAULT_FIELD, new StandardAnalyzer());
+        this.parser.setSplitOnWhitespace(true);
     }
 
     public ParsedQuery parse(final String query) throws ParseException {
         final Query parsed = parser.parse(query);
         final ParsedQuery.Builder builder = ParsedQuery.builder().query(query);
 
-        final List<Token> tokens = this.parser.getTokens();
-        builder.tokensBuilder().addAll(tokens);
+        final List<ImmutableToken> availableTokens = new ArrayList<>(this.parser.getTokens());
+        builder.tokensBuilder().addAll(availableTokens);
 
         parsed.visit(new QueryVisitor() {
             @Override
@@ -54,20 +56,21 @@ public class LuceneQueryParser {
                             .value(t.text());
 
                     if (field.equals(ParsedTerm.DEFAULT_FIELD)) {
-                        tokens.stream()
-                                .filter(token -> token.kind == QueryParserConstants.TERM)
-                                .filter(token -> token.image.equals(t.text()))
+                        availableTokens.stream()
+                                .filter(token -> token.matches(QueryParserConstants.TERM, t.text()))
                                 .findFirst()
                                 .ifPresent(token -> {
                                     termBuilder.tokensBuilder().add(token);
+                                    availableTokens.remove(token);
                                 });
                     } else {
-                        tokens.stream()
-                                .filter(token -> token.kind == QueryParserConstants.TERM)
-                                .filter(token -> token.image.equals(field))
+                        availableTokens.stream()
+                                .filter(token -> token.kind() == QueryParserConstants.TERM)
+                                .filter(token -> token.image().equals(field))
                                 .findFirst()
                                 .ifPresent(token -> {
                                     termBuilder.tokensBuilder().add(token);
+                                    availableTokens.remove(token);
                                 });
                     }
                     builder.termsBuilder().add(termBuilder.build());

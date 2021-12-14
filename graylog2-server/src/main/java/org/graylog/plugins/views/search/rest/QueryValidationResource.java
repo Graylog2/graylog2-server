@@ -39,7 +39,6 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -69,7 +68,7 @@ public class QueryValidationResource extends RestResource implements PluginRestR
 
         final ValidationRequest.Builder q = ValidationRequest.Builder.builder()
                 .query(validationRequest.query())
-                .timerange(Optional.ofNullable(validationRequest.timerange()).orElse(defaultTimeRange()))
+                .timerange(validationRequest.timerange().orElse(defaultTimeRange()))
                 .streams(adaptStreams(validationRequest.streams()))
                 .parameters(resolveParameters(validationRequest));
 
@@ -110,13 +109,12 @@ public class QueryValidationResource extends RestResource implements PluginRestR
         return ValidationMessageDTO.create(message.beginLine(), message.beginColumn(), message.endLine(), message.endColumn(), message.errorType(), message.errorMessage());
     }
 
-    private Set<String> adaptStreams(Set<String> streams) {
-        if (streams == null || streams.isEmpty()) {
-            return loadAllAllowedStreamsForUser();
-        } else {
-            // TODO: is it ok to filter out a stream that's not accessible or should we throw an exception?
-            return streams.stream().filter(this::hasStreamReadPermission).collect(Collectors.toSet());
-        }
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    private Set<String> adaptStreams(Optional<Set<String>> optionalStreams) {
+        return optionalStreams.filter(streams -> !streams.isEmpty())
+                // TODO: is it ok to filter out a stream that's not accessible or should we throw an exception?
+                .map(streams -> streams.stream().filter(this::hasStreamReadPermission).collect(Collectors.toSet()))
+                .orElseGet(this::loadAllAllowedStreamsForUser);
     }
 
     private RelativeRange defaultTimeRange() {

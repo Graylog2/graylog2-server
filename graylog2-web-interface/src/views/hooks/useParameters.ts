@@ -14,21 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.validation;
+import { useStore } from 'stores/connect'; import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore'; import { SearchStore } from 'views/stores/SearchStore';
 
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.queryparser.classic.QueryParser;
+const useParameters = () => {
+  const { parameterBindings } = useStore(SearchExecutionStateStore);
+  const { search: { parameters } } = useStore(SearchStore);
 
-import java.util.List;
+  return { parameterBindings, parameters };
+};
 
-public class TermCollectingQueryParser extends QueryParser {
-
-    public TermCollectingQueryParser(String defaultFieldName, Analyzer analyzer) {
-        super(new CollectingQueryParserTokenManager(defaultFieldName, analyzer));
-        init(defaultFieldName, analyzer);
-    }
-
-    public List<ImmutableToken> getTokens() {
-        return ((CollectingQueryParserTokenManager) super.token_source).getTokens();
-    }
-}
+export default useParameters;

@@ -51,7 +51,8 @@ jest.mock('views/stores/SearchConfigStore', () => ({
   },
 }));
 
-jest.mock('views/components/searchbar/AsyncQueryInput', () => () => null);
+jest.mock('views/components/searchbar/queryvalidation/validateQuery', () => () => Promise.resolve({ status: 'OK', explanations: [] }));
+jest.mock('views/logic/debounceWithPromise', () => (fn: any) => fn);
 
 const config = {
   analysis_disabled_fields: ['full_message', 'message'],
@@ -82,7 +83,9 @@ describe('DashboardSearchBar', () => {
   it('should refresh search when button is clicked', async () => {
     render(<DashboardSearchBar onExecute={onExecute} config={config} />);
 
-    const searchButton = screen.getByTitle('Perform search');
+    const searchButton = await screen.findByTitle('Perform search');
+
+    await waitFor(() => expect(searchButton.classList).not.toContain('disabled'));
 
     userEvent.click(searchButton);
 
@@ -99,6 +102,8 @@ describe('DashboardSearchBar', () => {
     userEvent.click(await screen.findByRole('button', { name: 'Apply' }));
 
     const searchButton = await screen.findByTitle('Perform search (changes were made after last search execution)');
+
+    await waitFor(() => expect(searchButton.classList).not.toContain('disabled'));
 
     userEvent.click(searchButton);
 

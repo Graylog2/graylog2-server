@@ -20,4 +20,53 @@ then
         value: "dup_last=1 dup_last=2",
         handle_dup_keys: "take_last"
     ));
+
+    set_fields(key_value(
+        value: "spacequote1=\"a space quote\""
+    ));
+    set_fields(key_value(
+        value: "spacequote2=\"a space quote\"",
+        trim_value_chars: "\""
+    ));
+    set_fields(key_value(
+        value: "spacequote3='a space quote'"
+    ));
+    set_fields(key_value(
+        value: "spacequote4='a space quote'",
+        trim_value_chars: "'"
+    ));
+    set_fields(key_value(
+        value: "spacequote5=\"a space 'quote'\"",
+        trim_value_chars: "\""
+    ));
+    set_fields(key_value(
+        value: "spacequote6='a space \"quote\"'",
+        trim_value_chars: "'"
+    ));
+    set_fields(key_value(
+        value: "spacequote7=\"it's a space 'quote'\"",
+        trim_value_chars: "\""
+    ));
+    set_fields(key_value(
+        value: "sq1=\" a \" sq2=\" b\" sq3=' c  ' sq4=\" ' d ' \" sq5=' \" e\" ' sq6='it\"s a space'",
+        trim_value_chars: "\"'"
+    ));
+    set_fields(key_value(
+        value: "dup-spacequote=\"it's a space 'quote'\" dup-spacequote=another",
+        trim_value_chars: "\"",
+        handle_dup_keys: "|"
+    ));
+
+    set_fields(key_value(
+        value: "sq7=\"a, b\"|sq8=\"c|d\"|sq9='e| \"f, g\" | h'|sq10=\" ' i,j ' \",sq11=' \" k|\" ',sq12='l\"m n, o'",
+        delimiters: ",|",
+        trim_value_chars: "\"'"
+    ));
+
+    set_fields(key_value(
+        value: "\"sq@1\"='space quote'@\"sq@2\"=hello",
+        delimiters: "@",
+        trim_key_chars: "\"",
+        trim_value_chars: "'"
+    ));
 end

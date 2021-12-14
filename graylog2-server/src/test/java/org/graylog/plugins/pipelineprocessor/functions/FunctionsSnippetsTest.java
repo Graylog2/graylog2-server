@@ -943,6 +943,33 @@ public class FunctionsSnippetsTest extends BaseParserTest {
 
         assertThat(message.getField("dup_first")).isEqualTo("1");
         assertThat(message.getField("dup_last")).isEqualTo("2");
+
+        assertThat(message.getField("spacequote1")).isEqualTo("\"a space quote\"");
+        assertThat(message.getField("spacequote2")).isEqualTo("a space quote");
+        assertThat(message.getField("spacequote3")).isEqualTo("'a space quote'");
+        assertThat(message.getField("spacequote4")).isEqualTo("a space quote");
+        assertThat(message.getField("spacequote5")).isEqualTo("a space 'quote'");
+        assertThat(message.getField("spacequote6")).isEqualTo("a space \"quote\"");
+        assertThat(message.getField("spacequote7")).isEqualTo("it's a space 'quote'");
+
+        assertThat(message.getField("sq1")).isEqualTo("a");
+        assertThat(message.getField("sq2")).isEqualTo("b");
+        assertThat(message.getField("sq3")).isEqualTo("c");
+        assertThat(message.getField("sq4")).isEqualTo("' d '");
+        assertThat(message.getField("sq5")).isEqualTo("\" e\"");
+        assertThat(message.getField("sq6")).isEqualTo("it\"s a space");
+
+        assertThat(message.getField("sq7")).isEqualTo("a, b");
+        assertThat(message.getField("sq8")).isEqualTo("c|d");
+        assertThat(message.getField("sq9")).isEqualTo("e| \"f, g\" | h");
+        assertThat(message.getField("sq10")).isEqualTo("' i,j '");
+        assertThat(message.getField("sq11")).isEqualTo("\" k|\"");
+        assertThat(message.getField("sq12")).isEqualTo("l\"m n, o");
+
+        assertThat(message.getField("dup-spacequote")).isEqualTo("it's a space 'quote'|another");
+
+        assertThat(message.getField("sq@1")).isEqualTo("space quote");
+        assertThat(message.getField("sq@2")).isEqualTo("hello");
     }
 
     @Test
