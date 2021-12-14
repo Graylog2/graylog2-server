@@ -174,6 +174,32 @@ describe('DateTimeProvider', () => {
           expect(format(adjustTimezone(moment('2021-03-27T14:32:31.894Z')))).toBe('2021-03-27 15:32:31.894');
         });
       });
+
+      describe('throws an error when for invalid', () => {
+        it('date time string', async () => {
+          const { adjustTimezone } = renderSUT();
+
+          expect(() => adjustTimezone('2021-03-00T14:32:31.894Z')).toThrow(new Error('Date time 2021-03-00T14:32:31.894Z is not valid'));
+        });
+
+        it('JS date', () => {
+          const { adjustTimezone } = renderSUT();
+
+          expect(() => adjustTimezone(new Date('2021-03-00T14:32:31.894Z'))).toThrow(new Error('Date time Invalid Date is not valid'));
+        });
+
+        it('unix timestamp', () => {
+          const { adjustTimezone } = renderSUT();
+
+          expect(() => adjustTimezone(16168555518940000)).toThrow(new Error('Date time 16168555518940000 is not valid'));
+        });
+
+        it('moment object', () => {
+          const { adjustTimezone } = renderSUT();
+
+          expect(() => adjustTimezone(moment('2021-00-00T14:32:31.894Z'))).toThrow(new Error('Date time Invalid date is not valid'));
+        });
+      });
     });
 
     describe('formatAsBrowserTime method should', () => {
