@@ -19,7 +19,7 @@ import { useCallback, useMemo, useContext } from 'react';
 import moment from 'moment-timezone';
 import type { Moment } from 'moment';
 
-import DateTimeContext, { DateTimeContextType } from 'contexts/DateTimeContext';
+import DateTimeContext, { DateTimeContextType, DateTime, DateTimeFormats } from 'contexts/DateTimeContext';
 import AppConfig from 'util/AppConfig';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 
@@ -44,7 +44,7 @@ export const DATE_TIME_FORMATS = {
   date: 'YYYY-MM-DD',
 };
 
-const validateDateTime = (dateTime: Moment, originalDateTime) => {
+const validateDateTime = (dateTime: Moment, originalDateTime: DateTime) => {
   if (!dateTime.isValid()) {
     throw new Error(`Date time ${originalDateTime} is not valid`);
   }
@@ -60,19 +60,19 @@ const DateTimeProvider = ({ children }: Props) => {
   const currentUser = useContext(CurrentUserContext);
   const userTimezone = useMemo(() => getUserTimezone(currentUser?.timezone), [currentUser?.timezone]);
 
-  const adjustTimezone = useCallback((time, tz = userTimezone) => {
+  const adjustTimezone = useCallback((time: DateTime, tz: string = userTimezone) => {
     return validateDateTime(moment.tz(time, tz), time);
   }, [userTimezone]);
 
-  const formatTime = useCallback((time, tz = userTimezone, format = 'default') => {
+  const formatTime = useCallback((time: DateTime, tz:string = userTimezone, format: string = 'default') => {
     return adjustTimezone(time, tz).format(DATE_TIME_FORMATS[format]);
   }, [adjustTimezone, userTimezone]);
 
-  const formatAsBrowserTime = (time, format) => {
+  const formatAsBrowserTime = (time: DateTime, format: DateTimeFormats) => {
     return formatTime(time, getBrowserTimezone(), format);
   };
 
-  const relativeDifference = (time) => {
+  const relativeDifference = (time: DateTime) => {
     return validateDateTime(moment(time), time).fromNow();
   };
 
