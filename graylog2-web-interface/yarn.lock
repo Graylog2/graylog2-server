@@ -7825,11 +7825,11 @@ graceful-fs@^4.2.4:
     "@babel/preset-env" "7.13.10"
     "@babel/preset-typescript" "7.13.0"
     create-react-class "15.7.0"
-    eslint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.3.0-SNAPSHOT-f40940c5-39d3-4337-92ea-2310756ad7d6-1639487444591/node_modules/eslint-config-graylog"
+    eslint-config-graylog "file:packages/eslint-config-graylog"
     formik "2.2.9"
     html-webpack-plugin "^5.5.0"
     javascript-natural-sort "0.7.1"
-    jest-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.3.0-SNAPSHOT-f40940c5-39d3-4337-92ea-2310756ad7d6-1639487444591/node_modules/jest-preset-graylog"
+    jest-preset-graylog "file:packages/jest-preset-graylog"
     jquery "3.5.1"
     moment "2.29.1"
     moment-timezone "0.5.31"
@@ -7843,7 +7843,7 @@ graceful-fs@^4.2.4:
     react-router-dom "5.3.0"
     reflux "0.2.13"
     styled-components "5.3.3"
-    stylelint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.3.0-SNAPSHOT-f40940c5-39d3-4337-92ea-2310756ad7d6-1639487444591/node_modules/stylelint-config-graylog"
+    stylelint-config-graylog "file:packages/stylelint-config-graylog"
     typescript "4.5.4"
     webpack "5.65.0"
     webpack-cleanup-plugin "0.5.1"
@@ -12507,13 +12507,6 @@ react-plotly.js@2.5.1:
   integrity sha512-Oya14whSHvPsYXdI0nHOGs1pZhMzV2edV7HAW1xFHD58Y73m/LbG2Encvyz1tztL0vfjph0JNhiwO8cGBJnlhg==
   dependencies:
     prop-types "^15.7.2"
-
-react-portal@^4.2.0:
-  version "4.2.1"
-  resolved "https://registry.yarnpkg.com/react-portal/-/react-portal-4.2.1.tgz#12c1599238c06fb08a9800f3070bea2a3f78b1a6"
-  integrity sha512-fE9kOBagwmTXZ3YGRYb4gcMy+kSA+yLO0xnPankjRlfBv4uCpFXqKPfkpsGQQR15wkZ9EssnvTOl1yMzbkxhPQ==
-  dependencies:
-    prop-types "^15.5.8"
 
 react-prop-types@^0.4.0:
   version "0.4.0"
