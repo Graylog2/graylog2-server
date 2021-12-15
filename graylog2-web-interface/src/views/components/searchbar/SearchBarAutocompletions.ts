@@ -42,15 +42,9 @@ export interface Completer {
   shouldShowCompletions?: (currentLine: number, lines: Array<Array<Line>>) => boolean;
 }
 
-const catchCompleterError = async <T>(fn: () => T, fallbackValue: T): Promise<T> => {
-  try {
-    return await fn();
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.warn('Exception thrown in completer: ', e);
-  }
-
-  return fallbackValue;
+const onCompleterError = (error: Error) => {
+  // eslint-disable-next-line no-console
+  console.warn('Exception thrown in completer: ', error);
 };
 
 export default class SearchBarAutoCompletions implements AutoCompleter {
@@ -77,11 +71,14 @@ export default class SearchBarAutoCompletions implements AutoCompleter {
 
     const results = await Promise.all(
       this.completers
-        .map((completer) => {
-          return catchCompleterError(
-            () => completer.getCompletions(currentToken, lastToken, prefix, tokens, currentTokenIdx, this.timeRange, this.streams),
-            [],
-          );
+        .map(async (completer) => {
+          try {
+            return await completer.getCompletions(currentToken, lastToken, prefix, tokens, currentTokenIdx, this.timeRange, this.streams);
+          } catch (e) {
+            onCompleterError(e);
+          }
+
+          return [];
         }),
     );
     const uniqResults = uniqBy(sortBy(results.flat(), ['score', 'name']), 'name');
@@ -92,10 +89,11 @@ export default class SearchBarAutoCompletions implements AutoCompleter {
   shouldShowCompletions = (currentLine: number, lines: Array<Array<Line>>) => {
     return this.completers.some((completer) => {
       if (typeof completer.shouldShowCompletions === 'function') {
-        return catchCompleterError(
-          () => completer.shouldShowCompletions(currentLine, lines),
-          false,
-        );
+        try {
+          return completer.shouldShowCompletions(currentLine, lines);
+        } catch (e) {
+          onCompleterError(e);
+        }
       }
 
       return false;
