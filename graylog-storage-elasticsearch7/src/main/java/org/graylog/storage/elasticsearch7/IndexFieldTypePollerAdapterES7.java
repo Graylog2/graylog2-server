@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -33,19 +34,16 @@ import java.util.stream.Collectors;
 
 public class IndexFieldTypePollerAdapterES7 implements IndexFieldTypePollerAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(IndexFieldTypePollerAdapterES7.class);
-    private final ElasticsearchClient client;
     private final FieldMappingApi fieldMappingApi;
 
     @Inject
-    public IndexFieldTypePollerAdapterES7(ElasticsearchClient client,
-                                          FieldMappingApi fieldMappingApi) {
-        this.client = client;
+    public IndexFieldTypePollerAdapterES7(FieldMappingApi fieldMappingApi) {
         this.fieldMappingApi = fieldMappingApi;
     }
 
     @Override
     public Optional<Set<FieldTypeDTO>> pollIndex(String indexName, Timer pollTimer) {
-        final Map<String, String> fieldTypes;
+        final Map<String, FieldMappingApi.FieldMapping> fieldTypes;
         try (final Timer.Context ignored = pollTimer.time()) {
             fieldTypes = fieldMappingApi.fieldTypes(indexName);
         } catch (IndexNotFoundException e) {
@@ -58,12 +56,18 @@ public class IndexFieldTypePollerAdapterES7 implements IndexFieldTypePollerAdapt
         }
 
         return Optional.of(fieldTypes.entrySet()
-                        .stream()
-                        // The "type" value is empty if we deal with a nested data type
-                        // TODO: Figure out how to handle nested fields, for now we only support the top-level fields
-                        .filter(field -> !field.getValue().isEmpty())
-                        .map(field -> FieldTypeDTO.create(field.getKey(), field.getValue()))
-                        .collect(Collectors.toSet())
+                .stream()
+                // The "type" value is empty if we deal with a nested data type
+                // TODO: Figure out how to handle nested fields, for now we only support the top-level fields
+                .filter(field -> !field.getValue().type().isEmpty())
+                .map(field -> {
+                    final FieldMappingApi.FieldMapping mapping = field.getValue();
+                    final Boolean fielddata = mapping.fielddata().orElse(false);
+                    return FieldTypeDTO.create(field.getKey(), mapping.type(), fielddata
+                            ? Collections.singleton(FieldTypeDTO.Properties.FIELDDATA)
+                            : Collections.emptySet());
+                })
+                .collect(Collectors.toSet())
         );
     }
 }
