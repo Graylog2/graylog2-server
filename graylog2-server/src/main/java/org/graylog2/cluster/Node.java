@@ -16,6 +16,7 @@
  */
 package org.graylog2.cluster;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.plugin.database.Persisted;
 import org.joda.time.DateTime;
@@ -31,6 +32,7 @@ public interface Node extends Persisted {
     /**
      * @deprecated Use {@link LeaderElectionService#isLeader()} or {@link #isLeader()} instead.
      */
+    @JsonProperty("is_master")
     default boolean isMaster() {
         return isLeader();
     }
