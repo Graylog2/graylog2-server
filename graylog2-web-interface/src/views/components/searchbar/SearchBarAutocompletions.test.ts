@@ -87,4 +87,31 @@ describe('SearchAutoCompletions', () => {
 
     expect(callback).toHaveBeenCalledWith(null, [sourceIpCompletion, sourceCompletion]);
   });
+
+  it('should not show completions manually when no Completer provides `shouldShowCompletions`', async () => {
+    const searchBarAutoCompletions = new SearchBarAutoCompletions([new SimpleCompleter()]);
+
+    const result = searchBarAutoCompletions.shouldShowCompletions(1, [[{ type: 'keyword', value: 'http_method:', index: 0, start: 0 }], null]);
+
+    expect(result).toBe(false);
+  });
+
+  it('should consider a Completer when deciding if it should show completions', async () => {
+    const mockShouldShowCompletions = jest.fn();
+
+    class ExampleCompleter implements Completer {
+      getCompletions = () => ([sourceIpCompletion]);
+
+      shouldShowCompletions = mockShouldShowCompletions;
+    }
+
+    const searchBarAutoCompletions = new SearchBarAutoCompletions([new ExampleCompleter()]);
+    const result = searchBarAutoCompletions.shouldShowCompletions(1, [[{ type: 'keyword', value: 'http_method:', index: 0, start: 0 }], null]);
+
+    expect(mockShouldShowCompletions).toHaveBeenCalledTimes(1);
+
+    expect(mockShouldShowCompletions).toHaveBeenCalledWith(1, [[{ type: 'keyword', value: 'http_method:', index: 0, start: 0 }], null]);
+
+    expect(result).toBe(true);
+  });
 });

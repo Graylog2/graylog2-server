@@ -78,142 +78,194 @@ describe('FieldValueCompletion', () => {
     asMock(fetch).mockReturnValue(Promise.resolve(suggestionsResponse));
   });
 
-  it('returns empty list if inputs are empty', () => {
-    const completer = new FieldValueCompletion();
+  describe('getCompletions', () => {
+    it('returns empty list if inputs are empty', () => {
+      const completer = new FieldValueCompletion();
 
-    expect(completer.getCompletions(null, null, '', [], -1, undefined, undefined)).toEqual([]);
-  });
-
-  it('returns suggestions, when current token is a keyword', async () => {
-    const currentToken = createKeywordToken('http_method:');
-    const completer = new FieldValueCompletion();
-
-    const suggestions = await completer.getCompletions(
-      currentToken,
-      null,
-      '',
-      [currentToken],
-      0,
-      undefined,
-      undefined,
-    );
-
-    expect(suggestions).toEqual(expectedSuggestions);
-  });
-
-  it('returns suggestions, when current token is a term and last token is a keyword', async () => {
-    const currentToken = {
-      type: 'term',
-      value: 'P',
-      index: 1,
-      start: 12,
-    };
-    const lastToken = {
-      type: 'keyword',
-      value: 'http_method:',
-    };
-    const completer = new FieldValueCompletion();
-
-    const suggestions = await completer.getCompletions(
-      currentToken,
-      lastToken,
-      'P',
-      [lastToken, currentToken],
-      1,
-      undefined,
-      undefined,
-    );
-
-    expect(suggestions).toEqual(expectedSuggestions);
-  });
-
-  it('returns suggestions when field type can only be found in all field types', async () => {
-    asMock(FieldTypesStore.getInitialState).mockReturnValue({
-      all: Immutable.List([httpMethodField]),
-      queryFields: Immutable.fromJS({ query1: [] }),
+      expect(completer.getCompletions(null, null, '', [], -1, undefined, undefined)).toEqual([]);
     });
 
-    const currentToken = createKeywordToken('http_method:');
+    it('returns suggestions, when current token is a keyword', async () => {
+      const currentToken = createKeywordToken('http_method:');
+      const completer = new FieldValueCompletion();
 
-    const completer = new FieldValueCompletion();
+      const suggestions = await completer.getCompletions(
+        currentToken,
+        null,
+        '',
+        [currentToken],
+        0,
+        undefined,
+        undefined,
+      );
 
-    const suggestions = await completer.getCompletions(
-      currentToken,
-      null,
-      '',
-      [currentToken],
-      0,
-      undefined,
-      undefined,
-    );
-
-    expect(suggestions).toEqual(expectedSuggestions);
-  });
-
-  it('returns empty list when current token is a term which does not end with ":"', async () => {
-    const currentToken = {
-      index: 0,
-      start: 0,
-      type: 'term',
-      value: 'http_method',
-    };
-    const completer = new FieldValueCompletion();
-
-    const suggestions = await completer.getCompletions(
-      currentToken,
-      null,
-      '',
-      [currentToken],
-      0,
-      undefined,
-      undefined,
-    );
-
-    expect(suggestions).toEqual([]);
-  });
-
-  it('returns empty list when field type can not be found in all and query field types', async () => {
-    asMock(FieldTypesStore.getInitialState).mockReturnValue({
-      all: Immutable.List(),
-      queryFields: Immutable.fromJS({ query1: [] }),
+      expect(suggestions).toEqual(expectedSuggestions);
     });
 
-    const currentToken = createKeywordToken('unknown_field:');
-    const completer = new FieldValueCompletion();
+    it('returns suggestions, when current token is a term and last token is a keyword', async () => {
+      const currentToken = {
+        type: 'term',
+        value: 'P',
+        index: 1,
+        start: 12,
+      };
+      const lastToken = {
+        type: 'keyword',
+        value: 'http_method:',
+      };
+      const completer = new FieldValueCompletion();
 
-    const suggestions = await completer.getCompletions(
-      currentToken,
-      null,
-      '',
-      [currentToken],
-      0,
-      undefined,
-      undefined,
-    );
+      const suggestions = await completer.getCompletions(
+        currentToken,
+        lastToken,
+        'P',
+        [lastToken, currentToken],
+        1,
+        undefined,
+        undefined,
+      );
 
-    expect(suggestions).toEqual([]);
-  });
-
-  it('returns empty list when field type is not enumerable', async () => {
-    asMock(FieldTypesStore.getInitialState).mockReturnValue({
-      all: Immutable.List([messageField]),
-      queryFields: Immutable.fromJS({ query1: [messageField] }),
+      expect(suggestions).toEqual(expectedSuggestions);
     });
 
-    const currentToken = createKeywordToken('message:');
+    it('returns suggestions when field type can only be found in all field types', async () => {
+      asMock(FieldTypesStore.getInitialState).mockReturnValue({
+        all: Immutable.List([httpMethodField]),
+        queryFields: Immutable.fromJS({ query1: [] }),
+      });
 
-    const completer = new FieldValueCompletion();
+      const currentToken = createKeywordToken('http_method:');
 
-    const suggestions = await completer.getCompletions(
-      currentToken,
-      null,
-      '',
-      [currentToken],
-      0,
-      undefined,
-      undefined,
-    );
+      const completer = new FieldValueCompletion();
 
-    expect(suggestions).toEqual([]);
+      const suggestions = await completer.getCompletions(
+        currentToken,
+        null,
+        '',
+        [currentToken],
+        0,
+        undefined,
+        undefined,
+      );
+
+      expect(suggestions).toEqual(expectedSuggestions);
+    });
+
+    it('returns empty list when current token is a term which does not end with ":"', async () => {
+      const currentToken = {
+        index: 0,
+        start: 0,
+        type: 'term',
+        value: 'http_method',
+      };
+      const completer = new FieldValueCompletion();
+
+      const suggestions = await completer.getCompletions(
+        currentToken,
+        null,
+        '',
+        [currentToken],
+        0,
+        undefined,
+        undefined,
+      );
+
+      expect(suggestions).toEqual([]);
+    });
+
+    it('returns empty list when field type can not be found in all and query field types', async () => {
+      asMock(FieldTypesStore.getInitialState).mockReturnValue({
+        all: Immutable.List(),
+        queryFields: Immutable.fromJS({ query1: [] }),
+      });
+
+      const currentToken = createKeywordToken('unknown_field:');
+      const completer = new FieldValueCompletion();
+
+      const suggestions = await completer.getCompletions(
+        currentToken,
+        null,
+        '',
+        [currentToken],
+        0,
+        undefined,
+        undefined,
+      );
+
+      expect(suggestions).toEqual([]);
+    });
+
+    it('returns empty list when field type is not enumerable', async () => {
+      asMock(FieldTypesStore.getInitialState).mockReturnValue({
+        all: Immutable.List([messageField]),
+        queryFields: Immutable.fromJS({ query1: [messageField] }),
+      });
+
+      const currentToken = createKeywordToken('message:');
+
+      const completer = new FieldValueCompletion();
+
+      const suggestions = await completer.getCompletions(
+        currentToken,
+        null,
+        '',
+        [currentToken],
+        0,
+        undefined,
+        undefined,
+      );
+
+      expect(suggestions).toEqual([]);
+    });
+  });
+
+  describe('shouldShowCompletions', () => {
+    it('returns false by default', async () => {
+      const completer = new FieldValueCompletion();
+      const result = completer.shouldShowCompletions(1, [[], null]);
+
+      expect(result).toEqual(false);
+    });
+
+    it('returns false if current token is a keyword which does not end with :', async () => {
+      const completer = new FieldValueCompletion();
+      const result = completer.shouldShowCompletions(1, [[{ type: 'keyword', value: 'http_method', index: 0, start: 0 }, null]]);
+
+      expect(result).toEqual(false);
+    });
+
+    it('returns true if current token is a keyword and ends with :', async () => {
+      const completer = new FieldValueCompletion();
+      const result = completer.shouldShowCompletions(1, [[{ type: 'keyword', value: 'http_method:', index: 0, start: 0 }, null]]);
+
+      expect(result).toEqual(true);
+    });
+
+    it('returns true if current token is a keyword in a complex query and ends with :', async () => {
+      const completer = new FieldValueCompletion();
+      const result = completer.shouldShowCompletions(
+        1,
+        [
+          [
+            { type: 'keyword', value: 'source:' },
+            { type: 'term', value: 'example' },
+            { type: 'text', value: '.' },
+            { type: 'term', value: 'org' },
+            { type: 'text', value: ' ' },
+            { type: 'term', value: 'and' },
+            { type: 'text', value: ' ' },
+            {
+              type: 'keyword',
+              value: 'http_method:',
+              index: 7,
+              start: 23,
+            },
+          ],
+          null,
+        ],
+      );
+
+      expect(result).toEqual(true);
+    });
   });
 });

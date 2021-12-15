@@ -18,7 +18,16 @@ import { sortBy, uniqBy } from 'lodash';
 
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 
-import type { Editor, ResultsCallback, Session, Position, CompletionResult, AutoCompleter, Token } from './ace-types';
+import type {
+  Editor,
+  ResultsCallback,
+  Session,
+  Position,
+  CompletionResult,
+  AutoCompleter,
+  Token,
+  Line,
+} from './ace-types';
 
 export interface Completer {
   getCompletions(
@@ -30,7 +39,19 @@ export interface Completer {
     timeRange?: TimeRange | NoTimeRangeOverride,
     streams?: Array<string>
   ): Array<CompletionResult> | Promise<Array<CompletionResult>>;
+  shouldShowCompletions?: (currentLine: number, lines: Array<Array<Line>>) => boolean;
 }
+
+const catchCompleterError = async <T>(fn: () => T, fallbackValue: T): Promise<T> => {
+  try {
+    return await fn();
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.warn('Exception thrown in completer: ', e);
+  }
+
+  return fallbackValue;
+};
 
 export default class SearchBarAutoCompletions implements AutoCompleter {
   completers: Array<Completer>;
@@ -56,19 +77,28 @@ export default class SearchBarAutoCompletions implements AutoCompleter {
 
     const results = await Promise.all(
       this.completers
-        .map(async (completer) => {
-          try {
-            return await completer.getCompletions(currentToken, lastToken, prefix, tokens, currentTokenIdx, this.timeRange, this.streams);
-          } catch (e) {
-            // eslint-disable-next-line no-console
-            console.warn('Exception thrown in completer: ', e);
-          }
-
-          return [];
+        .map((completer) => {
+          return catchCompleterError(
+            () => completer.getCompletions(currentToken, lastToken, prefix, tokens, currentTokenIdx, this.timeRange, this.streams),
+            [],
+          );
         }),
     );
     const uniqResults = uniqBy(sortBy(results.flat(), ['score', 'name']), 'name');
 
     callback(null, uniqResults);
+  }
+
+  shouldShowCompletions = (currentLine: number, lines: Array<Array<Line>>) => {
+    return this.completers.some((completer) => {
+      if (typeof completer.shouldShowCompletions === 'function') {
+        return catchCompleterError(
+          () => completer.shouldShowCompletions(currentLine, lines),
+          false,
+        );
+      }
+
+      return false;
+    });
   }
 }

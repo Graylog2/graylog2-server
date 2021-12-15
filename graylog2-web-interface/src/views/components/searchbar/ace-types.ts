@@ -88,4 +88,5 @@ export type Line = {
 
 export interface AutoCompleter {
   getCompletions(editor: Editor, session: Session, position: Position, prefix: string, callback: ResultsCallback): void;
+  shouldShowCompletions(currentLine, lines): boolean;
 }

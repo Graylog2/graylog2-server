@@ -27,7 +27,7 @@ import { onSubmittingTimerange } from 'views/components/TimerangeForForm';
 import { isNoTimeRangeOverride } from 'views/typeGuards/timeRange';
 
 import type { Completer } from '../SearchBarAutocompletions';
-import type { Token } from '../ace-types';
+import type { Token, Editor, Line } from '../ace-types';
 
 type SuggestionsResponse = {
   field: string,
@@ -88,7 +88,7 @@ class FieldValueCompletion implements Completer {
     FieldTypesStore.listen((newState) => this._newFields(newState));
   }
 
-  shouldShowSuggestions = (fieldName: string) => {
+  shouldFetchCompletions = (fieldName: string) => {
     if (!fieldName) {
       return false;
     }
@@ -115,7 +115,7 @@ class FieldValueCompletion implements Completer {
   ) => {
     const { fieldName, input } = getFieldNameAndInput(currentToken, lastToken);
 
-    if (!this.shouldShowSuggestions(fieldName)) {
+    if (!this.shouldFetchCompletions(fieldName)) {
       return [];
     }
 
@@ -158,6 +158,12 @@ class FieldValueCompletion implements Completer {
       this._newFields(this.fields);
     }
   };
+
+  shouldShowCompletions = (currentLine: number, lines: Array<Array<Line>>) => {
+    const currentToken = lines[currentLine - 1].find((token) => token?.start !== undefined);
+
+    return currentToken?.type === 'keyword' && currentToken?.value.endsWith(':');
+  }
 }
 
 export default FieldValueCompletion;
