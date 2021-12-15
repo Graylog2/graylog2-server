@@ -16,12 +16,11 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Portal } from 'react-portal';
 import { Position } from 'react-overlays';
 import styled, { css } from 'styled-components';
 
 import { Popover } from 'components/bootstrap';
-import { Icon, HoverForHelp } from 'components/common';
+import { Icon, HoverForHelp, Portal } from 'components/common';
 
 const StyledDescriptionBox = styled.div(({ theme }) => css`
   background-color: ${theme.colors.variant.lightest.default};
@@ -71,8 +70,7 @@ class DescriptionBox extends React.Component {
 
     return (
       <Portal>
-        <Position container={document.body}
-                  placement="bottom"
+        <Position placement="bottom"
                   target={this.target}>
           <Popover title="Config options" id="config-popover">
             {configurableElement}
