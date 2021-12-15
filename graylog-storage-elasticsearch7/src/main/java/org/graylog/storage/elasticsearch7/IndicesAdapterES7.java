@@ -395,9 +395,9 @@ public class IndicesAdapterES7 implements IndicesAdapter {
     @Override
     public void removeAliases(Set<String> indices, String alias) {
         final IndicesAliasesRequest indicesAliasesRequest = new IndicesAliasesRequest();
-        final IndicesAliasesRequest.AliasActions aliasAction = new IndicesAliasesRequest.AliasActions(IndicesAliasesRequest.AliasActions.Type.REMOVE_INDEX)
-                .indices(indices.toArray(new String[0]))
-                .alias(alias);
+        final IndicesAliasesRequest.AliasActions aliasAction = IndicesAliasesRequest.AliasActions.remove()
+                .alias(alias)
+                .indices(indices.toArray(new String[0]));
         indicesAliasesRequest.addAliasAction(aliasAction);
 
         client.execute((c, requestOptions) -> c.indices().updateAliases(indicesAliasesRequest, requestOptions),
@@ -502,8 +502,10 @@ public class IndicesAdapterES7 implements IndicesAdapter {
 
         static State parse(String state) {
             switch (state.toLowerCase(Locale.ENGLISH)) {
-                case "open": return Open;
-                case "close": return Closed;
+                case "open":
+                    return Open;
+                case "close":
+                    return Closed;
             }
 
             throw new IllegalStateException("Unable to parse invalid index state: " + state);
