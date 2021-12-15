@@ -20,8 +20,9 @@ import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
-import { FieldTypesStore, FieldTypesStoreState, FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
-import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import type { FieldTypesStoreState, FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
+import { FieldTypesStore } from 'views/stores/FieldTypesStore';
+import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import { onSubmittingTimerange } from 'views/components/TimerangeForForm';
 import { isNoTimeRangeOverride } from 'views/typeGuards/timeRange';
 
@@ -66,8 +67,8 @@ const getFieldByName = (fields: FieldTypeMappingsList, fieldName: string) => {
   return fields.find(({ name }) => name === fieldName);
 };
 
-const isEnumerableField = (field: FieldTypeMapping) => {
-  return !!field?.type.properties.find((property) => property === 'enumerable');
+const isEnumerableField = (field: FieldTypeMapping | undefined) => {
+  return field?.type.isEnumerable() ?? false;
 };
 
 class FieldValueCompletion implements Completer {
