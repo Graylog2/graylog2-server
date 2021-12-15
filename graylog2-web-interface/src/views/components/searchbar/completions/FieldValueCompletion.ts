@@ -27,7 +27,7 @@ import { onSubmittingTimerange } from 'views/components/TimerangeForForm';
 import { isNoTimeRangeOverride } from 'views/typeGuards/timeRange';
 
 import type { Completer } from '../SearchBarAutocompletions';
-import type { Token, Editor, Line } from '../ace-types';
+import type { Token, Line } from '../ace-types';
 
 type SuggestionsResponse = {
   field: string,
