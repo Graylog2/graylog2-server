@@ -37,7 +37,7 @@ public abstract class Periodical implements Runnable {
     public abstract boolean stopOnGracefulShutdown();
 
     /**
-     * Only start this thread on master nodes?
+     * Only start this thread on leader nodes?
      *
      * @deprecated Use {@link #leaderOnly()} instead.
      */
