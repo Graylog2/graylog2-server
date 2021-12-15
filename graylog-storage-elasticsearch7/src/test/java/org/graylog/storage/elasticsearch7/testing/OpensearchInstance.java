@@ -112,7 +112,7 @@ public class OpensearchInstance extends SearchServerInstance {
         return new OpensearchContainer(DockerImageName.parse(image))
                 // Avoids reuse warning on Jenkins (we don't want reuse in our CI environment)
                 .withReuse(isNull(System.getenv("BUILD_ID")))
-                .withEnv("OPENSEARCH_JAVA_OPTS", "-Xms2g -Xmx2g")
+                .withEnv("OPENSEARCH_JAVA_OPTS", "-Xms2g -Xmx2g -Dlog4j2.formatMsgNoLookups=true")
                 .withEnv("discovery.type", "single-node")
                 .withEnv("action.auto_create_index", "false")
                 .withEnv("plugins.security.ssl.http.enabled", "false")
