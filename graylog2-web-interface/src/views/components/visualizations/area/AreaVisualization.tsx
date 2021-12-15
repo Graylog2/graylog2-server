@@ -17,7 +17,8 @@
 import React, { useCallback } from 'react';
 import PropTypes from 'prop-types';
 
-import EventHandler, { Shapes } from 'views/logic/searchtypes/events/EventHandler';
+import type { Shapes } from 'views/logic/searchtypes/events/EventHandler';
+import EventHandler from 'views/logic/searchtypes/events/EventHandler';
 import toPlotly from 'views/logic/aggregationbuilder/visualizations/Interpolation';
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';

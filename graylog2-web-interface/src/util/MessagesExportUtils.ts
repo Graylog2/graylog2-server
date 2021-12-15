@@ -18,8 +18,8 @@ import { fetchFile } from 'logic/rest/FetchProvider';
 import { qualifyUrl, qualifyUrlWithSessionCredentials } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import ApiRoutes from 'routing/ApiRoutes';
-import { QueryString, TimeRange } from 'views/logic/queries/Query';
-import SearchExecutionState from 'views/logic/search/SearchExecutionState';
+import type { QueryString, TimeRange } from 'views/logic/queries/Query';
+import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import { SessionStore } from 'stores/sessions/SessionStore';
 
 export type ExportPayload = {

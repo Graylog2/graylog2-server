@@ -19,10 +19,11 @@ import PropTypes from 'prop-types';
 
 import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
-import EventHandler, { Shapes } from 'views/logic/searchtypes/events/EventHandler';
+import type { Shapes } from 'views/logic/searchtypes/events/EventHandler';
+import EventHandler from 'views/logic/searchtypes/events/EventHandler';
 import { DateType } from 'views/logic/aggregationbuilder/Pivot';
 import { makeVisualization, retrieveChartData } from 'views/components/aggregationbuilder/AggregationBuilder';
-import BarVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
+import type BarVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
 
 import { chartData } from '../ChartData';
 import XYPlot from '../XYPlot';

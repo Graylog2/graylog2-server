@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import type React from 'react';
 import PropTypes from 'prop-types';
 
 import useFeature from 'hooks/useFeature';

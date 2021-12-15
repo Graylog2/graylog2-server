@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useState, useRef, useCallback } from 'react';
 
 import { WidgetActions } from 'views/stores/WidgetStore';
-import Widget from 'views/logic/widgets/Widget';
+import type Widget from 'views/logic/widgets/Widget';
 import UserNotification from 'util/UserNotification';
 
 import WidgetEditApplyAllChangesContext from './WidgetEditApplyAllChangesContext';

@@ -14,7 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import Series, { parseSeries } from 'views/logic/aggregationbuilder/Series';
+import type Series from 'views/logic/aggregationbuilder/Series';
+import { parseSeries } from 'views/logic/aggregationbuilder/Series';
 import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 
 import FieldType, { FieldTypes } from './FieldType';

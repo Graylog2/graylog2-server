@@ -14,7 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useCallback, useRef, useState, useEffect, SyntheticEvent } from 'react';
+import type { SyntheticEvent } from 'react';
+import React, { useCallback, useRef, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 
 import { Input } from 'components/bootstrap';

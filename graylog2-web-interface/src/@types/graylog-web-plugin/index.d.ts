@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import FetchError from 'logic/errors/FetchError';
+import type FetchError from 'logic/errors/FetchError';
 
 interface PluginRoute {
   path: string;

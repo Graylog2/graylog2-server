@@ -20,7 +20,7 @@ import { Overlay } from 'react-overlays';
 import styled from 'styled-components';
 import { useFormikContext } from 'formik';
 
-import { TimeRange, NoTimeRangeOverride, RelativeTimeRangeWithEnd } from 'views/logic/queries/Query';
+import type { TimeRange, NoTimeRangeOverride, RelativeTimeRangeWithEnd } from 'views/logic/queries/Query';
 import { ButtonGroup } from 'components/bootstrap';
 import { normalizeIfAllMessagesRange } from 'views/logic/queries/NormalizeTimeRange';
 

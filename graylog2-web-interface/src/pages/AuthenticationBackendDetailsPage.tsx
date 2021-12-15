@@ -29,7 +29,7 @@ import BackendDetails from 'components/authentication/BackendDetails';
 import DocumentationLink from 'components/support/DocumentationLink';
 import Routes from 'routing/Routes';
 import { Button } from 'components/bootstrap';
-import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
+import type AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
 
 type Props = {
   params: {

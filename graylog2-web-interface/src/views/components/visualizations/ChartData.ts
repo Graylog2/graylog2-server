@@ -17,7 +17,7 @@
 import { flatten, flow, isEqual, set } from 'lodash';
 
 import type { Key, Leaf, Row, Rows, Value } from 'views/logic/searchtypes/pivot/PivotHandler';
-import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 
 import transformKeys from './TransformKeys';
 

@@ -16,7 +16,7 @@
  */
 import moment from 'moment-timezone';
 
-import FieldType from 'views/logic/fieldtypes/FieldType';
+import type FieldType from 'views/logic/fieldtypes/FieldType';
 import { escape, addToQuery } from 'views/logic/queries/QueryHelper';
 import type { ActionHandler } from 'views/components/actions/ActionHandler';
 

@@ -16,9 +16,9 @@
  */
 import * as Immutable from 'immutable';
 
-import { DirectoryServiceBackend } from 'logic/authentication/directoryServices/types';
+import type { DirectoryServiceBackend } from 'logic/authentication/directoryServices/types';
 
-import { WizardFormValues } from './BackendWizard/BackendWizardContext';
+import type { WizardFormValues } from './BackendWizard/BackendWizardContext';
 
 export default ({
   title,

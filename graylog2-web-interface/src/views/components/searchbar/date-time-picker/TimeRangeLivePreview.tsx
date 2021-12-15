@@ -25,7 +25,7 @@ import { isTypeRelative, isTypeRelativeWithEnd, isTypeRelativeWithStartOnly } fr
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import { Icon } from 'components/common';
 import DateTime from 'logic/datetimes/DateTime';
-import { SearchBarFormValues } from 'views/Constants';
+import type { SearchBarFormValues } from 'views/Constants';
 
 import { EMPTY_OUTPUT, EMPTY_RANGE } from '../TimeRangeDisplay';
 

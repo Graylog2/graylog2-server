@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as chroma from 'chroma-js';
+import type * as chroma from 'chroma-js';
 
 import scaleForGradient from 'views/components/sidebar/highlighting/Scale';
 

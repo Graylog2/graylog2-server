@@ -18,8 +18,10 @@ import * as Immutable from 'immutable';
 
 import { StoreMock as MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
-import { ViewMetaData, ViewMetadataStore } from 'views/stores/ViewMetadataStore';
-import { FieldTypeMappingsList, FieldTypesStore, FieldTypesStoreState } from 'views/stores/FieldTypesStore';
+import type { ViewMetaData } from 'views/stores/ViewMetadataStore';
+import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
+import type { FieldTypeMappingsList, FieldTypesStoreState } from 'views/stores/FieldTypesStore';
+import { FieldTypesStore } from 'views/stores/FieldTypesStore';
 
 import FieldNameCompletion from './FieldNameCompletion';
 

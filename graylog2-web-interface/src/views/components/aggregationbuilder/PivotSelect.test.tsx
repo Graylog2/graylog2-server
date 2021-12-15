@@ -23,7 +23,8 @@ import suppressConsole from 'helpers/suppressConsole';
 import PivotGenerator from 'views/logic/searchtypes/aggregation/PivotGenerator';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
-import FieldTypesContext, { FieldTypes } from 'views/components/contexts/FieldTypesContext';
+import type { FieldTypes } from 'views/components/contexts/FieldTypesContext';
+import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 
 import PivotSelect from './PivotSelect';
 

@@ -18,7 +18,7 @@ import React from 'react';
 import { render } from 'wrappedTestingLibrary';
 
 import { AdditionalContext } from 'views/logic/ActionContext';
-import { Message } from 'views/components/messagelist/Types';
+import type { Message } from 'views/components/messagelist/Types';
 
 import Highlight from './Highlight';
 

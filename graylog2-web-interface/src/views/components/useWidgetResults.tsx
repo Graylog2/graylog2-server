@@ -21,11 +21,11 @@ import { widgetDefinition } from 'views/logic/Widgets';
 import { useStore } from 'stores/connect';
 import { SearchStore } from 'views/stores/SearchStore';
 import { WidgetStore } from 'views/stores/WidgetStore';
-import Widget from 'views/logic/widgets/Widget';
-import { WidgetMapping } from 'views/logic/views/types';
-import QueryResult from 'views/logic/QueryResult';
+import type Widget from 'views/logic/widgets/Widget';
+import type { WidgetMapping } from 'views/logic/views/types';
+import type QueryResult from 'views/logic/QueryResult';
 import { ViewStore } from 'views/stores/ViewStore';
-import SearchError from 'views/logic/SearchError';
+import type SearchError from 'views/logic/SearchError';
 
 const _getDataAndErrors = (widget: Widget, widgetMapping: WidgetMapping, results: QueryResult) => {
   const { searchTypes } = results;

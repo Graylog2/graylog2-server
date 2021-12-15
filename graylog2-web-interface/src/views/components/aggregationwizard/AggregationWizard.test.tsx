@@ -17,7 +17,8 @@
 import React from 'react';
 import * as Immutable from 'immutable';
 import { render, screen, waitFor, within } from 'wrappedTestingLibrary';
-import { PluginRegistration, PluginStore } from 'graylog-web-plugin/plugin';
+import type { PluginRegistration } from 'graylog-web-plugin/plugin';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 import userEvent from '@testing-library/user-event';
 
 import { simpleFields, simpleQueryFields } from 'fixtures/fields';

@@ -20,13 +20,15 @@ import chroma from 'chroma-js';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
-import { ViewMetaData as ViewMetadata } from 'views/stores/ViewMetadataStore';
-import QueryResult from 'views/logic/QueryResult';
-import SearchPageLayoutContext, { SearchPageLayout } from 'views/components/contexts/SearchPageLayoutContext';
+import type { ViewMetaData as ViewMetadata } from 'views/stores/ViewMetadataStore';
+import type QueryResult from 'views/logic/QueryResult';
+import type { SearchPageLayout } from 'views/components/contexts/SearchPageLayoutContext';
+import SearchPageLayoutContext from 'views/components/contexts/SearchPageLayoutContext';
 
 import SidebarNavigation from './SidebarNavigation';
 import ContentColumn from './ContentColumn';
-import sidebarSections, { SidebarSection } from './sidebarSections';
+import type { SidebarSection } from './sidebarSections';
+import sidebarSections from './sidebarSections';
 
 import CustomPropTypes from '../CustomPropTypes';
 

@@ -17,7 +17,7 @@
 import * as React from 'react';
 
 import { Spinner, IfPermitted } from 'components/common';
-import Role from 'logic/roles/Role';
+import type Role from 'logic/roles/Role';
 
 import UsersSection from './UsersSection';
 import TeamsSection from './TeamsSection';

@@ -25,7 +25,7 @@ import connect from 'stores/connect';
 import DocsHelper from 'util/DocsHelper';
 import Version from 'util/Version';
 import * as FormsUtils from 'util/FormsUtils';
-import { Store } from 'stores/StoreTypes';
+import type { Store } from 'stores/StoreTypes';
 import { InputsActions, InputsStore } from 'stores/inputs/InputsStore';
 
 type StreamRule = {

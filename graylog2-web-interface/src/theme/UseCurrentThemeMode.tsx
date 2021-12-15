@@ -21,7 +21,8 @@ import Store from 'logic/local-storage/Store';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import { PreferencesStore } from 'stores/users/PreferencesStore';
 
-import { PREFERENCES_THEME_MODE, DEFAULT_THEME_MODE, ThemeMode } from './constants';
+import type { ThemeMode } from './constants';
+import { PREFERENCES_THEME_MODE, DEFAULT_THEME_MODE } from './constants';
 
 import UserPreferencesContext from '../contexts/UserPreferencesContext';
 import usePrefersColorScheme from '../hooks/usePrefersColorScheme';

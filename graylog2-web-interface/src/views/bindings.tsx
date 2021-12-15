@@ -16,9 +16,9 @@
  */
 import React from 'react';
 import { get } from 'lodash';
-import { PluginExports } from 'graylog-web-plugin/plugin';
+import type { PluginExports } from 'graylog-web-plugin/plugin';
 
-import { WidgetComponentProps } from 'views/types';
+import type { WidgetComponentProps } from 'views/types';
 import Routes from 'routing/Routes';
 import App from 'routing/App';
 import AppConfig from 'util/AppConfig';

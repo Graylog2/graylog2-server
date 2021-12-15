@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import PropTypes from 'prop-types';
-import React, { SyntheticEvent } from 'react';
+import type { SyntheticEvent } from 'react';
+import React from 'react';
 
 import { Input } from 'components/bootstrap';
 import { URLWhiteListInput, KeyValueTable } from 'components/common';

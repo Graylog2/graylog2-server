@@ -26,7 +26,7 @@ import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import Store from 'logic/local-storage/Store';
 import SearchActions from 'views/actions/SearchActions';
 import { ViewStatesActions } from 'views/stores/ViewStatesStore';
-import ViewState from 'views/logic/views/ViewState';
+import type ViewState from 'views/logic/views/ViewState';
 
 import { mockFieldCharts, viewState as mockViewState } from './MigrateFieldCharts.fixtures';
 

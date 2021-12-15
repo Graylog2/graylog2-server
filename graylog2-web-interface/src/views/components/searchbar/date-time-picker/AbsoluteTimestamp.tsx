@@ -19,7 +19,7 @@ import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import { Field } from 'formik';
 
-import { AbsoluteTimeRange } from 'views/logic/queries/Query';
+import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 
 import AbsoluteDateInput from './AbsoluteDateInput';
 

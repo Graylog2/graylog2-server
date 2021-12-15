@@ -19,7 +19,7 @@ import URI from 'urijs';
 
 import AppConfig from 'util/AppConfig';
 import { extendedSearchPath, viewsPath } from 'views/Constants';
-import { TimeRangeTypes } from 'views/logic/queries/Query';
+import type { TimeRangeTypes } from 'views/logic/queries/Query';
 
 type RoutesRelativeTimeRange = {
   relative: number

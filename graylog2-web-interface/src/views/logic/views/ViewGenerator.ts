@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { TimeRange, ElasticsearchQueryString } from 'views/logic/queries/Query';
+import type { TimeRange, ElasticsearchQueryString } from 'views/logic/queries/Query';
 
 import View from './View';
 import ViewStateGenerator from './ViewStateGenerator';

@@ -19,7 +19,7 @@ import React from 'react';
 
 import { DropdownButton, MenuItem } from 'components/bootstrap';
 import { ConfigurationForm, ConfigurationWell } from 'components/configurationforms';
-import { Decorator } from 'views/logic/widgets/MessagesWidgetConfig';
+import type { Decorator } from 'views/logic/widgets/MessagesWidgetConfig';
 import type { DecoratorType } from 'views/components/messagelist/decorators/Types';
 
 import InlineForm from './InlineForm';

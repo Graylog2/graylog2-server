@@ -17,9 +17,9 @@
 import * as React from 'react';
 import { useState, useRef, useEffect } from 'react';
 import { compact, camelCase, mapKeys, mapValues } from 'lodash';
-import { $PropertyType } from 'utility-types';
+import type { $PropertyType } from 'utility-types';
 import PropTypes from 'prop-types';
-import { FormikProps } from 'formik';
+import type { FormikProps } from 'formik';
 
 import history from 'util/History';
 import { validateField } from 'util/FormsUtils';
@@ -28,13 +28,15 @@ import { Row, Col, Alert } from 'components/bootstrap';
 import { Spinner } from 'components/common';
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import Routes from 'routing/Routes';
-import { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
-import Wizard, { Step, StepKey } from 'components/common/Wizard';
-import FetchError from 'logic/errors/FetchError';
-import { LoadResponse as LoadBackendResponse } from 'stores/authentication/AuthenticationStore';
-import { PaginatedRoles } from 'actions/roles/AuthzRolesActions';
+import type { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
+import type { Step, StepKey } from 'components/common/Wizard';
+import Wizard from 'components/common/Wizard';
+import type FetchError from 'logic/errors/FetchError';
+import type { LoadResponse as LoadBackendResponse } from 'stores/authentication/AuthenticationStore';
+import type { PaginatedRoles } from 'actions/roles/AuthzRolesActions';
 
-import BackendWizardContext, { WizardStepsState, WizardFormValues, AuthBackendMeta } from './BackendWizardContext';
+import type { WizardStepsState, WizardFormValues, AuthBackendMeta } from './BackendWizardContext';
+import BackendWizardContext from './BackendWizardContext';
 import {
   FORM_VALIDATION as SERVER_CONFIG_VALIDATION,
   STEP_KEY as SERVER_CONFIG_KEY,

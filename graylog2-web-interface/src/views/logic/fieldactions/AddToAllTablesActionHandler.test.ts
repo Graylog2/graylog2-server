@@ -21,7 +21,8 @@ import Widget from 'views/logic/widgets/Widget';
 import AddToAllTablesActionHandler from 'views/logic/fieldactions/AddToAllTablesActionHandler';
 import { FieldTypes } from 'views/logic/fieldtypes/FieldType';
 import MessageWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
-import { WidgetActions, WidgetStore, WidgetStoreState } from 'views/stores/WidgetStore';
+import type { WidgetStoreState } from 'views/stores/WidgetStore';
+import { WidgetActions, WidgetStore } from 'views/stores/WidgetStore';
 
 describe('AddToAllTablesActionHandler', () => {
   it('should add a field to all message widgets', () => {

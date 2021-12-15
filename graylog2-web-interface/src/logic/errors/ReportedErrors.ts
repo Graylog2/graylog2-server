@@ -15,9 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 // eslint-disable-next-line import/no-cycle
-import { $PropertyType } from 'utility-types';
+import type { $PropertyType } from 'utility-types';
 
-import FetchError from 'logic/errors/FetchError';
+import type FetchError from 'logic/errors/FetchError';
 
 export const ReactErrorType = 'ReactError';
 export const NotFoundErrorType = 'NotFoundError';

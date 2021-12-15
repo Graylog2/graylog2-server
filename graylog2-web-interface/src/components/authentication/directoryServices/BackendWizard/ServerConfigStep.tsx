@@ -17,13 +17,15 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import { useContext } from 'react';
-import { Formik, Form, Field, FormikProps } from 'formik';
+import type { FormikProps } from 'formik';
+import { Formik, Form, Field } from 'formik';
 
 import { validateField, formHasErrors } from 'util/FormsUtils';
 import { FormikFormGroup, FormikInput, InputOptionalInfo as Opt } from 'components/common';
 import { Input, Button, ButtonToolbar } from 'components/bootstrap';
 
-import BackendWizardContext, { WizardFormValues } from './BackendWizardContext';
+import type { WizardFormValues } from './BackendWizardContext';
+import BackendWizardContext from './BackendWizardContext';
 
 export const STEP_KEY = 'server-configuration';
 // Form validation needs to include all input names

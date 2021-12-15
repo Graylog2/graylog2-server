@@ -25,7 +25,7 @@ import Store from 'logic/local-storage/Store';
 import View from 'views/logic/views/View';
 import CurrentViewTypeProvider from 'views/components/views/CurrentViewTypeProvider';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
-import { UserJSON } from 'logic/users/User';
+import type { UserJSON } from 'logic/users/User';
 import { PreferencesActions } from 'stores/users/PreferencesStore';
 
 import SearchPageLayoutContext from './SearchPageLayoutContext';

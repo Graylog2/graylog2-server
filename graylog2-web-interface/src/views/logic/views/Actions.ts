@@ -16,7 +16,7 @@
  */
 import history from 'util/History';
 import Routes from 'routing/Routes';
-import View from 'views/logic/views/View';
+import type View from 'views/logic/views/View';
 
 export const loadNewView = () => history.push(`${Routes.SEARCH}/new`);
 

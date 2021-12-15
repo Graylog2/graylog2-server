@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { useMemo } from 'react';
-import { PluginExports, PluginStore } from 'graylog-web-plugin/plugin';
+import type { PluginExports } from 'graylog-web-plugin/plugin';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 const usePluginEntities = <S extends keyof PluginExports>(entityKey: S) => useMemo(() => PluginStore.exports(entityKey), [entityKey]);
 

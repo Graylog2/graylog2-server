@@ -14,7 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import SearchBarAutoCompletions, { Completer } from './SearchBarAutocompletions';
+import type { Completer } from './SearchBarAutocompletions';
+import SearchBarAutoCompletions from './SearchBarAutocompletions';
 
 const sourceIpCompletion = {
   exactMatch: 0,

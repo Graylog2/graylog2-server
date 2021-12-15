@@ -18,14 +18,15 @@ import * as React from 'react';
 import { useState, useContext } from 'react';
 import { Formik, Form } from 'formik';
 
-import { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
+import type { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 import { FormikInput, Spinner } from 'components/common';
 import { Button, Row, Col } from 'components/bootstrap';
-import { LoginTestResult } from 'stores/authentication/AuthenticationStore';
+import type { LoginTestResult } from 'stores/authentication/AuthenticationStore';
 
 import ConnectionErrors, { NotificationContainer } from './ConnectionErrors';
-import BackendWizardContext, { WizardFormValues } from './BackendWizardContext';
+import type { WizardFormValues } from './BackendWizardContext';
+import BackendWizardContext from './BackendWizardContext';
 
 type Props = {
   prepareSubmitPayload: (fromValues: WizardFormValues | null | undefined) => WizardSubmitPayload,

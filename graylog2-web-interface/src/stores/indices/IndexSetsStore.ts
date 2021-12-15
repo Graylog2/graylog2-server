@@ -22,7 +22,8 @@ import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import { singletonStore, singletonActions } from 'logic/singleton';
-import { RetentionStrategyConfig, RetentionStrategyConfigPropType, RotationStrategyConfig, RotationStrategyConfigPropType } from 'components/indices/Types';
+import type { RetentionStrategyConfig, RotationStrategyConfig } from 'components/indices/Types';
+import { RetentionStrategyConfigPropType, RotationStrategyConfigPropType } from 'components/indices/Types';
 
 export const IndexSetPropType = PropTypes.shape({
   can_be_default: PropTypes.bool,

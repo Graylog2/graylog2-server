@@ -16,7 +16,7 @@
  */
 // eslint-disable-next-line import/prefer-default-export
 import Routes from 'routing/Routes';
-import { GRN, GRNType } from 'logic/permissions/types';
+import type { GRN, GRNType } from 'logic/permissions/types';
 
 const _convertEmptyString = (value: string) => (value === '' ? undefined : value);
 

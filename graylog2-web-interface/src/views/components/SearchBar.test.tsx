@@ -21,9 +21,10 @@ import { StoreMock as MockStore } from 'helpers/mocking';
 import mockAction from 'helpers/mocking/MockAction';
 import { SearchActions } from 'views/stores/SearchStore';
 import MockQuery from 'views/logic/queries/Query';
-import WidgetFocusContext, {
+import type {
   WidgetEditingState, WidgetFocusingState,
 } from 'views/components/contexts/WidgetFocusContext';
+import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
 
 import SearchBar from './SearchBar';

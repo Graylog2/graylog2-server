@@ -16,7 +16,8 @@
  */
 import * as React from 'react';
 import { useContext, useState, useRef, useCallback, useEffect } from 'react';
-import styled, { DefaultTheme, css, keyframes } from 'styled-components';
+import type { DefaultTheme } from 'styled-components';
+import styled, { css, keyframes } from 'styled-components';
 import { Overlay, Transition } from 'react-overlays';
 import { delay } from 'lodash';
 import { useFormikContext } from 'formik';

@@ -29,12 +29,14 @@ import { SearchActions } from 'views/stores/SearchStore';
 import { RefreshActions } from 'views/stores/RefreshStore';
 import * as messageList from 'views/components/messagelist';
 import { InputsActions, InputsStore } from 'stores/inputs/InputsStore';
-import { SearchExecutionResult } from 'views/actions/SearchActions';
-import { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
+import type { SearchExecutionResult } from 'views/actions/SearchActions';
+import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import CancellablePromise from 'logic/rest/CancellablePromise';
 
-import MessageList, { MessageListResult } from './MessageList';
-import RenderCompletionCallback, { TRenderCompletionCallback } from './RenderCompletionCallback';
+import type { MessageListResult } from './MessageList';
+import MessageList from './MessageList';
+import type { TRenderCompletionCallback } from './RenderCompletionCallback';
+import RenderCompletionCallback from './RenderCompletionCallback';
 
 const MessageTableEntry = () => (
   <AdditionalContext.Consumer>

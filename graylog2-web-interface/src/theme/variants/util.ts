@@ -15,11 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import chroma from 'chroma-js';
-import { $PropertyType } from 'utility-types';
+import type { $PropertyType } from 'utility-types';
 
-import { Colors } from 'theme/colors';
+import type { Colors } from 'theme/colors';
 
-import { THEME_MODE_LIGHT, THEME_MODE_DARK, ThemeMode } from '../constants';
+import type { ThemeMode } from '../constants';
+import { THEME_MODE_LIGHT, THEME_MODE_DARK } from '../constants';
 
 const lightThemeRatio = ['0.22', '0.55', '0.88'];
 const darkThemeRatio = ['0.15', '0.55', '0.95'];

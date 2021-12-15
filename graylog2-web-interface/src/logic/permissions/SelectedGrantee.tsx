@@ -14,11 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { $PropertyType } from 'utility-types';
+import type { $PropertyType } from 'utility-types';
 
-import { GranteeInterface } from './GranteeInterface';
-import Grantee from './Grantee';
-import Capability from './Capability';
+import type { GranteeInterface } from './GranteeInterface';
+import type Grantee from './Grantee';
+import type Capability from './Capability';
 import type { ActiveShares } from './EntityShareState';
 
 type InternalState = {

@@ -16,7 +16,7 @@
  */
 import * as Immutable from 'immutable';
 import URI from 'urijs';
-import { $PropertyType } from 'utility-types';
+import type { $PropertyType } from 'utility-types';
 
 import Routes from 'routing/Routes';
 import type { QueryString, TimeRange } from 'views/logic/queries/Query';

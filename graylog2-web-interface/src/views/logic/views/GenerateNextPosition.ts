@@ -16,10 +16,10 @@
  */
 import * as Immutable from 'immutable';
 
-import WidgetPosition from 'views/logic/widgets/WidgetPosition';
+import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import GetPositionForNewWidget from 'views/logic/views/GetPositionForNewWidget';
 
-import Widget from '../widgets/Widget';
+import type Widget from '../widgets/Widget';
 
 const incrementRow = (position: WidgetPosition) => position.row + 1;
 

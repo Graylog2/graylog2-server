@@ -19,8 +19,8 @@ import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 
 import Select from 'views/components/Select';
-import Pivot from 'views/logic/aggregationbuilder/Pivot';
-import Series from 'views/logic/aggregationbuilder/Series';
+import type Pivot from 'views/logic/aggregationbuilder/Pivot';
+import type Series from 'views/logic/aggregationbuilder/Series';
 import { defaultCompare } from 'views/logic/DefaultCompare';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 

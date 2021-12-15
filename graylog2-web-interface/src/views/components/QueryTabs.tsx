@@ -16,16 +16,17 @@
  */
 import * as React from 'react';
 import { useRef } from 'react';
-import * as Immutable from 'immutable';
+import type * as Immutable from 'immutable';
 import PropTypes from 'prop-types';
 import { SizeMe } from 'react-sizeme';
 import ImmutablePropTypes from 'react-immutable-proptypes';
-import { OrderedSet } from 'immutable';
+import type { OrderedSet } from 'immutable';
 
 import { Col, Row } from 'components/bootstrap';
-import Query, { QueryId } from 'views/logic/queries/Query';
+import type { QueryId } from 'views/logic/queries/Query';
+import type Query from 'views/logic/queries/Query';
 import type { TitlesMap } from 'views/stores/TitleTypes';
-import ViewState from 'views/logic/views/ViewState';
+import type ViewState from 'views/logic/views/ViewState';
 
 import QueryTitleEditModal from './queries/QueryTitleEditModal';
 import AdaptableQueryTabs from './AdaptableQueryTabs';

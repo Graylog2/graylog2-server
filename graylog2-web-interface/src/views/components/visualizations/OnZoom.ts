@@ -18,7 +18,7 @@ import moment from 'moment-timezone';
 
 import AppConfig from 'util/AppConfig';
 import { QueriesActions } from 'views/stores/QueriesStore';
-import Query from 'views/logic/queries/Query';
+import type Query from 'views/logic/queries/Query';
 import type { ViewType } from 'views/logic/views/View';
 import View from 'views/logic/views/View';
 import { GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';

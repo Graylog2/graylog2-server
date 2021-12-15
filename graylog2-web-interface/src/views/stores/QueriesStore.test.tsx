@@ -21,7 +21,8 @@ import asMock from 'helpers/mocking/AsMock';
 import View from 'views/logic/views/View';
 
 import { QueriesActions, QueriesStore } from './QueriesStore';
-import { ViewStore, ViewStoreState } from './ViewStore';
+import type { ViewStoreState } from './ViewStore';
+import { ViewStore } from './ViewStore';
 
 import type { QueryId } from '../logic/queries/Query';
 import Query from '../logic/queries/Query';

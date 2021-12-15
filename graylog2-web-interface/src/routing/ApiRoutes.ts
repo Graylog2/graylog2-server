@@ -16,7 +16,7 @@
  */
 import Qs from 'qs';
 
-import { TimeRange } from 'views/logic/queries/Query';
+import type { TimeRange } from 'views/logic/queries/Query';
 
 type SearchQueryString = {
   query: string,

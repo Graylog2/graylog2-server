@@ -19,7 +19,7 @@ import { useFormikContext } from 'formik';
 import { isEmpty } from 'lodash';
 import styled from 'styled-components';
 
-import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 
 import ElementConfigurationSection from './ElementConfigurationSection';
 import ElementsConfigurationActions from './ElementsConfigurationActions';

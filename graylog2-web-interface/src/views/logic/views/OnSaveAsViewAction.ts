@@ -18,7 +18,7 @@ import UserNotification from 'util/UserNotification';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import { ViewActions } from 'views/stores/ViewStore';
 
-import View from './View';
+import type View from './View';
 import { loadDashboard } from './Actions';
 
 export default (view: View) => {

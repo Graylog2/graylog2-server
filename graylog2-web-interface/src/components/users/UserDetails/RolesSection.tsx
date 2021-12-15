@@ -18,8 +18,9 @@ import * as React from 'react';
 import { useState, useCallback } from 'react';
 
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
-import User from 'logic/users/User';
-import PaginatedItemOverview, { PaginatedListType } from 'components/common/PaginatedItemOverview';
+import type User from 'logic/users/User';
+import type { PaginatedListType } from 'components/common/PaginatedItemOverview';
+import PaginatedItemOverview from 'components/common/PaginatedItemOverview';
 import SectionComponent from 'components/common/Section/SectionComponent';
 
 import RolesQueryHelp from '../RolesQueryHelp';

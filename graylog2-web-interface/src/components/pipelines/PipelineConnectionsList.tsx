@@ -20,7 +20,7 @@ import naturalSort from 'javascript-natural-sort';
 
 import type { PipelineType } from 'stores/pipelines/PipelinesStore';
 import type { PipelineConnectionsType } from 'stores/pipelines/PipelineConnectionsStore';
-import { Stream } from 'stores/streams/StreamsStore';
+import type { Stream } from 'stores/streams/StreamsStore';
 
 type Props = {
   pipeline: PipelineType,
