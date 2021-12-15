@@ -18,6 +18,7 @@ package org.graylog2.configuration;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
@@ -30,6 +31,7 @@ import java.nio.file.Path;
  * information. Building a list manually because we need to guarantee never to return any
  * sensitive variables like passwords etc. - See this as a whitelist approach.
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect
 @AutoValue
 @WithBeanGetter
@@ -81,6 +83,16 @@ public abstract class ExposedConfiguration {
 
     @JsonProperty("output_module_timeout")
     public abstract long outputModuleTimeout();
+
+    /**
+     * @deprecated We will serialize the field to the same value as {@link #staleLeaderTimeout()} for backwards
+     * compatibility but ignore it on deserialization.
+     */
+    @Deprecated
+    @JsonProperty("stale_master_timeout")
+    public int staleMasterTimeout() {
+        return staleLeaderTimeout();
+    }
 
     @JsonProperty("stale_leader_timeout")
     public abstract int staleLeaderTimeout();

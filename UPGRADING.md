@@ -7,11 +7,11 @@ Please make sure to create a MongoDB database backup before starting the upgrade
 
 ## Breaking Changes
 
-### Breaking API changes ##
+### Notable API Endpoint Changes ##
 
 | Endpoint                        | Description                 |
 | ------------------------------- | --------------------------- |
-| `GET /api/system/configuration` | The key `stale_master_timeout` has been been replaced with `stale_leader_timeout` in the response object. |
+| `GET /api/system/configuration` | The field `stale_master_timeout` has been deprecated. It is still present in the response object for backwards compatibility but will hold the same value as the new `stale_leader_timeout` field, which has been added as a replacement. |
 
 ## API Endpoint Deprecations
 

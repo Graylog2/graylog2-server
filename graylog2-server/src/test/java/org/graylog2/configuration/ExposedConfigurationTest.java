@@ -52,6 +52,8 @@ public class ExposedConfigurationTest {
         assertThat(c.streamProcessingMaxFaults()).isEqualTo(configuration.getStreamProcessingMaxFaults());
         assertThat(c.outputModuleTimeout()).isEqualTo(configuration.getOutputModuleTimeout());
         assertThat(c.staleLeaderTimeout()).isEqualTo(configuration.getStaleLeaderTimeout());
+        //noinspection deprecation
+        assertThat(c.staleMasterTimeout()).isEqualTo(configuration.getStaleLeaderTimeout());
         assertThat(c.gcWarningThreshold()).isEqualTo(configuration.getGcWarningThreshold().toString());
     }
 
@@ -78,6 +80,7 @@ public class ExposedConfigurationTest {
         assertThat((int) JsonPath.read(json, "$.stream_processing_max_faults")).isEqualTo(c.streamProcessingMaxFaults());
         assertThat((int) JsonPath.read(json, "$.output_module_timeout")).isEqualTo((int) c.outputModuleTimeout());
         assertThat((int) JsonPath.read(json, "$.stale_leader_timeout")).isEqualTo(c.staleLeaderTimeout());
+        assertThat((int) JsonPath.read(json, "$.stale_master_timeout")).isEqualTo(c.staleLeaderTimeout());
         assertThat((String) JsonPath.read(json, "$.gc_warning_threshold")).isEqualTo(c.gcWarningThreshold());
     }
 
@@ -101,6 +104,7 @@ public class ExposedConfigurationTest {
                 "  \"stream_processing_max_faults\": 3," +
                 "  \"output_module_timeout\": 10000," +
                 "  \"stale_leader_timeout\": 2000," +
+                "  \"stale_master_timeout\": 3000," +
                 "  \"gc_warning_threshold\": \"1 second\"" +
                 "}";
 
@@ -122,7 +126,9 @@ public class ExposedConfigurationTest {
         assertThat((int) c.streamProcessingTimeout()).isEqualTo(JsonPath.read(json, "$.stream_processing_timeout"));
         assertThat(c.streamProcessingMaxFaults()).isEqualTo(JsonPath.read(json, "$.stream_processing_max_faults"));
         assertThat((int) c.outputModuleTimeout()).isEqualTo(JsonPath.read(json, "$.output_module_timeout"));
-        assertThat(c.staleLeaderTimeout()).isEqualTo(JsonPath.read(json, "$.stale_leader_timeout"));
+        //noinspection deprecation
+        assertThat(c.staleLeaderTimeout()).isEqualTo(JsonPath.read(json, "$.stale_leader_timeout"))
+                .isEqualTo(c.staleMasterTimeout());
         assertThat(c.gcWarningThreshold()).isEqualTo(JsonPath.read(json, "$.gc_warning_threshold"));
     }
 }
