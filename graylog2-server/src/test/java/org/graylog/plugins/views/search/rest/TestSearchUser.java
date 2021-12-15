@@ -21,6 +21,7 @@ import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.plugin.database.users.User;
 import org.mockito.Mockito;
 
+import static org.graylog2.shared.security.RestPermissions.DASHBOARDS_READ;
 import static org.graylog2.shared.security.RestPermissions.STREAMS_READ;
 
 public class TestSearchUser {
@@ -40,9 +41,18 @@ public class TestSearchUser {
         return this;
     }
 
+    public TestSearchUser allowDashboard(String id) {
+        this.permissions.put(DASHBOARDS_READ + ":" + id, true);
+        return this;
+    }
 
     public TestSearchUser denyStream(String streamId) {
         this.permissions.put(STREAMS_READ + ":" + streamId, false);
+        return this;
+    }
+
+    public TestSearchUser denyDashboard(String id) {
+        this.permissions.put(DASHBOARDS_READ + ":" + id, false);
         return this;
     }
 
