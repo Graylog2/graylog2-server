@@ -108,11 +108,11 @@ public class LookupTableService extends AbstractIdleService {
         this.adapterRefreshService = new LookupDataAdapterRefreshService(scheduler, liveTables);
     }
 
-    public LookupTableConfigService getConfigService() {
+    protected LookupTableConfigService getConfigService() {
         return configService;
     }
 
-    public ScheduledExecutorService getScheduler() {
+    protected ScheduledExecutorService getScheduler() {
         return scheduler;
     }
 
