@@ -131,9 +131,7 @@ public class MessagesResource extends RestResource implements PluginRestResource
 
         executionGuard.checkUserIsPermittedToSeeStreams(request.streams(), searchUser::canReadStream);
 
-        // TODO: add query validation service here
-
-        ExportMessagesCommand command = commandFactory.buildFromRequest(request);
+         ExportMessagesCommand command = commandFactory.buildFromRequest(request);
 
         return asyncRunner.apply(chunkConsumer -> exporter().export(command, chunkConsumer));
     }
