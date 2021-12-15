@@ -21,6 +21,7 @@ import com.google.auto.value.AutoValue;
 import javax.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 @AutoValue
 public abstract class ValidationResponse {

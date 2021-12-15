@@ -105,6 +105,8 @@ import org.graylog.plugins.views.search.views.widgets.aggregation.WorldMapVisual
 import org.graylog.plugins.views.search.views.widgets.aggregation.sort.PivotSortConfig;
 import org.graylog.plugins.views.search.views.widgets.aggregation.sort.SeriesSortConfig;
 import org.graylog.plugins.views.search.views.widgets.messagelist.MessageListConfigDTO;
+import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
+import org.graylog2.indexer.fieldtypes.MappedFieldTypesServiceImpl;
 import org.graylog2.plugin.PluginConfigBean;
 import org.graylog2.rest.MoreMediaTypes;
 
@@ -130,7 +132,7 @@ public class ViewsBindings extends ViewsModule {
         addSystemRestResource(SearchResource.class);
         addSystemRestResource(SearchMetadataResource.class);
         addSystemRestResource(ViewsResource.class);
-         addSystemRestResource(QueryValidationResource.class);
+        addSystemRestResource(QueryValidationResource.class);
 
         addPermissions(ViewsRestPermissions.class);
 
@@ -172,6 +174,7 @@ public class ViewsBindings extends ViewsModule {
         registerJacksonSubtype(AutoIntervalDTO.class);
 
         bind(SearchJobService.class).to(InMemorySearchJobService.class).in(Scopes.SINGLETON);
+        bind(MappedFieldTypesService.class).to(MappedFieldTypesServiceImpl.class).in(Scopes.SINGLETON);
         bind(QueryValidationService.class).to(QueryValidationServiceImpl.class).in(Scopes.SINGLETON);
         bind(ChunkDecorator.class).to(LegacyChunkDecorator.class);
         bind(MessagesExporter.class).to(DecoratingMessagesExporter.class);
