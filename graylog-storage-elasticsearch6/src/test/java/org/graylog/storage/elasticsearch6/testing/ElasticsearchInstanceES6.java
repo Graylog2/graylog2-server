@@ -17,7 +17,6 @@
 package org.graylog.storage.elasticsearch6.testing;
 
 import com.github.joschi.jadconfig.util.Duration;
-import com.github.zafarkhaja.semver.Version;
 import com.google.common.collect.ImmutableList;
 import io.searchbox.client.JestClient;
 import org.graylog.storage.elasticsearch6.jest.JestClientProvider;
@@ -46,6 +45,11 @@ public class ElasticsearchInstanceES6 extends SearchServerInstance {
         this.jestClient = jestClientFrom();
         this.client = new ClientES6(jestClient);
         this.fixtureImporter = new FixtureImporterES6(jestClient);
+    }
+
+    @Override
+    public SearchServer searchServer() {
+        return SearchServer.ES6;
     }
 
     @Override
@@ -102,6 +106,7 @@ public class ElasticsearchInstanceES6 extends SearchServerInstance {
         ).get();
     }
 
+    @Override
     public String getHttpHostAddress() {
         return this.container.getHost() + ":" + this.container.getMappedPort(9200);
     }

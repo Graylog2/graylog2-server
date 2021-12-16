@@ -22,6 +22,7 @@ import org.graylog.shaded.elasticsearch7.org.apache.http.impl.client.BasicCreden
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestHighLevelClient;
 import org.graylog.storage.elasticsearch7.ElasticsearchClient;
 import org.graylog.storage.elasticsearch7.RestHighLevelClientProvider;
+import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.elasticsearch.Client;
 import org.graylog.testing.elasticsearch.FixtureImporter;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
@@ -57,6 +58,11 @@ public class OpensearchInstance extends SearchServerInstance {
         this.elasticsearchClient = new ElasticsearchClient(this.restHighLevelClient, false, new ObjectMapperProvider().get());
         this.client = new ClientES7(this.elasticsearchClient);
         this.fixtureImporter = new FixtureImporterES7(this.elasticsearchClient);
+    }
+
+    @Override
+    public SearchServer searchServer() {
+        return SearchServer.OS1;
     }
 
     private RestHighLevelClient buildRestClient() {
@@ -109,6 +115,7 @@ public class OpensearchInstance extends SearchServerInstance {
         return this.restHighLevelClient;
     }
 
+    @Override
     protected GenericContainer<?> buildContainer(String image, Network network) {
         return new OpensearchContainer(DockerImageName.parse(image))
                 // Avoids reuse warning on Jenkins (we don't want reuse in our CI environment)

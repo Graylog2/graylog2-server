@@ -23,11 +23,13 @@ import org.graylog.shaded.elasticsearch7.org.apache.http.impl.client.BasicCreden
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestHighLevelClient;
 import org.graylog.storage.elasticsearch7.ElasticsearchClient;
 import org.graylog.storage.elasticsearch7.RestHighLevelClientProvider;
+import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.elasticsearch.Client;
 import org.graylog.testing.elasticsearch.FixtureImporter;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.storage.SearchVersion;
 import org.graylog2.system.shutdown.GracefulShutdownService;
 import org.slf4j.Logger;
@@ -52,6 +54,11 @@ public class ElasticsearchInstanceES7 extends SearchServerInstance {
         this.elasticsearchClient = new ElasticsearchClient(this.restHighLevelClient, false, new ObjectMapperProvider().get());
         this.client = new ClientES7(this.elasticsearchClient);
         this.fixtureImporter = new FixtureImporterES7(this.elasticsearchClient);
+    }
+
+    @Override
+    public SearchServer searchServer() {
+        return SearchServer.ES7;
     }
 
     private RestHighLevelClient buildRestClient() {
