@@ -32,7 +32,7 @@ jest.mock('components/common', () => ({
   PageHeader: mockComponent('PageHeader'),
 }));
 
-const mockViewManagementStore = StoreMock('listen', 'getInitialState');
+const mockViewManagementStore = StoreMock();
 const mockViewManagementActions = { search: jest.fn(), delete: jest.fn() };
 
 jest.mock('views/stores/ViewManagementStore', () => ({

@@ -51,7 +51,6 @@ jest.mock('components/layout/Footer', () => mockComponent('Footer'));
 
 jest.mock('views/stores/ViewMetadataStore', () => ({
   ViewMetadataStore: MockStore(
-    ['listen', () => jest.fn()],
     'get',
     ['getInitialState', () => ({
       activeQuery: 'beef-dead',
@@ -66,7 +65,6 @@ jest.mock('views/stores/SearchStore', () => ({
     executeWithCurrentState: jest.fn(),
   },
   SearchStore: MockStore(
-    ['listen', () => jest.fn()],
     'get',
     ['getInitialState', () => ({
       result: {
@@ -81,7 +79,6 @@ jest.mock('views/stores/SearchStore', () => ({
 jest.mock('views/stores/FieldTypesStore', () => ({
   FieldTypesActions: {},
   FieldTypesStore: MockStore(
-    ['listen', () => jest.fn()],
     'get',
     ['getInitialState', () => ({
       all: {},

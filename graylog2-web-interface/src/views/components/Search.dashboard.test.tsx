@@ -39,7 +39,6 @@ import WidgetFocusContext from './contexts/WidgetFocusContext';
 
 jest.mock('views/stores/ViewMetadataStore', () => ({
   ViewMetadataStore: MockStore(
-    ['listen', () => jest.fn()],
     'get',
     ['getInitialState', () => ({
       activeQuery: 'beef-dead',
