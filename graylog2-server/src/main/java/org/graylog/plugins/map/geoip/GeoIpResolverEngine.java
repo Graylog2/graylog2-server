@@ -18,53 +18,52 @@ package org.graylog.plugins.map.geoip;
 
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
-import com.google.auto.value.AutoValue;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.net.InetAddresses;
-import com.maxmind.geoip2.DatabaseReader;
-import com.maxmind.geoip2.model.CityResponse;
-import com.maxmind.geoip2.record.City;
-import com.maxmind.geoip2.record.Country;
-import com.maxmind.geoip2.record.Location;
 import org.graylog.plugins.map.config.GeoIpResolverConfig;
 import org.graylog2.plugin.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import java.io.File;
-import java.io.IOException;
 import java.net.InetAddress;
-import java.nio.file.Files;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
 public class GeoIpResolverEngine {
     private static final Logger LOG = LoggerFactory.getLogger(GeoIpResolverEngine.class);
 
+    /**
+     * A mapping of fields that to search that contain IP addresses.  ONLY these fields will be checked
+     * to see if they have valid Geo IP information.
+     */
+    private final Map<String, String> ipAddressFields = new ImmutableMap.Builder<String, String>()
+            .put("source_ip", "source")
+            .put("host_ip", "host")
+            .put("destination_ip", "destination")
+            .build();
+
     private final Timer resolveTime;
-    private DatabaseReader databaseReader;
+    private final GeoIpResolver<?, GeoLocationInformation> ipLocationResolver;
+    private final GeoIpResolver<?, GeoAsnInformation> ipAsnResolver;
     private boolean enabled;
 
 
     public GeoIpResolverEngine(GeoIpResolverConfig config, MetricRegistry metricRegistry) {
         this.resolveTime = metricRegistry.timer(name(GeoIpResolverEngine.class, "resolveTime"));
 
-        try {
-            final File database = new File(config.dbPath());
-            if (Files.exists(database.toPath())) {
-                this.databaseReader = new DatabaseReader.Builder(database).build();
-                this.enabled = config.enabled();
-            } else {
-                LOG.warn("GeoIP database file does not exist: {}", config.dbPath());
-                this.enabled = false;
-            }
-        } catch (IOException e) {
-            LOG.error("Could not open GeoIP database {}", config.dbPath(), e);
-            this.enabled = false;
-        }
+        GeoIpResolverFactory resolverFactory = GeoIpResolverFactory.getInstance();
+        ipLocationResolver = resolverFactory.createLocationResolver(resolveTime, config);
+        ipAsnResolver = resolverFactory.createIpAsnResolver(resolveTime, config);
+
+        //TODO: Confirm with Dan/Rob/et. al, if enabled here should be if either (any) resolver is working/enabled
+        this.enabled = ipLocationResolver.isEnabled() && ipAsnResolver.isEnabled();
+
     }
 
     public boolean filter(Message message) {
@@ -72,24 +71,51 @@ public class GeoIpResolverEngine {
             return false;
         }
 
-        for (Map.Entry<String, Object> field : message.getFields().entrySet()) {
-            final String key = field.getKey();
-            if (!key.startsWith(Message.INTERNAL_FIELD_PREFIX)) {
-                final Optional<GeoLocationInformation> geoLocationInformation = extractGeoLocationInformation(field.getValue());
-                geoLocationInformation.ifPresent(locationInformation -> {
-                    // We will store the coordinates as a "lat,long" string
-                    message.addField(key + "_geolocation", locationInformation.latitude() + "," + locationInformation.longitude());
-                    message.addField(key + "_country_code", locationInformation.countryIsoCode());
-                    message.addField(key + "_city_name", locationInformation.cityName());
-                });
+        List<String> ipFields = getIpAddressFields(message);
+
+        for (String key : ipFields) {
+            Object fieldValue = message.getField(key);
+            final InetAddress address = getValidRoutableInetAddress(fieldValue);
+            if (address == null) {
+                continue;
             }
+
+            final String prefix = ipAddressFields.get(key);
+            ipLocationResolver.getGeoIpData(address).ifPresent(locationInformation -> {
+                message.addField(prefix + "_geo_coordinates", locationInformation.latitude() + "," + locationInformation.longitude());
+                message.addField(prefix + "_geo_country", locationInformation.countryIsoCode());
+                message.addField(prefix + "_geo_city", locationInformation.cityName());
+                message.addField(prefix + "_geo_region", locationInformation.region());
+                message.addField(prefix + "_geo_timeZone", locationInformation.timeZone());
+            });
+
+            ipAsnResolver.getGeoIpData(address).ifPresent(info -> {
+
+                message.addField(prefix + "_as_organization", info.organization());
+                message.addField(prefix + "_as_number", info.asn());
+            });
+
         }
 
-        return false;
+        return true;
     }
 
+    private List<String> getIpAddressFields(Message message) {
+        return message.getFieldNames()
+                .stream()
+                .filter(e -> ipAddressFields.containsKey(e)
+                        && !e.startsWith(Message.INTERNAL_FIELD_PREFIX))
+                .collect(Collectors.toList());
+    }
+
+    //TODO: remove this and unit tests--test the resolvers individually instead
     @VisibleForTesting
-    Optional<GeoLocationInformation> extractGeoLocationInformation(Object fieldValue) {
+    Optional<GeoLocationInformation> extractGeoLocationInformation(InetAddress address) {
+
+        return ipLocationResolver.getGeoIpData(address);
+    }
+
+    private InetAddress getValidRoutableInetAddress(Object fieldValue) {
         final InetAddress ipAddress;
         if (fieldValue instanceof InetAddress) {
             ipAddress = (InetAddress) fieldValue;
@@ -98,26 +124,7 @@ public class GeoIpResolverEngine {
         } else {
             ipAddress = null;
         }
-
-        GeoLocationInformation geoLocationInformation = null;
-        if (ipAddress != null) {
-            try (Timer.Context ignored = resolveTime.time()) {
-                final CityResponse response = databaseReader.city(ipAddress);
-                final Location location = response.getLocation();
-                final Country country = response.getCountry();
-                final City city = response.getCity();
-
-                geoLocationInformation = GeoLocationInformation.create(
-                        location.getLatitude(), location.getLongitude(),
-                        country.getGeoNameId() != null ? country.getIsoCode() : "N/A",
-                        city.getGeoNameId() != null ? city.getName() : "N/A" // calling to .getName() may throw a NPE
-                );
-            } catch (Exception e) {
-                LOG.debug("Could not get location from IP {}", ipAddress.getHostAddress(), e);
-            }
-        }
-
-        return Optional.ofNullable(geoLocationInformation);
+        return ipAddress;
     }
 
     @Nullable
@@ -130,20 +137,5 @@ public class GeoIpResolverEngine {
         }
 
         return null;
-    }
-
-    @AutoValue
-    static abstract class GeoLocationInformation {
-        public abstract double latitude();
-
-        public abstract double longitude();
-
-        public abstract String countryIsoCode();
-
-        public abstract String cityName();
-
-        public static GeoLocationInformation create(double latitude, double longitude, String countryIsoCode, String cityName) {
-            return new AutoValue_GeoIpResolverEngine_GeoLocationInformation(latitude, longitude, countryIsoCode, cityName);
-        }
     }
 }

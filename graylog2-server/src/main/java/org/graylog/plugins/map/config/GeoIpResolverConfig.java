@@ -16,12 +16,11 @@
  */
 package org.graylog.plugins.map.config;
 
-import com.google.auto.value.AutoValue;
-
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
 
 @JsonAutoDetect
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -32,27 +31,39 @@ public abstract class GeoIpResolverConfig {
     public abstract boolean enabled();
 
     @JsonProperty("db_type")
-    public abstract DatabaseType dbType();
+    public abstract DatabaseType cityDbType();
 
     @JsonProperty("db_path")
-    public abstract String dbPath();
+    public abstract String cityDbPath();
+
+    @JsonProperty("asn_db_type")
+    public abstract DatabaseType asnDbType();
+
+    @JsonProperty("asn_db_path")
+    public abstract String asnDbPath();
 
     @JsonCreator
-    public static GeoIpResolverConfig create(@JsonProperty("enabled") boolean enabled,
+    public static GeoIpResolverConfig create(@JsonProperty("enabled") boolean cityEnabled,
                                              @JsonProperty("db_type") DatabaseType dbType,
-                                             @JsonProperty("db_path") String dbPath) {
+                                             @JsonProperty("db_path") String cityDbPath,
+                                             @JsonProperty("asn_db_type") DatabaseType asnDbType,
+                                             @JsonProperty("asn_db_path") String asnDbPath) {
         return builder()
-                .enabled(enabled)
-                .dbType(dbType)
-                .dbPath(dbPath)
+                .enabled(cityEnabled)
+                .cityDbType(dbType)
+                .cityDbPath(cityDbPath)
+                .asnDbType(asnDbType)
+                .asnDbPath(asnDbPath)
                 .build();
     }
 
     public static GeoIpResolverConfig defaultConfig() {
        return builder()
                .enabled(false)
-               .dbType(DatabaseType.MAXMIND_CITY)
-               .dbPath("/etc/graylog/server/GeoLite2-City.mmdb")
+               .cityDbType(DatabaseType.MAXMIND_CITY)
+               .cityDbPath("/etc/graylog/server/GeoLite2-City.mmdb")
+               .asnDbType(DatabaseType.MAXMIND_ASN)
+               .asnDbPath("/etc/graylog/server/GeoLite2-ASN.mmdb")
                .build();
     }
 
@@ -63,10 +74,16 @@ public abstract class GeoIpResolverConfig {
     public abstract Builder toBuilder();
 
     @AutoValue.Builder
-    public static abstract class Builder {
+    public abstract static class Builder {
         public abstract Builder enabled(boolean enabled);
-        public abstract Builder dbType(DatabaseType dbType);
-        public abstract Builder dbPath(String dbPath);
+
+        public abstract Builder cityDbType(DatabaseType dbType);
+
+        public abstract Builder cityDbPath(String dbPath);
+
+        public abstract Builder asnDbType(DatabaseType dbType);
+
+        public abstract Builder asnDbPath(String asnDBPath);
 
         public abstract GeoIpResolverConfig build();
     }

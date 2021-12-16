@@ -565,6 +565,11 @@
             <artifactId>geoip2</artifactId>
         </dependency>
         <dependency>
+            <groupId>io.ipinfo</groupId>
+            <artifactId>ipinfo-api</artifactId>
+            <version>${ipinfo.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.graylog.cef</groupId>
             <artifactId>cef-parser</artifactId>
         </dependency>
