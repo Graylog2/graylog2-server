@@ -135,8 +135,8 @@ describe('Search', () => {
     WidgetStore.listen = jest.fn(() => jest.fn());
     QueryFiltersStore.listen = jest.fn(() => jest.fn());
     SearchActions.execute = mockAction(jest.fn(async () => ({} as SearchExecutionResult)));
-    StreamsActions.refresh = mockAction(jest.fn());
-    SearchConfigActions.refresh = mockAction(jest.fn());
+    StreamsActions.refresh = mockAction();
+    SearchConfigActions.refresh = mockAction();
     SearchExecutionStateStore.listen = jest.fn(() => jest.fn());
     ViewActions.search.completed.listen = jest.fn(() => jest.fn());
 
@@ -151,7 +151,7 @@ describe('Search', () => {
     FieldTypesActions.refresh = mockAction(jest.fn(async () => {}));
     SearchMetadataActions.parseSearch = mockAction(jest.fn(() => mockPromise(SearchMetadata.empty())));
     SearchMetadataStore.listen = jest.fn(() => jest.fn());
-    SearchActions.refresh = mockAction(jest.fn(() => Promise.resolve()));
+    SearchActions.refresh = mockAction();
     asMock(CurrentViewTypeProvider as React.FunctionComponent).mockImplementation(({ children }) => <ViewTypeContext.Provider value={View.Type.Dashboard}>{children}</ViewTypeContext.Provider>);
   });
 

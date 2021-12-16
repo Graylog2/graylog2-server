@@ -84,7 +84,7 @@ describe('SearchBar', () => {
   };
 
   beforeEach(() => {
-    SearchActions.refresh = mockAction(jest.fn());
+    SearchActions.refresh = mockAction();
   });
 
   it('should render the SearchBar', async () => {

@@ -37,8 +37,8 @@ const mockLoadUsersPaginatedPromise = Promise.resolve(paginatedUsers);
 jest.mock('stores/users/UsersStore', () => ({
   UsersActions: {
     loadUsersPaginated: jest.fn(() => mockLoadUsersPaginatedPromise),
-    delete: mockAction(jest.fn(() => Promise.resolve())),
-    setStatus: mockAction(jest.fn(() => Promise.resolve())),
+    delete: mockAction(),
+    setStatus: mockAction(),
   },
 }));
 
