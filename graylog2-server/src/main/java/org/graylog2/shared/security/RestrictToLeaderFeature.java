@@ -16,21 +16,18 @@
  */
 package org.graylog2.shared.security;
 
-import org.graylog2.cluster.leader.LeaderElectionService;
-
 import javax.inject.Inject;
 import javax.ws.rs.container.DynamicFeature;
 import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.FeatureContext;
 import java.lang.reflect.Method;
 
-public class RestrictToMasterFeature implements DynamicFeature {
-    private final RestrictToMasterFilter restrictToMasterFilter;
+public class RestrictToLeaderFeature implements DynamicFeature {
+    private final RestrictToLeaderFilter restrictToLeaderFilter;
 
     @Inject
-    public RestrictToMasterFeature(LeaderElectionService leaderElectionService,
-                                   RestrictToMasterFilter restrictToMasterFilter) {
-        this.restrictToMasterFilter = restrictToMasterFilter;
+    public RestrictToLeaderFeature(RestrictToLeaderFilter restrictToLeaderFilter) {
+        this.restrictToLeaderFilter = restrictToLeaderFilter;
     }
 
     @Override
@@ -38,9 +35,12 @@ public class RestrictToMasterFeature implements DynamicFeature {
         final Class<?> resourceClass = resourceInfo.getResourceClass();
         final Method resourceMethod = resourceInfo.getResourceMethod();
 
-        if (resourceMethod.isAnnotationPresent(RestrictToMaster.class) ||
+        //noinspection deprecation
+        if (resourceMethod.isAnnotationPresent(RestrictToLeader.class) ||
+                resourceMethod.isAnnotationPresent(RestrictToMaster.class) ||
+                resourceClass.isAnnotationPresent(RestrictToLeader.class) ||
                 resourceClass.isAnnotationPresent(RestrictToMaster.class)) {
-            context.register(restrictToMasterFilter);
+            context.register(restrictToLeaderFilter);
         }
     }
 }

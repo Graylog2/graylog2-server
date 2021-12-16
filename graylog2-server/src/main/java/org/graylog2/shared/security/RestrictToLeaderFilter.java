@@ -31,21 +31,21 @@ import java.io.IOException;
 
 @Singleton
 @Priority(Priorities.AUTHORIZATION)
-public class RestrictToMasterFilter implements ContainerRequestFilter {
-    private static final Logger LOG = LoggerFactory.getLogger(RestrictToMasterFilter.class);
+public class RestrictToLeaderFilter implements ContainerRequestFilter {
+    private static final Logger LOG = LoggerFactory.getLogger(RestrictToLeaderFilter.class);
 
     private final LeaderElectionService leaderElectionService;
 
     @Inject
-    public RestrictToMasterFilter(LeaderElectionService leaderElectionService) {
+    public RestrictToLeaderFilter(LeaderElectionService leaderElectionService) {
         this.leaderElectionService = leaderElectionService;
     }
 
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
         if (!leaderElectionService.isLeader()) {
-            LOG.warn("Rejected request to <{}> which is only allowed against master nodes.", requestContext.getUriInfo().getPath());
-            throw new ForbiddenException("Request is only allowed against master nodes.");
+            LOG.warn("Rejected request to <{}> which is only allowed against leader nodes.", requestContext.getUriInfo().getPath());
+            throw new ForbiddenException("Request is only allowed against leader nodes.");
         }
     }
 }

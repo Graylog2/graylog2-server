@@ -7,6 +7,12 @@ Please make sure to create a MongoDB database backup before starting the upgrade
 
 ## Breaking Changes
 
+### Notable API Endpoint Changes ##
+
+| Endpoint                        | Description                 |
+| ------------------------------- | --------------------------- |
+| `GET /api/system/configuration` | The field `stale_master_timeout` has been deprecated. It is still present in the response object for backwards compatibility but will hold the same value as the new `stale_leader_timeout` field, which has been added as a replacement. |
+
 ## API Endpoint Deprecations
 
 The following API endpoints are deprecated beginning with 4.3.
@@ -31,10 +37,14 @@ pre 2.2 Graylog installations.
 
 ## Configuration File Changes
 
-The following configuration option has been removed: `index_field_type_periodical_interval`.
-
-It has been replaced with a new configuration option which allows users to tweak the default full refresh interval for
-index field type information: `index_field_type_periodical_full_refresh_interval`.
+| Option                                              | Action      | Description |
+| --------------------------------------------------- | ----------  | ------------ |
+| `is_master`                                         | **removed** | Replaced with `is_leader`. For backwards compatibility, `is_master` will still be evaluated, but `is_leader` takes precedence, if both are configured.|
+| `stale_master_timeout`                              | **removed** | Replaced with `stale_leader_timeout`. For backwards compatibility, `stale_master_timeout` will still be evaluated, but `stale_leader_timeout` takes precedence, if both are configured. |
+| `index_field_type_periodical_interval`              | **removed** | To control index field type refreshing, the new `index_field_type_periodical_full_refresh_interval` may be used instead. |
+| `is_leader`                                         | *added*     | Replacement for `is_master` to promote [inclusive naming](https://inclusivenaming.org/faqs/). |
+| `stale_leader_timeout`                              | *added*     | Replacement for `stale_master_timeout` to promote [inclusive naming](https://inclusivenaming.org/faqs/). |
+| `index_field_type_periodical_full_refresh_interval` | *added*     | Allows users to tweak the default interval after which field type information will be refreshed for *all* indices. |
 
 ## Behaviour Changes
 

@@ -38,16 +38,16 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
     @Inject
     public NodeServiceImpl(final MongoConnection mongoConnection, final Configuration configuration) {
         super(mongoConnection);
-        this.pingTimeout = TimeUnit.MILLISECONDS.toSeconds(configuration.getStaleMasterTimeout());
+        this.pingTimeout = TimeUnit.MILLISECONDS.toSeconds(configuration.getStaleLeaderTimeout());
     }
 
     @Override
-    public String registerServer(String nodeId, boolean isMaster, URI httpPublishUri, String hostname) {
+    public String registerServer(String nodeId, boolean isLeader, URI httpPublishUri, String hostname) {
         Map<String, Object> fields = Maps.newHashMap();
         fields.put("last_seen", Tools.getUTCTimestamp());
         fields.put("node_id", nodeId);
         fields.put("type", Node.Type.SERVER.toString());
-        fields.put("is_master", isMaster);
+        fields.put("is_leader", isLeader);
         fields.put("transport_address", httpPublishUri.toString());
         fields.put("hostname", hostname);
 
@@ -106,8 +106,9 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
     public Map<String, Node> allActive() {
         Map<String, Node> nodes = Maps.newHashMap();
 
-        for (Node.Type type : Node.Type.values())
+        for (Node.Type type : Node.Type.values()) {
             nodes.putAll(allActive(type));
+        }
 
         return nodes;
     }
@@ -122,14 +123,11 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
 
     /**
      * Mark this node as alive and probably update some settings that may have changed since last server boot.
-     *
-     * @param isMaster
-     * @param restTransportAddress
      */
     @Override
-    public void markAsAlive(Node node, boolean isMaster, String restTransportAddress) {
+    public void markAsAlive(Node node, boolean isLeader, String restTransportAddress) {
         node.getFields().put("last_seen", Tools.getUTCTimestamp());
-        node.getFields().put("is_master", isMaster);
+        node.getFields().put("is_leader", isLeader);
         node.getFields().put("transport_address", restTransportAddress);
         try {
             save(node);
@@ -139,27 +137,27 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
     }
 
     @Override
-    public void markAsAlive(Node node, boolean isMaster, URI restTransportAddress) {
-        markAsAlive(node, isMaster, restTransportAddress.toString());
+    public void markAsAlive(Node node, boolean isLeader, URI restTransportAddress) {
+        markAsAlive(node, isLeader, restTransportAddress.toString());
     }
 
     @Override
-    public boolean isOnlyMaster(NodeId nodeId) {
+    public boolean isOnlyLeader(NodeId nodeId) {
         BasicDBObject query = new BasicDBObject();
         query.put("type", Node.Type.SERVER.toString());
         query.put("last_seen", new BasicDBObject("$gte", Tools.getUTCTimestamp() - pingTimeout));
         query.put("node_id", new BasicDBObject("$ne", nodeId.toString()));
-        query.put("is_master", true);
+        query.put("is_leader", true);
 
         return query(NodeImpl.class, query).size() == 0;
     }
 
     @Override
-    public boolean isAnyMasterPresent() {
+    public boolean isAnyLeaderPresent() {
         BasicDBObject query = new BasicDBObject();
         query.put("type", Node.Type.SERVER.toString());
         query.put("last_seen", new BasicDBObject("$gte", Tools.getUTCTimestamp() - pingTimeout));
-        query.put("is_master", true);
+        query.put("is_leader", true);
 
         return query(NodeImpl.class, query).size() > 0;
     }

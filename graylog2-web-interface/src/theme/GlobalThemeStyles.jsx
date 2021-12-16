@@ -210,7 +210,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     margin-bottom: 0;
   }
 
-  .master-node {
+  .leader-node {
     color: ${theme.colors.variant.dark.warning};
   }
 
