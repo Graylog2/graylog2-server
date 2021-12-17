@@ -54,37 +54,81 @@ const EditorMock = {
 };
 
 describe('SearchAutoCompletions', () => {
-  it('should return completions based on provided Completers', async () => {
-    const searchBarAutoCompletions = new SearchBarAutoCompletions([new SimpleCompleter()]);
+  describe('getCompletions', () => {
+    it('should return completions based on provided Completers', async () => {
+      const searchBarAutoCompletions = new SearchBarAutoCompletions([new SimpleCompleter()]);
 
-    const callback = jest.fn();
+      const callback = jest.fn();
 
-    await searchBarAutoCompletions.getCompletions(
-      // @ts-ignore
-      EditorMock,
-      {},
-      { row: 0, column: 1 },
-      's',
-      callback,
-    );
+      await searchBarAutoCompletions.getCompletions(
+        // @ts-ignore
+        EditorMock,
+        {},
+        { row: 0, column: 1 },
+        's',
+        callback,
+      );
 
-    expect(callback).toHaveBeenCalledWith(null, [sourceIpCompletion]);
+      expect(callback).toHaveBeenCalledWith(null, [sourceIpCompletion]);
+    });
+
+    it('should support Completers which provide the completions asynchronously', async () => {
+      const searchBarAutoCompletions = new SearchBarAutoCompletions([new SimpleCompleter(), new AsyncCompleter()]);
+
+      const callback = jest.fn();
+
+      await searchBarAutoCompletions.getCompletions(
+        // @ts-ignore
+        EditorMock,
+        {},
+        { row: 0, column: 1 },
+        's',
+        callback,
+      );
+
+      expect(callback).toHaveBeenCalledWith(null, [sourceIpCompletion, sourceCompletion]);
+    });
   });
 
-  it('should support Completers which provide the completions asynchronously', async () => {
-    const searchBarAutoCompletions = new SearchBarAutoCompletions([new SimpleCompleter(), new AsyncCompleter()]);
+  describe('shouldShowCompletions', () => {
+    it('should not show completions manually when no Completer provides `shouldShowCompletions`', async () => {
+      const searchBarAutoCompletions = new SearchBarAutoCompletions([new SimpleCompleter()]);
 
-    const callback = jest.fn();
+      const result = searchBarAutoCompletions.shouldShowCompletions(1, [[{ type: 'keyword', value: 'http_method:', index: 0, start: 0 }], null]);
 
-    await searchBarAutoCompletions.getCompletions(
-      // @ts-ignore
-      EditorMock,
-      {},
-      { row: 0, column: 1 },
-      's',
-      callback,
-    );
+      expect(result).toBe(false);
+    });
 
-    expect(callback).toHaveBeenCalledWith(null, [sourceIpCompletion, sourceCompletion]);
+    it('should not show completions manually when a Completer provides `shouldShowCompletions` which returns false', async () => {
+      class ExampleCompleter implements Completer {
+        getCompletions = () => ([sourceIpCompletion]);
+
+        shouldShowCompletions = () => false;
+      }
+
+      const searchBarAutoCompletions = new SearchBarAutoCompletions([new ExampleCompleter()]);
+      const result = searchBarAutoCompletions.shouldShowCompletions(1, [[{ type: 'keyword', value: 'http_method:', index: 0, start: 0 }], null]);
+
+      expect(result).toBe(false);
+    });
+
+    it('should consider a Completer when deciding if it should show completions', async () => {
+      const mockShouldShowCompletions = jest.fn(() => true);
+
+      class ExampleCompleter implements Completer {
+        getCompletions = () => ([sourceIpCompletion]);
+
+        shouldShowCompletions = mockShouldShowCompletions;
+      }
+
+      const searchBarAutoCompletions = new SearchBarAutoCompletions([new ExampleCompleter()]);
+      const result = searchBarAutoCompletions.shouldShowCompletions(1, [[{ type: 'keyword', value: 'http_method:', index: 0, start: 0 }], null]);
+
+      expect(mockShouldShowCompletions).toHaveBeenCalledTimes(1);
+
+      expect(mockShouldShowCompletions).toHaveBeenCalledWith(1, [[{ type: 'keyword', value: 'http_method:', index: 0, start: 0 }], null]);
+
+      expect(result).toBe(true);
+    });
   });
 });
