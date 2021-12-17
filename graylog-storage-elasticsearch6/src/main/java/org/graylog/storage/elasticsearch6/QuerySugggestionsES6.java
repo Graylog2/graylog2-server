@@ -68,9 +68,10 @@ public class QuerySugggestionsES6 implements QuerySuggestionsService {
 
             final TermsAggregation aggregation = result.getAggregations().getTermsAggregation("fieldvalues");
             final List<SuggestionEntry> entries = aggregation.getBuckets().stream().map(b -> new SuggestionEntry(b.getKeyAsString(), b.getCount())).collect(Collectors.toList());
-            return SuggestionResponse.builder(req.field(), req.input()).suggestions(entries).build();
+            return SuggestionResponse.forSuggestions(req.field(), req.input(), entries);
         } catch (Exception e) {
-            return SuggestionResponse.builder(req.field(), req.input()).suggestionError(SuggestionError.create(e.getClass().getSimpleName(), e.getMessage())).build();
+            final SuggestionError err = SuggestionError.create(e.getClass().getSimpleName(), e.getMessage());
+            return SuggestionResponse.forError(req.field(), req.input(), err);
         }
     }
 }

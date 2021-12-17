@@ -36,20 +36,11 @@ public abstract class SuggestionResponse {
     public abstract Optional<SuggestionError> suggestionError();
 
 
-    public static Builder builder(final String field, final String input) {
-        return new AutoValue_SuggestionResponse.Builder().field(field).input(input).suggestions(Collections.emptyList());
+    public static SuggestionResponse forSuggestions(final String field, final String input, final List<SuggestionEntry> suggestions) {
+        return new AutoValue_SuggestionResponse(field, input, suggestions, Optional.empty());
     }
 
-    @AutoValue.Builder
-    public abstract static class Builder {
-        public abstract Builder field(final String field);
-
-        public abstract Builder input(final String input);
-
-        public abstract Builder suggestions(final List<SuggestionEntry> suggestionEntries);
-
-        public abstract Builder suggestionError(@Nullable final SuggestionError suggestionError);
-
-        public abstract SuggestionResponse build();
+    public static SuggestionResponse forError(final String field, final String input, final SuggestionError error) {
+        return new AutoValue_SuggestionResponse(field, input, Collections.emptyList(), Optional.of(error));
     }
 }

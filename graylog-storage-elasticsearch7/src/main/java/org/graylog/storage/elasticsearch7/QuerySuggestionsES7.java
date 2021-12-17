@@ -59,12 +59,11 @@ public class QuerySuggestionsES7 implements QuerySuggestionsService {
             final SearchResponse result = client.singleSearch(new SearchRequest(affectedIndices.toArray(new String[]{})).source(search), "Failed to execute aggregation");
             final ParsedStringTerms fieldValues = result.getAggregations().get("fieldvalues");
             final List<SuggestionEntry> entries = fieldValues.getBuckets().stream().map(b -> new SuggestionEntry(b.getKeyAsString(), b.getDocCount())).collect(Collectors.toList());
-            return SuggestionResponse.builder(req.field(), req.input()).suggestions(entries).build();
+            return SuggestionResponse.forSuggestions(req.field(), req.input(), entries);
         } catch (org.graylog.shaded.elasticsearch7.org.elasticsearch.ElasticsearchException exception) {
             final SuggestionError err = tryResponseException(exception)
                     .orElseGet(() -> parseException(exception));
-            return SuggestionResponse.builder(req.field(), req.input()).suggestionError(err).build();
-
+            return SuggestionResponse.forError(req.field(), req.input(), err);
         }
     }
 
