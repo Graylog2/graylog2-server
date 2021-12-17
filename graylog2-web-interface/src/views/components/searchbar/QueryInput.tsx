@@ -55,9 +55,13 @@ type Props = {
   warning?: QueryValidationState,
 };
 
-const defaultCompleterFactory = (completers, timeRange, streams) => new SearchBarAutoCompletions(completers, timeRange, streams);
+const defaultCompleterFactory = (
+  completers: Array<Completer>,
+  timeRange: TimeRange | NoTimeRangeOverride,
+  streams: Array<string>,
+) => new SearchBarAutoCompletions(completers, timeRange, streams);
 
-const handleExecution = (editor, onExecute, value, error) => {
+const handleExecution = (editor: Editor, onExecute: (query: string) => void, value: string, error: QueryValidationState | undefined) => {
   if (editor?.completer && editor.completer.popup) {
     editor.completer.popup.hide();
   }
