@@ -18,16 +18,17 @@ import * as React from 'react';
 import { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { $PropertyType } from 'utility-types';
-import { FormikProps } from 'formik';
+import type { $PropertyType } from 'utility-types';
+import type { FormikProps } from 'formik';
 
 import type { GRN } from 'logic/permissions/types';
-import EntityShareState from 'logic/permissions/EntityShareState';
-import SharedEntity from 'logic/permissions/SharedEntity';
+import type EntityShareState from 'logic/permissions/EntityShareState';
+import type SharedEntity from 'logic/permissions/SharedEntity';
 import EntityShareDomain from 'domainActions/permissions/EntityShareDomain';
-import { EntitySharePayload } from 'actions/permissions/EntityShareActions';
+import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 
-import GranteesSelector, { SelectionRequest, FormValues as GranteesSelectFormValues } from './GranteesSelector';
+import type { SelectionRequest, FormValues as GranteesSelectFormValues } from './GranteesSelector';
+import GranteesSelector from './GranteesSelector';
 import GranteesList from './GranteesList';
 import DependenciesWarning from './DependenciesWarning';
 import ValidationError from './ValidationError';

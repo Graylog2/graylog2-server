@@ -16,7 +16,7 @@
  */
 
 declare module 'graylog-web-plugin/plugin' {
-  import { Component } from 'react';
+  import type { Component } from 'react';
 
   interface PluginExports {
     'systemOverview'?: Array<{ component: typeof Component }>;

@@ -15,12 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { List } from 'immutable';
+import type { List } from 'immutable';
 import { Field } from 'formik';
 
-import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
-import Widget from 'views/logic/widgets/Widget';
-import View from 'views/logic/views/View';
+import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import type Widget from 'views/logic/widgets/Widget';
+import type View from 'views/logic/views/View';
 import { Input, HelpBlock, Row } from 'components/bootstrap';
 import FieldSelect from 'views/components/widgets/FieldSelect';
 import IfDashboard from 'views/components/dashboard/IfDashboard';

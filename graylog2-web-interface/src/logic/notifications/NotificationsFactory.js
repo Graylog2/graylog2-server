@@ -181,15 +181,15 @@ class NotificationsFactory {
             </span>
           ),
         };
-      case 'multi_master':
+      case 'multi_leader':
         return {
-          title: 'Multiple Graylog server masters in the cluster',
+          title: 'Multiple Graylog server leaders in the cluster',
           description: (
             <span>
-              There were multiple Graylog server instances configured as master in your Graylog cluster. The cluster handles
-              this automatically by launching new nodes as slaves if there already is a master but you should still fix this.
-              Check the graylog.conf of every node and make sure that only one instance has is_master set to true. Close this
-              notification if you think you resolved the problem. It will pop back up if you start a second master node again.
+              There were multiple Graylog server instances configured as leader in your Graylog cluster. The cluster handles
+              this automatically by launching new nodes as followers if there already is a leader but you should still fix this.
+              Check the graylog.conf of every node and make sure that only one instance has is_leader set to true. Close this
+              notification if you think you resolved the problem. It will pop back up if you start a second leader node again.
             </span>
           ),
         };
@@ -206,13 +206,13 @@ class NotificationsFactory {
             </span>
           ),
         };
-      case 'no_master':
+      case 'no_leader':
         return {
-          title: 'There was no master Graylog server node detected in the cluster.',
+          title: 'There was no leader Graylog server node detected in the cluster.',
           description: (
             <span>
-              Certain operations of Graylog server require the presence of a master node, but no such master was started.
-              Please ensure that one of your Graylog server nodes contains the setting <code>is_master = true</code> in its
+              Certain operations of Graylog server require the presence of a leader node, but no such leader was started.
+              Please ensure that one of your Graylog server nodes contains the setting <code>is_leader = true</code> in its
               configuration and that it is running. Until this is resolved index cycling will not be able to run, which
               means that the index retention mechanism is also not running, leading to increased index sizes. Certain
               maintenance functions as well as a variety of web interface pages (e.g. Dashboards) are unavailable.
@@ -314,7 +314,7 @@ class NotificationsFactory {
           description: (
             <span>
               The Elasticsearch version which is currently running ({currentVersion}) has a different major version than
-              the one the Graylog master node was started with ({initialVersion}).{' '}
+              the one the Graylog leader node was started with ({initialVersion}).{' '}
               This will most probably result in errors during indexing or searching. Graylog requires a full restart after an
               Elasticsearch upgrade from one major version to another.
               <br />

@@ -16,10 +16,9 @@
  */
 package org.graylog2.indexer.fieldtypes;
 
-import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.SetMultimap;
+import com.google.common.collect.Sets;
 
 import javax.inject.Inject;
 import java.util.Collection;
@@ -29,7 +28,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * This can be used to lookup types for message fields.
@@ -123,37 +121,42 @@ public class MongoFieldTypeLookup implements FieldTypeLookup {
         // }
 
         // field-name -> {physical-type -> [index-name, ...]}
-        final Map<String, SetMultimap<String, String>> fields = new HashMap<>();
+        final Map<String, Map<FieldTypeDTO, Set<String>>> fields = new HashMap<>();
 
         // Convert the data from the database to be indexed by field name and physical type
-        getTypesStream(fieldNames, indexNames).forEach(types -> {
-            final String indexName = types.indexName();
+        getTypesStream(fieldNames, indexNames)
+                .stream()
+                .filter(types -> indexNames.isEmpty() || indexNames.contains(types.indexName()))
+                .forEach(types -> {
+                    final String indexName = types.indexName();
 
-            types.fields().forEach(fieldType -> {
-                final String fieldName = fieldType.fieldName();
-                final String physicalType = fieldType.physicalType();
+                    types.fields().stream()
+                            .filter(fieldType -> fieldNames.contains(fieldType.fieldName()))
+                            .forEach(fieldType -> {
+                                final String fieldName = fieldType.fieldName();
 
-                if (fieldNames.contains(fieldName)) {
-                    if (indexNames.isEmpty() || indexNames.contains(indexName)) {
-                        if (!fields.containsKey(fieldName)) {
-                            fields.put(fieldName, HashMultimap.create());
-                        }
-                        fields.get(fieldName).put(physicalType, indexName);
-                    }
-                }
-            });
-        });
+                                fields.merge(fieldName,
+                                        Collections.singletonMap(fieldType, Collections.singleton(indexName)),
+                                        (existingMap, newMap) -> {
+                                            final Map<FieldTypeDTO, Set<String>> result = new HashMap<>(existingMap);
+                                            result.merge(fieldType,
+                                                    Collections.singleton(indexName),
+                                                    Sets::union);
+                                            return result;
+                                        });
+                            });
+                });
 
         final ImmutableMap.Builder<String, FieldTypes> result = ImmutableMap.builder();
 
-        for (Map.Entry<String, SetMultimap<String, String>> fieldNameEntry : fields.entrySet()) {
+        for (Map.Entry<String, Map<FieldTypeDTO, Set<String>>> fieldNameEntry : fields.entrySet()) {
             final String fieldName = fieldNameEntry.getKey();
-            final Map<String, Collection<String>> physicalTypes = fieldNameEntry.getValue().asMap();
+            final Map<FieldTypeDTO, Set<String>> physicalTypes = fieldNameEntry.getValue();
 
             // Use the field type mapper to do the conversion between the Elasticsearch type and our logical type
             final Set<FieldTypes.Type> types = physicalTypes.entrySet().stream()
                     .map(entry -> {
-                        final String physicalType = entry.getKey();
+                        final FieldTypeDTO physicalType = entry.getKey();
                         final Set<String> indices = ImmutableSet.copyOf(entry.getValue());
 
                         return typeMapper.mapType(physicalType).map(t -> t.withIndexNames(indices));

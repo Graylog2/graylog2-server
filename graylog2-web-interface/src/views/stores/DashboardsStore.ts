@@ -24,7 +24,7 @@ import type { RefluxActions, Store } from 'stores/StoreTypes';
 
 import type { PaginatedViews, SortField, SortOrder } from './ViewManagementStore';
 
-import View from '../logic/views/View';
+import type View from '../logic/views/View';
 
 type DashboardsActionsType = RefluxActions<{
   search: (query?: string, page?: number, perPage?: number, sortBy?: SortField, order?: SortOrder) => Promise<PaginatedViews>,

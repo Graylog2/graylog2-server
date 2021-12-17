@@ -56,8 +56,8 @@ import SearchPageLayoutProvider from 'views/components/contexts/SearchPageLayout
 import usePluginEntities from 'views/logic/usePluginEntities';
 import WidgetFocusProvider from 'views/components/contexts/WidgetFocusProvider';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
-import SearchExecutionState from 'views/logic/search/SearchExecutionState';
-import { RefluxActions } from 'stores/StoreTypes';
+import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
+import type { RefluxActions } from 'stores/StoreTypes';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import SynchronizeUrl from 'views/components/SynchronizeUrl';
 

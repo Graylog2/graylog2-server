@@ -18,7 +18,7 @@ import { useEffect, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { parse, stringify } from 'qs';
 
-import { Pagination } from 'stores/PaginationTypes';
+import type { Pagination } from 'stores/PaginationTypes';
 
 type UseLocationSearchPaginationType = {
   isInitialized: boolean,

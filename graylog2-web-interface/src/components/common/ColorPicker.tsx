@@ -17,7 +17,8 @@
 import * as React from 'react';
 import { useCallback } from 'react';
 import PropTypes from 'prop-types';
-import { SwatchesPicker, ColorResult } from 'react-color';
+import type { ColorResult } from 'react-color';
+import { SwatchesPicker } from 'react-color';
 
 type Props = {
   color: string,

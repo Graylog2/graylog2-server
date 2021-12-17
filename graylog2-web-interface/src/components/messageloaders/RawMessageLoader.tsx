@@ -18,7 +18,7 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
-import { Subtract } from 'utility-types';
+import type { Subtract } from 'utility-types';
 
 import { getValueFromInput } from 'util/FormsUtils';
 import { Select } from 'components/common';

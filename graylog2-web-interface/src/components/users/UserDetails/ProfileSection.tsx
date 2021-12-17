@@ -17,7 +17,7 @@
 import * as React from 'react';
 
 import { ReadOnlyFormGroup } from 'components/common';
-import User from 'logic/users/User';
+import type User from 'logic/users/User';
 import SectionComponent from 'components/common/Section/SectionComponent';
 
 type Props = {

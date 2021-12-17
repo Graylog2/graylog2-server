@@ -16,13 +16,13 @@
  */
 import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
-import * as Immutable from 'immutable';
+import type * as Immutable from 'immutable';
 
-import { BackendWidgetPosition } from 'views/types';
+import type { BackendWidgetPosition } from 'views/types';
 import { AdditionalContext } from 'views/logic/ActionContext';
 import WidgetContext from 'views/components/contexts/WidgetContext';
-import WidgetPosition from 'views/logic/widgets/WidgetPosition';
-import TFieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
+import type TFieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import ExportSettingsContextProvider from 'views/components/ExportSettingsContextProvider';
 import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 import View from 'views/logic/views/View';

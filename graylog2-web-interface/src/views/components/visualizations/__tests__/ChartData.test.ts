@@ -22,7 +22,8 @@ import { flow, merge, fill } from 'lodash';
 
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 
-import { chartData, ExtractedSeries, extractSeries, formatSeries, generateChart, ValuesBySeries } from '../ChartData';
+import type { ExtractedSeries, ValuesBySeries } from '../ChartData';
+import { chartData, extractSeries, formatSeries, generateChart } from '../ChartData';
 import transformKeys from '../TransformKeys';
 
 const cwd = dirname(__filename);

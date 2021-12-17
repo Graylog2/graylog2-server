@@ -22,6 +22,7 @@ import com.google.common.util.concurrent.Uninterruptibles;
 import com.google.inject.Provider;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
+import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.SuppressForbidden;
@@ -49,6 +50,11 @@ public class ServerStatus {
 
     public enum Capability {
         SERVER,
+        /**
+         * @deprecated Use {@link LeaderElectionService#isLeader()} to determine if the node currently acts as a leader,
+         * if you absolutely must.
+         */
+        @Deprecated
         MASTER,
         LOCALMODE
     }

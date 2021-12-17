@@ -223,30 +223,35 @@ public class Server extends ServerBootstrap {
                 httpConfiguration.getHttpPublishUri(),
                 Tools.getLocalCanonicalHostname());
         serverStatus.setLocalMode(isLocal());
-        if (leaderElectionService.isLeader() && !nodeService.isOnlyMaster(serverStatus.getNodeId())) {
-            LOG.warn("Detected another master in the cluster. Retrying in {} seconds to make sure it is not "
-                    + "an old stale instance.", TimeUnit.MILLISECONDS.toSeconds(configuration.getStaleMasterTimeout()));
+        if (leaderElectionService.isLeader() && !nodeService.isOnlyLeader(serverStatus.getNodeId())) {
+            LOG.warn("Detected another leader in the cluster. Retrying in {} seconds to make sure it is not "
+                    + "an old stale instance.", TimeUnit.MILLISECONDS.toSeconds(configuration.getStaleLeaderTimeout()));
             try {
-                Thread.sleep(configuration.getStaleMasterTimeout());
+                Thread.sleep(configuration.getStaleLeaderTimeout());
             } catch (InterruptedException e) { /* nope */ }
 
-            if (!nodeService.isOnlyMaster(serverStatus.getNodeId())) {
+            if (!nodeService.isOnlyLeader(serverStatus.getNodeId())) {
                 // All devils here.
-                String what = "Detected other master node in the cluster! Starting as non-master! "
+                String what = "Detected other leader node in the cluster! Starting as non-leader! "
                         + "This is a mis-configuration you should fix.";
                 LOG.warn(what);
                 activityWriter.write(new Activity(what, Server.class));
 
-                // Write a notification.
                 final NotificationService notificationService = injector.getInstance(NotificationService.class);
+
+                // remove legacy notification, if present
+                //noinspection deprecation
+                notificationService.fixed(notificationService.build().addType(Notification.Type.MULTI_MASTER));
+
+                // Write a notification.
                 Notification notification = notificationService.buildNow()
-                        .addType(Notification.Type.MULTI_MASTER)
+                        .addType(Notification.Type.MULTI_LEADER)
                         .addSeverity(Notification.Severity.URGENT);
                 notificationService.publishIfFirst(notification);
 
-                configuration.setIsMaster(false);
+                configuration.setIsLeader(false);
             } else {
-                LOG.warn("Stale master has gone. Starting as master.");
+                LOG.warn("Stale leader has gone. Starting as leader.");
             }
         }
     }
@@ -258,7 +263,7 @@ public class Server extends ServerBootstrap {
         private final GracefulShutdown gracefulShutdown;
         private final AuditEventSender auditEventSender;
         private final Journal journal;
-        private Service leaderElectionService;
+        private final Service leaderElectionService;
 
         @Inject
         public ShutdownHook(ActivityWriter activityWriter,
@@ -319,7 +324,8 @@ public class Server extends ServerBootstrap {
 
     @Override
     protected Set<ServerStatus.Capability> capabilities() {
-        if (configuration.isMaster()) {
+        if (configuration.isLeader()) {
+            //noinspection deprecation
             return EnumSet.of(ServerStatus.Capability.SERVER, ServerStatus.Capability.MASTER);
         } else {
             return EnumSet.of(ServerStatus.Capability.SERVER);

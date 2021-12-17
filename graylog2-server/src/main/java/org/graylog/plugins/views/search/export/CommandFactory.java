@@ -103,13 +103,11 @@ public class CommandFactory {
     }
 
     private ExportMessagesCommand.Builder builderFrom(ResultFormat resultFormat) {
-        ExportMessagesCommand.Builder requestBuilder = ExportMessagesCommand.builder();
+        ExportMessagesCommand.Builder requestBuilder = ExportMessagesCommand.builder()
+                .fieldsInOrder(resultFormat.fieldsInOrder());
 
-        requestBuilder.fieldsInOrder(resultFormat.fieldsInOrder());
-
-        if (resultFormat.limit().isPresent()) {
-            requestBuilder.limit(resultFormat.limit().orElseThrow(() -> new IllegalStateException("No value present!")));
-        }
+        resultFormat.limit().ifPresent(requestBuilder::limit);
+        resultFormat.timeZone().ifPresent(requestBuilder::timeZone);
 
         return requestBuilder;
     }

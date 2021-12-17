@@ -22,7 +22,7 @@ import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 import { getParameterBindingsAsMap } from 'views/logic/search/SearchExecutionState';
 import { SearchMetadataStore } from 'views/stores/SearchMetadataStore';
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
-import { SearchesConfig } from 'components/search/SearchConfig';
+import type { SearchesConfig } from 'components/search/SearchConfig';
 
 const _disableSearch = (undeclaredParameters, parameterBindings, usedParameters) => {
   const bindingsMap = getParameterBindingsAsMap(parameterBindings);

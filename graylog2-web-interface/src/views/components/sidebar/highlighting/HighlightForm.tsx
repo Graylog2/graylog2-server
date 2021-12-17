@@ -23,7 +23,7 @@ import { Formik, Form, Field } from 'formik';
 import { defaultCompare } from 'views/logic/DefaultCompare';
 import { Input, BootstrapModalWrapper, Button, Modal } from 'components/bootstrap';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
-import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import Select from 'components/common/Select';
 import { HighlightingRulesActions } from 'views/stores/HighlightingRulesStore';
 import HighlightingRule, {
@@ -32,10 +32,11 @@ import HighlightingRule, {
 } from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import HighlightingColorForm, { createNewColor } from 'views/components/sidebar/highlighting/HighlightingColorForm';
 import type { StaticColorObject, GradientColorObject } from 'views/components/sidebar/highlighting/HighlightingColorForm';
-import { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
+import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import Series, { isFunction } from 'views/logic/aggregationbuilder/Series';
 import inferTypeForSeries from 'views/logic/fieldtypes/InferTypeForSeries';
-import HighlightingColor, {
+import type HighlightingColor from 'views/logic/views/formatting/highlighting/HighlightingColor';
+import {
   GradientColor,
   StaticColor,
 } from 'views/logic/views/formatting/highlighting/HighlightingColor';

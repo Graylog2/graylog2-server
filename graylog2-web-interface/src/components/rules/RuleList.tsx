@@ -24,7 +24,7 @@ import { DataTable } from 'components/common';
 import Routes from 'routing/Routes';
 import { RulesActions, RulesStore } from 'stores/rules/RulesStore';
 import type { RuleType, MetricsConfigType, RulesContext, RulesStoreState } from 'stores/rules/RulesStore';
-import { Store } from 'stores/StoreTypes';
+import type { Store } from 'stores/StoreTypes';
 
 import RuleMetricsConfigContainer from './RuleMetricsConfigContainer';
 import RuleListEntry from './RuleListEntry';

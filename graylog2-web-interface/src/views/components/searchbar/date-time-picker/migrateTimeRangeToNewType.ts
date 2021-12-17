@@ -17,10 +17,10 @@
 
 import moment from 'moment';
 
-import { AbsoluteTimeRange, KeywordTimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
+import type { AbsoluteTimeRange, KeywordTimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import { DEFAULT_RELATIVE_FROM } from 'views/Constants';
 import DateTime from 'logic/datetimes/DateTime';
-import { RelativeTimeRangeClassified } from 'views/components/searchbar/date-time-picker/types';
+import type { RelativeTimeRangeClassified } from 'views/components/searchbar/date-time-picker/types';
 
 import {
   classifyFromRange,

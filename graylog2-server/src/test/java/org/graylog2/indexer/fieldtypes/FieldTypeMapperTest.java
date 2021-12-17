@@ -19,12 +19,19 @@ package org.graylog2.indexer.fieldtypes;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Collections;
+
 import static com.google.common.collect.ImmutableSet.copyOf;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.indexer.fieldtypes.FieldTypes.Type.createType;
 
 public class FieldTypeMapperTest {
     private FieldTypeMapper mapper;
+    private static final FieldTypeDTO textWithFielddata = FieldTypeDTO.builder()
+            .physicalType("text")
+            .fieldName("test")
+            .properties(Collections.singleton(FieldTypeDTO.Properties.FIELDDATA))
+            .build();
 
     @Before
     public void setUp() throws Exception {
@@ -32,6 +39,15 @@ public class FieldTypeMapperTest {
     }
 
     private void assertMapping(String esType, String glType, String... properties) {
+        assertMapping(FieldTypeDTO.builder()
+                        .fieldName("test")
+                        .physicalType(esType)
+                        .build(),
+                glType,
+                properties);
+    }
+
+    private void assertMapping(FieldTypeDTO esType, String glType, String... properties) {
         assertThat(mapper.mapType(esType))
                 .isPresent().get()
                 .isEqualTo(createType(glType, copyOf(properties)));
@@ -40,6 +56,7 @@ public class FieldTypeMapperTest {
     @Test
     public void mappings() {
         assertMapping("text", "string", "full-text-search");
+        assertMapping(textWithFielddata, "string", "full-text-search", "enumerable");
         assertMapping("keyword", "string", "enumerable");
 
         assertMapping("long", "long", "numeric", "enumerable");

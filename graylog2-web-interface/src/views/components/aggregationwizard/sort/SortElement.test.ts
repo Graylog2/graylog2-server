@@ -16,7 +16,7 @@
  */
 import SortElement from './SortElement';
 
-import { WidgetConfigFormValues } from '../WidgetConfigForm';
+import type { WidgetConfigFormValues } from '../WidgetConfigForm';
 
 describe('SortElement', () => {
   describe('Validation', () => {

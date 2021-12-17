@@ -18,7 +18,8 @@ import * as React from 'react';
 import { useCallback, useContext } from 'react';
 import moment from 'moment-timezone';
 
-import TimeLocalizeContext, { TimeLocalizeContextType } from 'contexts/TimeLocalizeContext';
+import type { TimeLocalizeContextType } from 'contexts/TimeLocalizeContext';
+import TimeLocalizeContext from 'contexts/TimeLocalizeContext';
 import AppConfig from 'util/AppConfig';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 

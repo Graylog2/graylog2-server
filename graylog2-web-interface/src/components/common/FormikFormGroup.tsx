@@ -15,9 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { SyntheticEvent } from 'react';
+import type { SyntheticEvent } from 'react';
 
-import { Input } from 'components/bootstrap';
+import type { Input } from 'components/bootstrap';
 
 import FormikInput from './FormikInput';
 

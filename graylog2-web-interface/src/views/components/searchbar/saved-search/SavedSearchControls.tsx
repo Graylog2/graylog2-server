@@ -16,7 +16,8 @@
  */
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { withTheme, DefaultTheme } from 'styled-components';
+import type { DefaultTheme } from 'styled-components';
+import { withTheme } from 'styled-components';
 
 import connect from 'stores/connect';
 import { isPermitted } from 'util/PermissionsMixin';
@@ -35,7 +36,7 @@ import ViewTypeLabel from 'views/components/ViewTypeLabel';
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import * as ViewsPermissions from 'views/Permissions';
-import User from 'logic/users/User';
+import type User from 'logic/users/User';
 import ViewPropertiesModal from 'views/components/views/ViewPropertiesModal';
 import { loadAsDashboard, loadNewSearch } from 'views/logic/views/Actions';
 import IfPermitted from 'components/common/IfPermitted';

@@ -15,33 +15,21 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled, { DefaultTheme, css, keyframes } from 'styled-components';
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { useContext, useState, useRef, useCallback, useEffect } from 'react';
+import type { DefaultTheme } from 'styled-components';
+import styled, { css, keyframes } from 'styled-components';
 import { Overlay, Transition } from 'react-overlays';
 import { delay } from 'lodash';
+import { useFormikContext } from 'formik';
 
 import { Popover } from 'components/bootstrap';
 import Icon from 'components/common/Icon';
 import StringUtils from 'util/StringUtils';
-import { TimeRange, NoTimeRangeOverride, ElasticsearchQueryString } from 'views/logic/queries/Query';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
 import QueryValidationActions from 'views/actions/QueryValidationActions';
-
-import { useSyncFormErrors, useSyncFormWarnings } from './hooks/useSyncFormValidationState';
-import useValidateQuery from './hooks/useValidateQuery';
-
-export type QueryValidationState = {
-  status: 'OK' | 'ERROR' | 'WARNING',
-  explanations: Array<{
-    errorType: string,
-    errorMessage: string,
-    beginLine: number,
-    endLine: number,
-    beginColumn: number,
-    endColumn: number,
-  }> | undefined
-}
+import FormWarningsContext from 'contexts/FormWarningsContext';
+import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 
 const Container = styled.div`
   margin-right: 5px;
@@ -59,7 +47,7 @@ const ExplanationTrigger = styled.button<{ $clickable?: boolean }>(({ $clickable
   cursor: ${$clickable ? 'pointer' : 'default'};
 `);
 
-const ErrorIcon = styled(Icon)(({ theme, $status }: { theme: DefaultTheme, $status: string}) => `
+const ErrorIcon = styled(Icon)(({ theme, $status }: { theme: DefaultTheme, $status: string }) => `
   color: ${$status === 'ERROR' ? theme.colors.variant.danger : theme.colors.variant.warning};
   font-size: 22px;
 `);
@@ -115,87 +103,69 @@ const ExplanationTitle = ({ title }: { title: string }) => (
   </Title>
 );
 
-const useShakeIfAlreadyOpen = (showExplanation) => {
-  const [shakingPopover, setShakingPopover] = useState(false);
+const useShakeTemporarily = () => {
+  const [shouldShake, setShake] = useState(false);
 
-  const shakePopover = useCallback(() => {
-    if (!shakingPopover) {
-      setShakingPopover(true);
-      delay(() => setShakingPopover(false), 820);
+  const shake = useCallback(() => {
+    if (!shouldShake) {
+      setShake(true);
+      delay(() => setShake(false), 820);
     }
-  }, [shakingPopover]);
+  }, [shouldShake]);
 
-  useEffect(() => {
-    const unsubscribe = QueryValidationActions.displayValidationErrors.listen(() => {
-      if (showExplanation) {
-        shakePopover();
-      }
-    });
-
-    return () => {
-      unsubscribe();
-    };
-  }, [showExplanation, shakingPopover, shakePopover]);
-
-  return shakingPopover;
+  return [shouldShake, shake] as const;
 };
 
-const useListenToDisplayErrorsAction = (showExplanation, setShowExplanation) => {
+const useTriggerIfErrorsPersist = (trigger: () => void) => {
+  const [showExplanation, setShowExplanation] = useState(false);
+  const toggleShow = useCallback(() => setShowExplanation((prevShow) => !prevShow), []);
+
   useEffect(() => {
     const unsubscribe = QueryValidationActions.displayValidationErrors.listen(() => {
       if (!showExplanation) {
-        setShowExplanation(true);
+        toggleShow();
+      } else {
+        trigger();
       }
     });
 
     return () => {
       unsubscribe();
     };
-  }, [showExplanation, setShowExplanation]);
+  }, [trigger, showExplanation, toggleShow]);
+
+  return [showExplanation, toggleShow] as const;
 };
 
-type Props = {
-  filter?: ElasticsearchQueryString | string,
-  queryString: ElasticsearchQueryString | string | undefined,
-  streams?: Array<string>,
-  timeRange: TimeRange | NoTimeRangeOverride | undefined,
-}
+const QueryValidation = () => {
+  const [shakingPopover, shake] = useShakeTemporarily();
+  const [showExplanation, toggleShow] = useTriggerIfErrorsPersist(shake);
 
-const QueryValidation = ({ queryString, timeRange, streams, filter }: Props) => {
-  const [showExplanation, setShowExplanation] = useState(false);
-  const toggleShow = () => setShowExplanation((prevShow) => !prevShow);
-  const containerRef = useRef(undefined);
   const explanationTriggerRef = useRef(undefined);
-  const validationState = useValidateQuery({ queryString, timeRange, streams, filter });
-  const shakingPopover = useShakeIfAlreadyOpen(showExplanation);
+  const { errors: { queryString: queryStringErrors } } = useFormikContext();
+  const { warnings } = useContext(FormWarningsContext);
 
-  useSyncFormErrors(validationState);
-  useSyncFormWarnings(validationState);
-  useListenToDisplayErrorsAction(showExplanation, setShowExplanation);
+  const validationState = (queryStringErrors ?? warnings?.queryString) as QueryValidationState;
 
-  // We need to always display the container to avoid query inout resizing problems
-  if (!validationState || validationState.status === 'OK') {
-    return (
-      <Container ref={() => containerRef} />
-    );
-  }
-
-  const { status, explanations } = validationState;
+  const { status, explanations } = validationState ?? {};
+  const hasExplanations = validationState && validationState?.status !== 'OK';
 
   return (
-    <Container ref={() => containerRef}>
-      <ExplanationTrigger title="Toggle validation error explanation"
-                          ref={explanationTriggerRef}
-                          onClick={toggleShow}
-                          $clickable
-                          tabIndex={0}
-                          type="button">
-        <ErrorIcon $status={status} name="exclamation-circle" />
-      </ExplanationTrigger>
+    <>
+      <Container ref={explanationTriggerRef}>
+        {hasExplanations && (
+        <ExplanationTrigger title="Toggle validation error explanation"
+                            onClick={toggleShow}
+                            $clickable
+                            tabIndex={0}
+                            type="button">
+          <ErrorIcon $status={status} name="exclamation-circle" />
+        </ExplanationTrigger>
+        )}
+      </Container>
 
-      {showExplanation && (
+      {hasExplanations && showExplanation && (
         <Overlay show
-                 container={containerRef.current}
                  containerPadding={10}
                  placement="bottom"
                  target={explanationTriggerRef.current}
@@ -214,7 +184,7 @@ const QueryValidation = ({ queryString, timeRange, streams, filter }: Props) => 
           </StyledPopover>
         </Overlay>
       )}
-    </Container>
+    </>
   );
 };
 

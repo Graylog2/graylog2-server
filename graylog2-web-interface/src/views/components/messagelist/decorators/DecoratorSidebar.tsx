@@ -20,8 +20,8 @@ import React from 'react';
 import { DecoratorsActions, DecoratorsStore } from 'stores/decorators/DecoratorsStore';
 import connect from 'stores/connect';
 import { Spinner } from 'components/common';
-import { Decorator } from 'views/logic/widgets/MessagesWidgetConfig';
-import { Store } from 'stores/StoreTypes';
+import type { Decorator } from 'views/logic/widgets/MessagesWidgetConfig';
+import type { Store } from 'stores/StoreTypes';
 
 import AddDecoratorButton from './AddDecoratorButton';
 import DecoratorSummary from './DecoratorSummary';

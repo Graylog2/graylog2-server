@@ -19,19 +19,20 @@ import { useState, useContext, useMemo } from 'react';
 import styled, { css } from 'styled-components';
 import { SizeMe } from 'react-sizeme';
 
-import { WidgetPositions, BackendWidgetPosition } from 'views/types';
+import type { WidgetPositions, BackendWidgetPosition } from 'views/types';
 import ReactGridContainer from 'components/common/ReactGridContainer';
 import { widgetDefinition } from 'views/logic/Widgets';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
-import WidgetFocusContext, { FocusContextState } from 'views/components/contexts/WidgetFocusContext';
-import { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
+import type { FocusContextState } from 'views/components/contexts/WidgetFocusContext';
+import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
+import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import { useStore } from 'stores/connect';
 import { WidgetStore } from 'views/stores/WidgetStore';
 import { CurrentViewStateActions } from 'views/stores/CurrentViewStateStore';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
 import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
-import { StoreState } from 'stores/StoreTypes';
+import type { StoreState } from 'stores/StoreTypes';
 import { ViewStatesStore } from 'views/stores/ViewStatesStore';
 
 import WidgetContainer from './WidgetContainer';

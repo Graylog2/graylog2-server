@@ -20,7 +20,7 @@ import styled from 'styled-components';
 import usePluginEntities from 'views/logic/usePluginEntities';
 import { MenuItem } from 'components/bootstrap';
 import ActionMenuItem from 'views/components/actions/ActionMenuItem';
-import { ActionDefinition, ActionHandlerArguments } from 'views/components/actions/ActionHandler';
+import type { ActionDefinition, ActionHandlerArguments } from 'views/components/actions/ActionHandler';
 
 const DropdownHeader = styled.span`
   padding-left: 10px;

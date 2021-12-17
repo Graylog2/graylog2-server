@@ -28,7 +28,7 @@ import java.util.List;
 
 public class CollectingQueryParserTokenManager extends QueryParserTokenManager {
 
-    private final List<Token> tokens = new LinkedList<>();
+    private final List<ImmutableToken> tokens = new LinkedList<>();
 
     public CollectingQueryParserTokenManager(String f, Analyzer a) {
         super(new FastCharStream(new StringReader("")));
@@ -43,11 +43,11 @@ public class CollectingQueryParserTokenManager extends QueryParserTokenManager {
     @Override
     public Token getNextToken() {
         final Token token = super.getNextToken();
-        this.tokens.add(token);
+        this.tokens.add(ImmutableToken.create(token));
         return token;
     }
 
-    public List<Token> getTokens() {
+    public List<ImmutableToken> getTokens() {
         return tokens;
     }
 }

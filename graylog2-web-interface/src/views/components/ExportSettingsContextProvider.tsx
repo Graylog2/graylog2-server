@@ -17,7 +17,8 @@
 import * as React from 'react';
 import { useState } from 'react';
 
-import ExportSettingsContext, { ExportSettings } from 'views/components/ExportSettingsContext';
+import type { ExportSettings } from 'views/components/ExportSettingsContext';
+import ExportSettingsContext from 'views/components/ExportSettingsContext';
 
 type Props = {
   children: React.ReactNode,

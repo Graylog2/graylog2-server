@@ -17,10 +17,16 @@
 import * as React from 'react';
 
 import { singleton } from 'logic/singleton';
+import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
+
+type Warnings = {
+  queryString?: QueryValidationState,
+};
 
 interface FormWarningsContextType {
-  warnings: {[fieldName: string]: unknown},
-  setFieldWarning: (fieldName: string, warning: unknown) => void,
+  warnings: Warnings,
+
+  setFieldWarning: <R extends keyof Warnings>(fieldName: R, warning: Warnings[R]) => void,
 }
 
 const FormWarningsContext = React.createContext<FormWarningsContextType | undefined>(undefined);

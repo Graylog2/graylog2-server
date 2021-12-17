@@ -15,12 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as Immutable from 'immutable';
-import { $ReadOnly } from 'utility-types';
+import type { $ReadOnly } from 'utility-types';
 
 import { FieldTypesStore } from 'views/stores/FieldTypesStore';
 import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import type { FieldTypeMappingsList, FieldTypesStoreState } from 'views/stores/FieldTypesStore';
-import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 
 import type { CompletionResult, Token } from '../ace-types';
 import type { Completer } from '../SearchBarAutocompletions';
@@ -112,7 +112,7 @@ class FieldNameCompletion implements Completer {
       return [];
     }
 
-    if (currentToken && currentToken.type === 'string') {
+    if (currentToken && (currentToken.type === 'string' || (currentToken.type === 'keyword' && !prefix))) {
       return [];
     }
 

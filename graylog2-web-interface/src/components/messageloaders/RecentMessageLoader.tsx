@@ -16,7 +16,7 @@
  */
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import * as Immutable from 'immutable';
+import type * as Immutable from 'immutable';
 import styled from 'styled-components';
 
 import { Row, Col, Input } from 'components/bootstrap';

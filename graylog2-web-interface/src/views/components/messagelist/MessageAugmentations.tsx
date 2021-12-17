@@ -16,11 +16,12 @@
  */
 import * as React from 'react';
 import Sticky from 'react-sticky-el';
-import styled, { withTheme, DefaultTheme } from 'styled-components';
+import type { DefaultTheme } from 'styled-components';
+import styled, { withTheme } from 'styled-components';
 import { useContext } from 'react';
 
 import usePluginEntities from 'views/logic/usePluginEntities';
-import { Message } from 'views/components/messagelist/Types';
+import type { Message } from 'views/components/messagelist/Types';
 import WindowDimensionsContext from 'contexts/WindowDimensionsContext';
 
 const StyledSticky = styled(Sticky)`

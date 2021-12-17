@@ -17,14 +17,15 @@
 import * as React from 'react';
 import { useState } from 'react';
 import styled from 'styled-components';
-import { $PropertyType } from 'utility-types';
+import type { $PropertyType } from 'utility-types';
 
-import SharedEntity from 'logic/permissions/SharedEntity';
+import type SharedEntity from 'logic/permissions/SharedEntity';
 import { Alert } from 'components/bootstrap';
 import { Pagination, PageSizeSelect } from 'components/common';
-import EntityShareState, { ActiveShares, CapabilitiesList, SelectedGrantees } from 'logic/permissions/EntityShareState';
-import Grantee from 'logic/permissions/Grantee';
-import Capability from 'logic/permissions/Capability';
+import type { ActiveShares, CapabilitiesList, SelectedGrantees } from 'logic/permissions/EntityShareState';
+import type EntityShareState from 'logic/permissions/EntityShareState';
+import type Grantee from 'logic/permissions/Grantee';
+import type Capability from 'logic/permissions/Capability';
 
 import GranteesListItem from './GranteesListItem';
 

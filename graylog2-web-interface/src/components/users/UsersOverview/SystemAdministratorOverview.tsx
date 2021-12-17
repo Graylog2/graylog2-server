@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 
-import UserOverview from 'logic/users/UserOverview';
+import type UserOverview from 'logic/users/UserOverview';
 import { DataTable } from 'components/common';
 import { Col, Row } from 'components/bootstrap';
 

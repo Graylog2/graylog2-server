@@ -16,10 +16,11 @@
  */
 import { useQuery } from 'react-query';
 
-import { TimeRange } from 'views/logic/queries/Query';
+import type { TimeRange } from 'views/logic/queries/Query';
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
-import FieldTypeMapping, { FieldTypeMappingJSON } from 'views/logic/fieldtypes/FieldTypeMapping';
+import type { FieldTypeMappingJSON } from 'views/logic/fieldtypes/FieldTypeMapping';
+import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 
 const fieldTypesUrl = qualifyUrl('/views/fields');
 

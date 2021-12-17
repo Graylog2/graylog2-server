@@ -27,7 +27,7 @@ import { PageHeader, DocumentTitle } from 'components/common';
 import { Button } from 'components/bootstrap';
 import DocumentationLink from 'components/support/DocumentationLink';
 import Routes from 'routing/Routes';
-import Role from 'logic/roles/Role';
+import type Role from 'logic/roles/Role';
 
 type Props = {
   params: {

@@ -28,18 +28,22 @@ public abstract class ValidationResponse {
 
     @NotNull
     public abstract ValidationStatus status();
+
     public abstract List<ValidationMessage> explanations();
 
-    public static ValidationResponse.Builder builder(ValidationStatus status) {
-        return new AutoValue_ValidationResponse.Builder()
-                .status(status);
+    static ValidationResponse create(ValidationStatus status, List<ValidationMessage> explanations) {
+        return new AutoValue_ValidationResponse(status, explanations);
     }
 
-    @AutoValue.Builder
-    public abstract static class Builder {
-        public abstract Builder status(ValidationStatus status);
-        public abstract Builder explanations(List<ValidationMessage> explanations);
-        public abstract ValidationResponse build();
+    public static ValidationResponse ok() {
+        return create(ValidationStatus.OK, Collections.emptyList());
+    }
 
+    public static ValidationResponse error(List<ValidationMessage> explanations) {
+        return create(ValidationStatus.ERROR, explanations);
+    }
+
+    public static ValidationResponse warning(List<ValidationMessage> explanations) {
+        return create(ValidationStatus.WARNING, explanations);
     }
 }

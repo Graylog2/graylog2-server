@@ -19,7 +19,7 @@ import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 
 import inferTypeForSeries from './InferTypeForSeries';
 import FieldType from './FieldType';
-import FieldTypeMapping from './FieldTypeMapping';
+import type FieldTypeMapping from './FieldTypeMapping';
 
 const fieldTypeFor = (field: string, types: (FieldTypeMappingsList | Array<FieldTypeMapping>)): FieldType => {
   if (isFunction(field)) {

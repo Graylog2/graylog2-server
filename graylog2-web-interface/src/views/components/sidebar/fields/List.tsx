@@ -17,12 +17,12 @@
 import * as React from 'react';
 import { SizeMe } from 'react-sizeme';
 import { FixedSizeList } from 'react-window';
-import { List as ImmutableList } from 'immutable';
+import type { List as ImmutableList } from 'immutable';
 import styled from 'styled-components';
 
 import MessageFieldsFilter from 'logic/message/MessageFieldsFilter';
 import type { ViewMetaData as ViewMetadata } from 'views/stores/ViewMetadataStore';
-import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 
 import ListItem from './ListItem';
 

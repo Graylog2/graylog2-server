@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.views.search.validation;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.graylog.plugins.views.search.ParameterProvider;
 import org.graylog.plugins.views.search.Query;
@@ -50,18 +51,23 @@ public class QueryValidationServiceImpl implements QueryValidationService {
     @Override
     public ValidationResponse validate(ValidationRequest req) {
         final String query = decoratedQuery(req);
+
+        if(StringUtils.isEmpty(query)) {
+            return ValidationResponse.ok();
+        }
+
         try {
             final ParsedQuery parsedQuery = luceneQueryParser.parse(query);
             final List<ParsedTerm> unknownFields = getUnknownFields(req, parsedQuery);
             final List<ParsedTerm> invalidOperators = parsedQuery.invalidOperators();
             final List<ValidationMessage> explanations = getExplanations(unknownFields, invalidOperators);
-            final ValidationStatus status = explanations.isEmpty() ? ValidationStatus.OK : ValidationStatus.WARNING;
-            return ValidationResponse.builder(status)
-                    .explanations(explanations)
-                    .build();
+
+            return explanations.isEmpty()
+                    ? ValidationResponse.ok()
+                    : ValidationResponse.warning(explanations);
 
         } catch (ParseException e) {
-            return ValidationResponse.builder(ValidationStatus.ERROR).explanations(toExplanation(query, e)).build();
+            return ValidationResponse.error(toExplanation(query, e));
         }
     }
 
@@ -78,10 +84,10 @@ public class QueryValidationServiceImpl implements QueryValidationService {
                     .errorMessage("Query contains unknown field: " + f.getRealFieldName());
 
             f.tokens().stream().findFirst().ifPresent(t -> {
-                message.beginLine(t.beginLine);
-                message.beginColumn(t.beginColumn);
-                message.endLine(t.endLine);
-                message.endColumn(t.endColumn);
+                message.beginLine(t.beginLine());
+                message.beginColumn(t.beginColumn());
+                message.endLine(t.endLine());
+                message.endColumn(t.endColumn());
             });
 
             return message.build();
@@ -95,10 +101,10 @@ public class QueryValidationServiceImpl implements QueryValidationService {
                             .errorType("Invalid operator")
                             .errorMessage(errorMessage);
                     token.tokens().stream().findFirst().ifPresent(t -> {
-                        message.beginLine(t.beginLine);
-                        message.beginColumn(t.beginColumn);
-                        message.endLine(t.endLine);
-                        message.endColumn(t.endColumn);
+                        message.beginLine(t.beginLine());
+                        message.beginColumn(t.beginColumn());
+                        message.endLine(t.endLine());
+                        message.endColumn(t.endColumn());
                     });
                     return message.build();
                 })

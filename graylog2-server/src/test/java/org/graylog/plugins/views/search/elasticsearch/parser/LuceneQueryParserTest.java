@@ -17,7 +17,7 @@
 package org.graylog.plugins.views.search.elasticsearch.parser;
 
 import org.apache.lucene.queryparser.classic.ParseException;
-import org.apache.lucene.queryparser.classic.Token;
+import org.graylog.plugins.views.search.validation.ImmutableToken;
 import org.graylog.plugins.views.search.validation.LuceneQueryParser;
 import org.graylog.plugins.views.search.validation.ParsedQuery;
 import org.graylog.plugins.views.search.validation.ParsedTerm;
@@ -62,13 +62,13 @@ class LuceneQueryParserTest {
         assertThat(query.invalidOperators().stream().map(ParsedTerm::value).collect(Collectors.toSet())).contains("and");
 
         final ParsedTerm term = query.invalidOperators().iterator().next();
-        final Token token = term.tokens().iterator().next();
+        final ImmutableToken token = term.tokens().iterator().next();
         assertThat(token).isNotNull();
 
-        assertThat(token.beginColumn).isEqualTo(8);
-        assertThat(token.beginLine).isEqualTo(1);
-        assertThat(token.endColumn).isEqualTo(11);
-        assertThat(token.endLine).isEqualTo(1);
+        assertThat(token.beginColumn()).isEqualTo(8);
+        assertThat(token.beginLine()).isEqualTo(1);
+        assertThat(token.endColumn()).isEqualTo(11);
+        assertThat(token.endLine()).isEqualTo(1);
     }
 
     @Test
@@ -91,5 +91,22 @@ class LuceneQueryParserTest {
             final ParsedTerm invalidOperator = queryWithOr.invalidOperators().iterator().next();
             assertThat(invalidOperator.value()).isEqualTo("or");
         }
+    }
+
+    @Test
+    void testRepeatedInvalidTokens() throws ParseException {
+        final ParsedQuery query = parser.parse("foo:bar and lorem:ipsum and dolor:sit");
+        assertThat(query.invalidOperators().size()).isEqualTo(2);
+    }
+
+    @Test
+    void testLongStringOfInvalidTokens() throws ParseException {
+        final ParsedQuery query = parser.parse("and and and or or or");
+        assertThat(query.invalidOperators().size()).isEqualTo(6);
+        assertThat(query.invalidOperators().stream().allMatch(op -> op.tokens().size() == 1)).isTrue();
+        assertThat(query.invalidOperators().stream().allMatch(op -> {
+            final String tokenValue = op.tokens().iterator().next().image();
+            return tokenValue.equals("or") || tokenValue.equals("and");
+        })).isTrue();
     }
 }

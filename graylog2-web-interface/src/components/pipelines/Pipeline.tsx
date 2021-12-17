@@ -21,7 +21,7 @@ import styled from 'styled-components';
 import { Row, Col, Alert } from 'components/bootstrap';
 import { EntityList, Pluralize } from 'components/common';
 import type { PipelineType, StageType } from 'stores/pipelines/PipelinesStore';
-import { Stream } from 'stores/streams/StreamsStore';
+import type { Stream } from 'stores/streams/StreamsStore';
 import type { PipelineConnectionsType } from 'stores/pipelines/PipelineConnectionsStore';
 
 import Stage from './Stage';

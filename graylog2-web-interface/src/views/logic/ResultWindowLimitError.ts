@@ -14,11 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { QueryId } from 'views/logic/queries/Query';
-import { SearchTypeId } from 'views/logic/SearchType';
-import SearchResult from 'views/logic/SearchResult';
+import type { QueryId } from 'views/logic/queries/Query';
+import type { SearchTypeId } from 'views/logic/SearchType';
+import type SearchResult from 'views/logic/SearchResult';
 
-import SearchError, { SearchErrorResponse, SearchErrorState } from './SearchError';
+import type { SearchErrorResponse, SearchErrorState } from './SearchError';
+import SearchError from './SearchError';
 
 type ResultWindowLimitErrorState = SearchErrorState & {};
 

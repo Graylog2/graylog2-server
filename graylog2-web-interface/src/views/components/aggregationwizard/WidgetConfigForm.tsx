@@ -16,14 +16,15 @@
  */
 import * as React from 'react';
 import { useRef, useEffect, useContext } from 'react';
-import { Form, Formik, FormikProps } from 'formik';
+import type { FormikProps } from 'formik';
+import { Form, Formik } from 'formik';
 import styled from 'styled-components';
 
-import { ConfigurationField } from 'views/types';
+import type { ConfigurationField } from 'views/types';
 import WidgetEditApplyAllChangesContext from 'views/components/contexts/WidgetEditApplyAllChangesContext';
 import PropagateValidationState from 'views/components/aggregationwizard/PropagateValidationState';
-import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
-import { AutoTimeConfig, TimeUnitConfig } from 'views/logic/aggregationbuilder/Pivot';
+import type VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
+import type { AutoTimeConfig, TimeUnitConfig } from 'views/logic/aggregationbuilder/Pivot';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 
 import { updateWidgetAggregationElements } from './AggregationWizard';
