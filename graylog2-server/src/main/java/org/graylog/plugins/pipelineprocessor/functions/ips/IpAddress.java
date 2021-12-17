@@ -16,6 +16,8 @@
  */
 package org.graylog.plugins.pipelineprocessor.functions.ips;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.common.net.InetAddresses;
 
 import java.net.InetAddress;
@@ -43,14 +45,16 @@ public class IpAddress {
     }
 
     @Override
+    @JsonValue
     public String toString() {
         return InetAddresses.toAddrString(address);
     }
 
     @SuppressWarnings("unused")
+    @JsonIgnore
     public IpAddress getAnonymized() {
         final byte[] address = this.address.getAddress();
-        address[address.length-1] = 0x00;
+        address[address.length - 1] = 0x00;
         try {
             return new IpAddress(InetAddress.getByAddress(address));
         } catch (UnknownHostException e) {
