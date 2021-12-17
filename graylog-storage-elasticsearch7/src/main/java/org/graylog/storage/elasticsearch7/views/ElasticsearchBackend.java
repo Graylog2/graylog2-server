@@ -35,7 +35,6 @@ import org.graylog.plugins.views.search.filter.AndFilter;
 import org.graylog.plugins.views.search.filter.OrFilter;
 import org.graylog.plugins.views.search.filter.QueryStringFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
-import org.graylog.plugins.views.search.validation.LuceneQueryParser;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.ShardOperationFailedException;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.MultiSearchResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchRequest;
@@ -128,7 +127,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
         for (SearchType searchType : searchTypes) {
 
             final Optional<SearchTypeError> searchTypeError = validateSearchType(query, searchType, searchConfig);
-            if(searchTypeError.isPresent()) {
+            if (searchTypeError.isPresent()) {
                 LOG.error("Invalid search type {} for elasticsearch backend, cannot generate query part. Skipping this search type.", searchType.type());
                 queryContext.addError(searchTypeError.get());
                 continue;
@@ -168,7 +167,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                 continue;
             }
 
-            if(isSearchTypeWithError(queryContext, searchType.id())) {
+            if (isSearchTypeWithError(queryContext, searchType.id())) {
                 LOG.error("Failed search type '{}', cannot convert query result, skipping.", searchType.type());
                 // no need to add another error here, as the query generation code will have added the error about the missing handler already
                 continue;
@@ -264,7 +263,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                 continue;
             }
 
-            if(isSearchTypeWithError(queryContext, searchTypeId)) {
+            if (isSearchTypeWithError(queryContext, searchTypeId)) {
                 LOG.error("Failed search type '{}', cannot convert query result, skipping.", searchType.type());
                 // no need to add another error here, as the query generation code will have added the error about the missing handler already
                 continue;

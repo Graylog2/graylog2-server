@@ -31,6 +31,7 @@ import org.graylog.plugins.views.migrations.V20200204122000_MigrateUntypedViewsT
 import org.graylog.plugins.views.migrations.V20200409083200_RemoveRootQueriesFromMigratedDashboards;
 import org.graylog.plugins.views.migrations.V20200730000000_AddGl2MessageIdFieldAliasForEvents;
 import org.graylog.plugins.views.providers.ExportBackendProvider;
+import org.graylog.plugins.views.providers.QuerySuggestionsProvider;
 import org.graylog.plugins.views.search.SearchRequirements;
 import org.graylog.plugins.views.search.SearchRequiresParameterSupport;
 import org.graylog.plugins.views.search.ValueParameter;
@@ -38,6 +39,7 @@ import org.graylog.plugins.views.search.db.InMemorySearchJobService;
 import org.graylog.plugins.views.search.db.SearchJobService;
 import org.graylog.plugins.views.search.db.SearchesCleanUpJob;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
+import org.graylog.plugins.views.search.engine.QuerySuggestionsService;
 import org.graylog.plugins.views.search.engine.SearchConfig;
 import org.graylog.plugins.views.search.engine.SearchConfigProvider;
 import org.graylog.plugins.views.search.export.ChunkDecorator;
@@ -61,6 +63,7 @@ import org.graylog.plugins.views.search.rest.QueryValidationResource;
 import org.graylog.plugins.views.search.rest.SavedSearchesResource;
 import org.graylog.plugins.views.search.rest.SearchMetadataResource;
 import org.graylog.plugins.views.search.rest.SearchResource;
+import org.graylog.plugins.views.search.rest.SuggestionsResource;
 import org.graylog.plugins.views.search.rest.ViewsResource;
 import org.graylog.plugins.views.search.rest.ViewsRestPermissions;
 import org.graylog.plugins.views.search.rest.contexts.SearchUserBinder;
@@ -132,7 +135,8 @@ public class ViewsBindings extends ViewsModule {
         addSystemRestResource(SearchResource.class);
         addSystemRestResource(SearchMetadataResource.class);
         addSystemRestResource(ViewsResource.class);
-        addSystemRestResource(QueryValidationResource.class);
+        addSystemRestResource(SuggestionsResource.class);
+         addSystemRestResource(QueryValidationResource.class);
 
         addPermissions(ViewsRestPermissions.class);
 
@@ -220,6 +224,8 @@ public class ViewsBindings extends ViewsModule {
         jerseyAdditionalComponentsBinder().addBinding().toInstance(SearchUserBinder.class);
 
         bind(SearchConfig.class).toProvider(SearchConfigProvider.class);
+
+        binder().bind(QuerySuggestionsService.class).toProvider(QuerySuggestionsProvider.class);
     }
 
     private void registerExportBackendProvider() {
