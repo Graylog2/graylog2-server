@@ -31,7 +31,8 @@ import com.google.inject.assistedinject.Assisted;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import org.graylog2.plugin.Version;
+import org.apache.commons.validator.routines.InetAddressValidator;
+import org.graylog.integrations.ReservedIpChecker;
 import org.graylog2.plugin.lookup.LookupCachePurge;
 import org.graylog2.plugin.lookup.LookupDataAdapter;
 import org.graylog2.plugin.lookup.LookupDataAdapterConfiguration;
@@ -46,7 +47,9 @@ import javax.inject.Inject;
 import javax.validation.constraints.NotEmpty;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * A {@link LookupDataAdapter} that uses the <a href="https://docs.greynoise.io/reference/get_v3-community-ip">GreyNoise Community API</a>
@@ -63,7 +66,10 @@ public class GreyNoiseCommunityIpLookupAdapter extends LookupDataAdapter {
     protected static final String GREYNOISE_COMMUNITY_ENDPOINT = "https://api.greynoise.io/v3/community";
 
     private static final Logger LOG = LoggerFactory.getLogger(GreyNoiseCommunityIpLookupAdapter.class);
-    private static final String USER_AGENT = "Graylog/%s";
+
+    private static final List<Object> EXCLUDED_FIELDS = Collections.singletonList("message");
+
+    private static final String USER_AGENT = "Graylog";
     private static final String ACCEPT_TYPE = "application/json";
     private static final String METHOD = "GET";
 
@@ -125,17 +131,13 @@ public class GreyNoiseCommunityIpLookupAdapter extends LookupDataAdapter {
         return result;
     }
 
-    private Request createRequest(Object ipAddress) {
-        String ipString = ipAddress == null? "" : ipAddress.toString();
-        if(ipString.trim().isEmpty()){
-            String error = String.format("[%s] requires an IP address to perform Lookup",ADAPTER_NAME);
-            throw new IllegalArgumentException(error);
-        }
+    @VisibleForTesting
+    Request createRequest(Object ipAddress) {
+        String ipString = getValidIpString(ipAddress);
 
-        String userAgent = String.format(USER_AGENT, Version.CURRENT_CLASSPATH);
         String apiToken = encryptedValueService.decrypt(config.apiToken());
-        if(apiToken == null || apiToken.trim().isEmpty()){
-            String error = String.format("[%s] requires a non-null API Token",ADAPTER_NAME);
+        if (apiToken == null || apiToken.trim().isEmpty()) {
+            String error = String.format("[%s] requires a non-null API Token", ADAPTER_NAME);
             throw new IllegalArgumentException(error);
         }
 
@@ -143,9 +145,29 @@ public class GreyNoiseCommunityIpLookupAdapter extends LookupDataAdapter {
                 .url(String.join("/", GREYNOISE_COMMUNITY_ENDPOINT, ipString))
                 .method(METHOD, null)
                 .addHeader("Accept", ACCEPT_TYPE)
-                .addHeader("User-Agent", userAgent)
+                .addHeader("User-Agent", USER_AGENT)
                 .addHeader("key", apiToken)
                 .build();
+    }
+
+    private String getValidIpString(Object ipAddress) {
+        String ipString = ipAddress == null ? "" : ipAddress.toString();
+        if (ipString.trim().isEmpty()) {
+            String error = String.format("[%s] requires an IP address to perform Lookup", ADAPTER_NAME);
+            throw new IllegalArgumentException(error);
+        }
+
+        if (!InetAddressValidator.getInstance().isValidInet4Address(ipString)) {
+            String error = String.format("[%s] is not a valid IPv4 Address", ipString);
+            throw new IllegalArgumentException(error);
+        }
+
+        if (ReservedIpChecker.getInstance().isReservedIpAddress(ipString)) {
+            String error = String.format("[%s] is a reserved IP Address", ipString);
+            throw new IllegalArgumentException(error);
+        }
+
+        return ipString;
     }
 
     @VisibleForTesting
@@ -205,7 +227,11 @@ public class GreyNoiseCommunityIpLookupAdapter extends LookupDataAdapter {
             LOG.error("An error occurred while parsing parsing Lookup result. {}", e.getMessage(), e);
             values = Collections.emptyMap();
         }
-        return values;
+
+        return values.entrySet()
+                .stream()
+                .filter(e -> !EXCLUDED_FIELDS.contains(e.getKey()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     public interface Factory extends LookupDataAdapter.Factory<GreyNoiseCommunityIpLookupAdapter> {
