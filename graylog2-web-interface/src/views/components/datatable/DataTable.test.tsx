@@ -22,7 +22,8 @@ import 'helpers/mocking/react-dom_mock';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import Series from 'views/logic/aggregationbuilder/Series';
-import FieldType, { FieldTypes } from 'views/logic/fieldtypes/FieldType';
+import type FieldType from 'views/logic/fieldtypes/FieldType';
+import { FieldTypes } from 'views/logic/fieldtypes/FieldType';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import DataTable from 'views/components/datatable/DataTable';
 

@@ -27,7 +27,8 @@ import { WidgetStore } from 'views/stores/WidgetStore';
 import { SearchActions } from 'views/stores/SearchStore';
 import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 
-import WidgetFocusContext, { FocusContextState } from './WidgetFocusContext';
+import type { FocusContextState } from './WidgetFocusContext';
+import WidgetFocusContext from './WidgetFocusContext';
 
 type WidgetFocusRequest = {
   id: string,

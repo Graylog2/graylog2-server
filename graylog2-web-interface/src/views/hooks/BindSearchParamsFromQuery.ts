@@ -16,9 +16,10 @@
  */
 import isDeepEqual from 'stores/isDeepEqual';
 import { QueriesActions } from 'views/stores/QueriesStore';
-import { ViewHook } from 'views/logic/hooks/ViewHook';
+import type { ViewHook } from 'views/logic/hooks/ViewHook';
 import View from 'views/logic/views/View';
-import normalizeSearchURLQueryParams, { RawQuery } from 'views/logic/NormalizeSearchURLQueryParams';
+import type { RawQuery } from 'views/logic/NormalizeSearchURLQueryParams';
+import normalizeSearchURLQueryParams from 'views/logic/NormalizeSearchURLQueryParams';
 
 const bindSearchParamsFromQuery: ViewHook = ({ query, view }: {query: RawQuery, view: View }) => {
   if (view.type !== View.Type.Search) {

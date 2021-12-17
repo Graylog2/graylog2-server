@@ -16,9 +16,9 @@
  */
 import React from 'react';
 import { get } from 'lodash';
-import { PluginExports } from 'graylog-web-plugin/plugin';
+import type { PluginExports } from 'graylog-web-plugin/plugin';
 
-import { WidgetComponentProps } from 'views/types';
+import type { WidgetComponentProps } from 'views/types';
 import Routes from 'routing/Routes';
 import App from 'routing/App';
 import AppConfig from 'util/AppConfig';
@@ -63,6 +63,7 @@ import BarVisualizationConfig from 'views/logic/aggregationbuilder/visualization
 import ShowDocumentsHandler from 'views/logic/valueactions/ShowDocumentsHandler';
 import HighlightValueHandler from 'views/logic/valueactions/HighlightValueHandler';
 import FieldNameCompletion from 'views/components/searchbar/completions/FieldNameCompletion';
+import FieldValueCompletion from 'views/components/searchbar/completions/FieldValueCompletion';
 import OperatorCompletion from 'views/components/searchbar/completions/OperatorCompletion';
 import requirementsProvided from 'views/hooks/RequirementsProvided';
 import bindSearchParamsFromQuery from 'views/hooks/BindSearchParamsFromQuery';
@@ -340,6 +341,7 @@ const exports: PluginExports = {
   ],
   'views.completers': [
     new FieldNameCompletion(),
+    new FieldValueCompletion(),
     new OperatorCompletion(),
   ],
   'views.hooks.loadingView': [

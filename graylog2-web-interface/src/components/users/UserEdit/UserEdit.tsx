@@ -22,7 +22,7 @@ import CurrentUserContext from 'contexts/CurrentUserContext';
 import { Spinner, IfPermitted } from 'components/common';
 import { Alert } from 'components/bootstrap';
 import SectionComponent from 'components/common/Section/SectionComponent';
-import User from 'logic/users/User';
+import type User from 'logic/users/User';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 
 import ReadOnlyWarning from './ReadOnlyWarning';

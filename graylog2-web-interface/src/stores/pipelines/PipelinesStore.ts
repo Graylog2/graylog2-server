@@ -21,7 +21,7 @@ import UserNotification from 'util/UserNotification';
 import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
-import { PaginatedList, PaginatedListJSON, Pagination } from 'stores/PaginationTypes';
+import type { PaginatedList, PaginatedListJSON, Pagination } from 'stores/PaginationTypes';
 import PaginationURL from 'util/PaginationURL';
 import { singletonStore, singletonActions } from 'logic/singleton';
 

@@ -20,11 +20,14 @@ import * as Immutable from 'immutable';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import type { RefluxActions, Store } from 'stores/StoreTypes';
-import FieldTypeMapping, { FieldTypeMappingJSON } from 'views/logic/fieldtypes/FieldTypeMapping';
+import type { FieldTypeMappingJSON } from 'views/logic/fieldtypes/FieldTypeMapping';
+import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import { singletonActions, singletonStore } from 'logic/singleton';
 import { CurrentQueryStore } from 'views/stores/CurrentQueryStore';
-import Query, { TimeRange } from 'views/logic/queries/Query';
-import { GlobalOverrideStore, GlobalOverrideStoreState } from 'views/stores/GlobalOverrideStore';
+import type { TimeRange } from 'views/logic/queries/Query';
+import type Query from 'views/logic/queries/Query';
+import type { GlobalOverrideStoreState } from 'views/stores/GlobalOverrideStore';
+import { GlobalOverrideStore } from 'views/stores/GlobalOverrideStore';
 
 import { QueryFiltersStore } from './QueryFiltersStore';
 

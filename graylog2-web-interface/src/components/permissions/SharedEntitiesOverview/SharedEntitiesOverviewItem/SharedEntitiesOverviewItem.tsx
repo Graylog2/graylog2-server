@@ -17,7 +17,7 @@
 import * as React from 'react';
 
 import { Link } from 'components/common/router';
-import SharedEntity from 'logic/permissions/SharedEntity';
+import type SharedEntity from 'logic/permissions/SharedEntity';
 import { getShowRouteFromGRN } from 'logic/permissions/GRN';
 
 import OwnersCell from './OwnersCell';

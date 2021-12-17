@@ -14,17 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { Set } from 'immutable';
+import type { Set } from 'immutable';
 
-import { ExportPayload } from 'util/MessagesExportUtils';
+import type { ExportPayload } from 'util/MessagesExportUtils';
 import StringUtils from 'util/StringUtils';
-import Query from 'views/logic/queries/Query';
-import View from 'views/logic/views/View';
-import Widget from 'views/logic/widgets/Widget';
+import type Query from 'views/logic/queries/Query';
+import type View from 'views/logic/views/View';
+import type Widget from 'views/logic/widgets/Widget';
 import ViewTypeLabel from 'views/components/ViewTypeLabel';
-import SearchExecutionState from 'views/logic/search/SearchExecutionState';
+import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import type { SearchType } from 'views/logic/queries/SearchType';
-import { ExportSettings } from 'views/components/ExportSettingsContext';
+import type { ExportSettings } from 'views/components/ExportSettingsContext';
 
 const getFilename = (view, selectedWidget) => {
   let filename = 'search-result';

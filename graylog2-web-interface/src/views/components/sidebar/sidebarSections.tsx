@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 
-import { ViewMetaData as ViewMetadata } from 'views/stores/ViewMetadataStore';
+import type { ViewMetaData as ViewMetadata } from 'views/stores/ViewMetadataStore';
 
 import ViewDescription from './description/ViewDescription';
 import AddWidgetButton from './create/AddWidgetButton';

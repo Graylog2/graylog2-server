@@ -17,24 +17,25 @@
 import * as React from 'react';
 import { useCallback, useEffect, useContext, useRef } from 'react';
 import { Field } from 'formik';
-import { isEmpty } from 'lodash';
 import moment from 'moment';
 import styled from 'styled-components';
+import { isEmpty } from 'lodash';
 import { useIsFetching } from 'react-query';
 
 import WidgetEditApplyAllChangesContext from 'views/components/contexts/WidgetEditApplyAllChangesContext';
 import { StreamsStore } from 'views/stores/StreamsStore';
 import connect, { useStore } from 'stores/connect';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
-import Widget from 'views/logic/widgets/Widget';
+import type Widget from 'views/logic/widgets/Widget';
 import { WidgetActions } from 'views/stores/WidgetStore';
-import { DEFAULT_TIMERANGE, SearchBarFormValues } from 'views/Constants';
+import type { SearchBarFormValues } from 'views/Constants';
+import { DEFAULT_TIMERANGE } from 'views/Constants';
 import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 import { Row, Col } from 'components/bootstrap';
 import { Icon } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
-import GlobalOverride from 'views/logic/search/GlobalOverride';
+import type GlobalOverride from 'views/logic/search/GlobalOverride';
 import WidgetContext from 'views/components/contexts/WidgetContext';
 import { GlobalOverrideStore, GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
 import { SearchActions } from 'views/stores/SearchStore';
@@ -184,6 +185,8 @@ const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
                   <FormWarningsContext.Consumer>
                     {({ warnings }) => (
                       <QueryInput value={value}
+                                  timeRange={!isEmpty(globalOverride?.timerange) ? globalOverride.timerange : values?.timerange}
+                                  streams={values?.streams}
                                   placeholder={'Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'}
                                   error={error}
                                   warning={warnings.queryString}

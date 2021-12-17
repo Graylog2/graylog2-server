@@ -23,8 +23,8 @@ import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationW
 import Viewport from 'views/logic/aggregationbuilder/visualizations/Viewport';
 import Series from 'views/logic/aggregationbuilder/Series';
 import RenderCompletionCallback from 'views/components/widgets/RenderCompletionCallback';
-import { AbsoluteTimeRange } from 'views/logic/queries/Query';
-import { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
+import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
+import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 
 import WorldMapVisualization from '../WorldMapVisualization';
 

@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.util.Locale;
 import java.util.Optional;
 
 public class IpInfoIpAsnResolver extends GeoIpResolver<IPinfoIPLocationDatabaseAdapter, GeoAsnInformation> {
@@ -40,7 +41,7 @@ public class IpInfoIpAsnResolver extends GeoIpResolver<IPinfoIPLocationDatabaseA
         try {
             adapter = new IPinfoIPLocationDatabaseAdapter(configFile);
         } catch (IOException e) {
-            String error = String.format("Error creating '%s'. %s", getClass(), e.getMessage());
+            String error = String.format(Locale.US, "Error creating '%s'. %s", getClass(), e.getMessage());
             LOG.warn(error, e);
             adapter = null;
         }

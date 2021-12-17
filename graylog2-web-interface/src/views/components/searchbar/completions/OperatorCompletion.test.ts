@@ -125,4 +125,11 @@ describe('OperatorCompletion', () => {
 
     expect(results).toEqual([]);
   });
+
+  it('does not suggest anything if current token is a keyword without a prefix', () => {
+    const token = { index: 0, start: 0, type: 'keyword', value: 'controller:' };
+    const results = operatorCompletion.getCompletions(token, null, 'N', [token], 0);
+
+    expect(results).toEqual([]);
+  });
 });

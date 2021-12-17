@@ -14,38 +14,38 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import * as Immutable from 'immutable';
-import { FormikErrors } from 'formik';
+import type React from 'react';
+import type * as Immutable from 'immutable';
+import type { FormikErrors } from 'formik';
 
-import Widget from 'views/logic/widgets/Widget';
-import { ActionDefinition } from 'views/components/actions/ActionHandler';
-import { SearchRefreshCondition } from 'views/logic/hooks/SearchRefreshCondition';
-import { VisualizationComponent } from 'views/components/aggregationbuilder/AggregationBuilder';
-import { WidgetActionType } from 'views/components/widgets/Types';
-import { Creator } from 'views/components/sidebar/create/AddWidgetButton';
-import { ViewHook } from 'views/logic/hooks/ViewHook';
-import WidgetConfig from 'views/logic/widgets/WidgetConfig';
-import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
-import { Completer } from 'views/components/searchbar/SearchBarAutocompletions';
-import { Result } from 'views/components/widgets/Widget';
-import { Widgets } from 'views/stores/WidgetStore';
-import { OverrideProps } from 'views/components/WidgetOverrideElements';
-import {
+import type Widget from 'views/logic/widgets/Widget';
+import type { ActionDefinition } from 'views/components/actions/ActionHandler';
+import type { SearchRefreshCondition } from 'views/logic/hooks/SearchRefreshCondition';
+import type { VisualizationComponent } from 'views/components/aggregationbuilder/AggregationBuilder';
+import type { WidgetActionType } from 'views/components/widgets/Types';
+import type { Creator } from 'views/components/sidebar/create/AddWidgetButton';
+import type { ViewHook } from 'views/logic/hooks/ViewHook';
+import type WidgetConfig from 'views/logic/widgets/WidgetConfig';
+import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import type { Completer } from 'views/components/searchbar/SearchBarAutocompletions';
+import type { Result } from 'views/components/widgets/Widget';
+import type { Widgets } from 'views/stores/WidgetStore';
+import type { OverrideProps } from 'views/components/WidgetOverrideElements';
+import type {
   VisualizationConfigDefinition,
   VisualizationConfigFormValues,
   VisualizationFormValues,
   WidgetConfigFormValues,
 } from 'views/components/aggregationwizard';
-import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
-import { TimeRange } from 'views/logic/queries/Query';
-import { CopyWidgetToDashboardHook } from 'views/logic/views/CopyWidgetToDashboard';
-import View from 'views/logic/views/View';
-import User from 'logic/users/User';
-import { Message } from 'views/components/messagelist/Types';
-import { ValuePath } from 'views/logic/valueactions/ValueActionHandler';
-import WidgetPosition from 'views/logic/widgets/WidgetPosition';
-import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
+import type VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
+import type { TimeRange } from 'views/logic/queries/Query';
+import type { CopyWidgetToDashboardHook } from 'views/logic/views/CopyWidgetToDashboard';
+import type View from 'views/logic/views/View';
+import type User from 'logic/users/User';
+import type { Message } from 'views/components/messagelist/Types';
+import type { ValuePath } from 'views/logic/valueactions/ValueActionHandler';
+import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
+import type MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 
 type BackendWidgetPosition = {
   id: string,

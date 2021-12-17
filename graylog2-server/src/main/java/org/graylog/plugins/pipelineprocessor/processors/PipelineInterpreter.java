@@ -266,6 +266,12 @@ public class PipelineInterpreter implements MessageProcessor {
         // iterate through all stages for all matching pipelines, per "stage slice" instead of per pipeline.
         // pipeline execution ordering is not guaranteed
         while (stages.hasNext()) {
+            // Don't execute the "stage slice" if the message has been dropped. Break out of the loop to skip all
+            // remaining stages.
+            if (message.getFilterOut()) {
+                break;
+            }
+
             final List<Stage> stageSet = stages.next();
             for (final Stage stage : stageSet) {
                 evaluateStage(stage, message, msgId, result, pipelinesToSkip, interpreterListener);

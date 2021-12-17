@@ -21,11 +21,19 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 
+import java.util.Collections;
+import java.util.Set;
+
 @AutoValue
 @JsonDeserialize(builder = FieldTypeDTO.Builder.class)
 public abstract class FieldTypeDTO {
     static final String FIELD_NAME = "field_name";
     static final String FIELD_PHYSICAL_TYPE = "physical_type";
+    static final String FIELD_PROPERTIES = "properties";
+
+    public enum Properties {
+        FIELDDATA
+    }
 
     @JsonProperty(FIELD_NAME)
     public abstract String fieldName();
@@ -33,8 +41,19 @@ public abstract class FieldTypeDTO {
     @JsonProperty(FIELD_PHYSICAL_TYPE)
     public abstract String physicalType();
 
+    @JsonProperty(FIELD_PROPERTIES)
+    public abstract Set<Properties> properties();
+
     public static FieldTypeDTO create(String fieldName, String physicalType) {
         return builder().fieldName(fieldName).physicalType(physicalType).build();
+    }
+
+    public static FieldTypeDTO create(String fieldName, String physicalType, Set<Properties> properties) {
+        return builder()
+                .fieldName(fieldName)
+                .physicalType(physicalType)
+                .properties(properties)
+                .build();
     }
 
     public static Builder builder() {
@@ -47,7 +66,8 @@ public abstract class FieldTypeDTO {
     public static abstract class Builder {
         @JsonCreator
         public static Builder create() {
-            return new AutoValue_FieldTypeDTO.Builder();
+            return new AutoValue_FieldTypeDTO.Builder()
+                    .properties(Collections.emptySet());
         }
 
         @JsonProperty(FIELD_NAME)
@@ -55,6 +75,9 @@ public abstract class FieldTypeDTO {
 
         @JsonProperty(FIELD_PHYSICAL_TYPE)
         public abstract Builder physicalType(String physicalType);
+
+        @JsonProperty(FIELD_PROPERTIES)
+        public abstract Builder properties(Set<Properties> properties);
 
         public abstract FieldTypeDTO build();
     }

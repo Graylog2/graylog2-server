@@ -24,7 +24,7 @@ import static org.graylog2.storage.SearchVersion.Distribution.OPENSEARCH;
 public enum SearchServer {
     ES7(ELASTICSEARCH, "7.10.2"),
     ES6(ELASTICSEARCH, "6.8.4"),
-    OS1(OPENSEARCH, "1.2.0");
+    OS1(OPENSEARCH, "1.2.1");
 
     public static final SearchServer DEFAULT_VERSION = ES7;
 

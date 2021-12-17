@@ -24,7 +24,8 @@ import useCreateSavedSearch from 'views/logic/views/UseCreateSavedSearch';
 import withLocation from 'routing/withLocation';
 import type { Location } from 'routing/withLocation';
 import { loadNewViewForStream } from 'views/logic/views/Actions';
-import normalizeSearchURLQueryParams, { RawQuery } from 'views/logic/NormalizeSearchURLQueryParams';
+import type { RawQuery } from 'views/logic/NormalizeSearchURLQueryParams';
+import normalizeSearchURLQueryParams from 'views/logic/NormalizeSearchURLQueryParams';
 
 import SearchPage from './SearchPage';
 

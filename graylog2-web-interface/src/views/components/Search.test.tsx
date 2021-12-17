@@ -34,7 +34,7 @@ import View from 'views/logic/views/View';
 import SearchMetadata from 'views/logic/search/SearchMetadata';
 import CurrentViewTypeProvider from 'views/components/views/CurrentViewTypeProvider';
 import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
-import { SearchExecutionResult } from 'views/actions/SearchActions';
+import type { SearchExecutionResult } from 'views/actions/SearchActions';
 import WindowLeaveMessage from 'views/components/common/WindowLeaveMessage';
 import MockSearchPageLayoutProvider from 'views/components/contexts/SearchPageLayoutProvider';
 

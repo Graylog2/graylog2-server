@@ -19,7 +19,7 @@ import * as mockImmutable from 'immutable';
 import { render, fireEvent } from 'wrappedTestingLibrary';
 
 import { alice } from 'fixtures/users';
-import User from 'logic/users/User';
+import type User from 'logic/users/User';
 import Search from 'views/logic/search/Search';
 import View from 'views/logic/views/View';
 import CurrentUserContext from 'contexts/CurrentUserContext';

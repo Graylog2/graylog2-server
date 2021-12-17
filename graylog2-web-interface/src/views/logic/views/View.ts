@@ -18,14 +18,14 @@ import * as Immutable from 'immutable';
 import { flatten } from 'lodash';
 import ObjectID from 'bson-objectid';
 
-import Widget from 'views/logic/widgets/Widget';
+import type Widget from 'views/logic/widgets/Widget';
 import defaultTitle from 'views/components/defaultTitle';
 
 import ViewState from './ViewState';
 import type { WidgetMapping } from './types';
 import type { ViewStateJson } from './ViewState';
 
-import Search from '../search/Search';
+import type Search from '../search/Search';
 import type { SearchType as QuerySearchType } from '../queries/SearchType';
 import type { QueryId } from '../queries/Query';
 

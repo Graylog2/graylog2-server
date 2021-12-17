@@ -19,7 +19,7 @@ import { Field, useFormikContext } from 'formik';
 import { useContext } from 'react';
 
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
-import { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
+import type { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
 
 import FieldSelect from '../../FieldSelect';
 

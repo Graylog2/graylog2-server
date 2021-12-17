@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { isString, trim, truncate as trunc } from 'lodash';
 
-import FieldType from 'views/logic/fieldtypes/FieldType';
+import type FieldType from 'views/logic/fieldtypes/FieldType';
 
 import EmptyValue from './EmptyValue';
 import type { ValueRendererProps } from './messagelist/decoration/ValueRenderer';

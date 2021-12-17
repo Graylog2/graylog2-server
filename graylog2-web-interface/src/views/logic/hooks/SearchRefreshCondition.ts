@@ -14,9 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import SearchExecutionState from 'views/logic/search/SearchExecutionState';
-import SearchMetadata from 'views/logic/search/SearchMetadata';
-import View from 'views/logic/views/View';
+import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
+import type SearchMetadata from 'views/logic/search/SearchMetadata';
+import type View from 'views/logic/views/View';
 
 export type SearchRefreshConditionArguments = { view: View, searchMetadata: SearchMetadata, executionState: SearchExecutionState };
 export type SearchRefreshCondition = (args: SearchRefreshConditionArguments) => boolean;

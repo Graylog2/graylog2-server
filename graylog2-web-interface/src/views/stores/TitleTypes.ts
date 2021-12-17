@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { Map } from 'immutable';
+import type { Map } from 'immutable';
 
 export type TitleType = 'tab' | 'widget';
 export type TitlesMap = Map<TitleType, Map<string, string>>;

@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import * as Immutable from 'immutable';
+import type * as Immutable from 'immutable';
 
 import PaginatedList, { INITIAL_PAGE } from 'components/common/PaginatedList';
 import SearchForm from 'components/common/SearchForm';

@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.util.Locale;
 import java.util.Optional;
 
 public class MaxMindIpLocationResolver extends GeoIpResolver<DatabaseReader, GeoLocationInformation> {
@@ -44,7 +45,7 @@ public class MaxMindIpLocationResolver extends GeoIpResolver<DatabaseReader, Geo
         try {
             return new DatabaseReader.Builder(configFile).build();
         } catch (IOException e) {
-            String error = String.format("Error creating '%s'.  %s", getClass().getName(), e.getMessage());
+            String error = String.format(Locale.US, "Error creating '%s'.  %s", getClass().getName(), e.getMessage());
             throw new IllegalStateException(error, e);
         }
     }

@@ -21,12 +21,13 @@ import * as Immutable from 'immutable';
 import asMock from 'helpers/mocking/AsMock';
 import mockAction from 'helpers/mocking/MockAction';
 import history from 'util/History';
-import { ViewStore, ViewStoreState } from 'views/stores/ViewStore';
+import type { ViewStoreState } from 'views/stores/ViewStore';
+import { ViewStore } from 'views/stores/ViewStore';
 import View from 'views/logic/views/View';
 import { QueriesActions } from 'views/actions/QueriesActions';
-import Query, { createElasticsearchQueryString, filtersForQuery, RelativeTimeRange } from 'views/logic/queries/Query';
+import Query, { createElasticsearchQueryString, filtersForQuery } from 'views/logic/queries/Query';
 import Search from 'views/logic/search/Search';
-import type { TimeRange } from 'views/logic/queries/Query';
+import type { TimeRange, RelativeTimeRange } from 'views/logic/queries/Query';
 
 import { syncWithQueryParameters, useSyncWithQueryParameters } from './SyncWithQueryParameters';
 

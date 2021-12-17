@@ -24,7 +24,7 @@ import type { ViewType } from './View';
 
 import { resultHistogram, allMessagesTable } from '../Widgets';
 import WidgetPosition from '../widgets/WidgetPosition';
-import Widget from '../widgets/Widget';
+import type Widget from '../widgets/Widget';
 
 type Result = {
   titles: { widget: { [key: string]: string } },

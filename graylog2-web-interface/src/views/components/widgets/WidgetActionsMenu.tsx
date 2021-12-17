@@ -18,13 +18,13 @@ import * as React from 'react';
 import { useState, useContext, useCallback } from 'react';
 import styled from 'styled-components';
 
-import { BackendWidgetPosition } from 'views/types';
+import type { BackendWidgetPosition } from 'views/types';
 import ExportModal from 'views/components/export/ExportModal';
 import MoveWidgetToTab from 'views/logic/views/MoveWidgetToTab';
 import { loadDashboard } from 'views/logic/views/Actions';
 import { IconButton } from 'components/common';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
-import WidgetPosition from 'views/logic/widgets/WidgetPosition';
+import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import { TitlesActions, TitleTypes } from 'views/stores/TitlesStore';
 import { ViewActions, ViewStore } from 'views/stores/ViewStore';
 import View from 'views/logic/views/View';

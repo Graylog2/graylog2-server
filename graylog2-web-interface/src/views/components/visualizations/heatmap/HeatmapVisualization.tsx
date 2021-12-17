@@ -22,9 +22,9 @@ import type { VisualizationComponentProps } from 'views/components/aggregationbu
 import { makeVisualization, retrieveChartData } from 'views/components/aggregationbuilder/AggregationBuilder';
 import HeatmapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/HeatmapVisualizationConfig';
 
-import type { ChartDefinition, ExtractedSeries } from '../ChartData';
+import type { ChartDefinition, ExtractedSeries, ValuesBySeries } from '../ChartData';
 import GenericPlot from '../GenericPlot';
-import { chartData, ValuesBySeries } from '../ChartData';
+import { chartData } from '../ChartData';
 
 const _generateSeriesTitles = (config, x, y) => {
   const seriesTitles = config.series.map((s) => s.function);

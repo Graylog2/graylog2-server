@@ -17,9 +17,8 @@
 import uuid from 'uuid/v4';
 
 import { DEFAULT_TIMERANGE } from 'views/Constants';
-import Query, { TimeRange, ElasticsearchQueryString, createElasticsearchQueryString, filtersForQuery } from 'views/logic/queries/Query';
-
-import type { QueryId } from './Query';
+import type { TimeRange, ElasticsearchQueryString, QueryId } from 'views/logic/queries/Query';
+import Query, { createElasticsearchQueryString, filtersForQuery } from 'views/logic/queries/Query';
 
 export default (
   streamId?: string,

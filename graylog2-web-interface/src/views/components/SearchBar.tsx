@@ -43,7 +43,8 @@ import { StreamsStore } from 'views/stores/StreamsStore';
 import { QueryFiltersStore } from 'views/stores/QueryFiltersStore';
 import QueryValidation from 'views/components/searchbar/queryvalidation/QueryValidation';
 import type { FilterType, QueryId } from 'views/logic/queries/Query';
-import Query, { createElasticsearchQueryString, filtersForQuery, filtersToStreamSet } from 'views/logic/queries/Query';
+import type Query from 'views/logic/queries/Query';
+import { createElasticsearchQueryString, filtersForQuery, filtersToStreamSet } from 'views/logic/queries/Query';
 import type { SearchesConfig } from 'components/search/SearchConfig';
 import type { SearchBarFormValues } from 'views/Constants';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
@@ -195,6 +196,8 @@ const SearchBar = ({
                             <FormWarningsContext.Consumer>
                               {({ warnings }) => (
                                 <StyledQueryInput value={value}
+                                                  timeRange={values.timerange}
+                                                  streams={values.streams}
                                                   placeholder='Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'
                                                   error={error}
                                                   warning={warnings.queryString}

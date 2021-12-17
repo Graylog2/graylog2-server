@@ -16,16 +16,17 @@
  */
 import uuid from 'uuid/v4';
 import { Set } from 'immutable';
-import { $Shape } from 'utility-types';
+import type { $Shape } from 'utility-types';
 
 import { parseSeries } from 'views/logic/aggregationbuilder/Series';
-import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
-import Pivot, { TimeConfigType, TimeUnitConfig } from 'views/logic/aggregationbuilder/Pivot';
+import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import type { TimeConfigType, TimeUnitConfig } from 'views/logic/aggregationbuilder/Pivot';
+import type Pivot from 'views/logic/aggregationbuilder/Pivot';
 import type { Definition } from 'views/logic/aggregationbuilder/Series';
-import NumberVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
+import type NumberVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
 import type { TimeUnit } from 'views/Constants';
 
-import SortConfig from '../../aggregationbuilder/SortConfig';
+import type SortConfig from '../../aggregationbuilder/SortConfig';
 
 const mapTimeunit = (unit: TimeUnit) => {
   switch (unit) {

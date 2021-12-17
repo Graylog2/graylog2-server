@@ -21,7 +21,7 @@ import moment from 'moment';
 
 import { RELATIVE_RANGE_TYPES } from 'views/Constants';
 import { Select } from 'components/common';
-import { RangeClassified } from 'views/components/searchbar/date-time-picker/types';
+import type { RangeClassified } from 'views/components/searchbar/date-time-picker/types';
 
 import { isTypeRelativeClassified, RELATIVE_CLASSIFIED_ALL_TIME_RANGE } from './RelativeTimeRangeClassifiedHelper';
 import RelativeRangeValueInput from './RelativeRangeValueInput';

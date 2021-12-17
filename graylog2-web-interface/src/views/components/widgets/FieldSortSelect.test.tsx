@@ -20,7 +20,8 @@ import { List } from 'immutable';
 import selectEvent from 'react-select-event';
 
 import Direction from 'views/logic/aggregationbuilder/Direction';
-import FieldType, { Property } from 'views/logic/fieldtypes/FieldType';
+import type { Property } from 'views/logic/fieldtypes/FieldType';
+import FieldType from 'views/logic/fieldtypes/FieldType';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 

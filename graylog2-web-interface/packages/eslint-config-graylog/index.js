@@ -35,6 +35,7 @@ module.exports = {
         '@typescript-eslint/no-redeclare': ['error'],
         'no-shadow': 'off',
         '@typescript-eslint/no-shadow': ['error'],
+        '@typescript-eslint/consistent-type-imports': ['error', { prefer: 'type-imports' }],
       },
     },
     {

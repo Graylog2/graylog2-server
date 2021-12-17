@@ -21,6 +21,8 @@ import com.codahale.metrics.Timer;
 import org.graylog.plugins.map.config.DatabaseType;
 import org.graylog.plugins.map.config.GeoIpResolverConfig;
 
+import java.util.Locale;
+
 public class GeoIpResolverFactory {
     private static GeoIpResolverFactory INSTANCE;
 
@@ -40,7 +42,7 @@ public class GeoIpResolverFactory {
                 break;
             default:
                 String opts = String.join(",", DatabaseType.MAXMIND_CITY.name(), DatabaseType.IPINFO_STANDARD_LOCATION.name());
-                String error = String.format("'%s' is not a valid DatabaseType for a GeoLocation Resolver. Valid options are: %s", opts);
+                String error = String.format(Locale.US, "'%s' is not a valid DatabaseType for a GeoLocation Resolver. Valid options are: %s", config.cityDbType(), opts);
                 throw new IllegalArgumentException(error);
         }
 
@@ -61,7 +63,7 @@ public class GeoIpResolverFactory {
                 break;
             default:
                 String opts = String.join(",", DatabaseType.MAXMIND_ASN.name(), DatabaseType.IPINFO_ASN.name());
-                String error = String.format("'%s' is not a valid DatabaseType for a GeoLocation Resolver. Valid options are: %s", config.asnDbType(), opts);
+                String error = String.format(Locale.US, "'%s' is not a valid DatabaseType for a GeoLocation Resolver. Valid options are: %s", config.asnDbType(), opts);
                 throw new IllegalArgumentException(error);
         }
 

@@ -263,8 +263,8 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
     }
 
     @Override
-    public boolean masterOnly() {
-        // Only needs to run on the master node because results are stored in the database
+    public boolean leaderOnly() {
+        // Only needs to run on the leader node because results are stored in the database
         return true;
     }
 

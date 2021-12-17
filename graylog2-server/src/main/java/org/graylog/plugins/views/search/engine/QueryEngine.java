@@ -175,4 +175,5 @@ public class QueryEngine {
     private QueryBackend<? extends GeneratedQueryContext> getQueryBackend(Query query) {
         return elasticsearchBackend;
     }
+
 }

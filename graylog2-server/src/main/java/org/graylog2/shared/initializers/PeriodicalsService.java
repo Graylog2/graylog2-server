@@ -55,7 +55,7 @@ public class PeriodicalsService extends AbstractIdleService {
         this.leaderElectionService = leaderElectionService;
 
         allPeriodicals.forEach(p -> {
-            if (p.masterOnly()) {
+            if (p.leaderOnly()) {
                 leaderNodePeriodicals.add(p);
             } else {
                 anyNodePeriodicals.add(p);

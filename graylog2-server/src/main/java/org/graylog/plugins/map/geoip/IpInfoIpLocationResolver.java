@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.util.Locale;
 import java.util.Optional;
 
 public class IpInfoIpLocationResolver extends GeoIpResolver<IPinfoIPLocationDatabaseAdapter, GeoLocationInformation> {
@@ -41,7 +42,7 @@ public class IpInfoIpLocationResolver extends GeoIpResolver<IPinfoIPLocationData
         try {
             adapter = new IPinfoIPLocationDatabaseAdapter(configFile);
         } catch (IOException e) {
-            String error = String.format("Error creating '%s'. %s", getClass(), configFile);
+            String error = String.format(Locale.US, "Error creating '%s'. %s", getClass(), configFile);
             LOG.error(error);
             adapter = null;
         }
@@ -59,7 +60,7 @@ public class IpInfoIpLocationResolver extends GeoIpResolver<IPinfoIPLocationData
                     loc.city(), loc.region(), loc.timezone());
 
         } catch (Exception e) {
-            String error = String.format("Error getting IP location info for '%s'. %s", address, e.getMessage());
+            String error = String.format(Locale.US, "Error getting IP location info for '%s'. %s", address, e.getMessage());
             LOG.error(error, e);
             info = null;
         }

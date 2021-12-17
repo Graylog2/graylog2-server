@@ -16,18 +16,19 @@
  */
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { useEffect, useMemo, useState, ReactNode } from 'react';
+import type { ReactNode } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 
 import { ModifiedNavDropdown as NavDropdown } from 'components/bootstrap/NavDropdown';
-import { QueryId } from 'views/logic/queries/Query';
-import QueryTitleEditModal from 'views/components/queries/QueryTitleEditModal';
+import type { QueryId } from 'views/logic/queries/Query';
+import type QueryTitleEditModal from 'views/components/queries/QueryTitleEditModal';
 import { Nav, NavItem, MenuItem } from 'components/bootstrap';
 import { Icon } from 'components/common';
 import QueryTitle from 'views/components/queries/QueryTitle';
 
-import { QueryTabsProps } from './QueryTabs';
+import type { QueryTabsProps } from './QueryTabs';
 
 interface Props extends QueryTabsProps {
   maxWidth: number,

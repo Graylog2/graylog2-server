@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.util.Locale;
 import java.util.Optional;
 
 public class MaxMindIpAsnResolver extends GeoIpResolver<DatabaseReader, GeoAsnInformation> {
@@ -42,7 +43,7 @@ public class MaxMindIpAsnResolver extends GeoIpResolver<DatabaseReader, GeoAsnIn
         try {
             return new DatabaseReader.Builder(configFile).build();
         } catch (IOException e) {
-            String error = String.format("Error creating '%s'.  %s", getClass().getName(), e.getMessage());
+            String error = String.format(Locale.US, "Error creating '%s'.  %s", getClass().getName(), e.getMessage());
             throw new IllegalStateException(error, e);
         }
     }
@@ -55,7 +56,7 @@ public class MaxMindIpAsnResolver extends GeoIpResolver<DatabaseReader, GeoAsnIn
             String number = response.getAutonomousSystemNumber() == null ? "N/A" : response.getAutonomousSystemNumber().toString();
             asn = GeoAsnInformation.create(response.getAutonomousSystemOrganization(), "N/A", number);
         } catch (GeoIp2Exception | IOException | UnsupportedOperationException e) {
-            String error = String.format("Error getting ASN for IP Address '%s'. %s", address, e.getMessage());
+            String error = String.format(Locale.US, "Error getting ASN for IP Address '%s'. %s", address, e.getMessage());
             LOG.warn(error, e);
             asn = null;
         }

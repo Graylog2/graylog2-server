@@ -23,10 +23,11 @@ import { ViewStore } from 'views/stores/ViewStore';
 import BigDisplayModeHeader from 'views/components/dashboard/BigDisplayModeHeader';
 import CycleQueryTab from 'views/components/dashboard/bigdisplay/CycleQueryTab';
 import type { QueryId } from 'views/logic/queries/Query';
-import View from 'views/logic/views/View';
+import type View from 'views/logic/views/View';
 import { RefreshActions } from 'views/stores/RefreshStore';
 import type { UntypedBigDisplayModeQuery } from 'views/components/dashboard/BigDisplayModeConfiguration';
-import withLocation, { Location } from 'routing/withLocation';
+import type { Location } from 'routing/withLocation';
+import withLocation from 'routing/withLocation';
 
 import ShowViewPage from './ShowViewPage';
 

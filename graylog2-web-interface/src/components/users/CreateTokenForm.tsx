@@ -16,7 +16,8 @@
  */
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import styled, { StyledComponent } from 'styled-components';
+import type { StyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { Button, ControlLabel, FormControl, FormGroup } from 'components/bootstrap';
 import { Spinner } from 'components/common';

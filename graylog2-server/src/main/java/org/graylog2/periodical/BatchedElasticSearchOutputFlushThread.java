@@ -48,7 +48,7 @@ public class BatchedElasticSearchOutputFlushThread extends Periodical {
     }
 
     @Override
-    public boolean masterOnly() {
+    public boolean leaderOnly() {
         return false;
     }
 

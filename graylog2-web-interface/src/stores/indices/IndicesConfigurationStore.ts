@@ -16,7 +16,7 @@
  */
 import Reflux from 'reflux';
 
-import {
+import type {
   IndicesConfigurationActionsType,
   IndicesConfigurationStoreState,
   RetentionStrategyResponse,

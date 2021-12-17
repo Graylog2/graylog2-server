@@ -21,10 +21,11 @@ import userEvent from '@testing-library/user-event';
 import MockStore from 'helpers/mocking/StoreMock';
 import { GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
 import { SearchActions } from 'views/stores/SearchStore';
-import WidgetFocusContext, {
+import type {
   WidgetEditingState,
   WidgetFocusingState,
 } from 'views/components/contexts/WidgetFocusContext';
+import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 
 import DashboardSearchBar from './DashboardSearchBar';
 

@@ -16,7 +16,7 @@
  */
 import Reflux from 'reflux';
 
-import { RefluxActions } from 'stores/StoreTypes';
+import type { RefluxActions } from 'stores/StoreTypes';
 import { singletonActions } from 'logic/singleton';
 
 type QueryValidationActionsType = RefluxActions<{
