@@ -41,10 +41,10 @@ public interface Input extends Persisted {
 
     String getNodeId();
 
-    default String getDesiredState() {
-        return IOState.Type.RUNNING.toString();
+    default IOState.Type getDesiredState() {
+        return IOState.Type.RUNNING;
     }
 
-    // Must provide a default to avoid breaking compat to existing forwarders by modifying ForwarderInput
-    default void setDesiredState(String desiredState){}
+    default void setDesiredState(IOState.Type desiredState) {
+    }
 }

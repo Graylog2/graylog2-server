@@ -119,7 +119,7 @@ public class InputStatesResource extends AbstractInputsResource {
     public InputCreated start(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) throws org.graylog2.database.NotFoundException {
         checkPermission(RestPermissions.INPUTS_CHANGESTATE, inputId);
         Input input = inputService.find(inputId);
-        persistDesiredState(input, IOState.Type.RUNNING.toString());
+        persistDesiredState(input, IOState.Type.RUNNING);
         final InputCreated result = InputCreated.create(inputId);
         this.serverEventBus.post(result);
 
@@ -137,7 +137,7 @@ public class InputStatesResource extends AbstractInputsResource {
     public InputDeleted stop(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) throws org.graylog2.database.NotFoundException {
         checkPermission(RestPermissions.INPUTS_CHANGESTATE, inputId);
         Input input = inputService.find(inputId);
-        persistDesiredState(input, IOState.Type.STOPPED.toString());
+        persistDesiredState(input, IOState.Type.STOPPED);
         final InputDeleted result = InputDeleted.create(inputId);
         this.serverEventBus.post(result);
 
@@ -171,7 +171,7 @@ public class InputStatesResource extends AbstractInputsResource {
         );
     }
 
-    private void persistDesiredState(Input input, String desiredState) {
+    private void persistDesiredState(Input input, IOState.Type desiredState) {
         try {
             input.setDesiredState(desiredState);
             inputService.saveWithoutEvents(input);
