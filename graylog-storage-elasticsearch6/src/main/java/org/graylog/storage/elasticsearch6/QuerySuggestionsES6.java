@@ -38,13 +38,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class QuerySugggestionsES6 implements QuerySuggestionsService {
+public class QuerySuggestionsES6 implements QuerySuggestionsService {
 
     private final JestClient jestClient;
     private final IndexLookup indexLookup;
 
     @Inject
-    public QuerySugggestionsES6(JestClient jestClient, IndexLookup indexLookup) {
+    public QuerySuggestionsES6(JestClient jestClient, IndexLookup indexLookup) {
         this.jestClient = jestClient;
         this.indexLookup = indexLookup;
     }

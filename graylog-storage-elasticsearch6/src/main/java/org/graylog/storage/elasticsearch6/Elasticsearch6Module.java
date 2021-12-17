@@ -55,7 +55,7 @@ public class Elasticsearch6Module extends VersionAwareModule {
         bindForSupportedVersion(V20200730000000_AddGl2MessageIdFieldAliasForEvents.ElasticsearchAdapter.class)
                 .to(V20200730000000_AddGl2MessageIdFieldAliasForEventsES6.class);
 
-        bindForSupportedVersion(QuerySuggestionsService.class).to(QuerySugggestionsES6.class);
+        bindForSupportedVersion(QuerySuggestionsService.class).to(QuerySuggestionsES6.class);
 
         install(new FactoryModuleBuilder().build(ScrollResultES6.Factory.class));
 
