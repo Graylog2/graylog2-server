@@ -397,6 +397,8 @@
                                         <exclude>org.apache.log4j.wso2:log4j</exclude>
                                         <!-- Make sure we don't pull in vulnerable log4j2 versions (CVE-2021-45046, CVE-2021-44228) -->
                                         <exclude>org.apache.logging.log4j:*:(,2.16)</exclude>
+                                        <!-- Pulling in slf4j-simple creates warnings about multiple SLF4J bindings on server startup -->
+                                        <exclude>org.slf4j:slf4j-simple</exclude>
                                     </excludes>
                                 </bannedDependencies>
                                 <!-- TODO: Enable once all duplicate dependency declarations have been fixed
