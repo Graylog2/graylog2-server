@@ -23,8 +23,6 @@ import io.searchbox.client.JestClient;
 import io.searchbox.core.MultiSearch;
 import io.searchbox.core.MultiSearchResult;
 import io.searchbox.core.Search;
-import io.searchbox.core.SearchResult;
-import io.searchbox.core.search.aggregation.TermsAggregation;
 import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.GlobalOverride;
 import org.graylog.plugins.views.search.Query;
@@ -36,10 +34,6 @@ import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.engine.QueryBackend;
 import org.graylog.plugins.views.search.engine.SearchConfig;
-import org.graylog.plugins.views.search.engine.suggestions.SuggestionError;
-import org.graylog.plugins.views.search.engine.suggestions.SuggestionRequest;
-import org.graylog.plugins.views.search.engine.suggestions.SuggestionEntry;
-import org.graylog.plugins.views.search.engine.suggestions.SuggestionResponse;
 import org.graylog.plugins.views.search.errors.SearchTypeError;
 import org.graylog.plugins.views.search.errors.SearchTypeErrorParser;
 import org.graylog.plugins.views.search.filter.AndFilter;
@@ -49,7 +43,6 @@ import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.shaded.elasticsearch6.org.elasticsearch.index.query.BoolQueryBuilder;
 import org.graylog.shaded.elasticsearch6.org.elasticsearch.index.query.QueryBuilder;
 import org.graylog.shaded.elasticsearch6.org.elasticsearch.index.query.QueryBuilders;
-import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.storage.elasticsearch6.TimeRangeQueryFactory;
 import org.graylog.storage.elasticsearch6.jest.JestUtils;
@@ -298,30 +291,5 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                 .searchTypes(resultsMap)
                 .errors(new HashSet<>(queryContext.errors()))
                 .build();
-    }
-
-    @Override
-    public SuggestionResponse suggest(SuggestionRequest req) {
-        final Set<String> affectedIndices = indexLookup.indexNamesForStreamsInTimeRange(req.streams(), req.timerange());
-        final SearchSourceBuilder search = new SearchSourceBuilder()
-                .query(QueryBuilders.prefixQuery(req.field(), req.input()))
-                .size(0)
-                .aggregation(AggregationBuilders.terms("fieldvalues").field(req.field()).size(10));
-
-        final Search.Builder searchBuilder = new Search.Builder(search.toString())
-                .addType(IndexMapping.TYPE_MESSAGE)
-                .addIndex(affectedIndices.isEmpty() ? Collections.singleton("") : affectedIndices)
-                .allowNoIndices(false)
-                .ignoreUnavailable(false);
-
-        try {
-            final SearchResult result = JestUtils.execute(jestClient, searchBuilder.build(), () -> "Unable to perform aggregation: ");
-
-            final TermsAggregation aggregation = result.getAggregations().getTermsAggregation("fieldvalues");
-            final List<SuggestionEntry> entries = aggregation.getBuckets().stream().map(b -> new SuggestionEntry(b.getKeyAsString(), b.getCount())).collect(Collectors.toList());
-            return SuggestionResponse.builder(req.field(), req.input()).suggestions(entries).build();
-        } catch (Exception e) {
-            return SuggestionResponse.builder(req.field(), req.input()).suggestionError(SuggestionError.create(e.getClass().getSimpleName(), e.getMessage())).build();
-        }
     }
 }

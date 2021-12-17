@@ -21,7 +21,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog.plugins.views.search.engine.QueryEngine;
+import org.graylog.plugins.views.search.engine.QuerySuggestionsService;
 import org.graylog.plugins.views.search.engine.suggestions.SuggestionRequest;
 import org.graylog.plugins.views.search.engine.suggestions.SuggestionResponse;
 import org.graylog.plugins.views.search.permissions.SearchUser;
@@ -34,7 +34,6 @@ import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersExc
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.rest.resources.RestResource;
-import org.graylog2.shared.security.RestPermissions;
 
 import javax.inject.Inject;
 import javax.ws.rs.POST;
@@ -53,12 +52,12 @@ import java.util.stream.Collectors;
 public class SuggestionsResource extends RestResource implements PluginRestResource {
 
     private final PermittedStreams permittedStreams;
-    private final QueryEngine queryEngine;
+    private final QuerySuggestionsService querySuggestionsService;
 
     @Inject
-    public SuggestionsResource(PermittedStreams permittedStreams, QueryEngine queryEngine) {
+    public SuggestionsResource(PermittedStreams permittedStreams, QuerySuggestionsService querySuggestionsService) {
         this.permittedStreams = permittedStreams;
-        this.queryEngine = queryEngine;
+        this.querySuggestionsService = querySuggestionsService;
     }
 
     @POST
@@ -75,7 +74,7 @@ public class SuggestionsResource extends RestResource implements PluginRestResou
                 .timerange(Optional.ofNullable(suggestionsRequest.timerange()).orElse(defaultTimeRange()))
                 .build();
 
-        SuggestionResponse res = queryEngine.suggest(req);
+        SuggestionResponse res = querySuggestionsService.suggest(req);
         final List<SuggestionEntryDTO> suggestions = res.suggestions().stream().map(s -> SuggestionEntryDTO.create(s.getValue(), s.getOccurrence())).collect(Collectors.toList());
         final SuggestionsDTO.Builder suggestionsBuilder = SuggestionsDTO.builder(res.field(), res.input()).suggestions(suggestions);
 
