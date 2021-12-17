@@ -136,7 +136,7 @@
     "@types/react-grid-layout": "^1.1.2",
     "@types/react-plotly.js": "^2.5.0",
     "@types/react-router-dom": "^5.1.7",
-    "@types/react-select": "^4.0.15",
+    "@types/react-select": "^5.0.1",
     "@types/react-sticky-el": "^1.0.3",
     "@types/react-window": "^1.8.3",
     "@types/ua-parser-js": "^0.7.36",
