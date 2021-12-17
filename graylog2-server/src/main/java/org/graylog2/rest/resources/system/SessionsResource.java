@@ -68,6 +68,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.ServiceUnavailableException;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
@@ -181,7 +182,7 @@ public class SessionsResource extends RestResource {
                 token.getAuthenticationToken(),
                 basePath,
                 baseUri.getHost(),
-                1,
+                Cookie.DEFAULT_VERSION,
                 "Authentication Cookie",
                 maxAge,
                 token.validUntil(),
