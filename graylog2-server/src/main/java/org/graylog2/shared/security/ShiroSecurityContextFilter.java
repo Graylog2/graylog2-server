@@ -118,15 +118,16 @@ public class ShiroSecurityContextFilter implements ContainerRequestFilter {
         if ("session".equalsIgnoreCase(credential)) {
             // Basic auth: undefined:session is sent when the UI doesn't have a valid session id,
             // we don't want to create a SessionIdToken in that case but fall back to looking at the headers instead
-            if ("undefined".equalsIgnoreCase(userName)) {
-                authToken = new HttpHeadersToken(headers, host, remoteAddr, cookies);
-            } else {
-                authToken = new SessionIdToken(userName, host);
-            }
+            authToken = new SessionIdToken(userName, host);
         } else if ("token".equalsIgnoreCase(credential)) {
             authToken = new AccessTokenAuthToken(userName, host);
         } else if (userName == null) { // without a username we default to using the header environment as potentially containing tokens used by plugins
-            authToken = new HttpHeadersToken(headers, host, remoteAddr, cookies);
+            if (cookies.containsKey("authentication")) {
+                final Cookie authenticationCookie = cookies.get(AuthenticationCookieToken.SESSION_COOKIE_NAME);
+                authToken = new AuthenticationCookieToken(authenticationCookie.getValue());
+            } else {
+                authToken = new HttpHeadersToken(headers, host, remoteAddr, cookies);
+            }
         } else { // otherwise we use the "standard" username/password combination
             authToken = new UsernamePasswordToken(userName, credential, host);
         }

@@ -25,19 +25,17 @@ import org.apache.shiro.realm.AuthenticatingRealm;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
 import org.graylog2.plugin.database.users.User;
-import org.graylog2.shared.security.HttpHeadersToken;
+import org.graylog2.shared.security.AuthenticationCookieToken;
 import org.graylog2.shared.users.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.ws.rs.core.Cookie;
 
 public class CookieAuthenticationRealm extends AuthenticatingRealm {
     private static final Logger LOG = LoggerFactory.getLogger(CookieAuthenticationRealm.class);
 
     public static final String NAME = "cookie-authentication";
-    public static final String SESSION_COOKIE_NAME = "authentication";
 
     private final UserService userService;
 
@@ -45,7 +43,7 @@ public class CookieAuthenticationRealm extends AuthenticatingRealm {
     public CookieAuthenticationRealm(UserService userService) {
         this.userService = userService;
 
-        setAuthenticationTokenClass(HttpHeadersToken.class);
+        setAuthenticationTokenClass(AuthenticationCookieToken.class);
         setCachingEnabled(false);
         // Credentials will be matched via the authentication service itself so we don't need Shiro to do it
         setCredentialsMatcher(new AllowAllCredentialsMatcher());
@@ -53,10 +51,9 @@ public class CookieAuthenticationRealm extends AuthenticatingRealm {
 
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authenticationToken) throws AuthenticationException {
-        final HttpHeadersToken headersToken = (HttpHeadersToken) authenticationToken;
-        final Cookie authenticationCookie = headersToken.getCookies().get(SESSION_COOKIE_NAME);
+        final AuthenticationCookieToken cookieToken = (AuthenticationCookieToken) authenticationToken;
 
-        final Subject subject = new Subject.Builder().sessionId(authenticationCookie.getValue()).buildSubject();
+        final Subject subject = new Subject.Builder().sessionId(cookieToken.getCookieValue()).buildSubject();
         final Session session = subject.getSession(false);
         if (session == null) {
             LOG.debug("Invalid session. Either it has expired or did not exist.");
