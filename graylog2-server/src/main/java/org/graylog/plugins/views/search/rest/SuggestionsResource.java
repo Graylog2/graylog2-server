@@ -62,10 +62,10 @@ public class SuggestionsResource extends RestResource implements PluginRestResou
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation("Validate a search query")
-    @NoAuditEvent("Only validating query structure, not changing any data")
-    public SuggestionsDTO validateQuery(@ApiParam(name = "validationRequest") SuggestionsRequestDTO suggestionsRequest,
-                                        @Context SearchUser searchUser) {
+    @ApiOperation("Suggest field value")
+    @NoAuditEvent("Only suggesting field value for query, not changing any data")
+    public SuggestionsDTO suggestFieldValue(@ApiParam(name = "validationRequest") SuggestionsRequestDTO suggestionsRequest,
+                                            @Context SearchUser searchUser) {
 
         final SuggestionRequest req = SuggestionRequest.builder()
                 .field(suggestionsRequest.field())
