@@ -34,9 +34,9 @@ import org.graylog.plugins.views.search.engine.SearchConfig;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.storage.elasticsearch6.views.searchtypes.ESMessageList;
 import org.graylog.storage.elasticsearch6.views.searchtypes.ESSearchTypeHandler;
-import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.Period;
 import org.junit.Test;
 
@@ -47,7 +47,6 @@ import java.util.UUID;
 
 import static com.google.common.collect.ImmutableSet.of;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 
 public class QueryPlanTest {
@@ -65,7 +64,7 @@ public class QueryPlanTest {
                 mock(IndexLookup.class),
                 new QueryStringDecorators.Fake(),
                 (elasticsearchBackend, ssb, job, query, results) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, results, fieldTypesLookup),
-                false);
+                false, new ObjectMapperProvider().get());
         queryEngine = new QueryEngine(backend, Collections.emptySet(), new QueryParser(new QueryStringParser()), () -> new SearchConfig(Period.ZERO));
     }
 

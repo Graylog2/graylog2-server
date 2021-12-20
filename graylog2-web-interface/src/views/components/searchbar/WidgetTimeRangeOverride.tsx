@@ -17,7 +17,7 @@
 import * as React from 'react';
 import styled from 'styled-components';
 
-import { TimeRange } from 'views/logic/queries/Query';
+import type { TimeRange } from 'views/logic/queries/Query';
 import { Button } from 'components/bootstrap';
 import timerangeToString from 'views/logic/queries/TimeRangeToString';
 

@@ -18,10 +18,9 @@ package org.graylog2.periodical;
 
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
-import org.graylog2.plugin.Version;
 import org.graylog2.plugin.periodical.Periodical;
-import org.graylog2.storage.ElasticsearchVersion;
-import org.graylog2.storage.versionprobe.SearchVersion;
+import org.graylog2.storage.DetectedSearchVersion;
+import org.graylog2.storage.SearchVersion;
 import org.graylog2.storage.versionprobe.VersionProbe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +41,7 @@ public class ESVersionCheckPeriodical extends Periodical {
     private final NotificationService notificationService;
 
     @Inject
-    public ESVersionCheckPeriodical(@ElasticsearchVersion SearchVersion elasticsearchVersion,
+    public ESVersionCheckPeriodical(@DetectedSearchVersion SearchVersion elasticsearchVersion,
                                     @Named("elasticsearch_version") @Nullable SearchVersion versionOverride,
                                     @Named("elasticsearch_hosts") List<URI> elasticsearchHosts,
                                     VersionProbe versionProbe,
@@ -65,7 +64,7 @@ public class ESVersionCheckPeriodical extends Periodical {
     }
 
     @Override
-    public boolean masterOnly() {
+    public boolean leaderOnly() {
         return true;
     }
 

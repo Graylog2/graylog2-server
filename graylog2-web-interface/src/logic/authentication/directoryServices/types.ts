@@ -14,9 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { $PropertyType } from 'utility-types';
+import type { $PropertyType } from 'utility-types';
 
-import AuthenticationBackend, { AuthenticationBackendJSON } from 'logic/authentication/AuthenticationBackend';
+import type { AuthenticationBackendJSON } from 'logic/authentication/AuthenticationBackend';
+import type AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
 
 type TransportSecurity = ('tls' | 'start_tls' | 'none');
 type ServerAddress = { host: string, port: number };

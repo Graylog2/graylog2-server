@@ -14,13 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { Set, List } from 'immutable';
+import type { Set, List } from 'immutable';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import View, { ViewType } from 'views/logic/views/View';
-import Widget from 'views/logic/widgets/Widget';
-import { exportSearchMessages, exportSearchTypeMessages, ExportPayload } from 'util/MessagesExportUtils';
-import Query from 'views/logic/queries/Query';
+import type { ViewType } from 'views/logic/views/View';
+import View from 'views/logic/views/View';
+import type Widget from 'views/logic/widgets/Widget';
+import type { ExportPayload } from 'util/MessagesExportUtils';
+import { exportSearchMessages, exportSearchTypeMessages } from 'util/MessagesExportUtils';
+import type Query from 'views/logic/queries/Query';
 import type { SearchType } from 'views/logic/queries/SearchType';
 
 type ExportStrategy = {

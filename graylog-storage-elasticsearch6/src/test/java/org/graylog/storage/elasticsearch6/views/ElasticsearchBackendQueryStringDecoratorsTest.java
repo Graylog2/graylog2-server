@@ -32,6 +32,7 @@ import org.graylog.plugins.views.search.engine.QueryStringDecorator;
 import org.graylog.plugins.views.search.engine.SearchConfig;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.Period;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -61,8 +62,8 @@ class ElasticsearchBackendQueryStringDecoratorsTest {
                 mock(IndexLookup.class),
                 new QueryStringDecorators(decorators),
                 (elasticsearchBackend, ssb, job, query, results) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, results, fieldTypesLookup),
-                true
-        );
+                true,
+                new ObjectMapperProvider().get());
     }
 
     @Test

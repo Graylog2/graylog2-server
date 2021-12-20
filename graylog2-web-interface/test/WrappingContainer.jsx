@@ -24,6 +24,7 @@ import { breakpoints, colors, fonts, utils, spacings } from 'theme';
 import { THEME_MODE_LIGHT } from 'theme/constants';
 import buttonStyles from 'components/bootstrap/styles/buttonStyles';
 import aceEditorStyles from 'components/bootstrap/styles/aceEditorStyles';
+import DefaultQueryClientProvider from 'contexts/DefaultQueryClientProvider';
 
 const WrappingContainer = ({ children }) => {
   const themeColors = colors[THEME_MODE_LIGHT];
@@ -48,11 +49,13 @@ const WrappingContainer = ({ children }) => {
   };
 
   return (
-    <Router history={history}>
-      <ThemeProvider theme={theme}>
-        {children}
-      </ThemeProvider>
-    </Router>
+    <DefaultQueryClientProvider>
+      <Router history={history}>
+        <ThemeProvider theme={theme}>
+          {children}
+        </ThemeProvider>
+      </Router>
+    </DefaultQueryClientProvider>
   );
 };
 

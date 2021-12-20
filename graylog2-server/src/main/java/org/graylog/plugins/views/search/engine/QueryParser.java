@@ -46,7 +46,7 @@ public class QueryParser {
 
     public QueryMetadata parse(Query query) {
         checkArgument(query.query() instanceof ElasticsearchQueryString);
-        final String mainQueryString = ((ElasticsearchQueryString) query.query()).queryString();
+        final String mainQueryString = query.query().queryString();
         final java.util.stream.Stream<String> queryStringStreams = java.util.stream.Stream.concat(
                 java.util.stream.Stream.of(mainQueryString),
                 query.searchTypes().stream().flatMap(this::queryStringsFromSearchType)
@@ -63,7 +63,7 @@ public class QueryParser {
     private java.util.stream.Stream<String> queryStringsFromSearchType(SearchType searchType) {
         return java.util.stream.Stream.concat(
                 searchType.query().filter(query -> query instanceof ElasticsearchQueryString)
-                        .map(query -> ((ElasticsearchQueryString) query).queryString())
+                        .map(query -> query.queryString())
                         .map(java.util.stream.Stream::of)
                         .orElse(java.util.stream.Stream.empty()),
                 queryStringsFromFilter(searchType.filter()).stream()

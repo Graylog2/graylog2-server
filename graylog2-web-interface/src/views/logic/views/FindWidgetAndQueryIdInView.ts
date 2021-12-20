@@ -17,10 +17,10 @@
 import type { QueryId } from 'views/logic/queries/Query';
 import type { WidgetId } from 'views/logic/views/types';
 
-import View from './View';
-import ViewState from './ViewState';
+import type View from './View';
+import type ViewState from './ViewState';
 
-import Widget from '../widgets/Widget';
+import type Widget from '../widgets/Widget';
 
 const FindWidgetAndQueryIdInView = (widgetId: WidgetId, view: View): [Widget, QueryId] | undefined | null => {
   return view.state.reduce((foundWidget: [Widget, QueryId] | undefined | null, state: ViewState, queryId: QueryId): [Widget, QueryId] | undefined | null => {

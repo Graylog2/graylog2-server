@@ -16,14 +16,15 @@
  */
 import uuid from 'uuid/v4';
 
-import AggregationWidgetConfig, { AggregationWidgetConfigBuilder } from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import type { AggregationWidgetConfigBuilder } from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Direction from 'views/logic/aggregationbuilder/Direction';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 
 import SortsConfiguration from './SortsConfiguration';
 
 import type { AggregationElement } from '../AggregationElementType';
-import { WidgetConfigFormValues } from '../WidgetConfigForm';
+import type { WidgetConfigFormValues } from '../WidgetConfigForm';
 
 type SortError = {
   field?: string,

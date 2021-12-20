@@ -396,6 +396,12 @@
                 <groupId>commons-validator</groupId>
                 <artifactId>commons-validator</artifactId>
                 <version>${commons-validator.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>commons-logging</groupId>
+                        <artifactId>commons-logging</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>
@@ -530,6 +536,12 @@
                 <groupId>com.maxmind.geoip2</groupId>
                 <artifactId>geoip2</artifactId>
                 <version>${geoip2.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>commons-logging</groupId>
+                        <artifactId>commons-logging</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.graylog.cef</groupId>
@@ -872,33 +884,6 @@
                                 <goals>
                                     <goal>check</goal>
                                 </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>dependency-check</id>
-
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-enforcer-plugin</artifactId>
-                        <version>3.0.0-M3</version>
-                        <executions>
-                            <execution>
-                                <id>check-dependencies</id>
-                                <goals>
-                                    <goal>enforce</goal>
-                                </goals>
-                                <configuration>
-                                    <rules>
-                                        <banDuplicatePomDependencyVersions/>
-                                        <dependencyConvergence/>
-                                    </rules>
-                                </configuration>
                             </execution>
                         </executions>
                     </plugin>

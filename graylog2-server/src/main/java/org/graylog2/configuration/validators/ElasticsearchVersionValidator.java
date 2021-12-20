@@ -19,12 +19,12 @@ package org.graylog2.configuration.validators;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.Validator;
 import com.google.common.collect.ImmutableList;
-import org.graylog2.storage.versionprobe.SearchVersion;
+import org.graylog2.storage.SearchVersion;
 
 import java.util.List;
 
-import static org.graylog2.storage.versionprobe.SearchVersion.Distribution.ELASTICSEARCH;
-import static org.graylog2.storage.versionprobe.SearchVersion.Distribution.OPENSEARCH;
+import static org.graylog2.storage.SearchVersion.Distribution.ELASTICSEARCH;
+import static org.graylog2.storage.SearchVersion.Distribution.OPENSEARCH;
 
 public class ElasticsearchVersionValidator implements Validator<SearchVersion> {
     private static final List<SearchVersionRange> SUPPORTED_ES_VERSIONS = ImmutableList.of(

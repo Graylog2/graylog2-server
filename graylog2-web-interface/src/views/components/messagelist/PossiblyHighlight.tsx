@@ -17,12 +17,13 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import { last, sortBy } from 'lodash';
-import { withTheme, DefaultTheme } from 'styled-components';
+import type { DefaultTheme } from 'styled-components';
+import { withTheme } from 'styled-components';
 
 import StringUtils from 'util/StringUtils';
 import { DEFAULT_HIGHLIGHT_COLOR } from 'views/Constants';
 import { isFunction } from 'views/logic/aggregationbuilder/Series';
-import HighlightingColor from 'views/logic/views/formatting/highlighting/HighlightingColor';
+import type HighlightingColor from 'views/logic/views/formatting/highlighting/HighlightingColor';
 
 import formatNumber from './FormatNumber';
 import isNumeric from './IsNumeric';

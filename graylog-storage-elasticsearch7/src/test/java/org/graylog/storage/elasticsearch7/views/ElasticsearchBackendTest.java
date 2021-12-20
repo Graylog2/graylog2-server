@@ -31,7 +31,6 @@ import org.graylog.plugins.views.search.engine.SearchConfig;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.storage.elasticsearch7.views.searchtypes.ESMessageList;
 import org.graylog.storage.elasticsearch7.views.searchtypes.ESSearchTypeHandler;
-import org.graylog2.indexer.searches.SearchesClusterConfig;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.joda.time.Period;
 import org.junit.BeforeClass;

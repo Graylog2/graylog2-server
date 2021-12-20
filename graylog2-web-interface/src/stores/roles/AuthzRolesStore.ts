@@ -16,7 +16,7 @@
  */
 import Reflux from 'reflux';
 import * as Immutable from 'immutable';
-import { $PropertyType } from 'utility-types';
+import type { $PropertyType } from 'utility-types';
 
 import type { PaginatedUsersResponse } from 'stores/users/UsersStore';
 import type { Store } from 'stores/StoreTypes';
@@ -27,7 +27,8 @@ import { singletonStore } from 'logic/singleton';
 import PaginationURL from 'util/PaginationURL';
 import Role from 'logic/roles/Role';
 import type { RoleJSON } from 'logic/roles/Role';
-import AuthzRolesActions, { PaginatedRoles, PaginatedUsers, RoleContext } from 'actions/roles/AuthzRolesActions';
+import type { PaginatedRoles, PaginatedUsers, RoleContext } from 'actions/roles/AuthzRolesActions';
+import AuthzRolesActions from 'actions/roles/AuthzRolesActions';
 import UserOverview from 'logic/users/UserOverview';
 import type { PaginatedListJSON, Pagination } from 'stores/PaginationTypes';
 

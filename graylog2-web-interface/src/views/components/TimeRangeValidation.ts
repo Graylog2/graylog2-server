@@ -16,7 +16,7 @@
  */
 import moment from 'moment';
 
-import {
+import type {
   TimeRange,
   NoTimeRangeOverride,
   KeywordTimeRange,

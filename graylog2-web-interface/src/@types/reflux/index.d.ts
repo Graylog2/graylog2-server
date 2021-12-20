@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 declare module 'reflux' {
-  import { RefluxActions, Store } from 'stores/StoreTypes';
+  import type { RefluxActions, Store } from 'stores/StoreTypes';
 
   export interface StoreDefinition {
     listenables?: any[];

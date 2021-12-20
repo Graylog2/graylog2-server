@@ -23,7 +23,7 @@ import { alice } from 'fixtures/users';
 import TimeLocalizeProvider, { ACCEPTED_FORMATS } from 'contexts/TimeLocalizeProvider';
 import TimeLocalizeContext from 'contexts/TimeLocalizeContext';
 import CurrentUserContext from 'contexts/CurrentUserContext';
-import User from 'logic/users/User';
+import type User from 'logic/users/User';
 
 const TestTimestamp = ({ timestamp }: { timestamp: string }) => {
   const { localizeTime } = useContext(TimeLocalizeContext);

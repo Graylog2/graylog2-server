@@ -16,6 +16,8 @@
  */
 package org.junit.jupiter.engine.descriptor;
 
+import org.graylog.testing.containermatrix.MongodbServer;
+import org.graylog2.storage.SearchVersion;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.TestInstances;
 import org.junit.jupiter.engine.config.JupiterConfiguration;
@@ -26,6 +28,8 @@ import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.TestTag;
 import org.junit.platform.engine.support.hierarchical.ThrowableCollector;
 
+import javax.annotation.Nullable;
+import java.net.URL;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
@@ -37,10 +41,11 @@ import static java.util.Collections.emptyList;
 public class ContainerMatrixTestClassDescriptor extends ClassBasedTestDescriptor {
     public static final String SEGMENT_TYPE = "class";
 
-    private final String esVersion;
-    private final String mongoVersion;
+    private final SearchVersion esVersion;
+    private final MongodbServer mongoVersion;
+    private final List<URL> mongoFixtures;
 
-    public ContainerMatrixTestClassDescriptor(TestDescriptor parent, Class<?> testClass, JupiterConfiguration configuration, String esVersion, String mongoVersion) {
+    public ContainerMatrixTestClassDescriptor(TestDescriptor parent, Class<?> testClass, JupiterConfiguration configuration, @Nullable SearchVersion esVersion, @Nullable MongodbServer mongoVersion, List<URL> mongoFixtures) {
         super(
                 parent.getUniqueId().append(SEGMENT_TYPE, testClass.getName() + "_" + esVersion + "_" + mongoVersion),
                 testClass,
@@ -49,11 +54,18 @@ public class ContainerMatrixTestClassDescriptor extends ClassBasedTestDescriptor
         );
         this.esVersion = esVersion;
         this.mongoVersion = mongoVersion;
+        this.mongoFixtures = mongoFixtures;
         setParent(parent);
     }
 
-    private static Supplier<String> determineDisplayName(Class testClass, String esVersion, String mongoVersion) {
-        return () -> SEGMENT_TYPE + " " + testClass.getSimpleName().replaceAll("_", " ") + " Elasticsearch " + esVersion + ", MongoDB " + mongoVersion;
+    public ContainerMatrixTestClassDescriptor(TestDescriptor parent, Class<?> testClass, JupiterConfiguration configuration, List<URL> mongoFixtures) {
+        this(parent, testClass, configuration, null, null, mongoFixtures);
+    }
+
+    private static Supplier<String> determineDisplayName(Class<?> testClass, @Nullable SearchVersion esVersion, @Nullable MongodbServer mongodbServer) {
+        final String searchVersionName = Optional.ofNullable(esVersion).map(SearchVersion::toString).orElse("UNKNOWN");
+        final String mongodbVersionName = Optional.ofNullable(mongodbServer).map(MongodbServer::getVersion).orElse("UNKNOWN");
+        return () -> SEGMENT_TYPE + " " + testClass.getSimpleName().replaceAll("_", " ") + " Search " + searchVersionName + ", MongoDB " + mongodbVersionName;
     }
 
     // --- TestDescriptor ------------------------------------------------------
@@ -83,11 +95,15 @@ public class ContainerMatrixTestClassDescriptor extends ClassBasedTestDescriptor
         return super.prepare(context);
     }
 
-    public String getEsVersion() {
+    public SearchVersion getEsVersion() {
         return esVersion;
     }
 
-    public String getMongoVersion() {
+    public MongodbServer getMongoVersion() {
         return mongoVersion;
+    }
+
+    public List<URL> getMongoFixtures() {
+        return mongoFixtures;
     }
 }

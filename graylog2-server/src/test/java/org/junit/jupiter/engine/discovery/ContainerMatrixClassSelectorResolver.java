@@ -16,7 +16,11 @@
  */
 package org.junit.jupiter.engine.discovery;
 
+import org.graylog.testing.completebackend.Lifecycle;
+import org.graylog.testing.containermatrix.ContainerMatrixTestEngine;
+import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.containermatrix.discovery.IsContainerMatrixTestClass;
+import org.graylog2.storage.SearchVersion;
 import org.junit.jupiter.engine.config.JupiterConfiguration;
 import org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor;
 import org.junit.jupiter.engine.descriptor.ContainerMatrixTestClassDescriptor;
@@ -133,19 +137,20 @@ public class ContainerMatrixClassSelectorResolver implements SelectorResolver {
 
     private ClassBasedTestDescriptor newClassTestDescriptor(TestDescriptor parent, Class<?> testClass) {
         Optional<ContainerMatrixTestsDescriptor> containerMatrixTestsDescriptor = findContainerMatrixTestsDescriptor(parent);
+
         if (containerMatrixTestsDescriptor.isPresent()) {
-            final String esVersion = containerMatrixTestsDescriptor.get().getEsVersion();
-            final String mongoVersion = containerMatrixTestsDescriptor.get().getMongoVersion();
+            final SearchVersion esVersion = containerMatrixTestsDescriptor.get().getEsVersion();
+            final MongodbServer mongoVersion = containerMatrixTestsDescriptor.get().getMongoVersion();
 
             return new ContainerMatrixTestClassDescriptor(
                     parent,
                     testClass,
-                    configuration, esVersion, mongoVersion);
+                    configuration, esVersion, mongoVersion, ContainerMatrixTestEngine.getMongoDBFixtures(Lifecycle.CLASS, testClass));
         } else {
             return new ContainerMatrixTestClassDescriptor(
                     parent,
                     testClass,
-                    configuration, "UNKNOWN", "UNKNOWN");
+                    configuration, ContainerMatrixTestEngine.getMongoDBFixtures(Lifecycle.CLASS, testClass));
 
         }
     }

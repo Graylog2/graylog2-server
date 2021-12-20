@@ -19,7 +19,7 @@ package org.graylog2.plugin;
 import com.google.inject.TypeLiteral;
 import com.google.inject.binder.LinkedBindingBuilder;
 import com.google.inject.multibindings.MapBinder;
-import org.graylog2.storage.versionprobe.SearchVersion;
+import org.graylog2.storage.SearchVersion;
 
 public abstract class VersionAwareModule extends PluginModule {
     protected  <T> LinkedBindingBuilder<T> bindForVersion(SearchVersion supportedVersion, Class<T> interfaceClass) {

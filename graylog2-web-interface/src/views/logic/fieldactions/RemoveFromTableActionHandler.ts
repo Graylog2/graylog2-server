@@ -16,7 +16,7 @@
  */
 import { WidgetActions } from 'views/stores/WidgetStore';
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
-import Widget from 'views/logic/widgets/Widget';
+import type Widget from 'views/logic/widgets/Widget';
 
 import type { FieldActionHandlerCondition, FieldActionHandler } from './FieldActionHandler';
 

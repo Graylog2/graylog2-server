@@ -17,7 +17,7 @@
 package org.graylog2.configuration.validators;
 
 import com.google.auto.value.AutoValue;
-import org.graylog2.storage.versionprobe.SearchVersion;
+import org.graylog2.storage.SearchVersion;
 
 @AutoValue
 public abstract class SearchVersionRange {

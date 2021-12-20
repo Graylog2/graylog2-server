@@ -16,7 +16,8 @@
  */
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import styled, { css, DefaultTheme } from 'styled-components';
+import type { DefaultTheme } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { Dropdown } from 'components/bootstrap';
 

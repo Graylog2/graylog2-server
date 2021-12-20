@@ -82,8 +82,7 @@ public class ElasticsearchBackendErrorHandlingTest {
                 indexLookup,
                 new QueryStringDecorators(Collections.emptySet()),
                 (elasticsearchBackend, ssb, job, query, results) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, results, fieldTypesLookup),
-                false
-        );
+                false);
         when(indexLookup.indexNamesForStreamsInTimeRange(any(), any())).thenReturn(Collections.emptySet());
 
         final SearchType searchType1 = mock(SearchType.class);

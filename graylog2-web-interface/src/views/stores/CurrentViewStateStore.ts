@@ -19,17 +19,17 @@ import * as Immutable from 'immutable';
 import { isEqual } from 'lodash';
 
 import type { RefluxActions, Store } from 'stores/StoreTypes';
-import FormattingSettings from 'views/logic/views/formatting/FormattingSettings';
-import Widget from 'views/logic/widgets/Widget';
+import type FormattingSettings from 'views/logic/views/formatting/FormattingSettings';
+import type Widget from 'views/logic/widgets/Widget';
 import { singletonActions, singletonStore } from 'logic/singleton';
 import GenerateNextPosition from 'views/logic/views/GenerateNextPosition';
-import WidgetPosition from 'views/logic/widgets/WidgetPosition';
+import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
 
 import { ViewStore } from './ViewStore';
 import { ViewStatesActions, ViewStatesStore } from './ViewStatesStore';
 import type { TitleType } from './TitleTypes';
 
-import ViewState from '../logic/views/ViewState';
+import type ViewState from '../logic/views/ViewState';
 
 type CurrentViewStateActionsType = RefluxActions<{
   fields: (fields: Immutable.Set<string>) => Promise<unknown>,

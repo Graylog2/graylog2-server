@@ -23,7 +23,9 @@ import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewLike;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.security.RestPermissions;
+import org.joda.time.DateTimeZone;
 
+import java.util.Optional;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
@@ -36,6 +38,10 @@ public class SearchUser implements SearchPermissions, StreamPermissions, ViewPer
         this.currentUser = currentUser;
         this.isPermitted = isPermitted;
         this.isPermittedEntity = isPermittedEntity;
+    }
+
+    public Optional<DateTimeZone> timeZone() {
+        return Optional.ofNullable(this.currentUser.getTimeZone());
     }
 
     public String username() {

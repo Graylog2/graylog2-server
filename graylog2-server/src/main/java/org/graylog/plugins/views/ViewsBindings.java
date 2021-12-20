@@ -31,6 +31,7 @@ import org.graylog.plugins.views.migrations.V20200204122000_MigrateUntypedViewsT
 import org.graylog.plugins.views.migrations.V20200409083200_RemoveRootQueriesFromMigratedDashboards;
 import org.graylog.plugins.views.migrations.V20200730000000_AddGl2MessageIdFieldAliasForEvents;
 import org.graylog.plugins.views.providers.ExportBackendProvider;
+import org.graylog.plugins.views.providers.QuerySuggestionsProvider;
 import org.graylog.plugins.views.search.SearchRequirements;
 import org.graylog.plugins.views.search.SearchRequiresParameterSupport;
 import org.graylog.plugins.views.search.ValueParameter;
@@ -38,6 +39,7 @@ import org.graylog.plugins.views.search.db.InMemorySearchJobService;
 import org.graylog.plugins.views.search.db.SearchJobService;
 import org.graylog.plugins.views.search.db.SearchesCleanUpJob;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
+import org.graylog.plugins.views.search.engine.QuerySuggestionsService;
 import org.graylog.plugins.views.search.engine.SearchConfig;
 import org.graylog.plugins.views.search.engine.SearchConfigProvider;
 import org.graylog.plugins.views.search.export.ChunkDecorator;
@@ -57,9 +59,11 @@ import org.graylog.plugins.views.search.rest.MessageExportFormatFilter;
 import org.graylog.plugins.views.search.rest.MessagesResource;
 import org.graylog.plugins.views.search.rest.PivotSeriesFunctionsResource;
 import org.graylog.plugins.views.search.rest.QualifyingViewsResource;
+import org.graylog.plugins.views.search.rest.QueryValidationResource;
 import org.graylog.plugins.views.search.rest.SavedSearchesResource;
 import org.graylog.plugins.views.search.rest.SearchMetadataResource;
 import org.graylog.plugins.views.search.rest.SearchResource;
+import org.graylog.plugins.views.search.rest.SuggestionsResource;
 import org.graylog.plugins.views.search.rest.ViewsResource;
 import org.graylog.plugins.views.search.rest.ViewsRestPermissions;
 import org.graylog.plugins.views.search.rest.contexts.SearchUserBinder;
@@ -86,6 +90,8 @@ import org.graylog.plugins.views.search.searchtypes.pivot.series.StdDev;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Sum;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.SumOfSquares;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Variance;
+import org.graylog.plugins.views.search.validation.QueryValidationService;
+import org.graylog.plugins.views.search.validation.QueryValidationServiceImpl;
 import org.graylog.plugins.views.search.views.RequiresParameterSupport;
 import org.graylog.plugins.views.search.views.ViewRequirements;
 import org.graylog.plugins.views.search.views.widgets.aggregation.AggregationConfigDTO;
@@ -102,6 +108,8 @@ import org.graylog.plugins.views.search.views.widgets.aggregation.WorldMapVisual
 import org.graylog.plugins.views.search.views.widgets.aggregation.sort.PivotSortConfig;
 import org.graylog.plugins.views.search.views.widgets.aggregation.sort.SeriesSortConfig;
 import org.graylog.plugins.views.search.views.widgets.messagelist.MessageListConfigDTO;
+import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
+import org.graylog2.indexer.fieldtypes.MappedFieldTypesServiceImpl;
 import org.graylog2.plugin.PluginConfigBean;
 import org.graylog2.rest.MoreMediaTypes;
 
@@ -127,6 +135,8 @@ public class ViewsBindings extends ViewsModule {
         addSystemRestResource(SearchResource.class);
         addSystemRestResource(SearchMetadataResource.class);
         addSystemRestResource(ViewsResource.class);
+        addSystemRestResource(SuggestionsResource.class);
+         addSystemRestResource(QueryValidationResource.class);
 
         addPermissions(ViewsRestPermissions.class);
 
@@ -168,6 +178,8 @@ public class ViewsBindings extends ViewsModule {
         registerJacksonSubtype(AutoIntervalDTO.class);
 
         bind(SearchJobService.class).to(InMemorySearchJobService.class).in(Scopes.SINGLETON);
+        bind(MappedFieldTypesService.class).to(MappedFieldTypesServiceImpl.class).in(Scopes.SINGLETON);
+        bind(QueryValidationService.class).to(QueryValidationServiceImpl.class).in(Scopes.SINGLETON);
         bind(ChunkDecorator.class).to(LegacyChunkDecorator.class);
         bind(MessagesExporter.class).to(DecoratingMessagesExporter.class);
 
@@ -212,6 +224,8 @@ public class ViewsBindings extends ViewsModule {
         jerseyAdditionalComponentsBinder().addBinding().toInstance(SearchUserBinder.class);
 
         bind(SearchConfig.class).toProvider(SearchConfigProvider.class);
+
+        binder().bind(QuerySuggestionsService.class).toProvider(QuerySuggestionsProvider.class);
     }
 
     private void registerExportBackendProvider() {

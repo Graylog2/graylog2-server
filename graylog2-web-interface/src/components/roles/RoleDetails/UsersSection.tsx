@@ -20,7 +20,7 @@ import { useState, useCallback } from 'react';
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import { PaginatedItemOverview } from 'components/common';
 import SectionComponent from 'components/common/Section/SectionComponent';
-import Role from 'logic/roles/Role';
+import type Role from 'logic/roles/Role';
 
 type Props = {
   role: Role,

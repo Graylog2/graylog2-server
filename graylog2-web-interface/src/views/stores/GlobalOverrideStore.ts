@@ -16,7 +16,7 @@
  */
 import Reflux from 'reflux';
 
-import SearchExecutionState from 'views/logic/search/SearchExecutionState';
+import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
 import { singletonActions, singletonStore } from 'logic/singleton';
 import type { ElasticsearchQueryString, TimeRange } from 'views/logic/queries/Query';

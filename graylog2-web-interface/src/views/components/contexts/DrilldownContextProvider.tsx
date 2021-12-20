@@ -18,12 +18,13 @@ import * as React from 'react';
 import { useContext } from 'react';
 
 import connect from 'stores/connect';
-import Widget from 'views/logic/widgets/Widget';
+import type Widget from 'views/logic/widgets/Widget';
 import View from 'views/logic/views/View';
-import Query, { createElasticsearchQueryString, filtersToStreamSet } from 'views/logic/queries/Query';
+import type Query from 'views/logic/queries/Query';
+import { createElasticsearchQueryString, filtersToStreamSet } from 'views/logic/queries/Query';
 import { CurrentQueryStore } from 'views/stores/CurrentQueryStore';
 import { GlobalOverrideStore } from 'views/stores/GlobalOverrideStore';
-import GlobalOverride from 'views/logic/search/GlobalOverride';
+import type GlobalOverride from 'views/logic/search/GlobalOverride';
 
 import DrilldownContext from './DrilldownContext';
 import ViewTypeContext from './ViewTypeContext';

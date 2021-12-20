@@ -20,6 +20,7 @@ import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.binder.LinkedBindingBuilder;
 import org.graylog.events.search.MoreSearchAdapter;
 import org.graylog.plugins.views.migrations.V20200730000000_AddGl2MessageIdFieldAliasForEvents;
+import org.graylog.plugins.views.search.engine.QuerySuggestionsService;
 import org.graylog.shaded.elasticsearch7.org.apache.http.client.CredentialsProvider;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestHighLevelClient;
 import org.graylog.storage.elasticsearch7.client.ESCredentialsProvider;
@@ -35,11 +36,11 @@ import org.graylog2.indexer.messages.MessagesAdapter;
 import org.graylog2.indexer.searches.SearchesAdapter;
 import org.graylog2.migrations.V20170607164210_MigrateReopenedIndicesToAliases;
 import org.graylog2.plugin.VersionAwareModule;
-import org.graylog2.storage.versionprobe.SearchVersion;
+import org.graylog2.storage.SearchVersion;
 
 public class Elasticsearch7Module extends VersionAwareModule {
 
-    private SearchVersion supportedVersion;
+    private final SearchVersion supportedVersion;
 
     public Elasticsearch7Module(final SearchVersion supportedVersion) {
         this.supportedVersion = supportedVersion;
@@ -60,6 +61,8 @@ public class Elasticsearch7Module extends VersionAwareModule {
                 .to(V20170607164210_MigrateReopenedIndicesToAliasesClusterStateES7.class);
         bindForSupportedVersion(V20200730000000_AddGl2MessageIdFieldAliasForEvents.ElasticsearchAdapter.class)
                 .to(V20200730000000_AddGl2MessageIdFieldAliasForEventsES7.class);
+
+        bindForSupportedVersion(QuerySuggestionsService.class).to(QuerySuggestionsES7.class);
 
         install(new FactoryModuleBuilder().build(ScrollResultES7.Factory.class));
 

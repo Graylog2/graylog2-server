@@ -29,11 +29,14 @@ import { SearchActions } from 'views/stores/SearchStore';
 import { RefreshActions } from 'views/stores/RefreshStore';
 import * as messageList from 'views/components/messagelist';
 import { InputsActions, InputsStore } from 'stores/inputs/InputsStore';
-import { SearchExecutionResult } from 'views/actions/SearchActions';
-import { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
+import type { SearchExecutionResult } from 'views/actions/SearchActions';
+import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
+import CancellablePromise from 'logic/rest/CancellablePromise';
 
-import MessageList, { MessageListResult } from './MessageList';
-import RenderCompletionCallback, { TRenderCompletionCallback } from './RenderCompletionCallback';
+import type { MessageListResult } from './MessageList';
+import MessageList from './MessageList';
+import type { TRenderCompletionCallback } from './RenderCompletionCallback';
+import RenderCompletionCallback from './RenderCompletionCallback';
 
 const MessageTableEntry = () => (
   <AdditionalContext.Consumer>
@@ -69,6 +72,8 @@ jest.mock('views/stores/SearchConfigStore', () => ({
   SearchConfigStore: MockStore('listSearchesClusterConfig', 'configurations', 'listen'),
 }));
 
+const mockReexecuteResult = CancellablePromise.of(Promise.resolve({ result: { errors: [] } }));
+
 jest.mock('views/stores/SearchStore', () => ({
   SearchStore: MockStore(
     'listen',
@@ -87,7 +92,7 @@ jest.mock('views/stores/SearchStore', () => ({
     })],
   ),
   SearchActions: {
-    reexecuteSearchTypes: jest.fn().mockReturnValue(Promise.resolve({ result: { errors: [] } })),
+    reexecuteSearchTypes: jest.fn(() => mockReexecuteResult),
     execute: { completed: { listen: jest.fn() } },
   },
 }));
@@ -239,9 +244,9 @@ describe('MessageList', () => {
   });
 
   it('displays error description, when using pagination throws an error', async () => {
-    asMock(SearchActions.reexecuteSearchTypes).mockReturnValue(Promise.resolve({
+    asMock(SearchActions.reexecuteSearchTypes).mockReturnValue(CancellablePromise.of(Promise.resolve({
       result: { errors: [{ description: 'Error description' }] },
-    } as SearchExecutionResult));
+    } as SearchExecutionResult)));
 
     const config = MessagesWidgetConfig.builder().fields([]).build();
     const secondPageSize = 10;

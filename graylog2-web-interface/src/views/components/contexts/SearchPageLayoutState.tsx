@@ -14,10 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import type * as React from 'react';
 import { useContext, useState } from 'react';
 
-import View, { ViewType } from 'views/logic/views/View';
+import type { ViewType } from 'views/logic/views/View';
+import View from 'views/logic/views/View';
 import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 import UserPreferencesContext from 'contexts/UserPreferencesContext';
 import CurrentUserContext from 'contexts/CurrentUserContext';

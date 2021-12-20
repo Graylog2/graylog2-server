@@ -23,7 +23,7 @@ import PaginationURL from 'util/PaginationURL';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
-import { Pagination, PaginatedListJSON, ListPagination } from 'stores/PaginationTypes';
+import type { Pagination, PaginatedListJSON, ListPagination } from 'stores/PaginationTypes';
 
 export type RuleType = {
   id?: string,

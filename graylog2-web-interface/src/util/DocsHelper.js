@@ -43,7 +43,7 @@ class DocsHelper {
     PIPELINES: 'pipelines',
     REPORTING: 'reporting',
     ROLLING_ES_UPGRADE: 'rolling-es-upgrade',
-    SEARCH_QUERY_LANGUAGE: 'queries',
+    SEARCH_QUERY_LANGUAGE: 'query-language',
     STREAMS: 'streams',
     STREAM_PROCESSING_RUNTIME_LIMITS: 'streams#stream-processing-runtime-limits',
     TIME_FRAME_SELECTOR: 'time-frame-selector',

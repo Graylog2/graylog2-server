@@ -92,19 +92,23 @@ const webpackConfig = {
   },
   output: {
     path: BUILD_PATH,
-    filename: '[name].[hash].js',
+    filename: '[name].[chunkhash].js',
   },
   module: {
     rules: [
       { test: /\.[jt]s(x)?$/, use: BABELLOADER, exclude: /node_modules|\.node_cache/ },
-      { test: /\.(svg)(\?.+)?$/, loader: 'file-loader' },
+      {
+        test: /\.(svg)(\?.+)?$/,
+        type: 'asset/resource',
+      },
       {
         test: /\.(woff(2)?|ttf|eot)(\?.+)?$/,
-        use: [{
-          loader: 'file-loader', options: { esModule: false },
-        }],
+        type: 'asset/resource',
       },
-      { test: /\.(png|gif|jpg)(\?.+)?$/, use: 'url-loader' },
+      {
+        test: /\.(png|gif|jpg)(\?.+)?$/,
+        type: 'asset',
+      },
       {
         test: /bootstrap\.less$/,
         use: [
@@ -173,11 +177,14 @@ const webpackConfig = {
       theme: path.resolve(APP_PATH, 'theme'),
     },
   },
-  resolveLoader: { modules: [path.join(ROOT_PATH, 'node_modules')], moduleExtensions: ['-loader'] },
+  resolveLoader: { modules: [path.join(ROOT_PATH, 'node_modules')] },
   devtool: 'source-map',
   plugins: [
+    new webpack.ProvidePlugin({
+      Buffer: ['buffer', 'Buffer'],
+    }),
     new UniqueChunkIdPlugin(),
-    new webpack.HashedModuleIdsPlugin({
+    new webpack.ids.HashedModuleIdsPlugin({
       hashFunction: 'sha256',
       hashDigestLength: 8,
     }),
@@ -188,7 +195,9 @@ const webpackConfig = {
       filename: 'index.html',
       inject: false,
       template: path.resolve(ROOT_PATH, 'templates/index.html.template'),
-      vendorModule: () => JSON.parse(fs.readFileSync(path.resolve(BUILD_PATH, 'vendor-module.json'), 'utf8')),
+      templateParameters: {
+        vendorModule: () => JSON.parse(fs.readFileSync(path.resolve(BUILD_PATH, 'vendor-module.json'), 'utf8')),
+      },
       chunksSortMode,
     }),
     new HtmlWebpackPlugin({
@@ -237,8 +246,8 @@ if (TARGET.startsWith('build')) {
   module.exports = merge(webpackConfig, {
     mode: 'production',
     optimization: {
+      moduleIds: 'deterministic',
       minimizer: [new TerserPlugin({
-        sourceMap: true,
         terserOptions: {
           compress: {
             warnings: false,

@@ -20,15 +20,13 @@ import React from 'react';
 import { DecoratorsActions, DecoratorsStore } from 'stores/decorators/DecoratorsStore';
 import connect from 'stores/connect';
 import { Spinner } from 'components/common';
-import { Decorator } from 'views/logic/widgets/MessagesWidgetConfig';
-import { Store } from 'stores/StoreTypes';
+import type { Decorator } from 'views/logic/widgets/MessagesWidgetConfig';
+import type { Store } from 'stores/StoreTypes';
 
 import AddDecoratorButton from './AddDecoratorButton';
 import DecoratorSummary from './DecoratorSummary';
 import DecoratorList from './DecoratorList';
-
-// eslint-disable-next-line import/no-webpack-loader-syntax
-import DecoratorStyles from '!style!css!./decoratorStyles.css';
+import DecoratorStyles from './decoratorStyles.css';
 
 type Props = {
   decorators: Array<Decorator>,
@@ -49,7 +47,10 @@ class DecoratorSidebar extends React.Component<Props> {
 
   _formatDecorator = (decorator: Decorator) => {
     const { decorators, decoratorTypes, onChange } = this.props;
-    const typeDefinition = decoratorTypes[decorator.type] || { requested_configuration: {}, name: `Unknown type: ${decorator.type}` };
+    const typeDefinition = decoratorTypes[decorator.type] || {
+      requested_configuration: {},
+      name: `Unknown type: ${decorator.type}`,
+    };
     const deleteDecorator = (decoratorId) => onChange(decorators.filter((_decorator) => _decorator.id !== decoratorId));
     const updateDecorator = (id, updatedDecorator) => onChange(decorators.map((_decorator) => (_decorator.id === id ? updatedDecorator : _decorator)));
 

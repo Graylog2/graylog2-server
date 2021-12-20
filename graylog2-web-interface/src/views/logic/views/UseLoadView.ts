@@ -16,7 +16,7 @@
  */
 import { useEffect, useState } from 'react';
 
-import View from './View';
+import type View from './View';
 import { processHooks } from './ViewLoader';
 
 import usePluginEntities from '../usePluginEntities';

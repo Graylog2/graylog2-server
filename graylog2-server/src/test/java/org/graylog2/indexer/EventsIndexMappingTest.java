@@ -21,7 +21,7 @@ import com.github.zafarkhaja.semver.Version;
 import com.revinate.assertj.json.JsonPathAssert;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.graylog2.storage.versionprobe.SearchVersion;
+import org.graylog2.storage.SearchVersion;
 import org.graylog2.utilities.AssertJsonPath;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;

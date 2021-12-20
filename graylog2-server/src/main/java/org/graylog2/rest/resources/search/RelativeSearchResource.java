@@ -24,11 +24,15 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.glassfish.jersey.server.ChunkedOutput;
+import org.graylog.plugins.views.search.Search;
+import org.graylog.plugins.views.search.SearchJob;
+import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog.plugins.views.search.rest.ExecutionState;
+import org.graylog.plugins.views.search.rest.SearchExecutor;
+import org.graylog.plugins.views.search.searchtypes.Sort;
 import org.graylog2.decorators.DecoratorProcessor;
 import org.graylog2.indexer.results.ScrollResult;
 import org.graylog2.indexer.searches.Searches;
-import org.graylog2.indexer.searches.SearchesConfig;
-import org.graylog2.indexer.searches.Sorting;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
@@ -48,6 +52,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
@@ -63,8 +68,9 @@ public class RelativeSearchResource extends SearchResource {
     @Inject
     public RelativeSearchResource(Searches searches,
                                   ClusterConfigService clusterConfigService,
-                                  DecoratorProcessor decoratorProcessor) {
-        super(searches, clusterConfigService, decoratorProcessor);
+                                  DecoratorProcessor decoratorProcessor,
+                                  SearchExecutor searchExecutor) {
+        super(searches, clusterConfigService, decoratorProcessor, searchExecutor);
     }
 
     @GET
@@ -81,31 +87,21 @@ public class RelativeSearchResource extends SearchResource {
             @QueryParam("query") @NotEmpty String query,
             @ApiParam(name = "range", value = "Relative timeframe to search in. See method description.", required = true)
             @QueryParam("range") @PositiveOrZero int range,
-            @ApiParam(name = "limit", value = "Maximum number of messages to return.", required = false) @QueryParam("limit") int limit,
-            @ApiParam(name = "offset", value = "Offset", required = false) @QueryParam("offset") int offset,
-            @ApiParam(name = "filter", value = "Filter", required = false) @QueryParam("filter") String filter,
-            @ApiParam(name = "fields", value = "Comma separated list of fields to return", required = false) @QueryParam("fields") String fields,
-            @ApiParam(name = "sort", value = "Sorting (field:asc / field:desc)", required = false) @QueryParam("sort") String sort,
-            @ApiParam(name = "decorate", value = "Run decorators on search result", required = false) @QueryParam("decorate") @DefaultValue("true") boolean decorate) {
+            @ApiParam(name = "limit", value = "Maximum number of messages to return.") @QueryParam("limit") int limit,
+            @ApiParam(name = "offset", value = "Offset") @QueryParam("offset") int offset,
+            @ApiParam(name = "filter", value = "Filter") @QueryParam("filter") String filter,
+            @ApiParam(name = "fields", value = "Comma separated list of fields to return") @QueryParam("fields") String fields,
+            @ApiParam(name = "sort", value = "Sorting (field:asc / field:desc)") @QueryParam("sort") String sort,
+            @ApiParam(name = "decorate", value = "Run decorators on search result") @QueryParam("decorate") @DefaultValue("true") boolean decorate,
+            @Context SearchUser searchUser) {
         checkSearchPermission(filter, RestPermissions.SEARCHES_RELATIVE);
 
         final List<String> fieldList = parseOptionalFields(fields);
-        final Sorting sorting = buildSorting(sort);
+        final Sort sorting = buildSortOrder(sort);
 
         final TimeRange timeRange = buildRelativeTimeRange(range);
-        final SearchesConfig searchesConfig = SearchesConfig.builder()
-                .query(query)
-                .filter(filter)
-                .fields(fieldList)
-                .range(timeRange)
-                .limit(limit)
-                .offset(offset)
-                .sorting(sorting)
-                .build();
 
-        final Optional<String> streamId = Searches.extractStreamId(filter);
-
-        return buildSearchResponse(searches.search(searchesConfig), timeRange, decorate, streamId);
+        return search(query, limit, filter, decorate, searchUser, fieldList, sorting, timeRange);
     }
 
     @GET

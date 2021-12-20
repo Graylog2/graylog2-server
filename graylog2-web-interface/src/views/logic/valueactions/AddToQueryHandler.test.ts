@@ -22,9 +22,10 @@ import { QueriesActions, QueriesStore } from 'views/stores/QueriesStore';
 import { ViewStore } from 'views/stores/ViewStore';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import Query from 'views/logic/queries/Query';
-import { GlobalOverrideActions, GlobalOverrideStore, GlobalOverrideStoreState } from 'views/stores/GlobalOverrideStore';
+import type { GlobalOverrideStoreState } from 'views/stores/GlobalOverrideStore';
+import { GlobalOverrideActions, GlobalOverrideStore } from 'views/stores/GlobalOverrideStore';
 import SearchActions from 'views/actions/SearchActions';
-import { QueriesList } from 'views/actions/QueriesActions';
+import type { QueriesList } from 'views/actions/QueriesActions';
 
 import AddToQueryHandler from './AddToQueryHandler';
 

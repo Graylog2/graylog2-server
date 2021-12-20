@@ -17,9 +17,9 @@
 import * as React from 'react';
 import { useCallback, useContext } from 'react';
 import PropTypes from 'prop-types';
-import * as Immutable from 'immutable';
+import type * as Immutable from 'immutable';
 import * as ImmutablePropTypes from 'react-immutable-proptypes';
-import { OrderedSet } from 'immutable';
+import type { OrderedSet } from 'immutable';
 
 import connect from 'stores/connect';
 import { TitlesActions } from 'views/stores/TitlesStore';
@@ -28,9 +28,10 @@ import NewQueryActionHandler from 'views/logic/NewQueryActionHandler';
 import { QueriesActions } from 'views/stores/QueriesStore';
 import { QueryIdsStore } from 'views/stores/QueryIdsStore';
 import { QueryTitlesStore } from 'views/stores/QueryTitlesStore';
-import { ViewMetaData, ViewMetadataStore } from 'views/stores/ViewMetadataStore';
+import type { ViewMetaData } from 'views/stores/ViewMetadataStore';
+import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import { ViewStatesActions } from 'views/stores/ViewStatesStore';
-import { QueryId } from 'views/logic/queries/Query';
+import type { QueryId } from 'views/logic/queries/Query';
 import DashboardPageContext from 'views/components/contexts/DashboardPageContext';
 
 import QueryTabs from './QueryTabs';

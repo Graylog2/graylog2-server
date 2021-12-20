@@ -15,16 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { act, render, screen, waitFor } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import MockStore from 'helpers/mocking/StoreMock';
 import { GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
 import { SearchActions } from 'views/stores/SearchStore';
-import WidgetFocusContext, {
+import type {
   WidgetEditingState,
   WidgetFocusingState,
 } from 'views/components/contexts/WidgetFocusContext';
+import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 
 import DashboardSearchBar from './DashboardSearchBar';
 
@@ -38,6 +39,7 @@ jest.mock('views/stores/GlobalOverrideStore', () => ({
 }));
 
 jest.mock('views/stores/SearchStore', () => ({
+  SearchStore: MockStore(['getInitialState', () => ({ search: { parameters: [] } })]),
   SearchActions: {
     refresh: jest.fn(),
   },
@@ -50,7 +52,8 @@ jest.mock('views/stores/SearchConfigStore', () => ({
   },
 }));
 
-jest.mock('views/components/searchbar/AsyncQueryInput', () => () => null);
+jest.mock('views/components/searchbar/queryvalidation/validateQuery', () => () => Promise.resolve({ status: 'OK', explanations: [] }));
+jest.mock('views/logic/debounceWithPromise', () => (fn: any) => fn);
 
 const config = {
   analysis_disabled_fields: ['full_message', 'message'],
@@ -81,7 +84,9 @@ describe('DashboardSearchBar', () => {
   it('should refresh search when button is clicked', async () => {
     render(<DashboardSearchBar onExecute={onExecute} config={config} />);
 
-    const searchButton = screen.getByTitle('Perform search');
+    const searchButton = await screen.findByTitle('Perform search');
+
+    await waitFor(() => expect(searchButton.classList).not.toContain('disabled'));
 
     userEvent.click(searchButton);
 
@@ -93,14 +98,13 @@ describe('DashboardSearchBar', () => {
 
     const timeRangeInput = await screen.findByText(/no override/i);
 
-    act(() => {
-      userEvent.click(timeRangeInput);
-    });
-
+    userEvent.click(timeRangeInput);
     userEvent.click(await screen.findByRole('tab', { name: 'Relative' }));
     userEvent.click(await screen.findByRole('button', { name: 'Apply' }));
 
     const searchButton = await screen.findByTitle('Perform search (changes were made after last search execution)');
+
+    await waitFor(() => expect(searchButton.classList).not.toContain('disabled'));
 
     userEvent.click(searchButton);
 

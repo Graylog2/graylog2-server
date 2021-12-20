@@ -28,4 +28,6 @@ public interface BackendQuery {
     String TYPE_FIELD = "type";
 
     String type();
+
+    String queryString();
 }

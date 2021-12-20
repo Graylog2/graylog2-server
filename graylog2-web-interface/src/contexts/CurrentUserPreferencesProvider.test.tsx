@@ -20,9 +20,10 @@ import { render } from 'wrappedTestingLibrary';
 import asMock from 'helpers/mocking/AsMock';
 import { MockStore } from 'helpers/mocking';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
-import { UserJSON } from 'logic/users/User';
+import type { UserJSON } from 'logic/users/User';
 
-import UserPreferencesContext, { defaultUserPreferences, UserPreferences } from './UserPreferencesContext';
+import type { UserPreferences } from './UserPreferencesContext';
+import UserPreferencesContext, { defaultUserPreferences } from './UserPreferencesContext';
 import CurrentUserProvider from './CurrentUserProvider';
 import CurrentUserPreferencesProvider from './CurrentUserPreferencesProvider';
 

@@ -19,6 +19,7 @@ package org.graylog2.commands;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 import com.google.common.collect.ImmutableList;
+import com.google.common.util.concurrent.Service;
 import com.google.common.util.concurrent.ServiceManager;
 import com.google.inject.Injector;
 import com.google.inject.Module;
@@ -51,6 +52,7 @@ import org.graylog2.bindings.ElasticsearchModule;
 import org.graylog2.bindings.InitializerBindings;
 import org.graylog2.bindings.MessageFilterBindings;
 import org.graylog2.bindings.MessageOutputBindings;
+import org.graylog2.bindings.MongoDBModule;
 import org.graylog2.bindings.PasswordAlgorithmBindings;
 import org.graylog2.bindings.PeriodicalBindings;
 import org.graylog2.bindings.PersistenceServicesBindings;
@@ -58,6 +60,7 @@ import org.graylog2.bindings.ServerBindings;
 import org.graylog2.bootstrap.Main;
 import org.graylog2.bootstrap.ServerBootstrap;
 import org.graylog2.cluster.NodeService;
+import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.configuration.ElasticsearchClientConfiguration;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.configuration.EmailConfiguration;
@@ -93,6 +96,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumSet;
@@ -144,6 +148,7 @@ public class Server extends ServerBootstrap {
         modules.add(
                 new VersionAwareStorageModule(),
                 new ConfigurationModule(configuration),
+                new MongoDBModule(),
                 new ServerBindings(configuration, isMigrationCommand()),
                 new ElasticsearchModule(),
                 new PersistenceServicesBindings(),
@@ -212,35 +217,41 @@ public class Server extends ServerBootstrap {
         final NodeService nodeService = injector.getInstance(NodeService.class);
         final ServerStatus serverStatus = injector.getInstance(ServerStatus.class);
         final ActivityWriter activityWriter = injector.getInstance(ActivityWriter.class);
+        final LeaderElectionService leaderElectionService = injector.getInstance(LeaderElectionService.class);
         nodeService.registerServer(serverStatus.getNodeId().toString(),
-                configuration.isMaster(),
+                leaderElectionService.isLeader(),
                 httpConfiguration.getHttpPublishUri(),
                 Tools.getLocalCanonicalHostname());
         serverStatus.setLocalMode(isLocal());
-        if (configuration.isMaster() && !nodeService.isOnlyMaster(serverStatus.getNodeId())) {
-            LOG.warn("Detected another master in the cluster. Retrying in {} seconds to make sure it is not "
-                    + "an old stale instance.", TimeUnit.MILLISECONDS.toSeconds(configuration.getStaleMasterTimeout()));
+        if (leaderElectionService.isLeader() && !nodeService.isOnlyLeader(serverStatus.getNodeId())) {
+            LOG.warn("Detected another leader in the cluster. Retrying in {} seconds to make sure it is not "
+                    + "an old stale instance.", TimeUnit.MILLISECONDS.toSeconds(configuration.getStaleLeaderTimeout()));
             try {
-                Thread.sleep(configuration.getStaleMasterTimeout());
+                Thread.sleep(configuration.getStaleLeaderTimeout());
             } catch (InterruptedException e) { /* nope */ }
 
-            if (!nodeService.isOnlyMaster(serverStatus.getNodeId())) {
+            if (!nodeService.isOnlyLeader(serverStatus.getNodeId())) {
                 // All devils here.
-                String what = "Detected other master node in the cluster! Starting as non-master! "
+                String what = "Detected other leader node in the cluster! Starting as non-leader! "
                         + "This is a mis-configuration you should fix.";
                 LOG.warn(what);
                 activityWriter.write(new Activity(what, Server.class));
 
-                // Write a notification.
                 final NotificationService notificationService = injector.getInstance(NotificationService.class);
+
+                // remove legacy notification, if present
+                //noinspection deprecation
+                notificationService.fixed(notificationService.build().addType(Notification.Type.MULTI_MASTER));
+
+                // Write a notification.
                 Notification notification = notificationService.buildNow()
-                        .addType(Notification.Type.MULTI_MASTER)
+                        .addType(Notification.Type.MULTI_LEADER)
                         .addSeverity(Notification.Severity.URGENT);
                 notificationService.publishIfFirst(notification);
 
-                configuration.setIsMaster(false);
+                configuration.setIsLeader(false);
             } else {
-                LOG.warn("Stale master has gone. Starting as master.");
+                LOG.warn("Stale leader has gone. Starting as leader.");
             }
         }
     }
@@ -252,6 +263,7 @@ public class Server extends ServerBootstrap {
         private final GracefulShutdown gracefulShutdown;
         private final AuditEventSender auditEventSender;
         private final Journal journal;
+        private final Service leaderElectionService;
 
         @Inject
         public ShutdownHook(ActivityWriter activityWriter,
@@ -259,13 +271,15 @@ public class Server extends ServerBootstrap {
                             NodeId nodeId,
                             GracefulShutdown gracefulShutdown,
                             AuditEventSender auditEventSender,
-                            Journal journal) {
+                            Journal journal,
+                            @Named("LeaderElectionService") Service leaderElectionService) {
             this.activityWriter = activityWriter;
             this.serviceManager = serviceManager;
             this.nodeId = nodeId;
             this.gracefulShutdown = gracefulShutdown;
             this.auditEventSender = auditEventSender;
             this.journal = journal;
+            this.leaderElectionService = leaderElectionService;
         }
 
         @Override
@@ -278,6 +292,8 @@ public class Server extends ServerBootstrap {
 
             gracefulShutdown.runWithoutExit();
             serviceManager.stopAsync().awaitStopped();
+
+            leaderElectionService.stopAsync().awaitTerminated();
 
             // Some services might continue performing processing
             // after the Journal service being down. Therefore it's
@@ -308,7 +324,8 @@ public class Server extends ServerBootstrap {
 
     @Override
     protected Set<ServerStatus.Capability> capabilities() {
-        if (configuration.isMaster()) {
+        if (configuration.isLeader()) {
+            //noinspection deprecation
             return EnumSet.of(ServerStatus.Capability.SERVER, ServerStatus.Capability.MASTER);
         } else {
             return EnumSet.of(ServerStatus.Capability.SERVER);

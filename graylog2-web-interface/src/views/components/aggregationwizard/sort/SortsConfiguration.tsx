@@ -19,7 +19,7 @@ import { useCallback } from 'react';
 import { FieldArray, useFormikContext } from 'formik';
 
 import { SortableList } from 'components/common';
-import { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
+import type { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
 
 import SortConfiguration from './SortConfiguration';
 import SortElement from './SortElement';

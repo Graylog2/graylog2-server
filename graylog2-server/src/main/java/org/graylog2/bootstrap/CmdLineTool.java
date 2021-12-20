@@ -75,7 +75,7 @@ import org.graylog2.shared.plugins.PluginLoader;
 import org.graylog2.shared.utilities.ExceptionUtils;
 import org.graylog2.storage.UnsupportedSearchException;
 import org.graylog2.storage.versionprobe.ElasticsearchProbeException;
-import org.graylog2.storage.versionprobe.SearchVersion;
+import org.graylog2.storage.SearchVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -202,6 +202,13 @@ public abstract class CmdLineTool implements CliCommand {
     protected void beforeStart(TLSProtocolsConfiguration configuration, PathConfiguration pathConfiguration) {
     }
 
+    /**
+     * Things that have to run before the guice injector is created.
+     * This call happens *after* the configuration file has been parsed.
+     */
+    protected void beforeInjectorCreation() {
+    }
+
     protected static void applySecuritySettings(TLSProtocolsConfiguration configuration) {
         // Disable insecure TLS parameters and ciphers by default.
         // Prevent attacks like LOGJAM, LUCKY13, et al.
@@ -280,6 +287,8 @@ public abstract class CmdLineTool implements CliCommand {
 
         final List<String> arguments = ManagementFactory.getRuntimeMXBean().getInputArguments();
         LOG.info("Running with JVM arguments: {}", Joiner.on(' ').join(arguments));
+
+        beforeInjectorCreation();
 
         injector = setupInjector(
                 new NamedConfigParametersModule(jadConfig.getConfigurationBeans()),

@@ -19,7 +19,7 @@ import * as Immutable from 'immutable';
 import { render, screen } from 'wrappedTestingLibrary';
 
 import { alice } from 'fixtures/users';
-import User from 'logic/users/User';
+import type User from 'logic/users/User';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 
 import IfPermitted from './IfPermitted';

@@ -19,7 +19,7 @@ import PropTypes from 'prop-types';
 
 import { getFullVersion } from 'util/Version';
 import connect from 'stores/connect';
-import { Store } from 'stores/StoreTypes';
+import type { Store } from 'stores/StoreTypes';
 import { SystemStore } from 'stores/system/SystemStore';
 
 type SystemStoreState = {

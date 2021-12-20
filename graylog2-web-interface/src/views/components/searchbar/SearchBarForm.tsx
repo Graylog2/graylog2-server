@@ -15,16 +15,18 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback } from 'react';
+import { useCallback, useContext } from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
+import type { FormikProps } from 'formik';
 import { Form, Formik } from 'formik';
 import { isFunction } from 'lodash';
-import type { FormikProps } from 'formik';
 
 import { onInitializingTimerange, onSubmittingTimerange } from 'views/components/TimerangeForForm';
 import type { SearchBarFormValues } from 'views/Constants';
-import validateTimeRange from 'views/components/TimeRangeValidation';
+import FormWarningsContext from 'contexts/FormWarningsContext';
+import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
+import validate from 'views/components/searchbar/validate';
 
 import DateTimeProvider from './date-time-picker/DateTimeProvider';
 
@@ -32,9 +34,10 @@ type Props = {
   children: ((props: FormikProps<SearchBarFormValues>) => React.ReactNode) | React.ReactNode,
   initialValues: SearchBarFormValues,
   limitDuration: number,
-  onSubmit: (Values) => void | Promise<any>,
+  onSubmit: (values: SearchBarFormValues) => void | Promise<any>,
   validateOnMount?: boolean,
   formRef?: React.Ref<FormikProps<SearchBarFormValues>>,
+  validateQueryString: (values: SearchBarFormValues) => Promise<QueryValidationState>,
 }
 
 const StyledForm = styled(Form)`
@@ -53,8 +56,8 @@ export const normalizeSearchBarFormValues = ({ timerange, streams, queryString }
   };
 };
 
-const SearchBarForm = ({ initialValues, limitDuration, onSubmit, children, validateOnMount, formRef }: Props) => {
-  const _onSubmit = useCallback(({ timerange, streams, queryString }) => {
+const SearchBarForm = ({ initialValues, limitDuration, onSubmit, children, validateOnMount, formRef, validateQueryString }: Props) => {
+  const _onSubmit = useCallback(({ timerange, streams, queryString }: SearchBarFormValues) => {
     return onSubmit(normalizeSearchBarFormValues({ timerange, streams, queryString }));
   }, [onSubmit]);
   const { timerange, streams, queryString } = initialValues;
@@ -65,13 +68,17 @@ const SearchBarForm = ({ initialValues, limitDuration, onSubmit, children, valid
     timerange: initialTimeRange,
   };
 
+  const { setFieldWarning } = useContext(FormWarningsContext);
+  const _validate = useCallback((values: SearchBarFormValues) => validate(values, limitDuration, setFieldWarning, validateQueryString),
+    [limitDuration, setFieldWarning, validateQueryString]);
+
   return (
-    <Formik initialValues={_initialValues}
-            enableReinitialize
-            onSubmit={_onSubmit}
-            innerRef={formRef}
-            validate={({ timerange: nextTimeRange }) => validateTimeRange(nextTimeRange, limitDuration)}
-            validateOnMount={validateOnMount}>
+    <Formik<SearchBarFormValues> initialValues={_initialValues}
+                                 enableReinitialize
+                                 onSubmit={_onSubmit}
+                                 innerRef={formRef}
+                                 validate={_validate}
+                                 validateOnMount={validateOnMount}>
       {(...args) => (
         <DateTimeProvider limitDuration={limitDuration}>
           <StyledForm>

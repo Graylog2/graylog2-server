@@ -90,7 +90,7 @@ public abstract class MessageInput implements Stoppable {
     protected String persistId;
     protected DateTime createdAt;
     protected Boolean global = false;
-    protected String desiredState = IOState.Type.RUNNING.toString();
+    protected IOState.Type desiredState = IOState.Type.RUNNING;
     protected String contentPack;
 
     protected final Configuration configuration;
@@ -246,17 +246,36 @@ public abstract class MessageInput implements Stoppable {
         return global;
     }
 
+    /**
+     * Determines if Graylog should only launch a single instance of this input at a time in the cluster.
+     * <p>
+     * This might be useful for an input which polls data from an external source and maintains local state, i.e. a
+     * cursor, to determine records have been fetched already. In that case, running a second instance of the input at
+     * the same time on a different node in the cluster might then lead to the same data fetched again, which would
+     * produce duplicate log messages in Graylog.
+     * <p>
+     * Returning {@code true} from this method will only really make sense if the input also {@code isGlobal}.
+     *
+     * @return {@code true} if only a single instance of the input should be launched in the cluster. It will be
+     * launched on the <em>leader</em> node.
+     * <p>
+     * {@code false} otherwise
+     */
+    public boolean onlyOnePerCluster() {
+        return false;
+    }
+
     public void setGlobal(Boolean global) {
         this.global = global;
     }
 
-    public String getDesiredState() {
+    public IOState.Type getDesiredState() {
         return desiredState;
     }
 
-    public void setDesiredState(String newDesiredState) {
-        if (newDesiredState.equals(IOState.Type.RUNNING.toString())
-                || newDesiredState.equals(IOState.Type.STOPPED.toString())) {
+    public void setDesiredState(IOState.Type newDesiredState) {
+        if (newDesiredState.equals(IOState.Type.RUNNING)
+                || newDesiredState.equals(IOState.Type.STOPPED)) {
             desiredState = newDesiredState;
         } else {
             LOG.error("Ignoring unexpected desired state " + newDesiredState + " for input " + title);
@@ -293,7 +312,7 @@ public abstract class MessageInput implements Stoppable {
         map.put(FIELD_TITLE, getTitle());
         map.put(FIELD_CREATOR_USER_ID, getCreatorUserId());
         map.put(FIELD_GLOBAL, isGlobal());
-        map.put(FIELD_DESIRED_STATE, getDesiredState());
+        map.put(FIELD_DESIRED_STATE, getDesiredState().toString());
         map.put(FIELD_CONTENT_PACK, getContentPack());
         map.put(FIELD_CONFIGURATION, getConfiguration().getSource());
 

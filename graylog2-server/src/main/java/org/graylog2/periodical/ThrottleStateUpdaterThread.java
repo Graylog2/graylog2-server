@@ -160,7 +160,7 @@ public class ThrottleStateUpdaterThread extends Periodical {
     }
 
     @Override
-    public boolean masterOnly() {
+    public boolean leaderOnly() {
         return false;
     }
 

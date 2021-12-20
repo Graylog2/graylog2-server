@@ -17,11 +17,11 @@
 import { List, Map } from 'immutable';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import Widget from 'views/logic/widgets/Widget';
+import type Widget from 'views/logic/widgets/Widget';
 import View from 'views/logic/views/View';
-import Query from 'views/logic/queries/Query';
+import type Query from 'views/logic/queries/Query';
 import GenerateNextPosition from 'views/logic/views/GenerateNextPosition';
-import WidgetPosition from 'views/logic/widgets/WidgetPosition';
+import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import TitleTypes from 'views/stores/TitleTypes';
 
 import UpdateSearchForWidgets from './UpdateSearchForWidgets';

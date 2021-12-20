@@ -31,7 +31,8 @@ import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationW
 import WidgetModel from 'views/logic/widgets/Widget';
 import { WidgetActions } from 'views/stores/WidgetStore';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
-import View, { ViewType } from 'views/logic/views/View';
+import type { ViewType } from 'views/logic/views/View';
+import View from 'views/logic/views/View';
 import { ViewStore } from 'views/stores/ViewStore';
 import type { ViewStoreState } from 'views/stores/ViewStore';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
@@ -78,6 +79,13 @@ jest.mock('views/stores/StreamsStore', () => ({
       { title: 'Stream 1', id: 'stream-id-1' },
     ],
   })]),
+}));
+
+jest.mock('views/stores/SearchStore', () => ({
+  SearchStore: MockStore(['getInitialState', () => ({ search: { parameters: [] } })]),
+  SearchActions: {
+    execute: mockAction(),
+  },
 }));
 
 const viewsPlugin = new PluginManifest({}, viewsBindings);

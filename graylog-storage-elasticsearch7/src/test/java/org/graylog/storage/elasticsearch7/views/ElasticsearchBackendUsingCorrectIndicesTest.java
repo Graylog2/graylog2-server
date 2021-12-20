@@ -36,7 +36,6 @@ import org.graylog.storage.elasticsearch7.ElasticsearchClient;
 import org.graylog.storage.elasticsearch7.testing.TestMultisearchResponse;
 import org.graylog.storage.elasticsearch7.views.searchtypes.ESMessageList;
 import org.graylog.storage.elasticsearch7.views.searchtypes.ESSearchTypeHandler;
-import org.graylog2.indexer.searches.SearchesClusterConfig;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.joda.time.DateTimeUtils;

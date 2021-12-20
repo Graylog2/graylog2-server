@@ -20,7 +20,8 @@ import { useLocation } from 'react-router-dom';
 
 import ErrorPage from 'components/errors/ErrorPage';
 import ErrorsActions from 'actions/errors/ErrorsActions';
-import { ReportedError, ReactErrorType, NotFoundErrorType, UnauthorizedErrorType, StreamPermissionErrorType } from 'logic/errors/ReportedErrors';
+import type { ReportedError } from 'logic/errors/ReportedErrors';
+import { ReactErrorType, NotFoundErrorType, UnauthorizedErrorType, StreamPermissionErrorType } from 'logic/errors/ReportedErrors';
 import RuntimeErrorPage from 'pages/RuntimeErrorPage';
 import NotFoundPage from 'pages/NotFoundPage';
 import UnauthorizedErrorPage from 'pages/UnauthorizedErrorPage';

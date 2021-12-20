@@ -17,7 +17,7 @@
 import { WidgetActions } from 'views/stores/WidgetStore';
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import type { FieldActionHandler, FieldActionHandlerCondition } from 'views/logic/fieldactions/FieldActionHandler';
-import Widget from 'views/logic/widgets/Widget';
+import type Widget from 'views/logic/widgets/Widget';
 
 type Contexts = { widget: Widget };
 

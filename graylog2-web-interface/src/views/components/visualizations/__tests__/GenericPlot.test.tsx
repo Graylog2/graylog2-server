@@ -17,7 +17,7 @@
 import * as React from 'react';
 import type { HTMLAttributes } from 'enzyme';
 import { mount } from 'wrappedEnzyme';
-import { PlotParams } from 'react-plotly.js';
+import type { PlotParams } from 'react-plotly.js';
 
 import ColorMapper from 'views/components/visualizations/ColorMapper';
 

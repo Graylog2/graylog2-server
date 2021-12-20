@@ -16,16 +16,18 @@
  */
 import Reflux from 'reflux';
 import * as Immutable from 'immutable';
-import { $PropertyType, $Shape } from 'utility-types';
+import type { $PropertyType, $Shape } from 'utility-types';
 
-import UserOverview, { UserOverviewJSON, AccountStatus } from 'logic/users/UserOverview';
+import type { UserOverviewJSON, AccountStatus } from 'logic/users/UserOverview';
+import UserOverview from 'logic/users/UserOverview';
 import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
 import { singletonStore, singletonActions } from 'logic/singleton';
 import { qualifyUrl } from 'util/URLUtils';
 import PaginationURL from 'util/PaginationURL';
-import User, { UserJSON } from 'logic/users/User';
-import { PaginatedListJSON, Pagination, PaginatedList } from 'stores/PaginationTypes';
+import type { UserJSON } from 'logic/users/User';
+import User from 'logic/users/User';
+import type { PaginatedListJSON, Pagination, PaginatedList } from 'stores/PaginationTypes';
 
 export type PaginatedUsersResponse = PaginatedListJSON & {
   users: Array<UserOverviewJSON>;

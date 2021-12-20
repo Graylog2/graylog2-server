@@ -18,27 +18,20 @@ package org.graylog.elasticsearch.e2e;
 
 import io.restassured.specification.RequestSpecification;
 import org.graylog.testing.completebackend.GraylogBackend;
+import org.graylog.testing.containermatrix.MongodbServer;
+import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.graylog.testing.utils.GelfInputUtils;
 import org.graylog.testing.utils.SearchUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.graylog.testing.completebackend.Lifecycle.VM;
-import static org.graylog.testing.containermatrix.ContainerVersions.ES6;
-import static org.graylog.testing.containermatrix.ContainerVersions.ES7;
-import static org.graylog.testing.containermatrix.ContainerVersions.MONGO3;
-import static org.graylog.testing.containermatrix.ContainerVersions.MONGO4;
 import static org.graylog.testing.graylognode.NodeContainerConfig.GELF_HTTP_PORT;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = VM, esVersions = {ES6, ES7}, mongoVersions = {MONGO3, MONGO4})
+@ContainerMatrixTestsConfiguration
 public class ElasticsearchE2E {
-    private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchE2E.class);
-
     private final GraylogBackend sut;
     private final RequestSpecification requestSpec;
 
@@ -64,6 +57,6 @@ public class ElasticsearchE2E {
                 "{\"short_message\":\"Hello there\", \"host\":\"example.org\", \"facility\":\"test\"}",
                 requestSpec);
 
-        assertThat(SearchUtils.searchForMessage(requestSpec, "Hello there")).isTrue();
+        assertThat(SearchUtils.waitForMessage(requestSpec, "Hello there")).isTrue();
     }
 }

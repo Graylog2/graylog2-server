@@ -14,7 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
+import { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import loadable from 'loadable-components';
 
@@ -24,7 +25,14 @@ type Props = {
   };
 };
 
-const ErrorComponent: React.FC<Props> = ({ error }: Props) => <div>Loading component failed: {error.message}</div>;
+const ErrorComponent: React.FC<Props> = ({ error }: Props) => {
+  useEffect(() => {
+    // eslint-disable-next-line no-console
+    console.error(error);
+  }, [error]);
+
+  return <div>Loading component failed: {error.message}</div>;
+};
 
 ErrorComponent.propTypes = {
   error: PropTypes.exact({

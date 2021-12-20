@@ -17,7 +17,7 @@
 package org.graylog2.indexer;
 
 import org.graylog2.indexer.indexset.IndexSetConfig;
-import org.graylog2.storage.versionprobe.SearchVersion;
+import org.graylog2.storage.SearchVersion;
 
 import javax.annotation.Nonnull;
 

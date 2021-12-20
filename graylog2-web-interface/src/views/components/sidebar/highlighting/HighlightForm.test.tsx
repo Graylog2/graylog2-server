@@ -23,7 +23,8 @@ import HighlightForm from 'views/components/sidebar/highlighting/HighlightForm';
 import HighlightingRule from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import { HighlightingRulesActions } from 'views/stores/HighlightingRulesStore';
 import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
-import FieldTypesContext, { FieldTypes } from 'views/components/contexts/FieldTypesContext';
+import type { FieldTypes } from 'views/components/contexts/FieldTypesContext';
+import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldType, { Properties } from 'views/logic/fieldtypes/FieldType';
 

@@ -37,14 +37,15 @@ import CopyWidgetToDashboard from 'views/logic/views/CopyWidgetToDashboard';
 import ViewState from 'views/logic/views/ViewState';
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import { loadDashboard } from 'views/logic/views/Actions';
-import { TitlesMap } from 'views/stores/TitleTypes';
+import type { TitlesMap } from 'views/stores/TitleTypes';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import { ViewStore } from 'views/stores/ViewStore';
 
 import WidgetActionsMenu from './WidgetActionsMenu';
 
 import WidgetContext from '../contexts/WidgetContext';
-import WidgetFocusContext, { WidgetFocusContextType } from '../contexts/WidgetFocusContext';
+import type { WidgetFocusContextType } from '../contexts/WidgetFocusContext';
+import WidgetFocusContext from '../contexts/WidgetFocusContext';
 
 jest.mock('views/components/search/IfSearch', () => jest.fn(({ children }) => children));
 

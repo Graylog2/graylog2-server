@@ -16,14 +16,13 @@
  */
 package org.graylog2.indexer;
 
-import com.github.zafarkhaja.semver.Version;
 import org.graylog2.indexer.indexset.IndexSetConfig;
-import org.graylog2.storage.versionprobe.SearchVersion;
+import org.graylog2.storage.SearchVersion;
 
 import javax.annotation.Nonnull;
 
-import static org.graylog2.storage.versionprobe.SearchVersion.Distribution.ELASTICSEARCH;
-import static org.graylog2.storage.versionprobe.SearchVersion.Distribution.OPENSEARCH;
+import static org.graylog2.storage.SearchVersion.Distribution.ELASTICSEARCH;
+import static org.graylog2.storage.SearchVersion.Distribution.OPENSEARCH;
 
 public class MessageIndexTemplateProvider implements IndexTemplateProvider {
 

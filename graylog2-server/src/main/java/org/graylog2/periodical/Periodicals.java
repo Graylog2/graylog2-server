@@ -25,9 +25,11 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -80,8 +82,23 @@ public class Periodicals {
         periodicals.add(periodical);
     }
 
+    public synchronized void unregisterAndStop(Periodical periodical) {
+        if (isPeriodic(periodical)) {
+            LOG.info("Shutting down periodical [{}].", periodical.getClass().getCanonicalName());
+
+            // Cancel future executions.
+            if (futures.containsKey(periodical)) {
+                futures.remove(periodical).cancel(false);
+                periodicals.remove(periodical);
+                LOG.debug("Shutdown of periodical [{}] complete.", periodical.getClass().getCanonicalName());
+            } else {
+                LOG.error("Could not find periodical [{}] in futures list. Not stopping execution.",
+                        periodical.getClass().getCanonicalName());
+            }
+        }
+    }
+
     /**
-     *
      * @return a copy of the list of all registered periodicals.
      */
     public List<Periodical> getAll() {
@@ -105,11 +122,22 @@ public class Periodicals {
     }
 
     /**
-     *
+     * All periodicals which are currently running, i.e. they have been scheduled for periodic execution and ar not just
+     * one-off periodicals.
+     */
+    public Set<Periodical> getAllRunning() {
+        return periodicals.stream().filter(this::isPeriodic).collect(Collectors.toSet());
+    }
+
+    /**
      * @return a copy of the map of all executor futures
      */
     public Map<Periodical, ScheduledFuture> getFutures() {
         return Maps.newHashMap(futures);
+    }
+
+    private boolean isPeriodic(Periodical periodical) {
+        return !periodical.runsForever();
     }
 
 }

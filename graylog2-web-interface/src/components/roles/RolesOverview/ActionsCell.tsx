@@ -17,12 +17,12 @@
 import * as React from 'react';
 import { useState } from 'react';
 import styled from 'styled-components';
-import { $PropertyType } from 'utility-types';
+import type { $PropertyType } from 'utility-types';
 
 import { LinkContainer } from 'components/common/router';
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import Routes from 'routing/Routes';
-import Role from 'logic/roles/Role';
+import type Role from 'logic/roles/Role';
 import { Button } from 'components/bootstrap';
 import { IfPermitted, Spinner } from 'components/common';
 

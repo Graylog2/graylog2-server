@@ -19,12 +19,17 @@ package org.junit.jupiter.engine.descriptor;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.MavenProjectDirProvider;
 import org.graylog.testing.completebackend.PluginJarsProvider;
+import org.graylog.testing.containermatrix.MongodbServer;
+import org.graylog2.storage.SearchVersion;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
 
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class ContainerMatrixTestsDescriptor extends AbstractTestDescriptor {
@@ -33,9 +38,10 @@ public class ContainerMatrixTestsDescriptor extends AbstractTestDescriptor {
     private final Lifecycle lifecycle;
     private final Class<? extends MavenProjectDirProvider> mavenProjectDirProvider;
     private final Class<? extends PluginJarsProvider> pluginJarsProvider;
-    private final String esVersion;
-    private final String mongoVersion;
+    private final SearchVersion esVersion;
+    private final MongodbServer mongoVersion;
     private final Set<Integer> extraPorts = Collections.synchronizedSet(new HashSet<>());
+    private final Set<URL> mongoDBFixtures = Collections.synchronizedSet(new HashSet<>());
 
     public ContainerMatrixTestsDescriptor(TestDescriptor parent,
                                           Lifecycle lifecycle,
@@ -43,9 +49,10 @@ public class ContainerMatrixTestsDescriptor extends AbstractTestDescriptor {
                                           String mavenProjectDirProviderId,
                                           Class<? extends PluginJarsProvider> pluginJarsProvider,
                                           String pluginJarsProviderId,
-                                          String esVersion,
-                                          String mongoVersion,
-                                          Set<Integer> extraPorts) {
+                                          SearchVersion esVersion,
+                                          MongodbServer mongoVersion,
+                                          Set<Integer> extraPorts,
+                                          List<URL> mongoDBFixtures) {
         super(parent.getUniqueId().append(SEGMENT_TYPE,
                         createKey(lifecycle, mavenProjectDirProviderId, pluginJarsProviderId, esVersion, mongoVersion)),
                 createKey(lifecycle, mavenProjectDirProviderId, pluginJarsProviderId, esVersion, mongoVersion));
@@ -56,10 +63,11 @@ public class ContainerMatrixTestsDescriptor extends AbstractTestDescriptor {
         this.esVersion = esVersion;
         this.mongoVersion = mongoVersion;
         this.extraPorts.addAll(extraPorts);
+        this.mongoDBFixtures.addAll(mongoDBFixtures);
     }
 
-    private static String createKey(Lifecycle lifecycle, String mavenProjectDirProvider, String pluginJarsProvider, String esVersion, String mongoVersion) {
-        return "Lifecyle: " + lifecycle.name() + ", MavenProjectDirProvider: " + mavenProjectDirProvider + ", PluginJarsProvider: " + pluginJarsProvider + ", Elasticsearch: " + esVersion + ", MongoDB: " + mongoVersion;
+    private static String createKey(Lifecycle lifecycle, String mavenProjectDirProvider, String pluginJarsProvider, SearchVersion esVersion, MongodbServer mongoVersion) {
+        return "Lifecycle: " + lifecycle.name() + ", MavenProjectDirProvider: " + mavenProjectDirProvider + ", PluginJarsProvider: " + pluginJarsProvider + ", Search: " + esVersion + ", MongoDB: " + mongoVersion.getVersion();
     }
 
     public Class<? extends MavenProjectDirProvider> getMavenProjectDirProvider() {
@@ -74,11 +82,11 @@ public class ContainerMatrixTestsDescriptor extends AbstractTestDescriptor {
         return lifecycle;
     }
 
-    public String getEsVersion() {
+    public SearchVersion getEsVersion() {
         return esVersion;
     }
 
-    public String getMongoVersion() {
+    public MongodbServer getMongoVersion() {
         return mongoVersion;
     }
 
@@ -88,10 +96,14 @@ public class ContainerMatrixTestsDescriptor extends AbstractTestDescriptor {
     }
 
     public void addExtraPorts(final int[] ports) {
-        Arrays.stream(ports).forEach(e -> extraPorts.add(e));
+        Arrays.stream(ports).forEach(extraPorts::add);
     }
 
     public int[] getExtraPorts() {
         return extraPorts.stream().mapToInt(i -> i).toArray();
+    }
+
+    public List<URL> getMongoDBFixtures() {
+        return new ArrayList<>(mongoDBFixtures);
     }
 }
