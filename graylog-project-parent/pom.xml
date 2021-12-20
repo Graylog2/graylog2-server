@@ -776,8 +776,6 @@
                     <suppressAnnotations>
                         <suppressAnnotation>org.graylog2.shared.SuppressForbidden</suppressAnnotation>
                     </suppressAnnotations>
-                    <!-- disallow undocumented classes like sun.misc.Unsafe: -->
-                    <internalRuntimeForbidden>false</internalRuntimeForbidden>
                     <!-- if the used Java version is too new, don't fail, just do nothing: -->
                     <failOnUnsupportedJava>false</failOnUnsupportedJava>
                     <failOnViolation>true</failOnViolation>
@@ -786,9 +784,9 @@
                         <bundledSignature>jdk-unsafe</bundledSignature>
                         <bundledSignature>jdk-deprecated</bundledSignature>
                         <bundledSignature>jdk-reflection</bundledSignature>
-                        <!-- Required until https://github.com/policeman-tools/forbidden-apis/pull/133 has been merged -->
-                        <bundledSignature>commons-io-unsafe-2.5</bundledSignature>
-                        <!--bundledSignature>commons-io-unsafe-${commons-io.version}</bundledSignature-->
+                        <!-- disallow undocumented classes like sun.misc.Unsafe: -->
+                        <bundledSignature>jdk-non-portable</bundledSignature>
+                        <bundledSignature>commons-io-unsafe-${commons-io.version}</bundledSignature>
                     </bundledSignatures>
                     <signaturesFiles>
                         <signaturesFile>${project.basedir}/../config/forbidden-apis/netty3.txt</signaturesFile>
