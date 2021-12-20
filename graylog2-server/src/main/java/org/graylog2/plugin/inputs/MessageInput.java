@@ -90,7 +90,7 @@ public abstract class MessageInput implements Stoppable {
     protected String persistId;
     protected DateTime createdAt;
     protected Boolean global = false;
-    protected String desiredState = IOState.Type.RUNNING.toString();
+    protected IOState.Type desiredState = IOState.Type.RUNNING;
     protected String contentPack;
 
     protected final Configuration configuration;
@@ -250,13 +250,13 @@ public abstract class MessageInput implements Stoppable {
         this.global = global;
     }
 
-    public String getDesiredState() {
+    public IOState.Type getDesiredState() {
         return desiredState;
     }
 
-    public void setDesiredState(String newDesiredState) {
-        if (newDesiredState.equals(IOState.Type.RUNNING.toString())
-                || newDesiredState.equals(IOState.Type.STOPPED.toString())) {
+    public void setDesiredState(IOState.Type newDesiredState) {
+        if (newDesiredState.equals(IOState.Type.RUNNING)
+                || newDesiredState.equals(IOState.Type.STOPPED)) {
             desiredState = newDesiredState;
         } else {
             LOG.error("Ignoring unexpected desired state " + newDesiredState + " for input " + title);
@@ -293,7 +293,7 @@ public abstract class MessageInput implements Stoppable {
         map.put(FIELD_TITLE, getTitle());
         map.put(FIELD_CREATOR_USER_ID, getCreatorUserId());
         map.put(FIELD_GLOBAL, isGlobal());
-        map.put(FIELD_DESIRED_STATE, getDesiredState());
+        map.put(FIELD_DESIRED_STATE, getDesiredState().toString());
         map.put(FIELD_CONTENT_PACK, getContentPack());
         map.put(FIELD_CONFIGURATION, getConfiguration().getSource());
 

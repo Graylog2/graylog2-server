@@ -117,15 +117,20 @@ public class InputLauncher {
 
     public void launchAllPersisted() {
         for (MessageInput input : persistedInputs) {
-            if (configuration.getAutoRestartInputs() || input.getDesiredState().equals(IOState.Type.RUNNING.toString())) {
-                LOG.info("Launching input {} {} - desired state is {}",
-                        input.getTitle(), input.getName(), input.getDesiredState());
+            if (shouldStartAutomatically(input)) {
+                LOG.info("Launching input [{}/{}/{}] - desired state is {}",
+                        input.getName(), input.getTitle(), input.getId(), input.getDesiredState());
                 input.initialize();
                 launch(input);
             } else {
-                LOG.info("Not auto-starting input {} {} - desired state is {}",
-                        input.getTitle(), input.getName(), input.getDesiredState());
+                LOG.info("Not auto-starting input [{}/{}/{}] - desired state is {}",
+                        input.getName(), input.getTitle(), input.getId(), input.getDesiredState());
             }
         }
+    }
+
+
+    public boolean shouldStartAutomatically(MessageInput input) {
+        return configuration.getAutoRestartInputs() || input.getDesiredState().equals(IOState.Type.RUNNING);
     }
 }
