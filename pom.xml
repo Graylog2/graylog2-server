@@ -396,7 +396,7 @@
                                         <!-- This dependency also pulls in log4j 1.x -->
                                         <exclude>org.apache.log4j.wso2:log4j</exclude>
                                         <!-- We use jcl-over-slf4j, so we need to make sure we don't pull in
-                                             the actual commons-logging dependency to avoid conflicts. http://www.slf4j.org/legacy.html#log4j-over-slf4j -->
+                                             the actual commons-logging dependency to avoid conflicts. http://www.slf4j.org/legacy.html#jclOverSLF4J -->
                                         <exclude>commons-logging:commons-logging</exclude>
                                         <!-- Make sure we don't pull in vulnerable log4j2 versions (CVE-2021-45046, CVE-2021-44228) -->
                                         <exclude>org.apache.logging.log4j:*:(,2.16)</exclude>
