@@ -30,29 +30,24 @@ public abstract class GeoIpResolverConfig {
     @JsonProperty("enabled")
     public abstract boolean enabled();
 
-    @JsonProperty("db_type")
-    public abstract DatabaseType cityDbType();
+    @JsonProperty("database_vendor_type")
+    public abstract DatabaseVendorType databaseVendorType();
 
     @JsonProperty("db_path")
     public abstract String cityDbPath();
-
-    @JsonProperty("asn_db_type")
-    public abstract DatabaseType asnDbType();
 
     @JsonProperty("asn_db_path")
     public abstract String asnDbPath();
 
     @JsonCreator
     public static GeoIpResolverConfig create(@JsonProperty("enabled") boolean cityEnabled,
-                                             @JsonProperty("db_type") DatabaseType dbType,
+                                             @JsonProperty("database_vendor_type") DatabaseVendorType databaseVendorType,
                                              @JsonProperty("db_path") String cityDbPath,
-                                             @JsonProperty("asn_db_type") DatabaseType asnDbType,
                                              @JsonProperty("asn_db_path") String asnDbPath) {
         return builder()
                 .enabled(cityEnabled)
-                .cityDbType(dbType)
+                .databaseVendorType(databaseVendorType)
                 .cityDbPath(cityDbPath)
-                .asnDbType(asnDbType)
                 .asnDbPath(asnDbPath)
                 .build();
     }
@@ -60,9 +55,8 @@ public abstract class GeoIpResolverConfig {
     public static GeoIpResolverConfig defaultConfig() {
        return builder()
                .enabled(false)
-               .cityDbType(DatabaseType.MAXMIND_CITY)
+               .databaseVendorType(DatabaseVendorType.MAXMIND)
                .cityDbPath("/etc/graylog/server/GeoLite2-City.mmdb")
-               .asnDbType(DatabaseType.MAXMIND_ASN)
                .asnDbPath("/etc/graylog/server/GeoLite2-ASN.mmdb")
                .build();
     }
@@ -77,11 +71,9 @@ public abstract class GeoIpResolverConfig {
     public abstract static class Builder {
         public abstract Builder enabled(boolean enabled);
 
-        public abstract Builder cityDbType(DatabaseType dbType);
+        public abstract Builder databaseVendorType(DatabaseVendorType type);
 
         public abstract Builder cityDbPath(String dbPath);
-
-        public abstract Builder asnDbType(DatabaseType dbType);
 
         public abstract Builder asnDbPath(String asnDBPath);
 

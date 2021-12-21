@@ -48,14 +48,13 @@ public class GeoIpResolverEngine {
             .put("destination_ip", "destination")
             .build();
 
-    private final Timer resolveTime;
     private final GeoIpResolver<?, GeoLocationInformation> ipLocationResolver;
     private final GeoIpResolver<?, GeoAsnInformation> ipAsnResolver;
     private boolean enabled;
 
 
     public GeoIpResolverEngine(GeoIpResolverConfig config, MetricRegistry metricRegistry) {
-        this.resolveTime = metricRegistry.timer(name(GeoIpResolverEngine.class, "resolveTime"));
+        Timer resolveTime = metricRegistry.timer(name(GeoIpResolverEngine.class, "resolveTime"));
 
         GeoIpResolverFactory resolverFactory = GeoIpResolverFactory.getInstance();
         ipLocationResolver = resolverFactory.createLocationResolver(resolveTime, config);

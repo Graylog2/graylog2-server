@@ -33,7 +33,8 @@ public class GeoIpResolverFactory {
     public GeoIpResolver<?, GeoLocationInformation> createLocationResolver(Timer timer, GeoIpResolverConfig config) {
 
         final GeoIpResolver<?, GeoLocationInformation> resolver;
-        switch (config.cityDbType()) {
+        DatabaseType dbType = config.databaseVendorType().getCityDbType();
+        switch (dbType) {
             case MAXMIND_CITY:
                 resolver = new MaxMindIpLocationResolver(timer, config.cityDbPath(), config.enabled());
                 break;
@@ -42,7 +43,7 @@ public class GeoIpResolverFactory {
                 break;
             default:
                 String opts = String.join(",", DatabaseType.MAXMIND_CITY.name(), DatabaseType.IPINFO_STANDARD_LOCATION.name());
-                String error = String.format(Locale.US, "'%s' is not a valid DatabaseType for a GeoLocation Resolver. Valid options are: %s", config.cityDbType(), opts);
+                String error = String.format(Locale.US, "'%s' is not a valid DatabaseType for a GeoLocation Resolver. Valid options are: %s", dbType, opts);
                 throw new IllegalArgumentException(error);
         }
 
@@ -54,7 +55,8 @@ public class GeoIpResolverFactory {
 
         final GeoIpResolver<?, GeoAsnInformation> resolver;
 
-        switch (config.asnDbType()) {
+        final DatabaseType dbType = config.databaseVendorType().getAsnDbType();
+        switch (dbType) {
             case IPINFO_ASN:
                 resolver = new IpInfoIpAsnResolver(timer, config.asnDbPath(), config.enabled());
                 break;
@@ -63,7 +65,7 @@ public class GeoIpResolverFactory {
                 break;
             default:
                 String opts = String.join(",", DatabaseType.MAXMIND_ASN.name(), DatabaseType.IPINFO_ASN.name());
-                String error = String.format(Locale.US, "'%s' is not a valid DatabaseType for a GeoLocation Resolver. Valid options are: %s", config.asnDbType(), opts);
+                String error = String.format(Locale.US, "'%s' is not a valid DatabaseType for a GeoLocation Resolver. Valid options are: %s", dbType, opts);
                 throw new IllegalArgumentException(error);
         }
 
