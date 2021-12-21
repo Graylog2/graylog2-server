@@ -14,8 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import { DataTable } from 'components/common';
 import type { RuleType, MetricsConfigType, RulesContext } from 'stores/rules/RulesStore';

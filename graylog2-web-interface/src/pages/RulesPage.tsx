@@ -25,7 +25,8 @@ import DocsHelper from 'util/DocsHelper';
 import RuleList from 'components/rules/RuleList';
 import RuleMetricsConfigContainer from 'components/rules/RuleMetricsConfigContainer';
 import Routes from 'routing/Routes';
-import { Pagination, DEFAULT_PAGINATION } from 'stores/PaginationTypes';
+import { DEFAULT_PAGINATION } from 'stores/PaginationTypes';
+import type { Pagination } from 'stores/PaginationTypes';
 import type { MetricsConfigType, PaginatedRules, RuleType } from 'stores/rules/RulesStore';
 import { RulesActions } from 'stores/rules/RulesStore';
 import useLocationSearchPagination from 'hooks/useLocationSearchPagination';
@@ -103,6 +104,11 @@ const RulesPage = () => {
     };
   };
 
+  const onCloseMetricsConfig = () => {
+    _loadRuleMetricData(setIsMetricDataLoading, setMetricsConfig);
+    toggleMetricsConfig(false);
+  };
+
   const renderDebugMetricsButton = () => {
     if (metricsConfig && metricsConfig.metrics_enabled) {
       return <Button bsStyle="warning" onClick={toggleMetricsConfig}>Debug Metrics: ON</Button>;
@@ -173,7 +179,7 @@ const RulesPage = () => {
                 <Col md={12}>
                   <PaginatedList onChange={handlePageChange} totalItems={total} activePage={page} pageSize={perPage}>
                     <RuleList rules={rules} rulesContext={rulesContext} onDelete={handleDelete} searchFilter={searchFilter} />
-                    {openMetricsConfig && <RuleMetricsConfigContainer onClose={toggleMetricsConfig} />}
+                    {openMetricsConfig && <RuleMetricsConfigContainer onClose={onCloseMetricsConfig} />}
                   </PaginatedList>
                 </Col>
               </Row>
