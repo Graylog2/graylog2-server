@@ -31,7 +31,6 @@ public abstract class ValidationMessage {
 
     private static final Pattern regexSimple = Pattern.compile("([\\w.]+):\\s+(.*)", Pattern.MULTILINE | Pattern.DOTALL);
     private static final Pattern regexPosition = Pattern.compile(".*at line (\\d+), column (\\d+).", Pattern.MULTILINE | Pattern.DOTALL);
-    private static final Pattern regexForExplanation = Pattern.compile("(\\w+)\\(\"(.+)\"\\)", Pattern.MULTILINE | Pattern.DOTALL);
 
     @JsonProperty
     @Nullable
@@ -74,13 +73,6 @@ public abstract class ValidationMessage {
             }
             errorBuilder.errorMessage(simpleMatcher.group(2));
         }
-
-        final Matcher explanationMatcher = regexForExplanation.matcher(input);
-        if (explanationMatcher.find()) {
-            errorBuilder.errorType(explanationMatcher.group(1));
-            errorBuilder.errorMessage(explanationMatcher.group(2));
-        }
-
 
         final Matcher positionMatcher = regexPosition.matcher(input);
         if (positionMatcher.find()) {
