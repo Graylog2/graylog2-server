@@ -49,6 +49,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -118,10 +119,14 @@ public class GreyNoiseCommunityIpLookupAdapter extends LookupDataAdapter {
     @Override
     protected LookupResult doGet(Object ipAddress) {
 
-        Request request = createRequest(ipAddress);
+
+        Optional<Request> request = createRequest(ipAddress);
+        if (!request.isPresent()) {
+            return LookupResult.withError();
+        }
 
         LookupResult result;
-        try (Response response = okHttpClient.newCall(request).execute()) {
+        try (Response response = okHttpClient.newCall(request.get()).execute()) {
             result = parseResponse(response);
 
         } catch (IOException e) {
@@ -132,42 +137,52 @@ public class GreyNoiseCommunityIpLookupAdapter extends LookupDataAdapter {
     }
 
     @VisibleForTesting
-    Request createRequest(Object ipAddress) {
-        String ipString = getValidIpString(ipAddress);
+    Optional<Request> createRequest(Object ipAddress) {
+        Optional<String> ipString = getValidIpString(ipAddress);
 
+        if (!ipString.isPresent()) {
+            return Optional.empty();
+        }
         String apiToken = encryptedValueService.decrypt(config.apiToken());
         if (apiToken == null || apiToken.trim().isEmpty()) {
             String error = String.format("[%s] requires a non-null API Token", ADAPTER_NAME);
             throw new IllegalArgumentException(error);
         }
 
-        return new Request.Builder()
-                .url(String.join("/", GREYNOISE_COMMUNITY_ENDPOINT, ipString))
+        Request request = new Request.Builder()
+                .url(String.join("/", GREYNOISE_COMMUNITY_ENDPOINT, ipString.get()))
                 .method(METHOD, null)
                 .addHeader("Accept", ACCEPT_TYPE)
                 .addHeader("User-Agent", USER_AGENT)
                 .addHeader("key", apiToken)
                 .build();
+
+        return Optional.of(request);
     }
 
-    private String getValidIpString(Object ipAddress) {
-        String ipString = ipAddress == null ? "" : ipAddress.toString();
+    private Optional<String> getValidIpString(Object ipAddress) {
+        final String ipString = ipAddress == null ? "" : ipAddress.toString();
         if (ipString.trim().isEmpty()) {
-            String error = String.format("[%s] requires an IP address to perform Lookup", ADAPTER_NAME);
+            String error = String.format("'%s' requires an IP address to perform Lookup", ADAPTER_NAME);
             throw new IllegalArgumentException(error);
         }
 
-        if (!InetAddressValidator.getInstance().isValidInet4Address(ipString)) {
-            String error = String.format("[%s] is not a valid IPv4 Address", ipString);
-            throw new IllegalArgumentException(error);
+        final String validIpAddress;
+        final InetAddressValidator validator = InetAddressValidator.getInstance();
+        if (validator.isValidInet6Address(ipString)) {
+            LOG.error("'{}' is an IPv6 Address.  '{}' does not support IPv6 Addresses", ipAddress, ADAPTER_NAME);
+            validIpAddress = null;
+        } else if (!validator.isValidInet4Address(ipString)) {
+            LOG.error("'{}' is not a valid IPv4 Address", ipString);
+            validIpAddress = null;
+        } else if (ReservedIpChecker.getInstance().isReservedIpAddress(ipString)) {
+            LOG.error("'{}' is a Reserved address", ipAddress);
+            validIpAddress = null;
+        } else {
+            validIpAddress = ipString;
         }
 
-        if (ReservedIpChecker.getInstance().isReservedIpAddress(ipString)) {
-            String error = String.format("[%s] is a reserved IP Address", ipString);
-            throw new IllegalArgumentException(error);
-        }
-
-        return ipString;
+        return Optional.ofNullable(validIpAddress);
     }
 
     @VisibleForTesting
