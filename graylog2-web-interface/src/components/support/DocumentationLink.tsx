@@ -14,25 +14,27 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
-import React from 'react';
-
 import DocsHelper from 'util/DocsHelper';
 
-class DocumentationLink extends React.Component {
-  static propTypes = {
-    page: PropTypes.string.isRequired,
-    text: PropTypes.node.isRequired,
-    title: PropTypes.string,
-  };
+import * as React from 'react';
+import type { ReactNode } from 'react';
 
-  render() {
-    return (
-      <a href={DocsHelper.toString(this.props.page)} title={this.props.title} target="_blank" rel="noreferrer">
-        {this.props.text}
-      </a>
-    );
-  }
+type Props = {
+  page: string;
+  text: ReactNode;
+  title?: string;
 }
+
+const DocumentationLink = ({ page, title = '', text }: Props) => {
+  return (
+    <a href={DocsHelper.toString(page)} title={title} target="_blank" rel="noreferrer">
+      {text}
+    </a>
+  );
+};
+
+DocumentationLink.defaultProps = {
+  title: '',
+};
 
 export default DocumentationLink;
