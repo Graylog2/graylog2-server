@@ -46,7 +46,7 @@ public abstract class GeoIpResolverConfig {
                                              @JsonProperty("asn_db_path") String asnDbPath) {
         return builder()
                 .enabled(cityEnabled)
-                .databaseVendorType(databaseVendorType)
+                .databaseVendorType(databaseVendorType == null ? DatabaseVendorType.MAXMIND : databaseVendorType)
                 .cityDbPath(cityDbPath)
                 .asnDbPath(asnDbPath)
                 .build();

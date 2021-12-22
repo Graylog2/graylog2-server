@@ -18,36 +18,21 @@
 package org.graylog.plugins.map.geoip;
 
 import com.codahale.metrics.Timer;
-import com.maxmind.geoip2.DatabaseReader;
 import com.maxmind.geoip2.model.CityResponse;
 import com.maxmind.geoip2.record.City;
 import com.maxmind.geoip2.record.Country;
 import com.maxmind.geoip2.record.Location;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.IOException;
 import java.net.InetAddress;
-import java.util.Locale;
 import java.util.Optional;
 
-public class MaxMindIpLocationResolver extends GeoIpResolver<DatabaseReader, GeoLocationInformation> {
-
-    private static final Logger LOG = LoggerFactory.getLogger(MaxMindIpLocationResolver.class);
+/**
+ * A {@link GeoIpResolver} to load IP location data from {@link org.graylog.plugins.map.config.DatabaseVendorType#MAXMIND}.
+ */
+public class MaxMindIpLocationResolver extends MaxMindIpResolver<GeoLocationInformation> {
 
     public MaxMindIpLocationResolver(Timer resolveTime, String configPath, boolean enabled) {
         super(resolveTime, configPath, enabled);
-    }
-
-    @Override
-    DatabaseReader createDataProvider(File configFile) {
-        try {
-            return new DatabaseReader.Builder(configFile).build();
-        } catch (IOException e) {
-            String error = String.format(Locale.US, "Error creating '%s'.  %s", getClass().getName(), e.getMessage());
-            throw new IllegalStateException(error, e);
-        }
     }
 
     @Override
@@ -55,7 +40,7 @@ public class MaxMindIpLocationResolver extends GeoIpResolver<DatabaseReader, Geo
 
         GeoLocationInformation info;
         try (Timer.Context ignored = resolveTime.time()) {
-            final CityResponse response = dataProvider.city(address);
+            final CityResponse response = databaseReader.city(address);
             final Location location = response.getLocation();
             final Country country = response.getCountry();
             final City city = response.getCity();

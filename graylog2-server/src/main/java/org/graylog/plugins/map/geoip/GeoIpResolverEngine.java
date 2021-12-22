@@ -29,8 +29,8 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 import java.net.InetAddress;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.codahale.metrics.MetricRegistry.name;
@@ -48,20 +48,23 @@ public class GeoIpResolverEngine {
             .put("destination_ip", "destination")
             .build();
 
-    private final GeoIpResolver<?, GeoLocationInformation> ipLocationResolver;
-    private final GeoIpResolver<?, GeoAsnInformation> ipAsnResolver;
+    private final GeoIpResolver<GeoLocationInformation> ipLocationResolver;
+    private final GeoIpResolver<GeoAsnInformation> ipAsnResolver;
     private boolean enabled;
 
 
     public GeoIpResolverEngine(GeoIpResolverConfig config, MetricRegistry metricRegistry) {
         Timer resolveTime = metricRegistry.timer(name(GeoIpResolverEngine.class, "resolveTime"));
 
-        GeoIpResolverFactory resolverFactory = GeoIpResolverFactory.getInstance();
-        ipLocationResolver = resolverFactory.createLocationResolver(resolveTime, config);
-        ipAsnResolver = resolverFactory.createIpAsnResolver(resolveTime, config);
+        GeoIpResolverFactory resolverFactory = new GeoIpResolverFactory(config, resolveTime);
+        ipLocationResolver = resolverFactory.createIpCityResolver();
+        ipAsnResolver = resolverFactory.createIpAsnResolver();
 
-        //TODO: Confirm with Dan/Rob/et. al, if enabled here should be if either (any) resolver is working/enabled
-        this.enabled = ipLocationResolver.isEnabled() && ipAsnResolver.isEnabled();
+        LOG.info("Created Geo IP Resolvers for '{}'", resolverFactory.getDatabaseVendorType());
+        LOG.info("'{}' Status Enabled: {}", ipLocationResolver.getClass().getSimpleName(), ipLocationResolver.isEnabled());
+        LOG.info("'{}' Status Enabled: {}", ipAsnResolver.getClass().getSimpleName(), ipAsnResolver.isEnabled());
+
+        this.enabled = ipLocationResolver.isEnabled() || ipAsnResolver.isEnabled();
 
     }
 
@@ -79,6 +82,8 @@ public class GeoIpResolverEngine {
                 continue;
             }
 
+            //TODO: Tag any reserved IP addresses with 'reserved_ip: true' once ReservedIpChecker is merged
+
             final String prefix = ipAddressFields.get(key);
             ipLocationResolver.getGeoIpData(address).ifPresent(locationInformation -> {
                 message.addField(prefix + "_geo_coordinates", locationInformation.latitude() + "," + locationInformation.longitude());
@@ -86,6 +91,11 @@ public class GeoIpResolverEngine {
                 message.addField(prefix + "_geo_city", locationInformation.cityName());
                 message.addField(prefix + "_geo_region", locationInformation.region());
                 message.addField(prefix + "_geo_timeZone", locationInformation.timeZone());
+
+                if (!(locationInformation.countryIsoCode() == null || locationInformation.cityName() == null)) {
+                    String name = String.format(Locale.ENGLISH, "%s, %s", locationInformation.cityName(), locationInformation.countryIsoCode());
+                    message.addField(prefix + "_geo_name", name);
+                }
             });
 
             ipAsnResolver.getGeoIpData(address).ifPresent(info -> {
@@ -105,13 +115,6 @@ public class GeoIpResolverEngine {
                 .filter(e -> ipAddressFields.containsKey(e)
                         && !e.startsWith(Message.INTERNAL_FIELD_PREFIX))
                 .collect(Collectors.toList());
-    }
-
-    //TODO: remove this and unit tests--test the resolvers individually instead
-    @VisibleForTesting
-    Optional<GeoLocationInformation> extractGeoLocationInformation(InetAddress address) {
-
-        return ipLocationResolver.getGeoIpData(address);
     }
 
     private InetAddress getValidRoutableInetAddress(Object fieldValue) {

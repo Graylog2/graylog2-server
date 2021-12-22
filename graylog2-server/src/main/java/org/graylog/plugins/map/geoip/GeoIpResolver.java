@@ -26,13 +26,12 @@ import java.net.InetAddress;
 import java.nio.file.Files;
 import java.util.Optional;
 
-public abstract class GeoIpResolver<P, V> {
+public abstract class GeoIpResolver<V> {
 
     private static final Logger LOG = LoggerFactory.getLogger(GeoIpResolver.class);
 
     protected final Timer resolveTime;
     private final boolean enabled;
-    protected final P dataProvider;
 
     GeoIpResolver(Timer resolveTime, String configPath, boolean enabled) {
 
@@ -40,16 +39,13 @@ public abstract class GeoIpResolver<P, V> {
         if (enabled) {
             final File configFile = new File(configPath);
             if (Files.exists(configFile.toPath())) {
-                this.dataProvider = createDataProvider(configFile);
-                this.enabled = true;
+                this.enabled = createDataProvider(configFile);
             } else {
                 LOG.warn("'{}' database file does not exist: {}", getClass().getName(), configPath);
                 this.enabled = false;
-                this.dataProvider = null;
             }
         } else {
             this.enabled = false;
-            this.dataProvider = null;
         }
     }
 
@@ -57,10 +53,10 @@ public abstract class GeoIpResolver<P, V> {
         return enabled;
     }
 
-    abstract P createDataProvider(File configFile);
+    abstract boolean createDataProvider(File configFile);
 
     public Optional<V> getGeoIpData(InetAddress address) {
-        if (!enabled || dataProvider == null || address == null) {
+        if (!enabled || address == null) {
             return Optional.empty();
         }
 

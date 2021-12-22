@@ -18,41 +18,28 @@
 package org.graylog.plugins.map.geoip;
 
 import com.codahale.metrics.Timer;
-import com.maxmind.geoip2.DatabaseReader;
 import com.maxmind.geoip2.exception.GeoIp2Exception;
 import com.maxmind.geoip2.model.AsnResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.Locale;
 import java.util.Optional;
 
-public class MaxMindIpAsnResolver extends GeoIpResolver<DatabaseReader, GeoAsnInformation> {
-
-    private static final Logger LOG = LoggerFactory.getLogger(MaxMindIpAsnResolver.class);
+/**
+ * A {@link GeoIpResolver} to load IP ASN data from {@link org.graylog.plugins.map.config.DatabaseVendorType#MAXMIND}.
+ */
+public class MaxMindIpAsnResolver extends MaxMindIpResolver<GeoAsnInformation> {
 
     public MaxMindIpAsnResolver(Timer resolveTime, String configPath, boolean enabled) {
         super(resolveTime, configPath, enabled);
     }
 
     @Override
-    DatabaseReader createDataProvider(File configFile) {
-        try {
-            return new DatabaseReader.Builder(configFile).build();
-        } catch (IOException e) {
-            String error = String.format(Locale.US, "Error creating '%s'.  %s", getClass().getName(), e.getMessage());
-            throw new IllegalStateException(error, e);
-        }
-    }
-
-    @Override
     protected Optional<GeoAsnInformation> doGetGeoIpData(InetAddress address) {
         GeoAsnInformation asn;
         try {
-            AsnResponse response = dataProvider.asn(address);
+            AsnResponse response = databaseReader.asn(address);
             String number = response.getAutonomousSystemNumber() == null ? "N/A" : response.getAutonomousSystemNumber().toString();
             asn = GeoAsnInformation.create(response.getAutonomousSystemOrganization(), "N/A", number);
         } catch (GeoIp2Exception | IOException | UnsupportedOperationException e) {

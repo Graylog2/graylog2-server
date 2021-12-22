@@ -18,34 +18,17 @@
 package org.graylog.plugins.map.geoip;
 
 import com.codahale.metrics.Timer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.IOException;
 import java.net.InetAddress;
-import java.util.Locale;
 import java.util.Optional;
 
-public class IpInfoIpAsnResolver extends GeoIpResolver<IPinfoIPLocationDatabaseAdapter, GeoAsnInformation> {
-    private static Logger LOG = LoggerFactory.getLogger(IpInfoIpAsnResolver.class);
+/**
+ * A {@link GeoIpResolver} to load IP ASN data from {@link org.graylog.plugins.map.config.DatabaseVendorType#IPINFO}.
+ */
+public class IpInfoIpAsnResolver extends IpInfoIpResolver<GeoAsnInformation> {
 
     public IpInfoIpAsnResolver(Timer timer, String configPath, boolean enabled) {
         super(timer, configPath, enabled);
-    }
-
-    @Override
-    IPinfoIPLocationDatabaseAdapter createDataProvider(File configFile) {
-
-        IPinfoIPLocationDatabaseAdapter adapter;
-        try {
-            adapter = new IPinfoIPLocationDatabaseAdapter(configFile);
-        } catch (IOException e) {
-            String error = String.format(Locale.US, "Error creating '%s'. %s", getClass(), e.getMessage());
-            LOG.warn(error, e);
-            adapter = null;
-        }
-        return adapter;
     }
 
     @Override
@@ -53,12 +36,11 @@ public class IpInfoIpAsnResolver extends GeoIpResolver<IPinfoIPLocationDatabaseA
 
         GeoAsnInformation info;
         try {
-            final IPinfoASN ipInfoASN = dataProvider.ipInfoASN(address);
+            final IPinfoASN ipInfoASN = adapter.ipInfoASN(address);
             info = GeoAsnInformation.create(ipInfoASN.name(), ipInfoASN.type(), ipInfoASN.asn());
         } catch (Exception e) {
             info = null;
         }
         return Optional.ofNullable(info);
-
     }
 }

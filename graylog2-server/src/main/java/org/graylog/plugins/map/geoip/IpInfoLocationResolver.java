@@ -18,36 +18,18 @@
 package org.graylog.plugins.map.geoip;
 
 import com.codahale.metrics.Timer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.IOException;
 import java.net.InetAddress;
 import java.util.Locale;
 import java.util.Optional;
 
-public class IpInfoIpLocationResolver extends GeoIpResolver<IPinfoIPLocationDatabaseAdapter, GeoLocationInformation> {
+/**
+ * A {@link GeoIpResolver} to load IP Location data from {@link org.graylog.plugins.map.config.DatabaseVendorType#IPINFO}.
+ */
+public class IpInfoLocationResolver extends IpInfoIpResolver<GeoLocationInformation> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(IpInfoIpLocationResolver.class);
-
-    public IpInfoIpLocationResolver(Timer resolveTime, String configPath, boolean enabled) {
+    public IpInfoLocationResolver(Timer resolveTime, String configPath, boolean enabled) {
         super(resolveTime, configPath, enabled);
-    }
-
-    @Override
-    IPinfoIPLocationDatabaseAdapter createDataProvider(File configFile) {
-
-        IPinfoIPLocationDatabaseAdapter adapter;
-        try {
-            adapter = new IPinfoIPLocationDatabaseAdapter(configFile);
-        } catch (IOException e) {
-            String error = String.format(Locale.US, "Error creating '%s'. %s", getClass(), configFile);
-            LOG.error(error);
-            adapter = null;
-        }
-
-        return adapter;
     }
 
     @Override
@@ -55,7 +37,7 @@ public class IpInfoIpLocationResolver extends GeoIpResolver<IPinfoIPLocationData
         GeoLocationInformation info;
 
         try {
-            IPinfoStandardLocation loc = dataProvider.ipInfoStandardLocation(address);
+            IPinfoStandardLocation loc = adapter.ipInfoStandardLocation(address);
             info = GeoLocationInformation.create(loc.latitude(), loc.longitude(), loc.country(),
                     loc.city(), loc.region(), loc.timezone());
 
