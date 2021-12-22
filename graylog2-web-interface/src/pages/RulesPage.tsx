@@ -49,12 +49,9 @@ const _loadData = (pagination: Pagination, setIsLoading, setPaginatedRules) => {
   });
 };
 
-const _loadRuleMetricData = (setIsloading, setMetricsConfig) => {
-  setIsloading(true);
-
+const _loadRuleMetricData = (setMetricsConfig) => {
   RulesActions.loadMetricsConfig().then((metricsConfig: MetricsConfigType) => {
     setMetricsConfig(metricsConfig);
-    setIsloading(false);
   });
 };
 
@@ -62,7 +59,6 @@ const RulesPage = () => {
   const [isDataLoading, setIsDataLoading] = useState<boolean>(false);
   const [openMetricsConfig, toggleMetricsConfig] = useState<boolean>(false);
   const [metricsConfig, setMetricsConfig] = useState<MetricsConfigType>();
-  const [isMetricDataLoading, setIsMetricDataLoading] = useState<boolean>(false);
   const { isInitialized: isPaginationReady, pagination, setPagination } = useLocationSearchPagination(DEFAULT_PAGINATION);
   const [paginatedRules, setPaginatedRules] = useState<PaginatedRules | undefined>();
   const { list: rules, pagination: { total = 0, count = 0 } = {}, context: rulesContext } = paginatedRules ?? {};
@@ -75,7 +71,7 @@ const RulesPage = () => {
   }, [isPaginationReady, pagination]);
 
   useEffect(() => {
-    _loadRuleMetricData(setIsMetricDataLoading, setMetricsConfig);
+    _loadRuleMetricData(setMetricsConfig);
   }, []);
 
   const handlePageChange = (newPage, newPerPage) => {
@@ -105,7 +101,7 @@ const RulesPage = () => {
   };
 
   const onCloseMetricsConfig = () => {
-    _loadRuleMetricData(setIsMetricDataLoading, setMetricsConfig);
+    _loadRuleMetricData(setMetricsConfig);
     toggleMetricsConfig(false);
   };
 
@@ -122,7 +118,7 @@ const RulesPage = () => {
       <LinkContainer to={Routes.SYSTEM.PIPELINES.RULE('new')}>
         <Button bsStyle="success">Create Rule</Button>
       </LinkContainer>
-      {!isMetricDataLoading && renderDebugMetricsButton()}
+      {renderDebugMetricsButton()}
     </ButtonToolbar>
   );
 
