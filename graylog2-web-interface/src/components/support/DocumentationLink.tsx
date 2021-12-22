@@ -14,10 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import DocsHelper from 'util/DocsHelper';
-
 import * as React from 'react';
 import type { ReactNode } from 'react';
+
+import DocsHelper from 'util/DocsHelper';
 
 type Props = {
   page: string;
