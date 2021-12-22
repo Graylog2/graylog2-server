@@ -16,6 +16,8 @@
  */
 package org.graylog2.rest.resources.system;
 
+import com.codahale.metrics.Timer;
+import com.codahale.metrics.UniformReservoir;
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,6 +28,9 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog.plugins.map.config.GeoIpResolverConfig;
+import org.graylog.plugins.map.geoip.GeoIpResolver;
+import org.graylog.plugins.map.geoip.GeoIpResolverFactory;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.plugin.cluster.ClusterConfigService;
@@ -55,6 +60,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Locale;
 import java.util.Set;
 
 import static java.util.Objects.requireNonNull;
@@ -129,6 +135,8 @@ public class ClusterConfigResource extends RestResource {
             throw new BadRequestException(msg);
         }
 
+        validateIfGeoIpResolverConfig(o);
+
         try {
             clusterConfigService.write(o);
         } catch (Exception e) {
@@ -138,6 +146,29 @@ public class ClusterConfigResource extends RestResource {
         }
 
         return Response.accepted(o).build();
+    }
+
+    private void validateIfGeoIpResolverConfig(Object o) {
+        if (o instanceof GeoIpResolverConfig) {
+            final GeoIpResolverConfig config = (GeoIpResolverConfig) o;
+            GeoIpResolverFactory factory = new GeoIpResolverFactory(config, new Timer(new UniformReservoir()));
+            try {
+                GeoIpResolver<?> cityResolver = factory.createIpCityResolver();
+                if (!cityResolver.isEnabled()) {
+                    String msg = String.format(Locale.ENGLISH, "Invalid '%s' City Geo IP database file '%s'.  Make sure the file exists and is valid for '%1$s'", config.databaseVendorType(), config.cityDbPath());
+                    throw new IllegalArgumentException(msg);
+                }
+
+                GeoIpResolver<?> asnResolver = factory.createIpAsnResolver();
+                if (!asnResolver.isEnabled()) {
+                    String msg = String.format(Locale.ENGLISH, "Invalid '%s'  ASN database file '%s'.  Make sure the file exists and is valid for '%1$s'", config.databaseVendorType(), config.asnDbPath());
+                    throw new IllegalArgumentException(msg);
+                }
+            } catch (IllegalArgumentException e) {
+                LOG.error(e.getMessage(), e);
+                throw new BadRequestException(e.getMessage());
+            }
+        }
     }
 
     @DELETE
