@@ -36,7 +36,7 @@ public abstract class ExecutionState {
 
     public abstract ImmutableMap<String, Object> queries();
 
-    public abstract ImmutableMap<String, Object> globalOverride();
+    public abstract ExecutionGlobalOverride globalOverride();
 
     public abstract ImmutableMap<String, Object> additionalParameters();
 
@@ -59,10 +59,9 @@ public abstract class ExecutionState {
         }
 
         @JsonProperty("global_override")
-        public abstract Builder setGlobalOverride(Map<String, Object> value);
+        public abstract Builder setGlobalOverride(ExecutionGlobalOverride globalOverride);
 
-        public abstract ImmutableMap.Builder<String, Object> globalOverrideBuilder();
-
+        public abstract ExecutionGlobalOverride.Builder globalOverrideBuilder();
 
         @JsonProperty
         public abstract ImmutableMap.Builder<String, Object> queriesBuilder();
