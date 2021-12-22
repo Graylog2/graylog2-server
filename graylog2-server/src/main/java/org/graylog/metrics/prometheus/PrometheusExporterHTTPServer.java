@@ -23,6 +23,7 @@ import com.sun.net.httpserver.HttpServer;
 import io.prometheus.client.Collector;
 import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.exporter.HTTPServer;
+import org.graylog2.shared.SuppressForbidden;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,6 +65,7 @@ public class PrometheusExporterHTTPServer {
         registryRef.set(newRegistry);
     }
 
+    @SuppressForbidden("Deliberate usage of HttpServer")
     public void start() {
         try {
             final InetSocketAddress addr = new InetSocketAddress(bindAddress.getHost(), bindAddress.getPort());
