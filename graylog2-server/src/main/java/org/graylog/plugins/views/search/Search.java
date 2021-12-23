@@ -107,7 +107,7 @@ public abstract class Search implements ContentPackable<SearchEntity> {
         if (executionState.queries() != null || executionState.globalOverride() != null) {
             final ImmutableSet<Query> queries = queries().stream()
                     .map(query -> {
-                        final JsonNode queryOverride = executionState.globalOverride() != null
+                        final JsonNode queryOverride = executionState.globalOverride().hasValues()
                                 ? objectMapper.convertValue(executionState.globalOverride(), JsonNode.class)
                                 : objectMapper.convertValue(executionState.queries(), JsonNode.class).path(query.id());
                         return query.applyExecutionState(objectMapper, queryOverride);

@@ -16,11 +16,9 @@
  */
 package org.graylog.plugins.views.search.rest;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -50,6 +48,15 @@ public abstract class ExecutionGlobalOverride {
         return new AutoValue_ExecutionGlobalOverride.Builder();
     }
 
+    public boolean hasValues() {
+        return timerange().isPresent() ||
+       query().isPresent() ||
+       limit().isPresent() ||
+       offset().isPresent() ||
+       !searchTypes().isEmpty() ||
+       !keepSearchTypes().isEmpty();
+    }
+
     @AutoValue.Builder
     public abstract static class Builder {
 
@@ -68,6 +75,7 @@ public abstract class ExecutionGlobalOverride {
         public abstract Builder offset(Integer offset);
         @JsonProperty
         public abstract ImmutableMap.Builder<String, Object> searchTypesBuilder();
+        @JsonProperty
         public abstract ImmutableSet.Builder<String> keepSearchTypesBuilder();
         public abstract ExecutionGlobalOverride build();
     }
