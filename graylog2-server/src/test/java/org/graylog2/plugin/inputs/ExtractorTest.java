@@ -981,32 +981,6 @@ public class ExtractorTest {
         assertThat(msg.getTimestamp()).isEqualTo(new DateTime(2021, 10, 20, 9, 5, 39, 892, UTC));
     }
 
-    @Test
-    public void testTimestampIsFixedWhenConverterHasFailed() throws Exception {
-        final Converter converter = new TestConverter.Builder()
-                .multiple(true)
-                .callback(new Function<Object, Object>() {
-                    @Nullable
-                    @Override
-                    public Object apply(Object input) {
-                        throw new IllegalArgumentException("Invalid format: FOO");
-                    }
-                })
-                .build();
-
-        final TestExtractor extractor = new TestExtractor.Builder()
-                .targetField("timestamp")
-                .converters(Collections.singletonList(converter))
-                .callback(() -> new Result[]{new Result("FOO", -1, -1)})
-                .build();
-
-        final Message msg = createMessage("the message");
-
-        extractor.runExtractor(msg);
-
-        assertThat(msg.getTimestamp()).isInstanceOf(DateTime.class);
-    }
-
     private Message createMessage(String message) {
         return new Message(message, "localhost", DateTime.now(UTC));
     }
