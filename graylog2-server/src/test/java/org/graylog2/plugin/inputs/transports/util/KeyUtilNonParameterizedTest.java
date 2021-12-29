@@ -16,14 +16,11 @@
  */
 package org.graylog2.plugin.inputs.transports.util;
 
-import org.bouncycastle.operator.OperatorCreationException;
-import org.bouncycastle.pkcs.PKCSException;
 import org.graylog.testing.ResourceUtil;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -41,7 +38,7 @@ public class KeyUtilNonParameterizedTest {
 
     @Test
     // Read a PKCS5 v2.0 encrypted private key in PKCS8 format
-    public void testPrivateKeyFromProtectedFile() throws URISyntaxException, IOException, OperatorCreationException, PKCSException {
+    public void testPrivateKeyFromProtectedFile() throws URISyntaxException, KeyUtilException {
         final String password = "test";
         final PrivateKey privateKey = fileToKey(resourceToFile("server.key.pem.pkcs8.protected"), password);
         assertThat(privateKey).isNotNull();
@@ -49,26 +46,26 @@ public class KeyUtilNonParameterizedTest {
 
     @Test
     // Read a PKCS5 v1.5 encrypted private key in PKCS8 format
-    public void testPrivateKeyFromLegacyProtectedFile() throws URISyntaxException, IOException, OperatorCreationException, PKCSException {
+    public void testPrivateKeyFromLegacyProtectedFile() throws URISyntaxException, KeyUtilException {
         final String password = "test";
         final PrivateKey privateKey = fileToKey(resourceToFile("server.key.pem.pkcs8.v1.protected"), password);
         assertThat(privateKey).isNotNull();
     }
 
     @Test
-    public void testPrivateKeyFromUnprotectedFile() throws URISyntaxException, IOException, OperatorCreationException, PKCSException {
+    public void testPrivateKeyFromUnprotectedFile() throws URISyntaxException, KeyUtilException {
         final PrivateKey privateKey = fileToKey(resourceToFile("server.key.pem.pkcs8.unprotected"), null);
         assertThat(privateKey).isNotNull();
     }
 
     @Test
-    public void testPrivateKeyFromPKCS1() throws URISyntaxException, IOException, OperatorCreationException, PKCSException {
+    public void testPrivateKeyFromPKCS1() throws URISyntaxException, KeyUtilException {
         final PrivateKey privateKey = fileToKey(resourceToFile("server.key.unprotected.pkcs1"), null);
         assertThat(privateKey).isNotNull();
     }
 
     @Test
-    public void testGeneratePKSC8PrivateKey() throws GeneralSecurityException, IOException, OperatorCreationException, PKCSException, URISyntaxException {
+    public void testGeneratePKSC8PrivateKey() throws GeneralSecurityException, URISyntaxException, KeyUtilException {
         final PrivateKey privateKey = fileToKey(resourceToFile("server.key.pem.pkcs8.unprotected"), null);
         final String tmpPassword = "dummypassword";
         final Path tmpDir = Paths.get(System.getProperty("java.io.tmpdir"));
@@ -81,7 +78,7 @@ public class KeyUtilNonParameterizedTest {
         return ResourceUtil.resourceToTmpFile("org/graylog2/plugin/inputs/transports/util/" + fileName);
     }
 
-    private PrivateKey fileToKey(File keyFile, String password) throws URISyntaxException, IOException, OperatorCreationException, PKCSException {
+    private PrivateKey fileToKey(File keyFile, String password) throws KeyUtilException {
         return KeyUtil.privateKeyFromFile(password, keyFile);
     }
 }
