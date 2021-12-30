@@ -33,10 +33,10 @@ import com.google.inject.util.Types;
 import org.graylog2.Configuration;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
-import org.graylog2.bindings.MongoDBModule;
+import org.graylog2.bootstrap.preflight.PreflightCheck;
+import org.graylog2.bootstrap.preflight.PreflightChecksModule;
 import org.graylog2.configuration.PathConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
-import org.graylog2.database.MongoConnection;
 import org.graylog2.migrations.Migration;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
@@ -116,15 +116,15 @@ public abstract class ServerBootstrap extends CmdLineTool {
 
     @Override
     protected void beforeInjectorCreation() {
-        testMongoDbConnection();
+        runPreFlightChecks();
     }
 
-    // Try to create a single MongoDBConnection, so we can fail early if there is an error
-    private void testMongoDbConnection() {
-        Guice.createInjector(
-                        new NamedConfigParametersModule(jadConfig.getConfigurationBeans()),
-                        new MongoDBModule())
-                .getInstance(MongoConnection.class);
+    private void runPreFlightChecks() {
+        final PreflightCheck preFlightCheck = Guice.createInjector(
+                new NamedConfigParametersModule(jadConfig.getConfigurationBeans()),
+                new PreflightChecksModule()).getInstance(PreflightCheck.class);
+
+        preFlightCheck.runChecks();
     }
 
     private void setNettyNativeDefaults(PathConfiguration pathConfiguration) {

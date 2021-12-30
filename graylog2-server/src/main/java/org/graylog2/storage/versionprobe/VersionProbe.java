@@ -18,7 +18,9 @@ package org.graylog2.storage.versionprobe;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
+import com.github.rholder.retry.Attempt;
 import com.github.rholder.retry.RetryException;
+import com.github.rholder.retry.RetryListener;
 import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
@@ -72,6 +74,19 @@ public class VersionProbe {
                     .retryIfResult(input -> !input.isPresent())
                     .retryIfExceptionOfType(IOException.class)
                     .retryIfRuntimeException()
+                    .withRetryListener(new RetryListener() {
+                        @Override
+                        public <V> void onRetry(Attempt<V> attempt) {
+                            if (attempt.getAttemptNumber() == 1) {
+                                return;
+                            }
+                            if (connectionAttempts == 0) {
+                                LOG.info("Elasticsearch is not available. Retry #{}", attempt.getAttemptNumber());
+                            } else {
+                                LOG.info("Elasticsearch is not available. Retry #{}/{}", attempt.getAttemptNumber(), connectionAttempts);
+                            }
+                        }
+                    })
                     .withWaitStrategy(WaitStrategies.fixedWait(delayBetweenAttempts.getQuantity(), delayBetweenAttempts.getUnit()))
                     .withStopStrategy((connectionAttempts == 0) ? StopStrategies.neverStop() : StopStrategies.stopAfterAttempt(connectionAttempts))
                     .build().call(() -> this.probeAllHosts(hosts));
