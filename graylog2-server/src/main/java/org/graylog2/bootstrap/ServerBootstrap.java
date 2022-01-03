@@ -124,7 +124,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
                 new NamedConfigParametersModule(jadConfig.getConfigurationBeans()),
                 new PreflightChecksModule()).getInstance(PreflightCheck.class);
 
-        preFlightCheck.runChecks();
+        preFlightCheck.runChecks(configuration);
     }
 
     private void setNettyNativeDefaults(PathConfiguration pathConfiguration) {

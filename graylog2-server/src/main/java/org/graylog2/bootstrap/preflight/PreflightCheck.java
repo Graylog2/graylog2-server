@@ -25,8 +25,10 @@ import com.github.rholder.retry.WaitStrategies;
 import com.github.zafarkhaja.semver.Version;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoTimeoutException;
+import org.graylog2.Configuration;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.MongoDBVersionCheck;
+import org.graylog2.shared.messageq.MessageQueueModule;
 import org.graylog2.storage.SearchVersion;
 import org.graylog2.storage.versionprobe.ElasticsearchProbeException;
 import org.graylog2.storage.versionprobe.VersionProbe;
@@ -63,13 +65,14 @@ public class PreflightCheck {
         this.mongoConnection = mongoConnection;
     }
 
-    public void runChecks() {
+    public void runChecks(Configuration configuration) {
         if (skipPreflightChecks) {
             LOG.info("Skipping preflight checks");
             return;
         }
         checkMongoDb();
         checkElasticsearch();
+        checkJournal(configuration);
     }
 
     private void checkMongoDb() {
@@ -118,5 +121,15 @@ public class PreflightCheck {
         } catch (ElasticsearchProbeException e) {
             throw new PreflightCheckException(e);
         }
+    }
+
+    private void checkJournal(Configuration configuration) {
+        if (!configuration.isMessageJournalEnabled()) {
+            return;
+        }
+        if (configuration.getMessageJournalMode().equals(MessageQueueModule.DISK_JOURNAL_MODE)) {
+
+        }
+
     }
 }
