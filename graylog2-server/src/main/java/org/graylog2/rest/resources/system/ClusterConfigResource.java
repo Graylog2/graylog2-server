@@ -65,12 +65,13 @@ import java.util.Set;
 
 import static java.util.Objects.requireNonNull;
 
-@Api(value = "System/ClusterConfig", description = "Graylog Cluster Configuration")
+@Api(value = "System/ClusterConfig")
 @RequiresAuthentication
 @Path("/system/cluster_config")
 @Produces(MediaType.APPLICATION_JSON)
 public class ClusterConfigResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(ClusterConfigResource.class);
+    public static final String NO_CLASS_MSG = "Couldn't find configuration class  '%s'";
 
     private final ClusterConfigService clusterConfigService;
     private final ChainingClassLoader chainingClassLoader;
@@ -107,7 +108,8 @@ public class ClusterConfigResource extends RestResource {
                        @PathParam("configClass") @NotBlank String configClass) {
         final Class<?> cls = classFromName(configClass);
         if (cls == null) {
-            throw new NotFoundException("Couldn't find configuration class \"" + configClass + "\"");
+            String error = createNoClassMsg(configClass);
+            throw new NotFoundException(error);
         }
 
         return clusterConfigService.get(cls);
@@ -126,7 +128,7 @@ public class ClusterConfigResource extends RestResource {
                            @NotNull InputStream body) throws IOException {
         final Class<?> cls = classFromName(configClass);
         if (cls == null) {
-            throw new NotFoundException("Couldn't find configuration class \"" + configClass + "\"");
+            throw new NotFoundException(createNoClassMsg(configClass));
         }
 
         final Object o;
@@ -163,10 +165,13 @@ public class ClusterConfigResource extends RestResource {
                     throw new IllegalArgumentException(msg);
                 }
 
-                GeoIpResolver<?> asnResolver = geoIpVendorResolverService.createAsnResolver(config, timer);
-                if (config.enabled() && !asnResolver.isEnabled()) {
-                    String msg = String.format(Locale.ENGLISH, "Invalid '%s'  ASN database file '%s'.  Make sure the file exists and is valid for '%1$s'", config.databaseVendorType(), config.asnDbPath());
-                    throw new IllegalArgumentException(msg);
+                //ASN file is optional--do not validate if not provided.
+                if (!(config.asnDbPath() == null || config.asnDbPath().trim().isEmpty())) {
+                    GeoIpResolver<?> asnResolver = geoIpVendorResolverService.createAsnResolver(config, timer);
+                    if (config.enabled() && !asnResolver.isEnabled()) {
+                        String msg = String.format(Locale.ENGLISH, "Invalid '%s'  ASN database file '%s'.  Make sure the file exists and is valid for '%1$s'", config.databaseVendorType(), config.asnDbPath());
+                        throw new IllegalArgumentException(msg);
+                    }
                 }
             } catch (IllegalArgumentException e) {
                 LOG.error(e.getMessage(), e);
@@ -185,7 +190,7 @@ public class ClusterConfigResource extends RestResource {
                        @PathParam("configClass") @NotBlank String configClass) {
         final Class<?> cls = classFromName(configClass);
         if (cls == null) {
-            throw new NotFoundException("Couldn't find configuration class \"" + configClass + "\"");
+            throw new NotFoundException(createNoClassMsg(configClass));
         }
 
         clusterConfigService.remove(cls);
@@ -201,7 +206,7 @@ public class ClusterConfigResource extends RestResource {
                              @PathParam("configClass") @NotBlank String configClass) {
         final Class<?> cls = classFromName(configClass);
         if (cls == null) {
-            throw new NotFoundException("Couldn't find configuration class \"" + configClass + "\"");
+            throw new NotFoundException(createNoClassMsg(configClass));
         }
 
         final SchemaFactoryWrapper visitor = new SchemaFactoryWrapper();
@@ -222,4 +227,9 @@ public class ClusterConfigResource extends RestResource {
             return null;
         }
     }
+
+    private static String createNoClassMsg(String configClass) {
+        return String.format(Locale.ENGLISH, NO_CLASS_MSG, configClass);
+    }
+
 }

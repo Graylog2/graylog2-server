@@ -20,7 +20,7 @@ package org.graylog.plugins.map.geoip;
 import com.google.auto.value.AutoValue;
 
 @AutoValue
-abstract class GeoLocationInformation {
+public abstract class GeoLocationInformation {
     public abstract double latitude();
 
     public abstract double longitude();

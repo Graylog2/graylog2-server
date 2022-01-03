@@ -34,7 +34,7 @@ public class GeoIpVendorResolverService {
         this.resolverFactory = resolverFactory;
     }
 
-    public GeoIpResolver createCityResolver(GeoIpResolverConfig config, Timer timer) {
+    public GeoIpResolver<GeoLocationInformation> createCityResolver(GeoIpResolverConfig config, Timer timer) {
 
         switch (config.databaseVendorType()) {
             case IPINFO:
@@ -46,7 +46,7 @@ public class GeoIpVendorResolverService {
         }
     }
 
-    public GeoIpResolver createAsnResolver(GeoIpResolverConfig config, Timer timer) {
+    public GeoIpResolver<GeoAsnInformation> createAsnResolver(GeoIpResolverConfig config, Timer timer) {
 
         switch (config.databaseVendorType()) {
             case IPINFO:

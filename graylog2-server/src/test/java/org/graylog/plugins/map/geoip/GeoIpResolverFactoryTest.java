@@ -61,7 +61,7 @@ class GeoIpResolverFactoryTest {
         GeoIpResolver<GeoLocationInformation> cityResolver = geoIpResolverFactory.createIpInfoCityResolver(timer, config.cityDbPath(), config.enabled());
         Assertions.assertTrue(cityResolver instanceof MaxMindIpLocationResolver);
 
-        GeoIpResolver<GeoAsnInformation> asnResolver = geoIpResolverFactory.createIpInfoCityResolver(timer, config.asnDbPath(), config.enabled());
+        GeoIpResolver<GeoAsnInformation> asnResolver = geoIpResolverFactory.createIpInfoAsnResolver(timer, config.asnDbPath(), config.enabled());
         Assertions.assertTrue(asnResolver instanceof MaxMindIpAsnResolver);
     }
 
@@ -72,7 +72,7 @@ class GeoIpResolverFactoryTest {
         GeoIpResolver<GeoLocationInformation> cityResolver = geoIpResolverFactory.createIpInfoCityResolver(timer, config.cityDbPath(), config.enabled());
         Assertions.assertTrue(cityResolver instanceof IpInfoLocationResolver);
 
-        GeoIpResolver<GeoAsnInformation> asnResolver = geoIpResolverFactory.createIpInfoCityResolver(timer, config.asnDbPath(), config.enabled());
+        GeoIpResolver<GeoAsnInformation> asnResolver = geoIpResolverFactory.createIpInfoAsnResolver(timer, config.asnDbPath(), config.enabled());
         Assertions.assertTrue(asnResolver instanceof IpInfoIpAsnResolver);
     }
 

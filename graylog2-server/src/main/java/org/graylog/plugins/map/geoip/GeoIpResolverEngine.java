@@ -21,8 +21,10 @@ import com.codahale.metrics.Timer;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.net.InetAddresses;
+import org.apache.commons.lang3.StringUtils;
 import org.graylog.plugins.map.config.GeoIpResolverConfig;
 import org.graylog2.plugin.Message;
+import org.graylog2.utilities.ReservedIpChecker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,6 +43,12 @@ public class GeoIpResolverEngine {
     /**
      * A mapping of fields that to search that contain IP addresses.  ONLY these fields will be checked
      * to see if they have valid Geo IP information.
+     *
+     * <p>
+     * The mapping is <b>field name</b> -> <b>new message field prefix</b>, where field_name is the field name expected in the message
+     * which will be searched in the GeoIP database, and the new message field prefix is the prefix for the new field with the GeoIP data
+     * that will be inserted into the message.
+     * </p>
      */
     private final Map<String, String> ipAddressFields = new ImmutableMap.Builder<String, String>()
             .put("source_ip", "source")
@@ -81,31 +89,38 @@ public class GeoIpResolverEngine {
                 continue;
             }
 
-            //TODO: Tag any reserved IP addresses with 'reserved_ip: true' once ReservedIpChecker is merged
-
             final String prefix = ipAddressFields.get(key);
-            ipLocationResolver.getGeoIpData(address).ifPresent(locationInformation -> {
-                message.addField(prefix + "_geo_coordinates", locationInformation.latitude() + "," + locationInformation.longitude());
-                message.addField(prefix + "_geo_country", locationInformation.countryIsoCode());
-                message.addField(prefix + "_geo_city", locationInformation.cityName());
-                message.addField(prefix + "_geo_region", locationInformation.region());
-                message.addField(prefix + "_geo_timeZone", locationInformation.timeZone());
 
-                if (!(locationInformation.countryIsoCode() == null || locationInformation.cityName() == null)) {
-                    String name = String.format(Locale.ENGLISH, "%s, %s", locationInformation.cityName(), locationInformation.countryIsoCode());
-                    message.addField(prefix + "_geo_name", name);
-                }
-            });
-
-            ipAsnResolver.getGeoIpData(address).ifPresent(info -> {
-
-                message.addField(prefix + "_as_organization", info.organization());
-                message.addField(prefix + "_as_number", info.asn());
-            });
+            if (ReservedIpChecker.getInstance().isReservedIpAddress(address.getHostAddress())) {
+                message.addField(prefix + "_reserved_ip", true);
+            } else {
+                addGeoIpDataIfPresent(message, address, prefix);
+            }
 
         }
 
         return true;
+    }
+
+    private void addGeoIpDataIfPresent(Message message, InetAddress address, String newFieldPrefix) {
+        ipLocationResolver.getGeoIpData(address).ifPresent(locationInformation -> {
+            message.addField(newFieldPrefix + "_geo_coordinates", locationInformation.latitude() + "," + locationInformation.longitude());
+            message.addField(newFieldPrefix + "_geo_country", locationInformation.countryIsoCode());
+            message.addField(newFieldPrefix + "_geo_city", locationInformation.cityName());
+            message.addField(newFieldPrefix + "_geo_region", locationInformation.region());
+            message.addField(newFieldPrefix + "_geo_timeZone", locationInformation.timeZone());
+
+            if (areValidGeoNames(locationInformation.cityName(), locationInformation.countryIsoCode())) {
+                String name = String.format(Locale.ENGLISH, "%s, %s", locationInformation.cityName(), locationInformation.countryIsoCode());
+                message.addField(newFieldPrefix + "_geo_name", name);
+            }
+        });
+
+        ipAsnResolver.getGeoIpData(address).ifPresent(info -> {
+
+            message.addField(newFieldPrefix + "_as_organization", info.organization());
+            message.addField(newFieldPrefix + "_as_number", info.asn());
+        });
     }
 
     private List<String> getIpAddressFields(Message message) {
@@ -126,6 +141,17 @@ public class GeoIpResolverEngine {
             ipAddress = null;
         }
         return ipAddress;
+    }
+
+    private boolean areValidGeoNames(String... names) {
+
+        for (String name : names) {
+            if (StringUtils.isBlank(name) || "N/A".equalsIgnoreCase(name)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     @Nullable

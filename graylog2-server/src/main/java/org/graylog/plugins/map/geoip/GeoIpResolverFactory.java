@@ -30,14 +30,14 @@ import javax.inject.Named;
 public interface GeoIpResolverFactory {
 
     @Named("MAXMIND_CITY")
-    GeoIpResolver createMaxMindCityResolver(Timer resolveTime, String configPath, boolean enabled);
+    GeoIpResolver<GeoLocationInformation> createMaxMindCityResolver(Timer resolveTime, String configPath, boolean enabled);
 
     @Named("MAXMIND_ASN")
-    GeoIpResolver createMaxMindAsnResolver(Timer resolveTime, String configPath, boolean enabled);
+    GeoIpResolver<GeoAsnInformation> createMaxMindAsnResolver(Timer resolveTime, String configPath, boolean enabled);
 
     @Named("IPINFO_CITY")
-    GeoIpResolver createIpInfoCityResolver(Timer resolveTime, String configPath, boolean enabled);
+    GeoIpResolver<GeoLocationInformation> createIpInfoCityResolver(Timer resolveTime, String configPath, boolean enabled);
 
     @Named("IPINFO_ASN")
-    GeoIpResolver createIpInfoAsnResolver(Timer resolveTime, String configPath, boolean enabled);
+    GeoIpResolver<GeoAsnInformation> createIpInfoAsnResolver(Timer resolveTime, String configPath, boolean enabled);
 }
