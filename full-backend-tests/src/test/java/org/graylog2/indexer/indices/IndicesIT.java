@@ -31,13 +31,11 @@ import org.graylog.storage.elasticsearch7.NodeAdapterES7;
 import org.graylog.storage.elasticsearch7.cat.CatApi;
 import org.graylog.storage.elasticsearch7.cluster.ClusterStateApi;
 import org.graylog.storage.elasticsearch7.stats.StatsApi;
-import org.graylog.storage.elasticsearch7.testing.ElasticsearchInstanceES7;
-import org.graylog.storage.elasticsearch7.testing.OpensearchInstance;
+import org.graylog.testing.ContainerMatrixElasticsearchITBaseTest;
 import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
-import org.graylog.testing.elasticsearch.ContainerMatrixElasticsearchBaseTest;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.audit.NullAuditEventSender;
 import org.graylog2.indexer.IgnoreIndexTemplate;
@@ -91,7 +89,7 @@ import static org.mockito.Mockito.when;
 
 // these tests only test the SearchServer, so there is only one MongoDB-version necessary (needed, to launch the tests)
 @ContainerMatrixTestsConfiguration(mongoVersions = MongodbServer.MONGO4)
-public class IndicesIT extends ContainerMatrixElasticsearchBaseTest {
+public class IndicesIT extends ContainerMatrixElasticsearchITBaseTest {
     private static final String INDEX_NAME = "graylog_0";
     private final Set<String> indicesToCleanUp = new HashSet<>();
 
@@ -117,20 +115,14 @@ public class IndicesIT extends ContainerMatrixElasticsearchBaseTest {
     @SuppressWarnings("UnstableApiUsage")
     private EventBus eventBus;
     protected Indices indices;
-    private final SearchServerInstance elasticsearch;
 
     public IndicesIT(SearchServerInstance elasticsearch) {
-        this.elasticsearch = elasticsearch;
-    }
-
-    @Override
-    protected SearchServerInstance elasticsearch() {
-        return this.elasticsearch;
+        super(elasticsearch);
     }
 
     protected IndicesAdapter indicesAdapter() {
         if (elasticsearch().searchServer().equals(SearchServer.ES6)) {
-            return new IndicesAdapterES6(jestClient(elasticsearch),
+            return new IndicesAdapterES6(jestClient(elasticsearch()),
                     new ObjectMapperProvider().get(),
                     new IndexingHelper());
         } else {
@@ -145,15 +137,9 @@ public class IndicesIT extends ContainerMatrixElasticsearchBaseTest {
         }
     }
 
-    protected ElasticsearchClient elasticsearchClient() {
-        return elasticsearch instanceof ElasticsearchInstanceES7
-                ? ((ElasticsearchInstanceES7) elasticsearch).elasticsearchClient()
-                : ((OpensearchInstance) elasticsearch).elasticsearchClient();
-    }
-
     protected NodeAdapter createNodeAdapter() {
         if (elasticsearch().searchServer().equals(SearchServer.ES6)) {
-            return new NodeAdapterES6(jestClient(elasticsearch));
+            return new NodeAdapterES6(jestClient(elasticsearch()));
         } else {
             final ObjectMapper objectMapper = new ObjectMapperProvider().get();
             return new NodeAdapterES7(elasticsearchClient(), objectMapper);

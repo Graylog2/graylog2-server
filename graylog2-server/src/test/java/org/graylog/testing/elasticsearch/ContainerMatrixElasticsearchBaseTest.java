@@ -29,6 +29,16 @@ import java.util.Map;
  * Check the {@link #importFixture(String)} method if you need to load fixture data from JSON files.
  */
 public abstract class ContainerMatrixElasticsearchBaseTest {
+    private final SearchServerInstance elasticsearch;
+
+    public ContainerMatrixElasticsearchBaseTest(SearchServerInstance elasticsearch) {
+        this.elasticsearch = elasticsearch;
+    }
+
+    protected SearchServerInstance elasticsearch() {
+        return this.elasticsearch;
+    }
+
     // override this in derived classes to skip import if the default template. See old ElasticsearchBaseTest + IndicesGetAllMessageFieldsIT
     protected boolean skipTemplates() {
         return false;
@@ -59,8 +69,6 @@ public abstract class ContainerMatrixElasticsearchBaseTest {
             elasticsearch().client().putTemplate(templateName, template.getValue());
         }
     }
-
-    protected abstract SearchServerInstance elasticsearch();
 
     /**
      * Returns a custom Elasticsearch client with a bunch of utility methods.
