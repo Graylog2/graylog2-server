@@ -117,8 +117,9 @@ public class SessionsResource extends RestResource {
     }
 
     @POST
-    @ApiOperation(value = "Create a new session", notes = "This request creates a new session for a user or " +
-            "reactivates an existing session: the equivalent of logging in.")
+    @ApiOperation(value = "Create a new session",
+                  notes = "This request creates a new session for a user or reactivates an existing session: the equivalent of logging in.",
+                  response = SessionResponse.class)
     @NoAuditEvent("dispatches audit events in the method body")
     public Response newSession(@Context ContainerRequestContext requestContext,
                                @ApiParam(name = "Login request", value = "Credentials. The default " +
@@ -196,17 +197,18 @@ public class SessionsResource extends RestResource {
     @GET
     @ApiOperation(value = "Validate an existing session",
                   notes = "Checks the session with the given ID: returns http status 204 (No Content) if session is valid.",
-                  code = 204
+                  code = 204,
+                  response = SessionValidationResponse.class
     )
-    public SessionValidationResponse validateSession(@Context ContainerRequestContext requestContext) {
+    public Response validateSession(@Context ContainerRequestContext requestContext) {
         try {
             this.authenticationFilter.filter(requestContext);
         } catch (NotAuthorizedException | LockedAccountException | IOException e) {
-            return SessionValidationResponse.invalid();
+            return Response.ok(SessionValidationResponse.invalid()).build();
         }
         final Subject subject = getSubject();
         if (!subject.isAuthenticated()) {
-            return SessionValidationResponse.invalid();
+            return Response.ok(SessionValidationResponse.invalid()).build();
         }
 
         // There's no valid session, but the authenticator would like us to create one.
@@ -236,10 +238,17 @@ public class SessionsResource extends RestResource {
             // save subject in session, otherwise we can't get the username back in subsequent requests.
             ((DefaultSecurityManager) SecurityUtils.getSecurityManager()).getSubjectDAO().save(subject);
 
-            return SessionValidationResponse.validWithNewSession(String.valueOf(session.getId()),
-                    String.valueOf(user.getName()));
+            final SessionResponse token = sessionResponseFactory.forSession(session);
+
+            return Response.ok(
+                            SessionValidationResponse.validWithNewSession(
+                                    String.valueOf(session.getId()),
+                                    String.valueOf(user.getName())
+                            ))
+                    .cookie(createSecureCookie(token, requestContext))
+                    .build();
         }
-        return SessionValidationResponse.valid();
+        return Response.ok(SessionValidationResponse.valid()).build();
     }
 
     @DELETE
