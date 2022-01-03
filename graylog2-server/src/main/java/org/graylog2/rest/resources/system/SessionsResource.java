@@ -163,6 +163,9 @@ public class SessionsResource extends RestResource {
 
     private URI baseUriFromOriginOrRequest(ContainerRequestContext requestContext) {
         final String origin = requestContext.getHeaderString("origin");
+        if (Strings.isNullOrEmpty(origin)) {
+            return requestContext.getUriInfo().getBaseUri();
+        }
 
         try {
             return URI.create(origin);
