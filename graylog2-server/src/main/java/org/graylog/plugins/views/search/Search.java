@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
@@ -106,12 +105,9 @@ public abstract class Search implements ContentPackable<SearchEntity> {
 
         if (executionState.queries() != null || executionState.globalOverride() != null) {
             final ImmutableSet<Query> queries = queries().stream()
-                    .map(query -> {
-                        final JsonNode queryOverride = executionState.globalOverride().hasValues()
-                                ? objectMapper.convertValue(executionState.globalOverride(), JsonNode.class)
-                                : objectMapper.convertValue(executionState.queries(), JsonNode.class).path(query.id());
-                        return query.applyExecutionState(objectMapper, queryOverride);
-                    })
+                    .map(query -> executionState.globalOverride().hasValues()
+                            ? query.applyExecutionState(executionState.globalOverride())
+                            : query.applyExecutionState(executionState.queries().get(query.id())))
                     .collect(toImmutableSet());
             builder.queries(queries);
         }

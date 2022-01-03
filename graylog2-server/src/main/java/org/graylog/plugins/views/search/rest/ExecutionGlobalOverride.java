@@ -39,7 +39,7 @@ public abstract class ExecutionGlobalOverride {
     @JsonProperty
     public abstract Optional<Integer> offset();
     @JsonProperty
-    public abstract ImmutableMap<String, Object> searchTypes();
+    public abstract ImmutableMap<String, SearchTypeExecutionState> searchTypes();
     @JsonProperty
     public abstract ImmutableSet<String> keepSearchTypes();
     public abstract Builder toBuilder();
@@ -55,6 +55,10 @@ public abstract class ExecutionGlobalOverride {
        offset().isPresent() ||
        !searchTypes().isEmpty() ||
        !keepSearchTypes().isEmpty();
+    }
+
+    public static ExecutionGlobalOverride empty() {
+        return builder().build();
     }
 
     @AutoValue.Builder
@@ -74,7 +78,7 @@ public abstract class ExecutionGlobalOverride {
         @JsonProperty
         public abstract Builder offset(Integer offset);
         @JsonProperty
-        public abstract ImmutableMap.Builder<String, Object> searchTypesBuilder();
+        public abstract ImmutableMap.Builder<String, SearchTypeExecutionState> searchTypesBuilder();
         @JsonProperty
         public abstract ImmutableSet.Builder<String> keepSearchTypesBuilder();
         public abstract ExecutionGlobalOverride build();

@@ -34,7 +34,7 @@ public abstract class ExecutionState {
 
     public abstract ImmutableMap<String,  Parameter.Binding> parameterBindings();
 
-    public abstract ImmutableMap<String, Object> queries();
+    public abstract ImmutableMap<String, ExecutionGlobalOverride> queries();
 
     public abstract ExecutionGlobalOverride globalOverride();
 
@@ -64,7 +64,7 @@ public abstract class ExecutionState {
         public abstract ExecutionGlobalOverride.Builder globalOverrideBuilder();
 
         @JsonProperty
-        public abstract ImmutableMap.Builder<String, Object> queriesBuilder();
+        public abstract ImmutableMap.Builder<String, ExecutionGlobalOverride> queriesBuilder();
 
         public abstract ImmutableMap.Builder<String,  Parameter.Binding> parameterBindingsBuilder();
 
