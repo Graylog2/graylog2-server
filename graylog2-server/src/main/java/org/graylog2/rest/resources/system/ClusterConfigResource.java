@@ -60,6 +60,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Locale;
 import java.util.Set;
 
@@ -165,6 +168,10 @@ public class ClusterConfigResource extends RestResource {
                     throw new IllegalArgumentException(msg);
                 }
 
+                InetAddress address = Inet4Address.getByName("127.0.0.1");
+
+                cityResolver.getGeoIpData(address);
+
                 //ASN file is optional--do not validate if not provided.
                 if (!(config.asnDbPath() == null || config.asnDbPath().trim().isEmpty())) {
                     GeoIpResolver<?> asnResolver = geoIpVendorResolverService.createAsnResolver(config, timer);
@@ -172,8 +179,9 @@ public class ClusterConfigResource extends RestResource {
                         String msg = String.format(Locale.ENGLISH, "Invalid '%s'  ASN database file '%s'.  Make sure the file exists and is valid for '%1$s'", config.databaseVendorType(), config.asnDbPath());
                         throw new IllegalArgumentException(msg);
                     }
+                    asnResolver.getGeoIpData(address);
                 }
-            } catch (IllegalArgumentException e) {
+            } catch (UnknownHostException | IllegalArgumentException e) {
                 LOG.error(e.getMessage(), e);
                 throw new BadRequestException(e.getMessage());
             }

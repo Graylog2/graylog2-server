@@ -30,6 +30,7 @@ public abstract class GeoIpResolver<V> {
 
     private static final Logger LOG = LoggerFactory.getLogger(GeoIpResolver.class);
 
+    protected String lastError = null;
     protected final Timer resolveTime;
     private final boolean enabled;
 
@@ -56,10 +57,10 @@ public abstract class GeoIpResolver<V> {
     abstract boolean createDataProvider(File configFile);
 
     public Optional<V> getGeoIpData(InetAddress address) {
+        lastError = null;
         if (!enabled || address == null) {
             return Optional.empty();
         }
-
         return doGetGeoIpData(address);
     }
 
