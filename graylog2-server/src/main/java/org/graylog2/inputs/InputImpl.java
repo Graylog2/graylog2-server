@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.mongodb.BasicDBList;
 import com.mongodb.DBObject;
+import org.apache.commons.lang3.EnumUtils;
 import org.bson.types.ObjectId;
 import org.graylog2.database.CollectionName;
 import org.graylog2.database.PersistedImpl;
@@ -165,11 +166,18 @@ public class InputImpl extends PersistedImpl implements Input {
     }
 
     @Override
-    public String getDesiredState() {
+    public IOState.Type getDesiredState() {
         if (fields.containsKey(MessageInput.FIELD_DESIRED_STATE)) {
-            return (String) fields.get(MessageInput.FIELD_DESIRED_STATE);
-        } else {
-            return IOState.Type.RUNNING.toString();
+            String value = (String) fields.get(MessageInput.FIELD_DESIRED_STATE);
+            if (EnumUtils.isValidEnum(IOState.Type.class, value)) {
+                return IOState.Type.valueOf(value);
+            }
         }
+        return IOState.Type.RUNNING;
+    }
+
+    @Override
+    public void setDesiredState(IOState.Type desiredState) {
+        fields.put(MessageInput.FIELD_DESIRED_STATE, desiredState.toString());
     }
 }

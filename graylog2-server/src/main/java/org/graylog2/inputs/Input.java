@@ -41,8 +41,8 @@ public interface Input extends Persisted {
 
     String getNodeId();
 
-    default String getDesiredState() {
-        return IOState.Type.RUNNING.toString();
-    }
+    IOState.Type getDesiredState();
+
+    void setDesiredState(IOState.Type desiredState);
 
 }
