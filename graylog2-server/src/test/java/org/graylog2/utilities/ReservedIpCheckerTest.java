@@ -24,7 +24,7 @@ import org.junit.Test;
 public class ReservedIpCheckerTest {
 
     @Test
-    public void testEsEmpty() {
+    public void testIsEmpty() {
 
         ReservedIpChecker checker = ReservedIpChecker.getInstance();
         Assert.assertFalse("Reserved IP Blocks expected to be non-empty", checker.isEmpty());
