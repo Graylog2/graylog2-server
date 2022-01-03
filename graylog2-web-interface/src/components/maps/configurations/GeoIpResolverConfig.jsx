@@ -100,10 +100,8 @@ const GeoIpResolverConfig = createReactClass({
 
   _availableDatabaseTypes() {
     // TODO: Support country database as well.
-    //TODO: Add the rest of the configs--added this one to keep from breaking with backend returns IPINFO
     return [
-      { value: 'MAXMIND_CITY', label: 'MaxMind City database' },
-      { value: 'IPINFO_STANDARD_LOCATION', label: 'IPInfo Standard Location' },
+      { value: 'MAXMIND_CITY', label: 'City database' },
     ];
   },
 
