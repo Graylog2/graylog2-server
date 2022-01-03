@@ -36,7 +36,7 @@ public class IpInfoLocationResolver extends IpInfoIpResolver<GeoLocationInformat
     protected Optional<GeoLocationInformation> doGetGeoIpData(InetAddress address) {
         GeoLocationInformation info;
 
-        try {
+        try (Timer.Context ignored = resolveTime.time()) {
             IPinfoStandardLocation loc = adapter.ipInfoStandardLocation(address);
             info = GeoLocationInformation.create(loc.latitude(), loc.longitude(), loc.country(),
                     loc.city(), loc.region(), loc.timezone());

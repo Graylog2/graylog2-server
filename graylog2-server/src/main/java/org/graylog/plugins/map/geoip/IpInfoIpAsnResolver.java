@@ -35,7 +35,7 @@ public class IpInfoIpAsnResolver extends IpInfoIpResolver<GeoAsnInformation> {
     protected Optional<GeoAsnInformation> doGetGeoIpData(InetAddress address) {
 
         GeoAsnInformation info;
-        try {
+        try (Timer.Context ignored = resolveTime.time()) {
             final IPinfoASN ipInfoASN = adapter.ipInfoASN(address);
             info = GeoAsnInformation.create(ipInfoASN.name(), ipInfoASN.type(), ipInfoASN.asn());
         } catch (Exception e) {

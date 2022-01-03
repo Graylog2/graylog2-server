@@ -38,7 +38,7 @@ public class MaxMindIpAsnResolver extends MaxMindIpResolver<GeoAsnInformation> {
     @Override
     protected Optional<GeoAsnInformation> doGetGeoIpData(InetAddress address) {
         GeoAsnInformation asn;
-        try {
+        try (Timer.Context ignored = resolveTime.time()) {
             AsnResponse response = databaseReader.asn(address);
             String number = response.getAutonomousSystemNumber() == null ? "N/A" : response.getAutonomousSystemNumber().toString();
             asn = GeoAsnInformation.create(response.getAutonomousSystemOrganization(), "N/A", number);
