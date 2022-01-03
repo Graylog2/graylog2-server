@@ -47,8 +47,10 @@ import static java.util.Objects.requireNonNull;
 // Give this a higher priority so it's run before the authentication filter
 @Priority(Priorities.AUTHENTICATION - 10)
 public class ShiroSecurityContextFilter implements ContainerRequestFilter {
+    public static final String SESSION_COOKIE_NAME = "authentication";
+
     private final DefaultSecurityManager securityManager;
-    private Provider<Request> grizzlyRequestProvider;
+    private final Provider<Request> grizzlyRequestProvider;
     private final Set<IpSubnet> trustedProxies;
 
     @Inject
@@ -122,11 +124,11 @@ public class ShiroSecurityContextFilter implements ContainerRequestFilter {
         } else if ("token".equalsIgnoreCase(credential)) {
             authToken = new AccessTokenAuthToken(userName, host);
         } else if (userName == null) { // without a username we default to using the header environment as potentially containing tokens used by plugins
-            if (cookies.containsKey("authentication")) {
-                final Cookie authenticationCookie = cookies.get(AuthenticationCookieToken.SESSION_COOKIE_NAME);
-                authToken = new AuthenticationCookieToken(authenticationCookie.getValue());
+            if (cookies.containsKey(SESSION_COOKIE_NAME)) {
+                final Cookie authenticationCookie = cookies.get(SESSION_COOKIE_NAME);
+                authToken = new SessionIdToken(authenticationCookie.getValue(), host);
             } else {
-                authToken = new HttpHeadersToken(headers, host, remoteAddr, cookies);
+                authToken = new HttpHeadersToken(headers, host, remoteAddr);
             }
         } else { // otherwise we use the "standard" username/password combination
             authToken = new UsernamePasswordToken(userName, credential, host);
