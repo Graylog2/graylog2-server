@@ -18,6 +18,7 @@
 package org.graylog.plugins.map.geoip;
 
 import com.codahale.metrics.Timer;
+import com.google.inject.assistedinject.Assisted;
 
 import javax.inject.Inject;
 import java.net.InetAddress;
@@ -29,7 +30,9 @@ import java.util.Optional;
 public class IpInfoIpAsnResolver extends IpInfoIpResolver<GeoAsnInformation> {
 
     @Inject
-    public IpInfoIpAsnResolver(Timer timer, String configPath, boolean enabled) {
+    public IpInfoIpAsnResolver(@Assisted Timer timer,
+                               @Assisted String configPath,
+                               @Assisted boolean enabled) {
         super(timer, configPath, enabled);
     }
 

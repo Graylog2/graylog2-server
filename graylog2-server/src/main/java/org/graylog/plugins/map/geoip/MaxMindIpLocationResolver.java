@@ -18,6 +18,7 @@
 package org.graylog.plugins.map.geoip;
 
 import com.codahale.metrics.Timer;
+import com.google.inject.assistedinject.Assisted;
 import com.maxmind.geoip2.model.CityResponse;
 import com.maxmind.geoip2.record.City;
 import com.maxmind.geoip2.record.Country;
@@ -33,7 +34,9 @@ import java.util.Optional;
 public class MaxMindIpLocationResolver extends MaxMindIpResolver<GeoLocationInformation> {
 
     @Inject
-    public MaxMindIpLocationResolver(Timer resolveTime, String configPath, boolean enabled) {
+    public MaxMindIpLocationResolver(@Assisted Timer resolveTime,
+                                     @Assisted String configPath,
+                                     @Assisted boolean enabled) {
         super(resolveTime, configPath, enabled);
     }
 

@@ -18,6 +18,7 @@
 package org.graylog.plugins.map.geoip;
 
 import com.codahale.metrics.Timer;
+import com.google.inject.assistedinject.Assisted;
 import com.maxmind.geoip2.exception.GeoIp2Exception;
 import com.maxmind.geoip2.model.AsnResponse;
 
@@ -33,7 +34,9 @@ import java.util.Optional;
 public class MaxMindIpAsnResolver extends MaxMindIpResolver<GeoAsnInformation> {
 
     @Inject
-    public MaxMindIpAsnResolver(Timer resolveTime, String configPath, boolean enabled) {
+    public MaxMindIpAsnResolver(@Assisted Timer resolveTime,
+                                @Assisted String configPath,
+                                @Assisted boolean enabled) {
         super(resolveTime, configPath, enabled);
     }
 
