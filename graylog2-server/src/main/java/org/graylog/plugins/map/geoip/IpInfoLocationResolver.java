@@ -19,6 +19,7 @@ package org.graylog.plugins.map.geoip;
 
 import com.codahale.metrics.Timer;
 
+import javax.inject.Inject;
 import java.net.InetAddress;
 import java.util.Locale;
 import java.util.Optional;
@@ -28,6 +29,7 @@ import java.util.Optional;
  */
 public class IpInfoLocationResolver extends IpInfoIpResolver<GeoLocationInformation> {
 
+    @Inject
     public IpInfoLocationResolver(Timer resolveTime, String configPath, boolean enabled) {
         super(resolveTime, configPath, enabled);
     }

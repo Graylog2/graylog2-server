@@ -16,6 +16,14 @@
  */
 package org.graylog.plugins.map;
 
+import com.google.inject.assistedinject.FactoryModuleBuilder;
+import com.google.inject.name.Names;
+import org.graylog.plugins.map.geoip.GeoIpResolver;
+import org.graylog.plugins.map.geoip.GeoIpResolverFactory;
+import org.graylog.plugins.map.geoip.IpInfoIpAsnResolver;
+import org.graylog.plugins.map.geoip.IpInfoLocationResolver;
+import org.graylog.plugins.map.geoip.MaxMindIpAsnResolver;
+import org.graylog.plugins.map.geoip.MaxMindIpLocationResolver;
 import org.graylog.plugins.map.geoip.MaxmindDataAdapter;
 import org.graylog.plugins.map.geoip.processor.GeoIpProcessor;
 import org.graylog2.plugin.PluginModule;
@@ -28,5 +36,12 @@ public class MapWidgetModule extends PluginModule {
                 MaxmindDataAdapter.class,
                 MaxmindDataAdapter.Factory.class,
                 MaxmindDataAdapter.Config.class);
+
+        install(new FactoryModuleBuilder()
+                .implement(GeoIpResolver.class, Names.named("MAXMIND_CITY"), MaxMindIpLocationResolver.class)
+                .implement(GeoIpResolver.class, Names.named("MAXMIND_ASN"), MaxMindIpAsnResolver.class)
+                .implement(GeoIpResolver.class, Names.named("IPINFO_CITY"), IpInfoLocationResolver.class)
+                .implement(GeoIpResolver.class, Names.named("IPINFO_ASN"), IpInfoIpAsnResolver.class)
+                .build(GeoIpResolverFactory.class));
     }
 }

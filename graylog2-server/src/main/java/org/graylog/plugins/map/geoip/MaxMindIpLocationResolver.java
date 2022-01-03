@@ -23,6 +23,7 @@ import com.maxmind.geoip2.record.City;
 import com.maxmind.geoip2.record.Country;
 import com.maxmind.geoip2.record.Location;
 
+import javax.inject.Inject;
 import java.net.InetAddress;
 import java.util.Optional;
 
@@ -31,6 +32,7 @@ import java.util.Optional;
  */
 public class MaxMindIpLocationResolver extends MaxMindIpResolver<GeoLocationInformation> {
 
+    @Inject
     public MaxMindIpLocationResolver(Timer resolveTime, String configPath, boolean enabled) {
         super(resolveTime, configPath, enabled);
     }

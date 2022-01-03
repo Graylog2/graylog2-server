@@ -25,21 +25,26 @@ import org.graylog.plugins.map.config.GeoIpResolverConfig;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 
 /**
  * Test that the factory creates the appropriate {@link GeoIpResolver}. Each resolver is expected to fail to create a data provider, but should
  * succeed in creating a <b>disabled</b> instance.
  */
+
 class GeoIpResolverFactoryTest {
 
+
+    @Mock
     private MetricRegistry metricRegistry;
     private Timer timer;
+    private GeoIpResolverFactory geoIpResolverFactory;
 
     @BeforeEach
     void setup() {
         metricRegistry = new MetricRegistry();
         timer = metricRegistry.timer("ResolverFactoryUnitTest");
+
     }
 
     @AfterEach
@@ -49,29 +54,25 @@ class GeoIpResolverFactoryTest {
         metricRegistry = null;
     }
 
-    @Test
     void testMaxMindVendor() {
 
         GeoIpResolverConfig config = createConfig(DatabaseVendorType.MAXMIND);
 
-        GeoIpResolverFactory factory = new GeoIpResolverFactory(config, timer);
-        GeoIpResolver<GeoLocationInformation> cityResolver = factory.createIpCityResolver();
+        GeoIpResolver<GeoLocationInformation> cityResolver = geoIpResolverFactory.createIpInfoCityResolver(timer, config.cityDbPath(), config.enabled());
         Assertions.assertTrue(cityResolver instanceof MaxMindIpLocationResolver);
 
-        GeoIpResolver<GeoAsnInformation> asnResolver = factory.createIpAsnResolver();
+        GeoIpResolver<GeoAsnInformation> asnResolver = geoIpResolverFactory.createIpInfoCityResolver(timer, config.asnDbPath(), config.enabled());
         Assertions.assertTrue(asnResolver instanceof MaxMindIpAsnResolver);
     }
 
-    @Test
     void testIpInfoVendor() {
 
         GeoIpResolverConfig config = createConfig(DatabaseVendorType.IPINFO);
 
-        GeoIpResolverFactory factory = new GeoIpResolverFactory(config, timer);
-        GeoIpResolver<GeoLocationInformation> cityResolver = factory.createIpCityResolver();
+        GeoIpResolver<GeoLocationInformation> cityResolver = geoIpResolverFactory.createIpInfoCityResolver(timer, config.cityDbPath(), config.enabled());
         Assertions.assertTrue(cityResolver instanceof IpInfoLocationResolver);
 
-        GeoIpResolver<GeoAsnInformation> asnResolver = factory.createIpAsnResolver();
+        GeoIpResolver<GeoAsnInformation> asnResolver = geoIpResolverFactory.createIpInfoCityResolver(timer, config.asnDbPath(), config.enabled());
         Assertions.assertTrue(asnResolver instanceof IpInfoIpAsnResolver);
     }
 

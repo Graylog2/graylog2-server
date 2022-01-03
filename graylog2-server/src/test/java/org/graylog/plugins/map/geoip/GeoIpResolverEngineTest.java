@@ -29,6 +29,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -46,11 +48,15 @@ import static org.junit.Assert.assertTrue;
 public class GeoIpResolverEngineTest {
     static final String GEO_LITE2_CITY_MMDB = "/GeoLite2-City.mmdb";
 
+    @Mock
+    GeoIpVendorResolverService geoIpVendorResolverService;
     private MetricRegistry metricRegistry;
     private GeoIpResolverConfig config;
 
     @Before
-    public void setUp() throws URISyntaxException {
+    public void setUp() throws Exception {
+
+        MockitoAnnotations.openMocks(this).close();
         config = GeoIpResolverConfig.defaultConfig().toBuilder().enabled(true).cityDbPath(this.getTestDatabasePath()).build();
         metricRegistry = new MetricRegistry();
     }
@@ -71,7 +77,7 @@ public class GeoIpResolverEngineTest {
 
     @Test
     public void getIpFromFieldValue() {
-        final GeoIpResolverEngine resolver = new GeoIpResolverEngine(config, metricRegistry);
+        final GeoIpResolverEngine resolver = new GeoIpResolverEngine(geoIpVendorResolverService, config, metricRegistry);
         final String ip = "127.0.0.1";
 
         assertEquals(InetAddresses.forString(ip), resolver.getIpFromFieldValue(ip));
@@ -81,7 +87,7 @@ public class GeoIpResolverEngineTest {
 
     @Test
     public void trimFieldValueBeforeLookup() {
-        final GeoIpResolverEngine resolver = new GeoIpResolverEngine(config, metricRegistry);
+        final GeoIpResolverEngine resolver = new GeoIpResolverEngine(geoIpVendorResolverService, config, metricRegistry);
         final String ip = "   2001:4860:4860::8888\t\n";
 
         assertNotNull(resolver.getIpFromFieldValue(ip));
@@ -89,7 +95,7 @@ public class GeoIpResolverEngineTest {
 
     @Test
     public void disabledFilterTest() {
-        final GeoIpResolverEngine resolver = new GeoIpResolverEngine(config.toBuilder().enabled(false).build(), metricRegistry);
+        final GeoIpResolverEngine resolver = new GeoIpResolverEngine(geoIpVendorResolverService, config.toBuilder().enabled(false).build(), metricRegistry);
 
         final Map<String, Object> messageFields = Maps.newHashMap();
         messageFields.put("_id", (new UUID()).toString());
@@ -120,7 +126,7 @@ public class GeoIpResolverEngineTest {
 
     @Test
     public void filterResolvesIpGeoLocation() {
-        final GeoIpResolverEngine resolver = new GeoIpResolverEngine(config, metricRegistry);
+        final GeoIpResolverEngine resolver = new GeoIpResolverEngine(geoIpVendorResolverService, config, metricRegistry);
 
         final Map<String, Object> messageFields = Maps.newHashMap();
         messageFields.put("_id", (new UUID()).toString());

@@ -21,6 +21,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import org.graylog.plugins.map.config.GeoIpResolverConfig;
 import org.graylog.plugins.map.geoip.GeoIpResolverEngine;
+import org.graylog.plugins.map.geoip.GeoIpVendorResolverService;
 import org.graylog2.cluster.ClusterConfigChangedEvent;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Messages;
@@ -53,6 +54,7 @@ public class GeoIpProcessor implements MessageProcessor {
     private final ClusterConfigService clusterConfigService;
     private final ScheduledExecutorService scheduler;
     private final MetricRegistry metricRegistry;
+    private final GeoIpVendorResolverService geoIpVendorResolverService;
 
     private final AtomicReference<GeoIpResolverConfig> config;
     private final AtomicReference<GeoIpResolverEngine> filterEngine;
@@ -61,15 +63,18 @@ public class GeoIpProcessor implements MessageProcessor {
     public GeoIpProcessor(ClusterConfigService clusterConfigService,
                           @Named("daemonScheduler") ScheduledExecutorService scheduler,
                           EventBus eventBus,
-                          MetricRegistry metricRegistry) {
+                          MetricRegistry metricRegistry,
+                          GeoIpVendorResolverService geoIpVendorResolverService) {
         this.clusterConfigService = clusterConfigService;
         this.scheduler = scheduler;
         this.metricRegistry = metricRegistry;
+        this.geoIpVendorResolverService = geoIpVendorResolverService;
+
         final GeoIpResolverConfig config = clusterConfigService.getOrDefault(GeoIpResolverConfig.class,
                 GeoIpResolverConfig.defaultConfig());
 
         this.config = new AtomicReference<>(config);
-        this.filterEngine = new AtomicReference<>(new GeoIpResolverEngine(config, metricRegistry));
+        this.filterEngine = new AtomicReference<>(new GeoIpResolverEngine(geoIpVendorResolverService, config, metricRegistry));
 
         eventBus.register(this);
     }
@@ -99,6 +104,6 @@ public class GeoIpProcessor implements MessageProcessor {
 
         LOG.info("Updating GeoIP resolver engine - {}", newConfig);
         config.set(newConfig);
-        filterEngine.set(new GeoIpResolverEngine(newConfig, metricRegistry));
+        filterEngine.set(new GeoIpResolverEngine(geoIpVendorResolverService, newConfig, metricRegistry));
     }
 }

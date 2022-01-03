@@ -30,7 +30,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.plugins.map.config.GeoIpResolverConfig;
 import org.graylog.plugins.map.geoip.GeoIpResolver;
-import org.graylog.plugins.map.geoip.GeoIpResolverFactory;
+import org.graylog.plugins.map.geoip.GeoIpVendorResolverService;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.plugin.cluster.ClusterConfigService;
@@ -75,14 +75,17 @@ public class ClusterConfigResource extends RestResource {
     private final ClusterConfigService clusterConfigService;
     private final ChainingClassLoader chainingClassLoader;
     private final ObjectMapper objectMapper;
+    private final GeoIpVendorResolverService geoIpVendorResolverService;
 
     @Inject
     public ClusterConfigResource(ClusterConfigService clusterConfigService,
                                  ChainingClassLoader chainingClassLoader,
-                                 ObjectMapper objectMapper) {
+                                 ObjectMapper objectMapper,
+                                 GeoIpVendorResolverService geoIpVendorResolverService) {
         this.clusterConfigService = requireNonNull(clusterConfigService);
         this.chainingClassLoader = chainingClassLoader;
         this.objectMapper = objectMapper;
+        this.geoIpVendorResolverService = geoIpVendorResolverService;
     }
 
     @GET
@@ -151,16 +154,17 @@ public class ClusterConfigResource extends RestResource {
     private void validateIfGeoIpResolverConfig(Object o) {
         if (o instanceof GeoIpResolverConfig) {
             final GeoIpResolverConfig config = (GeoIpResolverConfig) o;
-            GeoIpResolverFactory factory = new GeoIpResolverFactory(config, new Timer(new UniformReservoir()));
+
+            Timer timer = new Timer(new UniformReservoir());
             try {
-                GeoIpResolver<?> cityResolver = factory.createIpCityResolver();
-                if (!cityResolver.isEnabled()) {
+                GeoIpResolver<?> cityResolver = geoIpVendorResolverService.createCityResolver(config, timer);
+                if (config.enabled() && !cityResolver.isEnabled()) {
                     String msg = String.format(Locale.ENGLISH, "Invalid '%s' City Geo IP database file '%s'.  Make sure the file exists and is valid for '%1$s'", config.databaseVendorType(), config.cityDbPath());
                     throw new IllegalArgumentException(msg);
                 }
 
-                GeoIpResolver<?> asnResolver = factory.createIpAsnResolver();
-                if (!asnResolver.isEnabled()) {
+                GeoIpResolver<?> asnResolver = geoIpVendorResolverService.createAsnResolver(config, timer);
+                if (config.enabled() && !asnResolver.isEnabled()) {
                     String msg = String.format(Locale.ENGLISH, "Invalid '%s'  ASN database file '%s'.  Make sure the file exists and is valid for '%1$s'", config.databaseVendorType(), config.asnDbPath());
                     throw new IllegalArgumentException(msg);
                 }

@@ -21,6 +21,7 @@ import com.codahale.metrics.Timer;
 import com.maxmind.geoip2.exception.GeoIp2Exception;
 import com.maxmind.geoip2.model.AsnResponse;
 
+import javax.inject.Inject;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.Locale;
@@ -31,6 +32,7 @@ import java.util.Optional;
  */
 public class MaxMindIpAsnResolver extends MaxMindIpResolver<GeoAsnInformation> {
 
+    @Inject
     public MaxMindIpAsnResolver(Timer resolveTime, String configPath, boolean enabled) {
         super(resolveTime, configPath, enabled);
     }

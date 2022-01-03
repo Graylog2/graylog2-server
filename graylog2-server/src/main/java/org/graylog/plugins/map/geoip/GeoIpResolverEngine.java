@@ -53,14 +53,13 @@ public class GeoIpResolverEngine {
     private boolean enabled;
 
 
-    public GeoIpResolverEngine(GeoIpResolverConfig config, MetricRegistry metricRegistry) {
+    public GeoIpResolverEngine(GeoIpVendorResolverService resolverService, GeoIpResolverConfig config, MetricRegistry metricRegistry) {
         Timer resolveTime = metricRegistry.timer(name(GeoIpResolverEngine.class, "resolveTime"));
 
-        GeoIpResolverFactory resolverFactory = new GeoIpResolverFactory(config, resolveTime);
-        ipLocationResolver = resolverFactory.createIpCityResolver();
-        ipAsnResolver = resolverFactory.createIpAsnResolver();
+        ipLocationResolver = resolverService.createCityResolver(config, resolveTime);
+        ipAsnResolver = resolverService.createAsnResolver(config, resolveTime);
 
-        LOG.info("Created Geo IP Resolvers for '{}'", resolverFactory.getDatabaseVendorType());
+        LOG.info("Created Geo IP Resolvers for '{}'", config.databaseVendorType());
         LOG.info("'{}' Status Enabled: {}", ipLocationResolver.getClass().getSimpleName(), ipLocationResolver.isEnabled());
         LOG.info("'{}' Status Enabled: {}", ipAsnResolver.getClass().getSimpleName(), ipAsnResolver.isEnabled());
 
