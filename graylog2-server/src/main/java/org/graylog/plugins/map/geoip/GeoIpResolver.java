@@ -64,5 +64,14 @@ public abstract class GeoIpResolver<V> {
         return doGetGeoIpData(address);
     }
 
+    /**
+     * Get the last error, if any, produced after having called {@link #getGeoIpData(InetAddress)}.
+     *
+     * @return optional error message
+     */
+    public Optional<String> getLastError() {
+        return Optional.ofNullable(lastError);
+    }
+
     protected abstract Optional<V> doGetGeoIpData(InetAddress address);
 }

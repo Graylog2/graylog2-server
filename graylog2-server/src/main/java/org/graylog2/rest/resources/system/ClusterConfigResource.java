@@ -29,8 +29,10 @@ import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.plugins.map.config.GeoIpResolverConfig;
+import org.graylog.plugins.map.geoip.GeoAsnInformation;
 import org.graylog.plugins.map.geoip.GeoIpResolver;
 import org.graylog.plugins.map.geoip.GeoIpVendorResolverService;
+import org.graylog.plugins.map.geoip.GeoLocationInformation;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.plugin.cluster.ClusterConfigService;
@@ -162,29 +164,49 @@ public class ClusterConfigResource extends RestResource {
 
             Timer timer = new Timer(new UniformReservoir());
             try {
-                GeoIpResolver<?> cityResolver = geoIpVendorResolverService.createCityResolver(config, timer);
-                if (config.enabled() && !cityResolver.isEnabled()) {
-                    String msg = String.format(Locale.ENGLISH, "Invalid '%s' City Geo IP database file '%s'.  Make sure the file exists and is valid for '%1$s'", config.databaseVendorType(), config.cityDbPath());
-                    throw new IllegalArgumentException(msg);
-                }
+                //A test address.  This will NOT be in any database, but should only produce an
+                //AddressNotFoundException.  Any other exception suggests an actual error such as
+                //a database file that does does not belong to the vendor selected
+                InetAddress testAddress = Inet4Address.getByName("127.0.0.1");
 
-                InetAddress address = Inet4Address.getByName("127.0.0.1");
+                validateGeoIpLocationResolver(config, timer, testAddress);
+                validateGeoIpAsnResolver(config, timer, testAddress);
 
-                cityResolver.getGeoIpData(address);
-
-                //ASN file is optional--do not validate if not provided.
-                if (!(config.asnDbPath() == null || config.asnDbPath().trim().isEmpty())) {
-                    GeoIpResolver<?> asnResolver = geoIpVendorResolverService.createAsnResolver(config, timer);
-                    if (config.enabled() && !asnResolver.isEnabled()) {
-                        String msg = String.format(Locale.ENGLISH, "Invalid '%s'  ASN database file '%s'.  Make sure the file exists and is valid for '%1$s'", config.databaseVendorType(), config.asnDbPath());
-                        throw new IllegalArgumentException(msg);
-                    }
-                    asnResolver.getGeoIpData(address);
-                }
             } catch (UnknownHostException | IllegalArgumentException e) {
                 LOG.error(e.getMessage(), e);
                 throw new BadRequestException(e.getMessage());
             }
+        }
+    }
+
+    private void validateGeoIpAsnResolver(GeoIpResolverConfig config, Timer timer, InetAddress testAddress) {
+        //ASN file is optional--do not validate if not provided.
+        if (!(config.asnDbPath() == null || config.asnDbPath().trim().isEmpty())) {
+            GeoIpResolver<GeoAsnInformation> asnResolver = geoIpVendorResolverService.createAsnResolver(config, timer);
+            if (config.enabled() && !asnResolver.isEnabled()) {
+                String msg = String.format(Locale.ENGLISH, "Invalid '%s'  ASN database file '%s'.  Make sure the file exists and is valid for '%1$s'", config.databaseVendorType(), config.asnDbPath());
+                throw new IllegalArgumentException(msg);
+            }
+            asnResolver.getGeoIpData(testAddress);
+            if (asnResolver.getLastError().isPresent()) {
+                String error = String.format(Locale.ENGLISH, "Error querying ASN.  Make sure you have selected a valid ASN database for '%s'", config.databaseVendorType());
+                throw new IllegalStateException(error);
+            }
+        }
+    }
+
+    private void validateGeoIpLocationResolver(GeoIpResolverConfig config, Timer timer, InetAddress testAddress) {
+        GeoIpResolver<GeoLocationInformation> cityResolver = geoIpVendorResolverService.createCityResolver(config, timer);
+        if (config.enabled() && !cityResolver.isEnabled()) {
+            String msg = String.format(Locale.ENGLISH, "Invalid '%s' City Geo IP database file '%s'.  Make sure the file exists and is valid for '%1$s'", config.databaseVendorType(), config.cityDbPath());
+            throw new IllegalArgumentException(msg);
+        }
+
+
+        cityResolver.getGeoIpData(testAddress);
+        if (cityResolver.getLastError().isPresent()) {
+            String error = String.format(Locale.ENGLISH, "Error querying Geo Location.  Make sure you have selected a valid Location database for '%s'", config.databaseVendorType());
+            throw new IllegalStateException(error);
         }
     }
 

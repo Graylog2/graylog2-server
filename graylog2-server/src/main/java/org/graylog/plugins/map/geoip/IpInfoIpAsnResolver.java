@@ -19,9 +19,12 @@ package org.graylog.plugins.map.geoip;
 
 import com.codahale.metrics.Timer;
 import com.google.inject.assistedinject.Assisted;
+import com.maxmind.geoip2.exception.AddressNotFoundException;
 
 import javax.inject.Inject;
+import java.io.IOException;
 import java.net.InetAddress;
+import java.util.Locale;
 import java.util.Optional;
 
 /**
@@ -43,8 +46,13 @@ public class IpInfoIpAsnResolver extends IpInfoIpResolver<GeoAsnInformation> {
         try (Timer.Context ignored = resolveTime.time()) {
             final IPinfoASN ipInfoASN = adapter.ipInfoASN(address);
             info = GeoAsnInformation.create(ipInfoASN.name(), ipInfoASN.type(), ipInfoASN.asn());
-        } catch (Exception e) {
+        } catch (IOException | AddressNotFoundException | UnsupportedOperationException e) {
             info = null;
+            if (e instanceof AddressNotFoundException == false) {
+                String error = String.format(Locale.US, "Error getting ASN for IP Address '%s'. %s", address, e.getMessage());
+                LOG.warn(error, e);
+                lastError = e.getMessage();
+            }
         }
         return Optional.ofNullable(info);
     }

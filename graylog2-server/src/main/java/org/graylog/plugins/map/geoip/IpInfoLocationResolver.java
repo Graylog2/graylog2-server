@@ -19,8 +19,10 @@ package org.graylog.plugins.map.geoip;
 
 import com.codahale.metrics.Timer;
 import com.google.inject.assistedinject.Assisted;
+import com.maxmind.geoip2.exception.AddressNotFoundException;
 
 import javax.inject.Inject;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.util.Locale;
 import java.util.Optional;
@@ -46,10 +48,13 @@ public class IpInfoLocationResolver extends IpInfoIpResolver<GeoLocationInformat
             info = GeoLocationInformation.create(loc.latitude(), loc.longitude(), loc.country(),
                     loc.city(), loc.region(), loc.timezone());
 
-        } catch (Exception e) {
-            String error = String.format(Locale.US, "Error getting IP location info for '%s'. %s", address, e.getMessage());
-            LOG.error(error, e);
+        } catch (IOException | AddressNotFoundException | UnsupportedOperationException e) {
             info = null;
+            if (e instanceof AddressNotFoundException == false) {
+                String error = String.format(Locale.US, "Error getting IP location info for '%s'. %s", address, e.getMessage());
+                LOG.error(error, e);
+                lastError = e.getMessage();
+            }
         }
         return Optional.ofNullable(info);
     }

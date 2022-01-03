@@ -19,6 +19,7 @@ package org.graylog.plugins.map.geoip;
 
 import com.codahale.metrics.Timer;
 import com.google.inject.assistedinject.Assisted;
+import com.maxmind.geoip2.exception.AddressNotFoundException;
 import com.maxmind.geoip2.exception.GeoIp2Exception;
 import com.maxmind.geoip2.model.AsnResponse;
 
@@ -48,9 +49,13 @@ public class MaxMindIpAsnResolver extends MaxMindIpResolver<GeoAsnInformation> {
             String number = response.getAutonomousSystemNumber() == null ? "N/A" : response.getAutonomousSystemNumber().toString();
             asn = GeoAsnInformation.create(response.getAutonomousSystemOrganization(), "N/A", number);
         } catch (GeoIp2Exception | IOException | UnsupportedOperationException e) {
-            String error = String.format(Locale.US, "Error getting ASN for IP Address '%s'. %s", address, e.getMessage());
-            LOG.warn(error, e);
             asn = null;
+
+            if (e instanceof AddressNotFoundException == false) {
+                String error = String.format(Locale.US, "Error getting ASN for IP Address '%s'. %s", address, e.getMessage());
+                LOG.warn(error, e);
+                lastError = e.getMessage();
+            }
         }
 
         return Optional.ofNullable(asn);

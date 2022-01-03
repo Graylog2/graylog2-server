@@ -19,12 +19,15 @@ package org.graylog.plugins.map.geoip;
 
 import com.codahale.metrics.Timer;
 import com.google.inject.assistedinject.Assisted;
+import com.maxmind.geoip2.exception.AddressNotFoundException;
+import com.maxmind.geoip2.exception.GeoIp2Exception;
 import com.maxmind.geoip2.model.CityResponse;
 import com.maxmind.geoip2.record.City;
 import com.maxmind.geoip2.record.Country;
 import com.maxmind.geoip2.record.Location;
 
 import javax.inject.Inject;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.util.Optional;
 
@@ -56,9 +59,12 @@ public class MaxMindIpLocationResolver extends MaxMindIpResolver<GeoLocationInfo
                     city.getGeoNameId() == null ? "N/A" : city.getName(),// calling to .getName() may throw a NPE
                     "N/A",
                     "N/A");
-        } catch (Exception e) {
-            LOG.debug("Could not get location from IP {}", address.getHostAddress(), e);
+        } catch (IOException | GeoIp2Exception | UnsupportedOperationException e) {
             info = null;
+            if (e instanceof AddressNotFoundException == false) {
+                LOG.debug("Could not get location from IP {}", address.getHostAddress(), e);
+                lastError = e.getMessage();
+            }
         }
 
         return Optional.ofNullable(info);
