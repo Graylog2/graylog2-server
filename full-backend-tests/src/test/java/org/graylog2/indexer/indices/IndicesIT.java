@@ -64,7 +64,6 @@ import org.graylog2.rest.resources.system.indexer.responses.IndexSetStats;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Test;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
@@ -638,7 +637,7 @@ public class IndicesIT extends ContainerMatrixElasticsearchITBaseTest {
 
     // Prevent accidental use of AliasActions.Type.REMOVE_INDEX,
     // as despite being an *Alias* Action, it actually deletes an index!
-    @Test
+    @ContainerMatrixTest
     public void cyclingAliasLeavesOldIndexInPlace() {
         final String deflector = "indices_it_deflector";
 
