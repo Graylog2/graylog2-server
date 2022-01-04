@@ -52,18 +52,21 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 // these tests only test the SearchServer, so there is only one MongoDB-version necessary (needed, to launch the tests)
-@ContainerMatrixTestsConfiguration(mongoVersions = MongodbServer.MONGO4, searchVersions = SearchServer.ES6)
+@ContainerMatrixTestsConfiguration(mongoVersions = MongodbServer.MONGO4)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class CountsIT extends ContainerMatrixElasticsearchITBaseTest {
     private static final String INDEX_NAME_1 = "index_set_1_counts_test_0";
     private static final String INDEX_NAME_2 = "index_set_2_counts_test_0";
+    private static final String INDEX_NAME_3 = "index_set_3_counts_test_0";
 
     private IndexSetRegistry indexSetRegistry;
     private IndexSet indexSet1;
     private IndexSet indexSet2;
+    private IndexSet indexSet3;
     private Counts counts;
     private IndexSetConfig indexSetConfig1;
     private IndexSetConfig indexSetConfig2;
+    private IndexSetConfig indexSetConfig3;
 
     public CountsIT(SearchServerInstance elasticsearch) {
         super(elasticsearch);
@@ -83,10 +86,12 @@ public class CountsIT extends ContainerMatrixElasticsearchITBaseTest {
         indexSetRegistry = mock(IndexSetRegistry.class);
         indexSet1 = mock(IndexSet.class);
         indexSet2 = mock(IndexSet.class);
+        indexSet3 = mock(IndexSet.class);
 
         client().createIndex(INDEX_NAME_1, 1, 0);
         client().createIndex(INDEX_NAME_2, 1, 0);
-        client().waitForGreenStatus(INDEX_NAME_1, INDEX_NAME_2);
+        client().createIndex(INDEX_NAME_3, 1, 0);
+        client().waitForGreenStatus(INDEX_NAME_1, INDEX_NAME_2, INDEX_NAME_3);
 
         counts = new Counts(indexSetRegistry, countsAdapter());
 
@@ -123,6 +128,23 @@ public class CountsIT extends ContainerMatrixElasticsearchITBaseTest {
                 .indexOptimizationMaxNumSegments(1)
                 .indexOptimizationDisabled(false)
                 .build();
+
+        indexSetConfig3 = IndexSetConfig.builder()
+                .id("id-3")
+                .title("title-3")
+                .indexPrefix("index_set_3_counts_test")
+                .shards(1)
+                .replicas(0)
+                .rotationStrategyClass(MessageCountRotationStrategy.class.getCanonicalName())
+                .rotationStrategy(MessageCountRotationStrategyConfig.createDefault())
+                .retentionStrategyClass(DeletionRetentionStrategy.class.getCanonicalName())
+                .retentionStrategy(DeletionRetentionStrategyConfig.createDefault())
+                .creationDate(ZonedDateTime.of(2016, 10, 13, 0, 0, 0, 0, ZoneOffset.UTC))
+                .indexAnalyzer("standard")
+                .indexTemplateName("template-3")
+                .indexOptimizationMaxNumSegments(1)
+                .indexOptimizationDisabled(false)
+                .build();
     }
 
     @BeforeEach
@@ -130,8 +152,10 @@ public class CountsIT extends ContainerMatrixElasticsearchITBaseTest {
         when(indexSetRegistry.getManagedIndices()).thenReturn(new String[]{INDEX_NAME_1, INDEX_NAME_2});
         when(indexSetRegistry.get(indexSetConfig1.id())).thenReturn(Optional.of(indexSet1));
         when(indexSetRegistry.get(indexSetConfig2.id())).thenReturn(Optional.of(indexSet2));
+        when(indexSetRegistry.get(indexSetConfig3.id())).thenReturn(Optional.of(indexSet3));
         when(indexSet1.getManagedIndices()).thenReturn(new String[]{INDEX_NAME_1});
         when(indexSet2.getManagedIndices()).thenReturn(new String[]{INDEX_NAME_2});
+        when(indexSet3.getManagedIndices()).thenReturn(new String[]{INDEX_NAME_3});
     }
 
     @ContainerMatrixTest
@@ -140,6 +164,7 @@ public class CountsIT extends ContainerMatrixElasticsearchITBaseTest {
         assertThat(counts.total()).isEqualTo(0L);
         assertThat(counts.total(indexSet1)).isEqualTo(0L);
         assertThat(counts.total(indexSet2)).isEqualTo(0L);
+        assertThat(counts.total(indexSet3)).isEqualTo(0L);
     }
 
     @ContainerMatrixTest
@@ -150,7 +175,7 @@ public class CountsIT extends ContainerMatrixElasticsearchITBaseTest {
             final Map<String, Object> source = ImmutableMap.of(
                     "foo", "bar",
                     "counter", i);
-            bulkIndexRequest.addRequest(INDEX_NAME_1, source);
+            bulkIndexRequest.addRequest(INDEX_NAME_3, source);
         }
 
         client().bulkIndex(bulkIndexRequest);
@@ -158,8 +183,9 @@ public class CountsIT extends ContainerMatrixElasticsearchITBaseTest {
         // Simulate no indices for the second index set.
         when(indexSet2.getManagedIndices()).thenReturn(new String[0]);
 
-        assertThat(counts.total(indexSet1)).isEqualTo(10L);
+        assertThat(counts.total(indexSet1)).isEqualTo(0L);
         assertThat(counts.total(indexSet2)).isEqualTo(0L);
+        assertThat(counts.total(indexSet3)).isEqualTo(10L);
 
         // Simulate no indices for all index sets.
         when(indexSetRegistry.getManagedIndices()).thenReturn(new String[0]);
