@@ -152,7 +152,7 @@ const StyledAceEditor = styled(AceEditor).attrs(({ aceTheme, theme }) => ({
 
     .ace_content,
     .ace_placeholder {
-      padding: 0px !important;
+      padding: 0 !important;
     }
 
     .ace_placeholder {
