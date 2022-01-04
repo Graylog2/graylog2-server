@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { useCallback, useMemo, useRef } from 'react';
 import type { DefaultTheme } from 'styled-components';
-import { withTheme } from 'styled-components';
+import styled, { withTheme } from 'styled-components';
 import PropTypes from 'prop-types';
 
 import { themePropTypes } from 'theme';
@@ -53,6 +53,14 @@ type Props = {
   value: string,
   warning?: QueryValidationState,
 };
+
+const Container = styled.div`
+  display: flex;
+  max-height: 126px;
+  margin-top: 6px;
+  overflow-y: auto;
+  padding-bottom: 2px;
+`;
 
 const defaultCompleterFactory = (
   completers: Array<Completer>,
@@ -138,7 +146,7 @@ const QueryInput = ({
   const markers = useMemo(() => getMarkers(error, warning), [error, warning]);
 
   return (
-    <div className={`query ${className}`} style={{ display: 'flex' }} data-testid="query-input">
+    <Container className={`query ${className}`} data-testid="query-input">
       <UserPreferencesContext.Consumer>
         {({ enableSmartSearch = true }) => (
           <StyledAceEditor mode="lucene"
@@ -171,7 +179,7 @@ const QueryInput = ({
                            markers={markers} />
         )}
       </UserPreferencesContext.Consumer>
-    </div>
+    </Container>
   );
 };
 

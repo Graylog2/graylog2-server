@@ -24,7 +24,6 @@ const StyledAceEditor = styled(AceEditor).attrs(({ aceTheme, theme }) => ({
   $scTheme: theme,
 }))(({ $scTheme, disabled }) => css`
   &.ace-queryinput {
-    margin-top: 6px;
     width: 100% !important;
     background-color: ${$scTheme.colors.input.background};
     color: ${$scTheme.utils.contrastingColor($scTheme.colors.input.background, 'AAA')};
