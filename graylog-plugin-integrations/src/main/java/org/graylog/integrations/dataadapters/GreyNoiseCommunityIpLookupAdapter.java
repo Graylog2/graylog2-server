@@ -167,17 +167,14 @@ public class GreyNoiseCommunityIpLookupAdapter extends LookupDataAdapter {
             throw new IllegalArgumentException(error);
         }
 
-        final String validIpAddress;
+        String validIpAddress = null;
         final InetAddressValidator validator = InetAddressValidator.getInstance();
         if (validator.isValidInet6Address(ipString)) {
-            LOG.error("'{}' is an IPv6 Address.  '{}' does not support IPv6 Addresses", ipAddress, ADAPTER_NAME);
-            validIpAddress = null;
+            LOG.warn("'{}' is an IPv6 Address.  '{}' does not support IPv6 Addresses", ipAddress, ADAPTER_NAME);
         } else if (!validator.isValidInet4Address(ipString)) {
             LOG.error("'{}' is not a valid IPv4 Address", ipString);
-            validIpAddress = null;
         } else if (ReservedIpChecker.getInstance().isReservedIpAddress(ipString)) {
             LOG.error("'{}' is a Reserved address", ipAddress);
-            validIpAddress = null;
         } else {
             validIpAddress = ipString;
         }
