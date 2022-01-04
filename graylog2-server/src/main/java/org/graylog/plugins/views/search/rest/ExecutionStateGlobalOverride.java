@@ -45,7 +45,7 @@ public abstract class ExecutionStateGlobalOverride {
     public abstract Builder toBuilder();
 
     public static Builder builder() {
-        return new AutoValue_ExecutionGlobalOverride.Builder();
+        return new AutoValue_ExecutionStateGlobalOverride.Builder();
     }
 
     public boolean hasValues() {
