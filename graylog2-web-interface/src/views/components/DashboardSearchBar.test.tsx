@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
+import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 
 import MockStore from 'helpers/mocking/StoreMock';
 import { GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
@@ -52,7 +53,11 @@ jest.mock('views/stores/SearchConfigStore', () => ({
   },
 }));
 
-jest.mock('views/components/searchbar/queryvalidation/validateQuery', () => () => Promise.resolve({ status: 'OK', explanations: [] }));
+jest.mock('views/components/searchbar/queryvalidation/validateQuery', () => () => Promise.resolve({
+  status: 'OK',
+  explanations: [],
+}));
+
 jest.mock('views/logic/debounceWithPromise', () => (fn: any) => fn);
 
 const config = {
@@ -109,16 +114,20 @@ describe('DashboardSearchBar', () => {
     userEvent.click(searchButton);
 
     await waitFor(() => expect(GlobalOverrideActions.set).toHaveBeenCalledWith({ type: 'relative', from: 300 }, ''));
-  });
+  }, applyTimeoutMultiplier(10000));
 
   it('should hide the save and load controls if a widget is being edited', async () => {
     const focusedWidget: WidgetEditingState = { id: 'foo', editing: true, focusing: true };
     const widgetFocusContext = {
       focusedWidget,
-      setWidgetFocusing: () => {},
-      setWidgetEditing: () => {},
-      unsetWidgetFocusing: () => {},
-      unsetWidgetEditing: () => {},
+      setWidgetFocusing: () => {
+      },
+      setWidgetEditing: () => {
+      },
+      unsetWidgetFocusing: () => {
+      },
+      unsetWidgetEditing: () => {
+      },
     };
 
     render(
@@ -138,10 +147,14 @@ describe('DashboardSearchBar', () => {
     const focusedWidget: WidgetFocusingState = { id: 'foo', editing: false, focusing: true };
     const widgetFocusContext = {
       focusedWidget,
-      setWidgetFocusing: () => {},
-      setWidgetEditing: () => {},
-      unsetWidgetFocusing: () => {},
-      unsetWidgetEditing: () => {},
+      setWidgetFocusing: () => {
+      },
+      setWidgetEditing: () => {
+      },
+      unsetWidgetFocusing: () => {
+      },
+      unsetWidgetEditing: () => {
+      },
     };
 
     render(
