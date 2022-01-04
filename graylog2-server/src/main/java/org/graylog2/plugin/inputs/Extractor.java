@@ -27,7 +27,6 @@ import org.graylog2.inputs.extractors.ExtractorException;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.database.EmbeddedPersistable;
 import org.graylog2.shared.utilities.ExceptionUtils;
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +42,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static com.codahale.metrics.MetricRegistry.name;
-import static org.graylog2.plugin.Message.FIELD_TIMESTAMP;
 
 public abstract class Extractor implements EmbeddedPersistable {
     private static final Logger LOG = LoggerFactory.getLogger(Extractor.class);
@@ -237,10 +235,10 @@ public abstract class Extractor implements EmbeddedPersistable {
                     return;
                 } else if (results.length == 1 && results[0].target == null) {
                     // results[0].target is null if this extractor cannot produce multiple fields use targetField in that case
-                    addField(msg, targetField, results[0].getValue());
+                    msg.addField(targetField, results[0].getValue());
                 } else {
                     for (final Result result : results) {
-                        addField(msg, result.getTarget(), result.getValue());
+                        msg.addField(result.getTarget(), result.getValue());
                     }
                 }
 
@@ -266,26 +264,7 @@ public abstract class Extractor implements EmbeddedPersistable {
                 }
 
                 runConverters(msg);
-
-                // The extractor / converter might have failed to build a valid timestamp.
-                // In this case we run msg#addField() to log this error and fallback to a current date.
-                if (targetField.equals(FIELD_TIMESTAMP)) {
-                    final Object timestampValue = msg.getField(FIELD_TIMESTAMP);
-                    if (!(timestampValue instanceof DateTime)) {
-                        msg.addField(FIELD_TIMESTAMP, timestampValue);
-                    }
-                }
             }
-        }
-    }
-
-    // Don't use addField when assigning timestamps.
-    // We have to delay the conversion, because the converters expect this field as a String. (cf #11495)
-    private void addField(Message msg, final String key, final Object value) {
-        if (key.trim().equals(FIELD_TIMESTAMP) && value instanceof String) {
-            msg.setTimeFieldAsString((String) value);
-        } else {
-            msg.addField(key, value);
         }
     }
 

@@ -386,6 +386,7 @@ public class Message implements Messages, Indexable {
 
     @Override
     public DateTime getTimestamp() {
+        ensureValidTimestamp();
         return getFieldAs(DateTime.class, FIELD_TIMESTAMP).withZone(UTC);
     }
 
@@ -448,6 +449,16 @@ public class Message implements Messages, Indexable {
         }
 
         return obj;
+    }
+
+    public void ensureValidTimestamp() {
+        final Object timestampValue = getField(FIELD_TIMESTAMP);
+        if (timestampValue instanceof DateTime) {
+            return;
+        }
+
+        final DateTime dateTime = timestampValue == null ? fallbackForNullTimestamp() : convertToDateTime(timestampValue);
+        addField(FIELD_TIMESTAMP, dateTime);
     }
 
     private DateTime convertToDateTime(@Nonnull Object value) {
@@ -533,16 +544,6 @@ public class Message implements Messages, Indexable {
         addField(key, value, true);
     }
 
-    // Set the timestamp field without performing a conversion or fallback to the current time.
-    // This is needed by Extractors so they can use their own DateConverter. (cf #11495)
-    public void setTimeFieldAsString(final String value) {
-        final String str = value.trim();
-        if (!str.isEmpty()) {
-            final Object previousValue = fields.put(FIELD_TIMESTAMP, str);
-            updateSize(FIELD_TIMESTAMP, str, previousValue);
-        }
-    }
-
     private void addField(final String key, final Object value, final boolean isRequiredField) {
         final String trimmedKey = key.trim();
 
@@ -555,16 +556,19 @@ public class Message implements Messages, Indexable {
         }
 
         final boolean isTimestamp = FIELD_TIMESTAMP.equals(trimmedKey);
-        if (isTimestamp) {
-            final DateTime timeStamp = value == null ? fallbackForNullTimestamp() : convertToDateTime(value);
-            final Object previousValue = fields.put(FIELD_TIMESTAMP, timeStamp);
-            updateSize(trimmedKey, timeStamp, previousValue);
-        } else if (value instanceof String) {
+        if (value instanceof String) {
             final String str = ((String) value).trim();
 
             if (isRequiredField || !str.isEmpty()) {
                 final Object previousValue = fields.put(trimmedKey, str);
                 updateSize(trimmedKey, str, previousValue);
+            }
+        } else if (isTimestamp && value != null) {
+            try {
+                final DateTime timeStamp = DateTimeConverter.convertToDateTime(value);
+                final Object previousValue = fields.put(FIELD_TIMESTAMP, timeStamp);
+                updateSize(trimmedKey, timeStamp, previousValue);
+            } catch (IllegalArgumentException ignored) {
             }
         } else if (value != null) {
             final Object previousValue = fields.put(trimmedKey, value);
