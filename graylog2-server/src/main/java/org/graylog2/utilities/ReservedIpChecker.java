@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 
 public class ReservedIpChecker {
     private static final Logger LOG = LoggerFactory.getLogger(ReservedIpChecker.class);
-    private static final String[] RESERVED_IPV4_BLOCKS = new String[]{
+    private static final String[] RESERVED_IPV4_BLOCKS = {
             "0.0.0.0/8",
             "10.0.0.0/8",
             "100.64.0.0/10",
