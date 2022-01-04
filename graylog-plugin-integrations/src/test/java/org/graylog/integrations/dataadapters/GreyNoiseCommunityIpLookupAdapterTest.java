@@ -36,6 +36,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import java.util.Map;
+import java.util.Optional;
 
 public class GreyNoiseCommunityIpLookupAdapterTest extends TestWithResources {
 
@@ -134,15 +135,17 @@ public class GreyNoiseCommunityIpLookupAdapterTest extends TestWithResources {
     @Test
     public void createRequestWithReservedIp() {
 
-        Assert.assertThrows(IllegalArgumentException.class, () -> greyNoiseCommunityIpLookupAdapter.createRequest("127.0.0.1"));
-        Assert.assertThrows(IllegalArgumentException.class, () -> greyNoiseCommunityIpLookupAdapter.createRequest("192.168.1.100"));
-        Assert.assertThrows(IllegalArgumentException.class, () -> greyNoiseCommunityIpLookupAdapter.createRequest("10.1.1.100"));
-        Assert.assertThrows(IllegalArgumentException.class, () -> greyNoiseCommunityIpLookupAdapter.createRequest("172.1.1.100"));
+        String error = "Empty Request expected for Reserved IP Address";
+        Assert.assertFalse(error, greyNoiseCommunityIpLookupAdapter.createRequest("127.0.0.1").isPresent());
+        Assert.assertFalse(error, greyNoiseCommunityIpLookupAdapter.createRequest("192.168.1.100").isPresent());
+        Assert.assertFalse(error, greyNoiseCommunityIpLookupAdapter.createRequest("10.1.1.100").isPresent());
+        Assert.assertFalse(error, greyNoiseCommunityIpLookupAdapter.createRequest("172.16.1.100").isPresent());
     }
 
     @Test
     public void creatRequestWithIpv6Address() {
-        Assert.assertThrows(IllegalArgumentException.class, () -> greyNoiseCommunityIpLookupAdapter.createRequest("2001::ffff:ffff:ffff:ffff:ffff:ffff"));
+        Optional<Request> request = greyNoiseCommunityIpLookupAdapter.createRequest("2001::ffff:ffff:ffff:ffff:ffff:ffff");
+        Assert.assertFalse("Empty Request expected for IPv6", request.isPresent());
     }
 
     private Response createResponse(String responseBody, int statusCode) {
