@@ -82,6 +82,7 @@ import org.graylog2.plugin.KafkaJournalConfiguration;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.rest.resources.system.validate.ClusterConfigValidatorModule;
 import org.graylog2.shared.UI;
 import org.graylog2.shared.bindings.MessageInputBindings;
 import org.graylog2.shared.bindings.ObjectMapperModule;
@@ -179,7 +180,8 @@ public class Server extends ServerBootstrap {
                 new FreeEnterpriseModule(),
                 new GRNTypesModule(),
                 new SecurityModule(),
-                new PrometheusMetricsModule()
+                new PrometheusMetricsModule(),
+                new ClusterConfigValidatorModule()
         );
 
         if (!isMigrationCommand()) {

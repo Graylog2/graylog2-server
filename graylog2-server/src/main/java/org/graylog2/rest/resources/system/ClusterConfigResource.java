@@ -16,8 +16,6 @@
  */
 package org.graylog2.rest.resources.system;
 
-import com.codahale.metrics.Timer;
-import com.codahale.metrics.UniformReservoir;
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,19 +24,15 @@ import com.fasterxml.jackson.module.jsonSchema.factories.SchemaFactoryWrapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.graylog.plugins.map.config.GeoIpResolverConfig;
-import org.graylog.plugins.map.geoip.GeoAsnInformation;
-import org.graylog.plugins.map.geoip.GeoIpResolver;
-import org.graylog.plugins.map.geoip.GeoIpVendorResolverService;
-import org.graylog.plugins.map.geoip.GeoLocationInformation;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.rest.MoreMediaTypes;
 import org.graylog2.rest.models.system.config.ClusterConfigList;
+import org.graylog2.rest.resources.system.validate.ClusterConfigValidatorService;
+import org.graylog2.rest.resources.system.validate.ConfigValidationException;
 import org.graylog2.shared.plugins.ChainingClassLoader;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
@@ -63,9 +57,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.Locale;
 import java.util.Set;
 
@@ -82,17 +73,17 @@ public class ClusterConfigResource extends RestResource {
     private final ClusterConfigService clusterConfigService;
     private final ChainingClassLoader chainingClassLoader;
     private final ObjectMapper objectMapper;
-    private final GeoIpVendorResolverService geoIpVendorResolverService;
+    private final ClusterConfigValidatorService clusterConfigValidatorService;
 
     @Inject
     public ClusterConfigResource(ClusterConfigService clusterConfigService,
                                  ChainingClassLoader chainingClassLoader,
                                  ObjectMapper objectMapper,
-                                 GeoIpVendorResolverService geoIpVendorResolverService) {
+                                 ClusterConfigValidatorService clusterConfigValidatorService) {
         this.clusterConfigService = requireNonNull(clusterConfigService);
         this.chainingClassLoader = chainingClassLoader;
         this.objectMapper = objectMapper;
-        this.geoIpVendorResolverService = geoIpVendorResolverService;
+        this.clusterConfigValidatorService = clusterConfigValidatorService;
     }
 
     @GET
@@ -137,78 +128,41 @@ public class ClusterConfigResource extends RestResource {
             throw new NotFoundException(createNoClassMsg(configClass));
         }
 
-        final Object o;
-        try {
-            o = objectMapper.readValue(body, cls);
-        } catch (Exception e) {
-            final String msg = "Couldn't parse cluster configuration \"" + configClass + "\".";
-            LOG.error(msg, e);
-            throw new BadRequestException(msg);
-        }
+        final Object configObject = parseConfigObject(configClass, body, cls);
+        validateConfigObject(configObject);
+        writeConfigObject(configClass, configObject);
 
-        validateIfGeoIpResolverConfig(o);
+        return Response.accepted(configObject).build();
+    }
 
+    private void writeConfigObject(String configClass, Object configObject) {
         try {
-            clusterConfigService.write(o);
+            clusterConfigService.write(configObject);
         } catch (Exception e) {
             final String msg = "Couldn't write cluster config \"" + configClass + "\".";
             LOG.error(msg, e);
             throw new InternalServerErrorException(msg, e);
         }
-
-        return Response.accepted(o).build();
     }
 
-    private void validateIfGeoIpResolverConfig(Object o) {
-        if (o instanceof GeoIpResolverConfig) {
-            final GeoIpResolverConfig config = (GeoIpResolverConfig) o;
-
-            Timer timer = new Timer(new UniformReservoir());
-            try {
-                //A test address.  This will NOT be in any database, but should only produce an
-                //AddressNotFoundException.  Any other exception suggests an actual error such as
-                //a database file that does does not belong to the vendor selected
-                InetAddress testAddress = Inet4Address.getByName("127.0.0.1");
-
-                validateGeoIpLocationResolver(config, timer, testAddress);
-                validateGeoIpAsnResolver(config, timer, testAddress);
-
-            } catch (UnknownHostException | IllegalArgumentException e) {
-                LOG.error(e.getMessage(), e);
-                throw new BadRequestException(e.getMessage());
-            }
+    private void validateConfigObject(Object configObject) {
+        try {
+            clusterConfigValidatorService.validate(configObject);
+        } catch (ConfigValidationException e) {
+            throw new BadRequestException(e.getMessage(), e);
         }
     }
 
-    private void validateGeoIpAsnResolver(GeoIpResolverConfig config, Timer timer, InetAddress testAddress) {
-        //ASN file is optional--do not validate if not provided.
-        if (config.enabled() && StringUtils.isNotBlank(config.asnDbPath())) {
-            GeoIpResolver<GeoAsnInformation> asnResolver = geoIpVendorResolverService.createAsnResolver(config, timer);
-            if (config.enabled() && !asnResolver.isEnabled()) {
-                String msg = String.format(Locale.ENGLISH, "Invalid '%s'  ASN database file '%s'.  Make sure the file exists and is valid for '%1$s'", config.databaseVendorType(), config.asnDbPath());
-                throw new IllegalArgumentException(msg);
-            }
-            asnResolver.getGeoIpData(testAddress);
-            if (asnResolver.getLastError().isPresent()) {
-                String error = String.format(Locale.ENGLISH, "Error querying ASN.  Make sure you have selected a valid ASN database for '%s'", config.databaseVendorType());
-                throw new IllegalStateException(error);
-            }
+    private Object parseConfigObject(String configClass, InputStream body, Class<?> cls) {
+        final Object object;
+        try {
+            object = objectMapper.readValue(body, cls);
+        } catch (Exception e) {
+            final String msg = "Couldn't parse cluster configuration \"" + configClass + "\".";
+            LOG.error(msg, e);
+            throw new BadRequestException(msg);
         }
-    }
-
-    private void validateGeoIpLocationResolver(GeoIpResolverConfig config, Timer timer, InetAddress testAddress) {
-        GeoIpResolver<GeoLocationInformation> cityResolver = geoIpVendorResolverService.createCityResolver(config, timer);
-        if (config.enabled() && !cityResolver.isEnabled()) {
-            String msg = String.format(Locale.ENGLISH, "Invalid '%s' City Geo IP database file '%s'.  Make sure the file exists and is valid for '%1$s'", config.databaseVendorType(), config.cityDbPath());
-            throw new IllegalArgumentException(msg);
-        }
-
-
-        cityResolver.getGeoIpData(testAddress);
-        if (cityResolver.getLastError().isPresent()) {
-            String error = String.format(Locale.ENGLISH, "Error querying Geo Location.  Make sure you have selected a valid Location database for '%s'", config.databaseVendorType());
-            throw new IllegalStateException(error);
-        }
+        return object;
     }
 
     @DELETE
