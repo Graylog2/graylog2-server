@@ -133,7 +133,8 @@ public abstract class ServerBootstrap extends CmdLineTool {
                 new NamedConfigParametersModule(jadConfig.getConfigurationBeans()),
                 new ServerStatusBindings(capabilities()),
                 new ConfigurationModule(configuration),
-                new ServerPreflightChecksModule(),
+                new SystemStatsModule(configuration.isDisableNativeSystemStatsCollector()),
+                new ServerPreflightChecksModule(configuration),
                 new Module() {
                     @Override
                     public void configure(Binder binder) {

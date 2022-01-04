@@ -16,6 +16,7 @@
  */
 package org.graylog2.bootstrap.preflight;
 
+import com.github.joschi.jadconfig.util.Size;
 import com.github.rholder.retry.Attempt;
 import com.github.rholder.retry.RetryException;
 import com.github.rholder.retry.RetryListener;
@@ -29,7 +30,9 @@ import org.graylog2.Configuration;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.MongoDBVersionCheck;
 import org.graylog2.shared.messageq.MessageQueueModule;
-import org.graylog2.shared.messageq.MessageQueueWriter;
+import org.graylog2.shared.system.stats.fs.FsProbe;
+import org.graylog2.shared.system.stats.fs.FsStats;
+import org.graylog2.shared.utilities.StringUtils;
 import org.graylog2.storage.SearchVersion;
 import org.graylog2.storage.versionprobe.ElasticsearchProbeException;
 import org.graylog2.storage.versionprobe.VersionProbe;
@@ -38,35 +41,48 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
+@SuppressWarnings("UnstableApiUsage")
 public class ServerPreflightCheck {
     private static final Logger LOG = LoggerFactory.getLogger(ServerPreflightCheck.class);
 
     private final boolean skipPreflightChecks;
     private final int mongoVersionProbeAttempts;
     private final List<URI> elasticsearchHosts;
+    private final Path journalDirectory;
+    private final Size journalMaxSize;
     private final VersionProbe elasticVersionProbe;
     private final MongoConnection mongoConnection;
-    private MessageQueueWriter messageQueueWriter;
+    private final FsProbe fsProbe;
 
     @Inject
     public ServerPreflightCheck(@Named(value = "skip_preflight_checks") boolean skipPreflightChecks,
                                 @Named(value = "mongodb_version_probe_attempts") int mongoVersionProbeAttempts,
                                 @Named("elasticsearch_hosts") List<URI> elasticsearchHosts,
-                                VersionProbe elasticVersionProbe, MongoConnection mongoConnection,
-                                MessageQueueWriter messageQueueWriter) {
+                                @Named("message_journal_dir") Path journalDirectory,
+                                @Named("message_journal_max_size") Size journalMaxSize,
+                                VersionProbe elasticVersionProbe,
+                                MongoConnection mongoConnection,
+                                FsProbe fsProbe
+                                ) {
         this.skipPreflightChecks = skipPreflightChecks;
         this.mongoVersionProbeAttempts = mongoVersionProbeAttempts;
         this.elasticsearchHosts = elasticsearchHosts;
+        this.journalDirectory = journalDirectory;
+        this.journalMaxSize = journalMaxSize;
         this.elasticVersionProbe = elasticVersionProbe;
         this.mongoConnection = mongoConnection;
-        this.messageQueueWriter = messageQueueWriter;
+        this.fsProbe = fsProbe;
     }
 
     public void runChecks(Configuration configuration) {
@@ -76,7 +92,7 @@ public class ServerPreflightCheck {
         }
         checkMongoDb();
         checkElasticsearch();
-        checkJournal(configuration);
+        checkDiskJournal(configuration);
     }
 
     private void checkMongoDb() {
@@ -127,12 +143,34 @@ public class ServerPreflightCheck {
         }
     }
 
-    private void checkJournal(Configuration configuration) {
-        if (!configuration.isMessageJournalEnabled()) {
+    private void checkDiskJournal(Configuration configuration) {
+        if (!configuration.isMessageJournalEnabled() || (!configuration.getMessageJournalMode().equals(MessageQueueModule.DISK_JOURNAL_MODE))) {
             return;
         }
-        if (configuration.getMessageJournalMode().equals(MessageQueueModule.DISK_JOURNAL_MODE)) {
-            // TODO
+        if (!java.nio.file.Files.exists(journalDirectory)) {
+            try {
+                java.nio.file.Files.createDirectories(journalDirectory);
+            } catch (IOException e) {
+                throw new PreflightCheckException(StringUtils.f("Cannot create journal directory at <%s>", journalDirectory.toAbsolutePath()));
+            }
+        }
+        if (!Files.isWritable(journalDirectory)) {
+            throw new PreflightCheckException(StringUtils.f("Journal directory <%s> is not writable!", journalDirectory.toAbsolutePath()));
+        }
+
+        final Map<String, FsStats.Filesystem> filesystems = fsProbe.fsStats().filesystems();
+        final FsStats.Filesystem journalFs = filesystems.get(journalDirectory.toAbsolutePath().toString());
+        if (journalFs != null) {
+            if (journalFs.available() < journalMaxSize.toBytes()) {
+                throw new PreflightCheckException(StringUtils.f(
+                        "Journal directory <%s> has not enough free space (%d MB) to contain 'message_journal_max_size = %d MB' ",
+                        journalDirectory.toAbsolutePath(),
+                        Size.bytes(journalFs.available()).toMegabytes(),
+                        journalMaxSize.toMegabytes()
+                ));
+            }
+        } else {
+            LOG.warn("Could not perform size check on journal directory <{}>", journalDirectory.toAbsolutePath());
         }
     }
 }
