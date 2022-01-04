@@ -29,6 +29,7 @@ import org.graylog2.Configuration;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.MongoDBVersionCheck;
 import org.graylog2.shared.messageq.MessageQueueModule;
+import org.graylog2.shared.messageq.MessageQueueWriter;
 import org.graylog2.storage.SearchVersion;
 import org.graylog2.storage.versionprobe.ElasticsearchProbeException;
 import org.graylog2.storage.versionprobe.VersionProbe;
@@ -44,25 +45,28 @@ import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-public class PreflightCheck {
-    private static final Logger LOG = LoggerFactory.getLogger(PreflightCheck.class);
+public class ServerPreflightCheck {
+    private static final Logger LOG = LoggerFactory.getLogger(ServerPreflightCheck.class);
 
     private final boolean skipPreflightChecks;
     private final int mongoVersionProbeAttempts;
     private final List<URI> elasticsearchHosts;
     private final VersionProbe elasticVersionProbe;
     private final MongoConnection mongoConnection;
+    private MessageQueueWriter messageQueueWriter;
 
     @Inject
-    public PreflightCheck(@Named(value = "skip_preflight_checks") boolean skipPreflightChecks,
-                          @Named(value = "mongodb_version_probe_attempts") int mongoVersionProbeAttempts,
-                          @Named("elasticsearch_hosts") List<URI> elasticsearchHosts,
-                          VersionProbe elasticVersionProbe, MongoConnection mongoConnection) {
+    public ServerPreflightCheck(@Named(value = "skip_preflight_checks") boolean skipPreflightChecks,
+                                @Named(value = "mongodb_version_probe_attempts") int mongoVersionProbeAttempts,
+                                @Named("elasticsearch_hosts") List<URI> elasticsearchHosts,
+                                VersionProbe elasticVersionProbe, MongoConnection mongoConnection,
+                                MessageQueueWriter messageQueueWriter) {
         this.skipPreflightChecks = skipPreflightChecks;
         this.mongoVersionProbeAttempts = mongoVersionProbeAttempts;
         this.elasticsearchHosts = elasticsearchHosts;
         this.elasticVersionProbe = elasticVersionProbe;
         this.mongoConnection = mongoConnection;
+        this.messageQueueWriter = messageQueueWriter;
     }
 
     public void runChecks(Configuration configuration) {
@@ -128,8 +132,7 @@ public class PreflightCheck {
             return;
         }
         if (configuration.getMessageJournalMode().equals(MessageQueueModule.DISK_JOURNAL_MODE)) {
-
+            // TODO
         }
-
     }
 }

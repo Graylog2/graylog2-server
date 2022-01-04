@@ -17,15 +17,22 @@
 package org.graylog2.bootstrap.preflight;
 
 import com.google.inject.AbstractModule;
+import org.graylog2.audit.AuditEventSender;
+import org.graylog2.audit.NullAuditEventSender;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.MongoConnectionImpl;
+import org.graylog2.plugin.system.NodeId;
+import org.graylog2.shared.bindings.providers.NodeIdProvider;
 import org.graylog2.storage.providers.ElasticsearchVersionProvider;
 
-public class PreflightChecksModule extends AbstractModule {
+public class ServerPreflightChecksModule extends AbstractModule {
     @Override
     protected void configure() {
         bind(ElasticsearchVersionProvider.class).asEagerSingleton();
         bind(MongoConnection.class).to(MongoConnectionImpl.class);
-        bind(PreflightCheck.class);
+        //bind(MessageQueueWriter.class).to(NoopMessageQueueWriter.class); // TODO REMOVE
+        bind(ServerPreflightCheck.class);
+        bind(NodeId.class).toProvider(NodeIdProvider.class);
+        bind(AuditEventSender.class).to(NullAuditEventSender.class);
     }
 }
