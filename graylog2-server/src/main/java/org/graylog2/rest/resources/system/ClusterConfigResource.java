@@ -26,6 +26,7 @@ import com.fasterxml.jackson.module.jsonSchema.factories.SchemaFactoryWrapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.plugins.map.config.GeoIpResolverConfig;
@@ -70,7 +71,7 @@ import java.util.Set;
 
 import static java.util.Objects.requireNonNull;
 
-@Api(value = "System/ClusterConfig")
+@Api(value = "System/ClusterConfig", description = "Graylog Cluster Configuration")
 @RequiresAuthentication
 @Path("/system/cluster_config")
 @Produces(MediaType.APPLICATION_JSON)
@@ -181,7 +182,7 @@ public class ClusterConfigResource extends RestResource {
 
     private void validateGeoIpAsnResolver(GeoIpResolverConfig config, Timer timer, InetAddress testAddress) {
         //ASN file is optional--do not validate if not provided.
-        if (!(config.asnDbPath() == null || config.asnDbPath().trim().isEmpty())) {
+        if (config.enabled() && StringUtils.isNotBlank(config.asnDbPath())) {
             GeoIpResolver<GeoAsnInformation> asnResolver = geoIpVendorResolverService.createAsnResolver(config, timer);
             if (config.enabled() && !asnResolver.isEnabled()) {
                 String msg = String.format(Locale.ENGLISH, "Invalid '%s'  ASN database file '%s'.  Make sure the file exists and is valid for '%1$s'", config.databaseVendorType(), config.asnDbPath());
