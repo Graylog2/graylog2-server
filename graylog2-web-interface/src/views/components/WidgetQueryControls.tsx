@@ -57,6 +57,7 @@ import WidgetQueryOverride from './WidgetQueryOverride';
 
 const SecondRow = styled.div`
   display: flex;
+  align-items: flex-start;
 
   .query {
     flex: 1;

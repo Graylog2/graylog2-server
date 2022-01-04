@@ -91,6 +91,7 @@ const RefreshControlsWrapper = styled.div(({ theme }) => css`
 const SearchButtonAndQuery = styled.div`
   flex: 1;
   display: flex;
+  align-items: flex-start;
 `;
 
 const StyledQueryInput = styled(QueryInput)`
