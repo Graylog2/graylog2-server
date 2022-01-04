@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -37,7 +38,7 @@ import java.util.stream.Collectors;
 
 public class ReservedIpChecker {
     private static final Logger LOG = LoggerFactory.getLogger(ReservedIpChecker.class);
-    public static final String IPV4_BLOCKS_FILE = "reserved-ipv4-blocks.txt";
+    public static final String IPV4_BLOCKS_FILE = "/reserved-ipv4-blocks.txt";
 
     private static ReservedIpChecker instance;
 
@@ -51,7 +52,7 @@ public class ReservedIpChecker {
 
         List<IpSubnet> list;
         try {
-            URL url = getClass().getClassLoader().getResource(IPV4_BLOCKS_FILE);
+            URL url = getClass().getResource(IPV4_BLOCKS_FILE);
             if (url == null) {
                 String error = String.format(Locale.ENGLISH, "Error.  IP Block file '%s' was not found.", IPV4_BLOCKS_FILE);
                 LOG.error(error);
@@ -65,7 +66,7 @@ public class ReservedIpChecker {
                         .map(Optional::get)
                         .collect(Collectors.toList());
             }
-        } catch (IOException | URISyntaxException e) {
+        } catch (IOException | URISyntaxException | FileSystemNotFoundException e) {
 
             String error = String.format(Locale.ENGLISH, "Error loading Reserved IP Blocks. %s", e.getMessage());
             LOG.error(error, e);
