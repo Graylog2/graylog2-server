@@ -42,6 +42,9 @@ const UserMenu = ({ fullName, readOnly = true, userId }: Props) => {
 
   const onLogoutClicked = () => {
     SessionActions.logout().then(() => {
+      /* In some cases, when the authentication info is set externally (e.g. trusted headers), we need to retrigger a
+         session validation, so we are not stuck at the login screen. */
+      SessionActions.validate();
       history.push(Routes.STARTPAGE);
     });
   };
