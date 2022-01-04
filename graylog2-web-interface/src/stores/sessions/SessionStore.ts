@@ -84,7 +84,7 @@ export const SessionStore = singletonStore(
         .then((response) => {
           if (response.is_valid) {
             return SessionActions.login.completed({
-              username: username || response.username,
+              username: response.username ?? username,
             });
           }
 
