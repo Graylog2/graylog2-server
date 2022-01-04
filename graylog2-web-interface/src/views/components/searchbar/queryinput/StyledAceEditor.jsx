@@ -22,9 +22,9 @@ const StyledAceEditor = styled(AceEditor).attrs(({ aceTheme, theme }) => ({
   // NOTE: After setting the prop we need to swap them back so AceEditor uses the proper styles
   theme: aceTheme, /* stylelint-disable-line */
   $scTheme: theme,
-}))(({ $scTheme, $height = 34, disabled }) => css`
+}))(({ $scTheme, disabled }) => css`
   &.ace-queryinput {
-    height: ${$height}px !important;
+    margin-top: 6px;
     width: 100% !important;
     background-color: ${$scTheme.colors.input.background};
     color: ${$scTheme.utils.contrastingColor($scTheme.colors.input.background, 'AAA')};
@@ -153,8 +153,7 @@ const StyledAceEditor = styled(AceEditor).attrs(({ aceTheme, theme }) => ({
 
     .ace_content,
     .ace_placeholder {
-      top: 6px;
-      padding: 0 !important;
+      padding: 0px !important;
     }
 
     .ace_placeholder {

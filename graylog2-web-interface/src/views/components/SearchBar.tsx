@@ -86,6 +86,7 @@ const StreamWrap = styled.div`
 const SearchButtonAndQuery = styled.div`
   flex: 1;
   display: flex;
+  align-items: flex-start;
 `;
 
 const StyledQueryInput = styled(QueryInput)`

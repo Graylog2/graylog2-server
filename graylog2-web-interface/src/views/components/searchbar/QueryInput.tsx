@@ -43,7 +43,6 @@ type Props = {
   completers: Array<Completer>,
   disabled?: boolean,
   error?: QueryValidationState,
-  height?: number,
   onBlur?: (query: string) => void,
   onChange: (query: string) => Promise<string>,
   onExecute: (query: string) => void,
@@ -122,7 +121,6 @@ const QueryInput = ({
   completers,
   disabled,
   error,
-  height,
   onBlur,
   onChange,
   onExecute,
@@ -161,7 +159,7 @@ const QueryInput = ({
                            showPrintMargin={false}
                            highlightActiveLine={false}
                            minLines={1}
-                           maxLines={1}
+                           maxLines={Infinity}
                            enableBasicAutocompletion={enableSmartSearch}
                            enableLiveAutocompletion={enableSmartSearch}
                            editorProps={{
@@ -170,7 +168,6 @@ const QueryInput = ({
                            }}
                            fontSize={theme.fonts.size.large}
                            placeholder={placeholder}
-                           $height={height}
                            markers={markers} />
         )}
       </UserPreferencesContext.Consumer>
@@ -184,7 +181,6 @@ QueryInput.propTypes = {
   completers: PropTypes.array,
   disabled: PropTypes.bool,
   error: PropTypes.object,
-  height: PropTypes.number,
   onBlur: PropTypes.func,
   onChange: PropTypes.func.isRequired,
   onExecute: PropTypes.func.isRequired,
@@ -202,7 +198,6 @@ QueryInput.defaultProps = {
   completers: [],
   disabled: false,
   error: undefined,
-  height: undefined,
   onBlur: () => {},
   placeholder: '',
   streams: undefined,
