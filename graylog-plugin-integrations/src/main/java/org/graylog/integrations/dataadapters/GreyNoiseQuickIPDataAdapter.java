@@ -32,13 +32,14 @@ import com.unboundid.util.json.JSONObject;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import org.graylog2.plugin.Version;
+import org.apache.commons.validator.routines.InetAddressValidator;
 import org.graylog2.plugin.lookup.LookupCachePurge;
 import org.graylog2.plugin.lookup.LookupDataAdapter;
 import org.graylog2.plugin.lookup.LookupDataAdapterConfiguration;
 import org.graylog2.plugin.lookup.LookupResult;
 import org.graylog2.security.encryption.EncryptedValue;
 import org.graylog2.security.encryption.EncryptedValueService;
+import org.graylog2.utilities.ReservedIpChecker;
 import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,13 +94,32 @@ public class GreyNoiseQuickIPDataAdapter extends LookupDataAdapter {
 
     @Override
     protected LookupResult doGet(Object keyObject) {
-        String userAgent = String.format("Graylog/%s", Version.CURRENT_CLASSPATH);
+
+        String ip = keyObject.toString();
+        // if the IP address is a valid IPv4 address, check to see if it is a reserved IP.
+        // If it is, skip lookup and return empty. If it is not, proceed with lookup.
+        if (InetAddressValidator.getInstance().isValidInet4Address(ip)) {
+            if (ReservedIpChecker.getInstance().isReservedIpAddress(ip)) {
+                LOG.info("'{}' is an unsupported reserved address. Skipping lookup.", ip);
+                return LookupResult.empty();
+            }
+        } else {
+            // if the IP address is not a valid IPv4 address, check to see if it is IPv6.
+            // If it is not IPv6, skip lookup and return error. If it is, skip lookup and return empty.
+            if (InetAddressValidator.getInstance().isValidInet6Address(ip)) {
+                LOG.info("'{}' is an unsupported IPv6 address. Skipping lookup.", ip);
+                return LookupResult.empty();
+            } else {
+                LOG.error("'{}' is not a valid IPv4 Address", ip);
+                return LookupResult.withError();
+            }
+        }
         Request request = new Request.Builder()
-                .url(GREYNOISE_IPQC_ENDPOINT + keyObject.toString())
+                .url(GREYNOISE_IPQC_ENDPOINT + ip)
                 .method("GET", null)
                 .addHeader("Accept", "application/json")
                 .addHeader("key", encryptedValueService.decrypt(config.apiToken()))
-                .addHeader("User-Agent", userAgent)
+                .addHeader("User-Agent", "Graylog")
                 .build();
         try (Response response = okHttpClient.newCall(request).execute()) {
             return parseResponse(response);
@@ -120,6 +140,7 @@ public class GreyNoiseQuickIPDataAdapter extends LookupDataAdapter {
                 map.put("ip", Objects.requireNonNull(obj).getFieldAsString("ip"));
                 map.put("noise", Objects.requireNonNull(obj).getFieldAsBoolean("noise"));
                 map.put("code", Objects.requireNonNull(obj).getFieldAsString("code"));
+                map.put("riot", Objects.requireNonNull(obj).getFieldAsBoolean("riot"));
             } catch (JSONException | IOException e) {
                 LOG.error("An error occurred while parsing Lookup result [{}]", e.toString());
             }
