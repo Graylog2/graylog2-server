@@ -34,7 +34,7 @@ import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.filter.StreamFilter;
-import org.graylog.plugins.views.search.rest.ExecutionGlobalOverride;
+import org.graylog.plugins.views.search.rest.ExecutionStateGlobalOverride;
 import org.graylog.plugins.views.search.rest.SearchTypeExecutionState;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog2.database.ObjectIdSerializer;
@@ -103,7 +103,7 @@ public class QueryTest {
                 .build();
 
 
-        ExecutionGlobalOverride.Builder executionState = ExecutionGlobalOverride.builder();
+        ExecutionStateGlobalOverride.Builder executionState = ExecutionStateGlobalOverride.builder();
 
         executionState.timerange(RelativeRange.create(60));
         executionState.searchTypesBuilder().put(messageListId,  SearchTypeExecutionState.builder().offset(150).limit(300).build());
@@ -124,7 +124,7 @@ public class QueryTest {
     public void appliesExecutionStateTimeRangeToGlobalOverride() throws InvalidRangeParametersException {
 
 
-        final ExecutionGlobalOverride executionState = ExecutionGlobalOverride.builder()
+        final ExecutionStateGlobalOverride executionState = ExecutionStateGlobalOverride.builder()
                 .timerange(RelativeRange.create(60))
                 .build();
 
@@ -137,7 +137,7 @@ public class QueryTest {
     @Test
     public void appliesExecutionStateQueryToGlobalOverride() {
 
-        final ExecutionGlobalOverride executionState = ExecutionGlobalOverride.builder()
+        final ExecutionStateGlobalOverride executionState = ExecutionStateGlobalOverride.builder()
                 .query(ElasticsearchQueryString.of("NACKEN"))
                 .build();
 
@@ -149,7 +149,7 @@ public class QueryTest {
     @Test
     public void appliesExecutionStateTimeRangeAndQueryToGlobalOverrideIfBothArePresent() throws InvalidRangeParametersException {
 
-        final ExecutionGlobalOverride executionState = ExecutionGlobalOverride.builder()
+        final ExecutionStateGlobalOverride executionState = ExecutionStateGlobalOverride.builder()
                 .timerange(RelativeRange.create(60))
                 .query(ElasticsearchQueryString.of("NACKEN"))
                 .build();
@@ -165,7 +165,7 @@ public class QueryTest {
     @Test
     public void doesNotAddGlobalOverrideIfNeitherTimeRangeNorQueryArePresent() {
 
-        final ExecutionGlobalOverride.Builder executionState = ExecutionGlobalOverride.builder();
+        final ExecutionStateGlobalOverride.Builder executionState = ExecutionStateGlobalOverride.builder();
         executionState.searchTypesBuilder().put("some-id",
                 SearchTypeExecutionState.builder().offset(150).limit(300).build());
 

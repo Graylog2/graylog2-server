@@ -28,8 +28,8 @@ import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import java.util.Optional;
 
 @AutoValue
-@JsonDeserialize(builder = ExecutionGlobalOverride.Builder.class)
-public abstract class ExecutionGlobalOverride {
+@JsonDeserialize(builder = ExecutionStateGlobalOverride.Builder.class)
+public abstract class ExecutionStateGlobalOverride {
     @JsonProperty
     public abstract Optional<TimeRange> timerange();
     @JsonProperty
@@ -57,7 +57,7 @@ public abstract class ExecutionGlobalOverride {
        !keepSearchTypes().isEmpty();
     }
 
-    public static ExecutionGlobalOverride empty() {
+    public static ExecutionStateGlobalOverride empty() {
         return builder().build();
     }
 
@@ -65,8 +65,8 @@ public abstract class ExecutionGlobalOverride {
     public abstract static class Builder {
 
         @JsonCreator
-        public static ExecutionGlobalOverride.Builder create() {
-            return ExecutionGlobalOverride.builder();
+        public static ExecutionStateGlobalOverride.Builder create() {
+            return ExecutionStateGlobalOverride.builder();
         }
 
         @JsonProperty
@@ -81,6 +81,6 @@ public abstract class ExecutionGlobalOverride {
         public abstract ImmutableMap.Builder<String, SearchTypeExecutionState> searchTypesBuilder();
         @JsonProperty
         public abstract ImmutableSet.Builder<String> keepSearchTypesBuilder();
-        public abstract ExecutionGlobalOverride build();
+        public abstract ExecutionStateGlobalOverride build();
     }
 }

@@ -34,9 +34,9 @@ public abstract class ExecutionState {
 
     public abstract ImmutableMap<String,  Parameter.Binding> parameterBindings();
 
-    public abstract ImmutableMap<String, ExecutionGlobalOverride> queries();
+    public abstract ImmutableMap<String, ExecutionStateGlobalOverride> queries();
 
-    public abstract ExecutionGlobalOverride globalOverride();
+    public abstract ExecutionStateGlobalOverride globalOverride();
 
     public abstract ImmutableMap<String, Object> additionalParameters();
 
@@ -59,12 +59,12 @@ public abstract class ExecutionState {
         }
 
         @JsonProperty("global_override")
-        public abstract Builder setGlobalOverride(ExecutionGlobalOverride globalOverride);
+        public abstract Builder setGlobalOverride(ExecutionStateGlobalOverride globalOverride);
 
-        public abstract ExecutionGlobalOverride.Builder globalOverrideBuilder();
+        public abstract ExecutionStateGlobalOverride.Builder globalOverrideBuilder();
 
         @JsonProperty
-        public abstract ImmutableMap.Builder<String, ExecutionGlobalOverride> queriesBuilder();
+        public abstract ImmutableMap.Builder<String, ExecutionStateGlobalOverride> queriesBuilder();
 
         public abstract ImmutableMap.Builder<String,  Parameter.Binding> parameterBindingsBuilder();
 

@@ -30,7 +30,7 @@ import java.util.Optional;
 @JsonDeserialize(builder = SearchTypeExecutionState.Builder.class)
 public abstract class SearchTypeExecutionState {
 
-    public static SearchTypeExecutionState from(ExecutionGlobalOverride globalOverride) {
+    public static SearchTypeExecutionState from(ExecutionStateGlobalOverride globalOverride) {
         final Builder builder = builder();
         globalOverride.limit().ifPresent(builder::limit);
         globalOverride.offset().ifPresent(builder::offset);

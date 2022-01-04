@@ -29,6 +29,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.graylog.plugins.views.search.rest.ExecutionState;
+import org.graylog.plugins.views.search.rest.ExecutionStateGlobalOverride;
 import org.graylog.plugins.views.search.views.PluginMetadataSummary;
 import org.graylog2.contentpacks.ContentPackable;
 import org.graylog2.contentpacks.EntityDescriptorIds;
@@ -105,13 +106,20 @@ public abstract class Search implements ContentPackable<SearchEntity> {
 
         if (executionState.queries() != null || executionState.globalOverride() != null) {
             final ImmutableSet<Query> queries = queries().stream()
-                    .map(query -> executionState.globalOverride().hasValues()
-                            ? query.applyExecutionState(executionState.globalOverride())
-                            : query.applyExecutionState(executionState.queries().get(query.id())))
+                    .map(query -> applyStateToQuery(executionState, query))
                     .collect(toImmutableSet());
             builder.queries(queries);
         }
         return builder.build();
+    }
+
+    private Query applyStateToQuery(ExecutionState executionState, Query query) {
+        if (executionState.globalOverride().hasValues()) {
+            return query.applyExecutionState(executionState.globalOverride());
+        } else {
+            final ExecutionStateGlobalOverride queryOverride = executionState.queries().get(query.id());
+            return query.applyExecutionState(queryOverride);
+        }
     }
 
     public Search addStreamsToQueriesWithoutStreams(Supplier<Set<String>> defaultStreamsSupplier) {

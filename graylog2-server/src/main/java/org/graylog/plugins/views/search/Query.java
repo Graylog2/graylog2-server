@@ -31,7 +31,7 @@ import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.engine.EmptyTimeRange;
 import org.graylog.plugins.views.search.filter.AndFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
-import org.graylog.plugins.views.search.rest.ExecutionGlobalOverride;
+import org.graylog.plugins.views.search.rest.ExecutionStateGlobalOverride;
 import org.graylog.plugins.views.search.rest.SearchTypeExecutionState;
 import org.graylog2.contentpacks.ContentPackable;
 import org.graylog2.contentpacks.EntityDescriptorIds;
@@ -98,7 +98,7 @@ public abstract class Query implements ContentPackable<QueryEntity> {
         return Query.Builder.createWithDefaults();
     }
 
-    Query applyExecutionState(ExecutionGlobalOverride state) {
+    Query applyExecutionState(ExecutionStateGlobalOverride state) {
         if (state == null || !state.hasValues()) {
             return this;
         }
@@ -136,13 +136,13 @@ public abstract class Query implements ContentPackable<QueryEntity> {
         return this;
     }
 
-    private Set<SearchType> filterForWhiteListFromState(Set<SearchType> previousSearchTypes, ExecutionGlobalOverride state) {
+    private Set<SearchType> filterForWhiteListFromState(Set<SearchType> previousSearchTypes, ExecutionStateGlobalOverride state) {
         return previousSearchTypes.stream()
                 .filter(st -> state.keepSearchTypes().contains(st.id()))
                 .collect(toSet());
     }
 
-    private Set<SearchType> applyAvailableOverrides(ExecutionGlobalOverride state, Set<SearchType> searchTypes) {
+    private Set<SearchType> applyAvailableOverrides(ExecutionStateGlobalOverride state, Set<SearchType> searchTypes) {
         return searchTypes.stream().map(st -> {
             if (state.searchTypes().containsKey(st.id())) {
                 final SearchTypeExecutionState executionState = state.searchTypes().get(st.id());
