@@ -153,11 +153,6 @@ const QueryInput = ({
                              name: 'Execute',
                              bindKey: 'Enter',
                              exec: _onExecute,
-                           },
-                           {
-                             name: 'SuppressShiftEnter',
-                             bindKey: 'Shift-Enter',
-                             exec: () => {},
                            }]}
                            onChange={onChange}
                            value={value}
