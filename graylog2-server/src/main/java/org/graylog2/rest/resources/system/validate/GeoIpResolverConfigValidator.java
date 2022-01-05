@@ -25,14 +25,20 @@ import org.graylog.plugins.map.geoip.GeoAsnInformation;
 import org.graylog.plugins.map.geoip.GeoIpResolver;
 import org.graylog.plugins.map.geoip.GeoIpVendorResolverService;
 import org.graylog.plugins.map.geoip.GeoLocationInformation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Locale;
 
+/**
+ * A {@link ClusterConfigValidator} to validate configuration objects of type {@link GeoIpResolverConfig}.
+ */
 public class GeoIpResolverConfigValidator implements ClusterConfigValidator {
+
+    private static final Logger LOG = LoggerFactory.getLogger(GeoIpResolverConfigValidator.class);
 
     private final GeoIpVendorResolverService geoIpVendorResolverService;
 
@@ -47,19 +53,29 @@ public class GeoIpResolverConfigValidator implements ClusterConfigValidator {
         if (configObject instanceof GeoIpResolverConfig) {
             final GeoIpResolverConfig config = (GeoIpResolverConfig) configObject;
 
-            Timer timer = new Timer(new UniformReservoir());
-            try {
-                //A test address.  This will NOT be in any database, but should only produce an
-                //AddressNotFoundException.  Any other exception suggests an actual error such as
-                //a database file that does does not belong to the vendor selected
-                InetAddress testAddress = Inet4Address.getByName("127.0.0.1");
-
-                validateGeoIpLocationResolver(config, timer, testAddress);
-                validateGeoIpAsnResolver(config, timer, testAddress);
-
-            } catch (UnknownHostException | IllegalArgumentException e) {
-                throw new ConfigValidationException(e.getMessage());
+            if (config.enabled()) {
+                validateConfig(config);
+            } else {
+                LOG.debug("'{}' is disabled.  Skipping validation", config);
             }
+        } else {
+            LOG.warn("'{}' cannot be validated with '{}'.  Validator may have been registered incorrectly.", configObject, getClass());
+        }
+    }
+
+    private void validateConfig(GeoIpResolverConfig config) throws ConfigValidationException {
+        Timer timer = new Timer(new UniformReservoir());
+        try {
+            //A test address.  This will NOT be in any database, but should only produce an
+            //AddressNotFoundException.  Any other exception suggests an actual error such as
+            //a database file that does does not belong to the vendor selected
+            InetAddress testAddress = InetAddress.getByName("127.0.0.1");
+
+            validateGeoIpLocationResolver(config, timer, testAddress);
+            validateGeoIpAsnResolver(config, timer, testAddress);
+
+        } catch (UnknownHostException | IllegalArgumentException e) {
+            throw new ConfigValidationException(e.getMessage());
         }
     }
 

@@ -30,10 +30,10 @@ public abstract class GeoIpResolverConfig {
     @JsonProperty("enabled")
     public abstract boolean enabled();
 
-    @JsonProperty("database_vendor_type")
+    @JsonProperty("db_vendor_type")
     public abstract DatabaseVendorType databaseVendorType();
 
-    @JsonProperty("db_path")
+    @JsonProperty("city_db_path")
     public abstract String cityDbPath();
 
     @JsonProperty("asn_db_path")
@@ -41,8 +41,8 @@ public abstract class GeoIpResolverConfig {
 
     @JsonCreator
     public static GeoIpResolverConfig create(@JsonProperty("enabled") boolean cityEnabled,
-                                             @JsonProperty("database_vendor_type") DatabaseVendorType databaseVendorType,
-                                             @JsonProperty("db_path") String cityDbPath,
+                                             @JsonProperty("db_vendor_type") DatabaseVendorType databaseVendorType,
+                                             @JsonProperty("city_db_path") String cityDbPath,
                                              @JsonProperty("asn_db_path") String asnDbPath) {
         return builder()
                 .enabled(cityEnabled)

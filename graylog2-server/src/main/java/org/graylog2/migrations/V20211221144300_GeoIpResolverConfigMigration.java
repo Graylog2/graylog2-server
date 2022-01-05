@@ -30,9 +30,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.time.LocalDateTime;
-import java.time.Month;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
 public class V20211221144300_GeoIpResolverConfigMigration extends Migration {
@@ -40,8 +37,10 @@ public class V20211221144300_GeoIpResolverConfigMigration extends Migration {
     private static final Logger LOG = LoggerFactory.getLogger(V20211221144300_GeoIpResolverConfigMigration.class);
     private static final String COLLECTION_NAME = "cluster_config";
     public static final String PAYLOAD = "payload";
-    private static final String FIELD_DB_VENDOR = PAYLOAD + ".database_vendor_type";
+    private static final String FIELD_DB_VENDOR = PAYLOAD + ".db_vendor_type";
     private static final String FIELD_DB_TYPE = PAYLOAD + ".db_type";
+    private static final String FIELD_DB_PATH = PAYLOAD + ".db_path";
+    private static final String FIELD_CITY_DB_PATH = PAYLOAD + ".city_db_path";
 
     private final MongoConnection mongoConnection;
 
@@ -52,7 +51,7 @@ public class V20211221144300_GeoIpResolverConfigMigration extends Migration {
 
     @Override
     public ZonedDateTime createdAt() {
-        return ZonedDateTime.of(LocalDateTime.of(2021, Month.DECEMBER, 21, 14, 43), ZoneId.systemDefault());
+        return ZonedDateTime.parse("2021-12-21t14:43Z");
     }
 
     /**
@@ -71,13 +70,13 @@ public class V20211221144300_GeoIpResolverConfigMigration extends Migration {
         Bson geoConfFiler = Filters.eq("type", GeoIpResolverConfig.class.getCanonicalName());
         Bson noColumnFilter = Filters.exists(FIELD_DB_VENDOR, false);
 
-        //Set default db vendor field
-        Bson setDefaultVendor = Updates.set(FIELD_DB_VENDOR, DatabaseVendorType.MAXMIND.name());
+        //rename db type field to db vendor type
+        Bson renameDbTypeToVendor = Updates.rename(FIELD_DB_TYPE, FIELD_DB_VENDOR);
 
-        //remove vestigial fields
-        Bson dropAsn = Updates.unset(FIELD_DB_TYPE);
+        //rename existing db_path field to city_db_path
+        Bson renameDbPath = Updates.rename(FIELD_DB_PATH, FIELD_CITY_DB_PATH);
 
-        Bson updates = Updates.combine(setDefaultVendor, dropAsn);
+        Bson updates = Updates.combine(renameDbTypeToVendor, renameDbPath);
         LOG.info("Planned Updates: {}", updates);
         final UpdateResult updateResult = collection.updateOne(Filters.and(geoConfFiler, noColumnFilter), updates);
         LOG.info("Update Result: {}", updateResult);

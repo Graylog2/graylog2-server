@@ -22,10 +22,10 @@ import java.util.Map;
 
 public class ClusterConfigValidatorService {
 
-    private final Map<Class, ClusterConfigValidator> validators;
+    private final Map<Class<?>, ClusterConfigValidator> validators;
 
     @Inject
-    public ClusterConfigValidatorService(Map<Class, ClusterConfigValidator> validators) {
+    public ClusterConfigValidatorService(Map<Class<?>, ClusterConfigValidator> validators) {
         this.validators = validators;
     }
 
@@ -36,7 +36,13 @@ public class ClusterConfigValidatorService {
 
         try {
             Class<?> zclass = configObject.getClass();
-            ClusterConfigValidator validator = validators.getOrDefault(zclass, object -> {});
+            ClusterConfigValidator validator = validators.get(zclass);
+            if (validator == null) {
+                //try parent class--the config object is likely an AutoValue generated class which extends the
+                //registered class.
+                Class<?> zParent = zclass.getSuperclass();
+                validator = validators.getOrDefault(zParent, obj -> {});
+            }
             validator.validate(configObject);
 
         } catch (RuntimeException e) {

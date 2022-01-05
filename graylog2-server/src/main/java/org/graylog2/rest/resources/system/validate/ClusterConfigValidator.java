@@ -17,6 +17,9 @@
 
 package org.graylog2.rest.resources.system.validate;
 
+/**
+ * Specification for a <b>Cluster Configuration</b> object.
+ **/
 public interface ClusterConfigValidator {
 
     void validate(Object configObject) throws ConfigValidationException;

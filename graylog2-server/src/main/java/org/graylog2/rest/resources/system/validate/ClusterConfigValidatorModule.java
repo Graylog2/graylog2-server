@@ -17,22 +17,27 @@
 
 package org.graylog2.rest.resources.system.validate;
 
+import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
 import org.graylog.plugins.map.config.GeoIpResolverConfig;
 import org.graylog2.plugin.PluginModule;
 
 public class ClusterConfigValidatorModule extends PluginModule {
-
     @Override
     public void configure() {
+
         addClusterConfigValidator(GeoIpResolverConfig.class, GeoIpResolverConfigValidator.class);
     }
 
     private void addClusterConfigValidator(Class<?> configClass, Class<? extends ClusterConfigValidator> configValidatorClass) {
 
-        MapBinder<Class, ClusterConfigValidator> mapBinder = MapBinder.newMapBinder(binder(), Class.class, ClusterConfigValidator.class);
+        mapBinder().addBinding(configClass).to(configValidatorClass);
 
-        mapBinder.addBinding(configClass).to(configValidatorClass);
+    }
 
+    private MapBinder<Class<?>, ClusterConfigValidator> mapBinder() {
+        TypeLiteral<Class<?>> keyType = new TypeLiteral<Class<?>>() {};
+        TypeLiteral<ClusterConfigValidator> valueType = new TypeLiteral<ClusterConfigValidator>() {};
+        return MapBinder.newMapBinder(binder(), keyType, valueType);
     }
 }
