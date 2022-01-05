@@ -205,7 +205,7 @@ public abstract class CmdLineTool implements CliCommand {
     /**
      * Things that have to run before the guice injector is created.
      * This call happens *after* the configuration file has been parsed.
-     * @param plugins
+     * @param plugins  The already loaded plugins
      */
     protected void beforeInjectorCreation(Set<Plugin> plugins) {
     }

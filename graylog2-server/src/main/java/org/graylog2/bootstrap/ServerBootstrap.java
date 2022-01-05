@@ -129,6 +129,16 @@ public abstract class ServerBootstrap extends CmdLineTool {
         final List<PreflightCheckModule> preflightCheckModules = plugins.stream().map(Plugin::preflightCheckModules)
                 .flatMap(Collection::stream).collect(Collectors.toList());
 
+        final Injector injector = getPreflightInjector(preflightCheckModules);
+
+        // Run server preflight checks
+        injector.getInstance(ServerPreflightCheck.class).runChecks(configuration);
+
+        // Run preflight checks from plugins
+        preflightCheckModules.forEach(m -> m.doCheck(injector));
+    }
+
+    private Injector getPreflightInjector(List<PreflightCheckModule> preflightCheckModules) {
         final Injector injector = Guice.createInjector(
                 new NamedConfigParametersModule(jadConfig.getConfigurationBeans()),
                 new ServerStatusBindings(capabilities()),
@@ -141,12 +151,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
                         preflightCheckModules.forEach(binder::install);
                     }
                 });
-
-        // Run server preflight checks
-        injector.getInstance(ServerPreflightCheck.class).runChecks(configuration);
-
-        // Run preflight checks from plugins
-        preflightCheckModules.forEach(m -> m.doCheck(injector));
+        return injector;
     }
 
     private void setNettyNativeDefaults(PathConfiguration pathConfiguration) {
