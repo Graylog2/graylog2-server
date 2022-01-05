@@ -48,9 +48,10 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+
+import static org.graylog2.configuration.validators.ElasticsearchVersionValidator.SUPPORTED_ES_VERSIONS;
 
 @SuppressWarnings("UnstableApiUsage")
 public class ServerPreflightCheck {
@@ -132,12 +133,15 @@ public class ServerPreflightCheck {
 
     private void checkElasticsearch() {
         try {
-            final Optional<SearchVersion> searchVersion = elasticVersionProbe.probe(elasticsearchHosts);
-            searchVersion.orElseThrow(() -> new PreflightCheckException("Could not get Elasticsearch version"));
+            final SearchVersion searchVersion = elasticVersionProbe.probe(elasticsearchHosts)
+                    .orElseThrow(() -> new PreflightCheckException("Could not get Elasticsearch version"));
 
-            // TODO add ES version constraints check here
+            if (SUPPORTED_ES_VERSIONS.stream().noneMatch(searchVersion::satisfies)) {
+                throw new PreflightCheckException(StringUtils.f("Unsupported (Elastic/Open)Search version <%s>. Supported versions: <%s>",
+                        searchVersion, SUPPORTED_ES_VERSIONS));
+            }
 
-            LOG.info("Connected to Elasticsearch version {}", searchVersion.get().toString());
+            LOG.info("Connected to (Elastic/Open)Search version <{}>", searchVersion);
         } catch (ElasticsearchProbeException e) {
             throw new PreflightCheckException(e);
         }
