@@ -109,4 +109,34 @@ class LuceneQueryParserTest {
             return tokenValue.equals("or") || tokenValue.equals("and");
         })).isTrue();
     }
+
+    @Test
+    void testMultilineQuery() throws ParseException {
+        final ParsedQuery query = parser.parse("foo:bar AND\nlorem:ipsum");
+
+        {
+            final ImmutableToken token = query.tokens().stream().filter(t -> t.image().equals("foo")).findFirst().orElseThrow(() -> new IllegalStateException("Expected token not found"));
+            assertThat(token.beginLine()).isEqualTo(1);
+            assertThat(token.beginColumn()).isEqualTo(0);
+            assertThat(token.endLine()).isEqualTo(1);
+            assertThat(token.endColumn()).isEqualTo(3);
+        }
+
+        {
+            final ImmutableToken token = query.tokens().stream().filter(t -> t.image().equals("lorem")).findFirst().orElseThrow(() -> new IllegalStateException("Expected token not found"));
+            assertThat(token.beginLine()).isEqualTo(2);
+            assertThat(token.beginColumn()).isEqualTo(0);
+            assertThat(token.endLine()).isEqualTo(2);
+            assertThat(token.endColumn()).isEqualTo(5);
+        }
+
+        {
+            final ImmutableToken token = query.tokens().stream().filter(t -> t.image().equals("ipsum")).findFirst().orElseThrow(() -> new IllegalStateException("Expected token not found"));
+            assertThat(token.beginLine()).isEqualTo(2);
+            assertThat(token.beginColumn()).isEqualTo(6);
+            assertThat(token.endLine()).isEqualTo(2);
+            assertThat(token.endColumn()).isEqualTo(11);
+        }
+
+    }
 }
