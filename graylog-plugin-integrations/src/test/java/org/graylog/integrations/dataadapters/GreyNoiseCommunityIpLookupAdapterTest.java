@@ -16,29 +16,73 @@
  */
 package org.graylog.integrations.dataadapters;
 
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Timer;
+import com.codahale.metrics.UniformReservoir;
 import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
 import okhttp3.Protocol;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 import org.graylog.integrations.TestWithResources;
 import org.graylog2.plugin.lookup.LookupResult;
+import org.graylog2.security.encryption.EncryptedValueService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 import java.util.Map;
+import java.util.Optional;
 
 public class GreyNoiseCommunityIpLookupAdapterTest extends TestWithResources {
 
+    @Mock
+    private EncryptedValueService encryptedValueService;
+
+    @Mock
+    private GreyNoiseCommunityIpLookupAdapter.Config config;
+
+    @Mock
+    private OkHttpClient okHttpClient;
+
+    @Mock
+    private MetricRegistry metricRegistry;
+
     private Request request;
 
-    @Before
-    public void setup() {
+    private GreyNoiseCommunityIpLookupAdapter greyNoiseCommunityIpLookupAdapter;
 
+    @Before
+    public void setup() throws Exception {
+
+        MockitoAnnotations.openMocks(this).close();
         request = new Request.Builder()
                 .url(GreyNoiseCommunityIpLookupAdapter.GREYNOISE_COMMUNITY_ENDPOINT)
                 .build();
+
+        Mockito.when(metricRegistry.timer(Mockito.anyString())).thenReturn(new Timer(new UniformReservoir()));
+        greyNoiseCommunityIpLookupAdapter = new GreyNoiseCommunityIpLookupAdapter("001", "test"
+                , config, metricRegistry, encryptedValueService, okHttpClient);
+    }
+
+    @Test
+    public void testParseIgnoredFields() {
+
+        String string = getFileText("GreyNoiseCommunityIpLookupAdapter_test-parse-success.json");
+        int statusCode = 200;
+
+        Response response = createResponse(string, statusCode);
+        LookupResult result = GreyNoiseCommunityIpLookupAdapter.parseResponse(response);
+
+        Assert.assertNotNull(result);
+        Assert.assertFalse(result.isEmpty());
+        Assert.assertFalse("Result for status 200 not expected to have errors", result.hasError());
+        Assert.assertNotNull(result.multiValue());
+        Assert.assertFalse("Field 'message' is ignored and not expected in response", result.multiValue().containsKey("message"));
     }
 
     @Test
@@ -53,7 +97,7 @@ public class GreyNoiseCommunityIpLookupAdapterTest extends TestWithResources {
         Assert.assertNotNull(result);
         Assert.assertFalse(result.isEmpty());
         Assert.assertFalse("Result for status 200 not expected to have errors", result.hasError());
-        assertValidMapWithKeys(result.multiValue(), "ip", "noise", "riot", "message", "classification", "name", "link", "last_seen", "message");
+        assertValidMapWithKeys(result.multiValue(), "ip", "noise", "riot", "classification", "name", "link", "last_seen");
     }
 
     @Test
@@ -68,7 +112,7 @@ public class GreyNoiseCommunityIpLookupAdapterTest extends TestWithResources {
         Assert.assertNotNull(result);
         Assert.assertFalse(result.isEmpty());
 
-        assertValidMapWithKeys(result.multiValue(), "ip", "noise", "riot", "message");
+        assertValidMapWithKeys(result.multiValue(), "ip", "noise", "riot");
 
         Assert.assertFalse("Invalid Result. A 404 response should not be considered an error", result.hasError());
     }
@@ -85,7 +129,23 @@ public class GreyNoiseCommunityIpLookupAdapterTest extends TestWithResources {
         Assert.assertNotNull(result);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue("Result for status 429 expected to have errors", result.hasError());
-        assertValidMapWithKeys(result.multiValue(), "plan", "rate-limit", "plan_url", "message");
+        assertValidMapWithKeys(result.multiValue(), "plan", "rate-limit", "plan_url");
+    }
+
+    @Test
+    public void createRequestWithReservedIp() {
+
+        String error = "Empty Request expected for Reserved IP Address";
+        Assert.assertFalse(error, greyNoiseCommunityIpLookupAdapter.createRequest("127.0.0.1").isPresent());
+        Assert.assertFalse(error, greyNoiseCommunityIpLookupAdapter.createRequest("192.168.1.100").isPresent());
+        Assert.assertFalse(error, greyNoiseCommunityIpLookupAdapter.createRequest("10.1.1.100").isPresent());
+        Assert.assertFalse(error, greyNoiseCommunityIpLookupAdapter.createRequest("172.16.1.100").isPresent());
+    }
+
+    @Test
+    public void creatRequestWithIpv6Address() {
+        Optional<Request> request = greyNoiseCommunityIpLookupAdapter.createRequest("2001::ffff:ffff:ffff:ffff:ffff:ffff");
+        Assert.assertFalse("Empty Request expected for IPv6", request.isPresent());
     }
 
     private Response createResponse(String responseBody, int statusCode) {
