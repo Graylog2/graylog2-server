@@ -112,7 +112,8 @@
         <HdrHistogram.version>2.1.12</HdrHistogram.version>
         <hibernate-validator.version>6.1.2.Final</hibernate-validator.version>
         <hk2.version>2.6.1</hk2.version> <!-- The HK2 version should match the version being used by Jersey -->
-        <jackson.version>2.9.10.20200411</jackson.version>
+        <jackson.version>2.9.10.20200824</jackson.version>
+        <net.minidev>1.3.2</net.minidev>
         <jadconfig.version>0.13.0</jadconfig.version>
         <java-semver.version>0.9.0</java-semver.version>
         <javapoet.version>1.12.1</javapoet.version>
@@ -149,7 +150,7 @@
         <retrofit.version>2.9.0</retrofit.version>
         <scala.version>2.13.4</scala.version>
         <semver4j.version>2.2.0-graylog.1</semver4j.version>
-        <shiro.version>1.5.2</shiro.version>
+        <shiro.version>1.5.3</shiro.version>
         <oshi.version>5.3.7</oshi.version>
         <siv-mode.version>1.4.1</siv-mode.version>
         <slf4j.version>1.7.30</slf4j.version>
