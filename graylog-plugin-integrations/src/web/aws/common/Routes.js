@@ -49,7 +49,7 @@ const ApiRoutes = {
 const DocsRoutes = {
   INTEGRATIONS: {
     AWS: {
-      AWS_KINESIS_CLOUDWATCH_INPUTS: 'integrations/inputs/aws_kinesis_cloudwatch_input.html#aws-kinesis-cloudwatch-input',
+      AWS_KINESIS_CLOUDWATCH_INPUTS: 'aws-kinesiscloudwatch-input',
     },
   },
 };

@@ -14,15 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+
 import React from 'react';
 import PropTypes from 'prop-types';
 import cloneDeep from 'lodash/cloneDeep';
 import get from 'lodash/get';
 import camelCase from 'lodash/camelCase';
-import { getValueFromInput } from 'util/FormsUtils';
+
 import { Input, Button, ControlLabel, FormControl, FormGroup, HelpBlock, InputGroup } from 'components/bootstrap';
 import { ColorPickerPopover } from 'components/common';
 import ColorLabel from 'components/sidecars/common/ColorLabel';
+import DocumentationLink from 'components/support/DocumentationLink';
+import { getValueFromInput } from 'util/FormsUtils';
 
 class SlackNotificationForm extends React.Component {
     static propTypes = {
@@ -144,8 +147,7 @@ class SlackNotificationForm extends React.Component {
     render() {
       const { config, validation } = this.props;
       const { isBacklogSizeEnabled, backlogSize } = this.state;
-      const url = 'https://docs.graylog.org/en/latest/pages/alerts.html#data-available-to-notifications';
-      const element = <p>Custom message to be appended below the alert title. See <a href={url} rel="noopener noreferrer" target="_blank">docs </a>for more details.</p>;
+      const element = <p>Custom message to be appended below the alert title. See <DocumentationLink text="docs" page="alerts#notifications" /> for more details.</p>;
 
       return (
         <>
