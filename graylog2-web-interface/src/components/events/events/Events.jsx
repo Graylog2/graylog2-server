@@ -142,11 +142,9 @@ class Events extends React.Component {
     const tooltip = <Tooltip id={`priority-${eventId}`}>{priorityName} Priority</Tooltip>;
 
     return (
-      <>
-        <OverlayTrigger placement="top" trigger={['hover', 'click', 'focus']} overlay={tooltip}>
-          <EventsIcon name={icon} fixedWidth className={style} />
-        </OverlayTrigger>
-      </>
+      <OverlayTrigger placement="top" trigger={['hover', 'click', 'focus']} overlay={tooltip}>
+        <EventsIcon name={icon} fixedWidth className={style} />
+      </OverlayTrigger>
     );
   };
 
@@ -239,38 +237,36 @@ class Events extends React.Component {
     const entity = (filter === 'only' ? 'Alerts' : excludedFile);
 
     return (
-      <>
-        <Row>
-          <Col md={12}>
-            <EventsSearchBar parameters={parameters}
-                             onQueryChange={onQueryChange}
-                             onAlertFilterChange={onAlertFilterChange}
-                             onTimeRangeChange={onTimeRangeChange}
-                             onPageSizeChange={this.handlePageSizeChange}
-                             onSearchReload={onSearchReload}
-                             pageSize={parameters.pageSize}
-                             pageSizes={[10, 25, 50, 100]} />
-            <PaginatedList activePage={parameters.page}
+      <Row>
+        <Col md={12}>
+          <EventsSearchBar parameters={parameters}
+                           onQueryChange={onQueryChange}
+                           onAlertFilterChange={onAlertFilterChange}
+                           onTimeRangeChange={onTimeRangeChange}
+                           onPageSizeChange={this.handlePageSizeChange}
+                           onSearchReload={onSearchReload}
                            pageSize={parameters.pageSize}
-                           showPageSizeSelect={false}
-                           totalItems={totalEvents}
-                           onChange={onPageChange}>
-              {eventList.length === 0 ? (
-                <Alert bsStyle="info">No {entity} found for the current search criteria.</Alert>
-              ) : (
-                <EventsTable id="events-table">
-                  <thead>
-                    <tr>
-                      {HEADERS.map((header) => <th key={header}>{header}</th>)}
-                    </tr>
-                  </thead>
-                  {eventList.map(this.renderEvent)}
-                </EventsTable>
-              )}
-            </PaginatedList>
-          </Col>
-        </Row>
-      </>
+                           pageSizes={[10, 25, 50, 100]} />
+          <PaginatedList activePage={parameters.page}
+                         pageSize={parameters.pageSize}
+                         showPageSizeSelect={false}
+                         totalItems={totalEvents}
+                         onChange={onPageChange}>
+            {eventList.length === 0 ? (
+              <Alert bsStyle="info">No {entity} found for the current search criteria.</Alert>
+            ) : (
+              <EventsTable id="events-table">
+                <thead>
+                  <tr>
+                    {HEADERS.map((header) => <th key={header}>{header}</th>)}
+                  </tr>
+                </thead>
+                {eventList.map(this.renderEvent)}
+              </EventsTable>
+            )}
+          </PaginatedList>
+        </Col>
+      </Row>
     );
   }
 }

@@ -153,8 +153,7 @@ export const LookupTablesStore = singletonStore(
     },
 
     reloadPage() {
-      const promise = this.searchPaginated(this.pagination.page, this.pagination.per_page,
-        this.pagination.query);
+      const promise = this.searchPaginated(this.pagination.page, this.pagination.per_page, this.pagination.query);
 
       LookupTablesActions.reloadPage.promise(promise);
 

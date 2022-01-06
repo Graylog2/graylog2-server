@@ -95,8 +95,7 @@ const SubstringExtractorConfiguration = createReactClass({
       this.props.onExtractorPreviewLoad('');
       this.setState({ trying: false });
     } else {
-      const promise = ToolsStore.testSubstring(this.state.configuration.begin_index, this.state.configuration.end_index,
-        this.props.exampleMessage);
+      const promise = ToolsStore.testSubstring(this.state.configuration.begin_index, this.state.configuration.end_index, this.props.exampleMessage);
 
       promise.then((result) => {
         if (!result.successful) {

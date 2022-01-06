@@ -62,9 +62,7 @@ const ProfileSection = ({
     }
 
     return (
-      <>
-        <ReadOnlyFormGroup label="Username" value={username} />
-      </>
+      <ReadOnlyFormGroup label="Username" value={username} />
     );
   };
 
@@ -74,9 +72,7 @@ const ProfileSection = ({
     }
 
     return (
-      <>
-        <EmailFormGroup />
-      </>
+      <EmailFormGroup />
     );
   };
 
