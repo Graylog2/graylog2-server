@@ -94,21 +94,19 @@ const TimeoutInput = ({ value: propsValue, onChange }: Props) => {
                onChange={_onClick}
                checked={sessionTimeoutNever} />
 
-          <div className="clearfix">
-            <Col xs={2}>
-              <Input type="number"
-                     id="timeout"
-                     placeholder="Timeout amount"
-                     name="timeout"
-                     min={1}
-                     formGroupClassName="form-group no-bm"
+        <div className="clearfix">
+          <Col xs={2}>
+            <Input type="number"
+                   id="timeout"
+                   placeholder="Timeout amount"
+                   name="timeout"
+                   min={1}
+                   formGroupClassName="form-group no-bm"
                    disabled={sessionTimeoutNever}
                    value={value}
                    onChange={_onChangeValue} />
           </Col>
           <Col xs={4}>
-            {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
-            {/* @ts-ignore TODO: No overload matches this call */}
             <TimeoutUnitSelect disabled={sessionTimeoutNever}
                                value={`${unit}`}
                                onChange={_onChangeUnit} />
@@ -133,8 +131,7 @@ TimeoutInput.propTypes = {
 
 TimeoutInput.defaultProps = {
   value: MS_HOUR,
-  onChange: () => {
-  },
+  onChange: () => {},
 };
 
 export default TimeoutInput;

@@ -38,9 +38,7 @@ class StaticFieldForm extends React.Component {
 
   render() {
     return (
-      <BootstrapModalForm ref={(modal) => {
-        this.modal = modal;
-      }}
+      <BootstrapModalForm ref={(modal) => { this.modal = modal; }}
                           title="Add static field"
                           submitButtonText="Add field"
                           onSubmitForm={this._addStaticField}>
@@ -48,9 +46,7 @@ class StaticFieldForm extends React.Component {
           overwritten If the message already has that key. Key must only contain alphanumeric characters or
           underscores and not be a reserved field.
         </p>
-        <Input ref={(fieldName) => {
-          this.fieldName = fieldName;
-        }}
+        <Input ref={(fieldName) => { this.fieldName = fieldName; }}
                type="text"
                id="field-name"
                label="Field name"
@@ -58,9 +54,7 @@ class StaticFieldForm extends React.Component {
                pattern="[A-Za-z0-9_]*"
                title="Should consist only of alphanumeric characters and underscores."
                autoFocus />
-        <Input ref={(fieldValue) => {
-          this.fieldValue = fieldValue;
-        }}
+        <Input ref={(fieldValue) => { this.fieldValue = fieldValue; }}
                type="text"
                id="field-value"
                label="Field value"

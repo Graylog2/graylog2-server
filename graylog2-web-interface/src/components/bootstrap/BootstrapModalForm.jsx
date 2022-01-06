@@ -57,13 +57,10 @@ class BootstrapModalForm extends React.Component {
     cancelButtonText: 'Cancel',
     submitButtonText: 'Submit',
     submitButtonDisabled: false,
-    onModalOpen: () => {
-    },
-    onModalClose: () => {
-    },
+    onModalOpen: () => {},
+    onModalClose: () => {},
     onSubmitForm: undefined,
-    onCancel: () => {
-    },
+    onCancel: () => {},
     bsSize: undefined,
     show: false,
   };
@@ -120,9 +117,7 @@ class BootstrapModalForm extends React.Component {
     );
 
     return (
-      <BootstrapModalWrapper ref={(c) => {
-        this.modal = c;
-      }}
+      <BootstrapModalWrapper ref={(c) => { this.modal = c; }}
                              onOpen={onModalOpen}
                              onClose={onModalClose}
                              bsSize={bsSize}
@@ -132,9 +127,7 @@ class BootstrapModalForm extends React.Component {
         <Modal.Header closeButton>
           <Modal.Title>{title}</Modal.Title>
         </Modal.Header>
-        <form ref={(c) => {
-          this.form = c;
-        }}
+        <form ref={(c) => { this.form = c; }}
               onSubmit={this.submit}
               {...formProps}
               data-testid="modal-form">
