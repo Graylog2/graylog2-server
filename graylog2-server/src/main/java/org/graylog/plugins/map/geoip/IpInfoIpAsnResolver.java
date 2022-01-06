@@ -48,7 +48,7 @@ public class IpInfoIpAsnResolver extends IpInfoIpResolver<GeoAsnInformation> {
             info = GeoAsnInformation.create(ipInfoASN.name(), ipInfoASN.type(), ipInfoASN.asn());
         } catch (IOException | AddressNotFoundException | UnsupportedOperationException e) {
             info = null;
-            if (e instanceof AddressNotFoundException == false) {
+            if (!(e instanceof AddressNotFoundException)) {
                 String error = String.format(Locale.US, "Error getting ASN for IP Address '%s'. %s", address, e.getMessage());
                 LOG.warn(error, e);
                 lastError = e.getMessage();

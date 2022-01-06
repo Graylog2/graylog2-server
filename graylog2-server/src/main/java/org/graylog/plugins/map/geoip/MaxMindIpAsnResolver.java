@@ -51,7 +51,7 @@ public class MaxMindIpAsnResolver extends MaxMindIpResolver<GeoAsnInformation> {
         } catch (GeoIp2Exception | IOException | UnsupportedOperationException e) {
             asn = null;
 
-            if (e instanceof AddressNotFoundException == false) {
+            if (!(e instanceof AddressNotFoundException)) {
                 String error = String.format(Locale.US, "Error getting ASN for IP Address '%s'. %s", address, e.getMessage());
                 LOG.warn(error, e);
                 lastError = e.getMessage();

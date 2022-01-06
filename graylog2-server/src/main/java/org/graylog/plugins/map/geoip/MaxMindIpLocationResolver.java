@@ -62,7 +62,7 @@ public class MaxMindIpLocationResolver extends MaxMindIpResolver<GeoLocationInfo
                     "N/A");
         } catch (IOException | GeoIp2Exception | UnsupportedOperationException e) {
             info = null;
-            if (e instanceof AddressNotFoundException) {
+            if (!(e instanceof AddressNotFoundException)) {
                 LOG.debug("Could not get location from IP {}", address.getHostAddress(), e);
                 lastError = e.getMessage();
             }

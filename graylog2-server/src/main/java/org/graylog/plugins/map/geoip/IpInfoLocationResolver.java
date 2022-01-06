@@ -50,7 +50,7 @@ public class IpInfoLocationResolver extends IpInfoIpResolver<GeoLocationInformat
 
         } catch (NullPointerException | IOException | AddressNotFoundException | UnsupportedOperationException e) {
             info = null;
-            if (e instanceof AddressNotFoundException) {
+            if (!(e instanceof AddressNotFoundException)) {
                 String error = String.format(Locale.US, "Error getting IP location info for '%s'. %s", address, e.getMessage());
                 LOG.error(error, e);
                 lastError = e.getMessage();
