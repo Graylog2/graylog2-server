@@ -27,15 +27,17 @@ public abstract class GeoLocationInformation {
 
     public abstract String countryIsoCode();
 
+    public abstract String countryName();
+
     public abstract String cityName();
 
     public abstract String region();
 
     public abstract String timeZone();
 
-    public static GeoLocationInformation create(double latitude, double longitude, String countryIsoCode, String cityName,
+    public static GeoLocationInformation create(double latitude, double longitude, String countryIsoCode, String countryName, String cityName,
                                                 String region, String timeZone) {
-        return new AutoValue_GeoLocationInformation(latitude, longitude, countryIsoCode, cityName,
+        return new AutoValue_GeoLocationInformation(latitude, longitude, countryIsoCode, countryName, cityName,
                 region, timeZone);
     }
 }

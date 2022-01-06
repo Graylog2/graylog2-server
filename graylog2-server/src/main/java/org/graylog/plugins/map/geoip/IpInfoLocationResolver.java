@@ -45,12 +45,12 @@ public class IpInfoLocationResolver extends IpInfoIpResolver<GeoLocationInformat
 
         try (Timer.Context ignored = resolveTime.time()) {
             IPinfoStandardLocation loc = adapter.ipInfoStandardLocation(address);
-            info = GeoLocationInformation.create(loc.latitude(), loc.longitude(), loc.country(),
+            info = GeoLocationInformation.create(loc.latitude(), loc.longitude(), loc.country(), "N/A",
                     loc.city(), loc.region(), loc.timezone());
 
-        } catch (IOException | AddressNotFoundException | UnsupportedOperationException e) {
+        } catch (NullPointerException | IOException | AddressNotFoundException | UnsupportedOperationException e) {
             info = null;
-            if (e instanceof AddressNotFoundException == false) {
+            if (e instanceof AddressNotFoundException) {
                 String error = String.format(Locale.US, "Error getting IP location info for '%s'. %s", address, e.getMessage());
                 LOG.error(error, e);
                 lastError = e.getMessage();

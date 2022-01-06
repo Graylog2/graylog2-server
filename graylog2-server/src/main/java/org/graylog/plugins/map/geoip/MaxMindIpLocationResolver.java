@@ -56,12 +56,13 @@ public class MaxMindIpLocationResolver extends MaxMindIpResolver<GeoLocationInfo
             info = GeoLocationInformation.create(
                     location.getLatitude(), location.getLongitude(),
                     country.getGeoNameId() == null ? "N/A" : country.getIsoCode(),
+                    country.getGeoNameId() == null ? "N/A" : country.getName(),
                     city.getGeoNameId() == null ? "N/A" : city.getName(),// calling to .getName() may throw a NPE
                     "N/A",
                     "N/A");
         } catch (IOException | GeoIp2Exception | UnsupportedOperationException e) {
             info = null;
-            if (e instanceof AddressNotFoundException == false) {
+            if (e instanceof AddressNotFoundException) {
                 LOG.debug("Could not get location from IP {}", address.getHostAddress(), e);
                 lastError = e.getMessage();
             }

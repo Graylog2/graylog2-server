@@ -30,6 +30,9 @@ public abstract class GeoIpResolverConfig {
     @JsonProperty("enabled")
     public abstract boolean enabled();
 
+    @JsonProperty("enforce_graylog_schema")
+    public abstract boolean enforceGraylogSchema();
+
     @JsonProperty("db_vendor_type")
     public abstract DatabaseVendorType databaseVendorType();
 
@@ -41,11 +44,13 @@ public abstract class GeoIpResolverConfig {
 
     @JsonCreator
     public static GeoIpResolverConfig create(@JsonProperty("enabled") boolean cityEnabled,
+                                             @JsonProperty("enforce_graylog_schema") boolean enforceGraylogSchema,
                                              @JsonProperty("db_vendor_type") DatabaseVendorType databaseVendorType,
                                              @JsonProperty("city_db_path") String cityDbPath,
                                              @JsonProperty("asn_db_path") String asnDbPath) {
         return builder()
                 .enabled(cityEnabled)
+                .enforceGraylogSchema(enforceGraylogSchema)
                 .databaseVendorType(databaseVendorType == null ? DatabaseVendorType.MAXMIND : databaseVendorType)
                 .cityDbPath(cityDbPath)
                 .asnDbPath(asnDbPath)
@@ -56,6 +61,7 @@ public abstract class GeoIpResolverConfig {
        return builder()
                .enabled(false)
                .databaseVendorType(DatabaseVendorType.MAXMIND)
+               .enforceGraylogSchema(false)
                .cityDbPath("/etc/graylog/server/GeoLite2-City.mmdb")
                .asnDbPath("/etc/graylog/server/GeoLite2-ASN.mmdb")
                .build();
@@ -70,6 +76,8 @@ public abstract class GeoIpResolverConfig {
     @AutoValue.Builder
     public abstract static class Builder {
         public abstract Builder enabled(boolean enabled);
+
+        public abstract Builder enforceGraylogSchema(boolean enforce);
 
         public abstract Builder databaseVendorType(DatabaseVendorType type);
 

@@ -89,7 +89,7 @@ public class GeoIpResolverConfigValidator implements ClusterConfigValidator {
             }
             asnResolver.getGeoIpData(testAddress);
             if (asnResolver.getLastError().isPresent()) {
-                String error = String.format(Locale.ENGLISH, "Error querying ASN.  Make sure you have selected a valid ASN database for '%s'", config.databaseVendorType());
+                String error = String.format(Locale.ENGLISH, "Error querying ASN.  Make sure you have selected a valid ASN database type for '%s'", config.databaseVendorType());
                 throw new IllegalStateException(error);
             }
         }
@@ -105,7 +105,7 @@ public class GeoIpResolverConfigValidator implements ClusterConfigValidator {
 
         cityResolver.getGeoIpData(testAddress);
         if (cityResolver.getLastError().isPresent()) {
-            String error = String.format(Locale.ENGLISH, "Error querying Geo Location.  Make sure you have selected a valid Location database for '%s'", config.databaseVendorType());
+            String error = String.format(Locale.ENGLISH, "Error querying Geo Location.  Make sure you have selected a valid database type for '%s'", config.databaseVendorType());
             throw new IllegalStateException(error);
         }
     }

@@ -41,7 +41,8 @@ public class GeoIpResolverEngine {
     private static final Logger LOG = LoggerFactory.getLogger(GeoIpResolverEngine.class);
 
     /**
-     * A mapping of fields that to search that contain IP addresses.  ONLY these fields will be checked
+     * A mapping of fields (per the Graylog Schema) that to search that contain IP addresses.  When the user opts to
+     * enforce the Graylog Schema ONLY these fields will be checked; otherwise, all message fields will be checked.
      * to see if they have valid Geo IP information.
      *
      * <p>
@@ -58,12 +59,14 @@ public class GeoIpResolverEngine {
 
     private final GeoIpResolver<GeoLocationInformation> ipLocationResolver;
     private final GeoIpResolver<GeoAsnInformation> ipAsnResolver;
-    private boolean enabled;
+    private final boolean enabled;
+    private final boolean enforceGraylogSchema;
 
 
     public GeoIpResolverEngine(GeoIpVendorResolverService resolverService, GeoIpResolverConfig config, MetricRegistry metricRegistry) {
         Timer resolveTime = metricRegistry.timer(name(GeoIpResolverEngine.class, "resolveTime"));
 
+        enforceGraylogSchema = config.enforceGraylogSchema();
         ipLocationResolver = resolverService.createCityResolver(config, resolveTime);
         ipAsnResolver = resolverService.createAsnResolver(config, resolveTime);
 
@@ -89,7 +92,9 @@ public class GeoIpResolverEngine {
                 continue;
             }
 
-            final String prefix = ipAddressFields.get(key);
+            //IF the user has opted NOT to enforce the Graylog Schema, the key will likely not
+            //be in the field map--in such cases use the key (full field name) as the prefix
+            final String prefix = ipAddressFields.getOrDefault(key, key);
 
             if (ReservedIpChecker.getInstance().isReservedIpAddress(address.getHostAddress())) {
                 message.addField(prefix + "_reserved_ip", true);
@@ -105,10 +110,14 @@ public class GeoIpResolverEngine {
     private void addGeoIpDataIfPresent(Message message, InetAddress address, String newFieldPrefix) {
         ipLocationResolver.getGeoIpData(address).ifPresent(locationInformation -> {
             message.addField(newFieldPrefix + "_geo_coordinates", locationInformation.latitude() + "," + locationInformation.longitude());
-            message.addField(newFieldPrefix + "_geo_country", locationInformation.countryIsoCode());
+            message.addField(newFieldPrefix + "_geo_country_iso", locationInformation.countryIsoCode());
             message.addField(newFieldPrefix + "_geo_city", locationInformation.cityName());
             message.addField(newFieldPrefix + "_geo_region", locationInformation.region());
-            message.addField(newFieldPrefix + "_geo_timeZone", locationInformation.timeZone());
+            message.addField(newFieldPrefix + "_geo_timezone", locationInformation.timeZone());
+
+            if (areValidGeoNames(locationInformation.countryName())) {
+                message.addField(newFieldPrefix + "_geo_country", locationInformation.countryName());
+            }
 
             if (areValidGeoNames(locationInformation.cityName(), locationInformation.countryIsoCode())) {
                 String name = String.format(Locale.ENGLISH, "%s, %s", locationInformation.cityName(), locationInformation.countryIsoCode());
@@ -123,10 +132,21 @@ public class GeoIpResolverEngine {
         });
     }
 
+    /**
+     * Get the message fields that will be checked for IP addresses.
+     *
+     * <p>
+     * If the user has chosen NOT to enforce the Graylog Schema, then all fields will be checked as any field could
+     * have an IP address.
+     * </p>
+     *
+     * @param message message
+     * @return a list of field that may have an IP address
+     */
     private List<String> getIpAddressFields(Message message) {
         return message.getFieldNames()
                 .stream()
-                .filter(e -> ipAddressFields.containsKey(e)
+                .filter(e -> (!enforceGraylogSchema || ipAddressFields.containsKey(e))
                         && !e.startsWith(Message.INTERNAL_FIELD_PREFIX))
                 .collect(Collectors.toList());
     }
