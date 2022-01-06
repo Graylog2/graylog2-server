@@ -99,18 +99,14 @@ const TimeoutInput = ({ value: propsValue, onChange }: Props) => {
             <Input type="number"
                    id="timeout"
                    placeholder="Timeout amount"
-                   className="validatable"
                    name="timeout"
                    min={1}
                    formGroupClassName="form-group no-bm"
-                   data-validate="positive_number"
                    disabled={sessionTimeoutNever}
                    value={value}
                    onChange={_onChangeValue} />
           </Col>
           <Col xs={4}>
-            {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
-            {/* @ts-ignore TODO: No overload matches this call */}
             <TimeoutUnitSelect disabled={sessionTimeoutNever}
                                value={`${unit}`}
                                onChange={_onChangeUnit} />
