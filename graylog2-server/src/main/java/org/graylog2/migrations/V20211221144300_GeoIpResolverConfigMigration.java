@@ -41,6 +41,8 @@ public class V20211221144300_GeoIpResolverConfigMigration extends Migration {
     private static final String FIELD_DB_TYPE = PAYLOAD + ".db_type";
     private static final String FIELD_DB_PATH = PAYLOAD + ".db_path";
     private static final String FIELD_CITY_DB_PATH = PAYLOAD + ".city_db_path";
+    private static final String FIELD_ASN_DB_PATH = PAYLOAD + ".asn_db_path";
+    private static final String FIELD_ENFORCE = PAYLOAD + ".enforce_graylog_schema";
 
     private final MongoConnection mongoConnection;
 
@@ -70,13 +72,19 @@ public class V20211221144300_GeoIpResolverConfigMigration extends Migration {
         Bson geoConfFiler = Filters.eq("type", GeoIpResolverConfig.class.getCanonicalName());
         Bson noColumnFilter = Filters.exists(FIELD_DB_VENDOR, false);
 
+        //set default value for 'enforce_graylog_schema'
+        Bson setEnforceSchema = Updates.set(FIELD_ENFORCE, false);
+
+        //set blank asn db path
+        Bson setAsnPath = Updates.set(FIELD_ASN_DB_PATH, "");
+
         //rename db type field to db vendor type
         Bson renameDbTypeToVendor = Updates.rename(FIELD_DB_TYPE, FIELD_DB_VENDOR);
 
         //rename existing db_path field to city_db_path
         Bson renameDbPath = Updates.rename(FIELD_DB_PATH, FIELD_CITY_DB_PATH);
 
-        Bson updates = Updates.combine(renameDbTypeToVendor, renameDbPath);
+        Bson updates = Updates.combine(setEnforceSchema, renameDbTypeToVendor, renameDbPath, setAsnPath);
         LOG.info("Planned Updates: {}", updates);
         final UpdateResult updateResult = collection.updateOne(Filters.and(geoConfFiler, noColumnFilter), updates);
         LOG.info("Update Result: {}", updateResult);
