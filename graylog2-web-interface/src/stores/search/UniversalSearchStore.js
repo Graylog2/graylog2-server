@@ -38,8 +38,7 @@ export const UniversalSearchStore = singletonStore(
       const effectiveLimit = limit || this.DEFAULT_LIMIT;
       const offset = (page - 1) * effectiveLimit;
 
-      const url = URLUtils.qualifyUrl(ApiRoutes.UniversalSearchApiController.search(type, query,
-        timerangeParams, streamId, effectiveLimit, offset, sortField, sortOrder, decorate).url);
+      const url = URLUtils.qualifyUrl(ApiRoutes.UniversalSearchApiController.search(type, query, timerangeParams, streamId, effectiveLimit, offset, sortField, sortOrder, decorate).url);
 
       return fetch('GET', url).then((response) => {
         const result = jQuery.extend({}, response);

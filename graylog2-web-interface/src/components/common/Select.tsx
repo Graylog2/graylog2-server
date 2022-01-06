@@ -377,7 +377,7 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
     };
   }
 
-  UNSAFE_componentWillReceiveProps = (nextProps: Props<OptionValue>) => {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     const { inputProps, optionRenderer, value, valueRenderer } = this.props;
 
     if (value !== nextProps.value) {
@@ -389,7 +389,7 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
       || valueRenderer !== nextProps.valueRenderer) {
       this.setState({ customComponents: this.getCustomComponents(inputProps, optionRenderer, valueRenderer) });
     }
-  };
+  }
 
   getCustomComponents = (inputProps?: { [key: string]: any }, optionRenderer?: (option: Option) => React.ReactElement,
     valueRenderer?: (option: Option) => React.ReactElement): any => {

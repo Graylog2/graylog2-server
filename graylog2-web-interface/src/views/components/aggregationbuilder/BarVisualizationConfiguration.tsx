@@ -76,7 +76,7 @@ class BarVisualizationConfiguration extends React.Component<Props> {
     return { label: option.label, value: value };
   };
 
-  render = () => {
+  render() {
     const modes = Object.keys(BarVisualizationConfiguration.options);
     const options = modes.map(this._wrapOption);
     const { config } = this.props;
@@ -99,7 +99,7 @@ class BarVisualizationConfiguration extends React.Component<Props> {
                 value={this._wrapOption(config.barmode)} />
       </>
     );
-  };
+  }
 }
 
 export default BarVisualizationConfiguration;
