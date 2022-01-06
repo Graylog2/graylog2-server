@@ -54,13 +54,12 @@ type Props = {
   warning?: QueryValidationState,
 };
 
-const Container = styled.div`
-  display: flex;
-  max-height: 126px;
-  margin-top: 6px;
-  overflow-y: auto;
+const Container = styled.div(({ theme }) => `
   padding-bottom: 2px;
-`;
+  border: 1px solid ${theme.colors.variant.light.default};
+  border-radius: 4px;
+  padding: 5px 2px;
+`);
 
 const defaultCompleterFactory = (
   completers: Array<Completer>,

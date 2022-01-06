@@ -158,6 +158,7 @@ const StyledAceEditor = styled(AceEditor).attrs(({ aceTheme, theme }) => ({
     .ace_placeholder {
       font-family: inherit !important;
       z-index: auto !important;
+      margin-left: 7px;
     }
 
     .ace_marker {
