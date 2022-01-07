@@ -166,6 +166,9 @@ const QueryInput = ({
                            $blockScrolling: Infinity,
                            selectionStyle: 'line',
                          }}
+                         setOptions={{
+                           indentedSoftWrap: false,
+                         }}
                          fontSize={theme.fonts.size.large}
                          placeholder={placeholder}
                          markers={markers}
