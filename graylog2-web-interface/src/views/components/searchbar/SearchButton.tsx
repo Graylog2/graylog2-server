@@ -24,7 +24,8 @@ import { SearchActions } from 'views/stores/SearchStore';
 import QueryValidationActions from 'views/actions/QueryValidationActions';
 
 const StyledButton = styled(Button)`
-  margin-right: 7px;
+  margin-right: 12px;
+  min-width: 61px;
 `;
 
 const DirtyButton = styled(StyledButton)(({ theme }) => css`
