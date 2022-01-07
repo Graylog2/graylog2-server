@@ -157,15 +157,21 @@ const StyledAceEditor = styled(AceEditor).attrs(({ aceTheme, theme }) => ({
       background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAACCAYAAACZgbYnAAAAE0lEQVQImWP4////f4bdu3f/BwAlfgctduB85QAAAABJRU5ErkJggg==) right repeat-y;
     }
 
-    .ace_content,
     .ace_placeholder {
-      padding: 0 !important;
-    }
-
-    .ace_placeholder {
-      font-family: inherit !important;
+    left: 0;
+      right: 0;
+      padding: 0;
+      margin-top: 6px;
+      margin-left: 6px;
+      transform: none;
+      opacity: 1;
       z-index: auto !important;
-      margin-left: 7px;
+      font-family: inherit !important;
+      font-size: ${$scTheme.fonts.size.body};
+      color: ${$scTheme.colors.input.placeholder};
+      text-overflow: ellipsis;
+      max-width: 100%;
+      overflow: hidden;
     }
 
     .ace_marker {
