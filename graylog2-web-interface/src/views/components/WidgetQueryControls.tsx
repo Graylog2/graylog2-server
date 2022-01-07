@@ -204,11 +204,6 @@ const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
 
               <QueryValidation />
 
-              <div className="pull-right search-help">
-                <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
-                                   title="Search query syntax documentation"
-                                   text={<Icon name="lightbulb" type="regular" />} />
-              </div>
               {hasQueryOverride && <WidgetQueryOverride value={globalOverride?.query} onReset={_resetQueryOverride} />}
             </SecondRow>
           </>
