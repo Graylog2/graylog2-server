@@ -23,9 +23,7 @@ import styled from 'styled-components';
 import moment from 'moment';
 
 import connect from 'stores/connect';
-import DocumentationLink from 'components/support/DocumentationLink';
-import DocsHelper from 'util/DocsHelper';
-import { Spinner, Icon, FlatContentRow } from 'components/common';
+import { Spinner, FlatContentRow } from 'components/common';
 import { Row, Col } from 'components/bootstrap';
 import BottomRow from 'views/components/searchbar/BottomRow';
 import ViewActionsWrapper from 'views/components/searchbar/ViewActionsWrapper';
