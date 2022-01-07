@@ -92,10 +92,6 @@ const SearchButtonAndQuery = styled.div`
   align-items: flex-start;
 `;
 
-const StyledQueryInput = styled(QueryInput)`
-  flex: 1;
-`;
-
 const debouncedValidateQuery = debounceWithPromise(validateQuery, 350);
 
 const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onExecute: performSearch }: Props) => {
@@ -154,17 +150,17 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
                           {({ field: { name, value, onChange }, meta: { error } }) => (
                             <FormWarningsContext.Consumer>
                               {({ warnings }) => (
-                                <StyledQueryInput value={value}
-                                                  timeRange={values?.timerange}
-                                                  placeholder="Apply filter to all widgets"
-                                                  onChange={(newQuery) => {
-                                                    onChange({ target: { value: newQuery, name } });
+                                <QueryInput value={value}
+                                            timeRange={values?.timerange}
+                                            placeholder="Apply filter to all widgets"
+                                            onChange={(newQuery) => {
+                                              onChange({ target: { value: newQuery, name } });
 
-                                                    return Promise.resolve(newQuery);
-                                                  }}
-                                                  error={error}
-                                                  warning={warnings.queryString}
-                                                  onExecute={handleSubmit as () => void} />
+                                              return Promise.resolve(newQuery);
+                                            }}
+                                            error={error}
+                                            warning={warnings.queryString}
+                                            onExecute={handleSubmit as () => void} />
                               )}
                             </FormWarningsContext.Consumer>
                           )}

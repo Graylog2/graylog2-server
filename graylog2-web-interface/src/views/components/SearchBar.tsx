@@ -87,10 +87,6 @@ const SearchButtonAndQuery = styled.div`
   align-items: flex-start;
 `;
 
-const StyledQueryInput = styled(QueryInput)`
-  flex: 1;
-`;
-
 const defaultOnSubmit = ({ timerange, streams, queryString }, currentQuery: Query) => {
   const newQuery = currentQuery.toBuilder()
     .timerange(timerange)
@@ -194,18 +190,18 @@ const SearchBar = ({
                           {({ field: { name, value, onChange }, meta: { error } }) => (
                             <FormWarningsContext.Consumer>
                               {({ warnings }) => (
-                                <StyledQueryInput value={value}
-                                                  timeRange={values.timerange}
-                                                  streams={values.streams}
-                                                  placeholder='Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'
-                                                  error={error}
-                                                  warning={warnings.queryString}
-                                                  onChange={(newQuery) => {
-                                                    onChange({ target: { value: newQuery, name } });
+                                <QueryInput value={value}
+                                            timeRange={values.timerange}
+                                            streams={values.streams}
+                                            placeholder='Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'
+                                            error={error}
+                                            warning={warnings.queryString}
+                                            onChange={(newQuery) => {
+                                              onChange({ target: { value: newQuery, name } });
 
-                                                    return Promise.resolve(newQuery);
-                                                  }}
-                                                  onExecute={handleSubmit as () => void} />
+                                              return Promise.resolve(newQuery);
+                                            }}
+                                            onExecute={handleSubmit as () => void} />
                               )}
                             </FormWarningsContext.Consumer>
                           )}

@@ -142,6 +142,7 @@ const QueryInput = ({
       {({ enableSmartSearch = true }) => (
         <StyledAceEditor mode="lucene"
                          disabled={disabled}
+                         className={className}
                          aceTheme="ace-queryinput" // NOTE: is usually just `theme` but we need that prop for styled-components
                          ref={configureEditor}
                          onLoad={(editor) => { editor.renderer.setScrollMargin(6, 5); editor.renderer.setPadding(12); }}
