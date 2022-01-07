@@ -175,7 +175,8 @@ const QueryInput = ({
                            }}
                            fontSize={theme.fonts.size.large}
                            placeholder={placeholder}
-                           markers={markers} />
+                           markers={markers}
+                           wrapEnabled />
         )}
       </UserPreferencesContext.Consumer>
     </Container>
