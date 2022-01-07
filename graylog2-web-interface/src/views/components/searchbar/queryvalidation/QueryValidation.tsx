@@ -47,7 +47,6 @@ const ExplanationTrigger = styled.button<{ $clickable?: boolean }>(({ $clickable
   border: 0;
   display: flex;
   align-items: center;
-  min-height: 35px;
   cursor: ${$clickable ? 'pointer' : 'default'};
 `);
 
