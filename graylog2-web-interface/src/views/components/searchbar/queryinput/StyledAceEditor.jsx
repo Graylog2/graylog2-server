@@ -158,7 +158,7 @@ const StyledAceEditor = styled(AceEditor).attrs(({ aceTheme, theme }) => ({
     }
 
     .ace_placeholder {
-    left: 0;
+      left: 0;
       right: 0;
       padding: 0;
       margin-top: 6px;
