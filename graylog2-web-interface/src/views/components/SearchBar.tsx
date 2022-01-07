@@ -215,11 +215,6 @@ const SearchBar = ({
 
                         <QueryValidation />
 
-                        <div className="search-help">
-                          <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
-                                             title="Search query syntax documentation"
-                                             text={<Icon name="lightbulb" />} />
-                        </div>
                       </SearchButtonAndQuery>
 
                       {!editing && (
