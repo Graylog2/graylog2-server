@@ -95,7 +95,7 @@ const ExpandableContent = styled.div(({ theme }) => css`
   padding-left: 5px;
 `);
 
-type Props = {
+type Props = React.ComponentProps<typeof Checkbox> & {
   header: React.ReactNode,
   checked?: boolean,
   indetermined?: boolean,
