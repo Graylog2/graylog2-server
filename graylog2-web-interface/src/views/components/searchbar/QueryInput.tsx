@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { useCallback, useMemo, useRef } from 'react';
 import type { DefaultTheme } from 'styled-components';
-import styled, { withTheme } from 'styled-components';
+import { withTheme } from 'styled-components';
 import PropTypes from 'prop-types';
 
 import { themePropTypes } from 'theme';
@@ -53,13 +53,6 @@ type Props = {
   value: string,
   warning?: QueryValidationState,
 };
-
-const Container = styled.div(({ theme }) => `
-  padding-bottom: 2px;
-  border: 1px solid ${theme.colors.variant.light.default};
-  border-radius: 4px;
-  padding: 5px 2px;
-`);
 
 const defaultCompleterFactory = (
   completers: Array<Completer>,
@@ -145,41 +138,40 @@ const QueryInput = ({
   const markers = useMemo(() => getMarkers(error, warning), [error, warning]);
 
   return (
-    <Container className={`query ${className}`} data-testid="query-input">
-      <UserPreferencesContext.Consumer>
-        {({ enableSmartSearch = true }) => (
-          <StyledAceEditor mode="lucene"
-                           disabled={disabled}
-                           aceTheme="ace-queryinput" // NOTE: is usually just `theme` but we need that prop for styled-components
-                           ref={configureEditor}
-                           readOnly={disabled}
-                           onBlur={onBlur}
-                           commands={[{
-                             name: 'Execute',
-                             bindKey: 'Enter',
-                             exec: _onExecute,
-                           }]}
-                           onChange={onChange}
-                           value={value}
-                           name="QueryEditor"
-                           showGutter={false}
-                           showPrintMargin={false}
-                           highlightActiveLine={false}
-                           minLines={1}
-                           maxLines={Infinity}
-                           enableBasicAutocompletion={enableSmartSearch}
-                           enableLiveAutocompletion={enableSmartSearch}
-                           editorProps={{
-                             $blockScrolling: Infinity,
-                             selectionStyle: 'line',
-                           }}
-                           fontSize={theme.fonts.size.large}
-                           placeholder={placeholder}
-                           markers={markers}
-                           wrapEnabled />
-        )}
-      </UserPreferencesContext.Consumer>
-    </Container>
+    <UserPreferencesContext.Consumer>
+      {({ enableSmartSearch = true }) => (
+        <StyledAceEditor mode="lucene"
+                         disabled={disabled}
+                         aceTheme="ace-queryinput" // NOTE: is usually just `theme` but we need that prop for styled-components
+                         ref={configureEditor}
+                         onLoad={(editor) => { editor.renderer.setScrollMargin(6, 5); editor.renderer.setPadding(12); }}
+                         readOnly={disabled}
+                         onBlur={onBlur}
+                         commands={[{
+                           name: 'Execute',
+                           bindKey: 'Enter',
+                           exec: _onExecute,
+                         }]}
+                         onChange={onChange}
+                         value={value}
+                         name="QueryEditor"
+                         showGutter={false}
+                         showPrintMargin={false}
+                         highlightActiveLine={false}
+                         minLines={1}
+                         maxLines={4}
+                         enableBasicAutocompletion={enableSmartSearch}
+                         enableLiveAutocompletion={enableSmartSearch}
+                         editorProps={{
+                           $blockScrolling: Infinity,
+                           selectionStyle: 'line',
+                         }}
+                         fontSize={theme.fonts.size.large}
+                         placeholder={placeholder}
+                         markers={markers}
+                         wrapEnabled />
+      )}
+    </UserPreferencesContext.Consumer>
   );
 };
 
