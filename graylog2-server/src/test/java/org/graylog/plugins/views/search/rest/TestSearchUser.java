@@ -17,9 +17,13 @@
 package org.graylog.plugins.views.search.rest;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.plugin.database.users.User;
 import org.mockito.Mockito;
+
+import java.util.Optional;
+import java.util.function.Consumer;
 
 import static org.graylog2.shared.security.RestPermissions.DASHBOARDS_READ;
 import static org.graylog2.shared.security.RestPermissions.STREAMS_READ;
@@ -27,9 +31,12 @@ import static org.graylog2.shared.security.RestPermissions.STREAMS_READ;
 public class TestSearchUser {
 
     final ImmutableMap.Builder<String, Boolean> permissions;
+    final ImmutableSet.Builder<String> knownStreams;
+    private User user;
 
     private TestSearchUser() {
         permissions = ImmutableMap.builder();
+        knownStreams = ImmutableSet.builder();
     }
 
     public static TestSearchUser builder() {
@@ -38,6 +45,7 @@ public class TestSearchUser {
 
     public TestSearchUser allowStream(String streamId) {
         this.permissions.put(STREAMS_READ + ":" + streamId, true);
+        this.knownStreams.add(streamId);
         return this;
     }
 
@@ -48,6 +56,7 @@ public class TestSearchUser {
 
     public TestSearchUser denyStream(String streamId) {
         this.permissions.put(STREAMS_READ + ":" + streamId, false);
+        this.knownStreams.add(streamId);
         return this;
     }
 
@@ -56,8 +65,28 @@ public class TestSearchUser {
         return this;
     }
 
+    public TestSearchUser withUser(User user) {
+        this.user = user;
+        return this;
+    }
+
     public SearchUser build() {
-        final ImmutableMap<String, Boolean> build = permissions.build();
-        return new SearchUser(Mockito.mock(User.class), s -> build.getOrDefault(s, false), (u, v) -> build.getOrDefault(u + ":" + v, false));
+        final ImmutableMap<String, Boolean> permissions = this.permissions.build();
+        final ImmutableSet<String> knownStreamIDs = knownStreams.build();
+
+        return new SearchUser(
+                Optional.ofNullable(user).orElseGet(() -> Mockito.mock(User.class)),
+                permission -> verifyPermission(permissions, permission),
+                (permission, entityid) -> verifyPermission(permissions, permission, entityid),
+                new PermittedStreams(knownStreamIDs::stream)
+        );
+    }
+
+    private Boolean verifyPermission(ImmutableMap<String, Boolean> permissions, String permission, String entityId) {
+        return verifyPermission(permissions, permission + ":" + entityId);
+    }
+
+    private Boolean verifyPermission(ImmutableMap<String, Boolean> permissions, String permission) {
+        return permissions.getOrDefault(permission, false);
     }
 }

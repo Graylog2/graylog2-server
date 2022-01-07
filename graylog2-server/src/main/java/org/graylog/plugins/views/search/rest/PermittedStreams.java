@@ -22,19 +22,28 @@ import org.graylog2.streams.StreamService;
 
 import javax.inject.Inject;
 
+import java.util.List;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import static org.graylog2.plugin.streams.Stream.NON_MESSAGE_STREAM_IDS;
 
 public class PermittedStreams {
-    private final StreamService streamService;
+    private final Supplier<Stream<String>> allStreamsProvider;
+
+
+    public PermittedStreams(Supplier<Stream<String>> allStreamsProvider) {
+        this.allStreamsProvider = allStreamsProvider;
+    }
 
     @Inject
     public PermittedStreams(StreamService streamService) {
-        this.streamService = streamService;
+        this(() -> streamService.loadAll().stream().map(org.graylog2.plugin.streams.Stream::getId));
     }
 
     public ImmutableSet<String> load(StreamPermissions streamPermissions) {
-        return streamService.loadAll().stream()
-                .map(org.graylog2.plugin.streams.Stream::getId)
+        return allStreamsProvider.get()
                 // Unless explicitly queried, exclude event and failure indices by default
                 // Having these indices in every search, makes sorting almost impossible
                 // because it triggers https://github.com/Graylog2/graylog2-server/issues/6378

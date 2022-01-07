@@ -42,19 +42,16 @@ import java.util.Set;
 @RequiresAuthentication
 public class FieldTypesResource extends RestResource implements PluginRestResource {
     private final MappedFieldTypesService mappedFieldTypesService;
-    private final PermittedStreams permittedStreams;
 
     @Inject
-    public FieldTypesResource(MappedFieldTypesService mappedFieldTypesService,
-                              PermittedStreams permittedStreams) {
+    public FieldTypesResource(MappedFieldTypesService mappedFieldTypesService) {
         this.mappedFieldTypesService = mappedFieldTypesService;
-        this.permittedStreams = permittedStreams;
     }
 
     @GET
     @ApiOperation(value = "Retrieve the list of all fields present in the system")
     public Set<MappedFieldTypeDTO> allFieldTypes(@Context SearchUser searchUser) {
-        final ImmutableSet<String> streams = searchUser.streams(permittedStreams).loadAll();
+        final ImmutableSet<String> streams = searchUser.streams().loadAll();
         return mappedFieldTypesService.fieldTypesByStreamIds(streams, RelativeRange.allTime());
     }
 
@@ -62,7 +59,7 @@ public class FieldTypesResource extends RestResource implements PluginRestResour
     @ApiOperation(value = "Retrieve the field list of a given set of streams")
     @NoAuditEvent("This is not changing any data")
     public Set<MappedFieldTypeDTO> byStreams(FieldTypesForStreamsRequest request, @Context SearchUser searchUser) {
-        final ImmutableSet<String> streams = searchUser.streams(permittedStreams).readableOrAllIfEmpty(request.streams());
+        final ImmutableSet<String> streams = searchUser.streams().readableOrAllIfEmpty(request.streams());
         return mappedFieldTypesService.fieldTypesByStreamIds(streams, request.timerange().orElse(RelativeRange.allTime()));
     }
 }

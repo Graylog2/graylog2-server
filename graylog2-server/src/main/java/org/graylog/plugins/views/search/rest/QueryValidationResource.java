@@ -41,8 +41,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
@@ -73,7 +71,7 @@ public class QueryValidationResource extends RestResource implements PluginRestR
         final ValidationRequest.Builder q = ValidationRequest.Builder.builder()
                 .query(validationRequest.query())
                 .timerange(validationRequest.timerange().orElse(defaultTimeRange()))
-                .streams(searchUser.streams(permittedStreams).readableOrAllIfEmpty(validationRequest.streams()))
+                .streams(searchUser.streams().readableOrAllIfEmpty(validationRequest.streams()))
                 .parameters(resolveParameters(validationRequest));
 
         validationRequest.filter().ifPresent(q::filter);

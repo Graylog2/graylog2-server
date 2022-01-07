@@ -18,7 +18,6 @@ package org.graylog.plugins.views.search.rest;
 
 import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.permissions.SearchUser;
-import org.graylog.plugins.views.search.permissions.StreamPermissions;
 import org.graylog2.indexer.fieldtypes.FieldTypes;
 import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
@@ -34,8 +33,10 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -65,23 +66,32 @@ public class FieldTypesResourceTest {
 
     @Before
     public void setUp() throws Exception {
-        this.fieldTypesResource = new FieldTypesResource(mappedFieldTypesService, permittedStreams);
+        this.fieldTypesResource = new FieldTypesResource(mappedFieldTypesService);
     }
 
     @Test
     public void allFieldTypesChecksPermissionsForStream() {
+
         final SearchUser searchUser = TestSearchUser.builder()
-                .denyStream("2323")
                 .allowStream("4242")
+                .denyStream("2323")
                 .build();
 
-        this.fieldTypesResource.allFieldTypes(searchUser);
-        final ArgumentCaptor<StreamPermissions> userPermission = ArgumentCaptor.forClass(StreamPermissions.class);
-        Mockito.verify(permittedStreams).load(userPermission.capture());
-        final StreamPermissions userPermissionValue = userPermission.getValue();
-        assertThat(userPermissionValue.canReadStream("4242")).isTrue();
-        assertThat(userPermissionValue.canReadStream("2323")).isFalse();
+        final MappedFieldTypesService dependency = Mockito.mock(MappedFieldTypesService.class);
+        Mockito.when(dependency.fieldTypesByStreamIds(Mockito.any(), Mockito.any())).thenAnswer(invocation -> {
+            final Collection<String> streamIDs = invocation.getArgument(0);
+            // for each streamID return a field that's called exactly like the streamID
+            return streamIDs.stream().map(streamID -> MappedFieldTypeDTO.create(streamID, FieldTypes.Type.builder().type("text").build())).collect(Collectors.toSet());
+        });
 
+        final FieldTypesResource resource = new FieldTypesResource(dependency);
+        final Set<MappedFieldTypeDTO> fields = resource.allFieldTypes(searchUser);
+
+        // field for allowed stream has to be present
+        assertThat(fields.stream().anyMatch(f -> f.name().equals("4242"))).isTrue();
+
+        // field for denied stream must not be present
+        assertThat(fields.stream().anyMatch(f -> f.name().equals("2323"))).isFalse();
     }
 
     @Test
@@ -123,24 +133,33 @@ public class FieldTypesResourceTest {
 
     @Test
     public void byStreamChecksPermissionsForStream() {
-
-        final SearchUser searchUser = Mockito.spy(TestSearchUser.builder()
+        final SearchUser searchUser = TestSearchUser.builder()
                 .allowStream("2323")
                 .allowStream("4242")
-                .build());
+                .build();
 
-        this.fieldTypesResource.byStreams(
+
+        final MappedFieldTypesService dependency = Mockito.mock(MappedFieldTypesService.class);
+        Mockito.when(dependency.fieldTypesByStreamIds(Mockito.any(), Mockito.any())).thenAnswer(invocation -> {
+            final Collection<String> streamIDs = invocation.getArgument(0);
+            // for each streamID return a field that's called exactly like the streamID
+            return streamIDs.stream().map(streamID -> MappedFieldTypeDTO.create(streamID, FieldTypes.Type.builder().type("text").build())).collect(Collectors.toSet());
+        });
+
+        final FieldTypesResource resource = new FieldTypesResource(dependency);
+
+        final Set<MappedFieldTypeDTO> fields = resource.byStreams(
                 FieldTypesForStreamsRequest.Builder.builder()
                         .streams(ImmutableSet.of("2323", "4242"))
                         .build(),
                 searchUser
         );
 
-        final ArgumentCaptor<String> streamIdCaptor = ArgumentCaptor.forClass(String.class);
+        // field for allowed stream has to be present
+        assertThat(fields.stream().anyMatch(f -> f.name().equals("2323"))).isTrue();
+        assertThat(fields.stream().anyMatch(f -> f.name().equals("4242"))).isTrue();
 
-        verify(searchUser, times(2)).canReadStream(streamIdCaptor.capture());
 
-        assertThat(streamIdCaptor.getAllValues()).containsExactlyInAnyOrder("2323", "4242");
     }
 
     @Test

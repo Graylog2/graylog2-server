@@ -34,11 +34,13 @@ public class SearchUser implements SearchPermissions, StreamPermissions, ViewPer
     private final User currentUser;
     private final Predicate<String> isPermitted;
     private final BiPredicate<String, String> isPermittedEntity;
+    private final UserStreams userStreams;
 
-    public SearchUser(User currentUser, Predicate<String> isPermitted, BiPredicate<String, String> isPermittedEntity) {
+    public SearchUser(User currentUser, Predicate<String> isPermitted, BiPredicate<String, String> isPermittedEntity, PermittedStreams permittedStreams) {
         this.currentUser = currentUser;
         this.isPermitted = isPermitted;
         this.isPermittedEntity = isPermittedEntity;
+        this.userStreams = new UserStreams(this, permittedStreams);
     }
 
     public Optional<DateTimeZone> timeZone() {
@@ -92,8 +94,8 @@ public class SearchUser implements SearchPermissions, StreamPermissions, ViewPer
         return this.currentUser.isLocalAdmin() || isPermitted("*");
     }
 
-    public UserStreams streams(PermittedStreams permittedStreams) {
-        return new UserStreams(this, permittedStreams);
+    public UserStreams streams() {
+        return this.userStreams;
     }
 
     @Override

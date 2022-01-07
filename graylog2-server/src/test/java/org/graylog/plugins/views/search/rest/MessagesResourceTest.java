@@ -62,7 +62,6 @@ public class MessagesResourceTest {
     private CommandFactory commandFactory;
     @SuppressWarnings("UnstableApiUsage")
     private final EventBus eventBus = mock(EventBus.class);
-    private SearchUser searchUser;
 
     @BeforeEach
     void setUp() {
@@ -78,7 +77,6 @@ public class MessagesResourceTest {
         when(permittedStreams.load(any())).thenReturn(ImmutableSet.of("a-default-stream"));
         executionGuard = mock(SearchExecutionGuard.class);
         SearchDomain searchDomain = mock(SearchDomain.class);
-        searchUser = new SearchUser(currentUser, s -> true, (s, s2) -> true);
 
         final QueryValidationServiceImpl validationService = new QueryValidationServiceImpl(
                 new LuceneQueryParser(),
@@ -111,10 +109,13 @@ public class MessagesResourceTest {
     void appliesDefaultStreamsToRequestIfOmitted() {
         MessagesRequest request = validRequest();
 
-        when(permittedStreams.load(any())).thenReturn(ImmutableSet.of("stream-1", "stream-2"));
+        final SearchUser searchUser = TestSearchUser.builder()
+                .allowStream("stream-1")
+                .allowStream("stream-2")
+                .build();
+
 
         ArgumentCaptor<MessagesRequest> captor = ArgumentCaptor.forClass(MessagesRequest.class);
-
         when(commandFactory.buildFromRequest(captor.capture())).thenReturn(ExportMessagesCommand.withDefaults());
 
         sut.retrieve(request, searchUser);
@@ -126,6 +127,11 @@ public class MessagesResourceTest {
 
     @Test
     void checksStreamPermissionsForPlainRequest() {
+
+        final SearchUser searchUser = TestSearchUser.builder()
+                .denyStream("stream-1")
+                .build();
+
         MessagesRequest request = validRequest().toBuilder().streams(ImmutableSet.of("stream-1")).build();
 
         PermissionException exception = new PermissionException("The wurst is yet to come");
@@ -138,6 +144,13 @@ public class MessagesResourceTest {
 
     @Test
     void passesOnlyUserNameToAuditingExporterIfExportBasedOnRequest() {
+
+        final SearchUser searchUser = TestSearchUser
+                .builder()
+                .withUser(currentUser)
+                .build();
+
+
         AtomicReference<AuditContext> context = captureAuditContext();
 
         sut.retrieve(validRequest(), searchUser);
