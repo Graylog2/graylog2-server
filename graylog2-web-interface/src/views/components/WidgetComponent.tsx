@@ -41,20 +41,16 @@ type Props = {
   editing: boolean,
   fields: Immutable.List<TFieldTypeMapping>,
   onPositionsChange: (position: BackendWidgetPosition) => void,
-  onWidgetSizeChange: (widgetId?: string, dimensions?: { height: number, width: number }) => void,
   position: WidgetPosition,
   widgetId: string,
-  widgetDimension: { height: number | null | undefined, width: number | null | undefined },
 };
 
 const WidgetComponent = ({
   editing,
   fields,
   onPositionsChange = () => undefined,
-  onWidgetSizeChange = () => {},
   position,
   widgetId,
-  widgetDimension: { height, width },
 }: Props) => {
   const widget = useStore(WidgetStore, (state) => state.get(widgetId));
   const viewType = useContext(ViewTypeContext);
@@ -70,14 +66,11 @@ const WidgetComponent = ({
             <WidgetFieldTypesIfDashboard>
               <Widget editing={editing}
                       fields={fields}
-                      height={height}
                       id={widget.id}
                       onPositionsChange={onPositionsChange}
-                      onSizeChange={onWidgetSizeChange}
                       position={position}
                       title={title}
-                      widget={widget}
-                      width={width} />
+                      widget={widget} />
             </WidgetFieldTypesIfDashboard>
           </ExportSettingsContextProvider>
         </AdditionalContext.Provider>
@@ -90,14 +83,11 @@ WidgetComponent.propTypes = {
   editing: PropTypes.bool.isRequired,
   fields: PropTypes.object.isRequired,
   onPositionsChange: PropTypes.func,
-  onWidgetSizeChange: PropTypes.func,
   position: PropTypes.shape(Position).isRequired,
-  widgetDimension: PropTypes.object.isRequired,
 };
 
 WidgetComponent.defaultProps = {
   onPositionsChange: () => {},
-  onWidgetSizeChange: () => {},
 };
 
 export default WidgetComponent;

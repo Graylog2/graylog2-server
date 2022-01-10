@@ -77,8 +77,6 @@ interface WidgetComponentProps<Config extends WidgetConfig = WidgetConfig, Resul
   editing: boolean;
   fields: Immutable.List<FieldTypeMapping>;
   filter: string;
-  height: number;
-  width: number;
   queryId: string;
   onConfigChange: (newConfig: Config) => Promise<Widgets>;
   setLoadingState: (loading: boolean) => void;

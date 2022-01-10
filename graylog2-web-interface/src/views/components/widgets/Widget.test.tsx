@@ -125,7 +125,6 @@ describe('<Widget />', () => {
                 id="widgetId"
                 fields={Immutable.List([])}
                 onPositionsChange={() => {}}
-                onSizeChange={() => {}}
                 title="Widget Title"
                 position={new WidgetPosition(1, 1, 1, 1)}
                 {...props} />
