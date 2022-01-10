@@ -76,10 +76,12 @@ public class VersionProbe {
                     .retryIfRuntimeException()
                     .withRetryListener(new RetryListener() {
                         @Override
-                        public <V> void onRetry(Attempt<V> attempt) {
-                            final V result = attempt.getResult();
-                            if (result instanceof Optional && ((Optional<?>) result).isPresent()) {
-                                return;
+                        public void onRetry(Attempt attempt) {
+                            if (attempt.hasResult()) {
+                                final Object result = attempt.getResult();
+                                if (result instanceof Optional && ((Optional<?>) result).isPresent()) {
+                                    return;
+                                }
                             }
                             if (connectionAttempts == 0) {
                                 LOG.info("Elasticsearch is not available. Retry #{}", attempt.getAttemptNumber());
