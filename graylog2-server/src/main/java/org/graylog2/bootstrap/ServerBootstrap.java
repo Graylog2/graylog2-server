@@ -144,7 +144,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
                 new ServerStatusBindings(capabilities()),
                 new ConfigurationModule(configuration),
                 new SystemStatsModule(configuration.isDisableNativeSystemStatsCollector()),
-                new ServerPreflightChecksModule(configuration),
+                new ServerPreflightChecksModule(),
                 new Module() {
                     @Override
                     public void configure(Binder binder) {
