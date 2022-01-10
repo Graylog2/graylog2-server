@@ -15,10 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-package org.graylog2.rest.resources.system.validate;
+package org.graylog2.rest.resources.system;
 
-import com.google.inject.TypeLiteral;
-import com.google.inject.multibindings.MapBinder;
 import org.graylog.plugins.map.config.GeoIpResolverConfig;
 import org.graylog2.plugin.PluginModule;
 
@@ -29,15 +27,4 @@ public class ClusterConfigValidatorModule extends PluginModule {
         addClusterConfigValidator(GeoIpResolverConfig.class, GeoIpResolverConfigValidator.class);
     }
 
-    private void addClusterConfigValidator(Class<?> configClass, Class<? extends ClusterConfigValidator> configValidatorClass) {
-
-        mapBinder().addBinding(configClass).to(configValidatorClass);
-
-    }
-
-    private MapBinder<Class<?>, ClusterConfigValidator> mapBinder() {
-        TypeLiteral<Class<?>> keyType = new TypeLiteral<Class<?>>() {};
-        TypeLiteral<ClusterConfigValidator> valueType = new TypeLiteral<ClusterConfigValidator>() {};
-        return MapBinder.newMapBinder(binder(), keyType, valueType);
-    }
 }

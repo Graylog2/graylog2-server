@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-package org.graylog2.rest.resources.system.validate;
+package org.graylog2.plugin.validate;
 
 public class ConfigValidationException extends Exception {
     public ConfigValidationException(String message) {

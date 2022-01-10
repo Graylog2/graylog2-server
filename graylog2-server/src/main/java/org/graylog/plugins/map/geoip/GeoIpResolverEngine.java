@@ -143,7 +143,8 @@ public class GeoIpResolverEngine {
      * @param message message
      * @return a list of field that may have an IP address
      */
-    private List<String> getIpAddressFields(Message message) {
+    @VisibleForTesting
+    List<String> getIpAddressFields(Message message) {
         return message.getFieldNames()
                 .stream()
                 .filter(e -> (!enforceGraylogSchema || ipAddressFields.containsKey(e))

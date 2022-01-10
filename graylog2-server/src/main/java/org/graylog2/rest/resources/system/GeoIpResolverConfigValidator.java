@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-package org.graylog2.rest.resources.system.validate;
+package org.graylog2.rest.resources.system;
 
 import com.codahale.metrics.Timer;
 import com.codahale.metrics.UniformReservoir;
@@ -25,6 +25,8 @@ import org.graylog.plugins.map.geoip.GeoAsnInformation;
 import org.graylog.plugins.map.geoip.GeoIpResolver;
 import org.graylog.plugins.map.geoip.GeoIpVendorResolverService;
 import org.graylog.plugins.map.geoip.GeoLocationInformation;
+import org.graylog2.plugin.validate.ClusterConfigValidator;
+import org.graylog2.plugin.validate.ConfigValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
