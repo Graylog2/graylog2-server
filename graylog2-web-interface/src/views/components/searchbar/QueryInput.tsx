@@ -95,7 +95,7 @@ const _configureEditor = (editor, completer: AutoCompleter, configuredListeners:
 
 const getMarkers = (errors: QueryValidationState | undefined, warnings: QueryValidationState | undefined) => {
   const markerClassName = 'ace_marker';
-  const createMarkers = (explanations = [], className) => explanations.map(({
+  const createMarkers = (explanations = [], className = '') => explanations.map(({
     beginLine,
     beginColumn,
     endLine,
