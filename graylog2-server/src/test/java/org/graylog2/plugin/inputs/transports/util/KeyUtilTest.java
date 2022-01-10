@@ -18,21 +18,17 @@ package org.graylog2.plugin.inputs.transports.util;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Resources;
-import io.netty.handler.ssl.SslHandler;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import javax.net.ssl.KeyManager;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLEngine;
-import javax.net.ssl.TrustManager;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.security.PrivateKey;
-import java.security.SecureRandom;
+import java.security.Security;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
@@ -43,6 +39,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(Parameterized.class)
 public class KeyUtilTest {
+    @Before
+    public void init() {
+        Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+    }
+
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
 
@@ -56,25 +57,25 @@ public class KeyUtilTest {
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
                 // algorithm, key filename, password, exception class, exception text
-                {"RSA", "server.key.pem.ue.pkcs1.rsa", null, IllegalArgumentException.class, "Unsupported key type PKCS#1, please convert to PKCS#8"},
+                {"RSA", "server.key.pem.ue.pkcs1.rsa", null, null, null},
                 {"RSA", "server.key.pem.e.pkcs8.rsa", "test", null, null},
                 {"RSA", "server.key.pem.ue.pkcs8.rsa", null, null, null},
-                {"RSA", "server.key.der.e.pkcs8.rsa", "test", null, null},
-                {"RSA", "server.key.der.ue.pkcs8.rsa", null, null, null},
+                {"RSA", "server.key.der.e.pkcs8.rsa", "test", KeyUtilException.class, "No key found in PEM file"},
+                {"RSA", "server.key.der.ue.pkcs8.rsa", null, KeyUtilException.class, "No key found in PEM file"},
 
-                {"DSA", "server.key.pem.ue.pkcs1.dsa", null, IllegalArgumentException.class, "Unsupported key type PKCS#1, please convert to PKCS#8"},
+                {"DSA", "server.key.pem.ue.pkcs1.dsa", null, null, null},
                 {"DSA", "server.key.pem.e.pkcs8.dsa", "test", null, null},
                 {"DSA", "server.key.pem.ue.pkcs8.dsa", null, null, null},
-                {"DSA", "server.key.der.e.pkcs8.dsa", "test", null, null},
-                {"DSA", "server.key.der.ue.pkcs8.dsa", null, null, null},
+                {"DSA", "server.key.der.e.pkcs8.dsa", "test", KeyUtilException.class, "No key found in PEM file"},
+                {"DSA", "server.key.der.ue.pkcs8.dsa", null, KeyUtilException.class, "No key found in PEM file"},
 
-                {"ECDSA", "server.key.pem.ue.pkcs1.ecdsa", null, IllegalArgumentException.class, "Unsupported key type PKCS#1, please convert to PKCS#8"},
+                {"ECDSA", "server.key.pem.ue.pkcs1.ecdsa", null, null, null},
                 {"ECDSA", "server.key.pem.e.pkcs8.ecdsa", "test", null, null},
                 {"ECDSA", "server.key.pem.ue.pkcs8.ecdsa", null, null, null},
-                {"ECDSA", "server.key.der.e.pkcs8.ecdsa", "test", null, null},
-                {"ECDSA", "server.key.der.ue.pkcs8.ecdsa", null, null, null},
+                {"ECDSA", "server.key.der.e.pkcs8.ecdsa", "test", KeyUtilException.class, "No key found in PEM file"},
+                {"ECDSA", "server.key.der.ue.pkcs8.ecdsa", null, KeyUtilException.class, "No key found in PEM file"},
 
-                {"RSA", "server.key.invalid", null, IllegalArgumentException.class, "Unsupported key type: "},
+                {"RSA", "server.key.invalid", null, KeyUtilException.class, "No key found in PEM file"},
         });
     }
 
@@ -127,31 +128,7 @@ public class KeyUtilTest {
         }
 
         final File keyFile = resourceToFile(keyFileName);
-        final PrivateKey privateKey = KeyUtil.loadPrivateKey(keyFile, keyPassword);
+        final PrivateKey privateKey = KeyUtil.privateKeyFromFile(keyPassword, keyFile);
         assertThat(privateKey).isNotNull();
-    }
-
-    @Test
-    public void testCreateNettySslHandler() throws Exception {
-        if (exceptionClass != null) {
-            expectedException.expect(exceptionClass);
-            expectedException.expectMessage(exceptionMessage);
-        }
-
-        final File keyFile = resourceToFile(keyFileName);
-        final File certFile = resourceToFile(CERTIFICATES.get(keyAlgorithm));
-        final KeyManager[] keyManagers = KeyUtil.initKeyStore(keyFile, certFile, keyPassword);
-
-        final SSLContext sslContext = SSLContext.getInstance("TLS");
-        sslContext.init(keyManagers, new TrustManager[0], new SecureRandom());
-        assertThat(sslContext.getProtocol()).isEqualTo("TLS");
-
-        final SSLEngine sslEngine = sslContext.createSSLEngine();
-
-        assertThat(sslEngine.getEnabledCipherSuites()).isNotEmpty();
-        assertThat(sslEngine.getEnabledProtocols()).isNotEmpty();
-
-        final SslHandler sslHandler = new SslHandler(sslEngine);
-        assertThat(sslHandler).isNotNull();
     }
 }
