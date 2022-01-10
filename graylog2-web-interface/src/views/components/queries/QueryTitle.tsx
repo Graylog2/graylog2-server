@@ -22,8 +22,8 @@ import styled, { css } from 'styled-components';
 import { MenuItem } from 'components/bootstrap';
 import { QueriesActions } from 'views/stores/QueriesStore';
 import type { QueryId } from 'views/logic/queries/Query';
-import ViewState from 'views/logic/views/ViewState';
-import { QueriesList } from 'views/actions/QueriesActions';
+import type ViewState from 'views/logic/views/ViewState';
+import type { QueriesList } from 'views/actions/QueriesActions';
 import DashboardPageContext from 'views/components/contexts/DashboardPageContext';
 
 import QueryActionDropdown from './QueryActionDropdown';

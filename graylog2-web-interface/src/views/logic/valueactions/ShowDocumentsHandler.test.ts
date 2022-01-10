@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import asMock from 'helpers/mocking/AsMock';
-
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import { TitlesActions } from 'views/stores/TitlesStore';
 import TitleTypes from 'views/stores/TitleTypes';

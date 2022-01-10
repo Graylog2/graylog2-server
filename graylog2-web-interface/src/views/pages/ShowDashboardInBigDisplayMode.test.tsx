@@ -16,8 +16,8 @@
  */
 import * as React from 'react';
 import { render, waitFor } from 'wrappedTestingLibrary';
-import { StoreMock as MockStore } from 'helpers/mocking';
 
+import { StoreMock as MockStore } from 'helpers/mocking';
 import { RefreshActions } from 'views/stores/RefreshStore';
 import View from 'views/logic/views/View';
 import _ShowDashboardInBigDisplayMode from 'views/pages/ShowDashboardInBigDisplayMode';
@@ -38,14 +38,12 @@ jest.mock('views/stores/RefreshStore', () => ({
 
 jest.mock('views/stores/ViewStore', () => ({
   ViewStore: MockStore(
-    ['listen', () => jest.fn()],
     ['getInitialState', () => ({ activeQuery: 'somequery', view: mockView })],
   ),
 }));
 
 jest.mock('views/stores/SearchExecutionStateStore', () => ({
   SearchExecutionStateStore: MockStore(
-    ['listen', () => jest.fn()],
     ['getInitialState', () => ({ activeQuery: 'somequery', view: mockView })],
   ),
 }));

@@ -16,9 +16,8 @@
  */
 import * as React from 'react';
 import { render, waitFor, screen } from 'wrappedTestingLibrary';
-import { StoreMock as MockStore, asMock } from 'helpers/mocking';
 
-import DefaultQueryClientProvider from 'contexts/DefaultQueryClientProvider';
+import { StoreMock as MockStore, asMock } from 'helpers/mocking';
 import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
 
 import ShowMessagePage from './ShowMessagePage';
@@ -35,7 +34,7 @@ const mockListStreams = jest.fn((...args) => Promise.resolve([]));
 
 jest.mock('stores/nodes/NodesStore', () => ({
   NodesActions: { list: (...args) => mockListNodes(...args) },
-  NodesStore: MockStore(['listen', () => () => {}], ['getInitialState', () => ({ nodes: {} })]),
+  NodesStore: MockStore(['getInitialState', () => ({ nodes: {} })]),
 }));
 
 jest.mock('stores/messages/MessagesStore', () => ({
@@ -60,14 +59,13 @@ type SimpleShowMessagePageProps = {
 };
 
 const SimpleShowMessagePage = ({ index, messageId }: SimpleShowMessagePageProps) => (
-  <DefaultQueryClientProvider>
-    {/* @ts-expect-error */}
-    <ShowMessagePage params={{ index, messageId }} />
-  </DefaultQueryClientProvider>
+  // @ts-expect-error
+  <ShowMessagePage params={{ index, messageId }} />
 );
 
 describe('ShowMessagePage', () => {
   beforeEach(() => {
+    asMock(useFieldTypes).mockClear();
     asMock(useFieldTypes).mockReturnValue({ data: [] });
   });
 
@@ -91,9 +89,24 @@ describe('ShowMessagePage', () => {
     expect(container).toMatchSnapshot();
   });
 
+  it('retrieves field types only for user-accessible streams', async () => {
+    const messageWithMultipleStreams = { ...message };
+    messageWithMultipleStreams.fields.streams = ['000000000000000000000001', 'deadbeef'];
+    mockLoadMessage.mockImplementation(() => Promise.resolve(messageWithMultipleStreams));
+    mockListStreams.mockImplementation(() => Promise.resolve([{ id: 'deadbeef' }]));
+    mockGetInput.mockImplementation(() => Promise.resolve(input));
+
+    render(<SimpleShowMessagePage index="graylog_5" messageId="20f683d2-a874-11e9-8a11-0242ac130004" />);
+
+    await screen.findByText(/Deprecated field/);
+
+    expect(useFieldTypes).toHaveBeenCalledWith(['deadbeef'], { from: '2019-07-17T11:20:33.000Z', to: '2019-07-17T11:20:33.000Z', type: 'absolute' });
+  });
+
   it('renders for generic event', async () => {
     mockLoadMessage.mockImplementation(() => Promise.resolve(event));
     mockGetInput.mockImplementation(() => Promise.resolve());
+    mockListStreams.mockImplementation(() => Promise.resolve([]));
 
     const { container } = render(<SimpleShowMessagePage index="gl-events_0" messageId="01DFZQ64CMGV30NT7DW2P7HQX2" />);
 

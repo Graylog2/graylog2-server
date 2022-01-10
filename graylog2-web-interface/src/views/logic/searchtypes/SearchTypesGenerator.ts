@@ -17,14 +17,13 @@
 import * as Immutable from 'immutable';
 import uuid from 'uuid/v4';
 
-import Widget from 'views/logic/widgets/Widget';
-import { SearchTypeList } from 'views/logic/queries/Query';
-import { SearchType } from 'views/logic/queries/SearchType';
+import type Widget from 'views/logic/widgets/Widget';
+import type { SearchTypeList } from 'views/logic/queries/Query';
+import type { SearchType } from 'views/logic/queries/SearchType';
 
 import { widgetDefinition } from '../Widgets';
 import searchTypeDefinition from '../SearchType';
-import type { SearchTypeIds, WidgetMapping } from '../views/types';
-import { WidgetId } from '../views/types';
+import type { SearchTypeIds, WidgetMapping, WidgetId } from '../views/types';
 
 const filterForWidget = (widget) => (widget.filter ? { filter: { type: 'query_string', query: widget.filter } } : {});
 

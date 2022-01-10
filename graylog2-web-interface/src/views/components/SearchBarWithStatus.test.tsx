@@ -16,8 +16,8 @@
  */
 import React from 'react';
 import { mount } from 'wrappedEnzyme';
-import mockComponent from 'helpers/mocking/MockComponent';
 
+import mockComponent from 'helpers/mocking/MockComponent';
 import SearchMetadata from 'views/logic/search/SearchMetadata';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 

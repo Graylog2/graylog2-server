@@ -18,13 +18,16 @@ package org.graylog.storage.elasticsearch7.mapping;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.auto.value.AutoValue;
 import com.google.common.collect.Streams;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Request;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Response;
 import org.graylog.storage.elasticsearch7.ElasticsearchClient;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class FieldMappingApi {
@@ -38,7 +41,18 @@ public class FieldMappingApi {
         this.client = client;
     }
 
-    public Map<String, String> fieldTypes(String index) {
+    @AutoValue
+    public static abstract class FieldMapping {
+        public abstract String type();
+
+        public abstract Optional<Boolean> fielddata();
+
+        static FieldMapping create(String type, @Nullable Boolean fielddata) {
+            return new AutoValue_FieldMappingApi_FieldMapping(type, Optional.ofNullable(fielddata));
+        }
+    }
+
+    public Map<String, FieldMapping> fieldTypes(String index) {
         final JsonNode result = client.execute((c, requestOptions) -> {
             final Response response = c.getLowLevelClient().performRequest(request(index));
             return objectMapper.readTree(response.getEntity().getContent());
@@ -46,7 +60,10 @@ public class FieldMappingApi {
         final JsonNode fields = result.path(index).path("mappings").path("properties");
         //noinspection UnstableApiUsage
         return Streams.stream(fields.fields())
-                .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().path("type").asText()));
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> FieldMapping.create(
+                        entry.getValue().path("type").asText(),
+                        entry.getValue().path("fielddata").asBoolean()
+                )));
     }
 
     private Request request(String index) {

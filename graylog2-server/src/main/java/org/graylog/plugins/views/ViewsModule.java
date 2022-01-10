@@ -31,11 +31,11 @@ import org.graylog.plugins.views.search.rest.SeriesDescription;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog2.plugin.PluginMetaData;
-import org.graylog2.plugin.Version;
 import org.graylog2.plugin.VersionAwareModule;
+import org.graylog2.storage.SearchVersion;
 
 public abstract class ViewsModule extends VersionAwareModule {
-    protected LinkedBindingBuilder<ExportBackend> bindExportBackend(Version supportedVersion) {
+    protected LinkedBindingBuilder<ExportBackend> bindExportBackend(SearchVersion supportedVersion) {
         return bindForVersion(supportedVersion, ExportBackend.class);
     }
 
@@ -80,14 +80,14 @@ public abstract class ViewsModule extends VersionAwareModule {
         seriesSpecBinder().addBinding(name).toInstance(SeriesDescription.create(name, description));
     }
 
-    protected MapBinder<String, QueryBackend<? extends GeneratedQueryContext>> queryBackendBinder(Version version) {
+    protected MapBinder<String, QueryBackend<? extends GeneratedQueryContext>> queryBackendBinder(SearchVersion version) {
         return MapBinder.newMapBinder(binder(),
                 TypeLiteral.get(String.class),
                 new TypeLiteral<QueryBackend<? extends GeneratedQueryContext>>() {});
 
     }
 
-    protected ScopedBindingBuilder registerQueryBackend(Version version, String name, Class<? extends QueryBackend<? extends GeneratedQueryContext>> implementation) {
+    protected ScopedBindingBuilder registerQueryBackend(SearchVersion version, String name, Class<? extends QueryBackend<? extends GeneratedQueryContext>> implementation) {
         return queryBackendBinder(version).addBinding(name).to(implementation);
     }
 

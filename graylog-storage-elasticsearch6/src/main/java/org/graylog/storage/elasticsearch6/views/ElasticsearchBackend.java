@@ -16,6 +16,7 @@
  */
 package org.graylog.storage.elasticsearch6.views;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import com.google.inject.name.Named;
 import io.searchbox.client.JestClient;
@@ -28,20 +29,21 @@ import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
-import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
+import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.engine.QueryBackend;
+import org.graylog.plugins.views.search.engine.SearchConfig;
 import org.graylog.plugins.views.search.errors.SearchTypeError;
 import org.graylog.plugins.views.search.errors.SearchTypeErrorParser;
 import org.graylog.plugins.views.search.filter.AndFilter;
 import org.graylog.plugins.views.search.filter.OrFilter;
 import org.graylog.plugins.views.search.filter.QueryStringFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
-import org.graylog.shaded.elasticsearch5.org.elasticsearch.index.query.BoolQueryBuilder;
-import org.graylog.shaded.elasticsearch5.org.elasticsearch.index.query.QueryBuilder;
-import org.graylog.shaded.elasticsearch5.org.elasticsearch.index.query.QueryBuilders;
-import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.graylog.shaded.elasticsearch6.org.elasticsearch.index.query.BoolQueryBuilder;
+import org.graylog.shaded.elasticsearch6.org.elasticsearch.index.query.QueryBuilder;
+import org.graylog.shaded.elasticsearch6.org.elasticsearch.index.query.QueryBuilders;
+import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.storage.elasticsearch6.TimeRangeQueryFactory;
 import org.graylog.storage.elasticsearch6.jest.JestUtils;
 import org.graylog.storage.elasticsearch6.views.searchtypes.ESSearchTypeHandler;
@@ -82,7 +84,8 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                                 IndexLookup indexLookup,
                                 QueryStringDecorators queryStringDecorators,
                                 ESGeneratedQueryContext.Factory queryContextFactory,
-                                @Named("allow_leading_wildcard_searches") boolean allowLeadingWildcard) {
+                                @Named("allow_leading_wildcard_searches") boolean allowLeadingWildcard,
+                                ObjectMapper objectMapper) {
         this.elasticsearchSearchTypeHandlers = elasticsearchSearchTypeHandlers;
         this.jestClient = jestClient;
         this.indexLookup = indexLookup;
@@ -99,8 +102,10 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
     }
 
     @Override
-    public ESGeneratedQueryContext generate(SearchJob job, Query query, Set<QueryResult> results) {
-        final ElasticsearchQueryString backendQuery = (ElasticsearchQueryString) query.query();
+    public ESGeneratedQueryContext generate(SearchJob job, Query query, Set<QueryResult> results, SearchConfig searchConfig) {
+        final BackendQuery backendQuery = query.query();
+
+        validateQueryTimeRange(query, searchConfig);
 
         final Set<SearchType> searchTypes = query.searchTypes();
 
@@ -121,6 +126,15 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
 
         final ESGeneratedQueryContext queryContext = queryContextFactory.create(this, searchSourceBuilder, job, query, results);
         for (SearchType searchType : searchTypes) {
+
+            final Optional<SearchTypeError> searchTypeError = validateSearchType(query, searchType, searchConfig);
+            if(searchTypeError.isPresent()) {
+                LOG.error("Invalid search type {} for elasticsearch backend, cannot generate query part. Skipping this search type.", searchType.type());
+                queryContext.addError(searchTypeError.get());
+                continue;
+            }
+
+
             final SearchSourceBuilder searchTypeSourceBuilder = queryContext.searchSourceBuilder(searchType);
 
             final Set<String> effectiveStreamIds = searchType.effectiveStreams().isEmpty()
@@ -139,8 +153,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                     )
                     .must(QueryBuilders.termsQuery(Message.FIELD_STREAMS, effectiveStreamIds));
 
-            searchType.query().ifPresent(q -> {
-                final ElasticsearchQueryString searchTypeBackendQuery = (ElasticsearchQueryString) q;
+            searchType.query().ifPresent(searchTypeBackendQuery -> {
                 final String searchTypeQueryString = this.queryStringDecorators.decorate(searchTypeBackendQuery.queryString(), job, query, results);
                 final QueryBuilder normalizedSearchTypeQuery = normalizeQueryString(searchTypeQueryString);
                 searchTypeOverrides.must(normalizedSearchTypeQuery);
@@ -246,6 +259,13 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                 // no need to add another error here, as the query generation code will have added the error about the missing handler already
                 continue;
             }
+
+            if(isSearchTypeWithError(queryContext, searchTypeId)) {
+                LOG.error("Failed search type '{}', cannot convert query result, skipping.", searchType.type());
+                // no need to add another error here, as the query generation code will have added the error about the missing handler already
+                continue;
+            }
+
             // we create a new instance because some search type handlers might need to track information between generating the query and
             // processing its result, such as aggregations, which depend on the name and type
             final ESSearchTypeHandler<? extends SearchType> handler = handlerProvider.get();

@@ -17,8 +17,8 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { render, screen, fireEvent } from 'wrappedTestingLibrary';
-import { alice } from 'fixtures/users';
 
+import { alice } from 'fixtures/users';
 import { createGRN } from 'logic/permissions/GRN';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 

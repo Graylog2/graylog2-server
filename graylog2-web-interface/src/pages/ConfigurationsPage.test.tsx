@@ -16,11 +16,11 @@
  */
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
+
 import asMock from 'helpers/mocking/AsMock';
 import suppressConsole from 'helpers/suppressConsole';
 import MockStore from 'helpers/mocking/StoreMock';
 import { configuration as mockConfiguration } from 'fixtures/configurations';
-
 import ConfigurationsPage from 'pages/ConfigurationsPage';
 import usePluginEntities from 'views/logic/usePluginEntities';
 import SidecarConfig from 'components/configurations/SidecarConfig';
@@ -42,6 +42,7 @@ jest.mock('stores/configurations/ConfigurationsStore', () => ({
     listWhiteListConfig: jest.fn(() => Promise.resolve()),
     list: jest.fn(() => Promise.resolve()),
     listMessageProcessorsConfig: jest.fn(() => Promise.resolve()),
+    listPermissionsConfig: jest.fn(() => Promise.resolve()),
   },
 }));
 

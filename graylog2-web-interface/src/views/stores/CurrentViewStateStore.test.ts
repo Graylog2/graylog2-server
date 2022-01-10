@@ -15,19 +15,22 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as Immutable from 'immutable';
-import { PluginExports, PluginStore } from 'graylog-web-plugin/plugin';
-import mockAction from 'helpers/mocking/MockAction';
-import { WidgetExport } from 'views/types';
+import type { PluginExports } from 'graylog-web-plugin/plugin';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import mockAction from 'helpers/mocking/MockAction';
+import type { WidgetExport } from 'views/types';
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import ViewState from 'views/logic/views/ViewState';
-import { ViewStoreState } from 'views/stores/ViewStore';
+import type { ViewStoreState } from 'views/stores/ViewStore';
 import View from 'views/logic/views/View';
 import { createWidget } from 'views/logic/WidgetTestHelpers';
 
-import { CurrentViewStateActions, CurrentViewStateStore, CurrentViewStateStoreType } from './CurrentViewStateStore';
-import { ViewStatesActions, ViewStatesStoreState } from './ViewStatesStore';
+import type { CurrentViewStateActions, CurrentViewStateStoreType } from './CurrentViewStateStore';
+import { CurrentViewStateStore } from './CurrentViewStateStore';
+import type { ViewStatesStoreState } from './ViewStatesStore';
+import { ViewStatesActions } from './ViewStatesStore';
 
 type CurrentViewStateStoreTypeWithCallbacks = CurrentViewStateStoreType & {
   onViewStoreChange: (state: Partial<ViewStoreState>) => void;

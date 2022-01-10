@@ -17,13 +17,14 @@
 import * as React from 'react';
 import { mount } from 'wrappedEnzyme';
 import * as Immutable from 'immutable';
+
 import { simpleFields, simpleQueryFields } from 'fixtures/fields';
 import suppressConsole from 'helpers/suppressConsole';
-
 import PivotGenerator from 'views/logic/searchtypes/aggregation/PivotGenerator';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
-import FieldTypesContext, { FieldTypes } from 'views/components/contexts/FieldTypesContext';
+import type { FieldTypes } from 'views/components/contexts/FieldTypesContext';
+import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 
 import PivotSelect from './PivotSelect';
 

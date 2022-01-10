@@ -16,13 +16,15 @@
  */
 import Reflux from 'reflux';
 import * as Immutable from 'immutable';
-import { Optional } from 'utility-types';
+import type { Optional } from 'utility-types';
 
 import SharedEntity from 'logic/permissions/SharedEntity';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
-import EntityShareState, { EntityShareStateJson } from 'logic/permissions/EntityShareState';
-import EntityShareActions, { EntitySharePayload, PaginatedEntityShares } from 'actions/permissions/EntityShareActions';
+import type { EntityShareStateJson } from 'logic/permissions/EntityShareState';
+import EntityShareState from 'logic/permissions/EntityShareState';
+import type { EntitySharePayload, PaginatedEntityShares } from 'actions/permissions/EntityShareActions';
+import EntityShareActions from 'actions/permissions/EntityShareActions';
 import { qualifyUrl } from 'util/URLUtils';
 import { singletonStore } from 'logic/singleton';
 import type { Store } from 'stores/StoreTypes';

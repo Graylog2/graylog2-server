@@ -17,21 +17,22 @@
 import React from 'react';
 import * as Immutable from 'immutable';
 import { render, waitFor, fireEvent, screen, within } from 'wrappedTestingLibrary';
-import mockAction from 'helpers/mocking/MockAction';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
-import MockStore from 'helpers/mocking/StoreMock';
 import selectEvent from 'react-select-event';
 import userEvent from '@testing-library/user-event';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
-import { createSearch } from 'fixtures/searches';
 
+import MockStore from 'helpers/mocking/StoreMock';
+import mockAction from 'helpers/mocking/MockAction';
+import { createSearch } from 'fixtures/searches';
 import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';
 import Series from 'views/logic/aggregationbuilder/Series';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import WidgetModel from 'views/logic/widgets/Widget';
 import { WidgetActions } from 'views/stores/WidgetStore';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
-import View, { ViewType } from 'views/logic/views/View';
+import type { ViewType } from 'views/logic/views/View';
+import View from 'views/logic/views/View';
 import { ViewStore } from 'views/stores/ViewStore';
 import type { ViewStoreState } from 'views/stores/ViewStore';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
@@ -78,6 +79,13 @@ jest.mock('views/stores/StreamsStore', () => ({
       { title: 'Stream 1', id: 'stream-id-1' },
     ],
   })]),
+}));
+
+jest.mock('views/stores/SearchStore', () => ({
+  SearchStore: MockStore(['getInitialState', () => ({ search: { parameters: [] } })]),
+  SearchActions: {
+    execute: mockAction(),
+  },
 }));
 
 const viewsPlugin = new PluginManifest({}, viewsBindings);

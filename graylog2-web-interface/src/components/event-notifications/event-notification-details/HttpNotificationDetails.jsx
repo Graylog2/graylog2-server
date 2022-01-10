@@ -21,9 +21,7 @@ import { ReadOnlyFormGroup } from 'components/common';
 
 const HttpNotificationDetails = ({ notification }) => {
   return (
-    <>
-      <ReadOnlyFormGroup label="URL" value={notification.config.url} />
-    </>
+    <ReadOnlyFormGroup label="URL" value={notification.config.url} />
   );
 };
 

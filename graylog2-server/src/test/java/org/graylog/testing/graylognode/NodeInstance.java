@@ -17,6 +17,7 @@
 package org.graylog.testing.graylognode;
 
 import com.google.common.base.Stopwatch;
+import org.graylog2.storage.SearchVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
@@ -36,8 +37,8 @@ public class NodeInstance implements Closeable {
 
     private final GenericContainer<?> container;
 
-    public static NodeInstance createStarted(Network network, String mongoDbUri, String elasticsearchUri, String elasticsearchVersion, int[] extraPorts,
-            List<Path> pluginJars, Path mavenProjectDir) {
+    public static NodeInstance createStarted(Network network, String mongoDbUri, String elasticsearchUri, SearchVersion elasticsearchVersion, int[] extraPorts,
+                                             List<Path> pluginJars, Path mavenProjectDir) {
         NodeContainerConfig config = NodeContainerConfig.create(network, mongoDbUri, elasticsearchUri, elasticsearchVersion, extraPorts);
         GenericContainer<?> container = NodeContainerFactory.buildContainer(config, pluginJars, mavenProjectDir);
         return new NodeInstance(container);
@@ -73,6 +74,6 @@ public class NodeInstance implements Closeable {
 
     @Override
     public void close() {
-        container.stop();
+        container.close();
     }
 }

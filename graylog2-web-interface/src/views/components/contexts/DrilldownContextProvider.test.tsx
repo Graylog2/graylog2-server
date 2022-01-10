@@ -17,8 +17,8 @@
 import * as React from 'react';
 import { useContext } from 'react';
 import { mount } from 'wrappedEnzyme';
-import { StoreMock as mockStore, asMock } from 'helpers/mocking';
 
+import { StoreMock as mockStore, asMock } from 'helpers/mocking';
 import View from 'views/logic/views/View';
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import Query, { createElasticsearchQueryString, filtersForQuery } from 'views/logic/queries/Query';
@@ -31,11 +31,11 @@ import DrilldownContext from './DrilldownContext';
 import ViewTypeContext from './ViewTypeContext';
 
 jest.mock('views/stores/CurrentQueryStore', () => ({
-  CurrentQueryStore: mockStore(['listen', () => () => {}], ['getInitialState', jest.fn(() => null)]),
+  CurrentQueryStore: mockStore(['getInitialState', jest.fn(() => null)]),
 }));
 
 jest.mock('views/stores/GlobalOverrideStore', () => ({
-  GlobalOverrideStore: mockStore(['listen', () => () => {}], ['getInitialState', jest.fn()]),
+  GlobalOverrideStore: mockStore(),
 }));
 
 describe('DrilldownContextProvider', () => {

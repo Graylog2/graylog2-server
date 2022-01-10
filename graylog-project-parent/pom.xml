@@ -396,6 +396,12 @@
                 <groupId>commons-validator</groupId>
                 <artifactId>commons-validator</artifactId>
                 <version>${commons-validator.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>commons-logging</groupId>
+                        <artifactId>commons-logging</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>
@@ -530,6 +536,12 @@
                 <groupId>com.maxmind.geoip2</groupId>
                 <artifactId>geoip2</artifactId>
                 <version>${geoip2.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>commons-logging</groupId>
+                        <artifactId>commons-logging</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.graylog.cef</groupId>
@@ -764,8 +776,6 @@
                     <suppressAnnotations>
                         <suppressAnnotation>org.graylog2.shared.SuppressForbidden</suppressAnnotation>
                     </suppressAnnotations>
-                    <!-- disallow undocumented classes like sun.misc.Unsafe: -->
-                    <internalRuntimeForbidden>false</internalRuntimeForbidden>
                     <!-- if the used Java version is too new, don't fail, just do nothing: -->
                     <failOnUnsupportedJava>false</failOnUnsupportedJava>
                     <failOnViolation>true</failOnViolation>
@@ -774,9 +784,9 @@
                         <bundledSignature>jdk-unsafe</bundledSignature>
                         <bundledSignature>jdk-deprecated</bundledSignature>
                         <bundledSignature>jdk-reflection</bundledSignature>
-                        <!-- Required until https://github.com/policeman-tools/forbidden-apis/pull/133 has been merged -->
-                        <bundledSignature>commons-io-unsafe-2.5</bundledSignature>
-                        <!--bundledSignature>commons-io-unsafe-${commons-io.version}</bundledSignature-->
+                        <!-- disallow undocumented classes like sun.misc.Unsafe: -->
+                        <bundledSignature>jdk-non-portable</bundledSignature>
+                        <bundledSignature>commons-io-unsafe-${commons-io.version}</bundledSignature>
                     </bundledSignatures>
                     <signaturesFiles>
                         <signaturesFile>${project.basedir}/../config/forbidden-apis/netty3.txt</signaturesFile>
@@ -839,7 +849,7 @@
                                 <plugin>
                                     <groupId>com.h3xstream.findsecbugs</groupId>
                                     <artifactId>findsecbugs-plugin</artifactId>
-                                    <version>1.10.1</version>
+                                    <version>1.11.0</version>
                                 </plugin>
                                 <plugin>
                                     <groupId>com.mebigfatguy.fb-contrib</groupId>
@@ -872,33 +882,6 @@
                                 <goals>
                                     <goal>check</goal>
                                 </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>dependency-check</id>
-
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-enforcer-plugin</artifactId>
-                        <version>3.0.0-M3</version>
-                        <executions>
-                            <execution>
-                                <id>check-dependencies</id>
-                                <goals>
-                                    <goal>enforce</goal>
-                                </goals>
-                                <configuration>
-                                    <rules>
-                                        <banDuplicatePomDependencyVersions/>
-                                        <dependencyConvergence/>
-                                    </rules>
-                                </configuration>
                             </execution>
                         </executions>
                     </plugin>

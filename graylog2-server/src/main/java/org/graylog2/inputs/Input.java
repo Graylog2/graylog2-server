@@ -16,6 +16,7 @@
  */
 package org.graylog2.inputs;
 
+import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.database.Persisted;
 import org.joda.time.DateTime;
 
@@ -39,4 +40,9 @@ public interface Input extends Persisted {
     String getContentPack();
 
     String getNodeId();
+
+    IOState.Type getDesiredState();
+
+    void setDesiredState(IOState.Type desiredState);
+
 }

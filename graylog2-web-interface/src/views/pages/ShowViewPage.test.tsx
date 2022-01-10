@@ -17,9 +17,9 @@
 import * as React from 'react';
 import { List } from 'immutable';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
+
 import mockAction from 'helpers/mocking/MockAction';
 import asMock from 'helpers/mocking/AsMock';
-
 import StreamsContext from 'contexts/StreamsContext';
 import { NotFoundErrorType } from 'logic/errors/ReportedErrors';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
@@ -48,7 +48,7 @@ jest.mock('views/stores/ViewManagementStore', () => ({
 
 jest.mock('views/stores/SearchStore', () => ({
   SearchActions: {
-    execute: mockAction(jest.fn()),
+    execute: mockAction(),
   },
 }));
 
@@ -133,7 +133,7 @@ describe('ShowViewPage', () => {
 
   it('passes loaded view to ViewDeserializer', async () => {
     asMock(ViewManagementActions.get).mockImplementation(mockAction(jest.fn(() => Promise.resolve(viewJson))));
-    SearchExecutionStateActions.setParameterValues = mockAction(jest.fn());
+    SearchExecutionStateActions.setParameterValues = mockAction();
     const search = Search.create().toBuilder().parameters([]).build();
 
     asMock(ViewDeserializer).mockImplementation((response: ViewJson) => {

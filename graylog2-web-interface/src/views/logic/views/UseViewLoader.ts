@@ -14,10 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import type * as React from 'react';
 import { useEffect, useState } from 'react';
 
-import { ViewLoaderFn } from 'views/logic/views/ViewLoader';
+import type { ViewLoaderFn } from 'views/logic/views/ViewLoader';
 import usePluginEntities from 'views/logic/usePluginEntities';
 
 const useViewLoader = (viewId: string, query: { [key: string]: any }, viewLoader: ViewLoaderFn): [boolean, React.ReactElement | undefined] => {

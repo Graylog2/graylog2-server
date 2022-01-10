@@ -29,6 +29,7 @@ import okhttp3.Request;
 import okhttp3.ResponseBody;
 import org.graylog2.plugin.Version;
 import org.graylog2.shared.utilities.ExceptionUtils;
+import org.graylog2.storage.SearchVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import retrofit2.Converter;
@@ -65,9 +66,9 @@ public class VersionProbe {
         this.delayBetweenAttempts = elasticsearchVersionProbeDelay;
     }
 
-    public Optional<Version> probe(final Collection<URI> hosts) {
+    public Optional<SearchVersion> probe(final Collection<URI> hosts) {
         try {
-            return RetryerBuilder.<Optional<Version>>newBuilder()
+            return RetryerBuilder.<Optional<SearchVersion>>newBuilder()
                     .retryIfResult(input -> !input.isPresent())
                     .retryIfExceptionOfType(IOException.class)
                     .retryIfRuntimeException()
@@ -80,7 +81,7 @@ public class VersionProbe {
         return Optional.empty();
     }
 
-    private Optional<Version> probeAllHosts(final Collection<URI> hosts) {
+    private Optional<SearchVersion> probeAllHosts(final Collection<URI> hosts) {
         return hosts
                 .stream()
                 .map(this::probeSingleHost)
@@ -89,7 +90,7 @@ public class VersionProbe {
                 .orElse(Optional.empty());
     }
 
-    private Optional<Version> probeSingleHost(URI host) {
+    private Optional<SearchVersion> probeSingleHost(URI host) {
         final Retrofit retrofit;
         try {
             retrofit = new Retrofit.Builder()
@@ -117,7 +118,6 @@ public class VersionProbe {
 
         return rootResponse(root, errorLogger)
                 .map(RootResponse::version)
-                .map(VersionResponse::number)
                 .flatMap(this::parseVersion);
     }
 
@@ -141,12 +141,12 @@ public class VersionProbe {
         return okHttpClient;
     }
 
-    private Optional<Version> parseVersion(String versionString) {
+    private Optional<SearchVersion> parseVersion(VersionResponse versionResponse) {
         try {
-            final com.github.zafarkhaja.semver.Version version = com.github.zafarkhaja.semver.Version.valueOf(versionString);
-            return Optional.of(new Version(version));
+            final com.github.zafarkhaja.semver.Version version = com.github.zafarkhaja.semver.Version.valueOf(versionResponse.number());
+            return Optional.of(SearchVersion.create(versionResponse.distribution(), new Version(version)));
         } catch (Exception e) {
-            LOG.error("Unable to parse version retrieved from Elasticsearch node: <{}>", versionString, e);
+            LOG.error("Unable to parse version retrieved from Elasticsearch node: <{}>", versionResponse.number(), e);
             return Optional.empty();
         }
     }

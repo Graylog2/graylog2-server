@@ -108,6 +108,14 @@ public class LookupTableService extends AbstractIdleService {
         this.adapterRefreshService = new LookupDataAdapterRefreshService(scheduler, liveTables);
     }
 
+    protected LookupTableConfigService getConfigService() {
+        return configService;
+    }
+
+    protected ScheduledExecutorService getScheduler() {
+        return scheduler;
+    }
+
     @Override
     protected void startUp() throws Exception {
         // Start refresh service and wait until it's running so the adapters can register themselves
@@ -160,7 +168,7 @@ public class LookupTableService extends AbstractIdleService {
         adapterRefreshService.stopAsync();
     }
 
-    private class DataAdapterListener extends Service.Listener {
+    protected class DataAdapterListener extends Service.Listener {
         private final DataAdapterDto dto;
         private final LookupDataAdapter adapter;
         private final CountDownLatch latch;
@@ -361,7 +369,7 @@ public class LookupTableService extends AbstractIdleService {
         scheduler.schedule(() -> deleted.lookupTableNames().forEach(liveTables::remove), 0, TimeUnit.SECONDS);
     }
 
-    private CountDownLatch createAndStartAdapters() {
+    protected CountDownLatch createAndStartAdapters() {
         final Map<DataAdapterDto, LookupDataAdapter> adapters = createAdapters(configService.loadAllDataAdapters());
         final CountDownLatch latch = new CountDownLatch(toIntExact(adapters.size()));
 
@@ -379,7 +387,7 @@ public class LookupTableService extends AbstractIdleService {
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
-    private LookupDataAdapter createAdapter(DataAdapterDto dto) {
+    protected LookupDataAdapter createAdapter(DataAdapterDto dto) {
         try {
             final LookupDataAdapter.Factory2 factory2 = adapterFactories2.get(dto.config().type());
             final LookupDataAdapter.Factory factory = adapterFactories.get(dto.config().type());
@@ -394,18 +402,23 @@ public class LookupTableService extends AbstractIdleService {
                 // TODO system notification
                 return null;
             }
-            adapter.addListener(new LoggingServiceListener(
-                            "Data Adapter",
-                            String.format(Locale.ENGLISH, "%s/%s [@%s]", dto.name(), dto.id(), objectId(adapter)),
-                            LOG),
-                    scheduler);
-            // Each adapter needs to be added to the refresh scheduler
-            adapter.addListener(adapterRefreshService.newServiceListener(adapter), scheduler);
+            addListeners(adapter, dto);
             return adapter;
         } catch (Exception e) {
             LOG.error("Couldn't create adapter <{}/{}>", dto.name(), dto.id(), e);
             return null;
         }
+    }
+
+    protected void addListeners(LookupDataAdapter adapter, DataAdapterDto dto) {
+
+        adapter.addListener(new LoggingServiceListener(
+                        "Data Adapter",
+                        String.format(Locale.ENGLISH, "%s/%s [@%s]", dto.name(), dto.id(), objectId(adapter)),
+                        LOG),
+                scheduler);
+        // Each adapter needs to be added to the refresh scheduler
+        adapter.addListener(adapterRefreshService.newServiceListener(adapter), scheduler);
     }
 
     private CountDownLatch createAndStartCaches() {

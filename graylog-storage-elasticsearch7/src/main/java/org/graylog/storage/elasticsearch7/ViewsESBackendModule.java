@@ -38,6 +38,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Cardinality;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Latest;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Max;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Min;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Percentile;
@@ -62,6 +63,7 @@ import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.buckets.ESValu
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.series.ESAverageHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.series.ESCardinalityHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.series.ESCountHandler;
+import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.series.ESLatestHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.series.ESMaxHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.series.ESMinHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.series.ESPercentilesHandler;
@@ -69,15 +71,20 @@ import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.series.ESStdDe
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.series.ESSumHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.series.ESSumOfSquaresHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.series.ESVarianceHandler;
-
-import static org.graylog.storage.elasticsearch7.Elasticsearch7Plugin.SUPPORTED_ES_VERSION;
+import org.graylog2.storage.SearchVersion;
 
 public class ViewsESBackendModule extends ViewsModule {
+    private final SearchVersion supportedSearchVersion;
+
+    public ViewsESBackendModule(SearchVersion supportedSearchVersion) {
+        this.supportedSearchVersion = supportedSearchVersion;
+    }
+
     @Override
     protected void configure() {
         install(new FactoryModuleBuilder().build(ESGeneratedQueryContext.Factory.class));
 
-        bindForVersion(SUPPORTED_ES_VERSION, new TypeLiteral<QueryBackend<? extends GeneratedQueryContext>>() {})
+        bindForVersion(supportedSearchVersion, new TypeLiteral<QueryBackend<? extends GeneratedQueryContext>>() {})
                 .to(ElasticsearchBackend.class);
 
         registerESSearchTypeHandler(MessageList.NAME, ESMessageList.class);
@@ -94,6 +101,7 @@ public class ViewsESBackendModule extends ViewsModule {
         registerPivotSeriesHandler(SumOfSquares.NAME, ESSumOfSquaresHandler.class);
         registerPivotSeriesHandler(Variance.NAME, ESVarianceHandler.class);
         registerPivotSeriesHandler(Percentile.NAME, ESPercentilesHandler.class);
+        registerPivotSeriesHandler(Latest.NAME, ESLatestHandler.class);
 
         registerPivotBucketHandler(Values.NAME, ESValuesHandler.class);
         registerPivotBucketHandler(Time.NAME, ESTimeHandler.class);
@@ -108,7 +116,7 @@ public class ViewsESBackendModule extends ViewsModule {
     }
 
     private LinkedBindingBuilder<ExportBackend> bindExportBackend() {
-        return bindExportBackend(SUPPORTED_ES_VERSION);
+        return bindExportBackend(supportedSearchVersion);
     }
 
     private MapBinder<String, ESPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation>> pivotBucketHandlerBinder() {

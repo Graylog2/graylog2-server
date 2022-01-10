@@ -24,18 +24,21 @@ import useCreateSavedSearch from 'views/logic/views/UseCreateSavedSearch';
 import withLocation from 'routing/withLocation';
 import type { Location } from 'routing/withLocation';
 import { loadNewViewForStream } from 'views/logic/views/Actions';
+import type { RawQuery } from 'views/logic/NormalizeSearchURLQueryParams';
+import normalizeSearchURLQueryParams from 'views/logic/NormalizeSearchURLQueryParams';
 
 import SearchPage from './SearchPage';
 
 type Props = {
-  location: Location,
+  location: Location<RawQuery>,
   params: {
     streamId?: string,
   },
 };
 
 const StreamSearchPage = ({ params: { streamId }, location: { query } }: Props) => {
-  const newView = useCreateSavedSearch(streamId);
+  const { timeRange, queryString } = normalizeSearchURLQueryParams(query);
+  const newView = useCreateSavedSearch(streamId, timeRange, queryString);
   const [loaded, HookComponent] = useLoadView(newView, query);
 
   const _loadNewView = useCallback(() => {

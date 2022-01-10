@@ -19,6 +19,10 @@ package org.graylog.plugins.views.search.rest;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.apache.shiro.subject.Subject;
+import org.graylog.plugins.views.search.Search;
+import org.graylog.plugins.views.search.SearchDomain;
+import org.graylog.plugins.views.search.db.SearchDbService;
+import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.security.UserContext;
@@ -36,6 +40,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
@@ -48,6 +53,8 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -72,6 +79,9 @@ public class ViewsResourceTest {
     private User currentUser;
 
     @Mock
+    private SearchUser searchUser;
+
+    @Mock
     private ViewService viewService;
 
     @Mock
@@ -83,11 +93,14 @@ public class ViewsResourceTest {
     @Mock
     private UserService userService;
 
+    @Mock
+    private SearchDomain searchDomain;
+
     private ViewsResource viewsResource;
 
     class ViewsTestResource extends ViewsResource {
-        ViewsTestResource(ViewService viewService, ClusterEventBus clusterEventBus, UserService userService) {
-            super(viewService, clusterEventBus);
+        ViewsTestResource(ViewService viewService, ClusterEventBus clusterEventBus, UserService userService, SearchDomain searchDomain) {
+            super(viewService, clusterEventBus, searchDomain);
             this.userService = userService;
         }
 
@@ -105,8 +118,11 @@ public class ViewsResourceTest {
 
     @Before
     public void setUp() throws Exception {
-        this.viewsResource = new ViewsTestResource(viewService, clusterEventBus, userService);
-        when(subject.isPermitted("dashboards:create")).thenReturn(true);
+        this.viewsResource = new ViewsTestResource(viewService, clusterEventBus, userService, searchDomain);
+        when(searchUser.canCreateDashboards()).thenReturn(true);
+        final Search search = mock(Search.class, RETURNS_DEEP_STUBS);
+        when(search.queries()).thenReturn(ImmutableSet.of());
+        when(searchDomain.getForUser(eq("6141d457d3a6b9d73c8ac55a"), eq(searchUser))).thenReturn(Optional.of(search));
     }
 
     @Test
@@ -115,6 +131,7 @@ public class ViewsResourceTest {
 
         when(view.toBuilder()).thenReturn(builder);
         when(view.type()).thenReturn(ViewDTO.Type.DASHBOARD);
+        when(view.searchId()).thenReturn("6141d457d3a6b9d73c8ac55a");
         when(builder.owner(any())).thenReturn(builder);
         when(builder.build()).thenReturn(view);
 
@@ -123,10 +140,10 @@ public class ViewsResourceTest {
         final UserContext userContext = mock(UserContext.class);
         when(userContext.getUser()).thenReturn(testUser);
         when(userContext.getUserId()).thenReturn("testuser");
-        when(currentUser.getName()).thenReturn("testuser");
         when(currentUser.isLocalAdmin()).thenReturn(true);
+        when(searchUser.username()).thenReturn("testuser");
 
-        this.viewsResource.create(view, userContext);
+        this.viewsResource.create(view, userContext, searchUser);
 
         final ArgumentCaptor<String> ownerCaptor = ArgumentCaptor.forClass(String.class);
         verify(builder, times(1)).owner(ownerCaptor.capture());
@@ -137,28 +154,28 @@ public class ViewsResourceTest {
     public void shouldNotCreateADashboardWithoutPermission() {
         when(view.type()).thenReturn(ViewDTO.Type.DASHBOARD);
 
-        when(subject.isPermitted("dashboards:create")).thenReturn(false);
+        when(searchUser.canCreateDashboards()).thenReturn(false);
 
-        assertThatThrownBy(() -> this.viewsResource.create(view, null))
+        assertThatThrownBy(() -> this.viewsResource.create(view, null, searchUser))
                 .isInstanceOf(ForbiddenException.class);
     }
 
     @Test
     public void invalidObjectIdReturnsViewNotFoundException() {
         expectedException.expect(NotFoundException.class);
-        this.viewsResource.get("invalid");
+        this.viewsResource.get("invalid", searchUser);
     }
 
     @Test
     public void deletingDashboardTriggersEvent() {
         final String viewId = "foobar";
-        when(subject.isPermitted(ViewsRestPermissions.VIEW_DELETE + ":" + viewId)).thenReturn(true);
+        when(searchUser.canDeleteView(view)).thenReturn(true);
         when(view.type()).thenReturn(ViewDTO.Type.DASHBOARD);
         when(view.id()).thenReturn(viewId);
         when(viewService.get(viewId)).thenReturn(Optional.of(view));
         when(userService.loadAll()).thenReturn(Collections.emptyList());
 
-        this.viewsResource.delete(viewId);
+        this.viewsResource.delete(viewId, searchUser);
 
         final ArgumentCaptor<DashboardDeletedEvent> eventCaptor = ArgumentCaptor.forClass(DashboardDeletedEvent.class);
         verify(clusterEventBus, times(1)).post(eventCaptor.capture());

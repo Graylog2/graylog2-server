@@ -17,10 +17,11 @@
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import Immutable, { Map as MockMap } from 'immutable';
-import { MockStore, asMock } from 'helpers/mocking';
 
+import { MockStore, asMock } from 'helpers/mocking';
 import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
-import View, { ViewType } from 'views/logic/views/View';
+import type { ViewType } from 'views/logic/views/View';
+import View from 'views/logic/views/View';
 import { WidgetStore } from 'views/stores/WidgetStore';
 
 import Query from './Query';

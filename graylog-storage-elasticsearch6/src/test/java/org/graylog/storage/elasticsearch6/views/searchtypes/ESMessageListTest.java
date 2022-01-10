@@ -20,7 +20,8 @@ import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.revinate.assertj.json.JsonPathAssert;
 import io.searchbox.core.SearchResult;
-import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.graylog.plugins.views.search.ParameterProvider;
+import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.SearchJob;
@@ -81,7 +82,7 @@ public class ESMessageListTest {
 
     @Test
     public void appliesDecoratorsToQueryStringIfHighlightingActivated() {
-        final QueryStringDecorator queryStringDecorator = (String queryString, SearchJob job, Query query, Set<QueryResult> results) -> "Foobar!";
+        final QueryStringDecorator queryStringDecorator = (String queryString, ParameterProvider job, Query query, Set<QueryResult> results) -> "Foobar!";
 
         final MessageList messageList = someMessageList();
 

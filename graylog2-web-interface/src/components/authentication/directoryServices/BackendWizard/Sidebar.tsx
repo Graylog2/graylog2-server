@@ -17,15 +17,16 @@
 import * as React from 'react';
 import { useState, useContext, useEffect } from 'react';
 import styled from 'styled-components';
-import { $PropertyType } from 'utility-types';
+import type { $PropertyType } from 'utility-types';
 
-import { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
+import type { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
 import { PanelGroup, Panel } from 'components/bootstrap';
-import { Step } from 'components/common/Wizard';
+import type { Step } from 'components/common/Wizard';
 
 import { STEP_KEY as SERVER_CONFIG_KEY } from './ServerConfigStep';
 import { STEP_KEY as USER_SYNC_KEY } from './UserSyncStep';
-import BackendWizardContext, { WizardFormValues } from './BackendWizardContext';
+import type { WizardFormValues } from './BackendWizardContext';
+import BackendWizardContext from './BackendWizardContext';
 import ServerConnectionTest from './ServerConnectionTest';
 import UserLoginTest from './UserLoginTest';
 

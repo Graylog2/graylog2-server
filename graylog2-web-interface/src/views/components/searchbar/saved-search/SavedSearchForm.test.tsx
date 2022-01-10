@@ -16,13 +16,14 @@
  */
 import React from 'react';
 import { mount } from 'wrappedEnzyme';
+
 import mockComponent from 'helpers/mocking/MockComponent';
 
 import 'helpers/mocking/react-dom_mock';
 import SavedSearchForm from './SavedSearchForm';
 
 jest.mock('react-overlays', () => ({ Position: mockComponent('MockPosition') }));
-jest.mock('react-portal', () => ({ Portal: mockComponent('MockPortal') }));
+jest.mock('components/common/Portal', () => ({ children }) => (children));
 
 describe('SavedSearchForm', () => {
   describe('render the SavedSearchForm', () => {

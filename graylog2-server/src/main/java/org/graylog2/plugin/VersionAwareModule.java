@@ -19,21 +19,22 @@ package org.graylog2.plugin;
 import com.google.inject.TypeLiteral;
 import com.google.inject.binder.LinkedBindingBuilder;
 import com.google.inject.multibindings.MapBinder;
+import org.graylog2.storage.SearchVersion;
 
 public abstract class VersionAwareModule extends PluginModule {
-    protected  <T> LinkedBindingBuilder<T> bindForVersion(Version supportedVersion, Class<T> interfaceClass) {
+    protected  <T> LinkedBindingBuilder<T> bindForVersion(SearchVersion supportedVersion, Class<T> interfaceClass) {
         return mapBinder(interfaceClass).addBinding(supportedVersion);
     }
 
-    private <T> MapBinder<Version, T> mapBinder(Class<T> interfaceClass) {
-        return MapBinder.newMapBinder(binder(), Version.class, interfaceClass);
+    private <T> MapBinder<SearchVersion, T> mapBinder(Class<T> interfaceClass) {
+        return MapBinder.newMapBinder(binder(), SearchVersion.class, interfaceClass);
     }
 
-    protected  <T> LinkedBindingBuilder<T> bindForVersion(Version supportedVersion, TypeLiteral<T> interfaceClass) {
+    protected  <T> LinkedBindingBuilder<T> bindForVersion(SearchVersion supportedVersion, TypeLiteral<T> interfaceClass) {
         return mapBinder(interfaceClass).addBinding(supportedVersion);
     }
 
-    private <T> MapBinder<Version, T> mapBinder(TypeLiteral<T> interfaceClass) {
-        return MapBinder.newMapBinder(binder(), new TypeLiteral<Version>() {}, interfaceClass);
+    private <T> MapBinder<SearchVersion, T> mapBinder(TypeLiteral<T> interfaceClass) {
+        return MapBinder.newMapBinder(binder(), new TypeLiteral<SearchVersion>() {}, interfaceClass);
     }
 }

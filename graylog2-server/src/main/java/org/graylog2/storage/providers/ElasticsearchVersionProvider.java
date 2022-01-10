@@ -16,8 +16,8 @@
  */
 package org.graylog2.storage.providers;
 
-import org.graylog2.plugin.Version;
 import org.graylog2.storage.versionprobe.ElasticsearchProbeException;
+import org.graylog2.storage.SearchVersion;
 import org.graylog2.storage.versionprobe.VersionProbe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,21 +33,21 @@ import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 @Singleton
-public class ElasticsearchVersionProvider implements Provider<Version> {
+public class ElasticsearchVersionProvider implements Provider<SearchVersion> {
     private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchVersionProvider.class);
     public static final String NO_HOST_REACHABLE_ERROR = "Unable to probe any host for Elasticsearch version";
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    private final Optional<Version> versionOverride;
+    private final Optional<SearchVersion> versionOverride;
     private final List<URI> elasticsearchHosts;
     private final VersionProbe versionProbe;
-    private final AtomicCache<Optional<Version>> cachedVersion;
+    private final AtomicCache<Optional<SearchVersion>> cachedVersion;
 
     @Inject
-    public ElasticsearchVersionProvider(@Named("elasticsearch_version") @Nullable Version versionOverride,
+    public ElasticsearchVersionProvider(@Named("elasticsearch_version") @Nullable SearchVersion versionOverride,
                                         @Named("elasticsearch_hosts") List<URI> elasticsearchHosts,
                                         VersionProbe versionProbe,
-                                        AtomicCache<Optional<Version>> cachedVersion) {
+                                        AtomicCache<Optional<SearchVersion>> cachedVersion) {
 
         this.versionOverride = Optional.ofNullable(versionOverride);
         this.elasticsearchHosts = elasticsearchHosts;
@@ -56,17 +56,17 @@ public class ElasticsearchVersionProvider implements Provider<Version> {
     }
 
     @Override
-    public Version get() {
+    public SearchVersion get() {
         if (this.versionOverride.isPresent()) {
-            final Version explicitVersion = versionOverride.get();
+            final SearchVersion explicitVersion = versionOverride.get();
             LOG.info("Elasticsearch version set to " + explicitVersion + " - disabling version probe.");
             return explicitVersion;
         }
 
         try {
             return this.cachedVersion.get(() -> {
-                final Optional<Version> probedVersion = this.versionProbe.probe(this.elasticsearchHosts);
-                probedVersion.ifPresent(version -> LOG.info("Elasticsearch cluster is running v" + version));
+                final Optional<SearchVersion> probedVersion = this.versionProbe.probe(this.elasticsearchHosts);
+                probedVersion.ifPresent(version -> LOG.info("Elasticsearch cluster is running " + version));
                 return probedVersion;
             })
                     .orElseThrow(() -> new ElasticsearchProbeException(NO_HOST_REACHABLE_ERROR + "!"));

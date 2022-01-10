@@ -18,17 +18,20 @@ package org.graylog.elasticsearch.e2e;
 
 import io.restassured.specification.RequestSpecification;
 import org.graylog.testing.completebackend.GraylogBackend;
+import org.graylog.testing.containermatrix.MongodbServer;
+import org.graylog.testing.containermatrix.SearchServer;
+import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
+import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.graylog.testing.utils.GelfInputUtils;
 import org.graylog.testing.utils.SearchUtils;
-import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.testing.graylognode.NodeContainerConfig.GELF_HTTP_PORT;
 
-abstract class ElasticsearchE2E {
-
+@ContainerMatrixTestsConfiguration
+public class ElasticsearchE2E {
     private final GraylogBackend sut;
     private final RequestSpecification requestSpec;
 
@@ -37,18 +40,23 @@ abstract class ElasticsearchE2E {
         this.requestSpec = requestSpec;
     }
 
-    @Test
+    @ContainerMatrixTest
     void inputMessageCanBeSearched() {
         int mappedPort = sut.mappedPortFor(GELF_HTTP_PORT);
 
         GelfInputUtils.createGelfHttpInput(mappedPort, GELF_HTTP_PORT, requestSpec);
 
         GelfInputUtils.postMessage(mappedPort,
-                "{\"short_message\":\"Hello there\", \"host\":\"example.org\", \"facility\":\"test\"}",
+                "{\"short_message\":\"kram\", \"host\":\"example.org\", \"facility\":\"test\"}",
                 requestSpec);
 
         List<String> messages = SearchUtils.searchForAllMessages(requestSpec);
+        assertThat(messages).doesNotContain("Hello there");
 
-        assertThat(messages).containsExactly("Hello there");
+        GelfInputUtils.postMessage(mappedPort,
+                "{\"short_message\":\"Hello there\", \"host\":\"example.org\", \"facility\":\"test\"}",
+                requestSpec);
+
+        assertThat(SearchUtils.waitForMessage(requestSpec, "Hello there")).isTrue();
     }
 }

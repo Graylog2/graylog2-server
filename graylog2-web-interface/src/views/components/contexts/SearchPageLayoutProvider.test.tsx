@@ -16,16 +16,16 @@
  */
 import * as React from 'react';
 import { render, fireEvent } from 'wrappedTestingLibrary';
+
 import asMock from 'helpers/mocking/AsMock';
 import { MockStore } from 'helpers/mocking';
-
 import CurrentUserProvider from 'contexts/CurrentUserProvider';
 import CurrentUserPreferencesProvider from 'contexts/CurrentUserPreferencesProvider';
 import Store from 'logic/local-storage/Store';
 import View from 'views/logic/views/View';
 import CurrentViewTypeProvider from 'views/components/views/CurrentViewTypeProvider';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
-import { UserJSON } from 'logic/users/User';
+import type { UserJSON } from 'logic/users/User';
 import { PreferencesActions } from 'stores/users/PreferencesStore';
 
 import SearchPageLayoutContext from './SearchPageLayoutContext';

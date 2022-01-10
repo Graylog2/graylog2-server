@@ -124,8 +124,7 @@ class FilterPreviewContainer extends React.Component {
 export default connect(FilterPreviewContainer, {
   filterPreview: FilterPreviewStore,
   currentUser: CurrentUserStore,
-},
-({ currentUser, ...otherProps }) => ({
+}, ({ currentUser, ...otherProps }) => ({
   ...otherProps,
   currentUser: currentUser.currentUser,
 }));

@@ -15,9 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import asMock from 'helpers/mocking/AsMock';
-
 import { QueriesActions } from 'views/stores/QueriesStore';
-import { ViewStore, ViewStoreState } from 'views/stores/ViewStore';
+import type { ViewStoreState } from 'views/stores/ViewStore';
+import { ViewStore } from 'views/stores/ViewStore';
 
 import NewQueryActionHandler from './NewQueryActionHandler';
 import View from './views/View';

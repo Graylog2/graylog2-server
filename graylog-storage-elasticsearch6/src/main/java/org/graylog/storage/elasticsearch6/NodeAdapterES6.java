@@ -21,6 +21,7 @@ import io.searchbox.client.JestResult;
 import io.searchbox.core.Ping;
 import org.graylog2.indexer.cluster.NodeAdapter;
 import org.graylog.storage.elasticsearch6.jest.JestUtils;
+import org.graylog2.storage.SearchVersion;
 
 import javax.inject.Inject;
 import java.util.Optional;
@@ -34,9 +35,11 @@ public class NodeAdapterES6 implements NodeAdapter {
     }
 
     @Override
-    public Optional<String> version() {
+    public Optional<SearchVersion> version() {
         final Ping request = new Ping.Builder().build();
         final JestResult jestResult = JestUtils.execute(jestClient, request, () -> "Unable to retrieve Elasticsearch version");
-        return Optional.ofNullable(jestResult.getJsonObject().path("version").path("number").asText(null));
+        return Optional.ofNullable(jestResult.getJsonObject().path("version").path("number").asText(null))
+                .map(this::parseVersion)
+                .map(SearchVersion::elasticsearch);
     }
 }

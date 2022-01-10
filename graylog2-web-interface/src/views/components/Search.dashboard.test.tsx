@@ -17,11 +17,11 @@
 import * as React from 'react';
 import Immutable from 'immutable';
 import { render, screen } from 'wrappedTestingLibrary';
+
 import { StoreMock as MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
 import mockComponent from 'helpers/mocking/MockComponent';
 import mockAction from 'helpers/mocking/MockAction';
-
 import { StreamsActions } from 'views/stores/StreamsStore';
 import { WidgetStore } from 'views/stores/WidgetStore';
 import { QueryFiltersStore } from 'views/stores/QueryFiltersStore';
@@ -31,6 +31,7 @@ import { ViewStore } from 'views/stores/ViewStore';
 import { FieldTypesActions } from 'views/stores/FieldTypesStore';
 import { SearchMetadataStore } from 'views/stores/SearchMetadataStore';
 import View from 'views/logic/views/View';
+import type { SearchExecutionResult } from 'views/actions/SearchActions';
 
 import Search from './Search';
 import WidgetFocusProvider from './contexts/WidgetFocusProvider';
@@ -38,7 +39,6 @@ import WidgetFocusContext from './contexts/WidgetFocusContext';
 
 jest.mock('views/stores/ViewMetadataStore', () => ({
   ViewMetadataStore: MockStore(
-    ['listen', () => jest.fn()],
     'get',
     ['getInitialState', () => ({
       activeQuery: 'beef-dead',
@@ -106,10 +106,9 @@ describe('Dashboard Search', () => {
   beforeEach(() => {
     WidgetStore.listen = jest.fn(() => jest.fn());
     QueryFiltersStore.listen = jest.fn(() => jest.fn());
-    // @ts-ignore
-    SearchActions.execute = jest.fn(() => jest.fn());
-    StreamsActions.refresh = mockAction(jest.fn());
-    SearchConfigActions.refresh = mockAction(jest.fn());
+    SearchActions.execute = mockAction(jest.fn(() => Promise.resolve({} as SearchExecutionResult)));
+    StreamsActions.refresh = mockAction();
+    SearchConfigActions.refresh = mockAction();
 
     ViewStore.getInitialState = jest.fn(() => ({
       view: View.create().toBuilder().type(View.Type.Dashboard).build(),
@@ -120,7 +119,7 @@ describe('Dashboard Search', () => {
 
     FieldTypesActions.all = mockAction(jest.fn(async () => {}));
     SearchMetadataStore.listen = jest.fn(() => jest.fn());
-    SearchActions.refresh = mockAction(jest.fn(() => Promise.resolve()));
+    SearchActions.refresh = mockAction();
 
     asMock(WidgetFocusProvider as React.FunctionComponent).mockImplementation(({ children }) => (
       <WidgetFocusContext.Provider value={{

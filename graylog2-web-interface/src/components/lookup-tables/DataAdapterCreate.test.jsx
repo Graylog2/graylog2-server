@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import { mount } from 'wrappedEnzyme';
+
 import mockComponent from 'helpers/mocking/MockComponent';
 
 import DataAdapterCreate from './DataAdapterCreate';

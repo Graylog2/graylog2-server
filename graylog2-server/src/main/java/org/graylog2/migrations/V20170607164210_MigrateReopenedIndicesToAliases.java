@@ -17,7 +17,6 @@
 package org.graylog2.migrations;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.github.zafarkhaja.semver.Version;
 import com.google.common.collect.ImmutableSet;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.IndexSet;
@@ -25,6 +24,7 @@ import org.graylog2.indexer.MongoIndexSet;
 import org.graylog2.indexer.cluster.Node;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.indexer.indices.Indices;
+import org.graylog2.storage.SearchVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +36,9 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+
+import static org.graylog2.storage.SearchVersion.Distribution.*;
+import static org.graylog2.storage.SearchVersion.Distribution.OPENSEARCH;
 
 public class V20170607164210_MigrateReopenedIndicesToAliases extends Migration {
     private static final Logger LOG = LoggerFactory.getLogger(V20170607164210_MigrateReopenedIndicesToAliases.class);
@@ -77,11 +80,11 @@ public class V20170607164210_MigrateReopenedIndicesToAliases extends Migration {
                 .map(mongoIndexSetFactory::create)
                 .flatMap(indexSet -> getReopenedIndices(indexSet).stream())
                 .peek(indexName -> LOG.debug("Marking index {} to be reopened using alias.", indexName))
-            .forEach(indices::markIndexReopened);
+                .forEach(indices::markIndexReopened);
     }
 
     private Set<String> getReopenedIndices(final Collection<String> indices) {
-        final Version elasticsearchVersion = node.getVersion().orElseThrow(() -> new ElasticsearchException("Unable to retrieve Elasticsearch version."));
+        final SearchVersion elasticsearchVersion = node.getVersion().orElseThrow(() -> new ElasticsearchException("Unable to retrieve Elasticsearch version."));
 
         final JsonNode clusterStateJson = clusterState.getForIndices(indices);
 
@@ -115,14 +118,15 @@ public class V20170607164210_MigrateReopenedIndicesToAliases extends Migration {
         return reopenedIndices.build();
     }
 
-    private boolean checkForReopened(@Nonnull JsonNode indexSettings, Version elasticsearchVersion) {
+    private boolean checkForReopened(@Nonnull JsonNode indexSettings, SearchVersion searchVersion) {
         final JsonNode settings;
-        if (elasticsearchVersion.satisfies(">=2.1.0 & <5.0.0")) {
+        if (searchVersion.satisfies(ELASTICSEARCH, ">=2.1.0 & <5.0.0")) {
             settings = indexSettings;
-        } else if (elasticsearchVersion.satisfies("^5.0.0 | ^6.0.0 | ^7.0.0")) {
+        } else if (searchVersion.satisfies(ELASTICSEARCH, "^5.0.0 | ^6.0.0 | ^7.0.0") ||
+                searchVersion.satisfies(OPENSEARCH, "^1.0.0")) {
             settings = indexSettings.path("archived");
         } else {
-            throw new ElasticsearchException("Unsupported Elasticsearch version: " + elasticsearchVersion);
+            throw new ElasticsearchException("Unsupported search version: " + searchVersion);
         }
 
         // if this is a missing node, asBoolean() returns false

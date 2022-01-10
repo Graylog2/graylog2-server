@@ -17,24 +17,22 @@
 import React from 'react';
 import Immutable from 'immutable';
 import { render, screen } from 'wrappedTestingLibrary';
+
 import { MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
-
 import Search from 'views/logic/search/Search';
 import Widget from 'views/logic/widgets/Widget';
 import TimeLocalizeContext from 'contexts/TimeLocalizeContext';
-import { GlobalOverrideStore, GlobalOverrideStoreState } from 'views/stores/GlobalOverrideStore';
+import type { GlobalOverrideStoreState } from 'views/stores/GlobalOverrideStore';
+import { GlobalOverrideStore } from 'views/stores/GlobalOverrideStore';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
-import { SearchStore, SearchStoreState } from 'views/stores/SearchStore';
+import type { SearchStoreState } from 'views/stores/SearchStore';
+import { SearchStore } from 'views/stores/SearchStore';
 
 import TimerangeInfo from './TimerangeInfo';
 
 jest.mock('views/stores/GlobalOverrideStore', () => ({
-  GlobalOverrideStore: MockStore(
-    ['listen', () => jest.fn()],
-    'get',
-    ['getInitialState', jest.fn()],
-  ),
+  GlobalOverrideStore: MockStore('get'),
 }));
 
 const mockSearchStoreState = (storeState: {} = {}): {} => ({
@@ -60,7 +58,6 @@ const mockSearchStoreState = (storeState: {} = {}): {} => ({
 
 jest.mock('views/stores/SearchStore', () => ({
   SearchStore: MockStore(
-    ['listen', () => jest.fn()],
     'get',
     ['getInitialState', jest.fn(() => mockSearchStoreState())],
   ),

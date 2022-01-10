@@ -30,11 +30,10 @@ import org.graylog2.alerts.FormattedEmailAlertSender;
 import org.graylog2.bindings.providers.ClusterEventBusProvider;
 import org.graylog2.bindings.providers.DefaultSecurityManagerProvider;
 import org.graylog2.bindings.providers.DefaultStreamProvider;
-import org.graylog2.bindings.providers.MongoConnectionProvider;
 import org.graylog2.bindings.providers.SystemJobFactoryProvider;
 import org.graylog2.bindings.providers.SystemJobManagerProvider;
 import org.graylog2.cluster.ClusterConfigServiceImpl;
-import org.graylog2.database.MongoConnection;
+import org.graylog2.cluster.leader.LeaderElectionModule;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.grok.GrokModule;
 import org.graylog2.grok.GrokPatternRegistry;
@@ -71,7 +70,7 @@ import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
 import org.graylog2.shared.inputs.PersistedInputs;
 import org.graylog2.shared.messageq.MessageQueueModule;
 import org.graylog2.shared.metrics.jersey2.MetricsDynamicBinding;
-import org.graylog2.shared.security.RestrictToMasterFeature;
+import org.graylog2.shared.security.RestrictToLeaderFeature;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.graylog2.streams.DefaultStreamChangeHandler;
 import org.graylog2.streams.StreamRouter;
@@ -94,29 +93,39 @@ import javax.ws.rs.ext.ExceptionMapper;
 
 public class ServerBindings extends Graylog2Module {
     private final Configuration configuration;
+    private final boolean isMigrationCommand;
 
-    public ServerBindings(Configuration configuration) {
+    public ServerBindings(Configuration configuration, boolean isMigrationCommand) {
 
         this.configuration = configuration;
+        this.isMigrationCommand = isMigrationCommand;
     }
 
     @Override
     protected void configure() {
         bindInterfaces();
         bindSingletons();
+
+        if (isMigrationCommand) {
+            // If we are only running migrations, disable the journal
+            configuration.setMessageJournalEnabled(false);
+        }
         install(new MessageQueueModule(configuration));
         bindProviders();
         bindFactoryModules();
         bindDynamicFeatures();
         bindExceptionMappers();
         bindAdditionalJerseyComponents();
-        bindEventBusListeners();
+        if (!isMigrationCommand) {
+            bindEventBusListeners();
+        }
         install(new AuthenticatingRealmModule(configuration));
         install(new AuthorizationOnlyRealmModule());
         bindSearchResponseDecorators();
         install(new GrokModule());
         install(new LookupModule(configuration));
         install(new FieldTypesModule());
+        install(new LeaderElectionModule(configuration));
 
         // Just to create the binders so they are present in the injector. Prevents a server startup error when no
         // outputs are bound that implement MessageOutput.Factory2.
@@ -148,7 +157,6 @@ public class ServerBindings extends Graylog2Module {
     }
 
     private void bindSingletons() {
-        bind(MongoConnection.class).toProvider(MongoConnectionProvider.class);
         bind(SystemJobManager.class).toProvider(SystemJobManagerProvider.class);
         bind(DefaultSecurityManager.class).toProvider(DefaultSecurityManagerProvider.class).asEagerSingleton();
         bind(SystemJobFactory.class).toProvider(SystemJobFactoryProvider.class);
@@ -175,7 +183,7 @@ public class ServerBindings extends Graylog2Module {
     private void bindDynamicFeatures() {
         final Multibinder<Class<? extends DynamicFeature>> dynamicFeatures = jerseyDynamicFeatureBinder();
         dynamicFeatures.addBinding().toInstance(MetricsDynamicBinding.class);
-        dynamicFeatures.addBinding().toInstance(RestrictToMasterFeature.class);
+        dynamicFeatures.addBinding().toInstance(RestrictToLeaderFeature.class);
     }
 
     private void bindExceptionMappers() {

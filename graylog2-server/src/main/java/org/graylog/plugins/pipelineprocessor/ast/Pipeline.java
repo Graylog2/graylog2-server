@@ -24,8 +24,10 @@ import com.google.auto.value.extension.memoized.Memoized;
 import com.google.common.collect.Sets;
 import org.graylog2.shared.metrics.MetricUtils;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.SortedSet;
+import java.util.stream.Stream;
 
 @AutoValue
 public abstract class Pipeline {
@@ -85,6 +87,13 @@ public abstract class Pipeline {
         if (executed != null) {
             executed.mark();
         }
+    }
+
+    public boolean containsRule(@Nonnull String ruleName) {
+        return stages()
+                .stream()
+                .flatMap(stage -> stage.ruleReferences() == null ? Stream.empty() : stage.ruleReferences().stream())
+                .anyMatch(ruleName::equals);
     }
 
     @AutoValue.Builder

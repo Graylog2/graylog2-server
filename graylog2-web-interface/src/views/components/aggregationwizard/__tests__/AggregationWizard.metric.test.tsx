@@ -19,9 +19,10 @@ import * as Immutable from 'immutable';
 import { act, fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
 import userEvent from '@testing-library/user-event';
-import { PluginRegistration, PluginStore } from 'graylog-web-plugin/plugin';
-import { MockStore } from 'helpers/mocking';
+import type { PluginRegistration } from 'graylog-web-plugin/plugin';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import { MockStore } from 'helpers/mocking';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';
 import Series from 'views/logic/aggregationbuilder/Series';

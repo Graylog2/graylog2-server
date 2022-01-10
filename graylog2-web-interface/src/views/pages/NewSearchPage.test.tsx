@@ -17,9 +17,9 @@
 import * as React from 'react';
 import { act } from 'react-dom/test-utils';
 import { render, waitFor, fireEvent } from 'wrappedTestingLibrary';
+
 import asMock from 'helpers/mocking/AsMock';
 import { MockStore } from 'helpers/mocking';
-
 import { processHooks } from 'views/logic/views/ViewLoader';
 import { ViewActions } from 'views/stores/ViewStore';
 import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
@@ -112,7 +112,7 @@ describe('NewSearchPage', () => {
 
       await waitFor(() => expect(ViewActions.create).toBeCalledTimes(1));
 
-      expect(ViewActions.create).toHaveBeenCalledWith(View.Type.Search, undefined);
+      expect(ViewActions.create).toHaveBeenCalledWith(View.Type.Search, undefined, undefined, undefined);
     });
 
     it('should process hooks with provided location query', async () => {

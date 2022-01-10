@@ -15,12 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { mapValues } from 'lodash';
-import { MessageResult, SearchTypeResults } from 'views/types';
 
+import type { MessageResult, SearchTypeResults } from 'views/types';
 import searchTypeDefinition from 'views/logic/SearchType';
-import { TimeRange } from 'views/logic/queries/Query';
+import type { TimeRange } from 'views/logic/queries/Query';
 
-import SearchError, { SearchErrorResponse } from './SearchError';
+import type { SearchErrorResponse } from './SearchError';
+import SearchError from './SearchError';
 
 type Results = {
   searchTypes: SearchTypeResults,
@@ -29,7 +30,7 @@ type Results = {
 const _findMessages = (results: Results): (MessageResult | undefined) => {
   return Object.keys(results.searchTypes)
     .map((id) => results.searchTypes[id])
-    .find((searchType) => searchType.type.toLocaleLowerCase() === 'messages') as MessageResult;
+    .find((searchType) => searchType.type.toLowerCase() === 'messages') as MessageResult;
 };
 
 const _searchTypePlugin = (type: string) => {

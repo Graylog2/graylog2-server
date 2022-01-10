@@ -24,10 +24,10 @@ import { Col, Row } from 'components/bootstrap';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
 import MessageDetail from 'views/components/messagelist/MessageDetail';
 import withParams from 'routing/withParams';
-import { Stream } from 'views/stores/StreamsStore';
-import { Input } from 'components/messageloaders/Types';
+import type { Stream } from 'views/stores/StreamsStore';
+import type { Input } from 'components/messageloaders/Types';
 import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
-import { Message } from 'views/components/messagelist/Types';
+import type { Message } from 'views/components/messagelist/Types';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import WindowDimensionsContextProvider from 'contexts/WindowDimensionsContextProvider';
 import StreamsStore from 'stores/streams/StreamsStore';
@@ -101,6 +101,11 @@ const FieldTypesProvider = ({ streams, timestamp, children }: FieldTypesProvider
   );
 };
 
+type MessageFields = {
+  streams: Array<string>,
+  timestamp: string,
+};
+
 const ShowMessagePage = ({ params: { index, messageId } }: Props) => {
   if (!index || !messageId) {
     throw new Error('index and messageId need to be specified!');
@@ -117,14 +122,15 @@ const ShowMessagePage = ({ params: { index, messageId } }: Props) => {
     && allStreams !== undefined), [message, streams, inputs, allStreams]);
 
   if (isLoaded) {
-    const { streams: messageStreams, timestamp } = message.fields;
+    const { streams: messageStreams, timestamp } = message.fields as MessageFields;
+    const fieldTypesStreams = messageStreams.filter((streamId) => streams.has(streamId));
 
     return (
       <DocumentTitle title={`Message ${messageId} on ${index}`}>
         <Row className="content" id="sticky-augmentations-container">
           <Col md={12}>
             <WindowDimensionsContextProvider>
-              <FieldTypesProvider streams={messageStreams as Array<string>} timestamp={timestamp as string}>
+              <FieldTypesProvider streams={fieldTypesStreams} timestamp={timestamp}>
                 <InteractiveContext.Provider value={false}>
                   <MessageDetail fields={Immutable.List()}
                                  streams={streams}

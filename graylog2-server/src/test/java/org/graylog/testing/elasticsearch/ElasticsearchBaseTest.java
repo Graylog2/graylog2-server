@@ -16,8 +16,8 @@
  */
 package org.graylog.testing.elasticsearch;
 
-import com.github.zafarkhaja.semver.Version;
 import org.graylog2.indexer.MessageIndexTemplateProvider;
+import org.graylog2.storage.SearchVersion;
 import org.junit.Before;
 import org.junit.Rule;
 
@@ -50,7 +50,7 @@ public abstract class ElasticsearchBaseTest {
         addIndexTemplates(getGraylogDefaultMessageTemplates(elasticsearch().version()));
     }
 
-    private static Map<String, Map<String, Object>> getGraylogDefaultMessageTemplates(Version version) {
+    private static Map<String, Map<String, Object>> getGraylogDefaultMessageTemplates(SearchVersion version) {
         final Map<String, Object> template =
                 new MessageIndexTemplateProvider().create(version, null)
                         .messageTemplate("*", "standard", -1);
@@ -65,7 +65,7 @@ public abstract class ElasticsearchBaseTest {
         }
     }
 
-    protected abstract ElasticsearchInstance elasticsearch();
+    protected abstract SearchServerInstance elasticsearch();
 
     /**
      * Returns a custom Elasticsearch client with a bunch of utility methods.
@@ -88,7 +88,7 @@ public abstract class ElasticsearchBaseTest {
         elasticsearch().importFixtureResource(resourcePath, getClass());
     }
 
-    protected Version elasticsearchVersion() {
+    protected SearchVersion elasticsearchVersion() {
         return elasticsearch().version();
     }
 }

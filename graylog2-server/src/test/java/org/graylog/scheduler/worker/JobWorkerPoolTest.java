@@ -20,18 +20,28 @@ import com.codahale.metrics.MetricRegistry;
 import com.google.common.util.concurrent.Uninterruptibles;
 import org.assertj.core.api.AbstractThrowableAssert;
 import org.graylog2.system.shutdown.GracefulShutdownService;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
+@ExtendWith(MockitoExtension.class)
 public class JobWorkerPoolTest {
+
+    @Mock
+    Runnable shutdownCallback;
+
     @Test
     public void testExecute() throws Exception {
-        final JobWorkerPool pool = new JobWorkerPool("test", 2, new GracefulShutdownService(), new MetricRegistry());
+        final JobWorkerPool pool = new JobWorkerPool("test", 2, shutdownCallback, new GracefulShutdownService(), new MetricRegistry());
 
         final CountDownLatch latch1 = new CountDownLatch(1);
         final CountDownLatch latch2 = new CountDownLatch(1);
@@ -40,6 +50,7 @@ public class JobWorkerPoolTest {
 
         // Before we do anything, the number of free slots should be the same as the pool size
         assertThat(pool.freeSlots()).isEqualTo(2);
+        assertThat(pool.anySlotsUsed()).isFalse();
 
         // Execute the first task
         assertThat(pool.execute(() -> {
@@ -49,6 +60,7 @@ public class JobWorkerPoolTest {
 
         // The number of free slots should be reduced by one
         assertThat(pool.freeSlots()).isEqualTo(1);
+        assertThat(pool.anySlotsUsed()).isTrue();
 
         // Execute the second task
         assertThat(pool.execute(() -> {
@@ -71,8 +83,9 @@ public class JobWorkerPoolTest {
         task2Latch.countDown();
         assertThat(latch2.await(60, TimeUnit.SECONDS)).isTrue();
 
-        pool.shutdown();
-        pool.awaitTermination(30, TimeUnit.SECONDS);
+        pool.doGracefulShutdown();
+        assertThat(pool.anySlotsUsed()).isFalse();
+        verify(shutdownCallback, times(1)).run();
     }
 
     @Test
@@ -89,6 +102,6 @@ public class JobWorkerPoolTest {
     }
 
     private AbstractThrowableAssert<?, ? extends Throwable> assertName(String name) {
-        return assertThatCode(() -> new JobWorkerPool(name, 1, new GracefulShutdownService(), new MetricRegistry()));
+        return assertThatCode(() -> new JobWorkerPool(name, 1, shutdownCallback, new GracefulShutdownService(), new MetricRegistry()));
     }
 }

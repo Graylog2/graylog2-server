@@ -28,7 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-
 import java.io.IOException;
 
 import static com.google.common.collect.ImmutableList.of;
@@ -39,18 +38,24 @@ public class JsonParse extends AbstractFunction<JsonNode> {
 
     private final ObjectMapper objectMapper;
     private final ParameterDescriptor<String, String> valueParam;
+    private final ParameterDescriptor<Long, Long> depthParam;
 
     @Inject
     public JsonParse(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
         valueParam = ParameterDescriptor.string("value").description("The string to parse as a JSON tree").build();
+        depthParam = ParameterDescriptor.integer("depth").optional().description("Number of levels to parse. Default: no limit").build();
     }
 
     @Override
     public JsonNode evaluate(FunctionArgs args, EvaluationContext context) {
         final String value = valueParam.required(args, context);
+        final long depth = depthParam.optional(args, context).orElse(0L);
         try {
             final JsonNode node = objectMapper.readTree(value);
+            if (depth > 0) {
+                JsonUtils.deleteBelow(node, depth);
+            }
             if (node == null) {
                 throw new IOException("null result");
             }
@@ -66,9 +71,7 @@ public class JsonParse extends AbstractFunction<JsonNode> {
         return FunctionDescriptor.<JsonNode>builder()
                 .name(NAME)
                 .returnType(JsonNode.class)
-                .params(of(
-                        valueParam
-                ))
+                .params(of(valueParam, depthParam))
                 .description("Parses a string as a JSON tree")
                 .build();
     }

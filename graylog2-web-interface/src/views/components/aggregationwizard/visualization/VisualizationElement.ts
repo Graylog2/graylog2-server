@@ -16,15 +16,16 @@
  */
 import { isEmpty } from 'lodash';
 import { PluginStore } from 'graylog-web-plugin/plugin';
-import { VisualizationType } from 'views/types';
 
-import AggregationWidgetConfig, { AggregationWidgetConfigBuilder } from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
-import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
+import type { VisualizationType } from 'views/types';
+import type { AggregationWidgetConfigBuilder } from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import type VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 
 import VisualizationConfiguration from './VisualizationConfiguration';
 
 import type { AggregationElement } from '../AggregationElementType';
-import { VisualizationConfigFormValues, WidgetConfigFormValues } from '../WidgetConfigForm';
+import type { VisualizationConfigFormValues, WidgetConfigFormValues } from '../WidgetConfigForm';
 
 const findVisualizationType = (visualizationType: string) => {
   const visualizationTypeDefinition = PluginStore.exports('visualizationTypes').find(({ type }) => (type === visualizationType));

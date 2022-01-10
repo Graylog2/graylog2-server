@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 import java.util.Map;
 import java.util.Objects;
@@ -53,22 +54,24 @@ public class QueryEngine {
     // TODO proper thread pool with tunable settings
     private final Executor queryPool = Executors.newFixedThreadPool(4, new ThreadFactoryBuilder().setNameFormat("query-engine-%d").build());
     private final QueryBackend<? extends GeneratedQueryContext> elasticsearchBackend;
+    private final Provider<SearchConfig> searchConfig;
 
     @Inject
     public QueryEngine(QueryBackend<? extends GeneratedQueryContext> elasticsearchBackend,
                        Set<QueryMetadataDecorator> queryMetadataDecorators,
-                       QueryParser queryParser) {
+                       QueryParser queryParser, Provider<SearchConfig> searchConfig) {
         this.elasticsearchBackend = elasticsearchBackend;
         this.queryMetadataDecorators = queryMetadataDecorators;
         this.queryParser = queryParser;
+        this.searchConfig = searchConfig;
     }
 
     // TODO: Backwards-compatible constructor to avoid breakage. Remove at some point.
     @Deprecated
     public QueryEngine(Map<String, QueryBackend<? extends GeneratedQueryContext>> backends,
                        Set<QueryMetadataDecorator> queryMetadataDecorators,
-                       QueryParser queryParser) {
-        this(backends.get("elasticsearch"), queryMetadataDecorators, queryParser);
+                       QueryParser queryParser, Provider<SearchConfig> searchConfig) {
+        this(backends.get("elasticsearch"), queryMetadataDecorators, queryParser, searchConfig);
     }
 
     private static Set<QueryResult> allOfResults(Set<CompletableFuture<QueryResult>> futures) {
@@ -159,7 +162,7 @@ public class QueryEngine {
         // with all the results done, we can execute the current query and eventually complete our own result
         // if any of this throws an exception, the handle in #execute will convert it to an error and return a "failed" result instead
         // if the backend already returns a "failed result" then nothing special happens here
-        final GeneratedQueryContext generatedQueryContext = backend.generate(searchJob, query, results);
+        final GeneratedQueryContext generatedQueryContext = backend.generate(searchJob, query, results,  searchConfig.get());
         LOG.trace("[{}] Generated query {}, running it on backend {}", query.id(), generatedQueryContext, backend);
         final QueryResult result = backend.run(searchJob, query, generatedQueryContext, results);
         LOG.debug("[{}] Query returned {}", query.id(), result);
@@ -172,4 +175,5 @@ public class QueryEngine {
     private QueryBackend<? extends GeneratedQueryContext> getQueryBackend(Query query) {
         return elasticsearchBackend;
     }
+
 }

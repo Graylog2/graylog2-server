@@ -17,7 +17,8 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
-import styled, { css, DefaultTheme } from 'styled-components';
+import type { DefaultTheme } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { Button, ButtonToolbar, Col, Nav, NavItem, Row } from 'components/bootstrap';
 

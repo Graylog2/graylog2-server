@@ -18,9 +18,9 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import selectEvent from 'react-select-event';
 import { render, fireEvent, waitFor, screen, act } from 'wrappedTestingLibrary';
+
 import { alice } from 'fixtures/users';
 import { manager as assignedRole1, reader as assignedRole2, reportCreator as notAssignedRole } from 'fixtures/roles';
-
 import { AuthzRolesActions } from 'stores/roles/AuthzRolesStore';
 
 import RolesSection from './RolesSection';

@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { useEffect, useState, useContext, useCallback } from 'react';
 
-import User from 'logic/users/User';
+import type User from 'logic/users/User';
 import withParams from 'routing/withParams';
 import { Row, Col } from 'components/bootstrap';
 import CurrentUserContext from 'contexts/CurrentUserContext';

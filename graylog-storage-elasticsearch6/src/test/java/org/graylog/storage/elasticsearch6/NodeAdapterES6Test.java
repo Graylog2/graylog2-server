@@ -25,6 +25,7 @@ import io.searchbox.client.JestResult;
 import io.searchbox.core.Ping;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.cluster.NodeAdapter;
+import org.graylog2.storage.SearchVersion;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -86,9 +87,9 @@ public class NodeAdapterES6Test {
         when(jestResult.getJsonObject()).thenReturn(buildVersionJsonObject("5.4.0"));
         when(jestClient.execute(any(Ping.class))).thenReturn(jestResult);
 
-        final Optional<String> elasticsearchVersion = nodeAdapter.version();
+        final Optional<SearchVersion> elasticsearchVersion = nodeAdapter.version();
 
-        assertThat(elasticsearchVersion).contains("5.4.0");
+        assertThat(elasticsearchVersion).contains(SearchVersion.elasticsearch("5.4.0"));
     }
 
     private JsonNode buildVersionJsonObject(String foobar) {

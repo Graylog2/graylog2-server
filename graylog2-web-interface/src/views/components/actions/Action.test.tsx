@@ -17,10 +17,10 @@
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
-import { createSimpleExternalValueAction } from 'fixtures/externalValueActions';
-import { ActionContexts } from 'views/types';
-import asMock from 'helpers/mocking/AsMock';
 
+import { createSimpleExternalValueAction } from 'fixtures/externalValueActions';
+import type { ActionContexts } from 'views/types';
+import asMock from 'helpers/mocking/AsMock';
 import usePluginEntities from 'views/logic/usePluginEntities';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 

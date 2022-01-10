@@ -16,8 +16,8 @@
  */
 import * as Immutable from 'immutable';
 
-import Pivot from 'views/logic/aggregationbuilder/Pivot';
-import Series from 'views/logic/aggregationbuilder/Series';
+import type Pivot from 'views/logic/aggregationbuilder/Pivot';
+import type Series from 'views/logic/aggregationbuilder/Series';
 
 import type { DirectionJson } from './Direction';
 import Direction from './Direction';
@@ -83,7 +83,7 @@ export default class SortConfig {
   static __registrations: { [key: string]: typeof SortConfig } = {};
 
   static registerSubtype(type: string, implementingClass: typeof SortConfig) {
-    this.__registrations[type.toLocaleLowerCase()] = implementingClass;
+    this.__registrations[type.toLowerCase()] = implementingClass;
   }
 
   static fromPivot(pivot: Pivot) {

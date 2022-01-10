@@ -17,14 +17,21 @@
 package org.graylog2.configuration;
 
 import com.github.joschi.jadconfig.Parameter;
+import com.github.joschi.jadconfig.converters.StringSetConverter;
 import com.github.joschi.jadconfig.util.Duration;
 import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.PositiveLongValidator;
 import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
+import com.google.common.collect.Sets;
+import org.graylog2.configuration.validators.RotationStrategyValidator;
+import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
+import org.graylog2.indexer.rotation.strategies.SizeBasedRotationStrategy;
+import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategy;
 import org.joda.time.Period;
 
 import java.util.Locale;
+import java.util.Set;
 
 public class ElasticsearchConfiguration {
     public static final String DEFAULT_EVENTS_INDEX_PREFIX = "default_events_index_prefix";
@@ -53,6 +60,9 @@ public class ElasticsearchConfiguration {
     @Parameter(value = "elasticsearch_max_time_per_index", required = true)
     private Period maxTimePerIndex = Period.days(1);
 
+    @Parameter(value = "elasticsearch_max_write_index_age")
+    private Period maxWriteIndexAge = null;
+
     @Deprecated // Should be removed in Graylog 3.0
     @Parameter(value = "elasticsearch_shards", validator = PositiveIntegerValidator.class, required = true)
     private int shards = 4;
@@ -76,9 +86,13 @@ public class ElasticsearchConfiguration {
     @Parameter(value = "retention_strategy", required = true)
     private String retentionStrategy = "delete";
 
+    @Parameter(value = "enabled_index_rotation_strategies", converter = StringSetConverter.class, validators = RotationStrategyValidator.class)
+    private Set<String> enabledRotationStrategies = Sets.newHashSet(
+            MessageCountRotationStrategy.NAME, SizeBasedRotationStrategy.NAME, TimeBasedRotationStrategy.NAME);
+
     @Deprecated // Should be removed in Graylog 3.0
     @Parameter(value = "rotation_strategy")
-    private String rotationStrategy = "count";
+    private String rotationStrategy = MessageCountRotationStrategy.NAME;
 
     @Deprecated // Should be removed in Graylog 3.0
     @Parameter(value = "disable_index_optimization")
@@ -94,8 +108,8 @@ public class ElasticsearchConfiguration {
     @Parameter(value = "elasticsearch_index_optimization_jobs", validator = PositiveIntegerValidator.class)
     private int indexOptimizationJobs = 20;
 
-    @Parameter(value = "index_field_type_periodical_interval", validator = PositiveDurationValidator.class)
-    private Duration indexFieldTypePeriodicalInterval = Duration.hours(1L);
+    @Parameter(value = "index_field_type_periodical_full_refresh_interval", validators = {PositiveDurationValidator.class})
+    private Duration indexFieldTypePeriodicalFullRefreshInterval = Duration.minutes(5);
 
     @Parameter(value = DEFAULT_EVENTS_INDEX_PREFIX, validators = StringNotBlankValidator.class)
     private String defaultEventsIndexPrefix = "gl-events";
@@ -132,6 +146,10 @@ public class ElasticsearchConfiguration {
         return maxTimePerIndex;
     }
 
+    public Period getMaxWriteIndexAge() {
+        return maxWriteIndexAge;
+    }
+
     @Deprecated // Should be removed in Graylog 3.0
     public int getShards() {
         return shards;
@@ -150,6 +168,10 @@ public class ElasticsearchConfiguration {
     @Deprecated // Should be removed in Graylog 3.0
     public String getTemplateName() {
         return templateName;
+    }
+
+    public Set<String> getEnabledRotationStrategies() {
+        return enabledRotationStrategies;
     }
 
     @Deprecated // Should be removed in Graylog 3.0
@@ -182,10 +204,6 @@ public class ElasticsearchConfiguration {
 
     public int getIndexOptimizationJobs() {
         return indexOptimizationJobs;
-    }
-
-    public Duration getIndexFieldTypePeriodicalInterval() {
-        return indexFieldTypePeriodicalInterval;
     }
 
     public String getDefaultEventsIndexPrefix() {

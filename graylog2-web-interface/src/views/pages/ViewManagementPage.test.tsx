@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import { mount, shallow } from 'wrappedEnzyme';
+
 import { StoreMock } from 'helpers/mocking';
 import mockComponent from 'helpers/mocking/MockComponent';
 
@@ -31,7 +32,7 @@ jest.mock('components/common', () => ({
   PageHeader: mockComponent('PageHeader'),
 }));
 
-const mockViewManagementStore = StoreMock('listen', 'getInitialState');
+const mockViewManagementStore = StoreMock();
 const mockViewManagementActions = { search: jest.fn(), delete: jest.fn() };
 
 jest.mock('views/stores/ViewManagementStore', () => ({

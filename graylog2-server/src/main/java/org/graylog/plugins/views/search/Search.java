@@ -29,6 +29,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import org.graylog.plugins.views.search.rest.ExecutionState;
 import org.graylog.plugins.views.search.views.PluginMetadataSummary;
 import org.graylog2.contentpacks.ContentPackable;
 import org.graylog2.contentpacks.EntityDescriptorIds;
@@ -39,12 +40,12 @@ import org.joda.time.DateTimeZone;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -84,6 +85,10 @@ public abstract class Search implements ContentPackable<SearchEntity> {
     @JsonProperty(FIELD_OWNER)
     public abstract Optional<String> owner();
 
+    public Search withOwner(@Nonnull String owner) {
+        return toBuilder().owner(owner).build();
+    }
+
     @JsonProperty(FIELD_CREATED_AT)
     public abstract DateTime createdAt();
 
@@ -97,23 +102,21 @@ public abstract class Search implements ContentPackable<SearchEntity> {
         return Optional.ofNullable(parameterIndex.get(parameterName));
     }
 
-    public Search applyExecutionState(ObjectMapper objectMapper, Map<String, Object> executionState) {
+    public Search applyExecutionState(ObjectMapper objectMapper, ExecutionState executionState) {
         final Builder builder = toBuilder();
 
-        final JsonNode state = objectMapper.convertValue(executionState, JsonNode.class);
-
-        if (state.hasNonNull("parameter_bindings")) {
+        if (!executionState.parameterBindings().isEmpty()) {
             final ImmutableSet<Parameter> parameters = parameters().stream()
-                    .map(param -> param.applyExecutionState(objectMapper, state.path("parameter_bindings")))
+                    .map(param -> param.applyBindings(executionState.parameterBindings()))
                     .collect(toImmutableSet());
             builder.parameters(parameters);
         }
-        if (state.hasNonNull("queries") || state.hasNonNull("global_override")) {
+        if (executionState.queries() != null || executionState.globalOverride() != null) {
             final ImmutableSet<Query> queries = queries().stream()
                     .map(query -> {
-                        final JsonNode queryOverride = state.hasNonNull("global_override")
-                                ? state.path("global_override")
-                                : state.path("queries").path(query.id());
+                        final JsonNode queryOverride = executionState.globalOverride() != null
+                                ? objectMapper.convertValue(executionState.globalOverride(), JsonNode.class)
+                                : objectMapper.convertValue(executionState.queries(), JsonNode.class).path(query.id());
                         return query.applyExecutionState(objectMapper, queryOverride);
                     })
                     .collect(toImmutableSet());
@@ -122,14 +125,14 @@ public abstract class Search implements ContentPackable<SearchEntity> {
         return builder.build();
     }
 
-    public Search addStreamsToQueriesWithoutStreams(Supplier<ImmutableSet<String>> defaultStreamsSupplier) {
+    public Search addStreamsToQueriesWithoutStreams(Supplier<Set<String>> defaultStreamsSupplier) {
         if (!hasQueriesWithoutStreams()) {
             return this;
         }
         final Set<Query> withStreams = queries().stream().filter(Query::hasStreams).collect(toSet());
         final Set<Query> withoutStreams = Sets.difference(queries(), withStreams);
 
-        final ImmutableSet<String> defaultStreams = defaultStreamsSupplier.get();
+        final Set<String> defaultStreams = defaultStreamsSupplier.get();
 
         if (defaultStreams.isEmpty()) {
             throw new MissingStreamPermissionException("User doesn't have access to any streams",

@@ -17,8 +17,8 @@
 import * as React from 'react';
 import { render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
-import MockStore from 'helpers/mocking/StoreMock';
 
+import MockStore from 'helpers/mocking/StoreMock';
 import { WidgetActions } from 'views/stores/WidgetStore';
 import { SearchActions } from 'views/stores/SearchStore';
 import Widget from 'views/logic/widgets/Widget';
@@ -35,6 +35,7 @@ jest.mock('views/stores/WidgetStore', () => ({
 }));
 
 jest.mock('views/stores/SearchStore', () => ({
+  SearchStore: MockStore(['getInitialState', () => ({ search: { parameters: [] } })]),
   SearchActions: {
     refresh: jest.fn(),
   },

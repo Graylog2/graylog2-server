@@ -15,16 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as Immutable from 'immutable';
+
 import mockAction from 'helpers/mocking/MockAction';
 import asMock from 'helpers/mocking/AsMock';
-
 import { QueriesActions, QueriesStore } from 'views/stores/QueriesStore';
 import { ViewStore } from 'views/stores/ViewStore';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import Query from 'views/logic/queries/Query';
-import { GlobalOverrideActions, GlobalOverrideStore, GlobalOverrideStoreState } from 'views/stores/GlobalOverrideStore';
+import type { GlobalOverrideStoreState } from 'views/stores/GlobalOverrideStore';
+import { GlobalOverrideActions, GlobalOverrideStore } from 'views/stores/GlobalOverrideStore';
 import SearchActions from 'views/actions/SearchActions';
-import { QueriesList } from 'views/actions/QueriesActions';
+import type { QueriesList } from 'views/actions/QueriesActions';
 
 import AddToQueryHandler from './AddToQueryHandler';
 
@@ -120,7 +121,7 @@ describe('AddToQueryHandler', () => {
         .build());
 
       GlobalOverrideActions.query = mockAction(jest.fn(() => Promise.resolve(undefined as GlobalOverrideStoreState)));
-      SearchActions.refresh = mockAction(jest.fn(() => Promise.resolve()));
+      SearchActions.refresh = mockAction();
     });
 
     it('retrieves query string from global override', () => {

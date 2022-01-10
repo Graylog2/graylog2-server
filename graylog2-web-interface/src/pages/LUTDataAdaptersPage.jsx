@@ -207,9 +207,8 @@ LUTDataAdaptersPage.defaultProps = {
   action: undefined,
 };
 
-export default connect(withParams(withLocation(LUTDataAdaptersPage)), { lookupTableStore: LookupTablesStore, dataAdaptersStore: LookupTableDataAdaptersStore },
-  ({ dataAdaptersStore, lookupTableStore, ...otherProps }) => ({
-    ...otherProps,
-    ...dataAdaptersStore,
-    errorStates: lookupTableStore.errorStates,
-  }));
+export default connect(withParams(withLocation(LUTDataAdaptersPage)), { lookupTableStore: LookupTablesStore, dataAdaptersStore: LookupTableDataAdaptersStore }, ({ dataAdaptersStore, lookupTableStore, ...otherProps }) => ({
+  ...otherProps,
+  ...dataAdaptersStore,
+  errorStates: lookupTableStore.errorStates,
+}));

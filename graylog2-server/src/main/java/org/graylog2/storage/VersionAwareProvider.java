@@ -16,18 +16,16 @@
  */
 package org.graylog2.storage;
 
-import org.graylog2.plugin.Version;
-
 import javax.inject.Inject;
 import javax.inject.Provider;
 import java.util.Map;
 
 public class VersionAwareProvider<T> implements Provider<T> {
-    private final Version elasticsearchMajorVersion;
-    private final Map<Version, Provider<T>> pluginBindings;
+    private final SearchVersion elasticsearchMajorVersion;
+    private final Map<SearchVersion, Provider<T>> pluginBindings;
 
     @Inject
-    public VersionAwareProvider(@ElasticsearchVersion Version elasticsearchVersion, Map<Version, Provider<T>> pluginBindings) {
+    public VersionAwareProvider(@DetectedSearchVersion SearchVersion elasticsearchVersion, Map<SearchVersion, Provider<T>> pluginBindings) {
         this.elasticsearchMajorVersion = majorVersionFrom(elasticsearchVersion);
         this.pluginBindings = pluginBindings;
     }
@@ -36,12 +34,12 @@ public class VersionAwareProvider<T> implements Provider<T> {
     public T get() {
         final Provider<T> provider = this.pluginBindings.get(elasticsearchMajorVersion);
         if (provider == null) {
-            throw new UnsupportedElasticsearchException(elasticsearchMajorVersion);
+            throw new UnsupportedSearchException(elasticsearchMajorVersion, this.getClass().getName());
         }
         return provider.get();
     }
 
-    private Version majorVersionFrom(Version version) {
-        return Version.from(version.getVersion().getMajorVersion(), 0, 0);
+    private SearchVersion majorVersionFrom(SearchVersion version) {
+        return version.major();
     }
 }

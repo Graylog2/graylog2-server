@@ -50,11 +50,15 @@ class StaticFieldForm extends React.Component {
                type="text"
                id="field-name"
                label="Field name"
-               className="validatable"
-               data-validate="alphanum_underscore"
                required
+               pattern="[A-Za-z0-9_]*"
+               title="Should consist only of alphanumeric characters and underscores."
                autoFocus />
-        <Input ref={(fieldValue) => { this.fieldValue = fieldValue; }} type="text" id="field-value" label="Field value" required />
+        <Input ref={(fieldValue) => { this.fieldValue = fieldValue; }}
+               type="text"
+               id="field-value"
+               label="Field value"
+               required />
       </BootstrapModalForm>
     );
   }

@@ -16,11 +16,11 @@
  */
 import * as React from 'react';
 import { useCallback } from 'react';
-import type { NumericField as NumericFieldType } from 'views/types';
 
+import type { NumericField as NumericFieldType } from 'views/types';
 import { Input } from 'components/bootstrap';
 
-import { FieldComponentProps } from '../VisualizationConfigurationOptions';
+import type { FieldComponentProps } from '../VisualizationConfigurationOptions';
 
 type Props = FieldComponentProps & {
   field: NumericFieldType,

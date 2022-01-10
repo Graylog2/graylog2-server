@@ -16,14 +16,14 @@
  */
 package org.graylog2.indexer;
 
-import com.github.zafarkhaja.semver.Version;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.storage.SearchVersion;
 
 import javax.annotation.Nonnull;
 
 public interface IndexTemplateProvider {
 
     @Nonnull
-    IndexMappingTemplate create(@Nonnull Version elasticsearchVersion, @Nonnull IndexSetConfig indexSetConfig)
+    IndexMappingTemplate create(@Nonnull SearchVersion elasticsearchVersion, @Nonnull IndexSetConfig indexSetConfig)
             throws IgnoreIndexTemplate;
 }

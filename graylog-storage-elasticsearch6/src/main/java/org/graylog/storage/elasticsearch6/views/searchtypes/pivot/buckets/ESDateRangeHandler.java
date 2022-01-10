@@ -18,15 +18,15 @@ package org.graylog.storage.elasticsearch6.views.searchtypes.pivot.buckets;
 
 import io.searchbox.core.SearchResult;
 import io.searchbox.core.search.aggregation.DateRangeAggregation;
-import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.aggregations.AggregationBuilder;
-import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.aggregations.AggregationBuilders;
-import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.aggregations.bucket.range.date.DateRangeAggregationBuilder;
 import org.graylog.plugins.views.search.Query;
+import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
+import org.graylog.plugins.views.search.searchtypes.pivot.buckets.DateRangeBucket;
+import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.aggregations.AggregationBuilder;
+import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.aggregations.bucket.range.DateRangeAggregationBuilder;
 import org.graylog.storage.elasticsearch6.views.ESGeneratedQueryContext;
 import org.graylog.storage.elasticsearch6.views.searchtypes.pivot.ESPivot;
 import org.graylog.storage.elasticsearch6.views.searchtypes.pivot.ESPivotBucketSpecHandler;
-import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
-import org.graylog.plugins.views.search.searchtypes.pivot.buckets.DateRangeBucket;
 import org.joda.time.base.AbstractDateTime;
 
 import javax.annotation.Nonnull;

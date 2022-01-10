@@ -30,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -78,15 +79,16 @@ public class IndexFieldTypePollerAdapterES6 implements IndexFieldTypePollerAdapt
 
         final Spliterator<Map.Entry<String, JsonNode>> fieldSpliterator = Spliterators.spliteratorUnknownSize(properties.fields(), Spliterator.IMMUTABLE);
 
-        final Map<String, String> fieldTypes = StreamSupport.stream(fieldSpliterator, false)
-                .collect(Collectors.toMap(Map.Entry::getKey, field -> field.getValue().path("type").asText()));
         return Optional.of(
-                fieldTypes.entrySet()
-                        .stream()
+                StreamSupport.stream(fieldSpliterator, false)
                         // The "type" value is empty if we deal with a nested data type
                         // TODO: Figure out how to handle nested fields, for now we only support the top-level fields
-                        .filter(field -> !field.getValue().isEmpty())
-                        .map(field -> FieldTypeDTO.create(field.getKey(), field.getValue()))
+                        .filter(field -> !field.getValue().path("type").asText().isEmpty())
+                        .map(field -> {
+                            final boolean fielddata = field.getValue().path("fielddata").asBoolean(false);
+                            final Set<FieldTypeDTO.Properties> fieldProperties = fielddata ? Collections.singleton(FieldTypeDTO.Properties.FIELDDATA) : Collections.emptySet();
+                            return FieldTypeDTO.create(field.getKey(), field.getValue().path("type").asText(), fieldProperties);
+                        })
                         .collect(Collectors.toSet())
         );
     }

@@ -19,7 +19,7 @@ import { useContext } from 'react';
 import styled, { css } from 'styled-components';
 
 import { TextOverflowEllipsis } from 'components/common';
-import Widget from 'views/logic/widgets/Widget';
+import type Widget from 'views/logic/widgets/Widget';
 import timerangeToString from 'views/logic/queries/TimeRangeToString';
 import { DEFAULT_TIMERANGE } from 'views/Constants';
 import { useStore } from 'stores/connect';

@@ -16,22 +16,23 @@
  */
 import React from 'react';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
-import { StoreMock as MockStore } from 'helpers/mocking';
 import userEvent from '@testing-library/user-event';
+
+import { StoreMock as MockStore } from 'helpers/mocking';
 import mockSearchClusterConfig from 'fixtures/searchClusterConfig';
 
 import { DateTimeContext } from './DateTimeProvider';
-import OriginalTimeRangeDropDown, { TimeRangeDropdownProps } from './TimeRangeDropdown';
+import type { TimeRangeDropdownProps } from './TimeRangeDropdown';
+import OriginalTimeRangeDropDown from './TimeRangeDropdown';
 
 jest.mock('views/stores/SearchConfigStore', () => ({
   SearchConfigActions: {
     refresh: jest.fn(() => Promise.resolve()),
   },
   SearchConfigStore: MockStore(
-    ['listen', () => jest.fn()],
     'get',
+    'refresh',
     ['getInitialState', () => ({ searchesClusterConfig: mockSearchClusterConfig })],
-    ['refresh', () => jest.fn()],
   ),
 }));
 

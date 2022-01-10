@@ -16,12 +16,12 @@
  */
 import * as React from 'react';
 import { fireEvent, render, screen } from 'wrappedTestingLibrary';
-import { StoreMock as MockStore } from 'helpers/mocking';
 
+import { StoreMock as MockStore } from 'helpers/mocking';
 import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 import View from 'views/logic/views/View';
 import QueryResult from 'views/logic/QueryResult';
-import { ViewMetaData } from 'views/stores/ViewMetadataStore';
+import type { ViewMetaData } from 'views/stores/ViewMetadataStore';
 
 import Sidebar from './Sidebar';
 

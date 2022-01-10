@@ -15,12 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as Immutable from 'immutable';
-import { $PropertyType } from 'utility-types';
-import { DirectoryServiceAuthenticationService } from 'components/authentication/types';
+import type { $PropertyType } from 'utility-types';
 
+import type { DirectoryServiceAuthenticationService } from 'components/authentication/types';
 import { getAuthServicePlugin } from 'util/AuthenticationService';
-import { DirectoryServiceBackendConfig } from 'logic/authentication/directoryServices/types';
-import { OktaBackendConfig } from 'logic/authentication/okta/types';
+import type { DirectoryServiceBackendConfig } from 'logic/authentication/directoryServices/types';
+import type { OktaBackendConfig } from 'logic/authentication/okta/types';
 
 type InternalState = {
   id: string,

@@ -17,9 +17,9 @@
 import * as React from 'react';
 import { mount } from 'wrappedEnzyme';
 import * as Immutable from 'immutable';
+
 import mockComponent from 'helpers/mocking/MockComponent';
 import { StoreMock as MockStore } from 'helpers/mocking';
-
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import Series from 'views/logic/aggregationbuilder/Series';
@@ -32,7 +32,7 @@ import AreaVisualization from '../AreaVisualization';
 jest.mock('../../GenericPlot', () => mockComponent('GenericPlot'));
 
 jest.mock('views/stores/CurrentQueryStore', () => ({
-  CurrentQueryStore: MockStore(['getInitialState', () => MockQuery.builder().build()], 'listen'),
+  CurrentQueryStore: MockStore(['getInitialState', () => MockQuery.builder().build()]),
 }));
 
 jest.mock('util/AppConfig', () => ({

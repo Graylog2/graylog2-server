@@ -17,18 +17,20 @@
 import * as React from 'react';
 import { useContext } from 'react';
 import styled from 'styled-components';
-import { ActionContexts } from 'views/types';
 
+import type { ActionContexts } from 'views/types';
 import Icon from 'components/common/Icon';
 import { MenuItem } from 'components/bootstrap';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
-import {
+import type {
   ActionDefinition,
-  createHandlerFor,
   ActionHandlerArguments,
-  isExternalLinkAction,
   ExternalLinkAction,
   HandlerAction,
+} from 'views/components/actions/ActionHandler';
+import {
+  createHandlerFor,
+  isExternalLinkAction,
 } from 'views/components/actions/ActionHandler';
 import HoverForHelp from 'components/common/HoverForHelp';
 

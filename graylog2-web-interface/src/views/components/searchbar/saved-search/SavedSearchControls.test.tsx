@@ -17,22 +17,24 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
-import { adminUser, alice as currentUser } from 'fixtures/users';
-import mockAction from 'helpers/mocking/MockAction';
 import userEvent from '@testing-library/user-event';
 
+import { adminUser, alice as currentUser } from 'fixtures/users';
+import mockAction from 'helpers/mocking/MockAction';
 import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
-import ViewLoaderContext, { ViewLoaderContextType } from 'views/logic/ViewLoaderContext';
+import type { ViewLoaderContextType } from 'views/logic/ViewLoaderContext';
+import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
-import NewViewLoaderContext, { NewViewLoaderContextType } from 'views/logic/NewViewLoaderContext';
+import type { NewViewLoaderContextType } from 'views/logic/NewViewLoaderContext';
+import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
 import * as ViewsPermissions from 'views/Permissions';
 import CurrentUserContext from 'contexts/CurrentUserContext';
-import User from 'logic/users/User';
+import type User from 'logic/users/User';
 import type { ViewStoreState } from 'views/stores/ViewStore';
 import history from 'util/History';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
-import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 
 import SavedSearchControls from './SavedSearchControls';
 
