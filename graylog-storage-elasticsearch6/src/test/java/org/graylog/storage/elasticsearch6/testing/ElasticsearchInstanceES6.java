@@ -24,6 +24,7 @@ import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.elasticsearch.Client;
 import org.graylog.testing.elasticsearch.FixtureImporter;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
+import org.graylog.testing.elasticsearch.TestableSearchServerInstance;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.storage.SearchVersion;
 import org.slf4j.Logger;
@@ -32,7 +33,7 @@ import org.testcontainers.containers.Network;
 
 import java.net.URI;
 
-public class ElasticsearchInstanceES6 extends SearchServerInstance {
+public class ElasticsearchInstanceES6 extends TestableSearchServerInstance {
     private static final Logger LOG = LoggerFactory.getLogger(SearchServerInstance.class);
     private static final String DEFAULT_IMAGE_OSS = "docker.elastic.co/elasticsearch/elasticsearch-oss";
 
@@ -53,12 +54,12 @@ public class ElasticsearchInstanceES6 extends SearchServerInstance {
     }
 
     @Override
-    protected Client client() {
+    public Client client() {
         return this.client;
     }
 
     @Override
-    protected FixtureImporter fixtureImporter() {
+    public FixtureImporter fixtureImporter() {
         return this.fixtureImporter;
     }
 
