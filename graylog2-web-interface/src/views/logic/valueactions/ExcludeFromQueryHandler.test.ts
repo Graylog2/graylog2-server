@@ -125,7 +125,7 @@ describe('ExcludeFromQueryHandler', () => {
         .build());
 
       GlobalOverrideActions.query = mockAction(jest.fn(() => Promise.resolve(undefined as GlobalOverrideStoreState)));
-      SearchActions.refresh = mockAction(jest.fn(() => Promise.resolve()));
+      SearchActions.refresh = mockAction();
     });
 
     it('retrieves query string from global override', () => {
