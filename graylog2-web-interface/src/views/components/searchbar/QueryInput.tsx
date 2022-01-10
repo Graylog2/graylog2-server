@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useMemo, useRef } from 'react';
+import { useCallback, useMemo } from 'react';
 import type { DefaultTheme } from 'styled-components';
 import { withTheme } from 'styled-components';
 import PropTypes from 'prop-types';
@@ -27,7 +27,6 @@ import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import QueryValidationActions from 'views/actions/QueryValidationActions';
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 
-import type ReactAce from './queryinput/ace';
 import type { AutoCompleter, Editor } from './ace-types';
 import StyledAceEditor from './queryinput/StyledAceEditor';
 import SearchBarAutoCompletions from './SearchBarAutocompletions';
@@ -74,22 +73,20 @@ const handleExecution = (editor: Editor, onExecute: (query: string) => void, val
   onExecute(value);
 };
 
-const _configureEditor = (editor, completer: AutoCompleter, configuredListeners: React.MutableRefObject<boolean>) => {
+const _configureEditor = (editor, completer: AutoCompleter) => {
   if (editor) {
     editor.commands.removeCommands(['find', 'indent', 'outdent']);
     // eslint-disable-next-line no-param-reassign
     editor.completers = [completer];
 
-    if (!configuredListeners.current) {
-      editor.session.on('tokenizerUpdate', (input, { bgTokenizer: { currentLine, lines } }) => {
-        if (completer.shouldShowCompletions(currentLine, lines)) {
-          editor.execCommand('startAutocomplete');
-        }
-      });
+    editor.session.on('tokenizerUpdate', (input, { bgTokenizer: { currentLine, lines } }) => {
+      if (completer.shouldShowCompletions(currentLine, lines)) {
+        editor.execCommand('startAutocomplete');
+      }
+    });
 
-      // eslint-disable-next-line no-param-reassign
-      configuredListeners.current = true;
-    }
+    editor.renderer.setScrollMargin(6, 5);
+    editor.renderer.setPadding(12);
   }
 };
 
@@ -132,8 +129,7 @@ const QueryInput = ({
   warning,
 }: Props) => {
   const completer = useMemo(() => completerFactory(completers, timeRange, streams), [completerFactory, completers, timeRange, streams]);
-  const configuredListeners = useRef<boolean>(false);
-  const configureEditor = useCallback((node: ReactAce) => _configureEditor(node?.editor, completer, configuredListeners), [completer]);
+  const configureEditor = useCallback((editor: Editor) => _configureEditor(editor, completer), [completer]);
   const _onExecute = useCallback((editor: Editor) => handleExecution(editor, onExecute, value, error), [onExecute, value, error]);
   const markers = useMemo(() => getMarkers(error, warning), [error, warning]);
 
@@ -144,8 +140,7 @@ const QueryInput = ({
                          disabled={disabled}
                          className={className}
                          aceTheme="ace-queryinput" // NOTE: is usually just `theme` but we need that prop for styled-components
-                         ref={configureEditor}
-                         onLoad={(editor) => { editor.renderer.setScrollMargin(6, 5); editor.renderer.setPadding(12); }}
+                         onLoad={configureEditor}
                          readOnly={disabled}
                          onBlur={onBlur}
                          commands={[{
