@@ -388,7 +388,7 @@ public abstract class PluginModule extends Graylog2Module {
 
     protected void addClusterConfigValidator(Class<?> configClass, Class<? extends ClusterConfigValidator> configValidatorClass) {
 
-        mapBinder().addBinding(configClass).to(configValidatorClass);
+        clusterConfigMapBinder().addBinding(configClass).to(configValidatorClass);
 
     }
 }

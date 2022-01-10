@@ -495,7 +495,7 @@ public abstract class Graylog2Module extends AbstractModule {
         );
     }
 
-    protected MapBinder<Class<?>, ClusterConfigValidator> mapBinder() {
+    protected MapBinder<Class<?>, ClusterConfigValidator> clusterConfigMapBinder() {
         TypeLiteral<Class<?>> keyType = new TypeLiteral<Class<?>>() {};
         TypeLiteral<ClusterConfigValidator> valueType = new TypeLiteral<ClusterConfigValidator>() {};
         return MapBinder.newMapBinder(binder(), keyType, valueType);
