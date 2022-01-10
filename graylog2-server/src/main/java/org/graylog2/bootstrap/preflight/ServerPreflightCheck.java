@@ -105,7 +105,7 @@ public class ServerPreflightCheck {
                     .withRetryListener(new RetryListener() {
                         @Override
                         public <V> void onRetry(Attempt<V> attempt) {
-                            if (attempt.getAttemptNumber() == 1) {
+                            if (attempt.hasResult()) {
                                 return;
                             }
                             if (mongoVersionProbeAttempts == 0) {

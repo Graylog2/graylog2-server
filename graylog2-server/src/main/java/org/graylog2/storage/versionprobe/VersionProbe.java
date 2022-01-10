@@ -77,7 +77,8 @@ public class VersionProbe {
                     .withRetryListener(new RetryListener() {
                         @Override
                         public <V> void onRetry(Attempt<V> attempt) {
-                            if (attempt.getAttemptNumber() == 1) {
+                            final V result = attempt.getResult();
+                            if (result instanceof Optional && ((Optional<?>) result).isPresent()) {
                                 return;
                             }
                             if (connectionAttempts == 0) {
