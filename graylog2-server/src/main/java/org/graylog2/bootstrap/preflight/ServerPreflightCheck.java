@@ -174,11 +174,14 @@ public class ServerPreflightCheck {
                 ));
             }
             if (journalFs.typeName() != null && journalFs.typeName().equals("Network Disk")) {
-                throw new PreflightCheckException(StringUtils.f(
+                final String message = StringUtils.f(
                         "Journal directory <%s> should not be on a network file system (%s)!",
                         journalDirectory.toAbsolutePath(),
                         journalFs.sysTypeName()
-                ));
+                );
+                LOG.warn(message);
+                // TODO throw an exception on fresh installations
+                // throw new PreflightCheckException(message);
             }
         } else {
             LOG.warn("Could not perform size check on journal directory <{}>", journalDirectory.toAbsolutePath());
