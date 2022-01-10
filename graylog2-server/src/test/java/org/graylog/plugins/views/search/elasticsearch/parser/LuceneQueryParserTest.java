@@ -137,6 +137,17 @@ class LuceneQueryParserTest {
             assertThat(token.endLine()).isEqualTo(2);
             assertThat(token.endColumn()).isEqualTo(11);
         }
+    }
 
+    @Test
+    void testMultilineComplexQuery() throws ParseException {
+        final ParsedQuery query = parser.parse("(\"ssh login\" AND (source:example.org OR source:another.example.org))\n" +
+                "OR (\"login\" AND (source:example1.org OR source:another.example2.org))\n" +
+                "OR not_existing_field:test");
+        final ImmutableToken token = query.tokens().stream().filter(t -> t.image().equals("not_existing_field")).findFirst().orElseThrow(() -> new IllegalStateException("Expected token not found"));
+        assertThat(token.beginLine()).isEqualTo(3);
+        assertThat(token.beginColumn()).isEqualTo(3);
+        assertThat(token.endLine()).isEqualTo(3);
+        assertThat(token.endColumn()).isEqualTo(21);
     }
 }

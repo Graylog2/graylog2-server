@@ -23,71 +23,62 @@ import java.io.IOException;
 public class LineCountingCharStream implements CharStream {
 
     private final CharStream delegate;
-    private int lineBegin = 0;
-    private int lineCounter = 0;
-    private int thisLineStartPosition = 0;
+    private final TokenLineCounter tokenLineCounter;
 
     public LineCountingCharStream(CharStream delegate) {
         this.delegate = delegate;
+        this.tokenLineCounter = new TokenLineCounter(delegate);
+    }
+
+    @Override
+    public char BeginToken() throws IOException {
+        final char oneChar = delegate.BeginToken();
+        tokenLineCounter.beginToken(oneChar);
+        return oneChar;
     }
 
     @Override
     public char readChar() throws IOException {
         final char oneChar = delegate.readChar();
-        if (oneChar == '\n') {
-            thisLineStartPosition = getEndColumn();
-            lineCounter++;
-        }
+        tokenLineCounter.processChar(oneChar);
         return oneChar;
     }
 
+    @Deprecated
     @Override
     public int getColumn() {
         return delegate.getColumn();
     }
 
+    @Deprecated
     @Override
     public int getLine() {
         return delegate.getLine();
     }
 
     @Override
-    public int getEndColumn() {
-        if (lineCounter < 1) {
-            return delegate.getEndColumn();
-        } else {
-            return delegate.getEndColumn() - thisLineStartPosition;
-        }
-    }
-
-    @Override
-    public int getEndLine() {
-        return 1 + lineCounter;
+    public int getBeginLine() {
+        return tokenLineCounter.getBeginLine();
     }
 
     @Override
     public int getBeginColumn() {
-        if (lineCounter < 1) {
-            return delegate.getBeginColumn();
-        } else {
-            return delegate.getBeginColumn() - thisLineStartPosition;
-        }
+        return tokenLineCounter.getBeginColumn();
     }
 
     @Override
-    public int getBeginLine() {
-        return 1 + lineBegin;
+    public int getEndLine() {
+        return tokenLineCounter.getEndLine();
+    }
+
+    @Override
+    public int getEndColumn() {
+        return tokenLineCounter.getEndColumn();
     }
 
     @Override
     public void backup(int amount) {
         delegate.backup(amount);
-    }
-
-    @Override
-    public char BeginToken() throws IOException {
-        lineBegin = lineCounter;
-        return delegate.BeginToken();
     }
 
     @Override
