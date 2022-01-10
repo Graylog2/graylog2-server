@@ -27,7 +27,6 @@ import FieldNameCompletion from './FieldNameCompletion';
 
 jest.mock('views/stores/FieldTypesStore', () => ({
   FieldTypesStore: MockStore(
-    'listen',
     ['getInitialState', jest.fn(() => ({ all: [], queryFields: { get: () => [] } }))],
   ),
 }));
