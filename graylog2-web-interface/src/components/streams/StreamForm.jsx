@@ -21,7 +21,6 @@ import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import { Input } from 'components/bootstrap';
 import { Select, Spinner } from 'components/common';
 import * as FormsUtils from 'util/FormsUtils';
-import AppConfig from 'util/AppConfig';
 import { IndexSetsActions } from 'stores/indices/IndexSetsStore';
 
 class StreamForm extends React.Component {
@@ -117,10 +116,6 @@ class StreamForm extends React.Component {
   _indexSetSelect = () => {
     const { indexSetId } = this.state;
     const { indexSets } = this.props;
-
-    if (AppConfig.isCloud()) {
-      return null;
-    }
 
     if (indexSets) {
       return (
