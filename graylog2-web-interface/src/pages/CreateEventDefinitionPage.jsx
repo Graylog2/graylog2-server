@@ -106,5 +106,4 @@ class CreateEventDefinitionPage extends React.Component {
 
 export default connect(CreateEventDefinitionPage, {
   currentUser: CurrentUserStore,
-},
-({ currentUser }) => ({ currentUser: currentUser.currentUser }));
+}, ({ currentUser }) => ({ currentUser: currentUser.currentUser }));

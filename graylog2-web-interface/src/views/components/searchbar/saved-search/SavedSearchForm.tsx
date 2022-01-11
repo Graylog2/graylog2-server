@@ -15,10 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { Portal } from 'react-portal';
 import { Position } from 'react-overlays';
 import styled from 'styled-components';
 
+import { Portal } from 'components/common';
 import { Button, ControlLabel, FormControl, FormGroup, Popover } from 'components/bootstrap';
 
 import styles from './SavedSearchForm.css';
@@ -59,8 +59,7 @@ const SavedSearchForm = (props: Props) => {
 
   return (
     <Portal>
-      <Position container={document.body}
-                placement="left"
+      <Position placement="left"
                 target={target}>
         <Popover title="Name of search" id="saved-search-popover">
           <StyledForm onSubmit={stopEvent}>

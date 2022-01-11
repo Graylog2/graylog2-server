@@ -31,11 +31,11 @@ import DrilldownContext from './DrilldownContext';
 import ViewTypeContext from './ViewTypeContext';
 
 jest.mock('views/stores/CurrentQueryStore', () => ({
-  CurrentQueryStore: mockStore(['listen', () => () => {}], ['getInitialState', jest.fn(() => null)]),
+  CurrentQueryStore: mockStore(['getInitialState', jest.fn(() => null)]),
 }));
 
 jest.mock('views/stores/GlobalOverrideStore', () => ({
-  GlobalOverrideStore: mockStore(['listen', () => () => {}], ['getInitialState', jest.fn()]),
+  GlobalOverrideStore: mockStore(),
 }));
 
 describe('DrilldownContextProvider', () => {

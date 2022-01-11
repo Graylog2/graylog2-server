@@ -15,36 +15,26 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useRef } from 'react';
-import styled from 'styled-components';
+import type { ReactNode } from 'react';
 
-import useElementDimensions from 'hooks/useElementDimensions';
-
-const Wrapper = styled.div`
-  height: 100%;
-  width: 100%;
-  overflow: hidden;
-  grid-row: 2;
-  grid-column: 1;
-  -ms-grid-row: 2;
-  -ms-grid-column: 1;
-`;
-
-type Dimensions = { height: number; width: number; };
+import DocsHelper from 'util/DocsHelper';
 
 type Props = {
-  children: (dimensions: Dimensions) => React.ReactElement,
-};
+  page: string;
+  text: ReactNode;
+  title?: string;
+}
 
-const FullSizeContainer = ({ children }: Props) => {
-  const element = useRef<HTMLDivElement>(null);
-  const { width, height } = useElementDimensions(element);
-
+const DocumentationLink = ({ page, title = '', text }: Props) => {
   return (
-    <Wrapper ref={element}>
-      {children({ height, width })}
-    </Wrapper>
+    <a href={DocsHelper.toString(page)} title={title} target="_blank" rel="noreferrer">
+      {text}
+    </a>
   );
 };
 
-export default FullSizeContainer;
+DocumentationLink.defaultProps = {
+  title: '',
+};
+
+export default DocumentationLink;

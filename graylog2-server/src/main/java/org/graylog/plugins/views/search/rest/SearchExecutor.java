@@ -17,7 +17,6 @@
 package org.graylog.plugins.views.search.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.util.concurrent.Uninterruptibles;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchDomain;
@@ -46,7 +45,6 @@ public class SearchExecutor {
     private final SearchJobService searchJobService;
     private final QueryEngine queryEngine;
     private final SearchExecutionGuard executionGuard;
-    private final PermittedStreams permittedStreams;
     private final ObjectMapper objectMapper;
 
     @Inject
@@ -54,13 +52,11 @@ public class SearchExecutor {
                           SearchJobService searchJobService,
                           QueryEngine queryEngine,
                           SearchExecutionGuard executionGuard,
-                          PermittedStreams permittedStreams,
                           ObjectMapper objectMapper) {
         this.searchDomain = searchDomain;
         this.searchJobService = searchJobService;
         this.queryEngine = queryEngine;
         this.executionGuard = executionGuard;
-        this.permittedStreams = permittedStreams;
         this.objectMapper = objectMapper;
     }
 
@@ -71,7 +67,7 @@ public class SearchExecutor {
     }
 
     public SearchJob execute(Search search, SearchUser searchUser, ExecutionState executionState) {
-        final Search searchWithStreams = search.addStreamsToQueriesWithoutStreams(() -> loadAllAllowedStreamsForUser(searchUser));
+        final Search searchWithStreams = search.addStreamsToQueriesWithoutStreams(() -> searchUser.streams().loadAll());
 
         final Search searchWithExecutionState = searchWithStreams.applyExecutionState(objectMapper, firstNonNull(executionState, ExecutionState.empty()));
 
@@ -96,9 +92,5 @@ public class SearchExecutor {
 
     private void authorize(Search search, StreamPermissions streamPermissions) {
         this.executionGuard.check(search, streamPermissions::canReadStream);
-    }
-
-    private ImmutableSet<String> loadAllAllowedStreamsForUser(StreamPermissions streamPermissions) {
-        return permittedStreams.load(streamPermissions::canReadStream);
     }
 }

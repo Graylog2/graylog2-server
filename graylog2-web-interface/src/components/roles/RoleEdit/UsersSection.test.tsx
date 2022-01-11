@@ -38,8 +38,8 @@ const mockLoadUsersForRolePromise = Promise.resolve({
 jest.mock('stores/roles/AuthzRolesStore', () => ({
   AuthzRolesStore: {},
   AuthzRolesActions: {
-    removeMember: mockAction(jest.fn(() => Promise.resolve())),
-    addMembers: mockAction(jest.fn(() => Promise.resolve())),
+    removeMember: mockAction(),
+    addMembers: mockAction(),
     loadUsersForRole: jest.fn(() => mockLoadUsersForRolePromise),
   },
 }));

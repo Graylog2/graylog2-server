@@ -80,53 +80,47 @@ const TimeoutInput = ({ value: propsValue, onChange }: Props) => {
   };
 
   return (
-    <>
-      <Input id="timeout-controls"
-             labelClassName="col-sm-3"
-             wrapperClassName="col-sm-9"
-             label="Sessions Timeout">
-        <>
-          <Input type="checkbox"
-                 id="session-timeout-never"
-                 name="session_timeout_never"
-                 label="Sessions do not time out"
-                 help="When checked, sessions never time out due to inactivity."
-                 formGroupClassName="no-bm"
-                 onChange={_onClick}
-                 checked={sessionTimeoutNever} />
+    <Input id="timeout-controls"
+           labelClassName="col-sm-3"
+           wrapperClassName="col-sm-9"
+           label="Sessions Timeout">
+      <>
+        <Input type="checkbox"
+               id="session-timeout-never"
+               name="session_timeout_never"
+               label="Sessions do not time out"
+               help="When checked, sessions never time out due to inactivity."
+               formGroupClassName="no-bm"
+               onChange={_onClick}
+               checked={sessionTimeoutNever} />
 
-          <div className="clearfix">
-            <Col xs={2}>
-              <Input type="number"
-                     id="timeout"
-                     placeholder="Timeout amount"
-                     className="validatable"
-                     name="timeout"
-                     min={1}
-                     formGroupClassName="form-group no-bm"
-                     data-validate="positive_number"
-                     disabled={sessionTimeoutNever}
-                     value={value}
-                     onChange={_onChangeValue} />
+        <div className="clearfix">
+          <Col xs={2}>
+            <Input type="number"
+                   id="timeout"
+                   placeholder="Timeout amount"
+                   name="timeout"
+                   min={1}
+                   formGroupClassName="form-group no-bm"
+                   disabled={sessionTimeoutNever}
+                   value={value}
+                   onChange={_onChangeValue} />
+          </Col>
+          <Col xs={4}>
+            <TimeoutUnitSelect disabled={sessionTimeoutNever}
+                               value={`${unit}`}
+                               onChange={_onChangeUnit} />
+          </Col>
+          <Row className="no-bm">
+            <Col xs={12}>
+              <HelpBlock>
+                Session automatically end after this amount of time, unless they are actively used.
+              </HelpBlock>
             </Col>
-            <Col xs={4}>
-              {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
-              {/* @ts-ignore TODO: No overload matches this call */}
-              <TimeoutUnitSelect disabled={sessionTimeoutNever}
-                                 value={`${unit}`}
-                                 onChange={_onChangeUnit} />
-            </Col>
-            <Row className="no-bm">
-              <Col xs={12}>
-                <HelpBlock>
-                  Session automatically end after this amount of time, unless they are actively used.
-                </HelpBlock>
-              </Col>
-            </Row>
-          </div>
-        </>
-      </Input>
-    </>
+          </Row>
+        </div>
+      </>
+    </Input>
   );
 };
 

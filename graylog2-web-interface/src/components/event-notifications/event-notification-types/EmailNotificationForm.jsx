@@ -148,8 +148,7 @@ class EmailNotificationForm extends React.Component {
                  label={<ControlLabel>Sender <small className="text-muted">(Optional)</small></ControlLabel>}
                  type="text"
                  bsStyle={validation.errors.sender ? 'error' : null}
-                 help={lodash.get(validation, 'errors.sender[0]',
-                   'The email address that should be used as the notification sender. Leave it empty to use the default sender address.')}
+                 help={lodash.get(validation, 'errors.sender[0]', 'The email address that should be used as the notification sender. Leave it empty to use the default sender address.')}
                  value={config.sender || ''}
                  onChange={this.handleChange} />
         </HideOnCloud>
