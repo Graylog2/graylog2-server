@@ -144,7 +144,7 @@ const EditWrapper = ({ children, config, editing, fields, id, onToggleEdit, onCa
         {children}
       </EditComponent>
     </EditWidgetFrame>
-  ) : <>{children}</>;
+  ) : children;
 };
 
 const Widget = ({ id, editing, widget, fields, title, position, onPositionsChange }: Props) => {

@@ -14,7 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useContext } from 'react';
+import * as React from 'react';
+import { useContext, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import type * as Immutable from 'immutable';
 
@@ -55,13 +56,14 @@ const WidgetComponent = ({
   const widget = useStore(WidgetStore, (state) => state.get(widgetId));
   const viewType = useContext(ViewTypeContext);
   const title = useStore(TitlesStore, (titles) => titles?.getIn([TitleTypes.Widget, widget.id], defaultTitle(widget)) as string);
+  const additionalContext = useMemo(() => ({ widget }), [widget]);
 
   const WidgetFieldTypesIfDashboard = viewType === View.Type.Dashboard ? WidgetFieldTypesContextProvider : React.Fragment;
 
   return (
     <DrilldownContextProvider widget={widget}>
       <WidgetContext.Provider value={widget}>
-        <AdditionalContext.Provider value={{ widget }}>
+        <AdditionalContext.Provider value={additionalContext}>
           <ExportSettingsContextProvider>
             <WidgetFieldTypesIfDashboard>
               <Widget editing={editing}

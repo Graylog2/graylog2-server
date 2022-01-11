@@ -119,6 +119,7 @@ describe('<Widget />', () => {
     unsetWidgetEditing = () => {},
     ...props
   }: DummyWidgetProps) => (
+    // eslint-disable-next-line react/jsx-no-constructed-context-values
     <WidgetFocusContext.Provider value={{ focusedWidget, setWidgetFocusing, setWidgetEditing, unsetWidgetFocusing, unsetWidgetEditing }}>
       <WidgetContext.Provider value={propsWidget}>
         <Widget widget={propsWidget}
