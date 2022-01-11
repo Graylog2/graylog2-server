@@ -119,13 +119,13 @@ describe('<Widget />', () => {
     unsetWidgetEditing = () => {},
     ...props
   }: DummyWidgetProps) => (
+    // eslint-disable-next-line react/jsx-no-constructed-context-values
     <WidgetFocusContext.Provider value={{ focusedWidget, setWidgetFocusing, setWidgetEditing, unsetWidgetFocusing, unsetWidgetEditing }}>
       <WidgetContext.Provider value={propsWidget}>
         <Widget widget={propsWidget}
                 id="widgetId"
                 fields={Immutable.List([])}
                 onPositionsChange={() => {}}
-                onSizeChange={() => {}}
                 title="Widget Title"
                 position={new WidgetPosition(1, 1, 1, 1)}
                 {...props} />

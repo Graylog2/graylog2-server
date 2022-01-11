@@ -56,11 +56,8 @@ export type Props = {
   widget: WidgetModel,
   editing: boolean,
   fields: Immutable.List<FieldTypeMapping>,
-  height?: number,
-  width?: number,
   title: string,
   position: WidgetPosition,
-  onSizeChange: () => void,
   onPositionsChange: (position: BackendWidgetPosition) => void,
 };
 
@@ -84,14 +81,14 @@ const WidgetFooter = styled.div`
   justify-content: flex-end;
 `;
 
-type VisualizationProps = Pick<Props, 'title' | 'id' | 'widget' | 'height' | 'width' | 'fields' | 'editing'> & {
+type VisualizationProps = Pick<Props, 'title' | 'id' | 'widget' | 'fields' | 'editing'> & {
   queryId: string,
   setLoadingState: (loading: boolean) => void,
   onToggleEdit: () => void,
   onWidgetConfigChange: (newWidgetConfig: WidgetConfig) => Promise<Widgets>,
 };
 
-const Visualization = ({ title, id, widget, height, width, fields, queryId, editing, setLoadingState, onToggleEdit, onWidgetConfigChange }: VisualizationProps) => {
+const Visualization = ({ title, id, widget, fields, queryId, editing, setLoadingState, onToggleEdit, onWidgetConfigChange }: VisualizationProps) => {
   const VisComponent = useMemo(() => _visualizationForType(widget.type), [widget.type]);
   const { error: errors, widgetData: data } = useWidgetResults(id);
 
@@ -108,14 +105,12 @@ const Visualization = ({ title, id, widget, height, width, fields, queryId, edit
                     editing={editing}
                     fields={fields}
                     filter={filter}
-                    height={height}
                     queryId={queryId}
                     onConfigChange={onWidgetConfigChange}
                     setLoadingState={setLoadingState}
                     title={title}
                     toggleEdit={onToggleEdit}
                     type={widget.type}
-                    width={width}
                     id={id} />
     );
   }
@@ -124,7 +119,7 @@ const Visualization = ({ title, id, widget, height, width, fields, queryId, edit
 };
 
 type EditWrapperProps = {
-  children: React.ReactNode,
+  children: React.ReactElement,
   config: WidgetConfig,
   editing: boolean,
   fields: FieldTypeMappingsList,
@@ -149,10 +144,10 @@ const EditWrapper = ({ children, config, editing, fields, id, onToggleEdit, onCa
         {children}
       </EditComponent>
     </EditWidgetFrame>
-  ) : <>{children}</>;
+  ) : children;
 };
 
-const Widget = ({ id, editing, height, width, widget, fields, onSizeChange, title, position, onPositionsChange }: Props) => {
+const Widget = ({ id, editing, widget, fields, title, position, onPositionsChange }: Props) => {
   const [loading, setLoading] = useState(false);
   const [oldWidget, setOldWidget] = useState(editing ? widget : undefined);
   const { focusedWidget, setWidgetEditing, unsetWidgetEditing } = useContext(WidgetFocusContext);
@@ -168,7 +163,7 @@ const Widget = ({ id, editing, height, width, widget, fields, onSizeChange, titl
   }, [editing, setWidgetEditing, unsetWidgetEditing, widget]);
   const onCancelEdit = useCallback(() => {
     if (oldWidget) {
-      WidgetActions.update(id, oldWidget);
+      WidgetActions.update(id, oldWidget).then(() => {});
     }
 
     onToggleEdit();
@@ -182,7 +177,7 @@ const Widget = ({ id, editing, height, width, widget, fields, onSizeChange, titl
 
   return (
     <WidgetColorContext id={id}>
-      <WidgetFrame widgetId={id} onSizeChange={onSizeChange}>
+      <WidgetFrame widgetId={id}>
         <InteractiveContext.Consumer>
           {(interactive) => (
             <WidgetHeader title={title}
@@ -214,8 +209,6 @@ const Widget = ({ id, editing, height, width, widget, fields, onSizeChange, titl
                            widget={widget}
                            fields={fields}
                            title={title}
-                           height={height}
-                           width={width}
                            setLoadingState={setLoading}
                            onToggleEdit={onToggleEdit}
                            onWidgetConfigChange={onWidgetConfigChange} />
@@ -234,18 +227,13 @@ const Widget = ({ id, editing, height, width, widget, fields, onSizeChange, titl
 Widget.propTypes = {
   editing: PropTypes.bool,
   fields: PropTypes.any.isRequired,
-  height: PropTypes.number,
   id: PropTypes.string.isRequired,
   onPositionsChange: PropTypes.func.isRequired,
-  onSizeChange: PropTypes.func.isRequired,
   title: PropTypes.string.isRequired,
   widget: PropTypes.instanceOf(WidgetModel).isRequired,
-  width: PropTypes.number,
 };
 
 Widget.defaultProps = {
-  height: 1,
-  width: 1,
   editing: false,
 };
 
