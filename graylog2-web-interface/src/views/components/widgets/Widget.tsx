@@ -119,7 +119,7 @@ const Visualization = ({ title, id, widget, fields, queryId, editing, setLoading
 };
 
 type EditWrapperProps = {
-  children: React.ReactNode,
+  children: React.ReactElement,
   config: WidgetConfig,
   editing: boolean,
   fields: FieldTypeMappingsList,
