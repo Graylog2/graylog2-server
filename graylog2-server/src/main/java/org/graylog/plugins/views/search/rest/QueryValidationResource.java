@@ -22,6 +22,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.plugins.views.search.Parameter;
+import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.validation.QueryValidationService;
 import org.graylog.plugins.views.search.validation.ValidationMessage;
 import org.graylog.plugins.views.search.validation.ValidationRequest;
@@ -32,16 +33,14 @@ import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersExc
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.rest.resources.RestResource;
-import org.graylog2.shared.security.RestPermissions;
 
 import javax.inject.Inject;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
@@ -64,12 +63,15 @@ public class QueryValidationResource extends RestResource implements PluginRestR
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation("Validate a search query")
     @NoAuditEvent("Only validating query structure, not changing any data")
-    public ValidationResponseDTO validateQuery(@ApiParam(name = "validationRequest") ValidationRequestDTO validationRequest) {
+    public ValidationResponseDTO validateQuery(
+            @ApiParam(name = "validationRequest") ValidationRequestDTO validationRequest,
+            @Context SearchUser searchUser
+    ) {
 
         final ValidationRequest.Builder q = ValidationRequest.Builder.builder()
                 .query(validationRequest.query())
                 .timerange(validationRequest.timerange().orElse(defaultTimeRange()))
-                .streams(adaptStreams(validationRequest.streams()))
+                .streams(searchUser.streams().readableOrAllIfEmpty(validationRequest.streams()))
                 .parameters(resolveParameters(validationRequest));
 
         validationRequest.filter().ifPresent(q::filter);
@@ -109,32 +111,11 @@ public class QueryValidationResource extends RestResource implements PluginRestR
         return ValidationMessageDTO.create(message.beginLine(), message.beginColumn(), message.endLine(), message.endColumn(), message.errorType(), message.errorMessage());
     }
 
-    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    private Set<String> adaptStreams(Optional<Set<String>> optionalStreams) {
-        return optionalStreams.filter(streams -> !streams.isEmpty())
-                // TODO: is it ok to filter out a stream that's not accessible or should we throw an exception?
-                .map(streams -> streams.stream().filter(this::hasStreamReadPermission).collect(Collectors.toSet()))
-                .orElseGet(this::loadAllAllowedStreamsForUser);
-    }
-
     private RelativeRange defaultTimeRange() {
         try {
             return RelativeRange.create(300);
         } catch (InvalidRangeParametersException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private ImmutableSet<String> loadAllAllowedStreamsForUser() {
-        return permittedStreams.load(this::hasStreamReadPermission);
-    }
-
-    private boolean hasStreamReadPermission(String streamId) {
-        return isPermitted(RestPermissions.STREAMS_READ, streamId);
-    }
-
-    @Override
-    protected boolean isPermitted(String permission, String instanceId) {
-        return getSubject().isPermitted(permission + ":" + instanceId);
     }
 }

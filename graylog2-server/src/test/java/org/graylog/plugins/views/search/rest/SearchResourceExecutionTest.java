@@ -98,7 +98,6 @@ public class SearchResourceExecutionTest {
                             searchJobService,
                             queryEngine,
                             executionGuard,
-                            permittedStreams,
                             objectMapperProvider.get()),
                     searchJobService,
                     eventBus);
