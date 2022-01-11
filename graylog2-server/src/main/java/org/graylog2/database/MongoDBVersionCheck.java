@@ -32,7 +32,7 @@ import java.util.ArrayList;
 
 public class MongoDBVersionCheck {
     private static final Logger LOG = LoggerFactory.getLogger(MongoDBVersionCheck.class);
-    private static final Version MINIMUM_MONGODB_VERSION = Version.forIntegers(2, 4);
+    private static final Version MINIMUM_MONGODB_VERSION = Version.forIntegers(3, 6);
 
     public static Version getVersion(MongoClient mongoClient) {
         final MongoDatabase adminDb = mongoClient.getDatabase("admin");
