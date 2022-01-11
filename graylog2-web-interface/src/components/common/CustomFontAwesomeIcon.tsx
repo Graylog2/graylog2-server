@@ -14,19 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import PropTypes from 'prop-types';
+import React from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { fas } from '@fortawesome/free-solid-svg-icons';
+import { far } from '@fortawesome/free-regular-svg-icons';
+import { faApple, faGithub, faGithubAlt, faLinux, faWindows } from '@fortawesome/free-brands-svg-icons';
 
-import { ReadOnlyFormGroup } from 'components/common';
+library.add(fas, far, faApple, faGithub, faGithubAlt, faLinux, faWindows);
 
-const HttpNotificationDetails = ({ notification }) => {
-  return (
-    <ReadOnlyFormGroup label="URL" value={notification.config.url} />
-  );
-};
+const CustomFontAwesomeIcon = (props: React.ComponentProps<typeof FontAwesomeIcon>) => <FontAwesomeIcon {...props} />;
 
-HttpNotificationDetails.propTypes = {
-  notification: PropTypes.object.isRequired,
-};
-
-export default HttpNotificationDetails;
+export default CustomFontAwesomeIcon;

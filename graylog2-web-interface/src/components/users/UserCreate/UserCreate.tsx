@@ -121,9 +121,7 @@ const UserCreate = () => {
     }
 
     return (
-      <>
-        <UsernameFormGroup users={users} />
-      </>
+      <UsernameFormGroup users={users} />
     );
   };
 
@@ -139,9 +137,7 @@ const UserCreate = () => {
     }
 
     return (
-      <>
-        <EmailFormGroup />
-      </>
+      <EmailFormGroup />
     );
   };
 

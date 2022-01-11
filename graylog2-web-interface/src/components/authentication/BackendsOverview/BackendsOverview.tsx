@@ -48,7 +48,7 @@ const LoadingSpinner = styled(Spinner)(({ theme }) => css`
 `);
 
 const _headerCellFormatter = (header) => {
-  switch (header.toLocaleLowerCase()) {
+  switch (header.toLowerCase()) {
     case 'actions':
       return <th className="actions text-right">{header}</th>;
     default:

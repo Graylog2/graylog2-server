@@ -33,7 +33,6 @@ const mockCurrentUser = { currentUser: { fullname: 'Ada Lovelace', username: 'ad
 
 jest.mock('views/stores/SearchStore', () => ({
   SearchStore: MockStore(
-    'listen',
     ['getInitialState', () => ({ search: { parameters: [] } })],
   ),
   SearchActions: {
@@ -49,7 +48,6 @@ jest.mock('stores/users/CurrentUserStore', () => ({
 }));
 
 jest.mock('stores/streams/StreamsStore', () => MockStore(
-  'listen',
   ['listStreams', () => ({ then: jest.fn() })],
   'availableStreams',
 ));
@@ -84,7 +82,7 @@ describe('SearchBar', () => {
   };
 
   beforeEach(() => {
-    SearchActions.refresh = mockAction(jest.fn());
+    SearchActions.refresh = mockAction();
   });
 
   it('should render the SearchBar', async () => {

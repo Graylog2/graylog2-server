@@ -23,7 +23,7 @@ import 'helpers/mocking/react-dom_mock';
 import SavedSearchForm from './SavedSearchForm';
 
 jest.mock('react-overlays', () => ({ Position: mockComponent('MockPosition') }));
-jest.mock('react-portal', () => ({ Portal: mockComponent('MockPortal') }));
+jest.mock('components/common/Portal', () => ({ children }) => (children));
 
 describe('SavedSearchForm', () => {
   describe('render the SavedSearchForm', () => {

@@ -139,21 +139,21 @@ const EnterprisePage = createReactClass({
                     <p>Graylog Enterprise includes:</p>
 
                     <EnterpriseFeatureList>
-                      <li>Automated <DocumentationLink page="archiving.html" text={<strong>archiving</strong>} /> and retention</li>
-                      <li><DocumentationLink page="auditlog.html" text={<strong>Audit logs</strong>} /> of Graylog user activity</li>
+                      <li>Automated <DocumentationLink page="archiving" text={<strong>archiving</strong>} /> and retention</li>
+                      <li><DocumentationLink page="auditlog" text={<strong>Audit logs</strong>} /> of Graylog user activity</li>
                       <li>
-                        Alerts with <DocumentationLink page="alerts.html#filter-with-dynamic-lists-enterprise-feature" text={<strong>dynamic lists</strong>} />
-                        {' '}and <DocumentationLink page="alerts.html" text={<strong>correlation engine</strong>} /> for events
+                        Alerts with <DocumentationLink page="alerts#filter-with-dynamic-lists-enterprise-feature" text={<strong>dynamic lists</strong>} />
+                        {' '}and <DocumentationLink page="alerts" text={<strong>correlation engine</strong>} /> for events
                         to minimize the number of alerts that you need to create and maintain
                       </li>
                       <li>
-                        Customizable <DocumentationLink page="reporting.html" text={<strong>scheduled reporting</strong>} /> using dashboard widgets for sharing analysis outside Graylog
+                        Customizable <DocumentationLink page="reporting" text={<strong>scheduled reporting</strong>} /> using dashboard widgets for sharing analysis outside Graylog
                       </li>
-                      <li><DocumentationLink page="searching/parameters.html"
+                      <li><DocumentationLink page="parameters"
                                              text={<strong>Parameterized search templates</strong>} /> enable you to
                         combine and reuse queries
                       </li>
-                      <li><DocumentationLink page="integrations/forwarder.html"
+                      <li><DocumentationLink page="cluster-to-cluster-forwarder"
                                              text={<strong>Data forwarder</strong>} /> to easily combine data from
                         multiple Graylog instances
                       </li>

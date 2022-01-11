@@ -99,38 +99,34 @@ const Time = ({ index }: Props) => {
           </TypeCheckboxWrapper>
 
           {value.type === 'auto' && (
-            <>
-              <RangeSelect>
-                <Icon name="search-minus" size="lg" style={{ paddingRight: '0.5rem' }} />
-                <StyledFormControl type="range"
-                                   min={0.5}
-                                   max={10}
-                                   step={0.5}
-                                   value={value.scaling ? (1 / value.scaling) : 1.0}
-                                   onChange={(e) => onChange({ target: { name, value: { ...value, scaling: 1 / parseFloat(e.target.value) } } })} />
-                <Icon name="search-plus" size="lg" style={{ paddingLeft: '0.5rem' }} />
-                <CurrentScale>
-                  {value.scaling ? (1 / value.scaling) : 1.0}x
-                </CurrentScale>
-              </RangeSelect>
-            </>
+            <RangeSelect>
+              <Icon name="search-minus" size="lg" style={{ paddingRight: '0.5rem' }} />
+              <StyledFormControl type="range"
+                                 min={0.5}
+                                 max={10}
+                                 step={0.5}
+                                 value={value.scaling ? (1 / value.scaling) : 1.0}
+                                 onChange={(e) => onChange({ target: { name, value: { ...value, scaling: 1 / parseFloat(e.target.value) } } })} />
+              <Icon name="search-plus" size="lg" style={{ paddingLeft: '0.5rem' }} />
+              <CurrentScale>
+                {value.scaling ? (1 / value.scaling) : 1.0}x
+              </CurrentScale>
+            </RangeSelect>
           )}
           {value.type !== 'auto' && (
-            <>
-              <InputGroup>
-                <FormControl type="number"
-                             value={value.value}
-                             step="1"
-                             min="1"
-                             onChange={(e) => onChange({ target: { name, value: { ...value, value: e.target.value } } })} />
-                <InputGroup.Button>
-                  <DropdownButton id="input-dropdown-addon"
-                                  title={TimeUnits[value.unit] || ''}>
-                    {Object.keys(TimeUnits).map((unit) => <MenuItem key={unit} onSelect={() => onChange({ target: { name, value: { ...value, unit } } })}>{TimeUnits[unit]}</MenuItem>)}
-                  </DropdownButton>
-                </InputGroup.Button>
-              </InputGroup>
-            </>
+            <InputGroup>
+              <FormControl type="number"
+                           value={value.value}
+                           step="1"
+                           min="1"
+                           onChange={(e) => onChange({ target: { name, value: { ...value, value: e.target.value } } })} />
+              <InputGroup.Button>
+                <DropdownButton id="input-dropdown-addon"
+                                title={TimeUnits[value.unit] || ''}>
+                  {Object.keys(TimeUnits).map((unit) => <MenuItem key={unit} onSelect={() => onChange({ target: { name, value: { ...value, unit } } })}>{TimeUnits[unit]}</MenuItem>)}
+                </DropdownButton>
+              </InputGroup.Button>
+            </InputGroup>
           )}
         </Input>
       )}

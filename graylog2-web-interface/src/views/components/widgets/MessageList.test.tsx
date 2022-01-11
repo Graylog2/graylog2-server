@@ -58,25 +58,23 @@ jest.mock('views/components/messagelist/MessageTableEntry', () => ({}));
 
 jest.mock('views/stores/ViewStore', () => ({
   ViewStore: MockStore(
-    'listen',
     ['getInitialState', () => ({ activeQuery: 'somequery', view: { id: 'someview' } })],
   ),
 }));
 
 jest.mock('stores/inputs/InputsStore', () => ({
-  InputsStore: MockStore('listen', 'getInitialState'),
+  InputsStore: MockStore(),
   InputsActions: { list: jest.fn(() => Promise.resolve()) },
 }));
 
 jest.mock('views/stores/SearchConfigStore', () => ({
-  SearchConfigStore: MockStore('listSearchesClusterConfig', 'configurations', 'listen'),
+  SearchConfigStore: MockStore('listSearchesClusterConfig', 'configurations'),
 }));
 
 const mockReexecuteResult = CancellablePromise.of(Promise.resolve({ result: { errors: [] } }));
 
 jest.mock('views/stores/SearchStore', () => ({
   SearchStore: MockStore(
-    'listen',
     ['getInitialState', () => ({
       result: {
         results: {

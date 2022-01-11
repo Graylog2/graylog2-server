@@ -54,21 +54,13 @@ exports[`<Pagination /> should display Pagination 1`] = `
     aria-label="First"
     class="disabled"
   >
-    <span>
-      <svg
-        class="svg-inline--fa fa-angle-double-left"
-      />
-    </span>
+    <span />
   </li>
   <li
     aria-label="Prev"
     class="disabled"
   >
-    <span>
-      <svg
-        class="svg-inline--fa fa-angle-left"
-      />
-    </span>
+    <span />
   </li>
   <li
     class="active"
@@ -129,11 +121,7 @@ exports[`<Pagination /> should display Pagination 1`] = `
     <a
       href="#"
       role="button"
-    >
-      <svg
-        class="svg-inline--fa fa-angle-right"
-      />
-    </a>
+    />
   </li>
   <li
     aria-label="Last"
@@ -142,11 +130,7 @@ exports[`<Pagination /> should display Pagination 1`] = `
     <a
       href="#"
       role="button"
-    >
-      <svg
-        class="svg-inline--fa fa-angle-double-right"
-      />
-    </a>
+    />
   </li>
 </ul>
 `;

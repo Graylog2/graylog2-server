@@ -18,6 +18,7 @@ package org.graylog.plugins.views.search.permissions;
 
 import com.google.common.base.Objects;
 import org.graylog.plugins.views.search.Search;
+import org.graylog.plugins.views.search.rest.PermittedStreams;
 import org.graylog.plugins.views.search.rest.ViewsRestPermissions;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewLike;
@@ -33,11 +34,13 @@ public class SearchUser implements SearchPermissions, StreamPermissions, ViewPer
     private final User currentUser;
     private final Predicate<String> isPermitted;
     private final BiPredicate<String, String> isPermittedEntity;
+    private final UserStreams userStreams;
 
-    public SearchUser(User currentUser, Predicate<String> isPermitted, BiPredicate<String, String> isPermittedEntity) {
+    public SearchUser(User currentUser, Predicate<String> isPermitted, BiPredicate<String, String> isPermittedEntity, PermittedStreams permittedStreams) {
         this.currentUser = currentUser;
         this.isPermitted = isPermitted;
         this.isPermittedEntity = isPermittedEntity;
+        this.userStreams = new UserStreams(this, permittedStreams);
     }
 
     public Optional<DateTimeZone> timeZone() {
@@ -89,6 +92,10 @@ public class SearchUser implements SearchPermissions, StreamPermissions, ViewPer
 
     public boolean isAdmin() {
         return this.currentUser.isLocalAdmin() || isPermitted("*");
+    }
+
+    public UserStreams streams() {
+        return this.userStreams;
     }
 
     @Override

@@ -14,25 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
-import React from 'react';
+import type * as React from 'react';
+import { createPortal } from 'react-dom';
 
-import DocsHelper from 'util/DocsHelper';
+type Props = {
+  children: React.ReactNode
+  container?: Element,
+};
 
-class DocumentationLink extends React.Component {
-  static propTypes = {
-    page: PropTypes.string.isRequired,
-    text: PropTypes.node.isRequired,
-    title: PropTypes.string,
-  };
+/**
+ * Simple wrapper component for ReactDOMs native portal functionality.
+ */
+const Portal = ({ children, container }: Props) => createPortal(children, container);
 
-  render() {
-    return (
-      <a href={DocsHelper.toString(this.props.page)} title={this.props.title} target="_blank" rel="noreferrer">
-        {this.props.text}
-      </a>
-    );
-  }
-}
+Portal.defaultProps = {
+  container: document.body,
+};
 
-export default DocumentationLink;
+export default Portal;

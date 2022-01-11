@@ -21,23 +21,34 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.net.UnknownHostException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class ReservedIpChecker {
     private static final Logger LOG = LoggerFactory.getLogger(ReservedIpChecker.class);
-    public static final String IPV4_BLOCKS_FILE = "reserved-ipv4-blocks.txt";
+    private static final String[] RESERVED_IPV4_BLOCKS = {
+            "0.0.0.0/8",
+            "10.0.0.0/8",
+            "100.64.0.0/10",
+            "127.0.0.0/8",
+            "169.254.0.0/16",
+            "172.16.0.0/12",
+            "192.0.0.0/24",
+            "192.0.2.0/24",
+            "192.88.99.0/24",
+            "192.168.0.0/16",
+            "198.18.0.0/15",
+            "198.51.100.0/24",
+            "203.0.113.0/24",
+            "224.0.0.0/4",
+            "233.252.0.0/24",
+            "240.0.0.0/4",
+            "255.255.255.255/32"
+    };
 
     private static ReservedIpChecker instance;
 
@@ -49,30 +60,11 @@ public class ReservedIpChecker {
 
     private List<IpSubnet> loadReservedIpBlocks() {
 
-        List<IpSubnet> list;
-        try {
-            URL url = getClass().getClassLoader().getResource(IPV4_BLOCKS_FILE);
-            if (url == null) {
-                String error = String.format(Locale.ENGLISH, "Error.  IP Block file '%s' was not found.", IPV4_BLOCKS_FILE);
-                LOG.error(error);
-                list = Collections.emptyList();
-            } else {
-                Path path = Paths.get(url.toURI());
-                list = Files.readAllLines(path)
-                        .stream()
-                        .map(stringToSubnet())
-                        .filter(Optional::isPresent)
-                        .map(Optional::get)
-                        .collect(Collectors.toList());
-            }
-        } catch (IOException | URISyntaxException e) {
-
-            String error = String.format(Locale.ENGLISH, "Error loading Reserved IP Blocks. %s", e.getMessage());
-            LOG.error(error, e);
-            list = Collections.emptyList();
-        }
-
-        return list;
+        return Arrays.stream(RESERVED_IPV4_BLOCKS)
+                .map(stringToSubnet())
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
     }
 
     public boolean isEmpty() {

@@ -15,18 +15,26 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
+import type { ReactNode } from 'react';
 
-import { ReadOnlyFormGroup } from 'components/common';
+import DocsHelper from 'util/DocsHelper';
 
-const HttpNotificationDetails = ({ notification }) => {
+type Props = {
+  page: string;
+  text: ReactNode;
+  title?: string;
+}
+
+const DocumentationLink = ({ page, title = '', text }: Props) => {
   return (
-    <ReadOnlyFormGroup label="URL" value={notification.config.url} />
+    <a href={DocsHelper.toString(page)} title={title} target="_blank" rel="noreferrer">
+      {text}
+    </a>
   );
 };
 
-HttpNotificationDetails.propTypes = {
-  notification: PropTypes.object.isRequired,
+DocumentationLink.defaultProps = {
+  title: '',
 };
 
-export default HttpNotificationDetails;
+export default DocumentationLink;

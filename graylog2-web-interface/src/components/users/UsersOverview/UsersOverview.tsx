@@ -62,7 +62,7 @@ const StyledPaginatedList = styled(PaginatedList)`
 `;
 
 const _headerCellFormatter = (header) => {
-  switch (header.toLocaleLowerCase()) {
+  switch (header.toLowerCase()) {
     case 'client address':
       return <ClientAddressHead title={header} />;
     case 'actions':

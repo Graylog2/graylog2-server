@@ -31,10 +31,9 @@ jest.mock('views/stores/SearchConfigStore', () => ({
     refresh: jest.fn(() => Promise.resolve()),
   },
   SearchConfigStore: MockStore(
-    ['listen', () => jest.fn()],
     'get',
+    'refresh',
     ['getInitialState', () => ({ searchesClusterConfig: mockSearchClusterConfig })],
-    ['refresh', () => jest.fn()],
   ),
 }));
 

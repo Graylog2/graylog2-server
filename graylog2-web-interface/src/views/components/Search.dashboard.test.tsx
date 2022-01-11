@@ -39,7 +39,6 @@ import WidgetFocusContext from './contexts/WidgetFocusContext';
 
 jest.mock('views/stores/ViewMetadataStore', () => ({
   ViewMetadataStore: MockStore(
-    ['listen', () => jest.fn()],
     'get',
     ['getInitialState', () => ({
       activeQuery: 'beef-dead',
@@ -108,8 +107,8 @@ describe('Dashboard Search', () => {
     WidgetStore.listen = jest.fn(() => jest.fn());
     QueryFiltersStore.listen = jest.fn(() => jest.fn());
     SearchActions.execute = mockAction(jest.fn(() => Promise.resolve({} as SearchExecutionResult)));
-    StreamsActions.refresh = mockAction(jest.fn());
-    SearchConfigActions.refresh = mockAction(jest.fn());
+    StreamsActions.refresh = mockAction();
+    SearchConfigActions.refresh = mockAction();
 
     ViewStore.getInitialState = jest.fn(() => ({
       view: View.create().toBuilder().type(View.Type.Dashboard).build(),
@@ -120,7 +119,7 @@ describe('Dashboard Search', () => {
 
     FieldTypesActions.all = mockAction(jest.fn(async () => {}));
     SearchMetadataStore.listen = jest.fn(() => jest.fn());
-    SearchActions.refresh = mockAction(jest.fn(() => Promise.resolve()));
+    SearchActions.refresh = mockAction();
 
     asMock(WidgetFocusProvider as React.FunctionComponent).mockImplementation(({ children }) => (
       <WidgetFocusContext.Provider value={{

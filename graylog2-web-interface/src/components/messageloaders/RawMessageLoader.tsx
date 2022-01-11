@@ -173,8 +173,7 @@ const RawMessageLoader = ({ onMessageLoaded, inputIdSelector, codecTypes, inputs
     event.preventDefault();
 
     setLoading(true);
-    const promise = MessagesActions.loadRawMessage(message, remoteAddress,
-      codec, codecConfiguration);
+    const promise = MessagesActions.loadRawMessage(message, remoteAddress, codec, codecConfiguration);
 
     promise.then((loadedMessage) => {
       onMessageLoaded(

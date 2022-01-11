@@ -69,25 +69,15 @@ public class SearchExecutorTest extends RestResourceBaseTest {
     @Mock
     private SearchExecutionGuard searchExecutionGuard;
 
-    @Mock
-    private PermittedStreams permittedStreams;
-
-    @Mock
-    private User currentUser;
-
     @Captor
     private ArgumentCaptor<ExecutionState> executionStateCaptor;
 
     private SearchExecutor searchExecutor;
 
-    private final Predicate<ViewDTO> isAllowed = (id) -> true;
-    private final Predicate<String> isStreamAllowed = (id) -> true;
-    private final Predicate<String> isNotAllowed = (id) -> false;
-
     @Before
     public void setUp() throws Exception {
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
-        this.searchExecutor = new SearchExecutor(searchDomain, searchJobService, queryEngine, searchExecutionGuard, permittedStreams, objectMapper);
+        this.searchExecutor = new SearchExecutor(searchDomain, searchJobService, queryEngine, searchExecutionGuard, objectMapper);
     }
 
     @Test
