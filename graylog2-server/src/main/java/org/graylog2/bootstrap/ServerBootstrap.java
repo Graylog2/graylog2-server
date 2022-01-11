@@ -35,7 +35,7 @@ import org.graylog2.Configuration;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.bindings.ConfigurationModule;
-import org.graylog2.bootstrap.preflight.ServerPreflightCheck;
+import org.graylog2.bootstrap.preflight.PreflightCheckService;
 import org.graylog2.bootstrap.preflight.ServerPreflightChecksModule;
 import org.graylog2.configuration.PathConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
@@ -131,11 +131,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
 
         final Injector injector = getPreflightInjector(preflightCheckModules);
 
-        // Run server preflight checks
-        injector.getInstance(ServerPreflightCheck.class).runChecks(configuration);
-
-        // Run preflight checks from plugins
-        preflightCheckModules.forEach(m -> m.doCheck(injector));
+        injector.getInstance(PreflightCheckService.class).runChecks();
     }
 
     private Injector getPreflightInjector(List<PreflightCheckModule> preflightCheckModules) {

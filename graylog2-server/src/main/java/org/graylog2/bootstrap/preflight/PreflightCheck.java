@@ -14,13 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.plugin;
+package org.graylog2.bootstrap.preflight;
 
-/**
- * This Module can be implemented by Plugins that wish to perform
- * preflight checks before the server is started.
- * <p>
- * The Module is used to set up minimal Guice Bindings necessary to run preflight checks.
- */
-public abstract class PreflightCheckModule extends PluginModule {
+public interface PreflightCheck {
+    void runCheck() throws PreflightCheckException;
 }

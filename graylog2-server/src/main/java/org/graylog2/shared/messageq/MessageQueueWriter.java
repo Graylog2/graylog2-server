@@ -19,7 +19,6 @@ package org.graylog2.shared.messageq;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.google.auto.value.AutoValue;
-import org.graylog2.bootstrap.preflight.PreflightCheckException;
 import org.graylog2.shared.buffers.RawMessageEvent;
 
 import javax.inject.Inject;
@@ -30,9 +29,6 @@ import static com.codahale.metrics.MetricRegistry.name;
 public interface MessageQueueWriter {
 
     void write(List<RawMessageEvent> entries) throws MessageQueueException;
-
-    default void preFlightCheck() throws PreflightCheckException {
-    }
 
     @AutoValue
     abstract class Metrics {
