@@ -67,15 +67,15 @@ public class ElasticsearchInstanceES6 extends TestableSearchServerInstance {
         return this.jestClient;
     }
 
-    public static SearchServerInstance create() {
+    public static TestableSearchServerInstance create() {
         return create(Network.newNetwork());
     }
 
-    public static SearchServerInstance create(Network network) {
+    public static TestableSearchServerInstance create(Network network) {
         return create(SearchServer.ES6.getSearchVersion(), network);
     }
 
-    public static SearchServerInstance create(SearchVersion version, Network network) {
+    public static TestableSearchServerInstance create(SearchVersion version, Network network) {
         final String image = imageNameFrom(version);
 
         LOG.debug("Creating instance {}", image);

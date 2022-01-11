@@ -18,6 +18,7 @@ package org.graylog.storage.elasticsearch6;
 
 import org.graylog.storage.elasticsearch6.testing.ElasticsearchInstanceES6;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
+import org.graylog.testing.elasticsearch.TestableSearchServerInstance;
 import org.graylog2.indexer.cluster.NodeAdapter;
 import org.graylog2.indexer.cluster.NodeIT;
 import org.junit.Rule;
@@ -26,7 +27,7 @@ import static org.graylog.storage.elasticsearch6.testing.TestUtils.jestClient;
 
 public class NodeES6IT extends NodeIT {
     @Rule
-    public final SearchServerInstance elasticsearch = ElasticsearchInstanceES6.create();
+    public final TestableSearchServerInstance elasticsearch = ElasticsearchInstanceES6.create();
 
     @Override
     protected SearchServerInstance elasticsearch() {
