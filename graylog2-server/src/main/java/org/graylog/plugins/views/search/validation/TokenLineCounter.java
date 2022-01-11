@@ -33,7 +33,7 @@ public class TokenLineCounter {
     /**
      * Current lines count detected
      */
-    private int lineCounter;
+    private int lineCounter = 1;
     private int currentLineStartsAtPosition;
 
 
@@ -58,12 +58,8 @@ public class TokenLineCounter {
         }
     }
 
-    public int getLinesCount() {
-        return lineCounter;
-    }
-
     public int getBeginLine() {
-        return 1 + tokenBeginsAtLine;
+        return tokenBeginsAtLine;
     }
 
     public int getBeginColumn() {
@@ -71,10 +67,17 @@ public class TokenLineCounter {
     }
 
     public int getEndLine() {
-        return 1 + lineCounter;
+        return lineCounter;
     }
 
     public int getEndColumn() {
         return delegate.getEndColumn() - this.currentLineStartsAtPosition;
+    }
+
+    public void incrementTokenStartPositionOnError() {
+        this.tokenBeginsAtPosition++;
+        if(this.tokenBeginsAtLine != this.lineCounter) {
+            this.tokenBeginsAtLine = this.lineCounter;
+        }
     }
 }

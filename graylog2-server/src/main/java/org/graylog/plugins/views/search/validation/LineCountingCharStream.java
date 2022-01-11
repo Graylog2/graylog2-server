@@ -32,9 +32,20 @@ public class LineCountingCharStream implements CharStream {
 
     @Override
     public char BeginToken() throws IOException {
-        final char oneChar = delegate.BeginToken();
-        tokenLineCounter.beginToken(oneChar);
-        return oneChar;
+        try {
+            final char oneChar = delegate.BeginToken();
+            tokenLineCounter.beginToken(oneChar);
+            return oneChar;
+        } catch (IOException e) {
+            // in case of error we won't be able to detect current position from our own counting (won't be called),
+            // we have to increment here manually
+            if(e.getMessage().equals("read past eof")) {
+                final String image = delegate.GetImage();
+                System.out.println(image);
+                tokenLineCounter.incrementTokenStartPositionOnError();
+            }
+            throw e;
+        }
     }
 
     @Override

@@ -87,11 +87,8 @@ public abstract class ValidationMessage {
             errorBuilder.beginLine(1);
             errorBuilder.beginColumn(0);
 
-            String[] lines = query.split("\r\n|\r|\n");
-            final int linesCount = lines.length;
-
-            errorBuilder.endLine(linesCount);
-            errorBuilder.endColumn(lines[linesCount - 1].length());
+            errorBuilder.endLine(Integer.parseInt(positionMatcher.group(1)));
+            errorBuilder.endColumn(Integer.parseInt(positionMatcher.group(2)));
         }
 
         // Fallback, all parsing failed

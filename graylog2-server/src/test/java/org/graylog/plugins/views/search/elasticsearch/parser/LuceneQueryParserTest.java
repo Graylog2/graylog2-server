@@ -26,6 +26,7 @@ import org.junit.jupiter.api.Test;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class LuceneQueryParserTest {
 
@@ -149,5 +150,18 @@ class LuceneQueryParserTest {
         assertThat(token.beginColumn()).isEqualTo(3);
         assertThat(token.endLine()).isEqualTo(3);
         assertThat(token.endColumn()).isEqualTo(21);
+    }
+
+    @Test
+    void testMatchingPositions() throws ParseException {
+        assertThatThrownBy(() -> parser.parse("foo:"))
+                .hasMessageContaining("Cannot parse 'foo:': Encountered \"<EOF>\" at line 1, column 4.");
+    }
+
+
+    @Test
+    void testEmptyQueryNewlines() {
+        assertThatThrownBy(() -> parser.parse("\n\n\n"))
+                .hasMessageContaining("Cannot parse '\n\n\n': Encountered \"<EOF>\" at line 4, column 0.");
     }
 }
