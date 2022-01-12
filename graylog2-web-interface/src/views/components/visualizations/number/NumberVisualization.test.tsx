@@ -28,10 +28,6 @@ import type { CurrentViewType } from 'views/components/CustomPropTypes';
 
 import NumberVisualization from './NumberVisualization';
 
-jest.mock('react-sizeme', () => ({
-  SizeMe: ({ children: fn }) => fn({ size: { width: 320, height: 240 } }),
-}));
-
 jest.mock('./AutoFontSizer', () => ({ children }) => children);
 jest.mock('stores/connect', () => (x) => x);
 

@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { SizeMe } from 'react-sizeme';
 import { FixedSizeList } from 'react-window';
 import type { List as ImmutableList } from 'immutable';
 import styled from 'styled-components';
@@ -23,12 +22,13 @@ import styled from 'styled-components';
 import MessageFieldsFilter from 'logic/message/MessageFieldsFilter';
 import type { ViewMetaData as ViewMetadata } from 'views/stores/ViewMetadataStore';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import ElementDimensions from 'components/common/ElementDimensions';
 
 import ListItem from './ListItem';
 
 const DEFAULT_HEIGHT_PX = 50;
 
-const DynamicHeight = styled.div`
+const DynamicHeight = styled(ElementDimensions)`
   overflow: hidden;
 `;
 
@@ -79,18 +79,16 @@ const List = ({ viewMetadata: { activeQuery }, filter, activeQueryFields, allFie
   );
 
   return (
-    <SizeMe monitorHeight refreshRate={100}>
-      {({ size: { height, width } }) => (
-        <DynamicHeight>
-          <FixedSizeList height={height || DEFAULT_HEIGHT_PX}
-                         width={width}
-                         itemCount={fieldList.size}
-                         itemSize={20}>
-            {Row}
-          </FixedSizeList>
-        </DynamicHeight>
+    <DynamicHeight>
+      {({ width, height }) => (
+        <FixedSizeList height={height || DEFAULT_HEIGHT_PX}
+                       width={width}
+                       itemCount={fieldList.size}
+                       itemSize={20}>
+          {Row}
+        </FixedSizeList>
       )}
-    </SizeMe>
+    </DynamicHeight>
   );
 };
 
