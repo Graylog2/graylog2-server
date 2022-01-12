@@ -160,9 +160,20 @@ class FieldValueCompletion implements Completer {
   };
 
   shouldShowCompletions = (currentLine: number, lines: Array<Array<Line>>) => {
-    const currentToken = lines[currentLine - 1].find((token) => token?.start !== undefined);
+    console.log('shouldShowCompletions', currentLine, lines);
+    const currentLineTokens = lines[currentLine - 1];
+    const currentTokenIndex = currentLineTokens.findIndex((token) => token?.start !== undefined);
+    const currentToken = currentLineTokens[currentTokenIndex];
 
-    return currentToken?.type === 'keyword' && currentToken?.value.endsWith(':');
+    if (!currentToken) {
+      return false;
+    }
+
+    const previousToken = currentLineTokens[currentTokenIndex - 1];
+    const currentTokenIsFieldName = currentToken?.type === 'keyword' && currentToken?.value.endsWith(':');
+    const currentTokenIsFieldValue = currentToken?.type === 'term' && previousToken?.type === 'keyword';
+
+    return currentTokenIsFieldName || currentTokenIsFieldValue;
   }
 }
 
