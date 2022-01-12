@@ -61,6 +61,11 @@ const Title = styled.div`
   justify-content: space-between;
 `;
 
+const Explanation = styled.div`
+  display: flex;
+  justify-content: space-between;
+`;
+
 const shakeAnimation = keyframes`
   10%,
   90% {
@@ -97,9 +102,6 @@ const StyledPopover = styled(Popover)(({ $shaking }) => {
 const ExplanationTitle = ({ title }: { title: string }) => (
   <Title>
     {title}
-    <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
-                       title="Search query syntax documentation"
-                       text={<DocumentationIcon name="lightbulb" />} />
   </Title>
 );
 
@@ -135,6 +137,19 @@ const useTriggerIfErrorsPersist = (trigger: () => void) => {
   }, [trigger, showExplanation, toggleShow]);
 
   return [showExplanation, toggleShow] as const;
+};
+
+const getErrorDocumentationLink = (errorType: string) => {
+  switch (errorType) {
+    case 'Unknown field':
+      return DocsHelper.PAGES.SEARCH_QUERY_ERRORS.UNKNOWN_FIELD;
+    case 'ParseException':
+      return DocsHelper.PAGES.SEARCH_QUERY_ERRORS.PARSE_EXCEPTION;
+    case 'Invalid operator':
+      return DocsHelper.PAGES.SEARCH_QUERY_ERRORS.INVALID_OPERATOR;
+    default:
+      return DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE;
+  }
 };
 
 const QueryValidation = () => {
@@ -176,9 +191,12 @@ const QueryValidation = () => {
                          $shaking={shakingPopover}>
             <div role="alert">
               {explanations.map(({ errorType, errorMessage }) => (
-                <p key={errorMessage}>
-                  <b>{errorType}</b>: {errorMessage}
-                </p>
+                <Explanation key={errorMessage}>
+                  <span><b>{errorType}</b>: {errorMessage}</span>
+                  <DocumentationLink page={getErrorDocumentationLink(errorType)}
+                                     title={`${errorType} documentation`}
+                                     text={<DocumentationIcon name="lightbulb" />} />
+                </Explanation>
               ))}
             </div>
           </StyledPopover>
