@@ -34,6 +34,8 @@ public class MongoDbConfiguration {
     @Parameter(value = "mongodb_uri", required = true, validator = StringNotBlankValidator.class)
     private String uri = "mongodb://localhost/graylog";
 
+    @Parameter(value = "mongodb_version_probe_attempts", validators = {PositiveIntegerValidator.class})
+    int mongodbVersionProbeAttempts = 0;
 
     public int getMaxConnections() {
         return maxConnections;
