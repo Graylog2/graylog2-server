@@ -120,8 +120,8 @@ const GeoIpResolverConfig = createReactClass({
 
   _availableDatabaseTypes() {
     return [
-      { value: 'MAXMIND', label: 'MaxMind City Database' },
-      { value: 'IPINFO', label: 'IPInfo Standard Location' },
+      { value: 'MAXMIND', label: 'MaxMind' },
+      { value: 'IPINFO', label: 'IPInfo' },
     ];
   },
 
@@ -157,9 +157,9 @@ const GeoIpResolverConfig = createReactClass({
             <>
               <dt>Default Graylog schema:</dt>
               <dd>{config.enforce_graylog_schema === true ? 'Yes' : 'No'}</dd>
-              <dt>Database type:</dt>
+              <dt>Database vendor type:</dt>
               <dd>{this._activeDatabaseType(config.db_vendor_type)}</dd>
-              <dt>Database path:</dt>
+              <dt>City database path:</dt>
               <dd>{config.city_db_path}</dd>
               <dt>ASN database path:</dt>
               <dd>{config.asn_db_path}</dd>
