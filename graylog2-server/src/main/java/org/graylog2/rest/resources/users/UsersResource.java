@@ -417,7 +417,7 @@ public class UsersResource extends RestResource {
                 user.setSessionTimeoutMs(sessionTimeoutMs);
             }
         }
-        userManagementService.update(user);
+        userManagementService.update(user, cr);
     }
 
     @DELETE

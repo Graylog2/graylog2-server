@@ -18,6 +18,9 @@ package org.graylog2.shared.users;
 
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.rest.models.users.requests.ChangeUserRequest;
+
+import javax.validation.Valid;
 
 /**
  * User management extension for the UserService. Initially intended to be used in the UserResource for user
@@ -37,7 +40,7 @@ public interface UserManagementService extends UserService {
      * Additional method allows explicit update operations to be carried out
      * (as opposed to calling .save)
      */
-    String update(User user) throws ValidationException;
+    String update(User user, ChangeUserRequest cr) throws ValidationException;
 
     void setUserStatus(User user, User.AccountStatus status) throws ValidationException;
 
