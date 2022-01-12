@@ -64,6 +64,10 @@ const Title = styled.div`
 const Explanation = styled.div`
   display: flex;
   justify-content: space-between;
+
+  :not(:last-child) {
+    margin-bottom: 6px;
+  }
 `;
 
 const shakeAnimation = keyframes`
