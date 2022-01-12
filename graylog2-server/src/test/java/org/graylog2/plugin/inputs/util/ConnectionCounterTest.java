@@ -26,15 +26,19 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.channel.epoll.EpollDomainSocketChannel;
+import io.netty.channel.epoll.EpollEventLoopGroup;
+import io.netty.channel.epoll.EpollServerDomainSocketChannel;
+import io.netty.channel.unix.DomainSocketAddress;
+import io.netty.channel.unix.UnixChannel;
 import io.netty.handler.logging.LoggingHandler;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
-import java.net.InetAddress;
+import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -44,10 +48,13 @@ import java.util.concurrent.atomic.AtomicLong;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ConnectionCounterTest {
+    @Rule
+    public TemporaryFolder tempFolder = new TemporaryFolder();
+
     private static final int LATCH_TIMEOUT = 30;
 
     private ConnectionCounter connectionCounter;
-    private NioEventLoopGroup eventLoopGroup;
+    private EpollEventLoopGroup eventLoopGroup;
     private Channel serverChannel;
     private CountDownLatch readCompleteLatch;
     private CountDownLatch disconnectedLatch;
@@ -57,13 +64,13 @@ public class ConnectionCounterTest {
         readCompleteLatch = new CountDownLatch(1);
         disconnectedLatch = new CountDownLatch(1);
         connectionCounter = new ConnectionCounter(new AtomicInteger(), new AtomicLong());
-        eventLoopGroup = new NioEventLoopGroup(1);
+        eventLoopGroup = new EpollEventLoopGroup(1);
         final ServerBootstrap serverBootstrap = new ServerBootstrap()
                 .group(eventLoopGroup)
-                .channel(NioServerSocketChannel.class)
-                .childHandler(new ChannelInitializer<Channel>() {
+                .channel(EpollServerDomainSocketChannel.class)
+                .childHandler(new ChannelInitializer<UnixChannel>() {
                     @Override
-                    protected void initChannel(Channel ch) {
+                    protected void initChannel(UnixChannel ch) {
                         ch.pipeline().addFirst("connection-counter", connectionCounter);
 
                         // This adds some latches to allow us to wait until the server processed our connection.
@@ -86,7 +93,8 @@ public class ConnectionCounterTest {
                 });
 
         final CountDownLatch serverChannelLatch = new CountDownLatch(1);
-        serverBootstrap.bind(InetAddress.getLocalHost(), 0)
+        final File unixSocket = tempFolder.getRoot().toPath().resolve("connection-counter-test.sock").toFile();
+        serverBootstrap.bind(new DomainSocketAddress(unixSocket))
                 .addListener((ChannelFutureListener) future -> {
                     serverChannel = future.channel();
                     serverChannelLatch.countDown();
@@ -108,13 +116,12 @@ public class ConnectionCounterTest {
         assertThat(connectionCounter.getTotalConnections()).isEqualTo(0L);
         assertThat(connectionCounter.getConnectionCount()).isEqualTo(0);
 
-        final EventLoopGroup clientEventLoopGroup = new NioEventLoopGroup(1);
+        final EventLoopGroup clientEventLoopGroup = new EpollEventLoopGroup(1);
         try {
             final ChannelFuture connectFuture = new Bootstrap()
                     .group(clientEventLoopGroup)
-                    .channel(NioSocketChannel.class)
+                    .channel(EpollDomainSocketChannel.class)
                     .handler(new LoggingHandler())
-                    .localAddress(InetAddress.getLocalHost(), 0)
                     .connect(serverChannel.localAddress())
                     .sync();
             final Channel clientChannel = connectFuture.channel();
