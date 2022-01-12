@@ -119,8 +119,6 @@ type GridProps = {
 const Grid = ({ children, locked, onPositionsChange, positions, width }: GridProps) => {
   const { focusedWidget } = useContext(WidgetFocusContext);
 
-  // The SizeMe component is required to update the widget grid
-  // when its content height results in a scrollbar
   return (
     <StyledReactGridContainer $hasFocusedWidget={!!focusedWidget?.id}
                               columns={COLUMNS}
@@ -186,6 +184,8 @@ const WidgetGrid = () => {
     );
   }).filter((x) => (x !== null)), [fields, focusedWidget, positions, widgets]);
 
+  // Measuring the width is required to update the widget grid
+  // when its content height results in a scrollbar
   return (
     <DashboardWrap>
       {({ width }) => (
