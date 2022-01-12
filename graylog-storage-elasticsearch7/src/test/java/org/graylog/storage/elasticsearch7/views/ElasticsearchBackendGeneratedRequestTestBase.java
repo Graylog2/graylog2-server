@@ -94,7 +94,7 @@ public class ElasticsearchBackendGeneratedRequestTestBase {
                 client,
                 indexLookup,
                 new QueryStringDecorators.Fake(),
-                (elasticsearchBackend, ssb, job, query, results) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, results, fieldTypesLookup),
+                (elasticsearchBackend, ssb, job, query) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, fieldTypesLookup),
                 false);
     }
 
@@ -115,7 +115,7 @@ public class ElasticsearchBackendGeneratedRequestTestBase {
     }
 
     List<SearchRequest> run(SearchJob searchJob, Query query, ESGeneratedQueryContext queryContext, Set<QueryResult> predecessorResults) {
-        this.elasticsearchBackend.doRun(searchJob, query, queryContext, predecessorResults);
+        this.elasticsearchBackend.doRun(searchJob, query, queryContext);
 
         verify(client, times(1)).msearch(clientRequestCaptor.capture(), any());
 

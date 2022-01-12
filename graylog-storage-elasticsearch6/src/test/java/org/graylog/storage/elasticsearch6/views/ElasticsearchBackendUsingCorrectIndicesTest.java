@@ -49,7 +49,6 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import javax.inject.Provider;
-import java.util.Collections;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -90,7 +89,7 @@ public class ElasticsearchBackendUsingCorrectIndicesTest extends ElasticsearchBa
                 jestClient,
                 indexLookup,
                 new QueryStringDecorators.Fake(),
-                (elasticsearchBackend, ssb, job, query, results) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, results, fieldTypesLookup),
+                (elasticsearchBackend, ssb, job, query) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, fieldTypesLookup),
                 false, objectMapper);
     }
 
@@ -117,8 +116,8 @@ public class ElasticsearchBackendUsingCorrectIndicesTest extends ElasticsearchBa
 
     @Test
     public void queryDoesNotFallBackToUsingAllIndicesWhenNoIndexRangesAreReturned() throws Exception {
-        final ESGeneratedQueryContext context = backend.generate(job, query, Collections.emptySet(), new SearchConfig(Period.ZERO));
-        backend.doRun(job, query, context, Collections.emptySet());
+        final ESGeneratedQueryContext context = backend.generate(job, query, new SearchConfig(Period.ZERO));
+        backend.doRun(job, query, context);
 
         verify(jestClient, times(1)).execute(clientRequestCaptor.capture(), any());
 
@@ -132,8 +131,8 @@ public class ElasticsearchBackendUsingCorrectIndicesTest extends ElasticsearchBa
         final long datetimeFixture = 1530194810;
         DateTimeUtils.setCurrentMillisFixed(datetimeFixture);
 
-        final ESGeneratedQueryContext context = backend.generate(job, query, Collections.emptySet(), new SearchConfig(Period.ZERO));
-        backend.doRun(job, query, context, Collections.emptySet());
+        final ESGeneratedQueryContext context = backend.generate(job, query, new SearchConfig(Period.ZERO));
+        backend.doRun(job, query, context);
 
         ArgumentCaptor<TimeRange> captor = ArgumentCaptor.forClass(TimeRange.class);
 
@@ -168,12 +167,12 @@ public class ElasticsearchBackendUsingCorrectIndicesTest extends ElasticsearchBa
                 .build();
         final Search search = dummySearch(query);
         final SearchJob job = new SearchJob("job1", search, "admin");
-        final ESGeneratedQueryContext context = backend.generate(job, query, Collections.emptySet(), new SearchConfig(Period.ZERO));
+        final ESGeneratedQueryContext context = backend.generate(job, query, new SearchConfig(Period.ZERO));
 
         when(indexLookup.indexNamesForStreamsInTimeRange(ImmutableSet.of("streamId"), RelativeRange.create(600)))
                 .thenReturn(ImmutableSet.of("index1", "index2"));
 
-        backend.doRun(job, query, context, Collections.emptySet());
+        backend.doRun(job, query, context);
 
         verify(jestClient, times(1)).execute(clientRequestCaptor.capture(), any());
 
@@ -190,12 +189,12 @@ public class ElasticsearchBackendUsingCorrectIndicesTest extends ElasticsearchBa
                 .build();
         final Search search = dummySearch(query);
         final SearchJob job = new SearchJob("job1", search, "admin");
-        final ESGeneratedQueryContext context = backend.generate(job, query, Collections.emptySet(), new SearchConfig(Period.ZERO));
+        final ESGeneratedQueryContext context = backend.generate(job, query, new SearchConfig(Period.ZERO));
 
         when(indexLookup.indexNamesForStreamsInTimeRange(ImmutableSet.of("stream1", "stream2"), RelativeRange.create(600)))
                 .thenReturn(ImmutableSet.of("index1", "index2"));
 
-        backend.doRun(job, query, context, Collections.emptySet());
+        backend.doRun(job, query, context);
 
         verify(jestClient, times(1)).execute(clientRequestCaptor.capture(), any());
 

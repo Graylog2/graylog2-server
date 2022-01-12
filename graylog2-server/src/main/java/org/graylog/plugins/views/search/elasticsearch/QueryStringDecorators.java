@@ -18,8 +18,6 @@ package org.graylog.plugins.views.search.elasticsearch;
 
 import org.graylog.plugins.views.search.ParameterProvider;
 import org.graylog.plugins.views.search.Query;
-import org.graylog.plugins.views.search.QueryResult;
-import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.engine.QueryStringDecorator;
 
 import javax.inject.Inject;
@@ -41,8 +39,8 @@ public class QueryStringDecorators implements QueryStringDecorator {
     }
 
     @Override
-    public String decorate(String queryString, ParameterProvider job, Query query, Set<QueryResult> results) {
+    public String decorate(String queryString, ParameterProvider job, Query query) {
         return this.queryDecorators.isEmpty() ? queryString : this.queryDecorators.stream()
-                .reduce(queryString, (prev, decorator) -> decorator.decorate(prev, job, query, results), String::concat);
+                .reduce(queryString, (prev, decorator) -> decorator.decorate(prev, job, query), String::concat);
     }
 }

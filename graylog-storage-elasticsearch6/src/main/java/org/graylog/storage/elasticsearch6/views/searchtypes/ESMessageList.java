@@ -121,7 +121,7 @@ public class ESMessageList implements ESSearchTypeHandler<MessageList> {
     private QueryStringQueryBuilder decoratedHighlightQuery(SearchJob job, Query query) {
         final String raw = query.query().queryString();
 
-        final String decorated = this.esQueryDecorators.decorate(raw, job, query, Collections.emptySet());
+        final String decorated = this.esQueryDecorators.decorate(raw, job, query);
 
         return QueryBuilders.queryStringQuery(decorated);
     }
@@ -135,7 +135,7 @@ public class ESMessageList implements ESSearchTypeHandler<MessageList> {
                 .collect(Collectors.toList());
 
         final String undecoratedQueryString = query.query().queryString();
-        final String queryString = this.esQueryDecorators.decorate(undecoratedQueryString, job, query, Collections.emptySet());
+        final String queryString = this.esQueryDecorators.decorate(undecoratedQueryString, job, query);
 
         final DateTime from = query.effectiveTimeRange(searchType).getFrom();
         final DateTime to = query.effectiveTimeRange(searchType).getTo();
