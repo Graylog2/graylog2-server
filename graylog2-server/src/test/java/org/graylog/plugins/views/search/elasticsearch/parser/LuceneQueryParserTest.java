@@ -26,6 +26,7 @@ import org.junit.jupiter.api.Test;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class LuceneQueryParserTest {
 
@@ -108,5 +109,59 @@ class LuceneQueryParserTest {
             final String tokenValue = op.tokens().iterator().next().image();
             return tokenValue.equals("or") || tokenValue.equals("and");
         })).isTrue();
+    }
+
+    @Test
+    void testMultilineQuery() throws ParseException {
+        final ParsedQuery query = parser.parse("foo:bar AND\nlorem:ipsum");
+
+        {
+            final ImmutableToken token = query.tokens().stream().filter(t -> t.image().equals("foo")).findFirst().orElseThrow(() -> new IllegalStateException("Expected token not found"));
+            assertThat(token.beginLine()).isEqualTo(1);
+            assertThat(token.beginColumn()).isEqualTo(0);
+            assertThat(token.endLine()).isEqualTo(1);
+            assertThat(token.endColumn()).isEqualTo(3);
+        }
+
+        {
+            final ImmutableToken token = query.tokens().stream().filter(t -> t.image().equals("lorem")).findFirst().orElseThrow(() -> new IllegalStateException("Expected token not found"));
+            assertThat(token.beginLine()).isEqualTo(2);
+            assertThat(token.beginColumn()).isEqualTo(0);
+            assertThat(token.endLine()).isEqualTo(2);
+            assertThat(token.endColumn()).isEqualTo(5);
+        }
+
+        {
+            final ImmutableToken token = query.tokens().stream().filter(t -> t.image().equals("ipsum")).findFirst().orElseThrow(() -> new IllegalStateException("Expected token not found"));
+            assertThat(token.beginLine()).isEqualTo(2);
+            assertThat(token.beginColumn()).isEqualTo(6);
+            assertThat(token.endLine()).isEqualTo(2);
+            assertThat(token.endColumn()).isEqualTo(11);
+        }
+    }
+
+    @Test
+    void testMultilineComplexQuery() throws ParseException {
+        final ParsedQuery query = parser.parse("(\"ssh login\" AND (source:example.org OR source:another.example.org))\n" +
+                "OR (\"login\" AND (source:example1.org OR source:another.example2.org))\n" +
+                "OR not_existing_field:test");
+        final ImmutableToken token = query.tokens().stream().filter(t -> t.image().equals("not_existing_field")).findFirst().orElseThrow(() -> new IllegalStateException("Expected token not found"));
+        assertThat(token.beginLine()).isEqualTo(3);
+        assertThat(token.beginColumn()).isEqualTo(3);
+        assertThat(token.endLine()).isEqualTo(3);
+        assertThat(token.endColumn()).isEqualTo(21);
+    }
+
+    @Test
+    void testMatchingPositions() throws ParseException {
+        assertThatThrownBy(() -> parser.parse("foo:"))
+                .hasMessageContaining("Cannot parse 'foo:': Encountered \"<EOF>\" at line 1, column 4.");
+    }
+
+
+    @Test
+    void testEmptyQueryNewlines() {
+        assertThatThrownBy(() -> parser.parse("\n\n\n"))
+                .hasMessageContaining("Cannot parse '\n\n\n': Encountered \"<EOF>\" at line 4, column 0.");
     }
 }

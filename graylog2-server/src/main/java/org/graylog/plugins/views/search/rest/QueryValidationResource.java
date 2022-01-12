@@ -40,6 +40,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -104,6 +105,9 @@ public class QueryValidationResource extends RestResource implements PluginRestR
     private List<ValidationMessageDTO> toExplanations(ValidationResponse response) {
         return response.explanations().stream()
                 .map(this::toExplanation)
+                .sorted(Comparator
+                        .comparing(ValidationMessageDTO::beginLine)
+                        .thenComparing(ValidationMessageDTO::beginColumn))
                 .collect(Collectors.toList());
     }
 
