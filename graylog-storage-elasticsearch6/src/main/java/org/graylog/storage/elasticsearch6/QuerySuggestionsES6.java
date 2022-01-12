@@ -16,6 +16,7 @@
  */
 package org.graylog.storage.elasticsearch6;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import io.searchbox.client.JestClient;
 import io.searchbox.core.Search;
 import io.searchbox.core.SearchResult;
@@ -29,14 +30,22 @@ import org.graylog.plugins.views.search.engine.suggestions.SuggestionResponse;
 import org.graylog.shaded.elasticsearch6.org.elasticsearch.index.query.QueryBuilders;
 import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.suggest.SuggestBuilder;
+import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.suggest.SuggestBuilders;
+import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.suggest.term.TermSuggestion;
 import org.graylog.storage.elasticsearch6.jest.JestUtils;
 import org.graylog2.indexer.IndexMapping;
 
 import javax.inject.Inject;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 public class QuerySuggestionsES6 implements QuerySuggestionsService {
 
@@ -55,7 +64,10 @@ public class QuerySuggestionsES6 implements QuerySuggestionsService {
         final SearchSourceBuilder search = new SearchSourceBuilder()
                 .query(QueryBuilders.prefixQuery(req.field(), req.input()))
                 .size(0)
-                .aggregation(AggregationBuilders.terms("fieldvalues").field(req.field()).size(10));
+                .aggregation(AggregationBuilders.terms("fieldvalues").field(req.field()).size(10))
+                .suggest(new SuggestBuilder()
+                        .addSuggestion("corrections",
+                                SuggestBuilders.termSuggestion(req.field()).text(req.input()).size(10)));
 
         final Search.Builder searchBuilder = new Search.Builder(search.toString())
                 .addType(IndexMapping.TYPE_MESSAGE)
@@ -68,7 +80,20 @@ public class QuerySuggestionsES6 implements QuerySuggestionsService {
 
             final TermsAggregation aggregation = result.getAggregations().getTermsAggregation("fieldvalues");
             final List<SuggestionEntry> entries = aggregation.getBuckets().stream().map(b -> new SuggestionEntry(b.getKeyAsString(), b.getCount())).collect(Collectors.toList());
-            return SuggestionResponse.forSuggestions(req.field(), req.input(), entries);
+            if(!entries.isEmpty()) {
+                return SuggestionResponse.forSuggestions(req.field(), req.input(), entries);
+            } else {
+                final List<SuggestionEntry> corrections = Optional.of(result.getJsonObject())
+                        .map(o -> o.get("suggest"))
+                        .map(o -> o.get("corrections"))
+                        .map(o -> o.get(0))
+                        .map(o -> o.get("options"))
+                        .map(options -> StreamSupport.stream(Spliterators.spliteratorUnknownSize(options.elements(), Spliterator.ORDERED), false)
+                                .map(option -> new SuggestionEntry(option.get("text").textValue(), option.get("freq").longValue()))
+                                .collect(Collectors.toList()))
+                        .orElseGet(Collections::emptyList);
+                return SuggestionResponse.forSuggestions(req.field(), req.input(), corrections);
+            }
         } catch (Exception e) {
             final SuggestionError err = SuggestionError.create(e.getClass().getSimpleName(), e.getMessage());
             return SuggestionResponse.forError(req.field(), req.input(), err);
