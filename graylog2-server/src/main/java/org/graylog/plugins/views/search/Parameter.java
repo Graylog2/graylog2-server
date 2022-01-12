@@ -159,10 +159,10 @@ public interface Parameter {
         // this method only exists because the compiler cannot treat `Binding` and `B extends Binding` as the same types
         // see SearchTypeHandler
         @SuppressWarnings("unchecked")
-        default Object resolve(Binding binding, Parameter parameter, Map<String, QueryResult> results) {
-            return doResolve((B) binding, (P) parameter, results);
+        default Object resolve(Binding binding, Parameter parameter) {
+            return doResolve((B) binding, (P) parameter);
         }
 
-        Object doResolve(B binding, P parameter, Map<String, QueryResult> results);
+        Object doResolve(B binding, P parameter);
     }
 }

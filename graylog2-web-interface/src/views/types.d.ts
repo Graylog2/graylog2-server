@@ -71,14 +71,12 @@ interface WidgetResults {
  [key: string]: Result,
 }
 
-interface WidgetComponentProps<Config extends WidgetConfig = WidgetConfig, Result = WidgetResults> {
+interface WidgetComponentProps<Config extends WidgetConfig = WidgetConfig, Results = WidgetResults> {
   config: Config;
-  data: Result;
+  data: Results;
   editing: boolean;
   fields: Immutable.List<FieldTypeMapping>;
   filter: string;
-  height: number;
-  width: number;
   queryId: string;
   onConfigChange: (newConfig: Config) => Promise<Widgets>;
   setLoadingState: (loading: boolean) => void;

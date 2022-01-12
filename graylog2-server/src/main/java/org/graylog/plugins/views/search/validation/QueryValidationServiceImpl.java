@@ -127,6 +127,6 @@ public class QueryValidationServiceImpl implements QueryValidationService {
     private String decoratedQuery(ValidationRequest req) {
         ParameterProvider parameterProvider = (name) -> req.parameters().stream().filter(p -> Objects.equals(p.name(), name)).findFirst();
         final Query query = Query.builder().query(req.query()).timerange(req.timerange()).build();
-        return this.queryStringDecorators.decorate(req.getCombinedQueryWithFilter(), parameterProvider, query, Collections.emptySet());
+        return this.queryStringDecorators.decorate(req.getCombinedQueryWithFilter(), parameterProvider, query);
     }
 }

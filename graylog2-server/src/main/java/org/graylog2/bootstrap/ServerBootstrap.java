@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.util.concurrent.Service;
 import com.google.common.util.concurrent.ServiceManager;
+import com.google.inject.Binder;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Key;
@@ -33,11 +34,14 @@ import com.google.inject.util.Types;
 import org.graylog2.Configuration;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
-import org.graylog2.bindings.MongoDBModule;
+import org.graylog2.bindings.ConfigurationModule;
+import org.graylog2.bootstrap.preflight.PreflightCheckService;
+import org.graylog2.bootstrap.preflight.ServerPreflightChecksModule;
 import org.graylog2.configuration.PathConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
-import org.graylog2.database.MongoConnection;
 import org.graylog2.migrations.Migration;
+import org.graylog2.plugin.Plugin;
+import org.graylog2.plugin.PreflightCheckModule;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.inputs.MessageInput;
@@ -63,11 +67,13 @@ import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.graylog2.audit.AuditEventTypes.NODE_STARTUP_COMPLETE;
@@ -115,16 +121,33 @@ public abstract class ServerBootstrap extends CmdLineTool {
     }
 
     @Override
-    protected void beforeInjectorCreation() {
-        testMongoDbConnection();
+    protected void beforeInjectorCreation(Set<Plugin> plugins) {
+        runPreFlightChecks(plugins);
     }
 
-    // Try to create a single MongoDBConnection, so we can fail early if there is an error
-    private void testMongoDbConnection() {
-        Guice.createInjector(
-                        new NamedConfigParametersModule(jadConfig.getConfigurationBeans()),
-                        new MongoDBModule())
-                .getInstance(MongoConnection.class);
+    private void runPreFlightChecks(Set<Plugin> plugins) {
+        final List<PreflightCheckModule> preflightCheckModules = plugins.stream().map(Plugin::preflightCheckModules)
+                .flatMap(Collection::stream).collect(Collectors.toList());
+
+        final Injector injector = getPreflightInjector(preflightCheckModules);
+
+        injector.getInstance(PreflightCheckService.class).runChecks();
+    }
+
+    private Injector getPreflightInjector(List<PreflightCheckModule> preflightCheckModules) {
+        final Injector injector = Guice.createInjector(
+                new NamedConfigParametersModule(jadConfig.getConfigurationBeans()),
+                new ServerStatusBindings(capabilities()),
+                new ConfigurationModule(configuration),
+                new SystemStatsModule(configuration.isDisableNativeSystemStatsCollector()),
+                new ServerPreflightChecksModule(),
+                new Module() {
+                    @Override
+                    public void configure(Binder binder) {
+                        preflightCheckModules.forEach(binder::install);
+                    }
+                });
+        return injector;
     }
 
     private void setNettyNativeDefaults(PathConfiguration pathConfiguration) {

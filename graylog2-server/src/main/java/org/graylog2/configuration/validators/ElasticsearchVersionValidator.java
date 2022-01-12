@@ -27,7 +27,7 @@ import static org.graylog2.storage.SearchVersion.Distribution.ELASTICSEARCH;
 import static org.graylog2.storage.SearchVersion.Distribution.OPENSEARCH;
 
 public class ElasticsearchVersionValidator implements Validator<SearchVersion> {
-    private static final List<SearchVersionRange> SUPPORTED_ES_VERSIONS = ImmutableList.of(
+    public static final List<SearchVersionRange> SUPPORTED_ES_VERSIONS = ImmutableList.of(
             SearchVersionRange.of(OPENSEARCH, "^1.0.0"),
             SearchVersionRange.of(ELASTICSEARCH, "^6.0.0"),
             SearchVersionRange.of(ELASTICSEARCH, "^7.0.0")

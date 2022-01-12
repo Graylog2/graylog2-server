@@ -32,6 +32,7 @@ import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.AuditEventType;
 import org.graylog2.audit.PluginAuditEventTypes;
 import org.graylog2.audit.formatter.AuditEventFormatter;
+import org.graylog2.bootstrap.preflight.PreflightCheck;
 import org.graylog2.contentpacks.constraints.ConstraintChecker;
 import org.graylog2.contentpacks.facades.EntityWithExcerptFacade;
 import org.graylog2.contentpacks.model.ModelType;
@@ -360,6 +361,14 @@ public abstract class Graylog2Module extends AbstractModule {
 
     protected MapBinder<String, AuthorizingRealm> authorizationOnlyRealmBinder() {
         return MapBinder.newMapBinder(binder(), String.class, AuthorizingRealm.class);
+    }
+
+    protected MapBinder<String, PreflightCheck> preflightChecksBinder() {
+        return MapBinder.newMapBinder(binder(), String.class, PreflightCheck.class);
+    }
+
+    protected void addPreflightCheck(Class<? extends PreflightCheck> preflightCheck) {
+        preflightChecksBinder().addBinding(preflightCheck.getCanonicalName()).to(preflightCheck);
     }
 
     protected MapBinder<String, SearchResponseDecorator.Factory> searchResponseDecoratorBinder() {

@@ -49,11 +49,10 @@ public interface QueryBackend<T extends GeneratedQueryContext> {
      *
      * @param job                currently executing job
      * @param query              the graylog query structure
-     * @param predecessorResults the query result of the preceding queries
      * @param searchConfig       additional cluster-wide search configuration like query time-range limit
      * @return a backend specific generated query
      */
-    T generate(SearchJob job, Query query, Set<QueryResult> predecessorResults, SearchConfig searchConfig);
+    T generate(SearchJob job, Query query, SearchConfig searchConfig);
 
     default boolean isAllMessages(TimeRange timeRange) {
         return timeRange instanceof RelativeRange && ((RelativeRange)timeRange).isAllMessages();
@@ -79,14 +78,14 @@ public interface QueryBackend<T extends GeneratedQueryContext> {
         return AbsoluteRange.create(effectiveTimeRange.getFrom(), effectiveTimeRange.getTo());
     }
 
-    // TODO we can probably push job, query and predecessorResults into the GeneratedQueryContext to simplify the signature
-    default QueryResult run(SearchJob job, Query query, GeneratedQueryContext generatedQueryContext, Set<QueryResult> predecessorResults) {
+    // TODO we can probably push job and query into the GeneratedQueryContext to simplify the signature
+    default QueryResult run(SearchJob job, Query query, GeneratedQueryContext generatedQueryContext) {
         try {
             final Stopwatch stopwatch = Stopwatch.createStarted();
             final QueryExecutionStats.Builder statsBuilder = QueryExecutionStats.builderWithCurrentTime();
             // https://www.ibm.com/developerworks/java/library/j-jtp04298/index.html#3.0
             //noinspection unchecked
-            final QueryResult result = doRun(job, query, (T) generatedQueryContext, predecessorResults);
+            final QueryResult result = doRun(job, query, (T) generatedQueryContext);
             stopwatch.stop();
             return result.toBuilder()
                     .executionStats(
@@ -110,12 +109,11 @@ public interface QueryBackend<T extends GeneratedQueryContext> {
      *
      * @param job                currently executing job
      * @param query              the individual query to run from the current job
-     * @param queryContext       the generated query by {@link #generate(SearchJob, Query, Set, SearchConfig)}
-     * @param predecessorResults the query result of the preceding queries
+     * @param queryContext       the generated query by {@link #generate(SearchJob, Query, SearchConfig)}
      * @return the result for the query
      * @throws RuntimeException if the query could not be executed for some reason
      */
-    QueryResult doRun(SearchJob job, Query query, T queryContext, Set<QueryResult> predecessorResults);
+    QueryResult doRun(SearchJob job, Query query, T queryContext);
 
     default Optional<SearchTypeError> validateSearchType(Query query, SearchType searchType, SearchConfig searchConfig) {
         return searchConfig.getQueryTimeRangeLimit()

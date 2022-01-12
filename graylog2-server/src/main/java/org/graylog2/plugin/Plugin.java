@@ -17,6 +17,7 @@
 package org.graylog2.plugin;
 
 import java.util.Collection;
+import java.util.Collections;
 
 /**
  * A graylog plugin.
@@ -49,4 +50,8 @@ public interface Plugin {
     PluginMetaData metadata();
 
     Collection<PluginModule> modules();
+
+    default Collection<PreflightCheckModule> preflightCheckModules() {
+        return Collections.emptyList();
+    }
 }

@@ -23,7 +23,6 @@ import io.searchbox.core.SearchResult;
 import org.graylog.plugins.views.search.ParameterProvider;
 import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.plugins.views.search.Query;
-import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.storage.elasticsearch6.views.ESGeneratedQueryContext;
@@ -82,7 +81,7 @@ public class ESMessageListTest {
 
     @Test
     public void appliesDecoratorsToQueryStringIfHighlightingActivated() {
-        final QueryStringDecorator queryStringDecorator = (String queryString, ParameterProvider job, Query query, Set<QueryResult> results) -> "Foobar!";
+        final QueryStringDecorator queryStringDecorator = (String queryString, ParameterProvider job, Query query) -> "Foobar!";
 
         final MessageList messageList = someMessageList();
 
