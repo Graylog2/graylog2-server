@@ -44,9 +44,9 @@ class DocsHelper {
     REPORTING: 'reporting',
     ROLLING_ES_UPGRADE: 'rolling-es-upgrade',
     SEARCH_QUERY_ERRORS: {
-      UNKNOWN_FIELD: 'query-language#unkown-field',
+      UNKNOWN_FIELD: 'query-language#unknown-field',
       PARSE_EXCEPTION: 'query-language#parse-exception',
-      INVALID_OPERATOR: 'query-language#invali-operator',
+      INVALID_OPERATOR: 'query-language#invalid-operator',
     },
     SEARCH_QUERY_LANGUAGE: 'query-language',
     STREAMS: 'streams',
