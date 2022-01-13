@@ -42,7 +42,7 @@ type Props = {
 
 const isReservedField = (fieldName) => MessageFieldsFilter.FILTERED_FIELDS.includes(fieldName);
 
-const _fieldsToShow = (fields, allFields, currentGroup = 'all') => {
+const _fieldsToShow = (fields, allFields, currentGroup = 'all'): ImmutableList<FieldTypeMapping> => {
   const isNotReservedField = (f) => !isReservedField(f.name);
 
   switch (currentGroup) {
@@ -71,13 +71,6 @@ const List = ({ viewMetadata: { activeQuery }, filter, activeQueryFields, allFie
     return <i>No fields to show. Try changing your filter term or select a different field set above.</i>;
   }
 
-  const Row = ({ index, style }: { index: number, style: React.CSSProperties }) => (
-    <ListItem fieldType={fieldList.get(index)}
-              selectedQuery={activeQuery}
-              activeQueryFields={activeQueryFields}
-              style={style} />
-  );
-
   return (
     <DynamicHeight>
       {({ width, height }) => (
@@ -85,7 +78,12 @@ const List = ({ viewMetadata: { activeQuery }, filter, activeQueryFields, allFie
                        width={width}
                        itemCount={fieldList.size}
                        itemSize={20}>
-          {Row}
+          {({ index, style }) => (
+            <ListItem fieldType={fieldList.get(index)}
+                      selectedQuery={activeQuery}
+                      activeQueryFields={activeQueryFields}
+                      style={style} />
+          )}
         </FixedSizeList>
       )}
     </DynamicHeight>

@@ -19,7 +19,6 @@ import { useRef } from 'react';
 import type * as Immutable from 'immutable';
 import PropTypes from 'prop-types';
 import ImmutablePropTypes from 'react-immutable-proptypes';
-import type { OrderedSet } from 'immutable';
 
 import { Col, Row } from 'components/bootstrap';
 import type { QueryId } from 'views/logic/queries/Query';
@@ -35,7 +34,7 @@ export interface QueryTabsProps {
   onRemove: (queryId: string) => Promise<void> | Promise<ViewState>,
   onSelect: (queryId: string) => Promise<Query> | Promise<string>,
   onTitleChange: (queryId: string, newTitle: string) => Promise<TitlesMap>,
-  queries: OrderedSet<QueryId>,
+  queries: Immutable.OrderedSet<QueryId>,
   selectedQueryId: string,
   titles: Immutable.Map<string, string>,
 }
