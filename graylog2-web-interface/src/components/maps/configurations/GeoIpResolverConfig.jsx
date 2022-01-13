@@ -28,7 +28,7 @@ const defaultConfig = {
   enforce_graylog_schema: true,
   db_vendor_type: 'MAXMIND',
   city_db_path: '/etc/graylog/server/GeoLite2-City.mmdb',
-  asn_db_path: '/etc/graylog/server/asn.mmdb',
+  asn_db_path: '/etc/graylog/server/GeoLite2-ASN.mmdb',
   run_before_extractors: false,
 };
 
