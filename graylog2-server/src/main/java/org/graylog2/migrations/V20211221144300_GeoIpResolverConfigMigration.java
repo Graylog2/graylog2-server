@@ -90,9 +90,9 @@ public class V20211221144300_GeoIpResolverConfigMigration extends Migration {
         LOG.info("Update Result: {}", updateResult);
 
         Bson setDefaultVendor = Updates.set(FIELD_DB_VENDOR, DatabaseVendorType.MAXMIND.name());
-        LOG.info("Setting default vendor: " + setDefaultVendor);
+        LOG.info("Setting default vendor: {}", setDefaultVendor);
         final UpdateResult updateVendorResult = collection.updateOne(geoConfFilter, setDefaultVendor);
-        LOG.info("Default Vendor Update Result: " + updateVendorResult);
+        LOG.info("Default Vendor Update Result: {}", updateVendorResult);
 
     }
 }
