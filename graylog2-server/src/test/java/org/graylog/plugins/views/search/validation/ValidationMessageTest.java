@@ -38,7 +38,7 @@ class ValidationMessageTest {
             assertThat(validationMessage.beginColumn()).isEqualTo(0);
             assertThat(validationMessage.endColumn()).isEqualTo(4);
             assertThat(validationMessage.errorType()).isEqualTo("QueryParsingException");
-            assertThat(validationMessage.errorMessage()).startsWith("org.apache.lucene.queryparser.classic.ParseException: Cannot parse 'foo:': Encountered \"<EOF>\" at line 1, column 4");
+            assertThat(validationMessage.errorMessage()).startsWith("Cannot parse query 'foo:', cause: incomplete query, query ended unexpectedly");
         }
     }
 }

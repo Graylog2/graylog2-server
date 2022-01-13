@@ -113,7 +113,7 @@ class LuceneQueryParserTest {
     }
 
     @Test
-    void testMultilineQuery() throws ParseException {
+    void testMultilineQuery() throws QueryParsingException {
         final ParsedQuery query = parser.parse("foo:bar AND\nlorem:ipsum");
 
         {
@@ -142,7 +142,7 @@ class LuceneQueryParserTest {
     }
 
     @Test
-    void testMultilineComplexQuery() throws ParseException {
+    void testMultilineComplexQuery() throws QueryParsingException {
         final ParsedQuery query = parser.parse("(\"ssh login\" AND (source:example.org OR source:another.example.org))\n" +
                 "OR (\"login\" AND (source:example1.org OR source:another.example2.org))\n" +
                 "OR not_existing_field:test");
