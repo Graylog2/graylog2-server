@@ -81,10 +81,12 @@ public class V20211221144300_GeoIpResolverConfigMigration extends Migration {
         //rename db type field to db vendor type
         Bson renameDbTypeToVendor = Updates.rename(FIELD_DB_TYPE, FIELD_DB_VENDOR);
 
+        Bson setDefaultVendor = Updates.set(FIELD_DB_VENDOR, DatabaseVendorType.MAXMIND);
+
         //rename existing db_path field to city_db_path
         Bson renameDbPath = Updates.rename(FIELD_DB_PATH, FIELD_CITY_DB_PATH);
 
-        Bson updates = Updates.combine(setEnforceSchema, renameDbTypeToVendor, renameDbPath, setAsnPath);
+        Bson updates = Updates.combine(setEnforceSchema, renameDbTypeToVendor, setDefaultVendor, renameDbPath, setAsnPath);
         LOG.info("Planned Updates: {}", updates);
         final UpdateResult updateResult = collection.updateOne(Filters.and(geoConfFiler, noColumnFilter), updates);
         LOG.info("Update Result: {}", updateResult);
