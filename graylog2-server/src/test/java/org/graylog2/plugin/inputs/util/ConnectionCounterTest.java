@@ -35,13 +35,14 @@ public class ConnectionCounterTest {
         assertThat(connectionCounter.getConnectionCount()).isEqualTo(0);
 
         final EmbeddedChannel embeddedChannel = new EmbeddedChannel(connectionCounter);
-        embeddedChannel.connect(embeddedChannel.localAddress());
+        assertThat(embeddedChannel.isActive()).isTrue();
 
         // One client active
         assertThat(connectionCounter.getTotalConnections()).isEqualTo(1L);
         assertThat(connectionCounter.getConnectionCount()).isEqualTo(1);
 
-        embeddedChannel.disconnect();
+        embeddedChannel.disconnect().get();
+        assertThat(embeddedChannel.isActive()).isFalse();
 
         // No client, but 1 connection so far
         assertThat(connectionCounter.getTotalConnections()).isEqualTo(1L);
