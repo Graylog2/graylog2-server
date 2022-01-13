@@ -28,16 +28,13 @@ public class ConnectionCounterTest {
 
     @Test
     public void testConnectAndDisconnect() throws Exception {
-
-        ConnectionCounter connectionCounter = new ConnectionCounter(new AtomicInteger(), new AtomicLong());
+        final ConnectionCounter connectionCounter = new ConnectionCounter(new AtomicInteger(), new AtomicLong());
 
         // Fresh channel, no connections so far
         assertThat(connectionCounter.getTotalConnections()).isEqualTo(0L);
         assertThat(connectionCounter.getConnectionCount()).isEqualTo(0);
 
-        connectionCounter = new ConnectionCounter(new AtomicInteger(), new AtomicLong());
         final EmbeddedChannel embeddedChannel = new EmbeddedChannel(connectionCounter);
-
         embeddedChannel.connect(embeddedChannel.localAddress());
 
         // One client active
