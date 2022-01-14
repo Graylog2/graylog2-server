@@ -19,10 +19,11 @@ import { useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
+import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 
 import TimeRangeDropdownButton from './TimeRangeDropdownButton';
-import TimeRangeDropdown, { TimeRangeType } from './date-time-picker/TimeRangeDropdown';
+import type { TimeRangeType } from './date-time-picker/TimeRangeDropdown';
+import TimeRangeDropdown from './date-time-picker/TimeRangeDropdown';
 import TimeRangeDisplay from './TimeRangeDisplay';
 
 type Props = {

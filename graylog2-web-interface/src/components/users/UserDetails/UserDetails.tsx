@@ -17,7 +17,7 @@
 import * as React from 'react';
 
 import { IfPermitted, Spinner } from 'components/common';
-import User from 'logic/users/User';
+import type User from 'logic/users/User';
 import SectionGrid from 'components/common/Section/SectionGrid';
 
 import PreferencesSection from './PreferencesSection';

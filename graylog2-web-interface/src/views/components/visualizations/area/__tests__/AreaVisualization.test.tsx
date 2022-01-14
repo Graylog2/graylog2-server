@@ -32,7 +32,7 @@ import AreaVisualization from '../AreaVisualization';
 jest.mock('../../GenericPlot', () => mockComponent('GenericPlot'));
 
 jest.mock('views/stores/CurrentQueryStore', () => ({
-  CurrentQueryStore: MockStore(['getInitialState', () => MockQuery.builder().build()], 'listen'),
+  CurrentQueryStore: MockStore(['getInitialState', () => MockQuery.builder().build()]),
 }));
 
 jest.mock('util/AppConfig', () => ({

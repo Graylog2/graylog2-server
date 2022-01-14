@@ -16,7 +16,7 @@
  */
 import { isEqual } from 'lodash';
 
-import {
+import type {
   TimeRange,
   NoTimeRangeOverride,
   RelativeTimeRangeStartOnly,

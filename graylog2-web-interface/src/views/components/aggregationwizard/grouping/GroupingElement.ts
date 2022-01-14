@@ -17,8 +17,10 @@
 import { isEmpty } from 'lodash';
 import uuid from 'uuid/v4';
 
-import AggregationWidgetConfig, { AggregationWidgetConfigBuilder } from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
-import Pivot, { TimeConfigType, ValuesConfigType } from 'views/logic/aggregationbuilder/Pivot';
+import type { AggregationWidgetConfigBuilder } from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import type { TimeConfigType, ValuesConfigType } from 'views/logic/aggregationbuilder/Pivot';
+import Pivot from 'views/logic/aggregationbuilder/Pivot';
 
 import GroupingsConfiguration from './GroupingsConfiguration';
 

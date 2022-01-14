@@ -15,23 +15,24 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState, useContext, useMemo } from 'react';
+import { useContext, useMemo } from 'react';
 import styled, { css } from 'styled-components';
 import { SizeMe } from 'react-sizeme';
 
-import { WidgetPositions, BackendWidgetPosition } from 'views/types';
+import type { WidgetPositions, BackendWidgetPosition } from 'views/types';
 import ReactGridContainer from 'components/common/ReactGridContainer';
 import { widgetDefinition } from 'views/logic/Widgets';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
-import WidgetFocusContext, { FocusContextState } from 'views/components/contexts/WidgetFocusContext';
-import { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
+import type { FocusContextState } from 'views/components/contexts/WidgetFocusContext';
+import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
+import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import { useStore } from 'stores/connect';
 import { WidgetStore } from 'views/stores/WidgetStore';
 import { CurrentViewStateActions } from 'views/stores/CurrentViewStateStore';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
 import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
-import { StoreState } from 'stores/StoreTypes';
+import type { StoreState } from 'stores/StoreTypes';
 import { ViewStatesStore } from 'views/stores/ViewStatesStore';
 
 import WidgetContainer from './WidgetContainer';
@@ -66,20 +67,9 @@ const _defaultDimensions = (type) => {
   return new WidgetPosition(1, 1, widgetDef.defaultHeight, widgetDef.defaultWidth);
 };
 
-type WidgetDimensions = { height: number, width: number };
-
-const _onWidgetSizeChange = (
-  widgetDimensions: { [widgetId: string]: WidgetDimensions },
-  setWidgetDimensions: (newWidgetDimensions: { [widgetId: string]: WidgetDimensions }) => void,
-) => (widgetId: string, dimensions: WidgetDimensions) => {
-  setWidgetDimensions({ ...widgetDimensions, [widgetId]: dimensions });
-};
-
 type WidgetsProps = {
   fields: FieldTypeMappingsList,
   widgetId: string,
-  setWidgetDimensions: (newWidgetDimensions: { [widgetId: string]: WidgetDimensions }) => void,
-  widgetDimensions: { [widgetId: string]: WidgetDimensions },
   focusedWidget: FocusContextState | undefined,
   onPositionsChange: (position: BackendWidgetPosition) => void,
   positions: WidgetPositions,
@@ -89,22 +79,17 @@ const WidgetGridItem = ({
   fields,
   onPositionsChange,
   positions,
-  setWidgetDimensions,
-  widgetDimensions,
   widgetId,
   focusedWidget,
 }: WidgetsProps) => {
   const editing = focusedWidget?.id === widgetId && focusedWidget?.editing;
   const widgetPosition = positions[widgetId];
-  const onWidgetSizeChange = useMemo(() => _onWidgetSizeChange(widgetDimensions, setWidgetDimensions), [widgetDimensions, setWidgetDimensions]);
 
   return (
     <WidgetComponent editing={editing}
                      fields={fields}
                      onPositionsChange={onPositionsChange}
-                     onWidgetSizeChange={onWidgetSizeChange}
                      position={widgetPosition}
-                     widgetDimension={widgetDimensions[widgetId] || {} as WidgetDimensions}
                      widgetId={widgetId} />
   );
 };
@@ -179,7 +164,6 @@ const onPositionsChange = (newPositions: Array<BackendWidgetPosition>) => {
 const WidgetGrid = () => {
   const isInteractive = useContext(InteractiveContext);
   const { focusedWidget } = useContext(WidgetFocusContext);
-  const [widgetDimensions, setWidgetDimensions] = useState({});
 
   const widgets = useStore(WidgetStore, (state) => state.map(({ id, type }) => ({ id, type })).toArray().reverse());
 
@@ -199,13 +183,11 @@ const WidgetGrid = () => {
         <WidgetGridItem fields={fields}
                         positions={positions}
                         widgetId={widgetId}
-                        setWidgetDimensions={setWidgetDimensions}
-                        widgetDimensions={widgetDimensions}
                         focusedWidget={focusedWidget}
                         onPositionsChange={onPositionChange} />
       </WidgetContainer>
     );
-  }).filter((x) => (x !== null)), [fields, focusedWidget, positions, widgetDimensions, widgets]);
+  }).filter((x) => (x !== null)), [fields, focusedWidget, positions, widgets]);
 
   return (
     <DashboardWrap>

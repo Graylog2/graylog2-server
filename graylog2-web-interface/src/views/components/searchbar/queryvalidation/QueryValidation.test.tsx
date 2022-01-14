@@ -21,7 +21,7 @@ import { Form, Formik } from 'formik';
 
 import QueryValidation from 'views/components/searchbar/queryvalidation/QueryValidation';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
-import FormWarningsContext from 'contexts/FormWarningsContext'; import { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
+import FormWarningsContext from 'contexts/FormWarningsContext'; import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 
 jest.mock('views/stores/QueriesStore', () => ({
   QueriesActions: {

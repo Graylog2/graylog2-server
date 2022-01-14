@@ -15,15 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import * as Immutable from 'immutable';
+import type * as Immutable from 'immutable';
 import { flatten, get } from 'lodash';
-import styled, { css, DefaultTheme } from 'styled-components';
+import type { DefaultTheme } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import Value from 'views/components/Value';
-import FieldType from 'views/logic/fieldtypes/FieldType';
+import type FieldType from 'views/logic/fieldtypes/FieldType';
 import { AdditionalContext } from 'views/logic/ActionContext';
 import type { ValuePath } from 'views/logic/valueactions/ValueActionHandler';
-import Series, { parseSeries } from 'views/logic/aggregationbuilder/Series';
+import type Series from 'views/logic/aggregationbuilder/Series';
+import { parseSeries } from 'views/logic/aggregationbuilder/Series';
 import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import fieldTypeFor from 'views/logic/fieldtypes/FieldTypeFor';
 

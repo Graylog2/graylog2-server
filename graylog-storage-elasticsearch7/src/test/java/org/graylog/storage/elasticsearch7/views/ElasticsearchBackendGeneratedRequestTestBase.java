@@ -25,7 +25,6 @@ import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
-import org.graylog.plugins.views.search.validation.LuceneQueryParser;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
@@ -40,7 +39,6 @@ import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.ESPivotBucketS
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.ESPivotSeriesSpecHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.series.ESAverageHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.series.ESMaxHandler;
-import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
@@ -49,7 +47,6 @@ import org.junit.Rule;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
@@ -97,7 +94,7 @@ public class ElasticsearchBackendGeneratedRequestTestBase {
                 client,
                 indexLookup,
                 new QueryStringDecorators.Fake(),
-                (elasticsearchBackend, ssb, job, query, results) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, results, fieldTypesLookup),
+                (elasticsearchBackend, ssb, job, query) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, fieldTypesLookup),
                 false);
     }
 
@@ -118,7 +115,7 @@ public class ElasticsearchBackendGeneratedRequestTestBase {
     }
 
     List<SearchRequest> run(SearchJob searchJob, Query query, ESGeneratedQueryContext queryContext, Set<QueryResult> predecessorResults) {
-        this.elasticsearchBackend.doRun(searchJob, query, queryContext, predecessorResults);
+        this.elasticsearchBackend.doRun(searchJob, query, queryContext);
 
         verify(client, times(1)).msearch(clientRequestCaptor.capture(), any());
 

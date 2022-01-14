@@ -22,11 +22,11 @@ import { useStore } from 'stores/connect';
 import { Button } from 'components/bootstrap';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import UrlWhiteListForm from 'components/configurations/UrlWhiteListForm';
-import type { ConfigurationsStoreState } from 'stores/configurations/ConfigurationsStore';
+import type { ConfigurationsStoreState, WhiteListConfig } from 'stores/configurations/ConfigurationsStore';
 // Explicit import to fix eslint import/no-cycle
 import IfPermitted from 'components/common/IfPermitted';
 import { isPermitted } from 'util/PermissionsMixin';
-import { ConfigurationsActions, ConfigurationsStore, WhiteListConfig } from 'stores/configurations/ConfigurationsStore';
+import { ConfigurationsActions, ConfigurationsStore } from 'stores/configurations/ConfigurationsStore';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 
 const URL_WHITELIST_CONFIG = 'org.graylog2.system.urlwhitelist.UrlWhitelist';

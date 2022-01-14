@@ -14,19 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
+import PropTypes from 'prop-types';
 
-import { LinkContainer } from 'components/common/router';
-import connect from 'stores/connect';
-import { Button, ButtonToolbar } from 'components/bootstrap';
 import { DataTable } from 'components/common';
-import Routes from 'routing/Routes';
-import { RulesActions, RulesStore } from 'stores/rules/RulesStore';
-import type { RuleType, MetricsConfigType, RulesContext, RulesStoreState } from 'stores/rules/RulesStore';
-import { Store } from 'stores/StoreTypes';
+import type { RuleType, MetricsConfigType, RulesContext } from 'stores/rules/RulesStore';
 
-import RuleMetricsConfigContainer from './RuleMetricsConfigContainer';
 import RuleListEntry from './RuleListEntry';
 
 type Props = {
@@ -44,9 +37,7 @@ type State = {
 class RuleList extends React.Component<Props, State> {
   static propTypes = {
     rules: PropTypes.array.isRequired,
-    metricsConfig: PropTypes.exact({
-      metrics_enabled: PropTypes.bool.isRequired,
-    }),
+
     rulesContext: PropTypes.exact({
       used_in_pipelines: PropTypes.objectOf(PropTypes.any),
     }),
@@ -55,21 +46,8 @@ class RuleList extends React.Component<Props, State> {
   };
 
   static defaultProps = {
-    metricsConfig: undefined,
     rulesContext: undefined,
   };
-
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      openMetricsConfig: false,
-    };
-  }
-
-  componentDidMount() {
-    RulesActions.loadMetricsConfig();
-  }
 
   _headerCellFormatter = (header) => {
     return <th>{header}</th>;
@@ -81,49 +59,22 @@ class RuleList extends React.Component<Props, State> {
     return <RuleListEntry key={rule.id} rule={rule} usingPipelines={usingPipelines[rule.id]} onDelete={onDelete} />;
   };
 
-  toggleMetricsConfig = () => {
-    const { openMetricsConfig } = this.state;
-
-    this.setState({ openMetricsConfig: !openMetricsConfig });
-  };
-
-  renderDebugMetricsButton = (metricsConfig) => {
-    if (metricsConfig && metricsConfig.metrics_enabled) {
-      return <Button bsStyle="warning" onClick={this.toggleMetricsConfig}>Debug Metrics: ON</Button>;
-    }
-
-    return <Button onClick={this.toggleMetricsConfig}>Debug Metrics</Button>;
-  };
-
   render() {
-    const { rules, metricsConfig, searchFilter } = this.props;
+    const { rules, searchFilter } = this.props;
     const headers = ['Title', 'Description', 'Created', 'Last modified', 'Throughput', 'Errors', 'Pipelines', 'Actions'];
-    const { openMetricsConfig } = this.state;
 
     return (
-      <div>
-        <DataTable id="rule-list"
-                   className="table-hover"
-                   headers={headers}
-                   headerCellFormatter={this._headerCellFormatter}
-                   sortByKey="title"
-                   rows={rules}
-                   customFilter={searchFilter}
-                   dataRowFormatter={this._ruleInfoFormatter}
-                   filterKeys={[]}>
-          <ButtonToolbar className="pull-right">
-            <LinkContainer to={Routes.SYSTEM.PIPELINES.RULE('new')}>
-              <Button bsStyle="success">Create Rule</Button>
-            </LinkContainer>
-            {this.renderDebugMetricsButton(metricsConfig)}
-          </ButtonToolbar>
-        </DataTable>
-        {openMetricsConfig && <RuleMetricsConfigContainer onClose={this.toggleMetricsConfig} />}
-      </div>
+      <DataTable id="rule-list"
+                 className="table-hover"
+                 headers={headers}
+                 headerCellFormatter={this._headerCellFormatter}
+                 sortByKey="title"
+                 rows={rules}
+                 customFilter={searchFilter}
+                 dataRowFormatter={this._ruleInfoFormatter}
+                 filterKeys={[]} />
     );
   }
 }
 
-export default connect(RuleList, { rules: RulesStore as Store<RulesStoreState> }, ({ rules }) => {
-  return { metricsConfig: rules.metricsConfig };
-});
+export default RuleList;

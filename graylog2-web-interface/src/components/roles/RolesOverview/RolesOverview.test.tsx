@@ -48,7 +48,7 @@ jest.mock('stores/roles/AuthzRolesStore', () => ({
     listen: jest.fn(),
   },
   AuthzRolesActions: {
-    delete: mockAction(jest.fn(() => Promise.resolve())),
+    delete: mockAction(),
     loadRolesPaginated: jest.fn(() => mockLoadRolesPaginatedPromise),
   },
 }));

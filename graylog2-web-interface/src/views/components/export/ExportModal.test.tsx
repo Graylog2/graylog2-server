@@ -18,16 +18,17 @@ import * as React from 'react';
 import { render, fireEvent, waitFor } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
 import selectEvent from 'react-select-event';
-import { Optional } from 'utility-types';
-import { PluginRegistration, PluginStore } from 'graylog-web-plugin/plugin';
+import type { Optional } from 'utility-types';
+import type { PluginRegistration } from 'graylog-web-plugin/plugin';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import asMock from 'helpers/mocking/AsMock';
-import { TitleType } from 'views/stores/TitleTypes';
+import type { TitleType } from 'views/stores/TitleTypes';
 import { exportSearchMessages, exportSearchTypeMessages } from 'util/MessagesExportUtils';
-import type { ViewStateMap } from 'views/logic/views/View';
+import type { ViewStateMap, ViewType } from 'views/logic/views/View';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
-import { AbsoluteTimeRange, ElasticsearchQueryString } from 'views/logic/queries/Query';
-import View, { ViewType } from 'views/logic/views/View';
+import type { AbsoluteTimeRange, ElasticsearchQueryString } from 'views/logic/queries/Query';
+import View from 'views/logic/views/View';
 import ViewState from 'views/logic/views/ViewState';
 import ParameterBinding from 'views/logic/parameters/ParameterBinding';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
@@ -43,7 +44,8 @@ import {
 import { createWidget } from 'views/logic/WidgetTestHelpers';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 
-import ExportModal, { Props as ExportModalProps } from './ExportModal';
+import type { Props as ExportModalProps } from './ExportModal';
+import ExportModal from './ExportModal';
 
 jest.mock('util/MessagesExportUtils', () => ({
   exportSearchMessages: jest.fn(() => Promise.resolve()),

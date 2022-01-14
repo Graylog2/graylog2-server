@@ -19,7 +19,7 @@ import * as Immutable from 'immutable';
 import { mount } from 'wrappedEnzyme';
 
 import Series from 'views/logic/aggregationbuilder/Series';
-import Pivot from 'views/logic/aggregationbuilder/Pivot';
+import type Pivot from 'views/logic/aggregationbuilder/Pivot';
 import { FieldTypes } from 'views/logic/fieldtypes/FieldType';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';

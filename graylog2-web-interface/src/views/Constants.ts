@@ -16,7 +16,7 @@
  */
 import chroma from 'chroma-js';
 
-import { TimeRange, RelativeTimeRangeWithEnd } from 'views/logic/queries/Query';
+import type { TimeRange, RelativeTimeRangeWithEnd } from 'views/logic/queries/Query';
 import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
 
 export type SearchBarFormValues = {

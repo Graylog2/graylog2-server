@@ -16,11 +16,12 @@
  */
 import * as React from 'react';
 // import PropTypes from 'prop-types';
-import styled, { css, DefaultTheme } from 'styled-components';
+import type { DefaultTheme } from 'styled-components';
+import styled, { css } from 'styled-components';
 // eslint-disable-next-line no-restricted-imports
 import { Alert as BootstrapAlert } from 'react-bootstrap';
 
-import { ColorVariants } from 'theme/colors';
+import type { ColorVariants } from 'theme/colors';
 
 interface AlertProps {
   $bsStyle: ColorVariants,

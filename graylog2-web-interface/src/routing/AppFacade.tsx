@@ -23,10 +23,12 @@ import { useStore } from 'stores/connect';
 import LoginQueryClientProvider from 'contexts/LoginQueryClientProvider';
 import 'bootstrap/less/bootstrap.less';
 import 'toastr/toastr.less';
-import { Store } from 'stores/StoreTypes';
-import { CurrentUserStoreState, CurrentUserStore } from 'stores/users/CurrentUserStore';
+import type { Store } from 'stores/StoreTypes';
+import type { CurrentUserStoreState } from 'stores/users/CurrentUserStore';
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import { ServerAvailabilityStore } from 'stores/sessions/ServerAvailabilityStore';
-import { SessionStoreState, SessionStore } from 'stores/sessions/SessionStore';
+import type { SessionStoreState } from 'stores/sessions/SessionStore';
+import { SessionStore } from 'stores/sessions/SessionStore';
 
 const LoginPage = loadAsync(() => import(/* webpackChunkName: "LoginPage" */ 'pages/LoginPage'));
 const LoadingPage = loadAsync(() => import(/* webpackChunkName: "LoadingPage" */ 'pages/LoadingPage'));

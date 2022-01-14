@@ -18,13 +18,14 @@ import * as React from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import { useContext } from 'react';
 
-import { WidgetComponentProps } from 'views/types';
-import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import type { WidgetComponentProps } from 'views/types';
+import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import type { Events } from 'views/logic/searchtypes/events/EventHandler';
 import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
-import OnVisualizationConfigChangeContext, { OnVisualizationConfigChange } from 'views/components/aggregationwizard/OnVisualizationConfigChangeContext';
+import type { OnVisualizationConfigChange } from 'views/components/aggregationwizard/OnVisualizationConfigChangeContext';
+import OnVisualizationConfigChangeContext from 'views/components/aggregationwizard/OnVisualizationConfigChangeContext';
 
 import EmptyAggregationContent from './EmptyAggregationContent';
 import FullSizeContainer from './FullSizeContainer';

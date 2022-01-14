@@ -119,7 +119,7 @@ const GeoIpResolverConfig = createReactClass({
         <p>
           The Geo-Location Processor plugin scans all messages for fields containing <strong>exclusively</strong> an
           IP address, and puts their geo-location information (coordinates, ISO country code, and city name) into
-          different fields. Read more in the <DocumentationLink page="geolocation.html" text="Graylog documentation" />.
+          different fields. Read more in the <DocumentationLink page="geolocation" text="Graylog documentation" />.
         </p>
 
         <dl className="deflist">

@@ -35,6 +35,7 @@ module.exports = {
         '@typescript-eslint/no-redeclare': ['error'],
         'no-shadow': 'off',
         '@typescript-eslint/no-shadow': ['error'],
+        '@typescript-eslint/consistent-type-imports': ['error', { prefer: 'type-imports' }],
       },
     },
     {
@@ -52,6 +53,7 @@ module.exports = {
       ],
       rules: {
         'jest/expect-expect': ['error', { assertFunctionNames: ['expect*', '(screen.)?find(All)?By*'] }],
+        'react/jsx-no-constructed-context-values': 'off',
         'testing-library/no-debugging-utils': 'warn',
         'testing-library/prefer-screen-queries': 'off',
         'testing-library/render-result-naming-convention': 'off',
@@ -75,6 +77,7 @@ module.exports = {
   rules: {
     'arrow-body-style': 'off',
     camelcase: 'off',
+    'function-paren-newline': 'off',
     'import/extensions': 'off',
     'import/no-extraneous-dependencies': 'off',
     'import/no-unresolved': 'off',
@@ -105,6 +108,7 @@ module.exports = {
     'object-curly-newline': ['error', { multiline: true, consistent: true }],
     'object-shorthand': ['error', 'methods'],
     'react/forbid-prop-types': 'off',
+    'react/function-component-definition': 'off',
     'react/jsx-closing-bracket-location': ['warn', 'after-props'],
     'react/jsx-curly-spacing': ['warn', { when: 'never', children: true }],
     'react/jsx-filename-extension': [1, { extensions: ['.jsx', '.tsx'] }],

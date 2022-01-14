@@ -25,6 +25,7 @@ import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 
@@ -60,7 +61,7 @@ public abstract class ValidationRequest {
     public abstract ImmutableSet<Parameter> parameters();
 
     public static Builder builder() {
-        return new AutoValue_ValidationRequest.Builder();
+        return new AutoValue_ValidationRequest.Builder().parameters(ImmutableSet.<Parameter>builder().build());
     }
 
     @AutoValue.Builder

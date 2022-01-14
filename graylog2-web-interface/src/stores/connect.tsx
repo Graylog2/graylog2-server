@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { isFunction } from 'lodash';
-import { Optional } from 'utility-types';
+import type { Optional } from 'utility-types';
 
 import isDeepEqual from './isDeepEqual';
 

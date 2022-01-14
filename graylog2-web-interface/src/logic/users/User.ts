@@ -15,11 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as Immutable from 'immutable';
-import { $PropertyType } from 'utility-types';
+import type { $PropertyType } from 'utility-types';
 
-import { PreferencesMap } from 'stores/users/PreferencesStore';
+import type { PreferencesMap } from 'stores/users/PreferencesStore';
 
-import { AccountStatus } from './UserOverview';
+import type { AccountStatus } from './UserOverview';
 
 type StartPage = {
   id: string;

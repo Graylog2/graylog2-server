@@ -65,8 +65,7 @@ class AlertMessages extends React.Component {
       from: this._getFrom(),
       to: this._getTo(),
     };
-    const promise = UniversalSearchStore.search('absolute', '*', searchParams, this.props.stream.id, this.PAGE_SIZE,
-      page || 1, 'timestamp', 'asc', undefined, false);
+    const promise = UniversalSearchStore.search('absolute', '*', searchParams, this.props.stream.id, this.PAGE_SIZE, page || 1, 'timestamp', 'asc', undefined, false);
 
     promise.then(
       (response) => {

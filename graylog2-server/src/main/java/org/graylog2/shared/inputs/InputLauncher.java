@@ -138,7 +138,7 @@ public class InputLauncher {
 
 
     public boolean shouldStartAutomatically(MessageInput input) {
-        return configuration.getAutoRestartInputs() || input.getDesiredState().equals(IOState.Type.RUNNING.toString());
+        return configuration.getAutoRestartInputs() || input.getDesiredState().equals(IOState.Type.RUNNING);
     }
 
     public boolean leaderStatusInhibitsLaunch(MessageInput input) {

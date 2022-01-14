@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import * as Immutable from 'immutable';
+import type * as Immutable from 'immutable';
 
 import { MessageDetailsDefinitionList } from 'components/common';
 

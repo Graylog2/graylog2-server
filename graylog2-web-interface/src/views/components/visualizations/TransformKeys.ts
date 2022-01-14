@@ -17,7 +17,7 @@
 import moment from 'moment-timezone';
 
 import AppConfig from 'util/AppConfig';
-import Pivot from 'views/logic/aggregationbuilder/Pivot';
+import type Pivot from 'views/logic/aggregationbuilder/Pivot';
 import type { ColLeaf, Leaf, Key, Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 

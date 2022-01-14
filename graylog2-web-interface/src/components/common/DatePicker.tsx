@@ -22,6 +22,7 @@ import styled, { css } from 'styled-components';
 
 import 'react-day-picker/lib/style.css';
 import DateTimeContext from 'contexts/DateTimeContext';
+import { adjustFormat, adjustTimezone } from 'util/DateTime';
 
 const StyledDayPicker = styled(DayPicker)(({ theme }) => css`
   width: 100%;
@@ -66,13 +67,13 @@ type Props = {
 };
 
 const DatePicker = ({ date, fromDate, onChange, showOutsideDays }: Props) => {
-  const { adjustTimezone, formatTime } = useContext(DateTimeContext);
+  const { toUserTimezone, formatTime } = useContext(DateTimeContext);
 
   let selectedDate;
 
   if (date) {
     try {
-      selectedDate = adjustTimezone(date);
+      selectedDate = toUserTimezone(date);
     } catch (e) {
       // don't do anything
     }
@@ -84,7 +85,7 @@ const DatePicker = ({ date, fromDate, onChange, showOutsideDays }: Props) => {
         return false;
       }
 
-      return formatTime(moddedDate, 'UTC', 'date') === formatTime(selectedDate, 'date');
+      return adjustFormat(adjustTimezone(moddedDate, 'UTC'), 'date') === formatTime(selectedDate, 'date');
     },
     disabled: {
       before: new Date(fromDate),

@@ -20,6 +20,7 @@ import org.apache.shiro.subject.Subject;
 import org.glassfish.hk2.api.Factory;
 import org.glassfish.hk2.api.ServiceLocator;
 import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog.plugins.views.search.rest.PermittedStreams;
 import org.graylog.security.UserContext;
 import org.graylog2.shared.security.ShiroPrincipal;
 import org.slf4j.Logger;
@@ -33,17 +34,19 @@ public class SearchUserFactory implements Factory<SearchUser> {
     private static final Logger LOG = LoggerFactory.getLogger(SearchUserFactory.class);
 
     private final ServiceLocator serviceLocator;
+    private final PermittedStreams permittedStreams;
 
     @Inject
-    public SearchUserFactory(ServiceLocator serviceLocator) {
+    public SearchUserFactory(ServiceLocator serviceLocator, PermittedStreams permittedStreams) {
         this.serviceLocator = serviceLocator;
+        this.permittedStreams = permittedStreams;
     }
 
     @Override
     public SearchUser provide() {
         final UserContext userContext = serviceLocator.getService(UserContext.class);
         final SecurityContext securityContext = serviceLocator.getService(SecurityContext.class);
-        return new SearchUser(userContext.getUser(), (permission) -> this.isPermitted(securityContext, permission), (permission, instanceId) -> this.isPermitted(securityContext, permission, instanceId));
+        return new SearchUser(userContext.getUser(), (permission) -> this.isPermitted(securityContext, permission), (permission, instanceId) -> this.isPermitted(securityContext, permission, instanceId), permittedStreams);
     }
 
     protected Subject getSubject(SecurityContext securityContext) {

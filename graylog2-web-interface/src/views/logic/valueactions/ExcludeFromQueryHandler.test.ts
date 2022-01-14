@@ -18,7 +18,8 @@ import * as Immutable from 'immutable';
 
 import asMock from 'helpers/mocking/AsMock';
 import mockAction from 'helpers/mocking/MockAction';
-import { GlobalOverrideActions, GlobalOverrideStore, GlobalOverrideStoreState } from 'views/stores/GlobalOverrideStore';
+import type { GlobalOverrideStoreState } from 'views/stores/GlobalOverrideStore';
+import { GlobalOverrideActions, GlobalOverrideStore } from 'views/stores/GlobalOverrideStore';
 import { QueriesActions, QueriesStore } from 'views/stores/QueriesStore';
 import SearchActions from 'views/actions/SearchActions';
 import { ViewStore } from 'views/stores/ViewStore';
@@ -124,7 +125,7 @@ describe('ExcludeFromQueryHandler', () => {
         .build());
 
       GlobalOverrideActions.query = mockAction(jest.fn(() => Promise.resolve(undefined as GlobalOverrideStoreState)));
-      SearchActions.refresh = mockAction(jest.fn(() => Promise.resolve()));
+      SearchActions.refresh = mockAction();
     });
 
     it('retrieves query string from global override', () => {

@@ -22,7 +22,7 @@ import { Overlay, RootCloseWrapper } from 'react-overlays';
 import ColorPicker from 'components/common/ColorPicker';
 import Value from 'views/components/Value';
 import { useStore } from 'stores/connect';
-import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import ChartColorContext from 'views/components/visualizations/ChartColorContext';
 import { CurrentViewStateStore } from 'views/stores/CurrentViewStateStore';
 import { Popover } from 'components/bootstrap';
@@ -30,8 +30,8 @@ import FieldType from 'views/logic/fieldtypes/FieldType';
 import { colors as defaultColors } from 'views/components/visualizations/Colors';
 import { EVENT_COLOR, eventsDisplayName } from 'views/logic/searchtypes/events/EventHandler';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
-import Series from 'views/logic/aggregationbuilder/Series';
-import Pivot from 'views/logic/aggregationbuilder/Pivot';
+import type Series from 'views/logic/aggregationbuilder/Series';
+import type Pivot from 'views/logic/aggregationbuilder/Pivot';
 
 const ColorHint = styled.div(({ color }) => `
   cursor: pointer;

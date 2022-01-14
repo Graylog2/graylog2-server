@@ -16,9 +16,9 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Portal } from 'react-portal';
 import { Position } from 'react-overlays';
 
+import { Portal } from 'components/common';
 import { Popover } from 'components/bootstrap';
 
 import CustomPropTypes from '../CustomPropTypes';
@@ -62,7 +62,7 @@ export default class PortaledPopover extends React.Component<Props, State> {
     const { children, container, popover, title, ...rest } = this.props;
     const { isOpen } = this.state;
     const popoverElem = isOpen && (
-      <Portal node={container}>
+      <Portal container={container}>
         <Position container={container}
                   placement="bottom"
                   target={this.target}>

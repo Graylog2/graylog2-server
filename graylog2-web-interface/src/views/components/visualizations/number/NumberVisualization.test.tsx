@@ -23,8 +23,8 @@ import { FieldTypes } from 'views/logic/fieldtypes/FieldType';
 import RenderCompletionCallback from 'views/components/widgets/RenderCompletionCallback';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Series from 'views/logic/aggregationbuilder/Series';
-import { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
-import { CurrentViewType } from 'views/components/CustomPropTypes';
+import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
+import type { CurrentViewType } from 'views/components/CustomPropTypes';
 
 import NumberVisualization from './NumberVisualization';
 

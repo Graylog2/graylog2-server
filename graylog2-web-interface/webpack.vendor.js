@@ -18,7 +18,6 @@
 const path = require('path');
 
 const webpack = require('webpack');
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const AssetsPlugin = require('assets-webpack-plugin');
 const merge = require('webpack-merge');
 const TerserPlugin = require('terser-webpack-plugin');
@@ -46,6 +45,9 @@ const webpackConfig = {
     path: BUILD_PATH,
     filename: '[name].js',
     library: '__[name]',
+    clean: {
+      keep: /vendor-module\.json/,
+    },
   },
   plugins: [
     new webpack.DllPlugin({
@@ -54,7 +56,7 @@ const webpackConfig = {
     }),
     new AssetsPlugin({
       filename: 'vendor-module.json',
-      path: BUILD_PATH,
+      useCompilerPath: true,
       processOutput(assets) {
         const jsfiles = [];
         const cssfiles = [];
@@ -108,7 +110,6 @@ if (TARGET.startsWith('build')) {
       new webpack.DefinePlugin({
         'process.env.NODE_ENV': JSON.stringify('production'),
       }),
-      new CleanWebpackPlugin(),
       new webpack.LoaderOptionsPlugin({
         minimize: true,
       }),

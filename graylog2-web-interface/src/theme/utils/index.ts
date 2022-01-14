@@ -16,10 +16,14 @@
  */
 import PropTypes from 'prop-types';
 
-import colorLevel, { ColorLevel } from './colorLevel';
-import contrastingColor, { ContrastingColor } from './contrastingColor';
-import opacify, { Opacify } from './opacify';
-import readableColor, { ReadableColor } from './readableColor';
+import type { ColorLevel } from './colorLevel';
+import colorLevel from './colorLevel';
+import type { ContrastingColor } from './contrastingColor';
+import contrastingColor from './contrastingColor';
+import type { Opacify } from './opacify';
+import opacify from './opacify';
+import type { ReadableColor } from './readableColor';
+import readableColor from './readableColor';
 
 export type Utils = {
   colorLevel: ColorLevel,

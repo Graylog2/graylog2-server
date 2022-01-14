@@ -19,7 +19,7 @@ import * as React from 'react';
 import { Input } from 'components/bootstrap';
 import Select from 'components/common/Select';
 
-import { FieldComponentProps } from '../VisualizationConfigurationOptions';
+import type { FieldComponentProps } from '../VisualizationConfigurationOptions';
 
 const makeOptions = (options: ReadonlyArray<string | [string, any]>) => {
   return options.map((option) => {

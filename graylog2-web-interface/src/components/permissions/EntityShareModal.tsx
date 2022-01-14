@@ -16,17 +16,17 @@
  */
 import * as React from 'react';
 import { useRef, useEffect, useState } from 'react';
-import { FormikProps } from 'formik';
+import type { FormikProps } from 'formik';
 import PropTypes from 'prop-types';
-import { $PropertyType } from 'utility-types';
+import type { $PropertyType } from 'utility-types';
 
 import EntityShareDomain from 'domainActions/permissions/EntityShareDomain';
 import { createGRN } from 'logic/permissions/GRN';
 import { useStore } from 'stores/connect';
 import { Spinner } from 'components/common';
 import { EntityShareStore } from 'stores/permissions/EntityShareStore';
-import { EntitySharePayload } from 'actions/permissions/EntityShareActions';
-import SharedEntity from 'logic/permissions/SharedEntity';
+import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
+import type SharedEntity from 'logic/permissions/SharedEntity';
 import BootstrapModalConfirm from 'components/bootstrap/BootstrapModalConfirm';
 
 import type { FormValues as GranteesSelectFormValues } from './GranteesSelector';

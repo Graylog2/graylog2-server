@@ -38,14 +38,12 @@ jest.mock('views/stores/RefreshStore', () => ({
 
 jest.mock('views/stores/ViewStore', () => ({
   ViewStore: MockStore(
-    ['listen', () => jest.fn()],
     ['getInitialState', () => ({ activeQuery: 'somequery', view: mockView })],
   ),
 }));
 
 jest.mock('views/stores/SearchExecutionStateStore', () => ({
   SearchExecutionStateStore: MockStore(
-    ['listen', () => jest.fn()],
     ['getInitialState', () => ({ activeQuery: 'somequery', view: mockView })],
   ),
 }));

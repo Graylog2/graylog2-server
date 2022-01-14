@@ -22,7 +22,7 @@ import chroma from 'chroma-js';
 import { flatten } from 'lodash';
 import leafletStyles from 'leaflet/dist/leaflet.css';
 
-import Viewport from 'views/logic/aggregationbuilder/visualizations/Viewport';
+import type Viewport from 'views/logic/aggregationbuilder/visualizations/Viewport';
 
 import style from './MapVisualization.css';
 

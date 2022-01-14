@@ -78,6 +78,7 @@ export { default as PaginatedList } from './PaginatedList';
 export { default as Pagination } from './Pagination';
 export { default as Pluralize } from './Pluralize';
 export { default as ProgressBar } from './ProgressBar';
+export { default as Portal } from './Portal';
 export { default as QueryHelper } from './QueryHelper';
 export { default as ReactGridContainer } from './ReactGridContainer';
 export { default as ReadOnlyFormGroup } from './ReadOnlyFormGroup';

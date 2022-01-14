@@ -17,15 +17,15 @@
 import * as React from 'react';
 import { useState, useCallback } from 'react';
 import styled from 'styled-components';
-import * as Immutable from 'immutable';
+import type * as Immutable from 'immutable';
 
 import { ErrorAlert, PaginatedItemOverview } from 'components/common';
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
-import UserOverview from 'logic/users/UserOverview';
+import type UserOverview from 'logic/users/UserOverview';
 import { DEFAULT_PAGINATION } from 'components/common/PaginatedItemOverview';
 import SectionComponent from 'components/common/Section/SectionComponent';
-import Role from 'logic/roles/Role';
-import { PaginatedList } from 'stores/PaginationTypes';
+import type Role from 'logic/roles/Role';
+import type { PaginatedList } from 'stores/PaginationTypes';
 
 import UsersSelector from './UsersSelector';
 

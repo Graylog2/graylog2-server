@@ -102,8 +102,7 @@ RuleDetailsPage.defaultProps = {
 export default connect(withParams(RuleDetailsPage), {
   rule: RulesStore,
   pipelines: PipelinesStore,
-},
-({ pipelines, ...restProps }) => ({
+}, ({ pipelines, ...restProps }) => ({
   pipelines: pipelines.pipelines || [],
   ...restProps,
 }));

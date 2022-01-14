@@ -196,8 +196,7 @@ export const EventDefinitionsStore = singletonStore(
 
     update(eventDefinitionId, updatedEventDefinition) {
       const { eventDefinition, isScheduled } = this.extractSchedulerInfo(updatedEventDefinition);
-      const promise = fetch('PUT', this.eventDefinitionsUrl({ segments: [eventDefinitionId], query: { schedule: isScheduled } }),
-        this.setAlertFlag(eventDefinition));
+      const promise = fetch('PUT', this.eventDefinitionsUrl({ segments: [eventDefinitionId], query: { schedule: isScheduled } }), this.setAlertFlag(eventDefinition));
 
       promise.then(
         (response) => {

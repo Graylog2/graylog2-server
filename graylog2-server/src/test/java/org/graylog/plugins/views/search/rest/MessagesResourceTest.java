@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 import org.graylog.plugins.views.search.SearchDomain;
 import org.graylog.plugins.views.search.SearchExecutionGuard;
+import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.errors.PermissionException;
 import org.graylog.plugins.views.search.export.AuditContext;
 import org.graylog.plugins.views.search.export.CommandFactory;
@@ -29,11 +30,15 @@ import org.graylog.plugins.views.search.export.ExportMessagesCommand;
 import org.graylog.plugins.views.search.export.MessagesExporter;
 import org.graylog.plugins.views.search.export.MessagesRequest;
 import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog.plugins.views.search.validation.LuceneQueryParser;
+import org.graylog.plugins.views.search.validation.QueryValidationService;
+import org.graylog.plugins.views.search.validation.QueryValidationServiceImpl;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
@@ -57,7 +62,6 @@ public class MessagesResourceTest {
     private CommandFactory commandFactory;
     @SuppressWarnings("UnstableApiUsage")
     private final EventBus eventBus = mock(EventBus.class);
-    private SearchUser searchUser;
 
     @BeforeEach
     void setUp() {
@@ -73,9 +77,14 @@ public class MessagesResourceTest {
         when(permittedStreams.load(any())).thenReturn(ImmutableSet.of("a-default-stream"));
         executionGuard = mock(SearchExecutionGuard.class);
         SearchDomain searchDomain = mock(SearchDomain.class);
-        searchUser = mock(SearchUser.class);
 
-        sut = new MessagesTestResource(exporter, commandFactory, searchDomain, executionGuard, permittedStreams, mock(ObjectMapper.class), eventBus);
+        final QueryValidationServiceImpl validationService = new QueryValidationServiceImpl(
+                new LuceneQueryParser(),
+                (streamIds, timeRange) -> Collections.emptySet(),
+                new QueryStringDecorators(Collections.emptySet())
+        );
+
+        sut = new MessagesTestResource(exporter, commandFactory, searchDomain, executionGuard, permittedStreams, mock(ObjectMapper.class), eventBus, validationService);
 
         sut.asyncRunner = c -> {
             c.accept(x -> {
@@ -85,8 +94,8 @@ public class MessagesResourceTest {
     }
 
     class MessagesTestResource extends MessagesResource {
-        public MessagesTestResource(MessagesExporter exporter, CommandFactory commandFactory, SearchDomain searchDomain, SearchExecutionGuard executionGuard, PermittedStreams permittedStreams, ObjectMapper objectMapper, EventBus eventBus) {
-            super(exporter, commandFactory, searchDomain, executionGuard, permittedStreams, objectMapper, eventBus, mock(ExportJobService.class));
+        public MessagesTestResource(MessagesExporter exporter, CommandFactory commandFactory, SearchDomain searchDomain, SearchExecutionGuard executionGuard, PermittedStreams permittedStreams, ObjectMapper objectMapper, EventBus eventBus, QueryValidationService validationService) {
+            super(exporter, commandFactory, searchDomain, executionGuard, permittedStreams, objectMapper, eventBus, mock(ExportJobService.class), validationService);
         }
 
         @Nullable
@@ -100,10 +109,13 @@ public class MessagesResourceTest {
     void appliesDefaultStreamsToRequestIfOmitted() {
         MessagesRequest request = validRequest();
 
-        when(permittedStreams.load(any())).thenReturn(ImmutableSet.of("stream-1", "stream-2"));
+        final SearchUser searchUser = TestSearchUser.builder()
+                .allowStream("stream-1")
+                .allowStream("stream-2")
+                .build();
+
 
         ArgumentCaptor<MessagesRequest> captor = ArgumentCaptor.forClass(MessagesRequest.class);
-
         when(commandFactory.buildFromRequest(captor.capture())).thenReturn(ExportMessagesCommand.withDefaults());
 
         sut.retrieve(request, searchUser);
@@ -115,6 +127,11 @@ public class MessagesResourceTest {
 
     @Test
     void checksStreamPermissionsForPlainRequest() {
+
+        final SearchUser searchUser = TestSearchUser.builder()
+                .denyStream("stream-1")
+                .build();
+
         MessagesRequest request = validRequest().toBuilder().streams(ImmutableSet.of("stream-1")).build();
 
         PermissionException exception = new PermissionException("The wurst is yet to come");
@@ -127,6 +144,13 @@ public class MessagesResourceTest {
 
     @Test
     void passesOnlyUserNameToAuditingExporterIfExportBasedOnRequest() {
+
+        final SearchUser searchUser = TestSearchUser
+                .builder()
+                .withUser(currentUser)
+                .build();
+
+
         AtomicReference<AuditContext> context = captureAuditContext();
 
         sut.retrieve(validRequest(), searchUser);

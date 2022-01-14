@@ -35,7 +35,6 @@ jest.mock('views/stores/DashboardsStore', () => ({
     search: jest.fn(() => Promise.resolve()),
   },
   DashboardsStore: MockStore(
-    ['listen', () => jest.fn()],
     ['getInitialState', () => ({
       listen: [],
       pagination: {
@@ -49,7 +48,6 @@ jest.mock('views/stores/DashboardsStore', () => ({
 
 jest.mock('stores/users/CurrentUserStore', () => ({
   CurrentUserStore: MockStore(
-    ['listen', () => jest.fn()],
     'get',
     ['getInitialState', () => ({
       currentUser: {

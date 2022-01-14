@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.views.search.validation;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.graylog.plugins.views.search.ParameterProvider;
 import org.graylog.plugins.views.search.Query;
@@ -50,6 +51,11 @@ public class QueryValidationServiceImpl implements QueryValidationService {
     @Override
     public ValidationResponse validate(ValidationRequest req) {
         final String query = decoratedQuery(req);
+
+        if(StringUtils.isEmpty(query)) {
+            return ValidationResponse.ok();
+        }
+
         try {
             final ParsedQuery parsedQuery = luceneQueryParser.parse(query);
             final List<ParsedTerm> unknownFields = getUnknownFields(req, parsedQuery);
@@ -121,6 +127,6 @@ public class QueryValidationServiceImpl implements QueryValidationService {
     private String decoratedQuery(ValidationRequest req) {
         ParameterProvider parameterProvider = (name) -> req.parameters().stream().filter(p -> Objects.equals(p.name(), name)).findFirst();
         final Query query = Query.builder().query(req.query()).timerange(req.timerange()).build();
-        return this.queryStringDecorators.decorate(req.getCombinedQueryWithFilter(), parameterProvider, query, Collections.emptySet());
+        return this.queryStringDecorators.decorate(req.getCombinedQueryWithFilter(), parameterProvider, query);
     }
 }

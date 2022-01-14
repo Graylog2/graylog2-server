@@ -30,18 +30,15 @@ import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
-import org.graylog.plugins.views.search.validation.LuceneQueryParser;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.storage.elasticsearch6.views.searchtypes.ESSearchTypeHandler;
 import org.graylog2.indexer.ElasticsearchException;
-import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
@@ -86,7 +83,7 @@ public class ElasticsearchBackendErrorHandlingTest extends ElasticsearchBackendT
                 jestClient,
                 indexLookup,
                 new QueryStringDecorators(Collections.emptySet()),
-                (elasticsearchBackend, ssb, job, query, results) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, results, fieldTypesLookup),
+                (elasticsearchBackend, ssb, job, query) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, fieldTypesLookup),
                 false,
                 objectMapper);
         when(indexLookup.indexNamesForStreamsInTimeRange(any(), any())).thenReturn(Collections.emptySet());
@@ -117,7 +114,6 @@ public class ElasticsearchBackendErrorHandlingTest extends ElasticsearchBackendT
                 new SearchSourceBuilder(),
                 searchJob,
                 query,
-                Collections.emptySet(),
                 mock(FieldTypesLookup.class)
         );
 
@@ -134,7 +130,7 @@ public class ElasticsearchBackendErrorHandlingTest extends ElasticsearchBackendT
         when(result.getJsonObject()).thenReturn(resultObject);
 
         assertThatExceptionOfType(ElasticsearchException.class)
-                .isThrownBy(() -> this.backend.doRun(searchJob, query, queryContext, Collections.emptySet()))
+                .isThrownBy(() -> this.backend.doRun(searchJob, query, queryContext))
                 .satisfies(ex -> {
                     assertThat(ex.getErrorDetails()).hasSize(1);
                     assertThat(ex.getErrorDetails()).containsExactly("Something went wrong");
@@ -146,7 +142,7 @@ public class ElasticsearchBackendErrorHandlingTest extends ElasticsearchBackendT
         final MultiSearchResult multiSearchResult = searchResultFromFixture("errorhandling/failureOnSearchTypeLevel.json");
         when(jestClient.execute(any())).thenReturn(multiSearchResult);
 
-        final QueryResult queryResult = this.backend.doRun(searchJob, query, queryContext, Collections.emptySet());
+        final QueryResult queryResult = this.backend.doRun(searchJob, query, queryContext);
 
         final Set<SearchError> errors = queryResult.errors();
 
@@ -161,7 +157,7 @@ public class ElasticsearchBackendErrorHandlingTest extends ElasticsearchBackendT
         final MultiSearchResult multiSearchResult = searchResultFromFixture("errorhandling/numericFailureOnSearchTypeLevel.json");
         when(jestClient.execute(any())).thenReturn(multiSearchResult);
 
-        final QueryResult queryResult = this.backend.doRun(searchJob, query, queryContext, Collections.emptySet());
+        final QueryResult queryResult = this.backend.doRun(searchJob, query, queryContext);
 
         final Set<SearchError> errors = queryResult.errors();
 

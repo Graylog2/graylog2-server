@@ -25,6 +25,7 @@ import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.shared.SuppressForbidden;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,7 +79,7 @@ public class GarbageCollectionWarningThread extends Periodical {
     }
 
     @Override
-    public boolean masterOnly() {
+    public boolean leaderOnly() {
         return false;
     }
 
@@ -120,6 +121,7 @@ public class GarbageCollectionWarningThread extends Periodical {
 
             final NotificationEmitter emitter = (NotificationEmitter) gc;
             final NotificationListener listener = new NotificationListener() {
+                @SuppressForbidden("Deliberate usage of GcInfo and GarbageCollectionNotificationInfo")
                 @Override
                 public void handleNotification(javax.management.Notification notification, Object handback) {
                     if (GarbageCollectionNotificationInfo.GARBAGE_COLLECTION_NOTIFICATION.equals(notification.getType())) {

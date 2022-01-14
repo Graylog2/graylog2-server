@@ -33,11 +33,7 @@ import { SearchStore } from 'views/stores/SearchStore';
 import TimerangeInfo from './TimerangeInfo';
 
 jest.mock('views/stores/GlobalOverrideStore', () => ({
-  GlobalOverrideStore: MockStore(
-    ['listen', () => jest.fn()],
-    'get',
-    ['getInitialState', jest.fn()],
-  ),
+  GlobalOverrideStore: MockStore('get'),
 }));
 
 const mockSearchStoreState = (storeState: {} = {}): {} => ({
@@ -63,7 +59,6 @@ const mockSearchStoreState = (storeState: {} = {}): {} => ({
 
 jest.mock('views/stores/SearchStore', () => ({
   SearchStore: MockStore(
-    ['listen', () => jest.fn()],
     'get',
     ['getInitialState', jest.fn(() => mockSearchStoreState())],
   ),

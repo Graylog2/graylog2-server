@@ -21,7 +21,7 @@ import WrappingContainer from 'WrappingContainer';
 import MockStore from 'helpers/mocking/StoreMock';
 import { GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
 import { SearchActions } from 'views/stores/SearchStore';
-import GlobalOverride from 'views/logic/search/GlobalOverride';
+import type GlobalOverride from 'views/logic/search/GlobalOverride';
 import Widget from 'views/logic/widgets/Widget';
 import mockComponent from 'helpers/mocking/MockComponent';
 
@@ -43,7 +43,6 @@ jest.mock('views/stores/GlobalOverrideStore', () => ({
 
 jest.mock('views/stores/SearchStore', () => ({
   SearchStore: MockStore(
-    'listen',
     ['getInitialState', () => ({ search: { parameters: [] } })],
   ),
   SearchActions: {

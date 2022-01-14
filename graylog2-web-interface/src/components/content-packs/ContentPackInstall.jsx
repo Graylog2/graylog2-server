@@ -62,8 +62,7 @@ class ContentPackInstall extends React.Component {
       const contentPackRev = this.props.contentPack.rev;
       const parameters = this._convertedParameters();
 
-      this.props.onInstall(contentPackId, contentPackRev,
-        { parameters: parameters, comment: this.state.comment });
+      this.props.onInstall(contentPackId, contentPackRev, { parameters: parameters, comment: this.state.comment });
     }
   };
 

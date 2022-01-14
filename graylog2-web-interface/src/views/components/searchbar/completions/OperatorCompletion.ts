@@ -53,6 +53,10 @@ const _lastNonEmptyToken = (tokens: Array<Token>, currentTokenIdx: number): Toke
 
 class OperatorCompletion implements Completer {
   getCompletions = (currentToken: Token | undefined | null, lastToken: Token | undefined | null, prefix: string, tokens: Array<Token>, currentTokenIdx: number): Array<CompletionResult> => {
+    if (currentToken?.type === 'keyword') {
+      return [];
+    }
+
     const lastNonEmptyToken = _lastNonEmptyToken(tokens, currentTokenIdx);
 
     if (!lastNonEmptyToken || (lastNonEmptyToken && (lastNonEmptyToken.type === 'keyword.operator'))) {

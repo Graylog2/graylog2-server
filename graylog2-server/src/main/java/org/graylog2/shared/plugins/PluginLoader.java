@@ -26,6 +26,7 @@ import org.apache.commons.io.FileUtils;
 import org.graylog2.plugin.Plugin;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.PluginModule;
+import org.graylog2.plugin.PreflightCheckModule;
 import org.graylog2.shared.SuppressForbidden;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -163,6 +164,11 @@ public class PluginLoader {
         @Override
         public Collection<PluginModule> modules() {
             return plugin.modules();
+        }
+
+        @Override
+        public Collection<PreflightCheckModule> preflightCheckModules() {
+            return plugin.preflightCheckModules();
         }
 
         public String getPluginClassName() {

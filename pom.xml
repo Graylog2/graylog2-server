@@ -132,7 +132,7 @@
         <json-path.version>2.4.0</json-path.version>
         <kafka.version>2.7.0</kafka.version>
         <kafka09.version>0.9.0.1-6</kafka09.version>
-        <log4j.version>2.15.0</log4j.version>
+        <log4j.version>2.17.1</log4j.version>
         <lucene.version>8.10.1</lucene.version>
         <metrics.version>4.1.9</metrics.version>
         <mongodb-driver.version>3.12.1</mongodb-driver.version>
@@ -364,10 +364,61 @@
                     <artifactId>license-maven-plugin</artifactId>
                     <version>${license-maven.version}</version>
                 </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <version>3.0.0</version>
+                </plugin>
             </plugins>
         </pluginManagement>
 
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>enforce-versions</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <fail>true</fail>
+                            <failFast>false</failFast>
+                            <rules>
+                                <bannedDependencies>
+                                    <searchTransitive>true</searchTransitive>
+                                    <excludes>
+                                        <!-- We use log4j-over-slf4j, so we need to make sure we don't pull in
+                                             the actual log4j 1.x dependency to avoid conflicts. http://www.slf4j.org/legacy.html#log4j-over-slf4j -->
+                                        <exclude>log4j:log4j</exclude>
+                                        <!-- This dependency also pulls in log4j 1.x -->
+                                        <exclude>org.apache.log4j.wso2:log4j</exclude>
+                                        <!-- We use jcl-over-slf4j, so we need to make sure we don't pull in
+                                             the actual commons-logging dependency to avoid conflicts. http://www.slf4j.org/legacy.html#jclOverSLF4J -->
+                                        <exclude>commons-logging:commons-logging</exclude>
+                                        <!-- Make sure we don't pull in vulnerable log4j2 versions (CVE-2021-45046, CVE-2021-44228) -->
+                                        <exclude>org.apache.logging.log4j:*:(,2.16)</exclude>
+                                        <!-- Pulling in slf4j-simple creates warnings about multiple SLF4J bindings on server startup -->
+                                        <exclude>org.slf4j:slf4j-simple</exclude>
+                                    </excludes>
+                                </bannedDependencies>
+                                <banDuplicatePomDependencyVersions/>
+                                <requireMavenVersion>
+                                    <version>[3.6.0,)</version>
+                                </requireMavenVersion>
+                                <requireJavaVersion>
+                                    <version>1.8</version>
+                                </requireJavaVersion>
+                                <requireOS>
+                                    <family>unix</family>
+                                </requireOS>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>

@@ -16,7 +16,8 @@
  */
 import * as React from 'react';
 
-import { DEFAULT_THEME_MODE, PREFERENCES_THEME_MODE, ThemeMode } from 'theme/constants';
+import type { ThemeMode } from 'theme/constants';
+import { DEFAULT_THEME_MODE, PREFERENCES_THEME_MODE } from 'theme/constants';
 
 import { singleton } from '../logic/singleton';
 

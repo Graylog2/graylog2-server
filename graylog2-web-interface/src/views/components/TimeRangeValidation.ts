@@ -16,7 +16,7 @@
  */
 import moment from 'moment';
 
-import { DATE_TIME_FORMATS } from 'util/DateTime';
+import type { DATE_TIME_FORMATS } from 'util/DateTime';
 import type {
   TimeRange,
   NoTimeRangeOverride,

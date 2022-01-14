@@ -47,12 +47,12 @@ const ShowMetricsPage = createReactClass({
 
     let { nodeId } = this.props.params;
 
-    // "master" node ID is a placeholder for master node, get first master node ID
-    if (nodeId === 'master') {
+    // "leader" node ID is a placeholder for leader node, get first leader node ID
+    if (nodeId === 'leader' || nodeId === 'master') { // `master` is deprecated but we still support it here
       const nodeIDs = Object.keys(this.state.nodes);
-      const masterNodes = nodeIDs.filter((nodeID) => this.state.nodes[nodeID].is_master);
+      const leaderNodes = nodeIDs.filter((nodeID) => this.state.nodes[nodeID].is_leader);
 
-      nodeId = masterNodes[0] || nodeIDs[0];
+      nodeId = leaderNodes[0] || nodeIDs[0];
     }
 
     const { metricsNames, metricsErrors } = this.state;

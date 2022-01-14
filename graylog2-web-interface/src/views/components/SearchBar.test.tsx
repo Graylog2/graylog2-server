@@ -21,9 +21,10 @@ import { StoreMock as MockStore } from 'helpers/mocking';
 import mockAction from 'helpers/mocking/MockAction';
 import { SearchActions } from 'views/stores/SearchStore';
 import MockQuery from 'views/logic/queries/Query';
-import WidgetFocusContext, {
+import type {
   WidgetEditingState, WidgetFocusingState,
 } from 'views/components/contexts/WidgetFocusContext';
+import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
 
 import SearchBar from './SearchBar';
@@ -32,7 +33,6 @@ const mockCurrentUser = { currentUser: { fullname: 'Ada Lovelace', username: 'ad
 
 jest.mock('views/stores/SearchStore', () => ({
   SearchStore: MockStore(
-    'listen',
     ['getInitialState', () => ({ search: { parameters: [] } })],
   ),
   SearchActions: {
@@ -48,7 +48,6 @@ jest.mock('stores/users/CurrentUserStore', () => ({
 }));
 
 jest.mock('stores/streams/StreamsStore', () => MockStore(
-  'listen',
   ['listStreams', () => ({ then: jest.fn() })],
   'availableStreams',
 ));
@@ -83,7 +82,7 @@ describe('SearchBar', () => {
   };
 
   beforeEach(() => {
-    SearchActions.refresh = mockAction(jest.fn());
+    SearchActions.refresh = mockAction();
   });
 
   it('should render the SearchBar', async () => {

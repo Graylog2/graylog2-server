@@ -45,8 +45,8 @@ public interface Notification extends Persisted {
 
     enum Type {
         DEFLECTOR_EXISTS_AS_INDEX,
-        MULTI_MASTER,
-        NO_MASTER,
+        @Deprecated MULTI_MASTER, // use MULTI_LEADER instead
+        @Deprecated NO_MASTER, // use NO_LEADER instead
         ES_OPEN_FILES,
         ES_CLUSTER_RED,
         ES_UNAVAILABLE,
@@ -69,7 +69,9 @@ public interface Notification extends Persisted {
         ES_NODE_DISK_WATERMARK_HIGH,
         ES_NODE_DISK_WATERMARK_FLOOD_STAGE,
         ES_VERSION_MISMATCH,
-        LEGACY_LDAP_CONFIG_MIGRATION
+        LEGACY_LDAP_CONFIG_MIGRATION,
+        MULTI_LEADER,
+        NO_LEADER
     }
 
     enum Severity {

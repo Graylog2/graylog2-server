@@ -16,9 +16,10 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
-import styled, { css, DefaultTheme } from 'styled-components';
+import type { DefaultTheme } from 'styled-components';
+import styled, { css } from 'styled-components';
 import { Form, Formik } from 'formik';
-import { PermissionsConfigType } from 'src/stores/configurations/ConfigurationsStore';
+import type { PermissionsConfigType } from 'src/stores/configurations/ConfigurationsStore';
 
 import { Button, Col, Modal, Row } from 'components/bootstrap';
 import FormikInput from 'components/common/FormikInput';

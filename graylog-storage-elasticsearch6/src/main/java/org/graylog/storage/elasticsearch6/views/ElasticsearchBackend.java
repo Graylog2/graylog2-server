@@ -31,7 +31,6 @@ import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
-import org.graylog.plugins.views.search.validation.LuceneQueryParser;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.engine.QueryBackend;
 import org.graylog.plugins.views.search.engine.SearchConfig;
@@ -103,21 +102,21 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
     }
 
     @Override
-    public ESGeneratedQueryContext generate(SearchJob job, Query query, Set<QueryResult> results, SearchConfig searchConfig) {
+    public ESGeneratedQueryContext generate(SearchJob job, Query query, SearchConfig searchConfig) {
         final BackendQuery backendQuery = query.query();
 
         validateQueryTimeRange(query, searchConfig);
 
         final Set<SearchType> searchTypes = query.searchTypes();
 
-        final String queryString = this.queryStringDecorators.decorate(backendQuery.queryString(), job, query, results);
+        final String queryString = this.queryStringDecorators.decorate(backendQuery.queryString(), job, query);
         final QueryBuilder normalizedRootQuery = normalizeQueryString(queryString);
 
         final BoolQueryBuilder boolQuery = QueryBuilders.boolQuery()
                 .filter(normalizedRootQuery);
 
         // add the optional root query filters
-        generateFilterClause(query.filter(), job, query, results)
+        generateFilterClause(query.filter(), job, query)
                 .map(boolQuery::filter);
 
         final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
@@ -125,7 +124,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                 .from(0)
                 .size(0);
 
-        final ESGeneratedQueryContext queryContext = queryContextFactory.create(this, searchSourceBuilder, job, query, results);
+        final ESGeneratedQueryContext queryContext = queryContextFactory.create(this, searchSourceBuilder, job, query);
         for (SearchType searchType : searchTypes) {
 
             final Optional<SearchTypeError> searchTypeError = validateSearchType(query, searchType, searchConfig);
@@ -155,7 +154,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                     .must(QueryBuilders.termsQuery(Message.FIELD_STREAMS, effectiveStreamIds));
 
             searchType.query().ifPresent(searchTypeBackendQuery -> {
-                final String searchTypeQueryString = this.queryStringDecorators.decorate(searchTypeBackendQuery.queryString(), job, query, results);
+                final String searchTypeQueryString = this.queryStringDecorators.decorate(searchTypeBackendQuery.queryString(), job, query);
                 final QueryBuilder normalizedSearchTypeQuery = normalizeQueryString(searchTypeQueryString);
                 searchTypeOverrides.must(normalizedSearchTypeQuery);
             });
@@ -177,7 +176,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
     }
 
     // TODO make pluggable
-    public Optional<QueryBuilder> generateFilterClause(Filter filter, SearchJob job, Query query, Set<QueryResult> results) {
+    public Optional<QueryBuilder> generateFilterClause(Filter filter, SearchJob job, Query query) {
         if (filter == null) {
             return Optional.empty();
         }
@@ -186,7 +185,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
             case AndFilter.NAME:
                 final BoolQueryBuilder andBuilder = QueryBuilders.boolQuery();
                 filter.filters().stream()
-                        .map(filter1 -> generateFilterClause(filter1, job, query, results))
+                        .map(filter1 -> generateFilterClause(filter1, job, query))
                         .forEach(optQueryBuilder -> optQueryBuilder.ifPresent(andBuilder::must));
                 return Optional.of(andBuilder);
             case OrFilter.NAME:
@@ -194,20 +193,20 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                 // TODO for the common case "any of these streams" we can optimize the filter into
                 // a single "termsQuery" instead of "termQuery OR termQuery" if all direct children are "StreamFilter"
                 filter.filters().stream()
-                        .map(filter1 -> generateFilterClause(filter1, job, query, results))
+                        .map(filter1 -> generateFilterClause(filter1, job, query))
                         .forEach(optQueryBuilder -> optQueryBuilder.ifPresent(orBuilder::should));
                 return Optional.of(orBuilder);
             case StreamFilter.NAME:
                 // Skipping stream filter, will be extracted elsewhere
                 return Optional.empty();
             case QueryStringFilter.NAME:
-                return Optional.of(QueryBuilders.queryStringQuery(this.queryStringDecorators.decorate(((QueryStringFilter) filter).query(), job, query, results)));
+                return Optional.of(QueryBuilders.queryStringQuery(this.queryStringDecorators.decorate(((QueryStringFilter) filter).query(), job, query)));
         }
         return Optional.empty();
     }
 
     @Override
-    public QueryResult doRun(SearchJob job, Query query, ESGeneratedQueryContext queryContext, Set<QueryResult> predecessorResults) {
+    public QueryResult doRun(SearchJob job, Query query, ESGeneratedQueryContext queryContext) {
         if (query.searchTypes().isEmpty()) {
             return QueryResult.builder()
                     .query(query)
@@ -293,6 +292,4 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                 .errors(new HashSet<>(queryContext.errors()))
                 .build();
     }
-
-
 }
