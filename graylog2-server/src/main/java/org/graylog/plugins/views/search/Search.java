@@ -61,9 +61,6 @@ public abstract class Search implements ContentPackable<SearchEntity> {
     static final String FIELD_CREATED_AT = "created_at";
     public static final String FIELD_OWNER = "owner";
 
-    // generated during build to help quickly find a query by id.
-    private ImmutableMap<String, Query> queryIndex;
-
     // generated during build to help quickly find a parameter by name.
     private ImmutableMap<String, Parameter> parameterIndex;
 
@@ -91,11 +88,6 @@ public abstract class Search implements ContentPackable<SearchEntity> {
 
     @JsonProperty(FIELD_CREATED_AT)
     public abstract DateTime createdAt();
-
-    @JsonIgnore
-    public Optional<Query> getQuery(String sourceQueryId) {
-        return Optional.ofNullable(queryIndex.get(sourceQueryId));
-    }
 
     @JsonIgnore
     public Optional<Parameter> getParameter(String parameterName) {
@@ -229,7 +221,6 @@ public abstract class Search implements ContentPackable<SearchEntity> {
             }
 
             final Search search = autoBuild();
-            search.queryIndex = Maps.uniqueIndex(search.queries(), Query::id);
             search.parameterIndex = Maps.uniqueIndex(search.parameters(), Parameter::name);
             return search;
         }

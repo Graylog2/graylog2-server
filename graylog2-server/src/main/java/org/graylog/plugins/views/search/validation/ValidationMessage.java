@@ -86,8 +86,9 @@ public abstract class ValidationMessage {
         if (positionMatcher.find()) {
             errorBuilder.beginLine(1);
             errorBuilder.beginColumn(0);
-            errorBuilder.endColumn(query.length());
-            errorBuilder.endLine(countLines(query));
+
+            errorBuilder.endLine(Integer.parseInt(positionMatcher.group(1)));
+            errorBuilder.endColumn(Integer.parseInt(positionMatcher.group(2)));
         }
 
         // Fallback, all parsing failed
@@ -97,12 +98,6 @@ public abstract class ValidationMessage {
 
         return errorBuilder.build();
     }
-
-    private static int countLines(String str){
-        String[] lines = str.split("\r\n|\r|\n");
-        return  lines.length;
-    }
-
 
     public static Builder builder() {
         return new AutoValue_ValidationMessage.Builder();

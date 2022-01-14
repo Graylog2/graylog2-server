@@ -52,7 +52,6 @@ public class ESGeneratedQueryContext implements GeneratedQueryContext {
     private final SearchSourceBuilder ssb;
     private final SearchJob job;
     private final Query query;
-    private final Set<QueryResult> results;
 
     private final FieldTypesLookup fieldTypes;
 
@@ -62,13 +61,11 @@ public class ESGeneratedQueryContext implements GeneratedQueryContext {
             @Assisted SearchSourceBuilder ssb,
             @Assisted SearchJob job,
             @Assisted Query query,
-            @Assisted Set<QueryResult> results,
             FieldTypesLookup fieldTypes) {
         this.elasticsearchBackend = elasticsearchBackend;
         this.ssb = ssb;
         this.job = job;
         this.query = query;
-        this.results = results;
         this.fieldTypes = fieldTypes;
     }
 
@@ -77,8 +74,7 @@ public class ESGeneratedQueryContext implements GeneratedQueryContext {
                 ElasticsearchBackend elasticsearchBackend,
                 SearchSourceBuilder ssb,
                 SearchJob job,
-                Query query,
-                Set<QueryResult> results
+                Query query
         );
     }
 
@@ -111,7 +107,7 @@ public class ESGeneratedQueryContext implements GeneratedQueryContext {
     }
 
     private Optional<QueryBuilder> generateFilterClause(Filter filter) {
-        return elasticsearchBackend.generateFilterClause(filter, job, query, results);
+        return elasticsearchBackend.generateFilterClause(filter, job, query);
     }
 
     public String seriesName(SeriesSpec seriesSpec, Pivot pivot) {

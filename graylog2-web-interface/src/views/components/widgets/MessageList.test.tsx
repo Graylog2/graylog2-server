@@ -122,9 +122,8 @@ describe('MessageList', () => {
   };
 
   beforeEach(() => {
-    // eslint-disable-next-line import/namespace
     // @ts-ignore
-    messageList.MessageTableEntry = MessageTableEntry;
+    messageList.MessageTableEntry = MessageTableEntry; // eslint-disable-line no-import-assign
   });
 
   afterEach(() => {
@@ -139,8 +138,6 @@ describe('MessageList', () => {
   }) => (
     <MessageList title="Message List"
                  editing={false}
-                 height={480}
-                 width={640}
                  filter=""
                  type="messages"
                  id="message-list"

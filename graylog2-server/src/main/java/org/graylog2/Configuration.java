@@ -202,6 +202,9 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "run_migrations")
     private boolean runMigrations = true;
 
+    @Parameter(value = "skip_preflight_checks")
+    private boolean skipPreflightChecks = false;
+
     @Parameter(value = "leader_election_mode", converter = LeaderElectionMode.Converter.class)
     private LeaderElectionMode leaderElectionMode = LeaderElectionMode.STATIC;
 

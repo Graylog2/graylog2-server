@@ -37,7 +37,7 @@ public class CollectingQueryParserTokenManager extends QueryParserTokenManager {
     @Override
     public void ReInit(CharStream stream) {
         this.tokens.clear();
-        super.ReInit(stream);
+        super.ReInit(new LineCountingCharStream(stream));
     }
 
     @Override

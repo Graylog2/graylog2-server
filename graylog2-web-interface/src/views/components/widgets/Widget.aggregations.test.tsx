@@ -147,6 +147,7 @@ describe('Aggregation Widget', () => {
     ...props
   }: AggregationWidgetProps) => (
     <ViewTypeContext.Provider value={viewType}>
+      {/* eslint-disable-next-line react/jsx-no-constructed-context-values */}
       <FieldTypesContext.Provider value={{ all: Immutable.List(), queryFields: Immutable.Map() }}>
         <WidgetFocusContext.Provider value={widgetFocusContextState}>
           <WidgetContext.Provider value={propsWidget}>
@@ -154,7 +155,6 @@ describe('Aggregation Widget', () => {
                     id="widgetId"
                     fields={Immutable.List([])}
                     onPositionsChange={() => {}}
-                    onSizeChange={() => {}}
                     title="Widget Title"
                     position={new WidgetPosition(1, 1, 1, 1)}
                     {...props} />
