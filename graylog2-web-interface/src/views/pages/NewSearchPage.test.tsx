@@ -16,10 +16,11 @@
  */
 import * as React from 'react';
 import { act } from 'react-dom/test-utils';
-import { render, waitFor, fireEvent } from 'wrappedTestingLibrary';
+import { render, waitFor, fireEvent, screen } from 'wrappedTestingLibrary';
 
-import asMock from 'helpers/mocking/AsMock';
 import { MockStore } from 'helpers/mocking';
+import asMock from 'helpers/mocking/AsMock';
+import mockComponent from 'helpers/mocking/MockComponent';
 import { processHooks } from 'views/logic/views/ViewLoader';
 import { ViewActions } from 'views/stores/ViewStore';
 import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
@@ -40,6 +41,7 @@ const mockView = View.create()
 
 jest.mock('routing/withLocation', () => (x) => x);
 jest.mock('views/components/Search', () => jest.fn(() => <div>Extended search page</div>));
+jest.mock('components/common/PublicNotifications', () => mockComponent('PublicNotifications'));
 jest.mock('views/stores/SearchStore');
 
 jest.mock('views/stores/ViewStatesStore', () => ({
@@ -122,6 +124,15 @@ describe('NewSearchPage', () => {
 
       await waitFor(() => expect(processHooksAction).toBeCalledTimes(1));
       await waitFor(() => expect(processHooksAction.mock.calls[0][3]).toStrictEqual({ q: '', rangetype: 'relative', relative: '300' }));
+    });
+
+    it('should display errors which occur when processing hooks', async () => {
+      asMock(processHooks).mockImplementationOnce(() => Promise.reject(new Error('The Error')));
+
+      render(<SimpleNewSearchPage location={mockLocation} />);
+
+      await screen.findByText(/An unknown error has occurred./);
+      await screen.findByText(/The Error/);
     });
   });
 
