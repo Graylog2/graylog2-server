@@ -16,24 +16,13 @@
  */
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
-import moment from 'moment';
-
-import DateTimeContext from 'contexts/DateTimeContext';
 
 import BrowserTime from './BrowserTime';
 
 describe('BrowserTime', () => {
   it('should display browser time', () => {
     render(
-      <DateTimeContext.Provider value={{
-        relativeDifference: () => '',
-        formatAsBrowserTime: (dateTime) => `browser time based on ${dateTime}`,
-        formatTime: () => '',
-        adjustTimezone: () => moment(),
-        userTimezone: '',
-      }}>
-        <BrowserTime dateTime="2021-01-01 10:00:00" />
-      </DateTimeContext.Provider>,
+      <BrowserTime dateTime="2021-01-01 10:00:00" />,
     );
 
     expect(screen.getByText('browser time based on 2021-01-01 10:00:00')).toBeInTheDocument();

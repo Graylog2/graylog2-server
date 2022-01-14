@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useContext } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 import styled from 'styled-components';
@@ -22,7 +22,7 @@ import styled from 'styled-components';
 import { Popover } from 'components/bootstrap';
 import { OverlayTrigger, Icon } from 'components/common';
 import SidecarStatusEnum from 'logic/sidecar/SidecarStatusEnum';
-import DateTimeContext from 'contexts/DateTimeContext';
+import { relativeDifference } from 'util/DateTime';
 
 const Indicator = styled.span`
   white-space: nowrap;
@@ -36,7 +36,6 @@ type Props = {
 }
 
 const StatusIndicator = ({ message, id, lastSeen, status }: Props) => {
-  const { relativeDifference } = useContext(DateTimeContext);
   const text = lodash.upperFirst(SidecarStatusEnum.toString(status));
 
   let icon;

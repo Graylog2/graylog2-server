@@ -19,7 +19,7 @@ import { useContext } from 'react';
 import styled, { css } from 'styled-components';
 
 import { TextOverflowEllipsis } from 'components/common';
-import Widget from 'views/logic/widgets/Widget';
+import type Widget from 'views/logic/widgets/Widget';
 import timerangeToString from 'views/logic/queries/TimeRangeToString';
 import { DEFAULT_TIMERANGE } from 'views/Constants';
 import { useStore } from 'stores/connect';
@@ -44,19 +44,19 @@ const getEffectiveWidgetTimerange = (result, activeQuery, searchTypeId) => resul
   .searchTypes[searchTypeId]?.effective_timerange;
 
 const TimerangeInfo = ({ className, widget, activeQuery, widgetId }: Props) => {
-  const { adjustTimezone } = useContext(DateTimeContext);
+  const { formatTime } = useContext(DateTimeContext);
   const { result, widgetMapping } = useStore(SearchStore);
   const globalOverride = useStore(GlobalOverrideStore);
 
   const globalTimerangeString = globalOverride?.timerange
-    ? `Global Override: ${timerangeToString(globalOverride.timerange, adjustTimezone)}` : undefined;
+    ? `Global Override: ${timerangeToString(globalOverride.timerange, formatTime)}` : undefined;
 
-  const configuredTimerange = timerangeToString(widget.timerange || DEFAULT_TIMERANGE, adjustTimezone);
+  const configuredTimerange = timerangeToString(widget.timerange || DEFAULT_TIMERANGE, formatTime);
 
   const searchTypeId = widgetId ? widgetMapping?.get(widgetId)?.first() : undefined;
 
   const effectiveTimerange = (activeQuery && searchTypeId) ? getEffectiveWidgetTimerange(result, activeQuery, searchTypeId) : undefined;
-  const effectiveTimerangeString = effectiveTimerange ? timerangeToString(effectiveTimerange, adjustTimezone) : 'Effective widget time range is currently not available.';
+  const effectiveTimerangeString = effectiveTimerange ? timerangeToString(effectiveTimerange, formatTime) : 'Effective widget time range is currently not available.';
 
   return (
     <Wrapper className={className}>

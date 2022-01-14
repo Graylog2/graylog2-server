@@ -45,8 +45,8 @@ const StyledForm = styled(Form)`
 
 const _isFunction = (children: Props['children']): children is (props: FormikProps<SearchBarFormValues>) => React.ReactElement => isFunction(children);
 
-export const normalizeSearchBarFormValues = ({ timerange, streams, queryString }, adjustTimezone) => {
-  const newTimeRange = onSubmittingTimerange(timerange, adjustTimezone);
+export const normalizeSearchBarFormValues = ({ timerange, streams, queryString }) => {
+  const newTimeRange = onSubmittingTimerange(timerange);
 
   return {
     timerange: newTimeRange,
@@ -56,10 +56,10 @@ export const normalizeSearchBarFormValues = ({ timerange, streams, queryString }
 };
 
 const SearchBarForm = ({ initialValues, limitDuration, onSubmit, children, validateOnMount, formRef, validateQueryString }: Props) => {
-  const { formatTime, adjustTimezone } = useContext(DateTimeContext);
+  const { formatTime } = useContext(DateTimeContext);
   const _onSubmit = useCallback(({ timerange, streams, queryString }: SearchBarFormValues) => {
-    return onSubmit(normalizeSearchBarFormValues({ timerange, streams, queryString }, adjustTimezone));
-  }, [onSubmit, adjustTimezone]);
+    return onSubmit(normalizeSearchBarFormValues({ timerange, streams, queryString }));
+  }, [onSubmit]);
   const { timerange, streams, queryString } = initialValues;
   const initialTimeRange = onInitializingTimerange(timerange, formatTime);
   const _initialValues = {
@@ -69,8 +69,8 @@ const SearchBarForm = ({ initialValues, limitDuration, onSubmit, children, valid
   };
 
   const { setFieldWarning } = useContext(FormWarningsContext);
-  const _validate = useCallback((values: SearchBarFormValues) => validate(values, limitDuration, setFieldWarning, validateQueryString, formatTime),
-    [limitDuration, setFieldWarning, validateQueryString, formatTime]);
+  const _validate = useCallback((values: SearchBarFormValues) => validate(values, limitDuration, setFieldWarning, validateQueryString),
+    [limitDuration, setFieldWarning, validateQueryString]);
 
   return (
     <Formik<SearchBarFormValues> initialValues={_initialValues}

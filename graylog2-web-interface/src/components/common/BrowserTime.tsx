@@ -16,10 +16,10 @@
  */
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { Moment } from 'moment';
-import { useContext } from 'react';
+import type { Moment } from 'moment';
 
-import DateTimeContext, { DateTimeFormats } from 'contexts/DateTimeContext';
+import type { DateTimeFormats } from 'util/DateTime';
+import { formatAsBrowserTime } from 'util/DateTime';
 
 type Props = {
   dateTime: string | number | Date | Moment,
@@ -30,7 +30,6 @@ type Props = {
  * This component receives any date time and displays it in the browser time zone.
  */
 const BrowserTime = ({ dateTime, format }: Props) => {
-  const { formatAsBrowserTime } = useContext(DateTimeContext);
   const timeInBrowserTimeZone = formatAsBrowserTime(dateTime, format);
 
   return (

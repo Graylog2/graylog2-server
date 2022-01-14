@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useContext } from 'react';
+import { useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { Field } from 'formik';
 import moment from 'moment';
@@ -34,7 +34,7 @@ import { GlobalOverrideActions, GlobalOverrideStore } from 'views/stores/GlobalO
 import type { QueryString, TimeRange } from 'views/logic/queries/Query';
 import BottomRow from 'views/components/searchbar/BottomRow';
 import ViewActionsWrapper from 'views/components/searchbar/ViewActionsWrapper';
-import { SearchesConfig } from 'components/search/SearchConfig';
+import type { SearchesConfig } from 'components/search/SearchConfig';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import QueryValidation from 'views/components/searchbar/queryvalidation/QueryValidation';
 import FormWarningsContext from 'contexts/FormWarningsContext';
@@ -43,10 +43,10 @@ import useParameters from 'views/hooks/useParameters';
 import debounceWithPromise from 'views/logic/debounceWithPromise';
 import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
 import { isNoTimeRangeOverride } from 'views/typeGuards/timeRange';
-import DateTimeContext from 'contexts/DateTimeContext';
 
 import TimeRangeInput from './searchbar/TimeRangeInput';
-import DashboardSearchForm, { DashboardFormValues } from './DashboardSearchBarForm';
+import type { DashboardFormValues } from './DashboardSearchBarForm';
+import DashboardSearchForm from './DashboardSearchBarForm';
 
 type Props = {
   config: SearchesConfig,
@@ -100,7 +100,6 @@ const StyledQueryInput = styled(QueryInput)`
 const debouncedValidateQuery = debounceWithPromise(validateQuery, 350);
 
 const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onExecute: performSearch }: Props) => {
-  const { adjustTimezone } = useContext(DateTimeContext);
   const submitForm = useCallback(({ timerange, queryString }) => GlobalOverrideActions.set(timerange, queryString)
     .then(() => performSearch()), [performSearch]);
 
@@ -111,11 +110,10 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
       queryString: values?.queryString,
       parameterBindings,
       parameters,
-      adjustTimezone,
     };
 
     return debouncedValidateQuery(request);
-  }, [adjustTimezone, parameterBindings, parameters]);
+  }, [parameterBindings, parameters]);
 
   if (!config) {
     return <Spinner />;

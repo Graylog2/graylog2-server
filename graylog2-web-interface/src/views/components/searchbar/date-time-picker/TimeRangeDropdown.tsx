@@ -27,7 +27,7 @@ import type { AbsoluteTimeRange, KeywordTimeRange, NoTimeRangeOverride, TimeRang
 import type { SearchBarFormValues } from 'views/Constants';
 import { isTypeRelative } from 'views/typeGuards/timeRange';
 import { normalizeIfAllMessagesRange } from 'views/logic/queries/NormalizeTimeRange';
-import { RelativeTimeRangeClassified } from 'views/components/searchbar/date-time-picker/types';
+import type { RelativeTimeRangeClassified } from 'views/components/searchbar/date-time-picker/types';
 import validateTimeRange from 'views/components/TimeRangeValidation';
 import DateTimeContext from 'contexts/DateTimeContext';
 
@@ -121,7 +121,7 @@ const defaultRanges = (formatTime) => ({
   absolute: {
     type: 'absolute',
     from: formatTime(moment().subtract(300, 'seconds')),
-    to: formatTime(new Date(), undefined, 'complete'),
+    to: formatTime(new Date(), 'complete'),
   },
   relative: {
     type: 'relative',

@@ -16,40 +16,20 @@
  */
 import * as React from 'react';
 import { useCallback, useMemo, useContext } from 'react';
-import moment from 'moment-timezone';
-import type { Moment } from 'moment';
 
-import DateTimeContext, { DateTimeContextType, DateTime, DateTimeFormats } from 'contexts/DateTimeContext';
+import type { DateTimeContextType } from 'contexts/DateTimeContext';
+import DateTimeContext from 'contexts/DateTimeContext';
 import AppConfig from 'util/AppConfig';
 import CurrentUserContext from 'contexts/CurrentUserContext';
+import type { DateTime, DateTimeFormats } from 'util/DateTime';
+import { DATE_TIME_FORMATS, getBrowserTimezone, adjustTimezone } from 'util/DateTime';
 
 type Props = {
   children: React.ReactChildren | React.ReactChild | ((timeLocalize: DateTimeContextType) => Element),
 };
 
-const getBrowserTimezone = () => {
-  return moment.tz.guess();
-};
-
 const getUserTimezone = (userTimezone) => {
   return userTimezone ?? getBrowserTimezone() ?? AppConfig.rootTimeZone() ?? 'UTC';
-};
-
-export const DATE_TIME_FORMATS = {
-  default: 'YYYY-MM-DD HH:mm:ss', // default format when displaying date times
-  complete: 'YYYY-MM-DD HH:mm:ss.SSS', // includes ms, useful were precise time is important
-  withTz: 'YYYY-MM-DD HH:mm:ss Z', // includes the time zone
-  readable: 'dddd D MMMM YYYY, HH:mm ZZ', // easy to read
-  internal: 'YYYY-MM-DDTHH:mm:ss.SSSZ', // ISO 8601, internal default, not really nice to read. Mostly used communication with the API.
-  date: 'YYYY-MM-DD',
-};
-
-const validateDateTime = (dateTime: Moment, originalDateTime: DateTime) => {
-  if (!dateTime.isValid()) {
-    throw new Error(`Date time ${originalDateTime} is not valid`);
-  }
-
-  return dateTime;
 };
 
 /**
@@ -60,28 +40,18 @@ const DateTimeProvider = ({ children }: Props) => {
   const currentUser = useContext(CurrentUserContext);
   const userTimezone = useMemo(() => getUserTimezone(currentUser?.timezone), [currentUser?.timezone]);
 
-  const adjustTimezone = useCallback((time: DateTime, tz: string = userTimezone) => {
-    return validateDateTime(moment.tz(time, tz), time);
+  const toUserTimezone = useCallback((time: DateTime) => {
+    return adjustTimezone(time, userTimezone);
   }, [userTimezone]);
 
-  const formatTime = useCallback((time: DateTime, tz:string = userTimezone, format: string = 'default') => {
-    return adjustTimezone(time, tz).format(DATE_TIME_FORMATS[format]);
-  }, [adjustTimezone, userTimezone]);
-
-  const formatAsBrowserTime = (time: DateTime, format: DateTimeFormats) => {
-    return formatTime(time, getBrowserTimezone(), format);
-  };
-
-  const relativeDifference = (time: DateTime) => {
-    return validateDateTime(moment(time), time).fromNow();
-  };
+  const formatTime = useCallback((time: DateTime, format: DateTimeFormats = 'default') => {
+    return toUserTimezone(time).format(DATE_TIME_FORMATS[format]);
+  }, [toUserTimezone]);
 
   const contextValue = {
+    toUserTimezone,
     formatTime,
-    adjustTimezone,
     userTimezone,
-    formatAsBrowserTime,
-    relativeDifference,
   };
 
   return (

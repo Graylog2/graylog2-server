@@ -15,15 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useRef, useContext } from 'react';
+import { useRef } from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import moment from 'moment';
 
+import { DATE_TIME_FORMATS, toDateObject } from 'util/DateTime';
 import { Button, FormGroup, InputGroup, FormControl } from 'components/bootstrap';
-import { DATE_TIME_FORMATS } from 'contexts/DateTimeProvider';
 import { Icon } from 'components/common';
-import DateTimeContext from 'contexts/DateTimeContext';
 
 const TIME_ICON_BOD = 'hourglass-start';
 const TIME_ICON_MID = 'hourglass-half';
@@ -166,8 +165,8 @@ const fieldUpdate = (value) => {
     return newTime.format(DATE_TIME_FORMATS.default);
   };
 
-  const handleClickTimeNow = (adjustTimezone) => {
-    const newTime = adjustTimezone(new Date()).toObject();
+  const handleClickTimeNow = () => {
+    const newTime = toDateObject(new Date()).toObject();
 
     return moment({
       ...initialDateTime,
@@ -195,7 +194,6 @@ const fieldUpdate = (value) => {
 };
 
 const AbsoluteTimeInput = ({ dateTime, range, onChange }) => {
-  const { adjustTimezone } = useContext(DateTimeContext);
   const hourIcon = useRef(TIME_ICON_MID);
 
   const {
@@ -226,7 +224,7 @@ const AbsoluteTimeInput = ({ dateTime, range, onChange }) => {
   const _onClickTimeNow = () => {
     hourIcon.current = TIME_ICON_MID;
 
-    onChange(handleClickTimeNow(adjustTimezone));
+    onChange(handleClickTimeNow());
   };
 
   return (

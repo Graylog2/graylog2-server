@@ -18,11 +18,12 @@ import * as React from 'react';
 import { render } from 'wrappedTestingLibrary';
 import moment from 'moment';
 
+import { DATE_TIME_FORMATS } from 'util/DateTime';
 import { alice } from 'fixtures/users';
-import DateTimeProvider, { DATE_TIME_FORMATS } from 'contexts/DateTimeProvider';
+import DateTimeProvider from 'contexts/DateTimeProvider';
 import DateTimeContext from 'contexts/DateTimeContext';
 import CurrentUserContext from 'contexts/CurrentUserContext';
-import User from 'logic/users/User';
+import type User from 'logic/users/User';
 
 const mockedUnixTime = 1577836800000; // 2020-01-01 00:00:00.000
 

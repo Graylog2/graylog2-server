@@ -18,7 +18,7 @@ import { isEmpty } from 'lodash';
 
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 import validateTimeRange from 'views/components/TimeRangeValidation';
-import { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
+import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 
 type FormValues = {
   timerange: TimeRange | NoTimeRangeOverride,
@@ -29,12 +29,11 @@ const validate = async <T extends FormValues>(
   limitDuration: number,
   setFieldWarning: (fieldName: string, warning: unknown) => void,
   validateQueryString: (values: T) => Promise<QueryValidationState>,
-  unifyTime,
 ) => {
   const { timerange: nextTimeRange } = values;
   let errors = {};
 
-  const timeRangeErrors = validateTimeRange(nextTimeRange, limitDuration, unifyTime);
+  const timeRangeErrors = validateTimeRange(nextTimeRange, limitDuration);
 
   if (!isEmpty(timeRangeErrors)) {
     errors = { ...errors, timerange: timeRangeErrors };

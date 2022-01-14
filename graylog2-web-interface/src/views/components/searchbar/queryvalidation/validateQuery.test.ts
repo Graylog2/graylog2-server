@@ -16,12 +16,12 @@
  */
 import * as Immutable from 'immutable';
 import { waitFor } from 'wrappedTestingLibrary';
-import moment from 'moment';
 
 import fetch from 'logic/rest/FetchProvider';
 import { StoreMock as MockStore } from 'helpers/mocking';
 
-import validateQuery, { ValidationQuery } from './validateQuery';
+import type { ValidationQuery } from './validateQuery';
+import validateQuery from './validateQuery';
 
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
 jest.mock('stores/users/CurrentUserStore', () => ({ CurrentUserStore: MockStore('get') }));
@@ -37,7 +37,6 @@ describe('validateQuery', () => {
     streams: ['stream-id'],
     parameters: Immutable.Set(),
     parameterBindings: Immutable.Map(),
-    adjustTimezone: (time) => moment(time),
   };
 
   const requestPayload = {

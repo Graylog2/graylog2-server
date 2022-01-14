@@ -20,7 +20,7 @@ import { DateUtils } from 'react-day-picker';
 import moment from 'moment';
 
 import { DatePicker } from 'components/common';
-import { DATE_TIME_FORMATS } from 'contexts/DateTimeProvider';
+import { DATE_TIME_FORMATS } from 'util/DateTime';
 
 type Props = {
   dateTime: string,

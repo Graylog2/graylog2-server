@@ -72,6 +72,10 @@ export const adjustFormat = (dateTime: DateTime, format: DateTimeFormats = 'defa
   return toDateObject(dateTime).format(DATE_TIME_FORMATS[format]);
 };
 
+export const formatAsBrowserTime = (time: DateTime, format: DateTimeFormats = 'default') => {
+  return adjustFormat(adjustTimezone(time, getBrowserTimezone()), format);
+};
+
 export const relativeDifference = (dateTime: DateTime) => {
   const dateObject = toDateObject(dateTime);
 

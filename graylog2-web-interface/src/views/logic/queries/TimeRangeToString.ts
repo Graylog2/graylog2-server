@@ -17,27 +17,27 @@
 
 import 'moment-duration-format';
 import 'moment-precise-range-plugin';
-import type { Moment } from 'moment';
 
-import { AbsoluteTimeRange, KeywordTimeRange, RelativeTimeRange, TimeRange } from 'views/logic/queries/Query';
+import type { AbsoluteTimeRange, KeywordTimeRange, RelativeTimeRange, TimeRange } from 'views/logic/queries/Query';
+import { toDateObject } from 'util/DateTime';
 import { isTypeRelativeWithStartOnly } from 'views/typeGuards/timeRange';
 
-export const readableRange = (timerange: TimeRange, fieldName: 'range' | 'from' | 'to', adjustTimezone: (time: Date) => Moment, placeholder: string | undefined = 'All Time') => {
-  return !timerange[fieldName] ? placeholder : adjustTimezone(new Date())
+export const readableRange = (timerange: TimeRange, fieldName: 'range' | 'from' | 'to', placeholder: string | undefined = 'All Time') => {
+  return !timerange[fieldName] ? placeholder : toDateObject(new Date())
     .subtract(timerange[fieldName] * 1000)
     .fromNow();
 };
 
-const relativeTimeRangeToString = (timerange: RelativeTimeRange, adjustTimezone: (time: Date) => Moment): string => {
+const relativeTimeRangeToString = (timerange: RelativeTimeRange): string => {
   if (isTypeRelativeWithStartOnly(timerange)) {
     if (timerange.range === 0) {
       return 'All Time';
     }
 
-    return `${readableRange(timerange, 'range', adjustTimezone)} - Now`;
+    return `${readableRange(timerange, 'range')} - Now`;
   }
 
-  return `${readableRange(timerange, 'from', adjustTimezone)} - ${readableRange(timerange, 'to', adjustTimezone, 'Now')}`;
+  return `${readableRange(timerange, 'from')} - ${readableRange(timerange, 'to', 'Now')}`;
 };
 
 const absoluteTimeRangeToString = (timerange: AbsoluteTimeRange, localizer = (str) => str): string => {
@@ -50,11 +50,11 @@ const keywordTimeRangeToString = (timerange: KeywordTimeRange): string => {
   return timerange.keyword;
 };
 
-const TimeRangeToString = (timerange: TimeRange, adjustTimezone: (time: Date) => Moment, localizer?: (string) => string): string => {
+const TimeRangeToString = (timerange: TimeRange, localizer?: (string) => string): string => {
   const { type } = timerange || {};
 
   switch (type) {
-    case 'relative': return relativeTimeRangeToString(timerange as RelativeTimeRange, adjustTimezone);
+    case 'relative': return relativeTimeRangeToString(timerange as RelativeTimeRange);
     case 'absolute': return absoluteTimeRangeToString(timerange as AbsoluteTimeRange, localizer);
     case 'keyword': return keywordTimeRangeToString(timerange as KeywordTimeRange);
 

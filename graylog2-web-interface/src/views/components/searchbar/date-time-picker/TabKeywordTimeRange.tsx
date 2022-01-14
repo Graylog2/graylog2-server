@@ -46,7 +46,7 @@ const ErrorMessage = styled.span(({ theme }) => css`
 const _parseKeywordPreview = (data, formatTime) => {
   const { from, to, timezone } = data;
 
-  return { from: formatTime(from, undefined, 'complete'), to: formatTime(to, undefined, 'complete'), timezone };
+  return { from: formatTime(from, 'complete'), to: formatTime(to, 'complete'), timezone };
 };
 
 type Props = {

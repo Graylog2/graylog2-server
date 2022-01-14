@@ -16,7 +16,8 @@
  */
 import PropTypes from 'prop-types';
 import React, { useContext } from 'react';
-import DayPicker, { DayModifiers } from 'react-day-picker';
+import type { DayModifiers } from 'react-day-picker';
+import DayPicker from 'react-day-picker';
 import styled, { css } from 'styled-components';
 
 import 'react-day-picker/lib/style.css';
@@ -83,7 +84,7 @@ const DatePicker = ({ date, fromDate, onChange, showOutsideDays }: Props) => {
         return false;
       }
 
-      return formatTime(moddedDate, 'UTC', 'date') === formatTime(selectedDate, undefined, 'date');
+      return formatTime(moddedDate, 'UTC', 'date') === formatTime(selectedDate, 'date');
     },
     disabled: {
       before: new Date(fromDate),

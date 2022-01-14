@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useContext } from 'react';
+import { useCallback } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import { Field } from 'formik';
@@ -52,7 +52,6 @@ import FormWarningsProvider from 'contexts/FormWarningsProvider';
 import useParameters from 'views/hooks/useParameters';
 import debounceWithPromise from 'views/logic/debounceWithPromise';
 import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
-import DateTimeContext from 'contexts/DateTimeContext';
 
 import SearchBarForm from './searchbar/SearchBarForm';
 
@@ -117,7 +116,6 @@ const SearchBar = ({
   queryFilters,
   onSubmit = defaultProps.onSubmit,
 }: Props) => {
-  const { adjustTimezone } = useContext(DateTimeContext);
   const { parameterBindings, parameters } = useParameters();
   const _validateQueryString = useCallback((values: SearchBarFormValues) => {
     const request = {
@@ -126,11 +124,10 @@ const SearchBar = ({
       queryString: values?.queryString,
       parameterBindings,
       parameters,
-      adjustTimezone,
     };
 
     return debouncedValidateQuery(request);
-  }, [parameterBindings, parameters, adjustTimezone]);
+  }, [parameterBindings, parameters]);
 
   if (!currentQuery || !config) {
     return <Spinner />;

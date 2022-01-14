@@ -18,7 +18,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 import { useContext } from 'react';
 
-import { TimeRange } from 'views/logic/queries/Query';
+import type { TimeRange } from 'views/logic/queries/Query';
 import { Button } from 'components/bootstrap';
 import timerangeToString from 'views/logic/queries/TimeRangeToString';
 import DateTimeContext from 'contexts/DateTimeContext';
@@ -65,13 +65,13 @@ type Props = {
 };
 
 const WidgetTimeRangeOverride = ({ value, onReset }: Props) => {
-  const { adjustTimezone } = useContext(DateTimeContext);
+  const { formatTime } = useContext(DateTimeContext);
 
   return (
     <Wrapper>
       <TimeRangeButton disabled />
       <TimeRangeInfo>
-        <TimeRangeString>{timerangeToString(value, adjustTimezone)}</TimeRangeString>
+        <TimeRangeString>{timerangeToString(value, formatTime)}</TimeRangeString>
         <ResetButton bsSize="xs" bsStyle="primary" onClick={onReset} data-testid="reset-global-time-range">
           Reset Global Override
         </ResetButton>

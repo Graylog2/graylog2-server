@@ -15,12 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import moment, { Moment } from 'moment';
+import type { Moment } from 'moment';
+import moment from 'moment';
 
-import { AbsoluteTimeRange, KeywordTimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
+import type { AbsoluteTimeRange, KeywordTimeRange, NoTimeRangeOverride, TimeRange } from 'views/logic/queries/Query';
 import { DEFAULT_RELATIVE_FROM } from 'views/Constants';
-import { RelativeTimeRangeClassified } from 'views/components/searchbar/date-time-picker/types';
-import type { TimeRange } from 'views/logic/queries/Query';
+import type { RelativeTimeRangeClassified } from 'views/components/searchbar/date-time-picker/types';
 
 import {
   classifyFromRange,
@@ -28,7 +28,7 @@ import {
   normalizeClassifiedRange, RELATIVE_CLASSIFIED_ALL_TIME_RANGE,
 } from './RelativeTimeRangeClassifiedHelper';
 
-const formatDatetime = (dateTime, formatTime) => formatTime(dateTime, undefined, 'complete');
+const formatDatetime = (dateTime, formatTime) => formatTime(dateTime, 'complete');
 
 const getDefaultAbsoluteFromRange = (oldTimeRange: RelativeTimeRangeClassified | AbsoluteTimeRange | KeywordTimeRange | NoTimeRangeOverride | undefined | null) => {
   if (isTypeRelativeClassified(oldTimeRange)) {

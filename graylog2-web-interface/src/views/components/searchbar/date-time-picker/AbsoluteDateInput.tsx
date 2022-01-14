@@ -22,7 +22,7 @@ import { useContext } from 'react';
 import { Icon } from 'components/common';
 import { Button, Input } from 'components/bootstrap';
 import DateTimeContext from 'contexts/DateTimeContext';
-import { DATE_TIME_FORMATS } from 'contexts/DateTimeProvider';
+import { DATE_TIME_FORMATS } from 'util/DateTime';
 
 const Wrapper = styled.div`
   margin: 9px 6px;
@@ -35,7 +35,7 @@ const Wrapper = styled.div`
 
 const AbsoluteDateInput = ({ name, disabled, onChange, value, hasError }) => {
   const { formatTime } = useContext(DateTimeContext);
-  const _onSetTimeToNow = () => onChange(formatTime(new Date(), undefined, 'complete'));
+  const _onSetTimeToNow = () => onChange(formatTime(new Date(), 'complete'));
   const _onChange = (event) => onChange(event.target.value);
 
   return (

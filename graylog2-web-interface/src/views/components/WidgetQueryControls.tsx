@@ -26,20 +26,20 @@ import WidgetEditApplyAllChangesContext from 'views/components/contexts/WidgetEd
 import { StreamsStore } from 'views/stores/StreamsStore';
 import connect, { useStore } from 'stores/connect';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
-import Widget from 'views/logic/widgets/Widget';
+import type Widget from 'views/logic/widgets/Widget';
 import { WidgetActions } from 'views/stores/WidgetStore';
-import { DEFAULT_TIMERANGE, SearchBarFormValues } from 'views/Constants';
+import type { SearchBarFormValues } from 'views/Constants';
+import { DEFAULT_TIMERANGE } from 'views/Constants';
 import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 import { Row, Col } from 'components/bootstrap';
 import { Icon } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
-import GlobalOverride from 'views/logic/search/GlobalOverride';
+import type GlobalOverride from 'views/logic/search/GlobalOverride';
 import WidgetContext from 'views/components/contexts/WidgetContext';
 import { GlobalOverrideStore, GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
 import { SearchActions } from 'views/stores/SearchStore';
 import { PropagateValidationState } from 'views/components/aggregationwizard';
-import DateTimeContext from 'contexts/DateTimeContext';
 import QueryValidation from 'views/components/searchbar/queryvalidation/QueryValidation';
 import FormWarningsContext from 'contexts/FormWarningsContext';
 import FormWarningsProvider from 'contexts/FormWarningsProvider';
@@ -93,7 +93,6 @@ const _resetQueryOverride = () => GlobalOverrideActions.resetQuery().then(Search
 
 const useBindApplySearchControlsChanges = (formRef) => {
   const { bindApplySearchControlsChanges } = useContext(WidgetEditApplyAllChangesContext);
-  const { adjustTimezone } = useContext(DateTimeContext);
 
   useEffect(() => {
     bindApplySearchControlsChanges((newWidget: Widget) => {
@@ -101,7 +100,7 @@ const useBindApplySearchControlsChanges = (formRef) => {
         const { dirty, values, isValid } = formRef.current;
 
         if (dirty && isValid) {
-          const normalizedFormValues = normalizeSearchBarFormValues(values, adjustTimezone);
+          const normalizedFormValues = normalizeSearchBarFormValues(values);
 
           return updateWidgetSearchControls(newWidget, normalizedFormValues);
         }
@@ -109,13 +108,12 @@ const useBindApplySearchControlsChanges = (formRef) => {
 
       return undefined;
     });
-  }, [formRef, bindApplySearchControlsChanges, adjustTimezone]);
+  }, [formRef, bindApplySearchControlsChanges]);
 };
 
 const debouncedValidateQuery = debounceWithPromise(validateQuery, 350);
 
 const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
-  const { adjustTimezone } = useContext(DateTimeContext);
   const widget = useContext(WidgetContext);
   const config = useStore(SearchConfigStore, ({ searchesClusterConfig }) => searchesClusterConfig);
   const isValidatingQuery = !!useIsFetching('validateSearchQuery');
@@ -136,11 +134,10 @@ const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
       streams: values?.streams,
       parameters,
       parameterBindings,
-      adjustTimezone,
     };
 
     return debouncedValidateQuery(request);
-  }, [globalOverride?.query, globalOverride?.timerange, parameterBindings, parameters, adjustTimezone]);
+  }, [globalOverride?.query, globalOverride?.timerange, parameterBindings, parameters]);
 
   useBindApplySearchControlsChanges(formRef);
 

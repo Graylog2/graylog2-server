@@ -16,10 +16,9 @@
  */
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { Moment } from 'moment';
-import { useContext } from 'react';
+import type { Moment } from 'moment';
 
-import DateTimeContext from 'contexts/DateTimeContext';
+import { relativeDifference } from 'util/DateTime';
 
 type Props = {
   dateTime: string | number | Date | Moment,
@@ -31,7 +30,6 @@ type Props = {
  */
 
 const RelativeTime = ({ dateTime }: Props) => {
-  const { relativeDifference } = useContext(DateTimeContext);
   const relativeTime = relativeDifference(dateTime);
 
   return (

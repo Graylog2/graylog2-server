@@ -20,18 +20,19 @@ import { RELATIVE_ALL_TIME } from 'views/Constants';
 import type { TimeRange } from 'views/logic/queries/Query';
 import type { SearchBarFormValues } from 'views/Constants';
 import { isTypeRelativeWithStartOnly, isTypeRelativeWithEnd } from 'views/typeGuards/timeRange';
+import { toDateObject } from 'util/DateTime';
 
-const formatDatetime = (dateTime, formatTime) => formatTime(dateTime, undefined, 'complete');
+const formatDatetime = (dateTime, formatTime) => formatTime(dateTime, 'complete');
 
-export const onSubmittingTimerange = (timerange: TimeRange, adjustTimezone: (time: string) => Moment): TimeRange => {
+export const onSubmittingTimerange = (timerange: TimeRange): TimeRange => {
   const { type } = timerange;
 
   switch (timerange.type) {
     case 'absolute':
       return {
         type: timerange.type,
-        from: adjustTimezone(timerange.from).toISOString(),
-        to: adjustTimezone(timerange.to).toISOString(),
+        from: toDateObject(timerange.from).toISOString(),
+        to: toDateObject(timerange.to).toISOString(),
       };
     case 'relative':
       if (isTypeRelativeWithStartOnly(timerange)) {

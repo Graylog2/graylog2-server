@@ -19,14 +19,13 @@ import { useEffect, useState, useContext } from 'react';
 import styled, { css } from 'styled-components';
 import PropTypes from 'prop-types';
 import { useFormikContext } from 'formik';
-import { Moment } from 'moment';
 
 import { readableRange } from 'views/logic/queries/TimeRangeToString';
 import { isTypeRelative, isTypeRelativeWithEnd, isTypeRelativeWithStartOnly } from 'views/typeGuards/timeRange';
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import { Icon } from 'components/common';
-import { DATE_TIME_FORMATS } from 'contexts/DateTimeProvider';
-import { SearchBarFormValues } from 'views/Constants';
+import { DATE_TIME_FORMATS } from 'util/DateTime';
+import type { SearchBarFormValues } from 'views/Constants';
 import DateTimeContext from 'contexts/DateTimeContext';
 
 import { EMPTY_OUTPUT, EMPTY_RANGE } from '../TimeRangeDisplay';
@@ -71,7 +70,7 @@ const MiddleIcon = styled.span(({ theme }) => css`
   padding: 0 15px;
 `);
 
-const dateOutput = (timerange: TimeRange | NoTimeRangeOverride, adjustTimezone: (time: Date) => Moment, formatTime) => {
+const dateOutput = (timerange: TimeRange | NoTimeRangeOverride, formatTime) => {
   let from = EMPTY_RANGE;
   let to = EMPTY_RANGE;
 
@@ -81,14 +80,14 @@ const dateOutput = (timerange: TimeRange | NoTimeRangeOverride, adjustTimezone: 
 
   if (isTypeRelative(timerange)) {
     if (isTypeRelativeWithStartOnly(timerange)) {
-      from = readableRange(timerange, 'range', adjustTimezone);
+      from = readableRange(timerange, 'range');
     }
 
     if (isTypeRelativeWithEnd(timerange)) {
-      from = readableRange(timerange, 'from', adjustTimezone);
+      from = readableRange(timerange, 'from');
     }
 
-    to = readableRange(timerange, 'to', adjustTimezone, 'Now');
+    to = readableRange(timerange, 'to', 'Now');
 
     return {
       from,
@@ -97,8 +96,8 @@ const dateOutput = (timerange: TimeRange | NoTimeRangeOverride, adjustTimezone: 
   }
 
   return {
-    from: 'from' in timerange ? formatTime(timerange.from, undefined, 'complete') : from,
-    until: 'to' in timerange ? formatTime(timerange.to, undefined, 'complete') : to,
+    from: 'from' in timerange ? formatTime(timerange.from, 'complete') : from,
+    until: 'to' in timerange ? formatTime(timerange.to, 'complete') : to,
   };
 };
 

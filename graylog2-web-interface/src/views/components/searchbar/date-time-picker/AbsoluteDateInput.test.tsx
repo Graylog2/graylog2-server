@@ -18,7 +18,7 @@ import * as React from 'react';
 import { fireEvent, render, screen } from 'wrappedTestingLibrary';
 import moment from 'moment';
 
-import { DATE_TIME_FORMATS } from 'contexts/DateTimeProvider';
+import { DATE_TIME_FORMATS } from 'util/DateTime';
 
 import AbsoluteDateInput from './AbsoluteDateInput';
 

@@ -19,7 +19,8 @@ import * as React from 'react';
 import { useContext } from 'react';
 import type { Moment } from 'moment';
 
-import DateTimeContext, { DateTimeFormats } from 'contexts/DateTimeContext';
+import DateTimeContext from 'contexts/DateTimeContext';
+import type { DateTimeFormats } from 'util/DateTime';
 
 type Props = {
   dateTime: string | number | Date | Moment,

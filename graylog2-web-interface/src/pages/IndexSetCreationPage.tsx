@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect, useContext } from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 
 import { LinkContainer } from 'components/common/router';
@@ -31,7 +31,7 @@ import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import { IndicesConfigurationActions, IndicesConfigurationStore } from 'stores/indices/IndicesConfigurationStore';
 import { RetentionStrategyPropType, RotationStrategyPropType } from 'components/indices/Types';
 import type { RetentionStrategy, RotationStrategy } from 'components/indices/Types';
-import DateTimeContext from 'contexts/DateTimeContext';
+import { toDateObject } from 'util/DateTime';
 
 type Props = {
   indexSet: Partial<IndexSet> | null | undefined,
@@ -40,8 +40,6 @@ type Props = {
 }
 
 const IndexSetCreationPage = ({ retentionStrategies, rotationStrategies, indexSet }: Props) => {
-  const { adjustTimezone } = useContext(DateTimeContext);
-
   useEffect(() => {
     IndicesConfigurationActions.loadRotationStrategies();
     IndicesConfigurationActions.loadRetentionStrategies();
@@ -50,7 +48,7 @@ const IndexSetCreationPage = ({ retentionStrategies, rotationStrategies, indexSe
   const _saveConfiguration = (indexSetItem: IndexSet) => {
     const copy = indexSetItem;
 
-    copy.creation_date = adjustTimezone(new Date()).toISOString();
+    copy.creation_date = toDateObject(new Date()).toISOString();
 
     IndexSetsActions.create(copy).then(() => {
       history.push(Routes.SYSTEM.INDICES.LIST);

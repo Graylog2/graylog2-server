@@ -14,9 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import moment, { Moment } from 'moment';
+import moment from 'moment';
 
-import {
+import { DATE_TIME_FORMATS } from 'util/DateTime';
+import type {
   TimeRange,
   NoTimeRangeOverride,
   KeywordTimeRange,
@@ -24,14 +25,13 @@ import {
   AbsoluteTimeRange,
 } from 'views/logic/queries/Query';
 import { isTypeAbsolute, isTypeRelativeWithEnd, isTypeKeyword } from 'views/typeGuards/timeRange';
-import { DATE_TIME_FORMATS } from 'contexts/DateTimeProvider';
 
 const invalidDateFormatError = 'Format must be: YYYY-MM-DD [HH:mm:ss[.SSS]].';
 const rangeLimitError = 'Range is outside limit duration.';
 const dateLimitError = 'Date is outside limit duration.';
 const timeRangeError = 'The "Until" date must come after the "From" date.';
 
-const exceedsDuration = (timeRange, limitDuration, formatTime) => {
+const exceedsDuration = (timeRange, limitDuration) => {
   if (limitDuration === 0) {
     return false;
   }
@@ -40,7 +40,7 @@ const exceedsDuration = (timeRange, limitDuration, formatTime) => {
     case 'absolute':
     case 'keyword': { // eslint-disable-line no-fallthrough, padding-line-between-statements
       const durationFrom = timeRange.from;
-      const durationLimit = formatTime(moment().subtract(Number(limitDuration), 'seconds'), undefined, 'complete');
+      const durationLimit = moment().subtract(Number(limitDuration), 'seconds');
 
       return moment(durationFrom).isBefore(durationLimit);
     }
@@ -50,7 +50,7 @@ const exceedsDuration = (timeRange, limitDuration, formatTime) => {
   }
 };
 
-const validateAbsoluteTimeRange = (timeRange: AbsoluteTimeRange, limitDuration: number, formatTime: (time: Moment) => string) => {
+const validateAbsoluteTimeRange = (timeRange: AbsoluteTimeRange, limitDuration: number) => {
   let errors: {
     from?: string,
     to?: string,
@@ -68,7 +68,7 @@ const validateAbsoluteTimeRange = (timeRange: AbsoluteTimeRange, limitDuration: 
     errors = { ...errors, to: timeRangeError };
   }
 
-  if (exceedsDuration(timeRange, limitDuration, formatTime)) {
+  if (exceedsDuration(timeRange, limitDuration)) {
     errors = { ...errors, from: dateLimitError };
   }
 
@@ -103,21 +103,21 @@ const validateRelativeTimeRangeWithEnd = (timeRange: RelativeTimeRangeWithEnd, l
   return errors;
 };
 
-const validateKeywordTimeRange = (timeRange: KeywordTimeRange, limitDuration: number, formatTime) => {
+const validateKeywordTimeRange = (timeRange: KeywordTimeRange, limitDuration: number) => {
   let errors: { keyword?: string } = {};
 
-  if (exceedsDuration(timeRange, limitDuration, formatTime)) {
+  if (exceedsDuration(timeRange, limitDuration)) {
     errors = { keyword: rangeLimitError };
   }
 
   return errors;
 };
 
-const validateTimeRange = (timeRange: TimeRange | NoTimeRangeOverride, limitDuration: number, formatTime) => {
+const validateTimeRange = (timeRange: TimeRange | NoTimeRangeOverride, limitDuration: number) => {
   let errors = {};
 
   if (isTypeKeyword(timeRange)) {
-    errors = { ...errors, ...validateKeywordTimeRange(timeRange, limitDuration, formatTime) };
+    errors = { ...errors, ...validateKeywordTimeRange(timeRange, limitDuration) };
   }
 
   if (isTypeRelativeWithEnd(timeRange)) {
@@ -125,7 +125,7 @@ const validateTimeRange = (timeRange: TimeRange | NoTimeRangeOverride, limitDura
   }
 
   if (isTypeAbsolute(timeRange)) {
-    errors = { ...errors, ...validateAbsoluteTimeRange(timeRange, limitDuration, formatTime) };
+    errors = { ...errors, ...validateAbsoluteTimeRange(timeRange, limitDuration) };
   }
 
   return errors;

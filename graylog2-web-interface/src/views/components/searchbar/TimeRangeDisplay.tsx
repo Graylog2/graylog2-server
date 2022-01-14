@@ -17,7 +17,6 @@
 import * as React from 'react';
 import { useEffect, useRef, useState, useContext } from 'react';
 import styled, { css } from 'styled-components';
-import type { Moment } from 'moment';
 
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import { isTypeKeyword, isTypeRelativeWithStartOnly, isTypeRelativeWithEnd } from 'views/typeGuards/timeRange';
@@ -54,7 +53,7 @@ const TimeRangeWrapper = styled.p(({ theme }) => css`
   }
 `);
 
-const dateOutput = (timerange: TimeRange, adjustTimezone: (time: Date) => Moment, formatTime) => {
+const dateOutput = (timerange: TimeRange, formatTime) => {
   let from = EMPTY_RANGE;
   let to = EMPTY_RANGE;
 
@@ -66,14 +65,14 @@ const dateOutput = (timerange: TimeRange, adjustTimezone: (time: Date) => Moment
     case 'relative':
 
       if (isTypeRelativeWithStartOnly(timerange)) {
-        from = readableRange(timerange, 'range', adjustTimezone);
+        from = readableRange(timerange, 'range');
       }
 
       if (isTypeRelativeWithEnd(timerange)) {
-        from = readableRange(timerange, 'from', adjustTimezone);
+        from = readableRange(timerange, 'from');
       }
 
-      to = readableRange(timerange, 'to', adjustTimezone, 'Now');
+      to = readableRange(timerange, 'to', 'Now');
 
       return {
         from,
@@ -82,7 +81,7 @@ const dateOutput = (timerange: TimeRange, adjustTimezone: (time: Date) => Moment
 
     case 'absolute':
     case 'keyword':
-      return { from: formatTime(timerange.from, undefined, 'complete'), until: formatTime(timerange.to, undefined, 'complete') };
+      return { from: formatTime(timerange.from, 'complete'), until: formatTime(timerange.to, 'complete') };
     default:
       throw new Error('Invalid Timerange Type');
   }
@@ -91,7 +90,7 @@ const dateOutput = (timerange: TimeRange, adjustTimezone: (time: Date) => Moment
 const TimeRangeDisplay = ({ timerange, toggleDropdownShow }: Props) => {
   const [{ from, until }, setTimeOutput] = useState(EMPTY_OUTPUT);
   const dateTested = useRef(false);
-  const { adjustTimezone, userTimezone, formatTime } = useContext(DateTimeContext);
+  const { userTimezone, formatTime } = useContext(DateTimeContext);
 
   useEffect(() => {
     if (isTypeKeyword(timerange) && !timerange.from) {
@@ -101,17 +100,17 @@ const TimeRangeDisplay = ({ timerange, toggleDropdownShow }: Props) => {
             dateTested.current = true;
 
             setTimeOutput({
-              from: formatTime(response.from, undefined, 'complete'),
-              until: formatTime(response.to, undefined, 'complete'),
+              from: formatTime(response.from, 'complete'),
+              until: formatTime(response.to, 'complete'),
             });
           }, () => {
             setTimeOutput(EMPTY_OUTPUT);
           });
       }
     } else if (timerange && 'type' in timerange) {
-      setTimeOutput(dateOutput(timerange, adjustTimezone, formatTime));
+      setTimeOutput(dateOutput(timerange, formatTime));
     }
-  }, [dateTested, timerange, adjustTimezone, formatTime, userTimezone]);
+  }, [dateTested, timerange, formatTime, userTimezone]);
 
   return (
     <TimeRangeWrapper aria-label="Search Time Range, Opens Time Range Selector On Click" role="button" onClick={toggleDropdownShow}>

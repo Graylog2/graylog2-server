@@ -18,18 +18,11 @@ import * as React from 'react';
 import type { Moment } from 'moment';
 
 import { singleton } from 'logic/singleton';
-
-import { DATE_TIME_FORMATS } from './DateTimeProvider';
-
-export type DateTimeFormats = keyof typeof DATE_TIME_FORMATS;
-
-export type DateTime = string | number | Moment | Date;
+import { DateTime, DateTimeFormats } from 'util/DateTime';
 
 export type DateTimeContextType = {
-  relativeDifference: (time: DateTime, tz?: string) => string
-  formatAsBrowserTime: (time: DateTime, format?: DateTimeFormats) => string,
-  formatTime: (time: DateTime, tz?: string, format?: DateTimeFormats) => string
-  adjustTimezone: (time: DateTime, tz?: string, format?: DateTimeFormats) => Moment,
+  formatTime: (time: DateTime, format?: DateTimeFormats) => string
+  toUserTimezone: (time: DateTime) => Moment,
   userTimezone: string,
 };
 

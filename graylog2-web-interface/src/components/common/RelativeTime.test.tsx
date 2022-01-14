@@ -16,24 +16,13 @@
  */
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
-import moment from 'moment';
-
-import DateTimeContext from 'contexts/DateTimeContext';
 
 import RelativeTime from './RelativeTime';
 
 describe('RelativeTime', () => {
   it('should display relative time', () => {
     render(
-      <DateTimeContext.Provider value={{
-        relativeDifference: (dateTime) => `relative time based on ${dateTime}`,
-        formatAsBrowserTime: () => '',
-        formatTime: () => '',
-        adjustTimezone: () => moment(),
-        userTimezone: '',
-      }}>
-        <RelativeTime dateTime="2021-01-01 10:00:00" />
-      </DateTimeContext.Provider>,
+      <RelativeTime dateTime="2021-01-01 10:00:00" />,
     );
 
     expect(screen.getByText('relative time based on 2021-01-01 10:00:00')).toBeInTheDocument();
