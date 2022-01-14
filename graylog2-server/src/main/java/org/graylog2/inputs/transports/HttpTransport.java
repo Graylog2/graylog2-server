@@ -21,6 +21,7 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.EventLoopGroup;
+import io.netty.handler.codec.Delimiters;
 import io.netty.handler.codec.http.HttpContentDecompressor;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpRequestDecoder;
@@ -29,6 +30,7 @@ import io.netty.handler.timeout.ReadTimeoutHandler;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.inputs.transports.netty.EventLoopGroupFactory;
 import org.graylog2.inputs.transports.netty.HttpHandler;
+import org.graylog2.inputs.transports.netty.LenientDelimiterBasedFrameDecoder;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -49,13 +51,15 @@ import java.util.concurrent.TimeUnit;
 public class HttpTransport extends AbstractTcpTransport {
     private static final int DEFAULT_MAX_INITIAL_LINE_LENGTH = 4096;
     private static final int DEFAULT_MAX_HEADER_SIZE = 8192;
-    private static final int DEFAULT_MAX_CHUNK_SIZE = (int) Size.kilobytes(64L).toBytes();
+    protected static final int DEFAULT_MAX_CHUNK_SIZE = (int) Size.kilobytes(64L).toBytes();
     private static final int DEFAULT_IDLE_WRITER_TIMEOUT = 60;
 
+    static final String CK_ENABLE_BULK_RECEIVING = "enable_bulk_receiving";
     static final String CK_ENABLE_CORS = "enable_cors";
     static final String CK_MAX_CHUNK_SIZE = "max_chunk_size";
     static final String CK_IDLE_WRITER_TIMEOUT = "idle_writer_timeout";
 
+    protected final boolean enableBulkReceiving;
     protected final boolean enableCors;
     protected final int maxChunkSize;
     private final int idleWriterTimeout;
@@ -69,30 +73,30 @@ public class HttpTransport extends AbstractTcpTransport {
                          LocalMetricRegistry localRegistry,
                          TLSProtocolsConfiguration tlsConfiguration) {
         super(configuration,
-              throughputCounter,
-              localRegistry,
-              eventLoopGroup,
-              eventLoopGroupFactory,
-              nettyTransportConfiguration,
-              tlsConfiguration);
+                throughputCounter,
+                localRegistry,
+                eventLoopGroup,
+                eventLoopGroupFactory,
+                nettyTransportConfiguration,
+                tlsConfiguration);
 
-        enableCors = configuration.getBoolean(CK_ENABLE_CORS);
-
-        int maxChunkSize = configuration.intIsSet(CK_MAX_CHUNK_SIZE) ? configuration.getInt(CK_MAX_CHUNK_SIZE) : DEFAULT_MAX_CHUNK_SIZE;
-        this.maxChunkSize = maxChunkSize <= 0 ? DEFAULT_MAX_CHUNK_SIZE : maxChunkSize;
+        this.enableBulkReceiving = configuration.getBoolean(CK_ENABLE_BULK_RECEIVING);
+        this.enableCors = configuration.getBoolean(CK_ENABLE_CORS);
+        this.maxChunkSize = parseMaxChunkSize(configuration);
         this.idleWriterTimeout = configuration.intIsSet(CK_IDLE_WRITER_TIMEOUT) ? configuration.getInt(CK_IDLE_WRITER_TIMEOUT, DEFAULT_IDLE_WRITER_TIMEOUT) : DEFAULT_IDLE_WRITER_TIMEOUT;
+    }
+
+    /**
+     * @return If the configured Max Chunk Size is less than zero, return {@link HttpTransport#DEFAULT_MAX_CHUNK_SIZE}.
+     */
+    protected static int parseMaxChunkSize(Configuration configuration) {
+        int maxChunkSize = configuration.intIsSet(CK_MAX_CHUNK_SIZE) ? configuration.getInt(CK_MAX_CHUNK_SIZE) : DEFAULT_MAX_CHUNK_SIZE;
+        return maxChunkSize <= 0 ? DEFAULT_MAX_CHUNK_SIZE : maxChunkSize;
     }
 
     @Override
     protected LinkedHashMap<String, Callable<? extends ChannelHandler>> getCustomChildChannelHandlers(MessageInput input) {
         final LinkedHashMap<String, Callable<? extends ChannelHandler>> handlers = new LinkedHashMap<>();
-        addBaseHandlers(handlers);
-        handlers.put("http-handler", () -> new HttpHandler(enableCors));
-        handlers.putAll(super.getCustomChildChannelHandlers(input));
-        return handlers;
-    }
-
-    protected void addBaseHandlers(LinkedHashMap<String, Callable<? extends ChannelHandler>> handlers) {
         if (idleWriterTimeout > 0) {
             // Install read timeout handler to close idle connections after a timeout.
             // This avoids dangling HTTP connections when the HTTP client does not close the connection properly.
@@ -104,6 +108,16 @@ public class HttpTransport extends AbstractTcpTransport {
         handlers.put("decompressor", HttpContentDecompressor::new);
         handlers.put("encoder", HttpResponseEncoder::new);
         handlers.put("aggregator", () -> new HttpObjectAggregator(maxChunkSize));
+
+        if (!enableBulkReceiving) {
+            handlers.put("http-handler", () -> new HttpHandler(enableCors));
+        } else {
+            handlers.put("http-bulk-handler", () -> new HttpHandler(enableCors) /* TODO: Add chunking support? */);
+            handlers.put("http-bulk-newline-decoder",
+                    () -> new LenientDelimiterBasedFrameDecoder(maxChunkSize, Delimiters.lineDelimiter()));
+        }
+        handlers.putAll(super.getCustomChildChannelHandlers(input));
+        return handlers;
     }
 
     @FactoryClass
@@ -120,21 +134,25 @@ public class HttpTransport extends AbstractTcpTransport {
         @Override
         public ConfigurationRequest getRequestedConfiguration() {
             final ConfigurationRequest r = super.getRequestedConfiguration();
+            r.addField(new BooleanField(CK_ENABLE_BULK_RECEIVING,
+                    "Enable Bulk Receiving",
+                    false,
+                    "Enables bulk receiving of messages separated by newlines."));
             r.addField(new BooleanField(CK_ENABLE_CORS,
-                                        "Enable CORS",
-                                        true,
-                                        "Input sends CORS headers to satisfy browser security policies"));
+                    "Enable CORS",
+                    true,
+                    "Input sends CORS headers to satisfy browser security policies"));
             r.addField(new NumberField(CK_MAX_CHUNK_SIZE,
-                                        "Max. HTTP chunk size",
-                                        DEFAULT_MAX_CHUNK_SIZE,
-                                        "The maximum HTTP chunk size in bytes (e. g. length of HTTP request body)",
-                                        ConfigurationField.Optional.OPTIONAL));
+                    "Max. HTTP chunk size",
+                    DEFAULT_MAX_CHUNK_SIZE,
+                    "The maximum HTTP chunk size in bytes (e. g. length of HTTP request body)",
+                    ConfigurationField.Optional.OPTIONAL));
             r.addField(new NumberField(CK_IDLE_WRITER_TIMEOUT,
-                                        "Idle writer timeout",
-                                        DEFAULT_IDLE_WRITER_TIMEOUT,
-                                        "The server closes the connection after the given time in seconds after the last client write request. (use 0 to disable)",
-                                        ConfigurationField.Optional.OPTIONAL,
-                                        NumberField.Attribute.ONLY_POSITIVE));
+                    "Idle writer timeout",
+                    DEFAULT_IDLE_WRITER_TIMEOUT,
+                    "The server closes the connection after the given time in seconds after the last client write request. (use 0 to disable)",
+                    ConfigurationField.Optional.OPTIONAL,
+                    NumberField.Attribute.ONLY_POSITIVE));
             return r;
         }
     }
