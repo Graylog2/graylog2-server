@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as Immutable from 'immutable';
+import { isEqual } from 'lodash';
 
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
@@ -27,12 +28,15 @@ import { onSubmittingTimerange } from 'views/components/TimerangeForForm';
 import { isNoTimeRangeOverride } from 'views/typeGuards/timeRange';
 
 import type { Completer } from '../SearchBarAutocompletions';
-import type { Token, Line } from '../ace-types';
+import type { Token, Line, CompletionResult } from '../ace-types';
+
+const SUGGESTIONS_PAGE_SIZE = 50;
 
 type SuggestionsResponse = {
   field: string,
   input: string,
   suggestions: Array<{ value: string, occurrence: number}> | undefined,
+  sum_other_docs_count: number,
 }
 
 const suggestionsUrl = qualifyUrl('/search/suggest');
@@ -80,6 +84,15 @@ class FieldValueCompletion implements Completer {
 
   fields: FieldTypesStoreState;
 
+  previousState: undefined | {
+    furtherSuggestionsCount: number,
+    completions: Array<CompletionResult>,
+    fieldName: string,
+    input: string | number,
+    timeRange: TimeRange | NoTimeRangeOverride | undefined,
+    streams: Array<string> | undefined,
+  }
+
   constructor() {
     this.onViewMetadataStoreUpdate(ViewMetadataStore.getInitialState());
     ViewMetadataStore.listen(this.onViewMetadataStoreUpdate);
@@ -104,6 +117,38 @@ class FieldValueCompletion implements Completer {
     return true;
   }
 
+  alreadyFetchedAllSuggestions(
+    input: string | number,
+    fieldName: string,
+    streams: Array<string> | undefined,
+    timeRange: TimeRange | NoTimeRangeOverride | undefined,
+  ) {
+    if (!this.previousState) {
+      return false;
+    }
+
+    const {
+      fieldName: prevFieldName,
+      streams: prevStreams,
+      timeRange: prevTimeRange,
+      furtherSuggestionsCount,
+    } = this.previousState;
+
+    return String(input).startsWith(String(this.previousState?.input))
+      && prevFieldName === fieldName
+      && isEqual(prevStreams, streams)
+      && isEqual(prevTimeRange, timeRange)
+      && !furtherSuggestionsCount;
+  }
+
+  filterExistingSuggestions(input: string | number) {
+    if (this.previousState) {
+      return this.previousState.completions.filter((completion) => completion.name.startsWith(String(input)));
+    }
+
+    return [];
+  }
+
   getCompletions = (
     currentToken: Token | undefined | null,
     lastToken: Token | undefined | null,
@@ -119,6 +164,10 @@ class FieldValueCompletion implements Completer {
       return [];
     }
 
+    if (this.alreadyFetchedAllSuggestions(input, fieldName, streams, timeRange)) {
+      return this.filterExistingSuggestions(input);
+    }
+
     const normalizedTimeRange = (!timeRange || isNoTimeRangeOverride(timeRange)) ? undefined : onSubmittingTimerange(timeRange);
 
     return fetch('POST', suggestionsUrl, {
@@ -126,16 +175,29 @@ class FieldValueCompletion implements Completer {
       input,
       timerange: normalizedTimeRange,
       streams,
-    }).then(({ suggestions }: SuggestionsResponse) => {
+      size: SUGGESTIONS_PAGE_SIZE,
+    }).then(({ suggestions, sum_other_docs_count: furtherSuggestionsCount }: SuggestionsResponse) => {
       if (!suggestions) {
         return [];
       }
 
-      return suggestions.map(({ value, occurrence }) => ({
+      const completions = suggestions.map(({ value, occurrence }) => ({
         name: value,
         value: value,
         score: occurrence,
+        meta: `${occurrence} (occ)`,
       }));
+
+      this.previousState = {
+        furtherSuggestionsCount,
+        streams,
+        timeRange,
+        fieldName,
+        input,
+        completions,
+      };
+
+      return completions;
     });
   };
 
@@ -160,7 +222,6 @@ class FieldValueCompletion implements Completer {
   };
 
   shouldShowCompletions = (currentLine: number, lines: Array<Array<Line>>) => {
-    console.log('shouldShowCompletions', currentLine, lines);
     const currentLineTokens = lines[currentLine - 1];
     const currentTokenIndex = currentLineTokens.findIndex((token) => token?.start !== undefined);
     const currentToken = currentLineTokens[currentTokenIndex];
