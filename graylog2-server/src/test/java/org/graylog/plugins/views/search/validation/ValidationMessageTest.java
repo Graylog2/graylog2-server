@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.views.search.validation;
 
+import org.apache.lucene.queryparser.classic.ParseException;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -31,13 +32,13 @@ class ValidationMessageTest {
         try {
             luceneQueryParser.parse(query);
             fail("Should throw an exception!");
-        } catch (QueryParsingException e) {
+        } catch (ParseException e) {
             final ValidationMessage validationMessage = ValidationMessage.fromException(query, e);
             assertThat(validationMessage.beginLine()).isEqualTo(1);
             assertThat(validationMessage.endLine()).isEqualTo(1);
             assertThat(validationMessage.beginColumn()).isEqualTo(0);
             assertThat(validationMessage.endColumn()).isEqualTo(4);
-            assertThat(validationMessage.errorType()).isEqualTo("QueryParsingException");
+            assertThat(validationMessage.errorType()).isEqualTo("Query parsing error");
             assertThat(validationMessage.errorMessage()).startsWith("Cannot parse query 'foo:', cause: incomplete query, query ended unexpectedly");
         }
     }

@@ -19,6 +19,7 @@ package org.graylog.plugins.views.search.validation;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.apache.lucene.queryparser.classic.ParseException;
 import org.graylog2.shared.utilities.ExceptionUtils;
 
 import javax.annotation.Nullable;
@@ -57,13 +58,13 @@ public abstract class ValidationMessage {
     @JsonProperty
     public abstract String errorMessage();
 
-    public static ValidationMessage fromException(final String query, final Exception exception) {
+    public static ValidationMessage fromException(final String query, final ParseException exception) {
 
         final String input = exception.toString();
 
         final ValidationMessage.Builder errorBuilder = builder();
 
-        errorBuilder.errorType(exception.getClass().getSimpleName());
+        errorBuilder.errorType("Query parsing error");
         final String rootCause = getErrorMessage(exception);
         errorBuilder.errorMessage(String.format(Locale.ROOT, "Cannot parse query '%s', cause: %s", query, rootCause));
 

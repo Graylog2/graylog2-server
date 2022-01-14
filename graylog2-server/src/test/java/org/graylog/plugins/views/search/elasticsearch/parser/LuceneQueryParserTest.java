@@ -21,7 +21,6 @@ import org.graylog.plugins.views.search.validation.ImmutableToken;
 import org.graylog.plugins.views.search.validation.LuceneQueryParser;
 import org.graylog.plugins.views.search.validation.ParsedQuery;
 import org.graylog.plugins.views.search.validation.ParsedTerm;
-import org.graylog.plugins.views.search.validation.QueryParsingException;
 import org.junit.jupiter.api.Test;
 
 import java.util.stream.Collectors;
@@ -34,31 +33,31 @@ class LuceneQueryParserTest {
     private final LuceneQueryParser parser = new LuceneQueryParser();
 
     @Test
-    void getFieldNamesSimple() throws QueryParsingException {
+    void getFieldNamesSimple() throws ParseException {
         final ParsedQuery fields = parser.parse("foo:bar AND lorem:ipsum");
         assertThat(fields.allFieldNames()).contains("foo", "lorem");
     }
 
     @Test
-    void getFieldNamesExist() throws QueryParsingException {
+    void getFieldNamesExist() throws ParseException {
         final ParsedQuery fields = parser.parse("foo:bar AND _exists_:lorem");
         assertThat(fields.allFieldNames()).contains("foo", "lorem");
     }
 
     @Test
-    void getFieldNamesComplex() throws QueryParsingException {
+    void getFieldNamesComplex() throws ParseException {
         final ParsedQuery fields = parser.parse("type :( ssh OR login )");
         assertThat(fields.allFieldNames()).contains("type");
     }
 
     @Test
-    void getFieldNamesNot() throws QueryParsingException {
+    void getFieldNamesNot() throws ParseException {
         final ParsedQuery parsedQuery = parser.parse("NOT _exists_ : type");
         assertThat(parsedQuery.allFieldNames()).contains("type");
     }
 
     @Test
-    void unknownTerm() throws QueryParsingException {
+    void unknownTerm() throws ParseException {
         final ParsedQuery query = parser.parse("foo:bar and");
         assertThat(query.allFieldNames()).contains("foo");
         assertThat(query.invalidOperators().stream().map(ParsedTerm::value).collect(Collectors.toSet())).contains("and");
@@ -74,7 +73,7 @@ class LuceneQueryParserTest {
     }
 
     @Test
-    void testInvalidOperators() throws QueryParsingException {
+    void testInvalidOperators() throws ParseException {
         {
             final ParsedQuery query = parser.parse("foo:bar baz");
             assertThat(query.invalidOperators()).isEmpty();
@@ -96,13 +95,13 @@ class LuceneQueryParserTest {
     }
 
     @Test
-    void testRepeatedInvalidTokens() throws QueryParsingException {
+    void testRepeatedInvalidTokens() throws ParseException {
         final ParsedQuery query = parser.parse("foo:bar and lorem:ipsum and dolor:sit");
         assertThat(query.invalidOperators().size()).isEqualTo(2);
     }
 
     @Test
-    void testLongStringOfInvalidTokens() throws QueryParsingException {
+    void testLongStringOfInvalidTokens() throws ParseException {
         final ParsedQuery query = parser.parse("and and and or or or");
         assertThat(query.invalidOperators().size()).isEqualTo(6);
         assertThat(query.invalidOperators().stream().allMatch(op -> op.tokens().size() == 1)).isTrue();
@@ -113,7 +112,7 @@ class LuceneQueryParserTest {
     }
 
     @Test
-    void testMultilineQuery() throws QueryParsingException {
+    void testMultilineQuery() throws ParseException {
         final ParsedQuery query = parser.parse("foo:bar AND\nlorem:ipsum");
 
         {
@@ -142,7 +141,7 @@ class LuceneQueryParserTest {
     }
 
     @Test
-    void testMultilineComplexQuery() throws QueryParsingException {
+    void testMultilineComplexQuery() throws ParseException {
         final ParsedQuery query = parser.parse("(\"ssh login\" AND (source:example.org OR source:another.example.org))\n" +
                 "OR (\"login\" AND (source:example1.org OR source:another.example2.org))\n" +
                 "OR not_existing_field:test");

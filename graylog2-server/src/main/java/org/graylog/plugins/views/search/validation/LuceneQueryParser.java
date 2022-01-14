@@ -37,13 +37,8 @@ public class LuceneQueryParser {
         this.parser.setSplitOnWhitespace(true);
     }
 
-    public ParsedQuery parse(final String query) throws QueryParsingException {
-        final Query parsed;
-        try {
-            parsed = parser.parse(query);
-        } catch (ParseException e) {
-            throw new QueryParsingException(e);
-        }
+    public ParsedQuery parse(final String query) throws ParseException {
+        final Query parsed = parser.parse(query);
         final ParsedQuery.Builder builder = ParsedQuery.builder().query(query);
 
         final List<ImmutableToken> availableTokens = new ArrayList<>(this.parser.getTokens());

@@ -66,12 +66,12 @@ public class QueryValidationServiceImpl implements QueryValidationService {
                     ? ValidationResponse.ok()
                     : ValidationResponse.warning(explanations);
 
-        } catch (QueryParsingException e) {
+        } catch (ParseException e) {
             return ValidationResponse.error(toExplanation(query, e));
         }
     }
 
-    private List<ValidationMessage> toExplanation(final String query, final QueryParsingException parseException) {
+    private List<ValidationMessage> toExplanation(final String query, final ParseException parseException) {
         return Collections.singletonList(ValidationMessage.fromException(query, parseException));
     }
 
