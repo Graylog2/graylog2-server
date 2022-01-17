@@ -30,6 +30,7 @@ import org.glassfish.grizzly.http.server.Request;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.rest.RestTools;
@@ -160,15 +161,31 @@ public class SessionsResource extends RestResource {
     }
 
     private URI baseUriFromOriginOrRequest(ContainerRequestContext requestContext) {
-        final String origin = requestContext.getHeaderString("origin");
-        if (Strings.isNullOrEmpty(origin)) {
-            return requestContext.getUriInfo().getBaseUri();
+        final Optional<URI> graylogUrlFromHeader = Optional.ofNullable(requestContext.getHeaderString(HttpConfiguration.OVERRIDE_HEADER))
+                .filter(header -> !Strings.isNullOrEmpty(header))
+                .flatMap(this::safeCreateUri);
+        if (graylogUrlFromHeader.isPresent()) {
+            return graylogUrlFromHeader.get();
         }
 
+        final Optional<URI> origin = Optional.ofNullable(requestContext.getHeaderString("origin"))
+                .filter(header -> !Strings.isNullOrEmpty(header))
+                .flatMap(this::safeCreateUri);
+        
+        return origin.orElseGet(() -> requestContext.getUriInfo().getBaseUri());
+
+    }
+
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    private <T> Optional<T> firstPresent(Optional<T> optional1, Optional<T> optional2) {
+        return optional1.isPresent() ? optional1 : optional2;
+    }
+
+    private Optional<URI> safeCreateUri(String uri) {
         try {
-            return URI.create(origin);
+            return Optional.of(URI.create(uri));
         } catch (IllegalArgumentException ignored) {
-            return requestContext.getUriInfo().getBaseUri();
+            return Optional.empty();
         }
     }
 
