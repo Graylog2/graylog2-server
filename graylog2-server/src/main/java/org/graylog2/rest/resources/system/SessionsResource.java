@@ -21,7 +21,6 @@ import com.google.common.base.Strings;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.LockedAccountException;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.mgt.DefaultSecurityManager;
@@ -38,14 +37,12 @@ import org.graylog2.rest.models.system.sessions.responses.SessionResponse;
 import org.graylog2.rest.models.system.sessions.responses.SessionResponseFactory;
 import org.graylog2.rest.models.system.sessions.responses.SessionValidationResponse;
 import org.graylog2.security.headerauth.HTTPHeaderAuthConfig;
-import org.graylog2.security.realm.HTTPHeaderAuthenticationRealm;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.ActorAwareAuthenticationToken;
 import org.graylog2.shared.security.ActorAwareAuthenticationTokenFactory;
 import org.graylog2.shared.security.AuthenticationServiceUnavailableException;
 import org.graylog2.shared.security.SessionCreator;
 import org.graylog2.shared.security.ShiroAuthenticationFilter;
-import org.graylog2.shared.security.ShiroRequestHeadersBinder;
 import org.graylog2.shared.security.ShiroSecurityContext;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.utilities.IpSubnet;
@@ -147,7 +144,7 @@ public class SessionsResource extends RestResource {
         final String host = RestTools.getRemoteAddrFromRequest(grizzlyRequest, trustedSubnets);
 
         try {
-            Optional<Session> session = sessionCreator.create(sessionId, host, authToken);
+            Optional<Session> session = sessionCreator.login(sessionId, host, authToken);
             if (session.isPresent()) {
                 final SessionResponse token = sessionResponseFactory.forSession(session.get());
                 return Response.ok()
@@ -211,44 +208,34 @@ public class SessionsResource extends RestResource {
             return Response.ok(SessionValidationResponse.invalid()).build();
         }
 
-        // There's no valid session, but the authenticator would like us to create one.
-        // This is the "Trusted Header Authentication" scenario, where the browser performs this request to check if a
-        // session exists, with a trusted header identifying the user. The authentication filter will authenticate the
-        // user based on the trusted header and request a session to be created transparently. The UI will take the
-        // session information from the response to perform subsequent requests to the backend using this session.
-        if (subject.getSession(false) == null && ShiroSecurityContext.isSessionCreationRequested()) {
-            final Session session = subject.getSession();
+        final Session session = retrieveOrCreateSession(subject);
+        final User user = getCurrentUser();
+        final SessionResponse response = sessionResponseFactory.forSession(session);
 
-            final String userId = subject.getPrincipal().toString();
-            final User user = userService.loadById(userId);
-            if (user == null) {
-                throw new InternalServerErrorException("Unable to load user with ID <" + userId + ">.");
-            }
+        return Response.ok(
+                        SessionValidationResponse.validWithNewSession(
+                                String.valueOf(session.getId()),
+                                String.valueOf(user.getName())
+                        ))
+                .cookie(createSecureCookie(response, requestContext))
+                .build();
+    }
 
-            session.setAttribute("username", user.getName());
+    private Session retrieveOrCreateSession(Subject subject) {
+        final Session potentialSession = subject.getSession(false);
+        if (potentialSession == null && ShiroSecurityContext.isSessionCreationRequested()) {
+            // There's no valid session, but the authenticator would like us to create one.
+            // This is the "Trusted Header Authentication" scenario, where the browser performs this request to check if a
+            // session exists, with a trusted header identifying the user. The authentication filter will authenticate the
+            // user based on the trusted header and request a session to be created transparently. The UI will take the
+            // session information from the response to perform subsequent requests to the backend using this session.
+            final String host = RestTools.getRemoteAddrFromRequest(grizzlyRequest, trustedSubnets);
 
-            final HTTPHeaderAuthConfig httpHeaderConfig = loadHTTPHeaderConfig();
-            final Optional<String> usernameHeader = ShiroRequestHeadersBinder.getHeaderFromThreadContext(httpHeaderConfig.usernameHeader());
-            if (httpHeaderConfig.enabled() && usernameHeader.isPresent()) {
-                session.setAttribute(HTTPHeaderAuthenticationRealm.SESSION_AUTH_HEADER, usernameHeader.get());
-            }
-
-            LOG.debug("Create session for <{}>", user.getName());
-            session.touch();
-            // save subject in session, otherwise we can't get the username back in subsequent requests.
-            ((DefaultSecurityManager) SecurityUtils.getSecurityManager()).getSubjectDAO().save(subject);
-
-            final SessionResponse token = sessionResponseFactory.forSession(session);
-
-            return Response.ok(
-                            SessionValidationResponse.validWithNewSession(
-                                    String.valueOf(session.getId()),
-                                    String.valueOf(user.getName())
-                            ))
-                    .cookie(createSecureCookie(token, requestContext))
-                    .build();
+            return sessionCreator.create(subject, host)
+                    .orElseThrow(() -> new NotAuthorizedException("Invalid credentials.", "Basic realm=\"Graylog Server session\""));
         }
-        return Response.ok(SessionValidationResponse.valid()).build();
+
+        return potentialSession;
     }
 
     @DELETE
