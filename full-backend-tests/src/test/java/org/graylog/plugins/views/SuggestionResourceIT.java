@@ -82,4 +82,17 @@ public class SuggestionResourceIT {
         validatableResponse.assertThat().body("error", notNullValue());
 
     }
+
+    @ContainerMatrixTest
+    void testTypoCorrection() {
+        final ValidatableResponse validatableResponse = given()
+                .spec(requestSpec)
+                .when()
+                .body("{\"field\":\"facility\", \"input\":\"tets\"}")
+                .post("/search/suggest")
+                .then()
+                .statusCode(200);
+        validatableResponse.assertThat().body("suggestions.value[0]", equalTo("test"));
+        validatableResponse.assertThat().body("suggestions.occurrence[0]", greaterThanOrEqualTo(1));
+    }
 }
