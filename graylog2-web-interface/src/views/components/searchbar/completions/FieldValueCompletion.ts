@@ -84,7 +84,7 @@ class FieldValueCompletion implements Completer {
 
   fields: FieldTypesStoreState;
 
-  previousState: undefined | {
+  previousSuggestions: undefined | {
     furtherSuggestionsCount: number,
     completions: Array<CompletionResult>,
     fieldName: string,
@@ -123,7 +123,7 @@ class FieldValueCompletion implements Completer {
     streams: Array<string> | undefined,
     timeRange: TimeRange | NoTimeRangeOverride | undefined,
   ) {
-    if (!this.previousState) {
+    if (!this.previousSuggestions) {
       return false;
     }
 
@@ -132,9 +132,9 @@ class FieldValueCompletion implements Completer {
       streams: prevStreams,
       timeRange: prevTimeRange,
       furtherSuggestionsCount,
-    } = this.previousState;
+    } = this.previousSuggestions;
 
-    return String(input).startsWith(String(this.previousState?.input))
+    return String(input).startsWith(String(this.previousSuggestions?.input))
       && prevFieldName === fieldName
       && isEqual(prevStreams, streams)
       && isEqual(prevTimeRange, timeRange)
@@ -142,8 +142,8 @@ class FieldValueCompletion implements Completer {
   }
 
   filterExistingSuggestions(input: string | number) {
-    if (this.previousState) {
-      return this.previousState.completions.filter((completion) => completion.name.startsWith(String(input)));
+    if (this.previousSuggestions) {
+      return this.previousSuggestions.completions.filter((completion) => completion.name.startsWith(String(input)));
     }
 
     return [];
@@ -188,7 +188,7 @@ class FieldValueCompletion implements Completer {
         meta: `${occurrence} (occ)`,
       }));
 
-      this.previousState = {
+      this.previousSuggestions = {
         furtherSuggestionsCount,
         streams,
         timeRange,
