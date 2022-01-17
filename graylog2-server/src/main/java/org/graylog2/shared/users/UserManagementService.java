@@ -18,9 +18,6 @@ package org.graylog2.shared.users;
 
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
-import org.graylog2.rest.models.users.requests.ChangeUserRequest;
-
-import javax.validation.Valid;
 
 /**
  * User management extension for the UserService. Initially intended to be used in the UserResource for user

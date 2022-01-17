@@ -40,7 +40,7 @@ import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.rest.models.PaginatedResponse;
 import org.graylog2.rest.models.users.requests.ChangePasswordRequest;
-import org.graylog2.rest.models.users.requests.ChangeUserRequest;
+import org.graylog2.shared.users.ChangeUserRequest;
 import org.graylog2.rest.models.users.requests.CreateUserRequest;
 import org.graylog2.rest.models.users.requests.PermissionEditRequest;
 import org.graylog2.rest.models.users.requests.Startpage;
