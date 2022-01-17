@@ -60,10 +60,10 @@ describe('FieldValueCompletion', () => {
     ],
   };
   const expectedSuggestions = [
-    { name: 'GET', value: 'GET', score: 100 },
-    { name: 'DELETE', value: 'DELETE', score: 200 },
-    { name: 'POST', value: 'POST', score: 300 },
-    { name: 'PUT', value: 'PUT', score: 400 },
+    { name: 'GET', value: 'GET', score: 100, meta: '100 (occ)' },
+    { name: 'DELETE', value: 'DELETE', score: 200, meta: '200 (occ)' },
+    { name: 'POST', value: 'POST', score: 300, meta: '300 (occ)' },
+    { name: 'PUT', value: 'PUT', score: 400, meta: '400 (occ)' },
   ];
 
   const createKeywordToken = (value: string) => ({
