@@ -60,7 +60,7 @@ public class QuerySuggestionsES7 implements QuerySuggestionsService {
                 .query(QueryBuilders.prefixQuery(req.field(), req.input()))
                 .size(0)
                 .aggregation(AggregationBuilders.terms("fieldvalues").field(req.field()).size(10))
-                .suggest(new SuggestBuilder().addSuggestion("correction", suggestionBuilder));
+                .suggest(new SuggestBuilder().addSuggestion("corrections", suggestionBuilder));
 
         try {
             final SearchResponse result = client.singleSearch(new SearchRequest(affectedIndices.toArray(new String[]{})).source(search), "Failed to execute aggregation");
@@ -70,7 +70,7 @@ public class QuerySuggestionsES7 implements QuerySuggestionsService {
             if(!entries.isEmpty()) {
                 return SuggestionResponse.forSuggestions(req.field(), req.input(), entries);
             } else {
-                TermSuggestion suggestion = result.getSuggest().getSuggestion("correction");
+                TermSuggestion suggestion = result.getSuggest().getSuggestion("corrections");
                 final List<SuggestionEntry> corrections = suggestion.getEntries().stream().flatMap(e -> e.getOptions().stream()).map(o -> new SuggestionEntry(o.getText().string(), o.getFreq())).collect(Collectors.toList());
                 return SuggestionResponse.forSuggestions(req.field(), req.input(), corrections);
             }
