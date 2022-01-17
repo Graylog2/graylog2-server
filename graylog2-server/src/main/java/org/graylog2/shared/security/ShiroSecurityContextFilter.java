@@ -16,6 +16,7 @@
  */
 package org.graylog2.shared.security;
 
+import com.google.common.base.Strings;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.mgt.DefaultSecurityManager;
@@ -116,23 +117,7 @@ public class ShiroSecurityContextFilter implements ContainerRequestFilter {
                                                   String host,
                                                   String remoteAddr,
                                                   MultivaluedMap<String, String> headers, Map<String, Cookie> cookies) {
-        final AuthenticationToken authToken;
-        if ("session".equalsIgnoreCase(credential)) {
-            // Basic auth: undefined:session is sent when the UI doesn't have a valid session id,
-            // we don't want to create a SessionIdToken in that case but fall back to looking at the headers instead
-            authToken = new SessionIdToken(userName, host);
-        } else if ("token".equalsIgnoreCase(credential)) {
-            authToken = new AccessTokenAuthToken(userName, host);
-        } else if (userName == null) { // without a username we default to using the header environment as potentially containing tokens used by plugins
-            if (cookies.containsKey(SESSION_COOKIE_NAME)) {
-                final Cookie authenticationCookie = cookies.get(SESSION_COOKIE_NAME);
-                authToken = new SessionIdToken(authenticationCookie.getValue(), host);
-            } else {
-                authToken = new HttpHeadersToken(headers, host, remoteAddr);
-            }
-        } else { // otherwise we use the "standard" username/password combination
-            authToken = new UsernamePasswordToken(userName, credential, host);
-        }
+        final AuthenticationToken authToken = createAuthenticationToken(userName, credential, host, remoteAddr, cookies, headers);
 
         final Subject subject = new Subject.Builder(securityManager)
                 .host(host)
@@ -140,5 +125,23 @@ public class ShiroSecurityContextFilter implements ContainerRequestFilter {
                 .buildSubject();
 
         return new ShiroSecurityContext(subject, authToken, isSecure, authcScheme, headers);
+    }
+
+    private AuthenticationToken createAuthenticationToken(String userName, String credential, String host, String remoteAddr, Map<String, Cookie> cookies, MultivaluedMap<String, String> headers) {
+        if ("session".equalsIgnoreCase(credential)) {
+            return new SessionIdToken(userName, host);
+        }
+        if ("token".equalsIgnoreCase(credential)) {
+            return new AccessTokenAuthToken(userName, host);
+        }
+        if (!Strings.isNullOrEmpty(userName) && !Strings.isNullOrEmpty(credential)) {
+            return new UsernamePasswordToken(userName, credential, host);
+        }
+        if (cookies.containsKey(SESSION_COOKIE_NAME)) {
+            final Cookie authenticationCookie = cookies.get(SESSION_COOKIE_NAME);
+            return new SessionIdToken(authenticationCookie.getValue(), host);
+        }
+
+        return new HttpHeadersToken(headers, host, remoteAddr);
     }
 }
