@@ -21,14 +21,16 @@ import org.apache.shiro.authc.HostAuthenticationToken;
 
 import java.util.Objects;
 
-public final class SessionIdToken implements HostAuthenticationToken {
+public final class SessionIdToken implements HostAuthenticationToken, RemoteAddressAuthenticationToken {
 
     private final String sessionId;
     private final String host;
+    private final String remoteAddr;
 
-    public SessionIdToken(String sessionId, String host) {
+    public SessionIdToken(String sessionId, String host, String remoteAddr) {
         this.sessionId = sessionId;
         this.host = host;
+        this.remoteAddr = remoteAddr;
     }
 
     @Override
@@ -43,6 +45,10 @@ public final class SessionIdToken implements HostAuthenticationToken {
 
     public String getSessionId() {
         return sessionId;
+    }
+
+    public String getRemoteAddr() {
+        return remoteAddr;
     }
 
     @Override

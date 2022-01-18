@@ -19,16 +19,13 @@ package org.graylog2.shared.security;
 import org.apache.shiro.authc.HostAuthenticationToken;
 
 import javax.annotation.Nullable;
-import javax.ws.rs.core.MultivaluedMap;
 
-public class HttpHeadersToken implements HostAuthenticationToken {
+public class PossibleTrustedHeaderToken implements HostAuthenticationToken, RemoteAddressAuthenticationToken {
 
-    private final MultivaluedMap<String, String> httpHeaders;
     private final String host;
     private final String remoteAddr;
 
-    public HttpHeadersToken(MultivaluedMap<String, String> httpHeaders, String host, String remoteAddr) {
-        this.httpHeaders = httpHeaders;
+    public PossibleTrustedHeaderToken(String host, String remoteAddr) {
         this.host = host;
         this.remoteAddr = remoteAddr;
     }
@@ -58,10 +55,6 @@ public class HttpHeadersToken implements HostAuthenticationToken {
     @Override
     public String getHost() {
         return host;
-    }
-
-    public MultivaluedMap<String, String> getHeaders() {
-        return httpHeaders;
     }
 
     /**

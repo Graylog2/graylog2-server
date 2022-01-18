@@ -29,7 +29,8 @@ import org.graylog.security.authservice.AuthServiceException;
 import org.graylog.security.authservice.AuthServiceResult;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.security.headerauth.HTTPHeaderAuthConfig;
-import org.graylog2.shared.security.HttpHeadersToken;
+import org.graylog2.shared.security.RemoteAddressAuthenticationToken;
+import org.graylog2.shared.security.ShiroRequestHeadersBinder;
 import org.graylog2.shared.security.ShiroSecurityContext;
 import org.graylog2.utilities.IpSubnet;
 import org.slf4j.Logger;
@@ -65,7 +66,7 @@ public class HTTPHeaderAuthenticationRealm extends AuthenticatingRealm {
         this.authServiceAuthenticator = authServiceAuthenticator;
         this.trustedProxies = trustedProxies;
 
-        setAuthenticationTokenClass(HttpHeadersToken.class);
+        setAuthenticationTokenClass(RemoteAddressAuthenticationToken.class);
         setCachingEnabled(false);
         // Credentials will be matched via the authentication service itself so we don't need Shiro to do it
         setCredentialsMatcher(new AllowAllCredentialsMatcher());
@@ -73,7 +74,7 @@ public class HTTPHeaderAuthenticationRealm extends AuthenticatingRealm {
 
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
-        final HttpHeadersToken headersToken = (HttpHeadersToken) token;
+        final RemoteAddressAuthenticationToken remoteAddrToken = (RemoteAddressAuthenticationToken) token;
         final HTTPHeaderAuthConfig config = loadConfig();
 
         if (!config.enabled()) {
@@ -81,8 +82,7 @@ public class HTTPHeaderAuthenticationRealm extends AuthenticatingRealm {
             return null;
         }
 
-        final MultivaluedMap<String, String> headers = headersToken.getHeaders();
-        final Optional<String> optionalUsername = headerValue(headers, config.usernameHeader());
+        final Optional<String> optionalUsername = ShiroRequestHeadersBinder.getHeaderFromThreadContext(config.usernameHeader());
 
         if (optionalUsername.isPresent()) {
             final String username = optionalUsername.get().trim();
@@ -92,7 +92,7 @@ public class HTTPHeaderAuthenticationRealm extends AuthenticatingRealm {
                 return null;
             }
 
-            final String remoteAddr = headersToken.getRemoteAddr();
+            final String remoteAddr = remoteAddrToken.getRemoteAddr();
             if (inTrustedSubnets(remoteAddr)) {
                 return doAuthenticate(username, config, remoteAddr);
             }

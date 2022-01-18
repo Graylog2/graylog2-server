@@ -116,8 +116,9 @@ public class ShiroSecurityContextFilter implements ContainerRequestFilter {
                                                   String authcScheme,
                                                   String host,
                                                   String remoteAddr,
-                                                  MultivaluedMap<String, String> headers, Map<String, Cookie> cookies) {
-        final AuthenticationToken authToken = createAuthenticationToken(userName, credential, host, remoteAddr, cookies, headers);
+                                                  MultivaluedMap<String, String> headers,
+                                                  Map<String, Cookie> cookies) {
+        final AuthenticationToken authToken = createAuthenticationToken(userName, credential, host, remoteAddr, cookies);
 
         final Subject subject = new Subject.Builder(securityManager)
                 .host(host)
@@ -127,9 +128,9 @@ public class ShiroSecurityContextFilter implements ContainerRequestFilter {
         return new ShiroSecurityContext(subject, authToken, isSecure, authcScheme, headers);
     }
 
-    private AuthenticationToken createAuthenticationToken(String userName, String credential, String host, String remoteAddr, Map<String, Cookie> cookies, MultivaluedMap<String, String> headers) {
+    private AuthenticationToken createAuthenticationToken(String userName, String credential, String host, String remoteAddr, Map<String, Cookie> cookies) {
         if ("session".equalsIgnoreCase(credential)) {
-            return new SessionIdToken(userName, host);
+            return new SessionIdToken(userName, host, remoteAddr);
         }
         if ("token".equalsIgnoreCase(credential)) {
             return new AccessTokenAuthToken(userName, host);
@@ -139,9 +140,9 @@ public class ShiroSecurityContextFilter implements ContainerRequestFilter {
         }
         if (cookies.containsKey(SESSION_COOKIE_NAME)) {
             final Cookie authenticationCookie = cookies.get(SESSION_COOKIE_NAME);
-            return new SessionIdToken(authenticationCookie.getValue(), host);
+            return new SessionIdToken(authenticationCookie.getValue(), host, remoteAddr);
         }
 
-        return new HttpHeadersToken(headers, host, remoteAddr);
+        return new PossibleTrustedHeaderToken(host, remoteAddr);
     }
 }
