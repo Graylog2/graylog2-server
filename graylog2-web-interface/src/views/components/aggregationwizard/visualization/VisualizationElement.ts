@@ -70,7 +70,7 @@ const hasErrors = (errors: {}) => Object.values(errors)
   .filter((value) => value !== undefined)
   .length > 0;
 
-const validateConfig = (visualizationType: VisualizationType, config: VisualizationConfigFormValues) => {
+const validateConfig = (visualizationType: VisualizationType<any>, config: VisualizationConfigFormValues) => {
   const { fields = [] } = visualizationType.config;
 
   return fields
