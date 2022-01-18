@@ -37,7 +37,6 @@ import org.graylog2.rest.RestTools;
 import org.graylog2.rest.models.system.sessions.responses.SessionResponse;
 import org.graylog2.rest.models.system.sessions.responses.SessionResponseFactory;
 import org.graylog2.rest.models.system.sessions.responses.SessionValidationResponse;
-import org.graylog2.security.headerauth.HTTPHeaderAuthConfig;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.ActorAwareAuthenticationToken;
 import org.graylog2.shared.security.ActorAwareAuthenticationTokenFactory;
@@ -150,7 +149,7 @@ public class SessionsResource extends RestResource {
                 final SessionResponse token = sessionResponseFactory.forSession(session.get());
                 return Response.ok()
                         .entity(token)
-                        .cookie(createSecureCookie(token, requestContext))
+                        .cookie(createAuthenticationCookie(token, requestContext))
                         .build();
             } else {
                 throw new NotAuthorizedException("Invalid credentials.", "Basic realm=\"Graylog Server session\"");
@@ -171,7 +170,7 @@ public class SessionsResource extends RestResource {
         final Optional<URI> origin = Optional.ofNullable(requestContext.getHeaderString("origin"))
                 .filter(header -> !Strings.isNullOrEmpty(header))
                 .flatMap(this::safeCreateUri);
-        
+
         return origin.orElseGet(() -> requestContext.getUriInfo().getBaseUri());
 
     }
@@ -189,21 +188,29 @@ public class SessionsResource extends RestResource {
         }
     }
 
-    private NewCookie createSecureCookie(SessionResponse token, ContainerRequestContext requestContext) {
+    private NewCookie createAuthenticationCookie(SessionResponse token, ContainerRequestContext requestContext) {
+        return makeCookie(token.getAuthenticationToken(), token.validUntil(), requestContext);
+    }
+
+    private NewCookie deleteAuthenticationCookie(ContainerRequestContext requestContext) {
+        return makeCookie("", new Date(), requestContext);
+    }
+
+    private NewCookie makeCookie(String value, Date validUntil, ContainerRequestContext requestContext) {
         final Date now = new Date();
-        final int maxAge = Long.valueOf((token.validUntil().getTime() - now.getTime()) / 1000).intValue();
+        final int maxAge = Long.valueOf((validUntil.getTime() - now.getTime()) / 1000).intValue();
 
         final URI baseUri = baseUriFromOriginOrRequest(requestContext);
         final String basePath = Optional.ofNullable(Strings.emptyToNull(baseUri.getPath())).orElse("/");
 
         return new NewCookie("authentication",
-                token.getAuthenticationToken(),
+                value,
                 basePath,
                 baseUri.getHost(),
                 Cookie.DEFAULT_VERSION,
                 "Authentication Cookie",
                 maxAge,
-                token.validUntil(),
+                validUntil,
                 baseUri.getScheme().equalsIgnoreCase("https"),
                 true);
     }
@@ -218,14 +225,19 @@ public class SessionsResource extends RestResource {
         try {
             this.authenticationFilter.filter(requestContext);
         } catch (NotAuthorizedException | LockedAccountException | IOException e) {
-            return Response.ok(SessionValidationResponse.invalid()).build();
+            return Response.ok(SessionValidationResponse.invalid())
+                    .cookie(deleteAuthenticationCookie(requestContext))
+                    .build();
         }
         final Subject subject = getSubject();
         if (!subject.isAuthenticated()) {
-            return Response.ok(SessionValidationResponse.invalid()).build();
+            return Response.ok(SessionValidationResponse.invalid())
+                    .cookie(deleteAuthenticationCookie(requestContext))
+                    .build();
         }
 
         final Session session = retrieveOrCreateSession(subject);
+
         final User user = getCurrentUser();
         final SessionResponse response = sessionResponseFactory.forSession(session);
 
@@ -234,13 +246,13 @@ public class SessionsResource extends RestResource {
                                 String.valueOf(session.getId()),
                                 String.valueOf(user.getName())
                         ))
-                .cookie(createSecureCookie(response, requestContext))
+                .cookie(createAuthenticationCookie(response, requestContext))
                 .build();
     }
 
     private Session retrieveOrCreateSession(Subject subject) {
         final Session potentialSession = subject.getSession(false);
-        if (potentialSession == null && ShiroSecurityContext.isSessionCreationRequested()) {
+        if (needToCreateNewSession(potentialSession) || isOutdatedSession(potentialSession, subject)) {
             // There's no valid session, but the authenticator would like us to create one.
             // This is the "Trusted Header Authentication" scenario, where the browser performs this request to check if a
             // session exists, with a trusted header identifying the user. The authentication filter will authenticate the
@@ -255,27 +267,42 @@ public class SessionsResource extends RestResource {
         return potentialSession;
     }
 
+    private boolean isOutdatedSession(Session potentialSession, Subject subject) {
+        return potentialSession == null
+                || potentialSession.getAttribute("username") == null
+                || !potentialSession.getAttribute("username").equals(getCurrentUser().getName());
+    }
+
+    private boolean needToCreateNewSession(Session potentialSession) {
+        return potentialSession == null && ShiroSecurityContext.isSessionCreationRequested();
+    }
+
     @DELETE
     @ApiOperation(value = "Terminate an existing session", notes = "Destroys the session with the given ID: the equivalent of logging out.")
     @Path("/{sessionId}")
     @RequiresAuthentication
     @Deprecated
     @AuditEvent(type = AuditEventTypes.SESSION_DELETE)
-    public void terminateSessionWithId(@ApiParam(name = "sessionId", required = true) @PathParam("sessionId") String sessionId) {
+    public Response terminateSessionWithId(@ApiParam(name = "sessionId", required = true) @PathParam("sessionId") String sessionId,
+                                           @Context ContainerRequestContext requestContext) {
         final Subject subject = getSubject();
         securityManager.logout(subject);
+
+        return Response.ok()
+                .cookie(deleteAuthenticationCookie(requestContext))
+                .build();
     }
 
     @DELETE
     @ApiOperation(value = "Terminate an existing session", notes = "Destroys the session with the given ID: the equivalent of logging out.")
     @RequiresAuthentication
     @AuditEvent(type = AuditEventTypes.SESSION_DELETE)
-    public void terminateSession() {
+    public Response terminateSession(@Context ContainerRequestContext requestContext) {
         final Subject subject = getSubject();
         securityManager.logout(subject);
-    }
 
-    private HTTPHeaderAuthConfig loadHTTPHeaderConfig() {
-        return clusterConfigService.getOrDefault(HTTPHeaderAuthConfig.class, HTTPHeaderAuthConfig.createDisabled());
+        return Response.ok()
+                .cookie(deleteAuthenticationCookie(requestContext))
+                .build();
     }
 }
