@@ -140,9 +140,10 @@ class FieldValueCompletion implements Completer {
       streams: prevStreams,
       timeRange: prevTimeRange,
       furtherSuggestionsCount,
+      input: prevInput,
     } = this.previousSuggestions;
 
-    return String(input).startsWith(String(this.previousSuggestions?.input))
+    return String(input).startsWith(String(prevInput))
       && prevFieldName === fieldName
       && isEqual(prevStreams, streams)
       && isEqual(prevTimeRange, timeRange)

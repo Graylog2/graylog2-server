@@ -26,10 +26,11 @@ import fetch from 'logic/rest/FetchProvider';
 import FieldValueCompletion from './FieldValueCompletion';
 
 const httpMethodField = new FieldTypeMapping('http_method', new FieldType('string', ['enumerable'], []));
+const actionField = new FieldTypeMapping('action', new FieldType('string', ['enumerable'], []));
 const messageField = new FieldTypeMapping('message', new FieldType('string', [], []));
 const MockFieldTypesStoreState = {
   all: Immutable.List([httpMethodField]),
-  queryFields: Immutable.fromJS({ query1: [httpMethodField] }),
+  queryFields: Immutable.fromJS({ query1: [httpMethodField, actionField] }),
 };
 
 jest.mock('views/stores/FieldTypesStore', () => ({
@@ -52,30 +53,25 @@ describe('FieldValueCompletion', () => {
   const suggestionsResponse = {
     field: 'http_method',
     input: '',
+    sum_other_docs_count: 2,
     suggestions: [
-      { value: 'GET', occurrence: 100 },
-      { value: 'DELETE', occurrence: 200 },
       { value: 'POST', occurrence: 300 },
       { value: 'PUT', occurrence: 400 },
     ],
   };
   const expectedSuggestions = [
-    { name: 'GET', value: 'GET', score: 100, meta: '100 (occ)' },
-    { name: 'DELETE', value: 'DELETE', score: 200, meta: '200 (occ)' },
-    { name: 'POST', value: 'POST', score: 300, meta: '300 (occ)' },
-    { name: 'PUT', value: 'PUT', score: 400, meta: '400 (occ)' },
+    { name: 'POST', value: 'POST', caption: 'POST', score: 300, meta: '300 hits' },
+    { name: 'PUT', value: 'PUT', caption: 'PUT', score: 400, meta: '400 hits' },
   ];
 
-  const createKeywordToken = (value: string) => ({
-    index: 0,
-    start: 0,
-    type: 'keyword',
-    value,
-  });
+  const createCurrentToken = (type: string, value: string, index: number, start: number) => ({ type, value, index, start });
+
+  const createKeywordToken = (value: string) => createCurrentToken('keyword', value, 0, 0);
 
   beforeEach(() => {
     jest.clearAllMocks();
     asMock(fetch).mockReturnValue(Promise.resolve(suggestionsResponse));
+    FieldTypesStore.getInitialState = jest.fn(() => MockFieldTypesStoreState);
   });
 
   describe('getCompletions', () => {
@@ -103,12 +99,7 @@ describe('FieldValueCompletion', () => {
     });
 
     it('returns suggestions, when current token is a term and last token is a keyword', async () => {
-      const currentToken = {
-        type: 'term',
-        value: 'P',
-        index: 1,
-        start: 12,
-      };
+      const currentToken = createCurrentToken('term', 'P', 1, 12);
       const lastToken = {
         type: 'keyword',
         value: 'http_method:',
@@ -152,12 +143,7 @@ describe('FieldValueCompletion', () => {
     });
 
     it('returns empty list when current token is a term which does not end with ":"', async () => {
-      const currentToken = {
-        index: 0,
-        start: 0,
-        type: 'term',
-        value: 'http_method',
-      };
+      const currentToken = createCurrentToken('term', 'http_method', 0, 0);
       const completer = new FieldValueCompletion();
 
       const suggestions = await completer.getCompletions(
@@ -216,6 +202,138 @@ describe('FieldValueCompletion', () => {
       );
 
       expect(suggestions).toEqual([]);
+    });
+
+    it('handles suggestions for spelling mistakes correctly', async () => {
+      const response = {
+        field: 'http_method',
+        input: 'PSOT',
+        sum_other_docs_count: 0,
+        suggestions: [
+          { value: 'POST', occurrence: 300 },
+        ],
+      };
+      const currentToken = createCurrentToken('term', 'PSOT', 1, 12);
+      const lastToken = {
+        type: 'keyword',
+        value: 'http_method:',
+      };
+      asMock(fetch).mockReturnValue(Promise.resolve(response));
+
+      const completer = new FieldValueCompletion();
+
+      const suggestions = await completer.getCompletions(
+        currentToken,
+        lastToken,
+        'PSOT',
+        [lastToken, currentToken],
+        1,
+        undefined,
+        undefined,
+      );
+
+      const expectedCorrections = [
+        { name: 'POST', value: 'POST', caption: 'POST ⭢ PSOT', score: 300, meta: '300 hits' },
+      ];
+
+      expect(suggestions).toEqual(expectedCorrections);
+    });
+
+    describe('refetching suggestions', () => {
+      const currentToken = createCurrentToken('term', 'a', 1, 8);
+      const lastToken = {
+        type: 'keyword',
+        value: 'action:',
+      };
+
+      const firstResponse = {
+        field: 'action',
+        input: 'a',
+        sum_other_docs_count: 2,
+        suggestions: [
+          { value: 'action1', occurrence: 400 },
+          { value: 'action2', occurrence: 300 },
+        ],
+      };
+
+      const expectedFirstSuggestions = [
+        { name: 'action1', value: 'action1', caption: 'action1', score: 400, meta: '400 hits' },
+        { name: 'action2', value: 'action2', caption: 'action2', score: 300, meta: '300 hits' },
+      ];
+
+      it('is fetching further suggestions when there are some', async () => {
+        asMock(fetch).mockReturnValue(Promise.resolve(firstResponse));
+
+        const completer = new FieldValueCompletion();
+
+        const firstSuggestions = await completer.getCompletions(
+          currentToken,
+          lastToken,
+          'a',
+          [lastToken, currentToken],
+          1,
+          undefined,
+          undefined,
+        );
+
+        expect(firstSuggestions).toEqual(expectedFirstSuggestions);
+
+        const secondResponse = {
+          field: 'action',
+          input: 'ac',
+          sum_other_docs_count: 0,
+          suggestions: [
+            { value: 'action3', occurrence: 200 },
+            { value: 'action4', occurrence: 100 },
+          ],
+        };
+        asMock(fetch).mockReturnValue(Promise.resolve(secondResponse));
+
+        const secondSuggestions = await completer.getCompletions(
+          currentToken,
+          lastToken,
+          'ac',
+          [lastToken, currentToken],
+          1,
+          undefined,
+          undefined,
+        );
+
+        expect(secondSuggestions).toEqual([
+          { name: 'action3', value: 'action3', caption: 'action3', score: 200, meta: '200 hits' },
+          { name: 'action4', value: 'action4', caption: 'action4', score: 100, meta: '100 hits' },
+        ]);
+      });
+
+      it('is not fetching further suggestions when there are none', async () => {
+        asMock(fetch).mockReturnValue(Promise.resolve({ ...firstResponse, sum_other_docs_count: 0 }));
+
+        const completer = new FieldValueCompletion();
+
+        const firstSuggestions = await completer.getCompletions(
+          currentToken,
+          lastToken,
+          'a',
+          [lastToken, currentToken],
+          1,
+          undefined,
+          undefined,
+        );
+
+        expect(firstSuggestions).toEqual(expectedFirstSuggestions);
+
+        const secondSuggestions = await completer.getCompletions(
+          currentToken,
+          lastToken,
+          'ac',
+          [lastToken, currentToken],
+          1,
+          undefined,
+          undefined,
+        );
+
+        expect(secondSuggestions).toEqual(expectedFirstSuggestions);
+      });
     });
   });
 
