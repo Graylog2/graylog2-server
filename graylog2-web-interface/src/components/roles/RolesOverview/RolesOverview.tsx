@@ -17,17 +17,17 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import type { PaginatedRoles } from 'actions/roles/AuthzRolesActions';
 import { AuthzRolesActions } from 'stores/roles/AuthzRolesStore';
-import { DataTable, Spinner, PaginatedList, EmptyResult } from 'components/common';
+import { Spinner, PaginatedList } from 'components/common';
 import { Col, Row } from 'components/bootstrap';
 
-import RolesOverviewItem from './RolesOverviewItem';
+import RolesTable from './RolesTable';
 import RolesFilter from './RolesFilter';
 
-const TABLE_HEADERS = ['Name', 'Description', 'Users', 'Actions'];
 const DEFAULT_PAGINATION = {
   page: 1,
   perPage: 10,
@@ -56,15 +56,6 @@ const StyledPaginatedList = styled(PaginatedList)`
   }
 `;
 
-const _headerCellFormatter = (header) => {
-  switch (header.toLowerCase()) {
-    case 'actions':
-      return <th className="actions text-right">{header}</th>;
-    default:
-      return <th>{header}</th>;
-  }
-};
-
 const _loadRoles = (pagination, setLoading, setPaginatedRoles) => {
   setLoading(true);
 
@@ -76,12 +67,23 @@ const _loadRoles = (pagination, setLoading, setPaginatedRoles) => {
 
 const _updateListOnRoleDelete = (perPage, query, setPagination) => AuthzRolesActions.delete.completed.listen(() => setPagination({ page: DEFAULT_PAGINATION.page, perPage, query }));
 
+const _headerCellFormatter = (header) => {
+  switch (header.toLowerCase()) {
+    case 'actions':
+      return <th className="actions text-right">{header}</th>;
+    default:
+      return <th>{header}</th>;
+  }
+};
+
 const RolesOverview = () => {
   const [paginatedRoles, setPaginatedRoles] = useState<PaginatedRoles | undefined | null>();
   const [loading, setLoading] = useState(false);
   const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
   const { list: roles } = paginatedRoles || {};
   const { page, perPage, query } = pagination;
+  const teamsPlugin = PluginStore.exports('teams');
+  const RolesTableWithTeamMembers = teamsPlugin?.[0]?.RolesTableWithTeamMembers;
 
   useEffect(() => _loadRoles(pagination, setLoading, setPaginatedRoles), [pagination]);
   useEffect(() => _updateListOnRoleDelete(perPage, query, setPagination), [perPage, query]);
@@ -90,8 +92,9 @@ const RolesOverview = () => {
     return <Spinner />;
   }
 
-  const searchFilter = <RolesFilter onSearch={(newQuery) => setPagination({ ...pagination, query: newQuery, page: DEFAULT_PAGINATION.page })} />;
-  const _rolesOverviewItem = (role) => <RolesOverviewItem role={role} users={paginatedRoles?.context?.users[role.id]} />;
+  const searchFilter = <RolesFilter onSearch={(newQuery) => setPagination({ ...pagination, query: newQuery, page: 1 })} />;
+
+  const RolesTableComponent = RolesTableWithTeamMembers || RolesTable;
 
   return (
     <Container>
@@ -107,18 +110,12 @@ const RolesOverview = () => {
           <StyledPaginatedList activePage={page}
                                totalItems={paginatedRoles.pagination.total}
                                onChange={(newPage, newPerPage) => setPagination({ ...pagination, page: newPage, perPage: newPerPage })}>
-            <DataTable id="roles-overview"
-                       className="table-hover"
-                       rowClassName="no-bm"
-                       headers={TABLE_HEADERS}
-                       headerCellFormatter={_headerCellFormatter}
-                       sortByKey="name"
-                       rows={roles.toJS()}
-                       noDataText={<EmptyResult>No roles have been found.</EmptyResult>}
-                       customFilter={searchFilter}
-                       dataRowFormatter={_rolesOverviewItem}
-                       filterKeys={[]}
-                       filterLabel="Filter Roles" />
+            <RolesTableComponent roles={roles}
+                                 setPagination={setPagination}
+                                 searchFilter={searchFilter}
+                                 pagination={pagination}
+                                 headerCellFormatter={_headerCellFormatter}
+                                 paginatedRoles={paginatedRoles} />
           </StyledPaginatedList>
         </Col>
       </Row>
