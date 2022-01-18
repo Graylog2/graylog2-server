@@ -27,6 +27,7 @@ import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.engine.BackendQuery;
+import org.graylog.plugins.views.search.rest.SearchTypeExecutionState;
 import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.entities.EventListEntity;
@@ -69,7 +70,7 @@ public abstract class EventList implements SearchType {
     public abstract Builder toBuilder();
 
     @Override
-    public SearchType applyExecutionContext(ObjectMapper objectMapper, JsonNode state) {
+    public SearchType applyExecutionContext(SearchTypeExecutionState state) {
         return this;
     }
 
