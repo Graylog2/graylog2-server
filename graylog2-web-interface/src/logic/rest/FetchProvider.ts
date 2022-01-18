@@ -22,6 +22,7 @@ import history from 'util/History';
 import CancellablePromise from 'logic/rest/CancellablePromise';
 
 const reportServerSuccess = () => {
+  // eslint-disable-next-line global-require
   const { ServerAvailabilityActions } = require('stores/sessions/ServerAvailabilityStore');
   ServerAvailabilityActions.reportSuccess();
 };
@@ -33,6 +34,7 @@ const emptyToUndefined = (s: any) => (s && s !== '' ? s : undefined);
 const onServerError = async (error: Response | undefined, onUnauthorized = defaultOnUnauthorizedError) => {
   const contentType = error.headers?.get('Content-Type');
   const response = await (contentType?.startsWith('application/json') ? error.json().then((body) => body) : error?.text?.());
+  // eslint-disable-next-line global-require
   const { SessionStore, SessionActions } = require('stores/sessions/SessionStore');
   const fetchError = new FetchError(error.statusText, error.status, emptyToUndefined(response));
 
@@ -46,6 +48,7 @@ const onServerError = async (error: Response | undefined, onUnauthorized = defau
   }
 
   if (error && !error.status) {
+    // eslint-disable-next-line global-require
     const { ServerAvailabilityActions } = require('stores/sessions/ServerAvailabilityStore');
     ServerAvailabilityActions.reportError(fetchError);
   }
@@ -193,6 +196,7 @@ export class Builder {
 }
 
 function queuePromiseIfNotLoggedin(promise) {
+  // eslint-disable-next-line global-require
   const { SessionStore, SessionActions } = require('stores/sessions/SessionStore');
 
   if (!SessionStore.isLoggedIn()) {

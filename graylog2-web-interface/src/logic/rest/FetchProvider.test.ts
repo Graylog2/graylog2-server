@@ -46,7 +46,7 @@ const setUpServer = () => {
   const app = express();
 
   app.use(formidableMiddleware());
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars,no-console
   app.use((err, req, res, next) => console.error(err));
 
   app.get('/test1', (req, res) => {
