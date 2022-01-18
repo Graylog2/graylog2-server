@@ -49,6 +49,14 @@ const formatValue = (value: string, type: string) => {
   return value;
 };
 
+const completionCaption = (fieldValue: string, input: string | number) => {
+  if (fieldValue.startsWith(String(input))) {
+    return fieldValue;
+  }
+
+  return `${fieldValue} ⭢ ${input}`;
+};
+
 const getFieldNameAndInput = (currentToken: Token | undefined | null, lastToken: Token | undefined | null) => {
   if (currentToken?.type === 'keyword' && currentToken?.value.endsWith(':')) {
     return {
@@ -165,7 +173,11 @@ class FieldValueCompletion implements Completer {
     }
 
     if (this.alreadyFetchedAllSuggestions(input, fieldName, streams, timeRange)) {
-      return this.filterExistingSuggestions(input);
+      const existingSuggestions = this.filterExistingSuggestions(input);
+
+      if (existingSuggestions.length) {
+        return existingSuggestions;
+      }
     }
 
     const normalizedTimeRange = (!timeRange || isNoTimeRangeOverride(timeRange)) ? undefined : onSubmittingTimerange(timeRange);
@@ -185,7 +197,8 @@ class FieldValueCompletion implements Completer {
         name: value,
         value: value,
         score: occurrence,
-        meta: `${occurrence} (occ)`,
+        caption: completionCaption(value, input),
+        meta: `${occurrence} hits`,
       }));
 
       this.previousSuggestions = {
