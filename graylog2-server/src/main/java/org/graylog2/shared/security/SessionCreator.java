@@ -26,7 +26,10 @@ import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.security.headerauth.HTTPHeaderAuthConfig;
+import org.graylog2.security.realm.HTTPHeaderAuthenticationRealm;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.users.UserImpl;
 import org.slf4j.Logger;
@@ -46,11 +49,13 @@ public class SessionCreator {
 
     private final UserService userService;
     private final AuditEventSender auditEventSender;
+    private final ClusterConfigService clusterConfigService;
 
     @Inject
-    public SessionCreator(UserService userService, AuditEventSender auditEventSender) {
+    public SessionCreator(UserService userService, AuditEventSender auditEventSender, ClusterConfigService clusterConfigService) {
         this.userService = userService;
         this.auditEventSender = auditEventSender;
+        this.clusterConfigService = clusterConfigService;
     }
 
     /**
@@ -115,6 +120,13 @@ public class SessionCreator {
         ThreadContext.bind(subject);
 
         final Session session = subject.getSession();
+
+        final HTTPHeaderAuthConfig httpHeaderConfig = loadHTTPHeaderConfig();
+        final Optional<String> usernameHeader = ShiroRequestHeadersBinder.getHeaderFromThreadContext(httpHeaderConfig.usernameHeader());
+        if (httpHeaderConfig.enabled() && usernameHeader.isPresent()) {
+            session.setAttribute(HTTPHeaderAuthenticationRealm.SESSION_AUTH_HEADER, usernameHeader.get());
+        }
+
         return createSession(subject, session, host);
     }
 
@@ -161,5 +173,9 @@ public class SessionCreator {
         log.error("Unable to extract session attributes from subject. Expected <Map.class> but got <{}>.",
                 sessionAttributes.getClass().getSimpleName());
         return Collections.emptyMap();
+    }
+
+    private HTTPHeaderAuthConfig loadHTTPHeaderConfig() {
+        return clusterConfigService.getOrDefault(HTTPHeaderAuthConfig.class, HTTPHeaderAuthConfig.createDisabled());
     }
 }
