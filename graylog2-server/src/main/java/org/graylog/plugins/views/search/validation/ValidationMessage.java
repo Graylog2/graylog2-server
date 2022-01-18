@@ -58,7 +58,7 @@ public abstract class ValidationMessage {
     @JsonProperty
     public abstract String errorMessage();
 
-    public static ValidationMessage fromException(final String query, final ParseException exception) {
+    public static ValidationMessage fromException(final String query, final Exception exception) {
 
         final String input = exception.toString();
 
