@@ -62,12 +62,13 @@ public final class SessionIdToken implements HostAuthenticationToken, RemoteAddr
         if (o == null || getClass() != o.getClass()) return false;
         SessionIdToken that = (SessionIdToken) o;
         return Objects.equals(sessionId, that.sessionId) &&
-                Objects.equals(host, that.host);
+                Objects.equals(host, that.host) &&
+                Objects.equals(remoteAddr, that.remoteAddr);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(sessionId, host);
+        return Objects.hash(sessionId, host, remoteAddr);
     }
 
     @Override
