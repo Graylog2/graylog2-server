@@ -68,6 +68,7 @@ const _loadRoles = (pagination, setLoading, setPaginatedRoles) => {
 const _updateListOnRoleDelete = (perPage, query, setPagination) => AuthzRolesActions.delete.completed.listen(() => setPagination({ page: DEFAULT_PAGINATION.page, perPage, query }));
 
 const _headerCellFormatter = (header) => {
+  // eslint-disable-next-line react/destructuring-assignment
   switch (header.toLowerCase()) {
     case 'actions':
       return <th className="actions text-right">{header}</th>;
