@@ -79,9 +79,9 @@ public abstract class ViewStateDTO implements ContentPackable<ViewStateEntity> {
     @JsonIgnore
     public Optional<String> title() {
         return Optional.ofNullable(titles())
-                .flatMap(titles -> Optional.ofNullable(titles.titles()))
-                .flatMap(titles -> Optional.ofNullable(titles.get("tab")))
-                .flatMap(tab -> Optional.ofNullable(tab.get("title")));
+                .map(Titles::titles)
+                .map(titles -> titles.get("tab"))
+                .map(tab -> tab.get("title"));
     }
 
     @AutoValue.Builder
