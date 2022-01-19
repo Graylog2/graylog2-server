@@ -57,7 +57,7 @@ describe('DateTime utils', () => {
       const result = toDateObject(input);
 
       expect(moment.isMoment(result)).toBe(true);
-      expect(result.format(DATE_TIME_FORMATS.complete)).toBe('2020-01-01 11:00:00.000');
+      expect(result.format(DATE_TIME_FORMATS.complete)).toBe('2020-01-01 10:00:00.000');
     });
 
     it('should validate date based on defined format', () => {
@@ -106,7 +106,7 @@ describe('DateTime utils', () => {
 
   describe('adjustFormat', () => {
     it.each(exampleInput)('should adjust time for %s', (type: any, input) => {
-      expect(adjustFormat(input, 'internal')).toBe('2020-01-01T11:00:00.000+01:00');
+      expect(adjustFormat(input, 'internal')).toBe('2020-01-01T10:00:00.000+00:00');
     });
 
     it('should throw an error for an invalid date', () => {
@@ -120,7 +120,7 @@ describe('DateTime utils', () => {
     });
 
     it('should return browser time with specific format', () => {
-      expect(formatAsBrowserTime('2021-03-27T14:32:31.894Z', 'complete')).toBe('2021-03-27 09:32:31.894');
+      expect(formatAsBrowserTime('2020-01-01T10:00:00.000Z', 'withTz')).toBe('2020-01-01 04:00:00 -06:00');
     });
 
     it('should throw an error for an invalid date', () => {

@@ -21,7 +21,8 @@ export type DateTime = string | number | Moment | Date;
 
 export type DateTimeFormats = keyof typeof DATE_TIME_FORMATS;
 
-// This file provides utility functions to handle times.
+// This file provides utility functions to handle times. All functions expect a UTC date
+// and (except adjustTimezone) will return a UTC date.
 
 export const DATE_TIME_FORMATS = {
   default: 'YYYY-MM-DD HH:mm:ss', // default format when displaying date times
@@ -47,7 +48,7 @@ const validateDateTime = (dateTime: Moment, originalDateTime: DateTime, addition
 };
 
 export const toDateObject = (dateTime: DateTime, acceptedFormats?: Array<string>) => {
-  const dateObject = moment(dateTime, acceptedFormats, true);
+  const dateObject = moment.utc(dateTime, acceptedFormats, true);
   const validationInfo = acceptedFormats?.length ? `Expected formats: ${acceptedFormats.join(', ')}.` : undefined;
 
   return validateDateTime(dateObject, dateTime, validationInfo);
@@ -74,7 +75,7 @@ export const adjustFormat = (dateTime: DateTime, format: DateTimeFormats = 'defa
 };
 
 export const formatAsBrowserTime = (time: DateTime, format: DateTimeFormats = 'default') => {
-  return adjustFormat(adjustTimezone(time, getBrowserTimezone()), format);
+  return adjustTimezone(time, getBrowserTimezone()).format(DATE_TIME_FORMATS[format]);
 };
 
 export const relativeDifference = (dateTime: DateTime) => {
