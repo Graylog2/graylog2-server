@@ -184,8 +184,8 @@ class EmailNotificationForm extends React.Component {
           </HelpBlock>
         </FormGroup>
         <Input id="notification-time-zone"
-               help="Time Zone used for timestamps in the email body."
-               label={<ControlLabel>Time Zone for date/time values <small className="text-muted">(Optional)</small></ControlLabel>} >
+               help="Time zone used for timestamps in the email body."
+               label={<ControlLabel>Time zone for date/time values <small className="text-muted">(Optional)</small></ControlLabel>} >
           <TimezoneSelect className="timezone-select"
                           name="time_zone"
                           value={config.time_zone}
