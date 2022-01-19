@@ -82,6 +82,7 @@ export { default as Portal } from './Portal';
 export { default as QueryHelper } from './QueryHelper';
 export { default as ReactGridContainer } from './ReactGridContainer';
 export { default as ReadOnlyFormGroup } from './ReadOnlyFormGroup';
+export { default as RelativeTime } from './RelativeTime';
 export { default as ScrollButton } from './ScrollButton';
 export { default as SearchForm } from './SearchForm';
 export { default as Select } from './Select';
