@@ -27,4 +27,5 @@ export type UserDateTimeContextType = {
 };
 
 const UserDateTimeContext = React.createContext<UserDateTimeContextType | undefined>(undefined);
-export default singleton('contexts.TimeLocalizeContext', () => UserDateTimeContext);
+
+export default singleton('contexts.UserDateTimeContext', () => UserDateTimeContext);
