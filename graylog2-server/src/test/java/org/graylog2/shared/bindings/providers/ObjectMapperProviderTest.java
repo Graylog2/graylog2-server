@@ -32,12 +32,14 @@ class ObjectMapperProviderTest {
     void returnsMapperWithTimeZoneSet() throws Exception {
         final ObjectMapperProvider om = new ObjectMapperProvider();
 
-        final String forDefault = om.get().writeValueAsString(ImmutableMap.of("date", new DateTime(0)));
-        final String forNull = om.getForTimeZone(null).writeValueAsString(ImmutableMap.of("date", new DateTime(0)));
+        final String forDefault = om.get().
+                writeValueAsString(ImmutableMap.of("date", new DateTime(0, DateTimeZone.UTC)));
+        final String forNull = om.getForTimeZone(null).
+                writeValueAsString(ImmutableMap.of("date", new DateTime(0, DateTimeZone.UTC)));
         final String forUtc = om.getForTimeZone(DateTimeZone.forID("UTC"))
-                .writeValueAsString(ImmutableMap.of("date", new DateTime(0)));
+                .writeValueAsString(ImmutableMap.of("date", new DateTime(0, DateTimeZone.UTC)));
         final String forBerlin = om.getForTimeZone(DateTimeZone.forID("Europe/Berlin"))
-                .writeValueAsString(ImmutableMap.of("date", new DateTime(0)));
+                .writeValueAsString(ImmutableMap.of("date", new DateTime(0, DateTimeZone.UTC)));
 
         assertThat(forDefault).isEqualTo("{\"date\":\"1970-01-01T00:00:00.000Z\"}");
         assertThat(forDefault).isEqualTo(forNull).isEqualTo(forUtc);
