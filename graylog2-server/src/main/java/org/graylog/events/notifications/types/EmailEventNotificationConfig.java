@@ -178,6 +178,7 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
                 .htmlBodyTemplate(ValueReference.of(htmlBodyTemplate()))
                 .emailRecipients(emailRecipients())
                 .userRecipients(userRecipients())
+                .timeZone(ValueReference.of(timeZone().getID()))
             .build();
     }
 }
