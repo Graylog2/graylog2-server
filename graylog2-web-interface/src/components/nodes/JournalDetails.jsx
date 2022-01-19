@@ -26,7 +26,7 @@ import styled from 'styled-components';
 
 import { Link } from 'components/common/router';
 import { Row, Col, Alert } from 'components/bootstrap';
-import { Spinner, Timestamp, Icon } from 'components/common';
+import { Spinner, RelativeTime, Icon } from 'components/common';
 import ProgressBar, { Bar } from 'components/common/ProgressBar';
 import MetricsExtractor from 'logic/metrics/MetricsExtractor';
 import NumberUtils from 'util/NumberUtils';
@@ -147,7 +147,7 @@ const JournalDetails = createReactClass({
             <dt>Path:</dt>
             <dd>{journalInformation.journal_config.directory}</dd>
             <dt>Earliest entry:</dt>
-            <dd><Timestamp dateTime={oldestSegment} relative /></dd>
+            <dd><RelativeTime dateTime={oldestSegment} /></dd>
             <dt>Maximum size:</dt>
             <dd>{NumberUtils.formatBytes(journalInformation.journal_config.max_size)}</dd>
             <dt>Maximum age:</dt>
