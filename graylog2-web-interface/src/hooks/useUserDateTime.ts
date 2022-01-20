@@ -23,7 +23,7 @@ const useUserDateTime = () => {
   const userDateTime = useContext(UserDateTimeContext);
 
   if (!userDateTime) {
-    throw new Error('useUserDateTime hook needs to used inside UserDateTimeContext.Provider');
+    throw new Error('useUserDateTime hook needs to be used inside UserDateTimeContext.Provider');
   }
 
   return userDateTime;
