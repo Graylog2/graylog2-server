@@ -21,7 +21,6 @@ import {
   relativeDifference,
   formatAsBrowserTime,
   adjustFormat,
-  adjustTimezone,
   DATE_TIME_FORMATS, getBrowserTimezone, parseFromIsoString, toDateObject,
 } from 'util/DateTime';
 
