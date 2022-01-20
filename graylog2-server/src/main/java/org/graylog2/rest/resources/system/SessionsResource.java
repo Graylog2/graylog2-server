@@ -185,7 +185,7 @@ public class SessionsResource extends RestResource {
 
     private Session retrieveOrCreateSession(Subject subject) {
         final Session potentialSession = subject.getSession(false);
-        if (needToCreateNewSession(potentialSession) || isOutdatedSession(potentialSession)) {
+        if (needToCreateNewSession(potentialSession)) {
             // There's no valid session, but the authenticator would like us to create one.
             // This is the "Trusted Header Authentication" scenario, where the browser performs this request to check if a
             // session exists, with a trusted header identifying the user. The authentication filter will authenticate the
@@ -198,12 +198,6 @@ public class SessionsResource extends RestResource {
         }
 
         return potentialSession;
-    }
-
-    private boolean isOutdatedSession(Session potentialSession) {
-        return potentialSession == null
-                || potentialSession.getAttribute("username") == null
-                || !potentialSession.getAttribute("username").equals(getCurrentUser().getName());
     }
 
     private boolean needToCreateNewSession(Session potentialSession) {
