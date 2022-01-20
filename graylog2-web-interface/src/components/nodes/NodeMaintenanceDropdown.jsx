@@ -30,7 +30,7 @@ class NodeMaintenanceDropdown extends React.Component {
   };
 
   render() {
-    const apiBrowserURI = new URI(`${this.props.node.transport_address}/api-browser`).normalizePathname().toString();
+    const apiBrowserURI = new URI(`${this.props.node.transport_address}/api-browser/`).normalizePathname().toString();
 
     return (
       <ButtonGroup>
