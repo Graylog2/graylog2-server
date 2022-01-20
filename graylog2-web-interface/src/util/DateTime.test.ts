@@ -71,7 +71,7 @@ describe('DateTime utils', () => {
     });
 
     it('should validate date based on defined format', () => {
-      expect(() => toDateObject('2020-01-01T10:00:00.000Z', [DATE_TIME_FORMATS.date])).toThrowError('Date time 2020-01-01T10:00:00.000Z is not valid. Expected formats: YYYY-MM-DD.');
+      expect(() => toDateObject('2020-01-01T10:00:00.000Z', ['date'])).toThrowError('Date time 2020-01-01T10:00:00.000Z is not valid. Expected formats: YYYY-MM-DD.');
     });
 
     it('should throw an error for an invalid date', () => {

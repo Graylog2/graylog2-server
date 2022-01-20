@@ -48,15 +48,28 @@ const validateDateTime = (dateTime: Moment, originalDateTime: DateTime, addition
   return dateTime;
 };
 
-export const toDateObject = (dateTime: DateTime, acceptedFormats?: Array<string>, tz = DEFAULT_OUTPUT_TZ) => {
-  const dateObject = moment(dateTime, acceptedFormats, true).tz(tz);
-  const validationInfo = acceptedFormats?.length ? `Expected formats: ${acceptedFormats.join(', ')}.` : undefined;
+const getFormatStringsForDateTimeFormats = (dateTimeFormats: Array<DateTimeFormats>) => {
+  return dateTimeFormats?.map((dateTimeFormat) => {
+    const format = DATE_TIME_FORMATS[dateTimeFormat];
+
+    if (!format) {
+      throw new Error(`Provided date time format "${dateTimeFormat}" is not supported.`);
+    }
+
+    return format;
+  });
+};
+
+export const toDateObject = (dateTime: DateTime, acceptedFormats?: Array<DateTimeFormats>, tz = DEFAULT_OUTPUT_TZ) => {
+  const acceptedFormatStrings = getFormatStringsForDateTimeFormats(acceptedFormats);
+  const dateObject = moment(dateTime, acceptedFormatStrings, true).tz(tz);
+  const validationInfo = acceptedFormats?.length ? `Expected formats: ${acceptedFormatStrings.join(', ')}.` : undefined;
 
   return validateDateTime(dateObject, dateTime, validationInfo);
 };
 
 export const parseFromIsoString = (dateTimeString: string, tz = DEFAULT_OUTPUT_TZ) => {
-  return toDateObject(dateTimeString, [DATE_TIME_FORMATS.internal], tz);
+  return toDateObject(dateTimeString, ['internal'], tz);
 };
 
 export const getBrowserTimezone = () => {
