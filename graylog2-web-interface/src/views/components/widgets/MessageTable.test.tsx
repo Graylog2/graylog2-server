@@ -38,6 +38,8 @@ jest.mock('stores/configurations/ConfigurationsStore', () => ({
   },
 }));
 
+jest.mock('hooks/useUserDateTime');
+
 const messages = [
   {
     highlight_ranges: {},

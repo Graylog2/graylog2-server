@@ -107,8 +107,8 @@ class AlertMessages extends React.Component {
     return (
       <span>
         (
-        <Timestamp dateTime={this._getFrom()} format={DateTime.Formats.DATETIME} />&nbsp;&#8211;&nbsp;
-        <Timestamp dateTime={this._getTo()} format={DateTime.Formats.DATETIME} />
+        <Timestamp dateTime={this._getFrom()} />&nbsp;&#8211;&nbsp;
+        <Timestamp dateTime={this._getTo()} />
         )
       </span>
     );

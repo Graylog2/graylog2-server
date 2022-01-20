@@ -25,6 +25,8 @@ import { StaticColor } from 'views/logic/views/formatting/highlighting/Highlight
 
 import CustomHighlighting from './CustomHighlighting';
 
+jest.mock('hooks/useUserDateTime');
+
 const renderDecorators = (decorators, field, value) => decorators.map((Decorator) => (
   <Decorator key={Decorator.name}
              type={FieldType.Unknown}

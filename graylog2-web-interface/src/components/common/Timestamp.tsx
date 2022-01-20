@@ -45,7 +45,7 @@ type Props = {
  */
 const Timestamp = ({ dateTime, field, format, render: Component, tz }: Props) => {
   const { formatTime: formatWithUserTz } = useUserDateTime();
-  const formattedDateTime = tz ? adjustFormat(dateTime, format) : formatWithUserTz(dateTime, format);
+  const formattedDateTime = tz ? adjustFormat(dateTime, format, tz) : formatWithUserTz(dateTime, format);
   const dateTimeString = adjustFormat(dateTime, 'internal');
 
   return (
