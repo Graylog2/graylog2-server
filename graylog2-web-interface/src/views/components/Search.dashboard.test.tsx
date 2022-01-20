@@ -46,10 +46,7 @@ jest.mock('views/stores/ViewMetadataStore', () => ({
   ),
 }));
 
-jest.mock('react-sizeme', () => ({
-  // eslint-disable-next-line react/prop-types
-  SizeMe: ({ children }) => <div>{children({ size: { width: 1024 } })}</div>,
-}));
+jest.mock('hooks/useElementDimensions', () => () => ({ width: 1024, height: 768 }));
 
 const mockedQueryIds = Immutable.OrderedSet(['query-id-1', 'query-id-2']);
 

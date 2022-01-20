@@ -28,10 +28,6 @@ import type { CurrentViewType } from 'views/components/CustomPropTypes';
 
 import NumberVisualization from './NumberVisualization';
 
-jest.mock('react-sizeme', () => ({
-  SizeMe: ({ children: fn }) => fn({ size: { width: 320, height: 240 } }),
-}));
-
 jest.mock('./AutoFontSizer', () => ({ children }) => children);
 jest.mock('stores/connect', () => (x) => x);
 
@@ -100,14 +96,16 @@ describe('NumberVisualization', () => {
     expect(wrapper.find(NumberVisualization)).toExist();
   });
 
-  it('calls render completion callback after first render', (done) => {
-    const onRenderComplete = jest.fn(done);
+  it('calls render completion callback after first render', () => {
+    const onRenderComplete = jest.fn();
 
     mount((
       <RenderCompletionCallback.Provider value={onRenderComplete}>
         <SimplifiedNumberVisualization />
       </RenderCompletionCallback.Provider>
     ));
+
+    expect(onRenderComplete).toHaveBeenCalledTimes(1);
   });
 
   it('renders 0 if value is 0', () => {

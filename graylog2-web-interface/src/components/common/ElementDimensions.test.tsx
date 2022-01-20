@@ -14,4 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-/// <reference types="jest-enzyme" />
+import * as React from 'react';
+import { render } from 'wrappedTestingLibrary';
+
+import ElementDimensions from './ElementDimensions';
+
+jest.mock('hooks/useElementDimensions', () => jest.fn(() => ({ width: 1024, height: 768 })));
+
+describe('ElementDimensions', () => {
+  it('should provide width and height', () => {
+    const childrenMock = jest.fn();
+    render(<ElementDimensions>{childrenMock}</ElementDimensions>);
+
+    expect(childrenMock).toHaveBeenCalledTimes(1);
+    expect(childrenMock).toHaveBeenCalledWith({ width: 1024, height: 768 });
+  });
+});
