@@ -8519,16 +8519,16 @@ graceful-fs@^4.2.4:
   integrity sha512-nTnJ528pbqxYanhpDYsi4Rd8MAeaBA67+RZ10CM1m3bTAVFEDcd5AuA4a6W5YkGZ1iNXHzZz8T6TBKLeBuNriQ==
 
 "graylog-web-plugin@file:packages/graylog-web-plugin":
-  version "4.2.2-SNAPSHOT"
+  version "4.2.6-SNAPSHOT"
   dependencies:
     "@babel/preset-env" "7.13.10"
     "@babel/preset-typescript" "7.13.0"
     create-react-class "15.7.0"
-    eslint-config-graylog "file:../../../../../../../Users/ousmanesamba/Library/Caches/Yarn/v6/npm-graylog-web-plugin-4.2.2-SNAPSHOT-780a4526-5eb2-453e-9607-92c0fea50b35-1637330658921/node_modules/eslint-config-graylog"
+    eslint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.2.6-SNAPSHOT-7ee37bf2-d201-405d-8315-fdb724532475-1642690074221/node_modules/eslint-config-graylog"
     formik "2.2.9"
     html-webpack-plugin "^4.2.0"
     javascript-natural-sort "0.7.1"
-    jest-preset-graylog "file:../../../../../../../Users/ousmanesamba/Library/Caches/Yarn/v6/npm-graylog-web-plugin-4.2.2-SNAPSHOT-780a4526-5eb2-453e-9607-92c0fea50b35-1637330658921/node_modules/jest-preset-graylog"
+    jest-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.2.6-SNAPSHOT-7ee37bf2-d201-405d-8315-fdb724532475-1642690074221/node_modules/jest-preset-graylog"
     jquery "3.5.1"
     moment "2.29.1"
     moment-timezone "0.5.31"
@@ -8542,7 +8542,7 @@ graceful-fs@^4.2.4:
     react-router-dom "5.3.0"
     reflux "0.2.13"
     styled-components "5.3.1"
-    stylelint-config-graylog "file:../../../../../../../Users/ousmanesamba/Library/Caches/Yarn/v6/npm-graylog-web-plugin-4.2.2-SNAPSHOT-780a4526-5eb2-453e-9607-92c0fea50b35-1637330658921/node_modules/stylelint-config-graylog"
+    stylelint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.2.6-SNAPSHOT-7ee37bf2-d201-405d-8315-fdb724532475-1642690074221/node_modules/stylelint-config-graylog"
     typescript "4.4.3"
     webpack "4.44.2"
     webpack-cleanup-plugin "0.5.1"
@@ -11164,10 +11164,10 @@ markdown-to-jsx@^6.11.4:
     prop-types "^15.6.2"
     unquote "^1.1.0"
 
-marked@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/marked/-/marked-2.0.0.tgz#9662bbcb77ebbded0662a7be66ff929a8611cee5"
-  integrity sha512-NqRSh2+LlN2NInpqTQnS614Y/3NkVMFFU6sJlRFEpxJ/LHuK/qJECH7/fXZjk4VZstPW/Pevjil/VtSONsLc7Q==
+marked@^4.0.10:
+  version "4.0.10"
+  resolved "https://registry.yarnpkg.com/marked/-/marked-4.0.10.tgz#423e295385cc0c3a70fa495e0df68b007b879423"
+  integrity sha512-+QvuFj0nGgO970fySghXGmuw+Fd0gD2x3+MqCWLIPf5oxdv1Ka6b2q+z9RP01P/IaKPMEramy+7cNy/Lw8c3hw==
 
 mat4-decompose@^1.0.3:
   version "1.0.4"
