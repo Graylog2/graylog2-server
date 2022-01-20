@@ -206,7 +206,7 @@ public class SessionsResource extends RestResource {
         return new NewCookie("authentication",
                 value,
                 basePath,
-                baseUri.getHost(),
+                null,
                 Cookie.DEFAULT_VERSION,
                 "Authentication Cookie",
                 maxAge,
