@@ -29,7 +29,6 @@ import org.glassfish.grizzly.http.server.Request;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
-import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.rest.RestTools;
 import org.graylog2.rest.models.system.sessions.responses.SessionResponse;
@@ -80,7 +79,6 @@ public class SessionsResource extends RestResource {
     private final SessionCreator sessionCreator;
     private final ActorAwareAuthenticationTokenFactory tokenFactory;
     private final SessionResponseFactory sessionResponseFactory;
-    private final ClusterConfigService clusterConfigService;
     private final CookieFactory cookieFactory;
 
     @Inject
@@ -92,7 +90,6 @@ public class SessionsResource extends RestResource {
                             SessionCreator sessionCreator,
                             ActorAwareAuthenticationTokenFactory tokenFactory,
                             SessionResponseFactory sessionResponseFactory,
-                            ClusterConfigService clusterConfigService,
                             CookieFactory cookieFactory) {
         this.cookieFactory = cookieFactory;
         this.userService = userService;
@@ -103,7 +100,6 @@ public class SessionsResource extends RestResource {
         this.sessionCreator = sessionCreator;
         this.tokenFactory = tokenFactory;
         this.sessionResponseFactory = sessionResponseFactory;
-        this.clusterConfigService = clusterConfigService;
     }
 
     @POST
@@ -189,7 +185,7 @@ public class SessionsResource extends RestResource {
 
     private Session retrieveOrCreateSession(Subject subject) {
         final Session potentialSession = subject.getSession(false);
-        if (needToCreateNewSession(potentialSession) || isOutdatedSession(potentialSession, subject)) {
+        if (needToCreateNewSession(potentialSession) || isOutdatedSession(potentialSession)) {
             // There's no valid session, but the authenticator would like us to create one.
             // This is the "Trusted Header Authentication" scenario, where the browser performs this request to check if a
             // session exists, with a trusted header identifying the user. The authentication filter will authenticate the
@@ -204,7 +200,7 @@ public class SessionsResource extends RestResource {
         return potentialSession;
     }
 
-    private boolean isOutdatedSession(Session potentialSession, Subject subject) {
+    private boolean isOutdatedSession(Session potentialSession) {
         return potentialSession == null
                 || potentialSession.getAttribute("username") == null
                 || !potentialSession.getAttribute("username").equals(getCurrentUser().getName());
