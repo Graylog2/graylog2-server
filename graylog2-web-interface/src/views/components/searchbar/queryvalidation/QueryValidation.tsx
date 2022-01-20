@@ -35,6 +35,10 @@ const Container = styled.div`
   margin-right: 5px;
   margin-left: 5px;
   width: 25px;
+  min-height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 const ExplanationTrigger = styled.button<{ $clickable?: boolean }>(({ $clickable }) => `
@@ -43,7 +47,6 @@ const ExplanationTrigger = styled.button<{ $clickable?: boolean }>(({ $clickable
   border: 0;
   display: flex;
   align-items: center;
-  min-height: 35px;
   cursor: ${$clickable ? 'pointer' : 'default'};
 `);
 
@@ -153,14 +156,18 @@ const QueryValidation = () => {
   return (
     <>
       <Container ref={explanationTriggerRef}>
-        {hasExplanations && (
-        <ExplanationTrigger title="Toggle validation error explanation"
-                            onClick={toggleShow}
-                            $clickable
-                            tabIndex={0}
-                            type="button">
-          <ErrorIcon $status={status} name="exclamation-circle" />
-        </ExplanationTrigger>
+        {hasExplanations ? (
+          <ExplanationTrigger title="Toggle validation error explanation"
+                              onClick={toggleShow}
+                              $clickable
+                              tabIndex={0}
+                              type="button">
+            <ErrorIcon $status={status} name="exclamation-circle" />
+          </ExplanationTrigger>
+        ) : (
+          <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
+                             title="Search query syntax documentation"
+                             text={<Icon name="lightbulb" />} />
         )}
       </Container>
 

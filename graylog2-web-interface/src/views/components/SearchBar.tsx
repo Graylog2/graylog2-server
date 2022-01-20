@@ -23,9 +23,7 @@ import styled from 'styled-components';
 import moment from 'moment';
 
 import connect from 'stores/connect';
-import DocumentationLink from 'components/support/DocumentationLink';
-import DocsHelper from 'util/DocsHelper';
-import { Spinner, Icon, FlatContentRow } from 'components/common';
+import { Spinner, FlatContentRow } from 'components/common';
 import { Row, Col } from 'components/bootstrap';
 import BottomRow from 'views/components/searchbar/BottomRow';
 import ViewActionsWrapper from 'views/components/searchbar/ViewActionsWrapper';
@@ -86,10 +84,7 @@ const StreamWrap = styled.div`
 const SearchButtonAndQuery = styled.div`
   flex: 1;
   display: flex;
-`;
-
-const StyledQueryInput = styled(QueryInput)`
-  flex: 1;
+  align-items: flex-start;
 `;
 
 const defaultOnSubmit = ({ timerange, streams, queryString }, currentQuery: Query) => {
@@ -196,18 +191,18 @@ const SearchBar = ({
                           {({ field: { name, value, onChange }, meta: { error } }) => (
                             <FormWarningsContext.Consumer>
                               {({ warnings }) => (
-                                <StyledQueryInput value={value}
-                                                  timeRange={values.timerange}
-                                                  streams={values.streams}
-                                                  placeholder='Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'
-                                                  error={error}
-                                                  warning={warnings.queryString}
-                                                  onChange={(newQuery) => {
-                                                    onChange({ target: { value: newQuery, name } });
+                                <QueryInput value={value}
+                                            timeRange={values.timerange}
+                                            streams={values.streams}
+                                            placeholder='Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'
+                                            error={error}
+                                            warning={warnings.queryString}
+                                            onChange={(newQuery) => {
+                                              onChange({ target: { value: newQuery, name } });
 
-                                                    return Promise.resolve(newQuery);
-                                                  }}
-                                                  onExecute={handleSubmit as () => void} />
+                                              return Promise.resolve(newQuery);
+                                            }}
+                                            onExecute={handleSubmit as () => void} />
                               )}
                             </FormWarningsContext.Consumer>
                           )}
@@ -215,11 +210,6 @@ const SearchBar = ({
 
                         <QueryValidation />
 
-                        <div className="search-help">
-                          <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
-                                             title="Search query syntax documentation"
-                                             text={<Icon name="lightbulb" />} />
-                        </div>
                       </SearchButtonAndQuery>
 
                       {!editing && (

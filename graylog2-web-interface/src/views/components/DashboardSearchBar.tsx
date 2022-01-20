@@ -22,10 +22,8 @@ import moment from 'moment';
 import styled, { css } from 'styled-components';
 
 import connect from 'stores/connect';
-import DocumentationLink from 'components/support/DocumentationLink';
-import DocsHelper from 'util/DocsHelper';
 import RefreshControls from 'views/components/searchbar/RefreshControls';
-import { FlatContentRow, Icon, Spinner } from 'components/common';
+import { FlatContentRow, Spinner } from 'components/common';
 import ScrollToHint from 'views/components/common/ScrollToHint';
 import SearchButton from 'views/components/searchbar/SearchButton';
 import QueryInput from 'views/components/searchbar/AsyncQueryInput';
@@ -91,10 +89,7 @@ const RefreshControlsWrapper = styled.div(({ theme }) => css`
 const SearchButtonAndQuery = styled.div`
   flex: 1;
   display: flex;
-`;
-
-const StyledQueryInput = styled(QueryInput)`
-  flex: 1;
+  align-items: flex-start;
 `;
 
 const debouncedValidateQuery = debounceWithPromise(validateQuery, 350);
@@ -156,29 +151,23 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
                           {({ field: { name, value, onChange }, meta: { error } }) => (
                             <FormWarningsContext.Consumer>
                               {({ warnings }) => (
-                                <StyledQueryInput value={value}
-                                                  timeRange={values?.timerange}
-                                                  placeholder="Apply filter to all widgets"
-                                                  onChange={(newQuery) => {
-                                                    onChange({ target: { value: newQuery, name } });
+                                <QueryInput value={value}
+                                            timeRange={values?.timerange}
+                                            placeholder="Apply filter to all widgets"
+                                            onChange={(newQuery) => {
+                                              onChange({ target: { value: newQuery, name } });
 
-                                                    return Promise.resolve(newQuery);
-                                                  }}
-                                                  error={error}
-                                                  warning={warnings.queryString}
-                                                  onExecute={handleSubmit as () => void} />
+                                              return Promise.resolve(newQuery);
+                                            }}
+                                            error={error}
+                                            warning={warnings.queryString}
+                                            onExecute={handleSubmit as () => void} />
                               )}
                             </FormWarningsContext.Consumer>
                           )}
                         </Field>
 
                         <QueryValidation />
-
-                        <div className="search-help">
-                          <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
-                                             title="Search query syntax documentation"
-                                             text={<Icon name="lightbulb" />} />
-                        </div>
                       </SearchButtonAndQuery>
 
                       {!editing && (

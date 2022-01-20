@@ -63,7 +63,7 @@ type Props = {
 const WidgetQueryOverride = ({ value, onReset }: Props) => (
   <Wrapper>
     <TimeRangeInfo>
-      <QueryInput onChange={() => Promise.resolve('')} onExecute={() => {}} disabled value={value.query_string} height={32} />
+      <QueryInput onChange={() => Promise.resolve('')} onExecute={() => {}} disabled value={value.query_string} />
       <ResetButton bsSize="xs" bsStyle="primary" onClick={onReset} data-testid="reset-global-query">
         Reset Global Filter
       </ResetButton>
