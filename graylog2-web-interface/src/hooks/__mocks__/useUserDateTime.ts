@@ -16,13 +16,13 @@
  */
 
 import type { DateTime } from 'util/DateTime';
-import { adjustFormat, adjustTimezone } from 'util/DateTime';
+import { adjustFormat, toDateObject } from 'util/DateTime';
 
 const userTimeZone = 'UTC';
 
 const useUserDateTimeMock = () => ({
   formatTime: (dateTime: DateTime) => adjustFormat(dateTime),
-  toUserTime: (dateTime: DateTime) => adjustTimezone(dateTime, userTimeZone),
+  toUserTime: (dateTime: DateTime) => toDateObject(dateTime, undefined, userTimeZone),
   userTimeZone,
 });
 

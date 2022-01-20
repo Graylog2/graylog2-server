@@ -22,7 +22,7 @@ import UserDateTimeContext from 'contexts/UserDateTimeContext';
 import AppConfig from 'util/AppConfig';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import type { DateTime, DateTimeFormats } from 'util/DateTime';
-import { DATE_TIME_FORMATS, getBrowserTimezone, adjustTimezone } from 'util/DateTime';
+import { DATE_TIME_FORMATS, getBrowserTimezone, toDateObject } from 'util/DateTime';
 
 type Props = {
   children: React.ReactChildren | React.ReactChild | ((timeLocalize: UserDateTimeContextType) => Element),
@@ -42,7 +42,7 @@ const UserDateTimeProvider = ({ children }: Props) => {
   const userTimezone = useMemo(() => getUserTimezone(currentUser?.timezone), [currentUser?.timezone]);
 
   const toUserTimezone = useCallback((time: DateTime) => {
-    return adjustTimezone(time, userTimezone);
+    return toDateObject(time, undefined, userTimezone);
   }, [userTimezone]);
 
   const formatTime = useCallback((time: DateTime, format: DateTimeFormats = 'default') => {
