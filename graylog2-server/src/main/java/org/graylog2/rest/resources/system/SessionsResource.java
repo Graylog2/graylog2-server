@@ -17,7 +17,6 @@
 package org.graylog2.rest.resources.system;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.base.Strings;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -30,7 +29,6 @@ import org.glassfish.grizzly.http.server.Request;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
-import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.rest.RestTools;
@@ -46,8 +44,6 @@ import org.graylog2.shared.security.ShiroAuthenticationFilter;
 import org.graylog2.shared.security.ShiroSecurityContext;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.utilities.IpSubnet;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -65,14 +61,10 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.ServiceUnavailableException;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import java.io.IOException;
-import java.net.URI;
-import java.util.Date;
 import java.util.Optional;
 import java.util.Set;
 
@@ -81,8 +73,6 @@ import java.util.Set;
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class SessionsResource extends RestResource {
-    private static final Logger LOG = LoggerFactory.getLogger(SessionsResource.class);
-
     private final DefaultSecurityManager securityManager;
     private final ShiroAuthenticationFilter authenticationFilter;
     private final Set<IpSubnet> trustedSubnets;
@@ -91,6 +81,7 @@ public class SessionsResource extends RestResource {
     private final ActorAwareAuthenticationTokenFactory tokenFactory;
     private final SessionResponseFactory sessionResponseFactory;
     private final ClusterConfigService clusterConfigService;
+    private final CookieFactory cookieFactory;
 
     @Inject
     public SessionsResource(UserService userService,
@@ -101,7 +92,9 @@ public class SessionsResource extends RestResource {
                             SessionCreator sessionCreator,
                             ActorAwareAuthenticationTokenFactory tokenFactory,
                             SessionResponseFactory sessionResponseFactory,
-                            ClusterConfigService clusterConfigService) {
+                            ClusterConfigService clusterConfigService,
+                            CookieFactory cookieFactory) {
+        this.cookieFactory = cookieFactory;
         this.userService = userService;
         this.securityManager = securityManager;
         this.authenticationFilter = authenticationFilter;
@@ -149,7 +142,7 @@ public class SessionsResource extends RestResource {
                 final SessionResponse token = sessionResponseFactory.forSession(session.get());
                 return Response.ok()
                         .entity(token)
-                        .cookie(createAuthenticationCookie(token, requestContext))
+                        .cookie(cookieFactory.createAuthenticationCookie(token, requestContext))
                         .build();
             } else {
                 throw new NotAuthorizedException("Invalid credentials.", "Basic realm=\"Graylog Server session\"");
@@ -157,62 +150,6 @@ public class SessionsResource extends RestResource {
         } catch (AuthenticationServiceUnavailableException e) {
             throw new ServiceUnavailableException("Authentication service unavailable");
         }
-    }
-
-    private URI baseUriFromOriginOrRequest(ContainerRequestContext requestContext) {
-        final Optional<URI> graylogUrlFromHeader = Optional.ofNullable(requestContext.getHeaderString(HttpConfiguration.OVERRIDE_HEADER))
-                .filter(header -> !Strings.isNullOrEmpty(header))
-                .flatMap(this::safeCreateUri);
-        if (graylogUrlFromHeader.isPresent()) {
-            return graylogUrlFromHeader.get();
-        }
-
-        final Optional<URI> origin = Optional.ofNullable(requestContext.getHeaderString("origin"))
-                .filter(header -> !Strings.isNullOrEmpty(header))
-                .flatMap(this::safeCreateUri);
-
-        return origin.orElseGet(() -> requestContext.getUriInfo().getBaseUri());
-
-    }
-
-    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    private <T> Optional<T> firstPresent(Optional<T> optional1, Optional<T> optional2) {
-        return optional1.isPresent() ? optional1 : optional2;
-    }
-
-    private Optional<URI> safeCreateUri(String uri) {
-        try {
-            return Optional.of(URI.create(uri));
-        } catch (IllegalArgumentException ignored) {
-            return Optional.empty();
-        }
-    }
-
-    private NewCookie createAuthenticationCookie(SessionResponse token, ContainerRequestContext requestContext) {
-        return makeCookie(token.getAuthenticationToken(), token.validUntil(), requestContext);
-    }
-
-    private NewCookie deleteAuthenticationCookie(ContainerRequestContext requestContext) {
-        return makeCookie("", new Date(), requestContext);
-    }
-
-    private NewCookie makeCookie(String value, Date validUntil, ContainerRequestContext requestContext) {
-        final Date now = new Date();
-        final int maxAge = Long.valueOf((validUntil.getTime() - now.getTime()) / 1000).intValue();
-
-        final URI baseUri = baseUriFromOriginOrRequest(requestContext);
-        final String basePath = Optional.ofNullable(Strings.emptyToNull(baseUri.getPath())).orElse("/");
-
-        return new NewCookie("authentication",
-                value,
-                basePath,
-                null,
-                Cookie.DEFAULT_VERSION,
-                "Authentication Cookie",
-                maxAge,
-                validUntil,
-                baseUri.getScheme().equalsIgnoreCase("https"),
-                true);
     }
 
     @GET
@@ -226,13 +163,13 @@ public class SessionsResource extends RestResource {
             this.authenticationFilter.filter(requestContext);
         } catch (NotAuthorizedException | LockedAccountException | IOException e) {
             return Response.ok(SessionValidationResponse.invalid())
-                    .cookie(deleteAuthenticationCookie(requestContext))
+                    .cookie(cookieFactory.deleteAuthenticationCookie(requestContext))
                     .build();
         }
         final Subject subject = getSubject();
         if (!subject.isAuthenticated()) {
             return Response.ok(SessionValidationResponse.invalid())
-                    .cookie(deleteAuthenticationCookie(requestContext))
+                    .cookie(cookieFactory.deleteAuthenticationCookie(requestContext))
                     .build();
         }
 
@@ -246,7 +183,7 @@ public class SessionsResource extends RestResource {
                                 String.valueOf(session.getId()),
                                 String.valueOf(user.getName())
                         ))
-                .cookie(createAuthenticationCookie(response, requestContext))
+                .cookie(cookieFactory.createAuthenticationCookie(response, requestContext))
                 .build();
     }
 
@@ -289,7 +226,7 @@ public class SessionsResource extends RestResource {
         securityManager.logout(subject);
 
         return Response.ok()
-                .cookie(deleteAuthenticationCookie(requestContext))
+                .cookie(cookieFactory.deleteAuthenticationCookie(requestContext))
                 .build();
     }
 
@@ -302,7 +239,7 @@ public class SessionsResource extends RestResource {
         securityManager.logout(subject);
 
         return Response.ok()
-                .cookie(deleteAuthenticationCookie(requestContext))
+                .cookie(cookieFactory.deleteAuthenticationCookie(requestContext))
                 .build();
     }
 }
