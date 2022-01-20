@@ -29,9 +29,7 @@ class IndexerFailure extends React.Component {
 
     return (
       <tr>
-        <td title={failure.timestamp}>
-          <RelativeTime dateTime={failure.timestamp} />
-        </td>
+        <td><RelativeTime dateTime={failure.timestamp} /></td>
         <td>{failure.index}</td>
         <td>{failure.letter_id}</td>
         <td>{failure.message}</td>

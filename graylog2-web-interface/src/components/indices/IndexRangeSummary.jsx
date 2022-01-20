@@ -33,9 +33,7 @@ class IndexRangeSummary extends React.Component {
 
     return (
       <span>Range re-calculated{' '}
-        <span title={indexRange.calculated_at}>
-          <RelativeTime dateTime={indexRange.calculated_at} />
-        </span>{' '}
+        <RelativeTime dateTime={indexRange.calculated_at} />{' '}
         in {indexRange.took_ms}ms.
       </span>
     );

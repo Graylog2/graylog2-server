@@ -33,7 +33,9 @@ const RelativeTime = ({ dateTime }: Props) => {
   const dateTimeString = adjustFormat(dateTime, 'internal');
 
   return (
-    <time dateTime={dateTimeString}>{relativeTime}</time>
+    <time dateTime={dateTimeString} title={dateTimeString}>
+      {relativeTime}
+    </time>
   );
 };
 

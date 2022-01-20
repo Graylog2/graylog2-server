@@ -34,7 +34,7 @@ const BrowserTime = ({ dateTime, format }: Props) => {
   const timeInBrowserTimeZone = formatAsBrowserTime(dateTime, format);
 
   return (
-    <time dateTime={dateTimeString} title={String(dateTime)}>
+    <time dateTime={dateTimeString} title={dateTimeString}>
       {timeInBrowserTimeZone}
     </time>
   );
