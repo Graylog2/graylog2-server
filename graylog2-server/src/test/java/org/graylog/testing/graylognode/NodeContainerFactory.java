@@ -33,6 +33,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.StreamSupport;
 
@@ -73,10 +74,24 @@ public class NodeContainerFactory {
                 .withFileFromFile("docker-entrypoint.sh", entrypointScript, EXECUTABLE_MODE)
                 .withFileFromPath("graylog.conf", pathTo("graylog_config"))
                 .withFileFromClasspath("log4j2.xml", "log4j2.xml");
+
+
+        addBinIfExists(image, "chromedriver_start.sh", "chromedriver_start.sh");
+        addBinIfExists(image, "headless_shell_amd64", "headless_shell");
+        addBinIfExists(image, "chromedriver_amd64", "chromedriver");
+
         if (config.enableDebugging) {
             image.withBuildArg("DEBUG_OPTS", "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=0.0.0.0:5005");
         }
         return image;
+    }
+
+    private static void addBinIfExists(ImageFromDockerfile image, String bin, String alias) {
+        final Path path = Paths.get("../enterprise/bin/", bin);
+        final File file = path.toFile();
+        if (file.exists() && file.isFile()) {
+            image.withFileFromFile(Paths.get("/usr/share/graylog/bin/", alias).toString(), file, EXECUTABLE_MODE);
+        }
     }
 
     private static GenericContainer<?> createRunningContainer(NodeContainerConfig config, ImageFromDockerfile image,

@@ -76,7 +76,8 @@ RUN \
     ${GRAYLOG_HOME}/data/contentpacks \
     ${GRAYLOG_HOME}/lib \
     ${GRAYLOG_HOME}/log \
-    ${GRAYLOG_HOME}/plugin
+    ${GRAYLOG_HOME}/plugin \
+    ${GRAYLOG_HOME}/bin
 
 COPY docker-entrypoint.sh /
 COPY graylog.conf ${GRAYLOG_HOME}/data/config
