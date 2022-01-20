@@ -79,7 +79,7 @@ public class ElasticsearchInstanceES6 extends SearchServerInstance {
     }
 
     protected static String imageNameFrom(SearchVersion version) {
-        return DEFAULT_IMAGE_OSS + ":" + version.version().getVersion().toString();
+        return DEFAULT_IMAGE_OSS + ":" + version.version().toString();
     }
 
     private JestClient jestClientFrom() {
