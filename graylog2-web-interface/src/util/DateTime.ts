@@ -21,7 +21,7 @@ export type DateTime = string | number | Moment | Date;
 
 export type DateTimeFormats = keyof typeof DATE_TIME_FORMATS;
 
-// This file provides utility functions to handle times. Most functions expect a UTC date, if the `
+// This file provides utility functions to handle times. By default most functions return a UTC date.
 
 export const DATE_TIME_FORMATS = {
   default: 'YYYY-MM-DD HH:mm:ss', // default format when displaying date times
