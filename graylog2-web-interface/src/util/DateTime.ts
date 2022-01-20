@@ -21,8 +21,7 @@ export type DateTime = string | number | Moment | Date;
 
 export type DateTimeFormats = keyof typeof DATE_TIME_FORMATS;
 
-// This file provides utility functions to handle times. All functions expect a UTC date
-// and (except adjustTimezone) will return a UTC date.
+// This file provides utility functions to handle times. Most functions expect a UTC date, if the `
 
 export const DATE_TIME_FORMATS = {
   default: 'YYYY-MM-DD HH:mm:ss', // default format when displaying date times
@@ -32,6 +31,8 @@ export const DATE_TIME_FORMATS = {
   internal: 'YYYY-MM-DDTHH:mm:ss.SSSZ', // ISO 8601, internal default, not really nice to read. Mostly used communication with the API.
   date: 'YYYY-MM-DD',
 };
+
+const DEFAULT_OUTPUT_TZ = 'UTC';
 
 const validateDateTime = (dateTime: Moment, originalDateTime: DateTime, additionalInfo?: string) => {
   if (!dateTime.isValid()) {
@@ -47,35 +48,27 @@ const validateDateTime = (dateTime: Moment, originalDateTime: DateTime, addition
   return dateTime;
 };
 
-export const toDateObject = (dateTime: DateTime, acceptedFormats?: Array<string>) => {
-  const dateObject = moment.utc(dateTime, acceptedFormats, true);
+export const toDateObject = (dateTime: DateTime, acceptedFormats?: Array<string>, tz = DEFAULT_OUTPUT_TZ) => {
+  const dateObject = moment(dateTime, acceptedFormats, true).tz(tz);
   const validationInfo = acceptedFormats?.length ? `Expected formats: ${acceptedFormats.join(', ')}.` : undefined;
 
   return validateDateTime(dateObject, dateTime, validationInfo);
 };
 
-export const parseFromIsoString = (dateTimeString: string) => {
-  return toDateObject(dateTimeString, [DATE_TIME_FORMATS.internal]);
+export const parseFromIsoString = (dateTimeString: string, tz = DEFAULT_OUTPUT_TZ) => {
+  return toDateObject(dateTimeString, [DATE_TIME_FORMATS.internal], tz);
 };
 
 export const getBrowserTimezone = () => {
   return moment.tz.guess();
 };
 
-export const adjustTimezone = (dateTime: DateTime, tz: string) => {
-  if (!tz) {
-    throw new Error('Missing required time zone.');
-  }
-
-  return validateDateTime(moment.tz(dateTime, tz), dateTime);
-};
-
-export const adjustFormat = (dateTime: DateTime, format: DateTimeFormats = 'default') => {
-  return toDateObject(dateTime).format(DATE_TIME_FORMATS[format]);
+export const adjustFormat = (dateTime: DateTime, format: DateTimeFormats = 'default', tz = DEFAULT_OUTPUT_TZ) => {
+  return toDateObject(dateTime, undefined, tz).format(DATE_TIME_FORMATS[format]);
 };
 
 export const formatAsBrowserTime = (time: DateTime, format: DateTimeFormats = 'default') => {
-  return adjustTimezone(time, getBrowserTimezone()).format(DATE_TIME_FORMATS[format]);
+  return adjustFormat(time, format, getBrowserTimezone());
 };
 
 export const relativeDifference = (dateTime: DateTime) => {

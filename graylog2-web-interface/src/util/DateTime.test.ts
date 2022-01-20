@@ -42,22 +42,32 @@ jest.useFakeTimers()
   .setSystemTime(mockedUnixTime);
 
 describe('DateTime utils', () => {
-  const exampleInput = [
+  const exampleUTCInput = [
     ['date time string', '2020-01-01T10:00:00.000Z'],
     ['JS date', new Date('2020-01-01T10:00:00.000Z')],
     ['unix timestamp', 1577872800000],
     ['moment object', moment('2020-01-01T10:00:00.000Z')],
   ];
+  const exampleBerlinTime = '2020-01-01T10:00:00.000+01:00';
+  const moscowTZ = 'Europe/Moscow';
 
   const invalidDate = '2020-00-00T04:00:00.000Z';
   const expectErrorForInvalidDate = (action: () => any) => expect(action).toThrowError(`Date time ${invalidDate} is not valid.`);
 
   describe('toDateObject', () => {
-    it.each(exampleInput)('should transform %s to moment object', (type: any, input) => {
+    it.each(exampleUTCInput)('should transform %s to moment object', (type: any, input) => {
       const result = toDateObject(input);
 
       expect(moment.isMoment(result)).toBe(true);
       expect(result.format(DATE_TIME_FORMATS.complete)).toBe('2020-01-01 10:00:00.000');
+    });
+
+    it('should return date with UTC time zone per default', () => {
+      expect(toDateObject(exampleBerlinTime).format(DATE_TIME_FORMATS.internal)).toBe('2020-01-01T09:00:00.000+00:00');
+    });
+
+    it('should return date with specified time zone', () => {
+      expect(toDateObject(exampleBerlinTime, undefined, moscowTZ).format(DATE_TIME_FORMATS.internal)).toBe('2020-01-01T12:00:00.000+03:00');
     });
 
     it('should validate date based on defined format', () => {
@@ -72,6 +82,14 @@ describe('DateTime utils', () => {
   describe('parseFromIsoString', () => {
     it('should transform an ISO 8601 date to moment object', () => {
       expect(moment.isMoment(parseFromIsoString('2020-01-01T04:00:00.000Z'))).toBe(true);
+    });
+
+    it('should return date with UTC time zone per default', () => {
+      expect(parseFromIsoString(exampleBerlinTime).format(DATE_TIME_FORMATS.internal)).toBe('2020-01-01T09:00:00.000+00:00');
+    });
+
+    it('should return date with specified time zone', () => {
+      expect(parseFromIsoString(exampleBerlinTime, moscowTZ).format(DATE_TIME_FORMATS.internal)).toBe('2020-01-01T12:00:00.000+03:00');
     });
 
     it('should throw an error when provided date string is not an ISO 8601 date', () => {
@@ -89,24 +107,17 @@ describe('DateTime utils', () => {
     });
   });
 
-  describe('adjustTimezone', () => {
-    it.each(exampleInput)('should adjust time zone for %s', (type: any, input) => {
-      expect(adjustTimezone(input, 'US/Alaska').format(DATE_TIME_FORMATS.withTz)).toBe('2020-01-01 01:00:00 -09:00');
-    });
-
-    it('should throw an error when time zone is missing', () => {
-      // @ts-expect-error
-      expect(() => adjustTimezone(invalidDate)).toThrowError('Missing required time zone.');
-    });
-
-    it('should throw an error for an invalid date', () => {
-      expectErrorForInvalidDate(() => adjustTimezone(invalidDate, 'US/Alaska'));
-    });
-  });
-
   describe('adjustFormat', () => {
-    it.each(exampleInput)('should adjust time for %s', (type: any, input) => {
+    it.each(exampleUTCInput)('should adjust time for %s', (type: any, input) => {
       expect(adjustFormat(input, 'internal')).toBe('2020-01-01T10:00:00.000+00:00');
+    });
+
+    it('should return date with UTC time zone per default', () => {
+      expect(adjustFormat(exampleBerlinTime, 'internal')).toBe('2020-01-01T09:00:00.000+00:00');
+    });
+
+    it('should return date with specified time zone', () => {
+      expect(adjustFormat(exampleBerlinTime, 'internal', moscowTZ)).toBe('2020-01-01T12:00:00.000+03:00');
     });
 
     it('should throw an error for an invalid date', () => {
@@ -115,7 +126,7 @@ describe('DateTime utils', () => {
   });
 
   describe('formatAsBrowserTime', () => {
-    it.each(exampleInput)('should return browser time for $type', (type: any, input) => {
+    it.each(exampleUTCInput)('should return browser time for $type', (type: any, input) => {
       expect(formatAsBrowserTime(input)).toBe('2020-01-01 04:00:00');
     });
 
@@ -129,7 +140,7 @@ describe('DateTime utils', () => {
   });
 
   describe('relativeDifference', () => {
-    it.each(exampleInput)('should return relative time for $type', (type: any, input) => {
+    it.each(exampleUTCInput)('should return relative time for $type', (type: any, input) => {
       expect(relativeDifference(input)).toBe('in 10 hours');
     });
 
