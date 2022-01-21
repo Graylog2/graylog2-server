@@ -17,6 +17,7 @@
 package org.graylog.plugins.views.search.views;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
@@ -73,6 +74,14 @@ public abstract class ViewStateDTO implements ContentPackable<ViewStateEntity> {
 
     public static Builder builder() {
         return Builder.create();
+    }
+
+    @JsonIgnore
+    public Optional<String> title() {
+        return Optional.ofNullable(titles())
+                .map(Titles::titles)
+                .map(titles -> titles.get("tab"))
+                .map(tab -> tab.get("title"));
     }
 
     @AutoValue.Builder

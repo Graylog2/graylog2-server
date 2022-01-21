@@ -16,8 +16,8 @@
  */
 package org.graylog2.storage;
 
+import com.github.zafarkhaja.semver.Version;
 import org.graylog2.indexer.ElasticsearchException;
-import org.graylog2.plugin.Version;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -54,6 +54,6 @@ class SearchVersionTest {
     }
 
     private Version ver(final String version) {
-        return new Version(com.github.zafarkhaja.semver.Version.valueOf(version));
+        return com.github.zafarkhaja.semver.Version.valueOf(version);
     }
 }

@@ -14,29 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { createContext } from 'react';
-import PropTypes from 'prop-types';
+import * as React from 'react';
+import { render } from 'wrappedTestingLibrary';
 
-type Props = {
-  children: React.ReactElement,
-  limitDuration: number,
-}
+import ElementDimensions from './ElementDimensions';
 
-export const DateTimeContext = createContext({ limitDuration: 0 });
+jest.mock('hooks/useElementDimensions', () => jest.fn(() => ({ width: 1024, height: 768 })));
 
-const DateTimeProvider = ({ children, limitDuration }: Props) => {
-  return (
-    <DateTimeContext.Provider value={{
-      limitDuration,
-    }}>
-      {children}
-    </DateTimeContext.Provider>
-  );
-};
+describe('ElementDimensions', () => {
+  it('should provide width and height', () => {
+    const childrenMock = jest.fn();
+    render(<ElementDimensions>{childrenMock}</ElementDimensions>);
 
-DateTimeProvider.propTypes = {
-  children: PropTypes.node.isRequired,
-  limitDuration: PropTypes.number.isRequired,
-};
-
-export default DateTimeProvider;
+    expect(childrenMock).toHaveBeenCalledTimes(1);
+    expect(childrenMock).toHaveBeenCalledWith({ width: 1024, height: 768 });
+  });
+});

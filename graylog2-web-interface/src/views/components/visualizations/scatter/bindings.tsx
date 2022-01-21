@@ -20,7 +20,7 @@ import { hasAtLeastOneMetric } from 'views/components/visualizations/validations
 
 const validate = hasAtLeastOneMetric('Scatter plot');
 
-const scatterChart: VisualizationType = {
+const scatterChart: VisualizationType<typeof ScatterVisualization.type> = {
   type: ScatterVisualization.type,
   displayName: 'Scatter Plot',
   component: ScatterVisualization,

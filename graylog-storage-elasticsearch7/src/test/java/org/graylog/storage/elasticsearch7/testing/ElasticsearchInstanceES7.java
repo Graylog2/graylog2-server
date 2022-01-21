@@ -83,7 +83,7 @@ public class ElasticsearchInstanceES7 extends SearchServerInstance {
     }
 
     public static ElasticsearchInstanceES7 create(SearchVersion searchVersion, Network network) {
-        final String image = imageNameFrom(searchVersion.version().getVersion());
+        final String image = imageNameFrom(searchVersion.version());
 
         LOG.debug("Creating instance {}", image);
 

@@ -58,6 +58,6 @@ public class QueryValidationResourceIT {
                 .then()
                 .statusCode(200);
         validatableResponse.assertThat().body("status", equalTo("ERROR"));
-        validatableResponse.assertThat().body("explanations.error_message[0]", containsString("Cannot parse 'foo:': Encountered \"<EOF>\" at line 1, column 4."));
+        validatableResponse.assertThat().body("explanations.error_message[0]", containsString("Cannot parse query 'foo:', cause: incomplete query, query ended unexpectedly"));
     }
 }

@@ -17,7 +17,6 @@
 package org.graylog2.configuration.converters;
 
 import com.github.joschi.jadconfig.Converter;
-import org.graylog2.plugin.Version;
 import org.graylog2.storage.SearchVersion;
 
 public class MajorVersionConverter implements Converter<SearchVersion> {
@@ -26,7 +25,7 @@ public class MajorVersionConverter implements Converter<SearchVersion> {
         try {
             // only major version - we know it's elasticsearch
             final int majorVersion = Integer.parseInt(value);
-            return SearchVersion.elasticsearch(Version.from(majorVersion, 0, 0));
+            return SearchVersion.elasticsearch(majorVersion, 0, 0);
         } catch (NumberFormatException nfe) {
             // It's probably a distribution:version format
             // caution, this format assumes full version X.Y.Z, not just major number

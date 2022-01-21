@@ -28,8 +28,6 @@ import FormWarningsContext from 'contexts/FormWarningsContext';
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 import validate from 'views/components/searchbar/validate';
 
-import DateTimeProvider from './date-time-picker/DateTimeProvider';
-
 type Props = {
   children: ((props: FormikProps<SearchBarFormValues>) => React.ReactNode) | React.ReactNode,
   initialValues: SearchBarFormValues,
@@ -80,11 +78,9 @@ const SearchBarForm = ({ initialValues, limitDuration, onSubmit, children, valid
                                  validate={_validate}
                                  validateOnMount={validateOnMount}>
       {(...args) => (
-        <DateTimeProvider limitDuration={limitDuration}>
-          <StyledForm>
-            {_isFunction(children) ? children(...args) : children}
-          </StyledForm>
-        </DateTimeProvider>
+        <StyledForm>
+          {_isFunction(children) ? children(...args) : children}
+        </StyledForm>
       )}
     </Formik>
   );

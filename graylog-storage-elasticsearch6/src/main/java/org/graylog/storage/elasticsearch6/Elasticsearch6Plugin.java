@@ -20,13 +20,12 @@ import com.google.common.collect.ImmutableList;
 import org.graylog2.plugin.Plugin;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.PluginModule;
-import org.graylog2.plugin.Version;
 import org.graylog2.storage.SearchVersion;
 
 import java.util.Collection;
 
 public class Elasticsearch6Plugin implements Plugin {
-    public static final SearchVersion SUPPORTED_ES_VERSION = SearchVersion.elasticsearch(Version.from(6, 0, 0));
+    public static final SearchVersion SUPPORTED_ES_VERSION = SearchVersion.elasticsearch(6, 0, 0);
 
     @Override
     public PluginMetaData metadata() {

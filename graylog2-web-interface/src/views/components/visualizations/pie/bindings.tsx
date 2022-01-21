@@ -20,7 +20,7 @@ import { hasAtLeastOneMetric } from 'views/components/visualizations/validations
 
 const validate = hasAtLeastOneMetric('Pie chart');
 
-const pieChart: VisualizationType = {
+const pieChart: VisualizationType<typeof PieVisualization.type> = {
   type: PieVisualization.type,
   displayName: 'Pie Chart',
   component: PieVisualization,

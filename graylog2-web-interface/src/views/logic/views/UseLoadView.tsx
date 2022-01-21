@@ -15,11 +15,23 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { useEffect, useState } from 'react';
+import * as React from 'react';
+
+import ErrorPage from 'components/errors/ErrorPage';
 
 import type View from './View';
 import { processHooks } from './ViewLoader';
 
 import usePluginEntities from '../usePluginEntities';
+
+const LoadViewError = ({ error }: { error: Error }) => (
+  <ErrorPage title="Something went wrong"
+             description={<p>An unknown error has occurred. Please have a look at the following message and the graylog server log for more information.</p>}>
+    <pre>
+      {error?.message}
+    </pre>
+  </ErrorPage>
+);
 
 const useLoadView = (view: Promise<View>, query: { [key: string]: any }) => {
   const loadingViewHooks = usePluginEntities('views.hooks.loadingView');
@@ -40,7 +52,9 @@ const useLoadView = (view: Promise<View>, query: { [key: string]: any }) => {
       },
     ).catch((e) => {
       if (e instanceof Error) {
-        throw e;
+        setHookComponent(<LoadViewError error={e} />);
+
+        return;
       }
 
       setHookComponent(e);

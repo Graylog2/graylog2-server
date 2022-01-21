@@ -32,9 +32,6 @@ import type { SearchBarFormValues } from 'views/Constants';
 import { DEFAULT_TIMERANGE } from 'views/Constants';
 import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 import { Row, Col } from 'components/bootstrap';
-import { Icon } from 'components/common';
-import DocumentationLink from 'components/support/DocumentationLink';
-import DocsHelper from 'util/DocsHelper';
 import type GlobalOverride from 'views/logic/search/GlobalOverride';
 import WidgetContext from 'views/components/contexts/WidgetContext';
 import { GlobalOverrideStore, GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
@@ -57,6 +54,7 @@ import WidgetQueryOverride from './WidgetQueryOverride';
 
 const SecondRow = styled.div`
   display: flex;
+  align-items: flex-start;
 
   .query {
     flex: 1;
@@ -155,6 +153,7 @@ const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
               <Col md={6}>
                 {!hasTimeRangeOverride && (
                 <TimeRangeInput disabled={hasTimeRangeOverride}
+                                limitDuration={limitDuration}
                                 onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
                                 value={values?.timerange}
                                 hasErrorOnMount={!!errors.timerange}
@@ -203,11 +202,6 @@ const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
 
               <QueryValidation />
 
-              <div className="pull-right search-help">
-                <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
-                                   title="Search query syntax documentation"
-                                   text={<Icon name="lightbulb" type="regular" />} />
-              </div>
               {hasQueryOverride && <WidgetQueryOverride value={globalOverride?.query} onReset={_resetQueryOverride} />}
             </SecondRow>
           </>
