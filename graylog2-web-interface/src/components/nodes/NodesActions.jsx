@@ -57,7 +57,7 @@ class NodesActions extends React.Component {
 
   render() {
     const { systemOverview, node } = this.props;
-    const apiBrowserURI = new URI(`${node.transport_address}/api-browser`).normalizePathname().toString();
+    const apiBrowserURI = new URI(`${node.transport_address}/api-browser/`).normalizePathname().toString();
 
     return (
       <div className="item-actions">
