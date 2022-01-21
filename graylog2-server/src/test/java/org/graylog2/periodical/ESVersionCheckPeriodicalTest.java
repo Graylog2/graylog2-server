@@ -53,7 +53,7 @@ class ESVersionCheckPeriodicalTest {
 
     @Test
     void doesNotRunIfVersionOverrideIsSet() {
-        createPeriodical(SearchVersion.elasticsearch(Version.from(8, 0, 0)), SearchVersion.elasticsearch(Version.from(7, 0, 0))).doRun();
+        createPeriodical(SearchVersion.elasticsearch(8, 0, 0), SearchVersion.elasticsearch(7, 0, 0)).doRun();
 
         verifyNoInteractions(notificationService);
     }
@@ -61,33 +61,33 @@ class ESVersionCheckPeriodicalTest {
     @Test
     void doesNotDoAnythingIfVersionWasNotProbed() {
         returnProbedVersion(null);
-        createPeriodical(SearchVersion.elasticsearch(Version.from(8, 0, 0))).doRun();
+        createPeriodical(SearchVersion.elasticsearch(8, 0, 0)).doRun();
         verifyNoInteractions(notificationService);
     }
 
     @Test
     void createsNotificationIfCurrentVersionIsIncompatibleWithInitialOne() {
-        returnProbedVersion(Version.from(9, 2, 3));
+        returnProbedVersion(com.github.zafarkhaja.semver.Version.forIntegers(9, 2, 3));
 
-        createPeriodical(SearchVersion.elasticsearch(Version.from(8, 1, 2))).doRun();
+        createPeriodical(SearchVersion.elasticsearch(8, 1, 2)).doRun();
 
         assertNotificationWasRaised();
     }
 
     @Test
     void createsNotificationIfCurrentVersionIncompatiblyOlderThanInitialOne() {
-        returnProbedVersion(Version.from(6, 8, 1));
+        returnProbedVersion(com.github.zafarkhaja.semver.Version.forIntegers(6, 8, 1));
 
-        createPeriodical(SearchVersion.elasticsearch(Version.from(8, 1, 2))).doRun();
+        createPeriodical(SearchVersion.elasticsearch(8, 1, 2)).doRun();
 
         assertNotificationWasRaised();
     }
 
     @Test
     void fixesNotificationIfCurrentVersionIsIncompatibleWithInitialOne() {
-        returnProbedVersion(Version.from(8, 2, 3));
+        returnProbedVersion(com.github.zafarkhaja.semver.Version.forIntegers(8, 2, 3));
 
-        createPeriodical(SearchVersion.elasticsearch(Version.from(8, 1, 2))).doRun();
+        createPeriodical(SearchVersion.elasticsearch(8, 1, 2)).doRun();
 
         assertNotificationWasFixed();
     }
@@ -106,7 +106,7 @@ class ESVersionCheckPeriodicalTest {
         assertThat(captor.getValue().getType()).isEqualTo(Notification.Type.ES_VERSION_MISMATCH);
     }
 
-    private void returnProbedVersion(@Nullable Version probedVersion) {
+    private void returnProbedVersion(@Nullable com.github.zafarkhaja.semver.Version probedVersion) {
         when(versionProbe.probe(anyCollection())).thenReturn(Optional.ofNullable(probedVersion).map(SearchVersion::elasticsearch));
     }
 

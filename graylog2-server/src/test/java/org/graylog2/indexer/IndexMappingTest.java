@@ -60,7 +60,7 @@ class IndexMappingTest {
             "7.0.0"
     })
     void createsValidMappingTemplates(String versionString) throws Exception {
-        final SearchVersion version = SearchVersion.elasticsearch(Version.valueOf(versionString));
+        final SearchVersion version = SearchVersion.elasticsearch(versionString);
         final IndexMappingTemplate mapping = new MessageIndexTemplateProvider().create(version, null);
 
         final Map<String, Object> template = mapping.toTemplate(indexSetConfig, "sampleIndexTemplate");
@@ -70,7 +70,7 @@ class IndexMappingTest {
     }
 
     private String fixtureFor(SearchVersion version) {
-        final String fixtureFileName = String.format(Locale.ENGLISH, "expected_template%s.json", version.version().getVersion().getMajorVersion());
+        final String fixtureFileName = String.format(Locale.ENGLISH, "expected_template%s.json", version.version().getMajorVersion());
         return resourceFile(fixtureFileName);
     }
 

@@ -63,7 +63,7 @@ public class NodeTest {
 
         final Optional<SearchVersion> elasticsearchVersion = node.getVersion();
 
-        assertThat(elasticsearchVersion).contains(SearchVersion.elasticsearch(Version.forIntegers(5, 4, 0)));
+        assertThat(elasticsearchVersion).contains(SearchVersion.elasticsearch(5, 4, 0));
     }
 
     @Ignore("TODO: fix this test or remove?")
