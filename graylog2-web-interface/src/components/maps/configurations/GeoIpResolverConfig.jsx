@@ -15,11 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import PropTypes from 'prop-types';
-import React from 'react';
-import createReactClass from 'create-react-class';
+import React, { useEffect } from 'react';
+import { useState } from 'react';
 
 import { IfPermitted, Select } from 'components/common';
-import { Button, BootstrapModalForm, Col, Input, Row } from 'components/bootstrap';
+import { Button, Col, Input, Modal, Row } from 'components/bootstrap';
 import { DocumentationLink } from 'components/support';
 import ObjectUtils from 'util/ObjectUtils';
 
@@ -32,41 +32,20 @@ const defaultConfig = {
   run_before_extractors: false,
 };
 
-const GeoIpResolverConfig = createReactClass({
-  displayName: 'GeoIpResolverConfig',
+const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }) => {
+  const [showModal, setShowModal] = useState(false);
+  const [curConfig, setCurConfig] = useState(() => {
+    return { ...defaultConfig };
+  });
 
-  propTypes: {
-    config: PropTypes.object,
-    updateConfig: PropTypes.func.isRequired,
-  },
+  useEffect(() => {
+    setCurConfig({ ...config });
+  }, [config]);
 
-  getDefaultProps() {
-    return {
-      config: {
-        ...defaultConfig,
-      },
-    };
-  },
+  const _updateConfigField = (field, value) => {
+    let update = ObjectUtils.clone(curConfig);
 
-  getInitialState() {
-    const { config } = this.props;
-
-    return {
-      config: ObjectUtils.clone(config),
-    };
-  },
-
-  UNSAFE_componentWillReceiveProps(newProps) {
-    this.setState({ config: ObjectUtils.clone(newProps.config) });
-  },
-
-  inputs: {},
-
-  _updateConfigField(field, value) {
-    const { config } = this.state;
-    let update = ObjectUtils.clone(config);
-
-    if (field === 'enabled' && value && config.city_db_path === '' && config.asn_db_path === '') {
+    if (field === 'enabled' && value && curConfig.city_db_path === '' && curConfig.asn_db_path === '') {
       update = {
         ...defaultConfig,
       };
@@ -74,159 +53,150 @@ const GeoIpResolverConfig = createReactClass({
 
     update[field] = value;
 
-    this.setState({ config: update });
-  },
+    setCurConfig(update);
+  };
 
-  _onCheckboxClick(field, ref) {
+  const _onCheckboxClick = (setting) => {
     return () => {
-      this._updateConfigField(field, this.inputs[ref].getChecked());
+      _updateConfigField(setting, !curConfig[setting]);
     };
-  },
+  };
 
-  _onUpdate(field) {
+  const _onTextChange = (field) => {
     return (e) => {
-      this._updateConfigField(field, e.target.value);
+      _updateConfigField(field, e.target.value);
     };
-  },
+  };
 
-  _openModal() {
-    this.geoIpConfigModal.open();
-  },
+  const _openModal = () => {
+    setShowModal(true);
+  };
 
-  _closeModal() {
-    this.geoIpConfigModal.close();
-  },
+  const _resetConfig = () => {
+    setCurConfig(config);
+    setShowModal(false);
+  };
 
-  _resetConfig() {
-    // Reset to initial state when the modal is closed without saving.
-    this.setState(this.getInitialState());
-  },
+  const _handleSubmit = () => {
+    updateConfig(curConfig)
+      .then((value) => {
+        if ('enabled' in value) {
+          setShowModal(false);
+        }
+      });
+  };
 
-  _saveConfig() {
-    const { updateConfig } = this.props;
-    const { config } = this.state;
-
-    const updatedConfig = { ...config };
-
-    if (!updatedConfig.enabled) {
-      updatedConfig.asn_db_path = '';
-      updatedConfig.city_db_path = '';
-    }
-
-    updateConfig(updatedConfig).then(() => {
-      this._closeModal();
-    });
-  },
-
-  _availableDatabaseTypes() {
+  const _availableDatabaseTypes = () => {
     return [
       { value: 'MAXMIND', label: 'MaxMind' },
       { value: 'IPINFO', label: 'IPInfo' },
     ];
-  },
+  };
 
-  _activeDatabaseType(type) {
-    return this._availableDatabaseTypes().filter((t) => t.value === type)[0].label;
-  },
+  const _activeDatabaseType = (type) => {
+    return _availableDatabaseTypes().filter((t) => t.value === type)[0].label;
+  };
 
-  _onDbTypeSelect(value) {
-    const { config } = this.state;
-    const update = ObjectUtils.clone(config);
-
+  const _onDbTypeSelect = (value) => {
+    const update = ObjectUtils.clone(curConfig);
     update.db_vendor_type = value;
-    this.setState({ config: update });
-  },
+    setCurConfig(update);
+  };
 
-  render() {
-    const { config } = this.state;
+  return (
+    <div>
+      <h3>Geo-Location Processor</h3>
 
-    return (
-      <div>
-        <h3>Geo-Location Processor</h3>
+      <p>
+        The Geo-Location Processor plugin scans all messages for fields containing <strong>exclusively</strong> an
+        IP address, and puts their geo-location information (coordinates, ISO country code, and city name) into
+        different fields. Read more in the <DocumentationLink page="geolocation" text="Graylog documentation" />.
+      </p>
 
-        <p>
-          The Geo-Location Processor plugin scans all messages for fields containing <strong>exclusively</strong> an
-          IP address, and puts their geo-location information (coordinates, ISO country code, and city name) into
-          different fields. Read more in the <DocumentationLink page="geolocation" text="Graylog documentation" />.
-        </p>
+      <dl className="deflist">
+        <dt>Enabled:</dt>
+        <dd>{curConfig.enabled === true ? 'Yes' : 'No'}</dd>
+        {curConfig.enabled && (
+          <>
+            <dt>Default Graylog schema:</dt>
+            <dd>{curConfig.enforce_graylog_schema === true ? 'Yes' : 'No'}</dd>
+            <dt>Database vendor type:</dt>
+            <dd>{_activeDatabaseType(curConfig.db_vendor_type)}</dd>
+            <dt>City database path:</dt>
+            <dd>{curConfig.city_db_path}</dd>
+            <dt>ASN database path:</dt>
+            <dd>{curConfig.asn_db_path}</dd>
+          </>
+        )}
+      </dl>
 
-        <dl className="deflist">
-          <dt>Enabled:</dt>
-          <dd>{config.enabled === true ? 'Yes' : 'No'}</dd>
-          {config.enabled && (
-            <>
-              <dt>Default Graylog schema:</dt>
-              <dd>{config.enforce_graylog_schema === true ? 'Yes' : 'No'}</dd>
-              <dt>Database vendor type:</dt>
-              <dd>{this._activeDatabaseType(config.db_vendor_type)}</dd>
-              <dt>City database path:</dt>
-              <dd>{config.city_db_path}</dd>
-              <dt>ASN database path:</dt>
-              <dd>{config.asn_db_path}</dd>
-            </>
-          )}
-        </dl>
+      <IfPermitted permissions="clusterconfigentry:edit">
+        <Button bsStyle="info" bsSize="xs" onClick={_openModal}>Update</Button>
+      </IfPermitted>
+      <Modal show={showModal} onHide={_resetConfig} aria-modal="true" aria-labelledby="dialog_label">
 
-        <IfPermitted permissions="clusterconfigentry:edit">
-          <Button bsStyle="info" bsSize="xs" onClick={this._openModal}>Update</Button>
-        </IfPermitted>
+        <Modal.Header>
+          <Modal.Title id="dialog_label">Update Geo-Location Processor Configuration</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Row>
+            <Col sm={6}>
+              <Input id="geolocation-enable-checkbox"
+                     type="checkbox"
+                     label="Enable Geo-Location processor"
+                     name="enabled"
+                     checked={curConfig.enabled}
+                     onChange={_onCheckboxClick('enabled')} />
+            </Col>
+            <Col sm={6}>
+              <Input id="geolocation-enforce_graylog_schema-checkbox"
+                     type="checkbox"
+                     label="Enforce default Graylog schema"
+                     name="enforce_graylog_schema"
+                     checked={curConfig.enforce_graylog_schema}
+                     onChange={_onCheckboxClick('enforce_graylog_schema')} />
+            </Col>
+          </Row>
+          <Input id="maxmind-db-select"
+                 label="Select the GeoIP database vendor">
+            <Select placeholder="Select the GeoIP database vendor"
+                    required
+                    disabled={!curConfig.enabled}
+                    options={_availableDatabaseTypes()}
+                    matchProp="label"
+                    value={curConfig.db_vendor_type}
+                    onChange={_onDbTypeSelect} />
+          </Input>
+          <Input id="db-path"
+                 type="text"
+                 disabled={!curConfig.enabled}
+                 label="Path to the city database"
+                 name="city_db_path"
+                 value={curConfig.city_db_path}
+                 onChange={_onTextChange('city_db_path')}
+                 required />
+          <Input id="asn-db-path"
+                 type="text"
+                 disabled={!curConfig.enabled}
+                 label="Path to the ASN database"
+                 name="asn_db_path"
+                 value={curConfig.asn_db_path}
+                 onChange={_onTextChange('asn_db_path')} />
 
-        <BootstrapModalForm ref={(geoIpConfigModal) => { this.geoIpConfigModal = geoIpConfigModal; }}
-                            title="Update Geo-Location Processor Configuration"
-                            onSubmitForm={this._saveConfig}
-                            onModalClose={this._resetConfig}
-                            submitButtonText="Save">
-          <fieldset>
-            <Row>
-              <Col sm={6}>
-                <Input id="geolocation-enable-checkbox"
-                       type="checkbox"
-                       ref={(elem) => { this.inputs.configEnabled = elem; }}
-                       label="Enable Geo-Location processor"
-                       name="enabled"
-                       checked={config.enabled}
-                       onChange={this._onCheckboxClick('enabled', 'configEnabled')} />
-              </Col>
-              <Col sm={6}>
-                <Input id="geolocation-enforce_graylog_schema-checkbox"
-                       type="checkbox"
-                       ref={(elem) => { this.inputs.enforceEnabled = elem; }}
-                       label="Enforce default Graylog schema"
-                       name="enforce_graylog_schema"
-                       checked={config.enforce_graylog_schema}
-                       onChange={this._onCheckboxClick('enforce_graylog_schema', 'enforceEnabled')} />
-              </Col>
-            </Row>
-            <Input id="maxmind-db-select"
-                   label="Select the GeoIP database vendor">
-              <Select placeholder="Select the GeoIP database vendor"
-                      required
-                      disabled={!config.enabled}
-                      options={this._availableDatabaseTypes()}
-                      matchProp="label"
-                      value={config.db_vendor_type}
-                      onChange={this._onDbTypeSelect} />
-            </Input>
-            <Input id="db-path"
-                   type="text"
-                   disabled={!config.enabled}
-                   label="Path to the city database"
-                   name="city_db_path"
-                   value={config.city_db_path}
-                   onChange={this._onUpdate('city_db_path')}
-                   required />
-            <Input id="asn-db-path"
-                   type="text"
-                   disabled={!config.enabled}
-                   label="Path to the ASN database"
-                   name="asn_db_path"
-                   value={config.asn_db_path}
-                   onChange={this._onUpdate('asn_db_path')} />
-          </fieldset>
-        </BootstrapModalForm>
-      </div>
-    );
-  },
-});
+        </Modal.Body>
+        <Modal.Footer>
+          <Button type="button" bsStyle="link" onClick={_resetConfig}>Close</Button>
+          <Button type="submit" bsStyle="success" onClick={_handleSubmit}>Save</Button>
+        </Modal.Footer>
+      </Modal>
+    </div>
+  );
+
+};
+
+GeoIpResolverConfig.propTypes = {
+  config: PropTypes.object,
+  updateConfig: PropTypes.func.isRequired,
+};
 
 export default GeoIpResolverConfig;
