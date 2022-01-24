@@ -17,6 +17,7 @@
 import * as React from 'react';
 
 import type { ViewMetaData as ViewMetadata } from 'views/stores/ViewMetadataStore';
+import type { IconName } from 'components/common/Icon';
 
 import ViewDescription from './description/ViewDescription';
 import AddWidgetButton from './create/AddWidgetButton';
@@ -36,7 +37,7 @@ export type SidebarSectionProps = {
 export type SidebarSection = {
   key: string,
   title: string,
-  icon: string,
+  icon: IconName,
   content: React.ComponentType<SidebarSectionProps>,
 };
 

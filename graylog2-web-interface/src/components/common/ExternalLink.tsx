@@ -17,6 +17,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
+import type { IconName } from 'components/common/Icon';
 
 import Icon from './Icon';
 
@@ -24,7 +25,7 @@ type Props = {
   href?: string,
   children: React.ReactNode,
   target?: string,
-  iconClass?: string,
+  iconClass?: IconName,
   className?: string,
 };
 
