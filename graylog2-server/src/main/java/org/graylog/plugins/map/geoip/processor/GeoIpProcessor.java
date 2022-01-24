@@ -25,6 +25,7 @@ import org.graylog.plugins.map.geoip.GeoIpVendorResolverService;
 import org.graylog2.cluster.ClusterConfigChangedEvent;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Messages;
+import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.messageprocessors.MessageProcessor;
 import org.slf4j.Logger;
@@ -55,32 +56,40 @@ public class GeoIpProcessor implements MessageProcessor {
     private final ScheduledExecutorService scheduler;
     private final MetricRegistry metricRegistry;
     private final GeoIpVendorResolverService geoIpVendorResolverService;
+    private final ServerStatus serverStatus;
 
-    private final AtomicReference<GeoIpResolverConfig> config;
-    private final AtomicReference<GeoIpResolverEngine> filterEngine;
+    private final AtomicReference<GeoIpResolverEngine> filterEngine = new AtomicReference<>(null);
 
     @Inject
     public GeoIpProcessor(ClusterConfigService clusterConfigService,
                           @Named("daemonScheduler") ScheduledExecutorService scheduler,
                           EventBus eventBus,
                           MetricRegistry metricRegistry,
-                          GeoIpVendorResolverService geoIpVendorResolverService) {
+                          GeoIpVendorResolverService geoIpVendorResolverService,
+                          ServerStatus serverStatus) {
         this.clusterConfigService = clusterConfigService;
         this.scheduler = scheduler;
         this.metricRegistry = metricRegistry;
         this.geoIpVendorResolverService = geoIpVendorResolverService;
-
-        final GeoIpResolverConfig config = clusterConfigService.getOrDefault(GeoIpResolverConfig.class,
-                GeoIpResolverConfig.defaultConfig());
-
-        this.config = new AtomicReference<>(config);
-        this.filterEngine = new AtomicReference<>(new GeoIpResolverEngine(geoIpVendorResolverService, config, metricRegistry));
+        this.serverStatus = serverStatus;
 
         eventBus.register(this);
     }
 
     @Override
     public Messages process(Messages messages) {
+
+        if (filterEngine.get() == null) {
+            try {
+                serverStatus.awaitRunning();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                LOG.error("The GeoIpProcessor was interrupted while waiting for the Server to start up.");
+                return messages;
+            }
+            reload();
+        }
+
         for (Message message : messages) {
             filterEngine.get().filter(message);
         }
@@ -95,7 +104,7 @@ public class GeoIpProcessor implements MessageProcessor {
             return;
         }
 
-        scheduler.schedule((Runnable) this::reload, 0, TimeUnit.SECONDS);
+        scheduler.schedule(this::reload, 0, TimeUnit.SECONDS);
     }
 
     private void reload() {
@@ -103,7 +112,6 @@ public class GeoIpProcessor implements MessageProcessor {
                 GeoIpResolverConfig.defaultConfig());
 
         LOG.info("Updating GeoIP resolver engine - {}", newConfig);
-        config.set(newConfig);
         filterEngine.set(new GeoIpResolverEngine(geoIpVendorResolverService, newConfig, metricRegistry));
     }
 }
