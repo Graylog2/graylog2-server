@@ -16,27 +16,32 @@
  */
 const StringUtils = {
   tempDocument: document.createElement('textarea'),
-  capitalizeFirstLetter(text) {
+  capitalizeFirstLetter(text: string) {
     return text.charAt(0).toUpperCase() + text.slice(1);
   },
-  escapeHTML(text) {
+  escapeHTML(text: string) {
     this.tempDocument.textContent = text;
 
     return this.tempDocument.innerHTML;
   },
-  unescapeHTML(text) {
+  unescapeHTML(text: string) {
     this.tempDocument.innerHTML = text;
 
     return this.tempDocument.textContent;
   },
-  pluralize(number, singular, plural) {
+  pluralize(number: string | number, singular: string, plural: string) {
     return (number === 1 || number === '1' ? singular : plural);
   },
   stringify(text) {
     return (typeof text === 'object' ? JSON.stringify(text) : String(text)) || '';
   },
-  replaceSpaces(text, newCharacter = '-') {
+  replaceSpaces(text: string, newCharacter = '-') {
     return text.replace(/\s/g, newCharacter);
+  },
+  toTitleCase(str: string, splitCharacter: string = ' ') {
+    return str.toLowerCase().split(splitCharacter).map((word) => {
+      return (`${word.charAt(0).toUpperCase()}${word.slice(1)}`);
+    }).join(' ');
   },
   truncateWithEllipses(text = '', maxLength = 10, end = '...') {
     if (text.length > maxLength) {
