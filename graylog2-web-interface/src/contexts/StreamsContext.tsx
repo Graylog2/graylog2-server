@@ -16,6 +16,8 @@
  */
 import * as React from 'react';
 
+import { singleton } from 'logic/singleton';
+
 const StreamsContext = React.createContext<Array<any> | undefined>(undefined);
 
-export default StreamsContext;
+export default singleton('contexts.StreamsContext', () => StreamsContext);
