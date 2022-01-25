@@ -25,7 +25,7 @@ import HighlightingRules from './highlighting/HighlightingRules';
 
 /* eslint-disable react/no-unused-prop-types */
 export type SidebarSectionProps = {
-  sidebarChildren: React.ReactNode,
+  sidebarChildren: React.ReactElement,
   sidebarIsPinned: boolean,
   queryId: string,
   results: any,
@@ -66,8 +66,7 @@ const sidebarSections: Array<SidebarSection> = [
     key: 'fieldList',
     icon: 'subscript',
     title: 'Fields',
-    // eslint-disable-next-line react/jsx-no-useless-fragment
-    content: ({ sidebarChildren }: SidebarSectionProps) => <>{sidebarChildren}</>,
+    content: ({ sidebarChildren }: SidebarSectionProps) => sidebarChildren,
   },
 ];
 
