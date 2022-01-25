@@ -21,7 +21,6 @@ import com.github.rholder.retry.Retryer;
 import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
-import com.google.common.collect.ImmutableMap;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 import org.graylog.testing.completebackend.GraylogBackend;
@@ -129,16 +128,7 @@ public class SearchSyncIT {
 
     @ContainerMatrixTest
     void testRequestStoredSearch() throws ExecutionException, RetryException {
-        final ValidatableResponse result = given()
-                .spec(requestSpec)
-                .when()
-                .post("/views/search/61977043c1f17d26b45c8a0a/execute")
-                .then()
-                .statusCode(201);
-
-        final String jobId = result.extract().path("id").toString();
-
-        assertThat(jobId).isNotBlank();
+        final String jobId = executeStoredSearch("61977043c1f17d26b45c8a0a");
 
         retrieveSearchResults(jobId)
                 .body("execution.completed_exceptionally", equalTo(false))
@@ -147,26 +137,36 @@ public class SearchSyncIT {
 
     @ContainerMatrixTest
     void testRequestStoredSearchWithGlobalOverrideKeepingOnlySingleSearchType() throws ExecutionException, RetryException {
-        final ValidatableResponse result = given()
-                .spec(requestSpec)
-                .when()
-                .body(ImmutableMap.of(
-                        "global_override", ImmutableMap.of(
-                                "keep_search_types", Collections.singleton("01c76680-377b-4930-86e2-a55fdb867b58")
-                        )
-                ))
-                .post("/views/search/61977043c1f17d26b45c8a0a/execute")
-                .then()
-                .statusCode(201);
-
-        final String jobId = result.extract().path("id").toString();
-
-        assertThat(jobId).isNotBlank();
+        final String jobId = executeStoredSearch("61977043c1f17d26b45c8a0a", Collections.singletonMap(
+                "global_override", Collections.singletonMap(
+                        "keep_search_types", Collections.singleton("01c76680-377b-4930-86e2-a55fdb867b58")
+                )
+        ));
 
         retrieveSearchResults(jobId)
                 .body("execution.completed_exceptionally", equalTo(false))
                 .body("results.f1446410-a082-4871-b3bf-d69aa42d0c96.search_types", not(hasKey("f1446410-a082-4871-b3bf-d69aa42d0c97")))
                 .body("results.f1446410-a082-4871-b3bf-d69aa42d0c97.search_types", hasKey("01c76680-377b-4930-86e2-a55fdb867b58"));
+    }
+
+    private String executeStoredSearch(String searchId) {
+        return executeStoredSearch(searchId, Collections.emptyMap());
+    }
+
+    private String executeStoredSearch(String searchId, Object body) {
+        final ValidatableResponse result = given()
+                .spec(requestSpec)
+                .when()
+                .body(body)
+                .post("/views/search/{searchId}/execute", searchId)
+                .then()
+                .statusCode(201);
+
+        final String jobId = result.extract().path("id");
+
+        assertThat(jobId).isNotBlank();
+
+        return jobId;
     }
 
     private ValidatableResponse retrieveSearchResults(String jobId) throws ExecutionException, RetryException {
