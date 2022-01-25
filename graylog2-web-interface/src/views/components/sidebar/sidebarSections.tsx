@@ -66,7 +66,8 @@ const sidebarSections: Array<SidebarSection> = [
     key: 'fieldList',
     icon: 'subscript',
     title: 'Fields',
-    content: ({ sidebarChildren }: SidebarSectionProps) => <div>{sidebarChildren}</div>,
+    // eslint-disable-next-line react/jsx-no-useless-fragment
+    content: ({ sidebarChildren }: SidebarSectionProps) => <>{sidebarChildren}</>,
   },
 ];
 
