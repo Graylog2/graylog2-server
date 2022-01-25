@@ -66,7 +66,7 @@ const sidebarSections: Array<SidebarSection> = [
     key: 'fieldList',
     icon: 'subscript',
     title: 'Fields',
-    content: ({ sidebarChildren }: SidebarSectionProps) => <>{sidebarChildren}</>,
+    content: ({ sidebarChildren }: SidebarSectionProps) => <div>{sidebarChildren}</div>,
   },
 ];
 
