@@ -32,7 +32,7 @@ type Props = {
  */
 const ExpandableList = ({ children, className }: Props) => {
   return (
-    <ul className={`${style.list} ${className}`}>
+    <ul className={className ? `${style.list} ${className}` : style.list}>
       {children}
     </ul>
   );
