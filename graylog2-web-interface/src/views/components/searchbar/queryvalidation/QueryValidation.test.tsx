@@ -70,6 +70,11 @@ describe('QueryValidation', () => {
 
   const validationErrorIconTitle = 'Toggle validation error explanation';
 
+  const openExplanation = async () => {
+    const validationExplanationTrigger = await screen.findByTitle(validationErrorIconTitle);
+    userEvent.click(validationExplanationTrigger);
+  };
+
   const SUT = ({ error, warning }: SUTProps) => (
     <Formik onSubmit={() => {}} initialValues={{}} initialErrors={error ? { queryString: error } : {}}>
       <Form>
@@ -99,11 +104,19 @@ describe('QueryValidation', () => {
   it('should display validation error explanation', async () => {
     render(<SUT error={errorResponse} />);
 
-    const validationExplanationTrigger = await screen.findByTitle(validationErrorIconTitle);
-    userEvent.click(validationExplanationTrigger);
+    await openExplanation();
 
     await screen.findByText('Error');
     await screen.findByText('ParseException');
     await screen.findByText(/Cannot parse 'source: '/);
+  });
+
+  it('should display validation error specific documentation links', async () => {
+    render(<SUT error={errorResponse} />);
+
+    await openExplanation();
+
+    await screen.findByText('ParseException');
+    await screen.findByTitle('ParseException documentation');
   });
 });
