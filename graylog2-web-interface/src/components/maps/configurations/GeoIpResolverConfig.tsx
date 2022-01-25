@@ -15,11 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, {useEffect, useState} from 'react';
-
+import {Field, Form, Formik} from 'formik';
 import {IfPermitted, Select} from 'components/common';
 import {Button, Col, Input, Modal, Row} from 'components/bootstrap';
+import FormikInput from 'components/common/FormikInput';
 import {DocumentationLink} from 'components/support';
-import ObjectUtils from 'util/ObjectUtils';
 
 export type GeoDatabaseType = 'MAXMIND' | 'IPINFO'
 
@@ -61,48 +61,18 @@ const GeoIpResolverConfig = ({config = defaultConfig, updateConfig}: Props) => {
     setCurConfig({...config});
   }, [config]);
 
-  const _updateConfigField = (field, value) => {
-    let update = ObjectUtils.clone(curConfig);
-
-    // set default values for db paths if none currently exist
-    if (field === 'enabled' && value && curConfig.city_db_path === '' && curConfig.asn_db_path === '') {
-      update = {
-        ...defaultConfig,
-      };
-    }
-
-    update[field] = value;
-    setCurConfig(update);
-  };
-
-  const _onCheckboxClick = (setting: string) => {
-    return () => {
-      _updateConfigField(setting, !curConfig[setting]);
-    };
-  };
-
-  const _onTextChange = () => {
-    return (e) => {
-      _updateConfigField(e.target.name, e.target.value);
-    };
-  };
-
-  const _openModal = () => {
-    setShowModal(true);
-  };
-
   const _resetConfig = () => {
     setCurConfig(config);
     setShowModal(false);
   };
 
-  const _handleSubmit = () => {
-    updateConfig(curConfig)
+  const _handleSubmit = (values) => {
+    updateConfig(values)
       .then((value: GeoIpConfigType) => {
         if ('enabled' in value) {
           setShowModal(false);
         }
-      });
+      }).catch();
   };
 
   const _availableDatabaseTypes = (): OptionType[] => {
@@ -114,12 +84,6 @@ const GeoIpResolverConfig = ({config = defaultConfig, updateConfig}: Props) => {
 
   const _activeDatabaseType = (type: GeoDatabaseType) => {
     return _availableDatabaseTypes().filter((t) => t.value === type)[0].label;
-  };
-
-  const _onDbTypeSelect = (value) => {
-    const update = ObjectUtils.clone(curConfig);
-    update.db_vendor_type = value;
-    setCurConfig(update);
   };
 
   return (
@@ -150,63 +114,74 @@ const GeoIpResolverConfig = ({config = defaultConfig, updateConfig}: Props) => {
       </dl>
 
       <IfPermitted permissions="clusterconfigentry:edit">
-        <Button bsStyle="info" bsSize="xs" onClick={_openModal}>Update</Button>
+        <Button bsStyle="info" bsSize="xs" onClick={() => {
+          setShowModal(true);
+        }}>Update</Button>
       </IfPermitted>
       <Modal show={showModal} onHide={_resetConfig} aria-modal="true" aria-labelledby="dialog_label">
+        <Formik onSubmit={_handleSubmit} initialValues={curConfig}>
+          {({values, setFieldValue}) => {
+            return (
+              <Form>
+                <Modal.Header>
+                  <Modal.Title id="dialog_label">Update Geo-Location Processor Configuration</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                  <Row>
+                    <Col sm={6}>
+                      <FormikInput id="enabled"
+                                   type="checkbox"
+                                   label="Enable Geo-Location processor"
+                                   name="enabled" />
+                    </Col>
+                    <Col sm={6}>
+                      <FormikInput id="enforce_graylog_schema"
+                                   type="checkbox"
+                                   label="Enforce default Graylog schema"
+                                   name="enforce_graylog_schema" />
+                    </Col>
+                  </Row>
+                  <Field id="db_vendor_type_select"
+                         name="db_vendor_type_field">
+                    {() => (
+                      <Input id="db_vendor_type_input"
+                             label="Select the GeoIP database vendor">
+                        <Select id="db_vendor_type"
+                                name="db_vendor_type"
+                                clearable={false}
+                                placeholder="Select the GeoIP database vendor"
+                                required
+                                disabled={!values.enabled}
+                                options={_availableDatabaseTypes()}
+                                matchProp="label"
+                                value={values.db_vendor_type}
+                                onChange={(option) => {
+                                  setFieldValue('db_vendor_type', option);
+                                }} />
+                      </Input>
+                    )}
+                  </Field>
+                  <FormikInput id="city_db_path"
+                               type="text"
+                               disabled={!values.enabled}
+                               label="Path to the city database"
+                               name="city_db_path"
+                               required />
+                  <FormikInput id="asn_db_path"
+                               type="text"
+                               disabled={!values.enabled}
+                               label="Path to the ASN database"
+                               name="asn_db_path" />
 
-        <Modal.Header>
-          <Modal.Title id="dialog_label">Update Geo-Location Processor Configuration</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Row>
-            <Col sm={6}>
-              <Input id="geolocation-enable-checkbox"
-                     type="checkbox"
-                     label="Enable Geo-Location processor"
-                     name="enabled"
-                     checked={curConfig.enabled}
-                     onChange={_onCheckboxClick('enabled')} />
-            </Col>
-            <Col sm={6}>
-              <Input id="geolocation-enforce_graylog_schema-checkbox"
-                     type="checkbox"
-                     label="Enforce default Graylog schema"
-                     name="enforce_graylog_schema"
-                     checked={curConfig.enforce_graylog_schema}
-                     onChange={_onCheckboxClick('enforce_graylog_schema')} />
-            </Col>
-          </Row>
-          <Input id="db-select"
-                 label="Select the GeoIP database vendor">
-            <Select placeholder="Select the GeoIP database vendor"
-                    required
-                    disabled={!curConfig.enabled}
-                    options={_availableDatabaseTypes()}
-                    matchProp="label"
-                    value={curConfig.db_vendor_type}
-                    onChange={_onDbTypeSelect} />
-          </Input>
-          <Input id="db-path"
-                 type="text"
-                 disabled={!curConfig.enabled}
-                 label="Path to the city database"
-                 name="city_db_path"
-                 value={curConfig.city_db_path}
-                 onChange={_onTextChange()}
-                 required />
-          <Input id="asn-db-path"
-                 type="text"
-                 disabled={!curConfig.enabled}
-                 label="Path to the ASN database"
-                 name="asn_db_path"
-                 value={curConfig.asn_db_path}
-                 onChange={_onTextChange()} />
-
-        </Modal.Body>
-        <Modal.Footer>
-          <Button type="button" bsStyle="link" onClick={_resetConfig}>Close</Button>
-          <Button type="submit" bsStyle="success" onClick={_handleSubmit}>Save</Button>
-        </Modal.Footer>
+                </Modal.Body>
+                <Modal.Footer>
+                  <Button type="button" bsStyle="link" onClick={_resetConfig}>Close</Button>
+                  <Button type="submit" bsStyle="success">Save</Button>
+                </Modal.Footer>
+              </Form>
+            );
+          }}
+        </Formik>
       </Modal>
     </div>
   );
