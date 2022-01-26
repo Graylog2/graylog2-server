@@ -21,5 +21,7 @@ import java.nio.file.Path;
 public interface MavenProjectDirProvider {
     Path getProjectDir();
 
+    Path getBinDir();
+
     String getUniqueId();
 }

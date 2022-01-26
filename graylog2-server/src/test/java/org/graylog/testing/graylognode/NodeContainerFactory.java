@@ -51,18 +51,18 @@ public class NodeContainerFactory {
     private static final String ADMIN_PW_SHA2 = "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918";
 
     public static GenericContainer<?> buildContainer(NodeContainerConfig config, List<Path> pluginJars,
-            Path mavenProjectDir) {
+                                                     Path mavenProjectDir, Path projectBinDir) {
         if (!config.skipPackaging) {
             MavenPackager.packageJarIfNecessary(mavenProjectDir);
         } else {
             LOG.info("Skipping packaging");
         }
-        ImageFromDockerfile image = createImage(config, mavenProjectDir);
+        ImageFromDockerfile image = createImage(config, projectBinDir);
 
         return createRunningContainer(config, image, pluginJars);
     }
 
-    private static ImageFromDockerfile createImage(NodeContainerConfig config, Path projectDir) {
+    private static ImageFromDockerfile createImage(NodeContainerConfig config, Path projectBinDir) {
         // testcontainers only allows passing permissions if you pass a `File`
         File entrypointScript = resourceToTmpFile("org/graylog/testing/graylognode/docker-entrypoint.sh");
 
@@ -74,10 +74,11 @@ public class NodeContainerFactory {
                 .withFileFromPath("graylog.conf", pathTo("graylog_config"))
                 .withFileFromClasspath("log4j2.xml", "log4j2.xml");
 
+        final String arch = System.getProperty("os.arch");
 
-        addBinIfExists(image, projectDir, "chromedriver_start.sh", "chromedriver_start.sh");
-        addBinIfExists(image, projectDir, "headless_shell_amd64", "headless_shell");
-        addBinIfExists(image, projectDir, "chromedriver_amd64", "chromedriver");
+        addBinIfExists(image, projectBinDir, "chromedriver_start.sh", "chromedriver_start.sh");
+        addBinIfExists(image, projectBinDir, "headless_shell_" + arch, "headless_shell");
+        addBinIfExists(image, projectBinDir, "chromedriver_" + arch, "chromedriver");
 
         if (config.enableDebugging) {
             image.withBuildArg("DEBUG_OPTS", "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=0.0.0.0:5005");
@@ -86,7 +87,7 @@ public class NodeContainerFactory {
     }
 
     private static void addBinIfExists(ImageFromDockerfile image, Path projectDir, String bin, String alias) {
-        final Path path = projectDir.resolve("../graylog-plugin-enterprise/enterprise/bin").resolve(bin);
+        final Path path = projectDir.resolve(bin);
         final File file = path.toFile();
         if (file.exists() && file.isFile()) {
             image.withFileFromFile(Paths.get("/usr/share/graylog/bin/", alias).toString(), file, EXECUTABLE_MODE);

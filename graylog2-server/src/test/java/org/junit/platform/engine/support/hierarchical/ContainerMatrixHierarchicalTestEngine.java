@@ -115,7 +115,8 @@ public abstract class ContainerMatrixHierarchicalTestEngine<C extends EngineExec
         final SearchServerInstanceFactory searchServerInstanceFactory = new SearchServerInstanceFactoryByVersion(esVersion);
         final List<Path> pluginJars = instantiateFactory(pluginJarsProvider).getJars();
         final Path mavenProjectDir = instantiateFactory(mavenProjectDirProvider).getProjectDir();
-        return ContainerizedGraylogBackend.createStarted(extraPorts, mongoVersion, searchServerInstanceFactory, pluginJars, mavenProjectDir, mongoDBFixtures);
+        final Path projectBinDir = instantiateFactory(mavenProjectDirProvider).getBinDir();
+        return ContainerizedGraylogBackend.createStarted(extraPorts, mongoVersion, searchServerInstanceFactory, pluginJars, mavenProjectDir, projectBinDir, mongoDBFixtures);
     }
 
     private <T> T instantiateFactory(Class<? extends T> providerClass) {

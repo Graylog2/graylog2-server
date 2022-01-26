@@ -28,6 +28,11 @@ public class DefaultMavenProjectDirProvider implements MavenProjectDirProvider {
     }
 
     @Override
+    public Path getBinDir() {
+        return getProjectReposDir().resolve("graylog-plugin-enterprise/enterprise/bin");
+    }
+
+    @Override
     public String getUniqueId() {
         return "default";
     }

@@ -38,9 +38,9 @@ public class NodeInstance implements Closeable {
     private final GenericContainer<?> container;
 
     public static NodeInstance createStarted(Network network, String mongoDbUri, String elasticsearchUri, SearchVersion elasticsearchVersion, int[] extraPorts,
-                                             List<Path> pluginJars, Path mavenProjectDir) {
+                                             List<Path> pluginJars, Path mavenProjectDir, Path projectBinDir) {
         NodeContainerConfig config = NodeContainerConfig.create(network, mongoDbUri, elasticsearchUri, elasticsearchVersion, extraPorts);
-        GenericContainer<?> container = NodeContainerFactory.buildContainer(config, pluginJars, mavenProjectDir);
+        GenericContainer<?> container = NodeContainerFactory.buildContainer(config, pluginJars, mavenProjectDir, projectBinDir);
         return new NodeInstance(container);
     }
 
