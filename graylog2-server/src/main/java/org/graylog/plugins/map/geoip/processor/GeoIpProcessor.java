@@ -111,7 +111,7 @@ public class GeoIpProcessor implements MessageProcessor {
         final GeoIpResolverConfig newConfig = clusterConfigService.getOrDefault(GeoIpResolverConfig.class,
                 GeoIpResolverConfig.defaultConfig());
 
-        LOG.info("Updating GeoIP resolver engine - {}", newConfig);
+        LOG.debug("Updating GeoIP resolver engine - {}", newConfig);
         filterEngine.set(new GeoIpResolverEngine(geoIpVendorResolverService, newConfig, metricRegistry));
     }
 }

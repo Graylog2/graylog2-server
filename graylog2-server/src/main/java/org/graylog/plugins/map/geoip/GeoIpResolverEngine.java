@@ -70,9 +70,9 @@ public class GeoIpResolverEngine {
         ipLocationResolver = resolverService.createCityResolver(config, resolveTime);
         ipAsnResolver = resolverService.createAsnResolver(config, resolveTime);
 
-        LOG.info("Created Geo IP Resolvers for '{}'", config.databaseVendorType());
-        LOG.info("'{}' Status Enabled: {}", ipLocationResolver.getClass().getSimpleName(), ipLocationResolver.isEnabled());
-        LOG.info("'{}' Status Enabled: {}", ipAsnResolver.getClass().getSimpleName(), ipAsnResolver.isEnabled());
+        LOG.debug("Created Geo IP Resolvers for '{}'", config.databaseVendorType());
+        LOG.debug("'{}' Status Enabled: {}", ipLocationResolver.getClass().getSimpleName(), ipLocationResolver.isEnabled());
+        LOG.debug("'{}' Status Enabled: {}", ipAsnResolver.getClass().getSimpleName(), ipAsnResolver.isEnabled());
 
         this.enabled = ipLocationResolver.isEnabled() || ipAsnResolver.isEnabled();
 
