@@ -128,7 +128,7 @@ public class SearchSyncIT {
 
     @ContainerMatrixTest
     void testRequestStoredSearch() throws ExecutionException, RetryException {
-        final String jobId = executeStoredSearch("61977043c1f17d26b45c8a0a");
+        final String jobId = executeStoredSearch("61977043c1f17d26b45c8a0b");
 
         retrieveSearchResults(jobId)
                 .body("execution.completed_exceptionally", equalTo(false))
@@ -137,7 +137,7 @@ public class SearchSyncIT {
 
     @ContainerMatrixTest
     void testRequestStoredSearchWithGlobalOverrideKeepingOnlySingleSearchType() throws ExecutionException, RetryException {
-        final String jobId = executeStoredSearch("61977043c1f17d26b45c8a0a", Collections.singletonMap(
+        final String jobId = executeStoredSearch("61977043c1f17d26b45c8a0b", Collections.singletonMap(
                 "global_override", Collections.singletonMap(
                         "keep_search_types", Collections.singleton("01c76680-377b-4930-86e2-a55fdb867b58")
                 )
