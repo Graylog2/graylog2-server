@@ -53,6 +53,7 @@ import org.graylog2.plugin.lookup.LookupDataAdapterConfiguration;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.security.PasswordAlgorithm;
 import org.graylog2.plugin.security.PluginPermissions;
+import org.graylog2.plugin.validate.ClusterConfigValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -501,5 +502,11 @@ public abstract class Graylog2Module extends AbstractModule {
                 new TypeLiteral<Class<?>>() {},
                 Names.named(SYSTEM_REST_RESOURCES)
         );
+    }
+
+    protected MapBinder<Class<?>, ClusterConfigValidator> clusterConfigMapBinder() {
+        TypeLiteral<Class<?>> keyType = new TypeLiteral<Class<?>>() {};
+        TypeLiteral<ClusterConfigValidator> valueType = new TypeLiteral<ClusterConfigValidator>() {};
+        return MapBinder.newMapBinder(binder(), keyType, valueType);
     }
 }

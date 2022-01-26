@@ -16,12 +16,11 @@
  */
 package org.graylog.plugins.map.config;
 
-import com.google.auto.value.AutoValue;
-
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
 
 @JsonAutoDetect
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -31,28 +30,40 @@ public abstract class GeoIpResolverConfig {
     @JsonProperty("enabled")
     public abstract boolean enabled();
 
-    @JsonProperty("db_type")
-    public abstract DatabaseType dbType();
+    @JsonProperty("enforce_graylog_schema")
+    public abstract boolean enforceGraylogSchema();
 
-    @JsonProperty("db_path")
-    public abstract String dbPath();
+    @JsonProperty("db_vendor_type")
+    public abstract DatabaseVendorType databaseVendorType();
+
+    @JsonProperty("city_db_path")
+    public abstract String cityDbPath();
+
+    @JsonProperty("asn_db_path")
+    public abstract String asnDbPath();
 
     @JsonCreator
-    public static GeoIpResolverConfig create(@JsonProperty("enabled") boolean enabled,
-                                             @JsonProperty("db_type") DatabaseType dbType,
-                                             @JsonProperty("db_path") String dbPath) {
+    public static GeoIpResolverConfig create(@JsonProperty("enabled") boolean cityEnabled,
+                                             @JsonProperty("enforce_graylog_schema") boolean enforceGraylogSchema,
+                                             @JsonProperty("db_vendor_type") DatabaseVendorType databaseVendorType,
+                                             @JsonProperty("city_db_path") String cityDbPath,
+                                             @JsonProperty("asn_db_path") String asnDbPath) {
         return builder()
-                .enabled(enabled)
-                .dbType(dbType)
-                .dbPath(dbPath)
+                .enabled(cityEnabled)
+                .enforceGraylogSchema(enforceGraylogSchema)
+                .databaseVendorType(databaseVendorType == null ? DatabaseVendorType.MAXMIND : databaseVendorType)
+                .cityDbPath(cityDbPath)
+                .asnDbPath(asnDbPath)
                 .build();
     }
 
     public static GeoIpResolverConfig defaultConfig() {
        return builder()
                .enabled(false)
-               .dbType(DatabaseType.MAXMIND_CITY)
-               .dbPath("/etc/graylog/server/GeoLite2-City.mmdb")
+               .databaseVendorType(DatabaseVendorType.MAXMIND)
+               .enforceGraylogSchema(false)
+               .cityDbPath("/etc/graylog/server/GeoLite2-City.mmdb")
+               .asnDbPath("/etc/graylog/server/GeoLite2-ASN.mmdb")
                .build();
     }
 
@@ -63,10 +74,16 @@ public abstract class GeoIpResolverConfig {
     public abstract Builder toBuilder();
 
     @AutoValue.Builder
-    public static abstract class Builder {
+    public abstract static class Builder {
         public abstract Builder enabled(boolean enabled);
-        public abstract Builder dbType(DatabaseType dbType);
-        public abstract Builder dbPath(String dbPath);
+
+        public abstract Builder enforceGraylogSchema(boolean enforce);
+
+        public abstract Builder databaseVendorType(DatabaseVendorType type);
+
+        public abstract Builder cityDbPath(String dbPath);
+
+        public abstract Builder asnDbPath(String asnDBPath);
 
         public abstract GeoIpResolverConfig build();
     }
