@@ -55,7 +55,7 @@ function pluginMenuItemExists(description: string): boolean {
 
   if (!pluginExports) return false;
 
-  return !pluginExports.find((value) => value.description?.toLowerCase() === description.toLowerCase());
+  return !!pluginExports.find((value) => value.description?.toLowerCase() === description.toLowerCase());
 }
 
 const formatSinglePluginRoute = ({ description, path, permissions }, topLevel = false) => {
@@ -98,8 +98,8 @@ const Navigation = React.memo(({ pathname }: Props) => {
 
   const pluginExports = PluginStore.exports('navigation');
 
-  const enterpriseMenuIsMissing = pluginMenuItemExists(ENTERPRISE_ROUTE_DESCRIPTION);
-  const securityMenuIsMissing = pluginMenuItemExists(SECURITY_ROUTE_DESCRIPTION);
+  const enterpriseMenuIsMissing = !pluginMenuItemExists(ENTERPRISE_ROUTE_DESCRIPTION);
+  const securityMenuIsMissing = !pluginMenuItemExists(SECURITY_ROUTE_DESCRIPTION);
 
   const isPermittedToEnterpriseOrSecurity = isPermitted(permissions, ['licenseinfos:read']);
 
@@ -107,7 +107,7 @@ const Navigation = React.memo(({ pathname }: Props) => {
     // no enterprise plugin menu, so we will add one
     pluginExports.push({
       path: Routes.SYSTEM.ENTERPRISE,
-      description: 'Enterprise',
+      description: ENTERPRISE_ROUTE_DESCRIPTION,
     });
   }
 
@@ -115,7 +115,7 @@ const Navigation = React.memo(({ pathname }: Props) => {
     // no security plugin menu, so we will add one
     pluginExports.push({
       path: Routes.SECURITY,
-      description: 'Analyst Tools',
+      description: SECURITY_ROUTE_DESCRIPTION,
     });
   }
 

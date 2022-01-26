@@ -60,7 +60,7 @@ const Routes = {
       show: (notificationId: string) => `/alerts/notifications/${notificationId}`,
     },
   },
-  SECURITY: '/promo/security',
+  SECURITY: '/security',
   SOURCES: '/sources',
   DASHBOARDS: '/dashboards',
   GETTING_STARTED: '/gettingstarted',
