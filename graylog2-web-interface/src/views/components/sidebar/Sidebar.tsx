@@ -33,7 +33,7 @@ import sidebarSections from './sidebarSections';
 import CustomPropTypes from '../CustomPropTypes';
 
 type Props = {
-  children: React.ReactNode,
+  children: React.ReactElement,
   queryId: string,
   results: QueryResult,
   searchPageLayout?: SearchPageLayout,
@@ -133,9 +133,9 @@ Sidebar.defaultProps = {
   searchPageLayout: undefined,
 };
 
-const SidebarWithContext = (props: React.ComponentProps<typeof Sidebar>) => (
+const SidebarWithContext = ({ children, ...props }: React.ComponentProps<typeof Sidebar>) => (
   <SearchPageLayoutContext.Consumer>
-    {(searchPageLayout) => <Sidebar {...props} searchPageLayout={searchPageLayout} />}
+    {(searchPageLayout) => <Sidebar {...props} searchPageLayout={searchPageLayout}>{children}</Sidebar>}
   </SearchPageLayoutContext.Consumer>
 );
 

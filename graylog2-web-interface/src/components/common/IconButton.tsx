@@ -20,6 +20,7 @@ import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
 
 import Icon from 'components/common/Icon';
+import type { IconName } from 'components/common/Icon';
 
 const Wrapper = styled.button(({ theme, disabled }: {theme: DefaultTheme, disabled: boolean}) => css`
   display: inline-flex;
@@ -47,7 +48,7 @@ type Props = {
   title: string,
   onClick?: () => void,
   className?: string,
-  name: string,
+  name: IconName,
   disabled?: boolean,
 };
 

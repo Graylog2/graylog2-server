@@ -22,6 +22,7 @@ import { Button } from 'components/bootstrap';
 import { Icon } from 'components/common';
 import { SearchActions } from 'views/stores/SearchStore';
 import QueryValidationActions from 'views/actions/QueryValidationActions';
+import type { IconName } from 'components/common/Icon';
 
 const StyledButton = styled(Button)`
   margin-right: 12px;
@@ -45,7 +46,7 @@ const DirtyButton = styled(StyledButton)(({ theme }) => css`
 
 type Props = {
   disabled: boolean,
-  glyph: string,
+  glyph: IconName,
   dirty: boolean,
 };
 
@@ -62,7 +63,7 @@ const onButtonClick = (e: MouseEvent, disabled: Boolean, onClick?: () => void) =
   }
 };
 
-const DirtySearchButton = ({ glyph, className, disabled }: { disabled: boolean, glyph: string, className: string }) => (
+const DirtySearchButton = ({ glyph, className, disabled }: { disabled: boolean, glyph: IconName, className: string }) => (
   <DirtyButton type="submit"
                bsStyle="success"
                onClick={(e) => onButtonClick(e, disabled)}
@@ -72,7 +73,7 @@ const DirtySearchButton = ({ glyph, className, disabled }: { disabled: boolean, 
   </DirtyButton>
 );
 
-const CleanSearchButton = ({ disabled, glyph, className }: { disabled: boolean, glyph: string, className: string }) => (
+const CleanSearchButton = ({ disabled, glyph, className }: { disabled: boolean, glyph: IconName, className: string }) => (
   <StyledButton bsStyle="success"
                 onClick={(e) => onButtonClick(e, disabled, SearchActions.refresh)}
                 title="Perform search"

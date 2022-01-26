@@ -15,8 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 import { find } from 'lodash';
+import type { IconName } from '@fortawesome/fontawesome-common-types';
+import type { SizeProp } from '@fortawesome/fontawesome-svg-core';
 
 import deprecationNotice from 'util/deprecationNotice';
 import loadAsync from 'routing/loadAsync';
@@ -25,9 +26,11 @@ import compareIconNames from './icon-fallback';
 
 const CustomFontAwesomeIcon = loadAsync(() => import('./CustomFontAwesomeIcon'));
 
-const removeFaPrefix = (name) => name.replace(/^fa-/, ''); // remove "fa-" prefix if it exists
+type IconTypes = 'brand' | 'regular' | 'solid';
 
-const updateLegacyName = (icon) => {
+const removeFaPrefix = (name: string) => name.replace(/^fa-/, ''); // remove "fa-" prefix if it exists
+
+const updateLegacyName = (icon: string) => {
   const v4icon = find(compareIconNames, { v4: icon });
   const iconName = (v4icon && v4icon.v5) || icon;
 
@@ -38,7 +41,7 @@ const updateLegacyName = (icon) => {
   return iconName;
 };
 
-const cleanIconName = (name, type) => {
+const cleanIconName = (name: string, type: IconTypes) => {
   const iconName = removeFaPrefix(name);
 
   if (type !== 'brand') {
@@ -48,7 +51,7 @@ const cleanIconName = (name, type) => {
   return iconName;
 };
 
-const getPrefixForType = (type) => {
+const getPrefixForType = (type: IconTypes) => {
   switch (type) {
     case 'brand':
       return 'fab';
@@ -60,6 +63,24 @@ const getPrefixForType = (type) => {
   }
 };
 
+type Props = {
+  className?: string,
+  'data-testid'?: string,
+  /** Name of Font Awesome 5 Icon without `fa-` prefix */
+  name: IconName,
+  size?: SizeProp,
+  spin?: boolean,
+  /**
+   * Name of icon type, the brand type is needed for all brand icons.
+   * The type regular is needed to outlined icon.
+   * Not all icons can be outlined.
+   * */
+  type?: IconTypes,
+  fixedWidth?: boolean,
+  inverse?: boolean,
+  style?: React.CSSProperties
+}
+
 /**
  * Component that renders an icon or glyph.
  * Uses Font Awesome 5 : https://fontawesome.com/icons
@@ -68,28 +89,32 @@ const getPrefixForType = (type) => {
  * Visit [React FontAwesome Features](https://github.com/FortAwesome/react-fontawesome#features) for more information.
  */
 
-const Icon = ({ name, type, ...props }) => {
+const Icon = ({ name, type, size, className, spin, fixedWidth, inverse, style, 'data-testid': testId }: Props) => {
   const iconName = cleanIconName(name, type);
   const prefix = getPrefixForType(type);
 
   return (
-    <CustomFontAwesomeIcon {...props} icon={{ prefix, iconName }} />
+    <CustomFontAwesomeIcon className={className}
+                           data-testid={testId}
+                           fixedWidth={fixedWidth}
+                           icon={{ prefix, iconName }}
+                           inverse={inverse}
+                           size={size}
+                           spin={spin}
+                           style={style} />
   );
 };
 
-Icon.propTypes = {
-  /** Name of Font Awesome 5 Icon without `fa-` prefix */
-  name: PropTypes.string.isRequired,
-  /**
-   * Name of icon type, the brand type is needed for all brand icons.
-   * The type regular is needed to outlined icon.
-   * Not all icons can be outlined.
-   * */
-  type: PropTypes.oneOf(['brand', 'solid', 'regular']),
-};
-
 Icon.defaultProps = {
+  className: undefined,
+  'data-testid': undefined,
+  fixedWidth: false,
+  inverse: false,
+  size: undefined,
+  spin: false,
+  style: undefined,
   type: 'solid',
 };
 
+export type { IconName };
 export default Icon;
