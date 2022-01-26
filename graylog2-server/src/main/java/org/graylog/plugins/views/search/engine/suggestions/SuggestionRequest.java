@@ -17,6 +17,7 @@
 package org.graylog.plugins.views.search.engine.suggestions;
 
 import com.google.auto.value.AutoValue;
+import org.graylog.plugins.views.search.rest.FieldTypesForStreamsRequest;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import java.util.Set;
@@ -28,6 +29,7 @@ public abstract class SuggestionRequest {
     public abstract String input();
     public abstract TimeRange timerange();
     public abstract Set<String> streams();
+    public abstract int size();
 
     public static Builder builder() {
         return new AutoValue_SuggestionRequest.Builder();
@@ -41,11 +43,14 @@ public abstract class SuggestionRequest {
         public abstract SuggestionRequest.Builder input(String input);
         public abstract SuggestionRequest.Builder streams(Set<String> streams);
         public abstract SuggestionRequest.Builder timerange(TimeRange timerange);
+        public abstract SuggestionRequest.Builder size(int size);
 
         public abstract SuggestionRequest build();
 
         public static SuggestionRequest.Builder builder() {
             return new AutoValue_SuggestionRequest.Builder();
         }
+
+
     }
 }

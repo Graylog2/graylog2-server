@@ -33,12 +33,16 @@ public abstract class SuggestionsRequestDTO {
 
     private static final String FIELD_STREAMS = "streams";
     private static final String FIELD_TIMERANGE = "timerange";
+    public static final int DEFAULT_SUGGESTIONS_COUNT = 10;
 
     @JsonProperty
     public abstract String field();
 
     @JsonProperty
     public abstract String input();
+
+    @JsonProperty
+    public abstract int size();
 
     @Nullable
     @JsonProperty(FIELD_TIMERANGE)
@@ -57,18 +61,21 @@ public abstract class SuggestionsRequestDTO {
         @JsonProperty
         public abstract SuggestionsRequestDTO.Builder input(String input);
 
-
         @JsonProperty(FIELD_STREAMS)
         public abstract SuggestionsRequestDTO.Builder streams(@Nullable Set<String> streams);
 
         @JsonProperty(FIELD_TIMERANGE)
         public abstract SuggestionsRequestDTO.Builder timerange(@Nullable TimeRange timerange);
 
+        @JsonProperty
+        public abstract SuggestionsRequestDTO.Builder size(int size);
+
         public abstract SuggestionsRequestDTO build();
 
         @JsonCreator
         public static SuggestionsRequestDTO.Builder builder() {
-            return new AutoValue_SuggestionsRequestDTO.Builder();
+            return new AutoValue_SuggestionsRequestDTO.Builder()
+                    .size(DEFAULT_SUGGESTIONS_COUNT);
         }
     }
 }
