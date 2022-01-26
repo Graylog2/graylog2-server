@@ -14,29 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { createContext } from 'react';
-import PropTypes from 'prop-types';
 
-type Props = {
-  children: React.ReactElement,
-  limitDuration: number,
-}
+import { useContext } from 'react';
 
-export const DateTimeContext = createContext({ limitDuration: 0 });
+import UserDateTimeContext from 'contexts/UserDateTimeContext';
 
-const DateTimeProvider = ({ children, limitDuration }: Props) => {
-  return (
-    <DateTimeContext.Provider value={{
-      limitDuration,
-    }}>
-      {children}
-    </DateTimeContext.Provider>
-  );
+const useUserDateTime = () => {
+  const userDateTime = useContext(UserDateTimeContext);
+
+  if (!userDateTime) {
+    throw new Error('useUserDateTime hook needs to be used inside UserDateTimeContext.Provider');
+  }
+
+  return userDateTime;
 };
 
-DateTimeProvider.propTypes = {
-  children: PropTypes.node.isRequired,
-  limitDuration: PropTypes.number.isRequired,
-};
-
-export default DateTimeProvider;
+export default useUserDateTime;

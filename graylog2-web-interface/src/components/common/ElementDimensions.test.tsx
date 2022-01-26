@@ -15,13 +15,18 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { render } from 'wrappedTestingLibrary';
 
-import { singleton } from 'logic/singleton';
+import ElementDimensions from './ElementDimensions';
 
-export type TimeLocalizeContextType = {
-  localizeTime: (string) => string,
-};
+jest.mock('hooks/useElementDimensions', () => jest.fn(() => ({ width: 1024, height: 768 })));
 
-const TimeLocalizeContext = React.createContext<TimeLocalizeContextType | undefined>(undefined);
+describe('ElementDimensions', () => {
+  it('should provide width and height', () => {
+    const childrenMock = jest.fn();
+    render(<ElementDimensions>{childrenMock}</ElementDimensions>);
 
-export default singleton('contexts.TimeLocalizeContext', () => TimeLocalizeContext);
+    expect(childrenMock).toHaveBeenCalledTimes(1);
+    expect(childrenMock).toHaveBeenCalledWith({ width: 1024, height: 768 });
+  });
+});

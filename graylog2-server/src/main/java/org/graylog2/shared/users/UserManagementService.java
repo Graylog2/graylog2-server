@@ -37,7 +37,7 @@ public interface UserManagementService extends UserService {
      * Additional method allows explicit update operations to be carried out
      * (as opposed to calling .save)
      */
-    String update(User user) throws ValidationException;
+    String update(User user, ChangeUserRequest cr) throws ValidationException;
 
     void setUserStatus(User user, User.AccountStatus status) throws ValidationException;
 

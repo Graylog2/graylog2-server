@@ -33,17 +33,17 @@ class DetectedSearchVersionValidatorTest {
 
     @Test
     void validateMajorVersion() {
-        assertDoesNotThrow(() -> validator.validate("OS1", SearchVersion.create(OPENSEARCH, Version.from(1, 0, 0))));
-        assertDoesNotThrow(() -> validator.validate("ES7", SearchVersion.create(ELASTICSEARCH, Version.from(7, 0, 0))));
+        assertDoesNotThrow(() -> validator.validate("OS1", SearchVersion.create(OPENSEARCH, com.github.zafarkhaja.semver.Version.forIntegers(1, 0, 0))));
+        assertDoesNotThrow(() -> validator.validate("ES7", SearchVersion.create(ELASTICSEARCH, com.github.zafarkhaja.semver.Version.forIntegers(7, 0, 0))));
     }
 
     @Test
     void testPatchVersion() {
-        assertDoesNotThrow(() -> validator.validate("ES7", SearchVersion.create(ELASTICSEARCH, Version.from(7, 10, 2))));
+        assertDoesNotThrow(() -> validator.validate("ES7", SearchVersion.create(ELASTICSEARCH, com.github.zafarkhaja.semver.Version.forIntegers(7, 10, 2))));
     }
 
     @Test
     void testInvalidCombination() {
-        assertThrows(ValidationException.class, () -> validator.validate("ES5", SearchVersion.create(ELASTICSEARCH, Version.from(5, 0, 0))));
+        assertThrows(ValidationException.class, () -> validator.validate("ES5", SearchVersion.create(ELASTICSEARCH, com.github.zafarkhaja.semver.Version.forIntegers(5, 0, 0))));
     }
 }

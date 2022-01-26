@@ -19,7 +19,6 @@ package org.graylog.plugins.views.search;
 import com.codahale.metrics.json.MetricsModule;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -35,6 +34,8 @@ import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.filter.StreamFilter;
+import org.graylog.plugins.views.search.rest.ExecutionStateGlobalOverride;
+import org.graylog.plugins.views.search.rest.SearchTypeExecutionState;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog2.database.ObjectIdSerializer;
 import org.graylog2.jackson.JodaTimePeriodKeyDeserializer;
@@ -48,7 +49,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -101,15 +101,14 @@ public class QueryTest {
                 .query(ElasticsearchQueryString.of("*"))
                 .searchTypes(ImmutableSet.of(MessageList.builder().id(messageListId).build()))
                 .build();
-        Map<String, Object> executionState = of(
-                "timerange", of("type", RelativeRange.RELATIVE, "range", "60"),
-                "search_types", of(
-                        messageListId,
-                        of("type", MessageList.NAME, "id", messageListId, "offset", 150, "limit", 300)
-                )
-        );
 
-        final Query mergedQuery = query.applyExecutionState(objectMapper, objectMapper.convertValue(executionState, JsonNode.class));
+
+        ExecutionStateGlobalOverride.Builder executionState = ExecutionStateGlobalOverride.builder();
+
+        executionState.timerange(RelativeRange.create(60));
+        executionState.searchTypesBuilder().put(messageListId,  SearchTypeExecutionState.builder().offset(150).limit(300).build());
+
+        final Query mergedQuery = query.applyExecutionState(executionState.build());
         assertThat(mergedQuery)
                 .isNotEqualTo(query)
                 .extracting(Query::timerange).extracting("range").containsExactly(60);
@@ -122,33 +121,42 @@ public class QueryTest {
     }
 
     @Test
-    public void appliesExecutionStateTimeRangeToGlobalOverride() {
-        Map<String, Object> executionState = of(
-                "timerange", of("type", RelativeRange.RELATIVE, "range", "60")
-        );
+    public void appliesExecutionStateTimeRangeToGlobalOverride() throws InvalidRangeParametersException {
+
+
+        final ExecutionStateGlobalOverride executionState = ExecutionStateGlobalOverride.builder()
+                .timerange(RelativeRange.create(60))
+                .build();
+
+
         Query sut = validQueryBuilder().build();
-        Query query = sut.applyExecutionState(objectMapper, objectMapper.convertValue(executionState, JsonNode.class));
+        Query query = sut.applyExecutionState(executionState);
         assertThat(query.globalOverride()).hasValueSatisfying(go ->
                 assertThat(go.timerange()).contains(relativeRange(60)));
     }
     @Test
     public void appliesExecutionStateQueryToGlobalOverride() {
-        Map<String, Object> executionState = of(
-                "query", of("type", ElasticsearchQueryString.NAME, "query_string", "NACKEN")
-        );
+
+        final ExecutionStateGlobalOverride executionState = ExecutionStateGlobalOverride.builder()
+                .query(ElasticsearchQueryString.of("NACKEN"))
+                .build();
+
         Query sut = validQueryBuilder().build();
-        Query query = sut.applyExecutionState(objectMapper, objectMapper.convertValue(executionState, JsonNode.class));
+        Query query = sut.applyExecutionState(executionState);
         assertThat(query.globalOverride()).hasValueSatisfying(go ->
                 assertThat(go.query()).contains(ElasticsearchQueryString.of("NACKEN")));
     }
     @Test
-    public void appliesExecutionStateTimeRangeAndQueryToGlobalOverrideIfBothArePresent() {
-        Map<String, Object> executionState = of(
-                "timerange", of("type", RelativeRange.RELATIVE, "range", "60"),
-                "query", of("type", ElasticsearchQueryString.NAME, "query_string", "NACKEN")
-        );
+    public void appliesExecutionStateTimeRangeAndQueryToGlobalOverrideIfBothArePresent() throws InvalidRangeParametersException {
+
+        final ExecutionStateGlobalOverride executionState = ExecutionStateGlobalOverride.builder()
+                .timerange(RelativeRange.create(60))
+                .query(ElasticsearchQueryString.of("NACKEN"))
+                .build();
+
+
         Query sut = validQueryBuilder().build();
-        Query query = sut.applyExecutionState(objectMapper, objectMapper.convertValue(executionState, JsonNode.class));
+        Query query = sut.applyExecutionState(executionState);
         assertThat(query.globalOverride()).hasValueSatisfying(go -> {
             assertThat(go.timerange()).contains(relativeRange(60));
             assertThat(go.query()).contains(ElasticsearchQueryString.of("NACKEN"));
@@ -156,14 +164,13 @@ public class QueryTest {
     }
     @Test
     public void doesNotAddGlobalOverrideIfNeitherTimeRangeNorQueryArePresent() {
-        Map<String, Object> executionState = of(
-                "search_types", of(
-                        "some-id",
-                        of("type", MessageList.NAME, "id", "some-id", "offset", 150, "limit", 300)
-                )
-        );
+
+        final ExecutionStateGlobalOverride.Builder executionState = ExecutionStateGlobalOverride.builder();
+        executionState.searchTypesBuilder().put("some-id",
+                SearchTypeExecutionState.builder().offset(150).limit(300).build());
+
         Query sut = validQueryBuilder().build();
-        Query query = sut.applyExecutionState(objectMapper, objectMapper.convertValue(executionState, JsonNode.class));
+        Query query = sut.applyExecutionState(executionState.build());
         assertThat(query.globalOverride()).isEmpty();
     }
 

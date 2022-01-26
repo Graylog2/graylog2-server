@@ -30,8 +30,8 @@ public class Position {
 
     @JsonCreator
     public static Position fromJson(Object value) {
-        if (value instanceof Integer) {
-            return fromInt((int)value);
+        if (value instanceof Number && !value.equals(Infinity.value)) {
+            return fromInt(((Number) value).intValue());
         }
         if (value instanceof Double && value.equals(Infinity.value)) {
             return infinity();

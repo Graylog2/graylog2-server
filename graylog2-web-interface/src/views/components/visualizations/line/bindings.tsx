@@ -25,7 +25,7 @@ type LineVisualizationConfigFormValues = {
 
 const validate = hasAtLeastOneMetric('Line chart');
 
-const lineChart: VisualizationType<LineVisualizationConfig, LineVisualizationConfigFormValues> = {
+const lineChart: VisualizationType<typeof LineVisualization.type, LineVisualizationConfig, LineVisualizationConfigFormValues> = {
   type: LineVisualization.type,
   displayName: 'Line Chart',
   component: LineVisualization,

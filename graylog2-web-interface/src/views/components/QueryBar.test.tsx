@@ -23,9 +23,7 @@ import QueryBar from 'views/components/QueryBar';
 import { ViewActions } from 'views/stores/ViewStore';
 import DashboardPageContext from 'views/components/contexts/DashboardPageContext';
 
-jest.mock('react-sizeme', () => ({
-  SizeMe: ({ children: fn }) => fn({ size: { width: 1024, height: 768 } }),
-}));
+jest.mock('hooks/useElementDimensions', () => () => ({ width: 1024, height: 768 }));
 
 jest.mock('views/stores/ViewStore', () => ({
   ViewActions: {

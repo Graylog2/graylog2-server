@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useMemo, useRef } from 'react';
+import { useCallback, useMemo } from 'react';
 import type { DefaultTheme } from 'styled-components';
 import { withTheme } from 'styled-components';
 import PropTypes from 'prop-types';
@@ -27,7 +27,6 @@ import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import QueryValidationActions from 'views/actions/QueryValidationActions';
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 
-import type ReactAce from './queryinput/ace';
 import type { AutoCompleter, Editor } from './ace-types';
 import StyledAceEditor from './queryinput/StyledAceEditor';
 import SearchBarAutoCompletions from './SearchBarAutocompletions';
@@ -43,7 +42,6 @@ type Props = {
   completers: Array<Completer>,
   disabled?: boolean,
   error?: QueryValidationState,
-  height?: number,
   onBlur?: (query: string) => void,
   onChange: (query: string) => Promise<string>,
   onExecute: (query: string) => void,
@@ -75,28 +73,26 @@ const handleExecution = (editor: Editor, onExecute: (query: string) => void, val
   onExecute(value);
 };
 
-const _configureEditor = (editor, completer: AutoCompleter, configuredListeners: React.MutableRefObject<boolean>) => {
+const _configureEditor = (editor, completer: AutoCompleter) => {
   if (editor) {
     editor.commands.removeCommands(['find', 'indent', 'outdent']);
     // eslint-disable-next-line no-param-reassign
     editor.completers = [completer];
 
-    if (!configuredListeners.current) {
-      editor.session.on('tokenizerUpdate', (input, { bgTokenizer: { currentLine, lines } }) => {
-        if (completer.shouldShowCompletions(currentLine, lines)) {
-          editor.execCommand('startAutocomplete');
-        }
-      });
+    editor.session.on('tokenizerUpdate', (input, { bgTokenizer: { currentLine, lines } }) => {
+      if (completer.shouldShowCompletions(currentLine, lines)) {
+        editor.execCommand('startAutocomplete');
+      }
+    });
 
-      // eslint-disable-next-line no-param-reassign
-      configuredListeners.current = true;
-    }
+    editor.renderer.setScrollMargin(6, 5);
+    editor.renderer.setPadding(12);
   }
 };
 
 const getMarkers = (errors: QueryValidationState | undefined, warnings: QueryValidationState | undefined) => {
   const markerClassName = 'ace_marker';
-  const createMarkers = (explanations = [], className) => explanations.map(({
+  const createMarkers = (explanations = [], className = '') => explanations.map(({
     beginLine,
     beginColumn,
     endLine,
@@ -122,7 +118,6 @@ const QueryInput = ({
   completers,
   disabled,
   error,
-  height,
   onBlur,
   onChange,
   onExecute,
@@ -134,52 +129,48 @@ const QueryInput = ({
   warning,
 }: Props) => {
   const completer = useMemo(() => completerFactory(completers, timeRange, streams), [completerFactory, completers, timeRange, streams]);
-  const configuredListeners = useRef<boolean>(false);
-  const configureEditor = useCallback((node: ReactAce) => _configureEditor(node?.editor, completer, configuredListeners), [completer]);
+  const configureEditor = useCallback((editor: Editor) => _configureEditor(editor, completer), [completer]);
   const _onExecute = useCallback((editor: Editor) => handleExecution(editor, onExecute, value, error), [onExecute, value, error]);
   const markers = useMemo(() => getMarkers(error, warning), [error, warning]);
 
   return (
-    <div className={`query ${className}`} style={{ display: 'flex' }} data-testid="query-input">
-      <UserPreferencesContext.Consumer>
-        {({ enableSmartSearch = true }) => (
-          <StyledAceEditor mode="lucene"
-                           disabled={disabled}
-                           aceTheme="ace-queryinput" // NOTE: is usually just `theme` but we need that prop for styled-components
-                           ref={configureEditor}
-                           readOnly={disabled}
-                           onBlur={onBlur}
-                           commands={[{
-                             name: 'Execute',
-                             bindKey: 'Enter',
-                             exec: _onExecute,
-                           },
-                           {
-                             name: 'SuppressShiftEnter',
-                             bindKey: 'Shift-Enter',
-                             exec: () => {},
-                           }]}
-                           onChange={onChange}
-                           value={value}
-                           name="QueryEditor"
-                           showGutter={false}
-                           showPrintMargin={false}
-                           highlightActiveLine={false}
-                           minLines={1}
-                           maxLines={1}
-                           enableBasicAutocompletion={enableSmartSearch}
-                           enableLiveAutocompletion={enableSmartSearch}
-                           editorProps={{
-                             $blockScrolling: Infinity,
-                             selectionStyle: 'line',
-                           }}
-                           fontSize={theme.fonts.size.large}
-                           placeholder={placeholder}
-                           $height={height}
-                           markers={markers} />
-        )}
-      </UserPreferencesContext.Consumer>
-    </div>
+    <UserPreferencesContext.Consumer>
+      {({ enableSmartSearch = true }) => (
+        <StyledAceEditor mode="lucene"
+                         disabled={disabled}
+                         className={className}
+                         aceTheme="ace-queryinput" // NOTE: is usually just `theme` but we need that prop for styled-components
+                         onLoad={configureEditor}
+                         readOnly={disabled}
+                         onBlur={onBlur}
+                         commands={[{
+                           name: 'Execute',
+                           bindKey: 'Enter',
+                           exec: _onExecute,
+                         }]}
+                         onChange={onChange}
+                         value={value}
+                         name="QueryEditor"
+                         showGutter={false}
+                         showPrintMargin={false}
+                         highlightActiveLine={false}
+                         minLines={1}
+                         maxLines={4}
+                         enableBasicAutocompletion={enableSmartSearch}
+                         enableLiveAutocompletion={enableSmartSearch}
+                         editorProps={{
+                           $blockScrolling: Infinity,
+                           selectionStyle: 'line',
+                         }}
+                         setOptions={{
+                           indentedSoftWrap: false,
+                         }}
+                         fontSize={theme.fonts.size.large}
+                         placeholder={placeholder}
+                         markers={markers}
+                         wrapEnabled />
+      )}
+    </UserPreferencesContext.Consumer>
   );
 };
 
@@ -189,7 +180,6 @@ QueryInput.propTypes = {
   completers: PropTypes.array,
   disabled: PropTypes.bool,
   error: PropTypes.object,
-  height: PropTypes.number,
   onBlur: PropTypes.func,
   onChange: PropTypes.func.isRequired,
   onExecute: PropTypes.func.isRequired,
@@ -207,7 +197,6 @@ QueryInput.defaultProps = {
   completers: [],
   disabled: false,
   error: undefined,
-  height: undefined,
   onBlur: () => {},
   placeholder: '',
   streams: undefined,

@@ -76,7 +76,7 @@ const UnknownWidget: React.ComponentType<WidgetComponentProps & EditWidgetCompon
       </Row>
       <Row>
         Either way, you can copy the widget&rsquo;s config to the
-        clipboard: <ClipboardButton title={<Icon name="copy" bsSize="sm" />} text={JSON.stringify(config, null, 2)} bsSize="xsmall" />
+        clipboard: <ClipboardButton title={<Icon name="copy" size="sm" />} text={JSON.stringify(config, null, 2)} bsSize="xsmall" />
       </Row>
     </Description>
   </Container>

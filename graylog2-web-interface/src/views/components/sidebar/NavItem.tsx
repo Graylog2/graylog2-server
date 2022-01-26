@@ -18,12 +18,13 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
-import { Icon } from 'components/common';
+import Icon from 'components/common/Icon';
+import type { IconName } from 'components/common/Icon';
 
 type Props = {
   isSelected: boolean,
   title: string,
-  icon: string,
+  icon: IconName,
   onClick: () => void,
   showTitleOnHover: boolean,
   sidebarIsPinned: boolean,

@@ -25,7 +25,7 @@ type NumberVisualizationConfigFormValues = {
   trend_preference: 'LOWER' | 'NEUTRAL' | 'HIGHER',
 };
 
-const singleNumber: VisualizationType<NumberVisualizationConfig, NumberVisualizationConfigFormValues> = {
+const singleNumber: VisualizationType<typeof NumberVisualization.type, NumberVisualizationConfig, NumberVisualizationConfigFormValues> = {
   type: NumberVisualization.type,
   displayName: 'Single Number',
   component: NumberVisualization,

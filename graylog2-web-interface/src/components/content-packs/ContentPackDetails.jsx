@@ -16,7 +16,7 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
-import marked from 'marked';
+import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 
 import { Col, Row, Well } from 'components/bootstrap';

@@ -22,7 +22,8 @@ import MessagesWidgetConfig, { defaultSortDirection } from 'views/logic/widgets/
 import Direction from 'views/logic/aggregationbuilder/Direction';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import CustomPropTypes from 'views/components/CustomPropTypes';
-import { Icon } from 'components/common';
+import type { IconName } from 'components/common/Icon';
+import Icon from 'components/common/Icon';
 
 type Props = {
   config: MessagesWidgetConfig,
@@ -33,7 +34,7 @@ type Props = {
 
 type DirectionStrategy = {
   handleSortChange: (changeSort: (direction: Direction) => void) => void,
-  icon: string,
+  icon: IconName,
   sortActive: boolean,
   tooltip: (fieldName: string) => string,
 };

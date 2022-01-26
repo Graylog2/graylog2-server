@@ -88,7 +88,7 @@ public class OpensearchInstance extends SearchServerInstance {
     }
 
     private static String imageNameFrom(SearchVersion version) {
-        return String.format(Locale.ROOT, "opensearchproject/opensearch:%s", version.version().getVersion());
+        return String.format(Locale.ROOT, "opensearchproject/opensearch:%s", version.version());
     }
 
     @Override

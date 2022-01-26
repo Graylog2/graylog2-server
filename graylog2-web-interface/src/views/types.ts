@@ -39,7 +39,6 @@ import type {
 } from 'views/components/aggregationwizard';
 import type VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 import type { TimeRange } from 'views/logic/queries/Query';
-import type { CopyWidgetToDashboardHook } from 'views/logic/views/CopyWidgetToDashboard';
 import type View from 'views/logic/views/View';
 import type User from 'logic/users/User';
 import type { Message } from 'views/components/messagelist/Types';
@@ -47,7 +46,7 @@ import type { ValuePath } from 'views/logic/valueactions/ValueActionHandler';
 import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import type MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 
-type BackendWidgetPosition = {
+export type BackendWidgetPosition = {
   id: string,
   col: number,
   row: number,
@@ -55,9 +54,9 @@ type BackendWidgetPosition = {
   width: number,
 };
 
-type WidgetPositions = { [widgetId: string]: WidgetPosition };
+export type WidgetPositions = { [widgetId: string]: WidgetPosition };
 
-interface EditWidgetComponentProps<Config extends WidgetConfig = WidgetConfig> {
+export interface EditWidgetComponentProps<Config extends WidgetConfig = WidgetConfig> {
   children: React.ReactNode,
   config: Config,
   editing: boolean;
@@ -67,11 +66,11 @@ interface EditWidgetComponentProps<Config extends WidgetConfig = WidgetConfig> {
   onChange: (newConfig: Config) => void,
 }
 
-interface WidgetResults {
+export interface WidgetResults {
  [key: string]: Result,
 }
 
-interface WidgetComponentProps<Config extends WidgetConfig = WidgetConfig, Results = WidgetResults> {
+export interface WidgetComponentProps<Config extends WidgetConfig = WidgetConfig, Results = WidgetResults> {
   config: Config;
   data: Results;
   editing: boolean;
@@ -101,12 +100,12 @@ export interface WidgetExport {
   exportComponent?: React.ComponentType<{ widget: Widget }>;
 }
 
-interface VisualizationConfigProps {
+export interface VisualizationConfigProps {
   config: WidgetConfig;
   onChange: (newConfig: WidgetConfig) => void;
 }
 
-interface VisualizationConfigType {
+export interface VisualizationConfigType {
   type: string;
   component: React.ComponentType<VisualizationConfigProps>;
 }
@@ -137,7 +136,7 @@ export type NumericField = BaseRequiredField & {
   step?: string,
 };
 
-type ConfigurationField = SelectField | BooleanField | NumericField;
+export type ConfigurationField = SelectField | BooleanField | NumericField;
 
 export interface VisualizationCapabilities {
   'event-annotations': undefined,
@@ -145,10 +144,10 @@ export interface VisualizationCapabilities {
 
 export type VisualizationCapability = keyof VisualizationCapabilities;
 
-interface VisualizationType<ConfigType extends VisualizationConfig = VisualizationConfig, ConfigFormValuesType extends VisualizationConfigFormValues = VisualizationConfigFormValues> {
+export interface VisualizationType<Type extends string, ConfigType extends VisualizationConfig = VisualizationConfig, ConfigFormValuesType extends VisualizationConfigFormValues = VisualizationConfigFormValues> {
   type: string;
   displayName: string;
-  component: VisualizationComponent;
+  component: VisualizationComponent<Type>;
   config?: VisualizationConfigDefinition<ConfigType, ConfigFormValuesType>;
   capabilities?: Array<VisualizationCapability>;
   validate?: (formValues: WidgetConfigFormValues) => FormikErrors<VisualizationFormValues>;
@@ -157,9 +156,10 @@ interface VisualizationType<ConfigType extends VisualizationConfig = Visualizati
 interface ResultHandler<T, R> {
   convert: (result: T) => R;
 }
-interface SearchType {
+
+interface SearchType<T, R> {
   type: string;
-  handler: ResultHandler;
+  handler: ResultHandler<T, R>;
   defaults: {};
 }
 
@@ -171,7 +171,7 @@ interface ExportFormat {
   fileExtension: string;
 }
 
-interface SystemConfiguration {
+export interface SystemConfiguration {
   configType: string;
   component: React.ComponentType<{
     config: any,
@@ -224,6 +224,16 @@ type MessageDetailContextProviderProps = {
   message: Message,
 }
 
+export type CopyWidgetToDashboardHook = (widgetId: string, search: View, dashboard: View) => View;
+
+type RemovingWidgetHook = (widgetId: string, dashboardId: string) => boolean;
+
+interface MessageRowOverrideProps {
+  messageFields: Message['fields'],
+  config: MessagesWidgetConfig,
+  renderMessageRow: () => React.ReactNode,
+}
+
 declare module 'graylog-web-plugin/plugin' {
   export interface PluginExports {
     creators?: Array<Creator>;
@@ -231,7 +241,7 @@ declare module 'graylog-web-plugin/plugin' {
     externalValueActions?: Array<ActionDefinition>;
     fieldActions?: Array<ActionDefinition>;
     messageAugmentations?: Array<MessageAugmentation>;
-    searchTypes?: Array<SearchType>;
+    searchTypes?: Array<SearchType<any, any>>;
     systemConfigurations?: Array<SystemConfiguration>;
     valueActions?: Array<ActionDefinition>;
     'views.completers'?: Array<Completer>;
@@ -245,10 +255,11 @@ declare module 'graylog-web-plugin/plugin' {
     'views.hooks.loadingView'?: Array<ViewHook>;
     'views.hooks.searchRefresh'?: Array<SearchRefreshCondition>;
     'views.hooks.copyWidgetToDashboard'?: Array<CopyWidgetToDashboardHook>;
+    'views.hooks.removingWidget'?: Array<RemovingWidgetHook>;
     'views.overrides.widgetEdit'?: Array<React.ComponentType<OverrideProps>>;
     'views.widgets.actions'?: Array<WidgetActionType>;
     'views.requires.provided'?: Array<string>;
     visualizationConfigTypes?: Array<VisualizationConfigType>;
-    visualizationTypes?: Array<VisualizationType>;
+    visualizationTypes?: Array<VisualizationType<any>>;
   }
 }
