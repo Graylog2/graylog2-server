@@ -95,7 +95,8 @@ class EmailNotificationForm extends React.Component {
     body_template: DEFAULT_BODY_TEMPLATE, // TODO: Default body template should come from the server
     html_body_template: DEFAULT_HTML_BODY_TEMPLATE,
     user_recipients: [],
-    email_recipients: []
+    email_recipients: [],
+    time_zone: 'UTC',
   };
 
   propagateChange = (key, value) => {
@@ -185,7 +186,7 @@ class EmailNotificationForm extends React.Component {
         </FormGroup>
         <Input id="notification-time-zone"
                help="Time zone used for timestamps in the email body."
-               label={<ControlLabel>Time zone for date/time values <small className="text-muted">(Optional)</small></ControlLabel>} >
+               label={<>Time zone for date/time values <small className="text-muted">(Optional)</small></>}>
           <TimezoneSelect className="timezone-select"
                           name="time_zone"
                           value={config.time_zone}
