@@ -57,7 +57,9 @@ const defaultCompleterFactory = (
   completers: Array<Completer>,
   timeRange: TimeRange | NoTimeRangeOverride,
   streams: Array<string>,
-) => new SearchBarAutoCompletions(completers, timeRange, streams);
+) => {
+  return new SearchBarAutoCompletions(completers, timeRange, streams);
+};
 
 const handleExecution = (editor: Editor, onExecute: (query: string) => void, value: string, error: QueryValidationState | undefined) => {
   if (editor?.completer && editor.completer.popup) {
@@ -73,20 +75,40 @@ const handleExecution = (editor: Editor, onExecute: (query: string) => void, val
   onExecute(value);
 };
 
-const _configureEditor = (editor, completer: AutoCompleter) => {
+// This function takes care of all editor configuration options, which do not rely on external data.
+// It will only run once, on mount, which is important for e.g. the event listeners.
+const _onLoadEditor = (editor) => {
   if (editor) {
     editor.commands.removeCommands(['find', 'indent', 'outdent']);
-    // eslint-disable-next-line no-param-reassign
-    editor.completers = [completer];
 
     editor.session.on('tokenizerUpdate', (input, { bgTokenizer: { currentLine, lines } }) => {
-      if (completer.shouldShowCompletions(currentLine, lines)) {
-        editor.execCommand('startAutocomplete');
-      }
+      editor.completers.forEach((completer) => {
+        if (completer?.shouldShowCompletions(currentLine, lines)) {
+          editor.execCommand('startAutocomplete');
+        }
+      });
     });
 
     editor.renderer.setScrollMargin(6, 5);
     editor.renderer.setPadding(12);
+  }
+};
+
+// This function takes care of updating the editor config on every render.
+// This is necessary for configuration options which rely on external data.
+// Unfortunately it is not possible to configure for example the command once
+// with the `onLoad` or `commands` prop, because the reference for the related function will be outdated.
+const _updateEditorConfiguration = (node, completer, onExecute) => {
+  const editor = node && node.editor;
+
+  if (editor) {
+    editor.commands.addCommand({
+      name: 'Execute',
+      bindKey: { win: 'Enter', mac: 'Enter' },
+      exec: onExecute,
+    });
+
+    editor.completers = [completer];
   }
 };
 
@@ -120,7 +142,7 @@ const QueryInput = ({
   error,
   onBlur,
   onChange,
-  onExecute,
+  onExecute: onExecuteProp,
   placeholder,
   streams,
   timeRange,
@@ -129,9 +151,10 @@ const QueryInput = ({
   warning,
 }: Props) => {
   const completer = useMemo(() => completerFactory(completers, timeRange, streams), [completerFactory, completers, timeRange, streams]);
-  const configureEditor = useCallback((editor: Editor) => _configureEditor(editor, completer), [completer]);
-  const _onExecute = useCallback((editor: Editor) => handleExecution(editor, onExecute, value, error), [onExecute, value, error]);
+  const onLoadEditor = useCallback((editor: Editor) => _onLoadEditor(editor), []);
+  const onExecute = useCallback((editor: Editor) => handleExecution(editor, onExecuteProp, value, error), [onExecuteProp, value, error]);
   const markers = useMemo(() => getMarkers(error, warning), [error, warning]);
+  const updateEditorConfiguration = useCallback((node) => _updateEditorConfiguration(node, completer, onExecute), [onExecute, completer]);
 
   return (
     <UserPreferencesContext.Consumer>
@@ -140,14 +163,10 @@ const QueryInput = ({
                          disabled={disabled}
                          className={className}
                          aceTheme="ace-queryinput" // NOTE: is usually just `theme` but we need that prop for styled-components
-                         onLoad={configureEditor}
+                         ref={updateEditorConfiguration}
+                         onLoad={onLoadEditor}
                          readOnly={disabled}
                          onBlur={onBlur}
-                         commands={[{
-                           name: 'Execute',
-                           bindKey: 'Enter',
-                           exec: _onExecute,
-                         }]}
                          onChange={onChange}
                          value={value}
                          name="QueryEditor"
