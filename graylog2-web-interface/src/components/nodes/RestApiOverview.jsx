@@ -18,7 +18,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import styled from 'styled-components';
 
-import { Timestamp } from 'components/common';
+import RelativeTime from 'components/common/RelativeTime';
 
 const StyledDl = styled.dl`
   margin-top: 5px;
@@ -41,7 +41,7 @@ const RestApiOverview = ({ node }) => {
       <dt>Transport address:</dt>
       <dd>{transport_address}</dd>
       <dt>Last seen:</dt>
-      <dd><Timestamp dateTime={last_seen} relative /></dd>
+      <dd><RelativeTime dateTime={last_seen} /></dd>
     </StyledDl>
   );
 };

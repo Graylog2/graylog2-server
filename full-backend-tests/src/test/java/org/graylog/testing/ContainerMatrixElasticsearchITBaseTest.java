@@ -14,25 +14,22 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.elasticsearch7;
+package org.graylog.testing;
 
+import org.graylog.storage.elasticsearch7.ElasticsearchClient;
 import org.graylog.storage.elasticsearch7.testing.ElasticsearchInstanceES7;
+import org.graylog.storage.elasticsearch7.testing.OpensearchInstance;
+import org.graylog.testing.elasticsearch.ContainerMatrixElasticsearchBaseTest;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
-import org.graylog2.indexer.counts.CountsAdapter;
-import org.graylog2.indexer.counts.CountsIT;
-import org.junit.Rule;
 
-public class CountsES7IT extends CountsIT {
-    @Rule
-    public final ElasticsearchInstanceES7 elasticsearch = ElasticsearchInstanceES7.create();
-
-    @Override
-    protected SearchServerInstance elasticsearch() {
-        return this.elasticsearch;
+public abstract class ContainerMatrixElasticsearchITBaseTest extends ContainerMatrixElasticsearchBaseTest {
+    public ContainerMatrixElasticsearchITBaseTest(SearchServerInstance elasticsearch) {
+        super(elasticsearch);
     }
 
-    @Override
-    protected CountsAdapter countsAdapter() {
-        return new CountsAdapterES7(elasticsearch.elasticsearchClient());
+    protected ElasticsearchClient elasticsearchClient() {
+        return elasticsearch() instanceof ElasticsearchInstanceES7
+                ? ((ElasticsearchInstanceES7) elasticsearch()).elasticsearchClient()
+                : ((OpensearchInstance) elasticsearch()).elasticsearchClient();
     }
 }

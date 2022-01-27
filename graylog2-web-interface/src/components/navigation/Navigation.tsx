@@ -28,7 +28,7 @@ import { IfPermitted } from 'components/common';
 import { isPermitted } from 'util/PermissionsMixin';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import GlobalThroughput from 'components/throughput/GlobalThroughput';
-import Routes from 'routing/Routes';
+import Routes, { ENTERPRISE_ROUTE_DESCRIPTION, SECURITY_ROUTE_DESCRIPTION } from 'routing/Routes';
 
 import UserMenu from './UserMenu';
 import HelpMenu from './HelpMenu';
@@ -44,6 +44,19 @@ import StyledNavbar from './Navigation.styles';
 const _isActive = (requestPath, prefix) => {
   return requestPath.indexOf(appPrefixed(prefix)) === 0;
 };
+
+/**
+ * Checks if a plugin and its corresponding route is registered to the PluginStore
+ *
+ * @param {string} description
+ */
+function pluginMenuItemExists(description: string): boolean {
+  const pluginExports = PluginStore.exports('navigation');
+
+  if (!pluginExports) return false;
+
+  return !!pluginExports.find((value) => value.description?.toLowerCase() === description.toLowerCase());
+}
 
 const formatSinglePluginRoute = ({ description, path, permissions }, topLevel = false) => {
   const link = <NavigationLink key={description} description={description} path={appPrefixed(path)} topLevel={topLevel} />;
@@ -85,14 +98,24 @@ const Navigation = React.memo(({ pathname }: Props) => {
 
   const pluginExports = PluginStore.exports('navigation');
 
-  const enterpriseMenuIsMissing = !pluginExports.find((value) => value.description.toLowerCase() === 'enterprise');
-  const isPermittedToEnterprise = isPermitted(permissions, ['licenseinfos:read']);
+  const enterpriseMenuIsMissing = !pluginMenuItemExists(ENTERPRISE_ROUTE_DESCRIPTION);
+  const securityMenuIsMissing = !pluginMenuItemExists(SECURITY_ROUTE_DESCRIPTION);
 
-  if (enterpriseMenuIsMissing && isPermittedToEnterprise) {
+  const isPermittedToEnterpriseOrSecurity = isPermitted(permissions, ['licenseinfos:read']);
+
+  if (enterpriseMenuIsMissing && isPermittedToEnterpriseOrSecurity) {
     // no enterprise plugin menu, so we will add one
     pluginExports.push({
       path: Routes.SYSTEM.ENTERPRISE,
-      description: 'Enterprise',
+      description: ENTERPRISE_ROUTE_DESCRIPTION,
+    });
+  }
+
+  if (securityMenuIsMissing && isPermittedToEnterpriseOrSecurity) {
+    // no security plugin menu, so we will add one
+    pluginExports.push({
+      path: Routes.SECURITY,
+      description: SECURITY_ROUTE_DESCRIPTION,
     });
   }
 

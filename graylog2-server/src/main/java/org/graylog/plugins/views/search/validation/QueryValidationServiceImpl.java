@@ -21,6 +21,8 @@ import org.apache.lucene.queryparser.classic.ParseException;
 import org.graylog.plugins.views.search.ParameterProvider;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
+import org.graylog.plugins.views.search.errors.SearchException;
+import org.graylog.plugins.views.search.errors.UnboundParameterError;
 import org.graylog.plugins.views.search.rest.MappedFieldTypeDTO;
 import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
 
@@ -50,9 +52,14 @@ public class QueryValidationServiceImpl implements QueryValidationService {
 
     @Override
     public ValidationResponse validate(ValidationRequest req) {
-        final String query = decoratedQuery(req);
+        final String query;
+        try {
+            query = decoratedQuery(req);
+        } catch (SearchException searchException) {
+            return ValidationResponse.error(toExplanation(req.query().queryString(), searchException));
+        }
 
-        if(StringUtils.isEmpty(query)) {
+        if (StringUtils.isEmpty(query)) {
             return ValidationResponse.ok();
         }
 
@@ -69,6 +76,26 @@ public class QueryValidationServiceImpl implements QueryValidationService {
         } catch (ParseException e) {
             return ValidationResponse.error(toExplanation(query, e));
         }
+    }
+
+    private List<ValidationMessage> toExplanation(String query, SearchException searchException) {
+        if (searchException.error() instanceof UnboundParameterError) {
+            final UnboundParameterError error = (UnboundParameterError) searchException.error();
+            final List<SubstringMultilinePosition> positions = SubstringMultilinePosition.compute(query, "$" + error.parameterName() + "$");
+            if (!positions.isEmpty()) {
+                return positions.stream()
+                        .map(p -> ValidationMessage.builder()
+                                .errorType("Parameter error")
+                                .errorMessage(error.description())
+                                .beginLine(p.getLine())
+                                .endLine(p.getLine())
+                                .beginColumn(p.getBeginColumn())
+                                .endColumn(p.getEndColumn())
+                                .build())
+                        .collect(Collectors.toList());
+            }
+        }
+        return Collections.singletonList(ValidationMessage.fromException(query, searchException));
     }
 
     private List<ValidationMessage> toExplanation(final String query, final ParseException parseException) {

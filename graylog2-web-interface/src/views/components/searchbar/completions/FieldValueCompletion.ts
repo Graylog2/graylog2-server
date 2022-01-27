@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as Immutable from 'immutable';
+import { isEqual } from 'lodash';
 
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
@@ -27,12 +28,15 @@ import { onSubmittingTimerange } from 'views/components/TimerangeForForm';
 import { isNoTimeRangeOverride } from 'views/typeGuards/timeRange';
 
 import type { Completer } from '../SearchBarAutocompletions';
-import type { Token, Line } from '../ace-types';
+import type { Token, Line, CompletionResult } from '../ace-types';
+
+const SUGGESTIONS_PAGE_SIZE = 50;
 
 type SuggestionsResponse = {
   field: string,
   input: string,
   suggestions: Array<{ value: string, occurrence: number}> | undefined,
+  sum_other_docs_count: number,
 }
 
 const suggestionsUrl = qualifyUrl('/search/suggest');
@@ -43,6 +47,14 @@ const formatValue = (value: string, type: string) => {
   }
 
   return value;
+};
+
+const completionCaption = (fieldValue: string, input: string | number) => {
+  if (fieldValue.startsWith(String(input))) {
+    return fieldValue;
+  }
+
+  return `${fieldValue} ⭢ ${input}`;
 };
 
 const getFieldNameAndInput = (currentToken: Token | undefined | null, lastToken: Token | undefined | null) => {
@@ -80,6 +92,15 @@ class FieldValueCompletion implements Completer {
 
   fields: FieldTypesStoreState;
 
+  previousSuggestions: undefined | {
+    furtherSuggestionsCount: number,
+    completions: Array<CompletionResult>,
+    fieldName: string,
+    input: string | number,
+    timeRange: TimeRange | NoTimeRangeOverride | undefined,
+    streams: Array<string> | undefined,
+  }
+
   constructor() {
     this.onViewMetadataStoreUpdate(ViewMetadataStore.getInitialState());
     ViewMetadataStore.listen(this.onViewMetadataStoreUpdate);
@@ -104,6 +125,39 @@ class FieldValueCompletion implements Completer {
     return true;
   }
 
+  alreadyFetchedAllSuggestions(
+    input: string | number,
+    fieldName: string,
+    streams: Array<string> | undefined,
+    timeRange: TimeRange | NoTimeRangeOverride | undefined,
+  ) {
+    if (!this.previousSuggestions) {
+      return false;
+    }
+
+    const {
+      fieldName: prevFieldName,
+      streams: prevStreams,
+      timeRange: prevTimeRange,
+      furtherSuggestionsCount,
+      input: prevInput,
+    } = this.previousSuggestions;
+
+    return String(input).startsWith(String(prevInput))
+      && prevFieldName === fieldName
+      && isEqual(prevStreams, streams)
+      && isEqual(prevTimeRange, timeRange)
+      && !furtherSuggestionsCount;
+  }
+
+  filterExistingSuggestions(input: string | number) {
+    if (this.previousSuggestions) {
+      return this.previousSuggestions.completions.filter((completion) => completion.name.startsWith(String(input)));
+    }
+
+    return [];
+  }
+
   getCompletions = (
     currentToken: Token | undefined | null,
     lastToken: Token | undefined | null,
@@ -119,6 +173,14 @@ class FieldValueCompletion implements Completer {
       return [];
     }
 
+    if (this.alreadyFetchedAllSuggestions(input, fieldName, streams, timeRange)) {
+      const existingSuggestions = this.filterExistingSuggestions(input);
+
+      if (existingSuggestions.length) {
+        return existingSuggestions;
+      }
+    }
+
     const normalizedTimeRange = (!timeRange || isNoTimeRangeOverride(timeRange)) ? undefined : onSubmittingTimerange(timeRange);
 
     return fetch('POST', suggestionsUrl, {
@@ -126,16 +188,30 @@ class FieldValueCompletion implements Completer {
       input,
       timerange: normalizedTimeRange,
       streams,
-    }).then(({ suggestions }: SuggestionsResponse) => {
+      size: SUGGESTIONS_PAGE_SIZE,
+    }).then(({ suggestions, sum_other_docs_count: furtherSuggestionsCount }: SuggestionsResponse) => {
       if (!suggestions) {
         return [];
       }
 
-      return suggestions.map(({ value, occurrence }) => ({
+      const completions = suggestions.map(({ value, occurrence }) => ({
         name: value,
         value: value,
         score: occurrence,
+        caption: completionCaption(value, input),
+        meta: `${occurrence} hits`,
       }));
+
+      this.previousSuggestions = {
+        furtherSuggestionsCount,
+        streams,
+        timeRange,
+        fieldName,
+        input,
+        completions,
+      };
+
+      return completions;
     });
   };
 
@@ -160,9 +236,19 @@ class FieldValueCompletion implements Completer {
   };
 
   shouldShowCompletions = (currentLine: number, lines: Array<Array<Line>>) => {
-    const currentToken = lines[currentLine - 1].find((token) => token?.start !== undefined);
+    const currentLineTokens = lines[currentLine - 1];
+    const currentTokenIndex = currentLineTokens.findIndex((token) => token?.start !== undefined);
+    const currentToken = currentLineTokens[currentTokenIndex];
 
-    return currentToken?.type === 'keyword' && currentToken?.value.endsWith(':');
+    if (!currentToken) {
+      return false;
+    }
+
+    const previousToken = currentLineTokens[currentTokenIndex - 1];
+    const currentTokenIsFieldName = currentToken?.type === 'keyword' && currentToken?.value.endsWith(':');
+    const currentTokenIsFieldValue = currentToken?.type === 'term' && previousToken?.type === 'keyword';
+
+    return currentTokenIsFieldName || currentTokenIsFieldValue;
   }
 }
 

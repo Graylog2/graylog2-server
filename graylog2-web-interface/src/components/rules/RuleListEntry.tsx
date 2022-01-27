@@ -20,7 +20,7 @@ import styled, { css } from 'styled-components';
 
 import { LinkContainer, Link } from 'components/common/router';
 import { MetricContainer, CounterRate } from 'components/metrics';
-import { Timestamp, OverlayTrigger, CountBadge } from 'components/common';
+import { RelativeTime, OverlayTrigger, CountBadge } from 'components/common';
 import { Button, ButtonToolbar, Tooltip } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import type { RuleType, PipelineSummary } from 'stores/rules/RulesStore';
@@ -86,8 +86,8 @@ const RuleListEntry = ({ rule, onDelete, usingPipelines }: Props) => {
         </Link>
       </td>
       <td className="limited">{description}</td>
-      <td className="limited"><Timestamp dateTime={created_at} relative /></td>
-      <td className="limited"><Timestamp dateTime={modified_at} relative /></td>
+      <td className="limited"><RelativeTime dateTime={created_at} /></td>
+      <td className="limited"><RelativeTime dateTime={modified_at} /></td>
       <td>
         <MetricContainer name={`org.graylog.plugins.pipelineprocessor.ast.Rule.${id}.executed`} zeroOnMissing>
           <CounterRate suffix="msg/s" />

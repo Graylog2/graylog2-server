@@ -29,6 +29,8 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.plugin.validate.ClusterConfigValidatorService;
+import org.graylog2.plugin.validate.ConfigValidationException;
 import org.graylog2.rest.MoreMediaTypes;
 import org.graylog2.rest.models.system.config.ClusterConfigList;
 import org.graylog2.shared.plugins.ChainingClassLoader;
@@ -55,6 +57,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Locale;
 import java.util.Set;
 
 import static java.util.Objects.requireNonNull;
@@ -65,18 +68,22 @@ import static java.util.Objects.requireNonNull;
 @Produces(MediaType.APPLICATION_JSON)
 public class ClusterConfigResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(ClusterConfigResource.class);
+    public static final String NO_CLASS_MSG = "Couldn't find configuration class  '%s'";
 
     private final ClusterConfigService clusterConfigService;
     private final ChainingClassLoader chainingClassLoader;
     private final ObjectMapper objectMapper;
+    private final ClusterConfigValidatorService clusterConfigValidatorService;
 
     @Inject
     public ClusterConfigResource(ClusterConfigService clusterConfigService,
                                  ChainingClassLoader chainingClassLoader,
-                                 ObjectMapper objectMapper) {
+                                 ObjectMapper objectMapper,
+                                 ClusterConfigValidatorService clusterConfigValidatorService) {
         this.clusterConfigService = requireNonNull(clusterConfigService);
         this.chainingClassLoader = chainingClassLoader;
         this.objectMapper = objectMapper;
+        this.clusterConfigValidatorService = clusterConfigValidatorService;
     }
 
     @GET
@@ -98,7 +105,8 @@ public class ClusterConfigResource extends RestResource {
                        @PathParam("configClass") @NotBlank String configClass) {
         final Class<?> cls = classFromName(configClass);
         if (cls == null) {
-            throw new NotFoundException("Couldn't find configuration class \"" + configClass + "\"");
+            String error = createNoClassMsg(configClass);
+            throw new NotFoundException(error);
         }
 
         return clusterConfigService.get(cls);
@@ -117,27 +125,44 @@ public class ClusterConfigResource extends RestResource {
                            @NotNull InputStream body) throws IOException {
         final Class<?> cls = classFromName(configClass);
         if (cls == null) {
-            throw new NotFoundException("Couldn't find configuration class \"" + configClass + "\"");
+            throw new NotFoundException(createNoClassMsg(configClass));
         }
 
-        final Object o;
-        try {
-            o = objectMapper.readValue(body, cls);
-        } catch (Exception e) {
-            final String msg = "Couldn't parse cluster configuration \"" + configClass + "\".";
-            LOG.error(msg, e);
-            throw new BadRequestException(msg);
-        }
+        final Object configObject = parseConfigObject(configClass, body, cls);
+        validateConfigObject(configObject);
+        writeConfigObject(configClass, configObject);
 
+        return Response.accepted(configObject).build();
+    }
+
+    private void writeConfigObject(String configClass, Object configObject) {
         try {
-            clusterConfigService.write(o);
+            clusterConfigService.write(configObject);
         } catch (Exception e) {
             final String msg = "Couldn't write cluster config \"" + configClass + "\".";
             LOG.error(msg, e);
             throw new InternalServerErrorException(msg, e);
         }
+    }
 
-        return Response.accepted(o).build();
+    private void validateConfigObject(Object configObject) {
+        try {
+            clusterConfigValidatorService.validate(configObject);
+        } catch (ConfigValidationException e) {
+            throw new BadRequestException(e.getMessage(), e);
+        }
+    }
+
+    private Object parseConfigObject(String configClass, InputStream body, Class<?> cls) {
+        final Object object;
+        try {
+            object = objectMapper.readValue(body, cls);
+        } catch (Exception e) {
+            final String msg = "Couldn't parse cluster configuration \"" + configClass + "\".";
+            LOG.error(msg, e);
+            throw new BadRequestException(msg);
+        }
+        return object;
     }
 
     @DELETE
@@ -150,7 +175,7 @@ public class ClusterConfigResource extends RestResource {
                        @PathParam("configClass") @NotBlank String configClass) {
         final Class<?> cls = classFromName(configClass);
         if (cls == null) {
-            throw new NotFoundException("Couldn't find configuration class \"" + configClass + "\"");
+            throw new NotFoundException(createNoClassMsg(configClass));
         }
 
         clusterConfigService.remove(cls);
@@ -166,7 +191,7 @@ public class ClusterConfigResource extends RestResource {
                              @PathParam("configClass") @NotBlank String configClass) {
         final Class<?> cls = classFromName(configClass);
         if (cls == null) {
-            throw new NotFoundException("Couldn't find configuration class \"" + configClass + "\"");
+            throw new NotFoundException(createNoClassMsg(configClass));
         }
 
         final SchemaFactoryWrapper visitor = new SchemaFactoryWrapper();
@@ -187,4 +212,9 @@ public class ClusterConfigResource extends RestResource {
             return null;
         }
     }
+
+    private static String createNoClassMsg(String configClass) {
+        return String.format(Locale.ENGLISH, NO_CLASS_MSG, configClass);
+    }
+
 }

@@ -80,6 +80,7 @@ import {
   RolesOverviewPage,
   RuleDetailsPage,
   RulesPage,
+  SecurityPage,
   ShowAlertPage,
   ShowContentPackPage,
   ShowEventNotificationPage,
@@ -349,6 +350,7 @@ const AppRouter = () => {
                       <Route exact path={Routes.SYSTEM.PROCESSBUFFERDUMP(':nodeId')} component={ProcessBufferDumpPage} />
                       <Route exact path={Routes.SYSTEM.THREADDUMP(':nodeId')} component={ThreadDumpPage} />
                       <Route exact path={Routes.SYSTEM.ENTERPRISE} component={EnterprisePage} />
+                      <Route exact path={Routes.SECURITY} component={SecurityPage} />
 
                       {!isCloud && (
                       <Route exact path={Routes.SYSTEM.SIDECARS.OVERVIEW} component={SidecarsPage} />
