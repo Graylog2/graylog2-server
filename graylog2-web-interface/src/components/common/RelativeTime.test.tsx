@@ -14,30 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
-import React from 'react';
+import * as React from 'react';
+import { render, screen } from 'wrappedTestingLibrary';
 
-import RelativeTime from 'components/common/RelativeTime';
+import RelativeTime from './RelativeTime';
 
-class IndexRangeSummary extends React.Component {
-  static propTypes = {
-    indexRange: PropTypes.object,
-  };
+const mockedUnixTime = 1577836800000; // 2020-01-01 00:00:00.000
 
-  render() {
-    const { indexRange } = this.props;
+jest.useFakeTimers()
+  // @ts-expect-error
+  .setSystemTime(mockedUnixTime);
 
-    if (!indexRange) {
-      return <span><i>No index range available.</i></span>;
-    }
-
-    return (
-      <span>Range re-calculated{' '}
-        <RelativeTime dateTime={indexRange.calculated_at} />{' '}
-        in {indexRange.took_ms}ms.
-      </span>
+describe('RelativeTime', () => {
+  it('should display relative time', () => {
+    render(
+      <RelativeTime dateTime="2019-01-01 10:00:00" />,
     );
-  }
-}
 
-export default IndexRangeSummary;
+    expect(screen.getByText('a year ago')).toBeInTheDocument();
+  });
+});
