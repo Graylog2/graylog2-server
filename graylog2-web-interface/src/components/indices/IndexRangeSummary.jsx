@@ -17,7 +17,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Timestamp } from 'components/common';
+import RelativeTime from 'components/common/RelativeTime';
 
 class IndexRangeSummary extends React.Component {
   static propTypes = {
