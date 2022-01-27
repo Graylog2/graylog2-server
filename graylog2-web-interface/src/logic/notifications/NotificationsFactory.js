@@ -350,11 +350,13 @@ class NotificationsFactory {
         };
       case 'archiving_summary':
         return {
-          title: 'Some archiving jobs did not complete sucessfully',
+          title: 'Some archiving jobs did not complete successfully',
           description: (
             <span>
-              Recent attempts failed: {' '}
-              [{notification.details.archiveErrors}]
+              Recent failed attempts: {' '}
+              <ul>
+                {notification.details.archiveErrors.map((error, index) => <li key={index}>{error}</li>)}
+              </ul>
             </span>
           ),
         };
