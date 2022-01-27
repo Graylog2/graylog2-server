@@ -77,11 +77,9 @@ public class NodeContainerFactory {
                 .withFileFromPath("graylog.conf", pathTo("graylog_config"))
                 .withFileFromClasspath("log4j2.xml", "log4j2.xml");
 
-        final String arch = System.getProperty("os.arch");
-
         addBinIfExists(image, projectBinDir, "chromedriver_start.sh", "chromedriver_start.sh");
-        addBinIfExists(image, projectBinDir, "headless_shell_" + arch, "headless_shell");
-        addBinIfExists(image, projectBinDir, "chromedriver_" + arch, "chromedriver");
+        addBinIfExists(image, projectBinDir, "headless_shell_amd64", "headless_shell_amd64");
+        addBinIfExists(image, projectBinDir, "chromedriver_amd64", "chromedriver_amd64");
 
         if (config.enableDebugging) {
             image.withBuildArg("DEBUG_OPTS", "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=0.0.0.0:5005");
@@ -122,7 +120,6 @@ public class NodeContainerFactory {
                 .withEnv("GRAYLOG_ELASTICSEARCH_VERSION", config.elasticsearchVersion.encode())
                 .withEnv("GRAYLOG_PASSWORD_SECRET", "M4lteserKreuzHerrStrack?")
                 .withEnv("GRAYLOG_NODE_ID_FILE", "data/config/node-id")
-//                .withEnv("GRAYLOG_BIN_DIR", "/usr/share/graylog/bin")
                 .withEnv("GRAYLOG_HTTP_BIND_ADDRESS", "0.0.0.0:" + API_PORT)
                 .withEnv("GRAYLOG_ROOT_PASSWORD_SHA2", ADMIN_PW_SHA2)
                 .withEnv("GRAYLOG_LB_RECOGNITION_PERIOD_SECONDS", "0")

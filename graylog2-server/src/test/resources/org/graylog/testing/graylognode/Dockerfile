@@ -23,6 +23,7 @@ RUN \
   echo "export GRAYLOG_GROUP=${GRAYLOG_GROUP}"     >> /etc/profile.d/graylog.sh && \
   echo "export GRAYLOG_UID=${GRAYLOG_UID}"         >> /etc/profile.d/graylog.sh && \
   echo "export GRAYLOG_GID=${GRAYLOG_GID}"         >> /etc/profile.d/graylog.sh && \
+  echo "export GRAYLOG_REPORT_DISABLE_SANDBOX=true" >> /etc/profile.d/graylog.sh && \
   echo "export PATH=${GRAYLOG_HOME}/bin:${PATH}"   >> /etc/profile.d/graylog.sh && \
   apt-get update  > /dev/null && \
   apt-get install --no-install-recommends --assume-yes \
@@ -84,8 +85,8 @@ COPY docker-entrypoint.sh /
 COPY graylog.conf ${GRAYLOG_HOME}/data/config
 COPY log4j2.xml ${GRAYLOG_HOME}/data/config
 COPY chromedriver_start.sh ${GRAYLOG_HOME}/bin
-COPY headless_shell ${GRAYLOG_HOME}/bin
-COPY chromedriver ${GRAYLOG_HOME}/bin
+COPY headless_shell_amd64 ${GRAYLOG_HOME}/bin
+COPY chromedriver_amd64 ${GRAYLOG_HOME}/bin
 
 ENTRYPOINT ["tini", "--", "/docker-entrypoint.sh"]
 CMD ["graylog"]
