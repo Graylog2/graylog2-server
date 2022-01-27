@@ -52,19 +52,23 @@ public class QueryValidationServiceImpl implements QueryValidationService {
 
     @Override
     public ValidationResponse validate(ValidationRequest req) {
-        final String query;
-        try {
-            query = decoratedQuery(req);
-        } catch (SearchException searchException) {
-            return ValidationResponse.error(toExplanation(req.query().queryString(), searchException));
-        }
+        // caution, there are two validation steps!
+        // the validation uses query with _non_replaced parameters, as is, to be able to track the exact positions of errors
+        final String rawQuery = req.query().queryString();
 
-        if (StringUtils.isEmpty(query)) {
+        if (StringUtils.isEmpty(rawQuery)) {
             return ValidationResponse.ok();
         }
 
         try {
-            final ParsedQuery parsedQuery = luceneQueryParser.parse(query);
+            // but we want to trigger the decorators as well, because they may trigger additional exceptions
+            decoratedQuery(req);
+        } catch (SearchException searchException) {
+            return ValidationResponse.error(toExplanation(req.query().queryString(), searchException));
+        }
+
+        try {
+            final ParsedQuery parsedQuery = luceneQueryParser.parse(rawQuery);
             final List<ParsedTerm> unknownFields = getUnknownFields(req, parsedQuery);
             final List<ParsedTerm> invalidOperators = parsedQuery.invalidOperators();
             final List<ValidationMessage> explanations = getExplanations(unknownFields, invalidOperators);
@@ -74,7 +78,7 @@ public class QueryValidationServiceImpl implements QueryValidationService {
                     : ValidationResponse.warning(explanations);
 
         } catch (ParseException e) {
-            return ValidationResponse.error(toExplanation(query, e));
+            return ValidationResponse.error(toExplanation(rawQuery, e));
         }
     }
 
