@@ -15,20 +15,23 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { mount } from 'wrappedEnzyme';
-import ReactAce from 'react-ace';
+import { render, screen } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
+
+import QueryValidationActions from 'views/actions/QueryValidationActions';
+import { validationError } from 'fixtures/queryValidationState';
 
 import QueryInput from './QueryInput';
-
-import UserPreferencesContext, { defaultUserPreferences } from '../../../contexts/UserPreferencesContext';
-
-jest.mock('./SearchBarAutocompletions', () => ({}));
 
 jest.mock('views/stores/FieldTypesStore', () => ({
   FieldTypesStore: {
     getInitialState: jest.fn(),
     listen: jest.fn(),
   },
+}));
+
+jest.mock('views/actions/QueryValidationActions', () => ({
+  displayValidationErrors: jest.fn(),
 }));
 
 class Completer {
@@ -38,67 +41,84 @@ class Completer {
 }
 
 describe('QueryInput', () => {
+  const getQueryInput = () => screen.getByRole('textbox');
+
   const SimpleQueryInput = (props) => (
-    <QueryInput value="*"
+    <QueryInput value=""
                 onChange={() => Promise.resolve('')}
                 onExecute={() => {}}
                 completerFactory={() => new Completer()}
                 {...props} />
   );
 
-  const _mount = (component) => {
-    const wrapper = mount(component);
-
-    return wrapper.find(ReactAce);
-  };
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
 
   it('renders with minimal props', () => {
-    const wrapper = mount(<SimpleQueryInput />);
+    render(<SimpleQueryInput />);
 
-    expect(wrapper).not.toBeNull();
+    expect(getQueryInput()).toBeInTheDocument();
   });
 
   it('triggers onChange when input is changed', () => {
-    const _onChange = jest.fn();
-    const aceEditor = _mount(<SimpleQueryInput onChange={_onChange} />);
-    const { onChange } = aceEditor.props();
+    const onChange = jest.fn();
+    render(<SimpleQueryInput onChange={onChange} />);
 
-    onChange('new input');
+    userEvent.paste(getQueryInput(), 'the query');
 
-    expect(_onChange).toHaveBeenCalledWith('new input');
+    expect(onChange).toHaveBeenCalledTimes(1);
+    expect(onChange).toHaveBeenCalledWith('the query', expect.any(Object));
   });
 
   it('triggers onBlur when input is blurred', () => {
-    const _onBlur = jest.fn();
-    const aceEditor = _mount(<SimpleQueryInput onBlur={_onBlur} />);
-    const { onBlur } = aceEditor.props();
+    const onBlur = jest.fn();
+    render(<SimpleQueryInput onBlur={onBlur} />);
 
-    onBlur({ target: aceEditor });
+    userEvent.paste(getQueryInput(), 'the query');
+    userEvent.tab();
 
-    expect(_onBlur).toHaveBeenCalled();
+    expect(onBlur).toHaveBeenCalledTimes(1);
   });
 
-  it('disables auto completion if `enableSmartSearch` is false', () => {
-    const aceEditor = _mount((
-      <UserPreferencesContext.Provider value={{ ...defaultUserPreferences, enableSmartSearch: false }}>
-        <SimpleQueryInput />
-      </UserPreferencesContext.Provider>
-    ));
-    const { enableBasicAutocompletion, enableLiveAutocompletion } = aceEditor.props();
+  describe('on submit', () => {
+    it('triggers onExecute on enter', () => {
+      const onExecute = jest.fn();
+      render(<SimpleQueryInput value="the query" onExecute={onExecute} />);
 
-    expect(enableBasicAutocompletion).toBe(false);
-    expect(enableLiveAutocompletion).toBe(false);
-  });
+      const queryInput = getQueryInput();
+      queryInput.focus();
+      userEvent.type(queryInput, '{enter}');
 
-  it('enables auto completion if `enableSmartSearch` is true', () => {
-    const aceEditor = _mount((
-      <UserPreferencesContext.Provider value={{ ...defaultUserPreferences, enableSmartSearch: true }}>
-        <SimpleQueryInput />
-      </UserPreferencesContext.Provider>
-    ));
-    const { enableBasicAutocompletion, enableLiveAutocompletion } = aceEditor.props();
+      expect(onExecute).toHaveBeenCalledTimes(1);
+      expect(onExecute).toHaveBeenCalledWith('the query');
+    });
 
-    expect(enableBasicAutocompletion).toBe(true);
-    expect(enableLiveAutocompletion).toBe(true);
+    it('triggers QueryValidationActions.displayValidationErrors when there in an error', () => {
+      const onExecute = jest.fn();
+      render(<SimpleQueryInput value="source:" onExecute={onExecute} error={validationError} />);
+
+      const queryInput = getQueryInput();
+      queryInput.focus();
+      userEvent.type(queryInput, '{enter}');
+
+      expect(QueryValidationActions.displayValidationErrors).toHaveBeenCalledTimes(1);
+
+      expect(onExecute).not.toHaveBeenCalled();
+    });
+
+    it('triggers QueryValidationActions.displayValidationErrors when there is an error after a change', () => {
+      const onExecute = jest.fn();
+      const { rerender } = render(<SimpleQueryInput value="source" onExecute={onExecute} />);
+      rerender(<SimpleQueryInput value="source:" onExecute={onExecute} error={validationError} />);
+
+      const queryInput = getQueryInput();
+      queryInput.focus();
+      userEvent.type(queryInput, '{enter}');
+
+      expect(QueryValidationActions.displayValidationErrors).toHaveBeenCalledTimes(1);
+
+      expect(onExecute).not.toHaveBeenCalled();
+    });
   });
 });
