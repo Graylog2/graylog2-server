@@ -107,16 +107,12 @@ public class DiskJournalPreflightCheck implements PreflightCheck {
         final File file = new File(journalDirectory.toFile(), ".lock");
         FileLock fileLock = null;
         try {
-            //noinspection ResultOfMethodCallIgnored
-            file.createNewFile();
             fileLock = new FileLock(file);
             if (!fileLock.tryLock()) {
                 throw new PreflightCheckException(
                         StringUtils.f("The journal is already locked by another process. Try running fuser \"%s\" to find the PID.",
                         file.getAbsolutePath()));
             }
-        } catch (IOException e) {
-            throw new PreflightCheckException(StringUtils.f("Could not create journal lock file: <%s> ", file.getAbsolutePath()), e);
         } finally {
             if (fileLock != null) {
                 fileLock.unlock();
