@@ -21,6 +21,7 @@ import org.graylog.testing.PropertyLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.BindMode;
+import org.testcontainers.containers.Container;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.HttpWaitStrategy;
 import org.testcontainers.containers.wait.strategy.Wait;
@@ -49,6 +50,8 @@ public class NodeContainerFactory {
     private static final int EXECUTABLE_MODE = 0100755;
     // sha2 for password "admin"
     private static final String ADMIN_PW_SHA2 = "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918";
+
+    private static final String GRAYLOG_HOME = "/usr/share/graylog";
 
     public static GenericContainer<?> buildContainer(NodeContainerConfig config, List<Path> pluginJars,
                                                      Path mavenProjectDir, Path projectBinDir) {
@@ -86,20 +89,31 @@ public class NodeContainerFactory {
         return image;
     }
 
-    private static void addBinIfExists(ImageFromDockerfile image, Path projectDir, String bin, String alias) {
-        final Path path = projectDir.resolve(bin);
-        final File file = path.toFile();
+    private static void addBinIfExists(ImageFromDockerfile image, Path projectDir, String bin, String filename) {
+        final File file = projectDir.resolve(bin).toFile();
         if (file.exists() && file.isFile()) {
-            image.withFileFromFile(Paths.get("/usr/share/graylog/bin/", alias).toString(), file, EXECUTABLE_MODE);
+            image.withFileFromFile(filename, file, EXECUTABLE_MODE);
+        }
+    }
+
+    private static boolean containerFileExists(final GenericContainer container, String path) {
+        try {
+            Container.ExecResult r = container.execInContainer("/bin/sh", "-c",
+                    "if [ -f " + path
+                            + " ] ; then echo '0' ; else (>&2 echo '1') ; fi");
+
+            return !r.getStderr().contains("1");
+        } catch (IOException | InterruptedException e) {
+            LOG.error("Could not check for file existence: " + path, e);
+            return false;
         }
     }
 
     private static GenericContainer<?> createRunningContainer(NodeContainerConfig config, ImageFromDockerfile image,
                                                               List<Path> pluginJars) {
-        String graylogHome = "/usr/share/graylog";
 
         GenericContainer<?> container = new GenericContainer<>(image)
-                .withFileSystemBind(property("server_jar"), graylogHome + "/graylog.jar", BindMode.READ_ONLY)
+                .withFileSystemBind(property("server_jar"), GRAYLOG_HOME + "/graylog.jar", BindMode.READ_ONLY)
                 .withNetwork(config.network)
                 .withEnv("DEVELOPMENT", "true")
                 .withEnv("GRAYLOG_MONGODB_URI", config.mongoDbUri)
@@ -108,7 +122,7 @@ public class NodeContainerFactory {
                 .withEnv("GRAYLOG_ELASTICSEARCH_VERSION", config.elasticsearchVersion.encode())
                 .withEnv("GRAYLOG_PASSWORD_SECRET", "M4lteserKreuzHerrStrack?")
                 .withEnv("GRAYLOG_NODE_ID_FILE", "data/config/node-id")
-                .withEnv("GRAYLOG_BIN_DIR", "/usr/share/graylog/bin")
+//                .withEnv("GRAYLOG_BIN_DIR", "/usr/share/graylog/bin")
                 .withEnv("GRAYLOG_HTTP_BIND_ADDRESS", "0.0.0.0:" + API_PORT)
                 .withEnv("GRAYLOG_ROOT_PASSWORD_SHA2", ADMIN_PW_SHA2)
                 .withEnv("GRAYLOG_LB_RECOGNITION_PERIOD_SECONDS", "0")
@@ -136,7 +150,7 @@ public class NodeContainerFactory {
 
         pluginJars.forEach(hostPath -> {
             if (Files.exists(hostPath)) {
-                final Path containerPath = Paths.get(graylogHome, "plugin", hostPath.getFileName().toString());
+                final Path containerPath = Paths.get(GRAYLOG_HOME, "plugin", hostPath.getFileName().toString());
                 container.addFileSystemBind(hostPath.toString(), containerPath.toString(), BindMode.READ_ONLY);
             }
         });
@@ -146,6 +160,11 @@ public class NodeContainerFactory {
         if (config.enableDebugging) {
             LOG.info("Container debug port: " + container.getMappedPort(DEBUG_PORT));
         }
+
+        if (!containerFileExists(container, GRAYLOG_HOME + "/bin/" + "chromedriver_start.sh")) {
+            LOG.error("file does not exist");
+        }
+
         return container;
     }
 

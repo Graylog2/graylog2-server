@@ -18,6 +18,7 @@ RUN \
   echo "export GRAYLOG_VERSION=${GRAYLOG_VERSION}" >> /etc/profile.d/graylog.sh && \
   echo "export GRAYLOG_SERVER_JAVA_OPTS='-Dlog4j2.formatMsgNoLookups=true -Djdk.tls.acknowledgeCloseNotify=true -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -XX:NewRatio=1 -XX:MaxMetaspaceSize=256m -server -XX:+ResizeTLAB -XX:+UseConcMarkSweepGC -XX:+CMSConcurrentMTEnabled -XX:+CMSClassUnloadingEnabled -XX:+UseParNewGC -XX:-OmitStackTraceInFastThrow " ${DEBUG_OPTS} "'" >> /etc/profile.d/graylog.sh && \
   echo "export GRAYLOG_HOME=${GRAYLOG_HOME}"       >> /etc/profile.d/graylog.sh && \
+  echo "export GRAYLOG_BIN_DIR=${GRAYLOG_HOME}/bin"       >> /etc/profile.d/graylog.sh && \
   echo "export GRAYLOG_USER=${GRAYLOG_USER}"       >> /etc/profile.d/graylog.sh && \
   echo "export GRAYLOG_GROUP=${GRAYLOG_GROUP}"     >> /etc/profile.d/graylog.sh && \
   echo "export GRAYLOG_UID=${GRAYLOG_UID}"         >> /etc/profile.d/graylog.sh && \
@@ -82,6 +83,9 @@ RUN \
 COPY docker-entrypoint.sh /
 COPY graylog.conf ${GRAYLOG_HOME}/data/config
 COPY log4j2.xml ${GRAYLOG_HOME}/data/config
+COPY chromedriver_start.sh ${GRAYLOG_HOME}/bin
+COPY headless_shell ${GRAYLOG_HOME}/bin
+COPY chromedriver ${GRAYLOG_HOME}/bin
 
 ENTRYPOINT ["tini", "--", "/docker-entrypoint.sh"]
 CMD ["graylog"]
