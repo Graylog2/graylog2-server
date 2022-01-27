@@ -47,7 +47,7 @@ public class CookieFactory {
         final String basePath = Optional.ofNullable(Strings.emptyToNull(baseUri.getPath())).orElse("/");
 
         final boolean isSecure = schemeFromRequest(requestContext)
-                .map(header -> header.equalsIgnoreCase("https"))
+                .map(scheme -> scheme.equalsIgnoreCase("https"))
                 .orElse(false);
 
         return new NewCookie("authentication",

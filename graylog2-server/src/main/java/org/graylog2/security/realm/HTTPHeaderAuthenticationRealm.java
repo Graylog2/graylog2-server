@@ -36,12 +36,9 @@ import org.graylog2.utilities.IpSubnet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.ws.rs.core.MultivaluedMap;
 import java.net.UnknownHostException;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 
@@ -143,13 +140,6 @@ public class HTTPHeaderAuthenticationRealm extends AuthenticatingRealm {
 
     private HTTPHeaderAuthConfig loadConfig() {
         return clusterConfigService.getOrDefault(HTTPHeaderAuthConfig.class, HTTPHeaderAuthConfig.createDisabled());
-    }
-
-    private Optional<String> headerValue(MultivaluedMap<String, String> headers, @Nullable String headerName) {
-        if (headerName == null) {
-            return Optional.empty();
-        }
-        return Optional.ofNullable(headers.getFirst(headerName.toLowerCase(Locale.US)));
     }
 
     private boolean inTrustedSubnets(String remoteAddr) {
