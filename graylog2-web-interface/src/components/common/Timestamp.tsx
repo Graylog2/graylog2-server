@@ -31,16 +31,13 @@ type Props = {
 }
 
 /**
- * Component that renders a `time` HTML element with a given date time. It is
- * capable of render date times in different formats, accepting ISO 8601
+ * Component that renders a given date time based on the user time zone in a `time` HTML element.
+ * It is capable of render date times in different formats, accepting ISO 8601
  * strings, JS native Date objects, and Moment.js Date objects.
  *
- * The component can display the date time in different formats, and also can
- * show the relative time from/until now.
- *
- * It is also possible to change the time zone for the given date, something
- * that helps, for instance, to display a local time from a UTC time that
- * was used in the server.
+ * While the component is using the user time zone by default, it is also possible
+ * to change the time zone for the given date, something that helps, for instance, to display a local time
+ * from a UTC time that was used in the server.
  *
  */
 const Timestamp = ({ dateTime, field, format, render: Component, tz }: Props) => {
@@ -63,13 +60,14 @@ Timestamp.propTypes = {
    */
   dateTime: PropTypes.oneOfType([PropTypes.string, PropTypes.object, PropTypes.number]).isRequired,
   /**
-   * Format to use to represent the date time.
+   * Format to represent the date time.
    */
   format: PropTypes.string,
   /** Provides field prop for the render function. */
   field: PropTypes.string,
   /**
-   * Specifies the timezone to convert `dateTime`.
+   * Specifies the time zone to convert `dateTime` to.
+   * If not defined the user zone will be used.
    */
   tz: PropTypes.string,
   /**
