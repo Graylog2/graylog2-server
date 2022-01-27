@@ -348,6 +348,16 @@ class NotificationsFactory {
             </span>
           ),
         };
+      case 'archiving_summary':
+        return {
+          title: 'Some archiving jobs did not complete sucessfully',
+          description: (
+            <span>
+              Recent attempts failed: {' '}
+              [{notification.details.archiveErrors}]
+            </span>
+          ),
+        };
       default:
         return { title: `unknown (${notification.type})`, description: 'unknown' };
     }
