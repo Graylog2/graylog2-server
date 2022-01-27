@@ -18,12 +18,8 @@ package org.graylog2.alerts;
 
 import com.floreysoft.jmte.Engine;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Strings;
-import org.apache.commons.mail.DefaultAuthenticator;
 import org.apache.commons.mail.Email;
-import org.apache.commons.mail.EmailConstants;
 import org.apache.commons.mail.EmailException;
-import org.apache.commons.mail.SimpleEmail;
 import org.graylog2.configuration.EmailConfiguration;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
@@ -34,6 +30,7 @@ import org.graylog2.plugin.alarms.transports.TransportConfigurationException;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.shared.email.EmailFactory;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,16 +77,18 @@ public class FormattedEmailAlertSender implements AlertSender {
     private Configuration pluginConfig;
 
     private final EmailConfiguration configuration;
+    private final EmailFactory emailFactory;
 
     @Inject
     public FormattedEmailAlertSender(EmailConfiguration configuration,
                                      NotificationService notificationService,
                                      NodeId nodeId,
-                                     Engine templateEngine) {
+                                     Engine templateEngine, EmailFactory emailFactory) {
         this.configuration = requireNonNull(configuration, "configuration");
         this.notificationService = requireNonNull(notificationService, "notificationService");
         this.nodeId = requireNonNull(nodeId, "nodeId");
         this.templateEngine = requireNonNull(templateEngine, "templateEngine");
+        this.emailFactory = emailFactory;
     }
 
     @Override
@@ -168,33 +167,12 @@ public class FormattedEmailAlertSender implements AlertSender {
             throw new TransportConfigurationException("Email transport is not enabled in server configuration file!");
         }
 
-        final Email email = new SimpleEmail();
-        email.setCharset(EmailConstants.UTF_8);
+        final Email email = emailFactory.simpleEmail();
 
-        if (isNullOrEmpty(configuration.getHostname())) {
-            throw new TransportConfigurationException("No hostname configured for email transport while trying to send alert email!");
-        } else {
-            email.setHostName(configuration.getHostname());
-        }
-        email.setSmtpPort(configuration.getPort());
-        if (configuration.isUseSsl()) {
-            email.setSslSmtpPort(Integer.toString(configuration.getPort()));
-        }
-
-        if(configuration.isUseAuth()) {
-            email.setAuthenticator(new DefaultAuthenticator(
-                Strings.nullToEmpty(configuration.getUsername()),
-                Strings.nullToEmpty(configuration.getPassword())
-            ));
-        }
-
-        email.setSSLOnConnect(configuration.isUseSsl());
-        email.setStartTLSEnabled(configuration.isUseTls());
         if (pluginConfig != null && !isNullOrEmpty(pluginConfig.getString("sender"))) {
             email.setFrom(pluginConfig.getString("sender"));
-        } else {
-            email.setFrom(configuration.getFromEmail());
         }
+
         email.setSubject(buildSubject(stream, checkResult, backlog));
         email.setMsg(buildBody(stream, checkResult, backlog));
         email.addTo(emailAddress);
