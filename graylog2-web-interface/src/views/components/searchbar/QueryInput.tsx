@@ -57,9 +57,7 @@ const defaultCompleterFactory = (
   completers: Array<Completer>,
   timeRange: TimeRange | NoTimeRangeOverride,
   streams: Array<string>,
-) => {
-  return new SearchBarAutoCompletions(completers, timeRange, streams);
-};
+) => new SearchBarAutoCompletions(completers, timeRange, streams);
 
 const handleExecution = (editor: Editor, onExecute: (query: string) => void, value: string, error: QueryValidationState | undefined) => {
   if (editor?.completer && editor.completer.popup) {
