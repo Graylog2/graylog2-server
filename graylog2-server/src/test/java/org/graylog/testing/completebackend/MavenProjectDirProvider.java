@@ -26,6 +26,6 @@ public interface MavenProjectDirProvider {
     String getUniqueId();
 
     default boolean excludeFrontend() {
-        return false;
+        return true;
     }
 }

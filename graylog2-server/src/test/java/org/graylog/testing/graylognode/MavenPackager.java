@@ -32,7 +32,7 @@ import static org.graylog.testing.graylognode.ExecutableFileUtil.makeSureExecuta
 
 public class MavenPackager {
     private static final Logger LOG = LoggerFactory.getLogger(MavenPackager.class);
-    private static final String MVN_COMMAND = "mvn -X -V package -DskipTests -Dforbiddenapis.skip=true -Dmaven.javadoc.skip=true ";
+    private static final String MVN_COMMAND = "mvn -V package -DskipTests -Dforbiddenapis.skip=true -Dmaven.javadoc.skip=true ";
     private static final String EXCLUDE_FE = " -Dskip.web.build ";
 
     private static boolean jarHasBeenPackagedInThisRun = false;
