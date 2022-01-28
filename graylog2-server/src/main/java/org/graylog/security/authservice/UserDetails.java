@@ -17,6 +17,7 @@
 package org.graylog.security.authservice;
 
 import com.google.auto.value.AutoValue;
+import com.google.common.collect.ImmutableSet;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
@@ -55,6 +56,11 @@ public abstract class UserDetails {
 
     public abstract Set<String> defaultRoles();
 
+    /**
+     * Some authentication services include group membership info
+     */
+    public abstract Set<String> groupsFromAuthN();
+
     public UserDetails withDatabaseId(String id) {
         checkArgument(!isNullOrEmpty(id), "id cannot be null or empty");
 
@@ -70,7 +76,8 @@ public abstract class UserDetails {
     @AutoValue.Builder
     public abstract static class Builder {
         public static Builder create() {
-            return new AutoValue_UserDetails.Builder();
+            return new AutoValue_UserDetails.Builder()
+                    .groupsFromAuthN(ImmutableSet.of());
         }
 
         public abstract Builder databaseId(@Nullable String databaseId);
@@ -102,6 +109,8 @@ public abstract class UserDetails {
         public abstract Builder isExternal(boolean isExternal);
 
         public abstract Builder defaultRoles(Set<String> defaultRoles);
+
+        public abstract Builder groupsFromAuthN(Set<String> groupsFromAuthN);
 
         abstract UserDetails autoBuild();
 
