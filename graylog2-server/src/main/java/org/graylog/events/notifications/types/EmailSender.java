@@ -16,7 +16,6 @@
  */
 package org.graylog.events.notifications.types;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.floreysoft.jmte.Engine;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
@@ -33,7 +32,9 @@ import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.MessageSummary;
 import org.graylog2.plugin.alarms.transports.TransportConfigurationException;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.email.EmailFactory;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,7 +52,7 @@ public class EmailSender {
     private final EmailRecipients.Factory emailRecipientsFactory;
     private final NotificationService notificationService;
     private final NodeId nodeId;
-    private final ObjectMapper objectMapper;
+    private final ObjectMapperProvider objectMapperProvider;
     private final Engine templateEngine;
     private final EmailFactory emailFactory;
 
@@ -59,12 +60,13 @@ public class EmailSender {
     public EmailSender(EmailRecipients.Factory emailRecipientsFactory,
                        NotificationService notificationService,
                        NodeId nodeId,
-                       ObjectMapper objectMapper,
-                       Engine templateEngine, EmailFactory emailFactory) {
+                       ObjectMapperProvider objectMapperProvider,
+                       Engine templateEngine,
+                       EmailFactory emailFactory) {
         this.emailRecipientsFactory = requireNonNull(emailRecipientsFactory, "emailRecipientsFactory");
         this.notificationService = requireNonNull(notificationService, "notificationService");
         this.nodeId = requireNonNull(nodeId, "nodeId");
-        this.objectMapper = requireNonNull(objectMapper, "objectMapper)");
+        this.objectMapperProvider = requireNonNull(objectMapperProvider, "objectMapperProvider)");
         this.templateEngine = requireNonNull(templateEngine, "templateEngine");
         this.emailFactory = requireNonNull(emailFactory, "emailFactory");
     }
@@ -98,9 +100,9 @@ public class EmailSender {
         return this.templateEngine.transform(config.htmlBodyTemplate(), model);
     }
 
-    private Map<String, Object> getModel(EventNotificationContext ctx, ImmutableList<MessageSummary> backlog) {
+    private Map<String, Object> getModel(EventNotificationContext ctx, ImmutableList<MessageSummary> backlog, DateTimeZone timeZone) {
         final EventNotificationModelData modelData = EventNotificationModelData.of(ctx, backlog);
-        return objectMapper.convertValue(modelData, TypeReferences.MAP_STRING_OBJECT);
+        return objectMapperProvider.getForTimeZone(timeZone).convertValue(modelData, TypeReferences.MAP_STRING_OBJECT);
     }
 
     private void sendEmail(EmailEventNotificationConfig config, String emailAddress, Map<String, Object> model) throws TransportConfigurationException, EmailException {
@@ -161,7 +163,7 @@ public class EmailSender {
             notificationService.publishIfFirst(notification);
         }
 
-        final Map<String, Object> model = getModel(ctx, backlog);
+        final Map<String, Object> model = getModel(ctx, backlog, notificationConfig.timeZone());
 
         for (String email : recipientsSet) {
             sendEmail(notificationConfig, email, model);
