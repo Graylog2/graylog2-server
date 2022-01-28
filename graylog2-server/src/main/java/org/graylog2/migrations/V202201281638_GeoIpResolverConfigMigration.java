@@ -23,6 +23,7 @@ import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.Document;
 import org.bson.conversions.Bson;
+import org.graylog.plugins.map.config.DatabaseType;
 import org.graylog.plugins.map.config.DatabaseVendorType;
 import org.graylog.plugins.map.config.GeoIpResolverConfig;
 import org.graylog2.database.MongoConnection;
@@ -32,9 +33,17 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import java.time.ZonedDateTime;
 
-public class V20211221144300_GeoIpResolverConfigMigration extends Migration {
+/**
+ * The Original migration had a bug which cause the <b>db_vendor_type</b>  field to always be updated--replacing any user supplied values.
+ *
+ * <p>
+ * This update provides a filter when updating the <b>db_vendor_type</b> field such that it is only updated if the current value is
+ * <i>MAXMIND_CITY</i>--this is the old/original  value which we want to replace with the default MAXMIND.
+ * </p>
+ */
+public class V202201281638_GeoIpResolverConfigMigration extends Migration {
 
-    private static final Logger LOG = LoggerFactory.getLogger(V20211221144300_GeoIpResolverConfigMigration.class);
+    private static final Logger LOG = LoggerFactory.getLogger(V202201281638_GeoIpResolverConfigMigration.class);
     private static final String COLLECTION_NAME = "cluster_config";
     public static final String PAYLOAD = "payload";
     private static final String FIELD_DB_VENDOR = PAYLOAD + ".db_vendor_type";
@@ -47,13 +56,13 @@ public class V20211221144300_GeoIpResolverConfigMigration extends Migration {
     private final MongoConnection mongoConnection;
 
     @Inject
-    public V20211221144300_GeoIpResolverConfigMigration(MongoConnection mongoConnection) {
+    public V202201281638_GeoIpResolverConfigMigration(MongoConnection mongoConnection) {
         this.mongoConnection = mongoConnection;
     }
 
     @Override
     public ZonedDateTime createdAt() {
-        return ZonedDateTime.parse("2021-12-21t14:43Z");
+        return ZonedDateTime.parse("2022-01-28t16:38Z");
     }
 
     /**
@@ -90,8 +99,9 @@ public class V20211221144300_GeoIpResolverConfigMigration extends Migration {
         LOG.info("Update Result: {}", updateResult);
 
         Bson setDefaultVendor = Updates.set(FIELD_DB_VENDOR, DatabaseVendorType.MAXMIND.name());
+        Bson maxMindCityFilter = Filters.eq(FIELD_DB_VENDOR, DatabaseType.MAXMIND_CITY.name());
         LOG.info("Setting default vendor: {}", setDefaultVendor);
-        final UpdateResult updateVendorResult = collection.updateOne(geoConfFilter, setDefaultVendor);
+        final UpdateResult updateVendorResult = collection.updateOne(Filters.and(geoConfFilter, maxMindCityFilter), setDefaultVendor);
         LOG.info("Default Vendor Update Result: {}", updateVendorResult);
 
     }
