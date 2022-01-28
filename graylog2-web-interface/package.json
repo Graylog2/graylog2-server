@@ -180,11 +180,8 @@
     "yargs": "^17.0.1"
   },
   "resolutions": {
-    "jquery": "3.5.1",
-    "@babel/runtime-corejs2": "7.13.10",
     "immer": "9.0.6",
     "nth-check": "2.0.1",
-    "glob-parent": "5.1.2",
-    "browserslist": "4.16.5"
+    "glob-parent": "5.1.2"
   }
 }
