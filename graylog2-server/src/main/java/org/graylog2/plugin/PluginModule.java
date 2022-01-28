@@ -42,7 +42,6 @@ import org.graylog2.audit.AuditEventType;
 import org.graylog2.audit.PluginAuditEventTypes;
 import org.graylog2.audit.formatter.AuditEventFormatter;
 import org.graylog2.contentpacks.constraints.ConstraintChecker;
-import org.graylog2.contentpacks.facades.EntityFacade;
 import org.graylog2.contentpacks.facades.EntityWithExcerptFacade;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.migrations.Migration;
@@ -61,6 +60,7 @@ import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.plugin.security.PasswordAlgorithm;
 import org.graylog2.plugin.security.PluginPermissions;
+import org.graylog2.plugin.validate.ClusterConfigValidator;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.graylog2.shared.messageq.MessageQueueReader;
 import org.graylog2.shared.messageq.MessageQueueWriter;
@@ -383,5 +383,12 @@ public abstract class PluginModule extends Graylog2Module {
                 .filter(Service.class::isAssignableFrom)
                 .forEach(service ->
                         serviceBinder().addBinding().to((Class<? extends Service>) service).in(Scopes.SINGLETON));
+    }
+
+
+    protected void addClusterConfigValidator(Class<?> configClass, Class<? extends ClusterConfigValidator> configValidatorClass) {
+
+        clusterConfigMapBinder().addBinding(configClass).to(configValidatorClass);
+
     }
 }

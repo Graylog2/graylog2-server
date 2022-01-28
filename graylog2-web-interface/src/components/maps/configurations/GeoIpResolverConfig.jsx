@@ -19,9 +19,18 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 
 import { IfPermitted, Select } from 'components/common';
-import { Button, BootstrapModalForm, Input } from 'components/bootstrap';
+import { Button, BootstrapModalForm, Col, Input, Row } from 'components/bootstrap';
 import { DocumentationLink } from 'components/support';
 import ObjectUtils from 'util/ObjectUtils';
+
+const defaultConfig = {
+  enabled: false,
+  enforce_graylog_schema: true,
+  db_vendor_type: 'MAXMIND',
+  city_db_path: '/etc/graylog/server/GeoLite2-City.mmdb',
+  asn_db_path: '/etc/graylog/server/GeoLite2-ASN.mmdb',
+  run_before_extractors: false,
+};
 
 const GeoIpResolverConfig = createReactClass({
   displayName: 'GeoIpResolverConfig',
@@ -34,10 +43,7 @@ const GeoIpResolverConfig = createReactClass({
   getDefaultProps() {
     return {
       config: {
-        enabled: false,
-        db_type: 'MAXMIND_CITY',
-        db_path: '/etc/graylog/server/GeoLite2-City.mmdb',
-        run_before_extractors: false,
+        ...defaultConfig,
       },
     };
   },
@@ -58,9 +64,16 @@ const GeoIpResolverConfig = createReactClass({
 
   _updateConfigField(field, value) {
     const { config } = this.state;
-    const update = ObjectUtils.clone(config);
+    let update = ObjectUtils.clone(config);
+
+    if (field === 'enabled' && value && config.city_db_path === '' && config.asn_db_path === '') {
+      update = {
+        ...defaultConfig,
+      };
+    }
 
     update[field] = value;
+
     this.setState({ config: update });
   },
 
@@ -93,20 +106,35 @@ const GeoIpResolverConfig = createReactClass({
     const { updateConfig } = this.props;
     const { config } = this.state;
 
-    updateConfig(config).then(() => {
+    const updatedConfig = { ...config };
+
+    if (!updatedConfig.enabled) {
+      updatedConfig.asn_db_path = '';
+      updatedConfig.city_db_path = '';
+    }
+
+    updateConfig(updatedConfig).then(() => {
       this._closeModal();
     });
   },
 
   _availableDatabaseTypes() {
-    // TODO: Support country database as well.
     return [
-      { value: 'MAXMIND_CITY', label: 'City database' },
+      { value: 'MAXMIND', label: 'MaxMind' },
+      { value: 'IPINFO', label: 'IPInfo' },
     ];
   },
 
   _activeDatabaseType(type) {
     return this._availableDatabaseTypes().filter((t) => t.value === type)[0].label;
+  },
+
+  _onDbTypeSelect(value) {
+    const { config } = this.state;
+    const update = ObjectUtils.clone(config);
+
+    update.db_vendor_type = value;
+    this.setState({ config: update });
   },
 
   render() {
@@ -124,11 +152,19 @@ const GeoIpResolverConfig = createReactClass({
 
         <dl className="deflist">
           <dt>Enabled:</dt>
-          <dd>{config.enabled === true ? 'yes' : 'no'}</dd>
-          <dt>Database type:</dt>
-          <dd>{this._activeDatabaseType(config.db_type)}</dd>
-          <dt>Database path:</dt>
-          <dd>{config.db_path}</dd>
+          <dd>{config.enabled === true ? 'Yes' : 'No'}</dd>
+          {config.enabled && (
+            <>
+              <dt>Default Graylog schema:</dt>
+              <dd>{config.enforce_graylog_schema === true ? 'Yes' : 'No'}</dd>
+              <dt>Database vendor type:</dt>
+              <dd>{this._activeDatabaseType(config.db_vendor_type)}</dd>
+              <dt>City database path:</dt>
+              <dd>{config.city_db_path}</dd>
+              <dt>ASN database path:</dt>
+              <dd>{config.asn_db_path}</dd>
+            </>
+          )}
         </dl>
 
         <IfPermitted permissions="clusterconfigentry:edit">
@@ -141,30 +177,51 @@ const GeoIpResolverConfig = createReactClass({
                             onModalClose={this._resetConfig}
                             submitButtonText="Save">
           <fieldset>
-            <Input id="geolocation-enable-checkbox"
-                   type="checkbox"
-                   ref={(elem) => { this.inputs.configEnabled = elem; }}
-                   label="Enable Geo-Location processor"
-                   name="enabled"
-                   checked={config.enabled}
-                   onChange={this._onCheckboxClick('enabled', 'configEnabled')} />
+            <Row>
+              <Col sm={6}>
+                <Input id="geolocation-enable-checkbox"
+                       type="checkbox"
+                       ref={(elem) => { this.inputs.configEnabled = elem; }}
+                       label="Enable Geo-Location processor"
+                       name="enabled"
+                       checked={config.enabled}
+                       onChange={this._onCheckboxClick('enabled', 'configEnabled')} />
+              </Col>
+              <Col sm={6}>
+                <Input id="geolocation-enforce_graylog_schema-checkbox"
+                       type="checkbox"
+                       ref={(elem) => { this.inputs.enforceEnabled = elem; }}
+                       label="Enforce default Graylog schema"
+                       name="enforce_graylog_schema"
+                       checked={config.enforce_graylog_schema}
+                       onChange={this._onCheckboxClick('enforce_graylog_schema', 'enforceEnabled')} />
+              </Col>
+            </Row>
             <Input id="maxmind-db-select"
-                   label="Select the MaxMind database type"
-                   help="Select the MaxMind database type you want to use to extract geo-location information.">
-              <Select placeholder="Select MaxMind database type"
+                   label="Select the GeoIP database vendor">
+              <Select placeholder="Select the GeoIP database vendor"
                       required
+                      disabled={!config.enabled}
                       options={this._availableDatabaseTypes()}
                       matchProp="label"
-                      value={config.db_type}
+                      value={config.db_vendor_type}
                       onChange={this._onDbTypeSelect} />
             </Input>
-            <Input id="maxmind-db-path"
+            <Input id="db-path"
                    type="text"
-                   label="Path to the MaxMind database"
-                   help={<span>You can download a free version of the database from <a href="https://dev.maxmind.com/geoip/geoip2/geolite2/" target="_blank" rel="noopener noreferrer">MaxMind</a>.</span>}
-                   name="db_path"
-                   value={config.db_path}
-                   onChange={this._onUpdate('db_path')} />
+                   disabled={!config.enabled}
+                   label="Path to the city database"
+                   name="city_db_path"
+                   value={config.city_db_path}
+                   onChange={this._onUpdate('city_db_path')}
+                   required />
+            <Input id="asn-db-path"
+                   type="text"
+                   disabled={!config.enabled}
+                   label="Path to the ASN database"
+                   name="asn_db_path"
+                   value={config.asn_db_path}
+                   onChange={this._onUpdate('asn_db_path')} />
           </fieldset>
         </BootstrapModalForm>
       </div>

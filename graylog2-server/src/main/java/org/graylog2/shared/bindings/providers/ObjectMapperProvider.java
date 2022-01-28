@@ -30,6 +30,9 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.github.zafarkhaja.semver.Version;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.vdurmont.semver4j.Requirement;
 import com.vdurmont.semver4j.Semver;
 import org.graylog.grn.GRN;
@@ -53,8 +56,12 @@ import org.graylog2.security.encryption.EncryptedValueService;
 import org.graylog2.shared.jackson.SizeSerializer;
 import org.graylog2.shared.plugins.GraylogClassLoader;
 import org.graylog2.shared.rest.RangeJsonSerializer;
+import org.joda.time.DateTimeZone;
 import org.joda.time.Period;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
@@ -65,7 +72,20 @@ import java.util.concurrent.TimeUnit;
 
 @Singleton
 public class ObjectMapperProvider implements Provider<ObjectMapper> {
+    private static final Logger log = LoggerFactory.getLogger(ObjectMapperProvider.class);
+
     protected final ObjectMapper objectMapper;
+
+    private final LoadingCache<DateTimeZone, ObjectMapper> mapperByTimeZone = CacheBuilder.newBuilder()
+            .maximumSize(DateTimeZone.getAvailableIDs().size())
+            .build(
+                    new CacheLoader<DateTimeZone, ObjectMapper>() {
+                        @Override
+                        public ObjectMapper load(@Nonnull DateTimeZone key) {
+                            return objectMapper.copy().setTimeZone(key.toTimeZone());
+                        }
+                    }
+            );
 
     // WARNING: This constructor should ONLY be used for tests!
     public ObjectMapperProvider() {
@@ -123,6 +143,26 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
 
     @Override
     public ObjectMapper get() {
+        return objectMapper;
+    }
+
+    /**
+     * Returns an ObjectMapper which is configured to use the given time zone.
+     * <p>
+     * The mapper object is cached, so it must not be modified by the client.
+     *
+     * @param timeZone The time zone used for dates
+     * @return An object mapper with the given time zone configured. If a {@code null} time zone was used, or any
+     * exception happend, the default object mapper using the UTC time zone is returned.
+     */
+    public ObjectMapper getForTimeZone(DateTimeZone timeZone) {
+        if (timeZone != null) {
+            try {
+                return mapperByTimeZone.get(timeZone);
+            } catch (Exception e) {
+                log.error("Unable to get ObjectMapper for time zone <" + timeZone + ">. Using UTC ObjectMapper instead.", e);
+            }
+        }
         return objectMapper;
     }
 }

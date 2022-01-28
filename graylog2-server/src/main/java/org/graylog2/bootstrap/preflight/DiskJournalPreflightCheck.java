@@ -17,6 +17,7 @@
 package org.graylog2.bootstrap.preflight;
 
 import com.github.joschi.jadconfig.util.Size;
+import org.graylog.shaded.kafka09.utils.FileLock;
 import org.graylog2.Configuration;
 import org.graylog2.shared.messageq.MessageQueueModule;
 import org.graylog2.shared.system.stats.fs.FsProbe;
@@ -27,6 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -56,17 +58,12 @@ public class DiskJournalPreflightCheck implements PreflightCheck {
         if (!configuration.isMessageJournalEnabled() || (!configuration.getMessageJournalMode().equals(MessageQueueModule.DISK_JOURNAL_MODE))) {
             return;
         }
-        if (!java.nio.file.Files.exists(journalDirectory)) {
-            try {
-                java.nio.file.Files.createDirectories(journalDirectory);
-            } catch (IOException e) {
-                throw new PreflightCheckException(StringUtils.f("Cannot create journal directory at <%s>", journalDirectory.toAbsolutePath()));
-            }
-        }
-        if (!Files.isWritable(journalDirectory)) {
-            throw new PreflightCheckException(StringUtils.f("Journal directory <%s> is not writable!", journalDirectory.toAbsolutePath()));
-        }
+        checkWritableJournalDir();
+        checkJournalDirSizeAndType();
+        checkJournalUnlocked();
+    }
 
+    private void checkJournalDirSizeAndType() {
         final Map<String, FsStats.Filesystem> filesystems = fsProbe.fsStats().filesystems();
         final FsStats.Filesystem journalFs = filesystems.get(journalDirectory.toAbsolutePath().toString());
         if (journalFs != null) {
@@ -90,6 +87,36 @@ public class DiskJournalPreflightCheck implements PreflightCheck {
             }
         } else {
             LOG.warn("Could not perform size check on journal directory <{}>", journalDirectory.toAbsolutePath());
+        }
+    }
+
+    private void checkWritableJournalDir() {
+        if (!Files.exists(journalDirectory)) {
+            try {
+                Files.createDirectories(journalDirectory);
+            } catch (IOException e) {
+                throw new PreflightCheckException(StringUtils.f("Cannot create journal directory at <%s>", journalDirectory.toAbsolutePath()));
+            }
+        }
+        if (!Files.isWritable(journalDirectory)) {
+            throw new PreflightCheckException(StringUtils.f("Journal directory <%s> is not writable!", journalDirectory.toAbsolutePath()));
+        }
+    }
+
+    private void checkJournalUnlocked() {
+        final File file = new File(journalDirectory.toFile(), ".lock");
+        FileLock fileLock = null;
+        try {
+            fileLock = new FileLock(file);
+            if (!fileLock.tryLock()) {
+                throw new PreflightCheckException(
+                        StringUtils.f("The journal is already locked by another process. Try running fuser \"%s\" to find the PID.",
+                        file.getAbsolutePath()));
+            }
+        } finally {
+            if (fileLock != null) {
+                fileLock.unlock();
+            }
         }
     }
 }

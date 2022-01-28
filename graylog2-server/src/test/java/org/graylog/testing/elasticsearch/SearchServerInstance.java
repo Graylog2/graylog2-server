@@ -17,6 +17,7 @@
 package org.graylog.testing.elasticsearch;
 
 import com.google.common.io.Resources;
+import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog2.storage.SearchVersion;
 import org.junit.rules.ExternalResource;
 import org.slf4j.Logger;
@@ -107,6 +108,8 @@ public abstract class SearchServerInstance extends ExternalResource implements C
     public SearchVersion version() {
         return version;
     }
+
+    public abstract SearchServer searchServer();
 
     public void importFixtureResource(String resourcePath, Class<?> testClass) {
         boolean isFullResourcePath = Paths.get(resourcePath).getNameCount() > 1;

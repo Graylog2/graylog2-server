@@ -18,8 +18,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { Label } from 'components/bootstrap';
-import { Timestamp, Icon } from 'components/common';
-import DateTime from 'logic/datetimes/DateTime';
+import { RelativeTime, Icon } from 'components/common';
 import { IndexSizeSummary } from 'components/indices';
 
 class IndexSummary extends React.Component {
@@ -53,7 +52,7 @@ class IndexSummary extends React.Component {
 
   _formatIndexRange = () => {
     if (this.props.isDeflector) {
-      return <span>Contains messages up to <Timestamp dateTime={new DateTime().toISOString()} relative /></span>;
+      return <span>Contains messages up to <RelativeTime dateTime={new Date()} /></span>;
     }
 
     const sizes = this.props.index.size;
@@ -72,13 +71,13 @@ class IndexSummary extends React.Component {
     }
 
     if (this.props.indexRange.begin === 0) {
-      return <span>Contains messages up to <Timestamp dateTime={this.props.indexRange.end} relative /></span>;
+      return <span>Contains messages up to <RelativeTime dateTime={this.props.indexRange.end} /></span>;
     }
 
     return (
       <span>
-        Contains messages from <Timestamp dateTime={this.props.indexRange.begin} relative /> up to{' '}
-        <Timestamp dateTime={this.props.indexRange.end} relative />
+        Contains messages from <RelativeTime dateTime={this.props.indexRange.begin} /> up to{' '}
+        <RelativeTime dateTime={this.props.indexRange.end} />
       </span>
     );
   };

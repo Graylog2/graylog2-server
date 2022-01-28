@@ -39,7 +39,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class QuerySuggestionsES7 implements QuerySuggestionsService {
 
@@ -55,11 +54,11 @@ public class QuerySuggestionsES7 implements QuerySuggestionsService {
     @Override
     public SuggestionResponse suggest(SuggestionRequest req) {
         final Set<String> affectedIndices = indexLookup.indexNamesForStreamsInTimeRange(req.streams(), req.timerange());
-        final TermSuggestionBuilder suggestionBuilder = SuggestBuilders.termSuggestion(req.field()).text(req.input()).size(10);
+        final TermSuggestionBuilder suggestionBuilder = SuggestBuilders.termSuggestion(req.field()).text(req.input()).size(req.size());
         final SearchSourceBuilder search = new SearchSourceBuilder()
                 .query(QueryBuilders.prefixQuery(req.field(), req.input()))
                 .size(0)
-                .aggregation(AggregationBuilders.terms("fieldvalues").field(req.field()).size(10))
+                .aggregation(AggregationBuilders.terms("fieldvalues").field(req.field()).size(req.size()))
                 .suggest(new SuggestBuilder().addSuggestion("corrections", suggestionBuilder));
 
         try {
@@ -68,11 +67,11 @@ public class QuerySuggestionsES7 implements QuerySuggestionsService {
             final List<SuggestionEntry> entries = fieldValues.getBuckets().stream().map(b -> new SuggestionEntry(b.getKeyAsString(), b.getDocCount())).collect(Collectors.toList());
 
             if(!entries.isEmpty()) {
-                return SuggestionResponse.forSuggestions(req.field(), req.input(), entries);
+                return SuggestionResponse.forSuggestions(req.field(), req.input(), entries, fieldValues.getSumOfOtherDocCounts());
             } else {
                 TermSuggestion suggestion = result.getSuggest().getSuggestion("corrections");
                 final List<SuggestionEntry> corrections = suggestion.getEntries().stream().flatMap(e -> e.getOptions().stream()).map(o -> new SuggestionEntry(o.getText().string(), o.getFreq())).collect(Collectors.toList());
-                return SuggestionResponse.forSuggestions(req.field(), req.input(), corrections);
+                return SuggestionResponse.forSuggestions(req.field(), req.input(), corrections, null);
             }
 
 

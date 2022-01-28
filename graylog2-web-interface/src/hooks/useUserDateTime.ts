@@ -14,14 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
 
-import { singleton } from 'logic/singleton';
+import { useContext } from 'react';
 
-export type TimeLocalizeContextType = {
-  localizeTime: (string) => string,
+import UserDateTimeContext from 'contexts/UserDateTimeContext';
+
+const useUserDateTime = () => {
+  const userDateTime = useContext(UserDateTimeContext);
+
+  if (!userDateTime) {
+    throw new Error('useUserDateTime hook needs to be used inside UserDateTimeContext.Provider');
+  }
+
+  return userDateTime;
 };
 
-const TimeLocalizeContext = React.createContext<TimeLocalizeContextType | undefined>(undefined);
-
-export default singleton('contexts.TimeLocalizeContext', () => TimeLocalizeContext);
+export default useUserDateTime;

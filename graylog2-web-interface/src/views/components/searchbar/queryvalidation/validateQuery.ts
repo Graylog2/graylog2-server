@@ -16,6 +16,7 @@
  */
 import type * as Immutable from 'immutable';
 
+import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import type { ElasticsearchQueryString, TimeRange } from 'views/logic/queries/Query';
@@ -83,6 +84,12 @@ export const validateQuery = ({
     }
 
     return undefined;
+  }).catch((error) => {
+    UserNotification.error(`Validating search query failed with status: ${error}`);
+
+    return ({
+      status: 'OK',
+    });
   });
 };
 

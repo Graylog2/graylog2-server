@@ -1,0 +1,82 @@
+{
+  "searches": [
+    {
+      "_id": {
+        "$oid": "61977043c1f17d26b45c8a0b"
+      },
+      "queries": [
+        {
+          "id": "f1446410-a082-4871-b3bf-d69aa42d0c96",
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "action:$action$"
+          },
+          "timerange": {
+            "type": "relative",
+            "from": 300
+          },
+          "search_types": [
+            {
+              "timerange": null,
+              "query": null,
+              "streams": [],
+              "id": "8306779b-933f-473f-837d-b7a7d83a9a40",
+              "name": "chart",
+              "series": [
+                {
+                  "type": "count",
+                  "id": "count()"
+                }
+              ],
+              "sort": [],
+              "rollup": true,
+              "type": "pivot",
+              "row_groups": [
+                {
+                  "type": "time",
+                  "field": "timestamp",
+                  "interval": {
+                    "type": "auto",
+                    "scaling": 1.0
+                  }
+                }
+              ],
+              "column_groups": []
+            }
+          ]
+        },
+        {
+          "id": "f1446410-a082-4871-b3bf-d69aa42d0c97",
+          "query": {
+            "type": "elasticsearch",
+            "query_string": ""
+          },
+          "timerange": {
+            "type": "relative",
+            "from": 300
+          },
+          "search_types": [
+            {
+              "timerange": null,
+              "query": null,
+              "streams": [],
+              "id": "01c76680-377b-4930-86e2-a55fdb867b58",
+              "name": null,
+              "limit": 150,
+              "offset": 0,
+              "sort": [
+                {
+                  "field": "timestamp",
+                  "order": "DESC"
+                }
+              ],
+              "fields": [],
+              "decorators": [],
+              "type": "messages"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

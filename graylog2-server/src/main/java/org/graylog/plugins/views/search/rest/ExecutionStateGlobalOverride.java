@@ -32,16 +32,22 @@ import java.util.Optional;
 public abstract class ExecutionStateGlobalOverride {
     @JsonProperty
     public abstract Optional<TimeRange> timerange();
+
     @JsonProperty
     public abstract Optional<BackendQuery> query();
+
     @JsonProperty
     public abstract Optional<Integer> limit();
+
     @JsonProperty
     public abstract Optional<Integer> offset();
+
     @JsonProperty
     public abstract ImmutableMap<String, SearchTypeExecutionState> searchTypes();
+
     @JsonProperty
     public abstract ImmutableSet<String> keepSearchTypes();
+
     public abstract Builder toBuilder();
 
     public static Builder builder() {
@@ -50,11 +56,11 @@ public abstract class ExecutionStateGlobalOverride {
 
     public boolean hasValues() {
         return timerange().isPresent() ||
-       query().isPresent() ||
-       limit().isPresent() ||
-       offset().isPresent() ||
-       !searchTypes().isEmpty() ||
-       !keepSearchTypes().isEmpty();
+                query().isPresent() ||
+                limit().isPresent() ||
+                offset().isPresent() ||
+                !searchTypes().isEmpty() ||
+                !keepSearchTypes().isEmpty();
     }
 
     public static ExecutionStateGlobalOverride empty() {
@@ -65,22 +71,32 @@ public abstract class ExecutionStateGlobalOverride {
     public abstract static class Builder {
 
         @JsonCreator
-        public static ExecutionStateGlobalOverride.Builder create() {
+        public static Builder create() {
             return ExecutionStateGlobalOverride.builder();
         }
 
         @JsonProperty
         public abstract Builder timerange(TimeRange timerange);
+
         @JsonProperty
         public abstract Builder query(BackendQuery query);
+
         @JsonProperty
         public abstract Builder limit(Integer limit);
+
         @JsonProperty
         public abstract Builder offset(Integer offset);
+
         @JsonProperty
+        public abstract Builder keepSearchTypes(ImmutableSet<String> keepSearchTypes);
+
+        @JsonProperty
+        public abstract Builder searchTypes(ImmutableMap<String, SearchTypeExecutionState> searchTypes);
+
         public abstract ImmutableMap.Builder<String, SearchTypeExecutionState> searchTypesBuilder();
-        @JsonProperty
+
         public abstract ImmutableSet.Builder<String> keepSearchTypesBuilder();
+
         public abstract ExecutionStateGlobalOverride build();
     }
 }

@@ -16,14 +16,30 @@
  */
 package org.graylog2.indexer.indices;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
+import org.graylog.storage.elasticsearch6.IndexingHelper;
+import org.graylog.storage.elasticsearch6.IndicesAdapterES6;
+import org.graylog.storage.elasticsearch6.NodeAdapterES6;
+import org.graylog.storage.elasticsearch7.ElasticsearchClient;
+import org.graylog.storage.elasticsearch7.IndicesAdapterES7;
+import org.graylog.storage.elasticsearch7.NodeAdapterES7;
+import org.graylog.storage.elasticsearch7.cat.CatApi;
+import org.graylog.storage.elasticsearch7.cluster.ClusterStateApi;
+import org.graylog.storage.elasticsearch7.stats.StatsApi;
+import org.graylog.testing.ContainerMatrixElasticsearchITBaseTest;
+import org.graylog.testing.containermatrix.MongodbServer;
+import org.graylog.testing.containermatrix.SearchServer;
+import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
+import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.audit.NullAuditEventSender;
 import org.graylog2.indexer.IgnoreIndexTemplate;
+import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.IndexMappingFactory;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.IndexSet;
@@ -45,17 +61,16 @@ import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConf
 import org.graylog2.indexer.searches.IndexRangeStats;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetStats;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -65,15 +80,17 @@ import java.util.concurrent.TimeUnit;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
+import static org.graylog.storage.elasticsearch6.testing.TestUtils.jestClient;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public abstract class IndicesIT extends ElasticsearchBaseTest {
+// these tests only test the SearchServer, so there is only one MongoDB-version necessary (needed, to launch the tests)
+@ContainerMatrixTestsConfiguration(mongoVersions = MongodbServer.MONGO4)
+public class IndicesIT extends ContainerMatrixElasticsearchITBaseTest {
     private static final String INDEX_NAME = "graylog_0";
-
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
+    private final Set<String> indicesToCleanUp = new HashSet<>();
 
     private static final IndexSetConfig indexSetConfig = IndexSetConfig.builder()
             .id("index-set-1")
@@ -98,9 +115,52 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
     private EventBus eventBus;
     protected Indices indices;
 
-    protected abstract IndicesAdapter indicesAdapter();
+    public IndicesIT(SearchServerInstance elasticsearch) {
+        super(elasticsearch);
+    }
 
-    @Before
+    protected IndicesAdapter indicesAdapter() {
+        if (elasticsearch().searchServer().equals(SearchServer.ES6)) {
+            return new IndicesAdapterES6(jestClient(elasticsearch()),
+                    new ObjectMapperProvider().get(),
+                    new IndexingHelper());
+        } else {
+            final ObjectMapper objectMapper = new ObjectMapperProvider().get();
+            final ElasticsearchClient client = elasticsearchClient();
+            return new IndicesAdapterES7(
+                    client,
+                    new StatsApi(objectMapper, client),
+                    new CatApi(objectMapper, client),
+                    new ClusterStateApi(objectMapper, client)
+            );
+        }
+    }
+
+    protected NodeAdapter createNodeAdapter() {
+        if (elasticsearch().searchServer().equals(SearchServer.ES6)) {
+            return new NodeAdapterES6(jestClient(elasticsearch()));
+        } else {
+            final ObjectMapper objectMapper = new ObjectMapperProvider().get();
+            return new NodeAdapterES7(elasticsearchClient(), objectMapper);
+        }
+    }
+
+    protected Map<String, Object> createTemplateFor(String indexWildcard, Map<String, Object> mapping) {
+        if (elasticsearch().searchServer().equals(SearchServer.ES6)) {
+            return ImmutableMap.of(
+                    "template", indexWildcard,
+                    "mappings", ImmutableMap.of(IndexMapping.TYPE_MESSAGE, mapping)
+            );
+        } else {
+            // for ES7 and OS1
+            return ImmutableMap.of(
+                    "template", indexWildcard,
+                    "mappings", mapping
+            );
+        }
+    }
+
+    @BeforeEach
     public void setUp() {
         //noinspection UnstableApiUsage
         eventBus = new EventBus("indices-test");
@@ -116,19 +176,29 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
         );
     }
 
-    protected abstract NodeAdapter createNodeAdapter();
+    @AfterEach
+    public void cleanUp() {
+        indicesToCleanUp.forEach(client()::deleteIndices);
+        indicesToCleanUp.clear();
+    }
 
-    @Test
+    protected String createRandomIndex(final String prefix) {
+        final String index = client().createRandomIndex(prefix);
+        indicesToCleanUp.add(index);
+        return index;
+    }
+
+    @ContainerMatrixTest
     public void testDelete() {
-        final String index = client().createRandomIndex("indices_it_");
+        final String index = createRandomIndex("indices_it_");
         indices.delete(index);
 
         assertThat(client().indicesExists(index)).isFalse();
     }
 
-    @Test
+    @ContainerMatrixTest
     public void testClose() {
-        final String index = client().createRandomIndex("indices_it_");
+        final String index = createRandomIndex("indices_it_");
 
         assertThat(indices.isOpen(index)).isTrue();
 
@@ -137,11 +207,11 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
         assertThat(indices.isClosed(index)).isTrue();
     }
 
-    @Test
+    @ContainerMatrixTest
     public void findClosedIndices() {
-        final String index1 = client().createRandomIndex("indices_it_");
+        final String index1 = createRandomIndex("indices_it_");
         client().closeIndex(index1);
-        final String index2 = client().createRandomIndex("otherindices_it_");
+        final String index2 = createRandomIndex("otherindices_it_");
         client().closeIndex(index2);
         client().createRandomIndex("evenmoreindices_it_");
 
@@ -150,9 +220,9 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
         assertThat(closedIndices).containsExactlyInAnyOrder(index1, index2);
     }
 
-    @Test
+    @ContainerMatrixTest
     public void aliasExistsReturnsIfGivenIndexNameIsIndexOrAlias() {
-        final String index = client().createRandomIndex("indices_it_");
+        final String index = createRandomIndex("indices_it_");
         final String alias = "graylog_alias_exists";
         assertThat(indices.aliasExists(alias)).isFalse();
 
@@ -162,29 +232,29 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
         assertThat(indices.exists(alias)).isFalse();
     }
 
-    @Test
+    @ContainerMatrixTest
     public void aliasExistsReturnsIfGivenIndexHasAlias() {
-        final String indexName = client().createRandomIndex("indices_it_");
+        final String indexName = createRandomIndex("indices_it_");
 
         assertThat(indices.aliasExists(indexName)).isFalse();
     }
 
-    @Test
+    @ContainerMatrixTest
     public void existsIndicatesPresenceOfGivenIndex() {
-        final String indexName = client().createRandomIndex("indices_it_");
+        final String indexName = createRandomIndex("indices_it_");
 
         assertThat(indices.exists(indexName)).isTrue();
     }
 
-    @Test
+    @ContainerMatrixTest
     public void existsReturnsFalseIfGivenIndexDoesNotExists() {
         final String indexNotAlias = "graylog_index_does_not_exist";
         assertThat(indices.exists(indexNotAlias)).isFalse();
     }
 
-    @Test
+    @ContainerMatrixTest
     public void aliasTargetReturnsListOfTargetsGivenAliasIsPointingTo() {
-        final String index = client().createRandomIndex("indices_it_");
+        final String index = createRandomIndex("indices_it_");
         final String alias = "graylog_alias_target";
         assertThat(indices.aliasTarget(alias)).isEmpty();
 
@@ -193,7 +263,7 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
         assertThat(indices.aliasTarget(alias)).contains(index);
     }
 
-    @Test
+    @ContainerMatrixTest
     public void indexRangeStatsOfIndexReturnsMinMaxTimestampsForGivenIndex() {
         importFixture("org/graylog2/indexer/indices/IndicesIT.json");
 
@@ -203,9 +273,9 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
         assertThat(stats.max()).isEqualTo(new DateTime(2015, 1, 1, 5, 0, DateTimeZone.UTC));
     }
 
-    @Test
+    @ContainerMatrixTest
     public void indexRangeStatsWorksForEmptyIndex() {
-        final String indexName = client().createRandomIndex("indices_it_");
+        final String indexName = createRandomIndex("indices_it_");
 
         IndexRangeStats stats = indices.indexRangeStatsOfIndex(indexName);
 
@@ -213,23 +283,29 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
         assertThat(stats.max()).isEqualTo(new DateTime(0L, DateTimeZone.UTC));
     }
 
-    @Test(expected = IndexNotFoundException.class)
+    @ContainerMatrixTest
     public void indexRangeStatsThrowsExceptionIfIndexIsClosed() {
-        final String index = client().createRandomIndex("indices_it_");
+        assertThrows(IndexNotFoundException.class, () -> {
+            final String index = createRandomIndex("indices_it_");
 
-        client().closeIndex(index);
+            client().closeIndex(index);
 
-        indices.indexRangeStatsOfIndex(index);
+            indices.indexRangeStatsOfIndex(index);
+        });
     }
 
-    @Test(expected = IndexNotFoundException.class)
+    @ContainerMatrixTest
     public void indexRangeStatsThrowsExceptionIfIndexDoesNotExists() {
-        indices.indexRangeStatsOfIndex("does-not-exist");
+        assertThrows(IndexNotFoundException.class, () -> {
+            indices.indexRangeStatsOfIndex("does-not-exist");
+        });
     }
 
-    @Test
+    @ContainerMatrixTest
     public void createEnsuresIndexTemplateExists() {
         final String indexName = "index_template_test";
+        indicesToCleanUp.add(indexName);
+
         final String templateName = indexSetConfig.indexTemplateName();
 
         assertThat(client().templateExists(templateName)).isFalse();
@@ -237,13 +313,14 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
         indices.create(indexName, indexSet);
 
         assertThat(client().templateExists(templateName)).isTrue();
-        assertThat(client().fieldType("index_template_test", "message")).isEqualTo("text");
+        assertThat(client().fieldType(indexName, "message")).isEqualTo("text");
     }
 
-    protected abstract Map<String, Object> createTemplateFor(String indexWildcard, Map<String, Object> beforeMapping);
-
-    @Test
+    @ContainerMatrixTest
     public void createOverwritesIndexTemplate() {
+        final String indexName = "index_template_test";
+        indicesToCleanUp.add(indexName);
+
         final String templateName = indexSetConfig.indexTemplateName();
 
         final Map<String, Object> beforeMapping = ImmutableMap.of(
@@ -255,32 +332,32 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
 
         client().putTemplate(templateName, templateSource);
 
-        indices.create("index_template_test", indexSet);
+        indices.create(indexName, indexSet);
 
-        assertThat(client().fieldType("index_template_test", "message")).isEqualTo("text");
+        assertThat(client().fieldType(indexName, "message")).isEqualTo("text");
     }
 
-    @Test
+    @ContainerMatrixTest
     public void indexCreationDateReturnsIndexCreationDateOfExistingIndexAsDateTime() {
         final DateTime now = DateTime.now(DateTimeZone.UTC);
-        final String indexName = client().createRandomIndex("indices_it_");
+        final String indexName = createRandomIndex("indices_it_");
 
         final Optional<DateTime> indexCreationDate = indices.indexCreationDate(indexName);
         assertThat(indexCreationDate).isNotEmpty()
                 .hasValueSatisfying(date -> assertThat(date.toDate()).isCloseTo(now.toDate(), TimeUnit.SECONDS.toMillis(1)));
     }
 
-    @Test
+    @ContainerMatrixTest
     public void indexCreationDateReturnsEmptyOptionalForNonExistingIndex() {
         assertThat(indices.indexCreationDate("index_missing")).isEmpty();
     }
 
-    @Test
+    @ContainerMatrixTest
     public void closePostsIndicesClosedEvent() {
-        final IndicesEventListener listener = new IndicesEventListener();
+        final org.graylog2.indexer.indices.IndicesIT.IndicesEventListener listener = new org.graylog2.indexer.indices.IndicesIT.IndicesEventListener();
         eventBus.register(listener);
 
-        final String index = client().createRandomIndex("indices_it_");
+        final String index = createRandomIndex("indices_it_");
 
         indices.close(index);
 
@@ -289,12 +366,12 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
         assertThat(listener.indicesReopenedEvents).isEmpty();
     }
 
-    @Test
+    @ContainerMatrixTest
     public void deletePostsIndicesDeletedEvent() {
-        final IndicesEventListener listener = new IndicesEventListener();
+        final org.graylog2.indexer.indices.IndicesIT.IndicesEventListener listener = new org.graylog2.indexer.indices.IndicesIT.IndicesEventListener();
         eventBus.register(listener);
 
-        final String index = client().createRandomIndex("indices_it_");
+        final String index = createRandomIndex("indices_it_");
 
         indices.delete(index);
 
@@ -303,12 +380,12 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
         assertThat(listener.indicesReopenedEvents).isEmpty();
     }
 
-    @Test
+    @ContainerMatrixTest
     public void reopenIndexPostsIndicesReopenedEvent() {
-        final IndicesEventListener listener = new IndicesEventListener();
+        final org.graylog2.indexer.indices.IndicesIT.IndicesEventListener listener = new org.graylog2.indexer.indices.IndicesIT.IndicesEventListener();
         eventBus.register(listener);
 
-        final String index = client().createRandomIndex("indices_it_");
+        final String index = createRandomIndex("indices_it_");
 
         client().closeIndex(index);
 
@@ -319,7 +396,7 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
         assertThat(listener.indicesDeletedEvents).isEmpty();
     }
 
-    @Test
+    @ContainerMatrixTest
     public void ensureIndexTemplateDoesntThrowOnIgnoreIndexTemplateAndExistingTemplate() {
         final String templateName = indexSetConfig.indexTemplateName();
 
@@ -348,7 +425,7 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
         return indexMappingFactory;
     }
 
-    @Test
+    @ContainerMatrixTest
     public void ensureIndexTemplateThrowsOnIgnoreIndexTemplateAndNonExistingTemplate() {
         final String templateName = indexSetConfig.indexTemplateName();
 
@@ -396,11 +473,11 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
         }
     }
 
-    @Test
+    @ContainerMatrixTest
     public void getIndices() {
         final IndexSet indexSet = new TestIndexSet(indexSetConfig.toBuilder().indexPrefix("indices_it").build());
-        final String index1 = client().createRandomIndex("indices_it_");
-        final String index2 = client().createRandomIndex("indices_it_");
+        final String index1 = createRandomIndex("indices_it_");
+        final String index2 = createRandomIndex("indices_it_");
 
         client().closeIndex(index2);
 
@@ -414,18 +491,18 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
                 .containsOnly(index2);
     }
 
-    @Test
+    @ContainerMatrixTest
     public void storeSizeInBytesReturnsValue() {
-        final String index = client().createRandomIndex("foo");
+        final String index = createRandomIndex("foo");
 
         final Optional<Long> storeSizeInBytes = indices.getStoreSizeInBytes(index);
 
         assertThat(storeSizeInBytes).isNotEmpty();
     }
 
-    @Test
+    @ContainerMatrixTest
     public void retrievesCreationTimeOfIndexInUTC() {
-        final String index = client().createRandomIndex("foo");
+        final String index = createRandomIndex("foo");
 
         final Optional<DateTime> creationDate = indices.indexCreationDate(index);
 
@@ -433,10 +510,10 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
                 assertThat(dt.getZone()).isEqualTo(DateTimeZone.UTC));
     }
 
-    @Test
+    @ContainerMatrixTest
     public void retrievesAllAliasesForIndex() {
-        final String index1 = client().createRandomIndex("foo-");
-        final String index2 = client().createRandomIndex("foo-");
+        final String index1 = createRandomIndex("foo-");
+        final String index2 = createRandomIndex("foo-");
 
         client().addAliasMapping(index1, "alias1");
         client().addAliasMapping(index2, "alias2");
@@ -453,21 +530,21 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
                 );
     }
 
-    @Test
+    @ContainerMatrixTest
     public void retrieveIndexStatisticsForIndices() {
-        final String index = client().createRandomIndex("indices_it_");
+        final String index = createRandomIndex("indices_it_");
 
         final Set<IndexStatistics> indicesStats = indices.getIndicesStats(Collections.singleton(index));
 
         assertThat(indicesStats).isNotEmpty();
     }
 
-    @Test
+    @ContainerMatrixTest
     public void cyclingDeflectorMovesAliasFromOldToNewTarget() {
         final String deflector = "indices_it_deflector";
 
-        final String index1 = client().createRandomIndex("indices_it_");
-        final String index2 = client().createRandomIndex("indices_it_");
+        final String index1 = createRandomIndex("indices_it_");
+        final String index2 = createRandomIndex("indices_it_");
 
         client().addAliasMapping(index1, deflector);
 
@@ -478,7 +555,7 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
         assertThat(indices.aliasTarget(deflector)).hasValue(index2);
     }
 
-    @Test
+    @ContainerMatrixTest
     public void retrievingIndexStatsForWildcard() {
         final IndexSetStatsCreator indexSetStatsCreator = new IndexSetStatsCreator(indices);
         final String indexPrefix = "indices_wildcard_";
@@ -486,8 +563,8 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
         final IndexSet indexSet = mock(IndexSet.class);
         when(indexSet.getIndexWildcard()).thenReturn(wildcard);
 
-        client().createRandomIndex(indexPrefix);
-        client().createRandomIndex(indexPrefix);
+        createRandomIndex(indexPrefix);
+        createRandomIndex(indexPrefix);
 
         final IndexSetStats indexSetStats = indexSetStatsCreator.getForIndexSet(indexSet);
 
@@ -495,30 +572,30 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
         assertThat(indexSetStats.size()).isNotZero();
     }
 
-    @Test
+    @ContainerMatrixTest
     public void waitForRedIndexReturnsStatus() {
         final HealthStatus healthStatus = indices.waitForRecovery("this_index_does_not_exist", 0);
 
         assertThat(healthStatus).isEqualTo(HealthStatus.Red);
     }
 
-    @Test
+    @ContainerMatrixTest
     public void numberOfMessagesReturnsCorrectSize() {
         importFixture("org/graylog2/indexer/indices/IndicesIT.json");
 
         assertThat(indices.numberOfMessages("graylog_0")).isEqualTo(10);
     }
 
-    @Test
+    @ContainerMatrixTest
     public void optimizeIndexJobDoesNotThrowException() {
         importFixture("org/graylog2/indexer/indices/IndicesIT.json");
 
         indices.optimizeIndex("graylog_0", 1, Duration.minutes(1));
     }
 
-    @Test
+    @ContainerMatrixTest
     public void aliasTargetReturnsListOfTargetsGivenAliasIsPointingToWithWildcards() {
-        final String index = client().createRandomIndex("indices_it_");
+        final String index = createRandomIndex("indices_it_");
         final String alias = "graylog_alias_target";
         assertThat(indices.aliasTarget(alias)).isEmpty();
 
@@ -527,10 +604,10 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
         assertThat(indices.aliasTarget("graylog_alias_*")).contains(index);
     }
 
-    @Test
+    @ContainerMatrixTest
     public void aliasTargetSupportsIndicesWithPlusInName() {
         final String prefixWithPlus = "index+set_";
-        final String index = client().createRandomIndex(prefixWithPlus);
+        final String index = createRandomIndex(prefixWithPlus);
         final String alias = prefixWithPlus + "deflector";
         assertThat(indices.aliasTarget(alias)).isEmpty();
 
@@ -539,11 +616,11 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
         assertThat(indices.aliasTarget(prefixWithPlus + "*")).contains(index);
     }
 
-    @Test
+    @ContainerMatrixTest
     public void removeAliasesRemovesSecondTarget() {
         final String randomIndices = "random_";
-        final String index = client().createRandomIndex(randomIndices);
-        final String index2 = client().createRandomIndex(randomIndices);
+        final String index = createRandomIndex(randomIndices);
+        final String index2 = createRandomIndex(randomIndices);
         final String alias = randomIndices + "deflector";
         assertThat(indices.aliasTarget(alias)).isEmpty();
 
@@ -556,5 +633,21 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
         indices.removeAliases(alias, Collections.singleton(index));
 
         assertThat(indices.aliasTarget(alias)).contains(index2);
+    }
+
+    // Prevent accidental use of AliasActions.Type.REMOVE_INDEX,
+    // as despite being an *Alias* Action, it actually deletes an index!
+    @ContainerMatrixTest
+    public void cyclingAliasLeavesOldIndexInPlace() {
+        final String deflector = "indices_it_deflector";
+
+        final String index1 = createRandomIndex("indices_it_");
+        final String index2 = createRandomIndex("indices_it_");
+
+        client().addAliasMapping(index1, deflector);
+
+        indices.cycleAlias(deflector, index2, index1);
+
+        assertThat(indices.exists(index1)).isTrue();
     }
 }
