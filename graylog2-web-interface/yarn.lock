@@ -4656,11 +4656,9 @@ chownr@^2.0.0:
   integrity sha512-bIomtDF5KGpdogkLd9VspvFzk9KfpyyGlS8YFVZl7TGPBHL5snIOnxeshwVgPteQ9b4Eydl+pVbIyE1DcvCWgQ==
 
 chroma-js@^2.0.3:
-  version "2.1.2"
-  resolved "https://registry.yarnpkg.com/chroma-js/-/chroma-js-2.1.2.tgz#1075cb9ae25bcb2017c109394168b5cf3aa500ec"
-  integrity sha512-ri/ouYDWuxfus3UcaMxC1Tfp3IE9K5iQzxc2hSxbBRVNQFut1UuGAsZmiAf2mOUubzGJwgMSv9lHg+XqLaz1QQ==
-  dependencies:
-    cross-env "^6.0.3"
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/chroma-js/-/chroma-js-2.3.0.tgz#fdf68a18d8f97ce006422338044218ccbffb9ecb"
+  integrity sha512-dRgAp9FHHy+VfE7e3/I5HHU0+zZlUHBODcjvXUXinsR/NnHCO+kfv68ofzrAqFI80q2IWvDSAmHAqHh93TGgKg==
 
 chrome-trace-event@^1.0.2:
   version "1.0.2"
@@ -5204,13 +5202,6 @@ create-react-class@15.7.0:
   dependencies:
     loose-envify "^1.3.1"
     object-assign "^4.1.1"
-
-cross-env@^6.0.3:
-  version "6.0.3"
-  resolved "https://registry.yarnpkg.com/cross-env/-/cross-env-6.0.3.tgz#4256b71e49b3a40637a0ce70768a6ef5c72ae941"
-  integrity sha512-+KqxF6LCvfhWvADcDPqo64yVIB31gv/jQulX2NGzKS/g3GEVz6/pt4wjHFtFWsHMddebWD/sDthJemzM4MaAag==
-  dependencies:
-    cross-spawn "^7.0.0"
 
 cross-env@^7.0.2:
   version "7.0.3"
@@ -7921,11 +7912,11 @@ graceful-fs@^4.2.9:
     "@babel/preset-env" "7.16.11"
     "@babel/preset-typescript" "7.16.7"
     create-react-class "15.7.0"
-    eslint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.3.0-SNAPSHOT-b9b13143-8b9d-4012-90b2-75b03f748494-1643273374590/node_modules/eslint-config-graylog"
+    eslint-config-graylog "file:packages/eslint-config-graylog"
     formik "2.2.9"
     html-webpack-plugin "^5.5.0"
     javascript-natural-sort "0.7.1"
-    jest-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.3.0-SNAPSHOT-b9b13143-8b9d-4012-90b2-75b03f748494-1643273374590/node_modules/jest-preset-graylog"
+    jest-preset-graylog "file:packages/jest-preset-graylog"
     jquery "3.5.1"
     moment "2.29.1"
     moment-timezone "0.5.34"
@@ -7939,7 +7930,7 @@ graceful-fs@^4.2.9:
     react-router-dom "5.3.0"
     reflux "0.2.13"
     styled-components "5.3.3"
-    stylelint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.3.0-SNAPSHOT-b9b13143-8b9d-4012-90b2-75b03f748494-1643273374590/node_modules/stylelint-config-graylog"
+    stylelint-config-graylog "file:packages/stylelint-config-graylog"
     typescript "4.5.5"
     webpack "5.67.0"
     webpack-cleanup-plugin "0.5.1"
@@ -10553,9 +10544,9 @@ markdown-to-jsx@^6.11.4:
     unquote "^1.1.0"
 
 marked@^4.0.10:
-  version "4.0.10"
-  resolved "https://registry.yarnpkg.com/marked/-/marked-4.0.10.tgz#423e295385cc0c3a70fa495e0df68b007b879423"
-  integrity sha512-+QvuFj0nGgO970fySghXGmuw+Fd0gD2x3+MqCWLIPf5oxdv1Ka6b2q+z9RP01P/IaKPMEramy+7cNy/Lw8c3hw==
+  version "4.0.12"
+  resolved "https://registry.yarnpkg.com/marked/-/marked-4.0.12.tgz#2262a4e6fd1afd2f13557726238b69a48b982f7d"
+  integrity sha512-hgibXWrEDNBWgGiK18j/4lkS6ihTe9sxtV4Q1OQppb/0zzyPSzoFANBa5MfsG/zgsWklmNnhm0XACZOH/0HBiQ==
 
 match-sorter@^6.0.2:
   version "6.3.0"
