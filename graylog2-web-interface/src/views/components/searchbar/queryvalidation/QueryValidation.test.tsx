@@ -22,6 +22,7 @@ import { Form, Formik } from 'formik';
 import QueryValidation from 'views/components/searchbar/queryvalidation/QueryValidation';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import FormWarningsContext from 'contexts/FormWarningsContext'; import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
+import { validationError } from 'fixtures/queryValidationState';
 
 jest.mock('views/stores/QueriesStore', () => ({
   QueriesActions: {
@@ -56,18 +57,6 @@ type SUTProps = {
 }
 
 describe('QueryValidation', () => {
-  const errorResponse: QueryValidationState = {
-    status: 'ERROR',
-    explanations: [{
-      errorType: 'ParseException',
-      errorMessage: "Cannot parse 'source: '",
-      beginLine: 1,
-      endLine: 1,
-      beginColumn: 1,
-      endColumn: 5,
-    }],
-  };
-
   const validationErrorIconTitle = 'Toggle validation error explanation';
 
   const openExplanation = async () => {
@@ -90,7 +79,7 @@ describe('QueryValidation', () => {
   });
 
   it('should display validation error icon when there is a validation error', async () => {
-    render(<SUT error={errorResponse} />);
+    render(<SUT error={validationError} />);
 
     await screen.findByTitle(validationErrorIconTitle);
   });
@@ -102,7 +91,7 @@ describe('QueryValidation', () => {
   });
 
   it('should display validation error explanation', async () => {
-    render(<SUT error={errorResponse} />);
+    render(<SUT error={validationError} />);
 
     await openExplanation();
 
@@ -112,7 +101,7 @@ describe('QueryValidation', () => {
   });
 
   it('should display validation error specific documentation links', async () => {
-    render(<SUT error={errorResponse} />);
+    render(<SUT error={validationError} />);
 
     await openExplanation();
 
