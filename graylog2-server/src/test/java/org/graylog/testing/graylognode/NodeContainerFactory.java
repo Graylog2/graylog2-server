@@ -53,19 +53,20 @@ public class NodeContainerFactory {
 
     private static final String GRAYLOG_HOME = "/usr/share/graylog";
 
-    public static GenericContainer<?> buildContainer(NodeContainerConfig config, List<Path> pluginJars,
-                                                     Path mavenProjectDir, Path projectBinDir) {
+    public static GenericContainer<?> buildContainer(NodeContainerConfig config) {
         if (!config.skipPackaging) {
-            MavenPackager.packageJarIfNecessary(mavenProjectDir);
+            MavenPackager.packageJarIfNecessary(config);
         } else {
             LOG.info("Skipping packaging");
         }
-        ImageFromDockerfile image = createImage(config, projectBinDir);
+        ImageFromDockerfile image = createImage(config);
 
-        return createRunningContainer(config, image, pluginJars);
+        return createRunningContainer(config, image);
     }
 
-    private static ImageFromDockerfile createImage(NodeContainerConfig config, Path projectBinDir) {
+    private static ImageFromDockerfile createImage(NodeContainerConfig config) {
+        Path projectBinDir = config.mavenProjectDirProvider.getBinDir();
+
         // testcontainers only allows passing permissions if you pass a `File`
         File entrypointScript = resourceToTmpFile("org/graylog/testing/graylognode/docker-entrypoint.sh");
 
@@ -107,13 +108,14 @@ public class NodeContainerFactory {
         }
     }
 
-    private static GenericContainer<?> createRunningContainer(NodeContainerConfig config, ImageFromDockerfile image,
-                                                              List<Path> pluginJars) {
+    private static GenericContainer<?> createRunningContainer(NodeContainerConfig config, ImageFromDockerfile image) {
+
+        List<Path> pluginJars = config.pluginJarsProvider.getJars();
+        boolean excludeFrontend = config.mavenProjectDirProvider.excludeFrontend();
 
         GenericContainer<?> container = new GenericContainer<>(image)
                 .withFileSystemBind(property("server_jar"), GRAYLOG_HOME + "/graylog.jar", BindMode.READ_ONLY)
                 .withNetwork(config.network)
-                .withEnv("DEVELOPMENT", "true")
                 .withEnv("GRAYLOG_MONGODB_URI", config.mongoDbUri)
                 .withEnv("GRAYLOG_ELASTICSEARCH_HOSTS", config.elasticsearchUri)
                 // TODO: should we set this override search version or let graylog server to detect it from the search server itself?
@@ -144,6 +146,10 @@ public class NodeContainerFactory {
                                 })))
                 .withExposedPorts(config.portsToExpose())
                 .withStartupTimeout(Duration.of(120, SECONDS));
+
+        if (excludeFrontend) {
+            container.withEnv("DEVELOPMENT", "true");
+        }
 
         pluginJars.forEach(hostPath -> {
             if (Files.exists(hostPath)) {

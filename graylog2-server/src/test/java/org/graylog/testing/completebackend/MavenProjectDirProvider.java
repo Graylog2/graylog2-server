@@ -24,4 +24,8 @@ public interface MavenProjectDirProvider {
     Path getBinDir();
 
     String getUniqueId();
+
+    default boolean excludeFrontend() {
+        return false;
+    }
 }
