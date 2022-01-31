@@ -17,20 +17,26 @@
 
 package org.graylog2.migrations;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.Document;
 import org.bson.conversions.Bson;
-import org.graylog.plugins.map.config.DatabaseType;
+import org.graylog.autovalue.WithBeanGetter;
 import org.graylog.plugins.map.config.DatabaseVendorType;
 import org.graylog.plugins.map.config.GeoIpResolverConfig;
 import org.graylog2.database.MongoConnection;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
 /**
@@ -54,10 +60,13 @@ public class V202201281638_GeoIpResolverConfigMigration extends Migration {
     private static final String FIELD_ENFORCE = PAYLOAD + ".enforce_graylog_schema";
 
     private final MongoConnection mongoConnection;
+    private final ClusterConfigService clusterConfigService;
 
     @Inject
-    public V202201281638_GeoIpResolverConfigMigration(MongoConnection mongoConnection) {
+    public V202201281638_GeoIpResolverConfigMigration(MongoConnection mongoConnection,
+                                                      ClusterConfigService clusterConfigService) {
         this.mongoConnection = mongoConnection;
+        this.clusterConfigService = clusterConfigService;
     }
 
     @Override
@@ -74,6 +83,12 @@ public class V202201281638_GeoIpResolverConfigMigration extends Migration {
      */
     @Override
     public void upgrade() {
+
+        MigrationCompletion completion = clusterConfigService.get(MigrationCompletion.class);
+        if (completion != null) {
+            LOG.info("Migration was already completed on '{}'", completion.completionDate());
+            return;
+        }
 
         final MongoCollection<Document> collection = mongoConnection.getMongoDatabase().getCollection(COLLECTION_NAME);
         LOG.info("Updating '{}' collection.", COLLECTION_NAME);
@@ -99,11 +114,26 @@ public class V202201281638_GeoIpResolverConfigMigration extends Migration {
         LOG.info("Update Result: {}", updateResult);
 
         Bson setDefaultVendor = Updates.set(FIELD_DB_VENDOR, DatabaseVendorType.MAXMIND.name());
-        Bson maxMindCityFilter = Filters.eq(FIELD_DB_VENDOR, DatabaseType.MAXMIND_CITY.name());
         LOG.info("Setting default vendor: {}", setDefaultVendor);
-        final UpdateResult updateVendorResult = collection.updateOne(Filters.and(geoConfFilter, maxMindCityFilter), setDefaultVendor);
+        final UpdateResult updateVendorResult = collection.updateOne(geoConfFilter, setDefaultVendor);
         LOG.info("Default Vendor Update Result: {}", updateVendorResult);
 
+        ZonedDateTime completionDate = ZonedDateTime.now().withZoneSameInstant(ZoneId.of("UTC"));
+        clusterConfigService.write(MigrationCompletion.create(completionDate));
+
+    }
+
+    @JsonAutoDetect
+    @AutoValue
+    @WithBeanGetter
+    public static abstract class MigrationCompletion {
+        @JsonProperty("completion_date")
+        public abstract ZonedDateTime completionDate();
+
+        @JsonCreator
+        public static MigrationCompletion create(@JsonProperty("completion_date") ZonedDateTime completionDate) {
+            return new AutoValue_V202201281638_GeoIpResolverConfigMigration_MigrationCompletion(completionDate);
+        }
     }
 }
 
