@@ -40,11 +40,11 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
 /**
- * The Original migration had a bug which cause the <b>db_vendor_type</b>  field to always be updated--replacing any user supplied values.
+ * The Original migration had a bug which caused the <b>db_vendor_type</b>  field to always be updated--replacing any user supplied values.
  *
  * <p>
- * This update provides a filter when updating the <b>db_vendor_type</b> field such that it is only updated if the current value is
- * <i>MAXMIND_CITY</i>--this is the old/original  value which we want to replace with the default MAXMIND.
+ * This update writes a completion status record upon initial successful migration, and checks for presence of such record
+ * before stating any subsequent migration--aborts if record found.
  * </p>
  */
 public class V202201281638_GeoIpResolverConfigMigration extends Migration {
@@ -126,7 +126,7 @@ public class V202201281638_GeoIpResolverConfigMigration extends Migration {
     @JsonAutoDetect
     @AutoValue
     @WithBeanGetter
-    public static abstract class MigrationCompletion {
+    public abstract static class MigrationCompletion {
         @JsonProperty("completion_date")
         public abstract ZonedDateTime completionDate();
 
