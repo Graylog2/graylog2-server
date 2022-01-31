@@ -62,12 +62,12 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
     setCurConfig({ ...config });
   }, [config]);
 
-  const _resetConfig = () => {
+  const resetConfig = () => {
     setCurConfig(config);
     setShowModal(false);
   };
 
-  const _handleSubmit = (values) => {
+  const handleSubmit = (values) => {
     updateConfig(values)
       .then((value: GeoIpConfigType) => {
         if ('enabled' in value) {
@@ -76,15 +76,15 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
       }).catch();
   };
 
-  const _availableDatabaseTypes = (): OptionType[] => {
+  const availableDatabaseTypes = (): OptionType[] => {
     return [
       { value: 'MAXMIND', label: 'MaxMind GeoIP' },
       { value: 'IPINFO', label: 'IPInfo Standard Location' },
     ];
   };
 
-  const _activeDatabaseType = (type: GeoDatabaseType) => {
-    return _availableDatabaseTypes().filter((t) => t.value === type)[0].label;
+  const activeDatabaseType = (type: GeoDatabaseType) => {
+    return availableDatabaseTypes().filter((t) => t.value === type)[0].label;
   };
 
   return (
@@ -105,7 +105,7 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
             <dt>Default Graylog schema:</dt>
             <dd>{config.enforce_graylog_schema === true ? 'Yes' : 'No'}</dd>
             <dt>Database vendor type:</dt>
-            <dd>{_activeDatabaseType(config.db_vendor_type)}</dd>
+            <dd>{activeDatabaseType(config.db_vendor_type)}</dd>
             <dt>City database path:</dt>
             <dd>{config.city_db_path}</dd>
             <dt>ASN database path:</dt>
@@ -123,8 +123,8 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
           Update
         </Button>
       </IfPermitted>
-      <Modal show={showModal} onHide={_resetConfig} aria-modal="true" aria-labelledby="dialog_label">
-        <Formik onSubmit={_handleSubmit} initialValues={curConfig}>
+      <Modal show={showModal} onHide={resetConfig} aria-modal="true" aria-labelledby="dialog_label">
+        <Formik onSubmit={handleSubmit} initialValues={curConfig}>
           {({ values, setFieldValue }) => {
             return (
               <Form>
@@ -157,7 +157,7 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
                                 placeholder="Select the GeoIP database vendor"
                                 required
                                 disabled={!values.enabled}
-                                options={_availableDatabaseTypes()}
+                                options={availableDatabaseTypes()}
                                 matchProp="label"
                                 value={values.db_vendor_type}
                                 onChange={(option) => {
@@ -180,7 +180,7 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
 
                 </Modal.Body>
                 <Modal.Footer>
-                  <Button type="button" bsStyle="link" onClick={_resetConfig}>Close</Button>
+                  <Button type="button" bsStyle="link" onClick={resetConfig}>Close</Button>
                   <Button type="submit" bsStyle="success">Save</Button>
                 </Modal.Footer>
               </Form>
