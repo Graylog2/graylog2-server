@@ -14,12 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, {useEffect, useState} from 'react';
-import {Field, Form, Formik} from 'formik';
-import {IfPermitted, Select} from 'components/common';
-import {Button, Col, Input, Modal, Row} from 'components/bootstrap';
+import React, { useEffect, useState } from 'react';
+import { Field, Form, Formik } from 'formik';
+
+import { IfPermitted, Select } from 'components/common';
+import { Button, Col, Input, Modal, Row } from 'components/bootstrap';
 import FormikInput from 'components/common/FormikInput';
-import {DocumentationLink} from 'components/support';
+import { DocumentationLink } from 'components/support';
 
 export type GeoDatabaseType = 'MAXMIND' | 'IPINFO'
 
@@ -51,14 +52,14 @@ const defaultConfig: GeoIpConfigType = {
   run_before_extractors: false,
 };
 
-const GeoIpResolverConfig = ({config = defaultConfig, updateConfig}: Props) => {
+const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) => {
   const [showModal, setShowModal] = useState(false);
   const [curConfig, setCurConfig] = useState(() => {
-    return {...defaultConfig};
+    return { ...defaultConfig };
   });
 
   useEffect(() => {
-    setCurConfig({...config});
+    setCurConfig({ ...config });
   }, [config]);
 
   const _resetConfig = () => {
@@ -77,8 +78,8 @@ const GeoIpResolverConfig = ({config = defaultConfig, updateConfig}: Props) => {
 
   const _availableDatabaseTypes = (): OptionType[] => {
     return [
-      {value: 'MAXMIND', label: 'MaxMind GeoIP'},
-      {value: 'IPINFO', label: 'IPInfo Standard Location'},
+      { value: 'MAXMIND', label: 'MaxMind GeoIP' },
+      { value: 'IPINFO', label: 'IPInfo Standard Location' },
     ];
   };
 
@@ -114,13 +115,17 @@ const GeoIpResolverConfig = ({config = defaultConfig, updateConfig}: Props) => {
       </dl>
 
       <IfPermitted permissions="clusterconfigentry:edit">
-        <Button bsStyle="info" bsSize="xs" onClick={() => {
-          setShowModal(true);
-        }}>Update</Button>
+        <Button bsStyle="info"
+                bsSize="xs"
+                onClick={() => {
+                  setShowModal(true);
+                }}>
+          Update
+        </Button>
       </IfPermitted>
       <Modal show={showModal} onHide={_resetConfig} aria-modal="true" aria-labelledby="dialog_label">
         <Formik onSubmit={_handleSubmit} initialValues={curConfig}>
-          {({values, setFieldValue}) => {
+          {({ values, setFieldValue }) => {
             return (
               <Form>
                 <Modal.Header>
@@ -185,7 +190,6 @@ const GeoIpResolverConfig = ({config = defaultConfig, updateConfig}: Props) => {
       </Modal>
     </div>
   );
-
 };
 
 export default GeoIpResolverConfig;
