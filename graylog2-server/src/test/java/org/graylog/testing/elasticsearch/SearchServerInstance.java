@@ -16,7 +16,6 @@
  */
 package org.graylog.testing.elasticsearch;
 
-import com.google.common.io.Resources;
 import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog2.storage.SearchVersion;
 import org.testcontainers.containers.GenericContainer;
@@ -24,11 +23,10 @@ import org.testcontainers.containers.Network;
 
 import java.io.Closeable;
 
-/**
- * This rule starts an Elasticsearch instance and provides a configured {@link Client}.
- */
 public interface SearchServerInstance extends Closeable {
     Client client();
+
+    SearchServer searchServer();
 
     FixtureImporter fixtureImporter();
 
@@ -48,48 +46,4 @@ public interface SearchServerInstance extends Closeable {
 
     @Override
     void close();
-    protected void after() {
-        cleanUp();
-    }
-
-    public void cleanUp() {
-        client().cleanUp();
-    }
-
-    @Override
-    public void close() {
-        container.close();
-        final List<SearchVersion> version = containersByVersion.keySet().stream().filter(k -> container == containersByVersion.get(k)).collect(Collectors.toList());
-        version.forEach(containersByVersion::remove);
-    }
-
-    public static String internalUri() {
-        return String.format(Locale.US, "http://%s:%d", NETWORK_ALIAS, ES_PORT);
-    }
-
-    public SearchVersion version() {
-        return version;
-    }
-
-    public abstract SearchServer searchServer();
-
-    public void importFixtureResource(String resourcePath, Class<?> testClass) {
-        boolean isFullResourcePath = Paths.get(resourcePath).getNameCount() > 1;
-
-        @SuppressWarnings("UnstableApiUsage")
-        final URL fixtureResource = isFullResourcePath
-                ? Resources.getResource(resourcePath)
-                : Resources.getResource(testClass, resourcePath);
-
-        fixtureImporter().importResource(fixtureResource);
-
-        // Make sure the data we just imported is visible
-        client().refreshNode();
-    }
-
-
-    public String getHttpHostAddress() {
-        return this.container.getHost() + ":" + this.container.getMappedPort(9200);
-    }
-
 }

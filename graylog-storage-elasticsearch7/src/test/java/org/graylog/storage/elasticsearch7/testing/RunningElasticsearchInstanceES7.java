@@ -23,6 +23,7 @@ import org.graylog.shaded.elasticsearch7.org.apache.http.impl.client.BasicCreden
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestHighLevelClient;
 import org.graylog.storage.elasticsearch7.ElasticsearchClient;
 import org.graylog.storage.elasticsearch7.RestHighLevelClientProvider;
+import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.elasticsearch.Client;
 import org.graylog.testing.elasticsearch.FixtureImporter;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
@@ -72,6 +73,11 @@ public class RunningElasticsearchInstanceES7 implements SearchServerInstance {
                 false,
                 new BasicCredentialsProvider())
                 .get();
+    }
+
+    @Override
+    public SearchServer searchServer() {
+        return SearchServer.ES7;
     }
 
     @Override
