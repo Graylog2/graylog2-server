@@ -27,6 +27,7 @@ import org.testcontainers.containers.wait.strategy.HttpWaitStrategy;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.containers.wait.strategy.WaitAllStrategy;
 import org.testcontainers.images.builder.ImageFromDockerfile;
+import org.testcontainers.utility.MountableFile;
 
 import java.io.File;
 import java.io.IOException;
@@ -54,6 +55,7 @@ public class NodeContainerFactory {
     private static final String GRAYLOG_HOME = "/usr/share/graylog";
 
     public static GenericContainer<?> buildContainer(NodeContainerConfig config) {
+        checkBinaries(config);
         if (!config.skipPackaging) {
             MavenPackager.packageJarIfNecessary(config);
         } else {
@@ -65,8 +67,6 @@ public class NodeContainerFactory {
     }
 
     private static ImageFromDockerfile createImage(NodeContainerConfig config) {
-        Path projectBinDir = config.mavenProjectDirProvider.getBinDir();
-
         // testcontainers only allows passing permissions if you pass a `File`
         File entrypointScript = resourceToTmpFile("org/graylog/testing/graylognode/docker-entrypoint.sh");
 
@@ -78,28 +78,16 @@ public class NodeContainerFactory {
                 .withFileFromPath("graylog.conf", pathTo("graylog_config"))
                 .withFileFromClasspath("log4j2.xml", "log4j2.xml");
 
-        addBinIfExists(image, projectBinDir, "chromedriver_start.sh", "chromedriver_start.sh");
-        addBinIfExists(image, projectBinDir, "headless_shell_amd64", "headless_shell_amd64");
-        addBinIfExists(image, projectBinDir, "chromedriver_amd64", "chromedriver_amd64");
-
         if (config.enableDebugging) {
             image.withBuildArg("DEBUG_OPTS", "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=0.0.0.0:5005");
         }
         return image;
     }
 
-    private static void addBinIfExists(ImageFromDockerfile image, Path projectDir, String bin, String filename) {
-        final File file = projectDir.resolve(bin).toFile();
-        if (file.exists() && file.isFile()) {
-            image.withFileFromFile(filename, file, EXECUTABLE_MODE);
-        }
-    }
-
     private static boolean containerFileExists(final GenericContainer container, String path) {
         try {
             Container.ExecResult r = container.execInContainer("/bin/sh", "-c",
-                    "if [ -f " + path
-                            + " ] ; then echo '0' ; else (>&2 echo '1') ; fi");
+                    "if [ -f " + path + " ] ; then echo '0' ; else (>&2 echo '1') ; fi");
 
             return !r.getStderr().contains("1");
         } catch (IOException | InterruptedException e) {
@@ -108,8 +96,20 @@ public class NodeContainerFactory {
         }
     }
 
-    private static GenericContainer<?> createRunningContainer(NodeContainerConfig config, ImageFromDockerfile image) {
+    private static void checkBinaries(NodeContainerConfig config) {
+        final Path projectBinDir = config.mavenProjectDirProvider.getBinDir();
+        config.mavenProjectDirProvider.getFilesToAddFromBinDir().forEach(filename -> {
+            File file = projectBinDir.resolve(filename).toFile();
+            if (!file.exists()) {
+                LOG.error("Mandatory file {} does not exist in bindir {}", filename, projectBinDir);
+            } else if (!file.canExecute()) {
+                LOG.error("File {} in bindir {} is not executable.", filename, projectBinDir);
+            }
+        });
+    }
 
+    private static GenericContainer<?> createRunningContainer(NodeContainerConfig config, ImageFromDockerfile image) {
+        Path projectBinDir = config.mavenProjectDirProvider.getBinDir();
         List<Path> pluginJars = config.pluginJarsProvider.getJars();
         boolean includeFrontend = config.mavenProjectDirProvider.includeFrontend();
 
@@ -164,9 +164,13 @@ public class NodeContainerFactory {
             LOG.info("Container debug port: " + container.getMappedPort(DEBUG_PORT));
         }
 
-        if (!containerFileExists(container, GRAYLOG_HOME + "/bin/" + "chromedriver_start.sh")) {
-            LOG.error("file does not exist");
-        }
+        config.mavenProjectDirProvider.getFilesToAddFromBinDir().forEach(filename -> {
+            final String containerPath = GRAYLOG_HOME + "/bin/" + filename;
+            container.copyFileToContainer(MountableFile.forHostPath(projectBinDir.resolve(filename)), containerPath);
+            if (!containerFileExists(container, containerPath)) {
+                LOG.error("Mandatory file {} does not exist in container at {}", filename, containerPath);
+            }
+        });
 
         return container;
     }

@@ -84,9 +84,6 @@ RUN \
 COPY docker-entrypoint.sh /
 COPY graylog.conf ${GRAYLOG_HOME}/data/config
 COPY log4j2.xml ${GRAYLOG_HOME}/data/config
-COPY chromedriver_start.sh ${GRAYLOG_HOME}/bin
-COPY headless_shell_amd64 ${GRAYLOG_HOME}/bin
-COPY chromedriver_amd64 ${GRAYLOG_HOME}/bin
 
 ENTRYPOINT ["tini", "--", "/docker-entrypoint.sh"]
 CMD ["graylog"]
