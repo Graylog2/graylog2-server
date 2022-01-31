@@ -37,8 +37,8 @@ public class MavenPackager {
 
     private static boolean jarHasBeenPackagedInThisRun = false;
 
-    private static String getMavenCommand(boolean excludeFrontend) {
-        return excludeFrontend ? MVN_COMMAND + EXCLUDE_FE : MVN_COMMAND;
+    private static String getMavenCommand(boolean includeFrontend) {
+        return includeFrontend ? MVN_COMMAND : MVN_COMMAND + EXCLUDE_FE;
     }
 
     public static void packageJarIfNecessary(NodeContainerConfig config) {
@@ -60,9 +60,9 @@ public class MavenPackager {
 
     public static void packageJar(NodeContainerConfig config) {
         Path pomDir = config.mavenProjectDirProvider.getProjectDir();
-        boolean excludeFrontend = config.mavenProjectDirProvider.excludeFrontend();
+        boolean includeFrontend = config.mavenProjectDirProvider.includeFrontend();
 
-        Process p = startProcess(pomDir, excludeFrontend);
+        Process p = startProcess(pomDir, includeFrontend);
 
         Stopwatch sw = Stopwatch.createStarted();
 
@@ -72,7 +72,7 @@ public class MavenPackager {
         LOG.info("Finished packaging after {} seconds", sw.elapsed(TimeUnit.SECONDS));
         jarHasBeenPackagedInThisRun = true;
 
-        ensureZeroExitCode(p, exitCode, excludeFrontend);
+        ensureZeroExitCode(p, exitCode, includeFrontend);
     }
 
     private static int waitForExit(Process p) {
@@ -83,27 +83,27 @@ public class MavenPackager {
         }
     }
 
-    private static Process startProcess(Path pomDir, boolean excludeFrontend) {
+    private static Process startProcess(Path pomDir, boolean includeFrontend) {
         try {
-            return new ProcessBuilder().command("sh", "-c", getMavenCommand(excludeFrontend)).directory(pomDir.toFile()).inheritIO().start();
+            return new ProcessBuilder().command("sh", "-c", getMavenCommand(includeFrontend)).directory(pomDir.toFile()).inheritIO().start();
         } catch (IOException e) {
-            String msg = String.format(Locale.US, "Failed to start maven process with command [%s].", getMavenCommand(excludeFrontend));
+            String msg = String.format(Locale.US, "Failed to start maven process with command [%s].", getMavenCommand(includeFrontend));
             throw new RuntimeException(msg, e);
         }
     }
 
-    private static void ensureZeroExitCode(Process p, int exitCode, boolean excludeFrontend) {
+    private static void ensureZeroExitCode(Process p, int exitCode, boolean includeFrontend) {
         if (exitCode == 0) {
             return;
         }
         if (exitCode == 127) {
-            String msg = String.format(Locale.US, "/bin/sh couldn't find Maven on your PATH when attempting to run [%s]", getMavenCommand(excludeFrontend));
+            String msg = String.format(Locale.US, "/bin/sh couldn't find Maven on your PATH when attempting to run [%s]", getMavenCommand(includeFrontend));
             throw new RuntimeException(msg);
         }
 
         printOutputFrom(p);
 
-        String msg = String.format(Locale.US, "Maven exited with %s after running [%s]. ", exitCode, getMavenCommand(excludeFrontend));
+        String msg = String.format(Locale.US, "Maven exited with %s after running [%s]. ", exitCode, getMavenCommand(includeFrontend));
         throw new RuntimeException(msg);
 
     }

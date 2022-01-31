@@ -111,7 +111,7 @@ public class NodeContainerFactory {
     private static GenericContainer<?> createRunningContainer(NodeContainerConfig config, ImageFromDockerfile image) {
 
         List<Path> pluginJars = config.pluginJarsProvider.getJars();
-        boolean excludeFrontend = config.mavenProjectDirProvider.excludeFrontend();
+        boolean includeFrontend = config.mavenProjectDirProvider.includeFrontend();
 
         GenericContainer<?> container = new GenericContainer<>(image)
                 .withFileSystemBind(property("server_jar"), GRAYLOG_HOME + "/graylog.jar", BindMode.READ_ONLY)
@@ -147,7 +147,7 @@ public class NodeContainerFactory {
                 .withExposedPorts(config.portsToExpose())
                 .withStartupTimeout(Duration.of(120, SECONDS));
 
-        if (excludeFrontend) {
+        if (!includeFrontend) {
             container.withEnv("DEVELOPMENT", "true");
         }
 
