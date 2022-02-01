@@ -19,7 +19,6 @@ package org.graylog2.migrations;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
@@ -36,7 +35,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
 /**
@@ -47,9 +45,9 @@ import java.time.ZonedDateTime;
  * before stating any subsequent migration--aborts if record found.
  * </p>
  */
-public class V202201281638_GeoIpResolverConfigMigration extends Migration {
+public class V20211221144300_GeoIpResolverConfigMigration extends Migration {
 
-    private static final Logger LOG = LoggerFactory.getLogger(V202201281638_GeoIpResolverConfigMigration.class);
+    private static final Logger LOG = LoggerFactory.getLogger(V20211221144300_GeoIpResolverConfigMigration.class);
     private static final String COLLECTION_NAME = "cluster_config";
     public static final String PAYLOAD = "payload";
     private static final String FIELD_DB_VENDOR = PAYLOAD + ".db_vendor_type";
@@ -63,8 +61,8 @@ public class V202201281638_GeoIpResolverConfigMigration extends Migration {
     private final ClusterConfigService clusterConfigService;
 
     @Inject
-    public V202201281638_GeoIpResolverConfigMigration(MongoConnection mongoConnection,
-                                                      ClusterConfigService clusterConfigService) {
+    public V20211221144300_GeoIpResolverConfigMigration(MongoConnection mongoConnection,
+                                                        ClusterConfigService clusterConfigService) {
         this.mongoConnection = mongoConnection;
         this.clusterConfigService = clusterConfigService;
     }
@@ -86,7 +84,7 @@ public class V202201281638_GeoIpResolverConfigMigration extends Migration {
 
         MigrationCompletion completion = clusterConfigService.get(MigrationCompletion.class);
         if (completion != null) {
-            LOG.debug("Migration was already completed on '{}'", completion.completionDate());
+            LOG.debug("Migration was already completed");
             return;
         }
 
@@ -118,8 +116,7 @@ public class V202201281638_GeoIpResolverConfigMigration extends Migration {
         final UpdateResult updateVendorResult = collection.updateOne(geoConfFilter, setDefaultVendor);
         LOG.info("Default Vendor Update Result: {}", updateVendorResult);
 
-        ZonedDateTime completionDate = ZonedDateTime.now().withZoneSameInstant(ZoneId.of("UTC"));
-        clusterConfigService.write(MigrationCompletion.create(completionDate));
+        clusterConfigService.write(MigrationCompletion.create());
 
     }
 
@@ -127,12 +124,10 @@ public class V202201281638_GeoIpResolverConfigMigration extends Migration {
     @AutoValue
     @WithBeanGetter
     public abstract static class MigrationCompletion {
-        @JsonProperty("completion_date")
-        public abstract ZonedDateTime completionDate();
 
         @JsonCreator
-        public static MigrationCompletion create(@JsonProperty("completion_date") ZonedDateTime completionDate) {
-            return new AutoValue_V202201281638_GeoIpResolverConfigMigration_MigrationCompletion(completionDate);
+        public static MigrationCompletion create() {
+            return null;//new AutoValue_V202201281638_GeoIpResolverConfigMigration_MigrationCompletion(ZonedDateTime.now());
         }
     }
 }
