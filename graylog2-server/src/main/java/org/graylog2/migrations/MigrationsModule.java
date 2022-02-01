@@ -53,6 +53,6 @@ public class MigrationsModule extends PluginModule {
         addMigration(V20211221144300_GeoIpResolverConfigMigration.class);
 
         // Make sure there is always a binder for migration modules
-        Multibinder.newSetBinder(binder(), V20211221144300_GeoIpResolverConfigMigration.class);
+        Multibinder.newSetBinder(binder(), V20201103145400_LegacyAuthServiceMigration.MigrationModule.class);
     }
 }
