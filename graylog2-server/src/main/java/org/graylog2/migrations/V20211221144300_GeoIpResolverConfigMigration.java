@@ -127,7 +127,7 @@ public class V20211221144300_GeoIpResolverConfigMigration extends Migration {
 
         @JsonCreator
         public static MigrationCompletion create() {
-            return null;//new AutoValue_V202201281638_GeoIpResolverConfigMigration_MigrationCompletion(ZonedDateTime.now());
+            return new AutoValue_V20211221144300_GeoIpResolverConfigMigration_MigrationCompletion();
         }
     }
 }
