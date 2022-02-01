@@ -86,7 +86,7 @@ public class V202201281638_GeoIpResolverConfigMigration extends Migration {
 
         MigrationCompletion completion = clusterConfigService.get(MigrationCompletion.class);
         if (completion != null) {
-            LOG.info("Migration was already completed on '{}'", completion.completionDate());
+            LOG.debug("Migration was already completed on '{}'", completion.completionDate());
             return;
         }
 
