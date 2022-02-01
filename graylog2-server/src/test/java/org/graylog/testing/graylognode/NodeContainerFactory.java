@@ -107,7 +107,8 @@ public class NodeContainerFactory {
                 LOG.warn("File {} in bindir {} is not executable, setting executable flag.", filename, projectBinDir);
                 try {
                     Files.setPosixFilePermissions(path, PosixFilePermissions.fromString("rwxrwxr-x"));
-                } catch (IOException iox) {
+                    Thread.sleep(1000);
+                } catch (IOException | InterruptedException iox) {
                     LOG.error("Setting executable flag for file " + filename + " in bindir " + projectBinDir + " failed.", iox);
                 }
             }
