@@ -98,7 +98,7 @@ class NotificationsFactory {
           title: 'Elasticsearch cluster unavailable',
           description: (
             <span>
-              Graylog could not successfully connect to the Elasticsearch cluster. If you're using multicast, check that
+              Graylog could not successfully connect to the Elasticsearch cluster. If you are using multicast, check that
               it is working in your network and that Elasticsearch is accessible. Also check that the cluster name setting
               is correct. Read how to fix this in {' '}
               <DocumentationLink page={DocsHelper.PAGES.ES_CLUSTER_UNAVAILABLE}
@@ -306,7 +306,7 @@ class NotificationsFactory {
             </span>
           ),
         };
-      case 'es_version_mismatch':
+      case 'es_version_mismatch': {
         const { initial_version: initialVersion, current_version: currentVersion } = notification.details;
 
         return {
@@ -324,8 +324,9 @@ class NotificationsFactory {
 
             </span>
           ),
-        };
-      case 'legacy_ldap_config_migration':
+        }
+      };
+      case 'legacy_ldap_config_migration': {
         const { auth_service_id: authServiceId } = notification.details;
         const authServiceLink = <Link to={Routes.SYSTEM.AUTHENTICATION.BACKENDS.show(authServiceId)}>Authentication Service</Link>;
 
@@ -347,7 +348,8 @@ class NotificationsFactory {
               for more details.
             </span>
           ),
-        };
+        }
+      };
       case 'archiving_summary':
         return {
           title: 'Some archiving jobs did not complete successfully',
@@ -355,7 +357,7 @@ class NotificationsFactory {
             <span>
               Recent failed attempts: {' '}
               <ul>
-                {notification.details.archiveErrors.map((error, index) => <li key={index}>{error}</li>)}
+                {notification.details.archiveErrors.map((error) => <li key={error.id}>{error}</li>)}
               </ul>
             </span>
           ),
