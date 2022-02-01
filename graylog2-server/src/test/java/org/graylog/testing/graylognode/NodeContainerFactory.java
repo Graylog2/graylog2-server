@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.time.Duration;
 import java.util.List;
 import java.util.stream.StreamSupport;
@@ -99,11 +100,16 @@ public class NodeContainerFactory {
     private static void checkBinaries(NodeContainerConfig config) {
         final Path projectBinDir = config.mavenProjectDirProvider.getBinDir();
         config.mavenProjectDirProvider.getFilesToAddFromBinDir().forEach(filename -> {
-            File file = projectBinDir.resolve(filename).toFile();
-            if (!file.exists()) {
+            Path path = projectBinDir.resolve(filename);
+            if (!Files.exists(path)) {
                 LOG.error("Mandatory file {} does not exist in bindir {}", filename, projectBinDir);
-            } else if (!file.canExecute()) {
-                LOG.error("File {} in bindir {} is not executable.", filename, projectBinDir);
+            } else if (!Files.isExecutable(path)) {
+                LOG.warn("File {} in bindir {} is not executable, setting executable flag.", filename, projectBinDir);
+                try {
+                    Files.setPosixFilePermissions(path, PosixFilePermissions.fromString("rwxrwxr-x"));
+                } catch (IOException iox) {
+                    LOG.error("Setting executable flag for file " + filename + " in bindir " + projectBinDir + " failed.", iox);
+                }
             }
         });
     }
