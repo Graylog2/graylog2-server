@@ -19,6 +19,7 @@ package org.graylog.storage.elasticsearch6.views.export;
 import org.graylog.plugins.views.search.export.ExportMessagesCommand;
 import org.graylog.storage.elasticsearch6.testing.ElasticsearchInstanceES6;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
+import org.graylog.testing.elasticsearch.TestableSearchServerInstance;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -26,7 +27,7 @@ import static org.graylog.storage.elasticsearch6.testing.TestUtils.jestClient;
 
 public class ElasticsearchExportBackendSearchAfterIT extends ElasticsearchExportBackendITBase {
     @Rule
-    public final SearchServerInstance elasticsearch = ElasticsearchInstanceES6.create();
+    public final TestableSearchServerInstance elasticsearch = ElasticsearchInstanceES6.create();
 
     @Override
     protected SearchServerInstance elasticsearch() {

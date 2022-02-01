@@ -23,6 +23,7 @@ import io.searchbox.core.CatResult;
 import org.graylog.storage.elasticsearch6.jest.JestUtils;
 import org.graylog.storage.elasticsearch6.testing.ElasticsearchInstanceES6;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
+import org.graylog.testing.elasticsearch.TestableSearchServerInstance;
 import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.indexer.cluster.ClusterIT;
 import org.junit.Rule;
@@ -32,7 +33,7 @@ import static org.graylog.storage.elasticsearch6.testing.TestUtils.jestClient;
 
 public class ClusterES6IT extends ClusterIT {
     @Rule
-    public final SearchServerInstance elasticsearch = ElasticsearchInstanceES6.create();
+    public final TestableSearchServerInstance elasticsearch = ElasticsearchInstanceES6.create();
 
     @Override
     protected ClusterAdapter clusterAdapter(Duration timeout) {

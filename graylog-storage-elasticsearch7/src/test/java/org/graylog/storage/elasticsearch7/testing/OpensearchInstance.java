@@ -25,7 +25,7 @@ import org.graylog.storage.elasticsearch7.RestHighLevelClientProvider;
 import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.elasticsearch.Client;
 import org.graylog.testing.elasticsearch.FixtureImporter;
-import org.graylog.testing.elasticsearch.SearchServerInstance;
+import org.graylog.testing.elasticsearch.TestableSearchServerInstance;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.storage.SearchVersion;
 import org.graylog2.system.shutdown.GracefulShutdownService;
@@ -41,7 +41,7 @@ import java.util.Locale;
 
 import static java.util.Objects.isNull;
 
-public class OpensearchInstance extends SearchServerInstance {
+public class OpensearchInstance extends TestableSearchServerInstance {
     private static final Logger LOG = LoggerFactory.getLogger(OpensearchInstance.class);
 
     private static final int ES_PORT = 9200;
@@ -98,12 +98,12 @@ public class OpensearchInstance extends SearchServerInstance {
     }
 
     @Override
-    protected Client client() {
+    public Client client() {
         return this.client;
     }
 
     @Override
-    protected FixtureImporter fixtureImporter() {
+    public FixtureImporter fixtureImporter() {
         return this.fixtureImporter;
     }
 
@@ -116,7 +116,7 @@ public class OpensearchInstance extends SearchServerInstance {
     }
 
     @Override
-    protected GenericContainer<?> buildContainer(String image, Network network) {
+    public GenericContainer<?> buildContainer(String image, Network network) {
         return new OpensearchContainer(DockerImageName.parse(image))
                 // Avoids reuse warning on Jenkins (we don't want reuse in our CI environment)
                 .withReuse(isNull(System.getenv("BUILD_ID")))
