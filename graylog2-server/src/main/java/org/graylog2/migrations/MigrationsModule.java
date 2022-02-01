@@ -24,6 +24,12 @@ import org.graylog2.plugin.PluginModule;
 public class MigrationsModule extends PluginModule {
     @Override
     protected void configure() {
+
+        // Make sure there is always a binder for migration modules
+        // The LegacyAuthServiceMigration is pluggable. This call ensures that there is always a binder present
+        // even if there are no plugins registered for this migration.
+        Multibinder.newSetBinder(binder(), V20201103145400_LegacyAuthServiceMigration.MigrationModule.class);
+
         addMigration(V20151210140600_ElasticsearchConfigMigration.class);
         addMigration(V20161116172100_DefaultIndexSetMigration.class);
         addMigration(V20161116172200_CreateDefaultStreamMigration.class);
@@ -52,7 +58,5 @@ public class MigrationsModule extends PluginModule {
         addMigration(V20201103145400_LegacyAuthServiceMigration.class);
         addMigration(V20211221144300_GeoIpResolverConfigMigration.class);
 
-        // Make sure there is always a binder for migration modules
-        Multibinder.newSetBinder(binder(), V20211221144300_GeoIpResolverConfigMigration.class);
     }
 }
