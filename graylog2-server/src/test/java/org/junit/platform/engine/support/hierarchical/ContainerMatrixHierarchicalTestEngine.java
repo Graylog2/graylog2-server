@@ -18,16 +18,19 @@ package org.junit.platform.engine.support.hierarchical;
 
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.specification.RequestSpecification;
+import org.graylog.testing.completebackend.ContainerizedGraylogBackend;
 import org.graylog.testing.completebackend.GraylogBackend;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.MavenProjectDirProvider;
 import org.graylog.testing.completebackend.PluginJarsProvider;
+import org.graylog.testing.completebackend.RunningGraylogBackend;
 import org.graylog.testing.completebackend.SearchServerInstanceFactory;
 import org.graylog.testing.completebackend.SearchServerInstanceFactoryByVersion;
 import org.graylog.testing.containermatrix.ContainerMatrixTestEngine;
 import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog2.storage.SearchVersion;
 import org.junit.jupiter.engine.descriptor.ContainerMatrixTestClassDescriptor;
+import org.junit.jupiter.engine.descriptor.ContainerMatrixTestWithRunningESMongoTestsDescriptor;
 import org.junit.jupiter.engine.descriptor.ContainerMatrixTestsDescriptor;
 import org.junit.platform.commons.JUnitException;
 import org.junit.platform.engine.ExecutionRequest;
@@ -51,7 +54,11 @@ public abstract class ContainerMatrixHierarchicalTestEngine<C extends EngineExec
     @Override
     public void execute(ExecutionRequest request) {
         request.getRootTestDescriptor().getChildren().forEach(descriptor -> {
-            if (descriptor instanceof ContainerMatrixTestsDescriptor) {
+            if (descriptor instanceof ContainerMatrixTestWithRunningESMongoTestsDescriptor) {
+                GraylogBackend backend = RunningGraylogBackend.createStarted();
+                RequestSpecification specification = requestSpec(backend);
+                this.execute(request, ((ContainerMatrixTestsDescriptor) descriptor).getChildren(), backend, specification);
+            } else if (descriptor instanceof ContainerMatrixTestsDescriptor) {
                 ContainerMatrixTestsDescriptor containerMatrixTestsDescriptor = (ContainerMatrixTestsDescriptor) descriptor;
 
                 SearchVersion esVersion = containerMatrixTestsDescriptor.getEsVersion();
@@ -63,7 +70,7 @@ public abstract class ContainerMatrixHierarchicalTestEngine<C extends EngineExec
                 Class<? extends MavenProjectDirProvider> mavenProjectDirProvider = containerMatrixTestsDescriptor.getMavenProjectDirProvider();
 
                 if (Lifecycle.VM.equals(containerMatrixTestsDescriptor.getLifecycle())) {
-                    try (GraylogBackend backend = constructBackendFrom(esVersion, mongoVersion, extraPorts, mongoDBFixtures, pluginJarsProvider, mavenProjectDirProvider)) {
+                    try (ContainerizedGraylogBackend backend = constructBackendFrom(esVersion, mongoVersion, extraPorts, mongoDBFixtures, pluginJarsProvider, mavenProjectDirProvider)) {
                         RequestSpecification specification = requestSpec(backend);
                         this.execute(request, ((ContainerMatrixTestsDescriptor) descriptor).getChildren(), backend, specification);
                     } catch (Exception exception) {
@@ -75,7 +82,7 @@ public abstract class ContainerMatrixHierarchicalTestEngine<C extends EngineExec
                         if (td instanceof ContainerMatrixTestClassDescriptor) {
                             fixtures = ((ContainerMatrixTestClassDescriptor) td).getMongoFixtures();
                         }
-                        try (GraylogBackend backend = constructBackendFrom(esVersion, mongoVersion, extraPorts, fixtures, pluginJarsProvider, mavenProjectDirProvider)) {
+                        try (ContainerizedGraylogBackend backend = constructBackendFrom(esVersion, mongoVersion, extraPorts, fixtures, pluginJarsProvider, mavenProjectDirProvider)) {
                             RequestSpecification specification = requestSpec(backend);
                             this.execute(request, Collections.singleton(td), backend, specification);
                         } catch (Exception exception) {
@@ -86,7 +93,7 @@ public abstract class ContainerMatrixHierarchicalTestEngine<C extends EngineExec
                     LOG.error("Unknown lifecycle: " + containerMatrixTestsDescriptor.getLifecycle());
                 }
             } else {
-                LOG.error("All children of the root should be of type 'ContainerMatrixTestsDescriptor'");
+                LOG.error("All children of the root should be of type 'ContainerMatrixTestsDescriptor' or 'ContainerMatrixTestWithRunningESMongoTestsDescriptor'");
             }
             request.getEngineExecutionListener().executionFinished(descriptor, TestExecutionResult.successful());
         });
@@ -104,11 +111,11 @@ public abstract class ContainerMatrixHierarchicalTestEngine<C extends EngineExec
         }
     }
 
-    private GraylogBackend constructBackendFrom(SearchVersion esVersion, MongodbServer mongoVersion, int[] extraPorts, List<URL> mongoDBFixtures, Class<? extends PluginJarsProvider> pluginJarsProvider, Class<? extends MavenProjectDirProvider> mavenProjectDirProvider) {
+    private ContainerizedGraylogBackend constructBackendFrom(SearchVersion esVersion, MongodbServer mongoVersion, int[] extraPorts, List<URL> mongoDBFixtures, Class<? extends PluginJarsProvider> pluginJarsProvider, Class<? extends MavenProjectDirProvider> mavenProjectDirProvider) {
         final SearchServerInstanceFactory searchServerInstanceFactory = new SearchServerInstanceFactoryByVersion(esVersion);
         final List<Path> pluginJars = instantiateFactory(pluginJarsProvider).getJars();
         final Path mavenProjectDir = instantiateFactory(mavenProjectDirProvider).getProjectDir();
-        return GraylogBackend.createStarted(extraPorts, mongoVersion, searchServerInstanceFactory, pluginJars, mavenProjectDir, mongoDBFixtures);
+        return ContainerizedGraylogBackend.createStarted(extraPorts, mongoVersion, searchServerInstanceFactory, pluginJars, mavenProjectDir, mongoDBFixtures);
     }
 
     private <T> T instantiateFactory(Class<? extends T> providerClass) {

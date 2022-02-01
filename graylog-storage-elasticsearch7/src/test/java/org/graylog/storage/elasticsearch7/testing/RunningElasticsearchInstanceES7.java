@@ -17,8 +17,8 @@
 package org.graylog.storage.elasticsearch7.testing;
 
 import com.github.joschi.jadconfig.util.Duration;
-import com.github.zafarkhaja.semver.Version;
 import com.google.common.collect.ImmutableList;
+import com.google.common.io.Resources;
 import org.graylog.shaded.elasticsearch7.org.apache.http.impl.client.BasicCredentialsProvider;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestHighLevelClient;
 import org.graylog.storage.elasticsearch7.ElasticsearchClient;
@@ -26,44 +26,39 @@ import org.graylog.storage.elasticsearch7.RestHighLevelClientProvider;
 import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.elasticsearch.Client;
 import org.graylog.testing.elasticsearch.FixtureImporter;
-import org.graylog.testing.elasticsearch.TestableSearchServerInstance;
-import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.storage.SearchVersion;
 import org.graylog2.system.shutdown.GracefulShutdownService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 
 import java.net.URI;
+import java.net.URL;
+import java.nio.file.Paths;
 
-public class ElasticsearchInstanceES7 extends TestableSearchServerInstance {
-    private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchInstanceES7.class);
+public class RunningElasticsearchInstanceES7 implements SearchServerInstance {
+    private static final Logger LOG = LoggerFactory.getLogger(RunningElasticsearchInstanceES7.class);
     private static final String ES_VERSION = "7.10.2";
-    private static final String DEFAULT_IMAGE_OSS = "docker.elastic.co/elasticsearch/elasticsearch-oss";
 
     private final RestHighLevelClient restHighLevelClient;
     private final ElasticsearchClient elasticsearchClient;
     private final Client client;
     private final FixtureImporter fixtureImporter;
 
-    protected ElasticsearchInstanceES7(String image, SearchVersion version, Network network) {
-        super(image, version, network);
+    public RunningElasticsearchInstanceES7() {
         this.restHighLevelClient = buildRestClient();
         this.elasticsearchClient = new ElasticsearchClient(this.restHighLevelClient, false, new ObjectMapperProvider().get());
         this.client = new ClientES7(this.elasticsearchClient);
         this.fixtureImporter = new FixtureImporterES7(this.elasticsearchClient);
     }
 
-    @Override
-    public SearchServer searchServer() {
-        return SearchServer.ES7;
-    }
-
     private RestHighLevelClient buildRestClient() {
         return new RestHighLevelClientProvider(
                 new GracefulShutdownService(),
-                ImmutableList.of(URI.create("http://" + this.getHttpHostAddress())),
+                ImmutableList.of(URI.create("http://localhost:9200")),
                 Duration.seconds(60),
                 Duration.seconds(60),
                 Duration.seconds(60),
@@ -80,25 +75,9 @@ public class ElasticsearchInstanceES7 extends TestableSearchServerInstance {
                 .get();
     }
 
-    public static ElasticsearchInstanceES7 create() {
-        return create(Network.newNetwork());
-    }
-
-    public static ElasticsearchInstanceES7 create(Network network) {
-        return create(SearchVersion.elasticsearch(ES_VERSION), network);
-    }
-
-    public static ElasticsearchInstanceES7 create(SearchVersion searchVersion, Network network) {
-        final String image = imageNameFrom(searchVersion.version());
-
-        LOG.debug("Creating instance {}", image);
-
-        return new ElasticsearchInstanceES7(image, searchVersion, network);
-    }
-
-
-    protected static String imageNameFrom(Version version) {
-        return DEFAULT_IMAGE_OSS + ":" + version.toString();
+    @Override
+    public SearchServer searchServer() {
+        return SearchServer.ES7;
     }
 
     @Override
@@ -109,6 +88,56 @@ public class ElasticsearchInstanceES7 extends TestableSearchServerInstance {
     @Override
     public FixtureImporter fixtureImporter() {
         return this.fixtureImporter;
+    }
+
+    @Override
+    public GenericContainer<?> createContainer(String image, SearchVersion version, Network network) {
+        return null;
+    }
+
+    @Override
+    public GenericContainer<?> buildContainer(String image, Network network) {
+        return null;
+    }
+
+    @Override
+    public String internalUri() {
+        return null;
+    }
+
+    @Override
+    public SearchVersion version() {
+        return null;
+    }
+
+    @Override
+    public void importFixtureResource(String resourcePath, Class<?> testClass) {
+        boolean isFullResourcePath = Paths.get(resourcePath).getNameCount() > 1;
+
+        @SuppressWarnings("UnstableApiUsage")
+        final URL fixtureResource = isFullResourcePath
+                ? Resources.getResource(resourcePath)
+                : Resources.getResource(testClass, resourcePath);
+
+        fixtureImporter().importResource(fixtureResource);
+
+        // Make sure the data we just imported is visible
+        client().refreshNode();
+    }
+
+    @Override
+    public String getHttpHostAddress() {
+        return null;
+    }
+
+    @Override
+    public void cleanUp() {
+
+    }
+
+    @Override
+    public void close() {
+
     }
 
     public ElasticsearchClient elasticsearchClient() {
