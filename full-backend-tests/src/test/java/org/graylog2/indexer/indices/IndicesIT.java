@@ -32,6 +32,7 @@ import org.graylog.storage.elasticsearch7.cat.CatApi;
 import org.graylog.storage.elasticsearch7.cluster.ClusterStateApi;
 import org.graylog.storage.elasticsearch7.stats.StatsApi;
 import org.graylog.testing.ContainerMatrixElasticsearchITBaseTest;
+import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
@@ -87,7 +88,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 // these tests only test the SearchServer, so there is only one MongoDB-version necessary (needed, to launch the tests)
-@ContainerMatrixTestsConfiguration(mongoVersions = MongodbServer.MONGO4)
+@ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS, mongoVersions = MongodbServer.MONGO4)
 public class IndicesIT extends ContainerMatrixElasticsearchITBaseTest {
     private static final String INDEX_NAME = "graylog_0";
     private final Set<String> indicesToCleanUp = new HashSet<>();
