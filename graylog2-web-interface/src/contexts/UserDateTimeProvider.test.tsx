@@ -36,12 +36,12 @@ describe('DateTimeProvider', () => {
   const invalidDate = '2020-00-00T04:00:00.000Z';
   const expectErrorForInvalidDate = (action: () => any) => expect(action).toThrowError(`Date time ${invalidDate} is not valid.`);
 
-  const renderSUT = (currentUser: User = user) => {
+  const renderSUT = (currentUser: User = user, tzOverride = undefined) => {
     let contextValue;
 
     render(
       <CurrentUserContext.Provider value={currentUser}>
-        <UserDateTimeProvider>
+        <UserDateTimeProvider tzOverride={tzOverride}>
           <UserDateTimeContext.Consumer>
             {(value) => {
               contextValue = value;
@@ -56,10 +56,18 @@ describe('DateTimeProvider', () => {
     return contextValue;
   };
 
-  it('should provider user timezone', () => {
-    const { userTimezone } = renderSUT();
+  describe('userTimezone value should', () => {
+    it('provide user timezone', () => {
+      const { userTimezone } = renderSUT();
 
-    expect(userTimezone).toBe('Europe/Berlin');
+      expect(userTimezone).toBe('Europe/Berlin');
+    });
+
+    it('respect timezone override', () => {
+      const { userTimezone } = renderSUT(undefined, 'America/Los_Angeles');
+
+      expect(userTimezone).toBe('America/Los_Angeles');
+    });
   });
 
   describe('formatTime method should', () => {
@@ -72,6 +80,12 @@ describe('DateTimeProvider', () => {
     it('throw an error for an invalid date', () => {
       const { formatTime } = renderSUT();
       expectErrorForInvalidDate(() => formatTime(invalidDate));
+    });
+
+    it('respect timezone override', () => {
+      const { formatTime } = renderSUT(undefined, 'America/Los_Angeles');
+
+      expect(formatTime('2021-03-27T14:32:31.894Z')).toBe('2021-03-27 07:32:31');
     });
   });
 
@@ -87,6 +101,14 @@ describe('DateTimeProvider', () => {
     it('throw an error for an invalid date', () => {
       const { toUserTimezone } = renderSUT();
       expectErrorForInvalidDate(() => toUserTimezone(invalidDate));
+    });
+
+    it('respect timezone override', () => {
+      const { toUserTimezone } = renderSUT(undefined, 'America/Los_Angeles');
+      const result = toUserTimezone('2021-03-27T14:32:31.894Z');
+
+      expect(moment.isMoment(result)).toBe(true);
+      expect(result.format(DATE_TIME_FORMATS.internal)).toBe('2021-03-27T07:32:31.894-07:00');
     });
   });
 });
