@@ -252,7 +252,7 @@ class NotificationsFactory {
           title: 'Output disabled',
           description: (
             <span>
-              The output with the id {notification.details.outputId} in stream `"`{notification.details.streamTitle}`"`
+              The output with the id {notification.details.outputId} in stream &quot;{notification.details.streamTitle}&quot;
               (id: {notification.details.streamId}) has been disabled for {notification.details.faultPenaltySeconds}
               seconds because there were {notification.details.faultCount} failures.
               (Node: <em>{notification.node_id}</em>, Fault threshold: <em>{notification.details.faultCountThreshold}</em>)
@@ -265,8 +265,8 @@ class NotificationsFactory {
           title: 'Output failing',
           description: (
             <span>
-              The output `"`{notification.details.outputTitle}`"` (id: {notification.details.outputId})
-              in stream `"`{notification.details.streamTitle}`"` (id: {notification.details.streamId})
+              The output &quot;{notification.details.outputTitle}&quot; (id: {notification.details.outputId})
+              in stream &quot;{notification.details.streamTitle}&quot; (id: {notification.details.streamId})
               is unable to send messages to the configured destination.
               <br />
               The error message from the output is: <em>{notification.details.errorMessage}</em>
@@ -348,7 +348,7 @@ class NotificationsFactory {
 
             </span>
           ),
-        }
+        };
       }
 
       case 'legacy_ldap_config_migration': {
@@ -373,7 +373,7 @@ class NotificationsFactory {
               for more details.
             </span>
           ),
-        }
+        };
       }
 
       case 'archiving_summary':
