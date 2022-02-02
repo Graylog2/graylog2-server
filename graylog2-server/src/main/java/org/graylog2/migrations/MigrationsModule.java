@@ -25,7 +25,6 @@ public class MigrationsModule extends PluginModule {
     @Override
     protected void configure() {
 
-        // Make sure there is always a binder for migration modules
         // The LegacyAuthServiceMigration is pluggable. This call ensures that there is always a binder present
         // even if there are no plugins registered for this migration.
         Multibinder.newSetBinder(binder(), V20201103145400_LegacyAuthServiceMigration.MigrationModule.class);
