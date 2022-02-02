@@ -16,21 +16,21 @@
  */
 import React, { useEffect, useState } from 'react';
 import { Field, Form, Formik } from 'formik';
+import type { FormikHelpers } from 'formik';
 
 import { IfPermitted, Select } from 'components/common';
 import { Button, Col, Input, Modal, Row } from 'components/bootstrap';
 import FormikInput from 'components/common/FormikInput';
 import { DocumentationLink } from 'components/support';
 
-export type GeoDatabaseType = 'MAXMIND' | 'IPINFO'
+export type GeoVendorType = 'MAXMIND' | 'IPINFO'
 
 export type GeoIpConfigType = {
   enabled: boolean;
   enforce_graylog_schema: boolean;
-  db_vendor_type: GeoDatabaseType;
+  db_vendor_type: GeoVendorType;
   city_db_path: string;
   asn_db_path: string;
-  run_before_extractors: boolean;
 }
 
 export type OptionType = {
@@ -49,7 +49,6 @@ const defaultConfig: GeoIpConfigType = {
   db_vendor_type: 'MAXMIND',
   city_db_path: '/etc/graylog/server/GeoLite2-City.mmdb',
   asn_db_path: '/etc/graylog/server/GeoLite2-ASN.mmdb',
-  run_before_extractors: false,
 };
 
 const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) => {
@@ -67,24 +66,27 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
     setShowModal(false);
   };
 
-  const handleSubmit = (values) => {
+  const handleSubmit = (values: GeoIpConfigType, { setSubmitting }: FormikHelpers<GeoIpConfigType>) => {
     updateConfig(values)
       .then((value: GeoIpConfigType) => {
         if ('enabled' in value) {
+          setSubmitting(false);
           setShowModal(false);
         }
-      }).catch();
+      }).catch(() => {
+        setSubmitting(false);
+      });
   };
 
-  const availableDatabaseTypes = (): OptionType[] => {
+  const availableVendorTypes = (): OptionType[] => {
     return [
       { value: 'MAXMIND', label: 'MaxMind GeoIP' },
       { value: 'IPINFO', label: 'IPInfo Standard Location' },
     ];
   };
 
-  const activeDatabaseType = (type: GeoDatabaseType) => {
-    return availableDatabaseTypes().filter((t) => t.value === type)[0].label;
+  const activeVendorType = (type: GeoVendorType) => {
+    return availableVendorTypes().filter((t) => t.value === type)[0].label;
   };
 
   return (
@@ -102,10 +104,10 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
         <dd>{config.enabled === true ? 'Yes' : 'No'}</dd>
         {config.enabled && (
           <>
-            <dt>Default Graylog schema:</dt>
+            <dt>Enforce default Graylog schema:</dt>
             <dd>{config.enforce_graylog_schema === true ? 'Yes' : 'No'}</dd>
             <dt>Database vendor type:</dt>
-            <dd>{activeDatabaseType(config.db_vendor_type)}</dd>
+            <dd>{activeVendorType(config.db_vendor_type)}</dd>
             <dt>City database path:</dt>
             <dd>{config.city_db_path}</dd>
             <dt>ASN database path:</dt>
@@ -125,7 +127,7 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
       </IfPermitted>
       <Modal show={showModal} onHide={resetConfig} aria-modal="true" aria-labelledby="dialog_label">
         <Formik onSubmit={handleSubmit} initialValues={curConfig}>
-          {({ values, setFieldValue }) => {
+          {({ values, setFieldValue, isSubmitting }) => {
             return (
               <Form>
                 <Modal.Header>
@@ -157,7 +159,7 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
                                 placeholder="Select the GeoIP database vendor"
                                 required
                                 disabled={!values.enabled}
-                                options={availableDatabaseTypes()}
+                                options={availableVendorTypes()}
                                 matchProp="label"
                                 value={values.db_vendor_type}
                                 onChange={(option) => {
@@ -180,8 +182,19 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
 
                 </Modal.Body>
                 <Modal.Footer>
-                  <Button type="button" bsStyle="link" onClick={resetConfig}>Close</Button>
-                  <Button type="submit" bsStyle="success">Save</Button>
+                  <Button type="button"
+                          bsStyle="link"
+                          onClick={resetConfig}
+                          disabled={isSubmitting}
+                          aria-disabled={isSubmitting}>
+                    Close
+                  </Button>
+                  <Button type="submit"
+                          bsStyle="success"
+                          disabled={isSubmitting}
+                          aria-disabled={isSubmitting}>
+                    {isSubmitting ? 'Saving...' : 'Save'}
+                  </Button>
                 </Modal.Footer>
               </Form>
             );
