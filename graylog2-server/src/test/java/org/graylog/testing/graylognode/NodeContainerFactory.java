@@ -97,17 +97,6 @@ public class NodeContainerFactory {
         }
     }
 
-    private static void chmod(final GenericContainer container, String path) {
-        try {
-            Container.ExecResult r = container.execInContainer("/bin/bash", "-c", "chmod ogu+x " + path);
-            if (r.getExitCode() > 0) {
-                throw new IOException("Exit Code: " + r.getExitCode() + " Could not chmod ogu+x " + path);
-            }
-        } catch (IOException | InterruptedException e) {
-            LOG.error("IOError for: " + path, e);
-        }
-    }
-
     private static void checkBinaries(NodeContainerConfig config) {
         final Path projectBinDir = config.mavenProjectDirProvider.getBinDir();
         config.mavenProjectDirProvider.getFilesToAddFromBinDir().forEach(filename -> {
@@ -118,8 +107,7 @@ public class NodeContainerFactory {
                 LOG.warn("File {} in bindir {} is not executable, setting executable flag.", filename, projectBinDir);
                 try {
                     Files.setPosixFilePermissions(path, PosixFilePermissions.fromString("rwxrwxr-x"));
-                    Thread.sleep(1000);
-                } catch (IOException | InterruptedException iox) {
+                } catch (IOException iox) {
                     LOG.error("Setting executable flag for file " + filename + " in bindir " + projectBinDir + " failed.", iox);
                 }
             }
@@ -187,9 +175,7 @@ public class NodeContainerFactory {
             final String containerPath = GRAYLOG_HOME + "/bin/" + originalPath.getFileName();
             container.copyFileToContainer(MountableFile.forHostPath(originalPath), containerPath);
             if (!containerFileExists(container, containerPath)) {
-                throw new RuntimeException("Mandatory file " + filename + " does not exist in container at " + containerPath);
-            } else {
-                chmod(container, containerPath);
+                LOG.error("Mandatory file {} does not exist in container at {}", filename, containerPath);
             }
         });
 
