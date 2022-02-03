@@ -172,8 +172,9 @@ public class NodeContainerFactory {
         }
 
         config.mavenProjectDirProvider.getFilesToAddFromBinDir().forEach(filename -> {
-            final String containerPath = GRAYLOG_HOME + "/bin/" + filename;
-            container.copyFileToContainer(MountableFile.forHostPath(projectBinDir.resolve(filename)), containerPath);
+            final Path originalPath = projectBinDir.resolve(filename);
+            final String containerPath = GRAYLOG_HOME + "/bin/" + originalPath.getFileName();
+            container.copyFileToContainer(MountableFile.forHostPath(originalPath), containerPath);
             if (!containerFileExists(container, containerPath)) {
                 LOG.error("Mandatory file {} does not exist in container at {}", filename, containerPath);
             }
