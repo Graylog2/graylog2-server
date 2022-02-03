@@ -23,9 +23,9 @@ import java.util.List;
 public interface MavenProjectDirProvider {
     Path getProjectDir();
 
-    Path getBinDir();
+    Path getFileCopyBaseDir();
 
-    default List<String> getFilesToAddFromBinDir() {
+    default List<String> getFilesToAddToBinDir() {
         return new ArrayList<>();
     }
 

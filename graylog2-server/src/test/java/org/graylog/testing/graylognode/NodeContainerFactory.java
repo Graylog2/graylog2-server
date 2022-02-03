@@ -98,24 +98,24 @@ public class NodeContainerFactory {
     }
 
     private static void checkBinaries(NodeContainerConfig config) {
-        final Path projectBinDir = config.mavenProjectDirProvider.getBinDir();
-        config.mavenProjectDirProvider.getFilesToAddFromBinDir().forEach(filename -> {
-            Path path = projectBinDir.resolve(filename);
+        final Path fileCopyBaseDir = config.mavenProjectDirProvider.getFileCopyBaseDir();
+        config.mavenProjectDirProvider.getFilesToAddToBinDir().forEach(filename -> {
+            Path path = fileCopyBaseDir.resolve(filename);
             if (!Files.exists(path)) {
-                LOG.error("Mandatory file {} does not exist in bindir {}", filename, projectBinDir);
+                LOG.error("Mandatory file {} does not exist in {}", filename, fileCopyBaseDir);
             } else if (!Files.isExecutable(path)) {
-                LOG.warn("File {} in bindir {} is not executable, setting executable flag.", filename, projectBinDir);
+                LOG.warn("File {} in {} is not executable, setting executable flag.", filename, fileCopyBaseDir);
                 try {
                     Files.setPosixFilePermissions(path, PosixFilePermissions.fromString("rwxrwxr-x"));
                 } catch (IOException iox) {
-                    LOG.error("Setting executable flag for file " + filename + " in bindir " + projectBinDir + " failed.", iox);
+                    LOG.error("Setting executable flag for file " + filename + " in " + fileCopyBaseDir + " failed.", iox);
                 }
             }
         });
     }
 
     private static GenericContainer<?> createRunningContainer(NodeContainerConfig config, ImageFromDockerfile image) {
-        Path projectBinDir = config.mavenProjectDirProvider.getBinDir();
+        Path fileCopyBaseDir = config.mavenProjectDirProvider.getFileCopyBaseDir();
         List<Path> pluginJars = config.pluginJarsProvider.getJars();
         boolean includeFrontend = config.mavenProjectDirProvider.includeFrontend();
 
@@ -170,8 +170,8 @@ public class NodeContainerFactory {
             LOG.info("Container debug port: " + container.getMappedPort(DEBUG_PORT));
         }
 
-        config.mavenProjectDirProvider.getFilesToAddFromBinDir().forEach(filename -> {
-            final Path originalPath = projectBinDir.resolve(filename);
+        config.mavenProjectDirProvider.getFilesToAddToBinDir().forEach(filename -> {
+            final Path originalPath = fileCopyBaseDir.resolve(filename);
             final String containerPath = GRAYLOG_HOME + "/bin/" + originalPath.getFileName();
             container.copyFileToContainer(MountableFile.forHostPath(originalPath), containerPath);
             if (!containerFileExists(container, containerPath)) {
