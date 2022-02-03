@@ -187,7 +187,7 @@ public class NodeContainerFactory {
             final String containerPath = GRAYLOG_HOME + "/bin/" + originalPath.getFileName();
             container.copyFileToContainer(MountableFile.forHostPath(originalPath), containerPath);
             if (!containerFileExists(container, containerPath)) {
-                LOG.error("Mandatory file {} does not exist in container at {}", filename, containerPath);
+                throw new RuntimeException("Mandatory file " + filename + " does not exist in container at " + containerPath);
             } else {
                 chmod(container, containerPath);
             }
