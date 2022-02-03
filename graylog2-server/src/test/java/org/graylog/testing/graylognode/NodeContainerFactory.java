@@ -100,8 +100,11 @@ public class NodeContainerFactory {
     private static void chmod(final GenericContainer container, String path) {
         try {
             Container.ExecResult r = container.execInContainer("/bin/bash", "-c", "chmod ogu+x " + path);
+            if (r.getExitCode() > 0) {
+                throw new IOException("Exit Code: " + r.getExitCode() + " Could not chmod ogu+x " + path);
+            }
         } catch (IOException | InterruptedException e) {
-            LOG.error("Could not check for file existence: " + path, e);
+            LOG.error("IOError for: " + path, e);
         }
     }
 
