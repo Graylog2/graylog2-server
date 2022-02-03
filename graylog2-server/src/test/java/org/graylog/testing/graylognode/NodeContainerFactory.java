@@ -97,6 +97,14 @@ public class NodeContainerFactory {
         }
     }
 
+    private static void chmod(final GenericContainer container, String path) {
+        try {
+            Container.ExecResult r = container.execInContainer("/bin/bash", "-c", "chmod ogu+x " + path);
+        } catch (IOException | InterruptedException e) {
+            LOG.error("Could not check for file existence: " + path, e);
+        }
+    }
+
     private static void checkBinaries(NodeContainerConfig config) {
         final Path projectBinDir = config.mavenProjectDirProvider.getBinDir();
         config.mavenProjectDirProvider.getFilesToAddFromBinDir().forEach(filename -> {
@@ -177,6 +185,8 @@ public class NodeContainerFactory {
             container.copyFileToContainer(MountableFile.forHostPath(originalPath), containerPath);
             if (!containerFileExists(container, containerPath)) {
                 LOG.error("Mandatory file {} does not exist in container at {}", filename, containerPath);
+            } else {
+                chmod(container, containerPath);
             }
         });
 
