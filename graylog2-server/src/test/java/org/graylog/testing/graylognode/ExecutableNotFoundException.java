@@ -14,25 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.testing.completebackend;
+package org.graylog.testing.graylognode;
 
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-
-public interface MavenProjectDirProvider {
-    Path getProjectDir();
-
-    Path getFileCopyBaseDir();
-
-    default List<String> getFilesToAddToBinDir() {
-        return new ArrayList<>();
+public class ExecutableNotFoundException extends RuntimeException {
+    public ExecutableNotFoundException(String msg) {
+        super(msg);
     }
-
-    String getUniqueId();
-
-    default boolean includeFrontend() {
-        return false;
-    }
-
 }
