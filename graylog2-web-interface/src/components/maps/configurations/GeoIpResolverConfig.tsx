@@ -16,7 +16,6 @@
  */
 import React, { useEffect, useState } from 'react';
 import { Field, Form, Formik } from 'formik';
-import type { FormikHelpers } from 'formik';
 
 import { IfPermitted, Select } from 'components/common';
 import { Button, Col, Input, Modal, Row } from 'components/bootstrap';
@@ -66,15 +65,12 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
     setShowModal(false);
   };
 
-  const handleSubmit = (values: GeoIpConfigType, { setSubmitting }: FormikHelpers<GeoIpConfigType>) => {
-    updateConfig(values)
+  const handleSubmit = (values: GeoIpConfigType) => {
+    return updateConfig(values)
       .then((value: GeoIpConfigType) => {
         if ('enabled' in value) {
-          setSubmitting(false);
           setShowModal(false);
         }
-      }).catch(() => {
-        setSubmitting(false);
       });
   };
 
