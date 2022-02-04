@@ -27,6 +27,8 @@ import DataTableEntry from './DataTableEntry';
 
 import EmptyValue from '../EmptyValue';
 
+jest.mock('hooks/useUserDateTime');
+
 const f = (source: string, field: string = source): { field: string, source: string } => ({ field, source });
 const createFields = (fields: Array<string>) => OrderedSet(fields.map((field) => f(field)));
 const fields = createFields(['nf_dst_address', 'count()', 'max(timestamp)', 'card(timestamp)']);

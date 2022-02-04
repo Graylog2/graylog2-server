@@ -39,6 +39,8 @@ jest.mock('util/AppConfig', () => ({
   gl2ServerUrl: jest.fn(() => undefined),
 }));
 
+jest.mock('hooks/useUserDateTime');
+
 describe('<Sidebar />', () => {
   const viewMetaData = {
     activeQuery: '34efae1e-e78e-48ab-ab3f-e83c8611a683',
@@ -89,7 +91,7 @@ describe('<Sidebar />', () => {
 
     fireEvent.click(await screen.findByTitle(/open sidebar/i));
 
-    await screen.findAllByText((content, node) => (node.textContent === 'Query executed in 64ms at 2018-08-28 09:39:26.'));
+    await screen.findAllByText((content, node) => (node.textContent === 'Query executed in 64ms at 2018-08-28 14:39:26.'));
   });
 
   const emptyViewMetaData = {

@@ -44,8 +44,8 @@ class AlarmCallbackHistory extends React.Component {
       </span>
     );
     const description = (hadError
-      ? <span>Error sending notification at <Timestamp dateTime={history.created_at} format={DateTime.Formats.DATETIME} />: {history.result.error}</span>
-      : <span>Notification was sent successfully at <Timestamp dateTime={history.created_at} format={DateTime.Formats.DATETIME} />.</span>);
+      ? <span>Error sending notification at <Timestamp dateTime={history.created_at} />: {history.result.error}</span>
+      : <span>Notification was sent successfully at <Timestamp dateTime={history.created_at} />.</span>);
 
     let configurationWell;
     let configurationInfo;

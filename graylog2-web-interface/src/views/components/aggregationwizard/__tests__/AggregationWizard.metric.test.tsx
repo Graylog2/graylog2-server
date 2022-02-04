@@ -59,6 +59,8 @@ jest.mock('views/stores/ViewMetadataStore', () => ({
   ViewMetadataStore: MockStore(['getInitialState', () => ({ activeQuery: 'queryId' })]),
 }));
 
+jest.mock('hooks/useUserDateTime');
+
 const selectEventConfig = { container: document.body };
 
 const plugin: PluginRegistration = { exports: { visualizationTypes: [dataTable] } };

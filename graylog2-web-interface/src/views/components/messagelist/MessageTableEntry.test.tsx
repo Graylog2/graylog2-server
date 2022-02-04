@@ -31,6 +31,8 @@ jest.mock('stores/configurations/ConfigurationsStore', () => ({
   },
 }));
 
+jest.mock('hooks/useUserDateTime');
+
 describe('MessageTableEntry', () => {
   it('renders message for unknown selected fields', () => {
     const message = {
