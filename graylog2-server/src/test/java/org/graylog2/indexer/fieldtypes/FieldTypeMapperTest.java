@@ -20,6 +20,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Collections;
+import java.util.function.Predicate;
 
 import static com.google.common.collect.ImmutableSet.copyOf;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -73,5 +74,20 @@ public class FieldTypeMapperTest {
         assertMapping("binary", "binary");
         assertMapping("geo_point", "geo-point");
         assertMapping("ip", "ip", "enumerable");
+    }
+
+    @Test
+    public void testValidation() {
+        assertThat(validatorForType("long").test("123")).isTrue();
+        assertThat(validatorForType("long").test("ABC")).isFalse();
+        assertThat(validatorForType("date").test("2020-07-29T12:00:00.000-05:00")).isTrue();
+    }
+
+    private Predicate<String> validatorForType(String type) {
+        final FieldTypeDTO field = FieldTypeDTO.builder()
+                .fieldName("test")
+                .physicalType(type)
+                .build();
+        return mapper.mapType(field).get().validationFunction();
     }
 }

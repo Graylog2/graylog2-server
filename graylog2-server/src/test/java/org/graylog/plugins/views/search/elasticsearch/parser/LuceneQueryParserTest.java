@@ -120,6 +120,20 @@ class LuceneQueryParserTest {
     }
 
     @Test
+    void testRangeQuery() throws ParseException {
+        final ParsedQuery query = parser.parse("http_response_code:[500 TO 504]");
+        assertThat(query.terms().get(0).value()).isEqualTo("500");
+        assertThat(query.terms().get(1).value()).isEqualTo("504");
+    }
+
+
+    @Test
+    void testGtQuery() throws ParseException {
+        final ParsedQuery query = parser.parse("http_response_code:>400");
+        assertThat(query.terms().get(0).value()).isEqualTo("400");
+    }
+
+    @Test
     void testLongStringOfInvalidTokens() throws ParseException {
         final ParsedQuery query = parser.parse("and and and or or or");
         assertThat(query.invalidOperators().size()).isEqualTo(6);

@@ -19,6 +19,7 @@ package org.graylog.plugins.views.search.validation;
 import com.google.common.collect.Streams;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.QueryParserConstants;
+import org.apache.lucene.search.AutomatonQuery;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.PrefixQuery;
 import org.apache.lucene.search.Query;
