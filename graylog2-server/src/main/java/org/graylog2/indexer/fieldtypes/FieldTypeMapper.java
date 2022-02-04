@@ -58,7 +58,7 @@ public class FieldTypeMapper {
     private static final FieldTypes.Type GEO_POINT_TYPE = createType("geo-point", of(), ALWAYS_TRUE_PREDICATE);
     private static final FieldTypes.Type IP_TYPE = createType("ip", of(PROP_ENUMERABLE), InetAddresses::isInetAddress);
 
-
+    @SuppressWarnings("ReturnValueIgnored")
     private static Predicate<String> wrapException(Function<String, Object> parser) {
         return (value) -> {
             try {
