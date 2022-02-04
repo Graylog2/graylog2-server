@@ -29,6 +29,7 @@ import org.graylog.plugins.views.search.SearchDomain;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.views.ViewDTO;
+import org.graylog.plugins.views.search.views.ViewResolver;
 import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.WidgetDTO;
 import org.graylog.security.UserContext;
@@ -65,6 +66,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.util.Collection;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -85,13 +88,16 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     private final SearchQueryParser searchQueryParser;
     private final ClusterEventBus clusterEventBus;
     private final SearchDomain searchDomain;
+    private final Map<String, ViewResolver> viewResolvers;
 
     @Inject
     public ViewsResource(ViewService dbService,
-                         ClusterEventBus clusterEventBus, SearchDomain searchDomain) {
+                         ClusterEventBus clusterEventBus, SearchDomain searchDomain,
+                         Map<String, ViewResolver> viewResolvers) {
         this.dbService = dbService;
         this.clusterEventBus = clusterEventBus;
         this.searchDomain = searchDomain;
+        this.viewResolvers = viewResolvers;
         this.searchQueryParser = new SearchQueryParser(ViewDTO.FIELD_TITLE, SEARCH_FIELD_MAPPING);
     }
 
@@ -138,7 +144,9 @@ public class ViewsResource extends RestResource implements PluginRestResource {
                     .orElseThrow(() -> new NotFoundException("Default view doesn't exist"));
         }
 
-        final ViewDTO view = loadView(id);
+        // Attempt to resolve the view from optional view resolvers before using the default database lookup.
+        // The view resolvers must be used first, because the ID may not be a valid hex ID string.
+        ViewDTO view = resolveView(id).orElseGet(() -> loadView(id));
         if (searchUser.canReadView(view)) {
             return view;
         }
@@ -146,10 +154,27 @@ public class ViewsResource extends RestResource implements PluginRestResource {
         throw viewNotFoundException(id);
     }
 
+    /**
+     * Attempts to resolve a view by its id from any optional provided view resolvers.
+     *
+     * @param id The id of a view.
+     * @return An optional view.
+     */
+    private Optional<ViewDTO> resolveView(String id) {
+        for (ViewResolver resolver : viewResolvers.values()) {
+            final Optional<ViewDTO> optionalDto = resolver.get(id);
+            if (optionalDto.isPresent()) {
+                return optionalDto;
+            }
+        }
+        return Optional.empty();
+    }
+
+
     @POST
     @ApiOperation("Create a new view")
     @AuditEvent(type = ViewsAuditEventTypes.VIEW_CREATE)
-    public ViewDTO create(@ApiParam @Valid  @NotNull(message = "View is mandatory") ViewDTO dto,
+    public ViewDTO create(@ApiParam @Valid @NotNull(message = "View is mandatory") ViewDTO dto,
                           @Context UserContext userContext,
                           @Context SearchUser searchUser) throws ValidationException {
         if (dto.type().equals(ViewDTO.Type.DASHBOARD) && !searchUser.canCreateDashboards()) {

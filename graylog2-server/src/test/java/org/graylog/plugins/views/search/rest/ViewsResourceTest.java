@@ -21,7 +21,6 @@ import com.google.common.collect.ImmutableSet;
 import org.apache.shiro.subject.Subject;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchDomain;
-import org.graylog.plugins.views.search.db.SearchDbService;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewService;
@@ -40,7 +39,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
@@ -48,6 +46,7 @@ import javax.annotation.Nullable;
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.NotFoundException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -100,7 +99,7 @@ public class ViewsResourceTest {
 
     class ViewsTestResource extends ViewsResource {
         ViewsTestResource(ViewService viewService, ClusterEventBus clusterEventBus, UserService userService, SearchDomain searchDomain) {
-            super(viewService, clusterEventBus, searchDomain);
+            super(viewService, clusterEventBus, searchDomain, new HashMap<>());
             this.userService = userService;
         }
 

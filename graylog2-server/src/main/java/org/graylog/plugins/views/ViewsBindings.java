@@ -57,7 +57,6 @@ import org.graylog.plugins.views.search.rest.ExportJobsResource;
 import org.graylog.plugins.views.search.rest.FieldTypesResource;
 import org.graylog.plugins.views.search.rest.MessageExportFormatFilter;
 import org.graylog.plugins.views.search.rest.MessagesResource;
-import org.graylog.plugins.views.search.rest.PermittedStreams;
 import org.graylog.plugins.views.search.rest.PivotSeriesFunctionsResource;
 import org.graylog.plugins.views.search.rest.QualifyingViewsResource;
 import org.graylog.plugins.views.search.rest.QueryValidationResource;
@@ -227,6 +226,10 @@ public class ViewsBindings extends ViewsModule {
         bind(SearchConfig.class).toProvider(SearchConfigProvider.class);
 
         binder().bind(QuerySuggestionsService.class).toProvider(QuerySuggestionsProvider.class);
+
+        // The ViewResolver binder must be explicitly initialized to avoid an initialization error when
+        // no values are bound.
+        viewResolverBinder();
     }
 
     private void registerExportBackendProvider() {
