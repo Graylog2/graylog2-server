@@ -16,12 +16,14 @@
  */
 package org.graylog.events.processor;
 
+import org.graylog.events.notifications.EventNotificationExecutionJob;
 import org.graylog.scheduler.DBJobDefinitionService;
 import org.graylog.scheduler.DBJobTriggerService;
 import org.graylog.scheduler.JobDefinitionDto;
 import org.graylog.scheduler.JobTriggerDto;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog2.plugin.database.users.User;
+import org.mongojack.DBQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -170,7 +172,6 @@ public class EventDefinitionHandler {
                 .ifPresent(jobDefinition -> deleteJobDefinitionAndTrigger(jobDefinition, eventDefinition));
     }
 
-
     private EventDefinitionDto createEventDefinition(EventDefinitionDto unsavedEventDefinition, Optional<User> user) {
         EventDefinitionDto eventDefinition;
         if (user.isPresent()) {
@@ -287,7 +288,27 @@ public class EventDefinitionHandler {
 
     private void deleteJobDefinitionAndTrigger(JobDefinitionDto jobDefinition, EventDefinitionDto eventDefinition) {
         deleteJobTrigger(jobDefinition, eventDefinition);
+        deleteNotificationJobTriggers(eventDefinition);
         deleteJobDefinition(jobDefinition, eventDefinition);
+    }
+
+    /**
+     * Deletes notification triggers for this event.
+     * This mostly servers as a safety net, when a misconfiguration has lead to a high number of outstanding
+     * notifications.
+     * Processing these notifications would unnecessarily block the job scheduler and in some cases consume a lot of
+     * resources.
+     */
+    private void deleteNotificationJobTriggers(EventDefinitionDto eventDefinition) {
+        final DBQuery.Query query = DBQuery.and(
+                DBQuery.is("data.type", EventNotificationExecutionJob.TYPE_NAME),
+                DBQuery.is("data.event_dto.event_definition_id", eventDefinition.id()));
+
+        final int numberOfDeletedTriggers = jobTriggerService.deleteByQuery(query);
+
+        if (numberOfDeletedTriggers > 0) {
+            LOG.info("Deleted {} uncompleted notifications.", numberOfDeletedTriggers);
+        }
     }
 
     private JobTriggerDto newJobTrigger(JobDefinitionDto jobDefinition, EventProcessorSchedulerConfig schedulerConfig) {

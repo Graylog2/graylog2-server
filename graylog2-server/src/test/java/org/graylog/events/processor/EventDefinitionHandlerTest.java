@@ -23,6 +23,7 @@ import com.google.common.collect.ImmutableList;
 import org.graylog.events.JobSchedulerTestClock;
 import org.graylog.events.TestEventProcessorConfig;
 import org.graylog.events.TestEventProcessorParameters;
+import org.graylog.events.notifications.EventNotificationExecutionJob;
 import org.graylog.events.notifications.EventNotificationSettings;
 import org.graylog.events.processor.storage.PersistToStreamsStorageHandler;
 import org.graylog.scheduler.DBJobDefinitionService;
@@ -30,6 +31,7 @@ import org.graylog.scheduler.DBJobTriggerService;
 import org.graylog.scheduler.JobDefinitionDto;
 import org.graylog.scheduler.JobTriggerDto;
 import org.graylog.scheduler.schedule.IntervalJobSchedule;
+import org.graylog.scheduler.schedule.OnceJobSchedule;
 import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
@@ -89,7 +91,9 @@ public class EventDefinitionHandlerTest {
         objectMapper.registerSubtypes(new NamedType(TestEventProcessorParameters.class, TestEventProcessorParameters.TYPE_NAME));
         objectMapper.registerSubtypes(new NamedType(EventProcessorExecutionJob.Config.class, EventProcessorExecutionJob.TYPE_NAME));
         objectMapper.registerSubtypes(new NamedType(EventProcessorExecutionJob.Data.class, EventProcessorExecutionJob.TYPE_NAME));
+        objectMapper.registerSubtypes(new NamedType(EventNotificationExecutionJob.Data.class, EventNotificationExecutionJob.TYPE_NAME));
         objectMapper.registerSubtypes(new NamedType(IntervalJobSchedule.class, IntervalJobSchedule.TYPE_NAME));
+        objectMapper.registerSubtypes(new NamedType(OnceJobSchedule.class, OnceJobSchedule.TYPE_NAME));
         objectMapper.registerSubtypes(new NamedType(PersistToStreamsStorageHandler.Config.class, PersistToStreamsStorageHandler.Config.TYPE_NAME));
 
         final MongoJackObjectMapperProvider mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
@@ -490,5 +494,17 @@ public class EventDefinitionHandlerTest {
         assertThatThrownBy(() -> handler.unschedule(id))
                 .hasMessageContaining("doesn't exist")
                 .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @MongoDBFixtures("event-processors.json")
+    public void unscheduleRemovesNotifications() {
+        assertThat(jobTriggerService.get("61fbcca5b2507945cc120001")).isPresent();
+        assertThat(jobTriggerService.get("61fbcca5b2507945cc120002")).isPresent();
+
+        handler.unschedule("54e3deadbeefdeadbeef0000");
+
+        assertThat(jobTriggerService.get("61fbcca5b2507945cc120001")).isNotPresent();
+        assertThat(jobTriggerService.get("61fbcca5b2507945cc120002")).isPresent();
     }
 }
