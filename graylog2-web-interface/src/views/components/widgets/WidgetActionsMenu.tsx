@@ -127,7 +127,7 @@ const _onDelete = async (widget: Widget, view: View, title: string) => {
   // eslint-disable-next-line no-restricted-syntax
   for (const hook of widgetDeletionHooks) {
     try {
-    // eslint-disable-next-line no-await-in-loop
+      // eslint-disable-next-line no-await-in-loop
       const result = await hook(widget, view, title);
 
       if (result !== null) {
