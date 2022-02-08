@@ -92,8 +92,8 @@ export interface WidgetExport {
   defaultWidth?: number;
   visualizationComponent: React.ComponentType<WidgetComponentProps>;
   editComponent: React.ComponentType<EditWidgetComponentProps>;
-  needsControlledHeight: (widget: Widget) => boolean;
-  searchResultTransformer?: (data: Array<unknown>, widget: Widget) => unknown;
+  needsControlledHeight: (widget: { config: Widget['config'] }) => boolean;
+  searchResultTransformer?: (data: Array<unknown>) => unknown;
   searchTypes: (widget: Widget) => Array<any>;
   titleGenerator?: (widget: Widget) => string;
   reportStyle?: () => { width: React.CSSProperties['width'] };

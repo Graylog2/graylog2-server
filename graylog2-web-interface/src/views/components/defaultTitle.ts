@@ -20,7 +20,7 @@ import { widgetDefinition } from 'views/logic/Widgets';
 
 const defaultTitleGenerator = (w) => `Untitled ${w.type.replace('_', ' ').split(' ').map(capitalize).join(' ')}`;
 
-const defaultTitle = (widget) => {
+const defaultTitle = (widget: { type: string }) => {
   const widgetDef = widgetDefinition(widget.type);
 
   return (widgetDef.titleGenerator || defaultTitleGenerator)(widget);
