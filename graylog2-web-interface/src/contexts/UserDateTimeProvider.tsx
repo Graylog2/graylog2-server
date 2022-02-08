@@ -25,7 +25,7 @@ import { DATE_TIME_FORMATS, getBrowserTimezone, toDateObject } from 'util/DateTi
 
 type Props = {
   children: React.ReactNode,
-  tzOverride?: string,
+  tz?: string,
 };
 
 const getUserTimezone = (userTimezone, tzOverride) => {
@@ -41,7 +41,7 @@ const getUserTimezone = (userTimezone, tzOverride) => {
  * Should be used when displaying times and the related components are not a suitable option.
  */
 
-const UserDateTimeProvider = ({ children, tzOverride }: Props) => {
+const UserDateTimeProvider = ({ children, tz: tzOverride }: Props) => {
   const currentUser = useContext(CurrentUserContext);
   const userTimezone = useMemo(() => getUserTimezone(currentUser?.timezone, tzOverride), [currentUser?.timezone, tzOverride]);
 
@@ -66,7 +66,7 @@ const UserDateTimeProvider = ({ children, tzOverride }: Props) => {
 };
 
 UserDateTimeProvider.defaultProps = {
-  tzOverride: undefined,
+  tz: undefined,
 };
 
 export default UserDateTimeProvider;

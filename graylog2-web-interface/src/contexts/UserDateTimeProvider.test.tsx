@@ -41,7 +41,7 @@ describe('DateTimeProvider', () => {
 
     render(
       <CurrentUserContext.Provider value={currentUser}>
-        <UserDateTimeProvider tzOverride={tzOverride}>
+        <UserDateTimeProvider tz={tzOverride}>
           <UserDateTimeContext.Consumer>
             {(value) => {
               contextValue = value;
