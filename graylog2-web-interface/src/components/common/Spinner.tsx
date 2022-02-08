@@ -38,7 +38,7 @@ type Props = {
  */
 const Spinner = ({ name, text, delay, ...rest }: Props) => (
   <Delayed delay={delay}>
-    <StyledIcon {...rest} name={name} $displayMargin={!!text} spin />{text}
+    <StyledIcon {...rest} name={name} $displayMargin={!!text?.trim()} spin />{text}
   </Delayed>
 );
 
