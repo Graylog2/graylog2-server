@@ -30,11 +30,11 @@ type Props = {
   children: React.ReactNode,
   className?: string,
   onChange: (currentPage: number, pageSize: number) => void,
-  activePage: number,
-  pageSize: number,
-  pageSizes: Array<number>,
+  activePage?: number,
+  pageSize?: number,
+  pageSizes?: Array<number>,
   totalItems: number,
-  showPageSizeSelect: boolean,
+  showPageSizeSelect?: boolean,
 };
 
 /**
