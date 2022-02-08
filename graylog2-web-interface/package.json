@@ -101,7 +101,6 @@
     "react-sticky-el": "^2.0.9",
     "react-ultimate-pagination": "^1.2.0",
     "react-window": "^1.8.2",
-    "sockjs-client": "^1.4.0",
     "terser-webpack-plugin": "5.2.5",
     "toastr": "^2.1.2",
     "twix": "^1.1.4",
