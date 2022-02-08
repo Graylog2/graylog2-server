@@ -48,11 +48,15 @@ const handleViewDelete = async (view: View) => {
 
   // eslint-disable-next-line no-restricted-syntax
   for (const hook of dashboardDeletionHooks) {
-    // eslint-disable-next-line no-await-in-loop
-    const result = await hook(view);
+    try {
+      // eslint-disable-next-line no-await-in-loop
+      const result = await hook(view);
 
-    if (result !== null) {
-      return result === true ? ViewManagementActions.delete(view) : Promise.reject();
+      if (result !== null) {
+        return result === true ? ViewManagementActions.delete(view) : Promise.reject();
+      }
+    } catch (e) {
+      console.warn('Exception occurred in dashboard deletion hook: ', e);
     }
   }
 
