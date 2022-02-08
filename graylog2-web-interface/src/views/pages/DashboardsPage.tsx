@@ -14,7 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect } from 'react';
+import * as React from 'react';
+import { useEffect } from 'react';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { LinkContainer } from 'components/common/router';
 import { Col, Row, Button } from 'components/bootstrap';
@@ -28,16 +30,29 @@ import type { DashboardsStoreState } from 'views/stores/DashboardsStore';
 import ViewList from 'views/components/views/ViewList';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 
+import type View from '../logic/views/View';
+
 type Props = {
   dashboards: DashboardsStoreState,
 };
 
-const handleSearch = (query, page, perPage) => DashboardsActions.search(query, page, perPage);
+const handleSearch = (query: string, page: number, perPage: number) => DashboardsActions.search(query, page, perPage);
 
-const handleViewDelete = (view) => {
-  // eslint-disable-next-line no-alert
-  if (window.confirm(`Are you sure you want to delete "${view.title}"?`)) {
-    return ViewManagementActions.delete(view);
+// eslint-disable-next-line no-alert
+const defaultDashboardDeletionHook = (view: View) => window.confirm(`Are you sure you want to delete "${view.title}"?`);
+
+const handleViewDelete = (view: View) => {
+  const pluginDashboardDeletionHooks = PluginStore.exports('views.hooks.deletingDashboard');
+
+  const dashboardDeletionHooks = [...pluginDashboardDeletionHooks, defaultDashboardDeletionHook];
+
+  // eslint-disable-next-line no-restricted-syntax
+  for (const hook of dashboardDeletionHooks) {
+    const result = hook(view);
+
+    if (result !== null) {
+      return result === true ? ViewManagementActions.delete(view) : null;
+    }
   }
 
   return null;
