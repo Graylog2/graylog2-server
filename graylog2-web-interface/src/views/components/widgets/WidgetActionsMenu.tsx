@@ -126,11 +126,16 @@ const _onDelete = async (widget: Widget, view: View, title: string) => {
 
   // eslint-disable-next-line no-restricted-syntax
   for (const hook of widgetDeletionHooks) {
+    try {
     // eslint-disable-next-line no-await-in-loop
-    const result = await hook(widget, view, title);
+      const result = await hook(widget, view, title);
 
-    if (result !== null) {
-      return result === true ? WidgetActions.remove(widget.id) : Promise.reject();
+      if (result !== null) {
+        return result === true ? WidgetActions.remove(widget.id) : Promise.reject();
+      }
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.warn('Exception occurred in widget deletion hook: ', e);
     }
   }
 
