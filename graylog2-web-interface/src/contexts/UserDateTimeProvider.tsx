@@ -17,7 +17,6 @@
 import * as React from 'react';
 import { useCallback, useMemo, useContext } from 'react';
 
-import type { UserDateTimeContextType } from 'contexts/UserDateTimeContext';
 import UserDateTimeContext from 'contexts/UserDateTimeContext';
 import AppConfig from 'util/AppConfig';
 import CurrentUserContext from 'contexts/CurrentUserContext';
@@ -25,10 +24,15 @@ import type { DateTime, DateTimeFormats } from 'util/DateTime';
 import { DATE_TIME_FORMATS, getBrowserTimezone, toDateObject } from 'util/DateTime';
 
 type Props = {
-  children: React.ReactChildren | React.ReactChild | ((timeLocalize: UserDateTimeContextType) => Element),
+  children: React.ReactNode,
+  tz?: string,
 };
 
-const getUserTimezone = (userTimezone) => {
+const getUserTimezone = (userTimezone, tzOverride) => {
+  if (tzOverride) {
+    return tzOverride;
+  }
+
   return userTimezone ?? getBrowserTimezone() ?? AppConfig.rootTimeZone() ?? 'UTC';
 };
 
@@ -37,9 +41,9 @@ const getUserTimezone = (userTimezone) => {
  * Should be used when displaying times and the related components are not a suitable option.
  */
 
-const UserDateTimeProvider = ({ children }: Props) => {
+const UserDateTimeProvider = ({ children, tz: tzOverride }: Props) => {
   const currentUser = useContext(CurrentUserContext);
-  const userTimezone = useMemo(() => getUserTimezone(currentUser?.timezone), [currentUser?.timezone]);
+  const userTimezone = useMemo(() => getUserTimezone(currentUser?.timezone, tzOverride), [currentUser?.timezone, tzOverride]);
 
   const toUserTimezone = useCallback((time: DateTime) => {
     return toDateObject(time, undefined, userTimezone);
@@ -59,6 +63,10 @@ const UserDateTimeProvider = ({ children }: Props) => {
       {children}
     </UserDateTimeContext.Provider>
   );
+};
+
+UserDateTimeProvider.defaultProps = {
+  tz: undefined,
 };
 
 export default UserDateTimeProvider;
