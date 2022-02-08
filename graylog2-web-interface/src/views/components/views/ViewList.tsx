@@ -72,7 +72,7 @@ const ViewList = ({ pagination, handleSearch, handleViewDelete, views }) => {
     handleViewDelete(view).then(() => {
       dispatch({ type: 'viewDelete' });
       execSearch();
-    });
+    }, () => {});
   };
 
   if (!views) {

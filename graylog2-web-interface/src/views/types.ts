@@ -252,6 +252,7 @@ declare module 'graylog-web-plugin/plugin' {
     'views.elements.queryBar'?: Array<React.ComponentType>;
     'views.export.formats'?: Array<ExportFormat>;
     'views.hooks.deletingDashboard'?: Array<(view: View) => (boolean | null)>,
+    'views.hooks.deletingWidget'?: Array<(widget: Widget, view: View, title: string) => (boolean | null)>,
     'views.hooks.executingView'?: Array<ViewHook>;
     'views.hooks.loadingView'?: Array<ViewHook>;
     'views.hooks.searchRefresh'?: Array<SearchRefreshCondition>;

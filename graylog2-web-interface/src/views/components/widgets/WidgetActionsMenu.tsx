@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useState, useContext, useCallback } from 'react';
 import styled from 'styled-components';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import type { BackendWidgetPosition } from 'views/types';
 import ExportModal from 'views/components/export/ExportModal';
@@ -36,6 +37,7 @@ import IfSearch from 'views/components/search/IfSearch';
 import { MenuItem } from 'components/bootstrap';
 import { WidgetActions } from 'views/stores/WidgetStore';
 import { useStore } from 'stores/connect';
+import type Widget from 'views/logic/widgets/Widget';
 
 import ReplaySearchButton from './ReplaySearchButton';
 import ExtraWidgetActions from './ExtraWidgetActions';
@@ -115,11 +117,24 @@ const _onMoveWidgetToTab = (view, setShowMoveWidgetToTab, widgetId, queryId, kee
   }
 };
 
-const _onDelete = (widgetId, title) => {
-  // eslint-disable-next-line no-alert
-  if (window.confirm(`Are you sure you want to remove the widget "${title}"?`)) {
-    WidgetActions.remove(widgetId);
+const defaultOnDeleteWidget = async (widget: Widget, view: View, title: string) => window.confirm(`Are you sure you want to remove the widget "${title}"?`);
+
+const _onDelete = async (widget: Widget, view: View, title: string) => {
+  const pluggableWidgetDeletionHooks = PluginStore.exports('views.hooks.deletingWidget');
+
+  const widgetDeletionHooks = [...pluggableWidgetDeletionHooks, defaultOnDeleteWidget];
+
+  // eslint-disable-next-line no-restricted-syntax
+  for (const hook of widgetDeletionHooks) {
+    // eslint-disable-next-line no-await-in-loop
+    const result = await hook(widget, view, title);
+
+    if (result !== null) {
+      return result === true ? WidgetActions.remove(widget.id) : Promise.reject();
+    }
   }
+
+  return Promise.reject();
 };
 
 const _onDuplicate = (widgetId, setFocusWidget, title) => {
@@ -155,6 +170,7 @@ const WidgetActionsMenu = ({
   const onDuplicate = () => _onDuplicate(widget.id, setWidgetFocusing, title);
   const onCopyToDashboard = useCallback((widgetId, dashboardId) => _onCopyToDashboard(view, setShowCopyToDashboard, widgetId, dashboardId), [view]);
   const onMoveWidgetToTab = useCallback((widgetId, queryId, keepCopy) => _onMoveWidgetToTab(view, setShowMoveWidgetToTab, widgetId, queryId, keepCopy), [view]);
+  const onDelete = useCallback(() => _onDelete(widget, view?.view, title), [title, view?.view, widget]);
 
   return (
     <Container>
@@ -200,7 +216,7 @@ const WidgetActionsMenu = ({
           </IfDashboard>
           <ExtraWidgetActions widget={widget} onSelect={() => {}} />
           <MenuItem divider />
-          <MenuItem onSelect={() => _onDelete(widget.id, title)}>
+          <MenuItem onSelect={onDelete}>
             Delete
           </MenuItem>
         </WidgetActionDropdown>

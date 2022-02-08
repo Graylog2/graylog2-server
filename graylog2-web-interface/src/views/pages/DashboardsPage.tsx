@@ -41,21 +41,22 @@ const handleSearch = (query: string, page: number, perPage: number) => Dashboard
 // eslint-disable-next-line no-alert
 const defaultDashboardDeletionHook = (view: View) => window.confirm(`Are you sure you want to delete "${view.title}"?`);
 
-const handleViewDelete = (view: View) => {
+const handleViewDelete = async (view: View) => {
   const pluginDashboardDeletionHooks = PluginStore.exports('views.hooks.deletingDashboard');
 
   const dashboardDeletionHooks = [...pluginDashboardDeletionHooks, defaultDashboardDeletionHook];
 
   // eslint-disable-next-line no-restricted-syntax
   for (const hook of dashboardDeletionHooks) {
-    const result = hook(view);
+    // eslint-disable-next-line no-await-in-loop
+    const result = await hook(view);
 
     if (result !== null) {
-      return result === true ? ViewManagementActions.delete(view) : null;
+      return result === true ? ViewManagementActions.delete(view) : Promise.reject();
     }
   }
 
-  return null;
+  return Promise.reject();
 };
 
 const refreshDashboards = () => {
