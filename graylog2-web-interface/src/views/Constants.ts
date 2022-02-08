@@ -74,9 +74,6 @@ export const RELATIVE_RANGE_TYPES = [
 
 export type TimeUnit = keyof typeof TimeUnits;
 
-export const viewsPath = '/views';
-export const showViewsPath = `${viewsPath}/:viewId`;
-
 export const searchPath = '/search';
 export const newSearchPath = `${searchPath}/new`;
 export const showSearchPath = `${searchPath}/:viewId`;

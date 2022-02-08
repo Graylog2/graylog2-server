@@ -50,7 +50,7 @@ import ExcludeFromQueryHandler from 'views/logic/valueactions/ExcludeFromQueryHa
 import { isFunction } from 'views/logic/aggregationbuilder/Series';
 import AggregationControls from 'views/components/aggregationbuilder/AggregationControls';
 import EditMessageList from 'views/components/widgets/EditMessageList';
-import { DashboardsPage, ShowViewPage, NewSearchPage, ViewManagementPage, NewDashboardPage, StreamSearchPage } from 'views/pages';
+import { DashboardsPage, ShowViewPage, NewSearchPage, NewDashboardPage, StreamSearchPage } from 'views/pages';
 import AddMessageCountActionHandler from 'views/logic/fieldactions/AddMessageCountActionHandler';
 import AddMessageTableActionHandler from 'views/logic/fieldactions/AddMessageTableActionHandler';
 import RemoveFromTableActionHandler from 'views/logic/fieldactions/RemoveFromTableActionHandler';
@@ -73,10 +73,8 @@ import {
   extendedSearchPath,
   newDashboardsPath,
   showDashboardsPath,
-  showViewsPath,
   newSearchPath,
   showSearchPath,
-  viewsPath,
 } from 'views/Constants';
 import ShowDashboardInBigDisplayMode from 'views/pages/ShowDashboardInBigDisplayMode';
 import LookupTableParameter from 'views/logic/parameters/LookupTableParameter';
@@ -130,9 +128,6 @@ const exports: PluginExports = {
     { path: `${Routes.unqualified.stream_search(':streamId')}/new`, component: NewSearchRedirectPage, parentComponent: null },
     { path: Routes.unqualified.stream_search(':streamId'), component: StreamSearchPage, parentComponent: App },
     { path: extendedSearchPath, component: NewSearchPage, parentComponent: App },
-
-    { path: viewsPath, component: ViewManagementPage },
-    { path: showViewsPath, component: ShowViewPage, parentComponent: App },
   ],
   enterpriseWidgets: [
     {
@@ -141,7 +136,7 @@ const exports: PluginExports = {
       defaultHeight: 5,
       reportStyle: () => ({ width: 800 }),
       defaultWidth: 6,
-      // TODO: Subtyping needs to be taked into account
+      // TODO: Subtyping needs to be taken into account
       visualizationComponent: MessageList as unknown as React.ComponentType<WidgetComponentProps>,
       editComponent: EditMessageList,
       needsControlledHeight: () => false,
