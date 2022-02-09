@@ -89,7 +89,7 @@ class Output extends React.Component {
   static defaultProps = {
     streamId: '',
     onUpdate: () => {},
-  }
+  };
 
   constructor(props) {
     super(props);

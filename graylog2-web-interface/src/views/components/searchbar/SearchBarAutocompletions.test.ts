@@ -42,7 +42,7 @@ class SimpleCompleter implements Completer {
 class AsyncCompleter implements Completer {
   getCompletions = () => {
     return Promise.resolve([sourceCompletion]);
-  }
+  };
 }
 
 const EditorMock = {

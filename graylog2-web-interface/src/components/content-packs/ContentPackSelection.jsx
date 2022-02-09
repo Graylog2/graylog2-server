@@ -79,7 +79,7 @@ class ContentPackSelection extends React.Component {
 
     onStateChange({ contentPack: updatedPack });
     this.setState({ contentPack: updatedPack }, this._validate);
-  }
+  };
 
   _validate = (newSelection) => {
     const mandatoryFields = ['name', 'summary', 'vendor'];
@@ -119,7 +119,7 @@ class ContentPackSelection extends React.Component {
 
   _bindValue = (event) => {
     this._updateField(event.target.name, getValueFromInput(event.target));
-  }
+  };
 
   _updateSelectionEntity = (entity) => {
     const { selectedEntities, onStateChange } = this.props;
@@ -170,7 +170,7 @@ class ContentPackSelection extends React.Component {
 
     return !(selectedEntities[type].length === entities[type].length
        || selectedEntities[type].length === 0);
-  }
+  };
 
   _isSelected = (entity) => {
     const { selectedEntities } = this.props;
@@ -181,7 +181,7 @@ class ContentPackSelection extends React.Component {
     }
 
     return selectedEntities[typeName].findIndex((e) => { return e.id === entity.id; }) >= 0;
-  }
+  };
 
   _isGroupSelected = (type) => {
     const { selectedEntities, entities } = this.props;
@@ -191,7 +191,7 @@ class ContentPackSelection extends React.Component {
     }
 
     return selectedEntities[type].length === entities[type].length;
-  }
+  };
 
   _onSetFilter = (filter) => {
     this._filterEntities(filter);

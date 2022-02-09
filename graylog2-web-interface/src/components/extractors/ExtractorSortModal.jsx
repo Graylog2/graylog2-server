@@ -51,7 +51,7 @@ class ExtractorSortModal extends React.Component {
     this.setState({
       sortedExtractors: extractors,
     });
-  }
+  };
 
   _updateSorting = (newSorting) => {
     this.setState({
