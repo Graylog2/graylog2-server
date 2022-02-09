@@ -17,25 +17,19 @@
 package org.graylog2.indexer.fieldtypes;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableSet;
 
 import java.util.Collections;
 import java.util.Set;
-import java.util.function.Function;
-import java.util.function.Predicate;
 
 @AutoValue
 @JsonDeserialize(builder = FieldTypes.Builder.class)
 public abstract class FieldTypes {
     private static final String FIELD_FIELD_NAME = "field_name";
     private static final String FIELD_TYPES = "types";
-
-    public static final Predicate<String> ALWAYS_TRUE_PREDICATE = value -> true;
 
     @JsonProperty(FIELD_FIELD_NAME)
     public abstract String fieldName();
@@ -98,25 +92,15 @@ public abstract class FieldTypes {
         @JsonProperty(FIELD_INDEX_NAMES)
         public abstract ImmutableSet<String> indexNames();
 
-        @JsonIgnore
-        public abstract Predicate<String> validationFunction();
-
         public static Type.Builder builder() {
             return Type.Builder.create();
         }
 
-
         public static Type createType(String type, Set<String> properties) {
-            return createType(type, properties, ALWAYS_TRUE_PREDICATE);
-        }
-
-
-        public static Type createType(String type, Set<String> properties, Predicate<String> validation) {
             return Type.builder()
                     .type(type)
                     .properties(properties)
                     .indexNames(Collections.emptySet())
-                    .validationFunction(validation)
                     .build();
         }
 
@@ -151,8 +135,6 @@ public abstract class FieldTypes {
                 indexNamesBuilder().addAll(indexNames);
                 return this;
             }
-
-            public abstract Type.Builder validationFunction(Predicate<String> validationFunction);
 
             public abstract Type build();
         }

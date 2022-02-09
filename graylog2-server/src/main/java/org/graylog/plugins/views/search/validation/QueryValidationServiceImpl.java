@@ -51,12 +51,14 @@ public class QueryValidationServiceImpl implements QueryValidationService {
     private final LuceneQueryParser luceneQueryParser;
     private final MappedFieldTypesService mappedFieldTypesService;
     private final QueryStringDecorators queryStringDecorators;
+    private final FieldTypeValidation fieldTypeValidation;
 
     @Inject
-    public QueryValidationServiceImpl(LuceneQueryParser luceneQueryParser, MappedFieldTypesService mappedFieldTypesService, QueryStringDecorators queryStringDecorators) {
+    public QueryValidationServiceImpl(LuceneQueryParser luceneQueryParser, MappedFieldTypesService mappedFieldTypesService, QueryStringDecorators queryStringDecorators, FieldTypeValidation fieldTypeValidation) {
         this.luceneQueryParser = luceneQueryParser;
         this.mappedFieldTypesService = mappedFieldTypesService;
         this.queryStringDecorators = queryStringDecorators;
+        this.fieldTypeValidation = fieldTypeValidation;
     }
 
     @Override
@@ -195,38 +197,23 @@ public class QueryValidationServiceImpl implements QueryValidationService {
         try {
             final ParsedQuery parsedQuery = luceneQueryParser.parse(decorated);
             final Map<String, MappedFieldTypeDTO> fields = availableFields.stream().collect(Collectors.toMap(MappedFieldTypeDTO::name, Function.identity()));
-            return parsedQuery.terms().stream().map(term -> validateValue(term, fields)).filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
+
+            return parsedQuery.terms().stream()
+                    .map(term -> {
+                        final MappedFieldTypeDTO fieldType = fields.get(term.getRealFieldName());
+                        final Optional<String> typeName = Optional.ofNullable(fieldType)
+                                .map(MappedFieldTypeDTO::type)
+                                .map(FieldTypes.Type::type);
+                        return typeName.flatMap(type -> fieldTypeValidation.validateFieldValueType(term, type));
+                    })
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .collect(Collectors.toList());
         } catch (ParseException e) {
             // TODO! Handle exception!
         }
 
         return Collections.emptyList();
-    }
-
-    private Optional<ValidationMessage> validateValue(ParsedTerm t, Map<String, MappedFieldTypeDTO> fields) {
-        final MappedFieldTypeDTO fieldType = fields.get(t.getRealFieldName());
-        if (!typeMatching(fieldType, t.value())) {
-            return Optional.of(ValidationMessage.builder(ValidationType.INVALID_VALUE_TYPE)
-                    .errorMessage(String.format(Locale.ROOT, "Type of %s is %s, cannot use value %s", t.getRealFieldName(), fieldType.type().type(), t.value()))
-                    .build());
-        }
-        return Optional.empty();
-    }
-
-    private boolean typeMatching(MappedFieldTypeDTO type, String value) {
-        return Optional.ofNullable(type)
-                .map(MappedFieldTypeDTO::type)
-                .map(FieldTypes.Type::validationFunction)
-                .map(validator -> validateValue(validator, value))
-                .orElse(true);
-    }
-
-    private Boolean validateValue(Predicate<String> validator, String value) {
-        try {
-            return validator.test(value);
-        } catch (Exception e) {
-            return false;
-        }
     }
 
     private String decoratedQuery(ValidationRequest req) {

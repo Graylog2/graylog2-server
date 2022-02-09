@@ -18,18 +18,11 @@ package org.graylog2.indexer.fieldtypes;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.net.InetAddresses;
-import org.apache.commons.validator.routines.InetAddressValidator;
-import org.joda.time.DateTime;
 
 import javax.inject.Singleton;
-import java.time.format.DateTimeFormatter;
 import java.util.Optional;
-import java.util.function.Function;
-import java.util.function.Predicate;
 
 import static com.google.common.collect.ImmutableSet.of;
-import static org.graylog2.indexer.fieldtypes.FieldTypes.ALWAYS_TRUE_PREDICATE;
 import static org.graylog2.indexer.fieldtypes.FieldTypes.Type.createType;
 
 /**
@@ -44,31 +37,19 @@ public class FieldTypeMapper {
     private static final String PROP_FULL_TEXT_SEARCH = "full-text-search";
     private static final String PROP_NUMERIC = "numeric";
 
-    private static final FieldTypes.Type STRING_TYPE = createType("string", of(PROP_ENUMERABLE), ALWAYS_TRUE_PREDICATE);
-    private static final FieldTypes.Type STRING_FTS_TYPE = createType("string", of(PROP_FULL_TEXT_SEARCH), ALWAYS_TRUE_PREDICATE);
-    private static final FieldTypes.Type LONG_TYPE = createType("long", of(PROP_NUMERIC, PROP_ENUMERABLE), wrapException(Long::parseLong));
-    private static final FieldTypes.Type INT_TYPE = createType("int", of(PROP_NUMERIC, PROP_ENUMERABLE), wrapException(Integer::parseInt));
-    private static final FieldTypes.Type SHORT_TYPE = createType("short", of(PROP_NUMERIC, PROP_ENUMERABLE), wrapException(Short::parseShort));
-    private static final FieldTypes.Type BYTE_TYPE = createType("byte", of(PROP_NUMERIC, PROP_ENUMERABLE), wrapException(Byte::parseByte));
-    private static final FieldTypes.Type DOUBLE_TYPE = createType("double", of(PROP_NUMERIC, PROP_ENUMERABLE), wrapException(Double::parseDouble));
-    private static final FieldTypes.Type FLOAT_TYPE = createType("float", of(PROP_NUMERIC, PROP_ENUMERABLE), wrapException(Float::parseFloat));
-    private static final FieldTypes.Type DATE_TYPE = createType("date", of(PROP_ENUMERABLE), wrapException(DateTime::parse));
-    private static final FieldTypes.Type BOOLEAN_TYPE = createType("boolean", of(PROP_ENUMERABLE), wrapException(Boolean::parseBoolean));
-    private static final FieldTypes.Type BINARY_TYPE = createType("binary", of(), ALWAYS_TRUE_PREDICATE);
-    private static final FieldTypes.Type GEO_POINT_TYPE = createType("geo-point", of(), ALWAYS_TRUE_PREDICATE);
-    private static final FieldTypes.Type IP_TYPE = createType("ip", of(PROP_ENUMERABLE), InetAddresses::isInetAddress);
-
-    @SuppressWarnings("ReturnValueIgnored")
-    private static Predicate<String> wrapException(Function<String, Object> parser) {
-        return (value) -> {
-            try {
-                parser.apply(value);
-                return true;
-            } catch (Exception e) {
-                return false;
-            }
-        };
-    }
+    private static final FieldTypes.Type STRING_TYPE = createType("string", of(PROP_ENUMERABLE));
+    private static final FieldTypes.Type STRING_FTS_TYPE = createType("string", of(PROP_FULL_TEXT_SEARCH));
+    private static final FieldTypes.Type LONG_TYPE = createType("long", of(PROP_NUMERIC, PROP_ENUMERABLE));
+    private static final FieldTypes.Type INT_TYPE = createType("int", of(PROP_NUMERIC, PROP_ENUMERABLE));
+    private static final FieldTypes.Type SHORT_TYPE = createType("short", of(PROP_NUMERIC, PROP_ENUMERABLE));
+    private static final FieldTypes.Type BYTE_TYPE = createType("byte", of(PROP_NUMERIC, PROP_ENUMERABLE));
+    private static final FieldTypes.Type DOUBLE_TYPE = createType("double", of(PROP_NUMERIC, PROP_ENUMERABLE));
+    private static final FieldTypes.Type FLOAT_TYPE = createType("float", of(PROP_NUMERIC, PROP_ENUMERABLE));
+    private static final FieldTypes.Type DATE_TYPE = createType("date", of(PROP_ENUMERABLE));
+    private static final FieldTypes.Type BOOLEAN_TYPE = createType("boolean", of(PROP_ENUMERABLE));
+    private static final FieldTypes.Type BINARY_TYPE = createType("binary", of());
+    private static final FieldTypes.Type GEO_POINT_TYPE = createType("geo-point", of());
+    private static final FieldTypes.Type IP_TYPE = createType("ip", of(PROP_ENUMERABLE));
 
     /**
      * A map from Elasticsearch types to Graylog logical types.

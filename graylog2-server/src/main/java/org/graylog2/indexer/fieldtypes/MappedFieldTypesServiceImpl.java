@@ -97,7 +97,7 @@ public class MappedFieldTypesServiceImpl implements MappedFieldTypesService {
                     final Set<String> properties = distinctTypes.size() > 1
                             ? Sets.union(commonProperties, Collections.singleton(PROP_COMPOUND_TYPE))
                             : commonProperties;
-                    return MappedFieldTypeDTO.create(fieldName, createType(resultingFieldType, properties, value -> true));
+                    return MappedFieldTypeDTO.create(fieldName, createType(resultingFieldType, properties));
 
                 })
                 .collect(Collectors.toSet());
