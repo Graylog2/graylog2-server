@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as Immutable from 'immutable';
-import type { $ReadOnly } from 'utility-types';
 
 import { FieldTypesStore } from 'views/stores/FieldTypesStore';
 import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
@@ -25,9 +24,9 @@ import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import type { CompletionResult, Token } from '../ace-types';
 import type { Completer } from '../SearchBarAutocompletions';
 
-type Suggestion = $ReadOnly<{
+type Suggestion = Readonly<{
   name: string,
-  type: $ReadOnly<{
+  type: Readonly<{
     type: string,
   }>,
 }>;
@@ -63,6 +62,10 @@ const _matchesFieldName = (prefix) => {
   };
 };
 
+const isFollowingExistsOperator = (lastToken: Token | undefined | null) => ((lastToken && lastToken.value === `${existsOperator.name}:`) === true);
+
+const isFollowingFieldName = (lastToken: Token | undefined | null) => (lastToken && lastToken.type === 'keyword' && lastToken.value.endsWith(':'));
+
 class FieldNameCompletion implements Completer {
   activeQuery: string;
 
@@ -81,7 +84,7 @@ class FieldNameCompletion implements Completer {
     FieldTypesStore.listen((newState) => this._newFields(newState));
   }
 
-  _newFields = (fields: FieldTypesStoreState) => {
+  private _newFields = (fields: FieldTypesStoreState) => {
     this.fields = fields;
     const { queryFields } = this.fields;
 
@@ -102,12 +105,8 @@ class FieldNameCompletion implements Completer {
     }
   };
 
-  _isFollowingExistsOperator = (lastToken: Token | undefined | null) => ((lastToken && lastToken.value === `${existsOperator.name}:`) === true);
-
-  _isFollowingFieldName = (lastToken: Token | undefined | null) => (lastToken && lastToken.type === 'keyword' && lastToken.value.endsWith(':'));
-
   getCompletions = (currentToken: Token | undefined | null, lastToken: Token | undefined | null, prefix: string) => {
-    if (this._isFollowingFieldName(lastToken) && !this._isFollowingExistsOperator(lastToken)) {
+    if (isFollowingFieldName(lastToken) && !isFollowingExistsOperator(lastToken)) {
       return [];
     }
 
@@ -120,7 +119,7 @@ class FieldNameCompletion implements Completer {
     // @ts-ignore
     const currentQueryFields: FieldTypeMapping[] = queryFields.get(this.activeQuery, Immutable.List());
 
-    const valuePosition = this._isFollowingExistsOperator(lastToken);
+    const valuePosition = isFollowingExistsOperator(lastToken);
 
     const allButInCurrent = all.filter((field) => !this.currentQueryFieldNames[field.name]);
     const fieldsToMatchIn = valuePosition
