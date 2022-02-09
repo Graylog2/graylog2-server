@@ -17,21 +17,34 @@
 
 package org.graylog2.migrations;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.google.auto.value.AutoValue;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.Document;
 import org.bson.conversions.Bson;
+import org.graylog.autovalue.WithBeanGetter;
 import org.graylog.plugins.map.config.DatabaseVendorType;
 import org.graylog.plugins.map.config.GeoIpResolverConfig;
 import org.graylog2.database.MongoConnection;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.time.ZonedDateTime;
 
+/**
+ * The Original migration had a bug which caused the <b>db_vendor_type</b>  field to always be updated--replacing any user supplied values.
+ *
+ * <p>
+ * This update writes a completion status record upon initial successful migration, and checks for presence of such record
+ * before stating any subsequent migration--aborts if record found.
+ * </p>
+ */
 public class V20211221144300_GeoIpResolverConfigMigration extends Migration {
 
     private static final Logger LOG = LoggerFactory.getLogger(V20211221144300_GeoIpResolverConfigMigration.class);
@@ -45,15 +58,18 @@ public class V20211221144300_GeoIpResolverConfigMigration extends Migration {
     private static final String FIELD_ENFORCE = PAYLOAD + ".enforce_graylog_schema";
 
     private final MongoConnection mongoConnection;
+    private final ClusterConfigService clusterConfigService;
 
     @Inject
-    public V20211221144300_GeoIpResolverConfigMigration(MongoConnection mongoConnection) {
+    public V20211221144300_GeoIpResolverConfigMigration(MongoConnection mongoConnection,
+                                                        ClusterConfigService clusterConfigService) {
         this.mongoConnection = mongoConnection;
+        this.clusterConfigService = clusterConfigService;
     }
 
     @Override
     public ZonedDateTime createdAt() {
-        return ZonedDateTime.parse("2021-12-21t14:43Z");
+        return ZonedDateTime.parse("2022-01-28t16:38Z");
     }
 
     /**
@@ -65,6 +81,12 @@ public class V20211221144300_GeoIpResolverConfigMigration extends Migration {
      */
     @Override
     public void upgrade() {
+
+        MigrationCompletion completion = clusterConfigService.get(MigrationCompletion.class);
+        if (completion != null) {
+            LOG.debug("Migration was already completed");
+            return;
+        }
 
         final MongoCollection<Document> collection = mongoConnection.getMongoDatabase().getCollection(COLLECTION_NAME);
         LOG.info("Updating '{}' collection.", COLLECTION_NAME);
@@ -94,6 +116,19 @@ public class V20211221144300_GeoIpResolverConfigMigration extends Migration {
         final UpdateResult updateVendorResult = collection.updateOne(geoConfFilter, setDefaultVendor);
         LOG.info("Default Vendor Update Result: {}", updateVendorResult);
 
+        clusterConfigService.write(MigrationCompletion.create());
+
+    }
+
+    @JsonAutoDetect
+    @AutoValue
+    @WithBeanGetter
+    public abstract static class MigrationCompletion {
+
+        @JsonCreator
+        public static MigrationCompletion create() {
+            return new AutoValue_V20211221144300_GeoIpResolverConfigMigration_MigrationCompletion();
+        }
     }
 }
 
