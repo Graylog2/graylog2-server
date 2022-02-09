@@ -23,6 +23,7 @@ import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchDomain;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.views.ViewDTO;
+import org.graylog.plugins.views.search.views.ViewResolver;
 import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.security.UserContext;
 import org.graylog2.dashboards.events.DashboardDeletedEvent;
@@ -51,6 +52,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
@@ -99,7 +101,11 @@ public class ViewsResourceTest {
 
     class ViewsTestResource extends ViewsResource {
         ViewsTestResource(ViewService viewService, ClusterEventBus clusterEventBus, UserService userService, SearchDomain searchDomain) {
-            super(viewService, clusterEventBus, searchDomain, new HashMap<>());
+            this(viewService, clusterEventBus, userService, searchDomain, new HashMap<>());
+        }
+
+        ViewsTestResource(ViewService viewService, ClusterEventBus clusterEventBus, UserService userService, SearchDomain searchDomain, HashMap<String, ViewResolver> viewResolvers) {
+            super(viewService, clusterEventBus, searchDomain, viewResolvers);
             this.userService = userService;
         }
 
@@ -181,5 +187,22 @@ public class ViewsResourceTest {
         final DashboardDeletedEvent dashboardDeletedEvent = eventCaptor.getValue();
 
         assertThat(dashboardDeletedEvent.dashboardId()).isEqualTo("foobar");
+    }
+
+    @Test
+    public void testViewResolver() {
+        final HashMap<String, ViewResolver> viewResolvers = new HashMap<>();
+        final String testViewId = "test.resolved.view.id";
+        when(view.id()).thenReturn(testViewId);
+        viewResolvers.put("", id -> Optional.of(view));
+        final ViewsTestResource testResource = new ViewsTestResource(viewService, clusterEventBus, userService, searchDomain, viewResolvers);
+
+        // Verify that view not found for invalid id.
+        assertThatThrownBy(() -> this.viewsResource.get("invalid", searchUser))
+                .isInstanceOf(NotFoundException.class);
+
+        // Verify that view for valid id is found.
+        when(searchUser.canReadView(any())).thenReturn(true);
+        assertEquals(testViewId, testResource.get(testViewId, searchUser).id());
     }
 }
