@@ -44,7 +44,7 @@ class HttpNotificationForm extends React.Component {
 
   static defaultConfig = {
     url: '',
-  }
+  };
 
   render() {
     const { config, validation } = this.props;

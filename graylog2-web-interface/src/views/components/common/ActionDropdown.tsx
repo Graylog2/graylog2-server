@@ -154,7 +154,7 @@ class ActionDropdown extends React.Component<ActionDropdownProps, ActionDropdown
         ...this.closeOnChildSelect(child, updateDepth + 1),
       }) : child),
     );
-  }
+  };
 
   render() {
     const { children, container, element } = this.props;

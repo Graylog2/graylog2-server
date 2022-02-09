@@ -87,7 +87,7 @@ class TypeAheadInput extends React.Component {
     onSuggestionSelected: () => {},
     suggestions: [],
     suggestionText: undefined,
-  }
+  };
 
   componentDidMount() {
     const { suggestions, displayKey, suggestionText, onTypeaheadLoaded, onSuggestionSelected } = this.props;

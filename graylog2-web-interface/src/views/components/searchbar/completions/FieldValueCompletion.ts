@@ -99,7 +99,7 @@ class FieldValueCompletion implements Completer {
     input: string | number,
     timeRange: TimeRange | NoTimeRangeOverride | undefined,
     streams: Array<string> | undefined,
-  }
+  };
 
   constructor() {
     this.onViewMetadataStoreUpdate(ViewMetadataStore.getInitialState());
@@ -123,7 +123,7 @@ class FieldValueCompletion implements Completer {
     }
 
     return true;
-  }
+  };
 
   alreadyFetchedAllSuggestions(
     input: string | number,
@@ -249,7 +249,7 @@ class FieldValueCompletion implements Completer {
     const currentTokenIsFieldValue = currentToken?.type === 'term' && previousToken?.type === 'keyword';
 
     return currentTokenIsFieldName || currentTokenIsFieldValue;
-  }
+  };
 }
 
 export default FieldValueCompletion;

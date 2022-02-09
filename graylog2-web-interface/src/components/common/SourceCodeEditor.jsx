@@ -122,7 +122,7 @@ class SourceCodeEditor extends React.Component {
     value: PropTypes.string,
     /** Editor width in pixels. Use `Infinity` to indicate the editor should use 100% of its container's width. */
     width: PropTypes.number,
-  }
+  };
 
   static defaultProps = {
     annotations: [],

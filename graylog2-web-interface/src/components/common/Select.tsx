@@ -336,7 +336,7 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
     menuPlacement: PropTypes.oneOf(['top', 'bottom', 'auto']),
     /** Max height of the menu */
     maxMenuHeight: PropTypes.number,
-  }
+  };
 
   static defaultProps = {
     addLabelText: undefined,

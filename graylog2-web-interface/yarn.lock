@@ -4568,9 +4568,9 @@ caniuse-lite@^1.0.30001109, caniuse-lite@^1.0.30001214:
   integrity sha512-/Mqc1oESndUNszJP0kx0UaQU9kEv9nNtJ7Kn8AdA0mNnH8eR1cj0kG+NbNuC1Wq/b21eA8prhKRA3bbkjONegQ==
 
 caniuse-lite@^1.0.30001286, caniuse-lite@^1.0.30001304:
-  version "1.0.30001309"
-  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001309.tgz#e0ee78b9bec0704f67304b00ff3c5c0c768a9f62"
-  integrity sha512-Pl8vfigmBXXq+/yUz1jUwULeq9xhMJznzdc/xwl4WclDAuebcTHVefpz8lE/bMI+UN7TOkSSe7B7RnZd6+dzjA==
+  version "1.0.30001310"
+  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001310.tgz#da02cd07432c9eece6992689d1b84ca18139eea8"
+  integrity sha512-cb9xTV8k9HTIUA3GnPUJCk0meUnrHL5gy5QePfDjxHyNBcnzPzrHFv5GqfP7ue5b1ZyzZL0RJboD6hQlPXjhjg==
 
 canvas-fit@^1.5.0:
   version "1.5.0"
@@ -7915,11 +7915,11 @@ graceful-fs@^4.2.9:
     "@babel/preset-env" "7.16.11"
     "@babel/preset-typescript" "7.16.7"
     create-react-class "15.7.0"
-    eslint-config-graylog "file:packages/eslint-config-graylog"
+    eslint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.3.0-SNAPSHOT-e8012931-de58-46e7-8766-a7564a7a9968-1644394106654/node_modules/eslint-config-graylog"
     formik "2.2.9"
     html-webpack-plugin "^5.5.0"
     javascript-natural-sort "0.7.1"
-    jest-preset-graylog "file:packages/jest-preset-graylog"
+    jest-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.3.0-SNAPSHOT-e8012931-de58-46e7-8766-a7564a7a9968-1644394106654/node_modules/jest-preset-graylog"
     jquery "3.5.1"
     moment "2.29.1"
     moment-timezone "0.5.34"
@@ -7933,7 +7933,7 @@ graceful-fs@^4.2.9:
     react-router-dom "5.3.0"
     reflux "0.2.13"
     styled-components "5.3.3"
-    stylelint-config-graylog "file:packages/stylelint-config-graylog"
+    stylelint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.3.0-SNAPSHOT-e8012931-de58-46e7-8766-a7564a7a9968-1644394106654/node_modules/stylelint-config-graylog"
     typescript "4.5.5"
     webpack "5.68.0"
     webpack-cleanup-plugin "0.5.1"

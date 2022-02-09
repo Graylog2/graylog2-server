@@ -38,7 +38,7 @@ class EditExtractor extends React.Component {
 
   static defaultProps = {
     exampleMessage: undefined,
-  }
+  };
 
   constructor(props) {
     super(props);

@@ -58,7 +58,7 @@ class TypeAheadFieldInput extends React.Component {
     autoFocus: false,
     label: undefined,
     onChange: () => {},
-  }
+  };
 
   componentDidMount() {
     if (this.fieldInput) {
