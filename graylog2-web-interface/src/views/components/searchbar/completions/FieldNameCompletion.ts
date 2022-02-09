@@ -88,8 +88,7 @@ class FieldNameCompletion implements Completer {
     if (this.activeQuery) {
       const currentQueryFields: FieldTypeMappingsList = queryFields.get(this.activeQuery, Immutable.List());
 
-      this.currentQueryFieldNames = currentQueryFields.map((fieldMapping) => fieldMapping.name)
-        .reduce((prev, cur) => ({ ...prev, [cur]: cur }), {});
+      this.currentQueryFieldNames = Object.fromEntries(currentQueryFields.map(({ name }) => [name, name]).toArray());
     }
   };
 
