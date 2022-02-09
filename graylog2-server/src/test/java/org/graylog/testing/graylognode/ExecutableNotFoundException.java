@@ -14,33 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import PropTypes from 'prop-types';
-import numeral from 'numeral';
+package org.graylog.testing.graylognode;
 
-import { Timestamp } from 'components/common';
-
-type Props = {
-  results: {
-    timestamp?: string,
-    duration?: number,
-  },
-};
-
-const SearchResultOverview = ({ results: { timestamp, duration } }: Props) => {
-  if (!timestamp || !duration) {
-    return <i>No query executed yet.</i>;
-  }
-
-  return (
-    <span>
-      Query executed in {numeral(duration).format('0,0')}ms at <Timestamp dateTime={timestamp} />.
-    </span>
-  );
-};
-
-SearchResultOverview.propTypes = {
-  results: PropTypes.object.isRequired,
-};
-
-export default SearchResultOverview;
+public class ExecutableNotFoundException extends RuntimeException {
+    public ExecutableNotFoundException(String msg) {
+        super(msg);
+    }
+}

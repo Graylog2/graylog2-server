@@ -180,7 +180,7 @@ class Events extends React.Component {
           <td>
             {this.renderLinkToEventDefinition(event, eventDefinitionContext)}
           </td>
-          <td><Timestamp dateTime={event.timestamp} format={DateTime.Formats.DATETIME} /></td>
+          <td><Timestamp dateTime={event.timestamp} /></td>
         </CollapsibleTr>
         {expanded.includes(event.id) && (
           <ExpandedTR>

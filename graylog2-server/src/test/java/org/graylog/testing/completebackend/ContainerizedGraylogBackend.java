@@ -19,14 +19,15 @@ package org.graylog.testing.completebackend;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
+import org.graylog.testing.graylognode.ExecutableNotFoundException;
 import org.graylog.testing.graylognode.NodeInstance;
 import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog2.storage.SearchVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Network;
 
 import java.net.URL;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -35,21 +36,32 @@ import java.util.concurrent.Future;
 
 public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(GraylogBackend.class);
-    private final Network network;
-    private final SearchServerInstance searchServer;
-    private final MongoDBInstance mongodb;
-    private final NodeInstance node;
+    private Network network;
+    private SearchServerInstance searchServer;
+    private MongoDBInstance mongodb;
+    private NodeInstance node;
 
-    // Starting ES instance in parallel thread to save time.
-    // MongoDB and the node have to be started in sequence however, because the node might crash,
-    // if a MongoDb instance isn't already present while it's starting up.
-    public static ContainerizedGraylogBackend createStarted(int[] extraPorts, MongodbServer mongoVersion,
-                                                            SearchServerInstanceFactory searchServerInstanceFactory, List<Path> pluginJars, Path mavenProjectDir,
-                                                            List<URL> mongoDBFixtures) {
+    private ContainerizedGraylogBackend() {
+    }
+
+    public static ContainerizedGraylogBackend createStarted(SearchVersion esVersion, MongodbServer mongodbVersion,
+                                                            int[] extraPorts, List<URL> mongoDBFixtures,
+                                                            PluginJarsProvider pluginJarsProvider, MavenProjectDirProvider mavenProjectDirProvider) {
+
+        final ContainerizedGraylogBackend backend = new ContainerizedGraylogBackend();
+        backend.create(esVersion, mongodbVersion, extraPorts, mongoDBFixtures, pluginJarsProvider, mavenProjectDirProvider);
+        return backend;
+    }
+
+    private void create(SearchVersion esVersion, MongodbServer mongodbVersion,
+                        int[] extraPorts, List<URL> mongoDBFixtures,
+                        PluginJarsProvider pluginJarsProvider, MavenProjectDirProvider mavenProjectDirProvider) {
+
+        final SearchServerInstanceFactory searchServerInstanceFactory = new SearchServerInstanceFactoryByVersion(esVersion);
         Network network = Network.newNetwork();
         ExecutorService executor = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("build-es-container-for-api-it").build());
         Future<SearchServerInstance> esFuture = executor.submit(() -> searchServerInstanceFactory.create(network));
-        MongoDBInstance mongoDB = MongoDBInstance.createStartedWithUniqueName(network, Lifecycle.CLASS, mongoVersion);
+        MongoDBInstance mongoDB = MongoDBInstance.createStartedWithUniqueName(network, Lifecycle.CLASS, mongodbVersion);
         mongoDB.dropDatabase();
         mongoDB.importFixtures(mongoDBFixtures);
 
@@ -60,30 +72,24 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
                     network,
                     MongoDBInstance.internalUri(),
                     esInstance.internalUri(),
-                    searchServerInstanceFactory.getVersion(),
+                    esInstance.version(),
                     extraPorts,
-                    pluginJars, mavenProjectDir);
-            final ContainerizedGraylogBackend backend = new ContainerizedGraylogBackend(network, esInstance, mongoDB, node);
+                    pluginJarsProvider, mavenProjectDirProvider);
+            this.network = network;
+            this.searchServer = esInstance;
+            this.mongodb = mongoDB;
+            this.node = node;
 
             // ensure that all containers and networks will be removed after all tests finish
             // We can't close the resources in an afterAll callback, as the instances are cached and reused
             // so we need a solution that will be triggered only once after all test classes
-            Runtime.getRuntime().addShutdownHook(new Thread(backend::close));
-
-            return backend;
-        } catch (InterruptedException | ExecutionException e) {
+            Runtime.getRuntime().addShutdownHook(new Thread(this::close));
+        } catch (InterruptedException | ExecutionException | ExecutableNotFoundException e) {
             LOG.error("Container creation aborted", e);
             throw new RuntimeException(e);
         } finally {
             executor.shutdown();
         }
-    }
-
-    private ContainerizedGraylogBackend(Network network, SearchServerInstance searchServer, MongoDBInstance mongodb, NodeInstance node) {
-        this.network = network;
-        this.searchServer = searchServer;
-        this.mongodb = mongodb;
-        this.node = node;
     }
 
     public void purgeData() {
@@ -116,6 +122,10 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
     @Override
     public int apiPort() {
         return node.apiPort();
+    }
+
+    public void printServerLog() {
+        node.printLog();
     }
 
     @Override
