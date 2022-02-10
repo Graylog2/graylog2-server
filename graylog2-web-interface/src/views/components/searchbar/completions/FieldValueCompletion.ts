@@ -14,20 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as Immutable from 'immutable';
 import { isEqual } from 'lodash';
 
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
-import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
-import type { FieldTypesStoreState, FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
-import { FieldTypesStore } from 'views/stores/FieldTypesStore';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import { onSubmittingTimerange } from 'views/components/TimerangeForForm';
 import { isNoTimeRangeOverride } from 'views/typeGuards/timeRange';
 
-import type { Completer, CompleterContext } from '../SearchBarAutocompletions';
+import type { Completer, CompleterContext, FieldTypes } from '../SearchBarAutocompletions';
 import type { Token, Line, CompletionResult } from '../ace-types';
 
 const SUGGESTIONS_PAGE_SIZE = 50;
@@ -75,24 +71,12 @@ const getFieldNameAndInput = (currentToken: Token | undefined | null, lastToken:
   return {};
 };
 
-const getFieldByName = (fields: FieldTypeMappingsList, fieldName: string) => {
-  return fields.find(({ name }) => name === fieldName);
-};
-
 const isEnumerableField = (field: FieldTypeMapping | undefined) => {
   return field?.type.isEnumerable() ?? false;
 };
 
 class FieldValueCompletion implements Completer {
-  activeQuery: string;
-
-  allFields: FieldTypeMappingsList;
-
-  currentQueryFields: FieldTypeMappingsList;
-
-  fields: FieldTypesStoreState;
-
-  previousSuggestions: undefined | {
+  private previousSuggestions: undefined | {
     furtherSuggestionsCount: number,
     completions: Array<CompletionResult>,
     fieldName: string,
@@ -101,23 +85,16 @@ class FieldValueCompletion implements Completer {
     streams: Array<string> | undefined,
   };
 
-  constructor() {
-    this.onViewMetadataStoreUpdate(ViewMetadataStore.getInitialState());
-    ViewMetadataStore.listen(this.onViewMetadataStoreUpdate);
-
-    this._newFields(FieldTypesStore.getInitialState());
-    FieldTypesStore.listen((newState) => this._newFields(newState));
-  }
-
-  shouldFetchCompletions = (fieldName: string) => {
+  // eslint-disable-next-line class-methods-use-this
+  shouldFetchCompletions = (fieldName: string, fieldTypes: FieldTypes) => {
     if (!fieldName) {
       return false;
     }
 
-    const queryField = getFieldByName(this.currentQueryFields, fieldName);
+    const queryField = fieldTypes?.query[fieldName];
 
     if (!queryField || !isEnumerableField(queryField)) {
-      const allFieldType = getFieldByName(this.allFields, fieldName);
+      const allFieldType = fieldTypes?.all[fieldName];
 
       return isEnumerableField(allFieldType);
     }
@@ -163,10 +140,11 @@ class FieldValueCompletion implements Completer {
     lastToken,
     timeRange,
     streams,
+    fieldTypes,
   }: CompleterContext) => {
     const { fieldName, input } = getFieldNameAndInput(currentToken, lastToken);
 
-    if (!this.shouldFetchCompletions(fieldName)) {
+    if (!this.shouldFetchCompletions(fieldName, fieldTypes)) {
       return [];
     }
 
@@ -212,26 +190,7 @@ class FieldValueCompletion implements Completer {
     });
   };
 
-  _newFields = (fields: FieldTypesStoreState) => {
-    this.fields = fields;
-    const { queryFields, all } = this.fields;
-
-    if (this.activeQuery) {
-      this.currentQueryFields = queryFields.get(this.activeQuery, Immutable.List());
-      this.allFields = all;
-    }
-  };
-
-  onViewMetadataStoreUpdate = (newState: { activeQuery: string }) => {
-    const { activeQuery } = newState;
-
-    this.activeQuery = activeQuery;
-
-    if (this.fields) {
-      this._newFields(this.fields);
-    }
-  };
-
+  // eslint-disable-next-line class-methods-use-this
   shouldShowCompletions = (currentLine: number, lines: Array<Array<Line>>) => {
     const currentLineTokens = lines[currentLine - 1];
     const currentTokenIndex = currentLineTokens.findIndex((token) => token?.start !== undefined);
