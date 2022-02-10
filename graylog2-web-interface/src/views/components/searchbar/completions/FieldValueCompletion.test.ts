@@ -78,22 +78,22 @@ describe('FieldValueCompletion', () => {
     it('returns empty list if inputs are empty', () => {
       const completer = new FieldValueCompletion();
 
-      expect(completer.getCompletions(null, null, '', [], -1, undefined, undefined)).toEqual([]);
+      expect(completer.getCompletions({ currentToken: null, lastToken: null, prefix: '', tokens: [], currentTokenIdx: -1, timeRange: undefined, streams: undefined })).toEqual([]);
     });
 
     it('returns suggestions, when current token is a keyword', async () => {
       const currentToken = createKeywordToken('http_method:');
       const completer = new FieldValueCompletion();
 
-      const suggestions = await completer.getCompletions(
+      const suggestions = await completer.getCompletions({
         currentToken,
-        null,
-        '',
-        [currentToken],
-        0,
-        undefined,
-        undefined,
-      );
+        lastToken: null,
+        prefix: '',
+        tokens: [currentToken],
+        currentTokenIdx: 0,
+        timeRange: undefined,
+        streams: undefined,
+      });
 
       expect(suggestions).toEqual(expectedSuggestions);
     });
@@ -106,15 +106,15 @@ describe('FieldValueCompletion', () => {
       };
       const completer = new FieldValueCompletion();
 
-      const suggestions = await completer.getCompletions(
+      const suggestions = await completer.getCompletions({
         currentToken,
         lastToken,
-        'P',
-        [lastToken, currentToken],
-        1,
-        undefined,
-        undefined,
-      );
+        prefix: 'P',
+        tokens: [lastToken, currentToken],
+        currentTokenIdx: 1,
+        timeRange: undefined,
+        streams: undefined,
+      });
 
       expect(suggestions).toEqual(expectedSuggestions);
     });
@@ -129,15 +129,15 @@ describe('FieldValueCompletion', () => {
 
       const completer = new FieldValueCompletion();
 
-      const suggestions = await completer.getCompletions(
+      const suggestions = await completer.getCompletions({
         currentToken,
-        null,
-        '',
-        [currentToken],
-        0,
-        undefined,
-        undefined,
-      );
+        lastToken: null,
+        prefix: '',
+        tokens: [currentToken],
+        currentTokenIdx: 0,
+        timeRange: undefined,
+        streams: undefined,
+      });
 
       expect(suggestions).toEqual(expectedSuggestions);
     });
@@ -146,15 +146,15 @@ describe('FieldValueCompletion', () => {
       const currentToken = createCurrentToken('term', 'http_method', 0, 0);
       const completer = new FieldValueCompletion();
 
-      const suggestions = await completer.getCompletions(
+      const suggestions = await completer.getCompletions({
         currentToken,
-        null,
-        '',
-        [currentToken],
-        0,
-        undefined,
-        undefined,
-      );
+        lastToken: null,
+        prefix: '',
+        tokens: [currentToken],
+        currentTokenIdx: 0,
+        timeRange: undefined,
+        streams: undefined,
+      });
 
       expect(suggestions).toEqual([]);
     });
@@ -168,15 +168,15 @@ describe('FieldValueCompletion', () => {
       const currentToken = createKeywordToken('unknown_field:');
       const completer = new FieldValueCompletion();
 
-      const suggestions = await completer.getCompletions(
+      const suggestions = await completer.getCompletions({
         currentToken,
-        null,
-        '',
-        [currentToken],
-        0,
-        undefined,
-        undefined,
-      );
+        lastToken: null,
+        prefix: '',
+        tokens: [currentToken],
+        currentTokenIdx: 0,
+        timeRange: undefined,
+        streams: undefined,
+      });
 
       expect(suggestions).toEqual([]);
     });
@@ -191,15 +191,15 @@ describe('FieldValueCompletion', () => {
 
       const completer = new FieldValueCompletion();
 
-      const suggestions = await completer.getCompletions(
+      const suggestions = await completer.getCompletions({
         currentToken,
-        null,
-        '',
-        [currentToken],
-        0,
-        undefined,
-        undefined,
-      );
+        lastToken: null,
+        prefix: '',
+        tokens: [currentToken],
+        currentTokenIdx: 0,
+        timeRange: undefined,
+        streams: undefined,
+      });
 
       expect(suggestions).toEqual([]);
     });
@@ -222,15 +222,15 @@ describe('FieldValueCompletion', () => {
 
       const completer = new FieldValueCompletion();
 
-      const suggestions = await completer.getCompletions(
+      const suggestions = await completer.getCompletions({
         currentToken,
         lastToken,
-        'PSOT',
-        [lastToken, currentToken],
-        1,
-        undefined,
-        undefined,
-      );
+        prefix: 'PSOT',
+        tokens: [lastToken, currentToken],
+        currentTokenIdx: 1,
+        timeRange: undefined,
+        streams: undefined,
+      });
 
       const expectedCorrections = [
         { name: 'POST', value: 'POST', caption: 'POST ⭢ PSOT', score: 300, meta: '300 hits' },
@@ -266,15 +266,15 @@ describe('FieldValueCompletion', () => {
 
         const completer = new FieldValueCompletion();
 
-        const firstSuggestions = await completer.getCompletions(
+        const firstSuggestions = await completer.getCompletions({
           currentToken,
           lastToken,
-          'a',
-          [lastToken, currentToken],
-          1,
-          undefined,
-          undefined,
-        );
+          prefix: 'a',
+          tokens: [lastToken, currentToken],
+          currentTokenIdx: 1,
+          timeRange: undefined,
+          streams: undefined,
+        });
 
         expect(firstSuggestions).toEqual(expectedFirstSuggestions);
 
@@ -289,15 +289,15 @@ describe('FieldValueCompletion', () => {
         };
         asMock(fetch).mockReturnValue(Promise.resolve(secondResponse));
 
-        const secondSuggestions = await completer.getCompletions(
+        const secondSuggestions = await completer.getCompletions({
           currentToken,
           lastToken,
-          'ac',
-          [lastToken, currentToken],
-          1,
-          undefined,
-          undefined,
-        );
+          prefix: 'ac',
+          tokens: [lastToken, currentToken],
+          currentTokenIdx: 1,
+          timeRange: undefined,
+          streams: undefined,
+        });
 
         expect(secondSuggestions).toEqual([
           { name: 'action3', value: 'action3', caption: 'action3', score: 200, meta: '200 hits' },
@@ -310,27 +310,27 @@ describe('FieldValueCompletion', () => {
 
         const completer = new FieldValueCompletion();
 
-        const firstSuggestions = await completer.getCompletions(
+        const firstSuggestions = await completer.getCompletions({
           currentToken,
           lastToken,
-          'a',
-          [lastToken, currentToken],
-          1,
-          undefined,
-          undefined,
-        );
+          prefix: 'a',
+          tokens: [lastToken, currentToken],
+          currentTokenIdx: 1,
+          timeRange: undefined,
+          streams: undefined,
+        });
 
         expect(firstSuggestions).toEqual(expectedFirstSuggestions);
 
-        const secondSuggestions = await completer.getCompletions(
+        const secondSuggestions = await completer.getCompletions({
           currentToken,
           lastToken,
-          'ac',
-          [lastToken, currentToken],
-          1,
-          undefined,
-          undefined,
-        );
+          prefix: 'ac',
+          tokens: [lastToken, currentToken],
+          currentTokenIdx: 1,
+          timeRange: undefined,
+          streams: undefined,
+        });
 
         expect(secondSuggestions).toEqual(expectedFirstSuggestions);
       });

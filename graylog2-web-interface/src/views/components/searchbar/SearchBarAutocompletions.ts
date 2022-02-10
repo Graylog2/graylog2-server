@@ -29,16 +29,18 @@ import type {
   Line,
 } from './ace-types';
 
+export type CompleterContext = Readonly<{
+  currentToken: Token | undefined | null,
+  lastToken: Token | undefined | null,
+  prefix: string,
+  tokens: Array<Token>,
+  currentTokenIdx: number,
+  timeRange?: TimeRange | NoTimeRangeOverride,
+  streams?: Array<string>
+}>;
+
 export interface Completer {
-  getCompletions(
-    currentToken: Token | undefined | null,
-    lastToken: Token | undefined | null,
-    prefix: string,
-    tokens: Array<Token>,
-    currentTokenIdx: number,
-    timeRange?: TimeRange | NoTimeRangeOverride,
-    streams?: Array<string>
-  ): Array<CompletionResult> | Promise<Array<CompletionResult>>;
+  getCompletions(context: CompleterContext): Array<CompletionResult> | Promise<Array<CompletionResult>>;
   shouldShowCompletions?: (currentLine: number, lines: Array<Array<Line>>) => boolean;
 }
 
@@ -54,7 +56,7 @@ export default class SearchBarAutoCompletions implements AutoCompleter {
 
   streams: Array<string>;
 
-  constructor(completers: Array<Completer> = [], timeRange?: TimeRange | NoTimeRangeOverride | undefined, streams?: Array<string>) {
+  constructor(completers: Array<Completer>, timeRange?: TimeRange | NoTimeRangeOverride | undefined, streams?: Array<string>) {
     this.completers = completers;
     this.timeRange = timeRange;
     this.streams = streams;
@@ -73,7 +75,7 @@ export default class SearchBarAutoCompletions implements AutoCompleter {
       this.completers
         .map(async (completer) => {
           try {
-            return await completer.getCompletions(currentToken, lastToken, prefix, tokens, currentTokenIdx, this.timeRange, this.streams);
+            return await completer.getCompletions({ currentToken, lastToken, prefix, tokens, currentTokenIdx, timeRange: this.timeRange, streams: this.streams });
           } catch (e) {
             onCompleterError(e);
           }

@@ -27,7 +27,7 @@ import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import { onSubmittingTimerange } from 'views/components/TimerangeForForm';
 import { isNoTimeRangeOverride } from 'views/typeGuards/timeRange';
 
-import type { Completer } from '../SearchBarAutocompletions';
+import type { Completer, CompleterContext } from '../SearchBarAutocompletions';
 import type { Token, Line, CompletionResult } from '../ace-types';
 
 const SUGGESTIONS_PAGE_SIZE = 50;
@@ -158,15 +158,12 @@ class FieldValueCompletion implements Completer {
     return [];
   }
 
-  getCompletions = (
-    currentToken: Token | undefined | null,
-    lastToken: Token | undefined | null,
-    prefix: string,
-    tokens: Array<Token>,
-    currentTokenIdx: number,
-    timeRange: TimeRange | NoTimeRangeOverride | undefined,
-    streams: Array<string> | undefined,
-  ) => {
+  getCompletions = ({
+    currentToken,
+    lastToken,
+    timeRange,
+    streams,
+  }: CompleterContext) => {
     const { fieldName, input } = getFieldNameAndInput(currentToken, lastToken);
 
     if (!this.shouldFetchCompletions(fieldName)) {

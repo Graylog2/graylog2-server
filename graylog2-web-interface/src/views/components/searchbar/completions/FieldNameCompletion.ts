@@ -21,7 +21,7 @@ import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import type { FieldTypeMappingsList, FieldTypesStoreState } from 'views/stores/FieldTypesStore';
 
 import type { CompletionResult, Token } from '../ace-types';
-import type { Completer } from '../SearchBarAutocompletions';
+import type { Completer, CompleterContext } from '../SearchBarAutocompletions';
 
 type Suggestion = Readonly<{
   name: string,
@@ -104,7 +104,7 @@ class FieldNameCompletion implements Completer {
     }
   };
 
-  getCompletions = (currentToken: Token | undefined | null, lastToken: Token | undefined | null, prefix: string) => {
+  getCompletions = ({ currentToken, lastToken, prefix }: CompleterContext) => {
     if (isFollowingFieldName(lastToken) && !isFollowingExistsOperator(lastToken)) {
       return [];
     }
