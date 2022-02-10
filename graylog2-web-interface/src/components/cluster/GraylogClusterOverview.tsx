@@ -15,8 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 /* eslint-disable react/no-find-dom-node */
-import NumberUtils from 'util/NumberUtils';
-import EventHandlersThrottler from 'util/EventHandlersThrottler';
 
 import * as React from 'react';
 import { useState, useEffect, useRef } from 'react';
@@ -26,6 +24,8 @@ import styled, { css } from 'styled-components';
 import type { DefaultTheme } from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import EventHandlersThrottler from 'util/EventHandlersThrottler';
+import NumberUtils from 'util/NumberUtils';
 import { useStore } from 'stores/connect';
 import { Col, Row } from 'components/bootstrap';
 import { Spinner } from 'components/common';
