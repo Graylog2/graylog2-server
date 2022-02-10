@@ -17,6 +17,7 @@
 import { sortBy, uniqBy } from 'lodash';
 
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
+import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 
 import type {
   Editor,
@@ -29,6 +30,9 @@ import type {
   Line,
 } from './ace-types';
 
+export type FieldTypes = { all: FieldIndex, query: FieldIndex };
+type FieldIndex = { [fieldName: string]: FieldTypeMapping };
+
 export type CompleterContext = Readonly<{
   currentToken: Token | undefined | null,
   lastToken: Token | undefined | null,
@@ -37,6 +41,7 @@ export type CompleterContext = Readonly<{
   currentTokenIdx: number,
   timeRange?: TimeRange | NoTimeRangeOverride,
   streams?: Array<string>
+  fieldTypes?: FieldTypes,
 }>;
 
 export interface Completer {
@@ -50,16 +55,19 @@ const onCompleterError = (error: Error) => {
 };
 
 export default class SearchBarAutoCompletions implements AutoCompleter {
-  completers: Array<Completer>;
+  private readonly completers: Array<Completer>;
 
-  timeRange: TimeRange | NoTimeRangeOverride | undefined;
+  private readonly timeRange: TimeRange | NoTimeRangeOverride | undefined;
 
-  streams: Array<string>;
+  private readonly streams: Array<string>;
 
-  constructor(completers: Array<Completer>, timeRange?: TimeRange | NoTimeRangeOverride | undefined, streams?: Array<string>) {
+  private readonly fieldTypes: FieldTypes;
+
+  constructor(completers: Array<Completer>, timeRange: TimeRange | NoTimeRangeOverride | undefined, streams: Array<string>, fieldTypes: FieldTypes) {
     this.completers = completers;
     this.timeRange = timeRange;
     this.streams = streams;
+    this.fieldTypes = fieldTypes;
   }
 
   getCompletions = async (editor: Editor, session: Session, pos: Position, prefix: string, callback: ResultsCallback) => {
@@ -75,7 +83,7 @@ export default class SearchBarAutoCompletions implements AutoCompleter {
       this.completers
         .map(async (completer) => {
           try {
-            return await completer.getCompletions({ currentToken, lastToken, prefix, tokens, currentTokenIdx, timeRange: this.timeRange, streams: this.streams });
+            return await completer.getCompletions({ currentToken, lastToken, prefix, tokens, currentTokenIdx, timeRange: this.timeRange, streams: this.streams, fieldTypes: this.fieldTypes });
           } catch (e) {
             onCompleterError(e);
           }

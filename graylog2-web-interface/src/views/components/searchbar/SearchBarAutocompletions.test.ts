@@ -14,6 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { DEFAULT_TIMERANGE } from 'views/Constants';
+
 import type { Completer } from './SearchBarAutocompletions';
 import SearchBarAutoCompletions from './SearchBarAutocompletions';
 
@@ -53,10 +55,12 @@ const EditorMock = {
   },
 };
 
+const EMPTY_FIELDTYPES = { all: {}, query: {} };
+
 describe('SearchAutoCompletions', () => {
   describe('getCompletions', () => {
     it('should return completions based on provided Completers', async () => {
-      const searchBarAutoCompletions = new SearchBarAutoCompletions([new SimpleCompleter()]);
+      const searchBarAutoCompletions = new SearchBarAutoCompletions([new SimpleCompleter()], DEFAULT_TIMERANGE, [], EMPTY_FIELDTYPES);
 
       const callback = jest.fn();
 
@@ -73,7 +77,7 @@ describe('SearchAutoCompletions', () => {
     });
 
     it('should support Completers which provide the completions asynchronously', async () => {
-      const searchBarAutoCompletions = new SearchBarAutoCompletions([new SimpleCompleter(), new AsyncCompleter()]);
+      const searchBarAutoCompletions = new SearchBarAutoCompletions([new SimpleCompleter(), new AsyncCompleter()], DEFAULT_TIMERANGE, [], EMPTY_FIELDTYPES);
 
       const callback = jest.fn();
 
@@ -92,7 +96,7 @@ describe('SearchAutoCompletions', () => {
 
   describe('shouldShowCompletions', () => {
     it('should not show completions manually when no Completer provides `shouldShowCompletions`', async () => {
-      const searchBarAutoCompletions = new SearchBarAutoCompletions([new SimpleCompleter()]);
+      const searchBarAutoCompletions = new SearchBarAutoCompletions([new SimpleCompleter()], DEFAULT_TIMERANGE, [], EMPTY_FIELDTYPES);
 
       const result = searchBarAutoCompletions.shouldShowCompletions(1, [[{ type: 'keyword', value: 'http_method:', index: 0, start: 0 }], null]);
 
@@ -106,7 +110,7 @@ describe('SearchAutoCompletions', () => {
         shouldShowCompletions = () => false;
       }
 
-      const searchBarAutoCompletions = new SearchBarAutoCompletions([new ExampleCompleter()]);
+      const searchBarAutoCompletions = new SearchBarAutoCompletions([new ExampleCompleter()], DEFAULT_TIMERANGE, [], EMPTY_FIELDTYPES);
       const result = searchBarAutoCompletions.shouldShowCompletions(1, [[{ type: 'keyword', value: 'http_method:', index: 0, start: 0 }], null]);
 
       expect(result).toBe(false);
@@ -121,7 +125,7 @@ describe('SearchAutoCompletions', () => {
         shouldShowCompletions = mockShouldShowCompletions;
       }
 
-      const searchBarAutoCompletions = new SearchBarAutoCompletions([new ExampleCompleter()]);
+      const searchBarAutoCompletions = new SearchBarAutoCompletions([new ExampleCompleter()], DEFAULT_TIMERANGE, [], EMPTY_FIELDTYPES);
       const result = searchBarAutoCompletions.shouldShowCompletions(1, [[{ type: 'keyword', value: 'http_method:', index: 0, start: 0 }], null]);
 
       expect(mockShouldShowCompletions).toHaveBeenCalledTimes(1);
