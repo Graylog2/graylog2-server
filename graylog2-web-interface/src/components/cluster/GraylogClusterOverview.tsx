@@ -15,18 +15,20 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 /* eslint-disable react/no-find-dom-node */
+import NumberUtils from 'util/NumberUtils';
+import EventHandlersThrottler from 'util/EventHandlersThrottler';
+
 import * as React from 'react';
 import { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 import styled, { css } from 'styled-components';
 import type { DefaultTheme } from 'styled-components';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { useStore } from 'stores/connect';
 import { Col, Row } from 'components/bootstrap';
 import { Spinner } from 'components/common';
-import NumberUtils from 'util/NumberUtils';
-import EventHandlersThrottler from 'util/EventHandlersThrottler';
 import { ClusterTrafficActions, ClusterTrafficStore } from 'stores/cluster/ClusterTrafficStore';
 import { NodesStore } from 'stores/nodes/NodesStore';
 
@@ -53,6 +55,7 @@ const GraylogClusterOverview = ({ layout, children }: Props) => {
   const [graphWidth, setGraphWidth] = useState(600);
   const eventThrottler = useRef(new EventHandlersThrottler());
   const containerRef = useRef(null);
+  const licensePlugin = PluginStore.exports('license');
 
   useEffect(() => {
     const _resizeGraphs = () => {
@@ -97,6 +100,7 @@ const GraylogClusterOverview = ({ layout, children }: Props) => {
   };
 
   const renderTrafficGraph = () => {
+    const TrafficGraphComponent = licensePlugin[0]?.EnterpriseTrafficGraph || TrafficGraph;
     let sumOutput = null;
     let trafficGraph = <Spinner />;
 
@@ -106,8 +110,10 @@ const GraylogClusterOverview = ({ layout, children }: Props) => {
       sumOutput = <small>Last 30 days: {NumberUtils.formatBytes(bytesOut)}</small>;
 
       trafficGraph = (
-        <TrafficGraph traffic={traffic.output}
-                      width={graphWidth} />
+        <TrafficGraphComponent traffic={traffic.output}
+                               from={traffic.from}
+                               to={traffic.to}
+                               width={graphWidth} />
       );
     }
 
