@@ -16,23 +16,19 @@
  */
 import * as React from 'react';
 import { render } from 'wrappedTestingLibrary';
-import { Map, List } from 'immutable';
+import * as Immutable from 'immutable';
 
 import asMock from 'helpers/mocking/AsMock';
 import { simpleFields, simpleQueryFields } from 'fixtures/fields';
-import { FieldTypesStore } from 'views/stores/FieldTypesStore';
+import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
+import Query, { filtersForQuery } from 'views/logic/queries/Query';
+import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
 
 import FieldTypesContext from './FieldTypesContext';
 import DefaultFieldTypesProvider from './DefaultFieldTypesProvider';
 
-const mockEmptyStore = { all: List(), queryFields: Map() };
-
-jest.mock('views/stores/FieldTypesStore', () => ({
-  FieldTypesStore: {
-    listen: jest.fn(),
-    getInitialState: jest.fn(() => mockEmptyStore),
-  },
-}));
+jest.mock('views/logic/queries/useCurrentQuery');
+jest.mock('views/logic/fieldtypes/useFieldTypes');
 
 describe('DefaultFieldTypesProvider', () => {
   const renderSUT = () => {
@@ -50,19 +46,28 @@ describe('DefaultFieldTypesProvider', () => {
   };
 
   it('provides no field types with empty store', () => {
-    asMock(FieldTypesStore.getInitialState).mockReturnValue(undefined);
+    asMock(useCurrentQuery).mockReturnValue(Query.builder().id('foobar').build());
+    asMock(useFieldTypes).mockReturnValue({ data: undefined });
+
     const consume = renderSUT();
 
-    expect(consume).toHaveBeenCalledWith(undefined);
+    expect(consume).toHaveBeenCalledWith({ all: Immutable.List(), queryFields: Immutable.Map({ foobar: Immutable.List() }) });
   });
 
   it('provides field types of field types store', () => {
-    const fieldStoreState = { all: simpleFields(), queryFields: simpleQueryFields('queryId') };
+    asMock(useCurrentQuery).mockReturnValue(Query.builder()
+      .id('queryId')
+      .filter(filtersForQuery(['dummyStream']))
+      .build());
 
-    asMock(FieldTypesStore.getInitialState).mockReturnValue(fieldStoreState);
+    asMock(useFieldTypes).mockImplementation((streams) => (streams.length === 0
+      ? { data: simpleFields().toArray() }
+      : { data: simpleQueryFields('foo').get('foo').toArray() }));
 
     const consume = renderSUT();
 
-    expect(consume).toHaveBeenCalledWith(fieldStoreState);
+    const fieldTypes = { all: simpleFields(), queryFields: simpleQueryFields('queryId') };
+
+    expect(consume).toHaveBeenCalledWith(fieldTypes);
   });
 });
