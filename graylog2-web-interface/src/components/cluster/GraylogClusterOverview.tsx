@@ -50,7 +50,7 @@ const StyledH3 = styled.h3(({ theme }: { theme: DefaultTheme }) => css`
 `);
 
 const GraylogClusterOverview = ({ layout, children }: Props) => {
-  const { nodes } = useStore(NodesStore);
+  const nodes = useStore(NodesStore);
   const { traffic } = useStore(ClusterTrafficStore);
   const [graphWidth, setGraphWidth] = useState(600);
   const eventThrottler = useRef(new EventHandlersThrottler());
