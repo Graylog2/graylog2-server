@@ -24,6 +24,7 @@ import { Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/bootstr
 // TODO: This should be moved to a general place outside of `views`
 import { defaultCompare } from 'views/logic/DefaultCompare';
 import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
+import { ALL_MESSAGES_TIMERANGE } from 'views/Constants';
 
 import AggregationConditionsForm from './AggregationConditionsForm';
 
@@ -46,7 +47,7 @@ type Props = {
 };
 
 const AggregationForm = ({ aggregationFunctions, eventDefinition, validation, onChange }: Props) => {
-  const { data: allFieldTypes } = useFieldTypes(eventDefinition?.config?.streams ?? [], { type: 'relative', range: 0 });
+  const { data: allFieldTypes } = useFieldTypes(eventDefinition?.config?.streams ?? [], ALL_MESSAGES_TIMERANGE);
   // Memoize function to only format fields when they change. Use joined fieldNames as cache key.
   const formattedFields = useMemo(() => (allFieldTypes ?? [])
     .sort((ftA, ftB) => defaultCompare(ftA.name, ftB.name))

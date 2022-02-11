@@ -24,6 +24,7 @@ import { useStore } from 'stores/connect';
 import { isPermitted } from 'util/PermissionsMixin';
 import { LookupTablesActions, LookupTablesStore } from 'stores/lookup-tables/LookupTablesStore';
 import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
+import { ALL_MESSAGES_TIMERANGE } from 'views/Constants';
 
 import LookupTableFieldValueProviderForm from './LookupTableFieldValueProviderForm';
 
@@ -41,7 +42,7 @@ type Props = {
 }
 
 const LookupTableFieldValueProviderFormContainer = ({ currentUser, ...otherProps }: Props) => {
-  const { data: fieldTypes } = useFieldTypes([], { type: 'relative', range: 0 });
+  const { data: fieldTypes } = useFieldTypes([], ALL_MESSAGES_TIMERANGE);
   const lookupTables = useStore(LookupTablesStore);
 
   useEffect(() => {
