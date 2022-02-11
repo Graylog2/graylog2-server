@@ -25,8 +25,6 @@ import ChartActionHandler from './ChartActionHandler';
 import FieldType, { FieldTypes } from '../fieldtypes/FieldType';
 import { createElasticsearchQueryString } from '../queries/Query';
 
-jest.mock('views/stores/FieldTypesStore', () => ({ FieldTypesStore: { getInitialState: jest.fn() } }));
-
 jest.mock('views/stores/WidgetStore', () => ({
   WidgetActions: {
     create: jest.fn((widget: Widget) => Promise.resolve(widget)),

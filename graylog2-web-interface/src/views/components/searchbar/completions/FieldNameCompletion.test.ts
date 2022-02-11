@@ -14,24 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { StoreMock as MockStore } from 'helpers/mocking';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import type { CompletionResult } from 'views/components/searchbar/ace-types';
 
 import FieldNameCompletion from './FieldNameCompletion';
-
-jest.mock('views/stores/FieldTypesStore', () => ({
-  FieldTypesStore: MockStore(
-    ['getInitialState', jest.fn(() => ({ all: [], queryFields: { get: () => [] } }))],
-  ),
-}));
-
-jest.mock('views/stores/ViewMetadataStore', () => ({
-  ViewMetadataStore: MockStore(
-    ['getInitialState', jest.fn(() => ({ activeQuery: 'query1' }))],
-  ),
-}));
 
 const _createField = (name: string) => FieldTypeMapping.create(name, FieldType.create('string', []));
 

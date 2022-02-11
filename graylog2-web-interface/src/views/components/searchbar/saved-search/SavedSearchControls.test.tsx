@@ -40,7 +40,6 @@ import SavedSearchControls from './SavedSearchControls';
 
 jest.mock('routing/Routes', () => ({ pluginRoute: (x) => x }));
 
-jest.mock('views/stores/FieldTypesStore', () => ({}));
 jest.mock('util/History');
 
 describe('SavedSearchControls', () => {
