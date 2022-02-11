@@ -48,11 +48,13 @@ import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.NotFoundException;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
@@ -104,7 +106,7 @@ public class ViewsResourceTest {
             this(viewService, clusterEventBus, userService, searchDomain, new HashMap<>());
         }
 
-        ViewsTestResource(ViewService viewService, ClusterEventBus clusterEventBus, UserService userService, SearchDomain searchDomain, HashMap<String, ViewResolver> viewResolvers) {
+        ViewsTestResource(ViewService viewService, ClusterEventBus clusterEventBus, UserService userService, SearchDomain searchDomain, Map<String, ViewResolver> viewResolvers) {
             super(viewService, clusterEventBus, searchDomain, viewResolvers);
             this.userService = userService;
         }
@@ -192,24 +194,22 @@ public class ViewsResourceTest {
     @Test
     public void testViewResolver() {
         // Setup
-        final HashMap<String, ViewResolver> viewResolvers = new HashMap<>();
         final String viewId = "test-view";
         when(view.id()).thenReturn(viewId);
         final String resolverName = "test-resolver";
+        final Map<String, ViewResolver> viewResolvers = new HashMap<>();
         viewResolvers.put(resolverName, id -> id.equals(viewId) ? Optional.of(view) : Optional.empty());
-        final ViewsTestResource testResource = new ViewsTestResource(viewService, clusterEventBus, userService, searchDomain, viewResolvers);
+        final ViewsResource testResource = new ViewsTestResource(viewService, clusterEventBus, userService, searchDomain, viewResolvers);
 
         // Verify that view for valid id is found.
         when(searchUser.canReadView(any())).thenReturn(true);
         assertEquals(viewId, testResource.get(resolverName + ":" + viewId, searchUser).id());
 
 
-        // Verify error paths.
-        assertThatThrownBy(() -> testResource.get("invalid-resolver-name:" + viewId, searchUser))
-                .isExactlyInstanceOf(NotFoundException.class)
-                .hasMessageContaining("Failed to find view resolver");
-        assertThatThrownBy(() -> testResource.get(resolverName + ":invalid-view-id", searchUser))
-                .isExactlyInstanceOf(NotFoundException.class)
-                .hasMessageContaining("Failed to resolve view");
+        // Verify error paths for invalid resolver names and view ids.
+        assertThrows(NotFoundException.class,
+                () -> testResource.get("invalid-resolver-name:" + viewId, searchUser));
+        assertThrows(NotFoundException.class,
+                () -> testResource.get(resolverName + ":invalid-view-id", searchUser));
     }
 }
