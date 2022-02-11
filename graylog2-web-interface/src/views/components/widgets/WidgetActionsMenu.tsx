@@ -139,7 +139,7 @@ const _onDelete = async (widget: Widget, view: View, title: string) => {
       const result = await hook(widget, view, title);
 
       if (result !== null) {
-        return result === true ? WidgetActions.remove(widget.id) : Promise.reject();
+        return result === true ? WidgetActions.remove(widget.id) : Promise.resolve();
       }
     } catch (e) {
       // eslint-disable-next-line no-console
@@ -147,7 +147,7 @@ const _onDelete = async (widget: Widget, view: View, title: string) => {
     }
   }
 
-  return Promise.reject();
+  return Promise.resolve();
 };
 
 const _onDuplicate = (widgetId: string, setFocusWidget: (widgetId: string) => void, title: string) => {
@@ -180,10 +180,11 @@ const WidgetActionsMenu = ({
   const [showExport, setShowExport] = useState(false);
   const [showMoveWidgetToTab, setShowMoveWidgetToTab] = useState(false);
 
-  const onDuplicate = () => _onDuplicate(widget.id, setWidgetFocusing, title);
+  const onDuplicate = useCallback(() => _onDuplicate(widget.id, setWidgetFocusing, title), [setWidgetFocusing, title, widget.id]);
   const onCopyToDashboard = useCallback((widgetId: string, dashboardId: string) => _onCopyToDashboard(view, setShowCopyToDashboard, widgetId, dashboardId), [view]);
   const onMoveWidgetToTab = useCallback((widgetId: string, queryId: string, keepCopy: boolean) => _onMoveWidgetToTab(view, setShowMoveWidgetToTab, widgetId, queryId, keepCopy), [view]);
   const onDelete = useCallback(() => _onDelete(widget, view?.view, title), [title, view?.view, widget]);
+  const focusWidget = useCallback(() => setWidgetFocusing(widget.id), [widget.id]);
 
   return (
     <Container>
@@ -194,7 +195,7 @@ const WidgetActionsMenu = ({
         {isFocused && (
           <IconButton name="compress-arrows-alt"
                       title="Un-focus widget"
-                      onClick={() => unsetWidgetFocusing()} />
+                      onClick={unsetWidgetFocusing} />
         )}
         {!isFocused && (
           <>
@@ -204,7 +205,7 @@ const WidgetActionsMenu = ({
                                      position={position} />
             <IconButton name="expand-arrows-alt"
                         title="Focus this widget"
-                        onClick={() => setWidgetFocusing(widget.id)} />
+                        onClick={focusWidget} />
           </>
         )}
 
