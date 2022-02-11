@@ -19,6 +19,12 @@ import { render, screen } from 'wrappedTestingLibrary';
 
 import BrowserTime from './BrowserTime';
 
+const mockedUnixTime = 1577836800000; // 2020-01-01 00:00:00.000
+
+jest.useFakeTimers()
+  // @ts-expect-error
+  .setSystemTime(mockedUnixTime);
+
 jest.mock('util/DateTime', () => {
   const DateTime = jest.requireActual('util/DateTime');
   DateTime.getBrowserTimezone('America/Chicago');
@@ -32,7 +38,7 @@ describe('BrowserTime', () => {
       <BrowserTime dateTime="2020-01-01T10:00:00.000Z" />,
     );
 
-    expect(screen.getByText('2020-01-01 04:00:00')).toBeInTheDocument();
+    expect(screen.getByText('2019-12-31 18:00:00')).toBeInTheDocument();
   });
 
   it('should display browser time in a specific format', () => {
@@ -41,5 +47,23 @@ describe('BrowserTime', () => {
     );
 
     expect(screen.getByText('2020-01-01 04:00:00 -06:00')).toBeInTheDocument();
+  });
+
+  it('should display current browser time, when date time is not defined', () => {
+    render(<BrowserTime />);
+
+    expect(screen.getByText('2019-12-31 18:00:00')).toBeInTheDocument();
+  });
+
+  it('should display current browser time, when date time is undefined', () => {
+    render(<BrowserTime dateTime={undefined} />);
+
+    expect(screen.getByText('2019-12-31 18:00:00')).toBeInTheDocument();
+  });
+
+  it('should display current browser time, when date time is null', () => {
+    render(<BrowserTime dateTime={null} />);
+
+    expect(screen.getByText('2019-12-31 18:00:00')).toBeInTheDocument();
   });
 });
