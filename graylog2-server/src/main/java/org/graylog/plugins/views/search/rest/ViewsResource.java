@@ -30,6 +30,7 @@ import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewResolver;
+import org.graylog.plugins.views.search.views.ViewResolverDecoder;
 import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.WidgetDTO;
 import org.graylog.security.UserContext;
@@ -45,6 +46,8 @@ import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -67,7 +70,6 @@ import javax.ws.rs.core.MediaType;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -78,6 +80,7 @@ import static java.util.Locale.ENGLISH;
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
 public class ViewsResource extends RestResource implements PluginRestResource {
+    private static final Logger LOG = LoggerFactory.getLogger(ViewsResource.class);
     private static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
             .put("id", SearchQueryField.create(ViewDTO.FIELD_ID))
             .put("title", SearchQueryField.create(ViewDTO.FIELD_TITLE))
@@ -146,7 +149,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
 
         // Attempt to resolve the view from optional view resolvers before using the default database lookup.
         // The view resolvers must be used first, because the ID may not be a valid hex ID string.
-        ViewDTO view = resolveView(id).orElseGet(() -> loadView(id));
+        ViewDTO view = resolveView(id);
         if (searchUser.canReadView(view)) {
             return view;
         }
@@ -155,19 +158,26 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     }
 
     /**
-     * Attempts to resolve a view by its id from any optional provided view resolvers.
+     * Resolve (find) view from either the corresponding view resolver, or from the database.
      *
-     * @param id The id of a view.
+     * @param id The id of a view. If an ID matching the resolver format is provided (e.g. resolver_name:id)
+     *           then a view will be looked up from the corresponding resolver, otherwise, it will be looked
+     *           up in the database.
      * @return An optional view.
      */
-    private Optional<ViewDTO> resolveView(String id) {
-        for (ViewResolver resolver : viewResolvers.values()) {
-            final Optional<ViewDTO> optionalDto = resolver.get(id);
-            if (optionalDto.isPresent()) {
-                return optionalDto;
+    private ViewDTO resolveView(String id) {
+        final ViewResolverDecoder decoder = new ViewResolverDecoder(id);
+        if (decoder.isResolverId()) {
+            final ViewResolver viewResolver = viewResolvers.get(decoder.getResolverName());
+            if (viewResolver != null) {
+                return viewResolver.get(decoder.getViewId())
+                        .orElseThrow(() -> new NotFoundException("Failed to resolve view:" + id));
+            } else {
+                throw new NotFoundException("Failed to find view resolver: " + decoder.getResolverName());
             }
+        } else {
+            return loadView(id);
         }
-        return Optional.empty();
     }
 
 
